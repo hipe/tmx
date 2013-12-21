@@ -164,7 +164,7 @@ module Skylab::MetaHell
     Levenshtein_default_proc = Levenshtein_default_proc_.curry[ A_HANDFUL__ ]
 
     # `seeded_function_chain` - given a stack of functions and one seed value,
-    # resolve one result.. fuller description at [#mh-026].
+    # resolve one result.. fuller description at [#026].
     #
     # opaque but comprehensive example:
     #

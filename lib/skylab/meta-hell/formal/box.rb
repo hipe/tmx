@@ -367,7 +367,7 @@ module Skylab::MetaHell
       base_init(* base_args )
       nil
     end
-                                  # (base_args/base_init tracked by [#mh-021])
+                                  # (base_args/base_init tracked by [#021])
     def base_args                 # for initting duplicates that may not have
       [ @enumerator_class ]       # the same constitent data (elements).
     end
@@ -382,7 +382,7 @@ module Skylab::MetaHell
 
 
     # dupe an arbitrary constituent value for use in duping. we hate this,
-    # it is tracked by [#mh-014]. this is a design issue that should be
+    # it is tracked by [#014]. this is a design issue that should be
     # resolved per box.
 
     def dupe_constituent_value x

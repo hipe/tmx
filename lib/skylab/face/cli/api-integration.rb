@@ -47,7 +47,7 @@ module Skylab::Face
         plugin_host_metaservices
     end
 
-    def handle_events action  # hookback [#fa-017] #called-by API client
+    def handle_events action  # hookback [#017] #called-by API client
       if action.respond_to? :with_specificity  # else not a pub-subber.
         a, h = parent_shell_module.api_stream_box
         action.with_specificity do
@@ -74,7 +74,7 @@ module Skylab::Face
     # about our rigging for now .. a little more than just autovifiying some
     # sane defaults; but also, little more than just that. there is currently
     # no way to override this without actually overriding this; but watch for
-    # something like that in the spirit sort of maybe near [#fa-009]
+    # something like that in the spirit sort of maybe near [#009]
 
     def api_client_class
       @api_client_class ||= begin
@@ -83,7 +83,7 @@ module Skylab::Face
           fail "sanity - for now we follow convention strictly because of #{
             }the wide blast radius of our autogeneration .. expected that #{
             }the CLI Client exist inside of a `CLI` module. no such module#{
-            } - #{ amod }::CLI"  # maybe magic one day - [#fa-009]
+            } - #{ amod }::CLI"  # maybe magic one day - [#009]
         end
         Face::API[ amod ]  # no need to check anything, ok to repeat this.
         amod.const_get( :API, false ).const_get( :Client, false )

@@ -2,7 +2,7 @@ module Skylab::Face
 
   module CLI::Tableize
 
-    # `tableize` - deprecated, see  [#fa-036]
+    # `tableize` - deprecated, see  [#036]
     #
     # `tableize` has been deprecated.  but here's a demo:
     #

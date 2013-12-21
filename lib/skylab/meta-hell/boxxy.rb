@@ -369,7 +369,7 @@ module Skylab::MetaHell
     end
 
     # `optimistic constant inference` is something crazy your boxxy module does
-    # which is a social contract that stipulates that if you follow [#mh-029]
+    # which is a social contract that stipulates that if you follow [#029]
     # `isomorphic file locations` then you won't have to load a million files
     # to know that you have these million constants under this module. just
     # know that you won't know until load time what the correct casing is of

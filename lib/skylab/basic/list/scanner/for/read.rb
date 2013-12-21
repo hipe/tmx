@@ -3,7 +3,7 @@ module Skylab::Basic
   List::Scanner::For::Read = MetaHell::Function::Class.new :count, :gets
   class List::Scanner::For::Read
 
-    # [#ba-004] without adding or removing newlines, each call to `gets`
+    # [#004] without adding or removing newlines, each call to `gets`
     # results in the next line, ending in e.g. a "\n" iff one existed in the
     # file.
     #

@@ -4,7 +4,7 @@
 
 At the time of this writing there is an instance method
 `Face::CLI_Mechanics_#api_plugin_metaservices`. its purpose is to determine
-what the API will use during the isomorphic [#fa-015] call for its modality
+what the API will use during the isomorphic [#015] call for its modality
 hookbacks, e.g event wiring and services.
 
 for small, tight applications life might be easier to have the modal client

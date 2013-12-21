@@ -1,6 +1,6 @@
 module Skylab::Face
 
-  module CLI::Metastory  # [#fa-035]
+  module CLI::Metastory  # [#035]
     def self.touch ; nil end      #kick-the-loading-warninglessly-and-trackably
   end
 

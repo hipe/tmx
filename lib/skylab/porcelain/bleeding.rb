@@ -532,7 +532,7 @@ module Skylab::Porcelain::Bleeding
                                   # callback, which gets passed two arguments:
                                   # a message string and the relevant metadata.
 
-                                  # *no* exclamation! [#po-016]
+                                  # *no* exclamation! [#016]
     def parse argv, args, missing, unexpected=missing
       counts = parameters.reduce( ::Hash.new { |h, k| h[k] = 0 } ) do |m, p|
         m[p.type] += 1            # what are the counts of each type of
@@ -617,7 +617,7 @@ module Skylab::Porcelain::Bleeding
     attr_accessor :documentor_class
 
     def help y # !
-      documentor.summarize do |line| # use optparse interface! - keep [#po-015]
+      documentor.summarize do |line| # use optparse interface! - keep [#015]
         y[ line ]
       end
       nil

@@ -615,7 +615,7 @@ module Skylab::Porcelain::Legacy
         end
       # (for those actions that have no option parser, if e.g an '-h' or
       # a --help is the next argument we process it as help anyway. the only
-      # way to opt-out of this behavior is to override this method [#po-017])
+      # way to opt-out of this behavior is to override this method [#017])
       elsif argv.length.nonzero? && '-' == argv[0][0] &&
           Officious::Help.action_sheet.names.include?( argv[0] ) then
         parse_ok = true

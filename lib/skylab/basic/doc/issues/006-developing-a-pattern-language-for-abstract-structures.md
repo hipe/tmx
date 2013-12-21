@@ -136,7 +136,7 @@ let's pose some pseudo definitions for `integer` and `key`:
 
 `key~`: any node
 `integer~`: a subset of all of the nodes
-`node~`: please see the really loose definition above [#ba-012]
+`node~`: please see the really loose definition above [#012]
 
 interestingly (and perhaps unremarkably to any programmer) there is
 `semantic intersect` between what an `array` *means* and what a `dictionary`
@@ -192,7 +192,7 @@ amount spent on all other.
 
 ### introducing the `enumerability` category: `list-ish` or `atom-ish`
 
-  in a particular context, a `node` ([#ba-012] above) can be `atom-ish` or
+  in a particular context, a `node` ([#012] above) can be `atom-ish` or
   `list-ish`. we present these here as two ends of (another)
   `discrete binary category` that we will call `enumerability`.
   so the set of `atom-ish` and `list-ish` is the comprehensive set of
@@ -251,7 +251,7 @@ but first, some recursively nesting definition/examples yay:
   any `operation` is defined in association with at least one
   `semantic structure` [#it-004]. (conversely, semantic structures are defined
   by one or more operations.) the same `operation` can be a part of multiple
-  structure definitions. :[#ba-007]
+  structure definitions. :[#007]
 
   there exist `operational categories` that we use to categorize operations
   (examples follow). if an operational category can be said to apply to *any*

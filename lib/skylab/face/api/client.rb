@@ -76,10 +76,10 @@ module Skylab::Face
     def get_executable_with *a  # the lower-level, fully customizable interface.
       o = Executable_Request_[ * a ]
       get_executable_with_notify
-      action = build_primordial_action o.name_i_a    # [#fa-016]
-      wire_for_expression action, o                  # [#fa-017]
-      resolve_services action, o                     # [#fa-018]
-      normalize action, o.param_h                    # [#fa-019]
+      action = build_primordial_action o.name_i_a    # [#016]
+      wire_for_expression action, o                  # [#017]
+      resolve_services action, o                     # [#018]
+      normalize action, o.param_h                    # [#019]
     end
 
     class Executable_Request_
@@ -166,7 +166,7 @@ module Skylab::Face
       # get from a raw API call "out of the box" is its final result and
       # whatever side-effects it does. but if an event listener was passed
       # in the field we simply hook back to that. result undefined, raise
-      # o failure [#fa-017]
+      # o failure [#017]
 
       if ex.respond_to?( :has_emit_facet ) && ex.has_emit_facet &&
         o.event_listener then
@@ -177,7 +177,7 @@ module Skylab::Face
     end
 
     def resolve_services action, o
-      # result undefined, raise on failure. [#fa-018]
+      # result undefined, raise on failure. [#018]
       if action.respond_to?( :has_service_facet ) && action.has_service_facet
         ms = get_metaservices_for_of action, o.service_provider_p
         if o.param_h
@@ -212,7 +212,7 @@ module Skylab::Face
 
   private
 
-    # `normalize` - :[#fa-019]: give the API action a chance to run
+    # `normalize` - :[#019]: give the API action a chance to run
     # normalization (read: validation, internalization) hooks before
     # executing. we want the specifics of this out of the particular
     # modality clients as much as possible.
@@ -228,7 +228,7 @@ module Skylab::Face
     # was designed from the ground-up to accomodate requirements like that.
     #
     # given all of the above, and given that we are the last step in the API
-    # Action lifecycle [#fa-021], our result is then the result of our
+    # Action lifecycle [#021], our result is then the result of our
     # upstream caller - false-ish or an executable.
     #
     # currently writing to `y` just hooks back into the API action instance
@@ -236,7 +236,7 @@ module Skylab::Face
     # that `y#<<` received). this allows for evented handling of the message,
     # e.g adding meta-information about the action to the message.
     #
-    # (with the above said, please see [#fa-019] for information about
+    # (with the above said, please see [#019] for information about
     # possible future/possible current features of field-level normalization.)
 
     def normalize ex, par_h
@@ -285,7 +285,7 @@ module Skylab::Face
     end
     public :revelation_services
 
-    #  ~ facet 5.6x - metastories ~  ( was [#fa-035] )
+    #  ~ facet 5.6x - metastories ~  ( was [#035] )
 
     Magic_Touch_.enhance -> { API::Client::Metastory.touch },
       [ self, :singleton, :public, :metastory ]

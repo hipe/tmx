@@ -61,7 +61,7 @@ EDIT: (the below is from `pack_fields_and_options`, ancestor of
 `unpack_field_values`. and still seems somewhat relevant but not there.)
 
 experimentally many methods in the entity library take the "sacred four"
-parameters [#fa-012]. freqently requests coming in from the client will munge
+parameters [#012]. freqently requests coming in from the client will munge
 the two namespaces (one of business-level fields, (e.g "email") and the other
 of controller-level options (e.g `verbose`), however the entity library
 insists on more rigidity and structure than this.

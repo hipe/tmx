@@ -1131,7 +1131,7 @@ module Skylab::Face
     # had high novelty value to let this isomorphicism extend all the way to
     # to this level but then it looked more ugly then elegant, but again now
     # it seems like it might be ok because it is in accord with the whole
-    # spirit of this thing. meh who cares its just CLI [#fa-004].
+    # spirit of this thing. meh who cares its just CLI [#004].
 
     def argument_error ex, cmd  # result will be final result
       md = CALL_FRAME_RX_.match ex.backtrace.fetch( 1 )
@@ -1910,7 +1910,7 @@ module Skylab::Face
     end
   end
 
-  # ~ 5.6x - metastories [#fa-035] ~
+  # ~ 5.6x - metastories [#035] ~
 
   Magic_Touch_.enhance -> { CLI::Metastory.touch },
     [ Command, :singleton, :public, :metastory ],

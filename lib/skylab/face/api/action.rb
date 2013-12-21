@@ -9,7 +9,7 @@ module Skylab::Face
     # everthing is of course experimental; but note it is a very designed,
     # thought-out experiment, with both eyes focused squarely on the big dream.
 
-    # the API Action lifecycle :[#fa-021]:
+    # the API Action lifecycle :[#021]:
     #
     # the lifecycle of the API Action happens thusly (ignoring how we got
     # to an API Action instance for a moment):
@@ -19,21 +19,21 @@ module Skylab::Face
     #
     #     [primordial] --o          just been created. no ivars at all (as far
     #                     \         as this API knows). is is probably right
-    #                      \        after a call to `new`     [#fa-016]
+    #                      \        after a call to `new`     [#016]
     #                       \
-    #                        o->   expression/event wiring    [#fa-017]
+    #                        o->   expression/event wiring    [#017]
     #                         /
     #                        /      resolves how to express itself: any
     #     [wired]      <---o        listeners subscribe to its events, and/or
     #                  -o           it gets an expression agent set.
     #                    \
-    #                     o--->   `resolve_services`          [#fa-018]
+    #                     o--->   `resolve_services`          [#018]
     #                        /
     #     [plugged-in]  <---o       it resolves fulfillment strategies for
     #                   -o          the services it declared as using, e.g
     #                     \         implemented by the [hl] plugin subsystem,
     #                      \
-    #                       o-->  `normalize`                 [#fa-019]
+    #                       o-->  `normalize`                 [#019]
     #                         /
     #     [executable]  <----o       with its formal and/or actual parameters,
     #                   -o           with all its field-level assertions of
@@ -41,7 +41,7 @@ module Skylab::Face
     #                      \         declaratively (think DSL), assert them
     #                       \        now, result is soft failure or ivars.
     #                        \
-    #                         o-> `execute`                   [#fa-020]
+    #                         o-> `execute`                   [#020]
     #                          /
     #                         /      we now run this method that you wrote,
     #                        /       with your business logic in it.
@@ -63,7 +63,7 @@ module Skylab::Face
     # we break this into numbered sections corresponding to the lifecycle
     # point. there is for now no "section 1" because we are avoiding
     # implementing an `initialize` here, wanting to leave that wide open for
-    # the client, which we will one day document at [#fa-016].
+    # the client, which we will one day document at [#016].
     # there will be no "section 5" because that is for you to write.
     #
     # [1] - and/or it get an expression agent set
@@ -74,7 +74,7 @@ module Skylab::Face
     # calls to be processed atomic-ly, monadic-ly, er: zero or once each;
     # for ease of implementation. can be complexified as needed.)
 
-    # `has_emit_facet` - fulfill [#fa-027]. public.
+    # `has_emit_facet` - fulfill [#027]. public.
     # for this facet we default to true to let a modality client decide how /
     # whether to wire the action for itself (although we override this method
     # here in a sibling class..)
@@ -114,7 +114,7 @@ module Skylab::Face
 
     #                      ~ services (section 3) ~
 
-    def has_service_facet  # fullfil [#fa-027].
+    def has_service_facet  # fullfil [#027].
       false
     end
 
@@ -124,7 +124,7 @@ module Skylab::Face
 
     #                ~ parameters & normalization (section 4) ~
 
-    def has_param_facet  # fulfill [#fa-027]
+    def has_param_facet  # fulfill [#027]
       false
     end
 
@@ -151,7 +151,7 @@ module Skylab::Face
       yy.count.zero?
     end
 
-    # `self.params` - rabbit hole .. er "facet" [#fa-013]
+    # `self.params` - rabbit hole .. er "facet" [#013]
     # placed here because it fits in semantically with the `normalize`
     # step of the API Action lifecycle.
 
@@ -182,7 +182,7 @@ module Skylab::Face
     API::Normalizer_.enhance_client_class self, :conventional
       # needed whether params or no
 
-    # ~ facet 5.6x - metastories [#fa-035] ~
+    # ~ facet 5.6x - metastories [#035] ~
 
     Magic_Touch_.enhance -> { API::Action::Metastory.touch },
       [ self, :singleton, :public, :metastory ]

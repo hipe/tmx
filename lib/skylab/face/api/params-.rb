@@ -7,17 +7,17 @@ module Skylab::Face
     # your fields with these metafields and we can try to make magic happen
     # for you. but note it is only the beginning. within e.g a given action
     # class you can create arbitrary new meta-fields to describe your fields
-    # with, and use them however you want in that action :[#fa-014].
+    # with, and use them however you want in that action :[#014].
 
     METAFIELD_A_A_ = [
 
-      [ :arity, :property ],  # [#fa-024]
+      [ :arity, :property ],  # [#024]
 
       [ :argument_arity, :property ],  # #experimental
 
-      [ :desc, :property ],  # [#fa-030]
+      [ :desc, :property ],  # [#030]
 
-      [ :normalizer, :property ],  # [#fa-021]
+      [ :normalizer, :property ],  # [#021]
 
       # hack a specialized sub "class" of normalizer - the 'set' macro:
       [ :set, :property, :hook, :mutate, -> fld do  # #experimental
@@ -35,7 +35,7 @@ module Skylab::Face
         end
       end ],
 
-      [ :default, :property ],  # [#fa-033]
+      [ :default, :property ],  # [#033]
 
       [ :single_letter, :property ],
 
@@ -57,7 +57,7 @@ module Skylab::Face
     end.call
 
     def self.enhance_client_with_param_a_and_meta_param_a client, param_a,
-        meta_param_a  # fulfill [#fa-026]
+        meta_param_a  # fulfill [#026]
       # assume behind module mutex & `param_a` looks right structurally.
 
       Field::Box.enhance client do
@@ -76,7 +76,7 @@ module Skylab::Face
     module Param_IMs_
 
       def is_required *a
-        # isomorph the idea of required-ness from the arity [#fa-024]
+        # isomorph the idea of required-ness from the arity [#024]
         ! some_arity.includes_zero
       end
 
@@ -229,11 +229,11 @@ module Skylab::Face
 
     module Action_IMs_
 
-      def has_param_facet  # fulfill [#fa-027].
+      def has_param_facet  # fulfill [#027].
         true
       end
 
-    # `unpack_params` (what it was formerly is described in [#fa-012]) result
+    # `unpack_params` (what it was formerly is described in [#012]) result
     # is a tuple (fixed length array) of the same number as the number of
     # your arguments. each value of the tuple will be a hash whose each key
     # and value correspond to one of the bound parameters. which pair goes in

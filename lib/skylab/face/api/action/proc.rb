@@ -41,7 +41,7 @@ module Skylab::Face
         @proc[ * args ]
       end
 
-      def has_emit_facet  # fulfill [#fa-027] - we do *not* want the event-
+      def has_emit_facet  # fulfill [#027] - we do *not* want the event-
         # wiring hook. Procs are simple and have an atomic, monadic result.
         # if you need to do something like emitting events during the
         # execution of your proc you could attempt something convoluted

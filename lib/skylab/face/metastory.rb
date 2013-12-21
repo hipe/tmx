@@ -1,6 +1,6 @@
 module Skylab::Face
 
-  class Metastory  # [#fa-035]
+  class Metastory  # [#035]
 
     def self.enhance k, m, t
       me = self

@@ -1,6 +1,6 @@
 # handle events :[#017]
 
-part of the "API action lifecycle" [#fa-021], `handle_events` is the
+part of the "API action lifecycle" [#021], `handle_events` is the
 first hook-ish that is run with a newly created action on an execution
 track.
 
@@ -10,7 +10,7 @@ something that is currently deeply built into the API system as an integral
 part of it.
 
 the participating modality client will implement its own `handle_events`,
-which may want to use "binary facet reflection" [#fa-027] to see that the
+which may want to use "binary facet reflection" [#027] to see that the
 action `has_emit_facet`, and then somehow handle its events (possibly using
 e.g the reflection API of PubSub [#ps-014]).
 

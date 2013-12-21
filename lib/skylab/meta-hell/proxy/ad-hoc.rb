@@ -11,7 +11,7 @@ module Skylab::MetaHell
     # or have been used for this are / were: `Generic`, `Plastic`, `Dynamic`.
     # kind of amusing, actually)
     #
-    # (This was the orignal home of [#mh-009] - it was developed right before
+    # (This was the orignal home of [#009] - it was developed right before
     # we found out about define_singleton_method, but it stays b/c it's actually
     # a bit clearer to read than hacks like *that*. If for no other reason
     # it might be only slighly more useful than using ::Object because it leads

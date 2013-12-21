@@ -2,7 +2,7 @@ module ::Skylab::MetaHell
 
   module Formal::Attribute  # :[#024]
 
-    # (the fate of this node is discussed at [#mh-053] "discussion of the..")
+    # (the fate of this node is discussed at [#053] "discussion of the..")
 
     # What is the esssence of all data in the universe? It starts from
     # within. with metaprogramming.
@@ -18,7 +18,7 @@ module ::Skylab::MetaHell
     # of them in the abstract -- not those actual values, but other
     # occurences of particular values for those attributes. We use the word
     # "formal" to distinguish this meaning, in contrast to "actual" attributes
-    # :[#mh-025].
+    # :[#025].
     #
     # For example, we might want to define 'formal attributes' that define
     # some superset of recognizable or allowable names (and possibly values)

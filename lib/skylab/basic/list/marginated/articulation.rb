@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  # an answer to [#ba-015] .. one day we might refactor underneath to etc.
+  # an answer to [#015] .. one day we might refactor underneath to etc.
   # but we intentionally built this from the outside in (yes, behavior-
   # driven) while avoiding looking at the other 2 similar neighbors so
   # that our interface is pure and minimal.

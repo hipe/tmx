@@ -22,7 +22,7 @@ until it has incubated somewhat..
 
 ### every facet for now is hard-coded into the system somewhere
 
-every facet is hard-coded into the system now somewhere :[#fa-028]. at present
+every facet is hard-coded into the system now somewhere :[#028]. at present
 there is no way to load dynamically facets as if they were plugins. rather it
 is a conceptual distinction we are making rather than a physical one.
 
@@ -31,7 +31,7 @@ because that will probably become a thing, and even if no, it will still to
 better, more comprehendable extensible software.
 
 currently a subset of the facets corresponds to a subset of the states along
-the lifecyle of an API Action [#fa-021]; that is, they intersect.
+the lifecyle of an API Action [#021]; that is, they intersect.
 
 If we had to come up with a comprehensive list right now of normalized facet
 names that we know about and plan on using, it would look like:
@@ -59,7 +59,7 @@ Action lifecycle, namely:
 
 2) each item in the above list corresponds to the relevant DSL method, where
 we use the verb stem form (or singular noun if you prefer) of the DSL method
-that is used invoke the facet enhancement [#fa-026]; that is, the above
+that is used invoke the facet enhancement [#026]; that is, the above
 correspond to the DSL methods `emits`, `params` and `services`. we
 accidentally already demonstrated this in (1).
 

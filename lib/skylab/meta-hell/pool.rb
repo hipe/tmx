@@ -122,7 +122,7 @@ module Skylab::MetaHell
       #
       # (The two enhancements exist as separate only because they came from
       # different places. Whenever it is optimal to merge the other on top of
-      # the one we should do so [#mh-023].)
+      # the one we should do so [#023].)
 
     end.call
   end

@@ -2,7 +2,7 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
 
   # This is a weird old (and fun) #experiment that is salvaged from porcelain.
   # Watch for it to cross-fertilize with instances of action inflection
-  # happening elsewhere as [#hl-018].
+  # happening elsewhere as [#018].
 
   # See notes at `NLP::EN::POS::Noun` to see how far down the
   # inflection-hacking rabbit hole goes.
@@ -108,12 +108,12 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
                                   # order to infer a noun stem from your
                                   # action class name, we will start by assuming
                                   # it is in either the second- or third-to-
-    define_method :noun do        # last 'name piece.' (assumption [#hl-018])
+    define_method :noun do        # last 'name piece.' (assumption [#018])
       @noun ||= begin             # To find the appropriate action constants
         seen = [ ] ; hop = false  # for the noun, we crawl down the entire
         name_pieces.reduce( ::Object ) do |m, x| # const tree and back up again
           m.const_defined?( x, false ) or break
-          y = m.const_get x, false # part-way bc of [#hl-035] - if there is a
+          y = m.const_get x, false # part-way bc of [#035] - if there is a
           seen.push y             # pure box module, (that is, a module whose
           y                       # only purpose is to be a clean namespace
         end                       # to hold only constituent items), then such

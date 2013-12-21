@@ -88,7 +88,7 @@ module Skylab::Face
 
     class Normalization_ ; include Sayer_
 
-      # mutates param_h [#fa-019] [#bl-013] [#sl-116]
+      # mutates param_h [#019] [#bl-013] [#sl-116]
 
       MetaHell::FUN::Fields_[ :client, self, :method, :initialize, :field_i_a,
         [ :field_box, :notice_yielder, :any_expression_agent,

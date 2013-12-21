@@ -3,12 +3,12 @@
 first, a quick history:
 
   |  Name                |  Identifier  |  Approx. Start  |
-  |  formal attributes   |  [#mh-024]   |  2011-09-11     |
+  |  formal attributes   |  [#024]   |  2011-09-11     |
   |  parameter           |  [#hl-009]   |  2012-08-29     |
   |  field               |  [#ba-003]   |  2013-04-11     |
   |  ??                  |  [#ta-081]   |  2013-10-11     |
 
-  • first, there was "formal attributes" [#mh-024]
+  • first, there was "formal attributes" [#024]
   • then there was "parameter" [#hl-009]
   • then there was "field" [#ba-003]
   • then, during the "headless earthquake" of late 2013.. (well, read below)

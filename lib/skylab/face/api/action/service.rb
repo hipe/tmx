@@ -3,7 +3,7 @@ module Skylab::Face
   module API::Action::Service
 
     # `self.[]` - enhance the API::Action class with this facet.
-    # fulfill [#fa-026]. assumes it is behind a module mutex.
+    # fulfill [#026]. assumes it is behind a module mutex.
 
     def self.[] target_mod, x_a
       Services::Headless::Plugin.enhance target_mod do
@@ -19,7 +19,7 @@ module Skylab::Face
 
     module Instance_Methods_
 
-      def has_service_facet  # fulfill [#fa-027]
+      def has_service_facet  # fulfill [#027]
         true
       end
 
@@ -37,7 +37,7 @@ module Skylab::Face
       private :accept_value_as_service
 
       def resolve_services metasvcs_x  # a point on the api action lifecycle
-        # [#fa-018], raise on failure, undefined on success
+        # [#018], raise on failure, undefined on success
         receive_plugin_attachment_notification metasvcs_x
         nil
       end

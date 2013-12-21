@@ -72,7 +72,7 @@ class Skylab::Basic::Field
     end
 
     # `flush` - the fourth center of the universe has been found.
-    # see note at [#ba-013] about an infinite stack of metafields.
+    # see note at [#013] about an infinite stack of metafields.
 
     def flush
       field_a = @field_a ; @field_a = nil
@@ -98,7 +98,7 @@ class Skylab::Basic::Field
     end
   end
 
-  class N_Meta_Resolver_  # this is the implementation of [#ba-013]
+  class N_Meta_Resolver_  # this is the implementation of [#013]
 
     def initialize
       @stack = [ ]

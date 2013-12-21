@@ -261,7 +261,7 @@ serveral control points through which the callable can signal to the system
 that some kind of error (or maybe one day non-error event) occured.
 
 (this "more sophisticated object" has been dubbed "the #snitch", is used
-prototypically in a couple of systems, and is and is tracked by [#fa-051],
+prototypically in a couple of systems, and is and is tracked by [#051],
 but it is beyond our concern for now.)
 
 also it bears mentioning that this simple arrangement has proven
