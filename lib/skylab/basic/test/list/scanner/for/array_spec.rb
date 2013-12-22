@@ -1,50 +1,19 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::Headless::TestSupport::Services::File
+module Skylab::Basic::TestSupport::List::Scanner::For
 
-  ::Skylab::Headless::TestSupport::Services[ File_TestSupport = self ]
+  describe "[ba] list scanner for array" do
 
-  include CONSTANTS
-
-  extend TestSupport::Quickie
-
-  describe "#{ Headless::Services }::File::Lines::Producer" do
-
-    tmpdir = File_TestSupport.tmpdir
-
-    before :all do
-      if ! tmpdir.exist?
-        tmpdir.prepare
-        tmpdir.write 'foo.txt', <<-O.unindent
-          one
-          two
-        O
-      end
-    end
-
-    it "when build with pathname - `gets` - works as expected" do
-      pn = tmpdir.join 'foo.txt'
-      l = Headless::Services::File::Lines::Producer.new pn
-      l.line_number.should eql( nil )
-      l.gets.should eql( "one\n" )
-      l.line_number.should eql( 1 )
-      l.gets.should eql( "two\n" )
-      l.line_number.should eql( 2 )
-      l.gets.should eql( nil )
-      l.line_number.should eql( 2 )
-      l.gets.should eql( nil )
-    end
-
-    it "when built with array of lines - `gets` - works the same" do
-      l = Headless::Services::Array::Lines::Producer.new [ "one b\n", "two b\n" ]
-      l.line_number.should eql( nil )
-      l.gets.should eql( "one b\n" )
-      l.line_number.should eql( 1 )
-      l.gets.should eql( "two b\n" )
-      l.line_number.should eql( 2 )
-      l.gets.should eql( nil )
-      l.line_number.should eql( 2 )
-      l.gets.should eql( nil )
+    it "when built with array of lines - `gets` - works the same" do  # mirror 2 others
+      scn = Basic::List::Scanner::For::Array.new [ "one B\n", "two B\n" ]
+      scn.line_number.should be_nil
+      scn.gets.should eql "one B\n"
+      scn.line_number.should eql 1
+      scn.gets.should eql "two B\n"
+      scn.line_number.should eql 2
+      scn.gets.should be_nil
+      scn.line_number.should eql 2
+      scn.gets.should be_nil
     end
   end
 end

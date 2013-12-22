@@ -170,12 +170,11 @@ module Skylab::FileMetrics
 
       def op_common_tail
         # massive but semi-elegant hack, #goof-on wheel greasing.
-        Headless::Services::String::Lines::Consumer command.op.banner do |y|
-          y << ''
-          command.usage y
-          y << "\n#{ hi 'options:' }\n"
-        end
-        nil
+        s = command.op.banner
+        y = Headless::Services::Basic::List::Scanner::For::String::Reverse[ s ]
+        y << ''
+        command.usage y
+        y << "\n#{ hi 'options:' }\n" ; nil
       end
     # lost indent
 

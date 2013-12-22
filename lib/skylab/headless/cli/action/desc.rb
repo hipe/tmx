@@ -51,7 +51,7 @@ module Skylab::Headless
         p_a and build_producer_from_p_a p_a
       end
       def build_producer_from_p_a p_a
-        Headless::Services::Enumerator::Lines::Producer.new do |y|
+        Headless::Services::Basic::List::Scanner::For.block do |y|
           p_a.each do |p|
             @client.instance_exec y, & p
           end ; nil
@@ -114,10 +114,13 @@ module Skylab::Headless
                                  item_rx_h[ $~[:ind].length + 1 ] },
         subitem: -> {          section.lines << [ :item, nil, $~[1] ] }
       }
-      while line = lines.gets
-        name = stat.to.detect{ |sym| state_h[ sym ].rx =~ line }
-        trigger_h.fetch( name ).call
-        stat = state_h.fetch name
+      while (( line = lines.gets ))
+        line.chomp!
+        name_i = stat.to.detect do |i|
+          state_h[ i ].rx =~ line
+        end
+        trigger_h.fetch( name_i ).call
+        stat = state_h.fetch name_i
       end ; nil
     end
   end

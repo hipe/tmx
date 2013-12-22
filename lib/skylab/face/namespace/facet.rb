@@ -131,8 +131,7 @@ module Skylab::Face
             @block_a = [ b ]
           end
         end
-      end
-      private :absorb_additional_namespace_definition
+      end  # stay public
 
       define_method :build_into do |block, name_func, xtra_x|
         bm = box_mod[ @surface_mod[] ]

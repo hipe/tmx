@@ -70,7 +70,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       end
       hot = true
       finish = -> do
-        fh.close
+        fh.closed? or fh.close  # might get closed by scanner
         hot = false
         a.length > 1 and flush[]
       end

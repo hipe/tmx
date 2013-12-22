@@ -318,6 +318,7 @@ module Skylab::Headless
         def apply_reader_module_methods
           rmeth_i = @reflection_method_stem
           @sing.class_exec do
+            define_method :"#{ rmeth_i }_members", Parameter_members__
             module_exec :"#{ rmeth_i }s", & Define_enumerator_method__
             define_method :"get_#{ rmeth_i }_box", Get_box__
             define_method :"get_#{ rmeth_i }_scanner", Get_scanner__
@@ -408,8 +409,7 @@ module Skylab::Headless
       private
         def begin_mutable_a_and_h
           @mutable_a = @mod.module_exec( & Resolve_writable_a__ )
-          @mutable_h = ::Hash[ @mutable_a.map do |i|
-            [ i, Long_name__[ i ] ] end ] ; nil
+          @mutable_h = { } ; nil
         end
         def absorb_nonzero_length_parameter_definition
           _accepter = @mod.module_exec @mutable_a, @mutable_h, &
@@ -423,6 +423,11 @@ module Skylab::Headless
         end
         def end_mutable_a_and_h
           a = @mutable_a ; h = @mutable_h
+          if a.length != h.length
+            ( a - h.keys ).each do |i|
+              h[ i ] = Long_name__[ i ]
+            end
+          end
           @mod.module_exec do
             const_set CONST_A__, a.freeze ; const_set CONST_H__, h.freeze
           end ; nil
@@ -524,6 +529,10 @@ module Skylab::Headless
         Scn_.new do
           send h.fetch( a.fetch( d += 1 ) ) if d < last
         end
+      end
+
+      Parameter_members__ = -> do
+        const_get CONST_A__
       end
 
       class Parameter__
@@ -671,8 +680,8 @@ module Skylab::Headless
 
       params :errstream, :service, :session
 
-      def initialize x_a
-        nilify_and_absorb_iambic_fully x_a
+      def initialize x_a=nil
+        x_a and nilify_and_absorb_iambic_fully x_a
         super()
       end
       def say_unexpected_iambic

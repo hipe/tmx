@@ -3,7 +3,7 @@ module Skylab::Snag
   class Models::Manifest::File
 
     # (this is used by services and hence cannot be a sub-client!)
-    # ([#hl-044] might subsume parts (most?) of this)
+    # ([#ba-004] might subsume parts (most?) of this)
 
     # `normalized_line_producer` is like a filehandle that you call `gets`
     # on (in that when you reach the end of the file it returns nil)

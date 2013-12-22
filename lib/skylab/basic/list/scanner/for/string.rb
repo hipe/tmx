@@ -1,70 +1,53 @@
-module Skylab::Headless
+module Skylab::Basic
 
-  module Services::String::Lines
+  module List::Scanner
 
-    # don't do further development with this without looking at [#ba-004]
+    class For::String  # read [#024] (in [@022]) the string scanner narrative
 
-    Consumer = -> mutable_string do
+      class << self
+        alias_method :[], :new
+        private :new
+      end
 
-      # The first normalized line consumer ([#060]) -
-      # produce a new yielder ("normalized consumer") which expects to be
-      # given (with `yield` or `<<`) a sequence of zero or more lines
-      # that do not contain newlines.
+      def initialize s
+        @count = 0
+        scn = Basic::Services::StringScanner.new s
+        @gets_p = -> do
+          if (( s = scn.scan LINE_RX_ ))
+            @count += 1
+            s
+          else
+            scn.eos? or fail "sanity - rx logic failure"
+            @gets_p = MetaHell::EMPTY_P_ ; nil
+          end
+        end ; nil
+      end
 
-      # does something hacky, the reverse of what `puts` does, for
-      # aesthetics. but watch out!
+      def gets
+        @gets_p.call
+      end
 
-      first = true
-      ::Enumerator::Yielder.new do |line|
-        if first
-          first = false
-          mutable_string.concat line
-        else
-          mutable_string.concat "\n#{ line }"
+      def line_number
+        @count.nonzero?
+      end
+
+      # ~
+
+      def self.Reverse mutable_string
+        yield Reverse[ mutable_string ] ; nil
+      end
+
+      Reverse = -> mutable_string do
+        is_first = true
+        ::Enumerator::Yielder.new do |line|
+          if is_first
+            is_first = false
+            mutable_string.concat line
+          else
+            mutable_string.concat "\n#{ line }"
+          end ; nil
         end
       end
-    end
-
-    def self.Consumer mutable_string
-      yield Consumer[ mutable_string ]
-    end
-  end
-
-  class Services::String::Lines::Producer
-
-    # minimal abstract enumeration and scanning of the lines of a string.
-    # + quacks like subset of File::Lines::Producer
-    # + better than plain old ::Enumerator b.c you can call `next` (gets)
-    #     without catching the ::StopIteration.
-    # + Future-proof: maybe it uses ::StringScanner internally, maybe not.)
-
-    class << self
-      private :new
-    end
-
-    def self.factory string
-      if string.length > Headless::Constants::MAXLEN
-        fail 'implement me - fun!'
-      else
-        new string
-      end
-    end
-
-    def gets
-      if @current < @length
-        x = @lines[ @current ]
-        @current += 1
-        x
-      end
-    end
-
-  private
-
-    def initialize string
-      @lines = string.split "\n"
-      @length = @lines.length
-      @current = 0
-      nil
     end
   end
 end

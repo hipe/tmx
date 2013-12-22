@@ -42,7 +42,7 @@ module Skylab::Headless
       define_method :initialize do |sexp|
         state = :initial
         hot = true
-        scn = Headless::Services::Array::Scanner.new sexp
+        scn = Headless::Services::Basic::List::Scanner::For::Array.new sexp
         building = nil
 
         fetch = -> x do

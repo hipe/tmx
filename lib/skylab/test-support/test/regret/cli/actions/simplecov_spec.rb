@@ -25,7 +25,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI_Actions_Simplecov
     it "THIS TEST IS AT ONCE SO BEAUTIFUL AND SO UGLY" do
       cmd_a = build_command_a
       line_a, exitstatus = open2 cmd_a
-      exitstatus.should eql( 0 )
+      exitstatus.should be_zero
       handle_last_line line_a.pop
       check_errput line_a
     end

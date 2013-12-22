@@ -1,55 +1,65 @@
-module Skylab::Headless
+module Skylab::Basic
 
-  module Services::File::Lines
+  module List::Scanner
 
-  end
+    For::Read = MetaHell::Function::Class.new :count, :gets, :line_number
+    class For::Read
 
-  class Services::File::Lines::Producer < ::Enumerator
-                                  # read lines in a more convenient way
-                                  # (this is tracked by [#044])
-  # #deprecated by Basic::List::Scanner ([#ba-004]) #todo
+      # read [#004] (in [#022]) the scanner for read narrative
 
-    def gets
-      self.next if @live
-    rescue ::StopIteration
-    end
+      def initialize fh, maxlen=Basic::Services::Headless::Constants::MAXLEN
+        buffer = '' ; buffer_is_loaded = nil ; count = 0 ; gets = scn = nil
+        advance_scanner = -> do
+          scn = Basic::Services::StringScanner.new buffer
+          advance_scanner = -> do
+            scn.string = buffer ; nil
+          end ; nil
+        end
+        advance = -> do
+          advance_scanner[] ; buffer = '' ;  buffer_is_loaded = true
+        end
+        finish = -> do
+          gets = MetaHell::EMPTY_P_ ; fh.close ; false
+        end
+        load_buffer = -> do
+          buffer_ = fh.read maxlen, buffer
+          buffer_ ? advance[] : finish[]
+        end
+        current_line = nil
+        absorb_line_part = -> part do
+          if current_line
+            current_line.concat part
+          else
+            current_line = part
+          end ; nil
+        end
+        gets = -> do
+          begin
+            buffer_is_loaded or load_buffer[] or break
+            line_part = scn.scan LINE_RX_
+            line_part or next( buffer_is_loaded = false )
+            absorb_line_part[ line_part ]
+            line_part.include? NEWLINE_SEQUENCE__ and break( count += 1 )
+          end while true
+          r = current_line ; current_line = nil ; r
+        end
 
-    attr_reader :line_number
-
-    attr_reader :pathname
-
-  private
-
-    def initialize pathname
-      @fh = nil
-      @line_number = nil
-      @live = true
-      @pathname = pathname  # gigo
-      super( ) { |y| visit_fs y }
-    end
-
-    def increment_line_number
-      if @line_number.nil?
-        @line_number = 1
-      else
-        @line_number += 1
+        @gets = -> do
+          gets[]  # we make this totally hack-proof just as an OCD experiment
+        end
+        # ~ auxiliary service methods
+        @count = -> { count }
+        @fh = fh  # in case you want to close it yourself (if from Path)
+        @line_number = -> do
+          count.nonzero?
+        end
+        @pathname = ::Pathname.new fh.path
+        nil
       end
-      nil
-    end
 
-    def visit_fs y
-      @fh and fail 'implement me - file already open'
-      @fh = @pathname.open 'r'
-      @line_number = nil
-      @live = true
-      @fh.each_line do |line|
-        increment_line_number
-        y << line
-      end
-      @fh.close
-      @fh = nil
-      @live = nil
-      nil
+      attr_reader :fh, :pathname
+
+      NEWLINE_SEQUENCE__ = "\n".freeze
     end
   end
 end

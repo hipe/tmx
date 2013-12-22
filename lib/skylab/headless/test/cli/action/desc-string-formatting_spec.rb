@@ -17,7 +17,7 @@ module Skylab::Headless::TestSupport::CLI::Desc__
     end
 
     def parse s
-      _scn = Headless::Services::String::Lines::Producer.factory s
+      _scn = Headless::Services::Basic::List::Scanner::For::String[ s ]
       Headless::CLI::Action::Desc::Parse_sections[ @sections=[], _scn ] ; nil
     end
 
@@ -29,7 +29,7 @@ module Skylab::Headless::TestSupport::CLI::Desc__
       sect = @sections[0]
       sect.header.should eql( nil )
       sect.lines.length.should eql( 1 )
-      sect.lines[0][1].should eql( '        one line to rule them all' )
+      sect.lines[0][1].should eql "        one line to rule them all"
     end
 
     it "two normal lines" do

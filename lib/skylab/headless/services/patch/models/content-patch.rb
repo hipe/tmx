@@ -1,5 +1,15 @@
 module Skylab::Headless
-  class Services::Patch::Models::ContentPatch # builds a patch progressively.
+
+  class Services::Patch::Models::ContentPatch  # builds a patch progressively.
+
+    def initialize content_x
+      @chunks = []
+      if ! content_x.respond_to? :gets
+        content_x = Headless::Services::Basic::List::Scanner[ content_x ]
+      end
+      @lines = content_x
+      @offset = 0 ; nil
+    end
 
     def change_line num, new_line
       change_lines num, [new_line]
@@ -85,17 +95,5 @@ module Skylab::Headless
       end
 
     end.call
-
-  private
-
-    def initialize content_string
-      @chunks = [ ]
-      if ::String === content_string
-        @lines = Services::Array::Lines::Producer.new content_string.split( /^/ )
-      else
-        @lines = content_string # assumes it is `Lines` !
-      end
-      @offset = 0
-    end
   end
 end

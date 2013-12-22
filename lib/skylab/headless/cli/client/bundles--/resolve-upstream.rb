@@ -69,7 +69,7 @@ module Skylab::Headless
           }expecting #{ infile_moniker }"
       end
       def when_argv_length_is_one
-        @pathname = ::Pathname.new @argv.shift
+        @pathname = ::Pathname.new @argv.first  # note we do not shift
         attempt_to_open_pathname
       end
       def attempt_to_open_pathname

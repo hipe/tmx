@@ -127,7 +127,8 @@ module Skylab::Snag
       begin
         break if @file_changes.length.zero?
         first = @file_changes.first
-        lines = Headless::Services::File::Lines::Producer.new first.pathname
+        lines = Headless::Services::
+          Basic::List::Scanner::For::Path[ first.pathname ]
         patch = Headless::Services::Patch::Models::ContentPatch.new lines
         @file_changes.each do |todo|
           patch.change_line todo.line_number, todo.replacement_line

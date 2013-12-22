@@ -1,25 +1,36 @@
-module Skylab::Headless
+module Skylab::Basic
 
-  module Services::Enumerator
-    module Lines
-    end
-  end
+  module List::Scanner
 
-  class Services::Enumerator::Lines::Producer < ::Enumerator
+    module For
 
-    # add `gets` to an enumerator.
+      def self.block & p
 
-    def gets
-      self.next if @hot
-    rescue ::StopIteration
-      @hot = nil
-    end
+        Enumerator.new ::Enumerator.new( & p )
 
-  private
+      end
 
-    def initialize
-      super
-      @hot = true
+      class Enumerator  # wrap an enumerator to act like a mimimal scanner
+
+        def initialize enum
+          @gets_p = -> do
+            begin
+              enum.next
+            rescue ::StopIteration
+              @gets_p = MetaHell::EMPTY_P_ ; nil
+            end
+          end
+        end
+
+        def gets
+          @gets_p.call
+        end
+      end
+
+      Path = -> path_x, * a do
+        _open_filehandle = ::File.open "#{ path_x }", 'r'
+        For::Read.new _open_filehandle, * a
+      end
     end
   end
 end

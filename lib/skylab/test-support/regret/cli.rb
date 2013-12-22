@@ -4,6 +4,10 @@ module Skylab::TestSupport::Regret::CLI
   Face = ::Skylab::Face
   CLI = self
 
+  def self.new *a
+    CLI::Client.new( * a )
+  end
+
   class CLI::Client < Face::CLI
 
     API::Conf::Verbosity[ self ]
