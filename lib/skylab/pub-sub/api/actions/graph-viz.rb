@@ -236,7 +236,7 @@ module Skylab::PubSub
       else
         @paystream
       end
-      raw = job.event_stream_graph.describ
+      raw = job.event_stream_graph.describe_digraph
         # (expected never to fail but meh. we don't stream it because:)
       if raw && pay
         scn = Headless::Services::StringScanner.new raw ; num = 0 ; line = nil

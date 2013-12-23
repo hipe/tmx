@@ -10,7 +10,7 @@ module Skylab::Basic::TestSupport::Digraph::Core
 
   extend TestSupport::Quickie
 
-  describe "#{ Basic::Digraph }" do
+  describe "[ba] digraph" do
 
     it "here have an empty one" do
       digraph = Basic::Digraph.new
@@ -120,20 +120,11 @@ module Skylab::Basic::TestSupport::Digraph::Core
     context 'describing a graph - ' do
       it 'works (and looks a little like ..)' do
         d = plant[ ]
-        if true  # #todo integration only
-          exp = <<-HERE.unindent.chop
-          plant
+        _exp = <<-HERE.unindent.chop
           flower -> plant
-          flower
           bedillia -> flower
-          HERE
-        else  # see, it's stupid.
-        exp = <<-HERE.unindent.chop
-          flower->plant
-          bedillia->flower
         HERE
-        end
-        d.describe.should eql( exp )
+        d.describe_digraph( :with_spaces ).should eql _exp
       end
     end
 
@@ -164,13 +155,13 @@ module Skylab::Basic::TestSupport::Digraph::Core
 
       def self.describe_as from, exp, *tags
         it "#{ from }", *tags do
-          send( from ).describ.should eql( exp )
+          send( from ).describe_digraph.should eql exp
         end
       end
 
       def self.invert_as from, exp, *tags
         it "#{ from }", *tags do
-          send( from ).invert.describ.should eql( exp )
+          send( from ).invert.describe_digraph.should eql exp
         end
       end
 
@@ -217,7 +208,7 @@ module Skylab::Basic::TestSupport::Digraph::Core
         it "subtract one target and one inner - you are left with partial subset" do
           d2 = real.minus( [:info, :data, :strange] )
           d2.node_count.should eql( 2 )
-          d2.describ.should eql( 'row->text' )
+          d2.describe_digraph.should eql 'row->text'
         end
 
         it "subtract the minimum covering set - you are left with none" do
@@ -228,8 +219,8 @@ module Skylab::Basic::TestSupport::Digraph::Core
         it "just the two leaf nodes - the target node subset" do
           d2 = real.minus [ :empty, :row_count ]
           d2.node_count.should eql( 4 )
-          d2.describ.split( "\n" ).join( ' ' ).should eql(
-            "row->text info->text data" )
+          d2.describe_digraph.split( "\n" ).join( ' ' ).
+            should eql "row->text info->text data"
         end
       end
     end

@@ -117,11 +117,11 @@ module Skylab::PubSub
     # ~ dupe support
 
   private
-    def base_args
+    def get_args_for_copy
       super << @taxonomic_stream_i_a
     end
 
-    def base_init *a, any_taxo_stream_i_a
+    def initialize_copy *a, any_taxo_stream_i_a
       @taxonomic_stream_i_a = ( if any_taxo_stream_i_a
         any_taxo_stream_i_a.dup.freeze
       end )

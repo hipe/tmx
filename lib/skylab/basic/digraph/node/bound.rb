@@ -2,6 +2,13 @@ module Skylab::Basic
 
   class Basic::Digraph::Node::Bound
 
+    def initialize graph, name
+      @graph_ref = -> { graph }
+      @normalized_local_node_name = name
+    end
+
+    attr_reader :normalized_local_node_name
+
     # represent a node as an external entity capable of reflecting on
     # itself vis-a-vis its graph.
 
@@ -14,15 +21,6 @@ module Skylab::Basic
             @normalized_local_node_name, sym )
         end
       end
-    end
-
-    attr_reader :normalized_local_node_name
-
-  private
-
-    def initialize graph, name
-      @graph_ref = -> { graph }
-      @normalized_local_node_name = name
     end
   end
 end

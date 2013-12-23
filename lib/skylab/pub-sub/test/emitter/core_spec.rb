@@ -72,7 +72,7 @@ module ::Skylab::PubSub::TestSupport::Emitter
       end
 
       it "reflects on its event stream graph" do
-        act = klass.event_stream_graph.describe
+        act = klass.event_stream_graph.describe_digraph :with_spaces, :with_solos
         exp = <<-HERE.unindent.strip
           informational
           error -> informational

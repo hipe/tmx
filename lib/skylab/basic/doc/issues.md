@@ -1,3 +1,4 @@
+[#025]       #doc-node #digraph the digraph narrative ..
 [#024]       #parent-node: [#022] "the string scanner narrative.."
 [#023]       #parent-node: [#022] "the array scanner narrative.."
 [#022]       #doc-node scanners (taxonomic node only for now)
