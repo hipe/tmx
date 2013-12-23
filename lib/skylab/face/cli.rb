@@ -1955,7 +1955,7 @@ module Skylab::Face
   Magic_Touch_.enhance -> { CLI.const_get( :Set, false ).touch },
     [ Node_Sheet_, :public, :set_command_parameters_proc ],
     [ Namespace, :singleton, :public, :set ],  # (this and below is 5.11x)
-    [ Node_Sheet_, :private, :defer_set, :absorb_xtra ],
+    [ Node_Sheet_, :private, :defer_set, :absorb_extr ],
     [ NS_Sheet_, :private, :lift_prenatals ]
 
   # ~ 5.10x - API integration (*non*-revelation style)

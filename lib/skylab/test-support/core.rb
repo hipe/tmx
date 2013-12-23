@@ -16,7 +16,7 @@ module Skylab::TestSupport
   Autoloader = ::Skylab::Autoloader
   Headless = ::Skylab::Headless
   MetaHell = ::Skylab::MetaHell
-  Subsys = self                   # gotcha: we cannot set the eponymous
+  TestSupport_ = self                      # gotcha: we cannot set the eponymous
                                   # #hiccup constant because there is a
                                   # legitimate other module ::SL::TS::TS.
 

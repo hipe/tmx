@@ -1,6 +1,16 @@
 module Skylab::Basic
 
-  module List::Scanner  # read [#022] the scanners narrative
+  class List::Scanner < ::Proc  # read [#022] the scanners narrative
+
+    # basic list scanner
+    # like this:
+    #
+    #     a = %i( only_one )
+    #     scn = Basic::List::Scanner.new do a.shift end
+    #     scn.gets  # => :only_one
+    #     scn.gets  # => nil
+
+    alias_method :gets, :call
 
     def self.[] x
       if x.respond_to? :each_index
@@ -8,7 +18,7 @@ module Skylab::Basic
       elsif x.respond_to? :read
         List::Scanner::For::Read.new x
       elsif x.respond_to? :each
-        List::Scanenr::For::Enumerator.new x
+        List::Scanner::For::Enumerator.new x
       elsif x.respond_to? :ascii_only?
         List::Scanner::For::String[ x ]
       else
@@ -27,7 +37,7 @@ module Skylab::Basic
       end
     end
 
-    # basic list scanner
+    # basic list scanner aggregate
     # aggregates other scanners, makes them behave as one sequence of scanners
     #
     #     scn = Basic::List::Scanner::Aggregate[
@@ -168,6 +178,15 @@ module Skylab::Basic
           @p_a << p ; nil
         end
       end
+    end
+
+    module With
+
+      def self.[] scn, * i_a
+        mod = scn.singleton_class
+        With.apply_iambic_on_client i_a, mod ; nil
+      end
+      MetaHell::Bundle::Directory[ self ]
     end
 
     LINE_RX_ = /[^\r\n]*\r?\n|[^\r\n]+\r?\n?/

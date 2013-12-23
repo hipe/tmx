@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby -w
+
+require_relative '../lib/skylab'
+require 'skylab/test-support/core'
+
+Skylab::TestSupport::Regret::CLI.new( $stdin, $stdout, $stderr ).invoke ARGV

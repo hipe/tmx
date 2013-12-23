@@ -15,9 +15,21 @@ module Skylab::Basic::TestSupport::List::Scanner
   describe "Skylab::Basic::List::Scanner" do
     context "basic list scanner" do
       Sandbox_1 = Sandboxer.spawn
-      it "aggregates other scanners, makes them behave as one sequence of scanners" do
+      it "like this" do
         Sandbox_1.with self
         module Sandbox_1
+          a = %i( only_one )
+          scn = Basic::List::Scanner.new do a.shift end
+          scn.gets.should eql( :only_one )
+          scn.gets.should eql( nil )
+        end
+      end
+    end
+    context "basic list scanner aggregate" do
+      Sandbox_2 = Sandboxer.spawn
+      it "aggregates other scanners, makes them behave as one sequence of scanners" do
+        Sandbox_2.with self
+        module Sandbox_2
           scn = Basic::List::Scanner::Aggregate[
               Basic::List::Scanner[ [ :a, :b ] ],
               Basic::List::Scanner[ [ ] ],

@@ -3,7 +3,7 @@ module Skylab::TestSupport
   class IO::Spy < ::Skylab::Headless::IO::Interceptors::Tee  # :[#023] ..
 
     def self.standard
-      new( BUFFER_I__ => Subsys::Services::StringIO.new ).tty!
+      new( BUFFER_I__ => TestSupport_::Services::StringIO.new ).tty!
     end
 
     def string  # assumes this constituent

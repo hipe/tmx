@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  module List::Scanner
+  class List::Scanner
 
     class For::String  # read [#024] (in [@022]) the string scanner narrative
 

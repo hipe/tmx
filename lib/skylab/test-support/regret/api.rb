@@ -5,7 +5,7 @@ module Skylab::TestSupport
     module API
       API = self
       Regret = Regret
-      TestSupport = Subsys
+      TestSupport = TestSupport_
 
       %i| Basic Face Headless MetaHell |.each do |i|
         const_set i, TestSupport::Services.const_get( i, false )
@@ -17,7 +17,7 @@ module Skylab::TestSupport
 
     end
 
-    Subsys::Services::Face::API[ self ]
+    TestSupport_::Services::Face::API[ self ]
 
     action_name_white_rx( /[a-z0-9]$/ )
 
@@ -94,11 +94,16 @@ module Skylab::TestSupport
       private
 
         def snitch
-          @sn ||= begin
-            vtu = @vtuple or raise "sanity -  no vtuple for this #{
-              }instance of #{ self.class }"
-            vtu.make_snitch @err, some_expression_agent
-          end
+          @sn ||= bld_snitch
+        end
+
+        def bld_snitch
+          _vtu = @vtuple or raise say_no_vtuple
+          _vtu.make_snitch @err, some_expression_agent
+        end
+
+        def say_no_vtuple
+          "sanity -  no vtuple for this instance of #{ self.class }"
         end
 
         def generic_listener

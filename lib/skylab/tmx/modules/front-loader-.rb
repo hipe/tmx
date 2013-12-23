@@ -5,7 +5,8 @@ module ::Skylab::TMX
     # this is where sausage is made
 
     SKIP_H_ = {
-      :'quickie' => :hop
+      :'quickie' => :hop,
+      :'regret' => :hop
     }.freeze
 
     BIN_PN_, PREFIX_ = ::Skylab::Subsystem::PATHNAMES.at :bin, :binfile_prefix
@@ -101,14 +102,14 @@ module ::Skylab::TMX
     # can add a sub-node explicitly. in this case it is a sub-node with
     # a nonstandard location:
 
-    namespace :regret, -> do
-      require 'skylab/test-support/core'
-      ::Skylab::TestSupport::Regret::CLI::Client
-    end, :skip, false
-
     namespace :'quickie', -> do
       require 'skylab/test-support/core'
       ::Skylab::TestSupport::Quickie::Recursive_Runner
-    end
+    end, :skip, false
+
+    namespace :regret, -> do  # because names are not isomorphic with f.s
+      require 'skylab/test-support/core'
+      ::Skylab::TestSupport::Regret::CLI::Client
+    end, :skip, false
   end
 end

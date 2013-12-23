@@ -1,21 +1,27 @@
-module Skylab::TestSupport::Regret::CLI
+module Skylab::TestSupport
 
-  API = ::Skylab::TestSupport::Regret::API
-  Face = ::Skylab::Face
-  CLI = self
+  module Regret::CLI
 
-  def self.new *a
-    CLI::Client.new( * a )
+    def self.new * x_a
+      Client.new( * x_a )
+    end
+
+    Face = TestSupport_::Services::Face
+    Client = ::Class.new Face::CLI
   end
 
-  class CLI::Client < Face::CLI
+  class Regret::CLI::Client
+
+    API = Regret::API
+    CLI = Regret::CLI
+    Headless = TestSupport_::Services::Headless
 
     API::Conf::Verbosity[ self ]
 
     def initialize( * )
       super
       @param_h = { }
-      @pth = Face::Services::Headless::CLI::PathTools::FUN.pretty_path
+      @pth = Headless::CLI::PathTools::FUN.pretty_path
       nil
     end
 
@@ -90,10 +96,8 @@ module Skylab::TestSupport::Regret::CLI
       end
 
     def doc_test *a
-      if (( r = parse_doc_test_args a ))
-        r = execute_with :param_x, @param_h
-      end
-      r
+      r = parse_doc_test_args a
+      r and execute_with :param_x, @param_h
     end
 
   private
@@ -133,16 +137,21 @@ module Skylab::TestSupport::Regret::CLI
   private
 
     def recursive_check_bad_keys
-      if (( bad_a = @param_h.keys - WHITE_A__ )).length.nonzero?
-        omg = Face::Services::Headless::NLP::EN.calculate do
-          "the #{ and_ bad_a.map( & Cleanup_hack__ ) } option#{ s } #{
-            }#{ s :is } not supported with the recursive option."
-        end
-        @y << omg
+      if (( bad_a = @param_h.keys - WHITE_A__ )).length.zero? then true else
+        @y << say_bad_keys( bad_a )
         false
-      else true end
+      end
     end
+
+    def say_bad_keys bad_a
+      Headless::NLP::EN.calculate do
+       "the #{ and_ bad_a.map( & Cleanup_hack__ ) } option#{ s } #{
+         }#{ s :is } not supported with the recursive option."
+      end
+    end
+
     WHITE_A__ = %i( core_basename do_force recursive_o vtuple ).freeze
+
     Cleanup_hack__ = -> i do
       "'#{ Headless::Name::FUN::Labelize[ i ].downcase }'"
     end
@@ -258,7 +267,7 @@ module Skylab::TestSupport::Regret::CLI
       r
     end
 
-    Face::Services::Headless::Plugin::Host::Proxy.enhance self do  # at end
+    Headless::Plugin::Host::Proxy.enhance self do  # at end
       services [ :out, :ivar ],
                [ :err, :ivar ],
                [ :pth, :ivar ],

@@ -106,15 +106,26 @@ module Skylab::Face
       end
     end
 
-    Parameter_Arities_ = Face::Services::Headless::Arity::Space.create do
+    p = -> space, x do
+      _Headless = Services::Headless
+      _a = space.each.map { |ar| "'#{ ar.local_name_function.local_normal }'" }
+      _or = _Headless::NLP::EN::Minitesimal::Oxford_comma[' or ', _a ]
+      _for = _Headless::Name::FUN::Module_moniker[ space ]
+      _msg = "'#{ x }' is not a recognized arity of the #{ _for } - #{
+        }did you mean #{ _or }?"
+      raise ::NameError, _msg
+    end
+
+    Parameter_Arities_ = Face::Services::Headless::Arity::Space.create p do
       self::ZERO_OR_ONE = new 0, 1
       self::ZERO_OR_MORE = new 0, nil
       self::ONE = new 1, 1
       self::ONE_OR_MORE = new 1, nil
     end
 
-    Argument_Arities_ = Face::Services::Headless::Arity::Space.create do
+    Argument_Arities_ = Face::Services::Headless::Arity::Space.create p do
       self::ZERO = new 0, 0
+      self::ZERO_OR_MORE = new 0, nil
       self::ONE = new 1, 1
     end
 

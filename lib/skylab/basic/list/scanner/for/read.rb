@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  module List::Scanner
+  class List::Scanner
 
     For::Read = MetaHell::Function::Class.new :count, :gets, :line_number
     class For::Read

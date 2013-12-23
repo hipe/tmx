@@ -204,7 +204,7 @@ module Skylab::TestSupport
       end
     end
 
-    Basic = Subsys::Services::Basic
+    Basic = TestSupport_::Services::Basic
     Chain_ = MetaHell::FUN.function_chain
     Index_ = Headless::CLI::Option::FUN.basic_switch_index_curry
   end

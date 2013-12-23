@@ -134,7 +134,7 @@ module Skylab::TestSupport::Regret::API
     def build_down d, a
       @buff = TestSupport::Services::StringIO.new
       r = true ; begin
-        p = d.join TS_
+        p = d.join TestSupport_
         if p.exist?
           say :medium, -> { "exists - #{ p }" }
         else
@@ -145,10 +145,10 @@ module Skylab::TestSupport::Regret::API
       end while true
       r
     end
-    TS_ = 'test-support.rb'.freeze
+    TestSupport_ = 'test-support.rb'.freeze
 
     def make dpn
-      io = @buff ; pn = dpn.join TS_
+      io = @buff ; pn = dpn.join TestSupport_
       dpn.exist? or make_dir dpn
       tmpl = self.class.const_get( :Templo, false ).begin @wlk, pn
       tmpl.render_to io

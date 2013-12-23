@@ -4,7 +4,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Recursiv
 
   ::Skylab::TestSupport::Services::Face::TestSupport::CLI[ self ]
 
-  ::Skylab::TestSupport::TestSupport::Regret[ TS_ = self ]
+  ::Skylab::TestSupport::TestSupport::Regret[ TestSupport_ = self ]
 
   include CONSTANTS
 
@@ -12,7 +12,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Recursiv
 
   describe "#{ TestSupport }::Regret::CLI::Actions::DocTest (--recursive)" do
 
-    extend TS_
+    extend TestSupport_
 
     def client_class
       TestSupport::Regret::CLI::Client

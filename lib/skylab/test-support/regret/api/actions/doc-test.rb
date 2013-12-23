@@ -55,7 +55,7 @@ module Skylab::TestSupport::Regret::API
       [ :load_file, :arity, :zero_or_one ],
       [ :load_module, :arity, :zero_or_one ],
       [ :path, :arity, :zero_or_one ],
-      [ :template_option_a, :arity, :zero_or_one ],
+      [ :template_option_a, :arity, :zero_or_more ],
       API::Conf::Verbosity[ self ].param( :vtuple )
 
     def initialize( * )

@@ -25,6 +25,23 @@ module Skylab::Headless
         i.to_s.gsub DASH_, UNDERSCORE_
       end
 
+      Module_moniker_ = -> num_parts, mod do
+        s_a = mod.name.split DOUBLE_COLON_
+        _s_a_ = if ! num_parts then s_a
+        elsif num_parts.respond_to? :cover?
+          s_a[ num_parts ]
+        elsif num_parts.zero?
+          MetaHell::EMPTY_A_
+        else
+          s_a[ - num_parts .. -1 ]  # whether positive or negative
+        end
+        _s_a_.map do |s|
+          Naturalize[ Normify[ s ] ]
+        end * TERM_SEPARATOR_STRING_
+      end
+
+      Module_moniker = Module_moniker_.curry[ 1 ]
+
       Naturalize = -> do  # for normals only. handle dashy normals
         rx = %r([-_])
         -> i do
@@ -44,7 +61,8 @@ module Skylab::Headless
       end
     end
 
-    COLON_ = ':'.freeze ; DASH_ = '-'.freeze ; UNDERSCORE_ = '_'.freeze
+    COLON_ = ':'.freeze ; DASH_ = '-'.freeze ;
+    DOUBLE_COLON_ = '::'.freeze ; UNDERSCORE_ = '_'.freeze
 
     class Function
 

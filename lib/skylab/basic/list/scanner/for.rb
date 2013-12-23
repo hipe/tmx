@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  module List::Scanner
+  class List::Scanner
 
     module For
 

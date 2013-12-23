@@ -65,11 +65,10 @@ module Skylab::Headless
     NL__ = "\n".freeze  # not #DOS-line-endings
 
     def line_begin_string= s
-      self.line_begin_p = -> { @down_IO.write s }
-      s
+      self.line_begin_proc = -> { @down_IO.write s } ; s
     end
 
-    def line_begin= p
+    def line_begin_proc= p
       add_line_hndlr :@line_begin_p, p ; p
     end
 

@@ -2,12 +2,12 @@ require_relative '../../test-support'
 
 module Skylab::TestSupport::TestSupport::Regret::CLI_Actions_Simplecov
 
-  ::Skylab::TestSupport::TestSupport::Regret[ TS_ = self ]
+  ::Skylab::TestSupport::TestSupport::Regret[ TestSupport_ = self ]
 
   add_command_parts_for_system_under_test 'regret', 'simplecov'
 
   module InstanceMethods
-    SUT_TEST_SUPPORT_MODULE_HANDLE_ = TS_
+    SUT_TEST_SUPPORT_MODULE_HANDLE_ = TestSupport_
   end
 
   include CONSTANTS
@@ -20,7 +20,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI_Actions_Simplecov
 
   describe "#{ TestSupport }::Regret::CLI::Actions::Simplecov" do
 
-    extend TS_
+    extend TestSupport_
 
     it "THIS TEST IS AT ONCE SO BEAUTIFUL AND SO UGLY" do
       cmd_a = build_command_a

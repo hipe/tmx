@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  module List::Scanner
+  class List::Scanner
 
     class For::Array  # read [#023] (in [#022]) the array scanner narrative
 

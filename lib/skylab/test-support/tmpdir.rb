@@ -4,7 +4,7 @@ module Skylab::TestSupport
 
   class Tmpdir < ::Pathname  # #todo this should probably move to e.g [hl] IO b.c it is no longer used exclusively in testing
 
-    include Subsys::Services::FileUtils
+    include TestSupport_::Services::FileUtils
 
     def initialize * x_a  # [ <path_x> ] [ <opt_h> ]
       st = ST__.dup
@@ -17,7 +17,7 @@ module Skylab::TestSupport
       end
       x_a.length.zero? or raise ::ArgumentError, "#{ a.length } unparsed"
       @infostream, @max_mkdirs, @is_noop, pth, @be_verbose = st.to_a
-      super pth || Subsys::Services::Tmpdir.tmpdir
+      super pth || TestSupport_::Services::Tmpdir.tmpdir
     end
 
     St__ = ::Struct.new :infostream, :max_mkdirs, :noop, :path, :verbose
@@ -220,7 +220,7 @@ module Skylab::TestSupport
     end
     #
     def info msg
-      (( @infostream ||= Subsys::Stderr_[] )).puts msg
+      (( @infostream ||= TestSupport_::Stderr_[] )).puts msg
     end
   end
 end

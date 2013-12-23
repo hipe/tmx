@@ -192,9 +192,9 @@ module Skylab::Face
     private
 
       def say_multiple
-        fld = @fld
+        fld_object = @fld
         say do
-          "multiple arguments were provided for #{ par fld } but #{
+          "multiple arguments were provided for #{ par fld_object } but #{
             }only one can be accepted"  # note at [#050]
         end
       end
@@ -275,9 +275,11 @@ module Skylab::Face
 
       @y ||= ::Enumerator::Yielder.new( & @infostream.method( :puts ) )
       cy = Face::Services::Basic::Yielder::Counting.new( & @y.method( :<< ) )
-      ok = Normalization_.new( :field_box, field_box, :notifiee, self,
-        :any_expression_agent, any_expression_agent, :notice_yielder, cy,
-        :param_h, @param_h ).execute
+      _fb = field_box ; _exag = any_expression_agent
+      _norm = Normalization_.new :field_box, _fb, :notifiee, self,
+        :any_expression_agent, _exag, :notice_yielder, cy,
+        :param_h, @param_h
+      ok = _norm.execute
       ok &&= execute
       ok
     end
@@ -302,8 +304,13 @@ module Skylab::Face
 
         private
 
-          def par fld
-            "\"#{ hack_label fld.local_normal_name }\""
+          def par fld_x
+            if fld_x.respond_to? :id2name
+              i = fld_x
+            else
+              i = fld_x.local_normal_name
+            end
+            "\"#{ hack_label i }\""
           end
 
           define_method :hack_label, & Hack_label

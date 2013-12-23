@@ -97,7 +97,6 @@ module Skylab::CssConvert
   public
 
     def convert directives_file
-      require 'debugger' ; debugger ; 1.class
       result = :error
       begin
         set! or break

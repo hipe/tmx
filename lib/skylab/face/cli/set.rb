@@ -34,7 +34,7 @@ module Skylab::Face
     class << self
       undef_method :set
       def set *a
-        @story.absorb_xtra a
+        @story.absorb_extr a
         nil
       end
     end
@@ -83,7 +83,7 @@ module Skylab::Face
 
   class Node_Sheet_
 
-    # `absorb_xtra` - #called-by instance of child class : e.g NS_Sheet_
+    # #called-by instance of child class : e.g NS_Sheet_
     # we do it this way and not with using the attr_writer b.c using `foo=`
     # is too conceptually limiting - its conventional interface is a) not the
     # same as ours and b) ambiguous for how to procede with errors and c)
@@ -94,8 +94,8 @@ module Skylab::Face
 
     Fly_ = Services::Basic::List::Scanner::For::Array.new( Val_a_ = [ 0 ] )
 
-    undef_method :absorb_xtra
-    def absorb_xtra xtra_a  # assumes nonzero length
+    undef_method :absorb_extr
+    def absorb_extr xtra_a  # assumes nonzero length
       if 1 == xtra_a.length and xtra_a[ 0 ].respond_to? :each_pair
         h = xtra_a[ 0 ] ; keys = h.keys
         if keys.length.nonzero?

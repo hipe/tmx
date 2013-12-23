@@ -6,7 +6,7 @@ module Skylab::TestSupport
 
       module DocTest
 
-        Parse_Recursive_ = Subsys::Services::Basic::Struct[ :y, :v, :argv ]
+        Parse_Recursive_ = TestSupport_::Services::Basic::Struct[ :y, :v, :argv ]
 
         # the things we do for love. **necessary** to support argv's like:
         #
@@ -51,7 +51,7 @@ module Skylab::TestSupport
           P_ = MetaHell::FUN.parse_alternation.
             curry[ :pool_procs, A_.map(& :p ) ]
 
-          Or_ = Headless::NLP::EN::Minitesimal::Oxford_comma.
+          Or_ = Headless::NLP::EN::Minitesimal::Oxford_comma_.
             curry[ ', ', ' or ' ]
 
           REST_RX_ = /\A-(?<stem>[^-].*)\z/

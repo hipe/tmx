@@ -6,7 +6,7 @@ module ::Skylab::TestSupport
 
       def tmpdir
         @tmpdir ||= begin
-          Subsys::Tmpdir.new path: tmpdir_pathname,
+          TestSupport_::Tmpdir.new path: tmpdir_pathname,
             max_mkdirs: ( count_to_top + 1 ) # one for tmp/your-sub-product
         end
       end

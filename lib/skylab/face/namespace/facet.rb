@@ -24,151 +24,183 @@ module Skylab::Face
 
   class NS_Sheet_  # #re-open for 5.3x
 
-    # (the way it works out this is nicer structured as a top-down narrative
-    # rather than being broken into the traditional sections, hence you will
-    # see private/p-rotected called explicitly after each relevant method.)
-
-    def namespace norm_i, *a, &b
-      if ! @skip_h[ norm_i ]
-        write_ns norm_i, -> ns do
-          # if one existed by name `norm_i` already, is `ns`
-          ns.absorb_additional_namespace_definition a, b
-          nil
-        end, -> do  # else a namespace does not yet exist as `norm_i`
-          build_child_namespace_sheet norm_i, a, b
-        end
-      end
-      nil  # our internal struct is internal
+    def namespace norm_i, *a, &p
+      @skip_h[ norm_i ] or do_ns norm_i, a, p
+    end
+  private
+    def do_ns norm_i, a, p
+      write_ns norm_i, -> ns do
+        ns.absrb_additional_namespace_definition a, p  # #jump-1
+      end, -> do  # else a namespace does not yet exist as `norm_i`
+        bld_child_namespace_sheet norm_i, a, p  # #jump-2
+      end ; nil
     end
 
-    def write_ns norm_i, yes, no  # internally used to create or update n.s
-      @node_open and raise "can't add namespace #{
-        }when command is still open - #{ norm_i }"
+    def write_ns norm_i, yes_p, no_p  # internally used to create or update n.s
+      @node_open and raise say_cant_add_namespace_to_open_command norm_i
       @box.if? norm_i, -> nss do
-        nss.class.metastory.is_leaf and raise "attempt to reopen a command #{
-          }as a namespace - #{ norm_i }"
-        yes[ nss ]
-        nss.do_skip and raise "cannot skip an already opened namespace."
-        nil
-      end, -> do
-        nss = no[] or raise "expecting `no` block to produce namespace"
-        if nss.do_include
-          @surface_mod[].story._scooper.add_name_at_this_point norm_i
-          @box.add norm_i, nss
-        else
-          @skip_h[ norm_i ] = true
-        end
-        nil
-      end
-      nil  # our internal struct is internal
-    end
-    private :write_ns
-
-    # `build_child_namespace_sheet`
-
-    -> do  # (funtions are bottom-up, methods top-down)
-
-      mlf = -> { "module-loading function" } ; db = -> { "definition block" }
-      nsm = -> { "namespace module" }
-      mutex = -> mp, b do
-        ( mp && b and i = 2 ) or ( ! ( mp || b ) and i = 0 )
-        i and raise ::ArgumentError, "must have exactly 1 (#{ mlf[] }#{
-          } OR #{ db[] }) - had #{ i }"
-      end
-      box_mod = -> sm do
-        if sm.const_defined? :Commands, false
-          sm.const_get :Commands, false else
-          sm.const_set :Commands, ::Module.new
-        end
-      end
-      parse_args = -> a do
-        a.length.nonzero? && a[ 0 ].respond_to?( :call ) and mp = a.shift
-        if a.length.nonzero?
-          xtra_a = a  # still can be one hash or an arg list
-        end
-        [ mp, xtra_a ]
-      end
-      define_method :build_child_namespace_sheet do |norm_i, a, b|
-        nf = Services::Headless::Name::Function.new norm_i
-        mp, xtra_x = parse_args[ a ]
-        mutex[ mp, b ]
-        if mp
-          self.class.new( nil ).init_with_module_proc mp, nf, xtra_x
-        else
-          build_into b, nf, xtra_x
-        end
-      end
-      private :build_child_namespace_sheet
-
-      def has_name
-        @name
-      end
-
-      def name  # public like parent
-        if @name then @name else
-          fail "who is asking for namefunc of #{ @surface_mod[] }?"
-        end
-      end
-
-      define_method :absorb_additional_namespace_definition do |a, b|
-        mp, xtra_x = parse_args[ a ]
-        mp || b and mutex[ mp, b ]
-        xtra_x and absorb_xtra xtra_x
-        if mp
-          @surface_mod_origin_i and raise "can't set a #{ mlf[] } to a #{
-            }#{ nsm[] } already originates with #{ @surface_mod_origin_i }"
-          @surface_mod_origin_i = :function
-          @surface_mod = mp
-        elsif b
-          if @surface_mod_origin_i
-            @name and xtra = " \"#{ @name.local_normal }\""
-            :blocks == @surface_mod_origin_i or raise "won't add a #{ db[] }#{
-              } to #{ nsm[] }#{ xtra } that was loaded via #{
-              }#{ @surface_mod_origin_i }"
-            @block_a << b
-          else
-            @surface_mod_origin_i = :blocks
-            @block_a = [ b ]
-          end
-        end
-      end  # stay public
-
-      define_method :build_into do |block, name_func, xtra_x|
-        bm = box_mod[ @surface_mod[] ]
-        co = name_func.as_const
-        bm.const_defined?( co, false ) and raise "sanity - don't do this"
-        sty = ( bm.const_set co, ::Class.new( Namespace ) ).story
-        sty.init_with_block block, name_func, xtra_x
-      end
-      private :build_into
-
-    end.call
-
-    def init_with_local_normal_name i  # for hacks, exploration
-      @name and fail "won't clobber existing name"
-      @name = Services::Headless::Name::Function.new i
-      self
+        updt_namespace norm_i, nss, yes_p
+      end, -> _bx do
+        add_ns norm_i, no_p
+      end ; nil  # our internal struct is internal
     end
 
-  protected  # #protected not private
+    def updt_namespace norm_i, nss, yes_p
+      nss.class.metastory.is_leaf and raise say_leaf_to_branch_error norm_i
+      yes_p[ nss ]
+      nss.do_skip and raise say_cannot_skip_already_opened_namespace ; nil
+    end
 
-    def init_with_module_proc mp, nf, xtra_x
+    def add_ns norm_i, no_p
+      nss = no_p[] or raise say_no_block_must_produce_namespace
+      if nss.do_include
+        @surface_mod[].story._scooper.add_name_at_this_point norm_i
+        @box.add norm_i, nss
+      else
+        @skip_h[ norm_i ] = true
+      end ; nil
+    end
+
+    def say_cant_add_namespace_to_open_command norm_i
+      "can't add namespace when command is still open - #{ norm_i }"
+    end
+
+    def say_leaf_to_branch_error norm_i
+      "attempt to reopen a command as a namespace - #{ norm_i }"
+    end
+
+    def say_cannot_skip_already_opened_namespace
+      "cannot skip an already opened namespace."
+    end
+
+    def say_no_block_must_produce_namespace
+      "cannot skip an already opened namespace."
+    end
+
+  protected
+
+    def absrb_additional_namespace_definition a, p  # :#jump-1
+      mp, xtra_x = prs_ns_args a
+      mp || p and assrt_exactly_one mp, p
+      xtra_x and absorb_extr xtra_x
+      if mp
+        absrb_module_proc mp
+      elsif p
+        absrb_module_def_p p
+      end
+    end
+
+  private
+
+    def absrb_module_proc mp
+      @surface_mod_origin_i and raise "can't set a #{ MLF__ } to a #{
+        }#{ NSM__ } that already originates with a #{ @surface_mod_origin_i }"
+      @surface_mod_origin_i = :function
+      @surface_mod = mp ; nil
+    end
+
+    def absrb_module_def_p p
+      if @surface_mod_origin_i
+        :blocks == @surface_mod_origin_i or raise say_wont_add xtra
+        @block_a << p
+      else
+        @surface_mod_origin_i = :blocks
+        @block_a = [ p ]
+      end ; nil
+    end
+
+    def say_wont_add xtra
+      @name and _ = " \"#{ @name.local_normal }\""
+      "won't add a #{ DB__ } to #{ NSM__ }#{ _ } that was loaded via #{
+        }#{ @surface_mod_origin_i }"
+    end
+
+    def bld_child_namespace_sheet norm_i, a, p  # :#jump-2
+      nf = Services::Headless::Name::Function.new norm_i
+      mp, xtra_x = prs_ns_args a
+      assrt_exactly_one mp, p
+      if mp
+        self.class.new( nil ).init_w_module_proc mp, nf, xtra_x
+      else
+        build_into p, nf, xtra_x
+      end
+    end
+
+    def prs_ns_args a
+      a.length.nonzero? && a.first.respond_to?( :call ) and mp = a.shift
+      a.length.nonzero? and xtra_a = a  # can be a hash or an arg list
+      [ mp, xtra_a ]
+    end
+
+    def assrt_exactly_one mp, p
+      ( mp && p and d = 2 ) or ( ! ( mp || p ) and d = 0 )
+      d and raise ::ArgumentError, say_must_have_one( d )
+    end
+
+    def say_must_have_one d
+      "must have exactly 1 (#{ MLF__ } OR #{ DB__ }) - had #{ d }"
+    end
+
+    DB__ = "definition block"
+    MLF__ = "module-loading function"
+    NSM__ = "namespace module"
+
+  protected
+
+    def init_w_module_proc mp, nf, xtra_x
       @surface_mod = mp
-      init_extended_ns_sheet :function, nf, xtra_x
+      init_extndd_ns_sheet :function, nf, xtra_x
     end
 
-    def init_with_block b, nf, xtra_x
+  private
+
+    def build_into block, name_func, xtra_x
+      bm = box_mod_for @surface_mod[]
+      co = name_func.as_const
+      bm.const_defined?( co, false ) and raise "sanity - don't do this"
+      sty = ( bm.const_set co, ::Class.new( Namespace ) ).story
+      sty.init_w_block block, name_func, xtra_x
+    end
+
+    def box_mod_for sm
+      if sm.const_defined? :Commands, false
+        sm.const_get :Commands, false
+      else
+        sm.const_set :Commands, ::Module.new
+      end
+    end
+
+  protected
+
+    def init_w_block b, nf, xtra_x
       @block_a = [ b ]
-      init_extended_ns_sheet :blocks, nf, xtra_x  # overwrites `:module`, ok.
+      init_extndd_ns_sheet :blocks, nf, xtra_x  # overwrites `:module`, ok.
     end
 
-    def init_extended_ns_sheet i, nf, xtra_x
-      @hot = nil
-      @surface_mod_origin_i = i
-      @name = nf
-      xtra_x and absorb_xtra xtra_x
-      self
+  private
+
+    def init_extndd_ns_sheet i, nf, xtra_x
+      @hot = nil ;  @name = nf ; @surface_mod_origin_i = i
+      xtra_x and absorb_extr xtra_x ; self
     end
+
+  public
+
+    def has_name
+      @name
+    end
+
+    def name  # public like parent
+      @name or fail say_who_want_name
+    end
+
+  private
+
+    def say_who_wants_name s
+      "who is asking for namefunc of #{ @surface_mod[] }?"
+    end
+
+  protected
 
   public
 
@@ -217,6 +249,14 @@ module Skylab::Face
         end
       end
     end.call
+
+    # ~ hacks
+
+    def init_with_local_normal_name i  # for hacks, exploration
+      @name and fail "won't clobber existing name"
+      @name = Services::Headless::Name::Function.new i
+      self
+    end
   end
 
   class NS_Mechanics_  # #re-open for 5.3x
