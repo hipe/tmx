@@ -60,6 +60,8 @@ module Skylab::Headless
 
     Oxford_comma = Oxford_comma_.curry[ ', ' ]
 
+    Oxford_comma_or = Oxford_comma.curry[ ' or ' ]
+
     coc = o[:curriable_oxford_comma] = -> ult, sep, a do
       Oxford_comma_[ sep, ult, a ]  # #todo:after-the-fire
     end

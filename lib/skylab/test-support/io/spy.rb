@@ -3,7 +3,9 @@ module Skylab::TestSupport
   class IO::Spy < ::Skylab::Headless::IO::Interceptors::Tee  # :[#023] ..
 
     def self.standard
-      new( BUFFER_I__ => TestSupport_::Services::StringIO.new ).tty!
+      io = new( BUFFER_I__ => TestSupport_::Services::StringIO.new ).tty!
+      block_given? and yield io
+      io
     end
 
     def string  # assumes this constituent
@@ -18,20 +20,31 @@ module Skylab::TestSupport
     end
 
     def debug! prepend_x=nil
-      down_IO = Stderr_[]
-      if prepend_x
-        io = Headless::IO::Interceptors::Filter.new down_IO
-        if prepend_x.respond_to? :call
-          io.puts_filter! prepend_x
-        else
-          io.line_begin_string = prepend_x
-        end
-      else
-        io = down_IO
-      end
-      self[ DEBUG_I__ ] = io
-      self
+      set_dbg_element DEBUG_I__, Stderr_[], prepend_x ; self
     end
+
+    def any_debug_IO_notify any_debug_IO
+      any_debug_IO and set_dbg_element DEBUG_I__, any_debug_IO, nil ; nil
+    end
+
+  private
+
+    def set_dbg_element element_i, down_IO, prepend_x
+      self[ element_i ] = prepend_x ? wrp_IO( prepend_x, down_IO ) : down_IO
+      nil
+    end
+
+    def wrp_IO prepend_x, down_IO
+      io = Headless::IO::Interceptors::Filter.new down_IO
+      if prepend_x.respond_to? :call
+        io.puts_filter! prepend_x
+      else
+        io.line_begin_string = prepend_x
+      end
+      io
+    end
+
+  public
 
     BUFFER_I__ = :buffer ; DEBUG_I__ = :debug  # ok to open up if needed
 

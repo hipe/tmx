@@ -109,7 +109,7 @@ module Skylab::Face
     p = -> space, x do
       _Headless = Services::Headless
       _a = space.each.map { |ar| "'#{ ar.local_name_function.local_normal }'" }
-      _or = _Headless::NLP::EN::Minitesimal::Oxford_comma[' or ', _a ]
+      _or = _Headless::NLP::EN::Minitesimal::Oxford_comma_or[ _a ]
       _for = _Headless::Name::FUN::Module_moniker[ space ]
       _msg = "'#{ x }' is not a recognized arity of the #{ _for } - #{
         }did you mean #{ _or }?"

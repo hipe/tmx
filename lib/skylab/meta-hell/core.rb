@@ -2,11 +2,11 @@ require_relative '..'
 
 module Skylab
 
-  module MetaHell  # welcome to meta hell
+  module MetaHell  # welcome to meta hell. please read [#041] #storypoint-005
 
     MetaHell = self
 
-    EMPTY_A_            =  [ ].freeze  # #ocd
+    EMPTY_A_            =  [ ].freeze  #storypoint-015 explains this OCD
     EMPTY_P_            = ->   { }
     MONADIC_EMPTINESS_  = -> _ { }
     MONADIC_TRUTH_      = -> _ { true }
@@ -22,7 +22,7 @@ module Skylab
     #                  ~ auto-trans-substantiation ~
 
     module Autoloader
-      include ::Skylab::Autoloader  # [#041]
+      include ::Skylab::Autoloader  # [#054] #storypoint-025
       Enhance_ = Enhance_
       ::Skylab::Autoloader[ self ]
     end
@@ -39,9 +39,6 @@ module Skylab
         new( * x_a ).execute
       end
     end
-
-    stowaway :Method_Added_Muxer, %i( FUN Fields_ Mechanics_ )  # for now
-
   end
 end
 
@@ -106,11 +103,15 @@ module Skylab::MetaHell
       def build_hard_bundle_fetcher  # :+#bundle-multiset-API
         h = ::Hash.new( & method( :handle_bundle_not_found ) )
         constants.each do |const_i|
-          x = const_get const_i, false
-          k = if x.respond_to? :bundles_key then x.bundles_key
-          elsif UCASE_RANGE__.include? const_i.to_s.getbyte( 1 ) then const_i
-          else const_i.downcase end
-          h[ k ] = x
+          # #storypoint-110 how bundle name resolution works
+          str = const_i.to_s
+          _k = if UCASE_RANGE__.include? str.getbyte( 1 )
+            const_i
+          else
+            str[ 0 ] = str[ 0 ].downcase
+            str.intern
+          end
+          h[ _k ] = const_get const_i
         end
         h
       end

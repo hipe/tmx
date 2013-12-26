@@ -21,7 +21,7 @@ module Skylab::MetaHell::TestSupport::AL_
 
   Guess_dir_ = ::Skylab::Autoloader::Guess_dir_
 
-  # ( [#041] explains why we have fully qualified names below )
+  # ( [#054] explains why we have fully qualified names below )
 
   describe "#{ ::Skylab::Autoloader } [..] `guess_dir`" do
 
