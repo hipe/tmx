@@ -1,6 +1,8 @@
 module Skylab::TanMan
   class Models::Remote::Controller < Models::Model
-     extend MetaHell::DelegatesTo
+
+     Headless::Delegating[ self, :employ_the_DSL_method_called_delegates_to ]  # this is a non-functionig line to help during #de-integration
+
      extend MetaHell::Formal::Attribute::Definer
 
     # `bound` means "is it bound to a sexp?" .. might go away

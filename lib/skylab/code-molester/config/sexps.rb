@@ -50,7 +50,7 @@ module Config  # #borrow x 1
 
   class Sexps::Enumerator::Hashish::Sections < Sexps::Enumerator::Hashish
 
-    extend MetaHell::DelegatesTo
+    Headless::Delegating[ self, :employ_the_DSL_method_called_delegates_to ]
 
     def [] k
       detect do |i|

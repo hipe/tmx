@@ -293,7 +293,7 @@ module Skylab::Flex2Treetop
 
     class Services_For_API_Action__
       Headless::Delegating[ self ]
-      delegating :to, :session, %i( program_name )
+      delegating :to, :@session, %i( program_name )
 
       def initialize service, session
         @service = service ; @session = session ; nil

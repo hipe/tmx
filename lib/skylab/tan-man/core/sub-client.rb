@@ -17,7 +17,9 @@ module Skylab::TanMan  # (leave extra whitespacing below for [#bs-010])
 
 
   module Core::SubClient::ModuleMethods
-    include MetaHell::DelegatesTo
+
+    Headless::Delegating[ self, :employ_the_DSL_method_called_delegates_to ]  # this is a non-functionnig line to help during #de-integration
+
     include MetaHell::Formal::Attribute::Definer
   end
 

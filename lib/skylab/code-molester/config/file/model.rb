@@ -39,49 +39,12 @@ module Skylab::CodeMolester
 
     attr_reader :entity_noun_stem, :pathname
 
-    module Delegate__  # maybe push up to [#mh-052]
-      def self.[] mod, * x_a
-        begin
-          st = St__.new
-          :to == x_a.shift or fail '`to`' ; st[ :to ] = x_a.shift
-          :if == x_a.shift or fail '`if`' ; st[ :if ] = x_a.shift
-          :methods == x_a.shift or fail '`methods`' ; st[ :methods ] = x_a.shift
-          mod.module_exec st, & Flush__ ; nil
-        end while x_a.length.nonzero?
-      end
-      #
-      St__ = ::Struct.new :to, :if, :methods
-      #
-      Flush__ = -> st do
-        receiver_i, cond_p, meth_i_a = st.to_a
-        meth_p = if AT__ == receiver_i[ 0 ]
-          -> meth_i do
-            -> *a, &p do
-              instance_variable_get( receiver_i ).send meth_i, *a, &p if
-                instance_exec( & cond_p )
-            end
-          end
-        else
-          -> meth_i do
-            -> *a, &p do
-              send( receiver_i ).send meth_i, *a, &p if instance_exec( & cond_p )
-            end
-          end
-        end
-        meth_i_a.each do |meth_i|
-          define_method meth_i, & meth_p[ meth_i ]
-        end ; nil
-      end
-      #
-      AT__ = '@'.freeze
-    end
-
-    Delegate__[ self,
-      :to, :sexp, :if, -> { valid? }, :methods,
+    Headless::Delegating[ self,
+      :to, :sexp, :if, -> { valid? },
         %i( [] content_items get_section_scanner_with_map_reduce_p
             key? sections set_mixed value_items ),
       :to, :@pathname, :if, -> { @pathname },
-        :methods, %i( dirname exist? writable? ) ]
+        %i( dirname exist? writable? ) ]
 
     def fetch name_i_or_s, &p  # #comport to #box-API
       name_s = name_i_or_s.to_s

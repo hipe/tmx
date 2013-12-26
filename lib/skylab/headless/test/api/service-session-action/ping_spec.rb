@@ -22,9 +22,9 @@ module Skylab::Headless::TestSupport::API::SSA__
 
         class Services_For_API_Action__
           Headless::Delegating[ self ]
-          delegating :to, :service, :to_method, :object_id, :service_id
-          delegating :to, :session, %i( program_name )
-          delegating :to, :session, :to_method, :object_id, :session_id
+          delegating :to, :@service, :to_method, :object_id, :service_id
+          delegating :to, :@session, %i( program_name )
+          delegating :to, :@session, :to_method, :object_id, :session_id
 
           def initialize service, session
             @service = service ; @session = session ; nil

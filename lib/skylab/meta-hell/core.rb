@@ -287,3 +287,11 @@ module Skylab::MetaHell
     end
   end
 end
+module Skylab::MetaHell
+  module DelegatesTo
+    def self.extended mod
+      $stderr.puts "\e[34mDEPRECATID\e[0m"  # #todo:during-merge
+      MetaHell::Services::Headless::Delegating[ mod, :employ_the_DSL_method_called_delegates_to ]
+    end
+  end
+end
