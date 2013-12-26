@@ -10,10 +10,10 @@
 [#145]       #parent-node: [#146] the method parameter name #isomophicism
 [#144]       #node-tracker go away the client spy? #testing
 [#143]       #parent-node: [#064] "understanding the queue - the narrative ..
-[#142]       #stub #parent-node: [#0135] the CLI argument syntax DSL ..
+[#142]       #stub #parent-node: [#135] the CLI argument syntax DSL ..
 [#141]       #parent-node: [#125] the real deal with expression agents #pen
 [#140]       #parent-node: [#125] the System narrative ..
-[#139]       #doc-node the perfect agent interaction model
+[#139]       #doc-node the perfect agent interaction model ..
 [#138]       #parent-node: [#125] the Action narrative ..
 [#137]       #parent-node: [#126] the CLI box narrative ..
 [#136]       #test-node #in-situ
@@ -90,14 +90,16 @@
 [#070]       #plugins!
 [#069]       #doc-point (sorry to jump ahead) "ouroboros"
 [#068]       track this redundancy during a hack
-[#067]       #hole (was: move scanners to [ba])
+[#067]       #node-tracker "client-services" #in-situ
+             #repurposed:once (was: move scanners to [ba])
 [#066]       track this combinatorial dichototmy
 [#065]       how / when are things added to the lexicon
 [#064]       #parent-node: [#126] the CLI action core instance methods narr ..
 [#063] #open track the smells because of CLI action hybridization
 [#062] #open the sweeping architecture change to accomodate homonyms
 [#061]       flyweight the architecture of language production
-[#060]       #hole (was: normalized line consumer (now "reverse scanner"))
+[#060]       #doc-node: bundles
+             #repurposed:once (was: norm'd line consumer, now "reverse scanner")
 [#059]       #tracking places where we nerk with detecting o.p dflt --help -h
 [#058]       #doc-point narrative pre-order ("outside-in") ..
 [#057] #open see how throwing a :terminate could help with o.p deep graphs
@@ -118,7 +120,8 @@
              well - i mean this is a placeholder for [#sl-116] that one thing
 [#046]       #tracking-tag for CLI facilities that facilitate rendering trees
 [#045] #open #tracking-tag ellipsify - take into acct word producers
-[#044]       #hole (was file IO scanner, moved to [#ba-004])
+[#044]       #parent-node: [#060] the delegating bundle narrative ..
+             (#repurposed:once) (was file IO scanner, moved to [#ba-004])
 [#043]       #tracking-tag newlines (DOS line endings) be damned!
 [#042]       #done spec for CLI box DSL
 [#040]       #parent-node: [#126] the CLI box DSL narrative ..
@@ -158,7 +161,7 @@
 [#016] #open #low-priority dynamic uncolorize payload stream when ! tty?
 [#015]       #doc-node the CLI IO narrative #retrofitted
 [#014]       yacc2treetop
-[#013] #open IGNORE_THIS_CONSTANT haha no
+[#013]       (#repurposed:once) the core node narrative ..
 [#012] #open redesign this with_client nonsense
 [#011]       #done regrettify all tests in this subproduct
 [#010]       #repurposed:once the client tree model ..

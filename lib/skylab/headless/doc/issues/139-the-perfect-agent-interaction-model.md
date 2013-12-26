@@ -1,5 +1,8 @@
 # the perfect agent interaction model :[#139]
 
+(note: we will probably merge this node into [#sl-102] and move that one here,
+whenever the time is right.)
+
 at long last we have found it. the problem is it only exists in our heads.
 we will have to wait until we come full circle and bring four huge branches
 together. i hope it won't be 2014 by then but it probably will be.

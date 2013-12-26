@@ -1,9 +1,8 @@
 [#055]       #doc-point the module node narrative ..
-[#054]       (#move '041-ghost-modules-explained..md')
+[#054]       #parent-node: [#041] "ghost modules explained.." #autoloading
 [#054]       #formal-box:struct #doc-point (all notes)..
 [#053]       #doc-point "discussion of all the meta-properties.."
 [#053]       #in-situ
-[#052]       #in-situ
 [#052] #open #formal-box #doc-point #in-situ `to_struct` caveat. spec this ..
 [#051]       #in-situ
 [#051]       #doc-point #experimental-pattern :#method-cherry-picker..
@@ -18,7 +17,7 @@
 [#043]       #boxxy the stemmy tree issue - try autoloading the value corresp.
                to the path "headless/nlp/en/levenshtein-.rb"
 [#042]       #doc-point introducting tagged argument lists ..
-[#041]       #autoloading: ghost modules explained..
+[#041]       #doc-node the core node narrative ..
 [#040]       #autoloading: convenient to have `const_missing` result in value
 [#039]       #deprecated `private_attr_reader`
 [#038]       #experimental hack - when the set of all local `private` methods
@@ -57,7 +56,7 @@
 [#013]       #done move porcelain attribtues to here, then clean up
 [#012]       #done foo/ and foo.rb should be automagic, no declaration of module
 [#011]       #hole (was 'Services' watcher, moved to subsystem)
-[#010]       #done pull in DelegatesTo from porcelain!
+[#010]       #done pull in D-elegatesTo from porcelain!
 [#009]       #done hen you made plastic you didn't know about `define_singleton_method`
 [#008]       #done after etc, consider pulling in Let
 [#007] #open push up logic for autoviv. of superklassen maybe? (at least test)
