@@ -41,11 +41,9 @@ module Skylab::CodeMolester
       end
     end
 
-    CodeMolester::Services::Basic::Hash::FUN.tap do |fun|
-      %i| unpack_equal unpack_superset |.each do |i|
-        define_method i, & fun[ i ]
-        private i
-      end
+    _i_a = %i( unpack_equal unpack_superset )
+    CodeMolester::Services::Basic::Hash::FUN.pairs_at _i_a do |i, p|
+      define_method i, p ; private i
     end
 
     # `find_nearest_config_file_path`

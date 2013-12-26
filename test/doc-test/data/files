@@ -1,3 +1,4 @@
+lib/skylab/basic/hash.rb
 lib/skylab/basic/hash/order-proxy.rb
 lib/skylab/basic/hash/pair-enumerator.rb
 lib/skylab/basic/list/scanner.rb

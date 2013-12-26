@@ -152,8 +152,8 @@ module Skylab::CodeMolester::Config::File::Entity
       end
     end
 
-    %i| repack_difference |.each do |i|
-      define_method i, & Basic::Hash::FUN[ i ]
+    Basic::Hash::FUN.pairs_at :repack_difference  do |i, p|
+      define_method i, p
     end
 
     join = -> a do

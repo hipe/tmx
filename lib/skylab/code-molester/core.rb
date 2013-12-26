@@ -1,5 +1,4 @@
 require_relative '..'
-
 require 'skylab/headless/core'
 require 'skylab/pub-sub/core'
 
