@@ -1,5 +1,8 @@
 # Towards an event wiring pattern :[#102]
 
+(EDIT: this is obviated by [#hl-139] the perfect werpity derpity. we will
+probably do a node merge.)
+
 (this originally appeared in a comment in a sub-product. although the
 issue was resolved in the source code at that location, the spirit of
 the comment still holds..)
