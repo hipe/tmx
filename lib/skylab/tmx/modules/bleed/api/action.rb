@@ -2,7 +2,7 @@ module Skylab
 
   class TMX::Modules::Bleed::API::Action
 
-    extend PubSub::Emitter
+    PubSub[ self, :employ_DSL_for_emitter ]
 
     taxonomic_streams :all  # used for implementing borking on unhandled.
 

@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class CLI::Services::Yamlization
 
-    extend PubSub::Emitter
+    PubSub[ self, :employ_DSL_for_emitter ]
 
     emits :text_line
 

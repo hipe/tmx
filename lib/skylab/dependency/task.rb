@@ -15,7 +15,7 @@ module Skylab::Dependency
     attr_accessor  :context
     attr_reader :invalid_reason
 
-    extend PubSub::Emitter # child classes decide what to emit
+    PubSub[ self, :employ_DSL_for_emitter ]   # child classes decide what to emit
 
     event_class PubSub::Event::Textual  # can be made more complicated..
 

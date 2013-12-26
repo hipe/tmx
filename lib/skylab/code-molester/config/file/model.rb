@@ -7,7 +7,7 @@ module Skylab::CodeMolester
       # (while [#ps-101] (cover pub-sub viz) is open..) (multiple graphs
       # in one file, specifically)
 
-      extend PubSub::Emitter
+      PubSub[ self, :employ_DSL_for_emitter ]
       emits wizzle: :paazle
     end
 

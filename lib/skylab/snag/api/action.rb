@@ -11,7 +11,7 @@ module Skylab::Snag
     meta_attribute :default
     meta_attribute :required, default: false
 
-    extend PubSub::Emitter  # put `emit` i.m lower on the chain than s.c above!
+    PubSub[ self, :employ_DSL_for_emitter ]  # put `emit` nearer on the chain than s.c above
 
     event_factory MetaHell::FUN.memoize[ -> do
       PubSub::Event::Factory::Isomorphic.new API::Events # oh boy .. use the

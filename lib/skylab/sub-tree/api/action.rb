@@ -19,7 +19,7 @@ module Skylab::SubTree
 
     ACTIONS_ANCHOR_MODULE = SubTree::API::Actions
 
-    extend PubSub::Emitter
+    PubSub[ self, :employ_DSL_for_emitter ]
 
     event_factory PubSub::Event::Factory::Isomorphic.new( API::Events )
 

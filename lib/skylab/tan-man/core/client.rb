@@ -6,7 +6,8 @@ module Skylab::TanMan
 
 
   module Core::Client::ModuleMethods
-    include PubSub::Emitter::ModuleMethods # necessary when e.g. CLI defines
+
+    PubSub[ self, :include_emitter_module_methods ]  # necessary when e.g. CLI defines
   end                             # more granulated events
 
 
@@ -17,7 +18,7 @@ module Skylab::TanMan
 
     include Core::SubClient::InstanceMethods   # ask for trouble by name
 
-    extend PubSub::Emitter        # we want the instance methods this creates
+    PubSub[ self, :employ_DSL_for_emitter ]  # we want the i.m's from this
 
     emits payload: :all, info: :all, error: :all # the PIE convention [#hl-037]
                                   # note that clients will add their own events

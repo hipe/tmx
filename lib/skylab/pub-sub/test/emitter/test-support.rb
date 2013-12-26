@@ -45,7 +45,7 @@ module Skylab::PubSub::TestSupport::Emitter
       blk = inside                # make a PubSub empowered class and nerk it
       kls = Emitter_TestSupport.const_set "KLS_#{ counter += 1 }", ::Class.new
       kls.class_exec do
-        extend PubSub::Emitter
+        PubSub[ self, :employ_DSL_for_emitter ]
         public :emit # [#ps-002] public for testing
         class_exec(& blk ) if blk
       end

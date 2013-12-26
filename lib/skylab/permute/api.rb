@@ -4,7 +4,7 @@ module Skylab::Permute
   end
 
   class API::Action
-    extend PubSub::Emitter
+    PubSub[ self, :employ_DSL_for_emitter ]
     event_factory -> _, __, x=nil { x } # "datapoints" - events are just the data
   end
 

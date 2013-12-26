@@ -3,12 +3,17 @@ module Skylab::PubSub
   module Emitter  # READ [#019] #storypoint-1
 
     def self.extended mod  # #sl-111
-      mod.extend Emitter::ModuleMethods
-      mod.send :include, Emitter::IM__
+      $stderr.puts "#{ Em__[ "`extend PubSub::Emitter` is deprecated NOW" ] } - #{
+        }replace this line with `PubSub[ self, :employ_DSL_for_emitter ]` #{
+         }or the like"  # #todo:during-merge remove this
+      PubSub[ mod, :employ_DSL_for_emitter ] ; nil
+    end
+    Em__ = -> s do
+      "\e[33m#{ s }\e[0m"
     end
   end
 
-  module Emitter::ModuleMethods  # (yes, part of our public API)
+  module Emitter::MMs  # techincally visible to above, but :+#API-private
 
     def event_stream_graph
       @event_stream_graph ||= build_event_stream_graph
@@ -146,7 +151,7 @@ module Skylab::PubSub
     end
   end
 
-  module Emitter::IM__ # #storypoint-4
+  module Emitter::IMs  # #storypoint-4
 
     #         ~ in rougly lifecycle (and then pre-) order ~
 
@@ -432,7 +437,7 @@ module Skylab::PubSub
 
       ::Class.new.class_exec do
 
-        extend Emitter
+        PubSub[ self, :employ_DSL_for_emitter ]
 
         class << self
           public :event_class, :event_factory

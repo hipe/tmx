@@ -4,7 +4,7 @@ module Skylab::TestSupport
 
     PubSub = TestSupport_::Services::PubSub
 
-    extend PubSub::Emitter
+    PubSub[ self, :employ_DSL_for_emitter ]
 
     event_class PubSub::Event::Textual
 

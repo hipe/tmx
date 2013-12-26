@@ -20,7 +20,7 @@ module Skylab::Headless::CLI::Table
     # to your call to Table.render (or you can manipualte it directly in
     # the block).
 
-    extend PubSub::Emitter
+    PubSub[ self, :employ_DSL_for_emitter ]
 
     event_factory -> { PubSub::Event::Factory::Isomorphic.new Table::Events }
 

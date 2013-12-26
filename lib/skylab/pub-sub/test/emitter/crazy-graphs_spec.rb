@@ -8,12 +8,12 @@ module ::Skylab::PubSub::TestSupport::Emitter
 
     context "class Gamma extends mod Alpha which defines a graph" do  # #todo below could be etc
       modul :Alpha do
-        extend PubSub::Emitter
+        PubSub[ self, :employ_DSL_for_emitter ]
         emits :alpha
         public :emit # [#ps-002] public for testing
       end
       klass :Gamma do |o|
-        extend PubSub::Emitter::ModuleMethods
+        PubSub[ self, :extend_emitter_module_methods ]
         include o.Alpha
       end
 
@@ -27,7 +27,7 @@ module ::Skylab::PubSub::TestSupport::Emitter
 
     context "class D extends G which includes B which includes A which etc" do
       modul :Alpha do
-        extend PubSub::Emitter
+        PubSub[ self, :employ_DSL_for_emitter ]
         emits :alpha
         public :emit # [#ps-002] public for testing
       end
@@ -35,7 +35,7 @@ module ::Skylab::PubSub::TestSupport::Emitter
         include o.Alpha
       end
       klass :Gamma do |o|
-        extend PubSub::Emitter::ModuleMethods
+        PubSub[ self, :extend_emitter_module_methods ]
         include o.Beta
       end
       klass :Delta, extends: :Gamma

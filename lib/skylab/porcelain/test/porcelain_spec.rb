@@ -297,7 +297,7 @@ module Skylab::Porcelain::TestSupport
       let(:expecting_foo_bar) { /expecting \{(?:help\|)?foo\|bar\}/i }
       let(:klass) do
         Class.new.class_eval do
-          extend PubSub::Emitter
+          PubSub[ self, :employ_DSL_for_emitter ]
           event_class PubSub::Event::Textual
           extend Porcelain::Legacy::DSL
           def foo ; end

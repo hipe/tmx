@@ -7,7 +7,7 @@ module Skylab::TanMan
 
     include Headless::Action::Anchored_Name_MMs
 
-    include PubSub::Emitter::ModuleMethods # if descendents want to add to
+    PubSub[ self, :include_emitter_module_methods ]  # if descedents want to add to
                                   # the even graph or change the class, for e.g.
 
     def build parent              # hopefully only before [#018] bleeding,
@@ -18,7 +18,7 @@ module Skylab::TanMan
 
   module Core::Action::InstanceMethods
 
-    extend PubSub::Emitter        # we want the methods it generates to be here
+    PubSub[ self, :employ_DSL_for_emitter ]  # we want its generated methods here
                                   # we want its emit() def to trump above
 
     include Core::SubClient::InstanceMethods # per headless, this does a lot

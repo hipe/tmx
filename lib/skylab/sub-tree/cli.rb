@@ -6,8 +6,8 @@ module Skylab::SubTree
 
   private
 
-    extend PubSub::Emitter  # do this before you extend legacy, it gives you
-                            # a graph
+    PubSub[ self, :employ_DSL_for_emitter ]  # do this before you extend
+      # legacy, it gives you a graph
 
     def mutex name_i, value_i
       @param_h[ name_i ] ||= [ ]

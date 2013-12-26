@@ -13,8 +13,12 @@ module Skylab::PubSub
 
   module Bundles
 
+    Emit_via_simple_IO_manifold = -> x_a do
+      module_exec x_a, & Emit_via_simple_IO_manifold_.to_proc
+    end
+
     Emits = -> a do
-      extend PubSub::Emitter  # might be re-entrant
+      PubSub[ self, :employ_DSL_for_emitter ]  # #re-entrant
       graph_x = a.fetch 0 ; a.shift
       if graph_x
         if graph_x.respond_to? :each_pair
@@ -23,11 +27,6 @@ module Skylab::PubSub
           emits( * graph_x )
         end
       end ; nil
-    end
-
-    Event_factory = -> a do
-      extend PubSub::Emitter  # might be re-entrant
-      event_factory a.fetch 0 ; a.shift ; nil
     end
 
     module Emitter_methods  # assumes an `emit` method
@@ -81,7 +80,59 @@ module Skylab::PubSub
       end
     end
 
+    Employ_DSL_for_emitter = -> _ do
+      extend PubSub::Emitter::MMs ; include PubSub::Emitter::IMs ; nil
+    end
+
+    Event_factory = -> a do
+      PubSub[ self, :employ_DSL_for_emitter ]  # #re-entrant
+      event_factory a.fetch 0 ; a.shift ; nil
+    end
+
+    Extend_emitter_module_methods = -> _ do
+      extend PubSub::Emitter::MMs ; nil
+    end
+
+    Include_emitter_module_methods = -> _ do
+      include PubSub::Emitter::MMs ; nil
+    end
+
     MetaHell::Bundle::Multiset[ self ]
+  end
+
+  module Emit_via_simple_IO_manifold_
+    to_proc = -> x_a do
+      define_method :init_simple_IO_manifold, begin
+        if :default_to_stream == x_a.first
+          Build_init_method_with_default_stream__[ x_a ]
+        else
+          Build_init_method__[]
+        end
+      end
+      private :init_simple_IO_manifold
+    private
+      def emit_to_IO_stream_string i, s
+        @simple_IO_manifold_h[ i ].puts s ; nil
+      end
+    end ; define_singleton_method :to_proc do to_proc end
+
+    Build_init_method_with_default_stream__ = -> x_a do
+      x_a.shift ; default_stream_i = x_a.shift
+      default_proc = -> h, _ { h.fetch default_stream_i }
+      -> h do
+        h.default_proc and fail "default stream specified in 2 places"
+        h.default_proc = default_proc
+        @simple_IO_manifold_h = h ; nil
+      end
+    end
+
+    Build_init_method__ = -> do
+      default_proc = Basic::Hash::Loquacious_default_proc.curry[ 'stream' ]
+      -> h do
+        h.default_proc ||= default_proc
+        @simple_IO_manifold_h = h ; nil
+      end
+    end
   end
 
   MAARS = MetaHell::MAARS

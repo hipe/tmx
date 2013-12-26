@@ -2,7 +2,8 @@ module Skylab::PubSub::TestSupport
 
   class Fixtures::ZigZag
 
-    extend PubSub::Emitter
+    PubSub[ self, :employ_DSL_for_emitter ]
+
     emits hacking: [ :business, :pleasure ]
 
     public :emit, :with_specificity
