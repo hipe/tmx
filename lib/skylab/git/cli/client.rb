@@ -51,7 +51,11 @@ module Skylab::Git
     end
 
     def head argv
-      Git::CLI::Actions::Head[ self, argv ]
+      _pn = Git::Services::Headless::System.defaults.bin_pathname.
+        join 'tmx-git-head'
+      load _pn.to_s
+      _progname = "#{ program_name } head"
+      Git::CLI::Actions::Head[ get_y, _progname, argv ]
     end
 
     def spread argv

@@ -33,6 +33,9 @@ module Skylab::Headless
       CACHE_FILE__ = 'sl.skylab'.freeze
       CACHE_PERMS__ = 0766  # same perm as `TemporaryItems`
 
+      a << :bin_pathname << -> do
+        ::Skylab.dir_pathname.join( '../../bin' ).expand_path
+      end
 
       _MEMBER_I_A = nil
       a << :members << -> { _MEMBER_I_A }

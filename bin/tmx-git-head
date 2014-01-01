@@ -1,43 +1,413 @@
-module Skylab::Git
+#!/usr/bin/env ruby -w
 
-  CLI::Actions::Head = -> cli, argv do
-    cli.instance_exec do
-      _SELF = 'head' ; ready = true ; y = get_y ; is_dry_run = nil
-      progname = -> { progname_for _SELF }
-      usage_string = -> { "#{ progname[] } [opts] <file>" }
-      op = Git::Services::OptionParser.new do |o|
+module Skylab
+  module Git
+    module CLI
+      module Actions
+      end
+    end
+    module API
+      module Actions
+      end
+    end
+  end
+end
+class Skylab::Git::CLI::Actions::Head  # read [#gi-011] the git.. narrative
+
+  def self.[] y, progname, argv
+    new( y, progname, argv ).execute
+  end
+  The_CLI_Action_Class__ = self
+  class The_CLI_Action_Class__
+    def initialize y, progname, argv
+      @argv = argv ; @program_name = progname ; @y = y ; nil
+    end
+    def execute
+      _es = parse_opts_and_args
+      _es || procede
+    end
+  private
+    def parse_opts_and_args
+      exitstatus = nil ; argv = @argv ; y = @y
+      usage_string = -> { "#{ @program_name } [opts] <file>" }
+      op = Services::OptionParser[].new do |o|
         help = -> _ do
-          ready = false
+          exitstatus = SUCCEEDED__
           y << "#{ hi 'usage:' } #{ usage_string[] }\n\n"
-          y << "#{ hi 'description:' } moves your file to a temporary"
-          y << "location, checks out a copy from HEAD of the file, moves *it*"
-          y << "to \"foo.HEAD.rb\", and moves your file back in place.\n\n"
+          y << "#{ hi 'description:' } writes the version of the file from"
+          y << "HEAD to your/file.HEAD.rb. never overwrites anything.\n\n"
           y << "#{ hi 'option:' }"
 
           op.summarize( & y.method( :<< ) )
         end
         o.on '-h', '--help', & help
-        o.on '-n', '--dry-run' do is_dry_run = true end
       end
       invite = -> msg=nil do
-        ready = false
         y << msg if msg
-        y << "see #{ hi "#{ progname[] } -h" }"
+        y << "see #{ hi "#{ @program_name } -h" }"
+        exitstatus = FAILED__
       end
       begin
         op.permute! argv
       rescue ::OptionParser::ParseError => e
         invite[ e.message ]
       end
-      if ready && 1 != argv.length
+      if exitstatus
+      elsif 1 == argv.length
+        @path_s = argv.fetch 0
+      else
         y << "unexpected number of arguments - #{ argv.length }"
-        y << "usage: #{ usage_string[ ] }"
+        y << "usage: #{ usage_string[] }"
         invite[]
       end
-      if ready
-        Git::API::Actions::
-          Head[ :y, y, :path, argv.fetch( 0 ), :is_dry_run, is_dry_run ]
+      exitstatus
+    end
+    def hi s
+      "\e[32m#{ s }\e[0m"
+    end
+    def procede
+      Git::API::Actions::Head[ :y, @y,
+        :path, @path_s, :progname, @program_name ]
+    end
+    module Services
+      OptionParser = -> do require 'optparse' ; ::OptionParser end
+    end
+    Git = ::Skylab::Git
+    SUCCEEDED__ = 0 ; FAILED__ = 1
+  end
+end
+class Skylab::Git::API::Actions::Head
+  def self.[] * x_a
+    new( x_a ).execute
+  end
+  The_API_Action_Class__ = self
+  class The_API_Action_Class__
+    def initialize x_a
+      begin
+        send :"#{ x_a.shift }=", x_a.shift
+      end while x_a.length.nonzero?
+      @git = bld_git
+      init_tmp_paths
+    end
+    attr_writer :path, :progname, :y
+
+    def init_tmp_paths
+      @tmp_patch_pn = bld_tmp_patch_pn
+      @tmp_patch_path = @tmp_patch_pn.to_s
+    end
+
+    def bld_git
+      Git_Front__.new Simple_Suffixing_Listener__.new( :from_git, self )
+    end
+
+    def bld_tmp_patch_pn
+      _tail = "#{ self.class.name.gsub( '::', '-' ).downcase }-mutex"  # hah
+      Services::Pathname[].new( Services::Tmpdir[].tmpdir ).join _tail
+    end
+  public
+
+    def execute
+      es = exec_git_diff
+      es || write_patched_file
+    end
+  private
+    def exec_git_diff
+      es = @git.diff @path, @tmp_patch_path
+      es ? when_agent_failed( es ) : when_git_diff_succeeded
+    end
+    def when_git_diff_failed es
+      when_agent_failed es
+    end
+    def when_git_diff_succeeded
+      PROCEDE__
+    end
+    def bld_patch_listener
+       Simple_Suffixing_Listener__.new( :from_patch, self )
+    end
+
+    def error_string_from_git s
+      @y << "git subsystem says #{ s }" ; nil
+    end
+
+    def info_string_from_git s
+      @y << "(git: #{ s })" ; nil
+    end
+
+    # ~
+
+    def write_patched_file
+      init_output_path_and_pathname
+      es = Patch__[ :listener, bld_patch_listener,
+        :output_pn, @output_pn, :patch_path, @tmp_patch_path,
+        :subject_path, @path ]
+      es ? when_agent_failed( es ) : when_succeeded
+    end
+
+    def init_output_path_and_pathname
+      pn = Services::Pathname[].new @path
+      ext_s = pn.extname
+      bn = pn.basename.sub_ext ''
+      @output_pn = pn.dirname.join "#{ bn }.HEAD#{ ext_s }"
+      @output_path = @output_pn.instance_variable_get :@path ; nil
+    end
+
+    def error_string_from_patch s
+      @y << "could not patch - #{ s }" ; nil
+    end
+
+    def output_string_from_patch s
+      @y << s ; nil
+    end
+
+    def detail_string_from_patch s
+      @y << "(patch says: #{ s })" ; nil
+    end
+
+    # ~
+
+    def when_succeeded
+      bld_FU.rm @tmp_patch_path
+      @y << "probably wrote #{ @output_path }. done."
+      SUCCEEDED__
+    end
+
+    def when_agent_failed es
+      @y << "will not procede because of the above. #{ invite_string }"
+      es
+    end
+
+    def invite_string
+      "try \e[32m#{ "#{ @progname } -h" }\e[0m for help"
+    end
+
+    def bld_FU
+      FU__[].new do |msg|
+        @y << "(FU #{ msg })" ; nil
       end
     end
+
+    FU__ = -> do
+      p = -> do
+        cls = class FU___
+          include Services::FileUtils[]::Verbose
+          public :rm
+          def initialize &p
+            @p = p ; nil
+          end
+        private
+          def fu_output_message s
+            @p[ s ] ; nil
+          end
+          self
+        end
+        p = -> { cls } ; cls
+      end
+      -> { p[] }
+    end.call
+
+
+    class Git_Front__
+      def initialize listener
+        @listener = listener ; nil
+      end
+      def diff subject_path, output_patch_path
+        Git_diff__[ @listener, subject_path, output_patch_path ]
+      end
+    end
+
+    class System_Agent__
+      def initialize
+        @did_have_errput = @did_have_output = false
+      end
+    private
+      def execute_command_a_and_flsh_all
+        execute_cmd_a
+        flush_e ; flush_o ; flush_w ; nil
+      end
+      def execute_cmd_a
+        _, @o, @e, @w = Services::Open3[].popen3( * @cmd_a ) ; nil
+      end
+      def flush_e
+        while (( s = @e.gets ))
+          @did_have_errput ||= true
+          process_errput_str s.chomp!
+        end ; nil
+      end
+      def process_errput_str s
+        emit_error_string s ; nil
+      end
+      def flush_o
+        while (( s = @o.gets ))
+          @did_have_output ||= true
+          process_output_str s.chomp!
+        end ; nil
+      end
+      def flush_w
+        @exitstatus = @w.value.exitstatus ; nil
+      end
+      def when_output_or_no_output
+        @did_have_output ? when_outputted : when_no_output
+      end
+      def when_outputted
+        PROCEDE__
+      end
+      # ~
+      def emit_output_string s
+        @listener.call :output, :string do s end
+      end
+      def emit_error_string s
+        @listener.call :error, :string do s end
+      end
+      def emit_info_string s
+        @listener.call :info, :string do s end
+      end
+      def emit_detail_string s
+        @listener.call :detail, :string do s end
+      end
+    end
+
+    class Git_Agent__ < System_Agent__
+      def self.[] * x_a
+        new( * x_a ).execute
+      end
+      def initialize
+        super()
+      end
+    end
+
+    class Git_diff__ < Git_Agent__
+      def initialize listener, subject_path, output_patch_path
+        @listener = listener
+        @cmd_a = [ GIT__, 'diff', 'head', '--', subject_path ]
+        @o_fh = nil
+        @output_patch_path = output_patch_path
+        @subj_pth = subject_path
+        init_write_line_p
+        super()
+      end
+      def execute
+        emit_info_string "executing: #{ @cmd_a * ' ' }"
+        execute_command_a_and_flsh_all
+        @exitstatus.nonzero? ? @exitstatus : when_output_or_no_output
+      end
+    private
+      def execute_command_a_and_flsh_all  # override parent. don't block on e
+        execute_cmd_a
+        flush_o
+        @did_have_output || flush_e
+        flush_w ; nil
+      end
+      def when_no_output
+        es = Git_expected_to_be_versioned__[ @listener, @subj_pth ]
+        es || when_no_change
+      end
+      def when_no_change
+        emit_error_string "file has no changes: #{ @subj_pth }"
+        FAILED__
+      end
+      def process_output_str s
+        @write_line_p[ s ] ; nil
+      end
+      def init_write_line_p
+        @write_line_p = -> s do
+          @o_fh = ::File.open @output_patch_path, 'w'
+          (( @write_line_p = -> s_ do
+            @o_fh.puts s_ ; nil
+          end ))[ s ]
+        end
+      end
+      def when_outputted
+        @o_fh.close
+        PROCEDE__
+      end
+    end
+
+    class Git_expected_to_be_versioned__ < Git_Agent__
+      def initialize listener, path
+        @listener = listener ; @path = path
+        @cmd_a = [ GIT__, 'log', '--oneline', '-1', '--', @path ]
+        super()
+      end
+      def execute
+        execute_command_a_and_flsh_all
+        @exitstatus.nonzero? ? @exitstatus : when_output_or_no_output
+      end
+    private
+      def process_output_str _
+      end
+      def when_no_output
+        emit_error_string(
+          "file is not under #{ GIT__ } version control: #{ @path }" )
+        FAILED__
+      end
+    end
+    GIT__ = 'git'.freeze
+
+    class Patch__ < System_Agent__
+      def self.[] * x_a
+        new( x_a ).execute
+      end
+      def initialize x_a
+        send :"#{ x_a.shift }=", x_a.shift while x_a.length.nonzero?
+        @output_path = @output_pn.instance_variable_get :@path
+        @output_path && @patch_path && @subject_path or
+          raise ::ArgumentError, "sanity - required argument(s) missing"
+        @cmd_a = [ 'patch', '-R', '-i', @patch_path, '-o', @output_path,
+          @subject_path ]
+        super()
+      end
+      attr_writer :listener, :subject_path, :output_pn, :patch_path
+    public
+      def execute
+        if @output_pn.exist?
+          exec_when_outpath_is_not_clear
+        else
+          exec_when_outpath_is_clear
+        end
+      end
+    private
+      def exec_when_outpath_is_not_clear
+        emit_error_string "exists, won't overwrite: #{ @output_path }"
+        FAILED__
+      end
+      def exec_when_outpath_is_clear
+        emit_detail_string( @cmd_a * ' ' )
+        execute_command_a_and_flsh_all
+        @exitstatus.nonzero? ? @exitstatus : when_output_or_no_output
+      end
+      def process_output_str s
+        _rx = /\Apatching file #{ ::Regexp.escape @subject_path }\z/
+        _rx =~ s and s = "#{ s } and writing output to #{ @output_path }"
+        emit_output_string s
+      end
+    end
+
+    class Simple_Suffixing_Listener__
+      def initialize suffix_i, down_x
+        @call_p = -> chan_i, shape_i, &p do
+          _meth_i = :"#{ chan_i }_#{ shape_i }_#{ suffix_i }"
+          _payload_x = p[]
+          down_x.send _meth_i, _payload_x
+        end ; nil
+      end
+      def call chan_i, shape_i, & p
+        @call_p[ chan_i, shape_i, & p ]
+      end
+    end
+
+    module Services
+      FileUtils = -> do require 'fileutils' ; ::FileUtils end
+      Open3 = -> do require 'open3' ; ::Open3 end
+      Pathname = -> do require 'pathname' ; ::Pathname end
+      Tmpdir = -> do require 'tmpdir' ; ::Dir end
+    end
+
+    FAILED__ = 1 ; PROCEDE__ = nil ; SUCCEEDED__ = 0
   end
+end
+
+if ::File.basename( __FILE__ ) == (( pn = ::File.basename( $PROGRAM_NAME ) ))
+  _y = ::Enumerator::Yielder.new( & $stderr.method( :puts ) )
+  _es = ::Skylab::Git::CLI::Actions::Head[ _y, pn, ::ARGV ]
+  exit _es
 end
