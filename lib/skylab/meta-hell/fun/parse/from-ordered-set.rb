@@ -56,7 +56,7 @@ module Skylab::MetaHell
 
     o = FUN.redefiner
 
-    o[:parse_from_ordered_set] = FUN.parse_curry[
+    o[:parse_from_ordered_set] = FUN::Parse::Curry[
       :algorithm, -> parse, argv do
         set_a = parse.normal_argv_proc_a
         len = set_a.length

@@ -20,7 +20,7 @@ module Skylab::PubSub::TestSupport::Event_Tests__
     end
 
     def subject_class
-      PubSub::TestSupport::Event::Predicate::Nub
+      PubSub::TestSupport::Event::Assertion
     end
 
     context "the empty assertion against" do
@@ -29,34 +29,33 @@ module Skylab::PubSub::TestSupport::Event_Tests__
         subject_class.new []
       end
 
+      d = 'nothing'
+
       -> do
-
-        desc = 'nothing'
-        msg = "expected 1 event, had 0"
-
-        it "the empty array - no match - desc is #{desc} / #{msg.inspect}" do
+        m = "expected 1 event, had 0"
+        it "the empty array - x, '#{ d }', #{ m.inspect }" do
           match []
           expect_result false
-          expect_description desc
-          expect_fmfs msg
+          expect_description d
+          expect_fail_msg_for_should m
         end
       end.call
 
       -> do
-        it "the 1-length array (with nil) - matches - desc is 'nothing'" do
-          match [nil]
+        it "the 1-length array (with nil) - o, #{ d }" do
+          match [ nil ]
           expect_result true
-          expect_description 'nothing'
+          expect_description d
         end
       end.call
 
       -> do
-        desc = 'nothing'
-        msg = 'expected 1 event, had 2'
-        it "the 2-length ary - no match - desc is #{desc} / #{msg.inspect}" do
-          match [nil, nil]
-          expect_description desc
-          expect_fmfs msg
+        m = 'expected 1 event, had 2'
+        it "the 2-length ary - x, '#{ d }', #{ m.inspect }" do
+          match [ nil, nil ]
+          expect_result false
+          expect_description d
+          expect_fail_msg_for_should m
         end
       end.call
     end
@@ -68,21 +67,19 @@ module Skylab::PubSub::TestSupport::Event_Tests__
       end
 
       -> do
-        d = 'nothing' ; m = 'expected 1 event, had 0'
+        d = 'emit :nerk' ; m = 'expected 1 event, had 0'
 
-        it "an empty array - no match - #{ m.inspect } " do
+        it "an empty array - x, #{ m.inspect }" do
           match []
-          expect_description d
           expect_result false
-          expect_fmfs m
+          expect_description d
+          expect_fail_msg_for_should m
         end
       end.call
 
       -> do
         d = 'emit :nerk'
-
-        it "an event with a matching stream name - matches - #{
-            }(desc:) #{ d.inspect }" do
+        it "an event with a matching stream name - o, '#{ d }'" do
           match [ build_event( :nerk ) ]
           expect_result true
           expect_description d
@@ -91,21 +88,20 @@ module Skylab::PubSub::TestSupport::Event_Tests__
 
       -> do
         d = 'emit :nerk' ; m = 'expected stream_name :nerk, had :jerk'
-        it "an event with a not-matching stream name - #{
-            } no matche - #{ m.inspect }" do
+        it "an event with a not-matching stream name - x, #{ m.inspect }" do
           match [ build_event( :jerk ) ]
           expect_result false
           expect_description d
-          expect_fmfs m
+          expect_fail_msg_for_should m
         end
       end.call
 
       -> do
-        it "an array with a non-event element - borks: NoMethodError" do
+        rx = /undefined method `stream_name'/
+        it "an array with a non-event element - X #{ rx }" do
           -> do
             match [ nil ]
-          end.should raise_error( ::NoMethodError,
-                                  /undefined method `stream_name'/ )
+          end.should raise_error ::NoMethodError, rx
         end
       end.call
     end
@@ -119,27 +115,27 @@ module Skylab::PubSub::TestSupport::Event_Tests__
       d = 'emit "fing"'
 
       -> do
-        it "a raw event with a matching string payload - #{
-            }raises - must respond to `text`" do
+        rx = /undefined method `payload_x'/
+        it "a raw event with a matching string payload - X, #{ rx }" do
           -> do
             match [ build_event( :wtvr, 'fing' ) ]
-          end.should raise_error( ::NoMethodError, /undefined method `text'/ )
+          end.should raise_error ::NoMethodError, rx
         end
       end.call
 
       -> do
         m = 'expected text "fing", had "fung"'
         it "a textual event with a nonmatching string - #{
-            }no match - #{ d } / #{ m }" do
+            }x, '#{ d }', #{ m.inspect }" do
           match [ build_text_event( :wtvr, 'fung' ) ]
           expect_result false
           expect_description d
-          expect_fmfs m
+          expect_fail_msg_for_should m
         end
       end.call
 
       -> do
-        it "one textual event with equal text - matches." do
+        it "one textual event with equal text - o" do
           match [ build_text_event( :wtvr, 'fing' ) ]
           expect_result true
           expect_description d
@@ -149,24 +145,24 @@ module Skylab::PubSub::TestSupport::Event_Tests__
       -> do
         m = 'expected text "fing", had "feltch". expected 1 event, had 2'
         it "two events, only first of which is matching - #{
-            }no match - #{ m.inspect }" do
+            }x, #{ m.inspect }" do
           match [ build_text_event( :wtvr, 'fing' ),
                   build_text_event( :wver, 'feltch' ) ]
           expect_result false
           expect_description d
-          expect_fmfs m
+          expect_fail_msg_for_should m
         end
       end.call
 
       -> do
         m = 'expected 1 event, had 2'
         it "two events, only last of which is matching - #{
-            }no match - #{ m.inspect }" do
+            }x, #{ m.inspect }" do
           match [ build_text_event( :wtvr, 'fing' ),
                   build_text_event( :wver, 'fing' ) ]
           expect_result false
           expect_description d
-          expect_fmfs m
+          expect_fail_msg_for_should m
         end
       end.call
     end
@@ -178,8 +174,8 @@ module Skylab::PubSub::TestSupport::Event_Tests__
 
       -> do
         -> do
-          d = 'emit second "foo"'
-          it "when matching second element - matches, describes #{
+          d = 'emit second /foo/'
+          it "when matching second element - o, describes #{
               }regex as matching string" do
             match [ build_text_event( :x, 'fee' ),
                     build_text_event( :x, 'foo' ), build_text_event( :x, 'fum' ) ]
@@ -189,11 +185,12 @@ module Skylab::PubSub::TestSupport::Event_Tests__
         end.call
 
         -> do
-          d = "emit second (?-mix:foo)"
+          d = "emit second /foo/"
           m = 'expected text to match /foo/, had "fiz"'
-          it "when non-matching second element - #{ m.inspect }" do
+          it "when non-matching second element - x, #{ m.inspect }" do
             match [ nil, build_text_event( :x, 'fiz' ), nil ]
-            expect_fmfs m
+            expect_result false
+            expect_fail_msg_for_should m
             expect_description d
           end
         end.call
@@ -201,6 +198,7 @@ module Skylab::PubSub::TestSupport::Event_Tests__
     end
 
     context "stacking multiple asserions for one index" do
+
       let :nub do
         subject_class.new [ 2, :bazzle, 'foo' ]
       end
@@ -208,7 +206,7 @@ module Skylab::PubSub::TestSupport::Event_Tests__
       d = 'emit third  :bazzle "foo"'
 
       -> do
-        it "when matching - works" do
+        it "o" do
           match [ nil, nil, build_text_event( :bazzle, 'foo' ), nil,
             build_text_event( :wvr, 'doolicious' ), :not_see ]
           expect_result true
@@ -220,27 +218,72 @@ module Skylab::PubSub::TestSupport::Event_Tests__
 
         m = 'expected text "foo", had "fop"'
 
-        it "when no match - works" do
+        it "x, #{ m.inspect }" do
           match [ nil, nil, build_text_event( :bazzle, 'fop' ), nil ]
           expect_result false
           expect_description d
-          expect_fmfs m
+          expect_fail_msg_for_should m
         end
       end.call
     end
 
-    context "stacking multiple asserions for multiple indices" do
+    context "stacking multiple assertions for multiple indices" do
       let :nub do
         subject_class.new [ 2, :bazzle, 'foo', 4, /doo/ ]
       end
 
-      it "is not currently possible" do
+      rx = /\bcannot stack assertions\b/
+
+      it "is not currently possible - X #{ rx }" do
         a = [ nil, nil, build_text_event( :bazzle, 'foo' ), nil,
           build_text_event( :wvr, 'doolicious' ), :not_see ]
         -> do
           match a
-        end.should raise_error( ::RuntimeError, /primitive type mutex - pos/i )
+        end.should raise_error ::RuntimeError, rx
       end
+    end
+
+    context "an assertion of channel, style and regexp" do
+
+      let :nub do
+        subject_class.new [ :important, :styled, /\bfoo\b/ ]
+      end
+
+      -> do
+        d = "emit styled :important /\\bfoo\\b/"
+        m = "expected stream_name :important, had :impordunt"
+        it "everything correct but channel - x, #{ m.inspect }" do
+          match [ build_text_event( :impordunt, "\e[32mfoo\e[0m" ) ]
+          expect_result false
+          expect_fail_msg_for_should m
+          expect_description d
+        end
+      end.call
+
+      -> do
+        m = "expected string to be styled, was not: foo"
+        it "everything correct but style - x, #{ m.inspect }" do
+          match [ build_text_event( :important, "foo" ) ]
+          expect_result false
+          expect_fail_msg_for_should m
+        end
+      end.call
+
+      -> do
+        m = "expected text to match /\\bfoo\\b/, had \"foosball\""
+        it "everything correct but regexp - x, #{ m.inspect }" do
+          match [ build_text_event( :important, "\e[32mfoosball\e[0m" ) ]
+          expect_result false
+          expect_fail_msg_for_should m
+        end
+      end.call
+
+      -> do
+        it "everything correct - o" do
+          match [ build_text_event( :important, "hi \e[32mfoo\e[0m hey" ) ]
+          expect_result true
+        end
+      end.call
     end
 
     def debug!
@@ -257,11 +300,12 @@ module Skylab::PubSub::TestSupport::Event_Tests__
     def match x
       res = nub.match x
       if do_debug
-        stdinfo.puts "(with `num.match #{ x.inspect }`)"
-        stdinfo.puts "(result - #{ res.inspect })"
-        stdinfo.puts "(description - #{ nub.description.inspect })"
+        e = stdinfo
+        e.puts "(with `num.match #{ x.inspect }`)"
+        e.puts "(result - #{ res.inspect })"
+        e.puts "(description - #{ nub.description.inspect })"
         if nub.instance_variable_get :@fail_a
-          stdinfo.puts "(fmfs - #{ nub.failure_message_for_should.inspect })"
+          e.puts "(fmfs - #{ nub.failure_message_for_should.inspect })"
         end
       end
       __memoized[:last_result] = res
@@ -278,7 +322,7 @@ module Skylab::PubSub::TestSupport::Event_Tests__
       nil
     end
 
-    def expect_fmfs x
+    def expect_fail_msg_for_should x
       nub.failure_message_for_should.should eql x
     end
 
@@ -295,10 +339,10 @@ module Skylab::PubSub::TestSupport::Event_Tests__
 
       def initialize esg, stream_name, text
         super esg, stream_name
-        @text = text
+        @payload_x = text
       end
 
-      attr_reader :text
+      attr_reader :payload_x
     end
   end
 end

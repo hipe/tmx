@@ -2,9 +2,9 @@ module Skylab::Basic
 
   module String
 
-    o = { }
+    FUN = ::Module
 
-    o[:string_begins_with_string_curry] = -> haystack_string do
+    FUN::Build_proc_for_string_begins_with_string = -> haystack_string do
       len = haystack_string.length
       -> needle_string do
         if needle_string.length <= len
@@ -13,7 +13,7 @@ module Skylab::Basic
       end
     end
 
-    o[:string_is_at_end_of_string_curry] = -> needle_string do
+    FUN::Build_proc_for_string_ends_with_string = -> needle_string do
       len = needle_string.length
       -> haystack_string do
         (( idx = haystack_string.rindex needle_string )) and
@@ -21,6 +21,7 @@ module Skylab::Basic
       end
     end
 
-    FUN = ::Struct.new( * o.keys ).new( * o.values )
+    MUSTACHE_RX = / {{ ( (?: (?!}}) [^{] )+ ) }} /x
+
   end
 end

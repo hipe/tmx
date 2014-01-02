@@ -113,7 +113,7 @@ module Skylab::MetaHell
 
     o = FUN.redefiner
 
-    o[:parse_series] = FUN.parse_curry[
+    o[:parse_series] = FUN::Parse::Curry[
       :algorithm, -> parse, argv do
         fa = parse.normal_token_proc_a ; fz = fa.length
         ai = fi = 0 ; az = argv.length

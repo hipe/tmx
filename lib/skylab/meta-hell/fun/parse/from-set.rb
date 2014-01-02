@@ -139,7 +139,7 @@ module Skylab::MetaHell
 
     o = FUN.redefiner
 
-    o[:parse_from_set] = FUN.parse_curry[
+    o[:parse_from_set] = FUN::Parse::Curry[
       :algorithm, -> parse, input_x_a do
         did_parse_any = parsed_none_last_pass = false
         pool_a = parse.get_pool_proc_a

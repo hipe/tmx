@@ -268,7 +268,6 @@ module Skylab::MetaHell
 
     x = predefiner
 
-    x[:parse_curry]                      = [ :Parse, :Curry ]
     x[:parse_series]                     = [ :Parse, :Series ]
     x[:parse_from_set]                   = [ :Parse, :From_Set ]
     x[:parse_from_ordered_set]           = [ :Parse, :From_Ordered_Set ]

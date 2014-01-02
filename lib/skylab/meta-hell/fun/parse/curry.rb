@@ -4,9 +4,7 @@ module Skylab::MetaHell
 
     Parse = FUN::Parse
 
-    o = FUN.redefiner
-
-    o[:parse_curry] = -> * input_a do
+    def self.[] * input_a
       Parse_.new( input_a ).shell
     end
 

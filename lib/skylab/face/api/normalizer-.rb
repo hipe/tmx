@@ -315,7 +315,7 @@ module Skylab::Face
 
           define_method :hack_label, & Hack_label
 
-          def ick x  # [#mh-050] family
+          def ick x  # :+[#mh-050] family
             if x.respond_to? :id2name
               "'#{ x }'"
             else

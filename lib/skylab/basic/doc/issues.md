@@ -4,7 +4,7 @@
 [#023]       #parent-node: [#022] "the array scanner narrative.."
 [#022]       #doc-node scanners (taxonomic node only for now)
 [#021]       #digraph #redundancy-point
-[#020]       #open
+[#020]       #doc-node the core narrative ..
 [#019]       #done move semantic into here #after:cu-001
 [#018]       #doc-point #parent:006 #body-is-inline-in-parent
                a module and a switch statement hve `semantic intersect`

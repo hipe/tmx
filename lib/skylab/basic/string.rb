@@ -1,8 +1,1 @@
-module Skylab::Basic
-
-  module String
-
-    MUSTACHE_RX = / {{ ( (?: (?!}}) [^{] )+ ) }} /x
-
-  end
-end
+# (to keep history we are keeping this file, but its content was de-orphanized)

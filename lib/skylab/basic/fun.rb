@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module FUN
 
-    Inspect__ = -> length_d, x do  # :+[#it-002] summarization (trivial)
+    Inspect__ = -> length_d, x do  # :+[#it-002] summarization (trivial), :+[#mh-050] the leader of the "ick" family
       if case x
       when ::NilClass, ::FalseClass, ::TrueClass, ::Numeric, ::Module
         true

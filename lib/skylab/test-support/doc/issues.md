@@ -1,8 +1,9 @@
+[#024]       #doc-node the graded verbosity narrative ..
 [#023]       #doc-node #parent-node: [#020] "the IO spy"
 [#022]       #parent: [#021] "when to extlib and not to extlib.."
 [#021]       #doc-node "micro notes"
 [#020]       #family-tag - io spy triad, io spy, io spy group (and "..")
-[#019]       #node-point "tree walker"
+[#019]       #node-point "tree walker" (became [#st-007])
 [#018]       #quickie #in-situ
 [#017]       #doc-node #regret introduction..
 [#016]       #doc-point #regret why we do not include parent anchor module..

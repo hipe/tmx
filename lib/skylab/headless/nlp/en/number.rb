@@ -42,7 +42,7 @@ module Skylab::Headless::NLP::EN::Number
 
     o[:number] = number
 
-    o[:num2ord] = -> x do
+    o[:num2ord] = Num2ord = -> x do
       return x unless x % 1 == 0 && x > 0 # positive integers only
       mod = x % (m = 100)
       if mod >= arr.length and !(13..19).include? mod

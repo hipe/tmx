@@ -23,7 +23,7 @@ module Skylab::MetaHell
 
     o = FUN.redefiner
 
-    o[:parse_alternation] = FUN.parse_curry[
+    o[:parse_alternation] = FUN::Parse::Curry[
       :algorithm, -> parse, state_x_a do
         parse.get_pool_proc_a.reduce nil do |_, p|
           x = p[ * state_x_a ]

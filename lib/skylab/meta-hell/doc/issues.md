@@ -7,7 +7,7 @@
 [#051]       #in-situ
 [#051]       #doc-point #experimental-pattern :#method-cherry-picker..
 [#050]       #doc-point this class of grammars, and this parser..
-[#050]       #family 'Strage_'
+[#050]       #family 'Strange_'
 [#049]       #tracking-tag :#fuzzy
 [#048]       #doc-point what are puffers and when should you use them ..
 [#047]       (open)
@@ -30,7 +30,7 @@
 [#034] #open assess [module|class]-creator infection level, consider removal
 [#033]       #doc-point - "contained DSL" through `enhance` ..
 [#032]       #api-point constant trouble's fields are immutable (ergo dupable)
-[#031]       #api-lock.
+[#031] #hole (was: API-lock on 'replace' as a flyweight-related meth name)
 [#030]       #doc-point of the `stowaway` facility #documented-inline
 [#029]       #doc-point this is the official docpoint of :[#autoloading] and
              the idea of `isomorphic file locations` (yet to be documented)
@@ -39,14 +39,12 @@
 [#026]       #doc-point "tuple tower" defined ..
 [#025]       #doc-point #parent:024 #body-is-inline-in-parent
                `formal` defined informally.
-[#024]       #doc-node #body-is-inline-in-code:"formal/attribute.rb"
-               `formal attributes` explained. (body is in code for reasons.)
+[#024]       #doc-node the formal attribute narrative .
 [#023] #open merge the 2 pool enhancements
 [#022]       #tracking-tag #boxxy's relationship to a.l
-[#021]       #tracking-tag, #doc-point `base_args` / `base_init`: this
-               is an experiment in initting a blank-slate 'dupe'-ish subset.
-[#020]       #done #formal-box instance methods separate from box class maybe?
-               this issue has been co-opted to represent the box in general.
+[#021]       #doc-node the 'dupe' narrative ..
+[#020]       #doc-node the formal box narrative .. #refined:once
+             (was: instance methods separate from box class maybe?)
 [#019]       #node-tracker: #boxxy
 [#018]       #done corral proxies
 [#017]       #done corral tees
@@ -55,7 +53,8 @@
 [#014]       #tracking-tag #attr #doc-point dup[e]ing behavior
 [#013]       #done move porcelain attribtues to here, then clean up
 [#012]       #done foo/ and foo.rb should be automagic, no declaration of module
-[#011]       #hole (was 'Services' watcher, moved to subsystem)
+[#011]       #doc-node the fun parse curry narrative ..
+             (#re-purposed:once, was 'Services' watcher, moved to subsystem)
 [#010]       #done pull in D-elegatesTo from porcelain!
 [#009]       #done hen you made plastic you didn't know about `define_singleton_method`
 [#008]       #done after etc, consider pulling in Let

@@ -1,3 +1,5 @@
+[#022]       #doc-node the emit spy narrative ..
+[#021]       #doc-node the event predicate narrative ..
 [#020]       #in-situ
 [#019]       #storypoints
 [#018]       #parent-node: [#017] "this node in its scope.."

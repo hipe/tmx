@@ -148,7 +148,7 @@ module Skylab::Headless
 
     o[:memo] = memo
 
-    o[:pretty_path] = -> path do
+    o[:pretty_path] = Pretty_path = -> path do
       pretty_path[ path ]                     # because the function changes!
     end
 

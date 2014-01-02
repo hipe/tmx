@@ -18,7 +18,8 @@
                lets you "puff up" your (e.g. branch) client lazily
 [#037]       #eventpoint, #parent-node: [#040]: fundamentally rearchitect Face
                to deal with the DSL public instance method namespace problem.
-[#036] #todo replace universe with `tableize` with [ face cli table ]
+[#036]       #doc-node the CLI table narrative
+       #todo replace universe with `tableize` with [ face cli table ]
 [#035]       #tracking-tag #experiment with a `unary` discrete categorization
                for our main 3 classes (for which we make two exponents) ..
 [#034]       #doc-point the magical significance of nil ..

@@ -53,7 +53,7 @@ module Skylab::Basic
         @line_number = -> do
           count.nonzero?
         end
-        @pathname = ::Pathname.new fh.path
+        @pathname = ( ::Pathname.new( fh.path ) if fh.respond_to?( :path ) )
         nil
       end
 

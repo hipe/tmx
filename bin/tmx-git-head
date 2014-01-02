@@ -20,7 +20,9 @@ class Skylab::Git::CLI::Actions::Head  # read [#gi-011] the git.. narrative
   The_CLI_Action_Class__ = self
   class The_CLI_Action_Class__
     def initialize y, progname, argv
-      @argv = argv ; @program_name = progname ; @y = y ; nil
+      @argv = argv ; @program_name = progname ; @y = y
+      # ~
+      @branch_name = nil
     end
     def execute
       _es = parse_opts_and_args
@@ -30,6 +32,7 @@ class Skylab::Git::CLI::Actions::Head  # read [#gi-011] the git.. narrative
     def parse_opts_and_args
       exitstatus = nil ; argv = @argv ; y = @y
       usage_string = -> { "#{ @program_name } [opts] <file>" }
+      rr = nil
       op = Services::OptionParser[].new do |o|
         help = -> _ do
           exitstatus = SUCCEEDED__
@@ -40,7 +43,17 @@ class Skylab::Git::CLI::Actions::Head  # read [#gi-011] the git.. narrative
 
           op.summarize( & y.method( :<< ) )
         end
-        o.on '-h', '--help', & help
+
+        rr = RX_Replacer__.new %r(\A-(\d+)\z), 'HEAD~1 and so on' do |d, a, s|
+          a[ d, 1 ] = [ '-b', "HEAD~#{ s }" ] ; nil
+        end
+        o.base.short[ 'b' ] = ::OptionParser::Switch::RequiredArgument.new do |s|
+          @branch_name = s ; nil  # hidden option for above
+        end
+
+        o.top.prepend( * rr.to_optparse_args )
+
+        o.on '-h', '--help', 'this screen', & help
       end
       invite = -> msg=nil do
         y << msg if msg
@@ -48,6 +61,7 @@ class Skylab::Git::CLI::Actions::Head  # read [#gi-011] the git.. narrative
         exitstatus = FAILED__
       end
       begin
+        rr.apply_to argv
         op.permute! argv
       rescue ::OptionParser::ParseError => e
         invite[ e.message ]
@@ -67,7 +81,35 @@ class Skylab::Git::CLI::Actions::Head  # read [#gi-011] the git.. narrative
     end
     def procede
       Git::API::Actions::Head[ :y, @y,
+        :any_branch_name, @branch_name,
         :path, @path_s, :progname, @program_name ]
+    end
+
+    class RX_Replacer__
+      def initialize rx, s, &p
+        @rx = rx ; @s = s ; @p = p
+      end
+      def to_optparse_args
+        [ self, nil, nil, nil, nil ]
+      end
+      # ~ #comport to optparse
+      def summarize s_h, l_h, w, w_, margin_s, &p
+        s = "-[0-9][..]"
+        s_ = "%-#{ w }s" % [ s ]
+        s__ = "#{ margin_s }#{ s_ } #{ @s }"
+        p[ s__ ] ; nil
+      end
+      # ~
+      def apply_to argv
+        d = -1 ; last = argv.length
+        while d < last
+          md = @rx.match argv[ d += 1 ]
+          md or next
+          len = argv.length
+          @p[ d, argv, * md.captures ]
+          d += argv.length - len
+        end ; nil
+      end
     end
     module Services
       OptionParser = -> do require 'optparse' ; ::OptionParser end
@@ -89,7 +131,7 @@ class Skylab::Git::API::Actions::Head
       @git = bld_git
       init_tmp_paths
     end
-    attr_writer :path, :progname, :y
+    attr_writer :any_branch_name, :path, :progname, :y
 
     def init_tmp_paths
       @tmp_patch_pn = bld_tmp_patch_pn
@@ -112,7 +154,9 @@ class Skylab::Git::API::Actions::Head
     end
   private
     def exec_git_diff
-      es = @git.diff @path, @tmp_patch_path
+      @any_branch_name and ( x = [ :branch_name, @any_branch_name ] )
+      es = @git.diff :subject_path, @path,
+        :output_patch_path, @tmp_patch_path, * x
       es ? when_agent_failed( es ) : when_git_diff_succeeded
     end
     def when_git_diff_failed es
@@ -147,7 +191,8 @@ class Skylab::Git::API::Actions::Head
       pn = Services::Pathname[].new @path
       ext_s = pn.extname
       bn = pn.basename.sub_ext ''
-      @output_pn = pn.dirname.join "#{ bn }.HEAD#{ ext_s }"
+      _branch = @any_branch_name || DEFAULT_BRANCH_NAME_PRETTY__
+      @output_pn = pn.dirname.join "#{ bn }.#{ _branch }#{ ext_s }"
       @output_path = @output_pn.instance_variable_get :@path ; nil
     end
 
@@ -210,8 +255,9 @@ class Skylab::Git::API::Actions::Head
       def initialize listener
         @listener = listener ; nil
       end
-      def diff subject_path, output_patch_path
-        Git_diff__[ @listener, subject_path, output_patch_path ]
+      def diff * x_a
+        x_a.unshift :listener, @listener
+        Git_diff__[ x_a ]
       end
     end
 
@@ -276,16 +322,52 @@ class Skylab::Git::API::Actions::Head
     end
 
     class Git_diff__ < Git_Agent__
-      def initialize listener, subject_path, output_patch_path
-        @listener = listener
-        @cmd_a = [ GIT__, 'diff', 'head', '--', subject_path ]
+      def initialize x_a
+        @branch_name = nil
+        @x_a = x_a ; absrb_listener ; absrb_iambic_fully
         @o_fh = nil
-        @output_patch_path = output_patch_path
-        @subj_pth = subject_path
         init_write_line_p
         super()
       end
+      attr_writer :branch_name, :output_patch_path
+      def subject_path= x
+        @subj_pth = x
+      end
+    private
+      def absrb_listener
+        :listener == @x_a.first or raise ::ArgumentError, "listener first"  # future-proof
+        @x_a.shift ; @listener = @x_a.shift ; nil
+      end
+      def absrb_iambic_fully
+        send :"#{ @x_a.shift }=", @x_a.shift while @x_a.length.nonzero?
+        @x_a = nil
+      end
+    public
       def execute
+        es = rslv_valid_command
+        es || exec_command
+      end
+    private
+      def rslv_valid_command
+        es = rslv_branch_name
+        es ||= rslv_subject_path
+        es || rslv_valid_command_with_valid_parts
+      end
+      def rslv_branch_name
+        @branch_name ||= DEFAULT_BRANCH_NAME__
+        if BRANCH_NAME_RX__ !~ @branch_name
+          emit_error_string "not a valid branch name: #{ @branch_name }"
+          FAILED__
+        end
+      end
+      def rslv_subject_path
+        ! @subj_pth and raise ::ArgumentError, "missing subject_path"
+      end
+      def rslv_valid_command_with_valid_parts
+        @cmd_a = [ GIT__, 'diff', @branch_name, '--', @subj_pth ]
+        PROCEDE__
+      end
+      def exec_command
         emit_info_string "executing: #{ @cmd_a * ' ' }"
         execute_command_a_and_flsh_all
         @exitstatus.nonzero? ? @exitstatus : when_output_or_no_output
@@ -401,6 +483,10 @@ class Skylab::Git::API::Actions::Head
       Pathname = -> do require 'pathname' ; ::Pathname end
       Tmpdir = -> do require 'tmpdir' ; ::Dir end
     end
+
+    BRANCH_NAME_RX__ = /\A[-_a-zA-Z0-9]+(?:~\d+)?\z/
+    DEFAULT_BRANCH_NAME__ = 'head'.freeze
+    DEFAULT_BRANCH_NAME_PRETTY__ = DEFAULT_BRANCH_NAME__.upcase.freeze
 
     FAILED__ = 1 ; PROCEDE__ = nil ; SUCCEEDED__ = 0
   end
