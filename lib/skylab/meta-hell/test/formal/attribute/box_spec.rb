@@ -2,17 +2,15 @@ require_relative 'test-support'
 
 module ::Skylab::MetaHell::TestSupport::Formal::Attribute::Box
 
-  ::Skylab::MetaHell::TestSupport::Formal::Attribute[ self ]
-
-  Box_TestSupport = self
+  ::Skylab::MetaHell::TestSupport::Formal::Attribute[ TS__ = self ]
 
   include CONSTANTS
 
   extend TestSupport::Quickie
 
-  describe "[mh] formal attribute" do
+  describe "[mh] formal attribute box" do
 
-    extend Box_TestSupport
+    extend TS__
 
     context "`with` - doesn't care about truthiness just has?" do
 

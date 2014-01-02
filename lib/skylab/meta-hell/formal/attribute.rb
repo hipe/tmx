@@ -1,75 +1,16 @@
-module ::Skylab::MetaHell
+module Skylab::MetaHell
 
-  module Formal::Attribute  # :[#024]
-
-    # (the fate of this node is discussed at [#053] "discussion of the..")
-
-    # What is the esssence of all data in the universe? It starts from
-    # within. with metaprogramming.
-    #
-    # Let's take some arbitrary set of name-value pairs, say
-    # an "age" / "sex" / "location" of "55" / "male" / "mom's basement";
-    # let those be called 'actual attributes'. You could then say that
-    # each pairing of that attribute with that value, (e.g an "age of 35")
-    # is one "actual attribute" with "age" e.g. being the "attribute name"
-    # and "35" being the "attribute value."
-    #
-    # Now, when dealing with attributes you might want to speak in terms
-    # of them in the abstract -- not those actual values, but other
-    # occurences of particular values for those attributes. We use the word
-    # "formal" to distinguish this meaning, in contrast to "actual" attributes
-    # :[#025].
-    #
-    # For example, we might want to define 'formal attributes' that define
-    # some superset of recognizable or allowable names (and possibly values)
-    # for the actual attributes. For each such formal attribute, this
-    # library lets you define one `Formal::Attribute::Metadata` that will
-    # have metadata representig the particular formal attribute.
-    #
-    # To represent an associated set of such formal attributes, we use a
-    # `Formal::Attribute::Box`, which is something like an ordered set
-    # of formal attributes. Think of it as an overwrought method signature,
-    # or formal function parameters, or a regular expression etc, or
-    # superset definition, or map-reduce operation on all possible data etc wat
-    # If the name "box" throws you off, just read it as "collection" whenever
-    # you see it.
-    #
-    # To dig down even deeper, this library also lets you (requires you
-    # maybe) to stipulate the ways you define attributes themselves.
-    #
-    # Those are called `Formal::Attribute::MetaAttribute`s, and there is a box
-    # for those too..
-    #
-    # So, in reverse, from the base: you make a box of meta-attributes.
-    # This stipulates the allowable meta-attributes you can use when
-    # defining attributes.  With these you will then effective define
-    # (usually per class) a box of attributes, having been validated by
-    # those meta-attributes. Then when you have object of one such class,
-    # it will itself have (actual) attributes.
-    #
-    # (There is this whole other thing with hooks which is where it gets
-    # useful..)
-    #
-    # To round out the terminology, the object that gets blessed with
-    # all the dsl magic to create meta attributes and then attributes
-    # (and store them!) is known as the "definer" (`Formal::Attribute::Definer`)
-    # which is what your class should extend to tap in.
-    #
-    # It may be confusing, but the library is pretty lightweight
-    # for what it does.  Remember this is metahell!
-    #
+  class Formal::Attribute < Formal::Box  # read [#024] the form. #storypoint-5
 
     module Definer
 
       def self.[] mod
         DSL[ mod ]
-        mod.module_exec EMPTY_A_, & Bundles::Attributes.to_proc
-        nil
+        mod.module_exec EMPTY_A_, & Bundles::Attributes.to_proc ; nil
       end
 
       def self.extended mod
-        DSL[ mod ]
-        nil
+        DSL[ mod ] ; nil
       end
     end
 
@@ -107,7 +48,7 @@ module ::Skylab::MetaHell
     Build_item_grammar__ = -> do
       which_h = { 1 => (( mono_i_a = [ ] )), 2 => (( diad_i_a = [ ] )) }
       meta_attributes.each do |matr|
-        _arity = (( h = matr.hook )) ? h.arity : 1
+        _arity = (( h = matr.hook_p )) ? h.arity : 1
         which_h.fetch( _arity ) << matr.local_normal_name
       end
       MetaHell::Bundle::Item_Grammar.new mono_i_a, :attribute, diad_i_a
@@ -120,92 +61,85 @@ module ::Skylab::MetaHell
     end
   end
 
-  module Formal::Attribute::Definer::Methods
-                                  # inspect the attributes defined (directly
-                                  # or thru parent) in this definer.
+  module Formal::Attribute::Definer::Methods  # #storypoint-10
 
-                                  # note this is the only method that is
-                                  # public out of the box (also your attributes
-                                  # are mutable and not themselves private.)
     def attributes
-      @attributes ||= dupe_ancestor_attr :attributes do
-        Formal::Attribute::Box.new
-      end
+      @attributes ||= bld_attributes
     end
 
   private
 
-    define_singleton_method :private_attr_reader, &
-      MetaHell::FUN.private_attr_reader
+    def bld_attributes
+      dupe_ancestor_attr :attributes do
+        Formal::Attribute::Box.new
+      end
+    end
 
-                                  # define an attribute in detail, or the
-                                  # existence of several attributes by name.
-    def attribute sym, meta_attributes_h=nil
-      existing = attributes.fetch( sym ) { nil }     # is a metadata
-      delta = get_attribute_metadata_class.new sym   # is a metadata
-      if meta_attributes_h        # the delta actually becomes a delta.
-        if existing               # getting this right is important - if we
-          delta.merge_against! meta_attributes_h, existing # don't it borks
-        else                      # the correct order for hook chains
-          delta.merge! meta_attributes_h
+    def attribute i, matr_h=nil  # #storypoint-15
+      exist = attributes.fetch i do end
+      delta = atr_metadata_class.new i
+      if matr_h
+        if exist
+          delta.merge_against! matr_h, exist
+        else
+          delta.merge! matr_h
         end
       end
-      if ! existing               # if this is a new attribute, give it
-        merge_defaults_into_delta delta # whatever defaults exist at the time
-      end
-      if ( bad = delta._order - self.meta_attributes._order ).length.nonzero?
-        raise "meta attributes must first be declared: #{
-          }#{ bad.map(&:inspect) * ', ' }"
-      end
-      if existing                 # merge the new meta-attributes into an
-        existing.merge! delta     # existing attribute
+      exist or merge_defaults_into_delta delta
+      (( a = delta._order - self.meta_attributes._order )).length.zero? or
+        raise say_matr_not_declared( a )
+      if exist
+        exist.merge! delta
       else
-        on_attribute_introduced delta # create the new attribute by settings
-        existing = delta          # the default setter / getters (FOR NOW)
+        on_attribute_introduced delta
+        exist = delta
       end
-      delta.each do |k, v|
-        if respond_to?( m = "on_#{ k }_attribute" )
-          a = [ sym ]
-          if ! (( hook = meta_attributes[ k ].hook and 2 != hook.arity ))
-            a << existing
-          end
-          send m, * a
-        end
-      end
-      nil
+      delta.each_pair do |k, v|
+        respond_to?(( m_i = :"on_#{ k }_attribute" )) or next
+        prcss_hook exist, i, k, m_i
+      end ; nil
     end
 
-    private_attr_reader :attribute_metadata_class_is_defined
-
-                                  # set the attribute metadata class.
-    class_and_block_are_mutex = -> do
-      ArgumentError.new "passing class and block are mutually exclusive."
+    def say_matr_not_declared bad_i_a
+      "meta attributes must first be declared: #{
+        }#{ bad_i_a.map( & :inspect ) * ', ' }"
     end
 
-    define_method :attribute_metadata_class do |klass=nil, &block|
+    def prcss_hook exist, i, k, m_i
+      a = [ i ]
+      hook = meta_attributes[ k ].hook_p
+      if ! (( hook and 2 != hook.arity ))
+        a << exist
+      end
+      send m_i, * a ; nil
+    end
+
+    public ; attr_reader :attribute_metadata_class_is_defined ; private
+
+    def attribute_metadata_class cls=nil, &p
       do_define = -> do
-        define_singleton_method :get_attribute_metadata_class do
-          klass
+        define_singleton_method :atr_metadata_class do
+          cls
         end
         @attribute_metadata_class_is_defined = true
       end
-      if klass
-        if block
-          raise class_and_block_are_mutex[]
+      if cls
+        if p
+          raise Class_and_block_are_mutex__[]
         elsif attribute_metadata_class_is_defined
           raise "won't clobber existing custom class (for now)"
         else
           do_define[]
         end
-      elsif block
-        if klass
-          raise class_and_block_are_mutex[]
+      elsif p
+        if cls
+          raise Class_and_block_are_mutex__[]
         elsif const_defined? :Attribute_Metadata, false
           raise "won't assume this and won't clobber it. set it explicitly."
         else
-          klass = ::Class.new get_attribute_metadata_class
-          const_set :Attribute_Metadata, klass
-          klass.class_exec(& block)
+          cls = ::Class.new atr_metadata_class
+          const_set :Attribute_Metadata, cls
+          cls.class_exec( & p )
           do_define[]
         end
       else
@@ -213,235 +147,224 @@ module ::Skylab::MetaHell
       end
     end
 
-    def dupe_ancestor_attr meth, &default
-      p = ancestors[ (self == ancestors.first ? 1 : 0) .. -1 ].detect do |a|
-        ::Class === a and a.respond_to? meth
+    Class_and_block_are_mutex__ = -> do
+      ArgumentError.new "passing class and block are mutually exclusive."
+    end
+
+    def dupe_ancestor_attr meth_i, & else_p
+      anc_a = ancestors
+      self == anc_a.first and anc_a.shift
+      cls = anc_a.detect do |anc|
+        ::Class === anc and anc.respond_to? meth_i
       end
-      if p and a = p.send( meth )
-        a.dupe
+      if cls and (( x = cls.send meth_i ))
+        x.dupe
       else
-        default[]
-      end
-    end
-                                  # ugly name b.c dsl
-    def get_attribute_metadata_class
-      Formal::Attribute::Metadata
-    end
-
-    def import_meta_attributes_from_module mod
-      if mod.const_defined? :InstanceMethods, false
-        include mod::InstanceMethods
-      end
-      mod.meta_attributes.each do |name, meta|
-        if respond_to?( meta.hook_name ) || meta_attributes.has?( name )
-          fail "implement me: decide clobber behavior"
-        end
-        if meta.hook
-          define_singleton_method meta.hook_name, & meta.hook
-        end
-        meta_attributes.accept meta # heh
+        else_p[]
       end
     end
 
-    def merge_defaults_into_delta attr_delta_metadata
+    def atr_metadata_class
+      Formal::Attribute
+    end
+
+    def merge_defaults_into_delta atr_delta_metadata
       meta_attributes.each do |k, ma|
         if ma.has_default
-          if ! attr_delta_metadata.has? ma.local_normal_name
-            attr_delta_metadata.add_default ma.local_normal_name, ma.default_value
+          if ! atr_delta_metadata.has? ma.local_normal_name
+            atr_delta_metadata.add_dflt ma.local_normal_name, ma.default_value
           end
         end
       end
       nil
     end
 
-    normalize_meta_attribute_args = -> first, rest, b do
+    def meta_attribute first, * rest, & p  # #storypoint-30
+      matrs = meta_attributes
+      pair_a = Normalize_meta_attribute_args__[ first, rest, p ]
+      pair_a.each do |atr_x, p_|
+        p_ and next prcss_meta_attribute_proc atr_x, p_
+        atr_x.respond_to? :id2name and next matrs.touch_matr_w_nm atr_x
+        ::Hash.try_convert( atr_x ) and next matrs.touch_matr_w_hash atr_x
+        ::Module === atr_x and next imprt_matrs_from_module atr_x
+        raise Arg_error__[ atr_x ]
+      end ; nil
+    end
+
+    Normalize_meta_attribute_args__ = -> first, rest, p do
       if rest.length.nonzero?
-        if ::Hash === rest.last
+        if ::Hash.try_convert rest.last
           first = rest.pop.merge( _unsanitized_name: first )
-        elsif ! b and rest.last.respond_to? :call
-          b = rest.pop
+        elsif ! p and rest.last.respond_to? :call
+          p = rest.pop
         end
       end
       if rest.length.nonzero?
-        if b
-          raise ::ArgumentError, "with block form, only pass 1 #{
-            }meta_attribute, not #{ all.length }"
-        end
+        p and  raise ::ArgumentError, "with block form, only pass 1 #{
+          }meta_attribute, not #{ all.length }"
         rest.reduce( [ [ first ] ] ) do |m, x| m << [ x ] ; m end
       else
-        [ [ first, b ] ]
+        [ [ first, p ] ]
       end
     end
 
-    arg_error = -> x do
+    def prcss_meta_attribute_proc atr_i, p
+      atr_i.respond_to?( :id2name ) or raise Arg_error__[ atr_i ]
+        # truncate the args if for e.g. the hook doesn't need metadata
+      compress_p = Build_compressor__[ p.arity ]
+      define_singleton_method :"on_#{ atr_i }_attribute" do |*a|
+        instance_exec( * compress_p[ a ] , & p )
+      end
+      _matr = meta_attributes.touch_matr_w_nm atr_i
+      _matr.set_hook_p p ; nil
+    end
+
+    def imprt_matrs_from_module mod
+      mod.const_defined?( :InstanceMethods, false ) and
+        include mod::InstanceMethods
+      matrs = meta_attributes
+      mod.meta_attributes.each_pair do |i, matr|
+        respond_to?( matr.hook_name ) || matrs.has?( i ) and
+          fail "implement me: decide clobber behavior"
+        p = matr.hook_p
+        p and define_singleton_method matr.hook_name, p
+        matrs.accept_matr matr
+      end ; nil
+    end
+
+    Arg_error__ = -> x do
       ::ArgumentError.new "cannot define a meta attribute with #{ x.class }"
     end
 
-    define_method :meta_attribute do |first, *rest, &b|
-      # (this method signature is heavily overloaded not just to be dsl-ly
-      # bc honestly that is kind of annoying here, it is because we want
-      # `meta_attributes` (the plural form, with an 's') to be always the
-      # getter and never a setter for the same reason of not liking overloaded
-      # method signatures. so it is an unintended irony here.)
-
-      meta_attributes = self.meta_attributes # tiny opt. & debugging nicety
-      pairs = normalize_meta_attribute_args[ first, rest, b ]
-      pairs.each do |attr_ref, func|
-        if func
-          ::Symbol === attr_ref or raise arg_error[ attr_ref ]
-          # truncate the args if for e.g. the hook doesn't need metadata
-          limit = func.arity > 0 ? -> a { a[0, func.arity] } : -> a { a }
-          define_singleton_method "on_#{ attr_ref }_attribute" do |*a|
-            instance_exec( * limit[ a ] , &func)
-          end
-          meta_attributes.vivify( attr_ref ).hook = func
-        else
-          case attr_ref
-          when ::Symbol          # no block just a name.
-            meta_attributes.vivify! attr_ref # this may be too strict
-          when ::Hash
-            meta_attributes.vivify_from_hash attr_ref  # validates
-          when ::Module
-            import_meta_attributes_from_module attr_ref
-          else
-            raise arg_error[ attr_ref ]
-          end
-        end
+    Build_compressor__ = -> d do
+      if d < 1 then MetaHell::IDENTITY_ else
+        -> a { a[ 0, d ] }
       end
-      nil
     end
 
   public
-                                  # retrieve the box that represents the
-                                  # metaattributes defined for this definer
-                                  # creating it lazily.
-    def meta_attributes
-      @meta_attributes ||= dupe_ancestor_attr :meta_attributes do
-        Formal::Attribute::MetaAttribute::Box.new
+
+    def meta_attributes  # #storypoint-35
+      @meta_attributes ||= bld_meta_attributes
+    end
+  private
+    def bld_meta_attributes
+      dupe_ancestor_attr :meta_attributes do
+        Formal::Attribute::Matrs__.new
       end
     end
+  public
 
     def on_attribute_introduced atr
-      i = atr.local_normal_name
-      w_i = atr.writer_method_name
-      method_defined? i or attr_reader i
-      if ! ( method_defined? w_i or atr.is? :reader )
-        attr_writer i
-      end
-      attributes.accept atr ; nil
+      is_reader_x = atr.is? :reader
+      method_defined?( atr.local_normal_name ) or false == is_reader_x or
+        attr_reader atr.local_normal_name
+      method_defined?( atr.writer_method_name ) or is_reader_x or
+        write_attribute_writer( atr )
+      attributes.accept_atr atr ; nil
+    end
+
+  private
+
+    def write_attribute_writer atr
+      attr_writer atr.reader_method_name
     end
   end
-                                  # a meta attribute is of course an attribute's
-                                  # attribute. users can define them.
-                                  # e.g. `default`, `required`, these are
-                                  # common meta-attributes.  I know what you're
-                                  # thinking and the answer is no.
-  class Formal::Attribute::MetaAttribute
 
-    def default= x
-      @has_default = true
-      @default_value = x
+  class Formal::Attribute::Matr__  # #storypoint-40
+
+    def initialize local_normal_name
+      @default_value = @has_default = nil
+      @hook_name = :"on_#{ local_normal_name }_attribute"
+      @hook_p = nil
+      @local_normal_name = local_normal_name ; nil
     end
+    attr_reader :has_default, :hook_name, :hook_p, :local_normal_name
+
+    # ~ :+[#021] a typical base class implementation:
+    def dupe
+      dup
+    end
+    def initialize_copy otr
+      init_copy( * otr.get_args_for_copy ) ; nil
+    end
+  protected
+    def get_args_for_copy
+      [ @default_value, @has_default, @hook_name, @hook_p, @local_normal_name ]
+    end
+  private
+    def init_copy * five
+      @default_value, @has_default, @hook_name, @hook_p, @local_normal_name =
+        five ; nil
+    end
+    # ~
+
+  public
 
     def default_value
       @has_default or raise 'sanity - no default - check `has_default` first'
       @default_value
     end
 
-    def dupe                      # the definer itself will call this when
-      new = self.class.new @local_normal_name # building definitions.
-      new.hook = @hook
-      new.default = @default_value if @has_default
-      new
+    def set_hook_p p
+      @hook_p and fail "implement me: clobbering of existing hooks"
+      @hook_p = p ; nil
     end
 
-    attr_reader :has_default
-
-    attr_reader :hook
-
-    def hook= func
-      @hook and fail "implement me: clobbering of existing hooks"
-      @hook = func
+    def default= x
+      @has_default = true
+      @default_value = x
     end
+  end
 
-    def hook_name
-      "on_#{ @local_normal_name }_attribute"
+  class Formal::Attribute::Matrs__ < Formal::Box  # #storypoint-50
+
+    def touch_matr_w_hash h  # mutates
+      name_i = h.delete(:_unsanitized_name) or raise ::ArgumentError, say_no_nm
+      has_default = true
+      default_value = h.fetch :default do has_default = false end
+      if has_default
+        h.delete :default
+      end
+      h.length.zero? or raise ::ArgumentError, say_buck_stop( h )
+      matr = touch_matr_w_nm name_i
+      has_default and matr.default = default_value  # clobber OK
+      matr
+    end
+  private
+    def say_no_nm
+      "meta_attribute name not provided"
+    end
+    def say_buck_stop h
+      "unsupported meta-attribute(s): (#{ h.keys * ', ' })"
+    end
+  public
+
+    def touch_matr_w_nm atr_i
+      if? atr_i, IDENTITY_, method( :crt_and_add_matr_with_name )
+    end
+  private
+    def crt_and_add_matr_with_name _self, atr_i
+      matr = Formal::Attribute::Matr__.new atr_i
+      add matr.local_normal_name, matr
+      matr
+    end
+  public
+
+    def accept_matr matr
+      add matr.local_normal_name, matr ; nil
+    end
+  end
+
+  class Formal::Attribute < Formal::Box  # #storypoint-60
+
+    def initialize local_normal_name
+      local_normal_name.respond_to?( :id2name ) or self._sanity_
+      @local_normal_name = local_normal_name
+      super()
     end
 
     attr_reader :local_normal_name
-
-  private
-
-    def initialize local_normal_name
-      @local_normal_name = local_normal_name
-      @has_default = nil
-      @default_value = nil
-      @hook = nil
-    end
-  end
-
-  # but when you have a collection of meta-attributes, where do *they* go!?
-  # note this looks a lot like an attribute metadata, and might as well be
-  # one, except that it is for representing collections of meta-attributes
-  # that should be applied to all new attributes, which is similar but not
-  # the same as an attribute metadata (for one thing it does not have a name
-  # associated with it.) but notwithstanding it might should go away. imagine
-  # a prototype metadata instead of this..
-  class Formal::Attribute::MetaAttribute::Box < Formal::Box
-
-    public :accept                # used in definer logic
-
-    public :dupe                  # used in definer logic
-
-    def vivify attr_ref
-      if? attr_ref, IDENTITY_, -> { vivify! attr_ref }
-    end
-
-    def vivify! attr_ref          # create the new and add it, result is new el
-      ma = Formal::Attribute::MetaAttribute.new attr_ref
-      add ma.local_normal_name, ma
-      ma
-    end
-
-    arg_err = -> msg do
-     raise ::ArgumentError, msg
-    end
-
-    define_method :vivify_from_hash do |h|     # mutates hash `h`
-      mattr = nil
-      begin
-        attr_ref = h.delete :_unsanitized_name
-        if ! ( ::Symbol === attr_ref )
-          break( arr_err[ "meta_attribute name not provided." ] )
-        end
-        if h.key? :default
-          has_default = true
-          default_value = h.delete :default
-        end
-        if h.size.nonzero?
-          break( arg_err[ "unsupported meta-meta-attribute(s) - #{
-            }(#{ h.keys.map ', ' }) (the buck must stop somewhere.)" ] )
-        end
-        mattr = vivify attr_ref
-        if has_default
-          mattr.default = default_value        # ok to clobber previous default
-        end
-      end while nil
-      mattr
-    end
-
-    def remove_attribute atr_atr_i
-      remove atr_atr_i
-      nil
-    end
-  end
-                                  # metadata about an attribute is itself a
-                                  # box, it is a box of meta-attributes.
-  class Formal::Attribute::Metadata < Formal::Box
-
-    def is? i
-      has?( i ) and self[ i ]
-    end
 
     def reader_method_name
       @local_normal_name
@@ -451,23 +374,11 @@ module ::Skylab::MetaHell
       @writer_method_name ||= :"#{ local_normal_name }="
     end
 
-    def add_default name, val     # this is internal
-      x = dupe_constituent_value val
-      add name, x
-      nil
+    def is? i
+      self[ i ] if has? i
     end
 
-    def dupe
-      nn = @local_normal_name
-      super.instance_exec do
-        @local_normal_name = nn
-        self
-      end
-    end
-
-    # merge the hash-like `enum_x` into self whereby for each element if
-    # self has? an element with the name, change it else add it.
-    def merge! enum_x
+    def merge! enum_x  # #storypoint-75
       enum_x.each do |k, v|
         if? k,
           -> x { change k, v },
@@ -476,122 +387,72 @@ module ::Skylab::MetaHell
       nil
     end
 
-    # merge the hash-like `enum_x` into self whereby if the `compare`
-    # box already has an element with name, **add** the element iff it
-    # != the existing one. this allows us to make minimal deltas, a
-    # logical requirement.
     def merge_against! enum_x, compare
       enum_x.each do |k, v|
         compare.if? k,
-          -> x { add( k, v ) if x != v }, # will crap out on clobber! #todo
+          -> x { add( k, v ) if x != v },  # will crap out on clobber! #todo
           -> { add k, v }
       end
       nil
     end
 
-    attr_reader :local_normal_name  # used here by `accept`, may also be used by
-                                  # subclasses by clients e.g to make a custom
-                                  # derived property, like a label.
-
     def add_attribute_attribute atr_atr_i, atr_atr_x
-      add atr_atr_i, atr_atr_x
-      nil
+      add atr_atr_i, atr_atr_x ; nil
     end
 
     def change_attribute_attribute_value atr_atr_i, atr_atr_x
-      change atr_atr_i, atr_atr_x
-      nil
+      change atr_atr_i, atr_atr_x ; nil
     end
 
-  private
-
-    def initialize local_normal_name
-      fail "sanity - all metadatas must have a sybolic name" if !
-        ( ::Symbol === local_normal_name )
-      super()
-      @local_normal_name = local_normal_name
-      nil
+    def add_dflt name, val
+      x = dupe_constituent_value val
+      add name, x ; nil
     end
   end
 
-                                  # simply an ordered collection of formal
-                                  # attributes. think of it as a method
-                                  # signature..
-                                  # (sister class: Parameter::Set)
-  class Formal::Attribute::Box < Formal::Box
+  class Formal::Attribute::Box < Formal::Box  # #storypoint-90
 
-                                  # hash-like convenience constructor allows
-                                  # you to make an arbitrary ad-hoc attribute
-                                  # set intuitively with familiar primitives.
-                                  # note this does not care about metaattibutes.
-    def self.[] h_enum            # also there is a sinful "optimization" we
-      new = self.new              # throw in just to be jerks.
-      new.instance_exec do
-        h_enum.each do |k, h|
-#         attr = Formal::Attribute::Metadata.new k # this should work but
-#         attr.merge! h                            # OHAI HOW ABOUT THIS:
-          attr = Formal::Attribute::Metadata.allocate
-          attr.instance_exec do
-            @local_normal_name = k
-            @order = h.keys
-            @hash = h
-          end                                      # WAT COULD GO WRONG
-          accept attr
-        end
+    def self.[] i_h_pair_a  # #storypoint-95
+      me = new
+      me.init_from_i_h_pair_a i_h_pair_a
+      me
+    end
+
+    def init_from_i_h_pair_a i_h_pair_a
+      i_h_pair_a.each do |i, h|
+        atr = Formal::Attribute.allocate
+        atr.initialize_atr_spcl i, h
+        accept_atr atr
+      end ; nil
+    end
+
+    def accept_atr atr
+      add atr.local_normal_name, atr ; nil
+    end
+
+    def meta_attribute_value_box matr_i  # #storypoint-105
+      _ea = with matr_i
+      _ea.box_map do |atr|
+        atr[ matr_i ]
       end
-      new
     end
 
-    public :accept                # (used in definer logic)
-
-    public :dupe                  # definer calls this directly
-
-    # result is a new box whose every element represents every element from
-    # this box that has? `metaattribute`. Every element in the result box
-    # will have a name that corresponds to the name used for the original
-    # element in the original box, but the new element's value is the
-    # value of the original box element's `metaattribute` value., .e.g:
-    #   Foo.attributes #=>
-    #     {:age=>{:default=>1}, :sex=>{:default=>:banana}, :location=>{}}
-    #
-    #   Foo.attributes.meta_attribute_value_box :default #=>
-    #     {:age=>1, :sex=>:banana}
-    #
-
-    def meta_attribute_value_box mattr_name
-      with( mattr_name ).box_map { |x| x[mattr_name] }
+    def with matr_i, & p  # #storypoint-110
+      ea = filter -> x do
+        x.has? matr_i
+      end
+      p ? ea.each( & p ) : ea
     end
 
-    # `with` - wrapper around: produce a new enumerator that filters for only
-    # those attributes that has? `mattr_name`. note it does not care if those
-    # meta-attribute values are trueish, only if they `has?` that meta-attribute
-    # in the box. (a most common use case is defaults - sometimes defaults are
-    # nil or false. this is different than a formal attribute not having
-    # a default set.).
-
-    def with mattr_name, &block
-      ea = filter -> x { x.has? mattr_name }
-      block ? ea.each(& block ) : ea
-    end
-
-    def remove_attribute atr_atr_i
-      delete atr_atr_i
-      nil
-    end
-
-    # `which` - #experimental (we are considering adding a `with`-like ability
-    # to use a mattr name instead of a block, so it would be like a `with`
-    # with an extra true-ish check. but only if necessary)
-    #
-
-    alias_method :which, :filter
-
-  private
-
-    # nothing is private. constructor takes 0 arguments.
+    alias_method :which, :filter  # #storypoint-120
   end
 
-  module Formal::Attribute
+  class Formal::Attribute
+
+    def initialize_atr_spcl i, h
+      @local_normal_name = i ; @order = h.keys ; @hash = h
+      init_base nil ; nil
+    end
 
     module Reflection_IM__
 
@@ -599,9 +460,8 @@ module ::Skylab::MetaHell
         attribute_definer.attributes.names
       end
       #
-      def fetch i, &p
-        # in case nil is returned from the reader, we don't behave as if we
-        # "have" the value unless it has a default (which presumably is nil)
+      def fetch i, &p  # #storypoint-135
+
         if (( atr = attribute_definer.attributes.fetch( i ) { } ))
           x = send atr.reader_method_name
           did = if x.nil?
@@ -649,12 +509,7 @@ module ::Skylab::MetaHell
         attribute_definer.attributes
       end
 
-      def attribute_definer  # the default attribute definer for a typical
-        # object is its ordinary class. in some cases -- e.g. if you are
-        # dealing with a class or module object and want to use attribute
-        # definer for *that* -- you will want to redefine this method to
-        # result in the singleton class instead, for reflection to work
-        # (which is required for some kind of meta-attribute setters, etc)
+      def attribute_definer  # #storypoint-175
         self.class
       end
     end

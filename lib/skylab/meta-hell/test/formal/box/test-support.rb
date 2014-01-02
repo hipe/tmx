@@ -1,7 +1,8 @@
 require_relative '../test-support'
 
 module ::Skylab::MetaHell::TestSupport::Formal::Box
-  ::Skylab::MetaHell::TestSupport::Formal[ Box_TestSupport = self ]
+
+  ::Skylab::MetaHell::TestSupport::Formal[ TS__ = self ]
 
   include CONSTANTS
 

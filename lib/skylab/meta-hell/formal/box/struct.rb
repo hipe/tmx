@@ -16,24 +16,24 @@ module Skylab::MetaHell
         struct_new( * box._order ).init_from_box box
       end
 
-      attr_reader :names, :silhouette_box_base_args
+      attr_reader :names, :silhouette_box_args_for_base
 
     protected  # #protected-not-private
 
       def init_from_members
         @names = members.freeze
         @silhouette_box_class = Formal::Box
-        @silhouette_box_base_args = NIL_ARY__
+        @silhouette_box_args_for_base = NIL_ARY__
         self
       end
       #
       NIL_ARY__ = Formal::Box.
-        instance_method( :base_init ).arity.times.map{ }.freeze
+        instance_method( :init_base ).arity.times.map{ }.freeze
 
       def init_from_box box
         @names = members.freeze
         @silhouette_box_class = box.class
-        @silhouette_box_base_args = box.get_base_args.freeze
+        @silhouette_box_args_for_base = box.get_arguments_for_base_copy.freeze
         self
       end
     end
@@ -42,18 +42,18 @@ module Skylab::MetaHell
       super
       @order = self.class.names or fail "sanity"
       @hash = Build_hash_proxy__[ self ]
-      base_init( * self.class.silhouette_box_base_args )
+      init_base( * self.class.silhouette_box_args_for_base )
       nil
     end
 
-    def produce_offspring_box
-      self.class.produce_offspring_box_notify
+    def get_box_base_copy
+      self.class.get_box_base_copy_as_class
     end
 
-    def self.produce_offspring_box_notify
-      ba = @silhouette_box_base_args
+    def self.get_box_base_copy_as_class
+      x_a = @silhouette_box_args_for_base
       @silhouette_box_class.allocate.instance_exec do
-        base_init( * ba )
+        init_base( * x_a )
         self
       end
     end

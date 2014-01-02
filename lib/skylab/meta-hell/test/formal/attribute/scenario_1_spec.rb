@@ -64,8 +64,10 @@ module ::Skylab::MetaHell::TestSupport::Formal
     mod
   end
 
-  describe "#{ MetaHell }::Formal::Attribute - scenario 1" do
+  describe "[mh] formal attribute - scenario 1" do
+
     it "four-node inheritance chain and hook chain - whew" do
+
       mod = scenario_module[]
       o = mod::TarballTo.new
       o.build_dir = "ok/yes"

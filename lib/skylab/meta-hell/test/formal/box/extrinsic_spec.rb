@@ -10,7 +10,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box::Extr_
 
   Box = MetaHell::Formal::Box
 
-  describe "#{ MetaHell::Formal::Box } extrinsics" do
+  describe "[mh] formal box extrinsic" do
 
     it "(Open) you can make a \"hash controller\" around an existing hash" do
       h = { foo: :bar }

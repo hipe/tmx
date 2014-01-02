@@ -11,10 +11,14 @@ module Skylab::MetaHell::TestSupport
     TestSupport = ::Skylab::TestSupport
   end
 
+  include CONSTANTS
+
+  MetaHell = MetaHell
+
   module ModuleMethods
     include CONSTANTS
-    def memoize name, func
-      define_method name, & MetaHell::FUN.memoize[ func ]
+    def memoize name_i, p
+      define_method name_i, & MetaHell::FUN.memoize[ p ]
       nil
     end
   end
@@ -22,6 +26,16 @@ module Skylab::MetaHell::TestSupport
   module InstanceMethods
     include CONSTANTS
     extend MetaHell::Let
+
+    def debug!
+      @do_debug = true
+    end
+
+    attr_reader :do_debug
+
+    def debug_IO
+      MetaHell::Services::Headless::System::IO.some_stderr_IO
+    end
 
     let :o do
       klass.new

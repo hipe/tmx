@@ -375,7 +375,7 @@ module Skylab::Porcelain::Legacy
   class Action::Enumerator < MetaHell::Formal::Box::Enumerator # (used by story)
 
     def [] k  # actually just fetch - will throw on bad key
-      @box_ref.call.fetch k
+      @box_p.call.fetch k
     end
 
     def visible

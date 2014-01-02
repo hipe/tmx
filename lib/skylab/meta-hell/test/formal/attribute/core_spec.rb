@@ -1,13 +1,12 @@
 require_relative 'test-support'
 
-require 'set'
-
 module ::Skylab::MetaHell::TestSupport::Formal::Attribute
 
-  describe "[mh] formal attributes" do
+  MetaHell::Services.kick :Set
 
-    extend Attribute_TestSupport::ModuleMethods
-    include Attribute_TestSupport::InstanceMethods
+  describe "[mh] formal attribute" do
+
+    extend TS__
 
     it "creates getter/setters on classes" do
       klass = one_such_class do
@@ -86,7 +85,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Attribute
           one_such_class do
             meta_attribute :height
             class << self
-              public :meta_attributes
+              public :meta_attribute, :meta_attributes
             end
           end
         end
@@ -144,13 +143,10 @@ module ::Skylab::MetaHell::TestSupport::Formal::Attribute
 
     context "lets you import meta attribute definitions from modules" do
 
-      let :defining_module do
-        ::Module.new.module_eval do
+      before :all do
+
+        module Defining_Module
           extend MetaHell::Formal::Attribute::Definer
-          class << self
-            def to_s ; 'defining_module' end
-            public :meta_attributes
-          end
           meta_attribute :regex do |name, meta|
             alias_method(after = "#{name}_after_regex=", "#{name}=")
             define_method("#{name}=") do |str|
@@ -162,36 +158,45 @@ module ::Skylab::MetaHell::TestSupport::Formal::Attribute
               end
             end
           end
-          self
-        end
-      end
-
-      let :importing_class do
-        ctx = self
-        ::Class.new.class_eval do
-          extend MetaHell::Formal::Attribute::Definer
           class << self
-            def to_s ; 'importing_class' end
             public :meta_attributes
           end
-          meta_attribute ctx.defining_module
-          self
         end
-      end
 
-      let :stdout do [] end
+        class Importing_Class
+          extend MetaHell::Formal::Attribute::Definer
+          meta_attribute Defining_Module
+          class << self
+            public :meta_attributes
+          end
+        end
 
-      let :child_class do
-        ctx = self
-        ::Class.new(importing_class).class_eval do
+        class Child_Class < Importing_Class
+          def initialize espy
+            @emit_spy = espy
+          end
           attribute :first_name, :regex => /^[A-Z]/
-          define_method(:emit) { |_, s| ctx.stdout.push s }
-          self
+          def emit i, s
+            @emit_spy.emit i, s ; nil
+          end
         end
       end
 
-      it "which transfers the same MetaAttribute object to child (should be ok)" do
-        importing_class.meta_attributes[:regex].should be_kind_of(MetaHell::Formal::Attribute::MetaAttribute)
+      def defining_module
+        Defining_Module
+      end
+
+      def importing_class
+        Importing_Class
+      end
+
+      def child_class
+        Child_Class
+      end
+
+      it "which transfers the same matr object to child (should be ok)" do
+        _ = importing_class.meta_attributes[ :regex ]
+        _.should be_kind_of MetaHell::Formal::Attribute::Matr__
         importing_class.meta_attributes[:regex].object_id.should eql(defining_module.meta_attributes[:regex].object_id)
       end
 
@@ -201,15 +206,26 @@ module ::Skylab::MetaHell::TestSupport::Formal::Attribute
       end
 
       it "and which will work e.g. from an object of a child class" do
-        o = child_class.new
+        o = child_class.new build_and_attach_to_emit_spy
         o.first_name.should be_nil
         o.first_name = "Billford Brimley"
-        o.first_name.should eql("Billford Brimley")
-        stdout.size.should be_zero
+        o.first_name.should eql "Billford Brimley"
+        @em_a.length.should be_zero
         o.first_name = "toff tofferson"
-        stdout.size.should eql(1)
-        stdout.last.should eql('"toff tofferson" did not match regex: /^[A-Z]/')
-        o.first_name.should eql("Billford Brimley")
+        @em_a.length.should eql 1
+        em = @em_a.shift
+        em.stream_name.should eql :error
+        em.payload_x.should eql '"toff tofferson" did not match regex: /^[A-Z]/'
+        o.first_name.should eql "Billford Brimley"
+      end
+
+      def build_and_attach_to_emit_spy
+        es = MetaHell::Services::PubSub::TestSupport::Emit_Spy.new do |es_|
+          es_.debug_IO = debug_IO
+          es_.do_debug_proc = -> { do_debug }
+        end
+        @em_a = es.emission_a
+        es
       end
     end
   end

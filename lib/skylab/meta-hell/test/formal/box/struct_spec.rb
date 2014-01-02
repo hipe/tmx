@@ -2,15 +2,15 @@ require_relative 'test-support'
 
 module ::Skylab::MetaHell::TestSupport::Formal::Box::Struct
 
-  ::Skylab::MetaHell::TestSupport::Formal::Box[ Struct_TestSupport = self ]
+  ::Skylab::MetaHell::TestSupport::Formal::Box[ TS__ = self ]
 
   include CONSTANTS
 
   extend TestSupport::Quickie
 
-  describe "#{ MetaHell::Formal::Box }::Struct - from box" do
+  describe "[mh] formal box struct - from box" do
 
-    extend Struct_TestSupport
+    extend TS__
 
     define_method :struct, & MetaHell::FUN.memoize[ -> do
       build_box_notify.to_struct
@@ -18,7 +18,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box::Struct
 
     def self.build_box_notify
       MetaHell::Formal::Box.
-        from_hash( sure: :whaver, this: :that, ming: :mang )
+        from_hash sure: :whaver, this: :that, ming: :mang
     end
 
     def build_box
@@ -113,7 +113,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box::Struct
     end
   end
 
-  describe "#{ MetaHell::Formal::Box }::Struct - like tradtional struct" do
+  describe "[mh] formal box struct - like tradtional struct" do
 
     define_method :wiz_bang, & MetaHell::FUN.memoize[ -> do
        MetaHell::Formal::Box.const_get :Struct, false

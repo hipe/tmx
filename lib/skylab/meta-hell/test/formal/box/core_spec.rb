@@ -4,7 +4,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box
 
   describe "[mh] formal box" do
 
-    extend Box_TestSupport
+    extend TS__
 
     context "when it comes to visiting (enumerating / iteration), #{
       }honeybadger" do
@@ -114,11 +114,11 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box
         v1.should eql( :Three )
         v2 = subject.defectch -> v { :NotThere == v }, -> { :alternate }
         v2.should eql( :alternate )
-        begin
+        _eek_rxs = ::Regexp.escape __FILE__
+        -> do
           subject.defectch -> x { false }
-        rescue ::KeyError => e
-        end
-        e.to_s.should match( /value not found matching <#Proc.*_spec/ ) # EEK
+        end.should raise_error ::KeyError,
+          /\bvalue not found matching <#Proc@#{ _eek_rxs }:\d+>\z/
       end
     end
 
