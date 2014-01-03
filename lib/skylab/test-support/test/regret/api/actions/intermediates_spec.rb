@@ -63,7 +63,7 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::Intermediates
       it "when it is an existant absolute path - works (dry run)" do
         Sandbox_1.with self
         module Sandbox_1
-          in_pn = HOME_.join( 'api/actions/doc-test/templos-/quickie/context-' )
+          in_pn = HOME_.join( 'api/actions/doc-test/templos--/quickie/context--' )
           r, o, e = Intr_[ :path, in_pn, :vtuple, 4, :is_dry_run, true ]
           s = e * "\n"
           matches = -> rx do
@@ -75,12 +75,12 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::Intermediates
           yes = e.include?(
             "(verbosity level 3 is the highest. ignoring 1 of the verboses.)" )
           yes.should eql( true )
-          matches[ /yep i see it there.+context-$/ ].should eql( true )
+          matches[ /yep i see it there.+context--$/ ].should eql( true )
           s.scan( /^exists - / ).length.should eql( 5 )
-          big_rx =  %r|^\(writing .+templos-/quickie/test-support\.rb #{
+          big_rx =  %r|^\(writing .+templos--/quickie/test-support\.rb #{
             }\.\. done \(\d+ fake bytes\)\)$|
           matches[ big_rx ].should eql( true )
-          matches[ %r|^mkdir .+templos-/quickie/context-| ].should eql( true )
+          matches[ %r|^mkdir .+templos--/quickie/context--| ].should eql( true )
           e.pop.should eql( 'ok.' )
         end
       end

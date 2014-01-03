@@ -1,6 +1,6 @@
 class Skylab::TestSupport::Regret::API::Actions::DocTest
 
-  class Specer_
+  class Specer__
 
     # the specer accepts a sequence of Comment_::Block-s one by one and for
     # for each one it parses it line-by-line, chunking it into runs of 'code'
@@ -128,7 +128,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
 
       define_method :accept do |cblock|
         machine = Machine_.new
-        sblock = Specer_::Block.new @snitch
+        sblock = Specer__::Block.new @snitch
         comment_lines = Basic::List::Scanner[ cblock.a ]
         while cl = comment_lines.gets
           sblock.accept machine.move( cl )
@@ -164,7 +164,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
           @tail_path = resolve_tail_path or break
           c_a = resolve_loaded_anchorized_const_a or break c_a
         end
-        tmod = MetaHell::Boxxy::Fuzzy_const_get[ DocTest::Templos_, @templo_name ]
+        tmod = MetaHell::Boxxy::Fuzzy_const_get[ DocTest::Templos__, @templo_name ]
         tmod.begin @snitch, @base_mod, c_a, @block_a
       end.call
     end
@@ -289,7 +289,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
 
   end
 
-  class Specer_::Event_
+  class Specer__::Event_
 
     def self.[] msg
       new -> { msg }

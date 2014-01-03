@@ -1,8 +1,8 @@
 module Skylab::TestSupport::Regret::API
 
-  module Actions::DocTest::Templos_::Quickie::Context_
+  module Actions::DocTest::Templos__::Quickie::Context__
 
-    Context_ = self
+    Context__ = self
 
     module Part_
 
@@ -10,7 +10,7 @@ module Skylab::TestSupport::Regret::API
         case blk.snippet_a.length
         when 0 ; MetaHell::EMPTY_A_
         when 1 ; [ build_example( blk.snippet_a.fetch( 0 ), y ) ]
-        else   ; Context_::Beforer_.build_parts blk, y
+        else   ; Context__::Beforer_.build_parts blk, y
         end
       end
 
@@ -18,7 +18,7 @@ module Skylab::TestSupport::Regret::API
         Example_.new( y ) do |e|
           e.quoted_description_string =
             API::Support::Templo_::FUN.descify[ snippet.last_other ]
-          filter = Actions::DocTest::Templos_::Predicates.new
+          filter = Actions::DocTest::Templos__::Predicates.new
           snippet.line_a.each( & filter.method( :<< ) )
           e.local_lines = filter.flush
         end

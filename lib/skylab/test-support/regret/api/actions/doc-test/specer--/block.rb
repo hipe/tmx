@@ -1,7 +1,7 @@
 class Skylab::TestSupport::Regret::API::Actions::DocTest
 
-  Specer_::Block = MetaHell::Function::Class.new :accept, :flush
-  class Specer_::Block
+  Specer__::Block = MetaHell::Function::Class.new :accept, :flush
+  class Specer__::Block
 
     # what this mess does: within a block of comments there can be N code
     # sections ("snippets"), each snippet preceded by zero or one
@@ -97,7 +97,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       # strip trailing blank lines
       a.pop while a.length.nonzero? and a.last.length.zero?
       if a.length.nonzero?
-        sn = Specer_::Block::Snippet_.new last_other, a, ctx
+        sn = Specer__::Block::Snippet_.new last_other, a, ctx
         if sn.validate @snitch
           @snippet_a << sn
         end
@@ -106,7 +106,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     end
   end
 
-  class Specer_::Block::Snippet_
+  class Specer__::Block::Snippet_
 
     def initialize last_other, a, ctx
       @last_other, @line_a, @context_x = last_other, a, ctx

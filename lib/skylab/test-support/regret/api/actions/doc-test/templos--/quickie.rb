@@ -1,6 +1,6 @@
 module Skylab::TestSupport::Regret::API
 
-  class Actions::DocTest::Templos_::Quickie < API::Support::Templo_
+  class Actions::DocTest::Templos__::Quickie < API::Support::Templo_
 
     OPTION_A_ = [
       [ :cover, -> { @cover = nil }, -> { @cover = true ; true },
@@ -49,7 +49,7 @@ module Skylab::TestSupport::Regret::API
 
       render_tests = -> blk, cnum do
         y = ( rtma ||= Basic::List::Marginated::Articulation.new "\n" )
-        part_a = self.class::Context_::Part_.resolve_parts blk, rlma
+        part_a = self.class::Context__::Part_.resolve_parts blk, rlma
         part_a.each do |part|
           y << template_h.fetch( part.template_i )[ part, cnum ]
         end

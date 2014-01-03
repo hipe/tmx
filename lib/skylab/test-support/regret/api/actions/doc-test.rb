@@ -132,7 +132,7 @@ module Skylab::TestSupport::Regret::API
     end
 
     def build_specer snitch
-      DocTest::Specer_.new :core_basename, @core_basename,
+      DocTest::Specer__.new :core_basename, @core_basename,
         :load_file, @load_file, :load_module, @load_module,
         :outstream, @out, :snitch, snitch, :templo_name, :quickie,
         :path, @path

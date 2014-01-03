@@ -2,7 +2,7 @@ module Skylab::TestSupport::Regret::API  # [#sl-123] exempt:
 
   class Actions::DocTest                   # these breaks ..
 
-    module Templos_::Quickie::Context_       # reflect design ..
+    module Templos__::Quickie::Context__       # reflect design ..
 
       module Beforer_                          # choices.
 
@@ -33,7 +33,7 @@ module Skylab::TestSupport::Regret::API  # [#sl-123] exempt:
           bef and part_a << bef
           ex and part_a << ex
           while snip = snips.gets
-            part_a << Context_::Part_.build_example( snip, y )
+            part_a << Context__::Part_.build_example( snip, y )
           end
           part_a
         end
@@ -42,7 +42,7 @@ module Skylab::TestSupport::Regret::API  # [#sl-123] exempt:
         private
           def first_snip snip, y
             before_a = example_a = nil
-            preds = Templos_::Predicates.new -> line do
+            preds = Templos__::Predicates.new -> line do
               ( example_a ||= [ ] ) << line
               nil
             end, -> line do
@@ -61,12 +61,12 @@ module Skylab::TestSupport::Regret::API  # [#sl-123] exempt:
                 before_a.length.nonzero? && before_a.last.length.zero?
             end
             if before_a && before_a.length
-              bef = Context_::Part_::Before_.new( y ) do |b|
+              bef = Context__::Part_::Before_.new( y ) do |b|
                 b.local_lines = before_a
               end
             end
             if example_a
-              ex = Context_::Part_::Example_.new( y ) do |e|
+              ex = Context__::Part_::Example_.new( y ) do |e|
                 e.quoted_description_string =
                   API::Support::Templo_::FUN.descify[ snip.last_other ]
                 e.local_lines = example_a

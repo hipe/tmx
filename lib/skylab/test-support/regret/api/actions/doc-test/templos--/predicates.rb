@@ -1,6 +1,6 @@
 class Skylab::TestSupport::Regret::API::Actions::DocTest
 
-  class Templos_::Predicates  # a box module and a class.
+  class Templos__::Predicates  # a box module and a class.
 
     def << line
       @add[ line ]
@@ -46,7 +46,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     end
   end
 
-  Templos_::Predicates::SHOULD_RAISE_ = -> do
+  Templos__::Predicates::SHOULD_RAISE_ = -> do
     # e.g "NoMethodError: undefined method `wat` .."
     cnst = '[A-Z][A-Za-z0-9_]'
     hack_rx = /\A[ ]*
@@ -74,7 +74,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     end
   end.call
 
-  Templos_::Predicates::SHOULD_EQL_ = -> y, lef, rig do
+  Templos__::Predicates::SHOULD_EQL_ = -> y, lef, rig do
     y << "#{ lef }.should eql( #{ rig } )"
     true  # important
   end
