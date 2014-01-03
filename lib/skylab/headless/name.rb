@@ -4,8 +4,13 @@ module Skylab::Headless
 
     module FUN  # #storypoint-10
 
+      Local_normal_name_from_module = -> mod do
+        Normify[ Const_basename[ name_s ] ]
+      end
+
       Const_basename = -> name_s do
-        name_s[ name_s.rindex( COLON_ ) + 1 .. -1 ]
+        idx = name_s.rindex COLON_
+        idx ? name_s[ idx + 1 .. -1 ] : name_s
       end
 
       Constantify = -> do  # make a normalized symbol look like a const
@@ -110,22 +115,29 @@ module Skylab::Headless
           @local_normal = Headless::Name::FUN::Normify[ const_i ] ; nil
         end
 
+        # ~ :+[#mh-021] typical base class implementation:
+        def dupe
+          dup
+        end
+        def initialize_copy otr
+          init_copy( * otr.get_args_for_copy ) ; nil
+        end
+      protected
+        def get_args_for_copy
+          [ @const, @local_normal ]
+        end
+      private
+        def init_copy const_i, local_normal_i
+          @const = const_i ; @local_normal = local_normal_i ; nil
+        end
+        # ~
+
+      public
+
         alias_method :local_slug, :as_slug
 
         def as_const
           @const
-        end
-
-    private
-
-        def base_init const, local_normal
-          @const = const  # symbol!
-          @local_normal = local_normal
-          nil
-        end
-
-        def base_args
-          [ @const, @local_normal ]
         end
       end
 

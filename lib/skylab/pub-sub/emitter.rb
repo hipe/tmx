@@ -119,19 +119,16 @@ module Skylab::PubSub
       super
     end
 
-    # ~ dupe support
-
-  private
+    # ~ :+[#mh-056] a typical child implementation:
     def get_args_for_copy
       super << @taxonomic_stream_i_a
     end
-
-    def initialize_copy *a, any_taxo_stream_i_a
-      @taxonomic_stream_i_a = ( if any_taxo_stream_i_a
-        any_taxo_stream_i_a.dup.freeze
-      end )
+    def init_copy *a, i_a
+      @taxonomic_stream_i_a = ( i_a.dup.freeze if i_a )
       super( *a ) ; nil
     end
+    # ~
+
   public
 
     def ancestors i  # #storypoint-3
@@ -458,6 +455,10 @@ module Skylab::PubSub
           emit :error, msg ; false
         end
 
+        def to_listener
+          PubSub::Listener::From_emitter[ self ]
+        end
+
         p and class_exec( & p )
 
         self
@@ -466,6 +467,5 @@ module Skylab::PubSub
 
     COMMON_LEVELS = %i( debug info notice warn error fatal ).freeze
       # didactic, #bound, #deprecated
-
   end
 end

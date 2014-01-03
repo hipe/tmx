@@ -4,15 +4,9 @@ module Skylab::MetaHell
 
     class Fly__ < MetaHell::Services::Headless::Name::Function::From::Constant
 
-      alias_method :replace, :initialize ; public :replace  # [#031]
-      def initialize ; end  # poof you're a flyweight
-
-      def dupe
-        ba = base_args
-        self.class.allocate.instance_exec do
-          base_init(* ba )
-          self
-        end
+      alias_method :replace_fly_with_const, :initialize
+      public :replace_fly_with_const
+      def initialize
       end
     end
   end
@@ -30,8 +24,8 @@ module Skylab::MetaHell
     define_method :names do
       fly = the_only_fly[]
       ::Enumerator.new do |y|
-        constants.each do |const|
-          fly.replace const
+        constants.each do |const_i|
+          fly.replace_fly_with_const const_i
           y << fly
         end
       end

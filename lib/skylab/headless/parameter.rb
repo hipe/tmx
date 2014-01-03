@@ -1,8 +1,7 @@
 module Skylab::Headless
 
-  class Parameter  # :[#009]
+  class Parameter  # read [#009] the paramter narrative #storypoint-5
 
-    # the fate of this node is discussed at [#mh-053] "discussion of the .."
 
     def self.[] mod, * x_a
       Bundles__.apply_iambic_on_client x_a, mod
@@ -157,6 +156,27 @@ module Skylab::Headless
 
   class Parameter::Set < MetaHell::Formal::Box
 
+    def initialize host
+      host.respond_to? :formal_parameter_class or
+        def host.formal_parameter_class
+          Parameter::DEFAULT_DEFINITION_CLASS
+        end
+      @meta_set = nil ; @host = host
+      super()
+    end
+
+    # ~ :+[#mh-021] typical child class implementation:
+    def get_args_for_copy
+      a = super
+      a.push @host, @meta_set
+      a
+    end
+    def init_copy *supr, host, meta_set
+      @meta_set = meta_set ; @host = host
+      super( * supr )
+    end
+    # ~
+
     def [] normalized_parameter_name
       @hash.fetch normalized_parameter_name do end
     end
@@ -172,72 +192,34 @@ module Skylab::Headless
       end
     end
 
-    def meta_param! name, props, &b
-      meta_set.fetch!( name ).merge!( props, &b )
-    end
-
     def merge! set
       set.each do |name, param|
         fetch!( name ).merge! param
-      end
-      nil
+      end ; nil
     end
 
+    def meta_param! name, props, &b
+      meta_set.fetch!( name ).merge!( props, &b )
+    end
   private
-
-    def initialize host
-      super( )  # init box!
-      if ! host.respond_to? :formal_parameter_class
-        def host.formal_parameter_class
-          Parameter::DEFAULT_DEFINITION_CLASS
-        end
-      end
-      @host = host
-      @meta_set = nil
-      nil
-    end
-
-    def base_args
-      supr = super
-      [ * supr, @host, @meta_set ]
-    end
-
-    def base_init *supr, host, meta_set
-      super(* supr )
-      @host = host
-      @meta_set = meta_set  # .. watch out for this..
-      nil
-    end
-
     def meta_set
-      @meta_set ||= begin
-        # We must make our own procedurally-generated parameter definition class
-        # no matter what lest we create unintentional mutations out of our
-        # scope. If a formal_parameter_class has been indicated explicitly
-        # otherwise, that's fine, use it as a base class here.
-        fail 'sanity' if @host.const_defined? :ParameterDefinition0
-        meta_host = ::Class.new @host.formal_parameter_class
-        @host.const_set :ParameterDefinition0, meta_host
-        @host.singleton_class.class_eval do
-          remove_method :formal_parameter_class # avoid warnings, careful!
-          def formal_parameter_class
-            self::ParameterDefinition0
-          end
+      @meta_set ||= bld_meta_set
+    end
+    def bld_meta_set  # #storypoint-220
+      @host.const_defined?( :ParameterDefinition0 ) and self._sanity_
+      meta_host = ::Class.new @host.formal_parameter_class
+      @host.const_set :ParameterDefinition0, meta_host
+      @host.singleton_class.class_eval do
+        remove_method :formal_parameter_class # avoid warnings, careful!
+        def formal_parameter_class
+          self::ParameterDefinition0
         end
-        meta_host.parameters
       end
+      meta_host.parameters
     end
   end
 
-
-  class Parameter  # re-opened
-    # Experimentally let a formal parameter be defined as a name (symbol)
-    # and an unordered set of zero or more properties, each defined as a
-    # name-value pair (with Symbols for names, values as as-yet undefined.)
-    # A parameter definition is always created in association with one host
-    # (class or module), but in theory any existing parameter definition
-    # should be able to be deep-copy applied over to to another host, or for
-    # example a child class of a parent class that has parameter definitions.
+  class Parameter  # re-opened, #storypoint-230
 
     Parameter::DEFAULT_DEFINITION_CLASS = self # when the host module doesn't
                             # specify explicitly a formal_parameter_class
@@ -281,14 +263,7 @@ module Skylab::Headless
 
   private
 
-    # this badboy bears some explanation: so many of these method definitions
-    # need the same variables to be in scope that it is tighter to define
-    # them all here in this way.  Also it looks really really weird.
-    # [#049] we're gonna shut this whole thing down and merge this in with
-    # the way formal attributes does it.
-    #
-    def initialize host, name
-      ::Symbol === name or fail "sjkanity - #{ host.class } for ::Symbol" # #todo
+    def initialize host, name  # #storypoint-280
       @has_tail_queue = nil
       @property_keys = []
       class << self

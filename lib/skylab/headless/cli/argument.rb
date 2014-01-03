@@ -66,6 +66,25 @@ module Skylab::Headless
         super()
       end
 
+      # ~ :[#mh-021] custom implementation (just for getting slices)
+    private
+      def dupe
+        dup
+      end
+      def initialize_copy otr
+        init_copy( * otr.get_args_for_copy ) ; nil
+      end
+    protected
+      def get_args_for_copy
+        [ @farg_a, @_range_for_dupe_ ]
+      end
+    private
+      def init_copy farg_a, range
+        @farg_a = farg_a[ range ] ; nil
+      end
+      # ~
+    public
+
       # #storypoint-3 for error reporting it is useful to speak in terms of..
 
       def detect_argument &p  # used by #reflection-API
@@ -100,12 +119,10 @@ module Skylab::Headless
       alias_method :[], :argument_slice
     private
       def build_slice_from_range range
-        x_a = base_args ; farg_a = @farg_a
-        self.class.allocate.instance_exec do
-          base_init( * x_a )
-          @farg_a = farg_a[ range ]
-          self
-        end
+        @_range_for_dupe_ = range
+        r = dupe
+        @_range_for_dupe_ = nil
+        r
       end
     public
 
@@ -125,15 +142,6 @@ module Skylab::Headless
       end
 
     private
-
-      # ~ #hook-out's to #dupe-API
-
-      def base_args
-        MetaHell::EMPTY_A_
-      end
-
-      def base_init
-      end
 
       MetaHell::MAARS::Upwards[ self ]  # because we #stowaway but have childs
 

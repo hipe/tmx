@@ -13,19 +13,19 @@ module Skylab::Basic
       @normalized_local_node_name = nln
     end
 
+    # ~ :+[#mh-021] a typical base class implementation:
     def dupe
-      a = get_args_for_copy
-      self.class.allocate.instance_exec do
-        initialize_copy( * a )
-        self
-      end
+      dup
     end
-  private
+    def initialize_copy otr
+      init_copy( * otr.get_args_for_copy ) ; nil
+    end
+  protected
     def get_args_for_copy
       [ @normalized_local_node_name, ( @associations if @has_associations ) ]
     end
-
-    def initialize_copy normalized_local_node_name, associations
+  private
+    def init_copy normalized_local_node_name, associations
       @normalized_local_node_name = normalized_local_node_name
       @has_associations = if associations
         @associations = associations.send :dupe
@@ -34,6 +34,8 @@ module Skylab::Basic
         false
       end ; nil
     end
+    # ~
+
   public
 
     def absorb_association name_i
@@ -66,27 +68,33 @@ module Skylab::Basic
       g
     end
 
-  private
     def initialize
       @order = [ ] ; @hash = { }
       @node_class ||= Basic::Digraph::Node
     end
 
-    # ~ dupe support
-
+    # ~ :+[#mh-021] typical base class implementation:
+    def dupe
+      dup
+    end
+    def initialize_copy otr
+      init_copy( * otr.get_args_for_copy ) ; nil
+    end
+  protected
     def get_args_for_copy
       [ @order, @hash, @node_class ]
     end
-
-    def initialize_copy order, hash, node_class
-      @order = order.dup
-      @hash = { }
-      hash.each do |k, v|
-        @hash[ k ] = v.dupe
+  private
+    def init_copy order, hash, node_class
+      @order = order.dup ; h = { }
+      hash.each_pair do |k, v|
+        h[ k ] = v.dupe
       end
-      @node_class = node_class
-      nil
+      @hash = h
+      @node_class = node_class ; nil
     end
+    # ~
+
   public
 
     # ~ non-mutating (i.e inspection & retrieval)
@@ -153,14 +161,6 @@ module Skylab::Basic
     end
 
     # ~ operations that produce new graphs
-
-    def dupe
-      a = get_args_for_copy
-      self.class.allocate.instance_exec do
-        initialize_copy( * a )
-        self
-      end
-    end
 
     def invert  # #storypoint-35
       order = [ ] ; assoc = { }
@@ -244,7 +244,7 @@ module Skylab::Basic
     end
 
     def bnd_h
-      @bnd_h ||= { }
+      @bnd_h ||= {}
     end
   public
 
@@ -302,9 +302,7 @@ module Skylab::Basic
     end
 
     def clear  # #storypoint-85
-      @hash.clear
-      @order.clear
-      nil
+      @hash.clear ; @order.clear ; nil
     end
 
   private

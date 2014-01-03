@@ -20,12 +20,12 @@ problem (read: annoying and you would be doing it wrong)).
 BUT: when we run filters (like `reduce`-style operations) _on_ the
 produced struct that themselves produce new boxes on the other end,
 what would be really neat is if those themselves preserved all the
-same class associations and `base_init`-style ivars that you would
+same class associations and "base copy"-type ivars that you would
 have gotten had you run the filter on the original box (during the
 state it had when you crated the struct).
 
 SO: as such, what we attempt below is to sort of "freeze" the
-`base_args` as they stand at the time of struct creation (they
+base arguments as they stand at the time of struct creation (they
 shouldn't be too volotile anyway, as a matter of design) for use
 in future result boxes that we create.  BUT ALSO: we need a _slice_
 of the base args of the box to init ourself with, as if the box

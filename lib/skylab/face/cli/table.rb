@@ -1,6 +1,6 @@
 module Skylab::Face
 
-  class CLI::Table
+  class CLI::Table  # read [#036] the CLI table narrative #storypoint-5
 
     # a table
     # with nothing renders nothing
@@ -39,16 +39,48 @@ module Skylab::Face
 
     def initialize a
       @left_x = @sep_x = @right_x = @do_show_header = @field_box =
-        @read_rows_from = @write_lines_to = nil  # reminder: base_args/base_init
+        @read_rows_from = @write_lines_to = nil
       atomic_sugar a
       absorb( *a )
     end
-
+  private
     def atomic_sugar a  # hack - whenever exactly 1
       # element is passed assume it is a rows enumerator.
       1 == a.length and a.unshift :read_rows_from
     end
-    private :atomic_sugar
+
+    # ~ :+[#mh-021] typical base class implementation:
+  public
+    def dupe
+      dup
+    end
+    def initialize_copy otr
+      init_copy( * otr.get_args_for_copy ) ; nil
+    end
+  protected
+    def get_args_for_copy
+      [ @do_show_header,
+        @field_box,
+        @left_x,
+        @read_rows_from,
+        @right_x,
+        @sep_x,
+        @write_lines_to ]
+    end
+  private
+    def init_copy( * x_a )
+      @do_show_header,
+      field_box,
+      @left_x,
+      @read_rows_from,
+      @right_x,
+      @sep_x,
+      @write_lines_to = x_a
+      @field_box = ( field_box.dupe if field_box ) ; nil # #storypoint-80
+    end
+    # ~
+
+  public
 
     def execute
       begin
@@ -61,12 +93,7 @@ module Skylab::Face
 
    private
 
-    def first_pass # lock down the surface matrix from the data producer now
-      # - it might be a randomized functional tree, for e.g (in which case you
-      # wouldn't want to iterate over it twice). also, some custom enums want
-      # to short circuit the entire rendering of the table, halfway through
-      # collapsing themselves, hence we check the result of `each`.
-
+    def first_pass  # #storypoint-100
       max_a = [ ] ; get_max_of_row = -> ea do
         ea.each_with_index do |x, d|
           if (( len = max_a[ d ] ))
@@ -249,8 +276,7 @@ module Skylab::Face
 
   public
 
-    def [] *a  # when this form is called the instance is acting as a
-      # curried executable - the arguments do not mutate this instance.
+    def [] *a  # #storypoint-280
       curry( *a ).execute
     end
 
@@ -261,36 +287,7 @@ module Skylab::Face
       otr
     end
 
-  private
-
-    def dupe
-      ba = base_args
-      self.class.allocate.instance_exec do
-        base_init( * ba )
-        self
-      end
-    end
-
-    def base_args
-      [ @left_x, @sep_x, @right_x, @do_show_header, @read_rows_from,
-        @write_lines_to, @field_box ]
-    end
-
-    def base_init * lx_sx_rx_dsh_rlf_wlt, field_box
-      @left_x, @sep_x, @right_x, @do_show_header, @read_rows_from,
-        @write_lines_to = lx_sx_rx_dsh_rlf_wlt
-      @field_box = (( if field_box
-        field_box.class.allocate.instance_exec do
-          @a = field_box._a.dup ; @h = field_box._h.dup
-          self  # (keep in mind what is happening here - *every* time you
-        end  # call the curried executable, it makes a deep copy of the whole
-      end )) # field box. it feels like we should optimize this but it depends
-      # on the usage whether this is helpful: we don't expect our usage
-      # patterns to justify such an optimization at this point)
-      nil
-    end
-
-    FUN = ::Struct.new( :multiline_column_b ).new( -> row_a, cel_a, a do
+    Multiline_column_B = -> row_a, cel_a, a do
       #  #todo spec and/or cleanup interface
       col_a = [ cel_a ]
       if a.length.zero?
@@ -303,6 +300,6 @@ module Skylab::Face
         row_a.concat a[ 1 .. -1 ].map { |s| [ '', s ] }
       end
       nil
-    end )
+    end
   end
 end

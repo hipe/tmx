@@ -57,6 +57,36 @@ exit( -> sin, sout, serr, argv, program_name do
       end
       def initialize
       end
+
+      # :+[#mh-021] custom implementation:
+    private
+      def dupe
+        @_args_for_dup_ = [ @_remaining.dup, get_ivars_for_dupe ]
+        r = dup ; @_args_for_dup_ = nil ; r
+      end
+      def get_ivars_for_dupe
+        self.class::IVAR_A__.reduce [] do |m, i|
+          instance_variable_defined? i or next m
+          m << i << instance_variable_get( i )
+        end
+      end
+      def initialize_copy otr
+        init_copy( * otr.get_args_for_copy ) ; nil
+      end
+    protected
+      def get_args_for_copy
+        @_args_for_dup_
+      end
+    private
+      def init_copy set, ivar_x_a
+        @_remaining = set
+        while ivar_x_a.length.nonzero?
+          instance_variable_set ivar_x_a.shift, ivar_x_a.shift
+        end ; nil
+      end
+      # ~
+
+    public
       def initial_iambic_notify x_a
         @_remaining = ::Set.new self.class::I_A__
         absorb_iambic x_a
@@ -66,13 +96,6 @@ exit( -> sin, sout, serr, argv, program_name do
       def step
         @_remaining.length.zero? ? execute : self
       end
-    public
-      def initialize_copy set, ivar_x_a
-        @_remaining = set
-        while ivar_x_a.length.nonzero?
-          instance_variable_set ivar_x_a.shift, ivar_x_a.shift
-        end ; nil
-      end  ; protected :initialize_copy  # upgrade it
     protected
       def absorb_iambic x_a
         @_x_a = x_a ; while x_a.length.nonzero?
@@ -91,20 +114,6 @@ exit( -> sin, sout, serr, argv, program_name do
         otr = dupe
         otr.absorb_iambic x_a
         otr.execute
-      end
-    private
-      def dupe
-        otr = self.class.new
-        _ivar_x_a = get_ivars_for_dupe
-        _set = @_remaining.dup
-        otr.initialize_copy _set, _ivar_x_a
-        otr
-      end
-      def get_ivars_for_dupe
-        self.class::IVAR_A__.reduce [] do |m, i|
-          instance_variable_defined? i or next m
-          m << i << instance_variable_get( i )
-        end
       end
       self
     end

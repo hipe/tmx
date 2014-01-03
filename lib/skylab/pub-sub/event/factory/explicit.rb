@@ -1,6 +1,6 @@
 module Skylab::PubSub
 
-  class PubSub::Event::Factory::Explicit
+  class PubSub::Event::Factory::Explicit  # DEPRECATED
 
     # This was the third addition to the suite of factory-resolvers (after
     # isomorphic and late).  You construct it with 2 hashes - the first
@@ -8,13 +8,26 @@ module Skylab::PubSub
     # names (typically e.g :text or :datapoint). The second hash maps
     # logical names to physical factories.
 
-    def dupe
-      ba = base_args
-      self.class.allocate.instance_exec do
-        base_init(* ba )
-        self
-      end
+    def initialize logical_h, physical_h
+      @logical_h, @physical_h = logical_h, physical_h
     end
+
+    # :+[#mh-056] typical base class implementation:
+    def dupe
+      dup
+    end
+    def initialize_copy otr
+      lh, ph = otr.get_args_for_copy
+      @logical_h = lh.dup
+      @physical_h = ph.dup ; nil
+    end
+  protected
+    def get_args_for_copy
+      [ @logical_h, @physical_h ]
+    end
+    # ~
+
+  public
 
     def add_logical_factory name, x
       logical_box.add name, x
@@ -40,20 +53,6 @@ module Skylab::PubSub
     alias_method :[], :call  # #comport to look ::Proc-like
 
   private
-
-    def initialize logical_h, physical_h
-      @logical_h, @physical_h = logical_h, physical_h
-    end
-
-    def base_init lh, ph
-      @logical_h = lh.dup
-      @physical_h = ph.dup
-      nil
-    end
-
-    def base_args
-      [ @logical_h, @physical_h ]
-    end
 
     def logical_box
       @logical_box ||= MetaHell::Formal::Box::Open.hash_controller @logical_h

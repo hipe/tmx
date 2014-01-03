@@ -6,8 +6,7 @@ module Skylab::Basic
 
     def self.from_a_and_h a, h
       allocate.instance_exec do
-        initialize_copy a, h
-        self
+        @a = a ; @h = h ; self
       end
     end
 
@@ -15,16 +14,24 @@ module Skylab::Basic
       @a = [ ] ; @h = { }
     end
 
-    def initialize_copy a, h
-      @a = a ; @h = h ; nil
-    end
-
+    # ~ :+[#mh-021] a typical base class implementation:
     def dupe
-      a = @a.dup ; h = @h.dup
-      self.class.allocate.instance_exec do
-        @a = a ; @h = h ; self
-      end
+      dup
     end
+    def initialize_copy otr
+      init_copy( * otr.get_args_for_copy ) ; nil
+    end
+  protected
+    def get_args_for_copy
+      [ @a, @h ]
+    end
+  private
+    def init_copy a, h
+      @a = a.dup ; @h = h.dup ; nil
+    end
+    # ~
+
+  public
 
     def freeze
       @a.freeze ; @h.freeze ; super

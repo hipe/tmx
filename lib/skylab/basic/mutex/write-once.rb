@@ -7,20 +7,27 @@ module Skylab::Basic
       @held_by = nil
     end
 
-  private
-
-    def base_args
-      [ @name_x, @held_by ]
-    end
-
-    def base_init *a
-      @name_x, @held_by = a
-    end
-
-  public
-
     attr_reader :held_by
     alias_method :is_held, :held_by
+
+    # ~ :+[#mh-021] typical base class implementation:
+    def dupe
+      dup
+    end
+    def initialize_copy otr
+      init_copy( * otr.get_args_for_copy ) ; nil
+    end
+  protected
+    def get_args_for_copy
+      [ @name_x, @held_by ]
+    end
+  private
+    def init_copy x, y
+      @name_x = x ; @held_by = y ; nil
+    end
+    # ~
+
+  public
 
     def hold try_name_x
       try_hold try_name_x, MetaHell::EMPTY_P_, -> holder_name_x do
@@ -35,14 +42,6 @@ module Skylab::Basic
       else
         @held_by = holder_name_x
         if_ok[ ]
-      end
-    end
-
-    def dupe
-      ba = base_args
-      self.class.allocate.instance_exec do
-        base_init( * ba )
-        self
       end
     end
   end

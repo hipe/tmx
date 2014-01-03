@@ -236,21 +236,34 @@ module Skylab::MetaHell
     end
 
     class Free_Muxer_
+
       def initialize client
         @client = client
         @h = nil
       end
 
-      def dupe_for x
-        self.class.allocate.base_init x, @h
+      # ~ :+[#021] custom implementation:
+      def dupe_for client
+        otr = dup
+        otr.init_copy_ client
+        otr
       end
-
-      def base_init client, h
-        @h = ( h.dup if h )
-        @client = client
-        self
+      def initialize_copy otr
+        init_copy( * otr.get_args_for_copy ) ; nil
       end
-      protected :base_init
+    private
+      def init_copy h
+        @h = ( h.dup if h ) ; nil
+      end
+    protected
+      def get_args_for_copy
+        [ @h ]
+      end
+    public
+      def init_copy_ client
+        @client = client ; nil
+      end
+      # ~
 
       def notify event_i, agent
         if @h and (( a = @h[ event_i ] ))
