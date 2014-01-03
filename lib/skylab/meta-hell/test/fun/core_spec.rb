@@ -2,16 +2,6 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::FUN
 
-  ::Skylab::MetaHell::TestSupport[ self ]
-
-  include CONSTANTS
-
-  MetaHell = ::Skylab::MetaHell
-
-  extend TestSupport::Quickie
-
-  Sandboxer = TestSupport::Sandbox::Spawner.new
-
   describe "Skylab::MetaHell::FUN" do
     context "`seeded_function_chain` - given a stack of functions and one seed value," do
       Sandbox_1 = Sandboxer.spawn

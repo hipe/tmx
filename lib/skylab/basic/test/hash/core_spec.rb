@@ -2,16 +2,6 @@ require_relative 'test-support'
 
 module Skylab::Basic::TestSupport::Hash
 
-  ::Skylab::Basic::TestSupport[ self ]
-
-  include CONSTANTS
-
-  Basic = ::Skylab::Basic
-
-  extend TestSupport::Quickie
-
-  Sandboxer = TestSupport::Sandbox::Spawner.new
-
   describe "Skylab::Basic::Hash" do
     context "the loquacious default proc" do
       Sandbox_1 = Sandboxer.spawn

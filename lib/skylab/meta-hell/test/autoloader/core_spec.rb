@@ -9,7 +9,7 @@
 # in general). But alas, the center of the universe has to be
 # somewhere. TADA:
 
-require_relative 'test-support'
+require_relative '../test-support'
 
 module Skylab::MetaHell::TestSupport::AL_
 
@@ -23,8 +23,7 @@ module Skylab::MetaHell::TestSupport::AL_
 
   # ( [#054] explains why we have fully qualified names below )
 
-  describe "#{ ::Skylab::Autoloader } [..] `guess_dir`" do
-
+  describe "[mh] test autoloader" do
 
     context "infers a path based on simple heuristics." do
 

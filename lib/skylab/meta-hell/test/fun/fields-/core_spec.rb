@@ -2,16 +2,6 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::FUN::Fields_
 
-  ::Skylab::MetaHell::TestSupport::FUN[ self ]
-
-  include CONSTANTS
-
-  MetaHell = ::Skylab::MetaHell
-
-  extend TestSupport::Quickie
-
-  Sandboxer = TestSupport::Sandbox::Spawner.new
-
   describe "Skylab::MetaHell::FUN::Fields_" do
     context "using the basic fields facility out of the box only gives you" do
       Sandbox_1 = Sandboxer.spawn

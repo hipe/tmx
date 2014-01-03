@@ -6,6 +6,14 @@ module Skylab::MetaHell::TestSupport
 
     ::Skylab::MetaHell::TestSupport[ self ]
 
+    include CONSTANTS
+
+    MetaHell = MetaHell
+
+    extend TestSupport::Quickie
+
+    Sandboxer = TestSupport::Sandbox::Spawner.new
+
   end
 
   Fun = FUN  # #todo

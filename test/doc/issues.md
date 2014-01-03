@@ -1,3 +1,4 @@
+[#007] #open white plugin whines weirdly when strange files are in lib/skylab
 [#006]       #doc-point #in-situ (the particular importance of result values)
 [#005]       #doc-point confessions of an ambiguous grammar..
 [#004]       #inquiry-point choke point etc (#relates-to [#ts-013])

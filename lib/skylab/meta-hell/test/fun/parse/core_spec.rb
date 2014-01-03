@@ -2,16 +2,6 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::FUN::Parse
 
-  ::Skylab::MetaHell::TestSupport::FUN[ self ]
-
-  include CONSTANTS
-
-  MetaHell = ::Skylab::MetaHell
-
-  extend TestSupport::Quickie
-
-  Sandboxer = TestSupport::Sandbox::Spawner.new
-
   describe "Skylab::MetaHell::FUN::Parse" do
     context "hack label" do
       Sandbox_1 = Sandboxer.spawn

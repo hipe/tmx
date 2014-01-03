@@ -2,17 +2,9 @@ require_relative 'test-support'
 
 module Skylab::Face::TestSupport::CLI::Option
 
-  ::Skylab::Face::TestSupport::CLI[ Option_TestSupport = self ]
+  describe "[fa] CLI option" do
 
-  CONSTANTS::Common_setup_[ self ]
-
-  module CONSTANTS
-    Sandbox = CLI_TestSupport::Sandbox  # please be careful
-  end
-
-  describe "#{ Face }::CLI - options, officous" do
-
-    extend Option_TestSupport
+    extend TS__
 
     context 'the time has come for this' do
 

@@ -1,8 +1,8 @@
-require_relative 'field/test-support'
+require_relative 'test-support'
 
 module Skylab::Basic::TestSupport::Field
 
-  describe "#{ Basic::Field }" do
+  describe "[ba] field" do  # read [#003] storypoint-1313
 
     extend Field_TestSupport
 

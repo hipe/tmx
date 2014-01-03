@@ -1,12 +1,11 @@
-require_relative 'attribute/test-support'
+require_relative 'test-support'
 
 require 'set'
 
 module ::Skylab::MetaHell::TestSupport::Formal::Attribute
-  # Quickie.
-  #
 
-  describe MetaHell::Formal::Attribute::Definer do
+  describe "[mh] formal attributes" do
+
     extend Attribute_TestSupport::ModuleMethods
     include Attribute_TestSupport::InstanceMethods
 

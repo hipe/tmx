@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::Face::TestSupport::API::Param
 
-  ::Skylab::Face::TestSupport::API[ Param_TestSupport = self ]
+  ::Skylab::Face::TestSupport::API[ TS__ = self ]
 
   module Sandbox
     # mine.
@@ -18,9 +18,9 @@ module Skylab::Face::TestSupport::API::Param
 
   Face = Face
 
-  describe "extend module x with Face::API and use params" do
+  describe "[fa] test API action param" do
 
-    extend Param_TestSupport
+    extend TS__
 
     context "none" do
 

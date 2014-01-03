@@ -2,16 +2,6 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::Boxxy
 
-  ::Skylab::MetaHell::TestSupport[ self ]
-
-  include CONSTANTS
-
-  MetaHell = ::Skylab::MetaHell
-
-  extend TestSupport::Quickie
-
-  Sandboxer = TestSupport::Sandbox::Spawner.new
-
   describe "Skylab::MetaHell::Boxxy" do
     context "your boxxy module gets `const_fetch`. you can get the value of a const" do
       Sandbox_1 = Sandboxer.spawn

@@ -2,6 +2,12 @@ require_relative '../test-support'
 
 module Skylab::Headless::TestSupport::Plugin
 
-  ::Skylab::Headless::TestSupport[ Plugin_TestSupport = self ]
+  ::Skylab::Headless::TestSupport[ self ]
+
+  include CONSTANTS
+
+  Headless = Headless
+
+  extend TestSupport::Quickie
 
 end

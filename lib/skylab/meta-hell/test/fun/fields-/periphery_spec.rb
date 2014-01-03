@@ -10,7 +10,7 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_
 
   Subject = MetaHell::FUN::Fields_::Contoured_
 
-  describe "#{ MetaHell }::FUN::Fields_::Contoured_" do
+  describe "[mh] fun fields periphery" do
 
     it "whines on weirdness" do
       -> do

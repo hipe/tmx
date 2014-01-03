@@ -4,4 +4,12 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_
 
   ::Skylab::MetaHell::TestSupport::FUN[ self ]
 
+  include CONSTANTS
+
+  MetaHell = MetaHell
+
+  extend TestSupport::Quickie
+
+  Sandboxer = TestSupport::Sandbox::Spawner.new
+
 end

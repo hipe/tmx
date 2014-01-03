@@ -1,9 +1,8 @@
-require_relative 'box/test-support'
+require_relative 'test-support'
 
 module ::Skylab::MetaHell::TestSupport::Formal::Box
 
-  describe "#{ MetaHell::Formal::Box } acts like a strict, #{
-    }context-aware, ordered hash" do
+  describe "[mh] formal box" do
 
     extend Box_TestSupport
 
@@ -119,7 +118,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box
           subject.defectch -> x { false }
         rescue ::KeyError => e
         end
-        e.to_s.should match( /value not found matching <#Proc.*box_spec/ ) # EEK
+        e.to_s.should match( /value not found matching <#Proc.*_spec/ ) # EEK
       end
     end
 

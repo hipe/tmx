@@ -1,28 +1,27 @@
-lib/skylab/basic/hash.rb
+lib/skylab/basic/hash.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/basic/hash/order-proxy.rb
 lib/skylab/basic/hash/pair-enumerator.rb
 lib/skylab/basic/list/scanner.rb
 lib/skylab/basic/list/scanner/with/peek.rb
-lib/skylab/basic/method.rb
-lib/skylab/basic/method/curry/unbound-.rb
+lib/skylab/basic/method.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/basic/pathname/union.rb
-lib/skylab/test/rotating-buffer_spec.rb
+lib/skylab/basic/rotating-buffer.rb
 lib/skylab/basic/struct.rb
 lib/skylab/face/cli/lipstick.rb
 lib/skylab/face/cli/table.rb
 lib/skylab/face/cli/tableize.rb
-lib/skylab/headless/cli/option.rb
+lib/skylab/headless/cli/option.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/headless/nlp/en/levenshtein.rb
 lib/skylab/headless/plugin/host/metaservices-/chain-.rb
 lib/skylab/headless/plugin/host/proxy.rb
 lib/skylab/information-tactics/levenshtein.rb
-lib/skylab/meta-hell/boxxy.rb
+lib/skylab/meta-hell/boxxy.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/meta-hell/dsl-dsl.rb
-lib/skylab/meta-hell/fun.rb
-lib/skylab/meta-hell/fun/fields-.rb
+lib/skylab/meta-hell/fun.rb  #branch-down-to-core  #regret-setup:no
+lib/skylab/meta-hell/fun/fields-.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/meta-hell/fun/fields-/contoured-.rb
 lib/skylab/meta-hell/fun/fields-/from-.rb
-lib/skylab/meta-hell/fun/parse.rb
+lib/skylab/meta-hell/fun/parse.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/meta-hell/fun/parse/alternation-.rb
 lib/skylab/meta-hell/fun/parse/from-ordered-set.rb
 lib/skylab/meta-hell/fun/parse/from-set.rb

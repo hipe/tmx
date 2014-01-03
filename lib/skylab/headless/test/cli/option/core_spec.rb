@@ -2,17 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Headless::TestSupport::CLI::Option
 
-  ::Skylab::Headless::TestSupport::CLI[ self ]
-
-  include CONSTANTS
-
-  Headless = ::Skylab::Headless
-
-  extend TestSupport::Quickie
-
-  Sandboxer = TestSupport::Sandbox::Spawner.new
-
-  describe "Skylab::Headless::CLI::Option" do  # NOTE this is a generated file
+  describe "Skylab::Headless::CLI::Option" do
     context "hack to see if a basic switch is present" do
       Sandbox_1 = Sandboxer.spawn
       it "like this" do

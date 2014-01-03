@@ -2,15 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Headless::TestSupport::Plugin
 
-  ::Skylab::Headless::TestSupport[ self ]
-
-  include CONSTANTS
-
-  extend TestSupport::Quickie
-
-  Headless = Headless
-
-  describe "#{ Headless }::Plugin" do  # loaded late for coverage
+  describe "[hl] plugin" do  # loaded late for coverage
 
     context "basic - just host with nothing" do
       it "the module graph builds." do

@@ -2,16 +2,6 @@ require_relative 'test-support'
 
 module Skylab::Basic::TestSupport::Method
 
-  ::Skylab::Basic::TestSupport[ self ]
-
-  include CONSTANTS
-
-  Basic = ::Skylab::Basic
-
-  extend TestSupport::Quickie
-
-  Sandboxer = TestSupport::Sandbox::Spawner.new
-
   describe "Skylab::Basic::Method" do
     context "a method curry binds arguments to a bound method" do
       Sandbox_1 = Sandboxer.spawn

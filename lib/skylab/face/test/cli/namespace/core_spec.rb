@@ -2,17 +2,9 @@ require_relative 'test-support'
 
 module Skylab::Face::TestSupport::CLI::Namespace
 
-  ::Skylab::Face::TestSupport::CLI[ Namespace_TestSupport = self ]
+  describe "[fa] CLI namespace" do
 
-  CONSTANTS::Common_setup_[ self ]
-
-  module CONSTANTS
-    Sandbox = CLI_TestSupport::Sandbox  # please be careful
-  end
-
-  describe "#{ Face }::CLI - namespaces" do
-
-    extend Namespace_TestSupport
+    extend TS__
 
     it "the `namespace` \"macro\" needs 1 arg" do
       kls = Sandbox.produce_subclass

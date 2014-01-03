@@ -1,6 +1,7 @@
 require_relative '../test-support'
 
 module ::Skylab::MetaHell::TestSupport::Formal::Attribute
+
   ::Skylab::MetaHell::TestSupport::Formal[ Attribute_TestSupport = self ]
 
   include CONSTANTS

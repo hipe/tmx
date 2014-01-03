@@ -6,7 +6,11 @@ module Skylab::MetaHell::TestSupport::Boxxy
 
   include CONSTANTS
 
+  MetaHell = MetaHell
+
   extend TestSupport::Quickie
+
+  Sandboxer = TestSupport::Sandbox::Spawner.new
 
   module ModuleMethods
     include MetaHell::Class::Creator::ModuleMethods

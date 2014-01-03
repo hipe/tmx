@@ -1,9 +1,10 @@
-require_relative 'creator/test-support'
+require_relative 'test-support'
 
 module ::Skylab::MetaHell::TestSupport::Module::Creator
-  describe "say, did you know that when using #{MetaHell::Module::Creator}" do
-    extend Creator_TestSupport
 
+  describe "[mh] module creator" do
+
+    extend Creator_TestSupport
 
     context "defining a single module" do
       context "with no block" do
