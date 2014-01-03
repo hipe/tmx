@@ -2,12 +2,37 @@ module Skylab::TestSupport::Regret::API
 
   class Actions::DocTest::Templos__::Quickie < API::Support::Templo_
 
-    OPTION_A_ = [
-      [ :cover, -> { @cover = nil }, -> { @cover = true ; true },
-        -> y { y << "adds coverage hack to the end"
-               y << "of the `describe` block" } ],
-      [ :help, -> { }, -> { show_option_help ; nil },
-       -> y { y << 'this screen.' } ] ]
+    OPTION_X_A__ = [
+
+      :cover,
+        :when_not_provided, -> do
+          @cover = nil
+        end, :when_provided, -> do
+          @cover = true
+          OPTION_PROCEDE__
+        end, :summarize, -> y do
+          y << "adds coverage hack to the end"
+          y << "of the `describe` block"
+        end,
+
+      :exclude_regret_setup,
+        :when_not_provided, -> do
+          @do_include_regret_setup = true
+        end, :when_provided, -> do
+          @do_include_regret_setup = false
+          OPTION_PROCEDE__
+        end, :summarize, -> y do
+          y << "exerimental."
+        end,
+
+      :help,
+        :when_not_provided, MetaHell::EMPTY_P_,
+       :when_provided, -> do
+          show_option_help
+          SUCCESS_EXITSTATUS__
+        end, :summarize, -> y do
+          y << "this screen."
+        end ]
 
     def initialize snitch, base_mod, c_a, b_a
       @snitch = snitch
@@ -44,8 +69,7 @@ module Skylab::TestSupport::Regret::API
 
       template_h = {
         before: render_before,
-        example: render_example
-      }
+        example: render_example }.freeze
 
       render_tests = -> blk, cnum do
         y = ( rtma ||= Basic::List::Marginated::Articulation.new "\n" )
@@ -58,7 +82,7 @@ module Skylab::TestSupport::Regret::API
 
       context_descify = -> blk, num do
         if blk.first_other
-          API::Support::Templo_::FUN.descify[ blk.first_other ]
+          API::Support::Templo_::FUN::Descify[ blk.first_other ]
         else
           "context #{ num }".inspect
         end
@@ -77,31 +101,45 @@ module Skylab::TestSupport::Regret::API
         y.flush
       end
 
-      @render_to = -> io do
-        baset, ctxt, tstt, beft = get_templates :_base, :_ctx, :_tst, :_bef
-        c_a.length < 2 and fail "sanity - hard-coded for deep paths, #{
-          }we need at least 2 elements in this path for the hacking #{
-          }to work - #{ c_a * '::' }"
+      @render_to_p = -> io do
+        baset = rslv_some_base_template
+        ctxt, tstt, beft = get_templates :_ctx, :_tst, :_bef
+        c_a.length < 2 and fail say_less_than_two c_a
         acon = c_a.fetch 0
-        amod  = [ base_mod.to_s, acon ].join( '::' )
-        bmod = if 2 == c_a.length then nil else
-                 "::#{ c_a[ 1 .. -2 ] * '::' }"
-               end
+        amod  = [ base_mod.to_s, acon ].join DCOLON__
+        bmod = if 2 != c_a.length
+          "#{ DCOLON__ }#{ c_a[ 1 .. -2 ] * DCOLON__ }"
+        end
         cmod = "#{ c_a.fetch( -1 ) }"
         body = render_body[]
         io.write baset.call( amod: amod, bmod: bmod, cmod: cmod, body: body,
                              cover: render_cover( acon, bmod, cmod ),
                              acon: acon )
-        true
-      end
-      nil
+        SUCCEEDED__
+      end ; nil
+    end
+
+    def rslv_some_base_template
+      _i = @do_include_regret_setup ? :_base : :_sibling
+      get_template _i
+    end
+
+    def say_less_than_two c_a
+      "sanity - hard-coded for deep paths, we need at least 2 elements in #{
+        }this path for the hacking to work - #{ c_a * DCOLON__ }"
     end
 
     def render_cover a, any_b, c
       if @cover
-        mod = "#{ a }#{ any_b }::#{ c }"
+        mod = "#{ a }#{ any_b }#{ DCOLON__ }#{ c }"
         get_template( :_cover )[ mod: mod ].chomp
       end
     end
+
+    DCOLON__ = '::'.freeze
+    OPTION_PROCEDE__ = nil
+    SUCCESS_EXITSTATUS__ = 0
+    SUCCEEDED__ = true
+
   end
 end

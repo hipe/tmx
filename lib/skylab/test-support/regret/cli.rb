@@ -69,7 +69,7 @@ module Skylab::TestSupport
 
       o.on '-t', '--template-option <x>',
           "template option (try \"-t help\")" do |x|
-        ( @param_h[:template_option_a] ||= [ ] ) << x
+        ( @param_h[ :template_option_s_a ] ||= [] ) << x
       end
 
       o.on '-- <load-module>',
@@ -108,13 +108,13 @@ module Skylab::TestSupport
       if a.length.nonzero?
         @y << "unexpected argument(s) - #{ a.fetch( 0 ).inspect }"
         false
-      elsif ! path and ! @param_h[ :template_option_a ]  # eew
+      elsif ! path and ! @param_h[ :template_option_s_a ]  # eew
         @y << "wrong number of arguments (0 for 1..)"
         @y << "expecting <path>"
         false
       else
         @param_h[ :load_file ] = load_file
-        @param_h[ :path ] = path
+        @param_h[ :pathname ] = ( path and ::Pathname.new path )
         true
       end
     end

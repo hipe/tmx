@@ -4,15 +4,15 @@ module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Recursiv
 
   ::Skylab::TestSupport::Services::Face::TestSupport::CLI[ self ]
 
-  ::Skylab::TestSupport::TestSupport::Regret[ TestSupport_ = self ]
+  ::Skylab::TestSupport::TestSupport::Regret[ TS__ = self ]
 
   include CONSTANTS
 
   extend TestSupport::Quickie
 
-  describe "#{ TestSupport }::Regret::CLI::Actions::DocTest (--recursive)" do
+  describe "[ts] regret CLI actions recursive" do
 
-    extend TestSupport_
+    extend TS__
 
     def client_class
       TestSupport::Regret::CLI::Client
@@ -33,7 +33,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Recursiv
     it "outputs the lines" do
       r = cd_and_invoke '--recursive', 'list', 'regret'
       stdout_gets.should eql( "./regret/api/actions/doc-test.rb" )
-      stdout_gets.should eql( "./regret/api/actions/doc-test/specer-.rb" )
+      stdout_gets.should eql( "./regret/api/actions/doc-test/specer--.rb" )
       stderr_lines.should eql( MetaHell::EMPTY_A_ )
       r.should eql( true )
     end

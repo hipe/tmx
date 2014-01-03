@@ -41,8 +41,7 @@ module Skylab::TestSupport
           :left, '  ', :sep, '     ', :right, '',
           :write_lines_to, @y.method( :<< ),
           :read_rows_from, @svc.plugins._a.reduce( [] ) do |row_a, p|
-            tbl::FUN.
-              multiline_column_b[ row_a, p.syntax_moniker, p.some_desc_a ]
+            tbl::Multiline_column_B[ row_a, p.syntax_moniker, p.some_desc_a ]
             row_a
           end ]
         nil

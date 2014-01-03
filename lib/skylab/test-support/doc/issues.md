@@ -1,4 +1,7 @@
-[#024]       #doc-node the graded verbosity narrative ..
+[#027]       #parent-node:[#026] the templo narrative ..
+[#026]       #doc-node the doc-test narratives
+[#025]       #parent-node:[#026] the specer narrative ..
+[#024]       #parent-node:[#026] the graded verbosity narrative ..
 [#023]       #doc-node #parent-node: [#020] "the IO spy"
 [#022]       #parent: [#021] "when to extlib and not to extlib.."
 [#021]       #doc-node "micro notes"

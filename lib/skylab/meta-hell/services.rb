@@ -7,7 +7,8 @@ module Skylab::MetaHell
     o = { }
     o[:Basic] =
     o[:CodeMolester] =
-    o[:Headless] = subsys
+    o[:Headless] =
+    o[:PubSub] = subsys
     o[:Open3] =
     o[:Set] =
     o[:Shellwords] = stdlib

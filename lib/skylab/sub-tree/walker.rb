@@ -2,7 +2,7 @@ module Skylab
 
 module SubTree  # borrow x 1 - load this solo but it needs meta hell
 
-  class Walker  # (used to be :[#ts-019])
+  class Walker  # :[#007] this is the tree walker (was [#ts-019])
 
     # unifying something we've done in three places.
 
@@ -18,7 +18,7 @@ module SubTree  # borrow x 1 - load this solo but it needs meta hell
     }.freeze
 
     def initialize *a
-      @convert_relpath_p = @path_set = nil
+      @convert_relpath_p = @files_file_IO = @path_set = nil
       while a.length.nonzero?
         instance_exec( a, & CONDUIT__.fetch( a.shift ) )
       end
@@ -101,41 +101,68 @@ module SubTree  # borrow x 1 - load this solo but it needs meta hell
     attr_reader :files_file_pn
 
     def pathnames
-      ::Enumerator.new do |y|
+      Power_Scanner_[ :init, -> do
         files_file_pn && top_pn or fail "sanity"
-        tpn = Pathname__.new( @top_pn )
-        @files_file_pn.open do |fh|
-          while (( line = fh.gets ))
-            line.chomp!
-            if line.include? SPACE_
-              line, rest = line.split SPACE_, 2
-              pn = tpn._join line
-              pn.add_note :notice, "line had space", :line_had_space,
-                :rest, rest
-            else
-              pn = tpn._join line
-            end
-            y << pn
-          end
+        @tpn = Pathname__.new @top_pn
+        rwnd_files_file_IO
+      end, :gets, -> do
+        while true
+          @files_file_IO or break
+          line = @files_file_IO.gets
+          line or break cls_and_discard_files_file_IO
+          pn = prcr_any_pathname_from_file_line line
+          pn and break
         end
-        nil
+        pn
+      end ]
+    end
+
+    attr_reader :files_file_IO
+
+  private
+
+    def rwnd_files_file_IO
+      if @files_file_IO
+        @files_file_IO.rewind
+      else
+        @files_file_IO = @files_file_pn.open 'r'
+      end ; nil
+    end
+
+    def cls_and_discard_files_file_IO
+      @files_file_IO.close ; @files_file_IO = nil
+    end
+
+    def prcr_any_pathname_from_file_line line
+      line.chomp!
+      if line.include? SPACE__
+        prcr_any_pathname_when_line_includes_space line
+      else
+        @tpn.join_ line
       end
     end
 
-    SPACE_ = ' '.freeze
+    def prcr_any_pathname_when_line_includes_space line
+      line, rest_s = line.split SPACE__, 2
+      pn = @tpn.join_ line
+      pn.add_note :notice, "line had space", :line_had_space, :rest_s, rest_s
+      pn
+    end
+
+    SPACE__ = ' '.freeze
 
     class Pathname__ < ::Pathname
 
       attr_reader :has_notes, :note_a
 
-      def add_note severity, message, *rest
+      def add_note chan_i, msg_s, type_i=nil, *rest
         @has_notes ||= true
-        @note_a ||= [ ]
-        @note_a << [ severity, message, * rest ]
+        @note_a ||= []
+        @note_a << Note__.new( chan_i, msg_s, type_i, rest )
         nil
       end
 
-      def _join x
+      def join_ x
         p = join( x ).instance_variable_get :@path
         self.class.allocate.instance_exec do
           @path = p
@@ -144,17 +171,30 @@ module SubTree  # borrow x 1 - load this solo but it needs meta hell
       end
     end
 
+    Note__ = ::Struct.new :channel_i, :message_s, :type_i, :x_a
+
+  public
+
     def subtree_pathnames
-      ::Enumerator.new do |y|
-        p = @pn.instance_variable_get :@path ; len = p.length - SEPWIDTH_
-        pathnames.each do |pn|
-          pt = pn.instance_variable_get( :@path )[ 0 .. len ]
-          if pt == p
-            y << pn
-          end
+      path = scn = slice = nil
+      Power_Scanner_[ :init, -> do
+        path = @pn.instance_variable_get :@path
+        _length = path.length - SEPWIDTH_
+        slice = 0 .. _length
+        scn = pathnames
+      end, :gets, -> do
+        while true
+          pn = scn.gets or break
+          part = pn.instance_variable_get( :@path )[ slice ]
+          path == part or next
+          break( r = pn )
         end
-        nil
-      end
+        r
+      end ]
+    end
+
+    Power_Scanner_ = -> * x_a do
+      Basic::List::Scanner::Power.from_iambic x_a
     end
 
     SEPWIDTH_ = 1

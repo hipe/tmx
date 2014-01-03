@@ -29,11 +29,6 @@ module Skylab::TestSupport::Regret::API
 
   private
 
-    def bork msg=nil
-      msg and @err.puts msg
-      false
-    end
-
     def get_normalized_argument_path
       if (( p = @path ))
         if (( p = ::Pathname.new p )).relative?
@@ -46,27 +41,86 @@ module Skylab::TestSupport::Regret::API
     end
 
     def build_walker
-      Regret::Services::Walker.new :path, @normalized_argument_path,
+      Regret::Services::Walker[].new :path, @normalized_argument_path,
         :vtuple, @vtuple, :listener, generic_listener
     end
 
     def get_leaf_pathname_a
-      paths = API::Conf
-      -> do
-        dpn = @wlk.expect_upwards( paths.doc_test_dir ) or break bork
-        fpn = dpn.join paths.doc_test_files_file
-        @wlk.expect_files_file fpn or break bork
-        get_leaf_pn_a_from_walker @wlk
-      end.call
+      @paths = API::Conf
+      dpn = @wlk.expect_upwards @paths.doc_test_dir
+      dpn and gt_pn_a_from_doctest_dir_pn dpn
     end
 
-    def get_leaf_pn_a_from_walker wlk
+    def gt_pn_a_from_doctest_dir_pn dpn
+      fpn = dpn.join @paths.doc_test_files_file
+      ok = @wlk.expect_files_file fpn
+      ok and gt_leaf_pn_a_from_walker @wlk
+    end
+
+    def gt_leaf_pn_a_from_walker wlk
       a = nil
       wlk.subtree_pathnames.each do |pn|
-        pn.has_notes and next( note pn )
-        ( a ||= [ ] ) << pn
+        pn = map_rdc_the_pn pn
+        pn or next
+        ( a ||= [] ) << pn
       end
       a
+    end
+
+    def map_rdc_the_pn pn
+      if pn.has_notes
+        procure_any_pn_w_notes pn
+      else
+        pn
+      end
+    end
+
+    def procure_any_pn_w_notes pn
+      a = pn.note_a
+      if 1 == a.length and :line_had_space == a.first.type_i
+        map_rdc_when_line_had_space pn
+      else
+        rprt_notes pn ; nil
+      end
+    end
+
+    def map_rdc_when_line_had_space pn
+      _listener = spcl_path_listener
+      pn_ = Special_Path__[ _listener, pn, pn.note_a.first.x_a ]
+      if pn_.is_valid then pn_ else
+        rprt_notes pn ; nil
+      end
+    end
+
+    def spcl_path_listener
+      @spl ||= bld_special_path_listener
+    end
+
+    def bld_special_path_listener
+      MetaHell::Services::PubSub::Listener::Suffixed[ :from_special, self ]
+    end
+
+    Special_Path__ = -> * x_a do
+      API::Actions::Recursive__::Special_Path.new( * x_a )
+    end
+
+    def error_string_from_special s
+      @err.puts "(special path says: #{ s })" ; nil
+    end
+
+    def rprt_notes pn
+      pn.note_a.each do |note|
+        chan_i, msg_s, _type_i, x_a = note.to_a
+        _xtra = rndr_note_x_a x_a
+        @err.puts "#{ chan_i }: #{ msg_s }. skipping - #{ pn }#{ _xtra }"
+      end ; nil
+    end
+
+    def rndr_note_x_a x_a
+      if x_a.length.nonzero?
+        TestSupport::Services.kick :JSON
+        " #{ ::Hash[ * x_a ].to_json }"
+      end
     end
 
     def process_leaf_pathname_a a
@@ -86,92 +140,120 @@ module Skylab::TestSupport::Regret::API
         @o = @out
       else
         @io = @o = TestSupport::Services::StringIO.new
-      end
-      nil
+      end ; nil
     end
 
     def process_walker_pathname pn
-      -> do
-        if @do_list
-          @out.puts @pth[ pn ]
-          break true
-        elsif @do_check
-          @err.puts "--- #{ @pth[ pn ] } ---"
-        else
-          @err.write "<<< #{ @pth[ pn ] } .. "
-        end
-        r = prepare_pathname( pn ) or break r
-        ex = build_doc_test_action( pn ) or break ex
-        r = ex.execute or break r
-        @do_check or ( r = flush or break r )
-        true
-      end.call
-    end
-
-    def prepare_pathname pn
-      if @do_check then true else
-        if (( r = @opn = get_valid_output_pathname pn ))
-          r = true
-        end
-        r
+      @pn = pn
+      if @do_list
+        prcss_pn_when_list
+      else
+        prcss_pn_as_file
       end
     end
 
-    def get_valid_output_pathname pn
-      -> do
-        opn = get_output_pathname( pn ) or break opn
-        opn.exist? && ! @do_force and break bork( "won't overwrite #{
-          }without force - #{ @pth[ opn ] }" )
+    def prcss_pn_when_list
+      @out.puts @pth[ @pn ]
+      SUCCEEDED__
+    end
+
+    def prcss_pn_as_file
+      wrt_opener_glyphs
+      ok = rslv_open_pathname
+      ok &&= bld_doc_test_action
+      ok &&= ok.execute
+      ok and after_execute ok
+    end
+
+    def wrt_opener_glyphs
+      if @do_check
+        @err.puts "--- #{ @pth[ @pn ] } ---"
+      else
+        @err.write "<<< #{ @pth[ @pn ] } .. "
+      end ; nil
+    end
+
+    def rslv_open_pathname
+      if @do_check then SUCCEEDED__ else
+        @opn = rslv_some_ouput_pathname
+        @opn and SUCCEEDED__
+      end
+    end
+
+    def rslv_some_ouput_pathname
+      opn = get_output_pathname @pn
+      opn and gt_valid_opn_from_opn opn
+    end
+
+    def gt_valid_opn_from_opn opn
+      if opn.exist? && ! @do_force
+         bork say_wont_overwrite_without_force opn
+      else
         opn
-      end.call
+      end
     end
 
-    def get_output_pathname pn
+    def say_wont_overwrite_without_force opn
+      "won't overwrite without force - #{ @pth[ opn ] }"
+    end
+
+    def get_output_pathname pn_x
+      pn = ::Pathname.new pn_x.to_path
       relp = pn.relative_path_from( @wlk.top_pn ).to_s
-      md = RX_.match( relp ) or fail "sanity - #{ relp }"
-      tailpn = ::Pathname.new md.post_match ; ext = tailpn.extname
-      tail = "#{ tailpn.sub_ext( '' ) }#{ TEST_FILE_SUFFIX_ }#{ ext }"
-      test_dir = @wlk.top_pn.join( md[0], SUBP_TEST_DIR_ )
-      test_dir.join tail
+      md = TEST_RX__.match( relp ) or fail "sanity - #{ relp }"
+      op = Output_Path__.new
+      op.test_dir_pn = @wlk.top_pn.join md[ 0 ], SUBP_TEST_DIR__
+      op.tail_pn = ::Pathname.new md.post_match
+      if pn_x.respond_to? :construct_output_pathname
+        pn_x.construct_output_pathname op
+      else
+        cnstrct_output_pathname op
+      end
     end
 
-    TEST_DIR_DEPTH_ = 2
-    RX_ = %r|\A(?:[^/]+/){#{ TEST_DIR_DEPTH_ }}[^/]+/?|
-    SUBP_TEST_DIR_ = 'test'.freeze
-    TEST_FILE_SUFFIX_ = '_spec'.freeze
+    Output_Path__ = ::Struct.new :test_dir_pn, :tail_pn
 
-    def build_doc_test_action pn
-      ex = API::Actions::DocTest.new
-      ex.set_expression_agent @expression_agent
-      ex.set_vtuple @vtuple
-      ex.absorb_services :out, @o, :err, @err, :pth, @pth
-        # NOTE this litte `o` above is e.g our selfsame @out *OR* a
-        # handle on the little `@io` nerklette (depending on 'check')
-      r = ex.absorb_params_using_message_yielder snitch.y,
+    def cnstrct_output_pathname op
+      tailpn = op.tail_pn
+      _ext = tailpn.extname
+      _tail = "#{ tailpn.sub_ext( '' ) }#{ TEST_FILE_SUFFIX }#{ _ext }"
+      op.test_dir_pn.join _tail
+    end
+
+    def bld_doc_test_action
+      bnd = API::Actions::DocTest.new
+      bnd.set_expression_agent @expression_agent
+      bnd.set_vtuple @vtuple
+      bnd.absorb_services :out, @o, :err, @err, :pth, @pth
+      _toa = rslv_any_template_option_a
+      _r = bnd.absorb_params_using_message_yielder snitch.y,
         :core_basename, @core_basename,
         :do_close_output_stream, false,
         :load_file, nil,
         :load_module, nil,
-        :path, pn,
-        :template_option_a, nil
-      r&&= ex
+        :pathname, @pn,
+        :template_option_s_a, _toa
+      _r && bnd
+    end
+
+    def rslv_any_template_option_a
+      r = nil
+      y_p = -> x do
+        ( r ||= [] ) << x.to_s ; nil
+      end
+      if @pn.respond_to? :do_regret_setup
+        if ! @pn.do_regret_setup
+          y_p[ :exclude_regret_setup ]
+        end
+      end
       r
     end
 
-    # --*--
-
-    def note pn
-      pn.note_a.each do |severity, msg, type, * props|
-        @err.puts "#{ severity }: #{ msg }. skipping - #{
-          }#{ pn }#{ wat props }"
-      end
-      nil
-    end
-
-    def wat props
-      if props.length.nonzero?
-        TestSupport::Services.touch :JSON
-        " #{ ::Hash[ * props ].to_json }"
+    def after_execute ok
+      if @do_check
+        ok
+      else
+        flush
       end
     end
 
@@ -199,9 +281,22 @@ module Skylab::TestSupport::Regret::API
         }#{ ' fake' if @is_dry_run } bytes)."
       @io.truncate 0
       @io.rewind
-      true
+      SUCCEEDED__
+    end
+
+    # ~
+
+    def bork msg
+      @err.puts msg
+      FAILED__
     end
 
     DEV_NULL_ = API::Face::Services::Headless::IO::DRY_STUB
+    FAILED__ = false
+    SUBP_TEST_DIR__ = 'test'.freeze
+    SUCCEEDED__ = true
+    TEST_DIR_DEPTH__ = 2
+      TEST_RX__ = %r|\A(?:[^/]+/){#{ TEST_DIR_DEPTH__ }}[^/]+/?|
+    TEST_FILE_SUFFIX = '_spec'.freeze
   end
 end

@@ -17,7 +17,7 @@ module Skylab::TestSupport::Regret::API
       def self.build_example snippet, y
         Example_.new( y ) do |e|
           e.quoted_description_string =
-            API::Support::Templo_::FUN.descify[ snippet.last_other ]
+            API::Support::Templo_::FUN::Descify[ snippet.last_other ]
           filter = Actions::DocTest::Templos__::Predicates.new
           snippet.line_a.each( & filter.method( :<< ) )
           e.local_lines = filter.flush

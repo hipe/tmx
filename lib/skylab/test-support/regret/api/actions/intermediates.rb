@@ -114,7 +114,7 @@ module Skylab::TestSupport::Regret::API
   private
 
     def build_walker
-      Regret::Services::Walker.new :path, @path, :top, @top, :vtuple,
+      Regret::Services::Walker[].new :path, @path, :top, @top, :vtuple,
         @vtuple, :listener, generic_listener
     end
 

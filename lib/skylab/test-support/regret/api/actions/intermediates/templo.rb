@@ -3,7 +3,7 @@ module Skylab::TestSupport::Regret::API
   class API::Actions::Intermediates::Templo < API::Support::Templo_
 
     def initialize wlk, pn
-      @render_to = -> io do
+      @render_to_p = -> io do
 
         local_pn = wlk.class.subtract pn , wlk.top_pn
         local_a = local_pn.sub_ext( '' ).to_s.split ::Pathname::SEPARATOR_LIST

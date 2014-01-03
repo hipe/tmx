@@ -22,7 +22,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
 
   private
 
-    State_ = ::Struct.new :_name, :h
+    State__ = ::Struct.new :_name, :h
 
     -> do  # `initialize`
 
@@ -56,7 +56,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
           a = [ ]
           state = state_h.fetch :watching
         end
-        o = State_
+        o = State__
         state_h = {
           start: o[ :_start,
             other: store_contentful_hybrid_other,

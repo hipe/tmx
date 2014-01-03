@@ -1,6 +1,6 @@
 module Skylab::TestSupport::Regret::API
 
-  class API::Actions::DocTest < API::Action
+  class API::Actions::DocTest < API::Action  # #read [#015] the narrative
 
     # probably no one will ever find a reason to call our API directly
     # to generate doc-test output. but for the purposes of testing and
@@ -31,7 +31,7 @@ module Skylab::TestSupport::Regret::API
     #     stat = output.stat ; size1 = stat.size ; ctime1 = stat.ctime
     #       # (this test assumes one such file already exists)
     #
-    #     exitstatus = API.invoke :doc_test, path: here, output_path: output
+    #     exitstatus = API.invoke :doc_test, pathname: here, output_path: output
     #       # the moneyshot. did it work?
     #
     #     exitstatus  # => 0
@@ -44,7 +44,7 @@ module Skylab::TestSupport::Regret::API
     #
     # (if that worked, that's just ridiculous. to see that this is working,
     # add e.g a blank like to the generated test file and re-run it again.
-    # it should fail only the first time it is re-run. see [#ts-015])
+    # it should fail only the first time it is re-run.  #storypoint-15
 
     services [ :out, :ivar ],
              [ :err, :ivar ],
@@ -54,8 +54,8 @@ module Skylab::TestSupport::Regret::API
       [ :do_close_output_stream, :arity, :zero_or_one, :default, -> { true } ],
       [ :load_file, :arity, :zero_or_one ],
       [ :load_module, :arity, :zero_or_one ],
-      [ :path, :arity, :zero_or_one ],
-      [ :template_option_a, :arity, :zero_or_more ],
+      [ :pathname, :arity, :zero_or_one ],
+      [ :template_option_s_a, :arity, :zero_or_more ],
       API::Conf::Verbosity[ self ].param( :vtuple )
 
     def initialize( * )
@@ -71,49 +71,48 @@ module Skylab::TestSupport::Regret::API
     end
 
     def execute
-      res = -> do  # (we jump through hoops to allow the system to go through all
-        # of its motions without a @path just so that the template options
-        # can display without there needing to be a valid input stream.)
-        snitch
-        r = validate_appearances or break r
-        ok, up = resolve_upstream_status_tuple
-        ok or break up
-        up and bs = DocTest::Comment_::Block::Scanner[ @sn, up ]
-        sp = build_specer @sn
-        sp.set_template_options @template_option_a or break( false )
-        if bs
-          while cblock = bs.gets
-            @vtuple.do_murmur and cblock.describe_to @err
-            cblock.does_look_testy and sp.accept cblock
-          end
-        end
-        r = sp.flush or break r
-        say_done
-        0
-      end.call
-      @do_close_output_stream and ( @out.closed? || @out.tty? or @out.close )
-      res
+      snitch
+      ok = rslv_load_module
+      ok &&= rslv_upstream
+      ok &&= rslv_specer
+      ok &&= exec_scan_each_block_if_appropriate
+      ok &&= exec_flush
+      finally
+      @result
     end
 
   private
 
-    def validate_appearances
-      begin
-        if @load_module
-          r = models::Constant_.validate( @sn, @load_module ) or break
+    def rslv_load_module
+      if @load_module
+        ok = mdls_module::Constant_.validate @sn, @load_module
+        if ok
+          PROCEDE__
+        else
+          @result = ok
         end
-        r = true
-      end while nil
-      r
+      else
+        PROCEDE__
+      end
     end
 
-    def models
+    def mdls_module
       DocTest::Models_
     end
 
-    def resolve_upstream_status_tuple
-      if ! @path then [ true, nil ] else
-        up, e = get_up_or_error
+    def rslv_upstream
+      ok, up = prcr_upstream_status_tuple
+      if ok
+        @upstream = up
+      else
+        @result = ok
+      end
+      ok
+    end
+
+    def prcr_upstream_status_tuple
+      if ! @pathname then [ true, nil ] else # #storypoint-115
+        up, e = rslv_upstream_status_tuple
         if up then [ true, up ]
         else
           @sn.puts "#{ e }"
@@ -123,27 +122,71 @@ module Skylab::TestSupport::Regret::API
       end
     end
 
-    def get_up_or_error
+    def rslv_upstream_status_tuple
       begin
-        up = ::File.open @path, 'r'
+        up = ::File.open @pathname.to_path, 'r'
       rescue ::Errno::ENOENT => e
       end
       [ up, e ]
     end
 
-    def build_specer snitch
-      DocTest::Specer__.new :core_basename, @core_basename,
-        :load_file, @load_file, :load_module, @load_module,
-        :outstream, @out, :snitch, snitch, :templo_name, :quickie,
-        :path, @path
+    def rslv_specer
+      sp = bld_specer @sn
+      ok = sp.set_template_options @template_option_s_a
+      if ok
+        @specer = sp ; PROCEDE__
+      else
+        @result = ok
+      end
     end
 
-    def say_done
+    def bld_specer snitch
+      _path = @pathname && @pathname.to_path
+      DocTest::Specer__.new :snitch, @sn,
+        :core_basename, @core_basename, :load_file, @load_file,
+        :load_module, @load_module, :outstream, @out,
+        :path, _path, :templo_name, :quickie
+    end
+
+    def exec_scan_each_block_if_appropriate
+      if @upstream
+        exec_scan_each_block
+      else
+        PROCEDE__
+      end
+    end
+
+    def exec_scan_each_block
+      bs = DocTest::Comment_::Block::Scanner[ @sn, @upstream ]
+      while cblock = bs.gets
+        @vtuple.do_murmur and cblock.describe_to @err
+        cblock.does_look_testy and @specer.accept cblock
+      end
+      PROCEDE__
+    end
+
+    def exec_flush
+      ok = @specer.flush
+      if ok
+        emit_done_message
+        @result = SUCCESS_EXITSTATUS__
+        PROCEDE__
+      else
+        @result = ok
+      end
+    end
+
+    def emit_done_message
       if @vtuple.do_medium
-        @sn.puts "finished generated output for #{ @path }"
+        @sn.puts "finished generated output for #{ @pathname }"
       elsif @vtuple.do_notice
         @sn.puts 'done.'
-      end
+      end ; nil
+    end
+
+    def finally
+      @do_close_output_stream and ( @out.closed? || @out.tty? or @out.close )
+      nil
     end
 
     # we have a hefty branch node - this is used by our many children
@@ -152,8 +195,10 @@ module Skylab::TestSupport::Regret::API
     Basic = Basic
     DocTest = self ; Face = Face
     MetaHell = MetaHell
+    PROCEDE__ = true
     Regret = ::Skylab::TestSupport::Regret
     SEP = '# =>'.freeze
+    SUCCESS_EXITSTATUS__ = 0
 
   end
 end

@@ -57,9 +57,11 @@ module ::Skylab::TestSupport
 
         o[ :ModuleMethods, -> do
           pam and include pam.module_methods_module
-          method_defined? :nearest_test_node or
-            define_method :nearest_test_node do test_module_me end
-          # (2 reasons one of which is this triggers warnings when multiparent)
+          if ! private_instance_methods( false ).include? NEAREST__
+            # if not multiparent. if not custom hacks
+            define_method NEAREST__ do test_module_me end
+            private NEAREST__
+          end
         end ]
 
         o[ :InstanceMethods, -> do
@@ -159,5 +161,7 @@ module ::Skylab::TestSupport
     SPEC_RX__ = %r{\A
       (?<dir>.+[^/]) / (?<stem>[^/]+) #{ ::Regexp.escape SPEC_TAIL__ }
     \z}x
+
+    NEAREST__ = :nearest_test_node
   end
 end

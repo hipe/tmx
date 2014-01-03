@@ -88,8 +88,41 @@ module Skylab::TestSupport
 
       def when_found_test_directory
         @lcbp_a[ @test_dir_idx, 1 ] = MetaHell::EMPTY_A_
-        _path_prefix = ::Pathname.new( @lcbp_a * SEP__ ).expand_path.to_s
-        start_service_with_path_prefix _path_prefix
+        path_prefix = procure_any_pth_prefix_from_LCBP @lcbp_a * SEP__
+        path_prefix and start_service_with_path_prefix path_prefix
+      end
+
+      def procure_any_pth_prefix_from_LCBP longest_common_base_path
+        pn = ::Pathname.new( longest_common_base_path ).expand_path
+        tried_a = nil
+        begin
+          SEP__ == pn.instance_variable_get( :@path ) and break( did_fail = true )
+          pn.directory? and break
+          (( pn_ = pn.sub_ext EXTNAME__ )).exist? and break
+          (( tried_a ||= [] )) << pn_
+          pn = pn.dirname
+          redo
+        end while true
+        if did_fail
+          reprt_failure_to_find_business_path longest_common_base_path, tried_a
+        else
+          pn.to_s
+        end
+      end
+      EXTNAME__ = ::Skylab::Autoloader::EXTNAME
+
+      def reprt_failure_to_find_business_path lcbp, tried_a
+        @y << "failed to find business path from longest common base path - #{
+          }#{ lcbp }"
+        tried_a and reprt_tried_these_paths tried_a
+        FAILED__
+      end
+
+      def reprt_tried_these_paths tried_a
+        _a = tried_a.reduce [] do |m, x|
+          m << Headless::CLI::PathTools::FUN::Pretty_path[ x ]
+        end
+        @y << "(there is no #{ _a * ', ' })" ; nil
       end
 
       def start_service_with_path_prefix path_prefix

@@ -68,8 +68,8 @@ module Skylab::TestSupport
           y << :expression_agent_p << method( :get_expression_agent )
         end
 
-        def get_expression_agent _
-          :no_expression
+        def get_expression_agent _bound
+          Expression_agent_class__[].new
         end
       end
 
@@ -107,7 +107,11 @@ module Skylab::TestSupport
         end
 
         def generic_listener
-          @generic_listener ||= -> e do
+          @generic_listener ||= bld_generic_listener_p
+        end
+
+        def bld_generic_listener_p
+          -> e do
             if @vtuple[ e.volume ]
               @err.puts instance_exec( & e.message_proc )
               true
@@ -117,12 +121,19 @@ module Skylab::TestSupport
       end
     end
 
+    Expression_agent_class__ = -> do
+      Services::Face[]::API::Normalizer_::Expression_agent_class[]
+    end
+
     module Services  # #stowaway
-      define_singleton_method :Walker do
-        require 'skylab/sub-tree/walker' ; ::Skylab::SubTree::Walker
+      Face = -> do
+        ::Skylab::Face
       end
-      def self.const_missing i
-        const_set i, send( i )
+      Snag = -> do
+        require 'skylab/snag/core' ; ::Skylab::Snag
+      end
+      Walker = -> do
+        require 'skylab/sub-tree/walker' ; ::Skylab::SubTree::Walker
       end
     end
   end

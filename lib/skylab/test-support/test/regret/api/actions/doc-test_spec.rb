@@ -37,7 +37,7 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest
           stat = output.stat ; size1 = stat.size ; ctime1 = stat.ctime
             # (this test assumes one such file already exists)
 
-          exitstatus = API.invoke :doc_test, path: here, output_path: output
+          exitstatus = API.invoke :doc_test, pathname: here, output_path: output
             # the moneyshot. did it work?
 
           exitstatus.should eql( 0 )

@@ -1,13 +1,8 @@
 class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
 
-  # the verbosity object created by this node is itself a module - it is
-  # intended to be an immutable constant that is shared accross your
-  # application. (it is a module because it is generally associated with
-  # another constant: something like a static Conf module for your application,
-  # and it generates one or more modules, and as such it is useful to store
-  # these modules under it. :[#fa-032])
+  # read [#024] the graded verbosity narrative #storypoint-5
 
-  Graded = self  # readability
+  Graded = self
   MetaHell = ::Skylab::MetaHell
 
   class Graded
@@ -116,11 +111,7 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
       sty = self
       -> y, x, yes do
         lvl_a = sty.lvl_a ; len = lvl_a.length
-        x = -> do  # actually normalize x ..
-          # 3 things: 1) to report the validation articulations below, we build
-          # a one-off valid vtuple and use *its* snitch! (for grease) 2) we
-          # don't report re. setting a default below but we could and 3)
-          # be ready for one day revealing the below articulation.
+        x = -> do  # #storypoint-115
           sn = -> do
             sty.vtuple_class.new( 0 ).make_snitch @err
           end
@@ -203,23 +194,12 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
 
     MetaHell::Function self, :@aref, :[]
 
-    # `make_snitch` - (formerly `sc` for "sub-client")
-    # quick and dirty proof of concept, will almost certainly change. the idea
-    # is a simpler alternative to pub-sub. what if you could throw one
-    # listener around throughout your graph? the listener is like a golden
-    # snitch. no it isn't. :~[#fa-051]
-
-    def make_snitch io, *expression_agent
+    def make_snitch io, *expression_agent  # #storypoint-195
       self.class.get_snitch_class.new self, io, *expression_agent
     end
   end
 
-  class Sn_  # snitches are tracked by [#fa-051]
-
-    # the snitch itself is technically "immutable" but it just closes around
-    # the vtuple and relies on the vtuple as the datastore. if the vtuple
-    # changes its state (in terms of its category values, not its categories!)
-    # the snitch will act accordingly.
+  class Sn_  # #storypoint-200, part of the :+[#fa-051] snitch family
 
     class << self ; alias_method :orig_new, :new end
 
@@ -241,15 +221,9 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
     def initialize vtuple, io, expression_agent=nil
       @write = -> s { io.write s }
       @puts = -> s { io.puts s }
-      @say = -> i, p do  # if we are at or above verbosity threshhold `i`
-        # then invoke proc `p` and send its output to the `puts` function.
-        # in other words, conditionally say something. passing the rendering
-        # as a proc is useful because in cases where we wouldn't output the
-        # resuling string anyway, we save the overhead of building it.
-        # your expression proc will be executed in the context of your
-        # expression agent (if any) that you build the snitch with, which
-        # allows for dynamic styling of expressions where desired.
-        @is[ i ] and @puts[ expression_agent.instance_exec( & p ) ]
+      @say = -> i, *a, &p do  # #storypoint-225
+        p_ = ( p ? a << p : a ).fetch( a.length - 1 << 1 )
+        @is[ i ] and @puts[ expression_agent.instance_exec( & p_ ) ]
         nil
       end
       @is = -> i { vtuple[ i ] }
