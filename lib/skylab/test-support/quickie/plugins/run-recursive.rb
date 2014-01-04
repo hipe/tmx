@@ -6,6 +6,7 @@ module Skylab::TestSupport
 
       def initialize svc
         @be_verbose = false
+        @fuzzy_flag = svc.build_fuzzy_flag %w( -verbose )
         @test_path_a = nil
         @svc = svc
         @y = svc.y
@@ -14,28 +15,27 @@ module Skylab::TestSupport
       attr_reader :be_verbose
 
       def opts_moniker
-        '-v'
+        @fuzzy_flag.some_opts_moniker
       end
-      Match_ = Index_[ '--verbose' ]
 
       def args_moniker
-        ARGS_MONIKER_
+        ARGS_MONIKER__
       end
 
-      ARGS_MONIKER_ = '<path> [..]'.freeze
+      ARGS_MONIKER__ = '<path> [..]'.freeze
 
       def desc y
         y << "looks for test files recursively"
-        y << "in the indicated path(s)"
-        nil
+        y << "in the indicated path(s)" ; nil
       end
 
       def prepare sig
         argv = sig.input
         a, b = find_contiguous_range_of_paths argv
         if a
-          if (( idx = Match_[ sig.input ] ))
-            sig.input[ idx ] = nil
+          idx = @fuzzy_flag.any_first_index_in_input sig
+          if idx
+            sig.nilify_input_element_at_index idx
             @be_verbose = true
           end
           @input_path_a = argv[ a, b ]

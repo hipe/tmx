@@ -2,7 +2,7 @@ module Skylab::TestSupport
 
   module Quickie
 
-    class Executor_
+    class Execute__
 
       def initialize y, test_file_path_a
         @y = y

@@ -1,6 +1,6 @@
 module ::Skylab::TestSupport
 
-  module Regret  # full introduction at [#017], notes at [#016]
+  module Regret  # read [#017] the introduction to regret
 
     def self.[] mod
       mod.module_exec do

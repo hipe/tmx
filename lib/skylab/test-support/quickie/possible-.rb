@@ -4,14 +4,14 @@ module Skylab::TestSupport
 
     module Possible_
 
-      class Graph_
+      class Graph
 
         def self.[] mod
           ADAPTER_MOD_H_.fetch( mod.class )[][ mod ]
         end
 
         ADAPTER_MOD_H_ = {
-          ::Module => -> { Module_Adapter_Methods_ }
+          ::Module => -> { Module_Adapter_Methods__ }
         }.freeze
 
         def initialize a, h  # mutates nodes with linkbacks
@@ -48,15 +48,15 @@ module Skylab::TestSupport
         end
 
         def new_graph_signature client_x, input_x=nil
-          Signature_.new client_x, input_x
+          Signature__.new client_x, input_x
         end
 
         def reconcile y, from_i, to_i, sig_a
-          Reconciliation_.new( y, self, from_i, to_i, sig_a ).execute
+          Reconciliation__.new( y, self, from_i, to_i, sig_a ).execute
         end
 
         def reconcile_with_path_or_failure y, from_i, to_i, sig_a
-          Reconciliation_.new( y, self, from_i, to_i, sig_a ).
+          Reconciliation__.new( y, self, from_i, to_i, sig_a ).
             execute_with_story_or_failure
         end
 
@@ -90,7 +90,7 @@ module Skylab::TestSupport
         end
       end
 
-      module Graph_::Module_Adapter_Methods_
+      module Graph::Module_Adapter_Methods__
 
         def self.[] mod
           mod.extend self
@@ -99,7 +99,7 @@ module Skylab::TestSupport
 
         def eventpoint &blk
           graph_is_closed and raise "sanity - graph is closed."
-          Eventpoint_.new blk  # re-opening would be trivial
+          Eventpoint__.new blk  # re-opening would be trivial
         end
 
         attr_reader :graph_is_closed
@@ -116,21 +116,21 @@ module Skylab::TestSupport
               a << i
               h[ i ] = ep
             end
-            @possible_graph = Graph_.new a, h
+            @possible_graph = Graph.new a, h
           end
         end
       end
 
-      class Eventpoint_ < ::Module
+      class Eventpoint__ < ::Module
 
         def initialize blk
           @node_i = nil ; @to_a = nil
           if blk
-            Conduit_.new( a = [] ).instance_exec( & blk )
+            Conduit__.new( a = [] ).instance_exec( & blk )
             @from_a = a.freeze
           end
         end
-        class Conduit_
+        class Conduit__
           def initialize a
             @a = a
           end
@@ -172,11 +172,11 @@ module Skylab::TestSupport
         end
       end
 
-      Say_ = -> do
-        Possible_::Articulators_
+      Say_ = -> do  # #protected-not-private
+        Possible_::Articulators__
       end
 
-      Multi_add_ = -> i, x do
+      Multi_add_ = -> i, x do  # #protected-not-private
         @h.fetch( i ) do |_|
           @a << i
           @h[ i ] = [ ]
@@ -184,25 +184,25 @@ module Skylab::TestSupport
         nil
       end
 
-      Errmsg_ = -> agent, predicate, any_conj=nil do
-        Grid_Frame_[ agent, predicate, any_conj ].articulate_self
+      Errmsg_ = -> agent, predicate, any_conj=nil do  # #protected-not-private
+        Grid_Frame__[ agent, predicate, any_conj ].articulate_self
       end
       #
       # ( above and below share signature, make it easy to swap )
       #
-      Add_grid_frame_ = -> agent, predicate, any_conj=nil do
-        ( @grid ||= Grid_.new ) << Grid_Frame_[ agent, predicate, any_conj ]
+      Add_grid_frame__ = -> agent, predicate, any_conj=nil do
+        ( @grid ||= Grid__.new ) << Grid_Frame__[ agent, predicate, any_conj ]
         nil
       end
 
-      Articulate_grid_ = -> do # assume @grid
+      Articulate_grid__ = -> do # assume @grid
         @grid.articulate_each_frame_to @y.method( :<< )
         nil
       end
 
-      module Grid_Methods_
+      module Grid_Methods_  # #protected-not-private
 
-        define_method :add_frame, & Add_grid_frame_
+        define_method :add_frame, & Add_grid_frame__
         private :add_frame
 
         define_method :errmsg, & Errmsg_
@@ -215,11 +215,11 @@ module Skylab::TestSupport
           end
         end
 
-        define_method :articulate, & Articulate_grid_
+        define_method :articulate, & Articulate_grid__
         private :articulate
       end
 
-      class Grid_
+      class Grid__
         def initialize
           @a = [ ]
         end
@@ -247,7 +247,7 @@ module Skylab::TestSupport
         end
       end
 
-      class Grid_Frame_
+      class Grid_Frame__
 
         class << self ; alias_method :[], :new end
 
@@ -262,18 +262,18 @@ module Skylab::TestSupport
           word_a * ' ' if word_a.length.nonzero?
         end
 
-        Internen_ = -> mod_x do
+        Internen__ = -> mod_x do
           Headless::Name::FUN::Const_basename[ mod_x.to_s ].gsub( /_+\z/, '' ).
             downcase
         end
 
         def get_exponent
           @exponent ||=
-            :"#{ Internen_[ @agent.class ]}_#{ Internen_[ @predicate.class ] }"
+            :"#{ Internen__[ @agent.class ]}_#{ Internen__[ @predicate.class ] }"
         end
       end
 
-      class Reconciliation_
+      class Reconciliation__
 
         def initialize y, graph, from_i, to_i, sig_a
           @grid = nil
@@ -286,26 +286,26 @@ module Skylab::TestSupport
 
         def execute_with_story_or_failure
           begin
-            ok, x = Possible_::Pathfinder_.
+            ok, x = Possible_::Pathfinder__.
               new( @y, @graph, @from_i, @to_i, @sig_a ).
                 execute_with_path_or_failure
             ok or break
-            ok, x = Possible_::Dependency_Checker_.
+            ok, x = Possible_::Dependency_Checker__.
               new( @y, @graph, x, @sig_a ).execute_with_path_or_failure
           end while nil
           [ ok, x ]
         end
       end
 
-      At_ = -> * i_a do
+      At_ = -> * i_a do  # #protected-not-private
         i_a.map( & method( :send ) )
       end
 
-      class Signature_
+      class Signature__
 
         def initialize client_x, input_x
-          @client_x = client_x ; @input_x = input_x
-          @a = [ ] ; @h = { }
+          @a = [ ] ; @client_x = client_x ; @fuzzd = nil
+          @h = { } ; @input_x = input_x
         end
 
         def each_pair &blk
@@ -322,24 +322,40 @@ module Skylab::TestSupport
           @client_x
         end
 
+        def fuzzified
+          @fuzzd ||= bld_fuzzified
+        end
+      private
+        def bld_fuzzified
+          @input_x.map do |token_s|
+            /\A#{ ::Regexp.escape token_s }/
+          end
+        end
+      public
+
+        def nilify_input_element_at_index idx
+          @input_x[ idx ] = nil
+          @fuzzd and @fuzzd[ idx ] = nil
+        end
+
         def input
           @input_x
         end
 
         def nudge from_i, to_i
-          move pred::From_Soft_, from_i, to_i
+          move pred::From_Soft__, from_i, to_i
         end
 
         def carry from_i, to_i
-          move pred::From_Hard_, from_i, to_i
+          move pred::From_Hard__, from_i, to_i
         end
 
         def react i
-          depend pred::Depend_Soft_, i
+          depend pred::Depend_Soft, i
         end
 
         def rely i
-          depend pred::Depend_Hard_, i
+          depend pred::Depend_Hard, i
         end
 
         def subscribed_to? ep
@@ -361,7 +377,7 @@ module Skylab::TestSupport
       private
 
         def pred
-          Signature_::Predicates_
+          Signature__::Predicates
         end
 
         def depend clas, i
@@ -372,7 +388,7 @@ module Skylab::TestSupport
 
         def move clas, from_i, to_i
           from = clas.new self, from_i do |frm|
-            pred::To_[ self, frm, to_i ]
+            pred::To__[ self, frm, to_i ]
           end
           add from_i, from
           add to_i, from.to_pred
@@ -383,7 +399,7 @@ module Skylab::TestSupport
 
       end
 
-      class Signature_::Predicate_
+      class Signature__::Predicate
         class << self
           alias_method :orig_new, :new
         end
@@ -424,27 +440,27 @@ module Skylab::TestSupport
       SOFT_STRENGTH_ = 1
       HARD_STRENGTH_ = SOFT_STRENGTH_ << 1
 
-      module Signature_::Predicates_
+      module Signature__::Predicates
 
-        Depend_Soft_ = Signature_::Predicate_.new :depend, :node_i
+        Depend_Soft = Signature__::Predicate.new :depend, :node_i
 
-        class Depend_Soft_
+        class Depend_Soft
           def strength_i
             :react
           end
         end
 
-        class Depend_Hard_ < Depend_Soft_
+        class Depend_Hard < Depend_Soft
           def strength_i
             :rely
           end
         end
 
-        From_Soft_ = Signature_::Predicate_.new :from, :from_i, :to_pred
+        From_Soft__ = Signature__::Predicate.new :from, :from_i, :to_pred
 
-        To_ = Signature_::Predicate_.new :to, :from_pred, :to_i
+        To__ = Signature__::Predicate.new :to, :from_pred, :to_i
 
-        class From_Soft_  # this little tricklette lets us compose
+        class From_Soft__  # this little tricklette lets us compose
           # two objects that are immutable but associated with each other.
           alias_method :_, :initialize
           def initialize sig, from_i
@@ -464,7 +480,7 @@ module Skylab::TestSupport
           end
         end
 
-        class From_Hard_ < From_Soft_
+        class From_Hard__ < From_Soft__
           def strength
             HARD_STRENGTH_
           end

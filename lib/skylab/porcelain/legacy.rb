@@ -1040,20 +1040,12 @@ module Skylab::Porcelain::Legacy
       end,
       3 => -> up, pay, info, blk do
         blk and raise ::ArgumentError, "won't take block and args"
-        if MetaHell::FUN.
-          module_defines_method_in_some_manner[
+        if MetaHell::FUN.module_defines_method_in_some_manner[
             singleton_class, :event_listeners ]  # if pub sub eew  #todo
-          if pay  # (may have intentionally passed nil)
-            on_payload        do |e| pay.puts  e.text end
-          end
-          if info  # (may have intentionally passed nil)
-            on_info( on_error do |e| info.puts e.text end )
-          end
-          @three_streams_p = -> { [ up, pay, info ] }
+          init_as_with_three_streams_when_event_listener up, pay, info
         else
-          @instream, @paystream, @infostream = up, pay, info
-        end
-        nil
+          @instream = up ; @paystream = pay ; @infostream = info
+        end ; nil
       end
     }.freeze
 
@@ -1061,8 +1053,25 @@ module Skylab::Porcelain::Legacy
       @program_name = @request_client = @action_sheet = nil
       instance_exec(* up_pay_info, wire,
                    & args_length_h.fetch( up_pay_info.length ) )
-      super( nil, & nil) # #jump-1 wtf
+      super( nil, & nil)  # #jump-1 wtf
     end
+
+    def init_as_with_three_streams_when_event_listener up, pay, info
+      if pay
+        on_payload do |ev|
+          pay.puts ev.text
+        end
+      end
+      if info
+        on_info on_error { |ev| info.puts ev.text  }
+      end
+      @three_streams_p = -> do
+        [ up, pay, info ]
+      end ; nil
+    end
+
+  private
+
 
     class Event_Wiring_Conduit_ < ::BasicObject
       def initialize on_p

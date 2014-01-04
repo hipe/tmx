@@ -1,4 +1,7 @@
-# to extlib or not to extlib :[#021]
+# the core node narrative :[#021]
+
+
+## to extlib or not to extlib :[#022]
 
 we typically strenuously abstain from extlib (a.k.a monkeypatching) but this
 is one exception :1:[#sl-131]. having this method in String makes tests that

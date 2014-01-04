@@ -4,7 +4,7 @@ module Skylab::TestSupport
 
     module Possible_
 
-      class Pathfinder_
+      class Pathfinder__
 
         include Grid_Methods_
 
@@ -40,8 +40,8 @@ module Skylab::TestSupport
         def resolve_path
           bep = @graph.fetch_eventpoint @from_i
           fep = @graph.fetch_eventpoint @to_i
-          cep = bep ; path = Path_.new
-          @t = Node_Transitions_.new @graph, @sig_a  # validate names early, even
+          cep = bep ; path = Path__.new
+          @t = Node_Transitions__.new @graph, @sig_a  # validate names early, even
           goal_id = fep.node_id
           until (( goal_reached = goal_id == cep.node_id ))
             (( move_pred = resolve_one_move_predicate cep )) or break
@@ -104,7 +104,7 @@ module Skylab::TestSupport
         end
       end
 
-      class Pathfinder_::Path_
+      class Pathfinder__::Path__
         def initialize
           @a = []
         end
@@ -129,7 +129,7 @@ module Skylab::TestSupport
         end
       end
 
-      class Pathfinder_::Node_Transitions_
+      class Pathfinder__::Node_Transitions__
 
         def initialize graph, sig_a
           @graph = graph

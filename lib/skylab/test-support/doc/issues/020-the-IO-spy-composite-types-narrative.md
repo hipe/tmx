@@ -30,7 +30,7 @@ with `IO::Spy::Group#for` with a name you choose for each stream spy.
 
 When any of those stream-likes gets written to (with `<<`, `write`, `puts`,
 e.g) and that data has a newline in it, this puppy will create a "line"
-metadata struct out of the line which simply groups the name you chose
+struct out of the line which simply groups the name you chose
 and the string (the struct hence has the members `stream_name` and `string`).
 
 (If you have added line filter(s) with `line_filter!`, this will be
@@ -44,8 +44,7 @@ So effectively what this gets you is that it chunks the stream of data
 into "lines", writes these lines sequentially in the order received to
 one centralized list / queue / stack.  **NOTE** dangling writes without
 a trailing newline will not yet be flushed to the queue and hence
-not reflected in the `lines` list.  flushing could be provided if
-necessary.)
+not reflected in the `lines` list. flushing could be provided if necessary.)
 
-This is all just the ostensibly necessarily convoluted way that
-we spoof a stdout and stderr for testing.
+this is all just the ostensibly necessarily convoluted way that we spoof a
+stdout and stderr for testing.

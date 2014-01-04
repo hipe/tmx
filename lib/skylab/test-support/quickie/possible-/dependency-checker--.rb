@@ -4,7 +4,7 @@ module Skylab::TestSupport
 
     module Possible_
 
-      class Dependency_Checker_
+      class Dependency_Checker__
 
         include Grid_Methods_
 

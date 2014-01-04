@@ -1,4 +1,4 @@
-# the IO spy :[#023]
+# the IO spy narrative :[#023]
 
 the IO spy is part of (#parent-node) [#020] the family of IO spy
 aggregations ..

@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::TestSupport::TestSupport::Quickie::Possible_
 
-  describe "#{ Quickie::Possible_ } core" do  # this line is last `Q_uickie`
+  describe "[ts] quickie possile" do
 
     context "with a graph with three nodes" do
 
@@ -10,7 +10,7 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible_
 
         module Zing
 
-          Possible_::Graph_[ self ]
+          Possible_::Graph[ self ]
 
           BEGINNING = eventpoint
 

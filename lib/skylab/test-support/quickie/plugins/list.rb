@@ -5,16 +5,13 @@ module Skylab::TestSupport
     class Plugins::List
 
       def initialize svc
+        @fuzzy_flag = svc.build_fuzzy_flag %w( -list )
         @svc = svc
       end
 
       def opts_moniker
-        SWITCH_
+        @fuzzy_flag.some_opts_moniker
       end
-
-      SWITCH_ = '--list'.freeze
-
-      Match_ = Index_[ SWITCH_ ]
 
       def args_moniker
       end
@@ -26,8 +23,9 @@ module Skylab::TestSupport
       end
 
       def prepare sig
-        if (( idx = Match_[ sig.input ] ))
-          sig.input[ idx ] = nil
+        idx = @fuzzy_flag.any_first_index_in_input sig
+        if idx
+          sig.nilify_input_element_at_index idx
           sig.rely :TEST_FILES
           sig.carry :TEST_FILES, :FINISHED
           sig

@@ -2,7 +2,8 @@ module Skylab::TestSupport
 
   class IO::Spy::Triad < ::Struct.new :instream, :outstream, :errstream
 
-    # see [#020] a comparison of different IO spy aggregations ..
+    # see [#020] a comparison of different IO spy aggregations
+    # the TL;DR is that this class may be deprecated.
 
     def initialize *three
       @do_debug = nil
@@ -39,7 +40,6 @@ module Skylab::TestSupport
       end
       self
     end.new
-
 
     MOCK_NONINTERACTIVE_STDIN =
     class Stub_Noninteractive_STDIN__ < Stub_Interactive_STDIN__

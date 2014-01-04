@@ -2,9 +2,9 @@ module Skylab::TestSupport
 
   module Quickie
 
-    module Possibilities_
+    module Possibilities__
 
-      Quickie::Possible_::Graph_[ self ]
+      Quickie::Possible_::Graph[ self ]
 
       BEGINNING = eventpoint
 
@@ -27,9 +27,9 @@ module Skylab::TestSupport
       end
     end
 
-    POSSIBLE_GRAPH_ = Possibilities_.possible_graph
+    POSSIBLE_GRAPH_ = Possibilities__.possible_graph  # protected-not-private
 
-    class Run_
+    class Front__
 
       def initialize svc
         @paystream = @infostream = @y = nil
@@ -51,7 +51,7 @@ module Skylab::TestSupport
       end
 
       def invoke argv
-        bm = Chain_[
+        bm = Chain__[
           -> { ready_plugins },
           -> { parse_argv argv },
           -> sig_a { resolve sig_a } ]
@@ -92,7 +92,7 @@ module Skylab::TestSupport
 
     private
 
-      #  ~ ui ~
+      # ~ UI
 
       def invite_string
         "see '#{ program_moniker } --help'"
@@ -114,12 +114,12 @@ module Skylab::TestSupport
       #  ~ plugin mechanics ~
 
       def ready_plugins
-        ( @plugins ||= Quickie::Plugin_::Box_.new self, Quickie::Plugins ).
+        ( @plugins ||= Quickie::Plugin__::Box.new self, Quickie::Plugins ).
           ready
       end
 
       def parse_argv argv
-        a = Chain_[
+        a = Chain__[
           -> { collect_signatures argv },
           -> sig_a { check_if_argv_is_completely_parsed sig_a } ]
         a and [ true, a ]
@@ -185,7 +185,7 @@ module Skylab::TestSupport
       end
 
       def resolve_executor
-        e = Quickie::Executor_.new @y, get_test_path_a
+        e = Quickie::Execute__.new @y, get_test_path_a
         e.be_verbose = @plugins[ :run_recursive ].client.be_verbose
         (( @executor = e )).resolve
       end
@@ -205,7 +205,7 @@ module Skylab::TestSupport
     end
 
     Basic = TestSupport_::Services::Basic
-    Chain_ = MetaHell::FUN.function_chain
+    Chain__ = MetaHell::FUN.function_chain
     Index_ = Headless::CLI::Option::FUN.basic_switch_index_curry
   end
 end

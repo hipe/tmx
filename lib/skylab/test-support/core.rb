@@ -11,7 +11,7 @@ class ::String  # [#022] "to extlib or not to extlib.."
   end
 end
 
-module Skylab::TestSupport
+module Skylab::TestSupport  # (any future storypoints should go in [#021])
 
   Autoloader = ::Skylab::Autoloader
   Headless = ::Skylab::Headless

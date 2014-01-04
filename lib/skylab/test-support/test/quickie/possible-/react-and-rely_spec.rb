@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::TestSupport::TestSupport::Quickie::Possible_
 
-  describe "#{ Quickie::Possible_ } react and rely" do
+  describe "[ts] quickie possible react and rely" do
 
     include Possible_TS_::InstanceMethods
 
@@ -10,7 +10,7 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible_
 
       before :all do
         module Triangle
-          Possible_::Graph_[ self ]
+          Possible_::Graph[ self ]
           A = eventpoint
           B = eventpoint { from A }
           C = eventpoint { from B ; from A }

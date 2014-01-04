@@ -2,7 +2,7 @@ module Skylab::TestSupport
 
   module Quickie
 
-    class Plugin_::Adapter_
+    class Plugin__::Adapter_
 
       def initialize const_i, kls, svc
         @const_i = const_i ; @kls = kls ; @svc = svc
@@ -59,12 +59,23 @@ module Skylab::TestSupport
         @client.send ep.eventpoint_notify_method_name
       end
 
-      #  ~ services that plugins want ~
+      # ~
 
-      %i| y plugins paystream program_moniker get_test_path_a |.each do |i|
+      SERVICES_THAT_PLUGINS_WANT__ = %i(
+        get_test_path_a
+        paystream
+        plugins
+        program_moniker
+        y ).freeze
+
+      SERVICES_THAT_PLUGINS_WANT__.each do |i|
         define_method i do
           @svc.send i
         end
+      end
+
+      def build_fuzzy_flag a
+        @svc.build_fuzzy_flag a
       end
     end
   end

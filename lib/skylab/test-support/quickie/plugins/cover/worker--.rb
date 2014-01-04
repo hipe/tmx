@@ -2,7 +2,7 @@ module Skylab::TestSupport
 
   module Quickie
 
-    class Plugins::Cover::Worker_
+    class Plugins::Cover::Worker__
 
       def initialize svc
         @svc = svc

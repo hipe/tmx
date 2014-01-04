@@ -8,7 +8,7 @@ private
   end
 end
 
-module Skylab::Headless  # see [#013] the core node narrative for storypoints
+module Skylab::Headless  # ([#013] is reserved for a core node narrative - no storypoints yet)
 
   module Notificate
     def self.[] mod

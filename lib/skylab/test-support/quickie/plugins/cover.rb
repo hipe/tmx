@@ -5,16 +5,13 @@ module Skylab::TestSupport
     class Plugins::Cover
 
       def initialize svc
-        @svc = svc
+        @fuzzy_flag = svc.build_fuzzy_flag %w( -cover )
+        @svc = svc ; nil
       end
 
       def opts_moniker
-        SWITCH_
+        @fuzzy_flag.some_opts_moniker
       end
-
-      SWITCH_ = '--cover'.freeze
-
-      Match_ = Index_[ SWITCH_ ]
 
       def args_moniker
       end
@@ -26,15 +23,16 @@ module Skylab::TestSupport
       end
 
       def prepare sig
-        if (( idx = Match_[ sig.input ] ))
-          sig.input[ idx ] = nil
+        idx = @fuzzy_flag.any_first_index_in_input sig
+        if idx
+          sig.nilify_input_element_at_index idx
           sig.rely :BEFORE_EXECUTION
           sig
         end
       end
 
       def before_execution_eventpoint_notify
-        Quickie::Plugins::Cover::Worker_.new( @svc ).execute
+        Quickie::Plugins::Cover::Worker__.new( @svc ).execute
       end
     end
   end

@@ -5,7 +5,7 @@ module Skylab::Headless
     module FUN  # #storypoint-10
 
       Local_normal_name_from_module = -> mod do
-        Normify[ Const_basename[ name_s ] ]
+        Normify[ Const_basename[ mod.name ] ]
       end
 
       Const_basename = -> name_s do

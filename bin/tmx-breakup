@@ -8,6 +8,9 @@
   # lying around here too, and it is only five lines long (but i run it
   # by hand in bash) wtf!  it also experiments with drunken monkey style
   #
+  # EDIT: just use Gitx on a file with uncommitted changes. you can
+  # selectively chose hunks to add to the commit.
+
 
 exit_status = 0
 

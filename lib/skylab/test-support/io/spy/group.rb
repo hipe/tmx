@@ -1,6 +1,6 @@
 module Skylab::TestSupport
 
-  class IO::Spy::Group  # [#023] io spy group ..
+  class IO::Spy::Group  # read the related [#023] IO spy composite..narrative
 
     def initialize
       @debug = @debug_IO = nil
@@ -88,7 +88,18 @@ module Skylab::TestSupport
       spy
     end
     #
-    Line__ = ::Struct.new :stream_name, :string  # #duplicated at [#ts-007]
+    class Line__  # :+[#ts-007]
+      def initialize stream_name, string
+        @stream_name = stream_name ; @string = string
+      end
+      attr_reader :stream_name, :string
+      def payload_x
+        @string.chop
+      end
+      def to_a
+        [ @stream_name, @string ]
+      end
+    end
 
   public
 
@@ -121,14 +132,12 @@ module Skylab::TestSupport
     #
     Debug__ = ::Struct.new :condition_p, :emit_line_p
 
-
     def line_filter! p  # when a line is resolved to be added to '@line_a'
       # send the string to all such 'p' in the order they were received
       # in a reduce operation such that each next 'p' receives the result of
       # the previous 'p'. the final result will be added to '@line_a'.
       ( @line_filter_p_a ||= [] ).push p
     end
-
 
     def unzip  # goofy fun. result: 2 parallel arrays: names and strings
       r = Names_And_Strings__.new 2

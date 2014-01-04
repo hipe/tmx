@@ -5,29 +5,30 @@ module Skylab::TestSupport
     class Plugins::Help
 
       def initialize svc
+        @fuzzy_flag = svc.build_fuzzy_flag %w( -help )
         @svc = svc
         @y = svc.y
       end
 
       def opts_moniker
-        SWITCH_
+        @fuzzy_flag.some_opts_moniker
       end
 
-      SWITCH_ = '--help'.freeze
+      SWITCH__ = '--help'.freeze
 
-      Match_ = Index_[ SWITCH_ ]
+      Match__ = Index_[ SWITCH__ ]
 
       def args_moniker
       end
 
       def desc y
-        y << "this screen"
-        nil
+        y << "this screen" ; nil
       end
 
       def prepare sig
-        if (( idx = Match_[ sig.input ] ))
-          sig.input[ idx ] = nil
+        idx = @fuzzy_flag.any_first_index_in_input sig
+        if idx
+          sig.nilify_input_element_at_index idx
           sig.carry :BEGINNING, :FINISHED
           sig
         end

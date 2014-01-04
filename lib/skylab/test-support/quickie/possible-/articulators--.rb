@@ -4,7 +4,7 @@ module Skylab::TestSupport
 
     module Possible_
 
-      module Articulators_
+      module Articulators__
 
         o = Possible_::Articulator_.method :new
 

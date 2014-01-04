@@ -256,10 +256,14 @@ module Skylab::MetaHell
   public
 
     def on_attribute_introduced atr
-      is_reader_x = atr.is? :reader
-      method_defined?( atr.local_normal_name ) or false == is_reader_x or
-        attr_reader atr.local_normal_name
-      method_defined?( atr.writer_method_name ) or is_reader_x or
+      is_reader_was_specified = true
+      is_reader = atr.fetch :reader do is_reader_was_specified = nil ; true end
+      is_reader && ! method_defined?( r_m_i = atr.local_normal_name ) &&
+        attr_reader( r_m_i )
+      is_writer = atr.fetch :writer do
+        ! ( is_reader_was_specified && is_reader )
+      end
+      is_writer && ! method_defined?( atr.writer_method_name ) &&
         write_attribute_writer( atr )
       attributes.accept_atr atr ; nil
     end
@@ -371,7 +375,11 @@ module Skylab::MetaHell
     end
 
     def writer_method_name
-      @writer_method_name ||= :"#{ local_normal_name }="
+      @writer_method_name ||= :"#{ @local_normal_name }="
+    end
+
+    def ivar
+      @ivar ||= :"@#{ @local_normal_name }"
     end
 
     def is? i

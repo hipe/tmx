@@ -1066,15 +1066,25 @@ module Skylab::TestSupport::Quickie
 
   #  ~ facet N.2 - the runner experiment ~
 
-  class Quickie::Service
-    def run
-      @run ||= Quickie::Run_.new self
+  module Quickie
+    def self.active_session
+      service.active_sssn  # #de-vowelated names are used
     end
-    attr_reader :paystream, :infostream
+  end
+
+  class Quickie::Service
+    def active_sssn
+      @front ||= bld_front
+    end
+  private
+    def bld_front
+      Quickie::Front__.new self
+    end
+  public
     def attach_client_notify client
       @client and fail "sanity - client is already attached"
-      @client = client
-      nil
+      @client = client ; nil
     end
+    attr_reader :paystream, :infostream
   end
 end
