@@ -8,9 +8,6 @@ module Skylab::GitViz
         @tree = invoke_API_with_iambic x_a
         @tree and execute
       end
-      def invoke_API_with_iambic _
-        GitViz::Models_::File_Node.get_mock_tree
-      end
     private
       def execute
         es = first_pass

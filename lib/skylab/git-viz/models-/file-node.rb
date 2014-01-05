@@ -4,6 +4,11 @@ module Skylab::GitViz
 
     Porcelain::Tree[ self ]
 
+    def self.[] * x_a
+      node_a = Tree_node_a__.new( x_a ).execute
+      node_a and from :path_nodes, node_a
+    end
+
     def self.get_mock_tree
       wat = from :paths, [ "it's just/funky like that", LINE__ ]
       wat.commitpoint_manifest = build_mock_CM
@@ -14,6 +19,10 @@ module Skylab::GitViz
 
     def self.build_mock_CM
       Mock_Commitpoint_Manifest__.new
+    end
+
+    def set_node_payload x
+      @repo_node = x ; nil
     end
 
     attr_accessor :commitpoint_manifest
@@ -52,34 +61,23 @@ module Skylab::GitViz
       end
       attr_reader :commitpoint_index
     end
-  end
-end
-if false
-require File.expand_path('../file-node', __FILE__)
 
-module Skylab::GitViz::API::Model
-  class FileTree < FileNode
-  end
+    class Tree_node_a__
+      Services::Basic[]::Set[ self,
+        :with_members, %i( pathname VCS_front ).freeze,
+        :initialize_basic_set_with_iambic ]
 
-  module FileTree::Constants
-    SEPARATOR = '/'
-  end
-
-  class << FileTree
-    include FileTree::Constants
-
-    def build *a, &b
-      FileNode.build(*a, &b)
+      def initialize x_a
+        initialize_basic_set_with_iambic x_a
+      end
+      def execute
+        @repo = @VCS_front.procure_repo_from_path @pathname.expand_path
+        @repo and execute_with_repo
+      end
+    private
+      def execute_with_repo
+        @repo.get_tree_node_a
+      end
     end
-
-    def build_tree api, data
-      repo = api.vcs.repo(data.path) or return repo
-      files = repo.native.status
-      o = from_files files
-      o
-    end
-
-    # [ `from_files` #tombstone ]
   end
-end
 end

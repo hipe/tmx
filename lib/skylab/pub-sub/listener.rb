@@ -69,5 +69,47 @@ module Skylab::PubSub
         @down_p[].send [ * i_a, @sffx_i ].join( '_' ).intern, p.call
       end
     end
+
+    class Spy_Proxy
+
+      def initialize
+        yield self
+        @do_debug_proc ||= nil
+        @do_debug_proc and @debug_IO ||= HL__[]::System::IO.some_stderr_IO
+        @emission_a or raise ::ArgumentError, "emission_a must be set in block"
+        @inspect_emission_proc ||= method( :inspect_emission )
+        freeze
+      end
+
+      attr_writer :debug_IO, :do_debug_proc,
+        :emission_a, :inspect_emission_proc
+
+      def call * i_a, & p
+        x = p[]
+        if @do_debug_proc && @do_debug_proc[]
+          @debug_IO.puts @inspect_emission_proc[ i_a, x ]
+        end
+        @emission_a << Emission__.new( i_a.freeze, x ) ; nil
+      end
+    private
+      def inspect_emission i_a, x
+        "#{ i_a.inspect }: #{ HL__[]::FUN::Inspect[ x ] }"
+      end
+    end
+
+    class Emission__
+
+      def initialize i_a, x
+        i_a.frozen? or fail "i_a must be frozen"
+        @channel_i_a = i_a ; @payload_x = x
+        freeze
+      end
+
+      attr_reader :channel_i_a, :payload_x
+    end
+
+    HL__ = -> do
+      Basic::Services::Headless
+    end
   end
 end
