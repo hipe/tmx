@@ -1,50 +1,50 @@
 module Skylab::GitViz
 
-  module API  # b.c stowed away here :/
-    MetaHell::MAARS[ self ]
-  end
-
-  class API::Client < ::Struct.new :runtime
-
-    include Core::Client_IM_
-
-    def emit(*a)
-      runtime.emit(*a)
-    end
-
-    # would-be services:
-    attr_reader :y
-
-    def initialize runtime
-      super(runtime)
-      @y = runtime.y  # svc now
-      @vcs_name = :git
-    end
-    alias_method :svcs, :runtime  # idgaf blood
-    def invoke req
-      i = svcs.last_hot_local_normal
-      k = API::Actions.const_get camelize( i ), false
-      k.new(self, req).invoke
-    end
-    define_method(:root) { ROOT }
-    def vcs
-      @vcs ||= begin
-        require ROOT.join("api/vcs-adapter/#{vcs_name}")
-        self.class::VcsAdapter.const_get(camelize vcs_name).new(self)
-      end
-    end
-    attr_reader :vcs_name
-  end
   module API
-    @instance = Hash.new do |h, k|
-      if h.key? k.object_id
-        h[k.object_id]
-      else
-        h[ k.object_id ] = API::Client.new k
+
+    def self.invoke _API_action_locator_x, * x_a
+      x_a.unshift LOC_X_, _API_action_locator_x
+      Session__.new.invoke_with_iambic x_a
+    end
+
+    LOC_X_ = :API_action_locator_x
+
+    def self.invoke_with_iambic x_a
+      Session__.new.invoke_with_iambic x_a
+    end
+
+    class Session__
+
+      def invoke_with_iambic x_a
+        _unbound = Resolve_Some_Unbound__.new( x_a ).execute
+        _unbound[ :session, self, * x_a ]
       end
     end
-    class << self
-      attr_reader :instance
+
+    class Resolve_Some_Unbound__
+      def initialize x_a
+        @x_a = x_a
+      end
+      def execute
+        API::Actions__.const_fetch resolve_some_locator_x
+      end
+      private
+      def resolve_some_locator_x
+        while LOC_X_ == @x_a.first
+          @x_a.shift ; locator_x = @x_a.shift
+        end  # [#004]: #in-API-invocation-the-order-matters
+        locator_x or raise ::ArgumentError, say_no_locator_x
+      end
+    private
+      def say_no_locator_x
+        "we don't know what unbound action to resolve without '#{ LOC_X_ }'"
+      end
+    end
+
+    MetaHell::MAARS[ self ]
+
+    module Actions__
+      MetaHell::Boxxy[ self ]
     end
   end
 end
