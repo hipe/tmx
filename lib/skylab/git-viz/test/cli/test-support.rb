@@ -100,6 +100,11 @@ module Skylab::GitViz::TestSupport::CLI
       expect_no_more_lines
     end
 
+    def expect_succeeded
+      expect_result_for_success
+      expect_no_more_lines
+    end
+
     def expect_result_for_success
       @result.should eql 0
     end

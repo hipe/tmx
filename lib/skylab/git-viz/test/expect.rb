@@ -12,6 +12,12 @@ module Skylab::GitViz
 
       module Instance_Methods__
 
+        def expect_emissions_on_channel i
+          @default_channel_i = i ; nil
+        end
+
+        attr_reader :default_channel_i
+
         def expect * x_a, &p
           ::Array.try_convert( x_a.first ) and x_a.unshift :on_channel_i_a
           @expectation = Expectation__.new x_a, p
@@ -20,6 +26,8 @@ module Skylab::GitViz
             expct_channel_i
           elsif @expectation.on_channel_i_a
             expct_channel_i_a
+          elsif (( i = default_channel_i ))
+            @em.stream_name.should eql i
           end
           @matchee_x = @em.payload_x
           @expectation.is_styled and expct_styled_and_unstyle
