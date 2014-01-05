@@ -1,26 +1,56 @@
-# assuming operating under tmx for now. skipping canonical entrypoint setup.
+require_relative '..'
+require 'skylab/porcelain/core'  # and [hl]
 
 module Skylab::GitViz
 
-  %i| GitViz MetaHell Porcelain |.each do |i|
+  %i| GitViz Headless MetaHell Porcelain |.each do |i|
     const_set i, ::Skylab.const_get( i, false )
   end
 
   MetaHell::MAARS[ self ]
 
-  stowaway :API, 'api/client'
-
   module CLI
-    MetaHell::MAARS[ self ]
-  end
+    SUCCEEDED_ = true
+    MetaHell::MAARS::Upwards[ self ]
 
-  module Core
-  end
-
-  module Core::Client_IM_
-  private
-    def camelize s
-      s.to_s.gsub(/(?:^|-)([a-z])/) { $1.upcase }
+    module Actions__
+      MetaHell::Boxxy[ self ]
     end
+  end
+
+  stowaway :API, 'api/session--'
+
+  module VCS_Adapters_
+    MetaHell::Boxxy[ self ]
+  end
+
+  module Services
+    memoize = -> p do
+      p_ = -> do
+        r = p[] ; p_ = -> { r } ; r
+      end
+      -> { p_.call }
+    end
+    slugify = -> const_i do
+      const_i.to_s.gsub( /(?<=[a-z])[A-Z]/ ) { |s| "-#{ s }" }.downcase
+    end
+    subsys = -> i do
+      memoize[ -> do
+        require "skylab/#{ slugify[ i ] }/core"
+        ::Skylab.const_get i, false
+      end ]
+    end
+    stdlib = -> i do
+      memoize[ -> do
+        require slugify[ i ]
+        ::Object.const_get i, false
+      end ]
+    end
+
+    Basic = subsys[ :Basic ]
+    Grit = memoize[ -> do require 'grit' ; ::Grit end ]
+    Open3 = stdlib[ :Open3 ]
+    PubSub = subsys[ :PubSub ]
+    Set = stdlib[ :Set ]
   end
 end

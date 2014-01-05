@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby -w
+
+require_relative '../lib/skylab/git-viz/core'
+
+Skylab::GitViz::CLI::Client.new( $stdin, $stdout, $stderr ).invoke ARGV
