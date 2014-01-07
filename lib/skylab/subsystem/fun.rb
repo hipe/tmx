@@ -11,8 +11,9 @@ module Skylab
       class << o ; alias_method :[]=, :[] end
 
       o[:require_quietly] = -> s do   # load a warning-noisy library
-        Subsystem::Subsystems_::MetaHell::FUN.
-          without_warning[ -> { require s } ]
+        Subsystem::Subsystems_::MetaHell::FUN.without_warning do
+          require s
+        end
       end
 
       o[:require_stdlib] = o[:require_gemlib] = -> const_i do

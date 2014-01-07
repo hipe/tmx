@@ -48,7 +48,7 @@ class Skylab::Git::CLI::Actions::Head  # read [#gi-011] the git.. narrative
           a[ d, 1 ] = [ '-b', "HEAD~#{ s }" ] ; nil
         end
         o.base.short[ 'b' ] = ::OptionParser::Switch::RequiredArgument.new do |s|
-          @branch_name = s ; nil  # hidden option for above
+          @branch_name = s ; nil  # :+#hidden-option for the above
         end
 
         o.top.prepend( * rr.to_optparse_args )

@@ -126,6 +126,12 @@ module Skylab::Porcelain
         @name_services.detach_and_release_keyset_notify @node_id
       end
 
+      def set_node_payload x
+        @node_payload = x ; nil
+      end
+
+      attr_reader :node_payload
+
       # ~ as parent ~
 
       def has_children

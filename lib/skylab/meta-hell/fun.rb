@@ -128,9 +128,14 @@ module Skylab::MetaHell
       -> { p[ arg ] }
     end
 
-    o[:without_warning] = -> f do
+    def self.without_warning & p
+      p or raise "old form is deprectated - update this to use block not proc"
+      Without_warning__[ p ]
+    end
+
+    Without_warning__ = -> p do
       x = $VERBOSE; $VERBOSE = nil
-      r = f.call                  # `ensure` is out of scope for now
+      r = p.call  # `ensure` is out of scope for now
       $VERBOSE = x
       r
     end

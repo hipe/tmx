@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Porcelain::TestNamespace
 
-  describe "#{ Tree }::Merge_::FUN" do
+  describe "[po] tree mege fun" do
 
     it "loads" do
       Tree::Merge_::FUN

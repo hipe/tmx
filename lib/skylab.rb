@@ -195,10 +195,10 @@ module Skylab  # Welcome! :D
     private
       def stowaway *a  # [#mh-030] another goofy experiment
         @has_stowaways ||= true
-        ( @stowaway_a ||= [ ] ) << a ; nil
+        ( @stowaway_a_a ||= [] ) << a ; nil
       end
     public
-      attr_reader :has_stowaways, :stowaway_a
+      attr_reader :has_stowaways, :stowaway_a_a
     end
 
     class Tug  # the implementation of the `const_missing` hack

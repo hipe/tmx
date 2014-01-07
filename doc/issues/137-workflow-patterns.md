@@ -87,3 +87,16 @@ one way this could be accomplished is by this:
   whew!
 
 hm, not sure that was worth it. but mind you I haven't tried this yet!
+
+
+
+## #slow-step
+
+step-debugging wherin you loop through the following steps:
+
+1. set a breakpoint above the first as-yet-not-ran line you have written
+2. step through each new line you have written until you find a line
+   that either has an error or that you want to refactor for style.
+3. if you found such a line in 2, stop the debugging session, move the
+   breakpoint to above that line, and go back to 2.
+   if not, then your test should be passing. write the next test and repeat.

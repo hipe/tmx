@@ -92,10 +92,10 @@ module Skylab::Face
         if first
           first = false
           # (we used to rescue ::LoadError, could again)
-          MetaHell::FUN.without_warning[ -> do
+          MetaHell::FUN.without_warning do
             Services::Ncurses.initscr
             # snowleopard-ncurses ncurses_wrap.c:1951 @todo easy patch
-          end ]
+          end
           cols = ::Ncurses.COLS
           ::Ncurses.endwin
         end

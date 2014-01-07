@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Porcelain::TestNamespace
 
-  describe "#{ Tree } merge" do
+  describe "[po] tree merge" do
 
     def tree_from_paths a
       Tree.from :paths, a

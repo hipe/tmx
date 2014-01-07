@@ -77,7 +77,7 @@ module Skylab::PubSub
         @do_debug_proc ||= nil
         @do_debug_proc and @debug_IO ||= HL__[]::System::IO.some_stderr_IO
         @emission_a or raise ::ArgumentError, "emission_a must be set in block"
-        @inspect_emission_proc ||= method( :inspect_emission )
+        @inspect_emission_proc ||= method :inspect_emission_channel_and_payload
         freeze
       end
 
@@ -92,7 +92,7 @@ module Skylab::PubSub
         @emission_a << Emission__.new( i_a.freeze, x ) ; nil
       end
     private
-      def inspect_emission i_a, x
+      def inspect_emission_channel_and_payload i_a, x
         "#{ i_a.inspect }: #{ HL__[]::FUN::Inspect[ x ] }"
       end
     end
@@ -106,6 +106,8 @@ module Skylab::PubSub
       end
 
       attr_reader :channel_i_a, :payload_x
+
+      alias_method :channel_x, :channel_i_a
     end
 
     HL__ = -> do

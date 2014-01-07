@@ -37,9 +37,9 @@ module Skylab::PubSub::TestSupport
         @stream_name, @payload_x = stream_name, payload_x
       end
 
-      attr_reader :stream_name
+      attr_reader :stream_name, :payload_x
 
-      attr_reader :payload_x
+      alias_method :channel_x, :stream_name
 
       def to_a  # e.g for pretty debugging output
         [ @stream_name, @payload_x ]

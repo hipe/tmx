@@ -4,14 +4,31 @@ module Skylab::Porcelain
 
     class Fetch_or_create_
 
-      Fields_[ self, :client, :path, :init_node, :do_create ]
+      Fields_[ self,
+        :client,
+        :do_create,
+        :init_node,
+        :node_payload,
+        :path ]
 
       def execute
-        work @path.respond_to?( :each_index ) ? @path.dup :
-          @path.to_s.split( @client.path_separator ), @client
+        _path_a = some_normalized_path_a
+        node = work _path_a, @client
+        @node_payload and node.set_node_payload @node_payload
+        node
       end
 
     private
+
+      def some_normalized_path_a
+        path_a = ::Array.try_convert @path
+        path_a or some_normd_path_a_when_not_array
+      end
+
+      def some_normd_path_a_when_not_array
+        @path or raise ::ArgumentError, "'path' is a required iambic param."
+        "#{ @path }".split @client.path_separator
+      end
 
       def work mutable_path_a, node
         begin

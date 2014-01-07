@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Porcelain::TestNamespace
 
-  describe Porcelain::Tree do
+  describe "[po] tree node" do
 
     let(:paths) { [
       'a',

@@ -93,6 +93,7 @@ module Skylab::TestSupport
         @stream_name = stream_name ; @string = string
       end
       attr_reader :stream_name, :string
+      alias_method :channel_x, :stream_name
       def payload_x
         @string.chop
       end

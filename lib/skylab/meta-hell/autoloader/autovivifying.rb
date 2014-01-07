@@ -105,7 +105,7 @@ module Skylab::MetaHell
     def enhance_self_for_stowaways  # only ever called once per instance.
       define_singleton_method :enhance_self_for_stowaways do fail 'no' end
 
-      stow_a = @mod.stowaway_a or fail "sanity - no stowaways in #{ @mod }"
+      stow_a = @mod.stowaway_a_a or fail "sanity - no stowaways in #{ @mod }"
 
       get_res = -> do             # find the correct "record" of `stow`
         resolver_x = stow_a.reduce nil do | _, ( *guest_a, loc_x ) |
@@ -132,8 +132,8 @@ module Skylab::MetaHell
           end
         end
         m.const_defined?( c, false ) or raise ::LoadError, "`#{ m }::#{ c }` #{
-          }as a stowaway loaded via \"#{ res_x }\" was expected but not#{
-          }resolved via that means."
+          }as a stowaway loaded via \"#{ res_x }\" was expected but not #{
+           }resolved via that means."
         m.const_get c, false
       end
     end

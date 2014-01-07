@@ -2,13 +2,14 @@ module Skylab::Porcelain
 
   module Tree
 
-    H_ = {
+    H__ = {
+      hash: -> { Tree::From_hash_ },
       paths: -> { Tree::From_paths_ },
-      hash: -> { Tree::From_hash_ }
+      path_nodes: -> { Tree::From_path_nodes__ }
     }.freeze
 
     From_ = -> *a do
-      H_.fetch( a.fetch( 2 ) ).call[ *a ]
+      H__.fetch( a.fetch( 2 ) ).call[ *a ]
     end
   end
 end

@@ -5,7 +5,7 @@ require_relative 'test-support'
 module Skylab::Porcelain::TestNamespace
   # (above line left intact for posterity)
 
-  describe Porcelain::Tree do
+  describe "[po] tree" do
     it "renders a pretty tree" do
       node = Porcelain::Tree.from :hash,
         { :name => "document",

@@ -8,7 +8,7 @@ module Skylab::Porcelain::TestSupport::Tree::Traversal_Scanner
 
   extend TestSupport::Quickie
 
-  describe "#{ Tree }::Traversal::Scanner_" do
+  describe "[po] tree traversal scanner" do
 
     it "3 node triangle" do
       tree = fp 'a/b', 'a/c'
