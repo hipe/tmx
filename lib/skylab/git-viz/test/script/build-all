@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+
+git="git"
+repo_stem="mock-repo-1"
+tmp_dirname="tmp.$repo_stem"
+vcs_path="test/vcs-adapters-/git"
+script_path="$vcs_path/script"
+
+if [[ ! -d "$script_path" ]] ; then
+  echo "this must be run from the root of the git-viz installation" ; exit 1
+fi
+
+if [[ -e "$tmp_dirname" ]] ; then
+  echo "using $tmp_dirname"
+else
+  echo "building $tmp_dirname"
+  "./$script_path/for-$repo_stem/build-repo"
+fi
+
+if [[ ! -e "$tmp_dirname" ]] ; then
+  echo "not exist, aborting: $tmp_dirname" ; exit 1
+fi
+
+cd "$tmp_dirname"
+
+log="./log"
+
+ruby_output="tmp.1.output"
+git_lines="tmp.2.git-lines"
+
+cat "$log" | ruby -lne 'md = /\A\[master ([a-z0-9]+).+\bas commit ([a-z0-9]+)/.match $_ ; md and puts "treat commit #{ md[1] } as #{ md[2] }"' > "$ruby_output"
+
+sed -E "s/^treat commit ([a-z0-9]+) as ([a-z0-9]+)$/$git show --numstat --pretty=format:%ai \1 > tmp.show.\2.txt/" < "$ruby_output" > "$git_lines"
+
+if [[ ! -s "$git_lines" ]] ; then
+  echo "sed hack failed, aborting" ; exit 1
+fi
+
+. "$git_lines"
+
+cd ..
+
+
+find "$tmp_dirname" -name "tmp.show.*" | while read line ; do
+  "$script_path/normalize-date-on-first-line" "$line"
+done
+
+output_dir="$vcs_path/fixtures/$repo_stem"
+
+if [[ ! -d "$vcs_path" ]] ; then
+  echo "sanity - $vcs_path" ; exit 1
+fi
+
+if [[ ! -d "$output_dir" ]] ; then
+  echo "mkdir -p $output_dir" ; mkdir -p "$output_dir"
+fi
+
+find "$tmp_dirname" -name "tmp.show.*" | while read line ; do
+  bn=$(basename $line)
+  sha=$( echo $bn | sed -E 's/tmp\.show\.([a-z0-9]+)\.txt$/\1/' )
+  dest="$output_dir/show.$sha.txt"
+  cmd="mv $line $dest"
+  if [[ ! -e "$line" ]] ; then
+    echo "no source file: $line"
+  elif [[ ! -e "$dest" ]] ; then
+    echo "$cmd"
+    $( $cmd )
+  else
+    cmp "$line" "$dest"
+    if [ "0" = "$?" ] ; then
+      echo "no change, skipping this: $cmd"
+    else
+      echo "STRANGE! files were different. skipping: $cmd"
+    fi
+  fi
+done
+
+echo "done. (NOTE you can erase $tmp_dirname now if you want, or inspect it)"
+
+exit 0

@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+dirname="tmp.mock-repo-1"
+git="git"
+
+if [[ -e "$dirname" ]] ; then
+  echo "exists, aborting: $dirname"
+  exit 1
+fi
+
+mkdir "$dirname"
+
+cd "$dirname"
+
+mkdir -p "dirzo/it's just"
+
+file_1="dirzo/everybody in the room is floating"
+file_2="dirzo/it's just"/"funky like that"
+file_3_a="dirzo/move-before"
+file_3_b="dirzo/move-after"
+
+"$git" init .
+
+cat > "$file_2" <<HERE
+a
+b
+c
+d
+e
+HERE
+
+"$git" add "$file_2"
+"$git" commit -m "initial comit (outside of the story)" >> log
+
+
+echo "a
+b
+c" > "$file_1"
+
+"$git" add "$file_1"
+"$git" commit -m "commit to be treated as commit 345345" >> log
+
+
+cat > "$file_1" <<HERE
+A
+b
+C
+D
+HERE
+
+cat > "$file_2" <<HERE
+0
+1
+2
+3
+4
+HERE
+
+echo "one-line" > "$file_3_a"
+
+"$git" add "$file_3_a"
+"$git" commit -am "commit to be treated as commit 123123" >> log
+
+
+"$git" mv "$file_3_a" "$file_3_b"
+"$git" commit -m "commit to be treated as commit 234234" >> log
+
+echo "finished writing 4 commits (the last 3 are for the story). see 'log'."

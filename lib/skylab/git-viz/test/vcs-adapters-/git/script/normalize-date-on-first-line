@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby -w
+
+arg1, = ARGV
+
+if ! arg1
+  puts "usage: #{ ::File.basename $PROGRAM_NAME } <file>" ; exit 1
+end
+
+if %r(/tmp\.show\.([a-z0-9]+)\.txt) !~ arg1
+  puts "parse failure: #{ arg1 }" ; exit 1
+end
+
+fake_SHA = $1
+
+first_ = case fake_SHA
+when '345345' ; '2014-01-04 18:33:24 -0500'
+when '123123' ; '2014-01-05 04:03:24 -0500'
+when '234234' ; '2014-01-05 10:33:24 -0500'
+end
+
+if ! first_
+  puts "there is fake date for fake sha: #{ fake_SHA.inspect }" ; exit 1
+end
+
+fh = ::File.open arg1, 'r+'
+
+first = fh.gets
+
+if /\A\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} [-+]\d{4}\n\z/ =~ first
+  rest = fh.read
+  fh.rewind
+  fh.puts first_
+  fh.write rest
+  puts "normalized dateline from (#{ first.chomp }) to (#{ first_ }). done."
+  fh.close
+  exit 0
+else
+  puts "didn't look like dateline: #{ first.inspect }"
+  fh.close
+  exit 1
+end
