@@ -142,8 +142,9 @@ module Skylab::Porcelain
         @box_multi ? @box_multi.count : 0
       end
 
-      def fetch path
-        Tree::Fetch_or_create_[ :client, self, :do_create, false, :path, path ]
+      def fetch path, & else_p
+        Tree::Fetch_or_create_[ :client, self, :do_create, false,
+          :else_p, else_p, :path, path ]
       end
 
       def fetch_or_create *a  # ( may mutate )

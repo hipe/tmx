@@ -1,3 +1,5 @@
+[#014]       #parent-node:[#005] testing narratives
+[#013]       #parent-node:[#014] the mock FS narrative ..
 [#012]       #parent-node:[#005] datamodel and algorithm narratives ..
 [#011]       #parent-node:[#005] the git VCS adapter narrative
 [#010]       #parent-node:[#011] the git commit poool narrative ..

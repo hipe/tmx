@@ -6,12 +6,14 @@ module Skylab::GitViz::TestSupport
   module CONSTANTS
     MetaHell = ::Skylab::MetaHell
     GitViz = ::Skylab::GitViz
+    Headless = ::Skylab::Headless
     TestSupport = ::Skylab::TestSupport
   end
 
   include CONSTANTS
 
-  GitViz = GitViz ; MetaHell = MetaHell ; TS__ = self
+  GitViz = GitViz ; Headless = Headless
+  MetaHell = MetaHell ; TS__ = self
 
   TestSupport::Regret[ self ]
 
@@ -39,14 +41,15 @@ module Skylab::GitViz::TestSupport
     def build_listener
       GitViz::Services::PubSub[]::Listener::Spy_Proxy.new do |spy|
         spy.emission_a = @baked_em_a = []
-        spy.inspect_emission_proc = method( :inspect_emission )
+        spy.inspect_emission_proc =
+          method :inspect_emission_channel_and_payload
         spy.do_debug_proc = -> { do_debug }
         spy.debug_IO = debug_IO
       end
     end
 
-    def inspect_emission i_a, x
-      "#{ i_a.inspect }: #{  TS__::Expect::Inspect[ x ] }"
+    def inspect_emission_channel_and_payload i_a, x
+      "#{ i_a.inspect }: #{ TS__::Expect::Inspect[ x ] }"
     end
 
     def baked_em_a  # #hook-out: 'expect'

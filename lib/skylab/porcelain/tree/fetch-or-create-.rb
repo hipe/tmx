@@ -7,6 +7,7 @@ module Skylab::Porcelain
       Fields_[ self,
         :client,
         :do_create,
+        :else_p,
         :init_node,
         :node_payload,
         :path ]
@@ -38,6 +39,7 @@ module Skylab::Porcelain
             child = node[ slug ]
           end
           if ! child
+            @else_p and break r = @else_p[]
             @do_create or break
             child = node.class.new :slug, slug, :name_services, node
             @init_node and @init_node[ child ]
