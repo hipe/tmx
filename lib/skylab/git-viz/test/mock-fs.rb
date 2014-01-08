@@ -101,6 +101,16 @@ module Skylab::GitViz
           pn or tch_cached_pn path_s
         end
 
+        def get_some_mock_stat_of_path_s path_s
+          path_s = path_s.to_str
+          tn = any_tree_node_with_path_s path_s
+          if tn
+            Mock_Stat_.new tn.is_branch ? :directory_ftype : :file_ftype
+          else
+            raise ::Errno::ENOENT, path_s
+          end
+        end
+
         def does_path_s_exist path_s
           !! any_tree_node_with_path_s( path_s ) # #OCD
         end
@@ -182,12 +192,17 @@ module Skylab::GitViz
           @tree_path_x
         end
 
+        def to_path
+          to_str  # see
+        end
+
         def to_s
-          to_str
+          to_str  # see
         end
 
         def to_str
-          @path  # frozen means frozen so this might not comport #todo
+          @path  # frozen means frozen, so this does not comport with
+          # stdlib Pathname but we leave it here to detect suspicious mutation
         end
 
         def dirname
@@ -221,6 +236,10 @@ module Skylab::GitViz
 
         # ~ that talk to the FS
 
+        def stat
+          _FS.get_some_mock_stat_of_path_s @path
+        end
+
         def exist?
           _FS.does_path_s_exist @path
         end
@@ -240,6 +259,22 @@ module Skylab::GitViz
         def _FS
           @FS_p[]
         end
+      end
+
+      class Mock_Stat_
+        def initialize ftype_i
+          send :"set_ftype_to_#{ ftype_i }" ; nil
+        end
+        attr_reader :ftype
+      private
+        def set_ftype_to_directory_ftype
+          @ftype = DIRECTORY_FTYPE__ ; nil
+        end
+        def set_ftype_to_file_ftype
+          @ftype = FILE_FTYPE__
+        end
+        DIRECTORY_FTYPE__ = 'directory'.freeze
+        FILE_FTYPE__= 'file'.freeze
       end
 
       Exception_for_not_string_ = -> x do

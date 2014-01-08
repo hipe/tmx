@@ -76,7 +76,7 @@ module Skylab::MetaHell
 
     Define_method_ = -> mod, method_i, do_super do
       mod.send :define_method, method_i do |*a|
-        i_a = [ ] ; h = self.class::BASIC_FIELDS_H_  # #ancestor-const-ok
+        i_a = [] ; h = self.class::BASIC_FIELDS_H_  # #ancestor-const-ok
         while a.length.nonzero?
           i_a << ( i = a.shift )
           instance_variable_set h.fetch( i ), a.fetch( 0 )

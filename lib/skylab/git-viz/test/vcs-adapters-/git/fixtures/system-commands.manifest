@@ -1,0 +1,4 @@
+git show --numstat --pretty\=format:\%ai 123123	file mock-repo-1/show.123123.txt
+git show --numstat --pretty\=format:\%ai 123123	file mock-repo-1/show.123123.txt
+git show --numstat --pretty\=format:\%ai 345345	file mock-repo-1/show.345345.txt
+gerp --message\=\"hallo\"	file mock-repo-1/ohai.txt options {"chdir":"wa-da-da-dir"}

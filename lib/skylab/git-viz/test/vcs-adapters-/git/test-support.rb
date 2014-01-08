@@ -23,12 +23,19 @@ module Skylab::GitViz::TestSupport::VCS_Adapters_::Git
     end
 
     def build_front
-      GitViz::VCS_Adapters_::Git::Front.
-        new GitViz::VCS_Adapters_::Git, listener
+      _VCS_adapter_module::Front.new GitViz::VCS_Adapters_::Git, listener
     end
 
     def expect_result_for_failure  # #hook-out
       @result.should eql false
+    end
+
+    def execute_this_cmd( *a )
+      system_agent.execute_this_cmd_a a
+    end
+
+    def _VCS_adapter_module
+      GitViz::VCS_Adapters_::Git
     end
   end
 end

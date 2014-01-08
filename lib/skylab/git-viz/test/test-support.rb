@@ -56,4 +56,25 @@ module Skylab::GitViz::TestSupport
       @baked_em_a ||= build_baked_em_a
     end
   end
+
+  module Testable_Client  # read [#015] the testable client narrative intro.
+
+    DSL = -> mod do
+      mod.extend Test_Node_Module_Methods_ ; nil
+    end
+
+    module Test_Node_Module_Methods_
+    private
+      def testable_client_class i, & p
+        p_ = -> do  # #storypoint-20
+          r = p[] ; p_ = -> { r } ; r
+        end
+        instance_methods_module.module_exec do
+          define_method i do
+            p_[]
+          end
+        end ; nil
+      end
+    end
+  end
 end
