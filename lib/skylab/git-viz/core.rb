@@ -49,8 +49,11 @@ module Skylab::GitViz
 
     Basic = subsys[ :Basic ]
     Grit = memoize[ -> do require 'grit' ; ::Grit end ]
+    JSON = stdlib[ :JSON ]
     Open3 = stdlib[ :Open3 ]
     PubSub = subsys[ :PubSub ]
     Set = stdlib[ :Set ]
+    Shellwords = stdlib[ :Shellwords ]
+    StringScanner = memoize[ -> do require 'strscan' ; ::StringScanner end ]
   end
 end
