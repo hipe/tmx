@@ -5,7 +5,7 @@ module Skylab::GitViz
     module Expect
 
       def self.[] user_mod
-        user_mod.send :include, Expect::Instance_Methods__ ; nil
+        user_mod.send :include, Instance_Methods__ ; nil
       end
 
       Headless = GitViz::Headless
@@ -83,9 +83,26 @@ module Skylab::GitViz
           @matchee_x.should eql @expectation.matcher_x
         end
 
+        def expect_failed
+          expect_no_more_emissions
+          expect_result_for_failure  # :+#hook-out
+        end
+
         def expect_no_more_emissions
-          baked_em_a.length.zero? or fail "expected no more emissions, had: #{
-            }#{ baked_em_a.first.to_a.inspect }"
+          baked_em_a.length.zero? or fail say_expected_no_more_emissions
+        end
+
+        def say_expected_no_more_emissions
+          em = @baked_em_a.first
+          "expected no more emissions, had: #{ inspect_emission_object em }"
+        end
+
+        def inspect_emission_object em
+          inspect_emission_channel_and_payload em.channel_x, em.payload_x
+        end
+
+        def inspect_emission_channel_and_payload channel_x, payload_x
+          "#{ channel_x.inspect }: #{ Inspect[ payload_x ] }"
         end
       end
 
@@ -126,7 +143,7 @@ module Skylab::GitViz
       end
 
       Inspect = -> x do
-        Headless::Services::Basic::FUN::Inspect__[ 80, x ]
+        Headless::Services::Basic::FUN::Inspect__[ 120, x ]
       end
     end
   end

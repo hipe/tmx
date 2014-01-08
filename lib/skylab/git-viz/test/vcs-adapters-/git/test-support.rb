@@ -23,7 +23,12 @@ module Skylab::GitViz::TestSupport::VCS_Adapters_::Git
     end
 
     def build_front
-      GitViz::VCS_Adapters_::Git::Front.new TS__::Mocks, listener
+      GitViz::VCS_Adapters_::Git::Front.
+        new GitViz::VCS_Adapters_::Git, listener
+    end
+
+    def expect_result_for_failure  # #hook-out
+      @result.should eql false
     end
   end
 end

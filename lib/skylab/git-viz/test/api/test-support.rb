@@ -40,8 +40,7 @@ module Skylab::GitViz::TestSupport::API
         Listener::Class_from_diadic_matrix[ %i( info ), %i( line ) ]
     end ]
 
-    def expect_failed
-      expect_no_more_emissions
+    def expect_result_for_failure  # #hook-out
       @result.should eql false
     end
   end

@@ -142,5 +142,12 @@ module Skylab::GitViz::TestSupport::Mock_FS_Tests
         end
       end
     end
+
+    it "`relative_path_from`" do
+      from_pn = ::Pathname.new '/abc/lmn/op'
+      fugue '/abc/def/ghi' do |pn|
+        pn.relative_path_from from_pn
+      end
+    end
   end
 end

@@ -16,6 +16,9 @@ that create our fixtures) it apporaches our comfortable limit on coupling to
 "outside systems" when testing (generally accepted as problematic for unit-
 tyle tests), at least at some testing level.
 
+(also, chris was right: using the real life filesystem gets impractical for
+unit testing when you get into things like working with absolute paths.)
+
 this is why in our heads we got obsessed with wanting to have both "live" but
 scripted automated tests, and mocked tests. then we could make recordings of
 live responses and "play them back", which is the absolute best of both worlds

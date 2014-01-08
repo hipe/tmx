@@ -213,6 +213,12 @@ module Skylab::GitViz
 
         Plus__ = ::Pathname.new( '' ).method :plus
 
+        def relative_path_from x
+          x.respond_to?( :cleanpath ) or x = ::Pathname.new( x )
+          _pn = ::Pathname.new( @path ).relative_path_from x
+          inst_from_unsanitized _pn.instance_variable_get :@path
+        end
+
         # ~ that talk to the FS
 
         def exist?
