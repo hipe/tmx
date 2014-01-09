@@ -1,20 +1,20 @@
 #!/usr/bin/env ruby -w
 
-exit -> argv do
+exit -> program_name, stderr, argv do
 
-  y = ::Enumerator::Yielder.new( & $stderr.method( :puts ) )
+  y = ::Enumerator::Yielder.new( & stderr.method( :puts ) )
 
   r = nil ; _OK = 0 ; _NOPE = 1
 
   _DEFAULT_SUFFIX = '_GOOD.rb'
 
-  pn = -> { ::File.basename $PROGRAM_NAME }
+  pn = -> { ::File.basename program_name }
 
   invite_line = -> do
     "see #{ pn[] } -h"
   end
 
-  is_dry = suffix_arg = verbose = nil
+  do_reverse = is_dry = suffix_arg = verbose = nil
 
   if argv.length.nonzero?
     require 'optparse'
@@ -24,6 +24,11 @@ exit -> argv do
           "alpha-numeric, '-','_','.' OK, '..' is not)" do |x|
         suffix_arg = x
       end
+      o.on '-R', '--reverse',
+          "for each versioned file in the current directory tree",
+          "with unstaged changes, rename it to have SUFFIX appened.",
+          "attempts to abort atomicly if possible clobber.",
+          "(preview with -n)"  do do_reverse = true end
       o.on '-n', '--dry-run', "dry run." do
         is_dry = true
       end
@@ -34,7 +39,7 @@ exit -> argv do
       mgn = ' ' * title.length
       o.on '-h', '--help', 'this screen' do
         y << "usage: #{ pn[] } [options] [.]"
-        y << "#{ title }in the current directory, move every file #{
+        y << "#{ title }in the current directory tree, move every file #{
           }suffixed with \"#{ _DEFAULT_SUFFIX }\""
         y << "#{ mgn }back in \"place\". will attempt not to overwrite #{
           }modified files"
@@ -43,7 +48,6 @@ exit -> argv do
         op.summarize( & y.method( :<< ) )
         r = _OK
       end
-
     end
     begin
       op.parse! argv
@@ -98,11 +102,63 @@ exit -> argv do
     nil
   end
 
-  mod_h = { }
+  require 'fileutils'
+  fu = ::FileUtils
+  fu = ::Class.new.class_exec do
+    include ::FileUtils
+    def initialize y, vb, dr
+      @y = y ; @vb = vb ; @dr = dr
+    end
+    def mv a, b
+      super a, b, verbose: true, noop: @dr
+    end
+  private
+    def fu_output_message s
+      if @vb
+        @y << "(#{ s })"
+      else
+        @y << s
+      end
+    end
+    self
+  end.new y, verbose, is_dry
+
+  mod_a = [] ; mod_h = { }
   git_cmd[ "git ls-files --modified", -> line do
+    mod_a << line
     mod_h[ line ] = true
   end ]
   r and break r
+
+  if do_reverse
+    if mod_a.length.zero?
+      y << "there are no files that have modifications. nothing to do."
+      break _OK
+    end
+    _Unit_of_Work = ::Struct.new :from_path, :to_path
+    bad_a = nil ; good_a = []
+    mod_a.each do |s|
+      uow = _Unit_of_Work.new s, "#{ s }#{ suffix }"
+      if ::File.exist? uow.to_path
+        good_a &&= nil
+        (( bad_a ||= [] )) << uow
+      elsif good_a
+        good_a << uow
+      end
+    end
+    if bad_a
+      y << "cannot un-ungood: desintation file[s] exist[s]: (#{
+        }#{ bad_a.map( & :to_path ) * ', ' })"
+      break _NOPE
+    end
+    count = 0
+    good_a.each do |uow|
+      count += 1
+      fu.mv uow.from_path, uow.to_path
+    end
+    y << "moved #{ count } file(s) aside. done."
+    break _OK
+  end
 
   good_a = [] ; count = 0 ; collision_a = []
   rx = /\A(.+)#{ ::Regexp.escape suffix }\z/
@@ -136,26 +192,6 @@ exit -> argv do
     break _OK
   end
 
-  require 'fileutils'
-  fu = ::FileUtils
-  fu = ::Class.new.class_exec do
-    include ::FileUtils
-    def initialize y, vb, dr
-      @y = y ; @vb = vb ; @dr = dr
-    end
-    def mv a, b
-      super a, b, verbose: true, noop: @dr
-    end
-  private
-    def fu_output_message s
-      if @vb
-        @y << "(#{ s })"
-      else
-        @y << s
-      end
-    end
-    self
-  end.new y, verbose, is_dry
   count = 0
   good_a.each do |dst|
     count += 1
@@ -166,4 +202,4 @@ exit -> argv do
 
   _OK
 
-end.call ::ARGV
+end.call $PROGRAM_NAME, $stderr, ::ARGV
