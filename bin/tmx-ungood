@@ -1,0 +1,169 @@
+#!/usr/bin/env ruby -w
+
+exit -> argv do
+
+  y = ::Enumerator::Yielder.new( & $stderr.method( :puts ) )
+
+  r = nil ; _OK = 0 ; _NOPE = 1
+
+  _DEFAULT_SUFFIX = '_GOOD.rb'
+
+  pn = -> { ::File.basename $PROGRAM_NAME }
+
+  invite_line = -> do
+    "see #{ pn[] } -h"
+  end
+
+  is_dry = suffix_arg = verbose = nil
+
+  if argv.length.nonzero?
+    require 'optparse'
+    op = ::OptionParser.new do |o|
+      o.on '-s', '--suffix SUFFIX',
+          "use SUFFIX instead of \"#{ _DEFAULT_SUFFIX }\". (must be",
+          "alpha-numeric, '-','_','.' OK, '..' is not)" do |x|
+        suffix_arg = x
+      end
+      o.on '-n', '--dry-run', "dry run." do
+        is_dry = true
+      end
+      o.on '-v', '--verbose', 'verbose.' do
+        verbose = true
+      end
+      title = 'description: '
+      mgn = ' ' * title.length
+      o.on '-h', '--help', 'this screen' do
+        y << "usage: #{ pn[] } [options] [.]"
+        y << "#{ title }in the current directory, move every file #{
+          }suffixed with \"#{ _DEFAULT_SUFFIX }\""
+        y << "#{ mgn }back in \"place\". will attempt not to overwrite #{
+          }modified files"
+        y << "#{ mgn }(as seen through the eyes of «\e[32mgit\e[0m»)"
+        y << "options:"
+        op.summarize( & y.method( :<< ) )
+        r = _OK
+      end
+
+    end
+    begin
+      op.parse! argv
+    rescue ::OptionParser::ParseError => e
+      y << e.message
+      y << invite_line[]
+      r = _NOPE
+    end
+  end
+
+  r and break r
+
+  suffix = if suffix_arg
+    if /\A(?:[-_A-Za-z0-9]|\.(?!\.))+\z/ !~ suffix_arg
+      y << "suffix arg must be alpha-numic and cannot contain '..'#{
+        } (had: #{ suffix_arg.inspect })"
+      y << invite_line[]
+      break _NOPE
+    end
+    suffix_arg
+  else
+    _DEFAULT_SUFFIX
+  end
+
+  argv.length.nonzero? and '.' == argv.first and argv.shift
+
+  if argv.length.nonzero?
+    y << "unexpected argument: #{ argv[ 0 ] }"
+    y << invite_line[]
+    break _NOPE
+  end
+
+  require 'open3'
+
+  git_cmd = -> cmd, p do
+    verbose and y << cmd
+    _i, o, e, w = ::Open3.popen3 cmd
+    while (( s = e.gets ))
+      y << "(git-info: #{ s.chomp })"
+    end
+    if w.value.exitstatus.nonzero?
+      y << "nonzero exitstatus from git - #{ w.value.exitstatus }"
+      ( s = o.read ).length.zero? or ( y << "(out was: #{ s })" )
+      r = w.value.exitstatus
+    end
+    if ! r
+      while (( s = o.gets ))
+        s.chomp!
+        p[ s ]
+      end
+    end
+    nil
+  end
+
+  mod_h = { }
+  git_cmd[ "git ls-files --modified", -> line do
+    mod_h[ line ] = true
+  end ]
+  r and break r
+
+  good_a = [] ; count = 0 ; collision_a = []
+  rx = /\A(.+)#{ ::Regexp.escape suffix }\z/
+
+  git_cmd[ "git ls-files --others --exclude-standard --directory", -> line do
+    count += 1
+    md = rx.match line
+    md or next
+    stem = md[ 1 ]
+    collided = mod_h.fetch stem do
+      verbose and y << "(g: #{ stem })"
+      good_a << stem
+      false
+    end
+    if collided
+      y << "MODIFIED: #{ stem }"
+      collision_a << stem
+    end
+  end ]
+  r and break r
+
+  if collision_a.length.nonzero?
+    y << "we won't do this operation when the above files are modified"
+    y << invite_line[]
+    break _NOPE
+  end
+
+  if good_a.length.zero?
+    y << "no files found with suffix \"#{ suffix }\" (of #{ count } files)"
+    y << "nothing to do."
+    break _OK
+  end
+
+  require 'fileutils'
+  fu = ::FileUtils
+  fu = ::Class.new.class_exec do
+    include ::FileUtils
+    def initialize y, vb, dr
+      @y = y ; @vb = vb ; @dr = dr
+    end
+    def mv a, b
+      super a, b, verbose: true, noop: @dr
+    end
+  private
+    def fu_output_message s
+      if @vb
+        @y << "(#{ s })"
+      else
+        @y << s
+      end
+    end
+    self
+  end.new y, verbose, is_dry
+  count = 0
+  good_a.each do |dst|
+    count += 1
+    src = "#{ dst }#{ suffix }"
+    fu.mv src, dst
+  end
+  y << "#{ pn[] } moved #{ count } file(s) back#{ is_dry && ' (dry)' }. done."
+
+  _OK
+
+end.call ::ARGV
