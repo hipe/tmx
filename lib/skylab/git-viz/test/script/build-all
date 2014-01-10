@@ -1,0 +1,22 @@
+#!/usr/bin/env zsh
+
+# read [#017] the fixtures building narrative
+
+() {  # resolve $GV
+
+  [[ -z "$GV" ]] || return 0
+
+  typeset self="./test/script/build-all"
+
+  if [[ ! -x "${self}" ]] ; then
+    print -- "$0 must be run from [gv] for now. aborting." 1>&2
+    exit 1
+  fi
+
+  GV=$( pwd )
+
+}
+
+source $GV/test/zsh-lib/init.zsh
+
+gv-build all $*

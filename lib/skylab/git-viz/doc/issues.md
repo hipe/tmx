@@ -1,3 +1,4 @@
+[#017]       #parent-node:[#014] the fixtures building narrative ..
 [#016]       #parent-node:[#011] the git repo narrative ..
 [#015]       #parent-node:[#014] the testable client narrative ..
 [#014]       #parent-node:[#005] testing narratives

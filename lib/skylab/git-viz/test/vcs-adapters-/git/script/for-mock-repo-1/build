@@ -1,0 +1,39 @@
+#!/usr/bin/env zsh
+
+# ~ (our first ever top-down narrative in shell)
+
+me=$0 ; rest=($*)
+
+-build () {
+  typeset component_path=$( dirname $me )
+  typeset script_path=$( dirname $component_path )
+  VCS_DIR=$( dirname $script_path )
+  typeset vcs=$( basename $VCS_DIR )
+  source $VCS_DIR/zsh-lib/init-functions.zsh
+  typeset compstem=$( component-stem-from-component-path $component_path )
+  typeset build_repo=$component_path/build-repo
+  typeset output_dir="tmp.$vcs.$compstem"
+  -build-repo-if-necessary $output_dir
+  -exit-if-failure $?
+  build-dumps-for-repo $output_dir || return $?
+  process-dumps-for-repo $output_dir
+}
+
+-build-repo-if-necessary () {
+  typeset output_dir=$1
+  if [[ -d $output_dir ]] ; then
+    print "using $output_dir" 1>&2
+  else
+    $build_repo $output_dir
+  fi
+}
+
+-exit-if-failure () {
+  typeset exitstatus=$1
+  if (( 0 != $exitstatus )) ; then
+    print "aborting due to exitstatus $exitstatus." 1>&2
+    exit exitstatus
+  fi
+}
+
+-build

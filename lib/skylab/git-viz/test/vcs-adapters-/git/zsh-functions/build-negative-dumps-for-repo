@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh  # (for syntax hightlighting only. this is a function.)
+
+typeset dirname=$1
+
+print "(one day we will build negative dumps for ($dirname))"
+
+return 0

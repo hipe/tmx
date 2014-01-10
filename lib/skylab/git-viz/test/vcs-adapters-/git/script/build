@@ -1,0 +1,21 @@
+#!/usr/bin/env zsh
+
+[[ -z $GV ]] && return 1
+
+typeset fstem=$1 ; shift
+typeset -a rest
+rest=($*)
+
+typeset VCS='git'
+VCS_DIR=$GV/test/vcs-adapters-/$VCS
+
+source $VCS_DIR/zsh-lib/init-functions.zsh
+
+() {
+  typeset func="build-${fstem}"
+  if (( ! $+functions[$func] )) ; then
+    print "no such function \"$func\" for $VCS" 1>&2
+    exit 1
+  fi
+  $func $rest
+}

@@ -1,0 +1,101 @@
+#!/usr/bin/env zsh  # (just to get syntax highlighting)
+
+# assumes sibling functions are registered with the autoloader.
+
+typeset me=$0 ; typeset tmp_dirname=$1
+
+-process-dumps-for-repo () {
+  validate-repo-dir-as-only-parameter $tmp_dirname $me || return $?
+  -resolve-VCS-name || return $?
+  -resolve-repo-stem || return $?
+  -resolve-VCS-path || return $?
+  -resolve-VCS-script-path || return $?
+  -resolve-output-dir-for-dump || return $?
+  -normalize-every-date-on-every-first-line-of-every-dumpfile || return $?
+  -move-dumps-to-their-final-resting-place || return $?
+  -after-dumps-were-moved-successfully
+}
+
+typeset vcs_name
+-resolve-VCS-name () {
+  vcs_name=$( resolve-VCS-name-from-tmp-dirname $tmp_dirname )
+  [[ "" == "$vcs_name" ]] && return 1
+  return 0
+}
+
+typeset repo_stem
+-resolve-repo-stem () {
+  repo_stem=$( print $tmp_dirname | sed -E 's/^tmp\.[a-z]+\.(.+)$/\1/' )
+  print "repo stem yes: $repo_stem"
+}
+
+typeset vcs_path
+-resolve-VCS-path () {
+  vcs_path="./test/vcs-adapters-/$vcs_name"
+  print "vcs path yes: $vcs_path"
+}
+
+typeset script_path
+-resolve-VCS-script-path () {
+  script_path="$vcs_path/script"
+  print "script path yes: $script_path"
+}
+
+typeset output_dir
+-resolve-output-dir-for-dump () {
+  output_dir="$vcs_path/fixtures/$repo_stem"
+  if [[ -d "$output_dir" ]] ; then
+    return 0
+  else
+    print "mkdir -p $output_dir" 1>&2
+    mkdir -p "$output_dir"
+  fi
+}
+
+-normalize-every-date-on-every-first-line-of-every-dumpfile () {
+  typeset line
+  find "$tmp_dirname" -name "tmp.show.*" | while read line ; do
+    "$script_path/normalize-date-on-first-line" "$line"
+  done
+}
+
+-move-dumps-to-their-final-resting-place () {
+  typeset line
+  find "$tmp_dirname" -name "tmp.show.*" | while read line ; do
+    -move-dump-to-its-final-resting-place $line
+  done
+}
+
+-move-dump-to-its-final-resting-place () {
+  typeset line=$1 bn sha dest cmd
+  bn=$(basename $line)
+  sha=$( print $bn | sed -E 's/tmp\.show\.([a-z0-9]+)\.txt$/\1/' )
+  dest="$output_dir/show.$sha.txt"
+  if [[ ! -e "$line" ]] ; then
+    print "wtf no source file - $line" 1>&2 ; return 1
+  elif [[ -e "$dest" ]] ; then
+    -will-not-move-dump-file-because-destination-exists "$line" "$dest"
+  else
+    print "YAY: mv $line $dest"
+    mv $line $dest
+  fi
+}
+
+-will-not-move-dump-file-because-destination-exists () {
+  typeset line=$1 dest=$2
+  cmp "$line" "$dest"
+  if (( 0 == $? )) ; then
+    print "no change, skipping: $dest" 1>&2
+    return 0
+  else
+    print "STRANGE! files were different. won't clobber $dest"
+    return 1
+  fi
+}
+
+-after-dumps-were-moved-successfully () {
+  print "done. (NOTE inpsect $tmp_dirname if you want, or erase it)" 1>&2
+  return 0
+}
+
+-process-dumps-for-repo

@@ -1,0 +1,19 @@
+#!/usr/bin/env zsh  # (only for syntax highlighting)
+
+required-environment-parameter GV "$GV" $0 || return $?
+required-environment-parameter VCS_DIR "$VCS_DIR" $0 || return $?
+
+typeset -a rest
+rest=($*)
+
+() {
+  typeset scriptdir=$VCS_DIR/script pth bld
+  for pth ($scriptdir/for-mock-*) ; do
+    bld=$pth/build
+    if [[ ! -x $bld ]] ; then
+      print "not executable, skipping: $bld" 1>&2
+    else
+      $bld $rest
+    fi
+  done
+}

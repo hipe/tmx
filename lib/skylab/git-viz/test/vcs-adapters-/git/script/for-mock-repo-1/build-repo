@@ -1,10 +1,20 @@
 #!/usr/bin/env bash
 
-dirname="tmp.mock-repo-1"
+dirname=$1
+
+function serr {
+  echo "$@" 1>&2
+}
+
+if [[ "" = $dirname ]] ; then
+  serr "usage: $0 <dirname>" ; exit 1
+fi
+
+dirname="tmp.git.mock-repo-1"
 git="git"
 
 if [[ -e "$dirname" ]] ; then
-  echo "exists, aborting: $dirname"
+  serr "exists, aborting: $dirname"
   exit 1
 fi
 
@@ -65,4 +75,5 @@ echo "one-line" > "$file_3_a"
 "$git" mv "$file_3_a" "$file_3_b"
 "$git" commit -m "commit to be treated as commit 234234" >> log
 
-echo "finished writing 4 commits (the last 3 are for the story). see 'log'."
+serr "finished writing 4 commits (the last 3 are for the story). see 'log'."
+exit 0
