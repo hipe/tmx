@@ -49,3 +49,15 @@ writing, then it will always work out: whenever we chose a name for a function
 and that name has already been taken, then we should either use that existnig
 function or rename both of them! maybe this is why C has remained so popular
 all of these decades.
+
+
+
+## #pain-with-regexen-in-find
+
+our manpage for `find` (from BSD, february 2008) explains an `-E` options,
+yet the `find` on our system (whatever it is) supports no such option.
+(and apparently the regex engine it uses is not of the extended variety -
+there appears to be no support for the "kleene-plus" postfix operator '+' on
+my `find`). the topic regex works on our system without the `-E` flag, but if
+this ever causes pain we should switch to ruby for this, if for no other
+reason than to reduce the number of dependencies.

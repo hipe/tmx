@@ -1,7 +1,51 @@
 #!/usr/bin/env zsh  # (for syntax hightlighting only. this is a function.)
 
 typeset dirname=$1
+shift
+typeset -a rest
+rest=($*)
 
-print "(one day we will build negative dumps for ($dirname))"
+if [[ "" == "$dirname" ]] ; then
+  print "usage: $0 <dirname>" 1>&2 ; return 1
+fi
 
-return 0
+-build-negative-dumps-for-repo () {
+  -resolve-src_dir || return $?
+  -run-any-negatives-builder-in-src-dir
+}
+
+typeset src_dir
+-resolve-src_dir () {
+  -hack-VCS-name-and-component || return $?
+  src_dir="test/vcs-adapters-/$vcs/script/for-${component}"
+  if [[ ! -d "$src_dir" ]] ; then
+    print "oops - $src_dir"
+    return 1
+  fi
+}
+
+typeset component vcs
+-hack-VCS-name-and-component () {
+  typeset -a lines
+  lines=($( echo "$dirname" | sed -E 's/^tmp\.([^.]+)\.(.+)$/\1\
+  \2/' ))
+  vcs=$lines[1] ; component=$lines[2]
+}
+
+typeset negpath
+-run-any-negatives-builder-in-src-dir () {
+  negpath="$src_dir/build-negatives"
+  if [[ -e $negpath ]] ; then
+    -run-negatives-builder-in-src-dir
+  fi
+}
+
+-run-negatives-builder-in-src-dir () {
+  if [[ ! -x $negpath ]] ; then
+    print "must be executable - $negpath" 1>&2
+    return 1
+  fi
+  $negpath "$dirname" $rest
+}
+
+-build-negative-dumps-for-repo

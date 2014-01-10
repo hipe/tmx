@@ -15,7 +15,7 @@ me=$0 ; rest=($*)
   typeset output_dir="tmp.$vcs.$compstem"
   -build-repo-if-necessary $output_dir
   -exit-if-failure $?
-  build-dumps-for-repo $output_dir || return $?
+  build-dumps-for-repo $output_dir $rest || return $?
   process-dumps-for-repo $output_dir
 }
 

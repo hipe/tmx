@@ -1,0 +1,73 @@
+#!/usr/bin/env zsh
+
+me=$0 ; tmp_dirname=$1
+
+-build-negatives () {
+  -load-lib || return $?
+  -resolve-VCS-exe-name || return $?
+  validate-repo-dir-as-only-parameter $tmp_dirname $me || return $?
+  -build-negatives-triad-in-the-directory || return $?
+  -persist-the-negatives
+}
+
+typeset vcs_dir
+-load-lib () {
+  vcs_dir=$( echo $me | \
+    ruby -lne 'p = File.method(:dirname) ; puts p[p[p[$_]]]' )
+  if [[ -d $vcs_dir ]] ; then
+    typeset VCS_DIR=$vcs_dir
+    source $vcs_dir/zsh-lib/init-functions.zsh
+  else
+    print "oops - ($vcs_dir)" 1>&2
+    return 1
+  fi
+}
+
+typeset vcs_exe vcs
+-resolve-VCS-exe-name () {
+  vcs_exe=$( resolve-VCS-name-from-tmp-dirname "$tmp_dirname" ) || return $?
+  vcs=$vcs_exe
+}
+
+-build-negatives-triad-in-the-directory () {
+  cd "$tmp_dirname"
+  -build-negatives-inside-of-directory
+  typeset exitstatus=$?
+  cd ..
+  return exitstatus
+}
+
+typeset transient_iam transient_out transient_err
+-build-negatives-inside-of-directory () {
+  transient_out=tmp.show.456456.out.txt
+  transient_err=tmp.show.456456.err.txt
+  transient_iam=tmp.show.456456.iam.txt
+  $vcs_exe show --numstat --pretty=format:%ai 456456 -- \
+    1>"$transient_out" 2>"$transient_err"
+  typeset exitstatus=$?
+  print "exitstatus $exitstatus" > "$transient_iam"
+}
+
+-persist-the-negatives () {
+  -resolve-dest-dir || return $?
+  if [[ -s $transient_out ]] ; then
+    print "fix me - expecting NO output, had some in $transient_out" >1&2
+    return 1
+  fi
+  typeset dst=$( -tmpfile-basename "$transient_err" )
+  typeset dest=$dest_dir/$dst
+  persist-generated-file "$tmp_dirname/$transient_err" "$dest"
+}
+
+typeset dest_dir
+-resolve-dest-dir () {
+  typeset stem
+  stem=$( print $tmp_dirname | sed -E 's/^[^.]+\.[^.]+\.(.+)$/\1/' )
+  dest_dir="$vcs_dir/fixtures/$stem"
+}
+
+-tmpfile-basename () {
+  print "$1" | sed -E 's/^tmp\.//'
+}
+
+-build-negatives

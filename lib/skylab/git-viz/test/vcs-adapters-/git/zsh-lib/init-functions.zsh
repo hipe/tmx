@@ -2,9 +2,10 @@
 
 build-dumps-for-repo () {
   typeset tmp_dirname=$1
+  shift
   validate-repo-dir-as-only-parameter "$tmp_dirname" $0 || return $?
   build-positive-dumps-for-repo $tmp_dirname || return $?
-  build-negative-dumps-for-repo $tmp_dirname
+  build-negative-dumps-for-repo $tmp_dirname $*
 }
 
 validate-repo-dir-as-only-parameter () {

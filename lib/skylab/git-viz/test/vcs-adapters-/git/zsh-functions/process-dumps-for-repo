@@ -26,19 +26,16 @@ typeset vcs_name
 typeset repo_stem
 -resolve-repo-stem () {
   repo_stem=$( print $tmp_dirname | sed -E 's/^tmp\.[a-z]+\.(.+)$/\1/' )
-  print "repo stem yes: $repo_stem"
 }
 
 typeset vcs_path
 -resolve-VCS-path () {
   vcs_path="./test/vcs-adapters-/$vcs_name"
-  print "vcs path yes: $vcs_path"
 }
 
 typeset script_path
 -resolve-VCS-script-path () {
   script_path="$vcs_path/script"
-  print "script path yes: $script_path"
 }
 
 typeset output_dir
@@ -52,16 +49,19 @@ typeset output_dir
   fi
 }
 
+
+typeset output_rx='.*/tmp\.show\.[a-z0-9][a-z0-9]*\.txt'  # [#017] #pain-with-
+
 -normalize-every-date-on-every-first-line-of-every-dumpfile () {
   typeset line
-  find "$tmp_dirname" -name "tmp.show.*" | while read line ; do
+  find "$tmp_dirname" -regex "$output_rx" | while read line ; do
     "$script_path/normalize-date-on-first-line" "$line"
   done
 }
 
 -move-dumps-to-their-final-resting-place () {
   typeset line
-  find "$tmp_dirname" -name "tmp.show.*" | while read line ; do
+  find "$tmp_dirname" -regex "$output_rx" | while read line ; do
     -move-dump-to-its-final-resting-place $line
   done
 }
@@ -71,30 +71,11 @@ typeset output_dir
   bn=$(basename $line)
   sha=$( print $bn | sed -E 's/tmp\.show\.([a-z0-9]+)\.txt$/\1/' )
   dest="$output_dir/show.$sha.txt"
-  if [[ ! -e "$line" ]] ; then
-    print "wtf no source file - $line" 1>&2 ; return 1
-  elif [[ -e "$dest" ]] ; then
-    -will-not-move-dump-file-because-destination-exists "$line" "$dest"
-  else
-    print "YAY: mv $line $dest"
-    mv $line $dest
-  fi
-}
-
--will-not-move-dump-file-because-destination-exists () {
-  typeset line=$1 dest=$2
-  cmp "$line" "$dest"
-  if (( 0 == $? )) ; then
-    print "no change, skipping: $dest" 1>&2
-    return 0
-  else
-    print "STRANGE! files were different. won't clobber $dest"
-    return 1
-  fi
+  persist-generated-file "$line" "$dest"
 }
 
 -after-dumps-were-moved-successfully () {
-  print "done. (NOTE inpsect $tmp_dirname if you want, or erase it)" 1>&2
+  print "done. (inpsect $tmp_dirname if you want, or delete it)" 1>&2
   return 0
 }
 

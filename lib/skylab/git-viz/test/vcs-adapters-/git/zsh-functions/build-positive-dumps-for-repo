@@ -56,7 +56,7 @@ typeset vcs_exe
 
 -create-the-VCS-commands-file-from-the-readable-logfile () {
   sed -E "
-s/^treat commit ([a-z0-9]+) as ([a-z0-9]+)$/$vcs_show_cmd \1 > tmp.show.\2.txt/
+s/^treat commit ([a-z0-9]+) as ([a-z0-9]+)$/$vcs_show_cmd \1 -- > tmp.show.\2.txt/
   " < "$readable_log" > "$vcs_lines"
 }
 
