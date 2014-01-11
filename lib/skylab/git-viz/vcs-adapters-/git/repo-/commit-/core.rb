@@ -60,6 +60,36 @@ module Skylab::GitViz
             " (of #{ @file_numstat_h.length } files affected by that commit)"
           end
         end
+
+        class Pool
+          def initialize repo, sys_cond, listener
+            @cache_h = {} ; @commit_class = repo.class::Commit_
+            @listener = listener ; @repo = repo ; @system_conduit = sys_cond
+          end
+          def SHA_notify sha
+            r = true
+            @cache_h.fetch sha do |hash_key|
+              ci = rslv_any_ci sha
+              if ci
+                @cache_h[ hash_key ] = ci
+              else
+                r = ci
+              end
+            end
+            r
+          end
+        private
+          def rslv_any_ci sha
+            @commit_class.build_ci @repo, sha, @listener do |ci|
+              ci.set_system_conduit @system_conduit
+            end
+          end
+        public
+          def close_pool
+            a = @cache_h.values.freeze ; @cache_h = :_closed_
+            @commit_class::Rink_.build_rink a
+          end
+        end
       end
     end
   end

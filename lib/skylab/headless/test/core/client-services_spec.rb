@@ -49,7 +49,7 @@ module Skylab::Headless::TestSupport::CS__
         end
       end
 
-      it "x", f:true do
+      it "x" do
         expect_argument_error_ish do
           Client_Svcs.new :a, :b, :c
         end

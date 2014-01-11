@@ -14,7 +14,7 @@ module Skylab::GitViz
           yield args = Args__.new
           @cmd_s_a, @chdir_pathname, @system_conduit = args.to_a
         end
-        @system_conduit ||= GitViz::Services::Open3[]
+        @system_conduit or raise ::ArgumentError, "system conduit not present"
         nil
       end
 

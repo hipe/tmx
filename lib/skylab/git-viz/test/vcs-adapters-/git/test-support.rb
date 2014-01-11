@@ -23,7 +23,21 @@ module Skylab::GitViz::TestSupport::VCS_Adapters_::Git
     end
 
     def build_front
-      _VCS_adapter_module::Front.new GitViz::VCS_Adapters_::Git, listener
+      front_class.new GitViz::VCS_Adapters_::Git, listener do |f|
+        f.set_system_conduit system_conduit
+      end
+    end
+
+    def system_conduit
+    end
+
+    def front_class
+      _VCS_adapter_module::Front
+    end
+
+    def _VCS_const i
+      _VCS_adapter_module::Front.class  # always ensure this is loaded first
+      _VCS_adapter_module.const_get i, false
     end
 
     def expect_result_for_failure  # #hook-out

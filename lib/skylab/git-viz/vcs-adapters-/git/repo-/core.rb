@@ -4,23 +4,52 @@ module Skylab::GitViz
 
     class Repo_  # read [#016] the git repo narrative for storypoints
 
-      def self.[] pathname, listener
-        self::Resolve__.new( self, pathname, listener ).execute
+      def self.build_repo pathname, listener, & repo_option_p
+        pn = self::Resolve__.new( self, pathname, listener ).execute
+        pn and new( pn, pathname, listener, & repo_option_p )
       end
 
       def initialize absolute_pn, focus_dir_absoulte_pn, listener
         @listener = listener
-        @focus_dir_relpath_pn = focus_dir_absoulte_pn.
-          relative_path_from( absolute_pn )
         @absolute_pn = absolute_pn
         @ci_pool_p = -> { init_ci_pool }
+        @focus_dir_relpath_pn = focus_dir_absoulte_pn.
+          relative_path_from( absolute_pn )
+        yield self
         # MetaHell::FUN.without_warning { GitViz::Services::Grit[] }  # see [#016]:#as-for-grit
         # @inner = ::Grit::Repo.new absolute_pn.to_path ; nil
       end
 
+      attr_writer :system_conduit
+
       def absolute_pathname
         @absolute_pn
       end
+
+      # ~ the commit pool
+
+      def SHA_notify sha
+        commit_pool.SHA_notify sha
+      end
+    private
+      def commit_pool
+        @ci_pool_p[]
+      end
+      def init_ci_pool
+        ci_pool = bld_ci_pool ; @ci_pool_p = -> { ci_pool } ; ci_pool
+      end
+      def bld_ci_pool
+        self.class::Commit_::Pool.new self, @system_conduit, @listener
+      end
+    public
+      def close_the_pool
+        @commit_manifest = commit_pool.close_pool
+        @ci_pool_p = -> { raise "the pool's closed" }
+        @commit_manifest && PROCEDE_
+      end
+      attr_reader :commit_manifest
+
+      # ~ private helper classes
 
       class Resolve__  # this looks like a :+[#st-007] tree walk
 
@@ -41,7 +70,7 @@ module Skylab::GitViz
             pn = pn.dirname
           end while true
           @count = count
-          did_fail ? when_did_fail : when_did_succeed( pn )
+          did_fail ? when_did_fail : pn
         end
         TOP__ = '/'.freeze
       private
@@ -54,9 +83,6 @@ module Skylab::GitViz
         def say_didnt_find_repo_implementation_dir
           "Didn't find #{ IMPLEMENTATION_DIR_ } in this or any parent #{
             }directory (looked in #{ @count } dirs): #{ @pn }"
-        end
-        def when_did_succeed pn
-          @repo_cls.new pn, @pn, @listener
         end
       end
 
@@ -80,6 +106,9 @@ module Skylab::GitViz
 
         def initialize sha_i
           @SHA_i = sha_i ; freeze
+        end
+        def as_symbol
+          @SHA_i
         end
         def hash
           @SHA_i.hash

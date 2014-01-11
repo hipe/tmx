@@ -12,7 +12,7 @@ effort. generally an "agent" (again in this context) is the smallest object
 that still *does* something (as oppose to a pure data structure). they are
 often shortlived, created just to resolve one value or one side-effect.
 
-often "agents" are named after verbs, and can be thought of as glorified
+often "agents" are named after verbs and can be thought of as glorified
 functions. (we might even start calling them "method classes"). often but not
 always an agent at this level corresponds to one particular system command
 executed against the VCS.

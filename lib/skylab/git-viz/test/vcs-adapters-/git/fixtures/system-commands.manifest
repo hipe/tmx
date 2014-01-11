@@ -2,7 +2,7 @@ git show --numstat --pretty\=tformat:\%ai 123123 --
   options {"chdir":"/derp/berp"}
   file mock-repo-1/show.123123.txt
 
-git show --numstat --pretty\=tformat:\%ai 23234 --
+git show --numstat --pretty\=tformat:\%ai 234234 --
   options {"chdir":"/derp/berp"}
   file mock-repo-1/show.234234.txt
 

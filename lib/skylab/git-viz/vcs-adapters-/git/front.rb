@@ -4,13 +4,21 @@ module Skylab::GitViz
 
     class Front
 
-      def initialize context_mod, listener
+      def initialize context_mod, listener, & extra_p
         @context_mod = context_mod
         @listener = listener
+        yield self
+        freeze
+      end
+
+      def set_system_conduit x
+        @system_conduit = x ; nil
       end
 
       def procure_repo_from_pathname pn
-        @context_mod::Repo_[ pn, @listener ]
+        @context_mod::Repo_.build_repo pn, @listener do |repo|
+          repo.system_conduit = @system_conduit
+        end
       end
 
       def ping

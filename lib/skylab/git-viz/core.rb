@@ -10,7 +10,6 @@ module Skylab::GitViz
   MetaHell::MAARS[ self ]
 
   module CLI
-    SUCCEEDED_ = true
     MetaHell::MAARS::Upwards[ self ]
 
     module Actions__
@@ -21,6 +20,8 @@ module Skylab::GitViz
   module VCS_Adapters_
     MetaHell::Boxxy[ self ]
   end
+
+  SUCCEEDED_ = true
 
   module Services
     memoize = -> p do
