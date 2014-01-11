@@ -18,8 +18,6 @@ module Skylab::GitViz
     end
   end
 
-  stowaway :API, 'api/session--'
-
   module VCS_Adapters_
     MetaHell::Boxxy[ self ]
   end
@@ -48,6 +46,7 @@ module Skylab::GitViz
     end
 
     Basic = subsys[ :Basic ]
+    DateTime = memoize[ -> do require 'date' ; ::DateTime end ]
     Grit = memoize[ -> do require 'grit' ; ::Grit end ]
     JSON = stdlib[ :JSON ]
     Open3 = stdlib[ :Open3 ]
@@ -55,5 +54,8 @@ module Skylab::GitViz
     Set = stdlib[ :Set ]
     Shellwords = stdlib[ :Shellwords ]
     StringScanner = memoize[ -> do require 'strscan' ; ::StringScanner end ]
+
   end
+
+  stowaway :API, 'api/session--'
 end

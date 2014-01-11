@@ -500,7 +500,7 @@ module Skylab::Flex2Treetop
       def rslv_some_outstream_moniker_when_IO
         PAYSTREAM__
       end
-      PAYSTREAM__ = "«paystream»".freeze  # "guillemets"
+      PAYSTREAM__ = "«paystream»".freeze  # :+#guillemets
 
       def is_nonstandard_endpoint
         @do_show_sexp_only || @endpoint_is_FS_parser

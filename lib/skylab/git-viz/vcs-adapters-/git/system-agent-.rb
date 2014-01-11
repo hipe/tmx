@@ -4,6 +4,10 @@ module Skylab::GitViz
 
     class System_Agent_  # read [#008] the agent narrative for a statement of purpose
 
+      def self.call * a, & p
+        new( * a, & p ).execute
+      end
+
       def initialize listener
         @listener = listener
         if block_given?

@@ -49,7 +49,7 @@ module Skylab::GitViz::TestSupport::Mock_System_Tests
         -> do
           popn3 'no-way', 'jose'
         end.should raise_error ::KeyError,
-          /\bnot in the manifest: no-way jose/
+          /\bnot in the manifest: [«'"]?no-way jose/
       end
 
       it "multiple commands" do

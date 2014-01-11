@@ -27,7 +27,7 @@ module Skylab::TanMan::TestSupport::Sexp
     -> do
       pen = Headless::CLI::Pen::Minimal.new
       def pen.escape_path str
-        "«#{ str }»"                # "guillemets" just for fun and practice
+        "«#{ str }»"                # :+#guillemets just for fun and practice
       end
 
       sin, sout, serr = Headless::System::IO.some_three_IOs

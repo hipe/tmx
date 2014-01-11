@@ -26,7 +26,7 @@ module Skylab::Basic
       private
         def peeker
           @peeker ||= Peeker__.new self
-        end
+        end ; nil
       end ; define_singleton_method :to_proc do to_proc end
 
       class Peeker__

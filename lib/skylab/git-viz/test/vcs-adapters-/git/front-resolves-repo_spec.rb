@@ -19,12 +19,12 @@ module Skylab::GitViz::TestSupport::VCS_Adapters_::Git
     end
 
     it "just go ahead and TRY to give this low-level nerk a relpath" do
-      expect_realtive_paths_are_not_honored_here do
+      expect_relative_paths_are_not_honored_here do
         with_procure_from_mock_pathname 'anything'
       end
     end
 
-    def expect_realtive_paths_are_not_honored_here &p
+    def expect_relative_paths_are_not_honored_here &p
       p.should raise_error ::ArgumentError,
         "relative paths are not honored here - anything"
     end

@@ -1,4 +1,20 @@
-git show --numstat --pretty\=format:\%ai 123123	file mock-repo-1/show.123123.txt
-git show --numstat --pretty\=format:\%ai 123123	file mock-repo-1/show.123123.txt
-git show --numstat --pretty\=format:\%ai 345345	file mock-repo-1/show.345345.txt
-gerp --message\=\"hallo\"	file mock-repo-1/ohai.txt options {"chdir":"wa-da-da-dir"}
+git show --numstat --pretty\=tformat:\%ai 123123 --
+  options {"chdir":"/derp/berp"}
+  file mock-repo-1/show.123123.txt
+
+git show --numstat --pretty\=tformat:\%ai 23234 --
+  options {"chdir":"/derp/berp"}
+  file mock-repo-1/show.234234.txt
+
+git show --numstat --pretty\=tformat:\%ai 345345 --
+  options {"chdir":"/derp/berp"}
+  file mock-repo-1/show.345345.txt
+
+gerp --message\=\"hallo\"
+  options {"chdir":"wa-da-da-dir"}
+  file mock-repo-1/ohai.txt
+
+git show --numstat --pretty\=tformat:\%ai 456456 --
+  options {"chdir":"/derp/berp"}
+  serr file mock-repo-1/show.456456.err.txt
+  exitstatus 128

@@ -45,7 +45,7 @@ typeset vcs_lines="tmp.2.vcs-lines"
 typeset vcs_show_cmd
 -resolve-the-VCS-show-command () {
   -resolve-the-VCS-executable-from-the-tmpdir-name || return $?
-  vcs_show_cmd="$vcs_exe show --numstat --pretty=format:%ai"
+  vcs_show_cmd="$vcs_exe show --numstat --pretty=tformat:%ai"
 }
 
 typeset vcs_exe

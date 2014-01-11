@@ -56,70 +56,145 @@ module Skylab::GitViz
       class Mock_System_Conduit_
         def initialize pn
           @h = {} ; pn.open 'r' do |fh|
-            line = fh.gets or fail "empty command manifest file: #{ fh.path }"
-            begin
-              parse_line line
-            end while (( line = fh.gets ))
+            Parse_Manifest_.new( fh, method( :accpt_line ) ).execute
           end
           @manifest_dirname_pn = pn.dirname ; nil
         end
       private
-        def parse_line line
-          line.chop!
-          accpt_line( * line.split( RECORD_SEPARATOR__, -1 ) )
-        end
-        RECORD_SEPARATOR__ = "\t".freeze
-        def accpt_line cmd_s, op_s
-          cmd = Stored_Command_.new cmd_s.freeze, op_s
+        def accpt_line cmd_s, iam_s_a
+          cmd = Stored_Command_.new cmd_s.freeze, iam_s_a
           ( @h.fetch cmd.cmd_s do |k|
             @h[ k ] = []
           end ) << cmd ; nil
         end
       end
 
-      class Stored_Command_
-        def initialize cmd_s, op_s
-          @cmd_s = cmd_s ; @did_parse = false ; @op_s = op_s ; nil
+      class Parse_Manifest_
+        def initialize fh, p  # NOTE mutates filehandle to be a peeking scanner
+          GitViz::Services::Basic[]::List::Scanner::With[ fh, :peek ]
+          @accept_line_p = p ; @fh = fh
         end
-        attr_reader :cmd_s, :is_opened
+        def execute
+          line = @fh.gets or fail "empty command manifest file: #{ fh.path }"
+          begin
+            parse_entry line
+          end while (( line = @fh.gets )) ; nil
+        end
+      private
+        def parse_entry line
+          line.chop!
+          @_chopped_s_a = []  # be careful, we are iterate over many of these
+          key_s, any_rest_of_line = line.split RECORD_SEPARATOR__, -1
+          any_rest_of_line and @_chopped_s_a << any_rest_of_line
+          parse_any_sublines
+          @_chopped_s_a.length.zero? and fail say_no_content line
+          @accept_line_p[ key_s, @_chopped_s_a ] ; nil
+        end
+        RECORD_SEPARATOR__ = "\t".freeze
+        def parse_any_sublines
+          while true
+            (( line = @fh.peek )) or break
+            if NEWLINE__ == line.getbyte( 0 )  # here is how we skip empty lines
+              @fh.gets
+              next
+            end
+            SPACE__ == line.getbyte( 0 ) or break
+            @fh.gets
+            @_chopped_s_a << line.chop!  # we live dangerously
+          end ; nil
+        end
+        SPACE__ = ' '.getbyte 0 ; NEWLINE__ = "\n".getbyte 0
+        def say_no_content line
+          "must be followed by either a tab characer or \"sub-lines\":#{
+            }#{ line.inspect }"
+        end
+      end
+
+      class Stored_Command_
+        def initialize cmd_s, iam_s_a
+          @cmd_s = cmd_s ; @did_parse = false
+          @has_out_dumpfile = @has_err_dumpfile = nil
+          @iam_s_a = iam_s_a ; nil
+        end
+        attr_reader :cmd_s, :err_dumpfile_s,
+          :has_err_dumpfile, :has_out_dumpfile,
+          :is_opened, :out_dumpfile_s
         def any_opt_s
           @did_parse or parse
           @any_opt_s
         end
       private
         def parse
-          @did_parse = true ; ( @scn = SCANNER__ ).string = @op_s
+          @did_parse = true
+          @scn = Multiline_Scanner_.new( @iam_s_a ) ; @iam_s_a = :_parsed_
           while ! @scn.eos?
-            word = @scn.scan TERM_NAME_RX__
-            word or fail "expected word: #{ @scn.rest }"
+            @scn.skip SOME_SPACE__
+            word = scn_some_word
             @scn.skip SOME_SPACE__
             send :"#{ word }="
             @scn.skip SOME_SPACE__
           end
           post_parse ; nil
         end
-        SCANNER__ = GitViz::Services::StringScanner[].new ''
-        TERM_NAME_RX__ = /[_a-z0-9]+/
+        FILE_KEYWORD__ = /file\b/
         SOME_SPACE__ = /[ \t]+/
-        def file=
-          @file_s = @scn.scan EASY_WORD_RX__
-          @file_s or fail "expecting word" ; nil
+        TERM_NAME_RX__ = /[_a-z0-9]+/
+        def serr=
+          skip_some_file_keyword_and_space
+          @has_err_dumpfile = true
+          @err_dumpfile_s = scn_some_dumpfile_path ; nil
         end
-        public ; attr_reader :file_s ; private
-        EASY_WORD_RX__ = /[^ ]+/
+        def file=
+          @has_out_dumpfile = true
+          @out_dumpfile_s = scn_some_dumpfile_path ; nil
+        end
+        def scn_some_dumpfile_path
+          @scn.scan( EASY_WORD_RX__ ) or fail say_expecting_dumpfile_path
+        end ; EASY_WORD_RX__ = /[^ ]+/
+        def say_expecting_dumpfile_path
+          say_expecting "expected dumpfile path"
+        end
+        def skip_some_file_keyword_and_space
+          @scn.skip FILE_KEYWORD__ or fail say_expecting_file_keyword
+          @scn.skip SOME_SPACE__ ; nil
+        end
+        def say_expecting_file_keyword
+          say_expecting "the only thing that can follow 'serr' is 'file'"
+        end
+        def scn_some_word
+          @scn.scan TERM_NAME_RX__ or fail say_expecting_word
+        end
+        def say_expecting_word
+          say_expecting "expecting word"
+        end
         def options=
           d = @scn.string.rindex END_CURLY__
+          d or fail say_expecting_end_curly
           @any_opt_s = @scn.string[ @scn.pos .. d ]
           @scn.pos = d + 1 ; nil
+        end ; END_CURLY__ = '}'.freeze
+        def say_expecting_end_curly
+          say_expecting "found no '}' anywhere before end of string"
         end
-        END_CURLY__ = '}'.freeze
 
         def exitstatus=
-          d_s = @scn.scan %r(\d+)
-          d_s or fail "expected digit: #{ @scn.rest }"
+          d = scn_some_digit
           @mock_wait_thread = Wait__.new do |w|
-            w.value.exitstatus = d_s.to_t
+            w.value.exitstatus = d
           end ; nil
+        end
+        def scn_some_digit
+          d_s = @scn.scan %r(\d+)
+          d_s or fail say_expecting_digit
+          d_s.to_i
+        end
+        def say_expecting_digit
+          say_expecting "expected digit"
+        end
+        def say_expecting s
+          _rest = Headless::CLI::FUN::Ellipsify[ @scn.rest ]
+          _rest = "«#{ _rest }»"  # :+#guillemet
+          "#{ s } at #{ _rest }"
         end
 
         def post_parse
@@ -144,21 +219,141 @@ module Skylab::GitViz
         end
 
       public
-        def open_cmd pn
-          @is_opened = true
-          _s = pn.join( @file_s ).read
-          @o_a = _s.split( %r((?<=\n)) ) ; nil
-        end
-        def get_four
-          o_a = @o_a.dup
-          mock_sout = Headless::Scn_.new do
-            o_a.shift
-          end
-          mock_serr = EMPTY_SCN__
-          [ :_not_implemented_, mock_sout, mock_serr, @mock_wait_thread ]
-        end
 
+        def open_cmd pn
+          @is_opened = true ; @pn = pn
+          @has_err_dumpfile && rd_err_dumpfile
+          @has_out_dumpfile && rd_out_dumpfile
+        end
+      private
+        def rd_out_dumpfile
+          @o_a = rd_and_smartsplit_dumpfile @out_dumpfile_s ; nil
+        end
+        def rd_err_dumpfile
+          @e_a = rd_and_smartsplit_dumpfile @err_dumpfile_s ; nil
+        end
+        def rd_and_smartsplit_dumpfile path_s
+          @pn.join( path_s ).read.split LINE_BOUNDARY_RX__
+        end
+        LINE_BOUNDARY_RX__ = %r((?<=\n))
+      public
+        def get_four
+          _mock_sout = gt_some_mock_sout
+          _mock_serr = gt_some_mock_serr
+          [ :_not_implemented_, _mock_sout, _mock_serr, @mock_wait_thread ]
+        end
+      private
+        def gt_some_mock_serr
+          if @has_err_dumpfile
+            gt_scn_from_prototype_a @e_a
+          else
+            EMPTY_SCN__
+          end
+        end
+        def gt_some_mock_sout
+          if @has_out_dumpfile
+            gt_scn_from_prototype_a @o_a
+          else
+            EMPTY_SCN__
+          end
+        end
+        def gt_scn_from_prototype_a a
+          a = a.dup
+          Headless::Scn_.new do
+            a.shift
+          end
+        end
         EMPTY_SCN__ = Headless::Scn_.new do end
+      end
+
+      class Multiline_Scanner_  # get rid of this by turning the entry
+        # content into one big string early, at the first sign of trouble
+        def initialize s_a
+          @is_collapsed = @is_eos = false
+          @idx = -1 ; @s_a = s_a ; @scn = nil ; @last = s_a.length - 1
+          advance_to_any_next_nonempty_string
+        end
+      public
+        def eos?
+          if @is_collapsed
+            @scn.eos?
+          else
+            @is_eos
+          end
+        end
+        def scan rx
+          send_inwards :scan, rx
+        end
+        def skip rx
+          send_inwards :skip, rx
+        end
+      private
+        def send_inwards i, x
+          if @scn
+            r = @scn.send i, x
+            r && @scn.eos? && advance_to_any_next_nonempty_string
+            r
+          end
+        end
+      public
+        def rest
+          if @scn
+            if @is_collapsed
+              @scn.rest
+            else
+              y = [ @scn.rest ]
+              @s_a[ @idx + 1 .. -1 ].each { |s| y << s }
+              y * ''
+            end
+          end
+        end
+        def string
+          @is_collapsed || omg_collapse
+          @scn.string
+        end
+        def pos
+          @is_collapsed or fail "sanity - .."
+          @scn.pos
+        end
+        def pos= x
+          @is_collapsed or fail "sanity .."
+          @scn.pos = x
+        end
+      private
+        def omg_collapse  # turn a scanner with lots of little strings
+          # into a scanner with one big string only if you need to omg why
+          @is_collapsed = true
+          pos = calc_pos_when_collapsed
+          @scn.string = @s_a.join ''
+          @scn.pos = pos ; @idx = 0 ; @last = 0 ; @s_a = nil
+        end
+        def calc_pos_when_collapsed
+          pos = if @idx.zero? then 0 else
+            self._TEST_ME
+            @s_a[ 0 .. @idx - 1 ].reduce 0 do |m, x|
+              m + x.length
+            end
+          end
+          pos + @scn.pos
+        end
+      private
+        def advance_to_any_next_nonempty_string
+          while true
+            if @idx == @last
+              @is_eos = true ; break
+            end
+            advance_to_next_string
+            @scn.eos? or break
+          end ; nil
+        end
+        def advance_to_next_string
+          s = @s_a.fetch @idx += 1
+          if @scn
+            @scn.string = s
+          else
+            @scn = GitViz::Services::StringScanner[].new s
+          end ; nil
+        end
       end
 
       class Mock_System_Conduit_
@@ -189,7 +384,7 @@ module Skylab::GitViz
         end
       private
         def no
-          raise ::KeyError, "not in the manifest: #{ @normalized_cmd_s }"
+          raise ::KeyError, "not in the manifest: «#{ @normalized_cmd_s }»"
         end
         def yes
           opt_s = @any_opt_s
