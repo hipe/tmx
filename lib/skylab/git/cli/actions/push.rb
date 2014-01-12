@@ -1,3 +1,4 @@
+# EDIT: this is super ancient and just here for amusement #todo
 require 'fileutils'
 require 'optparse'
 require 'json'

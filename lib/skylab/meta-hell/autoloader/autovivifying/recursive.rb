@@ -6,11 +6,15 @@ module Skylab::MetaHell
 
     def self.[] mod, *a
       loc = if a.length.zero?
-        caller_locations( 1, 1 )[ 0 ]
-      elsif (( x = a[ 0 ] )) and x.respond_to? :base_label
+        if mod.instance_variable_defined? :@dir_pathname
+          :none
+        else
+          caller_locations( 1, 1 ).first
+        end
+      elsif (( x = a.first )) and x.respond_to? :base_label
         a.shift
       else
-        :deferred
+        :none
       end
       _enhance mod, * loc
       if a.length.nonzero?

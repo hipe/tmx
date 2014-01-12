@@ -27,6 +27,21 @@ module Skylab::Git
 
   private
 
+    def build_bound i
+      unbound = Git::CLI::Actions.const_get i, false
+      if unbound.const_defined? :CLI, false
+        unbound = unbound::CLI
+      end
+      bound = unbound.new @sin, @out, @err
+      bound.program_name = progname_for i.id2name.gsub( '_', '-' ).downcase
+      block_given? and yield bound
+      bound
+    end
+
+    def progname_for str
+      "#{ program_name } #{ str }"
+    end
+
     def program_name
       @program_name || Face::FUN.program_basename[]
     end
@@ -35,19 +50,14 @@ module Skylab::Git
       ( @hi ||= Face::CLI::FUN.stylify.curry[ [ :green ] ] )[ msg ]
     end
 
-    def progname_for str
-      "#{ program_name } #{ str }"
-    end
-
     def get_y
       ::Enumerator::Yielder.new( & @err.method( :puts ) )
     end
 
-    a = [ ]
+    a = []
 
     define_singleton_method :method_added do |i|
-      a and ( a << i )
-      nil
+      a and ( a << i ) ; nil
     end
 
     def head argv
@@ -58,16 +68,16 @@ module Skylab::Git
       Git::CLI::Actions::Head[ get_y, _progname, argv ]
     end
 
+    def scoot argv
+      build_bound( :Scoot ).invoke argv
+    end
+
     def spread argv
-      cli = Git::CLI::Actions::Spread.new( @sin, @out, @err )
-      cli.program_name = progname_for 'spread'
-      cli.invoke argv
+      build_bound( :Spread ).invoke argv
     end
 
     def stash_untracked argv
-      cli = Git::CLI::Actions::Stash_Untracked::CLI.new( @sin, @out, @err )
-      cli.program_name = progname_for 'stash-untracked'
-      cli.invoke argv
+      build_bound( :Stash_Untracked ).invoke argv
     end
 
     def push argv
@@ -81,9 +91,9 @@ module Skylab::Git
       :hello_from_git
     end
 
-    const_set :A_, [ ] ; const_set :H_, { }
+    const_set :A_, [] ; const_set :H_, { }
     a.each do |i|
-      moniker = i.to_s.gsub( '_', '-' )
+      moniker = i.to_s.gsub '_', '-'
       A_ << moniker
       H_[ moniker ] = i
     end

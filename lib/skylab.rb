@@ -17,7 +17,7 @@ module Skylab  # Welcome! :D
     Enhance_ = -> mod, loc_x=:auto do
       case loc_x
       when :auto ; loc_x = caller_locations( 2, 1 )[ 0 ]
-      when :deferred ; loc_x = false end
+      when :none; loc_x = false end
       autoloader = self
       mod.module_exec do
         @tug_class ||= autoloader::Tug
@@ -161,7 +161,7 @@ module Skylab  # Welcome! :D
       end
 
       def const_tug const
-        @dir_pathname or raise LoadError, say_autoloader_hack_failed( const )
+        dir_pathname or raise LoadError, say_autoloader_hack_failed( const )
         @tug_class.new const.intern, @dir_pathname, self
       end
     private
