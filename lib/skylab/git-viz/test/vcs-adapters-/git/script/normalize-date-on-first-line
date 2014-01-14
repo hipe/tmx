@@ -19,7 +19,7 @@ when '234234' ; '2014-01-05 10:33:24 -0500'
 end
 
 if ! first_
-  puts "there is fake date for fake sha: #{ fake_SHA.inspect }" ; exit 1
+  puts "there is no fake date for fake SHA: #{ fake_SHA.inspect }" ; exit 1
 end
 
 fh = ::File.open arg1, 'r+'

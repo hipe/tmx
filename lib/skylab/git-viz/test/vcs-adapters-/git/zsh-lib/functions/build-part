@@ -1,82 +1,25 @@
-#!/usr/bin/env zsh  # (just to get syntax highlighting)
+#!/usr/bin/env zsh  #just-for-syntax-highlighting
 
-# assumes sibling functions are registered with the autoloader.
+# overwrite the partent's variable of the same name. slip 'part' in there
+# to tell the asset node that this is a part request.
 
-typeset me=$0 ; typeset tmp_dirname=$1
+typeset x="$1"
+(( 0 < $# )) && shift
+typeset -a rest ; rest=("$x" part $*)
 
--process-dumps-for-repo () {
-  validate-repo-dir-as-only-parameter $tmp_dirname $me || return $?
-  -resolve-VCS-name || return $?
-  -resolve-repo-stem || return $?
-  -resolve-VCS-path || return $?
-  -resolve-VCS-script-path || return $?
-  -resolve-output-dir-for-dump || return $?
-  -normalize-every-date-on-every-first-line-of-every-dumpfile || return $?
-  -move-dumps-to-their-final-resting-place || return $?
-  -after-dumps-were-moved-successfully
+-print-component-node-description () {
+  serr
+  serr "$( -hdr "description:" ) build one asset [possibly just its sub part]"
+}
+-say-component-node-args () {
+  typeset s="$( -component-node-first-arg-moniker )"
+  print "part $s [..]"
+}
+-say-component-node-child-moniker () {
+  print "asset"
+}
+-say-component-node-function-name-prefix-infix () {
+  print -- '-asset-'
 }
 
-typeset vcs_name
--resolve-VCS-name () {
-  vcs_name=$( resolve-VCS-name-from-tmp-dirname $tmp_dirname )
-  [[ "" == "$vcs_name" ]] && return 1
-  return 0
-}
-
-typeset repo_stem
--resolve-repo-stem () {
-  repo_stem=$( print $tmp_dirname | sed -E 's/^tmp\.[a-z]+\.(.+)$/\1/' )
-}
-
-typeset vcs_path
--resolve-VCS-path () {
-  vcs_path="./test/vcs-adapters-/$vcs_name"
-}
-
-typeset script_path
--resolve-VCS-script-path () {
-  script_path="$vcs_path/script"
-}
-
-typeset output_dir
--resolve-output-dir-for-dump () {
-  output_dir="$vcs_path/fixtures/$repo_stem"
-  if [[ -d "$output_dir" ]] ; then
-    return 0
-  else
-    print "mkdir -p $output_dir" 1>&2
-    mkdir -p "$output_dir"
-  fi
-}
-
-
-typeset output_rx='.*/tmp\.show\.[a-z0-9][a-z0-9]*\.txt'  # [#017] #pain-with-
-
--normalize-every-date-on-every-first-line-of-every-dumpfile () {
-  typeset line
-  find "$tmp_dirname" -regex "$output_rx" | while read line ; do
-    "$script_path/normalize-date-on-first-line" "$line"
-  done
-}
-
--move-dumps-to-their-final-resting-place () {
-  typeset line
-  find "$tmp_dirname" -regex "$output_rx" | while read line ; do
-    -move-dump-to-its-final-resting-place $line
-  done
-}
-
--move-dump-to-its-final-resting-place () {
-  typeset line=$1 bn sha dest cmd
-  bn=$(basename $line)
-  sha=$( print $bn | sed -E 's/tmp\.show\.([a-z0-9]+)\.txt$/\1/' )
-  dest="$output_dir/show.$sha.txt"
-  persist-generated-file "$line" "$dest"
-}
-
--after-dumps-were-moved-successfully () {
-  print "done. (inpsect $tmp_dirname if you want, or delete it)" 1>&2
-  return 0
-}
-
--process-dumps-for-repo
+component-node-splay

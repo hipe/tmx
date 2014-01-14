@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh  #just-for-syntax-highlighting
+
+serr "pretending to do 'git log follow'"
+
+return $gv_success

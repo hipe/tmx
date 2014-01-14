@@ -2,21 +2,16 @@
 
 # read [#017] the fixtures building narrative
 
-() {  # resolve $GV
+typeset me=$0; typeset -a rest; rest=($*)
 
-  [[ -z "$GV" ]] || return 0
+source "$me/../../zsh-lib/init-component-node.zsh"
 
-  typeset self="./test/script/build-all"
+typeset child_nodes_dir=$component_node_local_top_dir/vcs-adapters-
 
-  if [[ ! -x "${self}" ]] ; then
-    print -- "$0 must be run from [gv] for now. aborting." 1>&2
-    exit 1
-  fi
-
-  GV=$( pwd )
-
+-print-component-node-description () {
+  serr
+  serr "$( -hdr description: ) builds assets and their parts typically"
+  serr "             for use in generating fixutre output snapshots."
 }
 
-source $GV/test/zsh-lib/init.zsh
-
-gv-build all $*
+component-node-splay

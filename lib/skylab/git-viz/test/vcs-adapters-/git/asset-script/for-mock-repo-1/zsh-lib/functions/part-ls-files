@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh  #just-for-syntax-highlighting
+
+serr "pretend to make 'git ls-files'"
+
+mock-1-toonsie-doonsie "fingle"
+
+return $gv_success

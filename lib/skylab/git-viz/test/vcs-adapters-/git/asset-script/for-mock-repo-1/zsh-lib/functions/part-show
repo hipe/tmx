@@ -1,71 +1,16 @@
-#!/usr/bin/env zsh  # (this is a function. for syntax highlighting only.)
+#!/usr/bin/env zsh  #just-for-syntax-highlighting
 
-# assumes sibling functions are registered with the autoloader.
+serr "pretending to do 'part show'"
 
-typeset me=$0 ; typeset tmp_dirname=$1
+return $gv_success
 
--build-positive-dumps-for-repo () {
-  validate-repo-dir-as-only-parameter $tmp_dirname $me || return $?
-  -build-positive-repo-dumps-from-within-directory
-}
-
--build-positive-repo-dumps-from-within-directory () {
-  cd "$tmp_dirname"
-  -build-positive-dumps-for-the-repo-while-within-the-directory
+typeset transient_iam transient_out transient_err
+-build-negatives-inside-of-directory () {
+  transient_out=tmp.show.456456.out.txt
+  transient_err=tmp.show.456456.err.txt
+  transient_iam=tmp.show.456456.iam.txt
+  $vcs_exe show --numstat --pretty=tformat:%ai 456456 -- \
+    1>"$transient_out" 2>"$transient_err"
   typeset exitstatus=$?
-  (( 0 == $exitstatus )) || print "got this here: $exitstatus"
-  cd ..
-  return exitstatus
+  print "exitstatus $exitstatus" > "$transient_iam"
 }
-
--build-positive-dumps-for-the-repo-while-within-the-directory () {
-  -the-file-called-log-should-exist-in-the-current-directory || return $?
-  -write-the-readable-logfile-from-the-first-logfile || return $?
-  -resolve-the-VCS-show-command || return $?
-  -create-the-VCS-commands-file-from-the-readable-logfile || return $?
-  -now-you-execute-those-VCS-lines
-}
-
-typeset log="./log"
--the-file-called-log-should-exist-in-the-current-directory () {
-  if [[ ! -r $log ]] ; then
-    print "logfile not found, aborting: $log" 1>&2 ; return 1
-  fi
-}
-
-typeset readable_log="tmp.1.output"
--write-the-readable-logfile-from-the-first-logfile () {
-  ruby -lne '
-    md = /\A\[master ([a-z0-9]+).+\bas commit ([a-z0-9]+)/.match $_;
-    md and puts "treat commit #{ md[1] } as #{ md[2] }"
-  ' < "$log" > "$readable_log"
-}
-
-typeset vcs_lines="tmp.2.vcs-lines"
-typeset vcs_show_cmd
--resolve-the-VCS-show-command () {
-  -resolve-the-VCS-executable-from-the-tmpdir-name || return $?
-  vcs_show_cmd="$vcs_exe show --numstat --pretty=tformat:%ai"
-}
-
-typeset vcs_exe
--resolve-the-VCS-executable-from-the-tmpdir-name () {
-  vcs_exe=$( resolve-VCS-name-from-tmp-dirname $tmp_dirname )
-  if [[ "" = "$vcs_exe" ]] ; then return 1 ; else return 0 ; fi
-}
-
--create-the-VCS-commands-file-from-the-readable-logfile () {
-  sed -E "
-s/^treat commit ([a-z0-9]+) as ([a-z0-9]+)$/$vcs_show_cmd \1 -- > tmp.show.\2.txt/
-  " < "$readable_log" > "$vcs_lines"
-}
-
--now-you-execute-those-VCS-lines () {
-  if [[ ! -s "$vcs_lines" ]] ; then
-    print "sed hack failed?, aborting. ($vcs_lines)" 1>&2 ; return 1
-  fi
-  print "omg sourcing $vcs_lines" 1>&2
-  source "$vcs_lines"
-}
-
--build-positive-dumps-for-repo

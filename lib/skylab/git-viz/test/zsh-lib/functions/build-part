@@ -1,12 +1,21 @@
-[[ -z "$GV" ]] && return 1
+#!/usr/bin/env zsh  #just-for-syntax-highlighting
 
-() {   # register all functions with the autoloader
+typeset me='build part'
+typeset -a rest ; rest=($*)
 
-  typeset bn func fdir=$GV/test/zsh-lib/functions
-
-  fpath=($fdir $fpath)
-  for func ($fdir/*) ; do
-    bn=$( basename $func )
-    autoload $bn
-  done
+-print-component-node-description () {
+  serr
+  serr "$( -hdr "description:" ) selectively execute parts of assets of\
+ sub-nodes!"
 }
+
+-say-component-node-child-moniker () {
+  print "sub node"
+}
+-say-each-component-child-node-slug () {
+  say-each-child-node-with-a-build-script
+}
+-component-node-splay-when-sub-command () {
+  dispatch-target-to-child-build-script part $rest
+}
+component-node-splay

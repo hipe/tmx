@@ -1,35 +1,7 @@
-#!/usr/bin/env zsh  # (just for highlighting)
+#!/usr/bin/env zsh  #just-for-syntax-highlighting
 
-[[ "" = "$GV" ]] && return 1
-
--gv-build-all () {
-  typeset vcs exitstatus first_failed=0
-  for vcs (${GV}/test/vcs-adapters-/*/script/build) ; do
-    -gv-build-all-for-vcs $vcs $*
-    exitstatus=$?
-    if (( 0 != exitstatus )) ; then
-      print "(notice: exitstatus $exitstatus from $vcs)" 1>&2
-      (( 0 == first_failed )) && first_failed=es
-    fi
-  done
-  return first_failed
-}
-
--gv-build-all-for-vcs () {
-  typeset script=$1 ; shift
-  if [[ ! -x $script ]] ; then
-    print "build script is not executable, skipping - \"$script\"" 1>&2
-    return 1
-  fi
-  GV=$GV $script 'all' $*
-}
-
-typeset function_stem=$1 ; shift
-typeset fname="-gv-build-$function_stem"
-
-if (( ! $+functions[$fname] )) ; then
-  print "'$0' has no '$function_stem' subcommand." 1>&2
-  return 1
-fi
-
-$fname $*
+part-repo $* || return $?
+part-ls-files $* || return $?
+part-show $* || return $?
+part-show-negatives $* || return $?
+part-log-follow $* || return $?

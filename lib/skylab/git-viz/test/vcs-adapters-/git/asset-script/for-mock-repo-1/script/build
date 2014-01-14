@@ -1,39 +1,28 @@
 #!/usr/bin/env zsh
 
-# ~ (our first ever top-down narrative in shell)
+typeset me=$0 ; typeset -a rest ; rest=($*)
 
-me=$0 ; rest=($*)
+source $me/../../../../../../zsh-lib/init-component-node.zsh || return $?
 
--build () {
-  typeset component_path=$( dirname $me )
-  typeset script_path=$( dirname $component_path )
-  VCS_DIR=$( dirname $script_path )
-  typeset vcs=$( basename $VCS_DIR )
-  source $VCS_DIR/zsh-lib/init-functions.zsh
-  typeset compstem=$( component-stem-from-component-path $component_path )
-  typeset build_repo=$component_path/build-repo
-  typeset output_dir="tmp.$vcs.$compstem"
-  -build-repo-if-necessary $output_dir
-  -exit-if-failure $?
-  build-dumps-for-repo $output_dir $rest || return $?
-  process-dumps-for-repo $output_dir
+typeset asset_stem
+asset_stem=\
+$( print $component_node_local_top_dir | sed -E 's_^.+/for-([^/]+)$_\1_' )
+
+typeset vcs
+vcs=$( basename $( dirname $( dirname $component_node_local_top_dir ) ) )
+
+typeset asset_output_dir=tmp.$vcs.$asset_stem
+
+if [[ (( 1 < $#rest )) || 'all' == $rest[1] ]] ; then
+  # pretty awful: we simply want the output dir as a positional parameter,
+  # and the first and only one, passed to the part-building scripts. however,
+  # we have to dance around detecting things like when no args are passed
+  # so that UI arg parsing errors are triggered when appropriate
+  rest+=($asset_output_dir)  # experimental
+fi
+
+mock-1-toonsie-doonsie () {
+  serr "i don't know, i guess i'm making '$1'"
 }
 
--build-repo-if-necessary () {
-  typeset output_dir=$1
-  if [[ -d $output_dir ]] ; then
-    print "using $output_dir" 1>&2
-  else
-    $build_repo $output_dir
-  fi
-}
-
--exit-if-failure () {
-  typeset exitstatus=$1
-  if (( 0 != $exitstatus )) ; then
-    print "aborting due to exitstatus $exitstatus." 1>&2
-    exit exitstatus
-  fi
-}
-
--build
+component-node-splay
