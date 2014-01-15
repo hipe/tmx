@@ -1,7 +1,27 @@
 #!/usr/bin/env zsh  #just-for-syntax-highlighting
 
-serr "pretend to make 'git ls-files'"
+--each-command () {
+  typeset cmd=$1 ; typeset cd=$2 ; typeset triad_callback=$4
+  typeset -a a ; a=(${(z)cmd})
+  if [[ ! -z  $cd ]] ; then
+    cd=/$cd ; typeset dd=/..
+  fi
 
-mock-1-toonsie-doonsie "fingle"
+  loud-cd $asset_output_dir$cd || return $?
+    typeset o e es ; o==() ; e==()
+    serr "${triad_indent}${a[1]} ${(j: :)a[2,-1]}"
+    $a[1] $a[2,-1] 1>$o 2>$e
+    es=$?
+  loud-cd "..$dd"
+  $triad_callback $o $e $es
+}
 
-return $gv_success
+-say-this-part () {
+  print 'ls-files'
+}
+
+-require-asset-output-dir || return $?
+
+troika-lookup-system-commands --each-command --each-command\
+  --command-white-filter-regex '^git ls-files\b'\
+  --chdir-prefix-white-filter /derp/berp

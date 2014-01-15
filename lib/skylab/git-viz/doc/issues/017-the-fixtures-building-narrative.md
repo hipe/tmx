@@ -106,32 +106,70 @@ we are considering it (at some level at least).
 of course we use name conventions in our shell script code, and of course
 they differ from the name conventions we use elsewhere:
 
+• "process-global-functions" :
+
+  for functions we generally use "names-like-this" and not "names_like_this"
+  because a) we can and b) it gives more visual distinction from the other
+  classes of things that use "names_like_this".
+
+  specifically as it pertains to process-global functions, we use this name
+  convention for functions that are made to be somehow reusable by multiple
+  scripts and/or contexts.
+
+  they are often but not always autoloaded. these will often have long-ish,
+  very qualified names a) to make them easier to find and and b) to avoid name
+  collisions with functions defined by the more specialized sub-nodes. we will
+  discuss ways to avoid stompable names in #we-can-have-happiness below.
+
 • "-local-volatile-functions":
 
   if you think it's ugly then it's because you just got here. names that are
   lowercase sepearated by dashes with leading dash are reserved for functions
   whose only scope is within the current "resource" (be it an executable
-  script, a "libaray"-style source-able file, or a function (yes, we use
-  functions inside functions. yes we are a girl, yes we play games). these
+  script, a "libraray"-style source-able file, or a function (yes, we use
+  functions inside functions. yes we are a girl, yes we play games)). these
   names can be stomped by other same names from other files, so only use them
   knowing this. also, see note below about avoiding stompable names.
 
   sometimes (even often in some places) they are written expecting possibly
   to be overwritten, almost like parent methods getting overridden by child
-  methods in (gasp) OOP.
+  methods in (gasp) OOP. but this approach is certainly experimental and
+  certainly not "scalable".
 
   depending on what kind of file you are in you may see these a lot, because
   when implementing logic, we prefer a style of lots of short functions with
   long readable names.
 
-• "process-global-functions" :
+• "--highly-coupled-tributary-function":
 
-  just like local functions but without the leading dash, names like these
-  are used to represent functions that are made somehow reusable by multiple
-  scripts. they are often but not always autoloaded. these will often have
-  long-ish very qualified names to avoid name collisions with functions
-  defined by the more specialized sub-nodes. again, see
-  #we-can-have-happiness below
+  yes these look like options and that is just an unfortunate coincidence that
+  you quickly learn to ignore. (just wait until we pass function names as an
+  argument to an option, and they are both the same symbol.)
+
+  functions of this form are written just to break out a small chunk from
+  a larger chunk of logic (but isn't every function?). the difference here
+  is that for these functions we couple them tightly to the variables in the
+  namespace of the caller.
+
+  specifically, we don't bother passing positional parameters to them, we just
+  refer directly to the parameters in the outside scope. indeed we even effect
+  the "result" value(s) this way. again it's better here to pretend these are
+  methods in a class, accessing instance variables.
+
+  when we employ this facility we do so because it requirs less code and
+  incurs less penalty of "visual noise", but it is not without its cost: when
+  you see these being called from a function, it means that that function
+  contains parameters that are referred to from within these "tributary"
+  functions, so the particular names and general constituency of the local
+  parameters of that function is coupled to all its tributaries, and so is
+  easier to break if care is not taken to look at the tributaries when you
+  modify the "parent".
+
+  it is recommended only to ever have this coupling span across one level
+  per variable name (i.e let's avoid sharing an ordiary local parameter with
+  a function's "grandchild" tributary); lest we end up with spaghettii,
+  but again, all of this is experimental, so we'll try different things, a
+  lot of which will end up ridiculous.
 
 • "variable_defined_within_current_scope"
 

@@ -1,0 +1,93 @@
+#!/usr/bin/env ruby -w
+
+# this mock emits to stdout a sequence of tab-delimited lines representing
+# the manifest entries filtered by the options below. the "API" for this
+# utility is shell-style options on ARGV, which makes it easy to invoke
+# from scripts and easy to test from the shell.
+
+    ::Object.new.instance_exec $stdout do |stdout|
+
+      general_error = 3
+
+      define_singleton_method :emit_info_string do |s|
+        stdout.puts "info\t#{ s }"
+      end
+
+      define_singleton_method :emit_notice_string do |s|
+        stdout.puts "notice\t#{ s }"
+      end
+
+      define_singleton_method :emit_error_string do |s|
+        stdout.puts "error\t#{ s }"
+      end
+
+      define_singleton_method :emit_payload_CVS_row_tail do |s|
+        stdout.puts "payload\t#{ s }"
+      end
+
+      require 'optparse'
+
+      op = ::OptionParser.new
+      _CHDIR_OPT='--chdir-prefix-white-filter'
+      cmd_rx_s = mani_path = white_filter=nil
+      op.on "#{ _CHDIR_OPT } <x>" do |s|
+        white_filter = s
+      end
+      _CMD_WHITE_FILTER_REGEX_OPT='--command-white-filter-regex'.freeze
+      op.on "#{ _CMD_WHITE_FILTER_REGEX_OPT } <s>" do |s|
+        cmd_rx_s = s
+      end
+      _MANI_PATH_OPT='--manifest-path'.freeze
+      op.on "#{ _MANI_PATH_OPT } <s>" do |s|
+        mani_path=s
+      end
+
+      begin
+        op.parse! ::ARGV
+      rescue ::OptionParser::ParseError => e
+        emit_error_string "#{ e.message }, aborting."
+        exit general_error
+      end
+
+      if cmd_rx_s
+        cmd_rx = ::Regexp.new cmd_rx_s
+      else
+        emit_error_string(
+          "for now, #{ _CMD_WHITE_FILTER_REGEX_OPT } is required." )
+        exit general_error
+      end
+
+      if ! mani_path
+        emit_error_string "for now, #{ _MANI_PATH_OPT } is required."
+        exit general_error
+      elsif ! ::File.exist? mani_path
+        emit_error_string "manifest file does not exist - #{ mani_path }"
+        exit general_error
+      end
+
+      y = [ $PROGRAM_NAME ]
+      cmd_rx_s and y.push( _CMD_WHITE_FILTER_REGEX_OPT, cmd_rx_s )
+      white_filter and y.push( _CHDIR_OPT, white_filter )
+      mani_path and y.push( _MANI_PATH_OPT, mani_path )
+      require 'shellwords'
+      _cmd_s = ::Shellwords.shelljoin y
+      emit_info_string "reconstructed invocation: #{ _cmd_s }"
+
+      require 'pathname' ; base_pn = ::Pathname.new ::File.dirname mani_path
+
+      ls_file_cmd='git ls-files -- .'
+      if cmd_rx =~ ls_file_cmd
+        emit_payload_CVS_row_tail <<-HERE.gsub %r(\n?^ *), "\t"
+          #{ ls_file_cmd }
+          dirzo
+          #{ base_pn.join 'mock-repo-1/ls-files.out.txt' }
+          #{ base_pn.join 'mock-repo-1/ls-files.err.txt' }
+          (what is exitstatus?)
+        HERE
+      else
+        emit_notice_string(
+          "there are no commands that match regex /#{ cmd_rx_s }/" )
+      end
+
+      exit 0
+    end

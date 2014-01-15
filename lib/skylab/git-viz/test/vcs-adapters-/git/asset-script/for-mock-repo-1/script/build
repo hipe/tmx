@@ -2,18 +2,22 @@
 
 typeset me=$0 ; typeset -a rest ; rest=($*)
 
-source $me/../../../../../../zsh-lib/init-component-node.zsh || return $?
+typeset __=${me:h:h:h:h:h:h}
+typeset high_up_lib_dir=$__/zsh-lib
+typeset high_up_script_dir=$__/script
+
+source $high_up_lib_dir/init-component-node.zsh || return $?
 
 typeset asset_stem
 asset_stem=\
 $( print $component_node_local_top_dir | sed -E 's_^.+/for-([^/]+)$_\1_' )
 
-typeset vcs
-vcs=$( basename $( dirname $( dirname $component_node_local_top_dir ) ) )
+typeset particular_vcs_dir=${component_node_local_top_dir%/*/*}
+typeset vcs=${particular_vcs_dir##*/}
 
 typeset asset_output_dir=tmp.$vcs.$asset_stem
 
-if [[ (( 1 < $#rest )) || 'all' == $rest[1] ]] ; then
+if [[ (( 1 < $#rest )) || all == $rest[1] ]] ; then
   # pretty awful: we simply want the output dir as a positional parameter,
   # and the first and only one, passed to the part-building scripts. however,
   # we have to dance around detecting things like when no args are passed
@@ -21,8 +25,31 @@ if [[ (( 1 < $#rest )) || 'all' == $rest[1] ]] ; then
   rest+=($asset_output_dir)  # experimental
 fi
 
-mock-1-toonsie-doonsie () {
-  serr "i don't know, i guess i'm making '$1'"
+troika-lookup-system-commands () {
+  -prepare-troika-once || return $?
+  typeset triad_indent="  "
+  triad-lookup-system-commands\
+    --system-commands-manifest $system_commands_manifest_path $*
+}
+
+typeset system_commands_manifest_path\
+=$particular_vcs_dir/fixtures/system-commands.manifest
+
+-prepare-troika-once () {
+  required-parameter high_up_lib_dir || return $?
+  required-parameter high_up_script_dir || return $?
+  -prepare-troika-once () {}
+  source $high_up_lib_dir/triad.zsh
+  set-triad-manifest-API-script $high_up_script_dir/manifest
+}
+
+-require-asset-output-dir () {
+  if [[ ! -d $asset_output_dir ]] ; then
+    serr "'$( -say-this-part )' requires that '${asset_stem#mock-}'"\
+      "be built first (this is not 'make')."
+    return $gv_err_no_resource
+  fi
+  return $gv_success
 }
 
 component-node-splay

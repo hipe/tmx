@@ -13,6 +13,12 @@ typeset gv_error=3  # 1 & 2 are reserved
 typeset gv_err_missing_param=$(( gv_error + 1 ))
 typeset gv_err_extra_param=$(( $gv_err_missing_param + 1 ))
 typeset gv_err_no_resource=$(( $gv_err_extra_param + 1 ))
+typeset gv_err_resource_exists=$(( $gv_err_no_resource + 1 ))
+typeset gv_err_param_is_extra_white_grammatical
+  gv_err_param_is_extra_white_grammatical=$(( $gv_err_resource_exists + 1 ))
+typeset gv_err_param_is_intra_black_grammatical
+  gv_err_param_is_intra_black_grammatical=\
+$(( $gv_err_param_is_extra_white_grammatical ))
 
 [[ -z $me ]] && -init-component-fatal--missing-required-parameter '$me'
 
@@ -218,7 +224,18 @@ say-component-node-error-predicate-for-any-base-exitstatus () {
       s="would not execute because of an unexpected parameter"
       ;;
     "$gv_err_no_resource")
-      s="could not execute because a required resource was not found"
+      s="could not execute because a required resource was not resolved"
+      ;;
+    "$gv_err_resource_exists")
+      s="would not execute because\
+ otherwise it would have clobbered an existing resource"
+      ;;
+    "$gv_err_param_is_extra_white_grammatical")
+      s="could not execute because\
+ parameter is outside the grammar of valid values"
+      ;;
+    "$gv_err_param_is_intra_black_grammatical")
+      s="could not execute because parameter has a disallowed value"
       ;;
     *)
       s="exited with the mysterious exit code $exitstatus"
@@ -294,4 +311,4 @@ say-each-child-node-with-a-build-script () {  # clients may hook in via this
   for x ($child_nodes_dir/*/script/build) ; do
     print $( basename $( dirname $( dirname $x ) ) )
   done
-}
+,n}
