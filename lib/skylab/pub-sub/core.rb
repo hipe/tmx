@@ -18,7 +18,7 @@ module Skylab::PubSub
     end
 
     Emits = -> a do
-      PubSub[ self, :employ_DSL_for_emitter ]  # #re-entrant
+      PubSub[ self, :employ_DSL_for_emitter ]  # #idempotent
       graph_x = a.fetch 0 ; a.shift
       if graph_x
         if graph_x.respond_to? :each_pair
@@ -85,7 +85,7 @@ module Skylab::PubSub
     end
 
     Event_factory = -> a do
-      PubSub[ self, :employ_DSL_for_emitter ]  # #re-entrant
+      PubSub[ self, :employ_DSL_for_emitter ]  # #idempotent
       event_factory a.fetch 0 ; a.shift ; nil
     end
 

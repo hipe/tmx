@@ -8,7 +8,7 @@ in the beginning: a locator for the action you are invoking must come first
 (preceded by the appropriate keyword term), no exceptions.
 
 this, despite how tempting it is to pass a listener or a client as the first
-pharse so that subsequent errors with resolving an unbound action can be
+phrase so that subsequent errors with resolving an unbound action can be
 reported through the listener rather than raising an exception no. that's not
 how it works in this family.
 

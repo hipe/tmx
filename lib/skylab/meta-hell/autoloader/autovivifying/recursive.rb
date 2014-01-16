@@ -82,7 +82,7 @@ module Skylab::MetaHell
     #
     # #multi-entrant
 
-    def self.[] mod  # #re-entrant
+    def self.[] mod  # #idempotent
       Flush_stack__[ Build_stack_from_mod__[ mod ] ]
     end
 

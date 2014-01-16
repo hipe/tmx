@@ -21,7 +21,7 @@ module Skylab::MetaHell
         nil
       end
 
-      Attributes = -> a do  # #re-entrant
+      Attributes = -> a do  # #idempotent
         include Reflection_IM__
         if a.length.nonzero?
           module_exec a, & Parse_the_attributes__
