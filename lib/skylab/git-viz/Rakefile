@@ -1,0 +1,7 @@
+require 'rake'
+
+::Dir[ "#{ ::File.dirname( __FILE__ ) }/tasks/*/tasks.rb" ].each do |path|
+  load path
+end
+
+task default: :'build-most-recent-rubinius'

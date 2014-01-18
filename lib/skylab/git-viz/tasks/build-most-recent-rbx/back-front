@@ -1,0 +1,86 @@
+#!/usr/bin/env ruby -w
+
+require_relative '../core'  # allow this file to be an entrypoint optionally
+
+module Skylab::GitViz::Tasks
+
+  class Build_RBX
+
+    MOST_RECENT_KNOWN_RBX_VERSION_S_ = '2.2.3'
+
+    URL_HEAD_AND_TAIL_ = %w( http://releases.rubini.us/rubinius- .tar.bz2 )
+
+    def initialize stderr
+      @y = ::Enumerator::Yielder.new( & stderr.method( :puts ) )
+    end
+
+    def execute
+      @installed_result = resolve_most_recent_installed_version
+      @installed_result && exec_threads  # or mock_exec_threads #debugging
+    end
+
+  private
+
+    def mock_exec_threads
+      ok = resolve_most_recent_cloud_version  # or mock_*  #debugging
+      ok && resolve_action
+    end
+
+    def exec_threads
+      require 'thread' ; mutex = ::Mutex.new ; cv = ::ConditionVariable.new
+      main_thread = ::Thread.new do
+        mutex.synchronize do
+          cv.wait mutex
+          resolve_action
+        end
+      end
+
+      curl_thread = ::Thread.new do
+        mutex.synchronize do
+          resolve_most_recent_cloud_version
+          cv.signal
+        end
+      end
+
+      main_thread.join
+      curl_thread.join
+    end
+
+  private
+
+    def resolve_most_recent_installed_version
+      Build_RBX::Installed_version__.new( @y ).execute
+    end
+
+    def resolve_most_recent_cloud_version
+      @cloud_result = Build_RBX::Curl_version__.new @y do |cv|
+        cv.url_head, cv.url_tail = URL_HEAD_AND_TAIL_
+        cv.most_recent_known_version_s = MOST_RECENT_KNOWN_RBX_VERSION_S_
+      end.execute
+    end
+
+    def mock_resolve_most_recent_cloud_version
+      r = Build_RBX::Curl_version__::Result__.new
+      r.did_change = true
+      r.version = ::Gem::Version.new '2.2.1'
+      a, b = URL_HEAD_AND_TAIL_
+      r.url = "#{ a }#{ r.version }#{ b }"
+      @cloud_result = r ; PROCEDE_
+    end
+
+    def resolve_action
+      @installed_result && @cloud_result && Build_RBX::Resolve_action__.
+        new( @y, @installed_result, @cloud_result ).execute
+    end
+
+    Autoloader_[ self, __FILE__ ]
+
+    Open3 = -> do
+      require 'open3' ; ::Open3
+    end
+
+    PROCEDE_ = true ; CEASE_ = false
+  end
+
+  Build_RBX.new( $stderr ).execute
+end

@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby -w
+
+file, const, version = ::ARGV
+
+if ! version
+  puts "usage: #{ $PROGRAM_NAME } <file> <const> <version>"
+  exit 3
+end
+
+cmd = "grep --perl-regexp --line-number --max-count=1 #{
+  }\"\\b#{ const }\\b\" #{ file }"
+
+x = `#{ cmd }`
+if x.length.zero?
+  puts "hack failed, grep command failed to match: #{ cmd }"
+  exit 3
+end
+
+md = /\A(?<lineno>\d+):(?<space>[[:space:]]+)/.match x
+if ! md
+  print "hack failed, failed to match grep result: #{ x.inspect }"
+  exit 3
+end
+
+lineno, indent = md.captures
+
+x = ::File.dirname( __FILE__ )
+exec "#{ x }/edit-file", file, lineno, indent, const, version
