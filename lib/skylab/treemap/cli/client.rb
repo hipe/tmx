@@ -203,6 +203,7 @@ module Skylab::Treemap
           end
         end
       end
+      public :handle
     end.call
 
     # `render_emission`, well within the scope of responsibility of this nerk,
@@ -230,6 +231,7 @@ module Skylab::Treemap
       define_method :api_client do
         api_client ||= Treemap::API::Client.instance
       end
+      public :api_client
     end.call
 
     private_attr_reader :infostream  # deep deep down something wants it
@@ -241,6 +243,7 @@ module Skylab::Treemap
       actions_box_module = CLI::Actions
 
       define_method :actions_box_module do actions_box_module end
+      public :actions_box_module
 
     end.call
 
