@@ -1112,12 +1112,14 @@ module Skylab::Flex2Treetop
       end
     end
     def guess_node_name
-      m = singleton_class.ancestors.first.to_s.match(/([^:0-9]+)\d+$/)
-      if m
-        m[1].gsub(/([a-z])([A-Z])/){ "#{$1}_#{$2}" }.downcase.intern
-      else
-        fail("what happen")
+      a = singleton_class.ancestors
+      modul = a.detect do |mod|
+        ::Module == mod.class  # special circumstances
       end
+      modul or fail "no module in ancestor chain?"
+      md = modul.name.match %r([^:0-9]+(?=\d+$))
+      md or raise "hack failed - failed to match against #{ modul.name.inspect}"
+      md[ 0 ].gsub(/([a-z])([A-Z])/){ "#{$1}_#{$2}" }.downcase.intern
     end
     def singleton_class
       @sc ||= class << self; self end
@@ -1158,7 +1160,7 @@ module Skylab::Flex2Treetop
         _name = translate_name @rule_name
         bldr = builder
         bldr.rule_declaration _name do
-          bldr.write "".indent bldr.level
+          bldr.write ONE_SINGLE_SPACE__ * bldr.level
           @pattern_like.translate @request_client
           bldr.newline
         end
@@ -1171,6 +1173,7 @@ module Skylab::Flex2Treetop
       end
     end
   end
+  ONE_SINGLE_SPACE__ = ' '.freeze
   module RuleWriter::InstanceMethods
     def write_rule request_client
       yield( build = RuleWriter::Rule.new(request_client) )

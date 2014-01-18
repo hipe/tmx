@@ -188,4 +188,5 @@ module Skylab::Flex2Treetop::MyTestSupport
         Skylab_Headless::CLI::Pen::FUN::Stylify.curry[ %i( yellow ) ]
     end
   end
+  XX = '@ rb_file_s_stat '.freeze  # 2.1.0 added this
 end

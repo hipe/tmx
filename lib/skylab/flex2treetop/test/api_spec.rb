@@ -50,7 +50,7 @@ module Skylab::Flex2Treetop::MyTestSupport
           * emitters,
           :flexfile, tmpdir.join( 'not-there.flex' ).to_path,
           * outpath( '_no_see_' )
-        expect %r(\bNo such file or directory - .+\bnot-there\.flex\z)i
+        expect %r(\bNo such file or directory #{ XX }- .+\bnot-there\.flex\z)i
         expect_no_more_lines
         @result.should eql :not_found
       end
@@ -205,7 +205,7 @@ module Skylab::Flex2Treetop::MyTestSupport
       it "nosaj thing - x" do
         foo = tmpdir.clear.join 'not-a-dir'
         _API_invoke_with_parser_dir foo
-        expect %r(\ANo such file or directory - [^ ]+/not-a-dir\z)
+        expect %r(\ANo such file or directory #{ XX }- [^ ]+/not-a-dir\z)
         expect_no_more_lines
         @result.should eql :parser_dir_not_exist
       end
