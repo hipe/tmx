@@ -1,14 +1,12 @@
 require_relative '../test-support'
 
-module Skylab::GitViz::TestSupport::Mock_FS_Tests  # we need this different
-  # name for the test node so long as the live node and test node share a
-  # parent node, get it? (for one thing, both regret and mock FS use `[]`).
+module Skylab::GitViz::TestSupport::Test_Lib_::Mock_FS
 
   ::Skylab::GitViz::TestSupport[ TS__ = self ]
 
   include CONSTANTS
 
-  Mock_FS_Parent_Module__ = GitViz::TestSupport
+  Mock_FS_Parent_Module__ = GitViz::Test_Lib_
 
   extend TestSupport::Quickie
 

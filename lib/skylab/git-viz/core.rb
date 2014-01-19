@@ -18,24 +18,29 @@ module Skylab::GitViz
 
     module Methods__
       def const_missing i
-        Const_missing__.new( self, @dir_pathname, i ).execute
+        Const_Missing__.new( self, @dir_pathname, i ).load_and_get
       end
       attr_reader :dir_pathname
       def to_path
         @dir_pathname.sub_ext( EXTNAME__ ).to_path
+      end
+      def get_const_missing i
+        Const_Missing__.new self, @dir_pathname, i
       end
       def set_dir_pn x  # compare more elaborate [sl] `init_dir_pathname`
         @dir_pathname = x ; nil
       end
     end
 
-    class Const_missing__
+    class Const_Missing__
 
       def initialize mod, dpn, i
         @i = i ; @dir_pathname = dpn ; @mod = mod
       end
 
-      def execute
+      def const ; @i end ; attr_reader :mod
+
+      def load_and_get _correction_proc=nil
         @stem = @i.to_s.gsub( %r((?<=[a-z])(?=[A-Z])|_), '-' ).downcase
         @d_pn = @dir_pathname.join @stem
         @f_pn = @d_pn.sub_ext EXTNAME__

@@ -1,6 +1,6 @@
 module Skylab::GitViz
 
-  module TestSupport
+  module Test_Lib_
 
     module Expect
 
@@ -8,7 +8,7 @@ module Skylab::GitViz
         user_mod.send :include, Instance_Methods__ ; nil
       end
 
-      Headless = Headless
+      Headless = GitViz::Lib_::Headless[]
 
       module Instance_Methods__
 

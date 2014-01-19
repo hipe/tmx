@@ -216,7 +216,7 @@ module Skylab::MetaHell
     Resolve_name__ = -> cbn, do_peek_hack, box, guess do
       if box.const_defined? guess, false
         guess
-      elsif box.respond_to? :const_tug
+      elsif box.respond_to? :get_const_missing
         Resolve_name_with_tug__[ do_peek_hack, box, guess ]
       elsif cbn
         Resolve_name_with_core_file__[ cbn, box, guess ]
@@ -224,7 +224,7 @@ module Skylab::MetaHell
     end
 
     Resolve_name_with_tug__ = -> do_peek_hack, box, guess do
-      tug = box.const_missing_class.new guess.intern, box.dir_pathname, box
+      tug = box.get_const_missing guess.intern
       correction = if do_peek_hack
         Boxxy::Peeker_::Tug[ tug ]
       else

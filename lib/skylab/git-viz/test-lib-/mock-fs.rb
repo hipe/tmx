@@ -1,6 +1,6 @@
 module Skylab::GitViz
 
-  module TestSupport
+  module Test_Lib_
 
     module Mock_FS  # read [#013] the mock FS narrative #storypoint-5 (or not)
 

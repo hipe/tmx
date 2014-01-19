@@ -1,6 +1,6 @@
 module Skylab::GitViz
 
-  module TestSupport
+  module Test_Lib_
 
     module Mock_System
 
@@ -192,7 +192,7 @@ module Skylab::GitViz
           say_expecting "expected digit"
         end
         def say_expecting s
-          _rest = Headless::CLI::FUN::Ellipsify[ @scn.rest ]
+          _rest = FUN_::Ellipsify[][ @scn.rest ]
           _rest = "«#{ _rest }»"  # :+#guillemet
           "#{ s } at #{ _rest }"
         end
@@ -247,23 +247,22 @@ module Skylab::GitViz
           if @has_err_dumpfile
             gt_scn_from_prototype_a @e_a
           else
-            EMPTY_SCN__
+            FUN_::EMPTY_SCN
           end
         end
         def gt_some_mock_sout
           if @has_out_dumpfile
             gt_scn_from_prototype_a @o_a
           else
-            EMPTY_SCN__
+            FUN_::EMPTY_SCN
           end
         end
         def gt_scn_from_prototype_a a
           a = a.dup
-          Headless::Scn_.new do
+          FUN_::Scn[].new do
             a.shift
           end
         end
-        EMPTY_SCN__ = Headless::Scn_.new do end
       end
 
       class Multiline_Scanner_  # get rid of this by turning the entry
@@ -429,6 +428,27 @@ module Skylab::GitViz
         def init_opt_h opt_h
           @any_opt_s = GitViz::Lib_::JSON[].generate opt_h ; nil
         end
+      end
+
+      module FUN_
+
+        Ellipsify = -> x do
+          if GitViz.const_defined?( :Lib_, false )
+            GitViz::Lib_::Headless[]::CLI::FUN::Ellipsify[ x ]
+          elsif 10 < x.length
+            "#{ x[ 0, 6 ] }[..]"
+          else
+            x
+          end
+        end
+
+        Scn = -> do
+          Scn__
+        end
+        class Scn__ < ::Proc
+          alias_method :gets, :call
+        end
+        EMPTY_SCN = Scn__.new do end
       end
     end
   end

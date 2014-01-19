@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::GitViz::TestSupport::Mock_FS_Tests
+module Skylab::GitViz::TestSupport::Test_Lib_::Mock_FS
 
   describe "[gv] mock FS - pathname as string" do
 

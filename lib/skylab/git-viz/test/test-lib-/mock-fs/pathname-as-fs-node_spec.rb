@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::GitViz::TestSupport::Mock_FS_Tests
+module Skylab::GitViz::TestSupport::Test_Lib_::Mock_FS
 
   class Eg_Test_Eg_Context_FS
     Mock_FS_Parent_Module__::Mock_FS[ self ]

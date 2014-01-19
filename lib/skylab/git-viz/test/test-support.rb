@@ -18,7 +18,7 @@ module Skylab::GitViz::TestSupport
 
   module ModuleMethods
     def use i
-      _mod = MetaHell::Boxxy::Fuzzy_const_get[ TS__, i ]
+      _mod = MetaHell::Boxxy::Fuzzy_const_get[ GitViz::Test_Lib_, i ]
       _mod[ self ] ; nil
     end
   end
@@ -48,7 +48,7 @@ module Skylab::GitViz::TestSupport
     end
 
     def inspect_emission_channel_and_payload i_a, x
-      "#{ i_a.inspect }: #{ TS__::Expect::Inspect[ x ] }"
+      "#{ i_a.inspect }: #{ GitViz::Test_Lib_::Expect::Inspect[ x ] }"
     end
 
     def baked_em_a  # #hook-out: 'expect'

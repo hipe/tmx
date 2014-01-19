@@ -153,14 +153,14 @@ module Skylab  # Welcome! :D
     module Methods
 
       def const_missing const
-        const_tug( const ).load_and_get  # [#mh-040] result is value
+        get_const_missing( const ).load_and_get  # [#mh-040] result is value
       end
 
       def const_probably_loadable? const
-        const_tug( const ).probably_loadable?
+        get_const_missing( const ).probably_loadable?
       end
 
-      def const_tug const
+      def get_const_missing const
         dir_pathname or raise LoadError, say_autoloader_hack_failed( const )
         @const_missing_class.new const.intern, @dir_pathname, self
       end

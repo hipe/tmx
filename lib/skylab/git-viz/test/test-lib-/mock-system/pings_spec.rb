@@ -1,20 +1,20 @@
 require_relative 'test-support'
 
-module Skylab::GitViz::TestSupport::Mock_System_Tests
+module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System
 
   describe "[gv] mock system pings" do
 
     extend TS__
 
     it 'loads' do
-      Mock_System_Parent_Module__::Mock_System
+      Mock_System_Lib_Parent_Module__::Mock_System
     end
 
     context "employment" do
 
       before :all do
         class Employer
-          Mock_System_Parent_Module__::Mock_System[ self ]
+          Mock_System_Lib_Parent_Module__::Mock_System[ self ]
         end
       end
 
@@ -33,7 +33,7 @@ module Skylab::GitViz::TestSupport::Mock_System_Tests
     context "usement" do
       before :all do
         class Eg_Context
-          Mock_System_Parent_Module__::Mock_System[ self ]
+          Mock_System_Lib_Parent_Module__::Mock_System[ self ]
           def initialize fm
             @fixtures_module = fm ; nil
           end
