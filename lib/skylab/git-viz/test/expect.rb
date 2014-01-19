@@ -8,7 +8,7 @@ module Skylab::GitViz
         user_mod.send :include, Instance_Methods__ ; nil
       end
 
-      Headless = GitViz::Headless
+      Headless = Headless
 
       module Instance_Methods__
 

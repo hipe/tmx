@@ -1,62 +1,46 @@
-require_relative '..'
-require 'skylab/porcelain/core'  # and [hl]
-
 module Skylab::GitViz
 
-  %i| GitViz Headless MetaHell Porcelain |.each do |i|
-    const_set i, ::Skylab.const_get( i, false )
-  end
+  module Lib_
 
-  MetaHell::MAARS[ self ]
-
-  module CLI
-    MetaHell::MAARS::Upwards[ self ]
-
-    module Actions__
-      MetaHell::Boxxy[ self ]
-    end
-  end
-
-  module VCS_Adapters_
-    MetaHell::Boxxy[ self ]
-  end
-
-  SUCCEEDED_ = true
-
-  module Lib_  # :+[#su-001]
-    memoize = -> p do
-      p_ = -> do
-        r = p[] ; p_ = -> { r } ; r
-      end
+    memo = -> p do
+      p_ = -> { x = p[] ; p_ = -> { x } ; x }
       -> { p_.call }
     end
-    slugify = -> const_i do
-      const_i.to_s.gsub( /(?<=[a-z])[A-Z]/ ) { |s| "-#{ s }" }.downcase
+
+    slug = -> i do
+      i.to_s.gsub( %r((?<=[a-z])(?=[A-Z])), '-' ).downcase
     end
+
+    sl = -> do
+      require_relative '..' ; sl = nil
+    end
+
     subsys = -> i do
-      memoize[ -> do
-        require "skylab/#{ slugify[ i ] }/core"
-        ::Skylab.const_get i, false
+      memo[ -> do
+        sl && sl[]
+        require "skylab/#{ slug[ i ] }/core" ; ::Skylab.const_get i, false
       end ]
     end
+
     stdlib = -> i do
-      memoize[ -> do
-        require slugify[ i ]
-        ::Object.const_get i, false
+      memo[ -> do
+        require slug[ i ] ; ::Object.const_get i, false
       end ]
     end
 
     Basic = subsys[ :Basic ]
-    DateTime = memoize[ -> do require 'date' ; ::DateTime end ]
-    Grit = memoize[ -> do require 'grit' ; ::Grit end ]
+    DateTime = memo[ -> do require 'date' ; ::DateTime end ]
+    Grit = memo[ -> do require 'grit' ; ::Grit end ]
+    Headless = subsys[ :Headless ]
     JSON = stdlib[ :JSON ]
+    MetaHell = subsys[ :MetaHell ]
     Open3 = stdlib[ :Open3 ]
+    Porcelain = subsys[ :Porcelain ]
     PubSub = subsys[ :PubSub ]
     Set = stdlib[ :Set ]
     Shellwords = stdlib[ :Shellwords ]
-    StringScanner = memoize[ -> do require 'strscan' ; ::StringScanner end ]
+    StringScanner = memo[ -> do require 'strscan' ; ::StringScanner end ]
+    TestSupport = subsys[ :TestSupport ]
 
   end
-
-  stowaway :API, 'api/session--'
 end

@@ -1,19 +1,18 @@
 require_relative '../core'
-require 'skylab/test-support/core'
 
 module Skylab::GitViz::TestSupport
 
   module CONSTANTS
-    MetaHell = ::Skylab::MetaHell
     GitViz = ::Skylab::GitViz
-    Headless = ::Skylab::Headless
-    TestSupport = ::Skylab::TestSupport
+    o = GitViz::Lib_
+    MetaHell = o::MetaHell[]
+    Headless = o::Headless[]
+    TestSupport = o::TestSupport[]
   end
 
   include CONSTANTS
 
-  GitViz = GitViz ; Headless = Headless
-  MetaHell = MetaHell ; TS__ = self
+  GitViz = GitViz ; Headless = Headless ; MetaHell = MetaHell ; TS__ = self
 
   TestSupport::Regret[ self ]
 
@@ -31,7 +30,7 @@ module Skylab::GitViz::TestSupport
     end
     attr_reader :do_debug
     def debug_IO
-      GitViz::Headless::System::IO.some_stderr_IO
+      Headless::System::IO.some_stderr_IO
     end
 
     def listener

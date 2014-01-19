@@ -78,7 +78,7 @@ module Skylab::GitViz
             end
             fh.close ; nil
           end
-          @tree = GitViz::Porcelain::Tree.from :path_nodes, _ea ; nil
+          @tree = GitViz::Lib_::Porcelain[]::Tree.from :path_nodes, _ea ; nil
         end
 
         def mutate_manifest_line_into_normd_path_and_get_tree_path line

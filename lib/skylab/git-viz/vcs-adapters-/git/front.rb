@@ -34,10 +34,9 @@ module Skylab::GitViz
 
     IMPLEMENTATION_DIR_ = '.git'.freeze
 
+    MetaHell = GitViz::Lib_::MetaHell[]
+
     PROCEDE_ = true
 
-    MetaHell::MAARS::Upwards[ self ]
-
-    stowaway :Repo_, 'repo-/core'
   end
 end

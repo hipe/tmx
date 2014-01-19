@@ -19,10 +19,10 @@ module Skylab::GitViz
     end
     #
     def self.local_normal_name
-      Headless::Name::FUN::Local_normal_name_from_module[ self ]
+      GitViz::Lib_::Headless[]::Name::FUN::Local_normal_name_from_module[ self ]
     end
 
-    Headless::Client[ self,
+    GitViz::Lib_::Headless[]::Client[ self,
       :client_services,
         :named, :svcs_for_API_action,
         :named, :listnr_for_VCS_front ]

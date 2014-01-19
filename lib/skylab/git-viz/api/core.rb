@@ -41,6 +41,8 @@ module Skylab::GitViz
       end
     end
 
+    MetaHell = GitViz::Lib_::MetaHell[]
+
     MetaHell::MAARS[ self ]
 
     module Actions__

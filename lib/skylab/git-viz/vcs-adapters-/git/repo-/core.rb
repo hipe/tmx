@@ -117,11 +117,6 @@ module Skylab::GitViz
           @SHA_i.id2name
         end
       end
-
-      MetaHell::MAARS[ self ]
-
-      stowaway :Commit_, 'commit-/core'
-
     end
   end
 end

@@ -2,7 +2,7 @@ module Skylab::GitViz
 
   class Models_::File_Node
 
-    Porcelain::Tree[ self ]
+    GitViz::Lib_::Porcelain[]::Tree[ self ]
 
     def self.[] * x_a
       node_a = Tree_node_a__.new( x_a ).execute
@@ -48,7 +48,7 @@ module Skylab::GitViz
           m << Commitpoint__.new( d )
         end
         d = -1 ; last = a.length - 1
-        Headless::Scn_.new do
+        GitViz::Lib_::Headless[]::Scn_.new do
           a.fetch( d += 1 ) if d < last
         end
       end

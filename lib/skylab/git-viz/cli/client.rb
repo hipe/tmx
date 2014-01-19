@@ -15,7 +15,7 @@ module Skylab::GitViz
     end
   public
 
-    extend Porcelain::Legacy::DSL
+    extend GitViz::Lib_::Porcelain[]::Legacy::DSL
 
     desc 'ping'  # #storypoint-20
 
@@ -56,7 +56,7 @@ module Skylab::GitViz
       _bound.invoke_with_iambic x_a
     end
 
-    Headless::Client[ self,
+    GitViz::Lib_::Headless[]::Client[ self,
       :client_services,
         :named, :svcs_for_CLI_action ]
 
@@ -73,6 +73,13 @@ module Skylab::GitViz
 
     def info_line_from_CLI_action s
       @infostream.puts s ; nil
+    end
+  end
+
+  module CLI
+    GitViz::Lib_::MetaHell[]::MAARS[ self, :methods ]  # #storypoint-80
+    module Actions__
+      GitViz::Lib_::MetaHell[]::Boxxy[ self ]
     end
   end
 end
