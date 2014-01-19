@@ -224,7 +224,7 @@ module Skylab::MetaHell
     end
 
     Resolve_name_with_tug__ = -> do_peek_hack, box, guess do
-      tug = box.tug_class.new guess.intern, box.dir_pathname, box
+      tug = box.const_missing_class.new guess.intern, box.dir_pathname, box
       correction = if do_peek_hack
         Boxxy::Peeker_::Tug[ tug ]
       else

@@ -39,8 +39,8 @@ module ::Skylab::TestSupport
 
         @parent_anchor_module = pam  # nil ok
 
-        tug_class.nil? and  # if you set it to false you are crazy
-          @tug_class = MetaHell::Autoloader::Autovivifying::Recursive::Tug
+        const_missing_class.nil? and  # if you set it to false you are crazy
+          @const_missing_class = MetaHell::MAARS::Const_Missing_
 
         dpn = Twerk_dir_pathname__[ loc, pam, -> x do
           init_autoloader x ; @dir_pathname

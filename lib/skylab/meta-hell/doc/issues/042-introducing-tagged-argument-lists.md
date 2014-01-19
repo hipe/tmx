@@ -1,5 +1,7 @@
 # introducing tagged argument lists :[#042]
 
+(EDIT: these are now called :#iambics)
+
 they have properties
 
   • always readable - can be more redable than hashes, because nesting

@@ -30,7 +30,7 @@ important facilities:
 1. MAARS. the recursive auto-vivifying auto-loader is used absolutely
    everywhere. this is the "innovation" that we are most eager to find
    alternatives for, because of how great we think it is. if you love
-   something, set it free etc.
+   something, set it free etc. (MAARS has [#031] a narrative now too)
 
 2. the Bundle facility. it's simply the best thing.
 

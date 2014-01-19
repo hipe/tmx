@@ -9,7 +9,7 @@ module ::Skylab::TanMan::TestSupport
 
     def self.extended mod
       mod.module_exec do
-        @tug_class = MetaHell::Autoloader::Autovivifying::Recursive::Tug
+        @const_missing_class = MetaHell::MAARS::Const_Missing_
         init_autoloader caller_locations( 3, 1 )[ 0 ]
       end
       nil

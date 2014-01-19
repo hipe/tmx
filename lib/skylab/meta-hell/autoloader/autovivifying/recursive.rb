@@ -1,6 +1,6 @@
 module Skylab::MetaHell
 
-  module Autoloader::Autovivifying::Recursive
+  module Autoloader::Autovivifying::Recursive  # read [#031] the MAARS nar.
 
     Methods = Autoloader::Methods
 
@@ -17,16 +17,12 @@ module Skylab::MetaHell
         :none
       end
       _enhance mod, * loc
-      if a.length.nonzero?
-        1 == a.length and :deferred == a[ 0 ] or fail "sanity - currently #{
-          }'deferred' is the only bundle option - had #{ a[ 0 ] }"
-        mod.module_exec( & Bundles__::Deferred )
-      end
+      a.length.zero? or mod.const_missing_class.reify_options a, mod
       nil
     end
     define_singleton_method :_enhance, & Autoloader::Enhance_
 
-    module Bundles__
+    module Bundles_
       Deferred = -> do
         singleton_class.class_exec do
           alias_method :_, :dir_pathname
@@ -42,54 +38,57 @@ module Skylab::MetaHell
         end
       end
     end
-  end
 
-  class Autoloader::Autovivifying::Recursive::Tug <
-        Autoloader::Autovivifying::Tug
+    class Const_Missing_ < Autoloader::Autovivifying::Const_Missing_
 
-    def load_and_get correction=nil
-      x = super
-      yes = if x.respond_to? :dir_pathname
-        true
-      elsif ::Module === x
-        x.extend Autoloader::Methods
-        true
-      end
-      if yes
-        tug = self
-        x.instance_exec do
-          if dir_pathname.nil?  # let module graphs charge passively
-            init_dir_pathname tug.branch_pathname  # just after file load
-          end
-          if tug_class.nil?
-            tug.class.enhance self
-          end
+      def load_and_get correction=nil
+        @x = super
+        do_enhance = if @x.respond_to? :dir_pathname
+          true
+        elsif ::Module === @x
+          @x.extend Autoloader::Methods
+          true
         end
+        do_enhance and enhance_loadee
+        @x
       end
-      x
+    private
+      def enhance_loadee
+        tug = self
+        @x.instance_exec do
+          dir_pathname.nil? and init_dir_pathname tug.branch_pathname
+          # let module graphs charge passively just after file load
+          const_missing_class.nil? and tug.class.enhance self
+        end ; nil
+      end
+
+      def self.reify_options a, mod
+        self::Reification__.new( a, mod ).execute
+      end
+    end
+
+    class Const_Missing_::Reification__
+      def initialize a, mod
+        @a = a ; @mod = mod
+      end
+      def execute
+        begin
+          send :"#{ @a.shift }="
+        end while @a.length.nonzero? ; nil
+      end
+    private
+      def deferred=
+        @mod.module_exec( & Bundles_::Deferred )
+      end
+      def methods=  # did
+      end
     end
   end
 
   module Autoloader::Autovivifying::Recursive::Upwards
 
-    # turn a module and each of its not-yet enhanced parent modules into a
-    # MAARS module. This works provided that it eventually hits a module that
-    # responds to `dir_pathname` and responds with true-ish.
-    #
-    # (note we can *not* assume that "having"/"knowing" the `dir_pathname`
-    # is isomorphic with `respond_to?` `dir_pathname` - in real life there are
-    # times when the one is true but not the other so we must check for both.)
-    #
-    # #multi-entrant
-
-    def self.[] mod  # #idempotent
+    def self.[] mod  # #storypoint-90, #idempotent
       Flush_stack__[ Build_stack_from_mod__[ mod ] ]
-    end
-
-    def self.to mod  # in contrast to above, this form mutates client module
-      # regardless of whether it already responds to dir_pathname
-      Flush_stack_[
-        Build_stack_from_2_mods__[ mod, Surrounding_module__[ mod ] ] ]
     end
 
     Build_stack_from_2_mods__ = -> mod1, mod do

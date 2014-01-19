@@ -20,7 +20,7 @@ module Skylab  # Welcome! :D
       when :none; loc_x = false end
       autoloader = self
       mod.module_exec do
-        @tug_class ||= autoloader::Tug
+        @const_missing_class ||= autoloader::Const_Missing_
         extend autoloader::Methods
         loc_x and init_autoloader loc_x
       end ; nil
@@ -100,7 +100,7 @@ module Skylab  # Welcome! :D
       def pathname
         @pathname ||= dir_pathname.sub_ext EXTNAME  # ymmv
       end
-      attr_reader :dir_pathname, :tug_class
+      attr_reader :dir_pathname, :const_missing_class
     private
       def init_atldr_when_dir_pn_nil caller_x
         _path_s = nrmlz_caller_x_for_autoloading caller_x
@@ -162,7 +162,7 @@ module Skylab  # Welcome! :D
 
       def const_tug const
         dir_pathname or raise LoadError, say_autoloader_hack_failed( const )
-        @tug_class.new const.intern, @dir_pathname, self
+        @const_missing_class.new const.intern, @dir_pathname, self
       end
     private
       def say_autoloader_hack_failed const
@@ -201,7 +201,7 @@ module Skylab  # Welcome! :D
       attr_reader :has_stowaways, :stowaway_a_a
     end
 
-    class Tug  # the implementation of the `const_missing` hack
+    class Const_Missing_  # the autoloading behavior as a class
 
       def initialize const, mod_dir_pathname, mod
         @const = const ; @mod = mod ; @mod_dir_pathname = mod_dir_pathname

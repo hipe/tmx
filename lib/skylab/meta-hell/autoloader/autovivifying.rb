@@ -2,7 +2,7 @@ module Skylab::MetaHell
 
   module Autoloader
 
-    module Autovivifying
+    module Autovivifying  # read [#029] the autovivifying autoloader narr..
 
       define_singleton_method :[], Enhance_
 
@@ -12,12 +12,12 @@ module Skylab::MetaHell
     end
   end
 
-  class Autoloader::Autovivifying::Tug < Autoloader::Tug
+  class Autoloader::Autovivifying::Const_Missing_ < Autoloader::Const_Missing_
 
     def self.enhance x
-      tug_class = self
+      const_missing_cls = self
       x.instance_exec do
-        @tug_class ||= tug_class
+        @const_missing_class ||= const_missing_cls
       end ; nil
     end
 
@@ -60,10 +60,10 @@ module Skylab::MetaHell
     end
 
     def build_autovivified_module
-      bpn = branch_pathname ; tug_class = self.class
+      bpn = branch_pathname ; const_missing_class = self.class
       ::Module.new.module_exec do
         extend Autoloader::Methods
-        tug_class.enhance self
+        const_missing_class.enhance self
         @dir_pathname = bpn
         self
       end
@@ -75,24 +75,7 @@ module Skylab::MetaHell
       pathname.relative_path_from ::Skylab.dir_pathname
     end
 
-    #                    ~ the stowaway experiment ~
-
-    # the `stowaway` facility :[#030] facilitates the dubious behavior of
-    # "defining" a given module in a file other than the file you would expect
-    # to find the module in (i.e in violation of `isomorphic file location`
-    # [#029]). #experimental
-
-    # a "record" is created in the "stowaway manifest" when `stowaway` is
-    # called on a module. each record is a tuple of the form (*guest_a, loc_x)
-    # where `loc_x` represents a loading strategy and `guest_a` is a list
-    # of symbols representing constants defined immediately under @mod
-    # but residing in `loc_x`:
-    #
-    #   [ :Foo, :Bar, :Baz ]  # =>
-    #                         # to get @mod::Foo or @mod::Bar load @mod::Baz
-    #   [ :Biff, 'luhrman' ]  # => to get @mod::Biff, do
-    #                         # `require "#{ dirpn }/luhrman"`
-
+    # read [#029]:#the-stowaway-experiment
 
     [ :has_stowaway_resolver, :get_stowaway_resolver ].each do |i|
       define_method i do

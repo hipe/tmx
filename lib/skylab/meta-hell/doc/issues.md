@@ -16,7 +16,7 @@
 [#044] #open #autoloading: swap-in caller_locations( 1, 1 )[ 0 ].base_label
 [#043]       #boxxy the stemmy tree issue - try autoloading the value corresp.
                to the path "headless/nlp/en/levenshtein-.rb"
-[#042]       #doc-point introducting tagged argument lists ..
+[#042]       #doc-point introducting tagged argument lists (#iambics) ..
 [#041]       #doc-node the core node narrative ..
 [#040]       #autoloading: convenient to have `const_missing` result in value
 [#039]       #deprecated `private_attr_reader`
@@ -30,10 +30,11 @@
 [#034] #open assess [module|class]-creator infection level, consider removal
 [#033]       #doc-point - "contained DSL" through `enhance` ..
 [#032]       #api-point constant trouble's fields are immutable (ergo dupable)
-[#031] #hole (was: API-lock on 'replace' as a flyweight-related meth name)
-[#030]       #doc-point of the `stowaway` facility #documented-inline
-[#029]       #doc-point this is the official docpoint of :[#autoloading] and
-             the idea of `isomorphic file locations` (yet to be documented)
+[#031]       #parent-node:[#029] the MAARS narrative .. (#re-purposed:once,
+               was: API-lock on 'replace' as a flyweight-related meth name)
+[#030]       #parent-node:[#029] #the-stowaway-experiment..
+[#029]       #doc-point the autovivifying autoloader narrative ..
+               #isomorphic-file-locations
 [#028]       #tracking-tag `without_warning`
 [#027]       a freeform `parse_series`? basically like minimal packrat parser
 [#026]       #doc-point "tuple tower" defined ..
