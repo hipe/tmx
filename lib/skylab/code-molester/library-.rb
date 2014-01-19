@@ -1,20 +1,18 @@
 module Skylab::CodeMolester
 
-  module Services  # :+[#su-001]
+  module Library_  # :+[#su-001]
 
     stdlib, subsystem = FUN.at :require_stdlib, :require_subsystem
 
     o = { }
-    o[:Basic] = subsystem
-    o[:Face] = subsystem
-    o[:FileUtils] = stdlib
-    o[:Headless] = subsystem
-    o[:Psych] = stdlib
-    o[:Set] = stdlib
-    o[:StringIO] = stdlib
-    o[:StringScanner] = -> _ { require 'strscan' ; ::StringScanner }
-    o[:Treetop] = -> _ { FUN.require_quietly[ 'treetop' ] ; ::Treetop }
-    o[:YAML] = stdlib
+    o[ :Basic ] = o[ :Face ] = subsystem
+    o[ :FileUtils ] = stdlib
+    o[ :Headless ] = subsystem
+    o[ :Psych ] = o[ :Set ] = stdlib
+    o[ :StringIO ] = stdlib
+    o[ :StringScanner ] = -> _ { require 'strscan' ; ::StringScanner }
+    o[ :Treetop ] = -> _ { FUN.require_quietly[  'treetop'  ] ; ::Treetop }
+    o[ :YAML ] = stdlib
 
     MAARS[ self ]  # LOOK.
 

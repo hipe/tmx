@@ -18,7 +18,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Hlp__
         cls.class_exec do
           Headless::CLI::Action[ self, :core_instance_methods ]
           define_method :build_option_parser, -> do
-            op = Headless::Services::OptionParser.new
+            op = Headless::Library_::OptionParser.new
             instance_exec op, & op_p
             op
           end

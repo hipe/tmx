@@ -7,10 +7,10 @@ module Skylab::Basic
 
       # read [#004] (in [#022]) the scanner for read narrative
 
-      def initialize fh, maxlen=Basic::Services::Headless::Constants::MAXLEN
+      def initialize fh, maxlen=Library_::Headless::Constants::MAXLEN
         buffer = '' ; buffer_is_loaded = nil ; count = 0 ; gets = scn = nil
         advance_scanner = -> do
-          scn = Basic::Services::StringScanner.new buffer
+          scn = Library_::StringScanner.new buffer
           advance_scanner = -> do
             scn.string = buffer ; nil
           end ; nil

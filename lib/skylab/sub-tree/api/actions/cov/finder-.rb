@@ -1,6 +1,6 @@
 module Skylab::SubTree
 
-  SubTree::Services::Shellwords.class  # #kick
+  SubTree::Library_::Shellwords.class  # #kick
 
   class API::Actions::Cov
 
@@ -14,7 +14,7 @@ module Skylab::SubTree
       def execute
         ok = true ; cmd = build_command
         @be_verbose and @info_p[ cmd ]
-        SubTree::Services::Open3.popen3 cmd do |_, sout, serr|
+        SubTree::Library_::Open3.popen3 cmd do |_, sout, serr|
           e = serr.read
           if '' != e then
             ok = false

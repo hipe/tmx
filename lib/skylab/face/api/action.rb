@@ -135,12 +135,12 @@ module Skylab::Face
     def field_box
       EMPTY_FIELD_BOX_
     end
-    EMPTY_FIELD_BOX_ = Services::Basic::Field::Box.new.freeze
+    EMPTY_FIELD_BOX_ = Library_::Basic::Field::Box.new.freeze
 
   public
 
     def absorb_params_using_message_yielder y, *a
-      yy = Services::Basic::Yielder::Counting.new( & y.method( :<< ) )
+      yy = Library_::Basic::Yielder::Counting.new( & y.method( :<< ) )
       bx = field_box
       while a.length.nonzero?
         i = a.shift ; x = a.fetch 0 ; a.shift

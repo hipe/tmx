@@ -61,7 +61,7 @@ module Skylab::Basic
             if ! x
               on_zero_items_p.call if on_zero_items_p
             else
-              sio = Basic::Services::StringIO.new
+              sio = Library_::StringIO.new
               yld = ::Enumerator::Yielder.new do |data|
                 sio.write data
               end

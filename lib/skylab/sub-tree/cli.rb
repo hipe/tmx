@@ -19,7 +19,7 @@ module Skylab::SubTree
       Client_Services_.new self
     end
 
-    Client_Services_ = SubTree::Services::Face::Services_::Iambic_.
+    Client_Services_ = SubTree::Library_::Face::Iambic.
       new :emit_proc, -> { method :emit },
           :instream, -> { some_upstream },
           :errstream, -> { some_infostream },
@@ -63,7 +63,7 @@ module Skylab::SubTree
     desc "but adds custom features geared towards development"
 
     option_parser do |o|
-      front = my_tree_front ; face = SubTree::Services::Face
+      front = my_tree_front ; face = SubTree::Library_::Face
       front.absorb( :param_h, @param_h, :expression_agent,
         face::API::Normalizer_::Field_Front_Exp_Ag_.new(
           front.field_box,

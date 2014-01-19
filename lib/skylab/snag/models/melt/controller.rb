@@ -127,13 +127,13 @@ module Skylab::Snag
       begin
         break if @file_changes.length.zero?
         first = @file_changes.first
-        lines = Headless::Services::
+        lines = Snag::Library_::
           Basic::List::Scanner::For::Path[ first.pathname ]
-        patch = Headless::Services::Patch::Models::ContentPatch.new lines
+        patch = Headless::Text::Patch::Models::ContentPatch.new lines
         @file_changes.each do |todo|
           patch.change_line todo.line_number, todo.replacement_line
         end
-        res = Headless::Services::Patch.file patch.render_simple,
+        res = Headless::Text::Patch.file patch.render_simple,
           first.path, @dry_run, @be_verbose, -> e { info e }
         # typically an exit_code, like 0
         res or break

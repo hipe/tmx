@@ -305,7 +305,7 @@ module Skylab::Headless
     end
   end
 
-  Plugin::Box_ = Headless::Services::Basic::Box
+  Plugin::Box_ = Headless::Library_::Basic::Box
 
   class Plugin::DeclarationError < ::RuntimeError
   end

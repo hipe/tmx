@@ -14,7 +14,7 @@ module Skylab::Dependency
         res = conduit.error msg
       end
       begin
-        scn = Dependency::Services::StringScanner.new str
+        scn = Dependency::Library_::StringScanner.new str
         capture = scn.scan_until REGEX
         capture or break error[
           "version pattern not matched anywhere in string: #{ str.inspect }" ]

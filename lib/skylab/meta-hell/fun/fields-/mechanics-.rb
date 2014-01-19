@@ -175,7 +175,7 @@ module Skylab::MetaHell
 
     #  ~ "foundation" classes ~
 
-    class Box_ < MetaHell::Services::Basic::Box
+    class Box_ < MetaHell::Library_::Basic::Box
       def initialize
         @field_attributes = nil
         super()
@@ -185,7 +185,7 @@ module Skylab::MetaHell
         end
       end
       Lev__ = -> a, x do
-        MetaHell::Services::Headless::NLP::EN::Levenshtein::
+        MetaHell::Library_::Headless::NLP::EN::Levenshtein::
           Or_with_closest_n_items_to_item.curry[ 3, a, x ]
       end
       def dupe

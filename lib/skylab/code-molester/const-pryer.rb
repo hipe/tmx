@@ -30,11 +30,11 @@ module Skylab::CodeMolester
       # of the recursive buck stopping somewhere even if it perhaps doesn't
       # need to.  (i.e.: yes i know, and i'm considering it.)
 
-      file = CodeMolester::Services::Basic::List::
+      file = CodeMolester::Library_::Basic::List::
         Scanner[ inpathname.open 'r' ]
       scn = nil ; set_scanner_to_line = -> line do
         if scn then scn.string = line else
-          scn = Headless::Services::StringScanner.new line
+          scn = Headless::Library_::StringScanner.new line
         end
         nil
       end
@@ -99,7 +99,7 @@ module Skylab::CodeMolester
 
     CTX_LEN_ = 40  # heuristic
 
-    Inspct_ = MetaHell::Services::Basic::FUN::Inspect__.curry[ CTX_LEN_ ]
+    Inspct_ = CodeMolester::Library_::Basic::FUN::Inspect__.curry[ CTX_LEN_ ]
 
     T_MODULE_ = 'module'.freeze
 

@@ -11,7 +11,7 @@ module Skylab::Basic
 
       def initialize s
         @count = 0
-        scn = Basic::Services::StringScanner.new s
+        scn = Library_::StringScanner.new s
         @gets_p = -> do
           if (( s = scn.scan LINE_RX_ ))
             @count += 1

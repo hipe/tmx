@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class Services::Manifest
+  class Library_::Manifest
 
     class Line_editor_ < Funcy_
 

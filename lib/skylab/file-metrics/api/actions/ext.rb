@@ -105,7 +105,7 @@ module Skylab::FileMetrics
         if @req[:show_commands] || @req.fetch( :debug_volume )
           @ui.err.puts cmd.string
         end
-        buff = Services::StringIO.new
+        buff = Library_::StringIO.new
         stay = true
         open2 cmd.string do |o|  # [#004]
           o.err do |s|
@@ -120,7 +120,7 @@ module Skylab::FileMetrics
           else -> s { buff.write s } end ) )
         end
         stay or break
-        scn = Services::StringScanner.new buff.string  # not good just fun
+        scn = Library_::StringScanner.new buff.string  # not good just fun
         file_a = [ ]
         loop do
           scn.skip( /\n+/ )

@@ -34,7 +34,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Service
             end
 
             class Client < Face::API::Client
-              Face::Services::Headless::Plugin::Host.enhance self do
+              Face::Library_::Headless::Plugin::Host.enhance self do
                 services :zap
               end  # note that we do *not* use the plugin *proxy* dsl here
 
@@ -80,7 +80,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Service
               attr_reader :imogen
               private :imogen
 
-              Face::Services::Headless::Plugin::Host::Proxy.enhance self do
+              Face::Library_::Headless::Plugin::Host::Proxy.enhance self do
                 services :imogen
               end
             end
@@ -114,7 +114,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Service
         -> do
           invoke 'winkle-tankle'
         end.should raise_error(
-          Face::Services::Headless::Plugin::DeclarationError,
+          Face::Library_::Headless::Plugin::DeclarationError,
             /has not declared the required services.+biffle.+baffle/
         )
       end

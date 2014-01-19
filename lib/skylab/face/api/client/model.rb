@@ -9,7 +9,7 @@ module Skylab::Face
     # additional side-effects.
 
     def self.[] host
-      Face::Services::Headless::Plugin::Host.enhance host do
+      Library_::Headless::Plugin::Host.enhance host do
         services( * %i|
           has_model_instance
           set_new_valid_model_instance

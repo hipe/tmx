@@ -71,7 +71,7 @@ module Skylab::Headless::TestSupport::CLI::Action::OP__
           attr_reader :param_x_a
 
           def build_option_parser
-            op = Headless::Services::OptionParser.new
+            op = Headless::Library_::OptionParser.new
             op.on '-y', '--yes <hi>' do |x|
               @param_x_a.push :yes, x
             end

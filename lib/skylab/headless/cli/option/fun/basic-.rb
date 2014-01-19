@@ -16,7 +16,7 @@ module Skylab::Headless
       bstmc = -> sw do  # "basic switch token match curry"
         md = full_basic_switch_match[ sw ]
         short = "-#{ md[1] }".freeze
-        long = Headless::Services::Basic::String::FUN::
+        long = Headless::Library_::Basic::String::FUN::
           Build_proc_for_string_begins_with_string[ sw ]
         -> tok do
           if FUN.starts_with_dash[ tok ]

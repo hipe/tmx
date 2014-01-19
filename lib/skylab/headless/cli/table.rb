@@ -10,7 +10,7 @@ module Skylab::Headless::CLI::Table
 
   Headless = ::Skylab::Headless
   MetaHell = ::Skylab::MetaHell
-  PubSub = Headless::Services::PubSub
+  PubSub = Headless::Library_::PubSub
   Table = self  # partly b.c PubSub is not part of headless proper
   TERM_SEPARATOR_STRING_ = Headless::TERM_SEPARATOR_STRING_
 
@@ -49,7 +49,7 @@ module Skylab::Headless::CLI::Table
       conduit = Conduit.new ; res = nil
       param_h.each { |k, v| conduit.send "#{ k }=", v } if param_h
       if blk then blk[ conduit ] else
-        res = Headless::Services::StringIO.new
+        res = Headless::Library_::StringIO.new
         conduit.on_text { |txt| res.puts txt }
       end
       conduit.instance_exec do

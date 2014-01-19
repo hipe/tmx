@@ -5,7 +5,7 @@ module Skylab::Headless
   module FUN
 
     Inspect = -> x do
-      Headless::Services::Basic::FUN::Inspect[ x ]
+      Headless::Library_::Basic::FUN::Inspect[ x ]
     end
 
     o = definer

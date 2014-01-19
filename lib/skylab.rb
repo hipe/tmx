@@ -282,15 +282,15 @@ module Skylab  # Welcome! :D
     Enhance_subsystem_module__ = -> loc do
       _mh = const_get :MetaHell, false
       const_set( :MAARS, _mh::MAARS )[ self, loc ]
-      const_defined? :Services, false or module_exec( & Make_svcs_stowaway__ )
+      const_defined? :Library_, false or module_exec( & Make_lib_stowaway__ )
       nil
     end
 
-    Make_svcs_stowaway__ = -> do
-      stowaway :Services, -> do
-        svcs = Subsystem::Services.new @dir_pathname
-        const_set :Services, svcs
-        load svcs.pathname ; nil
+    Make_lib_stowaway__ = -> do
+      stowaway :Library_, -> do
+        lib_mod = Subsystem::Library.new @dir_pathname
+        const_set :Library_, lib_mod
+        load lib_mod.pathname.to_path ; nil
       end
     end
   end

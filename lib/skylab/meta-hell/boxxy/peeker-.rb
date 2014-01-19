@@ -15,7 +15,7 @@ module Skylab::MetaHell
             }#{ tug.mod }"
         tug.autovivify_proc_notify -> do
           cmd_s = Build_find_command__[ tug ]
-          _, o, e, w = MetaHell::Services::Open3.popen3 cmd_s
+          _, o, e, w = MetaHell::Library_::Open3.popen3 cmd_s
           d = w.value.exitstatus
           0 == d or fail "sanity - exitstatus from cmd? #{ d.inspect }"
           err_s = e.read ; out_s = o.read
@@ -37,13 +37,13 @@ module Skylab::MetaHell
       end
 
       Build_find_command__ = -> tug do
-        MetaHell::Services.kick :Shellwords
+        MetaHell::Library_.kick :Shellwords
         "find #{ tug.branch_pathname.to_s.shellescape } -type f #{
           }-name #{ "*#{ Autoloader::EXTNAME }".shellescape } | head -n 1"
       end
 
       Any_correction_from_massive_hack__ = -> tug, path do
-        c_a = MetaHell::Services::CodeMolester::Const_Pryer[ path ]
+        c_a = MetaHell::Library_::CodeMolester::Const_Pryer[ path ]
         # the file that was found with `find` is of arbitrary depth.
         shorter = tug.branch_pathname.to_s
         path[ 0, shorter.length ] == shorter or fail "sanity"

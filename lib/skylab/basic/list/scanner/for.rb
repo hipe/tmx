@@ -14,16 +14,14 @@ module Skylab::Basic
 
         def initialize enum
           @gets_p = -> do
-            begin
-              enum.next
-            rescue ::StopIteration
-              @gets_p = MetaHell::EMPTY_P_ ; nil
-            end
+            enum.next
           end
         end
 
         def gets
           @gets_p.call
+        rescue ::StopIteration
+          @gets_p = MetaHell::EMPTY_P_ ; nil
         end
       end
 

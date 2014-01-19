@@ -45,7 +45,7 @@ module Skylab::Face
 
     -> do
 
-      fld = (( Field = Services::Basic::Field ))
+      fld = (( Field = Library_::Basic::Field ))
       r = fld::N_Meta_Resolver_.new
       r.push nil  # [#049] - sadly necessary to get the field class for now
       r.push METAFIELD_A_A_, nil, -> x do
@@ -107,7 +107,7 @@ module Skylab::Face
     end
 
     p = -> space, x do
-      _Headless = Services::Headless
+      _Headless = Library_::Headless
       _a = space.each.map { |ar| "'#{ ar.local_name_function.local_normal }'" }
       _or = _Headless::NLP::EN::Minitesimal::Oxford_comma_or[ _a ]
       _for = _Headless::Name::FUN::Module_moniker[ space ]
@@ -116,14 +116,14 @@ module Skylab::Face
       raise ::NameError, _msg
     end
 
-    Parameter_Arities_ = Face::Services::Headless::Arity::Space.create p do
+    Parameter_Arities_ = Library_::Headless::Arity::Space.create p do
       self::ZERO_OR_ONE = new 0, 1
       self::ZERO_OR_MORE = new 0, nil
       self::ONE = new 1, 1
       self::ONE_OR_MORE = new 1, nil
     end
 
-    Argument_Arities_ = Face::Services::Headless::Arity::Space.create p do
+    Argument_Arities_ = Library_::Headless::Arity::Space.create p do
       self::ZERO = new 0, 0
       self::ZERO_OR_MORE = new 0, nil
       self::ONE = new 1, 1

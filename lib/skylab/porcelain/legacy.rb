@@ -441,7 +441,7 @@ module Skylab::Porcelain::Legacy
     end
 
     def option_parser_class
-      @option_parser_class || Porcelain::Services::OptionParser
+      @option_parser_class || Porcelain::Library_::OptionParser
     end
 
     def argument_syntax_string= str            #   ~ arguments ~
@@ -1299,7 +1299,7 @@ module Skylab::Porcelain::Legacy
       argument_rx = Argument.rx
       define_method :init_from_string do |str|
         @element_a = [ ]
-        scn = Porcelain::Services::StringScanner.new str
+        scn = Porcelain::Library_::StringScanner.new str
         while ! scn.eos?
           scn.skip( / / )
           matched = scn.scan argument_rx

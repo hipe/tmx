@@ -14,7 +14,7 @@ module Skylab::Test
 
   UNIVERSAL_TEST_DIR_RELPATH_ = 'test'.freeze
 
-  ::Skylab::Subsystem[ self ]
+  MetaHell::MAARS[ self ]
 
   stowaway :Benchmark, -> { TestSupport::Benchmark }
 
@@ -22,4 +22,13 @@ module Skylab::Test
 
   Stderr_ = -> { $stderr }  # resources should not be accessed as contants
                             # or globals from within application code
+
+  module Lib_
+    Basic = -> do
+      require 'skylab/basic/core' ; ::Skylab::Basic
+    end
+    Set = -> do
+      require 'set' ; ::Set
+    end
+  end
 end

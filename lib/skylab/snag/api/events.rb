@@ -17,7 +17,7 @@ module Skylab::Snag
         x
       end
       def self.call graph, stream, x
-        # (hack it so it can be used as a factory by CLI::Services::Yamlization)
+        # (hack it so it can be used as a factory by the yamilization node)
         x
       end
     end

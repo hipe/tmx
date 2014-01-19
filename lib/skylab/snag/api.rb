@@ -56,7 +56,7 @@ module Skylab::Snag
         mp or break( res = mp )
         mp.absolute? or fail 'sanity'
         manny = ( @manifest_cache ||= { } ).fetch( mp.to_s ) do |path| # ofuck
-          man = Snag::Services::Manifest.new mp
+          man = Snag::Library_::Manifest.new mp
           man
         end
         res = manny

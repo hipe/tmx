@@ -190,7 +190,7 @@ module Skylab::Headless
       module IMs__
       private
         def build_option_parser  # #storypoint-925
-          op = Headless::Services::OptionParser.new
+          op = Headless::Library_::OptionParser.new
           p_a = self.class.any_option_parser_p_a
           p_a and apply_p_a_on_op p_a, op
           _yes = op_looks_like_it_defines_its_own_help op

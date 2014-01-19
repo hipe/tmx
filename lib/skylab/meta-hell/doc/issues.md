@@ -54,7 +54,7 @@
 [#013]       #done move porcelain attribtues to here, then clean up
 [#012]       #done foo/ and foo.rb should be automagic, no declaration of module
 [#011]       #doc-node the fun parse curry narrative ..
-             (#re-purposed:once, was 'Services' watcher, moved to subsystem)
+             (#re-purposed:once, became [#su-001])
 [#010]       #done pull in D-elegatesTo from porcelain!
 [#009]       #done hen you made plastic you didn't know about `define_singleton_method`
 [#008]       #done after etc, consider pulling in Let

@@ -38,8 +38,7 @@ module Skylab::Headless::TestSupport
     end
   end
 
-  module Services  # set up a Services::Foo_Bar to lazy load Foo_Bar only
-                   # if it is needed. (it keeps "require" lines out of tests)
+  module Library_  # :+[#su-001]:just-for-tests
     h = {
       PubSub_TestSupport: -> do
         require 'skylab/pub-sub/test/test-support'

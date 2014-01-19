@@ -21,7 +21,7 @@ module Skylab::Basic
           sep = a.fetch 0
           -> { any_subsequent_items -> x { "#{ sep }#{ x }" } }
         end.call
-        io = Basic::Services::StringIO.new
+        io = Library_::StringIO.new
         o = Conduit_.to_struct b
         count = 0
         @add = -> str do

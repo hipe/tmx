@@ -26,7 +26,7 @@ module Skylab::TestSupport::TestSupport::Tmpdir
       tmpdir = Tmpdir.new 'TMPDIR-TEST-NEVER-SEE', verbose: true
       from_here = anchor
       e = nil
-      TestSupport::Services::FileUtils.cd from_here do
+      TestSupport::Library_::FileUtils.cd from_here do
         begin tmpdir.prepare ; rescue ::SecurityError => e ; end
       end
       e.message.should match( /unsafe tmpdir name - \./ )
@@ -136,7 +136,7 @@ module Skylab::TestSupport::TestSupport::Tmpdir
     end
 
     def fu
-      TestSupport::Services::FileUtils
+      TestSupport::Library_::FileUtils
     end
   end
 end

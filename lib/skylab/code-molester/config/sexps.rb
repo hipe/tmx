@@ -197,7 +197,7 @@ module Config  # #borrow x 1
     end
 
     def any_names_notify
-      set = CodeMolester::Services::Set.new
+      set = CodeMolester::Library_::Set.new
       value_items.each do |sx|
         set.add? sx.item_name
       end

@@ -35,7 +35,7 @@ module Skylab::Dependency
     def _execute
       cmd = "cd #{escape_path build_dir}; tar -xzvf #{escape_path @unzip_tarball.basename}"
       emit(:shell, cmd)
-      err = Dependency::Services::StringIO.new
+      err = Dependency::Library_::StringIO.new
       bytes, seconds =  open2(cmd) do |on|
         on.out { |s| emit(:out, s) }
         on.err { |s| emit(:err, s) ; err.write(s) }

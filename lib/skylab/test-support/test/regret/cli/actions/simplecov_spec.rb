@@ -14,7 +14,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI_Actions_Simplecov
 
   extend TestSupport::Quickie
 
-  TestSupport::Services.kick :Open3
+  TestSupport::Library_.kick :Open3
 
   NILADIC_NILNESS_ = -> { }
 
@@ -128,7 +128,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI_Actions_Simplecov
     -> do
       fu = nil
       define_method :fu do
-        fu ||= TestSupport::Services::FileUtils
+        fu ||= TestSupport::Library_::FileUtils
       end
     end.call
 

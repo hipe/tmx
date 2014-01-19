@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module ::Skylab::MetaHell::TestSupport::Formal::Attribute
 
-  MetaHell::Services.kick :Set
+  MetaHell::Library_.kick :Set
 
   describe "[mh] formal attribute" do
 
@@ -220,7 +220,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Attribute
       end
 
       def build_and_attach_to_emit_spy
-        es = MetaHell::Services::PubSub::TestSupport::Emit_Spy.new do |es_|
+        es = MetaHell::Library_::PubSub::TestSupport::Emit_Spy.new do |es_|
           es_.debug_IO = debug_IO
           es_.do_debug_proc = -> { do_debug }
         end

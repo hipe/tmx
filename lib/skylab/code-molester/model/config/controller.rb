@@ -4,7 +4,7 @@ module Skylab::CodeMolester
 
     # immutable
 
-    CodeMolester::Services::Face::Model.enhance self do
+    CodeMolester::Library_::Face::Model.enhance self do
 
       do_memoize  # once you create a config instance, it is *the* config.
 
@@ -74,7 +74,7 @@ module Skylab::CodeMolester
     end
 
     _i_a = %i( unpack_equal unpack_superset unpack_subset repack_difference )
-    CodeMolester::Services::Basic::Hash::FUN.pairs_at _i_a  do |i, p|
+    CodeMolester::Library_::Basic::Hash::FUN.pairs_at _i_a  do |i, p|
       define_method i, p ; private i
     end
 

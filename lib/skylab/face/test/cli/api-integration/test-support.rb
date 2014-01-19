@@ -10,7 +10,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration
       Face::CLI::API_Integration::OP_[
         :field_box, field_box,
         :param_h, param_h,
-        :op, (( op = Face::Services::OptionParser.new )) ]
+        :op, (( op = Face::Library_::OptionParser.new )) ]
       op
     end
 

@@ -2,7 +2,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
   class Line_Source__
 
-    Basic = Skylab_Headless::Services::Basic
+    Basic = Flex2Treetop::Lib_::Basic[]
     MetaHell = ::Skylab::MetaHell
 
     def initialize debug_IO, &p

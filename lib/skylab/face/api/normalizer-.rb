@@ -274,7 +274,7 @@ module Skylab::Face
       # final flushing.
 
       @y ||= ::Enumerator::Yielder.new( & @infostream.method( :puts ) )
-      cy = Face::Services::Basic::Yielder::Counting.new( & @y.method( :<< ) )
+      cy = Library_::Basic::Yielder::Counting.new( & @y.method( :<< ) )
       _fb = field_box ; _exag = any_expression_agent
       _norm = Normalization_.new :field_box, _fb, :notifiee, self,
         :any_expression_agent, _exag, :notice_yielder, cy,
@@ -299,7 +299,7 @@ module Skylab::Face
 
         class Expression_Agent__
 
-          Face::Services::Headless::SubClient::EN_FUN[ self,
+          Library_::Headless::SubClient::EN_FUN[ self,
             :private, %i( s and_ or_ both ) ]
 
         private
@@ -323,7 +323,7 @@ module Skylab::Face
             end
           end
           #
-          Inspct__ = Face::Services::Basic::FUN::Inspect__.
+          Inspct__ = Library_::Basic::FUN::Inspect__.
             curry[ A_REASONABLY_SHORT_LENGTH_FOR_A_STRING__ = 10 ]
         end
         p = -> { Expression_Agent__ }

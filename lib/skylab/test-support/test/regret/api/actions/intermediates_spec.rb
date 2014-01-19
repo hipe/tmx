@@ -90,7 +90,7 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::Intermediates
           opn =  TestSupport::TestSupport.dir_pathname.
             join( 'regret/code-fixtures-' )
           remove_entry_secure = -> do
-            TestSupport::Services::FileUtils.remove_entry_secure opn.to_s
+            TestSupport::Library_::FileUtils.remove_entry_secure opn.to_s
           end
           opn.exist? and remove_entry_secure[]
           in_pn = HOME_.join( 'code-fixtures-/asap/whootenany.rb' )

@@ -71,13 +71,13 @@ module Skylab::Headless
           op
         end ; protected :begin_option_parser
         def option_parser_cls
-          Headless::Services::OptionParser
+          Headless::Library_::OptionParser
         end
         def prs_opts_from_nonzero_length_argv_when_op a
           @option_parser.parse! a do |p|
             instance_exec( & p )  # :#hook-in for custom o.p
           end ; OK_
-        rescue Headless::Services::OptionParser::ParseError => e
+        rescue Headless::Library_::OptionParser::ParseError => e
           prs_opts_when_parse_error e
         end
         def prs_opts_when_parse_error e
@@ -178,7 +178,7 @@ module Skylab::Headless
 
         CLI::Action::LEXICON__ = class Action::Lexicon__  # #storypoint-155
           def initialize
-            @bx = Headless::Services::Basic::Box.new
+            @bx = Headless::Library_::Basic::Box.new
             @is_collapsed = false ; @p_a = [] ; nil
           end
           def fetch_default_values_at_i_a i_a
@@ -490,7 +490,7 @@ module Skylab::Headless
           @q_x_a.fetch 0
         end
 
-        class Action::Bound_Task__ < Headless::Services::Basic::Method::Curry
+        class Action::Bound_Task__ < Headless::Library_::Basic::Method::Curry
           alias_method :replace, :initialize ; public :replace
           def initialize bm, arg_a, p
             super bm, arg_a ; @p = p ; nil

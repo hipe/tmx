@@ -34,7 +34,7 @@ module Skylab::MetaHell::TestSupport
     attr_reader :do_debug
 
     def debug_IO
-      MetaHell::Services::Headless::System::IO.some_stderr_IO
+      MetaHell::Library_::Headless::System::IO.some_stderr_IO
     end
 
     let :o do

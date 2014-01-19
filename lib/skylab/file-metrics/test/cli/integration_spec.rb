@@ -21,7 +21,7 @@ module Skylab::FileMetrics::TestSupport::CLI
       expt_desc "header / first line / summary line"
 
       memoize_output_lines do
-        TestSupport::Services::FileUtils.cd FileMetrics.dir_pathname.to_s do
+        FileMetrics::Library_::FileUtils.cd FileMetrics.dir_pathname.to_s do
           invoke [ 'lc', '.' ]  # le dorky [#006], [#007]
         end
       end
@@ -36,7 +36,7 @@ module Skylab::FileMetrics::TestSupport::CLI
         arr = cels_hack output_lines[ 1 ]
         arr.length.should eql( 5 )
         fl, ln, pc1, pc2, lip = arr
-        fl.should eql( './services/table.rb' )  # meh
+        fl.should eql './library-/table.rb'  # meh
         expect_integer ln, 50 .. 400
         expect_percent pc1
         expect_percent pc2, 100.0
@@ -56,7 +56,7 @@ module Skylab::FileMetrics::TestSupport::CLI
       expt_desc 'header looks good'
 
       memoize_output_lines do
-        TestSupport::Services::FileUtils.cd FileMetrics.dir_pathname.to_s do
+        FileMetrics::Library_::FileUtils.cd FileMetrics.dir_pathname.to_s do
           invoke [ 'ext', '.' ]  # more dorky [#006], [#007]
         end
       end
@@ -92,7 +92,7 @@ module Skylab::FileMetrics::TestSupport::CLI
       ptrn '2.3x3'
 
       memoize_output_lines do
-        TestSupport::Services::FileUtils.cd( FileMetrics.dir_pathname.to_s ) do
+        FileMetrics::Library_::FileUtils.cd( FileMetrics.dir_pathname.to_s ) do
           invoke [ 'dirs', '.' ]  # still dorky [#006], [#007]
         end
       end

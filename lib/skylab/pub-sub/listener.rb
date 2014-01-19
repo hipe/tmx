@@ -111,7 +111,7 @@ module Skylab::PubSub
     end
 
     HL__ = -> do
-      Basic::Services::Headless
+      Lib_::Headless[]
     end
   end
 end

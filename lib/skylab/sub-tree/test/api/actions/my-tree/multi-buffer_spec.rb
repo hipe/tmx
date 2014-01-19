@@ -20,7 +20,7 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree::MB_
 
     it "an in-notify extension - `mtime`" do
       f = start_front.absorb_params :path_a, [ 'one' ], :mtime, true
-      r = nil ; SubTree::Services::FileUtils.cd fixtures_dir_pn do
+      r = nil ; SubTree::Library_::FileUtils.cd fixtures_dir_pn do
         r = f.flush
       end
       @e.string.should be_empty
@@ -41,7 +41,7 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree::MB_
 
     it "a multi-buffer extension - `line count`" do
       f = start_front.absorb_params :path_a, [ 'one' ], :line_count, true
-      r = nil ; SubTree::Services::FileUtils.cd fixtures_dir_pn do
+      r = nil ; SubTree::Library_::FileUtils.cd fixtures_dir_pn do
         r = f.flush
       end
       @e.string.should be_empty
@@ -56,7 +56,7 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree::MB_
     it "a in-notify extension and a mutli-buffer extension" do
       f = start_front.absorb_params :path_a, [ 'one' ], :line_count, true,
         :mtime, true
-      r = nil ; SubTree::Services::FileUtils.cd fixtures_dir_pn do
+      r = nil ; SubTree::Library_::FileUtils.cd fixtures_dir_pn do
         r = f.flush
       end
       @e.string.should be_empty

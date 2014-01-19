@@ -1,6 +1,6 @@
 module Skylab::Dependency
 
-  module Services  # :+[#su-001]
+  module Library_  # :+[#su-001]
 
     load_method = ->(const) { "load_#{ Autoloader::FUN::Methodize[ const ] }" }
 

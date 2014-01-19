@@ -1,6 +1,6 @@
 module Skylab::FileMetrics
 
-  module Services::Table
+  module Library_::Table
 
     # There is no representation of a phycial table here, just a
     # grandiose function for rendering one:
@@ -29,7 +29,7 @@ module Skylab::FileMetrics
 
   end
 
-  module Services::Table::Render
+  module Library_::Table::Render
 
     def self.[] out, row_data_enum, design_x
 

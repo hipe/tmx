@@ -10,7 +10,7 @@ module Skylab::PubSub
   module CLI::Option::Parser
   end
 
-  class CLI::Option::Parser::Fire < Headless::Services::OptionParser
+  class CLI::Option::Parser::Fire < Lib_::OptionParser[]
 
     # do our hacky custom parse yay
     def parse! argv, &setback

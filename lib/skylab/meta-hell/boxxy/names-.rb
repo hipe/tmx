@@ -2,7 +2,7 @@ module Skylab::MetaHell
 
   module Boxxy::Names_
 
-    class Fly__ < MetaHell::Services::Headless::Name::Function::From::Constant
+    class Fly__ < MetaHell::Library_::Headless::Name::Function::From::Constant
 
       alias_method :replace_fly_with_const, :initialize
       public :replace_fly_with_const

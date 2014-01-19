@@ -78,7 +78,7 @@ module Skylab::CodeMolester
         else
           compile_parser[ o_pn ] or break  # (result is num bytes)
         end
-        CodeMolester::Services.kick :Treetop  # load it late, close to where it is used
+        CodeMolester::Library_.kick :Treetop  # load it late, close to where it is used
         load o_pn.to_s
         parent_module.const_defined? const, false or fail "we expected but #{
           }did not see #{ parent_module }::#{ const } in #{ o_pn }"
@@ -90,7 +90,7 @@ module Skylab::CodeMolester
 
         i_pn = CodeMolester.dir_pathname.join( path_part ).  # hack around
           dirname.join( 'grammar.treetop' )                  #   'version-'
-        cmp = CodeMolester::Services::Treetop::Compiler::GrammarCompiler.new
+        cmp = CodeMolester::Library_::Treetop::Compiler::GrammarCompiler.new
         ovr = o_pn.exist?  # even if we never overwrite we don't know that here.
         if debug
           y << "#{ ovr ? 'overwriting existing' : 'creating new' } #{

@@ -135,6 +135,18 @@ module Skylab::PubSub
     end
   end
 
+  module Lib_  # :+[#su-001]
+    Headless = -> do
+      require 'skylab/headless/core' ; ::Skylab::Headless
+    end
+    OptionParser = -> do
+      require 'optparse' ; ::OptionParser
+    end
+    StringScanner = -> do
+      require 'strscan' ; ::StringScanner
+    end
+  end
+
   MAARS = MetaHell::MAARS
 
   MAARS[ self ]

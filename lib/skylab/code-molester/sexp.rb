@@ -46,7 +46,7 @@ module ::Skylab::CodeMolester
     end
 
     def unparse
-      sio = CodeMolester::Services::StringIO.new
+      sio = CodeMolester::Library_::StringIO.new
       unparse_to sio
       sio.string
     end

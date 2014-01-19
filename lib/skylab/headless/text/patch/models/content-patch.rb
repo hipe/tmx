@@ -1,11 +1,11 @@
 module Skylab::Headless
 
-  class Services::Patch::Models::ContentPatch  # builds a patch progressively.
+  class Text::Patch::Models::ContentPatch  # builds a patch progressively.
 
     def initialize content_x
       @chunks = []
       if ! content_x.respond_to? :gets
-        content_x = Headless::Services::Basic::List::Scanner[ content_x ]
+        content_x = Headless::Library_::Basic::List::Scanner[ content_x ]
       end
       @lines = content_x
       @offset = 0 ; nil
@@ -23,7 +23,7 @@ module Skylab::Headless
       if range.exclude_end?
         fail "`exclude_end?` ranges must be zero-width" unless rbeg == rend
       end
-      chunk = Services::Patch::Models::Chunk.new
+      chunk = Text::Patch::Models::Chunk.new
       line = @lines.gets
       fail 'range begin too low' if @lines.line_number > rbeg
       line = @lines.gets while line && @lines.line_number < rbeg
@@ -57,7 +57,7 @@ module Skylab::Headless
     end
 
     def render_simple
-      io = Headless::Services::StringIO.new
+      io = Headless::Library_::StringIO.new
       write_simple io
       io.rewind
       io.read

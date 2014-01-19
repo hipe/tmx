@@ -193,8 +193,7 @@ module Skylab::TestSupport::Regret::API
 
     API = API
     Basic = Basic
-    DocTest = self ; Face = Face
-    MetaHell = MetaHell
+    DocTest = self ; Face = Face ; Lib_ = Lib_ ; MetaHell = MetaHell
     PROCEDE__ = true
     Regret = ::Skylab::TestSupport::Regret
     SEP = '# =>'.freeze

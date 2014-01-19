@@ -8,12 +8,12 @@ module Skylab::Headless::TestSupport::IO::Upstream::Select
 
   from_dir = Select_TestSupport.dir_pathname.join( 'visual' ).to_s
 
-  Headless::Services::FileUtils.cd from_dir, verbose: true do
+  Headless::Library_::FileUtils.cd from_dir, verbose: true do
 
     select = Headless::IO::Upstream::Select.new
     select.timeout_seconds = 0.3
 
-    Headless::Services::Open4.open4 'sh' do |pid, sin, sout, serr|
+    Headless::Library_::Open4.open4 'sh' do |pid, sin, sout, serr|
       sin.puts 'source tmp.sh'
       sin.close
 

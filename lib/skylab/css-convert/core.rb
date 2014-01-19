@@ -288,4 +288,6 @@ module Skylab::CssConvert
   o << test.new('color test', 'see what the CLI colors look like.', :color_test)
   o << test.new('001', 'platonic-ideal.txt', :fixture)
   o << test.new('002', 'minitessimal.txt', :fixture)
+
+  # (:+[#su-001]:none)
 end

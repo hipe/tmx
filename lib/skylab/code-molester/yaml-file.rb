@@ -6,7 +6,7 @@ module ::Skylab::CodeMolester
       # because of some facepalming decisions of how yaml trees are represented in psych, this.
       # this has some facepalming vulnerabilities of its own
       def init_from_psych_tree psych
-        if ! psych.kind_of? CodeMolester::Services::Psych::Nodes::Mapping
+        if ! psych.kind_of? CodeMolester::Library_::Psych::Nodes::Mapping
           fail "needed Psych::Nodes::Mapping, had: #{ psych.class }"
         end
         tree? or _change_to_tree!
@@ -127,7 +127,7 @@ module ::Skylab::CodeMolester
     def initialize path
       @pathname = ::Pathname.new path.to_s
       if pathname.exist?
-        parsed = CodeMolester::Services::YAML.parse pathname.read
+        parsed = CodeMolester::Library_::YAML.parse pathname.read
         if false == parsed # empty file, special case
           # nothing for now
         else

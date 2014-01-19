@@ -49,7 +49,7 @@ module Skylab::SubTree
         }, had #{ x.inspect }" ]
       $~[1] or x = "HEAD~1"  # meh
       cmd = "git diff --numstat #{ x }"
-      _, o, e, w = SubTree::Services::Open3.popen3 cmd
+      _, o, e, w = SubTree::Library_::Open3.popen3 cmd
       es = w.value.exitstatus ; 0 == es or break bork[ "got exitstatus #{
         }#{ es } from command - #{ cmd }" ]
       err_s = e.read
@@ -127,13 +127,13 @@ module Skylab::SubTree
   stk = -> do
     if true  # if we ever make lipstick an option
       begin
-        SubTree::Services::Ncurses.class # # below
+        SubTree::Library_::Ncurses.class # # below
         nc_ok = true
       rescue ::LoadError
       end
     end
     if ! nc_ok then -> _ { } else
-      SubTree::Services::Face.class  # #todo:during:0-subsystem, and above
+      SubTree::Library_::Face.class  # #todo:during:0-subsystem, and above
       sp = '  '
       f = -> do
         tbl_width = ( fmt % [ 0, 0.0, '', ''] ).length

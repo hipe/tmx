@@ -13,7 +13,7 @@ module Skylab::Headless::TestSupport::CLI::Table
   describe "[hl] CLI table" do
 
     def outstream
-      @outstream ||= Headless::Services::StringIO.new
+      @outstream ||= Headless::Library_::StringIO.new
     end
 
     def outstr

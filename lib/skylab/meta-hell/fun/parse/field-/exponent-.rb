@@ -4,7 +4,7 @@ module Skylab::MetaHell
 
     class Field_
 
-      Exponent_ = MetaHell::Services::Basic::
+      Exponent_ = MetaHell::Library_::Basic::
         Struct[ :i, :long, :short, :first_desc_line ]
 
       # the term 'exponent' is meant in the "Grammatical_category" sense.

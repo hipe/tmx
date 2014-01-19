@@ -3,7 +3,7 @@ module Skylab::TestSupport
   class IO::Spy < ::Skylab::Headless::IO::Interceptors::Tee  # :[#023] ..
 
     def self.standard
-      io = new( BUFFER_I__ => TestSupport_::Services::StringIO.new ).tty!
+      io = new( BUFFER_I__ => TestSupport_::Library_::StringIO.new ).tty!
       block_given? and yield io
       io
     end

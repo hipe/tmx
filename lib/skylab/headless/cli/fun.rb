@@ -7,7 +7,7 @@ module Skylab::Headless
     Parse_styles = -> do
       # Parse a string with ascii styles into an S-expression.
 
-      sexp = Headless::Services::CodeMolester::Sexp
+      sexp = Headless::Library_::CodeMolester::Sexp
 
       rx = /\A (?<string>[^\e]+)?  \e\[
         (?<digits> \d+  (?: ; \d+ )* )  m  (?<rest> .*) \z/mx
@@ -108,7 +108,7 @@ module Skylab::Headless
     Ellipsify_ = Ellipsify__.curry[ '[..]'.freeze ]
 
     Ellipsify = Ellipsify_.curry[
-      Headless::Services::Basic::FUN::A_REASONABLY_SHORT_LENGTH_FOR_A_STRING ]
+      Headless::Library_::Basic::FUN::A_REASONABLY_SHORT_LENGTH_FOR_A_STRING ]
 
     Looks_like_sentence = -> do
       punctuation_character_rx = /[.?!]/

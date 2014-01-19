@@ -24,7 +24,7 @@ module Skylab::Git::TestSupport::CLI
     # ~ test-time support
 
     def invoke_from_workdir * x_a
-      r = nil ; Git::Services::FileUtils.cd workdir_pn.to_s do
+      r = nil ; Git::Library_::FileUtils.cd workdir_pn.to_s do
         r = invk x_a
       end ; r
     end

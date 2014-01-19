@@ -69,7 +69,7 @@ module Skylab::MetaHell
         @abstract_field_list = @call_p = @constantspace_mod =
           @do_glob_extra_args = @exhaustion_p = @syntax = nil
         @state_mutex =
-            MetaHell::Services::Basic::Mutex::Write_Once.new :state_mutex
+            MetaHell::Library_::Basic::Mutex::Write_Once.new :state_mutex
           # state encompasses input and output. various algorithms may handle
           # input and output together or separately, but we ensure that etc.
         absorb( * input_a )
@@ -143,7 +143,7 @@ module Skylab::MetaHell
       end
       #
       Lev___ = -> a, x do
-        MetaHell::Services::Headless::NLP::EN::Levenshtein::
+        MetaHell::Library_::Headless::NLP::EN::Levenshtein::
           Or_with_closest_n_items_to_item[ 3, a, x ]
       end
       def clear_last

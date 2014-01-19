@@ -23,7 +23,7 @@ module Skylab::GitViz
 
   SUCCEEDED_ = true
 
-  module Services
+  module Lib_  # :+[#su-001]
     memoize = -> p do
       p_ = -> do
         r = p[] ; p_ = -> { r } ; r

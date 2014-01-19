@@ -62,7 +62,7 @@ module Skylab::SubTree
       Services_For_API_Action_.new self
     end
     #
-    Services_For_API_Action_ = SubTree::Services::Face::Services_::Iambic_.
+    Services_For_API_Action_ = SubTree::Library_::Face::Iambic.
       new :error, -> { method :error_notify },
           :info,  -> { method :info_notify }
     #

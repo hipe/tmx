@@ -67,7 +67,7 @@ module Skylab::Snag
         end
         sexp ||= [ :valid ]
         found = nodes.find( @max_count, sexp ) or break( res = found )
-        @lines = Snag::Services::Yielder::Mono.new do |txt|
+        @lines = Snag::Library_::Yielder::Mono.new do |txt|
           emit :output_line, txt
           nil
         end
@@ -95,7 +95,7 @@ module Skylab::Snag
     field_names = Snag::Models::Node::Flyweight.field_names
 
     define_method :render_node_as_yaml do
-      o = Snag::CLI::Services::Yamlization.new field_names
+      o = Snag::Text_::Yamlization.new field_names
       o.on_text_line(& @lines.method( :<< ) )
       o
     end

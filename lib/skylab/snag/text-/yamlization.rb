@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class CLI::Services::Yamlization
+  class Text_::Yamlization
 
     PubSub[ self, :employ_DSL_for_emitter ]
 

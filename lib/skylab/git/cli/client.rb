@@ -61,7 +61,7 @@ module Skylab::Git
     end
 
     def head argv
-      _pn = Git::Services::Headless::System.defaults.bin_pathname.
+      _pn = Git::Library_::Headless::System.defaults.bin_pathname.
         join 'tmx-git-head'
       load _pn.to_s
       _progname = "#{ program_name } head"

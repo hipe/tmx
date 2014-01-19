@@ -37,7 +37,7 @@ module Skylab::Face::TestSupport::API::Service
         -> do
           nc::API.invoke :w, never: :see
         end.should raise_error(
-          Face::Services::Headless::Plugin::DeclarationError,
+          Face::Library_::Headless::Plugin::DeclarationError,
           /Client has not declared the required service "nerk" declared #{
             }as needed by .+API::Actions::W\./
         )
@@ -50,7 +50,7 @@ module Skylab::Face::TestSupport::API::Service
         module Sandbox::Nightclub_2
           Face::API[ self ]
           class API::Client  # (re-open!)
-            Face::Services::Headless::Plugin::Host.enhance self do
+            Face::Library_::Headless::Plugin::Host.enhance self do
               services :nerk, :blerk
             end
           end
@@ -78,7 +78,7 @@ module Skylab::Face::TestSupport::API::Service
         module Sandbox::Nightclub_3
           Face::API[ self ]
           class API::Client  # (re-open!)
-            Face::Services::Headless::Plugin::Host.enhance self do
+            Face::Library_::Headless::Plugin::Host.enhance self do
               services :nerk, :blerk
             end
 
@@ -107,7 +107,7 @@ module Skylab::Face::TestSupport::API::Service
         module Sandbox::Nightclub_4
           Face::API[ self ]
           class API::Client  # (re-open!)
-            Face::Services::Headless::Plugin::Host.enhance self do
+            Face::Library_::Headless::Plugin::Host.enhance self do
               services :blerk
             end
 

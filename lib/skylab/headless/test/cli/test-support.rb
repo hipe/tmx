@@ -41,7 +41,7 @@ module Skylab::Headless::TestSupport::CLI
 
     def from_workdir &p
       r = nil
-      Headless::Services::FileUtils.cd workdir do
+      Headless::Library_::FileUtils.cd workdir do
         r = p[]
       end ; r
     end

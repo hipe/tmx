@@ -63,7 +63,7 @@ module Skylab::GitViz
     end
 
     class Tree_node_a__
-      Services::Basic[]::Set[ self,
+      Lib_::Basic[]::Set[ self,
         :with_members, %i( pathname VCS_front ).freeze,
         :initialize_basic_set_with_iambic ]
 

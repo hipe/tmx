@@ -31,7 +31,7 @@ module Skylab::Face
 
   module FUN
 
-    _Headless = Face::Services::Headless
+    _Headless = Library_::Headless
 
     Stdin = -> do
       _Headless::System::IO.some_stdin_IO

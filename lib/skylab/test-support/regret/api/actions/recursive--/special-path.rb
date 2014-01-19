@@ -4,7 +4,7 @@ module Skylab::TestSupport::Regret::API
 
     class Special_Path
 
-      MetaHell::Services::PubSub::Listener[ self,
+      Lib_::PubSub[]::Listener[ self,
         :emission_matrix, %i( error ), %i( string ) ]
 
       module Hashtag_Bundles__
@@ -59,8 +59,7 @@ module Skylab::TestSupport::Regret::API
 
       def rest_s=
         @rest_s = @x_a.shift
-        @ht_a = Regret::Services::
-          Snag[]::Models::Hashtag::Parse[ @listener, @rest_s ]
+        @ht_a = Lib_::Snag[]::Models::Hashtag::Parse[ @listener, @rest_s ]
         validate_ht_a ; nil
       end
 

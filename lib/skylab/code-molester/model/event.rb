@@ -1,5 +1,5 @@
 module Skylab::CodeMolester
 
-  Model::Event = CodeMolester::Services::Face::Model::Event
+  Model::Event = CodeMolester::Library_::Face::Model::Event
 
 end

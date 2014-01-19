@@ -736,7 +736,7 @@ module Skylab::Face
     end
 
     -> do  # `name`  # #called-by command and children to be `name`
-      f = -> x { Services::Headless::Name::Function.new x }
+      f = -> x { Library_::Headless::Name::Function.new x }
       h = {
         none: -> _ { false },
         method: f,
@@ -759,7 +759,7 @@ module Skylab::Face
     #      `name` that memoizes its result to `@name`
 
     def initialize name_i  # hacks only!
-      @name = Services::Headless::Name::Function.new name_i
+      @name = Library_::Headless::Name::Function.new name_i
       nil
     end
 
@@ -989,7 +989,7 @@ module Skylab::Face
     end
 
     def build_empty_option_parser
-      op = Face::Services::OptionParser.new
+      op = Library_::OptionParser.new
       op.base.long.clear  # no builtin -h or -v
       op
     end
@@ -1031,8 +1031,8 @@ module Skylab::Face
     def each_option  # assumes that @op (when constructed) will be an o.p
       @op_enum ||= begin
         @op.nil? and init_op
-        opt = Services::Headless::CLI::Option.new_flyweight
-        ea = Services::Headless::CLI::Option::Enumerator.new @op
+        opt = Library_::Headless::CLI::Option.new_flyweight
+        ea = Library_::Headless::CLI::Option::Enumerator.new @op
         ea.filter = -> sw do
           opt.replace_with_switch sw
           opt
@@ -1046,7 +1046,7 @@ module Skylab::Face
         scn = nil ; op_x = option_parser ? @op : Empty_A_
         Face::Options.new(
           fetch: -> ref, &blk do
-            scn ||= Services::Headless::CLI::Option::Parser::Scanner.new op_x
+            scn ||= Library_::Headless::CLI::Option::Parser::Scanner.new op_x
             scn.fetch ref, &blk
           end  )
       end.call
@@ -1526,9 +1526,9 @@ module Skylab::Face
       hl_chunker = hl_parse_styles = hl_unstyle_sexp = nil  # we lazy-
       hl = -> do                  # load these nerkulouses - they might be a
         hl_chunker =              # beast, the dependency is awkward.
-          Services::Headless::CLI::Pen::Chunker
+          Library_::Headless::CLI::Pen::Chunker
         hl_parse_styles, hl_unstyle_sexp =
-          Services::Headless::CLI::FUN.constants_at :Parse_styles, :Unstyle_sexp
+          Library_::Headless::CLI::FUN.constants_at :Parse_styles, :Unstyle_sexp
         hl = nil
       end
 
@@ -1735,12 +1735,12 @@ module Skylab::Face
     end
 
     CLI::FUN_[ :slugulate ] = -> x do
-      Services::Headless::Name::FUN::Slugulate[ x ]
+      Library_::Headless::Name::FUN::Slugulate[ x ]
     end  # (narrow focus of the dependency for now (but trivial))
 
     Requity_brackets_ = -> do  # ditto
       p = -> i do
-        (( p = Services::Headless::CLI::Argument::FUN::Reqity_brackets ))[ i ]
+        (( p = Library_::Headless::CLI::Argument::FUN::Reqity_brackets ))[ i ]
       end
       -> x { p[ x ] }
     end.call
@@ -2106,7 +2106,7 @@ module Skylab::Face
 
   class CLI::Fun_
     def stylify
-      p = Face::Services::Headless::CLI::Pen::FUN::Stylify
+      p = Library_::Headless::CLI::Pen::FUN::Stylify
       CLI::Fun_.class_exec do
         remove_method :stylify
         define_method :stylify do p end

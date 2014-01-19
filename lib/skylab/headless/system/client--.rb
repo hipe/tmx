@@ -11,7 +11,7 @@ module Skylab::Headless
 
       def which exe_name
         SAFE_NAME_RX__ =~ exe_name or "invalid name: #{ exe_name }"
-        out = Headless::Services::Open3.popen3 'which', exe_name do |_, o, e|
+        out = Headless::Library_::Open3.popen3 'which', exe_name do |_, o, e|
           EMPTY_STRING_ == (( err = e.read )) or raise ::SystemCallError,
             "unexpected response from `which` - #{ err }"
           o.read.strip

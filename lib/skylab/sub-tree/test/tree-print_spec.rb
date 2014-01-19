@@ -11,7 +11,7 @@ module Skylab::SubTree::TestSupport::Tree_Print
     extend TS__
 
     it "o" do
-      io = SubTree::Services::StringIO.new
+      io = SubTree::Library_::StringIO.new
       SubTree::Tree_Print.tree_print get_object, io, :do_verbose_lines,
         do_debug, :info_p, debug_stream.method( :puts )
       _exp = <<-HERE.unindent

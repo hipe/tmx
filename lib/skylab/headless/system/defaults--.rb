@@ -13,7 +13,7 @@ module Skylab::Headless
       end
 
       a << :tmpdir_pathname << -> do
-        ::Pathname.new Headless::Services::Tmpdir.tmpdir
+        ::Pathname.new Headless::Library_::Tmpdir.tmpdir
       end
 
       a << :dev_tmpdir_path << -> do

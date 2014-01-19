@@ -1,6 +1,6 @@
 module Skylab::SubTree
 
-  SubTree::Services.kick :Shellwords
+  SubTree::Library_.kick :Shellwords
 
   class Find_Command_  # [#sl-118]
 

@@ -2,7 +2,7 @@ module Skylab::CodeMolester
 
   class Model::Config::Collection
 
-    CodeMolester::Services::Face::Model.enhance self do
+    CodeMolester::Library_::Face::Model.enhance self do
 
       services_used( * %i|
         has_model_instance
@@ -42,7 +42,7 @@ module Skylab::CodeMolester
     end
 
     _i_a = %i( unpack_equal unpack_superset )
-    CodeMolester::Services::Basic::Hash::FUN.pairs_at _i_a do |i, p|
+    CodeMolester::Library_::Basic::Hash::FUN.pairs_at _i_a do |i, p|
       define_method i, p ; private i
     end
 

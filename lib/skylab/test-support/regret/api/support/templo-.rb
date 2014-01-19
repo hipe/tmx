@@ -19,7 +19,7 @@ module Skylab::TestSupport::Regret::API
     end
 
     def get_template i
-      Face::Services::Basic::String::Template.
+      Lib_::Basic[]::String::Template.
         from_string self.class.dir_pathname.join( "#{ i }#{ EXT__ }" ).read
     end
 

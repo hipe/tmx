@@ -9,15 +9,14 @@ module Skylab::Basic  # introduction at [#020]
 
   ::Skylab::Subsystem[ self ]
 
-  module Services
+  module Library_  # :+[#su-001]
 
     subsystem, stdlib = ::Skylab::Subsystem::FUN.
       at :require_subsystem, :require_stdlib
 
     o = { }
     o[ :Headless ] = subsystem
-    o[ :Set ] =
-      o[ :StringIO ] = stdlib
+    o[ :Set ] = o[ :StringIO ] = stdlib
     o[ :StringScanner ] = -> _ { require 'strscan' ; ::StringScanner }
 
     define_singleton_method :const_missing do |c|

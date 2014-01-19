@@ -24,7 +24,7 @@ module Skylab::Snag::TestSupport
     end
 
     def from_tmpdir &block
-      Snag::Services::FileUtils.cd tmpdir, verbose: do_debug, &block
+      Snag::Library_::FileUtils.cd tmpdir, verbose: do_debug, &block
     end
 
     manifest_path = Snag::API.manifest_path

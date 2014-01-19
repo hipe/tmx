@@ -41,7 +41,7 @@ module Skylab::TestSupport::Regret::API
     end
 
     def build_walker
-      Regret::Services::Walker[].new :path, @normalized_argument_path,
+      Lib_::SubTree[]::Walker.new :path, @normalized_argument_path,
         :vtuple, @vtuple, :listener, generic_listener
     end
 
@@ -97,7 +97,7 @@ module Skylab::TestSupport::Regret::API
     end
 
     def bld_special_path_listener
-      MetaHell::Services::PubSub::Listener::Suffixed[ :from_special, self ]
+      Lib_::PubSub[]::Listener::Suffixed[ :from_special, self ]
     end
 
     Special_Path__ = -> * x_a do
@@ -118,7 +118,7 @@ module Skylab::TestSupport::Regret::API
 
     def rndr_note_x_a x_a
       if x_a.length.nonzero?
-        TestSupport::Services.kick :JSON
+        TestSupport::Library_.kick :JSON
         " #{ ::Hash[ * x_a ].to_json }"
       end
     end
@@ -139,7 +139,7 @@ module Skylab::TestSupport::Regret::API
       if @do_check
         @o = @out
       else
-        @io = @o = TestSupport::Services::StringIO.new
+        @io = @o = TestSupport::Library_::StringIO.new
       end ; nil
     end
 
@@ -291,7 +291,7 @@ module Skylab::TestSupport::Regret::API
       FAILED__
     end
 
-    DEV_NULL_ = API::Face::Services::Headless::IO::DRY_STUB
+    DEV_NULL_ = Lib_::Headless[]::IO::DRY_STUB
     FAILED__ = false
     SUBP_TEST_DIR__ = 'test'.freeze
     SUCCEEDED__ = true

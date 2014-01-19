@@ -71,7 +71,7 @@ module Skylab::GitViz
 
       class Parse_Manifest_
         def initialize fh, p  # NOTE mutates filehandle to be a peeking scanner
-          GitViz::Services::Basic[]::List::Scanner::With[ fh, :peek ]
+          GitViz::Lib_::Basic[]::List::Scanner::With[ fh, :peek ]
           @accept_line_p = p ; @fh = fh
         end
         def execute
@@ -351,7 +351,7 @@ module Skylab::GitViz
           if @scn
             @scn.string = s
           else
-            @scn = GitViz::Services::StringScanner[].new s
+            @scn = GitViz::Lib_::StringScanner[].new s
           end ; nil
         end
       end
@@ -421,13 +421,13 @@ module Skylab::GitViz
       class Incoming_Command_
         def initialize env_h, cmd_s_a, opt_h
           env_h and raise ::NotImplementedError, "env too? #{ env_h }"
-          @normalized_cmd_s = GitViz::Services::Shellwords[].shelljoin cmd_s_a
+          @normalized_cmd_s = GitViz::Lib_::Shellwords[].shelljoin cmd_s_a
           opt_h and init_opt_h opt_h ; nil
         end
         attr_reader :normalized_cmd_s, :any_opt_s
       private
         def init_opt_h opt_h
-          @any_opt_s = GitViz::Services::JSON[].generate opt_h ; nil
+          @any_opt_s = GitViz::Lib_::JSON[].generate opt_h ; nil
         end
       end
     end

@@ -13,19 +13,19 @@ module ::Skylab::CodeMolester
   # the metahell experiments.)
 
   module TestNamespace::PersonName_01
-    class Node < CodeMolester::Services::Treetop::Runtime::SyntaxNode
+    class Node < CodeMolester::Library_::Treetop::Runtime::SyntaxNode
       CodeMolester::Sexp::Auto[ self ]
     end
   end
 
   module TestNamespace::PersonName_02
-    class Node < CodeMolester::Services::Treetop::Runtime::SyntaxNode
+    class Node < CodeMolester::Library_::Treetop::Runtime::SyntaxNode
       CodeMolester::Sexp::Auto[ self ]
     end
   end
 
   module TestNamespace::PersonName_03
-    class Node < CodeMolester::Services::Treetop::Runtime::SyntaxNode
+    class Node < CodeMolester::Library_::Treetop::Runtime::SyntaxNode
       CodeMolester::Sexp::Auto[ self ]
     end
   end

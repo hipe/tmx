@@ -77,12 +77,12 @@ module Skylab::Face
 
   Model::Event::Aggregate = Model::Event.new do |a|
     o = ''
-    Face::Services::Basic::List::Evented::Articulation a do
+    Library_::Basic::List::Evented::Articulation a do
       iff_zero_items               ->     { o << '(empty)' }
       any_first_item               ->   x { o << "#{ x.message_proc[] }" }
 
       any_subsequent_items -> x do
-        if Services::Headless::CLI::FUN::Looks_like_sentence[ o ]
+        if Library_::Headless::CLI::FUN::Looks_like_sentence[ o ]
           sep = ' '
         else
           sep ' - '

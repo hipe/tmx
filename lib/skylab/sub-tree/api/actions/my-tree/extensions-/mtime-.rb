@@ -4,13 +4,13 @@ module Skylab::SubTree
 
     class Extensions_::Mtime_
 
-      IT_ = SubTree::Services::InformationTactics
+      IT_ = SubTree::Library_::InformationTactics
 
       MetaHell::FUN::Fields_[ :client, self, :method, :absorb, :field_i_a,
         [ :local_normal_name, :infostream, :verbose ] ]
 
       def initialize *a
-        @now_t = SubTree::Services::Time.new  # doesn't get cleared anywhere
+        @now_t = SubTree::Library_::Time.new  # doesn't get cleared anywhere
         absorb( *a )
         nil
       end

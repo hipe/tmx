@@ -140,7 +140,7 @@ module Skylab::Headless
     o[:escape_path] = -> path do
       path = path.to_s
       if / |\$|'/ =~ path
-        Headless::Services::Shellwords.shellescape path
+        Headless::Library_::Shellwords.shellescape path
       else
         path
       end

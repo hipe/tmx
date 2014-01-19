@@ -116,7 +116,7 @@ module Skylab::Face
     end
 
     def bld_child_namespace_sheet norm_i, a, p  # :#jump-2
-      nf = Services::Headless::Name::Function.new norm_i
+      nf = Library_::Headless::Name::Function.new norm_i
       mp, xtra_x = prs_ns_args a
       assrt_exactly_one mp, p
       if mp
@@ -254,7 +254,7 @@ module Skylab::Face
 
     def init_with_local_normal_name i  # for hacks, exploration
       @name and fail "won't clobber existing name"
-      @name = Services::Headless::Name::Function.new i
+      @name = Library_::Headless::Name::Function.new i
       self
     end
   end

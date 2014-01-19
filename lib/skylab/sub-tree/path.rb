@@ -14,7 +14,7 @@ module Skylab::SubTree
     end
 
     Glob_to_rx_ = -> glob do  # a hack
-      scn = SubTree::Services::StringScanner.new glob
+      scn = SubTree::Library_::StringScanner.new glob
       out_a = []
       until scn.eos?
         if scn.scan( /\*/ )
@@ -35,7 +35,7 @@ module Skylab::SubTree
 
     o[:glob_h] = -> do
       p = -> do
-        srbg = "*#{ SubTree::Services::TestSupport::FUN::Spec_rb[] }"
+        srbg = "*#{ SubTree::Library_::TestSupport::FUN::Spec_rb[] }"
         r = { 'features' => '*.feature',
               'spec'     => srbg,
               'test'     => srbg

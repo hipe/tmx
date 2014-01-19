@@ -2,7 +2,7 @@ module Skylab::Git
 
   class CLI::Actions::Spread
 
-    Basic = Face::Services::Basic
+    Basic = Git::Library_::Basic
 
     def initialize i, o, e
       @y = ::Enumerator::Yielder.new( & e.method( :puts ) )
@@ -37,7 +37,7 @@ module Skylab::Git
 
     def build_option_parser
       @is_dry_run = false ; @from_file = nil
-      @op = Face::Services::OptionParser.new do |op|
+      @op = Git::Library_::OptionParser.new do |op|
         op.on '-n', '--dry-run', 'dry run.' do
           @is_dry_run = true
         end
@@ -190,7 +190,7 @@ module Skylab::Git
     end
 
     def get_branches_stream_from_git # #hack-alert
-      _i, o, _e = Face::Services::Open3.popen3 "git branch | cut -c 3-"
+      _i, o, _e = Git::Library_::Open3.popen3 "git branch | cut -c 3-"
       _i.close
       if '' != (( s = _e.read ))
         bork "huh? - #{ s }"
@@ -413,7 +413,7 @@ module Skylab::Git
           end
 
           def determine_work_a
-            bubble = Git::Services::Set.new ; work_a = [ ]
+            bubble = Git::Library_::Set.new ; work_a = [ ]
             do_number = -> d do
               is_even = ( d % 2 ).zero?
               d_ = is_even ? d : d + 1

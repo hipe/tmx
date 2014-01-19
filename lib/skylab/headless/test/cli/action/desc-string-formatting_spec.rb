@@ -17,7 +17,7 @@ module Skylab::Headless::TestSupport::CLI::Desc__
     end
 
     def parse s
-      _scn = Headless::Services::Basic::List::Scanner::For::String[ s ]
+      _scn = Headless::Library_::Basic::List::Scanner::For::String[ s ]
       Headless::CLI::Action::Desc::Parse_sections[ @sections=[], _scn ] ; nil
     end
 

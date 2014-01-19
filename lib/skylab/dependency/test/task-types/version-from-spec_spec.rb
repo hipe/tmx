@@ -9,7 +9,7 @@ module Skylab::Dependency::TestSupport::Tasks
     extend Tasks_TestSupport
 
     let(:klass) { TaskTypes::VersionFrom }
-    let(:log) { Dependency::Services::StringIO.new }
+    let(:log) { Dependency::Library_::StringIO.new }
     let(:must_be_in_range) { nil }
     let(:parse_with) { '/(\d+\.\d+\.\d+)/' }
     let(:version_from) { 'echo "version 1.2.34 is the version"' }

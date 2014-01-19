@@ -1,6 +1,6 @@
 module Skylab::FileMetrics
 
-  class Services::Find # [#sl-118] one day they will be unified
+  class Library_::Find # [#sl-118] one day they will be unified
 
     class << self
       private :new

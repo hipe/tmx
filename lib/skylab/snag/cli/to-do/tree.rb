@@ -40,7 +40,7 @@ module Skylab::Snag
           end
         end
       end
-      Headless::Services::Producer.new ea
+      Snag::Library_::Basic::List::Scanner::For::Enumerator.new ea
     end
 
     fun = Headless::CLI::Pen::FUN
@@ -71,7 +71,8 @@ module Skylab::Snag
       col_a_width = cache_a.reduce( 0 ) do |m, row|
         m > row[1] ? m : row[1]
       end
-      Headless::Services::Producer.new( ::Enumerator.new do |y|
+      Snag::Library_::Basic::List::Scanner::For::Enumerator.new(
+          ::Enumerator.new do |y|
         cache_a.each do | col_a, col_a_w, todo |
           col_b = if todo
             "#{ todo.pre_tag_string }#{

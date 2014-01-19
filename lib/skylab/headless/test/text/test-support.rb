@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::Headless::TestSupport::Services
+module Skylab::Headless::TestSupport::Text
 
-  ::Skylab::Headless::TestSupport[ Services_TestSupport = self ]
+  ::Skylab::Headless::TestSupport[ TS__ = self ]
 
   include CONSTANTS
 

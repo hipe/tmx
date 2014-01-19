@@ -9,7 +9,7 @@ module Skylab::Face
         def initialize p
           @keys_provided_set = @param_h = nil
           @proc = p ; @mod = Module.new
-          Services::Basic::Field::Box.enhance @mod do
+          Library_::Basic::Field::Box.enhance @mod do
             field_class_instance_methods -> { API::Params_::Param_IMs_ }
             meta_fields( * API::Params_::METAFIELD_A_A_ )
             fields( * p.parameters.map do |opt_req_rest, i|
@@ -61,7 +61,7 @@ module Skylab::Face
       define_method :super_normalize, & API::Normalizer_::Normalize_method_
 
       def normalize y, par_h
-        par_h and @keys_provided_set = Face::Services::Set.new( par_h.keys )
+        par_h and @keys_provided_set = Library_::Set.new( par_h.keys )
         super_normalize y, par_h
       end
 

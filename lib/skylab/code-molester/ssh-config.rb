@@ -24,7 +24,7 @@ module ::Skylab::CodeMolester
     end
     def _parse string
       hosts = []
-      scn = CodeMolester::Services::StringScanner.new string
+      scn = CodeMolester::Library_::StringScanner.new string
       scn.skip(/[[:space:]]+/)
       loop do
       ok = scn.scan(/Host  */) or return _fail("expected: \"Host\" had: #{scn.peek(20).inspect}")

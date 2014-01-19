@@ -40,7 +40,7 @@ module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked
       ctx = self
       _CLI_client.define_singleton_method :popen3_notify do |cmd_s, &p|
         ctx.last_popen3_command_string = cmd_s
-        p[ nil, Git::Services::StringIO.new( str ), ::StringIO.new( '' ) ]
+        p[ nil, Git::Library_::StringIO.new( str ), ::StringIO.new( '' ) ]
       end
     end
     #
@@ -50,7 +50,7 @@ module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked
     # ~ test-time support
 
     def cd path, & p
-      Git::Services::FileUtils.cd path.to_s, & p
+      Git::Library_::FileUtils.cd path.to_s, & p
     end
 
     def workdir_pn  # #hookout

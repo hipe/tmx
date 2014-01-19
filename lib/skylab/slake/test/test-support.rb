@@ -2,6 +2,7 @@ require_relative '../../test-support/core'
 require_relative '../core'
 
 module Skylab::Slake::TestSupport
+
   ::Skylab::TestSupport::Regret[ Slake_TestSupport = self ]
 
   module CONSTANTS
@@ -18,5 +19,6 @@ module Skylab::Slake::TestSupport
 
   include CONSTANTS
 
-  Headless = Headless  # (`dependency` (subroduct) test suite)
+  Headless = Headless ; Slake = Slake
+
 end

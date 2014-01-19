@@ -29,7 +29,7 @@ module Skylab::Basic
             instance_variable_set ivar_h.fetch( k ), v
           end
         else
-          raise ::NameError, Services::Headless::NLP::EN::Minitesimal::FUN.
+          raise ::NameError, Library_::Headless::NLP::EN::Minitesimal::FUN.
               inflect[ -> do
             "no member#{ s a } #{ or_( a.map { |x| "'#{ x }'" } ) } in struct"
           end ]
@@ -118,7 +118,7 @@ module Skylab::Basic
 
       ::Enumerator.new do |y|
         marg = ( Margin_Engine_.new if with_margins ) ; seen_h = { }
-        scn = Basic::Services::StringScanner.new get_template_string
+        scn = Basic::Library_::StringScanner.new get_template_string
         while ! scn.eos?
           skipped = marg ? ( scn.scan skip_rx ) : ( scn.skip skip_rx )
           surface = scn.scan param_rx

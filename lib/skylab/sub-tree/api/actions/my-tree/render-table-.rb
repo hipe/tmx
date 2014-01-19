@@ -18,7 +18,7 @@ module Skylab::SubTree
           else '' end )
           row_a << cel_a
         end
-        SubTree::Services::Face::CLI::Table[
+        SubTree::Library_::Face::CLI::Table[
           :field, :id, :glyphs_and_slug, :left,
           :field, :id, :xtra, :left,
           :show_header, false,

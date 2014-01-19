@@ -26,10 +26,10 @@ module Skylab::Headless
   private
 
     def initialize func
-      @buffer = Headless::Services::StringIO.new
+      @buffer = Headless::Library_::StringIO.new
       @separator = "\n"
       @separator_rx = /#{ ::Regexp.escape @separator }/
-      @scn = Headless::Services::StringScanner.new EMPTY_STRING_
+      @scn = Headless::Library_::StringScanner.new EMPTY_STRING_
       @func = func
     end
 

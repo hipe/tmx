@@ -22,7 +22,7 @@
 [#133]       #parent-node: [#125] headless testing conventions ..
 [#132]       #in-situ the magical, multipurpose Event base class and variants
 [#131]       #parent-node: [#125] the notificate narrative ..
-[#130]       the Services const_missing hack (#todo document)
+[#130] #hole (became [#su-001])
 [#129]       #parent-node: [#126] headless CLI client DSL narrative
 [#128]       #in-situ (?) hard-coded in-project tmpdir path!
 [#126]       #parent-node: [#125] headless CLI component & theory narratives ..

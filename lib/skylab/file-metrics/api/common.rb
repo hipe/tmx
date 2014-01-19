@@ -30,7 +30,7 @@ module Skylab::FileMetrics
     end
 
     def build_find_files_command path_a
-      FileMetrics::Services::Find.valid -> c do
+      FileMetrics::Library_::Find.valid -> c do
         c.concat_paths path_a
         c.concat_skip_dirs @req[:exclude_dirs]
         c.concat_names @req[:include_names]
@@ -45,7 +45,7 @@ module Skylab::FileMetrics
 
     def stdout_lines command_string, y
       tsa_limit = ( @tsa_limit ||= 0.33 )  # tsa = time since activity
-      FileMetrics::Services::Open3.popen3 command_string do |_, sout, serr|
+      FileMetrics::Library_::Open3.popen3 command_string do |_, sout, serr|
         er = nil
         select = Headless::IO::Upstream::Select.new
         select.timeout_seconds = 5.0  # exaggerated amount for fun
@@ -243,7 +243,7 @@ module Skylab::FileMetrics
         out.puts "(table has no rows)"  # last ditch fallback.
         false
       else
-        Services::Table::Render[ out, count.each_child, [ design,
+        Library_::Table::Render[ out, count.each_child, [ design,
           -> d do  # grease wheels
             d.the_rest count.first_child.class.members  # did we forget any?
             d.hdr do |sym|  # hack a header from the field id as a default

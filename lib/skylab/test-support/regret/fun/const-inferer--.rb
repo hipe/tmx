@@ -19,7 +19,7 @@ module Skylab::TestSupport
 
         def execute
           -> do  # #result-block
-            c_a = [] ; scn = Headless::Services::StringScanner.new @tail_path
+            c_a = [] ; scn = Regret::API::Lib_::StringScanner[].new @tail_path
             while (( tok = scn.scan RX_ ))  # the regex has a fwd lookahead
               scn.pos = scn.pos + 1         #  assertion so we don't capture
               c_a << Constantify_[ tok ].intern  # the '/' but skip over it

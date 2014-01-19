@@ -126,7 +126,7 @@ module Skylab::TMX::TestSupport::CLI::L2P
       argv = ::Skylab::Subsystem::PATHNAMES.calculate do
         [ bin.join( supernode_binfile ).to_s , i.to_s, ping_arg ]
       end
-      o, e, st = TestSupport::Services::Open3.capture3( * argv )
+      o, e, st = TestSupport::Library_::Open3.capture3( * argv )
       o.should eql ''
       e.should eql( "#{ hellomsg i }\n" )
       st.exitstatus.should eql( exitstatus )

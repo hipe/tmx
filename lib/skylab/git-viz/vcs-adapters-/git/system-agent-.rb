@@ -196,7 +196,7 @@ module Skylab::GitViz
       end
 
       INTERRUPT__ = false
-      Power_Scanner__ = GitViz::Services::Basic[]::List::Scanner::Power
+      Power_Scanner__ = GitViz::Lib_::Basic[]::List::Scanner::Power
       PROCEDE__ = true
 
     end

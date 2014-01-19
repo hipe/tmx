@@ -33,7 +33,7 @@ class Skylab::Git::CLI::Actions::Head  # read [#gi-011] the git.. narrative
       exitstatus = nil ; argv = @argv ; y = @y
       usage_string = -> { "#{ @program_name } [opts] <file>" }
       rr = nil
-      op = Services::OptionParser[].new do |o|
+      op = Library_::OptionParser[].new do |o|
         help = -> _ do
           exitstatus = SUCCEEDED__
           y << "#{ hi 'usage:' } #{ usage_string[] }\n\n"
@@ -111,7 +111,7 @@ class Skylab::Git::CLI::Actions::Head  # read [#gi-011] the git.. narrative
         end ; nil
       end
     end
-    module Services
+    module Library_
       OptionParser = -> do require 'optparse' ; ::OptionParser end
     end
     Git = ::Skylab::Git
@@ -144,7 +144,7 @@ class Skylab::Git::API::Actions::Head
 
     def bld_tmp_patch_pn
       _tail = "#{ self.class.name.gsub( '::', '-' ).downcase }-mutex"  # hah
-      Services::Pathname[].new( Services::Tmpdir[].tmpdir ).join _tail
+      Library_::Pathname[].new( Library_::Tmpdir[].tmpdir ).join _tail
     end
   public
 
@@ -188,7 +188,7 @@ class Skylab::Git::API::Actions::Head
     end
 
     def init_output_path_and_pathname
-      pn = Services::Pathname[].new @path
+      pn = Library_::Pathname[].new @path
       ext_s = pn.extname
       bn = pn.basename.sub_ext ''
       _branch = @any_branch_name || DEFAULT_BRANCH_NAME_PRETTY__
@@ -234,7 +234,7 @@ class Skylab::Git::API::Actions::Head
     FU__ = -> do
       p = -> do
         cls = class FU___
-          include Services::FileUtils[]::Verbose
+          include Library_::FileUtils[]::Verbose
           public :rm
           def initialize &p
             @p = p ; nil
@@ -271,7 +271,7 @@ class Skylab::Git::API::Actions::Head
         flush_e ; flush_o ; flush_w ; nil
       end
       def execute_cmd_a
-        _, @o, @e, @w = Services::Open3[].popen3( * @cmd_a ) ; nil
+        _, @o, @e, @w = Library_::Open3[].popen3( * @cmd_a ) ; nil
       end
       def flush_e
         while (( s = @e.gets ))
@@ -477,7 +477,7 @@ class Skylab::Git::API::Actions::Head
       end
     end
 
-    module Services
+    module Library_
       FileUtils = -> do require 'fileutils' ; ::FileUtils end
       Open3 = -> do require 'open3' ; ::Open3 end
       Pathname = -> do require 'pathname' ; ::Pathname end

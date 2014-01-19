@@ -225,7 +225,7 @@ module Skylab::MetaHell
           end
         end
         def initialize( * )
-          @key_set = MetaHell::Services::Set.new
+          @key_set = MetaHell::Library_::Set.new
           super
         end
         def keys
@@ -291,7 +291,7 @@ module Skylab::MetaHell
   module DelegatesTo
     def self.extended mod
       $stderr.puts "\e[34mDEPRECATID\e[0m"  # #todo:during-merge
-      MetaHell::Services::Headless::Delegating[ mod, :employ_the_DSL_method_called_delegates_to ]
+      MetaHell::Library_::Headless::Delegating[ mod, :employ_the_DSL_method_called_delegates_to ]
     end
   end
 end

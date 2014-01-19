@@ -179,7 +179,7 @@ module Skylab::Headless
     private
 
       def puff  # @args -> @norm_short_str @long_sexp @sexp
-        sexp = Headless::Services::CodeMolester::Sexp[ :opt ]
+        sexp = Headless::Library_::CodeMolester::Sexp[ :opt ]
         h = { }
         add = -> k, v do
           ( h[ k ] ||= [ ] ) << sexp.length

@@ -39,7 +39,7 @@ module Skylab::GitViz::TestSupport
     end
 
     def build_listener
-      GitViz::Services::PubSub[]::Listener::Spy_Proxy.new do |spy|
+      GitViz::Lib_::PubSub[]::Listener::Spy_Proxy.new do |spy|
         spy.emission_a = @baked_em_a = []
         spy.inspect_emission_proc =
           method :inspect_emission_channel_and_payload

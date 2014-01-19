@@ -4,7 +4,7 @@ module Skylab::Face
 
     def self.touch ; nil end      #kick-the-loading-warninglessly-and-trackably
 
-    Headless = Face::Services::Headless  # it's used often enough to warrant this
+    Headless = Library_::Headless  # it's used often enough to warrant this
 
   end
 

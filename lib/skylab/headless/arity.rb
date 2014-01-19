@@ -64,7 +64,7 @@ module Skylab::Headless
       end
 
       def index
-        bx = Headless::Services::Basic::Box.new
+        bx = Headless::Library_::Basic::Box.new
         constants.each do |c|
           ar = const_get c, false
           bx.add ar.local_normal_name, ar

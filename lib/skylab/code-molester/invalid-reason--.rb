@@ -57,7 +57,7 @@ module Skylab::CodeMolester
 
     # result : start_idx_of_line, line_number (1-indexed), line_width
     Line_info__ = -> string, seek_idx do
-      scn = CodeMolester::Services::StringScanner.new string
+      scn = CodeMolester::Library_::StringScanner.new string
       at_idx = -1
       line_idx = 0
       content = nil

@@ -5,8 +5,8 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
   Autoloader = ::Skylab::Autoloader  # #storypoint-3 "these constant ass.."
   Git = ::Skylab::Git
   MetaHell = ::Skylab::MetaHell
-  Basic = Git::Services::Basic
-  Headless = Git::Services::Headless
+  Basic = Git::Library_::Basic
+  Headless = Git::Library_::Headless
 
   module Sub_client__  # #storypoint-4 "the way sub-clients are used in t.."
 
@@ -77,7 +77,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     Shellesc = -> _ do
     private
       def shellesc x
-        Git::Services::Shellwords.shellescape x
+        Git::Library_::Shellwords.shellescape x
       end
     end
 
@@ -177,7 +177,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       @IO_adapter.pen
     end
 
-    define_method :popen3_notify, & Git::Services::Open3.method( :popen3 )
+    define_method :popen3_notify, & Git::Library_::Open3.method( :popen3 )
     # gets stubed by tests, hence at top # :#storypoint-7: this?
 
   private
@@ -254,7 +254,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       o
     end
     def begin_option_parser
-      Git::Services::OptionParser.new
+      Git::Library_::OptionParser.new
     end
     def begin_option_parser_for_child
       begin_option_parser
@@ -587,7 +587,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
   module FU_Bundle_and_IMs__
     Cd = -> _ do
-      include Git::Services::FileUtils
+      include Git::Library_::FileUtils
     end
     Move = -> _ do
       include FU_Bundle_and_IMs__

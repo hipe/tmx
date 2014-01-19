@@ -1,7 +1,7 @@
 module Skylab::Test::Plugins::Subtree
 
   include ::Skylab::Test
-  Headless = Headless
+  Headless = Headless ; Lib_ = Lib_
 
   class Agent_
     # search agents classes go here
@@ -28,8 +28,7 @@ module Skylab::Test::Plugins::Subtree
 
   end
 
-  module Agents
-  end
+  Agents = ::Module.new
 
   class Agents::Black < Agent_
 
@@ -84,7 +83,7 @@ module Skylab::Test::Plugins::Subtree
 
     compile do |y|
       if @is_hot
-        @pool_set = Headless::Services::Set[ * @str_a ]
+        @pool_set = Lib_::Set[][ * @str_a ]
         @length = @str_a.length
         true
       end
@@ -203,7 +202,7 @@ module Skylab::Test::Plugins::Subtree
       @length = @str_a.length
       @rx_a = @str_a.map { |s| %r{\A#{ ::Regexp.escape s }} }.freeze
       @cache_h = { }
-      @pool_set = Headless::Services::Set[ * @str_a ]
+      @pool_set = Lib_::Set[][ * @str_a ]
       if @be_verbose
         @ignore_name_a = [ ]
         @ignore_count_h = ::Hash.new do |h, k|

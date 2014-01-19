@@ -58,7 +58,7 @@ module Skylab::FileMetrics
   private
 
     def build_find_dirs_command
-      Services::Find.valid( -> c do
+      Library_::Find.valid( -> c do
         c.add_path @req[:path]
         c.concat_skip_dirs @req[:exclude_dirs]
         c.concat_names @req[:include_names]

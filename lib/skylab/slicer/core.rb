@@ -10,6 +10,8 @@ module Skylab::Slicer
 
   MAARS = MetaHell::MAARS
 
+  # (:+[#su-001]:none)
+
   MAARS[ self ]
 
 end

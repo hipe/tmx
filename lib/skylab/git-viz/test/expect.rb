@@ -143,7 +143,7 @@ module Skylab::GitViz
       end
 
       Inspect = -> x do
-        Headless::Services::Basic::FUN::Inspect__[ 120, x ]
+        GitViz::Lib_::Basic[]::FUN::Inspect__[ 120, x ]
       end
     end
   end

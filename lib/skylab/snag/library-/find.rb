@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class Services::Find  # [#032] - see if we can unify find commands ..
+  class Library_::Find  # [#032] - see if we can unify find commands ..
 
     #         ~ the point is to make it hard to succeed ~
 
@@ -49,7 +49,7 @@ module Skylab::Snag
         ( e = p[] ) ? m << e : m
       end
       if a.length.nonzero? then no[ a * ' - ' ] else
-        Snag::Services::Shellwords || nil
+        Snag::Library_::Shellwords || nil
         y = [ "find #{ @paths.map(& :shellescape ) * ' ' }" ]
         y << "\\( #{@names.map { |n| "-name #{ n.shellescape }"} * ' -o '} \\)"
         y <<

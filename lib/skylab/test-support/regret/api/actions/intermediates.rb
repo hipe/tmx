@@ -60,7 +60,7 @@ module Skylab::TestSupport::Regret::API
     #     opn =  TestSupport::TestSupport.dir_pathname.
     #       join( 'regret/code-fixtures-' )
     #     remove_entry_secure = -> do
-    #       TestSupport::Services::FileUtils.remove_entry_secure opn.to_s
+    #       TestSupport::Library_::FileUtils.remove_entry_secure opn.to_s
     #     end
     #     opn.exist? and remove_entry_secure[]
     #     in_pn = HOME_.join( 'code-fixtures-/asap/whootenany.rb' )
@@ -114,7 +114,7 @@ module Skylab::TestSupport::Regret::API
   private
 
     def build_walker
-      Regret::Services::Walker[].new :path, @path, :top, @top, :vtuple,
+      Lib_::SubTree[]::Walker.new :path, @path, :top, @top, :vtuple,
         @vtuple, :listener, generic_listener
     end
 
@@ -132,7 +132,7 @@ module Skylab::TestSupport::Regret::API
     end
 
     def build_down d, a
-      @buff = TestSupport::Services::StringIO.new
+      @buff = TestSupport::Library_::StringIO.new
       r = true ; begin
         p = d.join TestSupport_
         if p.exist?
@@ -178,7 +178,7 @@ module Skylab::TestSupport::Regret::API
       io.rewind ; io.truncate 0
       true
     end
-    DEV_NULL_ = TestSupport::Services::Headless::IO::DRY_STUB
+    DEV_NULL_ = TestSupport::Library_::Headless::IO::DRY_STUB
     WRITEMODE_ = Headless::WRITEMODE_
 
     def say volume, msg_p

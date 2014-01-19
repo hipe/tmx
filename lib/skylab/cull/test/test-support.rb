@@ -14,6 +14,8 @@ module Skylab::Cull::TestSupport
 
   include CONSTANTS
 
+  Cull = Cull
+
   Face::TestSupport::CLI[ self ]
 
   extend TestSupport::Quickie
@@ -72,7 +74,7 @@ module Skylab::Cull::TestSupport
       end
 
       r = nil
-      Headless::Services::FileUtils.cd "#{  dir_pn || tmpdir }" do |_dir|
+      Cull::Lib_::FileUtils[].cd "#{  dir_pn || tmpdir }" do |_dir|
         r = blk.call
       end
 

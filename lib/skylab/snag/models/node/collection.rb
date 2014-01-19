@@ -87,7 +87,7 @@ module Skylab::Snag
     date_format = '%Y-%m-%d'
 
     define_method :todays_date do
-      Snag::Services::DateTime.now.strftime date_format
+      Snag::Library_::DateTime.now.strftime date_format
     end
 
     def my_callbacks_a

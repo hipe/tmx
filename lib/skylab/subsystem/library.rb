@@ -1,18 +1,17 @@
 module Skylab::Subsystem
 
-  class Services < ::Module
+  class Library < ::Module
 
     # an experimental playground for DRY-ing up this popular pattern
     # among subproduct-level nodes :[#001]
 
     def initialize parent_dir_pn
-      @dir_pathname = parent_dir_pn.join SVCS__
+      @dir_pathname = parent_dir_pn.join FILE_STEM__
       @pathname = @dir_pathname.sub_ext ::Skylab::Autoloader::EXTNAME
-      const_set :FUN, ::Skylab::Subsystem::FUN
-      nil
+      const_set :FUN, ::Skylab::Subsystem::FUN ; nil
     end
 
-    SVCS__ = 'services'.freeze
+    FILE_STEM__ = 'library-'.freeze
 
     attr_reader :pathname
 

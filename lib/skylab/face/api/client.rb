@@ -208,7 +208,7 @@ module Skylab::Face
         end ].new a
     end
 
-    Plugin_ = Services::Headless::Plugin
+    Plugin_ = Library_::Headless::Plugin
 
   private
 
@@ -255,7 +255,7 @@ module Skylab::Face
 
     def build_counting_message_yielder_for ex
       ex.instance_exec do  # emitting call below might be private
-        Services::Basic::Yielder::Counting.new( &
+        Library_::Basic::Yielder::Counting.new( &
           if respond_to? :normalization_failure_line_notify
             method :normalization_failure_line_notify
           else

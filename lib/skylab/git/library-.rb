@@ -1,18 +1,16 @@
 module Skylab::Git
 
-  module Services  # :+[#su-001]
+  module Library_  # :+[#su-001]
 
     stdlib, subsys = ::Skylab::Subsystem::FUN.
       at :require_stdlib, :require_subsystem
     o = { }
-    o[:Basic] = subsys
-    o[:FileUtils] = stdlib
-    o[:Headless] = subsys
-    o[:Open3] = stdlib
-    o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser }
-    o[:Set] = stdlib
-    o[:Shellwords] = stdlib
-    o[:StringIO] = stdlib
+    o[ :Basic ] = subsys
+    o[ :FileUtils ] = stdlib
+    o[ :Headless ] = subsys
+    o[ :Open3 ] = stdlib
+    o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
+    o[ :Set ] = o[ :Shellwords ] = o[ :StringIO ] = stdlib
 
     define_singleton_method :const_missing do |const_i|
       const_set const_i, o.fetch( const_i )[ const_i ]

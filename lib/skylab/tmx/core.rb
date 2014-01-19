@@ -14,7 +14,6 @@ module Skylab::TMX
   end
 
   MetaHell::MAARS[ self ]
-    # now any module under `self` will autoload.
 
   module TMX::Modules
 
@@ -33,4 +32,6 @@ module Skylab::TMX
       self::Client.new( *a )
     end
   end
+
+  # (:+[#su-001]:none)
 end

@@ -17,7 +17,7 @@ module Skylab::Git
 
       def invoke argv
         @argv = argv ; @do_procede = true
-        Git::Services::OptionParser.class
+        Git::Library_::OptionParser.class
         ok = preparse_opts
         ok &&= parse_opts
         ok &&= parse_args

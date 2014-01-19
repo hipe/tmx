@@ -6,7 +6,7 @@ module Skylab::TestSupport
 
       module DocTest
 
-        Parse_Recursive_ = TestSupport_::Services::Basic::Struct[ :y, :v, :argv ]
+        Parse_Recursive_ = TestSupport_::Library_::Basic::Struct[ :y, :v, :argv ]
 
         # the things we do for love. **necessary** to support argv's like:
         #
@@ -56,7 +56,7 @@ module Skylab::TestSupport
 
           REST_RX_ = /\A-(?<stem>[^-].*)\z/
 
-          Value_ = CLI::Face::Services::Basic::Struct[ :did_error, *
+          Value_ = Regret::API::Lib_::Basic[]::Struct[ :did_error, *
             A_.reduce( [] ) { |m, x| x.i and m << x.i ; m } ]
           class Value_
             def to_i

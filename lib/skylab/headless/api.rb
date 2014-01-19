@@ -383,7 +383,7 @@ module Skylab::Headless
       PARSE_CLASS__ = PARSE_CLASS_
 
       Nilify_and_absorb_iambic_passively__ = -> x_a do
-        set = Headless::Services::Set.new self.class.const_get CONST_A__
+        set = Headless::Library_::Set.new self.class.const_get CONST_A__
         h = self.class.const_get CONST_H__
         @x_a = x_a
         while x_a.length.nonzero?
@@ -569,7 +569,7 @@ module Skylab::Headless
       Get_box__ = -> do
         a = const_get CONST_A__ ; h = const_get CONST_H__
         h_ = ::Hash[ a.map { |i| [ i, send( h[ i ] ) ] } ]
-        Headless::Services::Basic::Box.from_a_and_h a, h_
+        Headless::Library_::Basic::Box.from_a_and_h a, h_
       end
 
       Get_scanner__ = -> do

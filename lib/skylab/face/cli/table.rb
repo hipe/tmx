@@ -118,7 +118,7 @@ module Skylab::Face
 
     def render
       (( yp = @write_lines_to )) or begin
-        io = Face::Services::StringIO.new
+        io = Library_::StringIO.new
         yp = io.method :puts
       end
       fmt = get_format
@@ -176,7 +176,7 @@ module Skylab::Face
     private
     MetaHell::FUN::Fields_::From_.methods do
       def field a
-        bx = (( @field_box ||= Face::Services::Basic::Box.new ))
+        bx = (( @field_box ||= Library_::Basic::Box.new ))
         fld = Field_.new a, bx.length
         bx.add fld.name_i, fld
         @do_show_header.nil? and @do_show_header = true

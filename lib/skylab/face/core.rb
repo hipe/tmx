@@ -20,22 +20,18 @@ module Skylab::Face
     end
   end
 
-  module Services  # :+[#su-001]
+  module Library_  # :+[#su-001]
 
     MAARS[ self ]
 
     stdlib, subsys = ::Skylab::Subsystem::FUN.
       at :require_stdlib, :require_subsystem
     o = { }
-    o[:Basic] = subsys # `fields` used extensively by API API
-    o[:Headless] = subsys # used extensively everywhere
-    # o[:Ncurses] = stdlib  # #ncurses
-    o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser }  # crucial
-    o[:Open3] = stdlib
-    o[:Porcelain] = subsys  # option parser abtract modelling
-    o[:PubSub] = subsys  # engaged by the API Action API's `emit` facet.
-    o[:Set ] = stdlib
-    o[:StringIO] = stdlib
+    o[ :Basic ] = o[ :Headless ] = subsys
+    o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
+    o[ :Open3 ] = stdlib
+    o[ :Porcelain ] = o[ :PubSub ] = subsys
+    o[ :Set  ] = o[ :StringIO ] = stdlib
 
     define_singleton_method :const_missing do |c|
       if o.key? c
@@ -357,8 +353,8 @@ module Skylab::Face
       nil
     end
   end
-  class Services_  # the shortest, tightest way to do services yet
-    class Iambic_
+
+    class Iambic
       class << self
         alias_method :orig_new, :new
       private
@@ -370,7 +366,7 @@ module Skylab::Face
           def self.collapse
             super
             a = @formal_arg_a ; @formal_arg_a = nil
-            box = const_set :SERVICES_, Services::Basic::Box.new
+            box = const_set :SERVICES_, Library_::Basic::Box.new
             begin
               box.add (( i = a.shift )), a.shift
               define_method( i ) { self[ i ] }
@@ -417,5 +413,4 @@ module Skylab::Face
         self::SERVICES_._a.dup
       end
     end
-  end
 end

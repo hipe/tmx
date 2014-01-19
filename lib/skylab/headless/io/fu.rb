@@ -4,7 +4,7 @@ module Skylab::Headless
     # that is by default verbose whose output is bound to the proc passed
     # in its construction. ('p' will receive each message string.)
 
-    include Headless::Services::FileUtils
+    include Headless::Library_::FileUtils
 
     def initialize *a, & p
       @p = ( p ? a << p : a ).fetch( a.length - 1 << 1 )

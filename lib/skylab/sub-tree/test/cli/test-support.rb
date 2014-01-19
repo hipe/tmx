@@ -195,7 +195,7 @@ module Skylab::SubTree::TestSupport::CLI
 
     def cd path, &block
       SubTree::Headless::CLI::PathTools.clear
-      SubTree::Services::FileUtils.cd path, verbose: do_debug, &block
+      SubTree::Library_::FileUtils.cd path, verbose: do_debug, &block
     end
   end
 end

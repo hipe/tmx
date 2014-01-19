@@ -10,5 +10,7 @@ module Skylab::Permute
   Permute = self
   PubSub = ::Skylab::PubSub
 
+  # (:+[#su-001]:none)
+
   ::Skylab::MetaHell::MAARS[ self ]
 end

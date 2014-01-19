@@ -51,7 +51,7 @@ module Skylab::Headless
         p_a and build_producer_from_p_a p_a
       end
       def build_producer_from_p_a p_a
-        Headless::Services::Basic::List::Scanner::For.block do |y|
+        Headless::Library_::Basic::List::Scanner::For.block do |y|
           p_a.each do |p|
             @client.instance_exec y, & p
           end ; nil

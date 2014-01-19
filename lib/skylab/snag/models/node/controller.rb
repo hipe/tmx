@@ -151,7 +151,7 @@ module Skylab::Snag
           ok = true
 
           open_tag = Models::Tag.canonical[ :open ]
-          scn = Snag::Services::StringScanner.new -> do
+          scn = Snag::Library_::StringScanner.new -> do
             parts = [ ]
             if @do_prepend_open_tag
               parts.push open_tag

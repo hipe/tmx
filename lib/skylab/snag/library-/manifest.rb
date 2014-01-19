@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class Services::Manifest
+  class Library_::Manifest
 
     def initialize pathname
       @pathname = ( ::Pathname.new pathname if pathname )

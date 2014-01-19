@@ -13,7 +13,7 @@ module Skylab::Face
         kls.class_exec do
           if ! respond_to? :is_pub_sub_emitter_module or
               ! is_pub_sub_emitter_module  # unlikely
-            Services::PubSub[ self, :employ_DSL_for_emitter ]
+            Library_::PubSub[ self, :employ_DSL_for_emitter ]
             public :on, :with_specificity  # per the way we wire API actions.
             define_singleton_method :emits, & emits[ self ]
           end

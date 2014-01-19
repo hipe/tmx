@@ -51,7 +51,7 @@ module Skylab::Basic
       a.frozen? or raise ::ArgumentError, "when providing an array to #{
         }use as the member list, it must be frozen"
       p = -> do
-        set = Basic::Services::Set.new( a ).freeze
+        set = Library_::Set.new( a ).freeze
         p = -> { set } ; set
       end
       define_method :basic_set_member_set do p[] end
@@ -60,7 +60,7 @@ module Skylab::Basic
       define_method :basic_set_member_set do
         self.class.basic_set_member_set_from_p do
           _a = instance_exec( & p )
-          Basic::Services::Set.new( _a ).freeze
+          Library_::Set.new( _a ).freeze
         end
       end
       def self.basic_set_member_set_from_p & build_set_p
@@ -261,7 +261,7 @@ module Skylab::Basic
         @vessel_x or fail "sanity - no @vessel_x"
       end
       def traverse
-        @xtra_k_a = nil ; @provided = Basic::Services::Set.new
+        @xtra_k_a = nil ; @provided = Library_::Set.new
         @fld = Memberhood_Unit_of_Work__.new
         @input_pairs.each_pair do |k, v|
           @fld.replace k, v

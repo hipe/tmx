@@ -14,7 +14,7 @@ describe ::Skylab::CodeMolester::Sexp::Auto do
 
   let :parser_class do
     wat = cache.fetch( grammar ) do |str|
-      g = CodeMolester::Services::Treetop.load_from_string str
+      g = CodeMolester::Library_::Treetop.load_from_string str
       cache[ str ] = g
       g
     end
@@ -40,7 +40,7 @@ describe ::Skylab::CodeMolester::Sexp::Auto do
     end
     it "(the treetop grammar parses inputs like normal)" do
       parser.parse('mary').should be_kind_of(
-        CodeMolester::Services::Treetop::Runtime::SyntaxNode )
+        CodeMolester::Library_::Treetop::Runtime::SyntaxNode )
       parser.parse('joe bob').should be_nil
     end
     it "parse trees get a method called 'sexp'" do
@@ -150,7 +150,7 @@ describe ::Skylab::CodeMolester::Sexp::Auto do
 
       module Sandwich
 
-        class MyNode < CodeMolester::Services::Treetop::Runtime::SyntaxNode
+        class MyNode < CodeMolester::Library_::Treetop::Runtime::SyntaxNode
 
           CodeMolester::Sexp::Auto.enhance( self ).with MySexp
 

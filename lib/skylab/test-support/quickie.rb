@@ -376,7 +376,7 @@ module Skylab::TestSupport::Quickie
       if parse_opts argv
         parse_args argv
       end
-    rescue TestSupport::Services::OptionParser::ParseError => e
+    rescue TestSupport::Library_::OptionParser::ParseError => e
       usage_and_invite "#{ e }"
       nil
     end
@@ -427,7 +427,7 @@ module Skylab::TestSupport::Quickie
     end
 
     def build_option_parser
-      o = TestSupport::Services::OptionParser.new
+      o = TestSupport::Library_::OptionParser.new
       o.on '-t', '--tag TAG[:VALUE]',
           '(tries to be like the option in rspec)' do |v|
         process_tag_argument v

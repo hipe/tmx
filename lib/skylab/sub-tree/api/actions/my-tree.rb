@@ -2,7 +2,7 @@ module Skylab::SubTree
 
   class API::Actions::My_Tree
 
-    SubTree::Services::Face::API::Normalizer_.enhance_client_class self, :all
+    SubTree::Library_::Face::API::Normalizer_.enhance_client_class self, :all
 
     MetaHell::FUN::Fields_[ :client, self, :method, :absorb_iambic,
       :field_i_a, [ :expression_agent, :program_name, :param_h,
@@ -48,7 +48,7 @@ module Skylab::SubTree
       nil  # when field is optional, response "shouldn't" matter
     end
 
-    Face = SubTree::Services::Face
+    Face = SubTree::Library_::Face
 
     Face::API::Params_[ :client, self,
 
@@ -325,7 +325,7 @@ module Skylab::SubTree
         @pattern and cmd.set_pattern_s @pattern
         if ! (( cmd_s = cmd.string )) then false else
           @cmd_s_p[ cmd_s ]
-          i, o, e, t = SubTree::Services::Open3.popen3 cmd_s
+          i, o, e, t = SubTree::Library_::Open3.popen3 cmd_s
           i.close
           if (( s = e.read )) && '' != s
             o.close

@@ -164,7 +164,7 @@ module Skylab::CodeMolester::Config::File::Entity
     -> do  # `_get_normalized_pairs` - do not re-write these.
            # they lose whitespace formatting. also there are some gothas #todo
 
-      scn = CodeMolester::Services::StringScanner.new ''
+      scn = CodeMolester::Library_::StringScanner.new ''
       white = /[ \t]+/
       a = [ ]
       lit_rx = /(?:true|false)\b/

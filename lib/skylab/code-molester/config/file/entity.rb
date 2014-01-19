@@ -52,7 +52,7 @@ module Skylab::CodeMolester::Config::File::Entity
 
   CodeMolester = ::Skylab::CodeMolester
 
-  CodeMolester::Services.kick :Basic, :Face
+  CodeMolester::Library_.kick :Basic, :Face
 
   %i| Basic Face Headless MetaHell |.each do |i|
     const_set i, ::Skylab.const_get( i, false )

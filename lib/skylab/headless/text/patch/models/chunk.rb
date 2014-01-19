@@ -1,5 +1,6 @@
 module Skylab::Headless
-  class Services::Patch::Models::Chunk
+
+  class Text::Patch::Models::Chunk
 
     attr_reader :left
     attr_reader :right
@@ -12,7 +13,7 @@ module Skylab::Headless
     end
   end
 
-  class Services::Patch::Models::Chunk::Side
+  class Text::Patch::Models::Chunk::Side
 
     def << line
       @range.inc!
@@ -42,7 +43,7 @@ module Skylab::Headless
     end
   end
 
-  class Services::Patch::Models::Chunk::Side::Range
+  class Text::Patch::Models::Chunk::Side::Range
 
     attr_reader :begin
 

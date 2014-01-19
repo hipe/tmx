@@ -20,7 +20,7 @@ module Skylab::Snag
 
     def initialize paths, names, pattern
       @seen_count = nil
-      @command = Snag::Services::Find.new paths, names, pattern
+      @command = Snag::Library_::Find.new paths, names, pattern
       super(& method( :visit ) )
     end
 
@@ -56,7 +56,7 @@ module Skylab::Snag
 
     def visit_valid y, cmd
       res = true
-      Snag::Services::Open3.popen3( cmd ) do |sin, sout, serr|
+      Snag::Library_::Open3.popen3( cmd ) do |sin, sout, serr|
         todo = Models::ToDo::Flyweight.new @pattern
         sout.each_line do |line|
           @seen_count += 1

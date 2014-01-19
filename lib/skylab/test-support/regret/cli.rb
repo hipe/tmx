@@ -6,7 +6,7 @@ module Skylab::TestSupport
       Client.new( * x_a )
     end
 
-    Face = TestSupport_::Services::Face
+    Face = TestSupport_::Library_::Face
     Client = ::Class.new Face::CLI
   end
 
@@ -14,7 +14,7 @@ module Skylab::TestSupport
 
     API = Regret::API
     CLI = Regret::CLI
-    Headless = TestSupport_::Services::Headless
+    Headless = TestSupport_::Library_::Headless
 
     API::Conf::Verbosity[ self ]
 

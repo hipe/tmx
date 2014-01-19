@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class Services::Manifest
+  class Library_::Manifest
 
     class Tmpdir_Curry_ < Funcy_
 

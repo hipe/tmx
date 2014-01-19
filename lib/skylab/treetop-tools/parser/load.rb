@@ -39,7 +39,7 @@ module Skylab::TreetopTools
         # we want to hold on to the string representation of the path exactly
         # as the user provided it before we normalize it
         @grammar_a = treetop_grammar.each_with_index.map do |pn, i|
-          Services::CodeMolester::Const_Pryer.new(
+          Library_::CodeMolester::Const_Pryer.new(
             :outfile_stem, pn.to_s,
             :inpath_p, -> { treetop_grammar[ i ] },
             :outdir_p, -> { generated_grammar_dir } )

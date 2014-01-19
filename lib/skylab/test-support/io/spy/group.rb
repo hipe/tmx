@@ -69,7 +69,7 @@ module Skylab::TestSupport
   private
 
     def build_spy_for name_x, & init_p
-      downstream_IO = TestSupport_::Services::StringIO.new
+      downstream_IO = TestSupport_::Library_::StringIO.new
       filter = Headless::IO::Interceptors::Filter.new downstream_IO
       filter.line_end = -> do
         downstream_IO.rewind

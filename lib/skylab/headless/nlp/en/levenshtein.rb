@@ -27,7 +27,7 @@ module Skylab::Headless
           end
         end
         #
-        Closest_n_items_to_item__ = Headless::Services::InformationTactics::
+        Closest_n_items_to_item__ = Headless::Library_::InformationTactics::
           Levenshtein::Closest_n_items_to_item
 
         Or_with_closest_n_items_to_item =

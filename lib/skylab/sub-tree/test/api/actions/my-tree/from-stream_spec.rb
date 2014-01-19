@@ -77,7 +77,7 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree
 
     it "from good path (using find) - pretty (well done)" do
       f = start_front.absorb_params( :path_a, %w( one ) ) ; r = nil
-      SubTree::Services::FileUtils.cd fixtures_dir_pn do
+      SubTree::Library_::FileUtils.cd fixtures_dir_pn do
         r = f.flush
       end
       @e.string.should be_empty

@@ -74,7 +74,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
         hot = false
         a.length > 1 and flush[]
       end
-      cs = Comment_::Scanner[ sn, Face::Services::Basic::List::Scanner[ fh ] ]
+      cs = Comment_::Scanner[ sn, Lib_::Basic[]::List::Scanner[ fh ] ]
       @gets = -> do
         if hot
           while true

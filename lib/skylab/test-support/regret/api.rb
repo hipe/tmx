@@ -8,7 +8,7 @@ module Skylab::TestSupport
       TestSupport = TestSupport_
 
       %i| Basic Face Headless MetaHell |.each do |i|
-        const_set i, TestSupport::Services.const_get( i, false )
+        const_set i, TestSupport::Library_.const_get( i, false )
       end
 
       WRITEMODE_ = Headless::WRITEMODE_
@@ -17,7 +17,7 @@ module Skylab::TestSupport
 
     end
 
-    TestSupport_::Services::Face::API[ self ]
+    TestSupport_::Library_::Face::API[ self ]
 
     action_name_white_rx( /[a-z0-9]$/ )
 
@@ -119,21 +119,29 @@ module Skylab::TestSupport
           end
         end
       end
-    end
 
-    Expression_agent_class__ = -> do
-      Services::Face[]::API::Normalizer_::Expression_agent_class[]
-    end
+      module Lib_
+        memo = -> p do
+          p_ = -> { x = p.call ; p_ = -> { x } ; x }
+          -> { p_.call }
+        end
+        subsys = -> i do
+          memo[ -> do
+            _slug = i.to_s.gsub( %r((?<=[a-z])(?=[A-Z])), '-' ).downcase
+            require "skylab/#{ _slug }/core"
+            ::Skylab.const_get i, false
+          end ]
+        end
+        Basic = subsys[ :Basic ]
+        Face = subsys[ :Face ]
+        Headless = subsys[ :Headless ]
+        PubSub = subsys[ :PubSub ]
+        StringScanner = memo[ -> { require 'strscan' ; ::StringScanner } ]
+        SubTree = subsys[ :SubTree ]
+      end
 
-    module Services  # #stowaway
-      Face = -> do
-        ::Skylab::Face
-      end
-      Snag = -> do
-        require 'skylab/snag/core' ; ::Skylab::Snag
-      end
-      Walker = -> do
-        require 'skylab/sub-tree/walker' ; ::Skylab::SubTree::Walker
+      Expression_agent_class__ = -> do
+        Lib_::Face[]::API::Normalizer_::Expression_agent_class[]
       end
     end
   end

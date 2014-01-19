@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Recursiv
 
-  ::Skylab::TestSupport::Services::Face::TestSupport::CLI[ self ]
+  ::Skylab::TestSupport::Library_::Face::TestSupport::CLI[ self ]
 
   ::Skylab::TestSupport::TestSupport::Regret[ TS__ = self ]
 
@@ -20,7 +20,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Recursiv
 
     def cd_and_invoke *argv
       r = nil
-      TestSupport::Services::FileUtils.cd TestSupport.dir_pathname.to_s do
+      TestSupport::Library_::FileUtils.cd TestSupport.dir_pathname.to_s do
         r = invoke_subcmd( * argv )
       end
       r

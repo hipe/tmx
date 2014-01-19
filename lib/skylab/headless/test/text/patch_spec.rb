@@ -1,16 +1,16 @@
 require_relative 'test-support'
 
-module Skylab::Headless::TestSupport::Services::Patch
+module Skylab::Headless::TestSupport::Text::Patch
 
-  ::Skylab::Headless::TestSupport::Services[ Patch_TestSupport = self ]
+  ::Skylab::Headless::TestSupport::Text[ self ]
 
   include CONSTANTS
 
   extend TestSupport::Quickie
 
-  describe "#{ Headless::Services }::Patch::Models::ContentPatch" do
+  describe "[hl] text patch" do
 
-    patch = Headless::Services::Patch::Models::ContentPatch
+    patch = Headless::Text::Patch::Models::ContentPatch
 
     context "changes (\"c\")" do
       it "two non-contiguous single lines" do

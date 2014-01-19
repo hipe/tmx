@@ -10,7 +10,7 @@ module Skylab::Snag
 
       class Parse__
         def initialize _listener, str
-          @scn = Snag::Services::StringScanner.new str
+          @scn = Snag::Library_::StringScanner.new str
         end
         def execute
           y = []

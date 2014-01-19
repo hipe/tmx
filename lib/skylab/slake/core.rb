@@ -8,4 +8,9 @@ module Skylab::Slake
 
   ::Skylab::Autoloader[ self ]
 
+  module Lib_  # :+[#su-001]
+    StringIO = -> do
+      require 'stringio' ; ::StringIO
+    end
+  end
 end

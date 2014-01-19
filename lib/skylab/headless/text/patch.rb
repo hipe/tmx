@@ -1,6 +1,6 @@
 module Skylab::Headless
 
-  module Services::Patch          # using the host system's `patch` utility,
+  module Text::Patch          # using the host system's `patch` utility,
                                   # apply a patch to a file or directory on the
                                   # filesystem given
                                   # a string that contains the patch data.
@@ -17,7 +17,7 @@ module Skylab::Headless
           info[ "#{ command } < -\n#{ patch_str }" ] if verbose
           break( res = 0 )
         end
-        Headless::Services::Open3.popen3( command ) do |sin, sout, serr, w|
+        Headless::Library_::Open3.popen3( command ) do |sin, sout, serr, w|
           sin.write patch_str
           sin.close
           s = serr.read

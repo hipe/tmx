@@ -15,7 +15,7 @@ module Skylab::GitViz
       def initialize ci_a
         ci_a.frozen? or raise ::ArgumentError, "construct rink with frozen a"
         @ci_a = ci_a
-        @index_set = GitViz::Services::Set[].new ci_a.length.times.to_a
+        @index_set = GitViz::Lib_::Set[].new ci_a.length.times.to_a
         init_index_by_SHA
         init_index_for_X_axis ; nil
       end

@@ -61,7 +61,7 @@ module Skylab::Dependency
 
     def parse_version_string
       @parse_with and @regex = build_regex(@parse_with)
-      buffer = Dependency::Services::StringIO.new
+      buffer = Dependency::Library_::StringIO.new
       read = lambda { |s| buffer.write(s) }
       open2(version_from) { |on| on.out(&read); on.err(&read) }
       str = buffer.rewind && buffer.read
