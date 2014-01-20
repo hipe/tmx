@@ -35,6 +35,7 @@ module Skylab::GitViz
     JSON = stdlib[ :JSON ]
     MetaHell = subsys[ :MetaHell ]
     Open3 = stdlib[ :Open3 ]
+    OptionParser = memo[ -> do require 'optparse' ; ::OptionParser end ]
     Porcelain = subsys[ :Porcelain ]
     PubSub = subsys[ :PubSub ]
     Set = stdlib[ :Set ]

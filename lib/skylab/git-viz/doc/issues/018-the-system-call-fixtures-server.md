@@ -20,3 +20,134 @@ rubinius generally (*yet*), but as explained above, this core.rb is meant to
 be usedful to several concerns, including some that run under rubninius. hence
 this core.rb looks a lot different because it can't load its sibling nodes
 outright, nodes that do not yet target rbx.
+## :#introduction
+
+this is one of the most ridiculous tangents we've indulged on in a very long
+time. we went off to jupiter and turned around, and here we are stopped at
+saturn and working our way back to earth, with the intention of going back to
+jupiter again. we intend to draw this out to its logically extreme culmination,
+but we have decided to do so iteratively for the usual reasons (it makes a nice
+story, it builds a better foundation, and we learn it better this way).
+
+for now, this is a quick & dirty proof of concept to get us famliiar with:
+  • the idea of having a long running process at all (feature [#019])
+  • possibly mucking with different rubies talking to each other on
+    the same system, just for the lols (and for the threads, only where
+    we need them) (yes this is ridiculous, and is feature [#020])
+  • see if we can "rainbow kick" a server ("rainbow kick" is the name we made
+    up for the ides of a client starting a server herself if one hasn't been
+    started yet, via a fork & exec omg.) (feature [#021])
+  • see if we can give the server a heartbeat it listens to and an automatic
+    shutdown after some timeout (feature [#022]).
+  • be forwarned: we plan on using 'sleep' to create artificial latency.
+    this is the kind of wicked game we are playing with ourself.
+
+
+## :#module-graph-duping
+
+the above module graph is what it is for both consistencey and because we
+need some namespace to put all our stuff in and we may not trample any
+namespace (especially the topmost one) that doesn't "belong" to us, and this
+is always the way we (and i mean "we") solve this problem in ruby, is to make
+the module names and file names isomorph (at times only vaguely).
+
+but the main point here is that the above modules are in one sense the "same"
+as the modules with the same names that appear elsewhere and in another sense
+they are distinct - because we insist that this client will be run in its
+own process, we actively create the modules (as opposed to passively creating
+them with the 'module' keyword) which will have intentionally dire effects
+if this file is loaded "on top" of any other. it's designed to fail loudly
+so that we must reconsider our design immediately in such an event.
+
+
+
+# :#the-fields-of-a-record-command
+
+the response from our "fixture server" back to the caller will be a semi-
+structured iambic statement. these are sort of freeform, and may require
+knowlege of the grammar from the caller's end to un-marshall this, if she
+wants something other than a sequence of strings. but we generally find it
+to be a nice balance: enconding and unencoding JSON is overkill at this point,
+but a fixed-field "CSV"-style row will be too rigid. iambic statements let
+us do interesting things with how we write handlers. and if the caller choses
+to ignore the response, it still looks pretty.
+
+so, the "iambic statement" for a single command will consist of five (5)
+"business" fields in addition to any channel info we put in the leading
+fields (likely we will have something like a 2-term header 'payload',
+'command' to tell the caller the channel and the shape of this statement.)
+
+they are (but in no particular order, because the rest will be iambic
+key-value pairs):
+
+1) the command to execute as a shell-escaped string. (it is stored and
+returned this way only out of conveninece. sometimes it would be nicer to have
+it as an array instead, but Shellwords works well enough.)
+
+2) zero or one relative path to execute the command from. the relative path
+will have the above head fragment stripped from it; the head fragment being
+a path prefix in the request we haven't documented yet.
+
+3) the file to write any stdout to (more below about this).
+
+4) the file to write any stderr to (more below about this).
+
+5) the expected exitstatus result from this system command (more below).
+
+
+when the fields for stdout and stderr are empty variously, it is an indication
+from the manifest to the system agent that no such output is expected, under
+penalty of fatal error. when such a path is provided and there is no output
+on that stream from that actual command, a notice will be issued and a blank
+file will be written. the reasoning for this will be explained below.
+
+if an exit-status is provided from the manfest API it must be a positive
+integer (maybe negative?). the way the manifest API may indicate that a zero
+exitstatus is expected is by sending the empty string (i.e nothing/blank/nil)
+for this field. (because this is expected to be most common exit code for
+general use of this, we make it a forcible default: the way you specify it is
+by not specifying anything, and that is the only way you can specify it.
+
+like with unexpected stdout and stderr, when the first exitstatus is
+encountered that does not match what the API expects, further action is ceased
+and a fatal error is issued. if the manifest does not yet know what the
+exitstatus will be from a command (which is half the reason we are
+constructing this castle), the manifest may provide the question-mark
+character and the resultant actual exitstatus integer will be emitted as an
+info statement from the build script.
+
+(actually the following strings are all considered "question marks:"
+"?", "???", "(what is it?)". i can't remember exactly what the pattern is
+but it was desiged to cover strings like those.)
+
+
+## why all the ruckus?
+
+the reason for this delicate dance is twofold: 1) this "system adapter" of the
+troika may not write back to the manifest. that's just not how it works
+in this family (for now). it's much less ridiculous if all this thing is
+doing is writing files that are just redirected output, and issuing notices
+about a piddly little integer.
+
+2) when what is expected differs from what actually occurs on the system,
+this is considered a showstopper, and given 1), we must literally stop the
+show:
+
+the entire first and last point of this whole circus is to get a byte-per-byte
+spot-on representation of what a particular system does in response to
+commands (along these three relatively narrow axis). to have incomplete or
+inaccurate data dumps in your manifest will do more harm than good, so we fail
+as early as possible.
+
+to prevent the troika "recording session" from ever aborting halfway through,
+in your manifest for the particular commands in question you can indicate
+filenames for stdout and stderr both, and provide a '?' for the exitstatus,
+which are the safe, catch-all choices that will issue notices as approriate.
+
+then after the command is performed and responses are variously announced
+and/or written to disk, you can go back and write in the exit code in the
+manifest, and remove empty files and their corresponding filenames from
+the manifest. then if you re-perform the same command again, you should
+(assuming normalization is working where relevant), get the same behavior
+from the peformance that you have saved in your manifest, and hopefully
+the troika system will report as much.

@@ -2,7 +2,7 @@ module Skylab::GitViz
 
   module Test_Lib_
 
-    module Mock_System
+    module Mock_System  # read [#023] the mock system narrative #introduction
 
       def self.[] user_mod
         user_mod.module_exec do
@@ -13,25 +13,23 @@ module Skylab::GitViz
 
       module Instance_Methods__
       private
-
         def mock_system_conduit
-          _pn = get_system_command_manifest_pn
-          rslv_some_cached_system_conduit_for_pathname _pn
+          IO_Lookup__.new( self ).lookup_system_conduit
         end
-
+      public
+        def resolve_any_manifest_handle
+          IO_Lookup__.new( self ).lookup_manifest_handle
+        end
         def get_system_command_manifest_pn
           fixtures_module.dir_pathname.join 'system-commands.manifest'
         end
-
-        def rslv_some_cached_system_conduit_for_pathname pn
-          fixtures_module.module_exec do
-            @mock_system_conduit_cache ||= Mock_System_Conduit_Cache_.
-              new self
-          end.resolve_some_cached_conduit_for_pn pn
-        end
-
         def fixtures_module
           self.class.fixtures_mod
+        end
+        def resolve_any_memoized_IO_cache lookup
+          fixtures_module.module_exec do
+            @fixture_IO_cache ||= lookup.build_IO_cache
+          end
         end
       end
 
@@ -41,20 +39,54 @@ module Skylab::GitViz
         end
       end
 
-      class Mock_System_Conduit_Cache_
-        def initialize fixtures_module
-          @cache_h = ::Hash.new do |h, pn|
-            h[ pn ] = Mock_System_Conduit_.new pn
-          end
-          @fixtures_mod = fixtures_module
+      class IO_Lookup__
+        def initialize client
+          @client = client
         end
-        def resolve_some_cached_conduit_for_pn pn
-          @cache_h[ pn ]
+        def lookup_system_conduit
+          @IO_class = Mock_System_Conduit_
+          lookup
+        end
+        def lookup_manifest_handle
+          @IO_class = Mock_System::Manifest::Handle
+          lookup
+        end
+      private
+        def lookup
+          @pn = @client.get_system_command_manifest_pn
+          rslv_some_cached_IO_for_pathname
+        end
+        def rslv_some_cached_IO_for_pathname
+          x = @client.resolve_any_memoized_IO_cache self
+          x ||= @client.build_and_memoize_and_get_IO_cache
+          x.resolve_some_cached_IO_instance_of_class_for_pn @IO_class, @pn
+        end
+      public
+        def build_IO_cache
+          Mock_Command_IO_Cache_.new
         end
       end
 
-      class Mock_System_Conduit_
+      class Mock_Command_IO_Cache_
+        def initialize
+          @manifest_cls = Mock_System_Conduit_
+          @cache_h = ::Hash.new do |h, cls|
+            h[ cls ] = ::Hash.new do |h_, pn|
+              h_[ pn ] = cls.new pn
+            end
+          end
+        end
+        def lookup_any_cached_manifest_handle_for_pn pn
+          @cache_h[ @manifest_cls ].fetch( pn ) {  }
+        end
+        def resolve_some_cached_IO_instance_of_class_for_pn cls, pn
+          @cache_h[ cls ][ pn ]
+        end
+      end
+
+      class Manifest_IO___  # (abstract base class for at least 2 children)
         def initialize pn
+          @cmd_as_non_unique_key_s_a = []
           @h = {} ; pn.open 'r' do |fh|
             Parse_Manifest_.new( fh, method( :accpt_line ) ).execute
           end
@@ -64,6 +96,7 @@ module Skylab::GitViz
         def accpt_line cmd_s, iam_s_a
           cmd = Stored_Command_.new cmd_s.freeze, iam_s_a
           ( @h.fetch cmd.cmd_s do |k|
+            @cmd_as_non_unique_key_s_a << k
             @h[ k ] = []
           end ) << cmd ; nil
         end
@@ -113,15 +146,43 @@ module Skylab::GitViz
       class Stored_Command_
         def initialize cmd_s, iam_s_a
           @cmd_s = cmd_s ; @did_parse = false
+          @did_parse_opt_s = false
+          @exitstatus_is_query = false
           @has_out_dumpfile = @has_err_dumpfile = nil
-          @iam_s_a = iam_s_a ; nil
+          @iam_s_a = iam_s_a ; @mock_wait_thread = nil
         end
         attr_reader :cmd_s, :err_dumpfile_s,
+          :exitstatus_is_query,
           :has_err_dumpfile, :has_out_dumpfile,
           :is_opened, :out_dumpfile_s
+        def any_chdir_s
+          h = any_opt_h
+          h && h[ :chdir ]
+        end
+        def any_opt_h
+          @did_parse_opt_s or parse_opt_s
+          @any_opt_h
+        end
+      private
+        def parse_opt_s
+          @did_parse_opt_s = true
+          h = GitViz::Lib_::JSON[].parse @any_opt_s, symbolize_names: true
+          @any_opt_h = h.freeze ; nil
+        end
+      public
         def any_opt_s
-          @did_parse or parse
+          parse_everything_as_necessary
           @any_opt_s
+        end
+        def exit_code_mixed_string
+          if @exitstatus_is_query then EC_QUERY_S__ else
+            d = @mock_wait_thread.value.exitstatus
+            d.nonzero? and d.to_s
+          end
+        end
+        EC_QUERY_S__ = '(ec?)'.freeze  # short, normalized, still readable
+        def parse_everything_as_necessary
+          @did_parse or parse ; nil
         end
       private
         def parse
@@ -178,23 +239,32 @@ module Skylab::GitViz
         end
 
         def exitstatus=
-          d = scn_some_digit
+          d_s = @scn.scan %r(\d+)
+          if d_s
+            accept_exitstatus_digit d_s.to_i
+          elsif @scn.skip MIXED_QUESTION_MARK_RX__
+            exitstatus_query_notify
+          else
+            fail say_expecting_mixed_exitstatus
+          end
+        end
+        MIXED_QUESTION_MARK_RX__ = /[^ ?)]*\?+\)?(?![^ ])/
+        def accept_exitstatus_digit d
           @mock_wait_thread = Wait__.new do |w|
             w.value.exitstatus = d
           end ; nil
         end
-        def scn_some_digit
-          d_s = @scn.scan %r(\d+)
-          d_s or fail say_expecting_digit
-          d_s.to_i
-        end
-        def say_expecting_digit
-          say_expecting "expected digit"
+        def say_expecting_mixed_exitstatus
+          say_expecting "expected digit or e.g \"(foo?)\" or just \"?\""
         end
         def say_expecting s
           _rest = FUN_::Ellipsify[][ @scn.rest ]
           _rest = "«#{ _rest }»"  # :+#guillemet
           "#{ s } at #{ _rest }"
+        end
+        def exitstatus_query_notify
+          @exitstatus_is_query = true
+          @mock_wait_thread = :_query_ ; nil
         end
 
         def post_parse
@@ -240,7 +310,7 @@ module Skylab::GitViz
         def get_four
           _mock_sout = gt_some_mock_sout
           _mock_serr = gt_some_mock_serr
-          [ :_not_implemented_, _mock_sout, _mock_serr, @mock_wait_thread ]
+          [ :_env_not_implemented_, _mock_sout, _mock_serr, @mock_wait_thread ]
         end
       private
         def gt_some_mock_serr
@@ -355,15 +425,16 @@ module Skylab::GitViz
         end
       end
 
-      class Mock_System_Conduit_
+      class Mock_System_Conduit_ < Manifest_IO___
         def popen3 * a
           block_given? and raise ::ArgumentError, "no, don't"
-          cmd = Lookup_.new( @manifest_dirname_pn, @h, a ).execute
+          cmd = Lookup_for_playback__.
+            new( @manifest_dirname_pn, @h, a ).lookup_for_playback
           cmd.get_four
         end
       end
 
-      class Lookup_
+      class Lookup_for_playback__
         def initialize pn, h, a
           @h = h ; @manifest_dirname_pn = pn
           cmd = nrmlz_command a
@@ -377,7 +448,7 @@ module Skylab::GitViz
           Incoming_Command_.new env_h, a, opt_h
         end
       public
-        def execute
+        def lookup_for_playback
           @a = @h[ @normalized_cmd_s ]
           @a ? yes : no
         end
@@ -442,14 +513,16 @@ module Skylab::GitViz
           end
         end
 
-        Scn = -> do
-          Scn__
-        end
         class Scn__ < ::Proc
           alias_method :gets, :call
         end
+        Scn = -> do
+          Scn__
+        end
         EMPTY_SCN = Scn__.new do end
       end
+
+      Mock_System = self
     end
   end
 end

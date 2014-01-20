@@ -5,7 +5,7 @@ module Skylab::GitViz
     module Expect
 
       def self.[] user_mod
-        user_mod.send :include, Instance_Methods__ ; nil
+        user_mod.include Instance_Methods__ ; nil
       end
 
       Headless = GitViz::Lib_::Headless[]

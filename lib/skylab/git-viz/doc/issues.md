@@ -1,4 +1,11 @@
-[#017]       #parent-node:[#014] the fixtures building narrative ..
+[#023]       #parent-node:[#014] the mock system narrative ..
+[#022] #open heartbeat and shutdown timer
+[#021] #open #experimental is it practical to "#rainbow-kick" the server?
+[#020] #open just for the lols, different rubies talking on the same system
+[#019] #open the "manifest server" is a long running process, doesn't need to
+             re-parse the whole manjfest file for each request (read [#018])
+[#018]       #parent-node:[#023] the fixtures server ..
+[#017]       #parent-node:[#023] the fixtures building narrative ..
 [#016]       #parent-node:[#011] the git repo narrative ..
 [#015]       #parent-node:[#014] the testable client narrative ..
 [#014]       #parent-node:[#005] testing narratives

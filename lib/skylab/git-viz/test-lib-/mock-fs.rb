@@ -158,7 +158,6 @@ module Skylab::GitViz
 
         class Each__ < ::Proc
           alias_method :each, :call
-
         end
 
         WANKY_SEPARATOR_RX__ = %r((?<=/)/+|/+\z)
