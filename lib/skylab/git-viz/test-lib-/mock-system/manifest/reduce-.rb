@@ -60,8 +60,8 @@ module Skylab::GitViz
         end
 
         def prepare_query_params
-          @rx = ::Regexp.new @request.white_filter_regex
-          @cd_prefix = @request.chdir_prefix
+          @rx = ::Regexp.new @request.command_white_filter_regex
+          @cd_prefix = @request.chdir_prefix_white_filter
           @prefix_length = @cd_prefix.length
           PROCEDE_
         end
@@ -89,7 +89,7 @@ module Skylab::GitViz
         end
 
         def say_none_found
-          "no commands were found matching that query"
+          "no commands were found matching the above query."
         end
 
         def any_prefix cmd
@@ -117,13 +117,14 @@ module Skylab::GitViz
         def add_result_item cmd , pfx  # [#018]:#the-fields-of-a-record-command
           _odfs = cmd.out_dumpfile_s
           _edfs = cmd.err_dumpfile_s
-          _ec = cmd.exit_code_mixed_string
+          _ec = cmd.result_code_mixed_string
           @added_count += 1
-          @response.add_iambicly_structured_statement :payload,
-            :command, :string, cmd.cmd_s, :cd_relpath, pfx,
+          @response.add_iambicly_structured_statement(
+            :payload, :iambic, :command,
+            :command, cmd.cmd_s, :cd_relpath, pfx,
             :any_stdout_path, _odfs,
             :any_stderr_path, _edfs,
-            :exit_code_x, _ec
+            :result_code_x, _ec )
         end
       end
     end

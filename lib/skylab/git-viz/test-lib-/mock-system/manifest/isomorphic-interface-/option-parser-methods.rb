@@ -12,6 +12,8 @@ module Skylab::GitViz
           mod.include Option_Parser_Methods
         end
 
+        attr_reader :do_exit_early
+
       private
 
         def parse_options
@@ -21,7 +23,7 @@ module Skylab::GitViz
 
         def parse_options_with_option_parser
           @op.parse! @argv
-          PROCEDE_
+          do_exit_early ? EARLY_EXIT_ : PROCEDE_
         rescue ::OptionParser::ParseError => e
           when_option_parser_parse_error e
         end
@@ -42,6 +44,7 @@ module Skylab::GitViz
 
         def build_option_parser
           op = GitViz::Lib_::OptionParser[].new
+          alter_default_help op
           formal_parameter_a.each do |param|
             if param.does_take_argument
               takes_arg param, op
@@ -50,6 +53,17 @@ module Skylab::GitViz
             end
           end
           op
+        end
+
+        def alter_default_help op  # it exits.
+          op.on '--help' do
+            y = []
+            op.summarize do |s|
+              s.strip! ; y << s
+            end
+            emit_info_string "(parameters: #{ y * ', ' })"
+            @do_exit_early = true
+          end
         end
 
         def formal_parameter_a
@@ -139,7 +153,7 @@ module Skylab::GitViz
 
         build_oxford_h = -> final, separator do
           h = { 0 => nil, 1 => final }
-          h.default_proc = ->( * ) { separator }
+          h.default_proc = -> _, _ do separator end
           h.method :[]
         end
         OXFORD_AND_P__ = build_oxford_h[ ' and ', ', ' ]
@@ -167,6 +181,8 @@ module Skylab::GitViz
             end ; m
           end
         end
+
+        EARLY_EXIT_ = 33
       end
     end
   end

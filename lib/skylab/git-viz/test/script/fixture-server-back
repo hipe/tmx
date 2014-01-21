@@ -33,7 +33,7 @@ module Skylab::GitViz
     def execute
       mani = bld_manifest
       response = mani.process_strings @argv
-      @y << "got back exit code \"#{ response.exit_code }\"."
+      @y << "got back result code \"#{ response.result_code }\"."
       @y << "got back #{ response.statement_count } statement(s):"
       while (( s_a = response.gets_statement_string_a ))
         @y << "[ #{ s_a * ' ][ ' } ]"

@@ -8,9 +8,9 @@ module Skylab::GitViz
 
         Manifest::Isomorphic_Interface_[ self,
           :use, :option_parser_methods,
-          :required, :argument, :chdir_prefix,
-          :required, :argument, :manifest_path,
-          :required, :argument, :white_filter_regex ]
+          :required, :argument, :chdir_prefix_white_filter,
+          :required, :argument, :command_white_filter_regex,
+          :required, :argument, :manifest_path ]
 
         def initialize y, s_a, response
           @argv = s_a  # #hook-out
@@ -29,6 +29,10 @@ module Skylab::GitViz
 
         def emit_error_string s  # #hook-out
           @response.add_iambicly_structured_statement :error, s ; nil
+        end
+
+        def emit_info_string s
+          @response.add_iambicly_structured_statement :info, s ; nil
         end
 
         def echo_back_command

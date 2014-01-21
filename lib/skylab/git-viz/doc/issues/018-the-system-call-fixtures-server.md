@@ -1,5 +1,26 @@
 # the system call fixtures server :[#018]
 
+
+## :#introduction-to-the-server-micro-architecture
+
+for now the server lifecycle is like this: there is a "frontend" that is
+just a shell script that loads a correct ruby version with rbenv, and then
+execs out to the middle-end, having changed the path and made the symlinks
+etc. through rbenv to get the correct ruby loaded.
+
+the middle-end is concerned with everything to do with zero MQ: it listens on
+ports and so on. when it gets requests, it dispatches them out to the backend.
+
+the backend is concerned with nothing about zero MQ and everything about our
+business logix.
+
+
+## :#introduction-to-the-middle-end
+
+(for now, please see #introduction-to-the-server-micro-architecture)
+
+
+
 ## :#this-node-looks-funny-because-it-is-multi-domain
 
 we put this section up top because although its inspiration stems from the
@@ -43,25 +64,13 @@ for now, this is a quick & dirty proof of concept to get us famliiar with:
     this is the kind of wicked game we are playing with ourself.
 
 
-## :#module-graph-duping
-
-the above module graph is what it is for both consistencey and because we
-need some namespace to put all our stuff in and we may not trample any
-namespace (especially the topmost one) that doesn't "belong" to us, and this
-is always the way we (and i mean "we") solve this problem in ruby, is to make
-the module names and file names isomorph (at times only vaguely).
-
-but the main point here is that the above modules are in one sense the "same"
-as the modules with the same names that appear elsewhere and in another sense
-they are distinct - because we insist that this client will be run in its
-own process, we actively create the modules (as opposed to passively creating
-them with the 'module' keyword) which will have intentionally dire effects
-if this file is loaded "on top" of any other. it's designed to fail loudly
-so that we must reconsider our design immediately in such an event.
-
-
 
 # :#the-fields-of-a-record-command
+
+(note: the "record" above is the verb (rhymes with "accord"), not the noun
+(as in "record player"). it's confusing because "rows"/"entries"/"objects"
+may be referred to as "records", but that is not our intended meaning here.
+here we are referring the (related) act of recording something.)
 
 the response from our "fixture server" back to the caller will be a semi-
 structured iambic statement. these are sort of freeform, and may require
@@ -85,8 +94,8 @@ returned this way only out of conveninece. sometimes it would be nicer to have
 it as an array instead, but Shellwords works well enough.)
 
 2) zero or one relative path to execute the command from. the relative path
-will have the above head fragment stripped from it; the head fragment being
-a path prefix in the request we haven't documented yet.
+will have the head fragment stripped from it; the head fragment being a path
+prefix in the request we haven't documented yet.
 
 3) the file to write any stdout to (more below about this).
 
@@ -97,37 +106,44 @@ a path prefix in the request we haven't documented yet.
 
 when the fields for stdout and stderr are empty variously, it is an indication
 from the manifest to the system agent that no such output is expected, under
-penalty of fatal error. when such a path is provided and there is no output
-on that stream from that actual command, a notice will be issued and a blank
-file will be written. the reasoning for this will be explained below.
+penalty of fatal error. this is the recommended behavior of the system agent:
+when such a path is provided and there is no output on that stream from that
+actual command, a notice will be issued and a blank file will be written. the
+reasoning for this will be explained below.
 
-if an exit-status is provided from the manfest API it must be a positive
-integer (maybe negative?). the way the manifest API may indicate that a zero
-exitstatus is expected is by sending the empty string (i.e nothing/blank/nil)
-for this field. (because this is expected to be most common exit code for
-general use of this, we make it a forcible default: the way you specify it is
-by not specifying anything, and that is the only way you can specify it.
+normally if an exitstatus is provided from the manfest API it must be a
+positive integer (maybe negative?). the way the manifest API may indicate that
+a zero exitstatus is expected is by sending the empty string (i.e nothing/
+blank/nil) for this field. because this is expected to be the most common
+exitstatus for general use of this, we make it a forcible default: the way
+you specify '0' is by not specifying anything, and that is the only way you
+can specify it. this allows us to keep our manifests free from the noise of
+having '0' for most of its entries. this also forces us to assert always some
+exitstatus, which is more a feature than a hinderance as explained below.
 
 like with unexpected stdout and stderr, when the first exitstatus is
 encountered that does not match what the API expects, further action is ceased
 and a fatal error is issued. if the manifest does not yet know what the
 exitstatus will be from a command (which is half the reason we are
-constructing this castle), the manifest may provide the question-mark
-character and the resultant actual exitstatus integer will be emitted as an
-info statement from the build script.
+constructing this castle), the manifest may provide the question-mark ("?")
+character as the value in the exitstatus field: during the "performance" the
+system agent is then expected to emit whatever the actual exitstatus integer
+was from the system call (as a readable string) in an info statement.
 
-(actually the following strings are all considered "question marks:"
-"?", "???", "(what is it?)". i can't remember exactly what the pattern is
-but it was desiged to cover strings like those.)
+the following strings will all be treated as "question marks:" "?", "???",
+"(what is it?)". we intentionally refrain from documenting what the pattern
+is because it is certainly subject to change, but suffice it to say the above
+three examples (and other strings that fit the above implied "pattern")
+should always signify this "query".
 
 
 ## why all the ruckus?
 
 the reason for this delicate dance is twofold: 1) this "system adapter" of the
 troika may not write back to the manifest. that's just not how it works
-in this family (for now). it's much less ridiculous if all this thing is
-doing is writing files that are just redirected output, and issuing notices
-about a piddly little integer.
+in this family (for now). it's much less ridiculous if the only thing this
+system does is write files that are just redirected output, and issues
+notices about piddly little integers.
 
 2) when what is expected differs from what actually occurs on the system,
 this is considered a showstopper, and given 1), we must literally stop the
@@ -135,9 +151,9 @@ show:
 
 the entire first and last point of this whole circus is to get a byte-per-byte
 spot-on representation of what a particular system does in response to
-commands (along these three relatively narrow axis). to have incomplete or
-inaccurate data dumps in your manifest will do more harm than good, so we fail
-as early as possible.
+commands (along these three relatively narrow axes). to have incomplete or
+inaccurate data dumps in your manifest will not only do more harm than good,
+it is counter to our sole function.
 
 to prevent the troika "recording session" from ever aborting halfway through,
 in your manifest for the particular commands in question you can indicate

@@ -32,7 +32,7 @@ module Skylab::GitViz
         def respond
           ec = prepare
           ec ||= reduce
-          @response.set_exit_code ec || SUCCESS_
+          @response.set_result_code ec || SUCCESS_
           @response
         end
 
@@ -55,20 +55,31 @@ module Skylab::GitViz
 
       class Response_
         def initialize
+          @result_code = nil
           @statement_s_a_a = []
         end
-        attr_reader :exit_code
+        attr_reader :result_code
         def statement_count
           @statement_s_a_a.length
         end
         def gets_statement_string_a
           @statement_s_a_a.shift
         end
-        def set_exit_code ec
-          @exit_code = ec ; nil
+        def set_result_code ec
+          @result_code = ec ; nil
         end
         def add_iambicly_structured_statement * x_a
           @statement_s_a_a.push x_a ; nil
+        end
+
+        def flatten_via_flush
+          y = [] ; ec = @result_code and y.push :result_code, ec
+          while (( s_a = @statement_s_a_a.shift ))
+            y.push :statement, s_a.length
+            y.concat s_a
+          end
+          y.map!( & :to_s )
+          y
         end
       end
 

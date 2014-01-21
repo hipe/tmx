@@ -1,0 +1,48 @@
+#!/usr/bin/env zsh
+
+me=$0
+
+serr () {
+  print -- $* 1>&2
+}
+
+-execute () {
+  -check-that-rbenv-is-installed || return $?
+  -ensure-rbx-is-being-used || return $?
+  exec "${me:h}/fixture-server-middle"
+  print -- "never see"
+}
+
+-check-that-rbenv-is-installed () {
+  which rbenv > /dev/null
+  (( 0 == $? )) && return 0
+  serr "${0:t} requires rbenv for now (it's for your own good)"
+  return 3
+}
+
+prefix=rbx-
+
+-ensure-rbx-is-being-used () {
+  typeset version
+  version=$( rbenv version )
+  typeset ver=$version[1,4]
+  if [[ $prefix == $ver ]] ; then
+    serr "currently using $version"
+  else
+    -attempt-to-switch-to-rbx
+  fi
+}
+
+-attempt-to-switch-to-rbx () {
+  rbenv versions | cut -c3- | awk ';{ print $1 };' | while read line ; do
+    if [[ $prefix == $line[1,4] ]] ; then
+      this_one=$line
+      break
+    fi
+  done
+  typeset ver ; ver=$( echo $version | awk ';{ print $1 };' )
+  serr "changing from $ver to $this_one to run the server with concurrency"
+  eval $( rbenv sh-shell $this_one )
+}
+
+-execute

@@ -42,6 +42,7 @@ module Skylab::GitViz
     Shellwords = stdlib[ :Shellwords ]
     StringScanner = memo[ -> do require 'strscan' ; ::StringScanner end ]
     TestSupport = subsys[ :TestSupport ]
+    ZMQ = memo[ -> do require 'ffi-rzmq' ; ::ZMQ end ]
 
   end
 end

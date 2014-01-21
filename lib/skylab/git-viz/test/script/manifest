@@ -1,93 +1,316 @@
 #!/usr/bin/env ruby -w
 
-# this mock emits to stdout a sequence of tab-delimited lines representing
-# the manifest entries filtered by the options below. the "API" for this
-# utility is shell-style options on ARGV, which makes it easy to invoke
-# from scripts and easy to test from the shell.
+require_relative '../../core'
 
-    ::Object.new.instance_exec $stdout do |stdout|
+module Skylab::GitViz
 
-      general_error = 3
+  x = $VERBOSE ; $VERBOSE = nil ; GitViz::Lib_::ZMQ[] ; $VERBOSE = x
 
-      define_singleton_method :emit_info_string do |s|
-        stdout.puts "info\t#{ s }"
+  exit( class Test::Script::Manifest  # [#024] taste the pain of too much docs
+
+    Client__ = self  # normalize indentation
+
+    class Client__
+
+      def initialize program_name, sout, argv, port_d
+        @argv = argv
+        @poll_timeout_milliseconds = 1000
+        @port_d = port_d
+        @program_name = program_name
+        @timeout_seconds = 2
+        @stdout = sout
       end
 
-      define_singleton_method :emit_notice_string do |s|
-        stdout.puts "notice\t#{ s }"
+      def invoke
+        rc = establish_connection
+        rc || execute_with_connection
       end
 
-      define_singleton_method :emit_error_string do |s|
-        stdout.puts "error\t#{ s }"
+    private
+
+      def establish_connection
+        @context = GitViz::Lib_::ZMQ[]::Context.new 1
+        @socket = @context.socket ::ZMQ::REQ
+        @socket.setsockopt ::ZMQ::LINGER, 0
+        rc = @socket.connect "tcp://localhost:#{ @port_d }"
+        rc.nonzero? and _failed_to_connect_ rc
       end
 
-      define_singleton_method :emit_payload_CVS_row_tail do |s|
-        stdout.puts "payload\t#{ s }"
+      def execute_with_connection
+        ec = init_poller_and_register_socket
+        ec ||= send_request
+        ec ||= poll_for_response
+        ec_ = cleanup
+        ec_ and ec.zero? and ec = ec_
+        ec
       end
 
-      require 'optparse'
-
-      op = ::OptionParser.new
-      _CHDIR_OPT='--chdir-prefix-white-filter'
-      cmd_rx_s = mani_path = white_filter=nil
-      op.on "#{ _CHDIR_OPT } <x>" do |s|
-        white_filter = s
-      end
-      _CMD_WHITE_FILTER_REGEX_OPT='--command-white-filter-regex'.freeze
-      op.on "#{ _CMD_WHITE_FILTER_REGEX_OPT } <s>" do |s|
-        cmd_rx_s = s
-      end
-      _MANI_PATH_OPT='--manifest-path'.freeze
-      op.on "#{ _MANI_PATH_OPT } <s>" do |s|
-        mani_path=s
+      def init_poller_and_register_socket
+        @poller = ::ZMQ::Poller.new
+        d = @poller.register @socket, ::ZMQ::POLLIN
+        if 1 != d
+          emit_error_string "expected 1, had #{ d } for registering poller"
+          GENERAL_ERROR_
+        end
       end
 
-      begin
-        op.parse! ::ARGV
-      rescue ::OptionParser::ParseError => e
-        emit_error_string "#{ e.message }, aborting."
-        exit general_error
+      def send_request
+        s_a = @argv
+        len = s_a.length.nonzero? && s_a.last.length
+        rc = @socket.send_strings s_a
+        if ZMQ_ERROR_CODE_ == rc
+          when_ZMQ_error
+        elsif len != rc
+          raise say_unexpectd_result_code_for_send_strings rc
+        end
       end
 
-      if cmd_rx_s
-        cmd_rx = ::Regexp.new cmd_rx_s
-      else
-        emit_error_string(
-          "for now, #{ _CMD_WHITE_FILTER_REGEX_OPT } is required." )
-        exit general_error
+      def say_unexpectd_result_code_for_send_strings rc
+        "unexpected result code from ZMQ - '#{ rc }' (it's expected to #{
+          }be always the length of the last string in the request array)."
       end
 
-      if ! mani_path
-        emit_error_string "for now, #{ _MANI_PATH_OPT } is required."
-        exit general_error
-      elsif ! ::File.exist? mani_path
-        emit_error_string "manifest file does not exist - #{ mani_path }"
-        exit general_error
+      def poll_for_response
+        ec = poller_is_ready
+        ec ||= do_the_polling
+        ec || process_the_response_of_the_polling
       end
 
-      y = [ $PROGRAM_NAME ]
-      cmd_rx_s and y.push( _CMD_WHITE_FILTER_REGEX_OPT, cmd_rx_s )
-      white_filter and y.push( _CHDIR_OPT, white_filter )
-      mani_path and y.push( _MANI_PATH_OPT, mani_path )
-      require 'shellwords'
-      _cmd_s = ::Shellwords.shelljoin y
-      emit_info_string "reconstructed invocation: #{ _cmd_s }"
-
-      require 'pathname' ; base_pn = ::Pathname.new ::File.dirname mani_path
-
-      ls_file_cmd='git ls-files -- .'
-      if cmd_rx =~ ls_file_cmd
-        emit_payload_CVS_row_tail <<-HERE.gsub %r(\n?^ *), "\t"
-          #{ ls_file_cmd }
-          dirzo
-          #{ base_pn.join 'mock-repo-1/ls-files.out.txt' }
-          #{ base_pn.join 'mock-repo-1/ls-files.err.txt' }
-          (what is exitstatus?)
-        HERE
-      else
-        emit_notice_string(
-          "there are no commands that match regex /#{ cmd_rx_s }/" )
+      def poller_is_ready
+        if @poller.size.zero?
+          emit_error_string "no items are being polled."
+          GENERAL_ERROR_
+        end
       end
 
-      exit 0
+      def do_the_polling
+        d = @poller.poll @poll_timeout_milliseconds
+        case d
+        when -1 ; when_ZMQ_error
+        when  0 ; when_the_poll_indicates_no_readable_or_writable_sockets
+        else    ; when_the_poll_indicates_N_number_of_ready_sockets d
+        end
+      end
+
+      def when_the_poll_indicates_no_readable_or_writable_sockets
+        emit_error_string say_timeout_expired
+        NO_SERVER_
+      end
+
+      def say_timeout_expired
+        "no response from server after #{ timeout_s }#{
+          } - is the server running? (try starting it with '#{
+           }#{ path_to_fixture_server }' in a different terminal window)"
+      end
+
+      def path_to_fixture_server
+        "#{ ::File.dirname __FILE__ }/fixture-server"
+      end
+
+      def timeout_s
+        secs = @poll_timeout_milliseconds * 1.0 / 1000
+        secs_d = secs.to_i
+        1 == secs_d or s = 's'
+        "#{ secs_d == secs ? secs_d : secs } second#{ s }"
+      end
+
+      def when_the_poll_indicates_N_number_of_ready_sockets d
+        if 1 != d
+          emit_error_string "when is this ever not one? #{ d }"
+          GENERAL_ERROR_
+        end
+      end
+
+      def process_the_response_of_the_polling
+        @socket.recv_strings( a = [] )
+        listener = build_internal_dispatching_listener
+        Re_Marshaller_.new( listener, a ).remarshall
+      end
+
+      def cleanup
+        rc = deregister_socket_from_poller
+        rc_ = close_connection
+        rc || rc_
+      end
+
+      def deregister_socket_from_poller
+        x = @poller.deregister @socket, ::ZMQ::POLLIN
+        if true != x
+          emit_error_string "expected 'true' had #{ x } for deregister"
+          GENERAL_ERROR_
+        end
+      end
+
+      def close_connection
+        d = @socket.close
+        d.zero? or emit_error_string "failed to close connection? #{ d }"
+        d.nonzero?
+      end
+
+      def when_ZMQ_error
+        d = ::ZMQ::Util.errno
+        emit_error_string say_ZMQ_error d
+        d
+      end
+
+      def say_ZMQ_error d
+        s  =  ::LibZMQ.zmq_strerror( d ).read_string
+        m_i = :"say_ZMQ_error_#{ result_code_to_s d }"
+        if self.class.private_method_defined? m_i
+          send m_i, s
+        else
+          "sorry, got ZMQ error code #{ d } (#{ s })"
+        end
+      end
+
+      def result_code_to_s d
+        0 > d and begin negative = :negative_ ; d = d.abs end
+        "#{ negative }#{ d }"
+      end
+
+      def say_ZMQ_error_92 s
+        "ZMQ error 92 - #{ s } (this happens when there are no arguments)"
+      end
+
+      def build_internal_dispatching_listener
+        Dispatching_Listener__.new do |dl|
+          dl[ :debug ][ :string ] = method :emit_debug_string
+          dl[ :info ][ :string ] = method :emit_info_string
+          dl[ :info ][ :iambic ][ :argv_tail ] =
+            method :emit_argv_tail_info_iambic
+          dl[ :notice ][ :string ] = method :emit_notice_string
+          dl[ :error ][ :string ] = method :emit_error_string
+          dl[ :payload ][ :iambic ][ :command ] =
+            method :emit_command_payload_iambic
+        end
+      end
+
+      def emit_debug_string s
+        emit_row :debug, s
+      end
+
+      def emit_info_string s
+        emit_row :info, s
+      end
+
+      def emit_argv_tail_info_iambic a
+        emit_row :info, :iambic, :normalized_request, * a
+      end
+
+      def emit_notice_string s
+        emit_row :notice, s
+      end
+
+      def emit_error_string s
+        emit_row :error, s
+      end
+
+      def emit_command_payload_iambic a
+        cmd = Command__.new
+        a.each_slice( 2 ) do |k, v|
+          cmd[ k ] = v
+        end
+        emit_row :payload, :fixed_width, :command, * cmd.to_a
+      end
+      Command__ = ::Struct.new :command, :cd_relpath,
+        :any_stdout_path, :any_stderr_path, :result_code_x
+
+      def emit_row * x_a
+        @stdout.write "#{ x_a * "\t" }\n"
+      end
     end
+
+    class Re_Marshaller_
+
+      def initialize listener, a
+        @a = a ; @rc_a = [] ; @listener = listener
+      end
+
+      def remarshall
+        begin
+          send :"#{ @a.shift }="
+        end while @a.length.nonzero?
+        flush
+      end
+    private
+      def result_code=
+        d = @a.shift.to_i
+        if d.nonzero? or ! @rc_a.include? 0
+          @rc_a << d
+        end ; nil
+      end
+      def statement=
+        @len_ = @a.shift.to_i
+        @a_ = @a.shift @len_
+        uniform_statement_processing_grammar
+      end
+      def uniform_statement_processing_grammar
+        send :"when_#{ 3 < @len_ ? :many : @len_ }_fields"
+      end
+      def when_2_fields
+        chan_i = @a_.first.intern ; x = @a_.last
+        @listener.call chan_i, :string do x end ; nil
+      end
+      def when_many_fields
+        chan_i = @a_.shift.intern ; shape_i = @a_.shift.intern
+        form_i = @a_.shift.intern ; rest_a = @a_ ; @a_ = nil
+        @listener.call chan_i, shape_i, form_i do rest_a end ; nil
+      end
+      def flush
+        case @rc_a.length <=> 1
+        when -1 ; when_no_result_codes
+        when  0 ; when_one_result_code
+        when  1 ; when_multiple_result_codes
+        end
+      end
+      def when_one_result_code
+        d = @rc_a.first
+        emit_debug_string do
+          "the backend gave result code '#{ d }'"
+        end
+        @rc_a.first
+      end
+      def when_no_result_codes
+        emit_debug_string do
+          "strange, got no result code from backend."
+        end
+        SUCCESS_
+      end
+      def when_multiple_result_codes
+        emit_debug_string do
+          "got a variety of nonzero result codes from backend, result is #{
+            }first nonozero code among them. had: (#{ @rc_a * ', ' })"
+        end
+        @rc_a.detect( & :nonzero? ) or self.___logic_error___
+      end
+      def emit_debug_string & p
+        @listener.call :debug, :string, & p ; nil
+      end
+    end
+
+    class Dispatching_Listener__
+
+      def initialize
+        p = -> do
+          ::Hash.new { |h, k| h[ k ] = p[] }
+        end
+        yield( @h = p[] ) ; nil
+      end
+      def call * i_a
+        _p = i_a.reduce @h do |m, i|
+          m.fetch( i ) { } or raise ::KeyError, say_no_callback( i, i_a )
+        end
+        _p.call yield
+      end
+
+      def say_no_callback i, i_a
+        "bad channel path #{ i_a.inspect } - no callback registered for '#{i}'"
+      end
+    end
+
+    GENERAL_ERROR_ = 63 ; NO_SERVER_ = 25
+    SUCCESS_ = 0 ; ZMQ_ERROR_CODE_ = -1
+
+    self
+  end.new( $PROGRAM_NAME, $stdout, ::ARGV, 5555 ).invoke )
+end

@@ -3,7 +3,7 @@
 ## introduction
 
 from the highest level this whole mock system thing can be broken into two
-parts: the kind of crazy part, and the really crazy part.
+parts: the kind of crazy part and the really crazy part.
 
 the kind of crazy part is the fact that we store dumps of stdout, stderr
 and the exit code to a hand-written CSV-like 'database' and the filesystem;

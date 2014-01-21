@@ -103,9 +103,8 @@ module Skylab::GitViz
       end
 
       class Parse_Manifest_
-        def initialize fh, p  # NOTE mutates filehandle to be a peeking scanner
-          GitViz::Lib_::Basic[]::List::Scanner::With[ fh, :peek ]
-          @accept_line_p = p ; @fh = fh
+        def initialize fh, p
+          @accept_line_p = p ; @fh = Peeker__.new( fh )
         end
         def execute
           line = @fh.gets or fail "empty command manifest file: #{ fh.path }"
@@ -143,6 +142,27 @@ module Skylab::GitViz
         end
       end
 
+      class Peeker__
+        def initialize x
+          @instream = x ; @is_buffered = false
+        end
+        def gets
+          if @is_buffered
+            @is_buffered = false
+            x = @buffer_value ; @buffer_value = nil ; x
+          else
+            @instream.gets
+          end
+        end
+        def peek
+          if ! @is_buffered
+            @is_buffered = true
+            @buffer_value = @instream.gets
+          end
+          @buffer_value
+        end
+      end
+
       class Stored_Command_
         def initialize cmd_s, iam_s_a
           @cmd_s = cmd_s ; @did_parse = false
@@ -174,7 +194,7 @@ module Skylab::GitViz
           parse_everything_as_necessary
           @any_opt_s
         end
-        def exit_code_mixed_string
+        def result_code_mixed_string
           if @exitstatus_is_query then EC_QUERY_S__ else
             d = @mock_wait_thread.value.exitstatus
             d.nonzero? and d.to_s

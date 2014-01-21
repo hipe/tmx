@@ -10,6 +10,11 @@ GEM
     docile (1.1.2)
     faraday (0.9.0)
       multipart-post (>= 1.2, < 3)
+    ffi (1.9.3)
+    ffi-rzmq (2.0.0)
+      ffi-rzmq-core (>= 1.0.1)
+    ffi-rzmq-core (1.0.1)
+      ffi (~> 1.9)
     git (1.2.6)
     github_api (0.11.1)
       addressable (~> 2.3)
@@ -73,6 +78,7 @@ PLATFORMS
 
 DEPENDENCIES
   adsf
+  ffi-rzmq
   jeweler
   levenshtein
   rake

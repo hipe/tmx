@@ -27,6 +27,9 @@ group :development do
 
   #  needed by subproducts:
 
+  gem 'ffi-rzmq'
+    #  [gv]
+
   gem 'treetop'
     #  [ta]
 
