@@ -46,8 +46,10 @@ module Skylab::GitViz
           op = GitViz::Lib_::OptionParser[].new
           alter_default_help op
           formal_parameter_a.each do |param|
-            if param.does_take_argument
-              takes_arg param, op
+            if param.takes_exactly_one_argument
+              takes_exactly_one_arg param, op
+            elsif param.takes_multiple_arguments
+              takes_multiple_args param, op
             else
               takes_no_arg param, op
             end
@@ -74,11 +76,28 @@ module Skylab::GitViz
           self.class.get_parameters
         end
 
-        def takes_arg param, op
-          _suffix = " <#{ param.param_i.to_s[ 0 ] }>"
-          op.on "#{ param.CLI_moniker_s }#{ _suffix }" do |x|
+        def takes_multiple_args param, op
+          _p = if param.is_required
+            -> x do
+              ( instance_variable_get param.ivar or
+                instance_variable_set( param.ivar, [] ) ) << x
+            end
+          else
+            -> x do
+              ( instance_variable_get param.ivar ) << x
+            end
+          end
+          op.on "#{ param.CLI_moniker_s }#{ render_param_arg param }", & _p
+        end
+
+        def takes_exactly_one_arg param, op
+          op.on "#{ param.CLI_moniker_s }#{ render_param_arg param }" do |x|
             instance_variable_set param.ivar, x
           end ; nil
+        end
+
+        def render_param_arg param
+          " <#{ param.param_i.to_s[ 0 ] }>"
         end
 
         def takes_no_arg param, op
@@ -166,14 +185,17 @@ module Skylab::GitViz
           error_code_for_general_failure
         end
 
-
         def get_reconstruct_invocation_argv
           formal_parameter_a.reduce [] do |m, par|
             x = instance_variable_get par.ivar
             x or next m
-            if par.does_take_argument
+            if par.takes_exactly_one_argument
               m << par.CLI_moniker_s
               m << x
+            elsif par.takes_multiple_arguments
+              x.each do |x_|
+                m.push par.CLI_moniker_s, x_
+              end
             else
               x.times do
                 m << par.CLI_moniker_s

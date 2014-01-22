@@ -60,7 +60,42 @@ module Skylab::GitViz
         end
 
         def prepare_query_params
-          @rx = ::Regexp.new @request.command_white_filter_regex
+          es = prepare_volatile_query_params
+          es || prepare_deterministic_query_params
+        end
+
+        def prepare_volatile_query_params
+          @cmd_wht_rx_ex_a = nil
+          @cmd_wht_rx_a = @request.command_white_filter_regex_a.reduce [] do |m, rx_s|
+            attempt_regex rx_s, -> rx do
+              m << rx
+            end, -> ex do
+              (( @cmd_wht_rx_ex_a ||= [] )) << [ rx_s, ex ] ; m
+            end
+          end
+          @cmd_wht_rx_ex_a ? when_regexp_exceptions : PROCEDE_
+        end
+
+        def attempt_regex rx_s, yes_p, no_p
+          yes_p[ ::Regexp.new rx_s ]
+        rescue ::RegexpError => ex
+          no_p[ ex ]
+        end
+
+        def when_regexp_exceptions
+          @cmd_wht_rx_ex_a.each do |(s, ex)|
+            @response.add_iambicly_structured_statement :error,
+              say_cmd_white_rx_ex( s, ex )
+          end
+          GENERAL_ERROR_
+        end
+        def say_cmd_white_rx_ex input_s, ex
+          param = Prepare_.lookup_parameter :command_white_filter_regex
+          "can't make #{ param.as_human_moniker } from #{ input_s.inspect }#{
+            }- #{ ex.message }"
+        end
+
+        def prepare_deterministic_query_params
           @cd_prefix = @request.chdir_prefix_white_filter
           @prefix_length = @cd_prefix.length
           PROCEDE_
@@ -70,7 +105,8 @@ module Skylab::GitViz
           @scn = @mani.get_command_scanner_scanner
           while (( scn = @scn.gets ))
             cmd = scn.gets  # assume always at least one
-            @rx =~ cmd.cmd_s or next  # SCANNERS ARE SO COOL
+            _ok = command_string_does_pass_white_or_black_filters cmd.cmd_s
+            _ok or next  # THIS IS WHY SCANNERS ROCK
             begin
               cmd.parse_everything_as_necessary
               prefix = any_prefix cmd
@@ -80,6 +116,13 @@ module Skylab::GitViz
           end
           issue_a_notice_if_no_items_were_added
           PROCEDE_
+        end
+
+        def command_string_does_pass_white_or_black_filters cmd_s
+          _rx_that_it_did_not_match = @cmd_wht_rx_a.detect do |rx|
+            rx !~ cmd_s
+          end
+          ! _rx_that_it_did_not_match
         end
 
         def issue_a_notice_if_no_items_were_added

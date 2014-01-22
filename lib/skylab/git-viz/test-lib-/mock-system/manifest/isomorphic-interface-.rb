@@ -48,6 +48,9 @@ module Skylab::GitViz
       private
 
         module Module_Methods__
+          def lookup_parameter i
+            send :"lookup_#{ i }_parameter"
+          end
           def get_parameters
             const_get( :PARAM_I_A__, false ).map do |i|
               send i
@@ -58,7 +61,8 @@ module Skylab::GitViz
         module Instance_Methods__
           def initialize( * _ )
             self.class.get_parameters.each do |param|
-              instance_variable_set param.ivar, nil
+              instance_variable_set param.ivar,
+                ( [] if param.takes_multiple_arguments && ! param.is_required )
             end
             super
           end
@@ -95,7 +99,7 @@ module Skylab::GitViz
           end
           def argument=
             _param = Parameter__.new do |p|
-              p.does_take_argument = true
+              p.takes_at_least_one_argument_notify
               p.absorb_iambic_from_name @x_a
             end
             accpt_param _param ; nil
@@ -114,39 +118,65 @@ module Skylab::GitViz
 
         class Parameter__
           def initialize
-            yield self ; freeze
+            @_aa_ = Argument_Arity_.new nil, nil  # volatile ivar in a frozen.
+            yield self
+            freeze
           end
           def param_i
             @param_i
           end
-          attr_accessor :is_required, :does_take_argument
-          attr_reader :CLI_moniker_s, :ivar
+          attr_accessor :is_required
+          attr_reader :attr_reader_method_name, :CLI_moniker_s, :ivar
+          attr_reader :takes_exactly_one_argument, :takes_multiple_arguments
+
           def absorb_iambic_from_argument x_a
-            absorb_iambic x_a do scan_argument end
+            absorb_iambic x_a do
+              scan_any_accumulating
+              scan_argument
+            end
           end
           def absorb_iambic_from_name x_a
             absorb_iambic x_a do scan_name end
+          end
+          def takes_at_least_one_argument_notify
+            takes_at_least_one_arg_notify
+          end
+          def as_human_moniker  # in lieu of expression agents
+            "#{ @param_i.to_s.gsub '_', ' ' }"
           end
         private
           def absorb_iambic x_a, & p
             @x_a = x_a ; yield ; @x_a = nil
           end
+          def scan_any_accumulating
+            if scan_any_keyword :accumulating
+              takes_many_args_notify
+            end ; nil
+          end
           def scan_argument
             scan_keyword :argument
-            @does_take_argument = true
+            takes_at_least_one_arg_notify
             scan_name
+          end
+          def takes_at_least_one_arg_notify
+            @_aa_.begin = :one ; nil
+          end
+          def takes_many_args_notify
+            @_aa_.end = :many ; nil
           end
           def scan_name
             @x_a.length.zero? and raise ::ArgumentError, say_expecting_name
             @param_i = @x_a.shift
-            @ivar = :"@#{ @param_i }"
-            @CLI_moniker_s = "--#{ @param_i.to_s.gsub UNDERSCORE__, DASH__ }".
-              freeze
             nil
           end
           UNDERSCORE__ = '_'.freeze ; DASH__ = '-'.freeze
           def say_expecting_name
             "expecting parameter name, had no more terms to parse"
+          end
+          def scan_any_keyword i
+            if @x_a.length.nonzero? and i == @x_a.first
+              @x_a.shift ; true
+            end
           end
           def scan_keyword i
             @x_a.length.zero? || i != @x_a.first and
@@ -156,6 +186,49 @@ module Skylab::GitViz
           def say_expecting_keyword i
             "expecting '#{ i }' #{ @x_a.length.zero? ? "but had no #{
              }more terms to parse" : "had '#{ @x_a.first }'" }"
+          end
+          def freeze
+            finalize_names
+            b = @_aa_.begin || :unspecified
+            e = @_aa_.end || :not_specified
+            @_aa_ = nil
+            send :"set_final_arity_when_begin_is_#{ b }_and_end_is_#{ e }"
+            super
+          end
+          def finalize_names
+            hungarian_i = :many == @_aa_.end ? :"#{ @param_i }_a" : @param_i
+            @ivar = :"@#{ hungarian_i }"
+            @attr_reader_method_name = hungarian_i
+            @CLI_moniker_s =
+              "--#{ @param_i.to_s.gsub UNDERSCORE__, DASH__ }".freeze ; nil
+          end
+          def set_final_arity_when_begin_is_one_and_end_is_not_specified
+            @takes_exactly_one_argument = true
+          end
+          def set_final_arity_when_begin_is_one_and_end_is_many
+            @takes_multiple_arguments = true
+          end
+        end
+
+        class Argument_Arity_
+          def initialize x, y
+            @begin = @end = nil
+            self.begin = x ; self.end = y ; nil
+          end
+          attr_reader :begin, :end
+          def begin= x
+            @begin and fail "can't unwrite the past"
+            case x
+            when nil, :one ; @begin = x
+            else ; raise ::ArgumentError, "begin? \"#{ x }\""
+            end ; x
+          end
+          def end= x
+            @end and fail "can't unwrite the past"
+            case x
+            when nil, :many ; @end = x
+            else ; raise ::ArgumentError, "end? \"#{ x }\""
+            end ; x
           end
         end
       end

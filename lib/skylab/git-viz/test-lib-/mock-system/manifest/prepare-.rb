@@ -9,7 +9,7 @@ module Skylab::GitViz
         Manifest::Isomorphic_Interface_[ self,
           :use, :option_parser_methods,
           :required, :argument, :chdir_prefix_white_filter,
-          :required, :argument, :command_white_filter_regex,
+          :required, :accumulating, :argument, :command_white_filter_regex,
           :required, :argument, :manifest_path ]
 
         def initialize y, s_a, response
@@ -48,7 +48,8 @@ module Skylab::GitViz
         end
 
         Request__ = ::Struct.new( *
-          PARAM_I_A__.map( & method( :send ) ).map( & :param_i ) )
+          PARAM_I_A__.map( & method( :send ) ).
+            map( & :attr_reader_method_name) )
       end
     end
   end
