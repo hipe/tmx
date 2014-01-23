@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-me=$0
+me=$0 ; typeset -a rest ; rest=("${*[@]}")
 
 serr () {
   print -- $* 1>&2
@@ -9,7 +9,7 @@ serr () {
 -execute () {
   -check-that-rbenv-is-installed || return $?
   -ensure-rbx-is-being-used || return $?
-  exec "${me:h}/fixture-server-middle"
+  exec "${me:h}/fixture-server-middle" "${rest[@]}"
   print -- "never see"
 }
 
