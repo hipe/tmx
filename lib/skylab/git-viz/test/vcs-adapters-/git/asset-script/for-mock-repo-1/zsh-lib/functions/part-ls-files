@@ -1,7 +1,26 @@
 #!/usr/bin/env zsh  #just-for-syntax-highlighting
 
---each-command () {
-  typeset cmd=$1 ; typeset cd=$2 ; typeset triad_callback=$4
+part-ls-files-description () {
+  serr "description: build dumps for the ls-files commands"
+}
+
+part-ls-files-usage () {
+  serr "usage: $($partlib_say_invocation_name) [-h]"
+}
+
+-require-partlib
+
+typeset part_func=$0 ; typeset -a rest ; rest=("$*[@]")
+
+typeset adverb asset_output_dir
+partlib-parse-adverb-and-asset-output-dir
+
+-partlib-help && return  # #debugging: comment this line out to see API help
+
+-partlib-require-asset-output-dir || return $?
+
+--each-ls-files-command () {
+  typeset cmd=$1 ; typeset cd=$2 ; typeset triad_callback=$3
   typeset -a a ; a=(${(z)cmd})
   if [[ ! -z  $cd ]] ; then
     cd=/$cd ; typeset dd=/..
@@ -16,12 +35,8 @@
   $triad_callback $o $e $es
 }
 
--say-this-part () {
-  print 'ls-files'
-}
+# print "\n\n(part-ls-files:(${(f)rest})\n\n" ; return 0  # #debugging
 
--require-asset-output-dir || return $?
-
-troika-lookup-system-commands --each-command --each-command\
+troika-lookup-system-commands --each-command --each-ls-files-command\
   --command-white-filter-regex '^git ls-files\b'\
-  --chdir-prefix-white-filter /derp/berp
+  --chdir-prefix-white-filter /derp/berp "${rest[@]}"

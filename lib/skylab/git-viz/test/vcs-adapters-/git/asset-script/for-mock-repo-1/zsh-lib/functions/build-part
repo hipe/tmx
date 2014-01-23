@@ -11,19 +11,16 @@ typeset -a rest ; rest=($*)
   print part
 }
 
+-say-component-node-part-function-name-without-prefix () {
+  print -- "${1##$(-say-component-node-function-name-prefix)}"
+}
+
 -say-component-node-function-name-prefix () {
   print part-
 }
 
 -say-component-node-args () {
-  typeset s="$( -component-node-first-arg-moniker )"
-  print $s
+  print "$( -component-node-first-arg-moniker ) [remote opts]"
 }
-
-if (( 2 < $#rest )) ; then
-  -print-component-node-splay-usage-line "too many arguments. "
-  -print-component-node-splay-invite
-  return $gv_err_extra_param
-fi
 
 component-node-splay

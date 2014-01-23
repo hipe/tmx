@@ -33,13 +33,13 @@ triad-lookup-system-commands () {
 }
 
 -triad-call-out-to-API () {  # rc <- result code
-  typeset line mani_API_path remote_rc
+  typeset frame_count=0 line mani_API_path remote_rc
   required-parameter mani_path || return $?
   required-parameter callback_fname || return $?
   mani_API_path=$( -say-triad-manifest-API-script-path ) || return $?
   # a great battle was waged below to give you 2 streams & rc. fittingly ironic
   typeset tmpfile; tmpfile==()
-  serr "(tmpfile: $tmpfile)"  # #debugging
+  # serr "  (tmpfile: $tmpfile)"  # #debugging
   $mani_API_path --manifest-path $mani_path $* 1>$tmpfile 2>&2
   remote_rc=$?
   while read -r line ; do
@@ -88,6 +88,14 @@ triad-lookup-system-commands () {
   serr "${triad_indent}(debug from manifest API: ${(qqq)1})"
 }
 
+-triad-process-info-string () {
+  serr "${triad_indent}(info from manifest API: ${(qqq)1})"
+}
+
+-triad-process-notice-string () {
+  serr "${triad_indent}(notice from manifest API: ${(qqq)1})"
+}
+
 -triad-process-error-string () {
   serr "${triad_indent}(error from manifest API: ${(qqq)1})"
 }
@@ -102,12 +110,27 @@ triad-lookup-system-commands () {
 
 -triad-process-command-payload-fixed_width () {
   typeset cmd=$1 from_dir=$2
+  typeset -A triad_manifest_dumpfile_shortpath
+  triad_manifest_dumpfile_shortpath[out]="$3"
+  triad_manifest_dumpfile_shortpath[err]="$4"
   typeset triad_sout_fullpath=$(-triad-normalize-dumpfile-dst-path "$3")
   typeset triad_serr_fullpath=$(-triad-normalize-dumpfile-dst-path "$4")
   typeset expected_rc_s=$5
-  typeset _reserved_='_reserved_'
-  $callback_fname "$cmd" "$from_dir" $_reserved_ -triad-triad-callback
+  -triad-maybe-separator
+  $callback_fname "$cmd" "$from_dir" -triad-triad-callback
 }
+-triad-maybe-separator () {
+  frame_count=$(( $frame_count + 1 ))
+  if (( 1 < $frame_count )) ; then
+    if [[ 0 == $(( $frame_count % 2 )) ]] ; then
+      -triad-report-even-separator
+    else
+      -triad-report-odd-separator
+    fi
+  fi
+}
+-triad-report-even-separator () { serr '☆彡' }
+-triad-report-odd-separator () { serr '☆ミ' }
 
 -triad-normalize-dumpfile-dst-path () {
   if [[ $1 =~ '^[^/]' ]] ; then
@@ -130,80 +153,158 @@ triad-lookup-system-commands () {
   (( 0 == a )) || return $a
   (( 0 == b )) || return $b
   (( 0 == c )) || return $c
-  $out_operation output $outpath $triad_sout_fullpath ; a=$?
-  $err_operation errput $errpath $triad_serr_fullpath ; b=$?
+  $out_operation out $outpath $triad_sout_fullpath ; a=$?
+  $err_operation err $errpath $triad_serr_fullpath ; b=$?
   (( 0 == a )) || return $a ; (( 0 == $b )) || return $b
-  ${success_callback--triad-default-success-callback}
+  ${success_callback:-'-triad-default-success-callback'}
 }
-
 -triad-default-success-callback () {
   serr "finished building $( -triad-say-any-extra-part-description )part."
   return $gv_success
 }
-
 -triad-say-any-extra-part-description () {
-  typeset s=$( -say-this-part )
+  typeset s=$($partlib_say_part_moniker)
   [[ -z $s ]] || print "'$s' "
 }
 
 --triad-pre-mv () {
-  typeset moniker=$1 src=$2 dst=$3
-  if [[ ! -e $src ]] ; then
-    serr "your system call script gave back"\
-      "a path to a std${moniker} dump file that doesn't exist: $src"
-    return $gv_err_no_resource
-  elif [[ -z $dst && -s $src ]] ; then
-    serr "${_TRIAD_FOSP}std${moniker} output was generated"\
-      "but no \"s${moniker} file\" was specified in manifest."\
-       "(${moniker}put is in dumpfile: $src)"
-    return $gv_err_no_resource
-  elif [[ -e $dst ]] ; then
-    --triad-prepare-generated-file-move-when-destination-exists
-  else
-    --triad-prepare-generated-file-move-when-destination-does-not-exist
+  typeset stream=$1 src=$2 dst=$3
+  typeset dst_exists dst_has_content dst_is_specified
+  typeset src_exists src_has_content
+  --triad-pre-mv-build-state
+  --triad-pre-mv-act-on-state
+}
+
+--triad-pre-mv-build-state () {
+  if [[ ! -z $dst ]] ; then
+    dst_is_specified=true
+    if [[ -s $dst ]] ; then
+      dst_exists=true ; dst_has_content=true
+    elif [[ -e $dst ]] ; then
+      dst_exists=true
+    fi
+  fi
+  if [[ -s $src ]] ; then
+    src_exists=true ; src_has_content=true
+  elif [[ -e $src ]] ; then
+    src_exists=true
   fi
 }
 
-_TRIAD_FOSP='fatal off-script performance: '
-
---triad-prepare-generated-file-move-when-destination-exists () {
-  cmp "$src" "$dst"
+--triad-pre-mv-act-on-state () {
+  if [[ $src_has_content == true ]] ; then
+    if [[ $dst_has_content == true ]] ; then
+      --triad-pre-mv-when-both-have-content
+    elif [[ $dst_exists == true ]] ; then
+      --triad-off-script-content-emergence
+    elif [[ $dst_is_specified == true ]] ; then
+      --triad-pre-mv-when-first-build
+    else
+      --triad-off-script-unexpected-content
+    fi
+  elif [[ $src_exists == true ]] ; then
+    if [[ $dst_has_content == true ]] ; then
+      --triad-off-script-content-disappearance
+    elif [[ $dst_exists == true ]] ; then
+      print -- --triad-when-one-empty-file-to-another-remove-source
+    elif [[ $dst_is_specified == true ]] ; then
+      --triad-off-script-expected-content-did-not-occur
+    else
+      print -- --triad-remove-empty-file-and-report-no-output-as-expected
+    fi
+  else
+    --triad-bad-parameters-from-callback-source-dumpfile-does-not-exist
+  fi
+}
+--triad-bad-parameters-from-callback-source-dumpfile-does-not-exist () {
+  serr "your system call script gave back"\
+    "a path to a std${moniker} dump file that doesn't exist: $src"
+  return $gv_err_no_resource
+}
+--triad-pre-mv-when-both-have-content () {
+  typeset cmp_output
+  cmp_output=$(cmp -- "$src" "$dst")
   if (( 0 == $? )) ; then
-    print -- -triad-source-is-no-different-from-destination
-    return $gv_success
+    print -- --triad-remove-source-file-when-no-change
   else
-    serr "${_TRIAD_FOSP}files were different. won't clobber $dst"
-    return $gv_err_resource_exists
+    --triad-off-script-content-change
   fi
 }
-
---triad-prepare-generated-file-move-when-destination-does-not-exist () {
-  if [ -s $src ] ; then
-    print -- -triad-move-dumpfile-when-destination-does-not-exist-operation
-    return $gv_success
+--triad-off-script-content-change () {
+  serr "${_TRIAD_FOSP}the std${stream} of the performance was different"\
+    "than what is in the fixture dumpfile:"
+  serr $cmp_output
+  return $_TRIAD_OFF_SCRIPT
+}
+--triad-pre-mv-when-first-build () {
+  typeset dst_dirname=$dst:h
+  typeset dst_dirname_dirname=$dst_dirname:h
+  if [[ ! -d $dst_dirname ]] ; then
+    if [[ ! -d $dst_dirname_dirname ]] ; then
+      serr "fatal: when saving dumpfiles, we won't create more than"\
+        "one directory. this directory must exist: $dst_dirname_dirname"
+      return $gv_err_no_resource
+    else
+      print -- --triad-create-directory-and-mv-file
+    fi
   else
-    print -- -triad-source-is-empty-and-destination-does-not-exist-operation
-    return $gv_success
+    print -- --triad-mv-file
   fi
 }
-
--triad-source-is-no-different-from-destination () {
-  serr "${triad_indent}no change, skipping: $3"
-  serr "${triad_indent}rm $2"
-  rm $2  # #dry-run
+--triad-off-script-content-emergence () {
+  serr "${_TRIAD_FOSP}the fixtures have an empty ${stream}put dumpfile"\
+    "but the performance dump had content ($src)."
+  serr "${triad_indent}if the performance dump looks correct, consider"\
+    "running the performance again after removing the empty manifest file: $dst"
+  return $_TRIAD_OFF_SCRIPT
 }
-
--triad-source-is-empty-and-destination-does-not-exist-operation () {
-  serr "${triad_indent}(as expected,"\
-    "there was no $1 from the system call. removing tmpfile)"
-  serr "${triad_indent}rm $2"
-  rm $2  # #dry-run
+--triad-off-script-unexpected-content () {
+  serr "${_TRIAD_FOSP}the performance wrote to the std${stream} stream"\
+    "but no \"s${stream} file\" was specified in the manifest."
+  serr "${triad_indent}inspect the ${stream}put in the temporary dumpfile"\
+    "and if it looks right, consider specifying a name in the manifest: $src"
+  return $_TRIAD_OFF_SCRIPT
 }
-
--triad-move-dumpfile-when-destination-does-not-exist-operation () {
-  serr "  mv $2 $3"
-  mv -n "$2" "$3"  # #dry-run
+--triad-off-script-content-disappearance () {
+  serr "${_TRIAD_FOSP}the performance wrote nothing to the std${stream}"\
+    "stream but the content in this file was expected: $dst"
+  return $_TRIAD_OFF_SCRIPT
 }
+--triad-off-script-expected-content-did-not-occur () {
+  serr "${_TRIAD_FOSP}the manifest specified a \"s${stream} file\""\
+    "but the performance wrote nothing to std${stream}."
+  serr "${triad_indent}if the performance is not expected to generate any"\
+    "${stream}put, remove the filename from the manifest"\
+     " (${triad_manifest_dumpfile_shortpath[$stream]})"
+  return $_TRIAD_OFF_SCRIPT
+}
+--triad-create-directory-and-mv-file () {
+  typeset dirname="${3:h}"
+  serr "キタ━━━(゜∀゜)━━━!!!!! (mkdir $dirname)"  # kitaa!
+  mkdir -- "$dirname" || return $?  # #dry-run
+  --triad-mv-file "${*[@]}"
+}
+--triad-mv-file () {
+  serr "${triad_indent}mv $2 $3"
+  mv -n -- "$2" "$3"  # #dry-run
+}
+--triad-when-one-empty-file-to-another-remove-source () {
+  serr "(notice: empty fixture files are extraneous. they and their "\
+    "manifest entries should be removed: "\
+     "${triad_manifest_dumpfile_shortpath[$1]}"
+  --triad-remove-empty-file-and-report-no-output-as-expected "${*[@]}"
+}
+--triad-remove-empty-file-and-report-no-output-as-expected () {
+  serr "${triad_indent}no ${1}put as expected."
+  rm -- "$2"  # #dry-run
+}
+--triad-remove-source-file-when-no-change () {
+  serr "${triad_indent}${1}put is exactly as expected"\
+    "($(stat -f%z $3) bytes)."
+  rm -- "$2"  # #dry-run
+}
+_TRIAD_FOSP='fatal off-script performance: '
+_TRIAD_OFF_SCRIPT=$gv_early_exit
 
 -triad-validate-exitstatus () {
   typeset actual_s=$1 expected_s=$2
@@ -233,26 +334,39 @@ _TRIAD_FOSP='fatal off-script performance: '
 --triad-assert-expected-exitstatus () {
   if [[ $actual_s =~ '^[0-9]+$' ]] ; then
     if (( $actual_s == $expected_s )) ; then
-      serr "${triad_indent}(system command had ${_TRIAD_RC} $actual_s"\
-        "as expected)"
-      exitstatus=$gv_success
+      --triad-report-that-exitstatus-was-as-expected
     else
-      serr "${_TRIAD_FOSP}: expected $_TRIAD_RC $expected_s"\
-        "but actual $_TRIAD_RC was $actual_s."\
-         "please correct your manifest or figure out"\
-          "your vendor software"
-      exitstatus=$gv_err_param_is_extra_white_grammatical
+      --triad-off-script-exit-status
     fi
   else
-    serr "fatal: bad argument from your system call callback: expected"\
-      "$_TRIAD_RC to be an integer, had \"$actual_s\"."
-    exitstatus=$gv_err_param_is_extra_white_grammatical
+    --triad-bad-parameter-for-exit-status
   fi
+}
+--triad-report-that-exitstatus-was-as-expected () {
+  serr "${triad_indent}system command ${_TRIAD_RC} $actual_s"\
+    "is as expected"
+  exitstatus=$gv_success
+}
+--triad-off-script-exit-status () {
+  serr "${_TRIAD_FOSP}: expected $_TRIAD_RC $expected_s"\
+    "but actual $_TRIAD_RC was $actual_s."\
+     "please correct either your manifest or your performance."
+  exitstatus=$gv_err_param_is_extra_white_grammatical
+}
+--triad-bad-parameter-for-exit-status () {
+  serr "fatal: bad argument from your system call callback: expected"\
+    "$_TRIAD_RC to be an integer, had \"$actual_s\"."
+  exitstatus=$gv_err_param_is_extra_white_grammatical
 }
 
 _TRIAD_RC=exitstatus
 
 loud-cd () {
   serr "${triad_indent}cd $1"
-  cd $1
+  if [[ -d $1 ]] ; then
+    cd -- $1
+  else
+    serr "no such directory: $1"
+    return $gv_err_no_resource
+  fi
 }

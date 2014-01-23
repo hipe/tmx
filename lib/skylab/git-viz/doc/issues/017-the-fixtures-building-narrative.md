@@ -101,7 +101,7 @@ we are considering it (at some level at least).
 
 
 
-## :#storypoint-5  the name conventions
+## :#storypoint-5  :#the-name-conventions
 
 of course we use name conventions in our shell script code, and of course
 they differ from the name conventions we use elsewhere:
@@ -110,7 +110,10 @@ they differ from the name conventions we use elsewhere:
 
   for functions we generally use "names-like-this" and not "names_like_this"
   because a) we can and b) it gives more visual distinction from the other
-  classes of things that use "names_like_this".
+  classes of things that use "names_like_this". (when we get into [#028]:
+  #dynamic-scoping-as-ersatz-vtable it helps to have this visual disctinction,
+  because half the time in some documents we call functions thru parameters
+  and not directly, and this name change helps emphasize the difference.)
 
   specifically as it pertains to process-global functions, we use this name
   convention for functions that are made to be somehow reusable by multiple
@@ -126,7 +129,7 @@ they differ from the name conventions we use elsewhere:
   if you think it's ugly then it's because you just got here. names that are
   lowercase sepearated by dashes with leading dash are reserved for functions
   whose only scope is within the current "resource" (be it an executable
-  script, a "libraray"-style source-able file, or a function (yes, we use
+  script, a "library"-style source-able file, or a function (yes, we use
   functions inside functions. yes we are a girl, yes we play games)). these
   names can be stomped by other same names from other files, so only use them
   knowing this. also, see note below about avoiding stompable names.

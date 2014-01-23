@@ -1,22 +1,41 @@
 #!/usr/bin/env zsh  #just-for-syntax-highlighting
 
-typeset dirname=$1
+-require-partlib
+
+typeset part_func=$0 ; typeset -a rest ; rest=($*)
+
+typeset dirname=$rest[$(($#rest - 1))]
+rest[$(($#rest - 1)),$#rest]=()
+
+case $rest[1] in
+  -h | --help )
+    serr "usage: $($partlib_say_invocation_name) [-h]"
+    serr "description: builds a git resposity with three files,"
+    serr "             and carries them through a story of three commits."
+    return 0
+    ;;
+esac
+
 if [[ -z $dirname ]] ; then
-  serr "usage: $0 <dirname>"
+  serr "usage: $($partlib_say_invocation_name) <dirname>"
   return $gv_err_missing_param
+fi
+
+if (( 0 < $#rest )) ; then
+  serr "($0 ignoring: ${(f)rest})"
 fi
 
 required-parameter 'vcs' || return $?
 typeset git=$vcs
 
-if [[ -d $dirname ]] ; then
+if [[ -d "$dirname" ]] ; then
   serr "using existing $dirname"
   return $gv_success
 fi
 
-mkdir "$dirname"
+mkdir -- "$dirname"
 
-cd "$dirname"
+cd -- "$dirname"
 
 mkdir -p "dirzo/it's just"
 

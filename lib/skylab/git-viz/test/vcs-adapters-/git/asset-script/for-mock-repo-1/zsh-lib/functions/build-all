@@ -3,5 +3,4 @@
 part-repo $* || return $?
 part-ls-files $* || return $?
 part-show $* || return $?
-part-show-negatives $* || return $?
 part-log-follow $* || return $?

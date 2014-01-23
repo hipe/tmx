@@ -1,3 +1,5 @@
+[#028]       #parent-node:[#017] fixtures scripts in detail ..
+[#027] #idea #parent-node:[#018] the idea for the "free-tags" feature
 [#026] #open that filesystem push notify thing (like autotest)
 [#025] #open omg concurrency
 [#024]       #parent-node:[#023] the manifest client narrative ..

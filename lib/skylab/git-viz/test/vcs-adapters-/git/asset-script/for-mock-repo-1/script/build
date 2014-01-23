@@ -8,22 +8,10 @@ typeset high_up_script_dir=$__/script
 
 source $high_up_lib_dir/init-component-node.zsh || return $?
 
-typeset asset_stem
-asset_stem=\
-$( print $component_node_local_top_dir | sed -E 's_^.+/for-([^/]+)$_\1_' )
-
-typeset particular_vcs_dir=${component_node_local_top_dir%/*/*}
-typeset vcs=${particular_vcs_dir##*/}
-
-typeset asset_output_dir=tmp.$vcs.$asset_stem
-
-if [[ (( 1 < $#rest )) || all == $rest[1] ]] ; then
-  # pretty awful: we simply want the output dir as a positional parameter,
-  # and the first and only one, passed to the part-building scripts. however,
-  # we have to dance around detecting things like when no args are passed
-  # so that UI arg parsing errors are triggered when appropriate
-  rest+=($asset_output_dir)  # experimental
-fi
+-require-partlib () {
+  source $particular_vcs_dir/zsh-lib/partlib.zsh
+  -require-partlib () {}
+}
 
 troika-lookup-system-commands () {
   -prepare-troika-once || return $?
@@ -31,9 +19,6 @@ troika-lookup-system-commands () {
   triad-lookup-system-commands\
     --system-commands-manifest $system_commands_manifest_path $*
 }
-
-typeset system_commands_manifest_path\
-=$particular_vcs_dir/fixtures/system-commands.manifest
 
 -prepare-troika-once () {
   required-parameter high_up_lib_dir || return $?
@@ -43,13 +28,14 @@ typeset system_commands_manifest_path\
   set-triad-manifest-API-script $high_up_script_dir/manifest
 }
 
--require-asset-output-dir () {
-  if [[ ! -d $asset_output_dir ]] ; then
-    serr "'$( -say-this-part )' requires that '${asset_stem#mock-}'"\
-      "be built first (this is not 'make')."
-    return $gv_err_no_resource
-  fi
-  return $gv_success
-}
+typeset asset_stem=${component_node_local_top_dir##*/for-}
+typeset particular_vcs_dir=${component_node_local_top_dir%/*/*}
+typeset system_commands_manifest_path\
+=$particular_vcs_dir/fixtures/system-commands.manifest
+typeset vcs=${particular_vcs_dir##*/}
+
+rest[$(($#rest + 1))]=tmp.$vcs.$asset_stem  # 'asset_output_dir'
+rest[$(($#rest + 1))]="${rest[1]}"  # 'adverb'
+# [#028] #storypoint-1: we hiccup a double of the adverb on to the array
 
 component-node-splay

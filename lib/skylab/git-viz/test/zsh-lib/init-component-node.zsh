@@ -19,6 +19,7 @@ typeset gv_err_param_is_extra_white_grammatical
 typeset gv_err_param_is_intra_black_grammatical
   gv_err_param_is_intra_black_grammatical=\
 $(( $gv_err_param_is_extra_white_grammatical ))
+typeset gv_early_exit=33
 
 [[ -z $me ]] && -init-component-fatal--missing-required-parameter '$me'
 
@@ -83,15 +84,20 @@ component-node-splay () {
 
 -load-component-node-functions-once () {
   -load-component-node-functions-once () {}
-  fpath=($component_node_functions_dir $fpath)  # NOTE 'fpath' is magic
+  -component-node-add-all-functions-in-directory "$component_node_functions_dir"
+}
+
+-component-node-add-all-functions-in-directory () {
+  fpath=("$1" $fpath)  # NOTE 'fpath' is magic
   typeset file bn
-  for file ($component_node_functions_dir/*) ; do
+  for file ($1/*) ; do
     bn=$( basename $file )
     if [[ ! '_' = $bn[1] ]] ; then  # hackishly disappear a function this way
       autoload $bn
       # serr "('$bn' registered to autoload via $file)"  # #debugging
     fi
   done
+  return $gv_success
 }
 
 -component-node-splay-call-function () {
@@ -237,6 +243,9 @@ say-component-node-error-predicate-for-any-base-exitstatus () {
     "$gv_err_param_is_intra_black_grammatical")
       s="could not execute because parameter has a disallowed value"
       ;;
+    "$gv_early_exit")
+      s="exited early"
+      ;;
     *)
       s="exited with the mysterious exit code $exitstatus"
       ;;
@@ -311,4 +320,4 @@ say-each-child-node-with-a-build-script () {  # clients may hook in via this
   for x ($child_nodes_dir/*/script/build) ; do
     print $( basename $( dirname $( dirname $x ) ) )
   done
-,n}
+}
