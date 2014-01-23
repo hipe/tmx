@@ -21,4 +21,4 @@ gerp --message\=\"hallo\"
 git show --numstat --pretty\=tformat:\%ai 456456 --
   options {"chdir":"/derp/berp"}
   serr file mock-repo-1/show.456456.err.txt
-  exitstatus 128
+  exitstatus 128  #nonexistant-SHA

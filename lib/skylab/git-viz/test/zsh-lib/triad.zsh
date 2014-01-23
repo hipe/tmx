@@ -116,9 +116,19 @@ triad-lookup-system-commands () {
   typeset triad_sout_fullpath=$(-triad-normalize-dumpfile-dst-path "$3")
   typeset triad_serr_fullpath=$(-triad-normalize-dumpfile-dst-path "$4")
   typeset expected_rc_s=$5
+  typeset -A freetags ; -triad-parse-marshalled-freetags $6
   -triad-maybe-separator
   $callback_fname "$cmd" "$from_dir" -triad-triad-callback
 }
+-triad-parse-marshalled-freetags () {
+  (( 0 == $# )) && return
+  typeset x ; typeset -a a
+  for x do
+    a=(${(s:=:)x})
+    freetags[${a[1]}]="${a[2]}"
+  done
+}
+
 -triad-maybe-separator () {
   frame_count=$(( $frame_count + 1 ))
   if (( 1 < $frame_count )) ; then

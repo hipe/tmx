@@ -51,9 +51,14 @@ partlib-parse-adverb-and-asset-output-dir
   cmd=(${(z)real_cmd_s})
 }
 ---cmd-intentionally-refers-to-an-invalid-sha () {
-  # yes on everage there is a (4.0e-06) chance this hack will fail
-  [[ "$story_cmd_s" = *\ 456456\ -- ]] && return 0
-  return 1
+  if [[ "$freetags[nonexistant_SHA]" == true ]] ; then
+    return 0
+    # yes on everage there is a (4.0e-06) chance this hack will fail, if
+    # ever there is an actual SHA that matches our fabriacated SHA that
+    # is intended to be non-existant. it is a risk we are willing to take
+  else
+    return 1
+  fi
 }
 ---execute-the-cmd () {
   o==() ; e==()

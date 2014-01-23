@@ -213,7 +213,8 @@ module Skylab::GitViz
         emit_row :payload, :fixed_width, :command, * cmd.to_a
       end
       Command__ = ::Struct.new :command, :cd_relpath,
-        :any_stdout_path, :any_stderr_path, :result_code_x
+        :any_stdout_path, :any_stderr_path, :result_code_x,
+        :marshalled_freetags
 
       def emit_row * x_a
         @stdout.write "#{ x_a * "\t" }\n"

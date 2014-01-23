@@ -168,6 +168,7 @@ module Skylab::GitViz
           @cmd_s = cmd_s ; @did_parse = false
           @did_parse_opt_s = false
           @exitstatus_is_query = false
+          @freetag_a = nil
           @has_out_dumpfile = @has_err_dumpfile = nil
           @iam_s_a = iam_s_a ; @mock_wait_thread = nil
         end
@@ -208,14 +209,25 @@ module Skylab::GitViz
         def parse
           @did_parse = true
           @scn = Multiline_Scanner_.new( @iam_s_a ) ; @iam_s_a = :_parsed_
-          while ! @scn.eos?
+          while true
             @scn.skip SOME_SPACE__
-            word = scn_some_word
-            @scn.skip SOME_SPACE__
-            send :"#{ word }="
-            @scn.skip SOME_SPACE__
+            @scn.eos? and break
+            if (( @word_s = scn_any_word ))
+              scn_rest_of_word
+            elsif (( @freetag = scn_any_freetag ))
+              process_freetag
+            else
+              fail say_expecting_word_or_freetag
+            end
           end
           post_parse ; nil
+        end
+        def scn_rest_of_word
+          @scn.skip SOME_SPACE__
+          send :"#{ @word_s }="
+        end
+        def say_expecting_word_or_freetag
+          say_expecting "expecting word or #freetag"
         end
         FILE_KEYWORD__ = /file\b/
         SOME_SPACE__ = /[ \t]+/
@@ -242,11 +254,8 @@ module Skylab::GitViz
         def say_expecting_file_keyword
           say_expecting "the only thing that can follow 'serr' is 'file'"
         end
-        def scn_some_word
-          @scn.scan TERM_NAME_RX__ or fail say_expecting_word
-        end
-        def say_expecting_word
-          say_expecting "expecting word"
+        def scn_any_word
+          @scn.scan TERM_NAME_RX__
         end
         def options=
           d = @scn.string.rindex END_CURLY__
@@ -278,7 +287,7 @@ module Skylab::GitViz
           say_expecting "expected digit or e.g \"(foo?)\" or just \"?\""
         end
         def say_expecting s
-          _rest = FUN_::Ellipsify[][ @scn.rest ]
+          _rest = FUN_::Ellipsify[ @scn.rest ]
           _rest = "«#{ _rest }»"  # :+#guillemet
           "#{ s } at #{ _rest }"
         end
@@ -287,8 +296,44 @@ module Skylab::GitViz
           @mock_wait_thread = :_query_ ; nil
         end
 
+        # ~ freetags
+      public
+        attr_reader :freetag_a
+        def marshalled_freetags
+          @freetag_a and @freetag_a.first.class.marshall @freetag_a
+        end
+      private
+        def scn_any_freetag
+          @freetag_identifier = @scn.scan FREETAG_IDENTIFIER_RX__
+          @freetag_identifier && scn_rest_of_freetag
+        end
+        FREETAG_IDENTIFIER_RX__ = /#[a-zA-Z][-a-zA-Z0-9]+(?=$|[[:space:]]|:)/
+        FREETAG_NECK_RX__ = /:/
+        FREETAG_BODY_RX__ = /[-_a-zA-Z0-9]+(?=$|[[:space:]])/
+        def scn_rest_of_freetag
+          @freetag_body = if @scn.skip FREETAG_NECK_RX__
+            scn_some_freetag_body
+          end
+          bld_freetag
+        end
+        def scn_some_freetag_body
+          @scn.scan FREETAG_BODY_RX__ or fail say_expecting_freetag_body
+        end
+        def say_expecting_freetag_body
+          say_expecting "expecting valid freetag body value"
+        end
+        def bld_freetag
+          Mock_System::Manifest::FreeTag.new @freetag_identifier, @freetag_body
+        end
+        def process_freetag
+          @freetag_body = @freetag_identifier = nil
+          @freetag_a ||= [] << @freetag ; @freetag = nil
+        end
+        # (end freetag)
+
         def post_parse
           @any_opt_s ||= nil
+          @freetag_a && @freetag_a.freeze
           @mock_wait_thread ||= SUCCESS_WAIT__ ; nil
         end
         class Wait__

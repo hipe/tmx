@@ -161,13 +161,17 @@ module Skylab::GitViz
           _odfs = cmd.out_dumpfile_s
           _edfs = cmd.err_dumpfile_s
           _ec = cmd.result_code_mixed_string
+          if (( ft = cmd.marshalled_freetags ))
+            ft_a = [ :marshalled_freetags, ft ]
+          end
           @added_count += 1
           @response.add_iambicly_structured_statement(
             :payload, :iambic, :command,
             :command, cmd.cmd_s, :cd_relpath, pfx,
             :any_stdout_path, _odfs,
             :any_stderr_path, _edfs,
-            :result_code_x, _ec )
+            :result_code_x, _ec,
+            * ft_a )
         end
       end
     end
