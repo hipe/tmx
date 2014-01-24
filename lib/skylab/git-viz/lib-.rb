@@ -27,13 +27,16 @@ module Skylab::GitViz
         require slug[ i ] ; ::Object.const_get i, false
       end ]
     end
+    gem = stdlib
 
     Basic = subsys[ :Basic ]
     DateTime = memo[ -> do require 'date' ; ::DateTime end ]
     Grit = memo[ -> do require 'grit' ; ::Grit end ]
     Headless = subsys[ :Headless ]
     JSON = stdlib[ :JSON ]
+    Listen = gem[ :Listen ]
     MetaHell = subsys[ :MetaHell ]
+    MD5 = memo[ -> do require 'digest/md5' ; ::Digest::MD5 end ]
     Open3 = stdlib[ :Open3 ]
     OptionParser = memo[ -> do require 'optparse' ; ::OptionParser end ]
     Porcelain = subsys[ :Porcelain ]

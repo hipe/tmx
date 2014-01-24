@@ -28,7 +28,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters_::Git::System_Agent_
 
     def ping_from_path x
       with_system_agent do |sa|
-        sa.set_cmd_s_a %w( gerp --message="hallo" )
+        sa.set_cmd_s_a %w( print -l winz WINZ )
         sa.set_chdir_pathname mock_pathname x
       end
       @scn = @sa.get_any_nonzero_count_output_line_scanner_from_cmd
@@ -47,7 +47,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters_::Git::System_Agent_
     def expect_ping_command_with_chdir_value x
       expect %i( next_system command ) do |em|
         cmd = em.payload_x
-        cmd.command_s_a.should eql %w( gerp --message="hallo" )
+        cmd.command_s_a.should eql %w( print -l winz WINZ )
         cmd.any_nonzero_length_option_h[ :chdir ].should eql x
       end
     end

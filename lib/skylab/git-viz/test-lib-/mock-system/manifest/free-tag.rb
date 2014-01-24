@@ -7,7 +7,7 @@ module Skylab::GitViz
       class FreeTag
         def initialize head, body
           head.frozen? or head = head.dup.freeze
-          ! body or body.frozen? or body = bod.dup.freeze
+          ! body or body.frozen? or body = body.dup.freeze
           @body_s = body ; @identifier_s = head
           @normal_stem_i = head[ 1 .. -1 ].gsub( '-', '_' ).intern
           freeze

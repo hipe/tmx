@@ -20,7 +20,7 @@ partlib-parse-adverb-and-asset-output-dir
 -partlib-require-asset-output-dir || return $?
 
 --each-ls-files-command () {
-  typeset cmd=$1 ; typeset cd=$2 ; typeset triad_callback=$3
+  typeset cmd=$1 cd=$2 triad_callback=$3
   typeset -a a ; a=(${(z)cmd})
   if [[ ! -z  $cd ]] ; then
     cd=/$cd ; typeset dd=/..

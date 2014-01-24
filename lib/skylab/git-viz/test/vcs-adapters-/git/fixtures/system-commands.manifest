@@ -14,7 +14,7 @@ git show --numstat --pretty\=tformat:\%ai 345345 --
   options {"chdir":"/derp/berp"}
   file mock-repo-1/show.345345.txt
 
-gerp --message\=\"hallo\"
+print -l winz WINZ
   options {"chdir":"wa-da-da-dir"}
   file mock-repo-1/ohai.txt
 

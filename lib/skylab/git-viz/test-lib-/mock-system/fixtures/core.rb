@@ -9,6 +9,7 @@ module Skylab::GitViz
       def initialize serr, port_d, argv
         @argv = argv
         @buffer_a = []
+        @serr = serr
         @port_d = port_d
         @y = ::Enumerator::Yielder.new( & serr.method( :puts ) )
       end
@@ -26,7 +27,8 @@ module Skylab::GitViz
     private
 
       def init_responder
-        @responder = GitViz::Test_Lib_::Mock_System::Manifest.new @y ; nil
+        @responder = GitViz::Test_Lib_::Mock_System::Manifest.new @y
+        emit_to_plugins :on_responder_initted, @responder
       end
 
       def resolve_context
@@ -40,11 +42,28 @@ module Skylab::GitViz
 
       def trap_interrupt
         trap "INT" do
-          @y << "received shutdown signal. shutting down now."
-          @socket.close
-          @context.terminate
-          @is_running = false
+          @y << "received shutdown signal."
+          shutdown_if_necessary
         end ; nil
+      end
+
+      def shutdown_if_necessary
+        @is_shutting_down ||= begin ; yes = true end
+        if yes
+          shutdown
+        else
+          @y << "(shutdown already in progress)" ; nil
+        end
+      end
+
+      def shutdown
+        @y << "shutting down plugins.."
+        shutdown_every_plugin
+        @serr.write "shutting down server .."
+        @socket.close
+        @context.terminate
+        @is_running = false
+        @y << " done." ; nil
       end
 
       def run_loop
@@ -71,7 +90,9 @@ module Skylab::GitViz
       def when_recv_failure
         d = ::ZMQ::Util.errno
         _s = ::LibZMQ.zmq_strerror( d ).read_string
-        @y << "receive failure: #{ _s }" ; d
+        @y << "receive failure: #{ _s }"
+        shutdown_if_necessary
+        d
       end
 
       def process_received_strings
@@ -97,7 +118,7 @@ module Skylab::GitViz
 
       def load_plugins
         @listener_matrix_h = {} ; @plugin_h = {}
-        conduit = Plugin_Conduit__.new @y
+        conduit = Plugin_Conduit__.new @y, self
         box_mod = self.class::Plugins__
         box_mod.dir_pathname.children( false ).each do |pn|
           name = Name__.new pn
@@ -109,6 +130,14 @@ module Skylab::GitViz
         end
         init_plugins
       end
+    public
+      def clear_cache_for_mani_pn_from_conduit pn
+        @responder.clear_cache_for_manifest_pathname pn
+      end
+      def serr_for_conduit
+        @serr
+      end
+    private
 
       def index_plugin cond
         k = cond.name.norm_i ; did = false
@@ -150,12 +179,12 @@ module Skylab::GitViz
       end
 
       def write_op_help
-        @op.on '--help', "(this screen)" do
+        @op.on '--help', "this screen." do
           @y << "usage: #{ ::File.basename $PROGRAM_NAME  } [opts]"
           @y << "description: fixture server. listens on port #{ @port_d }"
           @y << "options:"
           @op.summarize @y
-          @result_code = EARLY_EXIT_
+          @result_code = SUCCESS_
         end ; nil
       end
 
@@ -185,6 +214,22 @@ module Skylab::GitViz
         end
       end
 
+      def shutdown_every_plugin
+        a = emit_to_every_plugin :on_shutdown
+        a and when_some_plugins_have_issues_shutting_down
+      end
+
+      def when_some_plugins_have_issues_shutting_down a
+        first = true
+        a.each do |conduit, ec|
+          @y << "had issue shutting down '#{ conduit.name.as_human }'#{
+            } plugin (exitcode #{ ec })"
+          first or next
+          first = true
+          @result_code = ec
+        end ; nil
+      end
+
       def emit_to_plugins m_i, * a, & p
         a.length.nonzero? and p and raise ::ArgumentError
         p ||= -> cond do
@@ -193,11 +238,22 @@ module Skylab::GitViz
         k_a = @listener_matrix_h[ m_i ]
         ec = PROCEDE_
         k_a.each do |k|
-          cond = @plugin_h.fetch k
-          ec = p[ cond ]
+          conduit = @plugin_h.fetch k
+          ec = p[ conduit ]
           ec and break
         end
         ec
+      end
+
+      def emit_to_every_plugin m_i, * a
+        y = PROCEDE_
+        @listener_matrix_h[ m_i ].each do |k|
+          conduit = @plugin_h.fetch k
+          ec = conduit.plugin.send m_i, * a
+          ec or next
+          ( y ||= [] ) << [ conduit, ec ]
+        end
+        y
       end
 
       class Plugin_Option_Parser_Proxy_
@@ -239,10 +295,12 @@ module Skylab::GitViz
       Listener_Set__ = ::Struct.
         new :on_build_option_parser,
           :on_options_parsed,
-          :on_response
+          :on_response,
+          :on_shutdown
 
       class Plugin_Conduit__
-        def initialize y
+        def initialize y, real
+          @up_p = -> { real }
           @stderr_line_yielder = y
         end
         attr_accessor :plugin
@@ -259,6 +317,31 @@ module Skylab::GitViz
           @name = name
         end
         attr_reader :name
+
+        def get_qualified_serr
+          serr = @up_p[].serr_for_conduit
+          Write_Proxy__.new do |s|
+            serr.write "#{ customized_message_prefix }#{ s }" ; nil
+          end
+        end
+        class Write_Proxy__ < ::Proc
+          alias_method :write, :call
+        end
+
+        def get_qualified_stderr_line_yielder
+          y = ::Enumerator::Yielder.new do |msg|
+            @stderr_line_yielder << "#{ customized_message_prefix }#{ msg }"
+            y
+          end ; y
+        end
+
+        def customized_message_prefix
+          "  • #{ @name.as_human } "
+        end
+
+        def clear_cache_for_manifest_pathname pn
+          @up_p[].clear_cache_for_mani_pn_from_conduit pn
+        end
       end
 
       class Name__
@@ -266,9 +349,10 @@ module Skylab::GitViz
           @pathname = pn
           @as_slug = pn.sub_ext( '' ).to_path.freeze
           @as_const = Constate__[ @as_slug ]
+          @as_human = @as_slug.gsub( '-', ' ' ).freeze
           @norm_i = @as_slug.gsub( '-', '_' ).intern
         end
-        attr_reader :as_const, :as_slug, :norm_i
+        attr_reader :as_const, :as_human, :as_slug, :norm_i
         def getbyte d
           @as_slug.getbyte d
         end

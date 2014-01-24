@@ -1,6 +1,7 @@
 #!/usr/bin/env zsh  #just-for-syntax-highlighting
 
 part-repo $* || return $?
+part-ohai $* || return $?
 part-ls-files $* || return $?
 part-show $* || return $?
 part-log-follow $* || return $?

@@ -69,36 +69,78 @@ module Skylab::GitViz
 
       class Mock_Command_IO_Cache_
         def initialize
+          @listener_p_a = nil
           @manifest_cls = Mock_System_Conduit_
           @cache_h = ::Hash.new do |h, cls|
             h[ cls ] = ::Hash.new do |h_, pn|
-              h_[ pn ] = cls.new pn
+              new = cls.new pn
+              h_[ pn ] = new
+              @listener_p_a and @listener_p_a.each { |p| p[ new ] }
+              new
             end
           end
         end
+        def on_item_added & p
+          ( @listener_p_a ||= [] ) << p ; nil
+        end
+        def retrieve_or_init cls, pn, retrieved_p, initted_p
+          x = lookup_any_cached_tuple cls, pn
+          if x then retrieved_p[ x ] else
+            x = resolve_some_cached_IO_instance_of_class_for_pn cls, pn
+            initted_p[ x ]
+          end
+        end
         def lookup_any_cached_manifest_handle_for_pn pn
-          @cache_h[ @manifest_cls ].fetch( pn ) {  }
+          lookup_any_cached_tuple @manifest_cls, pn
+        end
+        def lookup_any_cached_tuple cls, pn
+          @cache_h[ cls ].fetch( pn ) {  }
         end
         def resolve_some_cached_IO_instance_of_class_for_pn cls, pn
           @cache_h[ cls ][ pn ]
+        end
+        def clear_cache_for_item_tuple cls, pn, yes_p, no_p
+          if (( h = @cache_h.fetch( cls ) { } ))
+            item = h.fetch( pn ) { }
+            if item
+              yes_p[ h.delete pn ]
+            else
+              no_p[ [ pn, cls, :pathname ] ]
+            end
+          else
+            no_p[ [ cls, nil, :class ] ]
+          end
         end
       end
 
       class Manifest_IO___  # (abstract base class for at least 2 children)
         def initialize pn
           @cmd_as_non_unique_key_s_a = []
+          @entry_count = 0
           @h = {} ; pn.open 'r' do |fh|
             Parse_Manifest_.new( fh, method( :accpt_line ) ).execute
           end
-          @manifest_dirname_pn = pn.dirname ; nil
+          @manifest_dirname_pn = pn.dirname
+          @manifest_pathname = pn
         end
+        attr_reader :manifest_pathname  # only used by server plugins omz
       private
         def accpt_line cmd_s, iam_s_a
           cmd = Stored_Command_.new cmd_s.freeze, iam_s_a
+          @entry_count += 1
           ( @h.fetch cmd.cmd_s do |k|
             @cmd_as_non_unique_key_s_a << k
             @h[ k ] = []
           end ) << cmd ; nil
+        end
+      public
+        def manifest_summary
+          "#{ @entry_count } entries (#{ unique_commands_count }#{
+            } unique commands)"
+        end
+        attr_reader :entry_count
+        def unique_commands_count
+          @cmd_as_non_unique_key_s_a.length
         end
       end
 

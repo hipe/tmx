@@ -36,22 +36,12 @@ module Skylab::GitViz
           bork "manifest path is directory: #{ @mani_path }"
         end
         def resolve_manifest_when_path_is_file
-          _context = Manifest_Handle_Resolution_Context__.new @IO_cache, @pn
-          @mani = _context.resolve_any_manifest_handle
+          @mani = @IO_cache.retrieve_or_init Manifest::Handle, @pn, -> mani do
+              @y << "(using cached manifest parse tree)" ; mani
+            end, -> new do
+              @y << "parsed #{ new.manifest_summary } in #{ @pn }" ; new
+            end
           @mani ? PROCEDE_ : GENERAL_ERROR_
-        end
-
-        class Manifest_Handle_Resolution_Context__
-          def initialize cache, pn
-            @fixture_IO_cache = cache ; @pn = pn
-          end
-          include Mock_System::Instance_Methods__
-          def get_system_command_manifest_pn  # #hook-in
-            @pn
-          end
-          def resolve_any_memoized_IO_cache _lookup # #hook-in
-            @fixture_IO_cache
-          end
         end
 
         def reduce_with_manifest

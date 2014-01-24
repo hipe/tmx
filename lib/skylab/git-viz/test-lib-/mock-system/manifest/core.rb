@@ -5,12 +5,41 @@ module Skylab::GitViz
     class Manifest
 
       def initialize y
-        @y = y
+        @cache = Mock_Command_IO_Cache_.new ; @y = y
+      end
+
+      def on_manifest_added &p
+        @cache.on_item_added( & p )
       end
 
       def process_strings a
-        Respond_.new( @y, a ).respond
+        Respond_.new( @y, @cache, a ).respond
       end
+
+      def clear_cache_for_manifest_pathname pn
+        @cache.clear_cache_for_item_tuple Manifest::Handle, pn, -> man_han do
+          @y << "#{ prefix }cleared #{ man_han.manifest_pathname } #{
+            }from the cache (#{ man_han.manifest_summary })"
+          PROCEDE_
+        end, -> err do
+          x, inside, i = err.to_a
+          short = -> cls do
+            cls.name.split( '::' )[ -2..-1 ] * '::'
+          end
+          _msg = if inside
+            "there is no cached #{ short[ inside ] } for #{ i } #{ pn }"
+          else
+            "there is nothing cached of #{ i } #{ short[ x ] }"
+          end
+          @y << "#{ prefix }(#{ _msg }. nothing to do)"
+          GENERAL_ERROR_
+        end
+      end
+
+      def prefix
+        PREFIX__
+      end
+      PREFIX__ = '  • '.freeze
 
       class Agent_
         def initialize y, response
@@ -24,8 +53,8 @@ module Skylab::GitViz
 
       class Respond_ < Agent_
 
-        def initialize y, s_a
-          @s_a = s_a
+        def initialize y, cache, s_a
+          @cache = cache ; @s_a = s_a
           super y, Response_.new
         end
 
@@ -44,12 +73,7 @@ module Skylab::GitViz
         end
 
         def reduce
-          @cache ||= build_command_IO_cache
           Manifest::Reduce_.new( @y, @cache, @request, @response ).reduce
-        end
-
-        def build_command_IO_cache
-          Mock_Command_IO_Cache_.new
         end
       end
 
