@@ -260,6 +260,18 @@ say-component-node-error-predicate-for-any-base-exitstatus () {
 
 # ~ the below is not reached by the above, but may be so via client hooking
 
+dispatch-target-and-args-to-all () {
+  typeset target=$1 ; shift
+  typeset -a arr ; arr=(${(f)"$(-say-each-component-child-node-slug)"})
+  typeset r=$gv_success rr x
+  for x ($arr) ; do
+    dispatch-target-to-child-build-script "$target" $x "${*[@]}"
+    rr=$?
+    (( $gv_success == $rr )) && r=$rr
+  done
+  return $r
+}
+
 dispatch-target-to-child-build-script () {
   typeset tgt_name=$1 ; shift ; typeset child=$1 ; shift
   typeset script

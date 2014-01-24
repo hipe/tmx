@@ -19,14 +19,7 @@ typeset -a rest ; rest=($*)
   say-each-child-node-with-a-build-script
 }
 -component-node-splay-when-help-not-requested () {
-  typeset -a arr ; arr=(${(f)"$(-say-each-component-child-node-slug)"})
-  typeset r=$gv_success rr x
-  for x ($arr) ; do
-    dispatch-target-to-child-build-script all $x $*
-    rr=$?
-    (( $gv_success == $rr )) && r=$rr
-  done
-  return $r
+  dispatch-target-and-args-to-all all "${*[@]}"
 }
 
 component-node-splay
