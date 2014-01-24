@@ -5,7 +5,7 @@
 [#025] #open omg concurrency
 [#024]       #parent-node:[#023] the manifest client narrative ..
 [#023]       #parent-node:[#014] the mock system narrative ..
-[#022] #open heartbeat and shutdown timer
+[#022]       #done heartbeat and shutdown timer
 [#021] #open #experimental is it practical to "#rainbow-kick" the server?
 [#020]       #done just for the lols different rubies talk on the same system
 [#019]       #done fixture server is a long running process, doesn't need to

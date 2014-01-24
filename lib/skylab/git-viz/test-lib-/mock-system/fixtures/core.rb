@@ -21,6 +21,7 @@ module Skylab::GitViz
         ec ||= resolve_context
         ec ||= resolve_and_bind_socket
         ec || trap_interrupt
+        ec ||= notify_plugins_of_start
         ec || run_loop
       end
 
@@ -60,9 +61,9 @@ module Skylab::GitViz
         @y << "shutting down plugins.."
         shutdown_every_plugin
         @serr.write "shutting down server .."
+        @is_running = false  # do this before below so no receive failure
         @socket.close
         @context.terminate
-        @is_running = false
         @y << " done." ; nil
       end
 
@@ -136,6 +137,10 @@ module Skylab::GitViz
       end
       def serr_for_conduit
         @serr
+      end
+      def shutdown_requested_by_plugin_conduit cond
+        @y << "received shutdown signal from #{ cond.name.as_human }.."
+        shutdown_if_necessary ; nil
       end
     private
 
@@ -212,6 +217,10 @@ module Skylab::GitViz
           @y << "unexpected argument: #{ argv.first.inspect }"
           GENERAL_ERROR_
         end
+      end
+
+      def notify_plugins_of_start
+        emit_to_plugins :on_start
       end
 
       def shutdown_every_plugin
@@ -295,6 +304,7 @@ module Skylab::GitViz
       Listener_Set__ = ::Struct.
         new :on_build_option_parser,
           :on_options_parsed,
+          :on_start,
           :on_response,
           :on_shutdown
 
@@ -341,6 +351,10 @@ module Skylab::GitViz
 
         def clear_cache_for_manifest_pathname pn
           @up_p[].clear_cache_for_mani_pn_from_conduit pn
+        end
+
+        def shutdown
+          @up_p[].shutdown_requested_by_plugin_conduit self
         end
       end
 

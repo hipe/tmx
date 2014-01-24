@@ -12,8 +12,10 @@ module Skylab::GitViz
 
       def on_build_option_parser op
         op.on '--max-width=<m>',
-          "what is the threshold for the line width at which",
-           "lines get truncated when logging the responses?" do |s|
+          "what is the threshold for the line width at which #{
+            }lines get", "truncated when logging the responses? #{
+             }(default: #{ @default_max_width_s }) more may", "be useful #{
+              }when debugging, less if the output seems crufty." do |s|
              @max_width_s = s
         end
         PROCEDE_

@@ -5,15 +5,21 @@ module Skylab::GitViz
     class Manifest
 
       def initialize y
-        @cache = Mock_Command_IO_Cache_.new ; @y = y
+        @cache = Mock_Command_IO_Cache_.new
+        @response_started_p_a = nil
+        @y = y
       end
 
       def on_manifest_added &p
         @cache.on_item_added( & p )
       end
 
+      def on_response_started &p
+        ( @response_started_p_a ||= [] ) << p ; nil
+      end
+
       def process_strings a
-        Respond_.new( @y, @cache, a ).respond
+        Respond_.new( @y, @cache, @response_started_p_a, a ).respond
       end
 
       def clear_cache_for_manifest_pathname pn
@@ -53,9 +59,11 @@ module Skylab::GitViz
 
       class Respond_ < Agent_
 
-        def initialize y, cache, s_a
+        def initialize y, cache, started_p_a, s_a
           @cache = cache ; @s_a = s_a
-          super y, Response_.new
+          response = Response_.new
+          started_p_a and started_p_a.each { |p| p[ response ] }
+          super y, response
         end
 
         def respond
