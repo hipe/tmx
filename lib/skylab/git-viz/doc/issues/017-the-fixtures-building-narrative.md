@@ -2,6 +2,10 @@
 
 ## introduction
 
+(EDIT: this pertains to the "build scripts" written largely in zsh, and not
+the (perhaps more interesting) fixture client/server, whose top node of
+documentation is [#018].)
+
 every "node" and every level of this mini-system will implements its UI in
 this one, centralized way unless it has good reason not to: we can infer a
 whole mess of names from the invoked script path, and this serves as the

@@ -65,8 +65,8 @@ module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System
         execute
         expect_that_the_request_string_was_echoed
         expect :error, :iambic, :manifest_parse, :unexpected_term_parse_error
-        expect_errored(
-          GitViz::Test_Lib_::Mock_System::Manifest::MANIFEST_PARSE_ERROR_ )
+        expect_errored( GitViz::Test_Lib_::
+          Mock_System::Fixture_Server::MANIFEST_PARSE_ERROR_ )
       end
 
       let :manifest_suffix do
@@ -75,7 +75,8 @@ module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System
     end
 
     let :mani do
-      GitViz::Test_Lib_::Mock_System::Manifest::Responder.new stderr_yielder
+      GitViz::Test_Lib_::
+        Mock_System::Fixture_Server::Responder__.new stderr_yielder
     end
 
     let :stderr_yielder do

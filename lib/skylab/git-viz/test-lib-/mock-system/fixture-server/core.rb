@@ -4,7 +4,7 @@ module Skylab::GitViz
 
   module Test_Lib_::Mock_System
 
-    class Fixtures # read [#018]:#introduction-to-the-middle-end
+    class Fixture_Server  # read [#018]:#introduction-to-the-middle-end
 
       def initialize serr, port_d, argv
         @argv = argv
@@ -28,8 +28,7 @@ module Skylab::GitViz
     private
 
       def init_responder
-        @responder = GitViz::Test_Lib_::Mock_System::Manifest::Responder.
-          new @y
+        @responder = self.class::Responder__.new @y
         emit_to_plugins :on_responder_initted, @responder
       end
 
@@ -45,16 +44,23 @@ module Skylab::GitViz
       def trap_interrupt
         trap "INT" do
           @y << "received shutdown signal."
-          shutdown_if_necessary
-        end ; nil
+          shutdown_if_necessary 'interrupt signal'
+        end
+
+        at_exit do  # typically issued explicitly only during echo-debugging
+          if @is_running
+            @y << "received 'exit' callback."
+            shutdown_if_necessary 'exit'
+          end
+        end
       end
 
-      def shutdown_if_necessary
+      def shutdown_if_necessary s
         @is_shutting_down ||= begin ; yes = true end
         if yes
           shutdown
         else
-          @y << "(shutdown already in progress)" ; nil
+          @y << "(shutdown already in progress at #{ s })" ; nil
         end
       end
 
@@ -93,7 +99,7 @@ module Skylab::GitViz
         d = ::ZMQ::Util.errno
         _s = ::LibZMQ.zmq_strerror( d ).read_string
         @y << "receive failure: #{ _s }"
-        shutdown_if_necessary
+        shutdown_if_necessary 'receive failure'
         d
       end
 
@@ -141,7 +147,7 @@ module Skylab::GitViz
       end
       def shutdown_requested_by_plugin_conduit cond
         @y << "received shutdown signal from #{ cond.name.as_human }.."
-        shutdown_if_necessary ; nil
+        shutdown_if_necessary 'plugin request'
       end
     private
 
@@ -379,8 +385,19 @@ module Skylab::GitViz
         end
       end.call
 
-      EARLY_EXIT_ = 33
-      GENERAL_ERROR_ = 3 ; PROCEDE_ = nil ; SUCCESS_ = 0
+      class Response_Agent_
+        def initialize y, response
+          @response = response ; @y = y ; nil
+        end
+        def bork s
+          @response.add_iambicly_structured_statement :error, s
+          GENERAL_ERROR_
+        end
+      end
+
+      EARLY_EXIT_ = 33 ; Fixture_Server = self
+      GENERAL_ERROR_ = 3 ; MANIFEST_PARSE_ERROR_ = 36  # 3 -> m 9 -> p
+      PROCEDE_ = nil ; SUCCESS_ = 0
     end
   end
 end

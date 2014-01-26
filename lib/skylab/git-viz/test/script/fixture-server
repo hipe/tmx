@@ -1,5 +1,7 @@
 #!/usr/bin/env zsh
 
+# read [#018] the system call fixture server narrative
+
 me=$0 ; typeset -a rest ; rest=("${*[@]}")
 
 serr () {

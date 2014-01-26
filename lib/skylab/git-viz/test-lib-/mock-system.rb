@@ -17,9 +17,6 @@ module Skylab::GitViz
           IO_Lookup__.new( self ).lookup_system_conduit
         end
       public
-        def resolve_any_manifest_handle
-          IO_Lookup__.new( self ).lookup_manifest_handle
-        end
         def get_system_command_manifest_pn
           fixtures_module.dir_pathname.join 'system-commands.manifest'
         end
@@ -45,10 +42,6 @@ module Skylab::GitViz
         end
         def lookup_system_conduit
           @IO_class = Mock_System_Conduit_
-          lookup
-        end
-        def lookup_manifest_handle
-          @IO_class = Mock_System::Manifest::Handle
           lookup
         end
       private
@@ -378,23 +371,6 @@ module Skylab::GitViz
         end
       end
 
-      class Manifest_IO___  # (abstract base class for at least 2 children)
-        def initialize cmd_key_s_a, cmd_a_h, entry_count, pn
-          @cmd_a_h = cmd_a_h ; @cmd_as_non_unique_key_s_a = cmd_key_s_a
-          @entry_count = entry_count ; @manifest_dirname_pn = pn.dirname
-          @manifest_pathname = pn
-        end
-        attr_reader :manifest_pathname  # only used by server plugins omz
-        def manifest_summary
-          "#{ @entry_count } entries (#{ unique_commands_count }#{
-            } unique commands)"
-        end
-        attr_reader :entry_count
-        def unique_commands_count
-          @cmd_as_non_unique_key_s_a.length
-        end
-      end
-
       class Stored_Command_
         def initialize
           @did_parse = false ; @did_parse_opt_s = false
@@ -418,9 +394,7 @@ module Skylab::GitViz
       private
         def parse_opt_s
           @did_parse_opt_s = true
-          require 'strscan'  # oh my god so bad. in rbx only, unless we require
-          # *anything* else beforehand, an attempt to require 'json' at this
-          # point (but not before) raises a load error! #todo:wtf
+          # (this is a key-point in the [#030] load path fiasco)
           h = GitViz::Lib_::JSON[].parse @any_opt_s, symbolize_names: true
           @any_opt_h = h.freeze ; nil
         end
@@ -602,7 +576,8 @@ module Skylab::GitViz
           say_expecting "expecting valid freetag body value"
         end
         def bld_freetag
-          Mock_System::Manifest::FreeTag.new @freetag_identifier, @freetag_body
+          Mock_System::Manifest_Entry_::FreeTag.
+            new @freetag_identifier, @freetag_body
         end
         def process_freetag
           @freetag_body = @freetag_identifier = nil
@@ -769,15 +744,6 @@ module Skylab::GitViz
         end
       end
 
-      class Mock_System_Conduit_ < Manifest_IO___
-        def popen3 * a
-          block_given? and raise ::ArgumentError, "no, don't"
-          cmd = Lookup_for_playback__.
-            new( @manifest_dirname_pn, @cmd_a_h, a ).lookup_for_playback
-          cmd.get_four
-        end
-      end
-
       class Lookup_for_playback__
         def initialize pn, h, a
           @cmd_a_h = h ; @manifest_dirname_pn = pn
@@ -842,6 +808,23 @@ module Skylab::GitViz
       private
         def init_opt_h opt_h
           @any_opt_s = GitViz::Lib_::JSON[].generate opt_h ; nil
+        end
+      end
+
+      class Manifest_  # (abstract base class for at least 2 children)
+        def initialize cmd_key_s_a, cmd_a_h, entry_count, pn
+          @cmd_a_h = cmd_a_h ; @cmd_as_non_unique_key_s_a = cmd_key_s_a
+          @entry_count = entry_count ; @manifest_dirname_pn = pn.dirname
+          @manifest_pathname = pn
+        end
+      end
+
+      class Mock_System_Conduit_ < Manifest_
+        def popen3 * a
+          block_given? and raise ::ArgumentError, "no, don't"
+          cmd = Lookup_for_playback__.
+            new( @manifest_dirname_pn, @cmd_a_h, a ).lookup_for_playback
+          cmd.get_four
         end
       end
 

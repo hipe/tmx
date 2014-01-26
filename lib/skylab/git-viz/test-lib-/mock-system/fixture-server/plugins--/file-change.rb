@@ -1,6 +1,6 @@
 module Skylab::GitViz
 
-  class Test_Lib_::Mock_System::Fixtures
+  class Test_Lib_::Mock_System::Fixture_Server
 
     class Plugins__::File_Change
 
@@ -34,7 +34,7 @@ module Skylab::GitViz
       end
 
       def say_not_gonna_do_it
-        "(listener NOT listening for manifest file changes, per request)"
+        "listener DEACTIVATED per request"
       end
 
       def listen_for_manifests_being_added_to_the_manifest_collection

@@ -1,11 +1,11 @@
 module Skylab::GitViz
 
-  module Test_Lib_::Mock_System
+  class Test_Lib_::Mock_System::Fixture_Server
 
-    class Manifest
+    class Responder__
 
       def initialize y
-        @cache = Mock_Command_IO_Cache_.new
+        @cache = Test_Lib_::Mock_System::Mock_Command_IO_Cache_.new
         h = Handlers__.new
         @handlers = h
         @y = y
@@ -26,15 +26,24 @@ module Skylab::GitViz
       end
 
       def process_strings a
-        Respond_.new( @y, @cache, @handlers, a ).respond
+        Respond__.new( @y, @cache, @handlers, a ).respond
       end
 
       def clear_cache_for_manifest_pathname pn
-        @cache.clear_cache_for_item_tuple Manifest::Handle, pn, -> man_han do
+        @cache.clear_cache_for_item_tuple( Fixture_Server::Manifest_, pn,
+          method( :when_cleared_cache_for_item_tuple ),
+        -> err do
+          when_error_for_clear_cache_for_man_pn pn, err
+        end )
+      end
+    private
+        # (fix the below indents whenever you get a chance to)
+        def when_cleared_cache_for_item_tuple man_han
           @y << "#{ prefix }cleared #{ man_han.manifest_pathname } #{
             }from the cache (#{ man_han.manifest_summary })"
           PROCEDE_
-        end, -> err do
+        end
+        def when_error_for_clear_cache_for_man_pn pn, err
           x, inside, i = err.to_a
           short = -> cls do
             cls.name.split( '::' )[ -2..-1 ] * '::'
@@ -47,28 +56,17 @@ module Skylab::GitViz
           @y << "#{ prefix }(#{ _msg }. nothing to do)"
           GENERAL_ERROR_
         end
-      end
 
       def prefix
         PREFIX__
       end
       PREFIX__ = '  • '.freeze
 
-      class Agent_
-        def initialize y, response
-          @response = response ; @y = y ; nil
-        end
-        def bork s
-          @response.add_iambicly_structured_statement :error, s
-          GENERAL_ERROR_
-        end
-      end
-
-      class Respond_ < Agent_
+      class Respond__ < Response_Agent_
 
         def initialize y, cache, handlers, s_a
           @cache = cache ; @handlers = handlers ; @s_a = s_a
-          response = Response_.new
+          response = Response__.new
           handlers.call :response_started, response do end
           super y, response
         end
@@ -83,18 +81,18 @@ module Skylab::GitViz
       private
 
         def prepare
-          ec, @request = Manifest::Prepare_.
+          ec, @request = Fixture_Server::Prepare_.
             new( @y, @s_a, @handlers, @response ).prepare
           ec
         end
 
         def reduce
-          Manifest::Reduce_.
+          Fixture_Server::Reduce_.
             new( @y, @cache, @request, @handlers, @response ).reduce
         end
       end
 
-      class Response_
+      class Response__
         def initialize
           @result_code = nil
           @statement_s_a_a = []
@@ -123,12 +121,6 @@ module Skylab::GitViz
           y
         end
       end
-
-      GENERAL_ERROR_ = 3
-      MANIFEST_PARSE_ERROR_ = 36  # 3 -> m 9 -> p
-      PROCEDE_ = nil
-      Responder = self  # shh.. our little secret
-      SUCCESS_ = 0
     end
   end
 end

@@ -2,9 +2,10 @@ module Skylab::GitViz
 
   module Test_Lib_::Mock_System
 
-    class Manifest
+    module Manifest_Entry_
 
       class FreeTag
+
         def initialize head, body
           head.frozen? or head = head.dup.freeze
           ! body or body.frozen? or body = body.dup.freeze

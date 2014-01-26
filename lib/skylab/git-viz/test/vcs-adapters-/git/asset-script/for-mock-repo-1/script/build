@@ -25,7 +25,7 @@ troika-lookup-system-commands () {
   required-parameter high_up_script_dir || return $?
   -prepare-troika-once () {}
   source $high_up_lib_dir/triad.zsh
-  set-triad-manifest-API-script $high_up_script_dir/manifest
+  set-triad-manifest-API-script $high_up_script_dir/fixture-client
 }
 
 typeset asset_stem=${component_node_local_top_dir##*/for-}

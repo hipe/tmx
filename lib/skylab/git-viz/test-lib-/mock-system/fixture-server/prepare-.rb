@@ -2,11 +2,11 @@ module Skylab::GitViz
 
   module Test_Lib_::Mock_System
 
-    class Manifest
+    class Fixture_Server
 
-      class Prepare_ < Agent_
+      class Prepare_ < Response_Agent_
 
-        Manifest::Isomorphic_Interface_[ self,
+        Fixture_Server::Isomorphic_Interface_[ self,
           :use, :option_parser_methods,
           :required, :argument, :chdir_prefix_white_filter,
           :required, :accumulating, :argument, :command_white_filter_regex,

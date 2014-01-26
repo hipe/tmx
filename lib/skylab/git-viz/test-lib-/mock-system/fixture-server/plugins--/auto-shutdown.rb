@@ -1,6 +1,6 @@
 module Skylab::GitViz
 
-  class Test_Lib_::Mock_System::Fixtures
+  class Test_Lib_::Mock_System::Fixture_Server
 
     class Plugins__::Auto_Shutdown  # read [#022] shutdown timer narrative
 

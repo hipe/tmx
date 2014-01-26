@@ -2,9 +2,19 @@ module Skylab::GitViz
 
   module Test_Lib_::Mock_System
 
-    class Manifest
+    class Fixture_Server
 
-      class Handle < Manifest_IO___
+      class Manifest_ < Manifest_
+
+        attr_reader :manifest_pathname  # only used by server plugins omz
+        def manifest_summary
+          "#{ @entry_count } entries (#{ unique_commands_count }#{
+            } unique commands)"
+        end
+        attr_reader :entry_count
+        def unique_commands_count
+          @cmd_as_non_unique_key_s_a.length
+        end
 
         def get_command_scanner_scanner
           a = @cmd_as_non_unique_key_s_a ; d = -1 ; last = a.length - 1

@@ -6,7 +6,7 @@ module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System
 
   include CONSTANTS
 
-  Mock_System_Lib_Parent_Module__ = GitViz::Test_Lib_
+  GitViz = GitViz
 
   extend TestSupport::Quickie
 

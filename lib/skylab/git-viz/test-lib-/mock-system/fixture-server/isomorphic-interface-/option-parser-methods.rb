@@ -1,6 +1,6 @@
 module Skylab::GitViz
 
-  class Test_Lib_::Mock_System::Manifest
+  class Test_Lib_::Mock_System::Fixture_Server
 
     class Isomorphic_Interface_
 

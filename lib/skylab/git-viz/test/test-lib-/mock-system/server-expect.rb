@@ -45,8 +45,8 @@ module Skylab::GitViz
         end
 
         def expect_response_result_code_for_general_error
-          expect_response_result_code(
-            GitViz::Test_Lib_::Mock_System::Manifest::GENERAL_ERROR_ )
+          expect_response_result_code( GitViz::Test_Lib_::
+            Mock_System::Fixture_Server::GENERAL_ERROR_ )
         end
 
         def expect_response_result_code d

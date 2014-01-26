@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby -w
+
+require_relative '../../core'
+
+Skylab::GitViz::Test_Lib_::Mock_System::Fixture_Client.
+  new( $PROGRAM_NAME, $stdout, ::ARGV, 5555 ).invoke

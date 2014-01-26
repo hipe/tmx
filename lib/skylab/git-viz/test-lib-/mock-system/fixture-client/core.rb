@@ -1,16 +1,10 @@
-#!/usr/bin/env ruby -w
-
-require_relative '../../core'
-
 module Skylab::GitViz
 
-  x = $VERBOSE ; $VERBOSE = nil ; GitViz::Lib_::ZMQ[] ; $VERBOSE = x
+  module Test_Lib_::Mock_System
 
-  exit( class Test::Script::Manifest  # [#024] taste the pain of too much docs
+    class Fixture_Client  # [#024] taste the pain of too much docs
 
-    Client__ = self  # normalize indentation
-
-    class Client__
+      x = $VERBOSE ; $VERBOSE = nil ; GitViz::Lib_::ZMQ[] ; $VERBOSE = x
 
       def initialize program_name, sout, argv, port_d
         @argv = argv
@@ -317,7 +311,5 @@ module Skylab::GitViz
 
     GENERAL_ERROR_ = 63 ; NO_SERVER_ = 25
     SUCCESS_ = 0 ; ZMQ_ERROR_CODE_ = -1
-
-    self
-  end.new( $PROGRAM_NAME, $stdout, ::ARGV, 5555 ).invoke )
+  end
 end

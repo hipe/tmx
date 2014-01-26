@@ -2,9 +2,9 @@ module Skylab::GitViz
 
   module Test_Lib_::Mock_System
 
-    class Manifest
+    class Fixture_Server
 
-      class Reduce_ < Agent_
+      class Reduce_ < Response_Agent_
 
         def initialize y, cache, request, handlers, response
           @added_count = 0 ; @handlers = handlers
@@ -58,7 +58,7 @@ module Skylab::GitViz
         end
         def resolve_manifest_when_path_is_file
           @IO_cache.retrieve_or_init do |o|
-            o.IO_class = Manifest::Handle
+            o.IO_class = Fixture_Server::Manifest_
             o.IO_key = @pn
             o.parse_all_ASAP = true
             o.when_retrieve_existing= method :use_cached_mani_from_IO_cache

@@ -2,7 +2,8 @@
 
 # this is only for testing the responder "by hand" as a one-off request.
 # this builds the manifest and sends the args to it and returns and exits.
-# it is not a long-running process.
+# it is not a long-running process. it is *not* part of [#018] the stack used
+# for building fixtures, it is part of the stack used for building that stack.
 #
 # we are testing:
 #  • whether the guy loads ok (when rbx)
@@ -13,9 +14,10 @@
 # different rubies, e.g to use the debugger in one, to see if warnings are
 # triggered in that same one, and to see if it works at all in the other.
 #
-# we are *not* testing:
-#  • anything to do with this being a long-running process
-#  • anything to do with the transport layer of receiving requests,
+# this is *not*:
+#  • part of the production stack
+#  • testing anything to do with this being a long-running process
+#  • testing anything to do with the transport layer of receiving requests,
 #    sending responses
 #
 # since this is a one-off for doing manual testing, do not exceed one screen.
@@ -42,7 +44,7 @@ module Skylab::GitViz
     end
   private
     def bld_manifest
-      GitViz::Test_Lib_::Mock_System::Manifest::Responder.new @y
+      GitViz::Test_Lib_::Mock_System::Fixture_Server::Responder__.new @y
     end
 
     Autoloader_[ ( GitViz::TestSupport = ::Module.new ),  # eek: hack to avoid

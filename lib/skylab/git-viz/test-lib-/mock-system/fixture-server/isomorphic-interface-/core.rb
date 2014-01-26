@@ -2,7 +2,7 @@ module Skylab::GitViz
 
   module Test_Lib_::Mock_System
 
-    class Manifest
+    class Fixture_Server
 
       class Isomorphic_Interface_
 

@@ -7,14 +7,14 @@ module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System
     extend TS__
 
     it 'loads' do
-      Mock_System_Lib_Parent_Module__::Mock_System
+      GitViz::Test_Lib_::Mock_System
     end
 
     context "employment" do
 
       before :all do
         class Employer
-          Mock_System_Lib_Parent_Module__::Mock_System[ self ]
+          GitViz::Test_Lib_::Mock_System[ self ]
         end
       end
 
@@ -33,7 +33,7 @@ module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System
     context "usement" do
       before :all do
         class Eg_Context
-          Mock_System_Lib_Parent_Module__::Mock_System[ self ]
+          GitViz::Test_Lib_::Mock_System[ self ]
           def initialize fm
             @fixtures_module = fm ; nil
           end

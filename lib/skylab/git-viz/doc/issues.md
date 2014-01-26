@@ -1,3 +1,4 @@
+[#030] #open the load-path fiasco
 [#029] #open shutdown/fail more gracefully when manifest parse errors
 [#028]       #parent-node:[#017] fixtures scripts in detail ..
 [#027]       #done #parent-node:[#018] the idea for the "free-tags" feature
