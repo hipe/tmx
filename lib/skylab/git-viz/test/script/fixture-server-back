@@ -42,7 +42,7 @@ module Skylab::GitViz
     end
   private
     def bld_manifest
-      GitViz::Test_Lib_::Mock_System::Manifest.new @y
+      GitViz::Test_Lib_::Mock_System::Manifest::Responder.new @y
     end
 
     Autoloader_[ ( GitViz::TestSupport = ::Module.new ),  # eek: hack to avoid

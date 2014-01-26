@@ -6,12 +6,33 @@ module Skylab::GitViz
 
       class Reduce_ < Agent_
 
-        def initialize y, cache, request, response
-          @added_count = 0
+        def initialize y, cache, request, handlers, response
+          @added_count = 0 ; @handlers = handlers
           @IO_cache = cache ; @mani_path = request.manifest_path
           @pn = ::Pathname.new @mani_path ; @request = request
+          init_handlers handlers
           super y, response
         end
+      private
+        def init_handlers handlers
+          h = Handlers__.new
+          h.set :parse_error, method( :handle_parse_error )
+          h.glom handlers
+          @handlers = h
+        end
+        class Handlers__ < GitViz::Lib_::Handlers
+          def initialize
+            super parse_error: { unexpected_term: nil }
+          end
+        end
+        def handle_parse_error ex
+          msg, normd_err_class_bn, path, line, line_no, column = ex.to_a
+          @response.add_iambicly_structured_statement :error, :iambic,
+            :manifest_parse, normd_err_class_bn, msg, :path, path, :line, line,
+            :line_no, line_no, :column, column
+          MANIFEST_PARSE_ERROR_
+        end
+      public
 
         def reduce
           @mani = @IO_cache.lookup_any_cached_manifest_handle_for_pn @pn
@@ -36,14 +57,47 @@ module Skylab::GitViz
           bork "manifest path is directory: #{ @mani_path }"
         end
         def resolve_manifest_when_path_is_file
-          @mani = @IO_cache.retrieve_or_init Manifest::Handle, @pn, -> mani do
-              @y << "(using cached manifest parse tree)" ; mani
-            end, -> new do
-              @y << "parsed #{ new.manifest_summary } in #{ @pn }" ; new
-            end
-          @mani ? PROCEDE_ : GENERAL_ERROR_
+          @IO_cache.retrieve_or_init do |o|
+            o.IO_class = Manifest::Handle
+            o.IO_key = @pn
+            o.parse_all_ASAP = true
+            o.when_retrieve_existing= method :use_cached_mani_from_IO_cache
+            o.when_created_new= method :created_new_mani_from_IO_cache
+            o.handlers = @handlers
+          end
         end
-
+        def use_cached_mani_from_IO_cache mani
+          @y << "(using cached manifest parse tree)"
+          @mani = mani ; PROCEDE_
+        end
+        def created_new_mani_from_IO_cache mani
+          if (( @mani = mani )).entry_count.zero?
+            when_created_manifest_entry_count_is_zero
+          else
+            when_created_manifest_entry_count_is_nonzero
+          end
+        end
+        def when_created_manifest_entry_count_is_zero
+          bork "no entries in manifest file, all queries destined to fail #{
+            }- #{ @pn }"
+          GENERAL_ERROR_
+        end
+        def when_created_manifest_entry_count_is_nonzero
+          @y << "parsed #{ @mani.manifest_summary } in #{ @pn }"
+          PROCEDE_
+        end
+        def parse_error_from_IO_cache pe
+          render_parse_error_as_multiline pe
+          GENERAL_ERROR_
+        end
+        def render_parse_error_as_multiline pe
+          @y << "failed to parse #{ pe.path }"
+          prefix = "#{ pe.line_no }:"
+          @y << "#{ prefix }#{ pe.line }"
+          d = pe.column
+          @y << "#{ ' ' * prefix.length }#{ '-' * ( d - 1 ) }^"
+          @y << pe.message ; nil
+        end
         def reduce_with_manifest
           es = prepare_query_params
           es || reduce_with_manifest_when_prepared
@@ -98,14 +152,15 @@ module Skylab::GitViz
             _ok = command_string_does_pass_white_or_black_filters cmd.cmd_s
             _ok or next  # THIS IS WHY SCANNERS ROCK
             begin
-              cmd.parse_everything_as_necessary
+              ec = cmd.parse_everything_as_necessary
+              ec and break
               prefix = any_prefix cmd
               prefix or next
               add_result_item cmd, prefix
             end while(( cmd = scn.gets ))
+            ec and break
           end
-          issue_a_notice_if_no_items_were_added
-          PROCEDE_
+          ec || check_if_no_items_where_added
         end
 
         def command_string_does_pass_white_or_black_filters cmd_s
@@ -115,9 +170,10 @@ module Skylab::GitViz
           ! _rx_that_it_did_not_match
         end
 
-        def issue_a_notice_if_no_items_were_added
+        def check_if_no_items_where_added
           if @added_count.zero?
             @response.add_iambicly_structured_statement :notice, say_none_found
+            PROCEDE_
           end
         end
 

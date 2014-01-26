@@ -30,10 +30,10 @@ module Skylab::GitViz
 
         def when_option_parser_parse_error e
           emit_error_string e.message
-          error_code_for_option_parser_pare_error
+          error_code_for_option_parser_parse_error
         end
 
-        def error_code_for_option_parser_pare_error
+        def error_code_for_option_parser_parse_error
           error_code_for_general_failure
         end
 
@@ -156,30 +156,9 @@ module Skylab::GitViz
           1 == param_a.length or many = true
           "please provide the required (option-looking) parameter#{
             many && 's' }: #{
-              }#{ many && '(' }#{ say_oxford_and s_a }#{ many && ')' }"
+              }#{ many && '(' }#{ OXFORD_AND__[ s_a ] }#{ many && ')' }"
         end
-        def say_oxford_and a
-          say_oxford OXFORD_AND_P__, a
-        end
-        def say_oxford p, a
-          if a.length.zero? then say_oxford_none else
-            last = a.length - 1
-            a.each_with_index.reduce( [ a.shift ] ) do |m, (s, d)|
-              m << p[ last - d ] ; m << s ; m
-            end * ''
-          end
-        end
-
-        build_oxford_h = -> final, separator do
-          h = { 0 => nil, 1 => final }
-          h.default_proc = -> _, _ do separator end
-          h.method :[]
-        end
-        OXFORD_AND_P__ = build_oxford_h[ ' and ', ', ' ]
-
-        def say_oxford_none
-          '[none]'
-        end
+        OXFORD_AND__ = GitViz::Lib_::Oxford.curry[ ', ', '[none]', ' and ' ]
 
         def error_code_for_missing_required_params
           error_code_for_general_failure

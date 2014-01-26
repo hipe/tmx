@@ -180,6 +180,8 @@ module Skylab::GitViz
             method :emit_argv_tail_info_iambic
           dl[ :notice ][ :string ] = method :emit_notice_string
           dl[ :error ][ :string ] = method :emit_error_string
+          dl[ :error ][ :iambic ][ :manifest_parse ] =
+            method :emit_manifest_parse_error_iambic
           dl[ :payload ][ :iambic ][ :command ] =
             method :emit_command_payload_iambic
         end
@@ -203,6 +205,10 @@ module Skylab::GitViz
 
       def emit_error_string s
         emit_row :error, s
+      end
+
+      def emit_manifest_parse_error_iambic a
+        self._DO_ME  # #todo:NEXT-COMMIT
       end
 
       def emit_command_payload_iambic a

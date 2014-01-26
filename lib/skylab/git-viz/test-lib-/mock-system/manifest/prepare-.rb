@@ -12,8 +12,9 @@ module Skylab::GitViz
           :required, :accumulating, :argument, :command_white_filter_regex,
           :required, :argument, :manifest_path ]
 
-        def initialize y, s_a, response
+        def initialize y, s_a, handlers, response
           @argv = s_a  # #hook-out
+          @handlers = handlers
           super y, response
         end
 

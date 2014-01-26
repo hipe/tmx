@@ -1,0 +1,11 @@
+
+  # the above empty line, this comment line, and the below "blank" line ignored
+  	
+valid_command_looking_term
+  unrecognized_property
+
+
+  # the below entry should look valid to the parser, the above should not
+
+valid_command_looking_term
+  file foo.txt

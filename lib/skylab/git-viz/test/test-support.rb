@@ -18,10 +18,27 @@ module Skylab::GitViz::TestSupport
 
   module ModuleMethods
     def use i
-      _mod = MetaHell::Boxxy::Fuzzy_const_get[ GitViz::Test_Lib_, i ]
-      _mod[ self ] ; nil
+      mod = nearest_test_node
+      while true  # #todo make these non-private
+        _const_name, found_mod = Const_Aref__[ mod, i ]
+        found_mod and break
+        mod_ = mod.send :parent_anchor_module
+        if mod_
+          mod = mod_
+        else
+          _, found_mod = Const_Fetch__[ GitViz::Test_Lib_, i ]
+          break
+        end
+      end
+      found_mod[ self ] ; nil
     end
   end
+
+  Const_Aref__ = MetaHell::Boxxy::P__.
+    curry[ nil, nil, MetaHell::MONADIC_EMPTINESS_ ]
+
+  Const_Fetch__ = MetaHell::Boxxy::P__.
+    curry[ nil, nil, nil ]
 
   module InstanceMethods
 

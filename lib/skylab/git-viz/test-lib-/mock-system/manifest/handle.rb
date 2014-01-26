@@ -6,16 +6,12 @@ module Skylab::GitViz
 
       class Handle < Manifest_IO___
 
-        def initialize pn
-          super
-        end
-
         def get_command_scanner_scanner
           a = @cmd_as_non_unique_key_s_a ; d = -1 ; last = a.length - 1
           Scn__.new do
             if d < last
               cmd_s = a.fetch d += 1
-              bld_cmd_scanner @h.fetch cmd_s
+              bld_cmd_scanner @cmd_a_h.fetch cmd_s
             end
           end
         end

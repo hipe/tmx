@@ -6,8 +6,15 @@ module Skylab::GitViz
 
       def initialize y
         @cache = Mock_Command_IO_Cache_.new
-        @response_started_p_a = nil
+        h = Handlers__.new
+        @handlers = h
         @y = y
+      end
+
+      class Handlers__ < GitViz::Lib_::Handlers
+        def initialize
+          super response_started: nil
+        end
       end
 
       def on_manifest_added &p
@@ -15,11 +22,11 @@ module Skylab::GitViz
       end
 
       def on_response_started &p
-        ( @response_started_p_a ||= [] ) << p ; nil
+        @handlers.set :response_started, p ; nil
       end
 
       def process_strings a
-        Respond_.new( @y, @cache, @response_started_p_a, a ).respond
+        Respond_.new( @y, @cache, @handlers, a ).respond
       end
 
       def clear_cache_for_manifest_pathname pn
@@ -59,10 +66,10 @@ module Skylab::GitViz
 
       class Respond_ < Agent_
 
-        def initialize y, cache, started_p_a, s_a
-          @cache = cache ; @s_a = s_a
+        def initialize y, cache, handlers, s_a
+          @cache = cache ; @handlers = handlers ; @s_a = s_a
           response = Response_.new
-          started_p_a and started_p_a.each { |p| p[ response ] }
+          handlers.call :response_started, response do end
           super y, response
         end
 
@@ -76,12 +83,14 @@ module Skylab::GitViz
       private
 
         def prepare
-          ec, @request = Manifest::Prepare_.new( @y, @s_a, @response ).prepare
+          ec, @request = Manifest::Prepare_.
+            new( @y, @s_a, @handlers, @response ).prepare
           ec
         end
 
         def reduce
-          Manifest::Reduce_.new( @y, @cache, @request, @response ).reduce
+          Manifest::Reduce_.
+            new( @y, @cache, @request, @handlers, @response ).reduce
         end
       end
 
@@ -115,7 +124,11 @@ module Skylab::GitViz
         end
       end
 
-      GENERAL_ERROR_ = 3 ; PROCEDE_ = nil ; SUCCESS_ = 0
+      GENERAL_ERROR_ = 3
+      MANIFEST_PARSE_ERROR_ = 36  # 3 -> m 9 -> p
+      PROCEDE_ = nil
+      Responder = self  # shh.. our little secret
+      SUCCESS_ = 0
     end
   end
 end

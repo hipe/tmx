@@ -28,7 +28,8 @@ module Skylab::GitViz
     private
 
       def init_responder
-        @responder = GitViz::Test_Lib_::Mock_System::Manifest.new @y
+        @responder = GitViz::Test_Lib_::Mock_System::Manifest::Responder.
+          new @y
         emit_to_plugins :on_responder_initted, @responder
       end
 

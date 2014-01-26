@@ -39,7 +39,7 @@ module Skylab::GitViz
         end
       end
 
-      class IO_Lookup__
+      class IO_Lookup__  # #storypoint-45 #what-do-you-mean-by-IO
         def initialize client
           @client = client
         end
@@ -69,35 +69,79 @@ module Skylab::GitViz
 
       class Mock_Command_IO_Cache_
         def initialize
-          @listener_p_a = nil
+          @listeners = Listeners__.new
           @manifest_cls = Mock_System_Conduit_
           @cache_h = ::Hash.new do |h, cls|
-            h[ cls ] = ::Hash.new do |h_, pn|
-              new = cls.new pn
-              h_[ pn ] = new
-              @listener_p_a and @listener_p_a.each { |p| p[ new ] }
-              new
+            h[ cls ] = { }
+          end
+        end
+        class Listeners__
+          def initialize
+            @h = { item_added: nil }
+          end
+          def add_listener * i_a, p
+            last_h = last_i = nil
+            a = i_a.reduce @h do |h, i|
+              last_h = h ; last_i = i
+              h.fetch i
+            end
+            a ||= last_h[ last_i ] = []
+            a << p ; nil
+          end
+          def call * i_a, & p
+            a = i_a.reduce @h do |h, i|
+              h.fetch i
+            end
+            if a
+              x = p.call
+              a.each { |p_| p_[ x ] } ; nil
             end
           end
         end
         def on_item_added & p
-          ( @listener_p_a ||= [] ) << p ; nil
+          @listeners.add_listener :item_added, p ; nil
         end
-        def retrieve_or_init cls, pn, retrieved_p, initted_p
-          x = lookup_any_cached_tuple cls, pn
-          if x then retrieved_p[ x ] else
-            x = resolve_some_cached_IO_instance_of_class_for_pn cls, pn
-            initted_p[ x ]
+        def resolve_some_cached_IO_instance_of_class_for_pn cls, pn
+          retrieve_or_init do |o|
+            o.IO_class = cls ;  o.IO_key = pn
+            o.parse_all_ASAP = false
+            o.when_retrieve_existing = IDENTITY_P__
+            o.when_created_new = IDENTITY_P__
+            o.handlers = nil
           end
         end
+        def retrieve_or_init &p
+          p[ Lookup_IO_Conduit__.new( lookup = Request_for_Lookup_IO__.new ) ]
+          lookup.normalize
+          x = lookup_any_cached_tuple lookup.IO_class, lookup.IO_key
+          if x
+            lookup.when_retrieve_existing[ x ]
+          else
+            parse_manifest lookup
+          end
+        end
+        def parse_manifest lookup
+          parse = Parse_Manifest__.new lookup
+          ec = nil
+          lookup.IO_key.open 'r' do |fh|
+            ec = parse.parse_lines_in_peeking_scanner Counting_Peeker__.new fh
+            ec and break
+          end
+          ec or add_to_cache( lookup, parse )
+        end
+        def add_to_cache lookup, parse
+          cls = lookup.IO_class ; pn = lookup.IO_key
+          io = lookup.IO_class.new( * parse.parsed_results_to_a, pn )
+          @cache_h[ cls ][ pn ] = io
+          @listeners.call :item_added do io end
+          lookup.when_created_new[ io ]
+        end
+      public
         def lookup_any_cached_manifest_handle_for_pn pn
           lookup_any_cached_tuple @manifest_cls, pn
         end
         def lookup_any_cached_tuple cls, pn
           @cache_h[ cls ].fetch( pn ) {  }
-        end
-        def resolve_some_cached_IO_instance_of_class_for_pn cls, pn
-          @cache_h[ cls ][ pn ]
         end
         def clear_cache_for_item_tuple cls, pn, yes_p, no_p
           if (( h = @cache_h.fetch( cls ) { } ))
@@ -113,27 +157,234 @@ module Skylab::GitViz
         end
       end
 
-      class Manifest_IO___  # (abstract base class for at least 2 children)
-        def initialize pn
-          @cmd_as_non_unique_key_s_a = []
-          @entry_count = 0
-          @h = {} ; pn.open 'r' do |fh|
-            Parse_Manifest_.new( fh, method( :accpt_line ) ).execute
+      IDENTITY_P__ = -> x { x }
+
+      class Lookup_IO_Conduit__
+        def initialize container
+          @container = container
+        end
+        [ :IO_class=, :IO_key=, :handlers=, :parse_all_ASAP=,
+              :when_retrieve_existing=, :when_created_new= ].each do |i|
+          define_method i do |x|
+            @container.send i, x
           end
-          @manifest_dirname_pn = pn.dirname
+        end
+      end
+
+      class Request_for_Lookup_IO__
+        attr_accessor :handlers, :IO_class, :IO_key, :parse_all_ASAP,
+          :when_retrieve_existing, :when_created_new
+        def normalize
+          [ :IO_class, :IO_key,
+              :when_retrieve_existing, :when_created_new ].each do |i|
+            send i or raise ::ArgumentError, "missing required '#{ i }'"
+          end
+        end
+      end
+
+      class Parse_Manifest__
+
+        def initialize lookup
+          @cmd_a_h = {} ; @cmd_as_non_unique_key_s_a = []
+          @entry_count = 0 ; @lookup = lookup
+          @parse_now = lookup.parse_all_ASAP
+        end
+
+        def parsed_results_to_a
+          [ @cmd_as_non_unique_key_s_a, @cmd_a_h, @entry_count ]
+        end
+
+        def parse_lines_in_peeking_scanner pscn
+          @path = pscn.path ; @pscn = pscn
+          parse_entry_prototype = Parse_Entry__.
+            new @pscn, method( :receive_entry ), @lookup
+          while true
+            parse_entry = parse_entry_prototype.curry
+            ec = parse_entry.parse_entry
+            ec and break
+            @pscn.peek or break
+          end
+          ec
+        end
+      private
+        def receive_entry p
+          _xx = p[ cmd = Stored_Command_.new ]
+          if @parse_now
+            ec = cmd.parse_with_context_and_handlers @pscn, @lookup.handlers
+          end
+          ec or accept_entry cmd
+        end
+        def accept_entry cmd
+          @entry_count += 1
+          ( @cmd_a_h.fetch cmd.cmd_s do |k|
+            @cmd_as_non_unique_key_s_a << k
+            @cmd_a_h[ k ] = []
+          end ) << cmd
+          PROCEDE_
+        end
+      end
+
+      class Parse_Entry__
+
+        def initialize pscn, accept_entry_p, handlers
+          @accept_entry_p = accept_entry_p
+          @handlers = handlers
+          @pscn = pscn
+        end
+        def curry
+          dup
+        end
+        def initialize_copy _
+          @chopped_body_line_s_a = []
+        end
+        def parse_entry
+          begin
+            @line = @pscn.peek
+            @line or break
+            @line.chop!
+            if current_line_is_skippable
+              @pscn.gets
+              redo
+            end
+            ec = validate_first_line and break
+            @pscn.gets
+            @start_line_no = @pscn.line_no
+            ec = parse_entry_body
+          end while false
+          ec
+        end
+      private
+        def current_line_is_skippable
+          if BLANK_LINE_RX__ =~ @line
+            blank_lines_are_skippable
+          elsif SHELL_STYLE_COMMENT_LINE_RX__ =~ @line
+            shell_style_comment_looking_lines_are_skippable
+          end
+        end
+
+        BLANK_LINE_RX__ = /\A[[:blank:]]*\z/
+        def blank_lines_are_skippable
+          true
+        end
+
+        SHELL_STYLE_COMMENT_LINE_RX__ = /\A[[:blank:]]*#/
+        def shell_style_comment_looking_lines_are_skippable
+          true
+        end
+
+        def validate_first_line
+          if VALID_FIRST_LINE_RX__ !~ @line
+            _ex = Entry_Head_Can_Have_No_Indent.new @pscn
+            @handlers.call :parse_error, :entry_head_with_indent, _ex,
+              & method( :fail )
+          end
+        end
+        VALID_FIRST_LINE_RX__ = /\A[^[:space:]]/
+
+        def parse_entry_body
+          @key_s, any_rest_of_line = @line.split RECORD_SEPARATOR__, -1
+          any_rest_of_line and @chopped_body_line_s_a << any_rest_of_line
+          ec = parse_any_sublines
+          ec ||= validate
+          ec || flush
+        end
+        RECORD_SEPARATOR__ = "\t".freeze
+
+        def parse_any_sublines
+          while true
+            @line = @pscn.peek
+            @line or break
+            SPACE__ == @line.getbyte( 0 ) or break
+            @pscn.gets
+            @chopped_body_line_s_a << @line.chop!
+          end
+        end
+        SPACE__ = ' '.getbyte 0
+
+        def validate
+          if @chopped_body_line_s_a.length.zero?
+            emit_error_of_entry_with_no_body
+          end
+        end
+
+        def emit_error_of_entry_with_no_body
+          _ex = Entry_Must_Have_Body.new @pscn
+          @handlers.call :parse_error, :entry_with_no_body, _ex
+        end
+
+        def flush
+          @accept_entry_p[ -> cmd do
+            cmd.cmd_s = @key_s.freeze
+            cmd.body_s_a = @chopped_body_line_s_a
+            cmd.line_no = @start_line_no
+          end ]  # result of the outstream callback is our result.
+        end
+      end
+
+      class Manifest_Parse_Error < ::RuntimeError
+        def to_a
+          [ message, self.class.get_normalized_class_basename,
+              path, line, line_no, column ]
+        end
+        def self.get_normalized_class_basename
+          s = name
+          s[ (s.rindex ':') + 1 .. -1 ].downcase.intern
+        end
+      end
+
+      class First_Pass_Manifest_Parse_Error < Manifest_Parse_Error
+
+        def initialize pscn, msg=self.class::MESSAGE_S__, column=1
+          @column = column
+          @line = pscn.peek ; @line_no = pscn.line_no
+          @path = pscn.path
+          super msg
+        end
+        attr_reader :column, :line, :line_no, :path
+          # indexes are unit- not zero-based
+      end
+
+      class Entry_Head_Can_Have_No_Indent < First_Pass_Manifest_Parse_Error
+        MESSAGE_S__ = 'entry head line must have no leading space'.freeze
+      end
+
+      class Entry_Must_Have_Body < First_Pass_Manifest_Parse_Error
+        MESSAGE_S__ = 'entry must have body (iambic name-values pairs)'.freeze
+      end
+
+      class Counting_Peeker__  # give a filehandle simple peek and linecount
+        def initialize x
+          @instream = x ; @is_buffered = false
+          @line_no = 0  # unit-indexed not zero-indexed
+        end
+        attr_reader :line_no
+        def path
+          @instream.path
+        end
+        def gets
+          if @is_buffered
+            @is_buffered = false
+            x = @buffer_value ; @buffer_value = nil ; x
+          else
+            s = @instream.gets and @line_no += 1 ; s
+          end
+        end
+        def peek
+          if ! @is_buffered
+            @is_buffered = true
+            @buffer_value = @instream.gets and @line_no += 1
+          end
+          @buffer_value
+        end
+      end
+
+      class Manifest_IO___  # (abstract base class for at least 2 children)
+        def initialize cmd_key_s_a, cmd_a_h, entry_count, pn
+          @cmd_a_h = cmd_a_h ; @cmd_as_non_unique_key_s_a = cmd_key_s_a
+          @entry_count = entry_count ; @manifest_dirname_pn = pn.dirname
           @manifest_pathname = pn
         end
         attr_reader :manifest_pathname  # only used by server plugins omz
-      private
-        def accpt_line cmd_s, iam_s_a
-          cmd = Stored_Command_.new cmd_s.freeze, iam_s_a
-          @entry_count += 1
-          ( @h.fetch cmd.cmd_s do |k|
-            @cmd_as_non_unique_key_s_a << k
-            @h[ k ] = []
-          end ) << cmd ; nil
-        end
-      public
         def manifest_summary
           "#{ @entry_count } entries (#{ unique_commands_count }#{
             } unique commands)"
@@ -144,76 +395,14 @@ module Skylab::GitViz
         end
       end
 
-      class Parse_Manifest_
-        def initialize fh, p
-          @accept_line_p = p ; @fh = Peeker__.new( fh )
-        end
-        def execute
-          line = @fh.gets or fail "empty command manifest file: #{ fh.path }"
-          begin
-            parse_entry line
-          end while (( line = @fh.gets )) ; nil
-        end
-      private
-        def parse_entry line
-          line.chop!
-          @_chopped_s_a = []  # be careful, we are iterate over many of these
-          key_s, any_rest_of_line = line.split RECORD_SEPARATOR__, -1
-          any_rest_of_line and @_chopped_s_a << any_rest_of_line
-          parse_any_sublines
-          @_chopped_s_a.length.zero? and fail say_no_content line
-          @accept_line_p[ key_s, @_chopped_s_a ] ; nil
-        end
-        RECORD_SEPARATOR__ = "\t".freeze
-        def parse_any_sublines
-          while true
-            (( line = @fh.peek )) or break
-            if NEWLINE__ == line.getbyte( 0 )  # here is how we skip empty lines
-              @fh.gets
-              next
-            end
-            SPACE__ == line.getbyte( 0 ) or break
-            @fh.gets
-            @_chopped_s_a << line.chop!  # we live dangerously
-          end ; nil
-        end
-        SPACE__ = ' '.getbyte 0 ; NEWLINE__ = "\n".getbyte 0
-        def say_no_content line
-          "must be followed by either a tab characer or \"sub-lines\":#{
-            }#{ line.inspect }"
-        end
-      end
-
-      class Peeker__
-        def initialize x
-          @instream = x ; @is_buffered = false
-        end
-        def gets
-          if @is_buffered
-            @is_buffered = false
-            x = @buffer_value ; @buffer_value = nil ; x
-          else
-            @instream.gets
-          end
-        end
-        def peek
-          if ! @is_buffered
-            @is_buffered = true
-            @buffer_value = @instream.gets
-          end
-          @buffer_value
-        end
-      end
-
       class Stored_Command_
-        def initialize cmd_s, iam_s_a
-          @cmd_s = cmd_s ; @did_parse = false
-          @did_parse_opt_s = false
-          @exitstatus_is_query = false
-          @freetag_a = nil
+        def initialize
+          @did_parse = false ; @did_parse_opt_s = false
+          @exitstatus_is_query = false ; @freetag_a = nil
           @has_out_dumpfile = @has_err_dumpfile = nil
-          @iam_s_a = iam_s_a ; @mock_wait_thread = nil
+          @mock_wait_thread = nil
         end
+        attr_writer :body_s_a, :cmd_s, :line_no
         attr_reader :cmd_s, :err_dumpfile_s,
           :exitstatus_is_query,
           :has_err_dumpfile, :has_out_dumpfile,
@@ -229,6 +418,9 @@ module Skylab::GitViz
       private
         def parse_opt_s
           @did_parse_opt_s = true
+          require 'strscan'  # oh my god so bad. in rbx only, unless we require
+          # *anything* else beforehand, an attempt to require 'json' at this
+          # point (but not before) raises a load error! #todo:wtf
           h = GitViz::Lib_::JSON[].parse @any_opt_s, symbolize_names: true
           @any_opt_h = h.freeze ; nil
         end
@@ -245,28 +437,73 @@ module Skylab::GitViz
         end
         EC_QUERY_S__ = '(ec?)'.freeze  # short, normalized, still readable
         def parse_everything_as_necessary
-          @did_parse or parse ; nil
+          @did_parse or @parse_result = parse
+          @parse_result
+        end
+        def parse_with_context_and_handlers pscn, handlers
+          @parse_ctxt = pscn ; @handlers = handlers
+          @parse_result = parse
+          @parse_ctxt = @handlers = nil
+          @parse_result
         end
       private
         def parse
           @did_parse = true
-          @scn = Multiline_Scanner_.new( @iam_s_a ) ; @iam_s_a = :_parsed_
+          @scn = Multiline_Scanner_.new( @body_s_a ) ; @body_s_a = :_parsed_
           while true
             @scn.skip SOME_SPACE__
             @scn.eos? and break
-            if (( @word_s = scn_any_word ))
+            ec = if (( @word_s = scn_any_word ))
               scn_rest_of_word
             elsif (( @freetag = scn_any_freetag ))
               process_freetag
             else
-              fail say_expecting_word_or_freetag
+              expecting_word_or_freetag
             end
+            ec and break
           end
-          post_parse ; nil
+          ec || post_parse
         end
         def scn_rest_of_word
           @scn.skip SOME_SPACE__
-          send :"#{ @word_s }="
+          send self.class.map_word_to_method_name @word_s
+        end
+        def self.map_word_to_method_name s
+          TERM_H__[ s.intern ]
+        end
+        TERM_I_A__ = [ :exitstatus, :file, :options, :serr ].freeze
+        TERM_H__ = -> do
+          h = ::Hash[ TERM_I_A__.map { |i| [ i, "#{ i }=".intern ] } ]
+          h.default = :unexpected_term
+          h
+        end.call
+        def unexpected_term
+          _ex = Unexpected_Term_Parse_Error.
+            new @word_s, TERM_I_A__, @parse_ctxt.path, @line_no
+          @handlers.call :parse_error, :unexpected_term, _ex
+        end
+      end
+      class Entry_Parse_Error < Manifest_Parse_Error
+        def initialize msg, path, line, line_no, col=1
+          @column = col ; @line = line
+          @line_no = line_no ; @path = path
+          super msg
+        end
+        attr_reader :column, :line, :line_no, :path
+          # indexes are unit- not zero-based
+      end
+      class Unexpected_Term_Parse_Error < Entry_Parse_Error
+        def initialize s, a, path, line_no
+          _s = GitViz::Lib_::Oxford[ ', ', '[none]', ' or ', a ]
+          super "unexpected term. did you mean #{ _s }?",
+            path, "[..]#{ s }", line_no, COLUMN__
+        end
+        ELLIPSIS__ = '[..]'.freeze
+        COLUMN__ = ELLIPSIS__.length + 1
+      end
+      class Stored_Command_  # (re-open)
+        def expecting_word_or_freetag
+          self._DO_ME
         end
         def say_expecting_word_or_freetag
           say_expecting "expecting word or #freetag"
@@ -536,14 +773,14 @@ module Skylab::GitViz
         def popen3 * a
           block_given? and raise ::ArgumentError, "no, don't"
           cmd = Lookup_for_playback__.
-            new( @manifest_dirname_pn, @h, a ).lookup_for_playback
+            new( @manifest_dirname_pn, @cmd_a_h, a ).lookup_for_playback
           cmd.get_four
         end
       end
 
       class Lookup_for_playback__
         def initialize pn, h, a
-          @h = h ; @manifest_dirname_pn = pn
+          @cmd_a_h = h ; @manifest_dirname_pn = pn
           cmd = nrmlz_command a
           @normalized_cmd_s = cmd.normalized_cmd_s
           @any_opt_s = cmd.any_opt_s ;
@@ -556,7 +793,7 @@ module Skylab::GitViz
         end
       public
         def lookup_for_playback
-          @a = @h[ @normalized_cmd_s ]
+          @a = @cmd_a_h[ @normalized_cmd_s ]
           @a ? yes : no
         end
       private
@@ -630,6 +867,7 @@ module Skylab::GitViz
       end
 
       Mock_System = self
+      PROCEDE_ = nil
     end
   end
 end
