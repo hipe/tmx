@@ -47,51 +47,6 @@ module Skylab::GitViz
     TestSupport = subsys[ :TestSupport ]
     ZMQ = memo[ -> do require 'ffi-rzmq' ; ::ZMQ end ]
 
-    class Handlers
-      def initialize hash
-        p = -> h do
-          h.each_pair do |k, x|
-            h[ k ] = Node.new( x && p[ x ] )
-          end
-        end
-        p[ hash ]
-        @root = Node.new hash
-      end
-      Node = ::Struct.new :h, :p
-      def set * i_a, p
-        node = i_a.reduce @root do |m, i|
-          m.h.fetch i
-        end
-        node.p and raise ::KeyError, "won't clobber exiting '#{ i_a.last }'"
-        node.p = p ; nil
-      end
-      def call * i_a, & p
-        ex = i_a.pop ; last_p = nil
-        node = i_a.reduce @root do |m, i|
-          p_ = m.p and last_p = p_
-          m.h.fetch i do
-            raise ::KeyError, "no '#{ i }' channel, had #{ m.h.keys * ', ' }"
-          end
-        end
-        ( node.p || last_p || p || method( :raise ) )[ ex ]
-      end
-      def glom other
-        p = -> me, otr do
-          p_ = otr.p and me.p = p_
-          h = me.h ; h_ = otr.h
-          h && h_ and h.each_pair do |i, me_|
-            otr_ = h_[ i ]
-            if otr_
-              p[ me_, otr_ ]
-            end
-          end
-        end
-        p[ @root, other.root ] ; nil
-      end
-    protected
-      attr_reader :root
-    end
-
     Oxford = -> separator, none, final_sep, a do
       if a.length.zero?
         none
