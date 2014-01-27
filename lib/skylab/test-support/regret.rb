@@ -72,11 +72,13 @@ module ::Skylab::TestSupport
         nil
       end
 
+    public
+
       def parent_anchor_module
         @parent_anchor_module  # notices please
       end
 
-    public  # as parent
+    # ~ as parent
 
       def constants_module
         const_get :CONSTANTS, false

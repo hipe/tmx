@@ -19,10 +19,10 @@ module Skylab::GitViz::TestSupport
   module ModuleMethods
     def use i
       mod = nearest_test_node
-      while true  # #todo make these non-private
+      while true
         _const_name, found_mod = Const_Aref__[ mod, i ]
         found_mod and break
-        mod_ = mod.send :parent_anchor_module
+        mod_ = mod.parent_anchor_module
         if mod_
           mod = mod_
         else
