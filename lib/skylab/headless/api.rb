@@ -584,7 +584,7 @@ module Skylab::Headless
         const_get CONST_A__
       end
 
-      class Parameter__
+      class Parameter__  # :[#030], :+[#mh-053]
         def initialize
           yield self
           freeze

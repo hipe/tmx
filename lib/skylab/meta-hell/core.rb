@@ -193,7 +193,7 @@ module Skylab::MetaHell
       end
     end
 
-    class Item_Grammar  # implementation of "the item grammar" [#050]
+    class Item_Grammar  # implementation of the :#item-grammar :[#047]
       class << self
         alias_method :orig_new, :new
         def new adj_i_a, keyword_i, pp_i_a

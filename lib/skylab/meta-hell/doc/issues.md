@@ -6,11 +6,11 @@
 [#052] #open #formal-box #doc-point #in-situ `to_struct` caveat. spec this ..
 [#051]       #in-situ
 [#051]       #doc-point #experimental-pattern :#method-cherry-picker..
-[#050]       #doc-point this class of grammars, and this parser..
 [#050]       #family 'Strange_'
 [#049]       #tracking-tag :#fuzzy
 [#048]       #doc-point what are puffers and when should you use them ..
-[#047]       (open)
+[#047]       #doc-point this class of grammars, and this parser..
+             (#re-purpoesd:once. original may have been lost.)
 [#046]       #doc-point extension nodes?
 [#045]       #tracking-tag track various #puffers in the wild
 [#044] #open #autoloading: swap-in caller_locations( 1, 1 )[ 0 ].base_label
