@@ -39,7 +39,12 @@ module Skylab::GitViz
 
       def listen_for_manifests_being_added_to_the_manifest_collection
         @responder.on_manifest_added( & method( :listen_to_file_of_manifest ) )
+        @y<< say_gonna_do_it
         PROCEDE_
+      end
+
+      def say_gonna_do_it
+        "listener will listen for changes on each parsed manfest file"
       end
 
       def listen_to_file_of_manifest mani
@@ -59,7 +64,7 @@ module Skylab::GitViz
           @y << "detected \"modification\" (with no change in content):#{
             } #{ entry.path }"
         else
-          @y << "detected modification, clearing cache: #{ entry.path }"
+          @y << "detected modification, clearing any cached #{ entry.path }"
         end
         @cb_p[ entry.pn ] ; nil  # ignore any failure rc
       end
@@ -72,14 +77,17 @@ module Skylab::GitViz
       end
 
       def on_shutdown
-        if @a.length.zero?
+        if ! @be_on
+          @y << "listener already deactivated"
+          PROCEDE_
+        elsif @a.length.zero?
           @y << "not listening to any files. plugin is ready for shutdown."
           PROCEDE_
         else
           shutdown_each_listener
         end
       end
-
+    private
       def shutdown_each_listener
         @a.each do |k|
           entry = @h.fetch k

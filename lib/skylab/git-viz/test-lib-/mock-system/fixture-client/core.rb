@@ -202,7 +202,12 @@ module Skylab::GitViz
       end
 
       def emit_manifest_parse_error_iambic a
-        self._DO_ME  # #todo:NEXT-COMMIT
+        pe = Mock_System::Manifest_::Parse_Error.new a
+        emit_row :error, "#{ pe.message }: #{ pe.path }"
+        pe.render_ascii_graphic_location_lines do |s|
+          s.chomp!
+          emit_row :ascii_graphic, s
+        end
       end
 
       def emit_command_payload_iambic a

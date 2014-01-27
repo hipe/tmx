@@ -190,7 +190,7 @@ module Skylab::GitViz
         def parse_lines_in_peeking_scanner pscn
           @path = pscn.path ; @pscn = pscn
           parse_entry_prototype = Parse_Entry__.
-            new @pscn, method( :receive_entry ), @lookup
+            new @pscn, @lookup, method( :receive_entry )
           while true
             parse_entry = parse_entry_prototype.curry
             ec = parse_entry.parse_entry
@@ -201,8 +201,8 @@ module Skylab::GitViz
         end
       private
         def receive_entry p
-          _xx = p[ cmd = Stored_Command_.new ]
-          if @parse_now
+          ec = p[ cmd = Stored_Command_.new ]  # #jump-1
+          if ! ec && @parse_now
             ec = cmd.parse_with_context_and_handlers @pscn, @lookup.handlers
           end
           ec or accept_entry cmd
@@ -219,9 +219,9 @@ module Skylab::GitViz
 
       class Parse_Entry__
 
-        def initialize pscn, accept_entry_p, handlers
+        def initialize pscn, lookup, accept_entry_p
           @accept_entry_p = accept_entry_p
-          @handlers = handlers
+          @handlers = lookup.handlers
           @pscn = pscn
         end
         def curry
@@ -268,7 +268,7 @@ module Skylab::GitViz
         def validate_first_line
           if VALID_FIRST_LINE_RX__ !~ @line
             _ex = Entry_Head_Can_Have_No_Indent.new @pscn
-            @handlers.call :parse_error, :entry_head_with_indent, _ex,
+            @handlers.call :error, :parse, :entry_head_with_indent, _ex,
               & method( :fail )
           end
         end
@@ -302,14 +302,15 @@ module Skylab::GitViz
 
         def emit_error_of_entry_with_no_body
           _ex = Entry_Must_Have_Body.new @pscn
-          @handlers.call :parse_error, :entry_with_no_body, _ex
+          @handlers.call :error, :parse, :entry_with_no_body, _ex
         end
 
         def flush
-          @accept_entry_p[ -> cmd do
+          @accept_entry_p[ -> cmd do  # :#jump-1
             cmd.cmd_s = @key_s.freeze
             cmd.body_s_a = @chopped_body_line_s_a
             cmd.line_no = @start_line_no
+            PROCEDE_
           end ]  # result of the outstream callback is our result.
         end
       end
@@ -373,7 +374,7 @@ module Skylab::GitViz
 
       class Stored_Command_
         def initialize
-          @did_parse = false ; @did_parse_opt_s = false
+          @any_opt_s = nil ; @did_parse = false
           @exitstatus_is_query = false ; @freetag_a = nil
           @has_out_dumpfile = @has_err_dumpfile = nil
           @mock_wait_thread = nil
@@ -384,23 +385,14 @@ module Skylab::GitViz
           :has_err_dumpfile, :has_out_dumpfile,
           :is_opened, :out_dumpfile_s
         def any_chdir_s
-          h = any_opt_h
-          h && h[ :chdir ]
+          h = any_opt_h and h[ :chdir ]
         end
         def any_opt_h
-          @did_parse_opt_s or parse_opt_s
+          @did_parse or parse
           @any_opt_h
         end
-      private
-        def parse_opt_s
-          @did_parse_opt_s = true
-          # (this is a key-point in the [#030] load path fiasco)
-          h = GitViz::Lib_::JSON[].parse @any_opt_s, symbolize_names: true
-          @any_opt_h = h.freeze ; nil
-        end
-      public
         def any_opt_s
-          parse_everything_as_necessary
+          @did_parse or parse
           @any_opt_s
         end
         def result_code_mixed_string
@@ -410,7 +402,7 @@ module Skylab::GitViz
           end
         end
         EC_QUERY_S__ = '(ec?)'.freeze  # short, normalized, still readable
-        def parse_everything_as_necessary
+        def resolve_some_parse_result
           @did_parse or @parse_result = parse
           @parse_result
         end
@@ -427,16 +419,20 @@ module Skylab::GitViz
           while true
             @scn.skip SOME_SPACE__
             @scn.eos? and break
-            ec = if (( @word_s = scn_any_word ))
+            ec = if scn_any_word
               scn_rest_of_word
-            elsif (( @freetag = scn_any_freetag ))
-              process_freetag
+            elsif scn_any_freetag
+              scn_rest_of_freetag
             else
               expecting_word_or_freetag
             end
             ec and break
+            ec = parse_any_opt_s
           end
           ec || post_parse
+        end
+        def scn_any_word
+          @word_s = @scn.scan TERM_NAME_RX__
         end
         def scn_rest_of_word
           @scn.skip SOME_SPACE__
@@ -454,7 +450,7 @@ module Skylab::GitViz
         def unexpected_term
           _ex = Unexpected_Term_Parse_Error.
             new @word_s, TERM_I_A__, @parse_ctxt.path, @line_no
-          @handlers.call :parse_error, :unexpected_term, _ex
+          @handlers.call :error, :parse, :unexpected_term, _ex
         end
       end
       class Entry_Parse_Error < Manifest_Parse_Error
@@ -477,47 +473,57 @@ module Skylab::GitViz
       end
       class Stored_Command_  # (re-open)
         def expecting_word_or_freetag
-          self._DO_ME
+          respond_with_general_parse_error say_expecting_word_or_freetag
         end
         def say_expecting_word_or_freetag
-          say_expecting "expecting word or #freetag"
+          "expecting word or #freetag"
         end
         FILE_KEYWORD__ = /file\b/
         SOME_SPACE__ = /[ \t]+/
         TERM_NAME_RX__ = /[_a-z0-9]+/
         def serr=
-          skip_some_file_keyword_and_space
+          ec = skip_some_file_keyword_and_space
+          ec || scn_rest_of_serr_file
+        end
+        def scn_rest_of_serr_file
           @has_err_dumpfile = true
-          @err_dumpfile_s = scn_some_dumpfile_path ; nil
+          scn_some_dumpfile_path -> s do
+            @err_dumpfile_s = s ; PROCEDE_
+          end, method( :respond_with_general_parse_error )
         end
         def file=
           @has_out_dumpfile = true
-          @out_dumpfile_s = scn_some_dumpfile_path ; nil
+          scn_some_dumpfile_path -> s do
+            @out_dumpfile_s = s ; PROCEDE_
+          end, method( :respond_with_general_parse_error )
         end
-        def scn_some_dumpfile_path
-          @scn.scan( EASY_WORD_RX__ ) or fail say_expecting_dumpfile_path
+        def scn_some_dumpfile_path yes_p, no_p
+          s = @scn.scan EASY_WORD_RX__
+          s ? yes_p[ s ] : no_p[ say_expecting_dumpfile_path ]
         end ; EASY_WORD_RX__ = /[^ ]+/
         def say_expecting_dumpfile_path
-          say_expecting "expected dumpfile path"
+          "expected dumpfile path"
         end
         def skip_some_file_keyword_and_space
-          @scn.skip FILE_KEYWORD__ or fail say_expecting_file_keyword
-          @scn.skip SOME_SPACE__ ; nil
+          d = @scn.skip FILE_KEYWORD__
+          d and @scn.skip SOME_SPACE__
+          ! d and respond_with_general_parse_error( say_expecting_file_keyword )
         end
         def say_expecting_file_keyword
-          say_expecting "the only thing that can follow 'serr' is 'file'"
-        end
-        def scn_any_word
-          @scn.scan TERM_NAME_RX__
+          "the only thing that can follow 'serr' is 'file'"
         end
         def options=
           d = @scn.string.rindex END_CURLY__
-          d or fail say_expecting_end_curly
-          @any_opt_s = @scn.string[ @scn.pos .. d ]
-          @scn.pos = d + 1 ; nil
+          d ? scn_rest_of_JSON_object( d ) :
+            respond_with_general_parse_error( say_expecting_end_curly )
         end ; END_CURLY__ = '}'.freeze
+        def scn_rest_of_JSON_object d
+          @any_opt_s = @scn.string[ @scn.pos .. d ]
+          @scn.pos = d + 1
+          PROCEDE_
+        end
         def say_expecting_end_curly
-          say_expecting "found no '}' anywhere before end of string"
+          "found no '}' anywhere before end of string"
         end
 
         def exitstatus=
@@ -527,26 +533,21 @@ module Skylab::GitViz
           elsif @scn.skip MIXED_QUESTION_MARK_RX__
             exitstatus_query_notify
           else
-            fail say_expecting_mixed_exitstatus
+            respond_with_general_parse_error say_expecting_mixed_exitstatus
           end
         end
         MIXED_QUESTION_MARK_RX__ = /[^ ?)]*\?+\)?(?![^ ])/
         def accept_exitstatus_digit d
           @mock_wait_thread = Wait__.new do |w|
             w.value.exitstatus = d
-          end ; nil
+          end ; PROCEDE_
         end
         def say_expecting_mixed_exitstatus
-          say_expecting "expected digit or e.g \"(foo?)\" or just \"?\""
-        end
-        def say_expecting s
-          _rest = FUN_::Ellipsify[ @scn.rest ]
-          _rest = "«#{ _rest }»"  # :+#guillemet
-          "#{ s } at #{ _rest }"
+          "expected digit or e.g \"(foo?)\" or just \"?\""
         end
         def exitstatus_query_notify
           @exitstatus_is_query = true
-          @mock_wait_thread = :_query_ ; nil
+          @mock_wait_thread = :_query_ ; PROCEDE_
         end
 
         # ~ freetags
@@ -558,33 +559,56 @@ module Skylab::GitViz
       private
         def scn_any_freetag
           @freetag_identifier = @scn.scan FREETAG_IDENTIFIER_RX__
-          @freetag_identifier && scn_rest_of_freetag
         end
         FREETAG_IDENTIFIER_RX__ = /#[a-zA-Z][-a-zA-Z0-9]+(?=$|[[:space:]]|:)/
         FREETAG_NECK_RX__ = /:/
         FREETAG_BODY_RX__ = /[-_a-zA-Z0-9]+(?=$|[[:space:]])/
         def scn_rest_of_freetag
-          @freetag_body = if @scn.skip FREETAG_NECK_RX__
-            scn_some_freetag_body
+          if @scn.skip FREETAG_NECK_RX__
+            ec = scn_freetag_body
+          else
+            @freetag_body = nil
           end
-          bld_freetag
+          ec || prcss_freetag_parts
         end
-        def scn_some_freetag_body
-          @scn.scan FREETAG_BODY_RX__ or fail say_expecting_freetag_body
+        def scn_freetag_body
+          if (( s = @scn.scan FREETAG_BODY_RX__ ))
+            @freetag_body = s ; PROCEDE_
+          else
+            respond_with_general_parse_error say_expecting_freetag_body
+          end
         end
         def say_expecting_freetag_body
-          say_expecting "expecting valid freetag body value"
+          "expecting valid freetag body value"
         end
-        def bld_freetag
-          Mock_System::Manifest_Entry_::FreeTag.
+        def prcss_freetag_parts
+          ft = Mock_System::Manifest_Entry_::FreeTag.
             new @freetag_identifier, @freetag_body
-        end
-        def process_freetag
           @freetag_body = @freetag_identifier = nil
-          @freetag_a ||= [] << @freetag ; @freetag = nil
+          ( @freetag_a ||= [] ) << ft ; PROCEDE_
         end
         # (end freetag)
 
+        def parse_any_opt_s
+          if @any_opt_s
+            prs_opt_s
+          else
+            @any_opt_h = nil ; PROCEDE_
+          end
+        end
+        def prs_opt_s
+          h = GitViz::Lib_::JSON[].parse @any_opt_s, symbolize_names: true
+          @any_opt_h = h.freeze ; PROCEDE_
+        rescue GitViz::Lib_::JSON[]::ParserError => e
+          respond_with_general_parse_error e.message
+        end
+        def respond_with_general_parse_error msg_s
+          _line = @scn.string
+          _col = @scn.pos + 1
+          _ex = Entry_Parse_Error.new msg_s, @parse_ctxt.path, _line,
+            @line_no, _col
+          @handlers.call :error, :parse, :entry, _ex
+        end
         def post_parse
           @any_opt_s ||= nil
           @freetag_a && @freetag_a.freeze
@@ -717,7 +741,6 @@ module Skylab::GitViz
         end
         def calc_pos_when_collapsed
           pos = if @idx.zero? then 0 else
-            self._TEST_ME
             @s_a[ 0 .. @idx - 1 ].reduce 0 do |m, x|
               m + x.length
             end
@@ -817,6 +840,7 @@ module Skylab::GitViz
           @entry_count = entry_count ; @manifest_dirname_pn = pn.dirname
           @manifest_pathname = pn
         end
+        Autoloader_[ self ]
       end
 
       class Mock_System_Conduit_ < Manifest_
@@ -831,10 +855,8 @@ module Skylab::GitViz
       module FUN_
 
         Ellipsify = -> x do
-          if GitViz.const_defined?( :Lib_, false )
-            GitViz::Lib_::Headless[]::CLI::FUN::Ellipsify[ x ]
-          elsif 10 < x.length
-            "#{ x[ 0, 6 ] }[..]"
+          if 50 < x.length
+            "#{ x[ 0, 45 ] }[..]"
           else
             x
           end

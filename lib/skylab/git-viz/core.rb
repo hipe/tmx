@@ -9,11 +9,42 @@ module Skylab::GitViz
 
   module Autoloader_
 
-    def self.[] mod, pn
+    def self.[] mod, pn=nil
       mod.module_exec do
-        @dir_pathname = pn
-        extend Methods__
+        if pn
+          @dir_pathname = pn
+          extend Methods__
+        else
+          extend Deferred_Methods__
+        end
       end ; nil
+    end
+
+    module Deferred_Methods__
+      def const_missing i
+        insist_on_dir_pathname
+        const_missing i
+      end
+      def dir_pathname
+        insist_on_dir_pathname
+        dir_pathname
+      end
+      def to_path
+        insist_on_dir_pathname
+        to_path
+      end
+      def get_const_missing i  # #hook-in
+        insist_on_dir_pathname
+        Const_Missing__.new self, @dir_pathname, i
+      end
+    private
+      def insist_on_dir_pathname
+        s_a = name.split '::'
+        last_s = s_a.pop
+        mod = s_a.reduce( ::Object ) { |m, s| m.const_get s, false }
+        extend Methods__
+        set_dir_pn mod.dir_pathname.join last_s.gsub( '_', '-' ).downcase ; nil
+      end
     end
 
     module Methods__
@@ -24,7 +55,7 @@ module Skylab::GitViz
       def to_path
         @dir_pathname.sub_ext( EXTNAME__ ).to_path
       end
-      def get_const_missing i
+      def get_const_missing i  # #hook-in
         Const_Missing__.new self, @dir_pathname, i
       end
       def set_dir_pn x  # compare more elaborate [sl] `init_dir_pathname`

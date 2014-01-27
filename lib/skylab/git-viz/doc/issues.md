@@ -1,5 +1,5 @@
 [#030]       #parent-node:[#018] what is meant by isomorphic interface? ..
-[#029] #open shutdown/fail more gracefully when manifest parse errors
+[#029]       shutdown/fail more gracefully when manifest parse errors
 [#028]       #parent-node:[#017] fixtures scripts in detail ..
 [#027]       #done #parent-node:[#018] the idea for the "free-tags" feature
 [#026]       #done use 'listen' gem to listen to filesystem for manifest changes

@@ -16,13 +16,13 @@ module Skylab::GitViz
       private
         def init_handlers handlers
           h = Handlers__.new
-          h.set :parse_error, method( :handle_parse_error )
+          h.set :error, :parse, method( :handle_parse_error )
           h.glom handlers
           @handlers = h
         end
         class Handlers__ < GitViz::Lib_::Handlers
           def initialize
-            super parse_error: { unexpected_term: nil }
+            super error: { parse: nil }
           end
         end
         def handle_parse_error ex
@@ -92,11 +92,7 @@ module Skylab::GitViz
         end
         def render_parse_error_as_multiline pe
           @y << "failed to parse #{ pe.path }"
-          prefix = "#{ pe.line_no }:"
-          @y << "#{ prefix }#{ pe.line }"
-          d = pe.column
-          @y << "#{ ' ' * prefix.length }#{ '-' * ( d - 1 ) }^"
-          @y << pe.message ; nil
+          Mock_System::Manifest_::Parse_Error::Render_As_Lines[ pe, y ] ; nil
         end
         def reduce_with_manifest
           es = prepare_query_params
@@ -152,7 +148,7 @@ module Skylab::GitViz
             _ok = command_string_does_pass_white_or_black_filters cmd.cmd_s
             _ok or next  # THIS IS WHY SCANNERS ROCK
             begin
-              ec = cmd.parse_everything_as_necessary
+              ec = cmd.resolve_some_parse_result
               ec and break
               prefix = any_prefix cmd
               prefix or next
@@ -183,6 +179,10 @@ module Skylab::GitViz
 
         def any_prefix cmd
           s = cmd.any_chdir_s
+          s and prfx_from_chdir_s s
+        end
+
+        def prfx_from_chdir_s s
           case @prefix_length <=> s.length
           when -1 ; when_prefix_is_shorter s
           when  0 ; when_prefix_is_same_length s

@@ -100,6 +100,10 @@ triad-lookup-system-commands () {
   serr "${triad_indent}(error from manifest API: ${(qqq)1})"
 }
 
+-triad-process-ascii_graphic-string () {
+  serr "   $1"
+}
+
 -triad-process-normalized_request-info-iambic () {
   typeset i ; typeset -a orly
   for i in {1..$#row} ; do  # poor man's map, egads

@@ -33,12 +33,14 @@ module Skylab::GitViz
       end
 
       def resolve_context
-        @context = ::ZMQ::Context.new 1 ; nil
+        @context = ::ZMQ::Context.new 1
+        PROCEDE_
       end
 
       def resolve_and_bind_socket
         @socket = @context.socket ::ZMQ::REP
-        @socket.bind "tcp://*:#{ @port_d }" ; nil
+        @socket.bind "tcp://*:#{ @port_d }"
+        PROCEDE_
       end
 
       def trap_interrupt
@@ -76,13 +78,26 @@ module Skylab::GitViz
 
       def run_loop
         @is_running = true ; @result_code = SUCCESS_
-        @y << "fixture server listening on port #{ @port_d }"
+        @y << "fixture server running #{ rb_environment_moniker } #{
+          }listening on port #{ @port_d }"
         begin
           ec = exec_loop_body
           ec and break
         end while @is_running
         ec and @result_code = ec
         @result_code
+      end
+
+      def rb_environment_moniker
+        "#{ rb_engine_moniker } #{ ::RUBY_VERSION }"
+      end
+
+      def rb_engine_moniker
+        s = ::RUBY_ENGINE
+        case s
+        when 'ruby';'MRI ruby'
+        else ; "#{ s } ruby"
+        end
       end
 
       def exec_loop_body

@@ -74,9 +74,9 @@ module Skylab::GitViz
         /\Aruby\b/ =~ ::RUBY_ENGINE and but_you_are_running_MRI
       end
       def but_you_are_running_MRI
-        @y << "cannot run under MRI. this plugin needs true concurrency."
+        @y << "plugin cannot run under MRI. it needs true concurrency."
         @y << "says: if you start the server from the front it is supposed #{
-          } to switch to rbx automatically."
+          }to switch to rbx automatically."
         EARLY_EXIT_
       end
 
