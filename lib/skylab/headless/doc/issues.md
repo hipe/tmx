@@ -80,7 +80,8 @@
              are API private - knowledge of their shape or existence must not
              be necessary outside of the node they reside in.
 [#078]       #doc-point conduits, stories and flushers
-[#077]       #API-point #parent:070 - track how `initialize` looks in #plugins
+[#077]       #parent-node: [#070] the first plugin library (#broadened-from:
+             #API-point track how `initialize` looks in #plugins)
 [#076]       #parent:070 #future-feature enable/disable a particular plugin
              (don't start on this until we actually need it)
 [#075] #open ingest as method (plugin)
@@ -88,7 +89,7 @@
 [#073]       #doc-point extrinsic / intrinsic ..
 [#072]       #tracking-tag #parent:070 chained proxy hosts, chaining in gen.
 [#071] #open the possibility of stateless #plugin hosts
-[#070]       #plugins!
+[#070]       #plugins! the plugin libraries narrative ..
 [#069]       #doc-point (sorry to jump ahead) "ouroboros"
 [#068]       track this redundancy during a hack
 [#067]       #node-tracker "client-services" #in-situ

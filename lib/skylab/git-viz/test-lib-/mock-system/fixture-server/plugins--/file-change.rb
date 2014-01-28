@@ -78,7 +78,6 @@ module Skylab::GitViz
 
       def on_shutdown
         if ! @be_on
-          @y << "listener already deactivated"
           PROCEDE_
         elsif @a.length.zero?
           @y << "not listening to any files. plugin is ready for shutdown."
