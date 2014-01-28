@@ -4,6 +4,8 @@ module Skylab::GitViz
 
     class Fixture_Client  # [#024] taste the pain of too much docs
 
+      Mock_System::Socket_Agent_[ self ]
+
       x = $VERBOSE ; $VERBOSE = nil ; GitViz::Lib_::ZMQ[] ; $VERBOSE = x
 
       def initialize program_name, sout, argv, port_d
@@ -23,11 +25,10 @@ module Skylab::GitViz
     private
 
       def establish_connection
-        @context = GitViz::Lib_::ZMQ[]::Context.new 1
-        @socket = @context.socket ::ZMQ::REQ
+        init_context
+        init_socket
         @socket.setsockopt ::ZMQ::LINGER, 0
-        rc = @socket.connect "tcp://localhost:#{ @port_d }"
-        rc.nonzero? and _failed_to_connect_ rc
+        connect_socket
       end
 
       def execute_with_connection
@@ -49,19 +50,7 @@ module Skylab::GitViz
       end
 
       def send_request
-        s_a = @argv
-        len = s_a.length.nonzero? && s_a.last.length
-        rc = @socket.send_strings s_a
-        if ZMQ_ERROR_CODE_ == rc
-          when_ZMQ_error
-        elsif len != rc
-          raise say_unexpectd_result_code_for_send_strings rc
-        end
-      end
-
-      def say_unexpectd_result_code_for_send_strings rc
-        "unexpected result code from ZMQ - '#{ rc }' (it's expected to #{
-          }be always the length of the last string in the request array)."
+        send_strings @argv
       end
 
       def poll_for_response
@@ -98,7 +87,7 @@ module Skylab::GitViz
       end
 
       def path_to_fixture_server
-        "#{ ::File.dirname __FILE__ }/fixture-server"
+        GitViz::Test::Script.dir_pathname.join( 'fixture-server' ).to_path
       end
 
       def timeout_s
@@ -116,14 +105,18 @@ module Skylab::GitViz
       end
 
       def process_the_response_of_the_polling
-        @socket.recv_strings( a = [] )
-        listener = build_internal_dispatching_listener
-        Re_Marshaller_.new( listener, a ).remarshall
+        d = @socket.recv_strings( a = [] )
+        if 0 > d
+          report_socket_recv_failure
+        else
+          Re_Marshaller_.
+            new( build_internal_dispatching_listener, a ).remarshall
+        end
       end
 
       def cleanup
         rc = deregister_socket_from_poller
-        rc_ = close_connection
+        rc_ = close_socket
         rc || rc_
       end
 
@@ -133,37 +126,6 @@ module Skylab::GitViz
           emit_error_string "expected 'true' had #{ x } for deregister"
           GENERAL_ERROR_
         end
-      end
-
-      def close_connection
-        d = @socket.close
-        d.zero? or emit_error_string "failed to close connection? #{ d }"
-        d.nonzero?
-      end
-
-      def when_ZMQ_error
-        d = ::ZMQ::Util.errno
-        emit_error_string say_ZMQ_error d
-        d
-      end
-
-      def say_ZMQ_error d
-        s  =  ::LibZMQ.zmq_strerror( d ).read_string
-        m_i = :"say_ZMQ_error_#{ result_code_to_s d }"
-        if self.class.private_method_defined? m_i
-          send m_i, s
-        else
-          "sorry, got ZMQ error code #{ d } (#{ s })"
-        end
-      end
-
-      def result_code_to_s d
-        0 > d and begin negative = :negative_ ; d = d.abs end
-        "#{ negative }#{ d }"
-      end
-
-      def say_ZMQ_error_92 s
-        "ZMQ error 92 - #{ s } (this happens when there are no arguments)"
       end
 
       def build_internal_dispatching_listener
@@ -226,7 +188,7 @@ module Skylab::GitViz
       end
     end
 
-    class Re_Marshaller_
+    class Fixture_Client::Re_Marshaller_
 
       def initialize listener, a
         @a = a ; @rc_a = [] ; @listener = listener
@@ -294,7 +256,7 @@ module Skylab::GitViz
       end
     end
 
-    class Dispatching_Listener__
+    class Fixture_Client::Dispatching_Listener__
 
       def initialize
         p = -> do
@@ -314,7 +276,12 @@ module Skylab::GitViz
       end
     end
 
-    GENERAL_ERROR_ = 63 ; NO_SERVER_ = 25
-    SUCCESS_ = 0 ; ZMQ_ERROR_CODE_ = -1
+    class Fixture_Client  # (re-open)
+
+      GENERAL_ERROR_ = 63 ; NO_SERVER_ = 25
+      IO_THREADS_COUNT__ = 1
+      SUCCESS_ = 0 ; ZMQ_ERROR_CODE_ = -1
+
+    end
   end
 end

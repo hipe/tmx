@@ -1,12 +1,11 @@
 module Skylab::GitViz
 
-  x = $VERBOSE ; $VERBOSE = nil ; GitViz::Lib_::ZMQ[] ; $VERBOSE = x
-
   module Test_Lib_::Mock_System
 
     class Fixture_Server  # read [#018]:#introduction-to-the-middle-end
 
       Mock_System::Plugin_::Host[ self ]
+      Mock_System::Socket_Agent_[ self ]
 
       def initialize serr, port_d, argv
         @argv = argv
@@ -87,15 +86,10 @@ module Skylab::GitViz
       end
       event_a << :on_responder_initted
 
-      def resolve_context
-        @context = ::ZMQ::Context.new 1
-        PROCEDE_
-      end
-
       def resolve_and_bind_socket
         @socket = @context.socket ::ZMQ::REP
-        @socket.bind "tcp://*:#{ @port_d }"
-        PROCEDE_
+        d = @socket.bind "tcp://*:#{ @port_d }"
+        d.nonzero? and when_socket_bind_failure d
       end
 
       def trap_interrupt
@@ -126,10 +120,9 @@ module Skylab::GitViz
         @y << "shutting down plugins.."
         shutdown_every_plugin
         @serr.write "shutting down server .."
-        @socket.close
-        @serr.write '.'
-        @context.terminate
-        @y << " done." ; nil
+        ec = close_socket
+        ec ||= terminate_context
+        ec or begin @y << " done." ; nil end
       end
 
       def shutdown_every_plugin
@@ -185,11 +178,9 @@ module Skylab::GitViz
       end
 
       def when_recv_failure
-        d = ::ZMQ::Util.errno
-        _s = ::LibZMQ.zmq_strerror( d ).read_string
-        @y << "receive failure: #{ _s }"
+        ec = report_socket_recv_failure
         shutdown_if_necessary 'receive failure'
-        d
+        ec
       end
 
       def process_received_strings
@@ -201,16 +192,6 @@ module Skylab::GitViz
       end
       event_a << :on_response
 
-      def send_strings s_a
-        d = @socket.send_strings s_a
-        0 > d and when_send_failure
-      end
-
-      def when_send_failure
-        d = ::ZMQ::Util.errno
-        _s = ::LibZMQ.zmq_strerror( d ).read_string
-        @y << "send failure: #{ _s }" ; d
-      end
 
       def notify_plugins_of_start
         emit_to_plugins :on_start
@@ -268,7 +249,9 @@ module Skylab::GitViz
       # ~ constants used throughout this node
 
       EARLY_EXIT_ = 33 ; Fixture_Server = self
-      GENERAL_ERROR_ = 3 ; MANIFEST_PARSE_ERROR_ = 36  # 3 -> m 9 -> p
+      GENERAL_ERROR_ = 3
+      IO_THREADS_COUNT__ = 1
+      MANIFEST_PARSE_ERROR_ = 36  # 3 -> m 9 -> p
       PROCEDE_ = nil ; SUCCESS_ = 0
     end
   end

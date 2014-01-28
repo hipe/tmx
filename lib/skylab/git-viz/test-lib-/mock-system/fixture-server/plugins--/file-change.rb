@@ -127,14 +127,17 @@ module Skylab::GitViz
           pn = @entry.pn
           _dirpath = pn.dirname.to_path
           _rx = %r(\A#{ ::Regexp.escape pn.basename.to_path }\z)
-          $VERBOSE = nil
-          (( @entry.listener = ::Listen.to( _dirpath, only: _rx ) do |m, a, r|
+          listener = ::Listen.to( _dirpath, only: _rx ) do |m, a, r|
             _preterite = m.length.nonzero? ? :modified :
               a.length.nonzero? ? :added : :removed
             change = Change__.new _preterite, @entry.pn
             @entry.add_change change
             @listener.send change.preterite, @entry
-          end )).start
+          end
+          $CELLULOID_DEBUG = true  # #avoid-warnings:from:celluloid
+          listener.instance_variable_set :@stopping, nil
+          @entry.listener = listener
+          listener.start
         end
       end
 
