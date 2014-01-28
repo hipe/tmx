@@ -4,9 +4,15 @@ module Skylab::GitViz
 
     class Plugins__::Auto_Shutdown  # read [#022] shutdown timer narrative
 
+      Test_Lib_::Mock_System::Socket_Agent_[ self ]
+      include Test_Lib_::Mock_System::Socket_Agent_Constants_
+
       def initialize client
-        @client = client ; @seconds_s = nil ; @do_engage = false
-        @shutdown_p = client.method :shutdown
+        @client = client ; @do_engage = false
+        @port_d = client.port_d
+        @serr = client.stderr
+        @stderr = client.get_qualified_serr
+        @timer_thread = @seconds_s = nil
         @y = client.get_qualified_stderr_line_yielder
         @yy = client.stderr_line_yielder
       end
@@ -55,7 +61,7 @@ module Skylab::GitViz
             }seconds left on clock..)"
           restart_timer
         else
-          @y << "oh boy, this."  # #todo
+          @y << "ignoring response, request for shutdown already sent!"
         end ; nil
       end
 
@@ -82,8 +88,7 @@ module Skylab::GitViz
 
       def start_timer
         @time_of_last_activity = ::Time.now
-        @y << "countdown timer initiated. #{
-          }#{ @sec_d } seconds till autoshutdown.."
+        @y << "countdown timer started with #{ @sec_d } seconds left.."
         start_new_timer_thread
       end
 
@@ -96,7 +101,9 @@ module Skylab::GitViz
         @timer_thread = ::Thread.new do
           sleep @sec_d
           timer_has_fired
+          @y << "(got to end of thread)"
         end
+        @y << "started thread (#{ @timer_thread })"
         PROCEDE_
       end
 
@@ -119,23 +126,42 @@ module Skylab::GitViz
           }inactivity so:"
         @is_hot = false
         # the current thread is the timer thread! so we don't terminate it
-        @shutdown_p[] ; nil
+        init_context ; init_socket
+        @socket.setsockopt ::ZMQ::LINGER, 1_000  # dunno
+        ec = connect_socket
+        ec || send_message_talking_about_shut_it_down
+      end
+
+      def send_message_talking_about_shut_it_down
+        ec = send_strings [ 'shut it down' ]
+        ec or close_socket_and_terminate_context
       end
 
       FMT__ = '%.2f'.freeze
 
     public
       def on_shutdown  # #storypoint-130
-        if @do_engage && @is_hot
-          @y << "terminating active shutdown timer."
-          terminate_current_timer_thread
+        if ! @do_engage
+          @y << "(was never active. nothing to do)"
+        elsif @timer_thread
+          @stderr.write "joining current timer thread .."
+          @timer_thread.join
+          @yy << " done."
+        else
+          @y << "(has no timer thread to terminate)"
         end
         PROCEDE_
       end
-
     private
       def terminate_current_timer_thread
-        @timer_thread.terminate ; nil
+        @stderr.write "(terminating current thread .."
+        x = @timer_thread.terminate
+        @serr.puts " (#{ x }) done.)"
+        @timer_thread = nil
+      end
+
+      def emit_error_string s  # #hook-out
+        @y << "cannot shutdown: #{ s }"
       end
     end
   end

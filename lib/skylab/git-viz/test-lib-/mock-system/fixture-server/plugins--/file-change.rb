@@ -80,7 +80,7 @@ module Skylab::GitViz
         if ! @be_on
           PROCEDE_
         elsif @a.length.zero?
-          @y << "not listening to any files. plugin is ready for shutdown."
+          @y << "(not listening to any files. nothing to do)"
           PROCEDE_
         else
           shutdown_each_listener

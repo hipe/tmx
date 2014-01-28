@@ -9,15 +9,42 @@ module Skylab::GitViz
 
   module Autoloader_
 
-    def self.[] mod, pn=nil
+    def self.[] mod, x=nil
       mod.module_exec do
-        if pn
-          @dir_pathname = pn
-          extend Methods__
+        if x
+          if :boxxy == x
+            extend Boxxy_Methods__, Deferred_Methods__
+          else
+            @dir_pathname = x
+            extend Methods__
+          end
         else
           extend Deferred_Methods__
         end
       end ; nil
+    end
+
+    module Boxxy_Methods__
+      def const_defined? const_i, up=false
+        is_indexed_for_boxxy or index_for_boxxy
+        yes = @boxxy_h[ const_i ]
+        yes or super
+      end
+      def constants
+        self._NOT_IMPLEMENTED  # not yet, can be.
+      end
+      attr_reader :is_indexed_for_boxxy
+    private
+      def index_for_boxxy
+        @is_indexed_for_boxxy = true ; h = {}
+        dir_pathname.children( false ).each do |pn|
+          slug = pn.sub_ext( '' ).to_path
+          SLUG_WHITE_RX__ =~ slug or next
+          h[ Constate_[ slug ] ] = true
+        end
+        @boxxy_h = h.freeze ; nil
+      end
+      SLUG_WHITE_RX__ = /\A[a-z]/
     end
 
     module Deferred_Methods__
@@ -125,6 +152,13 @@ module Skylab::GitViz
     EXTNAME__ = '.rb'.freeze
     CORE_FILE__ = "core#{ EXTNAME__ }".freeze
   end
+
+  Constate_ = -> do  # 'constantize' and 'constantify' are taken
+    rx = %r((?:(-)|^)([a-z]))
+    -> s do
+      s.gsub( rx ) { "#{ '_' if $~[1] }#{ $~[2].upcase }" }.intern
+    end
+  end.call
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 

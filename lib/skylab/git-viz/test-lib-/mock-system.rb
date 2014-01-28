@@ -871,6 +871,10 @@ module Skylab::GitViz
         EMPTY_SCN = Scn__.new do end
       end
 
+      module Socket_Agent_Constants_  # first utilisant of [#hl-155] name conv.
+        IO_THREADS_COUNT__ = 1
+      end
+
       Mock_System = self
       PROCEDE_ = nil
     end

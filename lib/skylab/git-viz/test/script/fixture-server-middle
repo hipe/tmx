@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby -w
 
+# $DEBUG = true ; $VERBOSE = true  so many ex in rbx
+
 ## ensure that we are working from the gemfile
 ENV['BUNDLE_GEMFILE'] ||= File.
   expand_path( "../../../../../../Gemfile", __FILE__ )
@@ -12,5 +14,15 @@ require_relative '../../core'
 
 # read [#018] the system call fixtures server narrative
 
-Skylab::GitViz::Test_Lib_::Mock_System::Fixture_Server.
-  new( $stderr, 5555, ::ARGV ).run
+serr = $stderr
+
+ec = Skylab::GitViz::Test_Lib_::Mock_System::Fixture_Server.
+  new( serr, 5555, ::ARGV ).run
+
+if ec
+  serr.puts "(middle server exiting with status #{ ec })"
+else
+  serr.puts "(middle server stopped with no exitstatus)"
+  ec = 0
+end
+exit ec

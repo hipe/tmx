@@ -45,7 +45,7 @@ module Skylab::GitViz
 
       def report_socket_send_failure
         ec, str = error_code_and_error_string
-        @y << "send failure: #{ str }" ; ec
+        emit_error_string "send failure: #{ str }" ; ec
       end
 
       def recv_strings buffer_a
@@ -59,12 +59,17 @@ module Skylab::GitViz
 
       def report_socket_recv_failure
         ec, str = error_code_and_error_string
-        @y << "receive failure: #{ str }" ; ec
+        emit_error_string "receive failure: #{ str }" ; ec
       end
 
       def error_code_and_error_string
         d = ::ZMQ::Util.errno
         [ d, ::LibZMQ.zmq_strerror( d ).read_string ]
+      end
+
+      def close_socket_and_terminate_context
+        ec = close_socket
+        ec ||= terminate_context
       end
 
       def close_socket

@@ -1,4 +1,4 @@
-[#032] #open re-arch auto shutdown to use messages, currently it's creating
+[#032]       #done re-arch auto shutdown to use messages, currently it's creating
              assertion failures, perhaps b.c we are passing sockets across
              memory barriers?
 [#031]       #parent-node:[#018] the plugin narrative ..

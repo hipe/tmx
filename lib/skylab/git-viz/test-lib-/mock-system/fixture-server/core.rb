@@ -6,6 +6,7 @@ module Skylab::GitViz
 
       Mock_System::Plugin_::Host[ self ]
       Mock_System::Socket_Agent_[ self ]
+      include Socket_Agent_Constants_
 
       def initialize serr, port_d, argv
         @argv = argv
@@ -111,7 +112,8 @@ module Skylab::GitViz
           shutdown
         else
           @y << "(shutdown already in progress at #{ s })"
-        end ; nil
+          PROCEDE_
+        end
       end
 
       def shutdown
@@ -120,14 +122,13 @@ module Skylab::GitViz
         @y << "shutting down plugins.."
         shutdown_every_plugin
         @serr.write "shutting down server .."
-        ec = close_socket
-        ec ||= terminate_context
+        ec = close_socket_and_terminate_context
         ec or begin @y << " done." ; nil end
       end
 
       def shutdown_every_plugin
         a = emit_to_every_plugin :on_shutdown
-        a and when_some_plugins_have_issues_shutting_down
+        a and when_some_plugins_have_issues_shutting_down a ; nil
       end
       event_a << :on_shutdown
 
@@ -184,6 +185,36 @@ module Skylab::GitViz
       end
 
       def process_received_strings
+        if @buffer_a.length.nonzero? and
+            DASH__ != @buffer_a.fetch( 0 ).getbyte( 0 ) and
+              prs_server_directive_from_buffer_a
+          prcss_server_directive
+        else
+          prcss_received_strings_with_responder
+        end
+      end ; DASH__ = '-'.getbyte 0
+
+      def prs_server_directive_from_buffer_a
+        const_i = @buffer_a.fetch( 0 ).gsub( /(?:^|( ))([a-z])/ ) do
+          "#{ '_' if $~[1] }#{ $~[2].upcase }"
+        end.intern
+        if Fixture_Server::Alternate_Responders__.const_defined? const_i, false
+          @responder_const_i = const_i ; @buffer_a.shift ; true
+        end
+      end
+
+      def prcss_server_directive
+        const_i = @responder_const_i
+        cls = Fixture_Server::Alternate_Responders__.const_get const_i, false
+        name = Mock_System::Plugin_::Name.from_const const_i
+        cond = plugin_conduit_cls.new( @y, self ).curry( name )
+        responder = cls.new cond
+        ec = responder.invoke @buffer_a
+        @buffer_a.clear
+        ec
+      end
+
+      def prcss_received_strings_with_responder
         response = @responder.process_strings @buffer_a
         @buffer_a.clear
         s_a = response.flatten_via_flush
@@ -208,6 +239,10 @@ module Skylab::GitViz
         end
       end
 
+      def emit_error_string s
+        @y << s
+      end
+
       Plugin_Listener_Matrix = ::Struct.new( * event_a )
     end
 
@@ -216,15 +251,27 @@ module Skylab::GitViz
 
     class Fixture_Server  # (re-open)
 
-      def stderr_for_plugin_conduit  # #hook-out
+      plugin_conduit_class
+      class Plugin_Conduit  # ~ plugins can have raw stderr if they want it
+        def stderr
+          up.stderr_for_plugin_conduit
+        end
+      end
+      def stderr_for_plugin_conduit  # #hook-out to
         @serr
       end
 
-      plugin_conduit_class
+      class Plugin_Conduit  # ~ plugins that run threads need this
+        def port_d
+          up.port_d_for_plugin
+        end
+      end
+      def port_d_for_plugin
+        @port_d
+      end
 
-      # ~ give plugins the ability to clear this cache
+      class Plugin_Conduit  # ~ give plugins the ability to clear this cache
 
-      class Plugin_Conduit
         def clear_cache_for_manifest_pathname pn
           up.clear_cache_for_mani_pn_from_conduit pn
         end
@@ -233,24 +280,24 @@ module Skylab::GitViz
         @responder.clear_cache_for_manifest_pathname pn
       end
 
-      # ~ give plugins the ability to shutdown the server
-
-      class Plugin_Conduit
+      class Plugin_Conduit  # ~ give plugins the ability to shutdown the server
         def shutdown
           up.shutdown_requested_by_plugin_conduit self
         end
       end
       def shutdown_requested_by_plugin_conduit cond
         @y << "received shutdown signal from #{ cond.name.as_human }.."
-        shutdown_if_necessary 'plugin request' ; nil
+        shutdown_if_necessary 'plugin request'
       end
 
+      module Alternate_Responders__
+        Autoloader_[ self, :boxxy ]
+      end
 
       # ~ constants used throughout this node
 
       EARLY_EXIT_ = 33 ; Fixture_Server = self
       GENERAL_ERROR_ = 3
-      IO_THREADS_COUNT__ = 1
       MANIFEST_PARSE_ERROR_ = 36  # 3 -> m 9 -> p
       PROCEDE_ = nil ; SUCCESS_ = 0
     end

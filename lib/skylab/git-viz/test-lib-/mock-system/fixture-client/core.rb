@@ -5,6 +5,7 @@ module Skylab::GitViz
     class Fixture_Client  # [#024] taste the pain of too much docs
 
       Mock_System::Socket_Agent_[ self ]
+      include Socket_Agent_Constants_
 
       x = $VERBOSE ; $VERBOSE = nil ; GitViz::Lib_::ZMQ[] ; $VERBOSE = x
 
@@ -279,7 +280,6 @@ module Skylab::GitViz
     class Fixture_Client  # (re-open)
 
       GENERAL_ERROR_ = 63 ; NO_SERVER_ = 25
-      IO_THREADS_COUNT__ = 1
       SUCCESS_ = 0 ; ZMQ_ERROR_CODE_ = -1
 
     end

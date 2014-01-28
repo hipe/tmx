@@ -31,7 +31,7 @@ module Skylab::GitViz
           conduit = plugin_conduit_cls.new @y, self
           box_mod = self.class::Plugins__
           box_mod.dir_pathname.children( false ).each do |pn|
-            name = Name_.new pn
+            name = Name.from_local_pathname pn
             DASH__ == name.getbyte( 0 ) and next
             cond = conduit.curry name
             plugin = box_mod.const_get( name.as_const, false ).new cond
@@ -101,26 +101,50 @@ module Skylab::GitViz
         end
       end
 
-      class Name_
-        def initialize pn
-          @pathname = pn
+      class Name
+        class << self
+          def from_local_pathname pn
+            allocate_with :initialize_with_local_pathname, pn
+          end
+          def from_const const_i
+            allocate_with :initialize_with_const_i, const_i
+          end
+          private :new
+        private
+          def allocate_with method_i, x
+            new = allocate
+            new.send method_i, x
+            new
+          end
+        end
+      private
+        def initialize_with_const_i const_i
+          @as_const = const_i
+          @norm_i = const_i.to_s.downcase.intern
+          init_slug ; init_human ; freeze
+        end
+        def initialize_with_local_pathname pn
           @as_slug = pn.sub_ext( '' ).to_path.freeze
+          init_const ; init_human ; init_norm ; freeze
+        end
+        def init_const
           @as_const = Constate_[ @as_slug ]
-          @as_human = @as_slug.gsub( '-', ' ' ).freeze
+        end
+        def init_norm
           @norm_i = @as_slug.gsub( '-', '_' ).intern
         end
+        def init_human
+          @as_human = @as_slug.gsub( '-', ' ' ).freeze
+        end
+        def init_slug
+          @as_slug = @norm_i.to_s.gsub( '_', '-' ).freeze
+        end
+      public
         attr_reader :as_const, :as_human, :as_slug, :norm_i
         def getbyte d
           @as_slug.getbyte d
         end
       end
-
-      Constate_ = -> do  # 'constantize' and 'constantify' are taken
-        rx = %r((?:(-)|^)([a-z]))
-        -> s do
-          s.gsub( rx ) { "#{ '_' if $~[1] }#{ $~[2].upcase }" }.intern
-        end
-      end.call
 
       class Plugin_Conduit_  # see [#031]:#understanding-plugin-conduits
         def initialize y, real
@@ -143,8 +167,11 @@ module Skylab::GitViz
         attr_reader :name
 
         def get_qualified_stderr_line_yielder
-          y = ::Enumerator::Yielder.new do |msg|
-            @stderr_line_yielder << "#{ customized_message_prefix }#{ msg }"
+          y = ::Enumerator::Yielder.new do |msg_s|
+            msg = Qualifiable_Message_String__.new msg_s
+            msg.graphic_prefix = graphic_prefix
+            msg.agent_prefix = agent_prefix
+            @stderr_line_yielder << "#{ msg }"
             y
           end
         end
@@ -152,7 +179,10 @@ module Skylab::GitViz
         def get_qualified_serr
           serr = @up_p[].stderr_for_plugin_conduit  # :+#hook-out
           Write_Proxy__.new do |s|
-            serr.write "#{ customized_message_prefix }#{ s }" ; nil
+            msg = Qualifiable_Message_String__.new s
+            msg.graphic_prefix = graphic_prefix
+            msg.agent_prefix = agent_prefix
+            serr.write "#{ msg }"
           end
         end
         class Write_Proxy__ < ::Proc
@@ -161,12 +191,32 @@ module Skylab::GitViz
 
       private
 
-        def customized_message_prefix
-          "  • #{ @name.as_human } "
+        def graphic_prefix
+          self.class::GRAPHIC_PREFIX__
+        end ; GRAPHIC_PREFIX__ = '  • '.freeze
+
+        def agent_prefix
+          "#{ @name.as_human } "
         end
 
         def up
           @up_p[]
+        end
+      end
+
+      Qualifiable_Message_String__ = ::Struct.
+          new :graphic_prefix, :open, :agent_prefix, :body, :close
+      class Qualifiable_Message_String__
+        def initialize msg
+          if (( md = PAREN_EXPLODER_RX__.match msg ))
+            super nil, md[1], nil, md[2], md[3]
+          else
+            super nil, nil, nil, msg
+          end
+        end
+        PAREN_EXPLODER_RX__ = /\A(\()(.+)(\)?)\z/
+        def to_s
+          to_a.join
         end
       end
 

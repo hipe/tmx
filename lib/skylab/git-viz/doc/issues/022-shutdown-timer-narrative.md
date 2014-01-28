@@ -47,6 +47,22 @@ it on jruby).
 
 
 
+### :#then-there-was-issue-[#032]
+
+so it looks like this wasn't actually working smoothly, it was just giving
+the impression of working but actually causing a fatal error that made the
+server exit as a side-effect! if we understand the warnings in the source
+code of ffi-rzmq (in context.rb), we should not access the same context from
+different threads. although this certainly sounds like a use case for
+celluloid, we are waiting to introduce that until we would really understand
+it.
+
+..ok we're back. that seems to have solved it. from within the thread we
+create we send a message with zeromq over to the parent thread. yes this is a
+use-case for cellular..
+
+
+
 ## :#storypoint-45
 
 although PROCEDE_ is the same value as `nil`, which one we use indicates
