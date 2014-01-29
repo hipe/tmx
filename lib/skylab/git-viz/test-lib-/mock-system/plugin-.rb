@@ -10,6 +10,9 @@ module Skylab::GitViz
       end
 
       module Host_Module_Methods__
+        def build_mutable_callback_tree_specification
+          GitViz::Lib_::Callback_Tree::Mutable_Specification.new
+        end
         def plugin_conduit_class
           if const_defined? :Plugin_Conduit, false
             self::Plugin_Conduit
@@ -28,9 +31,9 @@ module Skylab::GitViz
           @plugin_conduit_h = {}
           init_plugin_listener_matrix_if_necessary
           conduit = plugin_conduit_cls.new @y, self
-          box_mod = self.class::Plugins__
-          box_mod.dir_pathname.children( false ).each do |pn|
-            name = Name.from_local_pathname pn
+          box_mod = rslv_some_plugin_box_mod
+          box_mod.constants.each do |const_i|
+            name = Name.from_const const_i
             WHITE_SLUG_RX__ =~ name.as_slug or next
             cond = conduit.curry name
             plugin = box_mod.const_get( name.as_const, false ).new cond
@@ -50,6 +53,20 @@ module Skylab::GitViz
 
         def plugin_conduit_cls
           self.class.plugin_conduit_class
+        end
+
+        def rslv_some_plugin_box_mod
+          if self.class.const_defined? PLUGIN_BOX__, false
+            self.class.const_get PLUGIN_BOX__, false
+          else
+            vivify_autoloading_plugin_box
+          end
+        end ; PLUGIN_BOX__ = :Plugins__
+
+        def vivify_autoloading_plugin_box
+          mod = self.class.const_set PLUGIN_BOX__, ::Module.new
+          GitViz::Autoloader_[ mod, :boxxy ]
+          mod
         end
 
         def idx_plugin cond
@@ -83,11 +100,20 @@ module Skylab::GitViz
         end
 
         def emit_to_plugins m_i, * a, & p  # #storypoint-60
+          p = nrmlz_callback_map_args m_i, a, p
+          @callbacks.call_shorters_with_map m_i, p
+        end
+
+        def attempt_with_plugins m_i, * a, & p  # #storypoint-65
+          p = nrmlz_callback_map_args m_i, a, p
+          @callbacks.call_attempters_with_map m_i, p
+        end
+
+        def nrmlz_callback_map_args m_i, a, p
           a.length.nonzero? and p and raise ::ArgumentError
-          p ||= -> plugin_i do
+          p || -> plugin_i do
             @plugin_conduit_h.fetch( plugin_i ).plugin.send m_i, * a
           end
-          @callbacks.call_shorters_with_map m_i, p
         end
 
         def emit_to_every_plugin m_i, * a  # #storypoint-75

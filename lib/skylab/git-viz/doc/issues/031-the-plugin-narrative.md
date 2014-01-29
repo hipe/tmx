@@ -31,7 +31,7 @@ there is a fair chance that these two concerns may split into two classes.
 
 ## :#storypoint-60
 
-this method will yield the conduit of every plugin that listens to the
+this method will yield the symbolic name of every plugin that listens to the
 channel (first argument), or if no block is given it will call the appropriate
 callback method for that channel along with any (non-block) args that were
 passed to this selfsame method call.
@@ -45,6 +45,19 @@ i.e this method allows any plugin to short-circuit the host out of dispatching
 the event to the other plugins, and so should be used when the host wants to
 allow any plugin to trigger a failure of system startup, for example.
 
+
+## :#storypoint-70
+
+this method is exactly like #storypoint-60 but semantically different: rather
+than a world of error codes, in this world "true"-ish means "succeeded" and
+"falseish" means "did not succeed." the plugins are conceived of as
+"attempters" that one-by-one will attempt something, and the first one to
+succeed short-circuits the rest of the attempts. the result will be any
+first true-ish value that any plugin resulted in.
+
+note that although these are logically the same, we keep the names different
+because they are semantically opposite and we want the client code to reflect
+the semantic expectations the client is placing on the agent callbacks.
 
 
 ## :#storypoint-75

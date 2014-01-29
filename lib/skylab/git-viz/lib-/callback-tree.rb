@@ -149,7 +149,17 @@ module Skylab::GitViz
         ( last_seen_p || p || ::Kernel.method( :raise ) )[ exception ]
       end
 
-      def call_shorters_with_map * i_a, p
+      def call_attempters_with_map * i_a, p  # [#033]:#the-attempters-pattern
+        did_succeed = false
+        x_a = rslv_any_shorters_leaf_callback_x_a i_a
+        x_a and x_a.each do |x|
+          did_succeed = p[ x ]
+          did_succeed and break
+        end
+        did_succeed
+      end
+
+      def call_shorters_with_map * i_a, p  # see [#033]:#the-shorters-pattern
         ec = PROCEDE_
         x_a = rslv_any_shorters_leaf_callback_x_a i_a
         x_a and x_a.each do |x|

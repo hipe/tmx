@@ -1,4 +1,4 @@
-# the different kinds of callback trees :[#033]
+# the different kinds of callback tree patterns :[#033]
 
 ## statement of scope and purpose of this document
 
@@ -85,7 +85,7 @@ the four patterns are "listeners", "handler", "shorters", "attempters".
 • "attempters" allows multiple callbacks per channel and will issue each such
   event to them in some order (probably last-in-first-out), and short-circuit
   on the first callback that "matches". if this sounds very similar to
-  "shorters" above it's because it is but see below (eventually).
+  "shorters" above it's because it is but see below.
 
 
 
@@ -192,12 +192,39 @@ attempters pattern        yes          no              yes
   'catch' clause in most other languages). with "shorters" pattern we lose
   this.
 
+• we take a discrete view of channels here: we do not deal with ascending
+  up the "ancestor chain" of parent nodes in the tree, because that would
+  make things confusing and weird.
 
 
 
-## the "attempters" pattern in detail
 
-# #todo:2-commits-from-now
+## :#the-attempters-pattern in detail
+
+• the "attempters" pattern is logically *identical* to the "shorters" pattern,
+  but the opposite semantic value is associated with the two categories
+  of return value:
+
+• something will be "attempted" by each agent subscribed to the channel.
+  whether the agent succeeds or fails will be reflected in the result of the
+  callback: true-ish means "succeeded" and false-ish means "did not succeed".
+
+• note we do not say "fail" here, we say "did not succeed." there is a subtle
+  semantic difference: saying "fail" might incorrecty suggeset that we should
+  short-circuit further processing.
+
+• in fact, if any agent *succeeds*, it is this condition that causes the
+  short circuit to happen. because one agent succeeded, whatever the goal is
+  was met and we need not continue attempting with the other agents.
+
+• although as stated above the logic here is identical to the "shorters"
+  pattern, we may maintain one or more small methods with their own names
+  and logically duplicate implementations just to make the semantics clear
+  to a sufficiently deep level.
+
+• likewise with "shorter" pattern, we do not deal with the "ancestor chain"
+  of event channels here.
+
 
 
 

@@ -27,7 +27,7 @@ module Skylab::GitViz
       end
     public
 
-      spec = GitViz::Lib_::Callback_Tree::Mutable_Specification.new
+      spec = build_mutable_callback_tree_specification
       spec << :on_build_option_parser
 
       def write_plugin_host_option_parser_options

@@ -31,18 +31,22 @@ module Skylab::GitViz
         yes or super
       end
       def constants
-        self._NOT_IMPLEMENTED  # not yet, can be.
+        if ! is_indexed_for_boxxy
+          index_for_boxxy
+        end
+        [ * super, * @boxxy_a ].uniq
       end
       attr_reader :is_indexed_for_boxxy
     private
       def index_for_boxxy
-        @is_indexed_for_boxxy = true ; h = {}
+        @is_indexed_for_boxxy = true ; a = [] ; h = {}
         dir_pathname.children( false ).each do |pn|
           slug = pn.sub_ext( '' ).to_path
           SLUG_WHITE_RX__ =~ slug or next
-          h[ Constate_[ slug ] ] = true
+          k = Constate_[ slug ]
+          a << k ; h[ k ] = true
         end
-        @boxxy_h = h.freeze ; nil
+        @boxxy_a = a.freeze ; @boxxy_h = h.freeze ; nil
       end
       SLUG_WHITE_RX__ = /\A[a-z]/
     end
