@@ -11,6 +11,8 @@ module Skylab::GitViz
           h.keys.each do |k|
             x = h[ k ]
             h[ k ] = case x
+            when :listeners
+              Listener_Leaf__.new
             when :handler
               Handler_Leaf__.new
             else
@@ -21,6 +23,19 @@ module Skylab::GitViz
         end
         p[ hash ]
         @root = Branch__.new hash
+      end
+
+      class Listener_Leaf__
+        def initialize
+          @p_a = nil
+        end
+        attr_reader :p_a
+        def add_p p
+          ( @p_a ||= [] ) << p ; nil
+        end
+        def retrieve_child i
+          raise ::KeyError, "off the end: '#{ i }'"
+        end
       end
 
       class Handler_Leaf__
@@ -36,26 +51,65 @@ module Skylab::GitViz
 
       class Branch__
         def initialize h
-          @h = h ; @p = nil
+          @h = h ; @p = @p_a = nil
         end
-        attr_reader :h
+        attr_reader :h, :p_a
         attr_accessor :p
+        def add_p p
+          ( @p_a ||= [] ) << p ; nil
+        end
         def to_handler_pair
           [ @h, @p ]
+        end
+        def retrieve_child i
+          @h.fetch i
         end
       end
 
       Node__ = ::Struct.new :h, :p
 
+      def add_listener * i_a, p
+        node = rslv_some_node i_a
+        node.add_p p ; nil
+      end
+
       def set_handler * i_a, p
-        node = ( 0 ... i_a.length ).reduce @root do |m, d|
+        node = rslv_some_node i_a
+        node.p and raise ::KeyError, "won't clobber exiting '#{ i_a.last }'"
+        node.p = p ; nil
+      end
+
+    private
+      def rslv_some_node i_a
+        ( 0 ... i_a.length ).reduce @root do |m, d|
           k = i_a.fetch d
           m.h.fetch k do
             raise ::KeyError, say_no_such_channel( d, i_a )
           end
         end
-        node.p and raise ::KeyError, "won't clobber exiting '#{ i_a.last }'"
-        node.p = p ; nil
+      end
+    public
+
+      def call_listeners * i_a, & p
+        value_p = -> do
+          r = p[] ; value_p = -> { r } ; r
+        end
+        stack_p_a_a = nil
+        add_p_a = -> p_a do
+         ( stack_p_a_a ||= [] ) << p_a
+        end
+        leaf = i_a.reduce @root do |node, i|
+          p_a = node.p_a and add_p_a[ p_a ]
+          node.retrieve_child i
+        end
+        p_a = leaf.p_a and add_p_a[ p_a ]
+        if stack_p_a_a
+          stack_p_a_a.each do |p_a_|
+            p_a_.each do |p_|
+              p_[ value_p[] ]
+            end
+          end ; nil
+        end
       end
 
       def call_handler * i_a, & p

@@ -2,9 +2,9 @@
 
 ## statement of scope and purpose of this document
 
-there are currently three kinds of callback trees. the document hopes to
-delineate their differences and possibly to speculate on the feasibility of
-merging them into one supertree.
+there are currently three callback patterns we want our "callback tree"
+to support. the document hopes to delineate their differences as a means
+of speculating the feasibility of integrating them into one tree.
 
 
 ## the callback tree structure and story in general
@@ -48,14 +48,13 @@ lifecycle of the host object; we are not sure which.
 
 
 
-## the different kinds of callback trees in brief
+## the different callback patterns in brief
 
 currenly we employ three different patterns for accepting callbacks and in
-turn handling their responses. although currently these three patterns are
-implemented as three different kinds of callback tree, keep in mind we are
-considering merging them into one grand omni-tree. (perhaps even (gulp) a
-plugin architecture for callback trees, but to introduce such a monstrosity
-now would certainly be premature.
+turn handling their responses. this document exists to guide their attempted
+integration into one tree. we even considered (gulp) a plugin architecture
+for callback trees, but to introduce such a monstrosity now would certainly
+be premature albeit fun.
 
 the three patterns are "listeners", "handlers" and "attempters".
 
@@ -64,7 +63,7 @@ the three patterns are "listeners", "handlers" and "attempters".
   is ignored by the host, so multiple of them may be associated with any given
   channel.
 
-• "handlers" are trees who rather than manage sets of listeners for each
+• "handlers" are nodes who rather than manage sets of listeners for each
   channel, allow at most one callback per channel (think of them as "slots");
   with ramifications discussed below.
 
@@ -76,14 +75,31 @@ the three patterns are "listeners", "handlers" and "attempters".
 
 ## the feature matrix
 
-                 multiple?   inherits?   result matters?
-listeners tree         yes          no               no
-handlers tree           no         yes              yes
-attempters tree        yes         yes              yes
+                    multiple?   inherits?   result matters?
+listeners pattern         yes          no               no
+handlers pattern           no         yes              yes
+attempters pattern        yes         yes              yes
 
 
 
-## the handlers tree in detail
+## the "listeners" pattern in detail
+
+• this is the simplest of the patterns
+
+• one such event will be dispatched outwards in two dimensions: "laterally"
+  to any listeners listening to that channel, and then "upwards" to each
+  parent channel of the channel, and on that node "laterally" out to any
+  listeners of that (branch) channel.
+
+• results of callbacks are ignored. they never have an impact on the behavior
+  of the host (or the callback tree).
+
+• if a client subscribes to both a more general and more specific channel;
+  when an event fires on the specific channel, both callbacks will be invoked
+  in order from specific to general.
+
+
+## the handlers pattern in detail
 
 • the data payloads that these callbacks are passed are necessarily
   exceptions.
@@ -129,3 +145,15 @@ attempters tree        yes         yes              yes
   (depending on how the agent is written and how the client builds (or sets)
   the handlers), it starts to feel like a powerful little dependency injection
   pattern. (we can imagine marionette strings between the client and the agent.)
+
+
+
+## the "attempters" pattern in detail
+
+# #todo:2-commits-from-now
+
+
+
+## issues in integrating all of them into one tree
+
+.. are anticipated.

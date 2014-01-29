@@ -76,7 +76,7 @@ module Skylab::GitViz
 
       def parse_arguments
         if @argv.length.nonzero?
-          @y << "unexpected argument: #{ argv.first.inspect }"
+          @y << "unexpected argument: #{ @argv.first.inspect }"
           GENERAL_ERROR_
         end
       end

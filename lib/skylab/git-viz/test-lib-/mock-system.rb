@@ -62,37 +62,19 @@ module Skylab::GitViz
 
       class Mock_Command_IO_Cache_
         def initialize
-          @listeners = Listeners__.new
-          @manifest_cls = Mock_System_Conduit_
           @cache_h = ::Hash.new do |h, cls|
             h[ cls ] = { }
           end
+          @callbacks = Callbacks__.new
+          @manifest_cls = Mock_System_Conduit_
         end
-        class Listeners__
+        class Callbacks__ < GitViz::Lib_::Callback_Tree
           def initialize
-            @h = { item_added: nil }
-          end
-          def add_listener * i_a, p
-            last_h = last_i = nil
-            a = i_a.reduce @h do |h, i|
-              last_h = h ; last_i = i
-              h.fetch i
-            end
-            a ||= last_h[ last_i ] = []
-            a << p ; nil
-          end
-          def call * i_a, & p
-            a = i_a.reduce @h do |h, i|
-              h.fetch i
-            end
-            if a
-              x = p.call
-              a.each { |p_| p_[ x ] } ; nil
-            end
+            super item_added: :listeners
           end
         end
         def on_item_added & p
-          @listeners.add_listener :item_added, p ; nil
+          @callbacks.add_listener :item_added, p ; nil
         end
         def resolve_some_cached_IO_instance_of_class_for_pn cls, pn
           retrieve_or_init do |o|
@@ -126,7 +108,7 @@ module Skylab::GitViz
           cls = lookup.IO_class ; pn = lookup.IO_key
           io = lookup.IO_class.new( * parse.parsed_results_to_a, pn )
           @cache_h[ cls ][ pn ] = io
-          @listeners.call :item_added do io end
+          @callbacks.call_listeners :item_added do io end
           lookup.when_created_new[ io ]
         end
       public

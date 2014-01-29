@@ -12,7 +12,7 @@ module Skylab::GitViz
 
       class Callbacks__ < GitViz::Lib_::Callback_Tree
         def initialize
-          super response_started: :handler  # #todo:next-commit this is a listener not a handler
+          super response_started: :listeners
         end
       end
 
@@ -21,7 +21,7 @@ module Skylab::GitViz
       end
 
       def on_response_started &p
-        @callbacks.set_handler :response_started, p ; nil
+        @callbacks.add_listener :response_started, p ; nil
       end
 
       def process_strings a
@@ -66,7 +66,7 @@ module Skylab::GitViz
         def initialize y, cache, callbacks, s_a
           @cache = cache ; @callbacks = callbacks; @s_a = s_a
           response = Response__.new
-          callbacks.call_handler :response_started, response do end
+          callbacks.call_listeners :response_started do response end
           super y, response
         end
 
