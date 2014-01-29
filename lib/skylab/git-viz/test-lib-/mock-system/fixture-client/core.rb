@@ -27,7 +27,8 @@ module Skylab::GitViz
       end
     public
 
-      event_a = %i( on_build_option_parser )
+      spec = GitViz::Lib_::Callback_Tree::Mutable_Specification.new
+      spec << :on_build_option_parser
 
       def write_plugin_host_option_parser_options
         # currenly all options exist only in the plugins
@@ -232,7 +233,7 @@ module Skylab::GitViz
         @stdout.write "#{ x_a * "\t" }\n"
       end
 
-      Plugin_Listener_Matrix = ::Struct.new( * event_a )
+      Callback_Tree__ = spec.flush
     end
 
     class Fixture_Client::Re_Marshaller_

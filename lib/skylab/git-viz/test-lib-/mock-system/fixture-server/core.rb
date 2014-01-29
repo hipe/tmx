@@ -42,7 +42,9 @@ module Skylab::GitViz
         end
       end
 
-      event_a = [ :on_build_option_parser ]
+      spec = GitViz::Lib_::Callback_Tree::Mutable_Specification.new
+
+      spec << :on_build_option_parser
 
       def write_plugin_host_option_parser_help_option  # #hook-out
         @op.on '--help', "this screen." do
@@ -72,7 +74,7 @@ module Skylab::GitViz
       def post_parse_options
         emit_to_plugins :on_options_parsed
       end
-      event_a << :on_options_parsed
+      spec << :on_options_parsed
 
       def parse_arguments
         if @argv.length.nonzero?
@@ -85,7 +87,7 @@ module Skylab::GitViz
         @responder = self.class::Responder__.new @y
         emit_to_plugins :on_responder_initted, @responder
       end
-      event_a << :on_responder_initted
+      spec << :on_responder_initted
 
       def resolve_and_bind_socket
         @socket = @context.socket ::ZMQ::REP
@@ -130,7 +132,7 @@ module Skylab::GitViz
         a = emit_to_every_plugin :on_shutdown
         a and when_some_plugins_have_issues_shutting_down a ; nil
       end
-      event_a << :on_shutdown
+      spec << :on_shutdown
 
       def when_some_plugins_have_issues_shutting_down a
         first = true
@@ -221,13 +223,13 @@ module Skylab::GitViz
         ec = emit_to_plugins :on_response, s_a
         ec or send_strings s_a
       end
-      event_a << :on_response
+      spec << :on_response
 
 
       def notify_plugins_of_start
         emit_to_plugins :on_start
       end
-      event_a << :on_start
+      spec << :on_start
 
       class Response_Agent_
         def initialize y, response
@@ -243,7 +245,8 @@ module Skylab::GitViz
         @y << s
       end
 
-      Plugin_Listener_Matrix = ::Struct.new( * event_a )
+      Callback_Tree__ = spec.flush
+
     end
 
 

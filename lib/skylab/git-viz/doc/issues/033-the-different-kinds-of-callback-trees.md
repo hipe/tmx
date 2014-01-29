@@ -2,9 +2,12 @@
 
 ## statement of scope and purpose of this document
 
-there are currently three callback patterns we want our "callback tree"
-to support. the document hopes to delineate their differences as a means
-of speculating the feasibility of integrating them into one tree.
+there is a variety of callback patterns (at least four) that we want our
+"callback tree" to support. the document hopes to survey them one by one and
+with each pattern: explain its behavior, present potential applications for it
+(when interesting), and finally to highlight the differences among the
+patterns as a means of speculating the feasibility of integrating them into
+one tree.
 
 
 ## the callback tree structure and story in general
@@ -16,12 +19,18 @@ host runs it emits "events" (or "eventpoints") on these channels, on which
 the listeners get notified of the events. in some cases the host (or callback
 tree itself) will take different actions based on the result of the callbacks.
 
+the interplay between the host and the callbacks is where it gets really
+intersting, but first we offer some rough working definitions for all the
+components and concepts at play here. (sadly the definitions are somewhat
+circular, but there was no easy way "around" this!)
+
 the "host" can be any object that accepts listeners to channels, and
 presumably then emits events at various points in its lifecycle.
 
 the callbacks are concrete, callable proc-likes that represent the more
-abstract notiong of a corresponding "listener" behind them, which is to say we
-may use these terms somewhat interchangeably. (but note that what actually
+abstract notion of a corresponding "listener" behind them, which is to say we
+may use the term "callback" and "listener" somewhat interchangeably.
+(but note that what actually
 happens when the callable is called is unimportant from the perspective of the
 host, except for in some cases the result value of the call, which will be
 explained below.)
@@ -34,51 +43,59 @@ listeners subscribe by referring to paths in that tree.
 hypothetically listeners could subscribe to non-terminal "branch" nodes in
 this tree (the equivalent of directories in the filesystem analogy) and
 thereby be subscribing to all the child channels of that node; but this is not
-necessarily implemented depending on the kind of callback tree it is.
+necessarily implemented depending on the pattern being employed.
 
 "events" may be accompanied by an object (like an exception, or a string, or
 any other mixed kind of data); but also it is perfectly acceptable not to pass
 event data along with an event depending on what is needed. sometimes just the
 occurrence of the event itself (on its particular channel) is enough
-information for the listeners to react accordingly.
+information for the listeners to react interestingly.
 
-we may say "eventpoint" instead of "event" either to refer to an event that
-has no data passed long with it; or an event that only occurs once during the
-lifecycle of the host object; we are not sure which.
+when we say "eventpoint" as opposed to "event', we may be referring to
+either an event that has no data passed along with it, or an event that only
+occurs once during the lifecycle of the host object; we are not sure which.
 
 
 
 ## the different callback patterns in brief
 
-currenly we employ three different patterns for accepting callbacks and in
-turn handling their responses. this document exists to guide their attempted
-integration into one tree. we even considered (gulp) a plugin architecture
-for callback trees, but to introduce such a monstrosity now would certainly
-be premature albeit fun.
+currently we employ the below "several" patterns for accepting callbacks and
+in turn handling their responses. this document exists to guide their
+attempted integration into one tree. we even considered (gulp) a plugin
+architecture for callback trees, but to introduce such a monstrosity now
+would certainly be premature albeit fun.
 
-the three patterns are "listeners", "handlers" and "attempters".
+the four patterns are "listeners", "handler", "shorters", "attempters".
 
 • "listeners" are just plain old proc-likes that get called whenever the host
   deems it has reached that particular eventpoint. whatever their result is
   is ignored by the host, so multiple of them may be associated with any given
   channel.
 
-• "handlers" are nodes who rather than manage sets of listeners for each
-  channel, allow at most one callback per channel (think of them as "slots");
-  with ramifications discussed below.
+• "handler" is the pattern whereby rather than a set of listeners being
+  allowed to be specified, the channel node allows at most one callback
+  for that channel (think of it as a "slot"), with the many ramifications of
+  this discussed below.
 
-• "attempters" allow multiple callbacks per channel, and will issue each such
+• "shorters" allows multiple callbacks per channel and short-circuits on
+  the first one that results in true-ish (treating it as if it is something
+  like an error code), making this result be the result of the call to the
+  callbacks tree. more below.
+
+• "attempters" allows multiple callbacks per channel and will issue each such
   event to them in some order (probably last-in-first-out), and short-circuit
-  on the first callback that "matches".
+  on the first callback that "matches". if this sounds very similar to
+  "shorters" above it's because it is but see below (eventually).
 
 
 
 ## the feature matrix
 
                     multiple?   inherits?   result matters?
-listeners pattern         yes          no               no
+listeners pattern         yes         yes               no
 handlers pattern           no         yes              yes
-attempters pattern        yes         yes              yes
+shorters pattern          yes          no              yes
+attempters pattern        yes          no              yes
 
 
 
@@ -91,12 +108,14 @@ attempters pattern        yes         yes              yes
   parent channel of the channel, and on that node "laterally" out to any
   listeners of that (branch) channel.
 
+• the order that the callbacks are called in "laterally" at any one level
+  is undefined, but note that "vertically" the order is from "bottom" to
+  "top", so when you have a deep tree (and not just a flat list of channels)
+  the more specific channels are called first before the more general ones.
+
 • results of callbacks are ignored. they never have an impact on the behavior
   of the host (or the callback tree).
 
-• if a client subscribes to both a more general and more specific channel;
-  when an event fires on the specific channel, both callbacks will be invoked
-  in order from specific to general.
 
 
 ## the handlers pattern in detail
@@ -117,20 +136,24 @@ attempters pattern        yes         yes              yes
   absence (that is, any false-ish result) is taken to mean that the error (i.e
   "exceptional event") was handled.
 
-• the one most essential and central difference from a listener tree is a
+• the one most essential and central difference from the listener pattern is a
   corollary of the above: given that we get one meaningful result back from a
   callback (rather than an aggregate of results from several callbacks); we
-  can use that one result to drive the remaining logic of the agent. always
+  can use that one result to drive the remaining logic of the host. always
   the pattern is this: if a true-ish is resulted from the callback, it is
-  taken to be an error code. the agent typically ceases further processing to
+  taken to be an error code. the host typically ceases further processing to
   whatever extent is appropriate and the error code (or a translated
-  equivalent error code) is bubbled all the way up and out of the agent, and
-  returned as the result of the top call to that agent.
+  equivalent error code) is bubbled all the way up and out of the host, and
+  returned as the result of the top call to that host.
 
-• a corollary of the above is this: not only can the client drive the agent
+• so in this scenario the "things" behind the callbacks are no longer passive
+  "listeners" but in fact they are active "agents", taking part in determining
+  the behavior of the host.
+
+• a corollary of the above is this: not only can these agents drive the host
   by effectively short-circuiting its operation by resulting in an error code
-  thru a callback; likewise the client can tell the agent to keep going where
-  normally it would have stopped.
+  thru a callback; likewise the agent can tell the host to keep going where
+  normally it would have stopped!
 
 • it remains to be "proven", but the author suspects this is more powerful
   than the exception model for certain techniques. it is nonetheless the
@@ -141,10 +164,34 @@ attempters pattern        yes         yes              yes
   an extra dimension. now the semantic taxonomy is divorced from the class
   taxonomy. handler trees can glom from other handler trees.
 
-• given how much dramatic sway the client can have on the agent's behavior
-  (depending on how the agent is written and how the client builds (or sets)
+• given how much dramatic sway the agent can have on the host's behavior
+  (depending on how the host is written and how the agent builds (or sets)
   the handlers), it starts to feel like a powerful little dependency injection
-  pattern. (we can imagine marionette strings between the client and the agent.)
+  pattern. (we can imagine marionette strings between the agent and the host.)
+
+
+
+## :#the-shorters-pattern in detail
+
+• this is something like a broadening of the "handler" pattern: it adds power
+  in one dimension and we lose power in another.
+
+• multiple callbacks may be associated with one channel. they are called
+  in some order (either defined or not, preferably it wil be defined);
+  and if any first callback results in a true-ish, it will be taken to be
+  something like an error code.
+
+• when such an error-code-is is resulted, further processing is
+  "short-circuted" (hence "shorters"), and this error-code-ish is the result
+  of the original call to the callbacks tree.
+
+• this is the way in which "handler" pattern is more powerful than this one:
+  with handler pattern, the host can write itself such that the handler
+  would override something that would normally be an error and instead
+  take some alternate action (sort of like a 'rescue' clause in ruby, or
+  'catch' clause in most other languages). with "shorters" pattern we lose
+  this.
+
 
 
 

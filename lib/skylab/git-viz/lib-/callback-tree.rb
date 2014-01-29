@@ -2,7 +2,7 @@ module Skylab::GitViz
 
   module Lib_
 
-    class Callback_Tree
+    class Callback_Tree  # read [#033] the different kinds of callback trees
 
       def initialize hash, identifier_x = self.class
 
@@ -10,11 +10,9 @@ module Skylab::GitViz
         p = -> h do
           h.keys.each do |k|
             x = h[ k ]
-            h[ k ] = case x
-            when :listeners
-              Listener_Leaf__.new
-            when :handler
-              Handler_Leaf__.new
+            cls = NODE_CLASS_H__[ x ]
+            h[ k ] = if cls
+              cls.new
             else
               p[ x ]
               Branch__.new x
@@ -25,7 +23,7 @@ module Skylab::GitViz
         @root = Branch__.new hash
       end
 
-      class Listener_Leaf__
+      class Listeners_Leaf__
         def initialize
           @p_a = nil
         end
@@ -43,11 +41,26 @@ module Skylab::GitViz
           @p = nil
         end
         attr_accessor :p
-        def type_i ; :handler end
         def to_handler_pair
           [ nil, @p ]
         end
       end
+
+      class Shorters_Leaf__
+        def initialize
+          @callback_x_a = nil
+        end
+        attr_reader :callback_x_a
+        def add_cb_x x
+          ( @callback_x_a ||= [] ) << x ; nil
+        end
+      end
+
+      NODE_CLASS_H__ = {
+        handler: Handler_Leaf__,
+        listeners: Listeners_Leaf__,
+        shorters: Shorters_Leaf__
+      }.freeze
 
       class Branch__
         def initialize h
@@ -77,6 +90,11 @@ module Skylab::GitViz
         node = rslv_some_node i_a
         node.p and raise ::KeyError, "won't clobber exiting '#{ i_a.last }'"
         node.p = p ; nil
+      end
+
+      def add_callback * i_a, x
+        node = rslv_some_node i_a
+        node.add_cb_x x ; nil
       end
 
     private
@@ -131,6 +149,39 @@ module Skylab::GitViz
         ( last_seen_p || p || ::Kernel.method( :raise ) )[ exception ]
       end
 
+      def call_shorters_with_map * i_a, p
+        ec = PROCEDE_
+        x_a = rslv_any_shorters_leaf_callback_x_a i_a
+        x_a and x_a.each do |x|
+          ec = p[ x ]
+          ec and break
+        end
+        ec
+      end
+
+      def aggregate_any_shorts_with_map * i_a, p
+        y = PROCEDE_
+        x_a = rslv_any_shorters_leaf_callback_x_a i_a
+        x_a and x_a.each do |x|
+          ec = p[ x ]
+          ec or next
+          ( y ||= [] ) << [ x, ec ]
+        end
+        y
+      end
+
+      def rslv_any_shorters_leaf_callback_x_a i_a
+        rslv_some_shorters_leaf( i_a ).callback_x_a
+      end
+
+      def rslv_some_shorters_leaf i_a
+        i_a.length.times.reduce @root do |m, d|
+          m.h.fetch i_a.fetch( d ) do
+            raise ::KeyError, say_no_such_channel( d, i_a )
+          end
+        end
+      end
+
       def say_no_such_channel d, a
         bad_k = a.fetch d ; any_good_k_a = a[ 0, d ]
         node = any_good_k_a.reduce @root do |m, k|
@@ -164,6 +215,46 @@ module Skylab::GitViz
       end
     protected
       attr_reader :root
+
+      class Mutable_Specification
+        def initialize
+          @h = { }
+        end
+        def << i
+          @h[ i ] = :shorters ; self
+        end
+        def flush
+          h = @h ; @h = nil
+          Specified_Callback_Tree_.new h
+        end
+      end
+
+      class Specified_Callback_Tree_ < self
+        class << self
+          alias_method :orig_new, :new
+          def new h
+            ::Class.new( self ).class_exec do
+              class << self ; alias_method :new, :orig_new ; end
+              const_set :H__, h.freeze
+              self
+            end
+          end
+        end
+
+        def initialize identifier_x=self.class
+          super DEEP_DUP_H__[ self.class::H__ ], identifier_x
+        end
+        DEEP_DUP_H__ = -> h do
+          h_ = {}
+          h.each_pair do |k, x|
+            ::Hash.try_convert( x ) and x = DEEP_DUP_H__[ x ]
+            h_[ k ] = x
+          end
+          h_
+        end
+      end
+
+      PROCEDE_ = nil
     end
   end
 end

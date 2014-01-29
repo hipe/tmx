@@ -25,9 +25,8 @@ module Skylab::GitViz
       private
 
         def load_plugins
-          @plugin_h = {}
-          @plugin_listener_matrix =
-            self.class.const_get( :Plugin_Listener_Matrix, false ).new
+          @plugin_conduit_h = {}
+          init_plugin_listener_matrix_if_necessary
           conduit = plugin_conduit_cls.new @y, self
           box_mod = self.class::Plugins__
           box_mod.dir_pathname.children( false ).each do |pn|
@@ -41,19 +40,27 @@ module Skylab::GitViz
           init_plugins
         end ; WHITE_SLUG_RX__ = /\A[a-z]/
 
+        def init_plugin_listener_matrix_if_necessary
+          @callbacks ||= bld_plugin_listener_matrix
+        end
+
+        def bld_plugin_listener_matrix
+          self.class.const_get( :Callback_Tree__, false ).new
+        end
+
         def plugin_conduit_cls
           self.class.plugin_conduit_class
         end
 
         def idx_plugin cond
           k = cond.name.norm_i ; did = false
-          pi_listener_matrix = @plugin_listener_matrix
+          callbacks = @callbacks
           cond.plugin.class.instance_methods( false ).each do |m_i|
             ON_RX__ =~ m_i or next
             did ||= true
-            ( pi_listener_matrix[ m_i ] ||= [] ) << k
+            callbacks.add_callback m_i, k
           end
-          @plugin_h[ k ] = cond ; nil
+          @plugin_conduit_h[ k ] = cond ; nil
         end
         ON_RX__ = /\Aon_/
 
@@ -65,7 +72,8 @@ module Skylab::GitViz
           @op = GitViz::Lib_::OptionParser[].new
           write_plugin_host_option_parser_options  # :+#hook-out
           rc = PROCEDE_
-          emit_to_plugins :on_build_option_parser do |cond|
+          emit_to_plugins :on_build_option_parser do |plugin_i|
+            cond = @plugin_conduit_h.fetch plugin_i
             op = Plugin_Option_Parser_Proxy_.new( a = [] )
             rc = cond.plugin.on_build_option_parser op
             rc and break
@@ -76,27 +84,16 @@ module Skylab::GitViz
 
         def emit_to_plugins m_i, * a, & p  # #storypoint-60
           a.length.nonzero? and p and raise ::ArgumentError
-          p ||= -> cond do
-            cond.plugin.send m_i, *a
+          p ||= -> plugin_i do
+            @plugin_conduit_h.fetch( plugin_i ).plugin.send m_i, * a
           end
-          ec = PROCEDE_
-          k_a = @plugin_listener_matrix[ m_i ]
-          k_a and k_a.each do |k|
-            ec = p[ @plugin_h.fetch( k ) ]
-            ec and break
-          end
-          ec
+          @callbacks.call_shorters_with_map m_i, p
         end
 
         def emit_to_every_plugin m_i, * a  # #storypoint-75
-          y = PROCEDE_
-          @plugin_listener_matrix[ m_i ].each do |k|
-            conduit = @plugin_h.fetch k
-            ec = conduit.plugin.send m_i, * a
-            ec or next
-            ( y ||= [] ) << [ conduit, ec ]
+          @callbacks.aggregate_any_shorts_with_map m_i, -> plugin_i do
+            @plugin_conduit_h.fetch( plugin_i ).plugin.send m_i, * a
           end
-          y
         end
       end
 
