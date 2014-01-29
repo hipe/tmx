@@ -6,14 +6,13 @@ module Skylab::GitViz
 
       def initialize y
         @cache = Test_Lib_::Mock_System::Mock_Command_IO_Cache_.new
-        h = Handlers__.new
-        @handlers = h
+        @callbacks = Callbacks__.new
         @y = y
       end
 
-      class Handlers__ < GitViz::Lib_::Handlers
+      class Callbacks__ < GitViz::Lib_::Callback_Tree
         def initialize
-          super response_started: nil
+          super response_started: :handler  # #todo:next-commit this is a listener not a handler
         end
       end
 
@@ -22,11 +21,11 @@ module Skylab::GitViz
       end
 
       def on_response_started &p
-        @handlers.set :response_started, p ; nil
+        @callbacks.set_handler :response_started, p ; nil
       end
 
       def process_strings a
-        Respond__.new( @y, @cache, @handlers, a ).respond
+        Respond__.new( @y, @cache, @callbacks, a ).respond
       end
 
       def clear_cache_for_manifest_pathname pn
@@ -64,10 +63,10 @@ module Skylab::GitViz
 
       class Respond__ < Response_Agent_
 
-        def initialize y, cache, handlers, s_a
-          @cache = cache ; @handlers = handlers ; @s_a = s_a
+        def initialize y, cache, callbacks, s_a
+          @cache = cache ; @callbacks = callbacks; @s_a = s_a
           response = Response__.new
-          handlers.call :response_started, response do end
+          callbacks.call_handler :response_started, response do end
           super y, response
         end
 
@@ -82,13 +81,13 @@ module Skylab::GitViz
 
         def prepare
           ec, @request = Fixture_Server::Prepare_.
-            new( @y, @s_a, @handlers, @response ).prepare
+            new( @y, @s_a, @callbacks, @response ).prepare
           ec
         end
 
         def reduce
           Fixture_Server::Reduce_.
-            new( @y, @cache, @request, @handlers, @response ).reduce
+            new( @y, @cache, @request, @callbacks, @response ).reduce
         end
       end
 

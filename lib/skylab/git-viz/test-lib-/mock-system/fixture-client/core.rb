@@ -4,6 +4,7 @@ module Skylab::GitViz
 
     class Fixture_Client  # [#024] taste the pain of too much docs
 
+      Mock_System::Plugin_::Host[ self ]
       Mock_System::Socket_Agent_[ self ]
       include Socket_Agent_Constants_
 
@@ -14,16 +15,59 @@ module Skylab::GitViz
         @poll_timeout_milliseconds = 1000
         @port_d = port_d
         @program_name = program_name
-        @timeout_seconds = 2
         @stdout = sout
+        init_info_yielder
+      end
+    private
+      def init_info_yielder
+        @y = ::Enumerator::Yielder.new do |msg|
+          msg.chomp!
+          emit_info_string msg
+        end
+      end
+    public
+
+      event_a = %i( on_build_option_parser )
+
+      def write_plugin_host_option_parser_options
+        # currenly all options exist only in the plugins
+      end
+
+      def write_plugin_host_option_parser_help_option
+        @op.on '--help','this screen.' do
+          @y << "usage: #{ ::File.basename $PROGRAM_NAME } [opts] -- [request]"
+          @y << "options:"
+          @op.summarize @y
+          @result_code = EARLY_EXIT_
+        end
       end
 
       def invoke
-        rc = establish_connection
-        rc || execute_with_connection
+        ec = load_plugins
+        ec ||= parse_parameters
+        ec ||= establish_connection
+        ec || execute_with_connection
       end
 
     private
+
+      def parse_parameters
+        ec = parse_options
+        ec || parse_arguments
+      end
+
+      def parse_arguments
+        # let all pass thru to nextstream
+      end
+
+      def parse_options
+        @result_code = PROCEDE_
+        @op.parse!
+        @result_code
+      rescue ::OptionParser::ParseError => e
+        emit_error_string e.message
+        EARLY_EXIT_
+      end
 
       def establish_connection
         init_context
@@ -94,7 +138,7 @@ module Skylab::GitViz
       def timeout_s
         secs = @poll_timeout_milliseconds * 1.0 / 1000
         secs_d = secs.to_i
-        1 == secs_d or s = 's'
+        1.0 == secs or s = 's'
         "#{ secs_d == secs ? secs_d : secs } second#{ s }"
       end
 
@@ -187,6 +231,8 @@ module Skylab::GitViz
       def emit_row * x_a
         @stdout.write "#{ x_a * "\t" }\n"
       end
+
+      Plugin_Listener_Matrix = ::Struct.new( * event_a )
     end
 
     class Fixture_Client::Re_Marshaller_
@@ -279,7 +325,7 @@ module Skylab::GitViz
 
     class Fixture_Client  # (re-open)
 
-      GENERAL_ERROR_ = 63 ; NO_SERVER_ = 25
+      NO_SERVER_ = 25
       SUCCESS_ = 0 ; ZMQ_ERROR_CODE_ = -1
 
     end

@@ -40,7 +40,7 @@ triad-lookup-system-commands () {
   # a great battle was waged below to give you 2 streams & rc. fittingly ironic
   typeset tmpfile; tmpfile==()
   # serr "  (tmpfile: $tmpfile)"  # #debugging
-  $mani_API_path --manifest-path $mani_path $* 1>$tmpfile 2>&2
+  $mani_API_path -- --manifest-path $mani_path $* 1>$tmpfile 2>&2
   remote_rc=$?
   while read -r line ; do
     --triad-process-API-statement

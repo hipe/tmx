@@ -32,15 +32,14 @@ module Skylab::GitViz
           box_mod = self.class::Plugins__
           box_mod.dir_pathname.children( false ).each do |pn|
             name = Name.from_local_pathname pn
-            DASH__ == name.getbyte( 0 ) and next
+            WHITE_SLUG_RX__ =~ name.as_slug or next
             cond = conduit.curry name
             plugin = box_mod.const_get( name.as_const, false ).new cond
             cond.plugin = plugin
             idx_plugin cond
           end
           init_plugins
-        end
-        DASH__ = '-'.getbyte 0
+        end ; WHITE_SLUG_RX__ = /\A[a-z]/
 
         def plugin_conduit_cls
           self.class.plugin_conduit_class
@@ -80,9 +79,9 @@ module Skylab::GitViz
           p ||= -> cond do
             cond.plugin.send m_i, *a
           end
-          k_a = @plugin_listener_matrix[ m_i ]
           ec = PROCEDE_
-          k_a.each do |k|
+          k_a = @plugin_listener_matrix[ m_i ]
+          k_a and k_a.each do |k|
             ec = p[ @plugin_h.fetch( k ) ]
             ec and break
           end
@@ -141,9 +140,6 @@ module Skylab::GitViz
         end
       public
         attr_reader :as_const, :as_human, :as_slug, :norm_i
-        def getbyte d
-          @as_slug.getbyte d
-        end
       end
 
       class Plugin_Conduit_  # see [#031]:#understanding-plugin-conduits

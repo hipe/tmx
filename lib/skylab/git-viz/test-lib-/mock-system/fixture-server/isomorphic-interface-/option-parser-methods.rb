@@ -23,9 +23,13 @@ module Skylab::GitViz
 
         def parse_options_with_option_parser
           @op.parse! @argv
-          do_exit_early ? EARLY_EXIT_ : PROCEDE_
+          do_exit_early ? code_for_early_exit : PROCEDE_
         rescue ::OptionParser::ParseError => e
           when_option_parser_parse_error e
+        end
+
+        def code_for_early_exit
+          self.class::EARLY_EXIT_
         end
 
         def when_option_parser_parse_error e
@@ -38,9 +42,8 @@ module Skylab::GitViz
         end
 
         def error_code_for_general_failure
-          GENERAL_ERROR_
+          self.class::GENERAL_ERROR_
         end
-
 
         def build_option_parser
           op = GitViz::Lib_::OptionParser[].new
@@ -182,8 +185,6 @@ module Skylab::GitViz
             end ; m
           end
         end
-
-        EARLY_EXIT_ = 33
       end
     end
   end

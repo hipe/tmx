@@ -12,9 +12,11 @@ module Skylab::GitViz
           :required, :accumulating, :argument, :command_white_filter_regex,
           :required, :argument, :manifest_path ]
 
-        def initialize y, s_a, handlers, response
+        include Socket_Agent_Constants_  # error codes
+
+        def initialize y, s_a, callbacks, response
           @argv = s_a  # #hook-out
-          @handlers = handlers
+          @callbacks = callbacks
           super y, response
         end
 

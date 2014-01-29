@@ -100,7 +100,7 @@ module Skylab::GitViz
             o.parse_all_ASAP = false
             o.when_retrieve_existing = IDENTITY_P__
             o.when_created_new = IDENTITY_P__
-            o.handlers = nil
+            o.callbacks = nil
           end
         end
         def retrieve_or_init &p
@@ -156,7 +156,7 @@ module Skylab::GitViz
         def initialize container
           @container = container
         end
-        [ :IO_class=, :IO_key=, :handlers=, :parse_all_ASAP=,
+        [ :IO_class=, :IO_key=, :callbacks=, :parse_all_ASAP=,
               :when_retrieve_existing=, :when_created_new= ].each do |i|
           define_method i do |x|
             @container.send i, x
@@ -165,7 +165,7 @@ module Skylab::GitViz
       end
 
       class Request_for_Lookup_IO__
-        attr_accessor :handlers, :IO_class, :IO_key, :parse_all_ASAP,
+        attr_accessor :callbacks, :IO_class, :IO_key, :parse_all_ASAP,
           :when_retrieve_existing, :when_created_new
         def normalize
           [ :IO_class, :IO_key,
@@ -203,7 +203,7 @@ module Skylab::GitViz
         def receive_entry p
           ec = p[ cmd = Stored_Command_.new ]  # #jump-1
           if ! ec && @parse_now
-            ec = cmd.parse_with_context_and_handlers @pscn, @lookup.handlers
+            ec = cmd.parse_with_context_and_handlers @pscn, @lookup.callbacks
           end
           ec or accept_entry cmd
         end
@@ -221,7 +221,7 @@ module Skylab::GitViz
 
         def initialize pscn, lookup, accept_entry_p
           @accept_entry_p = accept_entry_p
-          @handlers = lookup.handlers
+          @callbacks = lookup.callbacks
           @pscn = pscn
         end
         def curry
@@ -268,8 +268,7 @@ module Skylab::GitViz
         def validate_first_line
           if VALID_FIRST_LINE_RX__ !~ @line
             _ex = Entry_Head_Can_Have_No_Indent.new @pscn
-            @handlers.call :error, :parse, :entry_head_with_indent, _ex,
-              & method( :fail )
+            @callbacks.call_handler :error, :parse, :entry_head_with_indent, _ex
           end
         end
         VALID_FIRST_LINE_RX__ = /\A[^[:space:]]/
@@ -302,7 +301,7 @@ module Skylab::GitViz
 
         def emit_error_of_entry_with_no_body
           _ex = Entry_Must_Have_Body.new @pscn
-          @handlers.call :error, :parse, :entry_with_no_body, _ex
+          @callbacks.call_handler :error, :parse, :entry_with_no_body, _ex
         end
 
         def flush
@@ -406,10 +405,10 @@ module Skylab::GitViz
           @did_parse or @parse_result = parse
           @parse_result
         end
-        def parse_with_context_and_handlers pscn, handlers
-          @parse_ctxt = pscn ; @handlers = handlers
+        def parse_with_context_and_handlers pscn, cbx
+          @callbacks = cbx ; @parse_ctxt = pscn
           @parse_result = parse
-          @parse_ctxt = @handlers = nil
+          @parse_ctxt = @callbacks = nil
           @parse_result
         end
       private
@@ -450,7 +449,7 @@ module Skylab::GitViz
         def unexpected_term
           _ex = Unexpected_Term_Parse_Error.
             new @word_s, TERM_I_A__, @parse_ctxt.path, @line_no
-          @handlers.call :error, :parse, :unexpected_term, _ex
+          @callbacks.call_handler :error, :parse, :unexpected_term, _ex
         end
       end
       class Entry_Parse_Error < Manifest_Parse_Error
@@ -607,7 +606,7 @@ module Skylab::GitViz
           _col = @scn.pos + 1
           _ex = Entry_Parse_Error.new msg_s, @parse_ctxt.path, _line,
             @line_no, _col
-          @handlers.call :error, :parse, :entry, _ex
+          @callbacks.call_handler :error, :parse, :entry, _ex
         end
         def post_parse
           @any_opt_s ||= nil
@@ -872,6 +871,8 @@ module Skylab::GitViz
       end
 
       module Socket_Agent_Constants_  # first utilisant of [#hl-155] name conv.
+        # (e->3 g->6)
+        EARLY_EXIT_ = 33 ; GENERAL_ERROR_ = 63
         IO_THREADS_COUNT__ = 1
       end
 

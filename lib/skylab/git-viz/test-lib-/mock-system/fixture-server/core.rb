@@ -46,7 +46,7 @@ module Skylab::GitViz
 
       def write_plugin_host_option_parser_help_option  # #hook-out
         @op.on '--help', "this screen." do
-          @y << "usage: #{ ::File.basename $PROGRAM_NAME  } [opts]"
+          @y << "usage: #{ ::File.basename $PROGRAM_NAME } [opts]"
           @y << "description: fixture server. listens on port #{ @port_d }"
           @y << "options:"
           @op.summarize @y
@@ -296,8 +296,8 @@ module Skylab::GitViz
 
       # ~ constants used throughout this node
 
-      EARLY_EXIT_ = 33 ; Fixture_Server = self
-      GENERAL_ERROR_ = 3
+      Fixture_Server = self
+      GENERAL_ERROR_ = GENERAL_ERROR_
       MANIFEST_PARSE_ERROR_ = 36  # 3 -> m 9 -> p
       PROCEDE_ = nil ; SUCCESS_ = 0
     end

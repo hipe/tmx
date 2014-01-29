@@ -6,23 +6,23 @@ module Skylab::GitViz
 
       class Reduce_ < Response_Agent_
 
-        def initialize y, cache, request, handlers, response
-          @added_count = 0 ; @handlers = handlers
+        def initialize y, cache, request, callbacks, response
+          @added_count = 0
           @IO_cache = cache ; @mani_path = request.manifest_path
           @pn = ::Pathname.new @mani_path ; @request = request
-          init_handlers handlers
+          init_callbacks callbacks
           super y, response
         end
       private
-        def init_handlers handlers
-          h = Handlers__.new
-          h.set :error, :parse, method( :handle_parse_error )
-          h.glom handlers
-          @handlers = h
+        def init_callbacks callbacks
+          cb = Callbacks__.new
+          cb.set_handler :error, :parse, method( :handle_parse_error )
+          cb.glom callbacks
+          @callbacks = cb
         end
-        class Handlers__ < GitViz::Lib_::Handlers
+        class Callbacks__ < GitViz::Lib_::Callback_Tree
           def initialize
-            super error: { parse: nil }
+            super error: { parse: :handler }
           end
         end
         def handle_parse_error ex
@@ -63,7 +63,7 @@ module Skylab::GitViz
             o.parse_all_ASAP = true
             o.when_retrieve_existing= method :use_cached_mani_from_IO_cache
             o.when_created_new= method :created_new_mani_from_IO_cache
-            o.handlers = @handlers
+            o.callbacks = @callbacks
           end
         end
         def use_cached_mani_from_IO_cache mani
