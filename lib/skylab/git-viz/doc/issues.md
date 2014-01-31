@@ -29,7 +29,7 @@
 [#008]       #parent-node:[#005] the VCS adapter agent narrative ..
 [#007]       #parent-node:[#005] the CLI action narrative ..
 [#006]       #parent-node:[#005] the CLI client narrative ..
-[#005]       #doc-node the application narrative
+[#005]       #doc-node the application narrative ..
 [#004]       #parent-node:[#005] the infrastructure narrative ..
 [#003]       #parent-node:[#005] the API action narrative ..
 [#002]       #parent-node:005 "grit.."

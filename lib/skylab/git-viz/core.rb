@@ -1,5 +1,5 @@
 
-# read [#018]:#this-node-looks-funny-because-it-is-multi-domain
+# read [#005]:#this-node-looks-funny-because-it-is-multi-domain
 
 require 'pathname'
 
