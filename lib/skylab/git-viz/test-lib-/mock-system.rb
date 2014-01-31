@@ -445,7 +445,7 @@ module Skylab::GitViz
       end
       class Unexpected_Term_Parse_Error < Entry_Parse_Error
         def initialize s, a, path, line_no
-          _s = GitViz::Lib_::Oxford[ ', ', '[none]', ' or ', a ]
+          _s = GitViz::Lib_::Oxford_or[ a ]
           super "unexpected term. did you mean #{ _s }?",
             path, "[..]#{ s }", line_no, COLUMN__
         end

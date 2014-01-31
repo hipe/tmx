@@ -19,10 +19,9 @@ module Skylab::GitViz
            }not to engage in that behavior." do
           @be_on = false
         end
-        PROCEDE_
       end
 
-      def on_responder_initted responder
+      def on_front_responder_initted responder
         if @be_on
           GitViz::Lib_::Listen[]  # kick it early just to fail fast
           @responder = responder

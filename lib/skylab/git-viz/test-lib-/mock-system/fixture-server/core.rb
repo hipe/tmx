@@ -9,24 +9,29 @@ module Skylab::GitViz
       include Socket_Agent_Constants_
 
       def initialize serr, port_d, argv
-        @argv = argv
-        @buffer_a = []
-        @is_running = false
-        @serr = serr
-        @port_d = port_d
-        @y = ::Enumerator::Yielder.new( & serr.method( :puts ) )
+        @argv = argv ; @buffer_a = []
+        @serr = serr ; @port_d = port_d
+        @server_lifepoint_index = 0
+        @server_lifepoint_semaphore = Mutex.new
+        @y = ::Enumerator::Yielder.new do |msg|
+          @serr.puts msg
+          @serr.flush  # makes a different if you are tailing the log
+          @y
+        end
       end
 
       def run
         ec = load_plugins
         ec ||= parse_parameters
-        ec ||= init_responder
-        ec ||= resolve_context
-        ec ||= resolve_and_bind_socket
-        ec || trap_interrupt
-        ec ||= notify_plugins_of_start
+        ec ||= init_front_responder
+        ec ||= resolve_context_and_bind_reply_socket
+        ec || set_signal_handlers
+        ec ||= call_plugin_shorters :on_start
         ec || run_loop
       end
+
+      callbacks = build_mutable_callback_tree_specification
+      callbacks << :on_start
 
     private
 
@@ -42,8 +47,7 @@ module Skylab::GitViz
         end
       end
 
-      spec = build_mutable_callback_tree_specification
-      spec << :on_build_option_parser
+      callbacks << :on_build_option_parser
 
       def write_plugin_host_option_parser_help_option  # #hook-out
         @op.on '--help', "this screen." do
@@ -57,23 +61,19 @@ module Skylab::GitViz
 
       def parse_parameters
         ec = parse_options
-        ec ||= post_parse_options
+        ec ||= call_plugin_shorters :on_options_parsed
         ec || parse_arguments
       end
+      callbacks << :on_options_parsed
 
       def parse_options
         @result_code = nil
         @op.parse! @argv
         @result_code
       rescue ::OptionParser::ParseError => e
-        @y << e.message
+        @y << "fixture server: #{ e.message }"
         EARLY_EXIT_
       end
-
-      def post_parse_options
-        emit_to_plugins :on_options_parsed
-      end
-      spec << :on_options_parsed
 
       def parse_arguments
         if @argv.length.nonzero?
@@ -82,125 +82,92 @@ module Skylab::GitViz
         end
       end
 
-      def init_responder
-        @responder = self.class::Responder__.new @y
-        emit_to_plugins :on_responder_initted, @responder
+      def init_front_responder
+        @front_responder = self.class::Responder__.new @y
+        call_plugin_shorters :on_front_responder_initted, @front_responder
       end
-      spec << :on_responder_initted
+      callbacks << :on_front_responder_initted
 
-      def resolve_and_bind_socket
-        @socket = @context.socket ::ZMQ::REP
-        d = @socket.bind "tcp://*:#{ @port_d }"
-        d.nonzero? and when_socket_bind_failure d
-      end
-
-      def trap_interrupt
-        trap "INT" do
-          @y << "received interrupt signal."
-          shutdown_if_necessary 'interrupt signal'
+      def set_signal_handlers
+        trap 'INT' do
+          @y << "(caught interrupt. #{
+            }will attempt to shutdown at receive failure..)"
         end
+      end
 
-        at_exit do  # typically issued explicitly only during echo-debugging
-          if @is_running
-            @y << "shutting down because received 'exit' callback."
-            shutdown
+      def report_and_result_in_socket_recv_failure
+        ec = super
+        ZMQ_INTERRUPT_ERROR__ == ec and d = shutdown_during_interrupt and ec = d
+        ec
+      end
+      ZMQ_INTERRUPT_ERROR__ = 4
+
+      def shutdown_during_interrupt
+        @buffer_a.length.nonzero? and report_lost_buffer_during_shutdown
+        name = Test_Lib_::Mock_System::Plugin_::Name.from_human 'the server'
+        host = plugin_conduit_cls.new( @y, self ).curry name
+        yy = host.get_qualified_stderr_line_yielder
+        rc = host.shut_down "due to interrupt" do |sd|
+          sd.when_did_not do |msg|
+            yy << msg
+            GENERAL_ERROR_
           end
+          sd.when_did yy.method :<<
+          sd.info_line @y.method :<<
+          sd.info_line_head @serr.method :write
+          sd.info_line_tail @serr.method :puts
         end
+        rc || SUCCESS_
       end
 
-      def shutdown_if_necessary s
-        if @is_running
-          shutdown
-        else
-          @y << "(shutdown already in progress at #{ s })"
-          PROCEDE_
-        end
-      end
-
-      def shutdown
-        @is_running or fail "sanity - check 'is_running' before shutdown"
-        @is_running = false
-        @y << "shutting down plugins.."
-        shutdown_every_plugin
-        @serr.write "shutting down server .."
-        ec = close_socket_and_terminate_context
-        ec or begin @y << " done." ; nil end
-      end
-
-      def shutdown_every_plugin
-        a = emit_to_every_plugin :on_shutdown
-        a and when_some_plugins_have_issues_shutting_down a ; nil
-      end
-      spec << :on_shutdown
-
-      def when_some_plugins_have_issues_shutting_down a
-        first = true
-        a.each do |conduit, ec|
-          @y << "had issue shutting down '#{ conduit.name.as_human }'#{
-            } plugin (exitcode #{ ec })"
-          first or next
-          first = true
-          @result_code = ec
-        end ; nil
+      def report_lost_buffer_during_shutdown
+        @y << "(request starting with '#{ @buffer_a.first }' will not be #{
+          }processed due to being interrupted by a shutdown)"
       end
 
       def run_loop
-        @is_running = true ; @result_code = SUCCESS_
-        @y << "fixture server running #{ rb_environment_moniker } #{
-          }listening on port #{ @port_d }"
+        @server_lifepoint_index += 1
+        @result_code = SUCCESS_
+        call_plugin_listeners :on_beginning_of_loop
         begin
-          ec = exec_loop_body
+          ec = execute_loop_body
           ec and break
-        end while @is_running
+        end while is_running
         ec and @result_code = ec
+        call_plugin_listeners :on_end_of_loop
+        call_plugin_listeners :on_finalize
         @result_code
       end
+      callbacks.listeners :on_beginning_of_loop
+      callbacks.listeners :on_end_of_loop
+      callbacks.listeners :on_finalize
 
-      def rb_environment_moniker
-        "#{ rb_engine_moniker } #{ ::RUBY_VERSION }"
+      def execute_loop_body
+        ec = recv_strings @buffer_a
+        ec or call_plugin_listeners :on_received_request_strings
+        ec || process_received_strings
       end
-
-      def rb_engine_moniker
-        s = ::RUBY_ENGINE
-        case s
-        when 'ruby';'MRI ruby'
-        else ; "#{ s } ruby"
-        end
-      end
-
-      def exec_loop_body
-        d = @socket.recv_strings @buffer_a
-        if @is_running  # ignore recv interrupts except in in case of INT
-          if 0 > d
-            when_recv_failure
-          else
-            process_received_strings
-          end
-        end
-      end
-
-      def when_recv_failure
-        ec = report_socket_recv_failure
-        shutdown_if_necessary 'receive failure'
-        ec
-      end
+      callbacks.listeners :on_received_request_strings
 
       def process_received_strings
-        if @buffer_a.length.nonzero? and
-            DASH__ != @buffer_a.fetch( 0 ).getbyte( 0 ) and
-              prs_server_directive_from_buffer_a
+        if is_server_directive  # #jump-1, #[#018]:#what-are-server-directives
           prcss_server_directive
         else
-          prcss_received_strings_with_responder
+          prcss_received_strings
         end
+      end
+
+      def is_server_directive
+        ok = @buffer_a.length.nonzero?
+        ok &&= DASH__ != @buffer_a.fetch( 0 ).getbyte( 0 )
+        ok && can_and_do_preprocess_server_directive
       end ; DASH__ = '-'.getbyte 0
 
-      def prs_server_directive_from_buffer_a
-        const_i = @buffer_a.fetch( 0 ).gsub( /(?:^|( ))([a-z])/ ) do
-          "#{ '_' if $~[1] }#{ $~[2].upcase }"
-        end.intern
-        if Fixture_Server::Alternate_Responders__.const_defined? const_i, false
-          @responder_const_i = const_i ; @buffer_a.shift ; true
+      def can_and_do_preprocess_server_directive
+        slug_s = @buffer_a.fetch( 0 ).gsub ' ', '-'
+        i = Constify_map_reduce_slug_[ slug_s ]
+        if i and Fixture_Server::Alternate_Responders__.const_defined? i, false
+          @responder_const_i = i ; @buffer_a.shift ; true
         end
       end
 
@@ -215,20 +182,135 @@ module Skylab::GitViz
         ec
       end
 
+      def prcss_received_strings
+        call_plugin_listeners :on_request, @buffer_a
+        @buffer_a.length.nonzero? and prcss_received_strings_with_responder
+      end
+      callbacks.listeners :on_request
+
       def prcss_received_strings_with_responder
-        response = @responder.process_strings @buffer_a
+        response = @front_responder.process_strings @buffer_a
         @buffer_a.clear
         s_a = response.flatten_via_flush
-        ec = emit_to_plugins :on_response, s_a
+        ec = call_plugin_shorters :on_response, s_a
         ec or send_strings s_a
       end
-      spec << :on_response
+      callbacks << :on_response
 
+      callbacks << :on_shutdown
 
-      def notify_plugins_of_start
-        emit_to_plugins :on_start
+      Callback_Tree__ = callbacks.flush  # then used by plugin subsystem
+
+      # ~ small private utility methods used everywhere
+
+      def is_running
+        SERVER_IS_RUNNING_LIFEPOINT_INDEX_ == @server_lifepoint_index
+      end ; SERVER_IS_RUNNING_LIFEPOINT_INDEX_ = 1
+
+      def emit_error_string s  # #hook-out
+        @y << s
       end
-      spec << :on_start
+
+      # ~ the plugin API touchbacks: exposed channels from plugin to host
+
+      public
+      plugin_conduit_class
+
+      class Plugin_Conduit  # ~ plugins can know the port
+        def port_d
+          up.port_d_for_plugin
+        end
+      end
+      def port_d_for_plugin
+        @port_d
+      end
+
+      class Plugin_Conduit  # ~ plugins can have a reference to our stderr
+        def stderr_reference
+          up.stderr_reference_for_plugin
+        end
+      end
+      def stderr_reference_for_plugin  # #hook-out too
+        -> { @serr }
+      end
+
+      class Plugin_Conduit  # ~ plugins can change the stderr file descriptor
+        def swap_stderr fh
+          up.swap_stderr_for_plugin fh
+        end
+      end
+      def swap_stderr_for_plugin fh
+        orig_x = @serr ; @serr = fh ; orig_x
+      end
+
+      class Plugin_Conduit  # ~ give plugins the ability to clear this cache
+
+        def clear_cache_for_manifest_pathname pn
+          up.clear_cache_for_mani_pn_from_plugin pn
+        end
+      end
+      def clear_cache_for_mani_pn_from_plugin pn
+        @front_responder.clear_cache_for_manifest_pathname pn
+      end
+
+      class Plugin_Conduit  # ~ lots of lowlevel access
+        def context_and_socket
+          up.context_and_socket_for_plugin
+        end
+        def bfr_a
+          up.instance_variable_get :@buffer_a
+        end
+        def call_every_plugin_shorter *a, &p
+          up.send :call_every_plugin_shorter, *a, &p
+        end
+        def dereference_plugin_symbol_to_conduit i
+          up.dereference_plugin_symbol_to_conduit i
+        end
+        def lifepoint_synchronize &p
+          up.lifepoint_synchronize_for_plugin( &p )
+        end
+        def tentative_result_code
+          up.instance_variable_get :@result_code
+        end
+        def shut_down msg, &p
+          Fixture_Server::Shut_Down__.new( self, msg, &p ).attempt_to_shutdown
+        end
+      end
+
+      def context_and_socket_for_plugin
+        [ @context, @socket ]
+      end
+
+      def dereference_plugin_symbol_to_conduit i
+        @plugin_conduit_h.fetch i
+      end
+
+      def lifepoint_synchronize_for_plugin &p
+        @server_lifepoint_semaphore.synchronize do
+          read_p = -> do
+            @server_lifepoint_index
+          end
+          inc_p = -> do
+            @server_lifepoint_index += 1
+          end
+          cnt = Lifepoint_Controller__.new -> { read_p[] }, -> { inc_p[] }
+          r = p[ cnt ]
+          read_p = inc_p = -> { } ; r
+        end
+      end
+      class Lifepoint_Controller__
+        def initialize a, b
+          @a = a ; @b = b
+        end
+        def lifepoint_index
+          @a[]
+        end
+        def increment_lifepoint_index
+          @b[]
+        end
+      end
+
+      # ~ protected classes used by here and/or by children
 
       class Response_Agent_
         def initialize y, response
@@ -240,68 +322,23 @@ module Skylab::GitViz
         end
       end
 
-      def emit_error_string s
-        @y << s
-      end
-
-      Callback_Tree__ = spec.flush
-
-    end
-
-
-    # ~ the plugin API touchbacks: exposed channels from plugin to host
-
-    class Fixture_Server  # (re-open)
-
-      plugin_conduit_class
-      class Plugin_Conduit  # ~ plugins can have raw stderr if they want it
-        def stderr
-          up.stderr_for_plugin_conduit
+      class Shutdown_Message_
+        def initialize reason_s
+          @message_s_a = [ 'shut it down', 'message', reason_s ]
         end
-      end
-      def stderr_for_plugin_conduit  # #hook-out to
-        @serr
+        attr_reader :message_s_a
       end
 
-      class Plugin_Conduit  # ~ plugins that run threads need this
-        def port_d
-          up.port_d_for_plugin
-        end
-      end
-      def port_d_for_plugin
-        @port_d
-      end
-
-      class Plugin_Conduit  # ~ give plugins the ability to clear this cache
-
-        def clear_cache_for_manifest_pathname pn
-          up.clear_cache_for_mani_pn_from_conduit pn
-        end
-      end
-      def clear_cache_for_mani_pn_from_conduit pn
-        @responder.clear_cache_for_manifest_pathname pn
-      end
-
-      class Plugin_Conduit  # ~ give plugins the ability to shutdown the server
-        def shutdown
-          up.shutdown_requested_by_plugin_conduit self
-        end
-      end
-      def shutdown_requested_by_plugin_conduit cond
-        @y << "received shutdown signal from #{ cond.name.as_human }.."
-        shutdown_if_necessary 'plugin request'
-      end
+      # ~ constants used throughout this node
 
       module Alternate_Responders__
         Autoloader_[ self, :boxxy ]
       end
 
-      # ~ constants used throughout this node
-
       Fixture_Server = self
       GENERAL_ERROR_ = GENERAL_ERROR_
       MANIFEST_PARSE_ERROR_ = 36  # 3 -> m 9 -> p
-      PROCEDE_ = nil ; SUCCESS_ = 0
+      PROCEDE_ = SILENT_ = nil ; SUCCESS_ = 0
     end
   end
 end

@@ -24,7 +24,7 @@ module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System::Plugin_
           def init_plugins
           end
 
-          public :load_plugins, :emit_to_plugins
+          public :load_plugins, :call_plugin_shorters
 
           spec = build_mutable_callback_tree_specification
           spec << :on_zwagolio
@@ -42,7 +42,7 @@ module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System::Plugin_
       it "o" do
         man = Mandango.new
         man.load_plugins
-        r = man.emit_to_plugins :on_zwagolio
+        r = man.call_plugin_shorters :on_zwagolio
         man.did.should eql :yep
         r.should eql :bingo
       end

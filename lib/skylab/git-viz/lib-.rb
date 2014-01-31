@@ -62,5 +62,8 @@ module Skylab::GitViz
         end * ''
       end
     end
+
+    Oxford_or = Oxford.curry[ ', ', '[none]', ' or ' ]
+    Oxford_and = Oxford.curry[ ', ', '[none]', ' and ' ]
   end
 end

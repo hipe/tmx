@@ -2,7 +2,7 @@
 
 ## statement of scope and purpose of this document
 
-there is a variety of callback patterns (at least four) that we want our
+there is a variety of callback patterns (at least five) that we want our
 "callback tree" to support. the document hopes to survey them one by one and
 with each pattern: explain its behavior, present potential applications for it
 (when interesting), and finally to highlight the differences among the
@@ -25,17 +25,36 @@ components and concepts at play here. (sadly the definitions are somewhat
 circular, but there was no easy way "around" this!)
 
 the "host" can be any object that accepts listeners to channels, and
-presumably then emits events at various points in its lifecycle.
+presumably then emits events at various points in its lifecycle. typically
+one or many "agents" will subscribe to these channels. depending on the
+pattern specified for the channel, either one or many agents may
+enlist/subscribe into that channel.
 
-the callbacks are concrete, callable proc-likes that represent the more
+
+
+### the shape of the callback
+
+the callbacks may be concrete, callable proc-likes that represent the more
 abstract notion of a corresponding "listener" behind them, which is to say we
 may use the term "callback" and "listener" somewhat interchangeably.
-(but note that what actually
+
+alternately the callbacks may be symbolic references (e.g ::Symbol's) that
+"point to" some object somewhere that will be used as a callback. facilities
+exist below for some callback patterns to support the front half of this, but
+the host must implement its own de-referencing of these "callback references"
+into actual objects that make the calls (see the "plugin" subsystem, wherever
+it is now).
+
+but with these various shapes of callback note that whatever actually
 happens when the callable is called is unimportant from the perspective of the
 host, except for in some cases the result value of the call, which will be
-explained below.)
+explained below.
 
-listeners subscribe to "channels": in this system the different kinds of
+
+
+###  the agent enlists/subscribes to "channels" of the host, and gets "events"
+
+listeners enlist/subscribe to "channels": in this system the different kinds of
 events that can be emitted by the host are organzied in a taxonomical tree
 structure (like files in a filesytem). the host defines this tree and
 listeners subscribe by referring to paths in that tree.
@@ -57,7 +76,7 @@ occurs once during the lifecycle of the host object; we are not sure which.
 
 
 
-## the different callback patterns in brief
+## #the-different-callback-patterns-in-brief
 
 currently we employ the below "several" patterns for accepting callbacks and
 in turn handling their responses. this document exists to guide their
@@ -65,17 +84,24 @@ attempted integration into one tree. we even considered (gulp) a plugin
 architecture for callback trees, but to introduce such a monstrosity now
 would certainly be premature albeit fun.
 
-the four patterns are "listeners", "handler", "shorters", "attempters".
+the five patterns are "callback", "listeners", "handler", "shorters",
+"attempters".
+
+• "callback" is the simplest: for a channel designated as "callback", at most
+  one listener proc-like can be associated with it. if the host uses what is
+  currently the only method available for invoking such a .. ahem .. callback,
+  then it is something like a required field for the host: it is assumed always
+  that it was set by the caller agent.
 
 • "listeners" are just plain old proc-likes that get called whenever the host
   deems it has reached that particular eventpoint. whatever their result is
   is ignored by the host, so multiple of them may be associated with any given
   channel.
 
-• "handler" is the pattern whereby rather than a set of listeners being
-  allowed to be specified, the channel node allows at most one callback
-  for that channel (think of it as a "slot"), with the many ramifications of
-  this discussed below.
+• "handler" is the pattern whereby at most one listener agent may "enlist"
+  into the "slot"-like spot. the tight specifications are discussed below for
+  what kind of events may be emitted into such a channel, and the logical
+  repercussions of the result that the agent gives back to the host here.
 
 • "shorters" allows multiple callbacks per channel and short-circuits on
   the first one that results in true-ish (treating it as if it is something
@@ -92,16 +118,37 @@ the four patterns are "listeners", "handler", "shorters", "attempters".
 ## the feature matrix
 
                     multiple?   inherits?   result matters?
+callback pattern           no          no              yes
 listeners pattern         yes         yes               no
 handlers pattern           no         yes              yes
 shorters pattern          yes          no              yes
 attempters pattern        yes          no              yes
 
 
-
-## the "listeners" pattern in detail
+## :#the-callback-pattern in detail
 
 • this is the simplest of the patterns
+
+• typically the host has one "agent" which is the caller, and the caller
+  sets the callback(s) to event handlers that handle events appropriately
+  for that "client-agent".
+
+• whether or not the result of the callback will affect the behavior of the
+  host (or merely constitute its return value, or not) is determined by how
+  the host is written.
+
+• in the interest of simplicity as a design goal, currently there is no
+  built-in facility for determining if any particular callback proc-like has
+  been set or not
+
+• so effectively a "callback"-style node in a callback tree is always a
+  required field.
+
+
+
+## :#the-listeners-pattern in detail
+
+• this is the second simplest of the patterns, next to "callback"
 
 • one such event will be dispatched outwards in two dimensions: "laterally"
   to any listeners listening to that channel, and then "upwards" to each
@@ -227,7 +274,50 @@ attempters pattern        yes          no              yes
 
 
 
+## issues in integrating all of them into one tree (:#storypoint-200)
 
-## issues in integrating all of them into one tree
+..are anticipated:
 
-.. are anticipated.
+at present no type assertions are performed explicitly to ensure that the
+callback pattern being invoked on the channel correspond to the callback
+pattern that was specified for that node when the tree was built.
+
+when we are lucky, in such cases the call will fail loudly because depending
+on the pattern being attempted the node may not have the correct shape; but
+this is not guaranteed.
+
+for example, a "handlers" node has a different shape than the "listeners",
+so to try to call listeners as if they were a handler will raise a runtime
+no method error.
+
+but there is crossover that is not yet fully established for the requirements
+of the underlying structures necessary to support the various higher-level
+patterns specified above:
+
+for all practical purposes shorters, attempters
+and listeners could all be implemented with the same class and as such the
+same set of callbacks could be treated either as passive listeners or active
+agents depending on how you call them and what you do with the result.
+
+if this ever becomes an issue we will add an extra type-check somewhere
+but for now in the spirit of experimentation this is left as-is.
+
+
+
+## :#storypoint:50
+
+this is an #experimental hack to let a polyadic node quack like a monadic node
+for the purposes of using a mutable conduit.
+
+consider that all available "write" operations on any mutable conduit are
+always of the "set-foo" and not of the "add-foo" variety: you are always
+setting a proc for a particular channel, you are never adding a proc to a set
+of procs. we intend to keep it this way as long as it is practical to.
+
+if no proc-likes have yet beed added to this node, the node accepts the
+argument proc and results in true-ish indicating success. alternately if the
+node already has one or more procs associated with it, the result is false-ish
+and no further behavior is reified.
+
+the caller bears the responsibility of reacting appropriately in such
+circumstances.

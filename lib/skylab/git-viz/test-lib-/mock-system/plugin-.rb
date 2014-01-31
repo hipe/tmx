@@ -10,9 +10,11 @@ module Skylab::GitViz
       end
 
       module Host_Module_Methods__
-        def build_mutable_callback_tree_specification
-          GitViz::Lib_::Callback_Tree::Mutable_Specification.new
-        end
+
+        define_method :build_mutable_callback_tree_specification,
+          GitViz::Lib_::Callback_Tree::Methods::
+            Build_mutable_callback_tree_specification
+
         def plugin_conduit_class
           if const_defined? :Plugin_Conduit, false
             self::Plugin_Conduit
@@ -75,7 +77,7 @@ module Skylab::GitViz
           cond.plugin.class.instance_methods( false ).each do |m_i|
             ON_RX__ =~ m_i or next
             did ||= true
-            callbacks.add_callback m_i, k
+            callbacks.add_callback_reference m_i, k
           end
           @plugin_conduit_h[ k ] = cond ; nil
         end
@@ -88,18 +90,24 @@ module Skylab::GitViz
         def init_option_parser_by_aggregating_plugin_options
           @op = GitViz::Lib_::OptionParser[].new
           write_plugin_host_option_parser_options  # :+#hook-out
-          rc = PROCEDE_
-          emit_to_plugins :on_build_option_parser do |plugin_i|
+          call_plugin_listeners :on_build_option_parser do |plugin_i|
             cond = @plugin_conduit_h.fetch plugin_i
             op = Plugin_Option_Parser_Proxy_.new( a = [] )
-            rc = cond.plugin.on_build_option_parser op
-            rc and break
+            cond.plugin.on_build_option_parser op
             Plugin_Option_Parser_Playback_.new( @y, @op, cond, a ).playback
           end
-          rc or write_plugin_host_option_parser_help_option && nil # :+#hook-out
+          write_plugin_host_option_parser_help_option  # :+#hook-out
+          PROCEDE__
         end
 
-        def emit_to_plugins m_i, * a, & p  # #storypoint-60
+        # read #storypoint-50 intro to "callback tree" event handling patterns
+
+        def call_plugin_listeners m_i, * a, & p
+          p = nrmlz_callback_map_args m_i, a, p
+          @callbacks.call_listeners_with_map m_i, p
+        end
+
+        def call_plugin_shorters m_i, * a, & p  # #storypoint-60
           p = nrmlz_callback_map_args m_i, a, p
           @callbacks.call_shorters_with_map m_i, p
         end
@@ -116,20 +124,25 @@ module Skylab::GitViz
           end
         end
 
-        def emit_to_every_plugin m_i, * a  # #storypoint-75
+        def call_every_plugin_shorter m_i, * a  # #storypoint-75
           @callbacks.aggregate_any_shorts_with_map m_i, -> plugin_i do
             @plugin_conduit_h.fetch( plugin_i ).plugin.send m_i, * a
           end
         end
+
+        PROCEDE__ = nil
       end
 
       class Name
         class << self
-          def from_local_pathname pn
-            allocate_with :initialize_with_local_pathname, pn
-          end
           def from_const const_i
             allocate_with :initialize_with_const_i, const_i
+          end
+          def from_human human_s
+            allocate_with :initialize_with_human, human_s
+          end
+          def from_local_pathname pn
+            allocate_with :initialize_with_local_pathname, pn
           end
           private :new
         private
@@ -145,12 +158,17 @@ module Skylab::GitViz
           @norm_i = const_i.to_s.downcase.intern
           init_slug ; init_human ; freeze
         end
+        def initialize_with_human human_s
+          @as_human = human_s.freeze
+          @as_slug = human_s.gsub( ' ', '-' ).freeze
+          init_norm ; init_const ; freeze
+        end
         def initialize_with_local_pathname pn
           @as_slug = pn.sub_ext( '' ).to_path.freeze
           init_const ; init_human ; init_norm ; freeze
         end
         def init_const
-          @as_const = Constate_[ @as_slug ]
+          @as_const = Constify_map_reduce_slug_[ @as_slug ]
         end
         def init_norm
           @norm_i = @as_slug.gsub( '-', '_' ).intern
@@ -196,12 +214,15 @@ module Skylab::GitViz
         end
 
         def get_qualified_serr
-          serr = @up_p[].stderr_for_plugin_conduit  # :+#hook-out
+          serr_p = @up_p[].stderr_reference_for_plugin  # :+#hook-out
           Write_Proxy__.new do |s|
             msg = Qualifiable_Message_String__.new s
             msg.graphic_prefix = graphic_prefix
             msg.agent_prefix = agent_prefix
-            serr.write "#{ msg }"
+            io = serr_p[]
+            r = io.write "#{ msg }"
+            io.flush
+            r
           end
         end
         class Write_Proxy__ < ::Proc

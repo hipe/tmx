@@ -159,9 +159,9 @@ module Skylab::GitViz
           1 == param_a.length or many = true
           "please provide the required (option-looking) parameter#{
             many && 's' }: #{
-              }#{ many && '(' }#{ OXFORD_AND__[ s_a ] }#{ many && ')' }"
+              }#{ many && '(' }#{ GitViz::Lib_::Oxford_and[ s_a ] }#{
+               }#{ many && ')' }"
         end
-        OXFORD_AND__ = GitViz::Lib_::Oxford.curry[ ', ', '[none]', ' and ' ]
 
         def error_code_for_missing_required_params
           error_code_for_general_failure

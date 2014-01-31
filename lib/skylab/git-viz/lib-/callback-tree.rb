@@ -13,9 +13,11 @@ module Skylab::GitViz
             cls = NODE_CLASS_H__[ x ]
             h[ k ] = if cls
               cls.new
-            else
+            elsif x.respond_to? :keys
               p[ x ]
               Branch__.new x
+            else
+              raise ::ArgumentError, Say_unknown_pattern__[ x ]
             end
           end
         end
@@ -23,54 +25,83 @@ module Skylab::GitViz
         @root = Branch__.new hash
       end
 
-      class Listeners_Leaf__
+      Say_unknown_pattern__ = -> x do
+        s_a = [ * NODE_CLASS_H__.keys.map { |i| "'#{ i }'" }, 'a hash-like' ]
+        "not a known pattern: '#{ x }'. expecting #{
+          }#{ GitViz::Lib_::Oxford_or[ s_a ] }."
+      end
+
+      module Mono_Methods_
         def initialize
-          @p_a = nil
+          @p = nil ; super
+        end
+        attr_reader :p
+        def attempt_set_mono_no_clobber p
+          ! @p and @p = p
+        end
+      end
+
+      module Poly_Methods_
+        def initialize
+          @p_a = nil ; super
         end
         attr_reader :p_a
         def add_p p
           ( @p_a ||= [] ) << p ; nil
         end
-        def retrieve_child i
-          raise ::KeyError, "off the end: '#{ i }'"
+        def attempt_set_mono_no_clobber p  # #stroypoint-50
+          ! @p_a and @p_a = [ p ] and true
         end
       end
 
-      class Handler_Leaf__
-        def initialize
-          @p = nil
-        end
-        attr_accessor :p
-        def to_handler_pair
-          [ nil, @p ]
-        end
-      end
-
-      class Shorters_Leaf__
-        def initialize
-          @callback_x_a = nil
-        end
+      module Symbolic_Callback_Methods_
         attr_reader :callback_x_a
         def add_cb_x x
           ( @callback_x_a ||= [] ) << x ; nil
         end
       end
 
+      class Callback_Leaf__
+        include Mono_Methods_
+      end
+
+      class Handler_Leaf__
+        include Mono_Methods_
+        def to_handler_pair
+          [ nil, @p ]
+        end
+        def accept_p x  # experimental support for "glom"
+          @p = x ; nil
+        end
+      end
+
+      class Listeners_Leaf__
+        include Symbolic_Callback_Methods_
+        include Poly_Methods_
+        def retrieve_child i
+          raise ::KeyError, "off the end: '#{ i }'"
+        end
+      end
+
+      class Shorters_Leaf__
+        include Symbolic_Callback_Methods_
+      end
+
       NODE_CLASS_H__ = {
+        callback: Callback_Leaf__,
         handler: Handler_Leaf__,
         listeners: Listeners_Leaf__,
         shorters: Shorters_Leaf__
       }.freeze
 
       class Branch__
+        include Poly_Methods_  # before below, which intercepts ..
+        include Mono_Methods_  #  .. 'attempt_set_mono_no_clobber'
+
         def initialize h
-          @h = h ; @p = @p_a = nil
+          @h = h ; super()
         end
-        attr_reader :h, :p_a
-        attr_accessor :p
-        def add_p p
-          ( @p_a ||= [] ) << p ; nil
-        end
+        attr_reader :h
         def to_handler_pair
           [ @h, @p ]
         end
@@ -79,22 +110,37 @@ module Skylab::GitViz
         end
       end
 
-      Node__ = ::Struct.new :h, :p
-
-      def add_listener * i_a, p
-        node = rslv_some_node i_a
-        node.add_p p ; nil
+      def set_callback * i_a, p
+        set_mono_no_clobber i_a, p
       end
 
       def set_handler * i_a, p
-        node = rslv_some_node i_a
-        node.p and raise ::KeyError, "won't clobber exiting '#{ i_a.last }'"
-        node.p = p ; nil
+        set_mono_no_clobber i_a, p
       end
 
-      def add_callback * i_a, x
+    private
+      def set_mono_no_clobber i_a, p
         node = rslv_some_node i_a
-        node.add_cb_x x ; nil
+        node.attempt_set_mono_no_clobber p or
+          raise ::KeyError, "won't clobber exiting '#{ i_a.last }'" ; nil
+      end
+    public
+
+      def add_listener * i_a, p
+        _node = rslv_some_node i_a
+        _node.add_p p ; nil
+      end
+
+      def add_callback_reference * i_a, x
+        _node = rslv_some_node i_a
+        _node.add_cb_x x ; nil
+      end
+
+      def build_yielder_for * i_a
+        node = rslv_some_node i_a
+        ::Enumerator::Yielder.new do |x|
+          node.p[ x ]  # bind it late
+        end
       end
 
     private
@@ -107,6 +153,16 @@ module Skylab::GitViz
         end
       end
     public
+
+      def call_callback * i_a, x
+        node = rslv_some_node i_a
+        if node.p
+          node.p[ x ]
+        else
+          raise "no callback set for '#{ i_a * ' ' }'"
+          # one day we might make a 'call any callback'
+        end
+      end
 
       def call_listeners * i_a, & p
         value_p = -> do
@@ -149,6 +205,13 @@ module Skylab::GitViz
         ( last_seen_p || p || ::Kernel.method( :raise ) )[ exception ]
       end
 
+      def call_listeners_with_map * i_a, p  # [#033]:#the-listeners-pattern
+        x_a = rslv_any_listeners_leaf_callback_x_a i_a
+        x_a and x_a.each do |x|
+          p[ x ]
+        end ; nil
+      end
+
       def call_attempters_with_map * i_a, p  # [#033]:#the-attempters-pattern
         did_succeed = false
         x_a = rslv_any_shorters_leaf_callback_x_a i_a
@@ -180,11 +243,15 @@ module Skylab::GitViz
         y
       end
 
-      def rslv_any_shorters_leaf_callback_x_a i_a
-        rslv_some_shorters_leaf( i_a ).callback_x_a
+      def rslv_any_listeners_leaf_callback_x_a i_a  # #storypoint-200
+        rslv_some_leaf( i_a ).callback_x_a
       end
 
-      def rslv_some_shorters_leaf i_a
+      def rslv_any_shorters_leaf_callback_x_a i_a
+        rslv_some_leaf( i_a ).callback_x_a
+      end
+
+      def rslv_some_leaf i_a
         i_a.length.times.reduce @root do |m, d|
           m.h.fetch i_a.fetch( d ) do
             raise ::KeyError, say_no_such_channel( d, i_a )
@@ -206,13 +273,13 @@ module Skylab::GitViz
         "there is no '#{ bad_k }' channel #{
          }at the '#{ _moniker }' node. #{
           }#{ article_adjective }known channel#{ s } #{ verb } #{
-           }#{ Oxford[ ', ', '[none]', ' and ', branch_s_a ] }#{
+           }#{ Oxford_and[ branch_s_a ] }#{
             } (for the #{ @identifier_x } callbacks)"
       end
 
       def glom other
         p = -> me, otr do
-          p_ = otr.p and me.p = p_
+          p_ = otr.p and me.accept_p p_
           h = me.h ; h_ = otr.h
           h && h_ and h.each_pair do |i, me_|
             otr_ = h_[ i ]
@@ -225,14 +292,32 @@ module Skylab::GitViz
       end
     protected
       attr_reader :root
+    public
 
       class Mutable_Specification
-        def initialize
-          @h = { }
+
+        def initialize host_module
+          @default_pattern_i = :shorters
+          @h = { } ; @host_module = host_module
         end
+
+        def default_pattern i
+          @default_pattern_i = i
+        end
+
         def << i
-          @h[ i ] = :shorters ; self
+          @h[ i ] = @default_pattern_i ; self
         end
+
+        def listeners i
+          @h[ i ] = :listeners ; nil
+        end
+
+        def end
+          _tree = flush
+          @host_module.const_set :Callback_Tree__, _tree ; nil
+        end
+
         def flush
           h = @h ; @h = nil
           Specified_Callback_Tree_.new h
@@ -261,6 +346,76 @@ module Skylab::GitViz
             h_[ k ] = x
           end
           h_
+        end
+      end
+
+      # ~ mutable conduits
+
+      class Specified_Callback_Tree_
+
+        def build_mutable_conduit
+          _cls = mtbl_conduit_class
+          _cls.new do |callback_i, p|
+            set_callback callback_i, p ; nil
+          end
+        end
+      private
+        def mtbl_conduit_class
+          cls = self.class
+          if cls.const_defined? :Mutable_Conduit__, false
+            cls::Mutable_Conduit__
+          else
+            cls.const_set :Mutable_Conduit__, bld_mutable_conduit_class
+          end
+        end
+      private
+        def bld_mutable_conduit_class
+          i_a = @root.h.keys
+          ::Class.new( Mutable_Conduit__ ).class_exec do
+            i_a.each do |m_i|
+              define_method m_i do |*a, &p|
+                p = ( p ? a << p : a ).fetch a.length - 1 << 1  # normalize 1 p
+                @p[ m_i, p ] ; p
+              end
+            end
+            self
+          end
+        end
+      end
+
+      class Mutable_Conduit__
+        def initialize & p
+          @p = p
+        end
+      end
+
+      # ~ host
+
+      Host = -> mod do
+        mod.send :define_singleton_method,
+          :build_mutable_callback_tree_specification,
+            Methods::Build_mutable_callback_tree_specification
+        mod.include Instance_Methods__ ; nil
+      end
+
+      module Instance_Methods__
+
+        def initialize(*)
+          init_callback_tree
+          super
+        end
+      private
+        def init_callback_tree
+          @callbacks = self.class.const_get( :Callback_Tree__, false ).new ; nil
+        end
+      end
+
+
+      # ~ methods
+
+      module Methods
+        Build_mutable_callback_tree_specification = -> do
+          Mutable_Specification.new self
         end
       end
 

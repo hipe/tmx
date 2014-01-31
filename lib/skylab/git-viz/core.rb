@@ -24,6 +24,8 @@ module Skylab::GitViz
       end ; nil
     end
 
+    EXTNAME_ = '.rb'.freeze
+
     module Boxxy_Methods__
       def const_defined? const_i, up=false
         is_indexed_for_boxxy or index_for_boxxy
@@ -41,15 +43,20 @@ module Skylab::GitViz
       def index_for_boxxy
         @is_indexed_for_boxxy = true ; a = [] ; h = {}
         dir_pathname.children( false ).each do |pn|
-          slug = pn.sub_ext( '' ).to_path
-          SLUG_WHITE_RX__ =~ slug or next
-          k = Constate_[ slug ]
-          a << k ; h[ k ] = true
+          path = pn.to_path  # #storypoint-50
+          slug, extname = path.split SPLIT_EXTNAME_RX_
+          ! extname || extname =~ EXTENSION_PASS_FILTER_RX_ or next
+          const_i = Constify_map_reduce_slug_[ slug ]
+          const_i or next
+          h[ const_i ] and next  # e.g both "foo.rb" and "foo/"
+          a << const_i ; h[ const_i ] = true
         end
         @boxxy_a = a.freeze ; @boxxy_h = h.freeze ; nil
       end
-      SLUG_WHITE_RX__ = /\A[a-z]/
     end
+
+    SPLIT_EXTNAME_RX_ = %r((?=\.[^.]+\z))
+    EXTENSION_PASS_FILTER_RX_ = /\A(?:#{ ::Regexp.escape EXTNAME_ }|)\z/
 
     module Deferred_Methods__
       def const_missing i
@@ -84,7 +91,7 @@ module Skylab::GitViz
       end
       attr_reader :dir_pathname
       def to_path
-        @dir_pathname.sub_ext( EXTNAME__ ).to_path
+        @dir_pathname.sub_ext( EXTNAME_ ).to_path
       end
       def get_const_missing i  # #hook-in
         Const_Missing__.new self, @dir_pathname, i
@@ -105,7 +112,7 @@ module Skylab::GitViz
       def load_and_get _correction_proc=nil
         @stem = @i.to_s.gsub( %r((?<=[a-z])(?=[A-Z])|_), '-' ).downcase
         @d_pn = @dir_pathname.join @stem
-        @f_pn = @d_pn.sub_ext EXTNAME__
+        @f_pn = @d_pn.sub_ext EXTNAME_
         if @f_pn.exist?
           when_file_exists
         elsif @d_pn.exist?
@@ -120,7 +127,7 @@ module Skylab::GitViz
       def when_neither_file_nor_dir_exist
         raise ::NameError, "uninitialized constant #{ @mod.name }::#{ @i } #{
           }and no directory[file] #{
-           }#{ @d_pn.relative_path_from @dir_pathname }[#{ EXTNAME__ }]"
+           }#{ @d_pn.relative_path_from @dir_pathname }[#{ EXTNAME_ }]"
       end
 
       def when_file_exists
@@ -146,21 +153,25 @@ module Skylab::GitViz
           enhance_loaded_value mod
           mod
         end
-      end
+      end ; CORE_FILE__ = "core#{ EXTNAME_ }".freeze
 
       def enhance_loaded_value mod
         Autoloader_[ mod, @d_pn ] ; nil
       end
     end
-
-    EXTNAME__ = '.rb'.freeze
-    CORE_FILE__ = "core#{ EXTNAME__ }".freeze
   end
 
-  Constate_ = -> do  # 'constantize' and 'constantify' are taken
-    rx = %r((?:(-)|^)([a-z]))
+  Constify_map_reduce_slug_ = -> do
+    white_rx = %r(\A[a-z][-a-z0-9]*\z)
+    gsub_rx = /(-+)([a-z])?/
     -> s do
-      s.gsub( rx ) { "#{ '_' if $~[1] }#{ $~[2].upcase }" }.intern
+      if white_rx =~ s
+        s_ = s.gsub( gsub_rx ) do
+          "#{ '_' * $~[1].length }#{ $~[2].upcase if $~[2] }"
+        end
+        s_[0] = s_[0].upcase
+        s_.intern
+      end
     end
   end.call
 

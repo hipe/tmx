@@ -6,6 +6,8 @@ module Skylab::GitViz::TestSupport::Callback_Tree
 
   include CONSTANTS
 
+  GitViz = GitViz
+
   extend TestSupport::Quickie
 
 end

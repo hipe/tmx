@@ -18,7 +18,6 @@ module Skylab::GitViz
               }when debugging, less if the output seems crufty." do |s|
              @max_width_s = s
         end
-        PROCEDE_
       end
 
       def on_options_parsed

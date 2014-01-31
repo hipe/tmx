@@ -29,6 +29,13 @@ plugin itself, which is of mixed shape.)
 there is a fair chance that these two concerns may split into two classes.
 
 
+## :#storypoint-50
+
+the below cluster of methods corresponds to a subset of [#033] the different
+kinds of callback tree patterns. see #the-different-callback-patterns-in-brief
+there.
+
+
 ## :#storypoint-60
 
 this method will yield the symbolic name of every plugin that listens to the

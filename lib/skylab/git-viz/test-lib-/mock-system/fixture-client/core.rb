@@ -18,20 +18,26 @@ module Skylab::GitViz
         @stdout = sout
         init_info_yielder
       end
+
     private
+
       def init_info_yielder
         @y = ::Enumerator::Yielder.new do |msg|
           msg.chomp!
           emit_info_string msg
         end
       end
-    public
 
-      spec = build_mutable_callback_tree_specification
-      spec << :on_build_option_parser
+      plugin_conduit_class
+      class Plugin_Conduit
+        GRAPHIC_PREFIX__ = 'plugin '.freeze
+      end
+
+      callbacks = build_mutable_callback_tree_specification
+      callbacks << :on_build_option_parser
 
       def write_plugin_host_option_parser_options
-        # currenly all options exist only in the plugins
+        # currently all options exist only in the plugins
       end
 
       def write_plugin_host_option_parser_help_option
@@ -42,6 +48,8 @@ module Skylab::GitViz
           @result_code = EARLY_EXIT_
         end
       end
+
+    public
 
       def invoke
         ec = load_plugins
@@ -71,10 +79,9 @@ module Skylab::GitViz
       end
 
       def establish_connection
-        init_context
-        init_socket
-        @socket.setsockopt ::ZMQ::LINGER, 0
-        connect_socket
+        resolve_context_and_bind_request_socket do |sckt|
+          sckt.setsockopt ::ZMQ::LINGER, 0
+        end
       end
 
       def execute_with_connection
@@ -153,7 +160,7 @@ module Skylab::GitViz
       def process_the_response_of_the_polling
         d = @socket.recv_strings( a = [] )
         if 0 > d
-          report_socket_recv_failure
+          report_and_result_in_socket_recv_failure
         else
           Re_Marshaller_.
             new( build_internal_dispatching_listener, a ).remarshall
@@ -233,7 +240,7 @@ module Skylab::GitViz
         @stdout.write "#{ x_a * "\t" }\n"
       end
 
-      Callback_Tree__ = spec.flush
+      Callback_Tree__ = callbacks.flush
     end
 
     class Fixture_Client::Re_Marshaller_
@@ -261,7 +268,7 @@ module Skylab::GitViz
         uniform_statement_processing_grammar
       end
       def uniform_statement_processing_grammar
-        send :"when_#{ 3 < @len_ ? :many : @len_ }_fields"
+        send :"when_#{ 2 < @len_ ? :many : @len_ }_fields"
       end
       def when_2_fields
         chan_i = @a_.first.intern ; x = @a_.last
@@ -290,7 +297,7 @@ module Skylab::GitViz
         emit_debug_string do
           "strange, got no result code from backend."
         end
-        SUCCESS_
+        Fixture_Client::SUCCESS_
       end
       def when_multiple_result_codes
         emit_debug_string do

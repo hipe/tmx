@@ -14,15 +14,7 @@ require_relative '../../core'
 
 # read [#018] the system call fixtures server narrative
 
-serr = $stderr
+_ec = Skylab::GitViz::Test_Lib_::Mock_System::Fixture_Server.
+  new( $stderr, 5555, ::ARGV ).run
 
-ec = Skylab::GitViz::Test_Lib_::Mock_System::Fixture_Server.
-  new( serr, 5555, ::ARGV ).run
-
-if ec
-  serr.puts "(middle server exiting with status #{ ec })"
-else
-  serr.puts "(middle server stopped with no exitstatus)"
-  ec = 0
-end
-exit ec
+exit _ec

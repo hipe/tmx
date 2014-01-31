@@ -2,10 +2,21 @@
 
 ## :#this-node-looks-funny-because-it-is-multi-domain
 
-we put this section up top because although its inspiration stems from the
-fixtures server, it has implications for the whole project. we experiment
-with our own autoloader for .. reasons. we squeeze everything out of this
-top 'core.rb' node but this for those resasons.
+this application-top file looks a lot different than its cousin files
+in other subsystems because of how much new and strange infrastructure
+is being developed in this project:
+
+• our server must use true concurrency *so*
+• our server must run in (e.g) rbx *and*
+• general skylab code is not (yet) rbx compatible *so*
+• we re-write those parts of general skylab that we need here
+ • which is of course a good first step towards the goal of [sl]-rbx compat.
+• those parts include things like:
+ • autoloading
+
+because this top core will be used by a variety of sub-sub-systems with a
+significant variety of different (and at times mutually incompatible)
+environments, it will be focued on very general concerns (like autoloading).
 
 specifically this node will be loaded for at least three concerns: 1) it
 will be loaded by any scripts seeking to build a (CLI) client, e.g the tmx,
@@ -41,3 +52,30 @@ for now, this is a quick & dirty proof of concept to get us famliiar with:
     shutdown after some timeout (feature [#022]).
   • be forwarned: we plan on using 'sleep' to create artificial latency.
     this is the kind of wicked game we are playing with ourself.
+
+
+
+## :#storypoint-50
+
+there are filenames that won't pass our "map reduce" "test" to convert a
+filename "slug" into a const. this is there both as a safeguard to prevent
+the exception that occurs when we try to dereference a constant with an
+invalid name, and also this exists to be leveraged intentionally for reasons:
+
+• if the filename contains one or more leading underscores, for example, this
+  can be done intentionally to make the file (or directory) be ignored by the
+  autoloader. (any first character other than [a-z] (lowercase) will fail the
+  white rx for incoming slug names.)
+
+• if for example there was a file there called "foo.tar.gz", then the ".gz"
+  would be detected as being an extensioin, and it would be detected that it
+  is not an ".rb" extension, and this would not pass because it is not the
+  extension we are looking for.
+
+• if for example the file was named "my.weird.class.rb", the ".rb" part would
+  pass, but the other dots in the name would make it fail because it would not
+  pass the white ("pass-filter") regex.
+
+• if the filename has any captiol letters this would not pass, but the files
+  we are looking for must not have capitol letters anyway pursuant to our
+  [#hl-156] name conventions on filenames.

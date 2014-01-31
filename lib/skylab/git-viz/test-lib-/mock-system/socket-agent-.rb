@@ -12,6 +12,16 @@ module Skylab::GitViz
 
     private
 
+      def resolve_context_and_bind_reply_socket &p
+        ec = resolve_context
+        ec || resolve_and_bind_reply_socket( &p )
+      end
+
+      def resolve_context_and_bind_request_socket &p
+        ec = resolve_context
+        ec || resolve_and_bind_request_socket( &p )
+      end
+
       def resolve_context
         init_context ; PROCEDE_
       end
@@ -20,18 +30,46 @@ module Skylab::GitViz
         @context = ::ZMQ::Context.new self.class::IO_THREADS_COUNT__ ; nil
       end
 
-      def init_socket
+      def resolve_and_bind_reply_socket &p
+        init_reply_socket ; ec = PROCEDE_
+        p and p[ @socket ].nonzero? and ec = when_setsockopt_failure
+        ec || connect_reply_socket
+      end
+
+      def resolve_and_bind_request_socket &p
+        init_request_socket ; ec = PROCEDE_
+        p and p[ @socket ].nonzero? and ec = when_setsockopt_failure
+        ec || connect_request_socket
+      end
+
+      def init_reply_socket
+        @socket = @context.socket ::ZMQ::REP ; nil
+      end
+
+      def init_request_socket
         @socket = @context.socket ::ZMQ::REQ ; nil
       end
 
-      def connect_socket
-        rc = @socket.connect "tcp://localhost:#{ @port_d }"
-        rc.nonzero? and self.when_failed_to_connect_socket rc  # :+#hook-out
+      def connect_reply_socket
+        rc = @socket.bind "tcp://*:#{ @port_d }"
+        rc.nonzero? and when_socket_bind_failure
       end
 
-      def when_socket_bind_failure d
-        emit_error_string "failed to bind to socket, got error code #{ d }"
-        d  # #todo this has never been triggered or "tested", could use reporting
+      def when_socket_bind_failure
+        ec, s = error_code_and_reason_string
+        emit_error_string "failed to bind to socket #{ s }"
+        ec
+      end
+
+      def connect_request_socket
+        rc = @socket.connect "tcp://localhost:#{ @port_d }"
+        rc.nonzero? and when_failed_to_connect_socket
+      end
+
+      def when_failed_to_connect_socket
+        ec, s = error_code_and_reason_string
+        emit_error_string "failed to connect to socket #{ s }"
+        ec
       end
 
       def send_strings s_a
@@ -40,12 +78,13 @@ module Skylab::GitViz
       end
 
       def when_send_failure
-        report_socket_send_failure
+        report_and_result_in_socket_send_failure
       end
 
-      def report_socket_send_failure
-        ec, str = error_code_and_error_string
-        emit_error_string "send failure: #{ str }" ; ec
+      def report_and_result_in_socket_send_failure
+        ec, s = error_code_and_reason_string
+        emit_error_string "failed to send #{ s }"
+        ec
       end
 
       def recv_strings buffer_a
@@ -54,22 +93,19 @@ module Skylab::GitViz
       end
 
       def when_recv_failure
-        report_socket_recv_failure
+        @buffer_a.clear  # probably a good idea
+        report_and_result_in_socket_recv_failure
       end
 
-      def report_socket_recv_failure
-        ec, str = error_code_and_error_string
-        emit_error_string "receive failure: #{ str }" ; ec
-      end
-
-      def error_code_and_error_string
-        d = ::ZMQ::Util.errno
-        [ d, ::LibZMQ.zmq_strerror( d ).read_string ]
+      def report_and_result_in_socket_recv_failure
+        ec, str = error_code_and_reason_string
+        emit_error_string "failed to receive #{ str }"
+        ec
       end
 
       def close_socket_and_terminate_context
         ec = close_socket
-        ec ||= terminate_context
+        ec || terminate_context
       end
 
       def close_socket
@@ -83,34 +119,40 @@ module Skylab::GitViz
         d.nonzero? and when_failed_to_terminate_context d
       end
 
-      def when_failed_to_terminate_context d
+      def when_failed_to_terminate_context
         emit_error_string "failed to terminate context. (error code #{ d })"
         d  # #todo - the above has never been triggered or "tested" (reporting?)
       end
 
       def when_ZMQ_error
-        d = ::ZMQ::Util.errno
-        emit_error_string say_ZMQ_error d
-        d
+        ec, str = error_code_and_reason_string
+        emit_error_string str
+        ec
+      end
+
+      def error_code_and_reason_string
+        ec = ::ZMQ::Util.errno
+        [ ec, say_ZMQ_error( ec ) ]
       end
 
       def say_ZMQ_error d
-        s  =  ::LibZMQ.zmq_strerror( d ).read_string
-        m_i = :"say_ZMQ_error_#{ result_code_to_s d }"
+        s  = ::LibZMQ.zmq_strerror( d ).read_string
+        m_i = :"say_ZMQ_error_#{ res_code_as_method_tail d }"
         if self.class.private_method_defined? m_i
           send m_i, s
         else
-          "sorry, got ZMQ error code #{ d } (#{ s })"
+          s.sub! %r(\A[A-Z]), & :downcase
+          "because #{ s } (zmq error code #{ d })"
         end
       end
 
-      def result_code_to_s d
+      def res_code_as_method_tail d
         0 > d and begin negative = :negative_ ; d = d.abs end
         "#{ negative }#{ d }"
       end
 
       def say_ZMQ_error_92 s
-        "ZMQ error 92 - #{ s } (this happens when there are no arguments)"
+        "#{ s } (zmq code 92) (this happens when there are no arguments)"
       end
     end
   end

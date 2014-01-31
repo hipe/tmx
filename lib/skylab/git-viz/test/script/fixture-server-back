@@ -11,7 +11,7 @@
 #  • whether the responses look right when going back to the middle
 #
 # with this part of the stack able to run standalone we can run it in
-# different rubies, e.g to use the debugger in one, to see if warnings are
+# different rubies, e.g to use the d-ebugger in one, to see if warnings are
 # triggered in that same one, and to see if it works at all in the other.
 #
 # this is *not*:

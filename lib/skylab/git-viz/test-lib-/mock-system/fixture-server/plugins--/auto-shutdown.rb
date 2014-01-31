@@ -7,14 +7,15 @@ module Skylab::GitViz
       Test_Lib_::Mock_System::Socket_Agent_[ self ]
       include Test_Lib_::Mock_System::Socket_Agent_Constants_
 
-      def initialize client
-        @client = client ; @do_engage = false
-        @port_d = client.port_d
-        @serr = client.stderr
-        @stderr = client.get_qualified_serr
+      def initialize host
+        @do_engage = false ; @do_ignore_one = true ; @do_test = false
+        @host = host ; @port_d = host.port_d
+        @serr_p = host.stderr_reference
+        @stderr = host.get_qualified_serr
         @timer_thread = @seconds_s = nil
-        @y = client.get_qualified_stderr_line_yielder
-        @yy = client.stderr_line_yielder
+        @verbosity_level_d = INFO_LEVEL__
+        @y = host.get_qualified_stderr_line_yielder
+        @yy = host.stderr_line_yielder
       end
 
       def on_build_option_parser op
@@ -24,14 +25,46 @@ module Skylab::GitViz
             }useful for a #rainbow-kick)." do |x|
           @seconds_s = x
         end
+        op.on '--test-mode', "stay in server, don't go to responder #{
+            }(for development)" do
+          @y << "test mode activated. #{
+            }requests will not go to business responder."
+          @do_test = true
+        end
+        op.on '--less-verbose', 'reduces verbosity by one level.' do
+          if @verbosity_level_d.zero?
+            @y << "(verbosity level is already at the lowest level)"
+          else
+            @verbosity_level_d -= 1
+          end
+        end
+        op.on '--more-verbose', 'increase verbosity by one level.' do
+          if DEBUG_LEVEL__ == @verbosity_level_d
+            @y << "(verbosity level is already the highest level)"
+          else
+            @verbosity_level_d += 1
+          end
+        end
       end
 
+      INFO_LEVEL__ = 1
+      DEBUG_LEVEL__ = INFO_LEVEL__ + 1
+
       def on_options_parsed
+        init_verbosity_ivars
         @seconds_s and parse_seconds
       end
     private
+
+      def init_verbosity_ivars
+        [ :'@do_info', :'@do_debug' ].each_with_index do |ivar, d|
+          instance_variable_set ivar, ( d < @verbosity_level_d )
+        end
+      end
+
       def parse_seconds
         if /\A\d+\z/ =~ @seconds_s
+          init_verbosity_ivars
           @do_engage = true
           @sec_d = @seconds_s.to_i
           @sec_f = @sec_d.to_f
@@ -44,29 +77,55 @@ module Skylab::GitViz
       end
 
     public
-      def on_responder_initted responder
+      def on_received_request_strings
+        if @do_engage
+          if @is_hot
+            reset_timer_to_now_because :request_received
+          elsif @do_ignore_one and 'shut it down' == @host.bfr_a.fetch( 0 )
+            @do_ignore_one = false # yep, ignore our own (presumably) request
+          else
+            @y << "ignoring request received b.c shutdown request already sent!"
+          end
+        end ; SILENT_
+      end
+
+    public
+      def on_front_responder_initted responder
         if @do_engage
           responder.on_response_started( & method( :response_started_notify ) )
         end
         PROCEDE_  # #storypoint-45
       end
-
     private
       def response_started_notify _response
-        if @is_hot
-          now = ::Time.now
-          delta = now - @time_of_last_activity
-          @time_of_last_activity = now
-          @y << "countdown re-started (had #{ FMT__ % ( @sec_f - delta ) } #{
-            }seconds left on clock..)"
-          restart_timer
-        else
-          @y << "ignoring response, request for shutdown already sent!"
-        end ; nil
+        if @do_engage
+          if @is_hot
+            reset_timer_to_now_because :response_started
+          else
+            @y << "ignoring response started b.c shutdown request already sent!"
+          end
+        end ; SILENT_
+      end
+
+      def reset_timer_to_now_because reason_i
+        old_now = @time_of_last_activity
+        @time_of_last_activity = ::Time.now
+        if @do_info
+          report_the_difference reason_i, ( @time_of_last_activity - old_now )
+        end
+        restart_timer
+      end
+
+      def report_the_difference reason_i, delta
+        @y << "countdown re-started because #{ reason_i.to_s.gsub '_', ' ' } #{
+          }(had #{ say_time @sec_f - delta } left on clock)"
       end
 
     public
       def on_start
+        if @do_test
+          @context, @socket = @host.context_and_socket
+        end
         @do_engage ? attempt_to_start : PROCEDE_
       end
     private
@@ -79,6 +138,7 @@ module Skylab::GitViz
       def a_ruby_engine_other_than_MRI_is_required  # [#022]:#then-there-was-MRI
         /\Aruby\b/ =~ ::RUBY_ENGINE and but_you_are_running_MRI
       end
+
       def but_you_are_running_MRI
         @y << "plugin cannot run under MRI. it needs true concurrency."
         @y << "says: if you start the server from the front it is supposed #{
@@ -88,7 +148,7 @@ module Skylab::GitViz
 
       def start_timer
         @time_of_last_activity = ::Time.now
-        @y << "countdown timer started with #{ @sec_d } seconds left.."
+        @do_info and @y << "countdown timer started with #{ say_time } left.."
         start_new_timer_thread
       end
 
@@ -100,11 +160,24 @@ module Skylab::GitViz
       def start_new_timer_thread
         @timer_thread = ::Thread.new do
           sleep @sec_d
-          timer_has_fired
-          @y << "(got to end of thread)"
+          ex = nil
+          begin
+            timer_has_fired
+          rescue ::StandardError => ex
+          end
+          if ex
+            when_timer_thread_throws_an_exception ex
+          else
+            @do_info and @y << "(got to end of timer thread yay)"
+          end ; nil
         end
-        @y << "started thread (#{ @timer_thread })"
+        @do_debug and @y << "started thread (#{ @timer_thread })"
         PROCEDE_
+      end
+
+      def when_timer_thread_throws_an_exception ex
+        @serr_p[].puts
+        @y << "(timer thread aborted due to exception: #{ ex.message })" ; nil
       end
 
       def timer_has_fired
@@ -117,34 +190,48 @@ module Skylab::GitViz
       end
 
       def threshold_not_reached f  # #storypoint-110 chatty logging
-        @y << "it's been #{ FMT__ % f } seconds since last activity. #{
+        @do_info and report_live_another_day f
+      end
+
+      def report_live_another_day f
+        @y << "it's been #{ say_time f } seconds since last activity. #{
           }you may live another day."
       end
 
       def threshold_reached f   # #storypoint-130 is relevant here too
-        @y << "triggered: omg it's been #{ FMT__ % f } seconds of #{
-          }inactivity so:"
+        @stderr.write "triggered: omg it's been #{ say_time } of inactivity #{
+          }so .."
         @is_hot = false
+        y = ::Enumerator::Yielder.new do |msg|
+          @y << "(from thread:) #{ msg }"
+        end
+        _reason_s = "because of #{ say_time } of inactivity"
+        _shutdown = Shutdown_Request__.new y, @port_d, _reason_s
+        _shutdown.send_request_to_shut_it_down
+        @serr_p[].puts " sent shutdown message."
+        SILENT_
         # the current thread is the timer thread! so we don't terminate it
-        init_context ; init_socket
-        @socket.setsockopt ::ZMQ::LINGER, 1_000  # dunno
-        ec = connect_socket
-        ec || send_message_talking_about_shut_it_down
       end
 
-      def send_message_talking_about_shut_it_down
-        ec = send_strings [ 'shut it down' ]
-        ec or close_socket_and_terminate_context
+    public
+      def on_request buffer_a
+        @do_test and swallow_request buffer_a
       end
-
-      FMT__ = '%.2f'.freeze
+    private
+      def swallow_request buffer_a
+        send_a = [ 'result_code', '73', 'statement', '2', 'info',
+          "server is in test mode, ignoring: #{ buffer_a * ' ' }" ]
+        buffer_a.clear
+        send_strings send_a
+        SILENT_
+      end
 
     public
       def on_shutdown  # #storypoint-130
         if ! @do_engage
-          @y << "(was never active. nothing to do)"
+          @do_info and @y << "(was never active. nothing to do)"
         elsif @timer_thread
-          @stderr.write "joining current timer thread .."
+          @stderr.write "joining current timer thread .."  # #todo:now
           @timer_thread.join
           @yy << " done."
         else
@@ -154,14 +241,48 @@ module Skylab::GitViz
       end
     private
       def terminate_current_timer_thread
-        @stderr.write "(terminating current thread .."
+        @do_debug and @stderr.write "(terminating current thread .."
         x = @timer_thread.terminate
-        @serr.puts " (#{ x }) done.)"
+        @do_debug and @serr_p[].puts " (#{ x }) done.)"
         @timer_thread = nil
       end
 
       def emit_error_string s  # #hook-out
         @y << "cannot shutdown: #{ s }"
+      end
+
+      def say_time f=nil
+        f ||= @sec_f
+        1.0 == f or s = 's'
+        "#{ FMT__ % f } second#{ s }"
+      end ; FMT__ = '%.2f'.freeze
+
+      class Shutdown_Request__ < Shutdown_Message_
+
+        Test_Lib_::Mock_System::Socket_Agent_[ self ]
+        include Test_Lib_::Mock_System::Socket_Agent_Constants_
+
+        def initialize y, port_d, reason_s
+          @port_d = port_d ; @y = y
+          super reason_s
+        end
+        def send_request_to_shut_it_down
+          cnct || send
+        end
+      private
+        def cnct
+          resolve_context_and_bind_request_socket do |sock|
+            sock.setsockopt ::ZMQ::LINGER, 1_000  # dunno
+          end
+        end
+        def send
+          send_strings @message_s_a
+          close_socket_and_terminate_context
+          SILENT_
+        end
+        def emit_error_string s
+          @y << s ; nil
+        end
       end
     end
   end
