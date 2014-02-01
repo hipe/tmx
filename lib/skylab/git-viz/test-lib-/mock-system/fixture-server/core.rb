@@ -26,7 +26,7 @@ module Skylab::GitViz
         ec ||= init_front_responder
         ec ||= resolve_context_and_bind_reply_socket
         ec || set_signal_handlers
-        ec ||= call_plugin_shorters :on_start
+        ec ||= start_plugins
         ec || run_loop
       end
 
@@ -61,7 +61,7 @@ module Skylab::GitViz
 
       def parse_parameters
         ec = parse_options
-        ec ||= call_plugin_shorters :on_options_parsed
+        ec ||= parse_plugin_options
         ec || parse_arguments
       end
       callbacks << :on_options_parsed
@@ -73,6 +73,15 @@ module Skylab::GitViz
       rescue ::OptionParser::ParseError => e
         @y << "fixture server: #{ e.message }"
         EARLY_EXIT_
+      end
+
+      def parse_plugin_options
+        ec = call_plugin_shorters :on_options_parsed
+        ec and report_failure_to_parse_plugin_options ec
+      end
+
+      def report_failure_to_parse_plugin_options ec
+        cannot_start_server_because_plugin ec, "issue with a plugin option"
       end
 
       def parse_arguments
@@ -123,6 +132,15 @@ module Skylab::GitViz
       def report_lost_buffer_during_shutdown
         @y << "(request starting with '#{ @buffer_a.first }' will not be #{
           }processed due to being interrupted by a shutdown)"
+      end
+
+      def start_plugins
+        ec = call_plugin_shorters :on_start
+        ec and report_failure_to_start_because_of_plugins ec
+      end
+
+      def report_failure_to_start_because_of_plugins ec
+        cannot_start_server_because_plugin ec, "issue with starting a plugin"
       end
 
       def run_loop
@@ -203,6 +221,11 @@ module Skylab::GitViz
 
       # ~ small private utility methods used everywhere
 
+      def cannot_start_server_because_plugin ec, inner_msg
+        @y << "cannot start server because of the above #{ inner_msg } #{
+          }(exit code #{ ec })" ; ec
+      end
+
       def is_running
         SERVER_IS_RUNNING_LIFEPOINT_INDEX_ == @server_lifepoint_index
       end ; SERVER_IS_RUNNING_LIFEPOINT_INDEX_ = 1
@@ -253,7 +276,7 @@ module Skylab::GitViz
         @front_responder.clear_cache_for_manifest_pathname pn
       end
 
-      class Plugin_Conduit  # ~ lots of lowlevel access
+      class Plugin_Conduit  # ~ lots of low-level access
         def context_and_socket
           up.context_and_socket_for_plugin
         end

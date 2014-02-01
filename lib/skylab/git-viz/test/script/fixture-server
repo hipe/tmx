@@ -5,14 +5,31 @@
 me=$0 ; typeset -a rest ; rest=("${*[@]}")
 
 serr () {
-  print -- $* 1>&2
+  print -- "server front:" $* 1>&2
 }
 
 -execute () {
+  -peek-parse-args
   -check-that-rbenv-is-installed || return $?
   -ensure-rbx-is-being-used || return $?
-  exec "${me:h}/fixture-server-middle" "${rest[@]}"
+  typeset cmd_head="${me:h}/fixture-server-middle"
+  serr "exec'ing: ${cmd_head} ${rest[@]}"
+  exec "${cmd_head}" "${rest[@]}"
   print -- "never see"
+}
+
+-peek-parse-args () {
+  if [[ --stderr-path == $rest[1] ]] ; then
+    -peek-parse-stderr-path-arg 2
+  fi
+}
+
+-peek-parse-stderr-path-arg () {
+  _STDERR_PATH=$rest[$1]
+  serr "remaining stderr will written to: ${_STDERR_PATH}"
+  serr () {
+    echo "server front:" $* >> "$_STDERR_PATH"
+  }
 }
 
 -check-that-rbenv-is-installed () {
