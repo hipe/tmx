@@ -30,6 +30,20 @@ module Skylab::GitViz
 
       private
 
+        def resolve_extra_args
+          if PING__ == @argv
+            ping
+          else
+            super
+          end
+        end ; PING__ = %w( ping ).freeze
+
+        def ping
+          @response.add_iambicly_structured_statement :info,
+            "the fixture server responder says 'hello' in response to your ping"
+          EARLY_EXIT_
+        end
+
         def emit_error_string s  # #hook-out
           @response.add_iambicly_structured_statement :error, s ; nil
         end
