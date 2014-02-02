@@ -47,6 +47,10 @@ module Skylab::GitViz
     TestSupport = subsys[ :TestSupport ]
     ZMQ = memo[ -> do require 'ffi-rzmq' ; ::ZMQ end ]
 
+    Ick = -> x do
+      x.inspect  # placeholder for the future from the past
+    end
+
     Oxford = -> separator, none, final_sep, a do
       if a.length.zero?
         none

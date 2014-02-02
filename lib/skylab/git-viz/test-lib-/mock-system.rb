@@ -856,6 +856,7 @@ module Skylab::GitViz
         # (e->3 g->6)
         EARLY_EXIT_ = 33 ; GENERAL_ERROR_ = 63
         IO_THREADS_COUNT__ = 1
+        SILENT_ = nil
       end
 
       Mock_System = self

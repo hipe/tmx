@@ -2,7 +2,7 @@
 
 ## statement of scope and purpose of this document
 
-there is a variety of callback patterns (at least five) that we want our
+there is a variety of callback patterns (at least four) that we want our
 "callback tree" to support. the document hopes to survey them one by one and
 with each pattern: explain its behavior, present potential applications for it
 (when interesting), and finally to highlight the differences among the
@@ -85,7 +85,7 @@ architecture for callback trees, but to introduce such a monstrosity now
 would certainly be premature albeit fun.
 
 the five patterns are "callback", "listeners", "handler", "shorters",
-"attempters".
+"reducers".
 
 • "callback" is the simplest: for a channel designated as "callback", at most
   one listener proc-like can be associated with it. if the host uses what is
@@ -104,14 +104,12 @@ the five patterns are "callback", "listeners", "handler", "shorters",
   repercussions of the result that the agent gives back to the host here.
 
 • "shorters" allows multiple callbacks per channel and short-circuits on
-  the first one that results in true-ish (treating it as if it is something
-  like an error code), making this result be the result of the call to the
-  callbacks tree. more below.
+  the first one that results in true-ish, making this result be the result of
+  the call to the callbacks tree. more below.
 
-• "attempters" allows multiple callbacks per channel and will issue each such
-  event to them in some order (probably last-in-first-out), and short-circuit
-  on the first callback that "matches". if this sounds very similar to
-  "shorters" above it's because it is but see below.
+• "reducers" is not implemented, so we won't bother explaining it.
+
+
 
 
 
@@ -122,7 +120,6 @@ callback pattern           no          no              yes
 listeners pattern         yes         yes               no
 handlers pattern           no         yes              yes
 shorters pattern          yes          no              yes
-attempters pattern        yes          no              yes
 
 
 ## :#the-callback-pattern in detail
@@ -244,36 +241,6 @@ attempters pattern        yes          no              yes
   make things confusing and weird.
 
 
-
-
-## :#the-attempters-pattern in detail
-
-• the "attempters" pattern is logically *identical* to the "shorters" pattern,
-  but the opposite semantic value is associated with the two categories
-  of return value:
-
-• something will be "attempted" by each agent subscribed to the channel.
-  whether the agent succeeds or fails will be reflected in the result of the
-  callback: true-ish means "succeeded" and false-ish means "did not succeed".
-
-• note we do not say "fail" here, we say "did not succeed." there is a subtle
-  semantic difference: saying "fail" might incorrecty suggeset that we should
-  short-circuit further processing.
-
-• in fact, if any agent *succeeds*, it is this condition that causes the
-  short circuit to happen. because one agent succeeded, whatever the goal is
-  was met and we need not continue attempting with the other agents.
-
-• although as stated above the logic here is identical to the "shorters"
-  pattern, we may maintain one or more small methods with their own names
-  and logically duplicate implementations just to make the semantics clear
-  to a sufficiently deep level.
-
-• likewise with "shorter" pattern, we do not deal with the "ancestor chain"
-  of event channels here.
-
-
-
 ## issues in integrating all of them into one tree (:#storypoint-200)
 
 ..are anticipated:
@@ -294,7 +261,7 @@ but there is crossover that is not yet fully established for the requirements
 of the underlying structures necessary to support the various higher-level
 patterns specified above:
 
-for all practical purposes shorters, attempters
+for all practical purposes shorters
 and listeners could all be implemented with the same class and as such the
 same set of callbacks could be treated either as passive listeners or active
 agents depending on how you call them and what you do with the result.

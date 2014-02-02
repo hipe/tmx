@@ -58,7 +58,7 @@ allow any plugin to trigger a failure of system startup, for example.
 this method is exactly like #storypoint-60 but semantically different: rather
 than a world of error codes, in this world "true"-ish means "succeeded" and
 "falseish" means "did not succeed." the plugins are conceived of as
-"attempters" that one-by-one will attempt something, and the first one to
+"shorters" that one-by-one will attempt something, and the first one to
 succeed short-circuits the rest of the attempts. the result will be any
 first true-ish value that any plugin resulted in.
 

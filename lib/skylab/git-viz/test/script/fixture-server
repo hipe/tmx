@@ -4,64 +4,94 @@
 
 me=$0 ; typeset -a rest ; rest=("${*[@]}")
 
-serr () {
-  print -- "server front:" $* 1>&2
-}
-
 -execute () {
-  -peek-parse-args
-  -check-that-rbenv-is-installed || return $?
-  -ensure-rbx-is-being-used || return $?
+  -normalize-environment || return $?
+  -validate-rbenv-is-in-path || return $?
+  -switch-to-rbx-if-necessary || return $?
   typeset cmd_head="${me:h}/fixture-server-middle"
   serr "exec'ing: ${cmd_head} ${rest[@]}"
   exec "${cmd_head}" "${rest[@]}"
   print -- "never see"
 }
 
--peek-parse-args () {
-  if [[ --stderr-path == $rest[1] ]] ; then
-    -peek-parse-stderr-path-arg 2
+-normalize-environment () {
+  if [[ -z $HOME ]] ; then
+    serr "fatal: HOME environment variable must be set"
+    return 4
   fi
+  typeset -a a ; typeset home_="$HOME"
+  a[$(( ${#a} + 1 ))]="$home_/.rbenv/shims"
+  a[$(( ${#a} + 1 ))]="$home_/.rbenv/bin"
+  a[$(( ${#a} + 1 ))]="/usr/bin"  # rbenv will need to find 'head' here
+  a[$(( ${#a} + 1 ))]="/bin"  # rbenv will need to find bash here
+  typeset path_ ; path_="${(j_:_)a}"
+  serr "normalizing PATH to: $path_"
+  export PATH="$path_"
 }
 
--peek-parse-stderr-path-arg () {
-  _STDERR_PATH=$rest[$1]
-  serr "remaining stderr will written to: ${_STDERR_PATH}"
-  serr () {
-    echo "server front:" $* >> "$_STDERR_PATH"
-  }
+-validate-rbenv-is-in-path () {
+  -test-rbenv && return 0
+  serr "fatal: rbenv not in path. is it installed?"
+  return 4
 }
 
--check-that-rbenv-is-installed () {
+-test-rbenv () {
   which rbenv > /dev/null
-  (( 0 == $? )) && return 0
-  serr "${0:t} requires rbenv for now (it's for your own good)"
-  return 3
 }
 
-prefix=rbx-
-
--ensure-rbx-is-being-used () {
-  typeset version
-  version=$( rbenv version )
-  typeset ver=$version[1,4]
-  if [[ $prefix == $ver ]] ; then
-    serr "currently using $version"
+-switch-to-rbx-if-necessary () {
+  typeset current_fragement current_version
+  -set-current-fragment-and-current-version
+  if -test-current-fragment ; then
+    serr "using correct ruby: $current_version"
   else
-    -attempt-to-switch-to-rbx
+    -switch-to-rbx
   fi
 }
 
--attempt-to-switch-to-rbx () {
-  rbenv versions | cut -c3- | awk ';{ print $1 };' | while read line ; do
-    if [[ $prefix == $line[1,4] ]] ; then
-      this_one=$line
+target_fragment=rbx-
+
+-set-current-fragment-and-current-version () {
+  typeset long_version ; long_version=$( rbenv version )
+  current_version="${long_version%% *}"
+  current_fragment="${current_version[1,4]}"
+}
+
+-switch-to-rbx () {
+  typeset target_version
+  -find-target-version || return $?
+  typeset cmd ; cmd=$( rbenv sh-shell $target_version )
+  serr "changing from $current_version run the server with concurrency: $cmd"
+  eval "$cmd"
+  -set-current-fragment-and-current-version
+  if ! -test-current-fragment ; then
+    serr "FATAL: strange, hack didn't work"
+    return 4
+  fi
+}
+
+-test-current-fragment () {
+  [[ "$target_fragment" == "$current_fragment" ]]
+}
+
+-find-target-version () {
+  typeset line long_target_version
+  target_version=''
+  rbenv versions | cut -c3- | awk ';{ print $1 };' | while read -r line ; do
+    if [[ $target_fragment == $line[1,4] ]] ; then
+      long_target_version=$line
       break
     fi
   done
-  typeset ver ; ver=$( echo $version | awk ';{ print $1 };' )
-  serr "changing from $ver to $this_one to run the server with concurrency"
-  eval $( rbenv sh-shell $this_one )
+  if [[ -z $long_target_version ]] ; then
+    serr "fatal: none of the installed rubies have the stem '$target_fragment'"
+    return 4
+  fi
+  target_version=${long_target_version%% *}
+}
+
+serr () {
+  print -- "front script (zsh) ${@}" 1>&2
 }
 
 -execute

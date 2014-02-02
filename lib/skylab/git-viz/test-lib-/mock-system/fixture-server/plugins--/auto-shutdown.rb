@@ -63,11 +63,10 @@ module Skylab::GitViz
       end
 
       def parse_seconds
-        if /\A\d+\z/ =~ @seconds_s
+        if /\A\d+(?:\.\d+)?\z/ =~ @seconds_s
           init_verbosity_ivars
           @do_engage = true
-          @sec_d = @seconds_s.to_i
-          @sec_f = @sec_d.to_f
+          @sec_f = @seconds_s.to_f
           PROCEDE_
         else
           @yy << "fatal: need positive integer for seconds, had #{
@@ -159,7 +158,7 @@ module Skylab::GitViz
 
       def start_new_timer_thread
         @timer_thread = ::Thread.new do
-          sleep @sec_d
+          sleep @sec_f
           ex = nil
           begin
             timer_has_fired

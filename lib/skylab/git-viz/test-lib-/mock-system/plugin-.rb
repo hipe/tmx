@@ -31,7 +31,7 @@ module Skylab::GitViz
 
         def load_plugins
           @plugin_conduit_h = {}
-          init_plugin_listener_matrix_if_necessary
+          init_plugin_callbacks_if_necessary
           conduit = plugin_conduit_cls.new @y, self
           box_mod = rslv_some_plugin_box_mod
           box_mod.constants.each do |const_i|
@@ -45,7 +45,7 @@ module Skylab::GitViz
           init_plugins
         end ; WHITE_SLUG_RX__ = /\A[a-z]/
 
-        def init_plugin_listener_matrix_if_necessary
+        def init_plugin_callbacks_if_necessary
           @callbacks ||= bld_plugin_listener_matrix
         end
 
@@ -205,7 +205,7 @@ module Skylab::GitViz
 
         def get_qualified_stderr_line_yielder
           y = ::Enumerator::Yielder.new do |msg_s|
-            msg = Qualifiable_Message_String__.new msg_s
+            msg = Qualifiable_Message_String.new msg_s
             msg.graphic_prefix = graphic_prefix
             msg.agent_prefix = agent_prefix
             @stderr_line_yielder << "#{ msg }"
@@ -216,7 +216,7 @@ module Skylab::GitViz
         def get_qualified_serr
           serr_p = @up_p[].stderr_reference_for_plugin  # :+#hook-out
           Write_Proxy__.new do |s|
-            msg = Qualifiable_Message_String__.new s
+            msg = Qualifiable_Message_String.new s
             msg.graphic_prefix = graphic_prefix
             msg.agent_prefix = agent_prefix
             io = serr_p[]
@@ -244,9 +244,9 @@ module Skylab::GitViz
         end
       end
 
-      Qualifiable_Message_String__ = ::Struct.
+      Qualifiable_Message_String = ::Struct.
           new :graphic_prefix, :open, :agent_prefix, :body, :close
-      class Qualifiable_Message_String__
+      class Qualifiable_Message_String
         def initialize msg
           if (( md = PAREN_EXPLODER_RX__.match msg ))
             super nil, md[1], nil, md[2], md[3]

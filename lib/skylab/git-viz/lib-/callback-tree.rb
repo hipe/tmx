@@ -209,17 +209,18 @@ module Skylab::GitViz
         x_a = rslv_any_listeners_leaf_callback_x_a i_a
         x_a and x_a.each do |x|
           p[ x ]
-        end ; nil
+        end
+        SILENT_
       end
 
       def call_attempters_with_map * i_a, p  # [#033]:#the-attempters-pattern
-        did_succeed = false
+        trueish_x = nil
         x_a = rslv_any_shorters_leaf_callback_x_a i_a
         x_a and x_a.each do |x|
-          did_succeed = p[ x ]
-          did_succeed and break
+          trueish_x = p[ x ]
+          trueish_x and break
         end
-        did_succeed
+        trueish_x
       end
 
       def call_shorters_with_map * i_a, p  # see [#033]:#the-shorters-pattern
@@ -311,6 +312,10 @@ module Skylab::GitViz
 
         def listeners i
           @h[ i ] = :listeners ; nil
+        end
+
+        def shorters i
+          @h[ i ] = :shorters ; nil
         end
 
         def end
@@ -419,7 +424,7 @@ module Skylab::GitViz
         end
       end
 
-      PROCEDE_ = nil
+      PROCEDE_ = SILENT_ = nil
     end
   end
 end

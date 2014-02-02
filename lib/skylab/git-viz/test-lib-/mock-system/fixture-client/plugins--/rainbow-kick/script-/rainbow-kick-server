@@ -1,0 +1,77 @@
+#!/usr/bin/env ruby -w
+
+      # read [#021] "what is a rainbow kick"? this is the script that forks,
+      # and with the child of the fork execs off to a process that tries to
+      # start the server.
+
+      FRONT_RELPATH_ = '../../../../../../../test/script/fixture-server'.freeze
+
+      def execute sin, sout, serr, argv
+        @argv = argv ; @is_interactive = sin.tty?
+        @log_IO = serr
+        @stderr = serr ; @stdout = sout
+        @y = ::Enumerator::Yielder.new( & @stderr.method( :puts ) )
+        ec = prepare_for_fork
+        ec and exit ec
+
+        @pid = fork
+        @pid and exit_as_parent
+        ec = rainbow_run_as_child
+        exit ec || 0
+      end
+
+      def prepare_for_fork
+        parse_out_reason
+        resolve_front_script
+      end
+
+      def parse_out_reason
+        @reason_s = if (( idx = @argv.index '--reason' ))
+          s = @argv[ idx + 1 ] ; @argv[ idx, 2 ] = [] ; s
+        end ; nil
+      end
+
+      def resolve_front_script
+        require 'pathname'
+        front_script_pn = ::Pathname.new ::File.
+          expand_path( FRONT_RELPATH_, __FILE__ )
+        if front_script_pn.exist?
+          @front_script_path = front_script_pn.to_path
+          PROCEDE__
+        else
+          @log_IO.puts "uh-oh: front script not found: #{ front_script_pn }"
+          FAILED__
+        end
+      end
+
+      def exit_as_parent
+        sleep 0.45
+        @y << "rainbow-kick parent: #{
+          }spawned chid process #{ @pid } for #{ @reason_s || 'you' }!"
+        @log_IO.close
+        exit 0
+      end
+
+      def rainbow_run_as_child
+        do_exec
+      rescue ::Exception => @ex
+        @log_IO.puts "#{ @ex.class.name }: #{ @ex.message }"
+        @log_IO.puts @ex.backtrace
+        @log_IO.puts "shutting down server because of above."
+        4
+      end
+
+      def do_exec
+        require 'shellwords'
+        @argv.length.zero? and @argv << '--'  # because we can, insist on
+        # the multi-arg form so that we don't incur shell-expansion
+        cmd_a = [ @front_script_path, * @argv ]
+        cmd_s = Shellwords.shelljoin cmd_a
+        @log_IO.puts "child: exec'ing off to server front script with: #{ cmd_s }"
+        exec( * cmd_a, unsetenv_others: true, out: :out, err: :err )
+        self._NEVER_SEE
+      end
+
+      FAILED__ = 4 ; PROCEDE__ = nil
+
+      execute $stdin, $stdout, $stderr, ::ARGV

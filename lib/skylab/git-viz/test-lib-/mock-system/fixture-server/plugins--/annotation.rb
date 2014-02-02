@@ -7,22 +7,28 @@ module Skylab::GitViz
       # still have them
 
       def initialize host
-        @host = host
+        @host = host ; human_name_ = "#{ host.server_name.as_human } "
         @port_d = host.port_d
         serr_p = host.stderr_reference
         @y = ::Enumerator::Yielder.new do |msg|
-          serr_p[].puts msg ; @y
+          msg = Msg__.new msg
+          msg.agent_prefix = human_name_
+          serr_p[].puts msg.to_s ; @y
         end
       end
 
-      def on_beginning_of_loop
-        @y << "fixture server running #{ rb_environment_moniker } #{
-          }listening on port #{ @port_d }"
+      Msg__ = Test_Lib_::Mock_System::Plugin_::Qualifiable_Message_String
+
+      def on_intro
+        @y << "(running #{ rb_environment_moniker })"
       end
 
-      def on_end_of_loop
-        _ec = @host.tentative_result_code
-        @y << "(fixture server exiting with status #{ _ec })"
+      def on_beginning_of_loop
+        @y << "listening on port #{ @port_d }"
+      end
+
+      def on_end_of_loop ec
+        @y << "(exiting with status #{ ec })"
       end
 
     private

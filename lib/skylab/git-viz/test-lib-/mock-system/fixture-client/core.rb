@@ -16,6 +16,7 @@ module Skylab::GitViz
         @port_d = port_d
         @program_name = program_name
         @stdout = sout
+        @tried_to_connect_with_plugins = false
         init_info_yielder
       end
 
@@ -30,7 +31,10 @@ module Skylab::GitViz
 
       plugin_conduit_class
       class Plugin_Conduit
-        GRAPHIC_PREFIX__ = 'plugin '.freeze
+        GRAPHIC_PREFIX__ = nil
+        def agent_prefix  # because our output needs to look CSV-esque,
+          "#{ super }plugin "  # ..dont use graphics or indenting
+        end
       end
 
       callbacks = build_mutable_callback_tree_specification
@@ -120,6 +124,14 @@ module Skylab::GitViz
       end
 
       def do_the_polling
+        begin
+          @poll_again = false
+          r = do_the_polling_once
+        end while @poll_again
+        r
+      end
+
+      def do_the_polling_once
         d = @poller.poll @poll_timeout_milliseconds
         case d
         when -1 ; when_ZMQ_error
@@ -129,6 +141,14 @@ module Skylab::GitViz
       end
 
       def when_the_poll_indicates_no_readable_or_writable_sockets
+        if @tried_to_connect_with_plugins
+          when_the_poll_indicates_no_sockets_and_tried_plugins_already
+        else
+          try_to_connect_with_plugins
+        end
+      end
+
+      def when_the_poll_indicates_no_sockets_and_tried_plugins_already
         emit_error_string say_timeout_expired
         NO_SERVER_
       end
@@ -139,15 +159,42 @@ module Skylab::GitViz
            }#{ path_to_fixture_server }' in a different terminal window)"
       end
 
-      def path_to_fixture_server
-        GitViz::Test::Script.dir_pathname.join( 'fixture-server' ).to_path
-      end
-
       def timeout_s
         secs = @poll_timeout_milliseconds * 1.0 / 1000
         secs_d = secs.to_i
         1.0 == secs or s = 's'
         "#{ secs_d == secs ? secs_d : secs } second#{ s }"
+      end
+
+      def path_to_fixture_server
+        GitViz::Test::Script.dir_pathname.join( 'fixture-server' ).to_path
+      end
+
+      def try_to_connect_with_plugins
+        @tried_to_connect_with_plugins = true
+        new_timeout_seconds = attempt_with_plugins :on_attempt_to_connect
+        if new_timeout_seconds
+          if new_timeout_seconds.respond_to? :to_f
+            @poll_again = true
+            @poll_timeout_milliseconds = new_timeout_seconds * 1000
+            @y << "will try connecting again for plugin, #{
+              }this time with a timeout of #{ timeout_s }.."
+            PROCEDE_
+          else
+            @y << "expected floating point number, but some plugin resulted #{
+              }in #{ GitViz::Lib_::Ick[ new_timeout_seconds ] }"
+            NO_SERVER_
+          end
+        else
+          emit_error_string say_could_not_connect_with_plugins
+          NO_SERVER_
+        end
+      end
+      callbacks.shorters :on_attempt_to_connect
+
+      def say_could_not_connect_with_plugins
+        "no response from server after #{ timeout_s } (tried connecting #{
+        }with plugins). nothing else to try."
       end
 
       def when_the_poll_indicates_N_number_of_ready_sockets d

@@ -18,20 +18,32 @@ module Skylab::GitViz
           @serr.flush  # makes a different if you are tailing the log
           @y
         end
+        init_conduit_for_self
       end
+    private
+      def init_conduit_for_self
+        _name = Test_Lib_::Mock_System::Plugin_::Name.from_human 'middle server'
+        @conduit_for_self = plugin_conduit_cls.new( @y, self ).curry _name ; nil
+      end
+
+    public
 
       def run
         ec = load_plugins
+        call_plugin_listeners :on_intro
         ec ||= parse_parameters
         ec ||= init_front_responder
         ec ||= resolve_context_and_bind_reply_socket
         ec || set_signal_handlers
         ec ||= start_plugins
-        ec || run_loop
+        ec ||= run_loop
+        call_plugin_listeners :on_end_of_loop, ec
+        call_plugin_listeners :on_finalize
+        ec
       end
 
       callbacks = build_mutable_callback_tree_specification
-      callbacks << :on_start
+      callbacks << :on_intro << :on_start
 
     private
 
@@ -42,7 +54,7 @@ module Skylab::GitViz
             @port_d = x.intern
           else
             @y << "port must be postive int, aborting. (had: #{ x.inspect })"
-            @result_code = GENERAL_ERROR_
+            @result_code_from_OP = GENERAL_ERROR_
           end
         end
       end
@@ -55,7 +67,7 @@ module Skylab::GitViz
           @y << "description: fixture server. listens on port #{ @port_d }"
           @y << "options:"
           @op.summarize @y
-          @result_code = SUCCESS_
+          @result_code_from_OP = SUCCESS_
         end
       end
 
@@ -67,9 +79,9 @@ module Skylab::GitViz
       callbacks << :on_options_parsed
 
       def parse_options
-        @result_code = nil
+        @result_code_from_OP = nil
         @op.parse! @argv
-        @result_code
+        @result_code_from_OP
       rescue ::OptionParser::ParseError => e
         @y << "fixture server: #{ e.message }"
         EARLY_EXIT_
@@ -113,8 +125,7 @@ module Skylab::GitViz
 
       def shutdown_during_interrupt
         @buffer_a.length.nonzero? and report_lost_buffer_during_shutdown
-        name = Test_Lib_::Mock_System::Plugin_::Name.from_human 'the server'
-        host = plugin_conduit_cls.new( @y, self ).curry name
+        host = @conduit_for_self
         yy = host.get_qualified_stderr_line_yielder
         rc = host.shut_down "due to interrupt" do |sd|
           sd.when_did_not do |msg|
@@ -145,16 +156,12 @@ module Skylab::GitViz
 
       def run_loop
         @server_lifepoint_index += 1
-        @result_code = SUCCESS_
         call_plugin_listeners :on_beginning_of_loop
         begin
           ec = execute_loop_body
           ec and break
         end while is_running
-        ec and @result_code = ec
-        call_plugin_listeners :on_end_of_loop
-        call_plugin_listeners :on_finalize
-        @result_code
+        ec || SUCCESS_
       end
       callbacks.listeners :on_beginning_of_loop
       callbacks.listeners :on_end_of_loop
@@ -276,7 +283,7 @@ module Skylab::GitViz
         @front_responder.clear_cache_for_manifest_pathname pn
       end
 
-      class Plugin_Conduit  # ~ lots of low-level access
+      class Plugin_Conduit  # ~ lots of low-level & misc access
         def context_and_socket
           up.context_and_socket_for_plugin
         end
@@ -292,8 +299,8 @@ module Skylab::GitViz
         def lifepoint_synchronize &p
           up.lifepoint_synchronize_for_plugin( &p )
         end
-        def tentative_result_code
-          up.instance_variable_get :@result_code
+        def server_name
+          up.instance_variable_get( :@conduit_for_self ).name
         end
         def shut_down msg, &p
           Fixture_Server::Shut_Down__.new( self, msg, &p ).attempt_to_shutdown
@@ -361,7 +368,8 @@ module Skylab::GitViz
       Fixture_Server = self
       GENERAL_ERROR_ = GENERAL_ERROR_
       MANIFEST_PARSE_ERROR_ = 36  # 3 -> m 9 -> p
-      PROCEDE_ = SILENT_ = nil ; SUCCESS_ = 0
+      SILENT_ = SILENT_
+      PROCEDE_ = nil ; SUCCESS_ = 0
     end
   end
 end
