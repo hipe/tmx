@@ -14,7 +14,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters_::Git::System_Agent_
     it "ping when chdiring to a file - x" do
       ping_from_path 'wa-da-da-file'
       expect_ping_command_with_chdir_value 'wa-da-da-file'
-      expect_cannot_execute_command_saying "path is file, must have directory"
+      expect_cannot_execute_command_saying TS_::Messages::PATH_IS_FILE
       expect_no_output_scanner
     end
 

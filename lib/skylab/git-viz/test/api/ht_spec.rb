@@ -19,8 +19,7 @@ module Skylab::GitViz::TestSupport::API
       _pn = GitViz.dir_pathname.join 'core.rb'
       invoke_API_on_pathname _pn
       expect_command_with_chdir_matching %r(/core\.rb) if false
-      expect %i( cannot_execute_command string),
-        /\Apath is file, must have directory\z/
+      expect %i( cannot_execute_command string), TS_::Messages::PATH_IS_FILE
     end
 
     it "path is valid (mock) - o" do

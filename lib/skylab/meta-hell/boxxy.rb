@@ -127,7 +127,7 @@ module Skylab::MetaHell
           nam == Distill[ gues ] and break gues
         end
         if guess
-          const = Resolve_name__[ cbn, do_peek_hack, box, guess ]
+          const = Resolve_name__[ cbn, do_peek_hack, box, name_x, guess ]
         end
         if const
           [ const, box.const_get( const, false ) ]
@@ -213,22 +213,22 @@ module Skylab::MetaHell
     end.call
     UNDR__ = '_'.getbyte 0
 
-    Resolve_name__ = -> cbn, do_peek_hack, box, guess do
+    Resolve_name__ = -> cbn, do_peek_hack, box, name_x, guess do
       if box.const_defined? guess, false
         guess
       elsif box.respond_to? :get_const_missing
-        Resolve_name_with_tug__[ do_peek_hack, box, guess ]
+        Resolve_name_with_tug__[ do_peek_hack, box, name_x, guess ]
       elsif cbn
         Resolve_name_with_core_file__[ cbn, box, guess ]
       end
     end
 
-    Resolve_name_with_tug__ = -> do_peek_hack, box, guess do
-      tug = box.get_const_missing guess.intern
+    Resolve_name_with_tug__ = -> do_peek_hack, box, name_x, guess do
+      tug = box.get_const_missing name_x, guess.intern
       correction = if do_peek_hack
         Boxxy::Peeker_::Tug[ tug ]
       else
-        Tug_and_get_any_correction_[ tug ]
+        Tug_and_get_any_correction_[ tug, guess ]
       end
       correction and guess = correction
       box.const_defined?( guess, false ) and guess
@@ -247,19 +247,23 @@ module Skylab::MetaHell
       end
     end
 
-    Tug_and_get_any_correction_ = -> tug do
-      mod = tug.mod ; const = tug.const
+    Tug_and_get_any_correction_ = -> tug, guess do
+      mod = tug.mod
       is_boxxified = mod.respond_to? :boxxy_original_constants
       consts = is_boxxified ?
         -> { mod.boxxy_original_constants } : -> { mod.constants }
-      befor = consts[ ]
+      befor = consts[]
       any_correction = nil
       tug.load_and_get( -> do
-        cnst = Distill[ const ]
-        ( consts[ ] - befor ).each do |correct_i|
-          if cnst == Distill[ correct_i ] && const != correct_i
+        against_i = guess || tug.const
+        cnst = Distill[ against_i ]
+        _a = consts[] - befor
+        _a.each do |correct_i|
+          if cnst == Distill[ correct_i ] && against_i != correct_i
             any_correction = correct_i
-            mod._boxxy.correction_notification const, correct_i if is_boxxified
+            if is_boxxified
+              mod._boxxy.correction_notification against_i, correct_i
+            end
             tug.correction_notification correct_i
             break
           end
@@ -511,7 +515,7 @@ module Skylab::MetaHell
         ea = MetaHell::Formal::Box::Enumerator.new( -> pair_y do
           mod_load_guess = Resolve_name__.curry[ nil, false, self ]
           constants.each do |guess_i|
-            const = mod_load_guess[ guess_i ]
+            const = mod_load_guess[ nil, guess_i ]
             const and pair_y.yield( const, const_get( const, false ) )
           end
         end )

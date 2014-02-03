@@ -46,7 +46,7 @@ module Skylab::GitViz
           path = pn.to_path  # #storypoint-50
           slug, extname = path.split SPLIT_EXTNAME_RX_
           ! extname || extname =~ EXTENSION_PASS_FILTER_RX_ or next
-          const_i = Constify_map_reduce_slug_[ slug ]
+          const_i = Constify_if_possible_[ slug ]
           const_i or next
           h[ const_i ] and next  # e.g both "foo.rb" and "foo/"
           a << const_i ; h[ const_i ] = true
@@ -71,9 +71,9 @@ module Skylab::GitViz
         insist_on_dir_pathname
         to_path
       end
-      def get_const_missing i  # #hook-in
+      def get_const_missing name_x, _guess_i  # #hook-in
         insist_on_dir_pathname
-        Const_Missing__.new self, @dir_pathname, i
+        Const_Missing__.new self, @dir_pathname, name_i
       end
     private
       def insist_on_dir_pathname
@@ -93,8 +93,8 @@ module Skylab::GitViz
       def to_path
         @dir_pathname.sub_ext( EXTNAME_ ).to_path
       end
-      def get_const_missing i  # #hook-in
-        Const_Missing__.new self, @dir_pathname, i
+      def get_const_missing name_x, _guess_i  # #hook-in
+        Const_Missing__.new self, @dir_pathname, name_x
       end
       def set_dir_pn x  # compare more elaborate [sl] `init_dir_pathname`
         @dir_pathname = x ; nil
@@ -104,14 +104,20 @@ module Skylab::GitViz
     class Const_Missing__
 
       def initialize mod, dpn, i
-        @i = i ; @dir_pathname = dpn ; @mod = mod
+        @dir_pathname = dpn ; @mod = mod ;
+        @name = Name_.from_variegated_symbol i
       end
 
-      def const ; @i end ; attr_reader :mod
+      attr_reader :mod
 
-      def load_and_get _correction_proc=nil
-        @stem = @i.to_s.gsub( %r((?<=[a-z])(?=[A-Z])|_), '-' ).downcase
-        @d_pn = @dir_pathname.join @stem
+      def const
+        @name.as_const
+      end
+
+      def load_and_get correction_proc=nil
+        @correction_proc = correction_proc
+        @slug = @name.as_slug
+        @d_pn = @dir_pathname.join @slug
         @f_pn = @d_pn.sub_ext EXTNAME_
         if @f_pn.exist?
           when_file_exists
@@ -125,16 +131,16 @@ module Skylab::GitViz
     private
 
       def when_neither_file_nor_dir_exist
-        raise ::NameError, "uninitialized constant #{ @mod.name }::#{ @i } #{
+        raise ::NameError, "uninitialized constant #{
+         }#{ @mod.name }::#{ @name.as_const } #{
           }and no directory[file] #{
            }#{ @d_pn.relative_path_from @dir_pathname }[#{ EXTNAME_ }]"
       end
 
       def when_file_exists
         load @f_pn.to_path
-        @mod.const_defined? @i, false or raise ::LoadError,
-          "'#{ @i }' was not defined in #{ @f_pn.basename }"
-        mod = @mod.const_get @i
+        verify_const_defined_and_emit_correction
+        mod = @mod.const_get @name.as_const
         if ! mod.respond_to? :dir_pathname
           enhance_loaded_value mod
         elsif ! mod.dir_pathname  # if a child class, e.g
@@ -143,13 +149,30 @@ module Skylab::GitViz
         mod
       end
 
+      def verify_const_defined_and_emit_correction
+        i = @name.as_const or raise ::LoadError, say_cant_resolve_valid_cname
+        @mod.const_defined? i, false or raise ::LoadError, say_not_defined
+        if @correction_proc
+          @correction_proc[]
+        end ; nil
+      end
+
+      def say_cant_resolve_valid_cname
+        "can't resolve a valid const name from #{
+          }'#{ @name.as_variegated_symbol }'"
+      end
+
+      def say_not_defined
+        "'#{ @name.as_const }' was not defined in #{ @f_pn.basename }"
+      end
+
       def when_dir_exists
         c_pn = @d_pn.join CORE_FILE__
         if c_pn.exist?
           @f_pn = c_pn
           when_file_exists
         else
-          mod = @mod.const_set @i, ::Module.new
+          mod = @mod.const_set @name.as_const, ::Module.new
           enhance_loaded_value mod
           mod
         end
@@ -158,12 +181,109 @@ module Skylab::GitViz
       def enhance_loaded_value mod
         Autoloader_[ mod, @d_pn ] ; nil
       end
+    public
+      def correction_notification i
+        @name.as_const == i or fail "sanity"  # just for compat with old
+      end
     end
   end
 
-  Constify_map_reduce_slug_ = -> do
-    white_rx = %r(\A[a-z][-a-z0-9]*\z)
-    gsub_rx = /(-+)([a-z])?/
+  class Name_  # will freeze any string it is constructed with
+    # this only supports the simplified inflection necessary for this app.
+    class << self
+      def from_const const_i
+        allocate_with :initialize_with_const_i, const_i
+      end
+      def from_human human_s
+        allocate_with :initialize_with_human, human_s
+      end
+      def from_local_pathname pn
+        allocate_with :initialize_with_local_pathname, pn
+      end
+      def from_variegated_symbol i
+        allocate_with :initialize_with_variegated_symbol, i
+      end
+      private :new
+    private
+      def allocate_with method_i, x
+        new = allocate
+        new.send method_i, x
+        new
+      end
+    end
+  private
+    def initialize_with_const_i const_i
+      @as_const = const_i
+      @const_is_resolved = true
+    end
+    def initialize_with_human human_s
+      @as_human = human_s.freeze
+      @as_slug = human_s.gsub( SPACE__, DASH__ ).downcase.freeze
+      initialize
+    end
+    def initialize_with_local_pathname pn
+      @as_slug = pn.sub_ext( THE_EMPTY_STRING__ ).to_path.freeze
+      initialize
+    end
+    def initialize_with_variegated_symbol i
+      @as_variegated_symbol = i
+      @as_slug = i.to_s.gsub( NORMALIZE_CONST_RX__, DASH__ ).
+        gsub( UNDERSCORE__, DASH__ ).downcase.freeze
+      initialize
+    end
+    def initialize
+      @const_is_resolved = false
+    end
+  public
+    def as_const
+      @const_is_resolved || resolve_const
+      @as_const
+    end
+    def as_doc_slug
+      @as_doc_slug ||= build_doc_slug
+    end
+    def as_human
+      @as_human ||= build_human
+    end
+    def as_slug
+      @as_slug ||= build_slug
+    end
+    def as_variegated_symbol
+      @as_variegated_symbol ||= build_variegated_symbol
+    end
+  private
+    def build_doc_slug
+      as_normalized_const.gsub( SLUGIFY_CONST_RX__, & :downcase ).
+        gsub( UNDERSCORE__, DASH__ ).freeze
+    end
+    def build_human
+      as_slug.gsub( DASH__, SPACE__ ).freeze
+    end
+    def build_slug
+      as_normalized_const.gsub( UNDERSCORE__, DASH__ ).downcase.freeze
+    end
+    def build_variegated_symbol
+      as_slug.gsub( DASH__, UNDERSCORE__ ).intern
+    end
+    def as_normalized_const
+      as_const.to_s.gsub NORMALIZE_CONST_RX__, UNDERSCORE__
+    end
+    def resolve_const
+      @const_is_resolved = true
+      @as_const = Constify_if_possible_[ as_variegated_symbol.to_s ]
+    end
+
+    DASH__ = '-'.freeze
+    NORMALIZE_CONST_RX__ = /(?<=[a-z])(?=[A-Z])/
+    SLUGIFY_CONST_RX__ = /[A-Z](?=[a-z])/
+    SPACE__ = ' '.freeze
+    THE_EMPTY_STRING__ = ''.freeze
+    UNDERSCORE__ = '_'.freeze
+  end
+
+  Constify_if_possible_ = -> do
+    white_rx = %r(\A[a-z][-_a-z0-9]*\z)i
+    gsub_rx = /([-_]+)([a-z])?/
     -> s do
       if white_rx =~ s
         s_ = s.gsub( gsub_rx ) do

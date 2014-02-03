@@ -22,7 +22,7 @@ module Skylab::GitViz
       end
     private
       def init_conduit_for_self
-        _name = Test_Lib_::Mock_System::Plugin_::Name.from_human 'middle server'
+        _name = GitViz::Name_.from_human 'middle server'
         @conduit_for_self = plugin_conduit_cls.new( @y, self ).curry _name ; nil
       end
 
@@ -190,7 +190,7 @@ module Skylab::GitViz
 
       def can_and_do_preprocess_server_directive
         slug_s = @buffer_a.fetch( 0 ).gsub ' ', '-'
-        i = Constify_map_reduce_slug_[ slug_s ]
+        i = Constify_if_possible_[ slug_s ]
         if i and Fixture_Server::Alternate_Responders__.const_defined? i, false
           @responder_const_i = i ; @buffer_a.shift ; true
         end
@@ -199,7 +199,7 @@ module Skylab::GitViz
       def prcss_server_directive
         const_i = @responder_const_i
         cls = Fixture_Server::Alternate_Responders__.const_get const_i, false
-        name = Mock_System::Plugin_::Name.from_const const_i
+        name = GitViz::Name_.from_const const_i
         cond = plugin_conduit_cls.new( @y, self ).curry( name )
         responder = cls.new cond
         ec = responder.invoke @buffer_a

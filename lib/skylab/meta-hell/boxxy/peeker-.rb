@@ -27,7 +27,7 @@ module Skylab::MetaHell
           # then do what parent does
           tug.mod.const_set tug.const, tug.build_autovivified_module
         end
-        any_other_correction = Tug_and_get_any_correction_[ tug ]
+        any_other_correction = Tug_and_get_any_correction_[ tug, nil ]
         if any_expensive_correction
           any_other_correction and fail "sanity - why did the other correct it?"
           any_expensive_correction

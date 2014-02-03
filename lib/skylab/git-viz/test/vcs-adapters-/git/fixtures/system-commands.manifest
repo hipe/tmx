@@ -1,4 +1,4 @@
-git ls-files .
+git ls-files -- .
   options {"chdir":"/derp/berp/dirzo"}
   file mock-repo-1/ls-files.txt
 

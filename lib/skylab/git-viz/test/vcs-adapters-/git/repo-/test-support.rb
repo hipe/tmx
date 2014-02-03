@@ -20,10 +20,14 @@ module Skylab::GitViz::TestSupport::VCS_Adapters_::Git::Repo_
     end
 
     def build_repo
-      _pn = mock_pathname '/derp/berp'
+      _pn = mock_repo_argument_pathname
       _VCS_const( :Repo_ ).build_repo _pn, listener do |repo|
         repo.system_conduit = system_conduit
       end
+    end
+
+    def mock_repo_argument_pathname
+      mock_pathname '/derp/berp'
     end
 
     def my_fixtures_module

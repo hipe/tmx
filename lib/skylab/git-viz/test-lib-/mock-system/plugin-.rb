@@ -35,7 +35,7 @@ module Skylab::GitViz
           conduit = plugin_conduit_cls.new @y, self
           box_mod = rslv_some_plugin_box_mod
           box_mod.constants.each do |const_i|
-            name = Name.from_const const_i
+            name = Name_.from_const const_i
             WHITE_SLUG_RX__ =~ name.as_slug or next
             cond = conduit.curry name
             plugin = box_mod.const_get( name.as_const, false ).new cond
@@ -72,7 +72,7 @@ module Skylab::GitViz
         end
 
         def idx_plugin cond
-          k = cond.name.norm_i ; did = false
+          k = cond.name.as_variegated_symbol ; did = false
           callbacks = @callbacks
           cond.plugin.class.instance_methods( false ).each do |m_i|
             ON_RX__ =~ m_i or next
@@ -131,56 +131,6 @@ module Skylab::GitViz
         end
 
         PROCEDE__ = nil
-      end
-
-      class Name
-        class << self
-          def from_const const_i
-            allocate_with :initialize_with_const_i, const_i
-          end
-          def from_human human_s
-            allocate_with :initialize_with_human, human_s
-          end
-          def from_local_pathname pn
-            allocate_with :initialize_with_local_pathname, pn
-          end
-          private :new
-        private
-          def allocate_with method_i, x
-            new = allocate
-            new.send method_i, x
-            new
-          end
-        end
-      private
-        def initialize_with_const_i const_i
-          @as_const = const_i
-          @norm_i = const_i.to_s.downcase.intern
-          init_slug ; init_human ; freeze
-        end
-        def initialize_with_human human_s
-          @as_human = human_s.freeze
-          @as_slug = human_s.gsub( ' ', '-' ).freeze
-          init_norm ; init_const ; freeze
-        end
-        def initialize_with_local_pathname pn
-          @as_slug = pn.sub_ext( '' ).to_path.freeze
-          init_const ; init_human ; init_norm ; freeze
-        end
-        def init_const
-          @as_const = Constify_map_reduce_slug_[ @as_slug ]
-        end
-        def init_norm
-          @norm_i = @as_slug.gsub( '-', '_' ).intern
-        end
-        def init_human
-          @as_human = @as_slug.gsub( '-', ' ' ).freeze
-        end
-        def init_slug
-          @as_slug = @norm_i.to_s.gsub( '_', '-' ).freeze
-        end
-      public
-        attr_reader :as_const, :as_human, :as_slug, :norm_i
       end
 
       class Plugin_Conduit_  # see [#031]:#understanding-plugin-conduits

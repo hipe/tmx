@@ -8,9 +8,12 @@ module Skylab::GitViz::TestSupport
     MetaHell = o::MetaHell[]
     Headless = o::Headless[]
     TestSupport = o::TestSupport[]
+    TS_ = GitViz::TestSupport
   end
 
   include CONSTANTS
+
+  extend TestSupport::Quickie
 
   GitViz = GitViz ; Headless = Headless ; MetaHell = MetaHell ; TS__ = self
 
@@ -92,5 +95,9 @@ module Skylab::GitViz::TestSupport
         end ; nil
       end
     end
+  end
+
+  module Messages
+    PATH_IS_FILE = "path is file, must have directory".freeze
   end
 end
