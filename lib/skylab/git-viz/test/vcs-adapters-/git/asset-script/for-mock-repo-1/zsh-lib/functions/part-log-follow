@@ -1,5 +1,69 @@
 #!/usr/bin/env zsh  #just-for-syntax-highlighting
 
-serr "pretending to do 'git log follow'"
+part-ls-files-description () {
+  serr "description: build dumps for the 'log --follow' commands"
+}
 
-return $gv_success
+part-ls-files-usage () {
+  serr "usage: $($partlib_say_invocation_name) [-h]"
+}
+
+-require-partlib
+
+typeset part_func=$0 ; typeset -a rest ; rest=("$*[@]")
+
+typeset adverb asset_output_dir
+partlib-parse-adverb-and-asset-output-dir
+
+-partlib-help && return  # #debugging: comment this line out to see API help
+
+-partlib-require-asset-output-dir || return $?
+
+--each-log-follow-command () {
+  typeset story_cmd_s=$1 cd=$2 triad_callback=$3
+  typeset real_cmd_s="$story_cmd_s"
+  typeset -a cmd;
+  cmd=(${(z)real_cmd_s})
+
+  if [[ ! -z  $cd ]] ; then
+    cd=/$cd ; typeset dd=/..
+  fi
+  loud-cd $asset_output_dir$cd || return $?
+  typeset cmd_s="${cmd[1]}"
+  cmd[1,1]=()
+  serr "${triad_indent}<< $cmd_s ${(q)cmd[@]} >>"
+  typeset o e es real_o ; real_o==() ; e==()
+  $cmd_s "${(Q)cmd[@]}" 1>$real_o 2>$e
+  es=$?
+  setopt extendedglob
+
+  typeset match mbegin mend
+  typeset line ; typeset -A assoc
+  while read -r line ; do
+    if [[ $line = \[master* ]] ; then
+      if [[ $line = (#b)\[master\ ([^]]##)\]\ commit\ to\ be\ treated\ as\
+\ commit\ ([[:digit:]]##) ]] ; then
+        assoc[${match[1]}]="${match[2]}"
+      elif [[ $line = (#b)\[master\ \(root-commit\)\ ([^\]]##)* ]] ; then
+        assoc[${match[1]}]=012012
+      fi
+    fi
+  done < ../log
+  typeset short
+  o==()
+  while read -r line ; do
+    short=${line[1,7]}
+    echo "${assoc[$short]}" >> $o
+  done < $real_o
+
+  rm $real_o
+
+  loud-cd "..$dd"
+  $triad_callback $o $e $es
+}
+
+# print "\n\n(log-follow-files:(${(f)rest})\n\n" ; return 0  # #debugging
+
+troika-lookup-system-commands --each-command --each-log-follow-command\
+  --command-white-filter-regex '^git log --follow\b'\
+  --chdir-prefix-white-filter /derp/berp "${rest[@]}"

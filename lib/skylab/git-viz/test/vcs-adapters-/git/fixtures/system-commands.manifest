@@ -22,3 +22,15 @@ git show --numstat --pretty\=tformat:\%ai 456456 --
   options {"chdir":"/derp/berp"}
   serr file mock-repo-1/show.456456.err.txt
   exitstatus 128  #nonexistant-SHA
+
+git log --follow --pretty\=tformat:\%H -- everybody\ in\ the\ room\ is\ floating
+  options {"chdir":"/derp/berp/dirzo"}
+  file mock-repo-1/log-follow.out.1.txt
+
+git log --follow --pretty\=tformat:\%H -- it\'s\ just/funky\ like\ that
+  options {"chdir":"/derp/berp/dirzo"}
+  file mock-repo-1/log-follow.out.2.txt
+
+git log --follow --pretty\=tformat:\%H -- move-after
+  options {"chdir":"/derp/berp/dirzo"}
+  file mock-repo-1/log-follow.out.3.txt
