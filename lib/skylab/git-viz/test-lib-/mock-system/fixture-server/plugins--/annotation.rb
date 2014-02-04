@@ -17,7 +17,7 @@ module Skylab::GitViz
         end
       end
 
-      Msg__ = Test_Lib_::Mock_System::Plugin_::Qualifiable_Message_String
+      Msg__ = GitViz::Lib_::Plugin[]::Qualifiable_Message_String
 
       def on_intro
         @y << "(running #{ rb_environment_moniker })"

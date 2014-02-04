@@ -1,18 +1,20 @@
-module Skylab::GitViz
+module Skylab
 
-  module Test_Lib_::Mock_System
+  module Headless
 
-    module Plugin_  # read [#031] the plugin narrative
+    module Plugin  # read [#031] the plugin narrative
 
       Host = -> cls do
         cls.extend Host_Module_Methods__
         cls.include Host_Instance_Methods__ ; nil
       end
 
+      Callback = Headless::Library_::Callback
+
       module Host_Module_Methods__
 
         define_method :build_mutable_callback_tree_specification,
-          GitViz::Lib_::Callback_Tree::Methods::
+          Callback::Tree::Methods::
             Build_mutable_callback_tree_specification
 
         def plugin_conduit_class
@@ -35,7 +37,7 @@ module Skylab::GitViz
           conduit = plugin_conduit_cls.new @y, self
           box_mod = rslv_some_plugin_box_mod
           box_mod.constants.each do |const_i|
-            name = Name_.from_const const_i
+            name = Callback::Name.from_const const_i
             WHITE_SLUG_RX__ =~ name.as_slug or next
             cond = conduit.curry name
             plugin = box_mod.const_get( name.as_const, false ).new cond
@@ -67,7 +69,7 @@ module Skylab::GitViz
 
         def vivify_autoloading_plugin_box
           mod = self.class.const_set PLUGIN_BOX__, ::Module.new
-          GitViz::Autoloader_[ mod, :boxxy ]
+          Callback::Autoloader[ mod, :boxxy ]
           mod
         end
 
@@ -88,7 +90,7 @@ module Skylab::GitViz
         end
 
         def init_option_parser_by_aggregating_plugin_options
-          @op = GitViz::Lib_::OptionParser[].new
+          @op = Headless::Library_::OptionParser[].new
           write_plugin_host_option_parser_options  # :+#hook-out
           call_plugin_listeners :on_build_option_parser do |plugin_i|
             cond = @plugin_conduit_h.fetch plugin_i

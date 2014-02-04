@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System::Plugin_
+module Skylab::Headless::TestSupport::Plugin
 
   describe "[gv] test-lib- mock system plugin- attempters" do
 
@@ -10,7 +10,7 @@ module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System::Plugin_
 
         class Fazoozle
 
-          GitViz::Test_Lib_::Mock_System::Plugin_::Host[ self ]
+          Headless::Plugin::Host[ self ]
 
           def initialize
             m = method :raise

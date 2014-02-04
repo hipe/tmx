@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System::Plugin_
+module Skylab::Headless::TestSupport::Plugin
 
-  describe "[gv] test-lib- mock system plugin- loading" do
+  describe "[hl] plugin loading" do
 
     context "one" do
 
@@ -10,8 +10,8 @@ module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System::Plugin_
 
         class Mandango
 
-          GitViz::Test_Lib_::Mock_System::Plugin_::Host[ self ]
-          GitViz::Autoloader_[ self, TS__.dir_pathname.join( 'mandango' ) ]
+          Headless::Plugin::Host[ self ]
+          Callback::Autoloader[ self, TS__.dir_pathname.join( 'mandango' ) ]
 
           def initialize
             m = method :raise

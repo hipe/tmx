@@ -4,7 +4,7 @@ module Skylab::GitViz
 
     class Fixture_Client  # [#024] taste the pain of too much docs
 
-      Mock_System::Plugin_::Host[ self ]
+      GitViz::Lib_::Plugin[]::Host[ self ]
       Mock_System::Socket_Agent_[ self ]
       include Socket_Agent_Constants_
 

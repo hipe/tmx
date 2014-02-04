@@ -1,4 +1,4 @@
-module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System::Plugin_
+module Skylab::Headless::TestSupport::Plugin
 
   class Mandango
 

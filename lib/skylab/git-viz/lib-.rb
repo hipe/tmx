@@ -42,6 +42,7 @@ module Skylab::GitViz
     MD5 = memo[ -> do require 'digest/md5' ; ::Digest::MD5 end ]
     Open3 = stdlib[ :Open3 ]
     OptionParser = memo[ -> do require 'optparse' ; ::OptionParser end ]
+    Plugin = memo[ -> do Headless[]::Plugin end ]
     Porcelain = subsys[ :Porcelain ]
     Set = stdlib[ :Set ]
     Shellwords = stdlib[ :Shellwords ]
