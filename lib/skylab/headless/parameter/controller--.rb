@@ -36,7 +36,7 @@ module Skylab::Headless
       end
 
       Ev__ = ::Module.new
-      Event__ = Headless::Event_
+      Event__ = Headless::Event
 
       module IM__  # (changed event model at [#087])
 
@@ -100,7 +100,7 @@ module Skylab::Headless
         end
 
         #
-        Ev__::Internal__ = Event_.new do |param_a|
+        Ev__::Internal__ = Headless::Event.new do |param_a|
           _s_a = param_a.map( & method( :parameter_label ) )
           "#{ and_ _s_a } #{ s :is } #{ s :an }internal parameter#{ s }"
         end

@@ -210,11 +210,10 @@ module Skylab::Headless
         end
       end  # in Syntax
     end # in Argument
-
-    Missing_ = Event_.
+    Missing_ = Headless::Event.
       new :orientation_i, :syntax_slice, :any_at_token_set, :any_full_syntax
 
-    Extra_ = Event_.new :s_a  # :#API-private (and above)
+    Extra_ = Headless::Event.new :s_a  # :#API-private (and above)
 
     class CLI::Argument
 

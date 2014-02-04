@@ -9,7 +9,7 @@ module Skylab::Headless
 
     module Bundles
       Client_services = -> x_a do
-        module_exec x_a, & Client_Services.to_proc ; nil
+        module_exec x_a, & Headless::Client_Services.to_proc ; nil
       end
       Parameter_controller = -> _ do
         Headless::Parameter[ self, :parameter_controller ]

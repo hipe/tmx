@@ -77,7 +77,7 @@ module Skylab
       MetaHell::Bundle::Multiset[ self ]
     end
 
-    class Event_ < Headless::Event_
+    class Event_ < Headless::Event
     end
   end
 end
