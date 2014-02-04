@@ -9,7 +9,7 @@ module Skylab::Porcelain::Bleeding
   Headless = ::Skylab::Headless
   MetaHell = ::Skylab::MetaHell
   Porcelain = ::Skylab::Porcelain # #hiccup
-  PubSub = ::Skylab::PubSub
+  Callback = ::Skylab::Callback
 
   module Styles
     include Headless::NLP::EN::Methods
@@ -342,7 +342,7 @@ module Skylab::Porcelain::Bleeding
       res
     end
 
-    Find = PubSub::Emitter.new ambiguous: :error,
+    Find = Callback::Emitter.new ambiguous: :error,
       not_found: :error, not_provided: :error
 
     Find.event_factory -> _, __, x { x }  # "datapoint" - events are just the data

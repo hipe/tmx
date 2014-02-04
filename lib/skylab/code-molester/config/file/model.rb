@@ -4,10 +4,10 @@ module Skylab::CodeMolester
 
     module Foofer # (ignore)
 
-      # (while [#ps-101] (cover pub-sub viz) is open..) (multiple graphs
+      # (while [#ps-101] (cover [cb] digraph viz) is open..) (multiple graphs
       # in one file, specifically)
 
-      PubSub[ self, :employ_DSL_for_emitter ]
+      Callback[ self, :employ_DSL_for_emitter ]
       emits wizzle: :paazle
     end
 
@@ -252,7 +252,7 @@ module Skylab::CodeMolester
       r
     end
 
-    Write__ = PubSub::Emitter.new
+    Write__ = Callback::Emitter.new
     class Write__  # `write` is very evented [#006]
 
       taxonomic_streams :all, :structural, :text, :notice, :before, :after
@@ -265,7 +265,7 @@ module Skylab::CodeMolester
         after_create: [ :structural, :after, :notice ],
         no_change: [ :notice, :text ]
 
-      event_factory -> { PubSub::Event::Factory::Isomorphic.new Events__ }
+      event_factory -> { Callback::Event::Factory::Isomorphic.new Events__ }
 
       attr_accessor :dry_run
       alias_method :is_dry_run, :dry_run
@@ -281,8 +281,8 @@ module Skylab::CodeMolester
 
       module Events__
         MetaHell::Boxxy[ self ]
-        Text = PubSub::Event::Factory::Datapoint
-        Structural = PubSub::Event::Factory::Structural.new 2, nil, Events___
+        Text = Callback::Event::Factory::Datapoint
+        Structural = Callback::Event::Factory::Structural.new 2, nil, Events___
       end
     end
 

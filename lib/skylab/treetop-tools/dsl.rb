@@ -110,7 +110,7 @@ module Skylab::TreetopTools
     end
 
     def callbacks
-      @callbacks ||= begin        # cheap, compartmentalized pub-sub
+      @callbacks ||= begin  # cheap, compartmentalized pub-sub
         o = Headless::Parameter::Definer.new do
           param :error, hook: true, writer: true
           param :info,  hook: true, writer: true

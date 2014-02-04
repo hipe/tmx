@@ -4,7 +4,7 @@ module Skylab::SubTree
 
     MetaHell::Boxxy[ self ]  # events box modules are almost always boxified
 
-    Structural = PubSub::Event::Factory::Structural.new 5  # `structural`
+    Structural = Callback::Event::Factory::Structural.new 5  # `structural`
 
     module Datapoint  # `datapoint` - just pass data objects through
       def self.event _, __, x
@@ -19,9 +19,9 @@ module Skylab::SubTree
 
     ACTIONS_ANCHOR_MODULE = SubTree::API::Actions
 
-    PubSub[ self, :employ_DSL_for_emitter ]
+    Callback[ self, :employ_DSL_for_emitter ]
 
-    event_factory PubSub::Event::Factory::Isomorphic.new( API::Events )
+    event_factory Callback::Event::Factory::Isomorphic.new( API::Events )
 
     def initialize
       @error_was_emitted = false

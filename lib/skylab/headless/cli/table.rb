@@ -10,8 +10,8 @@ module Skylab::Headless::CLI::Table
 
   Headless = ::Skylab::Headless
   MetaHell = ::Skylab::MetaHell
-  PubSub = Headless::Library_::PubSub
-  Table = self  # partly b.c PubSub is not part of headless proper
+  Callback = Headless::Library_::Callback
+  Table = self  # partly b.c Callback is not part of headless proper
   TERM_SEPARATOR_STRING_ = Headless::TERM_SEPARATOR_STRING_
 
   class Table::Conduit
@@ -20,9 +20,9 @@ module Skylab::Headless::CLI::Table
     # to your call to Table.render (or you can manipualte it directly in
     # the block).
 
-    PubSub[ self, :employ_DSL_for_emitter ]
+    Callback[ self, :employ_DSL_for_emitter ]
 
-    event_factory -> { PubSub::Event::Factory::Isomorphic.new Table::Events }
+    event_factory -> { Callback::Event::Factory::Isomorphic.new Table::Events }
 
     emits row: :text,  # (contrast with `textual`, `on_text` reads better)
          info: :text,  # (:info is strictly a branch not a leaf)

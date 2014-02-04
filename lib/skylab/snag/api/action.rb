@@ -11,10 +11,10 @@ module Skylab::Snag
     meta_attribute :default
     meta_attribute :required, default: false
 
-    PubSub[ self, :employ_DSL_for_emitter ]  # put `emit` nearer on the chain than s.c above
+    Callback[ self, :employ_DSL_for_emitter ]  # put `emit` nearer on the chain than s.c above
 
     event_factory MetaHell::FUN.memoize[ -> do
-      PubSub::Event::Factory::Isomorphic.new API::Events # oh boy .. use the
+      Callback::Event::Factory::Isomorphic.new API::Events # oh boy .. use the
     end ]                   # same factory instance for every action subclass
                             # instance which *should* be fine given the funda-
                             # mental supposition of isomorphic factories (see)
@@ -132,7 +132,7 @@ module Skylab::Snag
       end
     end
 
-    # `build_event` - we override the one we get from pub-sub to pass our
+    # `build_event` - we override the one we get from [cb] to pass our
     # factory 1 more parameter than usual (if e.g the event class being
     # used is "lingual" it will take linguistic metadata from us, the
     # caller).

@@ -11,7 +11,7 @@ module Skylab::Porcelain::TestSupport
     Headless = ::Skylab::Headless
     MetaHell = ::Skylab::MetaHell
     Porcelain = ::Skylab::Porcelain
-    PubSub = ::Skylab::PubSub
+    Callback = ::Skylab::Callback
     TestSupport = ::Skylab::TestSupport
   end
 

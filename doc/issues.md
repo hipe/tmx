@@ -71,8 +71,8 @@
 [#065] 2012-02-18 @closed: porcelain: default args
 [#064] 2012-02-18 @closed: we must deep copy tag cloud!
 [#063] 2012-02-18 @closed gsu: fix it to use new porcelain
-[#062] 2012-02-18 @closed pub-sub: touch events
-[#061] 2012-02-18 @closed pub-sub: fix issue with deep trees
+[#062] 2012-02-18 @closed [cb]: touch events
+[#061] 2012-02-18 @closed [cb]: fix issue with deep trees
 [#060] 2012-02-18 @closed tmx: merge issues
 [#058] 2012-02-18 @closed muxer: rename things
 [#057] 2012-02-18 @closed porcelain: events

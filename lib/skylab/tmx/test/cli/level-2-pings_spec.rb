@@ -35,6 +35,10 @@ module Skylab::TMX::TestSupport::CLI::L2P
       capture3 :breakup, FLAG_, 0
     end
 
+    it "callback" do
+      go :'callback'
+    end
+
     it "citxt - capture3" do
       capture3 :citxt, FLAG_, 0
     end
@@ -61,10 +65,6 @@ module Skylab::TMX::TestSupport::CLI::L2P
 
     it "permute" do
       go :permute
-    end
-
-    it "pub-sub" do
-      go :'pub-sub'
     end
 
     it "quickie" do

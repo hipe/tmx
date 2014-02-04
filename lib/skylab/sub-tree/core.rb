@@ -12,7 +12,7 @@ module Skylab::SubTree
     :Headless,  # styles, parameter controller
     :MetaHell,
     :Porcelain,  # level-1 is this
-    :PubSub
+    :Callback
   ], self ]
 
   MetaHell::MAARS[ self ]

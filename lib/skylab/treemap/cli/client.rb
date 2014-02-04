@@ -7,14 +7,14 @@ module Skylab::Treemap
     include Treemap::Core::Action::InstanceMethods  # a lot of these are
                                   # up-delegators which we must implement
 
-    extend PubSub::Emitter        # NOTE here. overwrite s.c version of `emit`
+    extend Callback::Emitter  # NOTE here. overwrite s.c version of `emit`
 
     taxonomic_streams :all
 
     emits Bleeding::EVENT_GRAPH.merge(
       ::Hash[ CLI::Event::CANON_STREAMS.map { |sn| [ sn, :all ] } ]
     )                             # your best friend right now is:
-                                  # `pub-sub viz cli/client.rb --open`
+                                  # `tmx-callback viz cli/client.rb --open`
 
     event_factory CLI::Event::FACTORY
 

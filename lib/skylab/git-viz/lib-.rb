@@ -40,7 +40,7 @@ module Skylab::GitViz
     Open3 = stdlib[ :Open3 ]
     OptionParser = memo[ -> do require 'optparse' ; ::OptionParser end ]
     Porcelain = subsys[ :Porcelain ]
-    PubSub = subsys[ :PubSub ]
+    Callback = subsys[ :Callback ]
     Set = stdlib[ :Set ]
     Shellwords = stdlib[ :Shellwords ]
     StringScanner = memo[ -> do require 'strscan' ; ::StringScanner end ]

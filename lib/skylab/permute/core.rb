@@ -1,14 +1,14 @@
 require_relative '..'
+require 'skylab/callback/core'
 require 'skylab/headless/core'
 require 'skylab/porcelain/core'
-require 'skylab/pub-sub/core'
 
 module Skylab::Permute
 
   Bleeding = ::Skylab::Porcelain::Bleeding
   Headless = ::Skylab::Headless
   Permute = self
-  PubSub = ::Skylab::PubSub
+  Callback = ::Skylab::Callback
 
   # (:+[#su-001]:none)
 

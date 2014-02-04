@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models::ToDo::Enumerator < ::Enumerator
 
-    PubSub[ self, :employ_DSL_for_emitter ]
+    Callback[ self, :employ_DSL_for_emitter ]
 
     emits :error, :command
 

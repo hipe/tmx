@@ -1,5 +1,5 @@
 require_relative 'test-support'
-require 'skylab/pub-sub/test/test-support'  # keep here until needed elsewhere
+require 'skylab/callback/test/test-support'  # keep here until needed elsewhere
 
 module ::Skylab  # [#ts-010]
 # ..
@@ -8,7 +8,7 @@ describe "#{ Permute::CLI }" do
   before :all do  # just a bad idea all around, but we want to see how it goes
     cli = Permute::CLI.new
     cli.program_name = 'permoot'
-    spy = PubSub::TestSupport::Emit_Spy.new
+    spy = Callback::TestSupport::Emit_Spy.new
     cli.singleton_class.send(:define_method, :emit) do |type, payload|
       spy.emit(type, payload)
     end

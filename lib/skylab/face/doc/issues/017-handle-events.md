@@ -12,6 +12,6 @@ part of it.
 the participating modality client will implement its own `handle_events`,
 which may want to use "binary facet reflection" [#027] to see that the
 action `has_emit_facet`, and then somehow handle its events (possibly using
-e.g the reflection API of PubSub [#ps-014]).
+e.g the reflection API of Callback [#ps-014]).
 
 _

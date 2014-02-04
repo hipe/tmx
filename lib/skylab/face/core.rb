@@ -30,7 +30,7 @@ module Skylab::Face
     o[ :Basic ] = o[ :Headless ] = subsys
     o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
     o[ :Open3 ] = stdlib
-    o[ :Porcelain ] = o[ :PubSub ] = subsys
+    o[ :Porcelain ] = o[ :Callback ] = subsys
     o[ :Set  ] = o[ :StringIO ] = stdlib
 
     define_singleton_method :const_missing do |c|

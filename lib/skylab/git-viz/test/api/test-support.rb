@@ -20,7 +20,7 @@ module Skylab::GitViz::TestSupport::API
     end
 
     def bld_emit_spy
-      es = GitViz::Lib_::PubSub[]::TestSupport::Emit_Spy.new
+      es = GitViz::Lib_::Callback[]::TestSupport::Emit_Spy.new
       es.debug_IO = debug_IO
       es.do_debug_proc = -> { do_debug }
       es
@@ -36,7 +36,7 @@ module Skylab::GitViz::TestSupport::API
     end
 
     Common_shape_listener__ = MetaHell::FUN::Memoize[ -> do
-      GitViz::Lib_::PubSub[]::
+      GitViz::Lib_::Callback[]::
         Listener::Class_from_diadic_matrix[ %i( info ), %i( line ) ]
     end ]
 

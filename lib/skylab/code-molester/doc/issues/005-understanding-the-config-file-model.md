@@ -37,8 +37,8 @@ programmatically how to handle the event); and `notice` vs. `error` i.e. the
 severity -- e.g you may only want to act on events when they are at a certain
 level of severity to you.
 
-this big graph of streams is best viewed with `pub-sub viz`, a command-
-line tool that is part of pub-sub and works in conjunction with graph-viz
+this big graph of streams is best viewed with `[cb] viz`, a command-
+line tool that is part of [cb] and works in conjunction with graph-viz
 to display this graph visually.
 
 (incidentally this and its two constituent implementation methods

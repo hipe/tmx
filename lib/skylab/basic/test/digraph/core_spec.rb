@@ -201,7 +201,7 @@ module Skylab::Basic::TestSupport::Digraph::Core
 
       digraph :real,  [row: :text, info: :text, empty: :info, row_count: :data ]
 
-      # pub-sub-viz headless/core.rb Skylab::Headless::CLI::Table::Conduit --ope
+      # cb-digraph-viz headless/core.rb Skylab::Headless::CLI::Table::Conduit --ope
 
       context "you can ACHIEVE SEMANTIC DIFFERENCE" do
 

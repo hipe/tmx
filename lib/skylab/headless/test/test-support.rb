@@ -41,8 +41,8 @@ module Skylab::Headless::TestSupport
   module Library_  # :+[#su-001]:just-for-tests
     h = {
       PubSub_TestSupport: -> do
-        require 'skylab/pub-sub/test/test-support'
-        ::Skylab::PubSub::TestSupport
+        require 'skylab/callback/test/test-support'
+        ::Skylab::Callback::TestSupport
       end
     }.freeze
 

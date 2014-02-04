@@ -11,7 +11,7 @@ module Skylab::Headless
     o[ :Open3 ] = stdlib
     o[ :Open4 ] = -> { ::Skylab::Subsystem::FUN.require_quietly[  'open4'  ]; ::Open4 }
     o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
-    o[ :PubSub ] = subsys
+    o[ :Callback ] = subsys
     o[ :Set ] = stdlib
     o[ :Shellwords ] = o[ :StringIO ] = stdlib
     o[ :StringScanner ] = -> _ { require 'strscan' ; ::StringScanner }

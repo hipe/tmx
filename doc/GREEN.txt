@@ -2,6 +2,7 @@ file-metrics  NEEDS
 interface     NEEDS
 beauty-salon  n/a
 bnf2treetop   YES
+callback      YES YES
 code-molester YES
 cov-tree      YES
 css-convert   YES
@@ -18,7 +19,6 @@ meta-hell     YES YES YES
 my-tree       YES YES YES
 permute       YES
 porcelain     YES YES YES
-pub-sub       YES YES
 semantic      YES
 slake         YES YES
 tan-man       YES

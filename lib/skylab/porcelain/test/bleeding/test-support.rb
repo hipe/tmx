@@ -1,12 +1,12 @@
 require_relative '../test-support'
-require 'skylab/pub-sub/test/test-support'  # visiting! move up whenever
+require 'skylab/callback/test/test-support'  # visiting! move up whenever
 
 module Skylab::Porcelain::TestSupport::Bleeding
 
   ::Skylab::Porcelain::TestSupport[ Bleeding_TestSupport = self ] # #regret
 
   module CONSTANTS
-    PubSub_TestSupport = PubSub::TestSupport
+    PubSub_TestSupport = Callback::TestSupport
   end
 
   include CONSTANTS

@@ -125,7 +125,7 @@ module Skylab::Porcelain::Legacy
 
       mutex_h.fetch self do
         mutex_h[ self ] = true
-        # pub-sub is opt-in, implement `emit` however you want. still this sux
+        # [cb] digraph is opt-in, implement `emit` however you want. still this sux
         do_wire = Module_defines_method_[ singleton_class, :emits ]
         has_emit_method = Module_defines_method_[ self, :emit ]
         do_wire and class_exec( & event_graph_init )
@@ -148,7 +148,7 @@ module Skylab::Porcelain::Legacy
 
     event_graph_init = -> do
       if ! instance_methods( false ).include?( :event_class )
-        event_class ::Skylab::PubSub::Event::Textual
+        event_class ::Skylab::Callback::Event::Textual
       end  # experimental ack - all our events are textual, so..
 
       emits         payload: :all,
@@ -1118,7 +1118,7 @@ module Skylab::Porcelain::Legacy
       @instream ||= i ; @paystream ||= o ; @infostream ||= e ; nil
     end
 
-    # non-pub-sub variant of `emit` gets "turned on" elsewhere
+    # non [cb] digraph variant of `emit` gets "turned on" elsewhere
 
     def _porcelain_legacy_emit stream_name, text
       ( :payload == stream_name ? @paystream : @infostream ).puts text

@@ -9,7 +9,7 @@ module Skylab::Cull
     emits yes: :structural, no: :structural,
       hard_yes: :payload_lines
 
-    event_factory PubSub::Event::Factory::Structural.new(
+    event_factory Callback::Event::Factory::Structural.new(
       3, nil, API::Events_ ).method( :event )
       # #todo the above is good but can probably be cleaned up
 

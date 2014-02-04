@@ -128,7 +128,7 @@ module Skylab::Treemap
     end
   end
 
-  Core::Event::FACTORY = PubSub::Event::Factory::Explicit.new(
+  Core::Event::FACTORY = Callback::Event::Factory::Explicit.new(
     {
              payload_line: :datapoint,
                      info: :textual,
@@ -136,7 +136,7 @@ module Skylab::Treemap
                     error: :textual,
                      help: :datapoint
     }, {
-      datapoint: PubSub::Event::Factory::Datapoint
+      datapoint: Callback::Event::Factory::Datapoint
     }
   )
 end

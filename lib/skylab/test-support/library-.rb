@@ -16,7 +16,7 @@ module Skylab::TestSupport
     o[ :MetaHell ] = subsys
     o[ :Open3 ] = stdlib
     o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
-    o[ :Porcelain ] = o[ :PubSub ] = subsys
+    o[ :Porcelain ] = o[ :Callback ] = subsys
     o[ :Rack ] = gemlib
     o[ :StringIO ] = stdlib
     o[ :Tmpdir ] = -> _ { require 'tmpdir' ; ::Dir }  # Dir.tmpdir

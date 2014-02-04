@@ -24,7 +24,7 @@ one day revealing the below articulation.
 
 "make snitch" - (formerly `sc` for "sub-client")
 quick and dirty proof of concept, will almost certainly change. the idea is a
-simpler alternative to pub-sub. what if you could throw one listener around
+simpler alternative to [cb] digraph. what if you could throw one listener around
 throughout your graph? the listener is like a golden snitch. no it isn't.
 :~[#fa-051]
 

@@ -22,7 +22,7 @@ label="Core Dependencies (hand written (for now ..))"
 
 headless [label=headless]
 meta [label="meta-hell"]
-pub [label="pub-sub"]
+pub [label="[cb] digraph"]
 semantic [label=semantic]
 headless -> meta
 pub -> meta

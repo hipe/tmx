@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Text_::Yamlization
 
-    PubSub[ self, :employ_DSL_for_emitter ]
+    Callback[ self, :employ_DSL_for_emitter ]
 
     emits :text_line
 

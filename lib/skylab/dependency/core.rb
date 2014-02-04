@@ -15,7 +15,7 @@ module Skylab::Dependency
   Face = ::Skylab::Face
   Headless = ::Skylab::Headless
   Porcelain = ::Skylab::Porcelain
-  PubSub = ::Skylab::PubSub
+  Callback = ::Skylab::Callback
   Slake = ::Skylab::Slake
 
 end

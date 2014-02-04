@@ -6,7 +6,7 @@ module Skylab::SubTree
 
   private
 
-    PubSub[ self, :employ_DSL_for_emitter ]  # do this before you extend
+    Callback[ self, :employ_DSL_for_emitter ]  # do this before you extend
       # legacy, it gives you a graph
 
     def mutex name_i, value_i

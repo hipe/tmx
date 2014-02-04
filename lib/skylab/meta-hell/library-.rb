@@ -7,7 +7,7 @@ module Skylab::MetaHell
     o = { }
     o[ :Basic ] = o[ :CodeMolester ] = o[ :Headless ] = subsys
     o[ :Open3 ] = stdlib
-    o[ :PubSub ] = subsys
+    o[ :Callback ] = subsys
     o[ :Set ] = o[ :Shellwords ] = stdlib
 
     define_singleton_method :const_missing do |const_i|

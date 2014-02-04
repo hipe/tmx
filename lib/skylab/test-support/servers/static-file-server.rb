@@ -2,11 +2,11 @@ module Skylab::TestSupport
 
   class Servers::Static_File_Server
 
-    PubSub = TestSupport_::Library_::PubSub
+    Callback = TestSupport_::Library_::Callback
 
-    PubSub[ self, :employ_DSL_for_emitter ]
+    Callback[ self, :employ_DSL_for_emitter ]
 
-    event_class PubSub::Event::Textual
+    event_class Callback::Event::Textual
 
     emits info: :all, warn: :all, error: :all  # used internally
 
@@ -50,7 +50,7 @@ module Skylab::TestSupport
       nil
     end
 
-    LEVELS_= PubSub::Emitter::COMMON_LEVELS
+    LEVELS_= Callback::Emitter::COMMON_LEVELS
 
     def render_event_as_line e
       ">>> (#{ moniker } #{ e.stream_name } - #{ e.text })"

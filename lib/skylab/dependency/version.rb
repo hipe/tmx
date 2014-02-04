@@ -56,11 +56,11 @@ module Skylab::Dependency
     end
   end
 
-  Version::Parse = PubSub::Emitter.new :informational, error: :informational
+  Version::Parse = Callback::Emitter.new :informational, error: :informational
 
   class Version::Parse
 
-    event_class PubSub::Event::Textual
+    event_class Callback::Event::Textual
 
     def self.loud_singleton
       @loud ||= Dependency::Version::Parse.new( -> o do

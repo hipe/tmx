@@ -220,7 +220,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Attribute
       end
 
       def build_and_attach_to_emit_spy
-        es = MetaHell::Library_::PubSub::TestSupport::Emit_Spy.new do |es_|
+        es = MetaHell::Library_::Callback::TestSupport::Emit_Spy.new do |es_|
           es_.debug_IO = debug_IO
           es_.do_debug_proc = -> { do_debug }
         end

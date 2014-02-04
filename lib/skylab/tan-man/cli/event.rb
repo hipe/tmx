@@ -8,7 +8,7 @@ module Skylab::TanMan
   module CLI::Event
   end
 
-  class CLI::Event::Messagular < PubSub::Event::Unified  # `touched?`
+  class CLI::Event::Messagular < Callback::Event::Unified  # `touched?`
 
     class << self
       alias_method :event, :new
@@ -22,7 +22,7 @@ module Skylab::TanMan
     end
   end
 
-  class CLI::Event::Structic < PubSub::Event::Unified
+  class CLI::Event::Structic < Callback::Event::Unified
 
     # (used as dynamic namespace too)
 
@@ -33,10 +33,10 @@ module Skylab::TanMan
 
     String = CLI::Event::Messagular
 
-    Hash = PubSub::Event::Factory::Structural.new 10,
+    Hash = Callback::Event::Factory::Structural.new 10,
       CLI::Event::Structic, CLI::Event::Structic  # base kls & box module
 
   end
 
-  CLI::Event::Factory = PubSub::Event::Factory::Late.new( CLI::Event::Mappings )
+  CLI::Event::Factory = Callback::Event::Factory::Late.new( CLI::Event::Mappings )
 end

@@ -1,12 +1,12 @@
 require_relative '../test-support'
-require 'skylab/pub-sub/test/test-support'
+require 'skylab/callback/test/test-support'
 
 module Skylab::SubTree::TestSupport::CLI
 
   ::Skylab::SubTree::TestSupport[ self ]  # #regret
 
   module CONSTANTS
-    PubSub_TestSupport = ::Skylab::PubSub::TestSupport
+    PubSub_TestSupport = ::Skylab::Callback::TestSupport
     PN_ = 'sub-tree'.freeze
   end
 

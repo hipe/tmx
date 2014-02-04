@@ -15,9 +15,9 @@ module Skylab::Dependency
     attr_accessor  :context
     attr_reader :invalid_reason
 
-    PubSub[ self, :employ_DSL_for_emitter ]   # child classes decide what to emit
+    Callback[ self, :employ_DSL_for_emitter ]   # child classes decide what to emit
 
-    event_class PubSub::Event::Textual  # can be made more complicated..
+    event_class Callback::Event::Textual  # can be made more complicated..
 
     include Headless::CLI::PathTools::InstanceMethods
     include Headless::CLI::Pen::Methods # `stylize`

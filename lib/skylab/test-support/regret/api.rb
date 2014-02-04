@@ -135,7 +135,7 @@ module Skylab::TestSupport
         Basic = subsys[ :Basic ]
         Face = subsys[ :Face ]
         Headless = subsys[ :Headless ]
-        PubSub = subsys[ :PubSub ]
+        Callback = subsys[ :Callback ]
         StringScanner = memo[ -> { require 'strscan' ; ::StringScanner } ]
         SubTree = subsys[ :SubTree ]
       end

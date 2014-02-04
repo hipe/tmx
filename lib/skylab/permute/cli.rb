@@ -47,7 +47,7 @@ module Skylab::Permute
 
     extend Bleeding::Action
 
-    PubSub[ self, :employ_DSL_for_emitter ]
+    Callback[ self, :employ_DSL_for_emitter ]
 
     emits syntax_error: :info
 

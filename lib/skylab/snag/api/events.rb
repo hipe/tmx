@@ -23,7 +23,7 @@ module Skylab::Snag
     end
 
     Structural = -> do
-      o = PubSub::Event::Factory::Structural.new 5  # sanity - max
+      o = Callback::Event::Factory::Structural.new 5  # sanity - max
       class << o
         alias_method :snag_original_event, :event
         def event _, __, ___, payload_h
@@ -34,7 +34,7 @@ module Skylab::Snag
     end.call
   end
 
-  class API::Events::Lingual < PubSub::Event::Unified
+  class API::Events::Lingual < Callback::Event::Unified
 
   public
 
