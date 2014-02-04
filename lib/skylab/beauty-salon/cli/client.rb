@@ -118,7 +118,7 @@ module Skylab::BeautySalon
       nil
     end
 
-    Headless::Plugin::Host::Proxy.enhance self do  # at the end b.c..
+    Face::Plugin::Host::Proxy.enhance self do  # at the end b.c..
 
       services [ :ostream, :ivar, :@out ],
                [ :estream, :ivar, :@err ]

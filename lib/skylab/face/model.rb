@@ -12,7 +12,7 @@ module Skylab::Face
     end
   end
 
-  class Model::Conduit_ < Library_::Headless::Plugin::Conduit_
+  class Model::Conduit_ < Face::Plugin::Conduit_
     def do_memoize
       @story.do_memoize!
     end
@@ -21,7 +21,7 @@ module Skylab::Face
     end
   end
 
-  class Model::Metaservices_ < Library_::Headless::Plugin::Metaservices_
+  class Model::Metaservices_ < Face::Plugin::Metaservices_
     def self.do_memoize!
       const_set :DO_MEMOIZE_, true
     end

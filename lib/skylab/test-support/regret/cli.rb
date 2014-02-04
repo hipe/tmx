@@ -15,6 +15,7 @@ module Skylab::TestSupport
     API = Regret::API
     CLI = Regret::CLI
     Headless = TestSupport_::Library_::Headless
+    Plugin_ = ::Skylab::Face::Plugin
 
     API::Conf::Verbosity[ self ]
 
@@ -267,7 +268,7 @@ module Skylab::TestSupport
       r
     end
 
-    Headless::Plugin::Host::Proxy.enhance self do  # at end
+    Plugin_::Host::Proxy.enhance self do  # at end
       services [ :out, :ivar ],
                [ :err, :ivar ],
                [ :pth, :ivar ],

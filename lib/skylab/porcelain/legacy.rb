@@ -1,9 +1,11 @@
 module Skylab::Porcelain::Legacy
 
+  Face = ::Skylab::Face
   Headless = ::Skylab::Headless
   Legacy = self  # 3 rsns: readability, autoloading, future-proofing
   MAARS  = ::Skylab::MetaHell::Autoloader::Autovivifying::Recursive
   MetaHell = ::Skylab::MetaHell
+  Plugin_ = ::Skylab::Face::Plugin
   Porcelain = ::Skylab::Porcelain
 
   Module_defines_method_ = MetaHell::FUN.
@@ -1160,7 +1162,7 @@ module Skylab::Porcelain::Legacy
 
     include Action::InstanceMethods
 
-    Headless::Plugin::Host.enhance self do
+    Plugin_::Host.enhance self do
       services [ :kbd, :method, :kbd_as_service ]
     end
 
@@ -1389,7 +1391,7 @@ module Skylab::Porcelain::Legacy
     # as a plugin. (also, trending away from the SubClient pattern [#fa-030])
     #
 
-    Headless::Plugin.enhance self do
+    Plugin_.enhance self do
       services_used [ :kbd, :ivar ]
     end
 

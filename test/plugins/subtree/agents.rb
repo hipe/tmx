@@ -1,7 +1,8 @@
 module Skylab::Test::Plugins::Subtree
 
   include ::Skylab::Test
-  Headless = Headless ; Lib_ = Lib_
+  Lib_ = Lib_
+  Plugin_ = ::Skylab::Face::Plugin
 
   class Agent_
     # search agents classes go here
@@ -34,7 +35,7 @@ module Skylab::Test::Plugins::Subtree
 
     # blacklist-based filtering  ( `--not <subproduct>` )
 
-    Headless::Plugin.enhance self do
+    Plugin_.enhance self do
 
       eventpoints_subscribed_to( * %i|
         available_options
@@ -150,7 +151,7 @@ module Skylab::Test::Plugins::Subtree
 
     # whitelist-based filtering via subrpdocut name ( <sub1> <sub2> [..] )
 
-    Headless::Plugin.enhance self do
+    Plugin_.enhance self do
 
       eventpoints_subscribed_to( * %i|
         available_options
@@ -322,7 +323,7 @@ module Skylab::Test::Plugins::Subtree
       @is_hot = nil
     end
 
-    Headless::Plugin.enhance self do
+    Plugin_.enhance self do
 
       eventpoints_subscribed_to( * %i|
         available_options
@@ -409,7 +410,7 @@ module Skylab::Test::Plugins::Subtree
 
     # (just for fun we do this as a standalone class, to grease it)
 
-    Headless::Plugin.enhance self do
+    Plugin_.enhance self do
 
       eventpoints_subscribed_to( * %i|
         available_options
@@ -536,7 +537,7 @@ module Skylab::Test::Plugins::Subtree
 
   class Agents::Randomize
 
-    Headless::Plugin.enhance self do
+    Plugin_.enhance self do
 
       eventpoints_subscribed_to( * %i|
         available_options

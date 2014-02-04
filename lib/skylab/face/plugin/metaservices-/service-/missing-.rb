@@ -1,11 +1,11 @@
-module Skylab::Headless
+module Skylab::Face
 
   class Plugin::Metaservices_::Service_::Missing_
 
     def initialize
       raw_a = @raw_queue_a = [ ]
       @message_proc = -> do  # [#it-002] NLP aggregation experiment
-        Headless::Library_::Basic::List::Aggregated::Articulation raw_a do
+        Face::Library_::Basic::List::Aggregated::Articulation raw_a do
           template "{{ hst }}{{ adj1 }} has not declared the required #{
             }{{ service_i }} declared as needed by {{ pi }}{{ adj2 }}"
           on_zero_items -> { "everything was ok." }

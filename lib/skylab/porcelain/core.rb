@@ -1,13 +1,14 @@
 require_relative '..'
 
-require 'skylab/headless/core'
 require 'skylab/callback/core'
+require 'skylab/face/core'
+require 'skylab/headless/core'
 
 module Skylab
 
   module Porcelain
 
-    %i| Callback Headless MetaHell Porcelain |.each do |i|
+    %i| Callback Face Headless MetaHell Porcelain |.each do |i|
       const_set i, ::Skylab.const_get( i, false )
     end
 

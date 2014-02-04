@@ -205,7 +205,7 @@ module Skylab::Face
     end
   end
 
-  class Services_  # ( basically a miniature version of Headless::Plugin..
+  class Services_  # ( basically a miniature version of Face::Plugin..
     # because it is used by CLI and we want to use it in API we put it here,
     # elsewise why are you using face !? ^_^)
 

@@ -1,4 +1,4 @@
-module Skylab::Headless
+module Skylab::Face
 
   class Plugin::Metaservices_::Omni_
 

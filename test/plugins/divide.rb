@@ -8,7 +8,7 @@ module Skylab::Test
 
     Divide = self
 
-    Headless::Plugin.enhance self do
+    Plugin_.enhance self do
 
       eventpoints_subscribed_to( * %i|
         available_actions

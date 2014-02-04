@@ -5,7 +5,7 @@ module Skylab::Test
     # `Req` plugin. 'req' is short for 'require', and this ugly name will
     # stick until [#hl-070-002] we design something better.
 
-    Headless::Plugin.enhance self do
+    Plugin_.enhance self do
 
       eventpoints_subscribed_to( * %i|
         available_actions

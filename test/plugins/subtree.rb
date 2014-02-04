@@ -13,7 +13,7 @@ module Skylab::Test
 
   module Plugins::Subtree
 
-    Headless::Plugin.enhance self do  # LOOK - see below
+    Plugin_.enhance self do  # LOOK - see below
 
       eventpoints_subscribed_to( * %i|
         available_options
@@ -42,7 +42,7 @@ module Skylab::Test
 
   class Plugins::Subtree::Client
 
-    Headless::Plugin::Host.enhance self do
+    Plugin_::Host.enhance self do
 
       # LOOK - experimentally we are a plugin *and* a plugin host ("app")
       # we use abbreviated names when there is a symbol of the same name in

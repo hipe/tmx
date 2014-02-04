@@ -1,4 +1,4 @@
-module Skylab::Headless
+module Skylab::Face
 
   class Plugin::Metastory_
 

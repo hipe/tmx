@@ -18,7 +18,7 @@ module Skylab::Cull
 
     end
 
-    Headless::Plugin::Host.enhance self do
+    Face::Plugin::Host.enhance self do
       services [ :config, :method, :config_controller ],
                [ :configs, :method, :config_collection ], *
                ( API::Client::Config_.fields.map do |fld|

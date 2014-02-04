@@ -47,9 +47,11 @@ module Skylab::Test
     MetaHell::Boxxy[ self ]
   end
 
+  Plugin_ = ::Skylab::Face::Plugin
+
   class Front_Mechanics_  # a "headless" client, conceptually
 
-    Headless::Plugin::Host.enhance self do
+    Plugin_::Host.enhance self do
 
       plugin_box_module -> { Test::Plugins }
 
@@ -179,7 +181,7 @@ module Skylab::Test
     end
 
     def build_action_collision_error act, pi, taken
-      Headless::Plugin::DeclarationError.new "plugin #{
+      Plugin_::DeclarationError.new "plugin #{
         }comprehension sorting conflict - name conflict with #{
         }\"#{ act.local_normal_name }\" from both #{
         }#{ pi.local_plugin_moniker } and #{

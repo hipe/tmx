@@ -1,25 +1,25 @@
 require_relative 'test-support'
 
-module Skylab::Headless::TestSupport::Plugin::Host::Proxy
+module Skylab::Face::TestSupport::Plugin::Host::Proxy
 
-  ::Skylab::Headless::TestSupport::Plugin::Host[ self ]
+  ::Skylab::Face::TestSupport::Plugin::Host[ self ]
 
   include CONSTANTS
 
-  Headless = ::Skylab::Headless
+  Face = ::Skylab::Face
 
   extend TestSupport::Quickie
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::Headless::Plugin::Host::Proxy" do
-    context "using `Headless::Plugin::Host::Proxy`" do
+  describe "Skylab::Face::Plugin::Host::Proxy" do
+    context "using `Face::Plugin::Host::Proxy`" do
       Sandbox_1 = Sandboxer.spawn
       it "comprehensive example" do
         Sandbox_1.with self
         module Sandbox_1
           class Cheeky_CLI_Client
-            Headless::Plugin::Host::Proxy.enhance self do
+            Face::Plugin::Host::Proxy.enhance self do
               services :emphasize_text
             end
           private
@@ -29,7 +29,7 @@ module Skylab::Headless::TestSupport::Plugin::Host::Proxy
           end
 
           class Cheeky_Web_Client
-            Headless::Plugin::Host::Proxy.enhance self do
+            Face::Plugin::Host::Proxy.enhance self do
               services [ :emphasize_text, :ivar ]
             end
             def initialize

@@ -5,6 +5,7 @@ module Skylab::TestSupport
     module API
       API = self
       Regret = Regret
+      Plugin_ = ::Skylab::Face::Plugin
       TestSupport = TestSupport_
 
       %i| Basic Face Headless MetaHell |.each do |i|
@@ -33,7 +34,7 @@ module Skylab::TestSupport
 
       class Client
 
-        Headless::Plugin::Host.enhance self do
+        Plugin_::Host.enhance self do
           services :pth, :invitation
         end
 
@@ -74,7 +75,7 @@ module Skylab::TestSupport
       end
 
       class System_Services_ < Basic::Struct[ :err ]
-        Headless::Plugin::Host.enhance self do
+        Plugin_::Host.enhance self do
           services :err, :ivar
         end
       end

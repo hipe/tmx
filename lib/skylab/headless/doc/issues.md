@@ -82,8 +82,7 @@
              are API private - knowledge of their shape or existence must not
              be necessary outside of the node they reside in.
 [#078]       #doc-point conduits, stories and flushers
-[#077]       #parent-node: [#070] the first plugin library (#broadened-from:
-             #API-point track how `initialize` looks in #plugins)
+[#077] #hole (was plugin library that moved to [fa])
 [#076]       #parent:070 #future-feature enable/disable a particular plugin
              (don't start on this until we actually need it)
 [#075] #open ingest as method (plugin)

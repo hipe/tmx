@@ -1,4 +1,4 @@
-module Skylab::Headless
+module Skylab::Face
 
   Plugin = ::Module.new  # read [#077] introduction. :+[#070]
 
@@ -288,7 +288,7 @@ module Skylab::Headless
     end
   end
 
-  Plugin::Box_ = Headless::Library_::Basic::Box
+  Plugin::Box_ = Face::Library_::Basic::Box
 
   class Plugin::DeclarationError < ::RuntimeError
   end
@@ -296,7 +296,7 @@ module Skylab::Headless
   Plugin::EAT_H_ = -> kls, h do
     h.default_proc = -> hh, k do
       raise Plugin::DeclarationError, "unexpected token #{ k.inspect }, #{
-        }expecting #{ Headless::NLP::EN::Minitesimal::FUN.oxford_comma[
+        }expecting #{ Face::Library_::Headless::NLP::EN::Minitesimal::FUN.oxford_comma[
           hh.keys.map( & :inspect ), ' or ' ] } for #{
         }defining this #{ kls }"
     end
@@ -594,7 +594,7 @@ module Skylab::Headless
             absorb_metaservices_service host_metasvcs, @h.fetch( i )
           next
         end
-        ( err ||= Headless::Plugin::Metaservices_::Service_::Missing_.new ).
+        ( err ||= Face::Plugin::Metaservices_::Service_::Missing_.new ).
           host_lacks_service_for_plugin host_metasvcs, i, plugin_metasvcs
       end
       err and raise Plugin::DeclarationError, err.message_proc[]
@@ -840,7 +840,7 @@ module Skylab::Headless
       mod = box.const_get const, false  # (below is pursuant to [#077])
       host.attach_hot_plugin_with_name_proc(
         ( ::Class == mod.class ? mod : mod.const_get( :Client, false ) ).new,
-        Headless::Name::Function::From::Constant.new( const ) )
+        Face::Library_::Headless::Name::Function::From::Constant.new( const ) )
     end
   end
 

@@ -208,7 +208,7 @@ module Skylab::Face
         end ].new a
     end
 
-    Plugin_ = Library_::Headless::Plugin
+    Plugin_ = Face::Plugin
 
   private
 

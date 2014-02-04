@@ -1,4 +1,4 @@
-module Skylab::Headless
+module Skylab::Face
 
   module Plugin::Host::Proxy
 
@@ -8,11 +8,11 @@ module Skylab::Headless
     # as a plugin host. now you get @plugin_host on initialize always.
     # this is :[#fa-010].
 
-    # using `Headless::Plugin::Host::Proxy`:
+    # using `Face::Plugin::Host::Proxy`:
     # comprehensive example:
     #
     #     class Cheeky_CLI_Client
-    #       Headless::Plugin::Host::Proxy.enhance self do
+    #       Face::Plugin::Host::Proxy.enhance self do
     #         services :emphasize_text
     #       end
     #     private
@@ -22,7 +22,7 @@ module Skylab::Headless
     #     end
     #
     #     class Cheeky_Web_Client
-    #       Headless::Plugin::Host::Proxy.enhance self do
+    #       Face::Plugin::Host::Proxy.enhance self do
     #         services [ :emphasize_text, :ivar ]
     #       end
     #       def initialize

@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::Headless::TestSupport::Plugin
+module Skylab::Face::TestSupport::Plugin
 
   describe "[hl] plugin" do  # loaded late for coverage
 
@@ -8,7 +8,7 @@ module Skylab::Headless::TestSupport::Plugin
       it "the module graph builds." do
         module M1
           class PH
-            Headless::Plugin::Host.enhance self
+            Plugin_::Host.enhance self
           end
         end
       end
@@ -30,7 +30,7 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M4
           class PI
-            Headless::Plugin.enhance self
+            Plugin_.enhance self
           end
           self
         end
@@ -46,7 +46,7 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M3
           class PH
-            Headless::Plugin::Host.enhance self
+            Plugin_::Host.enhance self
           end
           self
         end
@@ -75,10 +75,10 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M10
           module P1
-            Headless::Plugin.enhance self
+            Plugin_.enhance self
           end
           class P2
-            Headless::Plugin.enhance self
+            Plugin_.enhance self
           end
           self
         end
@@ -100,7 +100,7 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M13
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               services :c, [ :d ]
             end
           end
@@ -136,10 +136,10 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M28
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               services :foo, :bar
             end
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               services :baz
             end
           end
@@ -158,12 +158,12 @@ module Skylab::Headless::TestSupport::Plugin
         -> do
           module M26
             class X
-              Headless::Plugin::Host.enhance self do
+              Plugin_::Host.enhance self do
                 services [ :wiffle, :xyzzy, :no_see ]
               end
             end
           end
-        end.should raise_error( Headless::Plugin::DeclarationError,
+        end.should raise_error( Plugin_::DeclarationError,
           /unexpected token :xyzzy, expecting .+ for defining #{
             }this .+\bHost.+Service_\b/ )
       end
@@ -173,19 +173,19 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M14
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               services :beep, :zeep
             end
           end
 
           class PI_A
-            Headless::Plugin.enhance self do
+            Plugin_.enhance self do
               services_used :beep, :feep, :meep
             end
           end
 
           class PI_B
-            Headless::Plugin.enhance self do
+            Plugin_.enhance self do
               services_used :zeep
             end
           end
@@ -198,7 +198,7 @@ module Skylab::Headless::TestSupport::Plugin
       it "when pi wants nonexistent svc - borks like mork at attach time" do
         -> do
           host.send :attach_hot_plugin, M14::PI_A.new
-        end.should raise_error( Headless::Plugin::DeclarationError,
+        end.should raise_error( Plugin_::DeclarationError,
           /\bPH has not declared the required services \(feep, meep\) #{
             }declared as needed by .+\bPI/ )
       end
@@ -212,7 +212,7 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M15
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               services :meep, :zeep
             end
 
@@ -227,7 +227,7 @@ module Skylab::Headless::TestSupport::Plugin
       it "call a service that is not declared - decl error" do
         -> do
           call_svc :beep
-        end.should raise_error( Headless::Plugin::DeclarationError,
+        end.should raise_error( Plugin_::DeclarationError,
           /"beep" has not been declared .+ service of this host.+\bM15::PH\z/ )
       end
 
@@ -246,7 +246,7 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M25
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               services [ :wat, :method, :wat_as_service ]
             end
 
@@ -267,7 +267,7 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M16
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               services [ :doink, :ivar ]
             end
 
@@ -293,7 +293,7 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M29
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               services [ :doink, :ivar, :@derk ]
             end
 
@@ -314,7 +314,7 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M30
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               services [ :truffle, :dispatch, :choc_factory, :trfl ],
                        [ :bon_bon, :dispatch, :choc_factory, :bb ]
             end
@@ -341,7 +341,7 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M31
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               services [ :zagnut, :dispatch, :choc_factory, nil ],
                        [ :ho_ho, :dispatch, :choc_factory, [ :a, :b ] ]
             end
@@ -368,7 +368,7 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M12
           class X
-            Headless::Plugin.enhance self do
+            Plugin_.enhance self do
               services_used :a, [:b]
             end
           end
@@ -400,13 +400,13 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M32
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               services :bliff
             end
             def bliff ; :fliff end
           end
           class PI
-            Headless::Plugin.enhance self do
+            Plugin_.enhance self do
               services_used :bliff
             end
             def run
@@ -426,13 +426,13 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M33
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               services :floof
             end
             def floof ; :boof end
           end
           class PI
-            Headless::Plugin.enhance self do
+            Plugin_.enhance self do
               services_used [ :floof, :method, :floof_service ]
             end
             def run
@@ -453,7 +453,7 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M20
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               services :clerkemer, [ :derkemer, :ivar ]
             end
 
@@ -467,7 +467,7 @@ module Skylab::Headless::TestSupport::Plugin
           end
 
           class PI
-            Headless::Plugin.enhance self do
+            Plugin_.enhance self do
               services_used [ :clerkemer, :ivar ],
                 [ :derkemer, :ivar, :@flerkemer ]
             end
@@ -505,7 +505,7 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M34
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               services :foo, :bar, :biff, :baz, :blimmo, :blammo
             end
           private
@@ -519,7 +519,7 @@ module Skylab::Headless::TestSupport::Plugin
             end
           end
           class PI
-            Headless::Plugin.enhance self do
+            Plugin_.enhance self do
               services_used :bar, [ :biff, :proxy ], [ :baz, :proxy ],
                 [ :blimmo, :proxy ], [ :blammo, :proxy ]
             end
@@ -538,7 +538,7 @@ module Skylab::Headless::TestSupport::Plugin
       it "call svc not declared at all (from plugin side) - ok" do
         -> do
           parent_svcs.foo
-        end.should raise_error( Headless::Plugin::DeclarationError,
+        end.should raise_error( Plugin_::DeclarationError,
           /the "foo" service must be but was not.+M34::PI/ )
       end
 
@@ -561,7 +561,7 @@ module Skylab::Headless::TestSupport::Plugin
       it "with `[]` call a totally nonexistant service - quacks" do
         -> do
           parent_svcs[ :blizzo ]
-        end.should raise_error( Headless::Plugin::DeclarationError,
+        end.should raise_error( Plugin_::DeclarationError,
           /the "blizzo" service must be but was not declared as #{
             }subscribed to/ )
       end
@@ -569,7 +569,7 @@ module Skylab::Headless::TestSupport::Plugin
       it "with `[]` call a service that the pi did not declare at all" do
         -> do
           parent_svcs[ :foo ]
-        end.should raise_error( Headless::Plugin::DeclarationError,
+        end.should raise_error( Plugin_::DeclarationError,
           /the "foo" service must be but was not declared as subscribed #{
             }to by the .+\bPI" plugin/i )
       end
@@ -594,7 +594,7 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M2
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               eventpoints :foo, [ :bar ]
             end
           end
@@ -612,7 +612,7 @@ module Skylab::Headless::TestSupport::Plugin
       it "emitting an undeclared eventpoint - raises" do
         -> do
           host.send :emit_eventpoint, :baz
-        end.should raise_error( Headless::Plugin::DeclarationError,
+        end.should raise_error( Plugin_::DeclarationError,
                                /undeclared.+baz.+\bdeclared.+foo.+bar/i )
       end
     end
@@ -622,7 +622,7 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M5
           class PI
-            Headless::Plugin.enhance self do
+            Plugin_.enhance self do
               eventpoints_subscribed_to :zip, [ :zap ]
             end
           end
@@ -644,12 +644,12 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M6
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               eventpoints :zaff, :ziff
             end
           end
           class PI
-            Headless::Plugin.enhance self do
+            Plugin_.enhance self do
               eventpoints_subscribed_to :zeeple, :ziff, :deeple
             end
           end
@@ -660,7 +660,7 @@ module Skylab::Headless::TestSupport::Plugin
       it "barks like clark" do
         -> do
           host.send :attach_hot_plugin, plugin
-        end.should raise_error( Headless::Plugin::DeclarationError,
+        end.should raise_error( Plugin_::DeclarationError,
           /unrecognized eventpoint\(s\) subscribed #{
             }to by .+M6::PI.+\(zeeple, deeple\)/i )
       end
@@ -670,12 +670,12 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M7
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               eventpoints :zaff, :ziff
             end
           end
           class PI
-            Headless::Plugin.enhance self do
+            Plugin_.enhance self do
               eventpoints_subscribed_to :ziff
             end
             attr_accessor :touched
@@ -711,12 +711,12 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M8
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               eventpoints :foo
             end
           end
           class PI
-            Headless::Plugin.enhance self do
+            Plugin_.enhance self do
               eventpoints_subscribed_to :foo
             end
             attr_reader :canary
@@ -742,12 +742,12 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M9
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               eventpoints :ziff
             end
           end
           class PI
-            Headless::Plugin.enhance self do
+            Plugin_.enhance self do
               eventpoints_subscribed_to :ziff
             end
 
@@ -784,12 +784,12 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M18
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               eventpoints :wenk
             end
           end
           class PI
-            Headless::Plugin.enhance self do
+            Plugin_.enhance self do
               eventpoints_subscribed_to :wenk
             end
             wenk :tenk, :menk
@@ -815,12 +815,12 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M19
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               eventpoints :boink
             end
           end
           class PI
-            Headless::Plugin.enhance self do
+            Plugin_.enhance self do
               eventpoints_subscribed_to :boink
             end
             boink do |a1, a2, a3, &blk|
@@ -848,14 +848,14 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M24
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               eventpoints :foo
               plugin_box_module -> { Plugins }
             end
           end
           module Plugins
             class PugbertOne
-              Headless::Plugin.enhance self do
+              Plugin_.enhance self do
                 eventpoints_subscribed_to :foo
               end
               foo do |a, b, &y|
@@ -863,7 +863,7 @@ module Skylab::Headless::TestSupport::Plugin
               end
             end
             class PugbertTwo
-              Headless::Plugin.enhance self do
+              Plugin_.enhance self do
                 eventpoints_subscribed_to :foo
               end
               foo do |a, b, &y|
@@ -891,17 +891,17 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M11
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               plugin_box_module -> { Plugins }
             end
           end
           module Plugins
           end
           module Plugins::P1
-            Headless::Plugin.enhance self
+            Plugin_.enhance self
           end
           class Plugins::P2
-            Headless::Plugin.enhance self
+            Plugin_.enhance self
           end
           self
         end
@@ -932,7 +932,7 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M21
           class PH
-            Headless::Plugin::Host.enhance self
+            Plugin_::Host.enhance self
           end
           self
         end
@@ -955,7 +955,7 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M22
           class PI
-            Headless::Plugin.enhance self
+            Plugin_.enhance self
           end
           self
         end
@@ -974,8 +974,8 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M23
           class Hybrid_
-            Headless::Plugin::Host.enhance self
-            Headless::Plugin.enhance self
+            Plugin_::Host.enhance self
+            Plugin_.enhance self
           end
 
           PH = Hybrid_
@@ -998,21 +998,21 @@ module Skylab::Headless::TestSupport::Plugin
       anchor -> do
         module M17
           class PH
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               services [ :bling, :delegatee, :Nerkulous ]
             end
           end
           class PI_A
-            Headless::Plugin::Host.enhance self do
+            Plugin_::Host.enhance self do
               services :bling
             end
-            Headless::Plugin.enhance self
+            Plugin_.enhance self
             def bling
               :zingo
             end
           end
           class PI_B
-            Headless::Plugin.enhance self do
+            Plugin_.enhance self do
               services_used :bling
             end
             def execute
@@ -1048,7 +1048,7 @@ module Skylab::Headless::TestSupport::Plugin
 
     TestSupport::Coverage::Muncher.munch '--cover', ::STDERR,
       -> do
-        Headless::Headless::Plugin.dir_pathname.to_s
+        Face::Plugin.dir_pathname.to_s
       end, ::ARGV
   end
 end

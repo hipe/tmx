@@ -133,7 +133,7 @@ module Skylab::Cull
 
     prepend CLI::Namespace::InstanceMethods  # at end because of [#ri-002]
 
-    Headless::Plugin::Host::Proxy.enhance self do  # ditto [#ri-002]
+    Face::Plugin::Host::Proxy.enhance self do  # ditto [#ri-002]
       services [ :pth, :ivar ]  # api actions want to know how to render a path
                                 # and we get a private method `plugin_host`
     end
