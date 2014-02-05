@@ -84,12 +84,12 @@ module Skylab::Headless
         end
 
         def resolve_for_proc_when_on_last_frame
-          _argv = @client.release_any_argv || MetaHell::EMPTY_A_
+          _argv = @client.release_any_argv || EMPTY_A_
           use_client_to_validate_proc_syntax_against _argv
         end
 
         def resolve_for_proc_when_not_on_last_frame
-          use_client_to_validate_proc_syntax_against MetaHell::EMPTY_A_
+          use_client_to_validate_proc_syntax_against EMPTY_A_
         end
 
         def use_client_to_validate_proc_syntax_against actual_x_a

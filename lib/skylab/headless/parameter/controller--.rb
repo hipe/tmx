@@ -8,7 +8,7 @@ module Skylab::Headless
         include IM__
         if :without == a[ 0 ]
           :headless_sub_client == a[ 1 ] or fail "no - #{ a[ 1 ] }"
-          a[ 0, 2 ] = MetaHell::EMPTY_A_
+          a[ 0, 2 ] = EMPTY_A_
         else
           include Headless::SubClient::InstanceMethods
         end ; nil

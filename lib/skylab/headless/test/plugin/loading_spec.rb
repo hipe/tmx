@@ -27,7 +27,7 @@ module Skylab::Headless::TestSupport::Plugin
           public :load_plugins, :call_plugin_shorters
 
           spec = build_mutable_callback_tree_specification
-          spec << :on_zwagolio
+          spec.listeners :on_zwagolio
           Callback_Tree__ = spec.flush
 
           def ohai

@@ -35,7 +35,7 @@ module Skylab::Headless
       end
       def get_section_scanner
         a = @sect_a ; d = -1 ; last = a.length - 1
-        Headless::Scn_.new { d < last and a.fetch( d += 1 ) }
+        Scn_.new { d < last and a.fetch( d += 1 ) }
       end
     private
       def resolve_desc_lines_and_sections

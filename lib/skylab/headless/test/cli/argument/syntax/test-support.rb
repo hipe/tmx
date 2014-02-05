@@ -6,7 +6,7 @@ module Skylab::Headless::TestSupport::CLI::Argument::Syntax
 
   include CONSTANTS
 
-  Headless = Headless ; MetaHell = MetaHell
+  Headless = Headless
 
   extend TestSupport::Quickie
 

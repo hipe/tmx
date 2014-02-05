@@ -1,6 +1,6 @@
 module Skylab::Headless
 
-  FUN = MetaHell::FUN::Module.new
+  FUN = Headless::Library_::FUN_Module.new
 
   module FUN
 

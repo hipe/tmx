@@ -6,7 +6,7 @@ module Skylab::Headless::TestSupport::CLI::Box
 
   include CONSTANTS
 
-  Headless = Headless ; MetaHell = MetaHell
+  Headless = Headless
 
   extend TestSupport::Quickie
 

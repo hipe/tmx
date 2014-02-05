@@ -6,7 +6,7 @@ module Skylab::Headless::TestSupport::CLI::Action
 
   include CONSTANTS
 
-  Headless = Headless ; MetaHell = MetaHell ; TestSupport = TestSupport
+  Headless = Headless ; TestSupport = TestSupport
 
   module ModuleMethods
 
@@ -23,7 +23,7 @@ module Skylab::Headless::TestSupport::CLI::Action
     end
 
     def dfn_actncls_with_i_and_p cls_i, cls_p
-      define_method :action_class, MetaHell::FUN::Memoize[ -> do
+      define_method :action_class, Headless::Library_::Memoize[ -> do
         cls = start_class cls_i
         Headless::CLI::Action[ cls, :core_instance_methods ]
         cls.class_exec( & cls_p ) ; cls
@@ -31,7 +31,7 @@ module Skylab::Headless::TestSupport::CLI::Action
     end
 
     def action_class_with_DSL cls_i, & cls_p
-      define_method :action_class, MetaHell::FUN::Memoize[ -> do
+      define_method :action_class, Headless::Library_::Memoize[ -> do
         cls = start_class cls_i
         cls.instance_variable_set :@dir_pathname, false
         Headless::CLI::Action[ cls, :DSL, :core_instance_methods ]

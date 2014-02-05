@@ -106,7 +106,15 @@ module Skylab
           [ @h, @p ]
         end
         def retrieve_child i
-          @h.fetch i
+          @h.fetch i do raise ::KeyError, say_not_found( i ) end
+        end
+      private
+        def say_not_found i
+          ks = @h.keys.map { |i_| "'#{ i_ }'" }
+          adj, verb, s = ( 1 == ks.length ) ?
+            [ 'the only ', 'is' ] : [ nil, 'are' ]
+          "no '#{ i }' at this node. #{ adj }known node#{ s } #{ verb } #{
+            }#{ Oxford_and[ ks ] }"
         end
       end
 
@@ -298,7 +306,7 @@ module Skylab
       class Mutable_Specification
 
         def initialize host_module
-          @default_pattern_i = :shorters
+          @default_pattern_i = nil
           @h = { } ; @host_module = host_module
         end
 
@@ -307,6 +315,7 @@ module Skylab
         end
 
         def << i
+          @default_pattern_i or raise "set 'default_pattern' before '<<'"
           @h[ i ] = @default_pattern_i ; self
         end
 

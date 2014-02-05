@@ -27,7 +27,7 @@ module Skylab::Headless
     end
 
     def proc_for_has_service
-      MetaHell::MONADIC_TRUTH_
+      MONADIC_TRUTH_
     end
 
     def call_service i, _=nil, _=nil

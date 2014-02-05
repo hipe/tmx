@@ -36,7 +36,7 @@ module Skylab::Headless
       Inflection = -> x_a do
         module_exec x_a, & Headless::Action::Bundles::Inflection
       end
-      MetaHell::Bundle::Multiset[ self ]
+      Headless::Library_::Bundle::Multiset[ self ]
     end
 
     module DSL_Meths  # #storypoint-10
@@ -83,7 +83,7 @@ module Skylab::Headless
       private :default_action_i ; nil
     end
 
-    CEASE_X_ = CEASE_X ; DASH_ = '-'.getbyte 0 ; PROCEDE_X_ = PROCEDE_X
+    CEASE_X_ = CEASE_X ; PROCEDE_X_ = PROCEDE_X
 
     # ~ #orphanage
 

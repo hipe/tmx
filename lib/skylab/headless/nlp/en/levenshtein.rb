@@ -32,7 +32,7 @@ module Skylab::Headless
 
         Or_with_closest_n_items_to_item =
           With_conj_s_render_p_closest_n_items_a_item_x.
-            curry[ ' or ', MetaHell::IDENTITY_ ]
+            curry[ ' or ', IDENTITY_ ]
       end
     end
   end

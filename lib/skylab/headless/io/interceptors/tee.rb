@@ -1,6 +1,6 @@
 module Skylab::Headless
 
-  IO::Interceptors::Tee = MetaHell::Proxy::Tee.new(
+  IO::Interceptors::Tee = Headless::Library_::MetaHell::Proxy::Tee.new(
     :<<,
     :close,
     :closed?,

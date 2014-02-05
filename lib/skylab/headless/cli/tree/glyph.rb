@@ -6,7 +6,7 @@ module Skylab::Headless
   end
 
   module CLI::Tree::Glyph::Sets
-    MetaHell::Boxxy[ self ]        # BOXXY IS QUEEN OF METAPROGRAMming
+    Headless::Library_::Boxxy[ self ]  # BOXXY IS QUEEN OF METAPROGRAMming
 
 
     WIDE = {                      # (these styles came to us later, and are

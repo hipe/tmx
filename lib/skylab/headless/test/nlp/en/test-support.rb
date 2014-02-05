@@ -6,18 +6,17 @@ module Skylab::Headless::TestSupport::NLP::EN
 
   include ::Skylab::Headless  # so you can say 'NLP'
   include CONSTANTS   # so you can say 'TS' (the right one!)
+  MetaHell_ = Headless::Library_::MetaHell
 
   extend TestSupport::Quickie
 
-  MetaHell = MetaHell # #annoy
-
   module ModuleMethods
-    include MetaHell::Class::Creator::ModuleMethods
+    include MetaHell_::Class::Creator::ModuleMethods
 
   end
 
   module InstanceMethods
-    extend MetaHell::Let
+    extend MetaHell_::Let
 
     let :meta_hell_anchor_module do
       ::Module.new

@@ -8,11 +8,11 @@ module Skylab::Headless::TestSupport::API::SSA__
 
   extend TestSupport::Quickie
 
-  Headless = Headless ; MetaHell = MetaHell ; TestSupport = TestSupport
+  Headless = Headless ; TestSupport = TestSupport
 
   module ModuleMethods
     def with_API_module & p
-      define_method :_API_module, MetaHell::FUN::Memoize[ p ]
+      define_method :_API_module, Headless::Library_::Memoize[ p ]
     end
   end
 

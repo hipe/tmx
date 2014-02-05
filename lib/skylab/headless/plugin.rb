@@ -90,7 +90,7 @@ module Skylab
         end
 
         def init_option_parser_by_aggregating_plugin_options
-          @op = Headless::Library_::OptionParser[].new
+          @op = Headless::Library_::OptionParser.new
           write_plugin_host_option_parser_options  # :+#hook-out
           call_plugin_listeners :on_build_option_parser do |plugin_i|
             cond = @plugin_conduit_h.fetch plugin_i

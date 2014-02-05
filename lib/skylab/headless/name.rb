@@ -27,7 +27,7 @@ module Skylab::Headless
       end.call
 
       Metholate = -> i do  # in case your normal is a slug for some reason
-        i.to_s.gsub DASH_, UNDERSCORE_
+        i.to_s.gsub DASH_S_, UNDERSCORE_
       end
 
       Module_moniker_ = -> num_parts, mod do
@@ -36,7 +36,7 @@ module Skylab::Headless
         elsif num_parts.respond_to? :cover?
           s_a[ num_parts ]
         elsif num_parts.zero?
-          MetaHell::EMPTY_A_
+          EMPTY_A_
         else
           s_a[ - num_parts .. -1 ]  # whether positive or negative
         end
@@ -62,11 +62,11 @@ module Skylab::Headless
       end.call
 
       Slugulate = -> i do  # for normals only. centralize this simple transform.
-        i.to_s.gsub UNDERSCORE_, DASH_
+        i.to_s.gsub UNDERSCORE_, DASH_S_
       end
     end
 
-    COLON_ = ':'.freeze ; DASH_ = '-'.freeze ;
+    COLON_ = ':'.freeze ; DASH_S_ = '-'.freeze ;  # there is another 'DASH_'
     DOUBLE_COLON_ = '::'.freeze ; UNDERSCORE_ = '_'.freeze
 
     class Function

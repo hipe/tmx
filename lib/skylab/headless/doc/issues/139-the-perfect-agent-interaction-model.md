@@ -56,7 +56,7 @@ mechanisms include:
 • ### be funcy
   pass simple arguments in, get one result value back, "function"-like.
   maybe the agent even *is* a function. you don't know, which is the point.
-  (MetaHell::Funcy in all its 3 lines of glory facilitates this.)
+  (M-etaHell::Funcy in all its 3 lines of glory facilitates this.)
 
 • ### huge iambic parameter lists
   if you need more than one or two arguments you might consider using an

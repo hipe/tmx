@@ -40,10 +40,10 @@ module Skylab::Headless
           end
           def intlz_unbound_act_box
             if ! respond_to? :dir_pathname  # #storypoint-25
-              MetaHell::MAARS::Upwards[ self ]
+              Headless::Library_::MAARS::Upwards[ self ]
             end
             mod = const_set ACTIONS_BOX_MOD_I__, ::Module.new
-            MetaHell::Boxxy[ mod ] ; nil
+            Headless::Library_::Boxxy[ mod ] ; nil
           end
         end
 
@@ -165,14 +165,14 @@ module Skylab::Headless
             attr_reader :value_x
             def bound_receiver ; self end
             def dispatchee_method_i ; :value_x end
-            def args ; MetaHell::EMPTY_A_ end
+            def args ; EMPTY_A_ end
             def invite_line ; end  # eew
           end
           DSL::NO_OP_ = class DSL::The_No_op_dispatch__
             alias_method :initialize, :freeze
             def bound_receiver ; self end
             def dispatchee_method_i ; :noop end
-            def args ; MetaHell::EMPTY_A_ end
+            def args ; EMPTY_A_ end
             def noop ; PROCEDE_X__ end
             self
           end.new

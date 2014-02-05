@@ -1,7 +1,7 @@
 module Skylab::Headless
 
-  class CLI::Option::Parser::Recorder < MetaHell::Function::Class.new :on,
-    :@on, :define  # ( note this doesn't yet follow exactliy the ::OP API.. )
+  class CLI::Option::Parser::Recorder < Headless::Library_::Function_Class.
+    new :on, :@on, :define  # ( note this doesn't yet follow exactliy the ::OP API.. )
 
     # (this was written after whatever happens in treemap and that should
     # get merged into this one day..)

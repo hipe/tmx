@@ -10,9 +10,11 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
   # Don't be decieved, we don't want self.extended [#sl-111] pattern here,
   # you just extend this module and you get this one knob:
 
-  EMPTY_STRING_ = ::Skylab::Headless::EMPTY_STRING_
-  MetaHell = ::Skylab::MetaHell
-  NLP = ::Skylab::Headless::NLP # (future-proof parts in case not [#sl-123])
+  Headless_ = ::Skylab::Headless
+
+  EMPTY_STRING_ = Headless_::EMPTY_STRING_
+
+  NLP = Headless_::NLP # (future-proof parts in case not [#sl-123])
 
   def inflection
     # Classes or modules that extend this badboy get an `inflection` knob
@@ -177,7 +179,7 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
 
     # for setting how to inflect things
 
-    MetaHell::DSL_DSL.enhance self do
+    Headless_::Library_::MetaHell::DSL_DSL.enhance self do
       atom_accessor :noun
       atom_accessor :verb
     end

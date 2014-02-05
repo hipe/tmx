@@ -17,7 +17,7 @@ module Skylab::Headless::TestSupport::CLI::Box
           end
           def build_option_parser
           end
-          MetaHell::Boxxy[ self ]
+          Headless::Library_::Boxxy[ self ]
           self
         end
       end
@@ -47,7 +47,7 @@ module Skylab::Headless::TestSupport::CLI::Box
             self.class
           end
 
-          MetaHell::Boxxy[ self ]  # our 'abm' must respond to 'each'
+          Headless::Library_::Boxxy[ self ]  # our 'abm' must respond to 'each'
 
           self
         end
@@ -129,7 +129,7 @@ module Skylab::Headless::TestSupport::CLI::Box
             end
           end
 
-          MetaHell::Boxxy[ self ]
+          Headless::Library_::Boxxy[ self ]
           self
         end
       end

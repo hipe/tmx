@@ -34,7 +34,7 @@ module Skylab::Headless::TestSupport::Plugin
           end
 
           spec = build_mutable_callback_tree_specification
-          spec << :on_attempt_to_connect
+          spec.listeners :on_attempt_to_connect
           Callback_Tree__ = spec.flush
 
           plugin_conduit_class

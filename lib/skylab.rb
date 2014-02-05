@@ -175,6 +175,10 @@ module Skylab  # Welcome! :D
         ( @dir_pathname_listener_a ||= [ ] ) << a ; nil
       end
 
+      def set_dir_pn x  # #comport to [cb] simplified autoloading
+        init_dir_pathname x
+      end
+
       def init_dir_pathname x
         dir_pathname and raise ::ArgumentError, "won't clobber existing pn"
         @dir_pathname = x

@@ -2,12 +2,22 @@ module Skylab::Headless
 
   module Library_  # :+[#su-001]
 
-    stdlib, subsys = ::Skylab::Subsystem::FUN.
-      at :require_stdlib, :require_subsystem
+    stdlib, subsys = Autoloader_.at :require_stdlib, :require_subsystem
+
     o = { }
-    o[ :Basic ] = o[ :CodeMolester ] = subsys
+    o[ :Basic ] = subsys
+    o[ :Boxxy ] = -> _ { self::MetaHell::Boxxy }
+    o[ :Bundle ] = -> _ { self::MetaHell::Bundle }
+    o[ :CodeMolester ] = subsys
     o[ :FileUtils ] = stdlib
-    o[ :InformationTactics ] = subsys
+    o[ :Function ] = -> _ { self::MetaHell::Function }
+    o[ :Funcy ] = -> _ { self::MetaHell::Funcy }
+    o[ :Formal_Box ] = -> _ { self::MetaHell::Formal::Box }
+    o[ :FUN_Module ] = -> _ { self::MetaHell::FUN::Module }
+    o[ :Function_Class ] = -> _ { self::MetaHell::Function::Class }
+    o[ :InformationTactics ] = o[ :MetaHell ] = subsys
+    o[ :MAARS ] = -> _ { self::MetaHell::MAARS }
+    o[ :Module_Resolve ] = -> _ { self::MetaHell::Module::Resolve }
     o[ :Open3 ] = stdlib
     o[ :Open4 ] = -> { ::Skylab::Subsystem::FUN.require_quietly[  'open4'  ]; ::Open4 }
     o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
@@ -18,22 +28,15 @@ module Skylab::Headless
     o[ :Tmpdir ] = -> _ { require 'tmpdir' ; ::Dir }
     o[ :TreetopTools ] = subsys
 
-    o.freeze
+    # ~ just do it live and implement small things here potentially redundantly
 
-    @o = o
-
-    MetaHell::MAARS[ self, :deferred ]
-
-    def self.const_missing i
-      if (( p = @o[ i ] ))
-        const_set i, p[ i ]
-      else
-        x = super( i ) or fail "sanity - result expected"  # [#mh-040]
-        (( pn = x.dir_pathname.join CORE_ )).exist? and load pn.to_s
-        x
-      end
+    Memoize = -> p do
+      p_ = -> { x = p[] ; p_ = -> { x } ; x }
+      -> { p_.call }
     end
 
-    CORE_ = "core#{ Autoloader::EXTNAME }"
+    def self.const_missing i
+      const_set i, @o.fetch( i )[ i ]
+    end ; @o = o.freeze
   end
 end

@@ -143,7 +143,7 @@ module Skylab::Headless
 
     private
 
-      MetaHell::MAARS::Upwards[ self ]  # because we #stowaway but have childs
+      Headless::Library_::MAARS::Upwards[ self ]  # we #stowaway but have childs
 
       class Isomorphic < self  # in Syntax
 

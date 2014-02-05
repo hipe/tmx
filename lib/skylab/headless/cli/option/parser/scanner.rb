@@ -1,6 +1,6 @@
 module Skylab::Headless
 
-  CLI::Option::Parser::Scanner = MetaHell::Function::Class.new :gets
+  CLI::Option::Parser::Scanner = Headless::Library_::Function_Class.new :gets
   class CLI::Option::Parser::Scanner  # for quick ::OptionParser hacks
                                   # (emigrated in from ancient tr, aged well)
                                   # this class and idea is tracked by [#053])

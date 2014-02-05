@@ -8,6 +8,8 @@ module Skylab::Headless
       Bundles__.apply_iambic_on_client x_a, mod ; nil
     end
 
+    Headless.const_get :Library_, false
+
     module Bundles__
       # ~ in dependency order!
       Location_of_residence = -> x_a do
@@ -24,13 +26,13 @@ module Skylab::Headless
       With_actions = -> _ do  # #storypoint-20
         module_exec( & Puff_dir_patname__ )
         (( const_set :Actions, ::Module.new )).module_exec do
-          MetaHell::Boxxy[ self ]
+          Library_::Boxxy[ self ]
         end
         const_defined?( :Action, false ) or
           const_set :Action, ::Class.new( Iambic_Action__ )
         define_singleton_method :action_class do end  # future-proofing
       end
-      MetaHell::Bundle::Multiset[ self ]
+      Library_::Bundle::Multiset[ self ]
     end
 
     Puff_dir_patname__ = -> do
@@ -40,12 +42,12 @@ module Skylab::Headless
       x.respond_to? :dir_pathname and x.dir_pathname
     end
     Rslv_Dpn__ = -> do  # #storypoint-25
-      parent = MetaHell::Module::Resolve[ '..', self ]
+      parent = Library_::Module_Resolve[ '..', self ]
       if parent and Has_dpn__[ parent ]
-        MetaHell::MAARS::Upwards[ self ]
+        Library_::MAARS::Upwards[ self ]
       else
         loc = @location_of_residence ; @location_of_residence = nil
-        MetaHell::MAARS[ self, loc ]
+        Library_::MAARS[ self, loc ]
       end ; nil
     end
 
@@ -186,7 +188,7 @@ module Skylab::Headless
         Simple_monadic_iambic_writers[ self ]
       private
         def params=
-          @params = @x_a ; @x_a = MetaHell::EMPTY_A_ ; nil
+          @params = @x_a ; @x_a = EMPTY_A_ ; nil
         end
         def reflection_method_stem=
           @reflection_mthd_stem_i = @x_a.shift ; nil
@@ -257,7 +259,7 @@ module Skylab::Headless
         Simple_monadic_iambic_writers[ self ]
       private
         def params=
-          @params = @x_a ; @x_a = MetaHell::EMPTY_A_ ; nil
+          @params = @x_a ; @x_a = EMPTY_A_ ; nil
         end
 
         def initialize builder, cls, x_a
@@ -383,7 +385,7 @@ module Skylab::Headless
       PARSE_CLASS__ = PARSE_CLASS_
 
       Nilify_and_absorb_iambic_passively__ = -> x_a do
-        set = Headless::Library_::Set.new self.class.const_get CONST_A__
+        set = Library_::Set.new self.class.const_get CONST_A__
         h = self.class.const_get CONST_H__
         @x_a = x_a
         while x_a.length.nonzero?
@@ -569,7 +571,7 @@ module Skylab::Headless
       Get_box__ = -> do
         a = const_get CONST_A__ ; h = const_get CONST_H__
         h_ = ::Hash[ a.map { |i| [ i, send( h[ i ] ) ] } ]
-        Headless::Library_::Basic::Box.from_a_and_h a, h_
+        Library_::Basic::Box.from_a_and_h a, h_
       end
 
       Get_scanner__ = -> do
@@ -709,7 +711,7 @@ module Skylab::Headless
         add_ancllry_parameters_to_the_iambic
         rslv_bound_action
         @method_name = :execute
-        @args = MetaHell::EMPTY_A_
+        @args = EMPTY_A_
         true
       end
       def add_ancllry_parameters_to_the_iambic

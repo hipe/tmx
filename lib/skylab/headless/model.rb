@@ -19,10 +19,9 @@ module Skylab::Headless
   end
 
   module Model::Event::ModuleMethods
-    extend MetaHell::Let          # just for memoizing below
 
-    let :name_function do
-      Headless::Name::From::Module_Anchored self, self::EVENTS_ANCHOR_MODULE
+    def name_function
+      @nf ||= Headless::Name::From::Module_Anchored self, self::EVENTS_ANCHOR_MODULE
     end
 
     def event_anchored_normal_name

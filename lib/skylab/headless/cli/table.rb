@@ -9,7 +9,6 @@ module Skylab::Headless::CLI::Table
   #   * left/right alignment config options
 
   Headless = ::Skylab::Headless
-  MetaHell = ::Skylab::MetaHell
   Callback = Headless::Library_::Callback
   Table = self  # partly b.c Callback is not part of headless proper
   TERM_SEPARATOR_STRING_ = Headless::TERM_SEPARATOR_STRING_
@@ -39,7 +38,7 @@ module Skylab::Headless::CLI::Table
     # --*--
     def initialize
       @head = @tail = @separator = nil
-      @field_box = MetaHell::Formal::Box::Open.new
+      @field_box = Headless::Library_::Formal_Box::Open.new
     end
   end
 
@@ -93,7 +92,7 @@ module Skylab::Headless::CLI::Table
   end
 
   module Table::Events
-    MetaHell::Boxxy[ self ]  # this gives us `const_fetch`
+    Headless::Library_::Boxxy[ self ]  # this gives us `const_fetch`
   end
 
   module Table::Events::Datapoint
@@ -220,7 +219,7 @@ module Skylab::Headless::CLI::Table
 
     def ancestor_names_recursive
       @ancestor_names_recursive ||= begin
-        box = MetaHell::Formal::Box::Open.new
+        box = Headless::Library_::Formal_Box::Open.new
         _ancestor_names_recursive box
         box.names
       end
@@ -244,7 +243,7 @@ module Skylab::Headless::CLI::Table
 
   module Table::Cels
 
-    MetaHell::Boxxy[ self ]
+    Headless::Library_::Boxxy[ self ]
 
     parse_styles   = Headless::CLI::FUN::Parse_styles
     unparse_styles = Headless::CLI::FUN::Unparse_styles

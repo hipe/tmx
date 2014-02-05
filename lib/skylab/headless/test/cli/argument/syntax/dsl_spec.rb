@@ -8,7 +8,7 @@ module Skylab::Headless::TestSupport::CLI::Argument::Syntax
 
     context "syntax 1" do
 
-      define_method :arg_syntax, MetaHell::FUN::Memoize[ -> do
+      define_method :arg_syntax, Headless::Library_::Memoize[ -> do
         Headless::CLI::Argument::Syntax.DSL do
           o :optional, :literal, 'node-names'
           alternation do

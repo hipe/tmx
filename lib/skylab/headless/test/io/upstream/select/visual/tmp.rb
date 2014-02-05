@@ -18,7 +18,7 @@ def flush_buffer! err_buff, require_newline = true
   num_chars_read > 0 ? num_chars_read : nil
 end
 
-MAXLEN = 80
+MAXLEN__ = 80
 
 status = ::Open4.open4('sh') do |pid, sin, sout, serr|
   sin.puts('source tmp.sh'); sin.close
@@ -31,7 +31,7 @@ status = ::Open4.open4('sh') do |pid, sin, sout, serr|
     end
     begin
       while eopen
-        if /^.+?\r?\n/ =~ my_ebuff.concat(serr.read_nonblock(MAXLEN))
+        if /^.+?\r?\n/ =~ my_ebuff.concat(serr.read_nonblock(MAXLEN__))
           flush_buffer!(my_ebuff)
         end
       end

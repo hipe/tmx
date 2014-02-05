@@ -4,7 +4,7 @@ module Skylab::Headless
 
     class Bundles__::Resolve_upstream  # read [#022] CLI upstr..
 
-      MetaHell::Funcy[ self ]
+      Headless::Library_::Funcy[ self ]
 
       def initialize client
         # #todo:during-merge use schlurp

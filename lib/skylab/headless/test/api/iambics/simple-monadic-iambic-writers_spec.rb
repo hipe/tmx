@@ -29,14 +29,14 @@ module Skylab::Headless::TestSupport::API::Iambics
 
       it "passive - ok on empty array, always sets @x_a" do
         a = foo.parse_this_passively
-        a.should eql MetaHell::EMPTY_A_
+        a.should eql EMPTY_A_
         a.object_id.should eql foo.x_a.object_id
       end
 
       it "passive - parses a subset ('fully')" do
         foo = self.foo
         a = foo.parse_this_passively :jiang, :J, :qing, :Q
-        a.should eql MetaHell::EMPTY_A_
+        a.should eql EMPTY_A_
         foo.jiang.should eql :J
         foo.qing.should eql :Q
       end

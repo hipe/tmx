@@ -1,7 +1,8 @@
 module Skylab::Headless
 
-  IO::Upstream::Select = MetaHell::Function::Class.new :select
-  class IO::Upstream::Select
+  IO::Upstream::Select = Headless::Library_::Function_Class.new( :select ) do
+
+    self::MAXLEN__ = 4096  # (2 ** 12), the number of bytes in about 50 lines
 
     # Select - a chunking, multstream `select` wrapper
     #
@@ -45,20 +46,17 @@ module Skylab::Headless
     end
 
     def heartbeat seconds, &block
-      if @set_heartbeat
-        normalize_time seconds do |flot|
-          @set_heartbeat[ flot, block ]
-        end
-      else
-        raise ::ArgumentError, "can only set heartbeat once."
-      end
+      @set_heartbeat or raise ::ArgumentError, "can only set heartbeat once."
+      normalize_time seconds do |flot|
+        @set_heartbeat[ flot, block ]
+      end ; nil
     end
 
   private
 
     def initialize               # no args - mutate exclusively thru the setters
       timeout_seconds = 0.3
-      maxlen = Headless::Constants::MAXLEN
+      maxlen = self.class::MAXLEN__
       @accept_timeout_seconds = -> x do timeout_seconds = x end
       up_a = [ ] ; down_h = { }
       @add_pair = -> io, line do

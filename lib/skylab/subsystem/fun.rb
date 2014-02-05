@@ -2,7 +2,7 @@ module Skylab
 
   module Subsystem
 
-    module FUN
+    module FUN  # :+[#002]
 
       o = -> i, p do
         define_singleton_method i do p end

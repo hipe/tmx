@@ -12,7 +12,10 @@ module Skylab::Headless
       const_get( :Model_, false ).new_flyweight
     end
 
-    MetaHell::MAARS::Upwards[ FUN = MetaHell::FUN::Module.new ]
+    FUN = Headless::Library_::FUN_Module.new
+
+    Headless::Library_::MAARS::Upwards[ FUN ]
+
     o = FUN.send :definer
 
     Local_normal_name_as_long = -> i do
@@ -26,8 +29,6 @@ module Skylab::Headless
     o[:starts_with_dash] = -> tok do
       DASH_ == tok.getbyte( 0 )
     end
-    #
-    DASH_ = MetaHell::DASH_
 
     x = FUN.send :predefiner
 

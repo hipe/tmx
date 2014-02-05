@@ -202,7 +202,7 @@ module Skylab::Headless
             while d < last
               @p_a.fetch( d += 1 )[ self ]
             end
-            @p_a[ 0, len ] = MetaHell::EMPTY_A_ ; nil
+            @p_a[ 0, len ] = EMPTY_A_ ; nil
           end
           self
         end.new
@@ -424,7 +424,7 @@ module Skylab::Headless
             @q_x_a ||= bld_default_queue
             task = Bound_Task__.new nil, nil, -> do  # #flyweight
               _has_more = release_some_queue_elmnt
-              _has_more or p = MetaHell::EMPTY_P_
+              _has_more or p = -> { }  # 'EMPTY_P_'
               nil
             end
             p = -> do
@@ -499,7 +499,7 @@ module Skylab::Headless
           def close
             @p.call
           end
-          MetaHell::MAARS::Upwards[ self ]
+          Headless::Library_::MAARS::Upwards[ self ]
         end
 
         Action::Value_As_Task__ = -> x do
@@ -511,7 +511,7 @@ module Skylab::Headless
         def resolve_call_tuple_from_queue_element_x x  # #storypoint-815
           if x.respond_to? :id2name
             th_q_has_exactly_one_item and a = release_any_argv
-            a ||= MetaHell::EMPTY_A_
+            a ||= EMPTY_A_
             rslv_call_tuple_from_method_i_and_args x, a
           else
             q_for_rd.begin_dequeue self

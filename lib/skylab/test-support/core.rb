@@ -2,6 +2,7 @@ require File.expand_path('../../../skylab', __FILE__)
 # above is [#bs-010]
 
 require 'skylab/headless/core'
+require 'skylab/meta-hell/core'
 
 class ::String  # [#022] "to extlib or not to extlib.."
 

@@ -180,7 +180,7 @@ module Skylab::Headless
 
     class Builder__
       def initialize nm_p=nil
-        @name_p = nm_p || MetaHell::IDENTITY_
+        @name_p = nm_p || IDENTITY_
       end
     end
     class When_One_Delegatee__ < Builder__

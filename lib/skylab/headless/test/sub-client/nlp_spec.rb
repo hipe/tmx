@@ -10,7 +10,7 @@ module ::Skylab::Headless::TestSupport::SubClient
       self.class.sc
     end
 
-    define_singleton_method :sc, & MetaHell::FUN.memoize[ -> do
+    define_singleton_method :sc, & Headless::Library_::Memoize[ -> do
       o = ::Object.new
       o.extend Headless::SubClient::InstanceMethods
       o

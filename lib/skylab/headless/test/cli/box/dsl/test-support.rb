@@ -6,7 +6,7 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
 
   include CONSTANTS
 
-  Headless = Headless ; MetaHell = MetaHell ; QUEUE_IVAR__ = QUEUE_IVAR
+  Headless = Headless ; QUEUE_IVAR__ = QUEUE_IVAR
 
   extend TestSupport::Quickie
 
@@ -14,7 +14,7 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
 
     def box_DSL_class cls_i, & cls_p
 
-      define_method :box_DSL_class, MetaHell::FUN::Memoize[ -> do
+      define_method :box_DSL_class, Headless::Library_::Memoize[ -> do
         _cls = sandbox_module.const_set cls_i, ::Class.new
         _cls.class_exec do
           Headless::CLI::Box[ self, :DSL ]

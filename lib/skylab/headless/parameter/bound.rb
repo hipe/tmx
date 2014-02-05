@@ -45,7 +45,7 @@ module Skylab::Headless
       when [:props, :select] ; ->(p) { props_p.call(p) && select_p.call(p) }
       when [:props]          ; props_p
       when [:select]         ; select_p
-      when []                ; MetaHell::MONADIC_TRUTH_
+      when []                ; MONADIC_TRUTH_
       end
       dupe(params_p: ->() do
         ::Enumerator.new do |y|

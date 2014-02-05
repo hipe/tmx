@@ -9,8 +9,10 @@ module Skylab::Headless
       end
     end
 
+    MetaHell_ = Headless::Library_::MetaHell
+
     define_singleton_method :system,
-      MetaHell::FUN.memoize_to_const_method[
+      MetaHell_::FUN.memoize_to_const_method[
         -> { System::Client__.new }, :SYSTEM_CLIENT__ ]
 
     def self.defaults

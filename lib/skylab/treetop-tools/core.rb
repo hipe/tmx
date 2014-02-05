@@ -1,12 +1,14 @@
 require_relative '..'
 require 'skylab/headless/core'
+require 'skylab/meta-hell/core'
 
 module Skylab::TreetopTools
 
   Headless = ::Skylab::Headless
+  MetaHell = ::Skylab::MetaHell
   TreetopTools = self
 
-  Headless::MAARS[ self ]
+  MetaHell::MAARS[ self ]
 
   class RuntimeError < ::RuntimeError
   end

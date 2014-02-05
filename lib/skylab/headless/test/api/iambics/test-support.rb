@@ -6,8 +6,7 @@ module Skylab::Headless::TestSupport::API::Iambics
 
   include CONSTANTS
 
-  Headless = Headless
-  MetaHell = MetaHell
+  EMPTY_A_ = Headless::EMPTY_A_ ; Headless = Headless
 
   extend TestSupport::Quickie
 

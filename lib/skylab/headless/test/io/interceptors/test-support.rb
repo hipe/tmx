@@ -6,7 +6,7 @@ module Skylab::Headless::TestSupport::IO::Interceptors
 
   include CONSTANTS # so we can say Headless inside the describe block
 
-  Headless::Library_.kick :StringIO
+  Headless::Library_.const_get :StringIO, false
 
   extend TestSupport::Quickie
 

@@ -5,9 +5,11 @@ module Skylab::Basic
     For::Read = MetaHell::Function::Class.new :count, :gets, :line_number
     class For::Read
 
+      MAXLEN__ = 4096  # 2**12, or the number of bytes in about 50 lines
+
       # read [#004] (in [#022]) the scanner for read narrative
 
-      def initialize fh, maxlen=Library_::Headless::Constants::MAXLEN
+      def initialize fh, maxlen=MAXLEN__
         buffer = '' ; buffer_is_loaded = nil ; count = 0 ; gets = scn = nil
         advance_scanner = -> do
           scn = Library_::StringScanner.new buffer

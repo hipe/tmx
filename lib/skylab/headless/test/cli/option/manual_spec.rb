@@ -12,7 +12,7 @@ module Skylab::Headless::TestSupport::CLI::Option::Manual
 
     context "for now an option will derive things from long opt (..)" do
 
-      define_method :memoized_option, & MetaHell::FUN.memoize[ -> do
+      define_method :memoized_option, & Headless::Library_::Memoize[ -> do
         Headless::CLI::Option.new_flyweight
       end ]   # (it's generally bad and wrong to test this way but we are
       # forcing ourself to use the flyweight to see if we can trigger any

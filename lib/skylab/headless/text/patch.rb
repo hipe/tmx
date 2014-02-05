@@ -5,7 +5,7 @@ module Skylab::Headless
                                   # filesystem given
                                   # a string that contains the patch data.
 
-    MAARS[ self ]
+    Headless::Library_::MAARS[ self ]
 
 
     patch = -> patch_str, as, target_path, dry_run, verbose, info do

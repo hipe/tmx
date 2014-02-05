@@ -2,7 +2,7 @@ module Skylab::Headless
 
   module CLI::Pen  # [#084]
 
-    FUN = MetaHell::FUN::Module.new
+    FUN = Headless::Library_::FUN_Module.new
     module FUN
 
       o = definer

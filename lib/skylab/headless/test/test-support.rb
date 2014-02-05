@@ -1,4 +1,5 @@
 require_relative '../core'
+require_relative '../..'
 require 'skylab/test-support/core'
 
 module Skylab::Headless::TestSupport
@@ -8,7 +9,6 @@ module Skylab::Headless::TestSupport
   module CONSTANTS
     Headless = ::Skylab::Headless
     Headless_TestSupport = Headless_TestSupport
-    MetaHell = ::Skylab::MetaHell
     TestSupport = ::Skylab::TestSupport
   end
 

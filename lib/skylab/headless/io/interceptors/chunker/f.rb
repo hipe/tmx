@@ -1,7 +1,7 @@
 module Skylab::Headless
 
-  IO::Interceptors::Chunker::F = MetaHell::Function::Class.new :flush, :write
-  class IO::Interceptors::Chunker::F
+  IO::Interceptors::Chunker::F = Headless::Library_::Function::Class.
+    new( :flush, :write ) do
 
     # #todo
 

@@ -46,7 +46,7 @@ module Skylab::Headless
         module_exec( & Three_streams_notify_methods__ ) ; nil
       end
 
-      MetaHell::Bundle::Multiset[ self ]
+      Headless::Library_::Bundle::Multiset[ self ]
     end
 
       Three_streams_notify_methods__ = -> do
@@ -76,7 +76,7 @@ module Skylab::Headless
       attr_writer :program_name  # public for ouroboros [#054]
 
       CLI::Client::INITIALIZE_P_H__ = {
-        0 => MetaHell::MONADIC_EMPTINESS_,
+        0 => -> _ { },  # MONADIC_EMPTINESS_
         3 => -> a do
           @IO_adapter = build_IO_adapter( * a )
         end }.freeze
@@ -182,7 +182,7 @@ module Skylab::Headless
 
       Wire_autoloader__ = -> do
         loc = @location_of_residence ; @location_of_residence = nil
-        MetaHell::MAARS[ self, loc ] ; nil
+        Headless::Library_::MAARS[ self, loc ] ; nil
       end
 
       # #storypoint-920 (N/A) "we may implement bundles as procs below.."
@@ -214,7 +214,7 @@ module Skylab::Headless
     end
 
     module Adapter  # for [#054] ouroboros
-      MetaHell::MAARS::Upwards[ self ]
+      Headless::Library_::MAARS::Upwards[ self ]
     end
 
     module IMs__

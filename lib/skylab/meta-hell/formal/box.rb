@@ -606,9 +606,5 @@ module Skylab::MetaHell
         @order = hash.keys ; @hash = hash ; init_base nil ; self
       end
     end
-
-    def self.kick c
-      const_get c, false
-    end
   end
 end

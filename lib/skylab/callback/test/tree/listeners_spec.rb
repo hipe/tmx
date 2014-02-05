@@ -37,7 +37,8 @@ module Skylab::Callback::TestSupport::Tree
       it "calling an event outside of the tree is a no-no" do
         -> do
           callbacks.call_listeners :i_am, :not_there do self._never_see_ end
-        end.should raise_error ::KeyError, /\Akey not found: :i_am\b/
+        end.should raise_error ::KeyError, /\Ano 'i_am' at this node\. #{
+          }the only known node is 'error'\z/
       end
 
       it "no listeners: not only does no body hear it, but it doesn't fall" do

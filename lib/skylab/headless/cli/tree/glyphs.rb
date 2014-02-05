@@ -2,7 +2,7 @@ module Skylab::Headless
 
   module CLI::Tree::Glyphs
 
-    MetaHell::Boxxy[ self ]        # BOXXY IS QUEEN
+    Headless::Library_::Boxxy[ self ]  # BOXXY IS QUEEN
                                   # this stuff is just for reflection.
 
     g = CLI::Tree::Glyph

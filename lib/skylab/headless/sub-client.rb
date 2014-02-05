@@ -2,8 +2,8 @@ module Skylab::Headless::SubClient
 
   Headless = ::Skylab::Headless
   include Headless
-  MetaHell = MetaHell
-  Private_attr_reader_ = Private_attr_reader_
+  MetaHell_ = Headless::Library_::MetaHell
+  Private_attr_reader_ = MetaHell_::FUN.private_attr_reader
 
   module InstanceMethods
 
@@ -143,7 +143,7 @@ end
 
   end
 
-  EN_FUN = MetaHell::FUN::Module.new
+  EN_FUN = Headless::Library_::FUN_Module.new
 
   module EN_FUN
 
@@ -192,12 +192,12 @@ end
     end
 
     o[:s] = -> * args do  # [length] [lexeme_i]
-      len_x, lexeme_i = MetaHell::FUN.parse_series[ args,
+      len_x, lexeme_i = MetaHell_::FUN.parse_series[ args,
         -> x { ! x.respond_to? :id2name }, # defer it
         -> x { x.respond_to? :id2name } ]
       lexeme_i ||= :s  # when `len_x` is nil it means "use memoized"
       p = if :identity == lexeme_i
-        MetaHell::IDENTITY_
+        IDENTITY_
       else
         -> len_x_ do
           fun[].s[ len_x_, lexeme_i ]
