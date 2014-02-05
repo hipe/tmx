@@ -203,6 +203,7 @@ module Skylab::Git
       end
 
       def parse_pattern_arg
+        @argv.length.zero? and call_plugin_listeners :on_no_arguments, @argv
         case @argv.length <=> 1
         when -1 ; when_missing_arg '<pattern>'
         when  0 ; when_good_arg
@@ -1116,6 +1117,7 @@ module Skylab::Git
       o << :on_build_option_parser
       o << :on_render_tiny_switches
       o << :on_render_usage_lines
+      o << :on_no_arguments
       o << :on_pattern_string_received
       o.end
 
@@ -1163,15 +1165,22 @@ module Skylab::Git
             }writes to", "#{ dotfile }. will write to file regardless of #{
              }-n", "flag, which is a feature.)" do
           engage
+          do_write!
         end
+      end
+
+      def on_no_arguments a
+        engage
+        on_no_arguments a
       end
 
       def on_pattern_string_received s
       end
+
     private
       def engage
         require self.class.dir_pathname.to_path
-        engage
+        init
       end
       Autoloader_[ self ]
     end

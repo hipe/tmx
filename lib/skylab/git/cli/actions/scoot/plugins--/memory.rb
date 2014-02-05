@@ -8,24 +8,35 @@ module Skylab::Git
         def engage
         end
         def on_pattern_string_received s
-          @pattern_s = s
-          procure_fh && write_to_fh
+          if @do_write
+            @pattern_s = s
+            procure_fh && write_to_fh
+          end
+          SILENT_
         end
       private
+        def init
+          @do_write = false
+          @parse = Parse_File__.curry :pattern
+          @path = nil
+        end
+        def do_write!
+          @do_write = true
+        end
         def write_to_fh
           @fh.seek 0, :END
           @fh.pos.zero? or _re = 're-'
           @y_IO.write "#{ _re }writing #{ dotfile } .."
           @fh.truncate 0
           @fh.seek 0, :SET
-          @fh.puts "pattern=#{ @pattern_s }"
+          @fh.puts "#{ @parse.value_name }=#{ @pattern_s }"
           @fh.close
           @y_IO.puts " done."
           SILENT_
         end
 
         def procure_fh
-          @path = procure_dotfile_path
+          @path ||= procure_dotfile_path
           @path && procure_fh_with_dotfile_path
         end
 
@@ -88,7 +99,105 @@ module Skylab::Git
           @pn = @mkdir_pn = @eg_home_pn = nil
           @fh && PROCEDE_
         end
+
+      public
+
+        def on_no_arguments argv
+          @argv = argv
+          @path ||= procure_dotfile_path
+          @path and attempt_to_write_pattern_in_file_to_argv
+        end
+
+        def attempt_to_write_pattern_in_file_to_argv
+          _parse = @parse.curry dotfile, @path, @y
+          _parse.parse_for_value method( :unmarshalled_value ), -> { false }
+        end
+
+        def unmarshalled_value s
+          @y << "(using stored pattern from #{ dotfile }: '#{ s }')"
+          @argv << s
+          PROCEDE_
+        end
       end
+
+      class Parse_File__
+        class << self
+          alias_method :curry, :new
+        end
+        def initialize value_name
+          @value_name = value_name
+          freeze
+        end
+        def initialize_copy otr
+          @value_name = otr.value_name
+        end
+        attr_reader :value_name
+        def curry pretty_path, path, y
+          dupe do |otr|
+            otr.path = path
+            otr.pretty_path = pretty_path
+            otr.y = y
+          end
+        end
+      private
+        def dupe & p
+          otr = dup
+          otr.initialize_dupe( & p )
+          otr
+        end
+      protected
+        def initialize_dupe
+          yield self ; freeze
+        end
+      public
+        attr_writer :path, :pretty_path, :y
+        def parse_for_value yes_p, no_p
+          Parse__.new( @value_name, @pretty_path, @path, @y, yes_p, no_p ).parse
+        end
+
+        class Parse__
+          def initialize vname, pret_path, path, y, yes_p, no_p
+            @hdr = "#{ vname }="
+            @hdr_len = @hdr.length
+            @no_p = no_p
+            @pn = ::Pathname.new path
+            @pretty_path = pret_path
+            @vname = vname ; @y = y ; @yes_p = yes_p
+          end
+          def parse
+            ok = pn_exist
+            ok &&= scan_for_value
+            ok ? @yes_p[ @value ] : @no_p[]
+          end
+        private
+          def pn_exist
+            @pn.exist? or report_pn_not_exist
+          end
+          def report_pn_not_exist
+            @y << "(no #{ @pret_path })"
+            CEASE_
+          end
+          def scan_for_value
+            @fh = @pn.open 'r'
+            @did_find = false
+            while @line = @fh.gets
+              parse_line and break
+            end
+            @fh.close
+            @did_find
+          end
+          def parse_line
+            @hdr == @line[ 0, @hdr_len ] and read_line
+          end
+          def read_line
+            @did_find = true
+            s = @line[ @hdr_len  .. -1 ]
+            s.chomp!
+            @value = s
+          end
+        end
+      end
+
       prepend Prepend__
     end
   end
