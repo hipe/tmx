@@ -64,13 +64,12 @@ exit( -> sin, sout, serr, argv, program_name do
         _USAGE = 'usage: '
         _INDENT = ' ' * _USAGE.length
         y << "#{ lbl _USAGE }#{ prog_name[] } #{ usage_syntax[] }"
-
         y << nil
 
         require_relative '../lib/skylab'
-        fun = subsystem[ :Headless ]::CLI::FUN
-        cols = [ fun::Cols[ -> { _DEFAULT_COLS } ], _MAX_COLS ].min
-        yy = fun::Wrapping_indenter[ cols, '', y ]
+        hl = subsystem[ :Headless ]
+        _cols = [ hl::CLI::FUN::Cols[ -> { _DEFAULT_COLS } ], _MAX_COLS ].min
+        yy = hl::CLI::Word_Wrap.curry '', _cols, y
 
         y << "#{ lbl 'description:' }"
         yy.indent = _INDENT

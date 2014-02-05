@@ -52,10 +52,10 @@ exit -> argv, stdin, stdout, stderr, program_name do
         _IND = ' ' * _USAGE.length
         y << "#{ lbl _USAGE } #{ progname[] } #{ syntax[] }"
         y << nil
+        hl = subsystem[ :Headless ]
 
-        fun = subsystem[ :Headless ]::CLI::FUN
-        cols = [ fun::Cols[ -> { _DEFAULT_COLS } ], _MAX_COLS ].min
-        yy = fun::Wrapping_indenter[ cols, '', y ]
+        _cols = [ hl::CLI::FUN::Cols[ -> { _DEFAULT_COLS } ], _MAX_COLS ].min
+        yy = hl::CLI::Word_Wrap.curry '', _cols, y
 
         yy << "#{ lbl 'description:' } #{ kw 'search' } is any string that #{
           }contains exactly one occurrence of #{ kw 'replstr' }."

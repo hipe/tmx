@@ -1,6 +1,6 @@
 module Skylab::Headless
 
-  class CLI::FUN::Wrapping_indenter < ::Enumerator::Yielder
+  class CLI::Word_Wrap < ::Enumerator::Yielder
 
     def initialize p, set_indent_p, flush_p
       @flush_p = flush_p ; @set_indent_p = set_indent_p
@@ -15,10 +15,10 @@ module Skylab::Headless
       @flush_p[]
     end
 
-    define_singleton_method :[], ( -> do
+    define_singleton_method :curry, ( -> do
 
       build_word_scanner = build_word_pool = build_indenter = nil
-      build_wrapping_indenter = -> width_d, indent_s, downstream_y do
+      build_wrapping_indenter = -> indent_s, width_d, downstream_y do
         process_input_line = flush_full_lines = flush_hard = nil
         indenter = build_indenter[ indent_s, downstream_y ]
         word_pool = build_word_pool[ width_d - indent_s.length ]
