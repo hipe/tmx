@@ -35,7 +35,7 @@ module Skylab
           @plugin_conduit_h = {}
           init_plugin_callbacks_if_necessary
           conduit = plugin_conduit_cls.new @y, self
-          box_mod = rslv_some_plugin_box_mod
+          box_mod = plugin_box_module
           box_mod.constants.each do |const_i|
             name = Callback::Name.from_const const_i
             WHITE_SLUG_RX__ =~ name.as_slug or next
@@ -59,7 +59,7 @@ module Skylab
           self.class.plugin_conduit_class
         end
 
-        def rslv_some_plugin_box_mod
+        def plugin_box_module
           if self.class.const_defined? PLUGIN_BOX__, false
             self.class.const_get PLUGIN_BOX__, false
           else
@@ -92,14 +92,18 @@ module Skylab
         def init_option_parser_by_aggregating_plugin_options
           @op = Headless::Library_::OptionParser.new
           write_plugin_host_option_parser_options  # :+#hook-out
-          call_plugin_listeners :on_build_option_parser do |plugin_i|
-            cond = @plugin_conduit_h.fetch plugin_i
-            op = Plugin_Option_Parser_Proxy_.new( a = [] )
-            cond.plugin.on_build_option_parser op
-            Plugin_Option_Parser_Playback_.new( @y, @op, cond, a ).playback
-          end
+          write_plugin_option_parser_options @op
           write_plugin_host_option_parser_help_option  # :+#hook-out
           PROCEDE__
+        end
+
+        def write_plugin_option_parser_options up_op
+          call_plugin_listeners :on_build_option_parser do |plugin_i|
+            cond = @plugin_conduit_h.fetch plugin_i
+            _op = Plugin_Option_Parser_Proxy_.new( a = [] )
+            cond.plugin.on_build_option_parser _op
+            Plugin_Option_Parser_Playback_.new( @y, up_op, cond, a ).playback
+          end
         end
 
         # read #storypoint-50 intro to "callback tree" event handling patterns
@@ -239,14 +243,20 @@ module Skylab
         def transform
           (( @md = RX__.match @a.first )) ? matched : not_matched ; nil
         end
-        RX__ = /\A--[-a-zA-Z0-9]+(?=\z|[= ])/
+        RX__ = /\A--[-a-z0-9]*[a-z0-9](?<post_preposition_dash>-)?(?=\z|[= ])/i
         def not_matched
           @y << "(bad option name, skipping - #{ @a.first }" ; nil
         end
         def matched
-          _new_name = "#{ @md[0] }-for-#{ @cond.name.as_slug }"
-          @a[ 0 ] = "#{ _new_name }#{ @md.post_match }"
+          @a[ 0 ] = "#{ get_new_name }#{ @md.post_match }"
           @op.on( * @a, & @p )
+        end
+        def get_new_name
+          if @md[ :post_preposition_dash ]
+            "#{ @md[0] }#{ @cond.name.as_slug }"
+          else
+            "#{ @md[0] }-for-#{ @cond.name.as_slug }"
+          end
         end
       end
     end

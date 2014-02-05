@@ -2,8 +2,8 @@ module Skylab::Git
 
   module Library_  # :+[#su-001]
 
-    stdlib, subsys = ::Skylab::Subsystem::FUN.
-      at :require_stdlib, :require_subsystem
+    stdlib, subsys = Autoloader_.at :require_stdlib, :require_subsystem
+
     o = { }
     o[ :Basic ] = subsys
     o[ :FileUtils ] = stdlib

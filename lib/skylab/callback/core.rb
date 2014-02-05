@@ -113,6 +113,9 @@ module Skylab::Callback
       def const_missing i
         Const_Missing__.new( self, @dir_pathname, i ).load_and_get
       end
+      def const_missing_class
+        :_has_one_  # #comport to oldschoool a.l
+      end
       attr_reader :dir_pathname
       def to_path
         @dir_pathname.sub_ext( EXTNAME_ ).to_path

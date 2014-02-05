@@ -3,13 +3,14 @@ module Skylab::Git
   module CLI::Actions::Scoot
 
     def self.new i, o, e
-      Client__.new i, o, e
+      Client_.new i, o, e
     end
 
     class Really_Basic_CLI_Client__
 
       def initialize sin, sout, serr
-        @exit_status = 1
+        @exit_status = ERROR_CODE_
+        @stderr_IO = serr
         @y = ::Enumerator::Yielder.new( & serr.method( :puts ) )
       end
 
@@ -60,11 +61,17 @@ module Skylab::Git
       end
     end
 
-    class Client__ < Really_Basic_CLI_Client__
+    class Client_ < Really_Basic_CLI_Client__
 
       def initialize( * )
-        @capture_index_s = @from_s = @is_dry_run = @to_s = nil
+        @capture_index_s = @do_remembers = nil
+        @from_s = @is_dry_run = @to_s = nil
         super
+        load_plugins
+      end
+
+      def init_plugins
+        # we do things like aggregate the o.p options ourself later
       end
 
       def build_option_parser
@@ -84,6 +91,9 @@ module Skylab::Git
           "the subject of the mutation (only 1 column at a time!)" do |s|
             @capture_index_s = s ; nil
         end
+
+        write_plugin_option_parser_options o
+
         o.on '-n', '--dry-run', "dry run." do
           @is_dry_run = true
         end
@@ -97,7 +107,9 @@ module Skylab::Git
 
       def render_help_screen op
         us = usage_string
-        @y << say { "#{ hdr 'usage:' } #{ us }" }
+        @usage_header = 'usage:'
+        @y << say { "#{ hdr @usage_header } #{ us }" }
+        render_plugin_usage_strings
         @y << BREAK__
         @y << say { "#{ hdr 'description:' }" }
         w = build_indenting_word_wrapper '  ', 80
@@ -160,8 +172,24 @@ module Skylab::Git
       end ; BREAK__ = ''.freeze
 
       def usage_string
-        "#{ program_name } #{
+        a = [] ; call_plugin_listeners :on_render_tiny_switches, a
+        "#{ program_name } #{ a.length.nonzero? and "#{ a * ' ' } " }#{
           }[-n] [ --from <d> | --to <d> ] <pattern> (+|-) <amount>"
+      end
+
+      def render_plugin_usage_strings
+        usage_yielder_for_plugin = -> do
+          _indent = ' ' * ( @usage_header.length + 1 )
+          margin = "#{ _indent }#{ program_name } "
+          y = ::Enumerator::Yielder.new do |str|
+            @y << "#{ margin }#{ str }"
+          end
+          usage_yielder_for_plugin = -> { y } ; y
+        end
+        call_plugin_listeners :on_render_usage_lines do |i|
+          @plugin_conduit_h.fetch( i ).
+            plugin.on_render_usage_lines usage_yielder_for_plugin[]
+        end
       end
 
       def preparse_opts
@@ -183,7 +211,9 @@ module Skylab::Git
       end
 
       def when_good_arg
-        @pattern_s = @argv.shift ; true
+        @pattern_s = @argv.shift
+        call_plugin_listeners :on_pattern_string_received, @pattern_s
+        PROCEDE_
       end
 
       def ensure_amount_arg
@@ -667,10 +697,6 @@ module Skylab::Git
       end ; PORCELAIN_HACK_TRIM_RX__ = /(?<=\A[ *] ).+\z/
     end
 
-    class Scn_ < ::Proc
-      alias_method :gets, :call
-    end
-
     class System_Call__
       def initialize
         yield self
@@ -1050,6 +1076,8 @@ module Skylab::Git
       end
     end
 
+    Scn_ = ::Skylab::Headless::Scn
+
     class Dry_Run_Sys_Cond_Mock_
       def popen3 * a
         [ nil,  ES__, ES__, WAIT__ ]
@@ -1079,6 +1107,77 @@ module Skylab::Git
       end
     end
 
+    # ~ plugins setup
+
+    class Client_
+      Git::Library_::Headless::Plugin::Host[ self ]
+      o = build_mutable_callback_tree_specification
+      o.default_pattern :listeners
+      o << :on_build_option_parser
+      o << :on_render_tiny_switches
+      o << :on_render_usage_lines
+      o << :on_pattern_string_received
+      o.end
+
+      def plugin_box_module
+        Plugins__
+      end
+
+      plugin_conduit_class
+      class Plugin_Conduit
+        def stderr_IO
+          up.stderr_IO
+        end
+      end
+      def stderr_IO
+        @stderr_IO
+      end
+    end
+
+    Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+    Autoloader_[ Plugins__ = ::Module.new ]
+
+    # ~ plugins
+
+    class Plugins__::Memory
+
+      def initialize host
+        @kernel = nil
+        @y_IO = host.stderr_IO
+        @y = host.stderr_line_yielder
+      end
+
+      def dotfile
+        DOTFILE__
+      end
+      DOTFILE__ = '~/.tmx/git-scoot'.freeze
+
+      def on_render_tiny_switches y
+        y << '[-a]'  # not scalable
+      end
+
+      def on_build_option_parser op
+        op.on '--add-to-', "\"remember\" the pattern for future re-use. #{
+          }on subsequent", "invocations if a pattern is not provided #{
+           }any pattern in", "\"memory\" will be used. (experimental, #{
+            }writes to", "#{ dotfile }. will write to file regardless of #{
+             }-n", "flag, which is a feature.)" do
+          engage
+        end
+      end
+
+      def on_pattern_string_received s
+      end
+    private
+      def engage
+        require self.class.dir_pathname.to_path
+        engage
+      end
+      Autoloader_[ self ]
+    end
+
+    # ~ general small support
+
     Word_Wrap_ = -> ind_s, col_d, y do
       Git::Library_::Headless::Text::Word_Wrap.curry ind_s, col_d, y
     end
@@ -1086,6 +1185,8 @@ module Skylab::Git
     CEASE_ = false
     GIT_EXE_ = 'git'.freeze
     EMPTY_S_ = ''.freeze
+    ERROR_CODE_ = 4
     PROCEDE_ = true
+    SILENT_ = nil
   end
 end
