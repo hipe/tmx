@@ -1,5 +1,7 @@
 module Skylab::Callback
 
+  Require_legacy_core_[]
+
   module Event
 
     MetaHell::MAARS[ self ]

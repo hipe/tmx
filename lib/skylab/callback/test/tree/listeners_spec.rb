@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::GitViz::TestSupport::Callback_Tree
+module Skylab::Callback::TestSupport::Tree
 
   describe "[gv] lib- callbacks-tree: listeners" do
 
@@ -28,7 +28,7 @@ module Skylab::GitViz::TestSupport::Callback_Tree
       end
 
       let :callbacks do
-        GitViz::Lib_::Callback_Tree.new( za_zang: :listeners )
+        Callback::Tree.new za_zang: :listeners
       end
     end
 
@@ -72,8 +72,7 @@ module Skylab::GitViz::TestSupport::Callback_Tree
       end
 
       let :callbacks do
-        GitViz::Lib_::Callback_Tree.
-          new error: { purple: { durple_error: :listeners } }
+        Callback::Tree.new error: { purple: { durple_error: :listeners } }
       end
     end
   end

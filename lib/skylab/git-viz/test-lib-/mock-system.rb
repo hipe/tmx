@@ -65,10 +65,10 @@ module Skylab::GitViz
           @cache_h = ::Hash.new do |h, cls|
             h[ cls ] = { }
           end
-          @callbacks = Callbacks__.new
+          @callbacks = Callback_Tree__.new
           @manifest_cls = Mock_System_Conduit_
         end
-        class Callbacks__ < GitViz::Lib_::Callback_Tree
+        class Callback_Tree__ < Callback_Tree_
           def initialize
             super item_added: :listeners
           end

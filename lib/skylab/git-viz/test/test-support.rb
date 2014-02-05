@@ -58,7 +58,7 @@ module Skylab::GitViz::TestSupport
     end
 
     def build_listener
-      GitViz::Lib_::Callback[]::Listener::Spy_Proxy.new do |spy|
+      GitViz::Callback_::Listener::Spy_Proxy.new do |spy|
         spy.emission_a = @baked_em_a = []
         spy.inspect_emission_proc =
           method :inspect_emission_channel_and_payload

@@ -10,7 +10,7 @@ module Skylab::GitViz
         # shutdown" with a wide, flat tree of line-oriented callback channels
         # (i.e. many callback) to hook into for whoever the client is.
 
-        GitViz::Lib_::Callback_Tree::Host[ self ]
+        Callback_Tree_::Host[ self ]
         Mock_System::Socket_Agent_[ self ]
 
         callbacks = build_mutable_callback_tree_specification

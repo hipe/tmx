@@ -43,7 +43,9 @@ module Skylab::GitViz
       end
 
       callbacks = build_mutable_callback_tree_specification
-      callbacks << :on_intro << :on_start
+      callbacks.default_pattern :listener
+      callbacks.listeners :on_intro
+      callbacks.listeners :on_start
 
     private
 
@@ -59,7 +61,7 @@ module Skylab::GitViz
         end
       end
 
-      callbacks << :on_build_option_parser
+      callbacks.listeners :on_build_option_parser
 
       def write_plugin_host_option_parser_help_option  # #hook-out
         @op.on '--help', "this screen." do
@@ -76,7 +78,6 @@ module Skylab::GitViz
         ec ||= parse_plugin_options
         ec || parse_arguments
       end
-      callbacks << :on_options_parsed
 
       def parse_options
         @result_code_from_OP = nil
@@ -91,6 +92,7 @@ module Skylab::GitViz
         ec = call_plugin_shorters :on_options_parsed
         ec and report_failure_to_parse_plugin_options ec
       end
+      callbacks.shorters :on_options_parsed
 
       def report_failure_to_parse_plugin_options ec
         cannot_start_server_because_plugin ec, "issue with a plugin option"
@@ -107,7 +109,7 @@ module Skylab::GitViz
         @front_responder = self.class::Responder__.new @y
         call_plugin_shorters :on_front_responder_initted, @front_responder
       end
-      callbacks << :on_front_responder_initted
+      callbacks.shorters :on_front_responder_initted
 
       def set_signal_handlers
         trap 'INT' do
@@ -189,8 +191,8 @@ module Skylab::GitViz
       end ; DASH__ = '-'.getbyte 0
 
       def can_and_do_preprocess_server_directive
-        slug_s = @buffer_a.fetch( 0 ).gsub ' ', '-'
-        i = Constify_if_possible_[ slug_s ]
+        _human = @buffer_a.fetch 0
+        i = Name_.from_human( _human ).as_const
         if i and Fixture_Server::Alternate_Responders__.const_defined? i, false
           @responder_const_i = i ; @buffer_a.shift ; true
         end
@@ -220,9 +222,8 @@ module Skylab::GitViz
         ec = call_plugin_shorters :on_response, s_a
         ec or send_strings s_a
       end
-      callbacks << :on_response
-
-      callbacks << :on_shutdown
+      callbacks.shorters :on_response
+      callbacks.shorters :on_shutdown  # by agent
 
       Callback_Tree__ = callbacks.flush  # then used by plugin subsystem
 

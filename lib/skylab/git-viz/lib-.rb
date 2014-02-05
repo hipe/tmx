@@ -7,32 +7,35 @@ module Skylab::GitViz
       -> { p_.call }
     end
 
-    slug = -> i do
-      i.to_s.gsub( %r((?<=[a-z])(?=[A-Z])), '-' ).downcase
-    end
-
     sl = -> do
       require_relative '..' ; sl = nil
     end
 
     subsys = -> i do
       memo[ -> do
+        /\Arbx\b/i =~ ::RUBY_ENGINE and raise "cannot load '#{ i }' in rbx!"
         sl && sl[]
-        require "skylab/#{ slug[ i ] }/core" ; ::Skylab.const_get i, false
+        require "skylab/#{ Name_.from_const( i ).as_slug }/core"
+        ::Skylab.const_get i, false
       end ]
     end
 
-    stdlib = -> i do
-      memo[ -> do
-        require slug[ i ] ; ::Object.const_get i, false
-      end ]
+    purified_, stdlib_ = Autoloader_.at :require_subsystem, :require_stdlib
+
+    purified = -> i do
+      -> { purified_[ i ] }
     end
+
+    stdlib = -> i do
+      -> { stdlib_[ i ] }
+    end
+
     gem = stdlib
 
     Basic = subsys[ :Basic ]
     DateTime = memo[ -> do require 'date' ; ::DateTime end ]
     Grit = memo[ -> do require 'grit' ; ::Grit end ]
-    Headless = subsys[ :Headless ]
+    Headless = purified[ :Headless ]
     JSON = stdlib[ :JSON ]
     Listen = gem[ :Listen ]
     MetaHell = subsys[ :MetaHell ]
@@ -40,7 +43,6 @@ module Skylab::GitViz
     Open3 = stdlib[ :Open3 ]
     OptionParser = memo[ -> do require 'optparse' ; ::OptionParser end ]
     Porcelain = subsys[ :Porcelain ]
-    Callback = subsys[ :Callback ]
     Set = stdlib[ :Set ]
     Shellwords = stdlib[ :Shellwords ]
     StringScanner = memo[ -> do require 'strscan' ; ::StringScanner end ]
@@ -51,23 +53,8 @@ module Skylab::GitViz
       x.inspect  # placeholder for the future from the past
     end
 
-    Oxford = -> separator, none, final_sep, a do
-      if a.length.zero?
-        none
-      else
-        p = -> do
-          h = { 0 => nil, 1 => final_sep }
-          h.default_proc = -> _, _ do separator end
-          h.method :[]
-        end.call
-        last = a.length - 1
-        a[ 1 .. -1 ].each_with_index.reduce( [ a.first ] ) do |m, (s, d)|
-          m << p[ last - d ] ; m << s ; m
-        end * ''
-      end
-    end
-
-    Oxford_or = Oxford.curry[ ', ', '[none]', ' or ' ]
-    Oxford_and = Oxford.curry[ ', ', '[none]', ' and ' ]
+    oxford = Callback_::Oxford
+    Oxford_or = oxford.curry[ ', ', '[none]', ' or ' ]
+    Oxford_and = oxford.curry[ ', ', '[none]', ' and ' ]
   end
 end

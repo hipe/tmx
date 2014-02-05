@@ -2,6 +2,8 @@ require 'skylab/headless/core'
 
 module Skylab::Callback
 
+  Require_legacy_core_[]
+
   Headless = ::Skylab::Headless   # be very careful that this only happens in
     # 1 place! this dependency must be downwards-only from this node.
 

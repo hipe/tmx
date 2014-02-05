@@ -99,7 +99,7 @@ module Skylab::GitViz
       def response_started_notify _response
         if @do_engage
           if @is_hot
-            reset_timer_to_now_because :response_started
+            reset_timer_to_now_because :on_response_started
           else
             @y << "ignoring response started b.c shutdown request already sent!"
           end

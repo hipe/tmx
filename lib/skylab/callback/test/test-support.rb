@@ -1,4 +1,7 @@
 require_relative '../core'
+
+Skylab::Callback::Require_legacy_core_[]
+
 require 'skylab/test-support/core'
 require 'skylab/headless/core'  # unstyle etc
 

@@ -1,13 +1,12 @@
-
-# read [#005]:#this-node-looks-funny-because-it-is-multi-domain
-
-require 'pathname'
-
 module Skylab ; end
 
-module Skylab::GitViz
+module Skylab::Callback
 
-  module Autoloader_
+  def self.[] mod, * x_a
+    self::Bundles.apply_iambic_on_client x_a, mod
+  end
+
+  module Autoloader
 
     def self.[] mod, x=nil
       mod.module_exec do
@@ -24,7 +23,31 @@ module Skylab::GitViz
       end ; nil
     end
 
-    EXTNAME_ = '.rb'.freeze
+    def self.at *a
+      @at_h ||= {}
+      a.map do |i|
+        @at_h.fetch i do
+          @at_h[ i ] = method i
+        end
+      end
+    end
+
+    # ~ :+[#ss-002] the below methods duplicate and purify their predecessors
+
+    def self.require_stdlib const_i
+      require const_i.downcase.to_s  # until it's useful to, no inflection
+      ::Object.const_get const_i
+    end
+
+    define_singleton_method :require_subsystem, -> do
+      sl_path = -> do
+        x = Callback.dir_pathname.dirname.to_path ; sl_path = -> { x } ; x
+      end
+      -> const_i do
+        require "#{ sl_path[] }/#{ Name.from_const( const_i ).as_slug }/core"
+        ::Skylab.const_get const_i, false
+      end
+    end.call
 
     module Boxxy_Methods__
       def const_defined? const_i, up=false
@@ -55,6 +78,7 @@ module Skylab::GitViz
       end
     end
 
+    EXTNAME_ = '.rb'.freeze
     SPLIT_EXTNAME_RX_ = %r((?=\.[^.]+\z))
     EXTENSION_PASS_FILTER_RX_ = /\A(?:#{ ::Regexp.escape EXTNAME_ }|)\z/
 
@@ -99,13 +123,18 @@ module Skylab::GitViz
       def set_dir_pn x  # compare more elaborate [sl] `init_dir_pathname`
         @dir_pathname = x ; nil
       end
+      attr_reader :stowaway_h
+    private
+      def stowaway i, path
+        ( @stowaway_h ||= {} )[ i ] = path ; nil
+      end
     end
 
     class Const_Missing__
 
       def initialize mod, dpn, i
         @dir_pathname = dpn ; @mod = mod ;
-        @name = Name_.from_variegated_symbol i
+        @name = Name.from_variegated_symbol i
       end
 
       attr_reader :mod
@@ -123,6 +152,8 @@ module Skylab::GitViz
           when_file_exists
         elsif @d_pn.exist?
           when_dir_exists
+        elsif h = @mod.stowaway_h and @stowaway_path = h[ @name.as_const ]
+          load_stowaway
         else
           when_neither_file_nor_dir_exist
         end
@@ -139,6 +170,15 @@ module Skylab::GitViz
 
       def when_file_exists
         load @f_pn.to_path
+        after_file_was_loaded
+      end
+
+      def load_stowaway
+        require @mod.dir_pathname.join( @stowaway_path ).to_path
+        after_file_was_loaded
+      end
+
+      def after_file_was_loaded
         verify_const_defined_and_emit_correction
         mod = @mod.const_get @name.as_const
         if ! mod.respond_to? :dir_pathname
@@ -152,9 +192,7 @@ module Skylab::GitViz
       def verify_const_defined_and_emit_correction
         i = @name.as_const or raise ::LoadError, say_cant_resolve_valid_cname
         @mod.const_defined? i, false or raise ::LoadError, say_not_defined
-        if @correction_proc
-          @correction_proc[]
-        end ; nil
+        @correction_proc and @correction_proc[] ; nil
       end
 
       def say_cant_resolve_valid_cname
@@ -179,7 +217,8 @@ module Skylab::GitViz
       end ; CORE_FILE__ = "core#{ EXTNAME_ }".freeze
 
       def enhance_loaded_value mod
-        Autoloader_[ mod, @d_pn ] ; nil
+        mod.respond_to? :module_exec and  # not all autoloaded objects are mods
+          Autoloader[ mod, @d_pn ] ; nil
       end
     public
       def correction_notification i
@@ -188,7 +227,7 @@ module Skylab::GitViz
     end
   end
 
-  class Name_  # will freeze any string it is constructed with
+  class Name  # will freeze any string it is constructed with
     # this only supports the simplified inflection necessary for this app.
     class << self
       def from_const const_i
@@ -295,8 +334,44 @@ module Skylab::GitViz
     end
   end.call
 
-  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+  Oxford = -> separator, none, final_sep, a do
+    if a.length.zero?
+      none
+    else
+      p = -> do
+        h = { 0 => nil, 1 => final_sep }
+        h.default_proc = -> _, _ do separator end
+        h.method :[]
+      end.call
+      last = a.length - 1
+      a[ 1 .. -1 ].each_with_index.reduce( [ a.first ] ) do |m, (s, d)|
+        m << p[ last - d ] ; m << s ; m
+      end * ''
+    end
+  end
 
-  GitViz = self
+  Oxford_or = Oxford.curry[ ', ', '[none]', ' or ' ]
+  Oxford_and = Oxford.curry[ ', ', '[none]', ' and ' ]
+
+  Require_legacy_core_ = -> do
+    p = -> do
+      require_relative '..'
+      require 'skylab/basic/core'
+
+      [ :Basic, :MetaHell ].each do |i|
+        const_set i, ::Skylab.const_get( i, false )
+      end
+      p = -> { } ; nil
+    end
+    -> { p[] }
+  end.call
+
+  require 'pathname'
+
+  Autoloader[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+
+  stowaway :TestSupport, 'test/test-support'
+
+  Callback = self
 
 end

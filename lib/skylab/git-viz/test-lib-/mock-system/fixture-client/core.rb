@@ -38,7 +38,7 @@ module Skylab::GitViz
       end
 
       callbacks = build_mutable_callback_tree_specification
-      callbacks << :on_build_option_parser
+      callbacks.listeners :on_build_option_parser
 
       def write_plugin_host_option_parser_options
         # currently all options exist only in the plugins

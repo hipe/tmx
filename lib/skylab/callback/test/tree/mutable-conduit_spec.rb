@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::GitViz::TestSupport::Callback_Tree
+module Skylab::Callback::TestSupport::Tree
 
   describe "[gv] lib- callbacks-tree: mutable conduit" do
 
@@ -9,7 +9,7 @@ module Skylab::GitViz::TestSupport::Callback_Tree
       before :all do
 
         class Wap_Zazzle
-          GitViz::Lib_::Callback_Tree::Host[ self ]
+          Callback::Tree::Host[ self ]
           spec = build_mutable_callback_tree_specification
           spec.default_pattern :callback
           spec << :wiff

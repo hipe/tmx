@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::GitViz::TestSupport::Callback_Tree
+module Skylab::Callback::TestSupport::Tree
 
   describe "[gv] lib- callbacks-tree: handlers" do
 
@@ -57,9 +57,8 @@ module Skylab::GitViz::TestSupport::Callback_Tree
     end
 
     let :hndlrs do
-      GitViz::Lib_::Callback_Tree.
-        new( { error: { frobulation:
-          { trans_dermal: :handler, sub_cutaneous: :handler } } }, :wazlo )
+      Callback::Tree.new( { error: { frobulation:
+        { trans_dermal: :handler, sub_cutaneous: :handler } } }, :wazlo )
     end
 
     def handle_it x

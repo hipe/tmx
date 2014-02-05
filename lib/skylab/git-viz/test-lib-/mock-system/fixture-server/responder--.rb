@@ -6,11 +6,11 @@ module Skylab::GitViz
 
       def initialize y
         @cache = Test_Lib_::Mock_System::Mock_Command_IO_Cache_.new
-        @callbacks = Callbacks__.new
+        @callbacks = Callback_Tree__.new
         @y = y
       end
 
-      class Callbacks__ < GitViz::Lib_::Callback_Tree
+      class Callback_Tree__ < Callback_Tree_
         def initialize
           super response_started: :listeners
         end
@@ -21,7 +21,7 @@ module Skylab::GitViz
       end
 
       def on_response_started &p
-        @callbacks.add_listener :response_started, p ; nil
+        @callbacks.add_listener :_response_started, p ; nil
       end
 
       def process_strings a

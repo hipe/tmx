@@ -15,12 +15,12 @@ module Skylab::GitViz
         end
       private
         def init_callbacks callbacks
-          cb = Callbacks__.new
+          cb = Callback_Tree__.new
           cb.set_handler :error, :parse, method( :handle_parse_error )
           cb.glom callbacks
           @callbacks = cb
         end
-        class Callbacks__ < GitViz::Lib_::Callback_Tree
+        class Callback_Tree__ < Callback_Tree_
           def initialize
             super error: { parse: :handler }
           end

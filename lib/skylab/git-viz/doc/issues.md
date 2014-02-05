@@ -1,4 +1,3 @@
-[#033]       #parent-node:[#021] the different kinds of callback trees
 [#032]       #done re-arch auto shutdown to use messages, currently it's creating
              assertion failures, perhaps b.c we are passing sockets across
              memory barriers?

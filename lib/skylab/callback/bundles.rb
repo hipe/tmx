@@ -1,15 +1,6 @@
-require_relative '..'
-require 'skylab/basic/core'
-
 module Skylab::Callback
 
-  %i| Autoloader Basic MetaHell Callback |.each do |i|
-    const_set i, ::Skylab.const_get( i, false )
-  end
-
-  def self.[] mod, * x_a
-    Bundles.apply_iambic_on_client x_a, mod
-  end
+  Require_legacy_core_[]
 
   module Bundles
 

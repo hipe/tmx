@@ -1,8 +1,8 @@
-module Skylab::GitViz
+module Skylab
 
-  module Lib_
+  module Callback
 
-    class Callback_Tree  # read [#033] the different kinds of callback trees
+    class Tree # read [#023] the different kinds of callback patterns
 
       def initialize hash, identifier_x = self.class
 
@@ -28,7 +28,7 @@ module Skylab::GitViz
       Say_unknown_pattern__ = -> x do
         s_a = [ * NODE_CLASS_H__.keys.map { |i| "'#{ i }'" }, 'a hash-like' ]
         "not a known pattern: '#{ x }'. expecting #{
-          }#{ GitViz::Lib_::Oxford_or[ s_a ] }."
+          }#{ Oxford_or[ s_a ] }."
       end
 
       module Mono_Methods_
