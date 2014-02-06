@@ -8,7 +8,7 @@ module Skylab::GitViz
         user_mod.include Instance_Methods__ ; nil
       end
 
-      Headless = GitViz::Lib_::Headless[]
+      Headless_ = GitViz::Headless_
 
       module Instance_Methods__
 
@@ -52,7 +52,7 @@ module Skylab::GitViz
         end
 
         def expct_styled_and_unstyle
-          s = Headless::CLI::Pen::FUN::Unstyle_styled[ @matchee_x ]
+          s = Headless_::CLI::Pen::FUN::Unstyle_styled[ @matchee_x ]
           s or fail "expected styled, was not: #{ @matchee_x }"
           @matchee_x = s ; nil
         end
@@ -108,7 +108,7 @@ module Skylab::GitViz
 
       class Expectation__
 
-        Headless::API::Simple_monadic_iambic_writers[ self,
+        Headless_::API::Simple_monadic_iambic_writers[ self,
           :on_channel_i, :on_channel_i_a ]
 
         attr_reader :any_finally_proc, :any_matcher_method_name,

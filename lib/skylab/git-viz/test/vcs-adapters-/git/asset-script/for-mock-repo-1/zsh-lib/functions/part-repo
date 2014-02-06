@@ -57,7 +57,7 @@ e
 HERE
 
 "$git" add "$file_2"
-"$git" commit -m "initial comit (outside of the story)" >> log
+"$git" commit -m "initial commit (outside of the story)" >> log
 
 
 echo "a
@@ -86,6 +86,7 @@ HERE
 echo "one-line" > "$file_3_a"
 
 "$git" add "$file_3_a"
+"$git" add -u
 "$git" commit -am "commit to be treated as commit 123123" >> log
 
 

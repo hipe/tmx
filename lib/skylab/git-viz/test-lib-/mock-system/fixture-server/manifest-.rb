@@ -18,7 +18,7 @@ module Skylab::GitViz
 
         def get_command_scanner_scanner
           a = @cmd_as_non_unique_key_s_a ; d = -1 ; last = a.length - 1
-          Scn__.new do
+          GitViz::Scn_.new do
             if d < last
               cmd_s = a.fetch d += 1
               bld_cmd_scanner @cmd_a_h.fetch cmd_s
@@ -28,12 +28,10 @@ module Skylab::GitViz
       private
         def bld_cmd_scanner a
           d = -1 ; last = a.length - 1
-          Scn__.new do
+          GitViz::Scn_.new do
             d < last and a.fetch d += 1
           end
         end
-
-        Scn__ = FUN_::Scn[]
       end
     end
   end

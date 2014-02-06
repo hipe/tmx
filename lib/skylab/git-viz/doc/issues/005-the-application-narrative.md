@@ -76,6 +76,6 @@ invalid name, and also this exists to be leveraged intentionally for reasons:
   pass, but the other dots in the name would make it fail because it would not
   pass the white ("pass-filter") regex.
 
-• if the filename has any captiol letters this would not pass, but the files
-  we are looking for must not have capitol letters anyway pursuant to our
+• it is undefined whether filenames with capitol letters would pass, but the
+  file we are looking for must not have capitol letters pursuant to our
   [#hl-156] name conventions on filenames.

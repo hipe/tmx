@@ -8,7 +8,7 @@ module Skylab::GitViz
         new( x_a ).execute
       end
 
-      GitViz::Lib_::Headless[]::API::Simple_monadic_iambic_writers[ self ]
+      Headless_::API::Simple_monadic_iambic_writers[ self ]
 
       def initialize x_a
         self.class.defaults.each_pair do |k, v|

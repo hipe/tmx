@@ -79,7 +79,7 @@ module Skylab::GitViz
           end
           line_s
         end
-        Power_Scanner__[ :init, -> do
+        GitViz::Lib_::Power_Scanner[ :init, -> do
          line_s.chomp!
         end, :gets, -> do
           gets_p[]
@@ -196,7 +196,6 @@ module Skylab::GitViz
       end
 
       INTERRUPT__ = false
-      Power_Scanner__ = GitViz::Lib_::Basic[]::List::Scanner::Power
       PROCEDE__ = true
 
     end

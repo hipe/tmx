@@ -641,19 +641,19 @@ module Skylab::GitViz
           if @has_err_dumpfile
             gt_scn_from_prototype_a @e_a
           else
-            FUN_::EMPTY_SCN
+            EMPTY_SCN_
           end
         end
         def gt_some_mock_sout
           if @has_out_dumpfile
             gt_scn_from_prototype_a @o_a
           else
-            FUN_::EMPTY_SCN
+            EMPTY_SCN_
           end
         end
         def gt_scn_from_prototype_a a
           a = a.dup
-          FUN_::Scn[].new do
+          GitViz::Scn_.new do
             a.shift
           end
         end
@@ -842,14 +842,6 @@ module Skylab::GitViz
             x
           end
         end
-
-        class Scn__ < ::Proc
-          alias_method :gets, :call
-        end
-        Scn = -> do
-          Scn__
-        end
-        EMPTY_SCN = Scn__.new do end
       end
 
       module Socket_Agent_Constants_  # first utilisant of [#hl-155] name conv.

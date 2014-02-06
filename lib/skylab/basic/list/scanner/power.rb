@@ -40,6 +40,9 @@ module Skylab::Basic
         end ; nil
       end
     public
+      def to_a
+        to_enum.to_a
+      end
       def each
         if block_given?
           while (( x = gets ))

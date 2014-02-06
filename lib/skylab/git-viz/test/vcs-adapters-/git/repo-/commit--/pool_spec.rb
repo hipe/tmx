@@ -47,11 +47,11 @@ module Skylab::GitViz::TestSupport::VCS_Adapters_::Git::Repo_
       end.should raise_error ::KeyError, /\Akey not found: -?\d+$/
     end
 
-    it "#{ _SUBJ } can 'lookup_commitpoint_index_of_commit' (chronologiezes)" do
+    it "#{ _SUBJ } can 'lookup_commitpoint_index_of_ci' (chronologiezes)" do
       ci = mani.lookup_commit_with_SHA _SHA '123123'
       ci_ = @mani.lookup_commit_with_SHA _SHA '345345'
-      idx = @mani.lookup_commitpoint_index_of_commit ci
-      idx_ = @mani.lookup_commitpoint_index_of_commit ci_
+      idx = @mani.lookup_commitpoint_index_of_ci ci
+      idx_ = @mani.lookup_commitpoint_index_of_ci ci_
       idx.should eql 1
       idx_.should eql 0
       ci.author_datetime.iso8601.should eql "2014-01-05T04:03:24-05:00"
@@ -73,7 +73,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters_::Git::Repo_
       @repo.SHA_notify _SHA '345345'
       r = @repo.close_the_pool
       r.should eql true
-      mani = @repo.commit_manifest or fail "expected ci manifest"
+      mani = @repo.sparse_matrix or fail "expected ci manifest"
       expect_next_system_command_emission
       expect_next_system_command_emission
       expect_no_more_emissions

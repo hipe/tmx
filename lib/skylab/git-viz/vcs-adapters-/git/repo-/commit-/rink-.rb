@@ -44,7 +44,7 @@ module Skylab::GitViz
         @ci_a.fetch @SHA_to_d_h.fetch sha.hash
       end
 
-      def lookup_commitpoint_index_of_commit ci
+      def lookup_commitpoint_index_of_ci ci
         @SHA_to_commitpoint_index_h.fetch ci.SHA.hash
       end
     end

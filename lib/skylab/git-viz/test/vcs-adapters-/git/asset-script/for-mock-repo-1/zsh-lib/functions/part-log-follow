@@ -49,11 +49,13 @@ partlib-parse-adverb-and-asset-output-dir
       fi
     fi
   done < ../log
-  typeset short
+  typeset real_short story_short
   o==()
   while read -r line ; do
-    short=${line[1,7]}
-    echo "${assoc[$short]}" >> $o
+    real_short=${line[1,7]}
+    story_short="${assoc[$real_short]}"
+    # echo "($real_short) MAPS TO ($story_short)"  # #debugging
+    print -- "$story_short" >> $o
   done < $real_o
 
   rm $real_o

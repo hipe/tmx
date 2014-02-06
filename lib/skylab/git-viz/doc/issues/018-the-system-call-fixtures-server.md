@@ -12,7 +12,8 @@ the middle-end is concerned with everything to do with zero MQ: it listens on
 ports and so on. when it gets requests, it dispatches them out to the backend.
 
 the backend is concerned with nothing about zero MQ and everything about our
-business logix.
+business logix. the "business responder" of the backend is documented at
+[#034] (currently in this document).
 
 
 ## :#introduction-to-the-middle-end
@@ -21,7 +22,7 @@ business logix.
 
 
 
-# :#the-fields-of-a-record-command
+# :#the-fields-of-a-record-command, :[#034]
 
 (note: the "record" above is the verb (rhymes with "accord"), not the noun
 (as in "record player"). it's confusing because "rows"/"entries"/"objects"

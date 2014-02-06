@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby -w
 
+# (the "backend" server (a business responder) as it is used by the fixture
+# client calling the fixture server is introduced at [#034]).
+#
 # this is only for testing the responder "by hand" as a one-off request.
 # this builds the manifest and sends the args to it and returns and exits.
 # it is not a long-running process. it is *not* part of [#018] the stack used

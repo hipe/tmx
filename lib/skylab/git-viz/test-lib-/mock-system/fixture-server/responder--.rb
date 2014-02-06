@@ -21,7 +21,7 @@ module Skylab::GitViz
       end
 
       def on_response_started &p
-        @callbacks.add_listener :_response_started, p ; nil
+        @callbacks.add_listener :response_started, p ; nil
       end
 
       def process_strings a

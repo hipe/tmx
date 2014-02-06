@@ -2,6 +2,10 @@ git ls-files -- .
   options {"chdir":"/derp/berp/dirzo"}
   file mock-repo-1/ls-files.txt
 
+git show --numstat --pretty\=tformat:\%ai 012012 --
+  options {"chdir":"/derp/berp"}
+  file mock-repo-1/show.012012.txt
+
 git show --numstat --pretty\=tformat:\%ai 123123 --
   options {"chdir":"/derp/berp"}
   file mock-repo-1/show.123123.txt
@@ -25,12 +29,12 @@ git show --numstat --pretty\=tformat:\%ai 456456 --
 
 git log --follow --pretty\=tformat:\%H -- everybody\ in\ the\ room\ is\ floating
   options {"chdir":"/derp/berp/dirzo"}
-  file mock-repo-1/log-follow.out.1.txt
+  file mock-repo-1/log-follow.out.floating.txt
 
 git log --follow --pretty\=tformat:\%H -- it\'s\ just/funky\ like\ that
   options {"chdir":"/derp/berp/dirzo"}
-  file mock-repo-1/log-follow.out.2.txt
+  file mock-repo-1/log-follow.out.funky.txt
 
 git log --follow --pretty\=tformat:\%H -- move-after
   options {"chdir":"/derp/berp/dirzo"}
-  file mock-repo-1/log-follow.out.3.txt
+  file mock-repo-1/log-follow.out.mover.txt

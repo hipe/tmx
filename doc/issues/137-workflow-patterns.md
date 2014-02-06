@@ -38,15 +38,15 @@ this will become a quagmire unless the scope of your step is relatively small.
 ## the golden plow :[#137]
 
 in real life a plow made of gold probably would not be very good, because gold
-is a soft metal. but we have started the idiom and now we are sticking with
-it. a compliment to [#136] the golden two-step, the golden plow is a differing
-strategy with the some underly goal: incremental stable changes.
+is a soft metal. but now that we have created this idiom we must run with it.
+a compliment to [#136] the golden two-step, the golden plow is a differing
+strategy with the some underlying goal: incremental stable changes.
 
 whereas the two-step tries to isolate universe changes in their own commits,
 the golden plow allows for small universe changes to be rolled into the topic
 changes.
 
-the rules of the golden plow are that each commit integrates with the univese
+the rules of the golden plow are that each commit integrate with the univese
 cleanly, so if you have to offline a subproduct because you are re-greening
 it, you must "plow through" this process without turning back.
 
@@ -60,7 +60,7 @@ one way this could be accomplished is by this:
 
 • backup your branch
 
-• if your golden plow chain in N+1 commits long, for each commit from HEAD to
+• if your golden plow chain is N+1 commits long, for each commit from HEAD to
   HEAD~N (that is, all of your commits in the chain), make a patch that has
   only your universe changes. (this step is itself a bit involved, but is left
   as an exercize to the reader).

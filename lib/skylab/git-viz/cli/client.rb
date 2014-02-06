@@ -56,7 +56,7 @@ module Skylab::GitViz
       _bound.invoke_with_iambic x_a
     end
 
-    GitViz::Lib_::Headless[]::Client[ self,
+    Headless_::Client[ self,
       :client_services,
         :named, :svcs_for_CLI_action ]
 

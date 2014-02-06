@@ -1,0 +1,14 @@
+git init .
+echo "abc" > onezie
+git add onezie
+g ci -m '012 (ci 0)'
+
+echo "abc" > twozie
+git add twozie
+g ci -m '345 (ci 1)'
+
+
+echo "pqr" > onezie
+echo "xyz" > twozie
+git add -u
+git ci -m '123 (ci 2)'

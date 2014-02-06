@@ -20,10 +20,33 @@ module Skylab::GitViz
         # @inner = ::Grit::Repo.new absolute_pn.to_path ; nil
       end
 
-      attr_writer :system_conduit
+      attr_accessor :system_conduit
+
+      def build_hist_tree_bunch  # this is a good starting point for :[#012]
+        _hist_tree = self.class::Hist_Tree__.new self, @listener
+        _hist_tree.build_bunch
+      end
+
+      def get_focus_dir_absolute_pn
+        @absolute_pn.join @focus_dir_relpath_pn
+      end
 
       def absolute_pathname
         @absolute_pn
+      end
+
+      # ~ for the children - filediffs
+
+      def normal_path_of_file_relpath relpath
+        @focus_dir_relpath_pn.join( relpath ).to_s
+      end
+
+      def lookup_commit_with_SHA x
+        @sparse_matrix.lookup_commit_with_SHA x
+      end
+
+      def lookup_commitpoint_index_of_commit ci
+        @sparse_matrix.lookup_commitpoint_index_of_ci ci
       end
 
       # ~ the commit pool
@@ -43,11 +66,11 @@ module Skylab::GitViz
       end
     public
       def close_the_pool
-        @commit_manifest = commit_pool.close_pool
+        @sparse_matrix = commit_pool.close_pool
         @ci_pool_p = -> { raise "the pool's closed" }
-        @commit_manifest && PROCEDE_
+        @sparse_matrix && PROCEDE_
       end
-      attr_reader :commit_manifest
+      attr_reader :sparse_matrix
 
       # ~ private helper classes
 

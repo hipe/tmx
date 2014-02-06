@@ -4,7 +4,7 @@
 ## :#storypoint-5 introduction
 
 
-### defining "agents" in this context
+### :#defining-agents-in-this-context
 
 "agent" is our working title for this common thing: an "agent" in this context
 is a low-level, smallish ad-hoc class that does something as part of a larger

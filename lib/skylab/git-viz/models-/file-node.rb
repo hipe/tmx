@@ -48,7 +48,7 @@ module Skylab::GitViz
           m << Commitpoint__.new( d )
         end
         d = -1 ; last = a.length - 1
-        GitViz::Lib_::Headless[]::Scn_.new do
+        GitViz::Scn_.new do
           a.fetch( d += 1 ) if d < last
         end
       end

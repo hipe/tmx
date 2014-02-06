@@ -23,7 +23,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters_::Git::Repo_
       with_commit_from_SHA '123123'
       expect_next_system_command_emission
       expect_no_more_emissions
-      counts = @result.lookup_filediff_counts_for_normpath(
+      counts = @result.lookup_any_filediff_counts_for_normpath(
         "dirzo/everybody in the room is floating" )
       counts.num_insertions.should eql 3
       counts.num_deletions.should eql 2

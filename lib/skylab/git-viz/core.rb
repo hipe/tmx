@@ -11,10 +11,15 @@ module Skylab::GitViz
 
   Callback_Tree_ = Callback_::Tree
 
-  Name_ = Callback_::Name
-
-  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+  EMPTY_SCN_ = (( Headless_ = Autoloader_.require_sidesystem :Headless ))::
+    Scn.new do end
 
   GitViz = self
+
+  Name_ = Callback_::Name
+
+  Scn_ = Headless_::Scn
+
+  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
 end

@@ -45,14 +45,24 @@ module Skylab::GitViz
 
         attr_reader :author_datetime, :SHA
 
-        def lookup_filediff_counts_for_normpath normpath
-          @file_numstat_h.fetch normpath do
+        def lookup_any_filediff_counts_for_normpath normpath
+          fetch_filediff_counts_for_normpath normpath do end
+        end
+
+        def fetch_filediff_counts_for_normpath normpath, &p
+          found = true
+          r = @file_numstat_h.fetch normpath do found = false end
+          found ? r : when_filediff_counts_for_relpath_not_found( normpath, p )
+        end
+      private
+        def when_filediff_counts_for_relpath_not_found normpath, p
+          p ||= -> do
             raise ::KeyError, "(corrupt model?) #{
               } #{ normpath } is not a part of commit #{
                }'#{ @SHA.to_string }'#{ say_known_files }"
           end
+          p[]
         end
-      private
         def say_known_files  # :+[#it-001] summarization
           if ( 1..5 ).include? @file_numstat_h.length
             ". known files:(#{ @file_numstat_h.keys * ', ' })"

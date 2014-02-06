@@ -38,6 +38,10 @@ module Skylab::Callback
       memoize { require_sidesystem i }
     end
 
+    def self.build_require_stdlib_proc i
+      memoize { require_stdlib i }
+    end
+
     def self.memoize *a, &p
       Memoize[ ( a.length.zero? ? a << p : a ).fetch a.length - 1 << 1 ]
     end
