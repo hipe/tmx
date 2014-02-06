@@ -2,15 +2,21 @@ module Skylab::Callback
 
   class API::Action
 
-    def self.formal_parameters
-      @formal_parameters ||= begin
-        const_get( :PARAMS, false ).map { |k| API::Formal_Parameter.new k }
+    class << self
+      def formal_parameters
+        @formal_parameters ||= bld_formal_params
       end
-    end
-
-    def self.name_function
-      @name_function ||= begin
-        Headless::Name::Function::From::Constant.from_name name
+    private
+      def bld_formal_params
+        const_get( :PARAMS, false ).map( & API::Formal_Parameter.method( :new ) )
+      end
+    public
+      def name_function
+        @name_function ||= bld_name_function
+      end
+    private
+      def bld_name_function
+        Callback::Lib_::Name[]::Function::From::Constant.from_name name
       end
     end
 
@@ -40,25 +46,25 @@ module Skylab::Callback
 
     # --*--
 
-    def emit stream, line
+    def puts_to_channel_line stream, line
       ( :pay == stream ? @paystream : @infostream ).puts line
       nil
     end
 
     def error msg
       @error_count += 1
-      emit :err, msg  # it looks nicer to have these be w/o prefix
+      puts_to_channel_line :err, msg  # it looks nicer to have these be w/o prefix
       false
     end
 
     def info msg
       a, m, b = ( /\A\((.+)\)\z/ =~ msg ) ? ['(', $~[1], ')'] : [nil, msg, nil]
-      emit :info, "#{ a }#{ prefix }#{ m }#{ b }"
+      puts_to_channel_line :info, "#{ a }#{ prefix }#{ m }#{ b }"
       nil
     end
 
     def pay data
-      emit :pay, data
+      puts_to_channel_line :pay, data
       nil
     end
 

@@ -2,11 +2,11 @@ module Skylab::Callback::TestSupport
 
   class Fixtures::ZigZag
 
-    Callback[ self, :employ_DSL_for_emitter ]
+    Callback[ self, :employ_DSL_for_digraph_emitter ]
 
-    emits hacking: [ :business, :pleasure ]
+    listeners_digraph hacking: [ :business, :pleasure ]
 
-    public :emit, :with_specificity
+    public :call_digraph_listeners, :with_specificity
 
   end
 end

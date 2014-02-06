@@ -6,9 +6,9 @@ module Skylab::Callback::TestSupport::Bundles
 
   include CONSTANTS
 
-  Callback = Callback ; TestSupport = TestSupport
+  Callback = Callback
 
-  extend TestSupport::Quickie
+  Callback::Lib_::Quickie[ self ]
 
   module InstanceMethods
 

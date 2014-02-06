@@ -3,21 +3,11 @@ module Skylab::Callback
   Require_legacy_core_[]
 
   module API
-    MAARS[ self ]
-  end
-
-  API::FUN = -> do
-
-    o = { }
-
-    o[:looks_like_emitter_module] = -> x do
-      x.singleton_class.method_defined? :emits or
-        x.singleton_class.private_method_defined? :emits
+    Looks_like_digraph_module_ = -> x do
+      x.singleton_class.method_defined? :listeners_digraph or
+        x.singleton_class.private_method_defined? :listeners_digraph
     end
-
-    ::Struct.new( * o.keys ).new( * o.values )
-
-  end.call
+  end
 
   class API::Formal_Parameter
 

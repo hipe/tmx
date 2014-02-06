@@ -4,12 +4,9 @@ module Skylab::Callback
 
   Require_legacy_core_[]
 
-  Headless = ::Skylab::Headless   # be very careful that this only happens in
-    # 1 place! this dependency must be downwards-only from this node.
-
   class CLI  # NOTE "this node in its scope is not related to pub-s.." [#018]
 
-    Headless::CLI::Client[ self,
+    Callback::Lib_::CLI[]::Client[ self,
       :three_streams_notify,
       :DSL ]  # don't add DSL till end b.c of it's method_added hook
 

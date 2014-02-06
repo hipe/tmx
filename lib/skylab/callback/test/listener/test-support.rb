@@ -8,14 +8,14 @@ module Skylab::Callback::TestSupport::Listener
 
   Callback = Callback
 
-  extend TestSupport::Quickie
+  Callback::Lib_::Quickie[ self ]
 
   module InstanceMethods
     def client
       @client ||= build_client
     end
     def emitter
-      @emitter ||= build_emitter
+      @emitter ||= build_digraph_emitter
     end
     def listener
       @listener ||= build_listener

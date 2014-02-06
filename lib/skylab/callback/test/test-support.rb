@@ -1,24 +1,14 @@
 require_relative '../core'
 
-Skylab::Callback::Require_legacy_core_[]
-
-require 'skylab/test-support/core'
-require 'skylab/headless/core'  # unstyle etc
-
 module Skylab::Callback::TestSupport
 
-  ::Skylab::TestSupport::Regret[ self ]
+  Callback = ::Skylab::Callback
 
   module CONSTANTS
-
-    ::Skylab::MetaHell::FUN::Import_constants[
-      ::Skylab, %i( Headless Callback TestSupport MetaHell ), self ]
-
+    Callback = Callback
   end
 
-  include CONSTANTS
-
-  Headless = Headless ; Callback = Callback
+  Callback::Autoloader.require_sidesystem( :TestSupport )::Regret[ self ]
 
   module InstanceMethods
 

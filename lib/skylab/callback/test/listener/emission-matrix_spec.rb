@@ -20,7 +20,7 @@ module Skylab::Callback::TestSupport::Listener
         def initialize a
           @a = a ; nil
         end
-        def call * i_a, & p
+        def call_any_listener * i_a, & p
           i_a << p.call
           @a.concat i_a ; nil
         end

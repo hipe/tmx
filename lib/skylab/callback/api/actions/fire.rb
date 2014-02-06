@@ -43,7 +43,7 @@ module Skylab::Callback
           end
           @infostream.puts "OK: #{ x.inspect }"
         end
-        obj.send :emit, @stream_name, payload_x
+        obj.send :call_digraph_listeners, @stream_name, payload_x
         if ! did_fire
           @infostream.puts "(#{ prefix }did not see a #{ @stream_name } #{
             }event fire.)"

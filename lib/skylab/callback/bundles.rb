@@ -4,25 +4,25 @@ module Skylab::Callback
 
   module Bundles
 
-    Emit_via_simple_IO_manifold = -> x_a do
-      module_exec x_a, & Emit_via_simple_IO_manifold_.to_proc
+    Emit_to_IO_stream_string = -> x_a do
+      module_exec x_a, & Emit_to_IO_stream_string_.to_proc
     end
 
-    Emits = -> a do
-      Callback[ self, :employ_DSL_for_emitter ]  # #idempotent
+    Listeners_digraph = -> a do
+      Callback[ self, :employ_DSL_for_digraph_emitter ]  # #idempotent
       graph_x = a.fetch 0 ; a.shift
       if graph_x
         if graph_x.respond_to? :each_pair
-          emits graph_x
+          listeners_digraph graph_x
         else
-          emits( * graph_x )
+          listeners_digraph( * graph_x )
         end
       end ; nil
     end
 
-    module Emitter_methods  # assumes an `emit` method
+    module Digraph_methods  # assumes an `call_digraph_listeners` method
 
-      Item_Grammar__ = MetaHell::Bundle::Item_Grammar.
+      Item_Grammar__ = Callback::Lib_::Bundle_Item_Grammar[].
         new %i( structure structifiying ), :emitter, %i( emits_to_channel )
 
       build_method = -> sp do
@@ -40,13 +40,13 @@ module Skylab::Callback
           end
         else
           -> do x
-            emit emits_to_channel, x
+            call_digraph_listeners emits_to_channel, x
           end
         end
       end
 
       to_proc = -> a do
-        include Emitter_methods
+        include Digraph_methods
         p = Item_Grammar__.build_parser_for a
         while (( sp = p[] ))
           define_method sp.keyword_value_x, & build_method[ sp ]
@@ -66,32 +66,32 @@ module Skylab::Callback
         ev.respond_to?( :members ) or raise ::TypeError, "no implicit #{
           }conversion of #{ ev.class } into ~Struct intended for #{
             }channel `#{ chan_i }` emitted by ( #{ self.class } )"
-        emit chan_i, ev
+        call_digraph_listeners chan_i, ev
         nil
       end
     end
 
-    Employ_DSL_for_emitter = -> _ do
-      extend Callback::Emitter::MMs ; include Callback::Emitter::IMs ; nil
+    Employ_DSL_for_digraph_emitter = -> _ do
+      extend Callback::Digraph::MMs ; include Callback::Digraph::IMs ; nil
     end
 
     Event_factory = -> a do
-      Callback[ self, :employ_DSL_for_emitter ]  # #idempotent
+      Callback[ self, :employ_DSL_for_digraph_emitter ]  # #idempotent
       event_factory a.fetch 0 ; a.shift ; nil
     end
 
-    Extend_emitter_module_methods = -> _ do
-      extend Callback::Emitter::MMs ; nil
+    Extend_digraph_emitter_module_methods = -> _ do
+      extend Callback::Digraph::MMs ; nil
     end
 
-    Include_emitter_module_methods = -> _ do
-      include Callback::Emitter::MMs ; nil
+    Include_digraph_emitter_module_methods = -> _ do
+      include Callback::Digraph::MMs ; nil
     end
 
-    MetaHell::Bundle::Multiset[ self ]
+    Callback::Lib_::Bundle_Multiset[ self ]
   end
 
-  module Emit_via_simple_IO_manifold_
+  module Emit_to_IO_stream_string_
     to_proc = -> x_a do
       define_method :init_simple_IO_manifold, begin
         if :default_to_stream == x_a.first
@@ -118,30 +118,12 @@ module Skylab::Callback
     end
 
     Build_init_method__ = -> do
-      default_proc = Basic::Hash::Loquacious_default_proc.curry[ 'stream' ]
+      default_proc = Callback::Lib_::Basic_Hash[]::
+        Loquacious_default_proc.curry[ 'stream' ]
       -> h do
         h.default_proc ||= default_proc
         @simple_IO_manifold_h = h ; nil
       end
     end
   end
-
-  module Lib_  # :+[#su-001]
-    Headless = -> do
-      require 'skylab/headless/core' ; ::Skylab::Headless
-    end
-    OptionParser = -> do
-      require 'optparse' ; ::OptionParser
-    end
-    StringScanner = -> do
-      require 'strscan' ; ::StringScanner
-    end
-  end
-
-  MAARS = MetaHell::MAARS
-
-  MAARS[ self ]
-
-  stowaway :TestSupport, 'test/test-support'  # [hl]
-
 end

@@ -14,7 +14,7 @@ module Skylab::Callback
     # optionally you can provide a base class at which point all
     # hell breaks loose, also a box module to put them in.
     #
-    # #not-most-recent of #nichepoint [#ps-015] (newer might be better)
+    # #not-most-recent of #nichepoint [#015] (newer might be better)
 
     def event esg, sn, payload_x
       @event[ esg, sn, payload_x ]
@@ -94,7 +94,7 @@ module Skylab::Callback
 
     -> do
 
-      constantify = Lib_::Headless[]::Name::FUN::Constantify
+      constantify = Callback::Lib_::Name[]::FUN::Constantify
 
       define_method :box_module= do |box_mod|
         @produce_event_class_hookback = -> key_a, kls do

@@ -2,20 +2,20 @@ module Skylab::Callback
 
   Require_legacy_core_[]
 
-  module Emitter  # READ [#019] #storypoint-1
+  module Digraph  # READ [#019] #storypoint-1
 
     def self.extended mod  # #sl-111
-      $stderr.puts "#{ Em__[ "`extend Callback::Emitter` is deprecated NOW" ] } - #{
-        }replace this line with `Callback[ self, :employ_DSL_for_emitter ]` #{
+      $stderr.puts "#{ Em__[ "`extend Callback::Digraph` is deprecated NOW" ] } - #{
+        }replace this line with `Callback[ self, :employ_DSL_for_digraph_emitter ]` #{
          }or the like"  # #todo:during-merge remove this
-      Callback[ mod, :employ_DSL_for_emitter ] ; nil
+      Callback[ mod, :employ_DSL_for_digraph_emitter ] ; nil
     end
     Em__ = -> s do
       "\e[33m#{ s }\e[0m"
     end
   end
 
-  module Emitter::MMs  # techincally visible to above, but :+#API-private
+  module Digraph::MMs  # techincally visible to above, but :+#API-private
 
     def event_stream_graph
       @event_stream_graph ||= build_event_stream_graph
@@ -24,7 +24,8 @@ module Skylab::Callback
   private
 
     def build_event_stream_graph  # #storypoint-2
-      scn = Basic::List::Scanner[ ancestors ] ; cur = found_a = nil
+      scn = Callback::Lib_::Basic_List[]::Scanner[ ancestors ]
+      cur = found_a = nil
       nil while ( cur = scn.rgets ) && ::Object != cur
       chk = -> do
         if cur.respond_to? :event_stream_graph
@@ -47,7 +48,7 @@ module Skylab::Callback
           Merge_graphs__[ found_a ]
         end
       else
-        Emitter::Stream_Digraph__.new  # 1 of 2
+        Digraph::Stream_Digraph__.new  # 1 of 2
       end
     end
 
@@ -61,10 +62,10 @@ module Skylab::Callback
       end
       mod_a.length.nonzero? and raise "implement me - #{
         }merge multiple graphs - (#{ mod_a * ', ' })"
-      Emitter::Stream_Digraph__.new  # 2 of 2
+      Digraph::Stream_Digraph__.new  # 2 of 2
     end
 
-    def emits * graph_x_a
+    def listeners_digraph * graph_x_a
       event_stream_graph.absorb_nodes graph_x_a, -> stream_name do
         # (this hookback is called only when a new node is added to the graph)
         m = "on_#{ stream_name }"
@@ -106,18 +107,18 @@ module Skylab::Callback
       event_stream_graph.set_taxonomic_stream_names name_a ; nil
     end
   public
-    def is_pub_sub_emitter_module
+    def is_callback_digraph_module
       true  # future-proof quack-testing
     end
   end  # module methods
 
-  Emitter::Stream__ = ::Class.new Basic::Digraph::Node
+  Digraph::Stream__ = ::Class.new Callback::Lib_::Basic_Digraph[]::Node
 
-  class Emitter::Stream_Digraph__ < Basic::Digraph
+  class Digraph::Stream_Digraph__ < Callback::Lib_::Basic_Digraph[]
 
     def initialize
       @taxonomic_stream_i_a = nil
-      @node_class = Emitter::Stream__
+      @node_class = Digraph::Stream__
       super
     end
 
@@ -150,7 +151,7 @@ module Skylab::Callback
     end
   end
 
-  module Emitter::IMs  # #storypoint-4
+  module Digraph::IMs  # #storypoint-4
 
     #         ~ in rougly lifecycle (and then pre-) order ~
 
@@ -166,9 +167,9 @@ module Skylab::Callback
 
     -> do  # #experimental #storypoint-6
 
-      these_a = %i( emit event_listeners event_stream_graph )
+      these_a = %i( call_digraph_listeners event_listeners event_stream_graph )
 
-      init_emitter = -> do  # #storypoint-7
+      init_digraph_emitter = -> do  # #storypoint-7
 
         instance_variable_defined? :@event_stream_graph and fail "re-name me"  # #todo
 
@@ -184,10 +185,10 @@ module Skylab::Callback
 
         @event_factory ||= build_event_factory  # idem
 
-        @event_listeners ||= Emitter::Listeners__.new  # idem
+        @event_listeners ||= Digraph::Listeners__.new  # idem
 
         a = these_a.select( & self.class.method( :public_method_defined? ) )
-        extend Emitter::Slidden_IM__
+        extend Digraph::Slidden_IM__
         a.each { |k| singleton_class.send :public, k }
 
         nil
@@ -195,7 +196,7 @@ module Skylab::Callback
 
       these_a.each do |i|
         define_method i do |*a, &p|
-          instance_exec( & init_emitter )
+          instance_exec( & init_digraph_emitter )
           send i, *a, &p
         end
       end
@@ -207,9 +208,9 @@ module Skylab::Callback
 
   public
 
-    # `emits` - part of the reflection API [#ps-014]
+    # `listeners_digraph` - part of the reflection API [#014]
 
-    def emits? stream_name
+    def callback_digraph_has? stream_name
       event_stream_graph.has? stream_name
     end
 
@@ -274,7 +275,7 @@ module Skylab::Callback
         end
         a.length.nonzero? and raise ::ArgumentError, "unexpected: '#{ a[ 0 ] }'"
         case p_a.length
-        when 1 ; @nope_p = p_a[ 0 ] ; @ok_p = MetaHell::EMPTY_P_
+        when 1 ; @nope_p = p_a[ 0 ] ; @ok_p = EMPTY_P_
         when 2 ; @nope_p, @ok_p = p_a
         else   ; raise ::ArgumentError, "too much/little proc: #{ p_a.length }"
         end
@@ -302,7 +303,7 @@ module Skylab::Callback
     #  ~ misc reflective services
 
     def build_contextualized_stream_name_from_channel_i channel_i
-      Emitter::Contextualized_Stream_Name.
+      Digraph::Contextualized_Stream_Name.
         new channel_i, some_event_stream_graph
     end
 
@@ -312,10 +313,10 @@ module Skylab::Callback
 
   end
 
-  module Emitter::Slidden_IM__
+  module Digraph::Slidden_IM__
   private
 
-    def emit x, *payload_a  # sacred & holy workhorse: a #center-of-the-unverse
+    def call_digraph_listeners x, *payload_a  # sacred & holy workhorse: a #center-of-the-unverse
       event = nil ; esg = @event_stream_graph_p.call
       if payload_a.length.zero? && x.respond_to?( :is_event ) && x.is_event
         stream_i = x.stream_name ; event = x  # (re-emit an existing event
@@ -359,7 +360,7 @@ module Skylab::Callback
     end
   end  # i.m
 
-  class Emitter::Contextualized_Stream_Name
+  class Digraph::Contextualized_Stream_Name
 
     def initialize stream_i, esg
       esg or never
@@ -377,7 +378,7 @@ module Skylab::Callback
     end
   end
 
-  class Emitter::Listeners__ < MetaHell::Formal::Box
+  class Digraph::Listeners__ < Callback::Lib_::Formal_Box[]
 
     def initialize
       @current_group_id = @group_frame_h = @is_in_group = nil
@@ -430,23 +431,23 @@ module Skylab::Callback
 
   # ~ auxiliary services
 
-  module Emitter  # ad-hoc emitter class producer.
+  module Digraph  # ad-hoc emitter class producer.
 
     def self.new * graph_x_a, & p
 
       ::Class.new.class_exec do
 
-        Callback[ self, :employ_DSL_for_emitter ]
+        Callback[ self, :employ_DSL_for_digraph_emitter ]
 
         class << self
           public :event_class, :event_factory
         end
 
-        public :with_specificity, :emit  # [#002] objects of this class
+        public :with_specificity, :call_digraph_listeners  # [#002] objects of this class
           # are not controller-like they are struct-like so this is always
           # the desired interface
 
-        graph_x_a.length.nonzero? and emits( * graph_x_a )
+        graph_x_a.length.nonzero? and listeners_digraph( * graph_x_a )
 
         # experimental interface for default constructor: multiple lambdas
         def initialize * p_a
@@ -454,11 +455,11 @@ module Skylab::Callback
         end
 
         def error msg  # #courtesy for common method [#sl-112]
-          emit :error, msg ; false
+          call_digraph_listeners :error, msg ; false
         end
 
         def to_listener
-          Callback::Listener::From_emitter[ self ]
+          Callback::Listener::From_digraph_emitter[ self ]
         end
 
         p and class_exec( & p )

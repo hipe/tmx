@@ -6,14 +6,14 @@ module Skylab::Callback::TestSupport::CLI::Fire
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  Callback::Lib_::Quickie[ self ]
 
   describe "[cb] CLI fire" do
 
     extend TS__
 
     it "with the ideal case - works" do
-      g = TestSupport::IO::Spy::Triad.new nil
+      g = Callback::Lib_::TestSupport_[]::IO::Spy::Triad.new nil
       # g.debug!
       c = Callback::CLI.new( * g.values )
       argv = [ 'fire',

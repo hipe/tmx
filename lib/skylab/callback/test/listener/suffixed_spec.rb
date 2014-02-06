@@ -22,14 +22,14 @@ module Skylab::Callback::TestSupport::Listener
     end
 
     it "makes a listener that sends method calls downwards w suffix - o" do
-      listener.call :wazzozle do :x end
-      @listener.call :wiff, :waff do :z end
+      listener.call_any_listener :wazzozle do :x end
+      @listener.call_any_listener :wiff, :waff do :z end
       @a.should eql %i( wzzzl x wff wff z )
     end
 
     it "when an unsupported channel name is emitted - X" do
       -> do
-        listener.call :montoya do :_no_see_ end
+        listener.call_any_listener :montoya do :_no_see_ end
       end.should raise_error ::NoMethodError,
         /\bundefined method `montoya_from_agent'/
     end

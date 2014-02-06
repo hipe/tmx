@@ -1,6 +1,6 @@
 module Skylab::Callback::TestSupport
 
-  class Emit_Spy  # read [#022] the emit spy narrative  #storypoint-1
+  class Call_Digraph_Listeners_Spy  # read [#022] the narrative  #storypoint-1
 
     def initialize
       @do_debug_p = nil ; @emission_a = [] ; @debug_IO = nil
@@ -23,7 +23,7 @@ module Skylab::Callback::TestSupport
       @do_debug_p = p ; nil
     end
 
-    def emit stream, payload_x  # per spec [#ps-001]
+    def call_digraph_listeners stream, payload_x  # per spec [#001]
       @emission_a << Emission__.new( stream, payload_x )
       if @do_debug_p && @do_debug_p.call
         o = @emission_a.last

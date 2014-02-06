@@ -2,7 +2,7 @@ module Skylab::Callback
 
   class CLI::Option::Scanner
 
-    # there are others like it, but this one is [#ps-008]. and the best.
+    # there are others like it, but this one is [#008]. and the best.
     # (in contrast to h.l's [#hl-053] this simply parses e.g an ARGV as
     # opposed to scanning an option parser)
 
@@ -27,7 +27,7 @@ module Skylab::Callback
     #         ~ what does it look like? ~
     -> do
 
-      opt_rx, long_rx = Headless::CLI::Option::Constants.
+      opt_rx, long_rx = Callback::Lib_::CLI[]::Option::Constants.
         values_at :OPT_RX, :LONG_RX
 
       [ [ :long, -> do
@@ -76,7 +76,7 @@ module Skylab::Callback
       @argv = argv
       @last = argv.length - 1
       @err = err
-      @opt = Headless::CLI::Option.new_flyweight
+      @opt = Callback::Lib_::CLI[]::Option.new_flyweight
     end
   end
 end

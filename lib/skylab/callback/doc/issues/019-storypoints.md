@@ -38,7 +38,7 @@ things. in so doing i think we improved it a bit.
 
 ## :#storypoint-3
 
-this method is the central workhorse of `emit`. if the argument symbol is not
+this method is the central workhorse of `call_digraph_listeners`. if the argument symbol is not
 in the graph, result is undefined.
 
 otherwise, result is an enumerator of names with the argument always being the
@@ -78,7 +78,7 @@ a familiar design problem that yet has no name - the below 3 methods trigger a
 call to `init` which hackishly adds another module to the ancestor chain of
 the singleton class of the object, which in turn overrides these methods!!
 this is done so that we don't have to check for whether the thing is initted
-each time we for e.g. call `emit`, and in theory it will only get us in to
+each time we for e.g. call `call_digraph_listeners`, and in theory it will only get us in to
 trouble if we use alias_method on the below three #experimental
 
 #todo this is a truly terrible way to do this and should be swapped out withx

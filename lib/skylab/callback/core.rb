@@ -32,22 +32,39 @@ module Skylab::Callback
       end
     end
 
-    # ~ :+[#ss-002] the below methods duplicate and purify their predecessors
+    # ~ functions often used in loading (may purify predecessors :+[#ss-002])
+
+    def self.build_require_sidesystem_proc i
+      memoize { require_sidesystem i }
+    end
+
+    def self.memoize *a, &p
+      Memoize[ ( a.length.zero? ? a << p : a ).fetch a.length - 1 << 1 ]
+    end
+
+    define_singleton_method :require_sidesystem, -> do
+      sl_path = -> do
+        x = Callback.dir_pathname.dirname.to_path ; sl_path = -> { x } ; x
+      end
+      require_single_sidesystem = -> const_i do
+        require "#{ sl_path[] }/#{ Name.from_const( const_i ).as_slug }/core"
+        ::Skylab.const_get const_i, false
+      end
+      -> * i_a do
+        if 1 == i_a.length
+          require_single_sidesystem[ i_a.first ]
+        else
+          i_a.map( & require_single_sidesystem )
+        end
+      end
+    end.call
 
     def self.require_stdlib const_i
       require const_i.downcase.to_s  # until it's useful to, no inflection
       ::Object.const_get const_i
     end
 
-    define_singleton_method :require_subsystem, -> do
-      sl_path = -> do
-        x = Callback.dir_pathname.dirname.to_path ; sl_path = -> { x } ; x
-      end
-      -> const_i do
-        require "#{ sl_path[] }/#{ Name.from_const( const_i ).as_slug }/core"
-        ::Skylab.const_get const_i, false
-      end
-    end.call
+    # ~
 
     module Boxxy_Methods__
       def const_defined? const_i, up=false
@@ -111,6 +128,7 @@ module Skylab::Callback
 
     module Methods__
       def const_missing i
+        @dir_pathname or super
         Const_Missing__.new( self, @dir_pathname, i ).load_and_get
       end
       def const_missing_class
@@ -165,11 +183,17 @@ module Skylab::Callback
     private
 
       def when_neither_file_nor_dir_exist
-        raise ::NameError, "uninitialized constant #{
+        ex = ::NameError.exception "uninitialized constant #{
          }#{ @mod.name }::#{ @name.as_const } #{
           }and no directory[file] #{
            }#{ @d_pn.relative_path_from @dir_pathname }[#{ EXTNAME_ }]"
+        a = caller_locations REMOVE_THIS_MANY_ELEMENTS_FROM_THE_STACK__
+        a.map!( & :to_s )
+        ex.set_backtrace a
+        raise ex
       end
+
+      REMOVE_THIS_MANY_ELEMENTS_FROM_THE_STACK__ = 3
 
       def when_file_exists
         load @f_pn.to_path
@@ -323,6 +347,8 @@ module Skylab::Callback
     UNDERSCORE__ = '_'.freeze
   end
 
+  # ~ small procs used here, there, everywhere
+
   Constify_if_possible_ = -> do
     white_rx = %r(\A[a-z][-_a-z0-9]*\z)i
     gsub_rx = /([-_]+)([a-z])?/
@@ -336,6 +362,11 @@ module Skylab::Callback
       end
     end
   end.call
+
+  Memoize = -> p do
+    p_ = -> { x = p[] ; p_ = -> { x } ; x }
+    -> { p_.call }
+  end
 
   Oxford = -> separator, none, final_sep, a do
     if a.length.zero?
@@ -357,17 +388,7 @@ module Skylab::Callback
   Oxford_and = Oxford.curry[ ', ', '[none]', ' and ' ]
 
   Require_legacy_core_ = -> do
-    p = -> do
-      require_relative '..'
-      require 'skylab/basic/core'
-
-      [ :Basic, :MetaHell ].each do |i|
-        const_set i, ::Skylab.const_get( i, false )
-      end
-      p = -> { } ; nil
-    end
-    -> { p[] }
-  end.call
+  end
 
   require 'pathname'
 
@@ -375,6 +396,7 @@ module Skylab::Callback
 
   stowaway :TestSupport, 'test/test-support'
 
+  EMPTY_P_ = -> { }
   Callback = self
 
 end

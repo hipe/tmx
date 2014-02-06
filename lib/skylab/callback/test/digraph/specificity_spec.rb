@@ -1,14 +1,14 @@
 require_relative 'test-support'
 
-module ::Skylab::Callback::TestSupport::Emitter::Specificity
+module ::Skylab::Callback::TestSupport::Digraph::Specificity
 
-  ::Skylab::Callback::TestSupport::Emitter[ Specificity_TestSupport = self ]
+  ::Skylab::Callback::TestSupport::Digraph[ Specificity_TestSupport = self ]
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  Callback::Lib_::Quickie[ self ]
 
-  describe "[cb] emitter specificity" do
+  describe "[cb] digraph specificity" do
 
     extend Specificity_TestSupport
 
@@ -37,7 +37,7 @@ module ::Skylab::Callback::TestSupport::Emitter::Specificity
       define_method :length do length end
 
       define_singleton_method :whence do |&blk|  # scope `length`
-        memoized_frame = MetaHell::FUN.memoize[ -> do
+        memoized_frame = Callback::Lib_::Memoize[ -> do
           a = ::Array.new length
           z = blk[ a ]  # use `call` not `instance_eval` for sane arch.
           [ a, z ]
@@ -69,8 +69,8 @@ module ::Skylab::Callback::TestSupport::Emitter::Specificity
         nil
       end
 
-      def emit stream_name
-        z.emit stream_name, true
+      def call_digraph_listeners stream_name
+        z.call_digraph_listeners stream_name, true
       end
 
       touch = -> a, i, e do
@@ -95,32 +95,32 @@ module ::Skylab::Callback::TestSupport::Emitter::Specificity
         end
 
         it 'b1' do
-          emit :business
+          call_digraph_listeners :business
           does nil, nil
         end
 
         it 'p1' do
-          emit :pleasure
+          call_digraph_listeners :pleasure
           does nil, nil
         end
 
         it 'h1' do
-          emit :hacking
+          call_digraph_listeners :hacking
           does true, nil
         end
 
         it 'p2' do
-          emit :pleasure
+          call_digraph_listeners :pleasure
           does nil, nil
         end
 
         it 'h2' do
-          emit :hacking
+          call_digraph_listeners :hacking
           does true, nil
         end
 
         it 'h3' do
-          emit :hacking
+          call_digraph_listeners :hacking
           does true, nil
         end
 
@@ -143,22 +143,22 @@ module ::Skylab::Callback::TestSupport::Emitter::Specificity
         end
 
         it 'b1' do
-          emit :business
+          call_digraph_listeners :business
           does nil, nil
         end
 
         it 'p1' do
-          emit :pleasure
+          call_digraph_listeners :pleasure
           does nil, true
         end
 
         it 'h1' do
-          emit :hacking
+          call_digraph_listeners :hacking
           does nil, true
         end
 
         it 'p2' do
-          emit :pleasure
+          call_digraph_listeners :pleasure
           does nil, true
         end
       end
@@ -183,32 +183,32 @@ module ::Skylab::Callback::TestSupport::Emitter::Specificity
         end
 
         it 'h1' do
-          emit :hacking
+          call_digraph_listeners :hacking
           does true, nil
         end
 
         it 'h2' do
-          emit :hacking
+          call_digraph_listeners :hacking
           does true, nil
         end
 
         it 'p1' do
-          emit :pleasure
+          call_digraph_listeners :pleasure
           does nil, true
         end
 
         it 'p2' do
-          emit :pleasure
+          call_digraph_listeners :pleasure
           does nil, true
         end
 
         it 'b1' do
-          emit :business
+          call_digraph_listeners :business
           does nil, nil
         end
 
         it 'b2' do
-          emit :business
+          call_digraph_listeners :business
           does nil, nil
         end
       end
@@ -233,17 +233,17 @@ module ::Skylab::Callback::TestSupport::Emitter::Specificity
         end
 
         it 'b1' do
-          emit :business
+          call_digraph_listeners :business
           does nil, nil, true
         end
 
         it 'p1' do
-          emit :pleasure
+          call_digraph_listeners :pleasure
           does nil, true, nil
         end
 
         it 'h1 MONEY' do
-          emit :hacking
+          call_digraph_listeners :hacking
           does nil, nil, true
         end
       end

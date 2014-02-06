@@ -266,7 +266,7 @@ module Skylab::Callback
       end
       nil
     end
-    WRITEMODE_ = Headless::WRITEMODE_
+    WRITEMODE_ = Callback::Lib_::Writemode[]
 
     def conclude_jobs
       if @error_count.zero?  # just to be sure

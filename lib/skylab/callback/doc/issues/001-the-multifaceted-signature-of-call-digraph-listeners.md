@@ -2,18 +2,18 @@
 
 Life is much easier and more readable if you assume a syntax like:
 
-  emit type, *payload
+  call_digraph_listeners type, *payload
 
 where `payload` is often a single string.
 
 
-However, remember these other important and essential variations of emit():
+However, remember these other important and essential variations of call_digraph_listeners():
 
-  + when the event has no metadata, like `emit :done`
-  + when you are [re-] emitting custom event object, like `emit my_obj`
-  + emissions with structured metadata: `emit :nerk, ferk: "blerk" ..`
+  + when the event has no metadata, like `call_digraph_listeners :done`
+  + when you are [re-] emitting custom event object, like `call_digraph_listeners my_obj`
+  + emissions with structured metadata: `call_digraph_listeners :nerk, ferk: "blerk" ..`
 
-Etc.  For this reason we have to assume that emit() takes one or more
+Etc.  For this reason we have to assume that call_digraph_listeners() takes one or more
 parameters and we have no idea the shape of the parameters.
 
 
@@ -32,7 +32,7 @@ event. This is a big experiment, and will definately pose problems
 unles we agree that:
 
 1) @param_a should be one-time write only immutable, and should always
-be the exact contents of the `rest` args to the original `emit` call or
+be the exact contents of the `rest` args to the original `call_digraph_listeners` call or
 equivalent.  Further sub-processing of payload args should be considered
 derived properties stored in e.g other ivars.
 

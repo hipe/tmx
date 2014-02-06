@@ -1,49 +1,49 @@
 require_relative 'test-support'
 
-module ::Skylab::Callback::TestSupport::Emitter
+module ::Skylab::Callback::TestSupport::Digraph
 
-  describe "[cb] emitter crazy graphs" do
+  describe "[cb] digraph crazy graphs" do
 
-    extend ::Skylab::Callback::TestSupport::Emitter
+    extend ::Skylab::Callback::TestSupport::Digraph
 
     context "class Gamma extends mod Alpha which defines a graph" do  # #todo below could be etc
       modul :Alpha do
-        Callback[ self, :employ_DSL_for_emitter ]
-        emits :alpha
-        public :emit # [#ps-002] public for testing
+        Callback[ self, :employ_DSL_for_digraph_emitter ]
+        listeners_digraph :alpha
+        public :call_digraph_listeners # [#002] public for testing
       end
       klass :Gamma do |o|
-        Callback[ self, :extend_emitter_module_methods ]
+        Callback[ self, :extend_digraph_emitter_module_methods ]
         include o.Alpha
       end
 
       it "works" do
         g = _Gamma.new
-        g.emit :alpha, nil # does not raise
-        ->{ g.emit :no, nil }.should raise_error(
+        g.call_digraph_listeners :alpha, nil # does not raise
+        ->{ g.call_digraph_listeners :no, nil }.should raise_error(
           'undeclared event type :no for Gamma' )
       end
     end
 
     context "class D extends G which includes B which includes A which etc" do
       modul :Alpha do
-        Callback[ self, :employ_DSL_for_emitter ]
-        emits :alpha
-        public :emit # [#ps-002] public for testing
+        Callback[ self, :employ_DSL_for_digraph_emitter ]
+        listeners_digraph :alpha
+        public :call_digraph_listeners # [#002] public for testing
       end
       modul :Beta do |o|
         include o.Alpha
       end
       klass :Gamma do |o|
-        Callback[ self, :extend_emitter_module_methods ]
+        Callback[ self, :extend_digraph_emitter_module_methods ]
         include o.Beta
       end
       klass :Delta, extends: :Gamma
 
       it "works" do
         d = _Delta.new
-        d.emit :alpha, nil
-        ->{ d.emit :no, nil }.should raise_error(
+        d.call_digraph_listeners :alpha, nil
+        ->{ d.call_digraph_listeners :no, nil }.should raise_error(
           'undeclared event type :no for Delta' )
       end
     end

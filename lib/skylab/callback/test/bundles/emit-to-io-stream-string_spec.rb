@@ -10,9 +10,9 @@ module Skylab::Callback::TestSupport::Bundles
 
       before :all do
         class Foo_EVSIM
-          Callback[ self, :emit_via_simple_IO_manifold ]
+          Callback[ self, :emit_to_IO_stream_string ]
           def initialize dbg_IO
-            @fun_IO = TestSupport::IO::Spy.standard do |io|
+            @fun_IO = Callback::Lib_::TestSupport_[]::IO::Spy.standard do |io|
               io.any_debug_IO_notify dbg_IO
             end
             init_simple_IO_manifold fun: @fun_IO ; nil

@@ -4,8 +4,6 @@ module Skylab::Callback
 
   module Event
 
-    MetaHell::MAARS[ self ]
-
     class Unified  # [#019] #storypoint-10
 
       -> do  # `initialize`
@@ -42,13 +40,13 @@ module Skylab::Callback
       end
 
       def is? stream_i
-        (( @cs ||= Callback::Emitter::Contextualized_Stream_Name.
+        (( @cs ||= Callback::Digraph::Contextualized_Stream_Name.
           new( @stream_name, event_stream_graph ) )).is? stream_i
       end
 
       undef_method :to_s  # for now this is here to catch mistakes loudly
 
-      MetaHell::Function.enhance( self ).
+      Callback::Lib_::Function[].enhance( self ).
         as_private_getter :@event_stream_graph_p, :event_stream_graph
 
       def touch!

@@ -2,9 +2,9 @@ module Skylab::Callback::TestSupport
 
   module Fixtures::WhoHah
 
-    Callback[ self, :employ_DSL_for_emitter ]
+    Callback[ self, :employ_DSL_for_digraph_emitter ]
 
-    emits hacking: [ :business, :pleasure ]
+    listeners_digraph hacking: [ :business, :pleasure ]
 
   end
 end

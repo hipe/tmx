@@ -1,21 +1,21 @@
 require_relative 'test-support'
 
-module ::Skylab::Callback::TestSupport::Emitter
+module ::Skylab::Callback::TestSupport::Digraph
 
   # Quickie.
 
-  describe "[cb] emitter" do
+  describe "[cb] digraph" do
 
-    extend Emitter_TestSupport
+    extend Digraph_TestSupport
 
     # --*--
 
     context "when a class extends it" do
 
-      context 'gives your class an "emits" method which:' do
+      context 'gives your class an "listeners_digraph" method which:' do
 
         it "your class responds to it" do
-          klass.singleton_class.should be_private_method_defined :emits
+          klass.singleton_class.should be_private_method_defined :listeners_digraph
         end
 
         it "when called with an event graph, adds those types to the #{
@@ -23,7 +23,7 @@ module ::Skylab::Callback::TestSupport::Emitter
 
           cls = klass
           cls.event_stream_graph.node_count.should be_zero
-          cls.send :emits, scream: :sound, yell: :sound
+          cls.send :listeners_digraph, scream: :sound, yell: :sound
           cls.event_stream_graph.node_count.should eql 3
         end
       end
@@ -32,7 +32,7 @@ module ::Skylab::Callback::TestSupport::Emitter
     context 'When you call "on_foo" with a block,' do
 
       inside do
-        emits :foo
+        listeners_digraph :foo
       end
 
       let :touch_me do
@@ -52,23 +52,23 @@ module ::Skylab::Callback::TestSupport::Emitter
         x.object_id.should eql nerk.object_id
       end
 
-      it "the call to emit( :foo ) - invokes the block." do
+      it "the call to call_digraph_listeners( :foo ) - invokes the block." do
         touch_me[:touched].should eql( :was_not_touched )
-        res = emitter.emit :foo
+        res = emitter.call_digraph_listeners :foo
         touch_me[:touched].should eql( :it_was_touched )
         res.should be_nil
       end
 
-      it "with `emits?` - you can see if it emits something" do
-        emitter.emits?( :baz ).should eql false
-        emitter.emits?( :foo ).should eql true
+      it "with `callback_digraph_has?` - you can see if it emits something" do
+        emitter.callback_digraph_has?( :baz ).should eql false
+        emitter.callback_digraph_has?( :foo ).should eql true
       end
     end
 
     context "this klass with a typical 3-node event stream graph" do
 
       inside do
-        emits :informational, error: :informational, info: :informational
+        listeners_digraph :informational, error: :informational, info: :informational
       end
 
       it "reflects on its event stream graph" do
@@ -86,7 +86,7 @@ module ::Skylab::Callback::TestSupport::Emitter
         emitter.on_error do |event|
           msg = event.payload_a.first
         end
-        emitter.emit :error, 'yes'
+        emitter.call_digraph_listeners :error, 'yes'
         msg.should eql 'yes'
       end
 
@@ -95,7 +95,7 @@ module ::Skylab::Callback::TestSupport::Emitter
         emitter.on_informational do |e|
           msg = "#{ e.stream_name }: #{ e.payload_a.first }"
         end
-        emitter.emit :error, 'yes'
+        emitter.call_digraph_listeners :error, 'yes'
         msg.should eql 'error: yes'
       end
 
@@ -105,7 +105,7 @@ module ::Skylab::Callback::TestSupport::Emitter
         prnt = nil
         emitter.on_informational { |e| prnt = "#{e.stream_name}: #{e.payload_a.first}" }
         emitter.on_info          { |e| chld = "#{e.stream_name}: #{e.payload_a.first}" }
-        emitter.emit :info, 'foo'
+        emitter.call_digraph_listeners :info, 'foo'
         chld.should eql 'info: foo'
         prnt.should eql 'info: foo'
       end
@@ -115,7 +115,7 @@ module ::Skylab::Callback::TestSupport::Emitter
         id_one = id_two = nil
         emitter.on_informational { |e| id_one = e.event_id }
         emitter.on_info          { |e| id_two = e.event_id }
-        emitter.emit :info
+        emitter.call_digraph_listeners :info
         ( !! id_one ).should eql true
         id_one.should eql id_two
         id_two.should be_kind_of ::Fixnum
@@ -126,7 +126,7 @@ module ::Skylab::Callback::TestSupport::Emitter
         }to track whether you've seen them (but this is a smell..)" do
 
       inside do
-        emits :informational, error: :informational, info: :informational
+        listeners_digraph :informational, error: :informational, info: :informational
       end
 
       it 'by explicitly touching and checking for touched?' do
@@ -145,11 +145,11 @@ module ::Skylab::Callback::TestSupport::Emitter
         o.on_error do |e|
           c.e += 1
         end
-        o.emit :informational
+        o.call_digraph_listeners :informational
         c.values.should eql [ 1, 0, 0 ]
-        o.emit :info
+        o.call_digraph_listeners :info
         c.values.should eql [ 1, 1, 0 ]
-        o.emit :error
+        o.call_digraph_listeners :error
         c.values.should eql [ 2, 1, 1 ]
       end
 
@@ -162,7 +162,7 @@ module ::Skylab::Callback::TestSupport::Emitter
           o = emitter
           o.on_informational { |e| lines << "inform:#{ e.payload_a.first }" }
           o.on_info          { |e| lines << "info:#{ e.payload_a.first }" }
-          o.emit :info, "A"
+          o.call_digraph_listeners :info, "A"
           lines.should eql %w( info:A inform:A )
         end
 
@@ -170,7 +170,7 @@ module ::Skylab::Callback::TestSupport::Emitter
           o = emitter
           o.on_informational { |e| lines << "inform:#{ e.payload_a.first }" unless e.touched? }
           o.on_info          { |e| lines << "info:#{ e.payload_a.first }"   unless e.touched? }
-          o.emit :info, "A"
+          o.call_digraph_listeners :info, "A"
           lines.should eql %w( info:A inform:A )
         end
 
@@ -182,7 +182,7 @@ module ::Skylab::Callback::TestSupport::Emitter
           o.on_info do |e|
             lines << "info:#{ e.touch!.payload_a.first }" unless e.touched?
           end
-          o.emit :info, "A"
+          o.call_digraph_listeners :info, "A"
           lines.should eql %w( info:A )
         end
       end
@@ -193,7 +193,7 @@ module ::Skylab::Callback::TestSupport::Emitter
       def inside
         sg = stream_graph         # ^^ context of the test  ^^
         -> do                     # vv context of the class vv
-          emits( *sg )
+          listeners_digraph( *sg )
         end
       end
 
@@ -211,7 +211,7 @@ module ::Skylab::Callback::TestSupport::Emitter
           o = emitter
           touched = 0
           o.on_all { |e| touched += 1 }
-          o.emit :hello
+          o.call_digraph_listeners :hello
           touched.should eql 1
         end
       end
@@ -232,21 +232,21 @@ module ::Skylab::Callback::TestSupport::Emitter
           o.on_son    { |e| @counts[ :son ]    += 1 }
           o.on_ghost  { |e| @counts[ :ghost ]  += 1 }
 
-          emitter.emit which
+          emitter.call_digraph_listeners which
           s = @counts.keys.map( & :to_s ).sort.join ' '
           s.should eql 'father ghost son'
           @counts.values.count{ |v| 1 == v }.should eql 3
         end
 
-        it "an emit to father emits to all three" do
+        it "an call_digraph_listeners to father emits to all three" do
           same :father
         end
 
-        it "an emit to son emits to all three" do
+        it "an call_digraph_listeners to son emits to all three" do
           same :son
         end
 
-        it "an emit to ghost emits to all three" do
+        it "an call_digraph_listeners to ghost emits to all three" do
           same :ghost
         end
       end
@@ -255,24 +255,24 @@ module ::Skylab::Callback::TestSupport::Emitter
     context "has a shorthand for creating emitter classes" do
 
       inside do
-        emits :one
+        listeners_digraph :one
       end
 
       alias_method :normal_class, :klass
 
       let :shorthand_class do
-        Callback::Emitter.new :all, error: :all
+        Callback::Digraph.new :all, error: :all
       end
 
       it "which works" do
         o = normal_class.new
         s = nil
         o.on_one { |x| s = x.payload_a.first }
-        o.emit :one, 'sone'
+        o.call_digraph_listeners :one, 'sone'
         s.should eql 'sone'
         o = shorthand_class.new
         o.on_all { |e| s = e.payload_a.first.to_s }
-        o.emit :error, 'serr'
+        o.call_digraph_listeners :error, 'serr'
         s.should eql 'serr'
       end
     end
@@ -280,7 +280,7 @@ module ::Skylab::Callback::TestSupport::Emitter
     context "will graphs defined in a parent class descend to child?" do
 
       inside do
-        emits :informational, error: :informational, info: :informational
+        listeners_digraph :informational, error: :informational, info: :informational
       end
 
       let :child_class do
@@ -291,7 +291,7 @@ module ::Skylab::Callback::TestSupport::Emitter
         ok = nil
         o = child_class.new
         o.on_informational { |e| ok = e }
-        o.emit :info, "wankers"
+        o.call_digraph_listeners :info, "wankers"
         ok.payload_a.first.should eql 'wankers'
       end
     end

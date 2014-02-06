@@ -1,5 +1,5 @@
 [#023]       #doc-node the different kinds of callback patterns ..
-[#022]       #doc-node the emit spy narrative ..
+[#022]       #doc-node the call_digraph_listeners spy narrative ..
 [#021]       #doc-node the event predicate narrative ..
 [#020]       #in-situ
 [#019]       #storypoints
