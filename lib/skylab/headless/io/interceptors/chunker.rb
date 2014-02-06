@@ -2,9 +2,9 @@ module Skylab::Headless
 
   class IO::Interceptors::Chunker
 
-    # chunker - scan each write of data and emit it in chunks based on separator
+    # chunker - scan each write of data and call_digraph_listeners it in chunks based on separator
 
-    def flush                     # emit out any remaining data. any data
+    def flush                     # call_digraph_listeners out any remaining data. any data
                                   # in the buffer got there thru write and
                                   # so it is guaranteed not to have newlines.
       string = flush_both

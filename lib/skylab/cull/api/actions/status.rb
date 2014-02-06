@@ -6,7 +6,7 @@ module Skylab::Cull
 
     services :configs, [ :pth, :ivar ]
 
-    emits yes: :structural, no: :structural,
+    listeners_digraph yes: :structural, no: :structural,
       hard_yes: :payload_lines
 
     event_factory Callback::Event::Factory::Structural.new(

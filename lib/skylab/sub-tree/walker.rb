@@ -406,7 +406,7 @@ module SubTree  # borrow x 1 - load this solo but it needs meta hell
     #               ~ non-topical private (section 3) ~
 
     def say volume, msg_func
-      @listener.call Event__.new( volume, msg_func )
+      @listener.call_any_listener Event__.new( volume, msg_func )
       nil
     end
     private :say

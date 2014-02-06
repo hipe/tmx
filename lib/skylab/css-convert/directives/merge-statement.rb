@@ -15,7 +15,7 @@ module Skylab::CssConvert
       end
       lp = css_parser.parse_file(left, &b)
       rp = css_parser.parse_file(right, &b)
-      emit(:info, "IMPLEMENT ME merge")
+      call_digraph_listeners(:info, "IMPLEMENT ME merge")
     end
     attr_reader :sexp
   private

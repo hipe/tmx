@@ -10,7 +10,7 @@ for one thing the file either does or does not already exist, and for these
 two states we will variously use the verbs `update` or `create` respectively
 in various symbols below.
 
-we emit separate events immediately `before` and immediately `after` the file
+we call_digraph_listeners separate events immediately `before` and immediately `after` the file
 is written to, which, when events on such streams are received by the caller
 that has a CLI modality, they are frequently written out as one line in two
 parts, with the reasoning that it is useful to see separately that the file

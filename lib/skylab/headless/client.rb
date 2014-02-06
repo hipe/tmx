@@ -36,8 +36,8 @@ module Skylab::Headless
       pen_class.new
     end
 
-    def emit type, *payload       # bound to sub-client (#sc-bound)
-      io_adapter.emit type, *payload
+    def call_digraph_listeners type, *payload       # bound to sub-client (#sc-bound)
+      io_adapter.call_digraph_listeners type, *payload
     end
 
     def infer_valid_action_names_from_public_instance_methods # [#017]

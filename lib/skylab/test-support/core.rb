@@ -1,10 +1,7 @@
 require File.expand_path('../../../skylab', __FILE__)
-# above is [#bs-010]
+# :+[#bs-010]  (and btw, is necessary b.c of a strong dependence on old a.l)
 
-require 'skylab/headless/core'
-require 'skylab/meta-hell/core'
-
-class ::String  # [#022] "to extlib or not to extlib.."
+class ::String  # :1:[#sl-131] [#022] "to extlib or not to extlib.."
 
   def unindent  # (formerly 'deindent')
     gsub! %r<^#{ ::Regexp.escape match( /\A[[:space:]]+/ )[ 0 ] }>, ''
@@ -12,11 +9,16 @@ class ::String  # [#022] "to extlib or not to extlib.."
   end
 end
 
-module Skylab::TestSupport  # (any future storypoints should go in [#021])
+module Skylab::TestSupport  # :[#021]
 
   Autoloader = ::Skylab::Autoloader
-  Headless = ::Skylab::Headless
-  MetaHell = ::Skylab::MetaHell
+
+  require_relative '../callback/core'
+  Callback_ = ::Skylab::Callback
+
+  Headless, MetaHell = Callback_::Autoloader.
+    require_sidesystem :Headless, :MetaHell
+
   TestSupport_ = self                      # gotcha: we cannot set the eponymous
                                   # #hiccup constant because there is a
                                   # legitimate other module ::SL::TS::TS.

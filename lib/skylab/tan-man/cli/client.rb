@@ -7,13 +7,13 @@ module Skylab::TanMan
     include Core::Client::InstanceMethods      # per the pattern
 
 
-    emits Bleeding::EVENT_GRAPH                # b/c granulated UI events
+    listeners_digraph Bleeding::EVENT_GRAPH                # b/c granulated UI events
                                                # note this gets merged with
                                                # 'parent' event graph above
 
     event_factory CLI::Event::Factory
 
-    emits event_structure: :all
+    listeners_digraph event_structure: :all
 
     def initialize i, o, e  # [#sl-114] these three are the convention
       @io_adapter = @IO_adapter = Headless::CLI::IO::Adapter::Minimal. # #todo:during-ta-merge

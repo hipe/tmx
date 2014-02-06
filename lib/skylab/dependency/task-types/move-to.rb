@@ -7,14 +7,14 @@ module Skylab::Dependency
     attribute :move_to, :required => true
     attribute :from, :required => true
 
-    emits :all, :error => :all, :shell => :all
+    listeners_digraph  :all, :error => :all, :shell => :all
 
     def fu_output_message msg
       md = /\Amv ([^ ]+) ([^ ]+)\z/.match msg # #cosmetic-shell wat hack
       if md
         msg = "mv #{ pretty_path md[1] } #{ pretty_path md[2] }"
       end
-      emit :shell, msg
+      call_digraph_listeners :shell, msg
     end
 
     remove_method :from= # -w, #todo
@@ -26,11 +26,11 @@ module Skylab::Dependency
       @context ||= (args[:context] || {})
       valid? or fail(invalid_reason)
       if ! from.exist?
-        emit(:error, "file not found: #{pretty_path from.to_s}")
+        call_digraph_listeners(:error, "file not found: #{pretty_path from.to_s}")
         return false
       end
       if move_to.exist?
-        emit(:error, "file exists: #{pretty_path move_to.to_s}")
+        call_digraph_listeners(:error, "file exists: #{pretty_path move_to.to_s}")
         return false
       end
       status = mv from, move_to, :verbose => true

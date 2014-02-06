@@ -19,7 +19,7 @@ module Skylab::SubTree
 
     ACTIONS_ANCHOR_MODULE = SubTree::API::Actions
 
-    Callback[ self, :employ_DSL_for_emitter ]
+    Callback[ self, :employ_DSL_for_digraph_emitter ]
 
     event_factory Callback::Event::Factory::Isomorphic.new( API::Events )
 
@@ -32,7 +32,7 @@ module Skylab::SubTree
 
     def error message_x
       @error_was_emitted ||= true
-      emit :error, message_x
+      call_digraph_listeners :error, message_x
       false
     end
   end

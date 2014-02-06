@@ -76,7 +76,7 @@ start reading from the bottom below at #1).
           ^ v
   +---------------------+            4. the services exposed by the modality
   | the modality client |            client could be limited to just
-  +---------------------+            "emit info line" and "emit payload line"
+  +---------------------+            "call_digraph_listeners info line" and "call_digraph_listeners payload line"
             ^ v
     +-------------------------+      3. this is where the event is prepared
     | the modality sub-client |      for modality-specific presentation /

@@ -7,11 +7,11 @@ module Skylab::Treemap
     include Treemap::Core::Action::InstanceMethods  # a lot of these are
                                   # up-delegators which we must implement
 
-    extend Callback::Emitter  # NOTE here. overwrite s.c version of `emit`
+    extend Callback::Digraph  # NOTE here. overwrite s.c version of `emit`
 
     taxonomic_streams :all
 
-    emits Bleeding::EVENT_GRAPH.merge(
+    listeners_digraph Bleeding::EVENT_GRAPH.merge(
       ::Hash[ CLI::Event::CANON_STREAMS.map { |sn| [ sn, :all ] } ]
     )                             # your best friend right now is:
                                   # `tmx-callback viz cli/client.rb --open`
@@ -138,7 +138,7 @@ module Skylab::Treemap
 
         identity = -> stream_name do
           -> event_x do
-            emit stream_name, event_x
+            call_digraph_listeners stream_name, event_x
           end
         end
 

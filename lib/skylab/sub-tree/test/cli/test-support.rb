@@ -6,7 +6,7 @@ module Skylab::SubTree::TestSupport::CLI
   ::Skylab::SubTree::TestSupport[ self ]  # #regret
 
   module CONSTANTS
-    PubSub_TestSupport = ::Skylab::Callback::TestSupport
+    Callback_TestSupport_ = ::Skylab::Callback::TestSupport
     PN_ = 'sub-tree'.freeze
   end
 
@@ -50,7 +50,7 @@ module Skylab::SubTree::TestSupport::CLI
       es = emit_spy
       client = client_class.new do |clnt|
         clnt.on_all do |e|
-          es.emit e.stream_name, e.text
+          es.call_digraph_listeners e.stream_name, e.text
         end
       end
       client.instance_variable_set :@program_name, PN_
@@ -68,7 +68,7 @@ module Skylab::SubTree::TestSupport::CLI
       client_class.new sin: t.instream, out: t.outstream, err: t.errstream,
         program_name: PN_, wire_p:( -> emtr do
           emtr.on_all do |e|
-            es.emit e.stream_name, e.text
+            es.call_digraph_listeners e.stream_name, e.text
           end
         end )
     end
@@ -79,7 +79,7 @@ module Skylab::SubTree::TestSupport::CLI
 
     def emit_spy
       @emit_spy ||= begin
-        es = PubSub_TestSupport::Emit_Spy.new
+        es = Callback_TestSupport_::Call_Digraph_Listeners_Spy.new
         es.do_debug_proc = -> { do_debug }
         es
       end

@@ -55,7 +55,7 @@ module Skylab::Face
     # listeners requires nothing.
     #
     # Each of these steps may also have corresponding DSL-ish facets that this
-    # class reveals (namely, `emits`, `services` and `params`) which we present
+    # class reveals (namely, `listeners_digraph`, `services` and `params`) which we present
     # below in the corresponding order and inline with the corresponding
     # instance method (callbacks) enumerated above. So, any time you wonder
     # where you might find something here, think to the lifecycle first. yay.
@@ -87,8 +87,8 @@ module Skylab::Face
       API::Action::Emit[ self, :taxonomic_streams, a, b ]
     end
 
-    def self.emits *a, &b
-      API::Action::Emit[ self, :emits, a, b ]
+    def self.listeners_digraph *a, &b
+      API::Action::Emit[ self, :listeners_digraph, a, b ]
     end
 
     def set_expression_agent x

@@ -4,45 +4,45 @@ module Skylab::Face
 
     # `self.[]` - fulfill [#026]. unlike its bretheren it does
     # *not* assume it is behind a mutex because it can get puffed up from
-    # multiple entrypoints, namely `emits` *and/or* `taxonomic_streams`
+    # multiple entrypoints, namely `listeners_digraph` *and/or* `taxonomic_streams`
     # (just as two examples)
 
     -> do  # `self.[]`
       emits = nil
       define_singleton_method :[] do |kls, meth_i, a, b|
         kls.class_exec do
-          if ! respond_to? :is_pub_sub_emitter_module or
-              ! is_pub_sub_emitter_module  # unlikely
-            Library_::Callback[ self, :employ_DSL_for_emitter ]
+          if ! respond_to? :is_callback_digraph_module or
+              ! is_callback_digraph_module  # unlikely
+            Library_::Callback[ self, :employ_DSL_for_digraph_emitter ]
             public :on, :with_specificity  # per the way we wire API actions.
-            define_singleton_method :emits, & emits[ self ]
+            define_singleton_method :listeners_digraph, & emits[ self ]
           end
         end
         kls.send meth_i, *a, &b
       end
 
       emits = -> kls do
-        orig_emits = kls.method( :emits ).unbind
+        orig_emits = kls.method( :listeners_digraph ).unbind
         MetaHell::Module::Mutex[ -> *a, &b do
           orig_emits.bind( self ).call( *a, &b )
           @event_stream_graph.names.each do |i|
             define_method i do |x|
-              emit i, x
+              call_digraph_listeners i, x
               nil
             end
           end
           nil
-        end, :emits ]
+        end, :listeners_digraph ]
       end
     end.call
 
     # EXPERIMENTAL - the above does a filthy nasty trick - for *every* event
-    # stream that we declare in our `emits` statement, we define a
+    # stream that we declare in our `listeners_digraph` statement, we define a
     # corresponding instance method *of the same name* that emits a probably
     # universal event.
     #
     # (we know when you are done declaring events because you can only call
-    # `emits` zero or one times per class!)
+    # `listeners_digraph` zero or one times per class!)
     #
     # this is probably fine for most applications because a) it is sort of
     # like what we always did anyway (but we cluttered the codespace with

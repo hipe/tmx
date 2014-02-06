@@ -22,7 +22,7 @@ module Skylab::GitViz
       end
 
       def ping
-        @listener.call :ping do :hello_from_front end ; nil
+        @listener.call_any_listener :ping do :hello_from_front end ; nil
       end
     end
 

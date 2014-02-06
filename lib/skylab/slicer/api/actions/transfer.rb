@@ -4,7 +4,7 @@ module Skylab::Slicer
 
     params :dry_run
 
-    emits :info_line, :info_message
+    listeners_digraph  :info_line, :info_message
 
     def execute
       info_line 'sure.'

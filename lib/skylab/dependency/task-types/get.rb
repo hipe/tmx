@@ -11,13 +11,12 @@ module Skylab::Dependency
     attribute :build_dir, :required => true, :from_context => true
     attribute :dry_run, :boolean => true, :from_context => true
 
-    emits(:all,
+    listeners_digraph :all,
       :info => :all,
       :error => :all,
       :shell => :all,
       :stdout => :all,
       :stderr => :all
-    )
 
     def bytes path
       ::File.stat(path).size if ::File.exist?(path)
@@ -32,10 +31,10 @@ module Skylab::Dependency
         when nil
           workunits.push [from_url, to_file]
         when 0
-          emit :info, "had zero byte file (strange), overwriting: #{pretty_path to_file}"
+          call_digraph_listeners :info, "had zero byte file (strange), overwriting: #{pretty_path to_file}"
           workunits.push [from_url, to_file]
         else
-          emit :info, "assuming already downloaded b/c exists " <<
+          call_digraph_listeners :info, "assuming already downloaded b/c exists " <<
             "(erase/move to re-download): #{pretty_path to_file}"
         end
       end
@@ -57,7 +56,7 @@ module Skylab::Dependency
     def curl_or_wget from_url, to_file
       cmd = "curl -o #{escape_path(pretty_path to_file.to_s)} #{from_url}"
       # cmd = "wget -O #{escape_path to_file} #{from_url}"
-      emit(:shell, cmd)
+      call_digraph_listeners(:shell, cmd)
       uri = URI.parse(from_url)
       response = nil
       ::Net::HTTP.start(uri.host, uri.port) do |h|
@@ -70,7 +69,7 @@ module Skylab::Dependency
         ::File.open(to_file, WRITEMODE_ ) { |fh| fh.write(response.body) }
         true
       else
-        emit(:error, "File not found: #{from_url}")
+        call_digraph_listeners(:error, "File not found: #{from_url}")
         false
       end
     end

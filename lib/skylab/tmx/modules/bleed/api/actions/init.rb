@@ -3,7 +3,7 @@ module Skylab
   class TMX::Modules::Bleed::API::Actions::Init <
     TMX::Modules::Bleed::API::Action
 
-    emits info: :all, error: :all, head: :all, tail: :all
+    listeners_digraph info: :all, error: :all, head: :all, tail: :all
 
     def invoke
 

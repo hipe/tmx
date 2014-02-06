@@ -9,7 +9,7 @@ module Skylab::BeautySalon
            [ :do_number_the_lines, :arity, :zero_or_one ],
            [ :file, :arity, :one ]
 
-    emits :info_line, :info, :normalization_failure_line_notify
+    listeners_digraph :info_line, :info, :normalization_failure_line_notify
 
     services [ :ostream, :ivar ] , [ :estream, :ivar ]
 

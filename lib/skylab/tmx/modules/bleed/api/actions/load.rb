@@ -2,7 +2,7 @@ module Skylab::TMX::Modules::Bleed::API
 
   class Actions::Load < Action
 
-    emits :bash, :error, :notice
+    listeners_digraph :bash, :error, :notice
 
     -> do
       script_path = 'script/bleed'
@@ -10,8 +10,8 @@ module Skylab::TMX::Modules::Bleed::API
       define_method :invoke do ||
         res = nil
         begin
-          config_read or break  # upstram emits
-          dir_pth = config_get_path or break  # upstream emits
+          config_read or break
+          dir_pth = config_get_path or break
           dir_pn = ::Pathname.new expand_tilde( dir_pth )
           if ! dir_pn.exist?
             break( error "not a directory, won't add to PATH: #{ dir_pn }" )
@@ -23,7 +23,7 @@ module Skylab::TMX::Modules::Bleed::API
           require 'open3'  # meh
           ::Open3.popen3( script_pn.to_s ) do |sin, sout, serr, thread|
             while line = sout.gets
-              emit :bash, line.chomp
+              call_digraph_listeners :bash, line.chomp
             end
             res = thread.join.value.exitstatus
           end

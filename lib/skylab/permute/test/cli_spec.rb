@@ -8,9 +8,9 @@ describe "#{ Permute::CLI }" do
   before :all do  # just a bad idea all around, but we want to see how it goes
     cli = Permute::CLI.new
     cli.program_name = 'permoot'
-    spy = Callback::TestSupport::Emit_Spy.new
-    cli.singleton_class.send(:define_method, :emit) do |type, payload|
-      spy.emit(type, payload)
+    spy = Callback::TestSupport::Call_Digraph_Listeners_Spy.new
+    cli.singleton_class.send(:define_method, :call_digraph_listeners) do |type, payload|
+      spy.call_digraph_listeners(type, payload)
     end
     @cli = cli ; @spy = spy
     # spy.debug!

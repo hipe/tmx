@@ -36,7 +36,7 @@ module Skylab::Dependency::TestSupport::Tasks
       let(:from){ BUILD_DIR.join('some-file.txt') }
       context "to an available location" do
         let(:move_to) { BUILD_DIR.join('move-worked.txt') }
-        it "should work and return true and emit a shell" do
+        it "should work and return true and call_digraph_listeners a shell" do
           from.should be_exist
           move_to.should_not be_exist
           content = File.read(from)
@@ -50,7 +50,7 @@ module Skylab::Dependency::TestSupport::Tasks
       end
       context "to an unavailable location" do
         let(:move_to) { FIXTURES_DIR.join('another-file.txt') }
-        it "should return false and emit an error" do
+        it "should return false and call_digraph_listeners an error" do
           r = subject.invoke
           r.should eql(false)
           fingers[:error].last.should match(/file exists.*another-file/)
@@ -60,7 +60,7 @@ module Skylab::Dependency::TestSupport::Tasks
     context "when moving a nonexitant file" do
       let(:from) { "#{FIXTURES_DIR}/not-there" }
       let(:move_to) { "#{BUILD_DIR}/wherever" }
-      it "should return false and emit an error" do
+      it "should return false and call_digraph_listeners an error" do
         r = subject.invoke(context)
         r.should eql(false)
         fingers[:error].last.should match(/file not found.*not-there/)

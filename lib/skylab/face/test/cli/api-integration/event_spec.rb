@@ -36,10 +36,10 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Event
             module Actions
               class Burf < Face::API::Action
                 taxonomic_streams  # none.
-                emits :honkey, :tonkey
+                listeners_digraph  :honkey, :tonkey
                 def execute
-                  emit :tonkey
-                  emit :honkey
+                  call_digraph_listeners :tonkey
+                  call_digraph_listeners :honkey
                   :x
                 end
               end
@@ -74,7 +74,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Event
             module Actions
               class Marf < Face::API::Action
                 taxonomic_streams  # none.
-                emits :hinkey, :tinkey
+                listeners_digraph  :hinkey, :tinkey
                 def execute
                   fail 'never see.'
                 end

@@ -60,12 +60,12 @@ module Skylab::Porcelain::TestSupport::Bleeding::Namespace
         mod = _ordinary_module
         act = Bleeding::Namespace::Inferred.new mod
         tok = self.token
-        spy = PubSub_TestSupport::Emit_Spy.new
+        spy = Callback_TestSupport_::Call_Digraph_Listeners_Spy.new
         spy.do_debug_proc = -> { do_debug }
         result = act.find tok do |o|
-          o.on_ambiguous { |txt| spy.emit :ambiguous, txt }
-          o.on_not_found { |txt| spy.emit :not_found, txt }
-          o.on_not_provided { |txt| spy.emit :not_provided, txt }
+          o.on_ambiguous { |txt| spy.call_digraph_listeners :ambiguous, txt }
+          o.on_not_found { |txt| spy.call_digraph_listeners :not_found, txt }
+          o.on_not_provided { |txt| spy.call_digraph_listeners :not_provided, txt }
         end
         { normalized_event_sheets: spy.delete_emission_a, result: result }
       end

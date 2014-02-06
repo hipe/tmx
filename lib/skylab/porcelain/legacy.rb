@@ -127,9 +127,9 @@ module Skylab::Porcelain::Legacy
 
       mutex_h.fetch self do
         mutex_h[ self ] = true
-        # [cb] digraph is opt-in, implement `emit` however you want. still this sux
-        do_wire = Module_defines_method_[ singleton_class, :emits ]
-        has_emit_method = Module_defines_method_[ self, :emit ]
+        # [cb] digraph is opt-in, implement `call_digraph_listeners` however you want. still this sux
+        do_wire = Module_defines_method_[ singleton_class, :listeners_digraph ]
+        has_emit_method = Module_defines_method_[ self, :call_digraph_listeners ]
         do_wire and class_exec( & event_graph_init )
         @is_collapsed = nil
         @dsl_is_hot = true
@@ -140,7 +140,7 @@ module Skylab::Porcelain::Legacy
           # ancestor chain right now, to produce the order this is expected.
           story
         end
-        has_emit_method or alias_method :emit, :_porcelain_legacy_emit
+        has_emit_method or alias_method :call_digraph_listeners, :_porcelain_legacy_emit
         class << self  # hack to avoid triggering this hook "early". sux
           alias_method :method_added, :_porcelain_legacy_method_added
         end
@@ -153,7 +153,7 @@ module Skylab::Porcelain::Legacy
         event_class ::Skylab::Callback::Event::Textual
       end  # experimental ack - all our events are textual, so..
 
-      emits         payload: :all,
+      listeners_digraph  payload: :all,
                        info: :all,
                       error: :all,
                        help: :info,
@@ -601,7 +601,7 @@ module Skylab::Porcelain::Legacy
     end
 
     def _porcelain_legacy_emit stream, text
-      @request_client.send :emit, stream, text
+      @request_client.send :call_digraph_listeners, stream, text
     end
 
     def resolve_options argv      # standard 3-arg result
@@ -628,7 +628,7 @@ module Skylab::Porcelain::Legacy
       if ! parse_ok then [ exit_code, nil, nil ] else
         if @borrowed_queue && @borrowed_queue.length.nonzero?
           if argv.length.nonzero?
-            emit :info, "(ignoring: #{ argv.map(& :inspect ).join ' ' })"
+            call_digraph_listeners :info, "(ignoring: #{ argv.map(& :inspect ).join ' ' })"
           end
           resolve_queue
         else
@@ -751,7 +751,7 @@ module Skylab::Porcelain::Legacy
 
     def help
       y = ::Enumerator::Yielder.new do |x|
-        emit :help, x
+        call_digraph_listeners :help, x
       end
       y << render_usage_line
       render_desc y
@@ -852,8 +852,8 @@ module Skylab::Porcelain::Legacy
     end
 
     def usage_and_invite msg
-      emit :usage_issue, msg
-      emit :usage, render_usage_line
+      call_digraph_listeners :usage_issue, msg
+      call_digraph_listeners :usage, render_usage_line
       invite
       nil
     end
@@ -863,7 +863,7 @@ module Skylab::Porcelain::Legacy
     end
 
     def invite
-      emit :ui, "Try #{ kbd "#{ normalized_invocation_string } -h"} for help."
+      call_digraph_listeners :ui, "Try #{ kbd "#{ normalized_invocation_string } -h"} for help."
     end
     public :invite
   end
@@ -925,12 +925,12 @@ module Skylab::Porcelain::Legacy
       end
       self.class.story.fetch_action_sheet ref, self.class.story.do_fuzzy,
         -> do
-          emit :usage_issue, "invalid action: #{ kbd ref }"
-          emit :usage_issue, "expecting #{ render_actions }"
+          call_digraph_listeners :usage_issue, "invalid action: #{ kbd ref }"
+          call_digraph_listeners :usage_issue, "expecting #{ render_actions }"
           false
         end,
         -> ambi_a do
-          emit :usage_issue, "Ambiguous action #{ kbd ref }. #{
+          call_digraph_listeners :usage_issue, "Ambiguous action #{ kbd ref }. #{
             }Did you mean #{ ambi_a.map(& method( :kbd )) * ' or ' }?"
           false
         end
@@ -1120,7 +1120,7 @@ module Skylab::Porcelain::Legacy
       @instream ||= i ; @paystream ||= o ; @infostream ||= e ; nil
     end
 
-    # non [cb] digraph variant of `emit` gets "turned on" elsewhere
+    # non [cb] digraph variant of `call_digraph_listeners` gets "turned on" elsewhere
 
     def _porcelain_legacy_emit stream_name, text
       ( :payload == stream_name ? @paystream : @infostream ).puts text
@@ -1170,8 +1170,8 @@ module Skylab::Porcelain::Legacy
 
     # all this is for dsl-style actions defined as methods on a host client
 
-    def emit stream, text
-      @request_client.send :emit, stream, text
+    def call_digraph_listeners stream, text
+      @request_client.send :call_digraph_listeners, stream, text
     end
 
     def bound_process_method  # this is for a dsl-style method on a host client
@@ -1472,8 +1472,8 @@ module Skylab::Porcelain::Legacy
       mutex_h.fetch self do
         mutex_h[ self ] = true
         @action_sheet ||= Action::Sheet.for_action_class( self )
-        if ! Module_defines_method_[ self, :emit ]
-          alias_method :emit, :_porcelain_legacy_emit
+        if ! Module_defines_method_[ self, :call_digraph_listeners ]
+          alias_method :call_digraph_listeners, :_porcelain_legacy_emit
         end
       end
       nil
@@ -1767,8 +1767,8 @@ module Skylab::Porcelain::Legacy
       "#{ @request_client.send :normalized_invocation_string }"
     end
 
-    def emit a, b
-      @request_client.send :emit, a, b
+    def call_digraph_listeners a, b
+      @request_client.send :call_digraph_listeners, a, b
     end
 
     def get_bound_method meth  # upstream

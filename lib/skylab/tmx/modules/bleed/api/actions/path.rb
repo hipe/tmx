@@ -5,21 +5,21 @@ module Skylab::TMX::Modules::Bleed::API
 
   class Actions::Path::Get < Action
 
-    emits :path, :error, :notice
+    listeners_digraph :path, :error, :notice
 
     # (#posterity - historical note, above line once lamented the `touch` hack)
 
     def invoke
       path = config_get_path
       if path
-        emit :path, path
+        call_digraph_listeners :path, path
       end
     end
   end
 
   class Actions::Path::Set < Action
 
-    emits :error, :notice, :info, :head, :tail
+    listeners_digraph :error, :notice, :info, :head, :tail
 
     def invoke pth
       res = nil

@@ -61,7 +61,7 @@ module Skylab::CssConvert
   private
 
     def version
-      emit :payload, "#{ program_name } #{ CssConvert::VERSION }"
+      call_digraph_listeners :payload, "#{ program_name } #{ CssConvert::VERSION }"
       true
     end
   end
@@ -112,8 +112,8 @@ module Skylab::CssConvert
         result = :ok
       end while false
       if :error == result
-        emit :help, usage_line
-        emit :help, invite_line
+        call_digraph_listeners :help, usage_line
+        call_digraph_listeners :help, invite_line
       end
       exitstatus_for_i result
     end
@@ -245,7 +245,7 @@ module Skylab::CssConvert
             "#{pen.stylize(a.map(&:to_s).join(' '), *a)} with that?"
           u = pen.unstyle(s)
           fill = ' ' * [width - u.length, 0].max
-          emit(:payload, "#{fill}#{s} - #{u}")
+          call_digraph_listeners(:payload, "#{fill}#{s} - #{u}")
         end
       end
       true
@@ -257,7 +257,7 @@ module Skylab::CssConvert
       _basename = "#{test.name}-#{test.value}"
       fixture_path = FIXTURES_DIR.join(_basename).relative_path_from(_pwd)
       _try = "#{program_name} #{fixture_path}"
-      emit(:info, "#{em 'try running this:'} #{_try}")
+      call_digraph_listeners(:info, "#{em 'try running this:'} #{_try}")
     end
 
     def test name=nil
@@ -267,10 +267,10 @@ module Skylab::CssConvert
       end
       if ! name or list.length > 1
         fmt = '  %16s  -  %s'
-        (list || VISUAL_TESTS).each {|o|emit(:payload, fmt % o.values_at(0..1))}
+        (list || VISUAL_TESTS).each {|o|call_digraph_listeners(:payload, fmt % o.values_at(0..1))}
       elsif list.empty?
-        emit :error, "no such test #{name.inspect}"
-        emit :info, invite_line
+        call_digraph_listeners :error, "no such test #{name.inspect}"
+        call_digraph_listeners :info, invite_line
       else
         test = list.first
         send test.method, test

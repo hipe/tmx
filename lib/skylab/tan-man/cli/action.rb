@@ -73,7 +73,7 @@ module Skylab::TanMan
 
     event_factory CLI::Event::Factory
 
-    emits event_structure: :all
+    listeners_digraph event_structure: :all
 
     empty_array = [ ].freeze
 

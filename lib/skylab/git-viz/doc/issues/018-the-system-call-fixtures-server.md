@@ -83,7 +83,7 @@ and a fatal error is issued. if the manifest does not yet know what the
 exitstatus will be from a command (which is half the reason we are
 constructing this castle), the manifest may provide the question-mark ("?")
 character as the value in the exitstatus field: during the "performance" the
-system agent is then expected to emit whatever the actual exitstatus integer
+system agent is then expected to call_digraph_listeners whatever the actual exitstatus integer
 was from the system call (as a readable string) in an info statement.
 
 the following strings will all be treated as "question marks:" "?", "???",

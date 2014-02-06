@@ -99,16 +99,16 @@ module Skylab::Porcelain::Bleeding
 
     alias_method :builder, :_klass  # gets overridden a lot here
 
-    def emit *a
+    def call_digraph_listeners *a
       if parent
-        parent.send :emit, *a
+        parent.send :call_digraph_listeners, *a
       else
         fail "sanity - where is parent of this #{ self.class }?"
       end
     end
 
     def help o={}
-      emit(:help, o[:message]) if o[:message]
+      call_digraph_listeners(:help, o[:message]) if o[:message]
       if o[:invite_only] then help_invite(o) ; return nil end
       help_usage o
       help_desc if o[:full]
@@ -120,24 +120,24 @@ module Skylab::Porcelain::Bleeding
     def help_desc
       case desc.size
       when 0 ;
-      when 1 ; emit(:help, "#{hdr 'description:'} #{desc.first}")
-      else   ; emit(:help, "#{hdr 'description:'}") ; desc.each { |s| emit(:help, s) }
+      when 1 ; call_digraph_listeners(:help, "#{hdr 'description:'} #{desc.first}")
+      else   ; call_digraph_listeners(:help, "#{hdr 'description:'}") ; desc.each { |s| call_digraph_listeners(:help, s) }
       end if desc
     end
 
     def help_invite o={}
-      emit(:help, "try #{pre "#{program_name} -h"}#{o[:for] || ' for help'}") unless o[:full]
+      call_digraph_listeners(:help, "try #{pre "#{program_name} -h"}#{o[:for] || ' for help'}") unless o[:full]
     end
 
     def help_list
       if option_syntax.any?
-        option_syntax.help -> line { emit :help, line }
+        option_syntax.help -> line { call_digraph_listeners :help, line }
       end
       nil
     end
 
     def help_usage o
-      emit :help, "#{ hdr 'usage:' } #{ program_name } #{ syntax }".strip
+      call_digraph_listeners :help, "#{ hdr 'usage:' } #{ program_name } #{ syntax }".strip
     end
 
     def option_syntax
@@ -161,11 +161,11 @@ module Skylab::Porcelain::Bleeding
         args = [] # the arguments that are actually passed to the method call
         r = option_syntax.parse( argv, args,
           ->   { help full: true       ; nil   }, # nil = no more help
-          -> e { emit :syntax_error, e ; false }  # false = yes more help
+          -> e { call_digraph_listeners :syntax_error, e ; false }  # false = yes more help
         )
         r or break
         r = argument_syntax.parse( argv, args,
-          -> msg, * { emit :syntax_error, msg ; false }
+          -> msg, * { call_digraph_listeners :syntax_error, msg ; false }
         )
         r or break
         r = [ bound_invocation_method, args ]
@@ -342,7 +342,7 @@ module Skylab::Porcelain::Bleeding
       res
     end
 
-    Find = Callback::Emitter.new ambiguous: :error,
+    Find = Callback::Digraph.new ambiguous: :error,
       not_found: :error, not_provided: :error
 
     Find.event_factory -> _, __, x { x }  # "datapoint" - events are just the data
@@ -354,7 +354,7 @@ module Skylab::Porcelain::Bleeding
       begin
         e = Find.new error
         if ! token
-          e.emit :not_provided, "expecting #{ syntax }"
+          e.call_digraph_listeners :not_provided, "expecting #{ syntax }"
           break( res = false )
         end
         builder = nil ; found = [] ; rx = /^#{ ::Regexp.escape token }/
@@ -372,10 +372,10 @@ module Skylab::Porcelain::Bleeding
         end
         res and break             # and so on
         case found.length
-        when 0 ; e.emit :not_found, "invalid action #{ token.inspect }. #{
+        when 0 ; e.call_digraph_listeners :not_found, "invalid action #{ token.inspect }. #{
                    }expecting #{ syntax }"
         when 1 ; res = builder # fuzzy match, found 1 match
-        else   ; e.emit :ambiguous, "ambiguous action #{ token.inspect }. #{
+        else   ; e.call_digraph_listeners :ambiguous, "ambiguous action #{ token.inspect }. #{
                    }did you mean #{ or_ found.map { |n| "#{ pre n }" } }?"
         end
       end while nil
@@ -393,7 +393,7 @@ module Skylab::Porcelain::Bleeding
     def help_invite o=nil
       a, b = if (o && o[:full]) then ['<action>',   " on a particular action."]
                                 else ['[<action>]'] end
-      emit :help, "try #{pre "#{program_name} #{a} -h"} for help#{b}"
+      call_digraph_listeners :help, "try #{pre "#{program_name} #{a} -h"} for help#{b}"
     end
 
     def help_list
@@ -401,19 +401,19 @@ module Skylab::Porcelain::Bleeding
         rows << [ help.aliases.first, ( help.summary_lines || [] ) ]
         rows
       end
-      emit :help, (tbl.length.zero? ? "(no actions)" : "#{hdr 'actions:'}")
+      call_digraph_listeners :help, (tbl.length.zero? ? "(no actions)" : "#{hdr 'actions:'}")
       width = tbl.reduce(0) { |m, o| o[0].length > m ? o[0].length : m }
       fmt = "  #{em "%#{width}s"}  %s"
       fmt2 = "  #{' ' * width}  %s"
       tbl.each do |row|
-        emit :help, (fmt % [row[0], row[1][0]])
-        row[1].size > 1 and row[1][1..1].each { |s| emit(:help, fmt2 % [s]) }
+        call_digraph_listeners :help, (fmt % [row[0], row[1][0]])
+        row[1].size > 1 and row[1][1..1].each { |s| call_digraph_listeners(:help, fmt2 % [s]) }
       end
     end
 
     def help_usage o
       syntax = (false == o[:syntax]) ? '<action>' : self.syntax
-      emit :help, "#{hdr 'usage:'} #{program_name} #{syntax} [opts] [args]"
+      call_digraph_listeners :help, "#{hdr 'usage:'} #{program_name} #{syntax} [opts] [args]"
     end
 
     def resolve argv # mutates argv .. here is the secret to our tail call rec.
@@ -783,7 +783,7 @@ module Skylab::Porcelain::Bleeding
     end
 
     def initialize parent, reflector, _obj=nil
-      if ! parent.singleton_class.method_defined? :emit
+      if ! parent.singleton_class.method_defined? :call_digraph_listeners
         fail "sanity - is parent not an emitter?"
       end
       self.parent = parent
@@ -869,7 +869,7 @@ module Skylab::Porcelain::Bleeding
       begin
         if token
           b = parent.fetch_builder token do |e|
-            emit :error, e
+            call_digraph_listeners :error, e
             result = false
             nil # set b!
           end
@@ -892,7 +892,7 @@ module Skylab::Porcelain::Bleeding
       result
 #     which do you prefer, above or below? #eye-blood
 #     token or return @parent.help(full: true)
-#     o = (b = @parent.fetch_builder(token) { |e| return emit(:error, e.message) }).respond_to?(:build) ? b.build(@parent) : b.new
+#     o = (b = @parent.fetch_builder(token) { |e| return call_digraph_listeners(:error, e.message) }).respond_to?(:build) ? b.build(@parent) : b.new
 #     (o.respond_to?(:help) ? o : DocumentorInferred.new(@parent, b)).help(full: true) # 'o' gets thrown away sometimes
     end
 

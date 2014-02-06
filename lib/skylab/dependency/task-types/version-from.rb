@@ -9,7 +9,7 @@ module Skylab::Dependency
     attribute :show_version, :from_context => true, :boolean => true
     attribute :version_from, :required => true
 
-    emits :all, :info => :all, :payload => :all
+    listeners_digraph  :all, :info => :all, :payload => :all
 
 
     rx_rx = %r{\A/(.+)/([a-z]*)\z}
@@ -39,11 +39,11 @@ module Skylab::Dependency
       version_range = build_version_range
       version_string = get_version_string
       if version_range.match(version_string)
-        emit :info, "#{hi 'version ok'}: version #{version_string} " <<
+        call_digraph_listeners :info, "#{hi 'version ok'}: version #{version_string} " <<
           "is in range #{version_range}"
         true
       else
-        emit :info, "#{no 'version mismatch'}: needed #{version_range} " <<
+        call_digraph_listeners :info, "#{no 'version mismatch'}: needed #{version_range} " <<
           "had #{version_string}"
         false
       end
@@ -82,7 +82,7 @@ module Skylab::Dependency
     def _show_version
       version, used_regex = parse_version_string
       (used_regex ? [version] : version.split("\n")).each do |line|
-        emit :payload, "#{hi 'version:'} #{line}"
+        call_digraph_listeners :payload, "#{hi 'version:'} #{line}"
       end
       true
     end

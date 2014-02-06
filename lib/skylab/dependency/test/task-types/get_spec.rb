@@ -42,7 +42,7 @@ module Skylab::Dependency::TestSupport::Tasks
       end
       context "that does not exit" do
         let(:uri) { "not/there.txt" }
-        it "should emit error, return false, but not raise" do
+        it "should call_digraph_listeners error, return false, but not raise" do
           r = subject.invoke(context)
           fingers[:error].grep(/file not found/i).length.should be > 0
           r.should eql(false)

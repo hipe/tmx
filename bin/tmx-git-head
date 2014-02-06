@@ -299,16 +299,16 @@ class Skylab::Git::API::Actions::Head
       end
       # ~
       def emit_output_string s
-        @listener.call :output, :string do s end
+        @listener.call_any_listener :output, :string do s end
       end
       def emit_error_string s
-        @listener.call :error, :string do s end
+        @listener.call_any_listener :error, :string do s end
       end
       def emit_info_string s
-        @listener.call :info, :string do s end
+        @listener.call_any_listener :info, :string do s end
       end
       def emit_detail_string s
-        @listener.call :detail, :string do s end
+        @listener.call_any_listener :detail, :string do s end
       end
     end
 

@@ -2,12 +2,12 @@ module Skylab::TMX::Modules::Bleed::API
 
   class Actions::Unbleed < Action
 
-    emits :bash, :error, :notice
+    listeners_digraph :bash, :error, :notice
 
     def invoke
       res = nil
       error = -> msg do
-        emit :bash, "echo #{ msg.inspect } ;"  # dodgy
+        call_digraph_listeners :bash, "echo #{ msg.inspect } ;"  # dodgy
         self.error msg
         false
       end
@@ -18,8 +18,8 @@ module Skylab::TMX::Modules::Bleed::API
         p = ::Pathname.new( p ).expand_path.join( 'bin' ).to_s
         i = a.index( p ) or break error[ "PATH does not include path - #{ p }"]
         b = [ * a[ 0 ... i ], * a[ i + 1 .. -1 ] ]  # (paranoid compact)
-        emit :bash, "export PATH=\"#{ b * ':' }\" ;"
-        emit :bash, "echo \"removed from head of PATH - #{ p }\" ;"
+        call_digraph_listeners :bash, "export PATH=\"#{ b * ':' }\" ;"
+        call_digraph_listeners :bash, "echo \"removed from head of PATH - #{ p }\" ;"
         res = true
       end while nil
       res

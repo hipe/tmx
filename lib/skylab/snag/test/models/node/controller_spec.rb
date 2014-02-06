@@ -48,7 +48,7 @@ module Skylab::Snag::TestSupport::Models::Node
 
 
     class Controller_RC_Mock
-      def emit name, pay
+      def call_digraph_listeners name, pay
         Stderr_[].puts "WAT: #{ [name, pay].inspect }"
       end
     end

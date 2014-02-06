@@ -6,7 +6,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
   ::Skylab::Porcelain::TestSupport[ Bleeding_TestSupport = self ] # #regret
 
   module CONSTANTS
-    PubSub_TestSupport = Callback::TestSupport
+    Callback_TestSupport_ = Callback::TestSupport
   end
 
   include CONSTANTS
@@ -30,7 +30,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
         send accessor # #kick #refactor
         box = send box_const
         ns = Bleeding::Namespace::Inferred.new box # #app-refactor
-        live = ns.build PubSub_TestSupport::Emit_Spy.new.debug! # #app-refactor
+        live = ns.build Callback_TestSupport_::Call_Digraph_Listeners_Spy.new.debug! # #app-refactor
         kls = live.fetch action_token
         once = -> { kls }
         kls
@@ -67,7 +67,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
 
     def emit_spy
       @emit_spy ||= begin
-        es = PubSub_TestSupport::Emit_Spy.new
+        es = Callback_TestSupport_::Call_Digraph_Listeners_Spy.new
         es.do_debug_proc = -> { do_debug }
         es
       end

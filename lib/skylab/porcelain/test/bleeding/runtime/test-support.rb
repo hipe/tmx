@@ -18,7 +18,7 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
     end
 
     let :parent_client do
-      o = PubSub_TestSupport::Emit_Spy.new
+      o = Callback_TestSupport_::Call_Digraph_Listeners_Spy.new
       o.do_debug_proc = -> { debug }
       o
     end
@@ -80,7 +80,7 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
     let :subject do
       # frame itself is memoized with the closure hack
       frame.result # trigger it, possibly re-accessing a self-memoized value
-      frame.parent_client.emission_a # from the Emit_Spy
+      frame.parent_client.emission_a # from the Call_Digraph_Listeners_Spy
     end
   end
 end

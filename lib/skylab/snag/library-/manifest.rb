@@ -54,7 +54,7 @@ module Skylab::Snag
 
       # using a hacky regex, scan all msgs emitted by the file utils client
       # and with any string that looks like an aboslute path run it through
-      # `escape_path_p` proc (*of the modality client*, e.g). in turn, emit
+      # `escape_path_p` proc (*of the modality client*, e.g). in turn, call_digraph_listeners
       # these messages as info to `info_p`, presumably to the same modality
       # client. This hack grants us the novelty of letting FileUtils render
       # its own messages (which it does heartily) while attempting possibly

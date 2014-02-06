@@ -4,7 +4,7 @@ module Skylab::Permute
   end
 
   class API::Action
-    Callback[ self, :employ_DSL_for_emitter ]
+    Callback[ self, :employ_DSL_for_digraph_emitter ]
     event_factory -> _, __, x=nil { x } # "datapoints" - events are just the data
   end
 
@@ -28,21 +28,21 @@ module Skylab::Permute
 
   class API::Actions::Generate < API::Action
 
-    emits :header, :row, :finished
+    listeners_digraph  :header, :row, :finished
 
     def execute
 
-      emit :header, ( @enum_a.map do |e|
+      call_digraph_listeners :header, ( @enum_a.map do |e|
         [ e.local_normal_name, e.label ]
       end )
 
       if @enum_a.length.nonzero?
         Permuterator.new( @enum_a ).each do |row|
-          emit :row, row
+          call_digraph_listeners :row, row
         end
       end
 
-      emit :finished
+      call_digraph_listeners :finished
     end
 
     attr_reader :enum_a

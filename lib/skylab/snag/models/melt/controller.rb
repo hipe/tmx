@@ -77,7 +77,7 @@ module Skylab::Snag
           a.on_new_node { |n| new_node = n }
           a.on_info method( :info )
           a.on_raw_info -> txt do
-            @request_client.send :emit, :raw_info, txt
+            @request_client.send :call_digraph_listeners, :raw_info, txt
           end
           a.on_error method( :error )
         end

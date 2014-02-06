@@ -5,7 +5,7 @@ module Skylab::Dependency
     attribute :tarball_to, :required => true
 
     attribute :get, :required => false # actually see if we can ..
-    emits :all, :shell => :all, :info => :all, :error => :all
+    listeners_digraph  :all, :shell => :all, :info => :all, :error => :all
 
     module CONSTANTS
       TARBALL_EXT = /\.tar\.(?:gz|bz2)|\.tgz/ # #bound

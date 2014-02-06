@@ -8,7 +8,7 @@ module Skylab::Snag
     attribute      :paths, required: true, default: ['.']  # not really..
     attribute    :pattern, default: Snag::Models::Pattern.default
 
-    emits            info: :lingual,
+    listeners_digraph  info: :lingual,
                  raw_info: :datapoint,
                   payload: :datapoint
 

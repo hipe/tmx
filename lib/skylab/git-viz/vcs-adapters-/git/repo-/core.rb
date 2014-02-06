@@ -75,7 +75,7 @@ module Skylab::GitViz
         TOP__ = '/'.freeze
       private
         def when_did_fail
-          @listener.call :repo_root_not_found, :error, :string do
+          @listener.call_any_listener :repo_root_not_found, :error, :string do
             say_didnt_find_repo_implementation_dir
           end
           DESIST_

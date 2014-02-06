@@ -10,7 +10,7 @@ module Skylab::FlattenFiles
     include ::FileUtils::Verbose
   private
     def error msg
-      emit(:error, msg)
+      call_digraph_listeners(:error, msg)
       false
     end
     def invoke
@@ -51,7 +51,7 @@ module Skylab::FlattenFiles
     end
     private
     def info msg
-      emit(:info, "(#{program_name} #{msg})")
+      call_digraph_listeners(:info, "(#{program_name} #{msg})")
       true
     end
     def initialize
@@ -60,7 +60,7 @@ module Skylab::FlattenFiles
       @fileutils_label = "#{program_name}: "
       @option_parser = nil
     end
-    def emit(type, data) ; errstream.puts(data) end
+    def call_digraph_listeners(type, data) ; errstream.puts(data) end
     attr_reader :errstream
     def option_parser
       @option_parser ||= begin
@@ -94,9 +94,9 @@ module Skylab::FlattenFiles
       (@program_name ||=nil) || ::File.basename($0, '.*')
     end
     def usage msg=nil
-      emit(:info, msg) if msg
-      emit(:info, usage_line)
-      emit(:info, "try #{program_name} -h for more help")
+      call_digraph_listeners(:info, msg) if msg
+      call_digraph_listeners(:info, usage_line)
+      call_digraph_listeners(:info, "try #{program_name} -h for more help")
       false
     end
     def usage_line

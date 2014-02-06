@@ -319,12 +319,12 @@ module Skylab::GitViz
       end
       def when_2_fields
         chan_i = @a_.first.intern ; x = @a_.last
-        @listener.call chan_i, :string do x end ; nil
+        @listener.call_any_listener chan_i, :string do x end ; nil
       end
       def when_many_fields
         chan_i = @a_.shift.intern ; shape_i = @a_.shift.intern
         form_i = @a_.shift.intern ; rest_a = @a_ ; @a_ = nil
-        @listener.call chan_i, shape_i, form_i do rest_a end ; nil
+        @listener.call_any_listener chan_i, shape_i, form_i do rest_a end ; nil
       end
       def flush
         case @rc_a.length <=> 1
@@ -354,7 +354,7 @@ module Skylab::GitViz
         @rc_a.detect( & :nonzero? ) or self.___logic_error___
       end
       def emit_debug_string & p
-        @listener.call :debug, :string, & p ; nil
+        @listener.call_any_listener :debug, :string, & p ; nil
       end
     end
 

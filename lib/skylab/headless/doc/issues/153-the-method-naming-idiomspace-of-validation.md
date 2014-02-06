@@ -57,7 +57,7 @@ is not a good general solution for several reasons:
 
 • for three, a normalization operation is rarely useful without an event model
   that it rests on top of. both when mutation occurs, or an unresolvable
-  validation error occurs, it is so undersirable as to be useless not to emit
+  validation error occurs, it is so undersirable as to be useless not to call_digraph_listeners
   this information in some kind of event behavior; and the method shape of
   topic does not self-document what the event substrate is, if one even
   exists.
@@ -99,7 +99,7 @@ these issues.
 
     2) in the case of the "validate" call that results in false-ish (that is,
     the business data was invalid), this method call *must* effect behavior
-    accordingly (i.e emit any output event structures for e.g). if you want
+    accordingly (i.e call_digraph_listeners any output event structures for e.g). if you want
     to write a validate method that has no side-effects, then you do not want
     a "validate" method but rather, see the next bullet.
 
@@ -107,7 +107,7 @@ these issues.
   of the business data (that is for "normalize"), then it necessarily follows
   that two calls to the "validate" method must effect the same behavior: that
   is, that if the field or object is invalid, that these two calls in a row
-  must e.g emit the exact same events. bullets below will discuss this.
+  must e.g call_digraph_listeners the exact same events. bullets below will discuss this.
 
 • if you want something like a "validate" method that has no behavioral
   (or otherwise) side-effects, then you must not name your method with
@@ -119,7 +119,7 @@ these issues.
 • if you want something like a "validate" method that only emits events once
   and does not repeat itself, then you need something like a state machine,
   or better yet a dedicated builder class whose only job is to build a
-  a valid object or emit events as appropriate.
+  a valid object or call_digraph_listeners events as appropriate.
 
 
 

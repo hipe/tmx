@@ -96,7 +96,7 @@ module Skylab::GitViz
       def unexpected_errput line_s
         begin
           line_s.chomp!
-          @listener.call :unexpected_stderr, :line do line_s end
+          @listener.call_any_listener :unexpected_stderr, :line do line_s end
           line_s = @e.gets
         end while line_s
         INTERRUPT__
@@ -105,7 +105,7 @@ module Skylab::GitViz
       def expect_zero_exitstatus
         d = @w.value.exitstatus
         if d.nonzero?
-          @listener.call :unexpected, :exitstatus do d end
+          @listener.call_any_listener :unexpected, :exitstatus do d end
         end
       end
 
@@ -150,7 +150,7 @@ module Skylab::GitViz
 
       def prepare_exec_when_enonent e
         emit_command_and_command_options
-        @listener.call :cannot_execute_command, :string do
+        @listener.call_any_listener :cannot_execute_command, :string do
           e.message
         end
         INTERRUPT__
@@ -162,7 +162,7 @@ module Skylab::GitViz
           PROCEDE__
         else
           emit_command_and_command_options
-          @listener.call :cannot_execute_command, :string do
+          @listener.call_any_listener :cannot_execute_command, :string do
             say_wrong_ftype
           end
           INTERRUPT__
@@ -181,7 +181,7 @@ module Skylab::GitViz
       end
 
       def emit_command_and_command_options
-        @listener.call :next_system, :command do
+        @listener.call_any_listener :next_system, :command do
           Command__.new @cmd_s_a, @cmd_opt_h
         end ; nil
       end

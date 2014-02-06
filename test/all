@@ -254,8 +254,8 @@ module Skylab::Test
 
     def initialize _, sout, serr
       super( )
-      @emit = -> type, str do
-        ( :payload == type  ? sout : serr ).puts str
+      @emit_to_channel_line_p = -> chan_i, line do
+        ( :payload == chan_i ? sout : serr ).puts line
       end
       @paystream, @infostream = sout, serr
       @info_y = ::Enumerator::Yielder.new( & @infostream.method( :puts ) )
@@ -327,18 +327,18 @@ module Skylab::Test
     end
 
     def usage msg
-      emit :error, msg
+      emit_to_channel_line :error, msg
       info usage_line
       info "See #{ em "#{ program_name } -h" } for more help."
       false
     end
 
-    def emit type, data
-      @emit[ type, data ]
+    def emit_to_channel_line type, data
+      @emit_to_channel_line_p[ type, data ]
     end
 
     def info msg
-      emit :info, msg
+      emit_to_channel_line :info, msg
       nil
     end
 

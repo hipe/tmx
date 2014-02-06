@@ -19,7 +19,7 @@ hard work is done by zeromq which makes this a sheer joy to work with.
 because this node acts as a little middleware that lets shell scripts talk
 to our server, our responses from this script are designed to be something
 that is easily read by those scripts. so our responses from this node look
-like this (get ready): we emit to stdout a sequence of tab-delimited lines
+like this (get ready): we call_digraph_listeners to stdout a sequence of tab-delimited lines
 representing the manifest entries filtered by the options provided in ARGV.
 
 make no mistake, the nodes of our n-tiered, distributed architecture
@@ -71,7 +71,7 @@ is a string with an unstyled, human-readable, screen printable message.
 as for the "payload" statement, such a row may consist of something like
 seven fields: 1) the channel name (again, the first field is always this),
 2) the string "command" (this is a "shape specification" to future-proof
-ourselves, to allow ourselves to emit polymorphic shapes of payload alongside
+ourselves, to allow ourselves to call_digraph_listeners polymorphic shapes of payload alongside
 each other other than just commands in the future. but for the present
 way may be able to just ignore this field.)
 
@@ -80,9 +80,9 @@ elements of the command as reported to us from the manifest server.
 what those fields are is explained in [#018]:#the-fields-of-a-record-command.
 
 
-### we don't emit to stderr because:
+### we don't call_digraph_listeners to stderr because:
 
-we do not ever emit to stderr from this node because to capture both stdout
+we do not ever call_digraph_listeners to stderr from this node because to capture both stdout
 *and* stderr from a shell script, while certainly possible, would not be easy
 (if possible at all) while processing the output from this script in a
 streaming, line-by-line sort of way as we are doing. (note too that we will

@@ -11,7 +11,7 @@ module Skylab::Snag
     meta_attribute :default
     meta_attribute :required, default: false
 
-    Callback[ self, :employ_DSL_for_emitter ]  # put `emit` nearer on the chain than s.c above
+    Callback[ self, :employ_DSL_for_digraph_emitter ]  # put `call_digraph_listeners` nearer on the chain than s.c above
 
     event_factory MetaHell::FUN.memoize[ -> do
       Callback::Event::Factory::Isomorphic.new API::Events # oh boy .. use the
@@ -24,9 +24,9 @@ module Skylab::Snag
                             # we check for unhandled even streams, but we don't
                             # care about taxonomic streams like these.
 
-    emits error: :lingual   # probably every api action subclass should have it
-                            # in its graph that it emits this (and so it does)
-                            # because we emit errors in `absorb_param_h`
+    listeners_digraph  error: :lingual   # probably every api action subclass should have it
+                            # in its graph that it listeners_digraph  this (and so it does)
+                            # because we call_digraph_listeners errors in `absorb_param_h`
                             # which they all use (i think..)
 
     def self.attributes_or_params

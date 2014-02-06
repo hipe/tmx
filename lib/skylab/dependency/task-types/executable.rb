@@ -3,16 +3,16 @@ module Skylab::Dependency
     include Face::Open2
     attribute :executable, :required => true
 
-    emits :all, :info => :all
+    listeners_digraph  :all, :info => :all
 
     def execute context
       @context ||= (context[:args] || {})
       valid? or fail invalid_reason
       if '' == (path = open2("which #{executable}").strip)
-        emit(:info, "#{no 'not in PATH:'} #{executable}")
+        call_digraph_listeners(:info, "#{no 'not in PATH:'} #{executable}")
         false
       else
-        emit(:info, path)
+        call_digraph_listeners(:info, path)
         true
       end
     end

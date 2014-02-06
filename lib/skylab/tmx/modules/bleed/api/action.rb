@@ -2,7 +2,7 @@ module Skylab
 
   class TMX::Modules::Bleed::API::Action
 
-    Callback[ self, :employ_DSL_for_emitter ]
+    Callback[ self, :employ_DSL_for_digraph_emitter ]
 
     taxonomic_streams :all  # used for implementing borking on unhandled.
 
@@ -10,11 +10,13 @@ module Skylab
 
     # graph set by children
 
-    # `emits` - HACK: assumes your subclass calls `emits` only once
-    # write emitter methods only for those streams that you emit on.
+    def self.listeners_digraph( * )  # HACK: assumes your subclass calls this
+      # method only once. write emitter methods only for those streams that
+      # you call_digraph_listeners on.
 
-    def self.emits( * )
+
       super
+
 
       o = -> event_stream_name, method_body do
         if event_stream_graph.has? event_stream_name
@@ -24,17 +26,17 @@ module Skylab
       end
 
       o[ :info, -> message_string do
-        emit :info, message_string
+        call_digraph_listeners :info, message_string
         nil
       end ]
 
       o[ :notice, -> message_string do
-        emit :notice, message_string
+        call_digraph_listeners :notice, message_string
         nil
       end ]
 
       o[ :error, -> message_string do
-        emit :error, message_string
+        call_digraph_listeners :error, message_string
         false
       end ]
     end
@@ -106,11 +108,11 @@ module Skylab
       config.write do |w|
 
         w.on_before do |e|
-          emit :head, "config: #{ e.message }"
+          call_digraph_listeners :head, "config: #{ e.message }"
         end
 
         w.on_after do |e|
-          emit :tail, " .. done (wrote #{ e.bytes } bytes)"
+          call_digraph_listeners :tail, " .. done (wrote #{ e.bytes } bytes)"
         end
 
         w.on_error do |e|

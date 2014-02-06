@@ -24,7 +24,7 @@ module Skylab::Porcelain::TestSupport
     let(:instance) do
       kls = klass
       if MetaHell::FUN.module_defines_method_in_some_manner[
-          kls.singleton_class, :emits ]
+          kls.singleton_class, :listeners_digraph ]
         # test both ways of event wiring..
         inst = kls.new do |o|
           # (tombstone of a great [#bm-008] vector)
@@ -297,7 +297,7 @@ module Skylab::Porcelain::TestSupport
       let(:expecting_foo_bar) { /expecting \{(?:help\|)?foo\|bar\}/i }
       let(:klass) do
         Class.new.class_eval do
-          Callback[ self, :employ_DSL_for_emitter ]
+          Callback[ self, :employ_DSL_for_digraph_emitter ]
           event_class Callback::Event::Textual
           extend Porcelain::Legacy::DSL
           def foo ; end
@@ -454,10 +454,10 @@ module Skylab::Porcelain::TestSupport
             extend ::Skylab::Porcelain::Legacy::DSL
             class_eval(& o.body)
             def foo
-              emit(:info, "I am foo.")
+              call_digraph_listeners(:info, "I am foo.")
             end
             def bar
-              emit(:info, "I am bar.")
+              call_digraph_listeners(:info, "I am bar.")
             end
             self
           end
@@ -526,7 +526,7 @@ module Skylab::Porcelain::TestSupport
           extend Porcelain::Legacy::DSL
           namespace :more do
             def tingle
-              emit(:info, "yes sure tingle inline")
+              call_digraph_listeners(:info, "yes sure tingle inline")
               :yes_tingle
             end
           end
@@ -543,7 +543,7 @@ module Skylab::Porcelain::TestSupport
         Class.new.class_eval do
           extend Porcelain::Legacy::DSL
           def tingle
-            emit(:info, "yes sure tingle external")
+            call_digraph_listeners(:info, "yes sure tingle external")
             :yes_tingle
           end
           def initialize rc, as
@@ -678,7 +678,7 @@ module Skylab::Porcelain::TestSupport
         let(:body) do
           lambda do |_|
             def foo first
-              emit(:info, "i am foo with: #{first}.")
+              call_digraph_listeners(:info, "i am foo with: #{first}.")
               :ok_foo
             end
           end
@@ -704,7 +704,7 @@ module Skylab::Porcelain::TestSupport
         let(:body) do
           lambda do |_|
             def foo first, second=nil
-              emit(:info, "i am foo with: #{first}, #{second}.")
+              call_digraph_listeners(:info, "i am foo with: #{first}, #{second}.")
               :ok_foo
             end
           end

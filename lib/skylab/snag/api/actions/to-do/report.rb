@@ -14,7 +14,7 @@ module Skylab::Snag
                              default: Snag::Models::Pattern.default
     attribute :show_command_only
 
-    emits            info: :lingual,
+    listeners_digraph  info: :lingual,
                      todo: :datapoint,
                   command: :datapoint,  # only for `show_command_only`
              number_found: :datapoint
@@ -25,7 +25,7 @@ module Skylab::Snag
       ea = Snag::Models::ToDo::Enumerator.new @paths, @names, @pattern
       if @show_command_only
         ea.command.command -> cmd_str do
-          emit :command, cmd_str
+          call_digraph_listeners :command, cmd_str
           true
         end, -> err do
           error err
@@ -34,14 +34,14 @@ module Skylab::Snag
         ea.on_error method( :error )  # e.g unexpected output from `find`
         ea.on_command do |cmd|  # if strict event handling, we must.
           if @be_verbose
-            emit :command, cmd
+            call_digraph_listeners :command, cmd
           end
         end
         res = ea.each do |todo|
-          emit :todo, todo
+          call_digraph_listeners :todo, todo
         end
         if ea.seen_count
-          emit :number_found, ea.seen_count
+          call_digraph_listeners :number_found, ea.seen_count
         end
         res
       end

@@ -15,7 +15,7 @@ and semantically as a noun, etc.
 
 ## at the mouth of the river
 
-it is tempting to, at the modality client level, simply emit
+it is tempting to, at the modality client level, simply call_digraph_listeners
 whatever events you end with as events out to whoever is listening to
 you. The problem is that it is your job ultimately to decide how events
 turn into strings - f.w's and libraries will not (nor should they,
@@ -40,6 +40,6 @@ e.g more help.
 a call to e.g `execute` or `process` (even at the end)
 2) putting it at the mouth of the river, in the modality client, with
 no decoration is bad because you loose the context of the call. what is
-nice is to have the modality client actually render and emit the
+nice is to have the modality client actually render and call_digraph_listeners the
 invitation, but use e.g the modal action reference in its nerkage.
 this is how everyone can be happy.

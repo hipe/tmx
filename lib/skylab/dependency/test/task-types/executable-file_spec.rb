@@ -27,7 +27,7 @@ module Skylab::Dependency::TestSupport::Tasks
 
     context "when pointing to an executable file" do
       let(:executable_file) { `which ruby`.strip }
-      it "should emit a notice and return true" do
+      it "should call_digraph_listeners a notice and return true" do
         r = subject.invoke
         r.should eql(true)
         fingers[:info].last.should match(/executable: .*\/ruby/)
@@ -36,7 +36,7 @@ module Skylab::Dependency::TestSupport::Tasks
 
     context "when pointing to a file not found" do
       let(:executable_file) { BUILD_DIR.join('not-a-file').to_s }
-      it "should emit a notice and return false" do
+      it "should call_digraph_listeners a notice and return false" do
         r = subject.invoke
         fingers[:info].last.should match(/executable does not exist.*not-a-file/)
         r.should eql( false )
@@ -45,7 +45,7 @@ module Skylab::Dependency::TestSupport::Tasks
 
     context "when pointing to a found, not executable file" do
       let(:executable_file) { FIXTURES_DIR.join('some-file.txt') }
-      it "should emit a notice and return false" do
+      it "should call_digraph_listeners a notice and return false" do
         r = subject.invoke
         fingers[:info].last.should match(/exists but is not executable.*some-file/)
         r.should eql( false )

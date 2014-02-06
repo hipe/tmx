@@ -19,11 +19,11 @@ module Skylab::Headless::CLI::Table
     # to your call to Table.render (or you can manipualte it directly in
     # the block).
 
-    Callback[ self, :employ_DSL_for_emitter ]
+    Callback[ self, :employ_DSL_for_digraph_emitter ]
 
     event_factory -> { Callback::Event::Factory::Isomorphic.new Table::Events }
 
-    emits row: :text,  # (contrast with `textual`, `on_text` reads better)
+    listeners_digraph  row: :text,  # (contrast with `textual`, `on_text` reads better)
          info: :text,  # (:info is strictly a branch not a leaf)
         empty: :info,
     row_count: :datapoint
@@ -110,12 +110,12 @@ module Skylab::Headless::CLI::Table
   class Table::Engine < Table::Conduit
 
     def render
-      emit :row_count, @row_a.length
+      call_digraph_listeners :row_count, @row_a.length
       if @row_a.length.zero?
-        emit :empty, '(empty)'
+        call_digraph_listeners :empty, '(empty)'
       else
         @row_a.each do |col_a|
-          emit :row, "#{ @head }#{
+          call_digraph_listeners :row, "#{ @head }#{
             }#{ @idx_a.map do |idx|
               @field_h.fetch( idx ).render col_a[idx]
             end.join @separator

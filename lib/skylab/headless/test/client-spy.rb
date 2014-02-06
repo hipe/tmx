@@ -2,7 +2,7 @@ module Skylab::Headless::TestSupport
 
   class Client_Spy  # go this away? [#144]
 
-    # use for emit-spy-style testing of application code (e.g controllers)
+    # use for call_digraph_listeners-spy-style testing of application code (e.g controllers)
     # in a *generic* (modality agnostic) way
 
     include CONSTANTS
@@ -27,7 +27,7 @@ module Skylab::Headless::TestSupport
     end
 
     def emit_help_line s
-      emit :help, s
+      call_digraph_listeners :help, s
     end
 
     def emit_info_line_p
@@ -35,7 +35,7 @@ module Skylab::Headless::TestSupport
     end
 
     def emit_info_line s
-      emit :info, s  # #todo:during-merge
+      call_digraph_listeners :info, s  # #todo:during-merge
     end
 
     def emission_a

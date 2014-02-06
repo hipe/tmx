@@ -13,7 +13,7 @@ module Skylab::TreetopTools
       if :initial == state        # if necessary, turn the `upstream` from a
         case upstream             # "pathspec" (::String or ::Pathname) into
         when ::String             # an open stream (!) setting @pathname, and
-          pn = ::Pathname.new upstream.to_s # emit appropriate errors if we
+          pn = ::Pathname.new upstream.to_s # call_digraph_listeners appropriate errors if we
         when ::Pathname           # cannot open the file.  This moves our state
           pn = upstream           # from :initial to :pathname
         else

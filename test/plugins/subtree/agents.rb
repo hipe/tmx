@@ -223,7 +223,7 @@ module Skylab::Test::Plugins::Subtree
 
     default_sort do |mtx, sp_a, info_y, fail_y|
       if @is_hot
-        mtx.is_held and fail "sanity - don't emit the event when is held."
+        mtx.is_held and fail "sanity - don't call_digraph_listeners the event when is held."
         mtx.try_hold '<whitelist>', -> { }, nil
         norm_a = @str_a.map( & :intern )  # we don't validate this as a
         # valid whitelist - that happens later.

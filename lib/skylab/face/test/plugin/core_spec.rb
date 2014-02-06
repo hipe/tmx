@@ -132,7 +132,7 @@ module Skylab::Face::TestSupport::Plugin
       end
     end
 
-    context "service - host - re-entrant" do
+    context "service - host - idempotent" do
       anchor -> do
         module M28
           class PH
@@ -589,7 +589,7 @@ module Skylab::Face::TestSupport::Plugin
 
     # --*--
 
-    context "eventpoint - host - declare, emit" do
+    context "eventpoint - host - declare, call_digraph_listeners" do
 
       anchor -> do
         module M2

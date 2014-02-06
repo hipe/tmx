@@ -104,7 +104,7 @@ module Skylab::GitViz
 
       def build_yielder_for * i_a
         ::Enumerator::Yielder.new do |x|
-          @listener.call( * i_a ) do x end
+          @listener.call_any_listener( * i_a ) do x end
         end
       end
 

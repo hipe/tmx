@@ -100,7 +100,7 @@ involves merely passing them through (delegator-style, hm..) to the client.
 # :#storypoint-7 placeholder
 
 
-# :#storypoint-8 these emit methods
+# :#storypoint-8 these call_digraph_listeners methods
 
 emitter methods at the top-client level merely write strings out to the
 appropriate stream. axes like "inner-string" are not a concern at this level.

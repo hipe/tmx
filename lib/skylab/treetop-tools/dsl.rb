@@ -128,7 +128,7 @@ module Skylab::TreetopTools
       Headless::CLI::IO.some_errstream_IO
     end
 
-    def emit type, payload
+    def call_digraph_listeners type, payload
       callbacks[ type ][ payload ]  # to be cute we did this a different way
     end
 

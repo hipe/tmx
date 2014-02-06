@@ -29,9 +29,9 @@ module Skylab::Snag
   private                         # (DSL happens at bottom half)
 
     # `initialize` - we are straddling two f.w's: all we want is our (modality)
-    # calls to to `emit` to "work". we follow the good standard of [#sl-114],
+    # calls to to `call_digraph_listeners` to "work". we follow the good standard of [#sl-114],
     # which among other things makes testing easier. Even though `legacy` gets
-    # priority on the chain, it won't overwrite the (io adapter-based) `emit`
+    # priority on the chain, it won't overwrite the (io adapter-based) `call_digraph_listeners`
     # we get from h.l, which is good.
 
     def initialize up, pay, info  # (only strictifies the signature)
@@ -124,7 +124,7 @@ module Skylab::Snag
       parts = action_sheet.full_name_proc.map :as_slug
       parts.unshift program_name
       parts << '-h'
-      emit :ui, "#{ kbd parts.join( ' ' ) } might have more information"
+      call_digraph_listeners :ui, "#{ kbd parts.join( ' ' ) } might have more information"
       nil  # SWALLOWED IT
     end
 
@@ -168,7 +168,7 @@ module Skylab::Snag
 
     # --*--
 
-    desc "emit all known issue numbers in descending order to stdout"
+    desc "call_digraph_listeners all known issue numbers in descending order to stdout"
     desc "one number per line, with any leading zeros per the file."
     desc "(more of a plumbing than porcelain feature!)"
 

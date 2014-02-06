@@ -97,7 +97,7 @@ module Skylab::Snag
     end
 
     def on_raw_info raw_info
-      @request_client.send :emit, :raw_info, raw_info  # #todo
+      @request_client.send :call_digraph_listeners, :raw_info, raw_info  # #todo
       nil
     end
   end

@@ -112,7 +112,7 @@ module Skylab::TestSupport
         end
 
         def bld_generic_listener_p
-          -> e do
+          Callback_::Listener::Proc_As_Listener.new do |e|
             if @vtuple[ e.volume ]
               @err.puts instance_exec( & e.message_proc )
               true
@@ -121,24 +121,16 @@ module Skylab::TestSupport
         end
       end
 
-      module Lib_
-        memo = -> p do
-          p_ = -> { x = p.call ; p_ = -> { x } ; x }
-          -> { p_.call }
-        end
-        subsys = -> i do
-          memo[ -> do
-            _slug = i.to_s.gsub( %r((?<=[a-z])(?=[A-Z])), '-' ).downcase
-            require "skylab/#{ _slug }/core"
-            ::Skylab.const_get i, false
-          end ]
-        end
-        Basic = subsys[ :Basic ]
-        Face = subsys[ :Face ]
-        Headless = subsys[ :Headless ]
-        Callback = subsys[ :Callback ]
+      module Lib_  # :+[#ss-001]
+
+        memo, sidesys = Callback_::Autoloader.
+          at :memoize, :build_require_sidesystem_proc
+
+        Basic = sidesys[ :Basic ]
+        Face = sidesys[ :Face ]
+        Headless = sidesys[ :Headless ]
         StringScanner = memo[ -> { require 'strscan' ; ::StringScanner } ]
-        SubTree = subsys[ :SubTree ]
+        SubTree = sidesys[ :SubTree ]
       end
 
       Expression_agent_class__ = -> do

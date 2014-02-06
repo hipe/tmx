@@ -100,7 +100,7 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime # #po-008
 
         class o::Actions::Pony::HelpLess < o::Action
           def process oingo=nil, boingo
-            emit :ze_payload,
+            call_digraph_listeners :ze_payload,
               "yerp-->#{ oingo.inspect }<-->#{ boingo.inspect }<--"
             :you_put_down_the_pony
           end
@@ -109,7 +109,7 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime # #po-008
         class o::Actions::Pony::Helpful < o::Action
           option_syntax.help!
           def process
-            emit :mein_payload, "yoip"
+            call_digraph_listeners :mein_payload, "yoip"
           end
         end
       end

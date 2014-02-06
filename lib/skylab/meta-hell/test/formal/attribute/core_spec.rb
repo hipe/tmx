@@ -153,7 +153,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Attribute
               if meta[:regex] =~ str
                 send(after, str)
               else
-                emit(:error, "#{str.inspect} did not match regex: /#{meta[:regex].source}/")
+                call_digraph_listeners(:error, "#{str.inspect} did not match regex: /#{meta[:regex].source}/")
                 str
               end
             end
@@ -176,8 +176,8 @@ module ::Skylab::MetaHell::TestSupport::Formal::Attribute
             @emit_spy = espy
           end
           attribute :first_name, :regex => /^[A-Z]/
-          def emit i, s
-            @emit_spy.emit i, s ; nil
+          def call_digraph_listeners i, s
+            @emit_spy.call_digraph_listeners i, s ; nil
           end
         end
       end
@@ -220,7 +220,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Attribute
       end
 
       def build_and_attach_to_emit_spy
-        es = MetaHell::Library_::Callback::TestSupport::Emit_Spy.new do |es_|
+        es = MetaHell::Library_::Callback::TestSupport::Call_Digraph_Listeners_Spy.new do |es_|
           es_.debug_IO = debug_IO
           es_.do_debug_proc = -> { do_debug }
         end

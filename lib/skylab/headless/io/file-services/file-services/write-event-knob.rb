@@ -5,7 +5,7 @@ module Skylab::CodeMolester
   module FileServices; end
   class FileServices::WriteEventKnob
     extend ::Skylab::Slake::Muxer
-    emits :all,
+    listeners_digraph  :all,
       :skipped             => :all,
       :failed              => :all,
       :contents_empty      => :skipped,
@@ -17,6 +17,6 @@ module Skylab::CodeMolester
       :rewrite_start       => :write_rewrite_start,
       :write_rewrite_end   => :all
 
-    alias_method :[], :emit
+    alias_method :[], :call_digraph_listeners
   end
 end

@@ -47,9 +47,9 @@ module Skylab::Permute
 
     extend Bleeding::Action
 
-    Callback[ self, :employ_DSL_for_emitter ]
+    Callback[ self, :employ_DSL_for_digraph_emitter ]
 
-    emits syntax_error: :info
+    listeners_digraph  syntax_error: :info
 
     event_factory -> _, __, x { x }  # "datapoints"
 
@@ -57,10 +57,10 @@ module Skylab::Permute
       act = new
       act.parent = runtime
       act.on_info do |e|
-        runtime.emit :info, e
+        runtime.call_digraph_listeners :info, e
       end
       act.on_payload do |e|
-        runtime.emit :payload, e
+        runtime.call_digraph_listeners :payload, e
       end
       act
     end
@@ -183,14 +183,14 @@ module Skylab::Permute
 
   class CLI::Actions::Ping < CLI::Action
 
-    emits :info, help: :info
+    listeners_digraph  :info, help: :info
 
     def on_payload
       # we don't actually, and we don't want to lie about it.
     end
 
     def process
-      emit :info, "hello from permute."
+      call_digraph_listeners :info, "hello from permute."
       :hello_from_permute
     end
   end
@@ -199,7 +199,7 @@ module Skylab::Permute
 
     desc "generate permutations."
 
-    emits :payload, :info, help: :info
+    listeners_digraph  :payload, :info, help: :info
 
     opt_syn = -> do  # hacklund
       op = HackParse.new
@@ -226,8 +226,8 @@ module Skylab::Permute
         end
         o.on_finished do
           Headless::CLI::Table.render row_a do |oo|
-            oo.on_info { |txt| emit :info, txt }
-            oo.on_row  { |txt| emit :payload, txt }
+            oo.on_info { |txt| call_digraph_listeners :info, txt }
+            oo.on_row  { |txt| call_digraph_listeners :payload, txt }
           end
         end
       end.execute

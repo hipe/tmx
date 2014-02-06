@@ -81,14 +81,14 @@ end
       request_client.send :actual_parameters
     end
 
-    def emit *a                   # (don't get into the habit of expecting
-      request_client.send :emit, *a # meaningful results from `emit` --
+    def call_digraph_listeners *a                   # (don't get into the habit of expecting
+      request_client.send :call_digraph_listeners, *a # meaningful results from `call_digraph_listeners` --
       nil                         # it's just never a good idea.  ever.)
     end
 
     def error s                   # be extra careful around methods that
       @error_count += 1           # affect or are expected to affect the
-      emit :error, s              # validity of your sub-client!
+      call_digraph_listeners :error, s              # validity of your sub-client!
       false                       # this implementation is the result of a
     end                           # "perfect abstraction" but may still cause
                                   # you pain if you're not careful.
@@ -108,7 +108,7 @@ end
     end
 
     def info x                    # provided as a convenience for this
-      emit :info, x               # extremely common implementation
+      call_digraph_listeners :info, x               # extremely common implementation
       nil                         # (note that `x` might be an `h`)
     end
 
@@ -117,8 +117,8 @@ end
     end
 
     def payload x                 # provided as a convenience for this common
-      emit :payload, x            # emitter "macro" -- not all sub-clients
-      nil                         # will necessarily emit this.
+      call_digraph_listeners :payload, x            # emitter "macro" -- not all sub-clients
+      nil                         # will necessarily call_digraph_listeners this.
     end
 
     def pen

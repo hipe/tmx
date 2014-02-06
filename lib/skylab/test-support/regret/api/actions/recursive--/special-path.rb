@@ -4,7 +4,7 @@ module Skylab::TestSupport::Regret::API
 
     class Special_Path
 
-      Lib_::Callback[]::Listener[ self,
+      Callback_::Listener[ self,
         :emission_matrix, %i( error ), %i( string ) ]
 
       module Hashtag_Bundles__

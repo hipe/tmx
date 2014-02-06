@@ -20,7 +20,7 @@ module Skylab::GitViz
       end ]
     end
 
-    purified_, stdlib_ = Autoloader_.at :require_subsystem, :require_stdlib
+    purified_, stdlib_ = Autoloader_.at :require_sidesystem, :require_stdlib
 
     purified = -> i do
       -> { purified_[ i ] }

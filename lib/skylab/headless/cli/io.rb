@@ -51,7 +51,7 @@ module Skylab::Headless
             [ @instream, @outstream, @errstream ]
           end
 
-          def emit type_i, msg
+          def call_digraph_listeners type_i, msg
             instance_variable_get(
               :payload == type_i ? :@outstream : :@errstream ).puts msg ; nil
           end

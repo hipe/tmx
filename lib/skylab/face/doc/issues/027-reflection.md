@@ -5,8 +5,8 @@ In this sense each facet in its relationship to each action is binary because
 we get either a `yes` or `no` for it.
 
 For example, by definition, any API action that is implemented via a simple
-Proc does not *have* the `emit` facet because by definition (and by design and
-de facto) such an API Action instance cannot emit any events, nor can one such
+Proc does not *have* the `call_digraph_listeners` facet because by definition (and by design and
+de facto) such an API Action instance cannot call_digraph_listeners any events, nor can one such
 API action (the formal one) declare that it emits any events. We could say
 that emits nothing but rather we want to conceptualize it as meaningless
 (or not..).

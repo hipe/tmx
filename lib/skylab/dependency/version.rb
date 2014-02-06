@@ -56,7 +56,7 @@ module Skylab::Dependency
     end
   end
 
-  Version::Parse = Callback::Emitter.new :informational, error: :informational
+  Version::Parse = Callback::Digraph.new :informational, error: :informational
 
   class Version::Parse
 

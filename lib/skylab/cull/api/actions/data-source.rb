@@ -10,7 +10,7 @@ module Skylab::Cull
 
     services :model, [ :pth, :ivar ]
 
-    emits :payload_line, couldnt: :entity_event
+    listeners_digraph :payload_line, couldnt: :entity_event
 
     def execute
       model( :data, :sources ).
@@ -33,7 +33,7 @@ module Skylab::Cull
 
     services :model, [ :pth, :ivar ]
 
-    emits  :before, :after, :all,
+    listeners_digraph :before, :after, :all,
       could: :entity_event, couldnt: :entity_event
 
     def execute

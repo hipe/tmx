@@ -251,7 +251,7 @@ for now we err on this side, because it's easy to make this behave the other
 way, but the reverse is not true.
 
 and in fact, the 'info' suite of methods would only exist as service methods
-(that is, part of our public API), since we would never ourselves emit 'info',
+(that is, part of our public API), since we would never ourselves call_digraph_listeners 'info',
 only 'help' or 'error'. this is likewise true of any 'payload' suite we might
 build into this. in fact this might be smell to even be considering, because
 while support for variegated, semantic event 'channels' is an auxilliary facet

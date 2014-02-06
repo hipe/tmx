@@ -11,7 +11,7 @@ module Skylab::Snag
     attribute    :dry_run
     attribute    :message, required: false
 
-    emits            info: :lingual,
+    listeners_digraph  info: :lingual,
                  new_node: :datapoint,
                  raw_info: :datapoint
 
@@ -26,7 +26,7 @@ module Skylab::Snag
           @dry_run,
           @be_verbose,
           -> n do
-            emit :new_node, n
+            call_digraph_listeners :new_node, n
           end
       end
     end
@@ -40,7 +40,7 @@ module Skylab::Snag
     attribute  :max_count
     attribute :query_sexp
 
-    emits           info: :lingual,
+    listeners_digraph  info: :lingual,
             invalid_node: :structural,
              output_line: :datapoint
 
@@ -68,7 +68,7 @@ module Skylab::Snag
         sexp ||= [ :valid ]
         found = nodes.find( @max_count, sexp ) or break( res = found )
         @lines = Snag::Library_::Yielder::Mono.new do |txt|
-          emit :output_line, txt
+          call_digraph_listeners :output_line, txt
           nil
         end
         @y = if @be_verbose
@@ -106,17 +106,17 @@ module Skylab::Snag
         if node.valid?
           @y << node
         else
-          emit :invalid_node, node.invalid_reason.to_hash
+          call_digraph_listeners :invalid_node, node.invalid_reason.to_hash
         end
       end
       ct = nodes.seen_count
       case ct
       when 0
-        emit :info, "found no nodes #{ nodes.search.phrasal_noun_modifier }"
+        call_digraph_listeners :info, "found no nodes #{ nodes.search.phrasal_noun_modifier }"
       when 1
         # ok
       else
-        emit :info, "found #{ ct } nodes #{ nodes.search.phrasal_noun_modifier}"
+        call_digraph_listeners :info, "found #{ ct } nodes #{ nodes.search.phrasal_noun_modifier}"
       end
       nil
     end

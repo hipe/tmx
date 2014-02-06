@@ -4,10 +4,10 @@ require 'optparse'
 module Skylab
   class QuiltModified
     def description
-      emit(:help, "#{hdr 'description:'} reads a list of files from stdin, outputs a particular thing..")
+      call_digraph_listeners(:help, "#{hdr 'description:'} reads a list of files from stdin, outputs a particular thing..")
     end
     def usage
-      emit(:help, "#{hdr 'usage:'} #{pre "#{program_name} [opts] <file1> [<file2> [..]]"} " <<
+      call_digraph_listeners(:help, "#{hdr 'usage:'} #{pre "#{program_name} [opts] <file1> [<file2> [..]]"} " <<
            "OR  #{pre "git ls-files -m | #{program_name} [opts]"}")
     end
     def optparse
@@ -20,7 +20,7 @@ module Skylab
       parse(argv) or return
       lines.each do |line|
         "git diff #{line} > #{line.gsub('/', '__')}.patch".tap do |cmd|
-           emit(:out, cmd)
+           call_digraph_listeners(:out, cmd)
         end
       end
     end
@@ -47,9 +47,9 @@ module Skylab
     # below this line are candidates
 
     def info msg
-      emit :info, msg
+      call_digraph_listeners :info, msg
     end
-    def emit type, msg
+    def call_digraph_listeners type, msg
       _IO[ :out == type ? :outstream : :errstream  ].puts msg ; nil
     end
   private
@@ -67,7 +67,7 @@ module Skylab
     def help
       usage
       description
-      emit(:help, optparse.to_s)
+      call_digraph_listeners(:help, optparse.to_s)
       @done = true
     end
     def initialize
@@ -75,7 +75,7 @@ module Skylab
       @params = {}
     end
     def invite
-      emit(:help, "Use #{pre "#{program_name} -h"} for help.")
+      call_digraph_listeners(:help, "Use #{pre "#{program_name} -h"} for help.")
     end
     def parse argv
       begin
@@ -90,7 +90,7 @@ module Skylab
       File.basename($PROGRAM_NAME)
     end
     def usage_error msg=nil
-      emit(:help, "#{program_name}: #{msg}") if msg
+      call_digraph_listeners(:help, "#{program_name}: #{msg}") if msg
       usage
       invite
       false

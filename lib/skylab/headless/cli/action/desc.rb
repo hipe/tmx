@@ -110,7 +110,7 @@ module Skylab::Headless
         section: -> { push[] ; section.header = line },
         normal:  -> {          section.lines << [ :line, line ] },
         item:    -> {          section.lines << [ :item, * $~.captures[1..-1]]
-                               state_h[:subitem].rx =  # *NOTE* not reentrant
+                               state_h[:subitem].rx =  # *NOTE* not #idempotent
                                  item_rx_h[ $~[:ind].length + 1 ] },
         subitem: -> {          section.lines << [ :item, nil, $~[1] ] }
       }

@@ -89,7 +89,7 @@ module Skylab::TMX
 
     def handle o, *event_a
       event_a.each do |event_stream_name|
-        if ! o.emits? event_stream_name
+        if ! o.callback_digraph_has? event_stream_name
           raise "#{ event_stream_name.inspect } is not emitted by #{ o.class }"
         else
           o.on event_stream_name, method( "handle_#{ event_stream_name }" )

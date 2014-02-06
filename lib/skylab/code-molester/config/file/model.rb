@@ -7,8 +7,8 @@ module Skylab::CodeMolester
       # (while [#ps-101] (cover [cb] digraph viz) is open..) (multiple graphs
       # in one file, specifically)
 
-      Callback[ self, :employ_DSL_for_emitter ]
-      emits wizzle: :paazle
+      Callback[ self, :employ_DSL_for_digraph_emitter ]
+      listeners_digraph wizzle: :paazle
     end
 
     def initialize * x_a
@@ -252,12 +252,12 @@ module Skylab::CodeMolester
       r
     end
 
-    Write__ = Callback::Emitter.new
+    Write__ = Callback::Digraph.new
     class Write__  # `write` is very evented [#006]
 
       taxonomic_streams :all, :structural, :text, :notice, :before, :after
 
-      emits error: [ :text, :all ],
+      listeners_digraph error: [ :text, :all ],
         notice: [ :text, :all ], before: :all, after: :all,
         before_update: [ :structural, :before, :notice ],
         after_update: [ :structural, :after, :notice ],
@@ -315,12 +315,12 @@ module Skylab::CodeMolester
     end
 
     def before_create w
-      w.emit :before_create, resource: self,
+      w.call_digraph_listeners :before_create, resource: self,
         message_proc: -> { "creating #{ w.escape_path[ @pathname ] }" } ; nil
     end
 
     def after_create w, bytes
-      w.emit :after_create, bytes: bytes, is_dry: w.is_dry_run,
+      w.call_digraph_listeners :after_create, bytes: bytes, is_dry: w.is_dry_run,
         message_proc: -> do
           "created #{ w.escape_path[ @pathname ] } (#{ bytes }#{
             }#{ " dry" if w.is_dry_run } bytes)"
@@ -345,16 +345,16 @@ module Skylab::CodeMolester
     end
 
     def update_when_no_change w
-      w.emit :no_change, "no change: #{ w.escape_path[ @pathname ] }" ; nil
+      w.call_digraph_listeners :no_change, "no change: #{ w.escape_path[ @pathname ] }" ; nil
     end
 
     def before_update w
-      w.emit :before_update, resource: self,
+      w.call_digraph_listeners :before_update, resource: self,
         message_proc: -> { "updating #{ w.escape_path[ @pathname ] }" } ; nil
     end
 
     def after_update w, bytes
-      w.emit :after_update, bytes: bytes, is_dry: w.is_dry_run,
+      w.call_digraph_listeners :after_update, bytes: bytes, is_dry: w.is_dry_run,
         message_proc: -> do
           "updated #{ w.escape_path[ @pathname ] } (#{ bytes }#{
             }#{ ' dry' if w.is_dry_run } bytes)"

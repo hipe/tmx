@@ -133,7 +133,7 @@ module Skylab::Headless
     protected
 
       def emit_help_line s  # #todo:during-merge, this was just to re-green tests
-        emit :help, s ; nil
+        call_digraph_listeners :help, s ; nil
       end
 
       def emit_error_line s
@@ -168,7 +168,7 @@ module Skylab::Headless
 
       def info msg  # barebones implementation as a convenience for this
         # shorthand commonly used in debugging and verbose modes
-        emit :info, msg ; nil  # #todo:after-mergge
+        call_digraph_listeners :info, msg ; nil  # #todo:after-mergge
       end
     end
 

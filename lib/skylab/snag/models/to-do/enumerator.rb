@@ -2,9 +2,9 @@ module Skylab::Snag
 
   class Models::ToDo::Enumerator < ::Enumerator
 
-    Callback[ self, :employ_DSL_for_emitter ]
+    Callback[ self, :employ_DSL_for_digraph_emitter ]
 
-    emits :error, :command
+    listeners_digraph :error, :command
 
     event_factory Snag::API::Events::Datapoint
 
@@ -29,11 +29,11 @@ module Skylab::Snag
       if all_required_events_are_handled
         res = true
         @seen_count = 0
-        err = -> e { emit :error, e ; res = false }
+        err = -> e { call_digraph_listeners :error, e ; res = false }
         @command.pattern -> p do
           @pattern = p
           @command.command -> cmd do
-            emit :command, cmd
+            call_digraph_listeners :command, cmd
             visit_valid y, cmd
           end, err
         end, err
@@ -47,7 +47,7 @@ module Skylab::Snag
         if a.include? :error
           raise ::RuntimeError, msg
         else
-          emit :error, msg
+          call_digraph_listeners :error, msg
         end
       end, -> do  # else
         true
@@ -64,7 +64,7 @@ module Skylab::Snag
         end
         serr.each_line do |line|
           res = false
-          emit :error, "(unexpected output: #{ line.chomp })"
+          call_digraph_listeners :error, "(unexpected output: #{ line.chomp })"
         end
       end
       res

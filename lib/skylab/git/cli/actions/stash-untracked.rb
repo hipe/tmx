@@ -10,7 +10,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
   module Sub_client__  # #storypoint-4 "the way sub-clients are used in t.."
 
-    def self.[] mod, * x_a  # re-entrant
+    def self.[] mod, * x_a  # #idempotent
       mod.send :include, Sub_client_universal_IMs__
       x_a.length.zero? and raise ::ArgumentError, "cherry-pick only."
       apply_iambic_on_client x_a, mod ; nil
@@ -266,15 +266,15 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     # emitters at the top-client level merely write..
 
     def emit_payload_line s
-      emit :payload, s
+      call_digraph_listeners :payload, s
     end
 
     def emit_error_line s
-      emit :_other_, s ; false
+      call_digraph_listeners :_other_, s ; false
     end
 
     def emit_info_line s
-      emit :_other_, s
+      call_digraph_listeners :_other_, s
     end
 
     # --*--
@@ -575,8 +575,8 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
         :hub_pathname, @hub.hub_pathname,
         :channel_string_listener_p, -> i, str do
           fail self.do_me
-          # define emit to sanitize paths from strings
-          emit i, str.gsub( RX__ ) { escape_path $~[ 0 ] }
+          # define call_digraph_listeners to sanitize paths from strings
+          call_digraph_listeners i, str.gsub( RX__ ) { escape_path $~[ 0 ] }
         end
     end
     RX__ = Headless::CLI::PathTools::FUN::ABSOLUTE_PATH_HACK_RX

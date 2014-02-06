@@ -2,7 +2,7 @@ module Skylab::Headless
 
   module Service_Terminal
 
-    to_proc = -> x_a do  # NOT re-entrant
+    to_proc = -> x_a do  # NOT #idempotent
       profile = Profile__.new
       if :intermediate == x_a[ 0 ]
         profile.is_intermediate = true ; x_a.shift

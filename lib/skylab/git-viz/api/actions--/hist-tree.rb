@@ -11,13 +11,13 @@ module Skylab::GitViz
       else mock_success ; end
     end
     def mock_not_found
-      @VCS_listener.call :cannot_execute_command, :string do
+      @VCS_listener.call_any_listener :cannot_execute_command, :string do
         'No such file or directory - /foo/zang'
       end
       false
     end
     def mock_is_file
-      @VCS_listener.call :cannot_execute_command, :string do
+      @VCS_listener.call_any_listener :cannot_execute_command, :string do
         'path is file, must have directory'
       end
       false

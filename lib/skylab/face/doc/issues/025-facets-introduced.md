@@ -36,7 +36,7 @@ the lifecyle of an API Action [#021]; that is, they intersect.
 If we had to come up with a comprehensive list right now of normalized facet
 names that we know about and plan on using, it would look like:
 
-  `emit`, `service`, `param`
+  `call_digraph_listeners`, `service`, `param`
 
 (but expect it to mutate and grow.)
 
@@ -45,7 +45,7 @@ note from the above list at least two things:
 1) each item in the above list correspond to one *transition* in the API
 Action lifecycle, namely:
 
-  `emit` corresponds to the `emits` DSL method that defines the event stream
+  `call_digraph_listeners` corresponds to the `listeners_digraph` DSL method that defines the event stream
     graph for the API action, and which when listened to brings the
     action into a `wired` state.
 
@@ -60,7 +60,7 @@ Action lifecycle, namely:
 2) each item in the above list corresponds to the relevant DSL method, where
 we use the verb stem form (or singular noun if you prefer) of the DSL method
 that is used invoke the facet enhancement [#026]; that is, the above
-correspond to the DSL methods `emits`, `params` and `services`. we
+correspond to the DSL methods `listeners_digraph`, `params` and `services`. we
 accidentally already demonstrated this in (1).
 
 ~

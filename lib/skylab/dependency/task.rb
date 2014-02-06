@@ -15,7 +15,7 @@ module Skylab::Dependency
     attr_accessor  :context
     attr_reader :invalid_reason
 
-    Callback[ self, :employ_DSL_for_emitter ]   # child classes decide what to emit
+    Callback[ self, :employ_DSL_for_digraph_emitter ]   # child classes decide what to call_digraph_listeners
 
     event_class Callback::Event::Textual  # can be made more complicated..
 

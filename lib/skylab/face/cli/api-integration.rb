@@ -52,7 +52,7 @@ module Skylab::Face
         a, h = parent_shell_module.api_stream_box
         action.with_specificity do
           a.each do |stream_i|
-            if action.emits? stream_i
+            if action.callback_digraph_has? stream_i
               action.on stream_i, parent_shell.method( h.fetch stream_i )
             end
           end

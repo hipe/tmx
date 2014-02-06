@@ -2,13 +2,11 @@ module Skylab::TestSupport
 
   class Servers::Static_File_Server
 
-    Callback = TestSupport_::Library_::Callback
+    Callback_[ self, :employ_DSL_for_digraph_emitter ]
 
-    Callback[ self, :employ_DSL_for_emitter ]
+    event_class Callback_::Event::Textual
 
-    event_class Callback::Event::Textual
-
-    emits info: :all, warn: :all, error: :all  # used internally
+    listeners_digraph info: :all, warn: :all, error: :all  # used internally
 
     include TestSupport_::Library_::FileUtils
 
@@ -50,24 +48,24 @@ module Skylab::TestSupport
       nil
     end
 
-    LEVELS_= Callback::Emitter::COMMON_LEVELS
+    LEVELS_= Callback_::Digraph::COMMON_LEVELS
 
     def render_event_as_line e
       ">>> (#{ moniker } #{ e.stream_name } - #{ e.text })"
     end
 
     def error msg
-      emit :error, msg
+      call_digraph_listeners :error, msg
       false
     end
 
     def warn msg
-      emit :warn, msg
+      call_digraph_listeners :warn, msg
       false
     end
 
     def info msg
-      emit :info, msg
+      call_digraph_listeners :info, msg
       nil
     end
 

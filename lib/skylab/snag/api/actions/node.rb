@@ -10,7 +10,7 @@ module Skylab::Snag
                  :dry_run,
                 :node_ref
 
-    emits            info: :lingual
+    listeners_digraph  info: :lingual
 
     def execute
       res = nil
@@ -35,7 +35,7 @@ module Skylab::Snag
                 :node_ref,
                 :tag_name
 
-    emits            info: :lingual
+    listeners_digraph  info: :lingual
 
     def execute
       res = nil
@@ -53,13 +53,13 @@ module Skylab::Snag
 
     params       :node_ref
 
-    emits            tags: :datapoint
+    listeners_digraph  tags: :datapoint
 
     def execute
       if nodes
         node = @nodes.fetch_node @node_ref
         if ! node then node else
-          emit :tags, Snag::Models::Tag::Events::Tags.new( node, node.tags )
+          call_digraph_listeners :tags, Snag::Models::Tag::Events::Tags.new( node, node.tags )
           true
         end
       end
@@ -73,7 +73,7 @@ module Skylab::Snag
                 :node_ref,
                 :tag_name
 
-    emits           info: :lingual,
+    listeners_digraph  info: :lingual,
                  payload: :datapoint
 
     def execute

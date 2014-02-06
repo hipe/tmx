@@ -49,7 +49,7 @@ or "any_") must be used to conveny that:
 
 calling such a method may effect arbitrary side-effects:
 
-  • it may emit events or otherwise effect behavioral side-effects, for e.g
+  • it may call_digraph_listeners events or otherwise effect behavioral side-effects, for e.g
     to indicate that the desired value or object could not be resolved.
   • these methods often but not always have some business objects or values
     that they were used to .. resolve. such values *must* be stored to ivars
@@ -60,7 +60,7 @@ calling such a method may effect arbitrary side-effects:
     or confirmation about an external state.
 
 it is for now undefined whether this method should be re-callable or
-re-entrant.
+idempotent.
 
 
 #### discussion
@@ -134,7 +134,7 @@ in some true-ish value.
 • the method body of such a method must not assign any resolved value to
   an ivar. the caller is free to do this as appropriate.
 
-• as to whether this method may emit behavior side-effects such as
+• as to whether this method may call_digraph_listeners behavior side-effects such as
   emitting events, see discussion below.
 
 the reason you would say "resolve_some_" and not "build_" is because maybe
@@ -166,7 +166,7 @@ call is its result value.
 
 • the method itself must not set any ivars (but its callees may).
 
-• as to whether this method may emit behavior side-effects such as
+• as to whether this method may call_digraph_listeners behavior side-effects such as
   emitting events, see discussion below.
 
 
@@ -191,7 +191,7 @@ methods are usually used rather than ideological design principles.)
 the short answer is "probably yes." because calling any form of a "resolve"
 method generally means you are doing some non-deterministic or (perhaps only
 slightly) non-trivial amount of work, then there is always a chance that you
-will want to emit informational events (if for exaple you want to state
+will want to call_digraph_listeners informational events (if for exaple you want to state
 explicitly that you are loading some default object because one was not
 stipulated specifically in the request.)
 

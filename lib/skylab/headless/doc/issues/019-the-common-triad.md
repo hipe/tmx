@@ -21,7 +21,7 @@ the three below sets of values the result value falls into:
   what is being requested, I think that no more information needs to be
   emitted to the client. This might be because I think I have fulfilled
   an exceptional end-goal of a request (i.e. just create some file or
-  emit some debugging info, then exit). It might also be because some
+  call_digraph_listeners some debugging info, then exit). It might also be because some
   necessary resource was unavailable, in which case I have emitted events
   expressing information to this end."
 
@@ -36,7 +36,7 @@ the three below sets of values the result value falls into:
   express the fact that we reached an exceptional early stop.
 
   A common use-case for this is with invalid request data. The
-  sub-client will emit what specifically was "wrong" with the parameters,
+  sub-client will call_digraph_listeners what specifically was "wrong" with the parameters,
   but expects that the client might further want to, from a UI
   perspective, contextualize this emission with e.g. UI that can lead
   to more help or futher information.

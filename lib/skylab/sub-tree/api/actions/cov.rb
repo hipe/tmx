@@ -2,7 +2,7 @@ module Skylab::SubTree
 
   class API::Actions::Cov < API::Action
 
-    emits       hub_point: :datapoint,
+    listeners_digraph hub_point: :datapoint,
                     error: :datapoint,
                      info: :datapoint,
      number_of_test_files: :datapoint,
@@ -65,7 +65,7 @@ module Skylab::SubTree
     STRIP_TRAILING_RX_ = %r{ \A (?<no_trailing> / | .* [^/] ) /* \z }x
 
     def normalize_list_as
-      @lister = self.class::Lister_.new :emit_p, method( :emit ),
+      @lister = self.class::Lister_.new :emit_p, method( :call_digraph_listeners ),
         :list_as, @list_as, :hubs, hub_a,
         :did_error_p, -> { @error_was_emitted }
       @lister.normalize
@@ -91,7 +91,7 @@ module Skylab::SubTree
             :sub_path_a, @sub_path_a,
             :lister_p, -> { @lister },
             :info_tree_p, -> label, tree do
-              emit :info_tree, label: label, tree: tree
+              call_digraph_listeners :info_tree, label: label, tree: tree
             end,
             :local_test_pathname_ea, ::Enumerator.new do |yy|
               ::Dir[ glob ].each do |path|
@@ -121,7 +121,7 @@ module Skylab::SubTree
     end
 
     def get_info_p
-      -> s { emit :info, s }
+      -> s { call_digraph_listeners :info, s }
     end
 
     def tree
@@ -130,7 +130,7 @@ module Skylab::SubTree
         false
       else
         self.class::Treeer_[ :hub_a, hub_a, :arg_pn, @arg_pn,
-          :card_p, -> card { emit :tree_line_card, card } ]
+          :card_p, -> card { call_digraph_listeners :tree_line_card, card } ]
       end
     end
 

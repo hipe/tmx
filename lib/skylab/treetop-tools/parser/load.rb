@@ -183,11 +183,11 @@ module Skylab::TreetopTools
     def summarize grammar_a
       exists = []; creates = []
       grammar_a.each { |g| (g.outpathname.exist? ? exists : creates).push g }
-      exists.empty? or emit(:info, "#{force_overwrite ? 'overwrit' : 'us'
+      exists.empty? or call_digraph_listeners(:info, "#{force_overwrite ? 'overwrit' : 'us'
         }ing: #{exists.map(&:outpath).join(', ')}")
       creates.empty? or
-        emit(:info, "creating: #{creates.map(&:outpath).join(', ')}")
-      grammar_a.length.zero? and emit :info, "none."
+        call_digraph_listeners(:info, "creating: #{creates.map(&:outpath).join(', ')}")
+      grammar_a.length.zero? and call_digraph_listeners :info, "none."
       true
     end
   end

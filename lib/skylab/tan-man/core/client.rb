@@ -7,7 +7,7 @@ module Skylab::TanMan
 
   module Core::Client::ModuleMethods
 
-    Callback[ self, :include_emitter_module_methods ]  # necessary when e.g. CLI defines
+    Callback[ self, :include_digraph_emitter_module_methods ]  # necessary when e.g. CLI defines
   end                             # more granulated events
 
 
@@ -18,9 +18,9 @@ module Skylab::TanMan
 
     include Core::SubClient::InstanceMethods   # ask for trouble by name
 
-    Callback[ self, :employ_DSL_for_emitter ]  # we want the i.m's from this
+    Callback[ self, :employ_DSL_for_digraph_emitter ]  # we want the i.m's from this
 
-    emits payload: :all, info: :all, error: :all # the PIE convention [#hl-037]
+    listeners_digraph payload: :all, info: :all, error: :all # the PIE convention [#hl-037]
                                   # note that clients will add their own events
 
   private

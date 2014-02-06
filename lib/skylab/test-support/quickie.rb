@@ -594,13 +594,13 @@ module Skylab::TestSupport::Quickie
 
       failed = -> errmsg, ord do
         state = :fail
-        flush[] if eg  # now it's safe to emit it
+        flush[] if eg  # now it's safe to call_digraph_listeners it
         y << "#{ ind[ d ] }  #{ stylize :red, errmsg }"
       end
 
       pended = -> do
         state = :pend
-        flush[] if eg  # now we certainly want to emit
+        flush[] if eg  # now we certainly want to call_digraph_listeners
       end
 
       branch = -> depth, ctx do   # render a description or context heading

@@ -8,7 +8,7 @@ module Skylab::Dependency
     attribute :build_dir, :from_context => true, :pathname => true, :required => true
     attribute :output_dir
 
-    emits :all,
+    listeners_digraph  :all,
       :info => :all, :error => :all,
       :shell => :all, :out => :all, :err => :all
 
@@ -19,33 +19,33 @@ module Skylab::Dependency
       valid? or fail(invalid_reason)
       unless @unzip_tarball.exist?
         # if optomistic dry run
-        emit(:error, "tarball not found: #{@unzip_tarball}")
+        call_digraph_listeners(:error, "tarball not found: #{@unzip_tarball}")
         return false
       end
       if 0 == @unzip_tarball.stat.size
-        emit(:error, "tarball is zero length: #{@unzip_tarball}")
+        call_digraph_listeners(:error, "tarball is zero length: #{@unzip_tarball}")
         return false
       end
       if unzipped_dir_path.exist?
-        emit(:info, "exists, won't tar extract: #{pretty_path unzipped_dir_path.to_s}")
+        call_digraph_listeners(:info, "exists, won't tar extract: #{pretty_path unzipped_dir_path.to_s}")
         return true
       end
       _execute
     end
     def _execute
       cmd = "cd #{escape_path build_dir}; tar -xzvf #{escape_path @unzip_tarball.basename}"
-      emit(:shell, cmd)
+      call_digraph_listeners(:shell, cmd)
       err = Dependency::Library_::StringIO.new
       bytes, seconds =  open2(cmd) do |on|
-        on.out { |s| emit(:out, s) }
-        on.err { |s| emit(:err, s) ; err.write(s) }
+        on.out { |s| call_digraph_listeners(:out, s) }
+        on.err { |s| call_digraph_listeners(:err, s) ; err.write(s) }
       end
       if no = err.string.split("\n").grep(/unrecognized archive format/i).first
-        emit(:error, "Failed to unzip: #{no}")
+        call_digraph_listeners(:error, "Failed to unzip: #{no}")
         return false
       end
       if seconds >= SIGNIFICANT_SECONDS
-        emit(:info, "read #{bytes} bytes in #{seconds} seconds.")
+        call_digraph_listeners(:info, "read #{bytes} bytes in #{seconds} seconds.")
       end
       true
     end

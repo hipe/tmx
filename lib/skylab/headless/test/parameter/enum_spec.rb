@@ -28,7 +28,7 @@ describe 'If you have an object "object" with a ' <<
           object.send(:[], :color).should eql(:blue)
         end
         it('"object.foo = :gamma" (an invalid value) will use the host ' <<
-           'instance\'s _with_client method to emit an error message') do # [#012]
+           'instance\'s _with_client method to call_digraph_listeners an error message') do # [#012]
           object.color = :orange
           emit_lines.shift.should match(/:orange is an invalid value for .*color/i)
           emit_lines.length.should eql(0)

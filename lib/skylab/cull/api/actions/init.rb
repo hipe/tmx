@@ -17,7 +17,7 @@ module Skylab::Cull
 
     services :configs, [ :pth, :ivar ], :config_default_init_directory
 
-    emits :before, :after, :all, couldnt_event: :entity_event
+    listeners_digraph :before, :after, :all, couldnt_event: :entity_event
 
     cfg
 

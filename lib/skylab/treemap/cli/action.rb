@@ -100,7 +100,7 @@ module Skylab::Treemap
 
     Headless::CLI::Action[ self, :core_instance_methods ]  # NOTE *that* ver. of `emit`
 
-    extend Callback::Emitter  # (child classes *must* declare their own
+    extend Callback::Digraph  # (child classes *must* declare their own
                                   # event profile, also defaults are assumed
                                   # in `initialize` here!)  NOTE this ver.
 

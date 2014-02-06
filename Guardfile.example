@@ -69,7 +69,7 @@ module Skylab::Guardfile
     end
   end
   class CLI < ::Skylab::Tolerance::Runtime
-    def emit _, msg      ; $stderr.puts(msg)  ; end
+    def call_digraph_listeners _, msg      ; $stderr.puts(msg)  ; end
     def option_syntax o                       ; end
     module Actions                            ; end
   end

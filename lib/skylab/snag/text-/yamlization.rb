@@ -2,9 +2,9 @@ module Skylab::Snag
 
   class Text_::Yamlization
 
-    Callback[ self, :employ_DSL_for_emitter ]
+    Callback[ self, :employ_DSL_for_digraph_emitter ]
 
-    emits :text_line
+    listeners_digraph  :text_line
 
     event_factory Snag::API::Events::Datapoint
 
@@ -25,7 +25,7 @@ module Skylab::Snag
 
     define_method :on_text_line do |*a, &b|
       @y ||= ::Enumerator::Yielder.new do |txt|
-        emit :text_line, txt
+        call_digraph_listeners :text_line, txt
         nil
       end
       m.bind( self ).call( *a, &b )

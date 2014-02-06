@@ -20,7 +20,7 @@ module Skylab::GitViz::TestSupport::API
     end
 
     def bld_emit_spy
-      es = GitViz::Callback_::TestSupport::Emit_Spy.new
+      es = GitViz::Callback_::TestSupport::Call_Digraph_Listeners_Spy.new
       es.debug_IO = debug_IO
       es.do_debug_proc = -> { do_debug }
       es

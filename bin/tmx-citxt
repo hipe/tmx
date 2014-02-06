@@ -37,7 +37,7 @@ module Skylab::CI_Txt
             end
             ok = true
           rescue ::OptionParser::ParseError => e
-            emit :help, e.message
+            call_digraph_listeners :help, e.message
           end
         end while nil
         if ! ok

@@ -6,7 +6,7 @@ module Skylab::SubTree
 
   private
 
-    Callback[ self, :employ_DSL_for_emitter ]  # do this before you extend
+    Callback[ self, :employ_DSL_for_digraph_emitter ]  # do this before you extend
       # legacy, it gives you a graph
 
     def mutex name_i, value_i
@@ -20,7 +20,7 @@ module Skylab::SubTree
     end
 
     Client_Services_ = SubTree::Library_::Face::Iambic.
-      new :emit_proc, -> { method :emit },
+      new :emit_proc, -> { method :call_digraph_listeners },
           :instream, -> { some_upstream },
           :errstream, -> { some_infostream },
           :outstream, -> { some_paystream }
@@ -129,7 +129,7 @@ module Skylab::SubTree
       o.on '-- HEAD[~N]', 'will become `git diff HEAD~<n> --numstat' do |x|
         old = @param_h[ :mode_a ]
         @param_h[ :mode_a ] = [ :git_diff, x ]
-        old and emit( :error, "(clobbering \"#{ old.last }\")" )
+        old and call_digraph_listeners( :error, "(clobbering \"#{ old.last }\")" )
       end
 
     end
@@ -169,7 +169,7 @@ module Skylab::SubTree
     end
 
     def bork msg
-      emit :error, msg
+      call_digraph_listeners :error, msg
       invite
       nil
     end
@@ -242,7 +242,7 @@ module Skylab::SubTree
     desc "performs a ping."
 
     def ping
-      emit :info, "hello from sub tree."
+      call_digraph_listeners :info, "hello from sub tree."
       :hello_from_sub_tree
     end
 

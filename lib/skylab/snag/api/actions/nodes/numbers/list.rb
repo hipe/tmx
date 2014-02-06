@@ -4,7 +4,7 @@ module Skylab::Snag
 
     # (no attributes.)
 
-    emits            info: :lingual,
+    listeners_digraph  info: :lingual,
               output_line: :datapoint
 
     def execute
@@ -12,7 +12,7 @@ module Skylab::Snag
         all = nodes.manifest.curry_enum.with_count!
         valid = all.valid.with_count!
         valid.each do |node|
-          emit :output_line, node.rendered_identifier
+          call_digraph_listeners :output_line, node.rendered_identifier
         end
         info "found #{valid.seen_count} valid of #{all.seen_count} total nodes."
         true

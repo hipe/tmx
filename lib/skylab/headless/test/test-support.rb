@@ -40,7 +40,7 @@ module Skylab::Headless::TestSupport
 
   module Library_  # :+[#su-001]:just-for-tests
     h = {
-      PubSub_TestSupport: -> do
+      Callback_TestSupport: -> do
         require 'skylab/callback/test/test-support'
         ::Skylab::Callback::TestSupport
       end

@@ -47,11 +47,11 @@ module Skylab::Tolerance
     def client_class
       self.class
     end
-    def emit _, msg
-      @parent.emit _, msg
+    def call_digraph_listeners _, msg
+      @parent.call_digraph_listeners _, msg
     end
     def help
-      emit :help, @option_parser.help
+      call_digraph_listeners :help, @option_parser.help
       throw :stop_parse
     end
     def invitation children=false
@@ -111,17 +111,17 @@ module Skylab::Tolerance
     def parse_args argv
       parameters = self.argument_parameters
       ok = if (pp = parameters.select { |p| :req == p.first }).length > argv.length
-        emit :missing_required_argument, "missing required argument: #{pre pp[argv.length].last}"
+        call_digraph_listeners :missing_required_argument, "missing required argument: #{pre pp[argv.length].last}"
         false
       elsif argv.length > parameters.length and ! parameters.index{ |x| :rest == x.first }
-        emit :unexpected_argument, "unexpected argument: #{pre argv[parameters.length]}"
+        call_digraph_listeners :unexpected_argument, "unexpected argument: #{pre argv[parameters.length]}"
         false
       else
         true
       end
       ok or begin
-        emit :usage,  usage
-        emit :invite, invitation
+        call_digraph_listeners :usage,  usage
+        call_digraph_listeners :invite, invitation
       end
       ok
     end
@@ -134,9 +134,9 @@ module Skylab::Tolerance
       catch(:stop_parse) { option_parser.parse!(argv) } or return nil
       true
     rescue ::OptionParser::ParseError => e
-      emit :parse_error, e.message
-      emit :usage,       usage
-      emit :invite,      invitation
+      call_digraph_listeners :parse_error, e.message
+      call_digraph_listeners :usage,       usage
+      call_digraph_listeners :invite,      invitation
       false
     end
     attr_reader :opts
@@ -148,9 +148,9 @@ module Skylab::Tolerance
       "#{@parent.program_name} #{name}"
     end
     def syntax msg
-      emit :syntax, msg
-      emit :usage, usage
-      emit :help, invitation
+      call_digraph_listeners :syntax, msg
+      call_digraph_listeners :usage, usage
+      call_digraph_listeners :help, invitation
       false
     end
     def usage

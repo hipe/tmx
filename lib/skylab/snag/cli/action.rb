@@ -68,7 +68,7 @@ module Skylab::Snag
 
     def warn_about_unhandled_streams action
       action.if_unhandled_non_taxonomic_stream_names -> missed_a do
-        emit :warn, "(warning, unhandled: #{ missed_a * ', ' })"
+        call_digraph_listeners :warn, "(warning, unhandled: #{ missed_a * ', ' })"
         true
       end, -> do
         false

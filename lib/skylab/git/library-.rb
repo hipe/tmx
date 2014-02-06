@@ -2,12 +2,12 @@ module Skylab::Git
 
   module Library_  # :+[#su-001]
 
-    stdlib, subsys = Autoloader_.at :require_stdlib, :require_subsystem
+    stdlib, sidesys = Autoloader_.at :require_stdlib, :require_sidesystem
 
     o = { }
-    o[ :Basic ] = subsys
+    o[ :Basic ] = sidesys
     o[ :FileUtils ] = stdlib
-    o[ :Headless ] = subsys
+    o[ :Headless ] = sidesys
     o[ :Open3 ] = stdlib
     o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
     o[ :Set ] = o[ :Shellwords ] = o[ :StringIO ] = stdlib
