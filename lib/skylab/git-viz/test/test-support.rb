@@ -5,8 +5,6 @@ module Skylab::GitViz::TestSupport
   module CONSTANTS
     GitViz = ::Skylab::GitViz
     o = GitViz::Lib_
-    MetaHell = o::MetaHell[]
-    Headless_ = GitViz::Headless_
     TestSupport = o::TestSupport[]
     TS_ = GitViz::TestSupport
   end
@@ -15,33 +13,30 @@ module Skylab::GitViz::TestSupport
 
   extend TestSupport::Quickie
 
-  GitViz = GitViz ; Headless_ = Headless_ ; MetaHell = MetaHell ; TS__ = self
+  GitViz = GitViz ; TS__ = self
 
   TestSupport::Regret[ self ]
 
   module ModuleMethods
     def use i
+      const_i = GitViz::Name_.from_variegated_symbol( i ).as_const
       mod = nearest_test_node
       while true
-        _const_name, found_mod = Const_Aref__[ mod, i ]
-        found_mod and break
+        if mod.const_defined? const_i, false
+          found_mod = mod.const_get const_i
+          break
+        end
         mod_ = mod.parent_anchor_module
         if mod_
           mod = mod_
         else
-          _, found_mod = Const_Fetch__[ GitViz::Test_Lib_, i ]
+          found_mod = GitViz::Test_Lib_.const_get const_i, false
           break
         end
       end
       found_mod[ self ] ; nil
     end
   end
-
-  Const_Aref__ = MetaHell::Boxxy::P__.
-    curry[ nil, nil, MetaHell::MONADIC_EMPTINESS_ ]
-
-  Const_Fetch__ = MetaHell::Boxxy::P__.
-    curry[ nil, nil, nil ]
 
   module InstanceMethods
 
@@ -50,7 +45,7 @@ module Skylab::GitViz::TestSupport
     end
     attr_reader :do_debug
     def debug_IO
-      Headless_::System::IO.some_stderr_IO
+      GitViz::Lib_::Some_stderr_IO[]
     end
 
     def listener
@@ -68,7 +63,7 @@ module Skylab::GitViz::TestSupport
     end
 
     def inspect_emission_channel_and_payload i_a, x
-      "#{ i_a.inspect }: #{ GitViz::Test_Lib_::Expect::Inspect[ x ] }"
+      "#{ i_a.inspect }: #{ GitViz::Test_Lib_::Inspect[ x ] }"
     end
 
     def baked_em_a  # #hook-out: 'expect'
@@ -100,4 +95,8 @@ module Skylab::GitViz::TestSupport
   module Messages
     PATH_IS_FILE = "path is file, must have directory".freeze
   end
+
+  _pn = GitViz.dir_pathname.join 'test'
+  GitViz::Autoloader_[ self, :boxxy, _pn ]
+
 end

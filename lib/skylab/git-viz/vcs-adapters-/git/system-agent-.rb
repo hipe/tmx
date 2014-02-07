@@ -90,7 +90,7 @@ module Skylab::GitViz
         line_s = @e.gets
         line_s and unexpected_errput line_s
         expect_zero_exitstatus
-        MetaHell::EMPTY_P_
+        EMPTY_P_
       end
 
       def unexpected_errput line_s

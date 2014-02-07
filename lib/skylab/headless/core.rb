@@ -8,10 +8,6 @@ end
 
 module Skylab::Headless  # ([#013] is reserved for a core node narrative - no storypoints yet)
 
-  class Scn < ::Proc
-    alias_method :gets, :call
-  end
-
   Autoloader_ = ::Skylab::Callback::Autoloader
   Callback_ = ::Skylab::Callback
   DASH_ = '-'.getbyte 0
@@ -21,7 +17,7 @@ module Skylab::Headless  # ([#013] is reserved for a core node narrative - no st
   IDENTITY_ = -> x { x }
   LINE_SEPARATOR_STRING_ = "\n".freeze
   MONADIC_TRUTH_ = -> _ { true }
-  Scn_ = Scn
+  Scn_ = Scn = Callback_::Scn
   TERM_SEPARATOR_STRING_ = ' '.freeze
   WRITEMODE_ = 'w'.freeze
 

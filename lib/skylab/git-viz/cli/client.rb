@@ -49,14 +49,14 @@ module Skylab::GitViz
   private
 
     def disptch_to_CLI_action
-      x_a = @param_x_a
       _i = @legacy_last_hot._sheet._name.local_normal
-      _unbnd = CLI::Actions__.const_fetch _i
+      _const_i = Name_.from_variegated_symbol( _i ).as_const
+      _unbnd = CLI::Actions__.const_get _const_i, false
       _bound = _unbnd.new( svcs_for_CLI_action )
-      _bound.invoke_with_iambic x_a
+      _bound.invoke_with_iambic @param_x_a
     end
 
-    Headless_::Client[ self,
+    GitViz::Lib_::Headless[]::Client[ self,
       :client_services,
         :named, :svcs_for_CLI_action ]
 
@@ -73,13 +73,6 @@ module Skylab::GitViz
 
     def info_line_from_CLI_action s
       @infostream.puts s ; nil
-    end
-  end
-
-  module CLI
-    GitViz::Lib_::MetaHell[]::MAARS[ self, :methods ]  # #storypoint-80
-    module Actions__
-      GitViz::Lib_::MetaHell[]::Boxxy[ self ]
     end
   end
 end

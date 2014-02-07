@@ -4,7 +4,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters_::Git::Repo_::Hist_Tree__
 
   describe "[gv] vcs adapters git repo hist-tree bunch build" do
 
-    extend TS__ ; use :expect ; use :mock_FS ; use :mock_system
+    extend TS__ ; use :expect ; use :mock_FS ; use :mock_system ; use :mock_1
 
     context "for no-ent path under repo" do
 
@@ -52,32 +52,12 @@ module Skylab::GitViz::TestSupport::VCS_Adapters_::Git::Repo_::Hist_Tree__
 
       it "oh nelly furtado watch out" do
         @bunch = repo.build_hist_tree_bunch
-        expect_this_many_system_commands 8
-        expect_this_many_statements_about_omissions 2
+        expect_informational_emissions_for_mock_1
         expect_constituency
       end
 
       def mock_repo_argument_pathname
         mock_pathname '/derp/berp/dirzo'
-      end
-
-      _NEXT_SYSTEM_COMMAND = %i( next_system command ).freeze
-
-      define_method :expect_this_many_system_commands do |d|
-        expect_this_many_of_this d, _NEXT_SYSTEM_COMMAND
-      end
-
-      _STATEMENTS_OF_OMISSION =
-        %i( info string omitting_informational_commitpoint ).freeze
-
-      define_method :expect_this_many_statements_about_omissions do |d|
-        expect_this_many_of_this d, _STATEMENTS_OF_OMISSION
-      end
-
-      def expect_this_many_of_this d, a
-        d.times do
-          expect a
-        end
       end
 
       def expect_constituency

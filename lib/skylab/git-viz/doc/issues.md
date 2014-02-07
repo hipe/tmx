@@ -1,3 +1,4 @@
+[#037]       :#todo:when-ba-is-purified
 [#036] #open #parent-node:[#017]
                redudnancy with mapping real SHA's to commitpoint SHA's
 [#035]       #parent-node:[#005] git gotchas ..

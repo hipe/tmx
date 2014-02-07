@@ -12,7 +12,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters_::Git
 
   include CONSTANTS
 
-  GitViz = GitViz ; MetaHell = MetaHell
+  GitViz = GitViz
 
   extend TestSupport::Quickie
 

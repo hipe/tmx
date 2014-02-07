@@ -1,7 +1,5 @@
 module Skylab::Callback
 
-  Require_legacy_core_[]
-
   module Bundles
 
     Emit_to_IO_stream_string = -> x_a do

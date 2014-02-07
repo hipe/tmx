@@ -1,7 +1,5 @@
 module Skylab::Callback
 
-  Require_legacy_core_[]
-
   module Event
 
     class Unified  # [#019] #storypoint-10

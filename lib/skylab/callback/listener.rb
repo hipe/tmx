@@ -1,7 +1,5 @@
 module Skylab::Callback
 
-  Require_legacy_core_[]
-
   module Listener  # this is the first node dedicated to [#todo:during-merge]
 
     def self.[] mod, * x_a

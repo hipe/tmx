@@ -1,7 +1,5 @@
 module Skylab::Callback
 
-  Require_legacy_core_[]
-
   module Digraph  # READ [#019] #storypoint-1
 
     def self.extended mod  # #sl-111

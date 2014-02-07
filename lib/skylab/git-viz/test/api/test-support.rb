@@ -6,7 +6,7 @@ module Skylab::GitViz::TestSupport::API
 
   include CONSTANTS
 
-  GitViz = GitViz ; MetaHell = MetaHell
+  GitViz = GitViz
 
   extend TestSupport::Quickie
 
@@ -35,7 +35,7 @@ module Skylab::GitViz::TestSupport::API
       Common_shape_listener__[].new emitter
     end
 
-    Common_shape_listener__ = MetaHell::FUN::Memoize[ -> do
+    Common_shape_listener__ = GitViz::Lib_::Memoize[ -> do
       GitViz::Callback_::
         Listener::Class_from_diadic_matrix[ %i( info ), %i( line ) ]
     end ]

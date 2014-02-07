@@ -8,8 +8,6 @@ module Skylab::GitViz
         user_mod.include Instance_Methods__ ; nil
       end
 
-      Headless_ = GitViz::Headless_
-
       module Instance_Methods__
 
         def expect_emissions_on_channel i
@@ -52,7 +50,7 @@ module Skylab::GitViz
         end
 
         def expct_styled_and_unstyle
-          s = Headless_::CLI::Pen::FUN::Unstyle_styled[ @matchee_x ]
+          s = GitViz::Lib_::Unstyle_styled[ @matchee_x ]
           s or fail "expected styled, was not: #{ @matchee_x }"
           @matchee_x = s ; nil
         end
@@ -102,13 +100,13 @@ module Skylab::GitViz
         end
 
         def inspect_emission_channel_and_payload channel_x, payload_x
-          "#{ channel_x.inspect }: #{ Inspect[ payload_x ] }"
+          "#{ channel_x.inspect }: #{ Inspect_[ payload_x ] }"
         end
       end
 
       class Expectation__
 
-        Headless_::API::Simple_monadic_iambic_writers[ self,
+        GitViz::Lib_::Simple_monadic_iambic_writers[ self,
           :on_channel_i, :on_channel_i_a ]
 
         attr_reader :any_finally_proc, :any_matcher_method_name,
@@ -130,20 +128,20 @@ module Skylab::GitViz
         def absrb_some_matcher
           @matcher_x = @x_a.shift
           @x_a.length.zero? or raise ::ArgumentError, "unexpected iambic: #{
-            }#{ Inspect[ @x_a.first ] }"
+            }#{ Inspect_[ @x_a.first ] }"
           if @matcher_x.respond_to? :named_captures
             @any_matcher_method_name = :expect_match_with_rx
           elsif @matcher_x.respond_to? :ascii_only?
             @any_matcher_method_name = :expect_match_with_str
           else
             raise ::ArgumentError, "expected some matcher, had #{
-              Inspect[ @matcher_x ] }"
+              Inspect_[ @matcher_x ] }"
           end
         end
       end
 
-      Inspect = -> x do
-        GitViz::Lib_::Basic[]::FUN::Inspect__[ 120, x ]
+      Inspect_ = -> x do
+        GitViz::Lib_::Inspect[ x ]
       end
     end
   end

@@ -25,7 +25,7 @@ module Skylab::GitViz
             n.slug
           end
           row = Row__.new card.prefix[], n.is_leaf,
-            _line_node_slug, n.repo_node
+            _line_node_slug, n.repo_trail
           d = row.file_column_string_length
           max < d and max = d
           row_a << row
@@ -80,7 +80,7 @@ module Skylab::GitViz
         end
 
         def execute
-          @scn = @row.repo_node.get_commitpoint_scanner
+          @scn = @row.repo_trail.get_commitpoint_scanner
           while (( cp = @scn.gets ))
             _index = cp.commitpoint_index
             @string[ _index ] = BULLET__
@@ -92,11 +92,11 @@ module Skylab::GitViz
       end
 
       class Row__
-        def initialize glyph_s, is_leaf, slug_s, repo_node
+        def initialize glyph_s, is_leaf, slug_s, repo_trail
           @glyph_s = glyph_s ; @is_leaf = is_leaf
-          @repo_node = repo_node ; @slug_s = slug_s
+          @repo_trail = repo_trail ; @slug_s = slug_s
         end
-        attr_reader :glyph_s, :is_leaf, :repo_node, :slug_s
+        attr_reader :glyph_s, :is_leaf, :repo_trail, :slug_s
         def file_column_string_length
           @glyph_s.length + @slug_s.length
         end

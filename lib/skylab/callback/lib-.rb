@@ -46,9 +46,14 @@ module Skylab::Callback
       self::MetaHell__[]::Boxxy::Fuzzy_const_get[ modul, part ]
     end
 
-    Inspect = -> x do
-      self::Headless__[]::FUN::Inspect[ x ]
-    end
+    Inspect = -> do
+      p = -> x do
+        _LENGTH_OF_A_LONG_LINE = 120
+        p = self::Basic__[]::FUN::Inspect__.curry[ _LENGTH_OF_A_LONG_LINE ]
+        p[ x ]
+      end
+      -> x { p[ x ] }
+    end.call
 
     Let = -> do
       self::MetaHell__[]::Let

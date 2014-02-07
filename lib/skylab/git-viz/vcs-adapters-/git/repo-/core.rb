@@ -16,7 +16,7 @@ module Skylab::GitViz
         @focus_dir_relpath_pn = focus_dir_absoulte_pn.
           relative_path_from( absolute_pn )
         yield self
-        # MetaHell::FUN.without_warning { GitViz::Lib_::Grit[] }  # see [#016]:#as-for-grit
+        # M-etaHell::FUN.without_warning { GitViz::Lib_::Grit[] }  # see [#016]:#as-for-grit
         # @inner = ::Grit::Repo.new absolute_pn.to_path ; nil
       end
 

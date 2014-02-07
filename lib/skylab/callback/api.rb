@@ -1,7 +1,5 @@
 module Skylab::Callback
 
-  Require_legacy_core_[]
-
   module API
     Looks_like_digraph_module_ = -> x do
       x.singleton_class.method_defined? :listeners_digraph or

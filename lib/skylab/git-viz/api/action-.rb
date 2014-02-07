@@ -8,7 +8,7 @@ module Skylab::GitViz
         new( x_a ).execute
       end
 
-      Headless_::API::Simple_monadic_iambic_writers[ self ]
+      GitViz::Lib_::Simple_monadic_iambic_writers[ self ]
 
       def initialize x_a
         self.class.defaults.each_pair do |k, v|
@@ -18,7 +18,14 @@ module Skylab::GitViz
         super()
       end
 
-      a = %i( listener session VCS_listener VCS_adapter_name )  # #storypoint-20
+      # #storypoint-20, #storypoint-25
+      a = %i(
+        listener session
+        system_conduit
+        VCS_adapter_name
+        VCS_adapters_module
+        VCS_listener )
+
       attr_writer( * a ) ; private( * a.map { |i| :"#{ i }=" } )
 
     private
@@ -41,7 +48,7 @@ module Skylab::GitViz
         end ; nil
       end
 
-      extend MetaHell::Formal::Attribute::Definer
+      GitViz::Lib_::Formal_attribute_definer[ self ]
 
       def self.write_attribute_writer atr  # #storypoint-40
         super
@@ -115,8 +122,12 @@ module Skylab::GitViz
       end
 
       def rslv_some_VCS_front
-        _anchor_mod = GitViz::VCS_Adapters_.const_fetch some_VCS_adapter_name
-        _anchor_mod::Front.new @VCS_listener
+        vcs_adapter_i = some_VCS_adapter_name
+        _const = Name_.from_variegated_symbol( vcs_adapter_i ).as_const
+        vcs_mod = @VCS_adapters_module.const_get _const, false
+        vcs_mod::Front.new vcs_mod, @VCS_listener do |front|
+          front.set_system_conduit @system_conduit
+        end
       end
 
       def some_VCS_adapter_name

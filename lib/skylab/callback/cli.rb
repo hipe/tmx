@@ -2,8 +2,6 @@ require 'skylab/headless/core'
 
 module Skylab::Callback
 
-  Require_legacy_core_[]
-
   class CLI  # NOTE "this node in its scope is not related to pub-s.." [#018]
 
     Callback::Lib_::CLI[]::Client[ self,

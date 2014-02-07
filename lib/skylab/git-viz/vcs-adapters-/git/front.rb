@@ -34,8 +34,6 @@ module Skylab::GitViz
 
     IMPLEMENTATION_DIR_ = '.git'.freeze
 
-    MetaHell = GitViz::Lib_::MetaHell[]
-
     PROCEDE_ = true
 
   end

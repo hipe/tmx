@@ -6,21 +6,105 @@ module Skylab::Callback
     self::Bundles.apply_iambic_on_client x_a, mod
   end
 
-  module Autoloader
+  module Autoloader  # read [#024] the new autolader narrative
 
-    def self.[] mod, x=nil
-      mod.module_exec do
-        if x
-          if :boxxy == x
-            extend Boxxy_Methods__, Deferred_Methods__
-          else
-            @dir_pathname = x
-            extend Methods__
-          end
+    class << self
+      def [] mod, * x_a
+        if x_a.length.zero?
+          mod.extend Deferred_Methods__
         else
-          extend Deferred_Methods__
+          employ_iambic_fully x_a, mod
         end
-      end ; nil
+      end
+    private
+      def employ_iambic_fully x_a, mod
+        Employment_Parse__.new( self, x_a, mod ).parse
+      end
+    public
+      def possible_p_a
+        self::POSSIBLE_P_A__
+      end
+    private
+      def boxxy_keyword i
+        if :boxxy == i
+          -> employer_mod do
+            employer_mod.respond_to?( :dir_pathname ) or
+              employer_mod.extend Deferred_Methods__
+            employer_mod.extend Boxxy_Methods__ ; nil
+          end
+        end
+      end
+      def dir_pathname_argument pn
+        if pn.respond_to? :relative_path_from
+          -> employer_mod do
+            employer_mod.module_exec do
+              @dir_pathname = pn
+              extend Methods__
+            end
+          end
+        end
+      end
+    end
+
+    POSSIBLE_P_A__ = [
+      method( :dir_pathname_argument ),
+      method( :boxxy_keyword ) ].freeze
+
+
+    class Employment_Parse__
+
+      def initialize employee_mod, x_a, employer_mod
+        @actual_p_a = []
+        @employer_mod = employer_mod
+        @possible_p_a = employee_mod.possible_p_a
+        @possible_d_a = @possible_p_a.length.times.to_a
+        @x_a = x_a
+      end
+      def parse
+        begin
+          p = nil ; x = @x_a.shift
+          idx = @possible_d_a.index do |d|
+            p = @possible_p_a.fetch( d )[ x ]
+          end
+          idx or raise ::ArgumentError, say_bad_term( x )
+          @actual_p_a[ @possible_d_a.fetch idx ] = p
+          @possible_d_a[ idx, 1 ] = EMPTY_A_
+        end while @x_a.length.nonzero?
+        flush
+      end
+    private
+      def say_bad_term x
+        "unexpected argument #{ Callback::Lib_::Inspect[ x ] }. #{
+         }expecting #{ say_expecting }"
+      end
+      def say_expecting
+        _a = @possible_d_a.map do |d|
+          name_s = @possible_p_a.fetch( d ).name.to_s
+          md = TERM_PARSER_NAME_MATCHER_RX__.match name_s
+          stem, type = if md
+            [ md[ 1 ], md[ 2 ].intern ]
+          else
+            [ name_s, :argument ]
+          end
+          send :"render_stem_as_#{ type }", stem
+        end
+        Oxford_or[ _a ]
+      end
+
+      TERM_PARSER_NAME_MATCHER_RX__ = %r(\A(.+)_(argument|keyword)\z)
+
+      def render_stem_as_argument s
+        "<#{ s }>"
+      end
+      def render_stem_as_keyword s
+        "'#{ s }'"
+      end
+      def flush
+        @actual_p_a.compact!
+        @actual_p_a.each do |p|
+          p[ @employer_mod ]
+        end ; nil
+      end
     end
 
     def self.at *a
@@ -133,7 +217,8 @@ module Skylab::Callback
     module Methods__
       def const_missing i
         @dir_pathname or super
-        Const_Missing__.new( self, @dir_pathname, i ).load_and_get
+        r = Const_Missing__.new( self, @dir_pathname, i ).load_and_get
+        r
       end
       def const_missing_class
         :_has_one_  # #comport to oldschoool a.l
@@ -391,16 +476,18 @@ module Skylab::Callback
   Oxford_or = Oxford.curry[ ', ', '[none]', ' or ' ]
   Oxford_and = Oxford.curry[ ', ', '[none]', ' and ' ]
 
-  Require_legacy_core_ = -> do
+  class Scn < ::Proc
+    alias_method :gets, :call
   end
+
+  EMPTY_A_ = [].freeze
+  EMPTY_P_ = -> { }
+  Callback = self
 
   require 'pathname'
 
   Autoloader[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
   stowaway :TestSupport, 'test/test-support'
-
-  EMPTY_P_ = -> { }
-  Callback = self
 
 end

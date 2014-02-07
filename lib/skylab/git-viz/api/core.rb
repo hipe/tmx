@@ -26,27 +26,20 @@ module Skylab::GitViz
         @x_a = x_a
       end
       def execute
-        API::Actions__.const_fetch resolve_some_locator_x
+        _i = resolve_some_locator_x
+        _const_i = Name_.from_variegated_symbol( _i ).as_const
+        API::Actions__.const_get _const_i, false
       end
-      private
+    private
       def resolve_some_locator_x
         while LOC_X_ == @x_a.first
           @x_a.shift ; locator_x = @x_a.shift
         end  # [#004]: #in-API-invocation-the-order-matters
         locator_x or raise ::ArgumentError, say_no_locator_x
       end
-    private
       def say_no_locator_x
         "we don't know what unbound action to resolve without '#{ LOC_X_ }'"
       end
-    end
-
-    MetaHell = GitViz::Lib_::MetaHell[]
-
-    MetaHell::MAARS[ self ]
-
-    module Actions__
-      MetaHell::Boxxy[ self ]
     end
   end
 end

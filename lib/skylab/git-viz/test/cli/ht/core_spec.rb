@@ -20,6 +20,7 @@ module Skylab::GitViz::TestSupport::CLI
       expect_succeeded
     end
 
+    false and
     it "mock output screen (for now)" do
       expect_emissions_on_channel :o
       invoke 'ht', 'mock-1'

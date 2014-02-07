@@ -25,6 +25,10 @@ module Skylab::GitViz
           Begin__.new( self, @listener_p[] ).execute
         end
 
+        def to_tree_path
+          @file_relpath
+        end
+
         # ~ for the children
 
         attr_reader :file_relpath
@@ -46,7 +50,7 @@ module Skylab::GitViz
           idx = @filediff_a.index do |fd|
             p[ fd.SHA.hash ]
           end or self._SANITY
-          @filediff_a[ idx, 1 ] = Headless_::EMPTY_A_
+          @filediff_a[ idx, 1 ] = EMPTY_A_
           SILENT_
         end
 

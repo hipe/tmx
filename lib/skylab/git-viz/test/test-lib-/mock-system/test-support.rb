@@ -10,4 +10,6 @@ module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System
 
   extend TestSupport::Quickie
 
+  GitViz::Autoloader_[ self, :boxxy ]  # find bundles sibling to this node
+
 end

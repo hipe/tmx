@@ -4,6 +4,15 @@
 
 ## :#storypoint-20
 
+adding a term to this list will create an oridnary attr writer for it that
+is then made weirdly private. doing this tells the iambic request parser that
+this is a field that can be set via iambic parameters.  at #storypoint-30
+this is implemented.
+
+
+
+## :#storypoint-25
+
 life is easier when we model it such that there is a common-denominator set
 of fields shared universally by every action. but the particular composition
 of that list (in terms of both shallow names and deep semantics) will flux
