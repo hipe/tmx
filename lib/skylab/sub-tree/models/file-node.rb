@@ -2,9 +2,9 @@ module Skylab::SubTree
 
   class Models::FileNode
 
-    extend  Porcelain::Tree::ModuleMethods
+    extend  SubTree::Library_::Tree::ModuleMethods
 
-    include Porcelain::Tree::InstanceMethods
+    include SubTree::Library_::Tree::InstanceMethods
 
     def initialize( * )
       super

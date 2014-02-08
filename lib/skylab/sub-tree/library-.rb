@@ -9,10 +9,12 @@ module Skylab::SubTree
     o[ :InformationTactics ] = subsys
     o[ :Open3 ] = stdlib
     o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
+    o[ :Porcelain__ ] = -> _ { subsys[ :Porcelain ] }
     o[ :Set  ] = o[ :Shellwords ] = o[ :StringIO ] = stdlib
     o[ :StringScanner ] = -> _ { require 'strscan' ; ::StringScanner }
     o[ :TestSupport ] = subsys
     o[ :Time ] = stdlib
+    o[ :Tree ] = -> _ { self::Porcelain__::Tree }
 
     define_singleton_method :const_missing do |c|
       const_set c, o.fetch( c )[ c ]

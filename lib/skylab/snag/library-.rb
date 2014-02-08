@@ -11,8 +11,10 @@ module Skylab::Snag
     o[ :Basic ] = subsystem
     o[ :DateTime ] = o[ :FileUtils ] = o[ :Open3 ] = stdlib
     o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
+    o[ :Porcelain__ ] = -> _ { subsystem[ :Porcelain ] }
     o[ :Shellwords ] = stdlib
     o[ :StringScanner ] = -> _ { require 'strscan' ; ::StringScanner }
+    o[ :Tree ] = -> _ { self::Porcelain__::Tree }
 
     def self.const_missing c
       if (( p = self::H_[ c ] ))

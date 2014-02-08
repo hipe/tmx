@@ -6,9 +6,9 @@ module Skylab::Snag
 
   class CLI::ToDo::Tree::Node
 
-    extend  Porcelain::Tree::ModuleMethods
+    extend  Snag::Library_::Tree::ModuleMethods
 
-    include Porcelain::Tree::InstanceMethods
+    include Snag::Library_::Tree::InstanceMethods
 
     attr_accessor :todo
 
@@ -26,7 +26,7 @@ module Skylab::Snag
 
     tree_lines_producer_basic = -> tree do
       ea = ::Enumerator.new do |y|
-        trav = Porcelain::Tree::Traversal.new
+        trav = Snag::Library_::Tree::Traversal.new
         trav.traverse tree do |card|
           prefix = trav.prefix card
           if (( n = card.node )).is_leaf

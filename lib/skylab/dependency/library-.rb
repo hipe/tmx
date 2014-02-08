@@ -23,5 +23,7 @@ module Skylab::Dependency
 
     o :StringScanner, -> { require 'strscan' ; ::StringScanner }
 
+    o :Tree, -> { self::Basic__::Tree }  # for the future if ever
+
   end
 end
