@@ -7,7 +7,8 @@
 [#032]       #done re-arch auto shutdown to use messages, currently it's creating
              assertion failures, perhaps b.c we are passing sockets across
              memory barriers?
-[#031] #hole (was: the plugin narrative, moved to [hl])
+[#031] #open detect renames
+               (was: the plugin narrative, moved to [hl])
 [#030]       #parent-node:[#018] what is meant by isomorphic interface? ..
 [#029]       shutdown/fail more gracefully when manifest parse errors
 [#028]       #parent-node:[#017] fixtures scripts in detail ..

@@ -11,35 +11,31 @@ module Skylab::GitViz
         end
       end
 
+      In_module = -> mod, relpath=DEFAULT_RELPATH_ do
+        FS_[ mod, relpath ]
+      end
+
+      DEFAULT_RELPATH_ = 'pathnames.manifest'.freeze
+
       module Instance_Methods__
         def mock_pathname path_s
           _fm = mock_FS
           _fm.touch_pn path_s
         end
         def mock_FS
-          @mock_FS ||= rslv_mock_FS
-        end
-        def rslv_mock_FS
-          pn = get_pathnames_manifest_pn
-          mock_FS_proc[ pn ]
-        end
-        def get_pathnames_manifest_pn
-          fixtures_module.dir_pathname.join 'pathnames.manifest'
+          @mock_FS ||= FS_[ fixtures_module, pathnames_manifest_relpath ]
         end
         def fixtures_module
           self.class.fixtures_mod
         end
-        def mock_FS_proc
-          self.class.mock_FS_p
+        def pathnames_manifest_relpath
+          DEFAULT_RELPATH_
         end
       end
 
       module Module_Methods__
         def fixtures_mod
           send( :nearest_test_node )::Fixtures  # covered
-        end
-        def mock_FS_p
-          @mock_FS_p ||= Cache_.new
         end
       end
 
@@ -55,6 +51,12 @@ module Skylab::GitViz
       end
 
       class FS_
+
+        def self.[] mod, relpath=DEFAULT_RELPATH_
+          mod.module_exec do
+            ( @mock_FS_cache ||= Cache_.new )[ dir_pathname.join( relpath ) ]
+          end
+        end
 
         def initialize pn
           @self_reference = -> { self }

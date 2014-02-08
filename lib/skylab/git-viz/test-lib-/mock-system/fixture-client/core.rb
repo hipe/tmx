@@ -366,7 +366,7 @@ module Skylab::GitViz
         end
         yield( @h = p[] ) ; nil
       end
-      def call * i_a
+      def call_any_listener * i_a
         _p = i_a.reduce @h do |m, i|
           m.fetch( i ) { } or raise ::KeyError, say_no_callback( i, i_a )
         end

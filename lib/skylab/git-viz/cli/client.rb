@@ -32,7 +32,9 @@ module Skylab::GitViz
     desc "fun ASCII-powered data vizualization on a git-versioned filetree"
 
     option_parser do |o|
-
+      o.base.long[ 'use-mocks' ] = ::OptionParser::Switch::NoArgument.new do  # :+#hidden-option
+        @param_x_a.push :do_use_mocks  # #storypoint-40
+      end
     end
 
     argument_syntax '[<path>]'
@@ -67,12 +69,16 @@ module Skylab::GitViz
       end
     end
 
-    def payload_line_from_CLI_action s
-      @paystream.puts s ; nil
-    end
-
     def info_line_from_CLI_action s
       @infostream.puts s ; nil
+    end
+
+    def error_line_from_CLI_action s
+      @infostream.puts s ; nil
+    end
+
+    def payload_line_from_CLI_action s
+      @paystream.puts s ; nil
     end
   end
 end

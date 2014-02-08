@@ -1,6 +1,6 @@
 module Skylab::GitViz
 
-  class CLI::Action_  # read [#--
+  class CLI::Action_  # read [#007] the CLI action narrative for storypoints
 
     def initialize client
       @client = client
@@ -36,7 +36,7 @@ module Skylab::GitViz
 
     listnr_for_VCS_front_class
     class Listnr_For_VCS_Front
-      def call * i_a, & p
+      def call_any_listener * i_a, & p
         @up_p[].send :"#{ i_a * '_' }_from_VCS", p[]
       end
     end
@@ -100,23 +100,29 @@ module Skylab::GitViz
       "executed from #{ s }"  # :+#system-path
     end
 
-    def pay_line_from_API_action s
-      emit_payload_line s
-    end
-
     def info_line_from_API_action s
       emit_info_line s
     end
 
-    def emit_payload_line s
-      @client.emit_on_channel_line :payload, s ; nil
+    def pay_line_from_API_action s
+      emit_payload_line s
     end
 
     def emit_info_line s
       @client.emit_on_channel_line :info, s ; nil
     end
 
+    def emit_error_line s
+      @client.emit_on_channel_line :error, s ; nil
+    end
+
+    def emit_payload_line s
+      @client.emit_on_channel_line :payload, s ; nil
+    end
+
     DEFAULT_VCS_ADAPTER_NAME_I__ = :git
+
+    FAILED_ = false
 
   end
 end

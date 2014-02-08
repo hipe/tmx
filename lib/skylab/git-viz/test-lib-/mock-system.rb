@@ -11,22 +11,27 @@ module Skylab::GitViz
         end
       end
 
+      In_module = -> mod, relpath=DEFAULT_RELPATH_ do
+        mod.module_exec do
+          ( @mock_system_cache ||= Mock_Command_IO_Cache_.new ).
+            resolve_some_cached_IO_instance_of_class_for_pn(
+              Mock_System_Conduit_, dir_pathname.join( relpath ) )
+        end
+      end
+
+      DEFAULT_RELPATH_ = 'system-commands.manifest'.freeze
+
       module Instance_Methods__
       private
         def mock_system_conduit
-          IO_Lookup__.new( self ).lookup_system_conduit
-        end
-      public
-        def get_system_command_manifest_pn
-          fixtures_module.dir_pathname.join 'system-commands.manifest'
+          @mock_system_conduit ||=
+            In_module[ fixtures_module, system_commands_manifest_relpath ]
         end
         def fixtures_module
           self.class.fixtures_mod
         end
-        def resolve_any_memoized_IO_cache lookup
-          fixtures_module.module_exec do
-            @fixture_IO_cache ||= lookup.build_IO_cache
-          end
+        def system_commands_manifest_relpath
+          DEFAULT_RELPATH_
         end
       end
 
@@ -36,29 +41,16 @@ module Skylab::GitViz
         end
       end
 
-      class IO_Lookup__  # #storypoint-45 #what-do-you-mean-by-IO
-        def initialize client
-          @client = client
+      class Build_system_conduit_
+        def initialize manifest_pn
+          @manifest_pn = manifest_pn
         end
-        def lookup_system_conduit
-          @IO_class = Mock_System_Conduit_
-          lookup
-        end
-      private
-        def lookup
-          @pn = @client.get_system_command_manifest_pn
-          rslv_some_cached_IO_for_pathname
-        end
-        def rslv_some_cached_IO_for_pathname
-          x = @client.resolve_any_memoized_IO_cache self
-          x ||= @client.build_and_memoize_and_get_IO_cache
-          x.resolve_some_cached_IO_instance_of_class_for_pn @IO_class, @pn
-        end
-      public
-        def build_IO_cache
-          Mock_Command_IO_Cache_.new
+        def build_system_conduit
+
         end
       end
+
+      # #storypoint-45 #what-do-you-mean-by-IO
 
       class Mock_Command_IO_Cache_
         def initialize
@@ -830,17 +822,6 @@ module Skylab::GitViz
           cmd = Lookup_for_playback__.
             new( @manifest_dirname_pn, @cmd_a_h, a ).lookup_for_playback
           cmd.get_four
-        end
-      end
-
-      module FUN_
-
-        Ellipsify = -> x do
-          if 50 < x.length
-            "#{ x[ 0, 45 ] }[..]"
-          else
-            x
-          end
         end
       end
 

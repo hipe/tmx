@@ -20,16 +20,27 @@ module Skylab::GitViz::TestSupport::CLI
       expect_succeeded
     end
 
-    false and
-    it "mock output screen (for now)" do
-      expect_emissions_on_channel :o
-      invoke 'ht', 'mock-1'
-      expect "   ├it's just                          │"
-      expect "   │ └funky like that                  │#{
-                   } •  •• • ••  •                   "
-      expect "   └everybody in the room is floating  │#{
-                 }• • • • ••• •  •• •• •• •  •• •  "
+    it "see dots (mocked)" do
+      _path = '/derp/berp/dirzo'
+      invoke 'ht', _path, '--use-mocks'
+      expect_information_about_moves
+      expect_dots
       expect_succeeded
+    end
+
+    def expect_information_about_moves
+      expect_emissions_on_channel :e
+      2.times do
+        expect %r(\bappears\b.+informational\b)
+      end
+    end
+
+    def expect_dots
+      expect_emissions_on_channel :o
+      expect "   ├everybody in the room is floating  │ •• "
+      expect "   ├it's just                          │"
+      expect "   │ └funky like that                  │• • "
+      expect "   └move-after                         │   •"
     end
   end
 end
