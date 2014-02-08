@@ -4,8 +4,6 @@ module Skylab::Test
 
     Test = Test  # so visible from children
 
-    MetaHell = ::Skylab::MetaHell
-
     Divide = self
 
     Plugin_.enhance self do

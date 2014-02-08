@@ -42,9 +42,9 @@ module Skylab::Test
         end
       end
 
-      Field_ = MetaHell::FUN::Parse::Field_
+      Field_ = Test::Lib_::Parse_field[]
 
-      Syntax_ = MetaHell::FUN.parse_series.curry[
+      Syntax_ = Test::Lib_::Parse_series[].curry[
         :syntax, :monikate, -> a { a * ' ' },
         :field, :monikate, -> s { "[ #{ s } ]" },
         :field, :moniker, '<integer>',

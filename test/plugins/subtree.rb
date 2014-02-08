@@ -101,7 +101,7 @@ module Skylab::Test
 
     def initialize( * )
       super
-      @sort_mtx = Lib_::Basic[]::Mutex::Write_Once.new
+      @sort_mtx = Lib_::Basic_Mutex[]::Write_Once.new
     end
 
   private
@@ -137,7 +137,7 @@ module Skylab::Test
     end
 
     def __hot_subtree__
-      Lib_::Basic[]::Tree.new do |y|
+      Lib_::Basic_Tree[].new do |y|
         conflict_a = nil
         ag = build_aggregated_agent nil, -> do
           true
@@ -166,7 +166,7 @@ module Skylab::Test
         end.call
         if r
           sp_cache_a.each do |sp, a|
-            y << ( Lib_::Basic[]::Tree.new sp do |yy|
+            y << ( Lib_::Basic_Tree[].new sp do |yy|
               a.each( & yy.method( :<< ) ) if a
             end )
           end
@@ -244,7 +244,7 @@ module Skylab::Test
         end
         [ * arg_a,
           ::Enumerator::Yielder.new do |msg|
-            iy << Face::CLI::FUN.reparenthesize[ msg, say ]
+            iy << Test::Lib_::Reparenthesize[ msg, say ]
           end,
           ::Enumerator::Yielder.new do |msg|
             ok = false
@@ -307,7 +307,7 @@ module Skylab::Test
       def build_p
         hublen = (( hub_pn = @project_hub_pn )).to_s.length + 1
         ::Pathname.glob( hub_pn.join(
-          "*/#{ UNIVERSAL_TEST_DIR_RELPATH_ }/**/*#{ ::Skylab::TestSupport::FUN::Spec_rb[] }"
+          "*/#{ UNIVERSAL_TEST_DIR_RELPATH_ }/**/*#{ Test::Lib_::Spec_rb[] }"
         )).group_by do |pn|
           FIRST_DIR_RX_.match( pn.to_s, hublen ).to_s.intern
         end.method :[]
@@ -339,7 +339,7 @@ module Skylab::Test
       end
 
       def some_test_paths
-        any_test_pn_a || MetaHell::EMPTY_A_
+        any_test_pn_a || EMPTY_A_
       end
     end
   end

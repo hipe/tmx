@@ -2,7 +2,7 @@ module Skylab::Test::Plugins::Subtree
 
   include ::Skylab::Test
   Lib_ = Lib_
-  Plugin_ = ::Skylab::Face::Plugin
+  Plugin_ = Lib_::Heavy_plugin[]
 
   class Agent_
     # search agents classes go here

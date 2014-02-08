@@ -33,7 +33,7 @@ module Skylab::Test
         mod.module_exec do
           adapter_moniker_notify i
           @dir_pathname ||= me.dir_pathname.join( i )
-          MetaHell::MAARS[ self, false ]
+          Autoloader_[ self ]
         end
         nil
       end

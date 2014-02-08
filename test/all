@@ -39,15 +39,10 @@ module Skylab  # hold on for a moment & let it get weird because of [#te-002]:
 end  # OK now that coverage agent may have started, we can procede as normal:
 
 require_relative 'core'
-require 'optparse'
 
 module Skylab::Test
 
-  module Plugins
-    MetaHell::Boxxy[ self ]
-  end
-
-  Plugin_ = ::Skylab::Face::Plugin
+  Plugin_ = Test::Lib_::Heavy_plugin[]
 
   class Front_Mechanics_  # a "headless" client, conceptually
 
@@ -88,17 +83,12 @@ module Skylab::Test
       @action_a = nil ; @queue_a = []
     end
 
-    def determine_hot_plugins_notify  # because we hackishly defined a node
-      # outside of its "home file" in #this-spot, we now have to pay it back
-      # here "manually" load the file now for any such nodes
-      # (because of [#te-002])
+    def determine_hot_plugins_notify
+      # because the coverage plugin is necessarily defined in multiple places
+      # (like #this-spot), we now have to load the rest of it explicitly
+      # because the rest of it won't load via  autoloading [#te-002]
 
-      Test::Plugins.boxxy do
-        original_constants.each do |i|
-          load dir_pathname.join( pathify i ).sub_ext( extname ).to_s
-          upwards get_const( i )
-        end
-      end
+      require Test::Plugins::Coverage.dir_pathname.to_path
       super
     end
 
@@ -226,9 +216,9 @@ module Skylab::Test
 
     def say_nonempty_queue &blk
       i = @last_action_name_i ; a = @queue_a
-      @info_y << ( Headless::NLP::EN.calculate do
+      @info_y << ( Test::Lib_::EN_calculate[ -> do
         instance_exec i, a, &blk
-      end )
+      end ] )
       nil
     end
 
@@ -260,7 +250,7 @@ module Skylab::Test
       @paystream, @infostream = sout, serr
       @info_y = ::Enumerator::Yielder.new( & @infostream.method( :puts ) )
       @em = -> s { "\e[1;32m#{ s }\e[0m" }
-      @pretty_path = Headless::CLI::PathTools::FUN.pretty_path
+      @pretty_path = Test::Lib_::Pretty_path_proc[]
       nil
     end
 
@@ -286,6 +276,7 @@ module Skylab::Test
     end
 
     def build_option_parser
+      require 'optparse'
       @option_parser = o = ::OptionParser.new
       o.banner = usage_line
       o.separator(
@@ -307,7 +298,7 @@ module Skylab::Test
       o.separator "#{ em 'Options:' }"
       merge_options o, -> merger do
         merger.add(
-          Headless::CLI::Option.on( '-h', '--help', 'this screen.' ) do
+          Test::Lib_::CLI_option[].on( '-h', '--help', 'this screen.' ) do
             @queue_a << :help
           end )
       end
@@ -379,7 +370,7 @@ module Skylab::Test
       EXP_AG_P_[ nil ]
     end
 
-    EXP_AG_P_ = MetaHell::FUN::Puff_constant_.
+    EXP_AG_P_ = Test::Lib_::Puff_constant[].
       curry[ false, -> _ { Expression_Agent_.new }, :EXPR_AGENT_, self ]
 
     class Expression_Agent_
@@ -400,14 +391,14 @@ module Skylab::Test
         1 == a.length ? " #{ a[0] }" : "\n#{ a * "\n" }"
       end
       def or_ a
-        Headless::NLP::EN::Minitesimal::FUN.oxford_comma[ a, ' or ' ]
+        Test::Lib_::Oxford_and[ a ]
       end
       def par i
         "<#{ i.to_s.gsub '_', '-' }>"
       end
     private
       def curry x
-        Headless::CLI::Expression::FUN.curriable_stylize.curry[ [ * x ] ]
+        Test::Lib_::CLI_curriable_stylize_proc[].curry[ [ * x ] ]
       end
     end
 
@@ -562,11 +553,12 @@ module Skylab::Test
     # aggregate option parser.
 
     def merge_options up_op, at_end=nil, ctx_a=nil
+      _CLI_Option = Test::Lib_::CLI_option[]
       ep = plugin_host_metaservices.eventpoints.fetch :available_options
-      merger = Headless::CLI::Option::Merger.new Anchorized_moniker_
+      merger = _CLI_Option::Merger.new Anchorized_moniker_
       hot_plugin_a.each do |pi|
         if pi.plugin_metaservices.subscribed_to_eventpoint? ep.normal
-          rec = Headless::CLI::Option::Parser::Recorder.new do |opt|
+          rec = _CLI_Option::Parser::Recorder.new do |opt|
             merger.add opt, * [ * ctx_a, pi ]
           end
           pi.send ep.as_method_name, rec, ctx_a
@@ -585,6 +577,11 @@ module Skylab::Test
         "#{ cx_a.map( & :local_plugin_moniker ) * ' ' } plugin"
       end
     end
+  end
+
+  module Plugins
+    Autoloader_[ self, :boxxy ]
+    Autoloader_[ Coverage ]  # because it was defined in this file
   end
 end
 

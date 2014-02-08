@@ -42,7 +42,7 @@ module Skylab::Test
     end
 
     def counts
-      Face::CLI::Table[
+      Test::Lib_::CLI_table[
         :field, 'subproduct',
         :field, 'num test files',
         :write_lines_to, info_y.method( :<< ),
