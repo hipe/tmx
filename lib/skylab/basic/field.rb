@@ -28,9 +28,9 @@ class Skylab::Basic::Field
 
     def self.build_into host_mod, def_blk
 
-      flsh = Flusher_.new host_mod, self
+      flsh = Kernel_.new host_mod, self
 
-      Conduit_.new( ->( * meta_f_a ) { flsh.concat_metafields meta_f_a },
+      Shell_.new( ->( * meta_f_a ) { flsh.concat_metafields meta_f_a },
                     ->( * fields_a ) { flsh.concat_fields fields_a },
                     ->( f          ) { flsh.field_class_instance_methods f },
                   ).
@@ -39,14 +39,14 @@ class Skylab::Basic::Field
       flsh.flush
     end
 
-    Conduit_ = Basic::Lib_::Enhance_Conduit[ %i(
+    Shell_ = Basic::Lib_::Enhancement_shell[ %i(
       meta_fields
       fields
       field_class_instance_methods
     ) ]
   end   # ( `Field::Box` reopens below .. )
 
-  class Flusher_
+  class Kernel_
 
     def initialize host_mod, box_kls
       @metafield_a = [ ] ; @field_a = nil ; @im = nil

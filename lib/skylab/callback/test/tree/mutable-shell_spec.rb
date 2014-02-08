@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Callback::TestSupport::Tree
 
-  describe "[gv] lib- callbacks-tree: mutable conduit" do
+  describe "[gv] lib- callbacks-tree: mutable shell" do
 
     context "one" do
 
@@ -27,17 +27,17 @@ module Skylab::Callback::TestSupport::Tree
         z.should eql :neet
       end
 
-      it "mutable conduit builds" do
-        Wap_Zazzle.new.callbacks.build_mutable_conduit
+      it "mutable shell builds" do
+        Wap_Zazzle.new.callbacks.build_mutable_shell
       end
 
-      it "mutable conduit single arg proc form" do
+      it "mutable shell single arg proc form" do
         same do |cond|
           cond.wiff -> x { @y = x }
         end
       end
 
-      it "mutable conduit block form" do
+      it "mutable shell block form" do
         same do |cond|
           cond.wiff { |x| @y = x }
         end
@@ -45,7 +45,7 @@ module Skylab::Callback::TestSupport::Tree
 
       def same
         cb = Wap_Zazzle.new.callbacks
-        cond = cb.build_mutable_conduit
+        cond = cb.build_mutable_shell
         yield cond
         cb.call_callback :wiff, :merp
         @y.should eql :merp

@@ -9,7 +9,7 @@ module ::Skylab::CodeMolester
     # the two - they work very differently. they will have to continue
     # to cross-polinate for a while..)
 
-    class Conduit_
+    class Shell_
       def initialize mod, op_h
         op_h.keys.each do |k|
           define_singleton_method k do |*a|
@@ -19,7 +19,7 @@ module ::Skylab::CodeMolester
       end
     end
 
-    class Conduit_::SingleShot
+    class Shell_::SingleShot
       def with sexp_auto_class
         @mutex = :with
         freeze
@@ -48,10 +48,10 @@ module ::Skylab::CodeMolester
       define_singleton_method :enhance do |mod, &blk|
         if blk
           mod.module_exec( & init )
-          Conduit_.new( mod, op_h ).instance_exec( &blk )
+          Shell_.new( mod, op_h ).instance_exec( &blk )
           nil
         else
-          Conduit_::SingleShot.new do |name, value|
+          Shell_::SingleShot.new do |name, value|
             mod.module_exec( & init )
             mod.module_exec value, & op_h.fetch( name )
             nil

@@ -363,29 +363,29 @@ module Skylab
         end
       end
 
-      # ~ mutable conduits
+      # ~ mutable shells
 
       class Specified_Callback_Tree_
 
-        def build_mutable_conduit
-          _cls = mtbl_conduit_class
+        def build_mutable_shell
+          _cls = mtbl_shell_class
           _cls.new do |callback_i, p|
             set_callback callback_i, p ; nil
           end
         end
       private
-        def mtbl_conduit_class
+        def mtbl_shell_class
           cls = self.class
-          if cls.const_defined? :Mutable_Conduit__, false
-            cls::Mutable_Conduit__
+          if cls.const_defined? :Mutable_Shell__, false
+            cls::Mutable_Shell__
           else
-            cls.const_set :Mutable_Conduit__, bld_mutable_conduit_class
+            cls.const_set :Mutable_Shell__, bld_mutable_shell_class
           end
         end
       private
-        def bld_mutable_conduit_class
+        def bld_mutable_shell_class
           i_a = @root.h.keys
-          ::Class.new( Mutable_Conduit__ ).class_exec do
+          ::Class.new( Mutable_Shell__ ).class_exec do
             i_a.each do |m_i|
               define_method m_i do |*a, &p|
                 p = ( p ? a << p : a ).fetch a.length - 1 << 1  # normalize 1 p
@@ -397,7 +397,7 @@ module Skylab
         end
       end
 
-      class Mutable_Conduit__
+      class Mutable_Shell__
         def initialize & p
           @p = p
         end

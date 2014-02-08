@@ -7,8 +7,8 @@ module Skylab::Basic::Field::Reflection
   module Reflection
 
     def self.enhance target
-      flsh = Flusher_.new target
-      cond = Conduit_.new( -> host do
+      flsh = Kernel_.new target
+      cond = Shell_.new( -> host do
         flsh.host = host
       end )
       if block_given?
@@ -16,7 +16,7 @@ module Skylab::Basic::Field::Reflection
           }one-off shooter for currently (do not use blocks. call #{
           }`with` on the result of the enhance() call.)"
       else
-        Conduit_::One_Shot_.new cond, -> { flsh.flush }
+        Shell_::One_Shot_.new cond, -> { flsh.flush }
       end
     end
 
@@ -25,9 +25,9 @@ module Skylab::Basic::Field::Reflection
     end
   end
 
-  Conduit_ = Basic::Lib_::Enhance_Conduit[ %i( with ) ]
+  Shell_ = Basic::Lib_::Enhancement_shell[ %i( with ) ]
 
-  Flusher_ = Basic::Lib_::Functional_methods.call :flush do
+  Kernel_ = Basic::Lib_::Functional_methods.call :flush do
 
     def initialize target
       @host = nil

@@ -1009,7 +1009,7 @@ module Skylab::Porcelain::Legacy
 
     wire_me = -> me, blk do
       if me.respond_to? :on  # [#ps-020] part of its public API
-        cnd = Event_Wiring_Conduit_.new me.method( :on )
+        cnd = Event_Wiring_Shell_.new me.method( :on )
         blk[ cnd ]
       else
         me.instance_exec( & blk )
@@ -1075,7 +1075,7 @@ module Skylab::Porcelain::Legacy
   private
 
 
-    class Event_Wiring_Conduit_ < ::BasicObject
+    class Event_Wiring_Shell_ < ::BasicObject
       def initialize on_p
         @on_p = on_p
       end

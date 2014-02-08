@@ -271,7 +271,7 @@ module Skylab::Face
         define_method :initialize do
           sam = siv = did_sam = did_siv = nil ; svc_queue_a = [ ]
           @absorb_services_defn_blk = -> blk do
-            Conduit_.new(
+            Shell_.new(
               -> i do
                 siv and fail "won't clobber existing #{
                   } services ivar - #{ @svc_ivar }"
@@ -311,7 +311,7 @@ module Skylab::Face
           nil
         end
         AT_ = '@'.getbyte 0
-        class Conduit_
+        class Shell_
           def initialize siv, sam, svs
             @h = { siv: -> i { siv[ i ] },
                    sam: -> i { sam[ i ] },

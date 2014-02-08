@@ -22,7 +22,7 @@ module Skylab::Basic
           -> { any_subsequent_items -> x { "#{ sep }#{ x }" } }
         end.call
         io = Basic::Lib_::String_IO[]
-        o = Conduit_.to_struct b
+        o = Shell_.to_struct b
         count = 0
         @add = -> str do
           if count.zero?
@@ -45,7 +45,7 @@ module Skylab::Basic
 
     Basic::Lib_::Function[ self, :@add, :<<, :flush, :count ]
 
-    Conduit_ = Basic::Lib_::Enhance_Conduit[ %i(
+    Shell_ = Basic::Lib_::Enhancement_shell[ %i(
       any_first_item
       any_subsequent_items
     ) ]  # NOTE keep the above consistent with neighbors!

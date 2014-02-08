@@ -15,13 +15,13 @@ module Skylab::Face
       else
         Metaservices_.new
       end
-      Conduit_.new( msvcs ).instance_exec( & blk ) if blk
+      Shell_.new( msvcs ).instance_exec( & blk ) if blk
       msvcs.flush mod
       nil
     end
   end
 
-  class Plugin::Host::Conduit_
+  class Plugin::Host::Shell_
     def initialize story
       @story = story
     end
@@ -167,14 +167,14 @@ module Skylab::Face
   module Plugin
 
     def self.enhance mod, &blk
-      cnd = Conduit_.new( fsh = Metaservices_.new )
+      cnd = Shell_.new( fsh = Metaservices_.new )
       blk and cnd.instance_exec( & blk )
       fsh.flush mod
       nil
     end
   end
 
-  class Plugin::Conduit_
+  class Plugin::Shell_
 
     def initialize story
       @story = story
@@ -305,7 +305,7 @@ module Skylab::Face
 
   # ~ facet 2 - services ~
 
-  class Plugin::Host::Conduit_
+  class Plugin::Host::Shell_
     def services *x_a
       @story.concat_services x_a
     end
@@ -505,7 +505,7 @@ module Skylab::Face
     public :dispatch_args_x
   end
 
-  class Plugin::Conduit_
+  class Plugin::Shell_
 
     def services_used *x_a
       @story.concat_services_used x_a
@@ -664,7 +664,7 @@ module Skylab::Face
 
   # ~ facet 3 - eventpoints ~
 
-  class Plugin::Host::Conduit_
+  class Plugin::Host::Shell_
 
     def eventpoints *x_a
       @story.concat_eventpoints x_a
@@ -739,7 +739,7 @@ module Skylab::Face
 
   # --*--
 
-  class Plugin::Conduit_
+  class Plugin::Shell_
 
     def eventpoints_subscribed_to * x_a
       @story.concat_eventpoints_subscribed_to x_a
@@ -806,7 +806,7 @@ module Skylab::Face
 
   # ~ facet 4 - determining plugins ~
 
-  class Plugin::Host::Conduit_
+  class Plugin::Host::Shell_
     def plugin_box_module x
       @story.set_determiner :Plugins_Box_Module_, x
       nil

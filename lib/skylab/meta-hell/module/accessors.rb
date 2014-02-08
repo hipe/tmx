@@ -110,7 +110,7 @@ module Skylab::MetaHell
 
     def self.enhance host_mod, &enhance_blk
 
-      cnd = Conduit_.new -> access, meth, path, create_blk=nil, extend_blk=nil do
+      cnd = Shell_.new -> access, meth, path, create_blk=nil, extend_blk=nil do
 
         ivar = "@#{ meth }".intern
 
@@ -145,11 +145,11 @@ module Skylab::MetaHell
         cnd.instance_exec( & enhance_blk  )
         nil
       else
-        Conduit_::OneShot_.new cnd  # (custom)
+        Shell_::OneShot_.new cnd  # (custom)
       end
     end
 
-    class Conduit_
+    class Shell_
 
       def initialize mod_bumper
         @stack = []
@@ -200,7 +200,7 @@ module Skylab::MetaHell
       end
     end
 
-    class Conduit_::OneShot_
+    class Shell_::OneShot_
 
       # (it's easier and clearer to just implement this "by hand" here.)
 
@@ -208,7 +208,7 @@ module Skylab::MetaHell
         @cnd = cnd
       end
 
-      Conduit_::A__.each do |i|
+      Shell_::A__.each do |i|
         define_method i do |*a, &b|
           @mutex = i
           freeze

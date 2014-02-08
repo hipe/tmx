@@ -95,7 +95,7 @@ about this `init` method:
 • you can always clear the ivar and/or set it to whatever yourself.
   for each of the below 3 things, some clients will have set their
   own before they get here (e.g h.l table with it's experimental
-  conduit / engine pattern omg)
+  shell / kernel pattern omg)
 
 
 ## :#storypoint-8

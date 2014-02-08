@@ -18,7 +18,7 @@ module Skylab::GitViz
 
         def initialize host, message
           super()
-          yield @callbacks.build_mutable_conduit
+          yield @callbacks.build_mutable_shell
           @context, @socket = host.context_and_socket
           @y = @callbacks.build_yielder_for :info_line
           @host = host ; @message = message

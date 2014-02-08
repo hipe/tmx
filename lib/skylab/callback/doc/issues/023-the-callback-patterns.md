@@ -274,9 +274,9 @@ but for now in the spirit of experimentation this is left as-is.
 ## :#storypoint:50
 
 this is an #experimental hack to let a polyadic node quack like a monadic node
-for the purposes of using a mutable conduit.
+for the purposes of using a mutable shell.
 
-consider that all available "write" operations on any mutable conduit are
+consider that all available "write" operations on any mutable shell are
 always of the "set-foo" and not of the "add-foo" variety: you are always
 setting a proc for a particular channel, you are never adding a proc to a set
 of procs. we intend to keep it this way as long as it is practical to.

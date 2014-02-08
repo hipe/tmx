@@ -25,8 +25,8 @@ module Skylab::Basic
       Headless__[]::NLP::EN::Minitesimal::FUN.inflect[ p ]
     end
 
-    Enhance_Conduit = -> a do
-      MetaHell__[]::Enhance::Conduit.new a
+    Enhancement_shell = -> a do
+      MetaHell__[]::Enhance::Shell.new a
     end
 
     Formal_Box_Open = -> do

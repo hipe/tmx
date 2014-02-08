@@ -232,7 +232,7 @@ module Skylab::FileMetrics
 
         process_fields = process_field = process_the_rest = nil
 
-        conduit = Conduit_.new(
+        shell = Shell_.new(
           fields:   -> x { process_fields[ x ] },
           field:    -> { process_field },
           hdr:      ->( &blk ) { @hdr = blk },
@@ -298,7 +298,7 @@ module Skylab::FileMetrics
         sra = nil
         process_field = -> sym do
           fetch sym  # sanity
-          Field_::Conduit_.new(
+          Field_::Shell_.new(
             summary: -> x, y=nil do
               sra ||= [ { } ]
               i = 0
@@ -330,9 +330,9 @@ module Skylab::FileMetrics
           the_rest
         end
 
-        -> do  # finally run the `design_x` against the conduit
-          h = { 0 => -> f { conduit.instance_exec( &f ) },
-                1 => -> f { f[ conduit ] } }  # your choice
+        -> do  # finally run the `design_x` against the shell
+          h = { 0 => -> f { shell.instance_exec( &f ) },
+                1 => -> f { f[ shell ] } }  # your choice
           design_x.each do |func|  # etc.
             h.fetch( func.arity )[ func ]
           end
@@ -359,11 +359,11 @@ module Skylab::FileMetrics
         nil
       end
 
-        # `Table::Render::Design_::Conduit_` - the conduit is the ..er..
-        # conduit through which we express how we want to create the
+        # `Table::Render::Design_::Shell_` - the shell is the ..er..
+        # shell through which we express how we want to create the
         # immutable design.
 
-      Conduit_ = MetaHell::Proxy::Nice.new :field, :fields, :hdr, :lambda,
+      Shell_ = MetaHell::Proxy::Nice.new :field, :fields, :hdr, :lambda,
         :sep, :the_rest
 
         # `Table::Render::Design_::Field_` - field metadata in a design.
@@ -372,7 +372,7 @@ module Skylab::FileMetrics
         :align_summary, :cook, :header, :is_autonomous, :is_noop, :is_rest,
         :prerender
 
-      Field_::Conduit_ = MetaHell::Proxy::Nice.new :summary
+      Field_::Shell_ = MetaHell::Proxy::Nice.new :summary
     end
   end
 end

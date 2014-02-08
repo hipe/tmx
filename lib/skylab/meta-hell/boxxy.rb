@@ -415,7 +415,7 @@ module Skylab::MetaHell
       end
     end
 
-    class Conduit__
+    class Shell__
       def initialize bxy
         @bxy = bxy
       end
@@ -424,7 +424,7 @@ module Skylab::MetaHell
     class Boxxy__
 
       def _absorb_block blk
-        Conduit__.new( self ).instance_exec( & blk )
+        Shell__.new( self ).instance_exec( & blk )
         nil
       end
 
@@ -561,7 +561,7 @@ module Skylab::MetaHell
     #     Cafes.constants  # => [ :EspressoBar, :LabCafe ]
     #
 
-    class Conduit__
+    class Shell__
       def inferred_name_scheme i
         @bxy.set_inferred_name_scheme i
         nil

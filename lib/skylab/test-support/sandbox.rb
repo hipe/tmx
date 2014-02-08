@@ -91,9 +91,9 @@ module Skylab::TestSupport::Sandbox
 
   def self.enhance sb_mod, &blk
     kiss_with = superklass = nil
-    cnd = Conduit_.new -> x { kiss_with = x }, -> x { superklass = x }
+    cnd = Shell_.new -> x { kiss_with = x }, -> x { superklass = x }
     flush = -> do
-      Flusher_.new( sb_mod, kiss_with, superklass ).flush
+      Kernel_.new( sb_mod, kiss_with, superklass ).flush
       nil
     end
     if blk
@@ -104,12 +104,12 @@ module Skylab::TestSupport::Sandbox
     end
   end
 
-  Conduit_ = MetaHell::Enhance::Conduit.new %i|
+  Shell_ = MetaHell::Enhance::Shell.new %i|
     kiss_with produce_subclasses_of
   |
 
-  Flusher_ = MetaHell::Function::Class.new :flush
-  class Flusher_
+  Kernel_ = MetaHell::Function::Class.new :flush
+  class Kernel_
 
     def initialize sb_mod, kiss_with, superklass
       @flush = -> do
@@ -139,12 +139,12 @@ module Skylab::TestSupport::Sandbox
     # an in-scope `Sandbox` module. #todo: example
 
     def self.[] anchor_mod
-      Flusher_.new( anchor_mod ).flush
+      Kernel_.new( anchor_mod ).flush
     end
   end
 
-  Host::Flusher_ = MetaHell::Function::Class.new :flush
-  class Host::Flusher_
+  Host::Kernel_ = MetaHell::Function::Class.new :flush
+  class Host::Kernel_
 
     def initialize anchor_mod
 

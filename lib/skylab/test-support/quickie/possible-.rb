@@ -126,11 +126,11 @@ module Skylab::TestSupport
         def initialize blk
           @node_i = nil ; @to_a = nil
           if blk
-            Conduit__.new( a = [] ).instance_exec( & blk )
+            Shell__.new( a = [] ).instance_exec( & blk )
             @from_a = a.freeze
           end
         end
-        class Conduit__
+        class Shell__
           def initialize a
             @a = a
           end

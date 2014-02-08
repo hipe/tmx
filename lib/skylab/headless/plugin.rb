@@ -34,12 +34,12 @@ module Skylab
         def load_plugins
           @plugin_conduit_h = {}
           init_plugin_callbacks_if_necessary
-          conduit = plugin_conduit_cls.new @y, self
+          shell = plugin_conduit_cls.new @y, self
           box_mod = plugin_box_module
           box_mod.constants.each do |const_i|
             name = Callback::Name.from_const const_i
             WHITE_SLUG_RX__ =~ name.as_slug or next
-            cond = conduit.curry name
+            cond = shell.curry name
             plugin = box_mod.const_get( name.as_const, false ).new cond
             cond.plugin = plugin
             idx_plugin cond
@@ -139,7 +139,7 @@ module Skylab
         PROCEDE__ = nil
       end
 
-      class Plugin_Conduit_  # see [#031]:#understanding-plugin-conduits
+      class Plugin_Conduit_  # see [#031]:#understanding-plugin-shells
         def initialize y, real
           @up_p = -> { real }
           @stderr_line_yielder = y

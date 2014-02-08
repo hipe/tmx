@@ -60,10 +60,10 @@ following reasons:
      corresponding callback methods, so here they all follow the name pattern
      /^on_.+/, as do all event channels.
   • rather than the complex API of 'meta-services' that [hl] employs, here
-    the plugin host simply implements one lone "plugin conduit" subclass
+    the plugin host simply implements one lone "plugin shell" subclass
     that will be used for two-way communication from host to plugin.
   • plugins need not subclass anything in particular; they derive services
-    from the host via the conduit passed to them in their construction, and
+    from the host via the shell passed to them in their construction, and
     they subscribe to events via following the method-naming patterne
   • we offer a *much* simplifield solution to the "crowded namespace"
     problem of different plugins wanting to define different options: each

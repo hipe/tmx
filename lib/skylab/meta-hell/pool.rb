@@ -36,7 +36,7 @@ module Skylab::MetaHell
       use_lease_and_release_instead_of_new = nil
       define_singleton_method :enhance do |mod|
         mutex = Mutex_.new
-        Conduit_.new(
+        Shell_.new(
           -> do
             mutex.bump :with_with_instance
             mod.module_exec( & use_with_instance_instead_of_new )
@@ -50,7 +50,7 @@ module Skylab::MetaHell
         )
       end
 
-      class Conduit_
+      class Shell_
         def initialize wi, lar
           define_singleton_method :with_with_instance, &wi
           define_singleton_method :with_lease_and_release, &lar

@@ -10,22 +10,8 @@ a) the conveninece of a DSL but b) your CLI is simple and doesn't have
 subcommands (i.e isn't a "box"). Everything is experimental and subject
 to change and will definately break your app. Everything.
 
-`default_action` - your default action is simply an instance method
-your client defiines that iself results in the name of another method
-to be used as the default "action method" - this in turn is the
-method name to be used as an "action method" if for e.g the queue
-is empty after parsing any opts, and the engine needs to decide what
-method to use to process the request.
-
-This action method will in turn be used possibly to parse argv args
-with, and then this method will be called with any valid-arity-having
-argv.
-
-A common default name for this assumed elsewhere is `process`, however
-it is the opinion of the present author that you should use a name
-that is expressive (in one or two words) about what your particular
-action actually does. Hence this method (er., dsl writer) can be used
-to indicate that.
+(EDIT: content that used to document the 'default_action' method here
+has moved to [#039] the CLI action top narrative #the-default-action-methhod.)
 
 
 `build_option_parser` -- different than the other two (e.g) same-named

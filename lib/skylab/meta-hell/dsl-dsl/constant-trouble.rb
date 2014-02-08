@@ -46,7 +46,7 @@ module Skylab::MetaHell
         h.freeze
 
         dynamic [ :const, const ], [ :superclass, superclass ],
-          [ :field_a, fld_a ], [ :conduit, ::Class.new.class_exec do
+          [ :field_a, fld_a ], [ :shell, ::Class.new.class_exec do
 
           define_method :initialize do |res_a|
             @set = -> i, *tpl do
@@ -94,7 +94,7 @@ module Skylab::MetaHell
 
     def self.enhance mod, blk=nil
       arr = ::Array.new self::FIELD_A_.length
-      cnd = self::CONDUIT_.new arr
+      cnd = self::SHELL_.new arr
       cnd.instance_exec( & blk ) if blk
       flush mod, arr
     end

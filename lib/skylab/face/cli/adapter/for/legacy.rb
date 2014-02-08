@@ -15,7 +15,7 @@ module Skylab::Face
 
         native = build_native[ act_class, request_client, action_sheet ]
         strange = native.instance_exec do
-          strng = Conduit_A.new(
+          strng = Shell_A.new(
             :didactic_invocation_string => -> do
               normalized_invocation_string
             end,
@@ -39,7 +39,7 @@ module Skylab::Face
         act_class.new h
       end
 
-      Conduit_A = MetaHell::Proxy::Nice.new :didactic_invocation_string,
+      Shell_A = MetaHell::Proxy::Nice.new :didactic_invocation_string,
         :send
     end.call
   end

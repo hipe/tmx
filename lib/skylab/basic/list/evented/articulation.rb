@@ -24,7 +24,7 @@ module Skylab::Basic
         f[ *a ] if f
       end
 
-      o = Conduit_.to_struct def_blk
+      o = Shell_.to_struct def_blk
       call[ o.always_at_the_beginning ]
       if gets[]
         call[ o.any_first_item, line ]
@@ -41,7 +41,7 @@ module Skylab::Basic
       count
     end
 
-    Conduit_ = Basic::Lib_::Enhance_Conduit[ %i(
+    Shell_ = Basic::Lib_::Enhancement_shell[ %i(
       always_at_the_beginning
       iff_zero_items
       any_first_item

@@ -6,7 +6,7 @@ module Skylab::MetaHell
 
   end
 
-  class Enhance::Conduit
+  class Enhance::Shell
 
     class << self
       alias_method :mh_new, :new
@@ -50,13 +50,13 @@ module Skylab::MetaHell
     end
   end
 
-  Enhance::Conduit::FUN_ = -> do
+  Enhance::Shell::FUN_ = -> do
 
     o = { }
 
     # `to_struct` - this is defined as a "class method" on the generated
-    # conduit class. pass it a `def_blk` - type function and it will result
-    # in a struct with members corresponding to the members of the conduit,
+    # shell class. pass it a `def_blk` - type function and it will result
+    # in a struct with members corresponding to the members of the shell,
     # with each "macro" strictly taking one argument.
 
     o[:to_struct] = -> f do
@@ -83,9 +83,9 @@ module Skylab::MetaHell
 
   class Enhance::OneShot
 
-    # per the `enhance` pattern, make one-shot conduits easy & paranoid.
+    # per the `enhance` pattern, make one-shot shells easy & paranoid.
     #
-    # a one-shot conduit is what we use when we do this:
+    # a one-shot shell is what we use when we do this:
     #
     #     class Foo
     #       Bar.enhance( self ).with :magic
@@ -107,7 +107,7 @@ module Skylab::MetaHell
       h = {
 
         # 2-arg form -
-        # initialize with the conduit object this one shot is a one-shot of,
+        # initialize with the shell object this one shot is a one-shot of,
         # and a callback function that flushes
 
         2 => -> cnd, flsh do
@@ -132,13 +132,13 @@ module Skylab::MetaHell
           [ cnd, flsh ]
         end
       }
-      define_method :initialize do |* conduit_flush_a|
-        conduit, flush = instance_exec( * conduit_flush_a, &
-          h.fetch( conduit_flush_a.length ) )
+      define_method :initialize do |* shell_flush_a|
+        shell, flush = instance_exec( * shell_flush_a, &
+          h.fetch( shell_flush_a.length ) )
         @execute = -> meth_i, arg_a, block_b do
           @mutex = meth_i
           freeze
-          r = conduit.send meth_i, * arg_a, & block_b
+          r = shell.send meth_i, * arg_a, & block_b
           flush.call
           r
         end

@@ -66,8 +66,8 @@ module Skylab::CodeMolester::Config::File::Entity
 
   module Entity
     def self.enhance target, &def_blk
-      flsh = Flusher_.new target
-      Conduit_.new(
+      flsh = Kernel_.new target
+      Shell_.new(
         ->( *a ) do
           flsh.concat_fields a
         end
@@ -76,9 +76,9 @@ module Skylab::CodeMolester::Config::File::Entity
     end
   end
 
-  Conduit_ = MetaHell::Enhance::Conduit.new %i| fields |
+  Shell_ = MetaHell::Enhance::Shell.new %i| fields |
 
-  class Flusher_
+  class Kernel_
 
     mutex_h = ::Hash.new do |h, mod|
       h[ mod ] = -> do

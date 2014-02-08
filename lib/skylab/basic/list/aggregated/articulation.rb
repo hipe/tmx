@@ -15,7 +15,7 @@ module Skylab::Basic
 
     def self.build_proc def_blk
       o = St_.new
-      Conduit_.new(
+      Shell_.new(
         -> str { o.template = str },
         -> ozi { o.on_zero_items = ozi },
         -> &agg { o.aggregate = agg },
@@ -32,7 +32,7 @@ module Skylab::Basic
       end
       miss_a and raise ::ArgumentError, "missing required parameter(s) - #{
         } #{ miss_a * ', ' }"
-      Flusher_.new( * o.to_a ).flush
+      Kernel_.new( * o.to_a ).flush
     end
 
     A_ = %i| template on_zero_items aggregate on_first_mention
@@ -43,10 +43,10 @@ module Skylab::Basic
 
     St_ = ::Struct.new( * A_ )
 
-    Conduit_ = Basic::Lib_::Enhance_Conduit[ A_ ]
+    Shell_ = Basic::Lib_::Enhancement_shell[ A_ ]
 
-    Flusher_ = Basic::Lib_::Functional_methods[ :flush ]
-    class Flusher_
+    Kernel_ = Basic::Lib_::Functional_methods[ :flush ]
+    class Kernel_
 
       def initialize template_str, on_zero_items_p, aggregate_p,
                          on_first_mention_p, on_subsequent_mentions_p
@@ -75,11 +75,11 @@ module Skylab::Basic
       def build_whens tmpl, aggregate_p, on_first_mention_p,
           on_subsequent_mentions_p
 
-        flusher = Mention_::Flusher_.new(
+        kernel = Mention_::Kernel_.new(
           nn_a = tmpl.get_formal_parameters.map( & :local_normal_name ) )
-        whn = When_[ flusher.flush( on_first_mention_p ),
-          flusher.flush( on_subsequent_mentions_p ),
-          flusher.flush( aggregate_p ), nn_a ]
+        whn = When_[ kernel.flush( on_first_mention_p ),
+          kernel.flush( on_subsequent_mentions_p ),
+          kernel.flush( aggregate_p ), nn_a ]
         normalize_aggregation whn
         whn
       end
@@ -198,24 +198,24 @@ module Skylab::Basic
 
     end
 
-    class Mention_::Flusher_
+    class Mention_::Kernel_
 
       def initialize nn_a
         nn_a << :_flush
-        @conduit_class = Basic::Lib_::Enhance_Conduit[ nn_a ]
-        @conduit_class.const_set :FUNC_STRUCT_,
-          ::Struct.new( * @conduit_class::A_ )
+        @shell_class = Basic::Lib_::Enhancement_shell[ nn_a ]
+        @shell_class.const_set :FUNC_STRUCT_,
+          ::Struct.new( * @shell_class::A_ )
       end
 
       def flush func
-        fs = @conduit_class::FUNC_STRUCT_.new
+        fs = @shell_class::FUNC_STRUCT_.new
         if func
           store = -> k, f do
             fs[ k ] and raise ::ArgumentError, "won't clobber existing #{ k }"
             fs[ k ] = f
             nil
           end
-          kls = @conduit_class ; a = kls::A_
+          kls = @shell_class ; a = kls::A_
           kls.new( *
             a.length.times.map do |x|
               -> f do

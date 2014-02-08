@@ -83,13 +83,13 @@ module Skylab::MetaHell
 
     def self.enhance host
       block_given? and raise ::ArgumentError, "sanity - not yet supported"
-      Conduit_One_Shot_.new -> ppp, gm, i_a do
+      Shell_One_Shot_.new -> ppp, gm, i_a do
         _make_methods host, ppp, gm, i_a
       end
     end
   end
 
-  class Function::Conduit_One_Shot_
+  class Function::Shell_One_Shot_
 
     def initialize f
       @f = f

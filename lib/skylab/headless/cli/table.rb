@@ -13,7 +13,7 @@ module Skylab::Headless::CLI::Table
   Table = self  # partly b.c Callback is not part of headless proper
   TERM_SEPARATOR_STRING_ = Headless::TERM_SEPARATOR_STRING_
 
-  class Table::Conduit
+  class Table::Shell
     # here have a goofy experiment - the public methods here (direct and
     # derived) are isomorphic with the parameters you can pass as settings
     # to your call to Table.render (or you can manipualte it directly in
@@ -32,7 +32,7 @@ module Skylab::Headless::CLI::Table
 
     def field! symbol
       @field_box.if? symbol, Headless::IDENTITY_, -> box do
-        box.add symbol, Table::Field::Conduit.new
+        box.add symbol, Table::Field::Shell.new
       end
     end
     # --*--
@@ -44,22 +44,22 @@ module Skylab::Headless::CLI::Table
 
   module Table
 
-    conduit_and_result = -> param_h, blk do
-      conduit = Conduit.new ; res = nil
-      param_h.each { |k, v| conduit.send "#{ k }=", v } if param_h
-      if blk then blk[ conduit ] else
+    shell_and_result = -> param_h, blk do
+      shell = Shell.new ; res = nil
+      param_h.each { |k, v| shell.send "#{ k }=", v } if param_h
+      if blk then blk[ shell ] else
         res = Headless::Library_::StringIO.new
-        conduit.on_text { |txt| res.puts txt }
+        shell.on_text { |txt| res.puts txt }
       end
-      conduit.instance_exec do
+      shell.instance_exec do
         @head ||=nil ; @tail ||= nil ; @separator ||= TERM_SEPARATOR_STRING_
       end
-      [ conduit, res ]
+      [ shell, res ]
     end
 
-    census_and_rows = -> row_enum, conduit do
+    census_and_rows = -> row_enum, shell do
       census = Census.new
-      field_box = conduit.instance_variable_get :@field_box
+      field_box = shell.instance_variable_get :@field_box
       rows_cache = row_enum.reduce [] do |rows, cel_enum|
         rows << ( cel_enum.each_with_index.reduce [] do |cels, (cel_x, idx)|
           cel_s = if ::String === cel_x
@@ -83,9 +83,9 @@ module Skylab::Headless::CLI::Table
     end
 
     render = -> row_enum, param_h=nil, &blk do
-      conduit, sio = conduit_and_result[ param_h, blk ]
-      census, rows = census_and_rows[ row_enum, conduit ]
-      Table::Engine.new( conduit, census, rows, sio ).render
+      shell, sio = shell_and_result[ param_h, blk ]
+      census, rows = census_and_rows[ row_enum, shell ]
+      Table::Engine.new( shell, census, rows, sio ).render
     end
 
     define_singleton_method :render, &render
@@ -107,7 +107,7 @@ module Skylab::Headless::CLI::Table
     end
   end
 
-  class Table::Engine < Table::Conduit
+  class Table::Engine < Table::Shell
 
     def render
       call_digraph_listeners :row_count, @row_a.length
@@ -130,9 +130,9 @@ module Skylab::Headless::CLI::Table
 
   private
 
-    def initialize conduit, census, rows, sio
-      conduit.instance_variables.each do |ivar|
-        instance_variable_set ivar, conduit.instance_variable_get( ivar )
+    def initialize shell, census, rows, sio
+      shell.instance_variables.each do |ivar|
+        instance_variable_set ivar, shell.instance_variable_get( ivar )
       end
       @row_a, @sio = rows, sio
       @field_h = { }
@@ -376,7 +376,7 @@ module Skylab::Headless::CLI::Table
     end
   end
 
-  class Table::Field::Conduit
+  class Table::Field::Shell
     attr_accessor :style  # a function
   end
 end

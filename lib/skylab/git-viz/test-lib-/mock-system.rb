@@ -41,15 +41,6 @@ module Skylab::GitViz
         end
       end
 
-      class Build_system_conduit_
-        def initialize manifest_pn
-          @manifest_pn = manifest_pn
-        end
-        def build_system_conduit
-
-        end
-      end
-
       # #storypoint-45 #what-do-you-mean-by-IO
 
       class Mock_Command_IO_Cache_

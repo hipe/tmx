@@ -5,14 +5,14 @@ module Skylab::Face
     # is it a good idea to extend the plugin library?  let's just see..
 
     def self.enhance mod, & blk
-      cnd = Conduit_.new( fsh = Metaservices_.new )
+      cnd = Shell_.new( fsh = Metaservices_.new )
       blk and cnd.instance_exec( & blk )
       fsh.flush mod
       nil
     end
   end
 
-  class Model::Conduit_ < Face::Plugin::Conduit_
+  class Model::Shell_ < Face::Plugin::Shell_
     def do_memoize
       @story.do_memoize!
     end

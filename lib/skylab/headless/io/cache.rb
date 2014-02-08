@@ -97,7 +97,7 @@ module Skylab::Headless
       define_singleton_method :build_cache_pathname_function_for do |mod, &blk|
         filename = nil
         if blk
-          Conduit_.new( -> x do
+          Shell_.new( -> x do
             if fn_rx =~ x
               filename = x
             else
@@ -140,7 +140,7 @@ module Skylab::Headless
       end
     end.call
 
-    class Conduit_
+    class Shell_
 
       def abbrev x
         @abbrev[ x ]

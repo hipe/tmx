@@ -11,12 +11,12 @@ there is [#hl-070] an overview of all plugin-like facilities in the skylab
 universe, of which this is one of at least six.
 
 
-## :#understanding-plugin-conduits
+## :#understanding-plugin-shells
 
 "couduit" is the working title of this essential two-way structure. the
-conduit both models services that the plugin needs from the host, like a
+shell both models services that the plugin needs from the host, like a
 stream to write info messages to, or perhaps the higher-level "info yielder".
-beyond these basics, the host is invited to subclass and customize this conduit
+beyond these basics, the host is invited to subclass and customize this shell
 class as necessary. (kick the class with the 'plugin_conduit_class' class
 method on your host.)
 
@@ -81,7 +81,7 @@ call to the plugin's callback, this iteration will continue, which is to say
 this method does not allow the plugin to short-circuit its operation.
 
 any true-ish result from the call to the plugin will be accumulated into an
-array of tuples, each tuple consisting of first the conduit to the plugin and
+array of tuples, each tuple consisting of first the shell to the plugin and
 second the value that the plugin resulted in.
 
 if all plugins resulted in false-ish, the result will be nil; but if any

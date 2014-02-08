@@ -4,9 +4,9 @@ module Skylab::CodeMolester::Config::File::Entity
 
     def self.enhance target, & def_blk
 
-      fls = Flusher_.new target
+      fls = Kernel_.new target
 
-      Conduit_.new(
+      Shell_.new(
         -> field_box_host_module do
           fls.field_box_host_module = field_box_host_module
           nil
@@ -21,13 +21,13 @@ module Skylab::CodeMolester::Config::File::Entity
       fls.flush
     end
 
-    Conduit_ = MetaHell::Enhance::Conduit.new %i|
+    Shell_ = MetaHell::Enhance::Shell.new %i|
       with
       add
       list_as_json
     |
 
-    class Flusher_
+    class Kernel_
 
       def initialize coll_kls
         @target = coll_kls
@@ -103,7 +103,7 @@ module Skylab::CodeMolester::Config::File::Entity
     end
 
     def natural_key_field_name
-      :name  # when needed .. conduit etc
+      :name  # when needed .. shell etc
     end
 
     def flyweight_class

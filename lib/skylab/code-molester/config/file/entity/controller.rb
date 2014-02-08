@@ -4,19 +4,19 @@ module Skylab::CodeMolester::Config::File::Entity
 
     def self.enhance controller_class, & def_blk
 
-      stct = Conduit_::struct.new
-      Conduit_.new( -> w { stct[ :with ] = w },
+      stct = Shell_::struct.new
+      Shell_.new( -> w { stct[ :with ] = w },
                     ->   { stct[ :add  ] = true }
 
       ).instance_exec( & def_blk )
-      flsh = Flusher_.new( controller_class, * stct.to_a )
+      flsh = Kernel_.new( controller_class, * stct.to_a )
       flsh.flush
 
     end
 
-    Conduit_ = MetaHell::Enhance::Conduit.new %i| with add |
+    Shell_ = MetaHell::Enhance::Shell.new %i| with add |
 
-    class Flusher_
+    class Kernel_
 
       def initialize controller_class, fld_box_host_mod, do_add
         @target = controller_class

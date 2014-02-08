@@ -170,7 +170,7 @@ more description occurs at #storypoint-#todo, in the corresponding i.m section.
 
 
 
-:#storypoint-30 (method)
+:#storypoint-30 :#the-default-action-methhod
 
 your default action is simply an instance method your action defiines that
 ltself results in the name of another method to be used as the default action

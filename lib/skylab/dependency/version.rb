@@ -10,8 +10,8 @@ module Skylab::Dependency
     define_singleton_method :parse_string_with_version do |str, &err|
       res = nil
       error = -> msg do
-        conduit = if err then Parse.new( err ) else Parse.loude_singleton end
-        res = conduit.error msg
+        shell = if err then Parse.new( err ) else Parse.loude_singleton end
+        res = shell.error msg
       end
       begin
         scn = Dependency::Library_::StringScanner.new str

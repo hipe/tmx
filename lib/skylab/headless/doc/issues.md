@@ -81,7 +81,7 @@
 [#079]       #name-convention: modules whose name ends in an `Underscore_`
              are API private - knowledge of their shape or existence must not
              be necessary outside of the node they reside in.
-[#078]       #doc-point conduits, stories and flushers
+[#078]       #doc-point shells, stories and kernels
 [#077]       #doc-point the plugin narrative ..
 [#076]       #parent:070 #future-feature enable/disable a particular plugin
              (don't start on this until we actually need it)
