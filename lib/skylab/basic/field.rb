@@ -1,14 +1,12 @@
 class Skylab::Basic::Field
 
-  Field = self  # :[#003]
+  Basic = ::Skylab::Basic
 
-  %i( Basic MetaHell ).each do |i|
-    const_set i, ::Skylab.const_get( i, false )
-  end
+  Field = self  # :[#003]
 
   #         ~ narrative pre-order with aesthetic pyramiding ~
 
-  class Field::Box < MetaHell::Formal::Box::Open
+  class Field::Box < Basic::Lib_::Formal_Box_Open[]
 
     def self.[] *a
       b = new
@@ -41,11 +39,11 @@ class Skylab::Basic::Field
       flsh.flush
     end
 
-    Conduit_ = MetaHell::Enhance::Conduit.new %i|
+    Conduit_ = Basic::Lib_::Enhance_Conduit[ %i(
       meta_fields
       fields
       field_class_instance_methods
-    |
+    ) ]
   end   # ( `Field::Box` reopens below .. )
 
   class Flusher_

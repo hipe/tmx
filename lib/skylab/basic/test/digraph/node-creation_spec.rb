@@ -6,8 +6,6 @@ module Skylab::Basic::TestSupport::Digraph::Holes__
 
   include CONSTANTS
 
-  MetaHell = ::Skylab::MetaHell
-
   extend TestSupport::Quickie
 
   describe "[ba] digraph node creation" do
@@ -25,7 +23,7 @@ module Skylab::Basic::TestSupport::Digraph::Holes__
       di = Basic::Digraph.new
       di.node! :waz, is: [ :wiff, :wengle ]
       di.node! :wengle, is: [ :waffle ]
-      io = Basic::Library_::StringIO.new
+      io = Basic::Lib_::String_IO[]
       di.describe_digraph :IO, io, :with_spaces, :with_solos
       _act = io.string
       _exp = <<-O.unindent.chop

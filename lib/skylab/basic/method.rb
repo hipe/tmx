@@ -18,7 +18,7 @@ module Skylab::Basic
       #     r = mc.receiver.send mc.method_name, * mc.arguments
       #     r  # => "ok:yessir"
 
-      def initialize method, arg_a=MetaHell::EMPTY_A_
+      def initialize method, arg_a=EMPTY_A_
         @bound_method = method
         @arguments = arg_a
       end

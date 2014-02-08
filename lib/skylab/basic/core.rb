@@ -1,28 +1,14 @@
-require_relative '..'
-require 'skylab/meta-hell/core'
+require_relative '../callback/core'
 
 module Skylab::Basic  # introduction at [#020]
 
-  %i| Basic MetaHell |.each do |i|
-    const_set i, ::Skylab.const_get( i, false )
-  end
+    Callback_ = ::Skylab::Callback
+  Autoloader_ = Callback_::Autoloader
+  Basic = self
+  EMPTY_A_ = [].freeze
+  EMPTY_P_ = -> { }
 
-  ::Skylab::Subsystem[ self ]
-
-  module Library_  # :+[#su-001]
-
-    subsystem, stdlib = ::Skylab::Subsystem::FUN.
-      at :require_subsystem, :require_stdlib
-
-    o = { }
-    o[ :Headless ] = subsystem
-    o[ :Set ] = o[ :StringIO ] = stdlib
-    o[ :StringScanner ] = -> _ { require 'strscan' ; ::StringScanner }
-
-    define_singleton_method :const_missing do |c|
-      const_set c, o.fetch( c )[ c ]
-    end
-  end
+  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
   stowaway :String, 'string/fun'
 

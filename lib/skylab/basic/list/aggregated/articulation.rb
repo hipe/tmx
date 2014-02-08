@@ -43,9 +43,9 @@ module Skylab::Basic
 
     St_ = ::Struct.new( * A_ )
 
-    Conduit_ = MetaHell::Enhance::Conduit.new A_
+    Conduit_ = Basic::Lib_::Enhance_Conduit[ A_ ]
 
-    Flusher_ = MetaHell::Function::Class.new :flush
+    Flusher_ = Basic::Lib_::Functional_methods[ :flush ]
     class Flusher_
 
       def initialize template_str, on_zero_items_p, aggregate_p,
@@ -61,7 +61,7 @@ module Skylab::Basic
             if ! x
               on_zero_items_p.call if on_zero_items_p
             else
-              sio = Library_::StringIO.new
+              sio = Basic::Lib_::String_IO[]
               yld = ::Enumerator::Yielder.new do |data|
                 sio.write data
               end
@@ -201,7 +201,8 @@ module Skylab::Basic
     class Mention_::Flusher_
 
       def initialize nn_a
-        @conduit_class = MetaHell::Enhance::Conduit.new [ * nn_a , :_flush ]
+        nn_a << :_flush
+        @conduit_class = Basic::Lib_::Enhance_Conduit[ nn_a ]
         @conduit_class.const_set :FUNC_STRUCT_,
           ::Struct.new( * @conduit_class::A_ )
       end

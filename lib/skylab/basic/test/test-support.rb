@@ -1,19 +1,19 @@
 require_relative '../core'
 
-require 'skylab/test-support/core'
+module Skylab::Basic
 
-module Skylab::Basic::TestSupport
+  module TestSupport
 
-  module CONSTANTS
-    %i| Basic TestSupport |.each do |i|
-      const_set i, ::Skylab.const_get( i, false )
+    module CONSTANTS
+      Basic = Basic
+      TestSupport = Autoloader_.require_sidesystem :TestSupport
     end
+
+    include CONSTANTS
+
+    self::TestSupport::Regret[ self ]
+
+    self::TestSupport::Sandbox::Host[ self ]
+
   end
-
-  include CONSTANTS
-
-  TestSupport::Regret[ self ]
-
-  TestSupport::Sandbox::Host[ self ]
-
 end

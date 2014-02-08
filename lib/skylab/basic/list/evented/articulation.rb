@@ -41,12 +41,12 @@ module Skylab::Basic
       count
     end
 
-    Conduit_ = MetaHell::Enhance::Conduit.new %i|
+    Conduit_ = Basic::Lib_::Enhance_Conduit[ %i(
       always_at_the_beginning
       iff_zero_items
       any_first_item
       any_subsequent_items
       at_the_end_iff_nonzero_items
-    |
+    ) ]
   end
 end

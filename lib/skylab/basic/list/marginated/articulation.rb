@@ -21,7 +21,7 @@ module Skylab::Basic
           sep = a.fetch 0
           -> { any_subsequent_items -> x { "#{ sep }#{ x }" } }
         end.call
-        io = Library_::StringIO.new
+        io = Basic::Lib_::String_IO[]
         o = Conduit_.to_struct b
         count = 0
         @add = -> str do
@@ -43,11 +43,11 @@ module Skylab::Basic
       end
     end.call
 
-    MetaHell::Function self, :@add, :<<, :flush, :count
+    Basic::Lib_::Function[ self, :@add, :<<, :flush, :count ]
 
-    Conduit_ = MetaHell::Enhance::Conduit.new %i|
+    Conduit_ = Basic::Lib_::Enhance_Conduit[ %i(
       any_first_item
       any_subsequent_items
-    |  # NOTE keep the above consistent with neighbors!
+    ) ]  # NOTE keep the above consistent with neighbors!
   end
 end

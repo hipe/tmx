@@ -6,8 +6,6 @@ module Skylab::Basic
 
   class Basic::Digraph::Node  # (#stowaway)
 
-    MetaHell::MAARS[ self ]
-
     def initialize nln
       @has_associations = nil
       @normalized_local_node_name = nln
@@ -40,7 +38,7 @@ module Skylab::Basic
 
     def absorb_association name_i
       @has_associations ||= true
-      @associations ||= MetaHell::Formal::Box::Open.new
+      @associations ||= Basic::Lib_::Formal_Box_Open[].new
       @associations.has? name_i or @associations.add name_i, true
       nil
     end
@@ -58,6 +56,8 @@ module Skylab::Basic
     end
 
     attr_reader :normalized_local_node_name
+
+    Autoloader_[ self ]
   end
 
   class Basic::Digraph  # #todo - don't you wish you were a box!?
@@ -327,8 +327,8 @@ module Skylab::Basic
         end
         while index = orphan_a.pop
           if targeted_h[ source_a[ index ] ]
-            source_a[ index, 1 ] = MetaHell::EMPTY_A_
-            target_a[ index, 1 ] = MetaHell::EMPTY_A_
+            source_a[ index, 1 ] = EMPTY_A_
+            target_a[ index, 1 ] = EMPTY_A_
           end
         end
         ( 0 ... source_a.length ).each do |idx|

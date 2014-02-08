@@ -1,3 +1,4 @@
+[#027] #open aggregated articulation refactor
 [#026]       #doc-node the hash narrative ..
 [#025]       #doc-node #digraph the digraph narrative ..
 [#024]       #parent-node: [#022] "the string scanner narrative.."

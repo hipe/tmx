@@ -44,7 +44,7 @@ module Skylab::Basic
 
       reset[]
 
-      scn = Library_::StringScanner.new ''
+      scn = Basic::Lib_::Empty_string_scanner[]
 
       @set_string = -> x do
         reset[]
@@ -89,8 +89,8 @@ module Skylab::Basic
       @set_unexpected_proc = -> x {  up = x }
     end
 
-    MetaHell::Function self, :@set_unexpected_proc, :unexpected_proc=,
-      :@set_string, :string=, :gets
+    Basic::Lib_::Function[ self, :@set_unexpected_proc, :unexpected_proc=,
+      :@set_string, :string=, :gets ]
 
   end
 end

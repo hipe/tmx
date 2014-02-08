@@ -30,7 +30,7 @@ module Skylab::Basic
   public
 
     def hold try_name_x
-      try_hold try_name_x, MetaHell::EMPTY_P_, -> holder_name_x do
+      try_hold try_name_x, EMPTY_P_, -> holder_name_x do
         raise ::ArgumentError, "#{ moniker } cannot be #{ try_name_x }, #{
           }is already #{ holder_name_x }"
       end

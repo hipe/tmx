@@ -9,7 +9,7 @@ module Skylab::Basic::TestSupport::List::Scanner::For
   Basic = Basic ; TestSupport = TestSupport
 
   set_tmpdir_pathname do
-    _pn = Basic::Library_::Headless::System.defaults.tmpdir_pathname
+    _pn = Basic::Lib_::Tmpdir_pathname[]
     _pn.join 'skylab-basic'
   end
 
@@ -25,7 +25,7 @@ module Skylab::Basic::TestSupport::List::Scanner::For
     attr_reader :do_debug
 
     def debug_IO
-      Basic::Library_::Headless::System::IO.some_stderr_IO
+      Basic::Lib_::Some_stderr_IO[]
     end
   end
 end

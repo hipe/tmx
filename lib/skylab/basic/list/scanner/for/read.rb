@@ -2,7 +2,7 @@ module Skylab::Basic
 
   class List::Scanner
 
-    For::Read = MetaHell::Function::Class.new :count, :gets, :line_number
+    For::Read = Basic::Lib_::Functional_methods[ :count, :gets, :line_number ]
     class For::Read
 
       MAXLEN__ = 4096  # 2**12, or the number of bytes in about 50 lines
@@ -12,7 +12,7 @@ module Skylab::Basic
       def initialize fh, maxlen=MAXLEN__
         buffer = '' ; buffer_is_loaded = nil ; count = 0 ; gets = scn = nil
         advance_scanner = -> do
-          scn = Library_::StringScanner.new buffer
+          scn = Basic::Lib_::String_scanner[ buffer ]
           advance_scanner = -> do
             scn.string = buffer ; nil
           end ; nil
@@ -21,7 +21,7 @@ module Skylab::Basic
           advance_scanner[] ; buffer = '' ;  buffer_is_loaded = true
         end
         finish = -> do
-          gets = MetaHell::EMPTY_P_ ; fh.close ; false
+          gets = EMPTY_P_ ; fh.close ; false
         end
         load_buffer = -> do
           buffer_ = fh.read maxlen, buffer

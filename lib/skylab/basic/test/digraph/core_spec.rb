@@ -6,8 +6,6 @@ module Skylab::Basic::TestSupport::Digraph::Core
 
   include CONSTANTS
 
-  MetaHell = ::Skylab::MetaHell
-
   extend TestSupport::Quickie
 
   describe "[ba] digraph" do
@@ -145,7 +143,7 @@ module Skylab::Basic::TestSupport::Digraph::Core
 
     context "THE DIFFERENCE ENGINE" do
 
-      memoize = MetaHell::FUN.memoize
+      memoize = Basic::Lib_::Memoize
 
       define_singleton_method :digraph do |meth, arr|
         define_method meth, & memoize[ -> do
@@ -201,7 +199,7 @@ module Skylab::Basic::TestSupport::Digraph::Core
 
       digraph :real,  [row: :text, info: :text, empty: :info, row_count: :data ]
 
-      # cb-digraph-viz headless/core.rb Skylab::Headless::CLI::Table::Conduit --ope
+      # cb-digraph-viz headless/core.rb Skylab::H-eadless::CLI::Table::Conduit --ope
 
       context "you can ACHIEVE SEMANTIC DIFFERENCE" do
 

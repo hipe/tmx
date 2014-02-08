@@ -12,9 +12,8 @@ module Skylab::Basic
       #     h[ :luhrmann ]  # => KeyError: no such beefel 'luhrmann'. did you mean 'foo' or 'biff'?
 
       _msg = "no such #{ moniker } #{ Basic::FUN::Inspect[ k ] }. #{
-        }did you mean #{ Library_::
-          Headless::NLP::EN::Minitesimal::Oxford_comma_or[
-            h.keys.map { |x| Basic::FUN::Inspect[ x ] } ] }?"
+        }did you mean #{
+          Basic::Lib_::Oxford_or[ h.keys.map( & Lib_::Inspect ) ] }?"
       raise ::KeyError, _msg
     end
 

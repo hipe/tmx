@@ -4,7 +4,7 @@ module Skylab::Basic
 
     class Describe__
 
-      Library_::Headless::API::Iambic_parameters[ self, :params,
+      Basic::Lib_::Iambic_parameters[ self, :params,
         :IO,
         :with_solos, %i( argument_arity zero ivar @do_solos ),
         :with_spaces, %i( argument_arity zero ivar @do_spaces ) ]
@@ -25,7 +25,7 @@ module Skylab::Basic
         if @IO
           @IO_was_provided = true ; @io = @IO
         else
-          @IO_was_provided = false ; @io = Library_::StringIO.new
+          @IO_was_provided = false ; @io = Basic::Lib_::String_IO[]
         end  ; nil
       end
       def init_solo_h

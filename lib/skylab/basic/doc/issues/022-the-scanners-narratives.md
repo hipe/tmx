@@ -158,7 +158,7 @@ minimal abstract enumeration and scanning of the lines of a string.
 + quacks like a simple scanner
 + better than plain old ::Enumerator b.c you can call `next` (gets)
     without catching the ::StopIteration.
-+ future-proof: maybe it uses ::StringScanner internally, maybe not.
++ future-proof: maybe it uses ::S-tringScanner internally, maybe not.
 
 
 ### the 'reverse' scannner

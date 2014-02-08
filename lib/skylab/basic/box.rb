@@ -155,7 +155,7 @@ module Skylab::Basic
     #
     def fetch_and_delete k
       r = @h.fetch k
-      @a[ @a.index( k ), 1 ] = MetaHell::EMPTY_A_ ; @h.delete k
+      @a[ @a.index( k ), 1 ] = EMPTY_A_ ; @h.delete k
       r
     end
 

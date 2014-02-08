@@ -21,7 +21,7 @@ module Skylab::Basic
         def gets
           @gets_p.call
         rescue ::StopIteration
-          @gets_p = MetaHell::EMPTY_P_ ; nil
+          @gets_p = EMPTY_P_ ; nil
         end
       end
 

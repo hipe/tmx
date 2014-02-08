@@ -135,7 +135,8 @@ module Skylab::Callback
         x = Callback.dir_pathname.dirname.to_path ; sl_path = -> { x } ; x
       end
       require_single_sidesystem = -> const_i do
-        require "#{ sl_path[] }/#{ Name.from_const( const_i ).as_slug }/core"
+        _stem = Name.from_const( const_i ).as_slug
+        require "#{ sl_path[] }/#{ _stem }/core"
         ::Skylab.const_get const_i, false
       end
       -> * i_a do
@@ -244,7 +245,7 @@ module Skylab::Callback
 
       def initialize mod, dpn, i
         @dir_pathname = dpn ; @mod = mod ;
-        @name = Name.from_variegated_symbol i
+        @name = Name.any_valid_from_const(i) || Name.from_variegated_symbol(i)
       end
 
       attr_reader :mod
@@ -258,12 +259,12 @@ module Skylab::Callback
         @slug = @name.as_slug
         @d_pn = @dir_pathname.join @slug
         @f_pn = @d_pn.sub_ext EXTNAME_
-        if @f_pn.exist?
+        if h = @mod.stowaway_h and @stowaway_path = h[ @name.as_const ]
+          load_stowaway
+        elsif @f_pn.exist?
           when_file_exists
         elsif @d_pn.exist?
           when_dir_exists
-        elsif h = @mod.stowaway_h and @stowaway_path = h[ @name.as_const ]
-          load_stowaway
         else
           when_neither_file_nor_dir_exist
         end
@@ -346,7 +347,12 @@ module Skylab::Callback
   class Name  # will freeze any string it is constructed with
     # this only supports the simplified inflection necessary for this app.
     class << self
+      def any_valid_from_const const_i
+        VALID_CONST_RX__ =~ const_i and
+          allocate_with :initialize_with_const_i, const_i
+      end
       def from_const const_i
+        VALID_CONST_RX__ =~ const_i or raise ::NameError, say_wrong( const_i )
         allocate_with :initialize_with_const_i, const_i
       end
       def from_human human_s
@@ -360,6 +366,9 @@ module Skylab::Callback
       end
       private :new
     private
+      def say_wrong const_i
+        "wrong constant name #{ const_i }"
+      end
       def allocate_with method_i, x
         new = allocate
         new.send method_i, x
@@ -434,6 +443,7 @@ module Skylab::Callback
     SPACE__ = ' '.freeze
     THE_EMPTY_STRING__ = ''.freeze
     UNDERSCORE__ = '_'.freeze
+    VALID_CONST_RX__ = /\A[A-Z][A-Z_a-z]*\z/
   end
 
   # ~ small procs used here, there, everywhere

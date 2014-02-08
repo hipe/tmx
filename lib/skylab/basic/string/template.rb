@@ -29,8 +29,7 @@ module Skylab::Basic
             instance_variable_set ivar_h.fetch( k ), v
           end
         else
-          raise ::NameError, Library_::Headless::NLP::EN::Minitesimal::FUN.
-              inflect[ -> do
+          raise ::NameError, Basic::Lib_::EN_inflect[ -> do
             "no member#{ s a } #{ or_( a.map { |x| "'#{ x }'" } ) } in struct"
           end ]
         end
@@ -118,7 +117,7 @@ module Skylab::Basic
 
       ::Enumerator.new do |y|
         marg = ( Margin_Engine_.new if with_margins ) ; seen_h = { }
-        scn = Basic::Library_::StringScanner.new get_template_string
+        scn = Basic::Lib_::String_scanner[ get_template_string ]
         while ! scn.eos?
           skipped = marg ? ( scn.scan skip_rx ) : ( scn.skip skip_rx )
           surface = scn.scan param_rx
@@ -198,9 +197,8 @@ module Skylab::Basic
     end
     private :_margin_cache_h
 
-    Margin_Engine_ = MetaHell::Function::Class.new :give, :take
-    class Margin_Engine_   # a would-be plugin to keep this logic out of the
-      -> do  # `initialize`
+    Margin_Engine_ = Basic::Lib_::Functional_methods.call :give, :take do
+      # a would-be plugin to keep this logic out of the `initialize`
         nl = "\n"
         define_method :initialize do
           is_fresh_line = true ; mgn = nil
@@ -226,7 +224,6 @@ module Skylab::Basic
             x = mgn ; mgn = nil ; x
           end
         end
-      end.call
     end
   end
 

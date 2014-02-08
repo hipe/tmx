@@ -17,7 +17,7 @@ module Skylab::Face
           end
           on_first_mention do
             hst pi -> x { x.moniker }
-            _flush -> x { "#{ x }." }
+            _flush -> x='WAT' { "#{ x }." }
           end
           on_subsequent_mentions do
             hst        -> { 'it' }

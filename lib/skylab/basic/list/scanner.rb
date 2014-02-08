@@ -64,7 +64,7 @@ module Skylab::Basic
             (( @gets_p = -> do
               while ! (( r = scn.gets ))
                 if last == d
-                  @gets_p = MetaHell::EMPTY_P_ ; break
+                  @gets_p = EMPTY_P_ ; break
                 else
                   scn = scn_a[ d += 1 ]
                 end
@@ -88,7 +88,7 @@ module Skylab::Basic
 
     class Delay
       def initialize p
-        close = -> { @gets_p = MetaHell::EMPTY_P_ ; nil }
+        close = -> { @gets_p = EMPTY_P_ ; nil }
         @gets_p = -> do
           scn = p.call
           if ! scn then close[] else
@@ -186,7 +186,7 @@ module Skylab::Basic
         _mod = scn.respond_to?( :superclass ) ? scn : scn.singleton_class
         With.apply_iambic_on_client i_a, _mod ; nil
       end
-      MetaHell::Bundle::Directory[ self ]
+      Basic::Lib_::Bundle_Directory[ self ]
     end
 
     LINE_RX_ = /[^\r\n]*\r?\n|[^\r\n]+\r?\n?/

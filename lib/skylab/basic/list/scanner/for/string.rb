@@ -11,14 +11,14 @@ module Skylab::Basic
 
       def initialize s
         @count = 0
-        scn = Library_::StringScanner.new s
+        scn = Basic::Lib_::String_scanner[ s ]
         @gets_p = -> do
           if (( s = scn.scan LINE_RX_ ))
             @count += 1
             s
           else
             scn.eos? or fail "sanity - rx logic failure"
-            @gets_p = MetaHell::EMPTY_P_ ; nil
+            @gets_p = EMPTY_P_ ; nil
           end
         end ; nil
       end

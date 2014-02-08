@@ -84,7 +84,7 @@ module Skylab::Basic
 
   class Tree::Leaf
 
-    MetaHell::Pool.enhance( self ).with_with_instance
+    Basic::Lib_::Pool[ self ].with_with_instance
 
     def init_from_pool x
       @leaf_data = x

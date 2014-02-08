@@ -34,14 +34,18 @@ module Skylab::Basic::TestSupport::List::Aggregated
             store needer -> x do
               x.to_s.upcase
             end
-            _flush -> x { "#{ x }." }
+            _flush -> x='WAT' do  # #todo:next
+              "#{ x }."
+            end
           end
           on_subsequent_mentions do
             store  -> { 'it' }
             adj1   -> { ' also' }
             needer -> { 'that needer' }
             adj2   -> { ' too' }
-            _flush -> x { " #{ x }." }
+            _flush -> x='WHOSE' do  # #todo:next
+              " #{ x }."
+            end
           end
         end
       end

@@ -1,10 +1,8 @@
 module Skylab::Basic::Field::Reflection
 
-  Reflection = self
+  Basic = ::Skylab::Basic
 
-  %i( Basic MetaHell ).each do |i|
-    const_set i, ::Skylab.const_get( i, false )
-  end
+  Reflection = self
 
   module Reflection
 
@@ -27,10 +25,10 @@ module Skylab::Basic::Field::Reflection
     end
   end
 
-  Conduit_ = MetaHell::Enhance::Conduit.new %i| with |
+  Conduit_ = Basic::Lib_::Enhance_Conduit[ %i( with ) ]
 
-  Flusher_ = MetaHell::Function::Class.new :flush
-  class Flusher_
+  Flusher_ = Basic::Lib_::Functional_methods.call :flush do
+
     def initialize target
       @host = nil
 
@@ -144,7 +142,7 @@ module Skylab::Basic::Field::Reflection
       @field.local_normal_name
     end
 
-    MetaHell::Function self, :@value_p, :value
+    Basic::Lib_::Function[ self, :@value_p, :value ]
 
     def initialize field, value_p
       @field, @value_p = field, value_p
