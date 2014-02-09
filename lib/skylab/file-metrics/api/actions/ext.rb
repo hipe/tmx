@@ -6,7 +6,7 @@ module Skylab::FileMetrics
 
     include API::Common::InstanceMethods
 
-    include Face::Open2
+    Lib_::System_open2[ self ]
 
     -> do
 
@@ -46,14 +46,14 @@ module Skylab::FileMetrics
         res
       end
 
-      inflect = Headless::NLP::EN::Minitesimal::FUN.inflect
+      inflect = Lib_::EN_inflect_proc[]
 
     end.call
 
   private
 
-    Count = Models::Count.subclass :total_share, :max_share, :lipstick_float,
-      :lipstick
+    Count = FileMetrics::Models::Count.subclass :total_share, :max_share,
+      :lipstick_float, :lipstick
 
     Count_ = ::Struct.new :extension, :count
 

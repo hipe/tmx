@@ -1,7 +1,9 @@
 module Skylab::FileMetrics
 
-  class Models::Count < Model::Node::Structure.new :label, :count
+  Models::Count = Model::Node::Structure.new :label, :count
+  class Models::Count
 
+    undef_method :count
     def count
       if @count || zero_children?
         @count
@@ -30,13 +32,16 @@ module Skylab::FileMetrics
     attr_writer :lipstick_float  # ratio of 0 to 1?
 
     def lipstick
+      @lipstick_pxy ||= bld_lipstick_pxy
+    end
 
-      @lipstick_pxy ||= CelPxy_.new(
+    def bld_lipstick_pxy
+      CelPxy_.new(
 
         # we act like a string during the pre-render, and don't ever add
         :length => -> { 0 },  # any width, you are strictly a decoration.
 
-        :respond_to? => MetaHell::MONADIC_TRUTH_,  # catch errors
+        :respond_to? => MONADIC_TRUTH_,  # catch errors
 
         :normalized_scalar => -> do
           @lipstick_float
@@ -44,8 +49,7 @@ module Skylab::FileMetrics
       )
     end
 
-    CelPxy_ = MetaHell::Proxy::Nice.new :length, :respond_to?,
-      :normalized_scalar
+    CelPxy_ = Lib_::Nice_proxy[ :length, :respond_to?, :normalized_scalar ]
 
     def sum_of sym
       each_child.map(& sym ).reduce :+

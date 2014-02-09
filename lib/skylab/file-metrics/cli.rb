@@ -1,6 +1,6 @@
 module Skylab::FileMetrics
 
-  class CLI < ::Skylab::Face::CLI
+  class CLI < Face_::CLI
 
     ::Skylab::Autoloader[ self ]
 
@@ -62,7 +62,7 @@ module Skylab::FileMetrics
           not_yet_set = volume_a.detect { |k| ! req[ k ] }
           if not_yet_set then req[ not_yet_set ] = true else
             @did_emit_verbose_max_volume_notice ||= begin
-              s = Headless::NLP::EN::Number::FUN.number[ volume_a.length ]
+              s = Lib_::EN_number[ volume_a.length ]
               @err.puts "(#{ s } is the max number of -v.)"
               true
             end
@@ -109,10 +109,12 @@ module Skylab::FileMetrics
 
       -> do
         UI = ::Struct.new :out, :err
-        def api_call name_sym
+        def api_call name_i
           @ui ||= UI.new @out, @err
-          kls = API::Actions.const_fetch name_sym
-          kls.run @ui, @param_h
+          _const_i = Callback_::Name.from_variegated_symbol( name_i ).
+            as_camelcase_const
+          _cls = FileMetrics::API::Actions.const_get _const_i, false
+          _cls.run @ui, @param_h
         end
         private :api_call
       end.call
@@ -171,15 +173,14 @@ module Skylab::FileMetrics
       def op_common_tail
         # massive but semi-elegant hack, #goof-on wheel greasing.
         s = command.op.banner
-        y = FileMetrics::Library_::
-          Basic::List::Scanner::For::String::Reverse[ s ]
+        y = Lib_::Reverse_string_scanner[ s ]
         y << ''
         command.usage y
         y << "\n#{ hi 'options:' }\n" ; nil
       end
     # lost indent
 
-    Lipstick = Face::CLI::Lipstick.new '+', :green, -> { 80 }
+    Lipstick = Lib_::CLI_lipstick[ '+', :green, -> { 80 } ]
 
     class Lipstick::Class_
 

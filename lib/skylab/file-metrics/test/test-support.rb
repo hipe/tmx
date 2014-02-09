@@ -8,7 +8,7 @@ module Skylab::FileMetrics
 
     module CONSTANTS
       FileMetrics = ::Skylab::FileMetrics
-      MetaHell = ::Skylab::MetaHell
+      Lib_ = FileMetrics::Lib_
       TestSupport = ::Skylab::TestSupport
     end
   end

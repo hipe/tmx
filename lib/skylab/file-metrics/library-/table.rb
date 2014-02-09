@@ -90,7 +90,7 @@ module Skylab::FileMetrics
       nil
     end
 
-    class Design_ < MetaHell::Formal::Box
+    class Design_ < Lib_::Formal_box_class[]
 
       # `Table::Render::Design_` -
       # An immutable encapsulation of the visual design of a particular table.
@@ -129,7 +129,7 @@ module Skylab::FileMetrics
         end
       end
 
-      MetaHell::Function self, :summary_rows
+      Lib_::Add_methods_for_the_procs_in_the_ivars[ self, :summary_rows ]
 
       def prerender_summary_row h
         @order.map do |sym|
@@ -363,8 +363,8 @@ module Skylab::FileMetrics
         # shell through which we express how we want to create the
         # immutable design.
 
-      Shell_ = MetaHell::Proxy::Nice.new :field, :fields, :hdr, :lambda,
-        :sep, :the_rest
+      Shell_ = Lib_::Nice_proxy[ :field, :fields, :hdr, :lambda,
+        :sep, :the_rest ]
 
         # `Table::Render::Design_::Field_` - field metadata in a design.
 
@@ -372,7 +372,7 @@ module Skylab::FileMetrics
         :align_summary, :cook, :header, :is_autonomous, :is_noop, :is_rest,
         :prerender
 
-      Field_::Shell_ = MetaHell::Proxy::Nice.new :summary
+      Field_::Shell_ = Lib_::Nice_proxy[ :summary ]
     end
   end
 end

@@ -7,7 +7,7 @@ module Skylab::FileMetrics
     include API::Common::InstanceMethods
 
     def run
-      c = Models::Count.new("folders summary")
+      c = FileMetrics::Models::Count.new("folders summary")
       find_cmd = build_find_dirs_command
       @req[:show_commands] and @ui.err.puts(find_cmd)
       dirs = %x{#{find_cmd}}.split("\n")

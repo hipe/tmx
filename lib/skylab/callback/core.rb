@@ -432,6 +432,10 @@ module Skylab::Callback
       @const_is_resolved = false
     end
   public
+    def as_camelcase_const
+      @camelcase_const_is_resolved ||= resolve_camelcase_const
+      @camelcase_const
+    end
     def as_const
       @const_is_resolved || resolve_const
       @as_const
@@ -464,6 +468,12 @@ module Skylab::Callback
     end
     def as_normalized_const
       as_const.to_s.gsub NORMALIZE_CONST_RX__, UNDERSCORE__
+    end
+    def resolve_camelcase_const
+      @camelcase_const_is_resolved = true
+      @camelcase_const = ( i = as_const and
+        i.to_s.gsub( UNDERSCORE__, THE_EMPTY_STRING__ ).intern  )
+      true
     end
     def resolve_const
       @const_is_resolved = true

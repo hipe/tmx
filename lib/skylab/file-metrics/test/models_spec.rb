@@ -10,15 +10,17 @@ module Skylab::FileMetrics::TestSupport::Models
 
   include CONSTANTS
 
-  MetaHell::DSL_DSL.enhance_module self do
+  Lib_ = Lib_
+
+  Lib_::DSL_DSL_enhance_module[ self, -> do
     block :with_klass
-  end
+  end ]
 
   module ModuleMethods
 
     include CONSTANTS
 
-    extend MetaHell::Let
+    extend Lib_::Let[]
 
     let :klass do
       Models_TestSupport::Sandbox.kiss with_klass_value.call

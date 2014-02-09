@@ -3,7 +3,11 @@ module Skylab::MetaHell
                                   # functionial proxies like this )
   module Proxy::Nice
 
-    def self.new *member_a, &blk
+    def self.new * member_a, & p
+      from_i_a_and_p member_a, p
+    end
+
+    def self.from_i_a_and_p member_a, blk
 
       Proxy::Functional.new( *member_a ).class_exec do
 

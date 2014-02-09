@@ -27,8 +27,8 @@ module Skylab::FileMetrics
       res
     end
 
-    LineCount = Models::Count.subclass :total_share, :max_share, :lipstick,
-      :lipstick_float
+    LineCount = FileMetrics::Models::Count.subclass :total_share, :max_share,
+      :lipstick, :lipstick_float
 
   private
 

@@ -88,7 +88,7 @@ module Skylab::FileMetrics
 
     -> do  # `string`
 
-      shellescape_path = FUN.shellescape_path
+      shellescape_path = Lib_::Shellescape_path[]
 
       define_method :string do
         part_a = [ "find" ]

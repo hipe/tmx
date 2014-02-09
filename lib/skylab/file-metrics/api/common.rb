@@ -47,7 +47,7 @@ module Skylab::FileMetrics
       tsa_limit = ( @tsa_limit ||= 0.33 )  # tsa = time since activity
       FileMetrics::Library_::Open3.popen3 command_string do |_, sout, serr|
         er = nil
-        select = Headless::IO::Upstream::Select.new
+        select = Lib_::Select[]
         select.timeout_seconds = 5.0  # exaggerated amount for fun
 
         num_souts = 0
@@ -128,18 +128,17 @@ module Skylab::FileMetrics
       build_prattle_space = -> do
         noun_h = { blank_lines: 'blank line', comment_lines: 'comment line' }
         verb_h = { include: 'include', exclude: 'exclude' }
-        interface = MetaHell::Proxy::Nice.new :conjunction_phrase
+        interface = Lib_::Nice_proxy[ :conjunction_phrase ]
         -> do
-          predicate_box = MetaHell::Formal::Box::Open.new
+          predicate_box = Lib_::Open_box[]
           aggregate = -> verb_sym, noun_sym do
             predicate_box.if? verb_sym, -> vp do
               vp << noun_h.fetch( noun_sym )
               nil
             end, -> box, k do
-              x = Headless::NLP::EN::POS::Verb::Phrase.new(
+              x = EN_verb_phrase[
                 v: verb_h.fetch( k ),
-                np: noun_h.fetch( noun_sym )
-              )
+                np: noun_h.fetch( noun_sym ) ]
               x.np.n.number = :plural  # just greasing the wheels
               x.v.markedness = nil
               x.v.tense = :progressive
@@ -153,8 +152,7 @@ module Skylab::FileMetrics
              -> sym { aggregate[ :exclude, sym ] },  # `excl`
              interface.new(                          # `prattle`
               conjunction_phrase: -> do
-                cp ||= Headless::NLP::EN::POS::Conjunction_::Phrase_.new(*
-                  predicate_box.values )
+                cp ||= Lib_::EN_conjuction_phrase[ predicate_box.values ]
               end )
           ]
         end
@@ -235,7 +233,7 @@ module Skylab::FileMetrics
       count
     end
 
-    define_method :shellescape_path, & FUN.shellescape_path
+    define_method :shellescape_path, Lib_::Shellescape_path[]
     private :shellescape_path
 
     def rndr_tbl out, count, design
