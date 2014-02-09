@@ -14,16 +14,16 @@ module Skylab::CodeMolester::Config::File::Entity
 
         define_method :entity_story do story end
 
-        Basic::Field::Reflection.enhance( self ).with story.host_module
+        Lib_::Field_reflection_enhance[ self ].with story.host_module
 
-        MetaHell::Pool.enhance( self ).with_with_instance
+        Lib_::Add_the_pool_method_known_as_with_instance[ self ]
 
         self
       end
     end
 
     def initialize
-      @string_box = MetaHell::Formal::Box::Open.new
+      @string_box = Lib_::Open_box[]
       @fld_box = field_box  # meh
       @miss_a = [ ] ; @xtra_a = [ ] ; @nbp_a = [ ] ; @issue_x_a = [ ]
       @had_issues = nil
@@ -47,7 +47,7 @@ module Skylab::CodeMolester::Config::File::Entity
       @entity_name_x
     end
 
-    Invalid = Face::Model::Event.new do |miss_a, xtra_a, issue_x_a|
+    Invalid = Lib_::Model_event[].new do |miss_a, xtra_a, issue_x_a|
       a = [ ]
       join = -> ar { ar.map { |x| "\"#{ x }\"" } * ', ' }
       if miss_a
@@ -74,9 +74,9 @@ module Skylab::CodeMolester::Config::File::Entity
     # point at which you have outgrown this library!)
 
     -> do  # `if_valid` -
-      no = MetaHell::EMPTY_P_
+      no = -> {}  # 'EMPTY_P_'
       sig_h = {
-        [ 0, true ] => -> _blk { [ MetaHell::MONADIC_TRUTH_, no ] },
+        [ 0, true ] => -> _blk { [ MONADIC_TRUTH_, no ] },
         [ 0, false ] => -> blk { [ blk, no ] },
         [ 1, true ] => -> if_yes, _blk { [ if_yes, no ] },
         [ 2, true ] => -> if_yes, if_no, _blk { [ if_yes, if_no ] }

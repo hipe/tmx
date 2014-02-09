@@ -4,11 +4,11 @@ module Skylab::CodeMolester
 
     # extend any class with services related to file-based config
 
-    CodeMolester::Library_::Basic::Field::Reflection[ self ]
+    Lib_::Field_reflection[ self ]
 
     # ~ section 1 - the actual enhancing of your nerklette
 
-    DSL = MetaHell::DSL_DSL::Constant_Trouble.
+    DSL = Lib_::Constant_trouble[].
       # we run this DSL thru the user and then we have the application's
       # field values stored in the below constants of its `Service` subclass
       # (called `Config_` and stored in the enhanced class itself.)

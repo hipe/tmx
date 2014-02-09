@@ -1,5 +1,1 @@
-module Skylab::CodeMolester
-
-  Model::Event = CodeMolester::Library_::Face::Model::Event
-
-end
+# kept around for continuity with the future (maybe)

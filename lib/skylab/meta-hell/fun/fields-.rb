@@ -2,6 +2,10 @@ module Skylab::MetaHell
 
   module FUN::Fields_
 
+    def self.[] * x_a
+      from_x_a x_a
+    end
+
     # using the basic fields facility out of the box only gives you
     # a readable way to set instance variables via a constructor
     #
@@ -45,7 +49,7 @@ module Skylab::MetaHell
       struct_like: flag,
       field_i_a: arg }.freeze
 
-    fields = -> * a do
+    define_singleton_method :from_x_a, -> a do
       o = Metafields_.new
       while a.length.nonzero?
         ii = a.shift
@@ -62,9 +66,12 @@ module Skylab::MetaHell
       o.scan_method && Define_scan_method_[ mod, o.scan_method ]
       nil
     end
-    define_singleton_method :[], &fields
 
     o = FUN.redefiner
+
+    fields = -> * x_a do
+      from_x_a x_a
+    end
 
     o[:fields] = -> mod, *field_i_a do
       fields[ :client, mod,

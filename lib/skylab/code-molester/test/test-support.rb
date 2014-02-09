@@ -1,26 +1,23 @@
 require_relative '../core'
 
-require 'skylab/test-support/core'
+module Skylab::CodeMolester
+  Autoloader_.require_sidesystem :TestSupport
+end
 
-module ::Skylab::CodeMolester::TestSupport
-
-  include ::Skylab # TestSupport
-
-  TestSupport::Regret[ CodeMolester_TestSupport = self ]
-
-  TMPDIR = TestSupport::Tmpdir.new(
-    Headless::System.defaults.tmpdir_pathname.join( 'co-mo' ),
-    verbose: false
-  )
+module Skylab::CodeMolester::TestSupport
 
   module CONSTANTS
-    include ::Skylab # *all subproducts!*
-
-    TMPDIR = TMPDIR
+    CodeMolester = ::Skylab::CodeMolester
+    Lib_ = CodeMolester::Lib_
+    TestSupport = ::Skylab::TestSupport
   end
 
   include CONSTANTS
 
+  TestSupport::Regret[ CodeMolester_TestSupport = self ]
+
+  CONSTANTS::TMPDIR = TestSupport::Tmpdir.new(
+    Lib_::System_default_tmpdir_pathname[].join( 'co-mo' ), verbose: false )
 
   module InstanceMethods
     include CONSTANTS # refer to constants from i.m's

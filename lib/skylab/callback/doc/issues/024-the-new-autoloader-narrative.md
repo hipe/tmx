@@ -63,3 +63,11 @@
 • this perhaps the beginnins of a clever, extensible bundle implementation
   in its own right but for reasons of both bootstrapping and freshenss we
   don't worry now about whether this logic belongs somewhere else (yet)
+
+
+
+## :#storypoint-265
+
+if you have a newschool base-class and an oldschool child class (e.g
+[de]::Version) this comportment is necessary for when the olschool a.l loads
+the newschool node.

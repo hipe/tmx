@@ -16,4 +16,9 @@ module Skylab::CodeMolester::TestSupport::Config
       end
     end
   end
+
+  include CONSTANTS
+
+  TestSupport::Quickie.enable_kernel_describe
+
 end

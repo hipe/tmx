@@ -1,8 +1,6 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module ::Skylab::CodeMolester::TestSupport
-
-  include ::Skylab::CodeMolester::TestSupport::CONSTANTS
+module ::Skylab::CodeMolester::TestSupport::Config
 
 # ..
 
@@ -39,8 +37,15 @@ describe ::Skylab::CodeMolester::Config::File do
     parses_ok
     unparses_ok
   end
-  it { should respond_to(:valid?) }
-  it { should respond_to(:invalid_reason) }
+
+  it "should respond to valid?" do
+    subject.should be_respond_to :valid?
+  end
+
+  it "should respond_to invalid_reason" do
+    subject.should be_respond_to :invalid_reason
+  end
+
   context "with regards to validity/parsing" do
     context "out of the box" do
       it "is valid (because an empty file is)" do
@@ -167,7 +172,7 @@ describe ::Skylab::CodeMolester::Config::File do
       end
     end
   end
-  context "Basic overall grammar check:" do
+  context "B-asic overall grammar check:" do
     context "grammar check: many values" do
       let(:content) {"a=b\nc=d\ne=f"}
       specify { parses_and_unparses_ok }

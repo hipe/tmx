@@ -14,7 +14,7 @@ module Skylab::CodeMolester::Config::File::Entity
 
     end
 
-    Shell_ = MetaHell::Enhance::Shell.new %i| with add |
+    Shell_ = Lib_::Simple_shell[ %i( with add ) ]
 
     class Kernel_
 
@@ -37,11 +37,11 @@ module Skylab::CodeMolester::Config::File::Entity
     private
 
       def fields
-        Basic::Field::Reflection.enhance( @target ).with @field_mod
+        Lib_::Field_reflection_enhance[ @target ].with @field_mod
       end
 
       def module_accessors
-        MetaHell::Module::Accessors.enhance @target do
+        Lib_::Module_accessors[].enhance @target do
           private_methods do
             module_reader :collection_module, '../Collection'
           end
@@ -50,9 +50,9 @@ module Skylab::CodeMolester::Config::File::Entity
       end
 
       def register_for_config_services
-        Face::Model.enhance @target do
+        Lib_::Model_enhance[ @target, -> do
           services_used :configs, :config
-        end
+        end ]
       end
 
       def add
@@ -152,7 +152,7 @@ module Skylab::CodeMolester::Config::File::Entity
       end
     end
 
-    Basic::Hash::FUN.pairs_at :repack_difference  do |i, p|
+    Lib_::Hash_functions[].pairs_at :repack_difference do |i, p|
       define_method i, p
     end
 
@@ -184,7 +184,7 @@ module Skylab::CodeMolester::Config::File::Entity
 
     def normalize_fields
       did = nil
-      @string_box ||= ( did = true ) && MetaHell::Formal::Box::Open.new
+      @string_box ||= ( did = true ) && Lib_::Open_box[]
       did or fail "sanity"
       @nerk_a = nil
       a = Entity::Event::Aggregation.new
@@ -250,12 +250,12 @@ module Skylab::CodeMolester::Config::File::Entity
     Invalid_ = Entity::Event.new do |pred_a, field|
       o = ''
       lbl = field.local_normal_name.id2name  # #todo
-      Basic::List::Evented::Articulation pred_a do
+      Lib_::Evented_list_articulation[ pred_a, -> do
         always_at_the_beginning      ->     { o << "#{ lbl }" }
         iff_zero_items               ->     { o << "was fine." }
         any_first_item               ->   s { o << "#{ s }." }
         any_subsequent_items         ->   s { o << "#{ lbl }#{ s }." }
-      end
+      end ]
       o
     end
 
@@ -280,7 +280,7 @@ module Skylab::CodeMolester::Config::File::Entity
       h = {
         ick: -> { "\"#{ x }\"" }
       }
-      tmpl_str.gsub Basic::String::MUSTACHE_RX do
+      tmpl_str.gsub Lib_::Mustache_rx[] do
         h.fetch( $~[1].intern ).call
       end
     end

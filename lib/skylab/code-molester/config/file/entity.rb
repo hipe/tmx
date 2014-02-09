@@ -52,13 +52,9 @@ module Skylab::CodeMolester::Config::File::Entity
 
   CodeMolester = ::Skylab::CodeMolester
 
-  CodeMolester::Library_.kick :Basic, :Face
+  Lib_ = CodeMolester::Lib_
 
-  %i| Basic Face Headless MetaHell |.each do |i|
-    const_set i, ::Skylab.const_get( i, false )
-  end
-
-  Event = Face::Model::Event  # ( pretend it is a subclass )
+  Event = Lib_::Model_event[]  # or a subclass
 
   Entity = self  # the usual hiccup, for readabilty
 
@@ -76,7 +72,7 @@ module Skylab::CodeMolester::Config::File::Entity
     end
   end
 
-  Shell_ = MetaHell::Enhance::Shell.new %i| fields |
+  Shell_ = Lib_::Simple_shell[ %i( fields ) ]
 
   class Kernel_
 
@@ -99,13 +95,13 @@ module Skylab::CodeMolester::Config::File::Entity
 
         mutex_h[ target ].call
 
-        Basic::Field::Box.enhance target do
+        Lib_::Field_box_enhance[ target, -> do
 
           meta_fields( * METAFIELDS_BASE_ )
 
           fields( * field_a ) if field_a
 
-        end
+        end ]
         nil
       end
     end

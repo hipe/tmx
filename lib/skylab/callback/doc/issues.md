@@ -1,3 +1,4 @@
+[#025]       isomorphic event factory is deprecated
 [#024]       #doc-node the new autoloader narative ..
 [#023]       #doc-node the different kinds of callback patterns ..
 [#022]       #doc-node the call_digraph_listeners spy narrative ..

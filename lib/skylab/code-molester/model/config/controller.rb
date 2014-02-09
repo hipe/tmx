@@ -1,14 +1,16 @@
 module Skylab::CodeMolester
 
+  Model::Event = Lib_::Model_event[]  # but it could be a subclass
+
   class Model::Config::Controller
 
     # immutable
 
-    CodeMolester::Library_::Face::Model.enhance self do
+    Lib_::Model_enhance[ self, -> do
 
       do_memoize  # once you create a config instance, it is *the* config.
 
-    end
+    end ]
 
     # `new_valid` - poka yoke. there is no public `new` (#experimental)
 
@@ -74,7 +76,7 @@ module Skylab::CodeMolester
     end
 
     _i_a = %i( unpack_equal unpack_superset unpack_subset repack_difference )
-    CodeMolester::Library_::Basic::Hash::FUN.pairs_at _i_a  do |i, p|
+    Lib_::Hash_functions[].pairs_at _i_a  do |i, p|
       define_method i, p ; private i
     end
 

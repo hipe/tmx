@@ -72,13 +72,13 @@ module Skylab::CodeMolester
 
       compile_parser = nil
       load_parser_class = -> do
-        o_pn = CodeMolester::Cache.pathname.join path_part
+        o_pn = Lib_::Cache_pathname[].join path_part
         if o_pn.exist?
           debug and y << "using cached parser - #{ o_pn }"
         else
           compile_parser[ o_pn ] or break  # (result is num bytes)
         end
-        CodeMolester::Library_.kick :Treetop  # load it late, close to where it is used
+        CodeMolester::Library_.touch :Treetop  # load it late, close to where it is used
         load o_pn.to_s
         parent_module.const_defined? const, false or fail "we expected but #{
           }did not see #{ parent_module }::#{ const } in #{ o_pn }"
@@ -110,14 +110,14 @@ module Skylab::CodeMolester
       mkdir_p = -> d_pn do
         # the number of dirs you have to create should not exceed the
         # number of dirs present in `path_part`
-        CodeMolester::Cache.pathname.exist? or fail "sanity"
-        relpath = d_pn.relative_path_from CodeMolester::Cache.pathname
+        Lib_::Cache_pathname[].exist? or fail "sanity"
+        relpath = d_pn.relative_path_from Lib_::Cache_pathname[]
         a = num_occurences[ relpath.to_s, '/' ]
         b = num_occurences[ path_part, '/' ]
         ( a < b ) or fail "sanity - #{ a } dirs to create for #{ b - 1 }"
-        Headless::IO::FU.new( -> msg do
+        Lib_::File_utils[ -> msg do
           debug and y << msg
-        end ).mkdir_p d_pn.to_s
+        end ].mkdir_p d_pn.to_s
       end
 
       num_occurences = -> str, substr do
@@ -128,7 +128,7 @@ module Skylab::CodeMolester
       end
 
       y = -> do
-        stderr = Headless::CLI::IO.some_errstream_IO
+        stderr = Lib_::CLI_errstream_IO
         ::Enumerator::Yielder.new { |msg| stderr.puts "cm: #{ msg }" }
       end.call
 

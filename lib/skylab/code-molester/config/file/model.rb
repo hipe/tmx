@@ -7,7 +7,7 @@ module Skylab::CodeMolester
       # (while [#ps-101] (cover [cb] digraph viz) is open..) (multiple graphs
       # in one file, specifically)
 
-      Callback[ self, :employ_DSL_for_digraph_emitter ]
+      Callback_[ self, :employ_DSL_for_digraph_emitter ]
       listeners_digraph wizzle: :paazle
     end
 
@@ -39,7 +39,7 @@ module Skylab::CodeMolester
 
     attr_reader :entity_noun_stem, :pathname
 
-    Headless::Delegating[ self,
+    Lib_::Delegating[ self,
       :to, :sexp, :if, -> { valid? },
         %i( [] content_items get_section_scanner_with_map_reduce_p
             key? sections set_mixed value_items ),
@@ -252,7 +252,7 @@ module Skylab::CodeMolester
       r
     end
 
-    Write__ = Callback::Digraph.new
+    Write__ = Callback_::Digraph.new
     class Write__  # `write` is very evented [#006]
 
       taxonomic_streams :all, :structural, :text, :notice, :before, :after
@@ -265,7 +265,7 @@ module Skylab::CodeMolester
         after_create: [ :structural, :after, :notice ],
         no_change: [ :notice, :text ]
 
-      event_factory -> { Callback::Event::Factory::Isomorphic.new Events__ }
+      event_factory -> { Callback_::Event::Factory::Isomorphic.new Events__ }
 
       attr_accessor :dry_run
       alias_method :is_dry_run, :dry_run
@@ -280,9 +280,8 @@ module Skylab::CodeMolester
       end
 
       module Events__
-        MetaHell::Boxxy[ self ]
-        Text = Callback::Event::Factory::Datapoint
-        Structural = Callback::Event::Factory::Structural.new 2, nil, Events___
+        Text = Callback_::Event::Factory::Datapoint
+        Structural = Callback_::Event::Factory::Structural.new 2, nil, Events___
       end
     end
 
@@ -303,7 +302,7 @@ module Skylab::CodeMolester
           # hence they use neither the emitter nor `escape_path` (for now)
 
         bytes = nil
-        ( w.is_dry_run ? Headless::IO::DRY_STUB : @pathname ).open 'a' do |fh|
+        ( w.is_dry_run ? Lib_::Dry_IO_stub[] : @pathname ).open 'a' do |fh|
           bytes = fh.write string  # 'a' not 'w' to fail gloriously
         end
         @cached_pn_exist = true  # hopefully ok, might bite
@@ -335,7 +334,7 @@ module Skylab::CodeMolester
         @pathname.writable? or raise "path is not writable, cannot #{
           }write - #{ @pathname }"
         bytes = nil
-        ( is_dry ? Headless::IO::DRY_STUB : @pathname ).open 'w' do |fh|
+        ( is_dry ? Lib_::Dry_IO_stub[] : @pathname ).open 'w' do |fh|
           bytes = fh.write str
         end
         after_update w, bytes
@@ -386,7 +385,7 @@ module Skylab::CodeMolester
       if valid?
         res_a = @content_x.any_names_notify
       end
-      res_a || MetaHell::EMPTY_A_
+      res_a || EMPTY_A_
     end
   end
 end

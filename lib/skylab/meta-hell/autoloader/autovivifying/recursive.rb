@@ -55,7 +55,7 @@ module Skylab::MetaHell
     private
       def enhance_loadee
         tug = self
-        @x.instance_exec do
+        @x.module_exec do
           dir_pathname.nil? and init_dir_pathname tug.branch_pathname
           # let module graphs charge passively just after file load
           const_missing_class.nil? and tug.class.enhance self

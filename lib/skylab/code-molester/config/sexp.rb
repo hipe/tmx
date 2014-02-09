@@ -3,7 +3,7 @@ module Skylab::CodeMolester
 
   class Config::Sexp < CodeMolester::Sexp
 
-    Headless::Delegating[ self, :employ_the_DSL_method_called_delegates_to ]
+    Lib_::Delegating[ self, :employ_the_DSL_method_called_delegates_to ]
 
     Sexp::Registrar[ self ]
 

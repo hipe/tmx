@@ -21,11 +21,7 @@ module Skylab::CodeMolester::Config::File::Entity
       fls.flush
     end
 
-    Shell_ = MetaHell::Enhance::Shell.new %i|
-      with
-      add
-      list_as_json
-    |
+    Shell_ = Lib_::Simple_shell[ %i( with add list_as_json ) ]
 
     class Kernel_
 
@@ -58,9 +54,9 @@ module Skylab::CodeMolester::Config::File::Entity
       end
 
       def register_for_config_services
-        Face::Model.enhance @target do
+        Lib_::Model_enhance[ @target, -> do
           services_used :configs, :config, :model
-        end
+        end ]
       end
 
       private :register_for_config_services
@@ -95,7 +91,7 @@ module Skylab::CodeMolester::Config::File::Entity
     end
 
     def inflection
-      @inflection ||= Headless::Entity::Inflection.new name
+      @inflection ||= Lib_::Entity_inflection[ name ]
     end
 
     def name
@@ -203,15 +199,15 @@ module Skylab::CodeMolester::Config::File::Entity
         end
       end
 
-      o = Headless::IO::Interceptors::Chunker::F.new yf
+      o = Lib_::IO_chunker_yielder[ yf ]
 
-      Basic::List::Evented::Articulation enum do
+      Lib_::Evented_list_articulation[ enum, -> do
         always_at_the_beginning      ->     { o << '[' }
         iff_zero_items               ->     { o << ' ]' }
         any_first_item               ->   s { o << "\n  #{ s }" }
         any_subsequent_items         ->   s { o << "#{ comma }\n  #{ s }" }
         at_the_end_iff_nonzero_items ->     { o << "\n]" }
-      end
+      end ]
       o.flush
       nil
     end

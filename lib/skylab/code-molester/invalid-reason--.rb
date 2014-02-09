@@ -16,7 +16,7 @@ module Skylab::CodeMolester
     def render opt_h=nil
       x_a = if opt_h
         opt_h.each_pair.reduce( [] ) do |m, (k,v)| m << k << v ; m end
-      else MetaHell::EMPTY_A_ end
+      else EMPTY_A_ end
       render_with( * x_a )
     end
     #

@@ -120,17 +120,20 @@ module Skylab::MetaHell
   class Function::Class
     class << self
       alias_method :orig_new, :new
-    end
-    me = self
-    define_singleton_method :new do | * i_a, & cls_p |
-      me == self or fail "sanity - hack failed"
-      ::Class.new( me ).class_exec do
-        class << self
-          alias_method :new, :orig_new
+
+      def new * i_a, & cls_p
+        from_i_a_and_p i_a, cls_p
+      end
+
+      def from_i_a_and_p i_a, cls_p
+        ::Class.new( self ).class_exec do
+          class << self
+            alias_method :new, :orig_new
+          end
+          MetaHell.Function self, * i_a
+          cls_p and class_exec( & cls_p )
+          self
         end
-        MetaHell::Function self, * i_a
-        cls_p and class_exec( & cls_p )
-        self
       end
     end
   end

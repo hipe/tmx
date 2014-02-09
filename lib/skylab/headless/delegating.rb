@@ -2,10 +2,18 @@ module Skylab::Headless
 
   module Delegating  # read [#060] the .. narrative #storypoint-025 intro.
 
-    def self.[] mod, * x_a
-      mod.module_exec x_a, & to_proc
-      x_a.length.zero? or raise ::ArgumentError, "unexpected #{
-        }#{ Headless::FUN::Inspect[ x_a[ 0 ] ] }" ; nil
+    class << self
+      def [] mod, * x_a
+        apply_iambic_on_client x_a, mod
+      end
+      def apply_iambic_on_client x_a, mod
+        mod.module_exec x_a, & to_proc
+        x_a.length.zero? or raise ::ArgumentError, say_unexpected( x_a.first )
+      end
+    private
+      def say_unexpected x
+        "unexpected #{ Headless::FUN::Inspect[ x_a[ 0 ] ] }"
+      end
     end
 
     to_proc = -> x_a=nil do

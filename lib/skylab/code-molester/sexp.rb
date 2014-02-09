@@ -178,12 +178,11 @@ module ::Skylab::CodeMolester
 
   # NOTE this assumes "strict sexps" [#003]
 
-  Sexp::Scanner_ = MetaHell::Function::Class.new :scan, :gets, :pos
-  class Sexp::Scanner_
+  Sexp::Scanner_ = Lib_::Procs_as_methods.call :scan, :gets, :pos do
 
     # this is not expected to work well if you instantiate it directly
 
-    MetaHell::Pool.enhance( self ).with_with_instance
+    Lib_::Add_the_pool_method_known_as_with_instance[ self ]
 
     def self.with_scanner sexp, &blk
       with_instance do |scn|
@@ -195,7 +194,7 @@ module ::Skylab::CodeMolester
     # ( for internal fly-weighting use only )
     def set_sexp sexp
       tgt_sym = gets = nil
-      FUN.build_scan_functions[ sexp,
+      Sexp::Build_scanner_functions_[ sexp,
         -> x do
           if x.respond_to? :each_index
             ! tgt_sym || tgt_sym == x.fetch( 0 )
@@ -223,10 +222,11 @@ module ::Skylab::CodeMolester
     end
   end
 
-  Sexp::Scanner_::Bound = MetaHell::Function::Class.new :gets, :pos, :rgets
-  class Sexp::Scanner_::Bound  # Bound to a search method
 
-    MetaHell::Pool.enhance( self ).with_with_instance
+  Sexp::Scanner_::Bound = Lib_::Procs_as_methods.call :gets, :post, :rgets do
+    # bound to a search method
+
+    Lib_::Add_the_pool_method_known_as_with_instance[ self ]
 
     def self.with_symbol_scanner sexp, search_symbol, &blk
       with_instance do |scn|
@@ -248,7 +248,7 @@ module ::Skylab::CodeMolester
         winc[ 1 ]
         forward = true
       end
-      Sexp::Scanner_::FUN.build_scan_functions[ sexp,
+      Sexp::Build_scanner_functions_[ sexp,
         -> x do
           x.respond_to? :each_index and bound_symbol == x.fetch( 0 )
         end,
@@ -287,16 +287,14 @@ module ::Skylab::CodeMolester
     end
   end
 
-  Sexp::Scanner_::FUN = -> do
-
-    o = { }
+  Sexp::Build_scanner_functions_ = -> do
 
     # `build_scan_functions` - a very internal function, and for fun a
     # very experimental one, that in one shot builds multiple functions
     # used in scanning. we come from a planet with no ivars.
 
     build_position_functions = nil
-    o[:build_scan_functions] = -> sexp, match, gets_, *rpos_wpos_rinc_winc do
+    payload_p = -> sexp, match, gets_, *rpos_wpos_rinc_winc do
       pgets = nil
       build_position_functions[ sexp, -> p { pgets = p }, *rpos_wpos_rinc_winc ]
       pos = nil
@@ -368,7 +366,6 @@ module ::Skylab::CodeMolester
       nil
     end
 
-    ::Struct.new( * o.keys ).new( * o.values )
+    payload_p
   end.call
-
 end

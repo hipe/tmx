@@ -2,12 +2,9 @@ module Skylab::Headless
 
   module NLP::EN::Methods
 
-    # This travelled a long way to get here, it represents what used to be
-    # the last holdover of nlp from porcelain.  it might just be transitional
-    # until we have coverage good enought to phase-in sub-client i.m
-    # everywhere instead of this yet-another-module but we'll see, maybe
-    # it's ok as-is
-
+    def self.[] mod
+      mod.include self
+    end
 
     fun = NLP::EN::Minitesimal::FUN
 

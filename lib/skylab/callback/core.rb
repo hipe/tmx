@@ -118,16 +118,19 @@ module Skylab::Callback
 
     # ~ functions often used in loading (may purify predecessors :+[#ss-002])
 
-    def self.build_require_sidesystem_proc i
-      memoize { require_sidesystem i }
-    end
+    class << self
 
-    def self.build_require_stdlib_proc i
-      memoize { require_stdlib i }
-    end
+      def build_require_sidesystem_proc i
+        memoize { require_sidesystem i }
+      end
 
-    def self.memoize *a, &p
-      Memoize[ ( a.length.zero? ? a << p : a ).fetch a.length - 1 << 1 ]
+      def build_require_stdlib_proc i
+        memoize { require_stdlib i }
+      end
+
+      def memoize *a, &p
+        Memoize[ ( p ? a << p : a ).fetch a.length - 1 << 1 ]
+      end
     end
 
     define_singleton_method :require_sidesystem, -> do
@@ -148,9 +151,29 @@ module Skylab::Callback
       end
     end.call
 
-    def self.require_stdlib const_i
-      require const_i.downcase.to_s  # until it's useful to, no inflection
-      ::Object.const_get const_i
+    class << self
+
+      def require_quietly const_i_or_path_s
+        without_warning do
+          if Name.is_valid_const const_i_or_path_s
+            require_stdlib const_i_or_path_s
+          else
+            require const_i_or_path_s
+          end
+        end
+      end
+    private
+      def without_warning
+        prev = $VERBOSE ; $VERBOSE = nil
+        r = yield  # 'ensure' is out of scope
+        $VERBOSE = prev ; r
+      end
+    public
+
+      def require_stdlib const_i
+        require const_i.downcase.to_s  # until it's useful to, no inflection
+        ::Object.const_get const_i
+      end
     end
 
     # ~
@@ -188,6 +211,10 @@ module Skylab::Callback
     SPLIT_EXTNAME_RX_ = %r((?=\.[^.]+\z))
     EXTENSION_PASS_FILTER_RX_ = /\A(?:#{ ::Regexp.escape EXTNAME_ }|)\z/
 
+    Write_stowaway_ = -> i, path do
+      ( @stowaway_h ||= {} )[ i ] = path ; nil
+    end
+
     module Deferred_Methods__
       def const_missing i
         insist_on_dir_pathname
@@ -213,6 +240,7 @@ module Skylab::Callback
         extend Methods__
         set_dir_pn mod.dir_pathname.join last_s.gsub( '_', '-' ).downcase ; nil
       end
+      define_method :stowaway, Write_stowaway_
     end
 
     module Methods__
@@ -231,14 +259,16 @@ module Skylab::Callback
       def get_const_missing name_x, _guess_i  # #hook-in
         Const_Missing__.new self, @dir_pathname, name_x
       end
+      def init_dir_pathname x  # #comport #storypoint-265
+        set_dir_pn x
+      end
       def set_dir_pn x  # compare more elaborate [sl] `init_dir_pathname`
         @dir_pathname = x ; nil
       end
+
       attr_reader :stowaway_h
     private
-      def stowaway i, path
-        ( @stowaway_h ||= {} )[ i ] = path ; nil
-      end
+      define_method :stowaway, Write_stowaway_
     end
 
     class Const_Missing__
@@ -350,6 +380,9 @@ module Skylab::Callback
       def any_valid_from_const const_i
         VALID_CONST_RX__ =~ const_i and
           allocate_with :initialize_with_const_i, const_i
+      end
+      def is_valid_const const_i
+        VALID_CONST_RX__ =~ const_i
       end
       def from_const const_i
         VALID_CONST_RX__ =~ const_i or raise ::NameError, say_wrong( const_i )

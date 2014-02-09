@@ -2,7 +2,7 @@ module Skylab::CodeMolester
 
   class Model::Config::Collection
 
-    CodeMolester::Library_::Face::Model.enhance self do
+    Lib_::Model_enhance[ self, -> do
 
       services_used( * %i|
         has_model_instance
@@ -12,7 +12,7 @@ module Skylab::CodeMolester
         config_get_search_start_pathname
       | )
 
-    end
+    end ]
 
     # `create`
     #   + `field_h`  - (exactly):
@@ -42,7 +42,7 @@ module Skylab::CodeMolester
     end
 
     _i_a = %i( unpack_equal unpack_superset )
-    CodeMolester::Library_::Basic::Hash::FUN.pairs_at _i_a do |i, p|
+    Lib_::Hash_functions[].pairs_at _i_a do |i, p|
       define_method i, p ; private i
     end
 

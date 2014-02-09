@@ -11,7 +11,7 @@ module Skylab::CodeMolester
     # (a lot of this has necessary vestigials from the treetop hack that
     # it originally was.)
 
-    MetaHell::FUN::Fields_[ :client, self, :method, :absorb,
+    Lib_::Fields[ :client, self, :method, :absorb,
       :field_i_a, [ :outfile_stem, :path, :inpath_p, :outdir_p ] ]
 
     def self.[] path_s
@@ -30,11 +30,11 @@ module Skylab::CodeMolester
       # of the recursive buck stopping somewhere even if it perhaps doesn't
       # need to.  (i.e.: yes i know, and i'm considering it.)
 
-      file = CodeMolester::Library_::Basic::List::
-        Scanner[ inpathname.open 'r' ]
+      file = Lib_::List_scanner[ inpathname.open 'r' ]
+
       scn = nil ; set_scanner_to_line = -> line do
         if scn then scn.string = line else
-          scn = Headless::Library_::StringScanner.new line
+          scn = Library_::StringScanner.new line
         end
         nil
       end
@@ -99,7 +99,7 @@ module Skylab::CodeMolester
 
     CTX_LEN_ = 40  # heuristic
 
-    Inspct_ = CodeMolester::Library_::Basic::FUN::Inspect__.curry[ CTX_LEN_ ]
+    Inspct_ = Lib_::Inspect_proc[].curry[ CTX_LEN_ ]
 
     T_MODULE_ = 'module'.freeze
 

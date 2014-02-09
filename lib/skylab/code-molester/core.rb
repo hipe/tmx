@@ -1,13 +1,20 @@
-require_relative '..'
-require 'skylab/callback/core'
-require 'skylab/headless/core'
+require_relative '../callback/core'
 
-module ::Skylab::CodeMolester
+module Skylab::CodeMolester
 
-  %i| CodeMolester Headless MetaHell Callback |.each do |i|
-    const_set i, ::Skylab.const_get( i, false )
+  Callback_ = ::Skylab::Callback
+  Autoloader_ = Callback_::Autoloader
+  CodeMolester = self
+  EMPTY_A_ = [].freeze
+  MONADIC_TRUTH_ = -> _ { true }
+
+  module Model
+    Autoloader_[ self ]
+    stowaway :Event, 'config/controller'
   end
 
-  ::Skylab::Subsystem[ self ]
+  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+
+  stowaway :Lib_, 'library-'
 
 end

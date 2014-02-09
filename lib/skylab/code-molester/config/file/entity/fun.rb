@@ -14,9 +14,9 @@ module Skylab::CodeMolester
         n = mod.name
         a = ( n[ ( n.rindex str ) + len .. -1 ] ).split( '::' )
         a.length.nonzero? or fail "sanity - hack failed (#{ n })"
-        Headless::Name::Function::Full.new(
+        Lib_::Name_function[]::Full.new(
           a.map do |s|
-            Headless::Name::Function::From::Constant.new s.intern
+            Lib_::Name_function[]::From::Constant.new s.intern
           end
         )
       end
