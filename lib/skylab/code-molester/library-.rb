@@ -84,7 +84,7 @@ module Skylab::CodeMolester
     end
 
     Fields = -> * x_a do
-      MetaHell__[]::FUN::Fields_.from_x_a x_a
+      MetaHell__[]::FUN::Fields_.via_iambic x_a
     end
 
     File_utils = -> p do

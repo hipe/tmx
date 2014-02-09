@@ -11,7 +11,7 @@ module Skylab::SubTree
       # by simply returning a symbolic method-ish name when relevant, to
       # indicate that there may be more rendering that needs to be done.
 
-      MetaHell::FUN.fields[ self, :emit_p, :hubs, :did_error_p, :list_as ]
+      Lib_::Fields[ self, :emit_p, :hubs, :did_error_p, :list_as ]
 
       def execute_and_resolve
         begin
@@ -21,7 +21,7 @@ module Skylab::SubTree
         r
       end
 
-      class Box_ < Basic::Box
+      class Box_ < Lib_::Box_class[]
         def render
           case length
           when 0 ;

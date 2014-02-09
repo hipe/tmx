@@ -35,6 +35,10 @@ module Skylab::Basic
     class << self
 
       def [] * member_i_a
+        from_i_a member_i_a
+      end
+
+      def from_i_a member_i_a
         if member_i_a.length.zero? or member_i_a[ 0 ].respond_to?( :id2name )
           build_struct_class_from_member_i_a member_i_a
         else

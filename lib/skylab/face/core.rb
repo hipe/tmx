@@ -359,8 +359,12 @@ module Skylab::Face
         alias_method :orig_new, :new
       private
         def collapse ; end
+      public
+        def new * formal_a
+          from_iambic formal_a
+        end
       end
-      def self.new * formal_a
+      def self.from_iambic formal_a
         ::Class.new( self ).class_exec do
           @formal_arg_a = formal_a
           def self.collapse

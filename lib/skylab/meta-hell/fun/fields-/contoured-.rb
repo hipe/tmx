@@ -35,8 +35,13 @@ module Skylab::MetaHell
       #
       #
 
-      def self.[] client, *a
-        Glint_.new( client ).absorb( a ).flush
+      class << self
+        def [] client, *a
+          from_iambic_and_client a, client
+        end
+        def from_iambic_and_client a, client
+           Glint_.new( client ).absorb( a ).flush
+        end
       end
 
       class Glint_

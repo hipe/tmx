@@ -29,6 +29,7 @@ module Skylab
 
     ( MAARS = Autoloader::Autovivifying::Recursive )[ self ]
       # a name this long that is used this often gets its own weird acronym
+    stowaway :Lib_, 'library-'
 
     def self.Function host, *rest
       self::Function._make_methods host, :public, :method, rest

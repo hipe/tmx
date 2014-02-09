@@ -2,6 +2,8 @@
 
 module Skylab::SubTree
 
+  SubTree::Library_.touch :Set
+
   class CLI::Actions::Cov < CLI::Action
 
     SIDE_A = [ :test, :code ].freeze
@@ -16,7 +18,7 @@ module Skylab::SubTree
     # order matters above - since test nodes get merged destructively into
     # code nodes, the order is as such and never the reverse.
 
-    MetaHell::FUN::Fields_[ :client, self, :method, :absorb_params,
+    Lib_::Fields_via[ :client, self, :method, :absorb_params,
       :field_i_a, [ :list_as, :path, :be_verbose ] ]
 
     def initialize
@@ -62,11 +64,11 @@ module Skylab::SubTree
       Services_For_API_Action_.new self
     end
     #
-    Services_For_API_Action_ = SubTree::Library_::Face::Iambic.
-      new :error, -> { method :error_notify },
-          :info,  -> { method :info_notify }
+    Services_For_API_Action_ = SubTree::Lib_::Iambic[
+         :error, -> { method :error_notify },
+          :info,  -> { method :info_notify } ]
     #
-    p = Basic::Method::Curry::Unbound.new instance_method :emit_from_parent
+    p = Lib_::Unbound_method_curry[ instance_method :emit_from_parent ]
     #
     define_method :_error_notify, & p.curry[ :error ]
     #

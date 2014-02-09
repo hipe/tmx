@@ -105,7 +105,8 @@ describe "[st] CLI actions cov" do
     end
   end
 
-  ::Skylab::TestSupport::Stderr_[].puts( ::Skylab::Headless::CLI::Pen::FUN::Stylify[ [ :red ], "    <<< SKIPPING COV TREE INTEGRATION >>>" ] )
+  Testlib_::Stderr[].puts Testlib_::CLI_stylify[ [ :red ], "    <<< SKIPPING COV TREE INTEGRATION >>>" ]
+
   false and it "LOOK AT THAT BEAUTIFUL COV TREE" do
     debug!
     cd SubTree.dir_pathname.dirname.to_s do

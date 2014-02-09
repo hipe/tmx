@@ -5,8 +5,8 @@ module Skylab::TestSupport
     module API
       API = self
       Regret = Regret
-      Plugin_ = ::Skylab::Face::Plugin
       TestSupport = TestSupport_
+      Plugin_ = TestSupport_::Lib_::Heavy_plugin[]
 
       %i| Basic Face Headless MetaHell |.each do |i|
         const_set i, TestSupport::Library_.const_get( i, false )

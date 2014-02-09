@@ -2,7 +2,7 @@ module Skylab::SubTree
 
   class API::Actions::My_Tree::Traversal_
 
-    MetaHell::FUN::Fields_::Contoured_[ self,
+    Lib_::Contoured_fields[ self,
       :absorb_method, [ :public, :absorb ],
       :field, :sep,
       :field, :do_verbose_lines,
@@ -10,7 +10,7 @@ module Skylab::SubTree
 
   private
 
-    MetaHell::FUN::Fields_::From_.methods do
+    Lib_::Fields_from_methods[ -> do
       def out_p a
         p = a.shift
         @out_p = case p.arity
@@ -35,12 +35,12 @@ module Skylab::SubTree
         end
         nil
       end
-    end
+    end ]
 
     def initialize * a
       absorb( * a )
       @curr_a = [] ; @matrix_a = [] ; @sep ||= SEP_
-      @glyph_set = Headless::CLI::Tree::Glyph::Sets::WIDE
+      @glyph_set = SubTree::Lib_::CLI_tree_glyph_sets[]::WIDE
       nil
     end
 
@@ -134,7 +134,7 @@ module Skylab::SubTree
       @info_p[ "(adding row: #{ seen_a.inspect }#{ '..' if extra_x })" ]
     end
 
-    Headless::CLI::Tree::Glyphs.each do |glyph|
+    SubTree::Lib_::CLI_tree_glyphs[].each do |glyph|
       m = glyph.normalized_glyph_name
       define_method m do @glyph_set[ m ] end
       private m

@@ -2,9 +2,9 @@ module Skylab::SubTree
 
   class API::Actions::My_Tree
 
-    class Render_table_ < Basic::Struct[ :paystream, :row_a ]
+    class Render_table_ < Lib_::Struct[ :paystream, :row_a ]
 
-      MetaHell::Funcy[ self ]
+      Lib_::Funcy[ self ]
 
       def execute
         row_a = [ ]
@@ -18,7 +18,7 @@ module Skylab::SubTree
           else '' end )
           row_a << cel_a
         end
-        SubTree::Library_::Face::CLI::Table[
+        SubTree::Lib_::CLI_table[
           :field, :id, :glyphs_and_slug, :left,
           :field, :id, :xtra, :left,
           :show_header, false,

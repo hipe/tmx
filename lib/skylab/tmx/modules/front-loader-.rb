@@ -75,7 +75,7 @@ module ::Skylab::TMX
     end
 
     Distill_proc_ = -> do
-      MetaHell::Boxxy::Distill
+      MetaHell::Boxxy::Distill_proc[]
     end
 
     module Stubs_

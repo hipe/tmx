@@ -1,5 +1,6 @@
 require_relative '../core'
-require 'skylab/test-support/core'
+
+::Skylab::InformationTactics::Autoloader_.require_sidesystem :TestSupport
 
 module Skylab::InformationTactics::TestSupport
 

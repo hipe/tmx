@@ -2,9 +2,9 @@ module Skylab::SubTree
 
   class API::Actions::My_Tree
 
-    SubTree::Library_::Face::API::Normalizer_.enhance_client_class self, :all
+    SubTree::Lib_::Enhance_as_API_normalizer[ self, :all ]
 
-    MetaHell::FUN::Fields_[ :client, self, :method, :absorb_iambic,
+    Lib_::Fields_via[ :client, self, :method, :absorb_iambic,
       :field_i_a, [ :expression_agent, :program_name, :param_h,
                     :upstream, :paystream, :infostream ] ]
     def absorb * a
@@ -48,9 +48,7 @@ module Skylab::SubTree
       nil  # when field is optional, response "shouldn't" matter
     end
 
-    Face = SubTree::Library_::Face
-
-    Face::API::Params_[ :client, self,
+    SubTree::Lib_::API_Params[ :client, self,
 
       :meta_param, :extension,
 
@@ -83,8 +81,9 @@ module Skylab::SubTree
 
     def write_option_parser_to o
       ex_ag = some_expression_agent
-      Face::CLI::API_Integration::OP_[ :field_box, field_box,
-        :any_expression_agent, ex_ag, :param_h, order_proxy, :op, o ]
+      SubTree::Lib_::Write_isomorphic_option_parser_options[
+        :field_box, field_box, :any_expression_agent, ex_ag,
+        :param_h, order_proxy, :op, o ]
       ex_ag.instance_exec do
         o.separator "   (it can also read paths from STDIN instead of #{
           }#{ par :file } or #{ par :path_a })"
@@ -93,7 +92,7 @@ module Skylab::SubTree
     end
 
     def order_proxy
-      @order_proxy ||= Basic::Hash::Order_Proxy.new @param_h
+      @order_proxy ||= Lib_::Order_proxy[ @param_h ]
     end
     private :order_proxy
 
@@ -225,13 +224,14 @@ module Skylab::SubTree
     end
 
     def init_extensions order_i_a
-      bx = Basic::Box.new
-      bound = Basic::Field::Reflection::Bound_
+      bx = Lib_::Box[]
+      bound = Lib_::Bound_field_reflection_class[]
       order_i_a.each do |i|
         fld = field_box.fetch i
         bf = bound.new fld, -> { instance_variable_get fld.as_host_ivar }
         bx.add bf.local_normal_name, bf
       end
+
       is_valid, @extensions =
         self.class::Extensions_.new(
           :arg_box, bx, :infostream, @infostream, :verbose, @verbose ).
@@ -267,10 +267,10 @@ module Skylab::SubTree
 
     alias_method :any_expression_agent, :some_expression_agent
 
-    class Upstream_resolver_ < Basic::Struct[ :upstream, :path_a, :file,
+    class Upstream_resolver_ < Lib_::Struct[ :upstream, :path_a, :file,
       :pattern, :say_p_p, :change_upstream_p, :cmd_s_p, :exit_status_p_p ]
 
-      MetaHell::Funcy[ self ]
+      Lib_::Funcy[ self ]
 
       def execute
         have_a = [ ]

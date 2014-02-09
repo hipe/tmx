@@ -4,15 +4,15 @@ module Skylab::SubTree
 
     class Treeer_
 
-      MetaHell::Funcy[ self ]
+      Lib_::Funcy[ self ]
 
-      MetaHell::FUN.fields[ self, :hub_a, :arg_pn, :card_p ]
+      Lib_::Fields[ self, :hub_a, :arg_pn, :card_p ]
 
       def execute
         @hub_a.length.nonzero? or fail "sanity"
         begin
           r = uber_tree = get_uber_tree or break
-          trav = SubTree::Library_::Tree::Traversal.new
+          trav = SubTree::Lib_::Tree_traversal[]
           trav.traverse uber_tree do |card|
             card.prefix = trav.prefix card
             @card_p[ card ]

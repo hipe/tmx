@@ -1,5 +1,7 @@
 module Skylab::SubTree
 
+  SubTree::Library_.touch :Set
+
   class CLI::Actions::Rerun < CLI::Actions::Cov
 
     @sides = [:all, :rerun] # left one gets the "plus"

@@ -1,5 +1,6 @@
 require_relative '../core'
-require 'skylab/test-support/core'
+
+::Skylab::SubTree::Autoloader_.require_sidesystem :TestSupport
 
 Skylab::TestSupport::Quickie.enable_kernel_describe
   # then we don't need to extend quick explicitly per test module ..
@@ -8,8 +9,8 @@ Skylab::TestSupport::Quickie.enable_kernel_describe
 module Skylab::SubTree::TestSupport
 
   module CONSTANTS
-    ::Skylab::MetaHell::FUN::
-      Import_constants[ ::Skylab, %i( MetaHell SubTree TestSupport ), self ]
+    SubTree = ::Skylab::SubTree
+    TestSupport = ::Skylab::TestSupport
   end
 
   include CONSTANTS
@@ -17,6 +18,42 @@ module Skylab::SubTree::TestSupport
   TestSupport = TestSupport
 
   TestSupport::Regret[ self ]
+
+  module Testlib_
+
+    sidesys = ::Skylab::SubTree::Autoloader_.
+      method :build_require_sidesystem_proc
+
+    Headless__ = sidesys[ :Headless ]
+
+    CLI_stylify = -> a, b do
+      ::Skylab::SubTree::Lib_::CLI_stylify[ a, b ]
+    end
+
+    Face_ = sidesys[ :Face ]
+
+    Parse_styles = -> s do  # TL
+      Headless__[]::CLI::FUN::Parse_styles[ s ]
+    end
+
+    Stderr = -> do
+      TestSupport::Stderr_[]
+    end
+
+    Unstyle_proc = -> do
+      Headless__[]::CLI::Pen::FUN.unstyle
+    end
+
+    Unstyle_styled = -> x do
+      Headless__[]::CLI::Pen::FUN::Unstyle_styled[ x ]
+    end
+
+    Unstyle_style_proc = -> do
+      Headless__[]::CLI::Pen::FUN::Unstyle_styled
+    end
+  end
+
+  CONSTANTS::Testlib_ = Testlib_
 
   module InstanceMethods
 

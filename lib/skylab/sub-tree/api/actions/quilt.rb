@@ -60,8 +60,7 @@ module Skylab
       @IO ||= omg_really
     end
     def omg_really
-      require_relative '../../core'
-      Headless::CLI::IO
+      self._WAT  # look at the prev lines
     end
   public
     def help

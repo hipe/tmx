@@ -32,4 +32,6 @@ module Skylab::TestSupport  # :[#021]
 
   ::Skylab::Subsystem[ self ]
 
+  stowaway :Lib_, 'library-'
+
 end

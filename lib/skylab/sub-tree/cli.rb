@@ -6,7 +6,7 @@ module Skylab::SubTree
 
   private
 
-    Callback[ self, :employ_DSL_for_digraph_emitter ]  # do this before you extend
+    Callback_[ self, :employ_DSL_for_digraph_emitter ]  # do this before you extend
       # legacy, it gives you a graph
 
     def mutex name_i, value_i
@@ -19,16 +19,16 @@ module Skylab::SubTree
       Client_Services_.new self
     end
 
-    Client_Services_ = SubTree::Library_::Face::Iambic.
-      new :emit_proc, -> { method :call_digraph_listeners },
+    Client_Services_ = SubTree::Lib_::Iambic[
+          :emit_proc, -> { method :call_digraph_listeners },
           :instream, -> { some_upstream },
           :errstream, -> { some_infostream },
-          :outstream, -> { some_paystream }
+          :outstream, -> { some_paystream } ]
 
   public
 
     def pen
-      Headless::CLI::Pen::SERVICES
+      SubTree::Lib_::CLI_pen[]
     end
 
     -> do
@@ -37,37 +37,37 @@ module Skylab::SubTree
           def initialize _ ; end
           alias_method :calculate, :instance_exec
         private
-          Headless::SubClient::EN_FUN[ self, :private, %i( s ) ]
-          o = Headless::CLI::Pen::FUN::Stylify.curry
+          SubTree::Lib_::EN_add_methods[ self, :private, %i( s ) ]
+          o = Lib_::CLI_stylify_proc[].curry
           define_method :em, o[ %i( green ) ]
-          define_method :escape_path, Headless::CLI::PathTools::FUN.pretty_path
-          define_method :ick, Basic::FUN::Inspect__.curry[ 60 ]
+          define_method :escape_path, Lib_::Pretty_path_proc[]
+          define_method :ick, Lib_::Inspect_proc[].curry[ 60 ]
         public
           def stylize *a
             _s = a.pop
-            Headless::CLI::Pen::FUN::Stylify[ a, _s ]
+            SubTree::Lib_::CLI_stylify[ a, _s ]
           end
         end
         r = Expression_Agent__.method :new ; p = -> { r } ; r
       end
       define_singleton_method :some_expression_agent,
-        MetaHell::FUN::Puff_constant_reader_[
+        Lib_::Puff_constant_reader[
           true, p[], :EXPRESSION_AGENT__, self, :_no_arg_ ]
     end.call
 
     # --*--                         DSL ZONE                              --*--
 
-    extend Porcelain::Legacy::DSL
+
+    Lib_::CLI_DSL[ self ]
 
     desc "inspired by unix builtin `tree`"
     desc "but adds custom features geared towards development"
 
     option_parser do |o|
-      front = my_tree_front ; face = SubTree::Library_::Face
+      front = my_tree_front
       front.absorb( :param_h, @param_h, :expression_agent,
-        face::API::Normalizer_::Field_Front_Exp_Ag_.new(
-          front.field_box,
-          face::CLI::API_Integration::EXPRESSION_AGENT_ )
+        SubTree::Lib_::Field_front_expression_agent[
+          front.field_box, Lib_::Stock_API_expression_agent[] ]
       ).write_option_parser_to o
       nil
     end
@@ -208,7 +208,8 @@ module Skylab::SubTree
 
     def cov path=nil, _opts
       @param_h[ :path ] = path
-      hot = CLI::Actions.const_fetch( :cov ).new.
+      _const = Name_.from_variegated_symbol( :cov ).as_const
+      hot = CLI::Actions.const_get( _const, false ).new.
         init_for_invocation get_services
       if false == (( r = hot.invoke @param_h ))
         invite
@@ -244,6 +245,12 @@ module Skylab::SubTree
     def ping
       call_digraph_listeners :info, "hello from sub tree."
       :hello_from_sub_tree
+    end
+
+    dsl_off
+
+    module Actions
+      Autoloader_[ self ]
     end
 
     Client = self  # #comport:tmx

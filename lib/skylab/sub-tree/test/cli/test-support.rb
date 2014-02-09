@@ -10,6 +10,8 @@ module Skylab::SubTree::TestSupport::CLI
     PN_ = 'sub-tree'.freeze
   end
 
+  Testlib_ = CONSTANTS::Testlib_
+
   module InstanceMethods
 
     include CONSTANTS # access SubTree from within i.m's in the specs
@@ -86,27 +88,22 @@ module Skylab::SubTree::TestSupport::CLI
     end
 
     def line
-      line_thru Unstyle_
+      line_thru Testlib_::Unstyle_proc[]
     end
 
     def styled
-      line_thru Unstyle_styled_
+      line_thru Testlib_::Unstyle_style_proc[]
     end
 
     def nonstyled
       line_thru Assert_nonstyled_
     end
 
-    Unstyle_, Unstyle_styled_ = ::Skylab::Headless::CLI::Pen::FUN.
-      at :unstyle, :unstyle_styled
-
     Assert_nonstyled_ = -> s do
-      (( x = Parse_styles_[ s ] )) and fail "line was styled, should #{
-        }not have been - #{ x }"
+      (( x = Testlib_::Parse_styles[ s ] )) and fail "line was #{
+        }styled, should not have been - #{ x }"
       s
     end
-
-    Parse_styles_ = ::Skylab::Headless::CLI::FUN::Parse_styles
 
     def line_thru p
       e = emission_a.shift
@@ -146,7 +143,7 @@ module Skylab::SubTree::TestSupport::CLI
       styled.should match( rx )
       while @emission_a.length.nonzero?
         e = @emission_a.fetch 0
-        if (( s = Unstyle_styled_[ e.payload_x ] ))  # if it's styled
+        if (( s = Testlib_::Unstyle_styled[ e.payload_x ] ))  # if it's styled
           if rx =~ s
             @emission_a.shift
             next
@@ -194,7 +191,7 @@ module Skylab::SubTree::TestSupport::CLI
     Emission_ = ::Struct.new :stream_name, :payload_x
 
     def cd path, &block
-      SubTree::Headless::CLI::PathTools.clear
+      SubTree::Lib_::Clear_pwd_cache[]
       SubTree::Library_::FileUtils.cd path, verbose: do_debug, &block
     end
   end

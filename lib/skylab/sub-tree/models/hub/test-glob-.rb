@@ -4,7 +4,7 @@ module Skylab::SubTree
 
     class Test_glob_
 
-      MetaHell::Funcy[ self ]
+      Lib_::Funcy[ self ]
 
       def initialize *a
         @test_dir_pn, @sub_path_a, @local_test_pathname_a = a

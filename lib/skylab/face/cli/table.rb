@@ -33,8 +33,13 @@ module Skylab::Face
     #     HERE
     #     act  # => exp
 
-    def self.[] *a
-      new( a ).execute
+    class << self
+      def [] * a
+        via_iambic a
+      end
+      def via_iambic a
+        new( a ).execute
+      end
     end
 
     def initialize a

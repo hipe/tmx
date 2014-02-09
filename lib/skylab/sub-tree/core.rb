@@ -1,27 +1,25 @@
-require_relative '..'
-require 'skylab/face/core'
-require 'skylab/headless/core'
-require 'skylab/porcelain/core'
+require_relative '../callback/core'
 
 module Skylab::SubTree
 
-  ::Skylab::MetaHell::FUN::Import_constants[ ::Skylab, [
-    :Autoloader,
-    :Basic,
-    :SubTree,
-    :Headless,  # styles, parameter controller
-    :MetaHell,
-    :Porcelain,  # level-1 is this
-    :Callback
-  ], self ]
+  const_defined?( :Callback_, false ) and fail 'whre?'
 
-  MetaHell::MAARS[ self ]
+  Callback_ = ::Skylab::Callback
+  Autoloader_ = Callback_::Autoloader
+
+  module API
+    module Actions
+      Autoloader_[ self ]
+    end
+    Autoloader_[ self ]
+  end
 
   module Core
-    MetaHell::MAARS::Upwards[ self ]
+    Autoloader_[ self ]
   end
 
   DOT_ = '.'.freeze
+  Name_ = Callback_::Name
   SEP_ = '/'.freeze
 
   Stop_at_pathname_ = -> do  # #todo
@@ -31,6 +29,10 @@ module Skylab::SubTree
     end
   end.call
 
-  ::Skylab::Subsystem[ self ]
+  SubTree = self
+
+  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+
+  stowaway :Lib_, 'library-'
 
 end

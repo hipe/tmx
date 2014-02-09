@@ -138,7 +138,8 @@
               `normalized_invocation_string`
 [#033]       #function-point #tracking-tag #node-tracker `desc` (and docs)
 [#032]       #done #low-priority do we care about our call-stack height for CLI?
-[#031]       #done a petition to get escape_path pushed up here
+[#031]       #parent-node: [#xxx] the path-tools narrative
+             (formerly: #done a petition to get escape_path pushed up here)
 [#030]       #done the raw dog experiment
 [#029] #open `stylize` as any of two of these happen: [#gs-004] [#bn-005]
                [#to-001] [#sc-001] [#ts-005] (low level nerks)

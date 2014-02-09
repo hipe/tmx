@@ -125,26 +125,16 @@ module Skylab::SubTree
   fmt = "%#{ max.to_s.length }d %6.2f  %-#{ widest }s%s"  # (shh math is hard)
 
   stk = -> do
-    if true  # if we ever make lipstick an option
-      begin
-        SubTree::Library_::Ncurses.class # # below
-        nc_ok = true
-      rescue ::LoadError
-      end
-    end
-    if ! nc_ok then -> _ { } else
-      SubTree::Library_::Face.class  # #todo:during:0-subsystem, and above
       sp = '  '
-      f = -> do
+      p = -> do
         tbl_width = ( fmt % [ 0, 0.0, '', ''] ).length
-        ::Skylab::Face::CLI::Lipstick.new([[ '+', :green ], [ '-', :red  ]]).
+        SubTree::Lib_::CLI_lipstick[ [[ '+', :green ], [ '-', :red  ]] ].
           instance.cook_rendering_proc( [ tbl_width ], nil, sp.length )
           # (if you want it to be `git diff --stat`-like, change `nil` to `80`)
       end.call
       -> node do
-        "#{ sp }#{ f[ lipfactor * node.added, lipfactor * node.removed ] }"
+        "#{ sp }#{ p[ lipfactor * node.added, lipfactor * node.removed ] }"
       end
-    end
   end.call
 
   bucket_a.each do |node|
@@ -159,7 +149,7 @@ module Skylab::SubTree
     # gain 2
     end
 
-    MetaHell::FUN.fields[ self, * Money_.parameters.map( & :last ) ]
+    Lib_::Fields[ self, * Money_.parameters.map( & :last ) ]
 
     def execute
 

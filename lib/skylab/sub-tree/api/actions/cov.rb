@@ -11,7 +11,7 @@ module Skylab::SubTree
                 info_tree: :structural
 
 
-    MetaHell::FUN::Fields_[ :client, self, :method, :absorb, :field_i_a,
+    Lib_::Fields_via[ :client, self, :method, :absorb, :field_i_a,
                             [ :list_as, :path, :be_verbose ] ]
 
     def initialize

@@ -3,7 +3,7 @@ module Skylab::MetaHell
   module FUN::Fields_
 
     def self.[] * x_a
-      from_x_a x_a
+      via_iambic x_a
     end
 
     # using the basic fields facility out of the box only gives you
@@ -30,8 +30,14 @@ module Skylab::MetaHell
     #
     #     Foo.new( :ding, :x, :bat, :y, :bazzle, :z )  # => KeyError: key not found: :bazzle
 
-    Metafields_ = ::Struct.new :client, :method, :scan_method,
-      :do_super, :struct_like, :field_i_a
+    FUN.redefiner[ :fields ] = -> mod, *field_i_a do
+      add_field_i_a_to_mod field_i_a, mod
+    end
+
+    def self.add_field_i_a_to_mod i_a, mod
+      via_iambic [ :client, mod, :do_super, :field_i_a, i_a,
+        :method, :initialize ]
+    end
 
     arg = -> o, i, a do
       o[ i ] = a.fetch 0 ; a.shift ; nil
@@ -49,8 +55,8 @@ module Skylab::MetaHell
       struct_like: flag,
       field_i_a: arg }.freeze
 
-    define_singleton_method :from_x_a, -> a do
-      o = Metafields_.new
+    define_singleton_method :via_iambic, -> a do
+      o = Metafields__.new
       while a.length.nonzero?
         ii = a.shift
         arg_h.fetch( ii )[ o, ii, a ]
@@ -60,28 +66,17 @@ module Skylab::MetaHell
         ::Hash[ o.field_i_a.map { |i| [ i, :"@#{ i }" ] } ].freeze
       if o.struct_like
         o.method ||= :initialize
-        Define_struct_like_methods_[ mod, o.field_i_a ]
+        Define_struct_like_methods__[ mod, o.field_i_a ]
       end
-      o.method && Define_method_[ mod, o.method, o.do_super ]
-      o.scan_method && Define_scan_method_[ mod, o.scan_method ]
+      o.method && Define_method__[ mod, o.method, o.do_super ]
+      o.scan_method && Define_scan_method__[ mod, o.scan_method ]
       nil
     end
 
-    o = FUN.redefiner
+    Metafields__ = ::Struct.new :client, :method, :scan_method,
+      :do_super, :struct_like, :field_i_a
 
-    fields = -> * x_a do
-      from_x_a x_a
-    end
-
-    o[:fields] = -> mod, *field_i_a do
-      fields[ :client, mod,
-              :method, :initialize,
-              :field_i_a, field_i_a,
-              :do_super ]
-      nil
-    end
-
-    Define_method_ = -> mod, method_i, do_super do
+    Define_method__ = -> mod, method_i, do_super do
       mod.send :define_method, method_i do |*a|
         i_a = [] ; h = self.class::BASIC_FIELDS_H_  # #ancestor-const-ok
         while a.length.nonzero?
@@ -89,14 +84,14 @@ module Skylab::MetaHell
           instance_variable_set h.fetch( i ), a.fetch( 0 )
           a.shift
         end
-        Nil_out_the_rest_[ h, self, i_a ]
+        Nil_out_the_rest__[ h, self, i_a ]
         super() if do_super  # imagine prepend, imagine block given
         nil
       end
       nil
     end
 
-    Define_struct_like_methods_ = -> mod, field_i_a do
+    Define_struct_like_methods__ = -> mod, field_i_a do
       field_i_a.freeze  # we take what is not ours
       mod.class_exec do
         const_set :BASIC_FIELD_A_, field_i_a
@@ -109,7 +104,7 @@ module Skylab::MetaHell
       nil
     end
 
-    Define_scan_method_ = -> mod, scan_method_i do
+    Define_scan_method__ = -> mod, scan_method_i do
       mod.send :define_method, scan_method_i do |a|  # NOTE `a` not `*a`
         i_a = [ ] ; h = self.class::BASIC_FIELDS_H_
         while a.length.nonzero?
@@ -117,12 +112,12 @@ module Skylab::MetaHell
           i_a << i
           a.shift ; instance_variable_set ivar, a.fetch( 0 ) ; a.shift
         end
-        Nil_out_the_rest_[ h, self, i_a ]
+        Nil_out_the_rest__[ h, self, i_a ]
         nil  # you can figure it out if you try
       end
     end
 
-    Nil_out_the_rest_ = -> ivar_h, obj, i_a do
+    Nil_out_the_rest__ = -> ivar_h, obj, i_a do
       obj.instance_exec do
         ( ivar_h.keys - i_a ).each do |ii|
           ivar = ivar_h.fetch ii
@@ -131,17 +126,17 @@ module Skylab::MetaHell
       end
     end
 
-    Iambic_detect_ = -> i, a do
+    Iambic_detect = -> i, a do
       ( 0 ... ( a.length / 2 )).reduce 0 do |_, idx|
         i == a[ idx * 2 ] and break a[ idx * 2 + 1 ]
       end
     end
 
-    # Iambic_detect_
+    # Iambic_detect
     # is a hack that lets to peek into iambic arrays:
     #
     #   a = [ :one, 'two', :three, 'four' ]
-    #   Iambic_detect_[ :three, a ]  # => 'four'
+    #   Iambic_detect[ :three, a ]  # => 'four'
 
   end
 end

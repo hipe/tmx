@@ -2,9 +2,7 @@ module Skylab::SubTree
 
   class Models::FileNode
 
-    extend  SubTree::Library_::Tree::ModuleMethods
-
-    include SubTree::Library_::Tree::InstanceMethods
+    SubTree::Lib_::Tree_MMs_and_IMs[ self ]
 
     def initialize( * )
       super
@@ -60,14 +58,16 @@ module Skylab::SubTree
 
     MERGE_ATTR_A_ = ( MERGE_ATTR_A_ + [ :tag_a ] ).freeze
 
+    IDENTITY_ = -> x { x }
+
     Corresponding_business_filename_ = -> test_filename do
       # (to go in the other direction - to detect a corresponding test file
       # for a given business file, would be annoying and require filesystem
       # hits - the transformation we do above is a deterministic one-way
       # lossy one.)
       if (( md = PATH.test_basename_rx.match test_filename ))
-        "#{ md.captures.detect( & MetaHell::IDENTITY_ )}#{
-          }#{ Autoloader::EXTNAME }"
+        "#{ md.captures.detect( & IDENTITY_ )}#{
+          }#{ Autoloader_::EXTNAME }"
       end
     end
 

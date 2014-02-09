@@ -14,7 +14,7 @@ module Skylab::Snag
         @rest_a = a
       end
 
-      Detect_info_p = MetaHell::FUN::Fields_::Iambic_detect_.curry[ :info_p ]
+      Detect_info_p = MetaHell::FUN::Fields_::Iambic_detect.curry[ :info_p ]
 
       def execute
         begin

@@ -2,11 +2,11 @@ module Skylab::SubTree
 
   class API::Actions::My_Tree::Extensions_
 
-    SubTree::Library_.kick :Shellwords
+    SubTree::Library_.touch :Shellwords
 
     class Line_Count_
 
-      MetaHell::FUN.fields[ self, :local_normal_name, :infostream, :verbose ]
+      Lib_::Fields[ self, :local_normal_name, :infostream, :verbose ]
 
       attr_reader :local_normal_name
 

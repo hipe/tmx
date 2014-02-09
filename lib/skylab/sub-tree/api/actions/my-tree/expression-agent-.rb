@@ -8,12 +8,12 @@ module Skylab::SubTree
 
     private
 
-      Headless::SubClient::EN_FUN[ self, :private, %i( and_ both ) ]
+      SubTree::Lib_::EN_add_methods[ self, :private, %i( and_ both ) ]
 
       def par i
         "<#{ Hak_lbl__[ i ] }>"
       end
-      Hak_lbl__ = Face::API::Normalizer_::Hack_label
+      Hak_lbl__ = SubTree::Lib_::Hack_label_proc[]
 
     end
 

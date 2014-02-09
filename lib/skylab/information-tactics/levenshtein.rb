@@ -10,7 +10,7 @@ module Skylab::InformationTactics
 
   module Levenshtein
 
-    InformationTactics::Library_.kick :Levenshtein
+    InformationTactics::Library_.touch :Levenshtein
 
     Closest_n_items_to_item = -> closest_n, pool_a, outside_x do  # #curry-friendly
       outside_s = outside_x.to_s

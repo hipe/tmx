@@ -2,7 +2,7 @@ module Skylab::SubTree
 
   class Models::Hub
 
-    MetaHell::FUN::Fields_[ :client, self, :method, :absorb,
+    Lib_::Fields_via[ :client, self, :method, :absorb,
      :field_i_a, [ :test_dir_pn, :sub_path_a, :local_test_pathname_ea,
                    :lister_p, :info_tree_p ] ]
 
@@ -106,7 +106,7 @@ module Skylab::SubTree
       @local_test_pathname_a ||= @local_test_pathname_ea.to_a.freeze
     end
 
-    EXTNAME_ = Autoloader::EXTNAME
+    EXTNAME_ = Autoloader_::EXTNAME
 
     def perform_destructive_merge c, t
       c.destructive_merge t, :key_proc, KEY_PROC_

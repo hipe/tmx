@@ -4,7 +4,7 @@ module Skylab::SubTree
 
     class Upstream_
 
-      MetaHell::FUN::Fields_::Contoured_[ self,
+      Lib_::Contoured_fields[ self,
         :required, :field, :be_verbose,
         :required, :field, :info_p ]
 
@@ -38,7 +38,7 @@ module Skylab::SubTree
 
       class From_::Filesystem_ < self
 
-        MetaHell::FUN::Fields_::Contoured_[ self,
+        Lib_::Contoured_fields[ self,
           :required, :field, :arg_pn ]
 
         def test_dir_pathnames

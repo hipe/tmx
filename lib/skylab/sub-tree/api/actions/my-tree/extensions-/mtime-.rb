@@ -4,9 +4,7 @@ module Skylab::SubTree
 
     class Extensions_::Mtime_
 
-      IT_ = SubTree::Library_::InformationTactics
-
-      MetaHell::FUN::Fields_[ :client, self, :method, :absorb, :field_i_a,
+      SubTree::Lib_::Fields_via[ :client, self, :method, :absorb, :field_i_a,
         [ :local_normal_name, :infostream, :verbose ] ]
 
       def initialize *a
@@ -24,7 +22,7 @@ module Skylab::SubTree
       def in_notify leaf
         stat = ::File::Stat.new leaf.input_line  # move into leaf if optimal
         seconds_old = @now_t - stat.mtime
-        unit_i, amt_f = IT_::Summarize::Time[ seconds_old ]
+        unit_i, amt_f = Lib_::Summarize_time[ seconds_old ]
         leaf.add_subcel "#{ amt_f.round } #{ ABBR_H_[ unit_i ] }"
         nil
       end

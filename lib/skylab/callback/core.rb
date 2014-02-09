@@ -207,7 +207,7 @@ module Skylab::Callback
       end
     end
 
-    EXTNAME_ = '.rb'.freeze
+    EXTNAME = EXTNAME_ = '.rb'.freeze
     SPLIT_EXTNAME_RX_ = %r((?=\.[^.]+\z))
     EXTENSION_PASS_FILTER_RX_ = /\A(?:#{ ::Regexp.escape EXTNAME_ }|)\z/
 

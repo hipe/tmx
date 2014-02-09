@@ -1,13 +1,11 @@
-require_relative '..'
-require 'skylab/meta-hell/core'
+require_relative '../callback/core'
 
 module Skylab::InformationTactics
 
-  ::Skylab::MetaHell::FUN::
-    Import_constants[ ::Skylab, %i( MetaHell InformationTactics ), self ]
+  Autoloader_ = ::Skylab::Callback::Autoloader
 
-  MetaHell::MAARS[ self ]
+  InformationTactics = self
 
-  ::Skylab::Subsystem[ self ]
+  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
 end

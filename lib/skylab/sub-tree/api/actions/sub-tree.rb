@@ -2,7 +2,7 @@ module Skylab::SubTree
 
   class API::Actions::Sub_Tree
 
-    MetaHell::FUN.fields[ self, :err, :in_dir, :out_dir, :list,
+    Lib_::Fields[ self, :err, :in_dir, :out_dir, :list,
                           :do_force, :is_dry_run ]
 
     def execute

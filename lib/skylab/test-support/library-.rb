@@ -27,4 +27,10 @@ module Skylab::TestSupport
 
     H_ = o.freeze
   end
+
+  module Lib_
+    Heavy_plugin = -> do
+      Library_::Face::Plugin
+    end
+  end
 end

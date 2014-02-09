@@ -101,7 +101,7 @@ module SubTree  # borrow x 1 - load this solo but it needs meta hell
     attr_reader :files_file_pn
 
     def pathnames
-      Power_Scanner_[ :init, -> do
+      Lib_::Power_Scanner[ :init, -> do
         files_file_pn && top_pn or fail "sanity"
         @tpn = Pathname__.new @top_pn
         rwnd_files_file_IO
@@ -177,7 +177,7 @@ module SubTree  # borrow x 1 - load this solo but it needs meta hell
 
     def subtree_pathnames
       path = scn = slice = nil
-      Power_Scanner_[ :init, -> do
+      Lib_::Power_Scanner[ :init, -> do
         path = @pn.instance_variable_get :@path
         _length = path.length - SEPWIDTH_
         slice = 0 .. _length
@@ -191,10 +191,6 @@ module SubTree  # borrow x 1 - load this solo but it needs meta hell
         end
         r
       end ]
-    end
-
-    Power_Scanner_ = -> * x_a do
-      Basic::List::Scanner::Power.from_iambic x_a
     end
 
     SEPWIDTH_ = 1
@@ -380,8 +376,13 @@ module SubTree  # borrow x 1 - load this solo but it needs meta hell
       end
     end.call
     attr_reader :xpn, :top_pn, :top_mod
-    #
-    Distill__ = MetaHell::Boxxy::Distill
+
+    Distill__ = -> do
+      p = -> x do
+        ( p = SubTree::Lib_::Distill_proc[] )[ x ]
+      end
+      -> x { p[ x ] }
+    end.call
 
     def current_path_exists
       pn = @pn

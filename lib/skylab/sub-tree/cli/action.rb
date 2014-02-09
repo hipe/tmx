@@ -9,7 +9,10 @@ module Skylab::SubTree
   private
 
     def corresponding_api_action_class
-      SubTree::API::Actions.const_fetch anchored_normal_name
+      i_a = anchored_normal_name
+      1 == i_a.length or self._DO_ME
+      _name = Name_.from_variegated_symbol i_a.last
+      SubTree::API::Actions.const_get _name.as_const, false
     end
 
     def emit_from_parent stream_i, message_x

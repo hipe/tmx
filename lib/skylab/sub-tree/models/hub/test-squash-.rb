@@ -12,9 +12,9 @@ module Skylab::SubTree
       # parent of the test tree. it makes more sense if you use the "-tct"
       # option to see the two trees that go into making the final tree.
 
-      MetaHell::Funcy[ self ]
+      Lib_::Funcy[ self ]
 
-      MetaHell::FUN.fields[ self, :app_hub_pn, :test_dir_pn, :tree ]
+      Lib_::Fields[ self, :app_hub_pn, :test_dir_pn, :tree ]
 
       def execute
         @test_dir_path_is_monadic = ! @test_dir_pn.to_s.include?( SEP_ )

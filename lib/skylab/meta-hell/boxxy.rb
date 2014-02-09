@@ -197,21 +197,16 @@ module Skylab::MetaHell
 
     VALID_CONST_RX__ = /\A[A-Z][A-Za-z0-9_]*\z/
 
-    Distill = -> do  # #part-of-public-FUN-libary
-      # different than `Normify` and `normize` this is a lossy operation
-      # that produces an internal distillation of a name for use in e.g
-      # fuzzy (case-insensitive) matching, while preserving meaningful
-      # trailing dashes or underscores from e.g a filename or constant
-      # note it is not always suitable as a const name
-
-      black_rx = /[-_ ]+(?=[^-_])/  # preserve final trailing underscores & dashes ; [#bm-002]
-      -> x do
-        s = x.to_s.gsub black_rx, ''
-        d = 0 ; s.setbyte d, UNDR__ while DASH_ == s.getbyte( d -= 1 )
-        s.downcase.intern
+    Distill = -> do
+      p = -> x do
+        ( p = MetaHell::Lib_::Distill_proc[] )[ x ]
       end
+      -> x { p[ x ] }
     end.call
-    UNDR__ = '_'.getbyte 0
+
+    Distill_proc = -> do
+      MetaHell::Lib_::Distill_proc[]
+    end
 
     Resolve_name__ = -> cbn, do_peek_hack, box, name_x, guess do
       if box.const_defined? guess, false

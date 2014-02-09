@@ -21,8 +21,7 @@ module Skylab::SubTree
       end
 
       def add_attribute i, x
-        (( @attribute_box ||= Basic::Box.new )).
-          add i, x
+        (( @attribute_box ||= Lib_::Box[] )).add i, x
         nil
       end
       attr_reader :attribute_box
@@ -30,9 +29,7 @@ module Skylab::SubTree
 
     class Extensions_
 
-      MetaHell::Boxxy[ self ]
-
-      MetaHell::FUN.fields[ self, :arg_box, :infostream, :verbose ]
+      Lib_::Fields[ self, :arg_box, :infostream, :verbose ]
 
       def is_valid_and_valid_self
         begin
@@ -69,7 +66,9 @@ module Skylab::SubTree
           a = [ :local_normal_name, i, :infostream, @infostream,
                 :verbose, @verbose  ]
           true == val or a << :arg_value << val  # only when interesting
-          ag = self.class.const_fetch( :"#{ i }_" ).new( * a )
+          _name = Name_.from_variegated_symbol :"#{ i }_"
+          _class = self.class.const_get _name.as_const, false
+          ag = _class.new( * a )
           index_notifiee ag
           _h[ i ] = ag
         end
