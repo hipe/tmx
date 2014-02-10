@@ -29,9 +29,11 @@ module Skylab::Face
     end.call
     #
     Normalize_method_ = -> y, par_h do  # assume `any_expression_agent`
-      Normalization_.new( :field_box, field_box, :notifiee, self,
-        :any_expression_agent, any_expression_agent, :notice_yielder, y,
-        :param_h, par_h ).execute
+      _fb = field_box
+      _noti = Normalization_.new :any_expression_agent, any_expression_agent,
+        :field_box, _fb, :notice_yielder, y, :notifiee, self,
+        :param_h, par_h
+      _noti.execute
     end
     #
     Field_normalize_method_ = -> y, fld, x do  # assume `field_value_notify`
@@ -90,16 +92,15 @@ module Skylab::Face
 
       # mutates param_h [#019] [#bl-013] [#sl-116]
 
-      MetaHell::FUN::Fields_[ :client, self, :method, :initialize, :field_i_a,
-        [ :field_box, :notice_yielder, :any_expression_agent,
-          :notifiee, :param_h ] ]
+      Lib_::Fields_via[ :client, self, :method, :initialize, :field_i_a,
+        %i( any_expression_agent field_box notice_yielder notifiee param_h ) ]
 
       def execute
         resolve_notifiers
         @y = @notice_yielder ; par_h = @param_h ; miss_a = nil
         av = Arity_Validator_.new @y, @any_expression_agent
         r = false ; befor = @y.count
-        @field_box.each do |i, fld|
+        @field_box.each_pair do |i, fld|
           x = ( par_h.delete i if par_h and par_h.key? i )
           @field_value_notify_p[ fld, x ]
           if fld.has_normalizer || fld.has_default  # yes after
@@ -274,7 +275,7 @@ module Skylab::Face
       # final flushing.
 
       @y ||= ::Enumerator::Yielder.new( & @infostream.method( :puts ) )
-      cy = Library_::Basic::Yielder::Counting.new( & @y.method( :<< ) )
+      cy = Lib_::Counting_yielder[ @y.method :<< ]
       _fb = field_box ; _exag = any_expression_agent
       _norm = Normalization_.new :field_box, _fb, :notifiee, self,
         :any_expression_agent, _exag, :notice_yielder, cy,
@@ -299,8 +300,8 @@ module Skylab::Face
 
         class Expression_Agent__
 
-          Library_::Headless::SubClient::EN_FUN[ self,
-            :private, %i( s and_ or_ both ) ]
+          Lib_::EN_add_private_methods_to_module[ %i( s and_ or_ both ), self ]
+
 
         private
 
@@ -323,7 +324,7 @@ module Skylab::Face
             end
           end
           #
-          Inspct__ = Library_::Basic::FUN::Inspect__.
+          Inspct__ = Lib_::Inspect_proc[].
             curry[ A_REASONABLY_SHORT_LENGTH_FOR_A_STRING__ = 10 ]
         end
         p = -> { Expression_Agent__ }

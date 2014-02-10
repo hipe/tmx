@@ -1,6 +1,6 @@
 module Skylab::Face
 
-  module Face::Namespace::Adapter::For::Face
+  module Face_::CLI::Namespace::Adapter::For::Face
 
     module Of
 
@@ -14,11 +14,11 @@ module Skylab::Face
       end
     end
 
-    Ouroboros_Sheet_ = MetaHell::Proxy::Nice.new :name, :set_a, :is_ok,
+    Ouroboros_Sheet_ = Lib_::Nice_proxy[ :name, :set_a, :is_ok,
       :do_include, :is_prenatal, :all_aliases,
       :desc_proc_a, :command_tree, :option_sheet_a,
       :has_default_argv, :has_option_sheets, :fetch_constituent,
-      :default_argv_value, :defers_invisibility
+      :default_argv_value, :defers_invisibility ]
 
     class Ouroboros_Sheet < Ouroboros_Sheet_
 
@@ -54,6 +54,8 @@ module Skylab::Face
         end
       end
     end
-    C = Face::CLI::FUN.concat_2  # in cli for now :/
+    C = -> a, b do
+      [ *a, *b ] if a || b
+    end
   end
 end

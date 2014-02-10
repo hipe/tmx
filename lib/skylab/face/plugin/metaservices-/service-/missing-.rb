@@ -5,7 +5,7 @@ module Skylab::Face
     def initialize
       raw_a = @raw_queue_a = [ ]
       @message_proc = -> do  # [#it-002] NLP aggregation experiment
-        Face::Library_::Basic::List::Aggregated::Articulation raw_a do
+        Lib_::NLP_aggregated_list_articulation[ raw_a, -> do
           template "{{ hst }}{{ adj1 }} has not declared the required #{
             }{{ service_i }} declared as needed by {{ pi }}{{ adj2 }}"
           on_zero_items -> { "everything was ok." }
@@ -26,7 +26,7 @@ module Skylab::Face
             adj2       -> { ' either' }
             _flush     -> x { " #{ x }." }
           end
-        end
+        end ]
       end
     end
 

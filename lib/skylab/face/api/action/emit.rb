@@ -13,7 +13,7 @@ module Skylab::Face
         kls.class_exec do
           if ! respond_to? :is_callback_digraph_module or
               ! is_callback_digraph_module  # unlikely
-            Library_::Callback[ self, :employ_DSL_for_digraph_emitter ]
+            Callback_[ self, :employ_DSL_for_digraph_emitter ]
             public :on, :with_specificity  # per the way we wire API actions.
             define_singleton_method :listeners_digraph, & emits[ self ]
           end
@@ -23,7 +23,7 @@ module Skylab::Face
 
       emits = -> kls do
         orig_emits = kls.method( :listeners_digraph ).unbind
-        MetaHell::Module::Mutex[ -> *a, &b do
+        Lib_::Module_mutex_proc[][ -> *a, &b do
           orig_emits.bind( self ).call( *a, &b )
           @event_stream_graph.names.each do |i|
             define_method i do |x|

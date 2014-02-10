@@ -66,8 +66,8 @@ module Skylab::Test
       MetaHell__[]::FUN::Puff_constant_
     end
 
-    Reparenthesize = -> msg, say do
-      Face__[]::CLI::FUN.reparenthesize[ msg, say ]
+    Reparenthesize = -> p, msg do
+      Face__[]::CLI.reparenthesize[ p, msg ]
     end
 
     Spec_rb = -> do

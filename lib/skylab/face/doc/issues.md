@@ -1,3 +1,10 @@
+[#061]       #tracker-tag the "reparenthesize" family
+[#060] #open correct namespace and indentation for CLI
+[#059]       #parent-node:[#todo] the model manager narrative ..
+[#058]       #parent-node:[#007] the API action narrative ..
+[#057]       #parent-node:[#055] the API client model narrative ..
+[#056]       #parent-node:[#todo] the CLI narrative ..
+[#055]       #parent-node:[#007] the API client narrative ..
 [#054]       #parent-node: [#hl-070] the first plugin library (#broadened-from:
                [#hl-077] #API-point track how `initialize` looks in #plugins)
 [#053]       #tracking-tag #the-caculate-pattern
@@ -63,15 +70,16 @@
 [#013]       #doc-point #parent:005 #initials:mf
                metafields are the light, they are the way ..
 [#012]       #doc-point the sacred four explained #parent:005
-[#011]       (available, previous node moved to [#it-003])
+[#011]       #doc-node the API top node narrative ..
+               (formerly what became #it-003])
 [#010]       #doc-point modality clients vs. modal clients ..
 [#009] #hm   magic with allowing either CLI or CLI::Client for the client.
 [#008]       #doc-point expression templates (#i18n)..
-[#007]       #doc-node the API library #initials:`api` ..
-[#006]       #doc-node CLI (API) revelation integration
-[#005]       #doc-node introducing the entity library #initials:`el` ..
+[#007]       #parent-node:[#011] the API library #initials:`api` ..
+[#006]       #parent-node:[#011] CLI (API) revelation integration
+[#005]       #parent-node:[#011] introducing the entity library #initials:`el` ..
 [#004]       argument error hack
-[#003] #open Face::Open2 is superseded by Headless::IO::Upstream::Select
+[#003] #open Face::Open2 is superseded by [hl]::IO::Upstream::Select
 [#002]       #done path-tools to e.g. headless
 [#001]       #postponed shorten wide lines #open #depends-on:sl-104
 [#sl-100.100.500] 2012-06-08 #open index all features

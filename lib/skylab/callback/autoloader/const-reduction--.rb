@@ -90,7 +90,7 @@ module Skylab::Callback
           mod.const_defined? const, false and break const
         end
         if const_i
-          mod.const_get const_i
+          mod.const_get const_i, false
         else
           @mod = mod
           when_const_not_defined

@@ -19,6 +19,8 @@ module Skylab::Face
       msvcs.flush mod
       nil
     end
+
+    Autoloader_[ self ]
   end
 
   class Plugin::Host::Shell_
@@ -27,34 +29,34 @@ module Skylab::Face
     end
   end
 
-  Plugin::Const_bang__ = -> mod, const_i, blk do
-    if mod.const_defined? const_i, false
-      mod.const_get const_i, false
-    else
-      mod.const_set const_i, blk.call
-    end
-  end
-
-  Plugin::Const_bang_ = -> const_i, &blk do
-    Plugin::Const_bang__[ self, const_i, blk ]
-  end
-
   class Plugin::Metaservices__
 
     class << self
       alias_method :orig_new, :new
-    end
 
-    def self.new
-      ::Class.new( self ).class_exec do
-        class << self
-          alias_method :new, :orig_new
+      def new
+        ::Class.new( self ).class_exec do
+          class << self
+            alias_method :new, :orig_new
+          end
+          self
         end
-        self
+      end
+
+    private
+
+      def const! i, & p
+        if const_defined? i, false
+          const_get i
+        else
+          const_set i, p.call
+        end
       end
     end
 
-    define_singleton_method :const!, & Plugin::Const_bang_
+    def emit_meta_eventpoint i, host_metasvcs
+      self.class.emit_meta_eventpoint i, self, host_metasvcs
+    end
 
     def self.emit_meta_eventpoint method_name, *a
       if const_defined? :FACET_I_A_, false
@@ -63,10 +65,6 @@ module Skylab::Face
         end
       end
       nil
-    end
-
-    def emit_meta_eventpoint i, host_metasvcs
-      self.class.emit_meta_eventpoint i, self, host_metasvcs
     end
   end
 
@@ -100,8 +98,7 @@ module Skylab::Face
       @host_p.call
     end
 
-    MAARS::Upwards[ self ]  # autoload plugin/*, plugin/host/*, p/h/msvcs_/*
-
+    Autoloader_[ self ]  # autoload plugin/*, plugin/host/*, p/h/msvcs_/*
   end
 
   module Plugin::Host::InstanceMethods_
@@ -183,8 +180,6 @@ module Skylab::Face
 
   class Plugin::Metaservices_ < Plugin::Metaservices__
 
-    MAARS::Upwards[ self ]  # autoload ./metaservices-/*
-
     def self.flush mod
       mod.const_defined? :Plugin_Metaservices_, false and fail 'no'
       mod.const_set :Plugin_Metaservices_, self
@@ -235,6 +230,8 @@ module Skylab::Face
     def has_already_met_need i
       @need_met_h && @need_met_h[ i ]
     end
+
+    Autoloader_[ self ]  # autoload ./metaservices-/*
   end
 
   module Plugin::ModuleMethods_
@@ -288,19 +285,20 @@ module Skylab::Face
     end
   end
 
-  Plugin::Box_ = Face::Library_::Basic::Box
+  Plugin::Box_ = Lib_::Box_class[]
 
-  class Plugin::DeclarationError < ::RuntimeError
-  end
+  Plugin::DeclarationError = ::Class.new ::RuntimeError
 
   Plugin::EAT_H_ = -> kls, h do
     h.default_proc = -> hh, k do
-      raise Plugin::DeclarationError, "unexpected token #{ k.inspect }, #{
-        }expecting #{ Face::Library_::Headless::NLP::EN::Minitesimal::FUN.oxford_comma[
-          hh.keys.map( & :inspect ), ' or ' ] } for #{
-        }defining this #{ kls }"
+      raise Plugin::DeclarationError, Plugin::Say_unexp_tok_[ kls, hh, k ]
     end
     h.freeze
+  end
+
+  Plugin::Say_unexp_tok_ = -> cls, hh, k do
+    "unexpected token #{ k.inspect }, expecting #{ Lib_::EN_oxford_or[
+      hh.keys.map( & :inspect ) ] } for defining this #{ cls }"
   end
 
   # ~ facet 2 - services ~
@@ -594,7 +592,7 @@ module Skylab::Face
             absorb_metaservices_service host_metasvcs, @h.fetch( i )
           next
         end
-        ( err ||= Face::Plugin::Metaservices_::Service_::Missing_.new ).
+        ( err ||= Plugin::Metaservices_::Service_::Missing_.new ).
           host_lacks_service_for_plugin host_metasvcs, i, plugin_metasvcs
       end
       err and raise Plugin::DeclarationError, err.message_proc[]
@@ -739,6 +737,12 @@ module Skylab::Face
 
   # --*--
 
+  module Plugin
+    def self.build_metaservices_chain_from_class_a a
+      self::Host::Metaservices_::Chain_.new a
+    end
+  end
+
   class Plugin::Shell_
 
     def eventpoints_subscribed_to * x_a
@@ -840,7 +844,7 @@ module Skylab::Face
       mod = box.const_get const, false  # (below is pursuant to [#077])
       host.attach_hot_plugin_with_name_proc(
         ( ::Class == mod.class ? mod : mod.const_get( :Client, false ) ).new,
-        Face::Library_::Headless::Name::Function::From::Constant.new( const ) )
+        Lib_::Name_from_constant[ const ] )
     end
   end
 

@@ -10,7 +10,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Par
 
   extend TestSupport::Quickie
 
-  describe "#{ Face }::CLI api integration - the `par` method" do
+  describe "[fa] CLI api integration - the `par` method" do
 
     extend TS_
 

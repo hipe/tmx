@@ -59,9 +59,7 @@ module Skylab::Callback
       self::MetaHell__[]::Let
     end
 
-    Memoize = -> p do
-      Memoize_[ p ]  # as you like it
-    end
+    Memoize = Memoize_  # as you like it
 
     Name = -> do
       self::Headless__[]::Name

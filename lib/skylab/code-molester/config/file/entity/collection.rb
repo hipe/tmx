@@ -103,16 +103,17 @@ module Skylab::CodeMolester::Config::File::Entity
     end
 
     def flyweight_class
-      @flyweight_class ||= begin
-        if @host_mod.const_defined?( :Flyweight, false ) or
-            @host_mod.const_probably_loadable? :Flyweight
-          @host_mod.const_get :Flyweight, false
-        else  # meh, it makes logic easier
-          @host_mod.const_set :Flyweight,
-            Entity::Flyweight.produce( self )
-        end
+      @flyweight_class ||= bld_flyweight_class
+    end
+  private
+    def bld_flyweight_class
+      if @host_mod.const_defined? FLY__, false
+        @host_mod.const_get FLY__, false
+      else
+        @host_mod.const_set FLY__, Entity::Flyweight.produce( self )
       end
     end
+    FLY__ = :Flyweight
   end
 
   module Entity::Collection::Collection_And_Controller_

@@ -10,7 +10,7 @@ module Skylab::Face::TestSupport::CLI::Invisible
 
   do_invoke = Do_invoke_[]
 
-  describe "#{ Face::CLI } `set node (invisible)` API" do
+  describe "[fa] CLI invisible" do
 
     extend This_TestSupport
 
@@ -176,6 +176,6 @@ module Skylab::Face::TestSupport::CLI::Invisible
   end
 
   if do_invoke  # try executing this file directly, passing '-x'
-    Eornholius::CLI_Client.new( nil, SO_, SE_ ).invoke ::ARGV
+    Eornholius::CLI_Client.new( nil, * TestLib_::Sout_serr[] ).invoke ::ARGV
   end
 end

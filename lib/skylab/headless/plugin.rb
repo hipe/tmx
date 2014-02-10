@@ -200,7 +200,7 @@ module Skylab
         end
       end
 
-      Qualifiable_Message_String = ::Struct.
+      Qualifiable_Message_String = ::Struct.  # :+[#fa-061] "reparenthesize"
           new :graphic_prefix, :open, :agent_prefix, :body, :close
       class Qualifiable_Message_String
         def initialize msg

@@ -11,7 +11,7 @@ module Skylab::Cull
         if @mechanics.last_api_executable.be_verbose
           pn.to_s
         else
-          Headless::CLI::PathTools::FUN.pretty_path_safe[ pn ]
+          Lib_::Pretty_path_safe[ pn ]
         end
       end
     end

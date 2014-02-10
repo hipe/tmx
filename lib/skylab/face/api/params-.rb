@@ -7,7 +7,7 @@ module Skylab::Face
         via_iambic x_a
       end
       def via_iambic x_a
-        # (in the spirit of MetaHell::FUN::Fields_::Countoured_)
+        # (in the spirit of [#mh-056] #contoured-fields)
         mod = (( contour = Contour_Parse_.new( * x_a ) )).client_mod
         mod.const_set :FIELDS_, contour.params  # gotta #comport with fields lib
         nil
@@ -48,15 +48,17 @@ module Skylab::Face
 
     ].tap { |a| a.freeze.each( & :freeze ) }
 
+    Param_Field_ = Lib_::Field_class
+
     -> do
 
-      fld = (( Field = Library_::Basic::Field ))
-      r = fld::N_Meta_Resolver_.new
+      _Param_Field = Param_Field_[]
+      r = _Param_Field::N_Meta_Resolver_.new
       r.push nil  # [#049] - sadly necessary to get the field class for now
       r.push METAFIELD_A_A_, nil, -> x do
         Param_ = x
       end
-      r.seed fld::Meta_Field_Factory_
+      r.seed _Param_Field::Meta_Field_Factory_
       r.flush or fail "sanity"  # (result is stack size)
 
     end.call
@@ -65,13 +67,14 @@ module Skylab::Face
         meta_param_a  # fulfill [#026]
       # assume behind module mutex & `param_a` looks right structurally.
 
-      Field::Box.enhance client do
+      _Param_Field = Param_Field_[]
+      _Param_Field::Box.enhance client do
         field_class_instance_methods -> { Param_IMs_ }
         meta_fields( * METAFIELD_A_A_, * meta_param_a )
         fields( * param_a )
       end
 
-      Field::Reflection.enhance( client ).with client
+      _Param_Field::Reflection.enhance( client ).with client
 
       client.send :include, Action_IMs_
 
@@ -112,33 +115,32 @@ module Skylab::Face
     end
 
     p = -> space, x do
-      _Headless = Library_::Headless
       _a = space.each.map { |ar| "'#{ ar.local_name_function.local_normal }'" }
-      _or = _Headless::NLP::EN::Minitesimal::Oxford_comma_or[ _a ]
-      _for = _Headless::Name::FUN::Module_moniker[ space ]
+      _or = Lib_::EN_oxford_or[ _a ]
+      _for = Lib_::Name_module_moniker[ space ]
       _msg = "'#{ x }' is not a recognized arity of the #{ _for } - #{
         }did you mean #{ _or }?"
       raise ::NameError, _msg
     end
 
-    Parameter_Arities_ = Library_::Headless::Arity::Space.create p do
+    Parameter_Arities_ = Lib_::Arity_space_create[ p, -> do
       self::ZERO_OR_ONE = new 0, 1
       self::ZERO_OR_MORE = new 0, nil
       self::ONE = new 1, 1
       self::ONE_OR_MORE = new 1, nil
-    end
+    end ]
 
-    Argument_Arities_ = Library_::Headless::Arity::Space.create p do
+    Argument_Arities_ = Lib_::Arity_space_create[ p, -> do
       self::ZERO = new 0, 0
       self::ZERO_OR_MORE = new 0, nil
       self::ONE = new 1, 1
-    end
+    end ]
 
     class Contour_Parse_
 
       def initialize *a
         @meta_param_x_a = @param_class = nil
-        @params = Field::Box.new
+        @params = Param_Field_[]::Box.new
         absorb( * a )
       end
 
@@ -149,7 +151,7 @@ module Skylab::Face
       end
 
       private
-      MetaHell::FUN::Fields_::From_.methods do
+      Lib_::Fields_from_methods[ -> do
 
         def client a
           @client_mod = a.shift
@@ -168,20 +170,21 @@ module Skylab::Face
           @params.add param.local_normal_name, param
           nil
         end
-      end
+      end ]
 
       def bake_param_class
         @param_class = @meta_param_x_a ? produce_param_class : Param_
       end
 
       def produce_param_class
+        _Param_Field = Param_Field_[]
         param_class = nil
-        r = Field::N_Meta_Resolver_.new
+        r = _Param_Field::N_Meta_Resolver_.new
         r.push nil  # [#049]
         r.push [ * METAFIELD_A_A_, * @meta_param_x_a ], nil, -> x do
           param_class = x
         end
-        r.seed Field::Meta_Field_Factory_
+        r.seed _Param_Field::Meta_Field_Factory_
         r.flush
         @client_mod.const_set :Param_, param_class
         Make_Include_and_or_Stow_2_Contour_IMs_[ param_class ]
@@ -202,15 +205,15 @@ module Skylab::Face
 
     Contour_ = -> field_box, im_mod do
       im_mod.module_exec do
-        MetaHell::FUN::Fields_::From_.methods do
-          field_box.each do |fld|
+        Lib_::Fields_from_methods[ -> do
+          field_box.values.each do |fld|
             if fld.is_property
               Contour_with_property_[ im_mod, fld ]
             else
               Contour_with_flag_[ im_mod, fld ]
             end
           end
-        end
+        end ]
       end
       nil
     end
@@ -252,7 +255,7 @@ module Skylab::Face
           if v.respond_to? :id2name
             a[ idx ] = Get_aref_proc_[ v ]
           elsif true == v
-            a[ idx ] = MetaHell::MONADIC_TRUTH_
+            a[ idx ] = MONADIC_TRUTH_
           end
         end
         fields_bound_to_ivars.each do |bf|

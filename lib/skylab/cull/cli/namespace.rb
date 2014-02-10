@@ -2,7 +2,7 @@ module Skylab::Cull
 
   # this file is the embodiment of [#fa-042].
 
-  class CLI::Namespace < Face::Namespace
+  class CLI::Namespace < Face::CLI::Namespace
   end
 
   module CLI::Namespace::InstanceMethods

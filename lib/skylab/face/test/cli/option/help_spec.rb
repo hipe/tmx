@@ -30,7 +30,7 @@ module Skylab::Face::TestSupport::CLI::Option::Help
 
   do_invoke = Do_invoke_[]
 
-  describe "#{ Face::CLI } option help" do
+  describe "[fa] option help" do
 
     extend This_TestSupport
 
@@ -85,6 +85,6 @@ module Skylab::Face::TestSupport::CLI::Option::Help
   end
 
   if do_invoke  # try executing this file directly, passing '-x'
-    Beffer::CLI_Client.new( nil, SO_, SE_ ).invoke( ::ARGV )
+    Beffer::CLI_Client.new( nil, * TestLib_::Sout_serr ).invoke( ::ARGV )
   end
 end

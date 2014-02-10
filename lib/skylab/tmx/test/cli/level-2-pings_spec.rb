@@ -6,6 +6,8 @@ module Skylab::TMX::TestSupport::CLI::L2P
 
   include CONSTANTS
 
+  MetaHell = MetaHell
+
   extend TestSupport::Quickie
 
   describe "#{ TMX }::CLI level 2 pings" do

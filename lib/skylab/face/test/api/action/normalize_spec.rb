@@ -2,25 +2,11 @@ require_relative 'test-support'
 
 module Skylab::Face::TestSupport::API::Action::Normalize
 
-  ::Skylab::Face::TestSupport::API::Action[ Normalize_TestSupport = self ]
-
-  module Sandbox
-    # mine.
-  end
-
-  module CONSTANTS
-    Sandbox = Sandbox
-  end
-
-  include CONSTANTS
-
-  extend TestSupport::Quickie
-
-  Face = Face
+  ::Skylab::Face::TestSupport::TestLib_::Sandboxify[ self ]
 
   describe "extend module x with Face::API and be normal" do
 
-    extend Normalize_TestSupport
+    extend TS_
 
     context "roll own normalize if you must" do
 
@@ -44,6 +30,7 @@ module Skylab::Face::TestSupport::API::Action::Normalize
               @valid_p_h.map { |k, v| "#{ k }:#{ v }" } * ', '
             end
           end
+          Face::Autoloader_[ self ]
         end
       end
 
@@ -54,7 +41,7 @@ module Skylab::Face::TestSupport::API::Action::Normalize
       it "no params" do
         -> do
           nightclub::API.invoke :w
-        end.should rais( /no params provided/ )
+        end.should rais( /\Ano params provided\b/ )
       end
 
       it "empty params" do
@@ -96,6 +83,7 @@ module Skylab::Face::TestSupport::API::Action::Normalize
               "okay(#{ @email })"
             end
           end
+          Face::Autoloader_[ self ]
         end
       end
 

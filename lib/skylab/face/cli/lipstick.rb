@@ -90,15 +90,15 @@ module Skylab::Face
     end
   end
 
-  CLI::Lipstick::Class__ =
-      MetaHell::Function::Class.new :cook_rendering_proc
+  CLI::Lipstick::Class__ = Lib_::Procs_as_methods[ :cook_rendering_proc ]
 
   class CLI::Lipstick::Class__
 
     GLYPH_FALLBACK = '.'
     PANE_WIDTH_FALLBACK = 72
 
-    Pen_ = MetaHell::Function::Class.new :cook
+    Pen_ = Lib_::Procs_as_methods[ :cook ]
+
     class Pen_
       def initialize glyph, color
         glyph ||= GLYPH_FALLBACK
@@ -110,8 +110,8 @@ module Skylab::Face
         @cook = -> my_room do
           # `normalized_float` below must be nil or btwn 0.0 and 1.0 inclusive
           styliz = if color
-            Face::CLI::FUN.stylify.curry[ [ color ] ]
-          else MetaHell::IDENTITY_ end
+            CLI::CLI_Lib_::Stylify_proc[].curry[ [ color ] ]
+          else IDENTITY_ end
           -> normalized_float do
             if normalized_float  # allow nil to mean "don't do it"
               styliz[ glyph * ( norm[ normalized_float ] * my_room ).to_i ]
@@ -119,6 +119,7 @@ module Skylab::Face
           end
         end
       end
+      IDENTITY_ = -> x { x }
     end
 
     # `initialize`
@@ -129,15 +130,15 @@ module Skylab::Face
     def initialize *args
       if args.length.nonzero? and args.fetch( 0 ).respond_to?(:each_with_index)
         tuple_a = args.shift
-        default_width, = MetaHell::FUN.parse_series[ args,
+        default_width, = Lib_::Parse_series[ args,
           -> x { x.respond_to? :call } ]
         pen_a = tuple_a.map do |tpl_a|
-          Pen_.new( * MetaHell::FUN.parse_series[ tpl_a,
+          Pen_.new( * Lib_::Parse_series[ tpl_a,
             -> x { x.respond_to? :ascii_only? },
             -> x { x.respond_to? :id2name } ] )
         end
       else
-        glyph, color, default_width = MetaHell::FUN.parse_series[ args,
+        glyph, color, default_width = Lib_::Parse_series[ args,
           -> x { x.respond_to? :ascii_only? },
           -> x { x.respond_to? :id2name },
           -> x { x.respond_to? :call } ]

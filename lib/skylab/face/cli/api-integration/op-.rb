@@ -4,15 +4,14 @@ module Skylab::Face
 
     class OP_
 
-      MetaHell::Funcy[ self ]
+      Lib_::Funcy[ self ]
 
-      MetaHell::FUN.fields[ self, :field_box, :any_expression_agent, :param_h,
-        :op ]
+      Lib_::Fields[ self, :field_box, :any_expression_agent, :param_h, :op ]
 
       def execute
         @short_h = { }
-        @opt_box = Library_::Basic::Box.new
-        @field_box.each do |fld|
+        @opt_box = Lib_::Box[]
+        @field_box.values.each do |fld|
           fld.is_required and next
           opt = build_option_with_resolved_short_and_long fld
           fld.has_desc and add_desc opt, fld
@@ -53,10 +52,10 @@ module Skylab::Face
         As_arg_raw_[ s[ ( (( i = s.rindex '_' )) ? i + 1 : 0 ) .. -1 ] ]
       end
       #
-      Chmp_sing_ltr_sfx_, As_arg_raw_ = Face::API::Procs.
+      Chmp_sing_ltr_sfx_, As_arg_raw_ = Face_::API::Procs.
         at :Chomp_single_letter_suffix, :Local_normal_name_as_argument_raw
       #
-      Option = Headless::CLI::Option::Model_
+      Option = Face_::CLI::CLI_Lib_::Option_model_class[]
 
       def add_desc opt, fld
         y = [ ]

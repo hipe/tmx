@@ -1,10 +1,8 @@
-module Skylab::Face
+class Skylab::Face::CLI
 
   module CLI::API_Integration
 
     def self.touch ; nil end      #kick-the-loading-warninglessly-and-trackably
-
-    Headless = Library_::Headless  # it's used often enough to warrant this
 
   end
 
@@ -85,18 +83,18 @@ module Skylab::Face
             }the CLI Client exist inside of a `CLI` module. no such module#{
             } - #{ amod }::CLI"  # maybe magic one day - [#009]
         end
-        Face::API[ amod ]  # no need to check anything, ok to repeat this.
+        Face_::API[ amod ]  # no need to check anything, ok to repeat this.
         amod.const_get( :API, false ).const_get( :Client, false )
       end
     end
 
-    MetaHell::Module::Accessors.enhance self do
+    Lib_::Module_accessors[ self, -> do
       private_methods do
         # we are Mine::CLI::Client::Mechanics
         module_reader :parent_shell_module, '..'
         module_reader :application_module, '../../../'
       end
-    end
+    end ]
 
     # `check_for_unhandled_non_taxonomic_streams_for_api` - this might
     # necessitate that the client class defines an API::Action base class that
@@ -161,8 +159,8 @@ module Skylab::Face
     end
 
     class Executable_Request_
-      MetaHell::FUN::Fields_[ :client, self, :struct_like, :field_i_a,
-                             [ :name_x, :param_x, :expression_agent_p ] ]
+      Lib_::Fields_via[ :client, self, :struct_like, :field_i_a,
+        [ :name_x, :param_x, :expression_agent_p ] ]
     end
 
     undef_method :get_api_executable_with  # #loader-stub
@@ -211,9 +209,7 @@ module Skylab::Face
     # is a tuple of the formal arguments.
 
     def finish_param_h_for_api args, cmd_i=nil
-      sht = @sheet.fetch_constituent( cmd_i ||
-        ::Skylab::Headless::Name::FUN::Metholate[
-          @last_hot.name.as_slug ].intern )
+      sht = @sheet.fetch_constituent( cmd_i || @last_hot.name.as_method )
       p_a = get_command_parameters sht
       len = args ? args.length : 0
       len == p_a.length or fail "sanity - #{ len } actual args for for #{

@@ -1,4 +1,4 @@
-module Skylab::Face
+class Skylab::Face::CLI
 
   CLI::Version = -> do
 

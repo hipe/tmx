@@ -1,5 +1,4 @@
 require_relative '../test-support'
-require 'skylab/headless/test/test-support'
 
 module Skylab::Face::TestSupport::CLI
 
@@ -7,37 +6,33 @@ module Skylab::Face::TestSupport::CLI
 
   module CONSTANTS
     CLI_TestSupport = CLI_TestSupport
-    Headless = ::Skylab::Headless
-    Headless_TestSupport = ::Skylab::Headless::TestSupport
-    MetaHell = ::Skylab::MetaHell
-    SO_, SE_ = Headless::System::IO.some_two_IOs
   end
 
   include CONSTANTS
 
   extend TestSupport::Quickie
 
-  TestSupport = TestSupport
+  TestSupport = TestSupport ; TestLib_ = TestLib_
 
   module Sandbox
   end
 
   TestSupport::Sandbox.enhance( Sandbox ).produce_subclasses_of -> { Face::CLI }
 
-  MetaHell::DSL_DSL.enhance_module self do
+  TestLib_::DSL_DSL[ self, -> do
     block :with_body
     atom :ptrn
     list :argv
     atom :desc
     list :expt
     atom :expt_desc
-  end
+  end ]
 
   module ModuleMethods
 
     include CONSTANTS
 
-    extend MetaHell::Let
+    TestLib_::Let[ self ]
 
     -> do
       fmt = "%-6s %-35s %-12s %s"
@@ -181,11 +176,9 @@ module Skylab::Face::TestSupport::CLI
       end
     end
 
-    Headless::CLI::Pen::FUN.tap do |fun|
-      %i( unstyle_styled unstyle ).each do |i|
-        define_method i, fun[ i ]
-      end
-    end
+    define_method :unstyle, TestLib_::CLI_unstyle_proc[]
+
+    define_method :unstyle_styled, TestLib_::CLI_unstyle_styled_proc[]
 
     def expect_styled line
       text = unstyle_styled line
@@ -264,7 +257,7 @@ module Skylab::Face::TestSupport::CLI
 
     -> do  # `expect_nonstyled_line`
 
-      simple_style_rx = Headless::CLI::Pen::SIMPLE_STYLE_RX
+      simple_style_rx = TestLib_::CLI_simple_style_rx[]
 
       define_method :expect_nonstyled_line do |rx, idx_ref=true, sn=:err|
         line = expect_line idx_ref, sn

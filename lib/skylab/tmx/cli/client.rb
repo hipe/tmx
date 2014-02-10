@@ -59,7 +59,7 @@ module Skylab::TMX
       rs
     end
 
-    class Mechanics_ < Face::CLI_Mechanics_  # the current way to do this :/
+    class Mechanics_ < Face::CLI::CLI_Mechanics_  # the current way to do this :/
 
       def puff  # this is [#fa-038] - we get "puffed" when we need to.
         ( @puffer ||= build_puffer ).puff

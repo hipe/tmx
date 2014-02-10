@@ -1,5 +1,7 @@
 require_relative '../core'
-require 'skylab/test-support/core'
+require_relative '../core'
+
+::Skylab::Cull::Autoloader_.require_sidesystem :TestSupport
 
 module Skylab::Cull::TestSupport
 
@@ -18,6 +20,8 @@ module Skylab::Cull::TestSupport
 
   Face::TestSupport::CLI[ self ]
 
+  Lib_ = Cull::Lib_
+
   extend TestSupport::Quickie
 
   module ModuleMethods
@@ -33,16 +37,12 @@ module Skylab::Cull::TestSupport
     end
   end
 
-  -> do
-    tmpdir = nil
-    define_singleton_method :sandboxed_tmpdir do
-      tmpdir ||= TestSupport::Tmpdir.new(
-        path: ::Skylab::Headless::System.
-          defaults.tmpdir_pathname.join( 'cull-sandboxes/cull-sandbox' ),
-        max_mkdirs: 2  # we go deep, we have to escape the 3 dir limit
-      )
-    end
-  end.call
+  define_singleton_method :sandboxed_tmpdir, Cull::Callback_.memoize[ -> do
+    _path = Lib_::System_default_tmpdir_pathname[].
+      join 'cull-sandboxes/cull-sandbox'
+    TestSupport::Tmpdir.new path: _path, max_mkdirs: 2
+      # we have to go deep to escape the 3 dir limit
+  end ]
 
   module InstanceMethods
 
@@ -56,7 +56,7 @@ module Skylab::Cull::TestSupport
 
     def from_inside_fixture_directory i, &blk
       _from_inside blk, Cull_TestSupport::Fixtures::Directories.dir_pathname.
-        join( Headless::Name::FUN::Slugulate[ i ] ), false
+        join( Lib_::Name_slugulate[ i ] ), false
     end
 
     def _from_inside blk, dir_pn, do_use_fixture, fixture_i=nil
@@ -89,9 +89,8 @@ module Skylab::Cull::TestSupport
     end
 
     def _load_fixture fixture_i
-      pn = Cull_TestSupport::Fixtures::Patches.
-        dir_pathname.join "#{ Headless::Name::FUN::Slugulate[ fixture_i ] }.patch"
-
+      _patch = "#{ Lib_::Name_slugulate[ fixture_i ] }.patch"
+      pn = Cull_TestSupport::Fixtures::Patches.dir_pathname.join _patch
       st = sandboxed_tmpdir.patch( pn.read ).exitstatus
       st.zero? or fail "sanity - patch failed? (exited with status #{ st })"
       nil

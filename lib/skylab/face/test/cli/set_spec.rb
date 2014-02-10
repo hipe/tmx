@@ -28,7 +28,7 @@ module Skylab::Face::TestSupport::CLI::Set
 
   do_invoke = Do_invoke_[]
 
-  describe "#{ Face::CLI } `set` API" do
+  describe "[fa] set API" do
 
     extend This_TestSupport
 
@@ -47,6 +47,6 @@ module Skylab::Face::TestSupport::CLI::Set
   end
 
   if do_invoke  # try executing this file directly, passing '-x'
-    Awoooga::CLI_Client.new( nil, SO_, SE_ ).invoke( ::ARGV )
+    Awoooga::CLI_Client.new( nil, * TestLib_::Sout_serr[] ).invoke( ::ARGV )
   end
 end

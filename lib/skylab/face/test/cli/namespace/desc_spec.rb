@@ -37,7 +37,7 @@ module Skylab::Face::TestSupport::CLI::Namespace::Desc
 
   do_invoke = Do_invoke_[]
 
-  describe "#{ Face::CLI }::Namespace desc" do
+  describe "[fa] Namespace desc" do
 
     extend This_TestSupport
 
@@ -66,6 +66,6 @@ module Skylab::Face::TestSupport::CLI::Namespace::Desc
   end
 
   if do_invoke  # try executing this file directly, passing '-x'
-    Wowzaa::CLI::Client.new( nil, SO_, SE_ ).invoke( ::ARGV )
+    Wowzaa::CLI::Client.new( nil, * TestLib_::Sout_serr[] ).invoke( ::ARGV )
   end
 end

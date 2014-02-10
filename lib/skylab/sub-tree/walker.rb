@@ -101,7 +101,7 @@ module SubTree  # borrow x 1 - load this solo but it needs meta hell
     attr_reader :files_file_pn
 
     def pathnames
-      Lib_::Power_Scanner[ :init, -> do
+      SubTree::Lib_::Power_Scanner[ :init, -> do
         files_file_pn && top_pn or fail "sanity"
         @tpn = Pathname__.new @top_pn
         rwnd_files_file_IO
@@ -177,7 +177,7 @@ module SubTree  # borrow x 1 - load this solo but it needs meta hell
 
     def subtree_pathnames
       path = scn = slice = nil
-      Lib_::Power_Scanner[ :init, -> do
+      SubTree::Lib_::Power_Scanner[ :init, -> do
         path = @pn.instance_variable_get :@path
         _length = path.length - SEPWIDTH_
         slice = 0 .. _length

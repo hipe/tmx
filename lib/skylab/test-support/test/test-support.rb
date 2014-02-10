@@ -6,6 +6,7 @@ module Skylab::TestSupport::TestSupport
   TS_TS = self
 
   module CONSTANTS
+    MetaHell = ::Skylab::MetaHell  # temporary b.c it isn't in [fa]
     TS_TS = TS_TS
     TestSupport = ::Skylab::TestSupport
   end

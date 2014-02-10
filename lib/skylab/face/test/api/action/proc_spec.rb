@@ -1,26 +1,12 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::Face::TestSupport::API::Proc
+module Skylab::Face::TestSupport::API::Action::Proc
 
-  ::Skylab::Face::TestSupport::API[ Proc_TestSupport = self ]
-
-  module Sandbox
-    # mine.
-  end
-
-  module CONSTANTS
-    Sandbox = Sandbox
-  end
-
-  include CONSTANTS
-
-  extend TestSupport::Quickie
-
-  Face = Face
+  ::Skylab::Face::TestSupport::TestLib_::Sandboxify[ self ]
 
   describe "extend module x with Face::API and use procs for actions" do
 
-    extend Proc_TestSupport
+    extend TS_
 
     context "against proc as API action" do
 
@@ -30,6 +16,7 @@ module Skylab::Face::TestSupport::API::Proc
           API::Actions::WahHoo = -> do
             :some_result
           end
+          Face::Autoloader_[ self ]
         end
       end
 
@@ -47,6 +34,7 @@ module Skylab::Face::TestSupport::API::Proc
           API::Actions::WahHoo = -> wing, ding=:ohai do
             "<<wing:#{ wing },ding:#{ ding }>>"
           end
+          Face::Autoloader_[ self ]
         end
       end
 

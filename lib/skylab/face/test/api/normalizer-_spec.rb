@@ -2,15 +2,9 @@ require_relative 'test-support'
 
 module Skylab::Face::TestSupport::API::Normalizer_
 
-  ::Skylab::Face::TestSupport::API[ TS_ = self ]
+  ::Skylab::Face::TestSupport::TestLib_::Sandboxify[ self ]
 
-  include CONSTANTS
-
-  Face = Face
-
-  extend TestSupport::Quickie
-
-  describe "#{ Face }::API::Normalizer_" do
+  describe "[fa] API::Normalizer_" do
 
     extend TS_
 

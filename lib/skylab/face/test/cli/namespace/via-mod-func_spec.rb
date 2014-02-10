@@ -16,7 +16,7 @@ module Skylab::Face::TestSupport::CLI::Namespace::Via_Mod_Func
         namespace :'data-source', -> { Actions::DataSrc }, aliases: [ 'ds' ]
       end
       module Actions
-        class DataSrc < Face::Namespace
+        class DataSrc < Face::CLI::Namespace
         end
       end
     end
@@ -24,7 +24,7 @@ module Skylab::Face::TestSupport::CLI::Namespace::Via_Mod_Func
 
   do_invoke = Do_invoke_[]
 
-  describe "#{ Face::CLI }::Namespace via mode func" do
+  describe "[fa] Namespace via mode func" do
 
     extend This_TestSupport
 
@@ -59,6 +59,6 @@ module Skylab::Face::TestSupport::CLI::Namespace::Via_Mod_Func
   end
 
   if do_invoke  # try executing this file directly, passing '-x'
-    Wizzle::CLI::Client.new( nil, SO_, SE_ ).invoke( ::ARGV )
+    Wizzle::CLI::Client.new( nil, * TestLib_::Sout_serr[] ).invoke( ::ARGV )
   end
 end

@@ -6,7 +6,7 @@ module Skylab::Face::TestSupport::CLI::Namespace::NIS
 
   CONSTANTS::Common_setup_[ self ]
 
-  describe "#{ Face }::CLI - namespace NIS (normalized invocation strings)" do
+  describe "[fa] CLI - namespace NIS (normalized invocation strings)" do
 
     extend NIS_TS
 

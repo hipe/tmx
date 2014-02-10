@@ -136,7 +136,7 @@ module Skylab::Face
     def get_format
       sep = @sep_x || SEP_DEFAULT_
       "#{ @left_x || LEFT_DEFAULT_ }#{
-        a = (( bx = @field_box )) ? bx._a : MetaHell::MONADIC_EMPTINESS_
+        a = (( bx = @field_box )) ? bx._a : MONADIC_EMPTINESS_
         num_cols.times.map do |d|
           sign = MINUS_ if (( k = a[ d ] )) && :left == bx.fetch( k ).align_i
           "%#{ sign }#{ @max_a[ d ] || 0 }s"
@@ -145,6 +145,7 @@ module Skylab::Face
     end
 
     MINUS_ = '-'.freeze
+    MONADIC_EMPTINESS_ = -> _ { }
     LEFT_DEFAULT_ = '|  '.freeze
     SEP_DEFAULT_ = ' |  '.freeze
     RIGHT_DEFAULT_ = ' |'.freeze
@@ -153,12 +154,12 @@ module Skylab::Face
       @max_a.length
     end
 
-    MetaHell::FUN::Fields_::From_.methods do
+    Lib_::Fields_from_methods[ -> do
       def read_rows_from a
         @read_rows_from = a.shift  # special case - allow no arg at end!
         nil
       end
-    end
+    end ]
     protected :absorb  # created by extension above - we let other selfs call
   end
 
@@ -179,9 +180,9 @@ module Skylab::Face
     #     ( a * 'X' )  # => "(Food,      Drink)X( nut,pomegranate)"
 
     private
-    MetaHell::FUN::Fields_::From_.methods do
+    Lib_::Fields_from_methods[ -> do
       def field a
-        bx = (( @field_box ||= Library_::Basic::Box.new ))
+        bx = (( @field_box ||= Lib_::Box[] ))
         fld = Field_.new a, bx.length
         bx.add fld.name_i, fld
         @do_show_header.nil? and @do_show_header = true
@@ -205,7 +206,7 @@ module Skylab::Face
       def right a
         @right_x = a.shift ; nil
       end
-    end
+    end ]
 
     def header_row
       @header_cel_a ||= @field_box.map( & :label_s )
@@ -241,7 +242,7 @@ module Skylab::Face
       attr_reader :label_s, :name_i, :align_i
 
       private
-      MetaHell::FUN::Fields_::From_.methods do
+      Lib_::Fields_from_methods[ -> do
         def left _
           @align_i = :left ; nil
         end
@@ -256,7 +257,7 @@ module Skylab::Face
         def id a  # typically for fields w/o labels, i.e non-displayed headers
           @name_i = a.shift ; nil
         end
-      end
+      end ]
     end
 
     # but the real fun begins with currying - curry a table in one place

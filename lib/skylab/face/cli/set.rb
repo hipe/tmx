@@ -1,4 +1,4 @@
-module Skylab::Face
+class Skylab::Face::CLI
 
   # a variety of 5.x facets are grouped here, including many that depend
   # on each other.
@@ -92,7 +92,7 @@ module Skylab::Face
     # for extensibility.
     # #result-is not important. mutating xtra_a is not important.
 
-    Fly_ = Library_::Basic::List::Scanner::For::Array.new( Val_a_ = [ 0 ] )
+    Fly_ = Lib_::Scanner_for_array[ Val_a_ = [ 0 ] ]
 
     undef_method :absorb_extr
     def absorb_extr xtra_a  # assumes nonzero length
@@ -107,8 +107,7 @@ module Skylab::Face
           end while keys.length.nonzero?
         end
       else
-        absorb_xtra_scn Library_::Basic::List::Scanner::For::Array.
-          new( xtra_a )
+        absorb_xtra_scn Lib_::Scanner_for_array[ xtra_a ]
       end
       nil
     end

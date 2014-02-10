@@ -8,7 +8,7 @@ module Skylab::Face
 
   class API::Action
 
-    Face::Metastory.enhance self, :API_, :Action_
+    Face_::Metastory.enhance self, :API_, :Action_
 
   end
 end

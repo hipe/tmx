@@ -1,94 +1,82 @@
-module Skylab::Face
+module Skylab::Face  # read [#056] the CLI narrative
 
-  # `Face`
-  #   + wraps around ::OptionParser by default
-  #   + renders styled help screens and the usual help UI
-  #   + arbitrarily deeply nested sub-commands (namespaces)
-  #   + nodes (commands and namespaces) can have aliases
-  #   + fuzzy matching
-  #   + command argument syntax inferred by default from method signature
-  #   + some built in 'officious' (allà stdlib o.p) like -v, -h
+  CLI = ::Class.new ::Class.new
 
-  # historical note - this library by this name came before headless and
-  # before porcelain (both `bleeding` and `legacy`, indeed it was the first
-  # client library for `tmx` itself) and it did not age well; but then saw a
-  # comprehensive, ground-up test-driven rewrite (TWICE) after those two fell
-  # out of fashion. it will hopefully be merged into headless one day because
-  # now it is close to perfect.
+  class CLI
 
-  # unlike its ancestors, `Face` eschews use of spurious, exuberant,
-  # extraneous, or frivolous modules. instead it aspires to a minimal and
-  # clean class graph with three classes, a graph that is the embodiment of a
-  # rigid and complete trinity of balance, whose goal is to be extensible
-  # while not sacrificing simplicity of design and clarity of comprehension.
+    Autoloader_ = Autoloader_
 
-  # in practice there are more than three classes but conceptually this
-  # "triforce" is intrinsic to the design here (illustrated in [#040]).
+    Command = ::Class.new
 
-  # as for the structure of this file, we may sometimes follow something like
-  # "narrative pre-order" ([#hl-058]), whose effect is that classes and
-  # modules are re-opened as necessary so as to fit method definitions within
-  # the appropriate section, to make a rousing narrative, and to make it
-  # semantically modular, if we ever need to break it up.
+    CLI = self
 
-  # within that structure we often follow a top-down outside-in order.
+    Face_ = ::Skylab::Face
 
-  #          ~ facet 1 - intrinsic mechanics & surface -
+    Namespace = superclass
 
-  #   ~ 1.1 - necessary forward declarations (nothing interesting)  ~
+    Node_Sheet_ = ::Class.new
 
-  class Command  # #forward-declared-for-narrative. re-opens below.
+    NS_Mechanics_ = ::Class.new Command
+
+    CLI_Mechanics_ = ::Class.new NS_Mechanics_
+
+    Mechanics__ = CLI_Mechanics_
+
   end
+end
 
-  class Namespace  # #forward-declared-for-narrative. re-opens below.
-    def _m  # #todo
-      @mechanics
+class Skylab::Face::CLI
+
+  module CLI_Lib_
+
+    sidesys = Autoloader_.method :build_require_sidesystem_proc
+
+    Chunker_enumerator = -> sexp do
+      Headless__[]::CLI::Pen::Chunker::Enumerator.new sexp
+    end
+
+    Headless__ = sidesys[ :Headless ]
+
+    Option_enumerator = -> op do
+      Headless__[]::CLI::Option::Enumerator.new op
+    end
+
+    Option_local_normal_name_as_long = -> i do
+      Headless__[]::CLI::Option::Local_normal_name_as_long[ i ]
+    end
+
+    Option_model_class = -> do
+      Headless__[]::CLI::Option::Model_  # #todo
+    end
+
+    Option_parser_scanner = -> op do
+      Headless__[]::CLI::Option::Parser::Scanner.new op
+    end
+
+    Option_flyweight = -> do
+      Headless__[]::CLI::Option.new_flyweight
+    end
+
+    Parse_styles = -> s do
+      Headless__[]::CLI::FUN::Parse_styles[ s ]
+    end
+
+    Requity_brackets = -> i do
+      Headless__[]::CLI::Argument::FUN::Reqity_brackets[ i ]
+    end
+
+    Stylify_proc = -> do
+      Headless__[]::CLI::Pen::FUN::Stylify
+    end
+
+    Unstyle_sexp = -> s do
+      Headless__[]::CLI::FUN::Unstyle_sexp[ s ]
     end
   end
 
-  class CLI < Namespace  # #forward-declaration
-    Namespace = Namespace  # the proper way to access it it outside this lib
-    Command = Command # the proper way to access it outside this lib
-  end
+  class CLI  # open for facet 1. #storypoint-40
 
-  class NS_Mechanics_ < Command
-    # #forward-declare-for-narrative. re-opens below
-  end
-
-  class CLI_Mechanics_ < NS_Mechanics_
-    # #forward-declare-for-narrative. re-opens below
-  end
-
-  class Node_Sheet_  # #forward-declared-for-narrative. re-opens below.
-  end
-
-  CLI::FUN_ = MetaHell::Formal::Box::Open.new
-
-  #           ~ 1.2 - `CLI` (the "modality client") & support ~
-
-  class CLI < Namespace  # open for facet 1
-
-    # an object of a subclass of the `CLI` class is *the* "modality client".
-    # it is the first node to "see" resources like ARGV and $stdin, $stdout,
-    # stderr ; and is the only node in this ecosystem to "be given" such
-    # resources from the ruby ecosystem directly.
-    #
-    # this `CLI` class itself is a would-be #abstract-base-class - it is not
-    # meant to be instantiated directly and to do so has undefined results.
-    #
-    # this `CLI` class in its implementation is a specilization of the
-    # `Namespace` class with some extra added functionality for being the
-    # topmost (or rootmost) node (for some context) in the application tree.
-    # except where noted, all description of `Namespace` below will apply to
-    # this class here, so please see that for further description of the `CLI`
-    # class.
-
-    #             ~ class section 1 - instance methods ~
-
-    # `invoke` - the only public method. #existential-workhorse. accords with
-    # [#hl-020].
-
-    def invoke argv
+    def invoke argv  # #storypoint-75
       ok, res, m, a, b, cmd = @mechanics.get_executable argv
       if ok
         begin
@@ -99,25 +87,13 @@ module Skylab::Face
       end
       res
     end
-
-    Mechanics__ = CLI_Mechanics_
   end
 
-  # ( `class CLI::Sheet_` note there is none. we use NS::Sheet_ that node. )
+  class CLI_Mechanics_
 
-  class CLI_Mechanics_ < NS_Mechanics_   # #re-open for facet 1
+    -> do
 
-    # ~ class section 1 - singleton methods. warning: what you are about to
-    # see is extremely clever, elegant, extensible and generally brilliant;
-    # in a manner so understated as to have a power that is at first hard to
-    # recognize, much less follow ~
-
-    -> do  # `self.enhance`
-
-      # the purpose of the call at this node is simply to normalize the args
-      # to allow for [#sl-114] the convention of `stdin, stdout, stderr` as
-      # flat args. to be more extensible, we then send the normalized hash at
-      # this point off to `_enhance` below it for whatever further processing.
+      # normalize [#sl-114] conventional 'sin sout serr'.
 
       a_len = {
         1 => -> h { h },
@@ -125,7 +101,7 @@ module Skylab::Face
       }
 
       define_singleton_method :enhance do |surface, a|
-        _enhance surface, a_len.fetch( a.length ).call( * a )  # be extensible
+        enhance_surface_with_h surface, a_len.fetch( a.length ).call( * a )
       end
 
     end.call
@@ -198,7 +174,7 @@ module Skylab::Face
       end
     end
 
-    DASH_ = MetaHell::DASH_
+    DASH_ = '-'.getbyte 0
 
     # `init_cli_surface` #called-by self.class only. [#040] explains it all.
     # so this is that weird place where we fan-out these resources upwards
@@ -217,19 +193,7 @@ module Skylab::Face
       nil
     end
 
-    # `pre_execute` - #called-by self in main execution loop, #called-by
-    # n-amespace facet when ouroboros is happening. about it: we "re-puff"
-    # (that is, `pre_execute`) before every execution for fun, sanity, grease,
-    # and design - ostensibly so that the p-arent can change the identity of
-    # these resources late and during runtime while b) we can still have them
-    # be simple ivars and not long-ass call chains. (also, the point is moot
-    # insomuchas CLI's are not long running processes anyway!)
-
-    # in this entire library (without extrinsic facets / extensions), of the
-    # whole matryoshka stack [#040], the only resource *we* need is @y: the
-    # standard error stream line yielder (makes sense, right?).
-
-    def pre_execute
+    def pre_execute  # #storypoint-175
       # we override p-arent and do what our grandparent does. meh.
       @y = parent_services[ :y ]
       @last_hot = nil
@@ -237,27 +201,11 @@ module Skylab::Face
     end
   end
 
-  #   ~ 1.3 `Namespace` *core only* & support (not for deep namespaces) ~
-
-  class Namespace  # #re-open for facet 1. no superclass.
-
-    # the `Namespace` class is an abstract base class - it is meant only to
-    # be subclassed. to instantiate object from it directly has undefined
-    # results. the `Namespace` class is the central embodiment of a DSL in
-    # this library - it is the interface entrypoint for employing [#041]
-    # `isomorphic command composition`, that is, public methods that you
-    # write in your class become commands in your user interface. as such,
-    # except where noted, the "n-amespace" of instance methods (public, private,
-    # and p-rotected) of this class is preserved entirely for "businessland"
-    # concerns - that is, the developer user determines them, not this
-    # library. again as such, for instance methods, you will only find one
-    # defined here - `initialize`.
-
-    #             ~ class section 1 - singleton methods ~
+  class Namespace  # 1.2 core only (not deep n.s) & support #storypoint-185
 
     class << self
 
-      attr_reader :story  # #called-by cli mechanics, and elsewhere
+      attr_reader :story  # #called-by CLI mechanics, and elsewhere
 
     private
 
@@ -275,25 +223,9 @@ module Skylab::Face
         nil
       end
 
-      # `use` - the `use` directive states, "i will be using the following
-      # methods provided by my mechanics layer up here in my surface layer."
-      #
-      # as explained in this class's head comment, we pledge to provide no
-      # instance methods at all to your namespace subclass [#037]. however
-      # in practice it can be convenient to have a few private methods defined
-      # here on your "surface" (or "shell") class for doing things like
-      # creating common o.p options or styling help screen text. the
-      # `@mechanics` object (itself a command) provides such facilities
-      # but it can look ugly (and presents scale issues) to have any trace
-      # of that in your UI code. the `use` facility, then, simply defines
-      # private delgator methods on your shell to services provided by the
-      # mechanics layer.
-
-      # (covered in cli/api-integration/with-namespaces_spec.rb)
-
       -> do
         h = { as: -> a, rest { a[ 0 ] = rest.shift } }.freeze
-        define_method :use do |*x_a|
+        define_method :use do |*x_a|  # #storypoint-210
           p = @do_track_method_added ; @do_track_method_added = false
           x_a.each do | ( svc_i, *rest ) |
             r = [ ]
@@ -325,37 +257,17 @@ module Skylab::Face
         self.class.const_set :Mechanics_, ::Class.new( self.class::Mechanics__ )
       end ).enhance( self, a )  # (`enhance` rabbit hole begins!)
 
-      # (remember, no need to call up to super. we have no superclass.)
-
-      # (lazily, only once the surface is created do we check and see if a
-      # custom `Mechanics_` class has been subclassed, defined, whatever, and
-      # if not; we subclass a default mechanics class (descending from the
-      # appropriate base class) and put it there. whichever class was resolved
-      # from the above is the one used to enhance this surface and resolve a
-      # @mechanics instance.)
+      # #storypoint-240
 
       nil
     end
 
     # note there are no public (and only 1 private) instance method defined.
+    _pn = Face_.dir_pathname.join 'namespace'
+    Autoloader_[ self, _pn ]  # :+[#060]
   end
 
-  class NS_Sheet_ < Node_Sheet_  # for facet 1
-
-    # the abstract representation of a n-amespace. before you build any actual
-    # things, you can aggreate the data around it progressively.
-
-    # the CLI client class (like many other entities here) internally stores
-    # *all* its "businessland data" in a "character-sheet"-ish object
-    # (sometimes called a "story" when it is in regards to a n-amespace).
-    # A n-amespace's story consists of properties and constituents. the
-    # properties are things like the n-amespace's normalized local slug name
-    # and aliases. the constituents represent the n-amespace's child nodes
-    # (either terminal commands or other namespaces (themselves a special kind
-    # of command)). we say "represents" because actual n-amespace classes or
-    # command objects are not necessarily built at declaration time. instead,
-    # we may have as our constituents one sheet for each of this node's child
-    # nodes. (deeply nested namespaces are then stories inside stories yay.)
+  class NS_Sheet_ < Node_Sheet_  # for facet 1, #storypoint-250
 
     def initialize surface_mod
       @name = nil  # (in a couple places now we check if it is set ..)
@@ -364,7 +276,7 @@ module Skylab::Face
         # n-amespace is defined with a block (these all happen elsewhere)
         # watch for this becoming a case for two child classes of a shared
         # base class..
-        @box = MetaHell::Formal::Box::Open.new
+        @box = Lib_::Open_box[]
         @surface_mod = -> { surface_mod }
         @surface_mod_origin_i = :module
         @node_open = false ; @methods_need_to_be_indexed = true
@@ -442,18 +354,13 @@ module Skylab::Face
     end
   end
 
-  class NS_Mechanics_  # #re-open for facet 1
-
-    # (this class broke out of Namespace itself and became a standalone
-    # class during [#037], to address the concerns therein. its funny name
-    # ending in an underscore means it is not part of the public API, nor
-    # stable. it follows [#hl-073] extrinsic / intrinsic ivars.)
+  class NS_Mechanics_  # #re-open for facet 1, #storypoint-335
 
     #           ~ class section 1 - singleton methods ~
 
     class << self
     private
-      def _enhance surface, h  # mutates h!  part of "extremely clever" above
+      def enhance_surface_with_h surface, h  # mutates h!  part of "extremely clever" above
         a = method( :__enhance ).parameters[ 1 .. -1 ].reduce [] do |m, (_, i)|
           m << h.delete( i )  # (yes it's just a map. but map would bloat?)
           m
@@ -473,15 +380,7 @@ module Skylab::Face
 
     #          ~ class section 2 - core public instance methods ~
 
-    # (use the `initialize` of p-arent - (sheet, parent_services, slug))
-
-    # `find_command` #existential-workhorse #called-by-main-invocation-loop
-    # #result-is-tuple. assume `argv` length is greater than or equal to 1.
-    # remove at most 1 element off the head of `argv. #result-is-tuple. if
-    # command can be resolved, a *h-ot* subcommand is the payload element of
-    # the pair.
-
-    def find_command argv
+    def find_command argv  # #storypoint-365
       given = argv.fetch 0
       rx = /\A#{ ::Regexp.escape given }/
       found_a = when_puffed do
@@ -736,11 +635,11 @@ module Skylab::Face
     end
 
     -> do  # `name`  # #called-by command and children to be `name`
-      f = -> x { Library_::Headless::Name::Function.new x }
+      p = -> x { Lib_::Name_from_symbol[ x ] }
       h = {
         none: -> _ { false },
-        method: f,
-        nln: f
+        method: p,
+        nln: p
       }.freeze
       define_method :name do
         if @name.nil?
@@ -759,8 +658,7 @@ module Skylab::Face
     #      `name` that memoizes its result to `@name`
 
     def initialize name_i  # hacks only!
-      @name = Library_::Headless::Name::Function.new name_i
-      nil
+      @name = Lib_::Name_from_symbol[ name_i ] ; nil
     end
 
     #  ~ section 1 - public instance methods ~
@@ -789,12 +687,14 @@ module Skylab::Face
 
   end
 
-  #                ~ 1.4 - internal service proxies! ~
-  #
-  # we can't / shouldn't just shoot messages upwards directly with `send`.
-  # for one, because of the pledge to keep the entire method namespace
-  # reserved for businessland (except `invoke` in the case of topmost), we
-  # simply cannot go adding "mechanical" methods willy nilly to there.
+  # ~ 1.4 - internal service proxies!, #storypoint-670
+
+  # (below is temporary before :+[#060])
+  Lib_ = Face_::Lib_
+  Library_ = Face_::Library_
+  Magic_Touch_ = Face_::Magic_Touch_
+  Services_ = Face_::Services_
+  Set_ = Face_::Set_
 
   CLI_Surface_Pxy_ = Services_.new do  # declare early, used to make SET_
     services_ivar :@surface_services
@@ -1031,8 +931,8 @@ module Skylab::Face
     def each_option  # assumes that @op (when constructed) will be an o.p
       @op_enum ||= begin
         @op.nil? and init_op
-        opt = Library_::Headless::CLI::Option.new_flyweight
-        ea = Library_::Headless::CLI::Option::Enumerator.new @op
+        opt = CLI_Lib_::Option_flyweight[]
+        ea = CLI_Lib_::Option_enumerator[ @op ]
         ea.filter = -> sw do
           opt.replace_with_switch sw
           opt
@@ -1044,14 +944,15 @@ module Skylab::Face
     def options  # #called-by self `parameters`
       @options ||= -> do
         scn = nil ; op_x = option_parser ? @op : Empty_A_
-        Face::Options.new(
+        Face_::Options.new(
           fetch: -> ref, &blk do
-            scn ||= Library_::Headless::CLI::Option::Parser::Scanner.new op_x
+            scn ||= CLI_Lib_::Option_parser_scanner[ op_x ]
             scn.fetch ref, &blk
           end  )
       end.call
     end
-    Face::Options = MetaHell::Proxy::Nice.new :fetch
+
+    Face_::Options = Lib_::Nice_proxy[ :fetch ]
 
   end
 
@@ -1125,13 +1026,7 @@ module Skylab::Face
 
   #                      ~ facet 3 - argv processing ~
 
-  class CLI_Mechanics_  # #re-open for facet 3
-
-    # we don't know if we love this or hate it. originally it was easy and
-    # had high novelty value to let this isomorphicism extend all the way to
-    # to this level but then it looked more ugly then elegant, but again now
-    # it seems like it might be ok because it is in accord with the whole
-    # spirit of this thing. meh who cares its just CLI [#004].
+  class CLI_Mechanics_  # #re-open for facet 3, #storypoint-1005
 
     def argument_error ex, cmd  # result will be final result
       md = CALL_FRAME_RX_.match ex.backtrace.fetch( 1 )
@@ -1296,7 +1191,7 @@ module Skylab::Face
   private
 
     def parameters  # #called-by self - `subcommand_help`
-      @parameters ||= Face::Parameters.new(
+      @parameters ||= Face_::Parameters.new(
         fetch: -> ref, &blk do
           ok = false
           res = options.fetch ref do ok = true end
@@ -1310,7 +1205,8 @@ module Skylab::Face
           res
         end )
     end
-    Face::Parameters = MetaHell::Proxy::Nice.new :fetch  # only here b.c etc.
+
+    Face_::Parameters = Lib_::Nice_proxy[ :fetch ]  # only here b.c etc
 
     # `subcmd_help` - #result-is-tuple. a hook for the benefit of both child
     # classes and nodes - it corrals help requests coming in from 2 places:
@@ -1487,13 +1383,7 @@ module Skylab::Face
       "#{ hi usage_header_text } #{ syntax }"
     end
 
-    # `get_summary_a_from_sheet` - # #called-by-p-arent documenting child #experimental
-    # *lots* of goofing around here - this terrific hack tries to
-    # distill a s-ummary out of the first one or two lines of the option parser
-    # -- it strips out all styling from them (b.c it looks wrong in summaries),
-    # and indeed strips out the styled content all together unless (ICK) that
-    # header says "usage:" #experimental proof-of-concept novelty hack.
-    # not actually ok.
+    ## #storypoint-1360
 
     -> do
 
@@ -1523,34 +1413,24 @@ module Skylab::Face
         nil
       end
 
-      hl_chunker = hl_parse_styles = hl_unstyle_sexp = nil  # we lazy-
-      hl = -> do                  # load these nerkulouses - they might be a
-        hl_chunker =              # beast, the dependency is awkward.
-          Library_::Headless::CLI::Pen::Chunker
-        hl_parse_styles, hl_unstyle_sexp =
-          Library_::Headless::CLI::FUN.constants_at :Parse_styles, :Unstyle_sexp
-        hl = nil
-      end
-
       restyle_sexp = -> do  # ..
 
         header_rx = /\A[^ ]+:[ ]?\z/  # no tabs [#hl-056]
 
         h = {
           string: -> m, x, _ do
-            m << hl_unstyle_sexp[ x ]
-            nil
+            m << CLI_Lib_::Unstyle_sexp[ x ] ; nil
           end,
           style: -> m, x, usg_hdr_txt do
-            s = hl_unstyle_sexp[ x ]
+            s = CLI_Lib_::Unstyle_sexp[ x ]
             # ICK only let a header through if it says "usage:" ICK
             m << s if usg_hdr_txt == s || header_rx !~ s
             nil
           end
         }.freeze
 
-        -> sexp, usg_hdr_txt do  # assumes hl
-          ea = hl_chunker::Enumerator.new sexp
+        -> sexp, usg_hdr_txt do
+          ea = CLI_Lib_::Chunker_enumerator[ sexp ]
           a = ea.reduce [] do |m, x|
             h.fetch( x[0][0] )[ m, x, usg_hdr_txt ]
             m
@@ -1560,10 +1440,9 @@ module Skylab::Face
       end.call
 
       restyle = -> a, usg_hdr_txt do
-        hl and hl[]  # iff..
         a.length.times do |idx|
           line = a[ idx ]
-          sexp = hl_parse_styles[ line ]
+          sexp = CLI_Lib_::Parse_styles[ line ]
           if sexp
             a[ idx ] = restyle_sexp[ sexp, usg_hdr_txt ]
           else
@@ -1610,7 +1489,6 @@ module Skylab::Face
         # (in case we ever go back to op.to_s, this is what we used #todo)
 
         -> op, usage_header_txt, num_lines do  # `hack_excerpt_from_op`
-          hl and hl[]  # load it lazily
           a = get_op_excerpt_lines[ op, num_lines + 1 ]
           ellipsify[ a, num_lines ]
           restyle[ a, usage_header_txt ]
@@ -1728,22 +1606,11 @@ module Skylab::Face
     def build_any_isomorphic_argument_syntax
       para_a = parent_services.get_command_parameters @sheet
       part_a = para_a.reduce [] do |m, x|
-        a, z = Requity_brackets_[ x[ 0 ] ]
-        m << "#{ a }<#{ CLI::FUN.slugulate[ x[1] ] }>#{ z }"
+        a, z = CLI_Lib_::Requity_brackets[ x[ 0 ] ]
+        m << "#{ a }<#{ Lib_::Name_slugulate[ x[1] ] }>#{ z }"
       end
       part_a * ' ' if part_a.length.nonzero?
     end
-
-    CLI::FUN_[ :slugulate ] = -> x do
-      Library_::Headless::Name::FUN::Slugulate[ x ]
-    end  # (narrow focus of the dependency for now (but trivial))
-
-    Requity_brackets_ = -> do  # ditto
-      p = -> i do
-        (( p = Library_::Headless::CLI::Argument::FUN::Reqity_brackets ))[ i ]
-      end
-      -> x { p[ x ] }
-    end.call
 
     def description_section y
       if @sheet.desc_proc_a
@@ -1882,7 +1749,6 @@ module Skylab::Face
   # ~ 5.3x - recursively nested namespaces ~
 
   class Namespace  # #re-open for 5.3x
-    MetaHell::MAARS[ self ]
   end
 
   Magic_Touch_.enhance -> { Namespace::Facet.touch },
@@ -1920,13 +1786,14 @@ module Skylab::Face
   # ~ 5.7x - adapters for when loading namespaces as a "strange module" ~
 
   class CLI
-    module Adapter  # (this is actually a bit like "magic touch" pattern..)
-      MAARS[ self ]
+    module Adapter  # (this is actually a bit like #magic-touch pattern..)
+      Autoloader_[ self ]
     end
   end
   class Namespace
-    module Adapter  # intermediate n.s's use a different adapter
-      MAARS[ self ]  # than level-1 clients
+    module Adapter
+      # intermedate n.s's use a different adapter than lvl-1 clients
+      Autoloader_[ self ]
     end
   end
 
@@ -1975,19 +1842,7 @@ module Skylab::Face
 
   class Namespace
 
-    @do_track_method_added = false  # location 3 of 3 - this is where it
-    # happens for the `Namespace` class itself, which does *not* have its own
-    # story (because stories are for holding "businessland" data, and the
-    # Namespace class itself has no such data of its own to hold as explained
-    # above.) however, because we define `method_added` in this file for this
-    # class, when we add any methods subsequently to the class (like in
-    # facets), we probably do not want the `method_added` mechanism to be
-    # engaged at all, hence we define one such ivar for the class itself, and
-    # subsequently use this ivar as a flag to indicate whether or not we want
-    # to react when methods are added. (in the past this same ends was
-    # achieved more opaquely with hacks like defining `method_added`
-    # dynamically on the businessland subclass; but this alternate solution
-    # here is seen as more transparent and less invasive.)
+    @do_track_method_added = false  # location 3 of 3 - #storypoint-1845
 
     class << self
     private
@@ -1999,16 +1854,7 @@ module Skylab::Face
         nil  # detail.
       end
 
-    # `self.with_dsl_off` - in cases where you want to create (or re-define
-    # existing) public methods on your client class that no *not* isomorph into
-    # commands, define them inside such a block. see spec `dsl-off_spec.rb`.
-    # use of this facility is considered a #smell, and as such the only
-    # reasonable use for this is for something like overriding and extending
-    # the one existing necessarily public method - `invoke`; something done
-    # to wrap the invocation in extra UI, e.g. displaying an invitation to
-    # more help when there is a soft failure.
-
-      def with_dsl_off &blk  # #see
+      def with_dsl_off &blk  # #storypoint-1855
         if instance_variable_defined? :@story  # this will have to do for now
           @story._scooper.while_dsl_off blk
         else
@@ -2017,13 +1863,7 @@ module Skylab::Face
         end
       end
 
-    # `self.dsl_off` - sadly this does not do exactly the same as above -
-    # we use this alongside the canonical one location of the call to `private`
-    # in a class so that we don't gather any extraneous data about (private)
-    # methods added. in theory it has no functional effect, it is just to make
-    # debugging easier by gathering less data (and is a micronic optimisation.)
-
-      def dsl_off &blk  # #see
+      def dsl_off &blk  # #storypoint-1865
         if block_given? then with_dsl_off( &blk ) else
           @story._scooper.dsl_off  # we do it a greasier way than we need to.
         end
@@ -2031,13 +1871,7 @@ module Skylab::Face
     end
   end
 
-  class Scooper_  # [#bm-001] - this one for sure!!
-
-    # Scooper_ encapsulates *all* of the low-level `method_added` hacking
-    # we do for `isomorphic command composition` [#041]. because there is
-    # exactly one scooper per n-amespace class, it does not really need to
-    # scale out much; hence we write it in the below style for fun and as
-    # an experiment.
+  class Scooper_  # [#bm-001] - this one for sure!!  #storypoint-1870
 
     def initialize scoop
       do_track_method_added = true
@@ -2083,35 +1917,17 @@ module Skylab::Face
     end
   end
 
-  CLI::FUN_[ :concat_2 ] = -> a, b do  # #called-by ouroboros sheet
-    [ *a, *b ] if a || b
+  def self.reparenthesize
+    Reparenthesize__
   end
-
-  CLI::FUN_[ :reparenthesize ] = -> do  # .. ; #called-by applications (e.g [te])
-    # NOTE we mutate the string, which is also the result.
+  Reparenthesize__ = -> do  # #called-by [te], :+[#061]
     rx = /\A(?<a>\([ ]*)(?<b>.*[^ ]|)(?<c>[ ]*\))\z/
-    -> msg, cb do                  # #todo we do something similar everywhere,
-      if (( md = rx.match msg ))   # but this way is Best.
-        msg.replace "#{ md[:a] }#{ cb[ md[:b] ] }#{ md[:c] }"
+    -> cb, msg do
+      if (( md = rx.match msg ))
+        "#{ md[:a] }#{ cb[ md[:b] ] }#{ md[:c] }"
       else
-        msg.replace cb[ msg ]
+        cb[ msg ]
       end
-      msg
     end
   end.call
-
-  class CLI
-    FUN = (( Fun_ = FUN_.produce_struct_class )).new( * FUN_.values )
-  end
-
-  class CLI::Fun_
-    def stylify
-      p = Library_::Headless::CLI::Pen::FUN::Stylify
-      CLI::Fun_.class_exec do
-        remove_method :stylify
-        define_method :stylify do p end
-      end
-      p
-    end
-  end
 end

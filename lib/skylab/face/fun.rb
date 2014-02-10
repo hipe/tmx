@@ -31,18 +31,16 @@ module Skylab::Face
 
   module FUN
 
-    _Headless = Library_::Headless
-
     Stdin = -> do
-      _Headless::System::IO.some_stdin_IO
+      Lib_::System_IO[].some_stdin_IO
     end
 
     Stdout = -> do
-      _Headless::System::IO.some_stdout_IO
+      Lib_::System_IO[].some_stdout_IO
     end
 
     Stderr = -> do
-      _Headless::System::IO.some_stderr_IO
+      Lib_::System_IO[].some_stderr_IO
     end
 
     Three_streams = -> do

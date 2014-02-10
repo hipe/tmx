@@ -7,6 +7,7 @@ module Skylab::TMX::TestSupport
 
   module CONSTANTS
     Face = ::Skylab::Face
+    MetaHell = ::Skylab::MetaHell
     TestSupport = ::Skylab::TestSupport
     TMX = ::Skylab::TMX
   end

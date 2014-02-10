@@ -10,7 +10,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::OP_
 
   extend TestSupport::Quickie
 
-  describe "#{ Face }::CLI::API_Integration::OP_" do
+  describe "[fa] CLI::API_Integration::OP_" do
 
     extend TS_
 

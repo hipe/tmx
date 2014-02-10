@@ -8,7 +8,7 @@ module Skylab::Face::TestSupport::CLI::DSL_Off
 
   CONSTANTS::Common_setup_[ self, :sandbox ]
 
-  describe "#{ Face::CLI } dsl off" do
+  describe "[fa] CLI DSL off" do
 
     extend CLI_TestSupport::API_Integration
     extend DSL_Off_TestSupport

@@ -1,26 +1,12 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
 module Skylab::Face::TestSupport::API::Service
 
-  ::Skylab::Face::TestSupport::API[ Service_TestSupport = self ]
-
-  module Sandbox
-    # mine.
-  end
-
-  module CONSTANTS
-    Sandbox = Sandbox
-  end
-
-  include CONSTANTS
-
-  extend TestSupport::Quickie
-
-  Face = Face
+  ::Skylab::Face::TestSupport::TestLib_::Sandboxify[ self ]
 
   describe "extend module x with Face::API and use services" do
 
-    extend Service_TestSupport
+    extend TS_
 
     context "when service is not declared" do
 
@@ -30,17 +16,22 @@ module Skylab::Face::TestSupport::API::Service
           class API::Actions::W < Face::API::Action
             services :nerk
           end
+          Face::Autoloader_[ self ]
         end
       end
 
       it "borks on invoke - custom exception" do
         -> do
           nc::API.invoke :w, never: :see
-        end.should raise_error(
+        end.should raise_this_error
+      end
+
+      def raise_this_error
+        raise_error(
           Face::Plugin::DeclarationError,
           /Client has not declared the required service "nerk" declared #{
             }as needed by .+API::Actions::W\./
-        )
+       )
       end
     end
 
@@ -61,6 +52,7 @@ module Skylab::Face::TestSupport::API::Service
               nerk
             end
           end
+          Face::Autoloader_[ self ]
         end
       end
 
@@ -93,6 +85,7 @@ module Skylab::Face::TestSupport::API::Service
               "<yup:#{ nerk }>"
             end
           end
+          Face::Autoloader_[ self ]
         end
       end
 
@@ -136,6 +129,7 @@ module Skylab::Face::TestSupport::API::Service
               "<yup-x:#{ @zoidberg.call }>"
             end
           end
+          Face::Autoloader_[ self ]
         end
       end
 

@@ -23,7 +23,7 @@ module Skylab::Face::TestSupport::CLI::Namespace::Skip
         end, :skip, true, :aliases, ['tt']
       end
     end
-    class TT < Face::Namespace
+    class TT < Face::CLI::Namespace
       def bar
       end
     end
@@ -31,7 +31,7 @@ module Skylab::Face::TestSupport::CLI::Namespace::Skip
 
   do_invoke = Do_invoke_[]
 
-  describe "#{ Face::CLI }::Namespace desc" do
+  describe "[fa] Namespace desc" do
 
     extend This_TestSupport
 
@@ -61,6 +61,6 @@ module Skylab::Face::TestSupport::CLI::Namespace::Skip
   end
 
   if do_invoke  # try executing this file directly, passing '-x'
-    Wiffle::CLI::Client.new( nil, SO_, SE_ ).invoke( ::ARGV )
+    Wiffle::CLI::Client.new( nil, * TestLib_::Sout_serr[] ).invoke( ::ARGV )
   end
 end

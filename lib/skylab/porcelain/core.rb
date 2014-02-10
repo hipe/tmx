@@ -1,16 +1,19 @@
 require_relative '..'
 
 require 'skylab/callback/core'
-require 'skylab/face/core'
-require 'skylab/headless/core'
 
 module Skylab
 
   module Porcelain
 
-    %i| Callback Face Headless MetaHell Porcelain |.each do |i|
-      const_set i, ::Skylab.const_get( i, false )
-    end
+    Callback = ::Skylab::Callback
+    Autoloader_ = Callback::Autoloader
+    o = Autoloader_.method :require_sidesystem
+
+    Face = o[ :Face ]
+    Headless = o[ :Headless ]
+    MetaHell = o[ :MetaHell ]
+    Porcelain = self
 
     # headless in porcelain yes. headles trumps porcelain.
 

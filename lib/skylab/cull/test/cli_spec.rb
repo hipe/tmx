@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Cull::TestSupport
 
-  describe "#{ Cull }" do
+  describe "[cu]" do
 
     extend Cull_TestSupport
 

@@ -4,20 +4,12 @@ module Skylab::Face::TestSupport::API
 
   ::Skylab::Face::TestSupport[ API_TestSupport = self ]
 
-  module CONSTANTS
-    MetaHell = Face::MetaHell
-    MAARS = Face::MAARS
-  end
-
   include CONSTANTS
 
   Face = Face
-  MetaHell = MetaHell
-  MAARS = MAARS
 
   module Sandbox
-    MAARS[ self ]
+    Face::Autoloader_[ self ]
   end
 
-  CONSTANTS::Sandbox = Sandbox
 end

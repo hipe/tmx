@@ -77,19 +77,19 @@ module Skylab::Face
 
   Model::Event::Aggregate = Model::Event.new do |a|
     o = ''
-    Library_::Basic::List::Evented::Articulation a do
+    Lib_::NLP_evented_list_articulation[ a, -> do
       iff_zero_items               ->     { o << '(empty)' }
       any_first_item               ->   x { o << "#{ x.message_proc[] }" }
 
       any_subsequent_items -> x do
-        if Library_::Headless::CLI::FUN::Looks_like_sentence[ o ]
+        if Lib_::Text_is_perhaps_a_sentence[ o ]
           sep = ' '
         else
           sep ' - '
         end
         o << "#{ sep }#{ x.message_proc[] }"
       end
-    end
+    end ]
     o
   end
 end

@@ -6,7 +6,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::WOU
 
   CONSTANTS::Common_setup_[ self, :sandbox ]
 
-  describe "#{ Face::CLI } API event integration" do
+  describe "[fa] API event integration" do
 
     extend CLI_TestSupport
     extend WOU_TestSupport  # so CONSTANTS (Sandbox) is visible in i.m's
@@ -31,7 +31,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::WOU
               namespace :foo, -> { CLI::Actions::Foo }
             end
             module Actions
-              class Foo < Face::Namespace
+              class Foo < Face::CLI::Namespace
                 use :api
                 def bar x
                   api x

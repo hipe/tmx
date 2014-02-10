@@ -8,12 +8,12 @@ module Skylab::Snag
     const_set i, ::Skylab.const_get( i, false )
   end
 
+  MetaHell::MAARS[ self ]
+
   module Core
-    MetaHell::MAARS[ self ]
+    MetaHell::MAARS::Upwards[ self ]
   end
 
   IDENTITY_ = -> x { x }
-
-  ::Skylab::Subsystem[ self ]
 
 end

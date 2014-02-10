@@ -1,65 +1,172 @@
-require_relative '..'
+require_relative '../callback/core'
 
-require 'skylab/meta-hell/core'
+module Skylab::Face  # read [#011] the top node narrative
 
-module Skylab::Face
-
-  %i| Face MetaHell |.each do |i|
-    const_set i, ::Skylab.const_get( i, false )
-  end
-
-  ::Skylab::Subsystem[ self ]
-
-  stowaway :TestSupport, 'test/test-support'  # [#mh-030] for [#045]
+  Callback_ = ::Skylab::Callback
+  Autoloader_ = Callback_::Autoloader
 
   module API
-    MAARS[ self ]
     def self.[] mod
-      const_get( :Client, false )._enhance mod
+      const_get( :Client, false ).enhance_anchor_mod mod
       nil
     end
+
+    Autoloader_[ self ]
   end
 
   module Library_  # :+[#su-001]
 
-    MAARS[ self ]
-
-    stdlib, subsys = ::Skylab::Subsystem::FUN.
-      at :require_stdlib, :require_subsystem
+    stdlib = Autoloader_.method :require_stdlib
     o = { }
-    o[ :Basic ] = o[ :Headless ] = subsys
     o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
-    o[ :Open3 ] = stdlib
-    o[ :Porcelain ] = o[ :Callback ] = subsys
-    o[ :Set  ] = o[ :StringIO ] = stdlib
+    o[ :Open3 ] =
+    o[ :Set  ] =
+    o[ :StringIO ] = stdlib
 
-    define_singleton_method :const_missing do |c|
-      if o.key? c
-        const_set c, o.fetch( c )[ c ]
-      else
-        super c
-      end
+    define_singleton_method :const_missing do |i|
+      p = o[ i ] or super i
+      const_set i, p[ i ]
+    end
+  end
+
+  module Lib_
+
+    memo, sidesys = Autoloader_.at :memoize, :build_require_sidesystem_proc
+
+    Arity_space_create = -> p, p_ do
+      Headless__[]::Arity::Space.create p, & p_
+    end
+
+    Basic__ = sidesys[ :Basic ]
+
+    Box_class = -> do
+      Basic__[]::Box
+    end
+
+    Box = -> do
+      Basic__[]::Box.new
+    end
+
+    Counting_yielder = -> p do
+      Basic__[]::Yielder::Counting.new( & p )
+    end
+
+    DSL_DSL_story = -> * a do
+      MetaHell__[]::DSL_DSL::Story_.new( * a )
+    end
+
+    EN_add_private_methods_to_module = -> i_a, mod do
+      Headless__[]::SubClient::EN_FUN[ mod, :private, i_a ]
+    end
+
+    EN_oxford_or = -> s_a do
+      Callback_::Oxford_or[ s_a ]
+    end
+
+    Field_box_enhance = -> x, p do
+      Basic__[]::Field::Box.enhance x, & p
+    end
+
+    Field_class = -> do
+      Basic__[]::Field
+    end
+
+    Fields = -> mod, * field_i_a do
+      MetaHell__[]::FUN::Fields_.add_field_i_a_to_mod field_i_a, mod
+    end
+
+    Fields_from_methods = -> p do
+      MetaHell__[]::FUN::Fields_::From_.methods( & p )
+    end
+
+    Fields_via = -> * x_a do
+      MetaHell__[]::FUN::Fields_.via_iambic x_a
+    end
+
+    Funcy = -> mod do
+      MetaHell__[]::Funcy[ mod ]
+    end
+
+    Headless__ = sidesys[ :Headless ]
+
+    Inspect_proc = -> do
+      Basic__[]::FUN::Inspect__
+    end
+
+    MetaHell__ = sidesys[ :MetaHell ]
+
+    Module_mutex_proc = -> do
+      MetaHell__[]::Module::Mutex
+    end
+
+    Module_accessors = -> x, p=nil do
+      MetaHell__[]::Module::Accessors.enhance x, & p
+    end
+
+    Name_from_constant = -> i do
+      Headless__[]::Name::Function::From::Constant.new i
+    end
+
+    Name_from_symbol = -> i do
+      Headless__[]::Name::Function.new i
+    end
+
+    Name_module_moniker = -> x do
+      Headless__[]::Name::FUN::Module_moniker[ x ]
+    end
+
+    Name_slugulate = -> i do
+      Callback_::Name.from_variegated_symbol( i ).as_slug
+    end
+
+    Nice_proxy = -> * i_a do
+      MetaHell__[]::Proxy::Nice.new( * i_a )
+    end
+
+    NLP_aggregated_list_articulation = -> a, p do
+      Basic__[]::List::Aggregated::Articulation a, & p
+    end
+
+    NLP_evented_list_articulation = -> a, p do
+      Basic__[]::List::Evented::Articulation a, & p
+    end
+
+    Open_box = -> do
+      MetaHell__[]::Formal::Box::Open.new
+    end
+
+    Parse_series = -> * x_a do
+      MetaHell__[]::FUN.parse_series[ * x_a ]
+    end
+
+    Plugin_lib = -> do
+      Face_::Plugin
+    end
+
+    Procs_as_methods = -> * i_a do
+      MetaHell__[]::Function::Class.new( * i_a )
+    end
+
+    Scanner_for_array = -> a do
+      Basic__[]::List::Scanner::For::Array.new a
+    end
+
+    System_IO = memo[ -> do
+      Headless__[]::System::IO
+    end ]
+
+    Text_is_perhaps_a_sentence = -> s do
+      Headless__[]::CLI::FUN::Looks_like_sentence[ s ]
+    end
+
+    Touch_proc = -> do
+      MetaHell__[]::Module::Accessors::Puff
     end
   end
 
   Some_ = -> x { x && x.length.nonzero? }
 
-  module Magic_Touch_  # local metaprogramming tightener for this pattern
-    # (tracked as [#046])
-
-    # Magic_Touch_ is an #experimental facility for lazy-loading libraries
-    # based on when particular methods are called. how it works is, given:
-    #   module [ :singleton ] ( :public | :private ) method [ method [..] ]
-    # and given a function that loads a library
-    #   ** that overrides those methods with new definitions of them **
-    # this makes stub definitions for those methods that, when any such method
-    # is called it loads the library (which hopefully re-defines this method),
-    # and then re-calls the "same" method with the hopefully new definition.
-    # i.e this allows us to lazy-load libraries catalyzed by when these
-    # particular "magic methods" are called that "wake" the library up.
-    # failure of the library to override these methods results in infinite
-    # recursion. this feels sketchy but has several benefits to be discussed
-    # elsewhere.
+  module Magic_Touch_  # [#046] #magic-touch (in [#011])
 
     do_private_h = { public: false, private: true }.freeze
 
@@ -84,38 +191,7 @@ module Skylab::Face
     end
   end
 
-  class Set_  # general purpose application tree configuration API.
-    # you create one SET_ function at the top-ish of your library, after you've
-    # you've declared some proxy classes or mechanical classes (the workhorses
-    # of the matryoshka doll [#040] stack.) you create it by giving it an
-    # ordered list of symbolic names representing your proxy classes, and then
-    # a hash with the classes themselves keyed to those names:
-    #
-    #     SET_ = Set_.new( [:hi, :mid, :lo], hi: App, mid: NS, lo: Cmd )
-    #
-    # when you want to add a field to your stack, you call your SET_ function
-    # with a symbolic name for the field, perhaps a default, and perhaps a
-    # `highest` and `lowest` markers (using the symbolic names for the proxy
-    # classes you set above), indicating the top and bottom of the call chain:
-    #
-    #     SET_[ :timeout, :lowest, :mid, :default, 30 ]
-    #
-    # the call to the SET_ function will then **add methods** to your proxy
-    # classes to manage making them locally settable and globally accessible
-    # to each other as appropriate. in the example above, the classes `App`
-    # and `NS` are both given setters named `set_timeout_value( x )`. `Cmd`
-    # is not touched because it was not within the range that was determined
-    # at the bottom end by the `lowest` directive, which said `mid`, which is
-    # `NS`.
-    #
-    # `NS` is then given a getter method `get_timeout_value` which results
-    # in the value of its ivar `@timeout_value` IFF one is defined. if such
-    # an ivar does not exist, the `NS` will delegate the call upwards..
-    #
-    # (#todo more on this..)
-    #
-    # to quote that guy from Mackelmore, this is really quite awesome.
-    #
+  class Set_  # see [#011]:#set
 
     -> do  # `initialize`
 
@@ -205,9 +281,8 @@ module Skylab::Face
     end
   end
 
-  class Services_  # ( basically a miniature version of Face::Plugin..
-    # because it is used by CLI and we want to use it in API we put it here,
-    # elsewise why are you using face !? ^_^)
+  class Services_
+    # (either deprected or due for a cleanup. used by CLI & API. [#hl-070])
 
     SERVICES_IVAR_ = nil
     class << self
@@ -246,10 +321,6 @@ module Skylab::Face
           defn_blk and absorb_services_defn_blk defn_blk
           self
         end
-      end
-
-      def ___provider  # #todo wat
-        @provider.call
       end
 
     private
@@ -370,7 +441,7 @@ module Skylab::Face
           def self.collapse
             super
             a = @formal_arg_a ; @formal_arg_a = nil
-            box = const_set :SERVICES_, Library_::Basic::Box.new
+            box = const_set :SERVICES_, Lib_::Box[]
             begin
               box.add (( i = a.shift )), a.shift
               define_method( i ) { self[ i ] }
@@ -417,4 +488,14 @@ module Skylab::Face
         self::SERVICES_._a.dup
       end
     end
+
+  Face_ = self
+
+  Name_ = Callback_::Name
+
+  MONADIC_TRUTH_ = -> _ { true }
+
+  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+
+  stowaway :TestSupport, 'test/test-support'  # [#mh-030] for [#045]
 end

@@ -244,7 +244,7 @@ module Skylab::Test
         end
         [ * arg_a,
           ::Enumerator::Yielder.new do |msg|
-            iy << Test::Lib_::Reparenthesize[ msg, say ]
+            iy << Test::Lib_::Reparenthesize[ say, msg ]
           end,
           ::Enumerator::Yielder.new do |msg|
             ok = false

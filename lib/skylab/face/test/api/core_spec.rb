@@ -1,18 +1,12 @@
 require_relative 'test-support'
 
-module Skylab::Face::TestSupport::API
+module Skylab::Face::TestSupport::API::Core_Spec_
 
-  extend TestSupport::Quickie
+  ::Skylab::Face::TestSupport::TestLib_::Sandboxify[ self ]
 
   describe "extend module x with Face::API and you get `x::API.invoke` that" do
 
-    extend API_TestSupport
-
-    def raise_this_error  # (let the below be the only place that the
-      raise_error( ::RuntimeError,  # <- particular class is asserted)
-        /isomorphic API action resolution failed - #{
-          }.*no.+constant.+isomorph.+"foo"/i )
-    end
+    extend TS_
 
     context "against the minimal case" do
 
@@ -22,7 +16,23 @@ module Skylab::Face::TestSupport::API
         end
       end
 
-      it "try to invoke anything - raises boxxy name not found error" do
+      it "will complain about dpn missing" do
+        -> do
+          nightclub::API.invoke :foo
+        end.should raise_error ::NoMethodError, %r(\Aneeds '?dir_pathname'?)
+      end
+    end
+
+    context "when dir pathname can be resolved" do
+
+      define_sandbox_constant :nightclub do
+        module Sandbox::Nightclub_1_B
+          Face::API[ self ]
+          Face::Autoloader_[ self ]
+        end
+      end
+
+      it "try to invoke anything - raises boxxy-esque name not found error" do
         -> do
           nightclub::API.invoke :foo
         end.should raise_this_error
@@ -38,6 +48,7 @@ module Skylab::Face::TestSupport::API
           module API::Actions
           end
           Face::API[ self ]
+          Face::Autoloader_[ self ]
         end
       end
 
@@ -57,6 +68,7 @@ module Skylab::Face::TestSupport::API
             class WahHoo
             end
           end
+          Face::Autoloader_[ self ]
         end
       end
 
@@ -78,6 +90,7 @@ module Skylab::Face::TestSupport::API
               :yerp
             end
           end
+          Face::Autoloader_[ self ]
         end
       end
 
@@ -91,6 +104,12 @@ module Skylab::Face::TestSupport::API
         end.should raise_error( ::NoMethodError,
           /undefined method `normalize'/ )
       end
+    end
+
+    def raise_this_error  # (let the below be the only place that the
+      raise_error( ::RuntimeError,  # <- particular class is asserted)
+        /isomorphic API action resolution failed - #{
+          }.*no.+constant.+isomorph.+"foo"/i )
     end
   end
 end

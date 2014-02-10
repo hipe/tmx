@@ -1,4 +1,4 @@
-require 'skylab/face/cli'
+require 'skylab/face/core'
 
 module Skylab::TMX
   module Modules::Jshint

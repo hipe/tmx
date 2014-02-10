@@ -39,8 +39,8 @@ module Skylab::Face
         act_class.new h
       end
 
-      Shell_A = MetaHell::Proxy::Nice.new :didactic_invocation_string,
-        :send
+      Shell_A = Lib_::Nice_proxy[ :didactic_invocation_string, :send ]
+
     end.call
   end
 end

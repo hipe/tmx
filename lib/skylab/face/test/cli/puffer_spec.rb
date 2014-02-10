@@ -6,7 +6,7 @@ module Skylab::Face::TestSupport::CLI::Puffer
 
   CONSTANTS::Common_setup_[ self ]
 
-  describe "#{ Face::CLI } puffer (hooks)" do
+  describe "[fa] puffer (hooks)" do
 
     extend Puffer_TestSupport
 
@@ -19,7 +19,7 @@ module Skylab::Face::TestSupport::CLI::Puffer
         end
         def foo
         end
-        class self::Mechanics_ < Face::CLI_Mechanics_  # sketchville
+        class self::Mechanics_ < Face::CLI::CLI_Mechanics_  # sketchville
           def puff
             @sheet.node_open!
             @sheet.close_node do |a|

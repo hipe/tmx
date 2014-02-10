@@ -6,7 +6,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Param
 
   CONSTANTS::Common_setup_[ self, :sandbox ]
 
-  describe "#{ Face::CLI } API event integration" do
+  describe "[fa] API event integration" do
 
     extend CLI_TestSupport
     extend Param_TestSupport  # so CONSTANTS (Sandbox) is visible in i.m's
@@ -34,6 +34,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Param
               end
             end
           end
+          Face::Autoloader_[ self ]
         end
       end
 

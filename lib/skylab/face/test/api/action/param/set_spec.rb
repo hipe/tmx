@@ -1,23 +1,10 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-module Skylab::Face::TestSupport::API::Param_Set
+module Skylab::Face::TestSupport::API::Action::Param_Set
 
-  ::Skylab::Face::TestSupport::API[ TS_ = self ]
+  ::Skylab::Face::TestSupport::TestLib_::Sandboxify[ self ]
 
-  module Sandbox
-  end
-
-  module CONSTANTS
-    Sandbox = Sandbox
-  end
-
-  include CONSTANTS
-
-  extend TestSupport::Quickie
-
-  Face = Face
-
-  describe "#{ Face }::API::Action - param - set" do
+  describe "[fa] API::Action - param - set" do
 
     extend TS_
 
@@ -44,6 +31,7 @@ module Skylab::Face::TestSupport::API::Param_Set
               Sandbox::Wizzle.last_msg = msg
             end
           end
+          Face::Autoloader_[ self ]
         end
       end
 
@@ -56,4 +44,3 @@ module Skylab::Face::TestSupport::API::Param_Set
     end
   end
 end
-

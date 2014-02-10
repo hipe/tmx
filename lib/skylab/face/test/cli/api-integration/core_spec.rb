@@ -6,7 +6,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Core
 
   CONSTANTS::Common_setup_[ self, :sandbox ]
 
-  describe "#{ Face::CLI } API integration (core)" do
+  describe "[fa] API integration (core)" do
 
     extend CLI_TestSupport
     extend Core_TestSupport  # so CONSTANTS (Sandbox) is visible in i.m's
@@ -50,9 +50,6 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Core
         r = invoke 'foo'
         r.should eql( :foo_it_is )
       end
-
-      # (NOTE having two tests above it clutch - it catches some things
-      # like that API::Client._enhance is actually re-runnable.)
     end
   end
 end

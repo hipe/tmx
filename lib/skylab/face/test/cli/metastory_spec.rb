@@ -6,7 +6,7 @@ module Skylab::Face::TestSupport::CLI::Metastory
 
   CONSTANTS::Common_setup_[ self, :sandbox ]
 
-  describe "#{ Face }::CLI metastories" do
+  describe "[fa] CLI metastories" do
 
     extend Metastory_TestSupport
 
@@ -134,9 +134,9 @@ module Skylab::Face::TestSupport::CLI::Metastory
       module Sandbox::CLI
         class Client < Face::CLI
         end
-        class Particular_Namespace < Face::Namespace
+        class Particular_Namespace < Face::CLI::Namespace
         end
-        class Particular_Command < Face::Command  # not in the wild
+        class Particular_Command < Face::CLI::Command  # not in the wild
         end
       end
     end

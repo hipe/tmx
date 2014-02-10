@@ -1,4 +1,4 @@
-module Skylab::Face
+class Skylab::Face::CLI
 
   # ~ facet 5.3x - recursively nested namespaces and ns properties ~
 
@@ -116,7 +116,7 @@ module Skylab::Face
     end
 
     def bld_child_namespace_sheet norm_i, a, p  # :#jump-2
-      nf = Library_::Headless::Name::Function.new norm_i
+      nf = Lib_::Name_from_symbol[ norm_i ]
       mp, xtra_x = prs_ns_args a
       assrt_exactly_one mp, p
       if mp
@@ -254,7 +254,7 @@ module Skylab::Face
 
     def init_with_local_normal_name i  # for hacks, exploration
       @name and fail "won't clobber existing name"
-      @name = Library_::Headless::Name::Function.new i
+      @name = Lib_::Name_from_symbol[ i ]
       self
     end
   end
@@ -277,7 +277,7 @@ module Skylab::Face
           raise ::KeyError, "bad number of args to build a namespace #{
             }(#{ k }), expecting #{ a_len.keys * ' or ' }"
         end.call( * a )
-        _enhance surface, h
+        enhance_surface_with_h surface, h
       end
     end.call
 

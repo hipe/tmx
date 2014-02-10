@@ -8,7 +8,7 @@ module Skylab::Face
 
   class API::Client
 
-    Face::Metastory.enhance self, :API_, :Modality_Client_
+    Face_::Metastory.enhance self, :API_, :Modality_Client_
 
   end
 end

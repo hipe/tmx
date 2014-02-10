@@ -4,7 +4,7 @@ module Skylab::CodeMolester
 
     # extend any class with services related to file-based config
 
-    Lib_::Field_reflection[ self ]
+    CodeMolester::Lib_::Field_reflection[ self ]
 
     # ~ section 1 - the actual enhancing of your nerklette
 
