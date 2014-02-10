@@ -54,7 +54,7 @@ module Skylab::GitViz
       self::Headless__[]::Name::FUN::Local_normal_name_from_module[ x ]
     end
 
-    Memoize = Callback_::Memoize
+    Memoize = Callback_.memoize
     MetaHell__ = wall[ :MetaHell ]
     MD5 = memo[ -> do require 'digest/md5' ; ::Digest::MD5 end ]
     Open3 = stdlib[ :Open3 ]

@@ -6,9 +6,10 @@ module Skylab::Callback::TestSupport
 
   module CONSTANTS
     Callback = Callback
+    TestSupport = Callback::Autoloader.require_sidesystem :TestSupport
   end
 
-  Callback::Autoloader.require_sidesystem( :TestSupport )::Regret[ self ]
+  CONSTANTS::TestSupport::Regret[ self ]
 
   module InstanceMethods
 

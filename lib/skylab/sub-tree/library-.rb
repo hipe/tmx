@@ -83,7 +83,7 @@ module Skylab::SubTree
     end
 
     Distill_proc = -> do
-      Callback_::FUN::Distill_proc[]
+      Callback_.distill
     end
 
     EN_add_methods = -> * i_a do

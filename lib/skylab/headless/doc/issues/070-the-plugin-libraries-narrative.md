@@ -39,16 +39,19 @@ is outside the scope of this document ^_^ #yolo ¯\_(ツ)_/¯
 
 ## a one-line summary of each item
 
- 6. [gv] custom plugin facility (the best)  Jan.,  2014
+ 6. [hl] import [gv]'s custom facility (best)   Jan.,  2014
  5. [ts] quickie rolls a custom solution        June,  2013
  4. [fa] the forgettable 'Services_'            June,  2013
- 3. [hl] Plugin abstracted out of test/all      April, 2013
+ 3. [fa] Plugin abstracted out of test/all      April, 2013
  2. [tr] "adapter" (plugin) facility            June,  2012
  1. [as] an "assesss" take on plugins           March, 2010
 
 
 
 ## library 6 of N: [gv] rolls an intra-reusable solution
+
+(EDIT: this was so excellent and simple, that headless's contemporary solution
+was bumped over to face and this was bumped up to headless.)
 
 although every collection of code has its own reasons for doing things in its
 own weird way, this particular solution calls itself "the best" for the
@@ -60,11 +63,13 @@ following reasons:
      corresponding callback methods, so here they all follow the name pattern
      /^on_.+/, as do all event channels.
   • rather than the complex API of 'meta-services' that [hl] employs, here
-    the plugin host simply implements one lone "plugin shell" subclass
+    the plugin host simply implements one lone "plugin conduit" subclass
     that will be used for two-way communication from host to plugin.
   • plugins need not subclass anything in particular; they derive services
     from the host via the shell passed to them in their construction, and
-    they subscribe to events via following the method-naming patterne
+    they subscribe to events via following the method-naming patterns
+    (that is, subscribing to events and declaring public methods with
+    particulr names are one and the same.)
   • we offer a *much* simplifield solution to the "crowded namespace"
     problem of different plugins wanting to define different options: each
     plugin automatically gets its name appended to each option it defines

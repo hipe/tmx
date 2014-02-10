@@ -24,7 +24,7 @@ module Skylab::MetaHell
     Callback__ = memo[ -> { Library_::Callback } ]
 
     Distill_proc = -> do
-      Callback__[]::FUN::Distill_proc[]
+      Callback__[].distill
     end
   end
 end

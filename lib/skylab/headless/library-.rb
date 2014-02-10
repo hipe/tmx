@@ -30,7 +30,7 @@ module Skylab::Headless
 
     # ~ just do it live and implement small things here potentially redundantly
 
-    Memoize = Callback_::Memoize
+    Memoize = Callback_.memoize
 
     def self.const_missing i
       const_set i, @o.fetch( i )[ i ]

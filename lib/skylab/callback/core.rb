@@ -6,16 +6,173 @@ module Skylab::Callback
     self::Bundles.apply_iambic_on_client x_a, mod
   end
 
-  module Autoloader  # read [#024] the new autolader narrative
+  module Autoloader  # read [#024] the new autoloader narrative
 
     class << self
+
       def [] mod, * x_a
         if x_a.length.zero?
-          mod.extend Deferred_Methods__
+          mod.respond_to? :dir_pathname and raise say_not_idempotent( mod )
+          mod.extend Triggering_Methods__, Universal_Base_Methods__
         else
           employ_iambic_fully x_a, mod
         end
+        mod
       end
+
+      def at *a
+        @at_h ||= {}
+        a.map { |i| @at_h.fetch( i ) { @at_h[ i ] = method i } }
+      end
+
+      def build_require_sidesystem_proc i
+        memoize { require_sidesystem i }
+      end
+
+      def build_require_stdlib_proc i
+        memoize { require_stdlib i }
+      end
+
+      def const_reduce *a, &p
+        self::Const_Reduction__::Dispatch[ a, p ]
+      end
+
+      def memoize *a, &p
+        Memoize_[ ( p ? a << p : a ).fetch a.length - 1 << 1 ]
+      end
+
+      def require_quietly const_i_or_path_s
+        without_warning do
+          if Name.is_valid_const const_i_or_path_s
+            require_stdlib const_i_or_path_s
+          else
+            require const_i_or_path_s
+          end
+        end
+      end
+    private
+      def without_warning
+        prev = $VERBOSE ; $VERBOSE = nil
+        r = yield  # 'ensure' is out of scope
+        $VERBOSE = prev ; r
+      end
+    public
+
+      define_method :require_sidesystem, -> do
+        sl_path = -> do
+          x = Callback.dir_pathname.dirname.to_path ; sl_path = -> { x } ; x
+        end
+        require_single_sidesystem = -> const_i do
+          _stem = Name.from_const( const_i ).as_slug
+          require "#{ sl_path[] }/#{ _stem }/core"
+          ::Skylab.const_get const_i, false
+        end
+        p = -> * i_a do
+          case i_a.length <=> 1
+          when -1 ; p
+          when  0 ; require_single_sidesystem[ i_a.first ]
+          else    ; i_a.map( & require_single_sidesystem )
+          end
+        end
+      end.call
+
+      def require_stdlib const_i
+        require const_i.downcase.to_s  # until it's useful to, no inflection
+        ::Object.const_get const_i
+      end
+    end
+
+    # ~ the default starter methods (read [#024]:the-four-method-modules-method)
+
+    module Triggering_Methods__  # #the-triggering-methods
+
+      def const_missing i
+        insist_on_dir_pathname
+        const_missing i
+      end
+      def dir_pathname
+        insist_on_dir_pathname
+        dir_pathname
+      end
+      def get_const_missing name_x, _guess_i  # #hook-in
+        insist_on_dir_pathname
+        Const_Missing__.new self, @dir_pathname, name_i
+      end
+      def pathname
+        self._DO_ME  # #todo
+      end
+      def to_path
+        insist_on_dir_pathname
+        to_path
+      end
+    private
+      def insist_on_dir_pathname
+        s_a = name.split '::'
+        last_s = s_a.pop
+        mod = s_a.reduce( ::Object ) { |m, s| m.const_get s, false }
+        mod.respond_to? :dir_pathname or raise ::NoMethodError, say_dpn( mod )
+        extend Final_Methods__
+        _dpn = mod.dir_pathname.join last_s.gsub( '_', '-' ).downcase
+        set_dir_pn _dpn ; nil
+      end
+      def say_dpn mod
+        "needs dir_pathname: #{ mod }"
+      end
+    end
+
+    module Universal_Base_Methods__  # #the-universal-base-methods
+
+      def enhance_autoloaded_value_with_dir_pathname x, dir_pathname
+        if can_be_enhanced_for_autoloading x
+          Autoloader[ x, dir_pathname ]
+        end
+      end
+    private
+      def can_be_enhanced_for_autoloading x  # not all autoloaded
+        # objects are modules. some autoloaded modules might wire themselves
+        ! x.respond_to? :dir_pathname and x.respond_to? :module_exec
+      end
+
+    public
+      attr_reader :stowaway_h
+    private
+      def stowaway i, path
+        ( @stowaway_h ||= {} )[ i ] = path ; nil
+      end
+    end
+
+    self[ self ]  # this occurs at the earliest moment it can (for #grease)
+
+    module Final_Methods__  # #the-final-methods
+      def const_missing i
+        @dir_pathname or super
+        r = Const_Missing__.new( self, @dir_pathname, i ).load_and_get
+        r
+      end
+      def const_missing_class
+        :_has_one_  # #comport to oldschoool a.l
+      end
+      attr_reader :dir_pathname
+      def to_path
+        pathname.to_path
+      end
+      def pathname
+        @dir_pathname.sub_ext EXTNAME_
+      end
+      def get_const_missing name_x, _guess_i  # #hook-in
+        Const_Missing__.new self, @dir_pathname, name_x
+      end
+      def init_dir_pathname x  # #comport #storypoint-265
+        set_dir_pn x
+      end
+      def set_dir_pn x  # compare more elaborate [sl] `init_dir_pathname`
+        @dir_pathname = x ; nil
+      end
+    end
+
+    # ~ the handling of extended autoloader options: [ dir_pn ] [ 'boxxy' ]
+
+    class << self
     private
       def employ_iambic_fully x_a, mod
         Employment_Parse__.new( self, x_a, mod ).parse
@@ -25,31 +182,38 @@ module Skylab::Callback
         self::POSSIBLE_P_A__
       end
     private
-      def boxxy_keyword i
-        if :boxxy == i
+
+      # (when both of below occur they are always processed in this order)
+
+      def dir_pathname_argument x
+        if x.respond_to? :relative_path_from
           -> employer_mod do
-            employer_mod.respond_to?( :dir_pathname ) or
-              employer_mod.extend Deferred_Methods__
+            employer_mod.module_exec do
+              @dir_pathname = x
+              extend Final_Methods__, Universal_Base_Methods__
+            end
+          end
+        end
+      end
+      def boxxy_keyword x
+        if :boxxy == x
+          -> employer_mod do
+            employer_mod.respond_to? :dir_pathname or
+              employer_mod.extend Triggering_Methods__, Universal_Base_Methods__
             employer_mod.extend Boxxy_Methods__ ; nil
           end
         end
       end
-      def dir_pathname_argument pn
-        if pn.respond_to? :relative_path_from
-          -> employer_mod do
-            employer_mod.module_exec do
-              @dir_pathname = pn
-              extend Methods__
-            end
-          end
-        end
+
+      def say_not_idempotent mod  # #storypoint-50
+        "this operation is not idempotent. autoloader will not enhance #{
+          }an object that already responds to 'dir_pathname': #{ mod }"
       end
     end
 
     POSSIBLE_P_A__ = [
       method( :dir_pathname_argument ),
       method( :boxxy_keyword ) ].freeze
-
 
     class Employment_Parse__
 
@@ -107,103 +271,128 @@ module Skylab::Callback
       end
     end
 
-    def self.at *a
-      @at_h ||= {}
-      a.map do |i|
-        @at_h.fetch i do
-          @at_h[ i ] = method i
-        end
-      end
-    end
-
-    # ~ functions often used in loading (may purify predecessors :+[#ss-002])
-
-    class << self
-
-      def build_require_sidesystem_proc i
-        memoize { require_sidesystem i }
-      end
-
-      def build_require_stdlib_proc i
-        memoize { require_stdlib i }
-      end
-
-      def memoize *a, &p
-        Memoize[ ( p ? a << p : a ).fetch a.length - 1 << 1 ]
-      end
-    end
-
-    define_singleton_method :require_sidesystem, -> do
-      sl_path = -> do
-        x = Callback.dir_pathname.dirname.to_path ; sl_path = -> { x } ; x
-      end
-      require_single_sidesystem = -> const_i do
-        _stem = Name.from_const( const_i ).as_slug
-        require "#{ sl_path[] }/#{ _stem }/core"
-        ::Skylab.const_get const_i, false
-      end
-      -> * i_a do
-        if 1 == i_a.length
-          require_single_sidesystem[ i_a.first ]
-        else
-          i_a.map( & require_single_sidesystem )
-        end
-      end
-    end.call
-
-    class << self
-
-      def require_quietly const_i_or_path_s
-        without_warning do
-          if Name.is_valid_const const_i_or_path_s
-            require_stdlib const_i_or_path_s
-          else
-            require const_i_or_path_s
-          end
-        end
-      end
-    private
-      def without_warning
-        prev = $VERBOSE ; $VERBOSE = nil
-        r = yield  # 'ensure' is out of scope
-        $VERBOSE = prev ; r
-      end
-    public
-
-      def require_stdlib const_i
-        require const_i.downcase.to_s  # until it's useful to, no inflection
-        ::Object.const_get const_i
-      end
-    end
-
-    # ~
-
-    module Boxxy_Methods__
+    module Boxxy_Methods__  # #the-boxxy-methods
       def const_defined? const_i, up=false
-        is_indexed_for_boxxy or index_for_boxxy
-        yes = @boxxy_h[ const_i ]
+        is_indexed_for_boxxy or constants
+        yes = @boxxy_index.const_might_be_defined const_i
         yes or super
       end
       def constants
+        a = super
         if ! is_indexed_for_boxxy
-          index_for_boxxy
+          index_for_boxxy a
         end
-        [ * super, * @boxxy_a ].uniq
+        [ * a, * @boxxy_a ]
       end
       attr_reader :is_indexed_for_boxxy
     private
-      def index_for_boxxy
-        @is_indexed_for_boxxy = true ; a = [] ; h = {}
-        dir_pathname.children( false ).each do |pn|
-          path = pn.to_path  # #storypoint-50
+      def index_for_boxxy a
+        @is_indexed_for_boxxy = true
+        @boxxy_index = Index_For_Boxxy_.
+          new( @boxxy_a = [] , self, dir_pathname, a ).index ; nil
+      end
+    public
+      def resolve_some_name_when_already_loaded name
+        Boxxy_Correction_.new( self, name, @boxxy_index ).reify_correction
+      end
+
+      def enhance_autoloaded_value_with_dir_pathname x, dir_pathname
+        if can_be_enhanced_for_autoloading x
+          Autoloader[ x, dir_pathname, :boxxy ]
+        end
+      end
+    end
+
+    class Index_For_Boxxy_
+      def initialize a, mod, dpn,  a_
+        @boxxy_a = a ; @dir_pathname = dpn ; @existing_a = a_ ; @mod = mod
+      end
+      def index
+        if @dir_pathname.exist?
+          index_when_directory
+        else
+          index_when_no_directory
+        end
+      end
+    private
+      def index_when_no_directory
+        Boxxy_Index_.new nil
+      end
+      def index_when_directory
+        @paths = @dir_pathname.children false
+        reduce_paths_to_normal_a
+        get_busy
+      end
+      def reduce_paths_to_normal_a
+        @normal_a = nil
+        h = { }
+        @paths.each do |pn|
+          path = pn.to_path
           slug, extname = path.split SPLIT_EXTNAME_RX_
           ! extname || extname =~ EXTENSION_PASS_FILTER_RX_ or next
           const_i = Constify_if_possible_[ slug ]
           const_i or next
           h[ const_i ] and next  # e.g both "foo.rb" and "foo/"
-          a << const_i ; h[ const_i ] = true
+          h[ const_i ] = true
+          ( @normal_a ||= [] ) << const_i
+        end ; nil
+      end
+      def get_busy
+        @existing_a.length.nonzero? and pare_normals  # #storypoint-240
+        @boxxy_a.concat @normal_a
+        Boxxy_Index_.new( @boxxy_a )
+      end
+      def pare_normals
+        loaded_h = ::Hash[ @existing_a.map { |i| [ Distill_[ i ], true ] } ]
+        @normal_a.reject! { |i| loaded_h[ Distill_[ i ] ] } ; nil
+      end
+    end
+
+    class Boxxy_Index_
+      def initialize normal_a
+        @normal_a = normal_a
+        @distilled_h = if normal_a
+          ::Hash[ @normal_a.map { |i| [ Distill_[ i ], i ] } ]
         end
-        @boxxy_a = a.freeze ; @boxxy_h = h.freeze ; nil
+      end
+      def const_might_be_defined x
+        @distilled_h && Name.is_valid_const( x ) &&
+          @distilled_h.key?( Distill_[ x ] )
+      end
+      def make_correction correct_i
+        norm_i = @distilled_h.fetch Distill_[ correct_i ]
+        idx = @normal_a.index norm_i
+        if idx
+          @normal_a[ idx ] = nil
+          @normal_a.compact!
+        end  # #todo - oK?
+      end
+    end
+
+    class Boxxy_Correction_
+      def initialize mod, name, listener
+        @listener = listener ; @mod = mod ; @name = name
+      end
+      def reify_correction
+        @const_a = @mod.constants  # will have fakes in them
+        @incorrect_i = @name.as_const
+        @distilled = Distill_[ @incorrect_i ]
+        @correct_i = @const_a.detect { |i| @distilled == Distill_[ i ] }
+        if @correct_i && @correct_i != @incorrect_i
+          flush_correction
+        else
+          just_say_no
+        end
+      end
+    private
+      def flush_correction
+        @listener.make_correction @correct_i
+        @mod.const_get @correct_i, false
+      end
+      def just_say_no
+        raise ::NameError.new "#{ @mod }( ~ #{ @name.as_variegated_symbol } )#{
+          } must be but appears not to be defined in #{ @mod.pathname }",
+           @incorrect_i
       end
     end
 
@@ -211,70 +400,13 @@ module Skylab::Callback
     SPLIT_EXTNAME_RX_ = %r((?=\.[^.]+\z))
     EXTENSION_PASS_FILTER_RX_ = /\A(?:#{ ::Regexp.escape EXTNAME_ }|)\z/
 
-    Write_stowaway_ = -> i, path do
-      ( @stowaway_h ||= {} )[ i ] = path ; nil
-    end
 
-    module Deferred_Methods__
-      def const_missing i
-        insist_on_dir_pathname
-        const_missing i
-      end
-      def dir_pathname
-        insist_on_dir_pathname
-        dir_pathname
-      end
-      def to_path
-        insist_on_dir_pathname
-        to_path
-      end
-      def get_const_missing name_x, _guess_i  # #hook-in
-        insist_on_dir_pathname
-        Const_Missing__.new self, @dir_pathname, name_i
-      end
-    private
-      def insist_on_dir_pathname
-        s_a = name.split '::'
-        last_s = s_a.pop
-        mod = s_a.reduce( ::Object ) { |m, s| m.const_get s, false }
-        extend Methods__
-        set_dir_pn mod.dir_pathname.join last_s.gsub( '_', '-' ).downcase ; nil
-      end
-      define_method :stowaway, Write_stowaway_
-    end
-
-    module Methods__
-      def const_missing i
-        @dir_pathname or super
-        r = Const_Missing__.new( self, @dir_pathname, i ).load_and_get
-        r
-      end
-      def const_missing_class
-        :_has_one_  # #comport to oldschoool a.l
-      end
-      attr_reader :dir_pathname
-      def to_path
-        @dir_pathname.sub_ext( EXTNAME_ ).to_path
-      end
-      def get_const_missing name_x, _guess_i  # #hook-in
-        Const_Missing__.new self, @dir_pathname, name_x
-      end
-      def init_dir_pathname x  # #comport #storypoint-265
-        set_dir_pn x
-      end
-      def set_dir_pn x  # compare more elaborate [sl] `init_dir_pathname`
-        @dir_pathname = x ; nil
-      end
-
-      attr_reader :stowaway_h
-    private
-      define_method :stowaway, Write_stowaway_
-    end
+    # ~ "runtime" implementation
 
     class Const_Missing__
 
       def initialize mod, dpn, i
-        @dir_pathname = dpn ; @mod = mod ;
+        @dir_pathname = dpn ; @mod = mod
         @name = Name.any_valid_from_const(i) || Name.from_variegated_symbol(i)
       end
 
@@ -286,8 +418,23 @@ module Skylab::Callback
 
       def load_and_get correction_proc=nil
         @correction_proc = correction_proc
-        @slug = @name.as_slug
-        @d_pn = @dir_pathname.join @slug
+        @d_pn = @dir_pathname.join @name.as_slug
+        if Has_been_loaded__[ @d_pn.to_path ]
+          load_and_get_when_has_been_loaded
+        else
+          load_and_get_via_loading
+        end
+      end
+
+      Has_been_loaded__ = -> do  # "cache"
+        h = { } ; -> s do
+          h.fetch( s ) { h[ s ] = true ; nil }
+        end
+      end.call
+
+    private
+
+      def load_and_get_via_loading
         @f_pn = @d_pn.sub_ext EXTNAME_
         if h = @mod.stowaway_h and @stowaway_path = h[ @name.as_const ]
           load_stowaway
@@ -300,8 +447,6 @@ module Skylab::Callback
         end
       end
 
-    private
-
       def when_neither_file_nor_dir_exist
         ex = ::NameError.exception "uninitialized constant #{
          }#{ @mod.name }::#{ @name.as_const } #{
@@ -313,7 +458,7 @@ module Skylab::Callback
         raise ex
       end
 
-      REMOVE_THIS_MANY_ELEMENTS_FROM_THE_STACK__ = 3
+      REMOVE_THIS_MANY_ELEMENTS_FROM_THE_STACK__ = 4
 
       def when_file_exists
         load @f_pn.to_path
@@ -364,15 +509,19 @@ module Skylab::Callback
       end ; CORE_FILE__ = "core#{ EXTNAME_ }".freeze
 
       def enhance_loaded_value mod
-        mod.respond_to? :module_exec and  # not all autoloaded objects are mods
-          Autoloader[ mod, @d_pn ] ; nil
+        @mod.enhance_autoloaded_value_with_dir_pathname mod, @d_pn ; nil
       end
     public
       def correction_notification i
         @name.as_const == i or fail "sanity"  # just for compat with old
       end
+
+    private
+      def load_and_get_when_has_been_loaded
+        @mod.resolve_some_name_when_already_loaded @name  # assumes a lot
+      end
     end
-  end
+  end  # ~ autoloader ends here
 
   class Name  # will freeze any string it is constructed with
     # this only supports the simplified inflection necessary for this app.
@@ -486,10 +635,13 @@ module Skylab::Callback
     SPACE__ = ' '.freeze
     THE_EMPTY_STRING__ = ''.freeze
     UNDERSCORE__ = '_'.freeze
-    VALID_CONST_RX__ = /\A[A-Z][A-Z_a-z]*\z/
+    VALID_CONST_RX__ = /\A[A-Z][A-Z_a-z0-9]*\z/
   end
 
-  # ~ small procs used here, there, everywhere
+
+  # ~ consts & small procs used here, there, somewhere
+
+  Callback = self
 
   Constify_if_possible_ = -> do
     white_rx = %r(\A[a-z][-_a-z0-9]*\z)i
@@ -505,7 +657,33 @@ module Skylab::Callback
     end
   end.call
 
-  Memoize = -> p do
+  def self.distill
+    Distill_
+  end
+
+  Distill_ = -> do  # [#026]:#the-distill-function  :+[#bm-002]
+    black_rx = /[-_ ]+(?=[^-_])/  # preserve final trailing underscores & dashes
+    dash = '-'.getbyte 0
+    empty_s = ''.freeze
+    undr = '_'.getbyte 0
+    -> x do
+      s = x.to_s.gsub black_rx, empty_s
+      d = 0 ; s.setbyte d, undr while dash == s.getbyte( d -= 1 )
+      s.downcase.intern
+    end
+  end.call
+
+  EMPTY_A_ = [].freeze
+
+  EMPTY_P_ = -> { }
+
+  EMPTY_S_ = ''.freeze  # think of all the memory you'll save
+
+  def self.memoize
+    Memoize_
+  end
+
+  Memoize_ = -> p do
     p_ = -> { x = p[] ; p_ = -> { x } ; x }
     -> { p_.call }
   end
@@ -522,7 +700,7 @@ module Skylab::Callback
       last = a.length - 1
       a[ 1 .. -1 ].each_with_index.reduce( [ a.first ] ) do |m, (s, d)|
         m << p[ last - d ] ; m << s ; m
-      end * ''
+      end * EMPTY_S_
     end
   end
 
@@ -533,9 +711,8 @@ module Skylab::Callback
     alias_method :gets, :call
   end
 
-  EMPTY_A_ = [].freeze
-  EMPTY_P_ = -> { }
-  Callback = self
+
+  # ~ "officious" final setup
 
   require 'pathname'
 

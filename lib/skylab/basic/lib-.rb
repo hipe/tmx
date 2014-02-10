@@ -56,7 +56,7 @@ module Skylab::Basic
     end
 
     Memoize = -> x do
-      Callback_::Memoize[ x ]
+      Callback_.memoize[ x ]
     end
 
     MetaHell__ = sidesys[ :MetaHell ]

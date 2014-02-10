@@ -55,3 +55,10 @@ that it upgrades in a regular (i.e trivial) manner into a module. we lose
 the advantes of such bundles as described under "pro's" above, but those
 advantages in such cases have become now become liabilities when you get
 to this point, and the bundle has now matured into its next phase.
+
+
+
+### history
+
+an early and possibly first occurrence of this pattern in the skylab universe
+corresponds with [#fa-055]:#the-invocation-method-added-via-proc.

@@ -60,10 +60,7 @@ module Skylab::Callback
     end
 
     Memoize = -> p do
-      p_ = -> do
-        x = p[] ; p_ = -> { x } ; x
-      end
-      -> { p_[] }
+      Memoize_[ p ]  # as you like it
     end
 
     Name = -> do
@@ -107,7 +104,7 @@ module Skylab::Callback
     end
 
     sidesystem = -> i do
-      Memoize[ -> do
+      Memoize_[ -> do
         Autoloader.require_sidesystem i
       end ]
     end
