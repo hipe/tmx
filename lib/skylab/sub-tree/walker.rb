@@ -8,6 +8,14 @@ module SubTree  # borrow x 1 - load this solo but it needs meta hell
 
     # experimental interface, pub-sub-like, *somewhat*
 
+    def self.new * a
+      if 1 == a.length
+        super a.first
+      else
+        super a
+      end
+    end
+
     CONDUIT__ = {
       listener: -> a { @listener = a.shift ; nil },
       pth: -> a { @pth = a.shift ; nil },
@@ -17,7 +25,7 @@ module SubTree  # borrow x 1 - load this solo but it needs meta hell
       vtuple: -> a { @vtuple = a.shift ; nil }
     }.freeze
 
-    def initialize *a
+    def initialize a
       @convert_relpath_p = @files_file_IO = @path_set = nil
       while a.length.nonzero?
         instance_exec( a, & CONDUIT__.fetch( a.shift ) )

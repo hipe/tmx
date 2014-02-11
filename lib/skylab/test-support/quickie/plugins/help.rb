@@ -37,7 +37,7 @@ module Skylab::TestSupport
       def beginning_eventpoint_notify
         usage
         @y << "options:"
-        (( tbl = TestSupport_::Library_::Face::CLI::Table ))[
+        (( tbl = TestSupport_::Lib_::CLI_table_class[] )) [
           :field, :field, :left, :show_header, false,
           :left, '  ', :sep, '     ', :right, '',
           :write_lines_to, @y.method( :<< ),

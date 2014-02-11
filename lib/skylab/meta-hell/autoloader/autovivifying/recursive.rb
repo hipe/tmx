@@ -72,9 +72,12 @@ module Skylab::MetaHell
         @a = a ; @mod = mod
       end
       def execute
-        begin
+        if @a.first.respond_to? :relative_path_from
+          @mod.init_dir_pathname @a.shift
+        end
+        while @a.length.nonzero?
           send :"#{ @a.shift }="
-        end while @a.length.nonzero? ; nil
+        end ; nil
       end
     private
       def deferred=

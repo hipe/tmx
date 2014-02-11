@@ -14,7 +14,9 @@ module Skylab::TestSupport::TestSupport::Regret::CLI_Actions_Simplecov
 
   extend TestSupport::Quickie
 
-  TestSupport::Library_.kick :Open3
+  TestSupport::Library_.touch :Open3
+
+  Lib_ = TestSupport::Lib_
 
   NILADIC_NILNESS_ = -> { }
 
@@ -72,7 +74,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI_Actions_Simplecov
       lines.shift.line.should match( /about to run:.+run-me\.rb orange/ )
       lines.shift.line.should eql( "welff you probably want orange\n" )
       if lines.length.nonzero?
-        TestSupport::Stderr_[].puts "LET's FIX SIMPLECOV (that one warning)"
+        Lib_::Stderr[].puts "LET's FIX SIMPLECOV (that one warning)"
       end
     end
 
@@ -121,7 +123,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI_Actions_Simplecov
 
     def get_any_debugging_yielder
       if do_debug
-        ::Enumerator::Yielder.new( & TestSupport::Stderr_.method( :puts ) )
+        ::Enumerator::Yielder.new( & Lib_::Stderr[].method( :puts ) )
       end
     end
 

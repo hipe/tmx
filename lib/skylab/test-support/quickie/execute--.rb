@@ -42,7 +42,7 @@ module Skylab::TestSupport
       def build_client
         a = @ctx_class_a ; @ctx_class_a = nil
         cli = Quickie::Client.new @y, :no_root_context
-        cli.tag_filter_p = MetaHell::MONADIC_TRUTH_
+        cli.tag_filter_p = MONADIC_TRUTH_
         cli.example_producer_p = -> branch, leaf do
           p = nil
           pp = -> do

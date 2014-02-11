@@ -4,21 +4,23 @@ module Skylab::TestSupport
 
     module API
       API = self
+      Lib_ = TestSupport_::Lib_
+      Library_ = TestSupport_::Library_
+      Plugin_ = TestSupport_::Lib_::Heavy_plugin[]
       Regret = Regret
       TestSupport = TestSupport_
-      Plugin_ = TestSupport_::Lib_::Heavy_plugin[]
 
-      %i| Basic Face Headless MetaHell |.each do |i|
+      %i| Basic Headless MetaHell |.each do |i|
         const_set i, TestSupport::Library_.const_get( i, false )
       end
 
       WRITEMODE_ = Headless::WRITEMODE_
 
-      DEFAULT_CORE_BASENAME_ = "core#{ ::Skylab::Autoloader::EXTNAME }"
+      DEFAULT_CORE_BASENAME_ = "core#{ Autoloader_::EXTNAME }"
 
     end
 
-    TestSupport_::Library_::Face::API[ self ]
+    Lib_::API[][ self ]
 
     action_name_white_rx( /[a-z0-9]$/ )
 
@@ -55,7 +57,7 @@ module Skylab::TestSupport
           # message.
           @system_service_provider ||= begin
             @do_debug ||= nil
-            stderr = TestSupport::Stderr_[]
+            stderr = Lib_::Stderr[]
             System_Services_.new( Dynamic_Puts_Proxy_.new do |s|
               @do_debug and stderr.puts s
             end )
@@ -84,7 +86,7 @@ module Skylab::TestSupport
         alias_method :puts, :call
       end
 
-      class Action < Face::API::Action
+      class Action < Lib_::API[]::Action
 
         def set_vtuple x
           did = false
@@ -121,20 +123,8 @@ module Skylab::TestSupport
         end
       end
 
-      module Lib_  # :+[#ss-001]
-
-        memo, sidesys = Callback_::Autoloader.
-          at :memoize, :build_require_sidesystem_proc
-
-        Basic = sidesys[ :Basic ]
-        Face = sidesys[ :Face ]
-        Headless = sidesys[ :Headless ]
-        StringScanner = memo[ -> { require 'strscan' ; ::StringScanner } ]
-        SubTree = sidesys[ :SubTree ]
-      end
-
       Expression_agent_class__ = -> do
-        Lib_::Face[]::API::Normalizer_::Expression_agent_class[]
+        Lib_::API_normalizer[]::Expression_agent_class[]
       end
     end
   end

@@ -5,6 +5,7 @@ module ::Skylab::TestSupport::TestSupport::Quickie
 
   include CONSTANTS
 
+  Lib_ = TestSupport::Lib_
   Quickie = TestSupport::Quickie
 
   extend Quickie  # NOTE the *second* this gives you any grief,
@@ -28,7 +29,7 @@ module ::Skylab::TestSupport::TestSupport::Quickie
     end
   end
 
-  describe "#{ TestSupport }::Quickie" do
+  describe "[ts] quickie" do
 
     last_id = 0
 
@@ -52,7 +53,7 @@ module ::Skylab::TestSupport::TestSupport::Quickie
 
     def add_output e
       if do_debug
-        TestSupport::Stderr_[].puts "GOT OUTPUT: #{ e.inspect }"
+        Lib_::Stderr[].puts "GOT OUTPUT: #{ e.inspect }"
       end
       ( @output ||= [ ] ) << e
     end

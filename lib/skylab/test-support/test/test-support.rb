@@ -7,8 +7,9 @@ module Skylab::TestSupport::TestSupport
 
   module CONSTANTS
     MetaHell = ::Skylab::MetaHell  # temporary b.c it isn't in [fa]
-    TS_TS = TS_TS
     TestSupport = ::Skylab::TestSupport
+      Lib_ = TestSupport::Lib_
+    TS_TS = TS_TS
   end
 
   include CONSTANTS

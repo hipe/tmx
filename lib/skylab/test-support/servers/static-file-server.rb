@@ -11,13 +11,13 @@ module Skylab::TestSupport
     include TestSupport_::Library_::FileUtils
 
     def initialize *a, &b  # [ doc_root_str ] [ opt_hash ] <<no blocks>>
-      TestSupport_::Library_.kick :Adsf, :Rack
+      TestSupport_::Library_.touch :Adsf, :Rack
       init_event_handling
       Parse_args_[ h = { }, a, b ]
       h = { log_level_i: DEFAULT_LOG_LEVEL_, port: DEFAULT_PORT_ }.merge h
       @doc_root = @doc_root_pathname = @rack_app = nil
       h.each { |k, v| send OPT_H_.fetch( k ), v }
-      @downstream = Stderr_[]  # can be made configurable if necessary
+      @downstream = TestSupport_::Lib_::Stderr[]  # or configured if nec.
       nil
     end
 

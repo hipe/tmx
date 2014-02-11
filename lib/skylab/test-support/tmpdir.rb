@@ -220,7 +220,7 @@ module Skylab::TestSupport
     end
     #
     def info msg
-      (( @infostream ||= TestSupport_::Stderr_[] )).puts msg
+      (( @infostream ||= TestSupport_::Lib_::Stderr[] )).puts msg
     end
   end
 end

@@ -6,9 +6,11 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible_
 
   include CONSTANTS
 
+  Lib_ = Lib_
+
   Quickie = TestSupport::Quickie
 
-  Possible_ = Quickie::Possible_
+    Possible_ = Quickie::Possible_
 
   TestSupport = TestSupport
 
@@ -41,7 +43,7 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible_
         @do_debug ||= false
         @err_a = [ ]
         ::Enumerator::Yielder.new do |msg|
-          @do_debug and TestSupport::Stderr_[].puts "(dbg:#{ msg })"
+          @do_debug and Lib_::Stderr[].puts "(dbg:#{ msg })"
           @err_a << msg
           nil
         end

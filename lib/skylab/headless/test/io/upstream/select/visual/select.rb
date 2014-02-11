@@ -4,7 +4,7 @@ require_relative '../test-support'
 
 module Skylab::Headless::TestSupport::IO::Upstream::Select
 
-  stderr = ::Skylab::TestSupport::Stderr_[]
+  stderr = ::Skylab::TestSupport::System.stderr
 
   from_dir = Select_TestSupport.dir_pathname.join( 'visual' ).to_s
 

@@ -162,7 +162,7 @@ module Skylab::TanMan::TestSupport
     attr_accessor :do_debug
 
     def some_debug_stream
-      TestSupport::Stderr_[]
+      TestSupport::System.stderr
     end
 
     attr_accessor :do_debug_parser_loading

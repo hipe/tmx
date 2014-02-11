@@ -98,7 +98,7 @@ module Skylab::TestSupport
         begin
           SEP__ == pn.instance_variable_get( :@path ) and break( did_fail = true )
           pn.directory? and break
-          (( pn_ = pn.sub_ext EXTNAME__ )).exist? and break
+          (( pn_ = pn.sub_ext Autoloader_::EXTNAME )).exist? and break
           (( tried_a ||= [] )) << pn_
           pn = pn.dirname
           redo
@@ -109,7 +109,6 @@ module Skylab::TestSupport
           pn.to_s
         end
       end
-      EXTNAME__ = ::Skylab::Autoloader::EXTNAME
 
       def reprt_failure_to_find_business_path lcbp, tried_a
         @y << "failed to find business path from longest common base path - #{

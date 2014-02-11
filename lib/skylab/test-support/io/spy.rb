@@ -2,6 +2,8 @@ module Skylab::TestSupport
 
   class IO::Spy < ::Skylab::Headless::IO::Interceptors::Tee  # :[#023] ..
 
+    Autoloader_[ self, :methods ]
+
     def self.standard
       io = new( BUFFER_I__ => TestSupport_::Library_::StringIO.new ).tty!
       block_given? and yield io
@@ -20,7 +22,7 @@ module Skylab::TestSupport
     end
 
     def debug! prepend_x=nil
-      set_dbg_element DEBUG_I__, Stderr_[], prepend_x ; self
+      set_dbg_element DEBUG_I__, TestSupport_::Lib_::Stderr[], prepend_x ; self
     end
 
     def any_debug_IO_notify any_debug_IO

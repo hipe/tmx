@@ -34,7 +34,7 @@ module ::Skylab::TestSupport
       def build_tmpdir_pathname
         (( pam = parent_anchor_module )) or raise errmsg( "set @tmpdir_pathname" )
         par = pam.tmpdir_pathname
-        dir = Autoloader::FUN::Pathify[
+        dir = Lib_::Name_from_const_to_path[
           name[ name.rindex( ':' ) + 1 .. -1 ] ]
         par.join dir
       end

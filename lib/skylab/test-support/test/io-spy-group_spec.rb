@@ -8,8 +8,10 @@ module Skylab::TestSupport::TestSupport::IO
 
   extend TestSupport::Quickie
 
-  describe "#{ TestSupport::IO::Spy::Group }" do
+  describe "[ts] IO spy group" do
+
     it "aggregates emissions from multiple streams onto the same ordered queue" do
+
       g = TestSupport::IO::Spy::Group.new
       red = g.for :red
       blue = g.for :blue

@@ -22,7 +22,7 @@ module Skylab::Callback::TestSupport::Bundles
     attr_reader :do_debug
 
     def debug_IO
-      TestSupport::Stderr_[]
+      TestSupport::System.stderr
     end
   end
 end

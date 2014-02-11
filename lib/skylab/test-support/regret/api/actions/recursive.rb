@@ -41,7 +41,7 @@ module Skylab::TestSupport::Regret::API
     end
 
     def build_walker
-      Lib_::SubTree[]::Walker.new :path, @normalized_argument_path,
+      Library_::SubTree::Walker.new :path, @normalized_argument_path,
         :vtuple, @vtuple, :listener, generic_listener
     end
 
@@ -118,7 +118,7 @@ module Skylab::TestSupport::Regret::API
 
     def rndr_note_x_a x_a
       if x_a.length.nonzero?
-        TestSupport::Library_.kick :JSON
+        TestSupport::Library_.touch :JSON
         " #{ ::Hash[ * x_a ].to_json }"
       end
     end
@@ -291,7 +291,7 @@ module Skylab::TestSupport::Regret::API
       FAILED__
     end
 
-    DEV_NULL_ = Lib_::Headless[]::IO::DRY_STUB
+    DEV_NULL_ = Library_::Headless::IO::DRY_STUB
     FAILED__ = false
     SUBP_TEST_DIR__ = 'test'.freeze
     SUCCEEDED__ = true

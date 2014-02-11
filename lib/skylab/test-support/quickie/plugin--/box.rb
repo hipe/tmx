@@ -24,9 +24,9 @@ module Skylab::TestSupport
       end
 
       Get_const_i_a_ = -> mod do
-        ::Dir[ "#{ mod.dir_pathname }/*#{ Autoloader::EXTNAME }" ].
+        ::Dir[ "#{ mod.dir_pathname }/*#{ Autoloader_::EXTNAME }" ].
             reduce [] do |m, path|
-          m << Autoloader::FUN::Constantize[
+          m << Name_from_path_to_const[
             ::Pathname.new( path ).basename.sub_ext '' ]
         end
       end

@@ -141,5 +141,7 @@ module Skylab::TestSupport::Regret::API
     SUCCESS_EXITSTATUS__ = 0
     SUCCEEDED__ = true
 
+    Lib_::Transitional_autoloader[ self, __FILE__ ]
+
   end
 end

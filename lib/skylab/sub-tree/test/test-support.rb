@@ -37,7 +37,7 @@ module Skylab::SubTree::TestSupport
     end
 
     Stderr = -> do
-      TestSupport::Stderr_[]
+      TestSupport::System.stderr
     end
 
     Unstyle_proc = -> do
@@ -58,7 +58,7 @@ module Skylab::SubTree::TestSupport
   module InstanceMethods
 
     def debug_stream
-      TestSupport::Stderr_[]
+      TestSupport::System.stderr
     end
 
     attr_reader :do_debug

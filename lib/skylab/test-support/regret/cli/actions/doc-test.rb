@@ -56,7 +56,7 @@ module Skylab::TestSupport
 
           REST_RX_ = /\A-(?<stem>[^-].*)\z/
 
-          Value_ = Regret::API::Lib_::Basic[]::Struct[ :did_error, *
+          Value_ = Regret::API::Lib_::Struct[ :did_error, *
             A_.reduce( [] ) { |m, x| x.i and m << x.i ; m } ]
           class Value_
             def to_i

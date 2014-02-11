@@ -12,7 +12,7 @@ module ::Skylab::TestSupport
 
     module Anchor_ModuleMethods
 
-      include Autoloader::Methods
+      include TestSupport_::Lib_::Autoloader__[]::Methods
 
       def [] child_mod, loc=nil
         loc ||= caller_locations( 1, 1 )[ 0 ]
@@ -165,5 +165,7 @@ module ::Skylab::TestSupport
     \z}x
 
     NEAREST__ = :nearest_test_node
+
+    Lib_::Transitional_autoloader[ self, __FILE__ ]
   end
 end

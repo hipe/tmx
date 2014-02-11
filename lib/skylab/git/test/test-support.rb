@@ -37,7 +37,7 @@ module Skylab::Git::TestSupport
     def bld_outstream
       @out_a ||= [ ]
       Mock_Stream__.new do |line|
-        @do_debug and TestSupport::Stderr_[].puts "(out: #{ line })"
+        @do_debug and TestSupport::System.stderr.puts "(out: #{ line })"
         @out_a << line ; nil
       end
     end

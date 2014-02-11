@@ -34,7 +34,7 @@ module Skylab::Headless::TestSupport
     attr_accessor :do_debug
 
     def debug_IO
-      TestSupport::Stderr_[]
+      TestSupport::System.stderr
     end
   end
 

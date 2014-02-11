@@ -32,7 +32,7 @@ module Skylab::SubTree::TestSupport::CLI
     attr_reader :result
 
     -> do
-      stderr = TestSupport::Stderr_[]
+      stderr = TestSupport::System.stderr
 
       define_method :dputs do |x|
         stderr.puts x

@@ -32,7 +32,7 @@ module Skylab::MetaHell::TestSupport::FUN::Parse::Series::Integration
       TS_.const_defined?( :Y_, false ) ?
         TS_.const_get( :Y_, false ) :
         TS_.const_set( :Y_, ::Enumerator::Yielder.
-          new( & TestSupport::Stderr_[].method( :puts ) ) )
+          new( & TestSupport::System.stderr.method( :puts ) ) )
     end
 
     def parse *argv

@@ -30,7 +30,7 @@ module Skylab::Porcelain::TestSupport
           # (tombstone of a great [#bm-008] vector)
           o.on_all do |e|
             _stderr.puts e.text  # might be styled
-            do_debug and TestSupport::Stderr_[].puts "(dbg:#{ e.text })"
+            do_debug and TestSupport::System.stderr.puts "(dbg:#{ e.text })"
             nil
           end
         end

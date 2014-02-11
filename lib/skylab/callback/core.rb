@@ -82,6 +82,16 @@ module Skylab::Callback
       end
     end
 
+    # ~ protected constants and their public accessor counterparts
+
+    def self.default_core_file
+      CORE_FILE_
+    end
+
+    EXTNAME = EXTNAME_ = '.rb'.freeze
+
+      CORE_FILE_ = "core#{ EXTNAME_ }".freeze
+
     # ~ the default starter methods (read [#024]:the-four-method-modules-method)
 
     module Triggering_Methods__  # #the-triggering-methods
@@ -183,24 +193,35 @@ module Skylab::Callback
       end
     private
 
-      # (when both of below occur they are always processed in this order)
+      # (when any of the below occur they are always processed in this order)
 
       def dir_pathname_argument x
         if x.respond_to? :relative_path_from
-          -> employer_mod do
-            employer_mod.module_exec do
+          -> mod do
+            mod.module_exec do
               @dir_pathname = x
               extend Final_Methods__, Universal_Base_Methods__
             end
           end
         end
       end
+
+      def methods_keyword x
+        if :methods == x
+          -> mod do
+            mod.module_exec do
+              extend Final_Methods__, Universal_Base_Methods__
+            end
+          end
+        end
+      end
+
       def boxxy_keyword x
         if :boxxy == x
-          -> employer_mod do
-            employer_mod.respond_to? :dir_pathname or
-              employer_mod.extend Triggering_Methods__, Universal_Base_Methods__
-            employer_mod.extend Boxxy_Methods__ ; nil
+          -> mod do
+            mod.respond_to? :dir_pathname or
+              mod.extend Triggering_Methods__, Universal_Base_Methods__
+            mod.extend Boxxy_Methods__ ; nil
           end
         end
       end
@@ -213,7 +234,9 @@ module Skylab::Callback
 
     POSSIBLE_P_A__ = [
       method( :dir_pathname_argument ),
-      method( :boxxy_keyword ) ].freeze
+      method( :methods_keyword ),
+      method( :boxxy_keyword )
+    ].freeze
 
     class Employment_Parse__
 
@@ -323,6 +346,7 @@ module Skylab::Callback
         reduce_paths_to_normal_a
         get_busy
       end
+
       def reduce_paths_to_normal_a
         @normal_a = nil
         h = { }
@@ -337,6 +361,9 @@ module Skylab::Callback
           ( @normal_a ||= [] ) << const_i
         end ; nil
       end
+      SPLIT_EXTNAME_RX_ = %r((?=\.[^.]+\z))
+      EXTENSION_PASS_FILTER_RX_ = /\A(?:#{ ::Regexp.escape EXTNAME_ }|)\z/
+
       def get_busy
         @existing_a.length.nonzero? and pare_normals  # #storypoint-240
         @boxxy_a.concat @normal_a
@@ -396,9 +423,6 @@ module Skylab::Callback
       end
     end
 
-    EXTNAME = EXTNAME_ = '.rb'.freeze
-    SPLIT_EXTNAME_RX_ = %r((?=\.[^.]+\z))
-    EXTENSION_PASS_FILTER_RX_ = /\A(?:#{ ::Regexp.escape EXTNAME_ }|)\z/
 
 
     # ~ "runtime" implementation
@@ -497,7 +521,7 @@ module Skylab::Callback
       end
 
       def when_dir_exists
-        c_pn = @d_pn.join CORE_FILE__
+        c_pn = @d_pn.join CORE_FILE_
         if c_pn.exist?
           @f_pn = c_pn
           when_file_exists
@@ -506,7 +530,7 @@ module Skylab::Callback
           enhance_loaded_value mod
           mod
         end
-      end ; CORE_FILE__ = "core#{ EXTNAME_ }".freeze
+      end
 
       def enhance_loaded_value mod
         @mod.enhance_autoloaded_value_with_dir_pathname mod, @d_pn ; nil

@@ -116,7 +116,7 @@ module Skylab::TestSupport
     end
 
     def some_debug_IO
-      @debug_IO || Stderr_[]
+      @debug_IO || TestSupport_::Lib_::Stderr[]
     end
 
     def debug! stderr  # each time a line is parsed out of any stream we will

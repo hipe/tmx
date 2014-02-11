@@ -21,7 +21,7 @@ module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked
     # ~ hook-ins
 
     def do_debug= yes
-      yes and @debug_IO ||= TestSupport::Stderr_[]
+      yes and @debug_IO ||= TestSupport::System.stderr
       super
     end
 

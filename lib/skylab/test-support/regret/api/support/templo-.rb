@@ -19,8 +19,7 @@ module Skylab::TestSupport::Regret::API
     end
 
     def get_template i
-      Lib_::Basic[]::String::Template.
-        from_string self.class.dir_pathname.join( "#{ i }#{ EXT__ }" ).read
+      Lib_::Template[ self.class.dir_pathname.join( "#{ i }#{ EXT__ }" ).read ]
     end
 
     # ~ option support & hook-outs
@@ -71,7 +70,7 @@ module Skylab::TestSupport::Regret::API
           opt.summarize_p[ build_section_yielder[ y, opt.name_i ] ]
         end
       end
-      Face::CLI::Table[
+      Lib_::CLI_table[
         :field, :id, :name,
         :field, :id, :desc, :left,
         :show_header, false,

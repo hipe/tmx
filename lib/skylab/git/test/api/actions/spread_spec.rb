@@ -19,7 +19,7 @@ module Skylab::Git::TestSupport::API::Actions::Spread
         @do_debug ||= do_debug
         @err_a ||= [ ]
         Spread::Support_::Snitch_.new( ::Enumerator::Yielder.new do |msg|
-          @do_debug and TestSupport::Stderr_[].puts msg
+          @do_debug and TestSupport::System.stderr.puts msg
           @err_a << msg
         end, :no_context )
       end

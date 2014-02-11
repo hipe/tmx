@@ -114,8 +114,8 @@ module Skylab::TestSupport::Regret::API
   private
 
     def build_walker
-      Lib_::SubTree[]::Walker.new :path, @path, :top, @top, :vtuple,
-        @vtuple, :listener, generic_listener
+      Lib_::Tree_walker[ :path, @path, :top, @top,
+        :vtuple, @vtuple, :listener, generic_listener ]
     end
 
     def walk_to_test_dir

@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Recursiv
 
-  ::Skylab::TestSupport::Library_::Face::TestSupport::CLI[ self ]
+  ::Skylab::TestSupport::Lib_::Face__[]::TestSupport::CLI[ self ]
 
   ::Skylab::TestSupport::TestSupport::Regret[ TS__ = self ]
 

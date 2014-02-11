@@ -12,7 +12,7 @@ module Skylab::MetaHell
         any_expensive_correction = nil
         tug.respond_to? :autovivify_proc_notify or fail ::ArgumentError,
           "your module has an unsupported tug class (do you need MAARS?) - #{
-            }#{ tug.mod }"
+            }had #{ tug.class } for #{ tug.mod }"
         tug.autovivify_proc_notify -> do
           cmd_s = Build_find_command__[ tug ]
           _, o, e, w = MetaHell::Library_::Open3.popen3 cmd_s

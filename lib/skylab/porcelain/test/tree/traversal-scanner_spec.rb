@@ -55,7 +55,7 @@ module Skylab::Porcelain::TestSupport::Tree::Traversal_Scanner
     end
 
     def get_enumerator
-      ::Enumerator::Yielder.new( & TestSupport::Stderr_[].method( :puts ) )
+      ::Enumerator::Yielder.new( & TestSupport::System.stderr.method( :puts ) )
     end
 
     def fp * x_a

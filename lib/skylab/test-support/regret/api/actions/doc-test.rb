@@ -193,11 +193,15 @@ module Skylab::TestSupport::Regret::API
 
     API = API
     Basic = Basic
-    DocTest = self ; Face = Face ; Lib_ = Lib_ ; MetaHell = MetaHell
+    DocTest = self
+    Lib_ = ::Skylab::TestSupport::Lib_
+    MetaHell = MetaHell
     PROCEDE__ = true
     Regret = ::Skylab::TestSupport::Regret
     SEP = '# =>'.freeze
     SUCCESS_EXITSTATUS__ = 0
+
+    Lib_::Transitional_autoloader[ self, __FILE__ ]
 
   end
 end
