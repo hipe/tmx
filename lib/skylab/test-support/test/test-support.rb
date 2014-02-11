@@ -25,6 +25,10 @@ module Skylab::TestSupport::TestSupport
     end
   end
 
-  SYSTEM_ = TestSupport::Headless::System.defaults
-
+  module TestLib_
+    Headless__ = ::Skylab::TestSupport::Lib_::Headless__
+    Tmpdir_pathname = -> do
+      Headless__[]::System.defaults.tmpdir_pathname
+    end
+  end
 end

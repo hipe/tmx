@@ -192,12 +192,12 @@ module Skylab::TestSupport::Regret::API
     # we have a hefty branch node - this is used by our many children
 
     API = API
-    Basic = Basic
     DocTest = self
     Lib_ = ::Skylab::TestSupport::Lib_
     MetaHell = MetaHell
     PROCEDE__ = true
     Regret = ::Skylab::TestSupport::Regret
+    RegretLib_ = API::RegretLib_
     SEP = '# =>'.freeze
     SUCCESS_EXITSTATUS__ = 0
 

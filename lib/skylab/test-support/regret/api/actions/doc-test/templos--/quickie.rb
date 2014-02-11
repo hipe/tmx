@@ -43,7 +43,7 @@ module Skylab::TestSupport::Regret::API
       rlma = MetaHell::FUN.memoize[ -> do
         mgn = tstt.first_margin_for :code
         mgn =~ /\A[ ]+\z/ or fail "sanity - clean margin? #{ mgn.inspect }"
-        Basic::List::Marginated::Articulation.new do
+        RegretLib_::List[]::Marginated::Articulation.new do
           any_subsequent_items -> s do
             if s.length.zero? then "\n" else
               "\n#{ mgn }#{ s }"  # don't add trailing spaces
@@ -72,7 +72,7 @@ module Skylab::TestSupport::Regret::API
         example: render_example }.freeze
 
       render_tests = -> blk, cnum do
-        y = ( rtma ||= Basic::List::Marginated::Articulation.new "\n" )
+        y = ( rtma ||= RegretLib_::List[]::Marginated::Articulation.new "\n" )
         part_a = self.class::Context__::Part_.resolve_parts blk, rlma
         part_a.each do |part|
           y << template_h.fetch( part.template_i )[ part, cnum ]
@@ -89,7 +89,7 @@ module Skylab::TestSupport::Regret::API
       end
 
       render_body = -> do
-        y = ( rbma ||= Basic::List::Marginated::Articulation.new "\n" )
+        y = ( rbma ||= RegretLib_::List[]::Marginated::Articulation.new "\n" )
         b_a.each do |blk|
           num = y.count + 1
           y << ctxt[

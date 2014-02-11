@@ -2,6 +2,8 @@ module Skylab::TestSupport
 
   module Quickie
 
+    self::Front__.class
+
     class Plugins::Cover::Worker__
 
       def initialize svc
@@ -24,7 +26,7 @@ module Skylab::TestSupport
       def when_there_is_one_path
         @path_s = @path_a.fetch 0 ; @path_a = nil
         @lcbp_a = @path_s.split( SEP__ )
-        @test_dir_idx = @lcbp_a.index( & Match_test_dir__ )
+        @test_dir_idx = @lcbp_a.index( & QuicLib_::Match_test_dir_proc[] )
         if @test_dir_idx
           money_for_single_path
         else
@@ -68,17 +70,12 @@ module Skylab::TestSupport
       end
 
       def when_lcbp_is_nonzero_in_length
-        if (( @test_dir_idx = @lcbp_a.index( & Match_test_dir__ ) ))
+        if ( @test_dir_idx = @lcbp_a.index( & QuicLib_::Match_test_dir_proc[] ))
           when_found_test_directory
         else
           when_failed_to_find_test_directory
         end
       end
-
-      Match_test_dir__ = -> do
-        require 'skylab/sub-tree/constants'  # special case, avoid loading core
-        ::Skylab::SubTree::Constants::TEST_DIR_NAME_A.method :include?
-      end.call
 
       def when_failed_to_find_test_directory
         @y << "(failed to find test directory - #{ @lcbp_a * SEP__ })"
@@ -119,7 +116,7 @@ module Skylab::TestSupport
 
       def reprt_tried_these_paths tried_a
         _a = tried_a.reduce [] do |m, x|
-          m << Headless::CLI::PathTools::FUN::Pretty_path[ x ]
+          m << QuicLib_::Pretty_path[ x ]
         end
         @y << "(there is no #{ _a * ', ' })" ; nil
       end

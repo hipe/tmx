@@ -4,20 +4,72 @@ module Skylab::TestSupport
 
     module API
       API = self
+      DEFAULT_CORE_BASENAME_ = "core#{ Autoloader_::EXTNAME }"
       Lib_ = TestSupport_::Lib_
       Library_ = TestSupport_::Library_
+      MetaHell = TestSupport_::Library_::MetaHell
       Plugin_ = TestSupport_::Lib_::Heavy_plugin[]
       Regret = Regret
       TestSupport = TestSupport_
+      WRITEMODE_ = 'w'.freeze
 
-      %i| Basic Headless MetaHell |.each do |i|
-        const_set i, TestSupport::Library_.const_get( i, false )
+      module RegretLib_
+        Basic__ = Lib_::Basic__
+        Box = Lib_::Box
+        CLI_stylify = -> a, x do
+          Headless__[]::CLI::Pen::FUN::Stylify[ a, x ]
+        end
+        Dev_null = -> do
+          Headless__[]::IO::DRY_STUB
+        end
+        EN = -> p do
+          Headless__::NLP::EN.calculate( & p )
+        end
+        EN_add_methods = -> mod, * x_a do
+          Headless__[]::SubClient::EN_FUN.via_iambic_on_mod x_a, mod
+        end
+        Headless__ = Lib_::Headless__
+        Name_normal_to_slug = -> i do
+          Headless__[]::Name::FUN::Slugulate[ i ]
+        end
+        Name_slug_to_const = -> s do
+          s_ = Headless__[]::Name::FUN::Metholate[ s ]
+          s_[ 0 ] = s_[ 0 ].upcase
+          s_.intern
+        end
+        Name_symbol_to_label = -> i do
+          Headless__[]::Name::FUN::Labelize[ i ].downcase
+        end
+        List = -> do
+          Basic__[]::List
+        end
+        Levenshtein = -> sep, p, d, a, s do
+          Headless__[]::NLP::EN::Levenshtein::
+            With_conj_s_render_p_closest_n_items_a_item_x[ sep, p, d, a, s ]
+        end
+        Oxford_or = TestSupport_::Callback_::Oxford_or
+        Path_tools_clear = -> do
+          Headless__[]::CLI::PathTools.clear
+        end
+        Pathname_union = -> a do
+          Basic__[]::Pathname::Union[ * a ]
+        end
+        Pretty_path_proc = -> do
+          Headless__[]::CLI::PathTools::FUN.pretty_path
+        end
+        Scanner = -> x do
+          Basic__[]::List::Scanner[ x ]
+        end
+        Struct = Lib_::Struct
+        SubTree__ = TestSupport_::Autoloader_.
+          build_require_sidesystem_proc :SubTree
+        Text_patch = -> do
+          Headless__[]::Text::Patch
+        end
+        Tree_walker = -> * x_a do
+          SubTree__[]::Walker.new x_a
+        end
       end
-
-      WRITEMODE_ = Headless::WRITEMODE_
-
-      DEFAULT_CORE_BASENAME_ = "core#{ Autoloader_::EXTNAME }"
-
     end
 
     Lib_::API[][ self ]
@@ -25,7 +77,7 @@ module Skylab::TestSupport
     action_name_white_rx( /[a-z0-9]$/ )
 
     before_each_execution do
-      Headless::CLI::PathTools.clear
+      API::RegretLib_::Path_tools_clear[]
     end
 
     module API
@@ -76,7 +128,7 @@ module Skylab::TestSupport
         end
       end
 
-      class System_Services_ < Basic::Struct[ :err ]
+      class System_Services_ < RegretLib_::Struct[ :err ]
         Plugin_::Host.enhance self do
           services :err, :ivar
         end

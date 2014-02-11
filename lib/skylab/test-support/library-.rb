@@ -15,11 +15,9 @@ module Skylab::TestSupport
 
     o = { }
     o[ :Adsf ] = gemlib
-    o[ :Basic ] = subsys
     o[ :Benchmark ] = stdlib
     o[ :DRb ] = -> _ { require 'drb/drb' ; ::DRb }
     o[ :FileUtils ] = stdlib
-    o[ :Headless ] = subsys
     o[ :JSON ] = stdlib
     o[ :MetaHell ] = subsys
     o[ :Open3 ] = stdlib
@@ -28,7 +26,6 @@ module Skylab::TestSupport
     o[ :Rack ] = gemlib
     o[ :StringIO ] = stdlib
     o[ :StringScanner ] = -> _ { require 'strscan' ; ::StringScanner }
-    o[ :SubTree ] = subsys
     o[ :Tmpdir ] = -> _ { require 'tmpdir' ; ::Dir }  # Dir.tmpdir
 
     def self.const_missing c
@@ -61,6 +58,10 @@ module Skylab::TestSupport
 
     Basic__ = sidesys[ :Basic ]
 
+    Box = -> do
+      Basic__[]::Box.new
+    end
+
     CLI = -> do
       Face__[]::CLI
     end
@@ -79,8 +80,14 @@ module Skylab::TestSupport
 
     Face__ = sidesys[ :Face ]
 
+    Headless__ = sidesys[ :Headless ]
+
     Heavy_plugin = -> do
       Face__[]::Plugin
+    end
+
+    IO = -> do
+      Headless__[]::IO
     end
 
     Let_methods = -> mod do
@@ -126,19 +133,17 @@ module Skylab::TestSupport
       Basic__[]::Struct.from_i_a i_a
     end
 
-    SubTree__ = sidesys[ :SubTree ]
-
     Template = -> s do
       Basic__[]::String::Template.from_string s
+    end
+
+    Text_patch = -> do
+      Headless__[]::Text::Patch
     end
 
     Transitional_autoloader = -> mod, file do
       _dpn = ::Pathname.new( file ).sub_ext ''
       MetaHell__[]::MAARS[ mod, _dpn ] ; nil
     end
-
-    Tree_walker = -> * x_a do
-      SubTree__[]::Walker.new x_a
-     end
   end
 end

@@ -140,7 +140,7 @@ module Skylab::TestSupport
       end
 
       def check_if_argv_is_completely_parsed sig_a  # assume any
-        scn = Basic::List::Scanner[ sig_a ] ; g = nil
+        scn = QuicLib_::Scanner[ sig_a ] ; g = nil
         until (( g = scn.gets )) ; end
         xtra_a = ::Array.new g.input.length, true
         begin  # ( bitwise OR )
@@ -204,8 +204,41 @@ module Skylab::TestSupport
       end
     end
 
-    Basic = TestSupport_::Library_::Basic
+    module QuicLib_
+
+      CLI_basic_switch_index = -> sw do
+        Headless__[]::CLI::Option::FUN.basic_switch_index_curry[ sw ]
+      end
+
+      CLI_starts_with_dash = -> s do
+        Headless__[]::CLI::Option::FUN.starts_with_dash[ s ]
+      end
+
+      EN_number = -> d do
+        Headless__[]::NLP::EN::Number::FUN.number[ d ]
+      end
+
+      Headless__ = TestSupport_::Lib_::Headless__
+
+      Name_const_basename = -> s do
+        Headless__[]::Name::FUN::Const_basename[ s ]
+      end
+
+      Match_test_dir_proc = -> do
+        require 'skylab/sub-tree/constants'  # special case, avoid loading core
+        ::Skylab::SubTree::Constants::TEST_DIR_NAME_A.method :include?
+      end
+
+      Oxford_and = Callback_::Oxford_and
+
+      Oxford_or = Callback_::Oxford_or
+
+      Pretty_path = -> x do
+        Headless__[]::CLI::PathTools::FUN::Pretty_path[ x ]
+      end
+    end
+
     Chain__ = MetaHell::FUN.function_chain
-    Index_ = Headless::CLI::Option::FUN.basic_switch_index_curry
+
   end
 end

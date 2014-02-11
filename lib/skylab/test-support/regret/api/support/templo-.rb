@@ -92,7 +92,7 @@ module Skylab::TestSupport::Regret::API
       end
     private
       def bld_nonzero_box name_i
-        box = Basic::Box.new
+        box = RegretLib_::Box[]
         while true
           opt = Option__.new name_i, @scn
           box.add name_i, opt

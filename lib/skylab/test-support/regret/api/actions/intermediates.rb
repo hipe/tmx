@@ -114,7 +114,7 @@ module Skylab::TestSupport::Regret::API
   private
 
     def build_walker
-      Lib_::Tree_walker[ :path, @path, :top, @top,
+      RegretLib_::Tree_walker[ :path, @path, :top, @top,
         :vtuple, @vtuple, :listener, generic_listener ]
     end
 
@@ -170,7 +170,7 @@ module Skylab::TestSupport::Regret::API
         @err.write io.read
       else
         @err.write "(writing #{ @pth[ pn ] } .." ; bytes = nil
-        ( @is_dry_run ? DEV_NULL_ : pn ).open WRITEMODE_ do |fh|
+        ( @is_dry_run ? Dev_null_[] : pn ).open WRITEMODE_ do |fh|
           bytes = fh.write io.read
         end
         @err.puts " done (#{ bytes }#{ ' fake' if @is_dry_run } bytes))"
@@ -178,8 +178,8 @@ module Skylab::TestSupport::Regret::API
       io.rewind ; io.truncate 0
       true
     end
-    DEV_NULL_ = TestSupport::Library_::Headless::IO::DRY_STUB
-    WRITEMODE_ = Headless::WRITEMODE_
+    Dev_null_ = API::RegretLib_::Dev_null
+    WRITEMODE_ = API::WRITEMODE_
 
     def say volume, msg_p
       snitch.say volume, msg_p

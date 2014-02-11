@@ -2,6 +2,8 @@ module Skylab::TestSupport
 
   module Quickie
 
+    self::Front__.class
+
     module Possible_
 
       module Articulators__
@@ -15,14 +17,14 @@ module Skylab::TestSupport
               when 0 ; 'no'
               when 1 ; 'the only'
               when 2 ; 'both of the'
-              else   ; "all #{ Num_[ n ] } of"
+              else   ; "all #{ QuicLib_::EN_number[ n ] } of"
               end
             end,
             exclusive: -> n do
               case n
               when 0 ; 'no'
               when 1 ; 'the only'
-              else   ; "none of the #{ Num_[ n ] }"
+              else   ; "none of the #{ QuicLib_::EN_number[ n ] }"
               end
             end
           }.freeze
@@ -39,10 +41,9 @@ module Skylab::TestSupport
             }#{ The_state_[ ep ] }"
         end ]
 
-        Headless::NLP::EN::Minitesimal::Oxford_comma_.tap do |p|
-          And_ = p.curry[ ', ', ' and ' ]
-          Or_  = p.curry[ ', ', ' or ' ]
-        end
+        And_ = QuicLib_::Oxford_and
+
+        Or_ = QuicLib_::Oxford_or
 
         Bring_ = o[ -> ep, a, inclusion_i do
           excl = :exclusive == inclusion_i
@@ -86,7 +87,6 @@ module Skylab::TestSupport
             Or_[ ep_a.map( & The_state_ ) ] }"
         end ]
 
-        Num_ = Headless::NLP::EN::Number::FUN.number
 
         Reach_ = o[ -> ep do
           "cannot reach #{ The_state_[ ep ] }"

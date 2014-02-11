@@ -24,11 +24,9 @@ module Skylab::TestSupport::Regret::API  # [#sl-123] exempt:
         # snippet will be transformed into a context with a before block
         # and one or more examples.
 
-        Scn_ = Basic::List::Scanner
-
         def self.build_parts blk, y
           part_a = [ ]
-          snips = Scn_[ blk.snippet_a ]
+          snips = RegretLib_::Scanner[ blk.snippet_a ]
           bef, ex = first_snip snips.gets, y
           bef and part_a << bef
           ex and part_a << ex
@@ -49,7 +47,7 @@ module Skylab::TestSupport::Regret::API  # [#sl-123] exempt:
               ( before_a ||= [ ] ) << line
               nil
             end
-            lines = Scn_[ snip.line_a ]
+            lines = RegretLib_::Scanner[ snip.line_a ]
             while line = lines.gets
               preds.add( line ) and break
             end

@@ -14,6 +14,9 @@ module Skylab
     # for typical coverage measurement of a test or test suite. for such
     # standard use, please see the simplecov gem's README.md
 
+    # EDIT: the quickie test runner now has simplecov integration.
+    # see 'tmx-quickie'.
+
     def initialize sin, sout, serr
       @program_name = nil
       @y = ::Enumerator::Yielder.new { |msg| serr.puts msg ; nil }
@@ -48,7 +51,7 @@ module Skylab
         require 'skylab/basic/core'
         @matcher = -> a do
           a.map! { |x| ::File.expand_path x }
-          u = ::Skylab::Basic::Pathname::Union[ * a ]
+          u = ::Skylab::TestSupport::Regret::API::RegretLib_::Pathname_union[a]
           u.normalize -> e do
             @y << "(#{ program_name } #{
               }#{ nil.instance_exec( & e.message_proc ) })"

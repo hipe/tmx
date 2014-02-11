@@ -132,7 +132,7 @@ module Skylab::TestSupport::TestSupport::Tmpdir
     # --*--
 
     def anchor
-      TS_TS::SYSTEM_.tmpdir_pathname
+      TS_TS::TestLib_::Tmpdir_pathname[]
     end
 
     def fu

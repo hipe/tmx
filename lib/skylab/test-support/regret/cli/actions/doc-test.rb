@@ -2,11 +2,15 @@ module Skylab::TestSupport
 
   module Regret
 
+    self::API.class
+
     module CLI::Actions
 
       module DocTest
 
-        Parse_Recursive_ = TestSupport_::Library_::Basic::Struct[ :y, :v, :argv ]
+        RegretLib_ = API::RegretLib_
+
+        Parse_Recursive_ = RegretLib_::Struct[ :y, :v, :argv ]
 
         # the things we do for love. **necessary** to support argv's like:
         #
@@ -51,8 +55,7 @@ module Skylab::TestSupport
           P_ = MetaHell::FUN.parse_alternation.
             curry[ :pool_procs, A_.map(& :p ) ]
 
-          Or_ = Headless::NLP::EN::Minitesimal::Oxford_comma_.
-            curry[ ', ', ' or ' ]
+          Or_ = RegretLib_::Oxford_or
 
           REST_RX_ = /\A-(?<stem>[^-].*)\z/
 

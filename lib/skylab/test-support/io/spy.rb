@@ -1,6 +1,6 @@
 module Skylab::TestSupport
 
-  class IO::Spy < ::Skylab::Headless::IO::Interceptors::Tee  # :[#023] ..
+  class IO::Spy < TestSupport_::Lib_::IO[]::Interceptors::Tee  # :[#023] ..
 
     Autoloader_[ self, :methods ]
 
@@ -37,7 +37,7 @@ module Skylab::TestSupport
     end
 
     def wrp_IO prepend_x, down_IO
-      io = Headless::IO::Interceptors::Filter.new down_IO
+      io = TestSupport_::Lib_::IO[]::Interceptors::Filter.new down_IO
       if prepend_x.respond_to? :call
         io.puts_filter! prepend_x
       else

@@ -114,7 +114,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     def accept cblock
       machine = Machine__.new
       sblock = Specer__::Block.new @snitch
-      comment_lines = Basic::List::Scanner[ cblock.a ]
+      comment_lines = RegretLib_::Scanner[ cblock.a ]
       while (( cl = comment_lines.gets ))
         sblock.accept machine.move cl
       end

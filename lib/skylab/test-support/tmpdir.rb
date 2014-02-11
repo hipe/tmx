@@ -55,8 +55,8 @@ module Skylab::TestSupport
     end
 
     def patch str
-      Headless::Text::Patch.directory str, to_s, @is_noop, @be_verbose,
-        -> e { info e }
+      TestSupport_::Lib_::Text_patch[].directory str, to_s,
+        @is_noop, @be_verbose, -> e { info e }
       # (result is exit_status)
     end
 

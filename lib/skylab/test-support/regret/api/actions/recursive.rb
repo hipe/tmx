@@ -41,8 +41,8 @@ module Skylab::TestSupport::Regret::API
     end
 
     def build_walker
-      Library_::SubTree::Walker.new :path, @normalized_argument_path,
-        :vtuple, @vtuple, :listener, generic_listener
+      RegretLib_::Tree_walker[ :path, @normalized_argument_path,
+        :vtuple, @vtuple, :listener, generic_listener ]
     end
 
     def get_leaf_pathname_a
@@ -273,7 +273,7 @@ module Skylab::TestSupport::Regret::API
     def do_flush
       bytes = nil
       @io.rewind
-      opener = @is_dry_run ? DEV_NULL_ : @opn
+      opener = @is_dry_run ? RegretLib_::Dev_null[] : @opn
       opener.open WRITEMODE_ do |fh|
         bytes = fh.write @io.read
       end
@@ -291,7 +291,6 @@ module Skylab::TestSupport::Regret::API
       FAILED__
     end
 
-    DEV_NULL_ = Library_::Headless::IO::DRY_STUB
     FAILED__ = false
     SUBP_TEST_DIR__ = 'test'.freeze
     SUCCEEDED__ = true

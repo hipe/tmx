@@ -148,6 +148,10 @@ end
   module EN_FUN
 
     def self.[] mod, * x_a
+      via_iambic_on_mod x_a, mod
+    end
+
+    def self.via_iambic_on_mod x_a, mod
       :private == x_a[ 0 ] or fail "only `private` is supported for now #{
         }(had #{ Headless::FUN::Inspect[ x_a[ 0 ] ] })"
       x_a.shift

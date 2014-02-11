@@ -103,9 +103,7 @@ module Skylab::TestSupport::Regret::API
       end
 
       def prcr_some_const_i_from_hashtag_stem s
-        s_ = Headless::Name::FUN::Metholate[ s ]
-        s_[ 0 ] = s_[ 0 ].upcase
-        s_.intern
+        RegretLib_::Name_slug_to_const[ s ]
       end
 
       def say_non_redundant_thing stem_s
@@ -120,17 +118,14 @@ module Skylab::TestSupport::Regret::API
 
       def say_insane_explication stem_hashtag_s
         _a = Hashtag_Bundles__.constants.map( & Const_2_hashtag_s_ )
-        _or_s = Headless::NLP::EN::Levenshtein::
-          With_conj_s_render_p_closest_n_items_a_item_x[
-            ' or ', ::Proc.new( & :inspect ), 3, _a, stem_hashtag_s ]
+        _or_s = RegretLib_::Levenshtein[ ' or ', ::Proc.new( & :inspect ), 3,
+          _a, stem_hashtag_s ]
         "unrecognized hashtag #{ stem_hashtag_s }. did you mean #{ _or_s }?"
       end
 
       Const_2_hashtag_s_ = -> const_i do
-        "##{ NF__::Slugulate[ NF__::Normify[ const_i ] ] }"
+        "##{ RegretLib_::Name_normal_to_slug[ NF__::Normify[ const_i ] ] }"
       end
-
-      NF__ = Headless::Name::FUN
 
       def attmpt_simple_bundle bndl
         ok = arity_check 0, bndl

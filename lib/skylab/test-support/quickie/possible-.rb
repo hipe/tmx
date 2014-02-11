@@ -263,8 +263,8 @@ module Skylab::TestSupport
         end
 
         Internen__ = -> mod_x do
-          Headless::Name::FUN::Const_basename[ mod_x.to_s ].gsub( /_+\z/, '' ).
-            downcase
+          QuicLib_::Name_const_basename[ mod_x.to_s ].
+            gsub( /_+\z/, '' ).downcase
         end
 
         def get_exponent

@@ -2,6 +2,8 @@ module Skylab::TestSupport
 
   module Quickie
 
+    self::Front__.class
+
     class Plugins::RunRecursive
 
       def initialize svc
@@ -48,7 +50,7 @@ module Skylab::TestSupport
         end
       end
 
-      Dash_ = Headless::CLI::Option::FUN.starts_with_dash
+      Dash_ = QuicLib_::CLI_starts_with_dash
 
       def beginning_eventpoint_notify
         # at our notification of the beginning, we do the work that needs
@@ -81,7 +83,7 @@ module Skylab::TestSupport
     private
 
       def find_contiguous_range_of_paths argv
-        scn = Basic::List::Scanner[ argv ]
+        scn = QuicLib_::Scanner[ argv ]
         while (( tok = scn.gets ))
           Dash_[ tok ] or break( a = scn.index )
         end
@@ -102,7 +104,7 @@ module Skylab::TestSupport
 
       def my_get_any_test_path_a
         found_all = true ; lg = local_glob
-        p = Basic::String::FUN::
+        p = QuicLib_::String[]::FUN::
           Build_proc_for_string_ends_with_string[ _spec_rb ]
         path_a = @input_path_a.reduce [] do |m, path|
           if p[ path ]

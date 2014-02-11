@@ -7,21 +7,22 @@ module Skylab::TestSupport
     end
 
     Client = ::Class.new Lib_::CLI[]
+    RegretLib_ = Regret::API::RegretLib_
   end
 
   class Regret::CLI::Client
 
     API = Regret::API
     CLI = Regret::CLI
-    Headless = TestSupport_::Library_::Headless
     Plugin_ = Lib_::Heavy_plugin[]
+    RegretLib_ = API::RegretLib_
 
     API::Conf::Verbosity[ self ]
 
     def initialize( * )
       super
       @param_h = { }
-      @pth = Headless::CLI::PathTools::FUN.pretty_path
+      @pth = RegretLib_::Pretty_path_proc[]
       nil
     end
 
@@ -145,16 +146,16 @@ module Skylab::TestSupport
     end
 
     def say_bad_keys bad_a
-      Headless::NLP::EN.calculate do
+      RegretLib_::EN[ -> do
        "the #{ and_ bad_a.map( & Cleanup_hack__ ) } option#{ s } #{
          }#{ s :is } not supported with the recursive option."
-      end
+      end ]
     end
 
     WHITE_A__ = %i( core_basename do_force recursive_o vtuple ).freeze
 
     Cleanup_hack__ = -> i do
-      "'#{ Headless::Name::FUN::Labelize[ i ].downcase }'"
+      "'#{ RegretLib_::Name_symbol_to_label[ i ] }'"
     end
 
     def recursive_dissolve_subcommand

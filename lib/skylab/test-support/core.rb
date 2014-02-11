@@ -14,7 +14,7 @@ module Skylab::TestSupport  # :[#021]
   Callback_ = ::Skylab::Callback
   Autoloader_ = Callback_::Autoloader
 
-  Headless, MetaHell = Autoloader_.require_sidesystem :Headless, :MetaHell
+  MetaHell = Autoloader_.require_sidesystem :MetaHell
 
   TestSupport_ = self  # gotcha: we cannot set the eponymous
                                   # #hiccup constant because there is a

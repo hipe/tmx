@@ -13,7 +13,7 @@ module Skylab::TestSupport
         # passed throughout the application and is the central conduit though
         # which all expression is received and then articulated.
 
-        Headless::SubClient::EN_FUN[ self, :private, [ :and_, :or_, :s ] ]
+        RegretLib_::EN_add_methods[ self, :private, [ :and_, :or_, :s ] ]
 
         def initialize * x_a
           @client = Services__.new x_a
@@ -35,12 +35,12 @@ module Skylab::TestSupport
         end
 
         def code x
-          Headless::CLI::Pen::FUN::Stylify[ [ :green ], x ]
+          RegretLib_::CLI_stylify[ [ :green ], x ]
         end
 
         def par i  # proof of concept - has problems
           par = @client.fetch_parameter i
-          stem = Headless::Name::FUN::Labelize[ par.local_normal_name ].downcase
+          stem = RegretLib_::Name_symbol_to_label[ par.loca_normal_name ]
           if par.has_arity
             if %i( zero_or_one zero_or_more ).include? par.arity_value
               code "--#{ stem.gsub ' ', '-' }"
@@ -48,12 +48,12 @@ module Skylab::TestSupport
               code "<#{ stem.gsub ' ', '-' }>"
             end
           else
-            "'#{ Headless::Name::FUN::Labelize[ par.local_normal_name ].downcase }'"
+            "'#{ RegretLib_::Name_symbol_to_label[ par.local_normal_name ] }'"
           end
         end
 
         def escape_path pn
-          Headless::CLI::PathTools::FUN.pretty_path[ pn ]
+          RegretLib_::Pretty_path_proc[][ pn ]
         end
 
         class Services___

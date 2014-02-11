@@ -16,7 +16,7 @@ module Skylab::TestSupport
 
       SWITCH__ = '--help'.freeze
 
-      Match__ = Index_[ SWITCH__ ]
+      Match__ = QuicLib_::CLI_basic_switch_index[ SWITCH__ ]
 
       def args_moniker
       end
