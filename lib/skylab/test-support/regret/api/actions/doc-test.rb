@@ -194,7 +194,6 @@ module Skylab::TestSupport::Regret::API
     API = API
     DocTest = self
     Lib_ = ::Skylab::TestSupport::Lib_
-    MetaHell = MetaHell
     PROCEDE__ = true
     Regret = ::Skylab::TestSupport::Regret
     RegretLib_ = API::RegretLib_

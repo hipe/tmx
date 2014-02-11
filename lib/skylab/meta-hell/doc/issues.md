@@ -1,3 +1,4 @@
+[#057]       #doc-point the library narrative ..
 [#056]       #node-tracker :#contoured-fields
 [#055]       #doc-point the module node narrative ..
 [#054]       #parent-node: [#041] "ghost modules explained.." #autoloading

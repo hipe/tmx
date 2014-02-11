@@ -118,7 +118,7 @@ module Skylab::TestSupport::Regret::API
 
     def rndr_note_x_a x_a
       if x_a.length.nonzero?
-        TestSupport::Library_.touch :JSON
+        TestSupport_::Library_.touch :JSON
         " #{ ::Hash[ * x_a ].to_json }"
       end
     end
@@ -139,7 +139,7 @@ module Skylab::TestSupport::Regret::API
       if @do_check
         @o = @out
       else
-        @io = @o = TestSupport::Library_::StringIO.new
+        @io = @o = TestSupport_::Library_::StringIO.new
       end ; nil
     end
 

@@ -124,7 +124,7 @@ module Skylab::TestSupport
       # both the stream name and the string content after any filters have
       # been applied
       @debug ||= Debug__.new
-      @debug.condition_p ||= MetaHell::MONADIC_TRUTH_
+      @debug.condition_p ||= MONADIC_TRUTH_
       @debug.emit_line_p = -> line do
         stderr.puts [ line.stream_name, line.string ].inspect
       end

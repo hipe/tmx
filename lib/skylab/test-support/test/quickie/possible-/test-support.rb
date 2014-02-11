@@ -2,23 +2,17 @@ require_relative '../../test-support'
 
 module Skylab::TestSupport::TestSupport::Quickie::Possible_
 
-  ::Skylab::TestSupport::TestSupport[ Possible_TS_ = self ]
-
-  include CONSTANTS
-
-  Lib_ = Lib_
-
-  Quickie = TestSupport::Quickie
-
+  TestSupport_ = ::Skylab::TestSupport
+  TestSupport_::TestSupport[ Possible_TS_ = self ]
+  Lib_ = TestSupport_::Lib_
+  Quickie = TestSupport_::Quickie
     Possible_ = Quickie::Possible_
-
-  TestSupport = TestSupport
 
   extend Quickie
 
   module Articulator_
 
-    Articulator_ = ::Skylab::TestSupport::Quickie::Possible_::Articulator_
+    Articulator_ = Quickie::Possible_::Articulator_
 
   end
 

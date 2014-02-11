@@ -51,7 +51,7 @@ module Skylab::TestSupport
       end
 
       def invoke argv
-        bm = Chain__[
+        bm = QuicLib_::Function_chain[
           -> { ready_plugins },
           -> { parse_argv argv },
           -> sig_a { resolve sig_a } ]
@@ -119,7 +119,7 @@ module Skylab::TestSupport
       end
 
       def parse_argv argv
-        a = Chain__[
+        a = QuicLib_::Function_chain[
           -> { collect_signatures argv },
           -> sig_a { check_if_argv_is_completely_parsed sig_a } ]
         a and [ true, a ]
@@ -218,7 +218,13 @@ module Skylab::TestSupport
         Headless__[]::NLP::EN::Number::FUN.number[ d ]
       end
 
+      Function_chain = -> * p_a do
+        MetaHell__[]::FUN::Function_chain_[ p_a, nil ]
+      end
+
       Headless__ = TestSupport_::Lib_::Headless__
+
+      MetaHell__ = TestSupport_::Lib_::MetaHell__
 
       Name_const_basename = -> s do
         Headless__[]::Name::FUN::Const_basename[ s ]
@@ -236,9 +242,8 @@ module Skylab::TestSupport
       Pretty_path = -> x do
         Headless__[]::CLI::PathTools::FUN::Pretty_path[ x ]
       end
+
+      Scanner = Lib_::Scanner
     end
-
-    Chain__ = MetaHell::FUN.function_chain
-
   end
 end

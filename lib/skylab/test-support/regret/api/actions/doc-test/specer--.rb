@@ -2,7 +2,9 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
 
   class Specer__  # read [#025] the specer narrative #storypoint-5 intro
 
-    MetaHell::FUN::Fields_[ :client, self, :method, :absorb, :field_i_a,
+    RegretLib_ = ::Skylab::TestSupport::Regret::API::RegretLib_
+
+    RegretLib_::Fields[ :client, self, :method, :absorb, :field_i_a,
       %i( core_basename load_file load_module
         outstream path snitch templo_name ) ]
 
@@ -224,7 +226,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     def get_another_correct_anchored_name_via_the_load_module
       c_a = @load_module.split DCOLON__
       top = ::Object.const_get c_a.shift
-      name, _ = MetaHell::Boxxy::Resolve_name_and_value[
+      name, _ = RegretLib_::Loader_resolve_const_name_and_value[
         :from_module, top, :path_x, c_a ]
       c_a[ -1 ] = name  # any correction to last part only
       c_a
@@ -239,7 +241,8 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     end
 
     def rslv_name_and_value m, c
-      MetaHell::Boxxy::Resolve_name_and_value[ :core_basename, @core_basename,
+      RegretLib_::Loader_resolve_const_name_and_value[
+        :core_basename, @core_basename,
         :else_p, -> err do
           say_no_such_constant m, c, err
         end, :from_module, m, :path_x, c ]
@@ -295,8 +298,8 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     end
 
     def begn_templo
-      _tmod = MetaHell::Boxxy::Fuzzy_const_get[
-        DocTest::Templos__, @templo_name ]
+      _tmod = RegretLib_::Loader_fuzzy_const_get[
+        @templo_name, DocTest::Templos__ ]
       @templo = _tmod.begin @snitch, @base_mod,
         @corrected_anchored_const_a, @block_a
       PROCEDE__

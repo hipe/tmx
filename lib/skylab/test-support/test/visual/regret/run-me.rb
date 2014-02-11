@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby -w
 
-module ::Skylab
+module Skylab
   class SimpleCov
   end
 end
 
-module ::Skylab::SimpleCov::TestSupport
+module Skylab::SimpleCov::TestSupport
 
   module Run_Me
 

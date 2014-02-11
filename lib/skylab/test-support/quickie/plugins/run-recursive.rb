@@ -128,7 +128,7 @@ module Skylab::TestSupport
       end
 
       def _spec_rb
-        TestSupport::FUN::Spec_rb[]
+        TestSupport_::FUN::Spec_rb[]
       end
 
       def files_not_found path

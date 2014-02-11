@@ -1010,8 +1010,6 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     attr_reader :paystream, :infostream
   end
 
-  # ~ consts at the bottom becuase they can be
-
-  MONADIC_TRUTH_ = -> _ { true }
+  MONADIC_TRUTH_ = ts::MONADIC_TRUTH_
 
 end

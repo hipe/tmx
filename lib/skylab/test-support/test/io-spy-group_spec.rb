@@ -6,13 +6,13 @@ module Skylab::TestSupport::TestSupport::IO
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[ts] IO spy group" do
 
     it "aggregates emissions from multiple streams onto the same ordered queue" do
 
-      g = TestSupport::IO::Spy::Group.new
+      g = TestSupport_::IO::Spy::Group.new
       red = g.for :red
       blue = g.for :blue
       red.puts "r1"

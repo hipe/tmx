@@ -2,7 +2,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
 
   class Comment_
 
-    MetaHell::Pool.enhance( self ).with_lease_and_release -> do
+    RegretLib_::Pool[ self ].with_lease_and_release -> do
       new
     end
 
@@ -30,8 +30,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     end
   end
 
-  Comment_::Scanner_ = MetaHell::Function::Class.new :gets
-  class Comment_::Scanner_  # base class
+  Comment_::Scanner_ = RegretLib_::Procs_as_methods.call :gets do
     class << self
       alias_method :[], :new
     end

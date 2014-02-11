@@ -44,6 +44,10 @@ module Skylab::MetaHell
     #     f.yep # => NoMethodError: private method `yep' called for ..
     #
 
+    def self.define_public_methods_on_client i_a, mod
+      _make_methods mod, :public, :method, i_a
+    end
+
     # `self._make_methods` - mutates `i_a`.
 
     -> do

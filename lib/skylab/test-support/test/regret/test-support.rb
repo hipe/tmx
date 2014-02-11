@@ -2,21 +2,27 @@ require_relative '../test-support'
 
 module Skylab::TestSupport::TestSupport::Regret
 
-  ::Skylab::TestSupport::TestSupport[ TestSupport_ = self ]
+  TestSupport_ = ::Skylab::TestSupport
 
-  part = nil
-  set_command_parts_for_system_under_test do |y|
-    part ||= ::Skylab::Subsystem::PATHNAMES.calculate do
-      bin.join( supernode_binfile ).to_s
+  TestSupport_::TestSupport[ TS__ = self ]
+
+  -> do
+    part = nil
+    set_command_parts_for_system_under_test do |y|
+      y << part[]
     end
-    y << part
-  end
+    part = -> do
+      TestSupport_::TestSupport::TestLib_::System_pathnames_calculate[ -> do
+        bin.join( supernode_binfile ).to_s
+      end ]
+    end
+  end.call
 
   module InstanceMethods
 
-    SUT_TEST_SUPPORT_MODULE_HANDLE_ = TestSupport_  # makes the below method work
+    SUT_TEST_SUPPORT_MODULE_HANDLE_ = TS__  # makes the below method work
 
-    define_method :sut_cmd_a, ::Skylab::TestSupport::Regret::Get_SUT_command_a_method_
+    define_method :sut_cmd_a, TestSupport_::Regret::Get_SUT_command_a_method_
 
   end
 end

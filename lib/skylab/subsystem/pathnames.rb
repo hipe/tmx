@@ -22,7 +22,7 @@ module ::Skylab
         define_singleton_method :method_added do |i| a << i end
 
         def bin
-          @bin ||= ::Skylab.dir_pathname.join( '../../bin' )
+          @bin ||= ::Skylab.dir_pathname.join '../../bin'
         end
 
         def binfile_prefix

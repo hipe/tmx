@@ -1,6 +1,6 @@
 module Skylab::TestSupport
 
-  module System
+  module System  # [#057]:the-system-node
     class << self
       def stderr
         Lib_::Stderr[]
@@ -8,21 +8,17 @@ module Skylab::TestSupport
     end
   end
 
-  module Library_  # :+[#su-001]
+  module Library_  # read [#057] the library narrative #into. :+[#su-001]
 
-    stdlib, subsys = Autoloader_.at :require_stdlib, :require_sidesystem
-    gemlib = stdlib
+    gemlib = stdlib = Autoloader_.method :require_stdlib
 
     o = { }
     o[ :Adsf ] = gemlib
     o[ :Benchmark ] = stdlib
-    o[ :DRb ] = -> _ { require 'drb/drb' ; ::DRb }
     o[ :FileUtils ] = stdlib
     o[ :JSON ] = stdlib
-    o[ :MetaHell ] = subsys
     o[ :Open3 ] = stdlib
     o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
-    o[ :Porcelain ] = subsys
     o[ :Rack ] = gemlib
     o[ :StringIO ] = stdlib
     o[ :StringScanner ] = -> _ { require 'strscan' ; ::StringScanner }
@@ -52,6 +48,10 @@ module Skylab::TestSupport
       Face__[]::API::Normalizer_
     end
 
+    Autoload_const_missing_class = -> do
+      MetaHell__[]::MAARS::Const_Missing_
+    end
+
     Autoloader__ = memoize[ -> do
       Skylab__[]::Autoloader
     end ]
@@ -78,6 +78,18 @@ module Skylab::TestSupport
       Autoloader_.default_core_file
     end
 
+    Enhancement_shell = -> * i_a do
+      MetaHell__[]::Enhance::Shell.new i_a
+    end
+
+    Fields_contoured = -> mod, * x_a do
+      MetaHell__[]::FUN::Fields_::Contoured_.from_iambic_and_client x_a, mod
+    end
+
+    Funcy = -> mod do
+      MetaHell__[]::Funcy[ mod ]
+    end
+
     Face__ = sidesys[ :Face ]
 
     Headless__ = sidesys[ :Headless ]
@@ -88,6 +100,10 @@ module Skylab::TestSupport
 
     IO = -> do
       Headless__[]::IO
+    end
+
+    Let = -> do
+      MetaHell__[]::Let
     end
 
     Let_methods = -> mod do
@@ -113,16 +129,21 @@ module Skylab::TestSupport
       Autoloader__[]::FUN::Constantize::Sanitized_file
     end
 
+    Procs_as_methods = -> * i_a, & p do
+      MetaHell__[]::Function::Class.from_i_a_and_p i_a, p
+    end
+
+    Proc_as_method = -> mod do
+      MetaHell__[]::Function.enhance mod
+    end
+
     Scanner = -> x do
       Basic__[]::List::Scanner[ x ]
     end
 
-    Stderr = -> { ::STDERR }      # littering our code with hard-coded globals
-                                  # (or constants, that albeit point to a
-    Stdout = -> { ::STDOUT }      # resource like this (an IO stream)) is a
-                                  # smell. we instead reference thme thru
-                                  # these, which will at least point back to
-                                  # this comment.
+    Stderr = -> { ::STDERR }
+      # [#057]:the-reasons-to-access-system-resources-this-way
+    Stdout = -> { ::STDOUT }
 
     Skylab__ = memoize[ -> do
       require_relative '..'

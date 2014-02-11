@@ -1,6 +1,7 @@
 class Skylab::TestSupport::Regret::API::Actions::DocTest
 
-  Specer__::Block = MetaHell::Function::Class.new :accept, :flush
+  Specer__::Block = RegretLib_::Procs_as_methods[ :accept, :flush ]
+
   class Specer__::Block
 
     # what this mess does: within a block of comments there can be N code

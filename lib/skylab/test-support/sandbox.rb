@@ -9,11 +9,12 @@ module Skylab::TestSupport::Sandbox
   #
   # These "sandbox" enhancements here, then, represent a year-ish worth of
   # distillation of such testy things we tended to do, things that were
-  # intented to be more readable than MetaHell::{ Klass | Modul }::Creator,
+  # intented to be more readable than [mh]::{ Klass | Modul }::Creator,
   # but more concise (and de-facto tagged) than writing these kind of things
   # always by hand.
 
-  MetaHell = ::Skylab::MetaHell
+
+  Lib_ = ::Skylab::TestSupport::Lib_
 
   module Spawner
 
@@ -104,12 +105,9 @@ module Skylab::TestSupport::Sandbox
     end
   end
 
-  Shell_ = MetaHell::Enhance::Shell.new %i|
-    kiss_with produce_subclasses_of
-  |
+  Shell_ = Lib_::Enhancement_shell[ :kiss_with, :produce_subclasses_of ]
 
-  Kernel_ = MetaHell::Function::Class.new :flush
-  class Kernel_
+  Kernel_ = Lib_::Procs_as_methods.call :flush do
 
     def initialize sb_mod, kiss_with, superklass
       @flush = -> do
@@ -125,9 +123,7 @@ module Skylab::TestSupport::Sandbox
           sb_mod.send :define_singleton_method, :produce_subclass do
             const_set "KLS_#{ last_id += 1 }", ::Class.new( superklass.call )
           end
-        end
-
-        nil
+        end ; nil
       end
     end
   end
@@ -143,8 +139,7 @@ module Skylab::TestSupport::Sandbox
     end
   end
 
-  Host::Kernel_ = MetaHell::Function::Class.new :flush
-  class Host::Kernel_
+  Host::Kernel_ = Lib_::Procs_as_methods.call :flush do
 
     def initialize anchor_mod
 
@@ -160,9 +155,7 @@ module Skylab::TestSupport::Sandbox
           engine ||= Host::Engine_.new anchor_mod
           mod.send :define_method, :define_sandbox_constant, &
             engine.define_sandbox_constant_proc
-        end
-
-        nil
+        end ; nil
       end
     end
   end
@@ -191,7 +184,8 @@ module Skylab::TestSupport::Sandbox
         end
       end
     end
-    MetaHell::Function.enhance( self ).
+
+    Lib_::Proc_as_method[ self ].
       as_public_getter :define_sandbox_constant_proc   # grease
 
   end

@@ -2,13 +2,11 @@ module Skylab::TestSupport
 
   module Regret
 
-    self::API.class
-
     module CLI::Actions
 
       module DocTest
 
-        RegretLib_ = API::RegretLib_
+        RegretLib_ = Regret::API::RegretLib_
 
         Parse_Recursive_ = RegretLib_::Struct[ :y, :v, :argv ]
 
@@ -22,7 +20,7 @@ module Skylab::TestSupport
 
         class Parse_Recursive_
 
-          MetaHell::Funcy[ self ]
+          Lib_::Funcy[ self ]
 
           def execute
             if @argv.length.nonzero?
@@ -45,14 +43,14 @@ module Skylab::TestSupport
             nil
           end
 
-          o = MetaHell::FUN::Parse::Field_::Exponent_
+          o = RegretLib_::Field_exponent_proc[]
 
           A_ = [ o[ :do_list, 'list', nil, "just list the files" ],
                  o[ :do_check, 'check', nil, "write to stdout all output" ],
                  o[ :is_dry_run, 'dry-run', 'n' ],
                  o[  nil, '--' ] ]
 
-          P_ = MetaHell::FUN.parse_alternation.
+          P_ = RegretLib_::Parse_alternation[].
             curry[ :pool_procs, A_.map(& :p ) ]
 
           Or_ = RegretLib_::Oxford_or

@@ -1,20 +1,20 @@
 require_relative '../core'
 
-
 module Skylab::TestSupport::TestSupport
 
+  TestSupport_ = ::Skylab::TestSupport
   TS_TS = self
 
   module CONSTANTS
-    MetaHell = ::Skylab::MetaHell  # temporary b.c it isn't in [fa]
-    TestSupport = ::Skylab::TestSupport
-      Lib_ = TestSupport::Lib_
+    EMPTY_A_ = TestSupport_::EMPTY_A_
+    Lib_ = TestSupport_::Lib_
+    TestSupport_ = TestSupport_
     TS_TS = TS_TS
   end
 
   include CONSTANTS
 
-  TestSupport::Regret[ self ]
+  TestSupport_::Regret[ self ]
 
   module InstanceMethods
 
@@ -26,7 +26,14 @@ module Skylab::TestSupport::TestSupport
   end
 
   module TestLib_
+    memoize = TestSupport_::Callback_.memoize
     Headless__ = ::Skylab::TestSupport::Lib_::Headless__
+    System_pathnames_calculate = -> p do
+      Subsystem__[]::PATHNAMES.calculate( & p )
+    end
+    Subsystem__ = memoize[ -> do
+      ::Skylab::Subsystem  # or..
+    end ]
     Tmpdir_pathname = -> do
       Headless__[]::System.defaults.tmpdir_pathname
     end

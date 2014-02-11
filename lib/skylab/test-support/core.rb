@@ -12,14 +12,10 @@ require_relative '../callback/core'
 module Skylab::TestSupport  # :[#021]
 
   Callback_ = ::Skylab::Callback
-  Autoloader_ = Callback_::Autoloader
-
-  MetaHell = Autoloader_.require_sidesystem :MetaHell
-
-  TestSupport_ = self  # gotcha: we cannot set the eponymous
-                                  # #hiccup constant because there is a
-                                  # legitimate other module ::SL::TS::TS.
-
+    Autoloader_ = Callback_::Autoloader
+  EMPTY_A_ = [].freeze
+  MONADIC_TRUTH_ = -> _ { true }
+  TestSupport_ = self  # there is another module called ::SL::TS::TS
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 

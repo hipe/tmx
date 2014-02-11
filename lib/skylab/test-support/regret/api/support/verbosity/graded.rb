@@ -3,7 +3,8 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
   # read [#024] the graded verbosity narrative #storypoint-5
 
   Graded = self
-  MetaHell = ::Skylab::MetaHell
+
+  Lib_ = ::Skylab::TestSupport::Regret::API::RegretLib_
 
   class Graded
     def self.produce_conf_module grade_i_a
@@ -26,8 +27,7 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
     end
   end
 
-  module Aggregate_
-  end
+  Aggregate_ = ::Module.new
 
   module Aggregate_::CLI_Modality_Client_
     def self.[] vmod, cli_kls
@@ -192,7 +192,7 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
       self.class.members
     end
 
-    MetaHell::Function self, :@aref, :[]
+    Lib_::Define_methods_for_procs_in_ivars[ self, :@aref, :[] ]
 
     def make_snitch io, *expression_agent  # #storypoint-195
       self.class.get_snitch_class.new self, io, *expression_agent
@@ -245,8 +245,8 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
       self.class.members
     end
 
-    MetaHell::Function self, :write, :puts, :say, :is, :@puts, :<<,
-      # ( because we often forget, the above is "use @puts for :<<" etc )
-      :event, :y
+    Lib_::Define_methods_for_procs_in_ivars[ self,
+      :write, :puts, :say, :is, :@puts, :<<, :event, :y ]
+        # (reminder: ":@foo, :bar" means "use proc in @foo for method 'bar')
   end
 end

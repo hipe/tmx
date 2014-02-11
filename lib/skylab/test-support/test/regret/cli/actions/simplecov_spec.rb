@@ -12,13 +12,13 @@ module Skylab::TestSupport::TestSupport::Regret::CLI_Actions_Simplecov
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  TestSupport::Library_.touch :Open3
+  TestSupport_::Library_.touch :Open3
 
-  Lib_ = TestSupport::Lib_
+  Lib_ = TestSupport_::Lib_
 
-  NILADIC_NILNESS_ = -> { }
+  NILADIC_EMPTINESS_ = -> { }
 
   describe "[ts] regret CLI action s simplecov" do
 
@@ -110,7 +110,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI_Actions_Simplecov
             yy and yy << line.to_a.inspect
             y << line ; true
           else
-            io.close ; p = NILADIC_NILNESS_ ; nil
+            io.close ; p = NILADIC_EMPTINESS_ ; nil
           end
         end
         -> { p[] }
@@ -130,7 +130,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI_Actions_Simplecov
     -> do
       fu = nil
       define_method :fu do
-        fu ||= TestSupport::Library_::FileUtils
+        fu ||= TestSupport_::Library_::FileUtils
       end
     end.call
 
@@ -139,7 +139,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI_Actions_Simplecov
     end
 
     def test_home_pathname
-      TestSupport::TestSupport.dir_pathname
+      TestSupport_::TestSupport.dir_pathname
     end
   end
 end

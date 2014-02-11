@@ -5,12 +5,13 @@ module Skylab::TestSupport
     module API
       API = self
       DEFAULT_CORE_BASENAME_ = "core#{ Autoloader_::EXTNAME }"
+      EMPTY_A_ = [].freeze
+      EMPTY_P_ = -> {}
       Lib_ = TestSupport_::Lib_
       Library_ = TestSupport_::Library_
-      MetaHell = TestSupport_::Library_::MetaHell
       Plugin_ = TestSupport_::Lib_::Heavy_plugin[]
       Regret = Regret
-      TestSupport = TestSupport_
+      TestSupport_ = TestSupport_
       WRITEMODE_ = 'w'.freeze
 
       module RegretLib_
@@ -19,16 +20,32 @@ module Skylab::TestSupport
         CLI_stylify = -> a, x do
           Headless__[]::CLI::Pen::FUN::Stylify[ a, x ]
         end
+        Define_methods_for_procs_in_ivars = -> mod, * i_a do
+          MetaHell__[]::Function.define_public_methods_on_client i_a, mod
+        end
         Dev_null = -> do
           Headless__[]::IO::DRY_STUB
         end
         EN = -> p do
-          Headless__::NLP::EN.calculate( & p )
+          Headless__[]::NLP::EN.calculate( & p )
         end
         EN_add_methods = -> mod, * x_a do
           Headless__[]::SubClient::EN_FUN.via_iambic_on_mod x_a, mod
         end
+        Field_exponent_proc = -> do
+          MetaHell__[]::FUN::Parse::Field_::Exponent_
+        end
+        Fields = -> * x_a do
+          MetaHell__[]::FUN::Fields_.via_iambic x_a
+        end
         Headless__ = Lib_::Headless__
+        Loader_fuzzy_const_get = -> name, mod do  # :[#028]:C
+          MetaHell__[]::Boxxy::Fuzzy_const_get[ mod, name ]
+        end
+        Loader_resolve_const_name_and_value = -> * x_a do
+          MetaHell__[]::Boxxy::Resolve_name_and_value[ * x_a ]  # :[#028]:B
+        end
+        MetaHell__ = Lib_::MetaHell__
         Name_normal_to_slug = -> i do
           Headless__[]::Name::FUN::Slugulate[ i ]
         end
@@ -47,19 +64,27 @@ module Skylab::TestSupport
           Headless__[]::NLP::EN::Levenshtein::
             With_conj_s_render_p_closest_n_items_a_item_x[ sep, p, d, a, s ]
         end
+        Memoize = -> p do
+          Callback_.memoize[ p ]
+        end
         Oxford_or = TestSupport_::Callback_::Oxford_or
+        Parse_alternation = -> do
+          MetaHell__[]::FUN.parse_alternation
+        end
         Path_tools_clear = -> do
           Headless__[]::CLI::PathTools.clear
         end
         Pathname_union = -> a do
           Basic__[]::Pathname::Union[ * a ]
         end
+        Pool = -> mod do
+          MetaHell__[]::Pool.enhance mod
+        end
         Pretty_path_proc = -> do
           Headless__[]::CLI::PathTools::FUN.pretty_path
         end
-        Scanner = -> x do
-          Basic__[]::List::Scanner[ x ]
-        end
+        Procs_as_methods = Lib_::Procs_as_methods
+        Scanner = Lib_::Scanner
         Struct = Lib_::Struct
         SubTree__ = TestSupport_::Autoloader_.
           build_require_sidesystem_proc :SubTree

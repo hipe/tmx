@@ -11,9 +11,9 @@ module Skylab::TestSupport
         # infers e.g [ :Foo, :BarBaz, :Bif ]. it can certainly guess the
         # casing wrong.
 
-        MetaHell::Funcy[ self ]
+        TestSupport_::Lib_::Funcy[ self ]
 
-        MetaHell::FUN::Fields_::Contoured_[ self,
+        Lib_::Fields_contoured[ self,
           :required, :field, :tail_path,
           :required, :field, :notice_p ]
 

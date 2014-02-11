@@ -1,4 +1,4 @@
-module ::Skylab::TestSupport
+module Skylab::TestSupport
 
   module Regret  # read [#017] the introduction to regret
 
@@ -39,8 +39,9 @@ module ::Skylab::TestSupport
 
         @parent_anchor_module = pam  # nil ok
 
-        const_missing_class.nil? and  # if you set it to false you are crazy
-          @const_missing_class = MetaHell::MAARS::Const_Missing_
+        const_missing_class.nil? and @const_missing_class =
+          TestSupport_::Lib_::Autoload_const_missing_class[]
+            # if you set it to false you are crazy
 
         dpn = Twerk_dir_pathname__[ loc, pam, -> x do
           init_autoloader x ; @dir_pathname
@@ -65,7 +66,7 @@ module ::Skylab::TestSupport
         end ]
 
         o[ :InstanceMethods, -> do
-          extend ::Skylab::MetaHell::Let::ModuleMethods  # or fly solo .. #rspec
+          extend TestSupport_::Lib_::Let[]::ModuleMethods
           pam and include pam.instance_methods_module
         end ]
 

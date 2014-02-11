@@ -36,7 +36,7 @@ module Skylab::TestSupport
 
       def money_for_single_path
         @last_s = @lcbp_a.fetch( -1 )
-        @tail_s = TestSupport::FUN::Spec_rb[]
+        @tail_s = TestSupport_::FUN::Spec_rb[]
         @rx = /#{ ::Regexp.escape @tail_s }\z/
         if @rx !~ @tail_s
           when_tail_part_did_not_match
@@ -84,7 +84,7 @@ module Skylab::TestSupport
       SEP__ = '/'.freeze
 
       def when_found_test_directory
-        @lcbp_a[ @test_dir_idx, 1 ] = MetaHell::EMPTY_A_
+        @lcbp_a[ @test_dir_idx, 1 ] = EMPTY_A_
         path_prefix = procure_any_pth_prefix_from_LCBP @lcbp_a * SEP__
         path_prefix and start_service_with_path_prefix path_prefix
       end
@@ -123,7 +123,7 @@ module Skylab::TestSupport
 
       def start_service_with_path_prefix path_prefix
         _io = resolve_stderr_IO
-        TestSupport::Coverage::Service.start _io, -> { path_prefix }
+        TestSupport_::Coverage::Service.start _io, -> { path_prefix }
       end
 
       def resolve_stderr_IO

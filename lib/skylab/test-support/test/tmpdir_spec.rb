@@ -4,16 +4,16 @@ module Skylab::TestSupport::TestSupport::Tmpdir
 
   include ::Skylab::TestSupport::TestSupport::CONSTANTS
 
-  extend TestSupport::Quickie     # rspec-like testing w/o rspec - try loading
+  Tmpdir = TestSupport_::Tmpdir
+
+  extend TestSupport_::Quickie     # rspec-like testing w/o rspec - try loading
                                   # this file with 'ruby -w this/file.rb'
 
-  describe "#{ Tmpdir = TestSupport::Tmpdir }" do
-
-    extend TestSupport::MetaHell::Let
+  describe "[ts] tmpdir" do
 
     it "with no pathname - you get ::Dir.tmpdir for your system" do
       tmpdir = Tmpdir.new
-      tmpdir.to_s.should eql(::Dir.tmpdir)
+      tmpdir.to_path.should eql ::Dir.tmpdir
     end
 
     it "relative path (don't!) - raises" do
@@ -26,7 +26,7 @@ module Skylab::TestSupport::TestSupport::Tmpdir
       tmpdir = Tmpdir.new 'TMPDIR-TEST-NEVER-SEE', verbose: true
       from_here = anchor
       e = nil
-      TestSupport::Library_::FileUtils.cd from_here do
+      TestSupport_::Library_::FileUtils.cd from_here do
         begin tmpdir.prepare ; rescue ::SecurityError => e ; end
       end
       e.message.should match( /unsafe tmpdir name - \./ )
@@ -136,7 +136,7 @@ module Skylab::TestSupport::TestSupport::Tmpdir
     end
 
     def fu
-      TestSupport::Library_::FileUtils
+      TestSupport_::Library_::FileUtils
     end
   end
 end

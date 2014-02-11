@@ -50,7 +50,7 @@ the utility of our widespread "library adapter layer", hence this document.
   with this experiment.
 
 a benefit of the above point is that (assuming the library has no uncovered
-(unused) code), at a glance we can see all of the external dependnecies that
+(unused) code), at a glance we can see all of the external dependencies that
 the subsystem has, not only in terms of what the sidesystems are (and stdlib
 and gems) that it needs, but what sub-parts of those side-systems it needs.
 
@@ -126,10 +126,15 @@ the same subsystem. this is part of the reason we use these two different
 names.)
 
 
-• the "Lib_" style may be perceived as more "direct" and less "magical"
+• the "Lib_" style may be perceived as more "direct" and less "magical" and..
 
   • when someone says "what is going on here", they may be more likely to
     answer their own question with this style
+
+  • because a lib module is nothing more than a hash-like collection of procs,
+    they can be thrown around easily as functions that are first-class objects,
+    making it trivial to nest different 'lib' nodes in the same big subsystem,
+    and to 'inherit' downwards certain elements from super-libs to sub-libs.
 
 
 • the "Library_" style may be seen as easier to read
@@ -140,4 +145,13 @@ names.)
   • but note that the difference is negligible in the case of proc-likes
     (as opposed to module-likes) in your library, where you will be using
     the '[]' (or 'call') anyway.
+
+
+In practice, the strong convention has become to use a "Library_" node for
+gems and stdlib libraries, and "Lib_" for libraries and API "portals" for
+going from inside the subsystem out to other sidesystems. this is because
+given how relatively little the former changes and how relatively frequently
+the latter does, we use the former for its readability and the latter for
+how amenable to change it is.
+
 _

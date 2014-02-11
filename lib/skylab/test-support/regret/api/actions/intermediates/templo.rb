@@ -16,7 +16,8 @@ module Skylab::TestSupport::Regret::API
         cur_a = [ cur_mod.to_s.intern ]
         count = 0
         step = -> do
-          i, mod = MetaHell::Boxxy::Resolve_name_and_value[ :from_module, cur_mod, :path_x, loc_a.fetch( 0 ) ]
+          i, mod = RegretLib_::Loader_resolve_const_name_and_value[
+            :from_module, cur_mod, :path_x, loc_a.fetch( 0 ) ]
           cur_a.push i
           loc_a.shift
           loc_a.length.zero? and break( step = nil )

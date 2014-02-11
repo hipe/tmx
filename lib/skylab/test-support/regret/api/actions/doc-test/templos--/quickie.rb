@@ -26,7 +26,7 @@ module Skylab::TestSupport::Regret::API
         end,
 
       :help,
-        :when_not_provided, MetaHell::EMPTY_P_,
+        :when_not_provided, EMPTY_P_,
        :when_provided, -> do
           show_option_help
           SUCCESS_EXITSTATUS__
@@ -40,7 +40,7 @@ module Skylab::TestSupport::Regret::API
       ctxt = tstt = beft =
         rtma = rbma = rlma = nil  # memoize articulators just for the snarks
 
-      rlma = MetaHell::FUN.memoize[ -> do
+      rlma = RegretLib_::Memoize[ -> do
         mgn = tstt.first_margin_for :code
         mgn =~ /\A[ ]+\z/ or fail "sanity - clean margin? #{ mgn.inspect }"
         RegretLib_::List[]::Marginated::Articulation.new do
