@@ -27,17 +27,19 @@ but has several benefits to be discussed elsewhere.
 
 
 
-## #set
+## :#vertical-fields
 
 general purpose application tree configuration API.
 
+(EDIT: this has progency elsewhere. but is still kind of nifty, if obtuse)
+
 you create one SET_ function at the top-ish of your library, after you've
-you've declared some proxy classes or mechanical classes (the workhorses
+declared some proxy classes or mechanical classes (the workhorses
 of the matryoshka doll [#040] stack.) you create it by giving it an
 ordered list of symbolic names representing your proxy classes, and then
 a hash with the classes themselves keyed to those names:
 
-    SET_ = Set_.new( [:hi, :mid, :lo], hi: App, mid: NS, lo: Cmd )
+    SET_ = Vertical_Fields_.new( [:hi, :mid, :lo], hi: App, mid: NS, lo: Cmd )
 
 when you want to add a field to your stack, you call your SET_ function
 with a symbolic name for the field, perhaps a default, and perhaps a

@@ -1,6 +1,6 @@
-module Skylab::Face
+class Skylab::Face::CLI::Client
 
-  module Face_::CLI::Namespace::Adapter::For::Face
+  module Namespace_::Adapter::For::Face  # this is an :+[#044] ouroboros
 
     module Of
 

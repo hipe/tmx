@@ -1,10 +1,13 @@
-class Skylab::Face::CLI
+module Skylab::Face
+
+  class CLI::Client
 
     # a variety of 5.x facets are grouped here, including many that depend
     # on each other.
 
-    module CLI::Set
-      def self.touch ; nil end      #kick-the-loading-warninglessly-and-trackably
+    module Set_
+      def self.touch
+      end  #kick-the-loading-warninglessly-and-trackably
     end
 
     # ~ 5.9x - command parameters as mutable ~
@@ -30,7 +33,7 @@ class Skylab::Face::CLI
 
     # ~ 5.11x - the `set` API ~
 
-    class Namespace  # #re-open for facet.
+    class Namespace_  # #re-open for facet.
       class << self
         undef_method :set
         def set *a
@@ -71,7 +74,7 @@ class Skylab::Face::CLI
       end
     end
 
-    class Command  # #re-open
+    class Command_  # #re-open
     private
       def process_deferred_set  # assume trueish `@sheet.set_a`
         @sheet.set_a.each do |k, v|  # do *NOT* mutate the set_a here!!
@@ -169,7 +172,7 @@ class Skylab::Face::CLI
 
     # ~ 5.14x - invisible
 
-    class Command
+    class Command_
       undef_method :is_visible  # even though it is not a magic toucher
       def is_visible
         ! invisible_value
@@ -212,7 +215,7 @@ class Skylab::Face::CLI
 
     # ~ 5.16x - autonomy
 
-    class Command
+    class Command_
       undef_method :is_autonomous
       def is_autonomous
         is_autonomous_value
@@ -251,4 +254,5 @@ class Skylab::Face::CLI
         nil
       end
     end
+  end
 end

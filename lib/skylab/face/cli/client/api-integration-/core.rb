@@ -1,14 +1,15 @@
-class Skylab::Face::CLI
+module Skylab::Face
 
-    module CLI::API_Integration
+  class CLI::Client
 
-      def self.touch ; nil end      #kick-the-loading-warninglessly-and-trackably
-
+    module API_Integration_
+      def self.touch
+      end  #kick-the-loading-warninglessly-and-trackably
     end
 
-    CLI::Metastory.touch
+    CLI::Client::Metastory_.touch
 
-    class CLI_Mechanics_  # #re-open for facet
+    class CLI_Kernel_  # #re-open for facet
 
       #  ~ class section 1 - singleton methods ~
 
@@ -90,7 +91,7 @@ class Skylab::Face::CLI
 
       Lib_::Module_accessors[ self, -> do
         private_methods do
-          # we are Mine::CLI::Client::Mechanics
+          # we are Mine::CLI::Client::Kernel
           module_reader :parent_shell_module, '..'
           module_reader :application_module, '../../../'
         end
@@ -108,7 +109,7 @@ class Skylab::Face::CLI
       end
     end
 
-    class Namespace
+    class Namespace_
 
       #  ~ class section 1 - public singleton methods added by this facet ~
 
@@ -134,7 +135,7 @@ class Skylab::Face::CLI
       end.call
     end
 
-    class NS_Mechanics_  # #re-open for facet
+    class NS_Kernel_  # #re-open for facet
 
       undef_method :api  # #loader-stub
 
@@ -155,7 +156,7 @@ class Skylab::Face::CLI
       undef_method :api_services  # #loader-stub
 
       def api_services
-        @api_services ||= CLI::API_Integration::Services_.new self
+        @api_services ||= CLI::Client::API_Integration_::Services_.new self
       end
 
       class Executable_Request_
@@ -233,4 +234,5 @@ class Skylab::Face::CLI
         par_h if par_h.length.nonzero? || had_some
       end
     end
+  end
 end

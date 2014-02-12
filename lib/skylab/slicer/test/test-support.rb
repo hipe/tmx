@@ -13,7 +13,7 @@ module Skylab::Slicer::TestSupport
 
   include CONSTANTS
 
-  Face::TestSupport::CLI[ self ]
+  Face::TestSupport::CLI::Client[ self ]
 
   extend TestSupport::Quickie
 

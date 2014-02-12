@@ -2,11 +2,11 @@ require_relative 'test-support'
 
 module Skylab::Face::TestSupport::API::Metastory
 
-  ::Skylab::Face::TestSupport::TestLib_::Sandboxify[ self ]
+  ::Skylab::Face::TestSupport::API[ self, :sandboxes_et_al ]
 
   describe "[fa] API metastories" do
 
-    extend TS_
+    extend TS__
 
     modex = :API_
 

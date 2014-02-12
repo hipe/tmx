@@ -2,14 +2,12 @@
 
 require_relative 'test-support'
 
-module Skylab::Face::TestSupport::CLI::Option::Help
+module Skylab::Face::TestSupport::CLI::Client::Option::Help
 
-  ::Skylab::Face::TestSupport::CLI::Option[ This_TestSupport = self ]
-
-  CONSTANTS::Common_setup_[ self, :sandbox ]
+  ::Skylab::Face::TestSupport::CLI::Client::Option[ self, :CLI_sandbox ]
 
   module Beffer
-    class CLI_Client < Face::CLI
+    class CLI_Client < Face_::CLI::Client
       use :hi
 
       option_parser do |o|
@@ -30,9 +28,9 @@ module Skylab::Face::TestSupport::CLI::Option::Help
 
   do_invoke = Do_invoke_[]
 
-  describe "[fa] option help" do
+  describe "[fa] CLI client option help" do
 
-    extend This_TestSupport
+    extend TS__
 
     context "typical" do
 
@@ -53,7 +51,7 @@ module Skylab::Face::TestSupport::CLI::Option::Help
 
     module Deffer
 
-      class CLI_Client < Face::CLI
+      class CLI_Client < Face_::CLI::Client
 
         set :num_summary_lines, 3
 

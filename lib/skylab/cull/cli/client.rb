@@ -1,6 +1,6 @@
 module Skylab::Cull
 
-  class CLI::Client < Face::CLI
+  class CLI::Client < Face::CLI::Client
 
     # (see i.m's `prepend`'ed at the end!)
 

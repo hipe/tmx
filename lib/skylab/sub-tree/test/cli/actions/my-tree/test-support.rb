@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SubTree::TestSupport::CLI::Actions::My_Tree
 
-  ::Skylab::SubTree::TestSupport::Testlib_::Face_[]::TestSupport::CLI[ self ]
+  ::Skylab::SubTree::TestSupport::Testlib_::Face_[]::TestSupport::CLI::Client[ self ]
     # do this first
 
   module InstanceMethods

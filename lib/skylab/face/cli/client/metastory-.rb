@@ -1,14 +1,15 @@
-class Skylab::Face::CLI
+module Skylab::Face
 
-    module CLI::Metastory  # [#035]
-      def self.touch ; nil end      #kick-the-loading-warninglessly-and-trackably
+  class CLI::Client
+
+    module Metastory_  # [#035]
+      def self.touch
+      end  #kick-the-loading-warninglessly-and-trackably
     end
 
-    class CLI
-      Face_::Metastory.enhance self, :CLI_, :Modality_Client_
-    end
+    Face_::Metastory.enhance self, :CLI_, :Modality_Client_
 
-    class Namespace
+    class Namespace_
       Face_::Metastory.enhance self, :CLI_, :Namespace_
     end
 
@@ -16,11 +17,12 @@ class Skylab::Face::CLI
       Face_::Metastory.enhance self, :CLI_, :Namespace_
     end
 
-    class Command
+    class Command_
       Face_::Metastory.enhance self, :CLI_, :Action_
     end
 
     #  class Cmd_Sheet_  # #todo only when needed
     #    Face::Metastory.enhance self, :CLI_, :Action_
     #  end
+  end
 end

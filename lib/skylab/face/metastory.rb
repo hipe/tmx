@@ -5,17 +5,17 @@ module Skylab::Face
     def self.enhance k, m, t
       me = self
       k.class_exec do
-        const_defined? :Metastory__, false and fail "already class - #{ k }"
-        const_defined? :Metastory_, false and fail "already metastory - #{ k }"
-        const_set :Metastory_, ( const_set :Metastory__, me.new( m, t ) ).
+        const_defined? :Metastory___, false and fail "already class - #{ k }"
+        const_defined? :Metastory__, false and fail "already metastory - #{ k }"
+        const_set :Metastory__, ( const_set :Metastory___, me.new( m, t ) ).
           new( nil )  # for metastories in libville, they have no subject!
         class << self
           undef_method :metastory
           define_method :metastory do
-            if const_defined? :Metastory_, false
-              const_get :Metastory_, false
+            if const_defined? :Metastory__, false
+              const_get :Metastory__, false
             else
-              const_set :Metastory_, self::Metastory__.new( self )  # money
+              const_set :Metastory__, self::Metastory___.new( self )  # money
             end
           end
         end

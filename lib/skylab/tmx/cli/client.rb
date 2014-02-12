@@ -6,7 +6,7 @@ module Skylab::TMX
   # an intimation at the aspirations for what may grow to maybe become .. hl.)
 
 
-  class CLI::Client < Face::CLI
+  class CLI::Client < Face::CLI::Client
 
     # TMX::Modules::Arch.touch
 
@@ -59,7 +59,7 @@ module Skylab::TMX
       rs
     end
 
-    class Mechanics_ < Face::CLI::CLI_Mechanics_  # the current way to do this :/
+    class Kernel_ < Face::CLI::Client::CLI_Kernel_  # the current way to do this :/
 
       def puff  # this is [#fa-038] - we get "puffed" when we need to.
         ( @puffer ||= build_puffer ).puff

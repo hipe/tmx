@@ -8,7 +8,7 @@ module Skylab::TMX::TestSupport::CLI::Arch
 
   extend TestSupport::Quickie
 
-  describe "#{ TMX }::CLI arch" do
+  describe "tmx CLI arch" do
 
     extend TS_
 

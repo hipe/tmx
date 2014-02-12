@@ -1,6 +1,6 @@
 module Skylab::FileMetrics
 
-  class CLI < Face_::CLI
+  class CLI < Face_::CLI::Client
 
     ::Skylab::Autoloader[ self ]
 

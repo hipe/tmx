@@ -2,7 +2,7 @@ module Skylab::TMX
 
   module Modules::Php
 
-    class CLI < Skylab::Face::CLI
+    class CLI < Skylab::Face::CLI::Client
 
       set :desc, -> y do
         y << 'whatever.'

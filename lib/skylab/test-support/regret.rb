@@ -14,13 +14,17 @@ module Skylab::TestSupport
 
       include TestSupport_::Lib_::Autoloader__[]::Methods
 
-      def [] child_mod, loc=nil
-        loc ||= caller_locations( 1, 1 )[ 0 ]
+      def [] child_mod, * x_a
+        loc = ( x_a.length.nonzero? and (( first = x_a.first )).
+          respond_to?(:absolute_path) || first.respond_to?(:relative_path_from)
+            ) ? x_a.shift : caller_locations( 1, 1 )[ 0 ]
         parent_anchor_module = self
         child_mod.module_exec do
           extend Anchor_ModuleMethods
           init_regret loc, parent_anchor_module
         end
+        x_a.length.nonzero? and
+          apply_x_a_on_child_test_node x_a, child_mod  # :#hook-out
         nil
       end
 

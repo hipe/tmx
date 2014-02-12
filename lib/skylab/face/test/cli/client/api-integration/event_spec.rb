@@ -1,21 +1,19 @@
 require_relative 'test-support'
 
-module Skylab::Face::TestSupport::CLI::API_Integration::Event
+module Skylab::Face::TestSupport::CLI::Client::API_Integration::Event
 
-  ::Skylab::Face::TestSupport::CLI::API_Integration[ Event_TestSupport = self ]
+  ::Skylab::Face::TestSupport::CLI::Client::API_Integration[ self, :CLI_sandbox]
 
-  CONSTANTS::Common_setup_[ self, :sandbox ]
+  describe "[fa] CLI client API event integration" do
 
-  describe "[fa] API event integration" do
-
-    extend CLI_TestSupport
-    extend Event_TestSupport  # so CONSTANTS (Sandbox) is visible in i.m's
+    extend CLI_Client_TS_
+    extend TS__  # so CONSTANTS (Sandbox) is visible in i.m's
 
     context "does the thing with event names and the `on_` pattern" do
       define_sandbox_constant :application_module do
         module Sandbox::Nightclub_1
           module CLI
-            class Client < Face::CLI
+            class Client < Face_::CLI::Client
               def barf
                 @mechanics.call_api :burf
               end
@@ -34,7 +32,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Event
 
           module API
             module Actions
-              class Burf < Face::API::Action
+              class Burf < Face_::API::Action
                 taxonomic_streams  # none.
                 listeners_digraph  :honkey, :tonkey
                 def execute
@@ -49,7 +47,6 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Event
       end
 
       it "you event handling solution is nothing short of sheer ginus" do
-        debug!
         x = invoke 'barf'
         lines[:err].shift.should eql( '<t.>' )
         lines[:err].shift.should eql( '<<H.>>' )
@@ -63,7 +60,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Event
       define_sandbox_constant :application_module do
         module Sandbox::Nightclub_2
           module CLI
-            class Client < Face::CLI
+            class Client < Face_::CLI::Client
               def marf
                 @mechanics.api
               end
@@ -72,7 +69,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Event
 
           module API
             module Actions
-              class Marf < Face::API::Action
+              class Marf < Face_::API::Action
                 taxonomic_streams  # none.
                 listeners_digraph  :hinkey, :tinkey
                 def execute

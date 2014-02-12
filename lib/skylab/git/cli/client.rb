@@ -47,7 +47,7 @@ module Skylab::Git
     end
 
     def hi msg
-      ( @hi ||= Face::CLI::FUN.stylify.curry[ [ :green ] ] )[ msg ]
+      ( @hi ||= Face::CLI.stylify.curry[ [ :green ] ] )[ msg ]
     end
 
     def get_y
@@ -108,7 +108,7 @@ module Skylab::Git
                 Adapter_.new( ns_sheet, my_client_class, mechanics )
               end
             end
-            class Adapter_ < ::Skylab::Face::CLI::Adapter::For::Face::Of::Hot
+            class Adapter_ < ::Skylab::Face::CLI::Client::Adapter::For::Face::Of::Hot
               def get_summary_a_from_sheet _
                 [ "assorted git-focused one-offs." ]
               end

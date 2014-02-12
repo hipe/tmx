@@ -1,6 +1,6 @@
 module Skylab::Face
 
-  class CLI::API_Integration::Services_
+  class CLI::Client::API_Integration_::Services_
 
     # API-related services bound to a specific ns mechanics - for regret hack
 

@@ -1,6 +1,8 @@
-class Skylab::Face::CLI
+module Skylab::Face
 
-    CLI::Version = -> do
+  class CLI::Client
+
+    Version_ = -> do
 
       norm_h = {
         0 => -> a, b do
@@ -55,4 +57,5 @@ class Skylab::Face::CLI
         cli_cls.class_exec( * args, & op_h.fetch( op ) )
       end
     end.call
+  end
 end

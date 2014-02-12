@@ -1,13 +1,17 @@
 require_relative '../test-support'
 
-module Skylab::Face::TestSupport::CLI::API_Integration
+module Skylab::Face::TestSupport::CLI::Client::API_Integration
 
-  ::Skylab::Face::TestSupport::CLI[ API_Integration_TestSupport = self ]
+  ::Skylab::Face::TestSupport::CLI::Client[ self, :flight_of_stairs ]
+
+  def self.bundles_class
+    parent_anchor_module.bundles_class
+  end
 
   module CONSTANTS
 
     Curriable_build_ = -> field_box, param_h do  # this used to there
-      Face::CLI::API_Integration::OP_[
+      Face::CLI::Client::API_Integration_::OP_[
         :field_box, field_box,
         :param_h, param_h,
         :op, (( op = Face::Library_::OptionParser.new )) ]
@@ -15,7 +19,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration
     end
 
     CLI_expression_agent_ = -> do
-      Face::CLI::API_Integration::EXPRESSION_AGENT_
+      Face::CLI::Client::API_Integration_::EXPRESSION_AGENT_
     end
   end
 

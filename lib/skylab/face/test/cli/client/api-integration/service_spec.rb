@@ -1,21 +1,19 @@
 require_relative 'test-support'
 
-module Skylab::Face::TestSupport::CLI::API_Integration::Service
+module Skylab::Face::TestSupport::CLI::Client::API_Integration::Service
 
-  ::Skylab::Face::TestSupport::CLI::API_Integration[ Service_TestSupport = self ]
+  ::Skylab::Face::TestSupport::CLI::Client::API_Integration[ self, :CLI_sandbox]
 
-  CONSTANTS::Common_setup_[ self, :sandbox ]
+  describe "[fa] CLI client API integrtaion - service" do
 
-  describe "[fa] API INTEGRATED SERVICES" do
-
-    extend CLI_TestSupport
-    extend Service_TestSupport  # so CONSTANTS (Sandbox) is visible in i.m's
+    extend CLI_Client_TS_
+    extend TS__  # so CONSTANTS (Sandbox) is visible in i.m's
 
     context "service in API/CLI is yes/no -" do
       define_sandbox_constant :application_module do
         module Sandbox::Nightclub_1
           module CLI
-            class Client < Face::CLI
+            class Client < Face_::CLI::Client
               def fiff x
                 @mechanics.api x
               end
@@ -24,7 +22,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Service
 
           module API
             module Actions
-              class Fiff < Face::API::Action
+              class Fiff < Face_::API::Action
                 services [ :zap, :ivar ]
                 params :x
                 def execute
@@ -33,8 +31,8 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Service
               end
             end
 
-            class Client < Face::API::Client
-              Face::Plugin::Host.enhance self do
+            class Client < Face_::API::Client
+              Face_::Plugin::Host.enhance self do
                 services :zap
               end  # note that we do *not* use the plugin *proxy* dsl here
 
@@ -60,7 +58,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Service
       define_sandbox_constant :application_module do
         module Sandbox::Nightclub_2
           module CLI
-            class Client < Face::CLI
+            class Client < Face_::CLI::Client
 
               def initialize( * )
                 super
@@ -80,21 +78,21 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Service
               attr_reader :imogen
               private :imogen
 
-              Face::Plugin::Host::Proxy.enhance self do
+              Face_::Plugin::Host::Proxy.enhance self do
                 services :imogen
               end
             end
           end
           module API
             module Actions
-              class GleepBeep < Face::API::Action
+              class GleepBeep < Face_::API::Action
                 services [ :imogen, :ivar ]
                 def execute
                   @imogen.call
                 end
               end
 
-              class WinkleTankle < Face::API::Action
+              class WinkleTankle < Face_::API::Action
                 services :biffle, [ :baffle ]
                 def execute
                   fail 'never see'
@@ -114,7 +112,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Service
         -> do
           invoke 'winkle-tankle'
         end.should raise_error(
-          Face::Plugin::DeclarationError,
+          Face_::Plugin::DeclarationError,
             /has not declared the required services.+biffle.+baffle/
         )
       end

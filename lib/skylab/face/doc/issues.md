@@ -1,9 +1,9 @@
 [#061]       #tracker-tag the "reparenthesize" family
-[#060] #open correct namespace and indentation for CLI
+[#060] #hole (was: correct namespace and indentation for CLI)
 [#059]       #parent-node:[#todo] the model manager narrative ..
 [#058]       #parent-node:[#007] the API action narrative ..
 [#057]       #parent-node:[#055] the API client model narrative ..
-[#056]       #parent-node:[#todo] the CLI narrative ..
+[#056]       #parent-node:[#todo] the CLI client narrative ..
 [#055]       #parent-node:[#007] the API client narrative ..
 [#054]       #parent-node: [#hl-070] the first plugin library (#broadened-from:
                [#hl-077] #API-point track how `initialize` looks in #plugins)

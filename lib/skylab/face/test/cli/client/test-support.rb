@@ -1,23 +1,77 @@
 require_relative '../test-support'
 
-module Skylab::Face::TestSupport::CLI
+module Skylab::Face::TestSupport::CLI::Client
 
-  ::Skylab::Face::TestSupport[ CLI_TestSupport = self ]
+  ::Skylab::Face::TestSupport::CLI[ TS__ = self, :flight_of_stairs ]
 
+  TestLib_ = ::Module.new
   module CONSTANTS
-    CLI_TestSupport = CLI_TestSupport
+    CLI_Client_TS_ = TS__
+    TestLib_.include self::TestLib_
+    TestLib_ = TestLib_
   end
 
   include CONSTANTS
 
+  Sandbox = ::Module.new
+
+  TestSupport::Sandbox.enhance( Sandbox ).
+    produce_subclasses_of -> { Face_::CLI::Client }
+
+  Face_ = Face_
+
   extend TestSupport::Quickie
 
-  TestSupport = TestSupport ; TestLib_ = TestLib_
-
-  module Sandbox
+  def self.bundles_class
+    Bundles__
   end
 
-  TestSupport::Sandbox.enhance( Sandbox ).produce_subclasses_of -> { Face::CLI }
+  class Bundles__ < parent_anchor_module.bundles_class
+    def CLI_sandbox=
+      send :CLI_party=
+      @child.const_set :Sandbox, ::Module.new
+      @child::CONSTANTS.const_set :Sandbox, @child::Sandbox
+    end
+    def CLI_party=
+      @child.const_set :Face_, Face_
+      @child.const_set :TS__, @child
+      @child.include @parent::CONSTANTS
+      @child.extend TestSupport::Quickie
+    end
+  end
+
+  TestSupport = TestSupport
+
+  module TestLib_
+    CLI_unstyle_proc = -> do
+      Headless__[]::CLI::Pen::FUN.unstyle
+    end
+
+    CLI_simple_style_rx = -> do
+      Headless__[]::CLI::Pen::SIMPLE_STYLE_RX
+    end
+
+    CLI_unstyle_styled_proc = -> do
+      Headless__[]::CLI::Pen::FUN::Unstyle_styled
+    end
+
+    DSL_DSL = -> x, p do
+      MetaHell__[]::DSL_DSL.enhance_module x, & p
+    end
+
+    Headless__ = Face_::Lib_::Headless__
+
+    Let = -> mod do
+      mod.extend MetaHell__[]::Let
+    end
+
+    MetaHell__ = Face_::Lib_::MetaHell__
+
+    Sout_serr = -> do
+      sys = Face::Lib_::System_IO[]
+      [ sys.some_stderr_IO, sys.some_stderr_IO ]
+    end
+  end
 
   TestLib_::DSL_DSL[ self, -> do
     block :with_body
@@ -122,6 +176,32 @@ module Skylab::Face::TestSupport::CLI
 
     def debug!
       @do_debug = true
+    end
+
+    def only_line
+      a = info_lines
+      1 == a.length or
+        fail "expected 1 had #{ a.length } lines (#{ a[ 1 ].inspect })"
+      a.shift
+    end
+
+    def line
+      info_lines.shift or fail "expected at least one more line, had none"
+    end
+
+    def there_should_be_no_lines
+      info_lines.length.zero? or fail "expected no lines had #{ info_lines[0]}"
+    end
+
+    def build_info_lines
+      io = @infostream ; @infostream = :spent
+      io.string.split "\n"
+    end
+
+    def build_infostream
+      io = ::Skylab::TestSupport::IO::Spy.standard
+      do_debug and io.debug! 'info >>> '
+      io
     end
 
     def expect * exp_a

@@ -1,11 +1,12 @@
-module Skylab::Face
+module Skylab::Face::CLI::Client
 
   # `Adapter` pattern is [#hl-054]
 
-  module Face::CLI::Adapter::For::Legacy
+  module Adapter::For::Legacy
+    Of = ::Module.new
   end
 
-  module Face::CLI::Adapter::For::Legacy::Of::Action_Subclient
+  module Adapter::For::Legacy::Of::Action_Subclient
 
     -> do  # `[]` defined -
 

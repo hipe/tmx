@@ -1,4 +1,4 @@
-# the CLI narrative :[#056]
+# the CLI client narrative :[#056]
 
 `Face`
   + wraps around ::OptionParser by default
@@ -114,7 +114,7 @@ mechanics layer.
 (remember, no need to call up to super. we have no superclass.)
 
 (lazily, only once the surface is created do we check and see if a
-custom `Mechanics_` class has been subclassed, defined, whatever, and
+custom kernel class has been subclassed, defined, whatever, and
 if not; we subclass a default mechanics class (descending from the
 appropriate base class) and put it there. whichever class was resolved
 from the above is the one used to enhance this surface and resolve a

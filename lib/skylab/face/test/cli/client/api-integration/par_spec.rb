@@ -1,18 +1,12 @@
 require_relative 'test-support'
 
-module Skylab::Face::TestSupport::CLI::API_Integration::Par
+module Skylab::Face::TestSupport::CLI::Client::API_Integration::Par
 
-  ::Skylab::Face::TestSupport::CLI::API_Integration[ TS_ = self ]
+  ::Skylab::Face::TestSupport::CLI::Client::API_Integration[ self, :CLI_party]
 
-  include CONSTANTS
+  describe "[fa] CLI client API integration - the `par` method" do
 
-  Face = Face
-
-  extend TestSupport::Quickie
-
-  describe "[fa] CLI api integration - the `par` method" do
-
-    extend TS_
+    extend TS__
 
     context "on an option" do
 
@@ -20,7 +14,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Par
 
         class Minsky < Base_Magic_
 
-          Face::API::Params_[ :client, self,
+          Face_::API::Params_[ :client, self,
             :param, :favorite_email, :arity, :one,
             :param, :secondary_email, :arity, :zero_or_one ]
 
@@ -71,7 +65,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Par
 
       before :all do
         class Pinsky < Base_Magic_
-          Face::API::Params_[ :client, self,
+          Face_::API::Params_[ :client, self,
             :param, :primary_email, :arity, :one, :normalizer, -> y, x, p do
               if /[0-9]/ =~ x
                 say do
@@ -92,7 +86,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Par
             Shorten_email[ @primary_email ]
           end
 
-          o = Face::API::Normalizer_
+          o = Face_::API::Normalizer_
 
           define_method :say, o::Build_say_method_[ -> do
             @front_expression_agent ||= o::Field_Front_Exp_Ag_.
@@ -122,7 +116,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Par
 
     class Base_Magic_
 
-      Face::API::Normalizer_.enhance_client_class self, :all
+      Face_::API::Normalizer_.enhance_client_class self, :all
 
       def self.field_box
         self::FIELDS_

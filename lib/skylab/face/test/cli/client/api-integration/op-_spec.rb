@@ -1,24 +1,18 @@
 require_relative 'test-support'
 
-module Skylab::Face::TestSupport::CLI::API_Integration::OP_
+module Skylab::Face::TestSupport::CLI::Client::API_Integration::OP_
 
-  ::Skylab::Face::TestSupport::CLI::API_Integration[ TS_ = self ]
+  ::Skylab::Face::TestSupport::CLI::Client::API_Integration[ self, :CLI_party ]
 
-  include CONSTANTS
+  describe "[fa] CLI client API integration OP" do
 
-  Face = Face
-
-  extend TestSupport::Quickie
-
-  describe "[fa] CLI::API_Integration::OP_" do
-
-    extend TS_
+    extend TS__
 
     before :all do
 
       class Nerk
 
-        Face::API::Params_[ :client, self, :meta_param, :nerk,
+        Face_::API::Params_[ :client, self, :meta_param, :nerk,
           :param, :email, :arity, :one, :desc, "the email",
           :param, :verbose, :arity, :zero_or_more, :argument_arity, :zero,
             :desc, -> y do
@@ -148,7 +142,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::OP_
 
     context "multiple desc" do
       class Derk
-        Face::API::Params_[ :client, self,
+        Face_::API::Params_[ :client, self,
           :param, :wiffle, :arity, :zero_or_one, :desc, "one", :desc, "two" ]
 
         define_singleton_method :build_op, &

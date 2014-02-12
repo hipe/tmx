@@ -1,8 +1,10 @@
-module Skylab::Face
+class Skylab::Face::CLI::Client
 
-  module CLI::API_Integration  # [#052]
+  module API_Integration_  # see [#052] what is the deal with exp
 
-    class Expression_Agent__ < Face_::API::Normalizer_::Expression_agent_class[]
+    EXPRESSION_AGENT_ = (( class Expression_Agent__ <
+
+        Face_::API::Normalizer_::Expression_agent_class[]
 
       def par fld
         kbd par_nonstyled fld
@@ -10,7 +12,7 @@ module Skylab::Face
 
     private  # ( make things public as necessary )
 
-      define_method :kbd, CLI::CLI_Lib_::Stylify_proc[].curry[%i( green )]
+      define_method :kbd, Lib_::Stylify_proc[].curry[%i( green )]
 
       def par_nonstyled fld
         if fld.respond_to? :id2name
@@ -29,10 +31,10 @@ module Skylab::Face
         at :Local_normal_name_as_argument_raw, :Chomp_single_letter_suffix
       #
       As_long_ = -> i do
-        CLI::CLI_Lib_::Option_local_normal_name_as_long[ Chmp_[ i ] ]
+        Lib_::Option_local_normal_name_as_long[ Chmp_[ i ] ]
       end
-    end
 
-    EXPRESSION_AGENT_ = Expression_Agent__.new
+      self
+    end )).new
   end
 end

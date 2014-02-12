@@ -11,7 +11,7 @@ module Skylab::TMX
 
   module Modules::Arch
 
-    class NS < ::Skylab::Face::CLI::Namespace
+    class NS < ::Skylab::Face::CLI::Client::Namespace_
       def initialize( * )
         super
         @mechanics.is_not_puffed!
@@ -19,7 +19,7 @@ module Skylab::TMX
       use :hi
     end
 
-    class NS::Mechanics_ < ::Skylab::Face::CLI::NS_Mechanics_
+    class NS::Kernel_ < ::Skylab::Face::CLI::Client::NS_Kernel_
 
       def initialize( * )
         super
@@ -61,7 +61,7 @@ module Skylab::TMX
       def direct_load pn, cli
         kls = load_it cli
         if kls
-          top_wisp = Face::CLI::NS_Sheet_.new( nil ).
+          top_wisp = Face::CLI::Client::NS_Sheet_.new( nil ).
             init_with_local_normal_name pn.to_s.intern
           ada = kls::Adapter::For::Face
           oro = ada::Of::Sheet[ top_wisp, kls.story ]

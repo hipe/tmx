@@ -4,7 +4,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Recursiv
 
   TestSupport_ = ::Skylab::TestSupport
 
-  TestSupport_::Lib_::Face__[]::TestSupport::CLI[ self ]
+  TestSupport_::Lib_::Face__[]::TestSupport::CLI::Client[ self ]
 
   TestSupport_::TestSupport::Regret[ TS__ = self ]
 

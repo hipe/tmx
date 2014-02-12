@@ -2,15 +2,13 @@
 
 require_relative 'test-support'
 
-module Skylab::Face::TestSupport::CLI::Set
+module Skylab::Face::TestSupport::CLI::Client::Set
 
-  ::Skylab::Face::TestSupport::CLI[ This_TestSupport = self ]
-
-  CONSTANTS::Common_setup_[ self, :sandbox ]
+  ::Skylab::Face::TestSupport::CLI::Client[ self, :CLI_party ]
 
   module Awoooga
 
-    class CLI_Client < Face::CLI
+    class CLI_Client < Face_::CLI::Client
 
       set :margin, 12
 
@@ -28,9 +26,9 @@ module Skylab::Face::TestSupport::CLI::Set
 
   do_invoke = Do_invoke_[]
 
-  describe "[fa] set API" do
+  describe "[fa] client set API" do
 
-    extend This_TestSupport
+    extend TS__
 
     context "some context" do
 

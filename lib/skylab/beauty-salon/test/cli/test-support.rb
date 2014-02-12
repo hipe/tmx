@@ -6,6 +6,6 @@ module Skylab::BeautySalon::TestSupport::CLI
 
   include CONSTANTS
 
-  Face::TestSupport::CLI[ self ]
+  Face::TestSupport::CLI::Client[ self ]
 
 end

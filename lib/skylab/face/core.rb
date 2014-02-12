@@ -14,6 +14,30 @@ module Skylab::Face  # read [#011] the top node narrative
     Autoloader_[ self ]
   end
 
+  Face_ = self
+  Lib_ = ::Module.new
+
+  module CLI
+
+    def self.reparenthesize
+      self::Client::Reparenthesize
+    end
+
+    def self.stylify
+      Lib_::Stylify_proc
+    end
+
+    module Lib_
+      include Face_::Lib_
+      Stylify_proc = -> do
+        Headless__[]::CLI::Pen::FUN::Stylify
+      end
+      include Face_::Lib_
+    end
+
+    Autoloader_[ self ]
+  end
+
   module Library_  # :+[#su-001]
 
     stdlib = Autoloader_.method :require_stdlib
@@ -191,7 +215,7 @@ module Skylab::Face  # read [#011] the top node narrative
     end
   end
 
-  class Set_  # see [#011]:#set
+  class Vertical_Fields_  # see [#011]:#vertical-fields
 
     -> do  # `initialize`
 
@@ -489,7 +513,6 @@ module Skylab::Face  # read [#011] the top node narrative
       end
     end
 
-  Face_ = self
 
   Name_ = Callback_::Name
 
@@ -497,5 +520,5 @@ module Skylab::Face  # read [#011] the top node narrative
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
-  stowaway :TestSupport, 'test/test-support'  # [#mh-030] for [#045]
+  stowaway :TestSupport, 'test/test-support'  # [#045] part of our public API
 end

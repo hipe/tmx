@@ -18,7 +18,7 @@ module Skylab::Cull::TestSupport
 
   Cull = Cull
 
-  Face::TestSupport::CLI[ self ]
+  Face::TestSupport::CLI::Client[ self ]
 
   Lib_ = Cull::Lib_
 

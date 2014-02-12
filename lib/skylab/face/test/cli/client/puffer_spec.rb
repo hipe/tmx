@@ -1,14 +1,12 @@
 require_relative 'test-support'
 
-module Skylab::Face::TestSupport::CLI::Puffer
+module Skylab::Face::TestSupport::CLI::Client::Puffer
 
-  ::Skylab::Face::TestSupport::CLI[ Puffer_TestSupport = self ]
+  ::Skylab::Face::TestSupport::CLI::Client[ self, :CLI_party ]
 
-  CONSTANTS::Common_setup_[ self ]
+  describe "[fa] CLI client puffer (hooks)" do
 
-  describe "[fa] puffer (hooks)" do
-
-    extend Puffer_TestSupport
+    extend TS__
 
     context "some context" do
 
@@ -19,7 +17,7 @@ module Skylab::Face::TestSupport::CLI::Puffer
         end
         def foo
         end
-        class self::Mechanics_ < Face::CLI::CLI_Mechanics_  # sketchville
+        class self::Kernel_ < Face_::CLI::Client::CLI_Kernel_  # sketchville
           def puff
             @sheet.node_open!
             @sheet.close_node do |a|

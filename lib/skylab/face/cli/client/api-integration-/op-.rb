@@ -1,6 +1,6 @@
 module Skylab::Face
 
-  module CLI::API_Integration
+  module CLI::Client::API_Integration_
 
     class OP_
 
@@ -55,7 +55,7 @@ module Skylab::Face
       Chmp_sing_ltr_sfx_, As_arg_raw_ = Face_::API::Procs.
         at :Chomp_single_letter_suffix, :Local_normal_name_as_argument_raw
       #
-      Option = Face_::CLI::CLI_Lib_::Option_model_class[]
+      Option = Face_::CLI::Client::Lib_::Option_model_class[]
 
       def add_desc opt, fld
         y = [ ]

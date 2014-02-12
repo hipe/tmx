@@ -14,7 +14,7 @@ module Skylab::Headless
           end
         end
 
-        class Hot_Adapter_ < ::Skylab::Face::CLI::Adapter::For::Face::Of::Hot
+        class Hot_Adapter_ < ::Skylab::Face::CLI::Client::Adapter::For::Face::Of::Hot
 
           def get_summary_a_from_sheet _ns_sheet
             [ @actual.some_summary_ln ]

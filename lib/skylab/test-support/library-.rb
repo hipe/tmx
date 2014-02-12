@@ -62,8 +62,8 @@ module Skylab::TestSupport
       Basic__[]::Box.new
     end
 
-    CLI = -> do
-      Face__[]::CLI
+    CLI_client_base_class = -> do
+      Face__[]::CLI::Client
     end
 
     CLI_table = -> * x_a do

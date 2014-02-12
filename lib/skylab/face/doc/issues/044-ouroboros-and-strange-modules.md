@@ -1,7 +1,7 @@
 # ouroboros and strange modules :[#044]
 
 the original description of the `ouroboros` phenomenon first appears in
-"cli/adapter/for/face.rb" which is left intact for historical reasons. we then
+"cli/client/adapter/for/face.rb" which is left intact for historical reasons. we then
 touch on it a bit more and justify it in [#hl-069] with some glimmer of what's
 to come w/ plugins .. but here we re-explain ouroboros anew.
 

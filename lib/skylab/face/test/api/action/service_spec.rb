@@ -1,12 +1,12 @@
 require_relative 'test-support'
 
-module Skylab::Face::TestSupport::API::Service
+module Skylab::Face::TestSupport::API::Action::Service
 
-  ::Skylab::Face::TestSupport::TestLib_::Sandboxify[ self ]
+  ::Skylab::Face::TestSupport::API::Action[ self, :sandboxes_et_al ]
 
   describe "extend module x with Face::API and use services" do
 
-    extend TS_
+    extend TS__
 
     context "when service is not declared" do
 

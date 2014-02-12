@@ -1,8 +1,10 @@
 require_relative 'test-support'
 
-module Skylab::Face::TestSupport::CLI::Option
+module Skylab::Face::TestSupport::CLI::Client::Option::Core_
 
-  describe "[fa] CLI option" do
+  ::Skylab::Face::TestSupport::CLI::Client::Option[ self, :CLI_party ]
+
+  describe "[fa] CLI client option" do
 
     extend TS__
 

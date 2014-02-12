@@ -1,26 +1,26 @@
 require_relative 'test-support'
 
-module Skylab::Face::TestSupport::CLI::Metastory
+module Skylab::Face::TestSupport::CLI::Client::Metastory
 
-  ::Skylab::Face::TestSupport::CLI[ Metastory_TestSupport = self ]
+  ::Skylab::Face::TestSupport::CLI::Client[ self, :CLI_sandbox ]
 
-  CONSTANTS::Common_setup_[ self, :sandbox ]
+  describe "[fa] CLI client metastory" do
 
-  describe "[fa] CLI metastories" do
-
-    extend Metastory_TestSupport
+    extend TS__
 
     context "facet 1 - the `modality_exponent` is `CLI`" do
       modex = :CLI_
       context "from libville" do
         it "CLI (modality client baseclass)" do
-          Face::CLI.metastory.modality_exponent.should eql( modex )
+          Face::CLI::Client.metastory.modality_exponent.should eql modex
         end
         it "Namespace" do
-          Face::CLI::Namespace.metastory.modality_exponent.should eql( modex )
+          Face::CLI::Client::Namespace_.
+            metastory.modality_exponent.should eql modex
         end
         it "Command" do
-          Face::CLI::Command.metastory.modality_exponent.should eql( modex )
+          Face::CLI::Client::Command_.
+            metastory.modality_exponent.should eql modex
         end
       end
       context "from businessland" do
@@ -66,7 +66,7 @@ module Skylab::Face::TestSupport::CLI::Metastory
         triforce_exponent :Modality_Client_
         trio true, true, false
         context "libville baseclass" do
-          metastory { Face::CLI.metastory }
+          metastory { Face_::CLI::Client.metastory }
           it "#{ explain_i }" do
             metastory.triforce_exponent.should eql( triforce_exponent )
           end
@@ -88,7 +88,7 @@ module Skylab::Face::TestSupport::CLI::Metastory
         triforce_exponent :Namespace_
         trio false, true, false
         context "libville baseclass" do
-          metastory { Face::CLI::Namespace.metastory }
+          metastory { Face_::CLI::Client::Namespace_.metastory }
           it "#{ explain_i }" do
             metastory.triforce_exponent.should eql( triforce_exponent )
           end
@@ -110,7 +110,7 @@ module Skylab::Face::TestSupport::CLI::Metastory
         triforce_exponent :Action_
         trio false, false, true
         context "libville baseclass" do
-          metastory { Face::CLI::Command.metastory }
+          metastory { Face_::CLI::Client::Command_.metastory }
           it "#{ explain_i }" do
             metastory.triforce_exponent.should eql( triforce_exponent )
           end
@@ -132,11 +132,10 @@ module Skylab::Face::TestSupport::CLI::Metastory
 
     define_sandbox_constant :businessland_cli_module do
       module Sandbox::CLI
-        class Client < Face::CLI
+        Client = ::Class.new Face_::CLI::Client
+        class Particular_Namespace < Face_::CLI::Client::Namespace_
         end
-        class Particular_Namespace < Face::CLI::Namespace
-        end
-        class Particular_Command < Face::CLI::Command  # not in the wild
+        class Particular_Command < Face_::CLI::Client::Command_  # not in the wild
         end
       end
     end

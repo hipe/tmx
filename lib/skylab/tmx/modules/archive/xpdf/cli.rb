@@ -2,7 +2,7 @@ module Skylab::TMX
 
   module Modules::Xpdf
 
-    class CLI < Skylab::Face::CLI
+    class CLI < Skylab::Face::CLI::Client
 
       set :desc, -> y do
         y << "idem."

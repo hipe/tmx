@@ -2,11 +2,11 @@ require_relative 'test-support'
 
 module Skylab::Face::TestSupport::API::Normalizer_
 
-  ::Skylab::Face::TestSupport::TestLib_::Sandboxify[ self ]
+  ::Skylab::Face::TestSupport::API[ self, :sandboxes_et_al ]
 
   describe "[fa] API::Normalizer_" do
 
-    extend TS_
+    extend TS__
 
     context "with one (defacto) required field" do
 

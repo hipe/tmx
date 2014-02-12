@@ -2,11 +2,11 @@ require_relative '../test-support'
 
 module Skylab::Face::TestSupport::API::Action::Param_Set
 
-  ::Skylab::Face::TestSupport::TestLib_::Sandboxify[ self ]
+  Skylab::Face::TestSupport::API::Action[ self, :sandboxes_et_al ]
 
   describe "[fa] API::Action - param - set" do
 
-    extend TS_
+    extend TS__
 
     context "`set` is like a `normalize` \"macro\"" do
       define_sandbox_constant :nightclub do

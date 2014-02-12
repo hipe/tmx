@@ -295,9 +295,12 @@ module Skylab::Test
       end
 
       def all_subproject_i_a
-        @all_subproject_i_a ||=
-          ::Pathname.glob( "#{ @project_hub_pn }/*" ).reduce( [] ) do |m, pn|
-          WHITE_RX_ =~ (( stem_s = pn.basename.to_s )) or break m
+        @all_subproject_i_a ||= bld_all_subp_i_a
+      end
+
+      def bld_all_subp_i_a
+        ::Pathname.glob( "#{ @project_hub_pn }/*" ).reduce( [] ) do |m, pn|
+          WHITE_RX_ =~ (( stem_s = pn.basename.to_s )) or next m
           m << stem_s.intern
         end.freeze
       end

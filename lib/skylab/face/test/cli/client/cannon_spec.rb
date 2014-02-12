@@ -1,10 +1,19 @@
 require_relative 'test-support'
 
-module Skylab::Face::TestSupport::CLI
+module Skylab::Face::TestSupport::CLI::Client
 
-  describe "[fa] CLI cannon" do
+  describe "[fa] CLI client cannon" do
 
-    extend CLI_TestSupport
+    extend CLI_Client_TS_
+
+    context "le basix" do
+      it "this test runs" do
+      end
+
+      it "the doohah loads" do
+        Face_::CLI::Client
+      end
+    end
 
     as :invite_as_branch_opt,
       /\ATry wtvr -h \[sub-cmd\] for help\.?\z/i, :styled

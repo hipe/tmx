@@ -2,11 +2,11 @@ require_relative '../test-support'
 
 module Skylab::Face::TestSupport::API::Action::Param
 
-  ::Skylab::Face::TestSupport::TestLib_::Sandboxify[ self ]
+  ::Skylab::Face::TestSupport::API::Action[ self, :sandboxes_et_al ]
 
   describe "[fa] test API action param" do
 
-    extend TS_
+    extend TS__
 
     context "none" do
 

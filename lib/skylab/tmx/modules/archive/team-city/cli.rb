@@ -2,7 +2,7 @@ module Skylab::TMX
 
   module Modules::TeamCity
 
-    class CLI < ::Skylab::Face::CLI
+    class CLI < ::Skylab::Face::CLI::Client
 
       set :aliases, [ :tc ],
       :desc, -> y do

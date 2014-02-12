@@ -2,15 +2,13 @@
 
 require_relative 'test-support'
 
-module Skylab::Face::TestSupport::CLI::Namespace::Desc
+module Skylab::Face::TestSupport::CLI::Client::Namespace::Desc
 
-  ::Skylab::Face::TestSupport::CLI::Namespace[ This_TestSupport = self ]
-
-  CONSTANTS::Common_setup_[ self ]
+  ::Skylab::Face::TestSupport::CLI::Client::Namespace[ self, :CLI_party ]
 
   module Wowzaa
     module CLI
-      class Client < Face::CLI
+      class Client < Face_::CLI::Client
 
         set :num_summary_lines, 2
 
@@ -37,9 +35,9 @@ module Skylab::Face::TestSupport::CLI::Namespace::Desc
 
   do_invoke = Do_invoke_[]
 
-  describe "[fa] Namespace desc" do
+  describe "[fa] CLI client namespace desc" do
 
-    extend This_TestSupport
+    extend TS__
 
     context "some context" do
 

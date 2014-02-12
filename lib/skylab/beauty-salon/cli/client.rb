@@ -1,6 +1,6 @@
 module Skylab::BeautySalon
 
-  class CLI::Client < Face::CLI
+  class CLI::Client < Face::CLI::Client
 
     def initialize( * )
       super

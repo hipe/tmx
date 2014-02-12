@@ -2,16 +2,14 @@ require_relative 'api-integration/test-support'
   # look, sorry: we want one method defined in above, because we choose to
   # define the whole client class (for aesthetics) and not just snippets.
 
-module Skylab::Face::TestSupport::CLI::DSL_Off
+module Skylab::Face::TestSupport::CLI::Client::DSL_Off
 
-  ::Skylab::Face::TestSupport::CLI[ DSL_Off_TestSupport = self ]
+  ::Skylab::Face::TestSupport::CLI::Client[ self, :CLI_sandbox ]
 
-  CONSTANTS::Common_setup_[ self, :sandbox ]
+  describe "[fa] CLI client DSL off" do
 
-  describe "[fa] CLI DSL off" do
-
-    extend CLI_TestSupport::API_Integration
-    extend DSL_Off_TestSupport
+    extend CLI_Client_TS_::API_Integration
+    extend TS__
 
     context "wankers" do
 
@@ -19,7 +17,7 @@ module Skylab::Face::TestSupport::CLI::DSL_Off
 
         module Sandbox::Nightclub_1
           module CLI
-            class Client < Face::CLI
+            class Client < Face_::CLI::Client
               with_dsl_off do
                 def invoke( * )
                   @touched = true

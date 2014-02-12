@@ -6,7 +6,7 @@ module Skylab::TMX
     end, skip: true
   end
 
-  class Modules::Bleed::CLI < Face::CLI
+  class Modules::Bleed::CLI < Face::CLI::Client
 
     # summary "run a bleeding edge version of tmx"  # #todo - later or never
 

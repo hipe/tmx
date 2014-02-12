@@ -16,7 +16,7 @@ module ::Skylab::TMX
         end
       end
 
-    class Basic_Stub_ < ::Skylab::Face::CLI::Adapter::For::Face::Of::Hot
+    class Basic_Stub_ < ::Skylab::Face::CLI::Client::Adapter::For::Face::Of::Hot
 
       def pre_execute  # we don't ever build an actual client ourselves
         true

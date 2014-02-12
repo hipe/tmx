@@ -1,8 +1,10 @@
 require_relative 'test-support'
 
-module Skylab::Face::TestSupport::CLI::Namespace
+module Skylab::Face::TestSupport::CLI::Client::Namespace::Core_
 
-  describe "[fa] CLI namespace" do
+  ::Skylab::Face::TestSupport::CLI::Client::Namespace[ self, :CLI_party ]
+
+  describe "[fa] CLI client namespace" do
 
     extend TS__
 

@@ -1,12 +1,12 @@
 require_relative 'test-support'
 
-module Skylab::Face::TestSupport::API::Core_Spec_
+module Skylab::Face::TestSupport::API::Core_
 
-  ::Skylab::Face::TestSupport::TestLib_::Sandboxify[ self ]
+  ::Skylab::Face::TestSupport::API[ self, :sandboxes_et_al ]
 
   describe "extend module x with Face::API and you get `x::API.invoke` that" do
 
-    extend TS_
+    extend TS__
 
     context "against the minimal case" do
 

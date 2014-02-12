@@ -1,13 +1,16 @@
-class Skylab::Face::CLI
+module Skylab::Face
+
+  class CLI::Client
 
     # ~ facet 5.3x - recursively nested namespaces and ns properties ~
 
-    CLI.const_get :Set, false
+    self::Set_.touch
 
-    class Namespace  # #re-open for 5.3x
+    class Namespace_  # #re-open for 5.3x
 
       module Facet
-        def self.touch ; nil end    #kick-the-loading-warninglessly-and-trackably
+        def self.touch
+        end  #kick-the-loading-warninglessly-and-trackably
       end
 
       class << self
@@ -19,7 +22,7 @@ class Skylab::Face::CLI
         end
       end
 
-      Mechanics__ = NS_Mechanics_
+      X_Kernel__ = NS_Kernel_
     end
 
     class NS_Sheet_  # #re-open for 5.3x
@@ -158,7 +161,7 @@ class Skylab::Face::CLI
         bm = box_mod_for @surface_mod[]
         co = name_func.as_const
         bm.const_defined?( co, false ) and raise "sanity - don't do this"
-        sty = ( bm.const_set co, ::Class.new( Namespace ) ).story
+        sty = ( bm.const_set co, ::Class.new( Namespace_ ) ).story
         sty.init_w_block block, name_func, xtra_x
       end
 
@@ -259,7 +262,7 @@ class Skylab::Face::CLI
       end
     end
 
-    class NS_Mechanics_  # #re-open for 5.3x
+    class NS_Kernel_  # #re-open for 5.3x
 
       -> do  # `self.enhance` - see subclass version
 
@@ -297,4 +300,5 @@ class Skylab::Face::CLI
         end
       end
     end
+  end
 end

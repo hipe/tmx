@@ -157,7 +157,7 @@ module Skylab::SubTree
     end
 
     Stock_API_expression_agent = -> do
-      Face__[]::CLI::API_Integration::EXPRESSION_AGENT_
+      Face__[]::CLI::Client::API_Integration_::EXPRESSION_AGENT_
     end
 
     Struct = -> * i_a do
@@ -189,7 +189,7 @@ module Skylab::SubTree
     end
 
     Write_isomorphic_option_parser_options = -> * a do
-      Face__[]::CLI::API_Integration::OP_.new( * a ).execute
+      Face__[]::CLI::Client::API_Integration_::OP_.new( * a ).execute
     end
   end
 end

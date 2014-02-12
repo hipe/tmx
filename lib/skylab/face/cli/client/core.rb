@@ -1,41 +1,27 @@
-module Skylab::Face  # read [#056] the CLI narrative
+module Skylab::Face
 
-  CLI = ::Class.new ::Class.new
+  CLI::Client = ::Class.new ::Class.new  # read [#056] the CLI client narrative
 
-  class CLI
+  class CLI::Client
 
-    Autoloader_ = Autoloader_
+    Namespace_ = superclass
 
-    Command = ::Class.new
+    Client_ = self
 
-    CLI = self
+    Command_ = ::Class.new
 
-    Face_ = ::Skylab::Face
+    NS_Kernel_ = ::Class.new Command_
 
-    Namespace = superclass
+    CLI_Kernel_ = ::Class.new NS_Kernel_
 
-    Node_Sheet_ = ::Class.new
+    X_Kernel__ = CLI_Kernel_
 
-    NS_Mechanics_ = ::Class.new Command
-
-    CLI_Mechanics_ = ::Class.new NS_Mechanics_
-
-    Mechanics__ = CLI_Mechanics_
-
-  end
-end
-
-class Skylab::Face::CLI
-
-    module CLI_Lib_
-
-      sidesys = Autoloader_.method :build_require_sidesystem_proc
+    module Lib_
+      include CLI::Lib_
 
       Chunker_enumerator = -> sexp do
         Headless__[]::CLI::Pen::Chunker::Enumerator.new sexp
       end
-
-      Headless__ = sidesys[ :Headless ]
 
       Option_enumerator = -> op do
         Headless__[]::CLI::Option::Enumerator.new op
@@ -65,16 +51,12 @@ class Skylab::Face::CLI
         Headless__[]::CLI::Argument::FUN::Reqity_brackets[ i ]
       end
 
-      Stylify_proc = -> do
-        Headless__[]::CLI::Pen::FUN::Stylify
-      end
-
       Unstyle_sexp = -> s do
         Headless__[]::CLI::FUN::Unstyle_sexp[ s ]
       end
     end
 
-    class CLI  # open for facet 1. #storypoint-40
+    class Client_  # open for facet 1. #storypoint-40
 
       def invoke argv  # #storypoint-75
         ok, res, m, a, b, cmd = @mechanics.get_executable argv
@@ -89,7 +71,7 @@ class Skylab::Face::CLI
       end
     end
 
-    class CLI_Mechanics_
+    class CLI_Kernel_
 
       -> do
 
@@ -201,7 +183,7 @@ class Skylab::Face::CLI
       end
     end
 
-    class Namespace  # 1.2 core only (not deep n.s) & support #storypoint-185
+    class Namespace_  # 1.2 core only (not deep n.s) & support #storypoint-185
 
       class << self
 
@@ -251,10 +233,11 @@ class Skylab::Face::CLI
 
         block_given? and raise ::ArgumentError, "this crap comes back after #100"
 
-        @mechanics ||= ( if self.class.const_defined? :Mechanics_, false
-          self.class.const_get :Mechanics_, false
+        @mechanics ||= ( if self.class.const_defined? :Kernel_, false
+          self.class.const_get :Kernel_, false
         else
-          self.class.const_set :Mechanics_, ::Class.new( self.class::Mechanics__ )
+          self.class.const_set :Kernel_,
+            ::Class.new( self.class::X_Kernel__ )
         end ).enhance( self, a )  # (`enhance` rabbit hole begins!)
 
         # #storypoint-240
@@ -263,9 +246,11 @@ class Skylab::Face::CLI
       end
 
       # note there are no public (and only 1 private) instance method defined.
-      _pn = Face_.dir_pathname.join 'namespace'
-      Autoloader_[ self, _pn ]  # :+[#060]
+
+      Autoloader_[ self ]
     end
+
+    Node_Sheet_ = ::Class.new
 
     class NS_Sheet_ < Node_Sheet_  # for facet 1, #storypoint-250
 
@@ -337,7 +322,7 @@ class Skylab::Face::CLI
         nil
       end
 
-      def node_open!  # #called-by e.g Namespace for adding aliases
+      def node_open!  # #called-by e.g n.s for adding aliases
         @node_open ||= Cmd_Sheet_.new nil  # no method name yet.
       end
 
@@ -354,7 +339,7 @@ class Skylab::Face::CLI
       end
     end
 
-    class NS_Mechanics_  # #re-open for facet 1, #storypoint-335
+    class NS_Kernel_  # #re-open for facet 1, #storypoint-335
 
       #           ~ class section 1 - singleton methods ~
 
@@ -476,7 +461,7 @@ class Skylab::Face::CLI
 
     Empty_A_ = [ ].freeze  # detect shenarnigans, have OCD
 
-    class Command  # #re-open for facet 1
+    class Command_  # #re-open for facet 1
 
       # @todo:#100.100.400 rename to 'Action'  (maybe..)
 
@@ -601,7 +586,7 @@ class Skylab::Face::CLI
 
       def hot parent_services, *rest_to_command
         # (`alias_used` nil e.g in the case of a command tree index listing)
-        cmd = Command.new self, parent_services, *rest_to_command
+        cmd = Command_.new self, parent_services, *rest_to_command
         r = cmd.pre_execute or cmd = r
         cmd
       end
@@ -689,13 +674,6 @@ class Skylab::Face::CLI
 
     # ~ 1.4 - internal service proxies!, #storypoint-670
 
-    # (below is temporary before :+[#060])
-    Lib_ = Face_::Lib_
-    Library_ = Face_::Library_
-    Magic_Touch_ = Face_::Magic_Touch_
-    Services_ = Face_::Services_
-    Set_ = Face_::Set_
-
     CLI_Surface_Pxy_ = Services_.new do  # declare early, used to make SET_
       services_ivar :@surface_services
       services_accessor_method :[]
@@ -721,7 +699,7 @@ class Skylab::Face::CLI
       end
     end
 
-    class NS_Mechanics_  # #re-open for 1.4
+    class NS_Kernel_  # #re-open for 1.4
       Services_.enhance self do
         services_ivar :@ns_mechanics_services
         services_accessor_method :[]
@@ -734,29 +712,29 @@ class Skylab::Face::CLI
       public :[]
     end
 
-    class Command  # #re-open for 1.4
+    class Command_  # #re-open for 1.4
       Services_.enhance self do  # we need to put the class there and have the
         services_ivar :@cmd_services  # method there for compatability with SET_
         services_accessor_method :[]
       end
     end
 
-    class CLI_Mechanics_  # #re-open for 1.4
+    class CLI_Kernel_  # #re-open for 1.4
     private
       def parent_services
         @parent_services ||= CLI_Surface_Pxy_.new @surface.call
       end
     end
 
-    CLI::SET_ = Set_.new( [ :top, :middle, :bottom ],
+    VERTICAL_FIELD__ = Vertical_Fields_.new( [ :top, :middle, :bottom ],
       top: CLI_Surface_Pxy_,
-      middle: NS_Mechanics_::Services_,
-      bottom: Command::Services_ )
+      middle: NS_Kernel_::Services_,
+      bottom: Command_::Services_ )
 
 
     #            ~ facet 2 - option representation & parsing ~
 
-    class Namespace  # #re-open for facet 2. no p-arent.
+    class Namespace_
       class << self
       private
         def on first, *rest, &b  # make an intrinsic option for self.
@@ -770,7 +748,7 @@ class Skylab::Face::CLI
       end
     end
 
-    class NS_Sheet_  # #re-open for facet 2
+    class NS_Sheet_
 
       def on first, *rest, &blk
         add_option_sheet Option_Sheet.new( rest.unshift( first ), blk )
@@ -787,7 +765,7 @@ class Skylab::Face::CLI
       end
     end
 
-    class NS_Mechanics_
+    class NS_Kernel_
 
       def surface_receiver  # #called-by-main-invocation-loop
         parent_shell
@@ -822,7 +800,7 @@ class Skylab::Face::CLI
       end
     end
 
-    class Command  # #re-open for facet 2
+    class Command_  # #re-open for facet 2
 
       # `process_opttions` - #existential-workhorse #result-is-tuple:complex
       # #called-by-main-invocation-loop. #assume '-' == argv[0][0].
@@ -931,8 +909,8 @@ class Skylab::Face::CLI
       def each_option  # assumes that @op (when constructed) will be an o.p
         @op_enum ||= begin
           @op.nil? and init_op
-          opt = CLI_Lib_::Option_flyweight[]
-          ea = CLI_Lib_::Option_enumerator[ @op ]
+          opt = Lib_::Option_flyweight[]
+          ea = Lib_::Option_enumerator[ @op ]
           ea.filter = -> sw do
             opt.replace_with_switch sw
             opt
@@ -946,7 +924,7 @@ class Skylab::Face::CLI
           scn = nil ; op_x = option_parser ? @op : Empty_A_
           Face_::Options.new(
             fetch: -> ref, &blk do
-              scn ||= CLI_Lib_::Option_parser_scanner[ op_x ]
+              scn ||= Lib_::Option_parser_scanner[ op_x ]
               scn.fetch ref, &blk
             end  )
         end.call
@@ -1026,7 +1004,7 @@ class Skylab::Face::CLI
 
     #                      ~ facet 3 - argv processing ~
 
-    class CLI_Mechanics_  # #re-open for facet 3, #storypoint-1005
+    class CLI_Kernel_  # #re-open for facet 3, #storypoint-1005
 
       def argument_error ex, cmd  # result will be final result
         md = CALL_FRAME_RX_.match ex.backtrace.fetch( 1 )
@@ -1047,7 +1025,7 @@ class Skylab::Face::CLI
 
     end
 
-    class NS_Mechanics_  # #re-open for facet 3
+    class NS_Kernel_  # #re-open for facet 3
 
       # `parse` - #called-by-main-invocation-loop. #result-is-tuple:complex
       # assume default argv was covered before. the below is characteristic
@@ -1075,7 +1053,7 @@ class Skylab::Face::CLI
       end
     end
 
-    class Command  # #re-open for facet 3
+    class Command_  # #re-open for facet 3
 
       # `parse` - #existential-workhorse #called-by-main-invocation-loop
       # like `process_options` but for a terminal node ("command").
@@ -1099,7 +1077,7 @@ class Skylab::Face::CLI
 
     # ~ facet 4.1 - a narrative about `normal_last_invocation_string` ~
 
-    class CLI_Mechanics_  # #re-open for facet 4.1
+    class CLI_Kernel_  # #re-open for facet 4.1
       def normal_last_invocation_string          # for UI, narrative from here
         ( last_hot_recursive || self ).normal_invocation_string
       end
@@ -1110,7 +1088,7 @@ class Skylab::Face::CLI
         [ parent_services.program_name ]         # resolves a name for UI.
       end                                        # (note level 1 is included)`
     end
-    class NS_Mechanics_  # #re-open for facet 4.1
+    class NS_Kernel_  # #re-open for facet 4.1
       def normal_last_invocation_string          # for UI, narrative from here
         last_hot_recursive.normal_invocation_string
       end
@@ -1118,7 +1096,7 @@ class Skylab::Face::CLI
         @last_hot ? @last_hot.last_hot_recursive : self
       end
     end
-    class Command  # #re-open for facet 4.1
+    class Command_  # #re-open for facet 4.1
       def last_hot_recursive                     # #in-narrative #buck-stopper
         self
       end
@@ -1135,12 +1113,12 @@ class Skylab::Face::CLI
 
     #  ~ facet 4.2 - a related narrative about `anchored_last` etc ~
 
-    class NS_Mechanics_                          # #re-open for facet 4.2
+    class NS_Kernel_  # #re-open for facet 4.2
       def anchored_last                          # #in-narrative
         last_hot_recursive.anchored_name
       end
     end
-    class Command
+    class Command_
       def anchored_last                          # when @last_hot is command
         anchored_name
       end
@@ -1151,7 +1129,7 @@ class Skylab::Face::CLI
         parent_services.get_anchored_name << name.local_normal
       end
     end
-    class CLI_Mechanics_                         # #re-open for facet 4.2
+    class CLI_Kernel_  # #re-open for facet 4.2
       undef_method :anchored_last                # this is only ever for childs
       def get_anchored_name                      # #in-narrative, for
         [ ]                                      # resolving an action's name.
@@ -1160,7 +1138,7 @@ class Skylab::Face::CLI
 
     #    ~ facet 4.3 - cosmetic concerns (near future #i18n and templating) ~
 
-    class NS_Mechanics_  # #re-open for facet 4
+    class NS_Kernel_  # #re-open for facet 4
 
       # `subcommand_help` - #result-is-tuple #called-by `process_queue`
 
@@ -1320,7 +1298,8 @@ class Skylab::Face::CLI
       end
     end
 
-    CLI::SET_[ :margin, :default, '  '.freeze, :lowest, :middle ]
+    VERTICAL_FIELD__[ :margin, :default, '  '.freeze, :lowest, :middle ]
+
     class NS_Sheet_
       private
       def parse_xtra_margin scn
@@ -1331,7 +1310,7 @@ class Skylab::Face::CLI
       end
     end
 
-    class Command  # #re-open for facet 4. no p-arent.
+    class Command_  # #re-open for facet 4. no p-arent.
 
       # `help` - #result-is-tuple
       # #called-by `process_queue`, p-arent documenting child.
@@ -1419,10 +1398,10 @@ class Skylab::Face::CLI
 
           h = {
             string: -> m, x, _ do
-              m << CLI_Lib_::Unstyle_sexp[ x ] ; nil
+              m << Lib_::Unstyle_sexp[ x ] ; nil
             end,
             style: -> m, x, usg_hdr_txt do
-              s = CLI_Lib_::Unstyle_sexp[ x ]
+              s = Lib_::Unstyle_sexp[ x ]
               # ICK only let a header through if it says "usage:" ICK
               m << s if usg_hdr_txt == s || header_rx !~ s
               nil
@@ -1430,7 +1409,7 @@ class Skylab::Face::CLI
           }.freeze
 
           -> sexp, usg_hdr_txt do
-            ea = CLI_Lib_::Chunker_enumerator[ sexp ]
+            ea = Lib_::Chunker_enumerator[ sexp ]
             a = ea.reduce [] do |m, x|
               h.fetch( x[0][0] )[ m, x, usg_hdr_txt ]
               m
@@ -1442,7 +1421,7 @@ class Skylab::Face::CLI
         restyle = -> a, usg_hdr_txt do
           a.length.times do |idx|
             line = a[ idx ]
-            sexp = CLI_Lib_::Parse_styles[ line ]
+            sexp = Lib_::Parse_styles[ line ]
             if sexp
               a[ idx ] = restyle_sexp[ sexp, usg_hdr_txt ]
             else
@@ -1606,7 +1585,7 @@ class Skylab::Face::CLI
       def build_any_isomorphic_argument_syntax
         para_a = parent_services.get_command_parameters @sheet
         part_a = para_a.reduce [] do |m, x|
-          a, z = CLI_Lib_::Requity_brackets[ x[ 0 ] ]
+          a, z = Lib_::Requity_brackets[ x[ 0 ] ]
           m << "#{ a }<#{ Lib_::Name_slugulate[ x[1] ] }>#{ z }"
         end
         part_a * ' ' if part_a.length.nonzero?
@@ -1632,7 +1611,7 @@ class Skylab::Face::CLI
       end
     end
 
-    CLI::SET_[ :num_summary_lines, :default, 1 ]  # full stack
+    VERTICAL_FIELD__[ :num_summary_lines, :default, 1 ]  # full stack
 
     class NS_Sheet_
     private
@@ -1660,7 +1639,7 @@ class Skylab::Face::CLI
 
     # ~ 5.1x - default argv ~
 
-    class Namespace  # #re-open for 5.1x
+    class Namespace_  # #re-open for 5.1x
       class << self
       private
         def default_argv *a
@@ -1686,7 +1665,7 @@ class Skylab::Face::CLI
       end
     end
 
-    class NS_Mechanics_  # #re-open for 5.1x
+    class NS_Kernel_  # #re-open for 5.1x
       def has_default_argv
         @sheet.has_default_argv
       end
@@ -1701,7 +1680,7 @@ class Skylab::Face::CLI
 
     # ~ 5.2x - aliases ~
 
-    class Namespace  # #re-open for 5.2x
+    class Namespace_  # #re-open for 5.2x
       def self.aliases * i_a
         @story.node_open!.add_aliases i_a
       end
@@ -1748,17 +1727,16 @@ class Skylab::Face::CLI
 
     # ~ 5.3x - recursively nested namespaces ~
 
-    class Namespace  # #re-open for 5.3x
-    end
-
-    Magic_Touch_.enhance -> { Namespace::Facet.touch },
-      [ Namespace, :singleton, :private, :namespace ],
+    Magic_Touch_.enhance -> do
+      Namespace_::Facet.touch
+    end,
+      [ Namespace_, :singleton, :private, :namespace ],
       [ NS_Sheet_, :public, :add_namespace ]
 
 
     # ~ 5.4x - invocation function ~
 
-    class Command  # #re-open for 5.4x
+    class Command_  # #re-open for 5.4x
       def invocation_proc  # #called-by-main-invocation-loop
         @sheet.invocation_proc
       end
@@ -1770,27 +1748,27 @@ class Skylab::Face::CLI
 
     # ~ 5.5x - version officious facet ~
 
-    class CLI
+    class Client_
       def self.version *a, &b
-        CLI::Version[ self, a, b ]
+        Client_::Version_[ self, a, b ]
       end
     end
 
     # ~ 5.6x - metastories [#035] ~
 
-    Magic_Touch_.enhance -> { CLI::Metastory.touch },
-      [ Command, :singleton, :public, :metastory ],
-      [ Namespace, :singleton, :public, :metastory ],
+    Magic_Touch_.enhance -> { Client_::Metastory_.touch },
+      [ Command_, :singleton, :public, :metastory ],
+      [ Namespace_, :singleton, :public, :metastory ],
       [ NS_Sheet_, :singleton, :public, :metastory ]
 
     # ~ 5.7x - adapters for when loading namespaces as a "strange module" ~
 
-    class CLI
+    class Client_
       module Adapter  # (this is actually a bit like #magic-touch pattern..)
         Autoloader_[ self ]
       end
     end
-    class Namespace
+    class Namespace_
       module Adapter
         # intermedate n.s's use a different adapter than lvl-1 clients
         Autoloader_[ self ]
@@ -1799,7 +1777,7 @@ class Skylab::Face::CLI
 
     # ~ 5.8x - "puffer" API for populating namespaces lazily [#038] ~
 
-    class Command  # #re-open for 5.8x
+    class Command_  # #re-open for 5.8x
 
       def is_not_puffed!
         @is_puffed = false ; nil
@@ -1819,28 +1797,28 @@ class Skylab::Face::CLI
 
     # ~ 5.9x - command parameters as mutable ~
 
-    Magic_Touch_.enhance -> { CLI.const_get( :Set, false ).touch },
+    Magic_Touch_.enhance -> { Client_.const_get( :Set_, false ).touch },
       [ Node_Sheet_, :public, :set_command_parameters_proc ],
-      [ Namespace, :singleton, :public, :set ],  # (this and below is 5.11x)
+      [ Namespace_, :singleton, :public, :set ],  # (this and below is 5.11x)
       [ Node_Sheet_, :private, :defer_set, :absorb_extr ],
       [ NS_Sheet_, :private, :lift_prenatals ]
 
     # ~ 5.10x - API integration (*non*-revelation style)
 
-    Magic_Touch_.enhance -> { CLI::API_Integration.touch },
-      [ NS_Mechanics_, :public, :api, :call_api, :api_services,
+    Magic_Touch_.enhance -> { Client_::API_Integration_.touch },
+      [ NS_Kernel_, :public, :api, :call_api, :api_services,
         :get_api_executable_with ]  # may be #called-by surface
 
     # ~ 5.11x - the `set` API ( munged in with 5.9x above ) ~
 
     # ~ facet N - housekeeping and file finalizing (and consequently DSL mgmt). ~
 
-    class CLI
+    class Client_
       @do_track_method_added = false  # location 2 of 3 -
       # this is explained in depth in its third and final location below.
     end
 
-    class Namespace
+    class Namespace_
 
       @do_track_method_added = false  # location 3 of 3 - #storypoint-1845
 
@@ -1917,17 +1895,18 @@ class Skylab::Face::CLI
       end
     end
 
-  def self.reparenthesize
-    Reparenthesize__
-  end
-  Reparenthesize__ = -> do  # #called-by [te], :+[#061]
-    rx = /\A(?<a>\([ ]*)(?<b>.*[^ ]|)(?<c>[ ]*\))\z/
-    -> cb, msg do
-      if (( md = rx.match msg ))
-        "#{ md[:a] }#{ cb[ md[:b] ] }#{ md[:c] }"
-      else
-        cb[ msg ]
+    Reparenthesize = -> do  # #called-by [te], :+[#061]
+      rx = /\A(?<a>\([ ]*)(?<b>.*[^ ]|)(?<c>[ ]*\))\z/
+      -> cb, msg do
+        if (( md = rx.match msg ))
+          "#{ md[:a] }#{ cb[ md[:b] ] }#{ md[:c] }"
+        else
+          cb[ msg ]
+        end
       end
-    end
-  end.call
+    end.call
+
+    Face_ = Face_  # sub-sub libs expect this in client
+
+  end
 end

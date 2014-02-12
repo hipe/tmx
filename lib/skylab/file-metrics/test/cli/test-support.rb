@@ -3,7 +3,7 @@ require 'skylab/face/test/cli/test-support'
 
 module Skylab::FileMetrics::TestSupport::CLI
 
-  ::Skylab::FileMetrics::Face_::TestSupport::CLI[ self ]  # KRAY
+  ::Skylab::FileMetrics::Face_::TestSupport::CLI::Client[ self ]  # KRAY
   ::Skylab::FileMetrics::TestSupport[ CLI_TestSupport = self ]
 
   include CONSTANTS

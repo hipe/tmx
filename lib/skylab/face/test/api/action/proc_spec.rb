@@ -2,11 +2,11 @@ require_relative 'test-support'
 
 module Skylab::Face::TestSupport::API::Action::Proc
 
-  ::Skylab::Face::TestSupport::TestLib_::Sandboxify[ self ]
+  ::Skylab::Face::TestSupport::API::Action[ self, :sandboxes_et_al ]
 
   describe "extend module x with Face::API and use procs for actions" do
 
-    extend TS_
+    extend TS__
 
     context "against proc as API action" do
 

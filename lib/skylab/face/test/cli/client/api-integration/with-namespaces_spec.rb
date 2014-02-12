@@ -1,21 +1,19 @@
 require_relative 'test-support'
 
-module Skylab::Face::TestSupport::CLI::API_Integration::WNS
+module Skylab::Face::TestSupport::CLI::Client::API_Integration::WNS
 
-  ::Skylab::Face::TestSupport::CLI::API_Integration[ WNS_TestSupport = self ]
+  ::Skylab::Face::TestSupport::CLI::Client::API_Integration[ self, :CLI_sandbox]
 
-  CONSTANTS::Common_setup_[ self, :sandbox ]
+  describe "[fa] CLI client API integration - with namespace" do
 
-  describe "[fa] API event integration" do
-
-    extend CLI_TestSupport
-    extend WNS_TestSupport  # so CONSTANTS (Sandbox) is visible in i.m's
+    extend CLI_Client_TS_
+    extend TS__  # so CONSTANTS (Sandbox) is visible in i.m's
 
     context "some basic tests of touching cli actions 3 and 4 levels deep" do
       define_sandbox_constant :application_module do
         module Sandbox::Nightclub_1
           module CLI
-            class Client < Face::CLI
+            class Client < Face_::CLI::Client
               namespace :'bee-nee' do
                 def dee
                   :deex
@@ -73,15 +71,15 @@ module Skylab::Face::TestSupport::CLI::API_Integration::WNS
           module API
             module Actions
               module BeeNee
-                class Dee < Face::API::Action
+                class Dee < Face_::API::Action
                   def execute
                     :deex
                   end
                 end
-                class Eee < Face::API::Action
+                class Eee < Face_::API::Action
                   params [:one], [:two]
                 end
-                class Fee < Face::API::Action
+                class Fee < Face_::API::Action
                   params :x, [ :y, :arity, :zero_or_one ]
                   def execute
                     "(#{ @x } and #{ @y.inspect })"
@@ -90,7 +88,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::WNS
               end
               module Gee
                 module Hee
-                  class Jee < Face::API::Action
+                  class Jee < Face_::API::Action
                     params :x
                     def execute
                       "nice work sailor: #{ @x }"
@@ -101,7 +99,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::WNS
             end
           end
           module CLI
-            class Client < Face::CLI
+            class Client < Face_::CLI::Client
               namespace :'bee-nee' do
                 use :api, :call_api
                 def cee

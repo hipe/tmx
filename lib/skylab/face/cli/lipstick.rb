@@ -110,7 +110,7 @@ module Skylab::Face
         @cook = -> my_room do
           # `normalized_float` below must be nil or btwn 0.0 and 1.0 inclusive
           styliz = if color
-            CLI::CLI_Lib_::Stylify_proc[].curry[ [ color ] ]
+            CLI::Lib_::Stylify_proc[].curry[ [ color ] ]
           else IDENTITY_ end
           -> normalized_float do
             if normalized_float  # allow nil to mean "don't do it"

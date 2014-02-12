@@ -76,7 +76,7 @@ module Skylab::Git
     NUM_NUM_ = "( <num> <num> | #{ EL_ } )"
 
     Hi_ = -> msg do
-      ( @hi ||= Face::CLI::FUN.stylify.curry[ [ :green ] ] )[ msg ]
+      ( @hi ||= Face::CLI.stylify.curry[ [ :green ] ] )[ msg ]
     end
 
     define_method :hi, & Hi_

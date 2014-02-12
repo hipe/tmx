@@ -1,6 +1,6 @@
 module Skylab::TMX::Modules::CLI
 
-  class CLI < ::Skylab::Face::CLI
+  class CLI < ::Skylab::Face::CLI::Client
 
     use :hi
     set :desc, -> y do

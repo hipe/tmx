@@ -1,15 +1,13 @@
 require_relative 'test-support'
 
-module Skylab::Face::TestSupport::CLI::API_Integration::WOU
+module Skylab::Face::TestSupport::CLI::Client::API_Integration::WOU
 
-  ::Skylab::Face::TestSupport::CLI::API_Integration[ WOU_TestSupport = self ]
+  ::Skylab::Face::TestSupport::CLI::Client::API_Integration[ self, :CLI_sandbox]
 
-  CONSTANTS::Common_setup_[ self, :sandbox ]
+  describe "[fa] CLI client API integration - with ouroboros" do
 
-  describe "[fa] API event integration" do
-
-    extend CLI_TestSupport
-    extend WOU_TestSupport  # so CONSTANTS (Sandbox) is visible in i.m's
+    extend CLI_Client_TS_
+    extend TS__  # so CONSTANTS (Sandbox) is visible in i.m's
 
     context "make sure ouroborous is ok when doing `api`" do
       define_sandbox_constant :application_module do
@@ -17,7 +15,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::WOU
           module API
             module Actions
               module Foo
-                class Bar < Face::API::Action
+                class Bar < Face_::API::Action
                   params :x
                   def execute
                     "okay:(#{ @x })"
@@ -27,11 +25,11 @@ module Skylab::Face::TestSupport::CLI::API_Integration::WOU
             end
           end
           module CLI
-            class Client < Face::CLI
+            class Client < Face_::CLI::Client
               namespace :foo, -> { CLI::Actions::Foo }
             end
             module Actions
-              class Foo < Face::CLI::Namespace
+              class Foo < Face_::CLI::Client::Namespace_
                 use :api
                 def bar x
                   api x

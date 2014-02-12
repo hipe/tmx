@@ -2,21 +2,19 @@
 
 require_relative 'test-support'
 
-module Skylab::Face::TestSupport::CLI::Namespace::Via_Mod_Func
+module Skylab::Face::TestSupport::CLI::Client::Namespace::Via_Mod_Func
 
   #   ~ we made this to get cull working again pro-actively after [#037] ~
 
-  ::Skylab::Face::TestSupport::CLI::Namespace[ This_TestSupport = self ]
-
-  CONSTANTS::Common_setup_[ self ]
+  ::Skylab::Face::TestSupport::CLI::Client::Namespace[ self, :CLI_party ]
 
   module Wizzle
     module CLI
-      class Client < Face::CLI
+      class Client < Face_::CLI::Client
         namespace :'data-source', -> { Actions::DataSrc }, aliases: [ 'ds' ]
       end
       module Actions
-        class DataSrc < Face::CLI::Namespace
+        class DataSrc < Face_::CLI::Client::Namespace_
         end
       end
     end
@@ -24,9 +22,9 @@ module Skylab::Face::TestSupport::CLI::Namespace::Via_Mod_Func
 
   do_invoke = Do_invoke_[]
 
-  describe "[fa] Namespace via mode func" do
+  describe "[fa] CLI client namespace via mode func" do
 
-    extend This_TestSupport
+    extend TS__
 
     as :usg1, /\Ausage: wtvr \{data-source\} \[opts\] \[args\]\z/, :styled
     as :usg2, /\A  +wtvr \{-h \[cmd\]}/, :nonstyled

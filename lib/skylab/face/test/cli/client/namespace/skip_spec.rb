@@ -2,15 +2,13 @@
 
 require_relative 'test-support'
 
-module Skylab::Face::TestSupport::CLI::Namespace::Skip
+module Skylab::Face::TestSupport::CLI::Client::Namespace::Skip
 
-  ::Skylab::Face::TestSupport::CLI::Namespace[ This_TestSupport = self ]
-
-  CONSTANTS::Common_setup_[ self ]
+  ::Skylab::Face::TestSupport::CLI::Client::Namespace[ self, :CLI_party ]
 
   module Wiffle
     module CLI
-      class Client < Face::CLI
+      class Client < Face_::CLI::Client
         namespace :'alcoa', aliases: ['ac'], skip: true do
           def foo
           end
@@ -23,7 +21,7 @@ module Skylab::Face::TestSupport::CLI::Namespace::Skip
         end, :skip, true, :aliases, ['tt']
       end
     end
-    class TT < Face::CLI::Namespace
+    class TT < Face_::CLI::Client::Namespace_
       def bar
       end
     end
@@ -31,9 +29,9 @@ module Skylab::Face::TestSupport::CLI::Namespace::Skip
 
   do_invoke = Do_invoke_[]
 
-  describe "[fa] Namespace desc" do
+  describe "[fa] CLI client namespace skip" do
 
-    extend This_TestSupport
+    extend TS__
 
     context "some context" do
 

@@ -1,13 +1,14 @@
 require_relative '../test-support'
 
-module Skylab::Face::TestSupport::CLI::Namespace
+module Skylab::Face::TestSupport::CLI::Client::Namespace
 
-  ::Skylab::Face::TestSupport::CLI[ TS__ = self ]
-
-  CONSTANTS::Common_setup_[ self ]
+  ::Skylab::Face::TestSupport::CLI::Client[ self, :flight_of_stairs ]
 
   module CONSTANTS
-    Sandbox = CLI_TestSupport::Sandbox  # please be careful
+    Sandbox = CLI_Client_TS_::Sandbox  # please be careful
   end
 
+  def self.bundles_class
+    parent_anchor_module.bundles_class
+  end
 end

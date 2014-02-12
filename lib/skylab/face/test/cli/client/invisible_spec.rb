@@ -2,23 +2,21 @@
 
 require_relative 'test-support'
 
-module Skylab::Face::TestSupport::CLI::Invisible
+module Skylab::Face::TestSupport::CLI::Client::Invisible
 
-  ::Skylab::Face::TestSupport::CLI[ This_TestSupport = self ]
-
-  CONSTANTS::Common_setup_[ self ]
+  ::Skylab::Face::TestSupport::CLI::Client[ self, :CLI_party ]
 
   do_invoke = Do_invoke_[]
 
-  describe "[fa] CLI invisible" do
+  describe "[fa] CLI client invisible" do
 
-    extend This_TestSupport
+    extend TS__
 
     context "an implicit command made invisible declaratively beforehand" do
 
       module Cornholius  # guess where this module goes to live
 
-        class CLI_Client < Face::CLI
+        class CLI_Client < Face_::CLI::Client
 
           def glo
           end
@@ -49,7 +47,7 @@ module Skylab::Face::TestSupport::CLI::Invisible
 
     context "implicit, afterhand" do
       module Dornholius
-        class CLI_Client < Face::CLI
+        class CLI_Client < Face_::CLI::Client
           def doo
             :doox
           end
@@ -74,7 +72,7 @@ module Skylab::Face::TestSupport::CLI::Invisible
 
       module Eornholius
 
-        class CLI_Client < Face::CLI
+        class CLI_Client < Face_::CLI::Client
 
           def glouchester
           end
@@ -117,7 +115,7 @@ module Skylab::Face::TestSupport::CLI::Invisible
 
     context "exlicit during" do
       module Fornholius
-        class CLI_Client < Face::CLI
+        class CLI_Client < Face_::CLI::Client
           option_parser do |o|
           end
           set :node, :foo, :invisible
@@ -142,7 +140,7 @@ module Skylab::Face::TestSupport::CLI::Invisible
 
     context "explicit after" do
       module Gornholius
-        class CLI_Client < Face::CLI
+        class CLI_Client < Face_::CLI::Client
           option_parser do |o|
           end
           def goo

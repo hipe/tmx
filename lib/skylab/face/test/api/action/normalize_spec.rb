@@ -2,11 +2,11 @@ require_relative 'test-support'
 
 module Skylab::Face::TestSupport::API::Action::Normalize
 
-  ::Skylab::Face::TestSupport::TestLib_::Sandboxify[ self ]
+  ::Skylab::Face::TestSupport::API::Action[ self, :sandboxes_et_al ]
 
   describe "extend module x with Face::API and be normal" do
 
-    extend TS_
+    extend TS__
 
     context "roll own normalize if you must" do
 
