@@ -2,6 +2,10 @@ module Skylab::TestSupport
 
   class Expect  # see [#029] the expect omnibus and narrative #intro-to-gamma
 
+    def self.apply_on_test_node_with_x_a_passively node, _
+      node.instance_methods_module.include InstanceMethods ; nil
+    end
+
     # ~ three laws for real ~
 
     module InstanceMethods
@@ -11,6 +15,7 @@ module Skylab::TestSupport
         exp = build_expectation_from_x_a_and_p x_a, p
         exp.assert_under self
       end
+      alias_method :ts_expect, :expect  # wrestle with rspec
 
       def build_expectation_from_x_a_and_p x_a, p
         expectation_class.new x_a, p
@@ -47,6 +52,22 @@ module Skylab::TestSupport
       end
       def match_with_regex exp_rx, em
         em.payload_x.should match exp_rx
+      end
+
+    private  # ~ convenience
+      def expect_succeeded
+        expect_result_for_success
+        expect_no_more_emissions
+      end
+      def expect_failed
+        expect_result_for_failure
+        expect_no_more_emissions
+      end
+      def expect_result_for_success
+        @result.should eql true
+      end
+      def expect_result_for_failure
+        @result.should eql false
       end
     end
 

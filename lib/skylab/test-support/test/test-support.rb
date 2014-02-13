@@ -27,6 +27,9 @@ module Skylab::TestSupport::TestSupport
 
   module TestLib_
     memoize = TestSupport_::Callback_.memoize
+    Face_module = -> do
+      TestSupport_::Lib_::Face__[]
+    end
     Headless__ = ::Skylab::TestSupport::Lib_::Headless__
     System_pathnames_calculate = -> p do
       Subsystem__[]::PATHNAMES.calculate( & p )

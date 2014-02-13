@@ -25,13 +25,26 @@ module Skylab::Callback
         a.map { |i| @at_h.fetch( i ) { @at_h[ i ] = method i } }
       end
 
-      def build_require_sidesystem_proc i
-        memoize { require_sidesystem i }
+      def build_require_sidesystem_proc * i_a
+        proc_or_call_or_map i_a do |x|
+          memoize { require_sidesystem x }
+        end
       end
 
-      def build_require_stdlib_proc i
-        memoize { require_stdlib i }
+      def build_require_stdlib_proc * i_a
+        proc_or_call_or_map i_a do |x|
+          memoize { require_stdlib x }
+        end
       end
+    private
+      def proc_or_call_or_map i_a, & p
+        case i_a.length <=> 1
+        when -1 ; p
+        when  0 ; p[ i_a.first ]
+        when  1 ; i_a.map( & p.method( :call ) )
+        end
+      end
+    public
 
       def const_reduce *a, &p
         self::Const_Reduction__::Dispatch[ a, p ]

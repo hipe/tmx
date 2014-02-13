@@ -326,6 +326,10 @@ module Skylab::Face
           #
           Inspct__ = Lib_::Inspect_proc[].
             curry[ A_REASONABLY_SHORT_LENGTH_FOR_A_STRING__ = 10 ]
+
+          def lbl x
+            Callback_::Name.from_variegated_symbol( x ).as_human
+          end
         end
         p = -> { Expression_Agent__ }
         Expression_Agent__

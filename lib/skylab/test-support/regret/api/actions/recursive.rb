@@ -14,6 +14,11 @@ module Skylab::TestSupport::Regret::API
       [ :path, :arity, :zero_or_one ],
       v.param( :vtuple )
 
+    def absorb_any_services_from_parameters_notify h
+      x = h.delete( :out ) and accept_value_as_service x, :out
+      x = h.delete( :err ) and accept_value_as_service x, :err ; nil
+    end
+
     def execute
       @do_list = @do_check = @is_dry_run = @do_execute = nil
       instance_variable_set :"@#{ @mode }", true
@@ -97,7 +102,7 @@ module Skylab::TestSupport::Regret::API
     end
 
     def bld_special_path_listener
-      Callback_::Listener::Suffixed[ :from_special, self ]
+      TestSupport_::Callback_::Listener::Suffixed[ :from_special, self ]
     end
 
     Special_Path__ = -> * x_a do

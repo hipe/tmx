@@ -8,7 +8,7 @@ lib/skylab/basic/pathname/union.rb
 lib/skylab/basic/rotating-buffer.rb
 lib/skylab/basic/struct.rb
 lib/skylab/face/cli/lipstick.rb
-lib/skylab/face/cli/table.rb
+lib/skylab/face/cli/table.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/face/cli/tableize.rb
 lib/skylab/headless/cli/option.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/headless/nlp/en/levenshtein.rb

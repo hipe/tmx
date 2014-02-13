@@ -71,6 +71,10 @@ module Skylab::TestSupport
         Parse_alternation = -> do
           MetaHell__[]::FUN.parse_alternation
         end
+        Parse_hashtag = -> listener, s do
+          Snag__[]::Models::Hashtag::Parse[ listener, s ]
+        end
+        sidesys = TestSupport_::Autoloader_.build_require_sidesystem_proc
         Path_tools_clear = -> do
           Headless__[]::CLI::PathTools.clear
         end
@@ -85,9 +89,10 @@ module Skylab::TestSupport
         end
         Procs_as_methods = Lib_::Procs_as_methods
         Scanner = Lib_::Scanner
+        Snag__ = sidesys[ :Snag ]
         Struct = Lib_::Struct
-        SubTree__ = TestSupport_::Autoloader_.
-          build_require_sidesystem_proc :SubTree
+        SubTree__ = sidesys[ :SubTree ]
+
         Text_patch = -> do
           Headless__[]::Text::Patch
         end
