@@ -5,10 +5,11 @@ require 'skylab/face/core'
 
 module Skylab::Git
 
-  Autoloader_ = ::Skylab::Callback::Autoloader
+  Callback_ = ::Skylab::Callback
+  Autoloader_ = Callback_::Autoloader
   Face = ::Skylab::Face
   Git = self
-  MetaHell = ::Skylab::MetaHell
+  MetaHell = Autoloader_.require_sidesystem :MetaHell
 
   MAARS = MetaHell::MAARS
 
