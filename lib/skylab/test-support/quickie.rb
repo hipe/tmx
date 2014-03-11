@@ -279,6 +279,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
   class Quickie::Client  # #storypoint-285
     def initialize y, root_context_class
       @tag_desc_h = @example_producer_p = @line_set = @or_p_a = nil
+      @run_option_p_a = nil
       @root_context_class = root_context_class
       @tag_filter_p = nil ; @y = y
     end
@@ -362,8 +363,11 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
           '(tries to be like the option in rspec)' do |v|
         process_tag_argument v
       end
-      o.on '-l', '--line NUMBER', '(experiment)' do |v|
+      o.on '--line NUMBER', '(experiment)' do |v|
         process_line_argument v
+      end
+      o.on '--to NUMBER', '(experiment)' do |v|
+        process_max_line_argument v
       end
       o
     end
@@ -382,32 +386,67 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
       no, tag_s, val_s = md.captures
       tag_i = tag_s.intern
       val_x = val_s ? val_s.intern : true
-      @or_p_a ||= [ ] ; @tag_desc_h ||= { }
+      @tag_desc_h ||= { }
       ( @tag_desc_h[ no ? :exclude : :include ] ||= [ ] ) << [ tag_i, val_x ]
-      if no
-        @or_p_a << -> tagset { val_x != tagset[ tag_i ] }
+      add_or_p ( if no
+        -> tagset { val_x != tagset[ tag_i ] }
       else
-        @or_p_a << -> tagset { val_x == tagset[ tag_i ] }
+        -> tagset { val_x == tagset[ tag_i ] }
+      end )
+      @did_add_render_tag_run_options ||= begin
+        add_run_option_renderer( & method( :render_tag_run_options ) )
+        true
       end ; nil
     end
 
+    def add_or_p p
+      (( @or_p_a ||= [] )) << p ; nil
+    end
+
+    def add_run_option_renderer & p
+      ( @run_option_p_a ||= [] ) << p ; nil
+    end
+
     def process_line_argument s
-      if LINE_RX__ !~ s
+      accept_line_argument cnvrt_line_argument s
+    end
+
+    def cnvrt_line_argument s
+      if LINE_RX__ =~ s
+        s.to_i
+      else
         @y << "(not a valid line number, expecting integer - #{ s.inspect })"
         raise ::OptionParser::InvalidArgument
-      else
-        accept_line_argument s.to_i
       end
     end
     LINE_RX__ = /\A\d+\z/
 
     def accept_line_argument d
-      @line_set ||= (( begin
-        (( @or_p_a ||= [] )) << -> tagset do
+      @did_add_line_set_p ||= begin
+        add_or_p -> tagset do
           @line_set.include? tagset.lineno
         end
-        require 'set' ; ::Set.new
-      end )) << d ; nil
+        require 'set'
+        @line_set = ::Set.new
+        add_run_option_renderer do |y|
+          @line_set.each do |d_| y << "--line #{ d_ }" end
+        end
+        true
+      end
+      @line_set << d ; nil
+    end
+
+    def process_max_line_argument s
+      accept_max_line_argument cnvrt_line_argument s
+    end
+
+    def accept_max_line_argument d
+      add_or_p -> tagset do
+        d >= tagset.lineno
+      end
+      add_run_option_renderer do |y|
+        y << "--to #{ d }"
+      end ; nil
     end
 
     def parse_args argv
@@ -558,16 +597,17 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     private :stylize
 
     def commence
-      if @tag_desc_h || @line_set
+      if @run_option_p_a
         @y << "Run options:#{ render_run_options }\n\n"
       end
       nil
     end
 
-    def render_run_options  # (eew)
+    def render_run_options
       y = []
-      @tag_desc_h and render_tag_run_options y
-      @line_set and render_line_run_options y
+      @run_option_p_a.each do |p|
+        p[ y ]
+      end
       if 1 == y.length
         " #{ y[ 0 ] }"
       else
@@ -585,10 +625,6 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     end
     #
     ORDER_A__ = [ :include, :exclude ].freeze
-
-    def render_line_run_options y
-      @line_set.each do |d| y << "--line #{ d }" end ; nil
-    end
 
     def conclude y, rt
       e, f, p = rt.counts   # total [e]xamples, failed, pending
