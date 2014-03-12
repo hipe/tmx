@@ -90,7 +90,7 @@ hm, not sure that was worth it. but mind you I haven't tried this yet!
 
 
 
-## #slow-step
+## :#slow-step
 
 step-debugging wherin you loop through the following steps:
 
@@ -100,3 +100,63 @@ step-debugging wherin you loop through the following steps:
 3. if you found such a line in 2, stop the debugging session, move the
    breakpoint to above that line, and go back to 2.
    if not, then your test should be passing. write the next test and repeat.
+
+
+
+
+## :#quarrantining-an-autoload-failure
+
+### a case study
+
+1. hopefully this starts by having one or more failing spec(s) from the
+   universe.
+2. write a test case in your topic node that produces the autoload failure
+   by referencing the same node (const name) from (1).
+3. effectively copy-paste the relevant graph into a fixture, but adding
+   depth to its base and stripping out the body of the nodes as necessary.
+   we give the new node names that are semi-regular transformations of the
+   original names so that they don't interfere with refactoring yet have some
+   bit of posterity and context (e.g "Erkshern" for "Action").
+4. add a new test that looks exactly like the test case in (2) except change
+   the names (and add depth as necessary) so that you are getting the exact
+   same failure except from the fixture graph and not the universe graph.
+   often rework of (3) is necessary to get the graph just right so it trips
+   the same error.
+5. with this "quarrantined" "bug" rework the topic code to fix it. sometimes
+   we run all topic specs except the new specs we have added in these steps,
+   to confirm that we are feature-adding without regressing.
+   (and then we came up with #focus-not-focus for this step.)
+6. confirm that you fixed it by running the test from (2), and either erase
+   it or keep it for posterity (we would prefer that you erase it ultimately).
+
+
+
+
+## :#focus-not-focus
+
+you have a test suite for a node (let's just assume it is one spec file)
+and you have written one test that fails (because either it's triggering
+the topic bug or because it's triggering a failure related to the missing
+topic feature).
+
+add e.g a 'f' (focus) tag to that test. confirm that everything is green
+except the topic by running all of the tests except the focus test (probably
+just for that node), and possibly lock this down with a "work in progress"
+commit. then as you work towards the topic (refactoring or feature adding
+as appropriate), flip back and forth between the "focus" and the "not focus"
+tests to make sure you don't regress.
+
+for an aggressive refactor of a featurepoint that has code that is somewhat
+#three-laws-compliant below it, it may be useful to use the experimental
+'--too' option of quickie to run all tests the topic spec file up to and
+including the test on a certain line: in this case let that line be the
+line of the last test before the topic test that you presumably broke by
+beginning this aggressive refactor:
+
+the rationale behind this is that all the tests that came "before"
+(or "under") the topic test should still pass because their correct
+functioning should preclude the correct functioning of the featurepoint in
+question; and if any of *those* tests is failing, you should fix those ones
+before you fix any failing "outstream" tests (that activate functionality
+that is presumably more complex than the "instream" functionality that came
+before (or "under") it.
