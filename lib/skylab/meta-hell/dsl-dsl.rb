@@ -1,5 +1,7 @@
 module Skylab::MetaHell::DSL_DSL
 
+  ::Skylab::MetaHell::DslDsl = self  # :+[#cb-027]
+
   # this DSL_DSL is a simple DSL for making simple DSL's.
   #
   # you declare fields associated with your module by giving them a name

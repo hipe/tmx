@@ -5,7 +5,7 @@ module Skylab::Git::TestSupport::CLI
   ::Skylab::Git::TestSupport[ self ]
 
   module CONSTANTS
-    Headless = ::Skylab::Headless
+    Headless = self::Git::Library_::Headless
   end
 
   include CONSTANTS

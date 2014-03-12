@@ -24,6 +24,16 @@ module Skylab::Cull::TestSupport
 
   extend TestSupport::Quickie
 
+  module Fixtures  # #stowaway
+    module Directories
+      Cull::Autoloader_[ self ]
+    end
+    module Patches
+      Cull::Autoloader_[ self ]
+    end
+    Cull::Autoloader_[ self ]
+  end
+
   module ModuleMethods
 
     include CONSTANTS

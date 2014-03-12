@@ -2,16 +2,6 @@ require_relative 'test-support'
 
 module Skylab::Face::TestSupport::CLI::Table
 
-  ::Skylab::Face::TestSupport::CLI[ self ]
-
-  include CONSTANTS
-
-  Face = ::Skylab::Face
-
-  extend TestSupport::Quickie
-
-  Sandboxer = TestSupport::Sandbox::Spawner.new
-
   describe "Skylab::Face::CLI::Table" do
     context "a table" do
       Sandbox_1 = Sandboxer.spawn

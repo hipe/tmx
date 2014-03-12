@@ -4,7 +4,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
 
   extend TestSupport::Quickie  # try running this file just with `ruby -w`
 
-  describe "#{ CodeMolester::Config::File } events" do
+  describe "[cm] config file events" do
 
     extend File_TestSupport
 

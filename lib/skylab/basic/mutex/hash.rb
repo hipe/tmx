@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  class Mutex::Hash
+  class self::Mutex::Hash
 
     def initialize &blk
       @h = { }

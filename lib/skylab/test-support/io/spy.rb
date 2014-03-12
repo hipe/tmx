@@ -1,5 +1,9 @@
 module Skylab::TestSupport
 
+  module IO
+    Autoloader_[ self ]
+  end
+
   class IO::Spy < TestSupport_::Lib_::IO[]::Interceptors::Tee  # :[#023] ..
 
     Autoloader_[ self, :methods ]

@@ -13,6 +13,10 @@ module Skylab::CodeMolester
     stowaway :Event, 'config/controller'
   end
 
+  module Config
+    Autoloader_[ self ]  # b.c of builtin class of same name :/
+  end
+
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
   stowaway :Lib_, 'library-'

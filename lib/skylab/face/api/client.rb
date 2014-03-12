@@ -20,7 +20,7 @@ module Skylab::Face
     private
       def touch_and_autoloadify mod, const_i, & p
         mod_ = if mod.const_defined? const_i, false
-          mod.const_get const_i
+          mod.const_get const_i, false
         else
           mod.const_set const_i, p[]
         end

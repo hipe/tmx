@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  class Range::Positive
+  class self::Range::Positive
 
     def initialize one, two
       one < 1 and raise "no: #{ one }"

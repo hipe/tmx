@@ -22,6 +22,10 @@ module Skylab::Git
     end
 
     Autoloader_[ self ]
+
+    module Actions  # #stowaway, because of legacy 'push.rb' artifact
+      Autoloader_[ self ]
+    end
   end
 
   MAARS[ self ]

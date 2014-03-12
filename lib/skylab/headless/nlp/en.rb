@@ -76,6 +76,7 @@ module Skylab::Headless
      exis: ['exist', 'is', 'are'],
        is: ['are', 'is', 'are'],
        no: ['no ', 'the only '],
+   one_of: [ nil, nil, 'one of ' ],
         s: ['s', nil, 's'],
        _s: [ nil, 's' ],               # it requires, they require
      this: ['these', 'this', 'these'],

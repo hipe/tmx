@@ -2,13 +2,15 @@ require_relative '../test-support'
 
 module Skylab::GitViz::TestSupport::Test_Lib_::Mock_FS
 
-  ::Skylab::GitViz::TestSupport[ TS__ = self ]
+  ::Skylab::GitViz::TestSupport::Test_Lib_[ TS__ = self ]
 
   include CONSTANTS
 
   Mock_FS_Parent_Module__ = GitViz::Test_Lib_
 
   extend TestSupport::Quickie
+
+  GitViz::Autoloader_[ Fixtures = ::Module.new ]
 
   module ModuleMethods
     def memoize i, &p  # this is used for OCD reasons, but can be problematic

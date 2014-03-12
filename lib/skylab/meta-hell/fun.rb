@@ -2,6 +2,8 @@ module Skylab::MetaHell
 
   (( FUN = ::Class.new( ::Module ).new )).const_set :Module, FUN.class
 
+  Fun = FUN  # :+[#cb-027]
+
   class FUN::Module
 
   private

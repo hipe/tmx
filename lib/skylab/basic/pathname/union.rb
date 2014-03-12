@@ -41,7 +41,7 @@ module Skylab::Basic
   #     x.to_s # => '/biff/baz'
   #
 
-  class Pathname::Union
+  class self::Pathname::Union
 
     def self.[] *a
       o = new

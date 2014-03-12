@@ -48,10 +48,6 @@ module Skylab::TestSupport
       Face__[]::API::Normalizer_
     end
 
-    Autoload_const_missing_class = -> do
-      MetaHell__[]::MAARS::Const_Missing_
-    end
-
     Autoloader__ = memoize[ -> do
       Skylab__[]::Autoloader
     end ]

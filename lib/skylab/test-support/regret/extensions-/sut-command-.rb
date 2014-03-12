@@ -13,8 +13,7 @@ module ::Skylab::TestSupport
 
       def get_command_parts_for_system_under_test_notify
         pts = get_any_command_parts_for_system_under_test_notify
-        pts or raise topless_errmsg( "set top SUT command#{
-          }#{ " in parent or" if parent_anchor_module }" )
+        pts or raise topless_errmsg sut_cmd_say_set
       end
 
       def get_any_command_parts_for_system_under_test_notify
@@ -23,24 +22,35 @@ module ::Skylab::TestSupport
           pam = parent_anchor_module
           ppts = pam && pam.get_any_command_parts_for_system_under_test_notify
         end
-        if setting
-          mypts = case setting.mode
-          when :value ; setting.value
-          when :block ; setting.value[ a = [ ] ] ; a
-          else        ; fail 'no'
-          end
-        end
+        setting and mypts = send( setting.mode, setting )
         if ppts
           mypts and ppts.concat mypts
           ppts
         elsif mypts
-          setting.is_root or raise topless_errmsg( "set (not add) a ROOT #{
-            }SUT command in parent or" )
-          :value == setting.mode ? mypts.dup : mypts
+          setting.is_root or raise sut_cmd_say_set_not_add
+          :sut_cmd_pts_in_value == setting.mode ? mypts.dup : mypts
         end
       end
 
     private
+
+      def sut_cmd_pts_in_value setting
+        setting.value
+      end
+
+      def sut_cmd_pts_in_block setting
+        a = []
+        setting.value.call a
+        a
+      end
+
+      def sut_cmd_say_set
+        "set top SUT command#{ " in parent or" if parent_anchor_module }"
+      end
+
+      def sut_cmd_say_set_not_add
+        topless_errmsg "set (not add) a ROOT SUT command in parent or"
+      end
 
       remove_method :set_command_parts_for_system_under_test
       def set_command_parts_for_system_under_test * parts, &block  # IMPORTANT name
@@ -68,11 +78,11 @@ module ::Skylab::TestSupport
         const_defined? :SUT_CMD_SETTING_, false and fail "is write once."
         if parts.length.nonzero?
           block and fail 'no'
-          setting.mode = :value
+          setting.mode = :sut_cmd_pts_in_value
           setting.value = parts.freeze
         else
           block.respond_to? :call or fail "expected callable - #{ block.class }"
-          setting.mode = :block
+          setting.mode = :sut_cmd_pts_in_block
           setting.value = block
         end
         const_set :SUT_CMD_SETTING_, setting

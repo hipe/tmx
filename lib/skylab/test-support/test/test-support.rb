@@ -23,6 +23,10 @@ module Skylab::TestSupport::TestSupport
     def debug!
       @do_debug = true
     end
+
+    def debug_IO
+      @debug_IO ||= TestSupport_::Lib_::Stderr[]
+    end
   end
 
   module TestLib_
@@ -32,7 +36,8 @@ module Skylab::TestSupport::TestSupport
     end
     Headless__ = ::Skylab::TestSupport::Lib_::Headless__
     System_pathnames_calculate = -> p do
-      Subsystem__[]::PATHNAMES.calculate( & p )
+      _pn = Subsystem__[]::PATHNAMES
+      _pn.module_exec( & p )  # call it 'calculate' instead and #core-dump
     end
     Subsystem__ = memoize[ -> do
       ::Skylab::Subsystem  # or..

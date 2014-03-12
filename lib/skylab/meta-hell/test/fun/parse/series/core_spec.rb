@@ -2,16 +2,6 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::FUN::Parse::Series
 
-  ::Skylab::MetaHell::TestSupport::FUN::Parse[ self ]
-
-  include CONSTANTS
-
-  MetaHell = ::Skylab::MetaHell
-
-  extend TestSupport::Quickie
-
-  Sandboxer = TestSupport::Sandbox::Spawner.new
-
   describe "Skylab::MetaHell::FUN::Parse::Series" do
     context "`parse_series` - parse out (a fixed) N values from M args" do
       Sandbox_1 = Sandboxer.spawn

@@ -16,6 +16,10 @@ module Skylab::GitViz::TestSupport::VCS_Adapters_::Git
 
   extend TestSupport::Quickie
 
+  module Fixtures
+    GitViz::Autoloader_[ self ]
+  end
+
   module InstanceMethods
 
     def front

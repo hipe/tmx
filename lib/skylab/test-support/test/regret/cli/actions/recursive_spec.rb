@@ -4,9 +4,16 @@ module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Recursiv
 
   TestSupport_ = ::Skylab::TestSupport
 
-  TestSupport_::Lib_::Face__[]::TestSupport::CLI::Client[ self ]
+  parent = ::Skylab::TestSupport::TestSupport::Regret::CLI::Actions
 
-  TestSupport_::TestSupport::Regret[ TS__ = self ]
+  @dir_pathname = parent.dir_pathname.join 'recursive'
+
+  _Face_TS = TestSupport_::Lib_::Face__[]::TestSupport
+  _Face_TS::CLI::Client[ self ]
+
+  parent[ TS__ = self ]
+
+  include CONSTANTS
 
   extend TestSupport_::Quickie
 

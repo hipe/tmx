@@ -120,6 +120,16 @@ module Skylab::MetaHell
     end
 
     P__ = -> cbn, do_peek_hack, else_value_p, mod, path_x do  # #curry-friendly
+      if mod.respond_to? :const_reduce
+        return mod.const_reduce do |cr|
+          cr.assume_is_defined  # [#cb-024]:pound-thru
+          cr.const_path [ * path_x ]
+          cbn and cr.core_basename cbn
+          do_peek_hack and cr.do_peek_hack
+          cr.else( & else_value_p )
+          cr.result_in_name_and_value
+        end
+      end
       [ * path_x ].reduce( [ nil, mod ] ) do | (_constant, box), name_x |
         const_a = Get_constants_including_inferred_constants__[ box ]
         nam = Distill[ name_x ]

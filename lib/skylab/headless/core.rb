@@ -14,6 +14,7 @@ module Skylab::Headless  # ([#013] is reserved for a core node narrative - no st
   EMPTY_STRING_ = ''.freeze
   EMPTY_A_ = [].freeze
   Headless = self
+  Autoloader_[ IO = ::Module.new ]
   IDENTITY_ = -> x { x }
   LINE_SEPARATOR_STRING_ = "\n".freeze
   MONADIC_TRUTH_ = -> _ { true }

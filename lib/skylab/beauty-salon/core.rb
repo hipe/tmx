@@ -1,6 +1,7 @@
 require_relative '..'
 require 'skylab/basic/core'
 require 'skylab/face/core'
+require 'skylab/meta-hell/core'
 require 'skylab/headless/core'
 
 module Skylab::BeautySalon

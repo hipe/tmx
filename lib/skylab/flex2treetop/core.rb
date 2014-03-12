@@ -9,14 +9,16 @@ module Skylab::Flex2Treetop
   }.freeze
 
   Callback_ = ::Skylab::Callback
+    Autoloader_ = Callback_::Autoloader
   Flex2Treetop = self
-  Headless, MetaHell = Callback_::Autoloader.
-    require_sidesystem :Headless, :MetaHell
+  Headless, MetaHell = Autoloader_.require_sidesystem :Headless, :MetaHell
 
   VERSION = '0.0.2'
 
+  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+
   module Lib_  # :+[#su-001]
-    Basic = -> { require 'skylab/basic/core' ; ::Skylab::Basic }
+    Basic = Autoloader_.build_require_sidesystem_proc :Basic
     OptionParser = -> { require 'optparse' ; ::OptionParser }
     StringScanner = -> { require 'strscan' ; ::StringScanner }
     Tmpdir = -> { require 'tmpdir' ; ::Dir }

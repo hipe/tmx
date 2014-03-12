@@ -37,7 +37,7 @@ module Skylab::GitViz
 
       module Module_Methods__
         def fixtures_mod
-          send( :nearest_test_node )::Fixtures  # covered
+          self.nearest_test_node::Fixtures  # covered
         end
       end
 

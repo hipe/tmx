@@ -99,7 +99,7 @@ module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System
         @test_context ||= build_test_context
       end
       def build_test_context
-        Eg_Context.new self.class.send( :nearest_test_node )::Fixtures
+        Eg_Context.new self.class.nearest_test_node::Fixtures
       end
     end
   end

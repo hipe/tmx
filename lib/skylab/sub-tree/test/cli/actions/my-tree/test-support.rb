@@ -2,8 +2,8 @@ require_relative '../test-support'
 
 module Skylab::SubTree::TestSupport::CLI::Actions::My_Tree
 
-  ::Skylab::SubTree::TestSupport::Testlib_::Face_[]::TestSupport::CLI::Client[ self ]
-    # do this first
+  _Face_TS = ::Skylab::SubTree::TestSupport::Testlib_::Face_[]::TestSupport
+  _Face_TS::CLI::Client[ self ]  # do this first
 
   module InstanceMethods
     alias_method :super_invoke, :invoke  # hackily grab this

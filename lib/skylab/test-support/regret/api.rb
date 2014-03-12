@@ -15,8 +15,14 @@ module Skylab::TestSupport
       WRITEMODE_ = 'w'.freeze
 
       module RegretLib_
+        Autoloader__ = -> do
+          ::Skylab::Callback::Autoloader
+        end
         Basic__ = Lib_::Basic__
         Box = Lib_::Box
+        Const_reduce = -> * x_a do
+          Autoloader__[].const_reduce.via_iambic x_a
+        end
         CLI_stylify = -> a, x do
           Headless__[]::CLI::Pen::FUN::Stylify[ a, x ]
         end
@@ -39,11 +45,24 @@ module Skylab::TestSupport
           MetaHell__[]::FUN::Fields_.via_iambic x_a
         end
         Headless__ = Lib_::Headless__
+        Ick = -> x do
+          Basic__[]::FUN::Inspect[ x ]
+        end
+        List = -> do
+          Basic__[]::List
+        end
+        Levenshtein = -> sep, p, d, a, s do
+          Headless__[]::NLP::EN::Levenshtein::
+            With_conj_s_render_p_closest_n_items_a_item_x[ sep, p, d, a, s ]
+        end
         Loader_fuzzy_const_get = -> name, mod do  # :[#028]:C
           MetaHell__[]::Boxxy::Fuzzy_const_get[ mod, name ]
         end
         Loader_resolve_const_name_and_value = -> * x_a do
           MetaHell__[]::Boxxy::Resolve_name_and_value[ * x_a ]  # :[#028]:B
+        end
+        Memoize = -> p do
+          Callback_.memoize[ p ]
         end
         MetaHell__ = Lib_::MetaHell__
         Name_normal_to_slug = -> i do
@@ -56,16 +75,6 @@ module Skylab::TestSupport
         end
         Name_symbol_to_label = -> i do
           Headless__[]::Name::FUN::Labelize[ i ].downcase
-        end
-        List = -> do
-          Basic__[]::List
-        end
-        Levenshtein = -> sep, p, d, a, s do
-          Headless__[]::NLP::EN::Levenshtein::
-            With_conj_s_render_p_closest_n_items_a_item_x[ sep, p, d, a, s ]
-        end
-        Memoize = -> p do
-          Callback_.memoize[ p ]
         end
         Oxford_or = TestSupport_::Callback_::Oxford_or
         Parse_alternation = -> do

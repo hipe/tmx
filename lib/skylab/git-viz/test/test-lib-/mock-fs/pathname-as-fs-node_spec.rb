@@ -4,8 +4,8 @@ module Skylab::GitViz::TestSupport::Test_Lib_::Mock_FS
 
   class Eg_Test_Eg_Context_FS
     Mock_FS_Parent_Module__::Mock_FS[ self ]
-    def self.nearest_test_node
-      TS__
+    def fixtures_module
+      TS__::Fixtures
     end
   end
 

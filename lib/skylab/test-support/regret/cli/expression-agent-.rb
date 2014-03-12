@@ -40,7 +40,7 @@ module Skylab::TestSupport
 
         def par i  # proof of concept - has problems
           par = @client.fetch_parameter i
-          stem = RegretLib_::Name_symbol_to_label[ par.loca_normal_name ]
+          stem = RegretLib_::Name_symbol_to_label[ par.local_normal_name ]
           if par.has_arity
             if %i( zero_or_one zero_or_more ).include? par.arity_value
               code "--#{ stem.gsub ' ', '-' }"
@@ -85,10 +85,46 @@ module Skylab::TestSupport
           end
 
           def fetch_parameter i, &p
-            hot = @hot_API_action_p.call
-            if hot.has_field_box
-              hot.field_box.fetch i, &p
-            elsif p then p else raise ::KeyError, "no field box for '#{ i }'" end
+            Fetch_parameter__.new( @hot_API_action_p.call, i, p ).fetch_param
+          end
+
+          class Fetch_parameter__
+            def initialize bound, i, p
+              @bound = bound ; @else_p = p ; @i = i
+            end
+            def fetch_param
+              if @bound.has_field_box
+                @box = @bound.field_box
+                when_field_box
+              else
+                raise ::KeyError, "no field box for '#{ @i }'"
+              end
+            end
+          private
+            def when_field_box
+              @box.fetch @i do
+                when_key_not_found
+              end
+            end
+            def when_key_not_found
+              if @else_p
+                @else_p[ i ]
+              else
+                do_crazy_lev_thing
+              end
+            end
+            def do_crazy_lev_thing
+              raise ::KeyError, say_no_such_param
+            end
+            def say_no_such_param
+              _or = say_lev_or
+              "parameter not found: #{ RegretLib_::Ick[ @i ] }. #{
+                }did you mean #{ _or }? (#{ @bound.class })"
+            end
+            def say_lev_or
+              RegretLib_::Levenshtein[
+                ' or ', -> x { "'#{ x }'" }, 5, @box.get_names, @i ]
+            end
           end
         end
 

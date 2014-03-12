@@ -10,10 +10,10 @@ lib/skylab/basic/struct.rb
 lib/skylab/face/cli/lipstick.rb
 lib/skylab/face/cli/table.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/face/cli/tableize.rb
+lib/skylab/face/plugin/host/metaservices-/chain-.rb
+lib/skylab/face/plugin/host/proxy.rb
 lib/skylab/headless/cli/option.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/headless/nlp/en/levenshtein.rb
-lib/skylab/headless/plugin/host/metaservices-/chain-.rb
-lib/skylab/headless/plugin/host/proxy.rb
 lib/skylab/information-tactics/levenshtein.rb
 lib/skylab/meta-hell/boxxy.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/meta-hell/dsl-dsl.rb
@@ -25,7 +25,7 @@ lib/skylab/meta-hell/fun/parse.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/meta-hell/fun/parse/alternation-.rb
 lib/skylab/meta-hell/fun/parse/from-ordered-set.rb
 lib/skylab/meta-hell/fun/parse/from-set.rb
-lib/skylab/meta-hell/fun/parse/series.rb
+lib/skylab/meta-hell/fun/parse/series.rb  #branch-down-to-core #regret-setup:no
 lib/skylab/meta-hell/function.rb
 lib/skylab/meta-hell/module/accessors.rb
 lib/skylab/test-support/quickie/possible-/articulator-.rb

@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module String
 
-    FUN = ::Module
+    FUN = ::Module.new
 
     FUN::Build_proc_for_string_begins_with_string = -> haystack_string do
       len = haystack_string.length

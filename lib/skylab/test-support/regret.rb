@@ -3,28 +3,29 @@ module Skylab::TestSupport
   module Regret  # read [#017] the introduction to regret
 
     def self.[] mod
-      mod.module_exec do
-        extend Regret::Anchor_ModuleMethods
-        init_regret caller_locations( 3, 1 )[ 0 ], nil
+      if ! mod.respond_to? :dir_pathname
+        s_a = mod.name.split '::'
+        s_a.pop
+        _parent_mod = s_a.reduce( ::Object ) { |m, s| m.const_get s, false }
+        _parent_mod.autoloaderize_with_filename_child_node 'test', mod
       end
-      nil
+      mod.extend Anchor_ModuleMethods
+      mod.initialize_for_regret_with_parent_anchor_mod nil
     end
 
     module Anchor_ModuleMethods
 
-      include TestSupport_::Lib_::Autoloader__[]::Methods
-
-      def [] child_mod, * x_a
-        loc = ( x_a.length.nonzero? and (( first = x_a.first )).
-          respond_to?(:absolute_path) || first.respond_to?(:relative_path_from)
-            ) ? x_a.shift : caller_locations( 1, 1 )[ 0 ]
-        parent_anchor_module = self
-        child_mod.module_exec do
-          extend Anchor_ModuleMethods
-          init_regret loc, parent_anchor_module
+      def [] mod, * x_a
+        if ! mod.respond_to? :dir_pathname
+          n = mod.name
+          _const = n[ n.rindex( ':' ) + 1 .. -1 ]
+          _filename = Callback_::Name.from_const( _const ).as_slug
+          autoloaderize_with_filename_child_node _filename, mod
         end
+        mod.extend Anchor_ModuleMethods
+        mod.initialize_for_regret_with_parent_anchor_mod self
         x_a.length.nonzero? and
-          apply_x_a_on_child_test_node x_a, child_mod  # :#hook-out
+          apply_x_a_on_child_test_node x_a, mod  # :#hook-out
         nil
       end
 
@@ -32,25 +33,21 @@ module Skylab::TestSupport
 
       def extended mod
         mod.extend module_methods_module
-        mod.send :include, instance_methods_module
-        mod.send :include, constants_module  # for 1.9.3
+        mod.include instance_methods_module
+        mod.include constants_module  # became necessary in 1.9.3
         nil
       end
 
-      alias_method :regret_extended_notify, :extended
+     alias_method :regret_extended_notify, :extended
 
-      def init_regret loc, pam
+    public
+
+      def initialize_for_regret_with_parent_anchor_mod pam
 
         @parent_anchor_module = pam  # nil ok
 
-        const_missing_class.nil? and @const_missing_class =
-          TestSupport_::Lib_::Autoload_const_missing_class[]
-            # if you set it to false you are crazy
-
-        dpn = Twerk_dir_pathname__[ loc, pam, -> x do
-          init_autoloader x ; @dir_pathname
-        end ]
-        dpn and @dir_pathname = dpn  # ( you can witness the change here )
+        const_missing_class.nil? and  # false if u are up to something
+          @const_missing_class = pam.const_missing_class
 
         o = Bump_module__.curry[ self ]
 
@@ -62,10 +59,9 @@ module Skylab::TestSupport
 
         o[ :ModuleMethods, -> do
           pam and include pam.module_methods_module
-          if ! private_instance_methods( false ).include? NEAREST__
+          if ! instance_methods( false ).include? NEAREST__
             # if not multiparent. if not custom hacks
             define_method NEAREST__ do test_module_me end
-            private NEAREST__
           end
         end ]
 
@@ -76,8 +72,6 @@ module Skylab::TestSupport
 
         nil
       end
-
-    public
 
       def parent_anchor_module
         @parent_anchor_module  # notices please
@@ -143,34 +137,8 @@ module Skylab::TestSupport
       p and mod.module_exec( & p )
       mod
     end
-    #
-    Twerk_dir_pathname__ = -> loc, pam, init_al_p do
-      if pam && SPEC_TAIL__ == loc.path[ SPEC_TAIL_POS__ .. -1 ]
-        Dir_pn_from_strange_location__[ loc, pam ]
-      else
-        dir_pn = init_al_p[ loc ]
-        TS_NAME__ == dir_pn.basename.to_s and dir_pn.dirname
-      end
-    end
-    #
-    SPEC_TAIL__ = TestSupport_::FUN::Spec_rb[]
-    SPEC_TAIL_POS__ = - SPEC_TAIL__.length
-    TS_NAME__ = 'test-support'.freeze
-    #
-    Dir_pn_from_strange_location__ = -> loc, pam do
-      path_s = "#{ loc.path }"
-      path_s.gsub! %r(//+), '/'
-      _md = SPEC_RX__.match path_s
-      _md or raise "failed to match against #{ SPEC_RX__ } - #{ path_s }"
-      pam.dir_pathname.join _md[ :stem ]
-    end
-    #
-    SPEC_RX__ = %r{\A
-      (?<dir>.+[^/]) / (?<stem>[^/]+) #{ ::Regexp.escape SPEC_TAIL__ }
-    \z}x
 
     NEAREST__ = :nearest_test_node
 
-    Lib_::Transitional_autoloader[ self, __FILE__ ]
   end
 end

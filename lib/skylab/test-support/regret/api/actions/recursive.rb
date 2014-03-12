@@ -10,6 +10,7 @@ module Skylab::TestSupport::Regret::API
 
     params [ :core_basename, :arity, :zero_or_one ],
       [ :do_force, :arity, :zero_or_one ],
+      [ :load_file, :arity, :zero_or_one ],  # for now only cosmetic
       [ :mode, :set, [ :do_list, :do_check, :is_dry_run, :do_execute ] ],
       [ :path, :arity, :zero_or_one ],
       v.param( :vtuple )

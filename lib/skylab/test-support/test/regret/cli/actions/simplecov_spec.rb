@@ -1,8 +1,8 @@
 require_relative '../../test-support'
 
-module Skylab::TestSupport::TestSupport::Regret::CLI_Actions_Simplecov
+module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Simplecov
 
-  ::Skylab::TestSupport::TestSupport::Regret[ TS__ = self ]
+  ::Skylab::TestSupport::TestSupport::Regret::CLI::Actions[ TS__ = self ]
 
   add_command_parts_for_system_under_test 'regret', 'simplecov'
 
@@ -20,13 +20,22 @@ module Skylab::TestSupport::TestSupport::Regret::CLI_Actions_Simplecov
 
   NILADIC_EMPTINESS_ = -> { }
 
+  TS_TS = TS_TS
+
   describe "[ts] regret CLI action s simplecov" do
 
     extend TS__
 
-    it "THIS TEST IS AT ONCE SO BEAUTIFUL AND SO UGLY" do
+    stop_s = '(tmx regret '
+    stop_range = 0.. ( stop_s.length - 1 )
+
+    it "SO BEAUTIFUL / SO UGLY : test simplecov in a sub-process" do
       cmd_a = build_command_a
       line_a, exitstatus = open2 cmd_a
+      while line = line_a.first and :err == line.out_or_err and
+          stop_s != line.line[ stop_range ]
+        debug_IO.puts "(skipping errput: #{ line_a.shift.line.chomp! })"
+      end
       exitstatus.should be_zero
       handle_last_line line_a.pop
       check_errput line_a
@@ -91,10 +100,8 @@ module Skylab::TestSupport::TestSupport::Regret::CLI_Actions_Simplecov
     end
 
     def visual
-      VISUAL_
+      @visual ||= TS_TS.dir_pathname.join 'visual/regret'
     end
-
-    VISUAL_ = ::Pathname.new 'visual/regret'
 
     def open2 cmd_a
       yy = get_any_debugging_yielder

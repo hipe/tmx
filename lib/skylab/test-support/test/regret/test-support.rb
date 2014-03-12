@@ -6,6 +6,20 @@ module Skylab::TestSupport::TestSupport::Regret
 
   TestSupport_::TestSupport[ TS__ = self ]
 
+  module CLI
+    TS__[ self ]
+
+    add_command_parts_for_system_under_test do |y|
+    end
+    TS__ = self
+
+    module Actions
+      TS__[ self ]
+      add_command_parts_for_system_under_test do |y|
+      end
+      TS__ = self
+    end
+  end
   def self.apply_x_a_on_child_test_node x_a, child  # ok to move up one level
     child.const_set :TS__, child
     child.include child::CONSTANTS
@@ -19,14 +33,14 @@ module Skylab::TestSupport::TestSupport::Regret
   end
 
   -> do
-    part = nil
-    set_command_parts_for_system_under_test do |y|
-      y << part[]
-    end
     part = -> do
       TestSupport_::TestSupport::TestLib_::System_pathnames_calculate[ -> do
-        bin.join( supernode_binfile ).to_s
+        bin.join( supernode_binfile ).to_path
       end ]
+    end
+
+    set_command_parts_for_system_under_test do |y|
+      y << part[]
     end
   end.call
 

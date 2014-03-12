@@ -3,7 +3,7 @@ require_relative '../callback/core'
 module Skylab::Cull
 
   Callback_ = ::Skylab::Callback
-  Autoloader_ = Callback_::Autoloader
+    Autoloader_ = Callback_::Autoloader
   couple = Autoloader_.method :require_sidesystem
 
   CodeMolester = couple[ :CodeMolester ]
@@ -24,7 +24,7 @@ module Skylab::Cull
     module Events_
       # gets filled with generated event classes
     end
-    Autoloader_[ self, :boxxy ] # peek to find client
+    Autoloader_[ self, :boxxy ]  # peek to find client
   end
 
 

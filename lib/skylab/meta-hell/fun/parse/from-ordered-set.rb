@@ -2,6 +2,9 @@ module Skylab::MetaHell
 
   module FUN::Parse::From_Ordered_Set
 
+    ::Skylab::MetaHell::FUN::Parse::FromOrderedSet = self  # :+[#cb-027]
+
+
     # `parse_from_ordered_set` result is array of same length as `set_a`.
     #
     # sorta like the packrat parser algorithm, `argv` (if any) will be evaluated

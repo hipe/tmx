@@ -2,6 +2,8 @@ module Skylab::MetaHell
 
   module FUN::Parse::From_Set
 
+    FUN::Parse::FromSet = self  # :+[#cb-027]
+
     # more flexible, powerful and complex pool-based deterministic parsing
     #
     # each parsing node in `set_a` must respond to `[]` (e.g. `call` of a

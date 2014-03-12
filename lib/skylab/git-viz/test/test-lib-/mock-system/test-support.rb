@@ -12,4 +12,6 @@ module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System
 
   GitViz::Autoloader_[ self, :boxxy ]  # find bundles sibling to this node
 
+  GitViz::Autoloader_[ Fixtures = ::Module.new ]
+
 end

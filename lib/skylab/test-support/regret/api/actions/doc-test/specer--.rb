@@ -159,6 +159,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     end
 
     def rslv_base_module_and_load_file_if_necessary
+      @base_mod_can_autoload = false
       @base_mod = ::Skylab  # #etc
       if @load_file
         _path = ::File.expand_path @load_file
@@ -200,7 +201,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
 
     def rslv_corrected_anchored_const_a_from_c_a
       mk_any_name_corrections
-      @const = rdc_const_array_down_to_some_value
+      @const = rdc_const_array_down_to_some_trueish_value
       if @const
         @corrected_anchored_const_a = rslv_some_normalized_const_array
         PROCEDE__
@@ -232,33 +233,53 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       c_a
     end
 
-    def rdc_const_array_down_to_some_value
-      @c_a.reduce @base_mod do |m, c|
-        name, value = rslv_name_and_value m, c
-        name or break false
-        value
+    def rdc_const_array_down_to_some_trueish_value
+      @const_reduce_is_ok = true
+      @const_reduce_from_mod = @base_mod
+      @const_reduce_else_p = -> err do
+        @const_reduce_is_ok = false
+        @const_reduce_from_mod = explain_no_such_constant err.module, err.name
       end
+      if ! @base_mod_can_autoload
+        do_rdc_once_with_loading_assistance
+      end
+      if @const_reduce_is_ok and @c_a.length.nonzero?
+        do_rdc_the_rest
+      end
+      @const_reduce_from_mod
     end
 
-    def rslv_name_and_value m, c
-      RegretLib_::Loader_resolve_const_name_and_value[
+    def do_rdc_once_with_loading_assistance  # #unfortunate-hack
+      x = RegretLib_::Const_reduce[
         :core_basename, @core_basename,
-        :else_p, -> err do
-          say_no_such_constant m, c, err
-        end, :from_module, m, :path_x, c ]
+        :do_assume_is_defined, false,
+        :else_p, @const_reduce_else_p,
+        :from_module, @const_reduce_from_mod,
+        :path_x, @c_a.shift ]
+      @const_reduce_is_ok and @const_reduce_from_mod = x ; IGNORED_
     end
 
-    def say_no_such_constant m, c, err
-      a = m.constants ; sac = say_any_constants a
+    def do_rdc_the_rest
+      x = RegretLib_::Const_reduce[
+        :core_basename, @core_basename,
+        :do_assume_is_defined, true,
+        :else_p, @const_reduce_else_p,
+        :from_module, @const_reduce_from_mod,
+        :path_x, @c_a ]
+      @const_reduce_is_ok and @const_reduce_from_mod = x ; IGNORED_
+    end
+
+    def explain_no_such_constant m, c
+      a = m.constants ; sac = self.say_any_constants a
       @snitch.notice do
-        "'#{ m }' does not have #{ err.name } loaded (or loadable?) as #{
+        "'#{ m }' does not have '#{ c }' loaded (or loadable?) as #{
           }#{ s a, :one_of }its #{ a.length } constant#{ s }#{ sac }"
       end
-      emit_message_about_suggestion_for_this
+      explain_suggestion_for_no_such_const
       FAILED__
     end
 
-    def emit_message_about_suggestion_for_this
+    def explain_suggestion_for_no_such_const
       @snitch.notice do
         "try passing a second #{ par :load_file } argument that loads it."
       end ; nil
@@ -318,6 +339,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
 
     DCOLON__ = '::'.freeze
     FAILED__ = false
+    IGNORED_ = nil
     PROCEDE__ = true
   end
 

@@ -164,6 +164,7 @@ module Skylab::TestSupport::Sandbox
 
     def initialize anchor_mod
 
+      engine = self
       @define_sandbox_constant_proc = -> do
         -> i, &b do
           x = nil
@@ -176,12 +177,28 @@ module Skylab::TestSupport::Sandbox
             list_b.length.zero? and fail "no constants were added to #{
               }#{ sb } by block - #{ b }"
             x = sb.const_get( list_b.fetch( -1 ), false )
+            engine.bust_autoloading x
+            x
           end
           define_method i do
             p && p[]
             x
           end
         end
+      end
+    end
+
+    def bust_autoloading x
+      if ::Module === x
+        x.extend Autoload_Buster_
+      end ; nil
+    end
+
+    module Autoload_Buster_
+      # sandboxes shouldn't have to support their nested modules that want
+      # to do filesystem-based autoloading, except under special circumstances
+      def dir_pathname
+        nil
       end
     end
 

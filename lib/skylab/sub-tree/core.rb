@@ -18,6 +18,10 @@ module Skylab::SubTree
     Autoloader_[ self ]
   end
 
+  module Test_Fixtures
+    Autoloader_[ self ]
+  end
+
   DOT_ = '.'.freeze
   Name_ = Callback_::Name
   SEP_ = '/'.freeze

@@ -50,7 +50,11 @@ module Skylab::MetaHell
       end
     end
 
-    def names
+    def get_names
+      @order.dup
+    end
+
+    def names  # #todo:deprecated
       @order.dup
     end
 

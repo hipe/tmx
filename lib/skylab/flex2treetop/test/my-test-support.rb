@@ -9,8 +9,7 @@ module Skylab::Flex2Treetop::MyTestSupport
   Skylab_Headless = ::Skylab::Headless
   TestSupport = ::Skylab::TestSupport
 
-  TestSupport::Regret[ self ]  # for now just for the autoloading
-  @dir_pathname = @dir_pathname.dirname  # because of our nonstandard name
+  Flex2Treetop::Autoloader_[ self, Flex2Treetop.dir_pathname.join( 'test' ) ]
 
   extend TestSupport::Quickie
 

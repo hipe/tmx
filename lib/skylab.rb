@@ -196,6 +196,19 @@ module Skylab  # Welcome! :D
         a.compact! ; nil
       end
 
+      def autoloaderize_with_filename_child_node fn, x  # [#cb-029] #proto-fit
+        if ::Module === x
+          autoloader = self
+          x.module_exec do
+            @const_missing_class ||= autoloader.const_missing_class
+            @dir_pathname ||= autoloader.dir_pathname.join fn
+          end
+          if ! x.respond_to? :dir_pathname
+            x.extend @const_missing_class.autoloader_methods
+          end
+        end ; nil
+      end
+
     private
       def stowaway *a  # [#mh-030] another goofy experiment
         @has_stowaways ||= true
@@ -266,6 +279,10 @@ module Skylab  # Welcome! :D
    public
       def correction_notification const
         @const = const ; nil
+      end
+
+      def self.autoloader_methods
+        Methods
       end
     end
   end

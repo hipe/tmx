@@ -40,7 +40,8 @@ module Skylab::Face::TestSupport::CLI::Client::API_Integration::Core_
       it "for which no action defined - raises boxxy name error" do
         -> do
           invoke 'fee'
-        end.should raise_error( /"fee"/i )
+        end.should raise_error(
+          %r(\bthere is no constant that isomorphs with "fee")i )
           # ( the particular class is asserted elsewhere. )
       end
 

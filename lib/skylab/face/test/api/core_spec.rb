@@ -16,10 +16,11 @@ module Skylab::Face::TestSupport::API::Core_
         end
       end
 
-      it "will complain about dpn missing" do
+      it "if parent doesn't do 'dir_pathname', silent failure!" do
         -> do
           nightclub::API.invoke :foo
-        end.should raise_error ::NoMethodError, %r(\Aneeds '?dir_pathname'?)
+        end.should raise_error ::RuntimeError,
+          %r(\bthere is no constant that isomorphs with "foo")
       end
     end
 

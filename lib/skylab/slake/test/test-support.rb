@@ -3,6 +3,10 @@ require_relative '../core'
 
 module Skylab::Slake::TestSupport
 
+  Slake = ::Skylab::Slake
+
+  ::Skylab::Callback::Autoloader[ self, Slake.dir_pathname.join( 'test' ) ]  # #while:[#ts-031]
+
   ::Skylab::TestSupport::Regret[ Slake_TestSupport = self ]
 
   module CONSTANTS
@@ -10,15 +14,12 @@ module Skylab::Slake::TestSupport
     FIXTURES_DIR = "#{ TEST_ROOT_DIR }/fixtures"
     TMP_DIR = ::File.expand_path '../../../../../tmp', __FILE__
     TEST_BUILD_DIR = ::File.join(TMP_DIR, 'build_dir')
-
-    include ::Skylab
-    TestSupport = TestSupport
-
+    TestSupport = ::Skylab::TestSupport
     include ::Skylab::Slake  # e.g just say `Task`
   end
 
-  include CONSTANTS
+  include CONSTANTS  # find [sl] t.s
 
-  Headless = Headless ; Slake = Slake
+  Headless = ::Skylab::Callback::Autoloader.require_sidesystem :Headless
 
 end

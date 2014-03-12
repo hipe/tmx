@@ -18,7 +18,7 @@ module ::Skylab::MetaHell::TestSupport::Formal
   end.call
 
   module CONSTANTS
-    Headless = ::Skylab::Headless
+    Headless = MetaHell::Library_::Headless
     FUN = FUN
   end
 
