@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Callback::TestSupport::Autoloader
 
-  describe "[cb] autoloader name correction (boxxy)" do
+  describe "[cb] autoloader \"boxxy\"" do
 
     context "this is a live test, must happen in one big story" do
 
@@ -19,7 +19,7 @@ module Skylab::Callback::TestSupport::Autoloader
         a = mod.constants
         a.should eql %i( LoL Ncsa_Spy )
         mod.should be_const_defined :NcSa_spy
-        x = mod.const_get( :NCsa_spy, false )
+        x = mod.const_get :NCsa_spy, false
         x.should eql :_hello_yes_this_is_NCSA_Spy_
         mod.constants.should eql %i( LoL NCSA_Spy )
        end
@@ -67,27 +67,46 @@ module Skylab::Callback::TestSupport::Autoloader
       it "it will say it is defined, and then BOOM - X" do
         _y = TS_::Fixtures::Two.const_defined? :Lorca, false
         _y.should eql true
+        TS_::Fixtures::Two.dir_pathname or fail
         -> do
           TS_::Fixtures::Two::Lorca
-        end.should raise_error ::NameError, %r(\A[A-Za-z:]+#{
-          }::Fixtures::Two\( ~ lorca \) must be but appears not to be #{
-           }defined in .+/fixtures/two\.rb)
+        end.should raise_error ::NameError, rx
+      end
+      def rx
+        %r(\A[A-Za-z:]+#{
+          }::Fixtures::Two::\( ~ lorca \) #{
+           }must be but does not appear to be defined in #{
+            }.+/fixtures/two/lorca\.rb)
       end
     end
 
     context "boxxy goes deep on your startup whether you like it or not" do
+
       before :all do
         module TS_::Fixtures::Three
           Callback::Autoloader[ self, :boxxy ]
         end
       end
-      it "for now boxxy is always recursively contagiuos" do
+
+      it "for now boxxy is always recursively contagious" do
         mod = TS_::Fixtures::Three
         lvl_1 = mod::Level_1
         _y = lvl_1.const_defined? :Level_2
         _y.should eql true
         x = lvl_1::Level_2::Leaf_3::SOME_CONST
         x.should eql :some_val
+      end
+    end
+
+    context "when there is a fuzzy pair (file and folder) of entries" do
+      before :all do
+        module TS_::Boxxy::Fixtures::One
+          Callback::Autoloader[ self, :boxxy ]
+        end
+      end
+      it "it works" do
+        i_a = TS_::Boxxy::Fixtures::One.constants
+        i_a.should eql %i( RedLeader )
       end
     end
   end

@@ -7,7 +7,7 @@ module Skylab::Callback
     end
 
     Listeners_digraph = -> a do
-      Callback[ self, :employ_DSL_for_digraph_emitter ]  # #idempotent
+      Callback_[ self, :employ_DSL_for_digraph_emitter ]  # #idempotent
       graph_x = a.fetch 0 ; a.shift
       if graph_x
         if graph_x.respond_to? :each_pair
@@ -20,7 +20,7 @@ module Skylab::Callback
 
     module Digraph_methods  # assumes an `call_digraph_listeners` method
 
-      Item_Grammar__ = Callback::Lib_::Bundle_Item_Grammar[].
+      Item_Grammar__ = Callback_::Lib_::Bundle_Item_Grammar[].
         new %i( structure structifiying ), :emitter, %i( emits_to_channel )
 
       build_method = -> sp do
@@ -70,23 +70,23 @@ module Skylab::Callback
     end
 
     Employ_DSL_for_digraph_emitter = -> _ do
-      extend Callback::Digraph::MMs ; include Callback::Digraph::IMs ; nil
+      extend Callback_::Digraph::MMs ; include Callback_::Digraph::IMs ; nil
     end
 
     Event_factory = -> a do
-      Callback[ self, :employ_DSL_for_digraph_emitter ]  # #idempotent
+      Callback_[ self, :employ_DSL_for_digraph_emitter ]  # #idempotent
       event_factory a.fetch 0 ; a.shift ; nil
     end
 
     Extend_digraph_emitter_module_methods = -> _ do
-      extend Callback::Digraph::MMs ; nil
+      extend Callback_::Digraph::MMs ; nil
     end
 
     Include_digraph_emitter_module_methods = -> _ do
-      include Callback::Digraph::MMs ; nil
+      include Callback_::Digraph::MMs ; nil
     end
 
-    Callback::Lib_::Bundle_Multiset[ self ]
+    Callback_::Lib_::Bundle_Multiset[ self ]
   end
 
   module Emit_to_IO_stream_string_
@@ -116,7 +116,7 @@ module Skylab::Callback
     end
 
     Build_init_method__ = -> do
-      default_proc = Callback::Lib_::Basic_Hash[]::
+      default_proc = Callback_::Lib_::Basic_Hash[]::
         Loquacious_default_proc.curry[ 'stream' ]
       -> h do
         h.default_proc ||= default_proc

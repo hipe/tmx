@@ -194,13 +194,13 @@ module Skylab::Callback::TestSupport
         _output_s
       end
       Mustache_rx__ = -> do
-        Callback::Lib_::Basic_String[]::MUSTACHE_RX
+        Callback_::Lib_::Basic_String[]::MUSTACHE_RX
       end
       TEMPLATE_S__ = 'emit{{pos}}{{adj}}{{channel}}{{msg}}'.freeze
 
       def get_element_scanner
         d = -1 ; last = @exp_a.length - 1
-        Callback::Lib_::Scn.call do
+        Callback_::Lib_::Scn.call do
           @exp_a[ d += 1 ] if d < last
         end
       end
@@ -249,7 +249,7 @@ module Skylab::Callback::TestSupport
             up.change_actual_index_to d
             @d = d ; @idx = idx
             _ord_s = if -1 == d then LAST_S_ else
-              Callback::Lib_::Num2ord[ d + 1 ]
+              Callback_::Lib_::Num2ord[ d + 1 ]
             end
             @description_x = '%-6s' % _ord_s
             super()
@@ -307,7 +307,7 @@ module Skylab::Callback::TestSupport
               Channel_Assertion__.new i
             else
               :styled == i or raise ::ArgumentError, "expected 'styled' #{
-                }had #{ Callback::Lib_::Inspect[ i ] }"
+                }had #{ Callback_::Lib_::Inspect[ i ] }"
               STYLED_ASSERTION__
             end
           end
@@ -336,7 +336,7 @@ module Skylab::Callback::TestSupport
         STYLED__ = 'styled'.freeze
         def see_when_event act
           s = act.matchable_string
-          s_ = Callback::Lib_::Unstyle_styled[ s ]
+          s_ = Callback_::Lib_::Unstyle_styled[ s ]
           if s_
             act.change_matchable_string! s_
           else
@@ -364,7 +364,7 @@ module Skylab::Callback::TestSupport
       end
       def unstyle_all_styled!
         @ass.set_legacy_string_map_proc -> s, &p do
-          s_ = Callback::Lib_::Unstyle_styled[ s ]
+          s_ = Callback_::Lib_::Unstyle_styled[ s ]
           s_ and p[ s_ ] ; nil
         end ; nil
       end

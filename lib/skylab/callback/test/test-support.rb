@@ -2,12 +2,17 @@ require_relative '../core'
 
 module Skylab::Callback::TestSupport
 
-  Callback = ::Skylab::Callback
+  Callback_ = ::Skylab::Callback
+    Autoloader_ = Callback_::Autoloader
 
   module CONSTANTS
-    Callback = Callback
-    TestSupport = Callback::Autoloader.require_sidesystem :TestSupport
+    Callback = Callback_
+    TestSupport = Callback_::Autoloader.require_sidesystem :TestSupport
   end
+
+  Autoloader_[ self, Callback_.dir_pathname.join( 'test' ) ]
+    # use our own autoloder from here on down, there will be much
+    # "existential testing". and [#028]:during:regret-autoloader-integration
 
   CONSTANTS::TestSupport::Regret[ self ]
 
@@ -15,7 +20,7 @@ module Skylab::Callback::TestSupport
 
     -> do
       p = -> do
-        pn = Callback::TestSupport.dir_pathname.join 'fixtures'
+        pn = Callback_::TestSupport.dir_pathname.join 'fixtures'
         p = -> { pn } ; pn
       end
       define_method :fixtures_dir_pn do
@@ -23,6 +28,4 @@ module Skylab::Callback::TestSupport
       end
     end.call
   end
-
-  IDENTITY_ = -> x { x }
 end

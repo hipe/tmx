@@ -2,7 +2,8 @@ module Skylab::Callback
 
   module Autoloader
 
-    class Const_Reduction__  # doc is spec, 100% covered, three laws compliant
+    class Const_Reduction__  # read [#029] the const reduce narrative
+      # also doc is spec, 100% covered, three laws compliant
 
       Dispatch = -> a, p do
         if a.length.zero?
@@ -17,8 +18,10 @@ module Skylab::Callback
       end
 
       def initialize
-        @try_these_const_method_i_a = ALL_CONST_METHOD_I_A__
-        @else_p = nil
+        @do_assume_is_defined = false
+        @do_result_in_n_and_v = false
+        @do_result_in_n_and_v_for_step = false
+        @else_p = nil ; @try_these_const_method_i_a = ALL_CONST_METHOD_I_A__
       end
 
       ALL_CONST_METHOD_I_A__ = %i( as_const as_camelcase_const ).freeze
@@ -43,67 +46,253 @@ module Skylab::Callback
 
       class Shell_
         def initialize kernel
-          @write_const_path = -> x { kernel.const_path = x }
-          @write_else_p = -> x { kernel.else_p = x }
-          @write_from_module = -> x { kernel.from_module = x }
+          @kernel = kernel
+        end
+        def assume_is_defined  # #assume-is-defined
+          do_assume_is_defined true
+        end
+        def do_assume_is_defined x
+          @kernel.do_assume_is_defined = x ; nil
+        end
+        def path_x x
+          const_path ::Array.try_convert( x ) || [ * x ]
         end
         def const_path x
-          @write_const_path[ x ] ; nil
+          @kernel.const_path = x ; nil
+        end
+        def core_basename core_rb
+          @kernel.core_basename = core_rb ; nil
+        end
+        def do_peek_hack
+          # kept for compatibility, but currently ignored #no-peek-hack
         end
         def else &p
-          @write_else_p[ p ] ; nil
+          else_p p
+        end
+        def else_p p
+          @kernel.else_p = p ; nil
         end
         def from_module x
-          @write_from_module[ x ] ; nil
+          @kernel.from_module = x ; nil
+        end
+        def result_in_name_and_value
+          do_result_in_n_and_v true
+        end
+        def do_result_in_n_and_v x
+          @kernel.do_result_in_n_and_v = x ; nil
         end
       end
 
-      attr_writer :const_path, :else_p, :from_module
+      attr_writer :const_path,
+        :do_assume_is_defined,
+        :do_result_in_n_and_v,
+        :else_p,
+        :from_module
+
+      def core_basename= x
+        x and CORE_FILE_ == x || self._IMPLEMENT_ME
+      end
 
       def flush
-        @const_path.length.times.reduce @from_module do |mod, d|
-          procure_some_valid_name @const_path.fetch d or break @result
-          step mod or break @result
-        end
+        @mod = @from_module
+        steps && rslv_result
+        @result
       end
     private
-      def procure_some_valid_name token_x
-        @name = Name.from_variegated_symbol token_x
-        @const_i = @name.as_const or when_cannot_construe_valid_const
+      def steps
+        @scn = bld_any_step_scanner
+        if @scn
+          nil while step
+          @step_OK
+        else
+          PROCEDE_
+        end
       end
-      def when_cannot_construe_valid_const
+      def bld_any_step_scanner
+        if 1 < @const_path.length
+          d = -1 ; last = @const_path.length - 2
+          Scn.new do
+            d < last and @const_path.fetch( d += 1 )
+          end
+        end
+      end
+      def step
+        @const_x = @scn.gets
+        @const_x and step_with_const_x
+      end
+      def step_with_const_x
+        @step_OK = procure_valid_name_from_const_x && step_with_valid_name
+      end
+      def procure_valid_name_from_const_x
+        @name = Name.from_variegated_symbol @const_x
+        @name.as_const or cannot_construe_valid_const
+      end
+      def cannot_construe_valid_const
         @exception = ::NameError.
           new say_cannot_construe, @name.as_variegated_symbol
-        flush_exception
+        rslv_result_via_exception
         CEASE_
       end
       def say_cannot_construe
         "wrong constant name #{ @name.as_variegated_symbol } for const reduce"
       end
-      def flush_exception
+      def rslv_result_via_exception
         @else_p && 1 == @else_p.arity or raise @exception
-        @result = @else_p[ @exception ] ; nil
+        @result = @else_p[ @exception ]
+        IGNORED_
       end
-      def step mod
-        const_i = @try_these_const_method_i_a.reduce nil do |_, const_method_i|
-          const = @name.send const_method_i
-          mod.const_defined? const, false and break const
-        end
-        if const_i
-          mod.const_get const_i, false
+      def step_with_valid_name
+        _procede = rslv_result_with_valid_name
+        if _procede
+          @mod = @result ; @result = nil ; PROCEDE_
         else
-          @mod = mod
-          when_const_not_defined
+          CEASE_
         end
       end
-      def when_const_not_defined
+
+      # ~ final step (intermixed with support for pre-final step)
+
+      def rslv_result
+        @const_x = @const_path.fetch( -1 )  # or not
+        if procure_valid_name_from_const_x
+          @do_result_in_n_and_v_for_step = @do_result_in_n_and_v
+          rslv_result_with_valid_name
+        end
+      end
+      def rslv_result_with_valid_name
+        if @do_assume_is_defined
+          rslv_result_when_assume_is_defined
+        else
+          rslv_result_by_any_means
+        end
+      end
+      def rslv_result_when_assume_is_defined  # leverage whatever autoloading
+        # the node defines for itself with a fuzzy name that we assume it will
+        # resolve; and then after the node has loaded the value, if necessary
+        # we go back and resolve the correct casing/scheme for the fuzzy
+        # name.
+        @result = @mod.const_get @name.as_const, false
+        if @do_result_in_n_and_v_for_step
+          rslv_some_result_via_fuzzy_lookup -> i { @result = [ i, @result, ] }
+        end
+        PROCEDE_
+      end
+      def rslv_some_result_via_fuzzy_lookup one_p=nil, many_p=nil, zero_p=nil
+        stem = @name.as_distilled_stem
+        stem_p = Distill_  # maybe 'fuzzy_stem_cache' but why?
+        a = [] ; @mod.constants.each do |const_i|
+          stem == stem_p[ const_i ] and a << const_i
+        end
+        @result = case a.length <=> 1
+        when -1 ; zero_p ? zero_p[] : rslv_some_result_when_const_not_defined
+        when  0 ; one_p ? one_p[ a.first ] :
+                    rslv_some_result_from_correct_const( a.first )
+        when  1 ; many_p ? many_p[ a ] : rslv_some_result_when_ambiguous( a )
+        end
+      end
+      def rslv_some_result_from_correct_const i
+        x = @mod.const_get i, false
+        if @do_result_in_n_and_v_for_step
+          [ i, x ]
+        else
+          x
+        end
+      end
+
+      # ~ the "by any means" strategy
+
+      def rslv_result_by_any_means
+        if @mod.const_defined? @name.as_const, false
+          @result = rslv_some_result_from_correct_const @name.as_const
+          PROCEDE_
+        else
+          rslv_result_via_name_search_or_loading
+        end
+      end
+      def rslv_result_via_name_search_or_loading
+        found = false
+        x = rslv_some_result_via_fuzzy_lookup(
+
+          -> i do  # when it is one stop now
+            found = true
+            rslv_some_result_from_correct_const i
+          end,
+
+          -> a do  # when it is many fail/resolve now
+            found = true
+            rslv_some_result_when_ambiguous a
+          end,
+
+          EMPTY_P_ )  # when it is zero do nothing
+        if found
+          @result = x
+          PROCEDE_
+        elsif @mod.respond_to? :dir_pathname
+          @result = rslv_some_result_via_loading
+          PROCEDE_
+        else
+          rslv_result_when_const_not_defined
+        end
+      end
+      def rslv_some_result_via_loading
+        tree = rslv_any_tree
+        tree and np = tree.normpath_from_distilled( @name.as_distilled_stem )
+        if np
+          rslv_some_result_by_loading_some_file_in_normpath np
+        else
+          rslv_some_result_when_const_not_defined
+        end
+      end
+      def rslv_any_tree
+        if @mod.respond_to? :entry_tree
+          tree = @mod.entry_tree
+        else
+          dpn = @mod.dir_pathname
+          dpn and tree = LOOKAHEAD_[ dpn ]
+        end
+        tree
+      end
+
+      def rslv_some_result_by_loading_some_file_in_normpath np
+        file = if np.can_produce_load_file_path
+          np
+        elsif (( np_ = np.any_corefile_normpath ))
+          np_
+        end
+        if file
+          rslv_some_result_by_loading_file_for_normpath file, ( np_ && np )
+        else
+          rslv_some_result_when_const_not_defined
+        end
+      end
+      def rslv_some_result_by_loading_file_for_normpath file_normpath, np
+        file_normpath.change_state_to :loaded
+        np and np.change_state_to :loaded
+        _path = file_normpath.get_require_file_path
+        require _path
+        rslv_some_result_via_fuzzy_lookup
+      end
+      def rslv_some_result_when_ambiguous a
+        idx = a.index @name.as_const
+        idx or self._NEVER_BEEN_TESTED
+        const = a.fetch idx
+        r = @mod.const_get const, false
+        if @do_result_in_n_and_v_for_step
+          r = [ const, r ]
+        end
+        r
+      end
+      def rslv_result_when_const_not_defined
+        @result = rslv_some_result_when_const_not_defined
+        CEASE_
+      end
+      def rslv_some_result_when_const_not_defined
         @else_p or raise build_name_error
-        @result = if @else_p.arity.zero?
+        if @else_p.arity.zero?
           @else_p[]
         else
           @else_p[ build_name_error ]
         end
-        CEASE_
       end
       def build_name_error
         Name_Error__.new @mod, @name.as_variegated_symbol
@@ -118,7 +307,22 @@ module Skylab::Callback
         attr_reader :module
       end
 
+      # ~ iambic form
+
+      def Proc_.via_iambic x_a
+        kernel = Kernel_.new
+        shell = Shell_.new kernel
+        begin
+          k, v = x_a.shift 2
+          shell.send k, v
+        end while x_a.length.nonzero?
+        kernel.flush
+      end
+
       CEASE_ = false
+      IGNORED_ = nil
+      PROCEDE_ = true
+      Kernel_ = self
     end
   end
 end

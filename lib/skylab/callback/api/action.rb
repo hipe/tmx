@@ -16,7 +16,7 @@ module Skylab::Callback
       end
     private
       def bld_name_function
-        Callback::Lib_::Name[]::Function::From::Constant.from_name name
+        Callback_::Lib_::Name[]::Function::From::Constant.from_name name
       end
     end
 

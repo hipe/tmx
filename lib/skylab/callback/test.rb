@@ -8,6 +8,6 @@ module Skylab::Callback
   require_relative 'core'
   require_relative 'test/test-support'
 
-  Test = TestSupport  # it's bad
+  Test = TestSupport  # ick/meh
 
 end

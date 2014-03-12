@@ -4,7 +4,7 @@ module Skylab::Callback
 
   class CLI  # NOTE "this node in its scope is not related to pub-s.." [#018]
 
-    Callback::Lib_::CLI[]::Client[ self,
+    Callback_::Lib_::CLI[]::Client[ self,
       :three_streams_notify,
       :DSL ]  # don't add DSL till end b.c of it's method_added hook
 
@@ -88,7 +88,7 @@ module Skylab::Callback
       end
       additional_file.unshift file
       _, o, e = three_streams
-      gv = Callback::API::Actions::GraphViz.new program_name, o, e
+      gv = Callback_::API::Actions::GraphViz.new program_name, o, e
       gv.absorb @param_h.merge!( files: additional_file, modul: modul,
         do_guess_mod: do_guess_mod )
       x = gv.execute
@@ -117,7 +117,7 @@ module Skylab::Callback
 
     def fire file, klass, stream_name
       _, o, e = three_streams
-      fi = Callback::API::Actions::Fire.new program_name, o, e
+      fi = Callback_::API::Actions::Fire.new program_name, o, e
       fi.absorb @param_h.merge!( files: [ file ], modul: klass,
         opendata: ( @opendata || false ), stream_name: stream_name.intern )
       x = fi.execute

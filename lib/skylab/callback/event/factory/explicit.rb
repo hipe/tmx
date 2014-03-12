@@ -1,6 +1,6 @@
 module Skylab::Callback
 
-  class Callback::Event::Factory::Explicit  # DEPRECATED
+  class Callback_::Event::Factory::Explicit  # DEPRECATED
 
     # This was the third addition to the suite of factory-resolvers (after
     # isomorphic and late).  You construct it with 2 hashes - the first
@@ -55,11 +55,11 @@ module Skylab::Callback
   private
 
     def logical_box
-      @logical_box ||= Callback::Lib_::Open_Box[].hash_controller @logical_h
+      @logical_box ||= Callback_::Lib_::Open_Box[].hash_controller @logical_h
     end
 
     def physical_box
-      @physical_box ||= Callback::Lib_::Open_Box[].hash_controller @physical_h
+      @physical_box ||= Callback_::Lib_::Open_Box[].hash_controller @physical_h
     end
   end
 end

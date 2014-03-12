@@ -40,7 +40,7 @@ module Skylab::Callback
       elsif scn.last? and scn.looks_like_arg?
         [ :string, scn.current ]
       else
-        box = Callback::Lib_::Formal_Box[]::Open.new
+        box = Callback_::Lib_::Formal_Box[]::Open.new
         valid = nil
         begin
           valid = false

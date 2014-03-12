@@ -59,7 +59,7 @@ module Skylab::Callback
       else
         parts = [ @subp, * @tok_a ]
         parts.reduce ::Skylab do |modul, part|
-          Callback::Lib_::Fuzzy_const_get[ modul, part ]
+          Callback_::Lib_::Fuzzy_const_get[ modul, part ]
         end
       end
     end

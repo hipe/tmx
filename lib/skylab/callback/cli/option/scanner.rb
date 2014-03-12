@@ -27,7 +27,7 @@ module Skylab::Callback
     #         ~ what does it look like? ~
     -> do
 
-      opt_rx, long_rx = Callback::Lib_::CLI[]::Option::Constants.
+      opt_rx, long_rx = Callback_::Lib_::CLI[]::Option::Constants.
         values_at :OPT_RX, :LONG_RX
 
       [ [ :long, -> do
@@ -76,7 +76,7 @@ module Skylab::Callback
       @argv = argv
       @last = argv.length - 1
       @err = err
-      @opt = Callback::Lib_::CLI[]::Option.new_flyweight
+      @opt = Callback_::Lib_::CLI[]::Option.new_flyweight
     end
   end
 end

@@ -6,7 +6,7 @@ module Skylab::Callback
       $stderr.puts "#{ Em__[ "`extend Callback::Digraph` is deprecated NOW" ] } - #{
         }replace this line with `Callback[ self, :employ_DSL_for_digraph_emitter ]` #{
          }or the like"  # #todo:during-merge remove this
-      Callback[ mod, :employ_DSL_for_digraph_emitter ] ; nil
+      Callback_[ mod, :employ_DSL_for_digraph_emitter ] ; nil
     end
     Em__ = -> s do
       "\e[33m#{ s }\e[0m"
@@ -22,7 +22,7 @@ module Skylab::Callback
   private
 
     def build_event_stream_graph  # #storypoint-2
-      scn = Callback::Lib_::Basic_List[]::Scanner[ ancestors ]
+      scn = Callback_::Lib_::Basic_List[]::Scanner[ ancestors ]
       cur = found_a = nil
       nil while ( cur = scn.rgets ) && ::Object != cur
       chk = -> do
@@ -110,9 +110,9 @@ module Skylab::Callback
     end
   end  # module methods
 
-  Digraph::Stream__ = ::Class.new Callback::Lib_::Basic_Digraph[]::Node
+  Digraph::Stream__ = ::Class.new Callback_::Lib_::Basic_Digraph[]::Node
 
-  class Digraph::Stream_Digraph__ < Callback::Lib_::Basic_Digraph[]
+  class Digraph::Stream_Digraph__ < Callback_::Lib_::Basic_Digraph[]
 
     def initialize
       @taxonomic_stream_i_a = nil
@@ -295,7 +295,7 @@ module Skylab::Callback
     alias_method :default_build_event_factory, :build_event_factory
 
     def event_class
-      Callback::Event::Unified  # a default
+      Callback_::Event::Unified  # a default
     end
 
     #  ~ misc reflective services
@@ -376,7 +376,7 @@ module Skylab::Callback
     end
   end
 
-  class Digraph::Listeners__ < Callback::Lib_::Formal_Box[]
+  class Digraph::Listeners__ < Callback_::Lib_::Formal_Box[]
 
     def initialize
       @current_group_id = @group_frame_h = @is_in_group = nil
@@ -435,7 +435,7 @@ module Skylab::Callback
 
       ::Class.new.class_exec do
 
-        Callback[ self, :employ_DSL_for_digraph_emitter ]
+        Callback_[ self, :employ_DSL_for_digraph_emitter ]
 
         class << self
           public :event_class, :event_factory
@@ -457,7 +457,7 @@ module Skylab::Callback
         end
 
         def to_listener
-          Callback::Listener::From_digraph_emitter[ self ]
+          Callback_::Listener::From_digraph_emitter[ self ]
         end
 
         p and class_exec( & p )
