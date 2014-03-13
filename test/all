@@ -370,7 +370,7 @@ module Skylab::Test
       EXP_AG_P_[ nil ]
     end
 
-    EXP_AG_P_ = Test::Lib_::Puff_constant[].
+    EXP_AG_P_ = Test::Lib_::Touch_constant[].
       curry[ false, -> _ { Expression_Agent_.new }, :EXPR_AGENT_, self ]
 
     class Expression_Agent_

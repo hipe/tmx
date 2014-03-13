@@ -10,7 +10,7 @@ module Skylab::MetaHell::TestSupport::FUN::Parse::Series::Integration
 
   MetaHell = MetaHell
 
-  describe "#{ MetaHell }::FUN::Parse::Series (integration spec)" do
+  describe "[mh] FUN::Parse::Series (integration spec)" do
 
     before :all do
       Field_ = MetaHell::FUN::Parse::Field_

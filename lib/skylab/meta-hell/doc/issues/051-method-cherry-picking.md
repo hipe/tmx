@@ -22,5 +22,5 @@ worse.
 
 ## facets
 
-"puffers" are a more complex and powerful expasion of this idea, explored
+"touchers" are a more complex and powerful expasion of this idea, explored
 at [#048].

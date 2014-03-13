@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby -w
+
+# minimal one-off hack that takes as input the lines from an undocumented
+# manual process (the output of several rspec test runs) and simply adds up
+# the number of passing test and the number of seconds.
+#
+# the output that is generated forms the basis for the informational summaries
+# found in many of our commit messages.
+
+
+_RX1 = /\AFinished in (\d+(?:\.\d+)?) seconds?\z/
+_RX2 = /\A(?<e>\d+) examples?, (?<f>\d+) failures?(?:, \d+ pending)?\z/
+
+in_io = $stdin ; out_io = $stdout
+
+num_examples = 0 ; seconds = 0.0 ; num_chunks = 0
+
+
+while (( line = in_io.gets ))
+  num_chunks += 1
+  line.chop!
+  md = _RX1.match line
+  md or fail "does not match first line pattern: -->#{ line }<--"
+  line = in_io.gets
+  line or fail "no."
+  line.chomp!
+  md_ = _RX2.match line
+  md_ or fail "does not match second line pattern: -->#{ line }<--"
+  e = md_[:e].to_i ; f = md_[:f].to_i
+  f.zero? or fail "won't tally with nonzero number of failures"
+  seconds += md[1].to_f
+  num_examples += e
+end
+
+
+out_io.puts "(#{ '.' * num_chunks } #{ num_examples })"
+out_io.puts "(#{ num_chunks } in #{ seconds })"

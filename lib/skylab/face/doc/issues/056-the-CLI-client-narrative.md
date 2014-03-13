@@ -60,7 +60,7 @@ the only public method. #existential-workhorse. accords with [#hl-020]
 ## :#storypoint-175
 
 `pre_execute` - #called-by self in main execution loop, #called-by
-n-amespace facet when ouroboros is happening. about it: we "re-puff"
+n-amespace facet when ouroboros is happening. about it: we "re-touch"
 (that is, `pre_execute`) before every execution for fun, sanity, grease,
 and design - ostensibly so that the p-arent can change the identity of
 these resources late and during runtime while b) we can still have them

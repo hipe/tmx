@@ -23,7 +23,7 @@ under your `anchor_mod`:
 3) an `invoke` method "on" your `API` module.
 4) an `Actions` box moudule - M-AARS-y and Boxxy
 
-using `puff` for this attempts to load any releveant file first.
+using `touch` for this attempts to load any releveant file first.
 
 
 

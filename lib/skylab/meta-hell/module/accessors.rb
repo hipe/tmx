@@ -217,8 +217,8 @@ module Skylab::MetaHell
       end
     end
 
-    Puff = -> do  # simplification of meta hell (class | module) creator
-      puff = -> mod, i, build_it do
+    Touch = -> do  # simplification of meta hell (class | module) creator
+      touch = -> mod, i, build_it do
         if ! mod.respond_to? :const_probably_loadable?
           MAARS::Upwards[ mod ]
         end
@@ -240,7 +240,7 @@ module Skylab::MetaHell
       end
 
       -> mod, i, build_it, with_it=nil do
-        mod_ = puff[ mod, i, build_it ]
+        mod_ = touch[ mod, i, build_it ]
         if with_it then mod_.module_exec( & with_it ) else mod_ end
       end
     end.call

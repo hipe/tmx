@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System
 
-  describe "[gv] mock system periphery (different kinds of strange behavior)" do
+  describe "[gv] mock system periphery (different kinds of strange behavior)", zmq: true do
 
     extend TS__ ; use :server_expect
 

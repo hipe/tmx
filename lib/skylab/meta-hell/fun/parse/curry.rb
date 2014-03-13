@@ -29,10 +29,10 @@ module Skylab::MetaHell
       end
 
       def get_value
-        Puff_value_class_[ @parse.some_constantspace_mod, @parse ].new
+        Touch_value_class_[ @parse.some_constantspace_mod, @parse ].new
       end
       #
-      Puff_value_class_ = FUN::Puff_constant_.curry[ false, -> parse do
+      Touch_value_class_ = FUN::Touch_constant_.curry[ false, -> parse do
         Parse::Field_::Values_.new parse._field_a
       end, :Parse_Value_ ]
 

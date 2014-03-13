@@ -368,7 +368,7 @@ module Skylab::Face
       def find_command argv  # #storypoint-365
         given = argv.fetch 0
         rx = /\A#{ ::Regexp.escape given }/
-        found_a = when_puffed do
+        found_a = when_touched do
           @sheet.command_tree or break Empty_A_
           catch :break_two do
             @sheet.command_tree.reduce [] do |mem, (_, node)|
@@ -1204,7 +1204,7 @@ module Skylab::Face
       end
 
       def expecting  # #styled
-        when_puffed do
+        when_touched do
           if @sheet.command_tree
             a = @sheet.command_tree.reduce [] do |m, (_, x)|
               if x.is_ok and ! x.defers_invisibility  # ick, meh
@@ -1316,7 +1316,7 @@ module Skylab::Face
       # #called-by `process_queue`, p-arent documenting child.
 
       def help
-        when_puffed do
+        when_touched do
           y = @y
           if documenter
             y << @op.banner  # usually usage line(s)
@@ -1691,14 +1691,14 @@ module Skylab::Face
       attr_reader :desc_proc_a  # (sneak this in for facet 5.12x)
 
       def add_aliases i_a
-        @aliases_are_puffed = nil
+        @aliases_are_touched = nil
         ( @alias_a ||= [ ] ).concat i_a
         nil
       end
 
       def all_aliases
         if ! has_name then Empty_A_ else  # otherwise too annoying
-          if ! aliases_are_puffed
+          if ! aliases_are_touched
             @all_alias_a ||= [ @name.as_slug ]  # NOTE strings important
             if alias_a
               w = ( @alias_a.length - @all_alias_a.length + 1 )
@@ -1707,20 +1707,20 @@ module Skylab::Face
                   @alias_a[ @all_alias_a.length - 1 .. -1 ].map(& :to_s ) )
               end
             end
-            @aliases_are_puffed = true
+            @aliases_are_touched = true
           end
           @all_alias_a
         end
       end
 
-      attr_reader :aliases_are_puffed ; private :aliases_are_puffed
+      attr_reader :aliases_are_touched ; private :aliases_are_touched
       attr_reader :alias_a ; private :alias_a
 
     private
 
       def parse_xtra_aliases scn
         ( @alias_a ||= [ ] ).concat scn.fetchs
-        @aliases_are_puffed = nil
+        @aliases_are_touched = nil
         nil
       end
     end
@@ -1775,22 +1775,22 @@ module Skylab::Face
       end
     end
 
-    # ~ 5.8x - "puffer" API for populating namespaces lazily [#038] ~
+    # ~ 5.8x - "toucher" API for populating namespaces lazily [#038] ~
 
     class Command_  # #re-open for 5.8x
 
-      def is_not_puffed!
-        @is_puffed = false ; nil
+      def is_not_touched!
+        @is_touched = false ; nil
       end
 
-      def is_puffed!
-        @is_puffed = true ; nil
+      def is_touched!
+        @is_touched = true ; nil
       end
 
-      attr_reader :is_puffed ; private :is_puffed  # #annoy
+      attr_reader :is_touched ; private :is_touched  # #annoy
 
-      def when_puffed
-        false == is_puffed and puff  # this is just a hook. you must implement.
+      def when_touched
+        false == is_touched and touch  # this is just a hook. you must implement.
         yield
       end
     end

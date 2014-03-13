@@ -76,12 +76,12 @@ module Skylab::Headless
       attr_reader :block
 
       def normal_short_string
-        @norm_short_str.nil? && @args and puff
+        @norm_short_str.nil? && @args and touch
         @norm_short_str
       end
 
       def normal_long_string
-        @long_sexp.nil? && @args and puff
+        @long_sexp.nil? && @args and touch
         if @long_sexp
           ( @long_sexp.at :__, :no, :stem, :arg ) * EMPTY_SEP__
         else
@@ -100,7 +100,7 @@ module Skylab::Headless
       def long_sexp
         if @long_sexp.nil?
           if @args
-            puff
+            touch
           else
             @long_sexp = if @norm_long_str
               Option::Long_.lease_from_matchdata(
@@ -148,12 +148,12 @@ module Skylab::Headless
       end
 
       def sexp
-        @sexp.nil? and puff
+        @sexp.nil? and touch
         @sexp
       end
 
       def short_fulls
-        @sexp.nil? and puff
+        @sexp.nil? and touch
         if @sexp
           ::Enumerator.new do |y|
             @sexp.children( :short_full ).each do |sx|
@@ -165,7 +165,7 @@ module Skylab::Headless
       end
 
       def long_fulls
-        @sexp.nil? and puff
+        @sexp.nil? and touch
         if @sexp
           ::Enumerator.new do |y|
             @sexp.children( :long_sexp ).each do |sx|
@@ -178,7 +178,7 @@ module Skylab::Headless
 
     private
 
-      def puff  # @args -> @norm_short_str @long_sexp @sexp
+      def touch  # @args -> @norm_short_str @long_sexp @sexp
         sexp = Headless::Library_::CodeMolester::Sexp[ :opt ]
         h = { }
         add = -> k, v do

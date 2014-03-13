@@ -83,9 +83,9 @@ module Skylab::FileMetrics
       end.call
 
       manifold = design.bake_manifold out, max_a
-      manifold.puff_header_rows hdr_row_a if hdr_row_a
-      manifold.puff_body_rows body_row_a if body_row_a
-      manifold.puff_summary_rows summary_row_a if summary_row_a
+      manifold.touch_header_rows hdr_row_a if hdr_row_a
+      manifold.touch_body_rows body_row_a if body_row_a
+      manifold.touch_summary_rows summary_row_a if summary_row_a
 
       nil
     end
@@ -153,7 +153,7 @@ module Skylab::FileMetrics
         # way an engine manifold pumps out whatever to an array of cylinders.)
 
         ( Parts_ = [ :header, :body, :summary ] ).each do |m|
-          define_method "puff_#{ m }_rows" do |a|
+          define_method "touch_#{ m }_rows" do |a|
             instance_variable_get( "@#{ m }" ).call a
             nil
           end

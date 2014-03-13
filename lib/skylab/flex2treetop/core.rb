@@ -56,7 +56,7 @@ module Skylab::Flex2Treetop
 
       o.base.long[ 'ping' ] = ::OptionParser::Switch::OptionalArgument.
           new do |x|
-        puff_queue_without_initial_queue
+        touch_queue_without_initial_queue
         enqueue_with_args :ping, x
       end
 

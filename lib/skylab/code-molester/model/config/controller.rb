@@ -1,7 +1,5 @@
 module Skylab::CodeMolester
 
-  Model::Event = Lib_::Model_event[]  # but it could be a subclass
-
   class Model::Config::Controller
 
     # immutable
@@ -11,6 +9,8 @@ module Skylab::CodeMolester
       do_memoize  # once you create a config instance, it is *the* config.
 
     end ]
+
+    Event__ = Lib_::Model_event[]
 
     # `new_valid` - poka yoke. there is no public `new` (#experimental)
 
@@ -28,7 +28,7 @@ module Skylab::CodeMolester
     New_Valid_ = ::Struct.new :pathname
       # (these member values in order will be flattened and passed to `new` )
 
-    Missing_Argument_ = Model::Event.new do |i|
+    Missing_Argument_ = Event__.new do |i|
       "`#{ i }` is required"
     end
 
@@ -80,7 +80,7 @@ module Skylab::CodeMolester
       define_method i, p ; private i
     end
 
-    Exists_ = Model::Event.new do |pn|
+    Exists_ = Event__.new do |pn|
       "exists, skipping - #{ @pth[ pn ] }"
     end
 
@@ -118,24 +118,24 @@ module Skylab::CodeMolester
       end
     end
 
-    Collision_ = Model::Event.new do |ent|
+    Collision_ = Event__.new do |ent|
       "#{ ent.inflection.lexemes.noun.singular } already exists, #{
         }won't clobber - #{ ent.natural_key }"
     end
 
-    Inserted_ = Model::Event.new do |item|
+    Inserted_ = Event__.new do |item|
       "inserted into list - #{ item.natural_key.inspect }"
     end
 
-    Wrap_ = Model::Event.new do |upstream|
+    Wrap_ = Event__.new do |upstream|
       upstream.message_proc[]
     end
 
-    Text_ = Model::Event.new do |text|
+    Text_ = Event__.new do |text|
       text
     end
 
-    Invalid_ = Model::Event.new do |rsn_o|
+    Invalid_ = Event__.new do |rsn_o|
       rsn_o.render
     end
 

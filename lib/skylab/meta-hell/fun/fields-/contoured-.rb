@@ -19,7 +19,9 @@ module Skylab::MetaHell
       #         public :absorb
       #     end
       #
-      #     f = Foo.new ; f.absorb( :foo, -> { :yes } ) ; f.foo  # => :yes
+      #     foo = Foo.new
+      #     foo.absorb_fully( :foo, -> { :yes } )
+      #     foo.foo  # => :yes
       #
       # and so:
       #
@@ -70,7 +72,7 @@ module Skylab::MetaHell
 
         def flush
           @field_box or field_box
-          Puff_const_with_dupe_for_[ -> _ do
+          Touch_const_with_dupe_for_[ -> _ do
             p = Required_fields_check_[ @field_box ]
             @client.facet_muxer.add_hook_listener :post_absorb, p
             p
@@ -123,7 +125,7 @@ module Skylab::MetaHell
 
         def field_box
           @field_box ||= begin
-            Puff_client_and_give_box_[
+            Touch_client_and_give_box_[
               @absorb_method_x || [ :override, :initialize ] , @client ]
           end
         end

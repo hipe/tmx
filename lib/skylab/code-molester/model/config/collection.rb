@@ -14,6 +14,8 @@ module Skylab::CodeMolester
 
     end ]
 
+    Event__ = Lib_::Model_event[]
+
     # `create`
     #   + `field_h`  - (exactly):
     #                + `directory`
@@ -91,7 +93,7 @@ module Skylab::CodeMolester
     module Events
     end
 
-    Events::No = Model::Event.new do |num_tries, start_pn|
+    Events::No = Event__.new do |num_tries, start_pn|
       "no config file in the #{ num_tries } dirs starting #{
       }from #{ @pth[ start_pn ] }"
     end

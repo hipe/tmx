@@ -14,7 +14,7 @@ module Skylab::TMX
     class NS < ::Skylab::Face::CLI::Client::Namespace_
       def initialize( * )
         super
-        @mechanics.is_not_puffed!
+        @mechanics.is_not_touched!
       end
       use :hi
     end
@@ -23,12 +23,12 @@ module Skylab::TMX
 
       def initialize( * )
         super
-        @puff_story = parent_shell.class.story
+        @touch_story = parent_shell.class.story
         @mod_mod = TMX::Modules
         @box_mod = TMX::Modules::Archive
       end
 
-      def puff
+      def touch
         box_mod = @box_mod
         box_mod.dir_pathname.children( false ).each do |pn|
           anchor = box_mod.dir_pathname.join pn
@@ -43,14 +43,14 @@ module Skylab::TMX
             require anchor.to_s
           end
         end
-        is_puffed!
+        is_touched!
       end
 
     private
 
       def soft_load pn, cli
         i = pn.to_s.intern
-        @puff_story.namespace i, -> do
+        @touch_story.namespace i, -> do
           load_it cli
         end
       end
@@ -71,7 +71,7 @@ module Skylab::TMX
             r = hot.pre_execute or hot = r
             hot
           end
-          @puff_story.add_namespace_sheet oro
+          @touch_story.add_namespace_sheet oro
         end
         nil
       end

@@ -420,7 +420,8 @@ module Skylab::Callback
           pet = apm.entry_tree
         end
         if pet
-          et = pet.normpath_from_distilled @autoloader_name.as_distilled_stem
+          np = pet.normpath_from_distilled @autoloader_name.as_distilled_stem
+          np and np.has_directory and et = np
         end
         @any_built_entry_tree = if et
           et

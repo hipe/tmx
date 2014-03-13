@@ -449,11 +449,11 @@ module Skylab::Headless
         end
 
         def enqueue_without_initial_queue x  # #todo:after-merge:01
-          puff_queue_without_initial_queue
+          touch_queue_without_initial_queue
           @q_x_a << x ; nil
         end
 
-        def puff_queue_without_initial_queue  # #todo:after-merge:01
+        def touch_queue_without_initial_queue  # #todo:after-merge:01
           @q_x_a ||= [] ; nil
         end
 

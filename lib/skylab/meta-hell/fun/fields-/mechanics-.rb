@@ -14,7 +14,7 @@ module Skylab::MetaHell
 
     #  ~ internal support ~
 
-    Puff_method_ = -> a, p, client do  # #curry-friendly
+    Touch_method_ = -> a, p, client do  # #curry-friendly
 
       # a    ::= flag * <method-name>
       # flag ::= override | private | public
@@ -88,7 +88,7 @@ module Skylab::MetaHell
       end
     end
 
-    Puff_singleton_method_ = -> priv_pub, m, p, client do  # #curry-friendly
+    Touch_singleton_method_ = -> priv_pub, m, p, client do  # #curry-friendly
       sc = client.singleton_class
       if ! ( sc.method_defined? m or sc.private_method_defined? m )
         client.define_singleton_method m, & p
@@ -97,19 +97,19 @@ module Skylab::MetaHell
       nil
     end
 
-    Puff_client_and_give_box__ =
+    Touch_client_and_give_box__ =
         -> field_box_const, absorb_method_x, client do
-      Puff_field_box_method_[ field_box_const, client ]
-      Puff_method_[ [ :private, * absorb_method_x ],
+      Touch_field_box_method_[ field_box_const, client ]
+      Touch_method_[ [ :private, * absorb_method_x ],
                     Absorb_method_[ field_box_const ], client ]
-      Puff_absorb_notify_[ client ]
-      Puff_facet_muxer_[ client ]
-      Puff_post_absorb_[ client ]
-      Puff_const_with_dupe_for_[ -> _ { Box_.new }, field_box_const, client ]
+      Touch_absorb_notify_[ client ]
+      Touch_facet_muxer_[ client ]
+      Touch_post_absorb_[ client ]
+      Touch_const_with_dupe_for_[ -> _ { Box_.new }, field_box_const, client ]
     end
     #
-    Puff_field_box_method_ = -> field_box_const, client do
-      Puff_method_[
+    Touch_field_box_method_ = -> field_box_const, client do
+      Touch_method_[
         :field_box, -> { self.class.const_get field_box_const }, client ]
     end
     #
@@ -126,7 +126,7 @@ module Skylab::MetaHell
       end
     end
     #
-    Puff_absorb_notify_ = Puff_method_.curry[ :absorb_notify, -> a do
+    Touch_absorb_notify_ = Touch_method_.curry[ :absorb_notify, -> a do
       # (note field can be from either school)
       op_box = field_box
       @last_x = nil
@@ -139,8 +139,8 @@ module Skylab::MetaHell
       nil
     end ]
     #
-    Puff_const_with_dupe_for_ = -> p, c, mod do
-      FUN::Puff_constant_[ false, -> _ do
+    Touch_const_with_dupe_for_ = -> p, c, mod do
+      FUN::Touch_constant_[ false, -> _ do
         if mod.const_defined? c
           mod.const_get( c ).dupe_for mod
         else
@@ -149,19 +149,19 @@ module Skylab::MetaHell
       end, c, mod, nil ]
     end
     #
-    Puff_facet_muxer_ = Puff_const_with_dupe_for_.curry[
+    Touch_facet_muxer_ = Touch_const_with_dupe_for_.curry[
       -> cli do
-        Puff_facet_muxer_reader_[ cli ]
+        Touch_facet_muxer_reader_[ cli ]
         Free_Muxer_.new cli
       end,
       :FIELD_FACET_MUXER_ ]
     #
-    Puff_facet_muxer_reader_ = Puff_singleton_method_.
+    Touch_facet_muxer_reader_ = Touch_singleton_method_.
         curry[ :public, :facet_muxer, -> do
       const_get :FIELD_FACET_MUXER_  # inherit
     end ]
     #
-    Puff_post_absorb_ = Puff_method_.
+    Touch_post_absorb_ = Touch_method_.
         curry[ [ :private, :post_absorb_notify ], -> do
       self.class.facet_muxer.notify :post_absorb, self
       nil
@@ -171,7 +171,7 @@ module Skylab::MetaHell
 
     CONST_ = :FIELDS_
 
-    Puff_client_and_give_box_ = Puff_client_and_give_box__.curry[ CONST_ ]
+    Touch_client_and_give_box_ = Touch_client_and_give_box__.curry[ CONST_ ]
 
     #  ~ "foundation" classes ~
 

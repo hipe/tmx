@@ -111,13 +111,13 @@ module Skylab::MetaHell
     o[ :memoize ] = Memoize
 
     o[:memoize_to_const_method] = -> p, c do  # use with `define_method`
-      puff = Puff_constant_.curry[ false, -> _ { p.call }, c ]
+      touch = Touch_constant_.curry[ false, -> _ { p.call }, c ]
       -> do
-        puff[ self, nil ]
+        touch[ self, nil ]
       end
     end
     #
-    Puff_constant_ = -> do_inherit, p, c, mod, arg do  # #curry-friendly
+    Touch_constant_ = -> do_inherit, p, c, mod, arg do  # #curry-friendly
       if mod.const_defined? c, do_inherit
         mod.const_get c
       else
@@ -125,8 +125,8 @@ module Skylab::MetaHell
       end
     end
     # ~
-    Puff_constant_reader_ = -> do_inherit, p, c, mod, arg do
-      p = Puff_constant_.curry[ do_inherit, p, c, mod ]
+    Touch_constant_reader_ = -> do_inherit, p, c, mod, arg do
+      p = Touch_constant_.curry[ do_inherit, p, c, mod ]
       -> { p[ arg ] }
     end
 

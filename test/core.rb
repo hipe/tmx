@@ -62,13 +62,11 @@ module Skylab::Test
       Headless__[]::CLI::PathTools::FUN::Pretty_path
     end
 
-    Puff_constant = -> do
-      MetaHell__[]::FUN::Puff_constant_
-    end
-
     Reparenthesize = -> p, msg do
       Face__[]::CLI.reparenthesize[ p, msg ]
     end
+
+    Set = stdlib[ :Set ]
 
     Spec_rb = -> do
       TestSupport__[]::FUN::Spec_rb[]
@@ -76,7 +74,9 @@ module Skylab::Test
 
     TestSupport__ = sidesys[ :TestSupport ]
 
-    Set = stdlib[ :Set ]
+    Touch_constant = -> do
+      MetaHell__[]::FUN::Touch_constant_
+    end
   end
 
   EMPTY_A_ = [].freeze

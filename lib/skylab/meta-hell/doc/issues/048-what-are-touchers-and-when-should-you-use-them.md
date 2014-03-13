@@ -1,10 +1,10 @@
-# what are puffers and when should you use them? :[#048]
+# what are touchers and when should you use them? :[#048]
 
-puffers are an experimental new way to extend modules. we don't know if
+touchers are an experimental new way to extend modules. we don't know if
 they're a good way.
 
 as opposed to a module, which can be added to the ancestor chain of another
-module with either `include` or `prepend`, a collection of method puffers
+module with either `include` or `prepend`, a collection of method touchers
 can give you more fine-grained control on what to do with a method definition
 given whether that method may already be defined in the client module itself
 or in its ancestor chain.

@@ -1,10 +1,10 @@
 require_relative 'test-support'
 
-module Skylab::Face::TestSupport::CLI::Client::Puffer
+module Skylab::Face::TestSupport::CLI::Client::Toucher
 
   ::Skylab::Face::TestSupport::CLI::Client[ self, :CLI_party ]
 
-  describe "[fa] CLI client puffer (hooks)" do
+  describe "[fa] CLI client toucher (hooks)" do
 
     extend TS__
 
@@ -13,12 +13,12 @@ module Skylab::Face::TestSupport::CLI::Client::Puffer
       with_body do
         def initialize( * )
           super
-          @mechanics.is_not_puffed!
+          @mechanics.is_not_touched!
         end
         def foo
         end
         class self::Kernel_ < Face_::CLI::Client::CLI_Kernel_  # sketchville
-          def puff
+          def touch
             @sheet.node_open!
             @sheet.close_node do |a|
               a.set_method_name :haxxville
@@ -27,7 +27,7 @@ module Skylab::Face::TestSupport::CLI::Client::Puffer
               end
             end
             @sheet._scooper.add_name_at_this_point :haxxville
-            is_puffed!
+            is_touched!
             nil
           end
         end

@@ -3,7 +3,7 @@ module Skylab::Face
   module API::Action::Emit
 
     # `self.[]` - fulfill [#026]. unlike its bretheren it does
-    # *not* assume it is behind a mutex because it can get puffed up from
+    # *not* assume it is behind a mutex because it can get vivified from
     # multiple entrypoints, namely `listeners_digraph` *and/or* `taxonomic_streams`
     # (just as two examples)
 

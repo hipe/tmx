@@ -701,7 +701,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     def execute
       @be_verbose and render_hub_info
       begin
-        stash = collection.puff_stash_expected_to_be_writable @stash_name
+        stash = collection.touch_stash_expected_to_be_writable @stash_name
         stash or break( r = stash )
         yes = false
         normalized_relative_others.each do |file_name|
@@ -741,7 +741,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
   private
 
     def execute
-      stash = collection.puff_stash @stash_name
+      stash = collection.touch_stash @stash_name
       @be_verbose and emit_inner_info_string "#{
         }(had stash path: #{ stash.pathname })"
       stash = stash.stash_expected_to_exist
@@ -795,7 +795,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     PARAMS = %i( be_verbose dry_run stash_name stashes_path )
 
     def execute
-      @stash = collection.puff_stash( @stash_name ).stash_expected_to_exist
+      @stash = collection.touch_stash( @stash_name ).stash_expected_to_exist
       @stash and with_stash
     end
   private
@@ -1051,11 +1051,11 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       end
     end
 
-    def puff_stash_expected_to_be_writable stash_name
-      puff_stash( stash_name ).stash_expected_to_be_writable
+    def touch_stash_expected_to_be_writable stash_name
+      touch_stash( stash_name ).stash_expected_to_be_writable
     end
 
-    def puff_stash name_x
+    def touch_stash name_x
       @cache_h[ name_x ] ||= build_stash name_x
     end
     def build_stash name_x
@@ -1069,7 +1069,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       ::Enumerator.new do |y|
         @stashes_pathname.children( true ).each do |pn|  # or e.g. Errno::ENOENT
           if pn.directory?
-            y << puff_stash( pn.basename.to_s )
+            y << touch_stash( pn.basename.to_s )
           elsif be_verbose
             emit_inner_info_string say {
               "(not a directory: #{ escape_path pn })" }

@@ -148,10 +148,6 @@ module Skylab::SubTree
       Headless__[]::CLI::PathTools::FUN::Pretty_path
     end
 
-    Puff_constant_reader = -> * a do
-      MetaHell__[]::FUN::Puff_constant_reader_[ *a ]
-    end
-
     Spec_rb = -> do
       TestSupport__[]::FUN::Spec_rb[]
     end
@@ -169,6 +165,10 @@ module Skylab::SubTree
     end
 
     TestSupport__ = sidesys[ :TestSupport ]
+
+    Touch_constant_reader = -> * a do
+      MetaHell__[]::FUN::Touch_constant_reader_[ *a ]
+    end
 
     Tree_traversal = -> do
       Treelib__[]::Traversal.new

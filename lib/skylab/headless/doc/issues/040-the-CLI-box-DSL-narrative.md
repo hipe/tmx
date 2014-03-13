@@ -72,9 +72,9 @@ the client will do this differently.
 
 the essence of this module is in this 'method_added' hook. providing that the
 DSL is "on") we resolve the constant that we will use to store the action
-class under. we "puff" the action class.
+class under. we "touch" the action class.
 
-when we say we :#puff the action cass we mean that we use any existing action
+when we say we :#touch the action cass we mean that we use any existing action
 class that is currently being built, and if one is not being built then we
 start one.
 

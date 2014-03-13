@@ -51,7 +51,7 @@ module Skylab::SubTree
         r = Expression_Agent__.method :new ; p = -> { r } ; r
       end
       define_singleton_method :some_expression_agent,
-        Lib_::Puff_constant_reader[
+        Lib_::Touch_constant_reader[
           true, p[], :EXPRESSION_AGENT__, self, :_no_arg_ ]
     end.call
 

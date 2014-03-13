@@ -10,11 +10,11 @@
 [#051]       #doc-point #experimental-pattern :#method-cherry-picker..
 [#050]       #family 'Strange_'
 [#049]       #tracking-tag :#fuzzy
-[#048]       #doc-point what are puffers and when should you use them ..
+[#048]       #doc-point what are touchers and when should you use them ..
 [#047]       #doc-point this class of grammars, and this parser..
              (#re-purpoesd:once. original may have been lost.)
 [#046]       #doc-point extension nodes?
-[#045]       #tracking-tag track various #puffers in the wild
+[#045]       #tracking-tag track various #touchers in the wild
 [#044] #open #autoloading: swap-in caller_locations( 1, 1 )[ 0 ].base_label
 [#043]       #boxxy the stemmy tree issue - try autoloading the value corresp.
                to the path "headless/nlp/en/levenshtein-.rb"

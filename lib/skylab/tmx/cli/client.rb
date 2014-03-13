@@ -42,7 +42,7 @@ module Skylab::TMX
 
     def initialize( * )
       super
-      @mechanics.is_not_puffed!
+      @mechanics.is_not_touched!
       @be_verbose = nil
     end
 
@@ -61,24 +61,24 @@ module Skylab::TMX
 
     class Kernel_ < Face::CLI::Client::CLI_Kernel_  # the current way to do this :/
 
-      def puff  # this is [#fa-038] - we get "puffed" when we need to.
-        ( @puffer ||= build_puffer ).puff
-        is_puffed!
+      def touch  # this is [#fa-038] - we get "touched" when we need to.
+        ( @toucher ||= build_toucher ).touch
+        is_touched!
       end
 
     private
 
-      def build_puffer
+      def build_toucher
         eew = parent_shell.instance_variable_get :@be_verbose
         white = ::Skylab::MetaHell::MONADIC_TRUTH_  # got replaced by `skip`
-        Puffer_[ TMX::Modules, white, sheet, @y, eew ]
+        Toucher_[ TMX::Modules, white, sheet, @y, eew ]
       end
     end
 
-    Puffer_ = MetaHell::Proxy::Nice.new :puff
-      # it "puffs" a command node (e.g. namespace) into life as it is needed.
+    Toucher_ = MetaHell::Proxy::Nice.new :touch
+      # it "touchs" a command node (e.g. namespace) into life as it is needed.
 
-    def Puffer_.[] box_mod, white, story, y, be_verbose
+    def Toucher_.[] box_mod, white, story, y, be_verbose
       pth = -> pn do
         pn.relative_path_from ::Skylab.dir_pathname
       end
@@ -113,7 +113,7 @@ module Skylab::TMX
           end
         end
       end
-      new( puff: -> do
+      new( touch: -> do
         y << "(loading all names.)" if be_verbose
         box_mod.names.each do |name|
           norm_i = name.as_slug.intern  # NOTE this is the convention

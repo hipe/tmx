@@ -24,7 +24,7 @@ module Skylab::Headless
         service_class.extend Session_Methods_for_Service_Class__ ; nil
       end
       With_actions = -> _ do  # #storypoint-20
-        module_exec( & Puff_dir_patname__ )
+        module_exec( & Touch_dir_patname__ )
         (( const_set :Actions, ::Module.new )).module_exec do
           Library_::Boxxy[ self ]
         end
@@ -35,7 +35,7 @@ module Skylab::Headless
       Library_::Bundle::Multiset[ self ]
     end
 
-    Puff_dir_patname__ = -> do
+    Touch_dir_patname__ = -> do
       Has_dpn__[ self ] or module_exec( & Rslv_Dpn__ )
     end
     Has_dpn__ = -> x do

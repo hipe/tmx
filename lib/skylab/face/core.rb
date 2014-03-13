@@ -184,7 +184,7 @@ module Skylab::Face  # read [#011] the top node narrative
     end
 
     Touch_proc = -> do
-      MetaHell__[]::Module::Accessors::Puff
+      MetaHell__[]::Module::Accessors::Touch
     end
   end
 
