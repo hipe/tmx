@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby -w
+
+require_relative '../lib/skylab/brazen/core'
+
+Skylab::Brazen::CLI.new( $stdin, $stdout, $stderr ).invoke ARGV

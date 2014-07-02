@@ -1105,6 +1105,10 @@ module Skylab::Callback
       def is_valid_const const_i
         VALID_CONST_RX__ =~ const_i
       end
+      def from_module mod
+        allocate_with :initialize_with_const_i,
+          mod.name.split( CONST_SEP_ ).last
+      end
       def from_const const_i
         VALID_CONST_RX__ =~ const_i or raise ::NameError, say_wrong( const_i )
         allocate_with :initialize_with_const_i, const_i
