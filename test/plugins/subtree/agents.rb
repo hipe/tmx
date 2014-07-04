@@ -166,7 +166,7 @@ module Skylab::Test::Plugins::Subtree
     end
 
     def initialize
-      @is_hot = nil
+      @be_verbose = @is_hot = nil
     end
 
     available_options do |o, _|
@@ -189,7 +189,6 @@ module Skylab::Test::Plugins::Subtree
 
     def activate
       @is_hot and fail "sanity - unexpected state transition"
-      @be_verbose ||= nil
       @is_hot = true
       nil
     end
@@ -200,9 +199,10 @@ module Skylab::Test::Plugins::Subtree
 
     def _compile y
       @str_a.freeze
+      @cache_h = {}
+      @exact_match_rx_idx_set = Lib_::Set[].new
       @length = @str_a.length
       @rx_a = @str_a.map { |s| %r{\A#{ ::Regexp.escape s }} }.freeze
-      @cache_h = { }
       @pool_set = Lib_::Set[][ * @str_a ]
       if @be_verbose
         @ignore_name_a = [ ]
@@ -257,8 +257,18 @@ module Skylab::Test::Plugins::Subtree
       yn = @cache_h.fetch sp.slug do |slug|
         @cache_h[ slug ] = @length.times.reduce :no do |m, idx|
           if @rx_a.fetch( idx ) =~ slug
-            @pool_set.delete @str_a.fetch( idx )
-            break :yes
+            if @exact_match_rx_idx_set.include? idx
+              # nothing: if we exact-matched a sub-product already with the
+              # input string then we do not fuzzy-match against this sub-prod.
+            else
+              if @str_a.fetch( idx ) == slug
+                # since we exact-matched now, don't use this same input string
+                # for a fuzzy match in the future (see [#009] note on this)
+                @exact_match_rx_idx_set.add idx
+              end
+              @pool_set.delete @str_a.fetch idx
+              break :yes
+            end
           end
           m
         end

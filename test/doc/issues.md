@@ -1,3 +1,4 @@
+[#009]       #done fix test globbing ..
 [#008]       #done folderize plugins
 [#007] #open white plugin whines weirdly when strange files are in lib/skylab
 [#006]       #doc-point #in-situ (the particular importance of result values)

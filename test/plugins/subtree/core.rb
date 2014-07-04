@@ -9,7 +9,7 @@ module Skylab::Test
   # `Subtree` manages determining the tree of tests to run, and paring down
   # the tree with any options provided. (in fact, `Subtree` itself will have
   # plugin modules that themselves provide different such options! plugins
-  # for plugons omg two levels! (relax it's just a tree))
+  # for plugins omg two levels! (relax it's just a tree))
 
   module Plugins::Subtree
 
