@@ -1,4 +1,4 @@
-[#008] #open folderize plugins
+[#008]       #done folderize plugins
 [#007] #open white plugin whines weirdly when strange files are in lib/skylab
 [#006]       #doc-point #in-situ (the particular importance of result values)
 [#005]       #doc-point confessions of an ambiguous grammar..

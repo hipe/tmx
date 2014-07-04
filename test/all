@@ -88,7 +88,7 @@ module Skylab::Test
       # (like #this-spot), we now have to load the rest of it explicitly
       # because the rest of it won't load via  autoloading [#te-002]
 
-      require Test::Plugins::Coverage.dir_pathname.to_path
+      require "#{ Test::Plugins::Coverage.dir_pathname }/core"
       super
     end
 
