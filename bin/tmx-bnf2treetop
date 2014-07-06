@@ -264,7 +264,7 @@ module Skylab::Bnf2Treetop
       self.scn = ::StringScanner.new(upstream.read)
       upstream.close
       modeline! or return
-      absorb! or return
+      prcss_parameters or return
       space!
       ok = catch :stop do
         grammar and grammar_prepare
@@ -296,7 +296,7 @@ module Skylab::Bnf2Treetop
     def paystream ; request_client.paystream end
     def upstream ; request_client.upstream end
     # --*--
-    def absorb!
+    def prcss_parameters
       [ @modeline_parameters, invocation_parameters].compact.each do |params|
         params.each do |name, value|
           if PARAM[name].list

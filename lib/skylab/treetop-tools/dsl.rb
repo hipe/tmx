@@ -85,7 +85,7 @@ module Skylab::TreetopTools
       super client_x
     end
 
-    def absorb! struct
+    def absrb_struct_into_ivars struct
       struct.members.each do |name|
         instance_variable_set "@#{ name }", struct[ name ]
       end
@@ -103,7 +103,7 @@ module Skylab::TreetopTools
         @dsl_body_p[ @joystick ]
         actuals = @joystick.__actual_parameters
         set! nil, actuals or break # defaults, validation etc
-        absorb! actuals           # now they are our ivars
+        absrb_struct_into_ivars actuals
         r = true
       end while false
       r

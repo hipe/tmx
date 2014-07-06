@@ -34,7 +34,7 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_::From_
             def three
             end
 
-            alias_method :initialize, :absorb
+            alias_method :initialize, :_FIXME_absrb
           end
         end
       end

@@ -72,7 +72,7 @@ module Skylab::MetaHell
             MetaHell::Library_::Basic::Mutex::Write_Once.new :state_mutex
           # state encompasses input and output. various algorithms may handle
           # input and output together or separately, but we ensure that etc.
-        absorb( * input_a )
+        _FIXME_absrb( * input_a ) ; nil
       end
 
       # ~ :+[#056] typical base class implementation:
@@ -233,8 +233,7 @@ module Skylab::MetaHell
         a.length.times do
           aa << cq.shift << a.shift
         end
-        absorb( *aa )
-        nil
+        _FIXME_absrb( * aa ) ; nil
       end
       def say_too_many cq, a
         "too many arguments (#{ a.length } for #{ cq.length } #{
@@ -343,8 +342,7 @@ module Skylab::MetaHell
         did = nil
         @syntax ||= ( did = true and Syntax_.new )
         did or fail "you should probably deep dup these immutable syntaxes!"
-        @syntax.absorb_notify a
-        nil
+        @syntax.absorb_iambic_fully a ; nil
       end
       def field a
         dflt = ( @default_field if instance_variable_defined? :@default_field )
@@ -371,7 +369,7 @@ module Skylab::MetaHell
         else
           field = x ; a.shift
         end
-        do_absorb and field.absorb_notify a
+        do_absorb and field.absorb_iambic_fully a
         field
       end
       def constantspace a

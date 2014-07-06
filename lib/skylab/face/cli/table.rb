@@ -46,7 +46,7 @@ module Skylab::Face
       @left_x = @sep_x = @right_x = @do_show_header = @field_box =
         @read_rows_from = @write_lines_to = nil
       atomic_sugar a
-      absorb( *a )
+      _FIXME_absrb( * a ) ; nil
     end
   private
     def atomic_sugar a  # hack - whenever exactly 1
@@ -159,8 +159,7 @@ module Skylab::Face
         @read_rows_from = a.shift  # special case - allow no arg at end!
         nil
       end
-    end ]
-    protected :absorb  # created by extension above - we let other selfs call
+    end ] ; protected :_FIXME_absrb  # we let other selfs call this
   end
 
   class CLI::Table
@@ -233,7 +232,7 @@ module Skylab::Face
         if a.first.respond_to? :ascii_only?
           label a
         else
-          absorb_notify a
+          absorb_iambic_fully a
         end
         @name_i ||= :"#{ idx }"  # always give it a unique id to act as a key
         freeze  # ensure that we can dupe with shallow copies
@@ -289,7 +288,7 @@ module Skylab::Face
     def curry *a
       atomic_sugar a
       otr = dupe
-      otr.absorb( *a )
+      otr._FIXME_absrb( *a )
       otr
     end
 

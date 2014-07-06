@@ -141,7 +141,7 @@ module Skylab::Face
       def initialize *a
         @meta_param_x_a = @param_class = nil
         @params = Param_Field_[]::Box.new
-        absorb( * a )
+        _FIXME_absrb( * a ) ; nil
       end
 
       attr_reader :params
@@ -166,7 +166,7 @@ module Skylab::Face
         def param a
           @param_class || bake_param_class
           param = @param_class.new( a.fetch 0 ) ; a.shift
-          param.absorb_notify a
+          param.absorb_iambic_fully a
           @params.add param.local_normal_name, param
           nil
         end

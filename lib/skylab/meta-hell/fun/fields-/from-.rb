@@ -56,7 +56,7 @@ module Skylab::MetaHell
 
       def self.methods &blk
         client = eval 'self', blk.binding
-        box = Touch_client_and_give_box_[ :absorb, client ]
+        box = Touch_client_and_give_box_[ :_FIXME_absrb, client ]
         Method_Added_Muxer[ client ].in_block_each_method_added blk do |m|
           if box.has_field_attributes
             fa = box.delete_field_attributes

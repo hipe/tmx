@@ -126,7 +126,7 @@ module Skylab::MetaHell
       end
     end
     #
-    Touch_absorb_notify_ = Touch_method_.curry[ :absorb_notify, -> a do
+    Touch_absorb_notify_ = Touch_method_.curry[ :absorb_iambic_fully, -> a do  # #todo
       # (note field can be from either school)
       op_box = field_box
       @last_x = nil
