@@ -273,7 +273,7 @@ module Skylab::MetaHell
           MetaHell::EMPTY_P_
         end
       end
-    FUN::Fields_::From_.methods do  # (borrow one indent)
+    MetaHell_::Fields::From.methods :argful do  # borrow 1 indent
       def algorithm a
         @algorithm_p = a.fetch 0 ; a.shift
         nil
@@ -389,7 +389,7 @@ module Skylab::MetaHell
           mk[ a ]
         end
       end
-    FUN::Fields_::From_.methods do
+    MetaHell_::Fields::From.methods :argful do
       def monikate a
         @monikate_p = a.fetch 0 ; a.shift
         nil

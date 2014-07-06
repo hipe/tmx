@@ -1,8 +1,12 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport::FUN::Fields_::From_
+module Skylab::MetaHell::TestSupport::Fields
+  ::Skylab::MetaHell::TestSupport[ self ]
+end
 
-  ::Skylab::MetaHell::TestSupport::FUN::Fields_[ self ]
+module Skylab::MetaHell::TestSupport::Fields::From
+
+  ::Skylab::MetaHell::TestSupport::Fields[ self ]
 
   include CONSTANTS
 
@@ -12,7 +16,7 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_::From_
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::MetaHell::FUN::Fields_::From_" do
+  describe "Skylab::MetaHell::Fields::From" do
     context "let a class define its fields via particular methods it defines" do
       Sandbox_1 = Sandboxer.spawn
       before :all do
@@ -23,7 +27,7 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_::From_
             def one
             end
 
-            MetaHell::FUN::Fields_::From_.methods do
+            MetaHell::Fields::From.methods :argful do
               def two a
                 @two_value = a.shift
               end
@@ -58,7 +62,7 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_::From_
         module Sandbox_1
           class Baz < Foo
 
-            MetaHell::FUN::Fields_::From_.methods do
+            MetaHell::Fields::From.methods :argful do
               def four a
                 @four_value = a.shift
               end
@@ -81,7 +85,7 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_::From_
         Sandbox_2.with self
         module Sandbox_2
           class Foo
-            MetaHell::FUN::Fields_::From_.methods do
+            MetaHell::Fields::From.methods do
               FIELDS_.set :next_field, :desc, -> y { y << "ok." }
               def bar
               end

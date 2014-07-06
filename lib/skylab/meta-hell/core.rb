@@ -4,7 +4,8 @@ module Skylab
 
   module MetaHell  # welcome to meta hell. please read [#041] #storypoint-005
 
-    MetaHell = self
+    MetaHell = self  # #todo
+    MetaHell_ = self
 
     EMPTY_A_            =  [ ].freeze  #storypoint-015 explains this OCD
     EMPTY_P_            = ->   { }

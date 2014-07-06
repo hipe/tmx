@@ -8,7 +8,7 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_::ICAF_
 
   MetaHell = MetaHell
 
-  describe "#{ MetaHell }::FUN::Fields_ integrate contoured and from" do
+  describe "[mh] FUN::Fields integrate contoured and from" do
 
     before :all do
 
@@ -19,7 +19,7 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_::ICAF_
           :required, :field, :bar ]
 
       private
-        MetaHell::FUN::Fields_::From_.methods do
+        MetaHell::Fields::From.methods :argful do
           def biz a
             @biz_x = a.shift
           end

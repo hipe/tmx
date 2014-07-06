@@ -52,6 +52,7 @@ module Skylab::TestSupport::Regret::API
 
     params [ :core_basename, :arity, :zero_or_one ],
       [ :do_close_output_stream, :arity, :zero_or_one, :default, -> { true } ],
+      [ :do_force, :arity, :zero_or_one ],
       [ :load_file, :arity, :zero_or_one ],
       [ :load_module, :arity, :zero_or_one ],
       [ :pathname, :arity, :zero_or_one ],

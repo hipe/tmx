@@ -1,6 +1,6 @@
 module Skylab::MetaHell
 
-  module FUN::Fields_
+  module Fields
 
     # let a class define its fields via particular methods it defines
     # in a special DSL block
@@ -10,7 +10,7 @@ module Skylab::MetaHell
     #       def one
     #       end
     #
-    #       MetaHell::FUN::Fields_::From_.methods do
+    #       MetaHell::Fields::From.methods :argful do
     #         def two a
     #           @two_value = a.shift
     #         end
@@ -21,7 +21,7 @@ module Skylab::MetaHell
     #       def three
     #       end
     #
-    #       alias_method :initialize, :absorb
+    #       alias_method :initialize, :with
     #     end
     #
     #     Foo.new( :two, "foozle" ).two_value  # => 'foozle'
@@ -37,7 +37,7 @@ module Skylab::MetaHell
     #
     #     class Baz < Foo
     #
-    #       MetaHell::FUN::Fields_::From_.methods do
+    #       MetaHell::Fields::From.methods :argful do
     #         def four a
     #           @four_value = a.shift
     #         end
@@ -50,13 +50,24 @@ module Skylab::MetaHell
     #     Foo.new( :four, "frick" )  # => ArgumentError: unrecognized keyword "four" - did you mean two?
     #
 
-    self::Mechanics_.touch
+    module From  # :[#053]
 
-    module From_  # :[#053]
+      def self.methods *a, &blk
+        if blk
+          Methods__.iambic_and_block a, blk
+        elsif a.length.zero?
+          Methods__
+        else
+          raise ::ArgumentError, "no."
+        end
+      end
+    end
 
-      def self.methods &blk
+    module From::Methods__
+
+      def self.iambic_and_block a, blk
         client = eval 'self', blk.binding
-        box = Touch_client_and_give_box_[ :_FIXME_absrb, client ]
+        box = Lib_::Touch_client_and_give_box[ :_FIXME_absrb, client ]
         Method_Added_Muxer[ client ].in_block_each_method_added blk do |m|
           if box.has_field_attributes
             fa = box.delete_field_attributes
@@ -71,7 +82,7 @@ module Skylab::MetaHell
         nil
       end
 
-      class Field_From_Method_ < Aspect_
+      class Field_From_Method_ < MetaHell_::Lib_::Aspect[]
         def absorb agent, a
           agent.send @method_i, a
           nil
@@ -83,7 +94,7 @@ module Skylab::MetaHell
     # like so (for now)
     #
     #     class Foo
-    #       MetaHell::FUN::Fields_::From_.methods do
+    #       MetaHell::Fields::From.methods do
     #         FIELDS_.set :next_field, :desc, -> y { y << "ok." }
     #         def bar
     #         end

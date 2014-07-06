@@ -108,8 +108,8 @@ module Skylab::SubTree
       MetaHell__[]::FUN::Fields_.via_iambic x_a
     end
 
-    Fields_from_methods = -> p do
-      MetaHell__[]::FUN::Fields_::From_.methods( & p )
+    Fields_from_methods = -> *a, p do
+      MetaHell__[]::Fields::From.methods.iambic_and_block a, p
     end
 
     Funcy = -> x do

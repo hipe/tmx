@@ -118,7 +118,7 @@ module Skylab::MetaHell
         nil
       end
 
-    FUN::Fields_::From_.methods do  # (borrow one indent)
+    MetaHell_::Fields::From.methods :argful do  # borrow 1 indent
 
       def predicate a
         @predicates.push a.fetch( 0 ) ; a.shift

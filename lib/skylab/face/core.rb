@@ -99,8 +99,8 @@ module Skylab::Face  # read [#011] the top node narrative
       MetaHell__[]::FUN::Fields_.add_field_i_a_to_mod field_i_a, mod
     end
 
-    Fields_from_methods = -> p do
-      MetaHell__[]::FUN::Fields_::From_.methods( & p )
+    Fields_from_methods = -> *a, p do
+      MetaHell__[]::Fields::From.methods.iambic_and_block a, p
     end
 
     Fields_via = -> * x_a do
