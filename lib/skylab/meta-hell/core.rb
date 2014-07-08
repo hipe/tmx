@@ -298,20 +298,8 @@ module Skylab::MetaHell
     end
   end
   # BEGIN until [#059]
+  stowaway :Fields, 'fields/core'
   Autoloader_ = ::Skylab::Callback::Autoloader
-  module Fields  # near [#061]
-
-    def self.box_for_client * x_a, client
-      self::Box_for.iambic_and_client x_a, client
-    end
-
-    Autoloader_[ self ]
-
-    _ = '../fun/fields-/mechanics-'.freeze
-    stowaway :Aspect_, _
-    stowaway :Box_for, _
-    CONST_ = :FIELDS_
-  end
   class << self
     def entry_tree
       @entry_tree ||= bld_entry_tree

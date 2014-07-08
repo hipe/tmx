@@ -1,14 +1,12 @@
 module Skylab::MetaHell
 
-  FUN::Fields_::Mechanics_ = nil  # just for now
-
-    # this is now the center of metahell. these are the tools of metahell.
-    # an extension node - know its implications [#046]. lots of touchers [#048]
-    # abstracted from siblings, whence comes its coverage
-
-  module Fields
+  module Fields  # read [#066] the metahell fields narrative
 
     # ~ payload as narrative
+
+    def self.box_for_client * x_a, client
+      self::Box_for.iambic_and_client x_a, client
+    end
 
     class Box_for
       class << self
@@ -397,5 +395,8 @@ module Skylab::MetaHell
         (( @h ||= {} )[ i ] ||= [] ).push p ; nil
       end
     end
+
+    CONST_ = :FIELDS_
+
   end
 end

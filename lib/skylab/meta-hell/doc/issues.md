@@ -1,3 +1,4 @@
+[#066]       #doc-point the metahell fields narrative ..
 [#065] #open unify use of MetaHell_ not MetaHell
 [#064] #open fix syntax sharing
 [#063] #open get rid of argful field parsers
