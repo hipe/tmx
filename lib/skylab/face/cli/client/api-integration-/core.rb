@@ -160,7 +160,7 @@ module Skylab::Face
       end
 
       class Executable_Request_
-        Lib_::Fields_with[ :client, self, :struct_like, :field_i_a,
+        Lib_::Basic_fields[ :client, self, :struct_like, :field_i_a,
           [ :name_x, :param_x, :expression_agent_p ] ]
       end
 

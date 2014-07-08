@@ -26,4 +26,20 @@ module Skylab::Snag
 
     H_ = o.freeze
   end
+
+  module Lib_
+    Basic_fields = -> client, * i_a do
+      MetaHell__[]::Basic_Fields.via_field_i_a_and_client i_a, client
+    end
+    Basic_Fields = -> * x_a do
+      if x_a.length.zero?
+        MetaHell__[]::Basic_Fields
+      else
+        MetaHell__[]::Basic_Fields.via_iambic x_a
+      end
+    end
+    MetaHell__ = -> do
+      Snag_::MetaHell  # for now
+    end
+  end
 end

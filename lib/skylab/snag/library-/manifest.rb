@@ -66,7 +66,7 @@ module Skylab::Snag
 
     class FU_curry_
       MetaHell::Funcy[ self ]
-      MetaHell::FUN.fields[ self, :escape_path_p, :be_verbose, :info_p ]
+      Snag_::Lib_::Basic_fields[ self, :escape_path_p, :be_verbose, :info_p ]
       def execute
         rx = Headless::CLI::PathTools::FUN::ABSOLUTE_PATH_HACK_RX
         Headless::IO::FU.new -> s do

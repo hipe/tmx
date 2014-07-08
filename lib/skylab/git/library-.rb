@@ -16,4 +16,10 @@ module Skylab::Git
       const_set const_i, o.fetch( const_i )[ const_i ]
     end
   end
+
+  module Lib_
+    Basic_fields = -> client, * i_a do
+      MetaHell::Basic_Fields.via_field_i_a_and_client i_a, client
+    end
+  end
 end

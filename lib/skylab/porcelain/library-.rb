@@ -12,4 +12,14 @@ module Skylab::Porcelain
       const_set c, o.fetch( c )[ c ]
     end
   end
+
+  module Lib_
+    Basic_Fields = -> * x_a do
+      if x_a.length.zero?
+        MetaHell::Basic_Fields
+      else
+        MetaHell::Basic_Fields.via_iambic x_a
+      end
+    end
+  end
 end

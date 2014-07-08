@@ -1,16 +1,12 @@
 module Skylab::MetaHell
 
-  module FUN::Fields_
-
-    def self.[] * x_a
-      via_iambic x_a
-    end
+  module Basic_Fields
 
     # using the basic fields facility out of the box only gives you
     # a readable way to set instance variables via a constructor
     #
     #     class Foo
-    #       MetaHell::FUN.fields[ self, :ding, :bat ]
+    #       MetaHell::Basic_Fields.for self, :ding, :bat
     #     end
     #
     #     (( FOO = Foo.new )).instance_variables.sort  # => [ :@bat, :@ding ]
@@ -30,11 +26,11 @@ module Skylab::MetaHell
     #
     #     Foo.new( :ding, :x, :bat, :y, :bazzle, :z )  # => KeyError: key not found: :bazzle
 
-    FUN.redefiner[ :fields ] = -> mod, *field_i_a do
-      add_field_i_a_to_mod field_i_a, mod
+    def self.for client, * i_a
+      via_field_i_a_and_client i_a, client
     end
 
-    def self.add_field_i_a_to_mod i_a, mod
+    def self.via_field_i_a_and_client i_a, mod
       via_iambic [ :client, mod, :do_super, :field_i_a, i_a,
         :method, :initialize ]
     end
@@ -126,7 +122,11 @@ module Skylab::MetaHell
       end
     end
 
-    Iambic_detect = -> i, a do
+    def self.iambic_detect
+      Iambic_detect__
+    end
+
+    Iambic_detect__ = -> i, a do
       ( 0 ... ( a.length / 2 )).reduce 0 do |_, idx|
         i == a[ idx * 2 ] and break a[ idx * 2 + 1 ]
       end
@@ -136,7 +136,11 @@ module Skylab::MetaHell
     # is a hack that lets to peek into iambic arrays:
     #
     #   a = [ :one, 'two', :three, 'four' ]
-    #   Iambic_detect[ :three, a ]  # => 'four'
+    #   Iambic_detect__[ :three, a ]  # => 'four'
 
+  end
+
+  module BasicFields
+    # #until [#mh-059]
   end
 end

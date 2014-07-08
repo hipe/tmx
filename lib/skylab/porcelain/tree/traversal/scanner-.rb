@@ -6,8 +6,8 @@ module ::Skylab::Porcelain
 
       MetaHell::Funcy[ self ]
 
-      MetaHell::FUN::Fields_[ :client, self, :method, :_FIXME_10_absrb, :field_i_a, [
-       :glyphset_x ] ]
+      Porcelain_::Lib_::Basic_Fields[ :client, self,
+        :method, :_FIXME_10_absrb, :field_i_a, [ :glyphset_x ] ]
 
       class Scn__ < ::Proc
         alias_method :gets, :call

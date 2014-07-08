@@ -16,4 +16,8 @@ module Skylab::Snag
 
   IDENTITY_ = -> x { x }
 
+  stowaway :Lib_, 'library-'
+
+  Snag_ = self
+
 end

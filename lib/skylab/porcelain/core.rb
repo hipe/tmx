@@ -14,11 +14,14 @@ module Skylab
     Headless = o[ :Headless ]
     MetaHell = o[ :MetaHell ]
     Porcelain = self
+    Porcelain_ = self
 
     # headless in porcelain yes. headles trumps porcelain.
 
     MAARS = MetaHell::MAARS
 
     MAARS[ self ]
+
+    stowaway :Lib_, 'library-'
   end
 end

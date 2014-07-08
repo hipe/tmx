@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::FUN::Fields_::ICAF_
+module Skylab::MetaHell::TestSupport::Fields::ICAF_
 
-  ::Skylab::MetaHell::TestSupport::FUN::Fields_[ TS_ = self ]
+  ::Skylab::MetaHell::TestSupport::Fields[ TS_ = self ]
 
   include CONSTANTS
 

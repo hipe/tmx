@@ -3,7 +3,7 @@
 [#064] #open fix syntax sharing
 [#063] #open get rid of argful field parsers
 [#062]       #done get rid of ridiculous attempts at currying methods
-[#061] #open promote fields out of fun
+[#061]       #done promote fields out of fun
 [#060]       #done separate general from specific "method touch"
 [#059] #open get rid of all old autoloader dependencies at this node
 [#058]       #doc-point the "touch method" function ..

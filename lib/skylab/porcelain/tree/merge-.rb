@@ -4,7 +4,7 @@ module Skylab::Porcelain
 
     class Merge_  # ( part of the [#mh-014] diaspora )
 
-      Tree::Fields_[ self, :client, :other, :key_proc, :attr_a ]
+      Fields_[ self, :client, :other, :key_proc, :attr_a ]
 
       def execute
         @attr_a ||= @client.merge_attr_a

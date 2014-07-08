@@ -12,7 +12,7 @@ module Skylab::Snag
         :file_utils_p, :tmpdir_p
       ].freeze
 
-      MetaHell::FUN.fields[ self, * MEMBER_A_ ]
+      Snag_::Lib_::Basic_Fields[].via_field_i_a_and_client MEMBER_A_, self
 
       attr_reader( * MEMBER_A_ )
 

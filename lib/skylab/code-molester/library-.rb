@@ -35,6 +35,10 @@ module Skylab::CodeMolester
 
     Basic__ = sidesys[ :Basic ]
 
+    Basic_Fields = -> * x_a do
+      MetaHell__[]::Basic_Fields.via_iambic x_a
+    end
+
     Cache_pathname = memo[ -> do
       module CodeMolester::Cache
         define_singleton_method :pathname, (
@@ -81,10 +85,6 @@ module Skylab::CodeMolester
 
     Field_reflection_enhance = -> x do
       Basic__[]::Field::Reflection.enhance x
-    end
-
-    Fields = -> * x_a do
-      MetaHell__[]::FUN::Fields_.via_iambic x_a
     end
 
     File_utils = -> p do

@@ -46,7 +46,7 @@ module Skylab::Porcelain
 
         class Modus_Operandus_
 
-          MetaHell::FUN.fields[ self, :type_ish_i, :match, :dupe,
+          Fields_[ self, :type_ish_i, :match, :dupe,
                                 :merge_atomic, :merge_one_dimensional,
                                 :merge_union ]
 

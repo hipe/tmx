@@ -11,7 +11,7 @@ module Skylab::CodeMolester
     # (a lot of this has necessary vestigials from the treetop hack that
     # it originally was.)
 
-    CodeMolester::Lib_::Fields[ :client, self, :method, :_FIXME_11_absrb,
+    CodeMolester::Lib_::Basic_Fields[ :client, self, :method, :_FIXME_11_absrb,
       :field_i_a, [ :outfile_stem, :path, :inpath_p, :outdir_p ] ]
 
     def self.[] path_s

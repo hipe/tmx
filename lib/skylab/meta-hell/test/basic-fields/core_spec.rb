@@ -1,15 +1,15 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::FUN::Fields_
+module Skylab::MetaHell::TestSupport::BasicFields
 
-  describe "Skylab::MetaHell::FUN::Fields_" do
+  describe "Skylab::MetaHell::BasicFields" do
     context "using the basic fields facility out of the box only gives you" do
       Sandbox_1 = Sandboxer.spawn
       before :all do
         Sandbox_1.with self
         module Sandbox_1
           class Foo
-            MetaHell::FUN.fields[ self, :ding, :bat ]
+            MetaHell::Basic_Fields.for self, :ding, :bat
           end
         end
       end

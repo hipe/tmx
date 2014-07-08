@@ -101,11 +101,11 @@ module Skylab::SubTree
     end
 
     Fields = -> mod, * i_a do
-      MetaHell__[]::FUN::Fields_.add_field_i_a_to_mod i_a, mod
+      MetaHell__[]::Basic_Fields.via_field_i_a_and_client i_a, mod
     end
 
     Fields_with = -> * x_a do
-      MetaHell__[]::FUN::Fields_.via_iambic x_a
+      MetaHell__[]::Basic_Fields.via_iambic x_a
     end
 
     Fields_from_methods = -> *a, p do

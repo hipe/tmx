@@ -4,8 +4,9 @@ module Skylab::Snag
 
     class Changer_ < Funcy_
 
-      MetaHell::FUN::Fields_[ :client, self, :scan_method, :parse,
+      Snag_::Lib_::Basic_Fields[ :client, self, :scan_method, :parse,
                               :field_i_a, [ :callbacks ] ]
+
       def initialize( node, * x_a )
         @node = node
         parse x_a

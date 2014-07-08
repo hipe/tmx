@@ -61,6 +61,10 @@ module Skylab::Face  # read [#011] the top node narrative
       Headless__[]::Arity::Space.create p, & p_
     end
 
+    Basic_fields = -> * x_a do
+      MetaHell__[]::Basic_Fields.via_iambic x_a
+    end
+
     Basic__ = sidesys[ :Basic ]
 
     Box_class = -> do
@@ -96,15 +100,11 @@ module Skylab::Face  # read [#011] the top node narrative
     end
 
     Fields = -> mod, * field_i_a do
-      MetaHell__[]::FUN::Fields_.add_field_i_a_to_mod field_i_a, mod
+      MetaHell__[]::Basic_Fields.via_field_i_a_and_client field_i_a, mod
     end
 
     Fields_from_methods = -> *a, p do
       MetaHell__[]::Fields::From.methods.iambic_and_block a, p
-    end
-
-    Fields_with = -> * x_a do
-      MetaHell__[]::FUN::Fields_.via_iambic x_a
     end
 
     Funcy = -> mod do

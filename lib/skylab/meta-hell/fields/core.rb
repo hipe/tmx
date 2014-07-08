@@ -314,7 +314,7 @@ module Skylab::MetaHell
     end
     #
     class Field_Attributes__
-      MetaHell::FUN.fields[ self, :desc ]
+      MetaHell_::Basic_Fields.for self, :desc
       attr_reader :desc
     end
 

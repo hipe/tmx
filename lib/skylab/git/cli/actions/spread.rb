@@ -405,7 +405,7 @@ module Skylab::Git
 
           MetaHell::Funcy[ self ]
 
-          MetaHell::FUN.fields[ self, :branches, :outstream, :snitch ]
+          Git_::Lib_::Basic_fields[ self, :branches, :outstream, :snitch ]
 
           def execute
             @work_a = determine_work_a
@@ -433,7 +433,7 @@ module Skylab::Git
 
           MetaHell::Funcy[ self ]
 
-          MetaHell::FUN.fields[ self, :branches, :move_request_a,
+          Git_::Lib_::Basic_fields[ self, :branches, :move_request_a,
             :outstream, :snitch ]
 
           def execute

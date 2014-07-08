@@ -6,10 +6,8 @@ module Skylab::Porcelain
       mod.extend ModuleMethods ; mod.send :include, InstanceMethods ; nil
     end
 
-    Fields__ = MetaHell::FUN.fields
-
     Fields_ = -> mod, *a do
-      Fields__[ mod, *a ]
+      Porcelain_::Lib_::Basic_Fields[].via_field_i_a_and_client a, mod
       mod.send :define_singleton_method, :[] do |*aa|
         new( * aa ).execute
       end
@@ -39,7 +37,7 @@ module Skylab::Porcelain
     module InstanceMethods
 
       class Construction_
-        Fields__[ self, :slug, :name_services ]
+        Fields_[ self, :slug, :name_services ]
         attr_reader :slug, :name_services
       end
 

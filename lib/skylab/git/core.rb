@@ -9,6 +9,7 @@ module Skylab::Git
   Autoloader_ = Callback_::Autoloader
   Face = ::Skylab::Face
   Git = self
+  Git_ = self
   MetaHell = Autoloader_.require_sidesystem :MetaHell
 
   MAARS = MetaHell::MAARS
@@ -29,4 +30,6 @@ module Skylab::Git
   end
 
   MAARS[ self ]
+
+  stowaway :Lib_, 'library-'
 end

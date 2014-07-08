@@ -4,7 +4,7 @@ module Skylab::Snag
 
     class Adder_ < Funcy_
 
-      MetaHell::FUN::Fields_[ :client, self, :scan_method, :parse,
+      Snag_::Lib_::Basic_Fields[ :client, self, :scan_method, :parse,
                               :field_i_a, [ :callbacks ] ]
 
       def initialize( node, * a )
@@ -14,7 +14,7 @@ module Skylab::Snag
         @rest_a = a
       end
 
-      Detect_info_p = MetaHell::FUN::Fields_::Iambic_detect.curry[ :info_p ]
+      Detect_info_p = Snag_::Lib_::Basic_Fields[].iambic_detect.curry[ :info_p ]
 
       def execute
         begin

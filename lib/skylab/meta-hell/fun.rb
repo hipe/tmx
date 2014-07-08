@@ -280,8 +280,6 @@ module Skylab::MetaHell
     x[:parse_from_ordered_set]           = [ :Parse, :From_Ordered_Set ]
     x[:parse_alternation]                = [ :Parse, :Alternation_ ]
 
-    x[:fields]                           = [ :Fields_ ]
-
     x[:private_attr_reader]              =
     x[:private_attr_accessor]            =
     x[:module_defines_method_in_some_manner] = [ :Deprecated ]

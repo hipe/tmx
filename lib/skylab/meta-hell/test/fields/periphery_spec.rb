@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::FUN::Fields_
+module Skylab::MetaHell::TestSupport::Fields::Periphery
 
-  ::Skylab::MetaHell::TestSupport::FUN[ self ]
+  ::Skylab::MetaHell::TestSupport::Fields[ self ]
 
   include CONSTANTS
 
