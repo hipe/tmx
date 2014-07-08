@@ -656,21 +656,33 @@ module Skylab::Callback
     private
       def bld_stwy_normpath_a  # #stow-1
         s_a = @stwy_core_load_relpath.split PATH_SEP_
-        et_ = @stwy_et = @mod.entry_tree
-        d = -1 ; @stwy_last = s_a.length - 1
-        np_a = []
+        et = @stwy_et = @mod.entry_tree
+        @stwy_last = s_a.length - 1
+        d = 0 ; token = s_a.first ; mod = @mod
         :not_loaded == @stwy_et.state_i and @stwy_et.change_state_to :loading
-        begin
+        np_a = []
+        while DOT_DOT__ == token
+          const_s_a = mod.name.split DCOLON_
+          const_s_a.pop
+          mod = const_s_a.reduce( ::Object ) { |m, x| m.const_get x, false }
+          et = mod.entry_tree
+          np_a << et
           token = s_a.fetch d += 1
-          et__ = et_.normpath_from_distilled Distill_[ token ]  # #todo:inelegant
-          et__ or fail "wat gives: #{ et_.norm_pathname } (~ #{ token }) #{
+        end
+        begin
+          et_ = et.normpath_from_distilled Distill_[ token ]  # #todo:inelegant
+          et_ or fail "wat gives: #{ et.norm_pathname } (~ #{ token }) #{
             }(for #{ @mod } ( ~ #{ @name.as_variegated_symbol } )"
-          :not_loaded == et__.state_i and et__.change_state_to :loading
-          np_a << et__
-          et_ = et__
-        end while d < @stwy_last
+          :not_loaded == et_.state_i and et_.change_state_to :loading
+          np_a << et_
+          d == @stwy_last and break
+          token = s_a.fetch d += 1
+          et = et_
+        end while true
         np_a
       end
+
+      DOT_DOT__ = '..'.freeze
 
       def load_stwy_file  # #stow-2
         real_dpn = @mod.dir_pathname.join @stwy_core_load_relpath

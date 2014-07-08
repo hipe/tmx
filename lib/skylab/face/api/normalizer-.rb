@@ -92,7 +92,7 @@ module Skylab::Face
 
       # mutates param_h [#019] [#bl-013] [#sl-116]
 
-      Lib_::Fields_via[ :client, self, :method, :initialize, :field_i_a,
+      Lib_::Fields_with[ :client, self, :method, :initialize, :field_i_a,
         %i( any_expression_agent field_box notice_yielder notifiee param_h ) ]
 
       def execute

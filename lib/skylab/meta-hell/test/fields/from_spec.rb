@@ -1,8 +1,4 @@
-require_relative '../test-support'
-
-module Skylab::MetaHell::TestSupport::Fields
-  ::Skylab::MetaHell::TestSupport[ self ]
-end
+require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::Fields::From
 
@@ -27,7 +23,9 @@ module Skylab::MetaHell::TestSupport::Fields::From
             def one
             end
 
-            MetaHell::Fields::From.methods :argful do
+            MetaHell::Fields::From.methods(
+              :argful, :overriding, :globbing, :absorber, :initialize
+            ) do
               def two a
                 @two_value = a.shift
               end
@@ -37,8 +35,6 @@ module Skylab::MetaHell::TestSupport::Fields::From
 
             def three
             end
-
-            alias_method :initialize, :_FIXME_absrb
           end
         end
       end

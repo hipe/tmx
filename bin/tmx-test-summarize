@@ -17,8 +17,9 @@ num_examples = 0 ; seconds = 0.0 ; num_chunks = 0
 
 
 while (( line = in_io.gets ))
+  line.strip!
+  line.empty? and next
   num_chunks += 1
-  line.chop!
   md = _RX1.match line
   md or fail "does not match first line pattern: -->#{ line }<--"
   line = in_io.gets

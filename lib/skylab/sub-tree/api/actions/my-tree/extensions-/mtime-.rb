@@ -4,12 +4,12 @@ module Skylab::SubTree
 
     class Extensions_::Mtime_
 
-      SubTree::Lib_::Fields_via[ :client, self, :method, :absorb, :field_i_a,
+      SubTree::Lib_::Fields_with[ :client, self, :method, :_FIXME_absrb_7, :field_i_a,
         [ :local_normal_name, :infostream, :verbose ] ]
 
       def initialize *a
         @now_t = SubTree::Library_::Time.new  # doesn't get cleared anywhere
-        absorb( *a )
+        _FIXME_absrb_7( *a )
         nil
       end
 

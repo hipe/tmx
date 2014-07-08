@@ -20,26 +20,27 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_::Contoured_
         module Sandbox_1
           class Foo
             MetaHell::FUN::Fields_::Contoured_[ self,
-              :absorb_method, :absorb,
+              :absorber, :with,
               :proc, :foo,
               :memoized, :proc, :bar,
               :method, :bif,
               :memoized, :method, :baz ]
-              public :absorb
           end
+
+          # one line #until:[#ts-032]
         end
       end
       it "like so" do
         Sandbox_1.with self
         module Sandbox_1
-          f = Foo.new ; f.absorb( :foo, -> { :yes } ) ; f.foo.should eql( :yes )
+          foo = Foo.new ; foo.with :foo, -> { :yes } ; foo.foo.should eql( :yes )
         end
       end
       it "and so" do
         Sandbox_1.with self
         module Sandbox_1
           @ohai = :hi
-          f = Foo.new ; f.absorb(  :foo, -> { 'x' },
+          f = Foo.new ; f.with(  :foo, -> { 'x' },
                                    :bar, -> { "y:#{ @ohai }" },
                                    :bif, -> { "_#{ foo }_" },
                                    :baz, -> { "<#{ foo }>" } )
@@ -57,6 +58,7 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_::Contoured_
         module Sandbox_2
           class Foo
             MetaHell::FUN::Fields_::Contoured_[ self,
+              :overriding, :absorber, :initialize,
               :required, :field, :foo, :field, :bar ]
           end
         end

@@ -10,7 +10,9 @@ module Skylab::MetaHell
     #       def one
     #       end
     #
-    #       MetaHell::Fields::From.methods :argful do
+    #       MetaHell::Fields::From.methods(
+    #         :argful, :overriding, :globbing, :absorber, :initialize
+    #       ) do
     #         def two a
     #           @two_value = a.shift
     #         end
@@ -20,8 +22,6 @@ module Skylab::MetaHell
     #
     #       def three
     #       end
-    #
-    #       alias_method :initialize, :with
     #     end
     #
     #     Foo.new( :two, "foozle" ).two_value  # => 'foozle'
@@ -63,12 +63,21 @@ module Skylab::MetaHell
       end
     end
 
-    module From::Methods__
+    class From::Methods__
 
       def self.iambic_and_block a, blk
         client = eval 'self', blk.binding
-        box = Lib_::Touch_client_and_give_box[ :_FIXME_absrb, client ]
-        Method_Added_Muxer[ client ].in_block_each_method_added blk do |m|
+        new( client, a, blk ).execute
+      end
+
+      def initialize client, a, p
+        @client = client ; @i_a = a ; @p = p
+      end
+
+      def execute
+        parse_modifiers
+        box = MetaHell_::Fields.box_for_client( * bld_modifiers, @client )
+        Method_Added_Muxer[ @client ].in_block_each_method_added @p do |m|
           if box.has_field_attributes
             fa = box.delete_field_attributes
             p = -> fld do
@@ -77,15 +86,58 @@ module Skylab::MetaHell
               end
             end
           end
-          box.add m, Field_From_Method_.new( m, p )
+          box.add m, Field_From_Method__.new( m, p )
+        end ; nil
+      end
+    private
+      def parse_modifiers
+        @explicit_pass_thru = nil
+        @d = -1 ; last = @i_a.length - 1
+        while @d < last
+          send OP_H__.fetch @i_a.fetch @d += 1
         end
-        nil
+      end
+      OP_H__ = {
+        absorber: :pass_thru_two,  # EEW [#064]
+        argful: :parse_argful,
+        globbing: :pass_thru_one,
+        globless: :pass_thru_one,
+        overriding: :pass_thru_one
+      }.freeze
+
+      def pass_thru_one
+        pass_thru 1
       end
 
-      class Field_From_Method_ < MetaHell_::Lib_::Aspect[]
-        def absorb agent, a
-          agent.send @method_i, a
-          nil
+      def pass_thru_two
+        pass_thru 2
+      end
+
+      def pass_thru d
+        @explicit_pass_thru ||= []
+        @explicit_pass_thru.concat @i_a[ @d, d ]
+        @d += ( d - 1 ) ; nil
+      end
+
+      def parse_argful
+        # one day use this to knock out [#063]
+      end
+
+      def bld_modifiers
+        if @explicit_pass_thru
+          @explicit_pass_thru
+        else
+          DEFAULT_MODIFIERS__
+        end
+      end
+
+      DEFAULT_MODIFIERS__ = [
+        :globless, :absorber, :absorb_iambic_fully,
+        :passive, :absorber, :absorb_iambic_passively ].freeze
+
+      class Field_From_Method__ < MetaHell_::Lib_::Aspect[]
+        def absorb_into_client_iambic client, x_a
+          client.send @method_i, x_a ; nil
         end
       end
     end

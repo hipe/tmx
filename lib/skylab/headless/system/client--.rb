@@ -21,7 +21,7 @@ module Skylab::Headless
       SAFE_NAME_RX__ = /\A[-a-z0-9_]+\z/i
 
 
-      defn_x_a = [ :absorb_method, :absrb ]
+      defn_x_a = [ :absorber, :absrb ]  # #_FIXME_
       o = defn_x_a.method :push  # declarations
       a = []  # definitions
 

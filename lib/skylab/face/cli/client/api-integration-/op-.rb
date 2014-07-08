@@ -58,10 +58,14 @@ module Skylab::Face
       Option = Face_::CLI::Client::Lib_::Option_model_class[]
 
       def add_desc opt, fld
-        y = [ ]
-        @any_expression_agent.instance_exec y, & fld.desc_value
-        opt.set_desc_a y
-        nil
+        y = []
+        x = fld.desc_value
+        if x.respond_to? :call
+          @any_expression_agent.instance_exec y, & x
+        else
+          y << x
+        end
+        opt.set_desc_a y ; nil
       end
 
       def build_proc fld

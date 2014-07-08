@@ -18,7 +18,7 @@ module Skylab::SubTree
     # order matters above - since test nodes get merged destructively into
     # code nodes, the order is as such and never the reverse.
 
-    Lib_::Fields_via[ :client, self, :method, :absorb_params,
+    Lib_::Fields_with[ :client, self, :method, :absorb_params,
       :field_i_a, [ :list_as, :path, :be_verbose ] ]
 
     def initialize

@@ -5,6 +5,7 @@ module Skylab::SubTree
     class Upstream_
 
       Lib_::Contoured_fields[ self,
+        :overriding, :globbing, :absorber, :initialize,
         :required, :field, :be_verbose,
         :required, :field, :info_p ]
 
@@ -33,8 +34,7 @@ module Skylab::SubTree
         end
       end
 
-      module From_
-      end
+      From_ = ::Module.new
 
       class From_::Filesystem_ < self
 

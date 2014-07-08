@@ -104,7 +104,7 @@ module Skylab::SubTree
       MetaHell__[]::FUN::Fields_.add_field_i_a_to_mod i_a, mod
     end
 
-    Fields_via = -> * x_a do
+    Fields_with = -> * x_a do
       MetaHell__[]::FUN::Fields_.via_iambic x_a
     end
 

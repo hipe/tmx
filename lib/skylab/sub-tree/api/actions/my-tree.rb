@@ -4,13 +4,9 @@ module Skylab::SubTree
 
     SubTree::Lib_::Enhance_as_API_normalizer[ self, :all ]
 
-    Lib_::Fields_via[ :client, self, :method, :absorb_iambic,
+    Lib_::Fields_with[ :client, self, :method, :_FIXME_15_with_,
       :field_i_a, [ :expression_agent, :program_name, :param_h,
                     :upstream, :paystream, :infostream ] ]
-    def absorb * a
-      absorb_iambic( * a )
-      self
-    end
 
     VERBOSE_SET_A = [ 'find command', 'lines' ].freeze
     VSA_ = [ 'v', * VERBOSE_SET_A.map { |str| str[ 0 ] } ].freeze
@@ -153,7 +149,7 @@ module Skylab::SubTree
 
     def traverse_direct
       t = @traversal ; u = @upstream ; line = nil
-      t.absorb :out_p, @paystream.method( :puts )
+      t._CONFIRM_ME_1_with :out_p, @paystream.method( :puts )
       t.puts line while (( line = u.gets ))
       close_upstream_and_flush_traversal
       true
@@ -171,7 +167,7 @@ module Skylab::SubTree
 
     def traverse_with_notification  # assume extensions
       u = @upstream ; t = @traversal
-      t.absorb :out_p, @paystream.method( :puts )
+      t._CONFIRM_ME_1_with  :out_p, @paystream.method( :puts )
       while (( line = u.gets ))
         line.chomp!
         lf = Leaf_.new line
@@ -184,7 +180,7 @@ module Skylab::SubTree
 
     def traverse_via_triple_buffer  # assume extensions
       u = @upstream ; t = @traversal ; row_a = [ ]
-      t.absorb :out_p, -> glyphs, slug, any_leaf do
+      t._CONFIRM_ME_1_with :out_p, -> glyphs, slug, any_leaf do
         row_a << Row_.new( glyphs, slug, any_leaf )
         nil
       end

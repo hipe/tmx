@@ -1,3 +1,4 @@
+[#032] #open #doc-test change sytax to work with contiguous nonblank lines
 [#031] #open #tracking-tag while regret no longer wires test nodes for autoloading
 [#030] #open the doc-test recursive spec needs mock fs
 [#029]       #tracking-tag the 'expect' omnibus and narrative ..

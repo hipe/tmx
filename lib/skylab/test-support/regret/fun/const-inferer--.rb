@@ -14,6 +14,7 @@ module Skylab::TestSupport
         TestSupport_::Lib_::Funcy[ self ]
 
         Lib_::Fields_contoured[ self,
+          :overriding, :absorber, :initialize,
           :required, :field, :tail_path,
           :required, :field, :notice_p ]
 

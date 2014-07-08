@@ -6,7 +6,7 @@ module ::Skylab::Porcelain
 
       MetaHell::Funcy[ self ]
 
-      MetaHell::FUN::Fields_[ :client, self, :method, :absorb, :field_i_a, [
+      MetaHell::FUN::Fields_[ :client, self, :method, :_FIXME_10_absrb, :field_i_a, [
        :glyphset_x ] ]
 
       class Scn__ < ::Proc
@@ -28,7 +28,7 @@ module ::Skylab::Porcelain
       def initialize tree, *a
         @tree = tree
         @initial_spaces ||= '  '
-        absorb( *a )
+        _FIXME_10_absrb( *a ) ; nil
       end
 
       def execute

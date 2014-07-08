@@ -55,7 +55,7 @@ module ::Skylab::MetaHell::TestSupport::Class::Creator
       context "for which if you use a literal class constant" do
         snip do
           klass :MyEnumerator, extends: ::Enumerator do
-            def initialize ; end # override parent
+            def initialize ; end  # override parent
           end
         end
         it "the created class will subclass it" do

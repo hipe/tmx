@@ -28,7 +28,7 @@ module Skylab::Callback
       end ; nil
     end
 
-    def absorb param_h
+    def absorb_param_h_fully param_h
       param_h_h = ::Hash[ formal_parameters.map { |p| [ p.sym, p ] } ]
       param_h.each do |k, v|
         instance_variable_set param_h_h.fetch( k ).ivar, v

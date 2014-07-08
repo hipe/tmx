@@ -10,6 +10,8 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_
 
   Subject = MetaHell::FUN::Fields_::Contoured_
 
+  ABSORBER__ = [ :overriding, :absorber, :initialize ].freeze
+
   describe "[mh] fun fields periphery" do
 
     it "whines on weirdness" do
@@ -22,7 +24,8 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_
 
     it "makes a non-memoized proc" do
       class Bar
-        Subject[ self, :proc, :jimmy ]
+        Subject[ self, * ABSORBER__,
+          :proc, :jimmy ]
       end
       b = Bar.new( :jimmy, -> { 'whales' } )
       (( s1 = b.jimmy )).should eql( 'whales' )
@@ -32,7 +35,8 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_
 
     it "makes a memoizing proc" do
       class Baz
-        Subject[ self, :memoized, :proc, :jimmy ]
+        Subject[ self, * ABSORBER__,
+          :memoized, :proc, :jimmy ]
       end
       b = Baz.new( :jimmy, -> { 'whales' } )
       (( s1 = b.jimmy )).should eql( 'whales' )
@@ -42,7 +46,8 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_
 
     it "one memoized and one not" do
       class Biff
-        Subject[ self, :proc, :jimmy, :memoized, :proc, :jammy ]
+        Subject[ self, * ABSORBER__,
+          :proc, :jimmy, :memoized, :proc, :jammy ]
       end
       b = Biff.new( :jimmy, -> { 'whiles' }, :jammy, -> { 'whales' } )
       s1, s2, s3, s4 = b.jimmy, b.jammy, b.jimmy, b.jammy

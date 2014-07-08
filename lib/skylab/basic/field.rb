@@ -244,9 +244,13 @@ class Skylab::Basic::Field
       @is_predicate ||= :"is_#{ @local_normal_name }"
     end                                  # for both meta fields and meta meta
                                          # fields...
+
+    def absorb_into_client_iambic client, _x_a
+      client.instance_variable_set as_is_predicate_ivar, true ; nil
+    end
+
     def mutate inst, _scn
-      inst.instance_variable_set as_is_predicate_ivar, true
-      nil
+      inst.instance_variable_set as_is_predicate_ivar, true ; nil
     end
 
     def as_is_predicate_ivar
@@ -320,17 +324,22 @@ class Skylab::Basic::Field
       @value_ivar ||= :"@#{ @local_normal_name }_value"
     end
 
+    def absorb_into_client_iambic client, x_a
+      set_val client, x_a.shift ; nil
+    end
+
     def mutate inst, scn
       scn.eos? and raise "expecting a property (any value) after :property"
-      x = scn.gets  # if scn is not eos then e.g. hook
-      ivar, jvar = as_has_predicate_ivar, as_value_ivar
-      inst.instance_exec do
-        instance_variable_set ivar, true
-        instance_variable_set jvar, x
-      end
+        # if scn is not eos then e.g. hook
+      set_val inst, scn.gets
       if has_hooks && (( p = @hook_box.fetch :mutate do end ))
         p[ inst ]
-      end
+      end ; nil
+    end
+
+    def set_val client, x
+      client.instance_variable_set as_has_predicate_ivar, true
+      client.instance_variable_set as_value_ivar, x
       nil
     end
 

@@ -103,7 +103,7 @@ module Skylab::Face  # read [#011] the top node narrative
       MetaHell__[]::Fields::From.methods.iambic_and_block a, p
     end
 
-    Fields_via = -> * x_a do
+    Fields_with = -> * x_a do
       MetaHell__[]::FUN::Fields_.via_iambic x_a
     end
 

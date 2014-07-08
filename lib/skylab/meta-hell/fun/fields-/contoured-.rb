@@ -2,8 +2,6 @@ module Skylab::MetaHell
 
   module FUN::Fields_
 
-    self::Mechanics_.touch
-
     module Contoured_
 
       # use it
@@ -11,22 +9,21 @@ module Skylab::MetaHell
       #
       #     class Foo
       #       MetaHell::FUN::Fields_::Contoured_[ self,
-      #         :absorb_method, :absorb,
+      #         :absorber, :with,
       #         :proc, :foo,
       #         :memoized, :proc, :bar,
       #         :method, :bif,
       #         :memoized, :method, :baz ]
-      #         public :absorb
       #     end
       #
-      #     foo = Foo.new
-      #     foo.absorb_fully( :foo, -> { :yes } )
-      #     foo.foo  # => :yes
+      #     # one line #until:[#ts-032]
+      #
+      #     foo = Foo.new ; foo.with :foo, -> { :yes } ; foo.foo  # => :yes
       #
       # and so:
       #
       #     @ohai = :hi
-      #     f = Foo.new ; f.absorb(  :foo, -> { 'x' },
+      #     f = Foo.new ; f.with(  :foo, -> { 'x' },
       #                              :bar, -> { "y:#{ @ohai }" },
       #                              :bif, -> { "_#{ foo }_" },
       #                              :baz, -> { "<#{ foo }>" } )
@@ -42,53 +39,56 @@ module Skylab::MetaHell
           from_iambic_and_client a, client
         end
         def from_iambic_and_client a, client
-           Glint_.new( client ).absorb( a ).flush
+           Glint__.new( client ).with_iambic_absorbed_fully( a ).flush
         end
       end
 
-      class Glint_
+      class Glint__
 
         def initialize client
-          @field_box = @absorb_method_x = nil
           @client = client
-          nil
+          @field_box = nil
         end
 
-        def absorb a
+        def with_iambic_absorbed_fully x_a
+          @d = 0 ; @x_a = x_a ; len = x_a.length
           begin
-            send OP_H_.fetch( a.shift ), a
-          end while a.length.nonzero?
+            send OP_H__.fetch @x_a.fetch @d
+          end while @d < len
           self
         end
         #
-        OP_H_ = {
-          absorb_method: :parse_absorb_method,
-          proc: :parse_proc,
+        OP_H__ = {  # near [#064]
+          absorber: :parse_absorber,
+          field: :parse_field,
+          globbing: :parse_absorber,
           memoized: :parse_memoized,
           method: :parse_method,
-          required: :parse_required,
-          field: :parse_field
+          overriding: :parse_absorber,
+          private: :parse_absorber,
+          proc: :parse_proc,
+          required: :parse_required
         }.freeze
 
         def flush
           @field_box or field_box
-          Touch_const_with_dupe_for_[ -> _ do
-            p = Required_fields_check_[ @field_box ]
+          MetaHell_::Fields::Touch_const_with_dupe_for___[ -> _ do
+            p = Required_fields_check__[ @field_box ]
             @client.facet_muxer.add_hook_listener :post_absorb, p
             p
-          end, :CONTOURED_REQUIRED_CHECK_, @client ]
-          nil
+          end, :CONTOURED_REQUIRED_CHECK_, @client ] ; nil
         end
         #
-        Required_fields_check_ = -> field_box do  # on dupe, rewrite the func
+        Required_fields_check__ = -> field_box do  # on dupe, rewrite the func
           on_dupe_for = -> client do
-            Dupable_Proc_.new on_dupe_for, &
-              Req_check_[ client.const_get CONST_ ]
+            Dupable_Proc__.new on_dupe_for, &
+              Req_check__[ client.const_get CONST__ ]
           end
-          Dupable_Proc_.new on_dupe_for, & Req_check_[ field_box ]
+          Dupable_Proc__.new on_dupe_for, & Req_check__[ field_box ]
         end
+        CONST__ = MetaHell_::Fields::CONST_
         #
-        Req_check_ = -> field_box do
+        Req_check__ = -> field_box do
           -> agent do
             miss_a = field_box._a.reduce [] do |m, method_i|
               (( fld = field_box.fetch method_i )).is_required or next m
@@ -102,12 +102,11 @@ module Skylab::MetaHell
           end
         end
         #
-        class Dupable_Proc_ < ::Proc
+        class Dupable_Proc__ < ::Proc
           class << self ; alias_method :[], :new end
           def initialize on_dupe_for, &blk
             super( &blk )
-            @on_dupe_for = on_dupe_for
-            nil
+            @on_dupe_for = on_dupe_for ; nil
           end
           def dupe_for x
             @on_dupe_for[ x ]
@@ -124,101 +123,88 @@ module Skylab::MetaHell
       private
 
         def field_box
-          @field_box ||= begin
-            Touch_client_and_give_box_[
-              @absorb_method_x || [ :override, :initialize ] , @client ]
-          end
+          @field_box ||= bld_field_box
         end
 
-        def parse_absorb_method a
-          x = a.fetch( 0 ) ; a.shift
-          @absorb_method_x = x
-          nil
+        def bld_field_box
+          MetaHell_::Fields::Box_for.client @client
         end
 
-        def parse_proc a
-          ( add_proc_field_with_name a ).flush @client
-          nil
+        def parse_absorber
+          d, item = MetaHell_::Fields::Absorber_Method_.
+            unobtrusive_passive_scan @d - 1, @x_a
+          d or raise ::ArgumentError, "syntax mixmatch near '#{ @x_a[ @d ] }'"
+          item.apply_to_client @client
+          @d = d + 1 ; nil
         end
 
-        def parse_method a
-          ( add_method_field_with_name a ).flush @client
-          nil
+        def parse_proc
+          accept_name_and_add_proc_field.flush @client ; nil
         end
 
-        def parse_memoized a
-          curry_branch proc: :parse_memoized_proc,
-                     method: :parse_memoized_method
-          parse_memoized a
-          nil
+        def parse_method
+          accept_name_and_add_method_field.flush @client ; nil
         end
 
-        def parse_memoized_proc a
-          add_proc_field_with_name a do |fld|
+        def parse_memoized
+          parse_with_branch MEMOIZED_BRANCH__
+        end
+
+        MEMOIZED_BRANCH__ = {
+          proc: :parse_memoized_proc,
+          method: :parse_memoized_method }.freeze
+
+        def parse_with_branch h
+          send h.fetch @x_a.fetch @d += 1
+        end
+
+        def parse_memoized_proc
+          accept_name_and_add_proc_field do |fld|
             fld.is_memoized = true
-          end.flush @client
-          nil
+          end.flush @client ; nil
         end
 
-        def parse_memoized_method a
-          add_method_field_with_name a do |fld|
+        def parse_memoized_method
+          accept_name_and_add_method_field do |fld|
             fld.is_memoized = true
-          end.flush @client
-          nil
+          end.flush @client ; nil
         end
 
-        def add_proc_field_with_name a, &blk
-          curry_field_builder Proc_
-          add_proc_field_with_name a, &blk
+        def accept_name_and_add_proc_field &blk
+          accept_name_and_add_field_with_class_and_block Proc__, blk
         end
 
-        def add_method_field_with_name a, &blk
-          curry_field_builder Method_
-          add_method_field_with_name a, &blk
+        def accept_name_and_add_method_field &blk
+          accept_name_and_add_field_with_class_and_block Method__, blk
         end
 
-        def curry_branch h
-          define_singleton_method caller_locations( 1, 1 )[ 0 ].base_label, &
-            Branch_.curry[ self, h ]
-          nil
-        end
-
-        Branch_ = -> r, h, a do
-          m = h.fetch( a.fetch 0 ) ; a.shift
-          r.send m, a
-        end
-
-        def curry_field_builder field_class
-          define_singleton_method caller_locations( 1, 1 )[ 0 ].base_label, &
-            Add_to_fields_with_class_and_name_.curry[ field_box, field_class ]
-          nil
-        end
-        #
-        Add_to_fields_with_class_and_name_ = -> fields, klass, a, &blk do
-          method_i = a.fetch( 0 ) ; a.shift
-          fld = klass.new method_i, blk
-          fields.add method_i, fld
+        def accept_name_and_add_field_with_class_and_block cls, p
+          field_bx = field_box
+          method_i = @x_a.fetch @d + 1
+          @d += 2
+          fld = cls.new method_i, p
+          field_bx.add method_i, fld
           fld
         end
-
-        # i just blue myself
+        # (was: [#062] "i just blue myself")
       end
 
-      class Procesque_ < Aspect_
+      Aspect_ = MetaHell_::Fields::Aspect_  # until [#061]
+
+      class Procesque__ < Aspect_
         def initialize( * )
           @is_memoized = false
           super
         end
         attr_accessor :is_memoized
-        def absorb client, a
+        def absorb_into_client_iambic client, a
           prock = a.fetch( 0 ) ; a.shift
           prock.respond_to? :call or fail "sanity - #{ prock.class }"
-          client.instance_variable_set @ivar, prock
-          nil
+          client.instance_variable_set @ivar, prock ; nil
         end
       end
 
-      class Proc_ < Procesque_
+      class Proc__ < Procesque__
         def flush client
           ivar = @ivar
           if @is_memoized
@@ -237,7 +223,7 @@ module Skylab::MetaHell
         end
       end
 
-      class Method_ < Procesque_
+      class Method__ < Procesque__
         def flush client
           ivar = @ivar
           if @is_memoized
@@ -262,6 +248,7 @@ module Skylab::MetaHell
     #
     #     class Foo
     #       MetaHell::FUN::Fields_::Contoured_[ self,
+    #         :overriding, :absorber, :initialize,
     #         :required, :field, :foo, :field, :bar ]
     #     end
     #
@@ -280,38 +267,35 @@ module Skylab::MetaHell
     #     Foo.new( :foo, :x, :bar, nil ).bar  # => nil
     #
 
-      class Field_ < Aspect_
+      class Field__ < Aspect_
         attr_writer :is_required  # not pushed up yet
         def flush client
           client.send :attr_reader, @method_i
         end
-        def absorb client, a
+        def absorb_into_client_iambic client, a
           x = a.fetch 0 ; a.shift
-          client.instance_variable_set @ivar, x
-          nil
+          client.instance_variable_set @ivar, x ; nil
         end
       end
 
-      class Glint_
+      class Glint__
       private
-        def parse_required a
-          curry_branch field: :parse_required_field
-          parse_required a
-          nil
+        def parse_required
+          parse_with_branch REQUIRED_BRANCH__
         end
-        def parse_field a
-          add_field_with_name( a ).flush @client
-          nil
+        REQUIRED_BRANCH__ = {
+          field: :parse_required_field }.freeze
+
+        def parse_field
+          take_name_and_add_field.flush @client ; nil
         end
-        def parse_required_field a
-          add_field_with_name a do |fld|
+        def parse_required_field
+          take_name_and_add_field do |fld|
             fld.is_required = true
-          end.flush @client
-          nil
+          end.flush @client ; nil
         end
-        def add_field_with_name a, &blk
-          curry_field_builder Field_
-          add_field_with_name a, &blk
+        def take_name_and_add_field &blk
+          accept_name_and_add_field_with_class_and_block Field__, blk
         end
       end
     end

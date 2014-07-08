@@ -46,7 +46,7 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree
         @o.debug! 's-tdout; '
         @e.debug! 's-tderr: '
       end
-      f.absorb :param_h, { }, :upstream, up, :paystream, @o, :infostream, @e
+      f._FIXME_15_with_ :param_h, { }, :upstream, up, :paystream, @o, :infostream, @e
       f
     end
 

@@ -141,7 +141,7 @@ module Skylab::Face
       def initialize *a
         @meta_param_x_a = @param_class = nil
         @params = Param_Field_[]::Box.new
-        _FIXME_absrb( * a ) ; nil
+        _FIXME_13_( * a ) ; nil
       end
 
       attr_reader :params
@@ -151,7 +151,9 @@ module Skylab::Face
       end
 
       private
-      Lib_::Fields_from_methods[ -> do
+      Lib_::Fields_from_methods[
+        :globbing, :absorber, :_FIXME_13_,
+      -> do
 
         def client a
           @client_mod = a.shift
@@ -166,7 +168,7 @@ module Skylab::Face
         def param a
           @param_class || bake_param_class
           param = @param_class.new( a.fetch 0 ) ; a.shift
-          param.absorb_iambic_fully a
+          param.absorb_iambic_passively a
           @params.add param.local_normal_name, param
           nil
         end

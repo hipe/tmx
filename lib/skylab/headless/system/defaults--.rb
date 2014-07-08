@@ -43,8 +43,9 @@ module Skylab::Headless
       _MEMBER_I_A = ( a.length / 2 ).times.map { |d| a[ d * 2 ] }.freeze
 
 
-      MetaHell_::FUN::Fields_::Contoured_[ self, *
-        ( _MEMBER_I_A.reduce [] do |m, i|
+      MetaHell_::FUN::Fields_::Contoured_[ self,
+        :overriding, :globbing, :absorber, :initialize,
+        * ( _MEMBER_I_A.reduce [] do |m, i|
           m << :memoized << :proc << i
         end ) ]
 

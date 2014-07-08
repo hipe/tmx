@@ -11,7 +11,7 @@ module Skylab::SubTree
                 info_tree: :structural
 
 
-    Lib_::Fields_via[ :client, self, :method, :absorb, :field_i_a,
+    Lib_::Fields_with[ :client, self, :method, :_FIXME_8_absrb, :field_i_a,
                             [ :list_as, :path, :be_verbose ] ]
 
     def initialize
@@ -26,7 +26,7 @@ module Skylab::SubTree
     end
 
     def prepare *a
-      absorb( *a )
+      _FIXME_8_absrb( *a )
       normalize_arg_pn @path
       if ! @error_was_emitted && @list_as
         normalize_list_as

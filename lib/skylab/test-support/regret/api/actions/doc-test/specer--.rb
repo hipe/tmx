@@ -4,12 +4,12 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
 
     RegretLib_ = ::Skylab::TestSupport::Regret::API::RegretLib_
 
-    RegretLib_::Fields[ :client, self, :method, :absorb, :field_i_a,
+    RegretLib_::Fields[ :client, self, :method, :_FIXME_2_absorb, :field_i_a,
       %i( core_basename load_file load_module
         outstream path snitch templo_name ) ]
 
     def initialize *a
-      absorb( *a )
+      _FIXME_2_absorb( *a )
       @base_mod = nil
       @block_a = []
     end

@@ -89,7 +89,8 @@ module Skylab::Callback
       additional_file.unshift file
       _, o, e = three_streams
       gv = Callback_::API::Actions::GraphViz.new program_name, o, e
-      gv.absorb @param_h.merge!( files: additional_file, modul: modul,
+      gv.absorb_param_h_fully @param_h.merge!(
+        files: additional_file, modul: modul,
         do_guess_mod: do_guess_mod )
       x = gv.execute
       usage_and_invite if false == x
@@ -118,7 +119,7 @@ module Skylab::Callback
     def fire file, klass, stream_name
       _, o, e = three_streams
       fi = Callback_::API::Actions::Fire.new program_name, o, e
-      fi.absorb @param_h.merge!( files: [ file ], modul: klass,
+      fi.absorb_param_h_fully @param_h.merge!( files: [ file ], modul: klass,
         opendata: ( @opendata || false ), stream_name: stream_name.intern )
       x = fi.execute
       usage_and_invite if false == x

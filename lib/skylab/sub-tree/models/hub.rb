@@ -2,12 +2,12 @@ module Skylab::SubTree
 
   class Models::Hub
 
-    Lib_::Fields_via[ :client, self, :method, :absorb,
+    Lib_::Fields_with[ :client, self, :method, :_FIXME_4_absrb,
      :field_i_a, [ :test_dir_pn, :sub_path_a, :local_test_pathname_ea,
                    :lister_p, :info_tree_p ] ]
 
     def initialize *a
-      absorb( *a )
+      _FIXME_4_absrb( *a )
       @did_show_debubbing_output = false
       @sub_hub_pn = nil
     end

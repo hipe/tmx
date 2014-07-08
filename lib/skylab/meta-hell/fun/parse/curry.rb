@@ -3,7 +3,7 @@ module Skylab::MetaHell
   module FUN::Parse::Curry  # read [#011] the fun parse curry narrative
 
     def self.[] * input_a
-      Parse_.new( input_a ).shell
+      Parse__.new( input_a ).shell
     end
 
     Parse = FUN::Parse
@@ -64,7 +64,7 @@ module Skylab::MetaHell
       end
     end
 
-    class Parse_
+    class Parse__
       def initialize input_a
         @abstract_field_list = @call_p = @constantspace_mod =
           @do_glob_extra_args = @exhaustion_p = @syntax = nil
@@ -72,7 +72,7 @@ module Skylab::MetaHell
             MetaHell::Library_::Basic::Mutex::Write_Once.new :state_mutex
           # state encompasses input and output. various algorithms may handle
           # input and output together or separately, but we ensure that etc.
-        _FIXME_absrb( * input_a ) ; nil
+        _FIXME_12_( * input_a ) ; nil
       end
 
       # ~ :+[#056] typical base class implementation:
@@ -233,7 +233,7 @@ module Skylab::MetaHell
         a.length.times do
           aa << cq.shift << a.shift
         end
-        _FIXME_absrb( * aa ) ; nil
+        _FIXME_12_( * aa ) ; nil
       end
       def say_too_many cq, a
         "too many arguments (#{ a.length } for #{ cq.length } #{
@@ -273,7 +273,10 @@ module Skylab::MetaHell
           MetaHell::EMPTY_P_
         end
       end
-    MetaHell_::Fields::From.methods :argful do  # borrow 1 indent
+    MetaHell_::Fields::From.methods( :argful,
+        :globbing, :absorber, :_CONFIRM_ME_2_with,
+        :absorber, :_FIXME_12_ ) do  # borrow 1 indent
+
       def algorithm a
         @algorithm_p = a.fetch 0 ; a.shift
         nil
@@ -340,9 +343,11 @@ module Skylab::MetaHell
       end
       def syntax a
         did = nil
-        @syntax ||= ( did = true and Syntax_.new )
+        @syntax ||= ( did = true and Syntax__.new )
         did or fail "you should probably deep dup these immutable syntaxes!"
-        @syntax.absorb_iambic_fully a ; nil
+        d = a.length
+        @syntax.absorb_iambic_passively a
+        d == a.length and raise ::ArgumentError, "syntax needs argument"
       end
       def field a
         dflt = ( @default_field if instance_variable_defined? :@default_field )
@@ -369,7 +374,7 @@ module Skylab::MetaHell
         else
           field = x ; a.shift
         end
-        do_absorb and field.absorb_iambic_fully a
+        do_absorb and field.absorb_iambic_passively a
         field
       end
       def constantspace a
@@ -379,7 +384,7 @@ module Skylab::MetaHell
       end  # (pay one back)
     end
 
-    class Syntax_
+    class Syntax__
       def build_syntax_proc afl
         mk = @monikate_p
         -> do

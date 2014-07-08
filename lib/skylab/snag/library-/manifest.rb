@@ -13,7 +13,7 @@ module Skylab::Snag
 
     def curry_enum *a
       ea = self.class::Enum_.new  @pathname, -> { manifest_file }
-      ea.absorb( * a )
+      ea._FIXME_9_absrb( *a )
       ea
     end
 

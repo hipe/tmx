@@ -21,10 +21,9 @@ module Skylab::MetaHell
   module Lib_
     memo = MetaHell::FUN::Memoize
 
-    Aspect = memo[ -> do
-      MetaHell_::FUN::Fields_::Mechanics_.touch
-      MetaHell_::FUN::Fields_::Aspect_
-    end ]
+    Aspect = -> do
+      MetaHell_::Fields::Aspect_
+    end
 
     Callback__ = memo[ -> { Library_::Callback } ]
 
@@ -32,9 +31,8 @@ module Skylab::MetaHell
       Callback__[].distill
     end
 
-    Touch_client_and_give_box = -> * a do
-      MetaHell_::FUN::Fields_::Mechanics_.touch
-      MetaHell_::FUN::Fields_::Touch_client_and_give_box_[ *a ]
+    Scn = -> do
+      Callback__[]::Scn
     end
   end
 end

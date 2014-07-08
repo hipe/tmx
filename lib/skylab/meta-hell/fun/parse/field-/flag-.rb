@@ -25,7 +25,7 @@ module Skylab::MetaHell
 
       def with *a
         fail 'fix me'  # #todo
-        absorb( * a )
+        absorb_iambic_fully a
         self
       end
 
