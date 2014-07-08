@@ -14,7 +14,7 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_::ICAF_
 
       class Foo
 
-        MetaHell::FUN::Fields_::Contoured_[ self,
+        MetaHell::Fields.contoured[ self,
           :overriding, :absorber, :initialize,
           :field, :foo,
           :required, :field, :bar ]

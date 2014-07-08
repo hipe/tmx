@@ -8,7 +8,7 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_
 
   extend TestSupport::Quickie
 
-  Subject = MetaHell::FUN::Fields_::Contoured_
+  Subject = MetaHell::Fields.contoured
 
   ABSORBER__ = [ :overriding, :absorber, :initialize ].freeze
 

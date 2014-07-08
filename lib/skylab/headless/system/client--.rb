@@ -40,7 +40,7 @@ module Skylab::Headless
       end
 
 
-      MetaHell_::FUN::Fields_::Contoured_[ self, * defn_x_a ]
+      MetaHell_::Fields.contoured self, * defn_x_a
 
       DEFAULT_ARG_X_A__ = a.freeze
 

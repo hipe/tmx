@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::FUN::Fields_::Contoured_
+module Skylab::MetaHell::TestSupport::Fields::Contoured__
 
-  ::Skylab::MetaHell::TestSupport::FUN::Fields_[ self ]
+  ::Skylab::MetaHell::TestSupport::Fields[ self ]
 
   include CONSTANTS
 
@@ -12,19 +12,19 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_::Contoured_
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::MetaHell::FUN::Fields_::Contoured_" do
+  describe "Skylab::MetaHell::Fields::Contoured__" do
     context "use it" do
       Sandbox_1 = Sandboxer.spawn
       before :all do
         Sandbox_1.with self
         module Sandbox_1
           class Foo
-            MetaHell::FUN::Fields_::Contoured_[ self,
+            MetaHell::Fields.contoured self,
               :absorber, :with,
               :proc, :foo,
               :memoized, :proc, :bar,
               :method, :bif,
-              :memoized, :method, :baz ]
+              :memoized, :method, :baz
           end
 
           # one line #until:[#ts-032]
@@ -57,9 +57,9 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_::Contoured_
         Sandbox_2.with self
         module Sandbox_2
           class Foo
-            MetaHell::FUN::Fields_::Contoured_[ self,
+            MetaHell::Fields.contoured self,
               :overriding, :absorber, :initialize,
-              :required, :field, :foo, :field, :bar ]
+              :required, :field, :foo, :field, :bar
           end
         end
       end

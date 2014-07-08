@@ -79,7 +79,7 @@ module Skylab::TestSupport
     end
 
     Fields_contoured = -> mod, * x_a do
-      MetaHell__[]::FUN::Fields_::Contoured_.from_iambic_and_client x_a, mod
+      MetaHell__[]::Fields.contoured.from_iambic_and_client x_a, mod
     end
 
     Funcy = -> mod do

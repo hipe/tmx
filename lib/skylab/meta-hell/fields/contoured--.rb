@@ -1,19 +1,19 @@
 module Skylab::MetaHell
 
-  module FUN::Fields_
+  module Fields
 
-    module Contoured_
+    module Contoured__
 
       # use it
       # like so:
       #
       #     class Foo
-      #       MetaHell::FUN::Fields_::Contoured_[ self,
+      #       MetaHell::Fields.contoured self,
       #         :absorber, :with,
       #         :proc, :foo,
       #         :memoized, :proc, :bar,
       #         :method, :bif,
-      #         :memoized, :method, :baz ]
+      #         :memoized, :method, :baz
       #     end
       #
       #     # one line #until:[#ts-032]
@@ -39,7 +39,7 @@ module Skylab::MetaHell
           from_iambic_and_client a, client
         end
         def from_iambic_and_client a, client
-           Glint__.new( client ).with_iambic_absorbed_fully( a ).flush
+          Glint__.new( client ).with_iambic_absorbed_fully( a ).flush
         end
       end
 
@@ -247,9 +247,9 @@ module Skylab::MetaHell
     # failing to pass a required field triggers an argument error
     #
     #     class Foo
-    #       MetaHell::FUN::Fields_::Contoured_[ self,
+    #       MetaHell::Fields.contoured self,
     #         :overriding, :absorber, :initialize,
-    #         :required, :field, :foo, :field, :bar ]
+    #         :required, :field, :foo, :field, :bar
     #     end
     #
     #     Foo.new  # => ArgumentError: missing required argument - foo

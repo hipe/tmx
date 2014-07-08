@@ -17,10 +17,10 @@ lib/skylab/headless/nlp/en/levenshtein.rb
 lib/skylab/information-tactics/levenshtein.rb
 lib/skylab/meta-hell/boxxy.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/meta-hell/dsl-dsl.rb
+lib/skylab/meta-hell/fields/contoured--.rb
 lib/skylab/meta-hell/fields/from.rb
 lib/skylab/meta-hell/fun.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/meta-hell/fun/fields-.rb  #branch-down-to-core  #regret-setup:no
-lib/skylab/meta-hell/fun/fields-/contoured-.rb
 lib/skylab/meta-hell/fun/parse.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/meta-hell/fun/parse/alternation-.rb
 lib/skylab/meta-hell/fun/parse/from-ordered-set.rb

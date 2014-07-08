@@ -396,6 +396,18 @@ module Skylab::MetaHell
       end
     end
 
+    # ~
+
+    def self.contoured * x_a
+      if x_a.length.zero?
+        self::Contoured__
+      else
+        self::Contoured__.from_iambic_and_client x_a, x_a.shift
+      end
+    end
+
+    # ~
+
     CONST_ = :FIELDS_
 
   end
