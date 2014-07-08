@@ -25,8 +25,8 @@ module Skylab::TestSupport::Regret::API
       instance_variable_set :"@#{ @mode }", true
       @normalized_argument_path = get_normalized_argument_path
       @wlk = build_walker
-      a = get_leaf_pathname_a
-      a and process_leaf_pathname_a a
+      a = get_nonzero_leaf_pathname_a
+      a and prcss_nonzero_leaf_pathname_a a
     end
 
     def normalization_failure_line_notify msg
@@ -51,26 +51,30 @@ module Skylab::TestSupport::Regret::API
         :vtuple, @vtuple, :listener, generic_listener ]
     end
 
-    def get_leaf_pathname_a
+    def get_nonzero_leaf_pathname_a
       @paths = API::Conf
       dpn = @wlk.expect_upwards @paths.doc_test_dir
-      dpn and gt_pn_a_from_doctest_dir_pn dpn
+      dpn and gt_nonzero_pn_a_from_doctest_dir_pn dpn
     end
 
-    def gt_pn_a_from_doctest_dir_pn dpn
+    def gt_nonzero_pn_a_from_doctest_dir_pn dpn
       fpn = dpn.join @paths.doc_test_files_file
       ok = @wlk.expect_files_file fpn
-      ok and gt_leaf_pn_a_from_walker @wlk
+      ok and gt_nonzero_leaf_pn_a_from_walker @wlk
     end
 
-    def gt_leaf_pn_a_from_walker wlk
+    def gt_nonzero_leaf_pn_a_from_walker wlk
       a = nil
       wlk.subtree_pathnames.each do |pn|
         pn = map_rdc_the_pn pn
         pn or next
         ( a ||= [] ) << pn
       end
-      a
+      a ? a : when_no_paths
+    end
+
+    def when_no_paths
+      bork "no \"code-node\" files found matching path from here - #{ @path }"
     end
 
     def map_rdc_the_pn pn
@@ -129,16 +133,12 @@ module Skylab::TestSupport::Regret::API
       end
     end
 
-    def process_leaf_pathname_a a
-      if a.length.zero?
-        bork "no input files to process"
-      else
-        before_all
-        while (( pn = a.shift )) do
-          false == (( r = process_walker_pathname pn )) and break
-        end
-        r
+    def prcss_nonzero_leaf_pathname_a a
+      before_all
+      while (( pn = a.shift )) do
+        false == (( r = process_walker_pathname pn )) and break
       end
+      r
     end
 
     def before_all
