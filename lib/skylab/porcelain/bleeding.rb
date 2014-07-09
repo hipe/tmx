@@ -6,10 +6,19 @@ module Skylab::Porcelain::Bleeding
 
   ::Skylab::Autoloader[ self ]
 
+  Autoloader_ = ::Skylab::Callback::Autoloader
+
   Headless = ::Skylab::Headless
-  MetaHell = ::Skylab::MetaHell
   Porcelain = ::Skylab::Porcelain # #hiccup
   Callback = ::Skylab::Callback
+
+  module Lib_
+    sidesys = Autoloader_.build_require_sidesystem_proc
+    Let = -> mod do
+      mod.extend MetaHell__[]::Let
+    end
+    MetaHell__ = sidesys[ :MetaHell ]
+  end
 
   module Styles
     include Headless::NLP::EN::Methods
@@ -505,7 +514,8 @@ module Skylab::Porcelain::Bleeding
   end
 
   class ArgumentSyntax < ::Struct.new :params, :takes_options
-    extend MetaHell::Let # we freeze and memoize
+
+    Lib_::Let[ self ]  # we freeze and memoize
 
     parameter_string = -> o do
       pre, post = case o.type
@@ -707,8 +717,7 @@ module Skylab::Porcelain::Bleeding
   end
 
   module Adapter   # for "ouroboros" ([#hl-069]).
-
-    MetaHell::MAARS[ self ]
+    Autoloader_[ self ]
   end
 
   class Runtime
@@ -733,7 +742,7 @@ module Skylab::Porcelain::Bleeding
       a = 0.step( x_a.length - 2, 2 ).select do |idx| :argv == x_a[ idx ] end
       idx = a.pop ; begin
         argv = x_a.fetch idx + 1
-        x_a[ idx, 2 ] = MetaHell::EMPTY_A_
+        x_a[ idx, 2 ] = EMPTY_A_
       end while (( idx = a.pop ))
       r, args = resolve argv.dup
       if r
@@ -763,6 +772,8 @@ module Skylab::Porcelain::Bleeding
       super
     end
   end
+
+  EMPTY_A_ = [].freeze  # etc
 
   class MetaInferred
     include Meta::InstaceMethods

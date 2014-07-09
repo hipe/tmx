@@ -64,7 +64,7 @@ module Skylab::Porcelain
 
         MODI_OPERANDI_A_ = -> do
 
-          identity = MetaHell::IDENTITY_
+          identity = IDENTITY_
 
           an = -> x do
             an = Headless::NLP::EN::Minitesimal::FUN.an
@@ -152,7 +152,7 @@ module Skylab::Porcelain
             end
           end
           -> x do
-            MetaHell::FUN::Function_chain_[ f_a, [ x ] ]
+            Porcelain_::Lib_::Function_chain[ f_a, [ x ] ]
           end
         end.call
       end

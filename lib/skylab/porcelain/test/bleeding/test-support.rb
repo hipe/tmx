@@ -11,9 +11,12 @@ module Skylab::Porcelain::TestSupport::Bleeding
 
   include CONSTANTS
 
+  TestLib_ = TestLib_
+
   module ModuleMethods
-    extend MetaHell::Module::Creator
-    include MetaHell::Class::Creator
+    extend TestLib_::Module_creator[]
+    include TestLib_::Class_creator[]
+
     include CONSTANTS
 
     def base_module!

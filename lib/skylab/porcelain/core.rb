@@ -1,27 +1,24 @@
 require_relative '..'
-
 require 'skylab/callback/core'
 
-module Skylab
+module Skylab::Porcelain
 
-  module Porcelain
-
-    Callback = ::Skylab::Callback
+  Callback = ::Skylab::Callback
     Autoloader_ = Callback::Autoloader
-    o = Autoloader_.method :require_sidesystem
 
-    Face = o[ :Face ]
-    Headless = o[ :Headless ]
-    MetaHell = o[ :MetaHell ]
-    Porcelain = self
-    Porcelain_ = self
+  o = Autoloader_.method :require_sidesystem
 
-    # headless in porcelain yes. headles trumps porcelain.
+  Headless = o[ :Headless ] # headless in porcelain yes. headles trumps porcelain.
 
-    MAARS = MetaHell::MAARS
+  Porcelain = self
+  Porcelain_ = self
 
-    MAARS[ self ]
+  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
-    stowaway :Lib_, 'library-'
-  end
+  IDENTITY_ = -> x { x }
+
+  EMPTY_P_ = -> { }
+
+  stowaway :Lib_, 'library-'
+
 end

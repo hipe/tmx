@@ -9,12 +9,14 @@ module Skylab::Porcelain::TestSupport::Bleeding::Namespace
   Bleeding = Bleeding  # so you can reach b. from inside a class defintion
                        # inside a memoized `let` in a spec.
 
+  TestLib_ = TestLib_
+
   module ModuleMethods
 
     last_number = 0
 
     define_method :namespace do |&blk|
-      define_method :_ordinary_module, & MetaHell::FUN.memoize[ -> do
+      define_method :_ordinary_module, & TestLib_::Memoize[ -> do
         mod = ::Module.new  # (you're still not in the text instance ctxt btw)
         Namespace_TestSupport.const_set "Xyzzy#{ last_number += 1 }", mod
         mod.module_exec(& blk )

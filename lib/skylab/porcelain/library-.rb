@@ -14,15 +14,23 @@ module Skylab::Porcelain
   end
 
   module Lib_
+    sidesys = Autoloader_.build_require_sidesystem_proc
     Basic_Fields = -> * x_a do
       if x_a.length.zero?
-        MetaHell::Basic_Fields
+        MetaHell__[]::Basic_Fields
       else
-        MetaHell::Basic_Fields.via_iambic x_a
+        MetaHell__[]::Basic_Fields.via_iambic x_a
       end
     end
-    Funcy_globless = -> client do
-      MetaHell::Funcy_globless[ client ]
+    Function_chain = -> x, y do
+      MetaHell__[]::FUN::Function_chain_[ x, y ]
     end
+    Funcy_globless = -> client do
+      MetaHell__[]::Funcy_globless[ client ]
+    end
+    Funcy_globful = -> client do
+      MetaHell__[]::Funcy[ client ]
+    end
+    MetaHell__ = sidesys[ :MetaHell ]
   end
 end

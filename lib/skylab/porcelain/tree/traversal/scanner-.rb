@@ -1,10 +1,10 @@
-module ::Skylab::Porcelain
+module Skylab::Porcelain
 
   class Tree::Traversal
 
     class Scanner_
 
-      MetaHell::Funcy[ self ]
+      Porcelain_::Lib_::Funcy_globful[ self ]
 
       Porcelain_::Lib_::Basic_Fields[ :client, self,
         :absorber, :absrb_iambic_fully,
@@ -58,7 +58,7 @@ module ::Skylab::Porcelain
         card
       end
 
-      DONE_ = EMPTY_ = MetaHell::EMPTY_P_
+      DONE_ = EMPTY_ = EMPTY_P_
 
       def push node, card
         node.has_children or fail "sanity"

@@ -1,15 +1,27 @@
 module Skylab::Porcelain::Legacy
 
-  Face = ::Skylab::Face
+  Autoloader_ = ::Skylab::Callback::Autoloader
+
+  module Lib_
+    sidesys = Autoloader_.build_require_sidesystem_proc
+    Face__ = sidesys[ :Face ]
+    Formal_box = -> do
+      MetaHell__[]::Formal::Box
+    end
+    MetaHell__ = sidesys[ :MetaHell ]
+    Method_in_mod = -> i, mod do
+      MetaHell__[]::FUN.module_defines_method_in_some_manner[ mod, i ]
+    end
+    Plugin = -> do
+      Face__[]::Plugin
+    end
+    Proxy = -> do
+      MetaHell__[]::Proxy
+    end
+  end
   Headless = ::Skylab::Headless
   Legacy = self  # 3 rsns: readability, autoloading, future-proofing
-  MAARS  = ::Skylab::MetaHell::Autoloader::Autovivifying::Recursive
-  MetaHell = ::Skylab::MetaHell
-  Plugin_ = ::Skylab::Face::Plugin
   Porcelain = ::Skylab::Porcelain
-
-  Module_defines_method_ = MetaHell::FUN.
-    module_defines_method_in_some_manner
 
   module DSL                      # (section 1 of 7)
     def self.[] mod
@@ -128,8 +140,8 @@ module Skylab::Porcelain::Legacy
       mutex_h.fetch self do
         mutex_h[ self ] = true
         # [cb] digraph is opt-in, implement `call_digraph_listeners` however you want. still this sux
-        do_wire = Module_defines_method_[ singleton_class, :listeners_digraph ]
-        has_emit_method = Module_defines_method_[ self, :call_digraph_listeners ]
+        do_wire = Lib_::Method_in_mod[ :listeners_digraph, singleton_class ]
+        has_emit_method = Lib_::Method_in_mod[ :call_digraph_listeners, self ]
         do_wire and class_exec( & event_graph_init )
         @is_collapsed = nil
         @dsl_is_hot = true
@@ -363,7 +375,7 @@ module Skylab::Porcelain::Legacy
     def initialize story_host_module
       @story_host_module = story_host_module
       @action_sheet = nil
-      @action_box = MetaHell::Formal::Box::Open.new
+      @action_box = Lib_::Formal_box[]::Open.new
       @action_box.enumerator_class = Action::Enumerator
       @ancestors_seen_h = { }
       @do_fuzzy = true  # note this isn't used internally by this class
@@ -374,7 +386,7 @@ module Skylab::Porcelain::Legacy
   class Action  # used as namespace here, re-opends below as class
   end
 
-  class Action::Enumerator < MetaHell::Formal::Box::Enumerator # (used by story)
+  class Action::Enumerator < Lib_::Formal_box[]::Enumerator # (used by story)
 
     def [] k  # actually just fetch - will throw on bad key
       @box_p.call.fetch k
@@ -548,7 +560,7 @@ module Skylab::Porcelain::Legacy
   end
 
   module Adapter
-    MAARS[ self ]
+    Autoloader_[ self ]
   end
 
   module Action::InstanceMethods
@@ -1042,8 +1054,8 @@ module Skylab::Porcelain::Legacy
       end,
       3 => -> up, pay, info, blk do
         blk and raise ::ArgumentError, "won't take block and args"
-        if MetaHell::FUN.module_defines_method_in_some_manner[
-            singleton_class, :event_listeners ]  # if pub sub eew  #todo
+        if Lib_::Method_in_mod[ :event_listeners, singleton_class ]
+            # if pub sub eew  #todo
           init_as_with_three_streams_when_event_listener up, pay, info
         else
           @instream = up ; @paystream = pay ; @infostream = info
@@ -1162,7 +1174,7 @@ module Skylab::Porcelain::Legacy
 
     include Action::InstanceMethods
 
-    Plugin_::Host.enhance self do
+    Lib_::Plugin[]::Host.enhance self do
       services [ :kbd, :method, :kbd_as_service ]
     end
 
@@ -1391,7 +1403,7 @@ module Skylab::Porcelain::Legacy
     # as a plugin. (also, trending away from the SubClient pattern [#fa-030])
     #
 
-    Plugin_.enhance self do
+    Lib_::Plugin[].enhance self do
       services_used [ :kbd, :ivar ]
     end
 
@@ -1472,7 +1484,7 @@ module Skylab::Porcelain::Legacy
       mutex_h.fetch self do
         mutex_h[ self ] = true
         @action_sheet ||= Action::Sheet.for_action_class( self )
-        if ! Module_defines_method_[ self, :call_digraph_listeners ]
+        if ! Lib_::Method_in_mod[ :call_digraph_listeners, self ]
           alias_method :call_digraph_listeners, :_porcelain_legacy_emit
         end
       end

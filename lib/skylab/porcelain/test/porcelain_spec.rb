@@ -23,8 +23,8 @@ module Skylab::Porcelain::TestSupport
 
     let(:instance) do
       kls = klass
-      if MetaHell::FUN.module_defines_method_in_some_manner[
-          kls.singleton_class, :listeners_digraph ]
+      if TestLib_::Method_is_defined_by_module[
+          :listeners_digraph, kls.singleton_class ]
         # test both ways of event wiring..
         inst = kls.new do |o|
           # (tombstone of a great [#bm-008] vector)

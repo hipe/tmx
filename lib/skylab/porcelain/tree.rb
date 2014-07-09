@@ -171,7 +171,7 @@ module Skylab::Porcelain
       end
 
       def get_some_child_scanner_p
-        has_children ? get_child_scanner_p : MetaHell::EMPTY_P_
+        has_children ? get_child_scanner_p : EMPTY_P_
       end
 
       def to_text

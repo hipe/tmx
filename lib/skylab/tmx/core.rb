@@ -1,6 +1,7 @@
 require_relative '..'
 
 require 'skylab/face/core'
+require 'skylab/meta-hell/core'
 require 'skylab/porcelain/core'
 
 

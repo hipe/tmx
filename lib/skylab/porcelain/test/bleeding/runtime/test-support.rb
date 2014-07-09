@@ -6,10 +6,11 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
   include CONSTANTS # so we can say `Bleeding` (the right one) in specs!
 
   Bleeding = self::Bleeding # #annoy -- *necessary* for the six-month @_todo's
+  TestLib_ = TestLib_
 
   class Frame < ::Struct.new :klass, :argv, :debug
     include CONSTANTS
-    extend MetaHell::Let
+    TestLib_::Let[ self ]
 
     let :client do
       o = klass.new
@@ -71,7 +72,8 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
 
   module InstanceMethods
     include CONSTANTS
-    extend MetaHell::Let
+
+    TestLib_::Let[ self ]
 
     def _build_frame
       Frame.new klass, argv, debug
