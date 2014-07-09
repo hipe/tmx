@@ -4,14 +4,25 @@ require 'skylab/test-support/core'
 module Skylab::Snag::TestSupport
   ::Skylab::TestSupport::Regret[ Snag_TestSupport = self ]
 
+  Snag_ = ::Skylab::Snag
+  TestLib_ = ::Module.new
+  TestSupport_ = ::Skylab::TestSupport
+
   module CONSTANTS
-    Headless = ::Skylab::Headless
     MetaHell = ::Skylab::MetaHell
     Snag = ::Skylab::Snag
     TestSupport = ::Skylab::TestSupport
+    TestLib_ = TestLib_
   end
 
   include CONSTANTS # in the body of child modules
+
+  module TestLib_
+    Headless__ = Snag_::Autoloader_.build_require_sidesystem_proc :Headless
+    Tmpdir_pathname = -> do
+      Headless__[]::System.defaults.tmpdir_pathname
+    end
+  end
 
   module InstanceMethods
     include CONSTANTS
@@ -31,8 +42,7 @@ module Skylab::Snag::TestSupport
 
     define_method :manifest_path do manifest_path end
 
-    tmpdir = TestSupport::Tmpdir.new(
-      Headless::System.defaults.tmpdir_pathname.join 'snaggle' )
+    tmpdir = TestSupport_::Tmpdir.new TestLib_::Tmpdir_pathname[].join 'snaggle'
 
     define_method :tmpdir do
       tmpdir

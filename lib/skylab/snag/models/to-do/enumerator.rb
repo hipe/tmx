@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models::ToDo::Enumerator < ::Enumerator
 
-    Callback[ self, :employ_DSL_for_digraph_emitter ]
+    Callback_[ self, :employ_DSL_for_digraph_emitter ]
 
     listeners_digraph :error, :command
 

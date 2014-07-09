@@ -1,6 +1,6 @@
 module Skylab::Face
 
-  module CLI::Tableize
+  module CLI::Tableize  # :+#deprecation:until-cull
 
     # `tableize` - deprecated, see  [#036]
     #

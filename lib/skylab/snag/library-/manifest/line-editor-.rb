@@ -159,8 +159,8 @@ module Skylab::Snag
         @mv[ x, y ]
       end
 
-      DEV_NULL_ = Headless::IO::DRY_STUB
-      WRITEMODE_ = Headless::WRITEMODE_
+      DEV_NULL_ = Snag_::Lib_::Dev_null[]
+      WRITEMODE_ = Snag_::Lib_::Writemode[]
 
     end
   end

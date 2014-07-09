@@ -75,8 +75,8 @@ module Skylab::Snag
       MetaHell::Funcy_globless[ self ]
       Entity_[ self, :fields, :escape_path_p, :be_verbose, :info_p ]
       def execute
-        rx = Headless::CLI::PathTools::FUN::ABSOLUTE_PATH_HACK_RX
-        Headless::IO::FU.new -> s do
+        rx = Snag_::Lib_::CLI[]::PathTools::FUN::ABSOLUTE_PATH_HACK_RX
+        Snag_::Lib_::IO_FU[].new -> s do
           @info_p[ s.gsub( rx ) { @escape_path_p[ $~[ 0 ] ] } ] if @be_verbose
         end
       end
@@ -84,7 +84,7 @@ module Skylab::Snag
 
     def get_tmpdir_p
       -> *a do
-        @tmpdir_pathname ||= Headless::System.defaults.tmpdir_pathname.join TMP_DIRNAME_
+        @tmpdir_pathname ||= Snag_::Lib_::Tmpdir_pathname[].join TMP_DIRNAME_
         Tmpdir_Curry_[ :tmpdir_pathname, @tmpdir_pathname, *a ]
       end
     end

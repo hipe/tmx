@@ -12,7 +12,7 @@ module Skylab::Snag
 
     include Snag::Core::SubClient::InstanceMethods
 
-    Headless::CLI::Action[ self, :core_instance_methods ]
+    Snag_::Lib_::CLI[]::Action[ self, :core_instance_methods ]
 
   private
 
@@ -95,11 +95,11 @@ module Skylab::Snag
 
   class CLI::Action
 
-    Headless::CLI::Action[ self, :DSL ]
+    Snag_::Lib_::CLI[]::Action[ self, :DSL ]
 
     include CLI::Action::InstanceMethods
 
-    extend Headless::NLP::EN::API_Action_Inflection_Hack
+    extend Snag_::Lib_::NLP[]::EN::API_Action_Inflection_Hack
 
     inflection.inflect.noun :singular
 

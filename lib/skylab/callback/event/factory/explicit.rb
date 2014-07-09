@@ -1,6 +1,6 @@
 module Skylab::Callback
 
-  class Callback_::Event::Factory::Explicit  # DEPRECATED
+  class Callback_::Event::Factory::Explicit  # [#025] :+#deprecation:pending
 
     # This was the third addition to the suite of factory-resolvers (after
     # isomorphic and late).  You construct it with 2 hashes - the first

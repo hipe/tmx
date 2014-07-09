@@ -1,6 +1,6 @@
 module Skylab::Callback
 
-  class Event::Factory::Isomorphic  # deprecated [#025]
+  class Event::Factory::Isomorphic  # [#025] :+#deprecation:pending
 
     def initialize box_module
       @stream_name_to_event_class_cache_h = h = {}  # yes there is danger

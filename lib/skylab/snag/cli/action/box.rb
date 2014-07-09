@@ -2,7 +2,8 @@ module Skylab::Snag
 
   class CLI::Action::Box < CLI::Action
 
-    Headless::CLI::Box[ self, :DSL, :leaf_action_base_class, -> { CLI::Action } ]
+    Snag_::Lib_::CLI[]::Box[ self,
+      :DSL, :leaf_action_base_class, -> { CLI::Action } ]
 
     def initialize client_x, _=nil  # (namespace sheet, not interesting)
       super client_x

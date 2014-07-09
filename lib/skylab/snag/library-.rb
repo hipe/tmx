@@ -28,6 +28,7 @@ module Skylab::Snag
   end
 
   module Lib_
+    sidesys = Autoloader_.build_require_sidesystem_proc
     Basic_Fields = -> * x_a do
       if x_a.length.zero?
         MetaHell__[]::Basic_Fields
@@ -35,8 +36,40 @@ module Skylab::Snag
         MetaHell__[]::Basic_Fields.via_iambic x_a
       end
     end
-    MetaHell__ = -> do
-      Snag_::MetaHell  # for now
+    CLI = -> do
+      Headless__[]::CLI
+    end
+    CLI_path_tools = -> do
+      Headless__[]::CLI::PathTools
+    end
+    Dev_null = -> do
+      Headless__[]::IO::DRY_STUB
+    end
+    Headless__ = sidesys[ :Headless ]
+    IO_FU = -> do
+      Headless__[]::IO::FU
+    end
+    Name = -> do
+      Headless__[]::Name
+    end
+    NLP = -> do
+      Headless__[]::NLP
+    end
+    MetaHell__ = sidesys[ :MetaHell ]
+    Model_event = -> mod do
+      Headless__[]::Model::Event.apply_on_client mod
+    end
+    Sub_client = -> do
+      Headless__[]::SubClient  # :+#deprecation:watch
+    end
+    Text_patch = -> do
+      Headless__[]::Text::Patch
+    end
+    Tmpdir_pathname = -> do
+      Headless__[]::System.defaults.tmpdir_pathname
+    end
+    Writemode = -> do
+      Headless__[]::WRITEMODE_
     end
   end
 end

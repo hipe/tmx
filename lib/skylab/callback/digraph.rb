@@ -2,7 +2,7 @@ module Skylab::Callback
 
   module Digraph  # READ [#019] #storypoint-1
 
-    def self.extended mod  # #sl-111
+    def self.extended mod  # #sl-111 :+#deprecation:until-universal-integration
       $stderr.puts "#{ Em__[ "`extend Callback::Digraph` is deprecated NOW" ] } - #{
         }replace this line with `Callback[ self, :employ_DSL_for_digraph_emitter ]` #{
          }or the like"  # #todo:during-merge remove this
@@ -467,6 +467,6 @@ module Skylab::Callback
     end
 
     COMMON_LEVELS = %i( debug info notice warn error fatal ).freeze
-      # didactic, #bound, #deprecated
+      # didactic, #bound, :+#deprication:pending
   end
 end

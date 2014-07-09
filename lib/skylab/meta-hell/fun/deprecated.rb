@@ -1,6 +1,6 @@
 module Skylab::MetaHell
 
-  module FUN::Deprecated
+  module FUN::Deprecated  # :+#deprecation:pending
 
     o = FUN.redefiner
 

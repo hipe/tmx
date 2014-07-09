@@ -42,7 +42,7 @@ module Skylab::Headless
       end
 
       def extended mod
-        fail "'extend' is deprecated NOW - use '[]' which has identical behavior"  # #todo:during-merge
+        fail "'extend' is deprecated NOW - use '[]' which has identical behavior"  # :+#deprecation:during-universal-integration
       end
     end
   end

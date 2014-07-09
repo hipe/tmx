@@ -43,7 +43,7 @@ module Skylab::Snag
       Snag::Library_::Basic::List::Scanner::For::Enumerator.new ea
     end
 
-    fun = Headless::CLI::Pen::FUN
+    fun = Snag_::Lib_::CLI[]::Pen::FUN
     line_num_style_a = [ :strong, :yellow ]
     path_style_a = [ :strong, :green ]
     tag_style_a = [ :reverse, :yellow ]

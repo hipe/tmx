@@ -5,7 +5,7 @@ module Skylab::TanMan
     # recursive autoloader.
   end
 
-  module API::Emitter             # [#046] may be deprecated
+  module API::Emitter             # [#046] may be :+#deprecation:watch
     def self.new *a
       e = PubSub::Emitter.new(* a )
       e.event_factory API::Event::Factory

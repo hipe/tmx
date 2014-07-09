@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Text_::Yamlization
 
-    Callback[ self, :employ_DSL_for_digraph_emitter ]
+    Callback_[ self, :employ_DSL_for_digraph_emitter ]
 
     listeners_digraph  :text_line
 

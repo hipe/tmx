@@ -4,17 +4,17 @@ module Skylab::Snag
 
     ACTIONS_ANCHOR_MODULE = -> { API::Actions }
 
-    extend Headless::NLP::EN::API_Action_Inflection_Hack
+    extend Snag_::Lib_::NLP[]::EN::API_Action_Inflection_Hack
     inflection.inflect.noun :singular
 
     extend MetaHell::Formal::Attribute::Definer
     meta_attribute :default
     meta_attribute :required, default: false
 
-    Callback[ self, :employ_DSL_for_digraph_emitter ]  # put `call_digraph_listeners` nearer on the chain than s.c above
+    Callback_[ self, :employ_DSL_for_digraph_emitter ]  # put `call_digraph_listeners` nearer on the chain than s.c above
 
     event_factory MetaHell::FUN.memoize[ -> do
-      Callback::Event::Factory::Isomorphic.new API::Events # oh boy .. use the
+      Callback_::Event::Factory::Isomorphic.new API::Events # oh boy .. use the
     end ]                   # same factory instance for every action subclass
                             # instance which *should* be fine given the funda-
                             # mental supposition of isomorphic factories (see)

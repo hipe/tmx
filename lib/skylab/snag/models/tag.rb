@@ -58,7 +58,7 @@ module Skylab::Snag
 
   class Models::Tag::Events::Add < Snag::Model::Event.new :rendered, :verb
     build_message -> do
-      "#{ Headless::NLP::EN::POS::Verb[ verb.to_s ].preterite } #{
+      "#{ Snag_::Lib_::NLP[]::EN::POS::Verb[ verb.to_s ].preterite } #{
         }#{ val rendered }"
     end
   end

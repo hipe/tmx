@@ -1,10 +1,10 @@
 module Skylab::Snag
 
-  module Core::SubClient
-  end
+  Core::SubClient = ::Module.new
 
   module Core::SubClient::InstanceMethods
-    include Headless::SubClient::InstanceMethods # #floodgates
+
+    include Snag_::Lib_::Sub_client[]::InstanceMethods  # #floodgates
 
                                   # (no public methods declared here)
   private

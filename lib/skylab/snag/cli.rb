@@ -14,10 +14,11 @@ module Skylab::Snag
 
     include CLI::Action::InstanceMethods
 
-    Headless::CLI::Client[ self, :client_instance_methods, :three_streams_notify ]
+    Snag_::Lib_::CLI[]::Client[ self,
+      :client_instance_methods, :three_streams_notify ]
 
     def invoke argv               # modify at [#010]
-      Headless::CLI::PathTools.clear # see
+      Snag_::Lib_::CLI_path_tools[].clear  # see
       res = super argv            # super handles argument errors etc.
       if false == res             # but if this, it is a petition for this:
         error "a low-ass-level error occured."
@@ -132,7 +133,7 @@ module Skylab::Snag
     #         ~ (some for compat as a modality client for headless) ~
     #         ~ (alphabetical) ~
 
-    define_method :escape_path, &Headless::CLI::PathTools::FUN.pretty_path
+    define_method :escape_path, & Snag_::Lib_::CLI_path_tools[]::FUN.pretty_path
 
     def val x                     # how do you decorate a special value?
       em x

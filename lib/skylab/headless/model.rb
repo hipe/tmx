@@ -12,9 +12,14 @@ module Skylab::Headless
 
 
   module Model::Event
-    def self.extended mod # [#sl-111]
+
+    def self.apply_on_client mod
       mod.extend Model::Event::ModuleMethods
       mod.send :include, Model::Event::InstanceMethods
+    end
+
+    def self.extended mod  # [#sl-111]  :+#deprecation:until-universal-integration
+      raise "`extend` is deprecated here - use `apply_on_client` instead"
     end
   end
 

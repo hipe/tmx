@@ -4,9 +4,12 @@ require 'skylab/porcelain/core'
 
 module Skylab::Snag
 
-  %i| Autoloader Headless MetaHell Porcelain Callback Snag |.each do |i|
+  %i| Autoloader MetaHell Porcelain Snag |.each do |i|
     const_set i, ::Skylab.const_get( i, false )
   end
+
+  Callback_ = ::Skylab::Callback
+    Autoloader_ = Callback_::Autoloader
 
   MetaHell::MAARS[ self ]
 

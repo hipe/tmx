@@ -21,7 +21,7 @@ module Skylab::Headless::SubClient
       super()
     end
 
-    def init_headless_sub_client x  # #deprecated #todo, waiting for [tr]
+    def init_headless_sub_client x  # :+#deprecation:post-tr
       @error_count = 0
       headless_client_notify x ; nil
     end

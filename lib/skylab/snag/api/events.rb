@@ -7,7 +7,7 @@ module Skylab::Snag
     -> do  # `taxonomic_streams`
       memo = nil
       define_singleton_method :taxonomic_streams do
-        memo ||= constants.map( & Headless::Name::FUN::Normify )
+        memo ||= constants.map( & Snag_::Lib_::Name[]::FUN::Normify )
         #  e.g [:datapoint, :lingual, :structural ]
       end
     end.call
@@ -23,7 +23,7 @@ module Skylab::Snag
     end
 
     Structural = -> do
-      o = Callback::Event::Factory::Structural.new 5  # sanity - max
+      o = Callback_::Event::Factory::Structural.new 5  # sanity - max
       class << o
         alias_method :snag_original_event, :event
         def event _, __, ___, payload_h
@@ -34,7 +34,7 @@ module Skylab::Snag
     end.call
   end
 
-  class API::Events::Lingual < Callback::Event::Unified
+  class API::Events::Lingual < Callback_::Event::Unified
 
   public
 

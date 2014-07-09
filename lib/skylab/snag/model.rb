@@ -1,11 +1,10 @@
 module Skylab::Snag
 
-  module Model
-  end
+  Model = ::Module.new
 
   class Model::Event < ::Struct
 
-    extend Headless::Model::Event # `normalized_event_name`
+    Snag_::Lib_::Model_event[ self ]
 
     EVENTS_ANCHOR_MODULE = Snag::Models
 

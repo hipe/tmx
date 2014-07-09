@@ -129,11 +129,11 @@ module Skylab::Snag
         first = @file_changes.first
         lines = Snag::Library_::
           Basic::List::Scanner::For::Path[ first.pathname ]
-        patch = Headless::Text::Patch::Models::ContentPatch.new lines
+        patch = Snag_::Lib_::Text_patch[]::Models::ContentPatch.new lines
         @file_changes.each do |todo|
           patch.change_line todo.line_number, todo.replacement_line
         end
-        res = Headless::Text::Patch.file patch.render_simple,
+        res = Snag_::Lib_::Text_patch[].file patch.render_simple,
           first.path, @dry_run, @be_verbose, -> e { info e }
         # typically an exit_code, like 0
         res or break

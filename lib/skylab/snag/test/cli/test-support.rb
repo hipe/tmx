@@ -14,7 +14,7 @@ module Skylab::Snag::TestSupport::CLI
     o[:output] = -> do
       output = TestSupport::IO::Spy::Group.new
       output.line_filter! -> s do
-        Headless::CLI::Pen::FUN.unstyle[ s ]
+        Snag::Lib_::CLI[]::PEN::FUN.unstyle[ s ]
       end
       output
     end

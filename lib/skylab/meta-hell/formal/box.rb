@@ -54,7 +54,7 @@ module Skylab::MetaHell
       @order.dup
     end
 
-    def names  # #todo:deprecated
+    def names  # :+#deprecation:imminent
       @order.dup
     end
 
