@@ -1,6 +1,6 @@
 module Skylab::Slicer
 
-  class CLI::Client < Face::CLI::Client
+  class CLI::Client < Slicer_::Lib_::CLI_Client[]
 
     def initialize( * )
       super

@@ -1,17 +1,26 @@
 require_relative '..'
-require 'skylab/face/core'
-require 'skylab/meta-hell/core'
+require 'skylab/callback/core'
 
 module Skylab::Slicer
 
-  %i| Face MetaHell Slicer |.each do |i|
-    const_set i, ::Skylab.const_get( i, false )
+  Autoloader_ = ::Skylab::Callback::Autoloader
+
+  module Lib_  # :+[#su-001]
+
+    sidesys, = Autoloader_.at :build_require_sidesystem_proc
+
+    API_Action = -> do
+      Face__[]::API::Action
+    end
+
+    CLI_Client = -> do
+      Face__[]::CLI::Client
+    end
+
+    Face__ = sidesys[ :Face ]
   end
 
-  MAARS = MetaHell::MAARS
+  Slicer_ = self
 
-  # (:+[#su-001]:none)
-
-  MAARS[ self ]
-
+  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 end
