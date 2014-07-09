@@ -1,5 +1,8 @@
 module Skylab::Dependency
-  class Dependency::TaskTypes::BuildTarball < Slake::Graph
+
+  self._NOT_COVERED  # #todo
+
+  class TaskTypes::BuildTarball < Dep_::Lib_::Slake[]::Graph
 
     attribute :build_tarball
     attribute :configure_with, :required => false
@@ -44,8 +47,8 @@ module Skylab::Dependency
 
     def update_check slake=false
       slake or dependencies_update_check or return false
-      old_url = Dependency::Version.parse_string_with_version(build_tarball, :ui => ui)
-      cu = Dependency::CheckUpdate.new(build_tarball)
+      old_url = Dep_::Version.parse_string_with_version(build_tarball, :ui => ui)
+      cu = Dep_::CheckUpdate.new(build_tarball)
       if new_url = cu.run(ui)
         old_ver = old_url.detect(:version).to_s
         new_ver = new_url.detect(:version).to_s

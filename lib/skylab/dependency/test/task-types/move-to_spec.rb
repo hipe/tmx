@@ -22,7 +22,7 @@ module Skylab::Dependency::TestSupport::Tasks
       end
     end
     context "when moving an existing file" do
-      include Dependency::Library_::FileUtils
+      include Dep_::Library_::FileUtils
       def fu_output_message str
         dputs "FOR TESTING: #{ str }" if do_debug
         nil

@@ -5,27 +5,37 @@ module Skylab::Dependency::TestSupport
 
   ::Skylab::TestSupport::Regret[ Dependency_TestSupport = self ]
 
-  module CONSTANTS
-    include ::Skylab::Dependency # include lots of constants
-    Headless = ::Skylab::Headless # not used in application code
-    MetaHell = ::Skylab::MetaHell
-    TestSupport = ::Skylab::TestSupport
+  Callback_ = ::Skylab::Callback
+    Autoloader_ = Callback_::Autoloader
+
+  Dep_ = ::Skylab::Dependency
+
+  TestSupport_ = ::Skylab::TestSupport
+
+  extend TestSupport_::Quickie
+
+  module TestLib_
+    sidesys = Autoloader_.build_require_sidesystem_proc
+    CLI = -> do
+      Headless__[]::CLI
+    end
+    Headless__ = sidesys[ :Headless ]
+    Let = -> do
+      MetaHell__[]::Let
+    end
+    MetaHell__ = sidesys[ :MetaHell ]
+    Tmpdir_path = -> do
+      Headless__[]::System.defaults.tmpdir_path
+    end
   end
 
-  include CONSTANTS # include them for use in here, and in specs
+  tmpdir = TestSupport_::Tmpdir.new TestLib_::Tmpdir_path[]
 
-  Headless = Headless # so they are visible in modules contained by this
-  MetaHell = MetaHell # module, without polluting that module itself's n.s
-
-  extend TestSupport::Quickie  # if you dare..
-
-  tmpdir = TestSupport::Tmpdir.new Headless::System.defaults.tmpdir_path
-
-  build_dir = TestSupport::Tmpdir.new tmpdir.join('build-dependency')
+  build_dir = TestSupport_::Tmpdir.new tmpdir.join('build-dependency')
 
   fixtures_dir = Dependency_TestSupport.dir_pathname.join 'fixtures'
 
-  file_server = TestSupport::Servers::Static_File_Server.new fixtures_dir,
+  file_server = TestSupport_::Servers::Static_File_Server.new fixtures_dir,
     log_level_i: :info, # (:info | :warn) e.g.
     pid_path: tmpdir
 
@@ -33,10 +43,15 @@ module Skylab::Dependency::TestSupport
   CONSTANTS::FIXTURES_DIR = fixtures_dir # #bound
   CONSTANTS::FILE_SERVER = file_server # #bound
 
+  module CONSTANTS
+    Dep_ = Dep_
+    TestSupport_ = TestSupport_
+  end
+
   module InstanceMethods
 
-    extend MetaHell::Let::ModuleMethods
-    include Headless::CLI::Pen::Methods # `unstyle`
+    extend TestLib_::Let[]::ModuleMethods
+    include TestLib_::CLI[]::Pen::Methods  # `unstyle`
 
     def debug!
       @do_debug = true

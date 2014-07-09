@@ -4,13 +4,13 @@ module Skylab::Dependency::TestSupport::Tasks
   ::Skylab::Dependency::TestSupport[ Tasks_TestSupport = self ] # #regret
 
   module CONSTANTS
-    include Dependency
-    Dependency::TaskTypes && nil # :/
+    include Dep_
+    Dep_::TaskTypes && nil # :/
   end
 
   include CONSTANTS # include them here for use in specs
 
-  extend TestSupport::Quickie  # let's see..
+  extend TestSupport_::Quickie  # let's see..
 
   module InstanceMethods
 

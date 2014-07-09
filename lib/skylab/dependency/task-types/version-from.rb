@@ -1,8 +1,8 @@
 module Skylab::Dependency
 
-  class TaskTypes::VersionFrom < Dependency::Task
+  class TaskTypes::VersionFrom < Dep_::Task
 
-    include Face::Open2
+    Dep_::Lib_::Open_2[ self ]
 
     attribute :must_be_in_range
     attribute :parse_with
@@ -32,7 +32,7 @@ module Skylab::Dependency
       @must_be_in_range or fail(<<-S.gsub(/\n */,' ').strip)
         Do not use "version from" as a target without a "must be in range" assertion.
       S
-      Dependency::VersionRange.build @must_be_in_range
+      Dep_::VersionRange.build @must_be_in_range
     end
 
     def check_version
@@ -61,7 +61,7 @@ module Skylab::Dependency
 
     def parse_version_string
       @parse_with and @regex = build_regex(@parse_with)
-      buffer = Dependency::Library_::StringIO.new
+      buffer = Dep_::Library_::StringIO.new
       read = lambda { |s| buffer.write(s) }
       open2(version_from) { |on| on.out(&read); on.err(&read) }
       str = buffer.rewind && buffer.read

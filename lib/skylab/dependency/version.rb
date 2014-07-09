@@ -1,11 +1,12 @@
 module Skylab::Dependency
-  class Version < CodeMolester::Sexp
+
+  class Version < Dep_::Lib_::Sexp[]
 
     REGEX      = /(\d+)\.(\d+)(?:\.(\d+))?/ # #bound
 
     split_rx = /\A(?<prefix>.*[^\.\d])?(?<scalar>#{REGEX.source})\z/
 
-    s = ->(* a) { CodeMolester::Sexp.new a }
+    s = ->(* a) { Dep_::Lib_::Sexp[].new a }
 
     define_singleton_method :parse_string_with_version do |str, &err|
       res = nil
@@ -14,7 +15,7 @@ module Skylab::Dependency
         res = shell.error msg
       end
       begin
-        scn = Dependency::Library_::StringScanner.new str
+        scn = Dep_::Library_::StringScanner.new str
         capture = scn.scan_until REGEX
         capture or break error[
           "version pattern not matched anywhere in string: #{ str.inspect }" ]
@@ -56,17 +57,16 @@ module Skylab::Dependency
     end
   end
 
-  Version::Parse = Callback::Digraph.new :informational, error: :informational
+  Version::Parse = Callback_::Digraph.new :informational, error: :informational
 
   class Version::Parse
 
-    event_class Callback::Event::Textual
+    event_class Callback_::Event::Textual
 
     def self.loud_singleton
-      @loud ||= Dependency::Version::Parse.new( -> o do
+      @loud ||= Dep_::Version::Parse.new( -> o do
         o.on_informational do |e|
           fail "find me an outstream"  # #todo
-          # "#{ Dependency::Version }:#{ e.stream_name }: #{ e.text }"
         end
       end )
     end

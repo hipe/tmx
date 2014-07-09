@@ -1,7 +1,9 @@
 module Skylab::Dependency
-  class TaskTypes::MoveTo < Dependency::Task
-    include Headless::CLI::PathTools::InstanceMethods
-    include Dependency::Library_::FileUtils
+
+  class TaskTypes::MoveTo < Dep_::Task
+
+    include Dep_::Lib_::CLI[]::PathTools::InstanceMethods
+    include Dep_::Library_::FileUtils
 
     # @todo look below etc
     attribute :move_to, :required => true

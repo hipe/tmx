@@ -1,5 +1,5 @@
 module Skylab::Dependency
-  class TaskTypes::ExecutableFile < Dependency::Task
+  class TaskTypes::ExecutableFile < Dep_::Task
     attribute :executable_file, :required => true, :pathname => true
     listeners_digraph  :all, :info => :all
 

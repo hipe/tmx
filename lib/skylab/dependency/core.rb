@@ -1,21 +1,18 @@
 require_relative '..'
-
-require 'skylab/code-molester/core'
-require 'skylab/face/core'
-require 'skylab/porcelain/core'
-require 'skylab/slake/core'
+require 'skylab/callback/core'
 
 module Skylab::Dependency
 
-  ::Skylab::MetaHell::MAARS[ self ]
+  Callback_ = ::Skylab::Callback
+    Autoloader_ = Callback_::Autoloader
 
-  Autoloader = ::Skylab::Autoloader
-  CodeMolester = ::Skylab::CodeMolester
-  Dependency = self
-  Face = ::Skylab::Face
-  Headless = ::Skylab::Headless
-  Porcelain = ::Skylab::Porcelain
-  Callback = ::Skylab::Callback
-  Slake = ::Skylab::Slake
+  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
+  Dep_ = self
+
+  stowaway :Lib_, 'library-'
+
+  module TaskTypes
+    Autoloader_[ self ]
+  end
 end

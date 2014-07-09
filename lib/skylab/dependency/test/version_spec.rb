@@ -7,7 +7,7 @@ module Skylab::Dependency::TestSupport
 
   Slake_TestSupport::UI::Tee || nil #(#kick) laod it now so prettier below
 
-  describe Dependency::Version do
+  describe Dep_::Version do
 
     include Dependency_TestSupport # so constants are avail. in i.m.'s below
 
@@ -30,7 +30,7 @@ module Skylab::Dependency::TestSupport
     it "whines on ambiguity" do
       ui = UI::Tee.new silent: true
       str = "abc1.2.3def4.5"
-      sexp = Dependency::Version.parse_string_with_version(str) do |o|
+      sexp = Dep_::Version.parse_string_with_version(str) do |o|
         o.on_error { |e| ui.err.puts e.text }
       end
       sexp.should eql( false )
@@ -38,9 +38,9 @@ module Skylab::Dependency::TestSupport
     end
 
     it "allows version bumps" do
-      sexp = Dependency::Version::parse_string_with_version( "abc-1.4.7-def" )
+      sexp = Dep_::Version::parse_string_with_version( "abc-1.4.7-def" )
       ver = sexp.child( :version )
-      ver.class.should eql( Dependency::Version )
+      ver.class.should eql( Dep_::Version )
       ver.unparse.should eql( "1.4.7" )
       ver.bump! :major
       sexp.unparse.should eql( "abc-2.4.7-def" )
@@ -57,7 +57,7 @@ module Skylab::Dependency::TestSupport
 
     def _parse str
       ui = UI::Tee.new
-      sexp = Dependency::Version::parse_string_with_version(str) do |o|
+      sexp = Dep_::Version::parse_string_with_version(str) do |o|
         o.on_informational { |e| ui.err.puts("#{e.stream_name}: #{e.text}") }
       end
       sexp.unparse.should eql(str)

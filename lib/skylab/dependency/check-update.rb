@@ -1,5 +1,5 @@
 module Skylab
-  module Dependency
+  module Dep_
     class CheckUpdate
       def initialize path
         @versions_not_found = []
@@ -11,7 +11,7 @@ module Skylab
       def run ui
         @versions_not_found.clear
         @ui = ui
-        url = Dependency::Version.parse_string_with_version(@path, :ui => ui) or return false
+        url = Dep_::Version.parse_string_with_version(@path, :ui => ui) or return false
         version = url.detect(:version)
         increment_this = case true
           when version.has_patch_version? ; :patch

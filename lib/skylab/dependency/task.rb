@@ -1,8 +1,7 @@
 module Skylab::Dependency
 
-  ::Skylab::Slake::Task.class
+  class Task < Dep_::Lib_::Slake[]::Task
 
-  class Task < Slake::Task
     attribute_metadata_class do
       def [] k ; fetch( k ) { } end # soften it
     end
@@ -15,12 +14,12 @@ module Skylab::Dependency
     attr_accessor  :context
     attr_reader :invalid_reason
 
-    Callback[ self, :employ_DSL_for_digraph_emitter ]   # child classes decide what to call_digraph_listeners
+    Callback_[ self, :employ_DSL_for_digraph_emitter ]   # child classes decide what to call_digraph_listeners
 
-    event_class Callback::Event::Textual  # can be made more complicated..
+    event_class Callback_::Event::Textual  # can be made more complicated..
 
-    include Headless::CLI::PathTools::InstanceMethods
-    include Headless::CLI::Pen::Methods # `stylize`
+    include Dep_::Lib_::CLI[]::PathTools::InstanceMethods
+    include Dep_::Lib_::CLI[]::Pen::Methods # `stylize`
 
     def hi str ; stylize str, :strong, :green end
 
@@ -95,7 +94,7 @@ module Skylab::Dependency
 
     def _view_tree
       raise "needs testing and re-development (very old)"  # #todo:meh
-      trav = Dependency::Library_::Tree::Locus.new
+      trav = Dep_::Library_::Tree::Locus.new
       color = ui.out.tty?
       trav.traverse self do |card|
         ui.out.puts "#{ loc.prefix card }#{

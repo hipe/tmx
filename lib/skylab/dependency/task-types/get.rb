@@ -1,9 +1,12 @@
 require 'net/http'
 
 module Skylab::Dependency
-  class TaskTypes::Get < Dependency::Task
-    include Face::Open2
-    include Headless::CLI::PathTools::InstanceMethods
+
+  class TaskTypes::Get < Dep_::Task
+
+    Dep_::Lib_::Open_2[ self ]
+
+    include Dep_::Lib_::CLI[]::PathTools::InstanceMethods
 
     attribute :from
     attribute :get, :required => true
@@ -66,13 +69,14 @@ module Skylab::Dependency
       # the *only* distinguishing thing that adsf does in lieu of a 404 is
       # that it does not send a "last-modified" header (and writes a message in the body)
       if response.to_hash.key?('last-modified')
-        ::File.open(to_file, WRITEMODE_ ) { |fh| fh.write(response.body) }
+        ::File.open to_file, Dep_::Lib_::Writemode[] do |fh|
+          fh.write response.body
+        end
         true
       else
         call_digraph_listeners(:error, "File not found: #{from_url}")
         false
       end
     end
-    WRITEMODE_ = Headless::WRITEMODE_
   end
 end

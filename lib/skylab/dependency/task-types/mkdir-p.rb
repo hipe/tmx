@@ -1,6 +1,6 @@
 module Skylab::Dependency
-  class TaskTypes::MkdirP < Dependency::Task
-    include Dependency::Library_::FileUtils
+  class TaskTypes::MkdirP < Dep_::Task
+    include Dep_::Library_::FileUtils
     alias_method :fu_mkdir_p, :mkdir_p
     attribute :dry_run, :boolean => true, :from_context => true, :default => false
     attribute :max_depth, :from_context => true, :default => 1

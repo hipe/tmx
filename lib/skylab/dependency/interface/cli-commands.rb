@@ -1,8 +1,10 @@
 module Skylab::Dependency
+
   module Interface
+
     CLI_Commands = lambda do |_|
       o do |op, req|
-        extend Headless::CLI::PathTools::InstanceMethods
+        extend Dep_::Lib_::CLI[]::PathTools::InstanceMethods
         item_name = @parent.name
         syntax "#{ normalized_invocation_string } [opts] [<name> [<name> [..]]]"
         op.banner = <<-HERE.gsub(/^ +/, '')
@@ -24,8 +26,7 @@ module Skylab::Dependency
                "that tries to run a fuller simulation than ordinary dry run of what the task",
                "will look like as it runs and succeeds.") { req[:dry_run] = req[:optimistic_dry_run] = true }
 
-        req[ :build_dir ] = Headless::FUN.
-          home_directory_pathname.join( 'build' ).to_s
+        req[ :build_dir ] = Dep_::Lib_::Home_dir_pn[].join( 'build' ).to_s
 
         op.on('--build-dir DIR',
           "Specifies build directory. (default: #{pretty_path(req[:build_dir])})") { |bd| req[:build_dir] = bd }
