@@ -87,7 +87,7 @@ elsif res
 
   require_relative 'core'
   module ::Skylab::Git
-    Git::CLI.new( nil, Stdout_[], Stderr_[] ).
+    Git_::CLI.new( nil, * Lib_::CLI_std_two[] ).
       invoke( [ 'stash-untracked', * ::ARGV ] )
   end
 end

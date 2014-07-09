@@ -1,5 +1,16 @@
 module Skylab::Git
 
+  module CLI
+
+    def self.new sin, sout, serr
+      CLI::Client.new sin, sout, serr
+    end
+
+    module Actions  # #stowaway, because of legacy 'push.rb' artifact
+      Autoloader_[ self ]
+    end
+  end
+
   class CLI::Client
 
     # we built a custom client so that `face` wouldn't intercept the '-h'
@@ -28,7 +39,7 @@ module Skylab::Git
   private
 
     def build_bound i
-      unbound = Git::CLI::Actions.const_get i, false
+      unbound = Git_::CLI::Actions.const_get i, false
       if unbound.const_defined? :CLI, false
         unbound = unbound::CLI
       end
@@ -43,11 +54,11 @@ module Skylab::Git
     end
 
     def program_name
-      @program_name || Face::FUN.program_basename[]
+      @program_name || Git_::Lib_::CLI_program_basename[]
     end
 
     def hi msg
-      ( @hi ||= Face::CLI.stylify.curry[ [ :green ] ] )[ msg ]
+      ( @hi ||= Git_::Lib_::CLI[]::Pen::FUN::Stylify.curry[ [ :green ] ] )[ msg ]
     end
 
     def get_y
@@ -61,11 +72,9 @@ module Skylab::Git
     end
 
     def head argv
-      _pn = Git::Library_::Headless::System.defaults.bin_pathname.
-        join 'tmx-git-head'
-      load _pn.to_s
+      load Git_::Lib_::Bin_pathname[].join 'tmx-git-head'
       _progname = "#{ program_name } head"
-      Git::CLI::Actions::Head[ get_y, _progname, argv ]
+      Git_::CLI::Actions::Head[ get_y, _progname, argv ]
     end
 
     def scoot argv
@@ -108,7 +117,7 @@ module Skylab::Git
                 Adapter_.new( ns_sheet, my_client_class, mechanics )
               end
             end
-            class Adapter_ < ::Skylab::Face::CLI::Client::Adapter::For::Face::Of::Hot
+            class Adapter_ < Git_::Lib_::Face__[]::CLI::Client::Adapter::For::Face::Of::Hot
               def get_summary_a_from_sheet _
                 [ "assorted git-focused one-offs." ]
               end

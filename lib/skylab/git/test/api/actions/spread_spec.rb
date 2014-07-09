@@ -1,14 +1,18 @@
 require_relative '../../test-support'
 
+module Skylab::Git::TestSupport::API
+  Actions = ::Module.new
+end
+
 module Skylab::Git::TestSupport::API::Actions::Spread
 
-  Skylab::Git::TestSupport[ TS_ = self ]
+  ::Skylab::Git::TestSupport[ TS_ = self ]
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  Spread = Git::CLI::Actions::Spread
+  Spread = Git_::CLI::Actions::Spread
 
   describe "[gi] API actions spread" do
 
@@ -19,7 +23,7 @@ module Skylab::Git::TestSupport::API::Actions::Spread
         @do_debug ||= do_debug
         @err_a ||= [ ]
         Spread::Support_::Snitch_.new( ::Enumerator::Yielder.new do |msg|
-          @do_debug and TestSupport::System.stderr.puts msg
+          @do_debug and TestSupport_::System.stderr.puts msg
           @err_a << msg
         end, :no_context )
       end
@@ -28,7 +32,7 @@ module Skylab::Git::TestSupport::API::Actions::Spread
     def self.branches a
       let :branches do
         Spread::API_Model::Branches.from_line_scanner(
-          ::Skylab::Basic::List::Scanner[ a ], snitch )
+          Git_::Lib_::Scanner[ a ], snitch )
       end
     end
 

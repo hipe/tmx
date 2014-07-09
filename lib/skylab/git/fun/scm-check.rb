@@ -1,5 +1,7 @@
 module Skylab::Git
 
+  FUN = Git_::Lib_::FUN_module[].new
+
   class FUN::SCM_check
 
     define_singleton_method :[], -> y, file_a, * x_a do

@@ -6,14 +6,14 @@ module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked
 
   module CONSTANTS
     GSU = -> do
-      Git::CLI::Actions::Stash_Untracked
+      Git_::CLI::Actions::Stash_Untracked
     end
     WAZZLE = 'wazzle'.freeze
   end
   include CONSTANTS
-  Git = Git ; GSU = GSU
-  Headless = Headless
-  TestSupport = TestSupport
+  Git_ = Git_
+  GSU = GSU
+  TestLib_ = TestLib_
   WAZZLE = WAZZLE
 
   module InstanceMethods
@@ -21,7 +21,7 @@ module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked
     # ~ hook-ins
 
     def do_debug= yes
-      yes and @debug_IO ||= TestSupport::System.stderr
+      yes and @debug_IO ||= TestLib_::Stderr[]
       super
     end
 
@@ -29,7 +29,7 @@ module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked
 
     let :_CLI_client do
       _i, _o, _e = [ nil, * two_spy_group.to_a ]
-      cli = Git::CLI::Actions::Stash_Untracked::CLI.new _i, _o, _e
+      cli = Git_::CLI::Actions::Stash_Untracked::CLI.new _i, _o, _e
       cli.program_name = WAZZLE
       cli
     end
@@ -40,7 +40,7 @@ module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked
       ctx = self
       _CLI_client.define_singleton_method :popen3_notify do |cmd_s, &p|
         ctx.last_popen3_command_string = cmd_s
-        p[ nil, Git::Library_::StringIO.new( str ), ::StringIO.new( '' ) ]
+        p[ nil, Git_::Library_::StringIO.new( str ), ::StringIO.new( '' ) ]
       end
     end
     #
@@ -50,7 +50,7 @@ module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked
     # ~ test-time support
 
     def cd path, & p
-      Git::Library_::FileUtils.cd path.to_s, & p
+      Git_::Library_::FileUtils.cd path.to_s, & p
     end
 
     def workdir_pn  # #hookout
@@ -74,8 +74,8 @@ module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked
     #
     GSU_Tmpdir__ = -> do
       p = -> do_dbg do
-        _tdpn = Headless::System.defaults.tmpdir_pathname.join 'gsu-xyzzy'
-        _GSU_tmpdir = TestSupport::Tmpdir.new _tdpn.to_s
+        _tdpn = TestLib_::Tmpdir_pathname[].join 'gsu-xyzzy'
+        _GSU_tmpdir = TestLib_::Tmpdir[].new _tdpn.to_s
         if do_dbg
           _GSU_tmpdir.debug!
         end

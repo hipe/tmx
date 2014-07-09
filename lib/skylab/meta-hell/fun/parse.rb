@@ -45,6 +45,7 @@ module Skylab::MetaHell
         moniker[ 0, tlen ] == tok
       end
     end
+    Fuzzy_matcher = Fuzzy_matcher_
 
     Parse = self
   end

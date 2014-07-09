@@ -2,11 +2,9 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
   # read [#010] #storypoint-1 "introduction..", #storypoint-2 "local idioms"
 
-  Autoloader = ::Skylab::Autoloader  # #storypoint-3 "these constant ass.."
-  Git = ::Skylab::Git
-  MetaHell = ::Skylab::MetaHell
-  Basic = Git::Library_::Basic
-  Headless = Git::Library_::Headless
+  # ( was #storypoint-3 "these constant ass.." #posterity )
+
+  Git_ = ::Skylab::Git
 
   module Sub_client__  # #storypoint-4 "the way sub-clients are used in t.."
 
@@ -17,14 +15,14 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
 
     As_basic_set = -> x_a do
-      module_exec x_a, & Basic::Set.to_proc
+      module_exec x_a, & Git_::Lib_::Set[].to_proc
     end
 
     As_basic_set_via_params_const = -> x_a do
       x_a.unshift :with_members, -> do
         self.class::PARAMS
       end
-      module_exec x_a, & Basic::Set.to_proc
+      module_exec x_a, & Git_::Lib_::Set[].to_proc
     end
 
     Color_inquisitor = -> _ do
@@ -32,6 +30,10 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       def is_in_color
         resolve_service( :color_inquisition ).invoke nil, nil
       end
+    end
+
+    Funcy = -> _ do
+      Git_::Lib_::Funcy_globful[ self ] ; nil
     end
 
     Emit_payload_line_to_listener = -> _ do
@@ -47,10 +49,6 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
     File_utils = -> x_a do
       module_exec x_a, & FU_Bundle_and_IMs__.to_proc
-    end
-
-    Funcy = -> _ do
-      MetaHell::Funcy[ self ] ; nil
     end
 
     Popener3 = -> x_a do
@@ -71,13 +69,13 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
 
     Service_terminal = -> x_a do
-      module_exec x_a, & Headless::Service_Terminal.to_proc
+      module_exec x_a, & Git_::Lib_::Service_terminal[].to_proc
     end
 
     Shellesc = -> _ do
     private
       def shellesc x
-        Git::Library_::Shellwords.shellescape x
+        Git_::Library_::Shellwords.shellescape x
       end
     end
 
@@ -87,7 +85,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       end ; nil
     end
 
-    MetaHell::Bundle::Multiset[ self ]
+    Git_::Lib_::Bundle[]::Multiset[ self ]
   end
 
   Verb_lemma_hack_ = -> mod do
@@ -130,12 +128,14 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
   end
 
+  Lib_CLI_ = Git_::Lib_::CLI[]
+
   class CLI
 
     Sub_client__[ self,
       :service_terminal, :service_module, -> { Services__ } ]
 
-    Headless::CLI::Client[ self, :client_services,
+    Lib_CLI_::Client[ self, :client_services,
                            :three_streams_notify, :client_instance_methods ]
 
     def initialize i, o, e
@@ -148,10 +148,10 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     def pen_class
       Expression_Agent__
     end
-    class Expression_Agent__ < Headless::CLI::Pen::Minimal
+    class Expression_Agent__ < Lib_CLI_::Pen::Minimal
       def escape_path x
         _s = x.to_s
-        Headless::CLI::PathTools::FUN.pretty_path[ _s ]
+        Lib_CLI_::PathTools::FUN.pretty_path[ _s ]
       end
     end
   public
@@ -177,7 +177,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       @IO_adapter.pen
     end
 
-    define_method :popen3_notify, & Git::Library_::Open3.method( :popen3 )
+    define_method :popen3_notify, & Git_::Library_::Open3.method( :popen3 )
     # gets stubed by tests, hence at top # :#storypoint-7: this?
 
   private
@@ -217,8 +217,8 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
     # ~ support for interfacing with API
 
-    def invoke_API action_locator_x, par_h
-      cls = API::Actions.const_fetch action_locator_x
+    def invoke_API action_locator_i, par_h
+      cls = Git_::Autoloader_.const_reduce [ action_locator_i ], API::Actions
       hot = cls.new client_services
       r = hot.invoke par_h
       case r
@@ -254,7 +254,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       o
     end
     def begin_option_parser
-      Git::Library_::OptionParser.new
+      Git_::Library_::OptionParser.new
     end
     def begin_option_parser_for_child
       begin_option_parser
@@ -283,7 +283,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
     #                 ~ DSL line of demarcation ~
 
-    Headless::CLI::Client[ self, :DSL ]
+    Lib_CLI_::Client[ self, :DSL ]
 
     option_parser do |o|
       o.separator " description: ping."
@@ -450,7 +450,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       :service_terminal, :intermediate,
       :verb_lemma_hack ]
 
-    Headless::Client[ self, :client_services ]
+    Git_::Lib_::Client[ self, :client_services ]
 
     def initialize client
       @be_verbose = false ; @error_count = 0 ; @hub = nil
@@ -477,7 +477,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       r = resolve_hub par_h
       r &&= initialize_basic_set_with_hash par_h
       if r
-        Headless::CLI::PathTools.clear  # see notes at `pretty_path` - danger
+        Lib_CLI_::PathTools.clear  # see notes at `pretty_path` - danger
         r = execute
       end ; r
     end
@@ -549,7 +549,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       (?<a>[#][ ]*) (?<s>.+) (?<b>)
     )\n?\z}x
 
-    Headless::Action[ self,
+    Git_::Lib_::Action[ self,
       :anchored_names, :with, :name_waypoint_module, -> { API::Actions } ]
 
     def render_hub_info
@@ -579,7 +579,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
           call_digraph_listeners i, str.gsub( RX__ ) { escape_path $~[ 0 ] }
         end
     end
-    RX__ = Headless::CLI::PathTools::FUN::ABSOLUTE_PATH_HACK_RX
+    RX__ = Lib_CLI_::PathTools::FUN::ABSOLUTE_PATH_HACK_RX
 
   end
 
@@ -587,7 +587,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
   module FU_Bundle_and_IMs__
     Cd = -> _ do
-      include Git::Library_::FileUtils
+      include Git_::Library_::FileUtils
     end
     Move = -> _ do
       include FU_Bundle_and_IMs__
@@ -607,7 +607,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     def _FU_agent
       resolve_service( :FU_agent ).invoke nil, nil
     end
-    MetaHell::Bundle::Multiset[ self ]
+    Git_::Lib_::Bundle[]::Multiset[ self ]
   end
   class API::Action
     class Client_Services
@@ -618,7 +618,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
   private
     def build_FU_agent
-      Headless::IO::FU.new -> msg do
+      Git_::Lib_::IO_FU[].new -> msg do
         emit_info_line "# #{ msg }"
       end
     end
@@ -627,7 +627,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
   #                               --*--
 
   module API::Actions
-    MetaHell::Boxxy[ self, :deferred ]  # :#storypoint-10 placeholder
+    Git_::Autoloader_[ self, :boxxy ]  # :#storypoint-10 placeholder (was)
   end
 
   class API::Actions::Ping < API::Action
@@ -1156,7 +1156,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
   end
 
-  define_singleton_method :stylize, & Headless::CLI::Pen::FUN.stylize  # #posterity for below ancient lines
+  define_singleton_method :stylize, & Git_::Lib_::CLI[]::Pen::FUN.stylize  # #posterity for below ancient lines
 
   PATCH_STYLE_P_A__ = [
     ->(s) { stylize(s, :strong, :red) },

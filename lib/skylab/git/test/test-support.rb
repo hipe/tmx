@@ -3,16 +3,18 @@ require 'skylab/test-support/core'
 
 module Skylab::Git::TestSupport
 
-  ::Skylab::TestSupport::Regret[ self ]
+  Git_ = ::Skylab::Git
+    Autoloader_ = Git_::Autoloader_
+  TestLib_ = ::Module.new
+  TestSupport_ = ::Skylab::TestSupport
+
+  TestSupport_::Regret[ self ]
 
   module CONSTANTS
-    Git = ::Skylab::Git
-    TestSupport = ::Skylab::TestSupport
+    Git_ = Git_
+    TestSupport_ = TestSupport_
+    TestLib_ = TestLib_
   end
-
-  include CONSTANTS
-
-  TestSupport = TestSupport
 
   module InstanceMethods
 
@@ -37,7 +39,7 @@ module Skylab::Git::TestSupport
     def bld_outstream
       @out_a ||= [ ]
       Mock_Stream__.new do |line|
-        @do_debug and TestSupport::System.stderr.puts "(out: #{ line })"
+        @do_debug and TestSupport_::System.stderr.puts "(out: #{ line })"
         @out_a << line ; nil
       end
     end
@@ -68,6 +70,27 @@ module Skylab::Git::TestSupport
     def expect_final str
       expect str
       @out_a.length.should eql( 0 )
+    end
+  end
+
+  module CONSTANTS::TestLib_
+
+    Headless__ = Git_::Lib_::Headless__
+
+    IO_spy_group = -> do
+      TestSupport_::IO::Spy::Group
+    end
+
+    Stderr = -> do
+      TestSupport_::System.stderr
+    end
+
+    Tmpdir = -> do
+      TestSupport_::Tmpdir
+    end
+
+    Tmpdir_pathname = -> do
+      Headless__[]::System.defaults.tmpdir_pathname.join 'gsu-xyzzy'
     end
   end
 end

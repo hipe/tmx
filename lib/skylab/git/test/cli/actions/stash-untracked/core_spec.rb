@@ -8,18 +8,18 @@ module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked::Core__
 
   OUT_I = OUT_I ; ERR_I = ERR_I
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[gi] CLI gsu core" do
 
     extend TS__
 
     it "CLI client loads" do  # can be moved up when appropriate
-      Git::CLI::Client
+      Git_::CLI::Client
     end
 
     it "CLI box action loads" do
-      Git::CLI::Actions::Stash_Untracked
+      Git_::CLI::Actions::Stash_Untracked
     end
 
     it "ping CLI payload line" do

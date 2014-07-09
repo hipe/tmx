@@ -2,9 +2,16 @@ module Skylab::Headless
 
   module Client
 
-    def self.[] mod, * x_a
-      x_a.length.zero? and raise ::ArgumentError, "cherry-picking only"
-      Bundles.apply_iambic_on_client x_a, mod ; nil
+    class << self
+
+      def [] mod, * x_a
+        apply_iambic_on_client x_a, mod
+      end
+
+      def apply_iambic_on_client x_a, mod
+        x_a.length.zero? and raise ::ArgumentError, "cherry-picking only"
+        Bundles.apply_iambic_on_client x_a, mod ; nil
+      end
     end
 
     module Bundles

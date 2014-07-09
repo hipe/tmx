@@ -8,7 +8,7 @@ module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked::Actions__
 
   GSU = GSU
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[gi] CLI actions gsu actions" do
 

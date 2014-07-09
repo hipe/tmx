@@ -2,8 +2,6 @@ module Skylab::Git
 
   class CLI::Actions::Spread
 
-    Basic = Git::Library_::Basic
-
     def initialize i, o, e
       @y = ::Enumerator::Yielder.new( & e.method( :puts ) )
       @snitch = Support_::Snitch_.new @y, self
@@ -32,12 +30,12 @@ module Skylab::Git
     end
 
     def program_name
-      @program_name || Face::FUN.program_basename[]
+      @program_name || Git_::Lib_::CLI_program_basename[]
     end
 
     def build_option_parser
       @is_dry_run = false ; @from_file = nil
-      @op = Git::Library_::OptionParser.new do |op|
+      @op = Git_::Library_::OptionParser.new do |op|
         op.on '-n', '--dry-run', 'dry run.' do
           @is_dry_run = true
         end
@@ -76,7 +74,8 @@ module Skylab::Git
     NUM_NUM_ = "( <num> <num> | #{ EL_ } )"
 
     Hi_ = -> msg do
-      ( @hi ||= Face::CLI.stylify.curry[ [ :green ] ] )[ msg ]
+      @hi ||= Git_::Lib_::CLI[]::Pen::FUN::Stylify.curry[ [ :green ] ]
+      @hi[ msg ]
     end
 
     define_method :hi, & Hi_
@@ -120,7 +119,7 @@ module Skylab::Git
         resolve_move_request_from_integers d_a
       end
     end
-    Match_ = MetaHell::FUN::Parse::Fuzzy_matcher_[ 1, EL_ ]  # fuzzy match 'e'
+    Match_ = Git_::Lib_::Fuzzy_matcher[ 1, EL_ ]  # fuzzy match 'e'
 
     def get_parsed_contiguous_integers argv
       a = [ ]
@@ -144,7 +143,7 @@ module Skylab::Git
       end.call
     end
 
-    Move_Request_ = Basic::Struct[ :from_d, :to_d ]
+    Move_Request_ = Git_::Lib_::Struct[ :from_d, :to_d ]
     class Move_Request_
 
       def factor
@@ -174,7 +173,7 @@ module Skylab::Git
 
     def get_branches_stream_line_scanner
       r = get_branches_stream
-      r && Basic::List::Scanner[ r ]
+      r && Git_::Lib_::Scanner[ r ]
     end
 
     def get_branches_stream
@@ -190,7 +189,7 @@ module Skylab::Git
     end
 
     def get_branches_stream_from_git # #hack-alert
-      _i, o, _e = Git::Library_::Open3.popen3 "git branch | cut -c 3-"
+      _i, o, _e = Git_::Library_::Open3.popen3 "git branch | cut -c 3-"
       _i.close
       if '' != (( s = _e.read ))
         bork "huh? - #{ s }"
@@ -240,7 +239,7 @@ module Skylab::Git
 
     module API_Model
 
-      Branches = Basic::Struct[ :branch_a ]
+      Branches = Git_::Lib_::Struct[ :branch_a ]
       class Branches
 
         class << self
@@ -334,7 +333,7 @@ module Skylab::Git
         end
       end
 
-      Branch_ = Basic::Struct[ :num_s, :body, :num_d ]
+      Branch_ = Git_::Lib_::Struct[ :num_s, :body, :num_d ]
       class Branch_
         def initialize num_s, body
           @num_s = num_s ; @body = body
@@ -375,7 +374,7 @@ module Skylab::Git
 
         module Actions
           define_singleton_method :fuzzy_const_get, &
-            MetaHell::Boxxy::Fuzzy_const_get.curry[ self ]
+            Git_::Lib_::Fuzzy_const_get[].curry[ self ]
         end
 
         Entity_ = -> client, _fields_, * field_i_a do
@@ -406,11 +405,11 @@ module Skylab::Git
           end
         end
 
-        Work_Unit_ = Basic::Struct[ :from_d, :to_d ]
+        Work_Unit_ = Git_::Lib_::Struct[ :from_d, :to_d ]
 
         class Actions::Evenulate < Branch_Mungulator_
 
-          MetaHell::Funcy_globless[ self ]
+          Git_::Lib_::Funcy_globless[ self ]
 
           Entity_[ self, :fields, :branches, :outstream, :snitch ]
 
@@ -420,7 +419,7 @@ module Skylab::Git
           end
 
           def determine_work_a
-            bubble = Git::Library_::Set.new ; work_a = [ ]
+            bubble = Git_::Library_::Set.new ; work_a = [ ]
             do_number = -> d do
               is_even = ( d % 2 ).zero?
               d_ = is_even ? d : d + 1
@@ -438,7 +437,7 @@ module Skylab::Git
 
         class Actions::Spread < Branch_Mungulator_
 
-          MetaHell::Funcy_globless[ self ]
+          Git_::Lib_::Funcy_globless[ self ]
 
           Entity_[ self, :fields, :branches, :move_request_a,
             :outstream, :snitch ]
@@ -458,7 +457,7 @@ module Skylab::Git
             @branch_number_to_idx_h = @branches._number_to_idx_h
             @work_a = @branches._sorted_number_a.
               map( & Work_Unit_.method( :new ) ).freeze
-            scn = Basic::List::Scanner[ @move_request_a ]
+            scn = Git_::Lib_::Scanner[ @move_request_a ]
             r = true
             while (( move_request = scn.gets ))
               r = process_single_move_request( move_request ) or break
@@ -486,7 +485,7 @@ module Skylab::Git
               d1 = ( pair.from_d * move.factor ).to_i
               if d1_h[ d1 ]
                 # when a collision is detected, the number has occurred 2 times.
-                ( col ||= Basic::Box.new ).
+                ( col ||= Git_::Lib_::Box[].new ).
                   add_or_modify d1, -> { 2 }, -> i { i + 1 }
               else
                 d1_h[ d1 ] = true
@@ -499,7 +498,6 @@ module Skylab::Git
               end * ', ' })" )
             r
           end
-          Count_ = Basic
 
           def prepare_hi move, idx1
             -> do

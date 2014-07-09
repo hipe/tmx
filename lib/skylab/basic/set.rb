@@ -196,9 +196,7 @@ module Skylab::Basic
 
     class Execute__
 
-      def initialize
-        super
-      end
+      # (no `initialize`)
 
       attr_writer( * %i( agent bork_p member_set input_pairs
         error_count_p vessel_has_p vessel_write_p vessel_x ) )

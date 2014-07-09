@@ -4,19 +4,16 @@ module Skylab::Git::TestSupport::CLI
 
   ::Skylab::Git::TestSupport[ self ]
 
-  module CONSTANTS
-    Headless = self::Git::Library_::Headless
-  end
-
   include CONSTANTS
-  Git = Git
-  Headless = Headless
-  TestSupport = TestSupport
 
-  OUT_I__ = :outstream ; ERR_I__ = :errstream
+  ERR_I__ = :errstream
+  Git_ = Git_
+  OUT_I__ = :outstream
+  TestLib_ = TestLib_
 
   module CONSTANTS
-    OUT_I = OUT_I__ ; ERR_I = ERR_I__
+    ERR_I = ERR_I__
+    OUT_I = OUT_I__
   end
 
   module InstanceMethods
@@ -24,7 +21,7 @@ module Skylab::Git::TestSupport::CLI
     # ~ test-time support
 
     def invoke_from_workdir * x_a
-      r = nil ; Git::Library_::FileUtils.cd workdir_pn.to_s do
+      r = nil ; Git_::Library_::FileUtils.cd workdir_pn.to_s do
         r = invk x_a
       end ; r
     end
@@ -44,7 +41,7 @@ module Skylab::Git::TestSupport::CLI
     # ~ ~ ~ two stream spying
 
     let :two_spy_group do
-      spy = TestSupport::IO::Spy::Group.new
+      spy = TestLib_::IO_spy_group[].new
       spy.do_debug_proc = -> { do_debug }
       spy.add_stream OUT_I__ ; spy.add_stream ERR_I__
       spy
@@ -80,10 +77,11 @@ module Skylab::Git::TestSupport::CLI
       s
     end
 
-    STYLE_RX__ = Headless::CLI::Pen::SIMPLE_STYLE_RX
+    pen = Git_::Lib_::CLI[]::Pen
 
-    Headless::CLI::Pen::FUN.each_pair_at %i( unstyle_styled ), &
-      method( :define_method )
+    STYLE_RX__ = pen::SIMPLE_STYLE_RX
+
+    pen::FUN.each_pair_at %i( unstyle_styled ), & method( :define_method )
 
     def contiguous_string_from_lines_on i
       line_a = bkd_a
