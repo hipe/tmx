@@ -50,7 +50,7 @@ module Skylab::TanMan::TestSupport::API::Actions
 
         response = api_invoke_action [:remote, :list]
         response.should be_success
-        a = response.result.to_a # FIXME [#048]
+        a = response.result.to_a # [#048]
         a.length.should eql(1)
         x = a.first
         d = x.to_a
@@ -63,7 +63,7 @@ module Skylab::TanMan::TestSupport::API::Actions
           /\Acreating global-conf-file \.\. done \(146 bytes\.\)\n\z/ )
         response = api_invoke_action [:remote, :list]
         response.should be_success
-        a = response.result.to_a # FIXME [#048]
+        a = response.result.to_a  # [#048]
         a.length.should eql(1)
         a = a.to_a
         a.map!(&:to_a) # omg i'm so sorry

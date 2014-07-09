@@ -46,8 +46,7 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree
         @o.debug! 's-tdout; '
         @e.debug! 's-tderr: '
       end
-      f._FIXME_15_with_ :param_h, { }, :upstream, up, :paystream, @o, :infostream, @e
-      f
+      f.with_properties :param_h, {}, :upstream, up, :paystream, @o, :infostream, @e
     end
 
     def fixtures_dir_pn

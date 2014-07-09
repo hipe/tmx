@@ -9,7 +9,7 @@ module Skylab::MetaHell
       #
       #     class Foo
       #       MetaHell::Fields.contoured self,
-      #         :absorber, :with,
+      #         :globbing, :absorber, :with,
       #         :proc, :foo,
       #         :memoized, :proc, :bar,
       #         :method, :bif,
@@ -39,11 +39,11 @@ module Skylab::MetaHell
           from_iambic_and_client a, client
         end
         def from_iambic_and_client a, client
-          Glint__.new( client ).with_iambic_absorbed_fully( a ).flush
+          Shell__.new( client ).with_iambic_absorbed_fully( a ).flush
         end
       end
 
-      class Glint__
+      class Shell__
 
         def initialize client
           @client = client
@@ -65,6 +65,7 @@ module Skylab::MetaHell
           memoized: :parse_memoized,
           method: :parse_method,
           overriding: :parse_absorber,
+          passive: :parse_absorber,
           private: :parse_absorber,
           proc: :parse_proc,
           required: :parse_required
@@ -248,7 +249,7 @@ module Skylab::MetaHell
     #
     #     class Foo
     #       MetaHell::Fields.contoured self,
-    #         :overriding, :absorber, :initialize,
+    #         :overriding, :globbing, :absorber, :initialize,
     #         :required, :field, :foo, :field, :bar
     #     end
     #
@@ -278,7 +279,7 @@ module Skylab::MetaHell
         end
       end
 
-      class Glint__
+      class Shell__
       private
         def parse_required
           parse_with_branch REQUIRED_BRANCH__

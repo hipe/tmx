@@ -10,7 +10,7 @@ module Skylab::MetaHell::TestSupport::Fields::Periphery
 
   Subject = MetaHell::Fields.contoured
 
-  ABSORBER__ = [ :overriding, :absorber, :initialize ].freeze
+  ABSORBER__ = [ :overriding, :globbing, :absorber, :initialize ].freeze
 
   describe "[mh] fun fields periphery" do
 

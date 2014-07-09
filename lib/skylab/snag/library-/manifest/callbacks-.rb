@@ -12,7 +12,9 @@ module Skylab::Snag
         :file_utils_p, :tmpdir_p
       ].freeze
 
-      Snag_::Lib_::Basic_Fields[].via_field_i_a_and_client MEMBER_A_, self
+      Snag_::Lib_::Basic_Fields[ :client, self,
+        :globbing, :absorber, :initialize,
+        :field_i_a, MEMBER_A_ ]
 
       attr_reader( * MEMBER_A_ )
 

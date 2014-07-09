@@ -101,8 +101,8 @@ module Skylab::MetaHell
         absorber: :pass_thru_two,  # EEW [#064]
         argful: :parse_argful,
         globbing: :pass_thru_one,
-        globless: :pass_thru_one,
-        overriding: :pass_thru_one
+        overriding: :pass_thru_one,
+        passive: :pass_thru_one
       }.freeze
 
       def pass_thru_one
@@ -132,7 +132,7 @@ module Skylab::MetaHell
       end
 
       DEFAULT_MODIFIERS__ = [
-        :globless, :absorber, :absorb_iambic_fully,
+        :absorber, :absorb_iambic_fully,
         :passive, :absorber, :absorb_iambic_passively ].freeze
 
       class Field_From_Method__ < MetaHell_::Lib_::Aspect[]

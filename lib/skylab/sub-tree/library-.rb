@@ -30,6 +30,10 @@ module Skylab::SubTree
 
     Basic__ = sidesys[ :Basic ]
 
+    Basic_Fields = -> * x_a do
+      MetaHell__[]::Basic_Fields.via_iambic x_a
+    end
+
     Bound_field_reflection_class = -> do
       Basic__[]::Field::Reflection::Bound_
     end
@@ -94,26 +98,32 @@ module Skylab::SubTree
       Face__[]::API::Normalizer_.enhance_client_class x, * x_a
     end
 
+    Entity_via_iambic = -> x_a do
+      client = x_a.fetch 0
+      :fields == x_a.fetch( 1 ) or raise ::ArgumentError
+      x_a[ 0, 2 ] = EMPTY_A__
+      Basic_Fields[ :client, client,
+        :absorber, :initialize,
+        :field_i_a, x_a ]
+    end
+    EMPTY_A__ = [].freeze  # etc
+
     Face__ = sidesys[ :Face ]
 
     Field_front_expression_agent = -> a, b do
       Face__[]::API::Normalizer_::Field_Front_Exp_Ag_.new a, b
     end
 
-    Fields = -> mod, * i_a do
-      MetaHell__[]::Basic_Fields.via_field_i_a_and_client i_a, mod
-    end
-
-    Fields_with = -> * x_a do
-      MetaHell__[]::Basic_Fields.via_iambic x_a
-    end
-
     Fields_from_methods = -> *a, p do
       MetaHell__[]::Fields::From.methods.iambic_and_block a, p
     end
 
-    Funcy = -> x do
+    Funcy_globful = -> x do
       MetaHell__[]::Funcy[ x ]
+    end
+
+    Funcy_globless = -> x do
+      MetaHell__[]::Funcy_globless[ x ]
     end
 
     Hack_label_proc = -> do

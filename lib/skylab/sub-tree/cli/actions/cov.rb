@@ -18,7 +18,8 @@ module Skylab::SubTree
     # order matters above - since test nodes get merged destructively into
     # code nodes, the order is as such and never the reverse.
 
-    Lib_::Fields_with[ :client, self, :method, :absorb_params,
+    Lib_::Basic_Fields[ :client, self,
+      :absorber, :absrb_iambic_fully,
       :field_i_a, [ :list_as, :path, :be_verbose ] ]
 
     def initialize
@@ -31,7 +32,7 @@ module Skylab::SubTree
     end
 
     def invoke param_h
-      absorb_params( * param_h.flatten )
+      absrb_iambic_fully param_h.flatten
       o = corresponding_api_action_class.new.
         init_for_invocation_with_services get_services
       o.prepare :list_as, @list_as, :path, @path, :be_verbose, @be_verbose

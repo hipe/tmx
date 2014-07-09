@@ -42,11 +42,11 @@ module Skylab::Face
       end
     end
 
-    def initialize a
+    def initialize x_a
       @left_x = @sep_x = @right_x = @do_show_header = @field_box =
         @read_rows_from = @write_lines_to = nil
-      atomic_sugar a
-      _FIXME_14_( * a ) ; nil
+      atomic_sugar x_a
+      absorb_iambic_fully x_a ; nil
     end
   private
     def atomic_sugar a  # hack - whenever exactly 1
@@ -154,9 +154,7 @@ module Skylab::Face
       @max_a.length
     end
 
-    Lib_::Fields_from_methods[
-      :globbing, :absorber, :_FIXME_14_,
-    -> do
+    Lib_::Fields_from_methods[ :absorber, :absorb_iambic_fully, -> do
       def read_rows_from a
         @read_rows_from = a.shift  # special case - allow no arg at end!
         nil
@@ -287,10 +285,10 @@ module Skylab::Face
       curry( *a ).execute
     end
 
-    def curry *a
-      atomic_sugar a
+    def curry * x_a
+      atomic_sugar x_a
       otr = dupe
-      otr._FIXME_14_( *a )
+      otr.absorb_iambic_fully x_a
       otr
     end
 

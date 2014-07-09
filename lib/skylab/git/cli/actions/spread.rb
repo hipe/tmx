@@ -278,10 +278,10 @@ module Skylab::Git
           end
         end.call
 
-        def invoke i, *a
-          clas = API_Model::Actions.fuzzy_const_get i
-          a << :branches << self << :snitch << @snitch
-          clas.new( * a ).execute
+        def invoke i, * x_a
+          cls = API_Model::Actions.fuzzy_const_get i
+          x_a << :branches << self << :snitch << @snitch
+          cls.new( x_a ).execute
         end
 
         def fetch_item_by_number num_d
@@ -378,6 +378,13 @@ module Skylab::Git
             MetaHell::Boxxy::Fuzzy_const_get.curry[ self ]
         end
 
+        Entity_ = -> client, _fields_, * field_i_a do
+          :fields == _fields_ or raise ::ArgumentError
+          Git_::Lib_::Basic_Fields[ :client, client,
+            :absorber, :initialize,
+            :field_i_a, field_i_a ]
+        end
+
         class Branch_Mungulator_
 
         private
@@ -403,9 +410,9 @@ module Skylab::Git
 
         class Actions::Evenulate < Branch_Mungulator_
 
-          MetaHell::Funcy[ self ]
+          MetaHell::Funcy_globless[ self ]
 
-          Git_::Lib_::Basic_fields[ self, :branches, :outstream, :snitch ]
+          Entity_[ self, :fields, :branches, :outstream, :snitch ]
 
           def execute
             @work_a = determine_work_a
@@ -431,9 +438,9 @@ module Skylab::Git
 
         class Actions::Spread < Branch_Mungulator_
 
-          MetaHell::Funcy[ self ]
+          MetaHell::Funcy_globless[ self ]
 
-          Git_::Lib_::Basic_fields[ self, :branches, :move_request_a,
+          Entity_[ self, :fields, :branches, :move_request_a,
             :outstream, :snitch ]
 
           def execute

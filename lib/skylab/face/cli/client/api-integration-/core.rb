@@ -160,14 +160,15 @@ module Skylab::Face
       end
 
       class Executable_Request_
-        Lib_::Basic_fields[ :client, self, :struct_like, :field_i_a,
-          [ :name_x, :param_x, :expression_agent_p ] ]
+        Lib_::Basic_Fields[ :client, self, :struct_like,
+          :absorber, :initialize,
+          :field_i_a, [ :name_x, :param_x, :expression_agent_p ] ]
       end
 
       undef_method :get_api_executable_with  # #loader-stub
 
       def get_api_executable_with *a
-        o = Executable_Request_[ *a ]
+        o = Executable_Request_[ a ]
         norm_a = (( nx = o.name_x )) ? [ * nx ] : @last_hot.anchored_last
         y = [ :name_i_a, norm_a,
               :event_listener, event_listener_for_api_executable ]

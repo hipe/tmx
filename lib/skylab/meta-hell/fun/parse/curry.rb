@@ -72,7 +72,7 @@ module Skylab::MetaHell
             MetaHell::Library_::Basic::Mutex::Write_Once.new :state_mutex
           # state encompasses input and output. various algorithms may handle
           # input and output together or separately, but we ensure that etc.
-        _FIXME_12_( * input_a ) ; nil
+        absrb_iambic_fully input_a ; nil
       end
 
       # ~ :+[#056] typical base class implementation:
@@ -233,7 +233,7 @@ module Skylab::MetaHell
         a.length.times do
           aa << cq.shift << a.shift
         end
-        _FIXME_12_( * aa ) ; nil
+        absrb_iambic_fully aa ; nil
       end
       def say_too_many cq, a
         "too many arguments (#{ a.length } for #{ cq.length } #{
@@ -273,9 +273,12 @@ module Skylab::MetaHell
           MetaHell::EMPTY_P_
         end
       end
+
     MetaHell_::Fields::From.methods( :argful,
-        :globbing, :absorber, :_CONFIRM_ME_2_with,
-        :absorber, :_FIXME_12_ ) do  # borrow 1 indent
+      :absorber, :absrb_iambic_fully,
+      :passive, :absorber, :absorb_iambic_passively,  # until [#067]
+      :globbing, :absorber, :with
+    ) do  # borrow 1 indent
 
       def algorithm a
         @algorithm_p = a.fetch 0 ; a.shift

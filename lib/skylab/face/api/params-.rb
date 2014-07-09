@@ -8,7 +8,7 @@ module Skylab::Face
       end
       def via_iambic x_a
         # (in the spirit of [#mh-056] #contoured-fields)
-        mod = (( contour = Contour_Parse_.new( * x_a ) )).client_mod
+        mod = (( contour = Contour_Parse_.new( x_a ) )).client_mod
         mod.const_set :FIELDS_, contour.params  # gotta #comport with fields lib
         nil
       end
@@ -138,10 +138,10 @@ module Skylab::Face
 
     class Contour_Parse_
 
-      def initialize *a
+      def initialize x_a
         @meta_param_x_a = @param_class = nil
         @params = Param_Field_[]::Box.new
-        _FIXME_13_( * a ) ; nil
+        absrb_iambic_fully x_a ; nil
       end
 
       attr_reader :params
@@ -152,7 +152,8 @@ module Skylab::Face
 
       private
       Lib_::Fields_from_methods[
-        :globbing, :absorber, :_FIXME_13_,
+        :absorber, :absrb_iambic_fully,
+        :passive, :absorber, :absorb_iambic_passively,  # until [#mh-067]
       -> do
 
         def client a

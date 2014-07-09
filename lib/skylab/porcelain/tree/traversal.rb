@@ -2,7 +2,7 @@ module ::Skylab::Porcelain
 
   class Tree::Traversal
 
-    # Tree::Fields_[ self, :crook, :pipe, :tee ]
+    # Tree::Entity_[ self, :fields, :crook, :pipe, :tee ]
 
     def initialize
       @glyphset_x = nil

@@ -60,7 +60,7 @@ module Skylab::Face
   public
 
     def get_executable_with *a  # the lower-level, fully customizable interface.
-      o = Executable_Request_[ * a ]
+      o = Executable_Request_[ a ]
       get_executable_with_notify
       action = build_primordial_action o.name_i_a    # [#016]
       wire_for_expression action, o                  # [#017]
@@ -69,9 +69,10 @@ module Skylab::Face
     end
 
     class Executable_Request_
-      Lib_::Basic_fields[ :client, self, :struct_like, :field_i_a,
-        [ :name_i_a, :param_h, :expression_agent_p, :event_listener,
-          :service_provider_p ] ]
+      Lib_::Basic_Fields[ :client, self, :struct_like,
+        :absorber, :initialize,
+        :field_i_a, [ :name_i_a, :param_h, :expression_agent_p,
+          :event_listener, :service_provider_p ]]
     end
 
     def get_reflective_action i_a  # for documentation, not execution

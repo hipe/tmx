@@ -11,7 +11,9 @@ module Skylab::SubTree
       # by simply returning a symbolic method-ish name when relevant, to
       # indicate that there may be more rendering that needs to be done.
 
-      Lib_::Fields[ self, :emit_p, :hubs, :did_error_p, :list_as ]
+      SubTree_::Lib_::Basic_Fields[ :client, self,
+        :globbing, :absorber, :initialize,
+        :field_i_a, [ :emit_p, :hubs, :did_error_p, :list_as ]]
 
       def execute_and_resolve
         begin

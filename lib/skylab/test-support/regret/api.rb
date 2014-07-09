@@ -19,6 +19,9 @@ module Skylab::TestSupport
           ::Skylab::Callback::Autoloader
         end
         Basic__ = Lib_::Basic__
+        Basic_Fields = -> * x_a do
+          MetaHell__[]::Basic_Fields.via_iambic x_a
+        end
         Box = Lib_::Box
         Const_reduce = -> * x_a do
           Autoloader__[].const_reduce.via_iambic x_a
@@ -40,9 +43,6 @@ module Skylab::TestSupport
         end
         Field_exponent_proc = -> do
           MetaHell__[]::FUN::Parse::Field_::Exponent_
-        end
-        Fields = -> * x_a do
-          MetaHell__[]::Basic_Fields.via_iambic x_a
         end
         Headless__ = Lib_::Headless__
         Ick = -> x do

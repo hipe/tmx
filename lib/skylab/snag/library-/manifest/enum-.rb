@@ -4,7 +4,8 @@ module Skylab::Snag
 
     class Enum_ < Funcy_
 
-      Snag_::Lib_::Basic_Fields[ :client, self, :method, :_FIXME_9_absrb,
+      Snag_::Lib_::Basic_Fields[ :client, self,
+        :absorber, :absorb_iambic_fully,
         :field_i_a, [ :flyweight, :error_p, :info_p ] ]
 
       def initialize any_pathname, manifest_file_p

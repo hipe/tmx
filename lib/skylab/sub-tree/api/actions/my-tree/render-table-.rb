@@ -4,7 +4,7 @@ module Skylab::SubTree
 
     class Render_table_ < Lib_::Struct[ :paystream, :row_a ]
 
-      Lib_::Funcy[ self ]
+      Lib_::Funcy_globful[ self ]
 
       def execute
         row_a = [ ]

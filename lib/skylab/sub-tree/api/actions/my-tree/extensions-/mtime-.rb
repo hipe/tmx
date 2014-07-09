@@ -4,13 +4,13 @@ module Skylab::SubTree
 
     class Extensions_::Mtime_
 
-      SubTree::Lib_::Fields_with[ :client, self, :method, :_FIXME_absrb_7, :field_i_a,
-        [ :local_normal_name, :infostream, :verbose ] ]
+      SubTree::Lib_::Basic_Fields[ :client, self,
+        :absorber, :absrb_iambic_fully,
+        :field_i_a, [ :local_normal_name, :infostream, :verbose ]]
 
-      def initialize *a
+      def initialize x_a
         @now_t = SubTree::Library_::Time.new  # doesn't get cleared anywhere
-        _FIXME_absrb_7( *a )
-        nil
+        absrb_iambic_fully x_a ; nil
       end
 
       attr_reader :local_normal_name

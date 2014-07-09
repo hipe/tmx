@@ -1,3 +1,6 @@
+[#069] #open Funcy will go all globless one day
+[#068] #open rewrite contoured parsing to be unobtrusive
+[#067] #open in countoured, absorption methods should be self-contained
 [#066]       #doc-point the metahell fields narrative ..
 [#065] #open unify use of MetaHell_ not MetaHell
 [#064] #open fix syntax sharing

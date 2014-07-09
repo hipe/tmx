@@ -4,7 +4,7 @@ module Skylab::Porcelain
 
     class To_text_
 
-      Fields_[ self, :client ]
+      Entity_[ self, :fields, :client ]
 
       def execute
         lines = get_lines_ea

@@ -4,9 +4,9 @@ module Skylab::SubTree
 
     class Code_glob_
 
-      Lib_::Funcy[ self ]
+      Lib_::Funcy_globless[ self ]
 
-      Lib_::Fields[ self, :app_hub_pn, :test_dir_pn, :sub_path_a ]
+      Entity_[ self, :fields, :app_hub_pn, :test_dir_pn, :sub_path_a ]
 
       def execute
         Stop_at_pathname_[ @test_dir_pn ] and fail "sanity - hub '.' or / ?"

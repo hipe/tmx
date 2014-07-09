@@ -4,7 +4,7 @@ module Skylab::Snag
 
     class Line_editor_ < Funcy_
 
-      Snag_::Lib_::Basic_fields[ self,
+      Entity_[ self, :fields,
 
         :at_position_x,  # when it is zero it means "insert the new lines at
         # the begnning of the file" else it is expected to be a rendered

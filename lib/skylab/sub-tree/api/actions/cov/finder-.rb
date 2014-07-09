@@ -6,10 +6,10 @@ module Skylab::SubTree
 
     class Finder_  # [#sl-118]
 
-      Lib_::Funcy[ self ]
+      Lib_::Funcy_globless[ self ]
 
-      Lib_::Fields[ self, :yielder, :error_p, :info_p,
-        :find_in_pn, :be_verbose ]
+      Entity_[ self,
+        :fields, :yielder, :error_p, :info_p, :find_in_pn, :be_verbose ]
 
       def execute
         ok = true ; cmd = build_command

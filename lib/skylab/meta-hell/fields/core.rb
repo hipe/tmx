@@ -180,7 +180,7 @@ module Skylab::MetaHell
         end
       end
       def initialize
-        @do_globbing = true
+        @do_globbing = false
         @do_passive = false
         super()
       end
@@ -188,7 +188,6 @@ module Skylab::MetaHell
       METHOD_OP_H__.merge!(
         absorber: :prcss_absorber,
         globbing: :prcss_globbing,
-        globless: :prcss_globless,
         passive: :prcss_passive,
       ).freeze
       def unobtrsv_passive_scan d, i_a
@@ -208,9 +207,6 @@ module Skylab::MetaHell
       end
       def prcss_globbing
         @do_globbing = true ; nil
-      end
-      def prcss_globless
-        @do_globbing = false ; nil
       end
       def prcss_passive
         @do_globbing = false
@@ -299,7 +295,7 @@ module Skylab::MetaHell
       def set next_field, *a
         :next_field == next_field or raise ::ArgumentError, 'no'
         @field_attributes and fail "sanity - clobber field attributes?"
-        @field_attributes = Field_Attributes__.new( *a )
+        @field_attributes = Field_Attributes__[ a ]
         nil
       end
       def delete_field_attributes
@@ -314,8 +310,9 @@ module Skylab::MetaHell
     end
     #
     class Field_Attributes__
-      MetaHell_::Basic_Fields.for self, :desc
-      attr_reader :desc
+      MetaHell_::Basic_Fields.with :client, self, :struct_like,
+        :absorber, :initialize,
+        :field_i_a, [ :desc ]
     end
 
     class Aspect_  # (apprentice/redux of Basic::Field)

@@ -29,7 +29,9 @@ module Skylab::SubTree
 
     class Extensions_
 
-      Lib_::Fields[ self, :arg_box, :infostream, :verbose ]
+      SubTree_::Lib_::Basic_Fields[ :client, self,
+        :globbing, :absorber, :initialize,
+        :field_i_a, [ :arg_box, :infostream, :verbose ]]
 
       def is_valid_and_valid_self
         begin
@@ -63,12 +65,12 @@ module Skylab::SubTree
         @in_notifiee_i_a = nil
         box.to_a.each do |i, bf|
           val = bf.value
-          a = [ :local_normal_name, i, :infostream, @infostream,
+          x_a = [ :local_normal_name, i, :infostream, @infostream,
                 :verbose, @verbose  ]
-          true == val or a << :arg_value << val  # only when interesting
+          true == val or x_a << :arg_value << val  # only when interesting
           _name = Name_.from_variegated_symbol :"#{ i }_"
           _class = self.class.const_get _name.as_const, false
-          ag = _class.new( * a )
+          ag = _class.new x_a
           index_notifiee ag
           _h[ i ] = ag
         end
@@ -82,8 +84,6 @@ module Skylab::SubTree
       end
     public
       attr_reader :in_notifiee_i_a, :post_notifiee_i_a
-    private
-
     end
   end
 end

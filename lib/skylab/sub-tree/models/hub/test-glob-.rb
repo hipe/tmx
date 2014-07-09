@@ -4,10 +4,10 @@ module Skylab::SubTree
 
     class Test_glob_
 
-      Lib_::Funcy[ self ]
+      Lib_::Funcy_globless[ self ]
 
-      def initialize *a
-        @test_dir_pn, @sub_path_a, @local_test_pathname_a = a
+      def initialize x_a
+        @test_dir_pn, @sub_path_a, @local_test_pathname_a = x_a
       end
 
       def execute

@@ -86,6 +86,10 @@ module Skylab::TestSupport
       MetaHell__[]::Funcy[ mod ]
     end
 
+    Funcy_globless = -> mod do
+      MetaHell__[]::Funcy_globless[ mod ]
+    end
+
     Face__ = sidesys[ :Face ]
 
     Headless__ = sidesys[ :Headless ]

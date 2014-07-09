@@ -4,7 +4,7 @@ module Skylab::Porcelain
 
     class From_paths_
 
-      Fields_[ self, :client, :paths, :init_node ]
+      Entity_[ self, :fields, :client, :paths, :init_node ]
 
       def execute
         root = @client.new :name_services, @client.new

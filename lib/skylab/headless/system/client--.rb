@@ -6,7 +6,8 @@ module Skylab::Headless
 
       def initialize
         # ( here is where we would easily append user args )
-        absrb( * DEFAULT_ARG_X_A__ ) ; freeze ; nil
+        absrb_iambic_fully DEFAULT_ARG_X_A__.dup  # until [#mh-068]
+        freeze ; nil
       end
 
       def which exe_name
@@ -21,7 +22,9 @@ module Skylab::Headless
       SAFE_NAME_RX__ = /\A[-a-z0-9_]+\z/i
 
 
-      defn_x_a = [ :absorber, :absrb ]  # #_FIXME_
+      defn_x_a = [ :absorber, :absrb_iambic_fully,
+        :passive, :absorber, :absorb_iambic_passively  # until [#mh-067]
+      ]
       o = defn_x_a.method :push  # declarations
       a = []  # definitions
 
@@ -40,7 +43,7 @@ module Skylab::Headless
       end
 
 
-      MetaHell_::Fields.contoured self, * defn_x_a
+      MetaHell_::Fields.contoured.from_iambic_and_client defn_x_a, self
 
       DEFAULT_ARG_X_A__ = a.freeze
 

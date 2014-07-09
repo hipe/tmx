@@ -11,8 +11,9 @@ module Skylab::SubTree
                 info_tree: :structural
 
 
-    Lib_::Fields_with[ :client, self, :method, :_FIXME_8_absrb, :field_i_a,
-                            [ :list_as, :path, :be_verbose ] ]
+    SubTree_::Lib_::Basic_Fields[ :client, self,
+      :absorber, :absrb_iambic_fully,
+      :field_i_a, [ :list_as, :path, :be_verbose ]]
 
     def initialize
       @error_was_emitted = @sub_path_a = @lister = nil
@@ -25,13 +26,12 @@ module Skylab::SubTree
       self
     end
 
-    def prepare *a
-      _FIXME_8_absrb( *a )
+    def prepare * x_a
+      absrb_iambic_fully x_a
       normalize_arg_pn @path
       if ! @error_was_emitted && @list_as
         normalize_list_as
-      end
-      nil
+      end ; nil
     end
 
     def execute

@@ -24,7 +24,7 @@ module Skylab::MetaHell::TestSupport::FUN::Parse::F_VS_
             :predicate, :do_server,
             :fuzzy_min, 1,
           :call, -> * input_x_a do
-            _CONFIRM_ME_2_with :state_x_a, input_x_a
+            with :state_x_a, input_x_a
             execute
           end,
           :constantspace, self

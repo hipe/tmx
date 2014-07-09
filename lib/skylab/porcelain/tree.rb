@@ -6,11 +6,12 @@ module Skylab::Porcelain
       mod.extend ModuleMethods ; mod.send :include, InstanceMethods ; nil
     end
 
-    Fields_ = -> mod, *a do
-      Porcelain_::Lib_::Basic_Fields[].via_field_i_a_and_client a, mod
-      mod.send :define_singleton_method, :[] do |*aa|
-        new( * aa ).execute
-      end
+    Entity_ = -> client, _fields_, * i_a do
+      :fields == _fields_ or raise ::ArgumentError
+      Porcelain_::Lib_::Basic_Fields[].with :client, client,
+        :absorber, :initialize,
+        :field_i_a, i_a
+      Porcelain_::Lib_::Funcy_globless[ client ] ; nil
     end
 
     DEFAULT_PATH_SEPARATOR_ = '/'
@@ -37,12 +38,12 @@ module Skylab::Porcelain
     module InstanceMethods
 
       class Construction_
-        Fields_[ self, :slug, :name_services ]
+        Entity_[ self, :fields, :slug, :name_services ]
         attr_reader :slug, :name_services
       end
 
-      def initialize *a
-        o = Construction_.new( *a )
+      def initialize * x_a
+        o = Construction_.new x_a
         if (( ns = o.name_services ))
           @node_id = ns.attach_notify self
           @name_services = ns

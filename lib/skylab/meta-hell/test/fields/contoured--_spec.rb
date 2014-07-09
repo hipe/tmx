@@ -20,7 +20,7 @@ module Skylab::MetaHell::TestSupport::Fields::Contoured__
         module Sandbox_1
           class Foo
             MetaHell::Fields.contoured self,
-              :absorber, :with,
+              :globbing, :absorber, :with,
               :proc, :foo,
               :memoized, :proc, :bar,
               :method, :bif,
@@ -58,7 +58,7 @@ module Skylab::MetaHell::TestSupport::Fields::Contoured__
         module Sandbox_2
           class Foo
             MetaHell::Fields.contoured self,
-              :overriding, :absorber, :initialize,
+              :overriding, :globbing, :absorber, :initialize,
               :required, :field, :foo, :field, :bar
           end
         end

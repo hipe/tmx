@@ -4,14 +4,15 @@ module Skylab::Snag
 
     class Adder_ < Funcy_
 
-      Snag_::Lib_::Basic_Fields[ :client, self, :scan_method, :parse,
-                              :field_i_a, [ :callbacks ] ]
+      Snag_::Lib_::Basic_Fields[ :client, self,
+        :passive, :absorber, :absrb_iambic_passively,
+        :field_i_a, [ :callbacks ] ]
 
-      def initialize( node, * a )
-        @node = node
-        parse a
-        @info_p = Detect_info_p[ a ]
-        @rest_a = a
+      def initialize x_a
+        @node = x_a.shift
+        absrb_iambic_passively x_a
+        @info_p = Detect_info_p[ x_a ]
+        @rest_a = x_a
       end
 
       Detect_info_p = Snag_::Lib_::Basic_Fields[].iambic_detect.curry[ :info_p ]

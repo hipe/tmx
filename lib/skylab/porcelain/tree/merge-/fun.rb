@@ -46,15 +46,15 @@ module Skylab::Porcelain
 
         class Modus_Operandus_
 
-          Fields_[ self, :type_ish_i, :match, :dupe,
-                                :merge_atomic, :merge_one_dimensional,
-                                :merge_union ]
+          Entity_[ self, :fields, :type_ish_i, :match, :dupe,
+           :merge_atomic, :merge_one_dimensional,
+           :merge_union ]
 
           class << self ; private :new end
 
-          def self.[] *a
-            a.unshift :type_ish_i
-            new( *a )
+          def self.[] * x_a
+            x_a.unshift :type_ish_i
+            new x_a
           end
 
           attr_reader :type_ish_i, :match, :dupe, :merge_atomic,

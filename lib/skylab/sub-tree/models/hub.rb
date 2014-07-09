@@ -2,14 +2,15 @@ module Skylab::SubTree
 
   class Models::Hub
 
-    Lib_::Fields_with[ :client, self, :method, :_FIXME_4_absrb,
-     :field_i_a, [ :test_dir_pn, :sub_path_a, :local_test_pathname_ea,
+    Lib_::Basic_Fields[ :client, self,
+      :absorber, :absrb_iambic_fully,
+      :field_i_a, [ :test_dir_pn, :sub_path_a, :local_test_pathname_ea,
                    :lister_p, :info_tree_p ] ]
 
-    def initialize *a
-      _FIXME_4_absrb( *a )
+    def initialize *x_a  # #yes-globbed
       @did_show_debubbing_output = false
       @sub_hub_pn = nil
+      absrb_iambic_fully x_a ; nil
     end
 
     def get_tree_combined

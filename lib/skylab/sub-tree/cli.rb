@@ -65,7 +65,7 @@ module Skylab::SubTree
 
     option_parser do |o|
       front = my_tree_front
-      front._FIXME_15_with_( :param_h, @param_h, :expression_agent,
+      front.with_properties( :param_h, @param_h, :expression_agent,
         SubTree::Lib_::Field_front_expression_agent[
           front.field_box, Lib_::Stock_API_expression_agent[] ]
       )
@@ -80,8 +80,8 @@ module Skylab::SubTree
         path << ( ::Dir.pwd if i.tty? && ! @param_h[ :file ] )  # yes nil
       end
       @param_h[ :path_a ] = path
-      f._CONFIRM_ME_3_with  :upstream, i, :paystream, o, :infostream, e, :program_name,
-        @legacy_last_hot.normalized_invocation_string
+      f.with_properties :upstream, i, :paystream, o, :infostream, e,
+        :program_name, @legacy_last_hot.normalized_invocation_string
       r = f.flush
       if false == r
         @legacy_last_hot.invite

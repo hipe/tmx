@@ -11,16 +11,17 @@ module Skylab::CodeMolester
     # (a lot of this has necessary vestigials from the treetop hack that
     # it originally was.)
 
-    CodeMolester::Lib_::Basic_Fields[ :client, self, :method, :_FIXME_11_absrb,
-      :field_i_a, [ :outfile_stem, :path, :inpath_p, :outdir_p ] ]
+    CodeMolester::Lib_::Basic_Fields[ :client, self,
+      :absorber, :absrb_iambic_fully,
+      :field_i_a, [ :outfile_stem, :path, :inpath_p, :outdir_p ]]
 
     def self.[] path_s
       new( :path, path_s ).get_nested_const_names
     end
 
-    def initialize *a
+    def initialize * x_a
       @inpathname = @path = @outpathname = @outpath = nil
-      _FIXME_11_absrb( *a )
+      absrb_iambic_fully x_a ; nil
     end
 
     def get_nested_const_names

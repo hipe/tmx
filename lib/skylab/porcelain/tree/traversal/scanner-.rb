@@ -7,7 +7,8 @@ module ::Skylab::Porcelain
       MetaHell::Funcy[ self ]
 
       Porcelain_::Lib_::Basic_Fields[ :client, self,
-        :method, :_FIXME_10_absrb, :field_i_a, [ :glyphset_x ] ]
+        :absorber, :absrb_iambic_fully,
+        :field_i_a, [ :glyphset_x ]]
 
       class Scn__ < ::Proc
         alias_method :gets, :call
@@ -25,10 +26,10 @@ module ::Skylab::Porcelain
         attr_reader :count
       end
 
-      def initialize tree, *a
+      def initialize tree, * x_a
         @tree = tree
         @initial_spaces ||= '  '
-        _FIXME_10_absrb( *a ) ; nil
+        absrb_iambic_fully x_a ; nil
       end
 
       def execute

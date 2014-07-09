@@ -4,7 +4,9 @@ module Skylab::SubTree
 
     SubTree::Lib_::Enhance_as_API_normalizer[ self, :all ]
 
-    Lib_::Fields_with[ :client, self, :method, :_FIXME_15_with_,
+    Lib_::Basic_Fields[ :client, self,
+      :absorber, :absrb_iambic_fully,
+      :passive, :absorber, :absorb_iambic_passively,  # until [#mh-067]
       :field_i_a, [ :expression_agent, :program_name, :param_h,
                     :upstream, :paystream, :infostream ] ]
 
@@ -87,26 +89,33 @@ module Skylab::SubTree
       nil
     end
 
-    def order_proxy
-      @order_proxy ||= Lib_::Order_proxy[ @param_h ]
+    def with_properties * x_a
+      absrb_iambic_fully x_a
+      self  # #allow-chaining
     end
-    private :order_proxy
 
-
-    def absorb_params *a
+    def with_parameters * x_a
       h = order_proxy
-      0.step( a.length - 1, 2 ).each do |i|
-        h[ a[ i ] ] = a[ i + 1 ]
+      0.step( x_a.length - 1, 2 ).each do |i|
+        h[ x_a[ i ] ] = x_a[ i + 1 ]
       end
-      self  # allow chaining
+      self  # #allow-chaining
     end
 
   private
+    def order_proxy
+      @order_proxy ||= bld_order_proxy
+    end
+    def bld_order_proxy
+      Lib_::Order_proxy[ @param_h ]
+    end
+
 
     def initialize
       @exit_status_p = nil
     end
 
+  public
     def execute
       begin
         r = resolve_upstream_from_i_and_OK or break
@@ -149,7 +158,7 @@ module Skylab::SubTree
 
     def traverse_direct
       t = @traversal ; u = @upstream ; line = nil
-      t._CONFIRM_ME_1_with :out_p, @paystream.method( :puts )
+      t.with :out_p, @paystream.method( :puts )
       t.puts line while (( line = u.gets ))
       close_upstream_and_flush_traversal
       true
@@ -167,7 +176,7 @@ module Skylab::SubTree
 
     def traverse_with_notification  # assume extensions
       u = @upstream ; t = @traversal
-      t._CONFIRM_ME_1_with  :out_p, @paystream.method( :puts )
+      t.with  :out_p, @paystream.method( :puts )
       while (( line = u.gets ))
         line.chomp!
         lf = Leaf_.new line
@@ -180,7 +189,7 @@ module Skylab::SubTree
 
     def traverse_via_triple_buffer  # assume extensions
       u = @upstream ; t = @traversal ; row_a = [ ]
-      t._CONFIRM_ME_1_with :out_p, -> glyphs, slug, any_leaf do
+      t.with :out_p, -> glyphs, slug, any_leaf do
         row_a << Row_.new( glyphs, slug, any_leaf )
         nil
       end
@@ -266,7 +275,7 @@ module Skylab::SubTree
     class Upstream_resolver_ < Lib_::Struct[ :upstream, :path_a, :file,
       :pattern, :say_p_p, :change_upstream_p, :cmd_s_p, :exit_status_p_p ]
 
-      Lib_::Funcy[ self ]
+      Lib_::Funcy_globful[ self ]
 
       def execute
         have_a = [ ]

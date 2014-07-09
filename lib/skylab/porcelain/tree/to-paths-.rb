@@ -4,7 +4,7 @@ module Skylab::Porcelain
 
     class To_paths_
 
-      Fields_[ self, :client ]
+      Entity_[ self, :fields, :client ]
 
       def execute
         @path_separator = @client.path_separator

@@ -4,7 +4,7 @@ module Skylab::Snag
 
     class Tmpdir_Curry_ < Funcy_
 
-      Snag_::Lib_::Basic_fields[ self, :dirname, :tmpdir_pathname,
+      Entity_[ self, :fields, :dirname, :tmpdir_pathname,
         :is_dry_run, :file_utils, :escape_path_p, :error_p ]
 
       def execute

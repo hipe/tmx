@@ -4,12 +4,13 @@ module Skylab::Snag
 
     class Changer_ < Funcy_
 
-      Snag_::Lib_::Basic_Fields[ :client, self, :scan_method, :parse,
-                              :field_i_a, [ :callbacks ] ]
+      Snag_::Lib_::Basic_Fields[ :client, self,
+        :passive, :absorber, :absrb_iambic_passively,
+        :field_i_a, [ :callbacks ] ]
 
-      def initialize( node, * x_a )
-        @node = node
-        parse x_a
+      def initialize x_a
+        @node = x_a.shift
+        absrb_iambic_passively x_a
         @rest_a = x_a
       end
 

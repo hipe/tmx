@@ -3,8 +3,8 @@ module Skylab::SubTree
   class API::Actions::My_Tree::Traversal_
 
     Lib_::Contoured_fields[ self,
-      :private, :globless, :absorber, :_CHECK_ME_1_absrb_iambic_fully,
-      :globbing, :absorber, :_CONFIRM_ME_1_with,
+      :private, :absorber, :absrb_iambic_fully,
+      :globbing, :absorber, :with,
       :field, :sep,
       :field, :do_verbose_lines,
       :field, :info_p ]
@@ -38,11 +38,10 @@ module Skylab::SubTree
       end
     end ]
 
-    def initialize * a
-      _CHECK_ME_1_absrb_iambic_fully a
+    def initialize * x_a
       @curr_a = [] ; @matrix_a = [] ; @sep ||= SEP_
       @glyph_set = SubTree::Lib_::CLI_tree_glyph_sets[]::WIDE
-      nil
+      absrb_iambic_fully x_a ; nil
     end
 
   public

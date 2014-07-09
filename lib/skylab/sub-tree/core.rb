@@ -22,7 +22,16 @@ module Skylab::SubTree
     Autoloader_[ self ]
   end
 
+  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+
   DOT_ = '.'.freeze
+
+  Entity_ = -> * x_a do
+    SubTree_::Lib_::Entity_via_iambic[ x_a ]
+  end
+
+  stowaway :Lib_, 'library-'
+
   Name_ = Callback_::Name
   SEP_ = '/'.freeze
 
@@ -34,9 +43,6 @@ module Skylab::SubTree
   end.call
 
   SubTree = self
-
-  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
-
-  stowaway :Lib_, 'library-'
+  SubTree_ = self
 
 end

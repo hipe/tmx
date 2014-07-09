@@ -2,11 +2,15 @@ module Skylab::MetaHell
 
   module Basic_Fields
 
-    # using the basic fields facility out of the box only gives you
-    # a readable way to set instance variables via a constructor
+    # the basic fields facility out of the box is a low-frills, low-level
+    # means of defining "absorber" methods (frequently but not always
+    # `initialize` for use in constructors) that accept as arguments
+    # "iambic"-looking lists (either globbed or not globbed depending on you).
     #
     #     class Foo
-    #       MetaHell::Basic_Fields.for self, :ding, :bat
+    #       MetaHell::Basic_Fields.with :client, self,
+    #         :globbing, :absorber, :initialize,
+    #         :field_i_a, [ :ding, :bat ]
     #     end
     #
     #     (( FOO = Foo.new )).instance_variables.sort  # => [ :@bat, :@ding ]
@@ -26,66 +30,167 @@ module Skylab::MetaHell
     #
     #     Foo.new( :ding, :x, :bat, :y, :bazzle, :z )  # => KeyError: key not found: :bazzle
 
-    def self.for client, * i_a
-      via_field_i_a_and_client i_a, client
+    def self.with * x_a
+      Shell__.new( x_a ).execute
     end
 
-    def self.via_field_i_a_and_client i_a, mod
-      via_iambic [ :client, mod, :do_super, :field_i_a, i_a,
-        :method, :initialize ]
+    def self.via_iambic x_a
+      Shell__.new( x_a ).execute
     end
 
-    arg = -> o, i, a do
-      o[ i ] = a.fetch 0 ; a.shift ; nil
-    end
-
-    flag = -> o, i, _ do
-      o[ i ] = true ; nil
-    end
-
-    arg_h = {
-      client: arg,
-      method: arg,
-      scan_method: arg,
-      do_super: flag,
-      struct_like: flag,
-      field_i_a: arg }.freeze
-
-    define_singleton_method :via_iambic, -> a do
-      o = Metafields__.new
-      while a.length.nonzero?
-        ii = a.shift
-        arg_h.fetch( ii )[ o, ii, a ]
+    class Shell__
+      def initialize x_a=nil
+        @absorber_a = @client = @field_i_a = nil
+        @is_struct_like = nil
+        x_a and parse_iambic_fully x_a ; nil
       end
-      mod = o.client
-      mod.const_set :BASIC_FIELDS_H_,
-        ::Hash[ o.field_i_a.map { |i| [ i, :"@#{ i }" ] } ].freeze
-      if o.struct_like
-        o.method ||= :initialize
-        Define_struct_like_methods__[ mod, o.field_i_a ]
+      attr_writer :client, :field_i_a
+
+      def parse_iambic_fully x_a
+        prs_iambic x_a, true
       end
-      o.method && Define_method__[ mod, o.method, o.do_super ]
-      o.scan_method && Define_scan_method__[ mod, o.scan_method ]
-      nil
-    end
-
-    Metafields__ = ::Struct.new :client, :method, :scan_method,
-      :do_super, :struct_like, :field_i_a
-
-    Define_method__ = -> mod, method_i, do_super do
-      mod.send :define_method, method_i do |*a|
-        i_a = [] ; h = self.class::BASIC_FIELDS_H_  # #ancestor-const-ok
-        while a.length.nonzero?
-          i_a << ( i = a.shift )
-          instance_variable_set h.fetch( i ), a.fetch( 0 )
-          a.shift
+      def parse_iambic_passively x_a
+        prs_iambic x_a, false
+      end
+    private
+      def prs_iambic x_a, is_active
+        @absorber = nil
+        @d = -1 ; @x_a = x_a ; @last = x_a.length - 1
+        while @d < @last
+          m_i = OP_H__[ @x_a.fetch @d += 1 ]
+          if m_i
+            send m_i
+          else
+            is_active and OP_H__.fetch @x_a.fetch @d
+            @d -= 1 ; break
+          end
         end
-        Nil_out_the_rest__[ h, self, i_a ]
-        super() if do_super  # imagine prepend, imagine block given
-        nil
+        -1 == @d or @x_a[ 0, @d + 1 ] = EMPTY_A_
+        @absorber and raise ::ArgumentError, "incomplete absorber" ; nil
       end
-      nil
+    public
+
+      def execute
+        @client.const_set :BASIC_FIELDS_H_,
+          ::Hash[ @field_i_a.map { |i| [ i, :"@#{ i }" ] } ].freeze
+        @is_struct_like and
+          Define_struct_like_methods__[ @client, @field_i_a ]
+        @absorber_a and @absorber_a.each do |absorber|
+          absorber.execute_on_client @client
+        end ; nil
+      end
+    private
+      OP_H__ = {
+        absorber: :finish_absorber,
+        client: :parse_client,
+        field_i_a: :parse_field_i_a,
+        globbing: :parse_globbing,
+        passive: :parse_passive,
+        struct_like: :parse_struct_like,
+        supering: :parse_supering
+      }.freeze
+      def parse_client
+        @absorber and raise bld_interrupted_absorber_exception
+        @client = @x_a.fetch @d += 1 ; nil
+      end
+      def parse_globbing
+        active_absorber.is_globbing = true ; nil
+      end
+      def parse_passive
+        active_absorber.is_passive = true ; nil
+      end
+      def parse_supering
+        active_absorber.is_supering = true ; nil
+      end
+      def finish_absorber
+        active_absorber.method_name = @x_a.fetch @d += 1
+        abs = @absorber ; @absorber = nil
+        ( @absorber_a ||= [] ).push abs ; nil
+      end
+      def active_absorber
+        @absorber ||= Absorber__.new
+      end
+      def parse_struct_like
+        @absorber and raise bld_interrupted_absorber_exception
+        @is_struct_like = true ; nil
+      end
+      def parse_field_i_a
+        @absorber and raise bld_interrupted_absorber_exception
+        @field_i_a = @x_a.fetch @d += 1 ; nil
+      end
+      def bld_interrupted_absorber_exception
+        ::ArgumentError.new "'#{ @x_a[ @d ] }' while absorber in progress"
+      end
     end
+
+    class Absorber__
+      def initialize
+        @is_globbing = @is_passive = @is_supering = nil
+      end
+      attr_writer :is_globbing, :is_passive, :is_supering, :method_name
+      def execute_on_client client
+        @is_globbing && @is_passive and self._SANITY
+        do_super = @is_supering
+        absrb = bld_proc
+        if @is_globbing
+          client.send :define_method, @method_name do |*x_a|
+            absrb[ self, x_a ]
+            do_super and super()  # imagine prepend, imagine block given
+          end
+        else
+          client.send :define_method, @method_name do |x_a|
+            absrb[ self, x_a ]
+            do_super and super()
+          end
+        end ; nil
+      end
+    private
+      def bld_proc
+        is_passive = @is_passive
+        -> instance, x_a do
+          ivar_h = instance.class::BASIC_FIELDS_H_  # #ancestor-const-ok
+          used_i_a = []
+          while x_a.length.nonzero?
+            i = x_a.first ; ivar = ivar_h[ i ]
+            if ivar
+              used_i_a.push i
+              instance.instance_variable_set ivar, x_a[ 1 ]
+              x_a[ 0, 2 ] = EMPTY_A_
+            else
+              is_passive or ivar_h.fetch i
+              break
+            end
+          end
+          Nil_out_the_rest__[ ivar_h, instance, used_i_a ] ; nil
+        end
+      end
+    end
+
+    # when you use the "struct like" "macro",
+    # you get a `members` instance method
+    #
+    #     class Foo
+    #       MetaHell::Basic_Fields.with :client, self, :struct_like,
+    #         :globbing, :absorber, :initialize,
+    #         :field_i_a, [ :fiz, :faz ]
+    #     end
+    #
+    #     Foo.new.members  # => [ :fiz, :faz ]
+    #
+    # you get an attr reader and writer for each member
+    #
+    #     f = Foo.new :faz, :hi
+    #     f.faz  # => :hi
+    #     f.fiz  # => nil
+    #     f.faz = :horf
+    #     f.faz  # => :horf
+    #     f.fiz = :heff
+    #     f.fiz  # => :heff
+    #
+    # and you get an alias from '[]' to 'new'
+    #
+    #     Foo[ :fiz, :hoo, :faz, :harf ].fiz  # => :hoo
+    #
 
     Define_struct_like_methods__ = -> mod, field_i_a do
       field_i_a.freeze  # we take what is not ours
@@ -96,21 +201,7 @@ module Skylab::MetaHell
         end
         def members ; self.class::BASIC_FIELD_A_ end
         attr_accessor( * field_i_a )
-      end
-      nil
-    end
-
-    Define_scan_method__ = -> mod, scan_method_i do
-      mod.send :define_method, scan_method_i do |a|  # NOTE `a` not `*a`
-        i_a = [ ] ; h = self.class::BASIC_FIELDS_H_
-        while a.length.nonzero?
-          (( ivar = h[ i = a.fetch( 0 ) ] )) or break
-          i_a << i
-          a.shift ; instance_variable_set ivar, a.fetch( 0 ) ; a.shift
-        end
-        Nil_out_the_rest__[ h, self, i_a ]
-        nil  # you can figure it out if you try
-      end
+      end ; nil
     end
 
     Nil_out_the_rest__ = -> ivar_h, obj, i_a do

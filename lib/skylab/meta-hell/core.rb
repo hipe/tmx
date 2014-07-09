@@ -42,6 +42,12 @@ module Skylab
         new( * x_a ).execute
       end
     end
+
+    Funcy_globless = -> cls do  # until [#069]
+      def cls.[] * x_a
+        new( x_a ).execute
+      end
+    end
   end
 end
 

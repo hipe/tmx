@@ -21,5 +21,8 @@ module Skylab::Porcelain
         MetaHell::Basic_Fields.via_iambic x_a
       end
     end
+    Funcy_globless = -> client do
+      MetaHell::Funcy_globless[ client ]
+    end
   end
 end

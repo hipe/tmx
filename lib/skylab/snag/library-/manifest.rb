@@ -11,9 +11,9 @@ module Skylab::Snag
       @pathname or fail "sanity - no pathname"
     end
 
-    def curry_enum *a
+    def curry_enum * x_a
       ea = self.class::Enum_.new  @pathname, -> { manifest_file }
-      ea._FIXME_9_absrb( *a )
+      ea.absorb_iambic_fully x_a
       ea
     end
 
@@ -64,9 +64,16 @@ module Skylab::Snag
       FU_curry_.method( :[] )
     end
 
+    Entity_ = -> client, _fields_, * field_i_a do
+      :fields == _fields_ or raise ::ArgumentError
+      Snag_::Lib_::Basic_Fields[ :client, client,
+        :absorber, :initialize,
+        :field_i_a, field_i_a ]
+    end
+
     class FU_curry_
-      MetaHell::Funcy[ self ]
-      Snag_::Lib_::Basic_fields[ self, :escape_path_p, :be_verbose, :info_p ]
+      MetaHell::Funcy_globless[ self ]
+      Entity_[ self, :fields, :escape_path_p, :be_verbose, :info_p ]
       def execute
         rx = Headless::CLI::PathTools::FUN::ABSOLUTE_PATH_HACK_RX
         Headless::IO::FU.new -> s do
@@ -86,7 +93,7 @@ module Skylab::Snag
 
     class Funcy_
 
-      MetaHell::Funcy[ self ]
+      MetaHell::Funcy_globless[ self ]
 
     private
 

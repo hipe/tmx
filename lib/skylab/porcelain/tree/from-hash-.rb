@@ -4,7 +4,7 @@ module Skylab::Porcelain
 
     class From_hash_
 
-      Fields_[ self, :client, :hash ]
+      Entity_[ self, :fields, :client, :hash ]
 
       def execute
         work @client.new, @hash

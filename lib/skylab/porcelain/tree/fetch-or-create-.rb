@@ -4,7 +4,7 @@ module Skylab::Porcelain
 
     class Fetch_or_create_
 
-      Fields_[ self,
+      Entity_[ self, :fields,
         :client,
         :do_create,
         :else_p,

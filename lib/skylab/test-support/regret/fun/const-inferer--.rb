@@ -11,10 +11,11 @@ module Skylab::TestSupport
         # infers e.g [ :Foo, :BarBaz, :Bif ]. it can certainly guess the
         # casing wrong.
 
-        TestSupport_::Lib_::Funcy[ self ]
+        TestSupport_::Lib_::Funcy_globless[ self ]
 
         Lib_::Fields_contoured[ self,
           :overriding, :absorber, :initialize,
+          :passive, :absorber, :absorb_iambic_passively,  # until [#mh-067]
           :required, :field, :tail_path,
           :required, :field, :notice_p ]
 

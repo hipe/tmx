@@ -4,9 +4,9 @@ module Skylab::SubTree
 
     class Treeer_
 
-      Lib_::Funcy[ self ]
+      Lib_::Funcy_globless[ self ]
 
-      Lib_::Fields[ self, :hub_a, :arg_pn, :card_p ]
+      Entity_[ self, :fields, :hub_a, :arg_pn, :card_p ]
 
       def execute
         @hub_a.length.nonzero? or fail "sanity"
