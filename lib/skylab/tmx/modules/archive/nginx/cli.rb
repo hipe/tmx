@@ -2,7 +2,7 @@ module Skylab::TMX
 
   module Modules::Nginx
 
-    class CLI < Skylab::Face::CLI::Client
+    class CLI < CLI_Client_[]
 
       set :desc, -> y do
         y << "(this used to install nginx, could be resucitated)"

@@ -6,6 +6,6 @@ module Skylab::TMX::TestSupport::CLI
 
   include CONSTANTS
 
-  Face::TestSupport::CLI::Client[ self ]  # tons of stuff from here
+  Face_::TestSupport::CLI::Client[ self ]  # tons of stuff from here
 
 end

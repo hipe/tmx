@@ -1,6 +1,8 @@
-module Skylab::TMX::Modules::Schema
+module Skylab::TMX
 
-  class CLI < Skylab::Face::CLI::Client
+  module Modules::Schema  # ..
+
+  class CLI < CLI_Client_[]
 
     set :desc, -> y do
       y << "part of the big dream, but off for now.."
@@ -13,5 +15,6 @@ module Skylab::TMX::Modules::Schema
 
     # kexternal_dependencies "#{File.dirname(__FILE__)}/data/deps.json"
 
+  end
   end
 end

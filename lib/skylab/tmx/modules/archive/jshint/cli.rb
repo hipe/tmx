@@ -2,7 +2,7 @@ require 'skylab/face/core'
 
 module Skylab::TMX
   module Modules::Jshint
-    class CLI < Skylab::Face::CLI::Client
+    class CLI < CLI_Client_[]
 
       set :desc, -> y do
         y << '(woah - heh this tiny thing "works")'

@@ -1,4 +1,4 @@
-module ::Skylab::TMX
+module Skylab::TMX
 
   module Front_Loader
 
@@ -8,7 +8,7 @@ module ::Skylab::TMX
 
         ::Class.new( Binfile_Stub_ ).class_exec do
 
-          box_mod.const_set Autoloader::FUN::Constantize[ stem ], self
+          box_mod.const_set Lib_::Constantize[ stem ], self
 
           self::BIN_PN_ = bin_pn ; self::PREFIX_ = prefix ; self::STEM_ = stem
           self::Adapter = self
@@ -16,7 +16,7 @@ module ::Skylab::TMX
         end
       end
 
-    class Basic_Stub_ < ::Skylab::Face::CLI::Client::Adapter::For::Face::Of::Hot
+    class Basic_Stub_ < CLI_Client_[]::Adapter::For::Face::Of::Hot
 
       def pre_execute  # we don't ever build an actual client ourselves
         true

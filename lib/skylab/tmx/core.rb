@@ -1,38 +1,40 @@
 require_relative '..'
-
-require 'skylab/face/core'
-require 'skylab/meta-hell/core'
-require 'skylab/porcelain/core'
-
+require 'skylab/callback/core'
 
 module Skylab::TMX
 
-  # (for each required internal library and sub-product constant, make a local
-  # such constant here under our own for readability and ease of refactoring:)
+  Callback_ = ::Skylab::Callback
+    Autoloader_ = Callback_::Autoloader
 
-  %i| Autoloader Face MetaHell Porcelain TMX |.each do |c|  # self too
-    const_set c, ::Skylab.const_get( c, false )
-  end
+  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
-  MetaHell::MAARS[ self ]
-
-  module TMX::Modules
-
-    # this isomorphs with the filesystem and is used to that end.
-    # (note that generated namespaces will go in a sister module)
-
-    MetaHell::Boxxy[ self ]
-
-  end
-
-  module CLI  # #stowaway this tiny thing here
-
-    MetaHell::MAARS[ self ]
-
+  module CLI  # #stowaway
     def self.new *a
       self::Client.new( *a )
     end
+    Autoloader_[ self ]
   end
+
+  CLI_Client_ = -> do
+    Lib_::Face__[]::CLI::Client
+  end
+
+  module Lib_
+    sidesys = Autoloader_.build_require_sidesystem_proc
+    Constantize = -> i do
+      ::Skylab::Autoloader::FUN::Constantize[ i ]
+    end
+    Distill = -> i do
+      Callback_::Distill_[ i ]
+    end
+    Face__ = sidesys[ :Face ]
+    MetaHell__ = sidesys[ :MetaHell ]
+    Proxy = -> do
+      MetaHell__[]::Proxy
+    end
+  end
+
+  TMX = self  # not 'TMX_', just for aesthetics
 
   # (:+[#su-001]:none)
 end

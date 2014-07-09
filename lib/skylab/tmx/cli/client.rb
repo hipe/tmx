@@ -6,7 +6,7 @@ module Skylab::TMX
   # an intimation at the aspirations for what may grow to maybe become .. hl.)
 
 
-  class CLI::Client < Face::CLI::Client
+  class CLI::Client < CLI_Client_[]
 
     # TMX::Modules::Arch.touch
 
@@ -59,7 +59,7 @@ module Skylab::TMX
       rs
     end
 
-    class Kernel_ < Face::CLI::Client::CLI_Kernel_  # the current way to do this :/
+    class Kernel_ < CLI_Client_[]::CLI_Kernel_  # the current way to do this :/
 
       def touch  # this is [#fa-038] - we get "touched" when we need to.
         ( @toucher ||= build_toucher ).touch
@@ -70,12 +70,13 @@ module Skylab::TMX
 
       def build_toucher
         eew = parent_shell.instance_variable_get :@be_verbose
-        white = ::Skylab::MetaHell::MONADIC_TRUTH_  # got replaced by `skip`
-        Toucher_[ TMX::Modules, white, sheet, @y, eew ]
+        Toucher_[ TMX::Modules, MONADIC_TRUTH__, sheet, @y, eew ]
       end
+      MONADIC_TRUTH__ = -> _ { true }
     end
 
-    Toucher_ = MetaHell::Proxy::Nice.new :touch
+    Toucher_ = Lib_::Proxy[]::Nice.new :touch
+
       # it "touchs" a command node (e.g. namespace) into life as it is needed.
 
     def Toucher_.[] box_mod, white, story, y, be_verbose
@@ -86,17 +87,17 @@ module Skylab::TMX
         # we cannot use autoloader/autovivifier when the module name is in
         # scream case, which some subproduct names are, hence:
         anchor = box_mod.dir_pathname.join "#{ norm_i }"
-        welcome = anchor.sub_ext Autoloader::EXTNAME
+        welcome = anchor.sub_ext Autoloader_::EXTNAME
         if welcome.exist?
           y << "(leaf - #{ pth[ welcome ] })" if be_verbose
-          # require welcome.to_s  ; doing it the below way instead
-          box_mod.const_fetch( norm_i )  # wires them for autoloading
+          Autoloader_.const_reduce [norm_i], box_mod  # loads it
           welcome
         else
-          cli = anchor.join "cli#{ Autoloader::EXTNAME }"
+          cli = anchor.join "cli#{ Autoloader_::EXTNAME }"
           if cli.exist?
             y << "(branch - #{ pth[ cli ] })" if be_verbose
-            box_mod.const_fetch( norm_i ).const_get( :CLI, false )
+            app_mod = Autoloader_.const_reduce [norm_i], box_mod
+            app_mod.const_get :CLI, false
             cli
           else
             y << "(nothing loadable for \"#{ norm_i }\")" if be_verbose

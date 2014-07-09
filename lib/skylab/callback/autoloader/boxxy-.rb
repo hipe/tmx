@@ -74,5 +74,32 @@ module Skylab::Callback
         name_for_lookup.as_distilled_stem
       end
     end
+
+    # ~ names method (rewrote from legacy a.l)
+
+    module Boxxy_
+      module Methods
+        def names
+          ::Enumerator.new do |y|
+            fly = Names__::Get_fly[]
+            constants.each do |i|
+              fly.replace_with_constant_i i
+              y << fly
+            end ; nil
+          end
+        end
+      end
+      module Names__
+        p = -> do
+          class Fly__ < Callback_::Lib_::Name[]::Function::From::Constant
+            alias_method :replace_with_constant_i, :initialize
+            public :replace_with_constant_i
+            def initialize ; end
+          end
+          fly = Fly__.new ; p = -> { fly } ; fly
+        end
+        Get_fly = -> { p[] }
+      end
+    end
   end
 end

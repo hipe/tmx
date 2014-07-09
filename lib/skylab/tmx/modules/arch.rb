@@ -1,5 +1,19 @@
 module Skylab::TMX
 
+  module Modules
+
+    # this isomorphs with the filesystem and is used to that end.
+    # (note that generated namespaces will go in a sister module)
+
+    class << self
+      alias_method :_tmx_original_constants_, :constants
+    end
+    module Archive
+      Autoloader_[ self, :boxxy ]
+    end
+    Autoloader_[ self, :boxxy ]
+  end
+
   class CLI::Client
     namespace :arch, -> do
       Modules::Arch::NS
@@ -11,7 +25,7 @@ module Skylab::TMX
 
   module Modules::Arch
 
-    class NS < ::Skylab::Face::CLI::Client::Namespace_
+    class NS < CLI_Client_[]::Namespace_
       def initialize( * )
         super
         @mechanics.is_not_touched!
@@ -19,7 +33,7 @@ module Skylab::TMX
       use :hi
     end
 
-    class NS::Kernel_ < ::Skylab::Face::CLI::Client::NS_Kernel_
+    class NS::Kernel_ < CLI_Client_[]::NS_Kernel_
 
       def initialize( * )
         super
@@ -32,7 +46,7 @@ module Skylab::TMX
         box_mod = @box_mod
         box_mod.dir_pathname.children( false ).each do |pn|
           anchor = box_mod.dir_pathname.join pn
-          cli = anchor.join "cli#{ Autoloader::EXTNAME }"
+          cli = anchor.join "cli#{ Autoloader_::EXTNAME }"
           if cli.exist?
             if false  # a fallback that we keep around..
               soft_load pn, cli
@@ -61,7 +75,7 @@ module Skylab::TMX
       def direct_load pn, cli
         kls = load_it cli
         if kls
-          top_wisp = Face::CLI::Client::NS_Sheet_.new( nil ).
+          top_wisp = CLI_Client_[]::NS_Sheet_.new( nil ).
             init_with_local_normal_name pn.to_s.intern
           ada = kls::Adapter::For::Face
           oro = ada::Of::Sheet[ top_wisp, kls.story ]
@@ -77,10 +91,10 @@ module Skylab::TMX
       end
 
       def load_it cli
-        b4 = @mod_mod.boxxy_original_constants ; res = nil
+        b4 = @mod_mod._tmx_original_constants_ ; res = nil
         require cli.to_s
         begin
-          otr = @mod_mod.boxxy_original_constants  - b4
+          otr = @mod_mod._tmx_original_constants_  - b4
           otr.length.nonzero? or break
           1 == otr.length or break
           c = otr.fetch 0

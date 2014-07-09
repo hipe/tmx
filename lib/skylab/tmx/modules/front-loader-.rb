@@ -36,7 +36,7 @@ module ::Skylab::TMX
     end
 
     Client_module_resolver_p_ = -> stem do
-      pn = ::Skylab.dir_pathname.join "#{ stem }/core#{ Autoloader::EXTNAME }"
+      pn = ::Skylab.dir_pathname.join "#{ stem }/core#{ Autoloader_::EXTNAME }"
       -> do
         if pn.exist?
           Resolve_client_module_from_core_[ pn, stem ]
@@ -53,7 +53,7 @@ module ::Skylab::TMX
       # letting legacy monoliths maintain their namespace purity. this might
       # be a tag expensive when we are generating index screens..)
 
-      distill = Distill_proc_[]
+      distill = Lib_::Distill
       tgt = distill[ stem ]
       require pn.to_s
       match_a = ::Skylab.constants.reduce [] do |m, c|
@@ -74,12 +74,7 @@ module ::Skylab::TMX
       end
     end
 
-    Distill_proc_ = -> do
-      MetaHell::Boxxy::Distill_proc[]
-    end
-
-    module Stubs_
-    end
+    Stubs_ = ::Module.new
 
     Produce_binfile_stub_class_from_stem_ = TMX::Front_Loader::
       Produce_binfile_stub_class_from_bin_pn_and_prefix_and_box_and_stem_.

@@ -1,6 +1,8 @@
-module Skylab::TMX::Modules::CLI
+module Skylab::TMX
 
-  class CLI < ::Skylab::Face::CLI::Client
+  module Modules::CLI
+
+  class CLI < CLI_Client_[]
 
     use :hi
     set :desc, -> y do
@@ -48,5 +50,6 @@ module Skylab::TMX::Modules::CLI
       require "#{File.dirname(__FILE__)}/api"
       API::Push.run(self, target, req)
     end
+  end
   end
 end

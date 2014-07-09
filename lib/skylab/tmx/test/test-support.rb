@@ -6,8 +6,8 @@ module Skylab::TMX::TestSupport
   ::Skylab::TestSupport::Regret[ self ]
 
   module CONSTANTS
-    Face = ::Skylab::Face
-    MetaHell = ::Skylab::MetaHell
+    TMX_ = ::Skylab::TMX
+    Face_ = TMX_::Lib_::Face__[]
     TestSupport = ::Skylab::TestSupport
     TMX = ::Skylab::TMX
   end

@@ -1,13 +1,8 @@
-require 'skylab/headless/core'  # meh
+module Skylab::TMX
 
-module Skylab
+  module Modules::Bleed::API
 
-  module TMX::Modules::Bleed::API
-  end
-
-  module TMX::Modules::Bleed::API
     module Actions
-      MetaHell::Boxxy[ self ]
     end
   end
 

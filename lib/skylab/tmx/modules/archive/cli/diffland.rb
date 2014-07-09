@@ -1,8 +1,10 @@
 require 'open3'
 
+self._ARCHIVED
+
 module Skylab::TMX::Modules::CLI
   module Diffland
-    extend Skylab::Face::Colors
+    extend Skylab::F_ace::Colors
     class << self
       def run cmd, opts={}
         out = opts.fetch :stdout do Headless::CLI::IO.some_outstream_IO end

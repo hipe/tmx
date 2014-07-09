@@ -6,11 +6,9 @@ module Skylab::TMX::TestSupport::CLI::L2P
 
   include CONSTANTS
 
-  MetaHell = MetaHell
-
   extend TestSupport::Quickie
 
-  describe "#{ TMX }::CLI level 2 pings" do
+  describe "[tmx] CLI level 2 pings" do
 
     extend TS_
 
@@ -142,9 +140,6 @@ module Skylab::TMX::TestSupport::CLI::L2P
 
       oa, ea = [ :outstream, :errstream ].map do |ii|
         io = iog[ ii ]
-        if MetaHell::Proxy::Tee === io  # omg eew allow debug!
-          io = io[ :buffer ]
-        end
         str = io.string
         a = str.split "\n"  # then:
         io.rewind
