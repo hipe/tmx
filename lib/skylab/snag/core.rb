@@ -1,18 +1,15 @@
 require_relative '..'
+require 'skylab/callback/core'
 
 module Skylab::Snag
-
-  %i| Autoloader MetaHell |.each do |i|
-    const_set i, ::Skylab.const_get( i, false )
-  end
 
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
 
-  MetaHell::MAARS[ self ]
+  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
   module Core
-    MetaHell::MAARS::Upwards[ self ]
+    Autoloader_[ self ]
   end
 
   IDENTITY_ = -> x { x }

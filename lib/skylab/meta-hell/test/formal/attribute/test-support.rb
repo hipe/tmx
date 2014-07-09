@@ -15,7 +15,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Attribute
     define_method :one_such_class do |&block|
       kls = TS__.const_set "KLS_#{ FUN.next_id[] }", ::Class.new
       kls.class_eval do
-        extend MetaHell::Formal::Attribute::Definer
+        MetaHell::Formal::Attribute::DSL[ self ]
         class_exec(& block )
       end
       kls

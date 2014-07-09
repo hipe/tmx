@@ -72,7 +72,7 @@ module Skylab::Snag
     end
 
     class FU_curry_
-      MetaHell::Funcy_globless[ self ]
+      Snag_::Lib_::Funcy_globless[ self ]
       Entity_[ self, :fields, :escape_path_p, :be_verbose, :info_p ]
       def execute
         rx = Snag_::Lib_::CLI[]::PathTools::FUN::ABSOLUTE_PATH_HACK_RX
@@ -93,7 +93,7 @@ module Skylab::Snag
 
     class Funcy_
 
-      MetaHell::Funcy_globless[ self ]
+      Snag_::Lib_::Funcy_globless[ self ]
 
     private
 

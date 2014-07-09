@@ -9,7 +9,7 @@ module Skylab::MetaHell
         mod.module_exec EMPTY_A_, & Bundles::Attributes.to_proc ; nil
       end
 
-      def self.extended mod
+      def self.extended mod  # :+#deprecation:until-universal-unification
         DSL[ mod ] ; nil
       end
     end

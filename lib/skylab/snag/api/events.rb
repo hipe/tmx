@@ -2,7 +2,7 @@ module Skylab::Snag
 
   module API::Events
 
-    MetaHell::Boxxy[ self ]
+    Autoloader_[ self, :boxxy ]
 
     -> do  # `taxonomic_streams`
       memo = nil

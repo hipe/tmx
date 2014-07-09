@@ -11,7 +11,7 @@ module ::Skylab::MetaHell::TestSupport::Formal
   build_modules = -> o do
 
     class o::Lib_Task
-      extend MetaHell::Formal::Attribute::Definer
+      MetaHell::Formal::Attribute::DSL[ self ]
     end
 
     class o::Task < o::Lib_Task

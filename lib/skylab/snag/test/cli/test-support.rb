@@ -35,7 +35,7 @@ module Skylab::Snag::TestSupport::CLI
 
     def use_memoized_client
       if ! method_defined? :memo_frame
-        define_method :memo_frame, & MetaHell::FUN.memoize[ -> do
+        define_method :memo_frame, & TestLib_::Memoize[ -> do
           output = FUN.output[]
           client = FUN.client[ output ]
           { output: output, client: client }

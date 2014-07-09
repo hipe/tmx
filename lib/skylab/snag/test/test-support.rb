@@ -9,7 +9,6 @@ module Skylab::Snag::TestSupport
   TestSupport_ = ::Skylab::TestSupport
 
   module CONSTANTS
-    MetaHell = ::Skylab::MetaHell
     Snag_ = Snag_
     TestSupport = ::Skylab::TestSupport
     TestLib_ = TestLib_
@@ -18,7 +17,12 @@ module Skylab::Snag::TestSupport
   include CONSTANTS # in the body of child modules
 
   module TestLib_
-    Headless__ = Snag_::Autoloader_.build_require_sidesystem_proc :Headless
+    sidesys = Snag_::Autoloader_.build_require_sidesystem_proc
+    Headless__ = sidesys[ :Headless ]
+    Memoize = -> p do
+      MetaHell__[]::FUN.memoize[ p ]
+    end
+    MetaHell__ = sidesys[ :MetaHell ]
     Tmpdir_pathname = -> do
       Headless__[]::System.defaults.tmpdir_pathname
     end

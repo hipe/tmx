@@ -7,13 +7,13 @@ module Skylab::Snag
     extend Snag_::Lib_::NLP[]::EN::API_Action_Inflection_Hack
     inflection.inflect.noun :singular
 
-    extend MetaHell::Formal::Attribute::Definer
+    Snag_::Lib_::Formal_attribute[]::DSL[ self ]
     meta_attribute :default
     meta_attribute :required, default: false
 
     Callback_[ self, :employ_DSL_for_digraph_emitter ]  # put `call_digraph_listeners` nearer on the chain than s.c above
 
-    event_factory MetaHell::FUN.memoize[ -> do
+    event_factory Snag_::Lib_::Memoize[ -> do
       Callback_::Event::Factory::Isomorphic.new API::Events # oh boy .. use the
     end ]                   # same factory instance for every action subclass
                             # instance which *should* be fine given the funda-
@@ -33,7 +33,7 @@ module Skylab::Snag
       res = nil
       if const_defined? :PARAMS, false
         a = const_get :PARAMS, false
-        res = MetaHell::Formal::Attribute::Box[
+        res = Snag_::Lib_::Formal_attribute[]::Box[
           a.map { |sym| [ sym, { required: true } ] }
         ]
       else

@@ -2,8 +2,6 @@ module Skylab::Snag
 
   module Library_  # :+[#su-001]
 
-    MetaHell::MAARS[ self ]
-
     stdlib, subsystem = ::Skylab::Subsystem::FUN.
       at :require_stdlib, :require_subsystem
 
@@ -48,6 +46,15 @@ module Skylab::Snag
     Dev_null = -> do
       Headless__[]::IO::DRY_STUB
     end
+    Funcy_globless = -> x do
+      MetaHell__[]::Funcy_globless[ x ]
+    end
+    Formal_attribute = -> do
+      MetaHell__[]::Formal::Attribute
+    end
+    Formal_box = -> do
+      MetaHell__[]::Formal::Box
+    end
     Headless__ = sidesys[ :Headless ]
     IO_FU = -> do
       Headless__[]::IO::FU
@@ -57,6 +64,9 @@ module Skylab::Snag
     end
     NLP = -> do
       Headless__[]::NLP
+    end
+    Memoize = -> p do
+      MetaHell__[]::FUN.memoize[ p ]
     end
     MetaHell__ = sidesys[ :MetaHell ]
     Model_event = -> mod do

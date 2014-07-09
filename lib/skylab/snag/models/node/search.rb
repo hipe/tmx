@@ -53,9 +53,8 @@ module Skylab::Snag
   private
 
     module Query_Nodes_
-      MetaHell::Boxxy[ self ]
       def self.new_valid request_client, query_sexp
-        klass = const_fetch query_sexp.first
+        klass = Autoloader_.const_reduce [ query_sexp.first ], self
         klass.new_valid request_client, query_sexp
       end
     end
@@ -63,7 +62,7 @@ module Skylab::Snag
     class Query_Nodes_::And
       def self.new_valid request_client, query_sexp
         a = query_sexp[ 1 .. -1 ].map do |x|
-          klass = Query_Nodes_.const_fetch x.first
+          klass = Autoloader_.const_reduce [ x.first ], Query_Nodes_
           klass.new_valid request_client, x
         end
         rs = nil

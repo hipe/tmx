@@ -9,9 +9,8 @@ module Skylab::Snag
     #       something, i'm not sure what
     #   + legacy DSL gets turned on below and that's when it hits the fan
 
-    MetaHell::MAARS[ self ]
-                                  # we autoload during load of this file
 
+    Autoloader_[ self ] # because we will need to autoload in the next line
     include CLI::Action::InstanceMethods
 
     Snag_::Lib_::CLI[]::Client[ self,
@@ -113,7 +112,7 @@ module Skylab::Snag
       else
         a = norm_name_a.dup  # [ 'a', 'b' ] => [ 'a', :Actions, 'b'] ..
         full_a = a.reduce( [ a.shift ] ) { |m, x| m << :Actions ; m << x ; m }
-        CLI::Actions.const_fetch full_a  # result in a class as a sheet!!
+        Autoloader_.const_reduce full_a, CLI::Actions  # result in a class as sheet
       end
     end
 
@@ -214,7 +213,7 @@ module Skylab::Snag
 
     def open message=nil, param_h
       # ( see description above - for fun we do a tricky dynamic syntax )
-      pbox = MetaHell::Formal::Box::Open.from_hash param_h ; param_h = nil
+      pbox = Snag_::Lib_::Formal_box[]::Open.from_hash param_h ; param_h = nil
       msg = -> is_opening do                   # i hope you enjoyed this
         a_b = [ 'opening issues', 'listing open issues' ]
         a_b.reverse! if is_opening
@@ -270,7 +269,7 @@ module Skylab::Snag
     Client = self  # #tmx-compat
   end
 
-  module CLI::Actions             # avoiding an #orphan sorry
-    MetaHell::Boxxy[ self ]        # (it's as if we are wiring an autoloader)
-  end                             # also BOXXY IS QUEEN
+  module CLI::Actions  # avoid an #orphan
+    Autoloader_[ self, :boxxy ]
+  end
 end

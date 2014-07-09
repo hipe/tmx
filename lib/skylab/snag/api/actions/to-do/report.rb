@@ -8,7 +8,7 @@ module Skylab::Snag
 
     attribute  :be_verbose
     attribute      :names, required: true,
-                            default: [ "*#{ Autoloader::EXTNAME }" ] # '*.rb'
+                            default: [ "*#{ Autoloader_::EXTNAME }" ] # '*.rb'
     attribute      :paths, required: true
     attribute    :pattern, required: true,
                              default: Snag_::Models::Pattern.default

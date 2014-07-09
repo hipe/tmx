@@ -18,7 +18,7 @@ module Skylab::Snag
     private
 
       def prepare
-        @escape_path_p ||= MetaHell::IDENTITY_
+        @escape_path_p ||= IDENTITY_
         true
       end
 

@@ -146,7 +146,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Attribute
       before :all do
 
         module Defining_Module
-          extend MetaHell::Formal::Attribute::Definer
+          MetaHell::Formal::Attribute::Definer[ self ]
           meta_attribute :regex do |name, meta|
             alias_method(after = "#{name}_after_regex=", "#{name}=")
             define_method("#{name}=") do |str|
@@ -164,7 +164,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Attribute
         end
 
         class Importing_Class
-          extend MetaHell::Formal::Attribute::Definer
+          MetaHell::Formal::Attribute::Definer[ self ]
           meta_attribute Defining_Module
           class << self
             public :meta_attributes

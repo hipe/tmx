@@ -14,6 +14,10 @@ module Skylab::Snag
     define_singleton_method :max_num_dirs_to_search_for_manifest_file do
       max_num_dirs_to_search_for_manifest_file
     end
+
+    module Actions
+      Autoloader_[ self, :boxxy ]
+    end
   end
 
   class API::Client
@@ -44,7 +48,8 @@ module Skylab::Snag
     def build_action normalized_action_name
       # keeping for #posterity, primordial boxxy:
       #path.reduce(self.class) { |m, s| m.const_get(constantize(s)) }.new(self)
-      API::Actions.const_fetch( normalized_action_name ).new self
+      Autoloader_.const_reduce( normalized_action_name, API::Actions ).
+        new self
     end
 
     # getters for *persistent* models *objects* (think daemons):

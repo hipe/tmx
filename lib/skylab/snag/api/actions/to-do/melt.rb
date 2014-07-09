@@ -4,7 +4,7 @@ module Skylab::Snag
 
     attribute :be_verbose
     attribute    :dry_run, default: false
-    attribute      :names, default: [ "*#{ Autoloader::EXTNAME }" ] # '*.rb'
+    attribute      :names, default: [ "*#{ Autoloader_::EXTNAME }" ] # '*.rb'
     attribute      :paths, required: true, default: ['.']  # not really..
     attribute    :pattern, default: Snag_::Models::Pattern.default
 
