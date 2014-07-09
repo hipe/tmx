@@ -10,13 +10,13 @@ module Skylab::CssConvert::TestSupport
 
   module CONSTANTS
     CssConvert = ::Skylab::CssConvert
-    Headless = ::Skylab::Headless
-    TestSupport = ::Skylab::TestSupport
+    Headless_ = CssConvert::Headless_
+    TestSupport_ = ::Skylab::TestSupport
   end
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   module InstanceMethods
     include CONSTANTS
@@ -29,7 +29,7 @@ module Skylab::CssConvert::TestSupport
 
     def cli_instance
       @cli_instance ||= begin
-        streams = TestSupport::IO::Spy::Triad.new
+        streams = TestSupport_::IO::Spy::Triad.new
         _a = streams.values
         app = CssConvert::CLI.new( * _a )
         app.send :program_name=, 'nerk'
@@ -58,6 +58,6 @@ module Skylab::CssConvert::TestSupport
       build_parser(CssConvert::Directive::Parser).parse_string pathname.read
     end
 
-    define_method :unstyle, & Headless::CLI::Pen::FUN.unstyle
+    define_method :unstyle, & Headless_::CLI::Pen::FUN.unstyle
   end
 end

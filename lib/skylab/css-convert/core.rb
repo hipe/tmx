@@ -1,14 +1,11 @@
 require_relative '..'
+require 'skylab/callback/core'
 require 'skylab/headless/core'
-require 'optparse'
 
 module Skylab::CssConvert
 
-  ::Skylab::MetaHell::Autoloader::Autovivifying[ self ]
-
-  Autoloader = ::Skylab::Autoloader
   CssConvert = self
-  Headless = ::Skylab::Headless
+  Headless_ = ::Skylab::Headless
 
   module Core
     # a namespace to hold modality-agnositc stuff
@@ -20,7 +17,7 @@ module Skylab::CssConvert
 
 
   module Core::SubClient::InstanceMethods
-    include Headless::SubClient::InstanceMethods
+    include Headless_::SubClient::InstanceMethods
 
   private
 
@@ -32,7 +29,7 @@ module Skylab::CssConvert
 
   class Core::Params < ::Hash
 
-    Headless::Parameter::Definer[ self ]
+    Headless_::Parameter::Definer[ self ]
 
     param :directives_file, pathname: true, writer: true do
       desc 'A file with directives in it.' # (not used yet)
@@ -56,7 +53,7 @@ module Skylab::CssConvert
 
     include Core::SubClient::InstanceMethods
 
-    Headless::Parameter[ self, :parameter_controller, :oldschool_parameter_error_structure_handler ]
+    Headless_::Parameter[ self, :parameter_controller, :oldschool_parameter_error_structure_handler ]
 
   private
 
@@ -74,7 +71,7 @@ module Skylab::CssConvert
 
   class CLI::Client
 
-    Headless::CLI::Client[ self ]
+    Headless_::CLI::Client[ self ]
 
     include Core::Client::InstanceMethods
 
@@ -131,6 +128,7 @@ module Skylab::CssConvert
     end
 
     def build_option_parser
+      require 'optparse'
       o = ::OptionParser.new
 
       o.base.long[ 'ping' ] = ::OptionParser::Switch::NoArgument.new do |_|
@@ -202,7 +200,7 @@ module Skylab::CssConvert
       keep_going
     end
 
-    define_method :escape_path, & Headless::CLI::PathTools::FUN.pretty_path
+    define_method :escape_path, & Headless_::CLI::PathTools::FUN.pretty_path
 
     def formal_parameters_class
       Core::Params
@@ -219,7 +217,7 @@ module Skylab::CssConvert
 
 
   class CLI::Pen
-    include Headless::CLI::Pen::InstanceMethods
+    include Headless_::CLI::Pen::InstanceMethods
     def em s
       stylize s, :strong, :cyan
     end
@@ -238,7 +236,7 @@ module Skylab::CssConvert
   private
     def color_test _
       pen = io_adapter.pen ; width = 50
-      code_names = Headless::CLI::Pen::CODE_NAME_A
+      code_names = Headless_::CLI::Pen::CODE_NAME_A
       ( code_names - [ :strong ] ).each do |c|
         [[c], [:strong, c]].each do |a|
           s = "would you like some " <<
@@ -282,12 +280,16 @@ module Skylab::CssConvert
     include CLI::VisualTest::InstanceMethods
   end
 
+  Autoloader_ = ::Skylab::Callback::Autoloader
+  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+
   FIXTURES_DIR = CssConvert.dir_pathname.join('test/fixtures')
   VISUAL_TESTS = o = []
   test = ::Struct.new(:name, :value, :method)
   o << test.new('color test', 'see what the CLI colors look like.', :color_test)
   o << test.new('001', 'platonic-ideal.txt', :fixture)
   o << test.new('002', 'minitessimal.txt', :fixture)
+
 
   # (:+[#su-001]:none)
 end
