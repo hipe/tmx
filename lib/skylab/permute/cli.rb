@@ -2,7 +2,7 @@ require_relative 'core'
 
 module Skylab::Permute
 
-  class CLI < Bleeding::Runtime
+  class CLI < Permute_::Lib_::CLI_Client[]
 
     desc "minimal permutations generator."
 
@@ -31,7 +31,8 @@ module Skylab::Permute
         if b
           fail "block and args?"
         else
-          self.parent = Headless::CLI::IO::Adapter::Minimal.new(* a )
+          self.parent = Permute_::Lib_::Headless__[]::
+            CLI::IO::Adapter::Minimal.new( *a )
         end
       end
     }
@@ -45,9 +46,9 @@ module Skylab::Permute
 
   class CLI::Action
 
-    extend Bleeding::Action
+    extend Permute_::Lib_::CLI_Action[]
 
-    Callback[ self, :employ_DSL_for_digraph_emitter ]
+    Callback_[ self, :employ_DSL_for_digraph_emitter ]
 
     listeners_digraph  syntax_error: :info
 
@@ -216,7 +217,7 @@ module Skylab::Permute
     end
 
     def process enum_a
-      Permute::API::Actions::Generate.new enum_a do |o|
+      Permute_::API::Actions::Generate.new enum_a do |o|
         row_a = []
         o.on_header do |pairs|
           row_a << pairs.map { |_, label| hdr label }
@@ -225,7 +226,7 @@ module Skylab::Permute
           row_a << pairs.map { |_, value| value }
         end
         o.on_finished do
-          Headless::CLI::Table.render row_a do |oo|
+          Permute_::Lib_::Table[].render row_a do |oo|
             oo.on_info { |txt| call_digraph_listeners :info, txt }
             oo.on_row  { |txt| call_digraph_listeners :payload, txt }
           end

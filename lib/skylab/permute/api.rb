@@ -1,10 +1,9 @@
 module Skylab::Permute
 
-  module API
-  end
+  API = ::Module.new
 
   class API::Action
-    Callback[ self, :employ_DSL_for_digraph_emitter ]
+    Callback_[ self, :employ_DSL_for_digraph_emitter ]
     event_factory -> _, __, x=nil { x } # "datapoints" - events are just the data
   end
 

@@ -1,14 +1,16 @@
 require_relative 'test-support'
 require 'skylab/callback/test/test-support'  # keep here until needed elsewhere
 
-module ::Skylab  # [#ts-010]
-# ..
-describe "#{ Permute::CLI }" do
+module Skylab::Permute::TestSupport::CLI  # (was [#ts-010])
+
+  include ::Skylab::Permute::TestSupport
+
+describe "[pe] CLI" do
 
   before :all do  # just a bad idea all around, but we want to see how it goes
-    cli = Permute::CLI.new
+    cli = Permute_::CLI.new
     cli.program_name = 'permoot'
-    spy = Callback::TestSupport::Call_Digraph_Listeners_Spy.new
+    spy = TestLib_::Spy[].new
     cli.singleton_class.send(:define_method, :call_digraph_listeners) do |type, payload|
       spy.call_digraph_listeners(type, payload)
     end
@@ -20,7 +22,7 @@ describe "#{ Permute::CLI }" do
 
   attr_reader :cli, :spy
 
-  unstyle = Headless::CLI::Pen::FUN.unstyle
+  unstyle = TestLib_::Unstyle[]
 
   let :out do
     spy.emission_a.map do |e| unstyle[ e.payload_x ] end

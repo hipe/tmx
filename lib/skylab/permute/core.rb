@@ -1,16 +1,37 @@
 require_relative '..'
 require 'skylab/callback/core'
-require 'skylab/headless/core'
-require 'skylab/porcelain/core'
 
 module Skylab::Permute
 
-  Bleeding = ::Skylab::Porcelain::Bleeding
-  Headless = ::Skylab::Headless
-  Permute = self
-  Callback = ::Skylab::Callback
+  Callback_ = ::Skylab::Callback
+    Autoloader_ = Callback_::Autoloader
 
-  # (:+[#su-001]:none)
+  module Lib_  # (:+[#su-001])
 
-  ::Skylab::MetaHell::MAARS[ self ]
+    memo, sidesys, req = Autoloader_.at :memoize,
+      :build_require_sidesystem_proc, :require_sidesystem
+
+    Bleeding__ = memo[ -> do
+      req[ :Porcelain ]::Bleeding
+    end ]
+
+    CLI_Action = -> do
+      Bleeding__[]::Action
+    end
+
+    CLI_Client = -> do
+      Bleeding__[]::Runtime
+    end
+
+    Headless__ = sidesys[ :Headless ]
+
+    Table = -> do
+      Headless__[]::CLI::Table
+    end
+  end
+
+  Permute_ = self
+
+  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+
 end
