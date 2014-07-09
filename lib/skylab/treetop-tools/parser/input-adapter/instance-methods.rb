@@ -2,7 +2,7 @@ module Skylab::TreetopTools
 
   module Parser::InputAdapter::InstanceMethods
 
-    include ::Skylab::Headless::SubClient::InstanceMethods
+    include Lib_::SubClient[]::InstanceMethods
 
     def initialize request_client, upstream, opts=nil, &block
       self.block = block

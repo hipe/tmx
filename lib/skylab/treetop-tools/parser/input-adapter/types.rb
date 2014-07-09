@@ -1,9 +1,8 @@
 module Skylab::TreetopTools
 
-  module Parser::InputAdapter::Types
-  end
+  Parser::InputAdapter::Types = ::Module.new
 
-  g = Library_::Basic::Digraph.new
+  g = Lib_::Digraph[].new
 
   Parser::InputAdapter::Types::STREAM = g.node! :stream
   Parser::InputAdapter::Types::FILE   = g.node! :file, is: :stream

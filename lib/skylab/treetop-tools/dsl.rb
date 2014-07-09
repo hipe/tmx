@@ -5,11 +5,9 @@ module Skylab::TreetopTools
   # #abstraction-candidate: this (in some form) might one day go up
   # if it ever isn't painful to look at.
 
-  module DSL
-  end
+  DSL = ::Module.new
 
-  module DSL::Client
-  end
+  DSL::Client = ::Module.new
 
   class DSL::Joystick
 
@@ -30,9 +28,9 @@ module Skylab::TreetopTools
     # of a simple, custom-built struct built dynamically from the
     # elements of the DSL.)
 
-    extend Headless::Parameter::Definer::ModuleMethods # we do *not* want ..
+    extend Lib_::Parameter[]::Definer::ModuleMethods # we do *not* want ..
 
-    include Headless::Parameter::Definer::InstanceMethods::ActualParametersIvar
+    include Lib_::Parameter[]::Definer::InstanceMethods::ActualParametersIvar
 
     def __actual_parameters       # we want to keep the namespace clear for
       @actual_parameters          # the DSL
@@ -56,7 +54,7 @@ module Skylab::TreetopTools
         k = ::Class.new( ::Struct.new(*
           parameters.each.map(& :normalized_parameter_name ) ) )
         k.class_eval do
-          include Headless::Parameter::Definer::InstanceMethods::StructAdapter
+          include Lib_::Parameter[]::Definer::InstanceMethods::StructAdapter
           public :known?
         end
         const_set const, k
@@ -71,9 +69,9 @@ module Skylab::TreetopTools
     # other end with a `actual_parameters` structure that holds the client's
     # (semi valid) request
 
-    Headless::Parameter[ self, :parameter_controller, :oldschool_parameter_error_structure_handler ]
+    Lib_::Parameter[][ self, :parameter_controller, :oldschool_parameter_error_structure_handler ]
 
-    include Headless::Parameter::Definer::InstanceMethods::IvarsAdapter
+    include Lib_::Parameter[]::Definer::InstanceMethods::IvarsAdapter
                                   # once we absorb the dsl actuals, we might
                                   # use this for reflection
 
@@ -111,7 +109,7 @@ module Skylab::TreetopTools
 
     def callbacks
       @callbacks ||= begin  # cheap, compartmentalized pub-sub
-        o = Headless::Parameter::Definer.new do
+        o = Lib_::Parameter[]::Definer.new do
           param :error, hook: true, writer: true
           param :info,  hook: true, writer: true
           alias_method :on_error, :error # hm ..
@@ -125,7 +123,7 @@ module Skylab::TreetopTools
     end
 
     def some_infostream
-      Headless::CLI::IO.some_errstream_IO
+      Lib_::CLI[]::IO.some_errstream_IO
     end
 
     def call_digraph_listeners type, payload

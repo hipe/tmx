@@ -1,19 +1,42 @@
 require_relative '..'
-require 'skylab/headless/core'
-require 'skylab/meta-hell/core'
+require 'skylab/callback/core'
 
 module Skylab::TreetopTools
 
-  Headless = ::Skylab::Headless
-  MetaHell = ::Skylab::MetaHell
-  TreetopTools = self
+  Callback_ = ::Skylab::Callback
+    Autoloader_ = Callback_::Autoloader
 
-  MetaHell::MAARS[ self ]
+  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
-  class RuntimeError < ::RuntimeError
+  RuntimeError = ::Class.new ::RuntimeError
+
+  module Lib_
+    sidesys = Autoloader_.build_require_sidesystem_proc
+    Basic__ = sidesys[ :Basic ]
+    CLI = -> do
+      Headless__[]::CLI
+    end
+    CodeMolester__ = sidesys[ :CodeMolester ]
+    Const_pryer = -> do
+      CodeMolester__[]::ConstPryer
+    end
+    Digraph = -> do
+      Basic__[]::Digraph
+    end
+    Headless__ = sidesys[ :Headless ]
+    Parameter = -> do
+      Headless__[]::Parameter
+    end
+    SubClient = -> do
+      Headless__[]::SubClient
+    end
   end
 
-  class Parameter < Headless::Parameter
+  module Parser  # #stowaway
+    Autoloader_[ self ]
+  end
+
+  class Parameter < Lib_::Parameter[]
     param :dir, boolean: true
     param :exist, enum: [:must], accessor: true
 
@@ -26,17 +49,7 @@ module Skylab::TreetopTools
     end
   end
 
-  module Library_  # :+[#su-001]
+  TreetopTools_ = self
 
-    o = { }
-
-    subsys = ::Skylab::Subsystem::FUN.require_subsystem
-
-    o[ :Basic ] = subsys
-    o[ :CodeMolester ] = subsys
-
-    define_singleton_method :const_missing do |c|
-      const_set c, o.fetch( c )[ c ]
-    end
-  end
+  # ([#su-001] none.)
 end

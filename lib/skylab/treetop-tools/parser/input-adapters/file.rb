@@ -46,7 +46,7 @@ module Skylab::TreetopTools
 
   private
 
-    EVENTS = Headless::Parameter::Definer.new do
+    EVENTS = Lib_::Parameter[]::Definer.new do
       param :on_file_is_dir,    hook: true, writer: true
       param :on_file_not_found, hook: true, writer: true
     end

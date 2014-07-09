@@ -27,7 +27,7 @@ module Skylab::TreetopTools
 
   class Parser::Load # re-open!
 
-    include Headless::Parameter::Bound::InstanceMethods # bound_parameters
+    include Lib_::Parameter[]::Bound::InstanceMethods  # bound_parameters
 
     attr_reader(* DSL.parameters.each.map(& :normalized_parameter_name ) )
                                   # for after call_body_and_absorb
@@ -39,7 +39,7 @@ module Skylab::TreetopTools
         # we want to hold on to the string representation of the path exactly
         # as the user provided it before we normalize it
         @grammar_a = treetop_grammar.each_with_index.map do |pn, i|
-          Library_::CodeMolester::Const_Pryer.new(
+          Lib_::Const_pryer[].new(
             :outfile_stem, pn.to_s,
             :inpath_p, -> { treetop_grammar[ i ] },
             :outdir_p, -> { generated_grammar_dir } )

@@ -2,7 +2,7 @@ module Skylab::TreetopTools
 
   module Parser::InstanceMethods
 
-    include Headless::SubClient::InstanceMethods
+    include Lib_::SubClient[]::InstanceMethods
 
     def parse_file pn, opts=nil, &p
       _ia = build_file_input_adapter pn, &p
