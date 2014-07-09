@@ -6,16 +6,16 @@ module Skylab::Snag
 
   class CLI::ToDo::Tree::Node
 
-    extend  Snag::Library_::Tree::ModuleMethods
+    extend  Snag_::Library_::Tree::ModuleMethods
 
-    include Snag::Library_::Tree::InstanceMethods
+    include Snag_::Library_::Tree::InstanceMethods
 
     attr_accessor :todo
 
   end
 
   class CLI::ToDo::Tree
-    include Snag::Core::SubClient::InstanceMethods
+    include Snag_::Core::SubClient::InstanceMethods
 
     def << todo
       if todo.valid?
@@ -26,7 +26,7 @@ module Skylab::Snag
 
     tree_lines_producer_basic = -> tree do
       ea = ::Enumerator.new do |y|
-        trav = Snag::Library_::Tree::Traversal.new
+        trav = Snag_::Library_::Tree::Traversal.new
         trav.traverse tree do |card|
           prefix = trav.prefix card
           if (( n = card.node )).is_leaf
@@ -40,7 +40,7 @@ module Skylab::Snag
           end
         end
       end
-      Snag::Library_::Basic::List::Scanner::For::Enumerator.new ea
+      Snag_::Library_::Basic::List::Scanner::For::Enumerator.new ea
     end
 
     fun = Snag_::Lib_::CLI[]::Pen::FUN
@@ -71,7 +71,7 @@ module Skylab::Snag
       col_a_width = cache_a.reduce( 0 ) do |m, row|
         m > row[1] ? m : row[1]
       end
-      Snag::Library_::Basic::List::Scanner::For::Enumerator.new(
+      Snag_::Library_::Basic::List::Scanner::For::Enumerator.new(
           ::Enumerator.new do |y|
         cache_a.each do | col_a, col_a_w, todo |
           col_b = if todo

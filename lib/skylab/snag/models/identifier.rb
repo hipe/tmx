@@ -44,10 +44,9 @@ module Skylab::Snag
     alias_method :to_s, :render
   end
 
-  module Models::Identifier::Events
-  end
+  Models::Identifier::Events = ::Module.new
 
-  class Models::Identifier::Events::Invalid < Snag::Model::Event.new :mixed
+  class Models::Identifier::Events::Invalid < Snag_::Model::Event.new :mixed
     build_message -> do
       "invalid identifier name #{ ick mixed } - rendered full identifer: #{
       }\"[#foo-001.2.3]\", equivalent to: \"001.2.3\" #{
@@ -56,7 +55,7 @@ module Skylab::Snag
   end
 
   class Models::Identifier::Events::Prefix_Ignored <
-    Snag::Model::Event.new :identifier
+    Snag_::Model::Event.new :identifier
 
     build_message -> do
       "prefixes are ignored currently - #{ ick identifier.prefix }"

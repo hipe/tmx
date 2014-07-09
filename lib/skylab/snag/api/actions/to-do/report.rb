@@ -11,7 +11,7 @@ module Skylab::Snag
                             default: [ "*#{ Autoloader::EXTNAME }" ] # '*.rb'
     attribute      :paths, required: true
     attribute    :pattern, required: true,
-                             default: Snag::Models::Pattern.default
+                             default: Snag_::Models::Pattern.default
     attribute :show_command_only
 
     listeners_digraph  info: :lingual,
@@ -22,7 +22,7 @@ module Skylab::Snag
   private
 
     def execute
-      ea = Snag::Models::ToDo::Enumerator.new @paths, @names, @pattern
+      ea = Snag_::Models::ToDo::Enumerator.new @paths, @names, @pattern
       if @show_command_only
         ea.command.command -> cmd_str do
           call_digraph_listeners :command, cmd_str

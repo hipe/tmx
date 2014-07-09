@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models::Node::Search
 
-    include Snag::Core::SubClient::InstanceMethods
+    include Snag_::Core::SubClient::InstanceMethods
 
     def self.new_valid request_client, max_count, query_sexp
       o = new request_client, max_count, query_sexp

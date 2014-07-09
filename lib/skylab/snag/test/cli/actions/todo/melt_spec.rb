@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
 
   # le Quickie.
 
-  describe "#{ Snag::CLI } actions todo melt" do
+  describe "[sg] CLI actions todo melt" do
     extend Actions_TestSupport
 
     invocation = [ 'todo', 'melt' ]

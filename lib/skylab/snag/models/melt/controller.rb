@@ -4,7 +4,7 @@ module Skylab::Snag
 
     # one public method - `melt`
 
-    include Snag::Core::SubClient::InstanceMethods
+    include Snag_::Core::SubClient::InstanceMethods
 
       # straightforward subclient - emits PIE upwards
 
@@ -17,7 +17,7 @@ module Skylab::Snag
       @dry_run = dry_run
       @pattern = pattern
       @file_changes = []
-      o = Snag::Models::ToDo::Enumerator.new paths, names, pattern
+      o = Snag_::Models::ToDo::Enumerator.new paths, names, pattern
       o.on_error method( :error )
       o.on_command do |cmd_str|   # (strict event handling)
         if @be_verbose
@@ -127,7 +127,7 @@ module Skylab::Snag
       begin
         break if @file_changes.length.zero?
         first = @file_changes.first
-        lines = Snag::Library_::
+        lines = Snag_::Library_::
           Basic::List::Scanner::For::Path[ first.pathname ]
         patch = Snag_::Lib_::Text_patch[]::Models::ContentPatch.new lines
         @file_changes.each do |todo|

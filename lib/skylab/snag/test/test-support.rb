@@ -10,7 +10,7 @@ module Skylab::Snag::TestSupport
 
   module CONSTANTS
     MetaHell = ::Skylab::MetaHell
-    Snag = ::Skylab::Snag
+    Snag_ = Snag_
     TestSupport = ::Skylab::TestSupport
     TestLib_ = TestLib_
   end
@@ -35,10 +35,10 @@ module Skylab::Snag::TestSupport
     end
 
     def from_tmpdir &block
-      Snag::Library_::FileUtils.cd tmpdir, verbose: do_debug, &block
+      Snag_::Library_::FileUtils.cd tmpdir, verbose: do_debug, &block
     end
 
-    manifest_path = Snag::API.manifest_path
+    manifest_path = Snag_::API.manifest_path
 
     define_method :manifest_path do manifest_path end
 

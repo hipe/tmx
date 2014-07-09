@@ -49,7 +49,7 @@ module Skylab::Snag
         ( e = p[] ) ? m << e : m
       end
       if a.length.nonzero? then no[ a * ' - ' ] else
-        Snag::Library_::Shellwords || nil
+        Snag_::Library_::Shellwords || nil
         y = [ "find #{ @paths.map(& :shellescape ) * ' ' }" ]
         y << "\\( #{@names.map { |n| "-name #{ n.shellescape }"} * ' -o '} \\)"
         y <<

@@ -14,13 +14,13 @@ module Skylab::Snag::TestSupport::CLI
     o[:output] = -> do
       output = TestSupport::IO::Spy::Group.new
       output.line_filter! -> s do
-        Snag::Lib_::CLI[]::PEN::FUN.unstyle[ s ]
+        Snag_::Lib_::CLI[]::PEN::FUN.unstyle[ s ]
       end
       output
     end
 
     o[:client] = -> output do
-      client = Snag::CLI.new nil, output.for( :pay ), output.for( :info )
+      client = Snag_::CLI.new nil, output.for( :pay ), output.for( :info )
       client.send :program_name=, 'sn0g'
       client
     end

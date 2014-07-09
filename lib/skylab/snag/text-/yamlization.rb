@@ -6,7 +6,7 @@ module Skylab::Snag
 
     listeners_digraph  :text_line
 
-    event_factory Snag::API::Events::Datapoint
+    event_factory Snag_::API::Events::Datapoint
 
     def << record
 

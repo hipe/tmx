@@ -11,7 +11,7 @@ module Skylab::Snag
       def initialize any_pathname, manifest_file_p
         @pathname = any_pathname
         @manifest_file_p = manifest_file_p
-        @enum_class = Snag::Models::Node::Enumerator
+        @enum_class = Snag_::Models::Node::Enumerator
       end
 
       def filter! p

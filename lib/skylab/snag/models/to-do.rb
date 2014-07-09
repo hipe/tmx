@@ -99,8 +99,8 @@ module Skylab::Snag
         regexes[ @pattern ]
       end
       ranges = ranges_struct.new
-      rscn ||= Snag::Library_::StringScanner.new ''
-      scn  ||= Snag::Library_::StringScanner.new ''
+      rscn ||= Snag_::Library_::StringScanner.new ''
+      scn  ||= Snag_::Library_::StringScanner.new ''
       scn.string = full_source_line
       ranges.precomment = -> do # we need to back up till
         scn.skip( before_rx ) or fail 'rx'      # before the '#' :(

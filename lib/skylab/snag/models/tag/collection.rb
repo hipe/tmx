@@ -39,8 +39,8 @@ module Skylab::Snag
   private
 
     def initialize body_string
-      @fly = Snag::Models::Tag::Flyweight.new body_string
-      @scn = Snag::Library_::StringScanner.new body_string
+      @fly = Snag_::Models::Tag::Flyweight.new body_string
+      @scn = Snag_::Library_::StringScanner.new body_string
       super( ) { |y| visit y }
     end
 

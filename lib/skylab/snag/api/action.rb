@@ -20,7 +20,7 @@ module Skylab::Snag
                             # mental supposition of isomorphic factories (see)
                             # **NOTE** see warnings there too re: coherence
 
-    taxonomic_streams(* Snag::API::Events.taxonomic_streams )
+    taxonomic_streams(* Snag_::API::Events.taxonomic_streams )
                             # we check for unhandled even streams, but we don't
                             # care about taxonomic streams like these.
 
@@ -51,7 +51,7 @@ module Skylab::Snag
 
     # --*--
 
-    include Snag::Core::SubClient::InstanceMethods
+    include Snag_::Core::SubClient::InstanceMethods
 
     def invoke param_h=nil
       res = nil
@@ -126,7 +126,7 @@ module Skylab::Snag
             error msg
           end
           mf or break( nodes = mf )
-          nodes = Snag::Models::Node::Collection.new self, mf
+          nodes = Snag_::Models::Node::Collection.new self, mf
         end while nil
         nodes
       end

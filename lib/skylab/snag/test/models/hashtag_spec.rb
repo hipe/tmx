@@ -115,7 +115,7 @@ module Skylab::Snag::TestSupport::Models::Hashtag__
     end
 
     def scan s
-      @part_a = Snag::Models::Hashtag::Parse[ :_listener_not_used_, s ]
+      @part_a = Snag_::Models::Hashtag::Parse[ :_listener_not_used_, s ]
     end
   end
 end

@@ -59,7 +59,7 @@ module Skylab::Snag
       if nodes
         node = @nodes.fetch_node @node_ref
         if ! node then node else
-          call_digraph_listeners :tags, Snag::Models::Tag::Events::Tags.new( node, node.tags )
+          call_digraph_listeners :tags, Snag_::Models::Tag::Events::Tags.new( node, node.tags )
           true
         end
       end

@@ -6,7 +6,7 @@ module Skylab::Snag
     attribute    :dry_run, default: false
     attribute      :names, default: [ "*#{ Autoloader::EXTNAME }" ] # '*.rb'
     attribute      :paths, required: true, default: ['.']  # not really..
-    attribute    :pattern, default: Snag::Models::Pattern.default
+    attribute    :pattern, default: Snag_::Models::Pattern.default
 
     listeners_digraph  info: :lingual,
                  raw_info: :datapoint,
@@ -20,7 +20,7 @@ module Skylab::Snag
     def execute
       res = nil
       begin
-        melt = Snag::Models::Melt::Controller.new self,
+        melt = Snag_::Models::Melt::Controller.new self,
           @paths, @dry_run, @names, @pattern, @be_verbose
         melt.melt
       end while nil

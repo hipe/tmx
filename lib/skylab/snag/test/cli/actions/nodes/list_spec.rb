@@ -5,7 +5,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
 
   # has Quickie - try running this with just `ruby -w foo_spec.rb`
 
-  describe "#{ Snag::CLI } Actions - Show" do
+  describe "[sg] CLI Actions - Show" do
 
     extend Actions_TestSupport
 

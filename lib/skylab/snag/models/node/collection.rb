@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models::Node::Collection
 
-    include Snag::Core::SubClient::InstanceMethods
+    include Snag_::Core::SubClient::InstanceMethods
 
     def add message, do_prepend_open_tag, dry_run, verbose_x, new_node=nil
       r = false
@@ -87,7 +87,7 @@ module Skylab::Snag
     date_format = '%Y-%m-%d'
 
     define_method :todays_date do
-      Snag::Library_::DateTime.now.strftime date_format
+      Snag_::Library_::DateTime.now.strftime date_format
     end
 
     def my_callbacks_a

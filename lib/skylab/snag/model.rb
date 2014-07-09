@@ -6,7 +6,7 @@ module Skylab::Snag
 
     Snag_::Lib_::Model_event[ self ]
 
-    EVENTS_ANCHOR_MODULE = Snag::Models
+    EVENTS_ANCHOR_MODULE = Snag_::Models
 
     def self.normalized_event_name
       @nen ||= begin              # (just for fun chop out the `events`

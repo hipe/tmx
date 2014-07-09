@@ -4,7 +4,7 @@ require 'skylab/porcelain/core'
 
 module Skylab::Snag
 
-  %i| Autoloader MetaHell Porcelain Snag |.each do |i|
+  %i| Autoloader MetaHell Porcelain |.each do |i|
     const_set i, ::Skylab.const_get( i, false )
   end
 

@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models::Node::Controller
 
-    include Snag::Core::SubClient::InstanceMethods
+    include Snag_::Core::SubClient::InstanceMethods
 
     def add_tag tag_ref, do_append
       tag( ( do_append ? :append : :prepend ), tag_ref, -> e { error e } )
@@ -151,7 +151,7 @@ module Skylab::Snag
           ok = true
 
           open_tag = Models::Tag.canonical[ :open ]
-          scn = Snag::Library_::StringScanner.new -> do
+          scn = Snag_::Library_::StringScanner.new -> do
             parts = [ ]
             if @do_prepend_open_tag
               parts.push open_tag

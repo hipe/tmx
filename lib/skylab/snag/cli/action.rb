@@ -10,7 +10,7 @@ module Skylab::Snag
 
     Adapter = Porcelain::Legacy::Adapter
 
-    include Snag::Core::SubClient::InstanceMethods
+    include Snag_::Core::SubClient::InstanceMethods
 
     Snag_::Lib_::CLI[]::Action[ self, :core_instance_methods ]
 
@@ -131,7 +131,7 @@ module Skylab::Snag
     #         ~ some wanktastic hacks for [#030] -1, -2 etc ~
 
     def leaf_create_option_parser
-      Snag::CLI::Option::Parser.new
+      Snag_::CLI::Option::Parser.new
     end
   end
 end

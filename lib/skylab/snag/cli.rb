@@ -156,7 +156,7 @@ module Skylab::Snag
     #         ~ api nerks ~
 
     def api
-      @api ||= Snag::API::Client.new self
+      @api ||= Snag_::API::Client.new self
     end
 
     # --*--

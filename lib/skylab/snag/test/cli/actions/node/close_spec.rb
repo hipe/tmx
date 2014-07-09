@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
 
   # le Quickie.
 
-  describe "#{ Snag::CLI } actions node close" do
+  describe "[sg] CLI actions node close" do
     extend Actions_TestSupport
 
     setup = -> ctx do

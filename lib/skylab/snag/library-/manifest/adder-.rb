@@ -43,7 +43,7 @@ module Skylab::Snag
         prefixed_h = { }
         greatest = enum.reduce( -1 ) do |m, node|
           if node.identifier_prefix
-            prefixed_h[ node.integer ] = Snag::Models::Identifier.render(
+            prefixed_h[ node.integer ] = Snag_::Models::Identifier.render(
               node.identifier_prefix, node.identifier_body )
             m
           else

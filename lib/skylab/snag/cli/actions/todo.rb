@@ -73,7 +73,7 @@ module Skylab::Snag
     end
 
     desc do |y|  # #todo - can you melt me
-      df = Snag::API::Actions::ToDo::Melt.attributes[ :paths ][ :default ]
+      df = Snag_::API::Actions::ToDo::Melt.attributes[ :paths ][ :default ]
       df.map!(& method( :ick ))
       y << 'arguments:'
       s = "  #{ say { param :path } } the path(s) to search (default: #{ df * ', '})"
@@ -83,7 +83,7 @@ module Skylab::Snag
 
     def melt *path
       if path.length.zero?  # triggering dflts to list params is not automatic
-        path.concat Snag::API::Actions::ToDo::Melt.attributes[ :paths ][ :default ]
+        path.concat Snag_::API::Actions::ToDo::Melt.attributes[ :paths ][ :default ]
       end
       api_invoke [ :to_do, :melt ],
         {           dry_run: false,
@@ -101,7 +101,7 @@ module Skylab::Snag
     turn_DSL_off
 
     default = -> do
-      box = Snag::API::Actions::ToDo::Report.attributes.
+      box = Snag_::API::Actions::ToDo::Report.attributes.
         meta_attribute_value_box :default
       default = -> { box }
       box

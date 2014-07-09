@@ -53,29 +53,30 @@ module Skylab::Snag
     end
   end
 
-  module Models::Tag::Events
-  end
+  Models::Tag::Events = ::Module.new
 
-  class Models::Tag::Events::Add < Snag::Model::Event.new :rendered, :verb
+  model_event = Snag_::Model::Event
+
+  class Models::Tag::Events::Add < model_event.new :rendered, :verb
     build_message -> do
       "#{ Snag_::Lib_::NLP[]::EN::POS::Verb[ verb.to_s ].preterite } #{
         }#{ val rendered }"
     end
   end
 
-  class Models::Tag::Events::Invalid < Snag::Model::Event.new :name
+  class Models::Tag::Events::Invalid < model_event.new :name
     build_message -> do
       "tag must be composed of 'a-z' - invalid tag name: #{ ick name }"
     end
   end
 
-  class Models::Tag::Events::Rm < Snag::Model::Event.new :rendered
+  class Models::Tag::Events::Rm < model_event.new :rendered
     build_message -> do
       "removed #{ val rendered }"
     end
   end
 
-  class Models::Tag::Events::Tags < Snag::Model::Event.new :node, :tags
+  class Models::Tag::Events::Tags < model_event.new :node, :tags
     build_message -> do
       "#{ val node.identifier } is tagged with #{
         }#{ and_ tags.map{ |t| val t } }."

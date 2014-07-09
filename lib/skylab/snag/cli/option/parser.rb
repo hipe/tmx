@@ -3,7 +3,7 @@ module Skylab::Snag
   module CLI::Option
   end
 
-  class CLI::Option::Parser < Snag::Library_::OptionParser
+  class CLI::Option::Parser < Snag_::Library_::OptionParser
 
     # off the chain [#030] custom parsing of e.g -1, -2 just because
 

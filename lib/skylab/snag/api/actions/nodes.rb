@@ -67,7 +67,7 @@ module Skylab::Snag
         end
         sexp ||= [ :valid ]
         found = nodes.find( @max_count, sexp ) or break( res = found )
-        @lines = Snag::Library_::Yielder::Mono.new do |txt|
+        @lines = Snag_::Library_::Yielder::Mono.new do |txt|
           call_digraph_listeners :output_line, txt
           nil
         end
@@ -92,10 +92,10 @@ module Skylab::Snag
       end
     end
 
-    field_names = Snag::Models::Node::Flyweight.field_names
+    field_names = Snag_::Models::Node::Flyweight.field_names
 
     define_method :render_node_as_yaml do
-      o = Snag::Text_::Yamlization.new field_names
+      o = Snag_::Text_::Yamlization.new field_names
       o.on_text_line(& @lines.method( :<< ) )
       o
     end

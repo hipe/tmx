@@ -1,13 +1,11 @@
 module Skylab::Snag
 
-  module Models::Parse
-  end
+  Models::Parse = ::Module.new
 
-  module Models::Parse::Events
-  end
+  Models::Parse::Events = ::Module.new
 
   class Models::Parse::Events::Failure <
-    Snag::Model::Event.new :expecting, :near, :line, :line_number, :pathname
+    Snag_::Model::Event.new :expecting, :near, :line, :line_number, :pathname
 
     def to_hash
       {

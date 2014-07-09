@@ -5,7 +5,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
 
   # Quickie compatible - just load this file with `ruby -w`
 
-  describe "#{ Snag::CLI } Actions - Open" do
+  describe "[sg] CLI Actions - Open" do
 
     extend Actions_TestSupport
 

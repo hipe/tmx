@@ -6,7 +6,7 @@ module Skylab::Snag
 
     listeners_digraph :error, :command
 
-    event_factory Snag::API::Events::Datapoint
+    event_factory Snag_::API::Events::Datapoint
 
     # (primary public method is `each` whose private impl is `visit`)
 
@@ -20,7 +20,7 @@ module Skylab::Snag
 
     def initialize paths, names, pattern
       @seen_count = nil
-      @command = Snag::Library_::Find.new paths, names, pattern
+      @command = Snag_::Library_::Find.new paths, names, pattern
       super(& method( :visit ) )
     end
 
@@ -56,7 +56,7 @@ module Skylab::Snag
 
     def visit_valid y, cmd
       res = true
-      Snag::Library_::Open3.popen3( cmd ) do |sin, sout, serr|
+      Snag_::Library_::Open3.popen3( cmd ) do |sin, sout, serr|
         todo = Models::ToDo::Flyweight.new @pattern
         sout.each_line do |line|
           @seen_count += 1
