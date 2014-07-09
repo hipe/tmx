@@ -12,11 +12,11 @@ module Skylab::Porcelain::Legacy
     module_defines_method_in_some_manner
 
   module DSL                      # (section 1 of 7)
-    def self.extended mod  # [#sl-111]
+    def self.[] mod
+      # mod.estend DSL
       mod.extend DSL::ModuleMethods
       mod.send :include, Client::InstanceMethods
-      mod._porcelain_legacy_dsl_init
-      nil
+      mod._porcelain_legacy_dsl_init ; nil
     end
   end
 
@@ -1547,7 +1547,7 @@ module Skylab::Porcelain::Legacy
 
   #         ~ Namespaces ~        # (section 7 of 7)
 
-  module DSL  # (re-opened)
+  module DSL::ModuleMethods  # (re-opened)
 
     def namespace normalized_local_ns_name, ext_ref=nil, xtra_h=nil, &inline_def
       # we need the namespace to occur in the right order, after/before

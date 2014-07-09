@@ -30,7 +30,7 @@
 [#009] #open awesome semantic open tag search - ("smart twitter")
 [#008]       #done -n on all destructive actions
 [#007]       #done autoloadify
-[#006]       #done reanme Api -> API, Porcelain -> CLI
+[#006]       #done reanme Api -> API, P-orcelain -> CLI
 [#005]       #done get cli working again
 [#004]       #done light fast solo CLI client 2012-11-12
 [#003]       #done tree report of todos 2012-10-13

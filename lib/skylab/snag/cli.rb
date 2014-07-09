@@ -161,7 +161,7 @@ module Skylab::Snag
 
     # --*--
 
-    extend Porcelain::Legacy::DSL              # now entering DSL zone
+    Snag_::Lib_::CLI_legacy_DSL[ self ]  # now entering DSL zone
 
     namespace :node, -> { CLI::Actions::Node }
 

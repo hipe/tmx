@@ -9,7 +9,7 @@ module Skylab::Porcelain::TestSupport
 
 
 
-  describe "The #{Porcelain::Legacy} module" do
+  describe "[po] legacy" do
     extend Porcelain_TestSupport
     def _stderr  # wind this back to see an even messier version
       @_stderr ||= ::StringIO.new
@@ -45,7 +45,7 @@ module Skylab::Porcelain::TestSupport
     context "(part 1 - inheritance) extended by a class allows that" do
       let(:klass) do
         Class.new.class_eval do
-          extend Porcelain::Legacy::DSL
+          Porcelain::Legacy::DSL[ self ]
           def foo ; end
           def bar ; end
           def self.to_s ; "WhoHah" end
@@ -76,19 +76,19 @@ module Skylab::Porcelain::TestSupport
         child_class.actions.map(&:normalized_local_action_name).should eql([:help, :foo, :bar, :she_bang])
       end
       context "a simple ancestor chain of 'parent' module and child class" do
-        let(:parent)    {         Module.new.module_eval         { extend Porcelain::Legacy::DSL ; def act_m ; end ; self } }
-        let(:child)     { o=self ; Class.new.class_eval          { extend Porcelain::Legacy::DSL ; def act_c ; end ; include o.parent ; self } }
+        let(:parent)    {         Module.new.module_eval         { Porcelain::Legacy::DSL[ self ] ; def act_m ; end ; self } }
+        let(:child)     { o=self ; Class.new.class_eval          { Porcelain::Legacy::DSL[ self ] ; def act_c ; end ; include o.parent ; self } }
         it "child gets parent actions, order is respected (but it's a smell to depend on this)" do
           child.actions.map(&:normalized_local_action_name).should eql([:help, :act_c, :act_m])
         end
       end
       context "all modules in the ancestor chain" do
-        let(:module_a)  {          Module.new.module_eval        { extend Porcelain::Legacy::DSL ; def act_a ; end ; self } }
-        let(:module_b)  { o=self ; Module.new.module_eval        { extend Porcelain::Legacy::DSL ; def act_b ; end ; include o.module_a ; self } }
-        let(:module_c)  {          Module.new.module_eval        { extend Porcelain::Legacy::DSL ; def act_c ; end ; self } }
-        let(:module_d)  {          Module.new.module_eval        { extend Porcelain::Legacy::DSL ; def act_d ; end ; self } }
-        let(:class_e)   { o=self ; Class.new.class_eval          { extend Porcelain::Legacy::DSL ; def act_e ; end ; include o.module_b, o.module_c ; self } }
-        let(:class_f)   { o=self ; Class.new(class_e).class_eval { extend Porcelain::Legacy::DSL ; def act_f ; end ; include o.module_d ; self } }
+        let(:module_a)  {          Module.new.module_eval        { Porcelain::Legacy::DSL[ self ] ; def act_a ; end ; self } }
+        let(:module_b)  { o=self ; Module.new.module_eval        { Porcelain::Legacy::DSL[ self ] ; def act_b ; end ; include o.module_a ; self } }
+        let(:module_c)  {          Module.new.module_eval        { Porcelain::Legacy::DSL[ self ] ; def act_c ; end ; self } }
+        let(:module_d)  {          Module.new.module_eval        { Porcelain::Legacy::DSL[ self ] ; def act_d ; end ; self } }
+        let(:class_e)   { o=self ; Class.new.class_eval          { Porcelain::Legacy::DSL[ self ] ; def act_e ; end ; include o.module_b, o.module_c ; self } }
+        let(:class_f)   { o=self ; Class.new(class_e).class_eval { Porcelain::Legacy::DSL[ self ] ; def act_f ; end ; include o.module_d ; self } }
         it "get their actions inherited, in a particular order: officious, parent class, [..], my actions, modules included after" do
           ('a'..'f').map { |l| "#{(respond_to?("module_#{l}") ? :module : :class)}_#{l}" }.
                      each { |n| send(n).singleton_class.send(:define_method, :to_s) { n } }
@@ -99,7 +99,7 @@ module Skylab::Porcelain::TestSupport
     context "(part 2 - desc and argument) DSL" do
       let(:klass) do
         Class.new.class_eval do
-          extend Porcelain::Legacy::DSL
+          Porcelain::Legacy::DSL[ self ]
           option_parser { }
           argument_syntax '<foo>'
           def bar foo ; end
@@ -110,7 +110,7 @@ module Skylab::Porcelain::TestSupport
         let(:klass) do
           ohai = self
           Class.new.class_eval do
-            extend Porcelain::Legacy::DSL
+            Porcelain::Legacy::DSL[ self ]
             module_eval(& ohai.desco)
             def ferp_derp one ; end
             self
@@ -299,7 +299,7 @@ module Skylab::Porcelain::TestSupport
         Class.new.class_eval do
           Callback[ self, :employ_DSL_for_digraph_emitter ]
           event_class Callback::Event::Textual
-          extend Porcelain::Legacy::DSL
+          Porcelain::Legacy::DSL[ self ]
           def foo ; end
           def bar ; end
         private
@@ -333,7 +333,7 @@ module Skylab::Porcelain::TestSupport
       context "does fuzzy matching on the action name" do
         let(:klass) do
           Class.new.class_eval do
-            extend Porcelain::Legacy::DSL
+            Porcelain::Legacy::DSL[ self ]
             def pliny ; end
             def plone ; end
             self
@@ -347,7 +347,7 @@ module Skylab::Porcelain::TestSupport
         context "but by using the config" do
           let(:klass) do
             Class.new.class_eval do
-              extend Porcelain::Legacy::DSL
+              Porcelain::Legacy::DSL[ self ]
               fuzzy_match false
               def pliny ; end
               def plone ; end
@@ -365,7 +365,7 @@ module Skylab::Porcelain::TestSupport
     context "(part 4) when invoking an actions with no syntaxes defined (just public methods)" do
       let(:klass) do
         Class.new.class_eval do
-          extend Porcelain::Legacy::DSL
+          Porcelain::Legacy::DSL[ self ]
           attr_reader :argv, :touched
           private :argv, :touched
         private
@@ -419,7 +419,7 @@ module Skylab::Porcelain::TestSupport
       let(:klass) do
         this = self
         Class.new.class_eval do
-          extend Porcelain::Legacy::DSL
+          Porcelain::Legacy::DSL[ self ]
           class_eval(&this.definition_block)
         private
           def initialize( * )
@@ -451,7 +451,7 @@ module Skylab::Porcelain::TestSupport
         let(:klass) do
           o = self
           Class.new.class_eval do
-            extend ::Skylab::Porcelain::Legacy::DSL
+            ::Skylab::Porcelain::Legacy::DSL[ self ]
             class_eval(& o.body)
             def foo
               call_digraph_listeners(:info, "I am foo.")
@@ -523,7 +523,7 @@ module Skylab::Porcelain::TestSupport
 
       let(:klass_with_inline_namespace) do
         Class.new.class_exec do
-          extend Porcelain::Legacy::DSL
+          Porcelain::Legacy::DSL[ self ]
           namespace :more do
             def tingle
               call_digraph_listeners(:info, "yes sure tingle inline")
@@ -541,7 +541,7 @@ module Skylab::Porcelain::TestSupport
       end
       let(:klass_for_namespace) do
         Class.new.class_eval do
-          extend Porcelain::Legacy::DSL
+          Porcelain::Legacy::DSL[ self ]
           def tingle
             call_digraph_listeners(:info, "yes sure tingle external")
             :yes_tingle
@@ -556,7 +556,7 @@ module Skylab::Porcelain::TestSupport
       let(:klass_with_external_namespace) do
         o = self
         Class.new.class_eval do
-          extend Porcelain::Legacy::DSL
+          Porcelain::Legacy::DSL[ self ]
           namespace :'more', o.klass_for_namespace
           def duckle ; end
           def initialize stdup, stdpay, stdinfo
@@ -660,7 +660,7 @@ module Skylab::Porcelain::TestSupport
       let(:klass) do
         o = self
         Class.new.class_eval do
-          extend ::Skylab::Porcelain::Legacy::DSL
+          ::Skylab::Porcelain::Legacy::DSL[ self ]
           module_eval(& o.body)
         private
           def initialize( * )

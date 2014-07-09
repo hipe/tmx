@@ -39,6 +39,9 @@ module Skylab::Snag
     CLI = -> do
       Headless__[]::CLI
     end
+    CLI_legacy_DSL = -> mod do
+      Porcelain__[]::Legacy::DSL[ mod ]
+    end
     CLI_path_tools = -> do
       Headless__[]::CLI::PathTools
     end
@@ -59,6 +62,7 @@ module Skylab::Snag
     Model_event = -> mod do
       Headless__[]::Model::Event.apply_on_client mod
     end
+    Porcelain__ = sidesys[ :Porcelain ]
     Sub_client = -> do
       Headless__[]::SubClient  # :+#deprecation:watch
     end

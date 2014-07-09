@@ -29,6 +29,10 @@ module Skylab::GitViz
       self::Basic__[]::Set[ * a ]
     end
 
+    CLI_legacy_DSL = -> mod do
+      Porcelain__[]::Legacy::DSL[ mod ]
+    end
+
     DateTime = memo[ -> do require 'date' ; ::DateTime end ]
 
     Formal_attribute_definer = -> mod do
@@ -65,7 +69,7 @@ module Skylab::GitViz
     Oxford_and = oxford.curry[ ', ', '[none]', ' and ' ]
 
     Plugin = -> { self::Headless__[]::Plugin }
-    Porcelain = wall[ :Porcelain ]
+    Porcelain__ = wall[ :Porcelain ]
 
     Power_Scanner = -> * x_a do
       self::Basic__[]::List::Scanner::Power.from_iambic x_a
@@ -84,6 +88,10 @@ module Skylab::GitViz
 
     StringScanner = memo[ -> do require 'strscan' ; ::StringScanner end ]
     TestSupport = wall[ :TestSupport ]
+
+    Tree = -> do
+      Porcelain__[]::Tree
+    end
 
     Unstyle_styled = -> x do
       self::Headless__[]::CLI::Pen::FUN::Unstyle_styled[ x ]

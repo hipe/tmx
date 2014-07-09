@@ -51,7 +51,7 @@ module Skylab::SubTree
     end
 
     CLI_DSL = -> mod do
-      mod.extend Porcelain__[]::Legacy::DSL
+      Porcelain__[]::Legacy::DSL[ mod ]
     end
 
     CLI_lipstick = -> * x_a do

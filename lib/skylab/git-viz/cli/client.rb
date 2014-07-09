@@ -15,7 +15,7 @@ module Skylab::GitViz
     end
   public
 
-    extend GitViz::Lib_::Porcelain[]::Legacy::DSL
+    GitViz::Lib_::CLI_legacy_DSL[ self ]
 
     desc 'ping'  # #storypoint-20
 

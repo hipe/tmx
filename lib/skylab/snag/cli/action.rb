@@ -8,7 +8,7 @@ module Skylab::Snag
 
   module CLI::Action::InstanceMethods
 
-    Adapter = Porcelain::Legacy::Adapter
+    Adapter = Snag_::Lib_::Porcelain__[]::Legacy::Adapter
 
     include Snag_::Core::SubClient::InstanceMethods
 

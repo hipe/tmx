@@ -2,7 +2,7 @@ module Skylab::GitViz
 
   class Models_::File_Node
 
-    GitViz::Lib_::Porcelain[]::Tree[ self ]
+    GitViz::Lib_::Tree[][ self ]
 
     def self.[] * x_a
       Build_Tree_Node__.build_tree_node x_a do |bld|
