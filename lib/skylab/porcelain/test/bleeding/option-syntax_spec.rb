@@ -1,7 +1,9 @@
 require_relative 'test-support'
 
 module Skylab::Porcelain::TestSupport::Bleeding # #po-008
-  describe Bleeding::OptionSyntax do
+
+  describe "[po][bl] option syntax spec" do
+
     extend Bleeding_TestSupport
     incrementing_anchor_module!
 

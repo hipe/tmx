@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
 
-  describe "desc, an inheritable attribute of #{ Bleeding::Action }" do
+  describe "[po][bl] action desc, an inheritable attribute" do
 
     extend Action_TestSupport
 
@@ -97,7 +97,7 @@ module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
         app = self.CLI.new emit_spy
         app.invoke [ '-h' ]
         a = emit_spy.delete_emission_a
-        styled = Headless::CLI::Pen::FUN.unstyle_styled
+        styled = TestLib_::CLI[]::Pen::FUN.unstyle_styled
         line = -> { styled[ a.shift.payload_x ] }
         line[].should match( /ferp.+derp/ )  # usage line
         line[].should match( /^ *actions\b/i )

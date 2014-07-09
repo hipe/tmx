@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module ::Skylab::Porcelain::TestSupport::Bleeding::Namespace # #po-008
 
-  describe "#{ Bleeding }::Namespace - resolving names" do
+  describe "[po][bl] namespace resolving" do
 
     extend Namespace_TestSupport
 

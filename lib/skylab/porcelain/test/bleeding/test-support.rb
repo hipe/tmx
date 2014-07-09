@@ -6,7 +6,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
   ::Skylab::Porcelain::TestSupport[ Bleeding_TestSupport = self ] # #regret
 
   module CONSTANTS
-    Callback_TestSupport_ = Callback::TestSupport
+    Callback_TestSupport_ = Callback_::TestSupport
   end
 
   include CONSTANTS
@@ -48,7 +48,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
   end
 
   module InstanceMethods
-    include Headless::CLI::Pen::Methods
+    include TestLib_::CLI[]::Pen::Methods
     include CONSTANTS
 
     attr_reader :base_module

@@ -2,8 +2,8 @@
 require_relative 'test-support'
 
 module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
-  describe "So check this shit out with summary, an inheritable attribute of #{
-    Bleeding::Action }:" do
+
+  describe "[po][bl] action summary (an inheritable action)" do
 
     extend Action_TestSupport
 

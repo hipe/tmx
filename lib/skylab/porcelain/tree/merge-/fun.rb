@@ -67,7 +67,7 @@ module Skylab::Porcelain
           identity = IDENTITY_
 
           an = -> x do
-            an = Headless::NLP::EN::Minitesimal::FUN.an
+            an = Porcelain_::Lib_::NLP[]::EN::Minitesimal::FUN.an
             an[ x ]
           end
 

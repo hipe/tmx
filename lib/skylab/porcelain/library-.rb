@@ -22,6 +22,9 @@ module Skylab::Porcelain
         MetaHell__[]::Basic_Fields.via_iambic x_a
       end
     end
+    CLI = -> do
+      Headless__[]::CLI
+    end
     Function_chain = -> x, y do
       MetaHell__[]::FUN::Function_chain_[ x, y ]
     end
@@ -31,6 +34,10 @@ module Skylab::Porcelain
     Funcy_globful = -> client do
       MetaHell__[]::Funcy[ client ]
     end
-    MetaHell__ = sidesys[ :MetaHell ]
+    MetaHell__ = MetaHell_ = sidesys[ :MetaHell ]
+    NLP = -> do
+      Headless__[]::NLP
+    end
+    Headless__ = Headless_ = sidesys[ :Headless ]
   end
 end

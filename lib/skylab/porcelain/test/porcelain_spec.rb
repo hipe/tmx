@@ -226,7 +226,7 @@ module Skylab::Porcelain::TestSupport
         end # optional
         context "a syntax for arguments of" do
           let(:otherwise) { lambda { |msg| _stderr.puts msg ; false } }
-          pen = Headless::CLI::Pen::MINIMAL
+          pen = TestLib_::CLI[]::Pen::MINIMAL
           define_method :pen do pen end
           context "zero-length" do
             let(:syntax) { Porcelain::Legacy::Argument::Syntax.from_string('').argument_syntax_subclient pen }
@@ -297,8 +297,8 @@ module Skylab::Porcelain::TestSupport
       let(:expecting_foo_bar) { /expecting \{(?:help\|)?foo\|bar\}/i }
       let(:klass) do
         Class.new.class_eval do
-          Callback[ self, :employ_DSL_for_digraph_emitter ]
-          event_class Callback::Event::Textual
+          Callback_[ self, :employ_DSL_for_digraph_emitter ]
+          event_class Callback_::Event::Textual
           Porcelain::Legacy::DSL[ self ]
           def foo ; end
           def bar ; end

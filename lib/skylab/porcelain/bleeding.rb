@@ -1,16 +1,11 @@
 require_relative 'core'
-require 'skylab/headless/core' # here til legacy.rb is away, Headless::NLP::EN::M.
-require 'optparse'
 
 module Skylab::Porcelain::Bleeding
 
-  ::Skylab::Autoloader[ self ]
+  Callback_ = ::Skylab::Callback
+    Autoloader_ = Callback_::Autoloader
 
-  Autoloader_ = ::Skylab::Callback::Autoloader
-
-  Headless = ::Skylab::Headless
-  Porcelain = ::Skylab::Porcelain # #hiccup
-  Callback = ::Skylab::Callback
+  Porcelain_ = ::Skylab::Porcelain # #hiccup
 
   module Lib_
     sidesys = Autoloader_.build_require_sidesystem_proc
@@ -18,11 +13,12 @@ module Skylab::Porcelain::Bleeding
       mod.extend MetaHell__[]::Let
     end
     MetaHell__ = sidesys[ :MetaHell ]
+    NLP = Porcelain_::Lib_::NLP
   end
 
   module Styles
-    include Headless::NLP::EN::Methods
-    include Headless::CLI::Pen::Methods
+    include Lib_::NLP[]::EN::Methods
+    include Porcelain_::Lib_::CLI[]::Pen::Methods
     extend self
     def em(s)  ; stylize(s, :green         )   end
     def hdr(s) ; stylize(s, :strong, :green)   end
@@ -351,7 +347,7 @@ module Skylab::Porcelain::Bleeding
       res
     end
 
-    Find = Callback::Digraph.new ambiguous: :error,
+    Find = Callback_::Digraph.new ambiguous: :error,
       not_found: :error, not_provided: :error
 
     Find.event_factory -> _, __, x { x }  # "datapoint" - events are just the data
@@ -692,6 +688,7 @@ module Skylab::Porcelain::Bleeding
 
   private
 
+    require 'optparse'  # meh
     def initialize definitions=[], documentor_class=::OptionParser,
       parser_class=::OptionParser, do_help=nil
       @definitions, @documentor_class, @parser_class, @do_help =

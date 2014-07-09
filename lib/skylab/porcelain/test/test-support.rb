@@ -5,16 +5,15 @@ module Skylab::Porcelain::TestSupport
 
   ::Skylab::TestSupport::Regret[ Porcelain_TestSupport = self ]
 
-  Autoloader_ = ::Skylab::Callback::Autoloader
+  Callback_ = ::Skylab::Callback
+    Autoloader_ = Callback_::Autoloader
 
   TestLib_ = ::Module.new
 
   module CONSTANTS
-    Autoloader = ::Skylab::Autoloader
     Bleeding = ::Skylab::Porcelain::Bleeding
-    Headless = ::Skylab::Headless
+    Callback_ = Callback_
     Porcelain = ::Skylab::Porcelain
-    Callback = ::Skylab::Callback
     TestLib_ = TestLib_
     TestSupport = ::Skylab::TestSupport
   end
@@ -28,6 +27,13 @@ module Skylab::Porcelain::TestSupport
     Class_creator = -> do
       MetaHell__[]::Class::Creator
     end
+    CLI = -> do
+      Headless__[]::CLI
+    end
+    Constantize_proc = -> do
+      ::Skylab::Autoloader::FUN::Constantize
+    end
+    Headless__ = sidesys[ :Headless ]
     Let = -> mod do
       mod.extend MetaHell__[]::Let
     end
@@ -47,10 +53,10 @@ module Skylab::Porcelain::TestSupport
     include CONSTANTS
     include TestLib_::Class_creator[]::ModuleMethods  # klass etc
 
-    define_method :constantize, & Autoloader::FUN::Constantize
+    define_method :constantize, & TestLib_::Constantize_proc[]
 
     def incrementing_anchor_module!  # so ridiculous
-      head = Autoloader::FUN::Constantize[ description ]
+      head = TestLib_::Constantize_proc[][ description ]
       if /\A[A-Z][_a-zA-Z0-9]*\z/ !~ head
         fail "oops - #{ head }"
       else
@@ -68,12 +74,12 @@ module Skylab::Porcelain::TestSupport
    include CONSTANTS
    include TestLib_::Class_creator[]::InstanceMethods  # klass!
 
-   define_method :style_free, & Headless::CLI::Pen::FUN.unstyle
+   define_method :style_free, & TestLib_::CLI[]::Pen::FUN.unstyle
 
    define_method :unstyle_styled,
-     & Headless::CLI::Pen::FUN.unstyle_styled
+     & TestLib_::CLI[]::Pen::FUN.unstyle_styled
 
-   define_method :constantize, & Autoloader::FUN::Constantize
+   define_method :constantize, & TestLib_::Constantize_proc[]
 
    attr_accessor :do_debug
 

@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
 
-  describe "This is the deal with aliases with #{ Bleeding::Action
+  describe "[po][bl] This is the deal with aliases with bleeding action#{
     } (NOT an inheritable attribute)" do
 
     extend Action_TestSupport

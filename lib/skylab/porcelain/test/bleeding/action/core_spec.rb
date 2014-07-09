@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
 
-  describe "#{ Bleeding::Action }" do
+  describe "[po][bl] action" do
 
     extend Action_TestSupport
 

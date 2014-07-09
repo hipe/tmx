@@ -8,7 +8,7 @@ module Skylab::Porcelain
 
       def execute
         lines = get_lines_ea
-        io = Porcelain::Library_::StringIO.new
+        io = Porcelain_::Library_::StringIO.new
         lines.each( & io.method( :puts ) )
         io.string
       end

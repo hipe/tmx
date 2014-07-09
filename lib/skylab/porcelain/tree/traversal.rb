@@ -1,4 +1,4 @@
-module ::Skylab::Porcelain
+module Skylab::Porcelain
 
   class Tree::Traversal
 
@@ -50,7 +50,7 @@ module ::Skylab::Porcelain
 
     Resolve_glyphset_ = -> x do
       if x.respond_to? :id2name
-        Headless::CLI::Tree::Glyph::Sets.const_fetch x
+        Porcelain_::Lib_::CLI[]::Tree::Glyph::Sets.const_fetch x
       end
     end
 
@@ -67,7 +67,7 @@ module ::Skylab::Porcelain
 
     Get_safe_glyph_p_ = -> do
       p = -> do
-        p = ::Hash[ Headless::CLI::Tree::Glyphs.each.map do |g|
+        p = ::Hash[ Porcelain_::Lib_::CLI[]::Tree::Glyphs.each.map do |g|
           [ g.normalized_glyph_name, true ]
         end ].freeze
       end
@@ -120,7 +120,7 @@ module ::Skylab::Porcelain
       end
     end
 
-    Headless::CLI::Tree::Glyphs.each do |g|
+    Porcelain_::Lib_::CLI[]::Tree::Glyphs.each do |g|
       attr_reader g.normalized_glyph_name  # blank crook pipe separator tee
     end
   end
