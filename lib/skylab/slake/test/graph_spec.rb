@@ -6,7 +6,7 @@ module ::Skylab  # [#ts-010]
 
 # ..
 
-describe "#{ Slake::Graph }" do
+describe "[sl] graph" do
 
   let( :graph ) { Slake::Graph.new }
   describe "when built empty" do

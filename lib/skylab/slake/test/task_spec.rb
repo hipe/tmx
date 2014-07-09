@@ -1,16 +1,18 @@
 require_relative 'test-support'
 
 module Skylab::Slake::TestSupport  # [#ts-010]
-  TestSupport::Quickie.enable_kernel_describe
+
+  TestSupport_::Quickie.enable_kernel_describe
+
 # ..
-describe Slake::Task do
+describe "[sl] task" do
 
   it "descends from Rake::Task (fyi)" do
-    Task.new.should be_kind_of( ::Rake::Task )
+    Slake_::Task.new.should be_kind_of ::Rake::Task
   end
 
   it "defines settable/gettable attributes in the class" do
-    klass = ::Class.new( Task ).class_eval do
+    klass = ::Class.new( Slake_::Task ).class_eval do
       attribute :some_val
       self
     end
@@ -22,7 +24,7 @@ describe Slake::Task do
 
   describe "has different ways of describing its actions:" do
     describe "When it overrides the execute() method of rake parent" do
-      class SomeTask < Task
+      class SomeTask < Slake_::Task
         def execute args
           @touched = true
         end
@@ -38,7 +40,7 @@ describe Slake::Task do
     describe "When you call enhance() (per rake)" do
       it "it works" do
         touched = false
-        t = Task.new.enhance{ touched = true }
+        t = Slake_::Task.new.enhance{ touched = true }
         t.invoke
         touched.should eql(true)
       end
@@ -46,7 +48,7 @@ describe Slake::Task do
     describe "When you set the action attribute to a lambda" do
       it "it works (provided you have the right arity)" do
         touched = false
-        Task.new(:action => ->(t) { touched = true }).invoke
+        Slake_::Task.new(:action => ->(t) { touched = true }).invoke
         touched.should eql(true)
       end
     end
@@ -55,7 +57,7 @@ describe Slake::Task do
   describe "with regards to passing arguments to the task" do
     let(:str) { "" }
     let(:t) do
-      Task.new(:action => ->(t, args) { str.replace "args: #{args.inspect}" })
+      Slake_::Task.new(:action => ->(t, args) { str.replace "args: #{args.inspect}" })
     end
     it "if you pass zero arguments to invoke(), it will have an empty args hash" do
       t.invoke()
@@ -73,7 +75,7 @@ describe Slake::Task do
 
   describe "can define attributes as being interpolated" do
     it "and can then make references to other attributes" do
-      klass = ::Class.new( Task ).class_eval do
+      klass = ::Class.new( Slake_::Task ).class_eval do
         attribute :foo, :interpolated => true
         attribute :bar
         self
@@ -91,7 +93,7 @@ describe Slake::Task do
       self
     end.new
 
-    let(:task) { ::Skylab::Slake::Task.new }
+    let(:task) { Slake_::Task.new }
     it "has no parent by default (of course!)" do
       task.parent?.should eql(false)
       task.parent.should eql(nil)
@@ -105,13 +107,13 @@ describe Slake::Task do
 
   describe "with regards to its name, the rake parent stringifies all names so" do
     it "a minimal Task object has \"\" for a name" do
-      Task.new.name.should eql('')
+      Slake_::Task.new.name.should eql('')
     end
     it "if you set it explicitly to nil it will still be \"\"" do
-      Task.new(:name => nil).name.should eql('')
+      Slake_::Task.new(:name => nil).name.should eql('')
     end
     it "and will call to_s on whatever name you give it (like false)" do
-      Task.new(:name => false).name.should eql('false')
+      Slake_::Task.new(:name => false).name.should eql('false')
     end
   end
 end

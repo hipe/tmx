@@ -9,10 +9,12 @@ module Skylab::Slake
   end
 
   class Task < ::Rake::Task
-    MetaHell::Formal::Attribute::DSL[ self ]
-    extend Slake::Interpolate
+
+    Slake_::Lib_::Formal_attribute[]::DSL[ self ]
+
+    extend Slake_::Interpolate
     extend TaskClassMethods
-    include Slake::Parenthood
+    include Slake_::Parenthood
     def action= action
       @actions.push action
     end

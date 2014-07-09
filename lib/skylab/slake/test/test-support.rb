@@ -1,25 +1,32 @@
-require_relative '../../test-support/core'
 require_relative '../core'
+require 'skylab/test-support/core'
 
 module Skylab::Slake::TestSupport
 
-  Slake = ::Skylab::Slake
+  Callback_ = ::Skylab::Callback
+    Autoloader_ = Callback_::Autoloader
 
-  ::Skylab::Callback::Autoloader[ self, Slake.dir_pathname.join( 'test' ) ]  # #while:[#ts-031]
+  Slake_ = ::Skylab::Slake
 
-  ::Skylab::TestSupport::Regret[ Slake_TestSupport = self ]
+  TestSupport_ = ::Skylab::TestSupport
+
+  Autoloader_[ self, Slake_.dir_pathname.join( 'test' ) ]  # #while:[#ts-031]
+
+  TestSupport_::Regret[ Slake_TestSupport = self ]
 
   module CONSTANTS
     TEST_ROOT_DIR = ::File.expand_path '..', __FILE__
     FIXTURES_DIR = "#{ TEST_ROOT_DIR }/fixtures"
     TMP_DIR = ::File.expand_path '../../../../../tmp', __FILE__
     TEST_BUILD_DIR = ::File.join(TMP_DIR, 'build_dir')
-    TestSupport = ::Skylab::TestSupport
-    include ::Skylab::Slake  # e.g just say `Task`
+    TestSupport_ = TestSupport_
   end
 
-  include CONSTANTS  # find [sl] t.s
-
-  Headless = ::Skylab::Callback::Autoloader.require_sidesystem :Headless
-
+  module TestLib_
+    sidesys = Autoloader_.build_require_sidesystem_proc
+    Tee = -> do
+      Headless__[]::IO::Interceptors::Tee
+    end
+    Headless__ = sidesys[ :Headless ]
+  end
 end

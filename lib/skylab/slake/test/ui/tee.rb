@@ -12,8 +12,8 @@ module Skylab::Slake::TestSupport
     end
 
     new_tee = -> silent, stream do
-      tee = Headless::IO::Interceptors::Tee.new
-      tee[:buffer] = Slake::Lib_::StringIO[].new
+      tee = TestLib_::Tee[].new
+      tee[:buffer] = Slake_::Lib_::StringIO[].new
       if ! silent
         tee[:stream] = stream
       end

@@ -4,12 +4,12 @@ Skylab::TestSupport::Quickie.enable_kernel_describe
 
 module Skylab::Slake  # [#ts-010]
 # ..
-describe Slake::Interpolate do
+describe "[sl] interpolate" do
   # include ::Skylab::Slake
 
   it "works" do
     src = ::Struct.new(:a, :b).new('one', 'two')
-    Interpolate.interpolate( '{a}AND{b}', src ).
+    Slake_::Interpolate.interpolate( '{a}AND{b}', src ).
       should eql( 'oneANDtwo' )
   end
 
@@ -17,7 +17,7 @@ describe Slake::Interpolate do
     let(:klass) do
       ::Class.new.class_eval do
         def self.to_s ; 'Foo' end
-        include Slake::Interpolator
+        include Slake_::Interpolator
         def one
           interpolate "{two}"
         end
