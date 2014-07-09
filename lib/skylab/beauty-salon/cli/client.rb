@@ -1,6 +1,12 @@
 module Skylab::BeautySalon
 
-  class CLI::Client < Face::CLI::Client
+  module CLI  # #stowaway
+    def self.new *a
+      CLI::Client.new( *a )
+    end
+  end
+
+  class CLI::Client < BeautySalon_::Lib_::CLI_Client[]
 
     def initialize( * )
       super
@@ -118,7 +124,7 @@ module Skylab::BeautySalon
       nil
     end
 
-    Face::Plugin::Host::Proxy.enhance self do  # at the end b.c..
+    BeautySalon_::Lib_::Plugin[]::Host::Proxy.enhance self do  # at the end b.c..
 
       services [ :ostream, :ivar, :@out ],
                [ :estream, :ivar, :@err ]

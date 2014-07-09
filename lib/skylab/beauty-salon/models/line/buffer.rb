@@ -1,6 +1,7 @@
 module Skylab::BeautySalon
 
-  Models::Line::Buffer = MetaHell::Function::Class.new :flush
+  Models::Line::Buffer = BeautySalon_::Lib_::Function_class[].new :flush
+
   class Models::Line::Buffer
 
     def initialize num_chars_wide, flush_line

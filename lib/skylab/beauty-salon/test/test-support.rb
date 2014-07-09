@@ -6,8 +6,7 @@ module Skylab::BeautySalon::TestSupport
   ::Skylab::TestSupport::Regret[ self ]
 
   module CONSTANTS
-    BeautySalon = ::Skylab::BeautySalon
-    Face = ::Skylab::Face
-    TestSupport = ::Skylab::TestSupport
+    BeautySalon_ = ::Skylab::BeautySalon
+    TestSupport_ = ::Skylab::TestSupport
   end
 end

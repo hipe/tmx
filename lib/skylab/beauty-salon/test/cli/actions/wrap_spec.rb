@@ -8,11 +8,13 @@ module Skylab::BeautySalon::TestSupport::CLI::Wrap_  # (no Actions node yet..)
 
   extend TestSupport::Quickie
 
-  describe "#{ BeautySalon }::CLI wrap" do
+  describe "[bs] CLI wrap" do
 
     extend Wrap_TestSupport
 
-    def self.client_class ; BeautySalon::CLI::Client end
+    def self.client_class
+      BeautySalon_::CLI::Client
+    end
 
     it "win" do
       path = TestSupport::Data::Universal_Fixtures.dir_pathname.
