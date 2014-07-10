@@ -134,7 +134,7 @@ module Skylab::MetaHell
           class << self
             alias_method :new, :orig_new
           end
-          MetaHell.Function self, * i_a
+          MetaHell_.Function self, * i_a
           cls_p and class_exec( & cls_p )
           self
         end

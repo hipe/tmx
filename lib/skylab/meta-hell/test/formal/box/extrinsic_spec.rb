@@ -8,7 +8,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box::Extr_
 
   extend TestSupport::Quickie
 
-  Box = MetaHell::Formal::Box
+  Box = MetaHell_::Formal::Box
 
   describe "[mh] formal box extrinsic" do
 

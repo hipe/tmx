@@ -12,7 +12,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box
     include CONSTANTS
 
     def new_modified_box
-      box = MetaHell::Formal::Box.new
+      box = MetaHell_::Formal::Box.new
       class << box
         public :add
       end

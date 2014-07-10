@@ -104,7 +104,7 @@ module Skylab::MetaHell
 
     def initialize tee, tee_class, tee_id, tee_args  # mutates tee_args
       @tee, @tee_class, @tee_id = tee, tee_class, tee_id
-      @box = MetaHell::Formal::Box.new
+      @box = MetaHell_::Formal::Box.new
       class << @box
         public :fetch, :add
       end

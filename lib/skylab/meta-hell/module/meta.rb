@@ -1,6 +1,6 @@
 module Skylab::MetaHell
   class Module::Meta
-    extend MetaHell::Let
+    extend MetaHell_::Let
 
     SEP  = '::'
     SEP_ = Module::Creator::SEP_

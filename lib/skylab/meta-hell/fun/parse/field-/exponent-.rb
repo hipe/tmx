@@ -4,7 +4,7 @@ module Skylab::MetaHell
 
     class Field_
 
-      Exponent_ = MetaHell::Library_::Basic::
+      Exponent_ = MetaHell_::Library_::Basic::
         Struct[ :i, :long, :short, :first_desc_line ]
 
       # the term 'exponent' is meant in the "Grammatical_category" sense.
@@ -25,7 +25,7 @@ module Skylab::MetaHell
             end
           end
         end
-        Fm_ = MetaHell::FUN::Parse::Fuzzy_matcher_.curry[ 1 ]  # min length
+        Fm_ = MetaHell_::FUN::Parse::Fuzzy_matcher_.curry[ 1 ]  # min length
 
         def name_monikers y
           y << @long.inspect

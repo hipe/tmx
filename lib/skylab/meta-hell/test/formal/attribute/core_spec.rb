@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module ::Skylab::MetaHell::TestSupport::Formal::Attribute
 
-  MetaHell::Library_.kick :Set
+  MetaHell_::Library_.kick :Set
 
   describe "[mh] formal attribute" do
 

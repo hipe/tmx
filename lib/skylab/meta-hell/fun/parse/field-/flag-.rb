@@ -67,7 +67,7 @@ module Skylab::MetaHell
 
       def any_index_of_consumed_token_anywhere_in_argv argv
         if (( idx = any_index_of_token_anywhere_in_argv argv ))
-          argv[ idx, 1 ] = MetaHell::EMPTY_A_
+          argv[ idx, 1 ] = EMPTY_A_
           idx
         end
       end

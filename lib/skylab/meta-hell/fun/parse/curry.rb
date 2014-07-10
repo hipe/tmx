@@ -69,7 +69,7 @@ module Skylab::MetaHell
         @abstract_field_list = @call_p = @constantspace_mod =
           @do_glob_extra_args = @exhaustion_p = @syntax = nil
         @state_mutex =
-            MetaHell::Library_::Basic::Mutex::Write_Once.new :state_mutex
+            MetaHell_::Library_::Basic::Mutex::Write_Once.new :state_mutex
           # state encompasses input and output. various algorithms may handle
           # input and output together or separately, but we ensure that etc.
         absrb_iambic_fully input_a ; nil
@@ -143,7 +143,7 @@ module Skylab::MetaHell
       end
       #
       Lev___ = -> a, x do
-        MetaHell::Library_::Headless::NLP::EN::Levenshtein::
+        MetaHell_::Library_::Headless::NLP::EN::Levenshtein::
           Or_with_closest_n_items_to_item[ 3, a, x ]
       end
       def clear_last
@@ -270,7 +270,7 @@ module Skylab::MetaHell
             instance_exec( & @syntax.build_syntax_proc( @abstract_field_list ) )
           end
         else
-          MetaHell::EMPTY_P_
+          EMPTY_P_
         end
       end
 
@@ -290,7 +290,7 @@ module Skylab::MetaHell
         nil
       end
       Exhaustion_when_false_ = -> argv, ai do  # #storypoint-290
-        argv[ 0, ai ] = MetaHell::EMPTY_A_ ; nil
+        argv[ 0, ai ] = EMPTY_A_ ; nil
       end
       def uncurried_queue a
         @curry_queue_a = a.fetch 0 ; a.shift

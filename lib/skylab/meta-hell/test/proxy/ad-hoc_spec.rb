@@ -9,7 +9,7 @@ module Skylab::MetaHell::TestSupport::Proxy::Ad_Hoc
 
   extend TestSupport::Quickie
 
-  describe "#{ MetaHell }::Proxy::Ad_Hoc" do
+  describe "#{ MetaHell_ }::Proxy::Ad_Hoc" do
 
     it "2 equivalent ways to construct it" do
       p2 = MetaHell::Proxy::Ad_Hoc[ bar: -> { :ba } ]

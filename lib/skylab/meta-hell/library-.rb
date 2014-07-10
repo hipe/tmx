@@ -1,6 +1,6 @@
 module Skylab::MetaHell
 
-  Library_ = ::Skylab::Subsystem::Library.new MetaHell.dir_pathname  # :+[#su-001]
+  Library_ = ::Skylab::Subsystem::Library.new MetaHell_.dir_pathname  # :+[#su-001]
   module Library_
 
     stdlib, subsys = FUN.at :require_stdlib, :require_subsystem
@@ -19,7 +19,7 @@ module Skylab::MetaHell
   end
 
   module Lib_
-    memo = MetaHell::FUN::Memoize
+    memo = MetaHell_::FUN::Memoize
 
     Aspect = -> do
       MetaHell_::Fields::Aspect_

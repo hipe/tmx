@@ -4,7 +4,7 @@ module Skylab::MetaHell::TestSupport::Boxxy
 
   # Quickie!
 
-  describe "#{ MetaHell::Boxxy }" do
+  describe "#{ MetaHell_::Boxxy }" do
 
     extend MetaHell::TestSupport::Boxxy
 

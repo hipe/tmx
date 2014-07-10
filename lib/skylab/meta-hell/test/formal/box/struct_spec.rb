@@ -12,7 +12,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box::Struct
 
     extend TS__
 
-    define_method :struct, & MetaHell::FUN.memoize[ -> do
+    define_method :struct, & MetaHell_::FUN.memoize[ -> do
       build_box_notify.to_struct
     end ]
 

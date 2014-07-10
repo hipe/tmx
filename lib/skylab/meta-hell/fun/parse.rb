@@ -20,7 +20,7 @@ module Skylab::MetaHell
     #     P[ :some_method ]  # => "some method"
 
     Hack_label_ = -> ivar_i do
-      MetaHell::Library_::Headless::Name::FUN::Labelize[ ivar_i ].downcase
+      MetaHell_::Library_::Headless::Name::FUN::Labelize[ ivar_i ].downcase
     end
 
     # fuzzy matcher

@@ -7,7 +7,7 @@ module Skylab::MetaHell::TestSupport
   ::Skylab::TestSupport::Quickie.enable_kernel_describe
 
   module CONSTANTS
-    MetaHell = ::Skylab::MetaHell
+    MetaHell = MetaHell_ = ::Skylab::MetaHell
     TestSupport = ::Skylab::TestSupport
   end
 

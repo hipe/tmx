@@ -115,7 +115,7 @@ module Skylab::MetaHell
         end
         #
         Missing_required_fields_notify_ = -> agent, miss_a do  # etc
-          s, op, cp = 1 == miss_a.length ? MetaHell::EMPTY_A_ : %w[ s ( ) ]
+          s, op, cp = 1 == miss_a.length ? EMPTY_A_ : %w[ s ( ) ]
           raise ::ArgumentError, "missing required argument#{ s } - #{ op }#{
             }#{ miss_a.map( & :method_i ) * ', ' }#{ cp }"
           nil

@@ -5,6 +5,6 @@ module ::Skylab::MetaHell::TestSupport::Class::Creator::ModuleMethods
 
   include CONSTANTS
 
-  MetaHell = MetaHell # #annoying
+  MetaHell = MetaHell
 
 end

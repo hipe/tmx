@@ -51,7 +51,7 @@ module Skylab::MetaHell
         _arity = (( h = matr.hook_p )) ? h.arity : 1
         which_h.fetch( _arity ) << matr.local_normal_name
       end
-      MetaHell::Bundle::Item_Grammar.new mono_i_a, :attribute, diad_i_a
+      MetaHell_::Bundle::Item_Grammar.new mono_i_a, :attribute, diad_i_a
     end
 
     DSL = -> mod do
@@ -237,7 +237,7 @@ module Skylab::MetaHell
     end
 
     Build_compressor__ = -> d do
-      if d < 1 then MetaHell::IDENTITY_ else
+      if d < 1 then IDENTITY_ else
         -> a { a[ 0, d ] }
       end
     end

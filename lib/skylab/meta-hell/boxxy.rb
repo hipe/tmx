@@ -209,13 +209,13 @@ module Skylab::MetaHell
 
     Distill = -> do
       p = -> x do
-        ( p = MetaHell::Lib_::Distill_proc[] )[ x ]
+        ( p = MetaHell_::Lib_::Distill_proc[] )[ x ]
       end
       -> x { p[ x ] }
     end.call
 
     Distill_proc = -> do
-      MetaHell::Lib_::Distill_proc[]
+      MetaHell_::Lib_::Distill_proc[]
     end
 
     Resolve_name__ = -> cbn, do_peek_hack, box, name_x, guess do
@@ -436,9 +436,9 @@ module Skylab::MetaHell
       def _init_autoloader al_i_a
         @mod.respond_to? :dir_pathname or begin
           if al_i_a.length.zero?
-            MetaHell::MAARS::Upwards[ @mod ]
+            MetaHell_::MAARS::Upwards[ @mod ]
           else
-            MetaHell::MAARS[ @mod, * al_i_a ]
+            MetaHell_::MAARS[ @mod, * al_i_a ]
           end
         end
         nil
@@ -517,7 +517,7 @@ module Skylab::MetaHell
 
     module MM__
       def each &blk
-        ea = MetaHell::Formal::Box::Enumerator.new( -> pair_y do
+        ea = MetaHell_::Formal::Box::Enumerator.new( -> pair_y do
           mod_load_guess = Resolve_name__.curry[ nil, false, self ]
           constants.each do |guess_i|
             const = mod_load_guess[ nil, guess_i ]
@@ -542,7 +542,7 @@ module Skylab::MetaHell
     module MM__
     private
       def abbrev h
-        @abbrev_box ||= MetaHell::Formal::Box::Open.new
+        @abbrev_box ||= MetaHell_::Formal::Box::Open.new
         h.each do |k, v|
           @abbrev_box.add k, v
         end

@@ -1,8 +1,8 @@
 module Skylab::MetaHell::Module::Creator
 
   Creator = self
-  MetaHell = ::Skylab::MetaHell
-  Module = MetaHell::Module
+  MetaHell_ = ::Skylab::MetaHell
+  Module = MetaHell_::Module
   SEP_ = '__'
 
   def self.extended mod # #sl-109
@@ -11,7 +11,7 @@ module Skylab::MetaHell::Module::Creator
   end
 
   module ModuleMethods # expects you to define your own let()
-    extend MetaHell::Let # #impl
+    extend MetaHell_::Let # #impl
 
     o = ::Hash.new
 
@@ -155,7 +155,7 @@ module Skylab::MetaHell::Module::Creator
       memo
     end
 
-    M = MetaHell::Struct[ o ] #  turns a hash into an ad-hoc struct object
+    M = MetaHell_::Struct[ o ] #  turns a hash into an ad-hoc struct object
 
     let :__metahell_known_graph do
       # #note the below causes core dumps yay [#006]
@@ -190,7 +190,7 @@ module Skylab::MetaHell::Module::Creator
   end
 
   module InstanceMethods
-    extend MetaHell::Let::ModuleMethods
+    extend MetaHell_::Let::ModuleMethods
 
     # (note: although we have a "sophisticated" mechanism for managing
     # definitions of module graphs in our complimentary module above,
@@ -242,7 +242,7 @@ module Skylab::MetaHell::Module::Creator
       sing_class.class_exec name, & M.convenience
     end
 
-    M_IM = MetaHell::Struct[ o ]
+    M_IM = MetaHell_::Struct[ o ]
 
 
     def modul! full_name, &module_body

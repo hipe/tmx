@@ -197,7 +197,7 @@ module Skylab::MetaHell
           raise ::StopIteration
         end
       end
-      MetaHell::Formal::Box.new.instance_exec do
+      MetaHell_::Formal::Box.new.instance_exec do
         box.reduce self do |memo, (k, v)|
           match = false
           three_p[ k, v, name_consumer ] rescue ::StopIteration

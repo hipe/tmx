@@ -7,9 +7,9 @@ module Skylab::MetaHell::Class::Creator
   #
   #   **very** #experimental
 
-  MetaHell = ::Skylab::MetaHell
-  Class = MetaHell::Class
-  Module = MetaHell::Module
+  MetaHell_ = ::Skylab::MetaHell
+  Class = MetaHell_::Class
+  Module = MetaHell_::Module
 
 
   def self.extended mod # #sl-109
@@ -55,7 +55,7 @@ module Skylab::MetaHell::Class::Creator
       [create, update]
     end
 
-    K = MetaHell::Struct[ o ]
+    K = MetaHell_::Struct[ o ]
 
     def klass full_name, *a, &class_body # `a` is extra args, e.g. extends:
                                   # see extensive comments at klass! for now.
@@ -91,7 +91,7 @@ module Skylab::MetaHell::Class::Creator
 
 
   module InstanceMethods
-    extend MetaHell::Let::ModuleMethods
+    extend MetaHell_::Let::ModuleMethods
 
     include Module::Creator::InstanceMethods # M_IM, Memo
 

@@ -51,7 +51,7 @@ module Skylab::MetaHell::DSL_DSL
   #
   # happy hacking!
 
-  MetaHell = ::Skylab::MetaHell
+  MetaHell_ = ::Skylab::MetaHell
 
   def self.enhance host, &def_blk
     Story_.new( host.singleton_class, host, ENHANCE_ADAPTER_ ).
@@ -90,7 +90,7 @@ module Skylab::MetaHell::DSL_DSL
     nil
   end
 
-  Story_ = MetaHell::Function::Class.new( :atom, :atom_accessor,
+  Story_ = MetaHell_::Function::Class.new( :atom, :atom_accessor,
                                           :list, :block )
   class Story_
 
@@ -227,7 +227,7 @@ module Skylab::MetaHell::DSL_DSL
     nil
   end
 
-  Enhance_Module_Adapter_ = MetaHell::Function::Class.new(
+  Enhance_Module_Adapter_ = MetaHell_::Function::Class.new(
     :add_field, :add_or_change_value )
   class Enhance_Module_Adapter_
     def initialize

@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module ::Skylab::MetaHell::TestSupport::Boxxy
 
-  describe "#{ MetaHell::Boxxy } load" do
+  describe "#{ MetaHell_::Boxxy } load" do
 
     it "fetching the same nerk twice does not fail" do # catch an edge case
       mod = TS_::Fixtures::Neeples

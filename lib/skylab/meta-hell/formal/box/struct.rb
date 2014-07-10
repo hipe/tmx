@@ -74,6 +74,6 @@ module Skylab::MetaHell
         end )
     end
     #
-    Hash_Pxy__ = MetaHell::Proxy::Nice.new( * %i| key? fetch dup | )
+    Hash_Pxy__ = MetaHell_::Proxy::Nice.new( * %i| key? fetch dup | )
   end
 end

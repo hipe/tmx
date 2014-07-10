@@ -154,9 +154,9 @@ module Skylab::MetaHell
     end
 
     Say_not_found_ = -> d, a, k do
-      _s = MetaHell::Library_::Headless::NLP::EN::Levenshtein::
+      _s = MetaHell_::Library_::Headless::NLP::EN::Levenshtein::
         Or_with_closest_n_items_to_item[ d, a, k ]
-      "not found #{ MetaHell::Library_::Basic::FUN::Inspect[ k ] } - #{
+      "not found #{ MetaHell_::Library_::Basic::FUN::Inspect[ k ] } - #{
         }did you mean #{ _s }?"
     end
 
@@ -231,7 +231,7 @@ module Skylab::MetaHell
       end
       def predefiner
         @predefiner ||= begin
-          bx = box ; mutex = MetaHell::Library_::Basic::
+          bx = box ; mutex = MetaHell_::Library_::Basic::
               Mutex::Hash.new do |key, c_a, _|
             raise "circular dependence detected with `#{ key }` - are you #{
               }sure it is defined in #{ self }::#{ c_a * '::' }?"

@@ -15,7 +15,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Attribute::Box
     context "`with` - doesn't care about truthiness just has?" do
 
       subject -> do
-        MetaHell::Formal::Attribute::Box[ [
+        MetaHell_::Formal::Attribute::Box[ [
           [:one, { name: :foo, ready: true, flavor: :bland } ],
           [:two, { name: :bar, ready: false} ],
           [:three, { name: :baz, ready: true, flavor: :spicy } ],

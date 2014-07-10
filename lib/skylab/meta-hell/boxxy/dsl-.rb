@@ -33,7 +33,7 @@ module Skylab::MetaHell
       end
 
       def upwards mod
-        MetaHell::MAARS::Upwards[ mod ]
+        MetaHell_::MAARS::Upwards[ mod ]
       end
     end
 

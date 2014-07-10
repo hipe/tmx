@@ -2,7 +2,7 @@
 [#068] #open rewrite contoured parsing to be unobtrusive
 [#067] #open in countoured, absorption methods should be self-contained
 [#066]       #doc-point the metahell fields narrative ..
-[#065] #open unify use of MetaHell_ not MetaHell
+[#065]       #done unify use of MetaHell_ not MetaHell
 [#064] #open fix syntax sharing
 [#063] #open get rid of argful field parsers
 [#062]       #done get rid of ridiculous attempts at currying methods

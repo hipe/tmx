@@ -7,7 +7,7 @@ module Skylab::MetaHell::TestSupport::Proxy::Functional
 
   extend TestSupport::Quickie
 
-  describe "#{ MetaHell }::Proxy::Function" do
+  describe "#{ MetaHell_ }::Proxy::Function" do
 
     def pee ; 'wee' end
 

@@ -1,6 +1,6 @@
 module Skylab::MetaHell
-  class Class::Meta < MetaHell::Module::Meta
-    include MetaHell::Let::InstanceMethods # __memoized #impl
+  class Class::Meta < MetaHell_::Module::Meta
+    include MetaHell_::Let::InstanceMethods # __memoized #impl
 
     # This metadata class (like its parent) has two distinct purposes :
     # 1) represent all data presented using the DSL in a lightweight way
