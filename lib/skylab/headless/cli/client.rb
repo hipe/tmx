@@ -1,12 +1,9 @@
 module Skylab::Headless
 
-  module CLI::Client  # read [#xXX] the CLI client narrative #storypoint-5
+  module CLI::Client  # read [#089] the CLI client narrative #storypoint-5
 
     def self.[] mod, * x_a
-      loc = caller_locations( 1, 1 ).first
-      was_empty = x_a.length.zero?
-      x_a.unshift :location_of_residence, loc
-      if was_empty
+      if x_a.length.zero?
         x_a.concat DEFAULT_BUNDLES_X_A__
       end
       Bundles_.apply_iambic_on_client x_a, mod
@@ -34,11 +31,6 @@ module Skylab::Headless
           module_exec nil, & Client_instance_methods
         end
         module_exec _, & DSL__.to_proc
-      end
-
-      Location_of_residence = -> x_a do
-        loc = x_a.shift
-        @location_of_residence ||= loc ; nil  # clobber ok
       end
 
       Three_streams_notify = -> _ do
@@ -174,16 +166,10 @@ module Skylab::Headless
 
     module DSL__ # read [#129] (in [#089]) the CLI client D.. #storypoint-905
 
-      to_proc = -> x_a do  # #storypoint-910 the order here matters
-        module_exec( & Wire_autoloader__ )
+      to_proc = -> _ do  # #storypoint-910 the order here matters
         CLI::Box[ self, :DSL ]  # NOTE method_added hook
         include IMs__ ; nil
       end ; define_singleton_method :to_proc do to_proc end
-
-      Wire_autoloader__ = -> do
-        loc = @location_of_residence ; @location_of_residence = nil
-        Headless::Library_::MAARS[ self, loc ] ; nil
-      end
 
       # #storypoint-920 (N/A) "we may implement bundles as procs below.."
 
@@ -213,8 +199,12 @@ module Skylab::Headless
       end
     end
 
-    module Adapter  # for [#054] ouroboros
-      Headless::Library_::MAARS::Upwards[ self ]
+    module Adapter  # #stowaway for [#054] ouroboros
+      Autoloader_[ self ]
+    end
+
+    module Bundles__  # #stowaway
+      Autoloader_[ self ]
     end
 
     module IMs__

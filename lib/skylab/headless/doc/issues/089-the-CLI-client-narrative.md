@@ -74,21 +74,11 @@ node. conversely, "instream" means more specialized or specific: an "instream"
 call would be one (perhaps a #hook-out or #hook-in) that gives the client a
 chance to perform the operation in a customized way (because for example
 a "#hook-in" method was overridden). factory pattern could be described as an
-"instreaming" operation: the agent that the factory produced for performing
+"instreaming" operation: the agent that the factory resolved for performing
 some operation is the "instream".)
 
-as a "top-client" (however intermediate we may actually be), we are typically
-defined in a file whose location is isomorphic with our node name (that is, a
-top-client is rarely a #stowaway). child action nodes, however, are typically
-defined wherever and all over the place (e.g they may be produced dynamically).
-
-all of this is to say that where and how we are created has an impact on how
-autoloading should be wired (or it may not), but to be safe we take care of
-that up front before we call out to our outstreams; so then presumably the
-outstream won't overwrite our explicitly wired autoloader properties with
-something wrong. (in other words and in more specific terms, all of this is
-so that MAARS::Upwards isn't actuated on a top-level node (which a top-client
-may be but not a child action), which reasonably results in an exception.)
+(#tombstone: the now defunct thing about what the wiring of autoloaders
+had to do with this was here.)
 
 not all top-clients are boxes and not all boxes are top-clients, but we
 conceive of a top-client as "more specifc" than a box because of its

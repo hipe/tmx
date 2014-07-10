@@ -14,7 +14,7 @@ module Skylab::Headless
 
     FUN = Headless::Library_::FUN_Module.new
 
-    Headless::Library_::MAARS::Upwards[ FUN ]
+    Autoloader_[ FUN ]  # we need to a.l children
 
     o = FUN.send :definer
 

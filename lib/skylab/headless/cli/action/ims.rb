@@ -499,7 +499,6 @@ module Skylab::Headless
           def close
             @p.call
           end
-          Headless::Library_::MAARS::Upwards[ self ]
         end
 
         Action::Value_As_Task__ = -> x do

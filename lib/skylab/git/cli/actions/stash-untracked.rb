@@ -150,8 +150,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
     class Expression_Agent__ < Lib_CLI_::Pen::Minimal
       def escape_path x
-        _s = x.to_s
-        Lib_CLI_::PathTools::FUN.pretty_path[ _s ]
+        Lib_CLI_::PathTools::FUN.pretty_path[ x.to_s ]
       end
     end
   public
@@ -474,12 +473,10 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
 
     def invoke par_h
+      Lib_CLI_::PathTools.clear  # #storypoint-8.5
       r = resolve_hub par_h
       r &&= initialize_basic_set_with_hash par_h
-      if r
-        Lib_CLI_::PathTools.clear  # see notes at `pretty_path` - danger
-        r = execute
-      end ; r
+      r && execute
     end
 
   private

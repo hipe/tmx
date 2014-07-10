@@ -109,6 +109,16 @@ just for #grease we test that [hl] gets this about to the write IO of the IO
 adapter.
 
 
+# :#storypoint-8.5
+
+[#hl-031] it is necessary to reset the "pretty path" facility between
+directory changes. at the time of this writing, this is revealed as an
+issue if you run e.g the [hl] testsuite before this one.
+
+this resetting activity is necessary here and not lower because even
+when invocation fails, paths may be prettified in the output.
+
+
 # :#storypoint-9 experiments with extensions
 
 note how we corral *all* file-utils-related implementation into one location

@@ -25,7 +25,7 @@ module Skylab::TestSupport::Regret::API
     # test code programmatically for this file you are reading,
     # from these comments you are reading:
     #
-    #     here = API::Actions::DocTest.pathname
+    #     here = API::Actions::DocTest.dir_pathname.sub_ext '.rb'
     #     output = TestSupport.dir_pathname.
     #       join( 'test/regret/api/actions/doc-test_spec.rb')
     #     stat = output.stat ; size1 = stat.size ; ctime1 = stat.ctime

@@ -143,7 +143,7 @@ module Skylab::Headless
 
     private
 
-      Headless::Library_::MAARS::Upwards[ self ]  # we #stowaway but have childs
+      Autoloader_[ self ]  # we are a #stowaway but we have childs that need a.l
 
       class Isomorphic < self  # in Syntax
 

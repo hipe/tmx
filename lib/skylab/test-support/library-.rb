@@ -164,7 +164,7 @@ module Skylab::TestSupport
 
     Transitional_autoloader = -> mod, file do
       _dpn = ::Pathname.new( file ).sub_ext ''
-      MetaHell__[]::MAARS[ mod, _dpn ] ; nil
+      Autoloader_[ mod, _dpn ] ; nil
     end
   end
 end

@@ -58,10 +58,10 @@ module Skylab::Headless
         "expecting #{ act_arg_stx_s }"
       end
       def act_arg_stx_s sep_s=ALTERNATION_SEPARATOR_GLYPH__
-        _a = unbound_action_box.each.reduce [] do |m, (_, x)|
-          m << x.name_function.local.as_slug
-        end
         kbd_p = say { method :kbd }
+        _a = unbound_action_box.names.reduce [] do |m, name|  # :+[#cb-031]
+          m << name.as_slug
+        end
         "{#{ _a.map( & kbd_p ) * sep_s }}"
       end
       def unbound_action_box
@@ -73,11 +73,15 @@ module Skylab::Headless
       end
     private
       def ftch_action_class action_s
-        unbound_action_box.const_fetch action_s, method( :on_no_act )
+        Autoloader_.const_reduce do |cr|
+          cr.from_module unbound_action_box
+          cr.const_path [ action_s ]
+          cr.else( & method( :on_no_act ) )
+        end
       end
       def on_no_act name_err
         exp_s = say_expting
-        _s = say { "there is no #{ ick name_err.const } action. #{ exp_s }" }
+        _s = say { "there is no #{ ick name_err.name } action. #{ exp_s }" }
         emit_error_line _s
         usage_and_invite
       end
@@ -197,8 +201,10 @@ module Skylab::Headless
     private
       def gt_bound_child_a
         client = client_services_for_bound_action_by_agent
-        unbound_action_box.each.reduce [] do |m, (_, cls)|
-          m << ( cls.new client )  # ich muss sein - we need a charged graph
+        mod = unbound_action_box
+        mod.constants.each.reduce [] do |m, const_i|  # :+[#cb-031]
+          m << mod.const_get( const_i, false ).new( client )
+          # ich muss sein - we need a charged graph
         end
       end
 

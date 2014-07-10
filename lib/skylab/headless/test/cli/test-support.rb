@@ -6,6 +6,7 @@ module Skylab::Headless::TestSupport::CLI
 
   include CONSTANTS
 
+  Autoloader_ = Headless::Autoloader_
   Headless = Headless
 
   extend TestSupport::Quickie  # e.g sibling 'path tools'
@@ -27,7 +28,10 @@ module Skylab::Headless::TestSupport::CLI
       if mod.const_defined? SANDBOX_I__, false
         mod.const_get SANDBOX_I__
       else
-        mod.const_set SANDBOX_I__, ::Module.new
+        mod_ = ::Module.new
+        mod.const_set SANDBOX_I__, mod_
+        Autoloader_[ mod_ ]
+        mod_
       end
     end
     SANDBOX_I__ = :Sbx

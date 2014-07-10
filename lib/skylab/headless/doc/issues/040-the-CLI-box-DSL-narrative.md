@@ -50,21 +50,14 @@ box node, as is one with only one public method definition..
 
 ## :#storypoint-25
 
-we want to avoid the smell of cross-cutting concerns, but in this case we
-can't think of an easy way not to. we are vivifying the box module. we use
-the general interface of a boxxy module (`const_fetch` and so on) to
-retrieve child nodes, etc; and this kind of thing is the task boxxy was built
-for, so we use boxxy here.
+this is less ugly than it used to be, but the general rubric still holds: we
+want to avoid the smell of cross-cutting concerns, but in this case we can't
+think of an easy way out:
 
-we assume it should be an autoloading boxxy because for applications they
-usually are (putting all of your actions in one file can be expensive in at
-least two ways). for us to create an autoloading boxxy it must know its own
-path (it will use MAARS::Upwards) which means that we ourselves (the action
-box) must know our own path or it will have one handed to it.
-
-to be explicit, we resolve some path now with a call to maars upwards, but
-the client will do this differently.
-
+we may be vivifying the box module. we will use const reduce or the
+equivalent elsewhere, and typically we want the "boxxy" behavior (that
+reads the filesystem and infers the names of constants that are not even
+loaded yet) so we specify that here as the asssumed default.
 
 
 

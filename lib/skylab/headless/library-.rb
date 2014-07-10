@@ -16,7 +16,6 @@ module Skylab::Headless
     o[ :FUN_Module ] = -> _ { self::MetaHell::FUN::Module }
     o[ :Function_Class ] = -> _ { self::MetaHell::Function::Class }
     o[ :InformationTactics ] = o[ :MetaHell ] = sidesys
-    o[ :MAARS ] = -> _ { self::MetaHell::MAARS }
     o[ :Module_Resolve ] = -> _ { self::MetaHell::Module::Resolve }
     o[ :Open3 ] = stdlib
     o[ :Open4 ] = -> { ::Skylab::Subsystem::FUN.require_quietly[  'open4'  ]; ::Open4 }

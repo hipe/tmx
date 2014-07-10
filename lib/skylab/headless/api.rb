@@ -3,8 +3,6 @@ module Skylab::Headless
   module API  # read [#017] the API node narrative (was (historical) [#010])
 
     def self.[] mod, * x_a
-      _loc = caller_locations( 1, 1 ).first
-      x_a.unshift :location_of_residence, _loc
       Bundles__.apply_iambic_on_client x_a, mod ; nil
     end
 
@@ -12,10 +10,6 @@ module Skylab::Headless
 
     module Bundles__
       # ~ in dependency order!
-      Location_of_residence = -> x_a do
-        loc = x_a.shift
-        @location_of_residence ||= loc ; nil
-      end
       With_service = -> _ do  # #storypoint-10
         extend Service_Methods_for_Toplevel_Module__ ; nil
       end
@@ -43,14 +37,9 @@ module Skylab::Headless
     end
     Rslv_Dpn__ = -> do  # #storypoint-25
       parent = Library_::Module_Resolve[ '..', self ]
-      if parent and Has_dpn__[ parent ]
-        Library_::MAARS::Upwards[ self ]
-      else
-        loc = @location_of_residence ; @location_of_residence = nil
-        Library_::MAARS[ self, loc ]
-      end ; nil
+      parent and Has_dpn__[ parent ] or fail "no support for toplevel modules"
+      Autoloader_[ self ] ; nil
     end
-
     module Service_Methods_for_Toplevel_Module__
       def invoke * x_a  # :+[#sl-121] the standard façade
         x_a.unshift :action_locator_x

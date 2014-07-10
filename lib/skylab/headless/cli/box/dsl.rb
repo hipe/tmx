@@ -38,12 +38,10 @@ module Skylab::Headless
             const_defined? ACTIONS_BOX_MOD_I__, false or intlz_unbound_act_box
             const_get ACTIONS_BOX_MOD_I__, false
           end
-          def intlz_unbound_act_box
-            if ! respond_to? :dir_pathname  # #storypoint-25
-              Headless::Library_::MAARS::Upwards[ self ]
-            end
+          def intlz_unbound_act_box  # #storypoint-25
+            respond_to? :dir_pathname or Autoloader_[ self ]
             mod = const_set ACTIONS_BOX_MOD_I__, ::Module.new
-            Headless::Library_::Boxxy[ mod ] ; nil
+            Autoloader_[ mod, :boxxy ] ; nil
           end
         end
 

@@ -101,5 +101,7 @@ module Skylab::Callback
         Get_fly = -> { p[] }
       end
     end
+
+    # ~ [#031]: 'each` (or 'each_value') - do you wish you had it? count: 1
   end
 end
