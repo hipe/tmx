@@ -5,20 +5,6 @@ module Skylab
 
   module MetaHell  # welcome to meta hell. please read [#041] #storypoint-005
 
-    MetaHell = self  # #todo
-    MetaHell_ = self
-
-    EMPTY_A_            =  [ ].freeze  #storypoint-015 explains this OCD
-    EMPTY_P_            = ->   { }
-    MONADIC_EMPTINESS_  = -> _ { }
-    MONADIC_TRUTH_      = -> _ { true }
-    IDENTITY_           = -> x { x }
-    DASH_               = '-'.getbyte 0
-
-    class Aset_ < ::Proc  # "aset" = "array set" ("[]="), from ruby source
-      alias_method :[]=, :call
-    end
-
     # ARE YOU READY TO EAT YOUR OWN DOGFOOD THAT IS MADE OF YOUR BODY
 
     #                  ~ auto-trans-substantiation ~
@@ -31,7 +17,16 @@ module Skylab
 
     ( MAARS = Autoloader::Autovivifying::Recursive )[ self ]
       # a name this long that is used this often gets its own weird acronym
-    stowaway :Lib_, 'library-'
+
+    class Aset_ < ::Proc  # "aset" = "array set" ("[]="), from ruby source
+      alias_method :[]=, :call
+    end
+
+    DASH_ = '-'.getbyte 0
+
+    EMPTY_A_ = [].freeze  #storypoint-015 explains this OCD
+
+    EMPTY_P_ = -> { }
 
     def self.Function host, *rest
       self::Function._make_methods host, :public, :method, rest
@@ -48,6 +43,18 @@ module Skylab
         new( x_a ).execute
       end
     end
+
+    IDENTITY_ = -> x { x }
+
+    stowaway :Lib_, 'library-'
+
+    MetaHell = self  # #todo
+
+    MetaHell_ = self
+
+    MONADIC_EMPTINESS_ = -> _ { }
+
+    MONADIC_TRUTH_ = -> _ { true }
   end
 end
 
