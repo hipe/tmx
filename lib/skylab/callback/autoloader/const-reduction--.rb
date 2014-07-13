@@ -179,9 +179,8 @@ module Skylab::Callback
       end
       def rslv_some_result_via_fuzzy_lookup one_p=nil, many_p=nil, zero_p=nil
         stem = @name.as_distilled_stem
-        stem_p = Distill_  # maybe 'fuzzy_stem_cache' but why?
         a = [] ; @mod.constants.each do |const_i|
-          stem == stem_p[ const_i ] and a << const_i
+          stem == Distill_[ const_i ] and a << const_i
         end
         @result = case a.length <=> 1
         when -1 ; zero_p ? zero_p[] : rslv_some_result_when_const_not_defined
@@ -254,20 +253,15 @@ module Skylab::Callback
       end
 
       def rslv_some_result_by_loading_some_file_in_normpath np
-        file = if np.can_produce_load_file_path
-          np
-        elsif (( np_ = np.any_corefile_normpath ))
-          np_
-        end
+        file = np.can_produce_load_file_path && np
         if file
-          rslv_some_result_by_loading_file_for_normpath file, ( np_ && np )
+          rslv_some_result_by_loading_file_for_normpath file
         else
           rslv_some_result_when_const_not_defined
         end
       end
-      def rslv_some_result_by_loading_file_for_normpath file_normpath, np
+      def rslv_some_result_by_loading_file_for_normpath file_normpath
         file_normpath.change_state_to :loaded
-        np and np.change_state_to :loaded
         _path = file_normpath.get_require_file_path
         require _path
         rslv_some_result_via_fuzzy_lookup
@@ -307,7 +301,23 @@ module Skylab::Callback
         attr_reader :module
       end
 
-      # ~ iambic form
+      # ~
+
+      def Proc_.via_args x_a
+        2 > x_a.length and raise ::ArgumentError, "(#{ x_a.length } for 2)"
+        shell = Shell_.new( kernel = Kernel_.new )
+        shell.const_path x_a.fetch 0
+        shell.from_module x_a.fetch 1
+        kernel.flush
+      end
+
+      # ~
+
+      def Proc_.with * x_a
+        via_iambic x_a
+      end
+
+      # ~
 
       def Proc_.via_iambic x_a
         kernel = Kernel_.new
@@ -318,6 +328,8 @@ module Skylab::Callback
         end while x_a.length.nonzero?
         kernel.flush
       end
+
+      # ~
 
       CEASE_ = false
       IGNORED_ = nil

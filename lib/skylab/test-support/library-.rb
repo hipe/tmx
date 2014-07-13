@@ -161,10 +161,5 @@ module Skylab::TestSupport
     Text_patch = -> do
       Headless__[]::Text::Patch
     end
-
-    Transitional_autoloader = -> mod, file do
-      _dpn = ::Pathname.new( file ).sub_ext ''
-      Autoloader_[ mod, _dpn ] ; nil
-    end
   end
 end

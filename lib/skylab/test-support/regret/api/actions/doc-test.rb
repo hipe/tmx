@@ -192,7 +192,10 @@ module Skylab::TestSupport::Regret::API
 
     # we have a hefty branch node - this is used by our many children
 
+    Autoloader_[ self, ::Pathname.new( __FILE__ ).sub_ext( EMPTY_S_ ) ]
+
     API = API
+    CONST_SEP_ = CONST_SEP_
     DocTest = self
     Lib_ = ::Skylab::TestSupport::Lib_
     PROCEDE__ = true
@@ -200,8 +203,7 @@ module Skylab::TestSupport::Regret::API
     RegretLib_ = API::RegretLib_
     SEP = '# =>'.freeze
     SUCCESS_EXITSTATUS__ = 0
-
-    Lib_::Transitional_autoloader[ self, __FILE__ ]
+    Autoloader_[ Templos__ = ::Module.new, :boxxy ]
 
   end
 end

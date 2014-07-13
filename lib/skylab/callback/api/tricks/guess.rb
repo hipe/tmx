@@ -57,9 +57,10 @@ module Skylab::Callback
       if @tok_a.length.zero?
         error "expecting more than just #{ @subp.inspect } for a file!"
       else
-        parts = [ @subp, * @tok_a ]
-        parts.reduce ::Skylab do |modul, part|
-          Callback_::Lib_::Fuzzy_const_get[ modul, part ]
+        Autoloader.const_reduce do |cr|
+          cr.const_path [ @subp, * @tok_a ]
+          cr.from_module ::Skylab
+          cr.assume_is_defined
         end
       end
     end

@@ -130,17 +130,7 @@ module Skylab::Callback::TestSupport::Autoloader
       end
     end
 
-    context "integration nudge (needs const reduce)" do
-      it "integration (with \"TRD\" specificially)" do
-        lib = Callback_::Lib_
-        lib::Headless__[]
-        lib::MetaHell__[]::Boxxy.class
-        n, v = ::Skylab::MetaHell::Boxxy::Resolve_name_and_value[
-          :from_module, ::Skylab::Headless, :path_x, :Nlp ]
-        n.should eql :NLP
-        v.name.should match %r(::Headless::NLP\z)
-      end
-    end
+    # (#tombstone for that one hack)
 
     context "with an (autolaoded) node that resolves its own dir_pathname" do
 

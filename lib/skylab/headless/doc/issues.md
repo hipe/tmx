@@ -171,7 +171,7 @@
 [#010]       #repurposed:once the client tree model ..
 [#009]       #tracking-tag places where HL::Parameters show signs of strain; also general tracking of the node
 [#008]       P::C::I_M --> SC::I_M THIS WAS BAD see [#004], [#027]
-[#007]       #done use of Parameter::Set#list, unify with Boxxy interface
+[#007]       #done use of Parameter::Set#list, unify with B-oxxy interface
 [#006]       #parent-node: [#sl-116], #facility-tracker `error_count`
 [#005]       unify concepts let sub-client trump rename parent_runtime par_clien
 [#004]       #doc-point the deprecation and rebirth of the sub-client pattern ..

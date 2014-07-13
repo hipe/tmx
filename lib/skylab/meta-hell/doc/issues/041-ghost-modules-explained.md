@@ -34,7 +34,7 @@ important facilities:
 
 2. the Bundle facility. it's simply the best thing.
 
-3. Boxxy is kind of a weird fit here, but didn't really fit anywhere else
+3. B-oxxy is kind of a weird fit here, but didn't really fit anywhere else
 
 4. the Item_Grammar is pretty great
 

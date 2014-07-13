@@ -1,3 +1,4 @@
+[#033] #open if you un-orphanize core.rb it presents an issue with autoloader
 [#032] #open #doc-test change sytax to work with contiguous nonblank lines
 [#031] #open #tracking-tag while regret no longer wires test nodes for autoloading
 [#030] #open the doc-test recursive spec needs mock fs

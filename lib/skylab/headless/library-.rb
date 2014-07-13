@@ -6,7 +6,6 @@ module Skylab::Headless
 
     o = { }
     o[ :Basic ] = sidesys
-    o[ :Boxxy ] = -> _ { self::MetaHell::Boxxy }
     o[ :Bundle ] = -> _ { self::MetaHell::Bundle }
     o[ :CodeMolester ] = sidesys
     o[ :FileUtils ] = stdlib

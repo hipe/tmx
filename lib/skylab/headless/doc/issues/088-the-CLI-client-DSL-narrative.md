@@ -30,7 +30,7 @@ is, do "enqueue :help" in the handler for your option).
 
 ## "on wiring the module graph for autloading"
 
-this deserves some explanation: we use Boxxy on our action box module
+this deserves some explanation: we use B-oxxy on our action box module
 because that was exactly what it was designed for: to be an unobtrusive
 hack for painless retrieval and collection management for constituent
 modules. now the point of this whole nerk here is to _create_ such a

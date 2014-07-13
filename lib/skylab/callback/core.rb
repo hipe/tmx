@@ -162,7 +162,7 @@ module Skylab::Callback
         @autoloader_parent_module
       end
       def orient_for_autoloader
-        s_a = name.split DCOLON_
+        s_a = name.split CONST_SEP_
         @autoloader_name = Name.from_const s_a.pop
         @autoloader_parent_module =
           s_a.reduce( ::Object ) { |m, s| m.const_get s, false }
@@ -413,12 +413,9 @@ module Skylab::Callback
       attr_reader :did_resolve_entry_tree
     private
       def rslv_entry_tree_by_looking_upwards
-        apm = autoloader_parent_module
         any_dpn = dir_pathname
-        apm or self._HOLE
-        if apm.respond_to? :entry_tree
-          pet = apm.entry_tree
-        end
+        apm = autoloader_parent_module or self._HOLE
+        apm.respond_to? :entry_tree and pet = apm.entry_tree
         if pet
           np = pet.normpath_from_distilled @autoloader_name.as_distilled_stem
           np and np.has_directory and et = np
@@ -669,7 +666,7 @@ module Skylab::Callback
         :not_loaded == @stwy_et.state_i and @stwy_et.change_state_to :loading
         np_a = []
         while DOT_DOT__ == token
-          const_s_a = mod.name.split DCOLON_
+          const_s_a = mod.name.split CONST_SEP_
           const_s_a.pop
           mod = const_s_a.reduce( ::Object ) { |m, x| m.const_get x, false }
           et = mod.entry_tree
@@ -783,7 +780,7 @@ module Skylab::Callback
         end
       end
       def when_is_different
-        const_a = @mod.name.split DCOLON_
+        const_a = @mod.name.split CONST_SEP_
         const_a[ - ( @mine_a.length ) .. -1 ] = EMPTY_A_
         _mod = const_a.reduce( ::Object ) { |m, s| m.const_get s, false }
         _mod_ = Autoloader.const_reduce do |cr|
@@ -985,11 +982,11 @@ module Skylab::Callback
 
     class Entry_Tree_
       def get_require_file_path
-        if @h.key? CORE_FILE_
-          "#{ @parent_pn.to_path }/#{ @dir_entry.corename }/#{ CORE_ }"
-        else
-          self._HOLE
-        end
+        @h.key? CORE_FILE_ or raise ::LoadError, "cannot determine a path #{
+         }to require: #{ @dir_entry.corename }/#{ CORE_FILE_ } does not #{
+          }exist. did #{ @dir_entry.corename }#{ EXTNAME_ } fail to load? (#{
+           }in #{ @parent_pn })"
+        "#{ @parent_pn.to_path }/#{ @dir_entry.corename }/#{ CORE_ }"
       end
     end
 
@@ -1229,6 +1226,8 @@ module Skylab::Callback
 
   Callback_ = self
 
+  CONST_SEP_ = '::'.freeze
+
   Constify_if_possible_ = -> do
     white_rx = %r(\A[a-z][-_a-z0-9]*\z)i
     gsub_rx = /([-_]+)([a-z])?/
@@ -1244,8 +1243,6 @@ module Skylab::Callback
   end.call
 
   DASH_ = '-'.freeze
-
-  DCOLON_ = '::'.freeze
 
   def self.distill
     Distill_

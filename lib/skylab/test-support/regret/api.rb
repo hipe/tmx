@@ -4,9 +4,12 @@ module Skylab::TestSupport
 
     module API
       API = self
+      Autoloader_ = Autoloader_
+      CONST_SEP_ = CONST_SEP_
       DEFAULT_CORE_BASENAME_ = "core#{ Autoloader_::EXTNAME }"
       EMPTY_A_ = [].freeze
       EMPTY_P_ = -> {}
+      EMPTY_S_ = ''.freeze
       Lib_ = TestSupport_::Lib_
       Library_ = TestSupport_::Library_
       Plugin_ = TestSupport_::Lib_::Heavy_plugin[]
@@ -15,17 +18,14 @@ module Skylab::TestSupport
       WRITEMODE_ = 'w'.freeze
 
       module RegretLib_
-        Autoloader__ = -> do
-          ::Skylab::Callback::Autoloader
+        Autoloader = -> do
+          Autoloader_
         end
         Basic__ = Lib_::Basic__
         Basic_Fields = -> * x_a do
           MetaHell__[]::Basic_Fields.via_iambic x_a
         end
         Box = Lib_::Box
-        Const_reduce = -> * x_a do
-          Autoloader__[].const_reduce.via_iambic x_a
-        end
         CLI_stylify = -> a, x do
           Headless__[]::CLI::Pen::FUN::Stylify[ a, x ]
         end
@@ -54,12 +54,6 @@ module Skylab::TestSupport
         Levenshtein = -> sep, p, d, a, s do
           Headless__[]::NLP::EN::Levenshtein::
             With_conj_s_render_p_closest_n_items_a_item_x[ sep, p, d, a, s ]
-        end
-        Loader_fuzzy_const_get = -> name, mod do  # :[#028]:C
-          MetaHell__[]::Boxxy::Fuzzy_const_get[ mod, name ]
-        end
-        Loader_resolve_const_name_and_value = -> * x_a do
-          MetaHell__[]::Boxxy::Resolve_name_and_value[ * x_a ]  # :[#028]:B
         end
         Memoize = -> p do
           Callback_.memoize[ p ]

@@ -4,6 +4,8 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
 
     RegretLib_ = ::Skylab::TestSupport::Regret::API::RegretLib_
 
+      Autoloader_ = RegretLib_::Autoloader[]
+
     RegretLib_::Basic_Fields[ :client, self,
       :absorber, :absrb_iambic_fully,
       :field_i_a, %i( core_basename load_file load_module
@@ -226,10 +228,13 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     end
 
     def get_another_correct_anchored_name_via_the_load_module
-      c_a = @load_module.split DCOLON__
+      c_a = @load_module.split CONST_SEP_
       top = ::Object.const_get c_a.shift
-      name, _ = RegretLib_::Loader_resolve_const_name_and_value[
-        :from_module, top, :path_x, c_a ]
+      name, = Autloader_.const_reduce do |cr|
+        cr.from_module top
+        cr.path_x c_a
+        cr.result_in_name_and_value
+      end
       c_a[ -1 ] = name  # any correction to last part only
       c_a
     end
@@ -251,22 +256,22 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     end
 
     def do_rdc_once_with_loading_assistance  # #unfortunate-hack
-      x = RegretLib_::Const_reduce[
+      x = Autoloader_.const_reduce.with(
         :core_basename, @core_basename,
         :do_assume_is_defined, false,
         :else_p, @const_reduce_else_p,
         :from_module, @const_reduce_from_mod,
-        :path_x, @c_a.shift ]
+        :path_x, @c_a.shift )
       @const_reduce_is_ok and @const_reduce_from_mod = x ; IGNORED_
     end
 
     def do_rdc_the_rest
-      x = RegretLib_::Const_reduce[
+      x = Autoloader_.const_reduce.with(
         :core_basename, @core_basename,
         :do_assume_is_defined, true,
         :else_p, @const_reduce_else_p,
         :from_module, @const_reduce_from_mod,
-        :path_x, @c_a ]
+        :path_x, @c_a )
       @const_reduce_is_ok and @const_reduce_from_mod = x ; IGNORED_
     end
 
@@ -298,7 +303,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       if @const.respond_to? :name
         _name = @const.name
         _range = @base_mod.name.length + 2 .. -1
-        _a = _name[ _range ].split DCOLON__
+        _a = _name[ _range ].split CONST_SEP_
         _a.map( & :intern )
       else
         when_best_guess_is_necessary
@@ -320,8 +325,11 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     end
 
     def begn_templo
-      _tmod = RegretLib_::Loader_fuzzy_const_get[
-        @templo_name, DocTest::Templos__ ]
+      _tmod = Autoloader_.const_reduce do |cr|
+        cr.from_module DocTest::Templos__
+        cr.const_path [ @templo_name ]
+        cr.assume_is_defined  # we experiment w/ using this instead of boxxy
+      end
       @templo = _tmod.begin @snitch, @base_mod,
         @corrected_anchored_const_a, @block_a
       PROCEDE__
@@ -338,7 +346,6 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       end
     end
 
-    DCOLON__ = '::'.freeze
     FAILED__ = false
     IGNORED_ = nil
     PROCEDE__ = true

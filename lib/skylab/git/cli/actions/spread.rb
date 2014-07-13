@@ -373,8 +373,9 @@ module Skylab::Git
       self[ :Actions ] = -> do
 
         module Actions
-          define_singleton_method :fuzzy_const_get, &
-            Git_::Lib_::Fuzzy_const_get[].curry[ self ]
+          def self.fuzzy_const_get i
+            Autoloader_.const_reduce [ i ], self
+          end
         end
 
         Entity_ = -> client, _fields_, * field_i_a do

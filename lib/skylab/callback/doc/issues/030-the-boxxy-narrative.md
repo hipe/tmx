@@ -1,5 +1,22 @@
 # :#the-boxxy-narrative
 
+## introduction
+
+this incarnation of boxxy is a rewrite of the legacy boxxy which has been
+removed from the current universe but exists in history as "[mh]/boxxy.rb"
+
+boxxy is an enhancer for modules. it is essentially a collection of methods
+that affect these modules with a set of behaviors each of which falls into
+one of two categories:
+
+1) convenience methods that allow the module to be treated more like a
+   collection ("names" returns an iterator of name objects,
+  "each_const_value" is comparable to "each_value" of a hash)
+
+2) overrides for "constants" and "const_defined?" that implement
+   [mh-029] "isomrphic-filenames".
+
+
 ## :#the-boxxy-methods (a.k.a :#boxxy-like behavior)
 
 these are optional and always experimental: they hack 'constants' and

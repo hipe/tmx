@@ -22,10 +22,6 @@ module Skylab::Callback::TestSupport::Autoloader
 
     Headless__ = sidesys[ :Headless ]
 
-    Loader_resolve_const_name_and_value = -> * a do
-      MetaHell__[]::Boxxy::Resolve_name_and_value[ * x_a ]  # :[#028]
-    end
-
     MetaHell__ = Callback::Lib_::MetaHell__
   end
 end

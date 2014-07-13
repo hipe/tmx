@@ -4,7 +4,7 @@ module Skylab::TestSupport
 
     def self.[] mod
       if ! mod.respond_to? :dir_pathname  # #storypoint-35
-        s_a = mod.name.split COLON_COLON__
+        s_a = mod.name.split CONST_SEP_
         s_a.pop
         _parent_mod = s_a.reduce( ::Object ) { |m, s| m.const_get s, false }
         Autoloader_[ mod, _parent_mod.dir_pathname.join( TEST_DIR_FILENAME__ ) ]
@@ -13,7 +13,6 @@ module Skylab::TestSupport
       mod.initialize_for_regret_with_parent_anchor_mod nil
     end
 
-    COLON_COLON__ = '::'.freeze
     TEST_DIR_FILENAME__ = 'test'.freeze
 
     module Anchor_ModuleMethods
@@ -141,6 +140,8 @@ module Skylab::TestSupport
       mod
     end
 
+    Autoloader_ = Autoloader_
+    CONST_SEP_ = '::'.freeze
     NEAREST__ = :nearest_test_node
 
   end

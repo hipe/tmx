@@ -17,7 +17,9 @@ module Skylab::Headless::TestSupport::CLI::Box
           end
           def build_option_parser
           end
-          Headless::Library_::Boxxy[ self ]
+
+          define_singleton_method :names, Autoloader_.names_method
+
           self
         end
       end

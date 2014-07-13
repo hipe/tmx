@@ -16,8 +16,11 @@ module Skylab::TestSupport::Regret::API
         cur_a = [ cur_mod.to_s.intern ]
         count = 0
         step = -> do
-          i, mod = RegretLib_::Loader_resolve_const_name_and_value[
-            :from_module, cur_mod, :path_x, loc_a.fetch( 0 ) ]
+          i, mod = Autoloader_.const_reduce do |cr|
+            cr.from_module cur_mod
+            cr.path_x loc_a.fetch 0
+            cr.result_in_name_and_value
+          end
           cur_a.push i
           loc_a.shift
           loc_a.length.zero? and break( step = nil )
@@ -26,7 +29,7 @@ module Skylab::TestSupport::Regret::API
         end
         amod = bmod = cmod = bles = requ = nil
         step[]
-        amod = cur_a.join '::'
+        amod = cur_a.join CONST_SEP_
         cr_a = cur_a
         cur_a = []
         step[] while step
@@ -40,7 +43,7 @@ module Skylab::TestSupport::Regret::API
           cmod = "::#{ cmd }"
           bles = "::#{ amod }::TestSupport"
           if cur_a.length != 1
-            bmod = "::#{ cur_a[ 0 .. -2 ] * '::' }"
+            bmod = "::#{ cur_a[ 0 .. -2 ] * CONST_SEP_ }"
           end
           bles = "::#{ amod }::TestSupport#{ bmod }"
         end

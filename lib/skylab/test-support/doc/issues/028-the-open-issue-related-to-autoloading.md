@@ -6,5 +6,3 @@
 
 • regret API support verbosity is really neato, but de-orphanize that file
   at this time.
-
-• :#B see if you can replace this old method with this new method

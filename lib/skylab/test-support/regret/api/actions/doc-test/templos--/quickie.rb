@@ -106,9 +106,9 @@ module Skylab::TestSupport::Regret::API
         ctxt, tstt, beft = get_templates :_ctx, :_tst, :_bef
         c_a.length < 2 and fail say_less_than_two c_a
         acon = c_a.fetch 0
-        amod  = [ base_mod.to_s, acon ].join DCOLON__
+        amod  = [ base_mod.to_s, acon ].join CONST_SEP_
         bmod = if 2 != c_a.length
-          "#{ DCOLON__ }#{ c_a[ 1 .. -2 ] * DCOLON__ }"
+          "#{ CONST_SEP_ }#{ c_a[ 1 .. -2 ] * CONST_SEP_ }"
         end
         cmod = "#{ c_a.fetch( -1 ) }"
         body = render_body[]
@@ -126,22 +126,22 @@ module Skylab::TestSupport::Regret::API
 
     def say_less_than_two c_a
       "sanity - hard-coded for deep paths, we need at least 2 elements in #{
-        }this path for the hacking to work - #{ c_a * DCOLON__ }"
+        }this path for the hacking to work - #{ c_a * CONST_SEP_ }"
     end
 
     def render_cover a, any_b, c
       if @cover
-        mod = "#{ a }#{ any_b }#{ DCOLON__ }#{ c }"
+        mod = "#{ a }#{ any_b }#{ CONST_SEP_ }#{ c }"
         get_template( :_cover )[ mod: mod ].chomp
       end
     end
 
-    DCOLON__ = '::'.freeze
+    Autoloader_[ Context__ = ::Module.new ]  # #stowaway
+
     OPTION_PROCEDE__ = nil
     SUCCESS_EXITSTATUS__ = 0
     SUCCEEDED__ = true
 
-    Lib_::Transitional_autoloader[ self, __FILE__ ]
-
+    Autoloader_[ self, ::Pathname.new( __FILE__ ).sub_ext( EMPTY_S_ ) ]
   end
 end

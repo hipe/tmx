@@ -46,10 +46,6 @@ module Skylab::Callback
       self::MetaHell__[]::Function
     end
 
-    Fuzzy_const_get = -> modul, part do
-      self::MetaHell__[]::Boxxy::Fuzzy_const_get[ modul, part ]
-    end
-
     Headless__ = sidesys[ :Headless ]
 
     Inspect = -> do

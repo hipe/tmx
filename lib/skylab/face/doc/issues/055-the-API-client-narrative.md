@@ -21,7 +21,7 @@ under your `anchor_mod`:
   const, one will be provided for you in the form of a subclass of
   Face::API::Client.)
 3) an `invoke` method "on" your `API` module.
-4) an `Actions` box moudule - M-AARS-y and Boxxy
+4) an `Actions` box moudule - M-AARS-y and B-oxxy
 
 using `touch` for this attempts to load any releveant file first.
 

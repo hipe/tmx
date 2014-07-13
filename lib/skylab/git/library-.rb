@@ -60,9 +60,6 @@ module Skylab::Git
     Funcy_globless = -> x do
       MetaHell__[]::Funcy_globless[ x ]
     end
-    Fuzzy_const_get = -> do
-      MetaHell__[]::Boxxy::Fuzzy_const_get
-    end
     Fuzzy_matcher = -> x, y do
       MetaHell__[]::FUN::Parse::Fuzzy_matcher[ x, y ]
     end
