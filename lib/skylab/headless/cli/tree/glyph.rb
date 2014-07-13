@@ -1,13 +1,9 @@
 # encoding: UTF-8
 module Skylab::Headless
 
-  class CLI::Tree::Glyph < ::Struct.new :normalized_glyph_name
-    # (used elsewhere for reflection.)
-  end
+  CLI::Tree::Glyph = ::Struct.new :normalized_glyph_name
 
   module CLI::Tree::Glyph::Sets
-    Headless::Library_::Boxxy[ self ]  # BOXXY IS QUEEN OF METAPROGRAMming
-
 
     WIDE = {                      # (these styles came to us later, and are
       blank:     '   ',           # based off of the glyphs used in
@@ -25,8 +21,11 @@ module Skylab::Headless
       tee:       ' ├'
     }
 
-    each do |gs|                  # freeze each of the strings in case
-      gs.values.each(& :freeze )  # someone accidentally mutates them
-    end                           # (it's happened once or twice :P)
+    # freeze each of the strings in case someone
+    # accidentally mutates them (happened once or twice)
+
+    constants.each do |i|
+      const_get( i, false ).values.each( & :freeze )
+    end
   end
 end

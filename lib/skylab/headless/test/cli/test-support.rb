@@ -6,10 +6,14 @@ module Skylab::Headless::TestSupport::CLI
 
   include CONSTANTS
 
-  Autoloader_ = Headless::Autoloader_
+  Autoloader_ = Autoloader_
   Headless = Headless
 
   extend TestSupport::Quickie  # e.g sibling 'path tools'
+
+  module CONSTANTS
+    Autoloader_ = Headless::Autoloader_
+  end
 
   module InstanceMethods
 

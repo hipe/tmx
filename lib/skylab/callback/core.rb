@@ -648,12 +648,19 @@ module Skylab::Callback
 
       def rslv_some_x_when_stowaway  # [cu] relies on this heavily
         @stwy_core_load_relpath = @mod.stowaway_h[ @name.as_const ]
+        if @stwy_core_load_relpath.respond_to? :split
+          rslv_some_x_when_stowaway_via_relpath
+        else
+          @stwy_core_load_relpath.call
+        end
+      end
+    private
+      def rslv_some_x_when_stowaway_via_relpath
         @stwy_np_a = bld_stwy_normpath_a
         load_stwy_file
         finish_stwy_np_a
         rslv_some_stwy_value
       end
-    private
       def bld_stwy_normpath_a  # #stow-1
         s_a = @stwy_core_load_relpath.split PATH_SEP_
         et = @stwy_et = @mod.entry_tree
@@ -1038,8 +1045,16 @@ module Skylab::Callback
         CORE_FILE_
       end
 
+      def each_const_value_method
+        self::Boxxy_::EACH_CONST_VALUE_METHOD_P
+      end
+
       def memoize *a, &p
         Memoize_[ ( p ? a << p : a ).fetch a.length - 1 << 1 ]
+      end
+
+      def names_method
+        self::Boxxy_::NAMES_METHOD_P
       end
 
       def require_quietly const_i_or_path_s

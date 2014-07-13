@@ -5,18 +5,16 @@ module Skylab
 
   module MetaHell  # welcome to meta hell. please read [#041] #storypoint-005
 
-    # ARE YOU READY TO EAT YOUR OWN DOGFOOD THAT IS MADE OF YOUR BODY
+    Callback_ = ::Skylab::Callback
+      Autoloader_ = ::Skylab::Callback::Autoloader
 
-    #                  ~ auto-trans-substantiation ~
+    Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
     module Autoloader
       include ::Skylab::Autoloader  # [#054] #storypoint-025
       Enhance_ = Enhance_
-      ::Skylab::Autoloader[ self ]
+      Autoloader_[ self ]
     end
-
-    ( MAARS = Autoloader::Autovivifying::Recursive )[ self ]
-      # a name this long that is used this often gets its own weird acronym
 
     class Aset_ < ::Proc  # "aset" = "array set" ("[]="), from ruby source
       alias_method :[]=, :call
@@ -27,6 +25,8 @@ module Skylab
     EMPTY_A_ = [].freeze  #storypoint-015 explains this OCD
 
     EMPTY_P_ = -> { }
+
+    stowaway :Fields, 'fields/core'
 
     def self.Function host, *rest
       self::Function._make_methods host, :public, :method, rest
@@ -48,13 +48,15 @@ module Skylab
 
     stowaway :Lib_, 'library-'
 
-    MetaHell = self  # #todo
+    stowaway :MAARS, -> do
+      MAARS = self::Autoloader::Autovivifying::Recursive
+    end
 
     MetaHell_ = self
 
     MONADIC_EMPTINESS_ = -> _ { }
-
     MONADIC_TRUTH_ = -> _ { true }
+
   end
 end
 
@@ -139,7 +141,7 @@ module Skylab::MetaHell
       end
       #
       def say_bundle_not_found a, k  # :+#bundle-multiset-API
-        MetaHell::FUN::Say_not_found[ a, k ]
+        MetaHell_::FUN::Say_not_found[ a, k ]
       end
 
     public
@@ -172,8 +174,7 @@ module Skylab::MetaHell
     module Directory
 
       def self.[] mod
-        loc = caller_locations( 1, 1 )[ 0 ]
-        MetaHell::MAARS[ mod, loc ]
+        Autoloader_[ mod ]
         Multiset[ mod ]
         mod.extend self ; nil
       end
@@ -190,7 +191,7 @@ module Skylab::MetaHell
 
       def build_soft_bundle_fetcher  # #bundle-multiset-API
         @a = [ ] ; @h = { }
-        @dir_pathname.children( false ).each do |pn|
+        dir_pathname.children( false ).each do |pn|
           stem = pn.sub_ext( '' ).to_s
           WHITE_STEM_RX__ =~ stem or next
           stem.gsub! '-', '_'
@@ -241,7 +242,7 @@ module Skylab::MetaHell
           end
         end
         def initialize( * )
-          @key_set = MetaHell::Library_::Set.new
+          @key_set = MetaHell_::Library_::Set.new
           super
         end
         def keys
@@ -307,12 +308,10 @@ module Skylab::MetaHell
   module DelegatesTo
     def self.extended mod
       $stderr.puts "\e[34mDEPRECATID\e[0m"  # #todo:during-merge
-      MetaHell::Library_::Headless::Delegating[ mod, :employ_the_DSL_method_called_delegates_to ]
+      MetaHell_::Library_::Headless::Delegating[ mod, :employ_the_DSL_method_called_delegates_to ]
     end
   end
   # BEGIN until [#059]
-  stowaway :Fields, 'fields/core'
-  Autoloader_ = ::Skylab::Callback::Autoloader
   class << self
     def entry_tree
       @entry_tree ||= bld_entry_tree

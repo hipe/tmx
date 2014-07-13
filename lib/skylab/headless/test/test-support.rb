@@ -8,6 +8,7 @@ module Skylab::Headless::TestSupport
 
   module CONSTANTS
     Headless = ::Skylab::Headless
+      Autoloader_ = Headless::Autoloader_
     Headless_TestSupport = Headless_TestSupport
     TestSupport = ::Skylab::TestSupport
   end

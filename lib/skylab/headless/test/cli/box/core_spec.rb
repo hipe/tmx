@@ -41,13 +41,17 @@ module Skylab::Headless::TestSupport::CLI::Box
 
       box_class do
         class FudgeBox
+
           Headless::CLI::Box[ self, :core_instance_methods ]
+
+          define_singleton_method :each_const_value,
+            Autoloader_.each_const_value_method
 
           def unbound_action_box
             self.class
           end
 
-          Headless::Library_::Boxxy[ self ]  # our 'abm' must respond to 'each'
+          define_singleton_method :names, Autoloader_.names_method
 
           self
         end
@@ -129,7 +133,12 @@ module Skylab::Headless::TestSupport::CLI::Box
             end
           end
 
-          Headless::Library_::Boxxy[ self ]
+          define_singleton_method :each_const_value,
+            Autoloader_.each_const_value_method
+          define_singleton_method :names,
+            Autoloader_.names_method
+
+          # Headless::Library_::Boxxy[ self ]
           self
         end
       end

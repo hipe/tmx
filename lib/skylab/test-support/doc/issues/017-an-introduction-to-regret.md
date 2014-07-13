@@ -32,7 +32,8 @@ modules have the following in common. every TestSupport module:
     with a `dir_pathname` that has a certain idiomatic customization related
     to the fact that our root test node module in a project always has a const
     name of "TestSupport" but it always isomporphs to a corresponding directory
-    called "test" (and not "test-support" or "test_support").
+    called "test" (and not "test-support" or "test_support"). :#storypoint-35
+
 
   • the test node module's InstanceMethods module responds to `let` in the
     r-spec way.

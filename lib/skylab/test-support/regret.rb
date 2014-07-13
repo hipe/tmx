@@ -3,15 +3,18 @@ module Skylab::TestSupport
   module Regret  # read [#017] the introduction to regret
 
     def self.[] mod
-      if ! mod.respond_to? :dir_pathname
-        s_a = mod.name.split '::'
+      if ! mod.respond_to? :dir_pathname  # #storypoint-35
+        s_a = mod.name.split COLON_COLON__
         s_a.pop
         _parent_mod = s_a.reduce( ::Object ) { |m, s| m.const_get s, false }
-        _parent_mod.autoloaderize_with_filename_child_node 'test', mod
+        Autoloader_[ mod, _parent_mod.dir_pathname.join( TEST_DIR_FILENAME__ ) ]
       end
       mod.extend Anchor_ModuleMethods
       mod.initialize_for_regret_with_parent_anchor_mod nil
     end
+
+    COLON_COLON__ = '::'.freeze
+    TEST_DIR_FILENAME__ = 'test'.freeze
 
     module Anchor_ModuleMethods
 

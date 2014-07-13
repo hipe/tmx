@@ -201,9 +201,8 @@ module Skylab::Headless
     private
       def gt_bound_child_a
         client = client_services_for_bound_action_by_agent
-        mod = unbound_action_box
-        mod.constants.each.reduce [] do |m, const_i|  # :+[#cb-031]
-          m << mod.const_get( const_i, false ).new( client )
+        unbound_action_box.each_const_value.reduce [] do |m, cls|
+          m << cls.new( client )
           # ich muss sein - we need a charged graph
         end
       end

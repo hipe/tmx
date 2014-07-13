@@ -134,7 +134,7 @@ module Skylab::SubTree
       @info_p[ "(adding row: #{ seen_a.inspect }#{ '..' if extra_x })" ]
     end
 
-    SubTree::Lib_::CLI_tree_glyphs[].each do |glyph|
+    SubTree::Lib_::CLI_tree_glyphs[].each_const_value do |glyph|
       m = glyph.normalized_glyph_name
       define_method m do @glyph_set[ m ] end
       private m

@@ -50,7 +50,8 @@ module Skylab::Porcelain
 
     Resolve_glyphset_ = -> x do
       if x.respond_to? :id2name
-        Porcelain_::Lib_::CLI[]::Tree::Glyph::Sets.const_fetch x
+        Autoloader_.const_reduce [ x ],
+          Porcelain_::Lib_::CLI[]::Tree::Glyph::Sets
       end
     end
 
@@ -67,9 +68,10 @@ module Skylab::Porcelain
 
     Get_safe_glyph_p_ = -> do
       p = -> do
-        p = ::Hash[ Porcelain_::Lib_::CLI[]::Tree::Glyphs.each.map do |g|
+        _a = Porcelain_::Lib_::CLI[]::Tree::Glyphs.each_const_value.map do |g|
           [ g.normalized_glyph_name, true ]
-        end ].freeze
+        end
+        p = ::Hash[ _a ].freeze
       end
     end.call
 
@@ -120,8 +122,8 @@ module Skylab::Porcelain
       end
     end
 
-    Porcelain_::Lib_::CLI[]::Tree::Glyphs.each do |g|
-      attr_reader g.normalized_glyph_name  # blank crook pipe separator tee
+    Porcelain_::Lib_::CLI[]::Tree::Glyphs.each_const_value do |glyph|
+      attr_reader glyph.normalized_glyph_name  # blank crook pipe separator tee
     end
   end
 end

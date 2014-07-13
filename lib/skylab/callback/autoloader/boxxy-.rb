@@ -75,20 +75,24 @@ module Skylab::Callback
       end
     end
 
-    # ~ names method (rewrote from legacy a.l)
-
     module Boxxy_
-      module Methods
-        def names
-          ::Enumerator.new do |y|
-            fly = Names__::Get_fly[]
-            constants.each do |i|
-              fly.replace_with_constant_i i
-              y << fly
-            end ; nil
-          end
+
+      # ~
+
+      NAMES_METHOD_P = -> do
+        ::Enumerator.new do |y|
+          fly = Names__::Get_fly[]
+          constants.each do |i|
+            fly.replace_with_constant_i i
+            y << fly
+          end ; nil
         end
       end
+
+      module Methods
+        define_method :names, & NAMES_METHOD_P
+      end
+
       module Names__
         p = -> do
           class Fly__ < Callback_::Lib_::Name[]::Function::From::Constant
@@ -100,8 +104,22 @@ module Skylab::Callback
         end
         Get_fly = -> { p[] }
       end
-    end
 
-    # ~ [#031]: 'each` (or 'each_value') - do you wish you had it? count: 1
+      # ~
+
+      EACH_CONST_VALUE_METHOD_P = -> & p do
+        if p
+          constants.each do |i|
+            p[ const_get i, false ]
+          end ; nil
+        else
+          enum_for :each_const_value
+        end
+      end
+
+      module Methods
+        define_method :each_const_value, & EACH_CONST_VALUE_METHOD_P
+      end
+    end
   end
 end

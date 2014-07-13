@@ -3,7 +3,7 @@ require_relative '../core'
 module Skylab::Face::TestSupport
 
   Face_ = ::Skylab::Face
-  TestSupport = Face_::Autoloader_.require_sidesystem( :TestSupport )
+  TestSupport = Face_::Autoloader_.require_sidesystem :TestSupport
   TestSupport::Regret[ self ]
   TestSupport::Sandbox::Host[ self ]
 
