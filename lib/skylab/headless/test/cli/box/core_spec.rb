@@ -138,7 +138,6 @@ module Skylab::Headless::TestSupport::CLI::Box
           define_singleton_method :names,
             Autoloader_.names_method
 
-          # Headless::Library_::Boxxy[ self ]
           self
         end
       end

@@ -19,9 +19,7 @@ module Skylab::Headless
       end
       With_actions = -> _ do  # #storypoint-20
         module_exec( & Touch_dir_patname__ )
-        (( const_set :Actions, ::Module.new )).module_exec do
-          Library_::Boxxy[ self ]
-        end
+        const_set :Actions, ::Module.new
         const_defined?( :Action, false ) or
           const_set :Action, ::Class.new( Iambic_Action__ )
         define_singleton_method :action_class do end  # future-proofing
@@ -673,15 +671,18 @@ module Skylab::Headless
         @unbound_action and rslv_bound_action_trio_from_unbound_action
       end
       def any_unbnd_action
-        @unbound_action_box.const_fetch @action_locator_x,
-          method( :unbnd_action_not_found )
+        Autoloader_.const_reduce do |cr|
+          cr.const_path [ @action_locator_x ]
+          cr.from_module @unbound_action_box
+          cr.else_p method :unbnd_action_not_found
+        end
       end
       def unbnd_action_not_found name_error
         raise ::NameError, say_nm_error( name_error )
       end
       def say_nm_error name_error
-        "cannot \"#{ name_error.const }\" - there is no such constant #{
-          }#{ name_error.module }::( ~ #{ name_error.const } )"
+        "cannot \"#{ name_error.name }\" - there is no such constant #{
+          }#{ name_error.module.name }::( ~ #{ name_error.name } )"
       end
       def rslv_bound_action_trio_from_unbound_action
         if @unbound_action.respond_to? :[]

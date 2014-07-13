@@ -841,11 +841,16 @@ module Skylab::Headless
       attr_reader :looks_terminal  # hacked for now
 
       def klass
-        @klass ||= NLP::EN::POS.const_fetch const
+        @klass ||= rslv_some_class
       end
-
+    private
+      def rslv_some_class
+        const = @const
+        const.respond_to?( :each_with_index ) or const = [ const ]
+        Autoloader_.const_reduce const, NLP::EN::POS
+      end
       def initialize abbrev, const
-        @abbrev, @const = abbrev, const
+        @abbrev = abbrev ; @const = const
         @ivar = :"@#{ abbrev }"
         @looks_terminal = 1 == abbrev.to_s.length
       end
@@ -957,7 +962,13 @@ module Skylab::Headless
     # modules. a parts of speech box module may only contain parts of
     # speech constants, or other parts of speech box modules.
 
-    Headless::Library_::Boxxy[ self ]  # (`abbrev`, `const_fetch`)
+    class << self
+      def abbrev h
+        @abbrev_box.merge! h ; nil
+      end
+      attr_reader :abbrev_box
+    end
+    @abbrev_box = {}
 
     abbrev v: :Verb, n: :Noun, vp: [ :Verb, :Phrase ], np: [ :Noun, :Phrase ]
 

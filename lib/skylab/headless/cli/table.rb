@@ -9,6 +9,7 @@ module Skylab::Headless::CLI::Table
   #   * left/right alignment config options
 
   Headless = ::Skylab::Headless
+    Autoloader_ = Headless::Autoloader_
   Callback = Headless::Library_::Callback
   Table = self  # partly b.c Callback is not part of headless proper
   TERM_SEPARATOR_STRING_ = Headless::TERM_SEPARATOR_STRING_
@@ -91,9 +92,7 @@ module Skylab::Headless::CLI::Table
     define_singleton_method :render, &render
   end
 
-  module Table::Events
-    Headless::Library_::Boxxy[ self ]  # this gives us `const_fetch`
-  end
+  Table::Events = ::Module.new
 
   module Table::Events::Datapoint
     def self.event graph, stream_name, payload_x
@@ -213,7 +212,9 @@ module Skylab::Headless::CLI::Table
       param_h.each do |k, v|
         instance_exec v, & param_h_h.fetch( k )
       end
-      @ancestor = ( Table::Cels.const_fetch @ancestor_i if @ancestor_i )
+      @ancestor = if @ancestor_i
+        Autoloader_.const_reduce [@ancestor_i], Table::Cels
+      end
       freeze
     end
 
@@ -242,8 +243,6 @@ module Skylab::Headless::CLI::Table
   end
 
   module Table::Cels
-
-    Headless::Library_::Boxxy[ self ]
 
     parse_styles   = Headless::CLI::FUN::Parse_styles
     unparse_styles = Headless::CLI::FUN::Unparse_styles
@@ -369,7 +368,7 @@ module Skylab::Headless::CLI::Table
       mode = stats.type_h.reduce( [ :string, 0 ] ) do |m, pair|
         pair.last > m.last ? pair : m
       end.first
-      @cel = Table::Cels.const_fetch mode
+      @cel = Autoloader_.const_reduce [ mode ], Table::Cels
       @stats = stats
       @is_align_left = :left == @cel.align
       @render = @cel.render[ self ]
