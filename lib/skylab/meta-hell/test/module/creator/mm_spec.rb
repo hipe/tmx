@@ -39,7 +39,7 @@ module ::Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
 
     end
 
-    F = MetaHell::Struct[ o ]
+    F = MetaHell.lib.struct_from_hash o
 
     done = FUN.done_p[ F ]         # this absurdity is just a sanity check
 
@@ -61,8 +61,7 @@ module ::Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
 
 
   module Scenario_Two
-
-    X = MetaHell::Struct[ {
+    X = MetaHell.lib.struct_from_hash(
       :once => -> do
 
         module OneGuy
@@ -86,8 +85,7 @@ module ::Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
       end,
 
      :done => ->( name ) { X[name] = FUN.done_msg_p[ name ] }
-
-    } ]
+    )
 
                                   # (interestingly look how rspec reports
                                   # the below module name when you run

@@ -55,7 +55,7 @@ module Skylab::MetaHell::Class::Creator
       [create, update]
     end
 
-    K = MetaHell_::Struct[ o ]
+    K = MetaHell_.lib.struct_from_hash o
 
     def klass full_name, *a, &class_body # `a` is extra args, e.g. extends:
                                   # see extensive comments at klass! for now.

@@ -24,7 +24,7 @@ while (( line = in_io.gets ))
   md or fail "does not match first line pattern: -->#{ line }<--"
   line = in_io.gets
   line or fail "no."
-  line.chomp!
+  line.strip!
   md_ = _RX2.match line
   md_ or fail "does not match second line pattern: -->#{ line }<--"
   e = md_[:e].to_i ; f = md_[:f].to_i

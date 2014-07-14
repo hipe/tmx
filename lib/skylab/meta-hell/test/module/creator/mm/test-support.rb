@@ -10,7 +10,7 @@ module ::Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
   MetaHell = MetaHell # #annoying
   Module = Module # #annoying
 
-  FUN = MetaHell::Struct[ {
+  FUN = MetaHell.lib.struct_from_hash(
     :done_p => -> struct do
       -> name do
         struct[name] = FUN.done_msg_p[ name ]
@@ -21,5 +21,5 @@ module ::Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
         Stderr_[].puts "NEVER AGAIN: #{name}"  # just a sanity check
       end
     end
-  } ]
+  )
 end

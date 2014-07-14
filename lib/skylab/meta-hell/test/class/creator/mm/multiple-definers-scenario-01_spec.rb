@@ -38,7 +38,7 @@ module ::Skylab::MetaHell::TestSupport::Class::Creator::ModuleMethods
 
     end
 
-    FUN = MetaHell::Struct[ o ] # make a struct object out of the hash
+    FUN = MetaHell.lib.struct_from_hash o
 
     describe "#{MetaHell::Class::Creator::ModuleMethods} Multiple Definers #{
       } Scenario One -- our graph accross a real graph" do

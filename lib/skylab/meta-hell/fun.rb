@@ -4,6 +4,16 @@ module Skylab::MetaHell
 
   Fun = FUN  # :+[#cb-027]
 
+  module FUN
+    LIB = class Lib__
+      def struct_from_hash h
+        # ( the simplest, oldest way to make a FUN )
+        ::Struct.new( * h.keys ).new( * h.values )
+      end
+      self
+    end.new
+  end
+
   class FUN::Module
 
   private
@@ -92,10 +102,6 @@ module Skylab::MetaHell
         :private == priv_pub and private( * i_a )
       end
       nil
-    end
-
-    o[:hash2struct] = -> h do     # ( the simplest, oldest way to make a FUN )
-      ::Struct.new( * h.keys ).new( * h.values )
     end
 
     Memoize = -> p do  # create a proc (suitable for use in 'define_method')

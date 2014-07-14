@@ -40,6 +40,10 @@ module Skylab
 
     IDENTITY_ = -> x { x }
 
+    def self.lib
+      self::FUN::LIB
+    end
+
     stowaway :Lib_, 'library-'
 
     MetaHell_ = self

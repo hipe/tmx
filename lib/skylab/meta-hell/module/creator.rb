@@ -155,7 +155,7 @@ module Skylab::MetaHell::Module::Creator
       memo
     end
 
-    M = MetaHell_::Struct[ o ] #  turns a hash into an ad-hoc struct object
+    M = MetaHell_.lib.struct_from_hash o
 
     let :__metahell_known_graph do
       # #note the below causes core dumps yay [#006]
@@ -242,7 +242,7 @@ module Skylab::MetaHell::Module::Creator
       sing_class.class_exec name, & M.convenience
     end
 
-    M_IM = MetaHell_::Struct[ o ]
+    M_IM = MetaHell_.lib.struct_from_hash o
 
 
     def modul! full_name, &module_body
