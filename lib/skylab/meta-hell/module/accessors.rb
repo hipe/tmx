@@ -61,7 +61,6 @@ module Skylab::MetaHell
     # like so
     #
     #     class Foo
-    #      ::Skylab::Autoloader[ self ]  # for now
     #       MetaHell::Module::Accessors.enhance self do
     #         private_module_autovivifier_reader :zapper, 'Ohai_',
     #           -> do  # when didn't exist

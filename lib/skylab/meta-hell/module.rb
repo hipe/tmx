@@ -16,8 +16,6 @@ module Skylab::MetaHell
         path_a.reduce ::Object do |m, s|
           if m.const_defined? s, false
             m.const_get s, false
-          elsif m.const_probably_loadable? s  # etc
-            m.const_get s, false
           elsif create_p
             m.const_set s, create_p.call
           elsif else_p

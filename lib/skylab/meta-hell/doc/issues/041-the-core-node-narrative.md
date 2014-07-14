@@ -27,14 +27,11 @@ and a bad idea). but by and large, MetaHell is an OK thing.
 in roughly descending order of popularity, here are a few of its most
 important facilities:
 
-1. MAARS. the recursive auto-vivifying auto-loader is used absolutely
-   everywhere. this is the "innovation" that we are most eager to find
-   alternatives for, because of how great we think it is. if you love
-   something, set it free etc. (MAARS has [#031] a narrative now too)
+1. (was M-AARS, offlined by [#ca-024])
 
 2. the Bundle facility. it's simply the best thing.
 
-3. B-oxxy is kind of a weird fit here, but didn't really fit anywhere else
+3. (was B-oxxy, replaced by [#ca-030])
 
 4. the Item_Grammar is pretty great
 

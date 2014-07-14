@@ -6,10 +6,6 @@ module Skylab::TanMan
 
     Headless::CLI::Box[ self, :core_instance_methods ]
 
-    def self.inherited klass
-      klass.send :init_autoloader, caller_locations( 1, 1 )[ 0 ]
-    end
-
     # `unbound_action_box` - this is the centerpiece of this class: this load
     # hack allows us to define only the barebones stuff in cli.rb and then
     # load the contents only lazily. (to be clear, we could do the above

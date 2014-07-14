@@ -8,11 +8,11 @@ module Skylab::TanMan
 
     Adapter = Bleeding::Adapter  # "ouroboros" ([#hl-069])
 
-    MetaHell::MAARS[ self ]      # this must happens before the file loads
-
     def self.new i, o, e, &b
       CLI::Client.new i, o, e, &b
     end
+
+    Autoloader_[ self ]  # must happen before the file loads
   end
 
   module CLI::Actions

@@ -46,7 +46,7 @@
 [#032]       #api-point constant trouble's fields are immutable (ergo dupable)
 [#031] #hole (#re-purposed:twice, then was: the MAARS narrative,
                was: API-lock on 'replace' as a flyweight-related meth name)
-[#030]       #parent-node:[#029] #the-stowaway-experiment..
+[#030] #hole (was: #the-stowaway-experiment)
 [#029] #hole (was: #doc-point the autovivifying autoloader narrative )
 [#028]       #tracking-tag `without_warning`
 [#027]       a freeform `parse_series`? basically like minimal packrat parser

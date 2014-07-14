@@ -10,13 +10,13 @@ module Skylab::Callback::Test::Name::CMP_
 
   name_mod = ::Object.new
   def name_mod.constantize
-    MetaHell__[]::Autoloader::FUN::Constantize
+    ::Skylab::Autoloader::FUN::Constantize
   end
   def name_mod.methodize
-    MetaHell__[]::Autoloader::FUN::Methodize
+    ::Skylab::Autoloader::FUN::Methodize
   end
   def name_mod.pathify
-    MetaHell__[]::Autoloader::FUN::Pathify
+    ::Skylab::Autoloader::FUN::Pathify
   end
   def name_mod.pathify_name
     MetaHell__[]::FUN.pathify_name

@@ -2,8 +2,6 @@ module Skylab::FileMetrics
 
   class CLI < Face_::CLI::Client
 
-    ::Skylab::Autoloader[ self ]
-
     use :hi, [ :last_hot, :as, :command ]
 
     set :node, :ping, :invisible

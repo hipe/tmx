@@ -13,16 +13,12 @@ module Skylab
     MetaHell     = ::Skylab::MetaHell
     TanMan       = self #sl-107 (pattern)
 
-    MetaHell::MAARS[ self ]
-
     CUSTOM_PARSE_TREE_METHOD_NAME_ = :tree
     WRITEMODE_ = Headless::WRITEMODE_
 
   end
 
   module TanMan::Core
-
-    MetaHell::MAARS[ self ]
 
     module Event  # #stowaway all of this
 
@@ -39,6 +35,8 @@ module Skylab
         end
       end
     end
+
+    TanMan::Autoloader_[ self ]
   end
 
   module TanMan
@@ -80,5 +78,7 @@ module Skylab
 
     class Event_ < Headless::Event
     end
+
+    Autoloader_[ self ]
   end
 end

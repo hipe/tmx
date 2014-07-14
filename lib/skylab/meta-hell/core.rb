@@ -10,12 +10,6 @@ module Skylab
 
     Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
-    module Autoloader
-      include ::Skylab::Autoloader  # [#054] #storypoint-025
-      Enhance_ = Enhance_
-      Autoloader_[ self ]
-    end
-
     class Aset_ < ::Proc  # "aset" = "array set" ("[]="), from ruby source
       alias_method :[]=, :call
     end
@@ -47,10 +41,6 @@ module Skylab
     IDENTITY_ = -> x { x }
 
     stowaway :Lib_, 'library-'
-
-    stowaway :MAARS, -> do
-      MAARS = self::Autoloader::Autovivifying::Recursive
-    end
 
     MetaHell_ = self
 
@@ -311,16 +301,4 @@ module Skylab::MetaHell
       MetaHell_::Library_::Headless::Delegating[ mod, :employ_the_DSL_method_called_delegates_to ]
     end
   end
-  # BEGIN until [#059]
-  class << self
-    def entry_tree
-      @entry_tree ||= bld_entry_tree
-    end
-  private
-    def bld_entry_tree
-      Autoloader_::Entry_Tree_.new ::Skylab.dir_pathname, nil,
-        Autoloader_::Dir_Entry_.new( 'meta-hell' )
-    end
-  end
-  # END until [#059]
 end

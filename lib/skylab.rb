@@ -1,6 +1,6 @@
 module Skylab  # Welcome! :D
 
-  # ~ facilities for bootstrapping subsystems - mostly autoloading
+  # ~ facilities for bootstrapping subsystems
 
   require 'pathname'
 
@@ -13,20 +13,6 @@ module Skylab  # Welcome! :D
   define_singleton_method :dir_pathname do dir_pathname end
 
   module Autoloader
-
-    Enhance_ = -> mod, loc_x=:auto do
-      case loc_x
-      when :auto ; loc_x = caller_locations( 2, 1 )[ 0 ]
-      when :none; loc_x = false end
-      autoloader = self
-      mod.module_exec do
-        @const_missing_class ||= autoloader::Const_Missing_
-        extend autoloader::Methods
-        loc_x and init_autoloader loc_x
-      end ; nil
-    end
-
-    define_singleton_method :[], & Enhance_
 
     EXTNAME = '.rb'.freeze
 
@@ -93,35 +79,6 @@ module Skylab  # Welcome! :D
       end
     end
 
-    module Methods
-      def init_autoloader caller_x  # takes multiform args until [#mh-044]
-        dir_pathname.nil? and init_atldr_when_dir_pn_nil caller_x ; nil
-      end
-      def pathname
-        @pathname ||= dir_pathname.sub_ext EXTNAME  # ymmv
-      end
-      attr_reader :dir_pathname, :const_missing_class
-    private
-      def init_atldr_when_dir_pn_nil caller_x
-        _path_s = nrmlz_caller_x_for_autoloading caller_x
-        guess = Guess_dir_[ name, _path_s, -> e do
-          raise ::LoadError, "Autoloader hack failed: #{ e }"
-        end ]
-        guess and @dir_pathname = ::Pathname.new( guess ) ; nil
-      end
-      def nrmlz_caller_x_for_autoloading caller_x
-        _path = caller_x.respond_to?( :absolute_path ) ?
-          caller_x.absolute_path :
-          caller_x.match( CALLFRAME_PATH_RX )[ :path ]
-        pn = ::Pathname.new _path
-        SLASH__ == pn.instance_variable_get( :@path ).getbyte( 0 ) or
-          pn = pn.expand_path # although this is a filesystme hit,
-            # you cannot reliably autoload with a relpath
-        pn.sub_ext( '' ).to_s
-      end
-      SLASH__ = '/'.getbyte 0  # [#bm-009] (open)
-    end
-
     CALLFRAME_PATH_RX = /^(?<path>.+)(?=:\d+:in[ ]`)/x  # everywhere this is used [#mh-044]
 
     Guess_dir_ = -> do
@@ -149,141 +106,5 @@ module Skylab  # Welcome! :D
         end
       end
     end.call
-
-    module Methods
-
-      def const_missing const
-        get_const_missing( nil, const ).load_and_get  # [#mh-040] result is value
-      end
-
-      def const_probably_loadable? const
-        get_const_missing( nil, const ).probably_loadable?
-      end
-
-      def get_const_missing _name_x, guess_i
-        dir_pathname or raise LoadError, say_autoloader_hack_failed( guess_i )
-        @const_missing_class.new guess_i, @dir_pathname, self
-      end
-    private
-      def say_autoloader_hack_failed const
-        "Autoloader hack failed: attempt to autoload #{ name }::#{ const } #{
-          }when dir_path of that anchor module not yet known (do you need #{
-           }to enhance that module explicitly with Autoloader?)"
-      end
-    public
-      def add_dir_pathname_listener *a  # goofy experiment on charging a graph
-        ( @dir_pathname_listener_a ||= [ ] ) << a ; nil
-      end
-
-      def set_dir_pn x  # #comport to [cb] simplified autoloading
-        init_dir_pathname x
-      end
-
-      def init_dir_pathname x
-        dir_pathname and raise ::ArgumentError, "won't clobber existing pn"
-        @dir_pathname = x
-        a = dir_pathname_listener_a and Notify_d_pn_listrs__[ x, a ] ; nil
-      end
-
-      attr_reader :dir_pathname_listener_a
-
-      Notify_d_pn_listrs__ = -> pn, a do
-        a.length.times do |d|
-          const_i, mod = a[ d ]
-          mod.init_dir_pathname pn.join Autoloader::FUN::Pathify[ const_i ]
-          a[ d ] = nil
-        end
-        a.compact! ; nil
-      end
-
-      def autoloaderize_with_filename_child_node fn, x  # [#cb-029] #proto-fit
-        if ::Module === x
-          autoloader = self
-          x.module_exec do
-            @const_missing_class ||= autoloader.const_missing_class
-            @dir_pathname ||= autoloader.dir_pathname.join fn
-          end
-          if ! x.respond_to? :dir_pathname
-            x.extend @const_missing_class.autoloader_methods
-          end
-        end ; nil
-      end
-
-    private
-      def stowaway *a  # [#mh-030] another goofy experiment
-        @has_stowaways ||= true
-        ( @stowaway_a_a ||= [] ) << a ; nil
-      end
-    public
-      attr_reader :has_stowaways, :stowaway_a_a
-    end
-
-    class Const_Missing_  # the autoloading behavior as a class
-
-      def initialize const, mod_dir_pathname, mod
-        @const = const ; @mod = mod ; @mod_dir_pathname = mod_dir_pathname
-      end
-
-      attr_reader :const, :mod
-
-      def probably_loadable?
-        leaf_pathname.exist?
-      end
-
-      def leaf_pathname
-        @leaf_pathname ||= bld_leaf_pathname
-      end
-
-      -> do
-        _EXTNAME = Autoloader::EXTNAME
-        pathify_p = Autoloader::FUN::Pathify
-        define_method :bld_leaf_pathname do
-          @mod_dir_pathname.join "#{ pathify_p[ @const ] }#{ _EXTNAME  }"
-        end
-      end.call
-
-      def load_and_get any_correction_p=nil
-        # requiring the same string more than once is never right -
-        mutex normalized_path and raise say_circular
-        require @normalized_path
-        any_correction_p and any_correction_p[]
-        if @mod.const_defined? @const, false
-          @mod.const_get @const, false
-        else
-          const_not_defined  # hackery might happen
-        end
-      end
-    private
-      def normalized_path
-        @normalized_path ||= leaf_pathname.sub_ext( '' ).to_s
-      end
-
-      define_method :mutex, &
-        ::Hash.new { | h, k| h[ k ] = true ; nil }.method( :[] )
-
-      def say_circular
-        "circular autoload dependency detected - probably from within file #{
-          }node `#{ leaf_pathname.basename }` an autoload was triggered for #{
-           }the selfsame corresponding const node `#{ @const }` - make sure #{
-            }that that constant is actually set there - #{ @leaf_pathname }."
-      end
-
-      def const_not_defined
-        raise ::LoadError, say_const_not_defined
-      end
-
-      def say_const_not_defined
-        "#{ @mod }::#{ @const } was not defined, #{
-          }must be, in #{ leaf_pathname }"
-      end
-   public
-      def correction_notification const
-        @const = const ; nil
-      end
-
-      def self.autoloader_methods
-        Methods
-      end
-    end
   end
 end

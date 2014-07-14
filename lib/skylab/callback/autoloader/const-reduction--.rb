@@ -63,9 +63,6 @@ module Skylab::Callback
         def core_basename core_rb
           @kernel.core_basename = core_rb ; nil
         end
-        def do_peek_hack
-          # kept for compatibility, but currently ignored #no-peek-hack
-        end
         def else &p
           else_p p
         end
