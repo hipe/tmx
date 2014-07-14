@@ -29,6 +29,10 @@ module Skylab::TMX
     end
     Face__ = sidesys[ :Face ]
     MetaHell__ = sidesys[ :MetaHell ]
+    Pathnames = -> do
+      Subsystem__[]::PATHNAMES
+    end
+    Subsystem__ = sidesys[ :Subsystem ]
     Proxy = -> do
       MetaHell__[]::Proxy
     end

@@ -3,7 +3,12 @@ require_relative '../callback/core'
 module Skylab::CodeMolester
 
   Callback_ = ::Skylab::Callback
-  Autoloader_ = Callback_::Autoloader
+    Autoloader_ = Callback_::Autoloader
+
+  def self.cache_pathname
+    self::Lib_::Cache_pathname_base[]
+  end
+
   CodeMolester = self
   EMPTY_A_ = [].freeze
   MONADIC_TRUTH_ = -> _ { true }

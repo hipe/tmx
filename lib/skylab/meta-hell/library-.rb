@@ -1,9 +1,8 @@
 module Skylab::MetaHell
 
-  Library_ = ::Skylab::Subsystem::Library.new MetaHell_.dir_pathname  # :+[#su-001]
-  module Library_
+  module Library_  # :+[#su-001]
 
-    stdlib, subsys = FUN.at :require_stdlib, :require_subsystem
+    stdlib, subsys = Autoloader_.at :require_stdlib, :require_sidesystem
     o = { }
     o[ :Basic ] =
     o[ :Callback ] =
@@ -12,6 +11,10 @@ module Skylab::MetaHell
     o[ :Open3 ] = stdlib
     o[ :Callback ] = subsys
     o[ :Set ] = o[ :Shellwords ] = stdlib
+
+    def self.kick i
+      const_get i, false ; nil
+    end
 
     define_singleton_method :const_missing do |const_i|
       const_set const_i, o.fetch( const_i )[ const_i ]

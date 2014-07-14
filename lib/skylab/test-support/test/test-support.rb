@@ -30,7 +30,7 @@ module Skylab::TestSupport::TestSupport
   end
 
   module TestLib_
-    memoize = TestSupport_::Callback_.memoize
+    sidesys = TestSupport_::Autoloader_.build_require_sidesystem_proc
     Face_module = -> do
       TestSupport_::Lib_::Face__[]
     end
@@ -39,9 +39,7 @@ module Skylab::TestSupport::TestSupport
       _pn = Subsystem__[]::PATHNAMES
       _pn.module_exec( & p )  # call it 'calculate' instead and #core-dump
     end
-    Subsystem__ = memoize[ -> do
-      ::Skylab::Subsystem  # or..
-    end ]
+    Subsystem__ = sidesys[ :Subsystem ]
     Tmpdir_pathname = -> do
       Headless__[]::System.defaults.tmpdir_pathname
     end

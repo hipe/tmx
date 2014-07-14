@@ -2,8 +2,7 @@ module Skylab::Snag
 
   module Library_  # :+[#su-001]
 
-    stdlib, subsystem = ::Skylab::Subsystem::FUN.
-      at :require_stdlib, :require_subsystem
+    stdlib, subsystem = Autoloader_.at :require_stdlib, :require_sidesystem
 
     o = { }
     o[ :Basic ] = subsystem
@@ -23,6 +22,8 @@ module Skylab::Snag
     end
 
     H_ = o.freeze
+
+    def self.kick ; end
   end
 
   module Lib_

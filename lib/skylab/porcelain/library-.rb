@@ -5,7 +5,7 @@ module Skylab::Porcelain
     o = { }
     o[ :Basic ] = -> _ { require 'skylab/basic/core' ; ::Skylab::Basic }
     o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
-    o[ :StringIO ] = ::Skylab::Subsystem::FUN.require_stdlib
+    o[ :StringIO ] = Autoloader_.method :require_stdlib
     o[ :StringScanner ] = -> _ { require 'strscan' ; ::StringScanner }
 
     define_singleton_method :const_missing do |c|

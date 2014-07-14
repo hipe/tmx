@@ -49,6 +49,10 @@ module Skylab::CodeMolester
       end.pathname
     end ]
 
+    Cache_pathname_base = -> do
+      Headless__[]::System.defaults.cache_pathname
+    end
+
     CLI_errstream_IO = -> do
       Headless__[]::CLI::IO.some_errstream_IO
     end

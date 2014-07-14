@@ -69,8 +69,7 @@ module Skylab::TreetopTools
     def load_or_generate_grammar_files
       summarize @grammar_a
       @grammar_a.each do |g|
-        defined? ::Treetop or ::Skylab::Subsystem::FUN.
-          require_quietly[ 'treetop' ]
+        defined? ::Treetop or Autoloader_.require_quietly 'treetop'
         if force_overwrite or ! g.outpathname.exist?
           recompile(g) or return
         end

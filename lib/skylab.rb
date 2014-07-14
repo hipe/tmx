@@ -286,33 +286,4 @@ module Skylab  # Welcome! :D
       end
     end
   end
-
-  def self.cache_pathname
-    Subsystem::Subsystems_::Headless::System.defaults.cache_pathname
-  end
-
-  module Subsystem
-
-    Autoloader[ self ]
-
-    def self.[] subsystem_mod
-      loc = caller_locations( 1, 1 )[ 0 ]
-      subsystem_mod.module_exec loc, & Enhance_subsystem_module__ ; nil
-    end
-
-    Enhance_subsystem_module__ = -> loc do
-      _mh = const_get :MetaHell, false
-      const_set( :MAARS, _mh::MAARS )[ self, loc ]
-      const_defined? :Library_, false or module_exec( & Make_lib_stowaway__ )
-      nil
-    end
-
-    Make_lib_stowaway__ = -> do
-      stowaway :Library_, -> do
-        lib_mod = Subsystem::Library.new @dir_pathname
-        const_set :Library_, lib_mod
-        load lib_mod.pathname.to_path ; nil
-      end
-    end
-  end
 end
