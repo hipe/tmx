@@ -1,9 +1,7 @@
 module Skylab::TanMan
 
   module CLI::Actions::Graph::Node::Actions
-
-    MetaHell::Boxxy[ self ]
-
+    # #was-boxxy
   end
 
   class CLI::Actions::Graph::Node::Actions::Add < CLI::Action

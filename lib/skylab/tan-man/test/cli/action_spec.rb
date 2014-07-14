@@ -44,7 +44,7 @@ module Skylab::TanMan::TestSupport::CLI
 
     modul :Actions do
       @dir_pathname = :nope
-      MetaHell::Boxxy[ self ]
+      # #was-boxxy
     end
 
     event_struct = ::Struct.new :message

@@ -100,7 +100,7 @@ module Skylab::Treemap
         else  # for now we jump thru hacking hoops to keep this out of the
           if ! mod.respond_to? :boxxy_original_constants # adapter code
             mod.dir_pathname or fail 'sanity - recursive autloader?'
-            MetaHell::Boxxy[ mod ]
+            # #was-boxxy (called on mod)
           end
           has = mod.constants.length.nonzero?
           catalyze_base_class mode
@@ -116,7 +116,7 @@ module Skylab::Treemap
           memo = memo.const_get const, false
         else
           # ( we debug here a lot )
-          if memo.const_probably_loadable? const
+          if false and memo.const_probably_loadable? const
             memo = memo.const_get const, false
           else
             break

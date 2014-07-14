@@ -5,8 +5,6 @@ module Skylab::Treemap
 
   module Core::SubClient::InstanceMethods
 
-    extend MetaHell::DelegatesTo
-
     include Headless::SubClient::InstanceMethods  # floodgates!
 
   private
@@ -39,7 +37,10 @@ module Skylab::Treemap
         base_label } up to request client #{
         }because request client is human - implement it?"
     end
+
                                   #      ~ pen delegators are popular ~
+
+    Headless::Delegating[ self, :employ_the_DSL_method_called_delegates_to ]
     delegates_to :stylus,
       :em,
       :escape_path,
@@ -128,7 +129,7 @@ module Skylab::Treemap
     end
   end
 
-  Core::Event::FACTORY = Callback::Event::Factory::Explicit.new(
+  Core::Event::FACTORY = Callback_::Event::Factory::Explicit.new(
     {
              payload_line: :datapoint,
                      info: :textual,
@@ -136,7 +137,7 @@ module Skylab::Treemap
                     error: :textual,
                      help: :datapoint
     }, {
-      datapoint: Callback::Event::Factory::Datapoint
+      datapoint: Callback_::Event::Factory::Datapoint
     }
   )
 end

@@ -120,6 +120,20 @@ module Skylab::Callback
       module Methods
         define_method :each_const_value, & EACH_CONST_VALUE_METHOD_P
       end
+
+      # ~
+
+      module Methods
+        def each_const_pair
+          if block_given?
+            constants.each do |const_i|
+              yield const_i, const_get( const_i, false )
+            end ; nil
+          else
+            enum_for :each_const_pair
+          end
+        end
+      end
     end
   end
 end

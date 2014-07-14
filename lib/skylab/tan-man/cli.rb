@@ -15,10 +15,9 @@ module Skylab::TanMan
     end
   end
 
-  module CLI::Actions             # although all its containees may be in this
-    MetaHell::Boxxy[ self ]        # file, they may need boxxy's `const_fetch`
-  end                             # for shenanigans. `Action` below requires
-                                  # the existence of `Actions`
+  module CLI::Actions
+    # #was-boxxy
+  end
 
   CLI::Action || nil              # load this class that's defined in another
   class CLI::Action               # file and re-open it here so that we can

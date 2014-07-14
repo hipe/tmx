@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   module Models
 
-    MetaHell::Boxxy[ self ] # sex
+    # #was-boxxy
 
     module DotFile
       # forward-delcare this one because of the casing

@@ -5,7 +5,7 @@ module Skylab::TanMan
     include Bleeding::NamespaceModuleMethods
 
     def self.extended mod
-      MetaHell::Boxxy[ mod ]  # (satisfying [#023] - use boxxy-like)
+      # #was-boxxy, to satisfy [#023] - use boxxy-like
     end
 
     def build request_client

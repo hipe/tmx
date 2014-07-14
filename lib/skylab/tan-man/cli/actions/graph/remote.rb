@@ -1,9 +1,7 @@
 module Skylab::TanMan
 
   module CLI::Actions::Graph::Remote::Actions
-
-    MetaHell::Boxxy[ self ]
-
+    # #was-boxxy
   end
 
   class CLI::Actions::Graph::Remote::Actions::Add < CLI::Action

@@ -100,9 +100,10 @@ module Skylab::Treemap
 
     Headless::CLI::Action[ self, :core_instance_methods ]  # NOTE *that* ver. of `emit`
 
-    extend Callback::Digraph  # (child classes *must* declare their own
-                                  # event profile, also defaults are assumed
-                                  # in `initialize` here!)  NOTE this ver.
+
+    Callback_[ self, :employ_DSL_for_digraph_emitter ] # (child classes *must*
+    # declare their own event profile, also defaults are assumed
+    # in `initialize` here!)  NOTE this ver.
 
     include Treemap::CLI::Action::InstanceMethods  # our own custom generic cli
                                   # NOTE *this* version of `build_event`

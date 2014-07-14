@@ -24,7 +24,7 @@ module Skylab::TanMan
 
   module Models::DotFile::Sexp::InstanceMethods
 
-    MetaHell::Boxxy[ self ]
+    # #was-boxxy
 
     # (this is the other end of [#078]) - This c-onst_defined? hack is an
     # #experimental alternative of loading every extention module file

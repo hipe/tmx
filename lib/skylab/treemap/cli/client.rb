@@ -7,7 +7,8 @@ module Skylab::Treemap
     include Treemap::Core::Action::InstanceMethods  # a lot of these are
                                   # up-delegators which we must implement
 
-    extend Callback::Digraph  # NOTE here. overwrite s.c version of `emit`
+    Callback_[ self, :employ_DSL_for_digraph_emitter ]
+      # something like the above once overwrite s.c version of `emit`
 
     taxonomic_streams :all
 
@@ -279,11 +280,7 @@ module Skylab::Treemap
 
   module CLI::Actions
 
-    MetaHell::Boxxy[ self ]
-
-    class << self
-      alias_method :treemap_original_each, :each
-    end
+    # #was-boxxy
 
     def self.each &blk            # have some fun with lots of things
       @story ||= begin

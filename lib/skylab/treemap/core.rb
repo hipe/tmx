@@ -1,61 +1,46 @@
-require 'singleton' # [#048] - - singleton goes away
-
 require_relative '..'
 require 'skylab/callback/core'
-require 'skylab/face/core'
 require 'skylab/porcelain/core'
 
 module Skylab::Treemap
-  [ :Autoloader,
-    :Basic,
-    :Callback,
-    :Headless,
-    :MetaHell,
-    :Porcelain,
-    :Treemap
-  ].each do |c|
-    const_set c, ::Skylab.const_get( c, false )  # (it's more readable to
-  end                             # have these subproduct consts in our sandbox)
 
-  Bleeding = Porcelain::Bleeding  # and this might as well be its own subproduct
-                                  # it is a legacy f.w that might go away
+  Callback_ = ::Skylab::Callback
+    Autoloader_ = Callback_::Autoloader
 
-  MAARS = MetaHell::MAARS
-
-  #         ~ tiny stowaway modules, too small for their own file ~
-  #                          (in load order)
+  Bleeding = ::Skylab::Porcelain::Bleeding  # heavily depended upon for now
 
   module CLI
-    MAARS[ self ]
-    Adapter = Porcelain::Bleeding::Adapter  # "ouroboros" ([#hl-069])
+    Adapter = Bleeding::Adapter  # "ouroboros" ([#hl-069])
 
     def self.new *a, &b
       CLI::Client.new( *a, &b )   # a conventional delegation. conform to the
     end                           # standard that CLI.new always works.
+
+    Autoloader_[ self ]
   end
 
   module Core
-    MAARS[ self ]
-
-    stowaway :Action, :Event, :SubClient  # (load s.c to find action, event)
+    Autoloader_[ self ]
+    stowaway :Action, 'sub-client'
+    stowaway :Event, 'sub-client'
   end
 
-  module Plugins                  # #stowaway
-    MetaHell::Boxxy.enhance self do  # for legacy reasons and grease ..
-      inferred_name_scheme :CamelCase
-    end
+  module Plugins  # #stowaway
+    Autoloader_[ self, :boxxy ]
   end
 
   module API
-    MAARS[ self ]
     module Actions
-      MetaHell::Boxxy[ self ]
+      Autoloader_[ self, :boxxy ]
     end
+    Autoloader_[ self ]
   end
 
-  IDENTITY_ = MetaHell::IDENTITY_
-  WRITEMODE_ = Headless::WRITEMODE_
+  IDENTITY_ = -> { x }
+  Headless = ::Skylab::Headless
+  MetaHell = ::Skylab::MetaHell
+  Treemap = self
+  WRITEMODE_ = 'w'.freeze
 
-  MAARS[ self ]                   # we put it at the
-                                  # bottom as proof that we don't use it here.
+  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 end

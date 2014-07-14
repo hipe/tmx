@@ -1,5 +1,5 @@
 module Skylab::TanMan
   module Models::DotFile::Actions
-    MetaHell::Boxxy[ self ]
+    # #was-boxxy
   end
 end

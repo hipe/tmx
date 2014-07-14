@@ -17,7 +17,7 @@ module ::Skylab::TanMan
     o[ :Template ] =
       -> _ { ::Skylab::Subsystem::Subsystems_::Basic::String::Template }
 
-    MetaHell::Boxxy[ self ]
+    # #was-boxxy
 
     def self.const_missing c
       if (( p = self::H_[ c ] ))

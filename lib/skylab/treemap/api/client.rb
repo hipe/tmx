@@ -1,3 +1,5 @@
+require 'singleton' # [#048] - - singleton goes away
+
 module Skylab::Treemap
 
   class API::Client # (was [#032])

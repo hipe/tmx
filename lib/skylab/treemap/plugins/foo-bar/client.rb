@@ -1,9 +1,5 @@
 module Skylab::Treemap
 
-  module Plugins::FooBar
-    MetaHell::Autoloader::Autovivifying[ self ]
-  end
-
   class Plugins::FooBar::Client
     def load_attributes_into x
     end
@@ -16,7 +12,6 @@ module Skylab::Treemap
   end
 
   module Plugins::FooBar::CLI::Actions
-    MetaHell::Autoloader::Autovifiying[ self ]
-    MetaHell::Boxxy[ self ]
+    # #was-boxxy
   end
 end

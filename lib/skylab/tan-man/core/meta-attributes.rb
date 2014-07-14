@@ -1,8 +1,13 @@
 module Skylab::TanMan
 
   module Core::MetaAttributes
-    MetaHell::Boxxy[ self ]
-    singleton_class.send :alias_method, :[], :const_fetch_all
+    # #was-boxxy
+    # singleton_class.send :alias_method, :[], :const_fetch_all (when #was-boxxy)
+    def self.[] * i_a
+      i_a.map do |i|
+        Autoloader_.const_reduce [ i ], self
+      end
+    end
   end
 
   module Core::MetaAttributes::Boolean extend MetaHell::Formal::Attribute::Definer

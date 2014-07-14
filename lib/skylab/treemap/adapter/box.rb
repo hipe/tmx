@@ -24,11 +24,11 @@ module Skylab::Treemap
     end
 
     def load
-      @box_module.each do |const, mod|
-        mote = Adapter::Catalyzer.new const, mod
-        add mote.normalized_local_adapter_name, mote
-      end
       @hot = true
+      @box_module.each_const_pair do |const_i, mod|
+        mote = Adapter::Catalyzer.new const_i, mod
+        add mote.normalized_local_adapter_name, mote
+      end ; nil
     end
   end
 end
