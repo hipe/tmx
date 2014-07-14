@@ -1,5 +1,6 @@
-# the autovivifying autoloader narrative :[#029]
+# the stowaway narrative :[#031]
 
+EDIT: large parts of this are legacy and will be removed.
 
 ## #introduction
 
