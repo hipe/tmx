@@ -1,17 +1,8 @@
-# (below comment is kept for #posterity although we have since broken
-# the regressibility of this test in the interest of getting complete
-# coverage testing thru quickie)
+require_relative 'test-support'
 
-# NOTE this file tests skylab.rb (specifically the central workhorse
-# method of all of autoloading for the entire universe org-wide)
-# and as such we cannot easily use lots of nerks that we otherwise
-# would want to (like Quickie, Regret, and of course autoloading
-# in general). But alas, the center of the universe has to be
-# somewhere. TADA:
+module Skylab::Callback::TestSupport::Name::Guess_dir_path
 
-require_relative '../test-support'
-
-module Skylab::MetaHell::TestSupport::AL_
+  ::Skylab::Callback::TestSupport::Name[ self ]
 
   module InstanceMethods
     def cleanpath x
@@ -23,7 +14,7 @@ module Skylab::MetaHell::TestSupport::AL_
 
   # ( [#054] explains why we have fully qualified names below )
 
-  describe "[mh] test autoloader" do
+  describe "[cb] name guess-dir-path" do
 
     context "infers a path based on simple heuristics." do
 
@@ -89,3 +80,4 @@ module Skylab::MetaHell::TestSupport::AL_
     end
   end
 end
+# #posterity: the first "center of the universe" may have in this file

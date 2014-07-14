@@ -1,10 +1,8 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::Autoloader_Extname_Experiment
+module Skylab::Callback::Test::Name::EE__
 
-  include ::Skylab::MetaHell::TestSupport::CONSTANTS
-
-  describe "#{ MetaHell } autoloader extname experiment" do
+  describe "[ca] name extname experiment" do
 
     # #todo this isn't used anywhere. but we are keeping it around
     # in case we we ever decide to raw-dog the extname logic

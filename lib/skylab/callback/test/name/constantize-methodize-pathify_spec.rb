@@ -1,28 +1,41 @@
-# (see our immediate parent spec file and the thing about being at
-# the center of the universe) despite this, we ballsic-ly insist
-# on using Quickie for this in an exercise in cyclic-ly depent
-# buffoonerly and tomfoolery and balderdash and tribond.
-#
+require_relative 'test-support'
 
-require_relative '../test-support'
+module Skylab::Callback::Test::Name::CMP_
 
-module Skylab::MetaHell::TestSupport::Autoloader
-  # confusingly we are testing s.l::a.l from where we would test s.l::m.h::a.l
-  # please bear with me -- it will probably move here
-
-  ::Skylab::MetaHell::TestSupport[ Inflection_TestSupport = self ]
+  ::Skylab::Callback::Test::Name[ self ]
 
   include CONSTANTS
 
   extend TestSupport::Quickie
 
-  describe "#{ MetaHell::Autoloader } inflection - IT IS TIME TO BOOGIE" do
+  name_mod = ::Object.new
+  def name_mod.constantize
+    MetaHell__[]::Autoloader::FUN::Constantize
+  end
+  def name_mod.methodize
+    MetaHell__[]::Autoloader::FUN::Methodize
+  end
+  def name_mod.pathify
+    MetaHell__[]::Autoloader::FUN::Pathify
+  end
+  def name_mod.pathify_name
+    MetaHell__[]::FUN.pathify_name
+  end
+  MetaHell__ = -> do
+    p = -> do
+      require 'skylab/meta-hell/core'
+      r = ::Skylab::MetaHell ; p = -> { r } ; r
+    end
+    -> { p[] }
+  end.call
+
+  describe "[cb] name (multiple methods)" do
 
     format = "%-48s %18s => %s"
 
     context "`pathify` - tries to turn constants into path fragments:" do
 
-      pathify = MetaHell::Autoloader::FUN::Pathify
+      pathify = name_mod.pathify
 
       define_singleton_method :o do |const, exp_path, desc, *a|
 
@@ -56,7 +69,7 @@ module Skylab::MetaHell::TestSupport::Autoloader
       pn = nil
       define_singleton_method :o do |const, exp_path, desc, *a|
         it "#{ format % [ desc, const.inspect, exp_path.inspect ] }", *a do
-          pn ||= MetaHell::FUN.pathify_name
+          pn ||= name_mod.pathify_name
           pn[ const ].should eql( exp_path )
         end
       end
@@ -72,9 +85,8 @@ module Skylab::MetaHell::TestSupport::Autoloader
     context "`constantize` tries to turn path framents #{
         }into constants-looking strings" do
 
-      constantize = MetaHell::Autoloader::FUN::Constantize
-
-      define_singleton_method :o do |path, exp_const, desc, *a|
+       constantize = name_mod.constantize
+       define_singleton_method :o do |path, exp_const, desc, *a|
         it "#{ format % [ desc, path.inspect, exp_const.inspect ] }", *a do
           constantize[ path ].should eql( exp_const )
         end
@@ -106,7 +118,7 @@ module Skylab::MetaHell::TestSupport::Autoloader
     context "`constantize` tries to turn method-looking #{
       }symbols into constants" do
 
-      constantize = MetaHell::Autoloader::FUN::Constantize
+      constantize = name_mod.constantize
 
       define_singleton_method :o do |in_str, out_str, desc, *tags|
         it "#{ format % [ desc, in_str, out_str ] }", *tags do
@@ -122,7 +134,7 @@ module Skylab::MetaHell::TestSupport::Autoloader
 
     context "`methodize` - tries to make whatevers look like method names" do
 
-      methodize = MetaHell::Autoloader::FUN::Methodize
+      methodize = name_mod.methodize
 
       fmt = "%20s => %s"
 
