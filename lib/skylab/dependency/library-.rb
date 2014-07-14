@@ -21,7 +21,7 @@ module Skylab::Dependency
     MetaHell__ = sidesys[ :MetaHell ]
 
     Methodize = -> i do
-      ::Skylab::Autoloader::FUN::Methodize[ i ]
+      Callback_::Name.lib.methodize i
     end
 
     Open_2 = -> mod do

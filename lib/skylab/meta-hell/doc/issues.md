@@ -8,12 +8,11 @@
 [#062]       #done get rid of ridiculous attempts at currying methods
 [#061]       #done promote fields out of fun
 [#060]       #done separate general from specific "method touch"
-[#059] #open get rid of all old autoloader dependencies at this node
+[#059]       #done get rid of all old autoloader dependencies at this node
 [#058]       #doc-point the "touch method" function ..
 [#057]       #doc-point the library narrative ..
 [#056]       #node-tracker :#contoured-fields
 [#055]       #doc-point the module node narrative ..
-[#054]       #parent-node: [#041] "ghost modules explained.." #autoloading
 [#054]       #formal-box:struct #doc-point (all notes)..
 [#053]       #doc-point "discussion of all the meta-properties.."
 [#053]       #in-situ
@@ -27,7 +26,7 @@
              (#re-purpoesd:once. original may have been lost.)
 [#046]       #doc-point extension nodes?
 [#045]       #tracking-tag track various #touchers in the wild
-[#044] #open #autoloading: swap-in caller_locations( 1, 1 )[ 0 ].base_label
+[#044] #hole (was #autoloading: swap-in caller_locations( 1, 1 )[ 0 ].base_label)
 [#043]       #boxxy the stemmy tree issue - try autoloading the value corresp.
                to the path "headless/nlp/en/levenshtein-.rb"
 [#042]       #doc-point introducting tagged argument lists (#iambics) ..

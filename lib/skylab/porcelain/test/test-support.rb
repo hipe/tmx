@@ -31,7 +31,7 @@ module Skylab::Porcelain::TestSupport
       Headless__[]::CLI
     end
     Constantize_proc = -> do
-      ::Skylab::Autoloader::FUN::Constantize
+      Callback_::Name.lib.constantize
     end
     Headless__ = sidesys[ :Headless ]
     Let = -> mod do

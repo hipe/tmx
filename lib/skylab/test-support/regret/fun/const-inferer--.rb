@@ -41,7 +41,7 @@ module Skylab::TestSupport
         FILE_RX_ = /\A (?<noext> [-_a-z0-9]+ ) #{
           }#{ ::Regexp.escape Autoloader_::EXTNAME } \z/x
 
-        Constantify_ = Lib_::Name_from_sanitized_file_to_const_proc[]
+        Constantify_ = Lib_::Name_sanitize_for_constantize_file_proc[]
 
       end
     end

@@ -19,6 +19,15 @@ module Skylab::Face
     module Lib_
       include CLI::Lib_
 
+      Call_frame_rx = -> do
+        p = -> do
+          rx = /#{ Callback_::Name.lib.callframe_path_rx.source } :
+            (?<no>\d+) : in [ ] ` (?<meth>[^']+) '\z/x
+          p = -> { rx } ; rx
+        end
+        -> { p[] }
+      end.call
+
       Chunker_enumerator = -> sexp do
         Headless__[]::CLI::Pen::Chunker::Enumerator.new sexp
       end
@@ -1007,7 +1016,9 @@ module Skylab::Face
     class CLI_Kernel_  # #re-open for facet 3, #storypoint-1005
 
       def argument_error ex, cmd  # result will be final result
-        md = CALL_FRAME_RX_.match ex.backtrace.fetch( 1 )
+
+        md = Lib_::Call_frame_rx[].match ex.backtrace.fetch 1
+
         if __FILE__ == md[:path] && 'invoke' == md[:meth]
           @y << ex.message
           cmd.usage @y
@@ -1017,12 +1028,6 @@ module Skylab::Face
           raise ex  # then it didn't originate from the above spot .. ICK
         end
       end
-      #
-      CALL_FRAME_RX_ = /
-        #{ ::Skylab::Autoloader::CALLFRAME_PATH_RX.source } :
-        (?<no>\d+) : in [ ] ` (?<meth>[^']+) '\z
-      /x
-
     end
 
     class NS_Kernel_  # #re-open for facet 3

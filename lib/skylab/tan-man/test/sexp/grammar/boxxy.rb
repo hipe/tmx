@@ -5,9 +5,8 @@ module ::Skylab::TanMan::TestSupport
 
     include CONSTANTS  # necessary to see m.h below
 
-    include ::Skylab::Autoloader::Methods # does not #trigger
-
     def self.extended mod
+      self._FIXME
       mod.module_exec do
         @const_missing_class = MetaHell::MAARS::Const_Missing_
         init_autoloader caller_locations( 3, 1 )[ 0 ]
@@ -19,7 +18,7 @@ module ::Skylab::TanMan::TestSupport
 
       rx = /\AGrammar(?<num>[0-9]+)(?:_(?<rest>.+))?\z/
 
-      pathify = ::Skylab::Autoloader::FUN::Pathify
+      pathify = Callback_::Name.lib.pathify
 
       define_method :const_missing do |const|
         md = rx.match const.to_s

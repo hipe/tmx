@@ -142,11 +142,6 @@ module Skylab::MetaHell
       r
     end
 
-    o[:pathify_name] = -> const_name_s do
-      # (one extra rarely-used step added to the often-used function)
-      ::Skylab::Autoloader::FUN::Pathify[ const_name_s.gsub( '::', '/' ) ]
-    end
-
     Is_primitive_esque = -> x do
       ! x or case x
       when ::TrueClass, ::Numeric, ::Symbol, ::String, ::Module ; true

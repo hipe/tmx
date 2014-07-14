@@ -2,6 +2,9 @@ require 'skylab/callback/core'
 
 module Skylab::Subsystem
 
-  ::Skylab::Callback::Autoloader[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+  Callback_ = ::Skylab::Callback
+    Autoloader_ = Callback_::Autoloader
+
+  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
 end

@@ -48,10 +48,6 @@ module Skylab::TestSupport
       Face__[]::API::Normalizer_
     end
 
-    Autoloader__ = memoize[ -> do
-      Skylab__[]::Autoloader
-    end ]
-
     Basic__ = sidesys[ :Basic ]
 
     Box = -> do
@@ -114,19 +110,19 @@ module Skylab::TestSupport
     MetaHell__ = sidesys[ :MetaHell ]
 
     Name_from_const_to_method = -> i do
-      Autoloader__[]::FUN::Methodize[ i ]
+      Callback_::Name.lib.methodize i
     end
 
     Name_from_const_to_path = -> x do
-      Autoloader__[]::FUN::Pathify[ x ]
+      Callback_::Name.lib.pathify x
     end
 
     Name_from_path_to_const = -> pn do
-      Autoloader__[]::FUN::Constantize[ pn ]
+      Callback_::Name.lib.constantize pn
     end
 
-    Name_from_sanitized_file_to_const_proc = -> do
-      Autoloader__[]::FUN::Constantize::Sanitized_file
+    Name_sanitize_for_constantize_file_proc = -> do
+      Callback_::Name.lib.constantize_sanitize_file
     end
 
     Procs_as_methods = -> * i_a, & p do

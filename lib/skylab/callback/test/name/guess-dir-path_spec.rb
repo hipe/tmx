@@ -4,13 +4,15 @@ module Skylab::Callback::TestSupport::Name::Guess_dir_path
 
   ::Skylab::Callback::TestSupport::Name[ self ]
 
+  include CONSTANTS
+
   module InstanceMethods
     def cleanpath x
       ::Pathname.new( x ).sub_ext( '' ).to_s  # copypasta nec.
     end
   end
 
-  Guess_dir_ = ::Skylab::Autoloader::Guess_dir_
+  Guess_dir_ = Callback_::Name.lib.guess_dir
 
   # ( [#054] explains why we have fully qualified names below )
 

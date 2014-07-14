@@ -7,7 +7,6 @@ module Skylab::TanMan::TestSupport
   ::Skylab::TestSupport::Regret[ TanMan_TestSupport = self ]
 
   module CONSTANTS
-    Autoloader   = ::Skylab::Autoloader
     Headless     = ::Skylab::Headless
     MetaHell     = ::Skylab::MetaHell
     TanMan       = ::Skylab::TanMan

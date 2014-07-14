@@ -188,7 +188,8 @@ module Skylab::Callback
         if stow_h && stow_h[ @name.as_const ]
           rslv_some_x_when_stowaway
         else
-          np = @mod.entry_tree.normpath_from_distilled @name.as_distilled_stem
+          ( et = @mod.entry_tree ).has_directory and
+            np = et.normpath_from_distilled( @name.as_distilled_stem )
           if np
             @normpath = np
             send @normpath.method_name_for_state
@@ -798,8 +799,6 @@ module Skylab::Callback
       end
     end
 
-    PATH_SEP_ = '/'.freeze
-
     class Entry_Tree_
       def add_imaginary_normpath_for_correct_name name, dpn=nil  # #stow-3
         h = ( @imaginary_h ||= {} )
@@ -1215,6 +1214,10 @@ module Skylab::Callback
       @as_const = Constify_if_possible_[ as_variegated_symbol.to_s ]
     end
 
+    def self.lib
+      Callback_::Name__
+    end
+
     NORMALIZE_CONST_RX__ = /(?<=[a-z])(?=[A-Z])/
     SLUGIFY_CONST_RX__ = /[A-Z](?=[a-z])/
     SPACE__ = ' '.freeze
@@ -1293,6 +1296,8 @@ module Skylab::Callback
 
   Oxford_or = Oxford.curry[ ', ', '[none]', ' or ' ]
   Oxford_and = Oxford.curry[ ', ', '[none]', ' and ' ]
+
+  PATH_SEP_ = '/'.freeze
 
   class Scn < ::Proc
     alias_method :gets, :call

@@ -22,7 +22,7 @@ module Skylab::TMX
   module Lib_
     sidesys = Autoloader_.build_require_sidesystem_proc
     Constantize = -> i do
-      ::Skylab::Autoloader::FUN::Constantize[ i ]
+      Callback_::Name.lib.constantize i
     end
     Distill = -> i do
       Callback_::Distill_[ i ]

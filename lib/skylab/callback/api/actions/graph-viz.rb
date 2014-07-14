@@ -39,8 +39,7 @@ module Skylab::Callback
 
     -> do  # `resolve_root_const`
 
-      pathify = ::Skylab::Autoloader::FUN::Pathify
-      constantize = ::Skylab::Autoloader::FUN::Constantize
+      constantize, pathify = Callback_::Name.lib.at :constantize, :pathify
 
       define_method :resolve_root_const do
         @mod_a = nil
@@ -65,7 +64,7 @@ module Skylab::Callback
 
         toplevel_const = -> do
           pn = ::Pathname.new(
-            "#{ part_a[ 0 .. idx ] * '/' }#{ ::Skylab::Autoloader::EXTNAME }" )
+            "#{ part_a[ 0 .. idx ] * '/' }#{ Autoloader::EXTNAME }" )
           pn.exist? or break error( "expected to exist but did not - #{
             }#{ pn }" )
           if ! ::Object.const_defined? @root_constant

@@ -6,6 +6,7 @@ module Skylab::Callback::TestSupport
     Autoloader_ = Callback_::Autoloader
 
   module CONSTANTS
+    Callback_ = Callback_
     Callback = Callback_
     TestSupport = Callback_::Autoloader.require_sidesystem :TestSupport
   end

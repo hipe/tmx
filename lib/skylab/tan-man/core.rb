@@ -6,7 +6,6 @@ module Skylab
   module TanMan
 
     Autoloader_ = ::Skylab::Callback::Autoloader
-    Autoloader   = ::Skylab::Autoloader
     Callback     = ::Skylab::Callback
     Bleeding     = ::Skylab::Porcelain::Bleeding
     Headless     = ::Skylab::Headless

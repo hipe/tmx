@@ -215,33 +215,6 @@ module Skylab::MetaHell
         end
       end
     end
-
-    Touch = -> do  # simplification of meta hell (class | module) creator
-      touch = -> mod, i, build_it do
-        if ! mod.respond_to? :const_probably_loadable?
-          MAARS::Upwards[ mod ]
-        end
-        mod_ = if mod.const_defined? i, false
-          mod.const_get i, false
-        elsif mod.const_probably_loadable? i
-          mod.const_get i, false
-        else
-          mod.const_set i, build_it.call
-        end
-        if ! mod_.instance_variable_defined? :@dir_pathname
-          n = mod_.name
-          mod_.instance_variable_set :@dir_pathname, mod.dir_pathname.join(
-            ::Skylab::Autoloader::FUN::Pathify[
-              n[ n.rindex( ':' ) + 1 .. -1 ] ] )
-          MAARS[ mod_ ]
-        end
-        mod_
-      end
-
-      -> mod, i, build_it, with_it=nil do
-        mod_ = touch[ mod, i, build_it ]
-        if with_it then mod_.module_exec( & with_it ) else mod_ end
-      end
-    end.call
+    # 'Touch' #tombstone
   end
 end

@@ -140,7 +140,7 @@ module Skylab::CodeMolester
       if @outpathname.nil?
         @outpathname = if @outfile_stem
           @outdir_p[].
-            join "#{ @outfile_stem }#{ ::Skylab::Autoloader::EXTNAME }"
+            join "#{ @outfile_stem }#{ Autoloader_::EXTNAME }"
         else false end
       end
       @outpathname

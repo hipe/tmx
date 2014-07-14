@@ -9,25 +9,22 @@ module Skylab::Callback::Test::Name::CMP_
   extend TestSupport::Quickie
 
   name_mod = ::Object.new
+
   def name_mod.constantize
-    ::Skylab::Autoloader::FUN::Constantize
+    Callback_::Name.lib.constantize
   end
+
   def name_mod.methodize
-    ::Skylab::Autoloader::FUN::Methodize
+    Callback_::Name.lib.methodize
   end
+
   def name_mod.pathify
-    ::Skylab::Autoloader::FUN::Pathify
+    Callback_::Name.lib.pathify
   end
+
   def name_mod.pathify_name
-    MetaHell__[]::FUN.pathify_name
+    Callback_::Name.lib.pathify_name
   end
-  MetaHell__ = -> do
-    p = -> do
-      require 'skylab/meta-hell/core'
-      r = ::Skylab::MetaHell ; p = -> { r } ; r
-    end
-    -> { p[] }
-  end.call
 
   describe "[cb] name (multiple methods)" do
 
