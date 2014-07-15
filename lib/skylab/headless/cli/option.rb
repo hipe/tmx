@@ -12,7 +12,7 @@ module Skylab::Headless
       const_get( :Model_, false ).new_flyweight
     end
 
-    FUN = Headless::Library_::FUN_Module.new
+    FUN = Headless_::Lib_::FUN_module[].new
 
     Autoloader_[ FUN ]  # we need to a.l children
 

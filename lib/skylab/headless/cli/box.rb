@@ -13,7 +13,7 @@ module Skylab::Headless
       DSL = -> x_a do
         module_exec x_a, & CLI::Box::DSL.to_proc ; nil
       end
-      Headless::Library_::Bundle::Multiset[ self ]
+      Headless_::Lib_::Bundle[]::Multiset[ self ]
     end
 
     CEASE_X__ = CLI::Action::CEASE_X
@@ -98,7 +98,7 @@ module Skylab::Headless
     end
 
     class Dispatch__
-      Headless::Library_::Funcy[ self ]
+      Headless::Lib_::Funcy_globful[ self ]
       def initialize client, action_s, arg_s_a
         @action_s = action_s ; @arg_s_a = arg_s_a ; @client = client ; nil
       end

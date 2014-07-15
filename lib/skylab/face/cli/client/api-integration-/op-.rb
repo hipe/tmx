@@ -4,7 +4,7 @@ module Skylab::Face
 
     class OP_
 
-      Lib_::Funcy[ self ]
+      Lib_::Funcy_globful[ self ]
 
       Lib_::Fields[ self, :field_box, :any_expression_agent, :param_h, :op ]
 

@@ -29,10 +29,10 @@ module Skylab::Porcelain
       MetaHell__[]::FUN::Function_chain_[ x, y ]
     end
     Funcy_globless = -> client do
-      MetaHell__[]::Funcy_globless[ client ]
+      MetaHell__[].funcy_globless client
     end
     Funcy_globful = -> client do
-      MetaHell__[]::Funcy[ client ]
+      MetaHell__[].funcy_globful client
     end
     MetaHell__ = MetaHell_ = sidesys[ :MetaHell ]
     NLP = -> do

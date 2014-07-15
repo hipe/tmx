@@ -1,6 +1,6 @@
 module Skylab::Headless
 
-  IO::Upstream::Select = Headless::Library_::Function_Class.new( :select ) do
+  IO::Upstream::Select = Headless_::Lib_::Function_class[].new( :select ) do
 
     self::MAXLEN__ = 4096  # (2 ** 12), the number of bytes in about 50 lines
 

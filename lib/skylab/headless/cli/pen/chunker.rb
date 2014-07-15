@@ -1,6 +1,6 @@
 module Skylab::Headless
 
-  CLI::Pen::Chunker = Headless::Library_::Function_Class.new :gets do # :[#085]
+  CLI::Pen::Chunker = Headless_::Lib_::Function_class[].new :gets do  # :[#085]
 
   private
 

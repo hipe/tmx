@@ -78,12 +78,12 @@ module Skylab::TestSupport
       MetaHell__[]::Fields.contoured.from_iambic_and_client x_a, mod
     end
 
-    Funcy = -> mod do
-      MetaHell__[]::Funcy[ mod ]
+    Funcy_globful = -> mod do
+      MetaHell__[].funcy_globful mod
     end
 
     Funcy_globless = -> mod do
-      MetaHell__[]::Funcy_globless[ mod ]
+      MetaHell__[].funcy_globless mod
     end
 
     Face__ = sidesys[ :Face ]

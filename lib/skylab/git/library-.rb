@@ -55,10 +55,10 @@ module Skylab::Git
       MetaHell__[]::FUN::Module
     end
     Funcy_globful = -> x do
-      MetaHell__[]::Funcy[ x ]
+      MetaHell__[].funcy_globful x
     end
     Funcy_globless = -> x do
-      MetaHell__[]::Funcy_globless[ x ]
+      MetaHell__[].funcy_globless x
     end
     Fuzzy_matcher = -> x, y do
       MetaHell__[]::FUN::Parse::Fuzzy_matcher[ x, y ]

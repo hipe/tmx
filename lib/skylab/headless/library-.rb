@@ -6,18 +6,11 @@ module Skylab::Headless
 
     o = { }
     o[ :Basic ] = sidesys
-    o[ :Bundle ] = -> _ { self::MetaHell::Bundle }
     o[ :CodeMolester ] = sidesys
     o[ :FileUtils ] = stdlib
-    o[ :Function ] = -> _ { self::MetaHell::Function }
-    o[ :Funcy ] = -> _ { self::MetaHell::Funcy }
-    o[ :Formal_Box ] = -> _ { self::MetaHell::Formal::Box }
-    o[ :FUN_Module ] = -> _ { self::MetaHell::FUN::Module }
-    o[ :Function_Class ] = -> _ { self::MetaHell::Function::Class }
     o[ :InformationTactics ] = o[ :MetaHell ] = sidesys
-    o[ :Module_Resolve ] = -> _ { self::MetaHell::Module::Resolve }
     o[ :Open3 ] = stdlib
-    o[ :Open4 ] = -> { ::Skylab::Subsystem::FUN.require_quietly[  'open4'  ]; ::Open4 }
+    o[ :Open4 ] = -> { Autoloader_.require_quiety( 'open4' ) ; ::Open4 }
     o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
     o[ :Callback ] = sidesys
     o[ :Set ] = stdlib
@@ -33,5 +26,43 @@ module Skylab::Headless
     def self.const_missing i
       const_set i, @o.fetch( i )[ i ]
     end ; @o = o.freeze
+  end
+
+  module Lib_
+    sidesys = Autoloader_.build_require_sidesystem_proc
+    Bundle = -> do
+      MetaHell__[]::Bundle
+    end
+    DSL_DSL = -> mod, p do
+      MetaHell__[]::DSL_DSL.enhance mod, &p
+    end
+    FUN_module = -> do
+      MetaHell__[]::FUN::Module
+    end
+    Formal_box = -> do
+      MetaHell__[]::Formal::Box
+    end
+    Function_class = -> do
+      MetaHell__[]::Function::Class
+    end
+    Funcy_globful = -> cls do
+      MetaHell__[].funcy_globful cls
+    end
+    MetaHell__ = sidesys[ :MetaHell ]
+    Module_resolve = -> path_s, mod do
+      MetaHell__[]::Module::Resolve[ path_s, mod ]
+    end
+    Parse_series = -> * x_a do
+      MetaHell__[]::FUN.parse_series[ * x_a ]
+    end
+    Pool = -> do
+      MetaHell__[]::Pool
+    end
+    Private_attr_reader = -> do
+      MetaHell__[]::FUN.private_attr_reader
+    end
+    Proxy_tee = -> do
+      MetaHell__[]::Proxy::Tee
+    end
   end
 end

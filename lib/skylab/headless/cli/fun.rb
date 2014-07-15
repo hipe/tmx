@@ -1,6 +1,6 @@
 module Skylab::Headless
 
-  CLI::FUN = Headless::Library_::FUN_Module.new
+  CLI::FUN = Headless_::Lib_::FUN_module[].new
 
   module CLI::FUN
 

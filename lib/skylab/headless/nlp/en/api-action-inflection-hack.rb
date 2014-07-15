@@ -179,10 +179,10 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
 
     # for setting how to inflect things
 
-    Headless_::Library_::MetaHell::DSL_DSL.enhance self do
+    Headless_::Lib_::DSL_DSL[ self, -> do
       atom_accessor :noun
       atom_accessor :verb
-    end
+    end ]
 
     def initialize
       @noun = :singular

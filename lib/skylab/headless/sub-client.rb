@@ -1,9 +1,8 @@
 module Skylab::Headless::SubClient
 
   Headless = ::Skylab::Headless
+  Headless_ = Headless
   include Headless
-  MetaHell_ = Headless::Library_::MetaHell
-  Private_attr_reader_ = MetaHell_::FUN.private_attr_reader
 
   module InstanceMethods
 
@@ -13,7 +12,8 @@ module Skylab::Headless::SubClient
 
   private
 
-    define_singleton_method :private_attr_reader, & Private_attr_reader_
+    define_singleton_method :private_attr_reader, &
+      Headless_::Lib_::Private_attr_reader[]
 
     def initialize client_x=nil  # XXX #transitional only #todo
       @error_count = 0
@@ -143,7 +143,7 @@ end
 
   end
 
-  EN_FUN = Headless::Library_::FUN_Module.new
+  EN_FUN = Headless_::Lib_::FUN_module[].new
 
   module EN_FUN
 
@@ -196,7 +196,7 @@ end
     end
 
     o[:s] = -> * args do  # [length] [lexeme_i]
-      len_x, lexeme_i = MetaHell_::FUN.parse_series[ args,
+      len_x, lexeme_i = Headless_::Lib_::Parse_series[ args,
         -> x { ! x.respond_to? :id2name }, # defer it
         -> x { x.respond_to? :id2name } ]
       lexeme_i ||= :s  # when `len_x` is nil it means "use memoized"

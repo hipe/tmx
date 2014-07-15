@@ -48,7 +48,7 @@ module Skylab::Snag
       Headless__[]::IO::DRY_STUB
     end
     Funcy_globless = -> x do
-      MetaHell__[]::Funcy_globless[ x ]
+      MetaHell__[].funcy_globless x
     end
     Formal_attribute = -> do
       MetaHell__[]::Formal::Attribute

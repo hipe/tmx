@@ -1,6 +1,6 @@
 module Skylab::Headless
 
-  IO::Interceptors::Chunker::F = Headless::Library_::Function::Class.
+  IO::Interceptors::Chunker::F = Headless_::Lib_::Function_class[].
     new( :flush, :write ) do
 
     # #todo

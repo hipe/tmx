@@ -52,7 +52,7 @@ module Skylab::Headless
         extend Headless::NLP::EN::API_Action_Inflection_Hack ; nil
       end
 
-      Headless::Library_::Bundle::Multiset[ self ]
+      Headless_::Lib_::Bundle[]::Multiset[ self ]
 
     end
 

@@ -32,8 +32,12 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       end
     end
 
-    Funcy = -> _ do
+    Funcy_globful = -> _ do
       Git_::Lib_::Funcy_globful[ self ] ; nil
+    end
+
+    Funcy_globless = -> _ do
+      Git_::Lib_::Funcy_globless[ self ] ; nil
     end
 
     Emit_payload_line_to_listener = -> _ do
@@ -888,11 +892,12 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
         :initialize_basic_set_with_iambic,
         :with_members, %i( filename_s is_dry quiet_h stash_pn ).freeze,
       :emitters,
-      :funcy,
+      :funcy_globless,
       :file_utils, :mkdir_p, :move
     ]
 
-    def initialize client, * x_a
+    def initialize x_a
+      client = x_a.shift
       initialize_basic_set_with_iambic x_a
       client_notify client
       super()
@@ -935,9 +940,10 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
         :initialize_basic_set_with_iambic,
       :file_utils,
         :mkdir_p, :move, :rmdir,
-      :funcy, :popener3, :shellesc ]
+      :funcy_globless, :popener3, :shellesc ]
 
-    def initialize client, * x_a
+    def initialize x_a
+      client = x_a.shift
       initialize_basic_set_with_iambic x_a
       client_notify client
       super()
@@ -1080,7 +1086,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
     Sub_client__[ self,
       :file_utils, :cd,
-      :funcy,
+      :funcy_globful,
       :popener3 ]
 
     class << self
@@ -1115,7 +1121,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
   end
 
   class Make_patch_for_file__
-    Sub_client__[ self, :emit_payload_line_to_listener, :funcy, :popener3 ]
+    Sub_client__[ self, :emit_payload_line_to_listener, :funcy_globful, :popener3 ]
     def initialize client, file_s, listener_p
       @file_s = file_s ; @listener_p = listener_p
       client_notify client
@@ -1187,7 +1193,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
         :initialize_basic_set_with_iambic,
       :color_inquisitor,
       :emit_payload_line_to_listener,
-      :funcy,
+      :funcy_globful,
       :say ]
 
     def initialize client, * x_a

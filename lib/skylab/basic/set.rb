@@ -68,7 +68,7 @@ module Skylab::Basic
       end
     end
     class Common_Runtime__
-      Basic::Lib_::Funcy[ self ]
+      Basic::Lib_::Funcy_globful[ self ]
       def initialize agent
         @agent = agent
         @agent_mod = agent.class

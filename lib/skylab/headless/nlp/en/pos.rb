@@ -53,9 +53,9 @@ module Skylab::Headless
     def self.grammatical_categories h
 
       @category_box ||= begin
-        @form_box     = Headless::Library_::Formal_Box::Open.new
-        @exponent_box = Headless::Library_::Formal_Box::Open.new
-                        Headless::Library_::Formal_Box::Open.new  # NOTE look.
+        @form_box     = Headless_::Lib_::Formal_box[]::Open.new
+        @exponent_box = Headless_::Lib_::Formal_box[]::Open.new
+                        Headless_::Lib_::Formal_box[]::Open.new  # NOTE look.
       end
 
       h.each do |cat_sym, exponent_a|
@@ -83,7 +83,7 @@ module Skylab::Headless
         nil
       end
 
-      @box = Headless::Library_::Formal_Box::Open.new
+      @box = Headless_::Lib_::Formal_box[]::Open.new
 
       class << self
         attr_reader :box
@@ -317,7 +317,7 @@ module Skylab::Headless
 
     # (watch for similarities with `self.as`)
     def add_irregular_forms form_h
-      @irregular_box ||= Headless::Library_::Formal_Box::Open.new if form_h.any?
+      @irregular_box ||= Headless_::Lib_::Formal_box[]::Open.new if form_h.any?
       form_h.each do |combination_x, surface_form|
         c = self.class.build_immutable_combination combination_x
         instance_variable_set c.ivar,  # allow nils
@@ -388,8 +388,8 @@ module Skylab::Headless
 
       def initialize pos_class
         @pos_class = pos_class
-        @monadic_form_box = Headless::Library_::Formal_Box::Open.new
-        @monadic_lemma_box = Headless::Library_::Formal_Box::Open.new
+        @monadic_form_box = Headless_::Lib_::Formal_box[]::Open.new
+        @monadic_lemma_box = Headless_::Lib_::Formal_box[]::Open.new
         @last_lemmaless_id = 0
       end
       private :initialize
@@ -793,7 +793,7 @@ module Skylab::Headless
         end.call
         ea << self
         membership_st =
-          parts.unshift(part).reduce Headless::Library_::Formal_Box::Open.new do |bx, x|
+          parts.unshift(part).reduce Headless_::Lib_::Formal_box[]::Open.new do |bx, x|
             bx.add x, Membership_.new( x, NLP::EN::POS.abbrev_box.fetch( x ) )
             bx
           end.to_struct

@@ -518,7 +518,7 @@ module Skylab::Flex2Treetop
     end
 
     class Resolve_IO__  # :+#tributary-agent
-      MetaHell::Funcy[ self ]
+      MetaHell.funcy_globful self
       Headless::API::Simple_monadic_iambic_writers[ self,
         :force_is_present, :infile, :listener, :out_pn ]
       def initialize * x_a

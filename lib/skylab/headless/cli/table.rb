@@ -8,11 +8,12 @@ module Skylab::Headless::CLI::Table
   #
   #   * left/right alignment config options
 
-  Headless = ::Skylab::Headless
-    Autoloader_ = Headless::Autoloader_
-  Callback = Headless::Library_::Callback
-  Table = self  # partly b.c Callback is not part of headless proper
-  TERM_SEPARATOR_STRING_ = Headless::TERM_SEPARATOR_STRING_
+  Headless_ = ::Skylab::Headless
+
+  Autoloader_ = Headless_::Autoloader_
+  Callback_ = Headless_::Callback_
+  Table = self  # partly b.c Callback_ is not part of headless proper
+  TERM_SEPARATOR_STRING_ = Headless_::TERM_SEPARATOR_STRING_
 
   class Table::Shell
     # here have a goofy experiment - the public methods here (direct and
@@ -20,9 +21,9 @@ module Skylab::Headless::CLI::Table
     # to your call to Table.render (or you can manipualte it directly in
     # the block).
 
-    Callback[ self, :employ_DSL_for_digraph_emitter ]
+    Callback_[ self, :employ_DSL_for_digraph_emitter ]
 
-    event_factory -> { Callback::Event::Factory::Isomorphic.new Table::Events }
+    event_factory -> { Callback_::Event::Factory::Isomorphic.new Table::Events }
 
     listeners_digraph  row: :text,  # (contrast with `textual`, `on_text` reads better)
          info: :text,  # (:info is strictly a branch not a leaf)
@@ -32,14 +33,14 @@ module Skylab::Headless::CLI::Table
     attr_writer :head, :tail, :separator
 
     def field! symbol
-      @field_box.if? symbol, Headless::IDENTITY_, -> box do
+      @field_box.if? symbol, Headless_::IDENTITY_, -> box do
         box.add symbol, Table::Field::Shell.new
       end
     end
     # --*--
     def initialize
       @head = @tail = @separator = nil
-      @field_box = Headless::Library_::Formal_Box::Open.new
+      @field_box = Headless_::Lib_::Formal_box[]::Open.new
     end
   end
 
@@ -49,7 +50,7 @@ module Skylab::Headless::CLI::Table
       shell = Shell.new ; res = nil
       param_h.each { |k, v| shell.send "#{ k }=", v } if param_h
       if blk then blk[ shell ] else
-        res = Headless::Library_::StringIO.new
+        res = Headless_::Library_::StringIO.new
         shell.on_text { |txt| res.puts txt }
       end
       shell.instance_exec do
@@ -220,7 +221,7 @@ module Skylab::Headless::CLI::Table
 
     def ancestor_names_recursive
       @ancestor_names_recursive ||= begin
-        box = Headless::Library_::Formal_Box::Open.new
+        box = Headless_::Lib_::Formal_box[]::Open.new
         _ancestor_names_recursive box
         box.names
       end
@@ -244,9 +245,9 @@ module Skylab::Headless::CLI::Table
 
   module Table::Cels
 
-    parse_styles   = Headless::CLI::FUN::Parse_styles
-    unparse_styles = Headless::CLI::FUN::Unparse_styles
-    unstyle      = Headless::CLI::Pen::FUN.unstyle
+    parse_styles   = Headless_::CLI::FUN::Parse_styles
+    unparse_styles = Headless_::CLI::FUN::Unparse_styles
+    unstyle      = Headless_::CLI::Pen::FUN.unstyle
     hackable_a = [ :style, :string, :style ]
 
     common = -> fld do
@@ -312,7 +313,7 @@ module Skylab::Headless::CLI::Table
     # --*--
 
     blank_rx = Table::Cels::BLANK.rx
-    unstyle = Headless::CLI::Pen::FUN.unstyle
+    unstyle = Headless_::CLI::Pen::FUN.unstyle
     start_type = Table::Cels::INTEGER
     float_detail_rx = Table::Cel::FLOAT_DETAIL_RX
 

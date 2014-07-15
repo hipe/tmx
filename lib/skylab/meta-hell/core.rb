@@ -26,13 +26,13 @@ module Skylab
       self::Function._make_methods host, :public, :method, rest
     end
 
-    Funcy = -> cls do  # apply on a class whose interface is stricly proc-like
+    def self.funcy_globful cls
       def cls.[] * x_a
         new( * x_a ).execute
       end
     end
 
-    Funcy_globless = -> cls do  # until [#069]
+    def self.funcy_globless cls
       def cls.[] * x_a
         new( x_a ).execute
       end

@@ -119,11 +119,11 @@ module Skylab::SubTree
     end
 
     Funcy_globful = -> x do
-      MetaHell__[]::Funcy[ x ]
+      MetaHell__[].funcy_globful x
     end
 
     Funcy_globless = -> x do
-      MetaHell__[]::Funcy_globless[ x ]
+      MetaHell__[].funcy_globless x
     end
 
     Hack_label_proc = -> do

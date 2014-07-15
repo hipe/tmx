@@ -20,7 +20,7 @@ module Skylab::TestSupport
 
         class Parse_Recursive_
 
-          Lib_::Funcy[ self ]
+          Lib_::Funcy_globful[ self ]
 
           def execute
             if @argv.length.nonzero?

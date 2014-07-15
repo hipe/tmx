@@ -33,8 +33,8 @@ module Skylab::Basic
       MetaHell__[]::Formal::Box::Open
     end
 
-    Funcy = -> x do
-      MetaHell__[]::Funcy[ x ]
+    Funcy_globful = -> x do
+      MetaHell__[].funcy_globful x
     end
 
     Function = -> host, * m_i_a do
