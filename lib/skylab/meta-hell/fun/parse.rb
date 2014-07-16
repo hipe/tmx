@@ -2,6 +2,10 @@ module Skylab::MetaHell
 
   module FUN::Parse
 
+    def self.strange x
+      Strange_[ x ]
+    end
+
     Strange_ = -> x do  # first of family [#050]
       if x.respond_to? :id2name
         "\"#{ x }\""

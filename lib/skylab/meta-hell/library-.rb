@@ -24,10 +24,6 @@ module Skylab::MetaHell
   module Lib_
     memo = MetaHell_::FUN::Memoize
 
-    Aspect = -> do
-      MetaHell_::Fields::Aspect_
-    end
-
     Callback__ = memo[ -> { Library_::Callback } ]
 
     Distill_proc = -> do
@@ -36,6 +32,10 @@ module Skylab::MetaHell
 
     Scn = -> do
       Callback__[]::Scn
+    end
+
+    Strange = -> x do
+      MetaHell_::FUN::Parse.strange x
     end
   end
 end

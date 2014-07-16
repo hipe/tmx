@@ -75,20 +75,29 @@ module Skylab::MetaHell::TestSupport::Fields::From
         end
       end
     end
-    context "an extreme hack exists that lets you add metadata to these nodes" do
+    context "here's an experimental hack to add metadata to the following field" do
       Sandbox_2 = Sandboxer.spawn
-      it "like so (for now)" do
+      it "like so" do
         Sandbox_2.with self
         module Sandbox_2
           class Foo
-            MetaHell::Fields::From.methods do
-              FIELDS_.set :next_field, :desc, -> y { y << "ok." }
+            MetaHell::Fields::From.methods :use_o_DSL do
+
+              o :desc, "a", "b"
+              o :desc, "c"
+              def foo
+              end
+
+              o :desc, -> y { y << "ok." }
               def bar
               end
             end
           end
 
-          Foo::FIELDS_[:bar].desc_p[ a = [ ] ]
+          Foo::FIELDS_[:foo].desc_p[ a = [] ]
+          a.should eql( %w( a b c ) )
+
+          Foo::FIELDS_[:bar].desc_p[ a = [] ]
           a.first.should eql( "ok." )
         end
       end

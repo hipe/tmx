@@ -23,16 +23,18 @@ module Skylab::MetaHell
       def initialize x_a, client
         @absorber_a = nil
         @client_class = client
+        @ext_mod_a = nil
         @field_box_const = CONST_
         x_a.length.nonzero? and prs_iambic_unobtrusive_fully x_a
       end
       def initialize_copy otr
         @absorber_a = otr.absorber_a.dup
+        @ext_mod_a = (( a = otr.ext_mod_a )) && a.dup
         @field_box_const = otr.field_box_const
         # when we dup, client_class and definee_module are not duped
         nil
       end
-      attr_reader :absorber_a, :field_box_const
+      attr_reader :absorber_a, :ext_mod_a, :field_box_const
       attr_accessor :client_class
       attr_accessor :definee_module # xx
       def frozen * x_a
@@ -57,7 +59,7 @@ module Skylab::MetaHell
       end
     private
       def prs_iambic_unobtrusive_fully x_a
-        @x_a = x_a ; @d = 0 ; @len = x_a.length - 1
+        @x_a = x_a ; @d = 0 ; @len = x_a.length
         while @d < @len
           d, abs = Absorber_Method_.unobtrusive_passive_scan @d, @x_a
           if d
@@ -75,7 +77,8 @@ module Skylab::MetaHell
       OP_H__ = {
         client_class: :prs_client_cls,
         definee_module: :prs_definee_mod,
-        field_box_const: :prs_fld_bx_const
+        field_box_const: :prs_fld_bx_const,
+        use_o_DSL: :prs_o_DSL
       }.freeze
       def prs_client_cls
         @client_class = @x_a.fetch @d ; @d += 1 ; nil
@@ -86,30 +89,64 @@ module Skylab::MetaHell
       def prs_fld_bx_const
         @field_box_const = @x_a.fetch @d ; @d += 1 ; nil
       end
+      def prs_o_DSL
+        ( @ext_mod_a ||= [] ) << Experimental_DSL__ ; nil
+      end
     public
       def flush
-        tch_field_box_method
-        Touch_facet_muxer__[ @client_class ]
         @absorber_a and @absorber_a.each do |ab|
           ab.apply_to_client @client_class
         end
+        Touch_facet_muxer__[ @client_class ]
+        @ext_mod_a and aply_ext_mod_a
         @client_class.send :include, Client_Methods
-        Touch_const_with_dupe_for___[ -> _ { Box__.new },
-          @field_box_const, @client_class ]
+        tch_field_box_method
+        tch_field_box
       end
     private
+      def aply_ext_mod_a
+        @ext_mod_a.each do |mod|
+          @client_class.extend mod
+        end ; nil
+      end
       def tch_field_box_method
         fld_bx_const = @field_box_const
         Method_Touch__.touch :field_box, -> do
           self.class.const_get fld_bx_const
         end, @client_class ; nil
       end
+      def tch_field_box
+        if @client_class.const_defined? @field_box_const
+          if @client_class.const_defined? @field_box_const, false
+            @client_class.const_get @field_box_const
+          else
+            _box = @client_class.const_get( @field_box_const ).dup
+            @client_class.const_set @field_box_const, _box
+          end
+        else
+          @client_class.const_set @field_box_const, bld_fld_box
+        end
+      end
+      def bld_fld_box
+        box = MetaHell_::Library_::Basic::Box.new
+        box._h.default_proc = -> h, k do
+          raise ::ArgumentError, say_xtra( h.keys, k )
+        end ; box
+      end
+      def say_xtra a, x
+        "unrecognized keyword #{ MetaHell_::Lib_::Strange[ x ] }#{
+         } - did you mean #{ Lev__[ a, x ] }?"
+      end
+      Lev__ = -> a, x do
+        MetaHell_::Library_::Headless::NLP::EN::Levenshtein::
+          Or_with_closest_n_items_to_item.curry[ 3, a, x ]
+      end
     end
 
     # ~ #curry-friendly support procs
 
     Touch_const_with_dupe_for___ = -> p, c, mod do
-      FUN::Touch_constant_[ false, -> _ do
+      MetaHell_::FUN::Touch_constant_[ false, -> _ do
         if mod.const_defined? c
           mod.const_get( c ).dupe_for mod
         else
@@ -379,53 +416,18 @@ module Skylab::MetaHell
       end
     end
 
-    # ~ "foundation" classes ~
-
-    class Box__ < MetaHell_::Library_::Basic::Box
-      def initialize
-        @field_attributes = nil
-        super()
-        @h.default_proc = -> h, k do
-          raise ::ArgumentError, "unrecognized keyword #{ FUN::Parse::
-            Strange_[ k ] } - did you mean #{ Lev__[ @a, k ] }?"
+    module Experimental_DSL__
+    private
+      def o * x_a
+        (( @fld_attrs_x_a_a ||= [] )) << x_a ; nil
+      end
+    public
+      attr_reader :fld_attrs_x_a_a
+      def release_any_next_fld_attrs
+        if (( x = fld_attrs_x_a_a ))
+          @fld_attrs_x_a_a = nil ; x
         end
       end
-      Lev__ = -> a, x do
-        MetaHell_::Library_::Headless::NLP::EN::Levenshtein::
-          Or_with_closest_n_items_to_item.curry[ 3, a, x ]
-      end
-      def dupe
-        a = @a ; h = @h
-        self.class.allocate.instance_exec  do
-          @field_attributes = nil
-          @a = a.dup ; @h = h.dup
-          self
-        end
-      end
-      def dupe_for _
-        dupe
-      end
-      def set next_field, *a
-        :next_field == next_field or raise ::ArgumentError, 'no'
-        @field_attributes and fail "sanity - clobber field attributes?"
-        @field_attributes = Field_Attributes__[ a ]
-        nil
-      end
-      def delete_field_attributes
-        if (( fa = @field_attributes ))
-          @field_attributes = nil
-          fa
-        end
-      end
-      def has_field_attributes
-        @field_attributes
-      end
-    end
-    #
-    class Field_Attributes__
-      MetaHell_::Basic_Fields.with :client, self, :struct_like,
-        :absorber, :initialize,
-        :field_i_a, [ :desc ]
     end
 
     class Aspect_  # (apprentice/redux of Basic::Field)
@@ -439,7 +441,16 @@ module Skylab::MetaHell
       attr_reader :method_i, :ivar, :as_slug
       alias_method :local_normal_name, :method_i
       attr_reader :is_required  # where available
-      attr_accessor :desc_p
+
+      def x_a_a_full x_a_a  # #experimental
+        x_a_a.each do |x_a|
+          @x_a = x_a
+          begin
+            send :"prs_#{ x_a.shift }"
+          end while x_a.length.nonzero?
+        end
+        @x_a = nil
+      end
     end
 
     # ~ facet muxer (e.g to implement a required fields check hook)

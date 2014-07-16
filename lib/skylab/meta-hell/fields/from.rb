@@ -74,20 +74,28 @@ module Skylab::MetaHell
 
         def execute
           prcss_iambic
+          if @client_class.respond_to? :release_any_next_fld_attrs
+            p = -> fld do
+              x_a_a = @client_class.release_any_next_fld_attrs
+              x_a_a and fld.x_a_a_full x_a_a ; nil
+            end
+          end
           Method_Added_Muxer[ @definee ].in_block_each_method_added @p do |m|
-            @box.has_field_attributes and p = flsh_field_attrs( @box )
             @box.add m, Field_From_Method__.new( m, p )
           end ; nil
         end
       private
         def prcss_iambic
-          case @i_a.length
-          when  0
+          if @i_a.length.zero?
             shell = DEFAULT_SHELL__.dup
-          when  1
-            shell = MACRO_H__.fetch( @i_a.first ).dup
           else
-            shell = Fields.start_shell.with_iambic_unobtrusive_fully @i_a
+            if 1 == @i_a.length
+              shell = MACRO_H__[ @i_a.first ]
+              shell &&= shell.dup
+            end
+            if ! shell
+              shell = Fields.start_shell.with_iambic_unobtrusive_fully @i_a
+            end
           end
           if ! shell.client_class
             shell.client_class = eval 'self', @p.binding
@@ -95,24 +103,30 @@ module Skylab::MetaHell
           if ! shell.definee_module
             shell.definee_module = shell.client_class
           end
+          @client_class = shell.client_class
           @definee = shell.definee_module
           @box = shell.flush ; nil
         end
-        def flsh_field_attrs box
-          fa = box.delete_field_attributes
-          -> fld do
-            if (( x = fa.desc ))
-              fld.desc_p = x.respond_to?( :call ) ? x : -> y { y << x }
-            end
-          end
-        end
 
-        class Field_From_Method__ < MetaHell_::Lib_::Aspect[]
+        class Field_From_Method__ < Aspect_
           def absorb_into_client_iambic client, x_a
             client.send @method_i, x_a ; nil
           end
           def accept_into_client_scan client, scan
             client.send @method_i, scan ; nil
+          end
+          attr_reader :desc_p
+        private
+          def prs_desc
+            if @x_a.first.respond_to? :call
+              @desc_p = @x_a.shift
+            else
+              @desc_a ||= []
+              @desc_p = -> y { @desc_a.each { |s| y << s } ; nil }
+              begin
+                @desc_a << @x_a.shift.freeze
+              end while @x_a.first.respond_to?( :ascii_only? )
+            end ; nil
           end
         end
 
@@ -126,19 +140,27 @@ module Skylab::MetaHell
     end
 
 
-
-    # an extreme hack exists that lets you add metadata to these nodes
-    # like so (for now)
+    # here's an experimental hack to add metadata to the following field
+    # like so
     #
     #     class Foo
-    #       MetaHell::Fields::From.methods do
-    #         FIELDS_.set :next_field, :desc, -> y { y << "ok." }
+    #       MetaHell::Fields::From.methods :use_o_DSL do
+    #
+    #         o :desc, "a", "b"
+    #         o :desc, "c"
+    #         def foo
+    #         end
+    #
+    #         o :desc, -> y { y << "ok." }
     #         def bar
     #         end
     #       end
     #     end
     #
-    #     Foo::FIELDS_[:bar].desc_p[ a = [ ] ]
+    #     Foo::FIELDS_[:foo].desc_p[ a = [] ]
+    #     a  # => %w( a b c )
+    #
+    #     Foo::FIELDS_[:bar].desc_p[ a = [] ]
     #     a.first  # => "ok."
 
   end
