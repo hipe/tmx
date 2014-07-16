@@ -115,6 +115,9 @@ module Skylab::MetaHell
           def accept_into_client_scan client, scan
             client.send @method_i, scan ; nil
           end
+          def notify_client_of_scan client, _scan_
+            client.send @method_i
+          end
           attr_reader :desc_p
         private
           def prs_desc

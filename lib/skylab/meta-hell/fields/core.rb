@@ -312,10 +312,14 @@ module Skylab::MetaHell
         else
           :build_peaceful_parse_adapter_for_iambic
         end
-        @fld_method_i = if arg && dest
-          :absorb_into_client_iambic
+        @fld_method_i = if arg
+          if dest
+            :absorb_into_client_iambic
+          else
+            :accept_into_client_scan
+          end
         else
-          :accept_into_client_scan
+          :notify_client_of_scan
         end
       end
       def for_client client
@@ -343,11 +347,15 @@ module Skylab::MetaHell
     private
       def prepare x_a
         @scan = @client.send @adapter_method_i, x_a
-        @field_arg_a = if @do_arg && @do_destructive
-          [ x_a ]
+        @field_arg_a = if @do_arg
+          if @do_destructive
+            [ x_a ]
+          else
+            [ @scan ]
+          end
         else
           [ @scan ]
-        end ; nil
+        end
       end
     end
 

@@ -202,6 +202,7 @@ module Skylab::MetaHell
           p.respond_to?( :call ) or fail "sanity - #{ p.class }"
           client.instance_variable_set @ivar, p ; nil
         end
+        alias_method :notify_client_of_scan, :accept_into_client_scan
       end
 
       class Proc__ < Procesque__
@@ -273,12 +274,13 @@ module Skylab::MetaHell
           client.send :attr_reader, @method_i
         end
         def absorb_into_client_iambic client, x_a
-          x = x_a.shift
-          client.instance_variable_set @ivar, x ; nil
+          client.instance_variable_set @ivar, x_a.shift ; nil
         end
         def accept_into_client_scan client, scan
-          x = scan.gets_one
-          client.instance_variable_set @ivar, x ; nil
+          client.instance_variable_set @ivar, scan.gets_one ; nil
+        end
+        def notify_client_of_scan client, scan
+          client.instance_variable_set @ivar, scan.gets_one ; nil
         end
       end
 

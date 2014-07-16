@@ -3,8 +3,8 @@ module Skylab::SubTree
   class API::Actions::My_Tree::Traversal_
 
     Lib_::Contoured_fields[ self,
-      :private, :argful, :destructive, :absorber, :absrb_iambic_fully,
-      :globbing, :argful, :destructive, :absorber, :with,
+      :globbing, :absorber, :with,
+      :private, :absorber, :absrb_iambic_fully,
       :field, :sep,
       :field, :do_verbose_lines,
       :field, :info_p ]
@@ -12,8 +12,8 @@ module Skylab::SubTree
   private
 
     Lib_::Fields_from_methods[ -> do
-      def out_p a
-        p = a.shift
+      def out_p
+        p = @iambic_scan.gets_one
         @out_p = case p.arity
         when 3 ; -> row_a do                   # glyphs, slug, extra
           node = row_a.pop
