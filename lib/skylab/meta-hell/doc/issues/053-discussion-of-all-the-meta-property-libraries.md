@@ -1,6 +1,7 @@
 # discussion of all the meta-property libraries :[#053]
 
-(EDIT: we now refer to these as :#parameter-library'ies. portions of this
+(EDIT: we refer to these variously as "field libraries" or
+:#parameter-library'ies. portions of this
 document have been re-formatted so that the most recent items are at the top
 (that is, reverse-chronological order); an order it is recommened we follow
 for future such documents.)
@@ -8,12 +9,12 @@ for future such documents.)
 first, a quick history (most recent at top):
 
   |  Name                                    |  Identifier |  Approx. Start  |
-  |  the [gv] isomorphic interface parameter |  [#gv-031]  |  2014-01-20     |
-  |  the [hl] API parameter library          |  [#hl-030]  |  2013-12-19     |
+  |  the [gv] isomorphic interface parameter |  [#gv-030]  |  2014-01-20     |
+  |  the [hl] API parameter library          |  [#hl-130]  |  2013-12-19     |
   |  the [ta] "config shell" (working title) |  [#ta-081]  |  2013-10-11     |
   |  the [ba] field                          |  [#ba-003]  |  2013-04-11     |
   |  the [hl] parameter                      |  [#hl-009]  |  2012-08-29     |
-  |  [mh] formal attributes                  |  [#024]     |  2011-09-11     |
+  |  the [mh] formal attributes              |  [#024]     |  2011-09-11     |
 
 annotation (most recent at top, start at bottom for a narrative):
   • [gv]'s is a clean rewrite of the below meant to be rbx-compatible
@@ -37,7 +38,7 @@ features:
   • a flat iambic interface for its DSL, one that starts to approach
     the [#mh-047] #item-grammar but simplifies by needing no prepositional
     phrases: our grammar prefers simple flag adjectives to key-value pair
-    predicates, arguing that the formal can often replace the latter to make
+    predicates, arguing that the former can often replace the latter to make
     for more readable specifications. (for example, ":argument_arity,
     ":one_or_more" can be replaced with ":list".)
 

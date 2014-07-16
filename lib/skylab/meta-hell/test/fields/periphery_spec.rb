@@ -19,7 +19,8 @@ module Skylab::MetaHell::TestSupport::Fields::Periphery
         module Foo
           Subject[ self, :weirdness ]
         end
-      end.should raise_error( ::KeyError, /key not found: :weirdness/ )
+      end.should raise_error ::ArgumentError,
+        /\bunexpected token near 'weirdness'/
     end
 
     it "makes a non-memoized proc" do

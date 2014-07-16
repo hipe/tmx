@@ -1,5 +1,11 @@
 # the field narrative :[#003]
 
+## introduction to basic fields
+
+see [#mh-053] the comprehensive list of field libraries to see how this
+fits in to the broader history of this kind of library.
+
+
 ## :#storypoint-1313
 
 i have no idea what happened here - it's as if we once used doc-test to

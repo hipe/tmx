@@ -10,7 +10,7 @@ module Skylab::Face
           @keys_provided_set = @param_h = nil
           @proc = p ; @mod = Module.new
           Lib_::Field_box_enhance[ @mod, -> do
-            field_class_instance_methods -> { API::Params_::Param_IMs_ }
+            field_class_instance_methods -> { API::Params_::Param_IMs }
             meta_fields( * API::Params_::METAFIELD_A_A_ )
             fields( * p.parameters.map do |opt_req_rest, i|
               [ i, * H_.fetch( opt_req_rest ) ]

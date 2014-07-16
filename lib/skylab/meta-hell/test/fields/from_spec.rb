@@ -24,7 +24,7 @@ module Skylab::MetaHell::TestSupport::Fields::From
             end
 
             MetaHell::Fields::From.methods(
-              :argful, :overriding, :globbing, :absorber, :initialize
+              :overriding, :argful, :destructive, :globbing, :absorber, :initialize
             ) do
               def two a
                 @two_value = a.shift

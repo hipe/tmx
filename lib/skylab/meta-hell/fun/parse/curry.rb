@@ -274,10 +274,9 @@ module Skylab::MetaHell
         end
       end
 
-    MetaHell_::Fields::From.methods( :argful,
-      :absorber, :absrb_iambic_fully,
-      :passive, :absorber, :absorb_iambic_passively,  # until [#067]
-      :globbing, :absorber, :with
+    MetaHell_::Fields::From.methods(
+      :argful, :destructive, :absorber, :absrb_iambic_fully,
+      :argful, :destructive, :globbing, :absorber, :with
     ) do  # borrow 1 indent
 
       def algorithm a
@@ -354,7 +353,7 @@ module Skylab::MetaHell
       end
       def field a
         dflt = ( @default_field if instance_variable_defined? :@default_field )
-        field = Resolve_field_[ a ]
+        field = Resolve_field__[ a ]
         set_last_x field
         dflt and field.merge_defaults! dflt
         if field.looks_like_default?
@@ -366,7 +365,7 @@ module Skylab::MetaHell
           end ).add_field field
         end
       end
-      Resolve_field_ = -> a do
+      Resolve_field__ = -> a do
         x = a.fetch 0  # DID NOT SHIFT YET
         if x.respond_to? :id2name
           field = Parse::Field_.new
@@ -397,7 +396,9 @@ module Skylab::MetaHell
           mk[ a ]
         end
       end
-    MetaHell_::Fields::From.methods :argful do
+    MetaHell_::Fields::From.methods(
+      :argful, :destructive, :passive, :absorber, :absorb_iambic_passively
+    ) do
       def monikate a
         @monikate_p = a.fetch 0 ; a.shift
         nil

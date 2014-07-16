@@ -53,20 +53,20 @@ module Skylab::MetaHell
         def with_iambic_absorbed_fully x_a
           @d = 0 ; @x_a = x_a ; len = x_a.length
           begin
-            send OP_H__.fetch @x_a.fetch @d
+            m_i = OP_H__[ @x_a.fetch @d ]
+            if m_i
+              send m_i
+            else
+              parse_absorber
+            end
           end while @d < len
           self
         end
         #
-        OP_H__ = {  # near [#064]
-          absorber: :parse_absorber,
+        OP_H__ = {
           field: :parse_field,
-          globbing: :parse_absorber,
           memoized: :parse_memoized,
           method: :parse_method,
-          overriding: :parse_absorber,
-          passive: :parse_absorber,
-          private: :parse_absorber,
           proc: :parse_proc,
           required: :parse_required
         }.freeze
@@ -132,19 +132,18 @@ module Skylab::MetaHell
         end
 
         def parse_absorber
-          d, item = MetaHell_::Fields::Absorber_Method_.
-            unobtrusive_passive_scan @d - 1, @x_a
-          d or raise ::ArgumentError, "syntax mixmatch near '#{ @x_a[ @d ] }'"
+          d, item = Fields::Absorber_Method_.unobtrusive_passive_scan @d, @x_a
+          d or raise ::ArgumentError, "unexpected token near '#{ @x_a[ @d ] }'"
           item.apply_to_client @client
-          @d = d + 1 ; nil
+          @d = d ; nil
         end
 
         def parse_proc
-          accept_name_and_add_proc_field.flush @client ; nil
+          accept_name_and_add_proc_field.flush_to_client @client ; nil
         end
 
         def parse_method
-          accept_name_and_add_method_field.flush @client ; nil
+          accept_name_and_add_method_field.flush_to_client @client ; nil
         end
 
         def parse_memoized
@@ -162,13 +161,13 @@ module Skylab::MetaHell
         def parse_memoized_proc
           accept_name_and_add_proc_field do |fld|
             fld.is_memoized = true
-          end.flush @client ; nil
+          end.flush_to_client @client ; nil
         end
 
         def parse_memoized_method
           accept_name_and_add_method_field do |fld|
             fld.is_memoized = true
-          end.flush @client ; nil
+          end.flush_to_client @client ; nil
         end
 
         def accept_name_and_add_proc_field &blk
@@ -198,15 +197,15 @@ module Skylab::MetaHell
           super
         end
         attr_accessor :is_memoized
-        def absorb_into_client_iambic client, a
-          prock = a.fetch( 0 ) ; a.shift
-          prock.respond_to? :call or fail "sanity - #{ prock.class }"
-          client.instance_variable_set @ivar, prock ; nil
+        def accept_into_client_scan client, scan
+          p = scan.gets_one
+          p.respond_to?( :call ) or fail "sanity - #{ p.class }"
+          client.instance_variable_set @ivar, p ; nil
         end
       end
 
       class Proc__ < Procesque__
-        def flush client
+        def flush_to_client client
           ivar = @ivar
           if @is_memoized
             did = value = nil
@@ -225,7 +224,7 @@ module Skylab::MetaHell
       end
 
       class Method__ < Procesque__
-        def flush client
+        def flush_to_client client
           ivar = @ivar
           if @is_memoized
             did = value = nil
@@ -270,11 +269,15 @@ module Skylab::MetaHell
 
       class Field__ < Aspect_
         attr_writer :is_required  # not pushed up yet
-        def flush client
+        def flush_to_client client
           client.send :attr_reader, @method_i
         end
-        def absorb_into_client_iambic client, a
-          x = a.fetch 0 ; a.shift
+        def absorb_into_client_iambic client, x_a
+          x = x_a.shift
+          client.instance_variable_set @ivar, x ; nil
+        end
+        def accept_into_client_scan client, scan
+          x = scan.gets_one
           client.instance_variable_set @ivar, x ; nil
         end
       end
@@ -288,12 +291,12 @@ module Skylab::MetaHell
           field: :parse_required_field }.freeze
 
         def parse_field
-          take_name_and_add_field.flush @client ; nil
+          take_name_and_add_field.flush_to_client @client ; nil
         end
         def parse_required_field
           take_name_and_add_field do |fld|
             fld.is_required = true
-          end.flush @client ; nil
+          end.flush_to_client @client ; nil
         end
         def take_name_and_add_field &blk
           accept_name_and_add_field_with_class_and_block Field__, blk

@@ -154,7 +154,9 @@ module Skylab::Face
       @max_a.length
     end
 
-    Lib_::Fields_from_methods[ :absorber, :absorb_iambic_fully, -> do
+    Lib_::Fields_from_methods[
+      :argful, :destructive, :absorber, :absorb_iambic_fully,
+    -> do
       def read_rows_from a
         @read_rows_from = a.shift  # special case - allow no arg at end!
         nil
@@ -182,7 +184,7 @@ module Skylab::Face
     Lib_::Fields_from_methods[ -> do
       def field a
         bx = (( @field_box ||= Lib_::Box[] ))
-        fld = Field_.new a, bx.length
+        fld = Field__.new a, bx.length
         bx.add fld.name_i, fld
         @do_show_header.nil? and @do_show_header = true
         @header_cel_a = nil
@@ -226,7 +228,7 @@ module Skylab::Face
     #     HERE
     #     str # => exp
 
-    class Field_
+    class Field__
       def initialize a, idx
         @name_i = nil
         if a.first.respond_to? :ascii_only?
@@ -241,7 +243,9 @@ module Skylab::Face
       attr_reader :label_s, :name_i, :align_i
 
       private
-      Lib_::Fields_from_methods[ -> do
+      Lib_::Fields_from_methods[
+        :argful, :destructive, :passive, :absorber, :absorb_iambic_passively,
+      -> do
         def left _
           @align_i = :left ; nil
         end

@@ -4,79 +4,105 @@ module Skylab::MetaHell
 
     # ~ payload as narrative
 
-    def self.box_for_client * x_a, client
-      self::Box_for.iambic_and_client x_a, client
+    class << self
+      def box_for_client * x_a, client
+        Box_for.iambic_and_client x_a, client
+      end
+      def start_shell
+        Box_for.new EMPTY_A_, nil
+      end
     end
 
     class Box_for
-      class << self
-        private :new
-      end
-      def self.client * x_a, client
-        new( x_a, client ).execute
+      def self.client client
+        new( EMPTY_A_, client ).flush
       end
       def self.iambic_and_client x_a, client
-        new( x_a, client ).execute
+        new( x_a, client ).flush
       end
       def initialize x_a, client
-        @client = client
-        @absorber_a = if x_a.length.nonzero?
-          Absorbers_.new( x_a ).to_a
-        end
-        @field_box_const ||= CONST_
+        @absorber_a = nil
+        @client_class = client
+        @field_box_const = CONST_
+        x_a.length.nonzero? and prs_iambic_unobtrusive_fully x_a
       end
-      def execute
+      def initialize_copy otr
+        @absorber_a = otr.absorber_a.dup
+        @field_box_const = otr.field_box_const
+        # when we dup, client_class and definee_module are not duped
+        nil
+      end
+      attr_reader :absorber_a, :field_box_const
+      attr_accessor :client_class
+      attr_accessor :definee_module # xx
+      def frozen * x_a
+        prs_iambic_unobtrusive_fully x_a
+        freeze
+      end
+      def freeze
+        @absorber_a.freeze
+        super
+      end
+      def with_client client
+        @client_class = client
+        self
+      end
+      def with * x_a
+        prs_iambic_unobtrusive_fully x_a
+        self
+      end
+      def with_iambic_unobtrusive_fully x_a
+        prs_iambic_unobtrusive_fully x_a
+        self
+      end
+    private
+      def prs_iambic_unobtrusive_fully x_a
+        @x_a = x_a ; @d = 0 ; @len = x_a.length - 1
+        while @d < @len
+          d, abs = Absorber_Method_.unobtrusive_passive_scan @d, @x_a
+          if d
+            @d = d ; ( @absorber_a ||= [] ).push abs
+            next
+          end
+          scn_some_other
+        end ; nil
+      end
+      def scn_some_other
+        m = OP_H__.fetch @x_a.fetch @d
+        @d += 1
+        send m
+      end
+      OP_H__ = {
+        client_class: :prs_client_cls,
+        definee_module: :prs_definee_mod,
+        field_box_const: :prs_fld_bx_const
+      }.freeze
+      def prs_client_cls
+        @client_class = @x_a.fetch @d ; @d += 1 ; nil
+      end
+      def prs_definee_mod
+        @definee_module = @x_a.fetch @d ; @d += 1 ; nil
+      end
+      def prs_fld_bx_const
+        @field_box_const = @x_a.fetch @d ; @d += 1 ; nil
+      end
+    public
+      def flush
         tch_field_box_method
+        Touch_facet_muxer__[ @client_class ]
         @absorber_a and @absorber_a.each do |ab|
-          ab.apply_to_client @client
+          ab.apply_to_client @client_class
         end
-
-        Touch_post_absorb__[ @client ]
-        Touch_facet_muxer__[ @client ]
-
+        @client_class.send :include, Client_Methods
         Touch_const_with_dupe_for___[ -> _ { Box__.new },
-          @field_box_const, @client ]
+          @field_box_const, @client_class ]
       end
     private
       def tch_field_box_method
-        field_box_const = @field_box_const
+        fld_bx_const = @field_box_const
         Method_Touch__.touch :field_box, -> do
-          self.class.const_get field_box_const
-        end, @client
-      end
-    end
-
-    class Absorbers_
-      def initialize x_a
-        @x_a = x_a
-      end
-      def to_a
-        reset ; scanner ; a = []
-        while (( x = @scanner.gets )) ; a.push x ; end
-        is_at_end or raise ::ArgumentError, say_extra
-        a
-      end
-    private
-      def reset
-        @d = -1 ; @last = @x_a.length - 1
-      end
-      def is_at_end
-        @d == @last
-      end
-      def say_extra
-        "unparsed: '#{ @x_a[ @d + 1 ] }'"
-      end
-      def scanner
-        @scanner ||= bld_scanner
-      end
-      def bld_scanner
-        MetaHell_::Lib_::Scn[].new do
-          new_d, item = Absorber_Method_.unobtrusive_passive_scan @d, @x_a
-          if new_d
-            @d = new_d
-            item
-          end
-        end
+          self.class.const_get fld_bx_const
+        end, @client_class ; nil
       end
     end
 
@@ -130,7 +156,7 @@ module Skylab::MetaHell
         if _yes
           p = @p
           @do_chainable and p = Make_chainable__[ p ]
-          client.send :define_method, m, & p
+          client.send :define_method, m, p
           @do_private and client.send :private, m
         end ; nil
       end
@@ -174,12 +200,15 @@ module Skylab::MetaHell
     end
 
     class Absorber_Method_ < Method_Characteristics__  # is [#060]
+
       def self.unobtrusive_passive_scan d, i_a
-        if d < i_a.length - 1 && METHOD_OP_H__.key?( i_a.fetch d + 1 )
+        if METHOD_OP_H__.key? i_a.fetch d
           new.unobtrsv_passive_scan d, i_a
         end
       end
       def initialize
+        @do_argful = false
+        @do_destructive = false
         @do_globbing = false
         @do_passive = false
         super()
@@ -187,23 +216,33 @@ module Skylab::MetaHell
       METHOD_OP_H__ = METHOD_OP_H__.dup
       METHOD_OP_H__.merge!(
         absorber: :prcss_absorber,
+        argful: :prcss_argful,
+        destructive: :prcss_destructive,
         globbing: :prcss_globbing,
         passive: :prcss_passive,
       ).freeze
       def unobtrsv_passive_scan d, i_a
         @d = d ; @i_a = i_a ; @is_done = false
         begin
-          send METHOD_OP_H__.fetch i_a.fetch @d += 1
+          m_i = METHOD_OP_H__.fetch i_a.fetch @d
+          @d += 1
+          send m_i
         end until @is_done
         @method_name or raise ::ArgumentError, "method name required"
-        d = @d ; @i_a = @d = nil
+        @i_a = nil
         @p = rslv_some_absorber_method
-        [ d, self ]
+        [ @d, self ]
       end
     private
       def prcss_absorber
         @is_done = true
-        @method_name = @i_a.fetch @d += 1 ; nil
+        @method_name = @i_a.fetch @d ; @d += 1 ; nil
+      end
+      def prcss_argful
+        @do_argful = true ; nil
+      end
+      def prcss_destructive
+        @do_destructive = true ; nil
       end
       def prcss_globbing
         @do_globbing = true ; nil
@@ -215,55 +254,129 @@ module Skylab::MetaHell
 
     private
       def rslv_some_absorber_method
-        if @do_passive
-          ABSORB_IAMBIC_PASSIVELY_METHOD__
-        elsif @do_globbing
-          GLOBBING_ABSORB_METHOD__
+        parse = Parse__.new @do_argful, @do_destructive, @do_passive
+        if @do_globbing
+          -> * x_a do
+            parse.for_client( self ).parse_x_a_from_beginning x_a
+          end
         else
-          ABSORB_IAMBIC_FULLY_METHOD__
+          -> x_a do
+            parse.for_client( self ).parse_x_a_from_beginning x_a
+          end
         end
       end
     end
 
-    # ~ implementations of absorber methods
-
-    GLOBBING_ABSORB_METHOD__ = -> * x_a do
-      fb = field_box
-      while x_a.length.nonzero?
-        fld = fb[ x_a.first ]  # custom default proc that raises custom ex.
-        x_a.shift
-        fld.absorb_into_client_iambic self, x_a
+    class Parse__
+      def initialize arg, dest, passive
+        @do_arg = arg ; @do_destructive = dest ; @do_passive = passive
+        @adapter_method_i = if dest
+          :build_destructive_parse_adapter_for_iambic
+        else
+          :build_peaceful_parse_adapter_for_iambic
+        end
+        @fld_method_i = if arg && dest
+          :absorb_into_client_iambic
+        else
+          :accept_into_client_scan
+        end
       end
-      post_absorb_notify
+      def for_client client
+        dup.with_client client
+      end
+      def with_client client
+        @client = client
+        self
+      end
+      def parse_x_a_from_beginning x_a
+        prepare x_a
+        fld = true ; fb = @client.field_box
+        while @scan.unparsed_exist
+          fld = fb.fetch( @scan.first_unparsed_arg ) { }
+          fld or break
+          @scan.advance_one
+          fld.send @fld_method_i, @client, * @field_arg_a
+        end
+        if fld || @do_passive
+          @client.post_absorb_iambic_args_notify
+        else
+          @client.unexpected_unparsable_iambic_args_were_encountered
+        end
+      end
+    private
+      def prepare x_a
+        @scan = @client.send @adapter_method_i, x_a
+        @field_arg_a = if @do_arg && @do_destructive
+          [ x_a ]
+        else
+          [ @scan ]
+        end ; nil
+      end
     end
 
-    ABSORB_IAMBIC_FULLY_METHOD__ = -> x_a do
-      absorb_iambic_passively x_a
-      x_a.length.nonzero? and field_box[ x_a.first ]
+    module Client_Methods  # see #client-methods
+      def build_destructive_parse_adapter_for_iambic x_a
+        @x_a = x_a
+        @iambic_scan = Destructive_Parse_Adapter__.new x_a
+      end
+      def build_peaceful_parse_adapter_for_iambic x_a
+        @x_a = x_a ; @d = 0 ; @x_a_length = x_a.length
+        @iambic_scan = Peaceful_Parse_Adapter__.new self
+      end
+      def unparsed_peaceful_iambic_exists
+        @d < @x_a_length
+      end
+      def gets_one_peaceful_iambic
+        x = @x_a.fetch @d ; @d += 1 ; x
+      end
+      def first_unparsed_peaceful_iambic
+        @x_a.fetch @d
+      end
+      def advance_one_peaceful_iambic
+        @d += 1 ; nil
+      end
+      def unexpected_unparsable_iambic_args_were_encountered
+        field_box[ @iambic_scan.first_unparsed_arg ]
+      end
+      def post_absorb_iambic_args_notify
+        self.class.facet_muxer.notify :post_absorb, self ; nil
+      end
     end
 
-    ABSORB_IAMBIC_PASSIVELY_METHOD__ = -> x_a do
-      box = field_box #  ; @last_x = nil
-      while x_a.length.nonzero?
-        fld = box.fetch x_a.first do end
-        fld or break
-        x_a.shift
-        # m_i = fld.local_normal_name
-        # @last_x = m_i  # #todo
-        # send m_i, x_a  # change at [#063]
-        fld.absorb_into_client_iambic self, x_a
-      end ; nil
+    class Peaceful_Parse_Adapter__
+      def initialize client
+        @client = client
+      end
+      def unparsed_exist
+        @client.unparsed_peaceful_iambic_exists
+      end
+      def gets_one
+        @client.gets_one_peaceful_iambic
+      end
+      def first_unparsed_arg
+        @client.first_unparsed_peaceful_iambic
+      end
+      def advance_one
+        @client.advance_one_peaceful_iambic
+      end
     end
 
-    PROCESS_IAMBIC_PASSIVELY_METHOD__ = -> do
-      self._NOT_USED_YET  # #todo
-      fb = field_box
-      while @x_a.length.nonzero?
-        fld = fb.fetch @x_a.first do end
-        fld or break
-        @x_a.shift
-        send fld.local_normal_name
-      end ; nil
+    class Destructive_Parse_Adapter__
+      def initialize x_a
+        @x_a = x_a
+      end
+      def unparsed_exist
+        @x_a.length.nonzero?
+      end
+      def gets_one
+        x = @x_a.fetch 0 ; @x_a[ 0, 1 ] = EMPTY_A_ ; x
+      end
+      def advance_one
+        @x_a[ 0, 1 ] = EMPTY_A_ ; nil
+      end
+      def first_unparsed_arg
+        @x_a.fetch 0
+      end
     end
 
     # ~ "foundation" classes ~
@@ -330,11 +443,6 @@ module Skylab::MetaHell
     end
 
     # ~ facet muxer (e.g to implement a required fields check hook)
-
-    Touch_post_absorb__ = Method_Touch__.curry :private, :post_absorb_notify,
-      -> do
-        self.class.facet_muxer.notify :post_absorb, self ; nil
-      end
 
     FIELD_FACET_MUXER_CONST__ = :FIELD_FACET_MUXER_
 

@@ -117,7 +117,7 @@ module Skylab::Headless
       "unexpected iambic term #{ Headless::FUN::Inspect[ @x_a[ 0 ] ] }"
     end
 
-    module Simple_monadic_iambic_writers
+    module Simple_monadic_iambic_writers  # :[#130].
 
       def self.[] mod, * i_a
         mod.module_exec i_a, & Bundle__

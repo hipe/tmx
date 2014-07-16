@@ -34,6 +34,6 @@
 [#006]       #doc-node developing a pattern language for abstract structures ..
 [#005]       #track-node all String Templating-like nerks
 [#004]       #oarent-node: [#022] IO scanner
-[#003]       #branch-node, field sub-node (#meta-fields)
+[#003]       #branch-node, field sub-node (#meta-fields) ..
 [#002]       #branch-node, list sub-node
 [#001]       #branch-node, tree sub-node

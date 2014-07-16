@@ -142,6 +142,15 @@ module Skylab::MetaHell
       end
     end
 
+    def get_value_scanner
+      d = -1 ; last = @order.length - 1
+      MetaHell_::Lib_::Scn[].new do
+        if d < last
+          @hash.fetch @order.fetch d += 1 or raise "can't scan: false-ish value"
+        end
+      end
+    end
+
     # ~ `fetch` and its derivatives (pre-order-ish)
 
     def fetch key, & else_p  # #storypoint-165

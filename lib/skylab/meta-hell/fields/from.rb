@@ -11,7 +11,7 @@ module Skylab::MetaHell
     #       end
     #
     #       MetaHell::Fields::From.methods(
-    #         :argful, :overriding, :globbing, :absorber, :initialize
+    #         :overriding, :argful, :destructive, :globbing, :absorber, :initialize
     #       ) do
     #         def two a
     #           @two_value = a.shift
@@ -61,86 +61,71 @@ module Skylab::MetaHell
           raise ::ArgumentError, "no."
         end
       end
-    end
 
-    class From::Methods__
+      class Methods__
 
-      def self.iambic_and_block a, blk
-        client = eval 'self', blk.binding
-        new( client, a, blk ).execute
-      end
+        def self.iambic_and_block a, blk
+          new( a, blk ).execute
+        end
 
-      def initialize client, a, p
-        @client = client ; @i_a = a ; @p = p
-      end
+        def initialize a, p
+          @i_a = a ; @p = p
+        end
 
-      def execute
-        parse_modifiers
-        box = MetaHell_::Fields.box_for_client( * bld_modifiers, @client )
-        Method_Added_Muxer[ @client ].in_block_each_method_added @p do |m|
-          if box.has_field_attributes
-            fa = box.delete_field_attributes
-            p = -> fld do
-              if (( x = fa.desc ))
-                fld.desc_p = x.respond_to?( :call ) ? x : -> y { y << x }
-              end
+        def execute
+          prcss_iambic
+          Method_Added_Muxer[ @definee ].in_block_each_method_added @p do |m|
+            @box.has_field_attributes and p = flsh_field_attrs( @box )
+            @box.add m, Field_From_Method__.new( m, p )
+          end ; nil
+        end
+      private
+        def prcss_iambic
+          case @i_a.length
+          when  0
+            shell = DEFAULT_SHELL__.dup
+          when  1
+            shell = MACRO_H__.fetch( @i_a.first ).dup
+          else
+            shell = Fields.start_shell.with_iambic_unobtrusive_fully @i_a
+          end
+          if ! shell.client_class
+            shell.client_class = eval 'self', @p.binding
+          end
+          if ! shell.definee_module
+            shell.definee_module = shell.client_class
+          end
+          @definee = shell.definee_module
+          @box = shell.flush ; nil
+        end
+        def flsh_field_attrs box
+          fa = box.delete_field_attributes
+          -> fld do
+            if (( x = fa.desc ))
+              fld.desc_p = x.respond_to?( :call ) ? x : -> y { y << x }
             end
           end
-          box.add m, Field_From_Method__.new( m, p )
-        end ; nil
-      end
-    private
-      def parse_modifiers
-        @explicit_pass_thru = nil
-        @d = -1 ; last = @i_a.length - 1
-        while @d < last
-          send OP_H__.fetch @i_a.fetch @d += 1
         end
-      end
-      OP_H__ = {
-        absorber: :pass_thru_two,  # EEW [#064]
-        argful: :parse_argful,
-        globbing: :pass_thru_one,
-        overriding: :pass_thru_one,
-        passive: :pass_thru_one
-      }.freeze
 
-      def pass_thru_one
-        pass_thru 1
-      end
-
-      def pass_thru_two
-        pass_thru 2
-      end
-
-      def pass_thru d
-        @explicit_pass_thru ||= []
-        @explicit_pass_thru.concat @i_a[ @d, d ]
-        @d += ( d - 1 ) ; nil
-      end
-
-      def parse_argful
-        # one day use this to knock out [#063]
-      end
-
-      def bld_modifiers
-        if @explicit_pass_thru
-          @explicit_pass_thru
-        else
-          DEFAULT_MODIFIERS__
+        class Field_From_Method__ < MetaHell_::Lib_::Aspect[]
+          def absorb_into_client_iambic client, x_a
+            client.send @method_i, x_a ; nil
+          end
+          def accept_into_client_scan client, scan
+            client.send @method_i, scan ; nil
+          end
         end
-      end
 
-      DEFAULT_MODIFIERS__ = [
-        :absorber, :absorb_iambic_fully,
-        :passive, :absorber, :absorb_iambic_passively ].freeze
+        DEFAULT_SHELL__ = Fields.start_shell.frozen(
+          :argful, :absorber, :absorb_iambic_fully )
 
-      class Field_From_Method__ < MetaHell_::Lib_::Aspect[]
-        def absorb_into_client_iambic client, x_a
-          client.send @method_i, x_a ; nil
-        end
+        MACRO_H__ = {
+          argful: Fields.start_shell.frozen( :overriding, :globbing,
+            :argful, :destructive, :absorber, :initialize ) }
       end
     end
+
+
 
     # an extreme hack exists that lets you add metadata to these nodes
     # like so (for now)

@@ -67,7 +67,9 @@ module Skylab::MetaHell
         nil
       end
 
-    MetaHell_::Fields::From.methods :argful do  # borrow 1 indent
+    MetaHell_::Fields::From.methods(
+      :destructive, :argful, :passive, :absorber, :absorb_iambic_passively
+    ) do  # borrow 1 indent
 
       def monikate a
         @monikate_p = a.shift

@@ -245,7 +245,7 @@ class Skylab::Basic::Field
     end                                  # for both meta fields and meta meta
                                          # fields...
 
-    def absorb_into_client_iambic client, _x_a
+    def absorb_into_client_scan client, _
       client.instance_variable_set as_is_predicate_ivar, true ; nil
     end
 
@@ -326,6 +326,10 @@ class Skylab::Basic::Field
 
     def absorb_into_client_iambic client, x_a
       set_val client, x_a.shift ; nil
+    end
+
+    def absorb_into_client_scan client, scan
+      set_val client, scan.gets_one ; nil
     end
 
     def mutate inst, scn

@@ -3,15 +3,15 @@ module Skylab::SubTree
   class API::Actions::My_Tree::Traversal_
 
     Lib_::Contoured_fields[ self,
-      :private, :absorber, :absrb_iambic_fully,
-      :globbing, :absorber, :with,
+      :private, :argful, :destructive, :absorber, :absrb_iambic_fully,
+      :globbing, :argful, :destructive, :absorber, :with,
       :field, :sep,
       :field, :do_verbose_lines,
       :field, :info_p ]
 
   private
 
-    Lib_::Fields_from_methods[ :argful, -> do
+    Lib_::Fields_from_methods[ -> do
       def out_p a
         p = a.shift
         @out_p = case p.arity
