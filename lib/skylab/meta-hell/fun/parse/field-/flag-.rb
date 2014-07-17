@@ -23,12 +23,6 @@ module Skylab::MetaHell
         @dsc_line_a && @desc_line_a.dup
       end
 
-      def with *a
-        fail 'fix me'  # #todo
-        absorb_iambic_fully a
-        self
-      end
-
       def looks_like_particular_field
         true
       end
@@ -112,29 +106,27 @@ module Skylab::MetaHell
 
     private
 
-      def moniker a  # this is how we override a field defined in parent
+      def moniker  # this is how we override a field defined in parent
         super
-        @i ||= @moniker
-        nil
+        @i ||= @moniker ; nil
       end
 
-    MetaHell_::Fields::From.methods :argful do  # borrow 1 indent
+    MetaHell_::Fields::From.methods do  # borrow 1 indent
 
-      def predicate a
-        @predicates.push a.fetch( 0 ) ; a.shift
-        nil
+      def predicate
+        @predicates.push iambic_property ; nil
       end
 
-      def short a
-        ivar_mutex :@short_s, a
+      def short
+        iambic_property_set_only_once :@short_s
       end
 
-      def long a
-        ivar_mutex :@long_s, a
+      def long
+        iambic_property_set_only_once :@long_s
       end
 
-      def fuzzy_min a
-        ivar_mutex :@fuzzy_min_d, a
+      def fuzzy_min
+        iambic_property_set_only_once :@fuzzy_min_d
       end
 
     end  # (pay one back)

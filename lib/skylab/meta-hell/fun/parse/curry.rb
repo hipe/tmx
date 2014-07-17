@@ -37,9 +37,8 @@ module Skylab::MetaHell
       end, :Parse_Value_ ]
 
       def curry
-        -> *a do
-          p = @parse.dupe
-          p.curry_notify a
+        -> * x_a do
+          @parse.dupe.shell_curried_with_iambic x_a
         end
       end
 
@@ -67,7 +66,7 @@ module Skylab::MetaHell
     class Parse__
       def initialize input_a
         @abstract_field_list = @call_p = @constantspace_mod =
-          @do_glob_extra_args = @exhaustion_p = @syntax = nil
+          @default_field = @do_glob_extra_args = @exhaustion_p = @syntax = nil
         @state_mutex =
             MetaHell_::Library_::Basic::Mutex::Write_Once.new :state_mutex
           # state encompasses input and output. various algorithms may handle
@@ -75,67 +74,48 @@ module Skylab::MetaHell
         absrb_iambic_fully input_a ; nil
       end
 
-      # ~ :+[#056] typical base class implementation:
       def dupe
-        otr = self.class.allocate
-        otr.initialize_copy_MINE self
-        otr
+        dup
       end
-      def initialize_copy_MINE otr
-        init_copy( * otr.get_args_for_copy ) ; nil
-      end
-    protected
-      def get_args_for_copy
-        [ @abstract_field_list,
-          @algorithm_p,
-          @call_p,
-          @constantspace_mod,
-          @curry_queue_a,
-          @do_glob_extra_args,
-          @exhaustion_p,
-          @state_mutex,
-          @syntax ]
-      end
-    private
-      def init_copy * x_a
-        @abstract_field_list,
-          @algorithm_p,
-          @call_p,
-          @constantspace_mod,
-          cqa,
-          @do_glob_extra_args,
-          @exhaustion_p,
-          sm,
-          @syntax = x_a
 
-        @curry_queue_a = ( cqa.dup if cqa )
-        @field = nil
-        @state_mutex = sm.dupe ; nil
+      def initialize_copy _otr_  # :+[#056] (ok)
+        # copy-by-reference: @abstract_field_list, @algorithm_p, @call_p,
+        #   @constantspace_mod, @do_glob_extra_args,
+        #   @default_field, @exhaustion_p, @syntax
+
+        # deep-copy:
+        @curry_queue_a &&= @curry_queue_a.dup
+        @state_mutex = @state_mutex.dupe
+
+        # NOT copied at all: parse-state related ivars
+        @d = @iambic_scan = @x_a = @x_a_length = nil
+        @shell = nil  # otherwise you'll have the shell of the earlier parse!
       end
-      # ~
 
     public
       def shell
         @shell ||= Shell_.new self
       end
-      def call_notify a  # assume was already duped. will mutate self, a
+      def call_notify a  # assume was already duped. will mutate self
         instance_exec( *a, & @call_p )  # result!
       end
-      def curry_notify a  # assume was already duped. will mutate self, a
-        op_box = field_box
-        clear_last
-        while a.length.nonzero?
-          x = a.shift
-          fld = op_box.fetch x do
-            raise ::ArgumentError, "unrecognized element: #{ Parse::
-              Strange_[ x ] }#{ any_context }#{
-              }#{ Lev__[ op_box.get_names, x ] if x.respond_to? :id2name }"
+      def shell_curried_with_iambic x_a  # assume was already duped. will mutate self
+        @d = 0 ; prepare_peaceful_parse_for_iambic x_a
+        fld_box = field_box
+        while @d < @x_a_length
+          i = @x_a.fetch @d ; @d += 1
+          fld = fld_box.fetch i do
+            raise ::ArgumentError, say_extra( i )
           end
-          set_last_x x
-          remove_from_curry_queue x
-          send fld.method_i, a
+          remove_from_curry_queue i
+          send fld.method_i
         end
         shell
+      end
+    private
+      def say_extra x
+        "unrecognized element: #{ Parse::Strange_[ x ] }#{ any_context }#{
+          }#{ Lev__[ field_box.get_names, x ] if x.respond_to? :id2name }"
       end
       #
       Lev__ = -> a, x do
@@ -143,21 +123,13 @@ module Skylab::MetaHell
       end
       #
       Lev___ = -> a, x do
-        MetaHell_::Library_::Headless::NLP::EN::Levenshtein::
+        MetaHell_::Lib_::Levenshtein[]::
           Or_with_closest_n_items_to_item[ 3, a, x ]
       end
-      def clear_last
-        @prev_x = @last_x = nil
-      end
-      def set_last_x x
-        @prev_x = @last_x
-        @last_x = x
-        nil
-      end
       def any_context
-        y = [ ]
-        @prev_x and y << say_prev( @prev_x )
-        @last_x and y << say_prev( @last_x )
+        y = []
+        1 < @d and y.push say_prev @x_a.fetch @d - 2
+        0 < @d and y.push say_prev @x_a.fetch @d - 1
         y.length.nonzero? and y * ', '
       end
       def say_prev x
@@ -167,6 +139,7 @@ module Skylab::MetaHell
           x.any_context
         end
       end
+    public
       def normal_token_proc_a
         @abstract_field_list.get_normal_token_proc_a
       end
@@ -210,7 +183,7 @@ module Skylab::MetaHell
     private
       def set_abstract_field_list class_i, a  # #storypoint-215
         fields_being_added_notification
-        @abstract_field_list = Abstract_Field_List_.new class_i, a
+        @abstract_field_list = Abstract_Field_List__.new class_i, a
         nil
       end
       def fields_being_added_notification
@@ -218,11 +191,18 @@ module Skylab::MetaHell
           :argv_scanners
         nil
       end
-      def absorb_along_curry_queue_and_execute *a
-        absorb_along_curry_queue( *a )
+      def absorb_along_curry_queue_and_execute * a
+        absrb_along_curry_queue_list a
         execute
       end
-      def absorb_along_curry_queue *a
+      def absrb_along_curry_queue_and_execute_list a
+        absrb_along_curry_queue_list a
+        execute
+      end
+      def absorb_along_curry_queue * a
+        absrb_along_curry_queue_list a
+      end
+      def absrb_along_curry_queue_list a
         cq = @curry_queue_a
         if cq.length < a.length
           @do_glob_extra_args or raise ::ArgumentError, say_too_many( cq, a )
@@ -250,19 +230,16 @@ module Skylab::MetaHell
           @curry_queue_a -= found
           curry_queue_changed_notification
           true
-        end
-        nil
+        end ; nil
       end
       def curry_queue_changed_notification
-        standardize_call_p!
-        nil
+        standardize_call_p! ; nil
       end
       def standardize_call_p!
-        @call_p = Standard_call_p_
-        nil
+        @call_p = STANDARD_CALL_P__ ; nil
       end
-      Standard_call_p_ = -> *a do
-        absorb_along_curry_queue_and_execute( *a )
+      STANDARD_CALL_P__ = -> *a do
+        absrb_along_curry_queue_and_execute_list a
       end
       def get_syntax_proc
         if @syntax
@@ -275,118 +252,107 @@ module Skylab::MetaHell
       end
 
     MetaHell_::Fields::From.methods(
-      :argful, :destructive, :absorber, :absrb_iambic_fully,
-      :argful, :destructive, :globbing, :absorber, :with
+      :absorber, :absrb_iambic_fully,
+      :globbing, :absorber, :with
     ) do  # borrow 1 indent
 
-      def algorithm a
-        @algorithm_p = a.fetch 0 ; a.shift
-        nil
+      def algorithm
+        @algorithm_p = iambic_property
       end
-      def exhaustion a
-        x = a.fetch 0 ; a.shift
+      def exhaustion
+        x = iambic_property
         @exhaustion_p = false == x ? Exhaustion_when_false_ : x
-        nil
       end
       Exhaustion_when_false_ = -> argv, ai do  # #storypoint-290
-        argv[ 0, ai ] = EMPTY_A_ ; nil
+        argv[ 0, ai ] = EMPTY_A_
       end
-      def uncurried_queue a
-        @curry_queue_a = a.fetch 0 ; a.shift
-        nil
+      def uncurried_queue
+        @curry_queue_a = iambic_property
       end
-      def prepend_to_uncurried_queue a
-        @curry_queue_a.unshift a.fetch 0 ; a.shift
+      def prepend_to_uncurried_queue
+        @curry_queue_a.unshift iambic_property
         curry_queue_changed_notification
-        nil
       end
-      def append_to_uncurried_queue a
-        @curry_queue_a.push a.fetch 0 ; a.shift
+      def append_to_uncurried_queue
+        @curry_queue_a.push iambic_property
         curry_queue_changed_notification
-        nil
       end
-      def call a
-        @call_p = a.fetch 0 ; a.shift
-        nil
+      def call
+        @call_p = iambic_property
       end
-      def glob_extra_args _
+      def glob_extra_args
         @do_glob_extra_args = true
-        nil
       end
-      def token_matchers a
-        set_abstract_field_list :Token_Matcher_, ( a.fetch 0 )
-        a.shift
-        nil
+      def token_matchers
+        set_abstract_field_list :Token_Matcher_, iambic_property
       end
-      def token_scanners a
-        set_abstract_field_list :Token_Scanner_, ( a.fetch 0 )
-        a.shift
-        nil
+      def token_scanners
+        set_abstract_field_list :Token_Scanner_, iambic_property
       end
-      def argv_scanners a
-        set_abstract_field_list :Argv_Scanner_, ( a.fetch 0 )
-        a.shift
-        nil
+      def argv_scanners
+        set_abstract_field_list :Argv_Scanner_, iambic_property
       end
-      def pool_procs a
-        set_abstract_field_list :Pool_Proc_, ( a.fetch 0 )
-        a.shift
-        nil
+      def pool_procs
+        set_abstract_field_list :Pool_Proc_, iambic_property
       end
-      def argv a
+      def argv
         @state_mutex.hold :argv
-        @state_x = a.fetch 0 ; a.shift
-        nil
+        @state_x = iambic_property
       end
-      def state_x_a a
+      def state_x_a
         @state_mutex.hold :state_x_a
-        @state_x = a.fetch 0 ; a.shift
-        nil
+        @state_x = iambic_property
       end
-      def syntax a
-        did = nil
-        @syntax ||= ( did = true and Syntax__.new )
-        did or fail "you should probably deep dup these immutable syntaxes!"
-        d = a.length
-        @syntax.absorb_iambic_passively a
-        d == a.length and raise ::ArgumentError, "syntax needs argument"
+      def syntax
+        @syntax and fail "FIXME: deep dup these immutable syntaxes?"
+        @syntax = Syntax__.new
+        d = @syntax.d = @d
+        @syntax.absorb_iambic_passively @x_a
+        d_ = @syntax.d
+        d == d_ and raise ::ArgumentError, "syntax needs argument"
+        @d = d_
       end
-      def field a
-        dflt = ( @default_field if instance_variable_defined? :@default_field )
-        field = Resolve_field__[ a ]
-        set_last_x field
-        dflt and field.merge_defaults! dflt
+      def field
+        @d, field = Resolve_field__[ @d, @x_a ]
+        @default_field and field.merge_defaults! @default_field
         if field.looks_like_default?
           @default_field = field
         else
-          ( @abstract_field_list ||= begin
-            fields_being_added_notification
-            Mutable_Concrete_Field_List_.new
-          end ).add_field field
+          abstract_field_list.add_field field
         end
       end
-      Resolve_field__ = -> a do
-        x = a.fetch 0  # DID NOT SHIFT YET
+      Resolve_field__ = -> d, x_a do
+        x = x_a.fetch d
         if x.respond_to? :id2name
           field = Parse::Field_.new
           do_absorb = true
         elsif x.respond_to? :superclass
-          field = x.new ; a.shift
+          field = x.new ; d += 1
           do_absorb = true
         else
-          field = x ; a.shift
+          field = x ; d += 1
         end
-        do_absorb and field.absorb_iambic_passively a
-        field
+        if do_absorb
+          field.d = d
+          field.absorb_iambic_passively x_a
+          d = field.d
+        end
+        [ d, field ]
       end
-      def constantspace a
-        @constantspace_mod = a.fetch 0 ; a.shift
-        nil
+      def constantspace
+        @constantspace_mod = iambic_property ; nil
       end
       end  # (pay one back)
+      def abstract_field_list
+        @abstract_field_list ||= begin
+          fields_being_added_notification
+          Mutable_Concrete_Field_List_.new
+        end
+      end
     end
 
     class Syntax__
+      attr_accessor :d
       def build_syntax_proc afl
         mk = @monikate_p
         -> do
@@ -397,16 +363,15 @@ module Skylab::MetaHell
         end
       end
     MetaHell_::Fields::From.methods(
-      :argful, :destructive, :passive, :absorber, :absorb_iambic_passively
+      :passive, :absorber, :absorb_iambic_passively
     ) do
-      def monikate a
-        @monikate_p = a.fetch 0 ; a.shift
-        nil
+      def monikate
+        @monikate_p = iambic_property ; nil
       end
     end
     end
 
-    class Abstract_Field_List_  # externally immutable! shared.
+    class Abstract_Field_List__  # externally immutable! shared.
       def initialize class_i, a
         ::Array.try_convert( a ) or raise "sanity - array? #{ a }"
         @class_i = class_i ; @surface_a = a

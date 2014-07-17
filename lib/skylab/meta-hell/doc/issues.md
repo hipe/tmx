@@ -1,10 +1,10 @@
 [#069]       #done differentiate Funcy globful vs. globless
-[#068] #hole (was: rewrite contoured parsing to be unobtrusive)
+[#068]       #done rewrite contoured parsing to be unobtrusive
 [#067]       #done in contoured, absorption methods should be self-contained
 [#066]       #doc-point the metahell fields narrative ..
 [#065]       #done unify use of MetaHell_ not MetaHell
 [#064]       #done fix syntax sharing
-[#063] #open get rid of argful field parsers
+[#063]       #done get rid of argful field parsers
 [#062]       #done get rid of ridiculous attempts at currying methods
 [#061]       #done promote fields out of fun
 [#060]       #done separate general from specific "method touch"

@@ -30,6 +30,10 @@ module Skylab::MetaHell
       Callback__[].distill
     end
 
+    Levenshtein = -> do
+      Library_::Headless::NLP::EN::Levenshtein
+    end
+
     Scn = -> do
       Callback__[]::Scn
     end

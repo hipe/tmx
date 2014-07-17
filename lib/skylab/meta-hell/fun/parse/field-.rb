@@ -8,6 +8,8 @@ module Skylab::MetaHell
         @normal_parse_p = nil
       end
 
+      attr_accessor :d  # lowlevel access to parsing
+
       def looks_like_default?
         ! looks_like_particular_field
       end
@@ -60,44 +62,38 @@ module Skylab::MetaHell
         instance_exec memo, argv, & @normal_parse_p
       end
 
-      def ivar_mutex ivar, a
+      def iambic_property_set_only_once ivar
         instance_variable_defined? ivar and raise "sanity - can have only #{
           }one #{ Hack_label_[ ivar ] } for now"
-        instance_variable_set ivar, a.fetch( 0 ) ; a.shift
-        nil
+        instance_variable_set ivar, iambic_property ; nil
       end
 
     MetaHell_::Fields::From.methods(
-      :destructive, :argful, :passive, :absorber, :absorb_iambic_passively
+      :passive, :absorber, :absorb_iambic_passively
     ) do  # borrow 1 indent
 
-      def monikate a
-        @monikate_p = a.shift
-        nil
+      def monikate
+        @monikate_p = iambic_property ; nil
       end
 
-      def moniker a
+      def moniker
         @looks_like_particular_field = true
-        @moniker = a.shift
-        nil
+        @moniker = iambic_property ; nil
       end
 
-      def token_scanner a
+      def token_scanner
         @looks_like_particular_field = true
-        @token_scanner_p = a.shift
-        nil
+        @token_scanner_p = iambic_property ; nil
       end
 
-      def parse a
+      def parse
         @looks_like_particular_field = true
-        @normal_parse_p = a.fetch 0 ; a.shift
-        nil
+        @normal_parse_p = iambic_property ; nil
       end
 
-      def agent a
-        p = a.fetch 0 ; a.shift ; p.respond_to?( :call ) or raise "proc? #{ p }"
-        @agent_p = p
-        nil
+      def agent
+        ( @agent_p = iambic_property ).respond_to?( :call ) or
+          raise ::ArgumentError, "proc? #{ @agent_p }" ; nil
       end
     end  # (pay 1 back)
     end
