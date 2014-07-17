@@ -45,13 +45,14 @@ module Skylab::Face
     def initialize x_a
       @left_x = @sep_x = @right_x = @do_show_header = @field_box =
         @read_rows_from = @write_lines_to = nil
-      atomic_sugar x_a
-      absorb_iambic_fully x_a ; nil
+      1 == x_a.length and when_one x_a
+      abs_iambic_fully x_a
+      clear_iambic_ivars
     end
   private
-    def atomic_sugar a  # hack - whenever exactly 1
+    def when_one x_a  # hack - whenever exactly 1
       # element is passed assume it is a rows enumerator.
-      1 == a.length and a.unshift :read_rows_from
+      x_a.unshift :read_rows_from ; nil
     end
 
     # ~ :+[#mh-021] typical base class implementation:
@@ -59,29 +60,20 @@ module Skylab::Face
     def dupe
       dup
     end
-    def initialize_copy otr
-      init_copy( * otr.get_args_for_copy ) ; nil
+    def initialize_copy _otr_
+      # copy-by-reference @do_show_header, @left_x, @read_rows_from,
+      # @right_x, @sep_x, @write_lines_to
+
+      # do not copy e.g @d, @x_a, @x_a_length @iambic_scan (iambic parse)
+      clear_iambic_ivars
+
+      # deep copy:
+      @field_box and @field_box = @field_box.dupe  # #storypoint-80
+      nil
     end
   protected
     def get_args_for_copy
-      [ @do_show_header,
-        @field_box,
-        @left_x,
-        @read_rows_from,
-        @right_x,
-        @sep_x,
-        @write_lines_to ]
-    end
-  private
-    def init_copy( * x_a )
-      @do_show_header,
-      field_box,
-      @left_x,
-      @read_rows_from,
-      @right_x,
-      @sep_x,
-      @write_lines_to = x_a
-      @field_box = ( field_box.dupe if field_box ) ; nil # #storypoint-80
+      [ @field_box ]
     end
     # ~
 
@@ -154,12 +146,9 @@ module Skylab::Face
       @max_a.length
     end
 
-    Lib_::Fields_from_methods[
-      :argful, :destructive, :absorber, :absorb_iambic_fully,
-    -> do
-      def read_rows_from a
-        @read_rows_from = a.shift  # special case - allow no arg at end!
-        nil
+    Lib_::Fields_from_methods[ :absorber, :abs_iambic_fully, -> do
+      def read_rows_from
+        @read_rows_from = iambic_property ; nil
       end
     end ]
   end
@@ -181,31 +170,29 @@ module Skylab::Face
     #     ( a * 'X' )  # => "(Food,      Drink)X( nut,pomegranate)"
 
     private
-    Lib_::Fields_from_methods[ -> do
-      def field a
+    Lib_::Fields_from_methods[ :absorber, :absorb_iambic_fully, -> do
+      def field
         bx = (( @field_box ||= Lib_::Box[] ))
-        fld = Field__.new a, bx.length
+        fld = Field__.new @d, @x_a, bx.length
+        @d = fld.d
         bx.add fld.name_i, fld
         @do_show_header.nil? and @do_show_header = true
         @header_cel_a = nil
-        nil
       end
-      def write_lines_to a
-        @write_lines_to = a.shift
-        nil
+      def write_lines_to
+        @write_lines_to = iambic_property ; nil
       end
-      def show_header a
-        @do_show_header = a.fetch 0 ; a.shift
-        nil
+      def show_header
+        @do_show_header = iambic_property ; nil
       end
-      def left a
-        @left_x = a.shift ; nil
+      def left
+        @left_x = iambic_property ; nil
       end
-      def sep a
-        @sep_x = a.shift ; nil
+      def sep
+        @sep_x = iambic_property ; nil
       end
-      def right a
-        @right_x = a.shift ; nil
+      def right
+        @right_x = iambic_property ; nil
       end
     end ]
 
@@ -229,36 +216,40 @@ module Skylab::Face
     #     str # => exp
 
     class Field__
-      def initialize a, idx
+      def initialize d, x_a, idx
+        @d = d
         @name_i = nil
-        if a.first.respond_to? :ascii_only?
-          label a
+        if x_a.fetch( d ).respond_to? :ascii_only?
+          prepare_peaceful_parse_for_iambic x_a
+          label
         else
-          absorb_iambic_passively a
+          absorb_iambic_passively x_a
         end
         @name_i ||= :"#{ idx }"  # always give it a unique id to act as a key
+        d = @d ; clear_iambic_ivars ; @d = d
         freeze  # ensure that we can dupe with shallow copies
       end
 
       attr_reader :label_s, :name_i, :align_i
+      attr_reader :d
 
       private
       Lib_::Fields_from_methods[
-        :argful, :destructive, :passive, :absorber, :absorb_iambic_passively,
+        :passive, :absorber, :absorb_iambic_passively,
       -> do
-        def left _
+        def left
           @align_i = :left ; nil
         end
-        def right _
+        def right
           @align_i = :right ; nil
         end
-        def label a
-          @label_s = a.shift
+        def label
+          @label_s = iambic_property
           @name_i.nil? and @name_i = @label_s.intern
           nil
         end
-        def id a  # typically for fields w/o labels, i.e non-displayed headers
-          @name_i = a.shift ; nil
+        def id  # typically for fields w/o labels, i.e non-displayed headers
+          @name_i = iambic_property ; nil
         end
       end ]
     end
@@ -286,15 +277,20 @@ module Skylab::Face
   public
 
     def [] *a  # #storypoint-280
-      curry( *a ).execute
+      cury_iambic( a ).execute
     end
 
     def curry * x_a
-      atomic_sugar x_a
+      cury_iambic x_a
+    end
+  private
+    def cury_iambic x_a
+      1 == x_a.length and when_one x_a
       otr = dupe
       otr.absorb_iambic_fully x_a
       otr
     end
+  public
 
     Multiline_column_B = -> row_a, cel_a, a do
       #  #todo spec and/or cleanup interface
@@ -310,5 +306,7 @@ module Skylab::Face
       end
       nil
     end
+
+    EMPTY_A_ = [].freeze
   end
 end

@@ -55,7 +55,11 @@
 [#024]       #doc-node the formal attribute narrative .
 [#023] #open merge the 2 pool enhancements
 [#022]       #tracking-tag #boxxy's relationship to a.l
-[#021]       #doc-node the 'dupe' narrative ..
+[#021] #open universe-wide re-audit these knowing now that `initialize_copy`
+             is called after *all* the ivars get shallow-copied over
+             (we didn't know that before) ([fa] CLI table is a model for
+             this change)
+             #doc-node the 'dupe' narrative ..
 [#020]       #doc-node the formal box narrative .. #refined:once
              (was: instance methods separate from box class maybe?)
 [#019] #hole (was: #node-tracker: #boxxy)

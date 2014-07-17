@@ -133,8 +133,7 @@ module Skylab::MetaHell
           end
         end
 
-        DEFAULT_SHELL__ = Fields.start_shell.frozen(
-          :argful, :absorber, :absorb_iambic_fully )
+        DEFAULT_SHELL__ = Fields.start_shell.frozen  # NO ARGS
 
         MACRO_H__ = {
           argful: Fields.start_shell.frozen( :overriding, :globbing,

@@ -28,7 +28,7 @@ module Skylab::MetaHell
         x_a.length.nonzero? and prs_iambic_unobtrusive_fully x_a
       end
       def initialize_copy otr
-        @absorber_a = otr.absorber_a.dup
+        @absorber_a = (( a = otr.absorber_a )) && a.dup
         @ext_mod_a = (( a = otr.ext_mod_a )) && a.dup
         @field_box_const = otr.field_box_const
         # when we dup, client_class and definee_module are not duped
@@ -291,26 +291,28 @@ module Skylab::MetaHell
 
     private
       def rslv_some_absorber_method
-        parse = Parse__.new @do_argful, @do_destructive, @do_passive
+        parse = Parse__.new @do_argful, @do_destructive,
+          @do_passive, @do_globbing
         if @do_globbing
           -> * x_a do
-            parse.for_client( self ).parse_x_a_from_beginning x_a
+            parse.for_client( self ).parse_iambic x_a
           end
         else
           -> x_a do
-            parse.for_client( self ).parse_x_a_from_beginning x_a
+            parse.for_client( self ).parse_iambic x_a
           end
         end
       end
     end
 
     class Parse__
-      def initialize arg, dest, passive
-        @do_arg = arg ; @do_destructive = dest ; @do_passive = passive
+      def initialize arg, dest, passive, rewind
+        @do_arg = arg ; @do_destructive = dest
+        @do_passive = passive ; @do_rewind = rewind
         @adapter_method_i = if dest
-          :build_destructive_parse_adapter_for_iambic
+          :prepare_destructive_parse_for_iambic
         else
-          :build_peaceful_parse_adapter_for_iambic
+          :prepare_peaceful_parse_for_iambic
         end
         @fld_method_i = if arg
           if dest
@@ -329,8 +331,24 @@ module Skylab::MetaHell
         @client = client
         self
       end
-      def parse_x_a_from_beginning x_a
-        prepare x_a
+      def parse_iambic x_a
+        prepare_for_iambic x_a
+        execute_parse
+      end
+    private
+      def prepare_for_iambic x_a
+        @scan = @client.send @adapter_method_i, x_a
+        prepare_args_for_iambic x_a ; nil
+      end
+      def prepare_args_for_iambic x_a
+        @field_arg_a = if @do_arg && @do_destructive
+          [ x_a ]
+        else
+          [ @scan ]
+        end ; nil
+      end
+      def execute_parse
+        @do_rewind and @scan.rewind
         fld = true ; fb = @client.field_box
         while @scan.unparsed_exist
           fld = fb.fetch( @scan.first_unparsed_arg ) { }
@@ -344,30 +362,25 @@ module Skylab::MetaHell
           @client.unexpected_unparsable_iambic_args_were_encountered
         end
       end
-    private
-      def prepare x_a
-        @scan = @client.send @adapter_method_i, x_a
-        @field_arg_a = if @do_arg
-          if @do_destructive
-            [ x_a ]
-          else
-            [ @scan ]
-          end
-        else
-          [ @scan ]
-        end
-      end
     end
 
     module Client_Methods  # see #client-methods
-      def build_destructive_parse_adapter_for_iambic x_a
+      def prepare_destructive_parse_for_iambic x_a
         @x_a = x_a
         @iambic_scan = Destructive_Parse_Adapter__.new x_a
       end
-      def build_peaceful_parse_adapter_for_iambic x_a
-        @x_a = x_a ; @d = 0 ; @x_a_length = x_a.length
+      def prepare_peaceful_parse_for_iambic x_a
+        @d ||= 0 ; @x_a = x_a ; @x_a_length = x_a.length
         @iambic_scan = Peaceful_Parse_Adapter__.new self
       end
+      def rewind_peaceful_iambic
+        @d = 0
+      end
+    private
+      def iambic_property
+        @iambic_scan.gets_one
+      end
+    public
       def unparsed_peaceful_iambic_exists
         @d < @x_a_length
       end
@@ -386,11 +399,17 @@ module Skylab::MetaHell
       def post_absorb_iambic_args_notify
         self.class.facet_muxer.notify :post_absorb, self ; nil
       end
+      def clear_iambic_ivars
+        @d = @iambic_scan = @x_a = @x_a_length = nil
+      end
     end
 
     class Peaceful_Parse_Adapter__
       def initialize client
         @client = client
+      end
+      def rewind
+        @client.rewind_peaceful_iambic
       end
       def unparsed_exist
         @client.unparsed_peaceful_iambic_exists
@@ -409,6 +428,9 @@ module Skylab::MetaHell
     class Destructive_Parse_Adapter__
       def initialize x_a
         @x_a = x_a
+      end
+      def rewind
+        # a destructive parse is always at the beginning
       end
       def unparsed_exist
         @x_a.length.nonzero?
