@@ -1,6 +1,6 @@
 module Skylab::MetaHell
 
-  module FUN::Parse::Alternation_
+  module Parse
 
     # parse `input_x` using no more than one of the parsers from the ordered
     # pool `pool_a`, where 'parser' is defined as a function that takes two
@@ -21,9 +21,7 @@ module Skylab::MetaHell
     # processing. in fact, forget we said anything about two parameters -
     # it's just `state_x_a`.
 
-    o = FUN.redefiner
-
-    o[:parse_alternation] = FUN::Parse::Curry[
+    Alternation__ = Parse::Curry_[
       :algorithm, -> parse, state_x_a do
         parse.get_pool_proc_a.reduce nil do |_, p|
           x = p[ * state_x_a ]
@@ -40,7 +38,7 @@ module Skylab::MetaHell
   # a normative example
   # like so:
   #
-  #     res = MetaHell::FUN.parse_alternation[ [
+  #     res = MetaHell::Parse.alternation[ [
   #       -> ix { :a == ix and :A },
   #       -> ix { :b == ix and :B } ],
   #       :b ]
@@ -51,7 +49,7 @@ module Skylab::MetaHell
   # it may be useful to curry your parser in one place
   # and then use it in another:
   #
-  #     P = MetaHell::FUN.parse_alternation.curry[ :pool_procs, [
+  #     P = MetaHell::Parse.alternation.curry[ :pool_procs, [
   #       -> ix { :a == ix and :A },
   #       -> ix { :b == ix and :B } ] ]
   #
@@ -66,14 +64,14 @@ module Skylab::MetaHell
   # the minimal case
   # the empty parser always result in nil
   #
-  #     P = MetaHell::FUN.parse_alternation.curry[ :pool_procs, [] ]
+  #     P = MetaHell::Parse.alternation.curry[ :pool_procs, [] ]
   #
   #     P[ :bizzle ]  # => nil
 
   # maintaining parse state (artibrary extra arguments)
   # like so:
   #
-  #     P = MetaHell::FUN.parse_alternation.curry[ :pool_procs, [
+  #     P = MetaHell::Parse.alternation.curry[ :pool_procs, [
   #       -> output_x, input_x do
   #         if :one == input_x.first
   #           input_x.shift

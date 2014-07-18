@@ -12,7 +12,7 @@ module Skylab::Basic::TestSupport::Struct
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::Basic::Struct" do
+  describe "[ba] Struct" do
     context "use it" do
       Sandbox_1 = Sandboxer.spawn
       before :all do

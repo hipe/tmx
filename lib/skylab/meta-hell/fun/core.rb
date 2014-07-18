@@ -2,8 +2,6 @@ module Skylab::MetaHell
 
   (( FUN = ::Class.new( ::Module ).new )).const_set :Module, FUN.class
 
-  Fun = FUN  # :+[#cb-027]
-
   module FUN
     LIB = class Lib__
       def struct_from_hash h
@@ -275,12 +273,6 @@ module Skylab::MetaHell
     end
 
     x = predefiner
-
-    x[:parse_series]                     = [ :Parse, :Series ]
-    x[:parse_from_set]                   = [ :Parse, :From_Set ]
-    x[:parse_from_ordered_set]           = [ :Parse, :From_Ordered_Set ]
-    x[:parse_alternation]                = [ :Parse, :Alternation_ ]
-
     x[:private_attr_reader]              =
     x[:private_attr_accessor]            =
     x[:module_defines_method_in_some_manner] = [ :Deprecated ]

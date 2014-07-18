@@ -1,6 +1,26 @@
 module Skylab::MetaHell
 
-  module FUN::Parse
+  module Parse
+
+    def self.alternation
+      self::Alternation__
+    end
+
+    def self.from_ordered_set
+      self::From_Ordered_Set__
+    end
+
+    def self.from_set
+      self::From_Set__
+    end
+
+    def self.series * a
+      if a.length.zero?
+        self::Series__
+      else
+        self::Series__.via_argument_list a
+      end
+    end
 
     def self.strange x
       Strange_[ x ]
@@ -19,7 +39,7 @@ module Skylab::MetaHell
     # hack label
     # like so -
     #
-    #     P = MetaHell::FUN::Parse::Hack_label_
+    #     P = MetaHell::Parse::Hack_label_
     #     P[ :@foo_bar_x ] # => "foo bar"
     #     P[ :some_method ]  # => "some method"
 
@@ -27,10 +47,10 @@ module Skylab::MetaHell
       MetaHell_::Library_::Headless::Name::FUN::Labelize[ ivar_i ].downcase
     end
 
-    # fuzzy matcher
-    # is a currier - it's a proc that generates other procs
+    # fuzzy matcher - partial match anchored to beginning
+    # it's a proc that generates other procs
     #
-    #     P = MetaHell::FUN::Parse::Fuzzy_matcher_
+    #     P = MetaHell::Parse::Fuzzy_matcher_
     #     Q = P[ 3, 'foobie' ]
     #
     #     Q[ 'f' ] # => nil
@@ -38,6 +58,10 @@ module Skylab::MetaHell
     #     Q[ 'foob' ]  # => true
     #     Q[ 'foobie-doobie' ]  # => nil
     #
+
+    def self.fuzzy_matcher
+      Fuzzy_matcher_
+    end
 
     Fuzzy_matcher_ = -> min, moniker do
       min ||= 1
@@ -49,8 +73,16 @@ module Skylab::MetaHell
         moniker[ 0, tlen ] == tok
       end
     end
-    Fuzzy_matcher = Fuzzy_matcher_
 
-    Parse = self
+    module Fields
+      module Int
+        Scan_token = -> tok do
+          RX__ =~ tok and tok.to_i
+        end
+        RX__ = /\A\d+\z/
+      end
+
+      Autoloader_[ self ]
+    end
   end
 end

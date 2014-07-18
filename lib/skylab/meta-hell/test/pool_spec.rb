@@ -16,7 +16,7 @@ module Skylab::MetaHell::TestSupport::Pool
 
   extend TestSupport::Quickie
 
-  describe "#{ MetaHell }::Pool" do
+  describe "[mh] Pool" do
 
     extend Pool_TestSupport
 

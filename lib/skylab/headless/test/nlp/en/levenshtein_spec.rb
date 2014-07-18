@@ -12,7 +12,7 @@ module Skylab::Headless::TestSupport::NLP::EN::Levenshtein
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::Headless::NLP::EN::Levenshtein" do
+  describe "[he] NLP::EN::Levenshtein" do
     context "we love levenshtein" do
       Sandbox_1 = Sandboxer.spawn
       it "reduce a big list to a small list" do

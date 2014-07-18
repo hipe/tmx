@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::FUN
 
-  describe "Skylab::MetaHell::FUN" do
+  describe "[mh] FUN" do
     context "`seeded_function_chain` - given a stack of functions and one seed value," do
       Sandbox_1 = Sandboxer.spawn
       it "opaque but comprehensive example" do

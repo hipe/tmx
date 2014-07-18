@@ -12,7 +12,7 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::TestSupport::Regret::API::Actions::DocTest" do
+  describe "[ts] Regret::API::Actions::DocTest" do
     context "probably no one will ever find a reason to call our API directly" do
       Sandbox_1 = Sandboxer.spawn
       before :all do

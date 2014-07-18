@@ -12,7 +12,7 @@ module Skylab::MetaHell::TestSupport::Fields::From
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::MetaHell::Fields::From" do
+  describe "[mh] Fields::From" do
     context "let a class define its fields via particular methods it defines" do
       Sandbox_1 = Sandboxer.spawn
       before :all do

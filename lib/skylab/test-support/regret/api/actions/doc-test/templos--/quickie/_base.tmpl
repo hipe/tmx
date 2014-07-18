@@ -12,7 +12,7 @@ module {{ amod }}::TestSupport{{ bmod }}::{{ cmod }}
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "{{ amod }}{{ bmod }}::{{ cmod }}" do
+  describe "{{ desc }}" do
 {{ body }}{{ cover }}
   end
 end

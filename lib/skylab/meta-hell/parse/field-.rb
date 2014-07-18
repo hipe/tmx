@@ -1,6 +1,6 @@
 module Skylab::MetaHell
 
-  module FUN::Parse
+  module Parse
 
     class Field_
 
@@ -70,7 +70,7 @@ module Skylab::MetaHell
 
     MetaHell_::Fields::From.methods(
       :passive, :absorber, :absorb_iambic_passively
-    ) do  # borrow 1 indent
+    ) do  # #borrow-one-indent
 
       def monikate
         @monikate_p = iambic_property ; nil
@@ -95,7 +95,7 @@ module Skylab::MetaHell
         ( @agent_p = iambic_property ).respond_to?( :call ) or
           raise ::ArgumentError, "proc? #{ @agent_p }" ; nil
       end
-    end  # (pay 1 back)
+      end  # #pay-one-back
     end
   end
 end

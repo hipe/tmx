@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Headless::TestSupport::CLI::Option
 
-  describe "Skylab::Headless::CLI::Option" do
+  describe "[he] CLI::Option" do
     context "hack to see if a basic switch is present" do
       Sandbox_1 = Sandboxer.spawn
       it "like this" do

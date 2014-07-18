@@ -2,7 +2,7 @@ require_relative 'tee/test-support.rb'
 
 module Skylab::MetaHell::TestSupport::Proxy::Tee
 
-  describe "#{ MetaHell_::Proxy::Tee } - a tee" do
+  describe "[mh] Proxy::Tee - a tee" do
 
     extend Tee_TestSupport
 

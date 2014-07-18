@@ -44,7 +44,7 @@ module ::Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
     done = FUN.done_p[ F ]         # this absurdity is just a sanity check
 
 
-    describe "#{MetaHell::Module::Creator::ModuleMethods} (*on* modules, #{
+    describe "[mh] Module::Creator::ModuleMethods (*on* modules, #{
       }not classes" do
 
       extend MM_TestSupport
@@ -91,7 +91,8 @@ module ::Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
                                   # the below module name when you run
                                   # this file alone)
 
-    describe "#{MetaHell::Module::Creator::ModuleMethods} scenario 2 - #{
+
+    describe "[mh] Module::Creator::ModuleMethods scenario 2 - #{
       }this is fucking amazing - composing different module graphs WTF" do
 
       extend MM_TestSupport

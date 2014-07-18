@@ -4,7 +4,7 @@ require_relative 'rendering/test-support'
 
 module ::Skylab::SubTree::TestSupport::API::Actions::My_Tree::Rendering
 
-describe "[st] API actions my-tree" do  # historic hiccup borrow one
+describe "[st] API actions my-tree" do  # historic hiccup #borrow-one-indent
 
   extend TS_
 
@@ -93,5 +93,5 @@ describe "[st] API actions my-tree" do  # historic hiccup borrow one
     HERE
 
   end
-end  # pay one back
+end  # #pay-one-back
 end

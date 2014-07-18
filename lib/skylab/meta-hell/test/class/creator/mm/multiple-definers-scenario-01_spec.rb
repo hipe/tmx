@@ -40,7 +40,7 @@ module ::Skylab::MetaHell::TestSupport::Class::Creator::ModuleMethods
 
     FUN = MetaHell.lib.struct_from_hash o
 
-    describe "#{MetaHell::Class::Creator::ModuleMethods} Multiple Definers #{
+    describe "[mh] Class::Creator::ModuleMethods Multiple Definers #{
       } Scenario One -- our graph accross a real graph" do
 
       before( :all ) { FUN.once[] }

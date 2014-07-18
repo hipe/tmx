@@ -1,8 +1,8 @@
 [#031]       #parent-node:[#024] the stowaway narrative ..
-[#030] #open things to integrate old boxxy/a.l with new a.l
+[#030]       #done things to integrate old boxxy/a.l with new a.l
 [#029]       #parent-node:[#024] const reduce ..
-[#028] #open todo:during:regret-integration-with-new-autoloader
-[#027] #open things that exist to comport with old a.l (or fwd with new)
+[#028]       #done during:regret-integration-with-new-autoloader
+[#027]       #done things that exist to comport with old a.l (or fwd with new)
 [#026]       #doc-point the FUN narrative ..
 [#025]       isomorphic event factory is deprecated ..
 [#024]       #doc-node the new autoloader narative ..

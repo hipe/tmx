@@ -12,7 +12,7 @@ module Skylab::MetaHell::TestSupport::Function
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::MetaHell::Function" do
+  describe "[mh] Function" do
     context "`MetaHell::Function` can act as an enhancer that enhances a class via" do
       Sandbox_1 = Sandboxer.spawn
       it "enabling ivars that hold procs to act as methods of the object" do

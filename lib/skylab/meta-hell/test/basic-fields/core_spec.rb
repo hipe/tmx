@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::BasicFields
 
-  describe "Skylab::MetaHell::BasicFields" do
+  describe "[mh] BasicFields" do
     context "the basic fields facility out of the box is a low-frills, low-level" do
       Sandbox_1 = Sandboxer.spawn
       before :all do

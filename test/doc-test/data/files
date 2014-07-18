@@ -16,15 +16,15 @@ lib/skylab/headless/cli/option.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/headless/nlp/en/levenshtein.rb
 lib/skylab/information-tactics/levenshtein.rb
 lib/skylab/meta-hell/basic-fields.rb #branch-down-to-core #regret-setup:no
-lib/skylab/meta-hell/dsl-dsl.rb
+lib/skylab/meta-hell/dsl-dsl/core.rb  #regret-setup:no
 lib/skylab/meta-hell/fields/contoured--.rb
 lib/skylab/meta-hell/fields/from.rb
-lib/skylab/meta-hell/fun.rb  #branch-down-to-core  #regret-setup:no
-lib/skylab/meta-hell/fun/parse.rb  #branch-down-to-core  #regret-setup:no
-lib/skylab/meta-hell/fun/parse/alternation-.rb
-lib/skylab/meta-hell/fun/parse/from-ordered-set.rb
-lib/skylab/meta-hell/fun/parse/from-set.rb
-lib/skylab/meta-hell/fun/parse/series.rb  #branch-down-to-core #regret-setup:no
+lib/skylab/meta-hell/fun/core.rb  #regret-setup:no
+lib/skylab/meta-hell/parse/core.rb  #regret-setup:no
+lib/skylab/meta-hell/parse/alternation--.rb
+lib/skylab/meta-hell/parse/from-ordered-set--.rb
+lib/skylab/meta-hell/parse/from-set--.rb
+lib/skylab/meta-hell/parse/series--.rb  #branch-down-to-core #regret-setup:no
 lib/skylab/meta-hell/function.rb
 lib/skylab/meta-hell/module/accessors.rb
 lib/skylab/test-support/quickie/possible-/articulator-.rb

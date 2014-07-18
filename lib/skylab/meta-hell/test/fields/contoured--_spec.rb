@@ -12,7 +12,7 @@ module Skylab::MetaHell::TestSupport::Fields::Contoured__
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::MetaHell::Fields::Contoured__" do
+  describe "[mh] Fields::Contoured__" do
     context "use it" do
       Sandbox_1 = Sandboxer.spawn
       before :all do

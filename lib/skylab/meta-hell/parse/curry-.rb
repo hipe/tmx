@@ -1,25 +1,26 @@
 module Skylab::MetaHell
 
-  module FUN::Parse::Curry  # read [#011] the fun parse curry narrative
+  module Parse::Curry_  # read [#011] the fun parse curry narrative
 
     def self.[] * input_a
       Parse__.new( input_a ).shell
     end
 
-    Parse = FUN::Parse
-
-    class Shell_  # #storypoint-55
+    class Shell__  # #storypoint-55
 
       def initialize parse
         @parse = parse
       end
 
       def [] *a
-        p = @parse.dupe
-        p.call_notify a
+        @parse.dupe.call_notify a
       end
 
       alias_method :call, :[]
+
+      def via_argument_list a
+        @parse.dupe.call_notify a
+      end
 
       def parse_argv argv
         value = get_value
@@ -32,9 +33,10 @@ module Skylab::MetaHell
         Touch_value_class_[ @parse.some_constantspace_mod, @parse ].new
       end
       #
-      Touch_value_class_ = FUN::Touch_constant_.curry[ false, -> parse do
-        Parse::Field_::Values_.new parse._field_a
-      end, :Parse_Value_ ]
+      Touch_value_class_ = MetaHell_::FUN::Touch_constant_.
+        curry[ false, -> parse do
+          Parse::Field::Values.new parse._field_a
+        end, :Parse_Value_ ]
 
       def curry
         -> * x_a do
@@ -94,7 +96,7 @@ module Skylab::MetaHell
 
     public
       def shell
-        @shell ||= Shell_.new self
+        @shell ||= Shell__.new self
       end
       def call_notify a  # assume was already duped. will mutate self
         instance_exec( *a, & @call_p )  # result!
@@ -254,7 +256,7 @@ module Skylab::MetaHell
     MetaHell_::Fields::From.methods(
       :absorber, :absrb_iambic_fully,
       :globbing, :absorber, :with
-    ) do  # borrow 1 indent
+    ) do  # #borrow-one-indent
 
       def algorithm
         @algorithm_p = iambic_property
@@ -342,7 +344,7 @@ module Skylab::MetaHell
       def constantspace
         @constantspace_mod = iambic_property ; nil
       end
-      end  # (pay one back)
+      end  # #pay-one-back
       def abstract_field_list
         @abstract_field_list ||= begin
           fields_being_added_notification
@@ -391,7 +393,7 @@ module Skylab::MetaHell
       end
     private
       def collapse!
-        clas = FUN::Parse::Curry.const_get @class_i, false
+        clas = Parse::Curry_.const_get @class_i, false
         @did_collapse = true
         @deep_a = @surface_a.map( & clas.method( :new ) ).freeze
         nil

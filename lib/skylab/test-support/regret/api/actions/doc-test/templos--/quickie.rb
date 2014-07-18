@@ -112,9 +112,10 @@ module Skylab::TestSupport::Regret::API
         end
         cmod = "#{ c_a.fetch( -1 ) }"
         body = render_body[]
+        desc = Generate_description__[ c_a ]
         io.write baset.call( amod: amod, bmod: bmod, cmod: cmod, body: body,
                              cover: render_cover( acon, bmod, cmod ),
-                             acon: acon )
+                             desc: desc, acon: acon )
         SUCCEEDED__
       end ; nil
     end
@@ -137,6 +138,28 @@ module Skylab::TestSupport::Regret::API
     end
 
     Autoloader_[ Context__ = ::Module.new ]  # #stowaway
+
+    Generate_description__ = -> c_a do
+      "[#{ Infer_Initials__[ c_a.first ] }] #{ c_a[ 1 .. -1 ] * CONST_SEP_ }"
+    end
+
+    Infer_Initials__ = -> do
+      h = {}
+      rx = %r{  \A  ([A-Z])  ([a-z])  [^A-Z]*  ([A-Z])?  }x
+      infer = -> i do
+        md = rx.match i.to_s
+        if md
+          "#{ md[1].downcase }#{ md[3] ? md[3].downcase : md[2] }"
+        else
+          i.to_s
+        end
+      end
+      -> i do
+        h.fetch i do
+          h[ i ] = infer[ i ]
+        end
+      end
+    end.call
 
     OPTION_PROCEDE__ = nil
     SUCCESS_EXITSTATUS__ = 0

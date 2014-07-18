@@ -12,7 +12,7 @@ module Skylab::Basic::TestSupport::List::Scanner::With::Peek
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::Basic::List::Scanner::With::Peek" do
+  describe "[ba] List::Scanner::With::Peek" do
     context "list scanner with peek" do
       Sandbox_1 = Sandboxer.spawn
       it "like this" do

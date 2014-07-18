@@ -12,7 +12,7 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest::Specer__
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::TestSupport::Regret::API::Actions::DocTest::Specer__" do
+  describe "[ts] Regret::API::Actions::DocTest::Specer__" do
     context "this is the first line of a comment block, to become a context desc" do
       Sandbox_1 = Sandboxer.spawn
       before :all do

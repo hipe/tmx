@@ -1,11 +1,8 @@
 module Skylab::MetaHell
 
-  module FUN::Parse::From_Ordered_Set
+  module Parse
 
-    ::Skylab::MetaHell::FUN::Parse::FromOrderedSet = self  # :+[#cb-027]
-
-
-    # `parse_from_ordered_set` result is array of same length as `set_a`.
+    # "from ordered set" result is array of same length as `set_a`.
     #
     # sorta like the packrat parser algorithm, `argv` (if any) will be evaluated
     # against each remaining element in `set_a`. each element of `set_a` is
@@ -18,7 +15,7 @@ module Skylab::MetaHell
     # *or* a matching function could not be found for the current front element
     # of `argv`. (this function is [#027].)
     #
-    # in contrast to the similar acting `parse_series`, this algorithm treats
+    # in contrast to the similar acting "parse series", this algorithm treats
     # the parsers in the running as a set - any one can match the current
     # state of input; whereas with the other function, the input symbols
     # must occur in the order they appear in the grammar. our set is called
@@ -27,7 +24,7 @@ module Skylab::MetaHell
     #
     # like so:
     #
-    #     PARSER = MetaHell::FUN.parse_from_ordered_set.curry[
+    #     PARSER = MetaHell::Parse.from_ordered_set.curry[
     #       :argv_scanners, [
     #         -> args { args.shift if args.first =~ /bill/i },
     #         -> args { if :hi == args.first then args.shift and :hello end }]]
@@ -57,9 +54,7 @@ module Skylab::MetaHell
     #     argv.length  # => 3
     #
 
-    o = FUN.redefiner
-
-    o[:parse_from_ordered_set] = FUN::Parse::Curry[
+    From_Ordered_Set__ = Parse::Curry_[
       :algorithm, -> parse, argv do
         set_a = parse.normal_argv_proc_a
         len = set_a.length
@@ -80,5 +75,6 @@ module Skylab::MetaHell
         res_a
       end,
       :uncurried_queue, [ :argv_scanners, :argv ] ]
+
   end
 end

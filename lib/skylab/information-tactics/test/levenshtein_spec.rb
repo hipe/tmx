@@ -12,7 +12,7 @@ module Skylab::InformationTactics::TestSupport::Levenshtein
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::InformationTactics::Levenshtein" do
+  describe "[it] Levenshtein" do
     context "levenshtein distance" do
       Sandbox_1 = Sandboxer.spawn
       it "is kind of amazing" do

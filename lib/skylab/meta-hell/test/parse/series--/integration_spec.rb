@@ -1,25 +1,25 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::FUN::Parse::Series::Integration
+module Skylab::MetaHell::TestSupport::Parse::Series__::Intgrtn
 
-  ::Skylab::MetaHell::TestSupport::FUN::Parse::Series[ TS_ = self ]
+  ::Skylab::MetaHell::TestSupport::Parse::Series__[ self ]
 
   include CONSTANTS
 
   extend TestSupport::Quickie
 
-  MetaHell = MetaHell
+  MetaHell_ = MetaHell
 
-  describe "[mh] FUN::Parse::Series (integration spec)" do
+  describe "[mh] Parse::Series (integration spec)" do
 
     before :all do
-      Field_ = MetaHell::FUN::Parse::Field_
-      P_ = MetaHell::FUN.parse_series.curry[
+      fields = MetaHell_::Parse::Fields
+      P_ = MetaHell::Parse::series.curry[
         :syntax, :monikate, -> a { a * ' ' },
         :field, :monikate, -> s { "[ #{ s } ]" },
         :field, :moniker, '<integer>',
-        :token_scanner, Field_::Int_::Scan_token,
-        :field, * Field_::Flag_[ :random ].to_a,
+        :token_scanner, fields::Int::Scan_token,
+        :field, * fields::Flag[ :random ].to_a,
         :prepend_to_uncurried_queue, :exhaustion
       ]
     end

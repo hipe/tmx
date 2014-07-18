@@ -12,7 +12,7 @@ module Skylab::MetaHell::TestSupport::Module::Accessors
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::MetaHell::Module::Accessors" do
+  describe "[mh] Module::Accessors" do
     context "a lightweight enhancer that for the module using it generates instance" do
       Sandbox_1 = Sandboxer.spawn
       before :all do

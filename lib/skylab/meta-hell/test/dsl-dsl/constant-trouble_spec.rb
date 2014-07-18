@@ -10,7 +10,7 @@ module Skylab::MetaHell::TestSupport::DSL_DSL::Constant_Trouble
 
   MetaHell = MetaHell
 
-  describe "#{ MetaHell }::DSL_DSL::Constant_Trouble" do
+  describe "[mh] DSL_DSL::Constant_Trouble" do
 
     # OK, deep breath, here goes: constant trouble is a facility for producing
     # classes. Specifically it is a class that produces a subclass of itself

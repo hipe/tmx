@@ -62,7 +62,7 @@
              #doc-node the 'dupe' narrative ..
 [#020]       #doc-node the formal box narrative .. #refined:once
              (was: instance methods separate from box class maybe?)
-[#019] #hole (was: #node-tracker: #boxxy)
+[#019]       #done move parse out of fun (was: #node-tracker: #boxxy)
 [#018]       #done corral proxies
 [#017]       #done corral tees
 [#016]       #tracking-tag wow hash-like iterators are sure annoying

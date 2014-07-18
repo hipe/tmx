@@ -12,7 +12,7 @@ module Skylab::Face::TestSupport::CLI::Lipstick
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::Face::CLI::Lipstick" do
+  describe "[fa] CLI::Lipstick" do
     context "a \"lipstick\" is an abstract rendering entity whose job it is to render" do
       Sandbox_1 = Sandboxer.spawn
       it "an illustration of the steps for building and using a lipstick" do

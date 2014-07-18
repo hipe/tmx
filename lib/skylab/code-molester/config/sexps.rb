@@ -1,6 +1,6 @@
 module Skylab::CodeMolester
 
-module Config  # #borrow x 1
+module Config  # #borrow-one-indent
                                   # if you somehow got here without sexp
   S = self::Sexp                  # load it here and now / shorten it
                                   # we especially need it for registering
@@ -386,5 +386,5 @@ module Config  # #borrow x 1
     Sexp[:comment] = self
     # node_reader :body
   end
-end
+end # #pay-one-back
 end

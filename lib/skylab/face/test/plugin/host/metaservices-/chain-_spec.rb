@@ -12,7 +12,7 @@ module Skylab::Face::TestSupport::Plugin::Host::Metaservices_::Chain_
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::Face::Plugin::Host::Metaservices_::Chain_" do
+  describe "[fa] Plugin::Host::Metaservices_::Chain_" do
     context "#experimental core of the whole headless world: this proxy." do
       Sandbox_1 = Sandboxer.spawn
       it "usage" do

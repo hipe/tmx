@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::FUN::Parse::Alternation_
+module Skylab::MetaHell::TestSupport::Parse::Alternation__
 
-  ::Skylab::MetaHell::TestSupport::FUN::Parse[ self ]
+  ::Skylab::MetaHell::TestSupport::Parse[ self ]
 
   include CONSTANTS
 
@@ -12,13 +12,13 @@ module Skylab::MetaHell::TestSupport::FUN::Parse::Alternation_
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::MetaHell::FUN::Parse::Alternation_" do
+  describe "[mh] Parse::Alternation__" do
     context "a normative example" do
       Sandbox_1 = Sandboxer.spawn
       it "like so" do
         Sandbox_1.with self
         module Sandbox_1
-          res = MetaHell::FUN.parse_alternation[ [
+          res = MetaHell::Parse.alternation[ [
             -> ix { :a == ix and :A },
             -> ix { :b == ix and :B } ],
             :b ]
@@ -32,7 +32,7 @@ module Skylab::MetaHell::TestSupport::FUN::Parse::Alternation_
       before :all do
         Sandbox_2.with self
         module Sandbox_2
-          P = MetaHell::FUN.parse_alternation.curry[ :pool_procs, [
+          P = MetaHell::Parse.alternation.curry[ :pool_procs, [
             -> ix { :a == ix and :A },
             -> ix { :b == ix and :B } ] ]
         end
@@ -56,7 +56,7 @@ module Skylab::MetaHell::TestSupport::FUN::Parse::Alternation_
       it "the empty parser always result in nil" do
         Sandbox_3.with self
         module Sandbox_3
-          P = MetaHell::FUN.parse_alternation.curry[ :pool_procs, [] ]
+          P = MetaHell::Parse.alternation.curry[ :pool_procs, [] ]
 
           P[ :bizzle ].should eql( nil )
         end
@@ -67,7 +67,7 @@ module Skylab::MetaHell::TestSupport::FUN::Parse::Alternation_
       before :all do
         Sandbox_4.with self
         module Sandbox_4
-          P = MetaHell::FUN.parse_alternation.curry[ :pool_procs, [
+          P = MetaHell::Parse.alternation.curry[ :pool_procs, [
             -> output_x, input_x do
               if :one == input_x.first
                 input_x.shift

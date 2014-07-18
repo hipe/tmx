@@ -1,8 +1,10 @@
 module Skylab::MetaHell
 
-  module FUN::Parse
+  module Parse
 
-    class Field_::Values_ < ::Struct
+    Field = ::Module.new
+
+    class Field::Values < ::Struct
 
       class << self
         alias_method :orig_new, :new

@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::Proxy
 
-  describe "#{ MetaHell_ }::Proxy::Nice is nice" do
+  describe "[mh] Proxy::Nice is nice" do
 
     extend Proxy_TestSupport
 

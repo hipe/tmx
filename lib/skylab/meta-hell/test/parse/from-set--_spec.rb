@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::FUN::Parse::From_Set
+module Skylab::MetaHell::TestSupport::Parse::FromSet__
 
-  ::Skylab::MetaHell::TestSupport::FUN::Parse[ self ]
+  ::Skylab::MetaHell::TestSupport::Parse[ self ]
 
   include CONSTANTS
 
@@ -12,13 +12,13 @@ module Skylab::MetaHell::TestSupport::FUN::Parse::From_Set
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::MetaHell::FUN::Parse::From_Set" do
+  describe "[mh] Parse::FromSet__" do
     context "more flexible, powerful and complex pool-based deterministic parsing" do
       Sandbox_1 = Sandboxer.spawn
       before :all do
         Sandbox_1.with self
         module Sandbox_1
-          P = MetaHell::FUN.parse_from_set.curry[ :pool_procs, [ ] ]
+          P = MetaHell::Parse.from_set.curry[ :pool_procs, [ ] ]
         end
       end
       it "a parser with no nodes in it will always report 'no parse' and 'spent'" do
@@ -41,7 +41,7 @@ module Skylab::MetaHell::TestSupport::FUN::Parse::From_Set
       it "it always reports the same as a final result" do
         Sandbox_2.with self
         module Sandbox_2
-          P = MetaHell::FUN.parse_from_set.curry[ :pool_procs, [
+          P = MetaHell::Parse.from_set.curry[ :pool_procs, [
            -> _input {  [ true, true ] }
           ]]
 
@@ -54,7 +54,7 @@ module Skylab::MetaHell::TestSupport::FUN::Parse::From_Set
       it "it always reports the same as a final result" do
         Sandbox_3.with self
         module Sandbox_3
-          P = MetaHell::FUN.parse_from_set.curry[ :pool_procs, [
+          P = MetaHell::Parse.from_set.curry[ :pool_procs, [
             -> _input {  [ false, true ] }
           ]]
 
@@ -77,7 +77,7 @@ module Skylab::MetaHell::TestSupport::FUN::Parse::From_Set
             end
           end
 
-          P = MetaHell::FUN.parse_from_set.curry[ :pool_procs, [
+          P = MetaHell::Parse.from_set.curry[ :pool_procs, [
             keyword[ 'foo' ],
             keyword[ 'bar' ],
             -> memo, argv do

@@ -12,7 +12,7 @@ module Skylab::Face::TestSupport::Plugin::Host::Proxy
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::Face::Plugin::Host::Proxy" do
+  describe "[fa] Plugin::Host::Proxy" do
     context "using `Face::Plugin::Host::Proxy`" do
       Sandbox_1 = Sandboxer.spawn
       it "comprehensive example" do

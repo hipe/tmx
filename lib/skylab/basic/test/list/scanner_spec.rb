@@ -12,7 +12,7 @@ module Skylab::Basic::TestSupport::List::Scanner
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::Basic::List::Scanner" do
+  describe "[ba] List::Scanner" do
     context "basic list scanner" do
       Sandbox_1 = Sandboxer.spawn
       it "like this" do

@@ -12,7 +12,7 @@ module Skylab::Face::TestSupport::CLI::Tableize
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::Face::CLI::Tableize" do
+  describe "[fa] CLI::Tableize" do
     context "`tableize` - deprecated, see  [#036]" do
       Sandbox_1 = Sandboxer.spawn
       it "`tableize` has been deprecated.  but here's a demo" do

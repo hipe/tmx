@@ -1,8 +1,6 @@
 module Skylab::MetaHell
 
-  module FUN::Parse::From_Set
-
-    FUN::Parse::FromSet = self  # :+[#cb-027]
+  module Parse
 
     # more flexible, powerful and complex pool-based deterministic parsing
     #
@@ -44,7 +42,7 @@ module Skylab::MetaHell
     # regardless of the input,
     # a parser with no nodes in it will always report 'no parse' and 'spent':
     #
-    #     P = MetaHell::FUN.parse_from_set.curry[ :pool_procs, [ ] ]
+    #     P = MetaHell::Parse.from_set.curry[ :pool_procs, [ ] ]
     #
     #     P[ argv = [] ]  # => [ false, true ]
     #     argv # => []
@@ -57,7 +55,7 @@ module Skylab::MetaHell
     # with parser with one node that reports it always matches & always spends
     # it always reports the same as a final result:
     #
-    #     P = MetaHell::FUN.parse_from_set.curry[ :pool_procs, [
+    #     P = MetaHell::Parse.from_set.curry[ :pool_procs, [
     #      -> _input {  [ true, true ] }
     #     ]]
     #
@@ -66,7 +64,7 @@ module Skylab::MetaHell
     # with a parser with one node that reports it never matches & always spends
     # it always reports the same as a final result:
     #
-    #     P = MetaHell::FUN.parse_from_set.curry[ :pool_procs, [
+    #     P = MetaHell::Parse.from_set.curry[ :pool_procs, [
     #       -> _input {  [ false, true ] }
     #     ]]
     #
@@ -85,7 +83,7 @@ module Skylab::MetaHell
     #       end
     #     end
     #
-    #     P = MetaHell::FUN.parse_from_set.curry[ :pool_procs, [
+    #     P = MetaHell::Parse.from_set.curry[ :pool_procs, [
     #       keyword[ 'foo' ],
     #       keyword[ 'bar' ],
     #       -> memo, argv do
@@ -139,9 +137,7 @@ module Skylab::MetaHell
     #     memo[ :foo  ]  # => true
     #     memo[ :bar  ]  # => nil
 
-    o = FUN.redefiner
-
-    o[:parse_from_set] = FUN::Parse::Curry[
+    From_Set__ = Parse::Curry_[
       :algorithm, -> parse, input_x_a do
         did_parse_any = parsed_none_last_pass = false
         pool_a = parse.get_pool_proc_a

@@ -2,17 +2,7 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::DSL_DSL
 
-  ::Skylab::MetaHell::TestSupport[ self ]
-
-  include CONSTANTS
-
-  MetaHell = ::Skylab::MetaHell
-
-  extend TestSupport::Quickie
-
-  Sandboxer = TestSupport::Sandbox::Spawner.new
-
-  describe "Skylab::MetaHell::DSL_DSL" do
+  describe "[mh] DSL_DSL" do
     context "this DSL_DSL is a simple DSL for making simple DSL's." do
       Sandbox_1 = Sandboxer.spawn
       it "introductory example" do
@@ -54,7 +44,7 @@ module Skylab::MetaHell::TestSupport::DSL_DSL
         Sandbox_2.with self
         module Sandbox_2
           class Foo
-            MetaHell::DSL_DSL.enhance self do
+           MetaHell::DSL_DSL.enhance self do
               block :zinger
             end
           end
@@ -78,7 +68,7 @@ module Skylab::MetaHell::TestSupport::DSL_DSL
         Sandbox_3.with self
         module Sandbox_3
           class Foo
-            MetaHell::DSL_DSL.enhance self do
+           MetaHell::DSL_DSL.enhance self do
               atom_accessor :with_name
             end
           end
@@ -95,7 +85,7 @@ module Skylab::MetaHell::TestSupport::DSL_DSL
         Sandbox_4.with self
         module Sandbox_4
           module Foo
-            MetaHell::DSL_DSL.enhance_module self do
+           MetaHell::DSL_DSL.enhance_module self do
               atom :pik
             end
           end

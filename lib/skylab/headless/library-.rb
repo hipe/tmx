@@ -52,8 +52,8 @@ module Skylab::Headless
     Module_resolve = -> path_s, mod do
       MetaHell__[]::Module::Resolve[ path_s, mod ]
     end
-    Parse_series = -> * x_a do
-      MetaHell__[]::FUN.parse_series[ * x_a ]
+    Parse_series = -> * a do
+      MetaHell__[]::Parse.series.via_argument_list a
     end
     Pool = -> do
       MetaHell__[]::Pool

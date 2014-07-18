@@ -12,7 +12,7 @@ module Skylab::Basic::TestSupport::Hash::Pair_Enumerator
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::Basic::Hash::Pair_Enumerator" do
+  describe "[ba] Hash::Pair_Enumerator" do
     context "usage: you must construct it with an array with an even number of args." do
       Sandbox_1 = Sandboxer.spawn
       it "failure to do so will result in immediate argument error raisal" do

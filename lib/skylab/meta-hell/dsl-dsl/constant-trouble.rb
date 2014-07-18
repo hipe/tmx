@@ -10,7 +10,7 @@ module Skylab::MetaHell
       :"#{ i.to_s.upcase }_"
     end
 
-    class Field_
+    class Field__
 
       def initialize i
         @normal = i
@@ -41,7 +41,7 @@ module Skylab::MetaHell
         h = { }
         fld_a = field_a.each_with_index.map do |i, idx|
           h[ i ] = idx
-          Field_.new i
+          Field__.new i
         end.freeze
         h.freeze
 

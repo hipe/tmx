@@ -1,8 +1,8 @@
 module Skylab::MetaHell
 
-  module FUN::Parse
+  module Parse
 
-    class Field_::Flag_ < Field_
+    class Fields::Flag < Parse::Field_
 
       class << self ; alias_method :[], :new end
 
@@ -111,7 +111,7 @@ module Skylab::MetaHell
         @i ||= @moniker ; nil
       end
 
-    MetaHell_::Fields::From.methods do  # borrow 1 indent
+    MetaHell_::Fields::From.methods do  # #borrow-one-indent
 
       def predicate
         @predicates.push iambic_property ; nil
@@ -129,7 +129,7 @@ module Skylab::MetaHell
         iambic_property_set_only_once :@fuzzy_min_d
       end
 
-    end  # (pay one back)
+    end  # #pay-one-back
     end
   end
 end

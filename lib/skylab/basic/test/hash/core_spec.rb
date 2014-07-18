@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Basic::TestSupport::Hash
 
-  describe "Skylab::Basic::Hash" do
+  describe "[ba] Hash" do
     context "the loquacious default proc" do
       Sandbox_1 = Sandboxer.spawn
       it "can be used like so" do

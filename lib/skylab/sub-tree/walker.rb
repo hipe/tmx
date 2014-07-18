@@ -1,6 +1,6 @@
 module Skylab
 
-module SubTree  # borrow x 1 - load this solo but it needs meta hell
+module SubTree  # #borrow-one-indent - load this solo but it needs meta hell
 
   class Walker  # :[#007] this is the tree walker (was [#ts-019])
 
@@ -426,5 +426,5 @@ module SubTree  # borrow x 1 - load this solo but it needs meta hell
       @vt
     end
   end
-end  # give back x 1
+end  # #pay-one-back
 end

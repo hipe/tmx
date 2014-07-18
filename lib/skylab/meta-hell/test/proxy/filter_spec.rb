@@ -7,7 +7,7 @@ module Skylab::MetaHell::TestSupport::Proxy::Filter
 
   extend TestSupport::Quickie
 
-  describe "#{ MetaHell_ }::Proxy::Filter::Post" do
+  describe "[mh] Proxy::Filter::Post" do
 
     it 'proxies nerks to a reciever, possibly wrapping them' do
 

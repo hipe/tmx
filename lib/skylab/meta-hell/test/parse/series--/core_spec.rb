@@ -1,15 +1,15 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::FUN::Parse::Series
+module Skylab::MetaHell::TestSupport::Parse::Series__
 
-  describe "Skylab::MetaHell::FUN::Parse::Series" do
-    context "`parse_series` - parse out (a fixed) N values from M args" do
+  describe "[mh] Parse::Series__" do
+    context "parse out (a fixed) N values from M args" do
       Sandbox_1 = Sandboxer.spawn
       it "one-shot, inline usage" do
         Sandbox_1.with self
         module Sandbox_1
           args = [ '30', 'other' ]
-          age, sex, loc =  MetaHell::FUN.parse_series[ args,
+          age, sex, loc =  MetaHell::Parse.series[ args,
             -> a { /\A\d+\z/ =~ a },
             -> s { /\A[mf]\z/i =~ s },
             -> l { /./ =~ l } ]
@@ -25,7 +25,7 @@ module Skylab::MetaHell::TestSupport::FUN::Parse::Series
       before :all do
         Sandbox_2.with self
         module Sandbox_2
-          P = MetaHell::FUN.parse_series.curry[
+          P = MetaHell::Parse.series.curry[
             :token_matchers, [
               -> age do
                 /\A\d+\z/ =~ age
@@ -88,7 +88,7 @@ module Skylab::MetaHell::TestSupport::FUN::Parse::Series
       it "indicate `token_scanners` instead of `token_matchers`" do
         Sandbox_3.with self
         module Sandbox_3
-          P = MetaHell::FUN.parse_series.curry[
+          P = MetaHell::Parse.series.curry[
             :token_scanners, [
               -> feet   { /\A\d+\z/ =~ feet and feet.to_i },
               -> inches { /\A\d+(?:\.\d+)?\z/ =~ inches and inches.to_f }

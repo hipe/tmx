@@ -1,17 +1,15 @@
-require_relative '../../../test-support'
+require_relative '../../../core'
 
-describe "Skylab::MetaHell::FUN `parse_series`" do
+describe "[mh] parse series (periphery)" do
 
-  MetaHell = ::Skylab::MetaHell
-
-  MetaHell::DSL_DSL.enhance self do
+  ::Skylab::MetaHell::DSL_DSL.enhance self do
     atom :h
     list :op_a
   end
 
   def parse *args
     f_a = op_a.map { |i| h.fetch i }
-    MetaHell::FUN.parse_series[ args, * f_a ]
+    ::Skylab::MetaHell::Parse.series args, * f_a
   end
 
   context "`parse_series`" do

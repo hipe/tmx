@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Face::TestSupport::CLI::Table
 
-  describe "Skylab::Face::CLI::Table" do
+  describe "[fa] CLI::Table" do
     context "a table" do
       Sandbox_1 = Sandboxer.spawn
       before :all do

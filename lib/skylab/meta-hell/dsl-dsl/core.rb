@@ -1,6 +1,6 @@
-module Skylab::MetaHell::DSL_DSL
+module Skylab::MetaHell
 
-  ::Skylab::MetaHell::DslDsl = self  # :+[#cb-027]
+  module DSL_DSL  # #borrow-one-indent
 
   # this DSL_DSL is a simple DSL for making simple DSL's.
   #
@@ -50,8 +50,6 @@ module Skylab::MetaHell::DSL_DSL
   #     Bar.new.wiz # => :piz
   #
   # happy hacking!
-
-  MetaHell_ = ::Skylab::MetaHell
 
   def self.enhance host, &def_blk
     Story_.new( host.singleton_class, host, ENHANCE_ADAPTER_ ).
@@ -247,4 +245,5 @@ module Skylab::MetaHell::DSL_DSL
 
   ENHANCE_MODULE_ADAPTER_ = Enhance_Module_Adapter_.new
 
+  end  # #pay-one-back
 end

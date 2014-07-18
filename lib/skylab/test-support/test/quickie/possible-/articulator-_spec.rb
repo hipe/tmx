@@ -12,7 +12,7 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible_::Articulator_
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::TestSupport::Quickie::Possible_::Articulator_" do
+  describe "[ts] Quickie::Possible_::Articulator_" do
     context "this generates a simple articulator class." do
       Sandbox_1 = Sandboxer.spawn
       it "one way to use it is like so" do

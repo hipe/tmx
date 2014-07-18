@@ -12,7 +12,7 @@ module Skylab::Basic::TestSupport::Pathname::Union
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::Basic::Pathname::Union" do
+  describe "[ba] Pathname::Union" do
     context "progressive construction" do
       Sandbox_1 = Sandboxer.spawn
       it "you can build up the union progressively, one path at at time" do

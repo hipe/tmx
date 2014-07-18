@@ -1,12 +1,12 @@
 require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport::FUN::Parse
+module Skylab::MetaHell::TestSupport::Parse
 
-  ::Skylab::MetaHell::TestSupport::FUN[ self ]
+  ::Skylab::MetaHell::TestSupport[ self ]
 
   include CONSTANTS
 
-  MetaHell = MetaHell
+  MetaHell = MetaHell_
 
   extend TestSupport::Quickie
 

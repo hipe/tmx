@@ -61,7 +61,7 @@ module Skylab::Git
       MetaHell__[].funcy_globless x
     end
     Fuzzy_matcher = -> x, y do
-      MetaHell__[]::FUN::Parse::Fuzzy_matcher[ x, y ]
+      MetaHell__[]::Parse.fuzzy_matcher[ x, y ]
     end
     Headless__ = sidesys[ :Headless ]
     IO_FU = -> do

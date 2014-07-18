@@ -1001,9 +1001,6 @@ module Skylab::Callback
       def autoloaderize_with_filename_child_node fn, cn
         Autoloader[ cn, dir_pathname.join( fn ) ] ; nil
       end
-      def const_missing_class
-        :_has_one_  # #comport to oldschoool a.l [#027]
-      end
     end
   end
 

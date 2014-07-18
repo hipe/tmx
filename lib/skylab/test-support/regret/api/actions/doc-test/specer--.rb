@@ -204,8 +204,8 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
 
     def rslv_corrected_anchored_const_a_from_c_a
       mk_any_name_corrections
-      @const = rdc_const_array_down_to_some_trueish_value
-      if @const
+      @value = rdc_const_array_down_to_some_trueish_value
+      if @value
         @corrected_anchored_const_a = rslv_some_normalized_const_array
         PROCEDE__
       end
@@ -249,7 +249,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       if ! @base_mod_can_autoload
         do_rdc_once_with_loading_assistance
       end
-      if @const_reduce_is_ok and @c_a.length.nonzero?
+      if @const_reduce_is_ok and 1 < @c_a.length
         do_rdc_the_rest
       end
       @const_reduce_from_mod
@@ -261,18 +261,29 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
         :do_assume_is_defined, false,
         :else_p, @const_reduce_else_p,
         :from_module, @const_reduce_from_mod,
-        :path_x, @c_a.shift )
+        :path_x, @c_a.first )
       @const_reduce_is_ok and @const_reduce_from_mod = x ; IGNORED_
     end
 
     def do_rdc_the_rest
+      CORE_MOD_I__ == @c_a.last and whn_core_is_last
       x = Autoloader_.const_reduce.with(
         :core_basename, @core_basename,
         :do_assume_is_defined, true,
         :else_p, @const_reduce_else_p,
         :from_module, @const_reduce_from_mod,
-        :path_x, @c_a )
+        :path_x, @c_a[ 1..-1 ] )
       @const_reduce_is_ok and @const_reduce_from_mod = x ; IGNORED_
+    end
+    CORE_MOD_I__ = :Core
+
+    def whn_core_is_last  # :[#034] exploratory
+      c_a = @c_a ; mod = @const_reduce_from_mod
+      @snitch.notice do
+        "ignoring last (\"core\") element of #{
+          }~#{ mod.name }::#{ c_a * CONST_SEP_ }"
+      end
+      @c_a.pop ; nil
     end
 
     def explain_no_such_constant m, c
@@ -300,8 +311,8 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     A_REASONABLE_LENGTH_FOR_A_FEW_ITEMS__ = 3
 
     def rslv_some_normalized_const_array
-      if @const.respond_to? :name
-        _name = @const.name
+      if @value.respond_to? :name
+        _name = @value.name
         _range = @base_mod.name.length + 2 .. -1
         _a = _name[ _range ].split CONST_SEP_
         _a.map( & :intern )

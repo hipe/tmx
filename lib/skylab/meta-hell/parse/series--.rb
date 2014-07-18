@@ -1,8 +1,8 @@
 module Skylab::MetaHell
 
-  module FUN::Parse::Series
+  module Parse
 
-    # `parse_series` - parse out (a fixed) N values from M args
+    # parse out (a fixed) N values from M args
     #
     # imagine a formal parameter syntax that is made up of one or more
     # contiguous optional arguments, and we want to determine which actual
@@ -43,7 +43,7 @@ module Skylab::MetaHell
     # formal arguments. such a grammar would be possible but is beyond this
     # scope (and is addressed by the sibling nodes of this node).
     #
-    # in contrast to the similar-acting `parse_from_ordered_set`, this only
+    # in contrast to the similar-acting "parse from ordered set", this only
     # matches input that occurs in the same order as the grammar; i.e there
     # is one cursor that tracks the current head of the input, and one cursor
     # that tracks the current head of the grammar. neither cursor ever moves
@@ -52,7 +52,7 @@ module Skylab::MetaHell
     # one-shot, inline usage:
     #
     #     args = [ '30', 'other' ]
-    #     age, sex, loc =  MetaHell::FUN.parse_series[ args,
+    #     age, sex, loc =  MetaHell::Parse.series[ args,
     #       -> a { /\A\d+\z/ =~ a },
     #       -> s { /\A[mf]\z/i =~ s },
     #       -> l { /./ =~ l } ]
@@ -70,7 +70,7 @@ module Skylab::MetaHell
     # curry a parser by telling it what part(s) you are giving it,
     # e.g curry this parser by giving it `matchers` in advance of usage:
     #
-    #     P = MetaHell::FUN.parse_series.curry[
+    #     P = MetaHell::Parse.series.curry[
     #       :token_matchers, [
     #         -> age do
     #           /\A\d+\z/ =~ age
@@ -111,9 +111,7 @@ module Skylab::MetaHell
     #     P[ argv ]  # => ArgumentError: unrecognized argument at index 3..
     #
 
-    o = FUN.redefiner
-
-    o[:parse_series] = FUN::Parse::Curry[
+    Series__ = Parse::Curry_[
       :algorithm, -> parse, argv do
         fa = parse.normal_token_proc_a ; fz = fa.length
         ai = fi = 0 ; az = argv.length
@@ -179,7 +177,7 @@ module Skylab::MetaHell
     # one way to do scanning in addition to matching is to
     # indicate `token_scanners` instead of `token_matchers`:
     #
-    #     P = MetaHell::FUN.parse_series.curry[
+    #     P = MetaHell::Parse.series.curry[
     #       :token_scanners, [
     #         -> feet   { /\A\d+\z/ =~ feet and feet.to_i },
     #         -> inches { /\A\d+(?:\.\d+)?\z/ =~ inches and inches.to_f }

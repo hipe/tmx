@@ -42,7 +42,7 @@ module Skylab::TestSupport
           Headless__[]::SubClient::EN_FUN.via_iambic_on_mod x_a, mod
         end
         Field_exponent_proc = -> do
-          MetaHell__[]::FUN::Parse::Field_::Exponent_
+          MetaHell__[]::Parse::Fields::Exponent
         end
         Headless__ = Lib_::Headless__
         Ick = -> x do
@@ -72,7 +72,7 @@ module Skylab::TestSupport
         end
         Oxford_or = TestSupport_::Callback_::Oxford_or
         Parse_alternation = -> do
-          MetaHell__[]::FUN.parse_alternation
+          MetaHell__[]::Parse.alternation
         end
         Parse_hashtag = -> listener, s do
           Snag__[]::Models::Hashtag::Parse[ listener, s ]

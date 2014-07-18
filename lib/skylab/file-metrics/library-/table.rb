@@ -275,7 +275,7 @@ module Skylab::FileMetrics
                 fail "merge is not implemented - #{ symbol }"
               else
                 state = state_h.fetch :initial
-                field = x_a.reduce Field_.new do |fld, x|
+                field = x_a.reduce Field__.new do |fld, x|
                   nxt = state.to.reduce nil do |_, sym|
                     ( stat = state_h.fetch sym ).match[ x ] and break stat
                   end
@@ -298,7 +298,7 @@ module Skylab::FileMetrics
         sra = nil
         process_field = -> sym do
           fetch sym  # sanity
-          Field_::Shell_.new(
+          Field__::Shell.new(
             summary: -> x, y=nil do
               sra ||= [ { } ]
               i = 0
@@ -368,11 +368,11 @@ module Skylab::FileMetrics
 
         # `Table::Render::Design_::Field_` - field metadata in a design.
 
-      Field_ = ::Struct.new :align, :align_body, :align_header,
+      Field__ = ::Struct.new :align, :align_body, :align_header,
         :align_summary, :cook, :header, :is_autonomous, :is_noop, :is_rest,
         :prerender
 
-      Field_::Shell_ = Lib_::Nice_proxy[ :summary ]
+      Field__::Shell = Lib_::Nice_proxy[ :summary ]
     end
   end
 end

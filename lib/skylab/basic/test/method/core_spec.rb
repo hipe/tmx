@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Basic::TestSupport::Method
 
-  describe "Skylab::Basic::Method" do
+  describe "[ba] Method" do
     context "a method curry binds arguments to a bound method" do
       Sandbox_1 = Sandboxer.spawn
       it "like so" do

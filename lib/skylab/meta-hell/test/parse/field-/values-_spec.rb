@@ -1,25 +1,25 @@
 require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport::FUN::Parse::F_VS_
+module Skylab::MetaHell::TestSupport::Parse::F_VS_
 
-  ::Skylab::MetaHell::TestSupport::FUN::Parse[ self ]
+  ::Skylab::MetaHell::TestSupport::Parse[ self ]
 
   include CONSTANTS
 
-  MetaHell = MetaHell
+  MetaHell_ = MetaHell_
 
-  describe "#{ MetaHell }::FUN parse field- values- (integration)" do
+  describe "[mh] parse field- values- (integration)" do
 
     before :all do
       module Bazzle
-        Flag_ = MetaHell::FUN::Parse::Field_::Flag_
-        BRANCH_ = MetaHell::FUN.parse_alternation.curry[
+        flag = MetaHell_::Parse::Fields::Flag
+        BRANCH_ = MetaHell_::Parse.alternation.curry[
           :syntax, :monikate, -> a { a * ' | ' },
-          :field, Flag_,
+          :field, flag,
             :moniker, :help,
             :predicate, :do_help,
             :short, '-h', :long, '--help',
-          :field, Flag_,
+          :field, flag,
             :moniker, :server,
             :predicate, :do_server,
             :fuzzy_min, 1,

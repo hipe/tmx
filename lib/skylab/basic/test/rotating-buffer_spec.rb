@@ -12,7 +12,7 @@ module Skylab::Basic::TestSupport::Rotating_Buffer
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::Basic::Rotating_Buffer" do
+  describe "[ba] Rotating_Buffer" do
     context "it's just like tivo" do
       Sandbox_1 = Sandboxer.spawn
       it "like so" do

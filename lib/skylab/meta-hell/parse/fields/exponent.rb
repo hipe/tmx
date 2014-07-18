@@ -1,17 +1,17 @@
 module Skylab::MetaHell
 
-  module FUN::Parse
+  module Parse
 
-    class Field_
+    module Fields
 
-      Exponent_ = MetaHell_::Library_::Basic::
+      Exponent = MetaHell_::Library_::Basic::
         Struct[ :i, :long, :short, :first_desc_line ]
 
       # the term 'exponent' is meant in the "Grammatical_category" sense.
       # similar but not the same as a flag. this was early-abstracted
       # out of one project and is #experimental
 
-      class Exponent_
+      class Exponent
 
         def p
           long = Fm_[ @long ]
@@ -25,7 +25,7 @@ module Skylab::MetaHell
             end
           end
         end
-        Fm_ = MetaHell_::FUN::Parse::Fuzzy_matcher_.curry[ 1 ]  # min length
+        Fm_ = Fuzzy_matcher_.curry[ 1 ]  # min length
 
         def name_monikers y
           y << @long.inspect

@@ -12,7 +12,7 @@ module Skylab::Basic::TestSupport::Hash::Order_Proxy
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::Basic::Hash::Order_Proxy" do
+  describe "[ba] Hash::Order_Proxy" do
     context "a proxy around a hash that tracks in order every key of every `aset` call" do
       Sandbox_1 = Sandboxer.spawn
       it "for dark hacks" do

@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::FUN::Parse::From_Ordered_Set
+module Skylab::MetaHell::TestSupport::Parse::FromOrderedSet__
 
-  ::Skylab::MetaHell::TestSupport::FUN::Parse[ self ]
+  ::Skylab::MetaHell::TestSupport::Parse[ self ]
 
   include CONSTANTS
 
@@ -12,13 +12,13 @@ module Skylab::MetaHell::TestSupport::FUN::Parse::From_Ordered_Set
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::MetaHell::FUN::Parse::From_Ordered_Set" do
-    context "`parse_from_ordered_set` result is array of same length as `set_a`." do
+  describe "[mh] Parse::FromOrderedSet__" do
+    context "\"from ordered set\" result is array of same length as `set_a`." do
       Sandbox_1 = Sandboxer.spawn
       before :all do
         Sandbox_1.with self
         module Sandbox_1
-          PARSER = MetaHell::FUN.parse_from_ordered_set.curry[
+          PARSER = MetaHell::Parse.from_ordered_set.curry[
             :argv_scanners, [
               -> args { args.shift if args.first =~ /bill/i },
               -> args { if :hi == args.first then args.shift and :hello end }]]

@@ -48,9 +48,6 @@ module Skylab::TestSupport
 
         @parent_anchor_module = pam  # nil ok
 
-        const_missing_class.nil? and  # false if u are up to something
-          @const_missing_class = pam.const_missing_class
-
         o = Bump_module__.curry[ self ]
 
         o[ :CONSTANTS, -> do

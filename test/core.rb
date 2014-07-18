@@ -51,11 +51,11 @@ module Skylab::Test
     end
 
     Parse_field = -> do
-      MetaHell__[]::FUN::Parse::Field_
+      MetaHell__[]::Parse::Field
     end
 
     Parse_series = -> do
-      MetaHell__[]::FUN.parse_series
+      MetaHell__[]::Parse.series
     end
 
     Pretty_path_proc = -> do
