@@ -94,7 +94,7 @@ module Skylab::Callback
       end
     private
       def inspect_emission_channel_and_payload i_a, x
-        "#{ i_a.inspect }: #{ Callback_::Lib_::Inspect[ x ] }"
+        "#{ i_a.inspect }: #{ Callback_::Lib_::Strange[ x ] }"
       end
     end
 

@@ -279,10 +279,10 @@ module Skylab::GitViz
       end
 
       Exception_for_not_string_ = -> x do
-        ::TypeError.new "no implicit conversion of #{ Inspect__[ x ]} into String"
+        ::TypeError.new "no implicit conversion of #{ Typeish__[ x ]} into String"
       end
 
-      Inspect__ = -> x do  # :+[#mh-050] a challenger appears
+      Typeish__ = -> x do  # :+[#mh-050]-like but for types not value
         case x
         when ::NilClass, ::FalseClass, ::TrueClass ; x.inspect
         else x.class.name

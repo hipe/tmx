@@ -153,7 +153,7 @@ end
 
     def self.via_iambic_on_mod x_a, mod
       :private == x_a[ 0 ] or fail "only `private` is supported for now #{
-        }(had #{ Headless::FUN::Inspect[ x_a[ 0 ] ] })"
+        }(had #{ Headless_::Lib_::Strange[ x_a[ 0 ] ] })"
       x_a.shift
       1 == x_a.length or fail "expecting exactly one element, an array"
       meth_i_a = [ * x_a.shift, :nlp_last_length, :set_nlp_last_length ]

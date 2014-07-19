@@ -307,7 +307,7 @@ module Skylab::Callback::TestSupport
               Channel_Assertion__.new i
             else
               :styled == i or raise ::ArgumentError, "expected 'styled' #{
-                }had #{ Callback_::Lib_::Inspect[ i ] }"
+                }had #{ Callback_::Lib_::Strange[ i ] }"
               STYLED_ASSERTION__
             end
           end

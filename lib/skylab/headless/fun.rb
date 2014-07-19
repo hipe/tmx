@@ -4,10 +4,6 @@ module Skylab::Headless
 
   module FUN
 
-    Inspect = -> x do
-      Headless::Library_::Basic::FUN::Inspect[ x ]
-    end
-
     o = definer
 
     # ~ the host system

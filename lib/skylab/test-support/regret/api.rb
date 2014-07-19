@@ -46,7 +46,7 @@ module Skylab::TestSupport
         end
         Headless__ = Lib_::Headless__
         Ick = -> x do
-          Basic__[]::FUN::Inspect[ x ]
+          MetaHell__[].strange x
         end
         List = -> do
           Basic__[]::List

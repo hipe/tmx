@@ -47,10 +47,6 @@ module Skylab::GitViz
       x.inspect  # placeholder for the future from the past
     end
 
-    Inspect = -> x do
-      self::Basic__[]::FUN::Inspect__[ 120, x ]
-    end
-
     JSON = stdlib[ :JSON ]
     Listen = gem[ :Listen ]
 
@@ -84,6 +80,10 @@ module Skylab::GitViz
 
     Some_stderr_IO = -> do
       self::Headless__[]::System::IO.some_stderr_IO
+    end
+
+    Strange = -> x do
+      MetaHell__[].strange 120, x
     end
 
     StringScanner = memo[ -> do require 'strscan' ; ::StringScanner end ]

@@ -109,10 +109,6 @@ module Skylab::CodeMolester
       Headless__[]::IO::Interceptors::Chunker::F.new p
     end
 
-    Inspect_proc = -> do
-      Basic__[]::FUN::Inspect__
-    end
-
     List_scanner = -> x do
       Basic__[]::List::Scanner[ x ]
     end
@@ -157,6 +153,10 @@ module Skylab::CodeMolester
 
     Simple_shell = -> a do
       MetaHell__[]::Enhance::Shell.new a
+    end
+
+    Strange_proc = -> do
+      MetaHell__[].strange.to_proc
     end
 
     System_default_tmpdir_pathname = memo[ -> do

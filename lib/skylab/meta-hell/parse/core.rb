@@ -22,20 +22,6 @@ module Skylab::MetaHell
       end
     end
 
-    def self.strange x
-      Strange_[ x ]
-    end
-
-    Strange_ = -> x do  # first of family [#050]
-      if x.respond_to? :id2name
-        "\"#{ x }\""
-      elsif ::Proc === x
-        x.inspect
-      else
-        "(#{ x.class })"
-      end
-    end
-
     # hack label
     # like so -
     #

@@ -63,7 +63,7 @@ module Skylab::GitViz::TestSupport
     end
 
     def inspect_emission_channel_and_payload i_a, x
-      "#{ i_a.inspect }: #{ GitViz::Test_Lib_::Inspect[ x ] }"
+      "#{ i_a.inspect }: #{ GitViz::Test_Lib_::Strange[ x ] }"
     end
 
     def baked_em_a  # #hook-out: 'expect'

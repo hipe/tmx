@@ -107,8 +107,7 @@ module Skylab::Headless
 
     Ellipsify_ = Ellipsify__.curry[ '[..]'.freeze ]
 
-    Ellipsify = Ellipsify_.curry[
-      Headless::Library_::Basic::FUN::A_REASONABLY_SHORT_LENGTH_FOR_A_STRING ]
+    Ellipsify = Ellipsify_.curry[ Headless_::Lib_::Reasonably_short[] ]
 
     Looks_like_sentence = -> do
       punctuation_character_rx = /[.?!]/

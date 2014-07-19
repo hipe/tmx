@@ -40,7 +40,7 @@ module Skylab::CodeMolester
         nil
       end
       errmsg = -> exp_s do
-        "expected #{ exp_s } near #{ Inspct_[ scn.rest ] }"
+        "expected #{ exp_s } near #{ Strange_[ scn.rest ] }"
       end
       fetch = -> rx do
         scn.scan( rx ) or raise errmsg[ rx.inspect ]
@@ -100,7 +100,7 @@ module Skylab::CodeMolester
 
     CTX_LEN_ = 40  # heuristic
 
-    Inspct_ = Lib_::Inspect_proc[].curry[ CTX_LEN_ ]
+    Strange_ = Lib_::Strange_proc[].curry[ CTX_LEN_ ]
 
     T_MODULE_ = 'module'.freeze
 

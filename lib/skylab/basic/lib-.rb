@@ -51,10 +51,6 @@ module Skylab::Basic
       Headless__[]::API::Iambic_parameters[ * i_a ]
     end
 
-    Inspect = -> x do
-      Basic::FUN::Inspect[ x ]
-    end
-
     Memoize = -> x do
       Callback_.memoize[ x ]
     end
@@ -77,6 +73,10 @@ module Skylab::Basic
 
     Some_stderr_IO = -> do
       Headless__[]::System::IO.some_stderr_IO
+    end
+
+    Strange = -> x do
+      MetaHell__[].strange x
     end
 
     String_IO = -> do

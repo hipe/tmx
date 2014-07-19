@@ -602,7 +602,7 @@ module Skylab::Flex2Treetop
     -> do
       x = @x_a.shift
       x && ! x.closed? or raise ::ArgumentError, "for '#{ par_i }' #{
-        }need open stream, had #{ Headless::FUN::Inspect[ x ] }"
+        }need open stream, had #{ MetaHell.inspect x }"
       instance_variable_set ivar, x ; nil
     end
   end

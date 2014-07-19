@@ -64,5 +64,11 @@ module Skylab::Headless
     Proxy_tee = -> do
       MetaHell__[]::Proxy::Tee
     end
+    Reasonably_short = -> do
+      MetaHell__[].strange::A_REASONABLY_SHORT_LENGTH_FOR_A_STRING
+    end
+    Strange = -> x do
+      MetaHell__[].strange x
+    end
   end
 end

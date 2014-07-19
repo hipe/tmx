@@ -114,7 +114,7 @@ module Skylab::Headless
     SUI_ = :say_unexpected_iambic
 
     Say_unexpected_iambic_ = -> do
-      "unexpected iambic term #{ Headless::FUN::Inspect[ @x_a[ 0 ] ] }"
+      "unexpected iambic term #{ Headless_::Lib_::Strange[ @x_a[ 0 ] ] }"
     end
 
     module Simple_monadic_iambic_writers  # :[#130].
@@ -543,7 +543,7 @@ module Skylab::Headless
       end
       #
       Say_fetch_param_name_er__ = -> param_i do
-        inspect_p = Headless::FUN::Inspect
+        inspect_p = Headless_::Lib_::Strange
         _member_i_a = const_get CONST_A__
         _phrase = Headless::NLP::EN::Levenshtein::
           With_conj_s_render_p_closest_n_items_a_item_x[ ' or ',

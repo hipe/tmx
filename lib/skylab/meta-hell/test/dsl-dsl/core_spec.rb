@@ -44,7 +44,7 @@ module Skylab::MetaHell::TestSupport::DSL_DSL
         Sandbox_2.with self
         module Sandbox_2
           class Foo
-           MetaHell::DSL_DSL.enhance self do
+            MetaHell::DSL_DSL.enhance self do
               block :zinger
             end
           end
@@ -68,7 +68,7 @@ module Skylab::MetaHell::TestSupport::DSL_DSL
         Sandbox_3.with self
         module Sandbox_3
           class Foo
-           MetaHell::DSL_DSL.enhance self do
+            MetaHell::DSL_DSL.enhance self do
               atom_accessor :with_name
             end
           end
@@ -85,7 +85,7 @@ module Skylab::MetaHell::TestSupport::DSL_DSL
         Sandbox_4.with self
         module Sandbox_4
           module Foo
-           MetaHell::DSL_DSL.enhance_module self do
+            MetaHell::DSL_DSL.enhance_module self do
               atom :pik
             end
           end

@@ -58,7 +58,7 @@ module Skylab::Headless
 
     Keyword_required__ = -> i, x_a do
       i == x_a.first or raise ::ArgumentError, "expected '#{ i }' had #{
-        }#{ Headless::FUN::Inspect[ x_a.first ] }"
+        }#{ Headless_::Lib_::Strange[ x_a.first ] }"
       x_a.shift ; nil
     end
 

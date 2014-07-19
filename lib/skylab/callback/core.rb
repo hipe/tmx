@@ -53,7 +53,7 @@ module Skylab::Callback
       end
     private
       def say_bad_term x
-        "unexpected argument #{ Callback_::Lib_::Inspect[ x ] }. #{
+        "unexpected argument #{ Callback_::Lib_::Strange[ x ] }. #{
           }expecting #{ say_expecting }"
       end
       def say_expecting

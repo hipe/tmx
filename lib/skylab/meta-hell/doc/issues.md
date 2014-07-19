@@ -19,7 +19,7 @@
 [#052] #open #formal-box #doc-point #in-situ `to_struct` caveat. spec this ..
 [#051]       #in-situ
 [#051]       #doc-point #experimental-pattern :#method-cherry-picker..
-[#050]       #family 'Strange_'
+[#050]       #family "strange" (as used in "ick", formerly "inspect")
 [#049]       #tracking-tag :#fuzzy
 [#048]       #doc-point what are touchers and when should you use them ..
 [#047]       #doc-point this class of grammars, and this parser..

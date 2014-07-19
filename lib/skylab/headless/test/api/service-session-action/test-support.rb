@@ -66,7 +66,7 @@ module Skylab::Headless::TestSupport::API::SSA__
     end
     def expect_no_more_lines
       bkd_emission_a.length.zero? or fail "expected no more lines had: #{
-        }#{ Headless::FUN::Inspect[ @bkd_em_a.first ] }"
+        }#{ Headless_::Lib_::Strange[ @bkd_em_a.first ] }"
     end
   end
 end

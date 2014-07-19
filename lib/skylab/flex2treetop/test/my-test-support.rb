@@ -86,7 +86,7 @@ module Skylab::Flex2Treetop::MyTestSupport
           x_a.shift ; do_expect_styled = true
         end
         x_a.length.zero? or
-          fail "unexpected #{ Skylab_Headless::FUN::Inspect[ x_a.first ] }"
+          fail "unexpected #{ Skylab_Headless.inspect x_a.first }"
         line = gets_some_chopped_line  # #storypoint-050
         do_expect_styled and line = expct_styled( line )
         if string_matcher_x.respond_to? :named_captures

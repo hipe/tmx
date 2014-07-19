@@ -41,7 +41,7 @@ module Skylab::SubTree
           o = Lib_::CLI_stylify_proc[].curry
           define_method :em, o[ %i( green ) ]
           define_method :escape_path, Lib_::Pretty_path_proc[]
-          define_method :ick, Lib_::Inspect_proc[].curry[ 60 ]
+          define_method :ick, Lib_::Strange_proc[].curry[ 60 ]
         public
           def stylize *a
             _s = a.pop

@@ -48,15 +48,6 @@ module Skylab::Callback
 
     Headless__ = sidesys[ :Headless ]
 
-    Inspect = -> do
-      p = -> x do
-        _LENGTH_OF_A_LONG_LINE = 120
-        p = self::Basic__[]::FUN::Inspect__.curry[ _LENGTH_OF_A_LONG_LINE ]
-        p[ x ]
-      end
-      -> x { p[ x ] }
-    end.call
-
     Let = -> do
       self::MetaHell__[]::Let
     end
@@ -92,6 +83,15 @@ module Skylab::Callback
     Some_stderr = -> do
       self::Headless__[]::System::IO.some_stderr_IO
     end
+
+    Strange = -> do
+      p = -> x do
+        _LENGTH_OF_A_LONG_LINE = 120
+        p = MetaHell__[].strange.curry[ _LENGTH_OF_A_LONG_LINE ]
+        p[ x ]
+      end
+      -> x { p[ x ] }
+    end.call
 
     StringScanner = -> do
       require 'strscan' ; ::StringScanner

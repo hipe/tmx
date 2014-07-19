@@ -141,7 +141,7 @@ module Skylab::GitViz
       end
 
       Inspect_ = -> x do
-        GitViz::Lib_::Inspect[ x ]
+        GitViz::Lib_::Strange[ x ]
       end
     end
   end

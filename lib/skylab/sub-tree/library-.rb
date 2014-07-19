@@ -136,10 +136,6 @@ module Skylab::SubTree
       Face__[]::Iambic.from_iambic x_a
     end
 
-    Inspect_proc = -> do
-      Basic__[]::FUN::Inspect__
-    end
-
     InformationTactics__ = sidesys[ :InformationTactics ]
 
     MetaHell__ = sidesys[ :MetaHell ]
@@ -164,6 +160,10 @@ module Skylab::SubTree
 
     Stock_API_expression_agent = -> do
       Face__[]::CLI::Client::API_Integration_::EXPRESSION_AGENT_
+    end
+
+    Strange_proc = -> do
+      MetaHell__[].strange.to_proc
     end
 
     Struct = -> * i_a do

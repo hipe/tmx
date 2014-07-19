@@ -47,7 +47,7 @@ module Skylab::MetaHell
     #     end
     #
     #     Baz.new( :four, "frick" ).four_value  # => 'frick'
-    #     Foo.new( :four, "frick" )  # => ArgumentError: unrecognized keyword "four" - did you mean two?
+    #     Foo.new( :four, "frick" )  # => ArgumentError: unrecognized keyword 'four' - did you mean two?
     #
 
     module From  # :[#053]

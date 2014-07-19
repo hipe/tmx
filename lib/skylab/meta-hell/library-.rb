@@ -39,7 +39,7 @@ module Skylab::MetaHell
     end
 
     Strange = -> x do
-      MetaHell_::Parse.strange x
+      MetaHell_.strange x
     end
   end
 end

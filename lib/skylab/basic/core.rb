@@ -4,7 +4,7 @@ module Skylab::Basic  # introduction at [#020]
 
     Callback_ = ::Skylab::Callback
   Autoloader_ = Callback_::Autoloader
-  Basic = self
+  Basic = Basic_ = self
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> { }
 

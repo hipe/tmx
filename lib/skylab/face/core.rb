@@ -115,10 +115,6 @@ module Skylab::Face  # read [#011] the top node narrative
 
     Headless__ = sidesys[ :Headless ]
 
-    Inspect_proc = -> do
-      Basic__[]::FUN::Inspect__
-    end
-
     MetaHell__ = sidesys[ :MetaHell ]
 
     Module_mutex_proc = -> do
@@ -175,6 +171,10 @@ module Skylab::Face  # read [#011] the top node narrative
 
     Scanner_for_array = -> a do
       Basic__[]::List::Scanner::For::Array.new a
+    end
+
+    Strange_proc = -> do
+      MetaHell__[].strange.to_proc
     end
 
     System_IO = memo[ -> do

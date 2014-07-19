@@ -317,16 +317,10 @@ module Skylab::Face
 
           define_method :hack_label, & Hack_label
 
-          def ick x  # :+[#mh-050] family
-            if x.respond_to? :id2name
-              "'#{ x }'"
-            else
-              Inspct__[ x ]
-            end
+          def ick x
+            Face_::Lib_::Strange_proc[][ REASONABLY_SHORT__, x ]
           end
-          #
-          Inspct__ = Lib_::Inspect_proc[].
-            curry[ A_REASONABLY_SHORT_LENGTH_FOR_A_STRING__ = 10 ]
+          REASONABLY_SHORT__ = 10
 
           def lbl x
             Callback_::Name.from_variegated_symbol( x ).as_human

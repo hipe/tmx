@@ -116,7 +116,7 @@ module Skylab::MetaHell
       end
     private
       def say_extra x
-        "unrecognized element: #{ Parse::Strange_[ x ] }#{ any_context }#{
+        "unrecognized element: #{ MetaHell_.strange x }#{ any_context }#{
           }#{ Lev__[ field_box.get_names, x ] if x.respond_to? :id2name }"
       end
       #

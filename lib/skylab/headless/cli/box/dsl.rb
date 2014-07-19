@@ -245,7 +245,7 @@ module Skylab::Headless
               bound = rslv_bound_action_for_help chld_x
               bound ? hlp_screen_for_bound_child( y,  bound ) : CEASE_X__
             else
-              x = chld_x[] and fail "sanity - #{ Headless::FUN::Inspect[ x ] }"
+              x = chld_x[] and fail "sanity - #{ Headless_::Lib_::Strange[ x ] }"
               hlp_screen_as_engaged_box y
             end
           end

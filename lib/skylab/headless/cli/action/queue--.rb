@@ -51,7 +51,7 @@ module Skylab::Headless
       end
 
       def say_not_i
-        "expected symbol had #{ Headless::FUN::Inspect[ @a[ 0 ] ] }"
+        "expected symbol had #{ Headless_::Lib_::Strange[ @a[ 0 ] ] }"
       end
 
     public

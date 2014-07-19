@@ -51,6 +51,9 @@ module Skylab
     MONADIC_EMPTINESS_ = -> _ { }
     MONADIC_TRUTH_ = -> _ { true }
 
+    def self.strange * a
+      MetaHell_::Strange__.via_argument_list a
+    end
   end
 end
 
