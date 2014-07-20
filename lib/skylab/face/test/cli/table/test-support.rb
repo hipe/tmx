@@ -16,4 +16,6 @@ module Skylab::Face::TestSupport::CLI::Table
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
+  Subject__ = -> { Face::CLI::Table }
+
 end

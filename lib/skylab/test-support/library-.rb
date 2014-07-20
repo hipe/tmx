@@ -62,10 +62,6 @@ module Skylab::TestSupport
       Face__[]::CLI::Table.via_iambic x_a
     end
 
-    CLI_table_class = -> do
-      Face__[]::CLI::Table
-    end
-
     Default_core_file = -> do
       Autoloader_.default_core_file
     end

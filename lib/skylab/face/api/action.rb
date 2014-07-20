@@ -62,7 +62,7 @@ module Skylab::Face
     def field_box
       EMPTY_FIELD_BOX__
     end
-    EMPTY_FIELD_BOX__ = Lib_::Box[].freeze
+    EMPTY_FIELD_BOX__ = Lib_::Box[].new.freeze
 
   public
 

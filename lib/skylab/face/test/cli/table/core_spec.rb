@@ -41,27 +41,27 @@ module Skylab::Face::TestSupport::CLI::Table
           Table[ [] ].should eql( '' )
         end
       end
-      it "here's a minimal non-empty table (note you get default styling)" do
+      it "default styling (\"| \", \" |\") is evident in this minimal non-empty table" do
         Sandbox_1.with self
         module Sandbox_1
-          Table[ [ [ 'a' ] ] ].should eql( "|  a |\n" )
+          Table[ [ [ 'a' ] ] ].should eql( "| a |\n" )
         end
       end
-      it "for a minimal normative example" do
+      it "with this minimal normative example" do
         Sandbox_1.with self
         module Sandbox_1
           act = Table[ [ [ 'Food', 'Drink' ], [ 'donuts', 'coffee' ] ] ]
           exp = <<-HERE.gsub %r<^ +>, ''
-            |    Food |   Drink |
-            |  donuts |  coffee |
+            | Food   | Drink  |
+            | donuts | coffee |
           HERE
           act.should eql( exp )
         end
       end
     end
-    context "but wait there's more-" do
+    context "but wait there's more -" do
       Sandbox_2 = Sandboxer.spawn
-      it "you can specify custom headers, separators, and output functions" do
+      it "specify custom headers, separators, and output functions" do
         Sandbox_2.with self
         module Sandbox_2
           Table = Face::CLI::Table
@@ -73,24 +73,24 @@ module Skylab::Face::TestSupport::CLI::Table
                      ]
 
           r.should eql( nil )
-          ( a * 'X' ).should eql( "(Food,      Drink)X( nut,pomegranate)" )
+          ( a * 'X' ).should eql( "(Food,Drink      )X(nut ,pomegranate)" )
         end
       end
     end
     context "this syntax is \"contoured\" - fields themselves eat keywords" do
       Sandbox_3 = Sandboxer.spawn
-      it "like so : you can align `left` or `right` (and watch for etc)" do
+      it "like so : you can align `left` or `right` (ambiguity is possible)" do
         Sandbox_3.with self
         module Sandbox_3
           str = Face::CLI::Table[
             :field, :right, :label, "Subproduct",
             :field, :left, :label, "num test files",
-            :read_rows_from, [ [ 'face', '100' ], [ 'headless', '99' ] ] ]
+            :read_rows_from, [ [ 'face', 100 ], [ 'headless', 99 ] ] ]
 
           exp = <<-HERE.unindent
-            |  Subproduct |  num test files |
-            |        face |  100            |
-            |    headless |  99             |
+            | Subproduct | num test files |
+            |       face | 100            |
+            |   headless | 99             |
           HERE
           str.should eql( exp )
         end

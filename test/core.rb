@@ -28,8 +28,8 @@ module Skylab::Test
       Headless__[]::CLI::Option
     end
 
-    CLI_table = -> * a do
-      Face__[]::CLI::Table.new( a ).execute
+    CLI_table = -> * x_a do
+      Face__[]::CLI::Table.via_iambic x_a
     end
 
     EN_calculate = -> p do

@@ -3,7 +3,7 @@ require_relative '../callback/core'
 module Skylab::Face  # read [#011] the top node narrative
 
   Callback_ = ::Skylab::Callback
-  Autoloader_ = Callback_::Autoloader
+    Autoloader_ = Callback_::Autoloader
 
   module API
     def self.[] mod
@@ -67,12 +67,8 @@ module Skylab::Face  # read [#011] the top node narrative
 
     Basic__ = sidesys[ :Basic ]
 
-    Box_class = -> do
-      Basic__[]::Box
-    end
-
     Box = -> do
-      Basic__[]::Box.new
+      Basic__[]::Box
     end
 
     Counting_yielder = -> p do
@@ -467,7 +463,7 @@ module Skylab::Face  # read [#011] the top node narrative
           def self.collapse
             super
             a = @formal_arg_a ; @formal_arg_a = nil
-            box = const_set :SERVICES_, Lib_::Box[]
+            box = const_set :SERVICES_, Lib_::Box[].new
             begin
               box.add (( i = a.shift )), a.shift
               define_method( i ) { self[ i ] }

@@ -20,143 +20,97 @@ module Skylab::Face
     #
     #     Table[ [] ]  # => ''
     #
-    # here's a minimal non-empty table (note you get default styling):
+    # default styling ("| ", " |") is evident in this minimal non-empty table:
     #
-    #     Table[ [ [ 'a' ] ] ]   # => "|  a |\n"
+    #     Table[ [ [ 'a' ] ] ]   # => "| a |\n"
     #
-    # for a minimal normative example:
+    #
+    # the default styling also includes " | " as the middle separator
+    # and text cels aligned left
+    # with this minimal normative example
     #
     #     act = Table[ [ [ 'Food', 'Drink' ], [ 'donuts', 'coffee' ] ] ]
     #     exp = <<-HERE.gsub %r<^ +>, ''
-    #       |    Food |   Drink |
-    #       |  donuts |  coffee |
+    #       | Food   | Drink  |
+    #       | donuts | coffee |
     #     HERE
     #     act  # => exp
 
     class << self
-      def [] * a
-        via_iambic a
+      def [] * x_a
+        new( x_a ).execute
       end
-      def via_iambic a
-        new( a ).execute
+      def via_iambic x_a
+        new( x_a ).execute
       end
     end
 
     def initialize x_a
-      @left_x = @sep_x = @right_x = @do_show_header = @field_box =
-        @read_rows_from = @write_lines_to = nil
-      1 == x_a.length and when_one x_a
-      abs_iambic_fully x_a
-      clear_iambic_ivars
-    end
-  private
-    def when_one x_a  # hack - whenever exactly 1
-      # element is passed assume it is a rows enumerator.
-      x_a.unshift :read_rows_from ; nil
+      @do_show_header = @field_box = @left_x = @right_x = @read_rows_from =
+        @sep_x = @write_lines_to = nil
+      Table_Shell__.new 0, x_a, self
     end
 
-    # ~ :+[#mh-021] typical base class implementation:
-  public
-    def dupe
-      dup
-    end
+    attr_writer :do_show_header, :field_box, :left_x, :read_rows_from,
+      :right_x, :sep_x, :write_lines_to
+
+    alias_method :dupe, :dup  # :+[#mh-021] (ok)
+
     def initialize_copy _otr_
-      # copy-by-reference @do_show_header, @left_x, @read_rows_from,
-      # @right_x, @sep_x, @write_lines_to
+      # @do_show_header, @left_x @right_x, @sep_x copy-by-reference
 
-      # do not copy e.g @d, @x_a, @x_a_length @iambic_scan (iambic parse)
-      clear_iambic_ivars
+      # ALSO @read_rows_from, @write_lines_to copy-by-reference (for now)
 
-      # deep copy:
-      @field_box and @field_box = @field_box.dupe  # #storypoint-80
+      @field_box and @field_box = @field_box.dupe  # deep copy #storypoint-80
       nil
     end
-  protected
-    def get_args_for_copy
-      [ @field_box ]
-    end
-    # ~
 
-  public
-
-    def execute
-      begin
-        @read_rows_from or break  # nothing to do when no data producers
-        r = first_pass or break
-        r = render
-      end while nil
-      r
-    end
-
-   private
-
-    def first_pass  # #storypoint-100
-      max_a = [ ] ; get_max_of_row = -> ea do
-        ea.each_with_index do |x, d|
-          if (( len = max_a[ d ] ))
-            len < x.length and max_a[ d ] = x.length
-          else
-            max_a[ d ] = x.length
-          end
+    class Table_Shell__
+      def initialize d, x_a, kernel
+        @d = d ; @kernel = kernel ; @x_a = x_a
+        @field_box = nil
+        1 == @x_a.length and when_one
+        absrb
+        if @field_box
+          @kernel.do_show_header.nil? and @kernel.do_show_header = true
+          @kernel.field_box and raise "field merge not implemented"
+          @kernel.field_box = @field_box
         end
       end
-      @do_show_header and get_max_of_row[ header_row ]
-      cache_a = [ ] ; ok = @read_rows_from.each do |row_ea|
-        get_max_of_row[ row_ea ]
-        cache_a << row_ea
-        nil
+    private
+      def when_one  # hack - whenever exactly 1 element is passed
+        # assume it is a rows enumerator.
+        @x_a.unshift :read_rows_from ; nil
       end
-      if ok
-        @max_a = max_a ; @cache_a = cache_a ; true
-      else
-        @max_a = @cache_a = nil ; ok  # promulgate particular false-ish-ness
+    Face_::Lib_::Fields_from_methods[ :niladic, :absorber, :absrb, -> do
+      def field
+        bx = (( @field_box ||= Lib_::Box[].new ))
+        shell = Field_Shell__.new @d, @x_a, bx
+        @d = shell.d
       end
-    end
-
-    def render
-      (( yp = @write_lines_to )) or begin
-        io = Library_::StringIO.new
-        yp = io.method :puts
+      def left
+        @kernel.left_x = iambic_property
       end
-      fmt = get_format
-      row_p = -> cel_ea { yp[ fmt % cel_ea ] }
-      @do_show_header and row_p[ header_row ]
-      @cache_a.each( & row_p )
-      io && io.string
-    end
-
-    def get_format
-      sep = @sep_x || SEP_DEFAULT_
-      "#{ @left_x || LEFT_DEFAULT_ }#{
-        a = (( bx = @field_box )) ? bx._a : MONADIC_EMPTINESS_
-        num_cols.times.map do |d|
-          sign = MINUS_ if (( k = a[ d ] )) && :left == bx.fetch( k ).align_i
-          "%#{ sign }#{ @max_a[ d ] || 0 }s"
-        end * sep
-      }#{ @right_x || RIGHT_DEFAULT_ }"
-    end
-
-    MINUS_ = '-'.freeze
-    MONADIC_EMPTINESS_ = -> _ { }
-    LEFT_DEFAULT_ = '|  '.freeze
-    SEP_DEFAULT_ = ' |  '.freeze
-    RIGHT_DEFAULT_ = ' |'.freeze
-
-    def num_cols
-      @max_a.length
-    end
-
-    Lib_::Fields_from_methods[ :absorber, :abs_iambic_fully, -> do
       def read_rows_from
-        @read_rows_from = iambic_property ; nil
+        @kernel.read_rows_from = iambic_property  # empty ary must be OK here
+      end
+      def right
+        @kernel.right_x = iambic_property
+      end
+      def sep
+        @kernel.sep_x = iambic_property
+      end
+      def show_header
+        @kernel.do_show_header = iambic_property
+      end
+      def write_lines_to
+        @kernel.write_lines_to = iambic_property
       end
     end ]
-  end
+    end
 
-  class CLI::Table
-
-    # but wait there's more-
-    # you can specify custom headers, separators, and output functions:
+    # but wait there's more -
+    # specify custom headers, separators, and output functions:
     #
     #     Table = Face::CLI::Table
     #     a = []
@@ -167,91 +121,395 @@ module Skylab::Face
     #                ]
     #
     #     r  # => nil
-    #     ( a * 'X' )  # => "(Food,      Drink)X( nut,pomegranate)"
+    #     ( a * 'X' )  # => "(Food,Drink      )X(nut ,pomegranate)"
 
-    private
-    Lib_::Fields_from_methods[ :absorber, :absorb_iambic_fully, -> do
-      def field
-        bx = (( @field_box ||= Lib_::Box[] ))
-        fld = Field__.new @d, @x_a, bx.length
-        @d = fld.d
-        bx.add fld.name_i, fld
-        @do_show_header.nil? and @do_show_header = true
-        @header_cel_a = nil
+    class Field_Shell__
+      def initialize d, x_a, bx
+        @d = d ; @x_a = x_a
+        prepare_peaceful_parse
+        Field__.new do |fld|
+          @field = fld
+          if @x_a.fetch( @d ).respond_to? :ascii_only?
+            label
+          else
+            absrb_passive
+          end
+          @field.name_i ||= :"#{ bx.length }"
+        end
+        bx.add @field.name_i, @field ; nil
       end
-      def write_lines_to
-        @write_lines_to = iambic_property ; nil
-      end
-      def show_header
-        @do_show_header = iambic_property ; nil
-      end
-      def left
-        @left_x = iambic_property ; nil
-      end
-      def sep
-        @sep_x = iambic_property ; nil
-      end
-      def right
-        @right_x = iambic_property ; nil
-      end
-    end ]
-
-    def header_row
-      @header_cel_a ||= @field_box.map( & :label_s )
+      attr_reader :d
+      Lib_::Fields_from_methods[
+        :niladic, :passive, :absorber, :absrb_passive,
+      -> do
+        def id  # typically for fields w/o labels, i.e non-displayed headers
+          @field.name_i = iambic_property
+        end
+        def label
+          @field.label_s = iambic_property
+          @field.name_i.nil? and @field.name_i = @field.label_s.intern
+        end
+        def left
+          @field.align_i = :left
+        end
+        def right
+          @field.align_i = :right
+        end
+      end ]
     end
 
     # this syntax is "contoured" - fields themselves eat keywords
-    # like so : you can align `left` or `right` (and watch for etc)
+    # like so : you can align `left` or `right` (ambiguity is possible)
     #
     #     str = Face::CLI::Table[
     #       :field, :right, :label, "Subproduct",
     #       :field, :left, :label, "num test files",
-    #       :read_rows_from, [ [ 'face', '100' ], [ 'headless', '99' ] ] ]
+    #       :read_rows_from, [ [ 'face', 100 ], [ 'headless', 99 ] ] ]
     #
     #     exp = <<-HERE.unindent
-    #       |  Subproduct |  num test files |
-    #       |        face |  100            |
-    #       |    headless |  99             |
+    #       | Subproduct | num test files |
+    #       |       face | 100            |
+    #       |   headless | 99             |
     #     HERE
     #     str # => exp
 
     class Field__
-      def initialize d, x_a, idx
-        @d = d
-        @name_i = nil
-        if x_a.fetch( d ).respond_to? :ascii_only?
-          prepare_peaceful_parse_for_iambic x_a
-          label
-        else
-          absorb_iambic_passively x_a
-        end
-        @name_i ||= :"#{ idx }"  # always give it a unique id to act as a key
-        d = @d ; clear_iambic_ivars ; @d = d
+      def initialize
+        yield self
         freeze  # ensure that we can dupe with shallow copies
       end
+      attr_accessor :align_i, :label_s, :name_i
+    end
 
-      attr_reader :label_s, :name_i, :align_i
-      attr_reader :d
+  public
 
-      private
-      Lib_::Fields_from_methods[
-        :passive, :absorber, :absorb_iambic_passively,
-      -> do
-        def left
-          @align_i = :left ; nil
+    def execute
+      ok = @read_rows_from  # nothing to do when no data producers
+      ok &&= string_pass
+      ok && render_pass
+    end
+
+  private
+
+    # ~ the string pass
+
+    def string_pass
+      The_String_Pass__.new( self ).field_stats_and_cel_matrix do |fs, cm|
+        @cel_matrix = cm
+        @field_stats = fs
+      end
+    end
+
+    class The_String_Pass__
+      def initialize kernel
+        @kernel = kernel
+      end
+      def field_stats_and_cel_matrix
+        if (( @scn = bld_row_scanner ))
+          yield( * rslv_two_from_scan )
+        else
+          yield @scn
         end
-        def right
-          @align_i = :right ; nil
+      end
+    private
+      def bld_row_scanner
+        p = nil
+        initialize_normal_p = -> do
+          ea = @kernel.read_rows_from.to_enum
+          p = -> do
+            begin
+              ea.next
+            rescue ::StopIteration
+            end
+          end ; nil
         end
-        def label
-          @label_s = iambic_property
-          @name_i.nil? and @name_i = @label_s.intern
-          nil
+        if @kernel.do_show_header
+          p = -> do
+            initialize_normal_p[]
+            @kernel.field_box.map( & :label_s )
+          end
+        else
+          initialize_normal_p[]
         end
-        def id  # typically for fields w/o labels, i.e non-displayed headers
-          @name_i = iambic_property ; nil
+        Callback_::Scn.new { p[] }
+      end
+      def rslv_two_from_scan
+        h = ::Hash.new do |h_, d|
+          h_[ d ] = Field_Statistics__.new d
         end
-      end ]
+        cel_matrix = []
+        while (( row = @scn.gets ))
+          cel_matrix.push( cel_row = [] )
+          row.each_with_index do |cel_x, d|
+            cel_row.push h[ d ].see_value_and_build_cel( cel_x )
+          end
+        end
+        [ h.length.times.map do |d|
+            h.fetch( d ).finish_string_pass
+          end, cel_matrix ]
+      end
+    end
+  public
+    attr_reader :do_show_header, :field_box, :read_rows_from
+
+    class Field_Statistics__
+      attr_reader :d, :min_numeric_x, :max_numeric_x,
+        :min_strlen, :max_strlen,
+        :max_whole_places, :max_rational_places,
+        :typecount_h
+      def initialize d
+        @d = d
+        @min_numeric_x = @max_numeric_x = nil
+        @min_strlen = @max_strlen = nil
+        @max_whole_places = @max_rational_places = 0
+        @render_p = nil
+        @typecount_h = ::Hash.new 0
+
+        @check_numeric_min_max = -> do
+          @min_numeric_x = @max_numeric_x = @x
+          @check_numeric_min_max = -> do
+            if @x < @min_numeric_x
+              @min_numeric_x = @x
+            elsif @max_numeric_x < @x
+              @max_numeric_x = @x
+            end ; nil
+          end ; nil
+        end
+
+        @check_strlen_min_max = -> do
+          @min_strlen = @max_strlen = @x.length
+          @check_strlen_min_max = -> do
+            len = @x.length
+            if len < @min_strlen
+              @min_strlen = len
+            elsif @max_strlen < len
+              @max_strlen = len
+            end ; nil
+          end ; nil
+        end
+      end
+      def see_value_and_build_cel x
+        if x
+          @x = x
+          if x.respond_to? :ascii_only?
+            see_string_value
+          else
+            see_numeric_value
+          end
+          @typecount_h[ @cel.type_i ] += 1
+          @cel
+        else
+          @typecount_h[ :falseish ] += 1
+          x
+        end
+      end
+    private
+      def see_numeric_value
+        @cel = Numeric_Cel__.new @x
+        @check_numeric_min_max[]
+        convert_to_string_and_count_places
+        finish_string_value
+      end
+
+      def convert_to_string_and_count_places
+        @x = @x.to_s
+        whole = @x.index PERIOD__
+        if whole
+          rational = @x.length - whole - 1
+          rational > @max_rational_places and @max_rational_places = rational
+        else
+          whole = @x.length
+        end
+        whole > @max_whole_places and @max_whole_places = whole
+      end
+      PERIOD__ = '.'.freeze
+
+      def see_string_value
+        @cel = String_Cel__.new
+        finish_string_value
+      end
+
+      def finish_string_value
+        @check_strlen_min_max[]
+        @cel.as_string = @x ; nil
+      end
+    public
+      def finish_string_pass
+        @check_numeric_min_max = @check_strlen_min_max = nil
+        @cel = @x = nil ; self
+      end
+    end
+
+    class String_Cel__
+      attr_accessor :as_string
+      def type_i
+        :string
+      end
+    end
+
+    class Numeric_Cel__ < String_Cel__
+      def initialize x
+        @x = x
+      end
+      attr_reader :x
+      def type_i
+        :numeric
+      end
+    end
+
+  private
+
+    # ~ the render pass
+
+    def render_pass
+      cel_renderers = prdc_cel_renderers
+      if @write_lines_to
+        puts_p = @write_lines_to
+      else
+        io = Library_::StringIO.new
+        puts_p = io.method :puts
+      end
+
+      left = @left_x || DEFAULT_LEFT_MARGIN__
+      sep = @sep_x || DEFAULT_SEPARATOR__
+      right = @right_x || DEFAULT_RIGHT_MARGIN__
+
+      scn = get_cel_row_iterator
+      while (( row = scn.gets ))
+        puts_p[ "#{ left }#{
+          ( row.map.with_index do |cel, d|
+            cel_renderers.fetch( d ).render_cel cel
+          end ) * ( sep ) }#{
+          }#{ right }" ]
+      end
+      io && io.string
+    end
+
+    DEFAULT_LEFT_MARGIN__ = '| '.freeze
+    DEFAULT_SEPARATOR__ = ' | '.freeze
+    DEFAULT_RIGHT_MARGIN__ = ' |'.freeze
+
+    def get_cel_row_iterator
+      d = -1 ; last = @cel_matrix.length - 1
+      Callback_::Scn.new do
+        if d < last
+          @cel_matrix.fetch d += 1
+        end
+      end
+    end
+
+    def prdc_cel_renderers
+      stats = @field_stats
+      widest_row_cels_count = stats.length
+      if @field_box
+        field_a = @field_box.values
+        fields_count = field_a.length
+        overage = widest_row_cels_count - fields_count
+        if 0 < overage
+          field_a.concat overage.times.map { DEFAULT_FIELD__ }
+        end
+        field_fetcher = -> d { field_a.fetch d }
+      else
+        field_fetcher = -> _ { DEFAULT_FIELD__ }
+      end
+      widest_row_cels_count.times.map do |d|
+        field_fetcher[ d ].produce_cel_renderer_via_stats stats.fetch d
+      end
+    end
+
+    class Field__
+      def produce_cel_renderer_via_stats stats
+        Cel_Renderer__.produce_via_field_and_stats self, stats
+      end
+    end
+
+    DEFAULT_FIELD__ = Field__.new { }
+
+    class Cel_Renderer__
+      def self.produce_via_field_and_stats field, stats
+        new( field, stats ).produce
+      end
+      def initialize field, stats
+        @field = field ; @stats = stats
+      end
+      def produce
+        if @stats.typecount_h.key? :numeric
+          if @stats.max_rational_places.zero?
+            Integer_Cel_Renderer__.new @field.align_i, @stats
+          else
+            Floating_Point_Cel_Renderer__.new @field.align_i, @stats
+          end
+        else
+          String_Cel_Renderer__.new @field.align_i, @stats.max_strlen
+        end
+      end
+    end
+
+    class Functional_Cel_Renderer__
+      def render_cel cel
+        @render_cel_p[ cel ]
+      end
+    end
+
+    class String_Cel_Renderer__ < Functional_Cel_Renderer__
+      def initialize align_i, max_strlen
+        resolve_string_format_string_from align_i, max_strlen
+        @render_cel_p = -> cel do
+          if cel
+            @string_format_string % cel.as_string
+          else
+            @string_format_string % cel
+          end
+        end ; nil
+      end
+    private
+      def resolve_string_format_string_from align_i, max_strlen
+        :right == align_i or minus = MINUS_
+        @string_format_string = "%#{ minus }#{ max_strlen }s" ; nil
+      end
+    end
+
+    class Numeric_Cel_Renderer__ < String_Cel_Renderer__
+    private
+      def from_two_formats_resolve_standard_numeric_renderer
+        @render_cel_p = -> cel do
+          if cel
+            if :numeric == cel.type_i
+              @numeric_format_string % cel.x
+            else
+              @string_format_string % cel.as_string
+            end
+          else
+            @string_format_string % cel
+          end
+        end
+      end
+    end
+
+    class Integer_Cel_Renderer__ < Numeric_Cel_Renderer__
+      def initialize align_i, stats
+        :left == align_i and minus = MINUS_
+        @numeric_format_string = "%#{ minus }#{ stats.max_strlen }d"
+        resolve_string_format_string_from align_i, stats.max_strlen
+        from_two_formats_resolve_standard_numeric_renderer ; nil
+      end
+    end
+
+    class Floating_Point_Cel_Renderer__ < Numeric_Cel_Renderer__
+      def initialize align_i, stats
+        number_of_numeric_columns =
+          stats.max_whole_places + 1 + stats.max_rational_places
+        if stats.max_strlen > number_of_numeric_columns
+          over_d = stats.max_strlen - number_of_numeric_columns
+        else
+          use_max_strlen = number_of_numeric_columns
+          over_d = 0
+        end
+        _bignum = number_of_numeric_columns + over_d
+        @numeric_format_string = "%#{ _bignum }.#{ stats.max_rational_places }f"
+        resolve_string_format_string_from align_i || :right, use_max_strlen
+        from_two_formats_resolve_standard_numeric_renderer ; nil
+      end
     end
 
     # but the real fun begins with currying - curry a table in one place
@@ -269,44 +527,29 @@ module Skylab::Face
     #     Q[ :sep, '_' ]  # => "<a_b>\n"
     #     Q[]  # => "<aXb>\n"
 
-    def self.curry *a
-      # (currying from the class means you get no ivars out of the box)
-      new( a ).freeze
+    class << self
+      def curry * x_a
+        new( x_a ).freeze
+      end
     end
-
   public
-
-    def [] *a  # #storypoint-280
-      cury_iambic( a ).execute
-    end
-
     def curry * x_a
-      cury_iambic x_a
+      mutable_kernel = dupe
+      mutable_kernel.absorb_iambic_flly x_a
+      mutable_kernel.freeze
     end
-  private
-    def cury_iambic x_a
-      1 == x_a.length and when_one x_a
-      otr = dupe
-      otr.absorb_iambic_fully x_a
-      otr
+    def [] * x_a  # typically from a frozen, curried kernel
+      mutable_kernel = dupe
+      mutable_kernel.absorb_iambic_flly x_a
+      mutable_kernel.execute
     end
-  public
-
-    Multiline_column_B = -> row_a, cel_a, a do
-      #  #todo spec and/or cleanup interface
-      col_a = [ cel_a ]
-      if a.length.zero?
-        col_a << ''
-      else
-        col_a << a.fetch( 0 )
-      end
-      row_a << col_a
-      if 1 < a.length
-        row_a.concat a[ 1 .. -1 ].map { |s| [ '', s ] }
-      end
-      nil
+  protected
+    def absorb_iambic_flly x_a
+      Table_Shell__.new 0, x_a, self
     end
 
-    EMPTY_A_ = [].freeze
+    # ~ done with currying
+
+    MINUS_ = '-'.freeze
   end
 end

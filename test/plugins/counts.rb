@@ -53,10 +53,10 @@ module Skylab::Test
             num = tre.children.count
             if num.nonzero? or @do_zero
               total += num
-              y << [ sp.slug, num.to_s ]
+              y << [ sp.slug, num ]
             end
           end
-          y << [ '(total)', total.to_s ]
+          y << [ '(total)', total ]
           ok
         end  ]
     end

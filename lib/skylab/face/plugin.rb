@@ -285,7 +285,7 @@ module Skylab::Face
     end
   end
 
-  Plugin::Box_ = Lib_::Box_class[]
+  Plugin::Box_ = Lib_::Box[]
 
   Plugin::DeclarationError = ::Class.new ::RuntimeError
 

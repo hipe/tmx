@@ -128,18 +128,7 @@ module Skylab::MetaHell
         end
       end
       def bld_fld_box
-        box = MetaHell_::Library_::Basic::Box.new
-        box._h.default_proc = -> h, k do
-          raise ::ArgumentError, say_xtra( h.keys, k )
-        end ; box
-      end
-      def say_xtra a, x
-        "unrecognized keyword #{ MetaHell_::Lib_::Strange[ x ] }#{
-         } - did you mean #{ Lev__[ a, x ] }?"
-      end
-      Lev__ = -> a, x do
-        MetaHell_::Library_::Headless::NLP::EN::Levenshtein::
-          Or_with_closest_n_items_to_item.curry[ 3, a, x ]
+        MetaHell_::Library_::Basic::Box.new
       end
     end
 
@@ -244,9 +233,9 @@ module Skylab::MetaHell
         end
       end
       def initialize
+        @absorber_arity_i = nil
         @do_argful = false
         @do_destructive = false
-        @do_globbing = false
         @do_passive = false
         super()
       end
@@ -256,6 +245,7 @@ module Skylab::MetaHell
         argful: :prcss_argful,
         destructive: :prcss_destructive,
         globbing: :prcss_globbing,
+        niladic: :prcss_niladic,
         passive: :prcss_passive,
       ).freeze
       def unobtrsv_passive_scan d, i_a
@@ -267,7 +257,7 @@ module Skylab::MetaHell
         end until @is_done
         @method_name or raise ::ArgumentError, "method name required"
         @i_a = nil
-        @p = rslv_some_absorber_method
+        @p = produce_absorber_method
         [ @d, self ]
       end
     private
@@ -282,34 +272,62 @@ module Skylab::MetaHell
         @do_destructive = true ; nil
       end
       def prcss_globbing
-        @do_globbing = true ; nil
+        set_absorber_arity :polyadic
+      end
+      def prcss_niladic
+        set_absorber_arity :niladic
       end
       def prcss_passive
-        @do_globbing = false
         @do_passive = true ; nil
       end
-
-    private
-      def rslv_some_absorber_method
-        parse = Parse__.new @do_argful, @do_destructive,
-          @do_passive, @do_globbing
-        if @do_globbing
-          -> * x_a do
-            parse.for_client( self ).parse_iambic x_a
-          end
+      def set_absorber_arity i
+        if @absorber_arity_i
+          raise ::ArgumentError, say_cant( i )
         else
-          -> x_a do
-            parse.for_client( self ).parse_iambic x_a
-          end
+          @absorber_arity_i = i ; nil
+        end
+      end
+      def say_cant i
+        "absorber can't be '#{ i }' because arguments that were provided #{
+          }explicity have already made its arity #{ @absorber_arity_i }."
+      end
+      def produce_absorber_method
+        arity_i = @absorber_arity_i || DEFAULT_ARITY_I__
+        send ARITY_METHOD_H__.fetch( arity_i ),
+          Parse__.new( arity_i, @do_argful, @do_destructive, @do_passive )
+      end
+      ARITY_METHOD_H__ = {
+        niladic: :produce_niladic_absorber_method,
+        monadic: :produce_monadic_absorber_method,
+        polyadic: :produce_polyadic_absorber_method
+      }.freeze
+      DEFAULT_ARITY_I__ = :monadic
+      def produce_niladic_absorber_method parse
+        -> do
+          parse.for_client( self ).parse_as_is
+        end
+      end
+      def produce_monadic_absorber_method parse
+        -> x_a do
+          parse.for_client( self ).parse_iambic x_a
+        end
+      end
+      def produce_polyadic_absorber_method parse
+        -> * x_a do
+          parse.for_client( self ).parse_iambic x_a
         end
       end
     end
 
     class Parse__
-      def initialize arg, dest, passive, rewind
+      def initialize absorber_arity_i, arg, dest, passive
         @do_arg = arg ; @do_destructive = dest
-        @do_passive = passive ; @do_rewind = rewind
-        @adapter_method_i = if dest
+        @do_passive = passive
+        @do_rewind = :polyadic == absorber_arity_i
+        @adapter_method_i = if :niladic == absorber_arity_i
+          dest ? :prepare_destructive_parse :
+            :prepare_peaceful_parse_if_necessary
+        elsif dest
           :prepare_destructive_parse_for_iambic
         else
           :prepare_peaceful_parse_for_iambic
@@ -331,11 +349,19 @@ module Skylab::MetaHell
         @client = client
         self
       end
+      def parse_as_is
+        prepare_as_is
+        execute_parse
+      end
       def parse_iambic x_a
         prepare_for_iambic x_a
         execute_parse
       end
     private
+      def prepare_as_is
+        @scan = @client.send @adapter_method_i
+        @field_arg_a = [ @scan ]
+      end
       def prepare_for_iambic x_a
         @scan = @client.send @adapter_method_i, x_a
         prepare_args_for_iambic x_a ; nil
@@ -373,6 +399,14 @@ module Skylab::MetaHell
         @d ||= 0 ; @x_a = x_a ; @x_a_length = x_a.length
         @iambic_scan = Peaceful_Parse_Adapter__.new self
       end
+      def prepare_peaceful_parse_if_necessary
+        iambic_scan || prepare_peaceful_parse
+      end
+      attr_reader :iambic_scan
+      def prepare_peaceful_parse  # @d and @x_a are assumed
+        @x_a_length = @x_a.length
+        @iambic_scan = Peaceful_Parse_Adapter__.new self
+      end
       def rewind_peaceful_iambic
         @d = 0
       end
@@ -394,8 +428,20 @@ module Skylab::MetaHell
         @d += 1 ; nil
       end
       def unexpected_unparsable_iambic_args_were_encountered
-        field_box[ @iambic_scan.first_unparsed_arg ]
+        raise ::ArgumentError, say_unexpected_iambic
       end
+    private
+      def say_unexpected_iambic
+        x = @iambic_scan.first_unparsed_arg
+        _a = field_box.get_names
+        "unrecognized keyword #{ MetaHell_::Lib_::Strange[ x ] }#{
+         } - did you mean #{ Lev__[ _a, x ] }?"
+      end
+      Lev__ = -> a, x do
+        MetaHell_::Library_::Headless::NLP::EN::Levenshtein::
+          Or_with_closest_n_items_to_item.curry[ 3, a, x ]
+      end
+    public
       def post_absorb_iambic_args_notify
         self.class.facet_muxer.notify :post_absorb, self ; nil
       end

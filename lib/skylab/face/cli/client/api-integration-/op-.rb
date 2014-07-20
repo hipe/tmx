@@ -10,7 +10,7 @@ module Skylab::Face
 
       def execute
         @short_h = { }
-        @opt_box = Lib_::Box[]
+        @opt_box = Lib_::Box[].new
         @field_box.values.each do |fld|
           fld.is_required and next
           opt = build_option_with_resolved_short_and_long fld

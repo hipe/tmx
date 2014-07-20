@@ -37,15 +37,28 @@ module Skylab::TestSupport
       def beginning_eventpoint_notify
         usage
         @y << "options:"
-        (( tbl = TestSupport_::Lib_::CLI_table_class[] )) [
+        TestSupport_::Lib_::CLI_table[
           :field, :field, :left, :show_header, false,
           :left, '  ', :sep, '     ', :right, '',
           :write_lines_to, @y.method( :<< ),
           :read_rows_from, @svc.plugins._a.reduce( [] ) do |row_a, p|
-            tbl::Multiline_column_B[ row_a, p.syntax_moniker, p.some_desc_a ]
+            Multiline_column_B__[ row_a, p.syntax_moniker, p.some_desc_a ]
             row_a
           end ]
         nil
+      end
+
+      Multiline_column_B__ = -> row_a, cel_a, a do
+        col_a = [ cel_a ]
+        if a.length.zero?
+          col_a << ''
+        else
+          col_a << a.fetch( 0 )
+        end
+        row_a << col_a
+        if 1 < a.length
+          row_a.concat a[ 1 .. -1 ].map { |s| [ '', s ] }
+        end ; nil
       end
 
       def usage  # may be called directly
