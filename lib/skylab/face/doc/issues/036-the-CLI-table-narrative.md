@@ -48,7 +48,18 @@ random gotcha: some custom enums want to short circuit the entire rendering of
 the table rather than render anything.
 
 
-## :#storypoint-280
 
-when this form is called the instance is acting as a curried executable - the
-arguments do not mutate this instance.
+## :#overage-here
+
+imagine a table whose target width is 20. it has four columns. two of
+them are "ordianary" data cels and two are fill columns. let's say that
+the data columns end up with widths that add up to 13. (we're going to
+ignore the idea of separators and margins for now). that leaves us with
+a width of 7 that our two fill columns have to share. let's say our fill
+columns each declare the same relative widths (the same 'parts' number).
+
+what we want is that one column ends up with 3 and one ends up with 4.
+the way we do this is we floor the floating point number (3.5 down to 3)
+and then with the amount of width that is left over (in this case 1), we
+distribute it from left to right, in a "one-for-you, one-for-you"
+manner.

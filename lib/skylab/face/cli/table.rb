@@ -46,8 +46,9 @@ module Skylab::Face
     end
 
     def initialize x_a
-      @do_show_header = @field_box = @left_x = @right_x = @read_rows_from =
-        @sep_x = @write_lines_to = nil
+      @do_show_header = @field_box = @left_x =
+        @right_x = @read_rows_from =
+        @sep_x = @target_width_d = @write_lines_to = nil
       Table_Shell__.new 0, x_a, self
     end
 
@@ -88,6 +89,11 @@ module Skylab::Face
         shell = Field_Shell__.new @d, @x_a, bx
         @d = shell.d
       end
+      def header
+        x = iambic_property
+        :none == x or raise ::ArgumentError, "only 'none' is allowed (#{ x })"
+        @kernel.do_show_header = false
+      end
       def left
         @kernel.left_x = iambic_property
       end
@@ -102,6 +108,9 @@ module Skylab::Face
       end
       def show_header
         @kernel.do_show_header = iambic_property
+      end
+      def target_width
+        @kernel.accept_target_width_from_scanner @iambic_scan
       end
       def write_lines_to
         @kernel.write_lines_to = iambic_property
@@ -142,6 +151,20 @@ module Skylab::Face
       Lib_::Fields_from_methods[
         :niladic, :passive, :absorber, :absrb_passive,
       -> do
+        def cel_renderer_builder
+          x = iambic_property
+          if x.respond_to? :id2name
+            @field.cel_renderer_p_p = Table_::Fill_.p_p_from_i x
+          else
+            @field.cel_renderer_p_p = x
+          end ; nil
+        end
+        def fill
+          shell = CLI::Table::Fill_::Shell.new
+          @field.fill and shell.previous_fill = @field.fill
+          shell.from_d_parse_iambic_passively @d, @x_a
+          @d = shell.d ; @field.fill = shell.fill
+        end
         def id  # typically for fields w/o labels, i.e non-displayed headers
           @field.name_i = iambic_property
         end
@@ -175,10 +198,11 @@ module Skylab::Face
 
     class Field__
       def initialize
+        @cel_renderer_p_p = nil
         yield self
         freeze  # ensure that we can dupe with shallow copies
       end
-      attr_accessor :align_i, :label_s, :name_i
+      attr_accessor :align_i, :label_s, :name_i, :cel_renderer_p_p
     end
 
   public
@@ -378,7 +402,7 @@ module Skylab::Face
       while (( row = scn.gets ))
         puts_p[ "#{ left }#{
           ( row.map.with_index do |cel, d|
-            cel_renderers.fetch( d ).render_cel cel
+            cel_renderers.fetch( d ).call cel
           end ) * ( sep ) }#{
           }#{ right }" ]
       end
@@ -399,31 +423,43 @@ module Skylab::Face
     end
 
     def prdc_cel_renderers
-      stats = @field_stats
-      widest_row_cels_count = stats.length
+      @widest_row_cels_count = @field_stats.length
+      @field_fetcher = prdc_field_fetcher
+      early_pass_only = true
+      a = @widest_row_cels_count.times.map do |d|
+        x = @field_fetcher[ d ].
+          prdc_early_pass_cel_renderer_via_stats @field_stats.fetch d
+        if x
+          x
+        else
+          early_pass_only = nil
+        end
+      end
+      early_pass_only or prdc_late_pass_renderers a
+      a
+    end
+
+    def prdc_field_fetcher
       if @field_box
         field_a = @field_box.values
         fields_count = field_a.length
-        overage = widest_row_cels_count - fields_count
+        overage = @widest_row_cels_count - fields_count
         if 0 < overage
           field_a.concat overage.times.map { DEFAULT_FIELD__ }
         end
-        field_fetcher = -> d { field_a.fetch d }
+        -> d { field_a.fetch d }
       else
-        field_fetcher = -> _ { DEFAULT_FIELD__ }
-      end
-      widest_row_cels_count.times.map do |d|
-        field_fetcher[ d ].produce_cel_renderer_via_stats stats.fetch d
+        -> _ { DEFAULT_FIELD__ }
       end
     end
+    DEFAULT_FIELD__ = Field__.new { }
 
     class Field__
-      def produce_cel_renderer_via_stats stats
-        Cel_Renderer__.produce_via_field_and_stats self, stats
+      def prdc_early_pass_cel_renderer_via_stats stats
+        ! @cel_renderer_p_p and
+          Cel_Renderer__.produce_via_field_and_stats self, stats
       end
     end
-
-    DEFAULT_FIELD__ = Field__.new { }
 
     class Cel_Renderer__
       def self.produce_via_field_and_stats field, stats
@@ -446,7 +482,7 @@ module Skylab::Face
     end
 
     class Functional_Cel_Renderer__
-      def render_cel cel
+      def call cel
         @render_cel_p[ cel ]
       end
     end
@@ -497,6 +533,7 @@ module Skylab::Face
 
     class Floating_Point_Cel_Renderer__ < Numeric_Cel_Renderer__
       def initialize align_i, stats
+        :left == align_i and minus = MINUS_
         number_of_numeric_columns =
           stats.max_whole_places + 1 + stats.max_rational_places
         if stats.max_strlen > number_of_numeric_columns
@@ -506,7 +543,8 @@ module Skylab::Face
           over_d = 0
         end
         _bignum = number_of_numeric_columns + over_d
-        @numeric_format_string = "%#{ _bignum }.#{ stats.max_rational_places }f"
+        @numeric_format_string =
+          "%#{ minus }#{ _bignum }.#{ stats.max_rational_places }f"
         resolve_string_format_string_from align_i || :right, use_max_strlen
         from_two_formats_resolve_standard_numeric_renderer ; nil
       end
@@ -550,6 +588,27 @@ module Skylab::Face
 
     # ~ done with currying
 
+    # ~ support for the "fill" subsystem
+
+  public
+    def accept_target_width_from_scanner scan
+      @target_width_d = scan.gets_one ; nil
+    end
+  private
+    class Field__
+      attr_accessor :fill
+    end
+    def prdc_late_pass_renderers a
+      Table_::Fill_.produce_late_pass_renderers a do |o|
+        o.field_fetcher = @field_fetcher
+        o.field_stats = @field_stats
+        o.left = @left_x ; o.sep = @sep_x ; o.right = @right_x
+        o.num_fields = @widest_row_cels_count
+        o.target_width_d = @target_width_d
+      end ; nil
+    end
+
     MINUS_ = '-'.freeze
+    Table_ = self
   end
 end
