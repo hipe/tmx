@@ -147,6 +147,17 @@ module Skylab::Face
       module Builtins__
         Autoloader_[ self, :boxxy ]
       end
+
+      # ~ ncurses
+
+      class << self
+        # placeholders for #nucurses
+        def any_calculated_screen_w
+        end
+        def some_screen_w
+          79
+        end
+      end
     end
   end
 end

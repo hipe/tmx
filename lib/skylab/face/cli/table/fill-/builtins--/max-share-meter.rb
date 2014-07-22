@@ -16,7 +16,7 @@ module Skylab::Face
             @max = column.stats.max_numeric_x.to_f
             @width = column.width
             @is_from_right = false
-            absrb_iambic_fully column.field.fill.with_x
+            absrb_any_iambic_fully column
             @glyph ||= DEFAULT_GLYPH__
             @background_glyph ||= DEFAULT_BACKGROUND_GLYPH__
             @when_no_cel_string = ( SPACE__ * @width ).freeze
@@ -36,6 +36,18 @@ module Skylab::Face
           DEFAULT_GLYPH__ = '+'.freeze
           DEFAULT_BACKGROUND_GLYPH__ = SPACE__
 
+        private
+          def absrb_any_iambic_fully column
+            fill = column.field.fill
+            fill or raise ::ArgumentError, say_not_fill
+            fill and with_x = fill.with_x
+            with_x and absrb_iambic_fully with_x ; nil
+          end
+
+          def say_not_fill
+            "for now, all 'max share meter' columns must be 'fill' columns."
+          end
+
         Face_::Lib_::Fields_from_methods[ :absorber, :absrb_iambic_fully, -> do
           def from_right
             @is_from_right = true
@@ -48,6 +60,7 @@ module Skylab::Face
           end
         end ]
 
+        public
           def to_proc
             -> cel do
               if cel

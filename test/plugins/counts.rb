@@ -12,7 +12,8 @@ module Skylab::Test
 
       services_used(
         :info_y,
-        :hot_subtree
+        :hot_subtree,
+        :paystream
       )
 
     end
@@ -21,6 +22,14 @@ module Skylab::Test
   class Plugins::Counts::Client
 
     available_options do |o, _|
+
+      o.on '-v', '--verbose', 'show max share meter (experimental)' do
+        @verbosity_level += 1
+      end
+
+      o.on '-V', 'reduce verbosity level' do
+        @verbosity_level -= 1
+      end
 
       o.on '-z', '--zero', 'display the zero values (when counting)' do
         @do_zero = true
@@ -38,14 +47,21 @@ module Skylab::Test
     )
 
     def initialize
+      @verbosity_level = 1
       @do_zero ||= nil
     end
 
     def counts
+      if 1 < @verbosity_level
+        field_extra = bld_max_share_meter_args
+        total_line_extra = [ nil ]
+        do_meter = true
+      end
       Test::Lib_::CLI_table[
         :field, 'subproduct',
         :field, 'num test files',
-        :write_lines_to, info_y.method( :<< ),
+        * field_extra,
+        :write_lines_to, paystream.method( :puts ),
         :read_rows_from, ::Enumerator.new do |y|
           total = 0 ; hs = hot_subtree
           ok = hs.children.each do |tre|
@@ -53,12 +69,26 @@ module Skylab::Test
             num = tre.children.count
             if num.nonzero? or @do_zero
               total += num
-              y << [ sp.slug, num ]
+              if do_meter
+                y << [ sp.slug, num, num ]
+              else
+                y << [ sp.slug, num ]
+              end
             end
           end
-          y << [ '(total)', total ]
+          y << [ '(total)', total, * total_line_extra ]
           ok
         end  ]
+      if 1 == @verbosity_level
+        info_y << '("-v" for visualization, "-V" hides this message)'
+      end
+      nil
+    end
+  private
+    def bld_max_share_meter_args
+      _width = Test::Lib_::CLI_table[].some_screen_width
+      [ :target_width, _width, :field, :fill,
+        :cel_renderer_builder, :max_share_meter ]
     end
   end
 end

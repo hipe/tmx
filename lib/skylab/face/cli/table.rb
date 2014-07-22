@@ -41,7 +41,11 @@ module Skylab::Face
         new( x_a ).execute
       end
       def via_iambic x_a
-        new( x_a ).execute
+        if x_a.length.zero?
+          self
+        else
+          new( x_a ).execute
+        end
       end
     end
 
@@ -590,6 +594,12 @@ module Skylab::Face
 
     # ~ support for the "fill" subsystem
 
+    def self.some_screen_width
+      Table_::Fill_.some_screen_w
+    end
+    def self.any_calculated_screen_width
+      Table_::Fill_.any_calculated_screen_w
+    end
   public
     def accept_target_width_from_scanner scan
       @target_width_d = scan.gets_one ; nil
