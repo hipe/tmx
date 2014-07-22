@@ -6,6 +6,7 @@ module Skylab::Brazen
 
       def [] client, p
         client.extend Module_Methods__
+        client.send :include, Iambic_Methods__
         if ! client.const_defined? :PROPERTIES_FOR_READ__
           client.const_set :PROPERTIES_FOR_READ__, Box__.new
         end
@@ -55,7 +56,7 @@ module Skylab::Brazen
       end
 
       def [] i
-        @h.fetch i
+        @h[ i ]
       end
 
       # ~ mutators
@@ -128,9 +129,55 @@ module Skylab::Brazen
 
       def initialize prop_i
         @name = Callback_::Name.from_variegated_symbol prop_i
+        @iambic_writer_method_name = prop_i
       end
 
-      attr_reader :name
+      attr_reader :iambic_writer_method_name, :name
+    end
+
+
+    # ~ iambics
+
+    module Iambic_Methods__
+    private
+
+      def process_iambic_fully * a
+        prcss_iambic_passively_with_args a
+        @d < @x_a.length and raise ::ArgumentError, say_strange_iambic
+        self
+      end
+
+      def say_strange_iambic
+        "unrecognized property '#{ @x_a[ @d ] }'"
+      end
+
+      def process_iambic_passively * a
+        prcss_iambic_passively_with_args a
+      end
+
+      def prcss_iambic_passively_with_args a
+        case a.length
+        when 0 ;
+        when 1 ; @d ||= 0 ; @x_a, = a ; @x_a_length = @x_a.length
+        when 2 ; @d, @x_a = a ; @x_a_length = @x_a.length
+        else   ; raise ::ArgumentError, "(#{ a.length } for 0..2)"
+        end
+        subject = self.class
+        box = subject.properties
+        while @d < @x_a.length
+          m_i = box[ @x_a[ @d ] ]
+          m_i or break
+          @d += 1
+          send subject.send( m_i ).iambic_writer_method_name
+        end
+        self
+      end
+
+      def iambic_property
+        x = @x_a.fetch @d
+        @d += 1
+        x
+      end
     end
   end
 end
