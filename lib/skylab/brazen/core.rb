@@ -1,3 +1,4 @@
+require_relative '..'
 require_relative '../callback/core'
 
 module Skylab::Brazen
