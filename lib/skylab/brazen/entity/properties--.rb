@@ -8,10 +8,26 @@ module Skylab::Brazen
         @proprietor = proprietor
       end
 
+      def [] i
+        m_i = @proprietor.property_method_names[ i ]
+        m_i and @proprietor.send m_i
+      end
+
       def to_values_array
         scn = to_values_scanner ; a = [] ; x = nil
         a.push x while (( x = scn.gets ))
         a
+      end
+
+      def group_by & p
+        to_values_enum.group_by( & p )
+      end
+
+      def to_values_enum
+        ::Enumerator.new do |y|
+          scn = to_values_scanner ; x = nil
+          y << x while x = scn.gets ; nil
+        end
       end
 
       def to_values_scanner
@@ -25,6 +41,9 @@ module Skylab::Brazen
     end
 
     class Box__
+      def get_names
+        @a.dup
+      end
       def to_values_scanner
         d = -1 ; last = @a.length - 1
         Callback_::Scn.new do

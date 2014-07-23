@@ -167,7 +167,7 @@ module Skylab::Brazen
 
       def add i, x
         had = true
-        @h.fetch i do had = nil ; @h[ i ] = x end
+        @h.fetch i do had = nil ; @a.push i ; @h[ i ] = x end
         had and raise ::KeyError, "won't clobber existing '#{ i }'"
       end
 

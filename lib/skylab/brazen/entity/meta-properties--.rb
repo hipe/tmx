@@ -123,9 +123,11 @@ module Skylab::Brazen
           enum = enum_box
           pc.send :attr_reader, @name_i
           if enum
+            pc.send :include, Meta_Prop_IMs__
+            name_i = @name_i
             pc.send :define_method, @iambic_writer_method_name do
               x = iambic_property
-              enum[ x ] or raise ::ArgumentError, say_bad_enum_value( x )
+              enum[ x ] or raise ::ArgumentError, say_bad_enum_value( name_i, x )
               instance_variable_set ivar, x
             end
           else
@@ -164,6 +166,14 @@ module Skylab::Brazen
           end
 
         end ]
+      end
+
+      module Meta_Prop_IMs__
+      private
+        def say_bad_enum_value name_i, x
+          _a = self.class.properties[ :color ].enum_box.get_names
+          "invalid #{ name_i } '#{ x }', expecting { #{ _a * " | " } }"
+        end
       end
     end
 
