@@ -59,7 +59,7 @@ module Skylab::Brazen
         client.send :include, Iambic_Methods__
         client.const_defined? READ_BOX__ or
           client.const_set READ_BOX__, Box__.new
-        apply_p_to_client @client
+        @p and apply_p_to_client @client
         nil
       end
 
@@ -84,6 +84,10 @@ module Skylab::Brazen
     WRITE_BOX__ = :PROPERTIES_FOR_WRITE__
 
     module Proprietor_Methods__
+
+      def properties
+        @properties ||= Entity::Properties__.new( self )
+      end
 
       def property_method_names_for_write
         if const_defined? WRITE_BOX__, false
@@ -161,6 +165,12 @@ module Skylab::Brazen
         end
       end
 
+      def add i, x
+        had = true
+        @h.fetch i do had = nil ; @h[ i ] = x end
+        had and raise ::KeyError, "won't clobber existing '#{ i }'"
+      end
+
     protected
       attr_reader :a, :h
     end
@@ -203,10 +213,40 @@ module Skylab::Brazen
 
     class Property__
 
+      def initialize *a
+        case a.length
+        when 2
+          prop_i, meth_i = a
+          set_name_i prop_i
+          set_iambic_writer_method_name meth_i
+        when 0
+        else
+          a.length.zero? or raise ::ArgumentError, "(#{ a.length } for 0|2)"
+        end
+        block_given? and yield self
+        emit_iambic_event :at_end_of_process_iambic
+        freeze
+      end
+
+      attr_reader :iambic_writer_method_name, :name
+
+      def set_name_i prop_i
+        @name = Callback_::Name.from_variegated_symbol prop_i
+      end
+
+      def set_iambic_writer_method_name meth_i
+        @iambic_writer_method_name = meth_i
+      end
+
+      def name_i
+        @name.as_variegated_symbol
+      end
+
       class Flusher
         def initialize
           @has_writer_method_name_constraints = false
         end
+        attr_writer :property
         def writer_method_name_suffix= i
           @has_writer_method_name_constraints = true
           @method_name_constraints_rx = /\A.+(?=#{ ::Regexp.escape i }\z)/
@@ -218,19 +258,34 @@ module Skylab::Brazen
           self
         end
         def flush_because_method m_i
+          @meth_i = m_i
           if @has_writer_method_name_constraints
-            i = apply_method_name_constraints m_i
+            @prop_i = apply_method_name_constraints @meth_i
           else
-            i = m_i
+            @prop_i = @meth_i
           end
-          m_i_ = :"produce_#{ i }_property"
-          @proprietor.property_method_names_for_write.add_or_assert i, m_i_
-          property = flsh_property i, m_i
-          @definee.send :define_method, m_i_ do property end ; nil
+          add_property flsh_property
+        end
+        def add_property property
+          i = property.name_i
+          m_i = :"produce_#{ i }_property"
+          @proprietor.property_method_names_for_write.add_or_assert i, m_i
+          @definee.send :define_method, m_i do property end ; nil
         end
       private
-        def flsh_property prop_i, meth_i
-          Property__.new prop_i, meth_i
+        def flsh_property
+          a = @proprietor.iambic_queue
+          if a && a.length.nonzero?
+            flsh_meta_properties_and_property a
+          else
+            @proprietor::PROPERTY_CLASS__.new @prop_i, @meth_i
+          end
+        end
+        def flsh_meta_properties_and_property a
+          Entity::Meta_Properties__.build_property do |mp|
+            mp.proprietor = @proprietor ;  mp.prop_i = @prop_i
+            mp.meth_i = @meth_i ; mp.queue = a
+          end
         end
         def apply_method_name_constraints m_i
           md = @method_name_constraints_rx.match m_i.to_s
@@ -242,13 +297,6 @@ module Skylab::Brazen
            }: '#{ m_i }'"
         end
       end
-
-      def initialize prop_i, meth_i
-        @name = Callback_::Name.from_variegated_symbol prop_i
-        @iambic_writer_method_name = meth_i
-      end
-
-      attr_reader :iambic_writer_method_name, :name
     end
 
 
@@ -273,7 +321,7 @@ module Skylab::Brazen
 
       def prcss_iambic_passively_with_args a
         case a.length
-        when 0 ;
+        when 0 ; @d ||= 0 ; @x_a_length ||= @x_a.length
         when 1 ; @d ||= 0 ; @x_a, = a ; @x_a_length = @x_a.length
         when 2 ; @d, @x_a = a ; @x_a_length = @x_a.length
         else   ; raise ::ArgumentError, "(#{ a.length } for 0..2)"
@@ -294,6 +342,16 @@ module Skylab::Brazen
         @d += 1
         x
       end
+
+      def emit_iambic_event _  # dangerous - re-written elsewhere
+      end
+
+      PROPERTY_CLASS__ = Property__  # delicate
+    end
+
+    class Property__  # re-open now for meta-properties support
+      Entity[ self, nil ]
+      public :process_iambic_fully
     end
 
     # ~ session options
@@ -344,5 +402,7 @@ module Skylab::Brazen
             method( :flush_because_method ) ; nil
       end
     end
+
+    Entity = self
   end
 end
