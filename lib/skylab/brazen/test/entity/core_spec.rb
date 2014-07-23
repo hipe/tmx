@@ -30,7 +30,7 @@ module Skylab::Brazen::TestSupport::Entity
       end
 
       def subject
-        Foo.properties
+        Foo.property_method_names
       end
     end
 
@@ -54,13 +54,13 @@ module Skylab::Brazen::TestSupport::Entity
       end
 
       it "child inherits properties of base" do
-        Foo_Base.properties.get_local_normal_names.should eql [ :foo ]
-        Foo_Child.properties.get_local_normal_names.should eql [ :foo, :bar ]
+        Foo_Base.property_method_names.get_local_normal_names.should eql [ :foo ]
+        Foo_Child.property_method_names.get_local_normal_names.should eql [ :foo, :bar ]
       end
 
       it "the child's handle on the property is THE SAME PROPERTY" do
-        foo1 = Foo_Base.properties[ :foo ]
-        foo2 = Foo_Child.properties[ :foo ]
+        foo1 = Foo_Base.property_method_names[ :foo ]
+        foo2 = Foo_Child.property_method_names[ :foo ]
         foo1 or fail
         foo1.object_id.should eql foo2.object_id
       end
@@ -68,9 +68,7 @@ module Skylab::Brazen::TestSupport::Entity
 
     context "for now with inheritence, re-opening properties" do
 
-      it "is something you cannot do (** for now **)" do
-
-        -> do
+      it "is something you can do" do
 
           class Foo_Reopener_Base
             Subject_[][ self, -> do
@@ -85,7 +83,7 @@ module Skylab::Brazen::TestSupport::Entity
             end
             end ]
           end
-        end.should raise_error ::KeyError, /\bkey already exists: 'foo'/
+
       end
     end
   end
