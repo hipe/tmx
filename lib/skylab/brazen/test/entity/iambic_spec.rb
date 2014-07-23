@@ -54,5 +54,36 @@ module Skylab::Brazen::TestSupport::Entity
         Foo_Iamb.new.process_iambic_fully [].freeze
       end
     end
+
+    context "iambic writer postfix option" do
+
+      before :all do
+        class FooI_With_Postfix
+          attr_reader :x
+          Subject_[][ self, :iambic_writer_method_name_suffix, :'=', -> do
+            def some_writer=
+              @x = iambic_property
+            end
+          end ]
+          define_singleton_method :with, WITH_CLASS_METHOD_
+        end
+      end
+
+      it "ok" do
+        FooI_With_Postfix.with( :some_writer, :foo ).x.should eql :foo
+      end
+
+      it "for now enforces that you use the suffix on every guy" do
+        -> do
+        class FooI_Bad_Suffixer
+          Subject_[][ self, :iambic_writer_method_name_suffix, :_derp, -> do
+            def ferp
+            end
+          end ]
+        end
+        end.should raise_error ::NameError,
+          /\bdid not have expected suffix '_derp': 'ferp'/
+      end
+    end
   end
 end

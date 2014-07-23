@@ -5,19 +5,43 @@ module Skylab::Brazen
     class << self
 
       def [] * a
-        via_argument_list a
+        Shell__.new( a ).execute
       end
 
       def via_argument_list a
-        case a.length
-        when 1 ; via_proc a.first
-        when 2 ; via_client_and_proc( * a )
-        when 0 ; self
-        else   ; raise ::ArgumentError, "not implemented - #{ a.length } args"
+        Shell__.new( a ).execute
+      end
+    end
+
+    class Shell__
+
+      def initialize arg_list
+        @x_a = arg_list
+      end
+
+      def execute
+        case @x_a.length
+        when 2
+          @client, @p = @x_a
+          via_client_and_proc
+        when 1
+          @p = @x_a.first
+          via_proc
+        when 0
+          Entity
+        else
+          via_options
         end
       end
 
-      def via_proc p
+      def via_options
+        @client = @x_a.first ; @p = @x_a.last  # for now
+        @d = 1 ; @x_a_length = @x_a.length - 1
+        process_iambic_fully
+        via_client_and_proc
+      end
+
+      def via_proc
         mod = ::Module.new
         mod.const_set :Module_Methods, ::Module.new
         mod.extend Proprietor_Methods__
@@ -25,29 +49,34 @@ module Skylab::Brazen
         mod.send :include, Iambic_Methods__
         mod.const_defined? READ_BOX__ or
           mod.const_set READ_BOX__, Box__.new
-        apply_p_to_extension_module p, mod
+        apply_p_to_extension_module mod
         mod
       end
 
-      def via_client_and_proc client, p
+      def via_client_and_proc
+        client = @client
         client.extend Proprietor_Methods__
         client.send :include, Iambic_Methods__
         client.const_defined? READ_BOX__ or
           client.const_set READ_BOX__, Box__.new
-        p and apply_p_to_client p, client
+        apply_p_to_client @client
         nil
       end
 
-      def apply_p_to_client p, client
-        Method_Added_Muxer__[ client ].for_each_method_added_in p,
-          Property__::Flusher.new( client.singleton_class, client ).
+      def apply_p_to_client client
+        Method_Added_Muxer__[ client ].for_each_method_added_in @p,
+          flusher.with_two( client.singleton_class, client ).
             method( :flush_because_method ) ; nil
       end
 
-      def apply_p_to_extension_module p, mod
-        Method_Added_Muxer__[ mod ].for_each_method_added_in p,
-          Property__::Flusher.new( mod::Module_Methods, mod ).
+      def apply_p_to_extension_module mod
+        Method_Added_Muxer__[ mod ].for_each_method_added_in @p,
+          flusher.with_two( mod::Module_Methods, mod ).
             method( :flush_because_method ) ; nil
+      end
+    private
+      def flusher
+        @flusher ||= Property__::Flusher.new
       end
     end
 
@@ -175,25 +204,48 @@ module Skylab::Brazen
     class Property__
 
       class Flusher
-        def initialize definee_mod, proprietor_mod
+        def initialize
+          @has_writer_method_name_constraints = false
+        end
+        def writer_method_name_suffix= i
+          @has_writer_method_name_constraints = true
+          @method_name_constraints_rx = /\A.+(?=#{ ::Regexp.escape i }\z)/
+          @writer_method_name_suffix = i
+        end
+        def with_two definee_mod, proprietor_mod
           @definee = definee_mod
           @proprietor = proprietor_mod
+          self
         end
         def flush_because_method m_i
-          m_i_ = :"produce_#{ m_i }_property"
-          @proprietor.property_method_names_for_write.add_or_assert m_i, m_i_
-          property = flsh_property m_i
+          if @has_writer_method_name_constraints
+            i = apply_method_name_constraints m_i
+          else
+            i = m_i
+          end
+          m_i_ = :"produce_#{ i }_property"
+          @proprietor.property_method_names_for_write.add_or_assert i, m_i_
+          property = flsh_property i, m_i
           @definee.send :define_method, m_i_ do property end ; nil
         end
       private
-        def flsh_property prop_i
-          Property__.new prop_i
+        def flsh_property prop_i, meth_i
+          Property__.new prop_i, meth_i
+        end
+        def apply_method_name_constraints m_i
+          md = @method_name_constraints_rx.match m_i.to_s
+          md or raise ::NameError, say_did_not_have_expected_suffix( m_i )
+          md[ 0 ].intern
+        end
+        def say_did_not_have_expected_suffix m_i
+          "did not have expected suffix '#{ @writer_method_name_suffix }'#{
+           }: '#{ m_i }'"
         end
       end
 
-      def initialize prop_i
+      def initialize prop_i, meth_i
         @name = Callback_::Name.from_variegated_symbol prop_i
-        @iambic_writer_method_name = prop_i
+        @iambic_writer_method_name = meth_i
       end
 
       attr_reader :iambic_writer_method_name, :name
@@ -207,7 +259,7 @@ module Skylab::Brazen
 
       def process_iambic_fully * a
         prcss_iambic_passively_with_args a
-        @d < @x_a.length and raise ::ArgumentError, say_strange_iambic
+        @d < @x_a_length and raise ::ArgumentError, say_strange_iambic
         self
       end
 
@@ -228,7 +280,7 @@ module Skylab::Brazen
         end
         subject = self.class
         box = subject.property_method_names
-        while @d < @x_a.length
+        while @d < @x_a_length
           m_i = box[ @x_a[ @d ] ]
           m_i or break
           @d += 1
@@ -244,6 +296,16 @@ module Skylab::Brazen
       end
     end
 
+    # ~ session options
+
+    class Shell__
+
+      Entity[ self, -> do
+        def iambic_writer_method_name_suffix
+          flusher.writer_method_name_suffix = iambic_property
+        end
+      end ]
+    end
 
     # ~ extension API
 
@@ -278,7 +340,7 @@ module Skylab::Brazen
 
       def apply_p_to_client p, client  # #copy-paste
         Method_Added_Muxer__[ client ].for_each_method_added_in p,
-          Property__::Flusher.new( client.singleton_class, client ).
+          Property__::Flusher.new.with_two( client.singleton_class, client ).
             method( :flush_because_method ) ; nil
       end
     end
