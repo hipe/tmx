@@ -313,7 +313,7 @@ module Skylab::Brazen
           end
         end
         def flsh_meta_properties_and_property a
-          Entity::Meta_Properties__.build_property do |mp|
+          Entity::Meta_Properties__.given_names_build_property do |mp|
             mp.proprietor = @proprietor ;  mp.prop_i = @prop_i
             mp.meth_i = @meth_i ; mp.queue = a
           end

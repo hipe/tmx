@@ -4,12 +4,20 @@ module Skylab::Brazen
 
     module Meta_Properties__
 
-      def self.build_property
+      def self.given_names_build_property
         yield (( shell = Process_DSL__.new ))
-        shell.build_prop
+        shell.given_names_build_prop
+      end
+
+      def self.flush_iambic_queue_in_proprietor_module mod
+        dsl = Process_DSL__.new
+        dsl.proprietor = mod
+        dsl.queue = mod.iambic_queue
+        dsl.flush_queue
       end
 
       class Process_DSL__
+
         def initialize
           @prop_class = nil
         end
@@ -24,27 +32,40 @@ module Skylab::Brazen
           @x_a_a = x
         end
 
-        def build_prop
-          @d_ = 0 ; x_a_a_length = @x_a_a.length
+        def given_names_build_prop
+          prs_any_leading_meta_property_declarations
+          via_names_prs_prop
+        end
+
+        def flush_queue
+          prs_any_leading_meta_property_declarations
+        end
+      private
+
+        def prs_any_leading_meta_property_declarations
+          @use_of_meta_properties_started = false
+          @d_ = 0 ; @x_a_a_length = @x_a_a.length
           begin
             prepare_standard_parse
             process_iambic_passively
             if @d < @x_a_length
-              use_of_meta_properties_started = true
+              @use_of_meta_properties_started = true
               break
             end
             @d_ += 1
-          end while @d_ < x_a_a_length
+          end while @d_ < @x_a_a_length ; nil
+        end
 
+        def via_names_prs_prop
           @prop_class ||= prop_class_for_read
-
           @prop_class.new do |prop|
             @prop = prop
-            if use_of_meta_properties_started
+            if @use_of_meta_properties_started
+              @use_of_meta_properties_started = false
               prcss_use_of_meta_properties
             end
             @d_ += 1
-            while @d_ < x_a_a_length
+            while @d_ < @x_a_a_length
               prepare_standard_parse
               process_iambic_passively
               if @d_ < @x_a.length
@@ -58,8 +79,6 @@ module Skylab::Brazen
           @x_a_a.clear
           @prop
         end
-
-      private
 
         def prepare_standard_parse
           @x_a = @x_a_a.fetch @d_
@@ -75,16 +94,6 @@ module Skylab::Brazen
           @mod.const_get :PROPERTY_CLASS__
         end
 
-        def prop_class_for_write
-          if @mod.const_defined? :PROPERTY_CLASS__, false
-            @mod.const_get :PROPERTY_CLASS__, false
-          else
-            cls = ::Class.new @mod.const_get( :PROPERTY_CLASS__, true )
-            @mod.const_set :Property, cls
-            @mod.const_set :PROPERTY_CLASS__, cls
-          end
-        end
-
         def add_names_to_property
           @prop_i && @meth_i or raise ::ArgumentError, "required name(s) missing"
           @prop.set_iambic_writer_method_name @meth_i
@@ -96,7 +105,7 @@ module Skylab::Brazen
           def meta_property
             mp = Meta_Property__.new @d, @x_a
             @d = mp.d
-            @prop_class = prop_class_for_write
+            @prop_class = @mod.property_cls_for_wrt
             mp.apply_to_property_class @prop_class
           end
         end ]
@@ -143,7 +152,8 @@ module Skylab::Brazen
 
         def aply_defaulting_behavior_to_property_class pc
           pc.add_iambic_event_listener :at_end_of_process_iambic, -> prop do
-            if prop.instance_variable_get( @as_ivar ).nil?
+            if ! prop.instance_variable_defined?( @as_ivar ) ||
+                prop.instance_variable_get( @as_ivar ).nil?
               prop.instance_variable_set @as_ivar, @default_x
             end
           end
@@ -198,13 +208,45 @@ module Skylab::Brazen
     # ~ experimental additions to entity core (BE CAREFUL!)
 
     module Proprietor_Methods__
+
+      def iambic_property_writers * x_a, & p
+        shell = Shell__.new
+        shell.client = self
+        shell.p = p
+        shell.process_option_iambic x_a
+        shell.to_client_via_p_apply ; nil
+      end
+
+      remove_method :property_class_for_write
+      def property_class_for_write
+        iambic_queue and @iambic_queue.length.nonzero? and flsh_iambic_queue
+        property_cls_for_wrt
+      end
+
+      def property_cls_for_wrt
+        if const_defined? :PROPERTY_CLASS__, false
+          const_get :PROPERTY_CLASS__, false
+        else
+          cls = ::Class.new const_get( :PROPERTY_CLASS__, true )
+          const_set :Property, cls
+          const_set :PROPERTY_CLASS__, cls
+        end
+      end
+
       def add_iambic_event_listener i, p
         ( @iambic_event_muxer ||= Muxer__.new ).add i, p ; nil
       end
       attr_reader :iambic_event_muxer
+
+    private
+      def flsh_iambic_queue
+        Meta_Properties__.flush_iambic_queue_in_proprietor_module self
+      end
     end
 
     module Iambic_Methods__
+
+      attr_writer :client, :p
       def clear_all_iambic_ivars
         @d = @x_a = @x_a_length = nil
         UNDEFINED_

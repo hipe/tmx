@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity- meta-meta-properties: enum" do
+  describe "[br] entity meta-meta-properties: enum" do
 
     context "a normative example is boring" do
 
@@ -36,7 +36,7 @@ module Skylab::Brazen::TestSupport::Entity
         end
       end
 
-      it "but the properties abstraction is useful" do
+      it "the properties abstraction is useful here with `group_by`" do
         h = MME_Foo.properties.group_by( & :color )
         a = h.keys
         a.length.should eql 3
@@ -46,7 +46,7 @@ module Skylab::Brazen::TestSupport::Entity
         h[ nil ].map( & :name_i ).should eql [ :no_color ]
       end
 
-      it "but enums try and prevent you from being naughty" do
+      it "enums try and prevent you from being naughty" do
 
         -> do
         class MME_Bar

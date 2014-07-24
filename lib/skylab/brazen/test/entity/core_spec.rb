@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity-" do
+  describe "[br] entity" do
 
     context "minimal non-empty" do
 

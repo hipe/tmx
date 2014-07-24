@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity- extending" do
+  describe "[br] entity extending" do
 
     context "empty definition block" do
 

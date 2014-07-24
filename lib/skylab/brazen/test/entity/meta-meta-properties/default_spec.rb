@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity- meta-meta-properties: default" do
+  describe "[br] entity meta-meta-properties: default" do
 
     context "uses an event hook" do
 

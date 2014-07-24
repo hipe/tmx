@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity- iambic" do
+  describe "[br] entity iambic" do
 
     context "basics" do
 
