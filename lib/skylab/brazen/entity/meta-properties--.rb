@@ -39,6 +39,8 @@ module Skylab::Brazen
 
         def flush_queue
           prs_any_leading_meta_property_declarations
+          @use_of_meta_properties_started and
+            raise ::ArgumentError, say_strange_iambic
         end
       private
 
@@ -106,7 +108,7 @@ module Skylab::Brazen
             mp = Meta_Property__.new @d, @x_a
             @d = mp.d
             @prop_class = @mod.property_cls_for_wrt
-            mp.apply_to_property_class @prop_class
+            mp.apply_to_property_class @prop_class ; nil
           end
         end ]
       end
@@ -115,19 +117,33 @@ module Skylab::Brazen
 
         def initialize d, x_a
           @d = d ; @x_a = x_a
+          @has_default_x = @has_entity_class_hook = false
           @name_i = iambic_property
           @as_ivar = :"@#{ @name_i }"
           @iambic_writer_method_name = :"#{ @name_i }="
           process_iambic_passively
           @x_a = @x_a_length = nil  # leave @d as-is
+          freeze
         end
 
-        attr_reader :as_ivar, :d, :default_x, :enum_box,
-          :iambic_writer_method_name, :name_i, :has_default_x
+        def might_have_entity_class_hooks
+        end
+
+        attr_reader :as_ivar, :d, :iambic_writer_method_name, :name_i,
+          :has_default_x, :default_x,
+          :enum_box
 
         def apply_to_property_class pc
-          _flsh = pc::Flusher.new.with_two( pc.singleton_class, pc )
-          _flsh.add_property self
+          pc::Flusher.new.with_two( pc.singleton_class, pc ).add_property self
+          aply_iambic_writers_to_property_class pc
+          @has_default_x and aply_defaulting_behavior_to_property_class pc
+          @has_entity_class_hook and aply_ent_cls_hook_to_prop_cls pc
+          nil
+        end
+
+      private
+
+        def aply_iambic_writers_to_property_class pc
           ivar = @as_ivar
           enum = enum_box
           pc.send :attr_reader, @name_i
@@ -144,11 +160,8 @@ module Skylab::Brazen
               instance_variable_set ivar, iambic_property
             end
           end
-          has_default_x and aply_defaulting_behavior_to_property_class pc
           nil
         end
-
-      private
 
         def aply_defaulting_behavior_to_property_class pc
           pc.add_iambic_event_listener :at_end_of_process_iambic, -> prop do
@@ -159,7 +172,21 @@ module Skylab::Brazen
           end
         end
 
+        def aply_ent_cls_hook_to_prop_cls pc
+          pc.add_ent_cls_hk @name_i, @entity_class_hook_p ; nil
+        end
+
         Entity[ self, -> do
+
+          def default
+            @has_default_x = true
+            @default_x = iambic_property
+          end
+
+          def entity_class_hook
+            @has_entity_class_hook = true
+            @entity_class_hook_p = iambic_property
+          end
 
           def enum
             x = iambic_property
@@ -168,11 +195,6 @@ module Skylab::Brazen
               bx.add i, true
             end
             @enum_box = bx ; nil
-          end
-
-          def default
-            @has_default_x = true
-            @default_x = iambic_property
           end
 
         end ]
@@ -241,6 +263,72 @@ module Skylab::Brazen
     private
       def flsh_iambic_queue
         Meta_Properties__.flush_iambic_queue_in_proprietor_module self
+      end
+    end
+
+    class Box__
+
+      def get_key_scanner
+        d = -1 ; last = @a.length - 1
+        Callback_::Scn.new do
+          if d < last
+            @a.fetch d += 1
+          end
+        end
+      end
+
+      def fetch i, & p
+        @h.fetch i, & p
+      end
+
+      def add_or_replace i, x
+        @h.fetch i do
+          @a.push i
+        end
+        @h[ i ] = x ; nil
+      end
+    end
+
+    class Property__
+      class << self
+        def add_ent_cls_hk metaprop_i, p
+          ( @entity_class_hks_box ||= begin
+            @has_entity_class_hks = true
+            Box__.new
+          end ).add_or_replace metaprop_i, p ; nil
+        end
+
+        attr_reader :has_entity_class_hks, :entity_class_hks_box
+      end
+
+      remove_method :might_have_entity_class_hooks
+      def might_have_entity_class_hooks
+        self.class.has_entity_class_hks
+      end
+
+      def get_any_relevant_entity_class_hks_p_a
+        box = self.class.entity_class_hks_box
+        scn = box.get_key_scanner
+        i = scn.gets
+        a = nil
+        begin
+          if instance_variable_defined? :"@#{ i }"  # or whatever
+            ( a ||= [] ).push box.fetch i
+          end
+          i = scn.gets
+        end while i
+        a
+      end
+
+      class Flusher
+        def prcs_any_ent_cls_hks prop
+          p_a = prop.get_any_relevant_entity_class_hks_p_a
+          if p_a
+            p_a.each do |p|
+              p[ @proprietor, prop ]
+            end
+          end ; nil
+        end
       end
     end
 

@@ -80,6 +80,8 @@ module Skylab::Brazen
         mod.send :include, Iambic_Methods__
         mod.const_set READ_BOX__, Box__.new
         apply_p_to_extension_module mod
+        mod.has_nonzero_length_iambic_queue and
+          Entity::Meta_Properties__.flush_iambic_queue_in_proprietor_module mod
         mod
       end
 
@@ -136,6 +138,10 @@ module Skylab::Brazen
         ( @iambic_queue ||= [] ).push x_a ; nil
       end
 
+      def has_nonzero_length_iambic_queue
+        iambic_queue and @iambic_queue.length.nonzero?
+      end
+
       attr_reader :iambic_queue
 
       def property_class_for_write  # :+#loader-hook
@@ -168,7 +174,7 @@ module Skylab::Brazen
 
       # ~ mutators
 
-      def merge_box! otr
+      def ensuring_same_values_merge_box! otr
         a = otr.a ; h = otr.h
         a.each do |i|
           had = true
@@ -273,6 +279,10 @@ module Skylab::Brazen
         @name.as_variegated_symbol
       end
 
+      def might_have_entity_class_hooks  # :+#re-defined elsewhere
+        false
+      end
+
       class Flusher
         def initialize
           @has_writer_method_name_constraints = false
@@ -301,13 +311,15 @@ module Skylab::Brazen
           i = property.name_i
           m_i = :"produce_#{ i }_property"
           @proprietor.property_method_names_for_write.add_or_assert i, m_i
-          @definee.send :define_method, m_i do property end ; nil
+          @definee.send :define_method, m_i do property end
+          property.might_have_entity_class_hooks and
+            prcs_any_ent_cls_hks property
+          nil
         end
       private
         def flsh_property
-          a = @proprietor.iambic_queue
-          if a && a.length.nonzero?
-            flsh_meta_properties_and_property a
+          if @proprietor.has_nonzero_length_iambic_queue
+            flsh_meta_properties_and_property @proprietor.iambic_queue
           else
             @proprietor::PROPERTY_CLASS__.new @prop_i, @meth_i
           end
@@ -374,7 +386,7 @@ module Skylab::Brazen
         x
       end
 
-      def emit_iambic_event _  # dangerous - re-written elsewhere
+      def emit_iambic_event _  # :#re-defined elsewhere
       end
 
       PROPERTY_CLASS__ = Property__  # delicate
@@ -430,7 +442,7 @@ module Skylab::Brazen
         @client.send :include, @extension_module  # iambic methods too
         _box = @client.property_method_names_for_write
         _box_ = @extension_module.property_method_names
-        _box.merge_box! _box_ ; nil
+        _box.ensuring_same_values_merge_box! _box_ ; nil
       end
     end
 
