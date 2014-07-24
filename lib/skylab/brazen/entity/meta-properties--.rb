@@ -211,32 +211,22 @@ module Skylab::Brazen
 
       module Muxer
         class << self
-          def [] cls, const_i, read_method_i, write_method_i
-            cls.send :define_method, read_method_i, bld_r_meth( const_i )
-            cls.send :define_method, write_method_i, bld_w_meth( const_i )
+          def [] cls, const_i, write_i
+            cls.send :define_method, write_i, bld_write_meth( const_i )
+            nil
           end
-
-        private
-
-          def bld_r_meth const_i
+          def bld_write_meth const_i
             -> do
-              if const_defined? const_i
-                const_get const_i
-              end
-            end
-          end
-
-          def bld_w_meth const_i
-            -> do
-              if const_defined? const_i
-                if const_defined? const_i, false
-                  const_get const_i
-                else
-                  _parent_muxer = const_get const_i
-                  const_set const_i, _parent_muxer.dup
-                end
+              if const_defined? const_i, false
+                const_get const_i, false
               else
-                const_set const_i, Muxer__.new
+                _MUXER = Muxer__.new
+                const_set const_i, _MUXER
+                define_method :notificate do |i|
+                  _MUXER.mux i, self
+                  super i
+                end
+                _MUXER
               end
             end
           end
@@ -248,15 +238,6 @@ module Skylab::Brazen
         def initialize
           @h = ::Hash.new { |h, k| h[k] = [] }
         end
-
-        def initialize_copy _otr_
-          @h = @h.dup
-          @h.keys.each do |i|
-            @h[i] = @h[i].dup
-          end ; nil
-        end
-
-        attr_reader :h
 
         def add i, p
           @h[ i ].push p ; nil
@@ -307,7 +288,7 @@ module Skylab::Brazen
       end
 
       Meta_Properties__::Muxer[ self, :IAMBIC_EVENT_MUXER__,
-        :iambic_event_muxer_for_read, :iambic_evnt_muxer_for_write ]
+        :iambic_evnt_muxer_for_write ]
 
     private
       def flsh_iambic_queue
@@ -392,11 +373,6 @@ module Skylab::Brazen
       remove_method :emit_iambic_event
       def emit_iambic_event i
         notificate i
-      end
-
-      def notificate i
-        mxr = self.class.iambic_event_muxer_for_read and mxr.mux i, self
-        super
       end
     end
 
