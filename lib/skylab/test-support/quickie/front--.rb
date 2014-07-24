@@ -206,6 +206,8 @@ module Skylab::TestSupport
 
     module QuicLib_
 
+      Basic__ = TestSupport_::Lib_::Basic__
+
       CLI_basic_switch_index = -> sw do
         Headless__[]::CLI::Option::FUN.basic_switch_index_curry[ sw ]
       end
@@ -244,6 +246,10 @@ module Skylab::TestSupport
       end
 
       Scanner = Lib_::Scanner
+
+      String = -> do
+        Basic__[]::String
+      end
     end
   end
 end

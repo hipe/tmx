@@ -41,6 +41,7 @@ module Skylab::Brazen
           prs_any_leading_meta_property_declarations
           @use_of_meta_properties_started and
             raise ::ArgumentError, say_strange_iambic
+          @x_a_a.clear ; nil
         end
       private
 
@@ -351,8 +352,9 @@ module Skylab::Brazen
       end
     end
 
-    if ! ::Object.method_defined?( :notificate )
+    if ! ::Object.private_method_defined? :notificate
       class ::Object
+      private
         def notificate i  # :+[#sl-131] the easiest implementation for this
         end
       end

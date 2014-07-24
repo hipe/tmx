@@ -1,8 +1,10 @@
 require_relative '../callback/core'
 
-class ::Object  # :2:[#sl-131] - experiment. this is the last extlib.
-private
-  def notificate i
+if ! ::Object.private_method_defined? :notificate
+  class ::Object  # :2:[#sl-131] - experiment. this is the last extlib.
+  private
+    def notificate i
+    end
   end
 end
 
