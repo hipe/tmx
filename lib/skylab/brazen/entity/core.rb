@@ -217,7 +217,7 @@ module Skylab::Brazen
         def [] mod
           me = self
           mod.module_exec do
-            @method_added_muxer ||= me.bld_for self
+            @method_added_mxr ||= me.bld_for self
           end
         end
         def bld_for client
@@ -242,6 +242,12 @@ module Skylab::Brazen
       end
       def remove_listener _
         @p = nil
+      end
+      def stop_listening
+        @stopped_p = @p ; @p = nil
+      end
+      def resume_listening
+        @p = @stopped_p ; @stopped_p = nil
       end
       def method_added_notify method_i
         @p && @p[ method_i ] ; nil
@@ -273,6 +279,10 @@ module Skylab::Brazen
 
       def set_iambic_writer_method_name meth_i
         @iambic_writer_method_name = meth_i
+      end
+
+      def as_ivar
+        @name.as_ivar
       end
 
       def name_i

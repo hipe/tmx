@@ -1181,6 +1181,9 @@ module Skylab::Callback
     def as_human
       @as_human ||= build_human
     end
+    def as_ivar
+      @as_ivar ||= bld_ivar
+    end
     def as_slug
       @as_slug ||= build_slug
     end
@@ -1194,6 +1197,9 @@ module Skylab::Callback
     end
     def build_human
       as_slug.gsub( DASH_, SPACE__ ).freeze
+    end
+    def bld_ivar
+      :"@#{ as_variegated_symbol }"
     end
     def build_slug
       as_normalized_const.gsub( UNDERSCORE_, DASH_ ).downcase.freeze

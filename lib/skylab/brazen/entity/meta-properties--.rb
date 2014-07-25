@@ -222,10 +222,15 @@ module Skylab::Brazen
               else
                 _MUXER = Muxer__.new
                 const_set const_i, _MUXER
+                if instance_variable_defined? :@method_added_mxr  # ick for now
+                  stopped = true
+                  @method_added_mxr.stop_listening
+                end
                 define_method :notificate do |i|
                   _MUXER.mux i, self
                   super i
                 end
+                stopped and @method_added_mxr.resume_listening
                 _MUXER
               end
             end
