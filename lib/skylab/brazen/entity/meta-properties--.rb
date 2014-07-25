@@ -4,13 +4,14 @@ module Skylab::Brazen
 
     module Meta_Properties__
 
-      def self.given_names_build_property
+      def self.given_propery_names_flush_queue
         yield (( shell = Process_DSL__.new ))
-        shell.given_names_build_prop
+        shell.given_names_flush_queue
       end
 
-      def self.flush_iambic_queue_in_proprietor_module mod
+      def self.flush_iambic_queue_in_to_two_mods mod, closure_mod
         dsl = Process_DSL__.new
+        dsl.closure_definee_mod = closure_mod
         dsl.proprietor = mod
         dsl.queue = mod.iambic_queue
         dsl.flush_queue
@@ -19,10 +20,12 @@ module Skylab::Brazen
       class Process_DSL__
 
         def initialize
-          @prop_class = nil
+          @prop_class = @prop = nil
         end
 
         attr_accessor :prop_i, :meth_i
+
+        attr_writer :closure_definee_mod
 
         def proprietor= mod
           @mod = mod
@@ -32,65 +35,126 @@ module Skylab::Brazen
           @x_a_a = x
         end
 
-        def given_names_build_prop
-          prs_any_leading_meta_property_declarations
-          via_names_prs_prop
+        # ~ the two kinds of propery builders
+
+        def given_names_flush_queue  # called when a method defined, for e.g
+          prep_big_scan
+          begin
+            @d_ += 1
+            prep_standard_parse
+            prcs_any_known_symbols
+            @stopped_at_unknown_symbol and break
+          end while @d_ < @x_a_a_last
+          prop = via_names_prs_prop
+          @x_a_a.clear
+          prop
         end
 
         def flush_queue
-          prs_any_leading_meta_property_declarations
-          @use_of_meta_properties_started and
-            raise ::ArgumentError, say_strange_iambic
+          prep_big_scan
+          begin
+            @d_ += 1
+            prep_standard_parse
+            prcs_any_known_symbols
+            @stopped_at_unknown_symbol and consume_complete_property
+          end while @d_ < @x_a_a_last
           @x_a_a.clear ; nil
         end
+
       private
 
-        def prs_any_leading_meta_property_declarations
-          @use_of_meta_properties_started = false
-          @d_ = 0 ; @x_a_a_length = @x_a_a.length
-          begin
-            prepare_standard_parse
-            process_iambic_passively
-            if @d < @x_a_length
-              @use_of_meta_properties_started = true
-              break
-            end
-            @d_ += 1
-          end while @d_ < @x_a_a_length ; nil
-        end
+        # ~ support methods in tandem for the two kinds of property builders
 
         def via_names_prs_prop
           @prop_class ||= prop_class_for_read
           @prop_class.new do |prop|
             @prop = prop
-            if @use_of_meta_properties_started
-              @use_of_meta_properties_started = false
-              prcss_use_of_meta_properties
-            end
-            @d_ += 1
-            while @d_ < @x_a_a_length
-              prepare_standard_parse
-              process_iambic_passively
-              if @d_ < @x_a.length
-                prcss_use_of_meta_properties
-              end
-              @d_ += 1
-            end
+            @stopped_at_unknown_symbol and towards_prop_cnsm_some_remainder
             add_names_to_property
-            prop.clear_all_iambic_ivars
+            @prop.clear_all_iambic_ivars
           end
-          @x_a_a.clear
-          @prop
+          prop = @prop ; @prop = nil ; prop
         end
 
-        def prepare_standard_parse
+        def consume_complete_property
+          @prop_class ||= prop_class_for_read
+          @prop_class.new do |prop|
+            @prop = prop
+            towards_prop_consume_any_metaproperties
+            finish_complete_prop_with_name
+            @prop.clear_all_iambic_ivars
+          end
+          @prop = nil
+        end
+
+        def towards_prop_cnsm_some_remainder  # allow no non-prop symbols
+          @stopped_at_unknown_symbol = false
+          begin
+            @prop.process_iambic_fully @d, @x_a
+            @x_a_a_last == @d_ and break
+            @d_ += 1
+            prep_standard_parse
+          end while true
+          nil
+        end
+
+        def towards_prop_consume_any_metaproperties
+          @stopped_at_unknown_symbol = false
+          begin
+            @prop.process_iambic_passively @d, @x_a
+            @d = @prop.d
+            if @d < @x_a_length
+              @stopped_at_unknown_symbol = true
+              break
+            end
+            @x_a_a_last == @d and break
+            @d += 1
+            prep_standard_parse
+          end while true
+          @stopped_at_unknown_symbol or raise ::ArgumentError, say_prop
+          nil
+        end
+
+        def finish_complete_prop_with_name
+          :property == current_iambic_token or raise ::ArgumentError, say_prop
+          advance_iambic_scanner
+          @prop_i = iambic_property
+          @meth_i = :"__PROCESS_IAMBIC_PARAMETER__#{ @prop_i }"
+          add_names_to_property
+          @prop.class::Flusher.new.
+            with_two_mods( @mod, @closure_definee_mod ).add_property @prop
+          ivar = @prop.as_ivar
+          @mod.method_added_mxr.stop_listening
+          @mod.send :define_method, @prop.iambic_writer_method_name do
+            instance_variable_set ivar, iambic_property ; nil
+          end
+          @mod.method_added_mxr.resume_listening
+          nil
+        end
+
+        # ~ shared support for the two kinds of property builders
+
+        def prep_big_scan
+          @d_ = -1 ; @x_a_a_last = @x_a_a.length - 1
+        end
+
+        def prep_standard_parse
           @x_a = @x_a_a.fetch @d_
           @d = 0 ; @x_a_length = @x_a.length
         end
 
-        def prcss_use_of_meta_properties
-          @prop.process_iambic_fully @d, @x_a
-          @d = @x_a = nil
+        def prcs_any_known_symbols
+          process_iambic_passively
+          @stopped_at_unknown_symbol = @d < @x_a_length ; nil
+        end
+
+        def say_prop
+          if @d < @x_a_length
+            x = current_iambic_token
+            "expected 'property' had \"#{ x }\""  # :+#needs-strange
+          else
+            "expected 'property' before end of iambic queue"
+          end
         end
 
         def prop_class_for_read
@@ -110,6 +174,11 @@ module Skylab::Brazen
             @d = mp.d
             @prop_class = @mod.property_cls_for_wrt
             mp.apply_to_property_class @prop_class ; nil
+          end
+
+          def property
+            @d -= 1  # wicked - imagine that there were metaprops being used
+            consume_complete_property
           end
         end ]
       end
@@ -135,7 +204,8 @@ module Skylab::Brazen
           :enum_box
 
         def apply_to_property_class pc
-          pc::Flusher.new.with_two( pc.singleton_class, pc ).add_property self
+          pc::Flusher.new.with_two_mods(
+            pc, pc.singleton_class ).add_property self
           aply_iambic_writers_to_property_class pc
           @has_default_x and aply_defaulting_behavior_to_property_class pc
           @has_entity_class_hook and aply_ent_cls_hook_to_prop_cls pc
@@ -222,15 +292,14 @@ module Skylab::Brazen
               else
                 _MUXER = Muxer__.new
                 const_set const_i, _MUXER
-                if instance_variable_defined? :@method_added_mxr  # ick for now
-                  stopped = true
-                  @method_added_mxr.stop_listening
+                if respond_to? :method_added_mxr and mxr = method_added_mxr
+                  mxr.stop_listening  # kind of ick for now
                 end
                 define_method :notificate do |i|
                   _MUXER.mux i, self
                   super i
                 end
-                stopped and @method_added_mxr.resume_listening
+                mxr and mxr.resume_listening
                 _MUXER
               end
             end
@@ -264,6 +333,8 @@ module Skylab::Brazen
 
     module Proprietor_Methods__
 
+      attr_reader :method_added_mxr
+
       def iambic_property_writers * x_a, & p
         shell = Shell__.new
         shell.client = self
@@ -274,7 +345,7 @@ module Skylab::Brazen
 
       remove_method :property_class_for_write
       def property_class_for_write
-        iambic_queue and @iambic_queue.length.nonzero? and flsh_iambic_queue
+        has_nonzero_length_iambic_queue and flsh_iambic_queue
         property_cls_for_wrt
       end
 
@@ -297,7 +368,13 @@ module Skylab::Brazen
 
     private
       def flsh_iambic_queue
-        Meta_Properties__.flush_iambic_queue_in_proprietor_module self
+        _closure_mod = if const_defined? :Module_Methods, false
+          const_get :Module_Methods, false
+        else
+          singleton_class
+        end
+        Meta_Properties__.flush_iambic_queue_in_to_two_mods self, _closure_mod
+        nil
       end
     end
 
@@ -336,6 +413,8 @@ module Skylab::Brazen
         attr_reader :has_entity_class_hks, :entity_class_hks_box
       end
 
+      attr_reader :d
+
       remove_method :might_have_entity_class_hooks
       def might_have_entity_class_hooks
         self.class.has_entity_class_hks
@@ -369,7 +448,20 @@ module Skylab::Brazen
 
     module Iambic_Methods__
 
-      attr_writer :client, :p
+      def with * a
+        @d = 0 ; process_iambic_fully a
+        clear_all_iambic_ivars
+        self
+      end
+
+      def current_iambic_token
+        @x_a.fetch @d
+      end
+
+      def advance_iambic_scanner
+        @d += 1 ; nil
+      end
+
       def clear_all_iambic_ivars
         @d = @x_a = @x_a_length = nil
         UNDEFINED_

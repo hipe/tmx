@@ -37,6 +37,13 @@ module Skylab::Brazen
       def process_option_iambic x_a
         @d = 0 ; process_iambic_fully x_a ; clear_all_iambic_ivars
       end
+
+      def to_client_via_p_apply
+        @prop_closure_definee = @client.singleton_class
+        @mod = @client
+        to_two_mods_aply_p
+      end
+
     private
 
       def when_zero_length_arg_list_execute
@@ -57,11 +64,19 @@ module Skylab::Brazen
         "wrong number of arguments (#{ @x_a.length })"
       end
 
-      def to_client_via_p_apply
-        Method_Added_Muxer__[ @client ].for_each_method_added_in @p,
-          flusher.with_two( @client.singleton_class, @client ).
-            method( :flush_because_method ) ; nil
-      end ; public :to_client_via_p_apply
+      def to_two_mods_aply_p
+        Method_Added_Muxer__[ @mod ].for_each_method_added_in @p,
+          flusher.with_two_mods( @mod,  @prop_closure_definee ).
+            method( :flush_because_method )
+        @mod.has_nonzero_length_iambic_queue and to_two_mods_flsh_iambic_queue
+        nil
+      end
+
+      def to_two_mods_flsh_iambic_queue
+        Entity::Meta_Properties__.flush_iambic_queue_in_to_two_mods(
+          @mod, @prop_closure_definee )
+        nil
+      end
 
       def flusher
         @flusher ||= Property__::Flusher.new
@@ -80,8 +95,6 @@ module Skylab::Brazen
         mod.send :include, Iambic_Methods__
         mod.const_set READ_BOX__, Box__.new
         apply_p_to_extension_module mod
-        mod.has_nonzero_length_iambic_queue and
-          Entity::Meta_Properties__.flush_iambic_queue_in_proprietor_module mod
         mod
       end
 
@@ -102,9 +115,9 @@ module Skylab::Brazen
       end
 
       def apply_p_to_extension_module mod
-        Method_Added_Muxer__[ mod ].for_each_method_added_in @p,
-          flusher.with_two( mod::Module_Methods, mod ).
-            method( :flush_because_method ) ; nil
+        @prop_closure_definee = mod::Module_Methods
+        @mod = mod
+        to_two_mods_aply_p
       end
     end
 
@@ -297,14 +310,14 @@ module Skylab::Brazen
         def initialize
           @has_writer_method_name_constraints = false
         end
-        attr_writer :property
+        attr_writer :meth_i, :prop_i
         def writer_method_name_suffix= i
           @has_writer_method_name_constraints = true
           @method_name_constraints_rx = /\A.+(?=#{ ::Regexp.escape i }\z)/
           @writer_method_name_suffix = i
         end
-        def with_two definee_mod, proprietor_mod
-          @definee = definee_mod
+        def with_two_mods proprietor_mod, closure_mod
+          @prop_closure_definee = closure_mod
           @proprietor = proprietor_mod
           self
         end
@@ -315,27 +328,30 @@ module Skylab::Brazen
           else
             @prop_i = @meth_i
           end
-          add_property flsh_property
+          add_property frm_queue_flsh_property ; nil
         end
         def add_property property
           i = property.name_i
           m_i = :"produce_#{ i }_property"
           @proprietor.property_method_names_for_write.add_or_assert i, m_i
-          @definee.send :define_method, m_i do property end
+          @prop_closure_definee.send :define_method, m_i do property end
           property.might_have_entity_class_hooks and
             prcs_any_ent_cls_hks property
           nil
         end
       private
-        def flsh_property
+        def frm_queue_flsh_property
           if @proprietor.has_nonzero_length_iambic_queue
             flsh_meta_properties_and_property @proprietor.iambic_queue
           else
-            @proprietor::PROPERTY_CLASS__.new @prop_i, @meth_i
+            bld_property
           end
         end
+        def bld_property
+          @proprietor::PROPERTY_CLASS__.new @prop_i, @meth_i
+        end
         def flsh_meta_properties_and_property a
-          Entity::Meta_Properties__.given_names_build_property do |mp|
+          Entity::Meta_Properties__.given_propery_names_flush_queue do |mp|
             mp.proprietor = @proprietor ;  mp.prop_i = @prop_i
             mp.meth_i = @meth_i ; mp.queue = a
           end
@@ -404,7 +420,7 @@ module Skylab::Brazen
 
     class Property__  # re-open now for meta-properties support
       Entity[ self, nil ]  # :#here-2
-      public :process_iambic_fully
+      public :process_iambic_passively, :process_iambic_fully
     end
 
     # ~ session options
