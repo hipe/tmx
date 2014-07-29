@@ -6,7 +6,7 @@ module Skylab::Brazen::TestSupport::Entity
 
     context "there are at least 5 ways of creating monadic iambic props" do
 
-      it "1) the classic form with method definitions as iambic writers" do
+      it "1)  the classic form with method definitions as iambic writers" do
 
         class P_Classic
           Subject_[][ self, -> do
@@ -21,7 +21,7 @@ module Skylab::Brazen::TestSupport::Entity
         expect P_Classic
       end
 
-      it "2) in the '[]' with the 'property' keyword" do
+      it "2)  in the '[]' with the 'property' keyword" do
 
         class P_Simplest
           Subject_[][ self, :property, :foo, :property, :bar ]
@@ -29,9 +29,15 @@ module Skylab::Brazen::TestSupport::Entity
         expect P_Simplest
       end
 
-      it "3) in the '[]' with the 'properties' keyword"  # pending
+      it "3)  in the '[]' with the 'properties' keyword" do
 
-      it "4) in the '-> { }' with the 'property' keyword" do
+        class P_Props_3
+          Subject_[][ self, :properties, :foo, :bar ]
+        end
+        expect P_Props_3
+      end
+
+      it "4)  in the '-> { }' with the 'property' keyword" do
 
         class P_In_Block
           Subject_[][ self, -> do
@@ -52,8 +58,7 @@ module Skylab::Brazen::TestSupport::Entity
         expect P_In_Block_B
       end
 
-      it "5) in the '-> { }' with the 'properties' keyword"
-      if false
+      it  "5)  in the '-> { }' with the 'properties' keyword" do
         class P_In_Block_Props
           Subject_[][ self, -> do
             o :properties, :foo, :bar
@@ -62,8 +67,7 @@ module Skylab::Brazen::TestSupport::Entity
         expect P_In_Block_Props
       end
 
-      it "5b) in the '-> { }' with the 'properties' keyword (2 lines)"
-      if false
+      it "5b) in the '-> { }' with the 'properties' keyword (2 lines)" do
         class P_In_Block_Props_B
           Subject_[][ self, -> do
             o :properties, :foo

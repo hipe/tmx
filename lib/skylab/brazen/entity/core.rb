@@ -548,8 +548,14 @@ module Skylab::Brazen
         end
 
         def meta_property
-          _mp = Entity::Meta_Property__.new @scan
-          _mp.apply_to_property_class @kernel.property_class_for_write
+          Entity::Meta_Property__.new( @scan ).
+            apply_to_property_class @kernel.property_class_for_write
+        end
+
+        def properties
+          begin
+            @kernel.flush_because_prop_i @scan.gets_one
+          end while @scan.unparsed_exists
         end
 
         def property
