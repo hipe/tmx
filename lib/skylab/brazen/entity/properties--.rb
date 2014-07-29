@@ -4,13 +4,13 @@ module Skylab::Brazen
 
     class Properties__
 
-      def initialize proprietor
-        @proprietor = proprietor
+      def initialize reader
+        @reader = reader
       end
 
       def [] i
-        m_i = @proprietor.property_method_names[ i ]
-        m_i and @proprietor.send m_i
+        m_i = @reader.property_method_nms_for_rd[ i ]
+        m_i and @reader.send m_i
       end
 
       def to_value_array
@@ -31,10 +31,10 @@ module Skylab::Brazen
       end
 
       def to_value_scanner
-        scn = @proprietor.property_method_names.to_value_scanner
+        scn = @reader.property_method_nms_for_rd.to_value_scanner
         Callback_::Scn.new do
           if (( m_i = scn.gets ))
-            @proprietor.send m_i
+            @reader.send m_i
           end
         end
       end

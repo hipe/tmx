@@ -2,48 +2,81 @@ require_relative 'test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity property" do
+  describe "[br] entity property: `property`" do
 
-    context "minimal - the property name is not used for the parse method .." do
+    context "there are at least 5 ways of creating monadic iambic props" do
 
-      before :all do
+      it "1) the classic form with method definitions as iambic writers" do
 
-        class EP_Foo
-          attr_reader :zig
+        class P_Classic
           Subject_[][ self, -> do
-            o :property, :zig
+            def foo
+              @foo = iambic_property
+            end
+            def bar
+              @bar = iambic_property
+            end
           end ]
         end
+        expect P_Classic
       end
 
-      it "so you can create a reader with the same name as the property" do
-        foo = EP_Foo.new.with :zig, :zag
-        foo.zig.should eql :zag
-      end
-    end
+      it "2) in the '[]' with the 'property' keyword" do
 
-    context "create arbitrary meta-properties and use them in the properties" do
-
-      before :all do
-
-        class EP_Bar
-          Subject_[][ self, -> do
-            o :meta_property, :fun_ness
-            o :fun_ness, :really_fun, :property, :zag
-          end ]
-
-          attr_reader :zag
-          public :with
+        class P_Simplest
+          Subject_[][ self, :property, :foo, :property, :bar ]
         end
+        expect P_Simplest
       end
 
-      it "still works as a property ofc" do
-        bar = EP_Bar.new.with :zag, :zig
-        bar.zag.should eql :zig
+      it "3) in the '[]' with the 'properties' keyword"  # pending
+
+      it "4) in the '-> { }' with the 'property' keyword" do
+
+        class P_In_Block
+          Subject_[][ self, -> do
+            o :property, :foo
+            o :property, :bar
+          end ]
+        end
+        expect P_In_Block
       end
 
-      it "reflect with your meta-properties" do
-        EP_Bar.properties[ :zag ].fun_ness.should eql :really_fun
+      it "4b) in the '-> { }' with the 'property' keyword (one line)" do
+
+        class P_In_Block_B
+          Subject_[][ self, -> do
+            o :property, :foo, :property, :bar
+          end ]
+        end
+        expect P_In_Block_B
+      end
+
+      it "5) in the '-> { }' with the 'properties' keyword"
+      if false
+        class P_In_Block_Props
+          Subject_[][ self, -> do
+            o :properties, :foo, :bar
+          end ]
+        end
+        expect P_In_Block_Props
+      end
+
+      it "5b) in the '-> { }' with the 'properties' keyword (2 lines)"
+      if false
+        class P_In_Block_Props_B
+          Subject_[][ self, -> do
+            o :properties, :foo
+            o :bar
+          end ]
+        end
+        expect P_In_Block_Props_B
+      end
+
+      def expect cls
+        subj = cls.new.send :with, :foo, :x, :bar, :y
+        subj.instance_variable_get( :@foo ).should eql :x
+        subj.instance_variable_get( :@bar ).should eql :y
       end
     end
   end

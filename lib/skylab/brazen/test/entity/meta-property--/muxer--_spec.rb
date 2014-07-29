@@ -9,7 +9,7 @@ module Skylab::Brazen::TestSupport::Entity::Muxer__
   extend TestSupport_::Quickie
 
   Subject_ = -> do
-    Brazen_::Entity::Meta_Properties__::Muxer
+    Brazen_::Entity::Meta_Property__::Muxer
   end
 
   describe "[br] entity muxer" do

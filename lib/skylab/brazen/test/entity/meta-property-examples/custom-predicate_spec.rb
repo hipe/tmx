@@ -19,7 +19,7 @@ module Skylab::Brazen::TestSupport::Entity
               arety == :"1"
             end
 
-            iambic_property_writers :iambic_writer_method_name_suffix, :'=' do
+            o :iambic_writer_method_name_suffix, :'=' do
               def necessary=
                 @arety = :"1"
               end

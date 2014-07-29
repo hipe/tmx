@@ -55,7 +55,7 @@ module Skylab::Brazen::TestSupport::Entity
       end
     end
 
-    context "iambic writer postfix option" do
+    context "iambic writer postfix option (& introduction to using the DSL)" do
 
       before :all do
         class FooI_With_Postfix
@@ -69,7 +69,7 @@ module Skylab::Brazen::TestSupport::Entity
         end
       end
 
-      it "ok" do
+      it "iambic writer is recognized (and the DSL is used in the '[]')" do
         FooI_With_Postfix.with( :some_writer, :foo ).x.should eql :foo
       end
 

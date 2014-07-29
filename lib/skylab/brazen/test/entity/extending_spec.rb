@@ -41,7 +41,6 @@ module Skylab::Brazen::TestSupport::Entity
           attr_reader :foo_x, :bar_x
         end
 
-
         class FooE_Two_Child
           FooE_Two[ self, -> do
 

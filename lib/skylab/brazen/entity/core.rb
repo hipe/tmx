@@ -17,31 +17,15 @@ module Skylab::Brazen
       end
     end
 
-    class Common_Shell__
-
-      def initialize
-      end
+    class Common_Shell__  # read [#001] the entity enhancement narrrative
 
       def execute_via_argument_list x_a
-        @x_a = x_a
-        case x_a.length
-        when 2 ; when_two_length_arg_list_execute
-        when 1 ; when_one_length_arg_list_execute
-        when 0 ; when_zero_length_arg_list_execute
-        else   ; when_many_length_arg_list_execute
+        @d = 0 ; @x_a = x_a ; @x_a_length = x_a.length
+        case @x_a_length <=> 1
+        when  1 ; when_many_length_arg_list_execute
+        when  0 ; when_one_length_arg_list_execute
+        when -1 ; when_zero_length_arg_list_execute
         end
-      end
-
-      attr_writer :client, :p
-
-      def process_option_iambic x_a
-        @d = 0 ; process_iambic_fully x_a ; clear_all_iambic_ivars
-      end
-
-      def to_client_via_p_apply
-        @prop_closure_definee = @client.singleton_class
-        @mod = @client
-        to_two_mods_aply_p
       end
 
     private
@@ -50,43 +34,58 @@ module Skylab::Brazen
         raise ::ArgumentError, say_wrong_number_of_arguments
       end
 
-      def when_two_length_arg_list_execute
-        @client, @p = @x_a ; @x_a = nil
-        to_client_apply_setup
-        @p and to_client_via_p_apply ; nil  # #here-2
-      end
-
-      def when_many_length_arg_list_execute
-        raise ::ArgumentError, say_wrong_number_of_arguments
-      end
-
       def say_wrong_number_of_arguments
         "wrong number of arguments (#{ @x_a.length })"
       end
 
-      def to_two_mods_aply_p
-        Method_Added_Muxer__[ @mod ].for_each_method_added_in @p,
-          flusher.with_two_mods( @mod,  @prop_closure_definee ).
-            method( :flush_because_method )
-        @mod.has_nonzero_length_iambic_queue and to_two_mods_flsh_iambic_queue
-        nil
+      def when_one_length_arg_list_execute  # build extension moudule via proc
+        if current_iambic_token.respond_to? :arity
+          when_one_length_arg_list_item_is_proc_execute
+        else
+          when_one_length_arg_list_item_is_client_execute
+        end
       end
 
-      def to_two_mods_flsh_iambic_queue
-        Entity::Meta_Properties__.flush_iambic_queue_in_to_two_mods(
-          @mod, @prop_closure_definee )
-        nil
+      def when_many_length_arg_list_execute  # more than one
+        if current_iambic_token.respond_to? :id2name
+          when_many_and_no_client_execute
+        else
+          @reader = iambic_property  # see [#001]:#reader-vs-writer
+          to_reader_apply_setup
+          _writer = @reader.singleton_class
+          @kernel = Kernel__.new @reader, _writer
+          if current_iambic_token.respond_to? :id2name
+            when_remaining_args_look_iambic_execute
+          else
+            when_remaining_args_do_not_look_iambic_execute
+          end
+        end
       end
 
-      def flusher
-        @flusher ||= Property__::Flusher.new
+      def when_many_and_no_client_execute
+        raise ::ArgumentError, say_client_expected_for_first_arg
+      end
+
+      def say_client_expected_for_first_arg
+        "client expected for first arg"
+      end
+
+    private
+
+      def when_remaining_args_do_not_look_iambic_execute
+        d = @x_a_length - @d
+        1 == d or raise ::ArgumentError, "(#{ d } for 1 remaining arg)"
+        p = current_iambic_token
+        p.respond_to? :arity or raise ::ArgumentError, say_expecting_proc
+        clear_all_iambic_ivars
+        @kernel.apply_p p ; nil
       end
     end
 
     class Shell__ < Common_Shell__
     private
 
-      def when_one_length_arg_list_execute  # build extension moudule via proc
+      def when_one_length_arg_list_item_is_proc_execute
         @p = @x_a.first
         mod = ::Module.new
         mod.const_set :Module_Methods, ::Module.new
@@ -94,35 +93,156 @@ module Skylab::Brazen
         mod.extend Extension_Module_Methods__
         mod.send :include, Iambic_Methods__
         mod.const_set READ_BOX__, Box__.new
-        apply_p_to_extension_module mod
+        @reader = mod
+        aply_p_to_reader_which_is_new_extension_module
         mod
       end
 
-      def when_many_length_arg_list_execute  # parse options
-        @client = @x_a.first ; @p = @x_a.last  # for now
-        @d = 1 ; @x_a_length = @x_a.length - 1
-        process_iambic_fully  # see #here-1
-        to_client_apply_setup
-        to_client_via_p_apply ; nil
+      def when_one_length_arg_list_item_is_client_execute
+        @reader = @x_a.first
+        to_reader_apply_setup
       end
 
-      def to_client_apply_setup
-        @client.extend Proprietor_Methods__
-        @client.send :include, Iambic_Methods__
-        @client.const_defined? READ_BOX__ or
-          @client.const_set READ_BOX__, Box__.new
+      def when_remaining_args_look_iambic_execute
+        dsl = DSL__.new @kernel, @d, @x_a
+        dsl.execute
+        @d = dsl.current_iambic_index
+        @d < @x_a_length and when_remaining_args_do_not_look_iambic_execute
+      end
+
+      def say_expecting_proc
+        "expecting proc, had '#{ current_iambic_token }'"
+      end
+
+      def to_reader_apply_setup
+        @reader.extend Proprietor_Methods__
+        @reader.send :include, Iambic_Methods__
+        @reader.const_defined? READ_BOX__ or
+          @reader.const_set READ_BOX__, Box__.new
         nil
       end
 
-      def apply_p_to_extension_module mod
-        @prop_closure_definee = mod::Module_Methods
-        @mod = mod
-        to_two_mods_aply_p
+      def aply_p_to_reader_which_is_new_extension_module
+        _writer = @reader::Module_Methods
+        @kernel = Kernel__.new @reader, _writer
+        @kernel.apply_p @p ; nil
       end
     end
 
     READ_BOX__ = :PROPERTIES_FOR_READ__
     WRITE_BOX__ = :PROPERTIES_FOR_WRITE__
+
+    class Kernel__  # formerly "flusher"
+
+      def initialize reader, writer
+        @reader = reader ; @writer = writer
+        @has_writer_method_name_constraints = false
+        @prop = nil
+      end
+
+      def apply_p p
+        Method_Added_Muxer__[ @reader ].for_each_method_added_in p, -> m_i do
+          flush_because_method m_i
+        end
+        @reader.has_nonzero_length_iambic_queue and flsh_trailing_DSL
+        nil
+      end
+    private
+      def flsh_trailing_DSL
+        flsh_iambic_queue
+      end
+    public
+
+      def iambic_writer_method_name_suffix= i
+        @has_writer_method_name_constraints = true
+        @method_name_constraints_rx = /\A.+(?=#{ ::Regexp.escape i }\z)/
+        @writer_method_name_suffix = i
+      end
+
+      def flush_because_method m_i
+        @meth_i = m_i
+        if @reader.has_nonzero_length_iambic_queue
+          flsh_iambic_queue
+          @meth_i and flush_bc_meth
+        else
+          flush_bc_meth
+        end ; nil
+      end
+    private
+      def flush_bc_meth
+        m_i = @meth_i ; @meth_i = nil
+        prop_i = @has_writer_method_name_constraints ?
+          aply_method_name_constraints( m_i ) : m_i
+        if @prop
+          @prop.set_prop_i_and_iambic_writer_method_name prop_i, m_i
+        else
+          did_build = true
+          @prop = @reader::PROPERTY_CLASS__.new prop_i, m_i
+        end
+        prop_accept
+        did_build and @prop = nil
+      end
+    public
+
+      def flush_because_prop_i prop_i
+        @meth_i = nil
+        m_i = :"__PROCESS_IAMBIC_PARAMETER__#{ prop_i }"
+        if @prop
+          @prop.set_prop_i_and_iambic_writer_method_name prop_i, m_i
+        else
+          did_build = true
+          @prop = @reader::PROPERTY_CLASS__.new prop_i, m_i
+        end
+        prop_accept
+        mxr = @reader.method_added_mxr and mxr.stop_listening
+        _IVAR_ = @prop.as_ivar
+        @reader.send :define_method, @prop.iambic_writer_method_name do
+          instance_variable_set _IVAR_, iambic_property ; nil
+        end
+        mxr and mxr.resume_listening
+        did_build and @prop = nil
+      end
+
+      def flush_iambic_queue
+        flsh_iambic_queue
+      end
+
+    private
+
+      def flsh_iambic_queue
+        x_a_a = @reader.iambic_queue
+        @scan = Entity::Compound_Iambic_Scanner__.new x_a_a
+        dsl = DSL__.new self, @scan
+        begin
+          dsl.execute
+          @scan.unparsed_exists or break
+          twds_prop_scan_some_DSL_as_metaproperties_being_used
+          @scan.unparsed_exists or break
+        end while true
+        @scan = nil
+        x_a_a.clear ; nil
+      end
+
+      def aply_method_name_constraints m_i
+        md = @method_name_constraints_rx.match m_i.to_s
+        md or raise ::NameError, say_did_not_have_expected_suffix( m_i )
+        md[ 0 ].intern
+      end
+      def say_did_not_have_expected_suffix m_i
+        "did not have expected suffix '#{ @writer_method_name_suffix }'#{
+          }: '#{ m_i }'"
+      end
+
+      def prop_accept
+        i = @prop.name_i
+        m_i = :"produce_#{ i }_property"
+        @reader.prop_mthd_names_for_write.add_or_assert i, m_i
+        _PROPERTY_ = @prop
+        @writer.send :define_method, m_i do _PROPERTY_ end
+        @prop.might_have_entity_class_hooks and prcs_any_ent_cls_hks
+        nil
+      end
+    end
 
     module Proprietor_Methods__
 
@@ -130,25 +250,30 @@ module Skylab::Brazen
         @properties ||= Entity::Properties__.new( self )
       end
 
-      def property_method_names_for_write
+      def prop_mthd_names_for_write
         if const_defined? WRITE_BOX__, false
           const_get WRITE_BOX__, false
         elsif const_defined? READ_BOX__, false
           const_set WRITE_BOX__, const_get( READ_BOX__, false )
         else
-          props = property_method_names.dup
+          props = property_method_nms_for_rd.dup
           const_set WRITE_BOX__, props
           const_set READ_BOX__, props
           props
         end
       end
 
-      def property_method_names
+      def property_method_nms_for_rd
         const_get READ_BOX__
       end
 
-      def o * x_a
-        ( @iambic_queue ||= [] ).push x_a ; nil
+      def o * x_a, & p
+        x_a.length.zero? or some_iambic_queue.push x_a
+        p and flsh_with_property_definition_block p ; nil
+      end
+
+      def some_iambic_queue
+        @iambic_queue ||= []
       end
 
       def has_nonzero_length_iambic_queue
@@ -158,9 +283,11 @@ module Skylab::Brazen
       attr_reader :iambic_queue
 
       def property_class_for_write  # :+#loader-hook
-        Entity::Meta_Properties__.class
+        Entity::Meta_Property__.class
         property_class_for_write
       end
+
+      attr_reader :method_added_mxr
     end
 
     class Box__
@@ -241,12 +368,12 @@ module Skylab::Brazen
           muxer
         end
       end
-      def initialize client
-        @client = client ; @p = nil
+      def initialize reader
+        @reader = reader ; @p = nil
       end
       def for_each_method_added_in defs_p, do_p
         add_listener do_p
-        @client.module_exec( & defs_p )
+        @reader.module_exec( & defs_p )
         remove_listener do_p
       end
       def add_listener p
@@ -270,15 +397,7 @@ module Skylab::Brazen
     class Property__
 
       def initialize *a
-        case a.length
-        when 2
-          prop_i, meth_i = a
-          set_name_i prop_i
-          set_iambic_writer_method_name meth_i
-        when 0
-        else
-          a.length.zero? or raise ::ArgumentError, "(#{ a.length } for 0|2)"
-        end
+        a.length.nonzero? and set_prop_i_and_iambic_writer_method_name( * a )
         block_given? and yield self
         emit_iambic_event :at_end_of_process_iambic
         freeze
@@ -286,12 +405,9 @@ module Skylab::Brazen
 
       attr_reader :iambic_writer_method_name, :name
 
-      def set_name_i prop_i
+      def set_prop_i_and_iambic_writer_method_name prop_i, meth_i
         @name = Callback_::Name.from_variegated_symbol prop_i
-      end
-
-      def set_iambic_writer_method_name meth_i
-        @iambic_writer_method_name = meth_i
+        @iambic_writer_method_name = meth_i ; nil
       end
 
       def as_ivar
@@ -305,98 +421,54 @@ module Skylab::Brazen
       def might_have_entity_class_hooks  # :+#re-defined elsewhere
         false
       end
-
-      class Flusher
-        def initialize
-          @has_writer_method_name_constraints = false
-        end
-        attr_writer :meth_i, :prop_i
-        def writer_method_name_suffix= i
-          @has_writer_method_name_constraints = true
-          @method_name_constraints_rx = /\A.+(?=#{ ::Regexp.escape i }\z)/
-          @writer_method_name_suffix = i
-        end
-        def with_two_mods proprietor_mod, closure_mod
-          @prop_closure_definee = closure_mod
-          @proprietor = proprietor_mod
-          self
-        end
-        def flush_because_method m_i
-          @meth_i = m_i
-          if @has_writer_method_name_constraints
-            @prop_i = apply_method_name_constraints @meth_i
-          else
-            @prop_i = @meth_i
-          end
-          add_property frm_queue_flsh_property ; nil
-        end
-        def add_property property
-          i = property.name_i
-          m_i = :"produce_#{ i }_property"
-          @proprietor.property_method_names_for_write.add_or_assert i, m_i
-          @prop_closure_definee.send :define_method, m_i do property end
-          property.might_have_entity_class_hooks and
-            prcs_any_ent_cls_hks property
-          nil
-        end
-      private
-        def frm_queue_flsh_property
-          if @proprietor.has_nonzero_length_iambic_queue
-            flsh_meta_properties_and_property @proprietor.iambic_queue
-          else
-            bld_property
-          end
-        end
-        def bld_property
-          @proprietor::PROPERTY_CLASS__.new @prop_i, @meth_i
-        end
-        def flsh_meta_properties_and_property a
-          Entity::Meta_Properties__.given_propery_names_flush_queue do |mp|
-            mp.proprietor = @proprietor ;  mp.prop_i = @prop_i
-            mp.meth_i = @meth_i ; mp.queue = a
-          end
-        end
-        def apply_method_name_constraints m_i
-          md = @method_name_constraints_rx.match m_i.to_s
-          md or raise ::NameError, say_did_not_have_expected_suffix( m_i )
-          md[ 0 ].intern
-        end
-        def say_did_not_have_expected_suffix m_i
-          "did not have expected suffix '#{ @writer_method_name_suffix }'#{
-           }: '#{ m_i }'"
-        end
-      end
     end
-
 
     # ~ iambics
 
     module Iambic_Methods__
     private
 
-      def process_iambic_fully * a
-        prcss_iambic_passively_with_args a
-        @d < @x_a_length and raise ::ArgumentError, say_strange_iambic
+      def with * a
+        process_iambic_fully 0, a
+        clear_all_iambic_ivars
         self
       end
 
+      def process_iambic_fully * a
+        prcss_iambic_passively_via_args a
+        unparsed_iambic_exists and raise ::ArgumentError, say_strange_iambic
+        self
+      end
+
+      def unparsed_iambic_exists
+        @d < @x_a_length
+      end
+
       def say_strange_iambic
-        "unrecognized property '#{ @x_a[ @d ] }'"
+        "unrecognized property '#{ current_iambic_token }'"
       end
 
       def process_iambic_passively * a
-        prcss_iambic_passively_with_args a
+        prcss_iambic_passively_via_args a
       end
 
-      def prcss_iambic_passively_with_args a
+      def prcss_iambic_passively_via_args a
+        prep_iambic_parse_via_args a
+        prcss_iambic_passively
+      end
+
+      def prep_iambic_parse_via_args a
         case a.length
         when 0 ; @d ||= 0 ; @x_a_length ||= @x_a.length
         when 1 ; @d ||= 0 ; @x_a, = a ; @x_a_length = @x_a.length
         when 2 ; @d, @x_a = a ; @x_a_length = @x_a.length
         else   ; raise ::ArgumentError, "(#{ a.length } for 0..2)"
-        end
+        end ; nil
+      end
+
+      def prcss_iambic_passively
         subject = self.class
-        box = subject.property_method_names
+        box = subject.property_method_nms_for_rd
         while @d < @x_a_length
           m_i = box[ @x_a[ @d ] ]
           m_i or break
@@ -412,26 +484,154 @@ module Skylab::Brazen
         x
       end
 
+      def current_iambic_token
+        @x_a.fetch @d
+      end
+
+      def advance_iambic_scanner
+        @d += 1 ; nil
+      end
+
+      def clear_all_iambic_ivars
+        @d = @x_a = @x_a_length = nil
+        UNDEFINED_
+      end
+
       def emit_iambic_event _  # :#re-defined elsewhere
       end
 
       PROPERTY_CLASS__ = Property__  # delicate
     end
 
-    class Property__  # re-open now for meta-properties support
-      Entity[ self, nil ]  # :#here-2
-      public :process_iambic_passively, :process_iambic_fully
+    UNDEFINED_ = nil
+
+    # ~ bootstrapping & core DSL
+
+    class Common_Shell__
+      include Iambic_Methods__
     end
 
-    # ~ session options
+    class Property__
+      include Iambic_Methods__
+    end
 
-    class Shell__
+    module Iambic_Methods_via_Scanner__
+      include Iambic_Methods__
+
+    private
+      def prep_iambic_parse_via_args a
+        a.length.zero? or raise ::ArgumentError, say_not_when_scan( a )
+      end
+
+      def say_not_when_scan a
+        "there is currently no support for nonzero number of arguments when #{
+          }scanning via scanner (#{ a.length } for 0)"
+      end
+
+      def prcss_iambic_passively
+        reader = self.class
+        box = reader.property_method_nms_for_rd
+        while unparsed_iambic_exists
+          m_i = box[ current_iambic_token ]
+          m_i or break
+          advance_iambic_scanner_by_one
+          send reader.send( m_i ).iambic_writer_method_name
+        end ; nil
+      end
+
+      def unparsed_iambic_exists
+        @scan.unparsed_exists
+      end
+
+      def iambic_property
+        @scan.gets_one
+      end
+
+      def current_iambic_token
+        @scan.current_token
+      end
+
+      def current_iambic_index
+        @scan.current_index
+      end
+
+      def advance_iambic_scanner_by_one
+        @scan.advance_one
+      end
+
+      def clear_all_iambic_ivars
+        @scan.clear_all
+      end
+    end
+
+    class DSL__
+
+      include Iambic_Methods_via_Scanner__
+
+      def initialize kernel, d, x_a=nil
+        @kernel = kernel
+        if x_a
+          @scan = Iambic_Scanner_.new d, x_a
+        else
+          @scan = d
+        end
+      end
+
+      def execute
+        process_iambic_passively
+        nil
+      end
+
+      public :current_iambic_index, :unparsed_iambic_exists
+
+    private
 
       Entity[ self, -> do
-        def iambic_writer_method_name_suffix  # :#here-1
-          flusher.writer_method_name_suffix = iambic_property
+
+        def iambic_writer_method_name_suffix
+          @kernel.iambic_writer_method_name_suffix = iambic_property
+        end
+
+        def meta_property
+          _mp = Entity::Meta_Property__.new @scan
+          _mp.apply_to_property_class @kernel.property_class_for_write
+        end
+
+        def property
+          @kernel.flush_because_prop_i iambic_property
         end
       end ]
+    end
+
+    class Iambic_Scanner_
+
+      def initialize d, x_a
+        @d = d ; @x_a = x_a ; @x_a_length = @x_a.length
+      end
+
+      def unparsed_exists
+        @d != @x_a_length
+      end
+
+      def gets_one
+        x = current_token ; advance_one ; x
+      end
+
+      def current_token
+        @x_a.fetch @d
+      end
+
+      def current_index
+        @d
+      end
+
+      def advance_one
+        @d += 1 ; nil
+      end
+
+      def clear_all
+        @d = @x_a = @x_a_length = nil
+      end
     end
 
     # ~ extension API
@@ -454,20 +654,24 @@ module Skylab::Brazen
         execute_via_argument_list arg_list
       end
 
-      def when_one_length_arg_list_execute
-        @client = @x_a.first
-        to_client_apply_setup ; nil
+      def when_many_and_no_client_execute
+        self._DO_ME
       end
 
-      def to_client_apply_setup
-        @client.extend Proprietor_Methods__
-        @client.extend @extension_module::Module_Methods
-        if ! @client.const_defined? READ_BOX__  # before we do any includes
-          @client.const_set READ_BOX__, Box__.new
+      def when_one_length_arg_list_execute
+        @reader = @x_a.first
+        to_reader_apply_setup ; nil
+      end
+
+      def to_reader_apply_setup
+        @reader.extend Proprietor_Methods__
+        @reader.extend @extension_module::Module_Methods
+        if ! @reader.const_defined? READ_BOX__  # before we do any includes
+          @reader.const_set READ_BOX__, Box__.new
         end
-        @client.send :include, @extension_module  # iambic methods too
-        _box = @client.property_method_names_for_write
-        _box_ = @extension_module.property_method_names
+        @reader.send :include, @extension_module  # iambic methods too
+        _box = @reader.prop_mthd_names_for_write
+        _box_ = @extension_module.property_method_nms_for_rd
         _box.ensuring_same_values_merge_box! _box_ ; nil
       end
     end

@@ -7,7 +7,7 @@ formatted to fit this screen, but it otherwise often historic.
 
 
 
-## :#storypoint-5 introduction
+## :#storypoint-5 introduction (:#formal-attributes-vs-actual-attributes)
 
 (the fate of this node is discussed at [#053] "discussion of the..")
 

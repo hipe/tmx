@@ -30,7 +30,7 @@ module Skylab::Brazen::TestSupport::Entity
       end
 
       def subject
-        Foo.property_method_names
+        Foo.property_method_nms_for_rd
       end
     end
 
@@ -54,13 +54,13 @@ module Skylab::Brazen::TestSupport::Entity
       end
 
       it "child inherits properties of base" do
-        Foo_Base.property_method_names.get_local_normal_names.should eql [ :foo ]
-        Foo_Child.property_method_names.get_local_normal_names.should eql [ :foo, :bar ]
+        Foo_Base.property_method_nms_for_rd.get_local_normal_names.should eql [ :foo ]
+        Foo_Child.property_method_nms_for_rd.get_local_normal_names.should eql [ :foo, :bar ]
       end
 
       it "the child's handle on the property is THE SAME PROPERTY" do
-        foo1 = Foo_Base.property_method_names[ :foo ]
-        foo2 = Foo_Child.property_method_names[ :foo ]
+        foo1 = Foo_Base.property_method_nms_for_rd[ :foo ]
+        foo2 = Foo_Child.property_method_nms_for_rd[ :foo ]
         foo1 or fail
         foo1.object_id.should eql foo2.object_id
       end
