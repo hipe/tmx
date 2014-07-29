@@ -9,11 +9,7 @@ module Skylab::Brazen
       end
 
       def via_argument_list a
-        if a.length.zero?
-          Entity
-        else
-          Shell__.new.execute_via_argument_list a
-        end
+        Shell__.new.execute_via_argument_list a
       end
     end
 
@@ -24,19 +20,10 @@ module Skylab::Brazen
         case @x_a_length <=> 1
         when  1 ; when_many_length_arg_list_execute
         when  0 ; when_one_length_arg_list_execute
-        when -1 ; when_zero_length_arg_list_execute
         end
       end
 
     private
-
-      def when_zero_length_arg_list_execute
-        raise ::ArgumentError, say_wrong_number_of_arguments
-      end
-
-      def say_wrong_number_of_arguments
-        "wrong number of arguments (#{ @x_a.length })"
-      end
 
       def when_one_length_arg_list_execute  # build extension moudule via proc
         if current_iambic_token.respond_to? :arity
@@ -47,27 +34,15 @@ module Skylab::Brazen
       end
 
       def when_many_length_arg_list_execute  # more than one
+        @reader = iambic_property  # see [#001]:#reader-vs-writer
+        to_reader_apply_setup
+        _writer = @reader.singleton_class
+        @kernel = Kernel__.new @reader, _writer
         if current_iambic_token.respond_to? :id2name
-          when_many_and_no_client_execute
+          when_remaining_args_look_iambic_execute
         else
-          @reader = iambic_property  # see [#001]:#reader-vs-writer
-          to_reader_apply_setup
-          _writer = @reader.singleton_class
-          @kernel = Kernel__.new @reader, _writer
-          if current_iambic_token.respond_to? :id2name
-            when_remaining_args_look_iambic_execute
-          else
-            when_remaining_args_do_not_look_iambic_execute
-          end
+          when_remaining_args_do_not_look_iambic_execute
         end
-      end
-
-      def when_many_and_no_client_execute
-        raise ::ArgumentError, say_client_expected_for_first_arg
-      end
-
-      def say_client_expected_for_first_arg
-        "client expected for first arg"
       end
 
     private
@@ -105,13 +80,11 @@ module Skylab::Brazen
 
       def when_remaining_args_look_iambic_execute
         dsl = DSL__.new @kernel, @d, @x_a
+        d = @d
         dsl.execute
         @d = dsl.current_iambic_index
+        d == @d and raise ::ArgumentError, say_strange_iambic
         @d < @x_a_length and when_remaining_args_do_not_look_iambic_execute
-      end
-
-      def say_expecting_proc
-        "expecting proc, had '#{ current_iambic_token }'"
       end
 
       def to_reader_apply_setup
@@ -280,14 +253,7 @@ module Skylab::Brazen
         iambic_queue and @iambic_queue.length.nonzero?
       end
 
-      attr_reader :iambic_queue
-
-      def property_class_for_write  # :+#loader-hook
-        Entity::Meta_Property__.class
-        property_class_for_write
-      end
-
-      attr_reader :method_added_mxr
+      attr_reader :iambic_queue, :method_added_mxr
     end
 
     class Box__
@@ -459,10 +425,8 @@ module Skylab::Brazen
 
       def prep_iambic_parse_via_args a
         case a.length
-        when 0 ; @d ||= 0 ; @x_a_length ||= @x_a.length
         when 1 ; @d ||= 0 ; @x_a, = a ; @x_a_length = @x_a.length
         when 2 ; @d, @x_a = a ; @x_a_length = @x_a.length
-        else   ; raise ::ArgumentError, "(#{ a.length } for 0..2)"
         end ; nil
       end
 
@@ -486,10 +450,6 @@ module Skylab::Brazen
 
       def current_iambic_token
         @x_a.fetch @d
-      end
-
-      def advance_iambic_scanner
-        @d += 1 ; nil
       end
 
       def clear_all_iambic_ivars
@@ -523,11 +483,6 @@ module Skylab::Brazen
         a.length.zero? or raise ::ArgumentError, say_not_when_scan( a )
       end
 
-      def say_not_when_scan a
-        "there is currently no support for nonzero number of arguments when #{
-          }scanning via scanner (#{ a.length } for 0)"
-      end
-
       def prcss_iambic_passively
         reader = self.class
         box = reader.property_method_nms_for_rd
@@ -544,7 +499,11 @@ module Skylab::Brazen
       end
 
       def iambic_property
+        @scan.unparsed_exists or raise ::ArgumentError, say_missing_iambic_value
         @scan.gets_one
+      end
+      def say_missing_iambic_value
+        "expecting a value for '#{ @scan.previous_token }'"
       end
 
       def current_iambic_token
@@ -557,10 +516,6 @@ module Skylab::Brazen
 
       def advance_iambic_scanner_by_one
         @scan.advance_one
-      end
-
-      def clear_all_iambic_ivars
-        @scan.clear_all
       end
     end
 
@@ -621,16 +576,16 @@ module Skylab::Brazen
         @x_a.fetch @d
       end
 
+      def previous_token
+        @x_a.fetch @d - 1
+      end
+
       def current_index
         @d
       end
 
       def advance_one
         @d += 1 ; nil
-      end
-
-      def clear_all
-        @d = @x_a = @x_a_length = nil
       end
     end
 
@@ -641,10 +596,6 @@ module Skylab::Brazen
       def [] *a
         Extension_Shell__.new.execute_via_extmod_and_arglist self, a
       end
-
-      def via_argument_list a
-        Extension_Shell__.new.execute_via_extmod_and_arglist self, a
-      end
     end
 
     class Extension_Shell__ < Common_Shell__
@@ -652,10 +603,6 @@ module Skylab::Brazen
       def execute_via_extmod_and_arglist extension_module, arg_list
         @extension_module = extension_module
         execute_via_argument_list arg_list
-      end
-
-      def when_many_and_no_client_execute
-        self._DO_ME
       end
 
       def when_one_length_arg_list_execute

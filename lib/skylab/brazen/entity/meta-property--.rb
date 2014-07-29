@@ -193,14 +193,6 @@ module Skylab::Brazen
           @prop = nil
         end
       end
-
-      def say_strange
-        "unrecognized iambic term: #{ strange @scan.current_token }"
-      end
-
-      def say_expected_def
-        "expected method definition at end of iambic input"
-      end
     end
 
     module Proprietor_Methods__
@@ -214,7 +206,6 @@ module Skylab::Brazen
 
       # ~ property class for write
 
-      remove_method :property_class_for_write
       def property_class_for_write
         if has_nonzero_length_iambic_queue
           _kernel = bld_property_kernel
@@ -337,22 +328,6 @@ module Skylab::Brazen
         unparsed_iambic_exists or raise ::ArgumentError, say_kw_not_end( i )
         i == current_iambic_token or raise ::ArgumentError, say_kw_not_x( i )
         advance_iambic_scanner_by_one ; nil
-      end
-
-      def say_kw_not_end i
-        "expected #{ kw i } at end of iambic input"
-      end
-
-      def say_kw_not_x i
-        "expected #{ kw i } not #{ strange @scan.current_token }"
-      end
-
-      def kw i
-        "'#{ i }'"
-      end
-
-      def strange i  # placeholder for [#mh-050]
-        "'#{ i }'"
       end
     end
 

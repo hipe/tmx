@@ -31,11 +31,6 @@ module Skylab::Brazen
         end
       end
 
-      def clear_all
-        super
-        @d_ = @x_a_a = @x_a_a_length = nil
-      end
-
     private
 
       def while_current_row_is_zero_length_advance

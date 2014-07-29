@@ -40,8 +40,7 @@ module Skylab::Brazen::TestSupport::Entity
       it "do parse strange does not work" do
         -> do
           Foo_Iamb.new.process_iambic_fully( [ :wiz ] )
-        end.should raise_error ::ArgumentError,
-          /\bunrecognized property 'wiz'/
+        end.should raise_error ::ArgumentError, unrec_rx( :wiz )
       end
 
       it "parse is non-destructive" do
@@ -53,6 +52,23 @@ module Skylab::Brazen::TestSupport::Entity
       it "do parse none does work" do
         Foo_Iamb.new.process_iambic_fully [].freeze
       end
+    end
+
+    it "DSL syntax fail - strange name" do
+      -> do
+        class FooI_Pity
+          Subject_[][ self, :VAG_rounded ]
+        end
+      end.should raise_error ::ArgumentError, unrec_rx( :VAG_rounded )
+    end
+
+    it "DSL syntax fail - strange value" do
+      -> do
+        class FooI_PityVal
+          Subject_[][ self, :iambic_writer_method_name_suffix ]
+        end
+      end.should raise_error ::ArgumentError,
+        /\bexpecting a value for 'iambic_/
     end
 
     context "iambic writer postfix option (& introduction to using the DSL)" do
@@ -84,6 +100,10 @@ module Skylab::Brazen::TestSupport::Entity
         end.should raise_error ::NameError,
           /\bdid not have expected suffix '_derp': 'ferp'/
       end
+    end
+
+    def unrec_rx x
+      /\bunrecognized property '#{ ::Regexp.escape( x.to_s ) }'/
     end
   end
 end
