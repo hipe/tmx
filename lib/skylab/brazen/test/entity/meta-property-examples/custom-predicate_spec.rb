@@ -8,7 +8,7 @@ module Skylab::Brazen::TestSupport::Entity
 
       before :all do
 
-        MPER_Entity = Subject_[][ -> do
+        MPEC_Entity = Subject_[][ -> do
 
           o :meta_property, :arety, :enum, [ :"0-1", :"1" ]
 
@@ -28,9 +28,9 @@ module Skylab::Brazen::TestSupport::Entity
         end ]
 
 
-        class MPER_Business_Widget
+        class MPEC_Business_Widget
 
-          MPER_Entity[ self, -> do
+          MPEC_Entity[ self, -> do
 
             o :necessary
 
@@ -45,7 +45,7 @@ module Skylab::Brazen::TestSupport::Entity
       end
 
       it "..can make property-based code arbitrarily more readable" do
-        hi, hey = MPER_Business_Widget.properties.to_value_array
+        hi, hey = MPEC_Business_Widget.properties.to_value_array
         hi.is_necessary.should eql true
         hey.is_necessary.should eql false
       end
