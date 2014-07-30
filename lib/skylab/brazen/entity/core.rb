@@ -36,16 +36,22 @@ module Skylab::Brazen
       def when_many_length_arg_list_execute  # more than one
         @reader = iambic_property  # see [#001]:#reader-vs-writer
         to_reader_apply_setup
-        _writer = @reader.singleton_class
-        @kernel = Kernel__.new @reader, _writer
-        if current_iambic_token.respond_to? :id2name
+        @kernel = @reader.init_property_scope_krnl
+        r = if current_iambic_token.respond_to? :id2name
           when_remaining_args_look_iambic_execute
         else
           when_remaining_args_do_not_look_iambic_execute
         end
+        @reader.property_scope_krnl = nil
+        r
       end
 
-    private
+      def when_remaining_args_look_iambic_execute
+        d = @kernel.process_any_DSL @d, @x_a
+        d == @d and raise ::ArgumentError, say_strange_iambic
+        @d = d
+        @d < @x_a_length and when_remaining_args_do_not_look_iambic_execute
+      end
 
       def when_remaining_args_do_not_look_iambic_execute
         d = @x_a_length - @d
@@ -64,27 +70,18 @@ module Skylab::Brazen
         @p = @x_a.first
         mod = ::Module.new
         mod.const_set :Module_Methods, ::Module.new
-        mod.extend Proprietor_Methods__
-        mod.extend Extension_Module_Methods__
+        mod.extend Extension_Module_Methods__, Proprietor_Methods__
         mod.send :include, Iambic_Methods__
         mod.const_set READ_BOX__, Box__.new
-        @reader = mod
-        aply_p_to_reader_which_is_new_extension_module
+        krn = mod.init_property_scope_krnl
+        krn.apply_p @p
+        mod.property_scope_krnl = nil
         mod
       end
 
       def when_one_length_arg_list_item_is_client_execute
         @reader = @x_a.first
         to_reader_apply_setup
-      end
-
-      def when_remaining_args_look_iambic_execute
-        dsl = DSL__.new @kernel, @d, @x_a
-        d = @d
-        dsl.execute
-        @d = dsl.current_iambic_index
-        d == @d and raise ::ArgumentError, say_strange_iambic
-        @d < @x_a_length and when_remaining_args_do_not_look_iambic_execute
       end
 
       def to_reader_apply_setup
@@ -94,37 +91,35 @@ module Skylab::Brazen
           @reader.const_set READ_BOX__, Box__.new
         nil
       end
-
-      def aply_p_to_reader_which_is_new_extension_module
-        _writer = @reader::Module_Methods
-        @kernel = Kernel__.new @reader, _writer
-        @kernel.apply_p @p ; nil
-      end
     end
 
     READ_BOX__ = :PROPERTIES_FOR_READ__
     WRITE_BOX__ = :PROPERTIES_FOR_WRITE__
 
-    class Kernel__  # formerly "flusher"
+    class Scope_Kernel__  # formerly "flusher"
 
       def initialize reader, writer
         @reader = reader ; @writer = writer
         @has_writer_method_name_constraints = false
-        @prop = nil
+        @meth_i = @prop = nil
+        @x_a_a = []
+      end
+
+      def has_nonzero_length_iambic_queue
+        @x_a_a.length.nonzero?
+      end
+
+      def add_iambic_row x_a
+        @x_a_a.push x_a ; nil
       end
 
       def apply_p p
         Method_Added_Muxer__[ @reader ].for_each_method_added_in p, -> m_i do
           flush_because_method m_i
         end
-        @reader.has_nonzero_length_iambic_queue and flsh_trailing_DSL
+        @x_a_a.length.nonzero? and flush_iambic_queue
         nil
       end
-    private
-      def flsh_trailing_DSL
-        flsh_iambic_queue
-      end
-    public
 
       def iambic_writer_method_name_suffix= i
         @has_writer_method_name_constraints = true
@@ -134,14 +129,14 @@ module Skylab::Brazen
 
       def flush_because_method m_i
         @meth_i = m_i
-        if @reader.has_nonzero_length_iambic_queue
-          flsh_iambic_queue
+        if @x_a_a.length.nonzero?
+          flush_iambic_queue
           @meth_i and flush_bc_meth
         else
           flush_bc_meth
         end ; nil
       end
-    private
+
       def flush_bc_meth
         m_i = @meth_i ; @meth_i = nil
         prop_i = @has_writer_method_name_constraints ?
@@ -152,10 +147,9 @@ module Skylab::Brazen
           did_build = true
           @prop = @reader::PROPERTY_CLASS__.new prop_i, m_i
         end
-        prop_accept
+        accept_property @prop
         did_build and @prop = nil
       end
-    public
 
       def flush_because_prop_i prop_i
         @meth_i = nil
@@ -166,7 +160,7 @@ module Skylab::Brazen
           did_build = true
           @prop = @reader::PROPERTY_CLASS__.new prop_i, m_i
         end
-        prop_accept
+        accept_property @prop
         mxr = @reader.method_added_mxr and mxr.stop_listening
         _IVAR_ = @prop.as_ivar
         @reader.send :define_method, @prop.iambic_writer_method_name do
@@ -176,24 +170,54 @@ module Skylab::Brazen
         did_build and @prop = nil
       end
 
-      def flush_iambic_queue
-        flsh_iambic_queue
+      def accept_property _PROPERTY_
+        i = _PROPERTY_.name_i
+        m_i = :"produce_#{ i }_property"
+        @reader.prop_mthd_names_for_write.add_or_assert i, m_i
+        @writer.send :define_method, m_i do _PROPERTY_ end
+        _PROPERTY_.class.hook_shell and _PROPERTY_.class.hook_shell.
+          process_relevant_hooks( @reader, _PROPERTY_ )
+        nil
       end
 
-    private
+      def process_any_DSL d, x_a
+        @scan = Iambic_Scanner_.new d, x_a
+        prcss_scan_as_DSL_passively
+        d = @scan.current_index ; @scan = nil ; d
+      end
+    # ~
+      attr_reader :meth_i, :reader, :scan
+      attr_writer :prop
 
-      def flsh_iambic_queue
-        x_a_a = @reader.iambic_queue
-        @scan = Entity::Compound_Iambic_Scanner__.new x_a_a
+      def flush_iambic_queue
+        @scan = Entity::Compound_Iambic_Scanner__.new @x_a_a
+        prcss_scan_as_DSL_fully
+        @x_a_a.clear ; @scan = nil
+      end
+
+      def prcss_scan_as_DSL_fully
         dsl = DSL__.new self, @scan
         begin
           dsl.execute
           @scan.unparsed_exists or break
-          twds_prop_scan_some_DSL_as_metaproperties_being_used
+          metaproperty_scanner.scan_some_DSL
           @scan.unparsed_exists or break
         end while true
-        @scan = nil
-        x_a_a.clear ; nil
+      end
+
+      def prcss_scan_as_DSL_passively
+        dsl = DSL__.new self, @scan
+        begin
+          dsl.execute
+          @scan.unparsed_exists or break
+          @scan.current_token.respond_to? :id2name or break
+          metaproperty_scanner.scan_some_DSL
+          @scan.unparsed_exists or break
+        end while true
+      end
+
+      def metaproperty_scanner
+        @mprop_scnr ||= Entity::Meta_Property__::Mprop_Scanner.new self
       end
 
       def aply_method_name_constraints m_i
@@ -205,22 +229,16 @@ module Skylab::Brazen
         "did not have expected suffix '#{ @writer_method_name_suffix }'#{
           }: '#{ m_i }'"
       end
-
-      def prop_accept
-        i = @prop.name_i
-        m_i = :"produce_#{ i }_property"
-        @reader.prop_mthd_names_for_write.add_or_assert i, m_i
-        _PROPERTY_ = @prop
-        @writer.send :define_method, m_i do _PROPERTY_ end
-        @prop.might_have_entity_class_hooks and prcs_any_ent_cls_hks
-        nil
-      end
     end
 
     module Proprietor_Methods__
 
       def properties
-        @properties ||= Entity::Properties__.new( self )
+        @properties ||= Entity::Properties__.new self
+      end
+
+      def property_method_nms_for_rd
+        const_get READ_BOX__
       end
 
       def prop_mthd_names_for_write
@@ -236,24 +254,45 @@ module Skylab::Brazen
         end
       end
 
-      def property_method_nms_for_rd
-        const_get READ_BOX__
-      end
-
       def o * x_a, & p
-        x_a.length.zero? or some_iambic_queue.push x_a
-        p and flsh_with_property_definition_block p ; nil
+        if p
+          krnl = init_property_scope_krnl
+          x_a.length.nonzero? and krnl.add_iambic_row x_a
+          krnl.has_nonzero_length_iambic_queue and krnl.flush_iambic_queue
+          krnl.apply_p p
+          @property_scope_krnl = nil
+        else
+          @property_scope_krnl.add_iambic_row x_a
+        end ; nil
       end
 
-      def some_iambic_queue
-        @iambic_queue ||= []
+      def property_class_for_write
+        metaproperty_kernel.property_class_for_write_impl
       end
 
-      def has_nonzero_length_iambic_queue
-        iambic_queue and @iambic_queue.length.nonzero?
+      def metaproperty_kernel
+        @mprop_kernel ||= Entity::Meta_Property__::Client_Kernel.new self
       end
 
-      attr_reader :iambic_queue, :method_added_mxr
+      attr_reader :method_added_mxr
+
+      def add_iambic_event_listener i, p
+        iambic_evnt_muxer_for_write.add i, p ; nil
+      end
+    private
+      def iambic_evnt_muxer_for_write
+        Entity::Meta_Property__::Muxer.for self
+      end
+    public
+      def init_property_scope_krnl
+        property_scope_krnl and self._SANITY
+        @property_scope_krnl = build_property_scope_krnl
+      end
+      attr_accessor :property_scope_krnl
+    private
+      def build_property_scope_krnl
+        Scope_Kernel__.new self, singleton_class
+      end
     end
 
     class Box__
@@ -278,6 +317,19 @@ module Skylab::Brazen
         @h[ i ]
       end
 
+      def fetch i, & p
+        @h.fetch i, & p
+      end
+
+      def get_key_scanner
+        d = -1 ; last = @a.length - 1
+        Callback_::Scn.new do
+          if d < last
+            @a.fetch d += 1
+          end
+        end
+      end
+
       # ~ mutators
 
       def ensuring_same_values_merge_box! otr
@@ -293,6 +345,13 @@ module Skylab::Brazen
             @a.push i ; @h[ i ] = h.fetch i
           end
         end ; nil
+      end
+
+      def add_or_replace i, x
+        @h.fetch i do
+          @a.push i
+        end
+        @h[ i ] = x ; nil
       end
 
       def add_or_assert i, x
@@ -365,7 +424,7 @@ module Skylab::Brazen
       def initialize *a
         a.length.nonzero? and set_prop_i_and_iambic_writer_method_name( * a )
         block_given? and yield self
-        emit_iambic_event :at_end_of_process_iambic
+        notificate :at_end_of_process_iambic
         freeze
       end
 
@@ -384,8 +443,20 @@ module Skylab::Brazen
         @name.as_variegated_symbol
       end
 
-      def might_have_entity_class_hooks  # :+#re-defined elsewhere
-        false
+      class << self
+        def hook_shell_for_write
+          @hook_shell ||= Meta_Property__::Hook_Shell.new self
+        end
+
+        attr_reader :hook_shell
+      end
+    end
+
+    if ! ::Object.private_method_defined? :notificate
+      class ::Object
+      private
+        def notificate i  # :+[#sl-131] the easiest implementation for this
+        end
       end
     end
 
@@ -457,26 +528,17 @@ module Skylab::Brazen
         UNDEFINED_
       end
 
-      def emit_iambic_event _  # :#re-defined elsewhere
-      end
-
       PROPERTY_CLASS__ = Property__  # delicate
     end
 
     UNDEFINED_ = nil
 
-    # ~ bootstrapping & core DSL
-
-    class Common_Shell__
-      include Iambic_Methods__
-    end
-
-    class Property__
-      include Iambic_Methods__
-    end
-
     module Iambic_Methods_via_Scanner__
       include Iambic_Methods__
+
+      def scan= x
+        @scan = x
+      end
 
     private
       def prep_iambic_parse_via_args a
@@ -510,36 +572,34 @@ module Skylab::Brazen
         @scan.current_token
       end
 
-      def current_iambic_index
-        @scan.current_index
-      end
-
       def advance_iambic_scanner_by_one
         @scan.advance_one
       end
     end
 
+    # ~ bootstrapping
+
+    class Common_Shell__
+      include Iambic_Methods__
+    end
+
+    class Property__
+      Entity[ self ]  # ~ property as entity
+      include Iambic_Methods_via_Scanner__
+      public :process_iambic_passively
+    end
+
+    # ~ core DSL
+
     class DSL__
 
-      include Iambic_Methods_via_Scanner__
-
-      def initialize kernel, d, x_a=nil
-        @kernel = kernel
-        if x_a
-          @scan = Iambic_Scanner_.new d, x_a
-        else
-          @scan = d
-        end
+      def initialize kernel, scan
+        @kernel = kernel ; @scan = scan
       end
 
       def execute
-        process_iambic_passively
-        nil
+        process_iambic_passively ; nil
       end
-
-      public :current_iambic_index, :unparsed_iambic_exists
-
-    private
 
       Entity[ self, -> do
 
@@ -548,8 +608,8 @@ module Skylab::Brazen
         end
 
         def meta_property
-          Entity::Meta_Property__.new( @scan ).
-            apply_to_property_class @kernel.property_class_for_write
+          _pc = @kernel.reader.metaproperty_kernel.property_cls_for_wrt
+          Entity::Meta_Property__.new( @scan ).apply_to_property_class _pc
         end
 
         def properties
@@ -562,6 +622,8 @@ module Skylab::Brazen
           @kernel.flush_because_prop_i iambic_property
         end
       end ]
+
+      include Iambic_Methods_via_Scanner__
     end
 
     class Iambic_Scanner_
@@ -601,6 +663,10 @@ module Skylab::Brazen
 
       def [] *a
         Extension_Shell__.new.execute_via_extmod_and_arglist self, a
+      end
+    private
+      def build_property_scope_krnl
+        Scope_Kernel__.new self, const_get( :Module_Methods, false )
       end
     end
 

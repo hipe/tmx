@@ -9,7 +9,8 @@ module Skylab::Brazen::TestSupport::Entity
       before :all do
 
         MPED_Entity = Subject_[][ -> do
-          o :meta_property, :defalt_proc, :entity_class_hook, -> cls, prop do
+          o :meta_property, :defalt_proc,
+              :entity_class_hook, -> cls, prop do
             cls.add_iambic_event_listener :iambuc_normalize_and_validate,
               -> obj do
                 obj.aply_dflt_proc_if_necessary prop ; nil
