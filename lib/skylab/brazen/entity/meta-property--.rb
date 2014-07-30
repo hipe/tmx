@@ -27,7 +27,7 @@ module Skylab::Brazen
           @has_default_x and aply_defaulting_behavior_to_property_class pc
           @entity_class_hook_p and pc.hook_shell_for_write.add_hook(
             :each, @name_i, @entity_class_hook_p )
-          @entity_class_hook_once_p and pc.hook_shell_for_write.add_hoook(
+          @entity_class_hook_once_p and pc.hook_shell_for_write.add_hook(
             :once, @name_i, @entity_class_hook_once_p )
           nil
         end
@@ -254,7 +254,7 @@ module Skylab::Brazen
           nil
         end
         def process_relevant_hooks reader, prop
-          hook_a = prdc_relevant_hooks prop
+          hook_a = partition_relevant_hooks reader, prop
           if hook_a
             hook_a.each do |hook|
               hook.p[ reader, prop ]
@@ -262,16 +262,23 @@ module Skylab::Brazen
           end
         end
       private
-        def prdc_relevant_hooks prop
+        def partition_relevant_hooks reader, prop
           box = @box ; scn = box.get_key_scanner
           i = scn.gets ; a = nil
           begin
-            if prop.instance_variable_defined? :"@#{ i }"  # or whatever
-              hook = box.fetch i
-              ( a ||= [] ).push hook
+            prop.instance_variable_defined?( :"@#{ i }" ) or next # or whatever
+            hook = box.fetch i
+            case hook.each_or_once
+            when :each ; ( a ||= [] ).push hook
+            when :once ;
+              reader.property_scope_krnl.
+                listener_box_for_eventpoint( :at_end_of_scope ).
+                  add_if_not_has i do
+                    p = hook.p
+                    -> { p[ reader ] }
+                  end
             end
-            i = scn.gets
-          end while i
+          end while (( i = scn.gets ))
           a
         end
       end

@@ -13,6 +13,18 @@ module Skylab::Brazen
         m_i and @reader.send m_i
       end
 
+      def reduce_by i
+        if block_given?
+          scn = to_value_scanner
+          ivar = :"@#{ i }"
+          while (( x = scn.gets ))
+            x.instance_variable_defined?( ivar ) and yield x
+          end
+        else
+          enum_for :reduce_by, i
+        end
+      end
+
       def to_value_array
         scn = to_value_scanner ; a = [] ; x = nil
         a.push x while (( x = scn.gets ))

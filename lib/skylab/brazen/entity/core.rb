@@ -42,6 +42,7 @@ module Skylab::Brazen
         else
           when_remaining_args_do_not_look_iambic_execute
         end
+        @kernel.end_scope
         @reader.property_scope_krnl = nil
         r
       end
@@ -75,6 +76,7 @@ module Skylab::Brazen
         mod.const_set READ_BOX__, Box__.new
         krn = mod.init_property_scope_krnl
         krn.apply_p @p
+        krn.end_scope
         mod.property_scope_krnl = nil
         mod
       end
@@ -101,7 +103,7 @@ module Skylab::Brazen
       def initialize reader, writer
         @reader = reader ; @writer = writer
         @has_writer_method_name_constraints = false
-        @meth_i = @prop = nil
+        @lstnrs = @meth_i = @prop = nil
         @x_a_a = []
       end
 
@@ -229,6 +231,18 @@ module Skylab::Brazen
         "did not have expected suffix '#{ @writer_method_name_suffix }'#{
           }: '#{ m_i }'"
       end
+
+      def end_scope
+        if @lstnrs and (( box = @lstnrs[ :at_end_of_scope ] ))
+          box.each_value( & :call )
+        end
+      end
+
+      def listener_box_for_eventpoint i
+        (( @lstnrs ||= {} )).fetch i do
+          @lstnrs[ i ] = Box__.new
+        end
+      end
     end
 
     module Proprietor_Methods__
@@ -260,6 +274,7 @@ module Skylab::Brazen
           x_a.length.nonzero? and krnl.add_iambic_row x_a
           krnl.has_nonzero_length_iambic_queue and krnl.flush_iambic_queue
           krnl.apply_p p
+          krnl.end_scope
           @property_scope_krnl = nil
         else
           @property_scope_krnl.add_iambic_row x_a
@@ -330,6 +345,10 @@ module Skylab::Brazen
         end
       end
 
+      def each_value
+        @a.each do |i| yield @h.fetch( i ) end ; nil
+      end
+
       # ~ mutators
 
       def ensuring_same_values_merge_box! otr
@@ -344,6 +363,13 @@ module Skylab::Brazen
           else
             @a.push i ; @h[ i ] = h.fetch i
           end
+        end ; nil
+      end
+
+      def add_if_not_has i, & p
+        @h.fetch i do
+          @a.push i
+          @h[ i ] = p.call
         end ; nil
       end
 
