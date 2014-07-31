@@ -183,7 +183,7 @@ module Skylab::Brazen
       end
 
       def process_any_DSL d, x_a
-        @scan = Iambic_Scanner_.new d, x_a
+        @scan = Iambic_Scanner.new d, x_a
         prcss_scan_as_DSL_passively
         d = @scan.current_index ; @scan = nil ; d
       end
@@ -652,7 +652,7 @@ module Skylab::Brazen
       include Iambic_Methods_via_Scanner__
     end
 
-    class Iambic_Scanner_
+    class Iambic_Scanner
 
       def initialize d, x_a
         @d = d ; @x_a = x_a ; @x_a_length = @x_a.length

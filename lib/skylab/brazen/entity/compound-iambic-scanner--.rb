@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   module Entity
 
-    class Compound_Iambic_Scanner__ < Iambic_Scanner_
+    class Compound_Iambic_Scanner__ < Iambic_Scanner
 
       def initialize x_a_a
         @current_index_offset = 0

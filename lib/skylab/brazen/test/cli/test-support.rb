@@ -7,6 +7,11 @@ module Skylab::Brazen::TestSupport::CLI
   Brazen_ = ::Skylab::Brazen
   TestSupport_ = ::Skylab::TestSupport
 
+  module CONSTANTS
+    Brazen_ = Brazen_
+    TestSupport_ = TestSupport_
+  end
+
   extend TestSupport_::Quickie
 
   module InstanceMethods
@@ -127,7 +132,7 @@ module Skylab::Brazen::TestSupport::CLI
       if expectation_scanner
         @expectation_scanner.send :initialize, 0, x_a
       else
-        @expectation_scanner = Brazen_::Entity::Iambic_Scanner_.new 0, x_a
+        @expectation_scanner = Brazen_::Entity::Iambic_Scanner.new 0, x_a
       end
       @scan = @expectation_scanner ; nil
     end
@@ -135,7 +140,7 @@ module Skylab::Brazen::TestSupport::CLI
     def init_emission_scan
       if ! emission_scanner
         _em_a = build_baked_em_a
-        @emission_scanner = Brazen_::Entity::Iambic_Scanner_.new 0, _em_a
+        @emission_scanner = Brazen_::Entity::Iambic_Scanner.new 0, _em_a
       end
       @scan = @emission_scanner ; nil
     end
