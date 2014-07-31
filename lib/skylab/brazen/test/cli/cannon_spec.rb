@@ -38,6 +38,7 @@ module Skylab::Brazen::TestSupport::CLI
       expect :styled, %r(\A  +init  +init a <workspace>)
       expect %r(\A  +status  +get status of a workspace\.?)
       expect :styled, /\Ause '?bzn -h <action>'? for help on that action\.?\b/
+      expect_succeeded
     end
 
     # ~ business

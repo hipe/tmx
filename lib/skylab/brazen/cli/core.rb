@@ -89,9 +89,8 @@ module Skylab::Brazen
       end
 
       def invoke_when_options
-        require 'optparse'
         processors = []
-        o = ::OptionParser.new
+        o = CLI::Lib_::Option_parser[].new
         o.on '-h', '--help [cmd]', "this screen" do |cmd|
           processors.push(
             CLI::State_Processors_::When_Help.new o, cmd, self )
@@ -115,7 +114,6 @@ module Skylab::Brazen
         last_exit_status
       end
 
-
       def invoke_when_action_argument
         @token = @argv.shift
         matching_actions = []
@@ -133,7 +131,7 @@ module Skylab::Brazen
         end
         case matching_actions.length
         when 0 ; whn_no_matching_action
-        when 1 ; matching_actions.first.invoke @argv
+        when 1 ; matching_actions.first.invoke_with_argv @argv
         else   ; whn_ambiguous_matching_actions
         end
       end
@@ -178,10 +176,8 @@ module Skylab::Brazen
       end
 
       def invocation_string
-        @invocation_str_a * SPACE__
+        @invocation_str_a * SPACE_
       end
-
-      SPACE__ = ' '.freeze
 
       def name
         @name ||= Callback_::Name.from_variegated_symbol(
@@ -196,21 +192,7 @@ module Skylab::Brazen
 
       def get_action_scanner
         Brazen_::Scanner_::Wrapper.new krnl.get_action_scanner do |action|
-          Action__.new action, self
-        end
-      end
-
-      class Action__
-        def initialize action, kernel
-          @action = action ; @kernel = kernel
-        end
-
-        def name
-          @action.name
-        end
-
-        def one_line_description
-          @action.get_one_line_description @kernel.expression_agent
+          Action_Adapter_.new action, self
         end
       end
 
@@ -220,6 +202,31 @@ module Skylab::Brazen
       end
     end
 
+    class Action_Adapter_
+      def initialize action, client
+        @action = action ; @client = client
+      end
+
+      def name
+        @action.name
+      end
+
+      def one_line_description
+        @action.get_one_line_description @client.expression_agent
+      end
+
+      def invoke_with_argv argv
+        x, method_i, args =
+          Action_Adapter_::Parse_ARGV.new( @client, @action, argv ).execute
+        if method_i
+          x.send method_i, * args
+        else
+          x || GENERIC_ERROR_
+        end
+      end
+
+      Autoloader_[ self ]
+    end
 
     class Expression_Agent__
 
@@ -260,6 +267,17 @@ module Skylab::Brazen
       end
     end
 
+    module Lib_
+      Option_parser = -> do
+        require 'optparse'
+        ::OptionParser
+      end
+    end
+
     GENERIC_ERROR_ = 5
+    PROCEDE_ = nil
+    SUCCESS_ = 0
+    SPACE_ = ' '.freeze
+    UNDERSCORE_ = '_'.freeze
   end
 end

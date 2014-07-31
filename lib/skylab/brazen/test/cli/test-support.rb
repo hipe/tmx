@@ -18,6 +18,11 @@ module Skylab::Brazen::TestSupport::CLI
       @exitstatus.should eql Brazen_::CLI::GENERIC_ERROR_
     end
 
+    def expect_succeeded
+      expect_no_more_lines
+      @exitstatus.should eql Brazen_::CLI::SUCCESS_
+    end
+
     # ~ action-under-test phase
 
     def debug!

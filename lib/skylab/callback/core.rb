@@ -1187,6 +1187,9 @@ module Skylab::Callback
     def as_slug
       @as_slug ||= build_slug
     end
+    def as_variegated_string
+      @as_variegated_string ||= as_variegated_symbol.id2name.freeze
+    end
     def as_variegated_symbol
       @as_variegated_symbol ||= build_variegated_symbol
     end

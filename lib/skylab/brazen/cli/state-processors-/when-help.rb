@@ -36,9 +36,8 @@ module Skylab::Brazen
           out.puts "use #{ code "#{ client.invocation_string } -h #{
             }<action>" } for help on that action."
         end
-        GENERIC_SUCCESS__
+        SUCCESS_
       end
-      GENERIC_SUCCESS__ = 0
 
       def rndr_actions
         scn = @client.get_visible_action_scanner

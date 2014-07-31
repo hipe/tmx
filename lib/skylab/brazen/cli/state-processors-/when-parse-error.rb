@@ -4,9 +4,9 @@ module Skylab::Brazen
 
     class State_Processors_::When_Parse_Error
 
-      def initialize e, client
+      def initialize e, client, out=client.stderr
         @client = client ; @exception = e
-        @out = client.stderr
+        @out = out
       end
 
       def execute
