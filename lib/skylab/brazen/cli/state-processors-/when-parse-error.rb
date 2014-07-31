@@ -4,14 +4,15 @@ module Skylab::Brazen
 
     class State_Processors_::When_Parse_Error
 
-      def initialize e, client, out=client.stderr
-        @client = client ; @exception = e
-        @out = out
+      def initialize e, help_renderer
+        @exception = e
+        @render = help_renderer
       end
 
       def execute
-        @out.puts @exception.message
-        @out.puts @client.invite_to_general_help_line
+        o = @render
+        o.y << @exception.message
+        o.output_invite_to_general_help
         GENERIC_ERROR_
       end
     end

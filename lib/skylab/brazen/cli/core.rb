@@ -100,7 +100,7 @@ module Skylab::Brazen
           o.parse! @argv
         rescue ::OptionParser::ParseError => e
           processors.push(
-            CLI::State_Processors_::When_Parse_Error.new e, self )
+            CLI::State_Processors_::When_Parse_Error.new e, help_renderer )
         end
         unless last_exit_status
           @argv.length.nonzero? and
@@ -118,7 +118,7 @@ module Skylab::Brazen
         @token = @argv.shift
         matching_actions = []
         rx = /\A#{ ::Regexp.escape @token }/
-        scn = get_action_scanner
+        scn = actions.get_scanner
         while (( action = scn.gets ))
           slug = action.name.as_slug
           if rx =~ slug
@@ -151,28 +151,17 @@ module Skylab::Brazen
     public
       attr_reader :stderr
 
+      def help_renderer
+        @hlp_rndrr ||= CLI::Action_Adapter_::Help_Renderer.
+          new self, nil, nil, self
+      end
+
       def expression_agent
-        @expr_ag ||= bld_expression_agent
-      end
-    private
-      def bld_expression_agent
-        CLI::Expression_Agent__.new
+        @expr_ag ||= CLI::Expression_Agent__.new
       end
 
-    public
-
-      def usage_line
-        client = self
-        expression_agent.calculate do
-          "#{ hdr "usage" } #{ client.invocation_string } #{ par 'action' } [..]"
-        end
-      end
-
-      def invite_to_general_help_line
-        client = self
-        expression_agent.calculate do
-          "use #{ code "#{ client.invocation_string } -h" } for help"
-        end
+      def render_syntax_string expression_agent
+        expression_agent.calculate { "#{ par 'action' } [..]" }
       end
 
       def invocation_string
@@ -186,19 +175,31 @@ module Skylab::Brazen
 
       # ~ deep API for agents
 
-      def get_visible_action_scanner
-        get_action_scanner
-      end
-
-      def get_action_scanner
-        Brazen_::Scanner_::Wrapper.new krnl.get_action_scanner do |action|
-          Action_Adapter_.new action, self
-        end
+      def actions
+        @actions ||= Actions__.new krnl, self
       end
 
     private
       def krnl
         @kernel ||= Brazen_::Kernel_.new( Brazen_, @invocation_str_a.last )
+      end
+    end
+
+    class Actions__
+      def initialize krnl, client
+        @client = client ; @kernel = krnl
+      end
+      def visible
+        self
+      end
+      def to_a
+        a = [] ; scn = get_scanner ; r = nil
+        a.push r while r = scn.gets ; a
+      end
+      def get_scanner
+        Brazen_::Scanner_::Wrapper.new @kernel.get_action_scanner do |action|
+          Action_Adapter_.new action, @client
+        end
       end
     end
 
@@ -211,8 +212,12 @@ module Skylab::Brazen
         @action.name
       end
 
-      def one_line_description
-        @action.get_one_line_description @client.expression_agent
+      def has_description
+        @action.has_description
+      end
+
+      def under_expression_agent_get_N_desc_lines exp, d=nil
+        @action.under_expression_agent_get_N_desc_lines exp, d
       end
 
       def invoke_with_argv argv
@@ -264,6 +269,37 @@ module Skylab::Brazen
 
       def stylize style_d_a, string
         "\e[#{ style_d_a.map( & :to_s ).join( ';' ) }m#{ string }\e[0m"
+      end
+    end
+
+    class N_Lines_
+      def initialize n, p_a, expag
+        @exp = expag ; @p_a = p_a
+        @y = []
+        if n
+          if 1 > n
+            @test_p = nil
+          else
+            d = 0
+            @test_p = -> { n == ( d += 1 ) }
+          end
+        else
+          @test_p = -> { false }
+        end
+      end
+      def execute
+        if @test_p
+          catch :done_with_N_lines do
+            @p_a.each do |p|
+              @exp.instance_exec self, & p
+            end
+          end
+        end
+        @y
+      end
+      def << line
+        @y.push line
+        @test_p[] and throw :done_with_N_lines
       end
     end
 

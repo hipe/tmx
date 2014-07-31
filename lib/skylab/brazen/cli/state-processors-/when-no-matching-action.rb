@@ -6,22 +6,22 @@ module Skylab::Brazen
 
       def initialize token, client
         @client = client ; @token = token
+        @render = client.help_renderer
       end
 
       def execute
-        client = @client ; out = @client.stderr
-        scn = @client.get_visible_action_scanner
+        o = @render
+        scn = @client.actions.visible.get_scanner
         token = @token
-        @client.expression_agent.calculate do
-          out.puts "unrecognized action #{ ick token }"
-          out.write "known actions are ("
-          action = scn.gets and out.write code action.name.as_slug
-          while (( action = scn.gets ))
-            out.write ", #{ code action.name.as_slug }"
-          end
-          out.puts ")"
-          out.puts client.invite_to_general_help_line
+        o.express { "unrecognized action #{ ick token }" }
+        action = nil ; s_a = []
+        while action = scn.gets
+          s_a.push( o.expression_agent.calculate do
+            code action.name.as_slug
+          end )
         end
+        o.y << "known actions are (#{ s_a * ', ' })"
+        o.output_invite_to_general_help
         GENERIC_ERROR_
       end
     end

@@ -10,15 +10,25 @@ module Skylab::Brazen
           @action = action ; @arg_a = arg_a ; @client = client ; @op = op
           @expression_agent = client.expression_agent
           @section_separator_p = -> { @y << nil }
-          @summary_indent = op.summary_indent
-          @summary_width = op.summary_width
+          @is_branch_view = action.object_id == client.object_id
           @y = ::Enumerator::Yielder.new( & client.stderr.method( :puts ) )
+          op and use_formatting_of_option_parser op
+          screen_boundary
         end
 
-        attr_reader :y
+        attr_reader :expression_agent, :y
+
+        def set_option_parser op
+          @op = op
+          use_formatting_of_option_parser op ; nil
+        end
+
+        def use_formatting_of_option_parser op
+          @summary_indent = op.summary_indent
+          @summary_width = op.summary_width ; nil
+        end
 
         def output_help_screen
-          screen_boundary
           output_usage
           @action.has_description and output_description
           output_options
@@ -30,25 +40,45 @@ module Skylab::Brazen
 
         def output_usage
           section_boundary
-          output_multiline_section_tight 'usage', get_syntax_strings ; nil
+          output_multiline_section_tight 'usage', get_full_syntax_strings ; nil
         end
 
-        def get_syntax_strings
+        def output_usage_line
+          a = [ action_invocation_string ]
+          s = @action.render_syntax_string( @expression_agent ) and a.push s
+          output_single_line_section 'usage', a * SPACE_
+          @action
+        end
+
+        def get_full_syntax_strings
           a = []
-          s = produce_main_syntax_string and a.push s
-          s = produce_auxiliary_syntax_string and a.push s
+          s = produce_full_main_syntax_string and a.push s
+          s = produce_full_auxiliary_syntax_string and a.push s
           a
         end
 
-        def produce_main_syntax_string
+        def produce_full_main_syntax_string
           y = [ action_invocation_string ]
-          a = any_option_glyphs and y.concat a
-          a = any_argument_glyphs and y.concat a
+          a = any_main_syntax_string_parts and y.concat a
           y * SPACE_
         end
 
+        def produce_main_syntax_string
+          a = any_main_syntax_string_parts and a * SPACE_
+        end
+
+        def any_main_syntax_string_parts
+          r = any_option_glyphs
+          a = any_argument_glyphs and r ? r.concat( a ) : ( r = a )
+          r
+        end
+
         def action_invocation_string
-          "#{ @client.invocation_string } #{ @action.name.as_slug }"
+          if @is_branch_view
+            @client.invocation_string
+          else
+            "#{ @client.invocation_string } #{ @action.name.as_slug }"
+          end
         end
 
         def any_option_glyphs
@@ -79,7 +109,7 @@ module Skylab::Brazen
           a.length.nonzero? and a
         end
 
-        def produce_auxiliary_syntax_string
+        def produce_full_auxiliary_syntax_string
           "#{ action_invocation_string } -h"
         end
 
@@ -87,13 +117,17 @@ module Skylab::Brazen
 
         def output_description
           section_boundary
-          output_multiline_section 'description',
-            @action.get_description_lines( @expression_agent ) ; nil
+          output_multiline_section 'description', @action.
+            under_expression_agent_get_N_desc_lines( @expression_agent ) ; nil
         end
 
         def output_options
           section_boundary
           @y << @expression_agent.hdr( 'options' )
+          output_option_parser_summary ; nil
+        end
+
+        def output_option_parser_summary
           @op.summarize @y ; nil
         end
 
@@ -102,9 +136,9 @@ module Skylab::Brazen
           output_items_with_descriptions 'argument', @arg_a ; nil
         end
 
-        def invite_to_general_help_line
+        def output_invite_to_general_help
           s = action_invocation_string
-          @expression_agent.calculate do
+          express do
             "use #{ code "#{ s } -h" } for help"
           end
         end
@@ -127,9 +161,9 @@ module Skylab::Brazen
 
         # ~ two-column item renderers
 
-        def output_items_with_descriptions hdr_s, x_a
-          output_header "#{ hdr_s }#{ 's' if 1 != x_a.length }"
-          prepare_output_items_with_descriptions
+        def output_items_with_descriptions hdr_s, x_a, d=nil
+          hdr_s and output_header "#{ hdr_s }#{ 's' if 1 != x_a.length }"
+          prepare_output_items_with_descriptions d
           x_a.each do |x|
             if x.has_description
               output_item_with_description x
@@ -139,7 +173,8 @@ module Skylab::Brazen
           end ; nil
         end
 
-        def prepare_output_items_with_descriptions
+        def prepare_output_items_with_descriptions num_lines_per
+          @N = num_lines_per
           d = @summary_width
           @first_line_item_format = "#{ @summary_indent }%-#{ d }s %s"
           d_ = d + @summary_indent.length + 1  # " " is 1 char wide
@@ -147,7 +182,7 @@ module Skylab::Brazen
         end
 
         def output_item_with_description x
-          a = x.get_description_lines @expression_agent
+          a = x.under_expression_agent_get_N_desc_lines( @expression_agent, @N )
           @y << @first_line_item_format % [ x.name.as_slug, a.fetch( 0 ) ]
           1.upto( a.length - 1 ) do |d|
             @y << @subsequent_line_item_format % a.fetch( d )
@@ -191,6 +226,16 @@ module Skylab::Brazen
 
         def output_header hdr_s
           @y << @expression_agent.hdr( hdr_s ) ; nil
+        end
+
+        # ~ courtesy
+
+        def express & p
+          if p.arity.zero?
+            @y << @expression_agent.calculate( & p ) ; nil
+          else
+            @expression_agent.calculate @y, & p ; nil
+          end
         end
       end
     end

@@ -36,7 +36,9 @@ module Skylab::Brazen::TestSupport::CLI
       expect_header_line 'actions'
       expect %r(\A  +-h, --help \[cmd\]  +this screen\.?)
       expect :styled, %r(\A  +init  +init a <workspace>)
+      expect %r(\A  +this is the second line)
       expect %r(\A  +status  +get status of a workspace\.?)
+      expect_maybe_a_blank_line
       expect :styled, /\Ause '?bzn -h <action>'? for help on that action\.?\b/
       expect_succeeded
     end

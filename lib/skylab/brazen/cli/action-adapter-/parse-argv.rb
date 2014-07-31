@@ -63,7 +63,8 @@ module Skylab::Brazen
               end
             end
             if prop.has_description
-              args.concat prop.get_description_lines
+              args.concat prop.under_expression_agent_get_N_desc_lines(
+                @client.expression_agent )
             end
             @op.on( * args, & p )
           end ; nil
@@ -102,7 +103,7 @@ module Skylab::Brazen
           @result
         rescue ::OptionParser::ParseError => e
           CLI::State_Processors_::When_Parse_Error.
-            new( e, build_help, @out ).execute
+            new( e, build_help ).execute
         end
 
         def parse_arguments

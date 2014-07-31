@@ -40,12 +40,8 @@ module Skylab::Brazen
         ! @desc_p_a.nil?
       end
 
-      def get_description_lines expression_agent
-        a = []
-        @desc_p_a.each do |p|
-          expression_agent.instance_exec a, & p
-        end
-        a
+      def under_expression_agent_get_N_desc_lines expression_agent, n=nil
+        Brazen_::CLI::N_Lines_.new( n, @desc_p_a, expression_agent ).execute
       end
 
       def is_required

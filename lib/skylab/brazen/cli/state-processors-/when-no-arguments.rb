@@ -5,19 +5,14 @@ module Skylab::Brazen
     class State_Processors_::When_No_Arguments
 
       def initialize client
-        @application = client
-        @expression_agent = client.expression_agent
-        @stderr = client.stderr
+        @render = client.help_renderer
       end
 
       def execute
-        client = @application
-        exp = @expression_agent ; out = @stderr
-        exp.calculate do
-          out.puts "expecting #{ par 'action' }"
-          out.puts client.usage_line
-          out.puts client.invite_to_general_help_line
-        end
+        o = @render
+        o.express { "expecting #{ par 'action' }" }
+        o.output_usage_line
+        o.output_invite_to_general_help
         GENERIC_ERROR_
       end
     end
