@@ -104,6 +104,10 @@ module Skylab::Brazen
         SHORT_HELP__ = '-h'.freeze
 
         def any_argument_glyphs
+          @arg_a and arg_glyphs
+        end
+
+        def arg_glyphs
           a = @arg_a.map do |prop|
             if prop.has_default
               "[<#{ prop.name.as_slug }>]"

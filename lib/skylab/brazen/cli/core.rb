@@ -6,51 +6,6 @@ module Skylab::Brazen
       CLI::Client__.new( *a )
     end
 
-    # ~ #comport:face
-
-    module Client
-      module Adapter
-        module For
-          module Face
-            module Of
-              module Hot
-                def self.[] kernel, token
-                  Client__
-                end
-              end
-            end
-          end
-        end
-      end
-    end
-
-    class Client__
-
-      def self.call kernel, token
-        a = kernel.get_normal_invocation_string_parts ; a.push token
-        Client__.new( * kernel.three_streams, a )
-      end
-
-      def pre_execute
-        self
-      end
-
-      def is_autonomous
-        true
-      end
-
-      def get_autonomous_quad argv
-        [ self, :invoke, [ argv ], nil ]  # receiver, method, args, block
-      end
-
-      def is_visible
-        true
-      end
-
-      def get_summary_a_from_sheet sht
-      end
-    end
-
     # ~ main CLI hand-made implementation
 
     class Client__
@@ -82,75 +37,85 @@ module Skylab::Brazen
 
       def invoke_when_no_action_argument
         if @argv.length.zero?
-          CLI::State_Processors_::When_No_Arguments.new( self ).execute
+          invoke_when_no_arguments
         else
           invoke_when_options
         end
+      end
+
+      def invoke_when_no_arguments
+        CLI::When_::No_Arguments.new( self ).execute  # read [#003]
       end
 
       def invoke_when_options
         processors = []
         o = CLI::Lib_::Option_parser[].new
         o.on '-h', '--help [cmd]', "this screen" do |cmd|
-          processors.push(
-            CLI::State_Processors_::When_Help.new o, cmd, self )
+          processors.push when_help( o, cmd )
         end
-        last_exit_status = nil
         begin
           o.parse! @argv
         rescue ::OptionParser::ParseError => e
-          processors.push(
-            CLI::State_Processors_::When_Parse_Error.new e, help_renderer )
+          processors.push when_parse_error e
         end
-        unless last_exit_status
-          @argv.length.nonzero? and
-            processors.push(
-              CLI::State_Processors_::When_Unhandled_Arguments.
-                new @argv, self )
-          while (( processor = processors.shift ))
-            last_exit_status = processor.execute
-            last_exit_status.zero? and break
-          end
+        @argv.length.nonzero? and processors.push when_unhanded_arguments
+        while (( processor = processors.shift ))
+          last_exit_status = processor.execute
+          last_exit_status.zero? and break
         end
         last_exit_status
       end
 
+      def when_help op, cmd
+        CLI::When_::Help.new op, cmd, self
+      end
+
+      def when_parse_error e
+        CLI::When_::Parse_Error.new e, help_renderer
+      end
+
+      def when_unhanded_arguments
+        CLI::When_::Unhandled_Arguments.new @argv, self
+      end
+
       def invoke_when_action_argument
-        @token = @argv.shift
+        matching_actions = find_matching_actions_with_token @argv.shift
+        case matching_actions.length
+        when 0 ; invoke_when_no_matching_action
+        when 1 ; matching_actions.first.invoke_via_argv @argv
+        else   ; invoke_when_ambiguous_matching_actions
+        end
+      end
+
+    public  # ~ interface for agents
+
+      attr_reader :stderr
+
+      def find_matching_actions_with_token tok
+        @token = tok
         matching_actions = []
-        rx = /\A#{ ::Regexp.escape @token }/
+        rx = /\A#{ ::Regexp.escape tok }/
         scn = actions.get_scanner
         while (( action = scn.gets ))
           slug = action.name.as_slug
           if rx =~ slug
-            if @token == slug
+            if tok == slug
               matching_actions.clear.push action
               break
             end
             matching_actions.push action
           end
         end
-        case matching_actions.length
-        when 0 ; whn_no_matching_action
-        when 1 ; matching_actions.first.invoke_via_argv @argv
-        else   ; whn_ambiguous_matching_actions
-        end
+        matching_actions
       end
 
-      def whn_no_matching_action
-        CLI::State_Processors_::When_No_Matching_Action.
-          new( @token, self ).execute
+      def invoke_when_no_matching_action
+        CLI::When_::No_Matching_Action.new( @token, self ).execute
       end
 
-      def whn_ambiguous_matching_actions
-        CLI::State_Processors_::When_Ambiguous_Matching_Actions.
-          new( @token, self ).execute
+      def invoke_when_ambiguous_matching_actions
+        CLI::When_::Ambiguous_Matching_Actions.new( @token, self ).execute
       end
-
-      # ~ interface for agents
-
-    public
-      attr_reader :stderr
 
       def help_renderer
         @hlp_rndrr ||= CLI::Action_Adapter_::Help_Renderer.
@@ -177,12 +142,12 @@ module Skylab::Brazen
       # ~ for ad-hoc facet agents
 
       def when_extra_ARGV_arguments_event ev, action_adapter
-        CLI::State_Processors_::When_Extra_Arguments.
+        CLI::When_::Extra_Arguments.
           new( ev, action_adapter, self ).execute
       end
 
       def when_missing_ARGV_arguments_event ev, action_adapter
-        CLI::State_Processors_::When_Missing_Arguments.
+        CLI::When_::Missing_Arguments.
           new( ev, action_adapter, self ).execute
       end
 

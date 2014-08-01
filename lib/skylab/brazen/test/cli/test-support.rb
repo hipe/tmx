@@ -18,6 +18,19 @@ module Skylab::Brazen::TestSupport::CLI
 
     # ~ common business assertions
 
+    def expect_help_screen_for_init
+      expect :styled, 'usage: bzn init'
+      expect %r(\A[ ]{7}bzn init -h\z)
+      expect_maybe_a_blank_line
+      expect_header_line 'description'
+      expect :styled, 'init a <workspace>'
+      expect 'this is the second line of the init description'
+      expect_maybe_a_blank_line
+      expect_header_line 'options'
+      expect %r(\A[ ]{4}-h, --help[ ]{10,}this screen\z)
+      expect_succeeded
+    end
+
     def expect_errored_with i
       expect_errd_with_d Brazen_::API.some_error_code_via_terminal_channel_i i
     end

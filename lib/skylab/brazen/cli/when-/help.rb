@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   module CLI
 
-    class State_Processors_::When_Help
+    class When_::Help
 
       def initialize option_parser, cmd, client
         @any_cmd_string = cmd
@@ -14,15 +14,15 @@ module Skylab::Brazen
 
       def execute
         if @any_cmd_string
-          when_command_string
+          whn_command_string
         else
-          when_no_command_string
+          whn_no_command_string
         end
       end
 
     private
 
-      def when_no_command_string
+      def whn_no_command_string
         o = @o = @client.help_renderer
         o.set_option_parser @option_parser
         o.section_boundary
@@ -37,6 +37,19 @@ module Skylab::Brazen
             }<action>" } for help on that action."
         end
         SUCCESS_
+      end
+
+      def whn_command_string
+        a = @client.find_matching_actions_with_token @any_cmd_string
+        case a.length
+        when 0 ; @client.invoke_when_no_matching_action
+        when 1 ; @action = a.first ; whn_action
+        else   ; @client.invoke_when_ambiguous_matching_actions
+        end
+      end
+
+      def whn_action
+        @action.invoke_via_argv [ '--help' ]
       end
     end
   end

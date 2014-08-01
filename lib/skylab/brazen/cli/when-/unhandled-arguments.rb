@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   module CLI
 
-    class State_Processors_::When_Unhandled_Arguments
+    class When_::Unhandled_Arguments
 
       def initialize args, client
         @args = args

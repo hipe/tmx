@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   module CLI
 
-    class State_Processors_::When_No_Matching_Action
+    class When_::No_Matching_Action
 
       def initialize token, client
         @client = client ; @token = token

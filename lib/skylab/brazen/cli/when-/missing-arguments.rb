@@ -2,19 +2,19 @@ module Skylab::Brazen
 
   module CLI
 
-    class State_Processors_::When_Extra_Arguments
+    class When_::Missing_Arguments
 
       def initialize event, action, client
-        @event = event
+        @property = event.property
         @render = client.help_renderer
         @render.set_action action  # eew
       end
 
       def execute
         o = @render
-        x = @event.x
+        prop = @property
         o.express do
-          "unexpected argument #{ ick x }"
+          "expecting #{ par prop }"
         end
         o.output_usage_line
         o.output_invite_to_general_help

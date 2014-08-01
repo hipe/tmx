@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   module CLI
 
-    class State_Processors_::When_Parse_Error
+    class When_::Parse_Error
 
       def initialize e, help_renderer
         @exception = e

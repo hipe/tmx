@@ -108,8 +108,7 @@ module Skylab::Brazen
           @op.parse! @argv
           @result
         rescue ::OptionParser::ParseError => e
-          CLI::State_Processors_::When_Parse_Error.
-            new( e, build_help ).execute
+          CLI::When_::Parse_Error.new( e, build_help ).execute
         end
 
         def parse_arguments

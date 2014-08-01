@@ -43,6 +43,11 @@ module Skylab::Brazen::TestSupport::CLI
       expect_succeeded
     end
 
+    it "2.4x3) help with a good argument" do
+      invoke '-h', 'ini'
+      expect_help_screen_for_init
+    end
+
     # ~ business
 
     def expect_usage_line

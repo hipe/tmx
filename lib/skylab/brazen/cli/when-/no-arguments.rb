@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   module CLI
 
-    class State_Processors_::When_No_Arguments
+    class When_::No_Arguments
 
       def initialize client
         @render = client.help_renderer
