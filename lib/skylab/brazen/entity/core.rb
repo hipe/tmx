@@ -151,10 +151,8 @@ module Skylab::Brazen
         @meth_i = :"__PROCESS_IAMBIC_PARAMETER__#{ @prop_i }"
         did_build = touch_and_accept_prop
         mxr = @reader.method_added_mxr and mxr.stop_listening
-        _IVAR_ = @prop.as_ivar
-        @reader.send :define_method, @prop.iambic_writer_method_name do
-          instance_variable_set _IVAR_, iambic_property ; nil
-        end
+        @reader.send :define_method, @prop.iambic_writer_method_name,
+          @prop.some_iambic_writer_method_proc
         mxr and mxr.resume_listening
         did_build and finish_property
       end
@@ -484,6 +482,7 @@ module Skylab::Brazen
     class Property__
 
       def initialize *a
+        @iambic_writer_method_proc = nil
         a.length.nonzero? and set_prop_i_and_iambic_writer_method_name( * a )
         notificate :at_end_of_process_iambic
         block_given? and yield self
@@ -492,9 +491,26 @@ module Skylab::Brazen
 
       attr_reader :iambic_writer_method_name, :name
 
+      attr_accessor :iambic_writer_method_proc
+
       def set_prop_i_and_iambic_writer_method_name prop_i, meth_i
         @name = Callback_::Name.from_variegated_symbol prop_i
         @iambic_writer_method_name = meth_i ; nil
+      end
+
+      def some_iambic_writer_method_proc
+        if @iambic_writer_method_proc
+          @iambic_writer_method_proc
+        else
+          bld_monadic_iambic_writer_method_proc
+        end
+      end
+
+      def bld_monadic_iambic_writer_method_proc
+        _IVAR_ = @name.as_ivar
+        -> do
+          instance_variable_set _IVAR_, iambic_property ; nil
+        end
       end
 
       def as_ivar
