@@ -150,7 +150,7 @@ module Skylab::Brazen
           @prop = @reader::PROPERTY_CLASS__.new prop_i, m_i
         end
         accept_property @prop
-        did_build and @prop = nil
+        did_build and finish_property
       end
 
       def flush_because_prop_i prop_i
@@ -169,7 +169,7 @@ module Skylab::Brazen
           instance_variable_set _IVAR_, iambic_property ; nil
         end
         mxr and mxr.resume_listening
-        did_build and @prop = nil
+        did_build and finish_property
       end
 
       def accept_property _PROPERTY_
@@ -177,9 +177,14 @@ module Skylab::Brazen
         m_i = :"produce_#{ i }_property"
         @reader.prop_mthd_names_for_write.add_or_assert i, m_i
         @writer.send :define_method, m_i do _PROPERTY_ end
-        _PROPERTY_.class.hook_shell and _PROPERTY_.class.hook_shell.
-          process_relevant_hooks( @reader, _PROPERTY_ )
         nil
+      end
+
+      def finish_property
+        if @prop.class.hook_shell
+          @prop.class.hook_shell.process_relevant_hooks @reader, @prop
+        end
+        @prop = nil
       end
 
       def process_any_DSL d, x_a
@@ -310,7 +315,7 @@ module Skylab::Brazen
       end
     end
 
-    class Box__
+    Box__ = class Box_
 
       def initialize
         @a = [] ; @h = {}
@@ -322,6 +327,10 @@ module Skylab::Brazen
 
       def length
         @a.length
+      end
+
+      def has_name i
+        @h.key? i
       end
 
       def get_local_normal_names
@@ -401,6 +410,8 @@ module Skylab::Brazen
 
     protected
       attr_reader :a, :h
+
+      self
     end
 
     class Method_Added_Muxer__  # from [mh] re-written

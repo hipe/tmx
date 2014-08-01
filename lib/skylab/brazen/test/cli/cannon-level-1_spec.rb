@@ -8,9 +8,14 @@ module Skylab::Brazen::TestSupport::CLI
 
     # it "  0)  no arguments"
 
-    # it "1.1)  strange argument"
+    it "1.1)  strange argument" do
+      invoke 'st', ''
+      expect_missing_required_property :path
+      expect_invite_line
+      expect_errored_with :missing_required_props
+    end
 
-    it "1.2)  strange option" do
+    it "1.2)  strange option - ( E I )" do
       invoke 'st', '-z'
       expect 'invalid option: -z'
       expect_invite_line
@@ -19,9 +24,9 @@ module Skylab::Brazen::TestSupport::CLI
 
     # it "1.3)  good argument"
 
-    it "1.4)  good option" do
+    it "1.4)  good option (help screen)" do
       invoke 'st', '-h'
-      expect :styled, /\Ausage: bzn status \[-v\] .*\[<path>\]\z/
+      expect_usage_line
       expect %r(\A[ ]{7}bzn status -h\z)
       expect_maybe_a_blank_line
       expect :styled, /\Adescription: get status of a workspace\b/
@@ -36,7 +41,22 @@ module Skylab::Brazen::TestSupport::CLI
       expect_succeeded
     end
 
+    it "2)    extra argument - ( E U I )" do
+      invoke 'st', 'wing', 'wang'
+      expect :styled, %r(\Aunexpected argument:? ['"]?wang['"]?)
+      expect_usage_line
+      expect_invite_line
+    end
+
     # ~ business
+
+    def expect_missing_required_property i
+      expect :styled, "missing required property <#{ i }>"
+    end
+
+    def expect_usage_line
+      expect :styled, /\Ausage: bzn status \[-v\] .*\[<path>\]\z/
+    end
 
     def expect_invite_line
       expect :styled, /\Ause '?bzn status -h'? for help\z/

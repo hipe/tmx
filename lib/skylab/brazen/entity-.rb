@@ -12,14 +12,25 @@ module Skylab::Brazen
       cls.add_iambic_event_listener :iambic_normalize_and_validate,
 
         -> obj do
-          obj.aply_dflt_proc_if_necessary prop ; nil
+          obj.aply_dflt_value_if_necessary prop ; nil
         end
 
     end
 
     o :meta_property, :parameter_arity,
         :enum, [ :zero_or_one, :one ],
-        :default, :zero_or_one
+        :default, :zero_or_one,
+        :entity_class_hook_once, -> cls do
+
+          req_a = cls.properties.reduce_by( & :is_required ).to_a.freeze
+          if req_a.length.nonzero?
+
+            cls.add_iambic_event_listener :iambic_normalize_and_validate,
+            -> obj do
+              obj.check_for_missing_required_props req_a ; nil
+            end
+          end
+        end
 
 
     property_class_for_write  # flush the above to get the below
@@ -39,6 +50,7 @@ module Skylab::Brazen
       def has_description
         ! @desc_p_a.nil?
       end
+
 
       def under_expression_agent_get_N_desc_lines expression_agent, n=nil
         Brazen_::CLI::N_Lines_.new( n, @desc_p_a, expression_agent ).execute
@@ -77,6 +89,7 @@ module Skylab::Brazen
   end ]
 
   module Entity_
+
     def aply_dflt_value_if_necessary prop
       ivar = prop.as_ivar
       if ! instance_variable_defined? ivar ||
@@ -84,5 +97,53 @@ module Skylab::Brazen
         instance_variable_set ivar, prop.default
       end ; nil
     end
+
+    def check_for_missing_required_props req_a
+      miss_a = req_a.reduce [] do |m, prop|
+        if instance_variable_defined? prop.as_ivar
+          x = instance_variable_get prop.as_ivar
+          x.nil? || EMPTY_S__ == x and m << prop
+        else
+          m << prop
+        end
+        m
+      end
+      miss_a.length.nonzero? and whine_about_missing_reqd_props miss_a ; nil
+    end
+
+  private
+
+    def whine_about_missing_reqd_props miss_a
+      entity_error :missing_required_props, :miss_a, miss_a do |ev|
+        a = ev.miss_a
+        "missing required propert#{ 1 == a.length ? 'y' : 'ies' } #{
+          }#{ a.map { |prop| par prop } * ' and ' }"
+      end ; nil
+    end
+
+    def entity_error * x_a, & p
+      on_channel_entity_structure :error, Brazen_::Entity::Event.new( x_a, p )
+    end
+
+    def on_channel_entity_structure i, ev
+      m = :"on_#{ i }_channel_#{ ev.terminal_channel_i }_entity_structure"
+      if respond_to? m
+        send m, ev
+      else
+        send :"on_#{ i }_channel_entity_structure", ev
+      end ; nil
+    end
+
+  public
+
+    def on_error_channel_missing_required_props_entity_structure ev
+      raise ::ArgumentError, ev.render_under( Brazen_::API::EXPRESSION_AGENT )
+    end
+
+    def on_error_channel_entity_structure ev
+      raise ev.render_under Brazen_::API::EXPRESSION_AGENT
+    end
+
+    EMPTY_S__ = ''.freeze
   end
 end

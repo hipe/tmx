@@ -18,9 +18,17 @@ module Skylab::Brazen::TestSupport::CLI
 
     # ~ common business assertions
 
+    def expect_errored_with i
+      expect_errd_with_d Brazen_::API.some_error_code_via_terminal_channel_i i
+    end
+
     def expect_errored
+      expect_errd_with_d Brazen_::CLI::GENERIC_ERROR_
+    end
+
+    def expect_errd_with_d d
       expect_no_more_lines
-      @exitstatus.should eql Brazen_::CLI::GENERIC_ERROR_
+      @exitstatus.should eql d
     end
 
     def expect_succeeded

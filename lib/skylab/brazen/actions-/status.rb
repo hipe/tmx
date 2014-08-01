@@ -16,7 +16,7 @@ module Skylab::Brazen
       o :description, -> y do
         y << "it's #{ highlight 'really' } neat"
       end
-      o :property, :path
+      o :required, :property, :path
 
     end ]
   end

@@ -2,8 +2,9 @@ module Skylab::Brazen
 
   class Action_
 
-    def initialize kernel
-      @kernel = kernel
+    include Brazen_::Entity_  # so we can override its behavior near events
+
+    def initialize
     end
 
     def name
@@ -34,6 +35,23 @@ module Skylab::Brazen
       else
         Callback_::Scn.the_empty_scanner
       end
+    end
+
+    def invoke_via_iambic_and_client_adapter x_a, client_adapter
+      @client_adapter = client_adapter
+      @error_count = 0
+      process_iambic_fully x_a
+      notificate :iambic_normalize_and_validate
+      @error_count.zero? and execute
+    end
+
+    def on_error_channel_missing_required_props_entity_structure ev
+      on_error_channel_entity_structure ev
+    end
+
+    def on_error_channel_entity_structure ev
+      @error_count += 1
+      @client_adapter.on_error_channel_entity_structure ev ; nil
     end
   end
 end

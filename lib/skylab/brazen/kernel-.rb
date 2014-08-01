@@ -13,7 +13,7 @@ module Skylab::Brazen
       Scanner_.From_Block do
         if d < len
           i = i_a.fetch d ; d += 1
-          actions_mod.const_get( i, false ).new self
+          actions_mod.const_get( i, false ).new
         end
       end
     end

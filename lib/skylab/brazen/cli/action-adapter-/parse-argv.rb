@@ -6,9 +6,10 @@ module Skylab::Brazen
 
       class Parse_ARGV
 
-        def initialize client, action, argv
-          @client = client ; @action = action ; @argv = argv
-          @out = @client.stderr
+        def initialize client, action_adapter, argv
+          @client = client ; @action_adapter = action_adapter ; @argv = argv
+          @action = @action_adapter.action
+          @output_iambic = []
           @result = nil
         end
 
@@ -53,13 +54,18 @@ module Skylab::Brazen
             letter = h[ prop.name_i ]
             letter and args.push "-#{ letter }"
             base = "--#{ prop.name.as_slug }"
+            p = -> x do
+              @output_iambic.push prop.name_i, x
+            end
             if prop.takes_argument
               args.push "#{ base } #{ argument_label_for prop }"
               p = -> x do
+                @output_iambic.push prop.name_i, x
               end
             else
               args.push base
-              p = -> do
+              p = -> _ do
+                @output_iambic.push prop.name_i
               end
             end
             if prop.has_description
@@ -107,16 +113,30 @@ module Skylab::Brazen
         end
 
         def parse_arguments
-
+          parse = Arguments__.new @argv, @arg_a
+          @action_adapter.set_help_renderer build_help
+          error_event = parse.execute
+          if error_event
+            _meth_i = ARGV_ERROR_OP_H__.fetch error_event.event_channel_i
+            @client.send _meth_i, error_event, @action_adapter
+          else
+            _x_a = parse.release_result_iambic
+            @output_iambic.concat _x_a
+            PROCEDE_
+          end
         end
+        ARGV_ERROR_OP_H__ = {
+          extra: :when_extra_ARGV_arguments_event,
+          missing: :when_missing_ARGV_arguments_event
+        }.freeze
 
         def build_help
-          Action_Adapter_::Help_Renderer.
-            new @action, @op, @arg_a, @client
+          Action_Adapter_::Help_Renderer.new(
+            @action_adapter, @op, @arg_a, @client )
         end
 
         def three_for_success
-
+          [ @action_adapter, :invoke_via_iambic, [ @output_iambic ] ]
         end
 
         class Arguments__

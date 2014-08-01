@@ -31,12 +31,16 @@ module Skylab::Brazen::TestSupport::Entity
             o :clandestine, nil
             def baz
             end
+
+            o :clandestine, true
+            def bif
+            end
           end ]
         end
       end
 
       it "to its properties it applies meta-properties with this m.m.property" do
-        MMECH_Business_Thing.clandestine_i_a.should eql [ :foo, :baz ]
+        MMECH_Business_Thing.clandestine_i_a.should eql [ :foo, :bif ]
       end
     end
   end

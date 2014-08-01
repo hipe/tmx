@@ -61,7 +61,7 @@ module Skylab::Brazen
       end
     end
 
-    class Box__
+    class Box_
       def get_names
         @a.dup
       end

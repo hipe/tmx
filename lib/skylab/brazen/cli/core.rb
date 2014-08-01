@@ -132,7 +132,7 @@ module Skylab::Brazen
         end
         case matching_actions.length
         when 0 ; whn_no_matching_action
-        when 1 ; matching_actions.first.invoke_with_argv @argv
+        when 1 ; matching_actions.first.invoke_via_argv @argv
         else   ; whn_ambiguous_matching_actions
         end
       end
@@ -161,7 +161,7 @@ module Skylab::Brazen
         @expr_ag ||= CLI::Expression_Agent__.new
       end
 
-      def render_syntax_string expression_agent
+      def render_syntax_string
         expression_agent.calculate { "#{ par 'action' } [..]" }
       end
 
@@ -172,6 +172,18 @@ module Skylab::Brazen
       def name
         @name ||= Callback_::Name.from_variegated_symbol(
           @invocation_str_a.last.intern )
+      end
+
+      # ~ for ad-hoc facet agents
+
+      def when_extra_ARGV_arguments_event ev, action_adapter
+        CLI::State_Processors_::When_Extra_Arguments.
+          new( ev, action_adapter, self ).execute
+      end
+
+      def when_missing_ARGV_arguments_event ev, action_adapter
+        CLI::State_Processors_::When_Missing_Arguments.
+          new( ev, action_adapter, self ).execute
       end
 
       # ~ deep API for agents
@@ -205,9 +217,13 @@ module Skylab::Brazen
     end
 
     class Action_Adapter_
+
       def initialize action, client
         @action = action ; @client = client
+        @hr = nil
       end
+
+      attr_reader :action
 
       def name
         @action.name
@@ -221,13 +237,43 @@ module Skylab::Brazen
         @action.under_expression_agent_get_N_desc_lines exp, d
       end
 
-      def invoke_with_argv argv
+      def set_help_renderer hr
+        @hr = hr
+      end
+
+      def render_syntax_string
+        @hr.produce_main_syntax_string
+      end
+
+      def invoke_via_argv argv
         x, method_i, args =
-          Action_Adapter_::Parse_ARGV.new( @client, @action, argv ).execute
+          Action_Adapter_::Parse_ARGV.new( @client, self, argv ).execute
         if method_i
           x.send method_i, * args
         else
           x || GENERIC_ERROR_
+        end
+      end
+
+      def invoke_via_iambic x_a
+        @exit_status = nil
+        @action.invoke_via_iambic_and_client_adapter x_a, self
+        @exit_status
+      end
+
+      def on_error_channel_entity_structure ev
+        @hr.y << ( ev.render_under @client.expression_agent )
+        @hr.output_invite_to_general_help
+        @exit_status = rslv_some_exit_status_via_event_structure ev
+        nil
+      end
+
+    private
+
+      def rslv_some_exit_status_via_event_structure ev
+        if ev.has_member :error_code then ev.error_code else
+          Brazen_::API.any_error_code_via_terminal_channel_i(
+            ev.terminal_channel_i ) || GENERIC_ERROR_
         end
       end
 
@@ -264,8 +310,9 @@ module Skylab::Brazen
         code s
       end
 
-      def par string  # make the string look like a parameter (placeholder)
-        highlight "<#{ string }>"
+      def par x  # make the string or prop look like a parameter (placeholder)
+        _string = x.respond_to?( :ascii_only? ) ? x : x.name.as_slug
+        highlight "<#{ _string }>"
       end
 
       def stylize style_d_a, string

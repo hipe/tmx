@@ -18,6 +18,11 @@ module Skylab::Brazen
 
         attr_reader :expression_agent, :y
 
+        def set_action x
+          @action = x
+          @is_branch_view = ( x && x.object_id == @client.object_id ) ; nil
+        end
+
         def set_option_parser op
           @op = op
           use_formatting_of_option_parser op ; nil
@@ -45,7 +50,7 @@ module Skylab::Brazen
 
         def output_usage_line
           a = [ action_invocation_string ]
-          s = @action.render_syntax_string( @expression_agent ) and a.push s
+          s = @action.render_syntax_string and a.push s
           output_single_line_section 'usage', a * SPACE_
           @action
         end

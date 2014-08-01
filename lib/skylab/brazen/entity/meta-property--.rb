@@ -85,7 +85,7 @@ module Skylab::Brazen
 
           def enum
             x = iambic_property
-            bx = Box__.new
+            bx = Box_.new
             x.each do |i|
               bx.add i, true
             end
@@ -208,8 +208,8 @@ module Skylab::Brazen
               @scope_kernel.meth_i or raise ::ArgumentError, say_expected_def
               @scope_kernel.flush_bc_meth
             end
-            @scope_kernel.prop = nil
           end
+          @scope_kernel.finish_property ; nil
         end
       private
         def this_child_must_iambicly_scan_something o
@@ -247,7 +247,7 @@ module Skylab::Brazen
       class Hook_Shell
         def initialize pclass
           @pclass = pclass
-          @box = Box__.new
+          @box = Box_.new
         end
         def add_hook each_or_once, metaprop_i, p
           @box.add_or_replace metaprop_i, Hook__.new( each_or_once, p )
@@ -266,7 +266,7 @@ module Skylab::Brazen
           box = @box ; scn = box.get_key_scanner
           i = scn.gets ; a = nil
           begin
-            prop.instance_variable_defined?( :"@#{ i }" ) or next # or whatever
+            prop.send( i ).nil? and next  # or whatever
             hook = box.fetch i
             case hook.each_or_once
             when :each ; ( a ||= [] ).push hook
