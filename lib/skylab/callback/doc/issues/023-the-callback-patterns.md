@@ -105,7 +105,7 @@ the five patterns are "callback", "listeners", "handler", "shorters",
 
 • "shorters" allows multiple callbacks per channel and short-circuits on
   the first one that results in true-ish, making this result be the result of
-  the call to the callbacks tree. more below.
+  the call to the callbacks tree. more below. :#shorters
 
 • "reducers" is not implemented, so we won't bother explaining it.
 

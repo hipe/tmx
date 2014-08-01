@@ -16,7 +16,7 @@ them. this is the familiar "agents" pattern that we see everywhere in
 this universe.
 
 but state processors add one important detail to the above: they must
-result in an exitstatus.
+(or perhaps just "can") result in an exitstatus.
 
 
 
@@ -40,6 +40,10 @@ this pattern lets the client accumulate processers from a variety of
 locations and only at a certain endpoint execute them all, perhaps
 stopping with an early exit if any one processor results in an
 exitstatus.
+
+(on second reading we see that this is exactly the
+[#ca-023] #shorters pattern, which should be looked at for a fuller
+understanding of this design in context.)
 
 as a corollary benefit, we wanted a way to cut down on low-level
 "busines logic" cluttering up the main client file; which is served

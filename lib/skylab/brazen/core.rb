@@ -15,6 +15,9 @@ module Skylab::Brazen
   end
 
   module Lib_
+    N_lines = -> do
+      Brazen_::Entity::Event::N_Lines
+    end
     Name = -> do
       Callback_::Name
     end

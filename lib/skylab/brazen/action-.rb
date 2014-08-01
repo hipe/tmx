@@ -16,8 +16,9 @@ module Skylab::Brazen
     end
 
     def under_expression_agent_get_N_desc_lines expression_agent, d=nil
-      Brazen_::CLI::N_Lines_.
-        new( d, [ self.class.description_block ], expression_agent ).execute
+      Brazen_::Lib_::N_lines[].
+        new( [], d, [ self.class.description_block ], expression_agent ).
+         execute
     end
 
     def self.desc &p

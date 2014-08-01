@@ -4,18 +4,23 @@ module Skylab::Brazen
 
     o :meta_property, :argument_arity,
         :enum, [ :zero, :one ],
-        :default, :one
-
-
-    o :meta_property, :default, :entity_class_hook, -> prop, cls do
-
-      cls.add_iambic_event_listener :iambic_normalize_and_validate,
-
-        -> obj do
-          obj.aply_dflt_value_if_necessary prop ; nil
+        :default, :one,
+        :property_hook, -> prop do
+          if :zero == prop.argument_arity
+            ivar = prop.as_ivar
+            prop.iambic_writer_method_proc = -> do
+              instance_variable_set ivar, true ; nil
+            end
+          end
         end
 
-    end
+    o :meta_property, :default,
+        :entity_class_hook, -> prop, cls do
+          cls.add_iambic_event_listener :iambic_normalize_and_validate,
+          -> obj do
+            obj.aply_dflt_value_if_necessary prop ; nil
+          end
+        end
 
     o :meta_property, :parameter_arity,
         :enum, [ :zero_or_one, :one ],
@@ -51,9 +56,9 @@ module Skylab::Brazen
         ! @desc_p_a.nil?
       end
 
-
       def under_expression_agent_get_N_desc_lines expression_agent, n=nil
-        Brazen_::CLI::N_Lines_.new( n, @desc_p_a, expression_agent ).execute
+        Brazen_::Lib_::N_lines[].
+          new( [], n, @desc_p_a, expression_agent ).execute
       end
 
       def is_required
@@ -114,9 +119,9 @@ module Skylab::Brazen
   private
 
     def whine_about_missing_reqd_props miss_a
-      entity_error :missing_required_props, :miss_a, miss_a do |ev|
+      entity_error :missing_required_props, :miss_a, miss_a do |y, ev|
         a = ev.miss_a
-        "missing required propert#{ 1 == a.length ? 'y' : 'ies' } #{
+        y << "missing required propert#{ 1 == a.length ? 'y' : 'ies' } #{
           }#{ a.map { |prop| par prop } * ' and ' }"
       end ; nil
     end
@@ -137,11 +142,12 @@ module Skylab::Brazen
   public
 
     def on_error_channel_missing_required_props_entity_structure ev
-      raise ::ArgumentError, ev.render_under( Brazen_::API::EXPRESSION_AGENT )
+      raise ::ArgumentError,
+        ev.render_first_line_under( Brazen_::API::EXPRESSION_AGENT )
     end
 
     def on_error_channel_entity_structure ev
-      raise ev.render_under Brazen_::API::EXPRESSION_AGENT
+      raise ev.render_first_line_under Brazen_::API::EXPRESSION_AGENT
     end
 
     EMPTY_S__ = ''.freeze

@@ -227,7 +227,7 @@ module Skylab::Brazen
       end
 
       def on_error_channel_entity_structure ev
-        @hr.y << ( ev.render_under @client.expression_agent )
+        ev.render_all_lines_into_under @hr.y, @client.expression_agent
         @hr.output_invite_to_general_help
         @exit_status = rslv_some_exit_status_via_event_structure ev
         nil
@@ -282,37 +282,6 @@ module Skylab::Brazen
 
       def stylize style_d_a, string
         "\e[#{ style_d_a.map( & :to_s ).join( ';' ) }m#{ string }\e[0m"
-      end
-    end
-
-    class N_Lines_
-      def initialize n, p_a, expag
-        @exp = expag ; @p_a = p_a
-        @y = []
-        if n
-          if 1 > n
-            @test_p = nil
-          else
-            d = 0
-            @test_p = -> { n == ( d += 1 ) }
-          end
-        else
-          @test_p = -> { false }
-        end
-      end
-      def execute
-        if @test_p
-          catch :done_with_N_lines do
-            @p_a.each do |p|
-              @exp.instance_exec self, & p
-            end
-          end
-        end
-        @y
-      end
-      def << line
-        @y.push line
-        @test_p[] and throw :done_with_N_lines
       end
     end
 
