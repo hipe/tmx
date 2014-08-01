@@ -105,7 +105,8 @@ module Skylab::Brazen
         unless last_exit_status
           @argv.length.nonzero? and
             processors.push(
-              CLI::State_Processors_::When_Extra_Args.new @argv, self )
+              CLI::State_Processors_::When_Unhandled_Arguments.
+                new @argv, self )
           while (( processor = processors.shift ))
             last_exit_status = processor.execute
             last_exit_status.zero? and break
