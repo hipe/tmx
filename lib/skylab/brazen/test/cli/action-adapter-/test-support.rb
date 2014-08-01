@@ -58,7 +58,7 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
             :enum, [ :zero, :one ],
             :default, :one
 
-        o :meta_property, :default, :entity_class_hook, -> cls, prop do
+        o :meta_property, :default, :entity_class_hook, -> prop, cls do
           cls.add_iambic_event_listener :iambuc_normalize_and_validate,
             -> obj do
               obj.aply_dflt_proc_if_necessary prop ; nil

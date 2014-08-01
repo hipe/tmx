@@ -73,7 +73,7 @@ module Skylab::Brazen
         mod.const_set :Module_Methods, ::Module.new
         mod.extend Extension_Module_Methods__, Proprietor_Methods__
         mod.send :include, Iambic_Methods__
-        mod.const_set READ_BOX__, Box__.new
+        mod.const_set READ_BOX__, Box_.new
         krn = mod.init_property_scope_krnl
         krn.apply_p @p
         krn.end_scope
@@ -90,7 +90,7 @@ module Skylab::Brazen
         @reader.extend Proprietor_Methods__
         @reader.send :include, Iambic_Methods__
         @reader.const_defined? READ_BOX__ or
-          @reader.const_set READ_BOX__, Box__.new
+          @reader.const_set READ_BOX__, Box_.new
         nil
       end
     end
@@ -140,29 +140,16 @@ module Skylab::Brazen
       end
 
       def flush_bc_meth
-        m_i = @meth_i ; @meth_i = nil
-        prop_i = @has_writer_method_name_constraints ?
-          aply_method_name_constraints( m_i ) : m_i
-        if @prop
-          @prop.set_prop_i_and_iambic_writer_method_name prop_i, m_i
-        else
-          did_build = true
-          @prop = @reader::PROPERTY_CLASS__.new prop_i, m_i
-        end
-        accept_property @prop
+        @prop_i = @has_writer_method_name_constraints ?
+          aply_method_name_constraints( @meth_i ) : @meth_i
+        did_build = touch_and_accept_prop
         did_build and finish_property
       end
 
       def flush_because_prop_i prop_i
-        @meth_i = nil
-        m_i = :"__PROCESS_IAMBIC_PARAMETER__#{ prop_i }"
-        if @prop
-          @prop.set_prop_i_and_iambic_writer_method_name prop_i, m_i
-        else
-          did_build = true
-          @prop = @reader::PROPERTY_CLASS__.new prop_i, m_i
-        end
-        accept_property @prop
+        @prop_i = prop_i
+        @meth_i = :"__PROCESS_IAMBIC_PARAMETER__#{ @prop_i }"
+        did_build = touch_and_accept_prop
         mxr = @reader.method_added_mxr and mxr.stop_listening
         _IVAR_ = @prop.as_ivar
         @reader.send :define_method, @prop.iambic_writer_method_name do
@@ -170,6 +157,42 @@ module Skylab::Brazen
         end
         mxr and mxr.resume_listening
         did_build and finish_property
+      end
+
+      def touch_and_accept_prop
+        if @prop
+          mutate_prop_in_progress
+        else
+          create_new_prop
+          did_build = true
+        end
+        @prop_i = @meth_i = nil
+        accept_property @prop
+        did_build
+      end
+
+      def mutate_prop_in_progress
+        @prop.set_prop_i_and_iambic_writer_method_name @prop_i, @meth_i
+        (( p = any_prop_hook @prop.class )) and p[ @prop ]
+        nil
+      end
+
+      def create_new_prop
+        p = any_prop_hook @reader::PROPERTY_CLASS__
+        @prop = @reader::PROPERTY_CLASS__.new @prop_i, @meth_i, & p
+        nil
+      end
+
+      def any_prop_hook cls
+        if cls.hook_shell and (( box = cls.hook_shell.props ))
+          -> prop do
+            box.each_pair do |i, p|
+              if prop.send i
+                p[ prop ]
+              end
+            end ; nil
+          end
+        end
       end
 
       def accept_property _PROPERTY_
@@ -182,7 +205,7 @@ module Skylab::Brazen
 
       def finish_property
         if @prop.class.hook_shell
-          @prop.class.hook_shell.process_relevant_hooks @reader, @prop
+          @prop.class.hook_shell.process_relevant_later_hooks @reader, @prop
         end
         @prop = nil
       end
@@ -245,7 +268,7 @@ module Skylab::Brazen
 
       def listener_box_for_eventpoint i
         (( @lstnrs ||= {} )).fetch i do
-          @lstnrs[ i ] = Box__.new
+          @lstnrs[ i ] = Box_.new
         end
       end
     end
@@ -315,7 +338,7 @@ module Skylab::Brazen
       end
     end
 
-    Box__ = class Box_
+    class Box_
 
       def initialize
         @a = [] ; @h = {}
@@ -356,6 +379,10 @@ module Skylab::Brazen
 
       def each_value
         @a.each do |i| yield @h.fetch( i ) end ; nil
+      end
+
+      def each_pair
+        @a.each do |i| yield i, @h.fetch( i ) end ; nil
       end
 
       # ~ mutators
@@ -410,8 +437,6 @@ module Skylab::Brazen
 
     protected
       attr_reader :a, :h
-
-      self
     end
 
     class Method_Added_Muxer__  # from [mh] re-written
@@ -460,8 +485,8 @@ module Skylab::Brazen
 
       def initialize *a
         a.length.nonzero? and set_prop_i_and_iambic_writer_method_name( * a )
-        block_given? and yield self
         notificate :at_end_of_process_iambic
+        block_given? and yield self
         freeze
       end
 
@@ -723,7 +748,7 @@ module Skylab::Brazen
         @reader.extend Proprietor_Methods__
         @reader.extend @extension_module::Module_Methods
         if ! @reader.const_defined? READ_BOX__  # before we do any includes
-          @reader.const_set READ_BOX__, Box__.new
+          @reader.const_set READ_BOX__, Box_.new
         end
         @reader.send :include, @extension_module  # iambic methods too
         _box = @reader.prop_mthd_names_for_write

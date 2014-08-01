@@ -9,7 +9,7 @@ module Skylab::Brazen::TestSupport::Entity
       before :all do
 
         MMECH_Entity = Subject_[][ -> do
-          o :meta_property, :clandestine, :entity_class_hook, -> cls, prop do
+          o :meta_property, :clandestine, :entity_class_hook, -> prop, cls do
             ( cls.clandestine_i_a ||= [] ).push prop.name_i ; nil
           end
         end ]

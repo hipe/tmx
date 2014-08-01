@@ -6,7 +6,8 @@ module Skylab::Brazen
 
         def initialize scan
           @scan = scan
-          @entity_class_hook_p = @entity_class_hook_once_p = nil
+          @entity_class_hook_p = @entity_class_hook_once_p =
+            @property_hook_p = nil
           @has_default_x = false
           @name_i = iambic_property
           @as_ivar = :"@#{ @name_i }"
@@ -29,6 +30,8 @@ module Skylab::Brazen
             :each, @name_i, @entity_class_hook_p )
           @entity_class_hook_once_p and pc.hook_shell_for_write.add_hook(
             :once, @name_i, @entity_class_hook_once_p )
+          @property_hook_p and pc.hook_shell_for_write.add_hook(
+            :prop, @name_i, @property_hook_p )
           nil
         end
 
@@ -90,6 +93,10 @@ module Skylab::Brazen
               bx.add i, true
             end
             @enum_box = bx ; nil
+          end
+
+          def property_hook
+            @property_hook_p = iambic_property
           end
 
         end ]
@@ -247,30 +254,46 @@ module Skylab::Brazen
       class Hook_Shell
         def initialize pclass
           @pclass = pclass
-          @box = Box_.new
+          @eaches_and_onces = @props = nil
         end
-        def add_hook each_or_once, metaprop_i, p
-          @box.add_or_replace metaprop_i, Hook__.new( each_or_once, p )
-          nil
+        attr_reader :props
+        def add_hook hook_variety_i, metaprop_i, p
+          send :"add_#{ hook_variety_i }_hook", metaprop_i, p ; nil
         end
-        def process_relevant_hooks reader, prop
-          hook_a = partition_relevant_hooks reader, prop
-          if hook_a
-            hook_a.each do |hook|
-              hook.p[ reader, prop ]
-            end ; nil
+      private
+        def add_each_hook mp_i, p
+          ( @eaches_and_onces ||= Box_.new ).add_or_replace mp_i,
+            Hook__.new( :each, p ) ; nil
+        end
+        def add_once_hook mp_i, p
+          ( @eaches_and_onces ||= Box_.new ).add_or_replace mp_i,
+            Hook__.new( :once, p ) ; nil
+        end
+        def add_prop_hook mp_i, p
+          ( @props ||= Box_.new ).add mp_i, p ; nil
+        end
+      public
+        def process_relevant_later_hooks reader, prop
+          if @eaches_and_onces
+            hook_a = partition_relevant_hooks reader, prop
+            if hook_a
+              hook_a.each do |hook|
+                hook.p[ prop, reader ]
+              end ; nil
+            end
           end
         end
       private
         def partition_relevant_hooks reader, prop
-          box = @box ; scn = box.get_key_scanner
+          box = @eaches_and_onces ; scn = box.get_key_scanner
           i = scn.gets ; a = nil
           begin
             prop.send( i ).nil? and next  # or whatever
             hook = box.fetch i
-            case hook.each_or_once
-            when :each ; ( a ||= [] ).push hook
-            when :once ;
+            case hook.variety_i
+            when :each
+              ( a ||= [] ).push hook
+            when :once
               reader.property_scope_krnl.
                 listener_box_for_eventpoint( :at_end_of_scope ).
                   add_if_not_has i do
@@ -283,7 +306,7 @@ module Skylab::Brazen
         end
       end
 
-      Hook__ = ::Struct.new :each_or_once, :p
+      Hook__ = ::Struct.new :variety_i, :p
 
     end
   end

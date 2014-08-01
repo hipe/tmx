@@ -7,7 +7,7 @@ module Skylab::Brazen
         :default, :one
 
 
-    o :meta_property, :default, :entity_class_hook, -> cls, prop do
+    o :meta_property, :default, :entity_class_hook, -> prop, cls do
 
       cls.add_iambic_event_listener :iambic_normalize_and_validate,
 
