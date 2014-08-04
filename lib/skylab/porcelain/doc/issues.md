@@ -1,3 +1,4 @@
+[#018] #open exodus of tree to [st]
 [#017]       forcible help #feature-point #tracking-tag
 [#016]       #doc-point exclamation points - follow ::OP convention iff
              you follow its signatures
