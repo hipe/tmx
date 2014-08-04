@@ -250,6 +250,12 @@ module Skylab::TestSupport
       String = -> do
         Basic__[]::String
       end
+
+      SubTree__ = Autoloader_.build_require_sidesystem_proc :SubTree
+
+      Tree = -> do
+        SubTree__[]::Tree
+      end
     end
   end
 end

@@ -50,11 +50,12 @@ module Skylab::SubTree
            :merge_atomic, :merge_one_dimensional,
            :merge_union ]
 
-          class << self ; private :new end
-
-          def self.[] * x_a
-            x_a.unshift :type_ish_i
-            new x_a
+          class << self
+            def build_with * x_a
+              x_a.unshift :type_ish_i
+              new x_a
+            end
+            private :new
           end
 
           attr_reader :type_ish_i, :match, :dupe, :merge_atomic,
@@ -86,7 +87,7 @@ module Skylab::SubTree
             end
           end
 
-          o = Modus_Operandus_
+          o = Modus_Operandus_.method :build_with
 
           [ o[ :nil,
                :match, -> x { x.nil? },

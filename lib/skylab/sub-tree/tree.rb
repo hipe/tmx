@@ -8,27 +8,35 @@ module Skylab::SubTree
     end
 
     Entity_ = -> client, _fields_, * i_a do
-      :fields == _fields_ or raise ::ArgumentError
+      :fields == _fields_ or raise ::ArgumentError, "'fields' not '#{ _fields_ }'"
+      SubTree_::Lib_::Funcy_globless[ client ]
+      def client.call_via_iambic x_a
+        new( x_a ).execute
+      end
       SubTree_::Lib_::Basic_fields[].with :client, client,
         :absorber, :initialize,
-        :field_i_a, i_a
-      SubTree_::Lib_::Funcy_globless[ client ] ; nil
+        :field_i_a, i_a ; nil
     end
 
-    DEFAULT_PATH_SEPARATOR_ = '/'
+    DEFAULT_PATH_SEPARATOR_ = '/'.freeze
 
     def self.new *a
       Node_.new( *a )
     end
 
     def self.from *a
-      Node_.from( *a )
+      Node_.from_mutable_args a
     end
 
     module Module_Methods__
 
-      def from *a
-        Tree::From_[ :client, self, *a ]
+      def from * a
+        from_mutable_args a
+      end
+
+      def from_mutable_args a
+        a.unshift :client, self
+        Tree::From_[ a ]
       end
 
       def path_separator
@@ -43,7 +51,7 @@ module Skylab::SubTree
         attr_reader :slug, :name_services
       end
 
-      def initialize * x_a
+      def initialize * x_a  # yes globbed, we construct these by hand
         o = Construction_.new x_a
         if (( ns = o.name_services ))
           @node_id = ns.attach_notify self

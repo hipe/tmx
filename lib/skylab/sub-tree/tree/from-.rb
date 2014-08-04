@@ -8,8 +8,8 @@ module Skylab::SubTree
       path_nodes: -> { Tree::From_path_nodes__ }
     }.freeze
 
-    From_ = -> *a do
-      H__.fetch( a.fetch( 2 ) ).call[ *a ]
+    From_ = -> x_a do
+      H__.fetch( x_a.fetch 2 )[].call_via_iambic x_a
     end
   end
 end

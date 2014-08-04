@@ -4,12 +4,12 @@ module Skylab::SubTree
 
     def self.tree_print obj, out, * x_a  # 'do_verbose_lines', 'info_p'
       _puts_p = out.respond_to?( :puts ) ? out.method( :puts ) : out
-      ctx = Context__.new _puts_p, x_a
+      ctx = Kernel__.new _puts_p, x_a
       obj.tree_print ctx
       ctx.flush ; nil
     end
 
-    class Context__
+    class Kernel__
 
       def initialize out_line_p, x_a
         @stack_label_x_a = []
