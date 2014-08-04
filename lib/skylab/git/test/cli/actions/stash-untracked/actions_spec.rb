@@ -210,12 +210,13 @@ module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked::Actions__
         _stashes_abs_pn = td.join 'stashes'
         stashes_rel_pn = _stashes_abs_pn.relative_path_from work_pn
         a = [ 'pop' ]
+        # a << '-v'  # #todo is borked
         a << '-s' << stashes_rel_pn.to_s
         a << 'dingle'
         cd work_pn.to_s do
           invoke a
         end
-        omg_a = [ 'mkdir', 'mv', 'mkdir', 2, 'mv', 6, 'rmdir' ]
+        omg_a = [ 'mkdir', 'mv', 'mkdir', 2, 'mv' ]
         str = contiguous_string_from_lines_on ERR_I
         omg str, omg_a
         _exp_s = <<-HERE.unindent

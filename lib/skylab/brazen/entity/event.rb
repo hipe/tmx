@@ -21,8 +21,16 @@ module Skylab::Brazen
 
       attr_reader :message_proc, :terminal_channel_i
 
+      def has_tag i
+        @ivar_box[ i ]
+      end
+
       def has_member i
         @ivar_box.has_name i
+      end
+
+      def first_member
+        @ivar_box.first_name
       end
 
       def members
@@ -53,7 +61,7 @@ module Skylab::Brazen
               tick_p = -> { n != ( d += 1 ) }
             end
           else
-            tick_p = -> { true }  # NILADIC_TRUTH_
+            tick_p = NILADIC_TRUTH_
           end
           super() do |line|
             @y << line
@@ -69,6 +77,29 @@ module Skylab::Brazen
             end
           end
           @y
+        end
+      end
+
+      module Simple_Listener_Broadcaster___
+
+        def self.[] mod
+          mod.include self ; nil
+        end
+
+      private
+
+        def entity_event * x_a, & p
+          broadcast_entity_event Event.new x_a, p
+        end
+
+        def broadcast_entity_event ev
+          m = :"on_entity_event_channel_#{
+            }#{ ev.terminal_channel_i }_entity_structure"
+          if @listener.respond_to? m
+            @listener.send m, ev
+          else
+            @listener.on_entity_event_channel_entity_structure ev
+          end ; nil
         end
       end
     end

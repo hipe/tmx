@@ -12,7 +12,7 @@ module Skylab::Brazen
 
       def s x
         x.respond_to?( :length ) and x = x.length
-        's' if x.nonzero?
+        's' if 1 != x
       end
 
       def code string
@@ -36,17 +36,23 @@ module Skylab::Brazen
         "'#{ _string }'"
       end
 
+      def pth x
+        x
+      end
+
       self
     end.new
 
-    h = {
-      missing_required_props: 6,
-    }.freeze
+    _ES_ = class Exit_Statii__
+      h = {
+        missing_required_props: 6,
+        is_negative: 7
+      }.freeze
+      define_method :[], & h.method( :[] )
+      define_method :fetch, & h.method( :fetch )
+      self
+    end.new
 
-    define_singleton_method :any_error_code_via_terminal_channel_i, &
-      h.method( :[] )
-
-    define_singleton_method :some_error_code_via_terminal_channel_i, &
-      h.method( :fetch )
+    define_singleton_method :exit_statii do _ES_ end
   end
 end

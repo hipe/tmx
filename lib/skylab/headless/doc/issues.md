@@ -1,3 +1,4 @@
+[#157]       #doc-node: the file utils agent
 [#156]       (reserved for a forthcoming entry about filenames)
 [#155]       (reserved for a forthcoming entry about const names)
 [#154]       #parent-node: [#095] the control flow method-naming idiomspace ..

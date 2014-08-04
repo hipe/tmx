@@ -34,20 +34,16 @@ module Skylab::Brazen
         end
       end
 
-      def to_value_array
-        scn = to_value_scanner ; a = [] ; x = nil
-        a.push x while (( x = scn.gets ))
-        a
-      end
-
       def group_by & p
-        to_value_enum.group_by( & p )
+        each_value.group_by( & p )
       end
 
-      def to_value_enum
-        ::Enumerator.new do |y|
+      def each_value
+        if block_given?
           scn = to_value_scanner ; x = nil
-          y << x while x = scn.gets ; nil
+          yield x while x = scn.gets ; nil
+        else
+          enum_for :each_value
         end
       end
 

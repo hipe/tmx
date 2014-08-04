@@ -37,7 +37,7 @@ module Skylab::Brazen::TestSupport::Entity
       end
 
       it "ok" do
-        a = MMD_Foo.properties.to_value_array
+        a = MMD_Foo.properties.each_value.to_a
         a.map( & :name_i ).should eql [ :foo, :bar, :baz ]
         a.map( & :importance ).should eql [ 10, 20, 22 ]
       end

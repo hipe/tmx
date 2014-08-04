@@ -6,27 +6,41 @@ module Skylab::Brazen
 
       class Parse_ARGV
 
-        def initialize client, action_adapter, argv
-          @client = client ; @action_adapter = action_adapter ; @argv = argv
+        def initialize argv, action_adapter, invocation
+          @action_adapter = action_adapter
+          @argv = argv
+          @invocation = invocation
           @action = @action_adapter.action
+          @did_set_h = {}
           @output_iambic = []
           @result = nil
         end
 
-        def execute
+        def produce_adapter
           partition_parameters
           rslv_option_parser
+          rslv_help_renderer
           result = parse_options
           result ||= parse_arguments
-          result || three_for_success
+          result ||= prcss_environment
+          if result
+            @invocation.set_exit_status result
+            NOTHING_
+          else
+            @action_adapter.adapter_via_iambic @output_iambic
+          end
         end
 
       private
 
         def partition_parameters
           scn = @action.get_property_scanner
-          arg_a = opt_a = nil
+          arg_a = env_a = opt_a = nil
           while (( prop = scn.gets ))
+            if prop.can_be_from_environment
+              ( env_a ||= [] ).push prop
+            end
+            prop.can_be_from_argv or next
             if prop.is_required
               ( arg_a ||= [] ).push prop
             else
@@ -38,7 +52,7 @@ module Skylab::Brazen
             ( arg_a ||= [] ).push opt_a.pop
             opt_a.length.zero? and opt_a = nil
           end
-          @opt_a = opt_a ; @arg_a = arg_a ; nil
+          @env_a = env_a ; @opt_a = opt_a ; @arg_a = arg_a ; nil
         end
 
         def rslv_option_parser
@@ -60,17 +74,19 @@ module Skylab::Brazen
             if prop.takes_argument
               args.push "#{ base } #{ argument_label_for prop }"
               p = -> x do
+                @did_set_h[ prop.name_i ] = true
                 @output_iambic.push prop.name_i, x
               end
             else
               args.push base
               p = -> _ do
+                @did_set_h[ prop.name_i ] = true
                 @output_iambic.push prop.name_i
               end
             end
             if prop.has_description
               args.concat prop.under_expression_agent_get_N_desc_lines(
-                @client.expression_agent )
+                @action_adapter.expression_agnt )
             end
             @op.on( * args, & p )
           end ; nil
@@ -97,10 +113,16 @@ module Skylab::Brazen
 
         def populate_option_parser_with_universal_options
           @op.on '-h', '--help', 'this screen' do
-            build_help.output_help_screen
+            @help_renderer.output_help_screen
             @result = SUCCESS_
           end
           nil
+        end
+
+        def rslv_help_renderer
+          @help_renderer = Action_Adapter_::Help_Renderer.new(
+            @action_adapter, @op, @arg_a, @invocation )
+          @action_adapter.set_help_renderer @help_renderer ; nil
         end
 
         def parse_options
@@ -108,16 +130,15 @@ module Skylab::Brazen
           @op.parse! @argv
           @result
         rescue ::OptionParser::ParseError => e
-          CLI::When_::Parse_Error.new( e, build_help ).execute
+          CLI::When_::Parse_Error.new( e, @help_renderer ).execute
         end
 
         def parse_arguments
           parse = Arguments__.new @argv, @arg_a
-          @action_adapter.set_help_renderer build_help
           error_event = parse.execute
           if error_event
             _meth_i = ARGV_ERROR_OP_H__.fetch error_event.event_channel_i
-            @client.send _meth_i, error_event, @action_adapter
+            @invocation.send _meth_i, error_event, @action_adapter
           else
             _x_a = parse.release_result_iambic
             @output_iambic.concat _x_a
@@ -129,13 +150,19 @@ module Skylab::Brazen
           missing: :when_missing_ARGV_arguments_event
         }.freeze
 
-        def build_help
-          Action_Adapter_::Help_Renderer.new(
-            @action_adapter, @op, @arg_a, @client )
+        def prcss_environment
+          @env_a and whn_env_a_prcss_environment
         end
 
-        def three_for_success
-          [ @action_adapter, :invoke_via_iambic, [ @output_iambic ] ]
+        def whn_env_a_prcss_environment
+          @env_a.each do |prop|
+            @did_set_h[ prop.name_i ] and next
+            prop.environment_name_i
+            s = @invocation.environment[ prop.environment_name_i ]
+            s or next
+            @output_iambic.push prop.name_i, s
+          end
+          PROCEDE_
         end
 
         class Arguments__

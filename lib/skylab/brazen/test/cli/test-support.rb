@@ -32,7 +32,7 @@ module Skylab::Brazen::TestSupport::CLI
     end
 
     def expect_errored_with i
-      expect_errd_with_d Brazen_::API.some_error_code_via_terminal_channel_i i
+      expect_errd_with_d Brazen_::API.exit_statii.fetch i
     end
 
     def expect_errored
@@ -58,15 +58,27 @@ module Skylab::Brazen::TestSupport::CLI
     attr_reader :do_debug
 
     def invoke * argv
+      invoke_via_argv argv
+    end
+
+    def invoke_via_argv argv
       grp = TestSupport_::IO::Spy::Group.new
       grp.do_debug_proc = -> { do_debug }
-      grp.debug_IO = TestSupport_::Lib_::Stderr[]
+      grp.debug_IO = debug_IO
       grp.add_stream :i, :_no_instream_
       grp.add_stream :o
       grp.add_stream :e
       @IO_spy_group = grp
-      @client = Brazen_::CLI.new( nil, * grp.values_at( :o, :e ), [ 'bzn' ] )
-      @exitstatus = @client.invoke argv ; nil
+      @invocation = Brazen_::CLI.new nil, * grp.values_at( :o, :e ), [ 'bzn' ]
+      prepare_invocation
+      @exitstatus = @invocation.invoke argv ; nil
+    end
+
+    def debug_IO
+      TestSupport_::Lib_::Stderr[]
+    end
+
+    def prepare_invocation
     end
 
     # ~ assertion phase

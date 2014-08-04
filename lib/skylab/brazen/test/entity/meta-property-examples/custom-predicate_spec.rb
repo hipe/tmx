@@ -45,7 +45,7 @@ module Skylab::Brazen::TestSupport::Entity
       end
 
       it "..can make property-based code arbitrarily more readable" do
-        hi, hey = MPEC_Business_Widget.properties.to_value_array
+        hi, hey = MPEC_Business_Widget.properties.each_value.to_a
         hi.is_necessary.should eql true
         hey.is_necessary.should eql false
       end

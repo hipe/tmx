@@ -15,7 +15,7 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
       contxt = self
       before :all do
         _the_class = nil.instance_exec( & blk )
-        _ARG_A_ = _the_class.properties.to_value_array.freeze
+        _ARG_A_ = _the_class.properties.each_value.to_a.freeze
         contxt.send :define_method, :arg_a do _ARG_A_ end
       end
     end

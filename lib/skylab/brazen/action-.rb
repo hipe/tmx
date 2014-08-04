@@ -38,12 +38,12 @@ module Skylab::Brazen
       end
     end
 
-    def invoke_via_iambic_and_client_adapter x_a, client_adapter
-      @client_adapter = client_adapter
+    def produce_adapter_via_iambic_and_adapter x_a, adapter
+      @client_adapter = adapter
       @error_count = 0
       process_iambic_fully x_a
       notificate :iambic_normalize_and_validate
-      @error_count.zero? and execute
+      @error_count.zero? and @client_adapter
     end
 
     def on_error_channel_missing_required_props_entity_structure ev

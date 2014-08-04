@@ -45,7 +45,7 @@ module Skylab::Brazen::TestSupport::Entity
       end
 
       it "..will pass thru iff that metaproperty value is true-ish.." do
-        hi, hey = MPEF_Business_Widget.properties.to_value_array
+        hi, hey = MPEF_Business_Widget.properties.each_value.to_a
         hi.is_florg.should eql true
         hey.is_florg.should eql false
       end

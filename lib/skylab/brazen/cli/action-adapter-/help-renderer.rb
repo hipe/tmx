@@ -4,7 +4,7 @@ module Skylab::Brazen
 
     class Action_Adapter_
 
-      class Help_Renderer
+      class Help_Renderer  # read [#004]
 
         def initialize action, op, arg_a, client
           @action = action ; @arg_a = arg_a ; @client = client ; @op = op

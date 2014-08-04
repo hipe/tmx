@@ -30,7 +30,7 @@ module Skylab::Brazen::TestSupport::Entity
       end
 
       it "ok", f:true do
-        hi, hey = MMPH_Business_Widget.properties.to_value_array
+        hi, hey = MMPH_Business_Widget.properties.each_value.to_a
         hi.wants_to_know.should eql true
         hey.wants_to_know.should eql nil
       end

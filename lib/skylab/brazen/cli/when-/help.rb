@@ -49,7 +49,8 @@ module Skylab::Brazen
       end
 
       def whn_action
-        @action.invoke_via_argv [ '--help' ]
+        @action.adapter_via_argv [ '--help' ]  # nil
+        SUCCESS_
       end
     end
   end

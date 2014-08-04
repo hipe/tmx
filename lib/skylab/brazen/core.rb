@@ -22,4 +22,10 @@ module Skylab::Brazen
       Callback_::Name
     end
   end
+
+  NILADIC_TRUTH_ = -> { true }
+  SLASH_ = '/'.getbyte 0
+  SPACE_ = ' '.freeze
+  UNDERSCORE_ = '_'.freeze
+
 end

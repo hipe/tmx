@@ -8,8 +8,9 @@ module Skylab::Brazen
 
     Brazen_::Entity_[ self, -> do
 
-      o :flag, :property, :verbose
+      o :environment, :non_negative_integer, :property, :MAX_NUM_DIRS
 
+      o :flag, :default, nil, :property, :verbose
 
       o :default, '.'
       o :description, "the location of the workspace"
@@ -19,5 +20,21 @@ module Skylab::Brazen
       o :required, :property, :path
 
     end ]
+
+    def execute
+      Brazen_::Models_::Workspace.status( @verbose, @path, @MAX_NUM_DIRS,
+        Responses__.new( @client_adapter ) )
+    end
+
+    class Responses__
+
+      def initialize client_adapter
+        @client_adapter = client_adapter
+      end
+
+      def on_entity_event_channel_entity_structure ev
+        @client_adapter.on_entity_event_channel_entity_structure ev ; nil
+      end
+    end
   end
 end

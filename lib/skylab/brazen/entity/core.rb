@@ -354,6 +354,10 @@ module Skylab::Brazen
         @h.key? i
       end
 
+      def first_name
+        @a.first
+      end
+
       def get_local_normal_names
         @a.dup
       end

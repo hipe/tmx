@@ -3,17 +3,19 @@ module Skylab::Brazen
   module CLI
 
     def self.new *a
-      CLI::Client__.new( *a )
+      CLI::Invocation__.new( *a )
     end
 
     # ~ main CLI hand-made implementation
 
-    class Client__
+    class Invocation__
 
       def initialize i, o, e, mutable_invocation_string_parts=nil
         init_mutable_invocation_string_parts mutable_invocation_string_parts
+        @environment = nil
         @stdout = o ; @stderr = e
       end
+      attr_writer :environment
     private
       def init_mutable_invocation_string_parts a
         a && a.last.nil? and a[ a.length - 1 ] = "brazen"  # bugfix for 'tmx -h'
@@ -24,10 +26,12 @@ module Skylab::Brazen
 
       def invoke argv
         @argv = argv
-        if argv.length.nonzero? && DASH__ != argv.first.getbyte( 0 )
-          invoke_when_action_argument
-        else
+        if argv.length.zero? || DASH__ == argv.first.getbyte( 0 )
           invoke_when_no_action_argument
+        else
+          adapter = adapter_when_action_token
+          adapter && adapter.execution_receiver.execute
+          @exit_status
         end
       end
 
@@ -78,18 +82,26 @@ module Skylab::Brazen
         CLI::When_::Unhandled_Arguments.new @argv, self
       end
 
-      def invoke_when_action_argument
+      def adapter_when_action_token
         matching_actions = find_matching_actions_with_token @argv.shift
         case matching_actions.length
-        when 0 ; invoke_when_no_matching_action
-        when 1 ; matching_actions.first.invoke_via_argv @argv
-        else   ; invoke_when_ambiguous_matching_actions
+        when 0
+          @exit_status = invoke_when_no_matching_action
+        when 1
+          adapter = matching_actions.first.adapter_via_argv @argv
+        else
+          @exit_status = invoke_when_ambiguous_matching_actions
         end
+        adapter
       end
 
     public  # ~ interface for agents
 
       attr_reader :stderr
+
+      def environment
+        @environment || ::ENV
+      end
 
       def find_matching_actions_with_token tok
         @token = tok
@@ -139,6 +151,10 @@ module Skylab::Brazen
           @invocation_str_a.last.intern )
       end
 
+      def set_exit_status d
+        @exit_status = d ; nil
+      end
+
       # ~ for ad-hoc facet agents
 
       def when_extra_ARGV_arguments_event ev, action_adapter
@@ -154,7 +170,7 @@ module Skylab::Brazen
       # ~ deep API for agents
 
       def actions
-        @actions ||= Actions__.new krnl, self
+        @actions ||= Actions__.new self, krnl
       end
 
     private
@@ -164,8 +180,8 @@ module Skylab::Brazen
     end
 
     class Actions__
-      def initialize krnl, client
-        @client = client ; @kernel = krnl
+      def initialize invocation, krnl
+        @invocation = invocation ; @kernel = krnl
       end
       def visible
         self
@@ -176,15 +192,15 @@ module Skylab::Brazen
       end
       def get_scanner
         Brazen_::Scanner_::Wrapper.new @kernel.get_action_scanner do |action|
-          Action_Adapter_.new action, @client
+          Action_Adapter_.new @invocation, action
         end
       end
     end
 
     class Action_Adapter_
 
-      def initialize action, client
-        @action = action ; @client = client
+      def initialize invocation, action
+        @action = action ; @invocation = invocation
         @hr = nil
       end
 
@@ -210,36 +226,55 @@ module Skylab::Brazen
         @hr.produce_main_syntax_string
       end
 
-      def invoke_via_argv argv
-        x, method_i, args =
-          Action_Adapter_::Parse_ARGV.new( @client, self, argv ).execute
-        if method_i
-          x.send method_i, * args
-        else
-          x || GENERIC_ERROR_
-        end
+      def adapter_via_argv argv
+        Action_Adapter_::Parse_ARGV.new(
+          argv, self, @invocation ).produce_adapter
       end
 
-      def invoke_via_iambic x_a
-        @exit_status = nil
-        @action.invoke_via_iambic_and_client_adapter x_a, self
-        @exit_status
+      def adapter_via_iambic x_a
+        @action.produce_adapter_via_iambic_and_adapter x_a, self
       end
 
       def on_error_channel_entity_structure ev
-        ev.render_all_lines_into_under @hr.y, @client.expression_agent
+        ev.render_all_lines_into_under @hr.y, expr_agent
         @hr.output_invite_to_general_help
-        @exit_status = rslv_some_exit_status_via_event_structure ev
-        nil
+        set_ext_status some_err_code_for_event ev ; nil
+      end
+
+      def on_entity_event_channel_entity_structure ev
+        ev.render_all_lines_into_under @hr.y, expr_agent
+        ev.has_tag :is_negative and
+          set_ext_status some_ext_status_for_chan_i :is_negative ; nil
+      end
+
+      def execution_receiver
+        @action
       end
 
     private
 
-      def rslv_some_exit_status_via_event_structure ev
-        if ev.has_member :error_code then ev.error_code else
-          Brazen_::API.any_error_code_via_terminal_channel_i(
-            ev.terminal_channel_i ) || GENERIC_ERROR_
-        end
+      def expr_agent
+        @invocation.expression_agent
+      end
+
+      def set_ext_status d
+        @invocation.set_exit_status d ; nil
+      end
+
+      def some_err_code_for_event ev
+        any_err_code_for_event( ev ) || GENERIC_ERROR_
+      end
+
+      def any_err_code_for_event ev
+        any_ext_status_for_chan_i ev.terminal_channel_i
+      end
+
+      def some_ext_status_for_chan_i i
+        Brazen_::API.exit_statii.fetch i
+      end
+
+      def any_ext_status_for_chan_i i
+        Brazen_::API.exit_statii[ i ]
       end
 
       Autoloader_[ self ]
@@ -251,7 +286,7 @@ module Skylab::Brazen
 
       def s x
         x.respond_to?( :length ) and x = x.length
-        's' if x.nonzero?
+        's' if 1 != x
       end
 
       GREEN__ = 32
@@ -280,9 +315,23 @@ module Skylab::Brazen
         highlight "<#{ _string }>"
       end
 
+      def pth s
+        if s.respond_to? :to_path
+          s = s.to_path
+        end
+        if DIR_SEP__ == s.getbyte( 0 )
+          self.class::Pretty_Path__.new( s ).execute
+        else
+          s
+        end
+      end
+      DIR_SEP__ = '/'.getbyte 0
+
       def stylize style_d_a, string
         "\e[#{ style_d_a.map( & :to_s ).join( ';' ) }m#{ string }\e[0m"
       end
+
+      Autoloader_[ self ]
     end
 
     module Lib_
@@ -293,9 +342,7 @@ module Skylab::Brazen
     end
 
     GENERIC_ERROR_ = 5
-    PROCEDE_ = nil
+    NOTHING_ = PROCEDE_ = nil
     SUCCESS_ = 0
-    SPACE_ = ' '.freeze
-    UNDERSCORE_ = '_'.freeze
   end
 end

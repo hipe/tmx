@@ -22,6 +22,14 @@ module Skylab::Brazen
           end
         end
 
+    o :meta_property, :has_ad_hoc_normalizers,
+        :entity_class_hook, -> prop, cls do
+          cls.add_iambic_event_listener :iambic_normalize_and_validate,
+          -> obj do
+            obj.aply_ad_hoc_normalizers prop ; nil
+          end
+        end
+
     o :meta_property, :parameter_arity,
         :enum, [ :zero_or_one, :one ],
         :default, :zero_or_one,
@@ -37,15 +45,26 @@ module Skylab::Brazen
           end
         end
 
+    add_iambic_event_listener :iambic_normalize_and_validate, -> obj do
+      obj.nilify_all_ivars_not_defined
+    end
 
     property_class_for_write  # flush the above to get the below
 
     class self::Property
 
       def initialize( * )
+        @can_be_from_argv = true
         @desc_p_a = nil
         @default = nil
         super
+      end
+
+      attr_reader :ad_hoc_normalizer, :norm_p_a
+      attr_reader :can_be_from_argv, :can_be_from_environment
+
+      def environment_name_i
+        "BRAZEN_#{ @name.as_variegated_symbol }"
       end
 
       def has_default
@@ -69,6 +88,13 @@ module Skylab::Brazen
         :one == @argument_arity
       end
 
+    private
+
+      def add_ad_hoc_normalizer & p
+        @has_ad_hoc_normalizers = true
+        ( @norm_p_a ||= [] ).push p
+      end
+
       o do
 
         o :iambic_writer_method_name_suffix, :'='
@@ -82,18 +108,66 @@ module Skylab::Brazen
           ( @desc_p_a ||= [] ).push x
         end
 
+        def environment=
+          @can_be_from_argv = false
+          @can_be_from_environment = true
+        end
+
         def flag=
           @argument_arity = :zero
+        end
+
+        def non_negative_integer=
+          add_ad_hoc_normalizer do |x, prop, val_p, ev_p|
+            x.nil? or NORMALIZE_NON_NEGATIVE_INTEGER__[ x, prop, val_p, ev_p ]
+          end
         end
 
         def required=
           @parameter_arity = :one
         end
       end
+
+      NORMALIZE_NON_NEGATIVE_INTEGER__ = -> x, prop, val_p, ev_p do
+        md = INTEGER_RX__.match x
+        if md
+          d = md[ 0 ].to_i
+          if 0 > d
+            ev_p[ :error, :invalid_non_negative_integer, :x, d, :prop, prop,
+              -> y, o do
+                y << "#{ par o.prop } must be non-negative, had #{ ick o.x }"
+              end ]
+          else
+            val_p[ d ]
+          end
+        else
+          ev_p[ :error, :invalid_non_negative_integer, :x, x, :prop, prop,
+            -> y, o do
+              y << "#{ par o.prop } must be a non-negative integer, #{
+                }had #{ ick o.x }"
+          end ]
+        end ; nil
+      end
+
+      INTEGER_RX__ = /\A-?\d+\z/
     end
   end ]
 
   module Entity_
+
+    def aply_ad_hoc_normalizers prop  # this evolved from [#fa-019]
+      ivar = prop.as_ivar
+      prop.norm_p_a.each do |p|
+        p[ ( instance_variable_get ivar if instance_variable_defined? ivar ),
+          prop,
+          -> x do
+            instance_variable_set ivar, x
+          end,
+          -> i, * x_a, p_ do
+            on_channel_entity_structure i, Brazen_::Entity::Event.new( x_a, p_ )
+          end ]
+      end ; nil
+    end
 
     def aply_dflt_value_if_necessary prop
       ivar = prop.as_ivar
@@ -114,6 +188,14 @@ module Skylab::Brazen
         m
       end
       miss_a.length.nonzero? and whine_about_missing_reqd_props miss_a ; nil
+    end
+
+    def nilify_all_ivars_not_defined
+      self.class.properties.each_value do |prop|
+        if ! instance_variable_defined? prop.as_ivar
+          instance_variable_set prop.as_ivar, nil
+        end
+      end ; nil
     end
 
   private
