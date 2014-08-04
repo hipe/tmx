@@ -1,6 +1,6 @@
 module Skylab::TestSupport
 
-  module System  # [#057]:the-system-node
+  module System  # [#035]:the-system-node
     class << self
       def stderr
         Lib_::Stderr[]
@@ -8,7 +8,7 @@ module Skylab::TestSupport
     end
   end
 
-  module Library_  # read [#057] the library narrative #into. :+[#su-001]
+  module Library_  #  :+[#su-001]
 
     gemlib = stdlib = Autoloader_.method :require_stdlib
 
@@ -134,7 +134,7 @@ module Skylab::TestSupport
     end
 
     Stderr = -> { ::STDERR }
-      # [#057]:the-reasons-to-access-system-resources-this-way
+      # [#035]:the-reasons-to-access-system-resources-this-way
     Stdout = -> { ::STDOUT }
 
     Skylab__ = memoize[ -> do

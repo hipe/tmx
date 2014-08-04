@@ -10,7 +10,7 @@
 [#060]       #done separate general from specific "method touch"
 [#059]       #done get rid of all old autoloader dependencies at this node
 [#058]       #doc-point the "touch method" function ..
-[#057]       #doc-point the library narrative ..
+[#057] #hole (moved to [#ts-035]. was: the library narrative)
 [#056]       #node-tracker :#contoured-fields
 [#055]       #doc-point the module node narrative ..
 [#054]       #formal-box:struct #doc-point (all notes)..

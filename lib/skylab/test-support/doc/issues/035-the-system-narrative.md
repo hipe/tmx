@@ -1,11 +1,6 @@
-# the library narrative :[#057]
+# the system narrative :[#035]
 
 ## :#intro
-
-this node strongly follows the [#ss-001] library adapter pattern.
-
-
-## :#the-system-node
 
 the "system" node is part of [ts]'s public API, and provides a universally
 consistent way for sidesystem to access these resources.
