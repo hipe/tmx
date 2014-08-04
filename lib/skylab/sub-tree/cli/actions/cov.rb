@@ -18,7 +18,7 @@ module Skylab::SubTree
     # order matters above - since test nodes get merged destructively into
     # code nodes, the order is as such and never the reverse.
 
-    Lib_::Basic_Fields[ :client, self,
+    Lib_::Basic_fields[ :client, self,
       :absorber, :absrb_iambic_fully,
       :field_i_a, [ :list_as, :path, :be_verbose ] ]
 

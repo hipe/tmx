@@ -4,7 +4,7 @@ module Skylab::SubTree
 
     class Extensions_::Mtime_
 
-      SubTree::Lib_::Basic_Fields[ :client, self,
+      SubTree::Lib_::Basic_fields[ :client, self,
         :absorber, :absrb_iambic_fully,
         :field_i_a, [ :local_normal_name, :infostream, :verbose ]]
 

@@ -1,15 +1,15 @@
 require_relative 'test-support'
 
-module Skylab::Porcelain::TestNamespace
+module Skylab::SubTree::TestSupport::Tree
 
-  describe "[po] tree mege fun" do
+  describe "[st] tree mege fun" do
 
     it "loads" do
-      Tree::Merge_::FUN
+      fun
     end
 
     def fun
-      Tree::Merge_::FUN
+      Subject_[]::Merge_::FUN
     end
 
     it "merge two ints" do

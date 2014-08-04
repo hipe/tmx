@@ -1,17 +1,17 @@
 require_relative '../test-support'
 
-module Skylab::Porcelain::TestSupport::Tree::From_PN__
+module Skylab::SubTree::TestSupport::Tree::From_PN__
 
-  ::Skylab::Porcelain::TestSupport::Tree[ TS__ = self ]
+  ::Skylab::SubTree::TestSupport::Tree[ TS__ = self ]
 
   include CONSTANTS
 
   extend TestSupport::Quickie
 
-  describe "[po] tree from path nodes" do
+  describe "[st] tree from path nodes" do
 
     it "so what" do
-      hi = Porcelain::Tree.from :path_nodes, [ path_node_one, path_node_two ]
+      hi = Subject_[].from :path_nodes, [ path_node_one, path_node_two ]
       hi.children_count.should eql 2
       one, two = hi.children.to_a
       one.slug.should eql "hi_there"

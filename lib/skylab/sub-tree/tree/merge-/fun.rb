@@ -1,4 +1,4 @@
-module Skylab::Porcelain
+module Skylab::SubTree
 
   module Tree
 
@@ -67,7 +67,7 @@ module Skylab::Porcelain
           identity = IDENTITY_
 
           an = -> x do
-            an = Porcelain_::Lib_::NLP[]::EN::Minitesimal::FUN.an
+            an = SubTree_::Lib_::NLP[]::EN::Minitesimal::FUN.an
             an[ x ]
           end
 
@@ -152,7 +152,7 @@ module Skylab::Porcelain
             end
           end
           -> x do
-            Porcelain_::Lib_::Function_chain[ f_a, [ x ] ]
+            SubTree_::Lib_::Function_chain[ f_a, [ x ] ]
           end
         end.call
       end

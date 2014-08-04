@@ -1,12 +1,12 @@
-module Skylab::Porcelain
+module Skylab::SubTree
 
   class Tree::Traversal
 
     class Scanner_
 
-      Porcelain_::Lib_::Funcy_globful[ self ]
+      SubTree_::Lib_::Funcy_globful[ self ]
 
-      Porcelain_::Lib_::Basic_Fields[ :client, self,
+      SubTree_::Lib_::Basic_fields[ :client, self,
         :absorber, :absrb_iambic_fully,
         :field_i_a, [ :glyphset_x ]]
 

@@ -1,14 +1,14 @@
 require_relative 'test-support'
 
-module Skylab::Porcelain::TestSupport::Tree::Traversal_Scanner
+module Skylab::SubTree::TestSupport::Tree::Traversal_Scanner
 
-  ::Skylab::Porcelain::TestSupport::Tree[ self ]
+  ::Skylab::SubTree::TestSupport::Tree[ self ]
 
   include CONSTANTS
 
   extend TestSupport::Quickie
 
-  describe "[po] tree traversal scanner" do
+  describe "[st] tree traversal scanner" do
 
     it "3 node triangle" do
       tree = fp 'a/b', 'a/c'
@@ -59,7 +59,7 @@ module Skylab::Porcelain::TestSupport::Tree::Traversal_Scanner
     end
 
     def fp * x_a
-      Tree.from :paths, x_a
+      Subject_[].from :paths, x_a
     end
   end
 end

@@ -29,7 +29,7 @@ module Skylab::SubTree
 
     class Extensions_
 
-      SubTree_::Lib_::Basic_Fields[ :client, self,
+      SubTree_::Lib_::Basic_fields[ :client, self,
         :globbing, :absorber, :initialize,
         :field_i_a, [ :arg_box, :infostream, :verbose ]]
 

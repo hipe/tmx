@@ -1,11 +1,11 @@
 require_relative 'test-support'
 
-module Skylab::Porcelain::TestNamespace
+module Skylab::SubTree::TestSupport::Tree
 
-  describe "[po] tree merge" do
+  describe "[st] tree merge" do
 
     def tree_from_paths a
-      Tree.from :paths, a
+      Subject_[].from :paths, a
     end
 
     it "merge monadic trees - different" do

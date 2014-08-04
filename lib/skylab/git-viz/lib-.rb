@@ -87,10 +87,13 @@ module Skylab::GitViz
     end
 
     StringScanner = memo[ -> do require 'strscan' ; ::StringScanner end ]
+
+    SubTree__ = sidesys[ :SubTree ]
+
     TestSupport = wall[ :TestSupport ]
 
     Tree = -> do
-      Porcelain__[]::Tree
+      SubTree__[]::Tree
     end
 
     Unstyle_styled = -> x do

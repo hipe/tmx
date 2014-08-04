@@ -8,6 +8,7 @@ module Skylab::SubTree
     o[ :Open3 ] = stdlib
     o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
     o[ :Set  ] = o[ :Shellwords ] = o[ :StringIO ] = stdlib
+    o[ :StringIO ] = stdlib
     o[ :StringScanner ] = -> _ { require 'strscan' ; ::StringScanner }
     o[ :Time ] = stdlib
 
@@ -30,8 +31,12 @@ module Skylab::SubTree
 
     Basic__ = sidesys[ :Basic ]
 
-    Basic_Fields = -> * x_a do
-      MetaHell__[]::Basic_Fields.via_iambic x_a
+    Basic_fields = -> * x_a do
+      if x_a.length.zero?
+        MetaHell__[]::Basic_Fields
+      else
+        MetaHell__[]::Basic_Fields.via_iambic x_a
+      end
     end
 
     Bound_field_reflection_class = -> do
@@ -102,7 +107,7 @@ module Skylab::SubTree
       client = x_a.fetch 0
       :fields == x_a.fetch( 1 ) or raise ::ArgumentError
       x_a[ 0, 2 ] = EMPTY_A__
-      Basic_Fields[ :client, client,
+      Basic_fields[ :client, client,
         :absorber, :initialize,
         :field_i_a, x_a ]
     end
@@ -116,6 +121,10 @@ module Skylab::SubTree
 
     Fields_from_methods = -> *a, p do
       MetaHell__[]::Fields::From.methods.iambic_and_block a, p
+    end
+
+    Function_chain = -> x, y do
+      MetaHell__[]::FUN::Function_chain_[ x, y ]
     end
 
     Funcy_globful = -> x do
@@ -139,6 +148,10 @@ module Skylab::SubTree
     InformationTactics__ = sidesys[ :InformationTactics ]
 
     MetaHell__ = sidesys[ :MetaHell ]
+
+    NLP = -> do
+      Headless__[]::NLP
+    end
 
     Order_proxy = -> x do
       Basic__[]::Hash::Order_Proxy.new x
@@ -180,17 +193,8 @@ module Skylab::SubTree
       MetaHell__[]::FUN::Touch_constant_reader_[ *a ]
     end
 
-    Tree_traversal = -> do
-      Treelib__[]::Traversal.new
-    end
-
-    Tree_MMs_and_IMs = -> mod do
-      _tree = Treelib__[]
-      mod.extend _tree::ModuleMethods
-      mod.include _tree::InstanceMethods
-    end
-
     Treelib__ = memo[ -> do
+
       Porcelain__[]::Tree
     end ]
 

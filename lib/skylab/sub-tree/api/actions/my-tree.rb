@@ -4,7 +4,7 @@ module Skylab::SubTree
 
     SubTree::Lib_::Enhance_as_API_normalizer[ self, :all ]
 
-    Lib_::Basic_Fields[ :client, self,
+    Lib_::Basic_fields[ :client, self,
       :absorber, :absrb_iambic_fully,
       :passive, :absorber, :absorb_iambic_passively,  # until [#mh-067]
       :field_i_a, [ :expression_agent, :program_name, :param_h,

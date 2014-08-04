@@ -10,10 +10,6 @@ module Skylab::Porcelain
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
-  IDENTITY_ = -> x { x }
-
-  EMPTY_P_ = -> { }
-
   stowaway :Lib_, 'library-'
 
 end

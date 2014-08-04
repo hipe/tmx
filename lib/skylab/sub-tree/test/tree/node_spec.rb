@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::Porcelain::TestNamespace
+module Skylab::SubTree::TestSupport::Tree
 
-  describe "[po] tree node" do
+  describe "[st] tree node" do
 
     let(:paths) { [
       'a',
@@ -12,7 +12,7 @@ module Skylab::Porcelain::TestNamespace
     ] }
 
     it "does paths to tree and vice-versa" do
-      node = Porcelain::Tree.from :paths, paths
+      node = Subject_[].from :paths, paths
       paths_ = node.to_paths
       want = <<-HERE.unindent
        a
@@ -26,7 +26,7 @@ module Skylab::Porcelain::TestNamespace
     end
 
     context "with regards to longest common base path" do
-      let(:tree) { Porcelain::Tree.from :paths, paths }
+      let(:tree) { Subject_[].from :paths, paths }
       let :subject do tree.longest_common_base_path end
       context "when empty" do
         let(:paths) { %w() }

@@ -2,12 +2,11 @@
 
 require_relative 'test-support'
 
-module Skylab::Porcelain::TestNamespace
-  # (above line left intact for posterity)
+module Skylab::SubTree::TestSupport::Tree
 
-  describe "[po] tree" do
+  describe "[st] tree" do
     it "renders a pretty tree" do
-      node = Porcelain::Tree.from :hash,
+      node = Subject_[].from :hash,
         { :name => "document",
           :children => [
             { :name => "head" },
@@ -56,3 +55,4 @@ module Skylab::Porcelain::TestNamespace
     end
   end
 end
+# #tombstone artifact

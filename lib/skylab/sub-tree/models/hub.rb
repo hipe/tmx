@@ -2,7 +2,7 @@ module Skylab::SubTree
 
   class Models::Hub
 
-    Lib_::Basic_Fields[ :client, self,
+    Lib_::Basic_fields[ :client, self,
       :absorber, :absrb_iambic_fully,
       :field_i_a, [ :test_dir_pn, :sub_path_a, :local_test_pathname_ea,
                    :lister_p, :info_tree_p ] ]

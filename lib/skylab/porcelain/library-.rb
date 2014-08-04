@@ -5,7 +5,6 @@ module Skylab::Porcelain
     o = { }
     o[ :Basic ] = -> _ { require 'skylab/basic/core' ; ::Skylab::Basic }
     o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
-    o[ :StringIO ] = Autoloader_.method :require_stdlib
     o[ :StringScanner ] = -> _ { require 'strscan' ; ::StringScanner }
 
     define_singleton_method :const_missing do |c|
@@ -15,26 +14,9 @@ module Skylab::Porcelain
 
   module Lib_
     sidesys = Autoloader_.build_require_sidesystem_proc
-    Basic_Fields = -> * x_a do
-      if x_a.length.zero?
-        MetaHell__[]::Basic_Fields
-      else
-        MetaHell__[]::Basic_Fields.via_iambic x_a
-      end
-    end
     CLI = -> do
       Headless__[]::CLI
     end
-    Function_chain = -> x, y do
-      MetaHell__[]::FUN::Function_chain_[ x, y ]
-    end
-    Funcy_globless = -> client do
-      MetaHell__[].funcy_globless client
-    end
-    Funcy_globful = -> client do
-      MetaHell__[].funcy_globful client
-    end
-    MetaHell__ = MetaHell_ = sidesys[ :MetaHell ]
     NLP = -> do
       Headless__[]::NLP
     end

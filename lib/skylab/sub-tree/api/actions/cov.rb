@@ -11,7 +11,7 @@ module Skylab::SubTree
                 info_tree: :structural
 
 
-    SubTree_::Lib_::Basic_Fields[ :client, self,
+    SubTree_::Lib_::Basic_fields[ :client, self,
       :absorber, :absrb_iambic_fully,
       :field_i_a, [ :list_as, :path, :be_verbose ]]
 

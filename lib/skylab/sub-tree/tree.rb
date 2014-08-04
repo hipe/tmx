@@ -1,17 +1,18 @@
-module Skylab::Porcelain
+module Skylab::SubTree
 
   module Tree
 
-    def self.[] mod
-      mod.extend ModuleMethods ; mod.send :include, InstanceMethods ; nil
+    def self.enhance_with_module_methods_and_instance_methods mod
+      mod.extend Module_Methods__
+      mod.include Instance_Methods__ ; nil
     end
 
     Entity_ = -> client, _fields_, * i_a do
       :fields == _fields_ or raise ::ArgumentError
-      Porcelain_::Lib_::Basic_Fields[].with :client, client,
+      SubTree_::Lib_::Basic_fields[].with :client, client,
         :absorber, :initialize,
         :field_i_a, i_a
-      Porcelain_::Lib_::Funcy_globless[ client ] ; nil
+      SubTree_::Lib_::Funcy_globless[ client ] ; nil
     end
 
     DEFAULT_PATH_SEPARATOR_ = '/'
@@ -24,7 +25,7 @@ module Skylab::Porcelain
       Node_.from( *a )
     end
 
-    module ModuleMethods
+    module Module_Methods__
 
       def from *a
         Tree::From_[ :client, self, *a ]
@@ -35,7 +36,7 @@ module Skylab::Porcelain
       end
     end
 
-    module InstanceMethods
+    module Instance_Methods__
 
       class Construction_
         Entity_[ self, :fields, :slug, :name_services ]
@@ -309,8 +310,7 @@ module Skylab::Porcelain
     end
 
     class Node_
-      extend ModuleMethods
-      include InstanceMethods
+      Tree.enhance_with_module_methods_and_instance_methods self
     end
   end
 end

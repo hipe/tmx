@@ -12,7 +12,7 @@ module Skylab::SubTree
         @hub_a.length.nonzero? or fail "sanity"
         begin
           r = uber_tree = get_uber_tree or break
-          trav = SubTree::Lib_::Tree_traversal[]
+          trav = SubTree_::Tree::Traversal.new
           trav.traverse uber_tree do |card|
             card.prefix = trav.prefix card
             @card_p[ card ]

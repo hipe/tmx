@@ -30,6 +30,10 @@ module Skylab::SubTree
     SubTree_::Lib_::Entity_via_iambic[ x_a ]
   end
 
+  EMPTY_P_ = -> { }
+
+  IDENTITY_ = -> x { x }
+
   stowaway :Lib_, 'library-'
 
   Name_ = Callback_::Name

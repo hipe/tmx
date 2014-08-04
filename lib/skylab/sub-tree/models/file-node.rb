@@ -2,7 +2,7 @@ module Skylab::SubTree
 
   class Models::FileNode
 
-    SubTree::Lib_::Tree_MMs_and_IMs[ self ]
+    SubTree_::Tree.enhance_with_module_methods_and_instance_methods self
 
     def initialize( * )
       super

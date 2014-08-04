@@ -11,7 +11,7 @@ module Skylab::SubTree
       # by simply returning a symbolic method-ish name when relevant, to
       # indicate that there may be more rendering that needs to be done.
 
-      SubTree_::Lib_::Basic_Fields[ :client, self,
+      SubTree_::Lib_::Basic_fields[ :client, self,
         :globbing, :absorber, :initialize,
         :field_i_a, [ :emit_p, :hubs, :did_error_p, :list_as ]]
 

@@ -2,7 +2,7 @@ module Skylab::GitViz
 
   class Models_::File_Node
 
-    GitViz::Lib_::Tree[][ self ]
+    GitViz::Lib_::Tree[].enhance_with_module_methods_and_instance_methods self
 
     def self.[] * x_a
       Build_Tree_Node__.build_tree_node x_a do |bld|

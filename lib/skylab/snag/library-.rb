@@ -11,7 +11,6 @@ module Skylab::Snag
     o[ :Porcelain__ ] = -> _ { subsystem[ :Porcelain ] }
     o[ :Shellwords ] = stdlib
     o[ :StringScanner ] = -> _ { require 'strscan' ; ::StringScanner }
-    o[ :Tree ] = -> _ { self::Porcelain__::Tree }
 
     def self.const_missing c
       if (( p = self::H_[ c ] ))
@@ -77,11 +76,15 @@ module Skylab::Snag
     Sub_client = -> do
       Headless__[]::SubClient  # :+#deprecation:watch
     end
+    SubTree__ = sidesys[ :SubTree ]
     Text_patch = -> do
       Headless__[]::Text::Patch
     end
     Tmpdir_pathname = -> do
       Headless__[]::System.defaults.tmpdir_pathname
+    end
+    Tree = -> do
+      SubTree__[]::Tree
     end
     Writemode = -> do
       Headless__[]::WRITEMODE_

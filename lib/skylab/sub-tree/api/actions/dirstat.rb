@@ -149,7 +149,7 @@ module Skylab::SubTree
     # gain 2
     end
 
-    SubTree_::Lib_::Basic_Fields[ :client, self,
+    SubTree_::Lib_::Basic_fields[ :client, self,
       :field_i_a, Money_.parameters.map( & :last ) ]
 
     def execute

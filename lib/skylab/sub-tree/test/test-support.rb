@@ -10,6 +10,7 @@ module Skylab::SubTree::TestSupport
 
   module CONSTANTS
     SubTree = ::Skylab::SubTree
+    SubTree_ = SubTree
     TestSupport = ::Skylab::TestSupport
   end
 
