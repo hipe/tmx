@@ -41,7 +41,7 @@ module Skylab::Brazen
               ( env_a ||= [] ).push prop
             end
             prop.can_be_from_argv or next
-            if prop.is_required
+            if prop.is_actually_required
               ( arg_a ||= [] ).push prop
             else
               ( opt_a ||= [] ).push prop
@@ -193,7 +193,7 @@ module Skylab::Brazen
             # we are ignoring the idea of #globbing for now
 
             a = @arg_a.length.times.reduce [] do |m, d|
-              if ! @arg_a[ d ].is_required
+              if ! @arg_a[ d ].is_actually_required
                 if m.length.nonzero?
                   m.last == d - 1 or raise say_bad_optional_indexes( m, d )
                 end

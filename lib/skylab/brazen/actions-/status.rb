@@ -10,14 +10,15 @@ module Skylab::Brazen
 
       o :environment, :non_negative_integer, :property, :MAX_NUM_DIRS
 
-      o :flag, :default, nil, :property, :verbose
+      o :flag, :property, :verbose
 
-      o :default, '.'
-      o :description, "the location of the workspace"
-      o :description, -> y do
-        y << "it's #{ highlight 'really' } neat"
-      end
-      o :required, :property, :path
+      o :default, '.',
+        :description, "the location of the workspace",
+        :description, -> y do
+          y << "it's #{ highlight 'really' } neat"
+        end,
+        :required,
+        :property, :path
 
     end ]
 

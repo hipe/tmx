@@ -58,6 +58,15 @@ module Skylab::Brazen::TestSupport::CLI::Actions
         with_max_num_dirs '1'
         it "not found, and note the language change" do
           invoke '.'
+          expect_same_result
+        end
+
+        it "with no path argument, uses default of '.' (same as above)" do
+          invoke
+          expect_same_result
+        end
+
+        def expect_same_result
           expect :styled, "'#{ filename }' not found in ."
           expect_negative_exitstatus
         end

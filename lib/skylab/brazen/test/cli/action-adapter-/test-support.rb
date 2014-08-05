@@ -83,6 +83,10 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
             ! @default.nil?
           end
 
+          def is_actually_required
+            is_required
+          end
+
           def is_required
             :one == @parameter_arity
           end

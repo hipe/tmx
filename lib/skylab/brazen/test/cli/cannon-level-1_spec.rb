@@ -8,12 +8,7 @@ module Skylab::Brazen::TestSupport::CLI
 
     # it "  0)  no arguments"
 
-    it "1.1)  strange argument" do
-      invoke 'st', ''
-      expect_missing_required_property :path
-      expect_invite_line
-      expect_errored_with :missing_required_props
-    end
+    # it "1.1)  strange argument"
 
     it "1.2)  strange option - ( E I )" do
       invoke 'st', '-z'

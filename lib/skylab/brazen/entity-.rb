@@ -35,7 +35,8 @@ module Skylab::Brazen
         :default, :zero_or_one,
         :entity_class_hook_once, -> cls do
 
-          req_a = cls.properties.reduce_by( & :is_required ).to_a.freeze
+          req_a = cls.properties.reduce_by( & :is_actually_required ).to_a.freeze
+
           if req_a.length.nonzero?
 
             cls.add_iambic_event_listener :iambic_normalize_and_validate,
@@ -78,6 +79,10 @@ module Skylab::Brazen
       def under_expression_agent_get_N_desc_lines expression_agent, n=nil
         Brazen_::Lib_::N_lines[].
           new( [], n, @desc_p_a, expression_agent ).execute
+      end
+
+      def is_actually_required  # see [#006]
+        is_required && ! has_default
       end
 
       def is_required
