@@ -25,7 +25,7 @@ module Skylab::TestSupport
 
       def when_there_is_one_path
         @path_s = @path_a.fetch 0 ; @path_a = nil
-        @lcbp_a = @path_s.split( SEP__ )
+        @lcbp_a = @path_s.split( SEP_ )
         @test_dir_idx = @lcbp_a.index( & QuicLib_::Match_test_dir_proc[] )
         if @test_dir_idx
           money_for_single_path
@@ -78,14 +78,13 @@ module Skylab::TestSupport
       end
 
       def when_failed_to_find_test_directory
-        @y << "(failed to find test directory - #{ @lcbp_a * SEP__ })"
+        @y << "(failed to find test directory - #{ @lcbp_a * SEP_ })"
         FAILED__
       end
-      SEP__ = '/'.freeze
 
       def when_found_test_directory
         @lcbp_a[ @test_dir_idx, 1 ] = EMPTY_A_
-        path_prefix = procure_any_pth_prefix_from_LCBP @lcbp_a * SEP__
+        path_prefix = procure_any_pth_prefix_from_LCBP @lcbp_a * SEP_
         path_prefix and start_service_with_path_prefix path_prefix
       end
 
@@ -93,7 +92,7 @@ module Skylab::TestSupport
         pn = ::Pathname.new( longest_common_base_path ).expand_path
         tried_a = nil
         begin
-          SEP__ == pn.instance_variable_get( :@path ) and break( did_fail = true )
+          SEP_ == pn.instance_variable_get( :@path ) and break( did_fail = true )
           pn.directory? and break
           (( pn_ = pn.sub_ext Autoloader_::EXTNAME )).exist? and break
           (( tried_a ||= [] )) << pn_
@@ -155,7 +154,7 @@ module Skylab::TestSupport
         end
 
         nonzero = -> path_a do
-          res_a = [] ; path_a_a = path_a.map { |x| x.split SEP__ }
+          res_a = [] ; path_a_a = path_a.map { |x| x.split SEP_ }
           visit = visitor_p[ path_a_a, res_a ]
           nil while visit[]
           res_a

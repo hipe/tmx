@@ -77,6 +77,14 @@ module Skylab::TestSupport
       def build_fuzzy_flag a
         @svc.build_fuzzy_flag a
       end
+
+      def build_required_arg_switch a
+        @svc.build_required_arg_switch a
+      end
+
+      def replace_test_path_s_a path_s_a
+        @svc.replace_test_path_s_a path_s_a
+      end
     end
   end
 end

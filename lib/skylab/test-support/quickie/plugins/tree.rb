@@ -26,13 +26,13 @@ module Skylab::TestSupport
         idx = @fuzzy_flag.any_first_index_in_input sig
         if idx
           sig.nilify_input_element_at_index idx
-          sig.rely :TEST_FILES
-          sig.carry :TEST_FILES, :FINISHED
+          sig.rely :CULLED_TEST_FILES
+          sig.carry :CULLED_TEST_FILES, :FINISHED
           sig
         end
       end
 
-      def test_files_eventpoint_notify
+      def culled_test_files_eventpoint_notify
         io = @svc.paystream
         _a = @svc.get_test_path_a
         tree = QuicLib_::Tree[].from( :paths, _a )

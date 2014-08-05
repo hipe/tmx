@@ -61,8 +61,16 @@ module Skylab::TestSupport
         @cool_pool.build_fuzzy_flag a
       end
 
+      def build_required_arg_switch a
+        @cool_pool.build_required_arg_switch a
+      end
+
       def plugins
         self
+      end
+
+      def replace_test_path_s_a path_s_a
+        @host.replace_test_path_s_a path_s_a
       end
 
     private
@@ -83,6 +91,9 @@ module Skylab::TestSupport
           back = Fuzzy_Flag_Back__.new @back_a.length,  a
           @back_a[ back.identifier_index ] = back
           Fuzzy_Flag_Front__.new back, self
+        end
+        def build_required_arg_switch x
+          Required_Arg_Switch__.new x
         end
         def any_first_idx_in_inp back, sig
           match =
@@ -198,6 +209,22 @@ module Skylab::TestSupport
       private
         def bld_options_moniker
           @s_a * '|'
+        end
+      end
+
+      class Required_Arg_Switch__
+        def initialize s
+          @s = s
+          @rx = /\A#{ ::Regexp.escape s }=/
+        end
+
+        attr_reader :s
+
+        def any_first_index_in_input sig
+          a = sig.input
+          a.length.times.detect do |d|
+            @rx =~ a.fetch( d )
+          end
         end
       end
     end

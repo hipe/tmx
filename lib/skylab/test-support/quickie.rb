@@ -41,7 +41,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
   class Quickie::Service          # ( re-opens as necessary for narrative )
 
     def initialize _, o, e
-      @paystream, @infostream = o, e
+      @paystream = o ; @infostream = e
       @default_info_stream_line_proc = -> line { @infostream.puts line }
       @info_stream_line_proc_is_default = nil
       self.info_stream_line_proc = nil  # see

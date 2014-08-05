@@ -43,7 +43,8 @@ module Skylab::TestSupport
           @input_path_a = argv[ a, b ]
           argv[ a, b ] = ::Array.new b
           sig.nudge :BEGINNING, :TEST_FILES
-          sig.nudge :TEST_FILES, :BEFORE_EXECUTION
+          sig.nudge :TEST_FILES, :CULLED_TEST_FILES
+          sig.nudge :CULLED_TEST_FILES, :BEFORE_EXECUTION
           sig.carry :BEFORE_EXECUTION, :EXECUTION
           sig.nudge :EXECUTION, :FINISHED
           sig
@@ -69,11 +70,19 @@ module Skylab::TestSupport
         nil
       end
 
+      def culled_test_files_eventpoint_notify
+      end
+
       # ~ services that this node provides upwards (for siblings!) ~
 
       def get_any_test_path_a
         # assume that pathfinder worked and the eventpoint path is working..
         (( a = @test_path_a )) ? a.dup : a
+      end
+
+      def replace_test_path_s_a path_s_a
+        @test_path_a = path_s_a
+        PROCEDE_
       end
 
       def before_execution_eventpoint_notify

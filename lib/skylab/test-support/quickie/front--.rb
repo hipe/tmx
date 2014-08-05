@@ -12,8 +12,12 @@ module Skylab::TestSupport
         from BEGINNING
       end
 
-      BEFORE_EXECUTION = eventpoint do
+      CULLED_TEST_FILES = eventpoint do
         from TEST_FILES
+      end
+
+      BEFORE_EXECUTION = eventpoint do
+        from CULLED_TEST_FILES
       end
 
       EXECUTION = eventpoint do
@@ -22,7 +26,7 @@ module Skylab::TestSupport
 
       FINISHED = eventpoint do
         from BEGINNING
-        from TEST_FILES
+        from CULLED_TEST_FILES
         from EXECUTION
       end
     end
@@ -46,7 +50,7 @@ module Skylab::TestSupport
       alias_method :program_name=, :program_moniker=
 
       def set_three_streams _, o, e
-        @paystream, @infostream = o, e
+        @paystream = o ; @infostream = e
         @y = nil
       end
 
@@ -65,12 +69,12 @@ module Skylab::TestSupport
         @paystream || @svc.paystream  # may be mounted under a supernode
       end
 
-      def infostream
-        @infostream || @svc.infostream
+      def y
+        @y ||= ::Enumerator::Yielder.new( & infostream.method( :puts ) )
       end
 
-      def y
-        @y ||= ::Enumerator::Yielder.new( & @infostream.method( :puts ) )
+      def infostream
+        @infostream || @svc.infostream
       end
 
       def program_moniker
@@ -79,6 +83,10 @@ module Skylab::TestSupport
 
       def get_test_path_a  # #reach-down
         @plugins[ :run_recursive ].client.get_any_test_path_a
+      end
+
+      def replace_test_path_s_a path_s_a
+        @plugins[ :run_recursive ].client.replace_test_path_s_a path_s_a
       end
 
       def add_context_class_and_resolve ctx
@@ -257,5 +265,8 @@ module Skylab::TestSupport
         SubTree__[]::Tree
       end
     end
+
+    PROCEDE_ = nil
+    SEP_ = '/'.freeze
   end
 end
