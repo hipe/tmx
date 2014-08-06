@@ -285,7 +285,7 @@ module Skylab::Brazen
         end
       private
         def partition_relevant_hooks reader, prop
-          box = @eaches_and_onces ; scn = box.get_key_scanner
+          box = @eaches_and_onces ; scn = box.to_key_scanner
           i = scn.gets ; a = nil
           begin
             prop.send( i ).nil? and next  # or whatever

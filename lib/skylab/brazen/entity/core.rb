@@ -358,7 +358,7 @@ module Skylab::Brazen
         @a.first
       end
 
-      def get_local_normal_names
+      def get_names
         @a.dup
       end
 
@@ -370,11 +370,20 @@ module Skylab::Brazen
         @h.fetch i, & p
       end
 
-      def get_key_scanner
+      def to_key_scanner
         d = -1 ; last = @a.length - 1
         Callback_::Scn.new do
           if d < last
             @a.fetch d += 1
+          end
+        end
+      end
+
+      def to_value_scanner
+        d = -1 ; last = @a.length - 1
+        Callback_::Scn.new do
+          if d < last
+            @h.fetch @a.fetch d += 1
           end
         end
       end

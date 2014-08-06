@@ -34,7 +34,7 @@ module Skylab::Brazen
       end
 
       def members
-        @ivar_box.get_local_normal_names
+        @ivar_box.get_names
       end
 
       def render_all_lines_into_under y, expression_agent

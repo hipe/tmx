@@ -56,19 +56,5 @@ module Skylab::Brazen
         end
       end
     end
-
-    class Box_
-      def get_names
-        @a.dup
-      end
-      def to_value_scanner
-        d = -1 ; last = @a.length - 1
-        Callback_::Scn.new do
-          if d < last
-            @h.fetch @a.fetch d += 1
-          end
-        end
-      end
-    end
   end
 end

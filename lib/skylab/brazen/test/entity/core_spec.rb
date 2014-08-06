@@ -23,9 +23,9 @@ module Skylab::Brazen::TestSupport::Entity
       end
 
       it "knows the local normal names of the properties" do
-        a = subject.get_local_normal_names
+        a = subject.get_names
         a.should eql [ :foo ]
-        a_ = subject.get_local_normal_names
+        a_ = subject.get_names
         ( a.object_id == a_.object_id ).should eql false
       end
 
@@ -54,8 +54,8 @@ module Skylab::Brazen::TestSupport::Entity
       end
 
       it "child inherits properties of base" do
-        Foo_Base.property_method_nms_for_rd.get_local_normal_names.should eql [ :foo ]
-        Foo_Child.property_method_nms_for_rd.get_local_normal_names.should eql [ :foo, :bar ]
+        Foo_Base.property_method_nms_for_rd.get_names.should eql [ :foo ]
+        Foo_Child.property_method_nms_for_rd.get_names.should eql [ :foo, :bar ]
       end
 
       it "the child's handle on the property is THE SAME PROPERTY" do
