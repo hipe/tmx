@@ -4,15 +4,13 @@ module Skylab::Brazen
 
     class When_::Extra_Arguments
 
-      def initialize event, action, client
-        @event = event
-        @render = client.help_renderer
-        @render.set_action action  # eew
+      def initialize ev, help_renderer
+        @render = help_renderer
+        @x = ev.x
       end
 
       def execute
-        o = @render
-        x = @event.x
+        o = @render ; x = @x
         o.express do
           "unexpected argument #{ ick x }"
         end

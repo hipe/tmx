@@ -24,7 +24,7 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
   module InstanceMethods
 
     def with * x_a
-      @parse = Brazen_::CLI::Action_Adapter_::Parse_ARGV::Arguments__.
+      @parse = Brazen_::CLI::Action_Adapter_::Arguments.
         new x_a, arg_a
       @result = @parse.execute
     end

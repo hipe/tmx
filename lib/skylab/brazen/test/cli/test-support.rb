@@ -99,7 +99,7 @@ module Skylab::Brazen::TestSupport::CLI
 
     def expect_no_more_lines
       unparsed_iambic_exists and fail "expected no more lines, had #{
-        }#{ current_iambic_token.inspect }"
+        }#{ current_iambic_token.to_a.inspect }"
     end
 
     def expect_maybe_a_blank_line

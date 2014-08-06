@@ -13,6 +13,15 @@ module Skylab::Brazen
         m_i and @reader.send m_i
       end
 
+      def fetch i, &p
+        found = true
+        m_i = @reader.property_method_nms_for_rd.fetch i do
+          found = false
+        end
+        found or raise ::KeyError, "key not found: #{ i.inspect }"
+        @reader.send m_i
+      end
+
       def reduce_by i=nil
         if i
           if block_given?

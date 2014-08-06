@@ -14,7 +14,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
       with_max_num_dirs 'potato'
       it "whines about non-integer environment variable" do
         invoke 'x'
-        expect :styled, /\A#{ par 'max-num-dirs' } must be a non-negative #{
+        expect :styled, /\A#{ env 'max-num-dirs' } must be a non-negative #{
           }integer, had #{ ick 'potato' }\z/
         expect_localized_invite_line
         expect_errored
@@ -25,7 +25,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
       with_max_num_dirs '-1'
       it "whines about integer being too low" do
         invoke 'x'
-        expect :styled, /\A#{ par 'max-num-dirs' } must be non-negative, #{
+        expect :styled, /\A#{ env 'max-num-dirs' } must be non-negative, #{
           }had #{ ick '-1' }/
         expect_localized_invite_line
         expect_errored

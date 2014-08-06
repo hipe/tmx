@@ -6,26 +6,28 @@ module Skylab::Brazen
 
       class Help_Renderer  # read [#004]
 
-        def initialize action, op, arg_a, client
-          @action = action ; @arg_a = arg_a ; @client = client ; @op = op
-          @expression_agent = client.expression_agent
+        def initialize op, kernel
+          @action = kernel.action
+          @action_adapter = kernel.action_adapter
+          @is_branch_view = true
+          @expression_agent = kernel.expression_agent
+          @invocation = kernel.invocation
+          set_op op
+          set_parts kernel.partitions
           @section_separator_p = -> { @y << nil }
-          @is_branch_view = action.object_id == client.object_id
-          @y = ::Enumerator::Yielder.new( & client.stderr.method( :puts ) )
-          op and use_formatting_of_option_parser op
+          @y = ::Enumerator::Yielder.new( & kernel.stderr.method( :puts ) )
           screen_boundary
         end
 
-        attr_reader :expression_agent, :y
+        attr_reader :expression_agent, :op, :y
 
-        def set_action x
-          @action = x
-          @is_branch_view = ( x && x.object_id == @client.object_id ) ; nil
+        def set_op op
+          @op = op
+          op and use_formatting_of_option_parser op ; nil
         end
 
-        def set_option_parser op
-          @op = op
-          use_formatting_of_option_parser op ; nil
+        def set_parts parts
+          @arg_a = parts.arg_a ; @env_a = parts.env_a ; nil
         end
 
         def use_formatting_of_option_parser op
@@ -50,7 +52,8 @@ module Skylab::Brazen
 
         def output_usage_line
           a = [ action_invocation_string ]
-          s = @action.render_syntax_string and a.push s
+          s = ( @action_adapter || @invocation ).render_syntax_string
+          s and a.push s
           output_single_line_section 'usage', a * SPACE_
           @action
         end
@@ -79,10 +82,10 @@ module Skylab::Brazen
         end
 
         def action_invocation_string
-          if @is_branch_view
-            @client.invocation_string
+          if @action_adapter
+            "#{ @invocation.invocation_string } #{ @action.name.as_slug }"
           else
-            "#{ @client.invocation_string } #{ @action.name.as_slug }"
+            @invocation.invocation_string
           end
         end
 

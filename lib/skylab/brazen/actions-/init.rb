@@ -3,7 +3,7 @@ module Skylab::Brazen
   class Actions_::Init < Brazen_::Action_
 
     desc do |y|
-      y << "init a #{ par 'workspace' }"
+      y << "init a #{ highlight '<workspace>' }"
       y << "this is the second line of the init description"
     end
 

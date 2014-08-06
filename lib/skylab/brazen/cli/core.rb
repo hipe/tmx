@@ -12,51 +12,60 @@ module Skylab::Brazen
 
       def initialize i, o, e, mutable_invocation_string_parts=nil
         init_mutable_invocation_string_parts mutable_invocation_string_parts
-        @environment = nil
         @stdout = o ; @stderr = e
+        @environment = @op = nil
       end
       attr_writer :environment
-    private
+
       def init_mutable_invocation_string_parts a
         a && a.last.nil? and a[ a.length - 1 ] = "brazen"  # bugfix for 'tmx -h'
         a ||= [ $PROGRAM_NAME ]
         @invocation_str_a = a.freeze ; nil
       end
-    public
 
       def invoke argv
         @argv = argv
-        if argv.length.zero? || DASH__ == argv.first.getbyte( 0 )
-          invoke_when_no_action_argument
+        @properties_adapter = Properties_Adapter__.new argv, self
+        if @argv.length.zero?
+          invoke_when_no_arguments
+        elsif DASH__ == @argv.first.getbyte( 0 )
+          invoke_when_options
         else
           adapter = adapter_when_action_token
           adapter && adapter.execution_receiver.execute
           @exit_status
         end
       end
-
       DASH__ = '-'.getbyte 0
 
-    private
-
-      def invoke_when_no_action_argument
-        if @argv.length.zero?
-          invoke_when_no_arguments
-        else
-          invoke_when_options
-        end
-      end
+    private  # ~ when no arguments
 
       def invoke_when_no_arguments
-        CLI::When_::No_Arguments.new( :_property_, help_renderer ).execute  # read [#003]
+        _prop = props.fetch :action
+        CLI::When_::No_Arguments.new( _prop, hlp_renderer ).execute  # [#003]
       end
 
-      def invoke_when_options
-        processors = []
-        o = CLI::Lib_::Option_parser[].new
-        o.on '-h', '--help [cmd]', "this screen" do |cmd|
-          processors.push when_help( o, cmd )
+      def props
+        My_properties_model__[].properties
+      end
+
+      My_properties_model__ = -> do  # #experimental
+        p = -> do
+          x = class My_Properties_Model___
+            Brazen_::Entity_[ self, -> do
+              o :required, :property, :action
+            end ]
+            self
+          end
+          p = -> { x } ; x
         end
+        -> { p[] }
+      end.call
+
+      # ~ when options (,the stock option parser)
+
+      def invoke_when_options
+        o = get_op_p.call ; processors = @processors
         begin
           o.parse! @argv
         rescue ::OptionParser::ParseError => e
@@ -65,28 +74,285 @@ module Skylab::Brazen
         @argv.length.nonzero? and processors.push when_unhanded_arguments
         while (( processor = processors.shift ))
           last_exit_status = processor.execute
-          last_exit_status.zero? and break
+          last_exit_status.nonzero? and break
         end
         last_exit_status
       end
 
-      def when_help op, cmd
-        CLI::When_::Help.new op, cmd, self
+      def get_op_p
+        -> { @op || init_op ; @op }
+      end
+
+      def init_op
+        processors = []
+        o = CLI::Lib_::Option_parser[].new
+        o.on '-h', '--help [cmd]', "this screen" do |cmd_s|
+          processors.push when_help cmd_s
+        end
+        @op = o ; @processors = processors; nil
+      end
+
+      def when_help cmd_s
+        CLI::When_::Help.new cmd_s, hlp_renderer, self
       end
 
       def when_parse_error e
-        CLI::When_::Parse_Error.new e, help_renderer
+        CLI::When_::Parse_Error.new e, hlp_renderer
       end
 
       def when_unhanded_arguments
-        CLI::When_::Unhandled_Arguments.new @argv, help_renderer
+        CLI::When_::Unhandled_Arguments.new @argv, hlp_renderer
       end
 
+      def hlp_renderer
+        @properties_adapter.help_renderer
+      end
+    end
+
+    # ~ interlude: tons of support classes
+
+    class Properties_Adapter__
+
+      def initialize argv, invocation, action_adapter=nil
+        _kernel = Kernel__.new argv, action_adapter, invocation
+        @parse_context = Parse_Context__.new _kernel
+      end
+
+      def expression_agnt
+        @parse_context.expression_ag
+      end
+
+      def help_renderer
+        @parse_context.help_renderer
+      end
+
+      attr_reader :parse_context
+
+      class Kernel__
+
+        def initialize argv, action_adapter, invocation
+          @action_adapter = action_adapter
+          @argv = argv
+          @invocation = invocation
+          _scn = ( action_adapter || invocation ).get_property_scanner
+          @partitions = Partitions__.new _scn
+        end
+
+        attr_reader :action_adapter, :argv, :invocation, :partitions
+
+        def action
+          ( @action_adapter || @invocation ).action
+        end
+
+        def expression_agent
+          @expag ||= Expression_Agent__.new @partitions
+        end
+
+        def any_option_parser_p
+          ( @action_adapter || @invocation ).any_optparse_p
+        end
+
+        def stderr
+          @invocation.stderr
+        end
+      end
+
+      class Partitions__
+        def initialize scn
+          arg_a = env_a = opt_a = nil
+          while (( prop = scn.gets ))
+            if prop.can_be_from_environment
+              ( env_a ||= [] ).push prop
+            end
+            prop.can_be_from_argv or next
+            if prop.is_actually_required
+              ( arg_a ||= [] ).push prop
+            else
+              ( opt_a ||= [] ).push prop
+            end
+          end
+          # experimental aesthetics - fill the trailing optional arg "slot"
+          if opt_a && ! arg_a && opt_a.last.has_default
+            ( arg_a ||= [] ).push opt_a.pop
+            opt_a.length.zero? and opt_a = nil
+          end
+          @opt_a = opt_a.freeze
+          @arg_a = arg_a.freeze
+          @env_a = env_a.freeze
+          freeze
+        end
+
+        attr_reader :env_a, :opt_a, :arg_a
+
+        def rendering_method_name_for prop
+          if @opt_a and @opt_a.include? prop
+            :render_prop_as_option
+          elsif @arg_a and @arg_a.include? prop
+            :render_prop_as_argument
+          else
+            @env_a && @env_a.include?( prop ) or fail "sanity: #{prop.name_i}"
+            :render_prop_as_environment_variable
+          end
+        end
+      end
+    end
+
+    class Invocation__  # ~ public API for nearby support classes
+
+      # ~ for processors (the "when" classes)
+
+      def find_matching_action_adapters_with_token s
+        fnd_matching_action_adapters_with_token s
+      end
+
+      def invoke_when_no_matching_action
+        invk_when_no_matching_action
+      end
+
+      def properties
+        props
+      end
+
+      # ~ for parse context
+
+      def environment
+        @environment || ::ENV
+      end
+
+      # ~ for help renderer
+
+      def invocation_string
+        @invocation_str_a * SPACE_
+      end
+
+      def render_syntax_string
+        prop = props.fetch :action
+        expr_ag.calculate { "#{ par prop } [..]" }
+      end
+    private
+      def expr_ag
+        @properties_adapter.expression_agnt
+      end
+    public
+
+      # ~ for kernel
+
+      def action
+        self
+      end
+
+      def any_optparse_p
+        get_op_p
+      end
+
+      def get_property_scanner
+        props.to_value_scanner
+      end
+
+      attr_reader :stderr
+    end
+
+    class Parse_Context__
+
+      def initialize kernel
+        @kernel = kernel
+      end
+
+      def expression_ag
+        @kernel.expression_agent
+      end
+
+      def help_renderer
+        @help_renderer ||= bld_help_renderer
+      end
+
+      def bld_help_renderer
+        _op = prdc_some_option_parser
+        Action_Adapter_::Help_Renderer.new _op, @kernel
+      end
+
+      def prdc_some_option_parser
+        if (( op_p = @kernel.any_option_parser_p  ))
+          op_p[]
+        else
+          bld_op
+        end
+      end
+
+      def bld_op
+        op = CLI::Lib_::Option_parser[].new
+        opt_a = @kernel.partitions.opt_a
+        opt_a and populate_option_parser_with_generated_options op, opt_a
+        populate_option_parser_with_universal_options op
+        op
+      end
+
+      def populate_option_parser_with_generated_options op, opt_a
+        h = build_unique_letter_hash opt_a
+        opt_a.each do |prop|
+          args = []
+          letter = h[ prop.name_i ]
+          letter and args.push "-#{ letter }"
+          base = "--#{ prop.name.as_slug }"
+          p = -> x do
+            @output_iambic.push prop.name_i, x
+          end
+          if prop.takes_argument
+            args.push "#{ base } #{ argument_label_for prop }"
+            p = -> x do
+              @did_set_h[ prop.name_i ] = true
+              @output_iambic.push prop.name_i, x
+            end
+          else
+            args.push base
+            p = -> _ do
+              @did_set_h[ prop.name_i ] = true
+              @output_iambic.push prop.name_i
+            end
+          end
+          if prop.has_description
+            args.concat prop.under_expression_agent_get_N_desc_lines(
+              @kernel.expression_agent )
+          end
+          op.on( * args, & p )
+        end ; nil
+      end
+
+      def build_unique_letter_hash opt_a
+        h = { } ; num_times_seen_h = ::Hash.new { |h_, k| h_[ k ] = 0 }
+        opt_a.each do |prop|
+          name_s = prop.name.as_variegated_string
+          d = name_s.getbyte 0
+          case num_times_seen_h[ d ] += 1
+          when 1
+            h[ prop.name_i ] = name_s[ 0, 1 ]
+          when 2
+            h.delete prop.name_i
+          end
+        end
+        h
+      end
+
+      def argument_label_for prop  # :+#hack
+        prop.name.as_variegated_string.split( UNDERSCORE_ ).last.upcase
+      end
+
+      def populate_option_parser_with_universal_options op
+        op.on '-h', '--help', 'this screen' do
+          @help_renderer.output_help_screen
+          @result = SUCCESS_
+        end ; nil
+      end
+    end
+
+    class Invocation__  # ~ when action token
+    private
+
       def adapter_when_action_token
-        matching_actions = find_matching_actions_with_token @argv.shift
+        matching_actions = fnd_matching_action_adapters_with_token @argv.shift
         case matching_actions.length
         when 0
-          @exit_status = invoke_when_no_matching_action
+          @exit_status = invk_when_no_matching_action
         when 1
           adapter = matching_actions.first.adapter_via_argv @argv
         else
@@ -95,15 +361,7 @@ module Skylab::Brazen
         adapter
       end
 
-    public  # ~ interface for agents
-
-      attr_reader :stderr
-
-      def environment
-        @environment || ::ENV
-      end
-
-      def find_matching_actions_with_token tok
+      def fnd_matching_action_adapters_with_token tok
         @token = tok
         matching_actions = []
         rx = /\A#{ ::Regexp.escape tok }/
@@ -121,32 +379,19 @@ module Skylab::Brazen
         matching_actions
       end
 
-      def invoke_when_no_matching_action
-        CLI::When_::No_Matching_Action.new( @token, help_renderer, self ).execute
+      def invk_when_no_matching_action
+        CLI::When_::No_Matching_Action.new( @token, hlp_renderer, self ).execute
       end
 
       def invoke_when_ambiguous_matching_actions
         CLI::When_::Ambiguous_Matching_Actions.new( @token, self ).execute
       end
 
-      def help_renderer
-        @hlp_rndrr ||= CLI::Action_Adapter_::Help_Renderer.
-          new self, nil, nil, self
-      end
+    public
 
-      def expression_agent
-        @expr_ag ||= CLI::Expression_Agent__.new
-      end
+      # ~ in support of above
 
-      def render_syntax_string
-        expression_agent.calculate { "#{ par 'action' } [..]" }
-      end
-
-      def invocation_string
-        @invocation_str_a * SPACE_
-      end
-
-      def name
+      def ___name
         @name ||= Callback_::Name.from_variegated_symbol(
           @invocation_str_a.last.intern )
       end
@@ -155,23 +400,11 @@ module Skylab::Brazen
         @exit_status = d ; nil
       end
 
-      # ~ for ad-hoc facet agents
-
-      def when_extra_ARGV_arguments_event ev, action_adapter
-        CLI::When_::Extra_Arguments.
-          new( ev, action_adapter, self ).execute
-      end
-
-      def when_missing_ARGV_arguments_event ev, action_adapter
-        CLI::When_::Missing_Arguments.new( ev, help_renderer ).execute
-      end
-
-      # ~ deep API for agents
+      # ~ deep API for mechanics agents
 
       def actions
         @actions ||= Actions__.new self, krnl
       end
-
     private
       def krnl
         @kernel ||= Brazen_::Kernel_.new( Brazen_, @invocation_str_a.last )
@@ -200,7 +433,6 @@ module Skylab::Brazen
 
       def initialize invocation, action
         @action = action ; @invocation = invocation
-        @hr = nil
       end
 
       attr_reader :action
@@ -217,43 +449,68 @@ module Skylab::Brazen
         @action.under_expression_agent_get_N_desc_lines exp, d
       end
 
-      def set_help_renderer hr
-        @hr = hr
+      def render_syntax_string
+        hlp_rndrr.produce_main_syntax_string
       end
 
-      def render_syntax_string
-        @hr.produce_main_syntax_string
-      end
+      # ~ for invocation
 
       def adapter_via_argv argv
-        Action_Adapter_::Parse_ARGV.new(
-          argv, self, @invocation ).produce_adapter
+        @properties_adapter = Properties_Adapter__.new argv, @invocation, self
+        @properties_adapter.produce_the_adapter
       end
 
-      def adapter_via_iambic x_a
-        @action.produce_adapter_via_iambic_and_adapter x_a, self
-      end
-
-      def on_error_channel_entity_structure ev
-        ev.render_all_lines_into_under @hr.y, expr_agent
-        @hr.output_invite_to_general_help
-        set_ext_status some_err_code_for_event ev ; nil
-      end
-
-      def on_entity_event_channel_entity_structure ev
-        ev.render_all_lines_into_under @hr.y, expr_agent
-        ev.has_tag :is_negative and
-          set_ext_status some_ext_status_for_chan_i :is_negative ; nil
+      def help_rndrr
+        @properties_adapter.help_renderer
       end
 
       def execution_receiver
         @action
       end
 
+      # ~ for parse context
+
+      def adapter_via_iambic x_a
+        @action.produce_adapter_via_iambic_and_adapter x_a, self
+      end
+
+      # ~ for kernel
+
+      def get_property_scanner
+        @action.get_property_scanner
+      end
+
+      def any_optparse_p  # in theory, a hook for building op manually
+      end
+
+      def stderr
+        @invocation.stderr
+      end
+
+      # ~ for ad-hoc business agents
+
+      def on_error_channel_entity_structure ev
+        hr = hlp_rndrr
+        ev.render_all_lines_into_under hr.y, expr_agent
+        hr.output_invite_to_general_help
+        set_ext_status some_err_code_for_event ev ; nil
+      end
+
+      def on_entity_event_channel_entity_structure ev
+        hr = hlp_rndrr
+        ev.render_all_lines_into_under hr.y, expr_agent
+        ev.has_tag :is_negative and
+          set_ext_status some_ext_status_for_chan_i :is_negative ; nil
+      end
+
     private
 
       def expr_agent
-        @invocation.expression_agent
+        @properties_adapter.expression_agnt
+      end
+
+      def hlp_rndrr
+        @properties_adapter.help_renderer
       end
 
       def set_ext_status d
@@ -277,10 +534,100 @@ module Skylab::Brazen
       end
 
       Autoloader_[ self ]
-      stowaway :Parse_ARGV, 'arguments'
+    end
+
+    class Properties_Adapter__  # ~ produce the adapter
+      def produce_the_adapter
+        @parse_context.produce_adapter
+      end
+    end
+
+    class Parse_Context__  # ~ produce adapter (that is, parse everything)
+
+      def produce_adapter
+        @argv = @kernel.argv ; @did_set_h = {} ; @output_iambic = []
+        _op = help_renderer.op
+        result = parse_options _op
+        result ||= parse_arguments
+        result ||= process_environment
+        if result
+          @kernel.invocation.set_exit_status result
+          NOTHING_
+        else
+          @kernel.action_adapter.adapter_via_iambic @output_iambic
+        end
+      end
+
+    private  # ~ parse options
+
+      def parse_options op
+        @result = PROCEDE_
+        op.parse! @argv
+        @result
+      rescue ::OptionParser::ParseError => e
+        CLI::When_::Parse_Error.new( e, help_renderer ).execute
+      end
+
+      # ~ parse arguments
+
+      def parse_arguments
+        _arg_a = @kernel.partitions.arg_a || EMPTY_A_
+        parse = Action_Adapter_::Arguments.new @argv, _arg_a
+        error_event = parse.execute
+        if error_event
+          _meth_i = ARGV_ERROR_OP_H__.fetch error_event.event_channel_i
+          @kernel.invocation.send(
+            _meth_i, error_event, @kernel.action_adapter )
+        else
+          _x_a = parse.release_result_iambic
+          @output_iambic.concat _x_a
+          PROCEDE_
+        end
+      end
+
+      EMPTY_A_ = [].freeze
+
+      ARGV_ERROR_OP_H__ = {
+        extra: :when_extra_ARGV_arguments_event,
+        missing: :when_missing_ARGV_arguments_event
+      }.freeze
+
+      # ~ process environment
+
+      def process_environment
+        @env_a = @kernel.partitions.env_a
+        @env_a and whn_env_a_prcss_environment
+      end
+
+      def whn_env_a_prcss_environment
+        env = @kernel.invocation.environment
+        @env_a.each do |prop|
+          @did_set_h[ prop.name_i ] and next
+          prop.environment_name_i
+          s = env[ prop.environment_name_i ]
+          s or next
+          @output_iambic.push prop.name_i, s
+        end
+        PROCEDE_
+      end
+    end
+
+    class Invocation__  # ~ produce the adapter
+
+      def when_extra_ARGV_arguments_event ev, action_adptr
+        CLI::When_::Extra_Arguments.new( ev, action_adptr.help_rndrr ).execute
+      end
+
+      def when_missing_ARGV_arguments_event ev, action_adptr
+        CLI::When_::Missing_Arguments.new( ev, action_adptr.help_rndrr ).execute
+      end
     end
 
     class Expression_Agent__
+
+      def initialize partitions
+        @partitions = partitions
+      end
 
       alias_method :calculate, :instance_exec
 
@@ -310,9 +657,21 @@ module Skylab::Brazen
         code s
       end
 
-      def par x  # make the string or prop look like a parameter (placeholder)
-        _string = x.respond_to?( :ascii_only? ) ? x : x.name.as_slug
-        highlight "<#{ _string }>"
+      def par prop
+        _unstyled = send @partitions.rendering_method_name_for( prop ), prop
+        highlight _unstyled
+      end
+
+      def render_prop_as_option prop
+        "--#{ prop.name.as_slug }"
+      end
+
+      def render_prop_as_argument prop
+        "<#{ prop.name.as_slug }>"
+      end
+
+      def render_prop_as_environment_variable prop
+        prop.environment_name_i
       end
 
       def pth s

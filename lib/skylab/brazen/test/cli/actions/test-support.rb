@@ -103,10 +103,16 @@ module Skylab::Brazen::TestSupport::CLI::Actions
       "'#{ ::Regexp.escape s }'"
     end
 
+    def env s
+      ::Regexp.escape "BRAZEN_#{ s.upcase.gsub DASH_, UNDERSCORE_ }"
+    end
+
     def par s
       "(?:--|<)(?i:#{ ::Regexp.escape s })>?"
     end
   end
+
+  DASH_ = '-'.freeze ; UNDERSCORE_ = '_'.freeze
 
   module TestLib_
     monadic_memoize = -> p do
