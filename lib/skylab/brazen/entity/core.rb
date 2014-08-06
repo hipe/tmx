@@ -342,6 +342,10 @@ module Skylab::Brazen
         @a = [] ; @h = {}
       end
 
+      def freeze
+        @a.freeze ; @h.freeze ; super
+      end
+
       def initialize_copy _otr_
         @a = @a.dup ; @h = @h.dup ; nil
       end
@@ -448,6 +452,10 @@ module Skylab::Brazen
 
     protected
       attr_reader :a, :h
+
+      def self.the_empty_box
+        @teb ||= new.freeze
+      end
     end
 
     class Method_Added_Muxer__  # from [mh] re-written
@@ -593,8 +601,8 @@ module Skylab::Brazen
       end
 
       def prcss_iambic_passively
-        subject = self.class
-        box = subject.property_method_nms_for_rd
+        subject = property_proprietor
+        box = subject ? subject.property_method_nms_for_rd : MONADIC_EMPTINESS_
         while @d < @x_a_length
           m_i = box[ @x_a[ @d ] ]
           m_i or break
@@ -602,6 +610,10 @@ module Skylab::Brazen
           send subject.send( m_i ).iambic_writer_method_name
         end
         self
+      end
+
+      def property_proprietor
+        self.class
       end
 
       def iambic_property
@@ -621,6 +633,8 @@ module Skylab::Brazen
 
       PROPERTY_CLASS__ = Property__  # delicate
     end
+
+    MONADIC_EMPTINESS_ = -> _ { }
 
     UNDEFINED_ = nil
 

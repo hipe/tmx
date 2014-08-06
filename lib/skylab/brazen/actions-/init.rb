@@ -7,7 +7,11 @@ module Skylab::Brazen
       y << "this is the second line of the init description"
     end
 
-    def self.properties ; end
+    def self.properties
+      Brazen_::Entity::Box_.the_empty_box
+    end
 
+    def property_proprietor
+    end
   end
 end
