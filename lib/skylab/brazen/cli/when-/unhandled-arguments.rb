@@ -4,9 +4,9 @@ module Skylab::Brazen
 
     class When_::Unhandled_Arguments
 
-      def initialize args, client
+      def initialize args, help_renderer
         @args = args
-        @render = client.help_renderer
+        @render = help_renderer
       end
 
       def execute

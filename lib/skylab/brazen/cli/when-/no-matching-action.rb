@@ -4,15 +4,15 @@ module Skylab::Brazen
 
     class When_::No_Matching_Action
 
-      def initialize token, client
-        @client = client ; @token = token
-        @render = client.help_renderer
+      def initialize token, help_renderer, action_adapter
+        @aa = action_adapter
+        @render = help_renderer
+        @token = token
       end
 
       def execute
-        o = @render
-        scn = @client.actions.visible.get_scanner
-        token = @token
+        o = @render ; token = @token
+        scn = @aa.actions.visible.get_scanner
         o.express { "unrecognized action #{ ick token }" }
         action = nil ; s_a = []
         while action = scn.gets

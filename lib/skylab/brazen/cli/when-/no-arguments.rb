@@ -4,13 +4,16 @@ module Skylab::Brazen
 
     class When_::No_Arguments
 
-      def initialize client
-        @render = client.help_renderer
+      def initialize prop, help_renderer
+        @prop = prop
+        @render = help_renderer
       end
 
       def execute
         o = @render
-        o.express { "expecting #{ par 'action' }" }
+        prop = @prop
+        o.express { "expecting #{ par 'action' }" } ; false and
+        o.express { "expecting #{ par prop }" }
         o.output_usage_line
         o.output_invite_to_general_help
         GENERIC_ERROR_

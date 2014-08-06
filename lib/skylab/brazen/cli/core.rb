@@ -48,7 +48,7 @@ module Skylab::Brazen
       end
 
       def invoke_when_no_arguments
-        CLI::When_::No_Arguments.new( self ).execute  # read [#003]
+        CLI::When_::No_Arguments.new( :_property_, help_renderer ).execute  # read [#003]
       end
 
       def invoke_when_options
@@ -79,7 +79,7 @@ module Skylab::Brazen
       end
 
       def when_unhanded_arguments
-        CLI::When_::Unhandled_Arguments.new @argv, self
+        CLI::When_::Unhandled_Arguments.new @argv, help_renderer
       end
 
       def adapter_when_action_token
@@ -122,7 +122,7 @@ module Skylab::Brazen
       end
 
       def invoke_when_no_matching_action
-        CLI::When_::No_Matching_Action.new( @token, self ).execute
+        CLI::When_::No_Matching_Action.new( @token, help_renderer, self ).execute
       end
 
       def invoke_when_ambiguous_matching_actions
@@ -163,8 +163,7 @@ module Skylab::Brazen
       end
 
       def when_missing_ARGV_arguments_event ev, action_adapter
-        CLI::When_::Missing_Arguments.
-          new( ev, action_adapter, self ).execute
+        CLI::When_::Missing_Arguments.new( ev, help_renderer ).execute
       end
 
       # ~ deep API for agents
