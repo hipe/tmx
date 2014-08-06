@@ -75,7 +75,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
       context "with a path argument that does not exist" do
         it "says as much" do
           invoke 'foozie'
-          expect "start directory does not exist - ./foozie"
+          expect :styled, %r(\A#{ par 'path' } does not exist - ./foozie\z)
           expect_negative_exitstatus
         end
       end

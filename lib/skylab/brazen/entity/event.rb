@@ -80,6 +80,51 @@ module Skylab::Brazen
         end
       end
 
+      class Inferred_Message  # #experimental - you hate me now
+
+        define_singleton_method :to_proc, -> do
+          cls = self
+          -> y, o do
+            cls.new( y, self, o ).execute ; nil
+          end
+        end
+
+        def initialize y, expag, o
+          @expression_agent = expag ; @o = o ; @y = y ; nil
+        end
+
+        def execute
+          @sp_as_s_a = @o.terminal_channel_i.to_s.split UNDERSCORE_
+          maybe_replace_noun_phrase_with_prop
+          rslv_item_x_from_first_member
+          maybe_pathify_item_x
+          @y << "#{ @sp_as_s_a * SPACE_ } - #{ @item_x }" ; nil
+        end
+      private
+        def maybe_replace_noun_phrase_with_prop
+          if @o.has_member( :prop ) and find_verb_index
+            _pretty = @expression_agent.par @o.prop
+            @sp_as_s_a[ 0, @verb_index ] = [ _pretty ]
+          end ; nil
+        end
+        def find_verb_index
+          @verb_index = @sp_as_s_a.length.times.detect do |d|
+            VERB_RX__ =~ @sp_as_s_a[ d ]
+          end
+        end
+        VERB_RX__ = /\A(?:is|does)\z/  # etc as needed
+        def rslv_item_x_from_first_member
+          @first_member_i = @o.first_member
+          @item_x = @o.send @first_member_i ; nil
+        end
+        def maybe_pathify_item_x
+          if PN_RX__ =~ @first_member_i.to_s
+            @item_x = @expression_agent.pth @item_x
+          end ; nil
+        end
+        PN_RX__ = /_pathname\z/
+      end
+
       module Simple_Listener_Broadcaster___
 
         def self.[] mod

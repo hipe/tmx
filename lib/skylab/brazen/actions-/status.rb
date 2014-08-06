@@ -24,6 +24,7 @@ module Skylab::Brazen
 
     def execute
       Brazen_::Models_::Workspace.status( @verbose, @path, @MAX_NUM_DIRS,
+        self.class.properties.fetch( :path ),
         Responses__.new( @client_adapter ) )
     end
 

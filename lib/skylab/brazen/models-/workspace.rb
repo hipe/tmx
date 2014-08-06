@@ -6,18 +6,19 @@ module Skylab::Brazen
 
     class << self
 
-      def status verbose, path, max_num_dirs, listener
-        new( verbose, path, max_num_dirs, listener ).status
+      def status verbose, path, max_num_dirs, prop, listener
+        new( verbose, path, max_num_dirs, prop, listener ).status
       end
 
       private :new
     end
 
-    def initialize verbose, path, max_num_dirs, listener
+    def initialize verbose, path, max_num_dirs, prop, listener
       @be_verbose = verbose
       @listener = listener
       @max_num_dirs_to_look_in = max_num_dirs
       @path = path
+      @prop = prop
       @config_filename = nil
     end
 
@@ -30,8 +31,8 @@ module Skylab::Brazen
 
     def rslv_any_nearest_config_filename
       @any_nearest_config_filename = Walker__.new(
-        @path, some_config_filename, @max_num_dirs_to_look_in, self, :walker ).
-          find_any_nearest_file_pathname
+        @path, some_config_filename, @max_num_dirs_to_look_in,
+          @prop, self, :walker ).find_any_nearest_file_pathname
     end
 
     def some_config_filename
@@ -50,9 +51,15 @@ module Skylab::Brazen
       broadcast_entity_event ev ; nil
     end
 
+    def on_walker_found_is_not_file ev
+      broadcast_entity_event ev ; nil
+    end
+
     class Walker__  # re-write a subset of [#st-007] the tree walker
 
-      def initialize start_path, filename, any_max_dirs_to_look, listener, chan
+      def initialize start_path, filename, any_max_dirs_to_look,
+                     prop, listener, chan
+
         @channel_i = chan
         @filename = filename
         @listener = listener
@@ -60,6 +67,7 @@ module Skylab::Brazen
         if SLASH_ != start_path.getbyte( 0 )
           start_path = ::File.expand_path start_path
         end
+        @prop = prop
         @start_path = start_path
         @start_pathname = ::Pathname.new start_path
       end
@@ -79,13 +87,13 @@ module Skylab::Brazen
       def whn_start_directory_is_not_directory st
         call_listener :start_directory_is_not_directory,
           :start_pathname, @start_pathname, :ftype, st.ftype,
-            :is_negative, true
+            :is_negative, true, :prop, @prop
       end
 
       def whn_start_directory_does_not_exist e
         call_listener :start_directory_does_not_exist,
           :start_pathname, @start_pathname, :exception, e,
-            :is_negative, true
+            :is_negative, true, :prop, @prop
       end
 
       def fnd_any_nearest_file_pathname_when_start_pathname_exist
@@ -103,7 +111,29 @@ module Skylab::Brazen
           TOP__ == pn.instance_variable_get( :@path ) and break
           pn = pn.dirname
         end
-        found || whn_file_not_found( count )
+        if found
+          whn_found found
+        else
+          whn_file_not_found count
+        end
+      end
+      TOP__ = '/'.freeze
+
+      def whn_found found
+        st = found.stat  # there is risk
+        if FILE_FTYPE__ == st.ftype
+          found
+        else
+          whn_found_is_not_file st, found
+        end
+      end
+      FILE_FTYPE__ = 'file'.freeze
+
+      def whn_found_is_not_file st, found
+        call_listener :found_is_not_file, :ftype, st.ftype,
+            :is_negative, true, :pathname, found do |y, o|
+          y << "is not file but #{ ick o.ftype } - #{ pth o.pathname }"
+        end
       end
 
       def whn_file_not_found count
@@ -125,24 +155,10 @@ module Skylab::Brazen
     private
 
       def call_listener * x_a, & p
-        p ||= DEFAULT_MESSAGE_PROC__
+        p ||= Brazen_::Entity::Event::Inferred_Message.to_proc
         ev = Brazen_::Entity::Event.new x_a, p
         @listener.send :"on_#{ @channel_i }_#{ ev.terminal_channel_i }", ev
       end
-
-      DEFAULT_MESSAGE_PROC__ = -> y, o do
-        ( msg = o.terminal_channel_i.to_s ).gsub! UNDERSCORE_, SPACE_
-        i = o.first_member
-        item_x = o.send i
-        if PN_RX__ =~ i.to_s
-          item_x = pth item_x
-        end
-        y << "#{ msg } - #{ item_x }" ; nil
-      end
-
-      PN_RX__ = /_pathname\z/
-
-      TOP__ = '/'.freeze
     end
   end
 end
