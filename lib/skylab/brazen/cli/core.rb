@@ -278,6 +278,7 @@ module Skylab::Brazen
       end
 
       Autoloader_[ self ]
+      stowaway :Parse_ARGV, 'arguments'
     end
 
     class Expression_Agent__
