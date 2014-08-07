@@ -15,10 +15,21 @@ module Skylab::Brazen
       end
 
       def parse
-        @document = Document__.new
-        @line = @lines.gets
-        @line and self._DO_ME
+        prepare_for_parse
+        while @line = @lines.gets
+          if BLANK_LINE_OR_COMMENT_RX__ =~ @line
+          else
+            send @state_i
+          end
+        end
         @document
+      end
+
+      BLANK_LINE_OR_COMMENT_RX__ = /\A[ ]*(?:\z|[#;])/
+
+      def prepare_for_parse
+        @document = Document__.new
+        @state_i = :when_before_section
       end
     end
 
