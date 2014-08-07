@@ -132,7 +132,7 @@ module Skylab::Brazen
       def whn_found_is_not_file st, found
         call_listener :found_is_not_file, :ftype, st.ftype,
             :is_negative, true, :pathname, found do |y, o|
-          y << "is not file but #{ ick o.ftype } - #{ pth o.pathname }"
+          y << "is #{ o.ftype }, must be file - #{ pth o.pathname }"
         end
       end
 

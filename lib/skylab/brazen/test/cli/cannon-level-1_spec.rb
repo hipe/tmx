@@ -33,6 +33,9 @@ module Skylab::Brazen::TestSupport::CLI
       expect_header_line 'argument'
       expect %r(\A[ ]{4}path[ ]{29}the location of the workspace)
       expect :styled, /\A[ ]{37}it's really neat\z/
+      expect_maybe_a_blank_line
+      expect_header_line 'environment variable'
+      expect %r(\A[ ]{4}BRAZEN_MAX_NUM_DIRS[ ]{14}how far up )
       expect_succeeded
     end
 

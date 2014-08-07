@@ -8,7 +8,11 @@ module Skylab::Brazen
 
     Brazen_::Entity_[ self, -> do
 
-      o :environment, :non_negative_integer, :property, :MAX_NUM_DIRS
+      o :environment, :non_negative_integer,
+        :description, -> y do
+          y << "how far up do we look?"
+        end,
+        :property, :MAX_NUM_DIRS
 
       o :flag, :property, :verbose
 

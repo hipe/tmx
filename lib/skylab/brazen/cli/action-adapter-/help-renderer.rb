@@ -40,6 +40,7 @@ module Skylab::Brazen
           @action.has_description and output_description
           output_options
           @arg_a and output_arguments
+          @env_a and output_environment_variables
           nil
         end
 
@@ -148,6 +149,12 @@ module Skylab::Brazen
           output_items_with_descriptions 'argument', @arg_a ; nil
         end
 
+        def output_environment_variables
+          section_boundary
+          output_items_with_descriptions 'environment variable',
+            @env_a, & :environment_name_i ; nil
+        end
+
         def output_invite_to_general_help
           s = action_invocation_string
           express do
@@ -173,32 +180,48 @@ module Skylab::Brazen
 
         # ~ two-column item renderers
 
-        def output_items_with_descriptions hdr_s, x_a, d=nil
+        def output_items_with_descriptions hdr_s, x_a, d=nil, & labelize_p
           hdr_s and output_header "#{ hdr_s }#{ 's' if 1 != x_a.length }"
-          prepare_output_items_with_descriptions d
-          x_a.each do |x|
-            if x.has_description
-              output_item_with_description x
+          p = bld_item_outputter d, labelize_p, @y
+          x_a.each( & p ) ; nil
+        end
+
+        def bld_item_outputter num_lines_per, label_p, y
+          label_p ||= DEFAULT_LABELIZE_P__
+          ex = @expression_agent
+          no_desc = bld_item_without_desc_outputter y, label_p
+          desc = bld_item_with_desc_outputter y, ex, num_lines_per, label_p
+          -> x do
+            ( x.has_description ? desc : no_desc )[ x ]
+          end
+        end
+        DEFAULT_LABELIZE_P__ = -> x do
+          x.name.as_slug
+        end
+
+        def bld_item_without_desc_outputter y, labelize_p
+          summary_s = @summary_indent
+          -> x do
+            y << "#{ summary_s }#{ labelize_p[ x ] }" ; nil
+          end
+        end
+
+        def bld_item_with_desc_outputter y, expag, num_lines_per, labelize_p
+          d = @summary_width ; s = @summary_indent
+          first_line_item_format = "#{ s }%-#{ d }s %s"
+          d_ = d + s.length + 1  # " " is 1 char wide
+          subsequent_line_item_format = "#{ SPACE_ * d_ }%s"
+          -> x do
+            a = x.under_expression_agent_get_N_desc_lines expag, num_lines_per
+            if a.length.zero?
+              y << "#{ s }#{ labelize_p[ x ] }"
             else
-              @y << "#{ @summary_indent }#{ x.name.as_slug }"
+              y << first_line_item_format % [ labelize_p[ x ], a.fetch( 0 ) ]
             end
-          end ; nil
-        end
-
-        def prepare_output_items_with_descriptions num_lines_per
-          @N = num_lines_per
-          d = @summary_width
-          @first_line_item_format = "#{ @summary_indent }%-#{ d }s %s"
-          d_ = d + @summary_indent.length + 1  # " " is 1 char wide
-          @subsequent_line_item_format = "#{ SPACE_ * d_ }%s" ; nil
-        end
-
-        def output_item_with_description x
-          a = x.under_expression_agent_get_N_desc_lines( @expression_agent, @N )
-          @y << @first_line_item_format % [ x.name.as_slug, a.fetch( 0 ) ]
-          1.upto( a.length - 1 ) do |d|
-            @y << @subsequent_line_item_format % a.fetch( d )
-          end ; nil
+            1.upto( a.length - 1 ) do |idx|
+              y << subsequent_line_item_format % a.fetch( idx )
+            end ; nil
+          end
         end
 
         # ~ multiline section renderers and their headers
