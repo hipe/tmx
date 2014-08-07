@@ -9,6 +9,7 @@ module Skylab::Brazen::TestSupport
 
   module CONSTANTS
     Brazen_ = ::Skylab::Brazen
+    EMPTY_S_ = ''
     TestSupport_ = TestSupport_
   end
 end
