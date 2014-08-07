@@ -7,11 +7,33 @@ module Skylab::Brazen
       y << "this is the second line of the init description"
     end
 
-    def self.properties
-      Brazen_::Entity::Box_.the_empty_box
+    Brazen_::Entity_[ self, -> do
+
+      o :flag, :property, :verbose
+
+      o :default, '.',
+        :description, -> y do
+          y << "the directory to init"
+        end,
+        :property, :path
+
+    end ]
+
+    def execute
+      Brazen_::Models_::Workspace.init @verbose, @path,
+       self.class.properties.fetch( :path ),
+        Responses__.new( @client_adapter )
     end
 
-    def property_proprietor
+    class Responses__
+
+      def initialize c_a
+        @client_adapter = c_a
+      end
+
+      def on_entity_event_channel_entity_structure ev
+        @client_adapter.on_entity_event_channel_entity_structure ev ; nil
+      end
     end
   end
 end

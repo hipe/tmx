@@ -112,7 +112,7 @@ module Skylab::Brazen
             VERB_RX__ =~ @sp_as_s_a[ d ]
           end
         end
-        VERB_RX__ = /\A(?:is|does)\z/  # etc as needed
+        VERB_RX__ = /\A(?:already|does|is)\z/  # etc as needed
         def rslv_item_x_from_first_member
           @first_member_i = @o.first_member
           @item_x = @o.send @first_member_i ; nil
@@ -122,7 +122,7 @@ module Skylab::Brazen
             @item_x = @expression_agent.pth @item_x
           end ; nil
         end
-        PN_RX__ = /_pathname\z/
+        PN_RX__ = /(?:_|\A)pathname\z/
       end
 
       module Simple_Listener_Broadcaster___
@@ -134,6 +134,7 @@ module Skylab::Brazen
       private
 
         def entity_event * x_a, & p
+          p ||= Inferred_Message.to_proc
           broadcast_entity_event Event.new x_a, p
         end
 

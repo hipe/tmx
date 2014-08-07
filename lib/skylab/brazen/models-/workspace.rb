@@ -10,6 +10,10 @@ module Skylab::Brazen
         new( verbose, path, max_num_dirs, prop, listener ).status
       end
 
+      def init verbose, path, prop, listener
+        new( verbose, path, nil, prop, listener ).init
+      end
+
       private :new
     end
 
@@ -30,13 +34,8 @@ module Skylab::Brazen
     end
 
     def rslv_any_nearest_config_filename
-      @any_nearest_config_filename = Walker__.new(
-        @path, some_config_filename, @max_num_dirs_to_look_in,
-          @prop, self, :walker ).find_any_nearest_file_pathname
-    end
-
-    def some_config_filename
-      @config_filename || CONFIG_FILENAME__
+      @any_nearest_config_filename =
+        walker( :channel, :walker ).find_any_nearest_file_pathname
     end
 
     def on_walker_start_directory_does_not_exist ev
@@ -55,12 +54,55 @@ module Skylab::Brazen
       broadcast_entity_event ev ; nil
     end
 
+    def init
+      x = walker( :channel, :init, :max_num_dirs, 1 ).
+        find_any_nearest_file_pathname
+      case x
+      when false ;
+      when true  ; procede_with_init
+      else       ; init_when_file_exists x
+      end ; nil
+    end
+
+    def init_when_file_exists pn
+      entity_event :directory_already_has_config_file, :pathname, pn,
+        :is_negative, true, :prop, @prop ; nil
+    end
+
+    def on_init_start_directory_does_not_exist ev
+      broadcast_entity_event ev ; false
+    end
+
+    def on_init_start_directory_is_not_directory ev
+      broadcast_entity_event ev ; false
+    end
+
+    def on_init_found_is_not_file ev
+      broadcast_entity_event ev ; false
+    end
+
+    def on_init_file_not_found ev
+      @be_verbose and broadcast_entity_event ev
+      true
+    end
+
+    def walker * x_a
+      wlk = Walker__.new @path, some_config_filename,
+        @max_num_dirs_to_look_in, @prop, self, :walker
+      wlk.process_iambic_fully x_a
+      wlk
+    end
+
+    def some_config_filename
+      @config_filename || CONFIG_FILENAME__
+    end
+
     class Walker__  # re-write a subset of [#st-007] the tree walker
 
       def initialize start_path, filename, any_max_dirs_to_look,
                      prop, listener, chan
 
-        @channel_i = chan
+        @channel = chan
         @filename = filename
         @listener = listener
         @any_max_num_dirs_to_look = any_max_dirs_to_look
@@ -157,8 +199,13 @@ module Skylab::Brazen
       def call_listener * x_a, & p
         p ||= Brazen_::Entity::Event::Inferred_Message.to_proc
         ev = Brazen_::Entity::Event.new x_a, p
-        @listener.send :"on_#{ @channel_i }_#{ ev.terminal_channel_i }", ev
+        @listener.send :"on_#{ @channel }_#{ ev.terminal_channel_i }", ev
       end
+
+      Brazen_::Entity[ self, :properties, :max_num_dirs, :channel ]
+
+      public :process_iambic_fully
+
     end
   end
 end

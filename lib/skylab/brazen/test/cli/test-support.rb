@@ -19,7 +19,7 @@ module Skylab::Brazen::TestSupport::CLI
     # ~ common business assertions
 
     def expect_help_screen_for_init
-      expect :styled, 'usage: bzn init'
+      expect :styled, 'usage: bzn init [-v] [<path>]'
       expect %r(\A[ ]{7}bzn init -h\z)
       expect_maybe_a_blank_line
       expect_header_line 'description'
@@ -27,7 +27,11 @@ module Skylab::Brazen::TestSupport::CLI
       expect 'this is the second line of the init description'
       expect_maybe_a_blank_line
       expect_header_line 'options'
+      expect %r(\A[ ]{4}-v, --verbose\z)
       expect %r(\A[ ]{4}-h, --help[ ]{10,}this screen\z)
+      expect_maybe_a_blank_line
+      expect_header_line 'argument'
+      expect %r(\A[ ]{4}path[ ]{7,}the dir)
       expect_succeeded
     end
 

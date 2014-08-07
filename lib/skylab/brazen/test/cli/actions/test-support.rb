@@ -51,6 +51,26 @@ module Skylab::Brazen::TestSupport::CLI::Actions
       end
     end
 
+    def from_new_directory_one_deep
+      from_directory do
+        pn = tmpdir.join 'scratch-one'
+        pn.exist? and blow_away pn.to_path
+        file_utils.mkdir pn.to_path
+        pn.to_path
+      end
+    end
+
+    def from_directory_with_already_a_file
+      from_directory do
+        pn = tmpdir.join 'with-one-empty-file'
+        if ! pn.exist?
+          file_utils.mkdir pn.to_path
+          file_utils.touch pn.join filename
+        end
+        pn.to_path
+      end
+    end
+
     def from_directory & p
       define_method :from_directory, & p ; nil
     end
@@ -74,7 +94,22 @@ module Skylab::Brazen::TestSupport::CLI::Actions
     def prepare_env _
     end
 
+    def invoke * argv
+      argv[ 0, 0 ] = sub_action_s_a
+      invoke_via_argv argv
+    end
+
     # ~ support above
+
+    def blow_away path
+      td_path = tmpdir.to_path
+      if td_path == path[ 0, td_path.length ] && path.include?( '/brAzen/' )
+        debug_IO.puts "rm -rf #{ path }"
+        file_utils.remove_entry_secure path  # SCARY
+      else
+        self._SANITY
+      end ; nil
+    end
 
     def from_directory
     end
@@ -97,6 +132,11 @@ module Skylab::Brazen::TestSupport::CLI::Actions
 
     def expect_localized_invite_line
       expect :styled, localized_invite_line_rx
+    end
+
+    def expect_negative_exitstatus
+      expect_no_more_lines
+      @exitstatus.should eql Brazen_::API.exit_statii.fetch :is_negative
     end
 
     def ick s
@@ -139,7 +179,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
           @io = io
         end
         _VERBOSE_ = { verbose: true }.freeze
-        [ :cd, :mkdir, :mkdir_p ].each do |meth_i|
+        [ :cd, :mkdir, :mkdir_p, :remove_entry_secure, :touch ].each do |meth_i|
         # ::FileUtils.collect_method( :verbose ).each do |meth_i|
           public ( define_method meth_i do | *a, &p |
             if @do_debug_p[]
