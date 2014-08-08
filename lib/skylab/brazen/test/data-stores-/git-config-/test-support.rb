@@ -1,23 +1,29 @@
-require_relative 'test-support'
+require_relative '../../test-support'
+
+module Skylab::Brazen::TestSupport::Data_Stores_
+
+  ::Skylab::Brazen::TestSupport[ self ]
+
+end
 
 module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
 
-  describe "[br] data stores: git config" do
+  ::Skylab::Brazen::TestSupport::Data_Stores_[ TS_ = self ]
 
-    it "the empty string parses" do
-      expect_no_sections_from EMPTY_S_
-    end
+  include CONSTANTS
 
-    it "one space parses" do
-      expect_no_sections_from SPACE_
-    end
+  extend TestSupport_::Quickie
+
+  EMPTY_S_ = EMPTY_S_
+
+  module InstanceMethods
 
     def expect_no_sections_from str
-      conf = Subject_[].parse_string str
+      conf = subject.parse_string str
       conf.sections.length.should be_zero
     end
 
-    it "some comments and one section parses" do
+    def some_comments_and_one_section_parses
       with <<-HERE.gsub! MARGIN_RX__, EMPTY_S_
 
         # it's time
@@ -31,7 +37,7 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
       end
     end
 
-    it "the subsection name parses" do
+    def the_subsection_name_parses
       with '[ -.secto-2014.08 "foo \\" \\\\ " ]'
       expect_config do |conf|
         sect = conf.sections.first
@@ -40,7 +46,7 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
       end
     end
 
-    it "two section names parse" do
+    def two_section_names_parse
       with <<-HERE.gsub! MARGIN_RX__, EMPTY_S_
         [ wiz "waz" ]
         [WiZ]
@@ -50,16 +56,16 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
       end
     end
 
-    it "a bare word not in a section fails" do
+    def a_bare_word_not_in_a_section_fails
       with 'moby'
-      ev = Subject_[].parse_string @input_string do |x| x end  # IDENTITY_
+      ev = subject.parse_string @input_string do |x| x end  # IDENTITY_
       ev.terminal_channel_i.should eql :section_expected
       ev.line_number.should eql 1
       ev.column_number.should eql 1
       ev.line.should eql 'moby'
     end
 
-    it "a simple assignment works" do
+    def a_simple_assignment_works
       with <<-HERE.gsub! MARGIN_RX__, EMPTY_S_
         [SECT]
         foo=bar
@@ -71,7 +77,7 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
       end
     end
 
-    it "a variety of other assignments work" do
+    def a_variety_of_other_assignments_work
       with <<-HERE.gsub! MARGIN_RX__, EMPTY_S_
         [ secto ]
         foo-moMMy = tRuE
@@ -96,7 +102,7 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
     end
 
     def expect_config & p
-      conf = Subject_[].parse_string @input_string
+      conf = subject.parse_string @input_string
       if conf
         block_given? ? yield( conf ) : conf
       else
@@ -105,5 +111,6 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
     end
 
     MARGIN_RX__ = /^[ ]{8}/
+
   end
 end
