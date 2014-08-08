@@ -40,14 +40,15 @@ module Skylab::Brazen
 
     private
       def error_event i
-        x_a = [ i, :line_number, @line_number, :column_number, 1, :line, @line ]
+        d = @column_number ||= 1
+        x_a = [ i, :line_number, @line_number, :column_number, d, :line, @line ]
         ev = Brazen_::Entity::Event.new x_a, -> y, o do
           y << "#{ i.to_s.gsub( UNDERSCORE_, SPACE_ ) } #{
            }(#{ o.line_number }:#{ o.column_number })"
         end
         if @parse_error_handler_p
           @document = @parse_error_handler_p[ ev ]
-          CEASE__
+          CEASE_
         else
           raise ParseError, ev.
             render_first_line_under( Brazen_::API::EXPRESSION_AGENT )
@@ -79,15 +80,19 @@ module Skylab::Brazen
 
       def accpt_section
         if (( ss = @md[ :subsect ] ))
-          ss.gsub! BACKSLASH_QUOTE_, QUOTE_
-          ss.gsub! BACKSLASH_BACKSLASH__, BACKSLASH__
+          self.class.unescape_two_escape_sequences ss
         end
         @sect = Section__.new @md[ :name ], ss
         @document.sections.accept_sect @sect
         @state_i = :when_section_or_assignment
-        PROCEDE__
+        PROCEDE_
       end
       BACKSLASH_BACKSLASH__ = '\\\\'.freeze ; BACKSLASH__ = '\\'.freeze
+
+      def self.unescape_two_escape_sequences s
+        s.gsub! BACKSLASH_QUOTE_, QUOTE_
+        s.gsub! BACKSLASH_BACKSLASH__, BACKSLASH__ ; nil
+      end
 
       def whn_not_section
         error_event :section_expected
@@ -111,10 +116,8 @@ module Skylab::Brazen
 
       def accpt_assignment
         @sect.assignments.accept_asmt Assignment__.new( * @md.captures )
-        PROCEDE__
+        PROCEDE_
       end
-
-      PROCEDE__ = true ; CEASE__ = false
     end
 
     class String_Input_Adapter_
@@ -247,6 +250,10 @@ module Skylab::Brazen
       QUOTED_STRING_RX__ = /(?<=\A")(?:\\"|[^"])*(?="[ ]*(?:[;#]|\z))/
     end
 
-    BACKSLASH_QUOTE_ = '\\"'.freeze ; QUOTE_= '"'.freeze
+    BACKSLASH_QUOTE_ = '\\"'.freeze
+    CEASE_ = false
+    PROCEDE_ = true
+    QUOTE_= '"'.freeze
+
   end
 end
