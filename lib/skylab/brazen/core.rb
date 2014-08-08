@@ -23,6 +23,7 @@ module Skylab::Brazen
     end
   end
 
+  EMPTY_S_ = ''.freeze
   NILADIC_TRUTH_ = -> { true }
   SLASH_ = '/'.getbyte 0
   SPACE_ = ' '.freeze

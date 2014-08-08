@@ -19,8 +19,8 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
   module InstanceMethods
 
     def expect_no_sections_from str
-      conf = subject.parse_string str
-      conf.sections.length.should be_zero
+      @document = subject.parse_string str
+      @document.sections.length.should be_zero
     end
 
     def some_comments_and_one_section_parses

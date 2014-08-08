@@ -186,7 +186,7 @@ module Skylab::Brazen
       miss_a = req_a.reduce [] do |m, prop|
         if instance_variable_defined? prop.as_ivar
           x = instance_variable_get prop.as_ivar
-          x.nil? || EMPTY_S__ == x and m << prop
+          x.nil? || EMPTY_S_ == x and m << prop
         else
           m << prop
         end
@@ -236,7 +236,5 @@ module Skylab::Brazen
     def on_error_channel_entity_structure ev
       raise ev.render_first_line_under Brazen_::API::EXPRESSION_AGENT
     end
-
-    EMPTY_S__ = ''.freeze
   end
 end

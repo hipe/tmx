@@ -4,14 +4,14 @@ module Skylab::Brazen
 
     class << self
       def parse_string str, & p
-        Parse_Context__.new( p ).
-          with_input( String_Input_Adapter__, str ).parse
+        Parse_Context_.new( p ).
+          with_input( String_Input_Adapter_, str ).parse
       end
     end
 
     ParseError = ::Class.new ::RuntimeError
 
-    class Parse_Context__
+    class Parse_Context_
 
       def initialize p
         @parse_error_handler_p = p
@@ -27,14 +27,14 @@ module Skylab::Brazen
         prepare_for_parse
         while @line = @lines.gets
           @line_number += 1
-          if BLANK_LINE_OR_COMMENT_RX__ =~ @line
+          if BLANK_LINE_OR_COMMENT_RX_ =~ @line
           else
             send @state_i or break
           end
         end
         @document
       end
-      BLANK_LINE_OR_COMMENT_RX__ = /\A[ ]*(?:\r?\n?\z|[#;])/
+      BLANK_LINE_OR_COMMENT_RX_ = /\A[ ]*(?:\r?\n?\z|[#;])/
 
       # ~ support is coming first before business b.c possible future fission
 
@@ -58,7 +58,7 @@ module Skylab::Brazen
 
       def prepare_for_parse
         @did_error = false
-        @document = Document__.new
+        @document = Document_.new
         @state_i = :when_before_section
       end
 
@@ -117,7 +117,7 @@ module Skylab::Brazen
       PROCEDE__ = true ; CEASE__ = false
     end
 
-    class String_Input_Adapter__
+    class String_Input_Adapter_
       def initialize str
         @scn = Lib_::String_scanner[].new str
       end
@@ -137,7 +137,7 @@ module Skylab::Brazen
       end ]
     end
 
-    class Document__
+    class Document_
       def initialize
         @sections = Sections__.new
       end
