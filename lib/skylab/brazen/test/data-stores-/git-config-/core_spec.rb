@@ -50,6 +50,47 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
       end
     end
 
+    it "a bare word not in a section fails" do
+      with 'moby'
+      ev = Subject_[].parse_string @input_string do |x| x end  # IDENTITY_
+      ev.terminal_channel_i.should eql :section_expected
+      ev.line_number.should eql 1
+      ev.column_number.should eql 1
+      ev.line.should eql 'moby'
+    end
+
+    it "a simple assignment works" do
+      with <<-HERE.gsub! MARGIN_RX__, EMPTY_S_
+        [SECT]
+        foo=bar
+      HERE
+      expect_config do |conf|
+        ast = conf.sections[ :sect ].assignments.first
+        ast.name_s.should eql 'foo'
+        ast.value_x.should eql 'bar'
+      end
+    end
+
+    it "a variety of other assignments work" do
+      with <<-HERE.gsub! MARGIN_RX__, EMPTY_S_
+        [ secto ]
+        foo-moMMy = tRuE
+         ; against spec, the below is an in not a boolean
+        int-not-bool =1
+        multi-word = one two three
+        multi-word-with-comment=   one two three   # a comment
+        quotes-with-etc=  "so; you think you can \\"dance\\" ? "  ; huzzah
+      HERE
+      expect_config do |conf|
+        o = conf.sections[ :secto ].assignments
+        o[ :'foo-mommy' ].should eql true
+        o[ :'int-not-bool' ].should eql 1
+        o[ :'multi-word' ].should eql 'one two three'
+        o[ :'multi-word-with-comment' ].should eql 'one two three'
+        o[ :'quotes-with-etc' ].should eql 'so; you think you can "dance" ? '
+      end
+    end
+
     def with s
       @input_string = s ; nil
     end
