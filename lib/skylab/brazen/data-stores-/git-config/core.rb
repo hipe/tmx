@@ -39,8 +39,8 @@ module Skylab::Brazen
       # ~ support is coming first before business b.c possible future fission
 
     private
-      def error_event i
-        d = @column_number ||= 1
+      def error_event i, col_number=nil
+        d = ( col_number or @column_number ||= 1 )
         x_a = [ i, :line_number, @line_number, :column_number, d, :line, @line ]
         ev = Brazen_::Entity::Event.new x_a, -> y, o do
           y << "#{ i.to_s.gsub( UNDERSCORE_, SPACE_ ) } #{
@@ -87,11 +87,10 @@ module Skylab::Brazen
         @state_i = :when_section_or_assignment
         PROCEDE_
       end
-      BACKSLASH_BACKSLASH__ = '\\\\'.freeze ; BACKSLASH__ = '\\'.freeze
 
       def self.unescape_two_escape_sequences s
         s.gsub! BACKSLASH_QUOTE_, QUOTE_
-        s.gsub! BACKSLASH_BACKSLASH__, BACKSLASH__ ; nil
+        s.gsub! BACKSLASH_BACKSLASH_, BACKSLASH_ ; nil
       end
 
       def whn_not_section
@@ -115,7 +114,7 @@ module Skylab::Brazen
       \r?\n?/x
 
       def accpt_assignment
-        @sect.assignments.accept_asmt Assignment__.new( * @md.captures )
+        @sect.assignments.accept_asmt Assignment_.new( * @md.captures )
         PROCEDE_
       end
     end
@@ -203,7 +202,7 @@ module Skylab::Brazen
       end
     end
 
-    class Assignment__
+    class Assignment_
       def initialize name_s, unparsed_value_s
         @name_s = name_s ; @unparsed_value_s = unparsed_value_s
         @normalized_name_i = @name_s.downcase.intern
@@ -244,12 +243,25 @@ module Skylab::Brazen
         @md = QUOTED_STRING_RX__.match @unparsed_value_s
         @md or raise ParseError, "huh? #{ @unparsed_value_s.inspect }"
         @value_x = @md[0]
-        @value_x.gsub! BACKSLASH_QUOTE_, QUOTE_
+        self.class.unescape_quoted_value_string @value_x
         nil
       end
       QUOTED_STRING_RX__ = /(?<=\A")(?:\\"|[^"])*(?="[ ]*(?:[;#]|\z))/
+
+      def self.unescape_quoted_value_string s
+        s.gsub! BACKSLASH_QUOTE_, QUOTE_
+        s.gsub! BACKSLASH_N__, NEWLINE__
+        s.gsub! BACKSLASH_T__, TAB__
+        s.gsub! BACKSLASH_B__, BACKSPACE__
+        s.gsub! BACKSLASH_BACKSLASH_, BACKSLASH_  # do this last, else etc
+      end
+      BACKSLASH_N__ = '\n'.freeze ; NEWLINE__ = "\n".freeze
+      BACKSLASH_T__ = '\t'.freeze ; TAB__ = "\t".freeze
+      BACKSLASH_B__ = '\b'.freeze ; BACKSPACE__ = "\b".freeze
     end
 
+    BACKSLASH_ = '\\'.freeze
+    BACKSLASH_BACKSLASH_ = '\\\\'.freeze
     BACKSLASH_QUOTE_ = '\\"'.freeze
     CEASE_ = false
     PROCEDE_ = true

@@ -40,6 +40,16 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
       ev.line.should eql 'moby'
     end
 
+    it "a simple assignment works" do
+      a_simple_assignment_works
+      expect_unparses
+    end
+
+    it "a variety of other assignments work" do
+      a_variety_of_other_assignments_work
+      expect_unparses
+    end
+
     def expect_config & p
       super do |config|
         @document = config

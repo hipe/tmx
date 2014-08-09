@@ -11,6 +11,13 @@ module Skylab::Brazen
         end
       end
 
+      module Autonomously_Parsing_Node_Methods__
+      private
+        def error_event i
+          @parse.error_event i, @column_number
+        end
+      end
+
       class Parse_Context__ < Parse_Context_
 
         attr_reader :parse_error_handler_p, :scn
@@ -22,7 +29,7 @@ module Skylab::Brazen
           while @line = @lines.gets
             @line_number += 1
             if BLANK_LINE_OR_COMMENT_RX_ =~ @line
-              @active_nonterminal_node.accept_blank_line_or_comment_line @line
+              @current_nonterminal_node.accept_blank_line_or_comment_line @line
             else
               @scn.string = @line
               send @state_i or break
@@ -36,7 +43,7 @@ module Skylab::Brazen
           @column_number = 1
           @did_error = false
           @document = Document__.new
-          @active_nonterminal_node = @document
+          @current_nonterminal_node = @document
           @scn = Lib_::String_scanner[].new EMPTY_S_
           @state_i = :when_before_section
         end
@@ -44,24 +51,40 @@ module Skylab::Brazen
         def when_before_section
           sect = Section_Or_Subsection__.new self
           if sect.parse
-            @active_nonterminal_node.accept_sect sect
-            PROCEDE_
+            accept_sect sect
           end
+        end
+
+        def when_section_or_assignment
+          @sect ||= Section_Or_Subsection__.new self
+          if @sect.begin_parse
+            if @sect.execute_parse
+              sect = @sect ; @sect = nil
+              accept_sect sect
+            end
+          else
+            ast = Assignment__.new self
+            if ast.parse
+              accept_asmt ast
+            end
+          end
+        end
+        def accept_sect sect
+          @document.accept_sect sect
+          @current_nonterminal_node = sect
+          @section = sect
+          @state_i = :when_section_or_assignment
+          PROCEDE_
+        end
+        def accept_asmt asmt
+          @section.accept_asmt asmt
         end
       end
 
-      class Document__
+      class Mutable_Collection_Kernel__
         def initialize
           @a = []
-          @sections = Sections__.new self
         end
-        attr_reader :sections
-
-        def unparse
-          @a.map( & :unparse ).join EMPTY_S_
-        end
-
-        # ~ for child agents only:
 
         def count_number_of_nodes i
           @a.count do |x|
@@ -77,6 +100,18 @@ module Skylab::Brazen
 
         def map_nodes i, p
           get_node_enum( i ).map( & p )
+        end
+
+        def aref_node_with_norm_name_i symbol_i, norm_i
+          scn = get_node_scanner symbol_i
+          while (( node = scn.gets ))
+            if norm_i == node.normalized_name_i
+              found = node ; break
+            end
+          end
+          if found
+            found.value_when_is_result_of_aref_lookup
+          end
         end
 
         def get_node_enum i
@@ -103,36 +138,68 @@ module Skylab::Brazen
           end
         end
 
+        # ~ more business-y, but still shared:
+
         def accept_blank_line_or_comment_line line_s
           @a.push Blank_Line_Or_Comment_Line__.new line_s ; nil
         end
+      end
+
+      class Document__ < Mutable_Collection_Kernel__
+        def initialize
+          super
+          @sections = Sections__.new self
+        end
+        attr_reader :sections
+
+        def unparse
+          y = []
+          @a.each do |x|
+            x.unparse_into_yielder y
+          end
+          y.join EMPTY_S_
+        end
+
+        # ~ for child agents only:
 
         def accept_sect section
           @a.push section ; nil
         end
       end
 
-      class Sections__
+      class Mutable_Collection_Shell__
+
         def initialize parent
           @parent = parent
         end
         def length
-          @parent.count_number_of_nodes :section_or_subsection
+          @parent.count_number_of_nodes self.class::SYMBOL_I
         end
         def first
-          @parent.first_node :section_or_subsection
+          @parent.first_node self.class::SYMBOL_I
         end
         def map & p
-          @parent.map_nodes :section_or_subsection, p
+          @parent.map_nodes self.class::SYMBOL_I, p
+        end
+        def [] norm_name_i
+          @parent.aref_node_with_norm_name_i(
+            self.class::SYMBOL_I, norm_name_i )
         end
       end
 
-      class Section_Or_Subsection__
+      class Sections__ < Mutable_Collection_Shell__
+        SYMBOL_I = :section_or_subsection
+      end
+
+      class Section_Or_Subsection__ < Mutable_Collection_Kernel__
         def initialize parse
-          @column_number = 0
+          super()
+          @assignments = Assignments__.new self
+          @column_number = 1
           @parse = parse
           @scn = parse.scn
         end
+        attr_reader :assignments
         def symbol_i
           :section_or_subsection
         end
@@ -152,8 +219,25 @@ module Skylab::Brazen
           Parse_Context_.unescape_two_escape_sequences s
           s
         end
-        def unparse
-          @line
+        def value_when_is_result_of_aref_lookup
+          self
+        end
+        def unparse_into_yielder y
+          y << @line
+          @a.each do |x|
+            x.unparse_into_yielder y
+          end ; nil
+        end
+        def begin_parse
+          d = @scn.skip OPEN_BRACE_RX__
+          if d
+            @began_parse_index = d
+            PROCEDE_
+          end
+        end
+        def execute_parse
+          d = @began_parse_index ; @began_parse_index = nil
+          parse_name d
         end
         def parse
           d = @scn.skip OPEN_BRACE_RX__
@@ -183,7 +267,6 @@ module Skylab::Brazen
           end
         end
         OPEN_QUOTE_RX__ = /[ ]+"/
-        SPACE_RX__ = /[ ]*/
         QUOTED_REST_RX__ = /(?:\\"|\\\\|[^"\n])+"/
 
         def parse_subsection_rest d
@@ -193,7 +276,7 @@ module Skylab::Brazen
         end
 
         def parse_close_square
-          @pre_close_square_bracket_white = @scn.skip SPACE_RX__
+          @pre_close_square_bracket_white = @scn.skip SPACE_RX_
           d = @scn.skip CLOSE_SQUARE_BRACET_RX__
           if d
             finish_parse
@@ -208,9 +291,205 @@ module Skylab::Brazen
           @column_number = @parse = @scn = nil ; PROCEDE_
         end
 
-        def error_event i
-          @parse.error_event i
+        def accept_asmt asmt
+          @a.push asmt
+          PROCEDE_
         end
+
+        include Autonomously_Parsing_Node_Methods__
+      end
+
+      class Assignments__ < Mutable_Collection_Shell__
+        SYMBOL_I = :assignment
+      end
+
+      class Assignment__
+
+        def initialize parse
+          @column_number = 1
+          @parse = parse
+          @scn = @parse.scn
+          @value_is_converted = false
+        end
+
+        def symbol_i
+          :assignment
+        end
+
+        def parse
+          @name_start_index = @scn.skip SPACE_RX_
+          @column_number += @name_start_index
+          d = @scn.skip NAME_RX__
+          d ? parse_any_value( d ) : error_event( :expected_variable_name )
+        end
+        NAME_RX__ = /[A-Za-z][-0-9A-Za-z]*/
+
+        def parse_any_value d
+          @name_width = d
+          @column_number += d
+          d = @scn.skip EQUALS_RX__
+          if d
+            parse_value d
+          else
+            d = @scn.skip THE_REST_RX_
+            d or error_event( :expected_equals_sign_or_end_of_line )
+          end
+        end
+        EQUALS_RX__ = /[ ]*=[ ]*/
+
+        def parse_value d
+          @equals_width = d
+          @column_number += d
+          @value_start_index = @column_number - 1
+          if (( d = @scn.skip INTEGER_RHS_RX__ ))
+            parse_integer d
+          elsif (( d = @scn.skip BOOLEAN_TRUE_RHS_RX__ ))
+            parse_boolean_true d
+          elsif (( d = @scn.skip BOOLEAN_FALSE_RHS_RX__ ))
+            parse_boolean_false d
+          else
+            parse_string
+          end
+        end
+        _REST_ = '(?=[ ]*(?:[#;]|\r?\n?\z))'
+        INTEGER_RHS_RX__ = /-?[0-9]+#{ _REST_ }/
+        BOOLEAN_TRUE_RHS_RX__ = /(?i:yes|true|on)#{ _REST_ }/
+        BOOLEAN_FALSE_RHS_RX__ = /(?i:no|false|off)#{ _REST_ }/
+
+        def parse_integer d
+          @value_conversion_method_i = :convert_integer
+          @value_width = d
+          finish_line
+        end
+
+        def parse_boolean_true d
+          @value_conversion_method_i = :convert_true
+          @value_width = d
+          finish_line
+        end
+
+        def parse_boolean_false d
+          @value_conversion_method_i = :convert_false
+          @value_width = d
+          finish_line
+        end
+
+        def parse_string
+          @seg_s_a = [] ; ok = false
+          if parse_any_non_quoted_string
+            begin
+              ok = parse_any_quoted_string
+              ok or break
+              ok = parse_any_non_quoted_string
+            end while ok
+            ok.nil? ? finish_parse_string : ok
+          elsif parse_any_quoted_string
+            begin
+              ok = parse_any_non_quoted_string
+              ok or break
+              ok = parse_any_quoted_string
+            end while ok
+            ok.nil? ? finish_parse_string : ok
+          else
+            error_event(
+              :expected_integer_or_boolean_or_quoted_or_non_quoted_string )
+          end
+        end
+
+        def parse_any_non_quoted_string
+          d = @scn.skip NON_QUOTED_STRING_RX__
+          if d
+            @seg_s_a.push @scn.string[ @column_number - 1, d ]
+            @column_number += d
+            PROCEDE_
+          end
+        end
+        NON_QUOTED_STRING_RX__ = /[^ \t\r\n#;"]+(?:[ \t]+[^ \t\r\n#;"]+)*/
+
+        def parse_any_quoted_string
+          if @scn.skip QUOTE_RX__
+            @column_number += 1  # skip over the open quote
+            d = @scn.skip QUOTED_REST_RX__
+            if d
+              @scn.pos += 1  # because the rx doesn't include the close quote
+              contents_s = @scn.string[ @column_number - 1, d ]
+              @column_number += ( d + 1 )  # skip over the close quote
+              Assignment_.unescape_quoted_value_string contents_s
+              @seg_s_a.push contents_s
+              PROCEDE_
+            else
+              error_event :end_quote_not_found_anywhere_before_end_of_line
+            end
+          end
+        end
+        QUOTE_RX__ = /"/
+        QUOTED_REST_RX__ = /(?:\\"|\\\\|[^"])*(?=")/
+
+        def finish_parse_string
+          @value_width = @column_number - 1 - @value_start_index
+          finish_line do |d|
+            @value_is_converted = true
+            @value_x = @seg_s_a.join EMPTY_S_ ; @seg_s_a = nil
+            PROCEDE_
+          end
+        end
+
+        def finish_line
+          d = @scn.skip THE_REST_RX_
+          if d
+            @line = @scn.string
+            @parse = @scn = @column_number = nil
+            if block_given?
+              yield d
+            else
+              PROCEDE_
+            end
+          else
+            error_event :expected_end_of_line
+          end
+        end
+
+        def normalized_name_i
+          @nn_i ||= name_s.downcase.intern
+        end
+
+        def name_s
+          @n_s ||= @line[ @name_start_index, @name_width ]
+        end
+
+        def value_when_is_result_of_aref_lookup
+          value_x
+        end
+
+        def value_x
+          @value_is_converted or cnvrt_value
+          @value_x
+        end
+
+        def cnvrt_value
+          @value_is_converted = true
+          send @value_conversion_method_i
+        end
+
+        def convert_integer
+          @value_x = @line[ @value_start_index, @value_width ].to_i ; nil
+        end
+
+        def convert_true
+          @value_x = true
+        end
+
+        def convert_false
+          @value_x = false
+        end
+
+        def unparse_into_yielder y
+          y << @line ; nil
+        end
+
+        include Autonomously_Parsing_Node_Methods__
+
+        THE_REST_RX_ = /[ ]*(?:[#;]|\r?\n?\z)/
       end
 
       class Blank_Line_Or_Comment_Line__
@@ -222,10 +501,11 @@ module Skylab::Brazen
           :blank_line_or_comment_line
         end
 
-        def unparse
-          @line_s
+        def unparse_into_yielder y
+          y << @line_s ; nil
         end
       end
+      SPACE_RX_ = /[ ]*/
     end
   end
 end
