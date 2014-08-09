@@ -11,7 +11,7 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable_Sections
       with_empty_document
 
       it "add a section" do
-        document.sections.touch_section 'foo'
+        touch_section 'foo'
         expect_document_content "[foo]\n"
       end
 
@@ -24,7 +24,7 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable_Sections
       end
 
       it "add a section with a subsection" do
-        document.sections.touch_section 'foo', 'bar'
+        touch_section 'foo', 'bar'
         expect_document_content "[foo \"bar\"]\n"
       end
 
@@ -39,28 +39,70 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable_Sections
 
     context "to a document with one section" do
 
-      it "add a section that comes lexcially before"
+      with_a_document_with_a_section_called_foo
 
-      it "add the same section"
+      it "add a section that comes lexcially before" do
+        touch_section 'fo'
+        expect_document_content "[fo]\n[foo]\n"
+      end
 
-      it "add a section that comes lexcially after"
+      it "add the same section (does add, retrieves!)" do
+        secto = touch_section 'foo'
+        expect_document_content "[foo]\n"
+
+        secto_ = touch_section 'foo'
+        secto.should be_respond_to :subsect_name_s
+        secto_.object_id.should eql secto.object_id
+      end
+
+      it "add a section that comes lexcially after" do
+        touch_section 'fooo'
+        expect_document_content "[foo]\n[fooo]\n"
+      end
     end
 
     context "to a document with one subsection" do
 
-      it "add a subsection that comes before"
+      with_a_document_with_one_subsection_called_foo_bar
 
-      it "add the same subsection"
+      it "add a subsection that comes before (because ss)" do
+        touch_section 'foo', 'baq'
+        expect_document_content "[foo \"baq\"]\n[foo \"bar\"]\n"
+      end
 
-      it "add a subsection that comes after"
+      it "add a section that comes before" do
+        touch_section 'foo'
+        expect_document_content "[foo]\n[foo \"bar\"]\n"
+      end
 
-      it "add the same section (but no subsection)"
+      it "add the same subsection" do
+        touch_section 'foo', 'bar'
+        expect_document_content "[foo \"bar\"]\n"
+      end
+
+      it "add a subsection that comes after" do
+        touch_section 'foo', 'baz'
+        expect_document_content "[foo \"bar\"]\n[foo \"baz\"]\n"
+      end
+
+      it "add a section that comes after" do
+        touch_section 'fooz'
+        expect_document_content "[foo \"bar\"]\n[fooz]\n"
+      end
     end
 
     context "to a document with two subsections" do
 
-      it "add a section that comes in the middle"
+      with_a_document_with_two_sections
 
+      it "add a section that comes in the middle" do
+        touch_section 'camma'
+        expect_document_content "[beta]\n[camma]\n[delta]\n"
+      end
+    end
+
+    def touch_section a, b=nil
+      document.sections.touch_section a, b
     end
   end
 end

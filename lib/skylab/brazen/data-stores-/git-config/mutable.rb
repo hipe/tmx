@@ -82,8 +82,17 @@ module Skylab::Brazen
       end
 
       class Mutable_Collection_Kernel__
+
         def initialize
           @a = []
+        end
+
+        def initialize_copy _otr_
+          a = ::Array.new @a.length
+          @a.length.times.each do |d|
+            a[ d ] = @a[ d ].dup
+          end
+          @a = a ; nil
         end
 
         def init_by_parsing_string line_s
@@ -158,9 +167,21 @@ module Skylab::Brazen
         end
 
         def insert_item_y_before_z y, z
+          idx = fnd_some_index_of_item z
+          @a[ idx, 0 ] = [ y ] ; nil
         end
 
         def after_x_insert_item_y x, y
+          idx = fnd_some_index_of_item x
+          @a[ idx + 1, 0 ] = [ y ] ; nil
+        end
+
+        def fnd_some_index_of_item x
+          match_p = x.object_id.method( :== )
+          idx = @a.length.times.detect do |d|
+            match_p[ @a.fetch( d ).object_id ]
+          end
+          idx or self._SANITY
         end
 
         # ~ more business-y, but still shared:
@@ -176,6 +197,11 @@ module Skylab::Brazen
           @sections = Sections__.new self
         end
         attr_reader :sections
+
+        def initialize_copy _otr_
+          super
+          @sections = Sections__.new self ; nil
+        end
 
         def unparse
           y = []
@@ -282,6 +308,12 @@ module Skylab::Brazen
         def initialize
           super()
         end
+
+        def initialize_copy _otr_
+          super
+          @assignments = Assignments__.new self ; nil
+        end
+
         def via_parse parse
           finish_initialize
           @column_number = 1
@@ -401,7 +433,7 @@ module Skylab::Brazen
         CLOSE_SQUARE_BRACET_RX__ = /[ ]*\][ ]*(?:[;#]|\r?\n?\z)/
 
         def finish_parse
-          @line = @scn.string
+          @line = @scn.string.freeze
           @column_number = @parse = @scn = nil ; PROCEDE_
         end
 
@@ -424,6 +456,10 @@ module Skylab::Brazen
           @parse = parse
           @scn = @parse.scn
           @value_is_converted = false
+        end
+
+        def initialize_copy _otr_
+          self._DO_ME  # #todo
         end
 
         def symbol_i
@@ -551,7 +587,7 @@ module Skylab::Brazen
         def finish_line
           d = @scn.skip THE_REST_RX_
           if d
-            @line = @scn.string
+            @line = @scn.string.freeze
             @parse = @scn = @column_number = nil
             if block_given?
               yield d
@@ -609,6 +645,10 @@ module Skylab::Brazen
       class Blank_Line_Or_Comment_Line__
         def initialize line
           @line_s = line.freeze
+        end
+
+        def initialize_copy _otr_
+          self._DO_ME  # todo
         end
 
         def symbol_i
