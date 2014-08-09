@@ -1,3 +1,6 @@
+[#010]       #doc-node: data stores
+[#009]       #parent-node: [#010] git config
+[#008]       #parent-node: [#009] the mutable git config narrative ..
 [#007] #open anticpating the issue with losing hooks accross inheritance bounds
 [#006] #open #doc-node the defaults vs required narrative ..
 [#005]       #done re-arch expressions agents to work correctly with 'par'

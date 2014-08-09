@@ -13,8 +13,14 @@ module Skylab::Brazen
 
     class Parse_Context_
 
-      def initialize p
+      def initialize p=nil
         @parse_error_handler_p = p
+      end
+
+      def for_single_line s
+        @line = s
+        @line_number = 1
+        self
       end
 
       def with_input adapter_cls, x
@@ -80,17 +86,12 @@ module Skylab::Brazen
 
       def accpt_section
         if (( ss = @md[ :subsect ] ))
-          self.class.unescape_two_escape_sequences ss
+          Section_.unescape_subsection_name ss
         end
-        @sect = Section__.new @md[ :name ], ss
+        @sect = Section_.new @md[ :name ], ss
         @document.sections.accept_sect @sect
         @state_i = :when_section_or_assignment
         PROCEDE_
-      end
-
-      def self.unescape_two_escape_sequences s
-        s.gsub! BACKSLASH_QUOTE_, QUOTE_
-        s.gsub! BACKSLASH_BACKSLASH_, BACKSLASH_ ; nil
       end
 
       def whn_not_section
@@ -172,7 +173,17 @@ module Skylab::Brazen
       end
     end
 
-    class Section__
+    class Section_
+
+      def self.escape_subsection_name s
+        s.gsub! BACKSLASH_, BACKSLASH_BACKSLASH_  # do this first
+        s.gsub! QUOTE_, BACKSLASH_QUOTE_ ; nil
+      end
+
+      def self.unescape_subsection_name s
+        s.gsub! BACKSLASH_QUOTE_, QUOTE_
+        s.gsub! BACKSLASH_BACKSLASH_, BACKSLASH_ ; nil
+      end
 
       def initialize name_s, subsect_name_s
         @name_s = name_s.freeze

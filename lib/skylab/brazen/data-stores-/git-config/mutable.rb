@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   module Data_Stores_::Git_Config
 
-    module Mutable
+    module Mutable  # see [#008]
 
       class << self
         def parse_string str, & p
@@ -49,14 +49,14 @@ module Skylab::Brazen
         end
 
         def when_before_section
-          sect = Section_Or_Subsection__.new self
+          sect = Section_Or_Subsection__.new.via_parse self
           if sect.parse
             accept_sect sect
           end
         end
 
         def when_section_or_assignment
-          @sect ||= Section_Or_Subsection__.new self
+          @sect ||= Section_Or_Subsection__.new.via_parse self
           if @sect.begin_parse
             if @sect.execute_parse
               sect = @sect ; @sect = nil
@@ -84,6 +84,13 @@ module Skylab::Brazen
       class Mutable_Collection_Kernel__
         def initialize
           @a = []
+        end
+
+        def init_by_parsing_string line_s
+          @column_number = 1
+          @parse = Parse_Context__.new.for_single_line line_s
+          @scn = Lib_::String_scanner[].new line_s
+          parse
         end
 
         def count_number_of_nodes i
@@ -138,6 +145,24 @@ module Skylab::Brazen
           end
         end
 
+        # ~ the mutators
+
+        def insert_item_y_between_x_and_z x, y, z
+          if z
+            insert_item_y_before_z y, z
+          elsif x
+            after_x_insert_item_y x, y
+          else
+            @a.push y
+          end ; nil
+        end
+
+        def insert_item_y_before_z y, z
+        end
+
+        def after_x_insert_item_y x, y
+        end
+
         # ~ more business-y, but still shared:
 
         def accept_blank_line_or_comment_line line_s
@@ -181,42 +206,130 @@ module Skylab::Brazen
         def map & p
           @parent.map_nodes self.class::SYMBOL_I, p
         end
+        def get_scanner
+          @parent.get_node_scanner self.class::SYMBOL_I
+        end
         def [] norm_name_i
           @parent.aref_node_with_norm_name_i(
             self.class::SYMBOL_I, norm_name_i )
+        end
+
+        # ~ the mutators
+
+        def touch_comparable_item item, compare_p
+          scn = get_scanner
+          while (( x = scn.gets ))
+            d = compare_p[ x ]
+            case d
+            when -1 ; last_above_neighbor = x
+            when  0 ; exact_match = x ; break
+            when  1 ; first_below_neighbor = x ; break
+            end
+          end
+          if exact_match
+            exact_match
+          else
+            item.finish_initialize
+            @parent.insert_item_y_between_x_and_z(
+              last_above_neighbor, item, first_below_neighbor )
+            item
+          end
         end
       end
 
       class Sections__ < Mutable_Collection_Shell__
         SYMBOL_I = :section_or_subsection
+
+        def touch_section section_name_s, subsection_name_s=nil
+          section = Section_Or_Subsection__.new.
+            via_names section_name_s, subsection_name_s
+          _compare_p = bld_compare section
+          touch_comparable_item section, _compare_p
+        end
+
+        def bld_compare section
+          normalized_name_s = section.normalized_name_s
+          subsection_name_s = section.subsect_name_s
+          if subsection_name_s
+            bld_compare_name_and_ss_name normalized_name_s, subsection_name_s
+          else
+            bld_compare_name normalized_name_s
+          end
+        end
+
+        def bld_compare_name_and_ss_name normalized_name_s, subsection_name_s
+          -> x do
+            d = x.normalized_name_s <=> normalized_name_s
+            if d.zero?
+              if x.subsect_name_s
+                x.subsect_name_s <=> subsection_name_s
+              else -1 end
+            else d end
+          end
+        end
+
+        def bld_compare_name normalized_name_s
+          -> x do
+            d = x.normalized_name_s <=> normalized_name_s
+            if d.zero?
+              x.subsect_name_s ? 1 : 0
+            else d end
+          end
+        end
       end
 
       class Section_Or_Subsection__ < Mutable_Collection_Kernel__
-        def initialize parse
+        def initialize
           super()
-          @assignments = Assignments__.new self
+        end
+        def via_parse parse
+          finish_initialize
           @column_number = 1
           @parse = parse
           @scn = parse.scn
+          self
         end
         attr_reader :assignments
+        def via_names name_s, subsection_name_s
+          ANCHORED_SECTION_NAME_RX__.match( name_s ) or  # see #note-1
+            raise ParseError, "invalid section name: #{ name_s.inspect }"
+          _line = if subsection_name_s
+            subsection_name_s = subsection_name_s.dup
+            Section_.escape_subsection_name subsection_name_s
+            "[#{ name_s } \"#{ subsection_name_s }\"]\n"
+          else
+            "[#{ name_s }]\n"
+          end
+          init_by_parsing_string _line
+          self
+        end
+        def finish_initialize
+          @assignments = Assignments__.new self ; nil
+        end
         def symbol_i
           :section_or_subsection
         end
         def normalized_name_i
-          @nn_i ||= name_s.downcase.intern
+          @nn_i ||= normalized_name_s.intern
+        end
+        def normalized_name_s
+          @nn_s ||= name_s.downcase
         end
         def name_s
           @n_s ||= @line[ @name_start_index, @name_width ]
         end
         def subsect_name_s
-          @ss_n_s ||= bld_ss_n
+          @did_parse_ss_name ||= begin
+            @ss_n_s = ( bld_ss_n if @subsection_leader_width )
+            true
+          end
+          @ss_n_s
         end
         def bld_ss_n
           s = @line[
             @name_start_index + @name_width + @subsection_leader_width,
             @subsection_name_width ]
-          Parse_Context_.unescape_two_escape_sequences s
+          Section_.unescape_subsection_name s
           s
         end
         def value_when_is_result_of_aref_lookup
@@ -251,6 +364,7 @@ module Skylab::Brazen
           d ? parse_rest( d ) : error_event( :expected_section_name )
         end
         SECTION_NAME_RX__ = /[-A-Za-z0-9.]+/
+        ANCHORED_SECTION_NAME_RX__ = /\A#{ SECTION_NAME_RX__.source }\z/
         def parse_rest d
           @column_number += d
           @name_width = d
