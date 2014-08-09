@@ -14,28 +14,32 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable_Sections
   module ModuleMethods
 
     def with_empty_document
-      establish_document_prototype_from_string EMPTY_S_
+      with_content EMPTY_S_
     end
 
     def with_a_document_with_a_section_called_foo
-      establish_document_prototype_from_string "[foo]\n"
+      with_content "[foo]\n"
     end
 
     def with_a_document_with_one_subsection_called_foo_bar
-      establish_document_prototype_from_string "[foo \"bar\"]\n"
+      with_content "[foo \"bar\"]\n"
     end
 
     def with_a_document_with_two_sections
-      establish_document_prototype_from_string "[beta]\n[delta]\n"
+      with_content "[beta]\n[delta]\n"
     end
 
-    def establish_document_prototype_from_string str
-      acpt_document_prototype Subject__[].parse_string str
+    def with_a_document_with_one_section_with_one_assignment
+      with_content "[foo]\nbar = baz\n"
     end
 
-    def acpt_document_prototype _DOCUMENT_
+    def with_content s
+      document_p = -> do
+        doc = Subject__[].parse_string s
+        document_p = -> { doc } ; doc
+      end
       define_method :__build_document__ do
-        _DOCUMENT_.dup
+        document_p[].dup
       end ; nil
     end
   end

@@ -6,19 +6,8 @@
 this is a rewrite and intended replacement for the stuff near (but not
 at) [#cm-005] code molester's config file.
 
-this is not intended to edit git config files per se. it is intended to
-be a library used for creating new, modifying existing and reading from
-existing config files; config files that happen to try and immitate the
-syntax from the git cofig files.
-
-we implement our rendition of the *git* config file syntax speficially
-because it is complex enough for our needs without being too complex, it
-is well documented and it should have a relatively widespread
-distribution of understanding in the world.
-
-however, using the git format specifically is a bit of an afterthought.
-we can build out other document editors for other formats as necessary.
-
+(the introduction in the parent document node to this node is also
+relevant here.)
 
 
 ## note-1

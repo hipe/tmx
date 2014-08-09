@@ -259,6 +259,15 @@ module Skylab::Brazen
       end
       QUOTED_STRING_RX__ = /(?<=\A")(?:\\"|[^"])*(?="[ ]*(?:[;#]|\z))/
 
+      def self.escape_value_string s
+        s.gsub! BACKSLASH_, BACKSLASH_BACKSLASH_BACKSLASH__  # do first else etc
+        s.gsub! QUOTE_, BACKSLASH_QUOTE_
+        s.gsub! NEWLINE__, BACKSLASH_N__
+        s.gsub! TAB__, BACKSLASH_T__
+        s.gsub! BACKSPACE__, BACKSLASH_B__
+      end
+      BACKSLASH_BACKSLASH_BACKSLASH__ = '\\\\\\'  # the gsub arg uses '\' too :(
+
       def self.unescape_quoted_value_string s
         s.gsub! BACKSLASH_QUOTE_, QUOTE_
         s.gsub! BACKSLASH_N__, NEWLINE__

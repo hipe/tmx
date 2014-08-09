@@ -13,6 +13,18 @@ module Skylab::Brazen
 
       module Autonomously_Parsing_Node_Methods__
       private
+
+        def init_by_parsing_string line_s
+          prepare_for_autonomous_parse_of_line line_s
+          parse
+        end
+
+        def prepare_for_autonomous_parse_of_line line_s
+          @column_number = 1
+          @parse = Parse_Context__.new.for_single_line line_s
+          @scn = Lib_::String_scanner[].new line_s ; nil
+        end
+
         def error_event i
           @parse.error_event i, @column_number
         end
@@ -49,21 +61,21 @@ module Skylab::Brazen
         end
 
         def when_before_section
-          sect = Section_Or_Subsection__.new.via_parse self
+          sect = Section_Or_Subsection__.new.with_parse self
           if sect.parse
             accept_sect sect
           end
         end
 
         def when_section_or_assignment
-          @sect ||= Section_Or_Subsection__.new.via_parse self
+          @sect ||= Section_Or_Subsection__.new.with_parse self
           if @sect.begin_parse
             if @sect.execute_parse
               sect = @sect ; @sect = nil
               accept_sect sect
             end
           else
-            ast = Assignment__.new self
+            ast = Assignment__.new.with_parse self
             if ast.parse
               accept_asmt ast
             end
@@ -93,13 +105,6 @@ module Skylab::Brazen
             a[ d ] = @a[ d ].dup
           end
           @a = a ; nil
-        end
-
-        def init_by_parsing_string line_s
-          @column_number = 1
-          @parse = Parse_Context__.new.for_single_line line_s
-          @scn = Lib_::String_scanner[].new line_s
-          parse
         end
 
         def count_number_of_nodes i
@@ -268,7 +273,7 @@ module Skylab::Brazen
 
         def touch_section section_name_s, subsection_name_s=nil
           section = Section_Or_Subsection__.new.
-            via_names section_name_s, subsection_name_s
+            with_names section_name_s, subsection_name_s
           _compare_p = bld_compare section
           touch_comparable_item section, _compare_p
         end
@@ -314,7 +319,7 @@ module Skylab::Brazen
           @assignments = Assignments__.new self ; nil
         end
 
-        def via_parse parse
+        def with_parse parse
           finish_initialize
           @column_number = 1
           @parse = parse
@@ -322,7 +327,7 @@ module Skylab::Brazen
           self
         end
         attr_reader :assignments
-        def via_names name_s, subsection_name_s
+        def with_names name_s, subsection_name_s
           ANCHORED_SECTION_NAME_RX__.match( name_s ) or  # see #note-1
             raise ParseError, "invalid section name: #{ name_s.inspect }"
           _line = if subsection_name_s
@@ -442,6 +447,36 @@ module Skylab::Brazen
           PROCEDE_
         end
 
+        # ~ mutators
+
+        def []= i, x
+          touch_assignment i, x
+          x
+        end
+
+        def touch_assignment i, x, listener=nil
+          ast = Assignment__.new.with_normal_name_and_value i, x
+          otr = @assignments.touch_comparable_item ast, bld_compare( ast )
+          if ast.object_id == otr.object_id
+            listener and listener.call :added
+          else
+            _x = otr.value_x
+            if x == _x
+              listener and listener.call :no_change
+            else
+              otr.value_x = x
+              listener and listener.call :changed
+            end
+          end
+        end
+
+        def bld_compare ast
+          norm_s = ast.normalized_name_s
+          -> x do
+            x.normalized_name_s <=> norm_s
+          end
+        end
+
         include Autonomously_Parsing_Node_Methods__
       end
 
@@ -451,20 +486,74 @@ module Skylab::Brazen
 
       class Assignment__
 
-        def initialize parse
-          @column_number = 1
-          @parse = parse
-          @scn = @parse.scn
-          @value_is_converted = false
+        def initialize
+        end
+
+        def finish_initialize
         end
 
         def initialize_copy _otr_
-          self._DO_ME  # #todo
+          # amazingly, nothing to do
+          @line.frozen? or self._SANITY
         end
 
         def symbol_i
           :assignment
         end
+
+        def with_parse parse
+          @column_number = 1
+          @parse = parse
+          @scn = @parse.scn
+          @value_is_converted = false
+          self
+        end
+
+        def with_normal_name_and_value i, x
+          NAME_RX__ =~ i.to_s or raise ParseError, say_invalid_name( i )
+          x.nil? and self._DO_ME
+          s = marshal_value x
+          init_by_parsing_string "#{ i } = #{ s }\n"
+          self
+        end
+
+        def value_x= x
+          x.nil? and raise ::ArgumentError, "cannot be nil"
+          s = marshal_value x
+          line = @line.dup
+          line[ @value_start_index, @value_width ] = s
+          prepare_for_autonomous_parse_of_line line
+          @value_is_converted = false
+          # #hack pretend we just parsed the equals non-terminal
+          @scn.pos = @name_start_index + @name_width + @equals_width
+          @column_number = @name_start_index + @name_width + 1
+          parse_value @equals_width
+          x
+        end
+
+        def say_invalid_name i
+          "invalid assignment name: #{ i.inspect }"
+        end
+
+        def marshal_value x
+          case x
+          when ::TrueClass, ::FalseClass, ::Fixnum ; x.inspect
+          else marshal_string_value x
+          end
+        end
+
+        def marshal_string_value s
+          if LEADING_WS_RX__ =~ s || TRAILING_WS_RX__ =~ s ||
+            SPECIAL_VALUE_CHARACTERS_RX__ =~ s
+            s = s.dup
+            Assignment_.escape_value_string s
+            "\"#{ s }\""
+          else
+            s
+          end
+        end
+        LEADING_WS_RX__ = /\A[ \t]+/ ; TRAILING_WS_RX__ = /[ \t]+\z/
+        SPECIAL_VALUE_CHARACTERS_RX__ = /[#;"\\\n\t\b]/
 
         def parse
           @name_start_index = @scn.skip SPACE_RX_
@@ -490,7 +579,7 @@ module Skylab::Brazen
         def parse_value d
           @equals_width = d
           @column_number += d
-          @value_start_index = @column_number - 1
+          @value_start_index = @column_number - 1  # might contain open quote!
           if (( d = @scn.skip INTEGER_RHS_RX__ ))
             parse_integer d
           elsif (( d = @scn.skip BOOLEAN_TRUE_RHS_RX__ ))
@@ -600,7 +689,11 @@ module Skylab::Brazen
         end
 
         def normalized_name_i
-          @nn_i ||= name_s.downcase.intern
+          @nn_i ||= normalized_name_s.intern
+        end
+
+        def normalized_name_s
+          @nn_s ||= name_s.downcase
         end
 
         def name_s
