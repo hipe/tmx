@@ -65,6 +65,8 @@ module Skylab::Snag
       res
     end
 
+    attr_reader :up_from_path
+
   private
 
     def initialize api
@@ -122,7 +124,7 @@ module Skylab::Snag
       @nodes ||= begin
         nodes = nil
         begin
-          mf = request_client.find_closest_manifest -> msg do
+          mf = request_client.find_closest_manifest up_from_path, -> msg do
             error msg
           end
           mf or break( nodes = mf )

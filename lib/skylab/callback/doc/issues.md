@@ -1,3 +1,4 @@
+[#032] #open document this corner
 [#031]       #parent-node:[#024] the stowaway narrative ..
 [#030]       #done things to integrate old boxxy/a.l with new a.l
 [#029]       #parent-node:[#024] const reduce ..

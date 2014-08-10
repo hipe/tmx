@@ -51,7 +51,7 @@ module Skylab::Snag
     define_method :each_node do |line_producer, node_consumer|
       o = @indexes
       line = nil
-      scn = Snag_::Library_::StringScanner.new ''
+      scn = Snag_::Library_::StringScanner.new EMPTY_S_
       gets = -> do
         line = line_producer.gets and scn.string = line
       end

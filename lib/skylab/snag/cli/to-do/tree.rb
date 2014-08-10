@@ -32,7 +32,7 @@ module Skylab::Snag
             if n.todo
               a << n.todo.full_source_line
             end
-            y << a.join( ' ' )
+            y << a.join( SPACE_ )
           else
             y << "#{ prefix } #{ n.slug }"
           end
@@ -77,7 +77,7 @@ module Skylab::Snag
               }#{ stylize[ todo.tag_string, * tag_style_a ] }#{
               }#{ todo.post_tag_string }"
           end
-          y << "#{ col_a }#{ ' ' * ( col_a_width - col_a_w ) }#{
+          y << "#{ col_a }#{ SPACE_ * ( col_a_width - col_a_w ) }#{
             } |#{ col_b }"
         end
       end )

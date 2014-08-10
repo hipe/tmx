@@ -363,7 +363,7 @@ module Skylab::Callback
         # dir tree then XYZZY
         if np.has_directory and x.respond_to? :did_resolve_entry_tree
           if x.did_resolve_entry_tree
-            $stderr.puts "TODO: document this:#{ x }"
+            # [#032] document why & when this gets here (e.g via the [sg] client)
           else
             # when dir exists but no file, WTF
             x.set_entry_tree np

@@ -172,7 +172,7 @@ module Skylab::Snag
           available_length = line_width - ( new_line.length + sep.length )
           fail 'sanity' if min_words < 1
           excerpt = words[ 0, min_words - 1 ].join sp
-          words[ 0, min_words - 1 ] = []
+          words[ 0, min_words - 1 ] = EMPTY_A_
           next_length = -> do
             x = excerpt.length
             if words.length.nonzero?
@@ -207,7 +207,7 @@ module Skylab::Snag
         # bother including in the replacement line - (too few sounds dumb,
         # an interesting nlp problems similar to summarization [#it-001])
 
-      sp = ' '
+      sp = SPACE_
 
       msg_body_excrpt
     end.call

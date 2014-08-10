@@ -131,7 +131,7 @@ module Skylab::Snag
         end
         use
       end )
-      @message = reduce.join ' '
+      @message = reduce.join SPACE_
       nil
     end
 
@@ -157,12 +157,12 @@ module Skylab::Snag
               parts.push open_tag
             elsif @do_prepend_open_tag_ws
               if ! ( @message && 0 == @message.index( open_tag.render ) )
-                parts.push( ' ' * open_tag.render.length ) # [#sg-021]
+                parts.push( SPACE_ * open_tag.render.length ) # [#sg-021]
               end
             end
             parts.push @message if @message
             parts.push @date_string if @date_string
-            parts.join ' '
+            parts.join SPACE_
           end.call # '' might be ok
 
           failure = -> msg do
@@ -234,7 +234,7 @@ module Skylab::Snag
         # "[#867] #open "
         x = Models::Manifest.header_width +
           Models::Tag.canonical[ :open ].to_s.length + 1
-        ' ' * x
+        SPACE_ * x
       end
     end
 

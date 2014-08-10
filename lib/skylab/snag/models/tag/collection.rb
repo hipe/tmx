@@ -4,7 +4,7 @@ module Skylab::Snag
 
     def add! body_string, do_append, error, info
       @scn.pos = 0 # #hacklund
-      sep = @scn.string.length.zero? ? '' : ' '
+      sep = @scn.string.length.zero? ? EMPTY_S_ : SPACE_
       tag_str = Models::Tag.render body_string
       if do_append
         @scn.string.concat "#{ sep }#{ tag_str }"
@@ -20,9 +20,9 @@ module Skylab::Snag
       message = @scn.string
       pos_a = fly.begin
       pos_b = fly.end
-      if pos_a > 0 && ' ' == message[ pos_a - 1 ]
+      if pos_a > 0 && SPACE_ == message[ pos_a - 1 ]
         pos_a -= 1
-      elsif pos_b < ( message.length - 1 ) && ' ' == message[ pos_b + 1 ]
+      elsif pos_b < ( message.length - 1 ) && SPACE_ == message[ pos_b + 1 ]
         pos_b += 1
       end
       pos_a = nil if 0 == pos_a

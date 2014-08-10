@@ -8,6 +8,8 @@ module Skylab::Snag::TestSupport::Models::Hashtag__
 
   extend TestSupport::Quickie
 
+  SPACE_ = Snag_::SPACE_
+
   describe "[sg] models hashtag" do
 
     context "parses" do
@@ -18,8 +20,8 @@ module Skylab::Snag::TestSupport::Models::Hashtag__
       end
 
       it "string with only one space" do
-        scan ' '
-        expect_part :string, ' '
+        scan SPACE_
+        expect_part :string, SPACE_
         expect_no_more_parts
       end
 

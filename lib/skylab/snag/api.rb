@@ -54,10 +54,10 @@ module Skylab::Snag
 
     # getters for *persistent* models *objects* (think daemons):
 
-    def find_closest_manifest error
+    def find_closest_manifest from_path, error
       res = nil
       begin
-        mp = find_closest_manifest_path error
+        mp = find_closest_manifest_path from_path, error
         mp or break( res = mp )
         mp.absolute? or fail 'sanity'
         manny = ( @manifest_cache ||= { } ).fetch( mp.to_s ) do |path| # ofuck
@@ -71,10 +71,15 @@ module Skylab::Snag
 
     manifest_path = API.manifest_path
 
-    define_method :find_closest_manifest_path do |error|
+    define_method :find_closest_manifest_path do |from_path, error|
       res = nil
       begin
-        pn = ::Pathname.pwd
+        if from_path
+          pn = ::Pathname.new from_path
+          pn.relative? and pn = pn.expand_path
+        else
+          pn = ::Pathname.pwd
+        end
         found = nil
         num_dirs_searched = 0
         seen = []

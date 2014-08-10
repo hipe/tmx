@@ -50,11 +50,11 @@ module Skylab::Snag
       end
       if a.length.nonzero? then no[ a * ' - ' ] else
         Snag_::Library_::Shellwords || nil
-        y = [ "find #{ @paths.map(& :shellescape ) * ' ' }" ]
+        y = [ "find #{ @paths.map(& :shellescape ) * SPACE_ }" ]
         y << "\\( #{@names.map { |n| "-name #{ n.shellescape }"} * ' -o '} \\)"
         y <<
          "-exec grep --line-number --with-filename #{@pattern.shellescape} {} +"
-        yes[ y * ' ' ]
+        yes[ y * SPACE_ ]
     # find lib/skylab/snag -name '*.rb' -exec grep --line-number '@t0d0\>' {} +
       end
     end
@@ -133,7 +133,7 @@ module Skylab::Snag
 
         my.patrn -> p { y << "with the pattern #{ val[ p ] }" }, e[ :pattern ]
 
-        y * ' '
+        y * SPACE_
       end
     end
 
