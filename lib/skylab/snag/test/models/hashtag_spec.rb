@@ -43,72 +43,30 @@ module Skylab::Snag::TestSupport::Models::Hashtag__
         expect_part :string, 'this is some code '
         expect_part :hashtag, '#public-API'
         expect_part :string, ', '
-        expect_part :hashtag, '#bill-Deblazio:2014'
+        expect_part :hashtag, '#bill-Deblazio'
+        expect_part :hashtag_name_value_separator, ':'
+        expect_part :hashtag_value, '2014'
         expect_no_more_parts
       end
     end
 
-    context "simple" do
+    context "the symbol classes are reflective" do
 
-      tag = -> ctx do
-        r = ctx.build_tag '#foo-bar'
-        tag = -> _ { r } ; r
-      end
-
-      it "means it does not have a colon" do
-        tg = tag[ self ]
-        tg.is_simple.should eql true
-        tg.is_complex.should eql false
-      end
-
-      it "'to_stem_and_value' is as is expected" do
-        arr = tag[ self ].to_stem_and_value
-        arr.length.should eql 2
-        s, v = arr
-        s.should eql 'foo-bar'
-        v.should be_nil
-      end
-
-      it "'get_stem' works" do
-        tag[ self ].get_stem.should eql 'foo-bar'
+      it "you can 'get_stem_s' from a hash object" do
+        hashtag = build_hashtag '#foo-bar'
+        hashtag.get_stem_s.should eql 'foo-bar'
       end
     end
 
-    context "complex" do
-
-      tag = -> ctx do
-        r = ctx.build_tag '#priority:low:very'
-        tag = -> _ { r } ; r
-      end
-
-      it "means it does have a colon" do
-        tg = tag[ self ]
-        tg.is_simple.should eql false
-        tg.is_complex.should eql true
-      end
-
-      it "'to_stem_and_value' is as is expected" do
-        arr = tag[ self ].to_stem_and_value
-        arr.length.should eql 2
-        s, v = arr
-        s.should eql 'priority'
-        v.should eql 'low:very'
-      end
-
-      it "'get_stem' works" do
-        tag[ self ].get_stem.should eql 'priority'
-      end
-    end
-
-    def build_tag str
-      scan str
-      1 == @part_a.length and :hashtag == @part_a.first.type_i or fail "sanity"
-      @part_a.shift
+    def build_hashtag str
+      a = Subject_[].parse str
+      1 == a.length and :hashtag == a.first.symbol_i or self._SANITY
+      a.first
     end
 
     def expect_part i, x
       part = @part_a.shift or fail "expected more parts, had none"
-      part.type_i.should eql i
+      part.symbol_i.should eql i
       part.to_s.should eql x
     end
 
@@ -117,7 +75,11 @@ module Skylab::Snag::TestSupport::Models::Hashtag__
     end
 
     def scan s
-      @part_a = Snag_::Models::Hashtag::Parse[ :_listener_not_used_, s ]
+      @part_a = Subject_[].parse s
+    end
+
+    Subject_ = -> do
+      Snag_::Models::Hashtag
     end
   end
 end

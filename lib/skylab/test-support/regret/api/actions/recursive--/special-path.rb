@@ -59,36 +59,49 @@ module Skylab::TestSupport::Regret::API
 
       def rest_s=
         @rest_s = @x_a.shift
-        @ht_a = RegretLib_::Parse_hashtag[ @listener, @rest_s ]
-        validate_ht_a ; nil
+        _scn = RegretLib_::Hashtag_scanner[ @rest_s ]
+        @scn = Callback_::Scanner::Puts_Wrapper.new _scn
+        validate_ht_scn ; nil
       end
 
-      def validate_ht_a
+      def validate_ht_scn
         @seen_hashtag_count = 0
-        @ht_a.each do |x|
-          :string == x.type_i and next
-          :hashtag == x.type_i or fail "unexpected: #{ x.type_i }"
-          absrb_hashtag( x ) or break
+        while (( o = @scn.gets ))
+          :string == o.symbol_i and next
+          :hashtag == o.symbol_i or raise say_strange_symbol( o )
+          absrb_hashtag( o ) or break
         end ; nil
       end
 
-      def absrb_hashtag x
+      def say_strange_symbol o
+        "unexpected: #{ o.symbol_i }"
+      end
+
+      def absrb_hashtag ht
         @seen_hashtag_count += 1
-        if x.is_complex
-          absrb_complex_hashtag x
+        o = @scn.peek
+        if o && :hashtag_name_value_separator == o.symbol_i
+          @scn.advance_one
+          o = @scn.peek
+          if o && :hashtag_value == o.symbol_i
+            @scn.advance_one
+            has_value = true
+            value_s = o.to_s
+          end
+        end
+        if has_value
+          absrb_hashtag_stem_and_value ht.get_stem_s, value_s
         else
-          absrb_simple_hashtag x
+          absrb_hashtag_stem ht.get_stem_s
         end
       end
 
-      def absrb_complex_hashtag x
-        stem_s, value_s = x.to_stem_and_value
+      def absrb_hashtag_stem_and_value stem_s, value_s
         bndl = prcr_any_bundle stem_s
         bndl and attmpt_complex_bundle bndl, value_s
       end
 
-      def absrb_simple_hashtag x
-        stem_s = x.get_stem
+      def absrb_hashtag_stem stem_s
         bndl = prcr_any_bundle stem_s
         bndl and attmpt_simple_bundle bndl
       end

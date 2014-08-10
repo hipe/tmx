@@ -5,6 +5,7 @@ module Skylab::TestSupport
     module API
       API = self
       Autoloader_ = Autoloader_
+      Callback_ = Callback_
       CONST_SEP_ = CONST_SEP_
       DEFAULT_CORE_BASENAME_ = "core#{ Autoloader_::EXTNAME }"
       EMPTY_A_ = [].freeze
@@ -44,6 +45,9 @@ module Skylab::TestSupport
         Field_exponent_proc = -> do
           MetaHell__[]::Parse::Fields::Exponent
         end
+        Hashtag_scanner = -> s do
+          Snag__[]::Models::Hashtag.scanner s
+        end
         Headless__ = Lib_::Headless__
         Ick = -> x do
           MetaHell__[].strange x
@@ -73,9 +77,6 @@ module Skylab::TestSupport
         Oxford_or = TestSupport_::Callback_::Oxford_or
         Parse_alternation = -> do
           MetaHell__[]::Parse.alternation
-        end
-        Parse_hashtag = -> listener, s do
-          Snag__[]::Models::Hashtag::Parse[ listener, s ]
         end
         sidesys = TestSupport_::Autoloader_.build_require_sidesystem_proc
         Path_tools_clear = -> do
