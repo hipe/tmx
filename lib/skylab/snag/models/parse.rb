@@ -4,8 +4,8 @@ module Skylab::Snag
 
   Models::Parse::Events = ::Module.new
 
-  class Models::Parse::Events::Failure <
-    Snag_::Model::Event.new :expecting, :near, :line, :line_number, :pathname
+  Models::Parse::Events::Failure = Snag_::Model_::Event.
+      new :expecting, :near, :line, :line_number, :pathname do
 
     def to_hash
       {

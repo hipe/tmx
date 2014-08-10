@@ -7,6 +7,10 @@ module Skylab::Snag
     include Snag_::Lib_::Sub_client[]::InstanceMethods  # #floodgates
 
                                   # (no public methods declared here)
+    def expression_agent
+      request_client.expression_agent
+    end
+
   private
 
     def api_invoke norm_name, param_h, *a, &b

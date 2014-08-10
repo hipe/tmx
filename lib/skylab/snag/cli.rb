@@ -26,6 +26,10 @@ module Skylab::Snag
       res
     end
 
+    def expression_agent
+      CLI::EXPRESSION_AGENT_
+    end
+
   private                         # (DSL happens at bottom half)
 
     # `initialize` - we are straddling two f.w's: all we want is our (modality)

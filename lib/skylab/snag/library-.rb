@@ -76,6 +76,9 @@ module Skylab::Snag
     Sub_client = -> do
       Headless__[]::SubClient  # :+#deprecation:watch
     end
+    Strange = -> x do
+      MetaHell__[].strange x
+    end
     SubTree__ = sidesys[ :SubTree ]
     Text_patch = -> do
       Headless__[]::Text::Patch

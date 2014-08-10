@@ -46,19 +46,19 @@ module Skylab::Snag
 
   Models::Identifier::Events = ::Module.new
 
-  class Models::Identifier::Events::Invalid < Snag_::Model::Event.new :mixed
-    build_message -> do
-      "invalid identifier name #{ ick mixed } - rendered full identifer: #{
-      }\"[#foo-001.2.3]\", equivalent to: \"001.2.3\" #{
-      }(prefixes ignored), \"001\" matches the superset"
+  Models::Identifier::Events::Invalid = Snag_::Model_::Event.new :mixed do
+    message_proc do |y, o|
+      y << "invalid identifier name #{ ick o.mixed } - rendered full identifer: #{
+       }\"[#foo-001.2.3]\", equivalent to: \"001.2.3\" #{
+        }(prefixes ignored), \"001\" matches the superset"
     end
   end
 
-  class Models::Identifier::Events::Prefix_Ignored <
-    Snag_::Model::Event.new :identifier
+  Models::Identifier::Events::Prefix_Ignored = Snag_::Model_::Event.
+      new :identifier do
 
-    build_message -> do
-      "prefixes are ignored currently - #{ ick identifier.prefix }"
+    message_proc do |y, o|
+      y << "prefixes are ignored currently - #{ ick o.identifier.prefix }"
     end
   end
 end

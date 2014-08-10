@@ -55,31 +55,31 @@ module Skylab::Snag
 
   Models::Tag::Events = ::Module.new
 
-  model_event = Snag_::Model::Event
+  ev = Snag_::Model_::Event.method :new
 
-  class Models::Tag::Events::Add < model_event.new :rendered, :verb
-    build_message -> do
-      "#{ Snag_::Lib_::NLP[]::EN::POS::Verb[ verb.to_s ].preterite } #{
-        }#{ val rendered }"
+  Models::Tag::Events::Add = ev.call :rendered, :verb do
+    message_proc do |y, o|
+      y << "#{ Snag_::Lib_::NLP[]::EN::POS::Verb[ o.verb.to_s ].preterite } #{
+       }#{ val o.rendered }"
     end
   end
 
-  class Models::Tag::Events::Invalid < model_event.new :name
-    build_message -> do
-      "tag must be composed of 'a-z' - invalid tag name: #{ ick name }"
+  Models::Tag::Events::Invalid = ev.call :name do
+    message_proc do |y, o|
+      y << "tag must be composed of 'a-z' - invalid tag name: #{ ick o.name }"
     end
   end
 
-  class Models::Tag::Events::Rm < model_event.new :rendered
-    build_message -> do
-      "removed #{ val rendered }"
+  Models::Tag::Events::Rm = ev.call :rendered do
+    message_proc do |y, o|
+      y << "removed #{ val o.rendered }"
     end
   end
 
-  class Models::Tag::Events::Tags < model_event.new :node, :tags
-    build_message -> do
-      "#{ val node.identifier } is tagged with #{
-        }#{ and_ tags.map{ |t| val t } }."
+  Models::Tag::Events::Tags = ev.call :node, :tags do
+    message_proc do |y, o|
+      y << "#{ val o.node.identifier } is tagged with #{
+       }#{ and_ o.tags.map{ |t| val t } }."
     end
   end
 end
