@@ -81,7 +81,7 @@ module Skylab::Snag
     end
 
     def tags
-      @tags ||= Models::Tag::Collection.new @message # asking for trouble
+      @tags ||= Models::Tag::Collection__.new @message # asking for trouble
     end
 
     def valid

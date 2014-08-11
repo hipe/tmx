@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class Models::Tag::Collection < ::Enumerator # #EXPERIMENTAL
+  class Models::Tag::Collection__ < ::Enumerator # #EXPERIMENTAL
 
     def add! body_string, do_append, error, info
       @scn.pos = 0 # #hacklund
@@ -39,7 +39,7 @@ module Skylab::Snag
   private
 
     def initialize body_string
-      @fly = Snag_::Models::Tag::Flyweight.new body_string
+      @fly = Snag_::Models::Tag::Flyweight__.new body_string
       @scn = Snag_::Library_::StringScanner.new body_string
       super( ) { |y| visit y }
     end
