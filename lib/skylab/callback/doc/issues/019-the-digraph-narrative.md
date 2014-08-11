@@ -2,7 +2,7 @@
 
 ## :#storypoint-1  introduction
 
-Welcome to [cb] digraph, née "pub-sub emitter. this was the first "really cool" event model in
+Welcome to [cb] digraph, née "pub-sub emitter." this was the first "really cool" event model in
 the skylab universe, but it has now fallen by the wayside. it continues to be
 essential to sub-products that were built around it and remains a fun
 and somewhat pure experiment. indeed it may yet demonstrate some value in the

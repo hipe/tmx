@@ -1,19 +1,21 @@
 # The Signature of Emit :[#001]
 
+(EDIT: this document is historic and is largely deprecated by point [#035])
+
 Life is much easier and more readable if you assume a syntax like:
 
-  call_digraph_listeners type, *payload
+    call_digraph_listeners type, *payload
 
 where `payload` is often a single string.
 
 
-However, remember these other important and essential variations of call_digraph_listeners():
+However, remember these other important and essential variations of `call_digraph_listeners()`:
 
   + when the event has no metadata, like `call_digraph_listeners :done`
   + when you are [re-] emitting custom event object, like `call_digraph_listeners my_obj`
   + emissions with structured metadata: `call_digraph_listeners :nerk, ferk: "blerk" ..`
 
-Etc.  For this reason we have to assume that call_digraph_listeners() takes one or more
+Etc.  For this reason we have to assume that `call_digraph_listeners`() takes one or more
 parameters and we have no idea the shape of the parameters.
 
 
@@ -26,12 +28,12 @@ event, but emit a new event that has a different stream name and is
 under the different event stream graph of that new action.
 
 A hackish way to accomplish this that saves on lines of code *and*
-memory *and* execution time is simply if the new event's @payload_a
+memory *and* execution time is simply if the new event's `@payload_a`
 member is simply a pointer to the exact same array of the original
 event. This is a big experiment, and will definately pose problems
 unles we agree that:
 
-1) @param_a should be one-time write only immutable, and should always
+1) `@param_a` should be one-time write only immutable, and should always
 be the exact contents of the `rest` args to the original `call_digraph_listeners` call or
 equivalent.  Further sub-processing of payload args should be considered
 derived properties stored in e.g other ivars.

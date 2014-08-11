@@ -1,3 +1,10 @@
+[#039]       #parent-node: [#037] #in-situ the cb method naming conventions
+[#038]       #parent-node: [#037] #in-situ use readable method names for cb's
+[#037]       #doc-node: the ordered dictionary narrative ..
+[#036]       #parent-node: [#034] testing tools
+[#035] #open (what sucks about pub-sub -- where is that blurb?)
+[#034]       #doc-node: the eventing mega-narrative
+[#033]       #parent-node:[#034] the tree node
 [#032] #open document this corner
 [#031]       #parent-node:[#024] the stowaway narrative ..
 [#030]       #done things to integrate old boxxy/a.l with new a.l
@@ -7,16 +14,16 @@
 [#026]       #doc-point the FUN narrative ..
 [#025]       isomorphic event factory is deprecated ..
 [#024]       #doc-node the new autoloader narative ..
-[#023]       #doc-node the different kinds of callback patterns ..
-[#022]       #doc-node the call_digraph_listeners spy narrative ..
-[#021]       #doc-node the event predicate narrative ..
+[#023]       #parent-node: [#033] the different kinds of callback patterns ..
+[#022]       #parent-node: [#036] the `call_digraph_listeners` spy narrative ..
+[#021]       #parent-node: [#036] the event predicate narrative ..
 [#020]       #in-situ
-[#019]       #storypoints
-[#018]       #parent-node: [#017] "this node in its scope.."
-[#017]       #doc-node "micro-notes.."
+[#019]       #parent-node: [#034] the digraph narrative ..
+[#018]       #parent-node: [#019] the CLI node narrative
+[#017]       #parent-node: [#034] the listener node
 [#016]       #done iambify extension interface
 [#015]       #nichepoint "event factory structural" (there are others..)
-[#014]       #doc-node the reflection API
+[#014]       #parent-node:[#019] the reflection API
 [#013]       #hole
 [#012]       #done #tracking-tag - can the idea of "specificity" be built ..
 [#011]       #done renamed "pub-sub" to "callback" universe wide.
@@ -32,6 +39,6 @@
 [#004]       #done rename `event_cloud` -> `event_graph`
 [#003]       #done event class should not be a struct
 [#002]       #tracking-tag #pattern: public emitters
-[#001]       #pattern: #doc-point "events and their payloads"
+[#001]       #pattern: #parent-node: [#019] "events and their payloads"
                assume emit(type, *payload) and ..
 [#sl-059] 2012-02-18 #open no redundant events per listener

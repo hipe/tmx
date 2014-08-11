@@ -5,15 +5,15 @@
 ### it is not a perfect isomorphicism
 
 it bears mentioning that this is not a perfect isomoprhicism: given our name
-convention, constant names may LookLikeThis or LOOK_LIKE_THIS or
-Look_Like_This, and they all belong in the same filename. a file called
-"nsa-spy.rb" might hold NsaSpy, NSA_Spy, or Nsa_Spy. (and believe it or not,
+convention, constant names may `LookLikeThis` or `LOOK_LIKE_THIS` or
+`Look_Like_This`, and they all belong in the same filename. a file called
+"nsa-spy.rb" might hold `NsaSpy`, `NSA_Spy`, or `Nsa_Spy`. (and believe it or not,
 in one dark corner we actually open the file to take a peek at the correct
 casing of the name before the file is even loaded into the ruby runtime,
 which is necessary to do for some deep, narrow tress and this autoloading
 algorithm.)
 
-we use-dashes-in-filenames and not_underscores because of the fact that
+we `use-dashes-in-filenames` and `not_underscores` because of the fact that
 it looks unequivocably better. (but still we use _spec.rb in our test
 because it is the default, and although this makes everything look horrible
 we stubbornly stick it out because of how strongly we feel for the dashes.)
