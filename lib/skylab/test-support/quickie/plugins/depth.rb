@@ -10,10 +10,6 @@ module Skylab::TestSupport
         @y = svc.y
       end
 
-      def flg
-        FLAG__
-      end
-
       FLAG__ = '-depth'.freeze
 
       def opts_moniker
@@ -22,12 +18,17 @@ module Skylab::TestSupport
       def args_moniker
         ARGS_MONIKER__
       end
-      ARGS_MONIKER__ = "#{ FLAG__ }=<N>"
+      ARGS_MONIKER__ = "#{ FLAG__ }=<[M-]N>"
 
       def desc y
-        y << "only operate on spec files at depths 1..N"
-        y << "depth is relative to the spec file(s) with the"
-        y << "shallowest path, which of depth 1"
+        y << "only operate on spec files at depths M thru N."
+        y << "floor depth M defaults to 1. a spec file's depth"
+        y << "is how deep its filesystem path is (in terms of"
+        y << "nested directories) relative to the \"shallowest\""
+        y << "spec file(s) which we designate a having a depth"
+        y << "of 1. i.e. given positive integer N, operate on"
+        y << "all spec files with depths up to and including"
+        y << "depth N, but none that are deeper."
         nil
       end
 
@@ -39,22 +40,45 @@ module Skylab::TestSupport
         @result_of_prepare
       end
 
+    private
+
       def via_idx_prepare
         @arg = @sig.input[ @idx ][ @sw.s.length + 1 .. -1 ]
         if @arg.length.nonzero?
-          if /\A-?[0-9]+\z/ =~ @arg
-            @depth_d = @arg.to_i
-            if -1 < @depth_d
-              accpt_args_and_activate_plugin
-              @result_of_prepare = @sig
-            else
-              @y << "#{ flg } must be non-negative (had: #{ @depth_d })"
-            end
-          else
-            @y << "#{ flg } must be an integer (had: \"#{ @arg }\")"
-          end
+          parse_argument
         else
           @y << "#{ flg } must have an argument"
+        end ; nil
+      end
+
+      def parse_argument
+        md = RANGE_RX__.match @arg
+        if md
+          parse_range( * md.captures )
+        else
+          @y << "#{ flg } must be an integer or range (had: \"#{ @arg }\")"
+        end ; nil
+      end
+      _DIGIT_ = '-?[0-9]+'
+      RANGE_RX__ = /\A
+        (?: (?<min>#{ _DIGIT_ })  (?:-|\.\.)   )?
+        (?<max>#{ _DIGIT_ })
+      \z/x
+
+      def parse_range min_s, max_s
+        min = min_s ? min_s.to_i : 1
+        max = max_s.to_i
+        if 0 > min
+          @y << "#{ flg } min must be non-negative (had: #{ min })"
+        elsif 0 > max
+          @y << "#{ flg } max must be non-negative (had: #{ max })"
+        elsif min > max
+          @y << "#{ flg } min must be less than or equal to max #{
+            }(min: #{ min }, max: #{ max })"
+        else
+          @range = ::Range.new min, max
+          accpt_args_and_activate_plugin
+          @result_of_prepare = @sig
         end ; nil
       end
 
@@ -66,7 +90,7 @@ module Skylab::TestSupport
 
       def test_files_eventpoint_notify
         a = @svc.get_test_path_a
-        if @depth_d.zero?
+        if @range.end.zero?
           when_depth_zero
         elsif a.length.zero?
           when_no_test_files
@@ -82,7 +106,7 @@ module Skylab::TestSupport
       end
 
       def when_depth_zero
-        @y << "(#{ flg }=0 always filters out all spec files.)"
+        @y << "(\"#{ flg }=0\" always filters out all spec files.)"
         replace_list_with EMPTY_A_
       end
 
@@ -115,34 +139,96 @@ module Skylab::TestSupport
       Entry__ = ::Struct.new :raw_depth_d, :path_s
 
       def second_pass
-        @too_much_depth = @depth_d + @min
-        removed_count = 0
+        raw_floor = @range.begin + @min - 1
+        raw_ceiling = @range.end + @min - 1
+        num_too_shallow = num_too_deep = 0
         path_s_a = @entry_a.reduce [] do |m, x|
-          if @too_much_depth > x.raw_depth_d
-            m.push x.path_s
+          raw_d = x.raw_depth_d
+          if raw_ceiling < raw_d
+            num_too_deep += 1
+          elsif raw_floor > raw_d
+            num_too_shallow += 1
           else
-            removed_count += 1
-            m
+            m.push x.path_s
+          end ; m
+        end
+        report num_too_shallow, num_too_deep, raw_floor, raw_ceiling
+        act num_too_shallow + num_too_deep, path_s_a
+      end
+
+      def report lo, hi, lo_, hi_  # :+[#it-002]
+        s_p_a = nil
+        noun = -> d do
+          r = "#{ d } spec file#{ 's' if 1 != d }"
+          noun = -> d_ { "#{ d_ }" } ; r
+        end
+        noun_ = -> do
+          r = "raw depth" ; noun_ = -> { "depth" } ; r
+        end
+        its = -> d do
+          1 == d ? 'its' : 'their'
+        end
+        if lo.nonzero?
+          ( s_p_a ||= [] ).push -> do
+            "#{ noun[ lo ] } because of #{ its[ lo ] } #{ noun_[] } #{
+             }less than #{ lo_ }"
           end
         end
-        if removed_count.zero?
-          when_nothing_to_filter
+        if hi.nonzero?
+          ( s_p_a ||= [] ).push -> do
+            "#{ noun[ hi ] } because of #{ its[ hi ] } #{ noun_[] } #{
+             }greater than #{ hi_ }"
+          end
+        end
+        if s_p_a
+          _s_a = s_p_a.map( & :call )
+          @y << "(filtering out #{ _s_a * ' and ' }.)"
         else
-          @y << "(filtering out #{ removed_count } spec file(s) because #{
-           }of their absolute depth greater than #{ @too_much_depth }.)"
+          report_nothing_was_filtered
+        end ; nil
+      end
+
+      def report_nothing_was_filtered
+        @y << "#{ ick_arg } filters nothing out. please omit this flag."
+        nil
+      end
+
+      def act num_filtered_out, path_s_a
+        if num_filtered_out.zero?
+          when_nothing_was_filtered
+        elsif path_s_a.length.zero?
+          when_everything_was_filtered
+        else
           replace_list_with path_s_a
         end
       end
 
-      def when_nothing_to_filter
-        @y << "(nothing filtered. with #{ flg }=#{ @depth_d } and a #{
-         }minimum absolute depth of #{ @min }, all spec files have paths #{
-         }that fall under the absolute depth limit (#{ @too_much_depth }).)"
+      def when_nothing_was_filtered
+        CEASE_
+      end
+
+      def when_everything_was_filtered
+        report_everything_was_filtered
+        @svc.replace_test_path_s_a EMPTY_A_
         PROCEDE_
+      end
+
+      def report_everything_was_filtered
+        @y << "#{ ick_arg } filters out every spec file. #{
+         }nothing to do."
       end
 
       def replace_list_with path_s_a
         @svc.replace_test_path_s_a path_s_a
+        PROCEDE_
+      end
+
+      def ick_arg
+        "\"#{ flg }=#{ @range }\""
+      end
+
+      def flg
+        FLAG__
       end
     end
   end

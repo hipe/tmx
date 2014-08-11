@@ -37,8 +37,8 @@ w  Sophist, Statesman, Philebus", Transl. Benjamin Jowett
 
 ## introducing `categories` and `exponents` as we see them
 
-this small calculus (ontology more like it) we are buildingas at its
-foundation the concepts of a `category` :[#007] and its `exponents`.
+as the foundation of this small calculus/ontology we build the concepts
+of a `category` :[#007] and its `exponents`
 defining words in any robust manner using solely other words is always a
 chore. fortunately for us, our conception of `category` and `exponent` in
 their relationship to each other is (for the sake of the discussion at this

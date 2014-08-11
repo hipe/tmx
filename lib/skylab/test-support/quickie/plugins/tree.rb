@@ -35,16 +35,16 @@ module Skylab::TestSupport
       def culled_test_files_eventpoint_notify
         io = @svc.paystream
         _a = @svc.get_test_path_a
-        tree = QuicLib_::Tree[].from( :paths, _a )
-        path_s = nil
+        tree = QuicLib_::Tree[].from :paths, _a
         path_s, tree_ = condense_stem tree
         if path_s
           io.puts path_s
           tree = tree_
-          scn = tree.get_traversal_scanner
-          scn.gets
-        else
-          scn = tree.get_traversal_scanner
+        end
+        scn = tree.get_traversal_scanner
+        x = scn.gets
+        if ! path_s
+          x.node.any_slug and fail "what: #{ x.node.any_slug }"
         end
         while (( card = scn.gets ))
           io.puts "#{ card.prefix[] }#{ card.node.any_slug }"
