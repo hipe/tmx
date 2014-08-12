@@ -48,7 +48,7 @@ module Skylab::Snag
           @pathname.exist? or break info( "manifest file didn't exist -#{
             } no issues." )
 
-          @node_flyweight ||= Models::Node::Flyweight.new nil, @pathname
+          @node_flyweight ||= Models::Node.build_flyweight nil, @pathname
 
           @manifest_file = @manifest_file_p[] or break @manifest_file
 

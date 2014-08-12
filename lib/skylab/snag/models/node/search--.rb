@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class Models::Node::Search
+  class Models::Node::Search__
 
     include Snag_::Core::SubClient::InstanceMethods
 

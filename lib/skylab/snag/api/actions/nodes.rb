@@ -92,7 +92,7 @@ module Skylab::Snag
       end
     end
 
-    field_names = Snag_::Models::Node::Flyweight.field_names
+    field_names = Snag_::Models::Node.main_field_names
 
     define_method :render_node_as_yaml do
       o = Snag_::Text_::Yamlization.new field_names

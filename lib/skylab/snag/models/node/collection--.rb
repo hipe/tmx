@@ -1,13 +1,13 @@
 module Skylab::Snag
 
-  class Models::Node::Collection
+  class Models::Node::Collection__
 
     include Snag_::Core::SubClient::InstanceMethods
 
     def add message, do_prepend_open_tag, dry_run, verbose_x, new_node=nil
       r = false
       begin
-        node = Models::Node::Controller.new request_client
+        node = Models::Node.build_controller request_client
         node.date_string = todays_date if false  # off for now
         node.message = message
         node.do_prepend_open_tag = do_prepend_open_tag
@@ -35,7 +35,7 @@ module Skylab::Snag
           end
           break( res = not_found[ node_ref ] )
         end
-        res = Models::Node::Controller.new self, fly
+        res = Models::Node.build_controller self, fly
       end while nil
       res
     end
@@ -45,7 +45,8 @@ module Skylab::Snag
       begin
         flyweight = node_flyweight
 
-        search = Models::Node::Search.new_valid self, max_count, query_sexp
+        search = Models::Node.build_valid_search self, max_count, query_sexp
+
         break if ! search
 
         enum = Models::Node::Enumerator.new do |y|
@@ -79,9 +80,7 @@ module Skylab::Snag
     end
 
     def node_flyweight
-      @node_flyweight ||= begin
-        Models::Node::Flyweight.new self, @manifest.pathname
-      end
+      @node_flyweight ||= Models::Node.build_flyweight self, @manifest.pathname
     end
 
     date_format = '%Y-%m-%d'

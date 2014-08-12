@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Snag::TestSupport::Models::Node
   # Quickie.
-  describe "[sg]::Models::Node::Controller" do
+  describe "[sg] models node controller" do
     extend Node_TestSupport
     context "delineation" do
       it "with 3 things added under 73 chars, delineates to one line" do
@@ -54,7 +54,7 @@ module Skylab::Snag::TestSupport::Models::Node
     end
 
     define_method :build_node do
-      node = Snag_::Models::Node::Controller.new Controller_RC_Mock.new
+      node = Snag_::Models::Node.build_controller Controller_RC_Mock.new
       node.instance_variable_set '@extra_lines_header', ''
       node
     end

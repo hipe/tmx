@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class Models::Node::Flyweight
+  class Models::Node::Flyweight__
 
     field_names = [
       :identifier_prefix,

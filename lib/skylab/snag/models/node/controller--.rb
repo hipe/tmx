@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class Models::Node::Controller
+  class Models::Node::Controller__
 
     include Snag_::Core::SubClient::InstanceMethods
 

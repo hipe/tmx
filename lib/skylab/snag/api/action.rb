@@ -128,7 +128,7 @@ module Skylab::Snag
             error msg
           end
           mf or break( nodes = mf )
-          nodes = Snag_::Models::Node::Collection.new self, mf
+          nodes = Snag_::Models::Node.build_collection self, mf
         end while nil
         nodes
       end

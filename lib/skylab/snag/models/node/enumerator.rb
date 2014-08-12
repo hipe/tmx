@@ -66,7 +66,7 @@ module Skylab::Snag
 
     def spy_begin y
       @spy.values.each { |e| e.begin[ ] }
-      Spy_.new( y ){ |item| spy_yield item }
+      Spy__.new( y ){ |item| spy_yield item }
     end
 
     def spy_end
@@ -76,9 +76,9 @@ module Skylab::Snag
     def spy_yield item
       @spy.values.each { |e| e.yield[ item ] }
     end
-  end
 
-  class Models::Node::Enumerator::Spy_
+
+    class Spy__
 
     def initialize y, &b
       @b = b or raise ::ArgumentError.new 'block required'
@@ -91,5 +91,7 @@ module Skylab::Snag
     end
 
     alias_method :<<, :yield
+
+    end
   end
 end
