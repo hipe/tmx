@@ -39,5 +39,17 @@ module Skylab::Callback::TestSupport::OD__
       listener.error_p.should eql :foo
       listener.info_p.should eql :bar
     end
+
+    context "inline" do
+
+      it "ok." do
+        a = []
+        listener = Subject_[].inline :foo, -> x { a << x }, :bar, -> { a << :b }
+        listener.receive_foo_event :a
+        listener.receive_bar_event
+        listener.foo_p[ :c ]
+        a.should eql [:a, :b, :c]
+      end
+    end
   end
 end

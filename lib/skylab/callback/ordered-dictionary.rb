@@ -51,5 +51,30 @@ module Skylab::Callback
         end
         attr_reader :attr_reader, :ivar
       end
+
+      # ~
+
+      def self.inline * x_a
+        Inline__.new x_a
+      end
+
+      class Inline__
+        def initialize x_a
+          sc = singleton_class
+          d = -2 ; last = x_a.length - 2
+          while d < last
+            d += 2
+            i = x_a.fetch d
+            sc.send :attr_reader, :"#{ i }_p"
+            ivar = :"@#{ i }_p"
+            instance_variable_set ivar, x_a.fetch( d + 1 )
+            -> ivar_ do
+              define_singleton_method :"receive_#{ i }_event" do |*a|
+                instance_variable_get( ivar_ )[ *a ]
+              end
+            end[ ivar ]
+          end
+        end
+      end
     end
 end
