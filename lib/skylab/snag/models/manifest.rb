@@ -2,14 +2,21 @@ module Skylab::Snag
 
   module Models::Manifest
 
-    require_relative 'manifest/file'     # [#mh-035] preload bc toplevel exists
+    class << self
 
-    header_width = '[#867] '.length
+      def build_file pathname
+        self::File__.new pathname
+      end
 
-    line_width = 80
+      def header_width
+        HEADER_WIDTH__
+      end
+      HEADER_WIDTH__ = '[#867] '.length
 
-    define_singleton_method :header_width do header_width end
-
-    define_singleton_method :line_width do line_width end
+      def line_width
+        LINE_WIDTH__
+      end
+      LINE_WIDTH__ = 80
+    end
   end
 end

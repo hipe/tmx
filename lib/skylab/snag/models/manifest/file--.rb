@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class Models::Manifest::File
+  class Models::Manifest::File__
 
     # (this is used by services and hence cannot be a sub-client!)
     # ([#ba-004] might subsume parts (most?) of this)

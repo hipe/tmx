@@ -22,7 +22,7 @@ module Skylab::Snag
   private
 
     def execute
-      ea = Snag_::Models::ToDo::Enumerator.new @paths, @names, @pattern
+      ea = Snag_::Models::ToDo.build_enumerator @paths, @names, @pattern
       if @show_command_only
         ea.command.command -> cmd_str do
           call_digraph_listeners :command, cmd_str

@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class Models::ToDo::Enumerator < ::Enumerator
+  class Models::ToDo::Enumerator__ < ::Enumerator
 
     Callback_[ self, :employ_DSL_for_digraph_emitter ]
 
@@ -57,7 +57,7 @@ module Skylab::Snag
     def visit_valid y, cmd
       res = true
       Snag_::Library_::Open3.popen3( cmd ) do |sin, sout, serr|
-        todo = Models::ToDo::Flyweight.new @pattern
+        todo = self.class::Flyweight__.new @pattern
         sout.each_line do |line|
           @seen_count += 1
           y << todo.replace( line.chomp )

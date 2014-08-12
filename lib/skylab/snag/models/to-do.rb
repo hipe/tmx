@@ -3,7 +3,11 @@ module Skylab::Snag
   class Models::ToDo
     # imagine that parts of this are frozen
 
-    require_relative 'to-do/enumerator' # [#mh-035] preload bc toplevel exists
+    class << self
+      def build_enumerator paths, names, pattern
+        self::Enumerator__.new paths, names, pattern
+      end
+    end
 
     attr_reader :full_source_line
 

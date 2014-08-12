@@ -1,14 +1,20 @@
 module Skylab::Snag
 
-  class Models::Melt::Controller
+  module Models::Melt
+
+    class << self
+      def build_controller * a
+        self::Controller__.new( * a )
+      end
+    end
+
+    class Controller__
 
     # one public method - `melt`
 
     include Snag_::Core::SubClient::InstanceMethods
 
       # straightforward subclient - emits PIE upwards
-
- private
 
     #        ~ all methods/procs listed in pre-order traversal ~
 
@@ -17,7 +23,7 @@ module Skylab::Snag
       @dry_run = dry_run
       @pattern = pattern
       @file_changes = []
-      o = Snag_::Models::ToDo::Enumerator.new paths, names, pattern
+      o = Snag_::Models::ToDo.build_enumerator paths, names, pattern
       o.on_error method( :error )
       o.on_command do |cmd_str|   # (strict event handling)
         if @be_verbose
@@ -58,7 +64,7 @@ module Skylab::Snag
       res
     end
 
-    public :melt
+    private
 
     todo_where = nil  # scope
 
@@ -211,5 +217,6 @@ module Skylab::Snag
 
       msg_body_excrpt
     end.call
+    end
   end
 end

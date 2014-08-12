@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class Models::ToDo::Flyweight
+  class Models::ToDo::Enumerator__::Flyweight__
 
     def collapse
       Models::ToDo.new path, line_number_string, full_source_line, @pattern

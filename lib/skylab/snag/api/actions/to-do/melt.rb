@@ -18,13 +18,9 @@ module Skylab::Snag
   private
 
     def execute
-      res = nil
-      begin
-        melt = Snag_::Models::Melt::Controller.new self,
-          @paths, @dry_run, @names, @pattern, @be_verbose
-        melt.melt
-      end while nil
-      res
+      _melt = Snag_::Models::Melt.build_controller(
+        self, @paths, @dry_run, @names, @pattern, @be_verbose )
+      _melt.melt
     end
   end
 end

@@ -46,7 +46,7 @@ module Skylab::Snag
     def manifest_file
       @manifest_file ||= begin
         @pathname or fail "sanity - pathname should be set by now"
-        Models::Manifest::File.new @pathname
+        Models::Manifest.build_file @pathname
       end
     end
 
