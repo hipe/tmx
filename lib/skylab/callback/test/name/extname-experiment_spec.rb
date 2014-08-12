@@ -2,6 +2,8 @@ require_relative 'test-support'
 
 module Skylab::Callback::Test::Name::EE__
 
+  extend ::Skylab::Callback::TestSupport::CONSTANTS::TestSupport_::Quickie
+
   describe "[ca] name extname experiment" do
 
     # #todo this isn't used anywhere. but we are keeping it around

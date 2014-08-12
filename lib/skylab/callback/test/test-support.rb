@@ -8,12 +8,12 @@ module Skylab::Callback::TestSupport
   module CONSTANTS
     Callback_ = Callback_
     Callback = Callback_
-    TestSupport = Callback_::Autoloader.require_sidesystem :TestSupport
+    TestSupport_ = Callback_::Autoloader.require_sidesystem :TestSupport
   end
 
   Autoloader_[ self, Callback_.dir_pathname.join( 'test' ) ]
 
-  CONSTANTS::TestSupport::Regret[ self ]
+  CONSTANTS::TestSupport_::Regret[ self ]
 
   module InstanceMethods
 

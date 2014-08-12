@@ -1,6 +1,6 @@
 module Skylab::Callback
 
-  module Listener  # this is the first node dedicated to [#todo:during-merge]
+  module Listener  # :[#017]
 
     def self.[] mod, * x_a
       Bundles__.apply_iambic_on_client x_a, mod ; nil

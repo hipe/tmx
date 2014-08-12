@@ -7,10 +7,10 @@ module Skylab::Callback::TestSupport::Autoloader
 
   include CONSTANTS
 
+  extend TestSupport_::Quickie
+
   Autoloader_ = Callback::Autoloader
   Callback = Callback
-
-  extend TestSupport::Quickie
 
   module TestLib_
 

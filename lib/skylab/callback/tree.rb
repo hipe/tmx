@@ -2,7 +2,7 @@ module Skylab
 
   module Callback
 
-    class Tree # read [#023] the different kinds of callback patterns
+    class Tree  # :[#033]
 
       def initialize hash, identifier_x = self.class
 
@@ -213,7 +213,7 @@ module Skylab
         ( last_seen_p || p || ::Kernel.method( :raise ) )[ exception ]
       end
 
-      def call_listeners_with_map * i_a, p  # [#033]:#the-listeners-pattern
+      def call_listeners_with_map * i_a, p  # [#023]:#the-listeners-pattern
         x_a = rslv_any_listeners_leaf_callback_x_a i_a
         x_a and x_a.each do |x|
           p[ x ]
@@ -221,7 +221,7 @@ module Skylab
         SILENT_
       end
 
-      def call_attempters_with_map * i_a, p  # [#033]:#the-attempters-pattern
+      def call_attempters_with_map * i_a, p  # [#023]:#the-attempters-pattern
         trueish_x = nil
         x_a = rslv_any_shorters_leaf_callback_x_a i_a
         x_a and x_a.each do |x|
@@ -231,7 +231,7 @@ module Skylab
         trueish_x
       end
 
-      def call_shorters_with_map * i_a, p  # see [#033]:#the-shorters-pattern
+      def call_shorters_with_map * i_a, p  # see [#023]:#the-shorters-pattern
         ec = PROCEDE_
         x_a = rslv_any_shorters_leaf_callback_x_a i_a
         x_a and x_a.each do |x|

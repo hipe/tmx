@@ -6,7 +6,7 @@ module Skylab::Callback::Test::Name::CMP_
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   name_mod = ::Object.new
 

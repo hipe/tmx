@@ -22,6 +22,8 @@ module Skylab::Callback
       self::Basic__[]::String
     end
 
+    Brazen__ = sidesys[ :Brazen ]
+
     Bundle_Item_Grammar = -> do
       self::MetaHell__[]::Bundle::Item_Grammar
     end
@@ -36,6 +38,10 @@ module Skylab::Callback
 
     CLI = -> do
       self::Headless__[]::CLI
+    end
+
+    Entity = -> do
+      Brazen__[]::Entity
     end
 
     Formal_Box = -> do

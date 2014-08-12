@@ -6,6 +6,8 @@ module Skylab::Callback::TestSupport::Name::Guess_dir_path
 
   include CONSTANTS
 
+  extend TestSupport_::Quickie
+
   module InstanceMethods
     def cleanpath x
       ::Pathname.new( x ).sub_ext( '' ).to_s  # copypasta nec.

@@ -8,6 +8,10 @@ module Skylab::Brazen
         via_argument_list a
       end
 
+      def box
+        Box_
+      end
+
       def via_argument_list a
         Shell__.new.execute_via_argument_list a
       end
@@ -372,6 +376,10 @@ module Skylab::Brazen
 
       def fetch i, & p
         @h.fetch i, & p
+      end
+
+      def at_position d
+        @h.fetch @a.fetch d
       end
 
       def to_key_scanner
