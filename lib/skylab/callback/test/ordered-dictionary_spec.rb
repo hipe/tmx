@@ -12,6 +12,8 @@ module Skylab::Callback::TestSupport::OD__
 
   describe "[cb] ordered dictionary" do
 
+    context "when you make a \"static\" listener class" do  # #needs-indent
+
     before :all do
       Adapter_Listener_ = Subject_[].new :error, :info
     end
@@ -39,6 +41,7 @@ module Skylab::Callback::TestSupport::OD__
       listener.error_p.should eql :foo
       listener.info_p.should eql :bar
     end
+    end
 
     context "inline" do
 
@@ -49,6 +52,58 @@ module Skylab::Callback::TestSupport::OD__
         listener.receive_bar_event
         listener.foo_p[ :c ]
         a.should eql [:a, :b, :c]
+      end
+    end
+
+    context "merge in other dictionary intersect" do
+
+      it "when no intersect" do
+        with inline :wizzle, :W, :wango, :A
+        foo_and_bar.should eql [ :F, :B ]
+      end
+
+      it "when equal member sets, the argument listener wins" do
+        with inline :foo, :F2, :bar, :B2
+        foo_and_bar.should eql [ :F2, :B2 ]
+      end
+
+      it "when argument listener has unheard of members, they are ignored." do
+        with inline :foo, :F2, :bar, :B2, :baz, :Z2
+        foo_and_bar.should eql [ :F2, :B2 ]
+      end
+
+      it "when there are inside and outside differences, ok" do
+        with inline :foo, :F2, :baz, :Z2
+        foo_and_bar.should eql [ :F2, :B ]
+      end
+
+      it "when there are inside & outside differences (classes reversed)" do
+        @subject_listener = inline :foo, :F, :bar, :B
+        merge_against Static_Guy_With_Three.new :B2, nil, :BOFFO
+        foo_and_bar.should eql [ :F, :B2 ]
+      end
+
+      def inline * x_a
+        @against_listener = Subject_[].inline_via_iambic x_a
+      end
+
+      def with argument_listener
+        @subject_listener = Static_Guy_With_Two.new :F, :B
+        merge_against argument_listener
+      end
+
+      def merge_against argument_listener
+        @subject_listener.merge_in_other_listener_intersect argument_listener
+        nil
+      end
+
+      def foo_and_bar
+        [ @subject_listener.foo_p, @subject_listener.bar_p ]
+      end
+
+      before :all do
+        Static_Guy_With_Two = Subject_[].new :foo, :bar
+        Static_Guy_With_Three = Subject_[].new :bar, :baz, :boffo
       end
     end
   end

@@ -12,7 +12,7 @@ module Skylab::Callback
             class << self
               alias_method :new, :orig_new
             end
-            _BOX_ = Callback_::Lib_::Entity[].box.new
+            _BOX_ = Box__[].new
             define_method :ordered_dictionary do
               _BOX_
             end
@@ -52,28 +52,59 @@ module Skylab::Callback
         attr_reader :attr_reader, :ivar
       end
 
+      include( module Dictionary_Instance_Methods__
+        def merge_in_other_listener_intersect lstn
+          my_box = ordered_dictionary
+          lstn.ordered_dictionary.each_pair do |i, cb_slot|
+            my_box.has_name i or next
+            p = lstn.send cb_slot.attr_reader
+            p or next
+            instance_variable_set cb_slot.ivar, p
+          end ; nil
+        end
+        self
+      end )
+
+      Box__ = -> do
+        Callback_::Lib_::Entity[].box
+      end
+
       # ~
 
-      def self.inline * x_a
-        Inline__.new x_a
+      class << self
+        def inline * x_a
+          inline_via_iambic x_a
+        end
+
+        def inline_via_iambic x_a
+          Inline__.new x_a
+        end
       end
 
       class Inline__
+
+        include Dictionary_Instance_Methods__
+
+        attr_reader :ordered_dictionary
+
         def initialize x_a
           sc = singleton_class
           d = -2 ; last = x_a.length - 2
+          box = Box__[].new
           while d < last
             d += 2
             i = x_a.fetch d
-            sc.send :attr_reader, :"#{ i }_p"
-            ivar = :"@#{ i }_p"
-            instance_variable_set ivar, x_a.fetch( d + 1 )
-            -> ivar_ do
+            slot = Callback_Slot__.new i
+            box.add i, slot
+            sc.send :attr_reader, slot.attr_reader
+            instance_variable_set slot.ivar, x_a.fetch( d + 1 )
+            -> ivar do
               define_singleton_method :"receive_#{ i }_event" do |*a|
-                instance_variable_get( ivar_ )[ *a ]
+                instance_variable_get( ivar )[ *a ]
               end
-            end[ ivar ]
+            end[ slot.ivar ]
           end
+          @ordered_dictionary = box ; nil
         end
       end
     end
