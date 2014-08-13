@@ -155,7 +155,7 @@ module Skylab::MetaHell
     Say_not_found_ = -> d, a, k do
       _s = MetaHell_::Library_::Headless::NLP::EN::Levenshtein::
         Or_with_closest_n_items_to_item[ d, a, k ]
-      "not found #{ MetaHell_::inspect k } - did you mean #{ _s }?"
+      "not found #{ MetaHell_.strange k } - did you mean #{ _s }?"
     end
 
     A_HANDFUL__ = 5

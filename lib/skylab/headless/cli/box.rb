@@ -32,8 +32,6 @@ module Skylab::Headless
         DISPATCH_METHOD_I_
       end
 
-      CLI::Box::DISPATCH_METHOD_I_ = :dsptch
-
       # #storypoint-30 [#119] intentionally ugly names are used here
 
       def dsptch action=nil, *args  # #storypoint-20, NOTE [#145] params
@@ -141,6 +139,25 @@ module Skylab::Headless
         self  # placeholder for future #todo:after-merge client svcs
       end
     private
+
+      def build_arg_stx action_i  # :+[#158] ick
+        if action_is_defined_via_meth action_i
+          super
+        else
+          _cls = some_unbound_action_for_act_i action_i
+          _cls.produce_arg_syntax
+        end
+      end
+
+      def action_is_defined_via_meth action_i
+        self.class.method_defined? action_i or
+          self.class.private_method_defined? action_i  # b.c q_x_a
+      end
+
+      def some_unbound_action_for_act_i action_i  # cmp `ftch_action_class`
+        Autoloader_.const_reduce [ action_i ], unbound_action_box
+      end
+
       def help *action  #hook-in # #storypoint-80 NOTE parameter name [#145]
         help_screen help_yielder, *action
       end
@@ -283,5 +300,9 @@ module Skylab::Headless
         lx.add_entry_with_default :sb_actn, 'sub-action'
       end
     end
+
+    DISPATCH_METHOD_I_ = :dsptch
+    OK_ = true
+
   end
 end

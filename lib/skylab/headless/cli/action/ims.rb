@@ -15,8 +15,8 @@ module Skylab::Headless
           super
         end
 
-        def invoke argv  # #storypoint-15
-          @argv = argv
+        def invoke argv=nil  # #storypoint-15
+          argv and @argv = argv
           r = parse_opts @argv
           OK_ == r && @param_queue_a and r = absorb_param_queue  # #todo:after-merge
           if OK_ == r
@@ -103,10 +103,6 @@ module Skylab::Headless
           ::Enumerator::Yielder.new( & emit_help_line_p )
         end
 
-        def emit_help_line_p  # ~ #storypoint-65, the emitter methods
-          @emit_help_line_p ||= @request_client.emit_help_line_p
-        end
-
         def emit_error_line s
           emit_info_line s
         end
@@ -119,6 +115,11 @@ module Skylab::Headless
           emit_payload_line_p[ s ]
         end
 
+      public
+        def emit_help_line_p  # ~ #storypoint-65, the emitter methods
+          @emit_help_line_p ||= @request_client.emit_help_line_p
+        end
+
         def emit_info_line_p
           @emit_info_line_p ||= @request_client.emit_info_line_p
         end
@@ -126,6 +127,7 @@ module Skylab::Headless
         def emit_payload_line_p
           @emit_payload_line_p ||= @request_client.emit_payload_line_p
         end
+      private
 
         def render_usg_lns y
           s = usage_line and y << s ; nil
@@ -340,7 +342,7 @@ module Skylab::Headless
         end
 
         def build_arg_stx meth_i
-          Headless::CLI::Argument::Syntax::Isomorphic.
+          CLI::Argument::Syntax::Isomorphic.
             new method( meth_i ).parameters, formal_parameters  # f.p nil ok
         end
 
@@ -429,7 +431,7 @@ module Skylab::Headless
             end
             p = -> do
               x = peek_some_queue_elmnt_x
-              x_, bnd_mth, arg_a = resolve_call_tuple_from_queue_element_x x
+              x_, bnd_mth, arg_a = produce_call_tuple_from_queue_element_x x
               if OK_ == x_
                 task.replace bnd_mth, arg_a ; task
               else
@@ -507,7 +509,7 @@ module Skylab::Headless
           bt
         end
 
-        def resolve_call_tuple_from_queue_element_x x  # #storypoint-815
+        def produce_call_tuple_from_queue_element_x x  # #storypoint-815
           if x.respond_to? :id2name
             th_q_has_exactly_one_item and a = release_any_argv
             a ||= EMPTY_A_
@@ -526,10 +528,14 @@ module Skylab::Headless
         def rslv_call_tuple_from_method_i_and_args i, a
           r = vldt_arity_for i, a
           if OK_ == r
-            [ OK_, method( i ), a ]
+            produce_call_tuple_from_method_i_and_valid_args i, a
           else
             [ r ]
           end
+        end
+
+        def produce_call_tuple_from_method_i_and_valid_args i, a
+          [ OK_, method( i ), a ]
         end
 
         # ~ step into the arguments facility

@@ -102,10 +102,10 @@ module Skylab::Headless
         module IMs__
         private
           def argument_stx
-            if @is_dsnggd
-              arg_stx_as_DSL_box_disengaged
-            else
+            if @is_engaged
               arg_stx_as_DSL_box_engaged
+            else
+              arg_stx_as_DSL_box_disengaged
             end
           end
           def arg_stx_as_DSL_box_engaged
@@ -115,8 +115,9 @@ module Skylab::Headless
             argument_syntax_for_action_i default_action_i
           end
           def initialize( * )
-            @bound_downtree_action = nil ; @is_dsnggd = true
+            @bound_downtree_action = nil ; @is_engaged = false
             @is_leaf = false ; @node_stry = nil
+            @reached_this_point = false
             super
           end
         public
@@ -137,18 +138,18 @@ module Skylab::Headless
           end
         private
           def engg_with downtree
-            @is_dsnggd or self.fail_sanity
+            @is_engaged and self._SANITY
             @bound_downtree_action = downtree
-            @has_od = nil ; @is_dsnggd = false ; @is_leaf = downtree.is_leaf
+            @has_od = nil ; @is_engaged = true ; @is_leaf = downtree.is_leaf
             @node_stry_before_engagement = @node_stry ; @node_stry = nil
             @op_before_engagement = @option_parser
             @option_parser = downtree.any_op
             nil
           end
           def dsngg_from downtree
-            @is_dsnggd and self.fail_sanity
+            @is_engaged or self._SANITY
             @bound_downtree_action = nil
-            @has_od = nil ; @is_dsnggd = true ; @is_leaf = false
+            @has_od = nil ; @is_engaged = false ; @is_leaf = false
             @node_stry = @node_stry_before_engagement
             @node_stry_before_engagement = nil
             @option_parser = @op_before_engagement
@@ -178,9 +179,23 @@ module Skylab::Headless
           def crt_dispatch_for_bound_downtree  # #storypoint-175
             _meth_i = @bound_downtree_action.name.as_method
             enqueue _meth_i
-            NO_OP_
+            if @reached_this_point
+              NO_OP_
+            else
+              _disp = Raw_Dispatch__.new self, :invk_when_engaged, EMPTY_A_
+              _disp
+            end
+          end
+
+          def invk_when_engaged
+            r = invoke
+            CEASE_X__ == r and r = nil  # don't double up the errmsgs
+            r
           end
         end
+
+        Raw_Dispatch__ = ::Struct.
+          new :bound_receiver, :dispatchee_method_i, :args
 
         module Leaf_IMs__
           include CLI::Action::IMs
@@ -201,6 +216,11 @@ module Skylab::Headless
         end
 
         module IMs__
+
+          def any_op  # :[#hl-158] fix
+            op
+          end
+
           def build_op_for_bound_actn bound
             if (( bld_p = bound.any_build_option_prsr_p ))
               bld_option_parser_for_bound_with_p bound, bld_p
@@ -241,12 +261,12 @@ module Skylab::Headless
             op
           end
           def help_screen_for_chld y, chld_x  # #storypoint-200
-            if @is_dsnggd
-              bound = rslv_bound_action_for_help chld_x
-              bound ? hlp_screen_for_bound_child( y,  bound ) : CEASE_X__
-            else
+            if @is_engaged
               x = chld_x[] and fail "sanity - #{ Headless_::Lib_::Strange[ x ] }"
               hlp_screen_as_engaged_box y
+            else
+              bound = rslv_bound_action_for_help chld_x
+              bound ? hlp_screen_for_bound_child( y,  bound ) : CEASE_X__
             end
           end
           def hlp_screen_for_bound_child y, bound
@@ -260,64 +280,112 @@ module Skylab::Headless
             help_screen y
           end
           def prepare_for_help_screen_as_bx
-            if @is_dsnggd
-              super
-            else
+            if @is_engaged
               replace_queue_head_wth_i @bound_downtree_action.name.as_method
+            else
+              super
             end ; nil
           end
         public  # #storypoint-405
           def invite_line z=nil
-            if @is_dsnggd then super else
+            if @is_engaged
               normalized_invocation_string_prts( y = [] )
               y[ -1, 0 ] = [ say_with_lxcn( :SHRT_HLP_SW ) ]
               _cmd = y * TERM_SEPARATOR_STRING_
               render_invite_line _cmd, z
+            else
+              super
             end
           end
           def normalized_invocation_string_prts y
             super
-            @is_dsnggd or y << @bound_downtree_action.name.as_slug ; nil
+            @is_engaged and y << @bound_downtree_action.name.as_slug ; nil
           end
         private
           def render_any_hlp_dsc y
-            if @is_dsnggd then super else
+            if @is_engaged
+              super
+            else
               super
             end
           end
         public
           def any_description_p_a_for_stry
-            if @is_dsnggd then super else
+            if @is_engaged
               @bound_downtree_action.any_description_p_a_for_stry
+            else
+              super
             end
           end
           def add_any_supplemental_sections_for_stry y
-            if @is_dsnggd then super else
+            if @is_engaged
               @bound_downtree_action.add_any_supplemental_sections_for_stry y
+            else
+              super
             end
           end
         private
           def build_any_line_sexp_about_this_chld bound
-            @is_dsnggd or self.fail_sanity
+            @is_engaged and self._SANITY
             engg_with bound
             _summary_line = some_summary_ln
             dsngg_from bound
             [ :item, bound.name.as_slug, _summary_line ]
           end
           def render_any_hlp_opts y
-            if @is_dsnggd then super else
+            if @is_engaged
+              super
+            else
               super
             end
           end
           def render_any_hlp_sects y
-            if @is_dsnggd then super else
+            if @is_engaged
+              super
+            else
               super
             end
           end
           def render_any_hlp_addtn y
-            if @is_dsnggd then super else
+            if @is_engaged
               @bound_downtree_action.send :render_any_hlp_addtn, y
+            else
+              super
             end
+          end
+        end
+
+        # ~ fix [#158] (tall stacks with hybrid box nodes)
+
+        module MMs__
+          def produce_arg_syntax
+            @as ||= bld_arg_syntax
+          end
+          def bld_arg_syntax
+            _i_a_a = instance_method( DISPATCH_METHOD_I_ ).parameters
+            CLI::Argument::Syntax::Isomorphic.new _i_a_a
+          end
+        end
+
+        module IMs__
+        private
+          def produce_call_tuple_from_method_i_and_valid_args meth_i, a
+            @reached_this_point  = true  # help
+            if action_is_defined_via_meth meth_i
+              super
+            else
+              prdc_call_tuple_because_it_is_another_box meth_i, a
+            end
+          end
+
+          def prdc_call_tuple_because_it_is_another_box act_i, a
+            1 == @q_x_a.length && act_i == @q_x_a.first or self._SANITY
+            # leave the above on the queue, it gets cleared later
+            @is_engaged or self._SANITY
+            bnd = @bound_downtree_action
+            dsngg_from bnd
+            _meth = bnd.method DISPATCH_METHOD_I_
+            [ OK_, _meth, a ]
           end
         end
 

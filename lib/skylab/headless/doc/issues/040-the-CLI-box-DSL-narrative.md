@@ -117,7 +117,7 @@ keep this in mind throughout the rest of the narrative.
 if we are here it means that we have engaged to a downtree action and that
 we have run its option parser around the argv, and furthermore that doing so
 did not add any additional items to the queue. we do that simply by adding
-the appropariate method to the queue, and bubbling up a no-op dispatch object.
+the appropriate method to the queue, and bubbling up a no-op dispatch object.
 keep in mind we set our argv back to the argv intended for the child above.
 we will bubble all the way out to the main invocation / queue loop, and it
 will evaluate one more iteration, doing the appropriate arg syntax validation.

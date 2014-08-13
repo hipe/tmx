@@ -188,7 +188,7 @@ module Skylab::Callback
         if stow_h && stow_h[ @name.as_const ]
           rslv_some_x_when_stowaway
         else
-          ( et = @mod.entry_tree ).has_directory and
+          ( et = @mod.entry_tree ) and et.has_directory and
             np = et.normpath_from_distilled( @name.as_distilled_stem )
           if np
             @normpath = np

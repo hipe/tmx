@@ -1,3 +1,4 @@
+[#158]       what we did to get tall mixed stacks (`tall_spec`) to work
 [#157]       #doc-node: the file utils agent
 [#156]       (reserved for a forthcoming entry about filenames)
 [#155]       (reserved for a forthcoming entry about const names)

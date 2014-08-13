@@ -1,10 +1,6 @@
 module Skylab::Snag
 
-  class CLI::Action
-
-    ACTIONS_ANCHOR_MODULE = -> { CLI::Actions }
-
-  end
+  CLI::Action = ::Class.new
 
   module CLI::Action::InstanceMethods
 
@@ -94,6 +90,8 @@ module Skylab::Snag
 
 
   class CLI::Action
+
+    ACTIONS_ANCHOR_MODULE = -> { CLI::Actions }
 
     Snag_::Lib_::CLI[]::Action[ self, :DSL ]
 

@@ -108,11 +108,11 @@ module Skylab::Headless
 
       # ~ #storypoint-205, these methods
 
+    public  # #todo:during-merge
+
       def emit_info_line_p
         emit_help_line_p
       end
-
-    public  # #todo:during-merge
 
       def emit_help_line_p
         @emit_help_line_p ||= method :emit_help_line

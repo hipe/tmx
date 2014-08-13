@@ -41,4 +41,8 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
     end
 
   end
+
+  CLI_ = -> do
+    Headless::CLI
+  end
 end
