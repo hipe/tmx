@@ -2,14 +2,15 @@ require_relative '../test-support'
 
 module Skylab::Snag::TestSupport::CLI::Actions
 
-  # this is a Quickie-compatible test - try `ruby -w` this file
+  describe "[sg] CLI actions nodes add" do
 
-  describe "[sg] CLI Actions - Add" do
+    extend TS_
 
-    extend Actions_TestSupport
+    with_invocation 'nodes', 'add'
 
-    def prepare_tmpdir
-      tmpdir_clear.patch <<-HERE.unindent
+    with_tmpdir_patch do
+
+      <<-O.unindent
         diff --git a/#{ manifest_path } b/#{ manifest_path }
         --- /dev/null
         +++ b/#{ manifest_path }
@@ -18,16 +19,13 @@ module Skylab::Snag::TestSupport::CLI::Actions
         +[#002]       #done wizzle bizzle 2013-11-11
         +               one more line
         +[#001]       #done
-      HERE
+      O
     end
 
-    invocation = [ 'nodes', 'add' ] # how it is invoked in cli changes s/times
-
     it "verbose dry run" do
-      prepare_tmpdir
-      from_tmpdir do
-        client_invoke( *invocation, '-n', '-v', 'foo bizzle' )
-      end
+      setup_tmpdir_read_only
+      invoke '-n', '-v', 'foo bizzle'
+
       o( / new line: / )
       if output.lines.first.string =~ /mkdir .+snag-PROD/ # [#033]
         output.lines.shift
@@ -41,10 +39,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
     end
 
     it "non-verbose non-dry run" do
-      prepare_tmpdir
-      from_tmpdir do
-        client_invoke( *invocation, 'foo bizzle' )
-      end
+      invoke 'foo bizzle'
       o( /new line: \[#004\] {7}foo bizzle$/ )
       o( /\bdone\./ )
       o

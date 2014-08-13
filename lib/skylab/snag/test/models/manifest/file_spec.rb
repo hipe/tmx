@@ -2,11 +2,9 @@ require_relative 'file/test-support'
 
 module Skylab::Snag::TestSupport::Models::Manifest::File
 
-  # has Quickie
-
   describe "[sg] models manifest file" do
 
-    extend File_TestSupport
+    extend TS_
 
     it "when file not found lines.each - raises raw runtime error lazily" do
       file = Snag_::Models::Manifest.build_file fixture_pathname 'not-there.txt'
@@ -20,19 +18,9 @@ module Skylab::Snag::TestSupport::Models::Manifest::File
 
     context "when file found" do
 
-      let :file do
-        file = Snag_::Models::Manifest.build_file fixture_pathname 'foo.txt'
-        file
-      end
-
       # if mutex is `false` it was never touched
       # if mutex is `true` file is open
       # if mutex is `nil` file was opened then closed
-      def mutex
-        file.instance_variable_get '@file_mutex'
-      end
-
-      # --*--
 
       it "when not interrupted, `lines` reads each line, chomped - closes" do
         mutex.should eql(false)
@@ -51,7 +39,6 @@ module Skylab::Snag::TestSupport::Models::Manifest::File
         line.should eql('beta')
       end
 
-
       it "when interrupted with a break from each - closes" do
         mutex.should eql(false)
         found = false
@@ -64,6 +51,14 @@ module Skylab::Snag::TestSupport::Models::Manifest::File
         end
         mutex.should eql(nil)
         found.should eql(true)
+      end
+
+      def mutex
+        file.instance_variable_get :@file_mutex
+      end
+
+      let :file do
+        Snag_::Models::Manifest.build_file fixture_pathname 'foo.txt'
       end
     end
   end

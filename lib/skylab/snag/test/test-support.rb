@@ -2,7 +2,8 @@ require_relative '../core'
 require 'skylab/test-support/core'
 
 module Skylab::Snag::TestSupport
-  ::Skylab::TestSupport::Regret[ Snag_TestSupport = self ]
+
+  ::Skylab::TestSupport::Regret[ self ]
 
   Snag_ = ::Skylab::Snag
   TestLib_ = ::Module.new
@@ -10,7 +11,7 @@ module Skylab::Snag::TestSupport
 
   module CONSTANTS
     Snag_ = Snag_
-    TestSupport = ::Skylab::TestSupport
+    TestSupport_ = TestSupport_
     TestLib_ = TestLib_
   end
 
@@ -29,31 +30,27 @@ module Skylab::Snag::TestSupport
   end
 
   module InstanceMethods
-    include CONSTANTS
 
-    attr_accessor :do_debug
+    include CONSTANTS
 
     def debug!
       tmpdir.debug!
-      self.do_debug = true
+      @do_debug = true
     end
 
-    def from_tmpdir &block
-      Snag_::Library_::FileUtils.cd tmpdir, verbose: do_debug, &block
+    attr_accessor :do_debug
+
+    def from_tmpdir & p
+      Snag_::Library_::FileUtils.cd tmpdir, verbose: do_debug, & p
     end
 
-    manifest_path = Snag_::API.manifest_path
+    -> x do
+      define_method :tmpdir do x end
+    end[ TestSupport_::Tmpdir.new TestLib_::Tmpdir_pathname[].join 'snaggle' ]
 
-    define_method :manifest_path do manifest_path end
+    -> x do
+      define_method :manifest_path do x end
+    end[ Snag_::API.manifest_path ]
 
-    tmpdir = TestSupport_::Tmpdir.new TestLib_::Tmpdir_pathname[].join 'snaggle'
-
-    define_method :tmpdir do
-      tmpdir
-    end
-
-    def tmpdir_clear
-      tmpdir.clear
-    end
   end
 end

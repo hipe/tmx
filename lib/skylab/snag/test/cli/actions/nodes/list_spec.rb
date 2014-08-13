@@ -1,16 +1,16 @@
 require_relative '../test-support'
 
-
 module Skylab::Snag::TestSupport::CLI::Actions
-
-  # has Quickie - try running this with just `ruby -w foo_spec.rb`
 
   describe "[sg] CLI Actions - Show" do
 
-    extend Actions_TestSupport
+    extend TS_
 
-    shared_setup = -> ctx do
-      ctx.tmpdir_clear.patch <<-O.unindent
+    with_invocation 'nodes', 'list'
+
+    with_tmpdir_patch do
+
+      <<-O.unindent
         diff --git a/#{ manifest_path } b/#{ manifest_path }
         --- /dev/null
         +++ b/#{ manifest_path }
@@ -20,14 +20,11 @@ module Skylab::Snag::TestSupport::CLI::Actions
         +               one more line
         +[#001]       #done
       O
-      shared_setup = -> _ { }
     end
 
-    invocation = [ 'nodes', 'list' ]
-
     it "with `list -n 1` - shows only the first one it finds" do
-      shared_setup[ self ]
-      invoke_from_tmpdir( *invocation, '-n', '1' )
+      setup_tmpdir_read_only
+      invoke '-n', '1'
 
       infos = []
       pays = []
@@ -49,15 +46,16 @@ module Skylab::Snag::TestSupport::CLI::Actions
     end
 
     it "with `list -2` - also works (-<n> option yay)" do
-      shared_setup[ self ]
-      invoke_from_tmpdir( *invocation, '-2' )
+      setup_tmpdir_read_only
+      invoke '-2'
       output.lines.last.string.should match( /found 2 nodes with validity/ )
     end
 
     context "if you ask to see a particular one" do
+
       it "with `show 002 --no-verbose` - it shows it tersely" do
-        shared_setup[ self ]
-        invoke_from_tmpdir( *invocation, '002', '--no-verbose' )
+        setup_tmpdir_read_only
+        invoke '002', '--no-verbose'
         names, = output.unzip
         names.count{ |x| x == :pay }.should eql( 2 ) # i don't care about info
         act = output.lines.select{ |x| :pay == x.stream_name }.map(&:string).join ''

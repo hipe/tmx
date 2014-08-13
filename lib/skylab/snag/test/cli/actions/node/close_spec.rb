@@ -2,45 +2,34 @@ require_relative '../test-support'
 
 module Skylab::Snag::TestSupport::CLI::Actions
 
-  # le Quickie.
-
   describe "[sg] CLI actions node close" do
-    extend Actions_TestSupport
 
-    setup = -> ctx do
-      ctx.tmpdir_clear.write manifest_path, <<-O.unindent
+    extend TS_
+
+    with_invocation 'node', 'close'
+
+    with_manifest <<-O.unindent
         [#003] #open biff bazz
           this second line will get concatted
         [#002]       #done this one is finished
         [#001]      this one has no markings and 6 spaces of ws
       O
-    end
-
-    invocation = [ 'node', 'close' ]
-
-    define_method :invoke do |*argv|
-      @pn = setup[ self ]
-      invoke_from_tmpdir( *invocation, *argv )
-    end
-
-    def expect name, rx
-      line = output.lines.shift
-      line.stream_name.should eql( name )
-      line.string.should match( rx )
-    end
 
     it "closing one with a funny looking name - whines gracefully" do
+      setup_tmpdir_read_only
       invoke 'abc'
       expect :info, /invalid identifier name/
     end
 
     it "closing one that doesn't exist - whines gracefully" do
+      setup_tmpdir_read_only
       invoke '867'
       expect :info,
         /failed to close node.*there is no node with the identifier "867"/i
     end
 
     it "closing one that is already closed - whines gracefully" do
+      setup_tmpdir_read_only
       invoke '002'
       expect :info, /\[#002\] is not tagged with "#open"/ # [#it-002] agg.
       expect :info, /\[#002\] is already tagged with #done/

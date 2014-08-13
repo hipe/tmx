@@ -1,3 +1,4 @@
+[#050] #open this kind of setup is bad
 [#049]       #parent-node: [#046] a cb error result may be propagagted
 [#048]       #parent-node: [#046] a cb error result may be disregarded
 [#047]       #parent-node: [#046] info channel result value is never meaningful

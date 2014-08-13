@@ -6,7 +6,7 @@ module Skylab::Snag::TestSupport::Models::Hashtag__
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   SPACE_ = Snag_::SPACE_
 

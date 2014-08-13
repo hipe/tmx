@@ -1,13 +1,10 @@
 require_relative 'test-support'
 
-
 module Skylab::Snag::TestSupport::CLI
 
-  # has Quickie - try running this with just `ruby -w foo_spec.rb`
+  describe "[sg] CLI core" do
 
-  describe "[sg] CLI - Core" do
-
-    extend CLI_TestSupport
+    extend TS_
 
     acts = '\{node.*nodes.*numbers.*open.*todo.*\}'
     expecting_rx = %r{\AExpecting #{ acts }}i
@@ -22,7 +19,7 @@ module Skylab::Snag::TestSupport::CLI
       use_memoized_client
 
       it "0.0  (no args) - expecting / usage / invite" do
-        client_invoke
+        invoke
         o expecting_rx
         o usage_rx
         o invite_rx
@@ -30,7 +27,7 @@ module Skylab::Snag::TestSupport::CLI
       end
 
       it "1.2  (strange opt) - reason / expecting / invite" do
-        client_invoke '-x'
+        invoke '-x'
         o( /\Ainvalid action.+-x/i )
         o expecting_rx
         o invite_rx
@@ -38,7 +35,7 @@ module Skylab::Snag::TestSupport::CLI
       end
 
       it "1.4 (good opt) - usage / invite" do
-        client_invoke '-h'
+        invoke '-h'
         o usage_rx
         o blank_line_rx
         o deeper_invite_rx
@@ -46,7 +43,7 @@ module Skylab::Snag::TestSupport::CLI
       end
 
       it "2.3x4H (good arg/good opt) (help postfix) (param api)" do
-        client_invoke 'todo', '-h'
+        invoke 'todo', '-h'
         c = output.class::Composite.of output.lines
         c.unique_stream_name_order_i_a.should eql %i( info )
         c.full_text.should be_include(

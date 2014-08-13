@@ -1,110 +1,235 @@
 require_relative '../test-support'
 
 module Skylab::Snag::TestSupport::CLI
-  ::Skylab::Snag::TestSupport[ CLI_TestSupport = self ]
+
+  ::Skylab::Snag::TestSupport[ TS_ = self ]
 
   include CONSTANTS
 
-  extend TestSupport::Quickie  # try running a _spec.rb file with `ruby -w`
+  extend TestSupport_::Quickie
 
-  FUN = -> do
+  TestLib_ = TestLib_
 
-    o = { }
 
-    o[:output] = -> do
-      output = TestSupport::IO::Spy::Group.new
-      output.line_filter! -> s do
-        Snag_::Lib_::CLI[]::PEN::FUN.unstyle[ s ]
-      end
-      output
-    end
-
-    o[:client] = -> output do
-      client = Snag_::CLI.new nil, output.for( :pay ), output.for( :info )
-      client.send :program_name=, 'sn0g'
-      client
-    end
-
-    fun = ::Struct.new(* o.keys).new ; o.each { |k, v| fun[k] = v } ; fun.freeze
-
-    fun
-  end.call
-
-  module ModuleMethods
-    include CONSTANTS  # so we can reach m.h from methods
-
-    def use_memoized_client
-      if ! method_defined? :memo_frame
-        define_method :memo_frame, & TestLib_::Memoize[ -> do
-          output = FUN.output[]
-          client = FUN.client[ output ]
-          { output: output, client: client }
-        end ]
-
-        define_method :output do
-          memo_frame[:output]
-        end
-
-        define_method :client do
-          mf = memo_frame
-          # (what would be ideal is to be able to turn debugging on on a per-
-          # scenario basis, even though it is a memoized frame.. is that crazy?
-          # b.c our io spy has the most sophisticaated debugging interface
-          # possible, hopefully..)
-          if do_debug
-            op = memo_frame[:output]
-            if ! op.debug  # it is a struct. if it was set hopefully it was here
-              op.do_debug_proc = -> { do_debug }  # and etc. the idea is awesome
-            end
-          end
-          mf[:client]
-        end
-      end
-    end
-  end
+  # ~ invocation
 
   module InstanceMethods
-    include CONSTANTS
 
-    def client_invoke *argv
+    def invoke * argv_tail_s_a
+      argv = [ * invocation_prefix_s_a, * argv_tail_s_a ]
       output.lines.clear
-      @result = client.invoke argv
-      @result
-    end
-
-    let :output do  # careful - this gets rewritten by `use_memoized_client`
-      output = CLI_TestSupport::FUN::output[]
-      output.do_debug_proc = -> { do_debug }
-      output
-    end
-
-    let :client do # careful - this gets rewritten by `use_memoized_client`
-      FUN.client[ output ]
-    end
-
-    def o *a
-      if a.empty?
-        output.lines.length.should eql( 0 )
+      clnt = client
+      p = -> _ do
+        @result = clnt.invoke argv
+      end
+      if has_tmpdir
+        setup_tmpdir_if_necessary
+        from_tmpdir( & p )
       else
-        if 1 == a.length
-          a.unshift :info
-        end
-        if 2 != a.length
-          raise "sanity - expecting [type] [rx], had #{ a.inspect }"
-        end
-        stream_name, rx = a
-        curr = output.lines.shift
-        if curr
-          curr.string.should match( rx )
-          curr.stream_name.should eql( stream_name )
-        else
-          fail "Had no more events in queue, #{
-            }expecting #{ [stream_name, rx].inspect }"
-        end
+        p[ nil ]
       end
       nil
     end
 
     attr_reader :result
+
+    def invocation_prefix_s_a
+    end
+
+    def has_tmpdir
+    end
+  end
+
+
+  # ~ invocation prefix write & read
+
+  module ModuleMethods
+
+    def with_invocation * s_a
+      s_a.freeze
+      define_method :invocation_prefix_s_a do
+        s_a
+      end ; nil
+    end
+  end
+
+
+  # ~ ordinary client & output
+
+  module InstanceMethods
+
+    let :client do
+      Client__[ output ]
+    end
+
+    let :output do
+      output = Output__[]
+      output.do_debug_proc = -> { do_debug }
+      output
+    end
+  end
+
+
+  # ~ sketchy memoized client & output
+
+  module ModuleMethods
+
+    def use_memoized_client
+      method_defined? :memo_frame or dfn_memoized_readers
+    end
+
+    def dfn_memoized_readers
+
+      def client
+        o = memo_frame
+        if do_debug
+          o.output.debug or o.output.do_debug_proc = -> { do_debug }
+        end
+        o.client
+      end
+
+      def output
+        memo_frame.output
+      end
+
+      define_method :memo_frame, TestLib_::Memoize[ -> do
+        Memo_Frame__.new _ = Output__[], Client__[ _ ]
+      end ]
+    end
+  end
+
+  Memo_Frame__ = ::Struct.new :output, :client
+
+
+  # ~ tmpdir setup writing & reading
+
+  module ModuleMethods
+
+    def with_manifest s
+      with_tmpdir do |o|
+        pn = o.clear.write manifest_path, s
+        memoize_last_pn pn
+        @pn = pn ; nil
+      end ; nil
+    end
+
+    def with_tmpdir_patch & p
+      with_tmpdir do |o|
+        _patch_s = instance_exec( & p )
+        o.clear.patch _patch_s ; nil
+      end
+    end
+
+    def with_tmpdir &p
+
+      define_method :has_tmpdir do true end
+
+      -> x do
+        define_method :tmpdir_setup_identifier do x end
+      end[ Produce_tmpdir_setup_identifier__[] ]
+
+      define_method :__execute_the_tmpdir_setup__ do
+        _td = tmpdir
+        instance_exec _td, & p
+        nil
+      end ; nil
+    end
+  end
+
+  Produce_tmpdir_setup_identifier__ = -> do
+    d = 0 ; -> { d += 1 }
+  end.call
+
+  module InstanceMethods
+
+    def setup_tmpdir_if_necessary
+      is_setup_as = MUTEX__.setup_identifier
+      if is_setup_as && is_setup_as == tmpdir_setup_identifier
+        @pn = MUTEX__.pn
+        if ! this_instance_wants_read_only  # taint setup so next one renews it
+          MUTEX__.setup_identifier = nil
+        end
+      else
+        do_setup_tmpdir
+      end ; nil
+    end
+
+    def setup_tmpdir_read_only
+      @this_instance_wants_read_only = true
+      did_setup_tmpdir_read_only or do_setup_tmpdir_read_only ; nil
+    end
+
+    attr_reader :this_instance_wants_read_only
+
+    def do_not_setup_tmpdir  # big hack
+      MUTEX__.setup_identifier = tmpdir_setup_identifier
+      @this_instance_wants_read_only = false ; nil
+    end
+
+    def did_setup_tmpdir_read_only
+      tmpdir_setup_identifier == MUTEX__.setup_identifier
+    end
+
+    def do_setup_tmpdir_read_only
+      MUTEX__.setup_identifier = tmpdir_setup_identifier
+      do_setup_tmpdir ; nil
+    end
+
+    def memoize_last_pn pn
+      MUTEX__.pn = pn
+    end
+
+    Mutex__ = ::Struct.new :setup_identifier, :pn
+    MUTEX__ = Mutex__.new
+
+    def do_setup_tmpdir
+      __execute_the_tmpdir_setup__ ; nil
+    end
+  end
+
+
+  # ~ expectations
+
+  module InstanceMethods
+
+    def expect name, rx
+      line = output.lines.shift
+      line.stream_name.should eql name
+      line.string.should match rx
+    end
+
+    def o * x_a
+      if x_a.length.zero?
+        output.lines.length.should be_zero
+      else
+        expct_via_nonzero_length_x_a x_a
+      end
+    end
+
+    def expct_via_nonzero_length_x_a x_a
+      1 == x_a.length and x_a.unshift :info
+      2 == x_a.length or raise ::ArgumentError, "need [channel] [rx]"
+      chan_i, rx = x_a
+      emission = output.lines.shift
+      emission or fail "had no more events in queue, expecting #{
+        }#{ [ chan_i, rx ].inspect }"
+      emission.string.should match rx
+      emission.stream_name.should eql chan_i
+      nil
+    end
+  end
+
+  Client__ = -> output do
+    client = Snag_::CLI.new nil, output.for( :pay ), output.for( :info )
+    client.send :program_name=, 'sn0g'
+    client
+  end
+
+  Output__ = -> do
+    output = TestSupport_::IO::Spy::Group.new
+    output.line_filter! -> s do
+      Snag_::Lib_::CLI[]::PEN::FUN.unstyle[ s ]
+    end
+    output
   end
 end

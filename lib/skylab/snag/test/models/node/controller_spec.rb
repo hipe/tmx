@@ -1,10 +1,13 @@
 require_relative 'test-support'
 
 module Skylab::Snag::TestSupport::Models::Node
-  # Quickie.
+
   describe "[sg] models node controller" do
-    extend Node_TestSupport
+
+    extend TS_
+
     context "delineation" do
+
       it "with 3 things added under 73 chars, delineates to one line" do
         node = build_node
         node.date_string = '2013-01-04'
@@ -43,9 +46,6 @@ module Skylab::Snag::TestSupport::Models::Node
         node.extra_line_a.length.should eql(3)
       end
     end
-
-    # --*--
-
 
     class Controller_RC_Mock
       def call_digraph_listeners name, pay

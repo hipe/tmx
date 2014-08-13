@@ -1,18 +1,13 @@
 require_relative 'test-support'
 
-
 module Skylab::Snag::TestSupport::CLI::Actions
 
-  # Quickie compatible - just load this file with `ruby -w`
+  describe "[sg] CLI actions open" do
 
-  describe "[sg] CLI Actions - Open" do
+    extend TS_
 
-    extend Actions_TestSupport
-
-    shared_setup = -> ctx do      # differently just for fun
-                                  # (one time we memoized it but oh lawd)
-
-      ctx.tmpdir_clear.write manifest_path, <<-O.unindent
+    with_tmpdir do |o|
+      o.clear.write manifest_path, <<-O.unindent
         [#004.2] #open this is #feature-creep but meh
         [#004] #open here's an open guy
                         with two lines
@@ -21,15 +16,14 @@ module Skylab::Snag::TestSupport::CLI::Actions
         [#leg-001]   this is an old ticket that is still #open
                        it has a prefix which will hopefully be ignored
       O
-      nil                         # (hopefully you don't need the pn from above)
+      nil
     end
 
     context "with no arguments show a report of open tickets!" do
 
       it "`open` (with no options) - shows a subset of lines from the file" do
-
-        shared_setup[ self ]
-        invoke_from_tmpdir 'o'
+        setup_tmpdir_read_only
+        invoke 'o'
         a = output.lines
         :info == a.first.stream_name and a.shift
         a.map(& :stream_name).should eql(
@@ -46,8 +40,8 @@ module Skylab::Snag::TestSupport::CLI::Actions
       end
 
       it "`open -v` - show it verbosely (the yaml report)" do
-        shared_setup[ self ]
-        invoke_from_tmpdir 'open', '-v'
+        setup_tmpdir_read_only
+        invoke 'open', '-v'
         act = output.lines.reduce( [] ) do |m, (x, _)|
           if :pay == x.stream_name
             m.push x.string
@@ -70,12 +64,12 @@ module Skylab::Snag::TestSupport::CLI::Actions
     context "with one argument" do
 
       it "`open foo` opens a ticket" do
-        shared_setup[ self ]
-        invoke_from_tmpdir 'open', 'foo'
+        invoke 'open', 'foo'
         output.lines.first.string.should match(
           /new line: \[#005\] #open foo/ )
         output.lines.clear
-        invoke_from_tmpdir 'open', # eighty characters:
+        do_not_setup_tmpdir
+        invoke 'open', # eighty characters:
 <<-O.chop
 1234 6789 2234 6789 3234 6789 4234 6789 5234 6789 6234 6789 7234 6789 8234 6789
 O
