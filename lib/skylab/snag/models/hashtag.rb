@@ -6,6 +6,9 @@ module Skylab::Snag
       def parse s
         Scan_Maker__.new( s ).to_a
       end
+      def puts_scanner s
+        Callback_::Scanner::Puts_Wrapper.new scanner s
+      end
       def scanner s
         Scan_Maker__.new( s ).to_scanner
       end
@@ -40,6 +43,7 @@ module Skylab::Snag
     private
       def step
         @str = @scn.scan NOT_HASHTAG_RX__
+        @tag_pos = @scn.pos
         @tag = @scn.scan HASHTAG_RX__
         @str || @tag or raise say_parse_failure
         @str and process_string
@@ -59,7 +63,7 @@ module Skylab::Snag
       end
 
       def process_tag
-        @queue.push Hashtag__.new @tag
+        @queue.push Hashtag__.new @tag_pos, @tag
         @sep = @scn.scan HASHTAG_NAME_VALUE_SEP_RX__
         @sep and process_sep ; nil
       end
@@ -70,7 +74,7 @@ module Skylab::Snag
         @value = @scn.scan HASHTAG_VALUE_RX__
         @value and process_value ; nil
       end
-      HASHTAG_VALUE_RX__ = /[^[:space:]]+/
+      HASHTAG_VALUE_RX__ = /[^[:space:],]+/
 
       def process_value
         @queue.push Value__.new @value ; nil
@@ -91,8 +95,16 @@ module Skylab::Snag
     end
 
     class Hashtag__ < Piece__
+      def initialize d, str
+        super str
+        @pos = d
+      end
+      attr_reader :pos
       def symbol_i
         :hashtag
+      end
+      def local_normal_name
+        @lnn ||= get_stem_s.downcase.intern
       end
       def get_stem_s
         @to_s[ 1..-1 ]

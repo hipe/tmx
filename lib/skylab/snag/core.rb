@@ -12,9 +12,13 @@ module Skylab::Snag
     Autoloader_[ self ]
   end
 
+  ACHIEVED_= true
+
   EMPTY_A_ = [].freeze
 
   EMPTY_S_ = ''.freeze
+
+  Event_ = -> { Snag_::Model_::Event }
 
   IDENTITY_ = -> x { x }
 
@@ -25,5 +29,7 @@ module Skylab::Snag
   Snag_ = self
 
   SPACE_ = ' '.freeze
+
+  UNABLE_ = false
 
 end

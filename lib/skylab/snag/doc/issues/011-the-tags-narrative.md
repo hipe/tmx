@@ -5,10 +5,40 @@ Tags are used to mark definitively a certain kind of thing (1) at a
 certain particular place (2) in text-based documents.
 
 Tags variously occur with a leading '@' or a leading '#'.
+(EDIT: '@' is deprecated).
 
 They occur variously in code and other version controlled text
 documents.
 
+
+
+## the structure of tags
+
+currently (although this may change) tags look like hashtags alla
+twitter, but they can contain dashes. the reason we added support for
+dashes is that we feel they look better than the other conventions in
+use for separating works within a hashtag (namely #camelCase,
+#nothingatall).
+
+a more rigid specification for tags is that they may consist only of
+alpha-numeric characters (and dashes but more on this below). whether
+or not they are case sensitive will depend partly on the client; but for
+now we code around the assumption that we will most likely want to
+employ case sensitivity at first unless we have some good reason not to
+:[#043]
+
+dashes may be used to separate for example words in such tags (so dashes
+may *not* occur at the beginning, at the end, nor more than once
+contiguously).
+
+examples:
+
+    #good-tag  good: dashes can be used to break up words
+    #-bad-tag  bad: dashes at beginning not allowed
+    #bad-tag-  bad: dashes at end not allowed
+    #bad--tag  bad: multiple dashes not allowed
+
+    #2014-ok   good: numbers can occur anywhere in the tag
 
 
 
@@ -42,7 +72,7 @@ where as (4) is great, it lets us roll past a possible code smell
 without needing to drop what we're doing and deal with it right
 then and there.
 
-So, mitigating (1) and towards (4) is this: 
+So, mitigating (1) and towards (4) is this:
 
 #### Turn "todos" into "pending" or "refactor" etc
 

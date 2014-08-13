@@ -1,12 +1,8 @@
 module Skylab::Snag
 
-  class Models::Node::Controller__
+  class Models::Node::Controller__  # [#045] this whole file needs an overhaul
 
     include Snag_::Core::SubClient::InstanceMethods
-
-    def add_tag tag_ref, do_append
-      tag( ( do_append ? :append : :prepend ), tag_ref, -> e { error e } )
-    end
 
     def build_identifier! int, node_number_digits
       fail "won't clobber existing identifier" if @identifier
@@ -16,22 +12,26 @@ module Skylab::Snag
     end
 
     def close
-      res = nil
-      begin
-        redundant = -> e { info e ; nil }
-        a = tag :remove,  :open, redundant
-        b = tag :prepend, :done, redundant
-        res = if false == a || false == b
-          # an error for one is an error for all, don't rewrite file
-          false
-        else
-          # two nils means it was fully redundant, do not rewrite file
-          # else at least one of them was trueish, rewrite file.
-          a || b
-        end
-      end while nil
-      res
+      rm_x = remove_tag :open, :listener, gentle_listener
+      ad_x = add_tag :done, :prepend, :listener, @gentle_listener
+      if UNABLE_ == rm_x || UNABLE_ == ad_x
+        # an error for one is an error for all, don't rewrite file
+        UNABLE_
+      else
+        # two nils means it was fully redundant, do not rewrite file
+        # else at least one of them was trueish, rewrite file.
+        rm_x || ad_x
+      end
     end
+  private
+    def gentle_listener
+      @gentle_listener ||= bld_gentle_listener
+    end
+    def bld_gentle_listener
+      p = method :info
+      Snag_::Model_::Info_Error_Listener.new p, p
+    end
+  public
 
     attr_reader :date_string
 
@@ -76,14 +76,6 @@ module Skylab::Snag
       msg
     end
 
-    def remove_tag tag_ref
-      tag :remove, tag_ref, -> e { error e }
-    end
-
-    def tags
-      @tags ||= Models::Tag::Collection__.new @message # asking for trouble
-    end
-
     def valid
       if @valid.nil? # iff not, we've already done this
         begin
@@ -99,7 +91,40 @@ module Skylab::Snag
       @valid
     end
 
+    # ~ tags
+
+    def add_tag tag_ref, * x_a
+      tags_controller.add_tag_using_iambic tag_ref, x_a
+    end
+
+    def remove_tag tag_ref, * x_a
+      tags_controller.remove_tag_using_iambic tag_ref, x_a
+    end
+
+    def tags_controller
+      @tc ||= tags.build_controller tags_listener
+    end
+
+    def tags
+      @tags ||= Models::Tag::Collection__.new @message, @identifier
+    end
   private
+
+    def tags_listener
+      @tl ||= bld_tags_listener
+    end
+
+    def bld_tags_listener
+      Callback_::Ordered_Dictionary.inline(
+        :error, method( :error ),
+        :info, method( :info ),
+        :change_body, method( :on_change_body_tag_event ) )
+    end
+
+    def on_change_body_tag_event s
+      @message = s ; undelineate
+      @tc.set_body_s s ; nil
+    end
 
     def initialize request_client, flyweight=nil
       super request_client
@@ -150,7 +175,7 @@ module Skylab::Snag
           lines = []
           ok = true
 
-          open_tag = Models::Tag.canonical[ :open ]
+          open_tag = Models::Tag.canonical_tags.open_tag
           scn = Snag_::Library_::StringScanner.new -> do
             parts = [ ]
             if @do_prepend_open_tag
@@ -230,12 +255,14 @@ module Skylab::Snag
     end
 
     def extra_lines_header
-      @extra_lines_header ||= begin
-        # "[#867] #open "
-        x = Models::Manifest.header_width +
-          Models::Tag.canonical[ :open ].to_s.length + 1
-        SPACE_ * x
-      end
+      @extra_lines_header ||= bld_xtra_lines_header
+    end
+
+    def bld_xtra_lines_header
+      # "[#867] #open ".length
+      _open_tag = Models::Tag.canonical_tags.open_tag
+      _d = Models::Manifest.header_width + _open_tag.render.length + 1
+      SPACE_ * _d
     end
 
     def line_width
@@ -245,44 +272,6 @@ module Skylab::Snag
 
     def max_lines
       @max_lines ||= Models::Node.max_lines_per_node
-    end
-
-    tag_parse_args = -> operation do
-      case operation
-      when :prepend ; do_add = true ; do_append = false
-      when :append  ; do_add = true ; do_append = true
-      when :remove  ; do_add = false
-      else raise ::ArgumentError.new "no"
-      end
-      [ do_add, do_append ]
-    end
-
-    define_method :tag do |operation, tag_ref, redundant|
-      error, info = method( :error ), method( :info )
-      do_add, do_append = tag_parse_args[ operation ] ; operation = nil
-      begin
-        res = Models::Tag.normalize( tag_ref, error, info ) or break
-        tag_body = res
-        found = tags.detect { |tg| tg.local_normal_name == tag_body }
-        rdn = nil ; redundnt = -> msg { rdn = true ; redundant[ msg ] }
-        res = if do_add
-          if found
-            redundnt[ "#{ val @identifier } is already tagged #{
-              }with #{ val found }" ]
-          else
-            tags.add! tag_body, do_append, error, info
-          end
-        elsif found
-          tags.rm! found, error, info
-        else
-          redundnt[ "#{ val @identifier } is not tagged with #{
-            }#{ ick Models::Tag.render( tag_body ) }" ]
-        end
-        rdn and break
-        undelineate               # here after above success. caveat err cnt
-        res = valid               # it might be too long now
-      end while nil
-      res
     end
 
     def undelineate

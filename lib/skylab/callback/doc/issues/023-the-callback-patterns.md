@@ -122,7 +122,7 @@ handlers pattern           no         yes              yes
 shorters pattern          yes          no              yes
 
 
-## :#the-callback-pattern in detail
+## :#the-callback-pattern in detail :[#040]
 
 • this is the simplest of the patterns
 

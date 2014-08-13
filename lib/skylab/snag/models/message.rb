@@ -17,7 +17,7 @@ module Skylab::Snag
       res = nil
       err = -> errmsg do
         r = error[ errmsg ]
-        res = r ? false : r       # [#017]
+        res = r ? UNABLE_ : r  # [#017]
       end
       msg = x.to_s
       if blank_rx =~ msg

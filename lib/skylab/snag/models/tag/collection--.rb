@@ -1,64 +1,81 @@
 module Skylab::Snag
 
-  class Models::Tag::Collection__ < ::Enumerator # #EXPERIMENTAL
+  class Models::Tag
 
-    def add! body_string, do_append, error, info
-      @scn.pos = 0 # #hacklund
-      sep = @scn.string.length.zero? ? EMPTY_S_ : SPACE_
-      tag_str = Models::Tag.render body_string
-      if do_append
-        @scn.string.concat "#{ sep }#{ tag_str }"
-      else
-        @scn.string.replace "#{ tag_str }#{ sep }#{ @scn.string }"
+    class Collection__
+
+      def initialize body_s, identifer
+        @body_s = body_s ; @identifier = identifer ; nil
       end
-      info[ Models::Tag::Events::Add.new tag_str,
-            ( do_append ? :append : :prepend ) ]
-      true
-    end
 
-    def rm! fly, error, info
-      message = @scn.string
-      pos_a = fly.begin
-      pos_b = fly.end
-      if pos_a > 0 && SPACE_ == message[ pos_a - 1 ]
-        pos_a -= 1
-      elsif pos_b < ( message.length - 1 ) && SPACE_ == message[ pos_b + 1 ]
-        pos_b += 1
+      attr_reader :identifier
+
+      def find_any_existing_tag_via_tag tag
+        s = tag.render
+        detect do |tag_|
+          s == tag_.render
+        end
       end
-      pos_a = nil if 0 == pos_a
-      pos_b = nil if pos_b == ( message.length - 1 )
-      new = "#{ message[ 0 .. ( pos_a - 1 ) ] if pos_a }#{
-        }#{ message[ ( pos_b + 1 ) .. -1 ] if pos_b }"
-      rendered = fly.render
-      fly.reset
-      @scn.string.replace new
-      info[ Models::Tag::Events::Rm.new rendered ]
-      true
-    end
 
-  private
-
-    def initialize body_string
-      @fly = Snag_::Models::Tag::Flyweight__.new body_string
-      @scn = Snag_::Library_::StringScanner.new body_string
-      super( ) { |y| visit y }
-    end
-
-    rx_ = nil
-    rx = Models::Tag.rendered_tag_rx
-
-    define_method :visit do |y|
-      @scn.pos = 0
-      rx_ ||= /((?!#{ rx }).)*/
-      loop do
-        @scn.skip rx_
-        @scn.eos? and break
-        beg = @scn.pos
-        len = @scn.skip( rx ) or fail 'sanity'
-        @fly.set beg, ( beg + len - 1 )
-        y << @fly
+      def detect & p
+        to_enum.detect( & p )
       end
-      nil
+
+      def to_enum
+        if block_given?
+          scn = to_scanner ; x = nil
+          yield x while x = scn.gets ; nil
+        else
+          enum_for :to_enum
+        end
+      end
+
+      def to_scanner
+        scanner = Models::Hashtag.scanner @body_s
+        flyweight = Flyweight__.new
+        tag = Tag_.new flyweight
+        Callback_::Scn.new do
+          begin
+            symbol = scanner.gets
+            symbol or break
+            if :hashtag == symbol.symbol_i
+              flyweight.replace symbol
+              result = tag
+              break
+            end
+          end while true
+          result
+        end
+      end
+
+      # ~ for mutation & mutating agents
+
+      def build_controller listener
+        self.class::Controller__.new self, listener
+      end
+
+      def get_body_s
+        @body_s.dup
+      end
+
+      def set_body_s s
+        @body_s = s ; nil
+      end
+
+      class Flyweight__
+
+        def replace symbol
+          @symbol = symbol
+        end
+
+        def to_string
+          @symbol.to_s
+        end
+
+        def tag_start_offset_in_node_body_string
+          @symbol.pos
+        end
+      end
     end
   end
 end

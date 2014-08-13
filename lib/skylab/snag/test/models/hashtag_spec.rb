@@ -48,6 +48,14 @@ module Skylab::Snag::TestSupport::Models::Hashtag__
         expect_part :hashtag_value, '2014'
         expect_no_more_parts
       end
+
+      it "edge case: a comma breaks the value" do
+        scan '#foo:bar,baz'
+        expect_part :hashtag, '#foo'
+        expect_part :hashtag_name_value_separator, ':'
+        expect_part :hashtag_value, 'bar'
+        expect_part :string, ',baz'
+      end
     end
 
     context "the symbol classes are reflective" do

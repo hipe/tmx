@@ -47,7 +47,7 @@ module Skylab::Snag
     end
 
     def valid
-      0 == error_count ? self : false
+      0 == error_count ? self : UNABLE_
     end
 
   private
@@ -106,17 +106,27 @@ module Skylab::Snag
 
     class Query_Nodes_::HasTag
       def self.new_valid request_client, sexp
-        tag = sexp[1]
-        normalized_tag_name = Models::Tag.normalize tag,
-          -> invalid do
-            request_client.send :error, ( invalid.render_under request_client )
+        tag_i = sexp[1]
+        tag_i_ = Models::Tag.normalize_stem_i tag_i,
+          -> ev do
+            request_client.send :error, ( ev.render_under request_client )
           end
-        if normalized_tag_name
-          new request_client, normalized_tag_name
+        if tag_i_
+          new request_client, tag_i_
         else
-          normalized_tag_name
+          tag_i_
         end
       end
+
+      def initialize request_client, valid_tag_stem_i
+        @tag_rx = /(?:^|[[:space:]])##{ ::Regexp.escape valid_tag_stem_i }\b/
+        @valid_tag_stem_i = valid_tag_stem_i
+      end
+
+      def phrase
+        "tag ##{ @valid_tag_stem_i }"
+      end
+
       def match? node
         if node.valid
           @tag_rx =~ node.first_line_body or
@@ -124,14 +134,6 @@ module Skylab::Snag
             node.extra_line_a.index { |x| @tag_rx =~ x }
           end
         end
-      end
-      def phrase
-        "tag ##{ @tag }"
-      end
-    private
-      def initialize request_client, tag
-        @tag = tag
-        @tag_rx = /(?:^|[[:space:]])##{ ::Regexp.escape tag }\b/
       end
     end
 

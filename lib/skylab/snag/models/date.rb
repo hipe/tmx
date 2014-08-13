@@ -9,7 +9,7 @@ module Skylab::Snag
         x
       else
         rs = error[ "invalid date: #{ x.inspect }" ]
-        rs ? false : rs           # [#017]
+        rs ? UNABLE_ : rs  # [#017]
       end
     end
   end

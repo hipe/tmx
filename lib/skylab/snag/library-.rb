@@ -34,6 +34,7 @@ module Skylab::Snag
         MetaHell__[]::Basic_Fields.via_iambic x_a
       end
     end
+    Brazen__ = sidesys[ :Brazen ]
     CLI = -> do
       Headless__[]::CLI
     end
@@ -45,6 +46,9 @@ module Skylab::Snag
     end
     Dev_null = -> do
       Headless__[]::IO::DRY_STUB
+    end
+    Entity = -> do
+      Brazen__[]::Entity
     end
     Funcy_globless = -> x do
       MetaHell__[].funcy_globless x
@@ -73,11 +77,11 @@ module Skylab::Snag
       Headless__[]::Model::Event.apply_on_client mod
     end
     Porcelain__ = sidesys[ :Porcelain ]
-    Sub_client = -> do
-      Headless__[]::SubClient  # :+#deprecation:watch
-    end
     Strange = -> x do
       MetaHell__[].strange x
+    end
+    Sub_client = -> do
+      Headless__[]::SubClient  # :+#deprecation:watch
     end
     SubTree__ = sidesys[ :SubTree ]
     Text_patch = -> do

@@ -1,3 +1,4 @@
+[#040]       #parent-node: [#023] the callback pattern
 [#039]       #parent-node: [#037] #in-situ the cb method naming conventions
 [#038]       #parent-node: [#037] #in-situ use readable method names for cb's
 [#037]       #doc-node: the ordered dictionary narrative ..
