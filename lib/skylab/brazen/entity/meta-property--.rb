@@ -212,7 +212,9 @@ module Skylab::Brazen
               _prop_i = @scan.gets_one
               @scope_kernel.flush_because_prop_i _prop_i
             else
-              @scope_kernel.meth_i or raise ::ArgumentError, say_expected_def
+              plan = @scope_kernel.plan
+              plan && plan.meth_i or
+                raise ::ArgumentError, say_expected_def
               @scope_kernel.flush_bc_meth
             end
           end

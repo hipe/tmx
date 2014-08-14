@@ -107,7 +107,7 @@ module Skylab::Brazen
       def initialize reader, writer
         @reader = reader ; @writer = writer
         @has_writer_method_name_constraints = false
-        @lstnrs = @meth_i = @prop = nil
+        @lstnrs = @prop = nil
         @x_a_a = []
       end
 
@@ -134,25 +134,40 @@ module Skylab::Brazen
       end
 
       def flush_because_method m_i
-        @meth_i = m_i
+        plan_in_progress.meth_i = m_i
         if @x_a_a.length.nonzero?
           flush_iambic_queue
-          @meth_i and flush_bc_meth
+          @plan and flush_bc_meth
         else
           flush_bc_meth
         end ; nil
       end
 
+      def plan_in_progress
+        @plan ||= Property_Plan__.new
+      end
+      attr_reader :plan
+
+      class Property_Plan__
+        attr_accessor :meth_i, :prop_i
+        def names
+          [ @prop_i, @meth_i ]
+        end
+      end
+
       def flush_bc_meth
-        @prop_i = @has_writer_method_name_constraints ?
-          aply_method_name_constraints( @meth_i ) : @meth_i
+        if @has_writer_method_name_constraints
+          @plan.prop_i = aply_method_name_constraints @plan.meth_i
+        else
+          @plan.prop_i = @plan.meth_i
+        end
         did_build = touch_and_accept_prop
         did_build and finish_property
       end
 
       def flush_because_prop_i prop_i
-        @prop_i = prop_i
-        @meth_i = :"__PROCESS_IAMBIC_PARAMETER__#{ @prop_i }"
+        plan_in_progress.prop_i = prop_i
+        @plan.meth_i = :"__PROCESS_IAMBIC_PARAMETER__#{ prop_i }"
         did_build = touch_and_accept_prop
         mxr = @reader.method_added_mxr and mxr.stop_listening
         @reader.send :define_method, @prop.iambic_writer_method_name,
@@ -168,20 +183,20 @@ module Skylab::Brazen
           create_new_prop
           did_build = true
         end
-        @prop_i = @meth_i = nil
+        @plan = nil
         accept_property @prop
         did_build
       end
 
       def mutate_prop_in_progress
-        @prop.set_prop_i_and_iambic_writer_method_name @prop_i, @meth_i
+        @prop.set_prop_i_and_iambic_writer_method_name( * @plan.names )
         (( p = any_prop_hook @prop.class )) and p[ @prop ]
         nil
       end
 
       def create_new_prop
         p = any_prop_hook @reader::PROPERTY_CLASS__
-        @prop = @reader::PROPERTY_CLASS__.new @prop_i, @meth_i, & p
+        @prop = @reader::PROPERTY_CLASS__.new( * @plan.names, & p )
         nil
       end
 

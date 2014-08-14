@@ -63,9 +63,12 @@ module Skylab::Brazen::TestSupport::CLI::Actions
     def from_directory_with_already_a_file
       from_directory do
         pn = tmpdir.join 'with-one-empty-file'
-        if ! pn.exist?
-          file_utils.mkdir pn.to_path
-          file_utils.touch pn.join filename
+        file_pn = pn.join filename
+        if ! file_pn.exist?
+          if ! pn.exist?
+            file_utils.mkdir pn.to_path
+          end
+          file_utils.touch file_pn.to_path
         end
         pn.to_path
       end
