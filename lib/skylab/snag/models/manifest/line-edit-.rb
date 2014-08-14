@@ -1,30 +1,22 @@
 module Skylab::Snag
 
-  class Library_::Manifest
+  class Models::Manifest
 
-    class Line_editor_ < Funcy_
+    class Line_edit_ < Agent_  # see [#038]
 
-      Entity_[ self, :fields,
-
-        :at_position_x,  # when it is zero it means "insert the new lines at
-        # the begnning of the file" else it is expected to be a rendered
-        # identifier, for which the the lines will replace the existing lines
-        # for that node.
-
-        :new_line_a,  # insert or replace
-
-        :is_dry_run, :verbose_x,  # options
-
-        :manifest_file_p,  # the model of the file, for our persistence impl.
-        :pathname,  # #todo - redundant with above
-
-        :tmpdir_p,  # used for our persistence implementation
-        :file_utils_p, # ditto
-        :escape_path_p,  # #eew should be curried into above
-
-        :error_p, # may be called when e.g the node is not found
-        :info_p,  # called for e.g verbose output or informational.
-        :raw_info_p  # probably lines to be written directly to stderr
+      Entity_[ self, :fields,  # all fields below are covered in the doc node.
+        :at_position_x,
+        :error_p,
+        :escape_path_p,
+        :file_utils_p,
+        :info_p,
+        :is_dry_run,
+        :manifest_file_p,
+        :new_line_a,
+        :pathname,
+        :tmpdir_p,
+        :raw_info_p,
+        :verbose_x,
       ]
 
       def execute
@@ -73,12 +65,7 @@ module Skylab::Snag
 
       Build_context_sensitive_line_writer_ = -> fh do
 
-        # when you save a file in vi it appears to append a a "\n" to the
-        # last line if there was not one already. we follow suit here when
-        # rewriting the manifest. however we leave the below in place in case
-        # we ever decide to revert back to the dumb way.
-
-        # sep = nil
+        # sep = nil  # #note-73
         -> line do
           # fh.write "#{ sep }#{ line }"
           # sep ||= "\n" # meh [#020]

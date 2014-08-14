@@ -67,7 +67,7 @@ module Skylab::Snag
         end
         sexp ||= [ :valid ]
         found = nodes.find( sexp, @max_count ) or break( res = found )
-        @lines = Snag_::Library_::Yielder::Mono.new do |txt|
+        @lines = Monadic_Yielder__.new do |txt|
           call_digraph_listeners :output_line, txt
           nil
         end
@@ -79,6 +79,13 @@ module Skylab::Snag
         res = render_nodes found
       end while nil
       res
+    end
+
+    class Monadic_Yielder__ < ::Enumerator::Yielder
+      def << x  # was once nec. for [cb] digraph to see an arity of 1. still?
+        super
+      end
+      alias_method :yield, :<<
     end
 
     # --*--

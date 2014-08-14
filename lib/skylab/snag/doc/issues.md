@@ -1,3 +1,4 @@
+[#057]       #doc-node the model
 [#054] #open no sub-client here
 [#053]       #doc-node structures for our CLI implementation
 [#052]       #parent-node: [#053] the CLI node
@@ -14,9 +15,9 @@
 [#041]       #parent-node: [#040] #in-situ callbacks should be readable
 [#040]       #parent-node: [#039] the listeners manifesto
 [#039]       #doc-point logical conventions and ideas
-[#038]       #parent-node: [#036] on the structure of manifests
+[#038]       #parent-node: [#036] the manifest narrative ..
 [#037]       #parent-node: [#036] on the structure of nodes
-[#036]       #doc-point on the structure of manifests and nodes
+[#036]       #parent-node: [#057] on the structure of manifests and nodes
 [#035] #open throwing is always ugly. just don't
 [#034]       #parent-node: [#038] on doc-node trees and flat numberspaces ..
 [#033]       #tracking-tag non-deterministic smelly tests

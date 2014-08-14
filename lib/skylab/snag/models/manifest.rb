@@ -1,6 +1,23 @@
 module Skylab::Snag
 
-  class Library_::Manifest
+  class Models::Manifest  # [#038]
+
+    class << self
+
+      def build_file pathname
+        self::File__.new pathname
+      end
+
+      def header_width
+        HEADER_WIDTH__
+      end
+      HEADER_WIDTH__ = '[#867] '.length
+
+      def line_width
+        LINE_WIDTH__
+      end
+      LINE_WIDTH__ = 80
+    end
 
     def initialize pathname
       @pathname = ( ::Pathname.new pathname if pathname )
@@ -12,23 +29,23 @@ module Skylab::Snag
     end
 
     def curry_enum * x_a
-      ea = self.class::Enum_.new  @pathname, -> { manifest_file }
+      ea = self.class::Node_Scan__.new  @pathname, -> { manifest_file }
       ea.absorb_iambic_fully x_a
       ea
     end
 
     def add_node_notify node, *a
-      self::class::Adder_[ node, :callbacks, get_callbacks, *a ]
+      self::class::Node_add__[ node, :callbacks, get_callbacks, *a ]
     end
 
     def change_node_notify node, *a
-      self::class::Changer_[ node, :callbacks, get_callbacks, *a ]
+      self::class::Node_edit__[ node, :callbacks, get_callbacks, *a ]
     end
 
   private
 
     def get_callbacks
-      self.class::Callbacks_.new :render_lines_p, method( :render_line_a ),
+      self.class::Callbacks__.new :render_lines_p, method( :render_line_a ),
         :manifest_file_p, method( :manifest_file ), :pathname, @pathname,
           :file_utils_p, get_file_utils_p, :tmpdir_p, get_tmpdir_p,
             :curry_enum_p, method( :curry_enum )
@@ -51,17 +68,7 @@ module Skylab::Snag
     end
 
     def get_file_utils_p
-
-      # using a hacky regex, scan all msgs emitted by the file utils client
-      # and with any string that looks like an aboslute path run it through
-      # `escape_path_p` proc (*of the modality client*, e.g). in turn, call_digraph_listeners
-      # these messages as info to `info_p`, presumably to the same modality
-      # client. This hack grants us the novelty of letting FileUtils render
-      # its own messages (which it does heartily) while attempting possibly
-      # to mask full filenames for security reasons. but at the end of day,
-      # it is still a hack!
-
-      FU_curry_.method( :[] )
+      FU_curry_.method :[]  # #note-75
     end
 
     Entity_ = -> client, _fields_, * field_i_a do
@@ -85,13 +92,11 @@ module Skylab::Snag
     def get_tmpdir_p
       -> *a do
         @tmpdir_pathname ||= Snag_::Lib_::Tmpdir_pathname[].join TMP_DIRNAME_
-        Tmpdir_Curry_[ :tmpdir_pathname, @tmpdir_pathname, *a ]
+        self.class::Tmpdir_Curry__[ :tmpdir_pathname, @tmpdir_pathname, *a ]
       end
     end
 
-    TMP_DIRNAME_ = 'snag-production-tmpdir'
-
-    class Funcy_
+    class Agent_
 
       Snag_::Lib_::Funcy_globless[ self ]
 
@@ -108,6 +113,8 @@ module Skylab::Snag
       end
     end
 
-    Manifest = self
+    Manifest_ = self
+
+    TMP_DIRNAME_ = 'snag-production-tmpdir'
   end
 end

@@ -1,8 +1,8 @@
 module Skylab::Snag
 
-  class Library_::Manifest
+  class Models::Manifest
 
-    class Changer_ < Funcy_
+    class Node_edit__ < Agent_
 
       Snag_::Lib_::Basic_Fields[ :client, self,
         :passive, :absorber, :absrb_iambic_passively,
@@ -15,7 +15,7 @@ module Skylab::Snag
       end
 
       def execute
-        Manifest::Line_editor_[
+        Manifest_::Line_edit_[
           :at_position_x, @node.identifier.render,
           :new_line_a, @callbacks.render_line_a( @node ),
           * @callbacks.get_subset_a, * @rest_a ]

@@ -1,8 +1,8 @@
 module Skylab::Snag
 
-  class Library_::Manifest
+  class Models::Manifest
 
-    class Callbacks_
+    class Callbacks__
 
       # callbacks is also immediate values for those values that
       # are immediate. so it both a proxy and a request structure.

@@ -1,8 +1,8 @@
 module Skylab::Snag
 
-  class Library_::Manifest
+  class Models::Manifest
 
-    class Enum_ < Funcy_
+    class Node_Scan__ < Agent_
 
       Snag_::Lib_::Basic_Fields[ :client, self,
         :absorber, :absorb_iambic_fully,

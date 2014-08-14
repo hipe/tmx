@@ -13,7 +13,7 @@ module Skylab::Snag
     #         ~ courtesy reflection & rendering (in asc. complexity) ~
 
     def initialize paths, pattern, names
-      @command = Snag_::Library_::Find.new paths, pattern, names
+      @command = Snag_::Models::Find.new paths, pattern, names
       @seen_count = nil
       super(& method( :visit ) )
     end

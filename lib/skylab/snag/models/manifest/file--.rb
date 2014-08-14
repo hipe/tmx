@@ -1,16 +1,6 @@
 module Skylab::Snag
 
-  class Models::Manifest::File__
-
-    # (this is used by services and hence cannot be a sub-client!)
-    # ([#ba-004] might subsume parts (most?) of this)
-
-    # `normalized_line_producer` is like a filehandle that you call `gets`
-    # on (in that when you reach the end of the file it returns nil)
-    # but a) you don't have to chomp each line and b) it keeps track
-    # of the line number internally for you (think of it as like a
-    # ::StringScanner but instead of for scanning over bytes in a string
-    # it is for scanning lines in a file).
+  class Models::Manifest::File__  # see [#038], intro at #note-12
 
     def initialize pathname
       @file_mutex = false
@@ -43,14 +33,7 @@ module Skylab::Snag
       lp
     end  # #todo this is unacceptable
 
-    # `normalized_lines` is comparable to File#each (aka `each_line`, `lines`)
-    # except a) it internalizes the fact that it is a file, taking care of
-    # closing the file for you, and b) it chomps each line, so you don't have
-    # to worry about whether your line happens to be the last in the file,
-    # or whether or not the last line in the file ends with newline characters,
-    # or what those characters are.
-
-    def normalized_lines
+    def normalized_lines  # #note-42
       ::Enumerator.new do |y|
         @file_mutex and fail 'sanity'
         @file_mutex = true
@@ -65,17 +48,14 @@ module Skylab::Snag
       end
     end
 
-    def open?                     # necessary in short-circuit finds to check
-      @fh                         # if the one we found was also the last one
-    end                           # in which case it will be closed already
+    def open?  # #note-52
+      @fh
+    end
 
     def release_early
       @file_mutex = nil
       @fh.close
       @fh = nil
     end
-
-    # (from stack overflow #3024372, thank you molf for a tail-like
-    # implementation if we ever need it)
   end
 end

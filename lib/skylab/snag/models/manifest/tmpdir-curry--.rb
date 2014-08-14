@@ -1,8 +1,8 @@
 module Skylab::Snag
 
-  class Library_::Manifest
+  class Models::Manifest
 
-    class Tmpdir_Curry_ < Funcy_
+    class Tmpdir_Curry__ < Agent_
 
       Entity_[ self, :fields, :dirname, :tmpdir_pathname,
         :is_dry_run, :file_utils, :escape_path_p, :error_p ]

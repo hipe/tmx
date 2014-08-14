@@ -1,8 +1,8 @@
 module Skylab::Snag
 
-  class Library_::Manifest
+  class Models::Manifest
 
-    class Adder_ < Funcy_
+    class Node_add__ < Agent_
 
       Snag_::Lib_::Basic_Fields[ :client, self,
         :passive, :absorber, :absrb_iambic_passively,
@@ -55,7 +55,7 @@ module Skylab::Snag
       end
 
       def work
-        r = Manifest::Line_editor_[ :at_position_x, 0,
+        r = Manifest_::Line_edit_[ :at_position_x, 0,
           :new_line_a, @callbacks.render_line_a( @node, @int ),
           * @callbacks.get_subset_a, * @rest_a ]
         r and info "done."
