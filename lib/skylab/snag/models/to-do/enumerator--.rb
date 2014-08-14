@@ -12,17 +12,17 @@ module Skylab::Snag
 
     #         ~ courtesy reflection & rendering (in asc. complexity) ~
 
+    def initialize paths, pattern, names
+      @command = Snag_::Library_::Find.new paths, pattern, names
+      @seen_count = nil
+      super(& method( :visit ) )
+    end
+
     attr_reader :command
 
     attr_reader :seen_count
 
   private
-
-    def initialize paths, names, pattern
-      @seen_count = nil
-      @command = Snag_::Library_::Find.new paths, names, pattern
-      super(& method( :visit ) )
-    end
 
     def visit y  # ( methods presented in pre-order from here )
       res = false

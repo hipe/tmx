@@ -12,6 +12,12 @@ module Skylab::Snag
     # ::StringScanner but instead of for scanning over bytes in a string
     # it is for scanning lines in a file).
 
+    def initialize pathname
+      @file_mutex = false
+      @fh = nil
+      @pathname = pathname
+    end
+
     class Normalized_Line_Producer_
     end
 
@@ -35,7 +41,7 @@ module Skylab::Snag
       pathname = -> { @pathname }
       lp.define_singleton_method :pathname do pathname[ ] end
       lp
-    end
+    end  # #todo this is unacceptable
 
     # `normalized_lines` is comparable to File#each (aka `each_line`, `lines`)
     # except a) it internalizes the fact that it is a file, taking care of
@@ -71,13 +77,5 @@ module Skylab::Snag
 
     # (from stack overflow #3024372, thank you molf for a tail-like
     # implementation if we ever need it)
-
-  private
-
-    def initialize pathname
-      @file_mutex = false
-      @fh = nil
-      @pathname = pathname
-    end
   end
 end

@@ -45,6 +45,12 @@ module Skylab::Snag
       end
     end
 
+    def initialize client
+      @max_num_dirs_to_search_for_manifest_file = nil
+      API::Client.setup_ivar and API::Client.setup_delete[ self ]
+      super client
+    end
+
     def build_action normalized_action_name
       # keeping for #posterity, primordial boxxy:
       #path.reduce(self.class) { |m, s| m.const_get(constantize(s)) }.new(self)
@@ -117,12 +123,6 @@ module Skylab::Snag
     attr_writer :max_num_dirs_to_search_for_manifest_file
 
   private
-
-    def initialize modality_client
-      @max_num_dirs_to_search_for_manifest_file = nil
-      super modality_client
-      API::Client.setup_delete[ self ] if API::Client.setup_ivar
-    end
 
     def max_num_dirs_to_search_for_manifest_file
       @max_num_dirs_to_search_for_manifest_file ||

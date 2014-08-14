@@ -6,24 +6,24 @@ module Skylab::Snag
 
     class << self
 
-      def build_collection client, manifest
-        self::Collection__.new client, manifest
+      def build_collection manifest, client
+        self::Collection__.new manifest, client
       end
 
       def main_field_names
         self::Flyweight__.field_names
       end
 
-      def build_flyweight client, pathname
-        self::Flyweight__.new client, pathname
+      def build_flyweight pathname
+        self::Flyweight__.new pathname
       end
 
-      def build_valid_search client, max_count, query_sexp
-        self::Search__.new_valid client, max_count, query_sexp
+      def build_valid_search query_sexp, max_count, client
+        self::Search__.new_valid query_sexp, max_count, client
       end
 
-      def build_controller client, fly=nil
-        self::Controller__.new client, fly
+      def build_controller fly=nil, client
+        self::Controller__.new fly, client
       end
 
       def max_lines_per_node

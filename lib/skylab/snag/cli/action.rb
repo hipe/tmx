@@ -10,13 +10,11 @@ module Skylab::Snag
 
     Snag_::Lib_::CLI[]::Action[ self, :core_instance_methods ]
 
-  private
-
-    #         ~ api invocation and wiring support (pre-order) ~
+    #         ~ API invocation and wiring support (pre-order) ~
 
 
     # note this gets called from the m.c and modals
-    def api_invoke local_normal_name, * x_a, & p
+    def call_API local_normal_name, * x_a, & p
       if ::Hash.try_convert x_a.first
         param_h = x_a.shift
         p ||= x_a.pop
@@ -24,13 +22,15 @@ module Skylab::Snag
         invoke_API_via_name_and_h_and_p local_normal_name, param_h, p
       else
         p and raise ::ArgumentError
-        action = api.build_action local_normal_name
+        action = _API_client.build_action local_normal_name
         action and action.invoke_via_iambic x_a
       end
     end
 
+  private
+
     def invoke_API_via_name_and_h_and_p local_normal_name, param_h, some_p
-      act = api_build_wired_action local_normal_name, some_p
+      act = bld_wired_API_action local_normal_name, some_p
       act and begin
         res = act.invoke param_h
         if false == res           # the placement of this check here is very
@@ -49,8 +49,8 @@ module Skylab::Snag
       "must have exactly 1 proc or block (#{ a.length } for 1)"
     end
 
-    def api_build_wired_action normalized_action_name, wire
-      action = api.build_action normalized_action_name
+    def bld_wired_API_action normalized_action_name, wire
+      action = _API_client.build_action normalized_action_name
       action and begin
         wire[ action ]
         if warn_about_unhandled_streams action
@@ -63,14 +63,16 @@ module Skylab::Snag
       end
     end
 
-    def api
-      request_client.send :api
-    end
+    def _API_client
+      request_client._API_client
+    end ; protected :_API_client
 
-    [ :handle_payload, :handle_info, :handle_error,
-      :handle_raw_info
+    [ :handle_payload, :handle_info,
+      :handle_error, :handle_raw_info
     ].each do |m|
-      define_method m do request_client.send m end
+      define_method m do
+        request_client.send m
+      end
     end
 
     public :handle_info, :handle_error  # #as-necessary
@@ -90,7 +92,7 @@ module Skylab::Snag
     end
 
     def issue_an_invitation_to live_action
-      request_client.send :issue_an_invitation_to, live_action
+      request_client.issue_an_invitation_to live_action
     end
 
     #         ~ randomass re-used view templates ick ~
@@ -119,6 +121,11 @@ module Skylab::Snag
 
     inflection.inflect.noun :singular
 
+    def initialize client
+      super
+      @param_h = {}
+    end
+
     def resolve_argv argv
       [ nil, method( :invoke ), [ argv ] ]  # compat legacy
     end
@@ -130,11 +137,6 @@ module Skylab::Snag
     end
 
   private
-
-    def initialize request_client
-      super
-      @param_h = { }
-    end
 
     #         ~ common optparse options ~
 

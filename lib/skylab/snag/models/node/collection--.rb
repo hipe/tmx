@@ -4,6 +4,14 @@ module Skylab::Snag
 
     include Snag_::Core::SubClient::InstanceMethods
 
+    def initialize manifest, client
+      @manifest = manifest
+      @node_flyweight = nil
+      super client
+    end
+
+    attr_reader :manifest  # used in actions for now
+
     def add message, do_prepend_open_tag, dry_run, verbose_x, new_node=nil
       r = false
       begin
@@ -27,7 +35,8 @@ module Skylab::Snag
     def fetch_node node_ref, not_found=nil
       res = nil
       begin
-        res = find( 1, [ :identifier_ref, node_ref ] ) or break
+        res = find [ :identifier_ref, node_ref ], A_COUNT_OF_ONE__
+        res or break
         fly = res.to_a.first      # just have faith in the system
         if ! fly
           not_found ||= -> nr do
@@ -35,17 +44,18 @@ module Skylab::Snag
           end
           break( res = not_found[ node_ref ] )
         end
-        res = Models::Node.build_controller self, fly
+        res = Models::Node.build_controller fly, self
       end while nil
       res
     end
+    A_COUNT_OF_ONE__ = 1
 
-    def find max_count, query_sexp
+    def find query_sexp, max_count
       res = false
       begin
         flyweight = node_flyweight
 
-        search = Models::Node.build_valid_search self, max_count, query_sexp
+        search = Models::Node.build_valid_search query_sexp, max_count, self
 
         break if ! search
 
@@ -69,18 +79,10 @@ module Skylab::Snag
       res
     end
 
-    attr_reader :manifest # used in actions for now!
-
   private
 
-    def initialize request_client, manifest
-      @node_flyweight = nil
-      @manifest = manifest
-      super request_client
-    end
-
     def node_flyweight
-      @node_flyweight ||= Models::Node.build_flyweight self, @manifest.pathname
+      @node_flyweight ||= Models::Node.build_flyweight @manifest.pathname
     end
 
     date_format = '%Y-%m-%d'

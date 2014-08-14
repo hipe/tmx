@@ -8,6 +8,14 @@ module Skylab::Snag
 
     event_factory Snag_::API::Events::Datapoint
 
+    def initialize field_names
+      _maxlen = field_names.reduce( 0 ) do |m, i|
+        x = i.to_s.length
+        m > x ? m : x
+      end
+      @fmt = "%-#{ _maxlen }s" ; nil
+    end
+
     def << record
 
       @y << '---'
@@ -29,17 +37,6 @@ module Skylab::Snag
         nil
       end
       m.bind( self ).call( *a, &b )
-    end
-
-  private
-
-    def initialize field_names
-      maxlen = field_names.reduce( 0 ) do |m, sym|
-        x = sym.to_s.length
-        m > x ? m : x
-      end
-      @fmt = "%-#{ maxlen }s"
-      nil
     end
   end
 end

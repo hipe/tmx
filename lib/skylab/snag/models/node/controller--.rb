@@ -4,6 +4,17 @@ module Skylab::Snag
 
     include Snag_::Core::SubClient::InstanceMethods
 
+    def initialize flyweight, client
+      @date_string = @delineated = @do_prepend_open_tag = nil
+      @do_prepend_open_tag_ws = true
+      @extra_line_header = nil
+      @extra_line_a = []
+      @first_line_body = @identifier = @line_width = nil
+      @max_lines = @message = nil
+      flyweight and absorb_flyweight! flyweight
+      super client
+    end
+
     def build_identifier! int, node_number_digits
       fail "won't clobber existing identifier" if @identifier
       integer_string = "%0#{ node_number_digits }d" % int
@@ -124,23 +135,6 @@ module Skylab::Snag
     def on_change_body_tag_event s
       @message = s ; undelineate
       @tc.set_body_s s ; nil
-    end
-
-    def initialize request_client, flyweight=nil
-      super request_client
-      @date_string = nil
-      @delineated = nil
-      @do_prepend_open_tag = nil
-      @do_prepend_open_tag_ws = true
-      @extra_line_header = nil
-      @extra_line_a = []
-      @first_line_body = nil
-      @identifier = nil
-      @line_width = nil
-      @max_lines = nil
-      @message = nil
-      absorb_flyweight!( flyweight ) if flyweight
-      nil
     end
 
     def absorb_flyweight! flyweight

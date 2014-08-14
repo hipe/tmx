@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class CLI
+  class CLI  # read [#052]
 
     # notable things about it:
     #   + it itself is not a pub sub emitter - kiss
@@ -15,6 +15,11 @@ module Skylab::Snag
 
     Snag_::Lib_::CLI[]::Client[ self,
       :client_instance_methods, :three_streams_notify ]
+
+    def initialize up, pay, info  # #storypoint-5
+      three_streams_notify up, pay, info
+      super nil, nil, nil
+    end
 
     def invoke argv               # modify at [#010]
       Snag_::Lib_::CLI_path_tools[].clear  # see
@@ -40,16 +45,6 @@ module Skylab::Snag
 
   private                         # (DSL happens at bottom half)
 
-    # `initialize` - we are straddling two f.w's: all we want is our (modality)
-    # calls to to `call_digraph_listeners` to "work". we follow the good standard of [#sl-114],
-    # which among other things makes testing easier. Even though `legacy` gets
-    # priority on the chain, it won't overwrite the (io adapter-based) `call_digraph_listeners`
-    # we get from h.l, which is good.
-
-    def initialize up, pay, info  # (only strictifies the signature)
-      three_streams_notify up, pay, info
-      super nil, nil, nil
-    end
 
     #         ~ event handling and emitting ~
 
@@ -164,11 +159,11 @@ module Skylab::Snag
       @legacy_last_hot.fetch_param norm_name
     end
 
-    #         ~ api nerks ~
+    #         ~ API nerks ~
 
-    def api
-      @api ||= Snag_::API::Client.new self
-    end
+    def _API_client
+      @API_client ||= Snag_::API::Client.new self
+    end ; public :_API_client
 
     # --*--
 
@@ -185,7 +180,7 @@ module Skylab::Snag
     desc "(more of a plumbing than porcelain feature!)"
 
     def numbers
-      api_invoke [ :nodes, :numbers, :list ], nil, -> a do
+      call_API [ :nodes, :numbers, :list ], nil, -> a do
         a.on_error handle_error
         a.on_info handle_info
         a.on_output_line handle_payload
@@ -235,7 +230,7 @@ module Skylab::Snag
       if message
         p = pbox.partition_where_name_in! :dry_run, :be_verbose  # p has the <= 2 eles
         if pbox.length.nonzero? then res = error msg[ true ] else
-          res = api_invoke [ :nodes, :add ],
+          res = call_API [ :nodes, :add ],
             p.to_hash.merge!(
               do_prepend_open_tag: true,
                           message: message
@@ -251,7 +246,7 @@ module Skylab::Snag
         if pbox.length.nonzero? then res = error msg[ false ] else
           p.add( :be_verbose, false ) if ! p.has? :be_verbose # decide dflt here
           p.add :query_sexp, [ :and, [ :has_tag, :open ] ]
-          res = api_invoke [ :nodes, :reduce ], p.to_hash, -> a do
+          res = call_API [ :nodes, :reduce ], p.to_hash, -> a do
             a.on_output_line handle_payload
             a.on_info handle_info
             a.on_error handle_error

@@ -5,7 +5,10 @@ we were flattening a deep doc-node tree, in a certain way. the commit in
 question will also be the first commit in the history of the file that
 this essay first resided in, that is, "this file".)
 
+
+
 # why this change
+
 
 ## the (new) document hierarchy "system" was already showing strain
 
@@ -18,10 +21,11 @@ should not require changes to code that references those doc-nodes.
 for example, we actually had a doc-point reference that looked like this:
 "[#fa-api-api-fa-003]". if you know what the initials stand for (and they
 are each local to that node they are in) then you might be able to induce
-that it reads: "face / api / api api / facets / issue 003". "what's wrong
+that it reads: "face / API / API API / facets / issue 003". "what's wrong
 with that?" you might ask. well for one thing:
 
-### qualified names are too damn verbose
+
+### the qualified names are too damn verbose
 
 those issues references are getting verbose (which is not necessarily bad,
 because it is semantic (but we see that scaling along one access introduces
@@ -31,10 +35,11 @@ reasonable length of any name for a given purpose in in a given system)).
 
 and for twosies,
 
+
 ### qualified names are not scalable along another axis
 
 another issue with that (long) name: there is a chance that we will one day
-merge the `entity` node and the `api action` nodes of the doc (and system)
+merge the `entity` node and the `API action` nodes of the doc (and system)
 somehow. do we really want to go through and change all the references in the
 code? all the time, it is changesets that we are writing - we want an optimal
 signal-to-noise ratio there; and commits with lots of officious changes like
@@ -55,6 +60,7 @@ necessary for scaling) and the more immediate thing (nested names are annoying
    ### if names were actually identity, they would have to be longer
    ### the map is not the territory
 etc.)
+
 
 # but some nesting lives on..
 

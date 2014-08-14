@@ -7,6 +7,11 @@ module Skylab::Snag
 
     # off the chain [#030] custom parsing of e.g -1, -2 just because
 
+    def initialize( * )
+      @regexp_filters = nil
+      super
+    end
+
     def parse! argv
       if @regexp_filters
         loop do
@@ -39,13 +44,6 @@ module Skylab::Snag
       o = rx_filter_struct.new rx, block
       ( @regexp_filters ||= [] ) << o
       o
-    end
-
-  private
-
-    def initialize( * )
-      @regexp_filters = nil
-      super
     end
   end
 end

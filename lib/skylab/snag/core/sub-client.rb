@@ -13,10 +13,10 @@ module Skylab::Snag
 
   private
 
-    def api_invoke norm_name, param_h, *a, &b
-      request_client.send :api_invoke, norm_name, param_h, *a, &b
+    def call_API norm_name, param_h, *a, &b
+      request_client.call_API norm_name, param_h, *a, &b
     end
-    protected :api_invoke  # #protected-not-private
+    protected :call_API  # #protected-not-private
 
     alias_method :val, :kbd
       # (maybe one day synchronized swimming will be in the olympics) [#hl-051]

@@ -13,7 +13,14 @@ module Skylab::Snag
   end
 
   class CLI::ToDo::Tree
+
     include Snag_::Core::SubClient::InstanceMethods
+
+    def initialize do_pretty, client
+      @do_pretty = do_pretty
+      @todos = []
+      super client
+    end
 
     def << todo
       if todo.valid?
@@ -104,14 +111,6 @@ module Skylab::Snag
         line = nil
         payload( line ) while line = producer.gets
       end
-    end
-
-  private
-
-    def initialize client, do_pretty
-      @do_pretty = do_pretty
-      @todos = []
-      super client
     end
   end
 end

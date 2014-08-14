@@ -36,6 +36,29 @@ module Skylab::Snag
 
   class API::Events::Lingual < Callback_::Event::Unified
 
+    def initialize a, b, act, x
+      @inflection = act.class.inflection
+      set_render_under x
+      super a, b
+    end
+  private
+    def set_render_under x
+      if x.respond_to? :can_render_under
+        if x.can_render_under
+          @can_render_under = true
+          @text = nil
+          @upstream_event = x
+        else
+          @can_render_under = false
+          @text = nil
+          @upstream_event = x
+        end
+      else
+        @can_render_under = nil
+        @text = x
+        @upstream_event = nil
+      end ; nil
+    end
   public
 
     #         ~ nlp assistance hack ~
@@ -76,27 +99,6 @@ module Skylab::Snag
 
     class << self
       alias_method :event, :new
-    end
-
-    def initialize a, b, act, x
-      super a, b
-      @inflection = act.class.inflection
-      @can_render_under =
-      if x.respond_to? :can_render_under
-        if x.can_render_under
-          @upstream_event = x
-          @text = nil
-          true
-        else
-          @upstream_event = x
-          @text = nil
-          false
-        end
-      else
-        @upstream_event = nil
-        @text = x
-        nil
-      end
     end
   end
 end

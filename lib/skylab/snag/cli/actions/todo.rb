@@ -29,7 +29,7 @@ module Skylab::Snag
           tree_level = @param_h.delete :tree_level
         end
         tree = nil
-        res = api_invoke [ :to_do, :report ], @param_h do |a|
+        res = call_API [ :to_do, :report ], @param_h do |a|
           a.on_info handle_info
           a.on_error handle_error
           a.on_command do |cmd|
@@ -52,8 +52,8 @@ module Skylab::Snag
         res
       end
 
-      build_tree = -> action, level, request_client do
-        tree = CLI::ToDo::Tree.new request_client, ( level > 1 )
+      build_tree = -> action, level, client do
+        tree = CLI::ToDo::Tree.new ( level > 1 ), client
         action.on_todo do |todo|
           tree << todo  # with each todo, build the tree
         end
@@ -85,7 +85,7 @@ module Skylab::Snag
       if path.length.zero?  # triggering dflts to list params is not automatic
         path.concat Snag_::API::Actions::ToDo::Melt.attributes[ :paths ][ :default ]
       end
-      api_invoke [ :to_do, :melt ],
+      call_API [ :to_do, :melt ],
         {           dry_run: false,
                       paths: path,
                  be_verbose: false }.merge!( @param_h ), -> a do

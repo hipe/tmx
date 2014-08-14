@@ -12,7 +12,7 @@ module Skylab::Snag
     end
 
     def close node_ref
-      api_invoke [ :node, :close ], {
+      call_API [ :node, :close ], {
                  be_verbose: false,
                     dry_run: false,
                    node_ref: node_ref
@@ -39,7 +39,7 @@ module Skylab::Snag
     end
 
     def add node_ref, tag_name
-      api_invoke [ :node, :tags, :add ], {
+      call_API [ :node, :tags, :add ], {
                  be_verbose: false,
                   do_append: true,
                     dry_run: false,
@@ -54,7 +54,7 @@ module Skylab::Snag
     desc 'list the tags for a given node.'
 
     def ls node_ref
-      api_invoke(
+      call_API(
         [ :node, :tags, :ls ],
         { node_ref: node_ref },
         -> o do
@@ -77,7 +77,7 @@ module Skylab::Snag
       par_h = { dry_run: false, node_ref: node_ref,
         tag_name: tag_name, be_verbose: false }
       par_h.merge! @param_h
-      api_invoke [ :node, :tags, :rm ], par_h do |o|
+      call_API [ :node, :tags, :rm ], par_h do |o|
         o.on_error handle_error
         o.on_info handle_info
         o.on_payload handle_payload

@@ -17,21 +17,20 @@ module Skylab::Snag
       # straightforward subclient - emits PIE upwards
 
     #        ~ all methods/procs listed in pre-order traversal ~
-
-    def initialize rc, paths, dry_run, names, pattern, be_verbose
-      super rc
+    def initialize dry_run, be_verbose, paths, pattern, names, client
       @dry_run = dry_run
-      @pattern = pattern
       @file_changes = []
-      o = Snag_::Models::ToDo.build_enumerator paths, names, pattern
-      o.on_error method( :error )
-      o.on_command do |cmd_str|   # (strict event handling)
+      @pattern = pattern
+      o = Snag_::Models::ToDo.build_enumerator paths, pattern, names
+      o.on_error method :error
+      o.on_command do |cmd_str|  # (strict event handling)
         if @be_verbose
           info cmd_str
         end
       end
       @todos = o
       @be_verbose = be_verbose
+      super client
     end
 
     def melt  # public
@@ -64,7 +63,7 @@ module Skylab::Snag
       res
     end
 
-    private
+  private
 
     todo_where = nil  # scope
 
@@ -74,16 +73,16 @@ module Skylab::Snag
         nil
       else
         new_node = nil
-        res = @request_client.api_invoke [ :nodes, :add ], {
+        res = @request_client.call_API [ :nodes, :add ], {
                    be_verbose: @be_verbose,
           do_prepend_open_tag: true,
                       dry_run: @dry_run,
                       message: todo.message_body_string
         }, -> a do
           a.on_new_node { |n| new_node = n }
-          a.on_info method( :info )
+          a.on_info method :info
           a.on_raw_info -> txt do
-            @request_client.send :call_digraph_listeners, :raw_info, txt
+            @request_client.call_digraph_listeners :raw_info, txt
           end
           a.on_error method( :error )
         end

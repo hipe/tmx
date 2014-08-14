@@ -66,7 +66,7 @@ module Skylab::Snag
           end
         end
         sexp ||= [ :valid ]
-        found = nodes.find( @max_count, sexp ) or break( res = found )
+        found = nodes.find( sexp, @max_count ) or break( res = found )
         @lines = Snag_::Library_::Yielder::Mono.new do |txt|
           call_digraph_listeners :output_line, txt
           nil

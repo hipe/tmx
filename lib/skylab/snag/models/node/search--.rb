@@ -4,19 +4,32 @@ module Skylab::Snag
 
     include Snag_::Core::SubClient::InstanceMethods
 
-    def self.new_valid request_client, max_count, query_sexp
-      o = new request_client, max_count, query_sexp
+    def self.new_valid query_sexp, max_count, client
+      o = new query_sexp, max_count, client
       o.valid
     end
 
-    positive_integer_rx = %r{\A\d+\z}
+    def initialize query_sexp, max_count, client
+      @counter = nil
+      super client  # before next line
+      if max_count
+        self.max_count = max_count
+      else
+        @max_count = nil
+      end
+      @query = Query_Nodes_.new_valid query_sexp, self
+    end
 
-    define_method :max_count= do |integer_ref|
+    def valid
+      error_count.zero? ? self : UNABLE_
+    end
+
+    def max_count= integer_ref
       begin
         if integer_ref
           if ::Fixnum === integer_ref
             integer = integer_ref
-          elsif positive_integer_rx =~ integer_ref
+          elsif POSITIVE_INTEGER_RX__ =~ integer_ref
             integer = integer_ref.to_i
           else
             error "must look like integer: #{ integer_ref }"
@@ -31,6 +44,11 @@ module Skylab::Snag
       end while nil
       integer_ref
     end
+    POSITIVE_INTEGER_RX__ = %r{\A\d+\z}
+
+    def phrasal_noun_modifier
+      "with #{ @query.phrase }"
+    end
 
     def match? node
       b = @query.match? node
@@ -42,83 +60,77 @@ module Skylab::Snag
       b
     end
 
-    def phrasal_noun_modifier
-      "with #{ @query.phrase }"
+    module Query_Nodes_  # #borrow-indent
+
+    def self.new_valid query_sexp, client
+      _cls = Autoloader_.const_reduce [ query_sexp.first ], self
+      _cls.new_valid query_sexp, client
     end
 
-    def valid
-      0 == error_count ? self : UNABLE_
-    end
+    class And
 
-  private
-
-    module Query_Nodes_
-      def self.new_valid request_client, query_sexp
-        klass = Autoloader_.const_reduce [ query_sexp.first ], self
-        klass.new_valid request_client, query_sexp
-      end
-    end
-
-    class Query_Nodes_::And
-      def self.new_valid request_client, query_sexp
+      def self.new_valid query_sexp, client
         a = query_sexp[ 1 .. -1 ].map do |x|
           klass = Autoloader_.const_reduce [ x.first ], Query_Nodes_
-          klass.new_valid request_client, x
+          klass.new_valid x, client
         end
-        rs = nil
         if ! a.index { |x| ! x }
           if a.length < 2
             rs = a.first
           else
-            rs = new request_client, a
+            rs = new a
           end
         end
         rs
       end
+
+      def initialize a
+        @elements = a
+      end
+
+      def phrase
+        @elements.map( & :phrase ).join ' and '
+      end
+
       def match? node
         ! detect { |x| ! x.match?( node ) }
       end
-      def phrase
-        @elements.map(&:phrase).join ' and '
-      end
-    private
-      def initialize request_client, a
-        @elements = a
-      end
     end
 
-    # --*--
+    class All
 
-    class Query_Nodes_::All
-      def self.new_valid request_client, sexp
-        new request_client
+      def self.new_valid _sexp, _client
+        ALL__
       end
+
+      def initialize
+        freeze
+      end
+
+      ALL__ = new
+
+      def phrase
+        PHRASE__
+      end
+      PHRASE__ = "either validity or no validity".freeze
+
       def match? node
         true
       end
-      def phrase
-        "either validity or no validity"
-      end
-    private
-      def initialize request_client
-      end
     end
 
-    class Query_Nodes_::HasTag
-      def self.new_valid request_client, sexp
-        tag_i = sexp[1]
+    class HasTag
+
+      def self.new_valid sexp, client
+        tag_i = sexp.fetch 1
         tag_i_ = Models::Tag.normalize_stem_i tag_i,
           -> ev do
-            request_client.send :error, ( ev.render_under request_client )
+            client.error ev.render_under client
           end
-        if tag_i_
-          new request_client, tag_i_
-        else
-          tag_i_
-        end
+        tag_i_ and new tag_i_
       end
 
-      def initialize request_client, valid_tag_stem_i
+      def initialize valid_tag_stem_i
         @tag_rx = /(?:^|[[:space:]])##{ ::Regexp.escape valid_tag_stem_i }\b/
         @valid_tag_stem_i = valid_tag_stem_i
       end
@@ -137,57 +149,57 @@ module Skylab::Snag
       end
     end
 
-    class Query_Nodes_::IdentifierRef
-      def self.new_valid request_client, sexp
-        identifier_body = sexp[1] # prefixes might bite [#019]
+    class IdentifierRef
+
+      def self.new_valid sexp, client
+        identifier_body = sexp[1]  # prefixes might bite [#019]
         normalized = Models::Identifier.normalize identifier_body,
           -> invalid do
-            request_client.send :error, ( invalid.render_under request_client )
+            client.send :error, ( invalid.render_under client )
           end,
           -> info do
-            request_client.send :info, ( info.render_under request_client )
+            client.send :info, ( info.render_under client )
           end
-        normalized ? new( request_client, normalized ) : normalized
+        normalized and new normalized
       end
+
+      def initialize identifier_struct
+        @identifier = identifier_struct
+        @identifier_rx = /\A#{ ::Regexp.escape @identifier.body }/  # [#019]
+      end
+
+      def phrase
+        "identifier starting with \"#{ @identifier.body }\""
+      end
+
       def match? node
         if node.valid
           @identifier_rx =~ node.identifier_body
         end
       end
-      def phrase
-        "identifier starting with \"#{ @identifier.body }\""
-      end
-    private
-      def initialize request_client, identifier_struct
-        @identifier = identifier_struct
-        @identifier_rx = /\A#{ ::Regexp.escape @identifier.body }/ # [#019]
-      end
     end
 
-    class Query_Nodes_::Valid
-      def self.new_valid *a
-        new( *a )
+    class Valid
+
+      def self.new_valid _sexp, _client
+        VALID__
       end
+
+      def initialize
+        freeze
+      end
+
+      VALID__ = new
+
+      def phrase
+        PHRASE__
+      end
+      PHRASE__ = 'validity'.freeze
+
       def match? node
         node.valid
       end
-      def phrase
-        'validity'
-      end
-    private
-      def initialize request_client, _
-      end
     end
-
-    def initialize emitter, max_count, query_sexp
-      super emitter
-      @counter = nil
-      @max_count = nil
-      self.max_count = max_count if max_count
-      @query = Query_Nodes_.new_valid self, query_sexp
-      if ! @query && 0 == error_count          # catches some thing earlier..
-        error "failed to build query for one weird old reason" # last resort
-      end
-    end
+    end # payback-indent
   end
 end

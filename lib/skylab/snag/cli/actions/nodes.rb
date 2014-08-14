@@ -18,7 +18,7 @@ module Skylab::Snag
     end
 
     def add message
-      api_invoke( [ :nodes, :add ], {
+      call_API( [ :nodes, :add ], {
                  be_verbose: false,
                     dry_run: false,
                     message: message,
@@ -70,7 +70,7 @@ module Skylab::Snag
     # (this function was original conception point of #doc-point [#sl-102])
 
     def list identifier_ref=nil
-      api_invoke( [ :nodes, :reduce ],
+      call_API( [ :nodes, :reduce ],
         {     be_verbose: true,
           identifier_ref: identifier_ref }.merge!( @param_h ) ) do |a|
         a.on_output_line handle_payload

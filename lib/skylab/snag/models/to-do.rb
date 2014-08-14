@@ -4,9 +4,19 @@ module Skylab::Snag
     # imagine that parts of this are frozen
 
     class << self
-      def build_enumerator paths, names, pattern
-        self::Enumerator__.new paths, names, pattern
+      def build_enumerator paths, pattern, names
+        self::Enumerator__.new paths, pattern, names
       end
+    end
+
+    def initialize full_source_line, line_number_string, path, pattern
+      @full_source_line = full_source_line
+      @line_number = line_number_string.to_i
+      @line_number_string = line_number_string
+      @path = path
+      @pathname = nil
+      @pattern = pattern
+      @ranges = nil
     end
 
     attr_reader :full_source_line
@@ -62,17 +72,6 @@ module Skylab::Snag
     end
 
   private
-
-    define_method :initialize do
-      |path, line_number_string, full_source_line, pattern|
-      @path = path                # (order ivars {aesthet, isomorph}ically!)
-      @pathname = nil
-      @line_number_string = line_number_string
-      @line_number = @line_number_string.to_i
-      @full_source_line = full_source_line
-      @pattern = pattern
-      @ranges = nil
-    end
 
     before_rx = last_pattern = todo_rx = nil
 

@@ -12,36 +12,45 @@ module Skylab::Snag
 
     define_singleton_method :field_names do field_names end
 
-    class Indexes_
-      attr_reader :identifier_prefix, :integer, :identifier_body, :body
-      def clear
-        @identifier_prefix.clear
-        @integer.clear
-        @identifier_body.clear
-        @body.clear
-      end
-    private
-      def initialize
-        @identifier_prefix = Index_.new
-        @integer = Index_.new
-        @identifier_body = Index_.new
-        @body = Index_.new
-      end
+    def initialize manifest_pathname
+      @extra_line_a = []
+      @first_line = nil
+      @indexes = Indexes__.new
+      @manifiset_pathname = manifest_pathname
+      @parse_failure = @valid = nil
     end
 
-    class Index_
-      attr_accessor :begin, :end
+    class Indexes__
+
+      def initialize
+        @body = Index__.new
+        @identifier_body = Index__.new
+        @identifier_prefix = Index__.new
+        @integer = Index__.new
+      end
+
+      attr_reader :body, :identifier_body, :identifier_prefix, :integer
+
       def clear
-        @begin = @end = nil
+        @body.clear
+        @identifier_prefix.clear
+        @identifier_body.clear
+        @integer.clear
       end
-      def exist?
-        ! @begin.nil?
+
+      class Index__
+        def initialize
+          @begin = @end = nil
+        end
+        alias_method :clear, :initialize ; public :clear
+        attr_accessor :begin, :end
+        def exist?
+          ! @begin.nil?
+        end
+        def range
+          @begin .. @end
+        end
       end
-      def range
-        @begin .. @end
-      end
-    private
-      alias_method :initialize, :clear
     end
 
     def build_identifier
@@ -157,27 +166,16 @@ module Skylab::Snag
 
   private
 
-    def initialize request_client, manifest_pathname
-      # experimentally ignore request client for now!
-
-      @valid = nil
-      @first_line = nil
-      @extra_line_a = []
-      @indexes = Indexes_.new
-      @manifiset_pathname = manifest_pathname
-      @parse_failure = nil
-    end
-
     def clear
-      @valid = nil
-      @first_line = nil
       @extra_line_a.clear
+      @first_line = nil
       @indexes.clear
+      @valid = nil
     end
 
-    def parse_failure                          # it is a lazily-created fly-
-      @parse_failure if ! @valid               # weight so we have to protect
-    end                                        # against inappropriate access
+    def parse_failure
+      ! @valid and @parse_failure
+    end
 
     def parse_failure! expecting, near, line, line_number, pathname
       # (be sure to set all properties! it is yet another flyweight)

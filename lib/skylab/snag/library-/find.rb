@@ -40,6 +40,19 @@ module Skylab::Snag
     # be called, always with exactly 1 string explaining the failure reason.
     #
 
+    def initialize paths, pattern, names
+      ech = -> x { ! x.respond_to?( :each ) and "each? - #{ x.inspect }" }
+      s_a = [ -> { ech[ paths ] },
+              -> { ech[ names ] },
+              -> { ! pattern.respond_to?( :ascii_only? ) and "pattern?" }
+      ].reduce( [] ) do |m, p|
+        s = p[] and m.push s ; m
+      end
+      s_a.length.zero? or raise ::ArgumentError, s_a * ' - '
+      @names = names ; @paths = paths ; @pattern = pattern
+      freeze
+    end
+
     def command yes, no
       a =
       [  method( :names_reason ),
@@ -134,25 +147,6 @@ module Skylab::Snag
         my.patrn -> p { y << "with the pattern #{ val[ p ] }" }, e[ :pattern ]
 
         y * SPACE_
-      end
-    end
-
-  private
-
-    def initialize paths, names, pattern
-      ech = -> x { "each? - #{ x.inspect }" if ! x.respond_to? :each }
-      [ -> { ech[ paths ] },
-        -> { ech[ names ] },
-        -> { "pattern? #{ pattern.class }" if ! ( ::String === pattern ) }
-      ].reduce( [] ) do |m, p|
-        ( e = p[] ) ? m << e : m
-      end.tap do |a|
-        if a.length.nonzero?
-          raise ::ArgumentError, e * ' - '
-        else
-          @paths, @names, @pattern = paths, names, pattern
-          freeze  # BOOM
-        end
       end
     end
   end

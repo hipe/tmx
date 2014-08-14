@@ -1,3 +1,7 @@
+[#054] #open no sub-client here
+[#053]       #doc-node structures for our CLI implementation
+[#052]       #parent-node: [#053] the CLI node
+[#051]       #done move all initialize to the top
 [#050] #open this kind of setup is bad
 [#049]       #parent-node: [#046] a cb error result may be propagagted
 [#048]       #parent-node: [#046] a cb error result may be disregarded
@@ -18,7 +22,7 @@
 [#033]       #tracking-tag non-deterministic smelly tests
 [#032]       see if we can unify find commands org wide #tracking-tag
 [#031]       #done NO. BAD. (horrible event wiring in todo tree) ..
-               and some comments on ui vs. api and so on
+               and some comments on UI vs. API and so on
 [#030]       #done we would love to have -1, -2 etc
 [#029]       #tracking-tag #pattern of `instance_eval` for rendering
 [#028]       melt makes patch for whole codebase #deferred

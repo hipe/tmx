@@ -42,7 +42,7 @@ module Skylab::Snag::TestSupport::CLI
         o
       end
 
-      it "2.3x4H (good arg/good opt) (help postfix) (param api)" do
+      it "2.3x4H (good arg/good opt) (help postfix) (param API)" do
         invoke 'todo', '-h'
         c = output.class::Composite.of output.lines
         c.unique_stream_name_order_i_a.should eql %i( info )

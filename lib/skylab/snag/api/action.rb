@@ -24,7 +24,7 @@ module Skylab::Snag
                             # we check for unhandled even streams, but we don't
                             # care about taxonomic streams like these.
 
-    listeners_digraph  error: :lingual   # probably every api action subclass should have it
+    listeners_digraph  error: :lingual   # probably every API action subclass should have it
                             # in its graph that it listeners_digraph  this (and so it does)
                             # because we call_digraph_listeners errors in `absorb_param_h`
                             # which they all use (i think..)
@@ -52,6 +52,11 @@ module Skylab::Snag
     # --*--
 
     include Snag_::Core::SubClient::InstanceMethods
+
+    def initialize _
+      @listener = @nodes = @param_h = nil
+      super
+    end
 
     def invoke_via_iambic x_a
       h = {} ; d = 0 ; length = x_a.length
@@ -81,13 +86,6 @@ module Skylab::Snag
     attr_reader :up_from_path
 
   private
-
-    def initialize api
-      @listener = nil
-      @nodes = nil
-      @param_h = nil
-      super
-    end
 
     def absorb_param_h            # [#hl-047] this kind of algo, sort of
       res = false
@@ -142,7 +140,7 @@ module Skylab::Snag
             error msg
           end
           mf or break( nodes = mf )
-          nodes = Snag_::Models::Node.build_collection self, mf
+          nodes = Snag_::Models::Node.build_collection mf, self
         end while nil
         nodes
       end
