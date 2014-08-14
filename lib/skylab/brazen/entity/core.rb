@@ -105,6 +105,7 @@ module Skylab::Brazen
     class Scope_Kernel__  # formerly "flusher"
 
       def initialize reader, writer
+        @ad_hocs_are_known = false
         @reader = reader ; @writer = writer
         @has_writer_method_name_constraints = false
         @lstnrs = @prop = nil
@@ -133,6 +134,14 @@ module Skylab::Brazen
         @writer_method_name_suffix = i
       end
 
+      def add_monadic_property_via_i i
+        plan = Property_Plan__.new i
+        plan.meth_i = generate_method_name_for_plan plan
+        prop = bld_prop_from_plan plan
+        define_iambic_writer_method_for_property prop
+        accept_property prop ; nil
+      end
+
       def flush_because_method m_i
         plan_in_progress.meth_i = m_i
         if @x_a_a.length.nonzero?
@@ -149,6 +158,9 @@ module Skylab::Brazen
       attr_reader :plan
 
       class Property_Plan__
+        def initialize i=nil
+          @prop_i = i
+        end
         attr_accessor :meth_i, :prop_i
         def names
           [ @prop_i, @meth_i ]
@@ -167,13 +179,21 @@ module Skylab::Brazen
 
       def flush_because_prop_i prop_i
         plan_in_progress.prop_i = prop_i
-        @plan.meth_i = :"__PROCESS_IAMBIC_PARAMETER__#{ prop_i }"
+        @plan.meth_i = generate_method_name_for_plan @plan
         did_build = touch_and_accept_prop
-        mxr = @reader.method_added_mxr and mxr.stop_listening
-        @reader.send :define_method, @prop.iambic_writer_method_name,
-          @prop.some_iambic_writer_method_proc
-        mxr and mxr.resume_listening
+        define_iambic_writer_method_for_property @prop
         did_build and finish_property
+      end
+
+      def define_iambic_writer_method_for_property prop
+        mxr = @reader.method_added_mxr and mxr.stop_listening
+        @reader.send :define_method, prop.iambic_writer_method_name,
+          prop.some_iambic_writer_method_proc
+        mxr and mxr.resume_listening ; nil
+      end
+
+      def generate_method_name_for_plan plan
+        :"__PROCESS_IAMBIC_PARAMETER__#{ plan.prop_i }"
       end
 
       def touch_and_accept_prop
@@ -195,9 +215,12 @@ module Skylab::Brazen
       end
 
       def create_new_prop
+        @prop = bld_prop_from_plan @plan ; nil
+      end
+
+      def bld_prop_from_plan plan
         p = any_prop_hook @reader::PROPERTY_CLASS__
-        @prop = @reader::PROPERTY_CLASS__.new( * @plan.names, & p )
-        nil
+        @reader::PROPERTY_CLASS__.new( * plan.names, & p )
       end
 
       def any_prop_hook cls
@@ -243,22 +266,23 @@ module Skylab::Brazen
       end
 
       def prcss_scan_as_DSL_fully
-        dsl = DSL__.new self, @scan
-        begin
-          dsl.execute
-          @scan.unparsed_exists or break
-          metaproperty_scanner.scan_some_DSL
-          @scan.unparsed_exists or break
-        end while true
+        prcss_scan_as_DSL false
       end
 
       def prcss_scan_as_DSL_passively
+        prcss_scan_as_DSL true
+      end
+
+      def prcss_scan_as_DSL is_passive
         dsl = DSL__.new self, @scan
         begin
           dsl.execute
           @scan.unparsed_exists or break
-          @scan.current_token.respond_to? :id2name or break
-          metaproperty_scanner.scan_some_DSL
+          if is_passive
+            @scan.current_token.respond_to? :id2name or break
+          end
+          _did = scan_anything_with_any_ad_hoc_processors
+          _did or metaproperty_scanner.scan_some_DSL
           @scan.unparsed_exists or break
         end while true
       end
@@ -288,6 +312,29 @@ module Skylab::Brazen
           @lstnrs[ i ] = Box_.new
         end
       end
+
+      # ~
+
+      def accept_ad_hoc_processor
+        Entity::Ad_Hoc_Processor__.new @scan, @reader, @writer
+      end
+
+      def scan_anything_with_any_ad_hoc_processors
+        @ad_hocs_are_known or determine_if_ad_hocs_exist
+        @ad_hocs_exist and @ad_hoc_scan.scan_any
+      end
+
+      def determine_if_ad_hocs_exist
+        @ad_hocs_are_known = true
+        if @reader.const_defined? :AD_HOC_PROCESSORS__
+          @ad_hoc_scan = @reader::AD_HOC_PROCESSORS__.
+            build_scan @scan, @reader, @writer
+          @ad_hocs_exist = true
+        else
+          @ad_hocs_exist = false
+        end ; nil
+      end
+
     end
 
     module Proprietor_Methods__
@@ -730,6 +777,10 @@ module Skylab::Brazen
       end
 
       Entity[ self, -> do
+
+        def ad_hoc_processor
+          @kernel.accept_ad_hoc_processor
+        end
 
         def iambic_writer_method_name_suffix
           @kernel.iambic_writer_method_name_suffix = iambic_property
