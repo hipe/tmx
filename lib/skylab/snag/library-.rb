@@ -47,6 +47,9 @@ module Skylab::Snag
     Dev_null = -> do
       Headless__[]::IO::DRY_STUB
     end
+    EN_mini = -> do
+      NLP[]::EN::Minitesimal
+    end
     Entity = -> do
       Brazen__[]::Entity
     end

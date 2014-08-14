@@ -39,6 +39,7 @@ express what is now symbolized with "x"; and we would sometimes say "bork"
 to say what is expressed by "X"
 
 
+
 ## the canonoical numbers for CLI arguments :[#134]
 
 because we so often test the same different permutations for CLI arguments
@@ -87,22 +88,26 @@ OK, so among the two axes of "valid vs. invalid" and "option vs. argument",
 any given single "argument" (sorry) can have one of four permutations, that
 correspond to the four numbers.
 
+
+
+### the meanings of the numbers 1 thru 4 (as the "Y" term)
+
 here is the part where it gets mnemonicy: if we had a random string generator
 that spit out random terms (and this is what we imagine we are doing when
 writing tests), the 'Y' numbers correspond to the four categories that those
-strings would fall into, ordered by liklihood they are to occur (descending):
+strings would fall into, ordered by likelihood they are to occur (descending):
 
-1) an invalid "argument"-looking string (i.e not staring with a dash)
+1) an invalid "argument"-looking string (i.e not starting with a dash)
 2) an invalid "option"-looking string (i.e starting with a dash)
 3) a valid (non-option) argument term
 4) a valid option term
 
-(granted, it is a bit arbitrary and dependent on the particular syntax whether
+granted, it is a bit arbitrary and dependent on the particular syntax whether
 or not for e.g an invalid option-looking term is more likely to occur before
 a valid argument term, but as a point of workflow, because we always start
 our test driving with "input most likely to occur" and in this case it is
 an invalid argument (so we are already testing for we), we decide to round out
-the invalid categories before moving on to valid input).
+the invalid categories before moving on to valid input.
 
 hence:     "0)    (no arguments)"
            "1.1)  (one argument, invalid)"
@@ -114,5 +119,9 @@ sometimes we may even take it to the next level, to cover permutations for
 options that themselves take arguments (either required-ly or optionally!)
 (remember that the first term simply counts the number of arguments:)
 
-           "2.4.1) (one option with one argument passed, arg is invalid)"
+           "2.4x1)"
+
+the above may be read as "two arguments were passed. the first is of
+type '4' and the second is type '1'. '4' means "valid option" and '1'
+means "invalid (non-option-looking) argument".
 _

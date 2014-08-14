@@ -54,10 +54,14 @@ module Skylab::Snag
       @kernel.last_callback_result
     end
 
-    # ~ specialy readers
+    # ~ specialy readers & producers
 
     def pos
       @kernel.tag_start_offset_in_node_body_string
+    end
+
+    def duplicate
+      self.class.new @kernel.duplicate_kernel
     end
 
     # ~ mutators

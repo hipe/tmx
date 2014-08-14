@@ -12,7 +12,7 @@ module Skylab::Snag::TestSupport::CLI
     usage_rx = %r{\Ausage: sn0g #{ acts } \[opts\] \[args\]$}
     deeper_invite_rx = %r{\AFor help on a particular subcommand, try #{
       }sn0g <subcommand> -h\.$}i
-    blank_line_rx = /\A\n\z/
+    blank_line_rx = /\A\z/  # expects chomp to be used
 
     context "the CLI cannon (with the same memoized client!) - lvls 0 & 1 ui" do
 

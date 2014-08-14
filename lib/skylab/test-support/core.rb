@@ -9,7 +9,11 @@ end
 
 require_relative '../callback/core'
 
-module Skylab::TestSupport  # :[#021]
+module Skylab::TestSupport  # :[#021].
+
+  def self.constant i
+    self::Constants__.const_get i, false
+  end
 
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader

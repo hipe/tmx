@@ -187,6 +187,10 @@ module Skylab::SubTree
       InformationTactics__[]::Summarize::Time[ x ]
     end
 
+    Test_dir_name_a = -> do
+      TestSupport__[].constant :TEST_DIR_NAME_A
+    end
+
     TestSupport__ = sidesys[ :TestSupport ]
 
     Touch_constant_reader = -> * a do
@@ -194,7 +198,6 @@ module Skylab::SubTree
     end
 
     Treelib__ = memo[ -> do
-
       Porcelain__[]::Tree
     end ]
 

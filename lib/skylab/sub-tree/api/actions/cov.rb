@@ -160,7 +160,7 @@ module Skylab::SubTree
       Messages_[ p ].new( * actual_arg_a )
     end
 
-    TEST_DIR_NAME_A_ = SubTree::Constants::TEST_DIR_NAME_A
+    TEST_DIR_NAME_A_ = SubTree_::Lib_::Test_dir_name_a[]
     #
     SOFT_RX_ = %r{(?:#{
       TEST_DIR_NAME_A_.map( & ::Regexp.method( :escape ) ) * '|'

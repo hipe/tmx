@@ -192,13 +192,7 @@ module Skylab::Snag::TestSupport::CLI
 
   module InstanceMethods
 
-    def expect name, rx
-      line = output.lines.shift
-      line.stream_name.should eql name
-      line.string.should match rx
-    end
-
-    def o * x_a
+    def expect * x_a
       if x_a.length.zero?
         output.lines.length.should be_zero
       else
@@ -206,16 +200,50 @@ module Skylab::Snag::TestSupport::CLI
       end
     end
 
+    alias_method :o, :expect  # legacy
+
     def expct_via_nonzero_length_x_a x_a
-      1 == x_a.length and x_a.unshift :info
-      2 == x_a.length or raise ::ArgumentError, "need [channel] [rx]"
-      chan_i, rx = x_a
+      case x_a.length
+      when 1 ; chan_i = :info ; x = x_a.first
+      when 2 ; chan_i, x = x_a
+      else   ; raise ::ArgumentError, "[channel] { rx | string }"
+      end
       emission = output.lines.shift
       emission or fail "had no more events in queue, expecting #{
-        }#{ [ chan_i, rx ].inspect }"
-      emission.string.should match rx
+        }#{ [ chan_i, x ].inspect }"
       emission.stream_name.should eql chan_i
-      nil
+      emission.string.chomp!  # meh
+      if x.respond_to? :ascii_only?
+        emission.string.should eql x
+      else
+        emission.string.should match x
+      end ; nil
+    end
+
+    def expect_failed
+      expect_no_more_output_lines
+      expect_failure_result
+    end
+
+    def expect_succeeded
+      expect_no_more_output_lines
+      expect_success_result
+    end
+
+    def expect_no_more_output_lines
+      output.lines.length.should be_zero
+    end
+
+    def expect_failure_result
+      @result.should eql LEGACY_ERROR_CODE__
+    end
+
+    def expect_success_result
+      @result.should eql SUCCESS_EXITSTATUS__
+    end
+
+    def weirdly_expect_success_result
+      @result.should eql LEGACY_SUCCESS_CODE__
     end
   end
 
@@ -225,6 +253,10 @@ module Skylab::Snag::TestSupport::CLI
     client
   end
 
+  LEGACY_ERROR_CODE__ = 1
+
+  LEGACY_SUCCESS_CODE__ = 0
+
   Output__ = -> do
     output = TestSupport_::IO::Spy::Group.new
     output.line_filter! -> s do
@@ -232,4 +264,6 @@ module Skylab::Snag::TestSupport::CLI
     end
     output
   end
+
+  SUCCESS_EXITSTATUS__ = 0
 end

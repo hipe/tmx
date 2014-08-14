@@ -241,8 +241,7 @@ module Skylab::TestSupport
       end
 
       Match_test_dir_proc = -> do
-        require 'skylab/sub-tree/constants'  # special case, avoid loading core
-        ::Skylab::SubTree::Constants::TEST_DIR_NAME_A.method :include?
+        TestSupport_.constant( :TEST_DIR_NAME_A ).method :include?
       end
 
       Oxford_and = Callback_::Oxford_and

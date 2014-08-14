@@ -30,7 +30,7 @@ module Skylab::SubTree
     end
 
     o[:test_dir_names_moniker] = -> do
-      "[#{ SubTree::Constants::TEST_DIR_NAME_A * '|' }]"
+      "[#{ SubTree_::Lib_::Test_dir_name_a[] * '|' }]"
     end
 
     o[:glob_h] = -> do

@@ -26,6 +26,14 @@ module Skylab::Snag
       res
     end
 
+    def paystream  # override the simple attr_reader from [po]
+      @IO_adapter.outstream
+    end
+
+    def pen  # #overide legacy hl
+      expression_agent
+    end
+
     def expression_agent
       CLI::EXPRESSION_AGENT_
     end
@@ -128,7 +136,7 @@ module Skylab::Snag
       parts = action_sheet.full_name_proc.map :as_slug
       parts.unshift program_name
       parts << '-h'
-      call_digraph_listeners :ui, "#{ kbd parts.join( ' ' ) } might have more information"
+      call_digraph_listeners :ui, "#{ kbd parts.join( SPACE_ ) } might have more information"
       nil  # SWALLOWED IT
     end
 
@@ -262,6 +270,8 @@ module Skylab::Snag
     namespace :todo, -> { CLI::Actions::Todo }
 
     # --*--
+
+    namespace :doc, -> { CLI::Actions::Doc }
 
     desc "pings snag (lowlevel)."   # #todo you know you want to
 

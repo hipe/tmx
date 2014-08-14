@@ -44,7 +44,8 @@ module Skylab::Snag
       begin
         nodes or break
         node = @nodes.fetch_node( @node_ref ) or break( res = node )
-        res = node.add_tag( @tag_name, @do_append ) or break
+        res = node.add_tag @tag_name, * [ * ( :prepend if ! @do_append ) ]
+        res or break
         res = @nodes.changed node, @dry_run, @be_verbose
       end while nil
       res
@@ -69,8 +70,13 @@ module Skylab::Snag
   end
   Tags_Event__ = Event_[].new :node, :tags do
     message_proc do |y, o|
-      y << "#{ val o.node.identifier } is tagged with #{
-       }#{ and_ o.tags.map{ |t| val t } }."
+      a = o.tags.to_a
+      _predicate = if a.length.zero?
+        'is not tagged at all'
+      else
+        "is tagged with #{ and_ a.map( & method( :val ) ) }"
+      end
+      y << "#{ val o.node.identifier } #{ _predicate }."
     end
   end
 

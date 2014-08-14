@@ -47,9 +47,7 @@ module Skylab::Snag
                    tag_name: tag_name
       }.merge( @param_h ) do |a|
         a.on_error handle_error
-        a.on_info do |e|
-          fail 'do me'  # #todo
-        end
+        a.on_info handle_info
       end
     end
 
@@ -76,11 +74,14 @@ module Skylab::Snag
     end
 
     def rm node_ref, tag_name
-      api_invoke( [ :node, :tags, :rm ],
-        { dry_run: false, node_ref: node_ref, tag_name: tag_name,
-          verbose: false }.merge( @param_h ) ) do |a|
-          fail 'ok'
-        end
+      par_h = { dry_run: false, node_ref: node_ref,
+        tag_name: tag_name, be_verbose: false }
+      par_h.merge! @param_h
+      api_invoke [ :node, :tags, :rm ], par_h do |o|
+        o.on_error handle_error
+        o.on_info handle_info
+        o.on_payload handle_payload
+      end
     end
   end
 end

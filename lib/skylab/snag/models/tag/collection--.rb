@@ -21,6 +21,12 @@ module Skylab::Snag
         to_enum.detect( & p )
       end
 
+      def to_a
+        to_enum.map do |shell_with_flyweight_as_kernel|
+          shell_with_flyweight_as_kernel.duplicate
+        end
+      end
+
       def to_enum
         if block_given?
           scn = to_scanner ; x = nil
@@ -66,6 +72,10 @@ module Skylab::Snag
 
         def replace symbol
           @symbol = symbol
+        end
+
+        def duplicate_kernel
+          dup
         end
 
         def to_string

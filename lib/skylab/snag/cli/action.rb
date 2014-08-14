@@ -16,9 +16,21 @@ module Skylab::Snag
 
 
     # note this gets called from the m.c and modals
-    def api_invoke local_normal_name, param_h, *a, &b
-      { 1 => true }.fetch( ( b ? a << b : a ).length )
-      act = api_build_wired_action local_normal_name, a[0]
+    def api_invoke local_normal_name, * x_a, & p
+      if ::Hash.try_convert x_a.first
+        param_h = x_a.shift
+        p ||= x_a.pop
+        x_a.length.zero? or raise ::ArgumentError
+        invoke_API_via_name_and_h_and_p local_normal_name, param_h, p
+      else
+        p and raise ::ArgumentError
+        action = api.build_action local_normal_name
+        action and action.invoke_via_iambic x_a
+      end
+    end
+
+    def invoke_API_via_name_and_h_and_p local_normal_name, param_h, some_p
+      act = api_build_wired_action local_normal_name, some_p
       act and begin
         res = act.invoke param_h
         if false == res           # the placement of this check here is very
@@ -28,9 +40,13 @@ module Skylab::Snag
             info invite_line
             res = nil
           end
-        end                       # particular, explained in [#031]
-        res
+        end
+        res  # [#031]
       end
+    end
+
+    def say_must_have_proc_or_bloc a
+      "must have exactly 1 proc or block (#{ a.length } for 1)"
     end
 
     def api_build_wired_action normalized_action_name, wire
@@ -56,6 +72,8 @@ module Skylab::Snag
     ].each do |m|
       define_method m do request_client.send m end
     end
+
+    public :handle_info, :handle_error  # #as-necessary
 
     # just a debugging tool (#overhead) that was several hours in
     # the making (ok days). experimentally we will result in trueish
@@ -103,6 +121,12 @@ module Skylab::Snag
 
     def resolve_argv argv
       [ nil, method( :invoke ), [ argv ] ]  # compat legacy
+    end
+
+    public :expression_agent
+
+    def paystream
+      request_client.paystream
     end
 
   private

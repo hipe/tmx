@@ -53,6 +53,19 @@ module Skylab::Snag
 
     include Snag_::Core::SubClient::InstanceMethods
 
+    def invoke_via_iambic x_a
+      h = {} ; d = 0 ; length = x_a.length
+      while d < length
+        h[ x_a.fetch( d ) ] = x_a.fetch( d + 1 )
+        d += 2
+      end
+      @listener = h.fetch :listener ; h.delete :listener
+      @prefix = h.fetch :prefix ; h.delete :prefix
+      @param_h = h
+      ok = absorb_param_h
+      ok && execute
+    end
+
     def invoke param_h=nil
       res = nil
       begin
@@ -70,6 +83,7 @@ module Skylab::Snag
   private
 
     def initialize api
+      @listener = nil
       @nodes = nil
       @param_h = nil
       super
@@ -142,6 +156,14 @@ module Skylab::Snag
     def build_event stream_name, pay_x
 
       @event_factory.call @event_stream_graph_p.call, stream_name, self, pay_x
+    end
+
+    def error msg_s
+      if @listener
+        @listener.send :"on_#{ @prefix }_error_string", msg_s
+      else
+        super
+      end
     end
   end
 end
