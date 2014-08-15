@@ -142,6 +142,16 @@ module Skylab::Brazen
         accept_property prop ; nil
       end
 
+      def add_property_via_i i, & p
+        plan = Property_Plan__.new i
+        plan.meth_i = generate_method_name_for_plan plan
+        prop = bld_prop_from_plan plan do |prp|
+          prp.iambic_writer_method_proc = p
+        end
+        define_iambic_writer_method_for_property prop
+        accept_property prop ; nil
+      end
+
       def flush_because_method m_i
         plan_in_progress.meth_i = m_i
         if @x_a_a.length.nonzero?
@@ -218,8 +228,20 @@ module Skylab::Brazen
         @prop = bld_prop_from_plan @plan ; nil
       end
 
-      def bld_prop_from_plan plan
-        p = any_prop_hook @reader::PROPERTY_CLASS__
+      def bld_prop_from_plan plan, & arg_p
+        hook_p = any_prop_hook @reader::PROPERTY_CLASS__
+        p = if arg_p
+          if hook_p
+            -> prp do
+              hook_p[ prp ]
+              arg_p[ prp ]
+            end
+          else
+            arg_p
+          end
+        elsif hook_p
+          hook_p
+        end
         @reader::PROPERTY_CLASS__.new( * plan.names, & p )
       end
 

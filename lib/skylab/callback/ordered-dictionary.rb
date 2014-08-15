@@ -13,7 +13,7 @@ module Skylab::Callback
               alias_method :new, :orig_new
             end
             _BOX_ = Box__[].new
-            define_method :ordered_dictionary do
+            define_singleton_method :ordered_dictionary do
               _BOX_
             end
             i_a.each do |i|
@@ -21,7 +21,7 @@ module Skylab::Callback
 
               _BOX_.add i, slot
 
-              attr_reader slot.attr_reader
+              attr_accessor slot.attr_reader_method_name
 
               ivar = slot.ivar
               define_method :"receive_#{ i }_event" do |ev|  # [#039]
@@ -44,12 +44,24 @@ module Skylab::Callback
         end ; nil
       end
 
+      def ordered_dictionary
+        self.class.ordered_dictionary
+      end
+
       class Callback_Slot__
         def initialize i
-          @attr_reader = :"#{ i }_p"
-          @ivar = :"@#{ @attr_reader }"
+          @name_i = i
         end
-        attr_reader :attr_reader, :ivar
+        attr_reader :name_i
+        def attr_reader_method_name
+          @attr_reader_method_name ||= :"#{ @name_i }_p"
+        end
+        def attr_writer_method_name
+          @attr_writer_method_name ||= :"#{ @name_i }_p="
+        end
+        def ivar
+          @ivar ||= :"@#{ @name_i }_p"
+        end
       end
 
       include( module Dictionary_Instance_Methods__
@@ -57,7 +69,7 @@ module Skylab::Callback
           my_box = ordered_dictionary
           lstn.ordered_dictionary.each_pair do |i, cb_slot|
             my_box.has_name i or next
-            p = lstn.send cb_slot.attr_reader
+            p = lstn.send cb_slot.attr_reader_method_name
             p or next
             instance_variable_set cb_slot.ivar, p
           end ; nil
@@ -96,7 +108,7 @@ module Skylab::Callback
             i = x_a.fetch d
             slot = Callback_Slot__.new i
             box.add i, slot
-            sc.send :attr_reader, slot.attr_reader
+            sc.send :attr_reader, slot.attr_reader_method_name
             instance_variable_set slot.ivar, x_a.fetch( d + 1 )
             -> ivar do
               define_singleton_method :"receive_#{ i }_event" do |*a|

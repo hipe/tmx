@@ -2,8 +2,13 @@ module Skylab::Brazen
 
   module CLI
 
-    def self.new *a
-      CLI::Invocation__.new( *a )
+    class << self
+      def new *a
+        CLI::Invocation__.new( *a )
+      end
+      def pretty_path x
+        Expression_Agent__.pretty_path x
+      end
     end
 
     # ~ main CLI hand-made implementation
@@ -624,6 +629,10 @@ module Skylab::Brazen
     end
 
     class Expression_Agent__
+
+      def self.pretty_path x
+        self::Pretty_Path__.new( x ).execute
+      end
 
       def initialize partitions
         @partitions = partitions

@@ -22,13 +22,14 @@ module Skylab::TestSupport
 
       def desc y
         y << "only operate on spec files at depths M thru N."
-        y << "floor depth M defaults to 1. a spec file's depth"
+        y << "floor depth M defaults to N. a spec file's depth"
         y << "is how deep its filesystem path is (in terms of"
         y << "nested directories) relative to the \"shallowest\""
-        y << "spec file(s) which we designate a having a depth"
-        y << "of 1. i.e. given positive integer N, operate on"
-        y << "all spec files with depths up to and including"
-        y << "depth N, but none that are deeper."
+        y << "spec file(s) which we designate as having a depth"
+        y << "of 1. e.g \"#{ flg }=2..3\" says \"operate on all"
+        y << "spec files at depths 2 and 3, but none at depth 1"
+        y << "nor at depth 4 or deeper. useful for working thru"
+        y << "a test-suite one layer at a time."
         nil
       end
 
@@ -66,8 +67,8 @@ module Skylab::TestSupport
       \z/x
 
       def parse_range min_s, max_s
-        min = min_s ? min_s.to_i : 1
         max = max_s.to_i
+        min = min_s ? min_s.to_i : max
         if 0 > min
           @y << "#{ flg } min must be non-negative (had: #{ min })"
         elsif 0 > max

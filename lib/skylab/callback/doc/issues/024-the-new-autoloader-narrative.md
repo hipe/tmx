@@ -672,3 +672,13 @@ if for some reason this same probelm were to affect the more general universe
 where autoloading is used we would make the same chage there; but as it
 stands the general universe generally uses the autoloader and rarely uses
 'require'.
+
+
+
+
+## what are hybrid boxxy nodes? :[#041]
+
+they are modules that define some constants "in line" (like normally) in
+the file that belongs to the subject node; but would like for others to
+be define alla boxxy with constant inference. when we do this we track
+them with this identifier.
