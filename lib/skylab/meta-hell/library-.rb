@@ -30,6 +30,10 @@ module Skylab::MetaHell
       Callback__[].distill
     end
 
+    Ellipsify_to_length = -> d, s do
+      Library_::Headless::CLI::FUN::Ellipsify_[ d, s ]
+    end
+
     Levenshtein = -> do
       Library_::Headless::NLP::EN::Levenshtein
     end

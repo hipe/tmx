@@ -31,6 +31,10 @@ module Skylab::MetaHell
         x.inspect
       elsif x.respond_to? :id2name
         "'#{ x }'"
+      elsif x.respond_to? :ascii_only?
+        _s = MetaHell_::Lib_::Ellipsify_to_length[
+          A_REASONABLY_SHORT_LENGTH_FOR_A_STRING, x ]
+        "\"#{ _s }\""
       else
         "< a #{ x.class } >"
       end
