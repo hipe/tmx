@@ -2,7 +2,7 @@
 
 require 'pathname'
 
-root = ::Pathname.new(::File.expand_path('../..', __FILE__))
+root = ::Pathname.new(::File.expand_path('../../../../../..', __FILE__))
 
 nerps = ::Pathname.glob(root.join('lib/skylab/*/doc/issues.md').to_s)
 

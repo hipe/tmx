@@ -22,29 +22,32 @@ module Skylab::Snag
   private
 
     def execute
-      ea = Snag_::Models::ToDo.build_enumerator @paths, @pattern, @names
+      @ea = Snag_::Models::ToDo.build_enumerator @paths, @pattern, @names
       if @show_command_only
-        ea.command.command -> cmd_str do
-          call_digraph_listeners :command, cmd_str
-          true
-        end, -> err do
-          error err
-        end
+        exec_show_command_only
       else
-        ea.on_error method( :error )  # e.g unexpected output from `find`
+        ea = @ea
+        ea.on_error method :error_event
         ea.on_command do |cmd|  # if strict event handling, we must.
           if @be_verbose
-            call_digraph_listeners :command, cmd
+            send_to_listener :command, cmd
           end
         end
         res = ea.each do |todo|
-          call_digraph_listeners :todo, todo
+          send_to_listener :todo, todo
         end
         if ea.seen_count
-          call_digraph_listeners :number_found, ea.seen_count
+          send_to_listener :number_found, ea.seen_count
         end
         res
       end
+    end
+
+    def exec_show_command_only
+      @ea.command.command -> cmd_str do
+        send_to_listener :command, cmd_str
+        ACHIEVED_
+      end, method( :error_event )
     end
   end
 end

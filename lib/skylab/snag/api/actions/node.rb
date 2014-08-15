@@ -13,11 +13,8 @@ module Skylab::Snag
     listeners_digraph  info: :lingual
 
   private
-    def if_nodes_execute
-      @node = @nodes.fetch_node @node_ref
-      @node and when_node
-    end
-    def when_node
+
+    def if_node_execute
       res = @node.close
       res and @nodes.changed @node, @dry_run, @be_verbose
     end
@@ -36,16 +33,11 @@ module Skylab::Snag
 
     listeners_digraph  info: :lingual
 
-    def execute
-      res = nil
-      begin
-        nodes or break
-        node = @nodes.fetch_node( @node_ref ) or break( res = node )
-        res = node.add_tag @tag_name, * [ * ( :prepend if ! @do_append ) ]
-        res or break
-        res = @nodes.changed node, @dry_run, @be_verbose
-      end while nil
-      res
+  private
+
+    def if_node_execute
+      ok = @node.add_tag @tag_name, * [ * ( :prepend if ! @do_append ) ]
+      ok and @nodes.changed @node, @dry_run, @be_verbose
     end
   end
 
@@ -55,16 +47,12 @@ module Skylab::Snag
 
     listeners_digraph  tags: :datapoint
 
-    def execute
-      if nodes
-        node = @nodes.fetch_node @node_ref
-        if ! node then node else
-          send_to_listener :tags, Tags_Event__.new( node, node.tags )
-          true
-        end
-      end
+    def if_node_execute
+      send_to_listener :tags, Tags_Event__.new( @node, @node.tags )
+      ACHIEVED_
     end
   end
+
   Tags_Event__ = Event_[].new :node, :tags do
     message_proc do |y, o|
       a = o.tags.to_a
@@ -87,16 +75,9 @@ module Skylab::Snag
     listeners_digraph  info: :lingual,
                  payload: :datapoint
 
-    def execute
-      nodes and begin
-        node = @nodes.fetch_node @node_ref
-        node and begin
-          ok = node.remove_tag @tag_name
-          ok and begin
-            @nodes.changed node, @dry_run, @be_verbose
-          end
-        end
-      end
+    def if_node_execute
+      ok = @node.remove_tag @tag_name
+      ok and @nodes.changed @node, @dry_run, @be_verbose
     end
   end
 end

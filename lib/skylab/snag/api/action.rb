@@ -161,6 +161,11 @@ module Skylab::Snag
       @nodes and if_nodes_execute
     end
 
+    def if_nodes_execute
+      @node = @nodes.fetch_node @node_ref
+      @node and if_node_execute
+    end
+
     def manifest_pathname # #gigo
       @nodes.manifest.pathname
     end

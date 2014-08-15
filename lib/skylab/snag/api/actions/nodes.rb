@@ -20,16 +20,14 @@ module Skylab::Snag
 
   private
 
-    def execute
-      if nodes
-        @nodes.add @message,
-          @do_prepend_open_tag,
-          @dry_run,
-          @be_verbose,
-          -> n do
-            send_to_listener :new_node, n
-          end
-      end
+    def if_nodes_execute
+      @nodes.add @message,
+        @do_prepend_open_tag,
+        @dry_run,
+        @be_verbose,
+        -> n do
+          send_to_listener :new_node, n
+        end
     end
   end
 
