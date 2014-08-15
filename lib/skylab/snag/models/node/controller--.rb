@@ -10,15 +10,15 @@ module Skylab::Snag
       @extra_line_header = nil
       @extra_line_a = []
       @first_line_body = @identifier = @line_width = nil
-      @max_lines = @message = nil
+      @max_lines = @message = @is_valid = nil
       flyweight and absorb_flyweight! flyweight
       super client
     end
 
-    def build_identifier! int, node_number_digits
+    def init_identifier int, node_number_digits
       fail "won't clobber existing identifier" if @identifier
-      integer_string = "%0#{ node_number_digits }d" % int
-      @identifier = Models::Identifier.new nil, integer_string, integer_string
+      _integer_s = "%0#{ node_number_digits }d" % int
+      @identifier = Models::Identifier.new nil, _integer_s, nil
       nil
     end
 
@@ -48,7 +48,7 @@ module Skylab::Snag
 
     def date_string= string
       ok = Models::Date.normalize string,
-        -> e { error e }, -> e { info e }
+        method( :error_string ), method( :info_string )
       if ok
         undelineate
         @date_string = ok
@@ -79,7 +79,7 @@ module Skylab::Snag
     attr_reader :identifier
 
     def message= msg
-      ok = Models::Message.normalize msg, -> e { error e }, -> e { info e }
+      ok = Models::Message.normalize msg, method( :error_string )
       if ok
         undelineate
         @message = ok
@@ -87,20 +87,34 @@ module Skylab::Snag
       msg
     end
 
-    def valid
-      if @valid.nil? # iff not, we've already done this
-        begin
-          break( @valid = false ) if error_count > 0 # iff errors emitted
-          @delineated or delineate or break( @valid = false )
-          if ! @first_line_body
-            error "node must have a message body."
-            break( @valid = false )
-          end
-          @valid = true
-        end while nil
-      end
-      @valid
+    def is_valid
+      @is_valid.nil? and determine_validity
+      @is_valid
     end
+  private
+    def determine_validity
+      if error_count.nonzero?
+        @is_valid = false
+      else
+        determine_validity_when_error_count_is_zero
+      end ; nil
+    end
+    def determine_validity_when_error_count_is_zero
+      if @delineated || delineate
+        determine_validity_when_delineated
+      else
+        @is_valid = false
+      end ; nil
+    end
+    def determine_validity_when_delineated
+      if @first_line_body
+        @is_valid = true
+      else
+        error "node must have a message body."
+        @is_valid = false
+      end ; nil
+    end
+  public
 
     # ~ tags
 
@@ -140,7 +154,7 @@ module Skylab::Snag
     def absorb_flyweight! flyweight
       # (this was written expecting it's called only from a constructor)
       @delineated and fail 'test me'
-      @identifier = flyweight.build_identifier
+      @identifier = flyweight.produce_identifier
       reduce = [ flyweight.first_line_body ]
       reduce.concat( flyweight.extra_line_a.map do |el|
         if 0 == el.index( extra_lines_header )
@@ -198,8 +212,9 @@ module Skylab::Snag
               lines.push line
               true
             else
-              error "your message would exceed the #{ max_lines } line #{
-              }limit (near #{ first_wrd[ line ].inspect })"
+              error_string "your message would exceed the #{
+               }#{ max_lines } line #{
+                }limit (near #{ first_wrd[ line ].inspect })"
               @delineated = true               # avoid hiccups .. hm
               ok = false                       # also result
             end

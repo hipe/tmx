@@ -30,6 +30,10 @@ module Skylab::Snag
         "#{ i }"
       end
 
+      def pth x
+        Snag_::Lib_::Pretty_path[ x.to_path ]
+      end
+
       def val x
         em x
       end

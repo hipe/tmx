@@ -37,7 +37,7 @@ module Skylab::Snag
 
     attr_reader :upstream_output_line
 
-    def valid?
+    def is_valid
       @md or parse
       if @md
         @md[:line] && @md[:path]

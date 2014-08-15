@@ -61,7 +61,6 @@ module Skylab::Snag
       end
     end.call
 
-    # --*--
 
     desc "melt is insanity"
 

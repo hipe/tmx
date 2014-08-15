@@ -20,5 +20,21 @@ module Skylab::Snag
 
     alias_method :val, :kbd
       # (maybe one day synchronized swimming will be in the olympics) [#hl-051]
+
+    def info_string s
+      info s
+    end
+
+    def error_string s
+      error e
+    end
+
+    def info_event e
+      info e
+    end
+
+    def error_event e
+      error e
+    end
   end
 end

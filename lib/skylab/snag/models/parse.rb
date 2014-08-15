@@ -1,20 +1,17 @@
 module Skylab::Snag
 
-  Models::Parse = ::Module.new
+  module Models::Parse
 
-  Models::Parse::Events = ::Module.new
+    module Events
 
-  Models::Parse::Events::Failure = Snag_::Model_::Event.
-      new :expecting, :near, :line, :line_number, :pathname do
+      Failure = Snag_::Model_::Event.new :expecting, :near, :line,
+                                          :line_number, :pathname  do
 
-    def to_hash
-      {
-        line: line,
-        line_number: line_number,
-        pathname: pathname.to_s,
-        invalid_reason_string: "expecting \"#{ expecting }\" #{
-          }near \"#{ near }\""
-      }
+        message_proc do |y, o|
+          _ctx = " (#{ pth o.pathname }:#{ o.line_number })"
+          y << "expecting #{ o.expecting } near #{ o.near }#{ _ctx }"
+        end
+      end
     end
   end
 end

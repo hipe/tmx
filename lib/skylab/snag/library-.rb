@@ -80,6 +80,9 @@ module Skylab::Snag
       Headless__[]::Model::Event.apply_on_client mod
     end
     Porcelain__ = sidesys[ :Porcelain ]
+    Pretty_path = -> x do
+      Brazen__[]::CLI.pretty_path x
+    end
     Strange = -> x do
       MetaHell__[].strange x
     end

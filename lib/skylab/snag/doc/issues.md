@@ -1,9 +1,15 @@
+[#061] #open stop emitting strings
+[#060]       #tracking-tag reasons we want something like adapters [#hl-067]
+[#059]       #parent-node: [#039] the grand simplification thru scanners ..
+[#058] #open probably get rid of all use of `date_string`
 [#057]       #doc-node the model
+[#056]       #doc-node structures for our API implementation
+[#055]       #parent-node: [#056] the API action narrative ..
 [#054] #open no sub-client here
 [#053]       #doc-node structures for our CLI implementation
 [#052]       #parent-node: [#053] the CLI node
 [#051]       #done move all initialize to the top
-[#050] #open this kind of setup is bad
+[#050] #open this kind of config setup (expects API singleton) is bad
 [#049]       #parent-node: [#046] a cb error result may be propagagted
 [#048]       #parent-node: [#046] a cb error result may be disregarded
 [#047]       #parent-node: [#046] info channel result value is never meaningful
@@ -18,7 +24,7 @@
 [#038]       #parent-node: [#036] the manifest narrative ..
 [#037]       #parent-node: [#036] on the structure of nodes
 [#036]       #parent-node: [#057] on the structure of manifests and nodes
-[#035] #open throwing is always ugly. just don't
+[#035]       #done throwing is always ugly. just don't
 [#034]       #parent-node: [#038] on doc-node trees and flat numberspaces ..
 [#033]       #tracking-tag non-deterministic smelly tests
 [#032]       see if we can unify find commands org wide #tracking-tag

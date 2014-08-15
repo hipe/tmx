@@ -5,7 +5,7 @@ module Skylab::Snag
     class Tmpdir_Curry__ < Agent_
 
       Entity_[ self, :fields, :dirname, :tmpdir_pathname,
-        :is_dry_run, :file_utils, :escape_path_p, :error_p ]
+        :is_dry_run, :file_utils, :escape_path_p, :error_event_p ]
 
       def execute
         -> do  # #result-block

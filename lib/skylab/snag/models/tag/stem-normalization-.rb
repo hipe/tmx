@@ -70,7 +70,7 @@ module Skylab::Snag
       end
 
       def value_changed
-        if @listener.info_p
+        if @listener.info_event_p
           _ev = Changed__.new @unsanitized_stem_i, out_s.intern
           @result_of_last_callback_called = @listener.receive_info_event _ev
         end ; nil

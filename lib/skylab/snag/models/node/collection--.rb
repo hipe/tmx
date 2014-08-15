@@ -16,10 +16,10 @@ module Skylab::Snag
       r = false
       begin
         node = Models::Node.build_controller request_client
-        node.date_string = todays_date if false  # off for now
+        # node.date_string = todays_date   # [#058] #open
         node.message = message
         node.do_prepend_open_tag = do_prepend_open_tag
-        r = node.valid or break
+        r = node.is_valid or break
         r = manifest.add_node_notify node, * my_callbacks_a,
           :is_dry_run, dry_run, :verbose_x, verbose_x
         r and new_node[ node ]
@@ -33,56 +33,59 @@ module Skylab::Snag
     end
 
     def fetch_node node_ref, not_found=nil
-      res = nil
-      begin
-        res = find [ :identifier_ref, node_ref ], A_COUNT_OF_ONE__
-        res or break
-        fly = res.to_a.first      # just have faith in the system
-        if ! fly
-          not_found ||= -> nr do
-            error "there is no node with the identifier #{ ick nr }"
-          end
-          break( res = not_found[ node_ref ] )
-        end
-        res = Models::Node.build_controller fly, self
-      end while nil
-      res
+      @not_found_p = nil
+      @q = build_query [ :identifier_ref, node_ref ], A_COUNT_OF_ONE__
+      @q and via_query_fetch_node
+    end
+  private
+    def via_query_fetch_node
+      nodes = reduce_all_nodes_via_query @q
+      node = nodes.gets
+      if node
+        Node_.build_controller node, self
+      else
+        when_not_found
+      end
     end
     A_COUNT_OF_ONE__ = 1
 
-    def find query_sexp, max_count
-      res = false
-      begin
-        flyweight = node_flyweight
+    def when_not_found
+      p = @not_found_p ; q = @q
+      ev = Snag_::Model_::Event.inline :node_not_found, :query, q do |y, o|
+        y << "there is no node #{ o.query.phrasal_noun_modifier }"
+      end
+      if p
+        p[ ev ]
+      else
+        error_event ev
+      end
+    end
+  public
 
-        search = Models::Node.build_valid_search query_sexp, max_count, self
+    def build_query query_sexp, max_count
+      Node_.build_valid_query query_sexp, max_count, self
+    end
 
-        break if ! search
-
-        enum = Models::Node::Enumerator.new do |y|
-          enu = manifest.curry_enum :flyweight, flyweight, :error_p,
-            method( :error ), :info_p, method( :info )
-
-          enu = enu.filter! -> yy, xx do
-            if search.match? xx
-              yy << xx
-            end
-          end
-
-          enu.each do |x|
-            y << x
-          end
+    def reduce_all_nodes_via_query q
+      scan = all.reduce_by do |node|
+        q.match? node
+      end
+      if q.max_count
+        scan = scan.stop_when do |_|
+          q.it_is_time_to_stop
         end
-        enum.search = search
-        res = enum
-      end while nil
-      res
+      end
+      scan
+    end
+
+    def all
+      Node_.build_scan_from_lines @manifest.manifest_file.normalized_line_producer
     end
 
   private
 
     def node_flyweight
-      @node_flyweight ||= Models::Node.build_flyweight @manifest.pathname
+      @node_flyweight ||= Models::Node.build_flyweight
     end
 
     date_format = '%Y-%m-%d'
@@ -93,13 +96,16 @@ module Skylab::Snag
 
     def my_callbacks_a
       @my_callbacks_a ||= [ :escape_path_p, method( :escape_path ),
-        :error_p, method( :error ), :info_p, method( :info ),
+        :error_event_p, method( :error_event ),
+        :info_event_p, method( :info_event ),
         :raw_info_p, method( :on_raw_info ) ]
     end
 
     def on_raw_info raw_info
-      @request_client.send :call_digraph_listeners, :raw_info, raw_info  # #todo
+      @request_client.send_to_listener :raw_info, raw_info
       nil
     end
+
+    Node_ = Models::Node
   end
 end

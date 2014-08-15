@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class Models::Node::Search__
+  class Models::Node::Query__
 
     include Snag_::Core::SubClient::InstanceMethods
 
@@ -20,8 +20,14 @@ module Skylab::Snag
       @query = Query_Nodes_.new_valid query_sexp, self
     end
 
+    attr_reader :max_count
+
     def valid
-      error_count.zero? ? self : UNABLE_
+      is_valid ? self : UNABLE_
+    end
+
+    def is_valid
+      error_count.zero?
     end
 
     def max_count= integer_ref
@@ -51,13 +57,15 @@ module Skylab::Snag
     end
 
     def match? node
-      b = @query.match? node
-      if @counter and b
-        if ( @counter += 1 ) >= @max_count
-          throw :last_item, node
-        end
+      ok = @query.match? node
+      if @counter and ok
+        @counter += 1
       end
-      b
+      ok
+    end
+
+    def it_is_time_to_stop
+      @max_count == @counter
     end
 
     module Query_Nodes_  # #borrow-indent
@@ -140,7 +148,7 @@ module Skylab::Snag
       end
 
       def match? node
-        if node.valid
+        if node.is_valid
           @tag_rx =~ node.first_line_body or
           if node.extra_lines_count > 0
             node.extra_line_a.index { |x| @tag_rx =~ x }
@@ -163,17 +171,17 @@ module Skylab::Snag
         normalized and new normalized
       end
 
-      def initialize identifier_struct
-        @identifier = identifier_struct
-        @identifier_rx = /\A#{ ::Regexp.escape @identifier.body }/  # [#019]
+      def initialize identifier_o
+        @identifier = identifier_o
+        @identifier_rx = /\A#{ ::Regexp.escape @identifier.body_s }/  # [#019]
       end
 
       def phrase
-        "identifier starting with \"#{ @identifier.body }\""
+        "identifier starting with \"#{ @identifier.body_s }\""
       end
 
       def match? node
-        if node.valid
+        if node.is_valid
           @identifier_rx =~ node.identifier_body
         end
       end
@@ -197,7 +205,7 @@ module Skylab::Snag
       PHRASE__ = 'validity'.freeze
 
       def match? node
-        node.valid
+        node.is_valid
       end
     end
     end # payback-indent

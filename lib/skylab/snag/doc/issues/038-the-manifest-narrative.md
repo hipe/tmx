@@ -11,7 +11,7 @@ would that it needs any introduction
 using a hacky regex, scan all msgs emitted by the file utils client and with
 any string that looks like an aboslute path run it through `escape_path_p`
 proc (*of the modality client*, e.g). in turn, `call_digraph_listeners`
-these messages as info to `info_p`, presumably to the same modality client.
+these messages as info to `info_event_p`, presumably to the same modality client.
 
 this hack grants us the novelty of letting FileUtils render its own messages
 (which it does heartily) while attempting possibly to mask full filenames for
@@ -28,7 +28,7 @@ this is used by services and hence cannot be a sub-client.
 
 [#ba-004] might subsume parts (most?) of this.
 
-`normalized_line_producer` is like a filehandle that you call `gets` on
+a normalized line producer is like a filehandle that you call `gets` on
 (in that when you reach the end of the file it returns nil) but a) you
 don't have to chomp each line and b) it keeps track of the line number
 internally for you (think of it as like a ::StringScanner but instead of
@@ -38,7 +38,7 @@ for scanning over bytes in a string it is for scanning lines in a file).
 
 ### :#note-42
 
-`normalized_lines` is comparable to File#each (aka `each_line`, `lines`)
+this method is comparable to File#each (aka `each_line`, `lines`)
 except a) it internalizes the fact that it is a file, taking care of
 closing the file for you, and b) it chomps each line, so you don't have
 to worry about whether your line happens to be the last in the file,
@@ -51,6 +51,25 @@ or what those characters are.
 
 necessary in short-circuit finds to checkif the one we found was also the
 last one in which case it will be closed already
+
+
+
+### :#note-72
+
+there a simplicity to the chain of scanners issues upwards a 'stop' call
+and having there not need to be this conditional check. we could
+probably do that were it not for the edge case of stopping on what
+happens to be the last item in the file (when the item consists of one line).
+in such cases the filehandle will be closed already once it has
+delivered that final line outward to scanner nodes further down on the
+chain. (but our system won't know that it is the
+final line yet anyway).
+
+in such cases a node further out on the chain may issue a 'stop' for
+whatever reason, but when it gets back to the resource node there is
+nothing to do. hence we must conditionaly check that closing the file
+is necessary.
+
 
 
 from stack overflow #3024372, thank you molf for a tail-like
@@ -67,8 +86,9 @@ implementation if we ever need it.
    lines for that node.
 
 
-• `error_p`  error callback (is passed what?) to be called for e.g when
-             the node is not found.
+• `error_event_p`  error callback (is passed what?) to be called for e.g when
+                   the node is not found. for a limited time only will
+                   get strings [#061]
 
 
 • `escape_path_p`  #eew should be curried into above
@@ -77,7 +97,8 @@ implementation if we ever need it.
 • `file_utils_p`  #eew ditto
 
 
-• `info_p`  called for e.g verbose output or informational.
+• `info_event_p`  called for e.g verbose output or informational.
+                  for a limited time only this will support strings [#061]
 
 
 • `is_dry_run`  will not actually write to disk, but tries to otherwise

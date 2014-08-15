@@ -1,7 +1,8 @@
 module Skylab::Snag
 
   module API::Actions::Nodes
-    # gets sexed
+
+    Autoloader_[ self, :boxxy ]  # :+[#cb-041] this is a hybrid boxxy node.
   end
 
   class API::Actions::Nodes::Add < API::Action
@@ -26,7 +27,7 @@ module Skylab::Snag
           @dry_run,
           @be_verbose,
           -> n do
-            call_digraph_listeners :new_node, n
+            send_to_listener :new_node, n
           end
       end
     end
@@ -41,54 +42,75 @@ module Skylab::Snag
     attribute :query_sexp
 
     listeners_digraph  info: :lingual,
-            invalid_node: :structural,
+            invalid_node: :datapoint,
              output_line: :datapoint
 
     inflection.inflect.noun :plural
 
   private
 
-    def execute
-      res = nil
-      begin
-        break if ! nodes # we need them we want them, we want them now
-        sexp = @query_sexp.dup if @query_sexp
-        if @identifier_ref
-          ( sexp ||= [ :and ] ).push [ :identifier_ref, @identifier_ref ]
-        end
-        if @include_all
-          if sexp
-            error "sorry - it doesn't make sense to use `all` with any #{
-              }other search criteria"
-            break( res = false )
-          else
-            sexp = [ :all ]
-          end
-        end
-        sexp ||= [ :valid ]
-        found = nodes.find( sexp, @max_count ) or break( res = found )
-        @lines = Monadic_Yielder__.new do |txt|
-          call_digraph_listeners :output_line, txt
-          nil
-        end
-        @y = if @be_verbose
-          render_node_as_yaml
-        else
-          render_node_tersely
-        end
-        res = render_nodes found
-      end while nil
-      res
-    end
-
-    class Monadic_Yielder__ < ::Enumerator::Yielder
-      def << x  # was once nec. for [cb] digraph to see an arity of 1. still?
-        super
+    def if_nodes_execute
+      @sexp = nil
+      @query_sexp and @sexp = @query_sexp.dup
+      if @identifier_ref
+        ( @sexp ||= [ :and ] ).push [ :identifier_ref, @identifier_ref ]
       end
-      alias_method :yield, :<<
+      ok = ! @include_all || when_include_all_resolve_sexp
+      ok &&= from_any_OK_sexp_resolve_query
+      ok &&= from_query_resolve_scan
+      ok && execute_with_scan
     end
 
-    # --*--
+    def when_include_all_resolve_sexp
+      if @sexp
+        error_string say_cannot_all
+      else
+        @sexp = [ :all ]
+        ACHIEVED_
+      end
+    end
+
+    def from_any_OK_sexp_resolve_query
+      @sexp ||= [ :valid ]
+      @query = @nodes.build_query @sexp, @max_count
+      @query and ACHIEVED_
+    end
+
+    def from_query_resolve_scan
+      @scan = @nodes.all
+      @scan = @scan.reduce_by { |_| @total_count += 1 }
+      @scan = @scan.reduce_by do |node|
+        _pass = @query.match? node
+        _pass
+      end
+      @scan = @scan.reduce_by { |_| @pass_count += 1 }
+      if @query.max_count
+        @scan = @scan.stop_when do |_|
+          _stop = @query.it_is_time_to_stop
+          _stop
+        end
+      end
+      @pass_count = @total_count = 0
+      ACHIEVED_
+    end
+
+    def execute_with_scan
+      @lines = Monadic_Yielder__.new do |txt|
+        send_to_listener :output_line, txt
+        nil
+      end
+      @y = if @be_verbose
+        render_node_as_yaml
+      else
+        render_node_tersely
+      end
+      in_scan_render_nodes
+    end
+
+    def say_cannot_all
+      "sorry - it doesn't make sense to use `all` #{
+        }with any other search criteria"
+    end
 
     def render_node_tersely
       m = @lines.method( :<< )
@@ -107,25 +129,60 @@ module Skylab::Snag
       o
     end
 
-    def render_nodes nodes
-      info "(looking at #{ escape_path manifest_pathname })"
-      nodes.with_count!.each do |node|
-        if node.valid?
+    def in_scan_render_nodes
+      scan = @scan
+      info_string "(looking at #{ escape_path manifest_pathname })"
+      scan.each do |node|
+        if node.is_valid
           @y << node
         else
-          call_digraph_listeners :invalid_node, node.invalid_reason.to_hash
+          send_to_listener :invalid_node, node
         end
       end
-      ct = nodes.seen_count
-      case ct
-      when 0
-        call_digraph_listeners :info, "found no nodes #{ nodes.search.phrasal_noun_modifier }"
-      when 1
-        # ok
-      else
-        call_digraph_listeners :info, "found #{ ct } nodes #{ nodes.search.phrasal_noun_modifier}"
+      case 1 <=> @pass_count
+      when -1 ; when_found_multiple
+      when  0 ; when_found_one
+      when  1 ; when_not_found
       end
-      nil
+    end
+
+    # these behaviors as such are not quite appropriate for the API :+[#061]
+
+    def when_not_found
+      info_string "of #{ @total_count } searched, found no node #{
+        }#{ @query.phrasal_noun_modifier }"
+      NEUTRAL_
+    end
+
+    def when_found_one
+      if @be_verbose
+        when_found_one_and_verbose
+      else
+        NEUTRAL_
+      end
+    end
+
+    def when_found_one_and_verbose
+      info_string "looked at #{ @total_count } nodes to find this one #{
+       }#{ @query.phrasal_noun_modifier }"
+      NEUTRAL_
+    end
+
+    def when_found_multiple
+      _s = if @total_count == @pass_count
+        "found #{ @pass_count } nodes "
+      else
+        "of #{ @total_count } seen nodes found #{ @pass_count } "
+      end
+      info_string "#{ _s }#{ @query.phrasal_noun_modifier }"
+      NEUTRAL_
+    end
+
+    class Monadic_Yielder__ < ::Enumerator::Yielder
+      def << x  # was once nec. for [cb] digraph to see an arity of 1. still?
+        super
+      end
+      alias_method :yield, :<<
     end
   end
 end

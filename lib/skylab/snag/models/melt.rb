@@ -22,7 +22,7 @@ module Skylab::Snag
       @file_changes = []
       @pattern = pattern
       o = Snag_::Models::ToDo.build_enumerator paths, pattern, names
-      o.on_error method :error
+      o.on_error method :error_event
       o.on_command do |cmd_str|  # (strict event handling)
         if @be_verbose
           info cmd_str
@@ -82,9 +82,9 @@ module Skylab::Snag
           a.on_new_node { |n| new_node = n }
           a.on_info method :info
           a.on_raw_info -> txt do
-            @request_client.call_digraph_listeners :raw_info, txt
+            @request_client.send_to_listener :raw_info, txt
           end
-          a.on_error method( :error )
+          a.on_error method( :error_event )
         end
         if res
           res = change_source_line todo, new_node
@@ -116,7 +116,7 @@ module Skylab::Snag
           res = file_changes_flush or break
         end
         new_line = "#{ todo.pre_comment_string }#{
-          }# #{ node.identifier }" # some lines will just be a comment
+          }# #{ node.identifier.render }" # some lines will just be a comment
         excerpt = message_body_excerpt[ new_line, todo ]
         if excerpt
           new_line << "#{ sep }#{ excerpt }"

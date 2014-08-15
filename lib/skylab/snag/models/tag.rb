@@ -16,7 +16,7 @@ module Skylab::Snag
       end
 
       def normalize_stem_i stem_i, error_p=nil, info_p=nil
-        _listener = if error_p || info_p
+        _listener = if error_p || info_event_p
           Snag_::Model_::Info_Error_Listener.new info_p, error_p
         else
           Snag_::Model_::THROWING_INFO_ERROR_LISTENER

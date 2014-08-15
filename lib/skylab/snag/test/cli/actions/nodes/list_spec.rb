@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Snag::TestSupport::CLI::Actions
 
-  describe "[sg] CLI Actions - Show" do
+  describe "[sg] CLI actions nodes list" do
 
     extend TS_
 
@@ -35,7 +35,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
         else       ; fail "wat? - #{ line.stream_name }"
         end
       end
-      infos.length.should eql(1)
+      infos.length.should eql 2
       infos.first.should match( %r{ doc/issues\.md }x ) # has this in it
       pays.length.should eql(3)
       o = -> { pays.shift }

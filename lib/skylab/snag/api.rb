@@ -16,6 +16,7 @@ module Skylab::Snag
     end
 
     module Actions
+      def self.name_function ; end
       Autoloader_[ self, :boxxy ]
     end
   end

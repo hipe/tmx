@@ -25,7 +25,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
       setup_tmpdir_read_only
       invoke '867'
       expect :info,
-        /failed to close node.*there is no node with the identifier "867"/i
+        /failed to close node.*there is no node with identifier.* "867"/i
     end
 
     it "closing one that is already closed - whines gracefully" do

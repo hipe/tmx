@@ -34,6 +34,12 @@ module Skylab::Snag::TestSupport::CLI
         o
       end
 
+      it "1.3 (good arg) (ping)" do
+        invoke 'ping'
+        o 'hello from snag.'
+        @result.should eql :hello_from_snag
+      end
+
       it "1.4 (good opt) - usage / invite" do
         invoke '-h'
         o usage_rx

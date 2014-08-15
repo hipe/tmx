@@ -12,11 +12,8 @@ module Skylab::Snag
 
     listeners_digraph  info: :lingual
 
-    def execute
-      nodes and when_nodes
-    end
   private
-    def when_nodes
+    def if_nodes_execute
       @node = @nodes.fetch_node @node_ref
       @node and when_node
     end
@@ -62,7 +59,7 @@ module Skylab::Snag
       if nodes
         node = @nodes.fetch_node @node_ref
         if ! node then node else
-          call_digraph_listeners :tags, Tags_Event__.new( node, node.tags )
+          send_to_listener :tags, Tags_Event__.new( node, node.tags )
           true
         end
       end
@@ -76,7 +73,7 @@ module Skylab::Snag
       else
         "is tagged with #{ and_ a.map( & method( :val ) ) }"
       end
-      y << "#{ val o.node.identifier } #{ _predicate }."
+      y << "#{ val o.node.identifier.render } #{ _predicate }."
     end
   end
 

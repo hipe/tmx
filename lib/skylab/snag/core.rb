@@ -26,6 +26,8 @@ module Skylab::Snag
 
   LINE_SEP_ = "\n".freeze
 
+  NEUTRAL_ = nil
+
   Snag_ = self
 
   SPACE_ = ' '.freeze

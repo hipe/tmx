@@ -10,11 +10,10 @@ module Skylab::Snag
 
     Snag_::Lib_::CLI[]::Action[ self, :core_instance_methods ]
 
-    #         ~ API invocation and wiring support (pre-order) ~
 
+    # ~ API invocation and wiring support (pre-order)
 
-    # note this gets called from the m.c and modals
-    def call_API local_normal_name, * x_a, & p
+    def call_API local_normal_name, * x_a, & p  # #todo `call_API` should be a service of the root client node
       if ::Hash.try_convert x_a.first
         param_h = x_a.shift
         p ||= x_a.pop
@@ -84,7 +83,7 @@ module Skylab::Snag
 
     def warn_about_unhandled_streams action
       action.if_unhandled_non_taxonomic_stream_names -> missed_a do
-        call_digraph_listeners :warn, "(warning, unhandled: #{ missed_a * ', ' })"
+        send_to_listener :warn, "(warning, unhandled: #{ missed_a * ', ' })"
         true
       end, -> do
         false
@@ -95,11 +94,19 @@ module Skylab::Snag
       request_client.issue_an_invitation_to live_action
     end
 
+    def send_to_listener i, x
+      call_digraph_listeners i, x ; nil
+    end
+
     #         ~ randomass re-used view templates ick ~
 
-    def invalid_node_message e
-      "failed to parse line #{ e.line_number } because #{
-        }#{ e.invalid_reason_string } (in #{ escape_path e.pathname })"
+    def invalid_node_message node
+      o = node.parse_failure_event
+      expression_agent.calculate do
+        "failed to parse line #{ o.line_number } because #{
+         }expecting #{ ick o.expecting } near #{ ick o.near }#{
+          } (in #{ pth o.pathname })"
+      end
     end
 
     def node_msg_smry n

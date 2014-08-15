@@ -6,16 +6,16 @@ module Skylab::Snag
 
       Snag_::Lib_::Basic_Fields[ :client, self,
         :passive, :absorber, :absrb_iambic_passively,
-        :field_i_a, [ :callbacks ] ]
+        :field_i_a, [ :client ] ]
 
       def initialize x_a
         @node = x_a.shift
         absrb_iambic_passively x_a
-        @info_p = Detect_info_p[ x_a ]
+        @info_event_p = Detect_info_p[ x_a ]
         @rest_a = x_a
       end
 
-      Detect_info_p = Snag_::Lib_::Basic_Fields[].iambic_detect.curry[ :info_p ]
+      Detect_info_p = Snag_::Lib_::Basic_Fields[].iambic_detect.curry[ :info_event_p ]
 
       def execute
         begin
@@ -33,18 +33,17 @@ module Skylab::Snag
         loop do
           int += 1
           (( x = extern_h[ int ] )) or break
-          info "avoiding confusing number collision with #{ x }"
+          info_string "avoiding confusing number collision with #{ x }"
         end
         int
       end
 
       def greatest_node_integer_and_externals
-        enum = @callbacks.curry_enum.valid
-        prefixed_h = { }
-        greatest = enum.reduce( -1 ) do |m, node|
+        _scan = @client.all_nodes.reduce_by( & :is_valid )
+        prefixed_h = {}
+        greatest = _scan.each.reduce( -1 ) do |m, node|
           if node.identifier_prefix
-            prefixed_h[ node.integer ] = Snag_::Models::Identifier.render(
-              node.identifier_prefix, node.identifier_body )
+            prefixed_h[ node.integer ] = node.render_identifier
             m
           else
             x = node.integer
@@ -56,9 +55,9 @@ module Skylab::Snag
 
       def work
         r = Manifest_::Line_edit_[ :at_position_x, 0,
-          :new_line_a, @callbacks.render_line_a( @node, @int ),
-          * @callbacks.get_subset_a, * @rest_a ]
-        r and info "done."
+          :new_line_a, @client.render_line_a( @node, @int ),
+          * @client.get_subset_a, * @rest_a ]
+        r and info_string "done."
         r
       end
     end

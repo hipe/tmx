@@ -34,7 +34,6 @@ module Skylab::Snag
       end
     end
 
-    # --*--
 
     desc "show the details of issue(s)"
 

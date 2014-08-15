@@ -115,7 +115,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
         setup_tmpdir_read_only
         invoke 'rm', '[#8]', 'faa'
         expect %r(\A#{ failed }#{
-          }there is no node with the identifier "\[#8\]")i
+          }there is no node with identifier .*"8")i
       end
 
       it "2.3x1)" do
@@ -172,7 +172,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
       it "2.3x1) (not found)" do
         do_not_setup_tmpdir
         invoke 'add', '[#002]', 'x'
-        expect %r(\A#{ failed }there is no node with the identifier "\[#002)i
+        expect %r(\A#{ failed }there is no node with identifier .*"002")i
       end
 
       it "2.3x1)" do

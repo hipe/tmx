@@ -11,45 +11,39 @@ module Skylab::Snag
     meta_attribute :default
     meta_attribute :required, default: false
 
-    Callback_[ self, :employ_DSL_for_digraph_emitter ]  # put `call_digraph_listeners` nearer on the chain than s.c above
+    Callback_[ self, :employ_DSL_for_digraph_emitter ]  # #note-10
 
-    event_factory Snag_::Lib_::Memoize[ -> do
-      Callback_::Event::Factory::Isomorphic.new API::Events # oh boy .. use the
-    end ]                   # same factory instance for every action subclass
-                            # instance which *should* be fine given the funda-
-                            # mental supposition of isomorphic factories (see)
-                            # **NOTE** see warnings there too re: coherence
+    event_factory Snag_::Lib_::Memoize[ -> do  # #note-15
+      Callback_::Event::Factory::Isomorphic.new API::Events
+    end ]
 
-    taxonomic_streams(* Snag_::API::Events.taxonomic_streams )
-                            # we check for unhandled even streams, but we don't
-                            # care about taxonomic streams like these.
 
-    listeners_digraph  error: :lingual   # probably every API action subclass should have it
-                            # in its graph that it listeners_digraph  this (and so it does)
-                            # because we call_digraph_listeners errors in `absorb_param_h`
-                            # which they all use (i think..)
+    taxonomic_streams(* Snag_::API::Events.taxonomic_streams ) # #note-20
 
-    def self.attributes_or_params
-      res = nil
-      if const_defined? :PARAMS, false
-        a = const_get :PARAMS, false
-        res = Snag_::Lib_::Formal_attribute[]::Box[
-          a.map { |sym| [ sym, { required: true } ] }
-        ]
-      else
-        res = self.attributes     # (for clearer error msgs)
+    listeners_digraph  error: :lingual  # #note-25
+
+    class << self  # ~ minimal hand-rolled
+
+      def attributes_or_params
+        if const_defined? :PARAMS, false
+          a = const_get :PARAMS, false
+          _o_a = a.map { |i| [ i, { required: true } ] }
+          Snag_::Lib_::Formal_attribute[]::Box[ _o_a ]
+        else
+          attributes     # (for clearer error msgs)
+        end
       end
-      res
+
+    private
+
+      def params * i_a
+        const_defined? :PARAMS, false and self._SANITY
+        attr_accessor( * i_a )
+        const_set :PARAMS, i_a.freeze
+        nil
+      end
     end
 
-    def self.params *params       # nerka derka nerka derka nerka derka
-      fail 'sanity' if const_defined? :PARAMS, false
-      attr_accessor( *params )
-      const_set :PARAMS, params
-      nil
-    end
-
-    # --*--
 
     include Snag_::Core::SubClient::InstanceMethods
 
@@ -64,8 +58,10 @@ module Skylab::Snag
         h[ x_a.fetch( d ) ] = x_a.fetch( d + 1 )
         d += 2
       end
-      @listener = h.fetch :listener ; h.delete :listener
-      @prefix = h.fetch :prefix ; h.delete :prefix
+      if h.key? :listener
+        @listener = h.delete :listener
+        @prefix = h.delete :prefix
+      end
       @param_h = h
       ok = absorb_param_h
       ok && execute
@@ -96,7 +92,7 @@ module Skylab::Snag
           m
         end
         if extra.length.nonzero?               # 1) bork on unexpected params
-          error "#{ s extra, :this } #{ s :is } not #{ s :a }#{
+          error_string "#{ s extra, :this } #{ s :is } not #{ s :a }#{
             }parameter#{ s }: #{ extra.join ', ' }"
           break
         end
@@ -115,7 +111,7 @@ module Skylab::Snag
           m
         end
         if missing.length.nonzero?
-          error "missing required parameter#{ s missing }: #{
+          error_string "missing required parameter#{ s missing }: #{
             }#{ missing.join ', ' }"
           break
         end
@@ -128,23 +124,9 @@ module Skylab::Snag
       res
     end
 
-    def manifest_pathname # #gigo
-      @nodes.manifest.pathname
-    end
-
-    def nodes
-      @nodes ||= begin
-        nodes = nil
-        begin
-          mf = request_client.find_closest_manifest up_from_path, -> msg do
-            error msg
-          end
-          mf or break( nodes = mf )
-          nodes = Snag_::Models::Node.build_collection mf, self
-        end while nil
-        nodes
-      end
-    end
+    def send_to_listener i, x
+      call_digraph_listeners i, x
+    end ; public :send_to_listener  # :+[#060]
 
     # `build_event` - we override the one we get from [cb] to pass our
     # factory 1 more parameter than usual (if e.g the event class being
@@ -152,16 +134,46 @@ module Skylab::Snag
     # caller).
 
     def build_event stream_name, pay_x
-
       @event_factory.call @event_stream_graph_p.call, stream_name, self, pay_x
     end
 
-    def error msg_s
+    def info_string s
       if @listener
-        @listener.send :"on_#{ @prefix }_error_string", msg_s
+        @listener.send :"on_#{ @prefix }_info_string", s
       else
-        super
+        info s  # inorite
       end
+    end
+
+    def error_string s
+      if @listener
+        @listener.send :"on_#{ @prefix }_error_string", s
+      else
+        error msg  # inorite
+      end
+    end
+
+
+    # ~ strictly business
+
+    def execute
+      nodes
+      @nodes and if_nodes_execute
+    end
+
+    def manifest_pathname # #gigo
+      @nodes.manifest.pathname
+    end
+
+    def nodes
+      @nodes ||= rslv_any_nodes
+    end
+
+    def rslv_any_nodes
+      mani = request_client.find_closest_manifest up_from_path, -> msg do
+        error_string msg
+      end
+      mani and Snag_::Models::Node.build_collection mani, self
     end
   end
 end

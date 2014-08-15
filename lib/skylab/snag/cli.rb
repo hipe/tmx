@@ -84,25 +84,35 @@ module Skylab::Snag
       end
     end.call
 
-    define_method :handle_info do
-      @handle_info ||= -> e do  # assume API::Events::Lingual subproduct wide?
-        txt = render[ self, e ]
-        a, txt, z = split[ txt ]
-        txt ="#{ a }while #{ e.verb_lexeme.progressive } #{ e.inflected_noun }#{
-          }, #{ txt }#{ z }"
-        info txt                               # (flatten the payload [#031])
-      end
+    def handle_info
+      @handle_info ||= method( :hndl_info )
     end
 
-    define_method :handle_error do
-      @handle_error ||= -> e do
-        txt = render[ self, e ]
-        a, txt, z = split[ txt ]
-        e.inflected_verb
-        txt = "#{ a }failed to #{ e.inflected_verb } #{ e.inflected_noun } #{
-          }- #{ txt }#{ z }"
-        error txt                               # (it flattens it [#031])
+    define_method :hndl_info do |ev|
+      txt = render[ self, ev ]
+      a, txt, z = split[ txt ]
+      vl = ev.verb_lexeme
+      _s = if vl
+        _n = ev.inflected_noun
+        "while #{ [ vl.progressive, _n ].compact * SPACE_ }, "
       end
+      _txt ="#{ a }#{ _s }#{ txt }#{ z }"
+      info _txt  # (flatten the payload [#031])
+    end
+
+    def handle_error
+      @handle_error ||= method( :hndl_error )
+    end
+
+    define_method :hndl_error do |ev|
+      txt = render[ self, ev ]
+      a, txt, z = split[ txt ]
+      v = ev.inflected_verb ; n = ev.inflected_noun
+      _s = if v || n
+        "failed to #{ [ v, n ].compact * SPACE_ } - "
+      end
+      _txt = "#{ a }#{ _s  }#{ txt }#{ z }"
+      error _txt  # (it flattens it [#031])
     end
 
     def issue_an_invitation_for norm_name_a
@@ -131,7 +141,7 @@ module Skylab::Snag
       parts = action_sheet.full_name_proc.map :as_slug
       parts.unshift program_name
       parts << '-h'
-      call_digraph_listeners :ui, "#{ kbd parts.join( SPACE_ ) } might have more information"
+      send_to_listener :ui, "#{ kbd parts.join( SPACE_ ) } might have more information"
       nil  # SWALLOWED IT
     end
 
@@ -165,29 +175,27 @@ module Skylab::Snag
       @API_client ||= Snag_::API::Client.new self
     end ; public :_API_client
 
-    # --*--
 
-    Snag_::Lib_::CLI_legacy_DSL[ self ]  # now entering DSL zone
+    # ~ now entering DSL zone
+
+    Snag_::Lib_::CLI_legacy_DSL[ self ]
 
     namespace :node, -> { CLI::Actions::Node }
 
     namespace :nodes, -> { CLI::Actions::Nodes }
 
-    # --*--
 
-    desc "call_digraph_listeners all known issue numbers in descending order to stdout"
+    desc "emit all known issue numbers in descending order to stdout"
     desc "one number per line, with any leading zeros per the file."
     desc "(more of a plumbing than porcelain feature!)"
 
     def numbers
-      call_API [ :nodes, :numbers, :list ], nil, -> a do
-        a.on_error handle_error
-        a.on_info handle_info
-        a.on_output_line handle_payload
-      end
+      call_API [ :nodes, :numbers, :list ],
+        :on_error, handle_error,
+        :on_info, handle_info,
+        :on_output_line, handle_payload
     end
 
-    # --*--
 
     desc "when no arguments provided, list open issues"
     desc "when one argument provided, is used as first line of new issue"
@@ -260,11 +268,9 @@ module Skylab::Snag
       res
     end
 
-    # --*--
 
     namespace :todo, -> { CLI::Actions::Todo }
 
-    # --*--
 
     namespace :doc, -> { CLI::Actions::Doc }
 

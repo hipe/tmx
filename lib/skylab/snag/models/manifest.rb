@@ -24,48 +24,47 @@ module Skylab::Snag
       @manifest_file = @tmpdir_pathname = nil
     end
 
-    def pathname
-      @pathname or fail "sanity - no pathname"
+    attr_reader :pathname
+
+    def manifest_file
+      @manifest_file ||= Manifest_.build_file @pathname
     end
 
-    def curry_enum * x_a
-      ea = self.class::Node_Scan__.new  @pathname, -> { manifest_file }
-      ea.absorb_iambic_fully x_a
-      ea
+    def curry_scan * x_a
+      scan = self.class::Node_Scan__.new
+      scan.absorb_iambic_fully x_a
+      scan
     end
 
     def add_node_notify node, *a
-      self::class::Node_add__[ node, :callbacks, get_callbacks, *a ]
+      self::class::Node_add__[ node, :client, bld_agent_adapter, *a ]
     end
 
     def change_node_notify node, *a
-      self::class::Node_edit__[ node, :callbacks, get_callbacks, *a ]
+      self::class::Node_edit__[ node, :client, bld_agent_adapter, *a ]
     end
 
   private
 
-    def get_callbacks
-      self.class::Callbacks__.new :render_lines_p, method( :render_line_a ),
+    def bld_agent_adapter
+      self.class::Agent_Adapter__.new :render_lines_p, method( :render_line_a ),
         :manifest_file_p, method( :manifest_file ), :pathname, @pathname,
           :file_utils_p, get_file_utils_p, :tmpdir_p, get_tmpdir_p,
-            :curry_enum_p, method( :curry_enum )
+            :all_nodes_p, method( :all_nodes_for_agent )
+    end
+
+    def all_nodes_for_agent
+      Models::Node.build_scan_from_lines manifest_file.normalized_line_producer
     end
 
     def render_line_a node, identifier_d=nil
-      identifier_d and node.build_identifier! identifier_d, ID_NUM_DIGITS_
+      identifier_d and node.init_identifier identifier_d, ID_NUM_DIGITS_
       line_a = [ "#{ node.identifier.render } #{ node.first_line_body }" ]
       line_a.concat node.extra_line_a
       line_a
     end
 
     ID_NUM_DIGITS_ = 3
-
-    def manifest_file
-      @manifest_file ||= begin
-        @pathname or fail "sanity - pathname should be set by now"
-        Models::Manifest.build_file @pathname
-      end
-    end
 
     def get_file_utils_p
       FU_curry_.method :[]  # #note-75
@@ -80,11 +79,11 @@ module Skylab::Snag
 
     class FU_curry_
       Snag_::Lib_::Funcy_globless[ self ]
-      Entity_[ self, :fields, :escape_path_p, :be_verbose, :info_p ]
+      Entity_[ self, :fields, :escape_path_p, :be_verbose, :info_event_p ]
       def execute
         rx = Snag_::Lib_::CLI[]::PathTools::FUN::ABSOLUTE_PATH_HACK_RX
         Snag_::Lib_::IO_FU[].new -> s do
-          @info_p[ s.gsub( rx ) { @escape_path_p[ $~[ 0 ] ] } ] if @be_verbose
+          @info_event_p[ s.gsub( rx ) { @escape_path_p[ $~[ 0 ] ] } ] if @be_verbose
         end
       end
     end
@@ -102,13 +101,13 @@ module Skylab::Snag
 
     private
 
-      def bork msg
-        @error_p[ msg ]
+      def bork ev
+        @error_event_p[ ev ]
         false
       end
 
-      def info msg
-        @info_p[ msg ]
+      def info_string ev
+        @info_event_p[ ev ]
         nil
       end
     end

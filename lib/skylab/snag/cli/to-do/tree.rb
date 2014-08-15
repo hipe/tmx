@@ -23,7 +23,7 @@ module Skylab::Snag
     end
 
     def << todo
-      if todo.valid?
+      if todo.is_valid
         @todos.push todo.collapse
       end
       nil

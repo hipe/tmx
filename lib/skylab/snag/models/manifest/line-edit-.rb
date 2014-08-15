@@ -4,28 +4,24 @@ module Skylab::Snag
 
     class Line_edit_ < Agent_  # see [#038]
 
-      Entity_[ self, :fields,  # all fields below are covered in the doc node.
+      Entity_[ self, :fields,  # all fields below are explained in the doc node.
         :at_position_x,
-        :error_p,
+        :error_event_p,
         :escape_path_p,
         :file_utils_p,
-        :info_p,
+        :info_event_p,
         :is_dry_run,
         :manifest_file_p,
         :new_line_a,
         :pathname,
-        :tmpdir_p,
         :raw_info_p,
+        :tmpdir_p,
         :verbose_x,
       ]
 
       def execute
-        r = nil
-        begin
-          r = prepare or break
-          r = commit
-        end while nil
-        r
+        ok = prepare
+        ok && commit
       end
 
     private
@@ -34,9 +30,9 @@ module Skylab::Snag
         @new_line_a.length.zero? and fail "sanity - zero new lines"
         @manifest_file = @manifest_file_p.call
         @fu = @file_utils_p[ :escape_path_p, @escape_path_p, :be_verbose,
-                             @verbose_x, :info_p, @info_p ]
+                             @verbose_x, :info_event_p, @info_event_p ]
         @tmpdir = @tmpdir_p[ :is_dry_run, @is_dry_run, :file_utils, @fu,
-                             :error_p, @error_p ]
+                             :error_event_p, @error_event_p ]
         @tmpold = @tmpdir.join 'issues.prev.md'
         @tmpnew = @tmpdir.join 'issues-next.md'
         @rm = -> pn do
@@ -49,18 +45,14 @@ module Skylab::Snag
       end
 
       def commit
-        begin
           @tmpnew.exist? and rm @tmpnew
           @scn = @manifest_file.normalized_line_producer  # #open-filehandle
-          p = r = if 0 == @at_position_x
+          p = if 0 == @at_position_x
             get_prepend_lines_p
           else
             get_change_lines_p
           end
-          p or break
-          r = flush_lines p
-        end while nil
-        r
+          p and flush_lines p
       end
 
       Build_context_sensitive_line_writer_ = -> fh do
@@ -80,9 +72,9 @@ module Skylab::Snag
         # simply rewrite the file line-by-line, putting new lines at top
         -> do
           if 1 == @new_line_a.length
-            info "new line: #{ @new_line_a.fetch 0 }"
+            info_string "new line: #{ @new_line_a.fetch 0 }"
           else
-            info "new lines:"
+            info_string "new lines:"
             many = true
           end
           @new_line_a.each do |line|

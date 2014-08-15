@@ -2,14 +2,17 @@ module Skylab::Snag
 
   class Models::Manifest
 
-    class Callbacks__
+    class Agent_Adapter__
 
-      # callbacks is also immediate values for those values that
-      # are immediate. so it both a proxy and a request structure.
+      # so we can keep track of what "services" the agents need
 
       MEMBER_A_ = [
-        :render_lines_p, :curry_enum_p, :manifest_file_p, :pathname,
-        :file_utils_p, :tmpdir_p
+        :all_nodes_p,
+        :file_utils_p,
+        :pathname,
+        :manifest_file_p,
+        :render_lines_p,
+        :tmpdir_p
       ].freeze
 
       Snag_::Lib_::Basic_Fields[ :client, self,
@@ -17,6 +20,10 @@ module Skylab::Snag
         :field_i_a, MEMBER_A_ ]
 
       attr_reader( * MEMBER_A_ )
+
+      def all_nodes
+        @all_nodes_p.call
+      end
 
       def render_line_a node, *identifier_d
         @render_lines_p[ node, *identifier_d ]
@@ -29,13 +36,9 @@ module Skylab::Snag
         end
       end
 
-      intrinsic = [ :render_lines_p, :curry_enum_p ]
+      _intrinsic = [ :render_lines_p, :all_nodes_p ]
 
-      SUBSET_A_ = ( MEMBER_A_ - intrinsic ).freeze
-
-      def curry_enum *a
-        @curry_enum_p[ *a ]
-      end
+      SUBSET_A_ = ( MEMBER_A_ - _intrinsic ).freeze
     end
   end
 end
