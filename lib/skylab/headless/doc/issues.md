@@ -1,3 +1,4 @@
+[#159]       #node-identity: (e.g IO interceptors filter) #marker
 [#158]       what we did to get tall mixed stacks (`tall_spec`) to work
 [#157]       #doc-node: the file utils agent
 [#156]       (reserved for a forthcoming entry about filenames)
@@ -74,7 +75,9 @@
 [#089]       #parent-node: [#126] the CLI client narrative ..
 [#088]       #track labelize
 [#087]       updated parameter controller event model
-[#085]       #node-identity: (e.g IO interceptors filter) #marker
+[#086]       #doc-node: NLP, NLP EN, NLP EN "methods"
+[#085]       #parent-node: [#086] what the hell is that sneeze at the top..
+             (once collided with what is now [#159])
 [#084]       #doc-point the great fire and earthquake (originally:
                "what is the deal with expression agents")
 [#083]       #node-tracker: name function (and #in-situ comment)

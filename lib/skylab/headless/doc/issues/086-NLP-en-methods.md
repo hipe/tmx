@@ -1,6 +1,23 @@
 # NLP EN methods :[#086]
 
-multiple above functions take a numerish as an argument. by "numerish"
+
+## introduction
+
+things about NLP here: 1) we put our NLP-ish subclient instance methods
+*first* in a struct-box and then distribute the definitions to this i.m
+module so that a) they can be re-used elsewhere independent of s.c but
+b) our ancester chain doesn't get annoyingly long. 2) for those NLP
+functions that inflect based on number (most of them) what we do here
+different from our downstream (dependees) is we memoize the last used
+numeric expressors (for the 'number' grammatical category) so that they
+don't need to be re-submitted as arguments for subsequent utterance
+producers, for shorter, more readable utterance templates.
+
+
+
+## how these methods handle numbers differently than their constituent functions
+
+multiple of these functions take a numerish as an argument. by "numerish"
 we mean "something we construe a count from" e.g an array is construed
 as numerish here because we construe a count from its length.
 

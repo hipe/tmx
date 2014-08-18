@@ -1,6 +1,6 @@
 module Skylab::Headless
 
-  class IO::Interceptors::Filter  # :[#085]
+  class IO::Interceptors::Filter  # :[#159]
 
     # intercept write-like messages intended for an ::IO, but do something
     # magical with the content. Don't forget to call flush! at the end.

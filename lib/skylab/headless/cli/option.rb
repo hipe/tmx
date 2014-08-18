@@ -2,14 +2,15 @@ module Skylab::Headless
 
   module CLI::Option
 
-    Option = self
+    class << self
 
-    def self.on *a, &b
-      const_get( :Model_, false ).on( *a, &b )
-    end
+      def on *a, &p
+        const_get( :Model_, false ).on( *a, &p )
+      end
 
-    def self.new_flyweight
-      const_get( :Model_, false ).new_flyweight
+      def new_flyweight
+        const_get( :Model_, false ).new_flyweight
+      end
     end
 
     FUN = Headless_::Lib_::FUN_module[].new
@@ -69,5 +70,7 @@ module Skylab::Headless
       \z/x   # names pursuant to `replace_with_long_rx_matchdata`
 
     end
+
+    Option = self
   end
 end

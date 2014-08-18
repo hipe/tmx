@@ -145,13 +145,13 @@ end
 
   EN_FUN = Headless_::Lib_::FUN_module[].new
 
-  module EN_FUN
+  module EN_FUN  # see [#086]
 
     def self.[] mod, * x_a
-      via_iambic_on_mod x_a, mod
+      on_mod_via_iambic mod, x_a
     end
 
-    def self.via_iambic_on_mod x_a, mod
+    def self.on_mod_via_iambic mod, x_a
       :private == x_a[ 0 ] or fail "only `private` is supported for now #{
         }(had #{ Headless_::Lib_::Strange[ x_a[ 0 ] ] })"
       x_a.shift
@@ -165,17 +165,6 @@ end
         private( * meth_i_a )
       end ; nil
     end
-
-    # things about NLP here: 1) we put our NLP-ish subclient instance methods
-    # *first* in a struct-box and then distribute the definitions to this i.m
-    # module so that a) they can be re-used elsewhere independent of s.c but
-    # b) our ancester chain doesn't get annoyingly long. 2) for those NLP
-    # functions that inflect based on number (most of them) what we do here
-    # different from our downstream (dependees) is we memoize the last used
-    # numeric expressors (for the 'number' grammatical category) so that they
-    # don't need to be re-submitted as arguments for subsequent utterance
-    # producers, for shorter, more readable utterance templates.
-  #
 
     o = definer
 
@@ -272,4 +261,3 @@ end
     end
   end
 end
-# #todo:during-merge associate [#086] with this node. (was lost in the fire # yay)

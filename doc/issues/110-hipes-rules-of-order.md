@@ -1,5 +1,9 @@
 # working draft of "rules of order" for declaring things :[#110]
 
+(EDIT: this is a historical document but we have deprecated half of
+these conventions (the half about alphabetical order) in lieu of [#129]
+the "Clean Code" top-down narrative story order)
+
 ## In summary, when defining a class (and module where applicable):
 
 1. the dsl section: the extension clauses, with any dsl calls

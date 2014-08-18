@@ -567,7 +567,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
         @collection_h[ hub ] = build_collection
       end
     end
-    # smell [#hl-027]: it could use model/view split. but only matters if we
+    # :+[#hl-027] smell: it could use model/view split. but only matters if we
     # ever have more than one API request processed in the same process
 
     def build_collection

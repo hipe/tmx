@@ -606,7 +606,7 @@ module Skylab::Brazen
 
       attr_accessor :iambic_writer_method_proc
 
-      def set_prop_i_and_iambic_writer_method_name prop_i, meth_i
+      def set_prop_i_and_iambic_writer_method_name prop_i, meth_i=nil
         @name = Callback_::Name.from_variegated_symbol prop_i
         @iambic_writer_method_name = meth_i ; nil
       end

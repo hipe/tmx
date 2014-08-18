@@ -2,11 +2,28 @@ module Skylab::Callback
 
     class Ordered_Dictionary  # read [#037]
 
+      PREFIX = :receive_ ; SUFFIX = :_event
+
       class << self
+
+        def curry * x_a
+          cls = ::Class.new self
+          begin
+            i = x_a.shift
+            case i
+            when :suffix ; cls.const_set :SUFFIX, x_a.shift
+            when :prefix ; cls.const_set :PREFIX, x_a.shift
+            else         ; raise ::ArgumentError, i
+            end
+          end while x_a.length.nonzero?
+          cls
+        end
 
         alias_method :orig_new, :new
 
         def new * i_a
+          prefix = self::PREFIX ; suffix = self::SUFFIX
+
           i_a.freeze
           ::Class.new( self ).class_exec do
             class << self
@@ -24,7 +41,7 @@ module Skylab::Callback
               attr_accessor slot.attr_reader_method_name
 
               ivar = slot.ivar
-              define_method :"receive_#{ i }_event" do |ev|  # [#039]
+              define_method :"#{ prefix }#{ i }#{ suffix }" do |ev|  # [#039]
                 p = instance_variable_get ivar
                 p && p[ ev ]
               end
@@ -100,6 +117,35 @@ module Skylab::Callback
         attr_reader :ordered_dictionary
 
         def initialize x_a
+          @prefix_i = :receive_
+          @suffix_i = :_event
+          x_a.length.zero? or prcs_x_a_fully x_a
+        end
+
+        def with * x_a
+          with_x_a x_a
+        end
+
+        def with_x_a x_a
+          begin
+            i = x_a.shift
+            case i
+            when :suffix ; @suffix_i = x_a.shift
+            when :prefix ; @prefix_i = x_a.shift
+            else         ; raise ::ArgumentError, i
+            end
+          end while x_a.length.nonzero?
+          self
+        end
+
+        def inline * x_a
+          prcs_x_a_fully x_a
+          self
+        end
+
+      private
+
+        def prcs_x_a_fully x_a
           sc = singleton_class
           d = -2 ; last = x_a.length - 2
           box = Box__[].new
@@ -111,7 +157,7 @@ module Skylab::Callback
             sc.send :attr_reader, slot.attr_reader_method_name
             instance_variable_set slot.ivar, x_a.fetch( d + 1 )
             -> ivar do
-              define_singleton_method :"receive_#{ i }_event" do |*a|
+              define_singleton_method :"#{ @prefix_i }#{ i }#{ @suffix_i }" do |*a|
                 instance_variable_get( ivar )[ *a ]
               end
             end[ slot.ivar ]

@@ -40,7 +40,7 @@ module Skylab::TestSupport
           Headless__[]::NLP::EN.calculate( & p )
         end
         EN_add_methods = -> mod, * x_a do
-          Headless__[]::SubClient::EN_FUN.via_iambic_on_mod x_a, mod
+          Headless__[]::SubClient::EN_FUN.on_mod_via_iambic mod, x_a
         end
         Field_exponent_proc = -> do
           MetaHell__[]::Parse::Fields::Exponent

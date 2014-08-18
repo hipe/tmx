@@ -66,6 +66,7 @@ module Skylab::Headless
           def turn_DSL_on
             @_DSL_is_off = false ; nil
           end
+          attr_reader :crrnt_open_action_cls
         private
           def fnsh_active_action i
             _const_i = Headless::Name::FUN::Constantify[ i ].intern
@@ -79,7 +80,6 @@ module Skylab::Headless
           def some_crrnt_open_action_class
             @crrnt_open_action_cls ||= bld_open_action_class
           end
-        private
           def bld_open_action_class
             unbound_acts_mod = unbound_action_box
             ::Class.new( leaf_action_base_cls ).class_exec do
