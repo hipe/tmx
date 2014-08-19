@@ -71,7 +71,7 @@ module Skylab::Snag
       verbose_option o
     end
 
-    desc do |y|  # #todo - can you melt me
+    desc do |y|
       a = Snag_::API::Actions::ToDo::Melt.attributes[ :paths ][ :default ]
       expression_agent.calculate do
         a = a.map( & method( :ick ) )

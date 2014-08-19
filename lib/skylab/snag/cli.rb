@@ -382,7 +382,7 @@ module Skylab::Snag
 
     namespace :doc, -> { CLI::Actions::Doc }
 
-    desc "pings snag (lowlevel)."   # #todo you know you want to
+    desc "pings snag (lowlevel)."   # #open [#064] - hide `ping` action
 
     def ping
       @IO_adapter.errstream.puts "hello from snag."

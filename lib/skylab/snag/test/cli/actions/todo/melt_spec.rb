@@ -57,7 +57,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
         O
         @source_pn.read.should eql( <<-O.unindent )
           aleph
-          bet # [#003] - we should fix this
+          bet  # #open [#003] - we should fix this
           gimmel
         O
       end

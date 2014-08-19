@@ -90,7 +90,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
         [#1234] one #two three
       O
 
-      # #todo tall stacks swallo error results (most of these tests)
+      # #open [#065] - tall stacks swallo error results (most of these tests)
 
       it "  0)" do
         do_not_setup_tmpdir

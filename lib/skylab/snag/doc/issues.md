@@ -1,3 +1,6 @@
+[#065] #open tall stacks swallo error results (most of these tests)
+[#064] #open hide `ping` action
+[#063]       #parent-node: [#057] the melt narrative ..
 [#062]       #parent-node: [#046] on success a cb's false-ish may be upgraded
 [#061] #open #parent-node: [#055] "stop emitting strings.."
 [#060]       #tracking-tag reasons we want something like adapters [#hl-067]

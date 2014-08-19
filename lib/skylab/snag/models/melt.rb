@@ -104,13 +104,7 @@ module Skylab::Snag
       "#{ todo.path }:#{ todo.line_number_string }"
     end
 
-    # Each time you want to change a line in source code, cache up all
-    # the changes you want to make to each line that is in the same file
-    # and patch the file all in one atomic action. (This pattern could of
-    # course be broadened, with some work, to make a patch for a whole
-    # codebase [#028].) (but note it is annoying b/c of the atomicicity
-    # of node ids and you need the correct id for the patch, so you want
-    # to be sure you do it right.)
+    # #note-110
 
     message_body_excerpt = sep = nil  # scope
 
@@ -122,17 +116,24 @@ module Skylab::Snag
         if @file_changes.length.nonzero? && @file_changes.last.path != todo.path
           res = file_changes_flush or break
         end
-        new_line = "#{ todo.pre_comment_string }#{
-          }# #{ node.identifier.render }" # some lines will just be a comment
+        pre_comment = todo.pre_comment_string
+        if ENDING_IN_ONLY_ONE_SPACE_RX__ =~ pre_comment
+          pre_comment = "#{ pre_comment } "
+        end
+        new_line = "#{ pre_comment }##{
+          } #{ OPEN_TAG_S__ } #{ node.identifier.render }"
+        # some lines will just be a comment
         excerpt = message_body_excerpt[ new_line, todo ]
         if excerpt
-          new_line << "#{ sep }#{ excerpt }"
+          new_line.concat "#{ sep }#{ excerpt }"
         end
         todo.replacement_line = new_line
         @file_changes << todo
       end while nil
       nil
     end
+    ENDING_IN_ONLY_ONE_SPACE_RX__ = /(?<![ ])[ ]\z/
+    OPEN_TAG_S__ =  Models::Tag.canonical_tags.open_tag.render
 
     def file_changes_flush
       res = nil
@@ -172,16 +173,7 @@ module Skylab::Snag
 
       ellipsis = line_width = min_words = sp = nil  # scope
 
-      # You are taking out the todo tag and message from the line, and replacing
-      # it with a node identifer (number). This operation may leave you with
-      # extra whitespace in the remainder of the line. To avoid having obtuse,
-      # unreadable node identifiers, we will fill the remaining available
-      # space with an excerpt from the original message, ellipsified to fit
-      # within whatever space remain in the line.
-      #
-      # (parts might get pushed up one day, tracked by [#hl-045])
-      #
-      msg_body_excrpt = -> new_line, todo do
+      msg_body_excrpt = -> new_line, todo do  # #note-170
         # add words to the excerpt so long as the next word would not
         # put you over the limit, taking into account spaces and ellipses etc
         res = nil
@@ -222,9 +214,7 @@ module Skylab::Snag
 
       line_width = Models::Manifest.line_width
 
-      min_words = 3 # arrived at heuristically, min num words from msg to
-        # bother including in the replacement line - (too few sounds dumb,
-        # an interesting nlp problems similar to summarization [#it-001])
+      min_words = 3  # #note-210
 
       sp = SPACE_
 
