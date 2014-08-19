@@ -2,130 +2,240 @@ module Skylab::Snag
 
   class CLI  # read [#052]
 
-    # notable things about it:
-    #   + it itself is not a pub sub emitter - kiss
-    #   + it's a franken-client of both legacy and headless,
-    #       with latter trumping former. that it works is a testament to
-    #       something, i'm not sure what
-    #   + legacy DSL gets turned on below and that's when it hits the fan
-
-
-    Autoloader_[ self ] # because we will need to autoload in the next line
-    include CLI::Action::InstanceMethods
-
     Snag_::Lib_::CLI[]::Client[ self,
       :client_instance_methods, :three_streams_notify ]
 
-    def initialize up, pay, info  # #storypoint-5
+    def initialize up, pay, info  # #storypoint-5 "strictify" the signature
       three_streams_notify up, pay, info
       super nil, nil, nil
     end
 
-    def invoke argv               # modify at [#010]
+    def invoke argv
       Snag_::Lib_::CLI_path_tools[].clear  # see
-      res = super argv            # super handles argument errors etc.
-      if false == res             # but if this, it is a petition for this:
-        error "a low-ass-level error occured."
-        res = nil
+      x = super argv
+      if UNABLE_ ==  x
+        send_error_string "(a low-level error occured.)"
+        NEUTRAL_
+      else
+        x
       end
-      res
     end
 
-    def paystream  # override the simple attr_reader from [po]
+  private
+
+    public def new_API_invocation
+      _API_client.new_invocation
+    end
+
+    def _API_client
+      @API_client ||= Snag_::API::Client.new Snag_
+    end
+
+    # ~ the narrative "order": [inside] string, [inside] event, line) [#031]
+
+    public def receive_UI_line s
+      send_UI_line s
+    end
+
+    def send_UI_line s
+      infostream.puts s ; nil
+    end
+
+    # ~
+
+    def handle_payload_line
+      @handle_payload_line ||= method :receive_payload_line
+    end
+
+    public def receive_payload_line s
+      send_payload_line s
+      ACHIEVED_
+    end
+
+    def send_payload_line s
+      paystream.puts s ; nil
+    end
+
+    def paystream  # (override attr_reader from [po])
       @IO_adapter.outstream
     end
 
-    def pen  # #overide legacy hl
-      expression_agent
+    # ~
+
+    def handle_inside_info_string
+      method :receive_inside_info_string
     end
 
-    def expression_agent
-      CLI::EXPRESSION_AGENT_
+    def receive_inside_info_string s
+      ev = Snag_::Model_::Event.inflectable_via_string s
+      inflect_inflectable_event ev
+      receive_info_event ev
     end
 
-  private                         # (DSL happens at bottom half)
-
-
-    #         ~ event handling and emitting ~
-
-    # emission of payload is straightforward. it is payload, we do not decorate
-    # it. (#doc-point [#031] might have details on this)
-
-    def handle_payload
-      @handle_payload ||= -> txt do
-        ::String === txt or fail "where? #{ txt.class }"  # #todo - remove
-        payload txt
-      end
+    def handle_info_string
+      method :receive_info_string
     end
 
-    def handle_raw_info
-      @handle_raw_info ||= -> txt do
-        ::String === txt or fail "wat #{ x.class }" # #todo -remove
-        info txt
-      end
+    public def receive_info_string s
+      receive_info_line s
     end
 
-    render = -> me, e do
-      if e.can_render_under
-        e.render_under me
-      else
-        e.fetch_text
-      end
+    def handle_inside_info_event
+      method :receive_inside_info_event
     end
 
-    split = -> do  # so ridiculous - "# (foo)" => [ "# (", "foo", ")" ]
-      rx = /\A([( #]+)(.*[^)])(\))?\z/
-      -> txt do
-        if rx =~ txt
-          $~.captures
-        else
-          [ nil, txt, nil ]
-        end
-      end
-    end.call
-
-    def handle_info
-      @handle_info ||= method( :hndl_info )
+    def receive_inside_info_event ev
+      _ev = sign_event ev
+      receive_info_event _ev
     end
 
-    define_method :hndl_info do |ev|
-      txt = render[ self, ev ]
-      a, txt, z = split[ txt ]
+    def handle_info_event
+      @handle_info_event ||= method :receive_info_event
+    end
+
+    public def receive_info_event ev
+      raw_s = render_event ev
+      open, sp_s, close = unparenthesize_message_string raw_s
       vl = ev.verb_lexeme
-      _s = if vl
-        _n = ev.inflected_noun
-        "while #{ [ vl.progressive, _n ].compact * SPACE_ }, "
+      _enhanced_s = if vl
+        _noun_s = ev.inflected_noun
+        gerund_phrase = [ vl.progressive, _noun_s ].compact * SPACE_
+        if HACK_IS_ONE_WORD_RX__ =~ sp_s  # done. finished. etc.
+          "#{ sp_s } #{ gerund_phrase }"
+        else
+          "while #{ gerund_phrase }, #{ sp_s }"
+        end
+      else
+        sp_s
       end
-      _txt ="#{ a }#{ _s }#{ txt }#{ z }"
-      info _txt  # (flatten the payload [#031])
+      _out_s = "#{ open }#{ _enhanced_s }#{ close }"
+      send_info_line _out_s
+      NEUTRAL_
+    end
+    HACK_IS_ONE_WORD_RX__ = /\A[a-z]+\z/
+
+    def handle_info_line
+      @handle_info_line ||= method :receive_info_line
     end
 
-    def handle_error
-      @handle_error ||= method( :hndl_error )
+    public def receive_info_line s
+      send_info_line s
+      NEUTRAL_
     end
 
-    define_method :hndl_error do |ev|
-      txt = render[ self, ev ]
-      a, txt, z = split[ txt ]
-      v = ev.inflected_verb ; n = ev.inflected_noun
-      _s = if v || n
-        "failed to #{ [ v, n ].compact * SPACE_ } - "
+    def send_info_line s
+      infostream.puts s ; nil
+    end
+
+    def infostream
+      @IO_adapter.errstream
+    end
+
+    # ~
+
+    def send_warning_line s
+      infostream.puts s ; nil
+    end
+
+    # ~
+
+    def handle_error_string
+      @handle_error_string ||= method :receive_error_string
+    end
+
+    def receive_error_string s
+      receive_error_line s  # meh
+    end
+
+    def handle_inside_error_event
+      @handle_inside_error_event ||= method :receive_inside_error_event
+    end
+
+    def receive_inside_error_event ev
+      _ev = sign_event ev
+      receive_error_event _ev
+    end
+
+    def handle_error_event
+      @handle_error_event ||= method :receive_error_event
+    end
+
+    public def receive_error_event ev
+      sp_a = nil
+      begin
+        v = ev.inflected_verb ; n = ev.inflected_noun
+        if v || n
+          ( sp_a ||= [] ).push "failed to #{ [ v, n ].compact * SPACE_ }"
+        end
+        if ev.respond_to? :ev
+          ev = ev.ev
+          ev.respond_to? :inflected_verb or break
+        else
+          break
+        end
+      end while true
+      txt = render_event ev
+      a, txt, z = unparenthesize_message_string txt
+      if sp_a
+        _s = "#{ sp_a * ' because ' } - "
       end
       _txt = "#{ a }#{ _s  }#{ txt }#{ z }"
-      error _txt  # (it flattens it [#031])
+      receive_error_line _txt
     end
 
-    def issue_an_invitation_for norm_name_a
-      as = CLI.fetch_action_sheetish norm_name_a
-      issue_an_invitation_to_sheet as
-      nil
+    def receive_error_line s
+      send_error_line s
+      UNABLE_
     end
 
-    def self.fetch_action_sheetish norm_name_a  #straddle
+    def send_error_line s
+      infostream.puts s ; nil
+    end
+
+    # ~ support for all of the above channel families
+
+    def inflect_inflectable_event ev
+      _v = @legacy_last_hot._sheet.slug
+      ev.inflected_verb = _v ; nil
+    end
+
+    def unparenthesize_message_string s
+      md = UNPARENTHESIZE_RX__.match s
+      md ? [ md[ :open ], md[ :body ], md[ :close ] ] : [ nil, s, nil ]
+    end
+    _P = '.?!:'
+    _P_ = "[#{ _P }]*"
+    UNPARENTHESIZE_RX__ = /\A(?:
+      (?<open> \( )  (?<body> .*[^#{ _P }] )?  (?<close> #{ _P_ }\) ) |
+      (?<open> \[ )  (?<body> .*[^#{ _P }] )?  (?<close> #{ _P_ }\] ) |
+      (?<open>  < )  (?<body> .*[^#{ _P }] )?  (?<close> #{ _P_ }>  ) |
+                     (?<body> .+[^#{ _P }] )   (?<close> [#{ _P }]+ )
+    )\z/x
+
+    def render_event ev
+      y = []
+      ev.respond_to? :ev and ev = ev.ev  # unwrap it eew
+      expression_agent.calculate y, ev, & ev.message_proc
+      y * LINE_SEP_
+    end
+
+    # ~ comport with invocation methods (#hook-out's, publifications)
+
+    public :program_name
+
+    def retrieve_param_for_expression_agent i
+      @legacy_last_hot.fetch_param i
+    end
+
+    public def retrieve_unbound_act norm_name_a
+      self.class.rtrv_unbound_action norm_name_a
+    end
+
+    def self.rtrv_unbound_action norm_name_a  #straddle
       # there is 1 level of legacy actions (which are now fine, it was cleaned)
       # but this nerk may be among the non-legacy too. hacklund
       if 1 == norm_name_a.length
-        story.action_box[ norm_name_a[0] ]
+        story.action_box[ norm_name_a.first ]
       else
         a = norm_name_a.dup  # [ 'a', 'b' ] => [ 'a', :Actions, 'b'] ..
         full_a = a.reduce( [ a.shift ] ) { |m, x| m << :Actions ; m << x ; m }
@@ -133,48 +243,21 @@ module Skylab::Snag
       end
     end
 
-    def issue_an_invitation_to live_action  # assume everything
-      issue_an_invitation_to_sheet live_action.class
+    # ~ framework comportments & overrides [hl]
+
+    def pen  # legacy [hl], will leave
+      expression_agent
     end
 
-    def issue_an_invitation_to_sheet action_sheet
-      parts = action_sheet.full_name_proc.map :as_slug
-      parts.unshift program_name
-      parts << '-h'
-      send_to_listener :ui, "#{ kbd parts.join( SPACE_ ) } might have more information"
-      nil  # SWALLOWED IT
-    end
-
-    #         ~ renderers not tied to any particular kind of event ~
-    #         ~ (some for compat as a modality client for headless) ~
-    #         ~ (alphabetical) ~
-
-    define_method :escape_path, & Snag_::Lib_::CLI_path_tools[]::FUN.pretty_path
-
-    def val x                     # how do you decorate a special value?
-      em x
-    end
-
-    def render_param param        # `param` is a wrapper object
-      if param.is_option
-        param.as_parameter_signifier
-      elsif param.is_argument
-        "<#{ param.slug }>"
+    def invite_to_self
+      if @legacy_last_hot
+        _s_a = [ @legacy_last_hot._sheet.slug ]
+        invite_via_mutable_slug_a _s_a
+      else
+        send_UI_line invite_line
+        NEUTRAL_
       end
     end
-
-    #         ~ a fresh take on [#hl-036] `param` ~
-
-    def param norm_name
-      @legacy_last_hot.fetch_param norm_name
-    end
-
-    #         ~ API nerks ~
-
-    def _API_client
-      @API_client ||= Snag_::API::Client.new self
-    end ; public :_API_client
-
 
     # ~ now entering DSL zone
 
@@ -191,9 +274,11 @@ module Skylab::Snag
 
     def numbers
       call_API [ :nodes, :numbers, :list ],
-        :on_error, handle_error,
-        :on_info, handle_info,
-        :on_output_line, handle_payload
+        :working_dir, working_directory_path,
+        :on_error_event, handle_inside_error_event,
+        :on_info_event, handle_info_event,
+        :on_info_string, handle_info_line,
+        :on_output_line, handle_payload_line
     end
 
 
@@ -222,55 +307,78 @@ module Skylab::Snag
       end
     end
 
+    Callback_::Autoloader[ self ]
+
     option_parser_class CLI::Option::Parser
 
     argument_syntax '[<message>]'
 
     def open message=nil, param_h
-      # ( see description above - for fun we do a tricky dynamic syntax )
+      # for fun we do a tricky dynamic syntax
       pbox = Snag_::Lib_::Formal_box[]::Open.from_hash param_h ; param_h = nil
-      msg = -> is_opening do                   # i hope you enjoyed this
+      msg_p = -> is_opening do                   # i hope you enjoyed this
         a_b = [ 'opening issues', 'listing open issues' ]
-        a_b.reverse! if is_opening
-        a = pbox.names.map { |n| em render_param( param n ) }
-        "sorry - #{ and_ a } #{ s :is } used for #{ a_b.first}, not #{a_b.last}"
+        is_opening and a_b.reverse!
+        expression_agent.calculate do
+          _s_a = pbox.names.map { |i| par i }
+          "sorry - #{ and_ _s_a } #{ s :is } #{
+           }used for #{ a_b.first}, not #{ a_b.last }"
+        end
       end
-      if message
-        p = pbox.partition_where_name_in! :dry_run, :be_verbose  # p has the <= 2 eles
-        if pbox.length.nonzero? then res = error msg[ true ] else
-          res = call_API [ :nodes, :add ],
-            p.to_hash.merge!(
-              do_prepend_open_tag: true,
-                          message: message
-            ), -> a do
-              a.on_error handle_error
-              a.on_info handle_info
-              a.on_raw_info handle_raw_info
-              a.on_new_node { |_| } # handled by manifest for now
-            end
+      r = if message
+        bx = pbox.partition_where_name_in! :dry_run, :be_verbose
+        if pbox.length.zero?
+          opn_node bx, message
+        else
+          receive_error_line msg_p[ true ]
         end
       else
-        p = pbox.partition_where_name_in! :max_count, :be_verbose
-        if pbox.length.nonzero? then res = error msg[ false ] else
-          p.add( :be_verbose, false ) if ! p.has? :be_verbose # decide dflt here
-          p.add :query_sexp, [ :and, [ :has_tag, :open ] ]
-          res = call_API [ :nodes, :reduce ], p.to_hash, -> a do
-            a.on_output_line handle_payload
-            a.on_info handle_info
-            a.on_error handle_error
-            a.on_invalid_node { |e| info invalid_node_message( e ) }
-          end
+        bx = pbox.partition_where_name_in! :max_count, :be_verbose
+        if pbox.length.zero?
+          rdc_nodes bx
+        else
+          receive_error_line msg_p[ false ]
         end
       end
-      if false == res
-        res = issue_an_invitation_for [ :open ]
+      if UNABLE_ == r
+        invite_via_normal_name [ :open ]
+      else
+        r
       end
-      res
     end
 
+  private
+
+    def opn_node bx, message
+      bx.add :working_dir, working_directory_path
+      _h = bx.to_hash.merge! do_prepend_open_tag: true, message: message
+      call_API [ :nodes, :add ], _h, -> o do
+        o.on_error_event handle_inside_error_event
+        o.on_error_string handle_error_string
+        o.on_info_event handle_inside_info_event
+        o.on_info_line handle_info_line
+        o.on_info_string handle_inside_info_string
+        o.on_new_node { |_| }  # handled by manifest for now
+      end
+    end
+
+    def rdc_nodes bx
+      bx.add :working_dir, working_directory_path
+      bx.has?( :be_verbose ) or bx.add :be_verbose, false  # decide dflt here
+      bx.add :query_sexp, [ :and, [ :has_tag, :open ] ]
+      call_API [ :nodes, :reduce ], bx.to_hash, -> o do
+        o.on_error_event handle_inside_error_event
+        o.on_error_string handle_error_string
+        o.on_info_event handle_inside_info_event
+        o.on_info_string handle_info_line
+        o.on_invalid_node { |e| info invalid_node_message( e ) }
+        o.on_output_line handle_payload_line
+      end
+    end
+
+  public
 
     namespace :todo, -> { CLI::Actions::Todo }
-
 
     namespace :doc, -> { CLI::Actions::Doc }
 
@@ -279,6 +387,84 @@ module Skylab::Snag
     def ping
       @IO_adapter.errstream.puts "hello from snag."
       :hello_from_snag
+    end
+
+    include module Invocation_Methods_  # shared b. root & child frames
+    private
+
+      def dry_run_option o
+        o.on '-n', '--dry-run', 'dry run.' do
+          @param_h[ :dry_run ] = true
+        end
+      end
+
+      def verbose_option o
+        o.on '-v', '--verbose', 'verbose output.' do
+          @param_h[ :be_verbose ] = true
+        end
+      end
+
+      # ~
+
+      def call_API * a, & p
+        x = new_API_invocation.with_a_and_p( a, p ).execute
+        UNABLE_ == x ? invite_to_self : x
+      end
+
+      def sign_event ev
+        ev_ = Snag_::Model_::Event.inflectable_via_event ev
+        inflect_inflectable_event ev_
+        ev_
+      end
+
+      def invite_via_bound_action live_action
+        invite_via_unbound_action live_action.class
+      end
+
+      def invite_via_normal_name norm_name_a
+        _cls = retrieve_unbound_act norm_name_a
+        invite_via_unbound_action _cls
+      end
+
+      def invite_via_unbound_action unbound_action
+        _s_a = if unbound_action.respond_to? :full_name_function
+          unbound_action.full_name_function.map( & :as_slug )
+        else
+          [ unbound_action.slug ]
+        end
+        invite_via_mutable_slug_a _s_a
+      end
+
+      def invite_via_mutable_slug_a s_a
+        s_a.unshift program_name
+        s_a.push '-h'
+        send_UI_line( expression_agent.calculate do
+          "#{ kbd s_a * SPACE_ } might have more information"
+        end )
+        NEUTRAL_
+      end
+
+      def expression_agent
+        @expression_agent ||= CLI::Expression_Agent_.
+          new method :retrieve_param_for_expression_agent
+      end
+
+      # ~
+
+      def working_directory_path
+        ::Dir.pwd
+      end
+
+      def invalid_node_message node
+        o = node.parse_failure_event
+        ( expression_agent.calculate do
+          "failed to parse line #{ o.line_number } because #{
+           }expecting #{ ick o.expecting } near #{ ick o.near }#{
+            } (in #{ pth o.pathname })"
+        end )
+      end
+
+      self
     end
 
     Client = self  # #tmx-compat

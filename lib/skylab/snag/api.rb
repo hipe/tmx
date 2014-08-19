@@ -1,133 +1,172 @@
 module Skylab::Snag
 
-  module API
-
-    # For no good reason API (the module) is the home of low-level,
-    # bootstrappy, zero-config-style config.
-
-    manifest_path = 'doc/issues.md'.freeze # etc
-
-    define_singleton_method :manifest_path do manifest_path end
-
-    max_num_dirs_to_search_for_manifest_file = 15 # wuh-evuh
-
-    define_singleton_method :max_num_dirs_to_search_for_manifest_file do
-      max_num_dirs_to_search_for_manifest_file
-    end
-
-    module Actions
-      def self.name_function ; end
-      Autoloader_[ self, :boxxy ]
-    end
-  end
-
-  class API::Client
-
-    include Snag_::Core::SubClient::InstanceMethods
-
-    @setup = nil                  # experimental hackery for .. well ..
+  class API  # see [#006]
 
     class << self
-
-      attr_reader :setup
-
-      alias_method :setup_ivar, :setup
-
-      def setup f
-        @setup and fail "won't stack (or queue) setups"
-        @setup = f
-        nil
+      def manifest_file
+        MANIFEST_FILE__
       end
 
-      def setup_delete
-        x = @setup
-        @setup = nil
-        x
+      def max_num_dirs_to_search_for_manifest_file
+        MAX_NUM_DIRS_TO_SEARCH_FOR_MANIFEST_FILE__
       end
     end
 
-    def initialize client
-      @max_num_dirs_to_search_for_manifest_file = nil
-      API::Client.setup_ivar and API::Client.setup_delete[ self ]
-      super client
+    MANIFEST_FILE__ = 'doc/issues.md'.freeze
+
+    MAX_NUM_DIRS_TO_SEARCH_FOR_MANIFEST_FILE__ = 15  # wuh-evuh
+
+    module Actions
+
+      def self.name_function  # #note-25
+      end
+
+      Autoloader_[ self, :boxxy ]
     end
 
-    def build_action normalized_action_name
-      # keeping for #posterity, primordial boxxy:
-      #path.reduce(self.class) { |m, s| m.const_get(constantize(s)) }.new(self)
-      Autoloader_.const_reduce( normalized_action_name, API::Actions ).
-        new self
-    end
+    Client = self
+    class Client
 
-    # getters for *persistent* models *objects* (think daemons):
+      @setup = nil  # #open [#050] this is not the way
 
-    def find_closest_manifest from_path, error
-      res = nil
-      begin
-        mp = find_closest_manifest_path from_path, error
-        mp or break( res = mp )
-        mp.absolute? or fail 'sanity'
-        manny = ( @manifest_cache ||= { } ).fetch( mp.to_s ) do |path| # ofuck
-          man = Snag_::Models::Manifest.new mp
-          man
+      class << self
+
+        attr_reader :setup
+
+        alias_method :setup_ivar, :setup
+
+        def setup f
+          @setup and fail "won't stack (or queue) setups"
+          @setup = f
+          nil
         end
-        res = manny
-      end while nil
-      res
+
+        def setup_delete
+          x = @setup
+          @setup = nil
+          x
+        end
+      end
+
+      def initialize app_module
+        @app_module = app_module
+        @max_num_dirs_to_search_for_manifest_file = nil
+        @manifest_cache_h = {}
+        API::Client.setup_ivar and API::Client.setup_delete[ self ]
+      end
+
+      attr_writer :max_num_dirs_to_search_for_manifest_file
+
+      def call * a, & p
+        new_invocation.with_a_and_p( a, p ).execute
+      end
+
+      def new_invocation
+        Invocation__.new self
+      end
+
+      def build_action_via_name_and_p normal_name, p
+        _cls = lookup_some_action_class_via_normal_name normal_name
+        _cls.new p, self
+      end
+
+      def build_action_via_name normal_name
+        _cls = lookup_some_action_class_via_normal_name normal_name
+        _cls.new self
+      end
+
+      def lookup_some_action_class_via_normal_name normal_name
+        Autoloader_.const_reduce normal_name, self.class::Actions
+      end
+
+      def models
+        @models ||= API::Models__.new self, @app_module::Models
+      end
+
+      # ~ business
+
+      def manifest_file
+        self.class.manifest_file
+      end
+
+      def max_num_dirs_to_search_for_manifest_file
+        @max_num_dirs_to_search_for_manifest_file ||
+          self.class.max_num_dirs_to_search_for_manifest_file
+      end
     end
 
-    manifest_path = API.manifest_path
+    class Invocation__
 
-    define_method :find_closest_manifest_path do |from_path, error|
-      res = nil
-      begin
-        if from_path
-          pn = ::Pathname.new from_path
-          pn.relative? and pn = pn.expand_path
+      def initialize _API_client
+        @API_client = _API_client
+      end
+
+      def with_a_and_p a, p
+        @x_a = a ; @p = p ; self
+      end
+
+      def execute
+        normal_name = @x_a.shift
+        if ::Hash.try_convert @x_a.first
+          par_h = @x_a.shift
+          @p ||= @x_a.pop
+          @x_a.length.zero? or raise ::ArgumentError
+        end
+        action = bld_action_from_name_and_p normal_name, @p
+        action and begin
+          if par_h
+            action.invoke par_h
+          else
+            action.invoke_via_iambic @x_a
+          end
+        end
+      end
+
+      def bld_action_from_name_and_p normal_name, p
+        if p
+          @API_client.build_action_via_name_and_p normal_name, p
         else
-          pn = ::Pathname.pwd
+          @API_client.build_action_via_name normal_name
         end
-        found = nil
-        num_dirs_searched = 0
-        seen = []
-        max = max_num_dirs_to_search_for_manifest_file
-        loop do
-          if num_dirs_searched >= max
-            break
-          end
-          num_dirs_searched += 1
-          try = pn.join manifest_path
-          if try.exist?
-            found = try
-            break
-          end
-          dirname = pn.dirname
-          if pn == dirname        # we have reached the last nerk of a relative
-            break                 # or absolute pathname.
-          end
-          seen.push pn.basename.to_s
-          pn = dirname
-        end
-        if ! found
-          rev = seen.reverse
-          a = [ * ::Array.new( rev.length, '..' ), * rev ]
-          tot = " (#{ rev.length } total)"
-          error[ "manifest not found, looked for #{ manifest_path } #{
-            }in each dir#{tot}: #{ a.join '/' }#{ a.empty? ? '(none)' : '/' }" ]
-          break
-        end
-        res = found
-      end while nil
-      res
+      end
     end
 
-    attr_writer :max_num_dirs_to_search_for_manifest_file
+    class Models__
 
-  private
+      def initialize _API_client, mod
+        @API_client = _API_client
+        @module = mod ; sc = singleton_class
+        scn = mod.entry_tree.get_normpath_scanner  # go deep into [cb] API
+        while (( np = scn.gets ))
+          name_i = np.name_for_lookup.as_variegated_symbol
+          sc.send :define_method, :"#{ name_i }s", bld_reader( name_i )
+        end
+        @cache_h = {}
+      end
 
-    def max_num_dirs_to_search_for_manifest_file
-      @max_num_dirs_to_search_for_manifest_file ||
-        API.max_num_dirs_to_search_for_manifest_file
+      # names of methods (public or private) cannot ever end in the letter 's'
+
+      attr_reader :API_client
+
+    private
+
+      def bld_reader name_i
+        -> &p do
+          @cache_h.fetch name_i do
+            cols = bld_shell name_i
+            cols and @cache_h[ name_i ] = cols
+          end
+        end
+      end
+
+      def bld_shell name_i
+        Autoloader_.const_reduce( [ name_i ], @module ).
+          build_collections @API_client
+      end
+    end
+
+    Event_Factory = -> digraph, chan_i, sender, ev  do
+      ev
     end
   end
 end

@@ -4,20 +4,13 @@ module Skylab::Snag
 
     class Line_edit_ < Agent_  # see [#038]
 
-      Entity_[ self, :fields,  # all fields below are explained in the doc node.
+      Entity_[ self, :fields,  # #note-9 explains all fields
         :at_position_x,
-        :error_event_p,
-        :escape_path_p,
-        :file_utils_p,
-        :info_event_p,
         :is_dry_run,
-        :manifest_file_p,
         :new_line_a,
-        :pathname,
-        :raw_info_p,
-        :tmpdir_p,
         :verbose_x,
-      ]
+        :client,
+        :listener ]
 
       def execute
         ok = prepare
@@ -27,79 +20,93 @@ module Skylab::Snag
     private
 
       def prepare
-        @new_line_a.length.zero? and fail "sanity - zero new lines"
-        @manifest_file = @manifest_file_p.call
-        @fu = @file_utils_p[ :escape_path_p, @escape_path_p, :be_verbose,
-                             @verbose_x, :info_event_p, @info_event_p ]
-        @tmpdir = @tmpdir_p[ :is_dry_run, @is_dry_run, :file_utils, @fu,
-                             :error_event_p, @error_event_p ]
+        @new_line_a.length.zero? and self._SANITY
+        @manifest_file = @client.manifest_file
+        @manifest_file_pn = @manifest_file.pathname
+        @fu = @client.build_file_utils(
+          :be_verbose, @verbose_x,
+          :listener, @listener )
+        @tmpdir = @client.produce_tmpdir(
+          :is_dry_run, @is_dry_run,
+          :file_utils, @fu,
+          :listener, @listener )
         @tmpold = @tmpdir.join 'issues.prev.md'
         @tmpnew = @tmpdir.join 'issues-next.md'
-        @rm = -> pn do
-          @fu.rm pn, noop: @is_dry_run
-        end
-        @mv = -> a, b do
-          @fu.mv a, b, noop: @is_dry_run
-        end
-        true
+        ACHIEVED_
       end
 
       def commit
-          @tmpnew.exist? and rm @tmpnew
-          @scn = @manifest_file.normalized_line_producer  # #open-filehandle
-          p = if 0 == @at_position_x
-            get_prepend_lines_p
-          else
-            get_change_lines_p
-          end
-          p and flush_lines p
+        @tmpnew.exist? and rm @tmpnew
+        @scn = @manifest_file.normalized_line_producer  # #open-filehandle
+        flush_lines( if 0 == @at_position_x
+          :prepend_lines
+        else
+          :change_lines
+        end )
       end
 
-      Build_context_sensitive_line_writer_ = -> fh do
+      def flush_lines flush_lines_method_i
+        ( @is_dry_run ? DEV_NULL_ : @tmpnew ).open WRITEMODE_ do |fh|
+          @write_line_p = Build_context_sensitive_line_writer__[ fh ]
+          send flush_lines_method_i
+        end
+        @tmpold.exist? and rm @tmpold
+        mv @manifest_file_pn, @tmpold
+        mv @tmpnew, @manifest_file_pn
+        ACHIEVED_
+      end
 
+      def mv src_pn, dest_pn
+        @fu.mv src_pn.to_path, dest_pn.to_path, noop: @is_dry_run
+      end
+
+      Build_context_sensitive_line_writer__ = -> fh do
         # sep = nil  # #note-73
         -> line do
           # fh.write "#{ sep }#{ line }"
           # sep ||= "\n" # meh [#020]
-          fh.write "#{ line }#{ NL_ }"
+          fh.write "#{ line }#{ LINE_SEP_ }"
           nil
         end
       end
 
-      NL_ = "\n".freeze
-
-      def get_prepend_lines_p
-        # simply rewrite the file line-by-line, putting new lines at top
-        -> do
-          if 1 == @new_line_a.length
-            info_string "new line: #{ @new_line_a.fetch 0 }"
-          else
-            info_string "new lines:"
-            many = true
-          end
-          @new_line_a.each do |line|
-            @raw_info_p[ line ] if many
-            @write_line_p[ line ]
-          end
-          while (( line = @scn.gets ))
-            @write_line_p[ line ]
-          end
-          true
-        end
+      def rm pn
+        @fu.rm pn.to_path, noop: @is_dry_run
       end
 
-      def get_change_lines_p
-        -> do
-          id_str = @at_position_x
-          len = id_str.length
-          while (( line = @scn.gets ))
-            if id_str == line[ 0, len ]
-              break( r = replace_and_rewrite )
-            end
-            @write_line_p[ line ]
+      def prepend_lines
+        # simply rewrite the file line-by-line, putting new lines at top
+        if 1 == @new_line_a.length
+          send_info_string "added new line: #{ @new_line_a.fetch 0 }"
+        else
+          send_info_string "added new lines:"
+          is_multiple = true
+        end
+        @new_line_a.each do |line|
+          is_multiple and @listener.receive_info_line line
+          @write_line_p[ line ]
+        end
+        while (( line = @scn.gets ))
+          @write_line_p[ line ]
+        end
+        ACHIEVED_
+      end
+
+      def change_lines
+        id_str = @at_position_x
+        len = id_str.length
+        while (( line = @scn.gets ))
+          if id_str == line[ 0, len ]
+            break( ok = replace_and_rewrite )
           end
-          r || bork( "node lines not found for node with identifier #{
-            }#{ id_str }" )
+          @write_line_p[ line ]
+        end
+        ok or bork_via_event bld_node_not_found_event id_str
+      end
+
+      def bld_node_not_found_event id_str
+        Snag_::Model_::Event.inline :node_not_found, :id_str, id_str do |y, o|
+          y << "node lines not found for node with identifier #{ ick id_str }"
         end
       end
 
@@ -114,29 +121,10 @@ module Skylab::Snag
         while (( line = @scn.gets ))
           @write_line_p[ line ]
         end
-        true
+        ACHIEVED_
       end
 
       SPACE_RX_ = /^[[:space:]]/
-
-      def rm x
-        @rm[ x ]
-      end
-
-      def flush_lines flush_p
-        ( @is_dry_run ? DEV_NULL_ : @tmpnew ).open WRITEMODE_ do |fh|
-          @write_line_p = Build_context_sensitive_line_writer_[ fh ]
-          flush_p[]
-        end
-        @tmpold.exist? and rm @tmpold
-        mv @pathname, @tmpold
-        mv @tmpnew, @pathname
-        true
-      end
-
-      def mv x, y
-        @mv[ x, y ]
-      end
 
       DEV_NULL_ = Snag_::Lib_::Dev_null[]
       WRITEMODE_ = Snag_::Lib_::Writemode[]

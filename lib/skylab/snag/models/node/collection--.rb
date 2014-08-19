@@ -2,68 +2,60 @@ module Skylab::Snag
 
   class Models::Node::Collection__
 
-    include Snag_::Core::SubClient::InstanceMethods
-
-    def initialize manifest, client
+    def initialize manifest, _API_client
+      @API_client = _API_client
       @manifest = manifest
-      @node_flyweight = nil
-      super client
     end
 
     attr_reader :manifest  # used in actions for now
 
-    def add message, do_prepend_open_tag, dry_run, verbose_x, new_node=nil
-      r = false
-      begin
-        node = Models::Node.build_controller request_client
-        # node.date_string = todays_date   # [#058] #open
-        node.message = message
-        node.do_prepend_open_tag = do_prepend_open_tag
-        r = node.is_valid or break
-        r = manifest.add_node_notify node, * my_callbacks_a,
-          :is_dry_run, dry_run, :verbose_x, verbose_x
-        r and new_node[ node ]
-      end while nil
-      r
+    def add message, do_prepend_open_tag, dry_run, verbose_x, listener
+
+      o = Models::Node.build_controller listener, @API_client
+
+      # node.date_string = todays_date   # [#058] #open
+      #
+      o.message = message
+      o.do_prepend_open_tag = do_prepend_open_tag
+      if o.is_valid
+        ok = @manifest.add_node o, dry_run, verbose_x
+        ok and listener.receive_new_node( o ) || ok  # :+[#062] upgrade result
+      else
+        o.result_value
+      end
     end
 
     def changed node, is_dry_run, verbose_x
-      manifest.change_node_notify node, * my_callbacks_a,
-        :is_dry_run, is_dry_run, :verbose_x, verbose_x
+      node.listener or self._SANITY
+      @manifest.change_node node, is_dry_run, verbose_x
     end
 
-    def fetch_node node_ref, not_found=nil
-      @not_found_p = nil
-      @q = build_query [ :identifier_ref, node_ref ], A_COUNT_OF_ONE__
-      @q and via_query_fetch_node
+    def fetch_node node_ref, listener
+      @q = build_query [ :identifier_ref, node_ref ], A_COUNT_OF_ONE__, listener
+      @q and via_query_fetch_node listener
     end
   private
-    def via_query_fetch_node
+    def via_query_fetch_node listener
       nodes = reduce_all_nodes_via_query @q
       node = nodes.gets
       if node
-        Node_.build_controller node, self
+        Node_.build_controller( listener, @API_client ).with_flyweight( node )
       else
-        when_not_found
+        when_not_found listener
       end
     end
     A_COUNT_OF_ONE__ = 1
 
-    def when_not_found
-      p = @not_found_p ; q = @q
-      ev = Snag_::Model_::Event.inline :node_not_found, :query, q do |y, o|
+    def when_not_found listener
+      _ev = Snag_::Model_::Event.inline :node_not_found, :query, @q do |y, o|
         y << "there is no node #{ o.query.phrasal_noun_modifier }"
       end
-      if p
-        p[ ev ]
-      else
-        error_event ev
-      end
+      listener.receive_error_event _ev
     end
   public
 
-    def build_query query_sexp, max_count
-      Node_.build_valid_query query_sexp, max_count, self
+    def build_query query_sexp, max_count, listener
+      Node_.build_valid_query query_sexp, max_count, listener
     end
 
     def reduce_all_nodes_via_query q
@@ -84,26 +76,10 @@ module Skylab::Snag
 
   private
 
-    def node_flyweight
-      @node_flyweight ||= Models::Node.build_flyweight
-    end
-
     date_format = '%Y-%m-%d'
 
     define_method :todays_date do
       Snag_::Library_::DateTime.now.strftime date_format
-    end
-
-    def my_callbacks_a
-      @my_callbacks_a ||= [ :escape_path_p, method( :escape_path ),
-        :error_event_p, method( :error_event ),
-        :info_event_p, method( :info_event ),
-        :raw_info_p, method( :on_raw_info ) ]
-    end
-
-    def on_raw_info raw_info
-      @request_client.send_to_listener :raw_info, raw_info
-      nil
     end
 
     Node_ = Models::Node

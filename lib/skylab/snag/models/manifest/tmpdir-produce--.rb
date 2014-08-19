@@ -2,51 +2,45 @@ module Skylab::Snag
 
   class Models::Manifest
 
-    class Tmpdir_Curry__ < Agent_
+    class Tmpdir_produce__ < Agent_
 
-      Entity_[ self, :fields, :dirname, :tmpdir_pathname,
-        :is_dry_run, :file_utils, :escape_path_p, :error_event_p ]
+      Entity_[ self, :fields,
+        :file_utils,
+        :is_dry_run,
+        :tmpdir_pathname,
+        :listener ]
 
       def execute
-        -> do  # #result-block
-          prepare or break false
-          create_if_not_exist or break false
-          self
-        end.call
+        if @tmpdir_pathname.exist?
+          @tmpdir_pathname
+        else
+          create
+        end
       end
 
     private
 
-      def prepare
-        @escape_path_p ||= IDENTITY_
-        true
-      end
-
-      def create_if_not_exist
-        @tmpdir_pathname.exist? ? true : create
-      end
-
       def create
-        -> do  # #result-block
-          pn = @tmpdir_pathname
-          pn.dirname.exist? or break bork( "won't create #{
-            }more than one directory. Parent directory of our tmpdir #{
-            }(#{ pn.basename }) must exist: #{ @escape_path_p[ pn.dirname ] }")
-          @file_utils.mkdir pn.to_s, noop: @is_dry_run
-          true
-        end.call
+        if @tmpdir_pathname.dirname.exist?
+          @file_utils.mkdir @tmpdir_pathname.to_path, noop: @is_dry_run
+          @tmpdir_pathname
+        else
+          when_dirname_not_exist
+        end
       end
 
-    public
-
-      # the proxy services :/
-
-      def exist?
-        @tmpdir_pathname.exist?
+      def when_dirname_not_exist
+        _ev = bld_directory_must_exist_event
+        bork_via_event _ev
       end
 
-      def join x
-        @tmpdir_pathname.join x
+      def bld_directory_must_exist_event
+        Snag_::Model_::Event.inline :directory_must_exist,
+            :tmpdir_pathname, @tmpdir_pathname do |y, o|
+          pn = o.tmpdir_pathname
+          y << "won't create more than one directory. Parent directory #{
+           }of our tmpdir (#{ pn.basename }) must exist: #{ pth pn.dirname }"
+        end
       end
     end
   end

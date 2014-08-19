@@ -1,168 +1,238 @@
 module Skylab::Snag
 
-  CLI::Action = ::Class.new
+  class CLI
 
-  module CLI::Action::InstanceMethods
+    class Action
 
-    Adapter = Snag_::Lib_::Porcelain__[]::Legacy::Adapter
+      ACTIONS_ANCHOR_MODULE = -> { CLI::Actions }
 
-    include Snag_::Core::SubClient::InstanceMethods
+      Snag_::Lib_::CLI[]::Action[ self, :DSL ]
 
-    Snag_::Lib_::CLI[]::Action[ self, :core_instance_methods ]
+      extend Snag_::Lib_::NLP[]::EN::API_Action_Inflection_Hack
 
+      inflection.inflect.noun :singular
 
-    # ~ API invocation and wiring support (pre-order)
-
-    def call_API local_normal_name, * x_a, & p  # #todo `call_API` should be a service of the root client node
-      if ::Hash.try_convert x_a.first
-        param_h = x_a.shift
-        p ||= x_a.pop
-        x_a.length.zero? or raise ::ArgumentError
-        invoke_API_via_name_and_h_and_p local_normal_name, param_h, p
-      else
-        p and raise ::ArgumentError
-        action = _API_client.build_action local_normal_name
-        action and action.invoke_via_iambic x_a
+      def initialize client=nil
+        if client
+          super client
+        else
+          super()
+        end
+        @param_h = {}
       end
-    end
 
-  private
+    protected  # or public, whatever
 
-    def invoke_API_via_name_and_h_and_p local_normal_name, param_h, some_p
-      act = bld_wired_API_action local_normal_name, some_p
-      act and begin
-        res = act.invoke param_h
-        if false == res           # the placement of this check here is very
-          if self.class.respond_to? :name_function  # ick
-            res = issue_an_invitation_to self
+      # ~ comport #hook-out's
+
+      def program_name
+        @request_client.program_name
+      end
+
+      def new_API_invocation
+        @request_client.new_API_invocation
+      end
+
+      def rtrv_unbound_action x
+        @request_client.rtrv_unbound_action x
+      end
+
+      def receive_UI_line s
+        listener.receive_UI_line s
+      end
+
+    private
+
+      def retrieve_param_for_expression_agent i
+        if @option_parser.top.long.key?( i.to_s  )
+          Lib_::CLI[]::Option.on "--#{ i }"
+        else
+          _fp = Fake_Formal_Parameter__.new Callback_::Name.from_variegated_symbol i
+          Lib_::CLI[]::Argument.new _fp, :req
+        end
+      end
+      Fake_Formal_Parameter__ = ::Struct.new :name
+
+      def send_UI_line s
+        listener.receive_UI_line s
+      end
+
+      def handle_payload_line
+        method :receive_payload_line
+      end
+
+      protected def receive_payload_line s
+        send_payload_line s
+      end
+
+      def send_payload_line s
+        listener.receive_payload_line s
+      end
+
+      def handle_info_line
+        method :receive_info_line
+      end
+
+      def handle_inside_info_string
+        method :receive_inside_info_string
+      end
+
+      def receive_info_line s
+        send_info_line s
+      end
+
+      def send_info_line s
+        listener.receive_info_line s
+      end
+
+      def handle_info_string
+        method :receive_info_string
+      end
+
+      def receive_inside_info_string s
+        ev = Snag_::Model_::Event.inflectable_via_string s
+        inflect_inflectable_event ev
+        receive_info_event ev
+      end
+
+      def receive_info_string s
+        listener.receive_info_string s
+      end
+
+      def handle_info_event
+        method :receive_inside_info_event
+      end
+
+      def receive_inside_info_event ev
+        _ev_ = sign_event ev
+        listener.receive_info_event _ev_
+      end
+
+      protected def receive_info_event ev
+        listener.receive_info_event ev
+      end
+
+      def handle_error_line
+        method :receive_error_line
+      end
+
+      def receive_error_line s
+        listener.receive_error_line s
+      end
+
+      def handle_error_string
+        method :receive_error_string
+      end
+
+      def receive_error_string s
+        ev = Snag_::Model_::Event.inflectable_via_string s
+        inflect_inflectable_event ev
+        listener.receive_error_event ev
+      end
+
+      def handle_error_event
+        method :receive_inside_error_event
+      end
+
+      def receive_inside_error_event ev
+        _ev_ = sign_event ev
+        listener.receive_error_event _ev_
+      end
+
+      protected def receive_error_event ev
+        listener.receive_error_event ev
+      end
+
+      def listener
+        @request_client
+      end
+
+      def invite_to_self
+        if @is_engaged
+          invite_via_bound_action @bound_downtree_action
+        else
+          invite_via_bound_action self
+        end
+      end
+
+      # ~ inflection ("signing")
+
+      def inflect_inflectable_event ev
+        verb_class = if @is_engaged
+          @bound_downtree_action.class
+        else
+          self.class
+        end
+        vnf = verb_class.name_function
+        if vnf
+          ev.inflected_verb = vnf.as_human
+          inflect_inflectable_event_with_any_noun ev, verb_class
+        end
+      end
+
+      def inflect_inflectable_event_with_any_noun ev, verb_class
+        noun_cls = verb_class.name_function.parent
+        noun_cls and nnf = noun_cls.name_function
+        nnf and inflect_inflectable_event_with_noun ev, nnf,
+          verb_class.inflection ; nil
+      end
+
+      def inflect_inflectable_event_with_noun ev, nnf, inflection
+        inflected_noun_s = nnf.as_human
+        looks_plural = HACK_DETERMINE_IS_PLURAL_RX__.match inflected_noun_s
+        case inflection.inflect.noun
+        when :singular
+          if looks_plural
+            inflected_noun_s = looks_plural.pre_match
+          end
+        when :plural
+          if ! looks_plural
+            inflected_noun_s = "#{ inflected_noun_s }s"
+          end
+        else self._DO_ME
+        end
+        ev.inflected_noun = inflected_noun_s ; nil
+      end
+
+      HACK_DETERMINE_IS_PLURAL_RX__ = /s\z/
+
+
+      class Leaf_Action__ < self
+        extend Skylab::Headless::Action::Anchored_Name_MMs  # we will override it
+        Snag_::Model_.name_function self
+      end
+
+      Snag_::Model_.name_function self
+
+      class Box < self
+
+        Snag_::Lib_::CLI[]::Box[ self, :DSL,
+          :leaf_action_base_class, -> { Leaf_Action__ } ]
+
+        def self.inflection
+          if crrnt_open_action_cls
+            @crrnt_open_action_cls.inflection
           else
-            info invite_line
-            res = nil
+            super
           end
         end
-        res  # [#031]
-      end
-    end
 
-    def say_must_have_proc_or_bloc a
-      "must have exactly 1 proc or block (#{ a.length } for 1)"
-    end
+        include Invocation_Methods_
 
-    def bld_wired_API_action normalized_action_name, wire
-      action = _API_client.build_action normalized_action_name
-      action and begin
-        wire[ action ]
-        if warn_about_unhandled_streams action
-          info "For now we won't proceded until you handle the above #{
-            }event(s) for #{ action.class }."
-          false   # should be just nil but we want to test the gears
-        else
-          action
+        def initialize client_x, _=nil  # (namespace sheet, not interesting)
+          super client_x
         end
+
+        # ~ framework-specific comportments (for [po] "legacy" f.w)
+
+        def resolve_argv argv
+          [ nil, method( :invoke ), [ argv ] ]  # compat legacy
+        end
+
+        Adapter = Snag_::Lib_::Porcelain__[]::Legacy::Adapter
       end
-    end
 
-    def _API_client
-      request_client._API_client
-    end ; protected :_API_client
-
-    [ :handle_payload, :handle_info,
-      :handle_error, :handle_raw_info
-    ].each do |m|
-      define_method m do
-        request_client.send m
-      end
-    end
-
-    public :handle_info, :handle_error  # #as-necessary
-
-    # just a debugging tool (#overhead) that was several hours in
-    # the making (ok days). experimentally we will result in trueish
-    # if there *were* warnings, and falseish if not (just to see
-    # how it reads)
-
-    def warn_about_unhandled_streams action
-      action.if_unhandled_non_taxonomic_stream_names -> missed_a do
-        send_to_listener :warn, "(warning, unhandled: #{ missed_a * ', ' })"
-        true
-      end, -> do
-        false
-      end
-    end
-
-    def issue_an_invitation_to live_action
-      request_client.issue_an_invitation_to live_action
-    end
-
-    def send_to_listener i, x
-      call_digraph_listeners i, x ; nil
-    end
-
-    #         ~ randomass re-used view templates ick ~
-
-    def invalid_node_message node
-      o = node.parse_failure_event
-      expression_agent.calculate do
-        "failed to parse line #{ o.line_number } because #{
-         }expecting #{ ick o.expecting } near #{ ick o.near }#{
-          } (in #{ pth o.pathname })"
-      end
-    end
-
-    def node_msg_smry n
-      tail = ' [..]' if n.extra_lines_count.nonzero?
-      "#{ n.first_line_body }#{ tail }"
-    end
-  end
-
-
-  class CLI::Action
-
-    ACTIONS_ANCHOR_MODULE = -> { CLI::Actions }
-
-    Snag_::Lib_::CLI[]::Action[ self, :DSL ]
-
-    include CLI::Action::InstanceMethods
-
-    extend Snag_::Lib_::NLP[]::EN::API_Action_Inflection_Hack
-
-    inflection.inflect.noun :singular
-
-    def initialize client
-      super
-      @param_h = {}
-    end
-
-    def resolve_argv argv
-      [ nil, method( :invoke ), [ argv ] ]  # compat legacy
-    end
-
-    public :expression_agent
-
-    def paystream
-      request_client.paystream
-    end
-
-  private
-
-    #         ~ common optparse options ~
-
-    def dry_run_option o
-      o.on '-n', '--dry-run', 'dry run.' do
-        @param_h[:dry_run] = true
-      end
-    end
-
-    def verbose_option o
-      o.on '-v', '--verbose', 'verbose output.' do
-        @param_h[:be_verbose] = true
-      end
-    end
-
-    #         ~ some wanktastic hacks for [#030] -1, -2 etc ~
-
-    def leaf_create_option_parser
-      Snag_::CLI::Option::Parser.new
+      include Invocation_Methods_  # after box above
     end
   end
 end

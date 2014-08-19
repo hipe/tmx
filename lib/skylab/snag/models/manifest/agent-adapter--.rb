@@ -6,39 +6,38 @@ module Skylab::Snag
 
       # so we can keep track of what "services" the agents need
 
-      MEMBER_A_ = [
-        :all_nodes_p,
-        :file_utils_p,
-        :pathname,
-        :manifest_file_p,
-        :render_lines_p,
-        :tmpdir_p
-      ].freeze
-
-      Snag_::Lib_::Basic_Fields[ :client, self,
-        :globbing, :absorber, :initialize,
-        :field_i_a, MEMBER_A_ ]
-
-      attr_reader( * MEMBER_A_ )
+      def initialize * x_a
+        process_iambic_fully x_a
+      end
 
       def all_nodes
-        @all_nodes_p.call
+        @all_nodes.call
       end
 
-      def render_line_a node, *identifier_d
-        @render_lines_p[ node, *identifier_d ]
+      def build_file_utils * x_a
+        @file_utils[ x_a ]
       end
 
-      def get_subset_a
-        h = self.class::BASIC_FIELDS_H_
-        SUBSET_A_.reduce [] do |m, i|
-          m << i << instance_variable_get( h.fetch i )
-        end
+      def manifest_file
+        @manifest_file.call
       end
 
-      _intrinsic = [ :render_lines_p, :all_nodes_p ]
+      def render_line_a identifier_d, node
+        @render_line_a[ identifier_d, node ]
+      end
 
-      SUBSET_A_ = ( MEMBER_A_ - _intrinsic ).freeze
+      def produce_tmpdir * x_a
+        @produce_tmpdir[ x_a ]
+      end
+
+      Snag_::Lib_::Entity[][ self, -> do
+        o :properties,
+            :all_nodes,
+            :file_utils,
+            :manifest_file,
+            :render_line_a,
+            :produce_tmpdir
+      end ]
     end
   end
 end
