@@ -11,8 +11,14 @@ require_relative '../callback/core'
 
 module Skylab::TestSupport  # :[#021].
 
-  def self.constant i
-    self::Constants__.const_get i, false
+  class << self
+    def constant i
+      self::Constants__.const_get i, false
+    end
+
+    def debug_IO
+      self::Lib_::Stderr[]
+    end
   end
 
   Callback_ = ::Skylab::Callback
