@@ -193,7 +193,7 @@ module Skylab::TestSupport
         attr_reader :unique_stream_name_order_i_a
 
         def full_text
-          @full_text ||= @text_a.join ''  # remember we didn't chomp anything!
+          @full_text ||= @text_a.join EMPTY_S_  # remember we didn't chomp anything!
         end
       end
     end

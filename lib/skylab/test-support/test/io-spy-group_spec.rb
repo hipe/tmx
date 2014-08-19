@@ -20,7 +20,7 @@ module Skylab::TestSupport::TestSupport::IO
       red.write "r2\nnever see"
       g.lines.length.should eql(4)
       g.lines.map(&:stream_name).should eql([:red, :blue, :blue, :red])
-      g.lines.map(&:string).join('').should eql("r1\nb1\nb2\nr2\n")
+      g.lines.map(&:string).join( EMPTY_S_ ).should eql("r1\nb1\nb2\nr2\n")
     end
   end
 end

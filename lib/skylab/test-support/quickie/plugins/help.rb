@@ -39,7 +39,7 @@ module Skylab::TestSupport
         @y << "options:"
         TestSupport_::Lib_::CLI_table[
           :field, :field, :left, :show_header, false,
-          :left, '  ', :sep, '     ', :right, '',
+          :left, '  ', :sep, '     ', :right, EMPTY_S_,
           :write_lines_to, @y.method( :<< ),
           :read_rows_from, @svc.plugins._a.reduce( [] ) do |row_a, p|
             Multiline_column_B__[ row_a, p.syntax_moniker, p.some_desc_a ]
@@ -51,13 +51,13 @@ module Skylab::TestSupport
       Multiline_column_B__ = -> row_a, cel_a, a do
         col_a = [ cel_a ]
         if a.length.zero?
-          col_a << ''
+          col_a.push EMPTY_S_
         else
-          col_a << a.fetch( 0 )
+          col_a.push a.fetch 0
         end
         row_a << col_a
         if 1 < a.length
-          row_a.concat a[ 1 .. -1 ].map { |s| [ '', s ] }
+          row_a.concat a[ 1 .. -1 ].map { |s| [ EMPTY_S_, s ] }
         end ; nil
       end
 

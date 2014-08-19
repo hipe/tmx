@@ -222,7 +222,7 @@ module Skylab::TestSupport::Regret::API
     def cnstrct_output_pathname op
       tailpn = op.tail_pn
       _ext = tailpn.extname
-      _tail = "#{ tailpn.sub_ext( '' ) }#{ TEST_FILE_SUFFIX }#{ _ext }"
+      _tail = "#{ tailpn.sub_ext( EMPTY_S_ ) }#{ TEST_FILE_SUFFIX }#{ _ext }"
       op.test_dir_pn.join _tail
     end
 

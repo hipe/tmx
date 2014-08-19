@@ -2,7 +2,9 @@
 class ::String  # :1:[#sl-131] [#022] "to extlib or not to extlib.."
 
   def unindent  # (formerly 'deindent')
-    gsub! %r<^#{ ::Regexp.escape match( /\A[[:space:]]+/ )[ 0 ] }>, ''
+    gsub!(
+      %r<^#{ ::Regexp.escape match( /\A[[:space:]]+/ )[ 0 ] }>,
+      ::Skylab::TestSupport::EMPTY_S_ )
     self
   end
 end
@@ -24,6 +26,7 @@ module Skylab::TestSupport  # :[#021].
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
   EMPTY_A_ = [].freeze
+  EMPTY_S_ = ''.freeze
   MONADIC_TRUTH_ = -> _ { true }
   TestSupport_ = self  # there is another module called ::SL::TS::TS
 

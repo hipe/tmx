@@ -611,7 +611,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
       if 1 == y.length
         " #{ y[ 0 ] }"
       else
-        [ '', * y ] * "\n  "
+        [ EMPTY_S_, * y ] * "\n  "
       end
     end
 

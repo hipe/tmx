@@ -28,14 +28,14 @@ module Skylab::TestSupport::Regret::API
 
       module Output_Pathname_Functions__
         Branch_down_to_core = -> op do
-          _middle = op.tail_pn.sub_ext ''
+          _middle = op.tail_pn.sub_ext EMPTY_S_
           op.test_dir_pn.join _middle, "core_spec#{ op.tail_pn.extname }"
         end
         Default = -> op do
           _sfx = API::Actions::Recursive::TEST_FILE_SUFFIX
           tailpn = op.tail_pn
           _ext = tailpn.extname
-          _tail = "#{ tailpn.sub_ext( '' ) }#{ _sfx }#{ _ext }"
+          _tail = "#{ tailpn.sub_ext( EMPTY_S_ ) }#{ _sfx }#{ _ext }"
           op.test_dir_pn.join _tail
         end
       end

@@ -61,7 +61,7 @@ module Skylab::TestSupport::Regret::API
             y << [ name_i.to_s, line ]
             first = false
           else
-            y << [ '', line ]
+            y << [ EMPTY_S_, line ]
           end
         end
       end
@@ -201,7 +201,7 @@ module Skylab::TestSupport::Regret::API
     FUN::Descify = -> do
       rx = /:\z/
       -> str do
-        no_colon = str.gsub rx, ''
+        no_colon = str.gsub rx, EMPTY_S_
         no_colon.inspect
       end
     end.call

@@ -10,7 +10,7 @@ module Skylab::TestSupport
       DEFAULT_CORE_BASENAME_ = "core#{ Autoloader_::EXTNAME }"
       EMPTY_A_ = [].freeze
       EMPTY_P_ = -> {}
-      EMPTY_S_ = ''.freeze
+      EMPTY_S_ = EMPTY_S_
       Lib_ = TestSupport_::Lib_
       Library_ = TestSupport_::Library_
       Plugin_ = TestSupport_::Lib_::Heavy_plugin[]

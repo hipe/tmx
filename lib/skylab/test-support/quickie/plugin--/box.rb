@@ -27,7 +27,7 @@ module Skylab::TestSupport
         ::Dir[ "#{ mod.dir_pathname }/*#{ Autoloader_::EXTNAME }" ].
             reduce [] do |m, path|
           m << Lib_::Name_from_path_to_const[
-            ::Pathname.new( path ).basename.sub_ext '' ]
+            ::Pathname.new( path ).basename.sub_ext EMPTY_S_ ]
         end
       end
 

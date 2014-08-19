@@ -167,7 +167,7 @@ module Skylab::TestSupport
           dirname = pn.dirname    #     split it into a dirname
           basename = pn.basename  #     and a basename
         end                       #
-      elsif '' == pn.extname      # otherwise, if the path has no extension,
+      elsif pn.extname.length.zero?  # otherwise, if the path has no extension,
         dirname = pn              #   assume it's supposed to be a dir
       else                        # otherwise assume it's supposed to be a file
         dirname = pn.dirname      #   split it into a dirname
