@@ -39,27 +39,33 @@ module Skylab::Snag
       @error_count.zero?
     end
 
-    def max_count= integer_ref
-      begin
-        if integer_ref
-          if ::Fixnum === integer_ref
-            integer = integer_ref
-          elsif POSITIVE_INTEGER_RX__ =~ integer_ref
-            integer = integer_ref.to_i
-          else
-            send_error_string "must look like integer: #{ integer_ref }"
-            break
-          end
-          @counter = 0
-          @max_count = integer
-        else
-          @counter = nil
-          @max_count = nil
+    def max_count= integer_x
+      if integer_x
+        x = rslv_some_valid_max_count integer_x
+        if x
+          @counter = 0 ; @max_count = x
         end
-      end while nil
-      integer_ref
+      else
+        @counter = @max_count = nil
+      end
+      integer_x
+    end
+  private
+    def rslv_some_valid_max_count x
+      if x.respond_to? :integer? and x.integer?
+        x
+      elsif POSITIVE_INTEGER_RX__ =~ x
+        x.to_i
+      else
+        send_error_string say_not_integer x
+        UNABLE_
+      end
     end
     POSITIVE_INTEGER_RX__ = %r{\A\d+\z}
+    def say_not_integer x
+      "must look like integer: #{ x }"
+    end
+  public
 
     def phrasal_noun_modifier
       "with #{ @query.phrase }"

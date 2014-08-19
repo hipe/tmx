@@ -177,7 +177,7 @@ module Skylab::Snag
       /\A\W*\w{0,8}/.match( str )[0]
     end
 
-    define_method :delineate do
+    define_method :delineate do  # #todo during de-functionalization, re-write
       if ! @delineated
         res = nil
         begin

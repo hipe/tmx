@@ -81,6 +81,8 @@ module Skylab::Snag
       end
     end
 
+    inflection.inflect.noun :plural
+
     def melt *path
       if path.length.zero?  # triggering dflts to list params is not automatic
         path.concat Snag_::API::Actions::ToDo::Melt.attributes[ :paths ][ :default ]

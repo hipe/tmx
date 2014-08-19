@@ -43,6 +43,7 @@ module Skylab::Snag
       p[ self ]
       assert_all_channels_handled
       @API_client = _API_client
+      @error_count = 0
       @nodes = @param_h = nil
       super()
     end
@@ -62,56 +63,61 @@ module Skylab::Snag
   public
 
     def invoke param_h=nil
-      res = nil
-      begin
-        @param_h and fail 'sanity'
-        @param_h = param_h || { }
-        res = absorb_param_h
-        res or break
-        res = execute  # false ok - pass it to modal. don't handle ui here.
-      end while nil
-      res
+      @param_h = param_h || {}
+      ok = absorb_param_h
+      ok && execute
     end
 
   private
 
-    def absorb_param_h            # [#hl-047] this kind of algo, sort of
-      res = false
-      begin
-        formal = self.class.attributes_or_params
-        extra = @param_h.keys.reduce [] do |m, k|
-          m << k if ! formal.has? k
-          m
+    def absorb_param_h  # :+[#hl-047] (bridge)
+      @formal = self.class.attributes_or_params
+      ok = bork_on_unexpected_params
+      ok && mutate_param_h_with_defaults_else_set_the_ivars_to_nil
+      ok &&= check_for_missing_required_params
+      ok && absorb_the_request_params_into_ivars
+    end
+
+    def bork_on_unexpected_params
+      xtra_a = @param_h.keys.reduce nil do |m, i|
+        @formal.has? i or ( m ||= [] ).push i ; m
+      end
+      ! xtra_a or begin
+        send_error_string say_extra xtra_a
+        UNABLE_
+      end
+    end
+
+    def mutate_param_h_with_defaults_else_set_the_ivars_to_nil
+      @formal.each_pair do |i, prop|
+        ivar = :"@#{ i }"
+        if prop.has?( :default ) && @param_h[ i ].nil?
+          @param_h[ i ] = prop[ :default ]
+        elsif ! instance_variable_defined? ivar
+          instance_variable_set ivar, nil
         end
-        if extra.length.nonzero?               # 1) bork on unexpected params
-          send_error_string say_extra extra
-          break
-        end
-        formal.each do |k, meta|               # 2) mutate the request h with
-          ivar = :"@#{ k }"
-          if meta.has?( :default ) && @param_h[k].nil?  # defaults iff nec.
-            @param_h[k] = meta[:default]       # (else set the ivar to nil!!)
-          elsif ! instance_variable_defined? ivar
-            instance_variable_set ivar, nil
-          end
-        end
-        missing = formal.each.reduce [] do |m, (k, meta)|  # 3) aggregate and
-          if meta[:required] && @param_h[k].nil?  # then bork on required
-            m << k                             # missing actual params.
-          end
-          m
-        end
-        if missing.length.nonzero?
-          send_error_string say_missing missing
-          break
-        end
-        @param_h.each do |k, v|                # 4) absorb the request params
-          send "#{ k }=", v                    #    by going thru the writers
-        end
-        @param_h = nil
-        res = true
-      end while nil
-      res
+      end
+    end
+
+    def check_for_missing_required_params
+      miss_a = @formal.each_pair.reduce nil do |m, ( i, prop )|
+        if prop[ :required ] && @param_h[ i ].nil?
+          ( m ||= [] ).push i
+        end ; m
+      end
+      ! miss_a or begin
+        send_error_string say_missing miss_a
+        UNABLE_
+      end
+    end
+
+    def absorb_the_request_params_into_ivars
+      befor = @error_count
+      @param_h.each do |i, x|
+        send :"#{ i }=", x
+      end
+      @param_h = nil
+      befor == @error_count
     end
 
     def say_extra a

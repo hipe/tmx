@@ -59,13 +59,34 @@ module Skylab::Snag
         And__[ a ]
       end
 
-      And__ = -> do
-        p = -> a do
-          p = Snag_::Lib_::EN_mini[]::Oxford_comma_.curry[ ', ', ' and ' ]
-          p[ a ]
+      def or_ a
+        Or__[ a ]
+      end
+
+      monadic_memoize = -> p do
+        p_ = -> a do
+          p_ = p[]
+          p_[ a ]
         end
-        -> a { p[ a ] }
-      end.call
+        -> a { p_[ a ] }
+      end
+
+      oxford_comma = -> penult do
+        p = Snag_::Lib_::EN_mini[]::Oxford_comma_.curry[ ', ' ]
+        oxford_comma = p
+        p[ penult ]
+      end
+
+      oxford_comma_with = -> s do
+        monadic_memoize[ -> do
+          oxford_comma[ s ]
+        end ]
+      end
+
+      And__ = oxford_comma_with[ ' and ' ]
+
+      Or__ = oxford_comma_with[ ' or ' ]
+
 
       def s x, i=:s
         Snag_::Lib_::EN_mini[]::FUN.s[ x, i ]

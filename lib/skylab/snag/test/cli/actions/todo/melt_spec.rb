@@ -8,6 +8,22 @@ module Skylab::Snag::TestSupport::CLI::Actions
 
     with_invocation 'todo', 'melt'
 
+    context "when no todo's are found" do
+
+      with_tmpdir do |o|
+        o.clear.write 'foo.source-code', <<-O.unindent
+          there is no todo here
+        O
+      end
+
+      it "awesome awesome awesome self-describing find structure" do
+        invoke '--name', '*.source-code', '.'
+        expect :info, %r(\Awhile melting todos, found no todo's in \. #{
+          }named \*\.source-code with the pattern \[@#\]todo\\>\z)
+        expect_succeeded
+      end
+    end
+
     context "with a plain old ##{}todo after a line, with no message" do
 
       with_tmpdir do |o|

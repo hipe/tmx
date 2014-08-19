@@ -27,40 +27,51 @@ module Skylab::Snag
       super listener, _API_client
     end
 
-    def melt  # public
-      res = true
-      begin
-        @file_changes.clear
-        cmd = @todos.command  # even if only used in error, couple to it now
-        @todos.each do |tod|
-          res = todo tod.collapse  # turn a flyweight into a proper model, b.c
-          false == res and break   # we will do some heavy lifing w/ it
+    def melt
+      @file_changes.clear
+      @cmd = @todos.command  # even if only used in error, couple to it now
+      ok = crt_open_nodes
+      ok && melt_when_nodes_opened
+    end
+  private
+    def crt_open_nodes
+      ok = ACHIEVED_
+      @todos.each do |tod|
+        ok_ = todo tod.collapse
+        if UNABLE_ == ok_
+          ok = UNABLE_
+          break
         end
-        false == res and break
-        cnt = @todos.seen_count
-        res = nil
-        if cnt
-          if cnt.zero?
-            send_info_string say_found_no_todos cmd
-          else
-            res = true
-          end
+      end
+      ok
+    end
+    def melt_when_nodes_opened
+      cnt = @todos.seen_count
+      if cnt
+        if cnt.zero?
+          send_info_event bld_found_no_todos_event @cmd
         else
-          send_info_string say_did_not_search
-          res = false
+          ok = ACHIEVED_
         end
-        res or break
+      else
+        send_info_string say_did_not_search
+        ok = UNABLE_
+      end
+      if ok
         if @file_changes.length.nonzero?
-          res = file_changes_flush
+          ok = flush_file_changes
         end
-      end while nil
-      res
+      end
+      ok
     end
 
-  private
-
-    def say_found_no_todos cmd
-      "found no todo's #{ cmd.prepositional_phrase_under self }"
+    def bld_found_no_todos_event cmd
+      _ev = cmd.to_phrasal_noun_modifier_event
+      Snag_::Model_::Event.inline :found_no_todo, :find_ev, _ev do |y, o|
+        calculate y_=[], o.find_ev, & o.find_ev.message_proc
+        _s = y_ * SPACE_
+        y << "found no todo's #{ _s }"
+      end
     end
 
     def say_did_not_search
@@ -110,11 +121,11 @@ module Skylab::Snag
 
     define_method :change_source_line do |todo, node|
       res = true
-      begin
+      begin  # #todo - during de-functionalization re-write this
         fail 'sanity - should have checked for empty message body string' if
           ! todo.message_body_string
         if @file_changes.length.nonzero? && @file_changes.last.path != todo.path
-          res = file_changes_flush or break
+          res = flush_file_changes or break
         end
         pre_comment = todo.pre_comment_string
         if ENDING_IN_ONLY_ONE_SPACE_RX__ =~ pre_comment
@@ -135,25 +146,24 @@ module Skylab::Snag
     ENDING_IN_ONLY_ONE_SPACE_RX__ = /(?<![ ])[ ]\z/
     OPEN_TAG_S__ =  Models::Tag.canonical_tags.open_tag.render
 
-    def file_changes_flush
-      res = nil
-      begin
-        break if @file_changes.length.zero?
-        first = @file_changes.first
-        lines = Snag_::Library_::
-          Basic::List::Scanner::For::Path[ first.pathname ]
-        patch = Snag_::Lib_::Text_patch[]::Models::ContentPatch.new lines
-        @file_changes.each do |todo|
-          patch.change_line todo.line_number, todo.replacement_line
-        end
-        res = Snag_::Lib_::Text_patch[].file patch.render_simple,
-          first.path, @dry_run, @be_verbose, method( :send_info_line )
-        # typically an exit_code, like 0
-        res or break
+    def flush_file_changes
+      @file_changes.length.nonzero? and flsh_nonzero_file_changes
+    end
+
+    def flsh_nonzero_file_changes
+      first = @file_changes.first
+      lines = Snag_::Library_::Basic::List::Scanner::For::Path[ first.pathname ]
+      patch = Snag_::Lib_::Text_patch[]::Models::ContentPatch.new lines
+      @file_changes.each do |todo|
+        patch.change_line todo.line_number, todo.replacement_line
+      end
+      ok = Snag_::Lib_::Text_patch[].file patch.render_simple,
+        first.path, @dry_run, @be_verbose, method( :send_info_line )
+      if ok  # typically an exit_code, like 0
         send_info_line say_summary_of_changes_in_file
         @file_changes.clear
-      end while nil
-      res
+        NEUTRAL_
+      end
     end
 
     def say_summary_of_changes_in_file
@@ -177,7 +187,7 @@ module Skylab::Snag
         # add words to the excerpt so long as the next word would not
         # put you over the limit, taking into account spaces and ellipses etc
         res = nil
-        begin
+        begin  # #todo during de-functionalization, rewrite this
           words = todo.message_body_string.split sp
           words.length.zero? and break # maybe just sanity
           available_length = line_width - ( new_line.length + sep.length )
@@ -231,6 +241,10 @@ module Skylab::Snag
 
     def send_info_string s
       @listener.receive_info_string s ; NEUTRAL_
+    end
+
+    def send_info_event ev
+      @listener.receive_info_event ev ; NEUTRAL_
     end
     end
   end

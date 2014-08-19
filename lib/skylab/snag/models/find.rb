@@ -87,15 +87,14 @@ module Skylab::Snag
       end
     end
 
-    #        ~ couresy & rendering ~
-
-    def prepositional_phrase_under client  # like [#029]
-      my = self
-      client.instance_exec do
-        y = [ ]
+    def to_phrasal_noun_modifier_event  # (was [#029])
+      Snag_::Model_::Event.inline(
+          :find_phrasal_noun_modifier, :find, self ) do |y, o|
+        my = o.find
 
         e = -> sym do
           -> msg do
+            self._COVER_ME  # #todo cover reporting errors in the find struct
             y << "with #{ sym } #{ omg "which #{ msg }" }"
           end
         end
@@ -108,7 +107,7 @@ module Skylab::Snag
 
         my.patrn -> p { y << "with the pattern #{ val[ p ] }" }, e[ :pattern ]
 
-        y * SPACE_
+        nil
       end
     end
   end
