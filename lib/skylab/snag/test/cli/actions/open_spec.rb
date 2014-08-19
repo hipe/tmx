@@ -19,6 +19,16 @@ module Skylab::Snag::TestSupport::CLI::Actions
       nil
     end
 
+    context "with options that don't make sense for that form" do
+      it '"foo is for X not Y"' do
+        do_not_setup_tmpdir
+        invoke 'open', '--dry-run'
+        expect %r(\Asorry - --dry-run is used for opening issues, not #{
+          }listing open issues\z)i
+        expect %r(\Asn0g open -h might have more information\z)i
+      end
+    end
+
     context "with no arguments show a report of open tickets!" do
 
       it "`open` (with no options) - shows a subset of lines from the file" do
