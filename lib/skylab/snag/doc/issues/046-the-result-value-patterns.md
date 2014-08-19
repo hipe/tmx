@@ -25,7 +25,7 @@ results via the listeners they pass in to the call.
 
 
 
-### a true-ish from an error handler may be ignored and becomes false :[#017]
+### a true-ish from an error handler may be ignored and become false :[#017]
 
 sometimes with the result of error callbacks, if the callback did not
 result in false-ish we result in false. so:
@@ -47,6 +47,26 @@ because of the above, in certain places we do not want the error handler
 to make what we perceive as being a failure appear as anything other
 than a failure. ultimately, though, this is a design question as to
 whether or not a method will employ this convention.
+
+
+
+
+### a false-ish from a success handler may be upgraded to true-ish :[#062]
+
+for a listener to produce a value as a result of delivering an event;
+this can be convenient but is not reliable.
+
+because its ability to do this depends on things like whether or not the
+listener is synchronous (on a given channel) and whether its downstream is
+one or multiple other listeners; i.e "the event model".
+
+since at the time of this writing our listener may either be of the
+"ordered dictionary" variety or it is an adapter from a digraph-style
+callback tree, we can't be sure that the result is meaningful.
+
+so what we do in such cases is that iff true-ish we assume the
+listener-produced result is meaninful, otherwise we "upgrade" the result
+to be meaninful (i.e the success value).
 
 
 

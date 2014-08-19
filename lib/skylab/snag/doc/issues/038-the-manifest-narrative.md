@@ -9,7 +9,7 @@ would that it needs any introduction
 ## #note-75
 
 using a hacky regex, scan all msgs emitted by the file utils client and with
-any string that looks like an aboslute path run it through `escape_path_p`
+any string that looks like an aboslute path run it through a
 proc (*of the modality client*, e.g). in turn, `call_digraph_listeners`
 these messages as info to `info_event_p`, presumably to the same modality client.
 
@@ -78,7 +78,7 @@ implementation if we ever need it.
 
 
 
-## line edit notes
+## line edit notes  :#note-9
 
 • `at_position_x`  when it is zero it means "insert the new lines at
                    the begnning of the file" else it is expected to be a
@@ -86,41 +86,21 @@ implementation if we ever need it.
    lines for that node.
 
 
-• `error_event_p`  error callback (is passed what?) to be called for e.g when
-                   the node is not found. for a limited time only will
-                   get strings [#061]
-
-
-• `escape_path_p`  #eew should be curried into above
-
-
-• `file_utils_p`  #eew ditto
-
-
-• `info_event_p`  called for e.g verbose output or informational.
-                  for a limited time only this will support strings [#061]
-
-
-• `is_dry_run`  will not actually write to disk, but tries to otherwise
-                be a realistic simulation
-
-
-• `manifest_file_p`  the model of the file, for our persistence impl.
+• `is_dry_run`  will not actually move the final changed manifest into
+                place, but otherwise attempts a realistic simulation.
 
 
 • `new_line_a`  the array of lines to insert or replace
 
 
-• `pathname`  #todo - redundant with above
+• `verbose_x`  perhaps more events will be emitted depending on the value
 
 
-• `raw_info_p` probably lines to be written directly to stderr
+• `client` provides facilities needed by this agent like the manifest
+           file, access to a tmpdir, acces to a file utils controller.
 
+• `listener` is per eventmodel
 
-• `tmpdir_p`  used for our persistence implementation
-
-
-• `verbose_x`  perhaps more events will be emitted
 
 
 

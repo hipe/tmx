@@ -24,12 +24,15 @@ yeah?) do it for you.
 So for now we flatten events into strings before they leave the mode
 client.
 
+
+
 ## the new frontier of event graphs..
 
 For a given modal chunk of your system that is a source of events
 (an API being a perfect example), it should
 A) have an event omni-graph that is coherent with itself, that is
 an event with a stream name .. NO
+
 
 
 ## thoughs on UI.. (specifically invitations, e.g)

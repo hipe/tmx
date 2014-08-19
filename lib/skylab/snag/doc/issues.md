@@ -1,10 +1,11 @@
-[#061] #open stop emitting strings
+[#062]       #parent-node: [#046] on success a cb's false-ish may be upgraded
+[#061] #open #parent-node: [#055] "stop emitting strings.."
 [#060]       #tracking-tag reasons we want something like adapters [#hl-067]
 [#059]       #parent-node: [#039] the grand simplification thru scanners ..
 [#058] #open probably get rid of all use of `date_string`
 [#057]       #doc-node the model
-[#056]       #doc-node structures for our API implementation
-[#055]       #parent-node: [#056] the API action narrative ..
+[#056] #hole
+[#055]       #parent-node: [#006] the API action narrative ..
 [#054] #open no sub-client here
 [#053]       #doc-node structures for our CLI implementation
 [#052]       #parent-node: [#053] the CLI node
@@ -13,8 +14,8 @@
 [#049]       #parent-node: [#046] a cb error result may be propagagted
 [#048]       #parent-node: [#046] a cb error result may be disregarded
 [#047]       #parent-node: [#046] info channel result value is never meaningful
-[#046]       #parent-node: [#039] the result value patterns
-[#045] #open node controller is the biggest mess
+[#046]       #parent-node: [#039] the result value patterns ..
+[#045] #open `delineate` needs an overhaul (and: #parent-node: [#057])
 [#044]       #tracking-tag whether or not we want inline events
 [#043]       #parent-node: [#011] #in-situ tags are case-sensitive for now
 [#042]       #parent-node: [#040] #in-situ method names are not channel names
@@ -56,7 +57,8 @@
 [#009] #open awesome semantic open tag search - ("smart twitter")
 [#008]       #done -n on all destructive actions
 [#007]       #done autoloadify
-[#006]       #done reanme Api -> API, P-orcelain -> CLI
+[#006]       #doc-node structures for our API implementation ..
+             (was: reanme Api -> API, P-orcelain -> CLI)
 [#005]       #done get cli working again
 [#004]       #done light fast solo CLI client 2012-11-12
 [#003]       #done tree report of todos 2012-10-13
