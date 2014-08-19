@@ -5,7 +5,7 @@
 [#061] #open #parent-node: [#055] "stop emitting strings.."
 [#060]       #tracking-tag reasons we want something like adapters [#hl-067]
 [#059]       #parent-node: [#039] the grand simplification thru scanners ..
-[#058] #open probably get rid of all use of `date_string`
+[#058]       #done get rid of all use of `date_string`
 [#057]       #doc-node the model
 [#056] #hole
 [#055]       #parent-node: [#006] the API action narrative ..

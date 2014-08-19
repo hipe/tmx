@@ -3,7 +3,7 @@ module Skylab::Snag
   class Models::Node::Controller__ < Snag_::Model_::Controller  # see [#045]
 
     def initialize listener, _API_client
-      @date_string = @delineated = @do_prepend_open_tag = nil
+      @delineated = @do_prepend_open_tag = nil
       @do_prepend_open_tag_ws = true
       @error_count = 0
       @extra_line_header = nil
@@ -65,17 +65,6 @@ module Skylab::Snag
       end
     end
   public
-
-    attr_reader :date_string
-
-    def date_string= string
-      ok = Models::Date.normalize string, @listener
-      if ok
-        undelineate
-        @date_string = ok
-      end
-      string
-    end
 
     def do_prepend_open_tag= b
       undelineate
@@ -199,7 +188,6 @@ module Skylab::Snag
               end
             end
             parts.push @message if @message
-            parts.push @date_string if @date_string
             parts.join SPACE_
           end.call # '' might be ok
 

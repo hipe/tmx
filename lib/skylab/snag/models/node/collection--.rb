@@ -12,9 +12,6 @@ module Skylab::Snag
     def add message, do_prepend_open_tag, dry_run, verbose_x, listener
 
       o = Models::Node.build_controller listener, @API_client
-
-      # node.date_string = todays_date   # [#058] #open
-      #
       o.message = message
       o.do_prepend_open_tag = do_prepend_open_tag
       if o.is_valid
@@ -72,14 +69,6 @@ module Skylab::Snag
 
     def all
       Node_.build_scan_from_lines @manifest.manifest_file.normalized_line_producer
-    end
-
-  private
-
-    date_format = '%Y-%m-%d'
-
-    define_method :todays_date do
-      Snag_::Library_::DateTime.now.strftime date_format
     end
 
     Node_ = Models::Node

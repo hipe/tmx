@@ -10,14 +10,13 @@ module Skylab::Snag::TestSupport::Models::Node
 
       it "with 3 things added under 73 chars, delineates to one line" do
         node = build_node
-        node.date_string = '2013-01-04'
         node.do_prepend_open_tag = true
         node.message = "gary jules - mad word (manic focus remix)"
         node.first_line_body.object_id.should eql(
         node.first_line_body.object_id )
         node.first_line_body.frozen?.should eql( true )
         node.first_line_body.should eql(
-          '#open gary jules - mad word (manic focus remix) 2013-01-04' )
+          '#open gary jules - mad word (manic focus remix)' )
       end
 
       it "with one line that is just a bunch of words longer than 73 chars" do

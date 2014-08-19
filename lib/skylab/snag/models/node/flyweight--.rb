@@ -12,7 +12,6 @@ module Skylab::Snag
       :identifier_prefix,
       :identifier_body,
       :first_line_body,
-      :date_string,
       :extra_lines_count
     ].freeze
 
@@ -38,9 +37,6 @@ module Skylab::Snag
       a = [
         [ :identifier_body, identifier_body ],
         [ :first_line_body, first_line_body ] ]
-      if (( s = date_string ))
-        a.push [ :date_string, s ]
-      end
       if extra_lines_count.nonzero?
         a.push [ :extra_lines_count, extra_lines_count ]
       end
@@ -81,14 +77,6 @@ module Skylab::Snag
 
     def first_line_body
       @first_line[ @indexes.body.range ]
-    end
-
-    date_rx = /\b\d{4}-\d{2}-\d{2}\b/          # (just know that dates like
-                                               # this might be deprecated
-    define_method :date_string do              # in lieu of vcs integration)
-      if date_rx =~ @first_line
-        $~[0]
-      end
     end
 
     def extra_lines_count
