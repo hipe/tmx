@@ -58,6 +58,16 @@ module Skylab::Snag::TestSupport
 
   end
 
+  # ~ business
+
+  module InstanceMethods
+    def with_API_max_num_dirs d
+      Skylab::Snag::API::Client.setup -> o do
+        o.max_num_dirs_to_search_for_manifest_file = d  # #open [#050]
+      end ; nil
+    end
+  end
+
   # ~ tmpdir setup writing & reading
 
   module ModuleMethods

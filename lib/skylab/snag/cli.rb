@@ -408,7 +408,12 @@ module Skylab::Snag
 
       def call_API * a, & p
         x = new_API_invocation.with_a_and_p( a, p ).execute
-        UNABLE_ == x ? invite_to_self : x
+        if UNABLE_ == x
+          invite_to_self
+          UNABLE_
+        else
+          x
+        end
       end
 
       def sign_event ev

@@ -58,5 +58,74 @@ module Skylab::Snag::TestSupport::CLI
         c.full_text.should be_include( 'melt is insanity' )
       end
     end
+
+    context "'numbers' with" do
+
+      with_invocation 'numbers'
+
+      with_default_expected_stream_name :pay
+
+      context "a manifest with two good lines" do
+        with_manifest <<-O.unindent
+          [#001] foo
+          [#3] bar
+        O
+        it "ok" do
+          setup_tmpdir_read_only
+          invoke
+          o '[#001]'
+          o '[#3]'
+          o :info, found_N_valid_of_N_total( 2, 2 )
+          expect_succeeded
+        end
+      end
+
+      context "a manifest with no lines" do
+        with_manifest TestSupport_::EMPTY_S_
+        it "ok." do
+          setup_tmpdir_read_only
+          invoke
+          o :info, found_N_valid_of_N_total( 0, 0 )
+          expect_succeeded
+        end
+      end
+
+      context "no manifest" do
+        with_tmpdir do |o|
+          o.clear
+        end
+        it "ok. (note the event is SIGNED TWICE - by both CLI and API!)" do
+          setup_tmpdir_read_only
+          with_API_max_num_dirs 1
+          invoke
+          expect :info,
+            %r(\Afailed to numbers because failed to find manifest file - #{
+              }"[^"]+" not found in \.\z)i
+          expect :info, %r(\Asn0g numbers -h might have more info)i
+          expect_failed
+        end
+      end
+
+      context "a manifest with two good one bad" do
+        with_manifest <<-O.unindent
+          [#01]
+          fml
+          [#99]
+        O
+        it "ok." do
+          setup_tmpdir_read_only
+          invoke
+          o '[#01]'
+          o :info, %r(\bexpecting identifier near fml \(\./doc/issues\.md:2\))i
+          o '[#99]'
+          o :info, found_N_valid_of_N_total( 2, 3 )
+          expect_succeeded
+        end
+      end
+
+      def found_N_valid_of_N_total d, d_
+        "found #{ d } valid of #{ d_ } total nodes."
+      end
+    end
   end
 end

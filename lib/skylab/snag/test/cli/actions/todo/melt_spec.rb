@@ -58,9 +58,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
           [#002]       i started at two just to be cute
         O
 
-        Skylab::Snag::API::Client.setup -> client do
-          client.max_num_dirs_to_search_for_manifest_file = 1  # #open [#050]
-        end
+        with_API_max_num_dirs 1
       end
 
       it "ADDS LINE TO MANIFEST AND CHANGES SOURCE CODE LINE" do

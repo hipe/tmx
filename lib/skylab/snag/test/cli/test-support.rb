@@ -103,6 +103,12 @@ module Skylab::Snag::TestSupport::CLI
 
   # ~ expectations
 
+  module ModuleMethods
+    def with_default_expected_stream_name i
+      define_method :default_expected_stream_name do i end ; nil
+    end
+  end
+
   module InstanceMethods
 
     def expect * x_a
@@ -117,7 +123,7 @@ module Skylab::Snag::TestSupport::CLI
 
     def expct_via_nonzero_length_x_a x_a
       case x_a.length
-      when 1 ; chan_i = :info ; x = x_a.first
+      when 1 ; chan_i = default_expected_stream_name ; x = x_a.first
       when 2 ; chan_i, x = x_a
       else   ; raise ::ArgumentError, "[channel] { rx | string }"
       end
@@ -131,6 +137,10 @@ module Skylab::Snag::TestSupport::CLI
       else
         emission.string.should match x
       end ; nil
+    end
+
+    def default_expected_stream_name
+      :info
     end
 
     def expect_failed
