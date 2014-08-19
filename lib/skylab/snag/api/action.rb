@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class API::Action               # (following [#sl-110] order)
+  class API::Action  # read [#055]
 
     ACTIONS_ANCHOR_MODULE = -> { API::Actions }
 
@@ -13,14 +13,9 @@ module Skylab::Snag
 
     Callback_[ self, :employ_DSL_for_digraph_emitter ]  # #note-10
 
-    event_factory Snag_::Lib_::Memoize[ -> do  # #note-15
-      Callback_::Event::Factory::Isomorphic.new API::Events
-    end ]
-
-
-    taxonomic_streams(* Snag_::API::Events.taxonomic_streams ) # #note-20
-
-    listeners_digraph  error: :lingual  # #note-25
+    event_factory -> do
+      API::Event_Factory
+    end  # #note-15
 
     class << self  # ~ minimal hand-rolled
 
@@ -44,28 +39,27 @@ module Skylab::Snag
       end
     end
 
-
-    include Snag_::Core::SubClient::InstanceMethods
-
-    def initialize _
-      @listener = @nodes = @param_h = nil
-      super
+    def initialize p, _API_client
+      p[ self ]
+      assert_all_channels_handled
+      @API_client = _API_client
+      @nodes = @param_h = nil
+      super()
     end
 
-    def invoke_via_iambic x_a
-      h = {} ; d = 0 ; length = x_a.length
-      while d < length
-        h[ x_a.fetch( d ) ] = x_a.fetch( d + 1 )
-        d += 2
+    attr_reader :up_from_path
+
+  private
+    def assert_all_channels_handled
+      if_unhandled_stream_names -> missed_a do
+        raise say_unhandled missed_a
       end
-      if h.key? :listener
-        @listener = h.delete :listener
-        @prefix = h.delete :prefix
-      end
-      @param_h = h
-      ok = absorb_param_h
-      ok && execute
     end
+
+    def say_unhandled missed_a
+      "unhandled channel(s): #{ missed_a * ', ' } (#{ self.class })"
+    end
+  public
 
     def invoke param_h=nil
       res = nil
@@ -79,8 +73,6 @@ module Skylab::Snag
       res
     end
 
-    attr_reader :up_from_path
-
   private
 
     def absorb_param_h            # [#hl-047] this kind of algo, sort of
@@ -92,8 +84,7 @@ module Skylab::Snag
           m
         end
         if extra.length.nonzero?               # 1) bork on unexpected params
-          error_string "#{ s extra, :this } #{ s :is } not #{ s :a }#{
-            }parameter#{ s }: #{ extra.join ', ' }"
+          send_error_string say_extra extra
           break
         end
         formal.each do |k, meta|               # 2) mutate the request h with
@@ -111,8 +102,7 @@ module Skylab::Snag
           m
         end
         if missing.length.nonzero?
-          error_string "missing required parameter#{ s missing }: #{
-            }#{ missing.join ', ' }"
+          send_error_string say_missing missing
           break
         end
         @param_h.each do |k, v|                # 4) absorb the request params
@@ -124,37 +114,86 @@ module Skylab::Snag
       res
     end
 
+    def say_extra a
+      expression_agent.calculate do
+        "#{ s a, :this } #{ s :is } not #{ s :a }#{
+          }parameter#{ s }: #{ a * ', ' }"
+      end
+    end
+
+    def say_missing a
+      expression_agent.calculate do
+        "missing required parameter#{ s a }: #{
+          }#{ a * ', ' }"
+      end
+    end
+
+    def expression_agent
+      API::EXPRESSION_AGENT
+    end
+
+    # ~ bridging the event gap [#note-136]
+
+    def to_listener
+      lstnr_to_digraph_proxy_class.new self
+    end
+    def lstnr_to_digraph_proxy_class
+      self.class.listener_to_digraph_proxy_cls
+    end
+    class << self
+      define_method :listener_to_digraph_proxy_cls, -> do
+        i = :Listener_to_Digraph_Proxy___
+        -> do
+          if const_defined? i, false
+            const_get i, false
+          else
+            const_set i, bld_listener_to_digraph_proxy_class
+          end
+        end
+      end.call
+    private
+      def bld_listener_to_digraph_proxy_class
+        i_a = chnnl_i_a
+        ::Class.new.class_exec do
+          def initialize act
+            @action = act
+          end
+          i_a.each do |i|
+            define_method :"receive_#{ i }" do |x|
+              @action.call_digraph_listeners i, x
+            end
+          end
+          self
+        end
+      end
+    end
+    public :call_digraph_listeners
+
+    class << self
+    private
+      def make_sender_methods
+        chnnl_i_a.each do |i|
+          define_method :"send_#{ i }" do |x|
+            send_to_listener i, x
+          end
+        end ; nil
+      end
+      def chnnl_i_a
+        event_stream_graph._a
+      end
+    end
+
     def send_to_listener i, x
       call_digraph_listeners i, x
-    end ; public :send_to_listener  # :+[#060]
+    end
 
-    # `build_event` - we override the one we get from [cb] to pass our
-    # factory 1 more parameter than usual (if e.g the event class being
-    # used is "lingual" it will take linguistic metadata from us, the
-    # caller).
+    # ~ overrides
 
-    def build_event stream_name, pay_x
+    def build_event stream_name, pay_x  # #note-195
       @event_factory.call @event_stream_graph_p.call, stream_name, self, pay_x
     end
 
-    def info_string s
-      if @listener
-        @listener.send :"on_#{ @prefix }_info_string", s
-      else
-        info s  # inorite
-      end
-    end
-
-    def error_string s
-      if @listener
-        @listener.send :"on_#{ @prefix }_error_string", s
-      else
-        error msg  # inorite
-      end
-    end
-
-
-    # ~ strictly business
+    include module Business_Methods___
 
     def execute
       nodes
@@ -162,23 +201,26 @@ module Skylab::Snag
     end
 
     def if_nodes_execute
-      @node = @nodes.fetch_node @node_ref
-      @node and if_node_execute
+      @node = @nodes.fetch_node @node_ref, to_listener
+      @node ? if_node_execute : UNABLE_  # we can't get errors back from digraph
     end
 
-    def manifest_pathname # #gigo
+    def manifest_pathname  # #gigo
       @nodes.manifest.pathname
     end
 
     def nodes
-      @nodes ||= rslv_any_nodes
+      @nodes ||= prdc_nodes
     end
 
-    def rslv_any_nodes
-      mani = request_client.find_closest_manifest up_from_path, -> msg do
-        error_string msg
+    def prdc_nodes
+      @API_client.models.nodes.collection_for @working_dir do |ev|
+        channel_i, ev_ = ev.unwrap
+        send_to_listener channel_i, ev_
+        UNABLE_
       end
-      mani and Snag_::Models::Node.build_collection mani, self
+    end
+    self
     end
   end
 end

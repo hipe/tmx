@@ -4,9 +4,9 @@ module Skylab::Snag
 
     Callback_[ self, :employ_DSL_for_digraph_emitter ]
 
-    listeners_digraph :error, :command
+    listeners_digraph :error_string, :command_string
 
-    event_factory Snag_::API::Events::Datapoint
+    event_factory -> _, __, x { x }
 
     # (primary public method is `each` whose private impl is `visit`)
 
@@ -29,11 +29,14 @@ module Skylab::Snag
       if all_required_events_are_handled
         res = true
         @seen_count = 0
-        err = -> e { call_digraph_listeners :error, e ; res = false }
+        err = -> ev do
+          send_to_listener :error_event, ev
+          res = false
+        end
         @command.pattern -> p do
           @pattern = p
           @command.command -> cmd do
-            call_digraph_listeners :command, cmd
+            send_to_listener :command_string, cmd
             visit_valid y, cmd
           end, err
         end, err
@@ -44,11 +47,8 @@ module Skylab::Snag
     def all_required_events_are_handled
       if_unhandled_stream_names -> a do
         msg = "strict about event coverage for now - unhandled: #{ a * ', ' }"
-        if a.include? :error
-          raise ::RuntimeError, msg
-        else
-          call_digraph_listeners :error, msg
-        end
+        a.include? :error_string and raise ::RuntimeError, msg
+        send_to_listener :error_string, msg
       end, -> do  # else
         true
       end
@@ -64,10 +64,14 @@ module Skylab::Snag
         end
         serr.each_line do |line|
           res = false
-          call_digraph_listeners :error, "(unexpected output: #{ line.chomp })"
+          send_to_listener :error_string, "(unexpected output: #{ line.chomp })"
         end
       end
       res
+    end
+
+    def send_to_listener i, x
+      call_digraph_listeners i, x
     end
   end
 end

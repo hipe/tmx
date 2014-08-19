@@ -49,8 +49,8 @@ module Skylab::Snag::TestSupport
     end[ TestSupport_::Tmpdir.new TestLib_::Tmpdir_pathname[].join 'snaggle' ]
 
     -> x do
-      define_method :manifest_path do x end
-    end[ Snag_::API.manifest_path ]
+      define_method :manifest_file do x end
+    end[ Snag_::API.manifest_file ]
 
   end
 end

@@ -2,9 +2,13 @@ module Skylab::Snag
 
   class CLI
 
-    EXPRESSION_AGENT_ = class Expression_Agent_
+    class Expression_Agent_
 
       # subclass Snag_::Lib_::CLI[]::Pen::Minimal for less DIY
+
+      def initialize retrieve_param
+        @retrieve_param = retrieve_param
+      end
 
       alias_method :calculate, :instance_exec
 
@@ -20,14 +24,25 @@ module Skylab::Snag
 
       define_method :h2, o[ :green ]
 
-      def ick x
-        Snag_::Lib_::Strange[ x ]
-      end
+      define_method :ick, -> do
+        p = -> x do
+          p = Snag_::Lib_::Strange[].to_proc.
+            curry[ A_REASONABLY_SHORT_LENGTH_FOR_A_STRING__ ]
+          p[ x ]
+        end
+        -> x { p[ x ] }
+      end.call
+      A_REASONABLY_SHORT_LENGTH_FOR_A_STRING__ = 15
 
       define_method :kbd, o[ :green ]
 
-      def param i
-        "#{ i }"
+      def par i  # :+[#hl-036]
+        param = @retrieve_param[ i ]
+        if param.is_option
+          param.as_parameter_signifier
+        elsif param.is_argument
+          "<#{ param.as_slug }>"
+        end
       end
 
       def pth x
@@ -52,11 +67,9 @@ module Skylab::Snag
         -> a { p[ a ] }
       end.call
 
-      def s x
-        Snag_::Lib_::EN_mini[]::FUN.s[ x ]
+      def s x, i=:s
+        Snag_::Lib_::EN_mini[]::FUN.s[ x, i ]
       end
-
-      new
     end
   end
 end

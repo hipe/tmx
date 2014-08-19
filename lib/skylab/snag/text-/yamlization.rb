@@ -4,9 +4,11 @@ module Skylab::Snag
 
     Callback_[ self, :employ_DSL_for_digraph_emitter ]
 
-    listeners_digraph  :text_line
+    listeners_digraph :text_line
 
-    event_factory Snag_::API::Events::Datapoint
+    event_factory -> _, __, x do
+      x
+    end
 
     def initialize field_names
       _maxlen = field_names.reduce( 0 ) do |m, i|

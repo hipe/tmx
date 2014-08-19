@@ -50,6 +50,9 @@ module Skylab::Snag
     EN_mini = -> do
       NLP[]::EN::Minitesimal
     end
+    EN_FUN = -> mod, * x_a do
+      Headless__[]::SubClient::EN_FUN.on_mod_via_iambic mod, x_a
+    end
     Entity = -> do
       Brazen__[]::Entity
     end
@@ -83,11 +86,8 @@ module Skylab::Snag
     Pretty_path = -> x do
       Brazen__[]::CLI.pretty_path x
     end
-    Strange = -> x do
-      MetaHell__[].strange x
-    end
-    Sub_client = -> do
-      Headless__[]::SubClient  # :+#deprecation:watch
+    Strange = -> * x_a do
+      MetaHell__[].strange.via_argument_list x_a
     end
     SubTree__ = sidesys[ :SubTree ]
     Text_patch = -> do
@@ -98,6 +98,9 @@ module Skylab::Snag
     end
     Tree = -> do
       SubTree__[]::Tree
+    end
+    Walker = -> do
+      Brazen__[]::Models_::Workspace::Walker__
     end
     Writemode = -> do
       Headless__[]::WRITEMODE_

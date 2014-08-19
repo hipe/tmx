@@ -1,54 +1,75 @@
 module Skylab::Snag
 
-  class Models::Node::Controller__  # [#045] this whole file needs an overhaul
+  class Models::Node::Controller__ < Snag_::Model_::Controller  # see [#045]
 
-    include Snag_::Core::SubClient::InstanceMethods
-
-    def initialize flyweight, client
+    def initialize listener, _API_client
       @date_string = @delineated = @do_prepend_open_tag = nil
       @do_prepend_open_tag_ws = true
+      @error_count = 0
       @extra_line_header = nil
       @extra_line_a = []
       @first_line_body = @identifier = @line_width = nil
       @max_lines = @message = @is_valid = nil
-      flyweight and absorb_flyweight! flyweight
-      super client
+      super
     end
 
+    attr_reader :result_value
+
     def init_identifier int, node_number_digits
-      fail "won't clobber existing identifier" if @identifier
+      @identifier and raise say_wont_clobber_identifier
       _integer_s = "%0#{ node_number_digits }d" % int
       @identifier = Models::Identifier.new nil, _integer_s, nil
       nil
     end
+    def say_wont_clobber_identifier
+      "won't clobber existing identifier: #{ @identifier }"
+    end
 
-    def close
-      rm_x = remove_tag :open, :listener, gentle_listener
-      ad_x = add_tag :done, :prepend, :listener, @gentle_listener
-      if UNABLE_ == rm_x || UNABLE_ == ad_x
-        # an error for one is an error for all, don't rewrite file
-        UNABLE_
-      else
-        # two nils means it was fully redundant, do not rewrite file
-        # else at least one of them was trueish, rewrite file.
-        rm_x || ad_x
-      end
+    def with_flyweight flyweight
+      @identifier = flyweight.produce_identifier
+      a = [ flyweight.first_line_body ]
+      width = extra_lines_header.length
+      a.concat( flyweight.extra_line_a.map do |s|
+        if @extra_line_header == s[ 0, width ]
+          s[ @width .. -1 ]
+        else
+          s.strip
+        end
+      end )
+      @message = a * SPACE_
+      self
     end
   private
-    def gentle_listener
-      @gentle_listener ||= bld_gentle_listener
+    def extra_lines_header
+      @extra_lines_header ||= bld_xtra_lines_header
     end
-    def bld_gentle_listener
-      p = method :info
-      Snag_::Model_::Info_Error_Listener.new p, p
+
+    def bld_xtra_lines_header
+      # "[#867] #open ".length
+      _open_tag = Models::Tag.canonical_tags.open_tag
+      _d = Models::Manifest.header_width + _open_tag.render.length + 1
+      SPACE_ * _d
+    end
+  public
+
+    def close  # #narration-60
+      lstnr = @listener
+      p = lstnr.method :receive_info_event
+      listener_ = Snag_::Model_::Info_Error_Listener.new p, p
+      rm_x = remove_tag :open, :listener, listener_
+      ad_x = add_tag :done, :prepend, :listener, listener_
+      if UNABLE_ == rm_x || UNABLE_ == ad_x
+        UNABLE_
+      else
+        rm_x || ad_x
+      end
     end
   public
 
     attr_reader :date_string
 
     def date_string= string
-      ok = Models::Date.normalize string,
-        method( :error_string ), method( :info_string )
+      ok = Models::Date.normalize string, @listener
       if ok
         undelineate
         @date_string = ok
@@ -79,7 +100,7 @@ module Skylab::Snag
     attr_reader :identifier
 
     def message= msg
-      ok = Models::Message.normalize msg, method( :error_string )
+      ok = Models::Message.normalize msg, method( :receive_error_string )
       if ok
         undelineate
         @message = ok
@@ -93,7 +114,7 @@ module Skylab::Snag
     end
   private
     def determine_validity
-      if error_count.nonzero?
+      if @error_count.nonzero?
         @is_valid = false
       else
         determine_validity_when_error_count_is_zero
@@ -110,7 +131,7 @@ module Skylab::Snag
       if @first_line_body
         @is_valid = true
       else
-        error "node must have a message body."
+        send_error_string "node must have a message body."
         @is_valid = false
       end ; nil
     end
@@ -140,32 +161,16 @@ module Skylab::Snag
     end
 
     def bld_tags_listener
-      Callback_::Ordered_Dictionary.inline(
-        :error, method( :error ),
-        :info, method( :info ),
-        :change_body, method( :on_change_body_tag_event ) )
+      lstnr = @listener
+      Callback_::Ordered_Dictionary.inline.with( :suffix, nil ).inline(
+        :error_event, lstnr.method( :receive_error_event ),
+        :info_event, lstnr.method( :receive_info_event ),
+        :change_body_string, method( :receive_change_body_string ) )
     end
 
-    def on_change_body_tag_event s
+    def receive_change_body_string s
       @message = s ; undelineate
       @tc.set_body_s s ; nil
-    end
-
-    def absorb_flyweight! flyweight
-      # (this was written expecting it's called only from a constructor)
-      @delineated and fail 'test me'
-      @identifier = flyweight.produce_identifier
-      reduce = [ flyweight.first_line_body ]
-      reduce.concat( flyweight.extra_line_a.map do |el|
-        if 0 == el.index( extra_lines_header )
-          use = el[ extra_lines_header.length .. -1 ]
-        else
-          use = el.strip # sketchy but not really -- whatever
-        end
-        use
-      end )
-      @message = reduce.join SPACE_
-      nil
     end
 
     first_wrd = -> str do
@@ -212,7 +217,7 @@ module Skylab::Snag
               lines.push line
               true
             else
-              error_string "your message would exceed the #{
+              send_error_string "your message would exceed the #{
                }#{ max_lines } line #{
                 }limit (near #{ first_wrd[ line ].inspect })"
               @delineated = true               # avoid hiccups .. hm
@@ -263,16 +268,14 @@ module Skylab::Snag
       end
     end
 
-    def extra_lines_header
-      @extra_lines_header ||= bld_xtra_lines_header
+    def undelineate
+      @delineated = nil
+      @extra_line_a.clear
+      @first_line_body = nil
+      @valid = nil
     end
 
-    def bld_xtra_lines_header
-      # "[#867] #open ".length
-      _open_tag = Models::Tag.canonical_tags.open_tag
-      _d = Models::Manifest.header_width + _open_tag.render.length + 1
-      SPACE_ * _d
-    end
+    # ~ used by above
 
     def line_width
       @line_width || Models::Manifest.line_width  # don't memoize it
@@ -283,11 +286,20 @@ module Skylab::Snag
       @max_lines ||= Models::Node.max_lines_per_node
     end
 
-    def undelineate
-      @delineated = nil
-      @extra_line_a.clear
-      @first_line_body = nil
-      @valid = nil
+    # ~
+
+    def receive_error_string s
+      @error_count += 1
+      x = send_error_string s
+      @result_value = x || UNABLE_  # digraphs will never result in false
+    end
+
+    def send_error_string s
+      @listener.receive_error_string s
+    end
+
+    def send_info_string s
+      @listener.receive_info_string s
     end
   end
 end

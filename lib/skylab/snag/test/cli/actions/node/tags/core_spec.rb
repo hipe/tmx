@@ -81,7 +81,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
       it "no manifest"
 
       def failed
-        'failed to ls tag - '
+        'failed to ls tags - '
       end
     end
 

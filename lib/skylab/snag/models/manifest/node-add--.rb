@@ -5,25 +5,17 @@ module Skylab::Snag
     class Node_add__ < Agent_
 
       Snag_::Lib_::Basic_Fields[ :client, self,
-        :passive, :absorber, :absrb_iambic_passively,
-        :field_i_a, [ :client ] ]
+        :absorber, :absrb_iambic_fully,
+        :field_i_a, [ :is_dry_run, :verbose_x ] ]
 
       def initialize x_a
-        @node = x_a.shift
-        absrb_iambic_passively x_a
-        @info_event_p = Detect_info_p[ x_a ]
-        @rest_a = x_a
+        @node, @client, @listener = x_a.shift 3
+        x_a.length.nonzero? and absrb_iambic_fully x_a
       end
 
-      Detect_info_p = Snag_::Lib_::Basic_Fields[].iambic_detect.curry[ :info_event_p ]
-
       def execute
-        begin
-          r = int = determine_int or break
-          @int = int
-          r = work
-        end while nil
-        r
+        int = determine_int
+        int and work int
       end
 
     private
@@ -33,7 +25,7 @@ module Skylab::Snag
         loop do
           int += 1
           (( x = extern_h[ int ] )) or break
-          info_string "avoiding confusing number collision with #{ x }"
+          send_info_string "avoiding confusing number collision with #{ x }"
         end
         int
       end
@@ -53,12 +45,16 @@ module Skylab::Snag
         [ greatest, prefixed_h ]
       end
 
-      def work
-        r = Manifest_::Line_edit_[ :at_position_x, 0,
-          :new_line_a, @client.render_line_a( @node, @int ),
-          * @client.get_subset_a, * @rest_a ]
-        r and info_string "done."
-        r
+      def work d
+        ok = Manifest_::Line_edit_[
+          :at_position_x, 0,
+          :new_line_a, @client.render_line_a( d, @node ),
+          :is_dry_run, @is_dry_run,
+          :verbose_x, @verbose_x,
+          :client, @client,
+          :listener, @listener ]
+        ok and send_info_string "done."
+        ok
       end
     end
   end

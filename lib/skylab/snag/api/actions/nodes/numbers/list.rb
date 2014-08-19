@@ -2,9 +2,13 @@ module Skylab::Snag
 
   class API::Actions::Nodes::Numbers::List < API::Action_
 
-    Listener = Callback_::Ordered_Dictionary.new :error, :info, :output_line
+    Listener = Snag_::Model_::Listener.
+      new :error_event, :error_string,
+        :info_event, :info_string,
+        :output_line
 
-    Entity_[ self, :make_listener_properties, :make_sender_methods ]
+    Entity_[ self, :make_listener_properties, :make_sender_methods,
+      :required, :property, :working_dir ]
 
     def if_nodes_execute
       all_count = valid_count = 0
@@ -13,15 +17,15 @@ module Skylab::Snag
         if node.is_valid
           true
         else
-          info_event node.invalid_reason_event
+          receive_info_event node.invalid_reason_event
           false
         end
       end
       valid = valid.reduce_by { |_| valid_count += 1 ; true }
       valid.each do |node|
-        send_output_line_event node.render_identifier
+        send_output_line node.render_identifier
       end
-      info_string "found #{ valid_count } valid of #{ all_count } total nodes."
+      send_info_string "found #{ valid_count } valid of #{ all_count } total nodes."
       ACHIEVED_
     end
   end

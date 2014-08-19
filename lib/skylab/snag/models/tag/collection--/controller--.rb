@@ -53,7 +53,7 @@ module Skylab::Snag
           end
 
           def set_body_s s
-            @listener.receive_change_body_event s ; nil
+            @listener.receive_change_body_string s ; nil
           end
 
           def merge_listener x

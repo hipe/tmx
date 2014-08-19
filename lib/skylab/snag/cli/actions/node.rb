@@ -13,12 +13,14 @@ module Skylab::Snag
 
     def close node_ref
       call_API [ :node, :close ], {
-                 be_verbose: false,
                     dry_run: false,
-                   node_ref: node_ref
+                   node_ref: node_ref,
+                 be_verbose: false,
+                working_dir: working_directory_path
         }.merge( @param_h ) do |a|
-        a.on_info handle_info
-        a.on_error handle_error
+        a.on_error_event handle_error_event
+        a.on_error_string handle_error_string
+        a.on_info_event handle_info_event
       end
     end
   end
@@ -38,31 +40,37 @@ module Skylab::Snag
       verbose_option o
     end
 
+    inflection.inflect.noun :singular
+
     def add node_ref, tag_name
       call_API [ :node, :tags, :add ], {
                  be_verbose: false,
                   do_append: true,
                     dry_run: false,
                    node_ref: node_ref,
-                   tag_name: tag_name
-      }.merge( @param_h ) do |a|
-        a.on_error handle_error
-        a.on_info handle_info
+                   tag_name: tag_name,
+                working_dir: working_directory_path
+      }.merge( @param_h ) do |o|
+        o.on_error_event handle_error_event
+        o.on_info_event handle_info_event
       end
     end
 
     desc 'list the tags for a given node.'
 
+    inflection.inflect.noun :plural
+
     def ls node_ref
-      call_API(
-        [ :node, :tags, :ls ],
-        { node_ref: node_ref },
-        -> o do
-          o.on_error handle_error
+      call_API( [ :node, :tags, :ls ], {
+                    node_ref: node_ref,
+                 working_dir: working_directory_path
+        }, -> o do
+          o.on_error_event handle_error_event
           o.on_tags do |tags|
-            payload tags.render_under( self )  # just for fun i tell you
-            nil
+            tags.render_all_lines_into_under y=[], expression_agent
+            send_payload_line y * SPACE_ ; nil
           end
+
         end )
     end
 
@@ -73,14 +81,20 @@ module Skylab::Snag
       verbose_option o
     end
 
+    inflection.inflect.noun :singular
+
     def rm node_ref, tag_name
-      par_h = { dry_run: false, node_ref: node_ref,
-        tag_name: tag_name, be_verbose: false }
-      par_h.merge! @param_h
-      call_API [ :node, :tags, :rm ], par_h do |o|
-        o.on_error handle_error
-        o.on_info handle_info
-        o.on_payload handle_payload
+      call_API [ :node, :tags, :rm ], {
+                    dry_run: false,
+                   node_ref: node_ref,
+                   tag_name: tag_name,
+                 be_verbose: false,
+                working_dir: working_directory_path
+      }.merge!( @param_h ), -> o do
+        o.on_error_event handle_error_event
+        o.on_error_string handle_error_string
+        o.on_info_event handle_info_event
+        o.on_payload handle_payload_line
       end
     end
   end

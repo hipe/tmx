@@ -4,7 +4,7 @@ module Skylab::Snag
 
     box.desc 'make the magic happen'
 
-    desc "Add an \"issue\" line to #{ Snag_::API.manifest_path }" #[#hl-025]
+    desc "Add an \"issue\" line to #{ Snag_::API.manifest_file }"  #[#hl-025]
     desc "Lines are added to the top and are sequentially numbered."
 
     # desc ' arguments:' #                      DESC # should be styled [#hl-025]
@@ -22,11 +22,14 @@ module Skylab::Snag
                  be_verbose: false,
                     dry_run: false,
                     message: message,
-      }.merge( @param_h ) ) do |a|
-        a.on_error handle_error
-        a.on_info handle_info
-        a.on_raw_info handle_raw_info
-        a.on_new_node -> node do
+                working_dir: working_directory_path
+      }.merge( @param_h ) ) do |o|
+        o.on_error_event handle_error_event
+        o.on_error_string handle_error_string
+        o.on_info_event handle_info_event
+        o.on_info_line handle_inside_info_string
+        o.on_info_string handle_inside_info_string
+        o.on_new_node -> node do
           # oops the manifest takes care of it
           # info "added #{ node.identifier.render } #{ node_msg_smry node }"
         end
@@ -69,19 +72,22 @@ module Skylab::Snag
     # (this function was original conception point of #doc-point [#sl-102])
 
     def list identifier_ref=nil
-      call_API( [ :nodes, :reduce ],
-        {     be_verbose: true,
-          identifier_ref: identifier_ref }.merge!( @param_h ) ) do |a|
-        a.on_output_line handle_payload
-        a.on_info        handle_info
-        a.on_error       handle_error
-        a.on_invalid_node do |e|
-          info '---'
-          e2 = Snag_::API::Events::Lingual.new :esg, # hack  # #todo
-            nil, @bound_downtree_action,  # no stream name / what we collapsed to
-            "##{ invalid_node_message e }"
-          handle_error[ e2 ]  # whether or not it is an error is sort of a
-        end                   # soft design concern
+      call_API( [ :nodes, :reduce ], {
+              be_verbose: true,
+          identifier_ref: identifier_ref,
+             working_dir: working_directory_path
+          }.merge!( @param_h ) ) do |o|
+        o.on_error_event handle_error_event
+        o.on_error_string handle_error_string
+        o.on_info_event handle_info_event
+        o.on_info_string handle_info_string
+        o.on_invalid_node do |ev|
+          send_info_line '---'
+          _s = "##{ invalid_node_message ev }"
+          _ev = Snag_::Model_::Event.inflectable_via_string _s
+          handle_error_event[ _ev ]
+        end
+        o.on_output_line handle_payload_line
       end
     end
   end

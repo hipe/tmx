@@ -11,10 +11,14 @@ module Skylab::Snag
     attribute :do_prepend_open_tag, default: false
     attribute    :dry_run
     attribute    :message, required: false
+    attribute :working_dir
 
-    listeners_digraph  info: :lingual,
-                 new_node: :datapoint,
-                 raw_info: :datapoint
+    listeners_digraph :error_event,
+      :error_string,
+      :info_event,
+      :info_line,
+      :info_string,
+      :new_node
 
     inflection.inflect.noun :singular
 
@@ -25,9 +29,7 @@ module Skylab::Snag
         @do_prepend_open_tag,
         @dry_run,
         @be_verbose,
-        -> n do
-          send_to_listener :new_node, n
-        end
+        to_listener
     end
   end
 
@@ -36,12 +38,16 @@ module Skylab::Snag
     attribute :be_verbose, default: true
     attribute :include_all  # (includes invalid nodes)
     attribute :identifier_ref
-    attribute  :max_count
+    attribute :max_count
     attribute :query_sexp
+    attribute :working_dir, required: true
 
-    listeners_digraph  info: :lingual,
-            invalid_node: :datapoint,
-             output_line: :datapoint
+    listeners_digraph :error_event,
+      :error_string,
+      :info_event,
+      :info_string,
+      :invalid_node,
+      :output_line
 
     inflection.inflect.noun :plural
 
@@ -61,7 +67,7 @@ module Skylab::Snag
 
     def when_include_all_resolve_sexp
       if @sexp
-        error_string say_cannot_all
+        send_error_string say_cannot_all
       else
         @sexp = [ :all ]
         ACHIEVED_
@@ -70,7 +76,7 @@ module Skylab::Snag
 
     def from_any_OK_sexp_resolve_query
       @sexp ||= [ :valid ]
-      @query = @nodes.build_query @sexp, @max_count
+      @query = @nodes.build_query @sexp, @max_count, to_listener
       @query and ACHIEVED_
     end
 
@@ -94,7 +100,7 @@ module Skylab::Snag
 
     def execute_with_scan
       @lines = Monadic_Yielder__.new do |txt|
-        send_to_listener :output_line, txt
+        send_output_line txt
         nil
       end
       @y = if @be_verbose
@@ -129,12 +135,16 @@ module Skylab::Snag
 
     def in_scan_render_nodes
       scan = @scan
-      info_string "(looking at #{ escape_path manifest_pathname })"
+      _pn = manifest_pathname
+      _ev = Snag_::Model_::Event.inline :looking_at, :pn, _pn do |y, o|
+        y << "(looking at #{ pth o.pn })"
+      end
+      send_info_event _ev
       scan.each do |node|
         if node.is_valid
           @y << node
         else
-          send_to_listener :invalid_node, node
+          send_invalid_node node
         end
       end
       case 1 <=> @pass_count
@@ -144,10 +154,12 @@ module Skylab::Snag
       end
     end
 
+    make_sender_methods
+
     # these behaviors as such are not quite appropriate for the API :+[#061]
 
     def when_not_found
-      info_string "of #{ @total_count } searched, found no node #{
+      send_info_string "of #{ @total_count } searched, found no node #{
         }#{ @query.phrasal_noun_modifier }"
       NEUTRAL_
     end
@@ -161,7 +173,7 @@ module Skylab::Snag
     end
 
     def when_found_one_and_verbose
-      info_string "looked at #{ @total_count } nodes to find this one #{
+      send_info_string "looked at #{ @total_count } nodes to find this one #{
        }#{ @query.phrasal_noun_modifier }"
       NEUTRAL_
     end
@@ -172,7 +184,7 @@ module Skylab::Snag
       else
         "of #{ @total_count } seen nodes found #{ @pass_count } "
       end
-      info_string "#{ _s }#{ @query.phrasal_noun_modifier }"
+      send_info_string "#{ _s }#{ @query.phrasal_noun_modifier }"
       NEUTRAL_
     end
 

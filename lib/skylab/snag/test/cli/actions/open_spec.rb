@@ -7,7 +7,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
     extend TS_
 
     with_tmpdir do |o|
-      o.clear.write manifest_path, <<-O.unindent
+      o.clear.write manifest_file, <<-O.unindent
         [#004.2] #open this is #feature-creep but meh
         [#004] #open here's an open guy
                         with two lines
@@ -73,29 +73,34 @@ module Skylab::Snag::TestSupport::CLI::Actions
 <<-O.chop
 1234 6789 2234 6789 3234 6789 4234 6789 5234 6789 6234 6789 7234 6789 8234 6789
 O
+        set_cut_width 'while opening, '.length
 
-        next_raw_line = -> do  # not exatcly raw.. we chop exactly one char
-          line = output.lines.shift.string
-          line.chop!
-          line
-        end
+        next_cut_line.should eql 'added new lines:'
 
-        cutlen = 'while adding node, '.length
-
-        cut = -> str { str[ cutlen .. -1 ] }
-
-        next_cut_line = -> do
-          cut[ next_raw_line[] ]
-        end
-
-        next_cut_line[].should eql( 'new lines:' )
-
-        next_raw_line[].should eql(
+        next_chopped_line.should eql(
  "[#006] #open 1234 6789 2234 6789 3234 6789 4234 6789 5234 6789 6234 6789 7234"
         ) # 78 chars wide yay
-        next_raw_line[].should eql( "             6789 8234 6789" )  # DAMN STRA
-        next_cut_line[].should eql( 'done.' )
-        output.lines.length.should eql( 0 )
+        next_chopped_line.should eql "             6789 8234 6789"  # DAMN STRA
+
+        next_chopped_line.should eql 'done opening.'
+        output.lines.length.should be_zero
+      end
+
+      def set_cut_width d
+        @cut = -> str do
+          str[ d .. -1 ]
+        end ; nil
+      end
+
+      def next_cut_line
+        s = next_chopped_line
+        s and @cut[ s ]
+      end
+
+      def next_chopped_line
+        s = output.lines.shift.string
+        s.chop!
+        s
       end
     end
   end

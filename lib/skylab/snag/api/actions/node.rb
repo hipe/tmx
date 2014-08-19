@@ -8,9 +8,12 @@ module Skylab::Snag
 
     params    :be_verbose,
                  :dry_run,
-                :node_ref
+                :node_ref,
+             :working_dir
 
-    listeners_digraph  info: :lingual
+    listeners_digraph :error_event,
+      :error_string,
+      :info_event
 
   private
 
@@ -18,6 +21,8 @@ module Skylab::Snag
       res = @node.close
       res and @nodes.changed @node, @dry_run, @be_verbose
     end
+
+    make_sender_methods
   end
 
   module API::Actions::Node::Tags
@@ -29,9 +34,11 @@ module Skylab::Snag
                :do_append,
                  :dry_run,
                 :node_ref,
-                :tag_name
+                :tag_name,
+             :working_dir
 
-    listeners_digraph  info: :lingual
+    listeners_digraph :error_event,
+      :info_event
 
   private
 
@@ -43,14 +50,18 @@ module Skylab::Snag
 
   class API::Actions::Node::Tags::Ls < API::Action
 
-    params       :node_ref
+    params       :node_ref,
+              :working_dir
 
-    listeners_digraph  tags: :datapoint
+    listeners_digraph :error_event,
+      :tags
 
     def if_node_execute
-      send_to_listener :tags, Tags_Event__.new( @node, @node.tags )
+      send_tags Tags_Event__.new( @node, @node.tags )
       ACHIEVED_
     end
+
+    make_sender_methods
   end
 
   Tags_Event__ = Event_[].new :node, :tags do
@@ -70,14 +81,19 @@ module Skylab::Snag
     params    :be_verbose,
                  :dry_run,
                 :node_ref,
-                :tag_name
+                :tag_name,
+             :working_dir
 
-    listeners_digraph  info: :lingual,
-                 payload: :datapoint
+    listeners_digraph :error_event,
+      :error_string,
+      :info_event,
+      :payload
 
     def if_node_execute
       ok = @node.remove_tag @tag_name
       ok and @nodes.changed @node, @dry_run, @be_verbose
     end
+
+    make_sender_methods
   end
 end

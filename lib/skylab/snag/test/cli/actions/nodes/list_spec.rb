@@ -11,9 +11,9 @@ module Skylab::Snag::TestSupport::CLI::Actions
     with_tmpdir_patch do
 
       <<-O.unindent
-        diff --git a/#{ manifest_path } b/#{ manifest_path }
+        diff --git a/#{ manifest_file } b/#{ manifest_file }
         --- /dev/null
-        +++ b/#{ manifest_path }
+        +++ b/#{ manifest_file }
         @@ -0,0 +1,4 @@
         +[#003] #open feep my deep
         +[#002]       #done wizzle bizzle 2013-11-11

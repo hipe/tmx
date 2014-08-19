@@ -29,20 +29,20 @@ module Skylab::Snag
           tree_level = @param_h.delete :tree_level
         end
         tree = nil
-        res = call_API [ :to_do, :report ], @param_h do |a|
-          a.on_info handle_info
-          a.on_error handle_error
-          a.on_command do |cmd|
-            payload cmd
+        res = call_API [ :to_do, :report ], @param_h do |o|
+          o.on_error_event handle_error_event
+          o.on_error_string handle_error_string
+          o.on_command_string do |cmd_s|
+            send_payload_line cmd_s
           end
-          a.on_number_found do |num|
-            info "(found #{ num } item#{ s num })"
+          o.on_number_found do |num|
+            send_info_line "(found #{ num } item#{ s num })"
           end
           if tree_level
-            tree = build_tree[ a, tree_level, request_client ]
+            tree = build_tree[ o, tree_level, listener ]
           else
-            a.on_todo do |t|
-              payload t.upstream_output_line
+            o.on_todo do |t|
+              send_payload_line t.upstream_output_line
             end
           end
         end
@@ -72,12 +72,13 @@ module Skylab::Snag
     end
 
     desc do |y|  # #todo - can you melt me
-      df = Snag_::API::Actions::ToDo::Melt.attributes[ :paths ][ :default ]
-      df.map!(& method( :ick ))
-      y << 'arguments:'
-      s = "  #{ say { param :path } } the path(s) to search (default: #{ df * ', '})"
-      y << s
-      nil
+      a = Snag_::API::Actions::ToDo::Melt.attributes[ :paths ][ :default ]
+      expression_agent.calculate do
+        a = a.map( & method( :ick ) )
+        y << 'arguments:'
+        y << "  #{ par :path }#{
+          }#{ SPACE_ * 20 }the path(s) to search (default: #{ a * ', '})"
+      end
     end
 
     def melt *path
@@ -87,11 +88,15 @@ module Skylab::Snag
       call_API [ :to_do, :melt ],
         {           dry_run: false,
                       paths: path,
-                 be_verbose: false }.merge!( @param_h ), -> a do
-        a.on_payload handle_payload
-        a.on_info handle_info
-        a.on_raw_info handle_raw_info
-        a.on_error handle_error
+                 be_verbose: false,
+                working_dir: working_directory_path
+        }.merge!( @param_h ),
+       -> o do
+        o.on_error_event handle_error_event
+        o.on_error_string handle_error_string
+        o.on_info_event handle_info_event
+        o.on_info_line handle_info_line
+        o.on_info_string handle_inside_info_string
       end
     end
 

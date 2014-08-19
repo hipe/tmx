@@ -13,10 +13,10 @@ module Skylab::Snag
       end
     end
 
-    define_singleton_method :normalize do |x, error, info=nil|
+    define_singleton_method :normalize do |x, error_s_p, _=nil|
       res = nil
       err = -> errmsg do
-        r = error[ errmsg ]
+        r = error_s_p[ errmsg ]
         res = r ? UNABLE_ : r  # [#017]
       end
       msg = x.to_s

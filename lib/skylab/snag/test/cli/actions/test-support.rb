@@ -10,8 +10,8 @@ module Skylab::Snag::TestSupport::CLI::Actions
 
   module ModuleMethods
     include CONSTANTS
-    def manifest_path
-      Snag_::API.manifest_path
+    def manifest_file
+      Snag_::API.manifest_file
     end
   end
 end

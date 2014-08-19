@@ -38,7 +38,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
           gimmel
         O
 
-        @manifest_pn = td.write manifest_path, <<-O.unindent
+        @manifest_pn = td.write manifest_file, <<-O.unindent
           [#002]       i started at two just to be cute
         O
 

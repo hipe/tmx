@@ -12,6 +12,10 @@ module Skylab::Snag
     Autoloader_[ self ]
   end
 
+  module Models
+    Autoloader_[ self, :boxxy ]
+  end
+
   ACHIEVED_= true
 
   EMPTY_A_ = [].freeze

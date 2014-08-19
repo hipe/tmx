@@ -11,9 +11,9 @@ module Skylab::Snag::TestSupport::CLI::Actions
     with_tmpdir_patch do
 
       <<-O.unindent
-        diff --git a/#{ manifest_path } b/#{ manifest_path }
+        diff --git a/#{ manifest_file } b/#{ manifest_file }
         --- /dev/null
-        +++ b/#{ manifest_path }
+        +++ b/#{ manifest_file }
         @@ -0,0 +1,4 @@
         +[#003] #open feep my deep
         +[#002]       #done wizzle bizzle 2013-11-11
@@ -34,15 +34,19 @@ module Skylab::Snag::TestSupport::CLI::Actions
       end
       o( / mv /)
       o( / mv /)
-      o( / done\./ )
+      expect_done_line
       o
     end
 
     it "non-verbose non-dry run" do
       invoke 'foo bizzle'
       o( /new line: \[#004\] {7}foo bizzle$/ )
-      o( /\bdone\./ )
+      expect_done_line
       o
+    end
+
+    def expect_done_line
+      o %r(\Adone adding node\.\z)i
     end
   end
 end

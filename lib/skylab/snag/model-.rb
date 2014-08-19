@@ -2,11 +2,27 @@ module Skylab::Snag
 
   module Model_
 
-    Info_Error_Listener = Callback_::Ordered_Dictionary.new :info, :error
+    Listener = Callback_::Ordered_Dictionary.curry :suffix, nil
+
+    Info_Error_Listener = Listener.new :info_event, :error_event
 
     THROWING_INFO_ERROR_LISTENER = Info_Error_Listener.new nil, -> ev do
-      raise ev.render_under_expression_agent Snag_::API::EXPRESSION_AGENT
+      y = []
+      ev.render_all_lines_into_under y, Snag_::API::EXPRESSION_AGENT
+      raise y * SPACE_
     end
+
+    class Controller
+
+      def initialize listener, _API_client
+        @API_client = _API_client
+        @listener = listener
+      end
+
+      attr_reader :listener
+    end
+
+    # ~
 
     def self.name_function mod
       mod.extend Name_Function_Methods__ ; nil
@@ -16,19 +32,38 @@ module Skylab::Snag
       def name_function
         @nf ||= bld_name_function
       end
+      def full_name_function
+        @fnf ||= bld_full_name_function
+      end
     private
+      def bld_full_name_function
+        y = [ nf = name_function ]
+        y.unshift nf while (( parent = nf.parent and nf = parent.name_function ))
+        y.freeze
+      end
       def bld_name_function
         s_a = name.split Callback_::CONST_SEP_
-        _i = s_a.pop.intern
-        parent = ( s_a.length.nonzero? and
-          s_a.reduce( ::Object ) do |m, s|
-            m.const_get s, false
-          end )
-        if parent and ! parent.respond_to? :name_function
-          parent.extend Name_Function_Methods__
+        i = s_a.pop.intern
+        x_a = ::Array.new s_a.length
+        mod = ::Object
+        s_a.each_with_index do |s, d|
+          mod = mod.const_get s, false
+          x_a[ d ] = mod
         end
-        Name_Function__.new _i, parent
+        d = s_a.length
+        until STOP_INDEX__ == ( d -= 1 )
+          mod = x_a.fetch d
+          if ! mod.respond_to? :name_function
+            TAXONOMIC_MODULE_RX__ =~ s_a.fetch( d ) and next
+            mod.extend Name_Function_Methods__
+          end
+          parent = mod
+          break
+        end
+        Name_Function__.new i, parent
       end
+      STOP_INDEX__ = 3  # skylab snag cli actions foo actions bar
+      TAXONOMIC_MODULE_RX__ = /\A(?:Actions)\z/  # meh / wee
     end
 
     class Name_Function__ < Callback_::Name
@@ -41,6 +76,8 @@ module Skylab::Snag
       end
       attr_reader :parent
     end
+
+    # ~
 
     class Event < ::Struct
 
@@ -62,26 +99,16 @@ module Skylab::Snag
           true
         end
 
-        def can_render_under  # :+#comport
-          !! message_proc
-        end
-
         attr_reader :message_proc
 
-        def render_under client
-          render_under_expression_agent client.expression_agent
-        end
-
-        def render_under_expression_agent expression_agent
-          y = []
+        def render_all_lines_into_under y, expression_agent
           expression_agent.calculate y, self, & message_proc
-          y * LINE_SEP_
         end
 
         self
       end
 
-      def self.from_string s, v=nil, n=nil
+      def self.inflectable_via_string s, v=nil, n=nil
         String__.new s, v, n
       end
       String__ = new :message_s, :inflected_verb, :inflected_noun do
@@ -112,23 +139,21 @@ module Skylab::Snag
         attr_reader :terminal_channel_i
       end
 
-      def self.from_event ev
+      def self.inflectable_via_event ev
         Event_Inflection_Wrapper__.new ev
       end
       class Event_Inflection_Wrapper__
         def initialize ev
           @ev = ev
         end
+        attr_reader :ev
         attr_accessor :inflected_verb, :inflected_noun
         def verb_lexeme
           @verb_lexeme ||= Snag_::Lib_::NLP[]::EN::POS::Verb[ @inflected_verb ]
         end
         attr_writer :verb_lexeme
-        def can_render_under
-          @ev.can_render_under
-        end
-        def render_under x
-          @ev.render_under x
+        def message_proc
+          @ev.message_proc
         end
       end
     end

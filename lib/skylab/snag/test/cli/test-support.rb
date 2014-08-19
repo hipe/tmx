@@ -107,7 +107,7 @@ module Skylab::Snag::TestSupport::CLI
 
     def with_manifest s
       with_tmpdir do |o|
-        pn = o.clear.write manifest_path, s
+        pn = o.clear.write manifest_file, s
         memoize_last_pn pn
         @pn = pn ; nil
       end ; nil

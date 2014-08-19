@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  module API
+  class API
 
     EXPRESSION_AGENT = class Expression_Agent___
 
@@ -13,6 +13,8 @@ module Skylab::Snag
       def pth x
         ::Pathname.new( "#{ x }" ).basename.to_path
       end
+
+      Snag_::Lib_::EN_FUN[ self, :private, [ :s ] ]
 
       self
     end.new

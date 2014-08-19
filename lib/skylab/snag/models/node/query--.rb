@@ -2,22 +2,31 @@ module Skylab::Snag
 
   class Models::Node::Query__
 
-    include Snag_::Core::SubClient::InstanceMethods
+    class << self
+      def new_valid query_sexp, max_count, listener
+        o = new query_sexp, max_count, listener
+        o.valid
+      end
 
-    def self.new_valid query_sexp, max_count, client
-      o = new query_sexp, max_count, client
-      o.valid
+      private :new
     end
 
-    def initialize query_sexp, max_count, client
+    def initialize query_sexp, max_count, listener
       @counter = nil
-      super client  # before next line
+      @error_count = 0
+      @falseish = UNABLE_
+      @listener = listener  # before below
       if max_count
         self.max_count = max_count
       else
         @max_count = nil
       end
-      @query = Query_Nodes_.new_valid query_sexp, self
+      qry = Query_Nodes_.new_valid query_sexp, listener
+      if qry
+        @query = qry
+      else
+        @error_count += 1
+      end
     end
 
     attr_reader :max_count
@@ -27,7 +36,7 @@ module Skylab::Snag
     end
 
     def is_valid
-      error_count.zero?
+      @error_count.zero?
     end
 
     def max_count= integer_ref
@@ -38,7 +47,7 @@ module Skylab::Snag
           elsif POSITIVE_INTEGER_RX__ =~ integer_ref
             integer = integer_ref.to_i
           else
-            error "must look like integer: #{ integer_ref }"
+            send_error_string "must look like integer: #{ integer_ref }"
             break
           end
           @counter = 0
@@ -68,19 +77,25 @@ module Skylab::Snag
       @max_count == @counter
     end
 
+  private
+    def send_error_string s
+      @error_count += 1
+      @listener.receive_error_string s
+    end
+
     module Query_Nodes_  # #borrow-indent
 
-    def self.new_valid query_sexp, client
+    def self.new_valid query_sexp, listener
       _cls = Autoloader_.const_reduce [ query_sexp.first ], self
-      _cls.new_valid query_sexp, client
+      _cls.new_valid query_sexp, listener
     end
 
     class And
 
-      def self.new_valid query_sexp, client
+      def self.new_valid query_sexp, listener
         a = query_sexp[ 1 .. -1 ].map do |x|
           klass = Autoloader_.const_reduce [ x.first ], Query_Nodes_
-          klass.new_valid x, client
+          klass.new_valid x, listener
         end
         if ! a.index { |x| ! x }
           if a.length < 2
@@ -107,7 +122,7 @@ module Skylab::Snag
 
     class All
 
-      def self.new_valid _sexp, _client
+      def self.new_valid _sexp, _listener
         ALL__
       end
 
@@ -129,11 +144,11 @@ module Skylab::Snag
 
     class HasTag
 
-      def self.new_valid sexp, client
+      def self.new_valid sexp, listener
         tag_i = sexp.fetch 1
         tag_i_ = Models::Tag.normalize_stem_i tag_i,
           -> ev do
-            client.error ev.render_under client
+            listener.receive_error_event ev
           end
         tag_i_ and new tag_i_
       end
@@ -159,15 +174,9 @@ module Skylab::Snag
 
     class IdentifierRef
 
-      def self.new_valid sexp, client
+      def self.new_valid sexp, listener
         identifier_body = sexp[1]  # prefixes might bite [#019]
-        normalized = Models::Identifier.normalize identifier_body,
-          -> invalid do
-            client.send :error, ( invalid.render_under client )
-          end,
-          -> info do
-            client.send :info, ( info.render_under client )
-          end
+        normalized = Models::Identifier.normalize identifier_body, listener
         normalized and new normalized
       end
 
@@ -189,7 +198,7 @@ module Skylab::Snag
 
     class Valid
 
-      def self.new_valid _sexp, _client
+      def self.new_valid _sexp, _listener
         VALID__
       end
 

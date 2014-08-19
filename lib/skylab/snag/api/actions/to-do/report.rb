@@ -14,10 +14,11 @@ module Skylab::Snag
                              default: Snag_::Models::Pattern.default
     attribute :show_command_only
 
-    listeners_digraph  info: :lingual,
-                     todo: :datapoint,
-                  command: :datapoint,  # only for `show_command_only`
-             number_found: :datapoint
+    listeners_digraph :command_string,
+      :error_event,
+      :error_string,
+      :number_found,
+      :todo
 
   private
 
@@ -27,17 +28,17 @@ module Skylab::Snag
         exec_show_command_only
       else
         ea = @ea
-        ea.on_error method :error_event
-        ea.on_command do |cmd|  # if strict event handling, we must.
+        ea.on_error_string method :send_error_string
+        ea.on_command_string do |cmd_s|  # if strict event handling, we must.
           if @be_verbose
-            send_to_listener :command, cmd
+            send_command_string cmd_s
           end
         end
         res = ea.each do |todo|
-          send_to_listener :todo, todo
+          send_todo todo
         end
         if ea.seen_count
-          send_to_listener :number_found, ea.seen_count
+          send_number_found ea.seen_count
         end
         res
       end
@@ -45,9 +46,11 @@ module Skylab::Snag
 
     def exec_show_command_only
       @ea.command.command -> cmd_str do
-        send_to_listener :command, cmd_str
+        send_command_string cmd_str
         ACHIEVED_
-      end, method( :error_event )
+      end, method( :send_error_event )
     end
+
+    make_sender_methods
   end
 end

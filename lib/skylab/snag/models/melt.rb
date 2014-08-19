@@ -4,33 +4,27 @@ module Skylab::Snag
 
     class << self
       def build_controller * a
-        self::Controller__.new( * a )
+        self::Controller__.new a
       end
     end
 
-    class Controller__
+    class Controller__ < Snag_::Model_::Controller
 
-    # one public method - `melt`
+    def initialize a
+      @dry_run, @be_verbose, @paths, @pattern, @names, @working_dir,
+        listener, _API_client = a
 
-    include Snag_::Core::SubClient::InstanceMethods
-
-      # straightforward subclient - emits PIE upwards
-
-    #        ~ all methods/procs listed in pre-order traversal ~
-    def initialize dry_run, be_verbose, paths, pattern, names, client
-      @dry_run = dry_run
       @file_changes = []
-      @pattern = pattern
-      o = Snag_::Models::ToDo.build_enumerator paths, pattern, names
-      o.on_error method :error_event
-      o.on_command do |cmd_str|  # (strict event handling)
+
+      o = Snag_::Models::ToDo.build_enumerator @paths, @pattern, @names
+      o.on_error_string listener.method :receive_error_string
+      o.on_command_string do |cmd_str|  # (strict event handling)
         if @be_verbose
-          info cmd_str
+          @listener.receive_info_line cmd_str
         end
       end
       @todos = o
-      @be_verbose = be_verbose
-      super client
+      super listener, _API_client
     end
 
     def melt  # public
@@ -47,12 +41,12 @@ module Skylab::Snag
         res = nil
         if cnt
           if cnt.zero?
-            info "found no todo's #{ cmd.prepositional_phrase_under self }"
+            send_info_string say_found_no_todos cmd
           else
             res = true
           end
         else
-          info "(did not search for any todos)"
+          send_info_string say_did_not_search
           res = false
         end
         res or break
@@ -65,35 +59,48 @@ module Skylab::Snag
 
   private
 
-    todo_where = nil  # scope
+    def say_found_no_todos cmd
+      "found no todo's #{ cmd.prepositional_phrase_under self }"
+    end
 
-    define_method :todo do |todo|
+    def say_did_not_search
+      "(did not search for any todos)"
+    end
+
+    def todo todo
       if ! todo.message_body_string
-        info "(will not melt todo with no message - #{ todo_where[ todo ] })"
+        send_info_line say_no_message todo
         nil
       else
-        new_node = nil
-        res = @request_client.call_API [ :nodes, :add ], {
-                   be_verbose: @be_verbose,
-          do_prepend_open_tag: true,
-                      dry_run: @dry_run,
-                      message: todo.message_body_string
-        }, -> a do
-          a.on_new_node { |n| new_node = n }
-          a.on_info method :info
-          a.on_raw_info -> txt do
-            @request_client.send_to_listener :raw_info, txt
-          end
-          a.on_error method( :error_event )
-        end
-        if res
-          res = change_source_line todo, new_node
-        end
-        res
+        node = add_new_open_node_for_todo_item todo
+        node and change_source_line todo, node
       end
     end
 
-    todo_where = -> todo do
+    def add_new_open_node_for_todo_item todo
+      new_node = nil
+      ok = @API_client.call [ :nodes, :add ], {
+                 be_verbose: @be_verbose,
+        do_prepend_open_tag: true,
+                    dry_run: @dry_run,
+                    message: todo.message_body_string,
+                working_dir: @working_dir
+      }, -> o do
+        o.on_error_event @listener.method :receive_error_event
+        o.on_error_string @listener.method :receive_error_string
+        o.on_info_event @listener.method :receive_info_event
+        o.on_info_line @listener.method :receive_info_line
+        o.on_info_string @listener.method :receive_info_string
+        o.on_new_node { |nn| new_node = nn }
+      end
+      ok && new_node
+    end
+
+    def say_no_message todo
+      "(will not melt todo with no message - #{ render_todo_location todo })"
+    end
+
+    def render_todo_location todo
       "#{ todo.path }:#{ todo.line_number_string }"
     end
 
@@ -139,17 +146,24 @@ module Skylab::Snag
           patch.change_line todo.line_number, todo.replacement_line
         end
         res = Snag_::Lib_::Text_patch[].file patch.render_simple,
-          first.path, @dry_run, @be_verbose, -> e { info e }
+          first.path, @dry_run, @be_verbose, method( :send_info_line )
         # typically an exit_code, like 0
         res or break
-        x = @file_changes.length
-        xtra = if 1 == x
-          " - #{ first.one_line_summary }"
-        end
-        info "(changed #{ x } line#{ s x } in #{ first.path }#{ xtra })"
+        send_info_line say_summary_of_changes_in_file
         @file_changes.clear
       end while nil
       res
+    end
+
+    def say_summary_of_changes_in_file
+      first = @file_changes.first
+      d = @file_changes.length
+      change_summary_s = if 1 == d
+        " - #{ first.one_line_summary }"
+      end
+      expression_agent.calculate do
+        "(changed #{ d } line#{ s d } in #{ first.path }#{ change_summary_s })"
+      end
     end
 
     sep = ' - '
@@ -216,6 +230,18 @@ module Skylab::Snag
 
       msg_body_excrpt
     end.call
+
+    def expression_agent
+      API::EXPRESSION_AGENT
+    end
+
+    def send_info_line s
+      @listener.receive_info_line s ; NEUTRAL_
+    end
+
+    def send_info_string s
+      @listener.receive_info_string s ; NEUTRAL_
+    end
     end
   end
 end

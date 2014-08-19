@@ -14,12 +14,10 @@ module Skylab::Snag
 
   class CLI::ToDo::Tree
 
-    include Snag_::Core::SubClient::InstanceMethods
-
-    def initialize do_pretty, client
+    def initialize do_pretty, listener
       @do_pretty = do_pretty
       @todos = []
-      super client
+      @listener = listener
     end
 
     def << todo
@@ -108,9 +106,11 @@ module Skylab::Snag
         producer = instance_exec tree, &tree_lines_producer_basic
       end
       if producer
-        line = nil
-        payload( line ) while line = producer.gets
+        while (( line = producer.gets ))
+          @listener.receive_payload_line line
+        end
       end
+      NEUTRAL_
     end
   end
 end
