@@ -77,7 +77,7 @@ module Skylab::Snag
         method :receive_inside_info_string
       end
 
-      def receive_info_line s
+      protected def receive_info_line s
         send_info_line s
       end
 

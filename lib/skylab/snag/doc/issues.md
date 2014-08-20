@@ -10,7 +10,7 @@
 [#059]       #parent-node: [#039] the grand simplification thru scanners ..
 [#058]       #done get rid of all use of `date_string`
 [#057]       #doc-node the model
-[#056] #hole
+[#056]       #parent-node: [#057] the hashtag narrative ..
 [#055]       #parent-node: [#006] the API action narrative ..
 [#054]       #done no sub-client here
 [#053]       #doc-node structures for our CLI implementation

@@ -17,8 +17,6 @@ module Skylab::Snag
         execute
       end
 
-      attr_reader :up_from_path
-
     private
 
       def if_any_missing_required_raise_argument_error

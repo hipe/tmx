@@ -27,6 +27,10 @@ module Skylab::Snag
         end
       end
 
+      def each & p
+        to_enum( & p )  # we keep it explicitly separate for now
+      end
+
       def to_enum
         if block_given?
           scn = to_scanner ; x = nil
@@ -37,8 +41,8 @@ module Skylab::Snag
       end
 
       def to_scanner
-        scanner = Models::Hashtag.scanner @body_s
-        flyweight = Flyweight__.new
+        scanner = Models::Hashtag.value_peeking_scanner @body_s
+        flyweight = Flyweight__.new -> { scanner.peek_for_value }
         tag = Tag_.new flyweight
         Callback_::Scn.new do
           begin
@@ -70,6 +74,10 @@ module Skylab::Snag
 
       class Flyweight__
 
+        def initialize p
+          @peek_for_value_p = p
+        end
+
         def replace symbol
           @symbol = symbol
         end
@@ -78,12 +86,21 @@ module Skylab::Snag
           dup
         end
 
+        def stem_i
+          @symbol.local_normal_name
+        end
+
         def to_string
           @symbol.to_s
         end
 
         def tag_start_offset_in_node_body_string
           @symbol.pos
+        end
+
+        def tag_value_x
+          x = @peek_for_value_p[]
+          x and x.to_s
         end
       end
     end

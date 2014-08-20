@@ -31,6 +31,10 @@ module Skylab::Snag
       freeze
     end
 
+    def stem_i
+      @kernel.stem_i
+    end
+
     def to_s
       @kernel.to_string
     end
@@ -57,6 +61,10 @@ module Skylab::Snag
 
     def duplicate
       self.class.new @kernel.duplicate_kernel
+    end
+
+    def value
+      @kernel.tag_value_x
     end
 
     # ~ mutators

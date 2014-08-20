@@ -34,9 +34,9 @@ module Skylab::Snag
   private
     def via_query_fetch_node listener
       nodes = reduce_all_nodes_via_query @q
-      node = nodes.gets
-      if node
-        Node_.build_controller( listener, @API_client ).with_flyweight( node )
+      fly = nodes.gets
+      if fly
+        fly.collapse listener, @API_client
       else
         when_not_found listener
       end

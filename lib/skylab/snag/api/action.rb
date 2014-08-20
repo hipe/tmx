@@ -48,8 +48,6 @@ module Skylab::Snag
       super()
     end
 
-    attr_reader :up_from_path
-
   private
     def assert_all_channels_handled
       if_unhandled_stream_names -> missed_a do

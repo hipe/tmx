@@ -33,6 +33,11 @@ module Skylab::Snag
       @is_valid = nil
     end
 
+    def collapse listener, _API_client
+      Models::Node.build_controller( listener, _API_client ).
+        with_flyweight self
+    end
+
     def yaml_data_pairs  # alla `field_names`
       a = [
         [ :identifier_body, identifier_body ],

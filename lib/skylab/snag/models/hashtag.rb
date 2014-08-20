@@ -1,16 +1,53 @@
 module Skylab::Snag
 
-  module Models::Hashtag
+  module Models::Hashtag  # see [#056]
 
     class << self
+
       def parse s
         Scan_Maker__.new( s ).to_a
       end
+
       def puts_scanner s
         Callback_::Scanner::Puts_Wrapper.new scanner s
       end
+
+      def value_peeking_scanner s
+        Value_Peeking_Wrapper__.new scanner s
+      end
+
       def scanner s
         Scan_Maker__.new( s ).to_scanner
+      end
+    end
+
+    class Value_Peeking_Wrapper__  # #note-25
+      def initialize scn
+        @scn = scn ; @queue = []
+      end
+      def gets
+        if @queue.length.zero?
+          @scn.gets
+        else
+          @queue.shift
+        end
+      end
+      def peek_for_value
+        if @queue.length.zero?
+          x = @scn.gets
+          x and @queue.push x
+        end
+        if @queue.length.nonzero? and
+            :hashtag_name_value_separator == @queue.first.symbol_i
+          if 2 > @queue.length
+            x = @scn.gets
+            x and @queue.push x
+          end
+          if 1 < @queue.length and :hashtag_value == @queue[1].symbol_i
+            result = @queue[1]
+          end
+        end
+        result
       end
     end
 
