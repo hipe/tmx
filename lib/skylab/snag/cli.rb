@@ -143,7 +143,7 @@ module Skylab::Snag
       @handle_error_string ||= method :receive_error_string
     end
 
-    def receive_error_string s
+    public def receive_error_string s
       receive_error_line s  # meh
     end
 
@@ -214,7 +214,9 @@ module Skylab::Snag
 
     def render_event ev
       y = []
-      ev.respond_to? :ev and ev = ev.ev  # unwrap it eew
+      while ev.respond_to? :ev
+        ev = ev.ev  # unwrap it eew/meh
+      end
       expression_agent.calculate y, ev, & ev.message_proc
       y * LINE_SEP_
     end

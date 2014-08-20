@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  module Models::Melt
+  module Models::Melt  # see [#063]
 
     class << self
       def build_controller * a
@@ -40,12 +40,12 @@ module Skylab::Snag
   private
     def crt_open_nodes
       ok = ACHIEVED_
-      @todos.each do |tod|
-        ok_ = todo tod.collapse
-        if UNABLE_ == ok_
-          ok = UNABLE_
-          break
-        end
+      @todos.each do |fly|
+        ok = fly.collapse @listener
+        ok or break
+        ok = add_open_node_for_todo_if_appropriate ok
+        ok or break
+        ok = ACHIEVED_
       end
       ok
     end
@@ -82,7 +82,7 @@ module Skylab::Snag
       "(did not search for any todos)"
     end
 
-    def todo todo
+    def add_open_node_for_todo_if_appropriate todo
       if todo.any_message_body_string
         node = add_new_open_node_for_todo_item todo
         node and change_source_line todo, node
@@ -152,7 +152,7 @@ module Skylab::Snag
         s_  # some lines will be only a comment
       end
       excerpt = Get_any_message_body_excerpt__[ new_line, todo ]
-      excerpt and new_line.concat "#{ SEP__ }#{ excerpt }"
+      excerpt and new_line.concat "#{ SEP_ }#{ excerpt }"
       new_line
     end
 
@@ -160,7 +160,7 @@ module Skylab::Snag
     COMMENT_OPENER__ = '# '.freeze
     ENDING_IN_ONLY_ONE_SPACE_RX__ = /(?<![ ])[ ]\z/
     OPEN_TAG_S__ =  Models::Tag.canonical_tags.open_tag.render
-    SEP__ = ' - '.freeze
+    SEP_ = ' - '.freeze
     TWO_SPACES__ = '  '.freeze
     Models::Melt::REPLACEMENT_NON_CONTENT_WIDTH__ =
       TWO_SPACES__.length + COMMENT_OPENER__.length
@@ -196,57 +196,75 @@ module Skylab::Snag
       end
     end
 
-    Get_any_message_body_excerpt__ = -> do
+    class Get_any_message_body_excerpt__
 
-      ellipsis = line_width = min_words = sp = nil  # scope
+      Snag_::Model_::Actor[ self,
+        :properties, :new_line, :todo_o ]
 
-      msg_body_excrpt = -> new_line, todo do  # #note-170
-        # add words to the excerpt so long as the next word would not
-        # put you over the limit, taking into account spaces and ellipses etc
-        res = nil
-        begin  # #todo during de-functionalization, rewrite this
-          words = todo.any_message_body_string.split sp
-          words.length.zero? and break # maybe just sanity
-          available_length = line_width - ( new_line.length + SEP__.length )
-          fail 'sanity' if min_words < 1
-          excerpt = words[ 0, min_words - 1 ].join sp
-          words[ 0, min_words - 1 ] = EMPTY_A_
-          next_length = -> do
-            x = excerpt.length
-            if words.length.nonzero?
-              x += sp.length if excerpt.length.nonzero?
-              x += words.first.length
-              if words.length > 1
-                x += ellipsis.length
-              end
-            end
-            x
-          end
-          shift = -> do
-            excerpt.concat "#{ sp if excerpt.length.nonzero? }#{ words.shift }"
-            nil
-          end
-          break if next_length[] > available_length # atomicicity w/ min_words
-          res = excerpt
-          while words.length.nonzero?
-            shift[]
-            break if next_length[] > available_length
-          end
-          excerpt.concat( ellipsis ) if words.length.nonzero?
-        end while nil
-        res
+      def execute
+        init
+        work
+        @message_body_excerpt
+      end
+    private
+      def init
+        @ellipsis = ELLIPSIS__
+        @line_width = LINE_WIDTH__
+        @min_words = MIN_WORDS__
+        0 < @min_words or self._SANITY
       end
 
-      ellipsis = ' ..'
+      def work
+        @word_s_a = @todo_o.any_message_body_string.split SPACE_
+        if @word_s_a.length.zero?
+          @message_body_excerpt = nil
+        else
+          when_nonzero_number_of_words
+        end
+      end
 
-      line_width = Models::Manifest.line_width
+      def when_nonzero_number_of_words
+        @available_length = LINE_WIDTH__ - ( @new_line.length + SEP_.length )
+        @excerpt_s = @word_s_a[ 0, @min_words - 1 ].join SPACE_
+        @word_s_a[ 0, @min_words - 1 ] = EMPTY_A_
+        if next_length > @available_length
+          @message_body_excerpt = nil
+        else
+          flush
+        end
+      end
 
-      min_words = 3  # #note-210
+      def flush
+        @message_body_excerpt = @excerpt_s  # success is guaranteed from here
+        while @word_s_a.length.nonzero?
+          accept_one
+          _stop = next_length > @available_length
+          _stop and break
+        end
+        if @word_s_a.length.nonzero?
+          @excerpt_s.concat @ellipsis
+        end ; nil
+      end
 
-      sp = SPACE_
+      def next_length
+        d = @excerpt_s.length
+        if @word_s_a.length.nonzero?
+          d.zero? or d += SPACE_.length
+          d += @word_s_a.first.length
+          1 < @word_s_a.length and d += @ellipsis.length
+        end
+        d
+      end
 
-      msg_body_excrpt
-    end.call
+      def accept_one
+        @excerpt_s.length.nonzero? and _s = SPACE_
+        @excerpt_s.concat "#{ _s }#{ @word_s_a.shift }" ; nil
+      end
+
+      ELLIPSIS__ = ' ..'.freeze
+      LINE_WIDTH__ = Models::Manifest.line_width
+      MIN_WORDS__ = 3  # #note-210
+    end
 
     def expression_agent
       API::EXPRESSION_AGENT

@@ -11,7 +11,7 @@ module Skylab::Snag
                             default: [ "*#{ Autoloader_::EXTNAME }" ] # '*.rb'
     attribute      :paths, required: true
     attribute    :pattern, required: true,
-                             default: Snag_::Models::Pattern.default
+                             default: Snag_::Models::ToDo.default_pattern_s
     attribute :show_command_only
 
     listeners_digraph :command_string,

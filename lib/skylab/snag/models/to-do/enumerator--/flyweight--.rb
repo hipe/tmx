@@ -8,8 +8,17 @@ module Skylab::Snag
       @upstream_output_line = nil  # e.g ffrom find, e.g "path:line:source"
     end
 
-    def collapse
-      Models::ToDo.new full_source_line, line_number_string, path, @pattern
+    attr_reader :upstream_output_line
+
+    def collapse listener
+      @md or parse
+      Models::ToDo.build( @md[ :full_source_line ], @md[ :line ], @md[ :path ],
+        @pattern, listener )
+    end
+
+    def is_valid
+      @md or parse
+      @md[ :line ] && @md[ :path ]
     end
 
     def full_source_line
@@ -33,13 +42,6 @@ module Skylab::Snag
       @md = nil
       @upstream_output_line = string
       self
-    end
-
-    attr_reader :upstream_output_line
-
-    def is_valid
-      @md or parse
-      @md[ :line ] && @md[ :path ]
     end
 
   private

@@ -16,21 +16,26 @@ module Skylab::Snag
 
     def initialize *a
       @do_pretty, @listener = a
+      @is_valid = true
       @glyphset_i = :wide  # narrow or wide
-      @todos = []
+      @todo_a = []
     end
+
+    attr_reader :is_valid
 
     attr_writer :glyphset_i
 
     def if_valid_add_todo_to_tree todo
-      if todo.is_valid
-        @todos.push todo.collapse
-      end
-      nil
+      collapsed = todo.collapse @listener
+      if collapsed
+        @todo_a.push collapsed
+      else
+        @is_valid = false
+      end ; nil
     end
 
     def render
-      rndr = Render__.new @do_pretty, @todos, @listener
+      rndr = Render__.new @do_pretty, @todo_a, @listener
       rndr.glyphset_i = @glyphset_i
       rndr.render
     end
@@ -38,7 +43,7 @@ module Skylab::Snag
     class Render__
 
       def initialize *a
-        @do_pretty, @todos, @listener = a
+        @do_pretty, @todo_a, @listener = a
         @glyphset_i = nil
       end
 
@@ -54,7 +59,7 @@ module Skylab::Snag
     private
 
       def populate_and_crop_tree
-        @todos.each do |todo|
+        @todo_a.each do |todo|
           _a = todo.path.split( SEP__ ).push todo.line_number_string
           @tree.fetch_or_create( :path, _a,
             :init_node, -> nod do
@@ -84,28 +89,11 @@ module Skylab::Snag
       SEP__ = '/'.freeze
     end
 
-    module Actor___
-      class << self
-        def [] cls, _, * i_a
-          cls.const_set :IVAR_I_A__, i_a.map { |i| :"@#{ i }" }
-          cls.extend MM__ ; cls.include self ; nil
-        end
-      end
-      module MM__
-        def [] * x_a
-          new( x_a ).execute
-        end
-      end
-      def initialize x_a
-        ivar_i_a = self.class::IVAR_I_A__
-        x_a.length.times do |d|
-          instance_variable_set ivar_i_a.fetch( d ), x_a.fetch( d )
-        end ; nil  # #etc
-      end
-    end
-
     class Build_basic_tree_lines_producer__
-      Actor___[ self, :properties, :tree, :glyphset_i ]
+
+      Snag_::Model_::Actor[ self,
+        :properties, :tree, :glyphset ]
+
       def initialize( * )
         super
         @glyphset_i ||= :wide  # wide or narrow
@@ -136,7 +124,8 @@ module Skylab::Snag
 
     class Build_pretty_tree_lines_producer__
 
-      Actor___[ self, :properties, :tree, :glyphset ]
+      Snag_::Model_::Actor[ self,
+        :properties, :tree, :glyphset ]
 
       def initialize( * )
         super

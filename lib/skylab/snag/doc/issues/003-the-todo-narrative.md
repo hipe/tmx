@@ -29,59 +29,42 @@ mean they have to be.
 
 
 
-## :#note-100
+## :#storypoint-100
 
 consider the line:
 
     @full_tag_string = "##{ @tag_stem }"  # %todo make the '#' be a variable
+<--------------------------------------><--><---><------------------------->
+                  (1)                    (2) (3)            (4)
 
-what we want (for starters) is a matchdata holding the offset and width
-(or `begin` and `end` offets if you prefer) of that there first occurrence
-of our pattern, in this case '%todo'.
++ the 'tag' segment (3) is self evident, and the least interesting.
 
-it's kind of annoying and sad that we re-search for the first occurrence
-of the tag. maybe there is a way to get the offset and with of the match
-from `grep` or whatever system utility is used, but on the other hand it
-would expose us to more dependency on the specifics of those utilities &
-make the system fragile.
++ `any_before_comment_content_string` is (1), not guaranteed to have width.
 
-but that's not even the really annoying part:
++ `any_pre_tag_string` is (1) and (2), likewise width is not guaranteed.
 
-for what we want with melting todo's out of source code, it is useful (if
-not necessary) for us to break this line up into several parts:
++ `any_post_tag_string` is (4), and also is not guaranteeed to have width.
 
 
-    <--[..]---------- code content ----><-><-----><------------------------>
-
-there are four segments above. the first segment, the "code content",
-always starts at offset 0 and goes (in our example) up to and including the
-end quote of the quoted interpolated string. it does not however include the
-(in the example) two spaces following it and preceding the '#' that starts
-the comment line.
-
-some gotcha's:
-
-+ there may or may not be anything before the first comment character of
-  the line. that is, maybe the line only contains a comment, that starts
-  at offset zero.
-
-+ the comment character may or may not also be the starting character of
-  the tag (this practice is frowned upon but not strictly enforced here.)
-
-+ there may or may not be a nonzero-width 'body' part after thee tag.
 
 
-our `s` variable holds the string from the beginning of the line up to
-but not including the first '#' ** used in the "%todo" ** tag (if any).
 
-now, if this character that starts the tag is in fact a '#' it may or
-may not have also been used as the character that starts a comment. the
-way we determine that is this:
+## :#note-155
 
-backwards from our position of where
+the main reason we need this regex builder is because the regex syntax
+supported by `grep` is not the same as the native engine.
 
-  # this is up to but not including the
-        # first occ
+also, we have to take some pains to build the regex right because
+ultimately this is a hack :[#068]: we are not parsing source code file in
+a truly language-aware way: this is just a regex hack.
 
-we need to go back up till before the '#'
+but given that, and if our tags can for example start with '@' or '#',
+then "@todo" the ivar will falsely match. our workaround to try to avoid
+such a case is here.
 
+
+
+
+## :#storypoint-210
+
+these are attempts at workarounds for some common mismatches ..

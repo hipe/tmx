@@ -1,3 +1,6 @@
+[#068]       #parent-node: [#003] "melt is a hack.."
+[#067]       #parent-node: [#057] model support
+[#066]       #parent-node: [#067] the actor dream
 [#065] #open tall stacks swallo error results (most of these tests)
 [#064] #open hide `ping` action
 [#063]       #parent-node: [#057] the melt narrative ..

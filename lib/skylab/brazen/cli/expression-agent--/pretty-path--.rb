@@ -66,8 +66,12 @@ module Skylab::Brazen
         end
 
         def do_relative_path_from_pwd
-          ::Pathname.new( @path ).
-            relative_path_from( ::Pathname.new @pwd ).to_path
+          subject = ::Pathname.new @path
+          if subject.relative?
+            subject.to_path
+          else
+            subject.relative_path_from( ::Pathname.new @pwd ).to_path
+          end
         end
       end
     end

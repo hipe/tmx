@@ -60,7 +60,7 @@ module Skylab::Snag
         todo = self.class::Flyweight__.new @pattern
         sout.each_line do |line|
           @seen_count += 1
-          y << todo.replace( line.chomp )
+          y << ( todo.replace line.chomp )
         end
         serr.each_line do |line|
           res = false

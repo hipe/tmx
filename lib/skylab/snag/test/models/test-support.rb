@@ -21,8 +21,8 @@ module Skylab::Snag::TestSupport::Models
       Listener_Spy__.new a, -> { do_debug }, -> { debug_IO }
     end
 
-    def expect * x_a
-      Model_Expectation__.new( @reception_a.shift, x_a, self ).execute
+    def expect * x_a, & p
+      Model_Expectation__.new( @reception_a.shift, x_a, p, self ).execute
     end
 
     def expect_failed
@@ -49,6 +49,16 @@ module Skylab::Snag::TestSupport::Models
     def expect_failure_result
       @result.should eql false
     end
+
+    # ~ called by expectation agent
+
+    def render_terminal_event ev
+      while ev.respond_to? :ev
+        ev = ev.ev
+      end
+      EXPAG__.calculate y=[], ev, & ev.message_proc
+      y * Snag_::SPACE_
+    end
   end
 
   class Listener_Spy__
@@ -59,7 +69,15 @@ module Skylab::Snag::TestSupport::Models
     end
 
     def receive_error_event ev
-      reception = Reception__.new :error_event, ev
+      rcv :error_event, ev
+    end
+
+    def receive_info_event ev
+      rcv :info_event, ev
+    end
+
+    def rcv i, ev
+      reception = Reception__.new i, ev
       if @do_debug_p[]
         @debug_IO_p[].puts reception.to_inspection_string
       end
@@ -76,11 +94,23 @@ module Skylab::Snag::TestSupport::Models
 
   class Model_Expectation__
     def initialize * a
-      @reception, x_a, @context = a
-      @chan_i = x_a.first
-      @expected_x = x_a.last
-      2 < x_a.length and raise ::ArgumentError, "(#{ x_a.length } for 2)"
-      @assertion_method_i_a = [ :chan, :str ]
+      @reception, x_a, p, @context = a
+      @chan_i = x_a.shift
+      a = [ :chan ]
+      if x_a.first.respond_to? :id2name
+        @term_chan_i = x_a.shift
+        a.push :term
+      end
+      if x_a.length.nonzero?
+        @expected_x = x_a.shift
+        a.push :str
+      end
+      if p
+        @p = p
+        a.push :ev_p
+      end
+      x_a.length.nonzero? and raise ::ArgumentError, "? #{ x_a.first }"
+      @assertion_method_i_a = a
     end
     def execute
       if @reception
@@ -105,16 +135,27 @@ module Skylab::Snag::TestSupport::Models
         STOP_EARLY__
       end
     end
+    def term
+      tci = @reception.ev.terminal_channel_i
+      if tci == @term_chan_i
+        PROCEDE__
+      else
+        tci.should @context.send( :eql, @term_chan_i )
+        STOP_EARLY__
+      end
+    end
     def str
-      ev = @reception.ev
-      EXPAG__.calculate y=[], ev, & ev.message_proc
-      str = y * Snag_::SPACE_
+      str = @context.render_terminal_event @reception.ev
       if str == @expected_x
         PROCEDE__
       else
         str.should @context.send( :eql, @expected_x )
         STOP_EARLY__
       end
+    end
+    def ev_p
+      @p[ @reception.ev ]
+      PROCEDE__
     end
   end
 
@@ -124,6 +165,12 @@ module Skylab::Snag::TestSupport::Models
     alias_method :calculate, :instance_exec
     def ick x
       "(ick #{ x })"
+    end
+    def pth x
+      "(pth #{ x })"
+    end
+    def val x
+      "(val #{ x })"
     end
     self
   end.new

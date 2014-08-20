@@ -6,7 +6,7 @@ module Skylab::Snag
     attribute    :dry_run, default: false
     attribute      :names, default: [ "*#{ Autoloader_::EXTNAME }" ] # '*.rb'
     attribute      :paths, required: true, default: ['.']  # not really..
-    attribute    :pattern, default: Snag_::Models::Pattern.default
+    attribute    :pattern, default: Snag_::Models::ToDo.default_pattern_s
     attribute :working_dir, required: true
 
     listeners_digraph :error_event,

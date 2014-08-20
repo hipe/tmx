@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  module Model_
+  module Model_  # [#067].
 
     Listener = Callback_::Ordered_Dictionary.curry :suffix, nil
 
@@ -11,6 +11,8 @@ module Skylab::Snag
       ev.render_all_lines_into_under y, Snag_::API::EXPRESSION_AGENT
       raise y * SPACE_
     end
+
+    # ~
 
     class Controller
 
@@ -24,8 +26,92 @@ module Skylab::Snag
 
     # ~
 
-    def self.name_function mod
-      mod.extend Name_Function_Methods__ ; nil
+    module Actor  # [#066]
+      class << self
+        def [] cls, * i_a
+          cls.extend MM__ ; cls.include self
+          while i_a.length.nonzero?
+            case i_a.first
+            when :properties
+              i_a.shift
+              cls.const_set :IVAR_I_A__, i_a.map { |i| :"@#{ i }" }
+              break
+            else
+              raise ::ArgumentError, i_a.first
+            end
+          end ; nil
+        end
+      end
+      module MM__
+        def [] * x_a
+          new( x_a ).execute
+        end
+      end
+      def initialize x_a
+        ivar_i_a = self.class::IVAR_I_A__
+        x_a.length.times do |d|
+          instance_variable_set ivar_i_a.fetch( d ), x_a.fetch( d )
+        end ; nil  # #etc
+      end
+    private
+
+      def send_info_event * x_a, & p
+        _ev = build_and_sign_inline_event x_a, p
+        @listener.receive_info_event _ev
+        NEUTRAL_
+      end
+
+      def send_error_event * x_a, & p
+        _ev = build_and_sign_inline_event x_a, p
+        @listener.receive_error_event _ev
+        UNABLE_
+      end
+
+      def build_and_sign_inline_event x_a, p
+        sign_event Event.inline_via_x_a_and_p x_a, p
+      end
+
+      def sign_event ev
+        ev_ = Event.inflectable_via_event ev
+        ev_.inflected_verb = inflected_verb
+        ev_.inflected_noun = inflected_noun
+        ev_
+      end
+
+      def inflected_noun
+        inferred_stems.noun
+      end
+
+      def inflected_verb
+        inferred_stems.verb
+      end
+
+      def inferred_stems
+        @inferred_stems ||= bld_infered_stems
+      end
+
+      def bld_infered_stems  # #note-80 (of [#066]
+        s_a = self.class.name_function.as_const.to_s.split( /_+/ ).map do |s|
+          Callback_::Name.from_const( s.intern ).as_slug
+        end
+        if 1 == s_a.length
+          noun_s = s_a.first
+          verb_s = DEFAULT_INFERRED_VERB__
+        else
+          verb_s = s_a.shift
+          noun_s = s_a * SPACE_
+        end
+        Inferred_Stems__.new verb_s, noun_s
+      end
+      DEFAULT_INFERRED_VERB__ = 'build'.freeze
+      Inferred_Stems__ = ::Struct.new :verb, :noun
+    end
+    # ~
+
+    class << self
+      def name_function mod
+        mod.extend Name_Function_Methods__ ; nil
+      end
     end
 
     module Name_Function_Methods__  # infects upwards
@@ -77,6 +163,8 @@ module Skylab::Snag
       attr_reader :parent
     end
 
+    Actor::MM__.include Name_Function_Methods__
+
     # ~
 
     class Event < ::Struct
@@ -121,9 +209,19 @@ module Skylab::Snag
         attr_writer :verb_lexeme
       end
 
-      def self.inline * x_a, & p
-        Inline__.new x_a, p
+      # ~
+
+      class << self
+
+        def inline * x_a, & p
+          Inline__.new x_a, p
+        end
+
+        def inline_via_x_a_and_p x_a, p
+          Inline__.new x_a, p
+        end
       end
+
       class Inline__
         include Event_Instance_Methods__
         def initialize x_a, p
@@ -154,6 +252,10 @@ module Skylab::Snag
         attr_writer :verb_lexeme
         def message_proc
           @ev.message_proc
+        end
+
+        def terminal_channel_i
+          @ev.terminal_channel_i
         end
       end
     end

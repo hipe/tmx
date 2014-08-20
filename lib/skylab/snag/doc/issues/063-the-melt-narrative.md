@@ -35,6 +35,11 @@ within whatever space remain in the line.
 (parts might get pushed up one day, tracked by [#hl-045])
 
 
+specifically the algorithm is something like this: add words to the
+excerpt so long as the next word would not put your over the limit,
+taking into account spaces and ellispes, etc
+
+
 
 
 ## :note-210
