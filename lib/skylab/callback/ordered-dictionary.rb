@@ -26,10 +26,11 @@ module Skylab::Callback
 
           i_a.freeze
           ::Class.new( self ).class_exec do
+            extend MM__
             class << self
               alias_method :new, :orig_new
             end
-            _BOX_ = Box__[].new
+            _BOX_ = Box__.new
             define_singleton_method :ordered_dictionary do
               _BOX_
             end
@@ -94,8 +95,40 @@ module Skylab::Callback
         self
       end )
 
-      Box__ = -> do
-        Callback_::Lib_::Entity[].box
+      # ~
+
+      module MM__
+        def via_iambic x_a
+          rx = via_iambic_rx
+          box = ordered_dictionary
+          d = -2 ; last = x_a.length - 2
+          a = ::Array.new box.length
+          until last == d
+            i = x_a.fetch d += 2
+            md = rx.match i
+            md or raise ::ArgumentError, say_did_not_match( i, rx )
+            i_ = md[ 0 ].intern
+            d_ = box.index i_
+            d_ or raise ::ArgumentError, say_no_event( i_ )
+            a[ d_ ] = x_a.fetch d + 1
+          end
+          new( * a )
+        end
+      private
+        def via_iambic_rx
+          @via_iambic_rx ||= bld_via_iambic_rx
+        end
+        def bld_via_iambic_rx
+          _s = ( ::Regexp.escape self::SUFFIX.id2name if self::SUFFIX )
+          /(?<=\Aon_).+(?=#{ _s }\z)/
+        end
+        def say_did_not_match i, rx
+          "did not match against #{ rx } - '#{ i }'"
+        end
+        def say_no_event i_
+          "no such channel '#{ i }' - have: (#{ ordered_dictionary.
+             get_names * ', ' })"
+        end
       end
 
       # ~
@@ -148,7 +181,7 @@ module Skylab::Callback
         def prcs_x_a_fully x_a
           sc = singleton_class
           d = -2 ; last = x_a.length - 2
-          box = Box__[].new
+          box = Box__.new
           while d < last
             d += 2
             i = x_a.fetch d
@@ -163,6 +196,12 @@ module Skylab::Callback
             end[ slot.ivar ]
           end
           @ordered_dictionary = box ; nil
+        end
+      end
+
+      class Box__ < Callback_::Lib_::Entity[].box
+        def index i
+          @a.index i
         end
       end
     end

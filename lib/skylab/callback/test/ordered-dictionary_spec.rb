@@ -14,33 +14,68 @@ module Skylab::Callback::TestSupport::OD__
 
     context "when you make a \"static\" listener class" do  # #needs-indent
 
-    before :all do
-      Adapter_Listener_ = Subject_[].new :error, :info
-    end
+      before :all do
+        Adapter_Listener_ = Subject_[].new :error, :info
+      end
 
-    it "normative" do
-      e_a = [] ; i_a = []
-      listener = Adapter_Listener_.new -> x { e_a << x }, -> x { i_a << x }
-      listener.receive_error_event :x
-      listener.receive_info_event :y
-      listener.receive_info_event :z
-      e_a.should eql [ :x ]
-      i_a.should eql [ :y, :z ]
-    end
+      it "normative" do
+        e_a = [] ; i_a = []
+        listener = Adapter_Listener_.new -> x { e_a << x }, -> x { i_a << x }
+        listener.receive_error_event :x
+        listener.receive_info_event :y
+        listener.receive_info_event :z
+        e_a.should eql [ :x ]
+        i_a.should eql [ :y, :z ]
+      end
 
-    it "nil callbacks don't get called" do
-      one_a = []
-      listener = Adapter_Listener_.new -> x { one_a << x }
-      listener.receive_error_event :a
-      listener.receive_info_event :b
-      one_a.should eql [ :a ]
-    end
+      it "nil callbacks don't get called" do
+        one_a = []
+        listener = Adapter_Listener_.new -> x { one_a << x }
+        listener.receive_error_event :a
+        listener.receive_info_event :b
+        one_a.should eql [ :a ]
+      end
 
-    it "you can reflect on the listeners themselves" do
-      listener = Adapter_Listener_.new :foo, :bar
-      listener.error_p.should eql :foo
-      listener.info_p.should eql :bar
-    end
+      it "you can reflect on the listeners themselves" do
+        listener = Adapter_Listener_.new :foo, :bar
+        listener.error_p.should eql :foo
+        listener.info_p.should eql :bar
+      end
+
+      context "\"static\" listener class with `via_iambic`" do
+
+        it "when good" do
+          e_a = [] ; i_a = []
+          subject :on_error_event, -> x { e_a << x },
+            :on_info_event, -> x { i_a << x }
+          @subject.receive_info_event :foo
+          @subject.receive_error_event :bar
+          i_a.should eql [ :foo ]
+          e_a.should eql [ :bar ]
+        end
+
+        it "clobbering only takes the last one (for now)" do
+          e_a = [] ; i_a = []
+          subject :on_error_event, -> x { e_a << x },
+            :on_info_event, -> x { i_a << x },
+            :on_info_event, -> x { e_a << x }
+          @subject.receive_info_event :foo
+          @subject.receive_error_event :bar
+          e_a.should eql [ :foo, :bar ]
+          i_a.length.should be_zero
+        end
+
+        it "when strange" do
+          -> do
+            subject :on_foo_zizzle
+          end.should raise_error ::ArgumentError,
+            %r(\Adid not match against .+ - 'on_foo_zizzle'\z)
+        end
+
+        def subject * x_a
+          @subject = Adapter_Listener_.via_iambic x_a
+        end
+      end
     end
 
     context "inline" do
