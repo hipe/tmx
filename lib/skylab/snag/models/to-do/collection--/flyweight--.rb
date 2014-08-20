@@ -1,10 +1,10 @@
 module Skylab::Snag
 
-  class Models::ToDo::Enumerator__::Flyweight__
+  class Models::ToDo::Collection__::Flyweight__
 
-    def initialize pattern
+    def initialize pattern_s
       @md = nil
-      @pattern = pattern  # just passed around. not used here.
+      @pattern_s = pattern_s  # just passed around. not used here.
       @upstream_output_line = nil  # e.g ffrom find, e.g "path:line:source"
     end
 
@@ -13,7 +13,7 @@ module Skylab::Snag
     def collapse listener
       @md or parse
       Models::ToDo.build( @md[ :full_source_line ], @md[ :line ], @md[ :path ],
-        @pattern, listener )
+        @pattern_s, listener )
     end
 
     def is_valid

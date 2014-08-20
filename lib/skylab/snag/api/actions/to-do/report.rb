@@ -16,36 +16,39 @@ module Skylab::Snag
 
     listeners_digraph :command_string,
       :error_event,
-      :error_string,
       :number_found,
       :todo
 
   private
 
     def execute
-      @ea = Snag_::Models::ToDo.build_enumerator @paths, @pattern, @names
       if @show_command_only
         exec_show_command_only
       else
-        ea = @ea
-        ea.on_error_string method :send_error_string
-        ea.on_command_string do |cmd_s|  # if strict event handling, we must.
-          if @be_verbose
-            send_command_string cmd_s
-          end
-        end
-        res = ea.each do |todo|
-          send_todo todo
-        end
-        if ea.seen_count
-          send_number_found ea.seen_count
-        end
-        res
+        exec_normal
       end
     end
 
+    def exec_normal
+      scan = Snag_::Models::Todo.build_scan @paths, @pattern, @names,
+        :on_command_string, -> cmd_s do
+          if @be_verbose
+            send_command_string cmd_s
+          end
+        end,
+        :on_error_event, method( :send_error_event )
+      scan.each do |todo|
+        send_todo todo
+      end
+      if scan.seen_count
+        send_number_found scan.seen_count
+      end
+      scan.result
+    end
+
     def exec_show_command_only
-      @ea.command.command -> cmd_str do
+      Snag_::Models::ToDo.build_scan( @paths, @pattern, @names ).
+          command.command -> cmd_str do
         send_command_string cmd_str
         ACHIEVED_
       end, method( :send_error_event )

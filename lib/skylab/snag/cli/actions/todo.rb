@@ -26,7 +26,6 @@ module Skylab::Snag
       tree = nil
       ok = call_API [ :to_do, :report ], @param_h do |o|
         o.on_error_event handle_error_event
-        o.on_error_string handle_error_string
         o.on_command_string do |cmd_s|
           send_payload_line cmd_s
         end

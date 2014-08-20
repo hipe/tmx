@@ -8,8 +8,8 @@ module Skylab::Snag
         new( a ).valid_result
       end
 
-      def build_enumerator paths, pattern, names
-        self::Enumerator__.new paths, pattern, names
+      def build_scan * a
+        self::Collection__.build_scan_via_a a
       end
 
       def default_pattern_s

@@ -19,15 +19,13 @@ module Skylab::Snag
         listener, _API_client = a
 
       @file_changes = []
-
-      o = Snag_::Models::ToDo.build_enumerator @paths, @pattern, @names
-      o.on_error_string listener.method :receive_error_string
-      o.on_command_string do |cmd_str|  # (strict event handling)
-        if @be_verbose
-          @listener.receive_info_line cmd_str
-        end
-      end
-      @todos = o
+      @todos = Snag_::Models::ToDo.build_scan @paths, @pattern, @names,
+        :on_command_string, -> cmd_str do
+          if @be_verbose
+            @listener.receive_info_line cmd_str
+          end
+        end,
+        :on_error_event, listener.method( :receive_error_event )
       super listener, _API_client
     end
 

@@ -1,77 +1,123 @@
 module Skylab::Snag
 
-  class Models::ToDo::Enumerator__ < ::Enumerator
+  class Models::ToDo
 
-    Callback_[ self, :employ_DSL_for_digraph_emitter ]
+    module Collection__
 
-    listeners_digraph :error_string, :command_string
+      class << self
 
-    event_factory -> _, __, x { x }
+        def build_scan_via_a a
+          Scan__.new a
+        end
+      end
 
-    # (primary public method is `each` whose private impl is `visit`)
+  class Scan__  # #borrow:2
 
-    #         ~ courtesy reflection & rendering (in asc. complexity) ~
+    Listener = Snag_::Model_::Listener.new :command_string, :error_event
 
-    def initialize paths, pattern, names
-      @command = Snag_::Models::Find.new paths, pattern, names
-      @seen_count = nil
-      super(& method( :visit ) )
+    Snag_::Model_::Actor[ self ]
+
+    def initialize a  # paths patterns names
+      @command = Snag_::Models::Find.new( * a.shift( 3 ) )
+      @listener = Listener.via_iambic a
     end
 
-    attr_reader :command
+    attr_reader :command, :exitstatus, :result, :seen_count
 
-    attr_reader :seen_count
+    def each
+      if block_given?
+        scn = to_scanner ; x = nil
+        yield x while x = scn.gets
+        @result
+      else
+        to_enum
+      end
+    end
 
+    def to_scanner
+      @seen_count = 0 ; @result = nil
+      @p = bld_initial_gets_proc
+      Callback_::Scn.new do
+        @p[]
+      end
+    end
   private
-
-    def visit y  # ( methods presented in pre-order from here )
-      res = false
-      if all_required_events_are_handled
-        res = true
-        @seen_count = 0
-        err = -> ev do
-          send_to_listener :error_event, ev
-          res = false
-        end
-        @command.pattern -> p do
-          @pattern = p
-          @command.command -> cmd do
-            send_to_listener :command_string, cmd
-            visit_valid y, cmd
-          end, err
-        end, err
-      end
-      res  # ick i hate semantic results from iterators..
-    end
-
-    def all_required_events_are_handled
-      if_unhandled_stream_names -> a do
-        msg = "strict about event coverage for now - unhandled: #{ a * ', ' }"
-        a.include? :error_string and raise ::RuntimeError, msg
-        send_to_listener :error_string, msg
-      end, -> do  # else
-        true
+    def bld_initial_gets_proc
+      -> do
+        @result = talk_to_command
+        @result and procede_with_normal_scan
       end
     end
-
-    def visit_valid y, cmd
-      res = true
-      Snag_::Library_::Open3.popen3( cmd ) do |sin, sout, serr|
-        todo = self.class::Flyweight__.new @pattern
-        sout.each_line do |line|
-          @seen_count += 1
-          y << ( todo.replace line.chomp )
-        end
-        serr.each_line do |line|
-          res = false
-          send_to_listener :error_string, "(unexpected output: #{ line.chomp })"
-        end
+    def procede_with_normal_scan
+      @p = bld_money_gets_proc
+      @p[]
+    end
+    def talk_to_command
+      ok = resolve_command_pattern
+      ok && resolve_command_string
+    end
+    def resolve_command_pattern
+      @command.pattern -> ok_x do
+        @pattern_s = ok_x ; ACHIEVED_
+      end, -> ev do
+        send_error_event ev
       end
-      res
     end
-
-    def send_to_listener i, x
-      call_digraph_listeners i, x
+    def resolve_command_string
+      @command.command -> cmd_s do
+        @command_s = cmd_s
+        @listener.receive_command_string cmd_s
+        ACHIEVED_
+      end, -> ev do
+        send_error_event ev
+      end
     end
+    def bld_money_gets_proc
+      -> do
+        fly = Collection__::Flyweight__.new @pattern_s
+        _i, o, e, wait = Snag_::Library_::Open3.popen3 @command_s
+        @p = -> do
+          if o
+            o_line = o.gets
+            o_line or o = nil
+          end
+          if e
+            e_line = e.gets
+            e_line or e = nil
+          end
+          if e
+            send_unexpected_output_error_event e_line
+          end
+          if o
+            o_line.chomp!
+            fly.replace o_line
+            if e
+              flush_more_e e
+            end
+            @seen_count += 1
+            fly
+          elsif e
+            flush_more_e e
+            @exitstatus = wait.value.exitstatus
+            @result = UNABLE_
+          else
+            @exitstatus = wait.value.exitstatus
+            @result = ACHIEVED_
+            @p = EMPTY_P_ ; nil
+          end
+        end
+        @p[]
+      end
+    end
+    def send_unexpected_output_error_event line
+      send_error_event :unexpected_output, :line, line do |y, o|
+        y << "(unexpected output: #{ line.chomp })"
+      end
+    end
+    def flush_more_e io
+      self._DO_ME  # #todo
+    end
+  end
+    end  # #pay-back:2
   end
 end

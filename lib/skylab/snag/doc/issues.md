@@ -12,7 +12,7 @@
 [#057]       #doc-node the model
 [#056] #hole
 [#055]       #parent-node: [#006] the API action narrative ..
-[#054] #open no sub-client here
+[#054]       #done no sub-client here
 [#053]       #doc-node structures for our CLI implementation
 [#052]       #parent-node: [#053] the CLI node
 [#051]       #done move all initialize to the top
