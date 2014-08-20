@@ -106,34 +106,40 @@ module Skylab::Snag
 
     turn_DSL_off
 
-    default = -> do
-      box = Snag_::API::Actions::ToDo::Report.attributes.
-        meta_attribute_value_box :default
-      default = -> { box }
-      box
-    end
-
-    define_method :command_option do |o|
+    def command_option o
       o.on '--cmd', 'just show the internal grep / find command',
         'that would be used (debugging).' do
         @param_h[:show_command_only] = true
       end
     end
 
-    define_method :name_option do |o|
+    def name_option o
       o.on '--name <NAME>',
         "the filename patterns to search, can be specified",
         "multiple times to broaden the search #{
-          }(default: '#{ default[][:names] * "', '" }')" do |n|
+          }(default: '#{ default_for( :names ) * "', '" }')" do |n|
             ( @param_h[:names] ||= [] ).push n
       end
     end
 
-    define_method :pattern_option do |o|
+    def pattern_option o
       o.on '-p', '--pattern <PATTERN>',
-        "the todo pattern to use (default: '#{ default[][:pattern] }')" do |p|
+        "the todo pattern to use (default: '#{ default_for :pattern }')" do |p|
         @param_h[:pattern] = p
       end
     end
+
+    def default_for i
+      Default_for__[ i ]
+    end
+    Default_for__ = -> do
+      p = -> i do
+        _cls = Snag_::API::Actions::ToDo::Report
+        box = _cls.attributes.meta_attribute_value_box :default
+        p = -> i_ { box[ i_ ] }
+        box[ i ]
+      end
+      -> i { p[ i ] }
+    end.call
   end
 end

@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class Models::ToDo
+  class Models::ToDo  # see [#003]
     # imagine that parts of this are frozen
 
     class << self
@@ -10,126 +10,143 @@ module Skylab::Snag
     end
 
     def initialize full_source_line, line_number_string, path, pattern
-      @full_source_line = full_source_line
+      @line = full_source_line
       @line_number = line_number_string.to_i
       @line_number_string = line_number_string
+      @did_parse = false
       @path = path
       @pathname = nil
-      @pattern = pattern
-      @ranges = nil
+      @pattern_s = pattern ; receive_pattern_changed
+      @replacement_line = nil
     end
 
-    attr_reader :full_source_line
-
-    attr_reader :line_number
-
-    attr_reader :line_number_string
-
-    def message_body_string
-      range :body
-    end
-
-    def one_line_summary # [#it-001] summarization might be nice here
-      if @replacement_line and @ranges || parse
-        @replacement_line[ @ranges.tag.begin .. -1 ]
-      else
-        message_body_string
-      end
-    end
-
-    attr_reader :path
-
-    def pathname
-      if @pathname.nil?
-        @pathname = @path ? ::Pathname.new( @path ) : false
-      end
-      @pathname
-    end
-
-    def post_tag_string
-      if @ranges || parse
-        @full_source_line[ @ranges.tag.end + 1 .. -1 ]
-      end
-    end
-
-    def pre_comment_string
-      range :precomment
-    end
-
-    def pre_tag_string
-      if @ranges || parse
-        r =  @ranges.precomment.begin .. @ranges.tag.begin - 1
-        if r.count.nonzero?
-          @full_source_line[ r ]
-        end
-      end
-    end
+    attr_reader :line_number, :line_number_string, :path
 
     attr_accessor :replacement_line
 
+    def full_source_line
+      @line
+    end
+
+    def one_line_summary  # [#it-001] summarization might be nice here
+      @did_parse or parse
+      if @replacement_line
+        _begin = @before_comment_content_range.end +
+          Models::Melt.replacement_non_content_width
+        @replacement_line[ _begin .. -1 ]
+      else
+        any_message_body_string
+      end
+    end
+
+    def pathname
+      @pathname.nil? and init_pn
+      @pathname
+    end
+    def init_pn
+      @pathname = @path ? ::Pathname.new( @path ) : false
+    end
+
+    # ~
+
+    def any_before_comment_content_string
+      before_comment_content_range.count.nonzero? and
+        @line[ @before_comment_content_range ]
+    end
+
+    def any_pre_tag_string  # includes the whitespace
+      pre_tag_string_range.count.nonzero? and
+        @line[ @pre_tag_string_range ]
+    end
+
     def tag_string
-      range :tag
+      @line[ tag_string_range ]
+    end
+
+    def any_post_tag_string
+      post_tag_string_range.count.nonzero? and
+        @line[ post_tag_string_range ]
+    end
+
+    def any_message_body_string
+      message_body_string_range.count.nonzero? and
+        @line[ @message_body_string_range ]
     end
 
   private
 
-    before_rx = last_pattern = todo_rx = nil
+    # #note-75
 
-    regexes = -> pattern do
-      last_pattern = pattern
-      todo_rx = /#{ pattern.gsub( /\\[<>]/, '\b' ) }/ # TERRIBLE
-      before_rx = /(?:(?!#{ todo_rx.source }).)*/
+    def before_comment_content_range
+      @did_parse or parse
+      @before_comment_content_range
     end
 
-    ranges_struct = ::Struct.new :precomment, :tag, :body
+    def pre_tag_string_range
+      @did_parse or parse
+      @pre_tag_string_range
+    end
 
-    rscn = scn = nil
+    def tag_string_range
+      @did_parse or parse
+      @tag_string_range
+    end
 
-    # given a `full_source_line` that looks like:
-    #   "      # %todo we would love to have -1, -2 etc"
-    # parse out ranges for:
-    #   + `precomment` : the leading whitespace before the '#'
-    #   + `body`       : the string from 'we' to 'etc'
-    #
-    # some of these ranges may be zero width so it is *crucial* that
-    # you check `count` on the range because otherwise getting the
-    # substring 0..-1 of a string may *not* be what you expect, depending
-    # on what you expect!
+    def post_tag_string_range
+      @did_parse or parse
+      @post_tag_string_range
+    end
 
-    define_method :parse do
-      fail 'sanity' if @ranges
-      if last_pattern != @pattern
-        regexes[ @pattern ]
+    def message_body_string_range
+      @did_parse or parse
+      @message_body_string_range
+    end
+
+    def parse
+      @did_parse = true
+      md = @todo_rx.match( @line ) or self._SANITY_RX  # #note-100
+      tag_begin = md.begin 0 ; tag_end = md.end 0
+      extra_length = if tag_begin.nonzero?
+        s = @line[ 0, tag_begin ]
+        space_md = SPACE_POUND_SPACE_AT_END_RX__.match s
+        space_md ? space_md[ 0 ].length : 0
+      else 0 end
+      _content_limit = tag_begin - extra_length
+      @before_comment_content_range = 0 ... _content_limit
+      @pre_tag_string_range = 0 ... tag_begin
+      @tag_string_range = tag_begin ... tag_end
+      line_length = @line.length
+      @post_tag_string_range = tag_end ... line_length  # may be X..X
+      @message_body_string_range = if line_length == tag_end
+        line_length ... line_length
+      else
+        _d = ANY_SPACE_AT_BEGINNING_RX__.match( @line, tag_end )[ 0 ].length
+        ( tag_end + _d ) ... line_length
+      end ; nil
+    end
+
+    _OPENING_COMMENT_CHARACTER_RX_ = ::Regexp.escape '#'
+    SPACE_POUND_SPACE_AT_END_RX__ =
+      / [ \t]+ (?: #{ _OPENING_COMMENT_CHARACTER_RX_ } [ \t]+ )? \z/x
+    ANY_SPACE_AT_BEGINNING_RX__ = /\G[ \t]*/
+
+
+    def receive_pattern_changed
+      @todo_rx, @before_rx = Cache__[ @pattern_s ]
+    end
+
+    Cache__ = -> do
+      bld = -> pattern_s do
+        todo_rx = /#{ pattern_s.gsub %r(\\[<>]), '\b' }/  # TERRIBLE
+        before_rx = /(?:(?!#{ todo_rx.source }).)*/
+        [ todo_rx, before_rx ].freeze
       end
-      ranges = ranges_struct.new
-      rscn ||= Snag_::Library_::StringScanner.new EMPTY_S_
-      scn  ||= Snag_::Library_::StringScanner.new EMPTY_S_
-      scn.string = full_source_line
-      ranges.precomment = -> do # we need to back up till
-        scn.skip( before_rx ) or fail 'rx'      # before the '#' :(
-        rscn.string = full_source_line[ 0, scn.pos ].reverse
-        if ! rscn.skip_until( /#/ ) && '#' != scn.peek( 1 )
-          fail 'rx' # covered - the tag's hash might have been a comment leader
-        end
-        0 .. rscn.string.length - rscn.pos - 1
-      end.call
-      # the beginning of the rest now looks like: '%todo '
-      pos = scn.pos
-      scn.skip( todo_rx ) or fail 'rx'
-      ranges.tag = pos .. scn.pos - 1
-      scn.skip( /[[:space:]]*/ )
-      ranges.body = scn.pos .. scn.string.length - 1
-      @ranges = ranges
-      true
-    end
-
-    def range name
-      if @ranges || parse
-        r = @ranges[ name ]
-        if r.count.nonzero?
-          @full_source_line[ r ]
+      h = {}
+      -> pattern_s do
+        h.fetch pattern_s do |_|
+          h[ pattern_s ] = bld[ pattern_s ]
         end
       end
-    end
+    end.call
   end
 end

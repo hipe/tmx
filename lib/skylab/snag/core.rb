@@ -20,6 +20,8 @@ module Skylab::Snag
 
   EMPTY_A_ = [].freeze
 
+  EMPTY_P_ = -> { }
+
   EMPTY_S_ = ''.freeze
 
   Event_ = -> { Snag_::Model_::Event }

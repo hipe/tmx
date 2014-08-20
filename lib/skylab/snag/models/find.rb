@@ -34,24 +34,28 @@ module Skylab::Snag
       end
     end
 
-    nothing = -> { }
-
     # for each :foo make a `foo_reason` that results in nil iff valid,
     # else string with a failure reason *sentence phrase*.
 
-    [ :names, :paths, :pattern ].each do |m|
-      define_method :"#{ m }_reason" do
-        send m, nothing, -> predicate { "#{ m } #{ predicate }" }
+    [ :names, :paths, :pattern ].each do |i|
+      define_method :"#{ i }_reason" do
+        send i, EMPTY_P_, -> predicate_s { "#{ i } #{ predicate_s }" }
       end
     end
 
-    nonzero_length = nil  # scope
-
-    define_method :names do |yes, no|          # the validity for `names` is
-      nonzero_length[ @names, yes, no ]  # defined as..
+    def names yes, no  # the validity for `names` is defined as..
+      Nonzero_length__[ @names, yes, no ]
     end
 
-    nonzero_length = -> x, yes, no do
+    def paths yes, no  # and so on
+      Nonzero_length__[ @paths, yes, no ]
+    end
+
+    def pattern yes, no
+      Trueish__[ @pattern, yes, no ]
+    end ; alias_method :patrn, :pattern  # #OCD
+
+    Nonzero_length__ = -> x, yes, no do
       if x.length.nonzero?
         if 1 == yes.arity
           yes[ x.map(& :dup ) ]
@@ -63,19 +67,7 @@ module Skylab::Snag
       end
     end
 
-    define_method :paths do |yes, no|          # and so on..
-      nonzero_length[ @paths, yes, no ]
-    end
-
-    trueish = nil  # scope
-
-    define_method :pattern do |yes, no|
-      trueish[ @pattern, yes, no ]
-    end
-
-    alias_method :patrn, :pattern  # ocd
-
-    trueish = -> x, yes, no do
+    Trueish__ = -> x, yes, no do
       if x
         if 1 == yes.arity
           yes[ x.dup ]

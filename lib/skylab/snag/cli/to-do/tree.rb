@@ -14,11 +14,13 @@ module Skylab::Snag
 
   class CLI::ToDo::Tree
 
-    def initialize do_pretty, listener
-      @do_pretty = do_pretty
+    def initialize *a
+      @do_pretty, @listener = a
+      @glyphset_i = :wide  # narrow or wide
       @todos = []
-      @listener = listener
     end
+
+    attr_writer :glyphset_i
 
     def << todo
       if todo.is_valid
@@ -27,90 +29,185 @@ module Skylab::Snag
       nil
     end
 
-    tree_lines_producer_basic = -> tree do
-      ea = ::Enumerator.new do |y|
-        trav = Snag_::Lib_::Tree[]::Traversal.new
-        trav.traverse tree do |card|
-          prefix = trav.prefix card
-          if (( n = card.node )).is_leaf
-            a = [ "#{ prefix } #{ n.slug }" ]
-            if n.todo
-              a << n.todo.full_source_line
-            end
-            y << a.join( SPACE_ )
-          else
-            y << "#{ prefix } #{ n.slug }"
-          end
-        end
-      end
-      Snag_::Library_::Basic::List::Scanner::For::Enumerator.new ea
+    def render
+      rndr = Render__.new @do_pretty, @todos, @listener
+      rndr.glyphset_i = @glyphset_i
+      rndr.render
     end
 
-    fun = Snag_::Lib_::CLI[]::Pen::FUN
-    line_num_style_a = [ :strong, :yellow ]
-    path_style_a = [ :strong, :green ]
-    tag_style_a = [ :reverse, :yellow ]
+    class Render__
 
-    tree_lines_producer_pretty = -> tree do
-      stylize = fun.stylize # here is where you could un-color it if not tty
+      def initialize *a
+        @do_pretty, @todos, @listener = a
+        @glyphset_i = nil
+      end
 
-      scn = tree.get_traversal_scanner :glyphset_x, :wide  # :narrow too
+      attr_writer :glyphset_i
 
-      cache_a = [ ]
-      while (( card = scn.gets ))
-        n = card.node
-        if n.is_branch
-          line_node_slug = stylize[ n.slug, * path_style_a ]
+      def render
+        @tree = CLI::ToDo::Tree::Node.new
+        populate_and_crop_tree
+        resolve_producer
+        @producer and flush
+      end
+
+    private
+
+      def populate_and_crop_tree
+        @todos.each do |todo|
+          _a = todo.path.split( SEP__ ).push todo.line_number_string
+          @tree.fetch_or_create( :path, _a,
+            :init_node, -> nod do
+              nod.is_leaf and nod.todo = todo
+            end )
+        end
+        if 1 == @tree.children_count
+          @tree = @tree.children.first # comment out and see
+        end ; nil
+      end
+
+      def resolve_producer
+        @producer = if @do_pretty
+          Build_pretty_tree_lines_producer__[ @tree, @glyphset_i ]
         else
-          line_node_slug = stylize[ n.slug, * line_num_style_a ]
-        end
-        cache_a << (( ro = ["#{ card.prefix[] } #{ line_node_slug }" ] ))
-        ro << fun.unstyle[ ro[0] ].length
-        if n.is_leaf && n.todo
-          ro << n.todo
+          Build_basic_tree_lines_producer__[ @tree, @glyphset_i ]
         end
       end
 
-      col_a_width = cache_a.reduce( 0 ) do |m, row|
-        m > row[1] ? m : row[1]
-      end
-      Snag_::Library_::Basic::List::Scanner::For::Enumerator.new(
-          ::Enumerator.new do |y|
-        cache_a.each do | col_a, col_a_w, todo |
-          col_b = if todo
-            "#{ todo.pre_tag_string }#{
-              }#{ stylize[ todo.tag_string, * tag_style_a ] }#{
-              }#{ todo.post_tag_string }"
-          end
-          y << "#{ col_a }#{ SPACE_ * ( col_a_width - col_a_w ) }#{
-            } |#{ col_b }"
-        end
-      end )
-    end
-
-    define_method :render do
-      tree = CLI::ToDo::Tree::Node.new
-      @todos.each do |todo|
-        tree.fetch_or_create(
-          :path, ( todo.path.split( '/' ) << todo.line_number_string ),
-          :init_node, -> nod do nod.is_leaf and nod.todo = todo end )
-      end
-
-      if 1 == tree.children_count
-        tree = tree.children.first # comment out and see
-      end
-
-      if @do_pretty
-        producer = tree_lines_producer_pretty[ tree ]
-      else
-        producer = instance_exec tree, &tree_lines_producer_basic
-      end
-      if producer
-        while (( line = producer.gets ))
+      def flush
+        while (( line = @producer.gets ))
           @listener.receive_payload_line line
         end
+        NEUTRAL_
       end
-      NEUTRAL_
+
+      SEP__ = '/'.freeze
+    end
+
+    module Actor___
+      class << self
+        def [] cls, _, * i_a
+          cls.const_set :IVAR_I_A__, i_a.map { |i| :"@#{ i }" }
+          cls.extend MM__ ; cls.include self ; nil
+        end
+      end
+      module MM__
+        def [] * x_a
+          new( x_a ).execute
+        end
+      end
+      def initialize x_a
+        ivar_i_a = self.class::IVAR_I_A__
+        x_a.length.times do |d|
+          instance_variable_set ivar_i_a.fetch( d ), x_a.fetch( d )
+        end ; nil  # #etc
+      end
+    end
+
+    class Build_basic_tree_lines_producer__
+      Actor___[ self, :properties, :tree, :glyphset_i ]
+      def initialize( * )
+        super
+        @glyphset_i ||= :wide  # wide or narrow
+      end
+      def execute
+        scn = @tree.get_traversal_scanner :glyphset_x, @glyphset_i
+        Callback_::Scn.new do
+          card = scn.gets
+          card and line_via_card card
+        end
+      end
+    private
+      def line_via_card card
+        prefix_s = card.prefix[]
+        node = card.node
+        s = "#{ prefix_s } #{ node.slug }"
+        if node.is_leaf
+          a = [ s ]
+          if node.todo
+            a.push node.todo.full_source_line
+          end
+          a * SPACE_
+        else
+          s
+        end
+      end
+    end
+
+    class Build_pretty_tree_lines_producer__
+
+      Actor___[ self, :properties, :tree, :glyphset ]
+
+      def initialize( * )
+        super
+        @glyphset_i ||= :wide  # wide or narrow
+        @line_num_style_a = [ :strong, :yellow ].freeze
+        @path_style_a = [ :strong, :green ].freeze
+        @tag_style_a = [ :reverse, :yellow ].freeze  # #etc
+        @fun = -> do
+          fun = Snag_::Lib_::CLI[]::PEN::FUN ; @fun = -> { fun } ; fun
+        end
+      end
+
+      def execute
+        build_cache
+        determine_column_A_width
+        via_cache_build_scanner
+      end
+
+    private
+
+      def build_cache
+        scn = @tree.get_traversal_scanner :glyphset_x, @glyphset_i ; y = []
+        while (( card = scn.gets ))
+          node = card.node
+          _line_node_slug = stylize node.slug,
+            node.is_branch ? @path_style_a : @line_num_style_a
+          s = "#{ card.prefix[] } #{ _line_node_slug }"
+          item = Item__.new s, unstyle( s ).length
+          y.push item
+          if node.is_leaf && node.todo
+            item.todo = node.todo
+          end
+        end
+        @cache_a = y ; nil
+      end
+
+      def determine_column_A_width
+        @column_A_width = @cache_a.reduce 0 do |m, item|
+          m > item.d ? m : item.d
+        end ; nil
+      end
+
+      def via_cache_build_scanner
+        d = -1 ; last = @cache_a.length - 1
+        Callback_::Scn.new do
+          if d < last
+            line_via_item @cache_a.fetch d += 1
+          end
+        end
+      end
+
+      def line_via_item item
+        col_a, col_a_w, todo = item.to_a
+        col_b = if todo
+          "#{ todo.any_pre_tag_string }#{
+           }#{ stylize todo.tag_string, @tag_style_a }#{
+            }#{ todo.any_post_tag_string }"
+        end
+        _space = SPACE_ * ( @column_A_width - col_a_w )
+        "#{ col_a }#{ _space } |#{ col_b }"
+      end
+
+      def stylize s, a
+        @fun[]::Stylify[ a, s ]
+      end
+
+      def unstyle s
+        @fun[].unstyle[ s ]
+      end
+
+      Item__ = ::Struct.new :s, :d, :todo
     end
   end
 end

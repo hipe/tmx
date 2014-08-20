@@ -6,6 +6,10 @@ module Skylab::Snag
       def build_controller * a
         self::Controller__.new a
       end
+
+      def replacement_non_content_width
+        REPLACEMENT_NON_CONTENT_WIDTH__
+      end
     end
 
     class Controller__ < Snag_::Model_::Controller
@@ -79,12 +83,12 @@ module Skylab::Snag
     end
 
     def todo todo
-      if ! todo.message_body_string
-        send_info_line say_no_message todo
-        nil
-      else
+      if todo.any_message_body_string
         node = add_new_open_node_for_todo_item todo
         node and change_source_line todo, node
+      else
+        send_info_line say_no_message todo
+        NEUTRAL_
       end
     end
 
@@ -94,7 +98,7 @@ module Skylab::Snag
                  be_verbose: @be_verbose,
         do_prepend_open_tag: true,
                     dry_run: @dry_run,
-                    message: todo.message_body_string,
+                    message: todo.any_message_body_string,
                 working_dir: @working_dir
       }, -> o do
         o.on_error_event @listener.method :receive_error_event
@@ -119,21 +123,22 @@ module Skylab::Snag
 
     message_body_excerpt = sep = nil  # scope
 
-    define_method :change_source_line do |todo, node|
+    define_method :change_source_line do |todo, node|  # #todo
       res = true
       begin  # #todo - during de-functionalization re-write this
         fail 'sanity - should have checked for empty message body string' if
-          ! todo.message_body_string
+          ! todo.any_message_body_string
         if @file_changes.length.nonzero? && @file_changes.last.path != todo.path
           res = flush_file_changes or break
         end
-        pre_comment = todo.pre_comment_string
-        if ENDING_IN_ONLY_ONE_SPACE_RX__ =~ pre_comment
-          pre_comment = "#{ pre_comment } "
+        s_ = "#{ COMMENT_OPENER__ }#{ OPEN_TAG_S__ }#{
+          }#{ BETWEEN_TAG_AND_NODE_IDENTIFIER__ }#{ node.identifier.render }"
+        s = todo.any_before_comment_content_string
+        new_line = if s
+          "#{ s }#{ TWO_SPACES__ }#{ s_ }"
+        else
+          s_  # some lines will be only a comment
         end
-        new_line = "#{ pre_comment }##{
-          } #{ OPEN_TAG_S__ } #{ node.identifier.render }"
-        # some lines will just be a comment
         excerpt = message_body_excerpt[ new_line, todo ]
         if excerpt
           new_line.concat "#{ sep }#{ excerpt }"
@@ -143,8 +148,13 @@ module Skylab::Snag
       end while nil
       nil
     end
+    BETWEEN_TAG_AND_NODE_IDENTIFIER__ = ' '.freeze
+    COMMENT_OPENER__ = '# '.freeze
     ENDING_IN_ONLY_ONE_SPACE_RX__ = /(?<![ ])[ ]\z/
     OPEN_TAG_S__ =  Models::Tag.canonical_tags.open_tag.render
+    TWO_SPACES__ = '  '.freeze
+    Models::Melt::REPLACEMENT_NON_CONTENT_WIDTH__ =
+      TWO_SPACES__.length + COMMENT_OPENER__.length
 
     def flush_file_changes
       @file_changes.length.nonzero? and flsh_nonzero_file_changes
@@ -188,7 +198,7 @@ module Skylab::Snag
         # put you over the limit, taking into account spaces and ellipses etc
         res = nil
         begin  # #todo during de-functionalization, rewrite this
-          words = todo.message_body_string.split sp
+          words = todo.any_message_body_string.split sp
           words.length.zero? and break # maybe just sanity
           available_length = line_width - ( new_line.length + sep.length )
           fail 'sanity' if min_words < 1

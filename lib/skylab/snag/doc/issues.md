@@ -65,7 +65,7 @@
              (was: reanme Api -> API, P-orcelain -> CLI)
 [#005]       #done get cli working again
 [#004]       #done light fast solo CLI client 2012-11-12
-[#003]       #done tree report of todos 2012-10-13
+[#003]       #parent-node: [#057] was: tree report of todos 2012-10-13
 [#002]       #done 2012-08-19 basic CLI integration specs - essential coverage
 [#001]       #done 2012-08-20 integrate the 'issue-all' one-off #deferred
 [#sl-048]    #done show should list (for now) 2012-02-10

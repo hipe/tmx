@@ -54,7 +54,7 @@ module Skylab::Snag
               _do_stop = @p[ x ]
               if _do_stop
                 @upstream.stop
-                p = -> { }  # EMPTY_P_
+                p = EMPTY_P_
               end
             end
             x

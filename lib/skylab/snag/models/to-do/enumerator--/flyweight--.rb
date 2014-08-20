@@ -39,23 +39,16 @@ module Skylab::Snag
 
     def is_valid
       @md or parse
-      if @md
-        @md[:line] && @md[:path]
-      end
+      @md[ :line ] && @md[ :path ]
     end
 
   private
 
-    rx = /\A (?<path>[^:]+) : (?<line>\d+) : (?<full_source_line>.*) $/x
-    # (if the above changes be *sure* to audit all of the heavyweight class)
-
-    define_method :parse do
-      if @upstream_output_line and md = rx.match( @upstream_output_line )
-        @md = md
-      else
-        @md = false
-        fail 'sanity'
-      end
+    def parse
+      @upstream_output_line or self._SANITY
+      @md = RX__.match( @upstream_output_line ) or self._SANITY
     end
+
+    RX__ = /\A (?<path>[^:]+) : (?<line>\d+) : (?<full_source_line>.*) $/x
   end
 end

@@ -90,8 +90,7 @@ module Skylab::Snag
       @scan = @scan.reduce_by { |_| @pass_count += 1 }
       if @query.max_count
         @scan = @scan.stop_when do |_|
-          _stop = @query.it_is_time_to_stop
-          _stop
+          @query.it_is_time_to_stop
         end
       end
       @pass_count = @total_count = 0
@@ -125,13 +124,12 @@ module Skylab::Snag
       end
     end
 
-    field_names = Snag_::Models::Node.main_field_names
-
-    define_method :render_node_as_yaml do
-      o = Snag_::Text_::Yamlization.new field_names
+    def render_node_as_yaml
+      o = Snag_::Text_::Yamlization.new FIELD_NAMES__
       o.on_text_line(& @lines.method( :<< ) )
       o
     end
+    FIELD_NAMES__ = Snag_::Models::Node.main_field_names
 
     def in_scan_render_nodes
       scan = @scan

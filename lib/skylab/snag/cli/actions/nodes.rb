@@ -72,11 +72,12 @@ module Skylab::Snag
     # (this function was original conception point of #doc-point [#sl-102])
 
     def list identifier_ref=nil
-      call_API( [ :nodes, :reduce ], {
-              be_verbose: true,
-          identifier_ref: identifier_ref,
-             working_dir: working_directory_path
-          }.merge!( @param_h ) ) do |o|
+      _par_h = {
+                 be_verbose: true,
+             identifier_ref: identifier_ref,
+                working_dir: working_directory_path }
+      _par_h.merge! @param_h
+      call_API [ :nodes, :reduce ], _par_h do |o|
         o.on_error_event handle_error_event
         o.on_error_string handle_error_string
         o.on_info_event handle_info_event

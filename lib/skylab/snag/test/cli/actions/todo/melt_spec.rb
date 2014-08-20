@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Snag::TestSupport::CLI::Actions
 
-  describe "[sg] CLI actions melt" do
+  describe "[sg] CLI actions todo melt" do
 
     extend TS_
 
