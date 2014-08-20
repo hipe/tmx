@@ -22,7 +22,7 @@ module Skylab::Snag
 
     attr_writer :glyphset_i
 
-    def << todo
+    def if_valid_add_todo_to_tree todo
       if todo.is_valid
         @todos.push todo.collapse
       end

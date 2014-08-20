@@ -18,49 +18,42 @@ module Skylab::Snag
       nil
     end
 
-    -> do  # `find`
-
-      build_tree = nil
-
-      define_method :find do |path, *paths|
-        paths.unshift( path ) ; path = nil
-        @param_h[ :paths ] = paths ; paths = nil
-        if @param_h.key? :tree_level
-          tree_level = @param_h.delete :tree_level
-        end
-        tree = nil
-        res = call_API [ :to_do, :report ], @param_h do |o|
-          o.on_error_event handle_error_event
-          o.on_error_string handle_error_string
-          o.on_command_string do |cmd_s|
-            send_payload_line cmd_s
-          end
-          o.on_number_found do |num|
-            send_info_line "(found #{ num } item#{ s num })"
-          end
-          if tree_level
-            tree = build_tree[ o, tree_level, listener ]
-          else
-            o.on_todo do |t|
-              send_payload_line t.upstream_output_line
-            end
-          end
-        end
-        if tree && res
-          res = tree.render
-        end
-        res
+    def find path, *paths
+      @param_h[ :paths ] = paths.unshift path ; path = paths = nil
+      if @param_h.key? :tree_level
+        tree_level = @param_h.delete :tree_level
       end
-
-      build_tree = -> action, level, client do
-        tree = CLI::ToDo::Tree.new ( level > 1 ), client
-        action.on_todo do |todo|
-          tree << todo  # with each todo, build the tree
+      tree = nil
+      ok = call_API [ :to_do, :report ], @param_h do |o|
+        o.on_error_event handle_error_event
+        o.on_error_string handle_error_string
+        o.on_command_string do |cmd_s|
+          send_payload_line cmd_s
         end
-        tree
+        o.on_number_found do |num|
+          send_info_line "(found #{ num } item#{ s num })"
+        end
+        if tree_level
+          tree = Build_tree__[ o, tree_level, listener ]
+        else
+          o.on_todo do |t|
+            send_payload_line t.upstream_output_line
+          end
+        end
       end
-    end.call
+      if tree && ok
+        ok = tree.render
+      end
+      ok
+    end
 
+    Build_tree__ = -> action, level, client do
+      tree = CLI::ToDo::Tree.new ( level > 1 ), client
+      action.on_todo do |todo|
+        tree.if_valid_add_todo_to_tree todo
+      end
+      tree
+    end
 
     desc "melt is insanity"
 
