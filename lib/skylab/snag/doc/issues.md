@@ -21,7 +21,7 @@
 [#048]       #parent-node: [#046] a cb error result may be disregarded
 [#047]       #parent-node: [#046] info channel result value is never meaningful
 [#046]       #parent-node: [#039] the result value patterns ..
-[#045] #open `delineate` needs an overhaul (and: #parent-node: [#057])
+[#045]       #parent-node: [#057] the node controller narrative ..
 [#044]       #tracking-tag whether or not we want inline events
 [#043]       #parent-node: [#011] #in-situ tags are case-sensitive for now
 [#042]       #parent-node: [#040] #in-situ method names are not channel names

@@ -33,9 +33,9 @@ module Skylab::Snag::TestSupport::Models::Node
 
       it "with one long line that looks (to it) line one long word" do
         node = build_node
-        node.instance_variable_set :@do_prepend_open_tag_ws, false
-        node.instance_variable_set :@line_width, 10 # other thing is at 7
-        node.instance_variable_set :@max_lines, 5
+        node.do_prepend_open_tag_ws = false
+        node.line_width = 10  # other thing is at like 7
+        node.max_lines = 5
         long_line = "ABC_one_line_-two-line-_tre_line_"
         node.message = long_line
         node.first_line_body.should eql( 'ABC' )

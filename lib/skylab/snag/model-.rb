@@ -92,7 +92,7 @@ module Skylab::Snag
 
       def bld_infered_stems  # #note-80 (of [#066]
         s_a = self.class.name_function.as_const.to_s.split( /_+/ ).map do |s|
-          Callback_::Name.from_const( s.intern ).as_slug
+          Callback_::Name.from_variegated_symbol( s.intern ).as_slug
         end
         if 1 == s_a.length
           noun_s = s_a.first
