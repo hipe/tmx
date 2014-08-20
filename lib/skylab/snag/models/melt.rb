@@ -121,37 +121,46 @@ module Skylab::Snag
 
     # #note-110
 
-    message_body_excerpt = sep = nil  # scope
-
-    define_method :change_source_line do |todo, node|  # #todo
-      res = true
-      begin  # #todo - during de-functionalization re-write this
-        fail 'sanity - should have checked for empty message body string' if
-          ! todo.any_message_body_string
-        if @file_changes.length.nonzero? && @file_changes.last.path != todo.path
-          res = flush_file_changes or break
-        end
-        s_ = "#{ COMMENT_OPENER__ }#{ OPEN_TAG_S__ }#{
-          }#{ BETWEEN_TAG_AND_NODE_IDENTIFIER__ }#{ node.identifier.render }"
-        s = todo.any_before_comment_content_string
-        new_line = if s
-          "#{ s }#{ TWO_SPACES__ }#{ s_ }"
-        else
-          s_  # some lines will be only a comment
-        end
-        excerpt = message_body_excerpt[ new_line, todo ]
-        if excerpt
-          new_line.concat "#{ sep }#{ excerpt }"
-        end
-        todo.replacement_line = new_line
-        @file_changes << todo
-      end while nil
-      nil
+    def change_source_line todo, node
+      todo.any_message_body_string or self._SANITY  # always check for empty msg body string
+      ok = flush_any_file_changes todo
+      ok and mutate_line todo, node
     end
+
+    def flush_any_file_changes todo
+      if @file_changes.length.nonzero? && @file_changes.last.path != todo.path
+        flush_file_changes
+      else
+        ACHIEVED_
+      end
+    end
+
+    def mutate_line todo, node
+      new_line = build_new_line todo, node
+      todo.replacement_line = new_line
+      @file_changes.push todo
+      ACHIEVED_
+    end
+
+    def build_new_line todo, node
+      s = todo.any_before_comment_content_string
+      s_ = "#{ COMMENT_OPENER__ }#{ OPEN_TAG_S__ }#{
+        }#{ BETWEEN_TAG_AND_NODE_IDENTIFIER__ }#{ node.identifier.render }"
+      new_line = if s
+        "#{ s }#{ TWO_SPACES__ }#{ s_ }"
+      else
+        s_  # some lines will be only a comment
+      end
+      excerpt = Get_any_message_body_excerpt__[ new_line, todo ]
+      excerpt and new_line.concat "#{ SEP__ }#{ excerpt }"
+      new_line
+    end
+
     BETWEEN_TAG_AND_NODE_IDENTIFIER__ = ' '.freeze
     COMMENT_OPENER__ = '# '.freeze
     ENDING_IN_ONLY_ONE_SPACE_RX__ = /(?<![ ])[ ]\z/
     OPEN_TAG_S__ =  Models::Tag.canonical_tags.open_tag.render
+    SEP__ = ' - '.freeze
     TWO_SPACES__ = '  '.freeze
     Models::Melt::REPLACEMENT_NON_CONTENT_WIDTH__ =
       TWO_SPACES__.length + COMMENT_OPENER__.length
@@ -187,9 +196,7 @@ module Skylab::Snag
       end
     end
 
-    sep = ' - '
-
-    message_body_excerpt = -> do
+    Get_any_message_body_excerpt__ = -> do
 
       ellipsis = line_width = min_words = sp = nil  # scope
 
@@ -200,7 +207,7 @@ module Skylab::Snag
         begin  # #todo during de-functionalization, rewrite this
           words = todo.any_message_body_string.split sp
           words.length.zero? and break # maybe just sanity
-          available_length = line_width - ( new_line.length + sep.length )
+          available_length = line_width - ( new_line.length + SEP__.length )
           fail 'sanity' if min_words < 1
           excerpt = words[ 0, min_words - 1 ].join sp
           words[ 0, min_words - 1 ] = EMPTY_A_
