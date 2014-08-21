@@ -1,6 +1,8 @@
 module Skylab::Brazen
 
-  class Action_
+  class Model_
+
+  class Action
 
     class << self
 
@@ -32,7 +34,7 @@ module Skylab::Brazen
     end
 
     class << self
-      attr_accessor :custom_inflection, :description_block
+      attr_accessor :custom_inflection, :description_block, :is_promoted
     end
 
     def to_even_iambic
@@ -86,5 +88,6 @@ module Skylab::Brazen
     def bld_listener
       self.class::Listener.new @client_adapter, self.class
     end
+  end
   end
 end

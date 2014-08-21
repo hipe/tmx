@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Models_::Workspace
 
-    class When__::Init
+    class Actors__::Init
 
       Brazen_::Model_::Actor[ self, :properties,
         :app_name,

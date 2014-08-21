@@ -4,7 +4,7 @@ module Skylab::Brazen
 
     module Mutable
 
-      class When__::Write
+      class Actors__::Write
 
         Brazen_::Model_::Actor[ self, :properties,
           :document, :is_dry, :listener, :prefix ]

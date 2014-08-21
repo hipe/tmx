@@ -1,10 +1,6 @@
 module Skylab::Brazen
 
-  Entity_ = :_defunct_
-
-  module Model_
-
-    Actor = Lib_::Snag__[]::Model_::Actor
+  class Model_
 
   Entity = Brazen_::Entity[ -> do
 
@@ -14,6 +10,11 @@ module Skylab::Brazen
 
     o :ad_hoc_processor, :inflect, -> scan do
       Entity::Customized_inflection__[ scan ]
+    end
+
+    o :ad_hoc_processor, :is_promoted, -> scan do
+      scan.scanner.advance_one
+      scan.reader.is_promoted = true
     end
 
     o :meta_property, :argument_arity,

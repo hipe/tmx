@@ -259,7 +259,7 @@ module Skylab::Brazen
         end
 
         def write_to_pathname pn, listener, * x_a
-          Mutable::When__::Write.new( pn, self, listener, x_a ).write
+          Mutable::Actors__::Write.new( pn, self, listener, x_a ).write
         end
 
         # ~ for child agents only:

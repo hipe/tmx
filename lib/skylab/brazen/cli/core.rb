@@ -434,7 +434,7 @@ module Skylab::Brazen
         a.push r while r = scn.gets ; a
       end
       def get_scanner
-        Brazen_::Scanner_::Wrapper.new @kernel.get_action_scanner do |action|
+        Kernel_.wrap_scanner @kernel.get_action_scanner do |action|
           Action_Adapter_.new @invocation, action
         end
       end

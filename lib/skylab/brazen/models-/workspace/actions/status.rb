@@ -1,6 +1,8 @@
 module Skylab::Brazen
 
-  class Actions_::Status < Brazen_::Action_
+  class Models_::Workspace
+
+  class Actions::Status < Brazen_::Model_::Action
 
     Brazen_::Model_::Entity[ self, -> do
 
@@ -9,6 +11,8 @@ module Skylab::Brazen
       end
 
       o :inflect, :verb, 'determine'
+
+      o :is_promoted
 
 
 
@@ -47,5 +51,6 @@ module Skylab::Brazen
         @listener.on_positive_event _ev
       end
     end
+  end
   end
 end

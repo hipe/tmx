@@ -6,14 +6,6 @@ module Skylab::Brazen
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
 
-  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
-
-  Brazen_ = self
-
-  module Actions_
-    Autoloader_[ self, :boxxy ]
-  end
-
   module Lib_
     sidesys = Autoloader_.build_require_sidesystem_proc
     Headless__ = sidesys[ :Headless ]
@@ -35,9 +27,12 @@ module Skylab::Brazen
     end
   end
 
+  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+
+  Brazen_ = self
   EMPTY_S_ = ''.freeze
+  Autoloader_[ Models_ = ::Module.new, :boxxy ]
   NILADIC_TRUTH_ = -> { true }
-  stowaway :Model_, 'entity-'
   SLASH_ = '/'.getbyte 0
   SPACE_ = ' '.freeze
   UNABLE_ = false

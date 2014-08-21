@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Models_::Workspace
+  class Models_::Workspace < Brazen_::Model_
 
     class << self
 
@@ -72,7 +72,7 @@ module Skylab::Brazen
     end
 
     def procede_with_init
-      self.class::When__::Init.with(
+      self.class::Actors__::Init.with(
         :app_name, @client.app_name,
         :config_filename, @config_filename || CONFIG_FILENAME__,
         :is_dry, @dry_run,
@@ -117,6 +117,10 @@ module Skylab::Brazen
 
     def some_config_filename
       @config_filename || CONFIG_FILENAME__
+    end
+
+    module Actions
+      Autoloader_[ self, :boxxy ]
     end
 
     class Filesystem_Walk__  # re-write a subset of [#st-007] the tree walker

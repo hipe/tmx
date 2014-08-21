@@ -1,6 +1,8 @@
 module Skylab::Brazen
 
-  class Actions_::Init < Brazen_::Action_
+  class Models_::Workspace
+
+  class Actions::Init < Brazen_::Model_::Action
 
     Brazen_::Model_::Entity[ self, -> do
 
@@ -10,6 +12,8 @@ module Skylab::Brazen
       end
 
       o :inflect, :noun, 'workspace'
+
+      o :is_promoted
 
 
 
@@ -43,5 +47,6 @@ module Skylab::Brazen
         @listener.on_event _ev
       end
     end
+  end
   end
 end
