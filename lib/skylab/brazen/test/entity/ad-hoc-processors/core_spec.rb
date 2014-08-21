@@ -9,8 +9,7 @@ module Skylab::Brazen::TestSupport::Entity
       before :all do
 
         class AHP_Base
-
-          Entity_ = Subject_[][ -> do
+          Subject_[][ self, -> do
             o :ad_hoc_processor, :gazoink, -> x { Gazoink_.new( x ).go }
           end ]
 
@@ -31,7 +30,7 @@ module Skylab::Brazen::TestSupport::Entity
 
         class AHP_Child < AHP_Base
           attr_reader :foo, :baz
-          Entity_[ self, -> do
+          Subject_[][ self, -> do
             o :iambic_writer_method_name_suffix, :'='
             def foo=
               @foo = iambic_property

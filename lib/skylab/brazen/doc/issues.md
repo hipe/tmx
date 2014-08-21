@@ -1,3 +1,5 @@
+[#012]       #spot #in-situ
+[#011]       #parent-node: [#001] the event narrative ..
 [#010]       #doc-node: data stores
 [#009]       #parent-node: [#010] the git config narrative ..
 [#008]       #parent-node: [#009] the mutable git config narrative ..

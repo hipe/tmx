@@ -5,6 +5,9 @@ module Skylab::Brazen
     module Mutable  # see [#008]
 
       class << self
+        def new
+          Document__.new
+        end
         def parse_string str, & p
           Parse_Context__.new( p ).
             with_input( String_Input_Adapter_, str ).parse
@@ -107,6 +110,45 @@ module Skylab::Brazen
           @a = a ; nil
         end
 
+        def unparse
+          unparse_into_yielder y=[]
+          y.join EMPTY_S_
+        end
+
+        def unparse_into_yielder y
+          @a.each do |x|
+            x.unparse_into_yielder y
+          end ; nil
+        end
+
+        def get_body_line_scanner
+          nscn = get_all_node_scanner
+          lscn = nil
+          Callback_::Scn.new do
+            begin
+              if lscn
+                x = lscn.gets
+                x and break
+                lscn = nil
+              end
+              node = nscn.gets
+              node or break
+              lscn = node.get_line_scanner
+            end while true
+            x
+          end
+        end
+
+        def get_all_node_scanner
+          d = -1 ; last = @a.length - 1
+          Callback_::Scn.new do
+            if d < last
+              @a.fetch d += 1
+            end
+          end
+        end
+
+
         def count_number_of_nodes i
           @a.count do |x|
             i == x.symbol_i
@@ -208,12 +250,16 @@ module Skylab::Brazen
           @sections = Sections__.new self ; nil
         end
 
-        def unparse
-          y = []
-          @a.each do |x|
-            x.unparse_into_yielder y
-          end
-          y.join EMPTY_S_
+        def get_line_scanner
+          get_body_line_scanner
+        end
+
+        def add_comment str
+          @a.push Blank_Line_Or_Comment_Line__.new "# #{ str }\n" ; nil
+        end
+
+        def write_to_pathname pn, listener, * x_a
+          Mutable::When__::Write.new( pn, self, listener, x_a ).write
         end
 
         # ~ for child agents only:
@@ -377,6 +423,18 @@ module Skylab::Brazen
           @a.each do |x|
             x.unparse_into_yielder y
           end ; nil
+        end
+        def get_line_scanner
+          line = @line ; scn = nil
+          Callback_::Scn.new do
+            if line
+              r = line ; line = nil
+              scn = get_body_line_scanner
+              r
+            else
+              scn.gets
+            end
+          end
         end
         def begin_parse
           d = @scn.skip OPEN_BRACE_RX__
@@ -730,6 +788,10 @@ module Skylab::Brazen
           y << @line ; nil
         end
 
+        def get_line_scanner
+          Single_line_scanner__[ @line ]
+        end
+
         include Autonomously_Parsing_Node_Methods__
 
         THE_REST_RX_ = /[ ]*(?:[#;]|\r?\n?\z)/
@@ -737,7 +799,7 @@ module Skylab::Brazen
 
       class Blank_Line_Or_Comment_Line__
         def initialize line
-          @line_s = line.freeze
+          @line = line.freeze
         end
 
         def initialize_copy _otr_
@@ -749,9 +811,22 @@ module Skylab::Brazen
         end
 
         def unparse_into_yielder y
-          y << @line_s ; nil
+          y << @line ; nil
+        end
+
+        def get_line_scanner
+          Single_line_scanner__[ @line ]
         end
       end
+
+      Single_line_scanner__ = -> line do
+        Callback_::Scn.new do
+          if line
+            r = line ; line = nil ; r
+          end
+        end
+      end
+
       SPACE_RX_ = /[ ]*/
     end
   end

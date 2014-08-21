@@ -14,7 +14,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
       with_max_num_dirs 'potato'
       it "whines about non-integer environment variable" do
         invoke 'x'
-        expect :styled, /\A#{ env 'max-num-dirs' } must be a non-negative #{
+        expect :styled, /#{ env 'max-num-dirs' } must be a non-negative #{
           }integer, had #{ ick 'potato' }\z/
         expect_localized_invite_line
         expect_errored
@@ -25,7 +25,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
       with_max_num_dirs '-1'
       it "whines about integer being too low" do
         invoke 'x'
-        expect :styled, /\A#{ env 'max-num-dirs' } must be non-negative, #{
+        expect :styled, /#{ env 'max-num-dirs' } must be non-negative, #{
           }had #{ ick '-1' }/
         expect_localized_invite_line
         expect_errored
@@ -36,8 +36,8 @@ module Skylab::Brazen::TestSupport::CLI::Actions
       with_max_num_dirs '0'
       it "ok, but never does anything" do
         invoke '.'
-        expect 'no directories were searched.'
-        expect_negative_exitstatus
+        expect %r(\bno directories were searched\.\z)
+        expect_exitstatus_for_file_not_found
       end
     end
 
@@ -49,8 +49,9 @@ module Skylab::Brazen::TestSupport::CLI::Actions
         with_max_num_dirs '2'
         it "finds nothing" do
           invoke '.'
-          expect :styled, "'#{ filename }' not found in . or 1 dir up"
-          expect_negative_exitstatus
+          expect :styled,
+            %r('#{ ::Regexp.escape filename }' not found in \. or 1 dir up\b)
+          expect_exitstatus_for_file_not_found
         end
       end
 
@@ -67,16 +68,16 @@ module Skylab::Brazen::TestSupport::CLI::Actions
         end
 
         def expect_same_result
-          expect :styled, "'#{ filename }' not found in ."
-          expect_negative_exitstatus
+          expect :styled, %r('#{ ::Regexp.escape filename }' not found in \.)
+          expect_exitstatus_for_file_not_found
         end
       end
 
       context "with a path argument that does not exist" do
         it "says as much" do
           invoke 'foozie'
-          expect :styled, %r(\A#{ par 'path' } does not exist - ./foozie\z)
-          expect_negative_exitstatus
+          expect :styled, %r(#{ par 'path' } does not exist - ./foozie\z)
+          expect_errored
         end
       end
     end

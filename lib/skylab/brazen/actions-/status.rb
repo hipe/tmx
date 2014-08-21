@@ -2,11 +2,16 @@ module Skylab::Brazen
 
   class Actions_::Status < Brazen_::Action_
 
-    desc do |y|
-      y << "get status of a workspace"
-    end
+    Brazen_::Model_::Entity[ self, -> do
 
-    Brazen_::Entity_[ self, -> do
+      o :desc, -> y do
+        y << "get status of a workspace"
+      end
+
+      o :inflect, :verb, 'determine'
+
+
+
 
       o :environment, :non_negative_integer,
         :description, -> y do
@@ -14,7 +19,9 @@ module Skylab::Brazen
         end,
         :property, :MAX_NUM_DIRS
 
+
       o :flag, :property, :verbose
+
 
       o :default, '.',
         :description, "the location of the workspace",
@@ -27,19 +34,17 @@ module Skylab::Brazen
     end ]
 
     def execute
-      Brazen_::Models_::Workspace.status( @verbose, @path, @MAX_NUM_DIRS,
-        self.class.properties.fetch( :path ),
-        Responses__.new( @client_adapter ) )
+      a = to_even_iambic
+      a.push :prop, self.class.properties.fetch( :path )
+      a.push :listener, listener
+      Brazen_::Models_::Workspace.status a
     end
 
-    class Responses__
+    class Listener < Brazen_::Entity::Event::Listener_X
 
-      def initialize client_adapter
-        @client_adapter = client_adapter
-      end
-
-      def on_entity_event_channel_entity_structure ev
-        @client_adapter.on_entity_event_channel_entity_structure ev ; nil
+      def on_workspace_event ev
+        _ev = sign_event ev
+        @listener.on_positive_event _ev
       end
     end
   end

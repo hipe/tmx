@@ -2,28 +2,34 @@ module Skylab::Brazen
 
   class Models_::Workspace
 
-    Brazen_::Entity::Event::Simple_Listener_Broadcaster___[ self ]
-
     class << self
 
-      def status verbose, path, max_num_dirs, prop, listener
-        new( verbose, path, max_num_dirs, prop, listener ).status
+      def filesystem_walk
+        Filesystem_Walk__
       end
 
-      def init verbose, path, prop, listener
-        new( verbose, path, nil, prop, listener ).init
+      def status x_a
+        new( x_a ).status
+      end
+
+      def init x_a
+        new( x_a ).init
       end
 
       private :new
     end
 
-    def initialize verbose, path, max_num_dirs, prop, listener
-      @be_verbose = verbose
-      @listener = listener
-      @max_num_dirs_to_look_in = max_num_dirs
-      @path = path
-      @prop = prop
+    Brazen_::Model_::Actor[ self,
+      :properties, :client, :dry_run, :listener,
+      :max_num_dirs, :path, :prop, :verbose ]
+
+    Brazen_::Entity::Event::Cascading_Prefixing_Sender[ self ]
+
+    def initialize x_a
       @config_filename = nil
+      @prefix = :workspace
+      @max_num_dirs = nil
+      process_iambic_fully x_a
     end
 
     CONFIG_FILENAME__ = 'brazen.conf'.freeze
@@ -35,86 +41,121 @@ module Skylab::Brazen
 
     def rslv_any_nearest_config_filename
       @any_nearest_config_filename =
-        walker( :channel, :walker ).find_any_nearest_file_pathname
+        filesystem_walk( :channel, :walker ).find_any_nearest_file_pathname
     end
 
     def on_walker_start_directory_does_not_exist ev
-      broadcast_entity_event ev ; nil
+      send_event_structure ev ; nil
     end
 
     def on_walker_start_directory_is_not_directory ev
-      broadcast_entity_event ev ; nil
+      send_event_structure ev ; nil
     end
 
     def on_walker_file_not_found ev
-      broadcast_entity_event ev ; nil
+      send_event_structure ev ; nil
     end
 
     def on_walker_found_is_not_file ev
-      broadcast_entity_event ev ; nil
+      send_event_structure ev ; nil
     end
 
     def init
-      x = walker( :channel, :init, :max_num_dirs, 1 ).
+      @init_method = nil
+      pn = filesystem_walk( :channel, :init, :any_max_num_dirs_to_look, 1 ).
         find_any_nearest_file_pathname
-      case x
-      when false ;
-      when true  ; procede_with_init
-      else       ; init_when_file_exists x
-      end ; nil
+      if pn
+        init_when_file_exists pn
+      elsif @init_method
+        send @init_method
+      end
+    end
+
+    def procede_with_init
+      self.class::When__::Init.with(
+        :app_name, @client.app_name,
+        :config_filename, @config_filename || CONFIG_FILENAME__,
+        :is_dry, @dry_run,
+        :listener, @listener,
+        :path, @path
+      ).init
     end
 
     def init_when_file_exists pn
-      entity_event :directory_already_has_config_file, :pathname, pn,
-        :is_negative, true, :prop, @prop ; nil
+      send_event :directory_already_has_config_file, :pathname, pn,
+        :is_positive, false, :prop, @prop
+      nil
     end
 
     def on_init_start_directory_does_not_exist ev
-      broadcast_entity_event ev ; false
+      send_event_structure ev ; nil
     end
 
     def on_init_start_directory_is_not_directory ev
-      broadcast_entity_event ev ; false
+      send_event_structure ev ;  nil
     end
 
     def on_init_found_is_not_file ev
-      broadcast_entity_event ev ; false
+      send_event_structure ev ; nil
     end
 
     def on_init_file_not_found ev
-      @be_verbose and broadcast_entity_event ev
-      true
+      if @verbose
+        _ev = ev.dup_with :is_positive, true
+        send_event_structure _ev
+      end
+      @init_method = :procede_with_init ; nil
     end
 
-    def walker * x_a
-      wlk = Walker__.new @path, some_config_filename,
-        @max_num_dirs_to_look_in, @prop, self, :walker
-      wlk.process_iambic_fully x_a
-      wlk
+    def filesystem_walk * x_a
+      x_a_ = [ :start_path, @path, :filename, some_config_filename,
+        :any_max_num_dirs_to_look, @max_num_dirs, :prop, @prop,
+        :listener, self, :channel, :walker ]
+      x_a_.concat x_a
+      Filesystem_Walk__.with_iambic x_a_
     end
 
     def some_config_filename
       @config_filename || CONFIG_FILENAME__
     end
 
-    class Walker__  # re-write a subset of [#st-007] the tree walker
+    class Filesystem_Walk__  # re-write a subset of [#st-007] the tree walker
 
-      def initialize start_path, filename, any_max_dirs_to_look,
-                     prop, listener, chan
+      Brazen_::Model_::Actor[ self,
+        :properties,
+          :channel,
+          :filename,
+          :listener,
+          :any_max_num_dirs_to_look,
+          :prop,
+          :start_path ]
 
-        @channel = chan
-        @filename = filename
-        @listener = listener
-        @any_max_num_dirs_to_look = any_max_dirs_to_look
-        if SLASH_ != start_path.getbyte( 0 )
-          start_path = ::File.expand_path start_path
+      class << self
+        def with * x_a
+          with_iambic x_a
         end
-        @prop = prop
-        @start_path = start_path
-        @start_pathname = ::Pathname.new start_path
+        def with_iambic x_a
+          new do init_via_iambic x_a end
+        end
+        private :new
       end
 
-      def find_any_nearest_file_pathname
+      def initialize & p
+        instance_exec( & p )
+        freeze
+      end
+
+    private
+
+      def init_via_iambic x_a
+        process_iambic_fully x_a
+        if SLASH_ != @start_path.getbyte( 0 )
+          @start_path = ::File.expand_path @start_path
+        end
+        @start_pathname = ::Pathname.new @start_path
+      end
+
+    public def find_any_nearest_file_pathname
         st = ::File::Stat.new @start_path
         if DIRECTORY_FTYPE__ == st.ftype
           fnd_any_nearest_file_pathname_when_start_pathname_exist
@@ -127,15 +168,15 @@ module Skylab::Brazen
       DIRECTORY_FTYPE__ = 'directory'.freeze
 
       def whn_start_directory_is_not_directory st
-        call_listener :start_directory_is_not_directory,
+        send_event :start_directory_is_not_directory,
           :start_pathname, @start_pathname, :ftype, st.ftype,
-            :is_negative, true, :prop, @prop
+            :is_positive, false, :prop, @prop
       end
 
       def whn_start_directory_does_not_exist e
-        call_listener :start_directory_does_not_exist,
+        send_event :start_directory_does_not_exist,
           :start_pathname, @start_pathname, :exception, e,
-            :is_negative, true, :prop, @prop
+            :is_positive, false, :prop, @prop
       end
 
       def fnd_any_nearest_file_pathname_when_start_pathname_exist
@@ -172,16 +213,16 @@ module Skylab::Brazen
       FILE_FTYPE__ = 'file'.freeze
 
       def whn_found_is_not_file st, found
-        call_listener :found_is_not_file, :ftype, st.ftype,
-            :is_negative, true, :pathname, found do |y, o|
+        send_event :found_is_not_file, :ftype, st.ftype,
+            :is_positive, false, :pathname, found do |y, o|
           y << "is #{ o.ftype }, must be file - #{ pth o.pathname }"
         end
       end
 
       def whn_file_not_found count
-        call_listener :file_not_found, :filename, @filename,
+        send_event :file_not_found, :filename, @filename,
             :num_dirs_looked, count, :start_pathname, @start_pathname,
-              :is_negative, true do |y, o|
+              :is_positive, false do |y, o|
           if o.num_dirs_looked.zero?
             y << "no directories were searched."
           else
@@ -194,18 +235,16 @@ module Skylab::Brazen
         end
       end
 
-    private
-
-      def call_listener * x_a, & p
+      def send_event * x_a, & p
         p ||= Brazen_::Entity::Event::Inferred_Message.to_proc
-        ev = Brazen_::Entity::Event.new x_a, p
-        @listener.send :"on_#{ @channel }_#{ ev.terminal_channel_i }", ev
+        ev = Brazen_::Entity::Event.inline_via_x_a_and_p x_a, p
+        m_i = :"on_#{ @channel }_#{ ev.terminal_channel_i }"
+        if @listener.respond_to? m_i
+          @listener.send m_i, ev
+        else
+          @listener.send :"on_#{ @channel }_event", ev
+        end
       end
-
-      Brazen_::Entity[ self, :properties, :max_num_dirs, :channel ]
-
-      public :process_iambic_fully
-
     end
   end
 end

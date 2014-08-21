@@ -171,9 +171,8 @@ module Skylab::Snag
         def lookup
           @config = @API_client
           @listener = Walk_Listener__.new method :on_walk_error_event
-          @walker = bld_walk
           @did_fail = false
-          @pathname = @walker.find_any_nearest_file_pathname
+          @pathname = bld_walk.find_any_nearest_file_pathname
           if @did_fail
             @no_p[ @ev ]
           else
@@ -181,11 +180,14 @@ module Skylab::Snag
           end
         end
         def bld_walk
-          Snag_::Lib_::Walker[].new @path,
-            @config.manifest_file,
-            @config.max_num_dirs_to_search_for_manifest_file,
-            Lib_::Entity[]::Property__.new( :path ),
-            @listener, :walk
+          Snag_::Lib_::Filesystem_walk[].with(
+            :channel, :walk,
+            :filename, @config.manifest_file,
+            :listener, @listener,
+            :any_max_num_dirs_to_look,
+              @config.max_num_dirs_to_search_for_manifest_file,
+            :prop, Lib_::Entity[]::Property__.new( :path ),
+            :start_path, @path )
         end
         def on_walk_error_event ev
           o = Snag_::Model_::Event.inflectable_via_event ev

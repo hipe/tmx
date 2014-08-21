@@ -36,7 +36,8 @@ module Skylab::Snag::TestSupport::Unparenthesize__
     end
 
     def subject s
-      md = Snag_::CLI::UNPARENTHESIZE_RX__.match s
+      md = Snag_::Text::Unparenthesize_message_string__::
+        UNPARENTHESIZE_RX__.match s
       md and [ md[ :open ], md[ :body ], md[ :close ] ]  # not 'captures'
     end
   end

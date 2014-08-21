@@ -446,8 +446,24 @@ module Skylab::Brazen
         @h.key? i
       end
 
+      def index i
+        @a.index i
+      end
+
       def first_name
         @a.first
+      end
+
+      def fetch_at_position d
+        @h.fetch @a.fetch d
+      end
+
+      def fetch_name_at_position d
+        @a.fetch d
+      end
+
+      def fetch_pair_at_position d
+        [ @a.fetch( d ), @h.fetch( @a.fetch d ) ]
       end
 
       def get_names
@@ -482,6 +498,10 @@ module Skylab::Brazen
             @h.fetch @a.fetch d += 1
           end
         end
+      end
+
+      def each_name
+        @a.each do |i| yield i end ; nil
       end
 
       def each_value
@@ -702,6 +722,18 @@ module Skylab::Brazen
           send subject.send( m_i ).iambic_writer_method_name
         end
         self
+      end
+
+      def via_scanner_process_iambic_passively
+        subject = property_proprietor
+        scn = @scanner
+        box = subject ? subject.property_method_nms_for_rd : MONADIC_EMPTINESS_
+        while scn.unparsed_exists
+          m_i = box[ scn.current_token ]
+          m_i or break
+          scn.advance_one
+          send subject.send( m_i ).iambic_writer_method_name
+        end ; nil
       end
 
       def property_proprietor

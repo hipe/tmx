@@ -15,18 +15,32 @@ module Skylab::Brazen
   end
 
   module Lib_
+    sidesys = Autoloader_.build_require_sidesystem_proc
+    Headless__ = sidesys[ :Headless ]
     N_lines = -> do
       Brazen_::Entity::Event::N_Lines
     end
-    Name = -> do
-      Callback_::Name
+    Name_function_methods = -> do
+      Snag__[]::Model_.name_function_methods
+    end
+    NLP = -> do
+      Headless__[]::NLP
+    end
+    IO = -> do
+      Headless__[]::IO
+    end
+    Snag__ = sidesys[ :Snag ]
+    Text = -> do
+      Snag__[]::Text
     end
   end
 
   EMPTY_S_ = ''.freeze
   NILADIC_TRUTH_ = -> { true }
+  stowaway :Model_, 'entity-'
   SLASH_ = '/'.getbyte 0
   SPACE_ = ' '.freeze
+  UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
 
 end

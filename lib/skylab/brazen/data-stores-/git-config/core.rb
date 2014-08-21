@@ -48,7 +48,7 @@ module Skylab::Brazen
       def error_event i, col_number=nil
         d = ( col_number or @column_number ||= 1 )
         x_a = [ i, :line_number, @line_number, :column_number, d, :line, @line ]
-        ev = Brazen_::Entity::Event.new x_a, -> y, o do
+        ev = Brazen_::Entity::Event.inline_via_x_a_and_p x_a, -> y, o do
           y << "#{ i.to_s.gsub( UNDERSCORE_, SPACE_ ) } #{
            }(#{ o.line_number }:#{ o.column_number })"
         end

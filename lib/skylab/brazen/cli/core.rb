@@ -57,7 +57,7 @@ module Skylab::Brazen
       My_properties_model__ = -> do  # #experimental
         p = -> do
           x = class My_Properties_Model___
-            Brazen_::Entity_[ self, -> do
+            Brazen_::Model_::Entity[ self, -> do
               o :required, :property, :action
             end ]
             self
@@ -405,6 +405,12 @@ module Skylab::Brazen
         @exit_status = d ; nil
       end
 
+      # ~ general client-related services for ad-hoc agents
+
+      def app_name
+        ::File.basename @invocation_str_a.last
+      end
+
       # ~ deep API for mechanics agents
 
       def actions
@@ -494,21 +500,121 @@ module Skylab::Brazen
 
       # ~ for ad-hoc business agents
 
-      def on_error_channel_entity_structure ev
-        hr = hlp_rndrr
-        ev.render_all_lines_into_under hr.y, expr_agent
-        hr.output_invite_to_general_help
-        set_ext_status some_err_code_for_event ev ; nil
+      def app_name
+        @invocation.app_name
       end
 
-      def on_entity_event_channel_entity_structure ev
-        hr = hlp_rndrr
-        ev.render_all_lines_into_under hr.y, expr_agent
-        ev.has_tag :is_negative and
-          set_ext_status some_ext_status_for_chan_i :is_negative ; nil
+      # ~
+
+      def on_event ev
+        ev_ = ev.to_event
+        if ev_.has_tag :is_positive
+          _ok = ev_.is_positive
+          if _ok
+            if ev_.has_tag :is_completion and ev_.is_completion
+              on_completion_event ev
+            else
+              on_positive_event ev
+            end
+          else
+            on_negative_event ev
+          end
+        else
+          send_event ev
+        end
+      end
+
+      def on_completion_event ev
+        set_ext_status SUCCESS_
+        a = render_event_lines ev
+        s = maybe_inflect_line_for_completion_via_event a.first, ev
+        s and a[ 0 ] = s
+        send_non_payload_event_lines a
+      end
+
+      def on_positive_event ev
+        ev_ = ev.to_event
+        if ev_.is_positive
+          set_ext_status SUCCESS_
+        else
+          set_ext_status some_err_code_for_event ev_
+        end
+        a = render_event_lines ev
+        s = maybe_inflect_line_for_positivity_via_event a.first, ev
+        s and a[ 0 ] = s
+        send_non_payload_event_lines a
+      end
+
+      def on_negative_event ev
+        set_ext_status some_err_code_for_event ev
+        a = render_event_lines ev
+        s = maybe_inflect_line_for_negativity_via_event a.first, ev
+        s and a[ 0 ] = s
+        send_non_payload_event_lines a
+        hlp_rndrr.output_invite_to_general_help
       end
 
     private
+
+      def send_event ev
+        _a = render_event_lines ev
+        send_non_payload_event_lines _a
+      end
+
+      def render_event_lines ev
+        y = []
+        ev.render_all_lines_into_under y, expr_agent
+        y
+      end
+
+      def maybe_inflect_line_for_completion_via_event s, ev
+        open, inside, close = unparenthesize s
+        if HACK_IS_ONE_WORD_RX__ =~ inside
+          maybe_inflect_line_for_positivity_via_event s, ev
+        else
+          n_s = ev.inflected_noun
+          v_s = ev.verb_lexeme.preterite
+          prefix = if n_s
+            "#{ v_s } #{ n_s }: "
+          else
+            v_s
+          end
+          "#{ open }#{ prefix }#{ inside }#{ close }"
+        end
+      end
+
+      def maybe_inflect_line_for_positivity_via_event s, ev
+        open, inside, close = unparenthesize s
+        n_s = ev.inflected_noun
+        v_s = ev.verb_lexeme.progressive
+        gerund_phrase = "#{ [ v_s, n_s ].compact * SPACE_ }"
+        inside_ = if HACK_IS_ONE_WORD_RX__ =~ inside
+          "#{ inside } #{ gerund_phrase }"
+        else
+          "while #{ gerund_phrase }, #{ inside }"
+        end
+        "#{ open }#{ inside_ }#{ close }"
+      end
+
+      HACK_IS_ONE_WORD_RX__ = /\A[a-z]+\z/
+
+      def maybe_inflect_line_for_negativity_via_event s, ev
+        open, inside, close = unparenthesize s
+        v_s = ev.inflected_verb ; n_s = ev.inflected_noun
+        prefix = "couldn't #{ [ v_s, n_s ].compact * SPACE_ } because "
+        "#{ open }#{ prefix }#{ inside }#{ close }"
+      end
+
+      def unparenthesize s
+        Brazen_::Lib_::Text[].unparenthesize_message_string s
+      end
+
+      def send_non_payload_event_lines a
+        _y = hlp_rndrr.y
+        a.each do |line|
+          _y << line
+        end ; nil
+      end
 
       def expr_agent
         @properties_adapter.expression_agnt

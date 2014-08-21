@@ -56,6 +56,9 @@ module Skylab::Snag
     Entity = -> do
       Brazen__[]::Entity
     end
+    Filesystem_walk = -> do
+      Brazen__[]::Models_::Workspace.filesystem_walk
+    end
     Funcy_globless = -> x do
       MetaHell__[].funcy_globless x
     end
@@ -98,9 +101,6 @@ module Skylab::Snag
     end
     Tree = -> do
       SubTree__[]::Tree
-    end
-    Walker = -> do
-      Brazen__[]::Models_::Workspace::Walker__
     end
     Writemode = -> do
       Headless__[]::WRITEMODE_

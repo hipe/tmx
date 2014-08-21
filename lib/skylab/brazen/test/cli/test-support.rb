@@ -19,7 +19,7 @@ module Skylab::Brazen::TestSupport::CLI
     # ~ common business assertions
 
     def expect_help_screen_for_init
-      expect :styled, 'usage: bzn init [-v] [<path>]'
+      expect :styled, 'usage: bzn init [-d] [-v] [<path>]'
       expect %r(\A[ ]{7}bzn init -h\z)
       expect_maybe_a_blank_line
       expect_header_line 'description'
@@ -27,6 +27,7 @@ module Skylab::Brazen::TestSupport::CLI
       expect 'this is the second line of the init description'
       expect_maybe_a_blank_line
       expect_header_line 'options'
+      expect %r(\A[ ]{4}-d, --dry-run\z)
       expect %r(\A[ ]{4}-v, --verbose\z)
       expect %r(\A[ ]{4}-h, --help[ ]{10,}this screen\z)
       expect_maybe_a_blank_line
@@ -36,16 +37,21 @@ module Skylab::Brazen::TestSupport::CLI
     end
 
     def expect_errored_with i
-      expect_errd_with_d Brazen_::API.exit_statii.fetch i
+      expect_no_more_lines
+      expect_exitstatus_for i
+    end
+
+    def expect_exitstatus_for i
+      @exitstatus.should eql Brazen_::API.exit_statii.fetch i
     end
 
     def expect_errored
-      expect_errd_with_d Brazen_::CLI::GENERIC_ERROR_
+      expect_no_more_lines
+      expect_generic_error_exitstatus
     end
 
-    def expect_errd_with_d d
-      expect_no_more_lines
-      @exitstatus.should eql d
+    def expect_generic_error_exitstatus
+      @exitstatus.should eql Brazen_::CLI::GENERIC_ERROR_
     end
 
     def expect_succeeded

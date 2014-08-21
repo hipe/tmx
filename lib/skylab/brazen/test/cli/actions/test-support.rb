@@ -137,9 +137,8 @@ module Skylab::Brazen::TestSupport::CLI::Actions
       expect :styled, localized_invite_line_rx
     end
 
-    def expect_negative_exitstatus
-      expect_no_more_lines
-      @exitstatus.should eql Brazen_::API.exit_statii.fetch :is_negative
+    def expect_exitstatus_for_file_not_found
+      expect_exitstatus_for :file_not_found
     end
 
     def ick s

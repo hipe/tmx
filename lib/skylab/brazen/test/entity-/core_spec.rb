@@ -28,7 +28,7 @@ module Skylab::Brazen::TestSupport::Entity_
 
       with_class do
         class E__Small_Agent_With_Required_Properties
-          Brazen_::Entity_[ self,
+          Subject_[][ self,
             :required, :property, :foo,
             :required, :property, :bar,
             :properties, :bif, :baz ]
@@ -61,7 +61,7 @@ module Skylab::Brazen::TestSupport::Entity_
       with_class do
         class E__Small_Agent_With_Defaults
           attr_reader :foo
-          Brazen_::Entity_[ self, -> do
+          Subject_[][ self, -> do
             o :default, :yay, :property, :foo
           end ]
 
@@ -83,6 +83,10 @@ module Skylab::Brazen::TestSupport::Entity_
         o = subject_class.new.send :with, :foo, :bar
         o.foo.should eql :bar
       end
+    end
+
+    Subject_ = -> do
+      Brazen_::Model_::Entity
     end
   end
 end

@@ -1,6 +1,20 @@
 module Skylab::Brazen
 
-  Entity_ = Brazen_::Entity[ -> do
+  Entity_ = :_defunct_
+
+  module Model_
+
+    Actor = Lib_::Snag__[]::Model_::Actor
+
+  Entity = Brazen_::Entity[ -> do
+
+    o :ad_hoc_processor, :desc, -> scan do
+      Entity::Add_description__[ scan ]
+    end
+
+    o :ad_hoc_processor, :inflect, -> scan do
+      Entity::Customized_inflection__[ scan ]
+    end
 
     o :meta_property, :argument_arity,
         :enum, [ :zero, :one ],
@@ -158,7 +172,7 @@ module Skylab::Brazen
     end
   end ]
 
-  module Entity_
+  module Entity
 
     def aply_ad_hoc_normalizers prop  # this evolved from [#fa-019]
       ivar = prop.as_ivar
@@ -169,7 +183,8 @@ module Skylab::Brazen
             instance_variable_set ivar, x
           end,
           -> i, * x_a, p_ do
-            on_channel_entity_structure i, Brazen_::Entity::Event.new( x_a, p_ )
+            _ev = Brazen_::Entity::Event.inline_via_x_a_and_p x_a, p_
+            receive_event_on_channel _ev, i
           end ]
       end ; nil
     end
@@ -206,35 +221,79 @@ module Skylab::Brazen
   private
 
     def whine_about_missing_reqd_props miss_a
-      entity_error :missing_required_props, :miss_a, miss_a do |y, ev|
-        a = ev.miss_a
+      receive_event :missing_required_props,
+          :is_positive, false, :miss_a, miss_a do |y, o|
+        a = o.miss_a
         y << "missing required propert#{ 1 == a.length ? 'y' : 'ies' } #{
           }#{ a.map { |prop| par prop } * ' and ' }"
       end ; nil
     end
 
-    def entity_error * x_a, & p
-      on_channel_entity_structure :error, Brazen_::Entity::Event.new( x_a, p )
+    def receive_event * x_a, & p
+      _ev = Brazen_::Entity::Event.inline_via_x_a_and_p x_a, p
+      receive_event_structure _ev
     end
 
-    def on_channel_entity_structure i, ev
-      m = :"on_#{ i }_channel_#{ ev.terminal_channel_i }_entity_structure"
+    def receive_event_on_channel ev, i
+      m = :"on_#{ ev.terminal_channel_i }_#{ i }"
       if respond_to? m
         send m, ev
       else
-        send :"on_#{ i }_channel_entity_structure", ev
-      end ; nil
+        m = :"on_#{ i }_event"  # #this-spot :[#012]
+        send m, ev
+      end
     end
 
-  public
-
-    def on_error_channel_missing_required_props_entity_structure ev
-      raise ::ArgumentError,
-        ev.render_first_line_under( Brazen_::API::EXPRESSION_AGENT )
+    def receive_event_structure ev
+      _m = :"on_#{ ev.terminal_channel_i }"
+      send _m, ev
     end
 
-    def on_error_channel_entity_structure ev
-      raise ev.render_first_line_under Brazen_::API::EXPRESSION_AGENT
+    def on_missing_required_props ev
+      _s = ev.render_first_line_under Brazen_::API::EXPRESSION_AGENT
+      raise ::ArgumentError, _s
     end
+
+    # ~
+
+    class Add_description__
+
+      Model_::Actor[ self, :properties, :scan ]
+
+      def execute
+        @scan.scanner.advance_one  # `desc`
+        @scan.reader.description_block = @scan.scanner.gets_one ; nil
+      end
+    end
+
+    class Customized_inflection__
+
+      Model_::Actor[ self, :properties, :scan ]
+
+      attr_reader :noun, :verb
+
+      def execute
+        @scanner = @scan.scanner
+        @scanner.advance_one  # `inflect`
+        via_scanner_process_iambic_passively
+        @scan.reader.custom_inflection = self
+        @scan = @scanner = nil
+        freeze
+      end
+
+      Brazen_::Entity[ self, -> do
+
+        o :iambic_writer_method_name_suffix, :'='
+
+        def noun=
+          @noun = @scanner.gets_one.freeze
+        end
+
+        def verb=
+          @verb = @scanner.gets_one.freeze
+        end
+      end ]
+    end
+  end
   end
 end

@@ -45,8 +45,9 @@ module Skylab::Brazen
 
     _ES_ = class Exit_Statii__
       h = {
-        missing_required_props: 6,
-        is_negative: 7
+        is_negative: 7,
+        missing_required_props: 8,
+        file_not_found: 9
       }.freeze
       define_method :[], & h.method( :[] )
       define_method :fetch, & h.method( :fetch )
