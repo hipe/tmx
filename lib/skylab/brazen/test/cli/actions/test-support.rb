@@ -12,13 +12,6 @@ module Skylab::Brazen::TestSupport::CLI::Actions
 
   module ModuleMethods
 
-    def with_invocation * s_a
-      s_a.freeze
-      define_method :sub_action_s_a do s_a end
-      _RX_ = /\Ause '?bzn #{ s_a * ' ' } -h'? for help\z/
-      define_method :localized_invite_line_rx do _RX_ end
-    end
-
     def with_max_num_dirs d
       add_env_setting :MAX_NUM_DIRS, d ; nil
     end
@@ -81,13 +74,14 @@ module Skylab::Brazen::TestSupport::CLI::Actions
 
   module InstanceMethods
 
+    def sub_action_s_a
+      self.class.sub_action_s_a
+    end
+
     def prepare_invocation
       env = {}
       prepare_env env
-      if env.length.nonzero?
-        @invocation.environment = env
-      end
-
+      @invocation.environment = env  # never use real life ::ENV !
       path = from_directory
       if path
         file_utils.cd path
@@ -95,11 +89,6 @@ module Skylab::Brazen::TestSupport::CLI::Actions
     end
 
     def prepare_env _
-    end
-
-    def invoke * argv
-      argv[ 0, 0 ] = sub_action_s_a
-      invoke_via_argv argv
     end
 
     # ~ support above

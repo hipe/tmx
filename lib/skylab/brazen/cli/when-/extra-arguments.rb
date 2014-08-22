@@ -1,8 +1,8 @@
 module Skylab::Brazen
 
-  module CLI
+  class CLI
 
-    class When_::Extra_Arguments
+    class When_::Extra_Arguments < Simple_Executable_
 
       def initialize ev, help_renderer
         @render = help_renderer
@@ -14,7 +14,7 @@ module Skylab::Brazen
         o.express do
           "unexpected argument #{ ick x }"
         end
-        o.output_usage_line
+        o.output_primary_usage_line
         o.output_invite_to_general_help
         GENERIC_ERROR_
       end

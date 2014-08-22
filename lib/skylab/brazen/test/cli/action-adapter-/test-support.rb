@@ -31,7 +31,7 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
 
     def expect_failure event_channel_i, x_i
       if @result
-        @result.event_channel_i.should eql event_channel_i
+        @result.terminal_channel_i.should eql event_channel_i
         if :missing == event_channel_i
           @result.property.name_i.should eql x_i
         else

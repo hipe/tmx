@@ -1,0 +1,17 @@
+digraph {
+
+partitions -> properties
+
+expr_ag -> partitions
+
+op -> partitions
+
+help_renderer -> op
+
+help_renderer -> action
+
+help_renderer -> action_adapter
+
+help_renderer -> invocation
+
+}

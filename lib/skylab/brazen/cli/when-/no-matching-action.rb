@@ -1,8 +1,8 @@
 module Skylab::Brazen
 
-  module CLI
+  class CLI
 
-    class When_::No_Matching_Action
+    class When_::No_Matching_Action < Simple_Executable_
 
       def initialize token, help_renderer, invo
         @invo = invo

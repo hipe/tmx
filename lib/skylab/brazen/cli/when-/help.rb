@@ -1,8 +1,8 @@
 module Skylab::Brazen
 
-  module CLI
+  class CLI
 
-    class When_::Help
+    class When_::Help < Simple_Executable_
 
       def initialize cmd_s, help_renderer, action_adapter
         @aa = action_adapter
@@ -23,29 +23,26 @@ module Skylab::Brazen
       def whn_command_string
         aa = @aa
         a = aa.find_matching_action_adapters_with_token @any_cmd_string
-        case a.length
-        when 0 ; aa.invoke_when_no_matching_action
-        when 1 ; whn_action a.first
-        else   ; aa.invoke_when_ambiguous_matching_actions
+        case 1 <=> a.length
+        when  0 ; a.first.receive_show_help @help_renderer.invocation
+        when  1 ; aa.receive_no_matching_action @any_cmd_string
+        when -1 ; aa.receive_multiple_matching_adapters a
         end
-      end
-
-      def whn_action action
-        action.adapter_via_argv [ '--help' ]  # nil
-        SUCCESS_
       end
 
       def whn_no_command_string
         o = @help_renderer ; aa = @aa
-        o.screen_boundary
-        o.section_boundary
-        o.output_usage_line
+        o.output_usage
+
+        aa.has_description and o.output_description
+
         o.section_boundary
         o.output_header 'actions'
-        o.output_option_parser_summary
-        _a = @aa.get_action_scn.reduce_by( & :is_visible ).to_a
+        o.output_option_parser_summary  # sic
+        _a = aa.get_action_scn.reduce_by( & :is_visible ).to_a
         o.output_items_with_descriptions nil, _a, 2
         o.section_boundary
+
         prop = aa.properties.fetch :action
         o.express do
           "use #{ code "#{ aa.invocation_string } -h #{

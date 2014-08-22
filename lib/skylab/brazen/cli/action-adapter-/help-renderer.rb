@@ -1,12 +1,13 @@
 module Skylab::Brazen
 
-  module CLI
+  class CLI
 
     class Action_Adapter_
 
       class Help_Renderer  # read [#004]
 
         def initialize op, kernel
+          @arg_a = nil
           @action = kernel.action
           @action_adapter = kernel.action_adapter
           @expression_agent = kernel.expression_agent
@@ -15,11 +16,12 @@ module Skylab::Brazen
           @section_a = []
           @section_separator_p = -> { @y << nil }
           @y = ::Enumerator::Yielder.new( & kernel.stderr.method( :puts ) )
-          kernel.partitions.populate_with_sections self
+          kernel.partitions.receive_help_renderer self
           screen_boundary
         end
 
         attr_reader :expression_agent, :op, :y
+        attr_reader :invocation
 
         attr_writer :arg_a
 
@@ -42,28 +44,29 @@ module Skylab::Brazen
 
         # ~ usage lines
 
-        def output_usage
-          section_boundary
-          output_multiline_section_tight 'usage', get_full_syntax_strings ; nil
-        end
-
-        def output_usage_line
-          a = [ action_invocation_string ]
-          s = ( @action_adapter || @invocation ).render_syntax_string
-          s and a.push s
-          output_single_line_section 'usage', a * SPACE_
+        def output_primary_usage_line
+          subject.write_any_primary_syntax_string a=[]
+          output_single_line_section 'usage', a[ 0 ]
           @action
         end
 
+        def output_usage
+          section_boundary
+          a = get_full_syntax_strings
+          output_usage_section_via_full_syntax_strings a
+        end
+
+        def output_usage_section_via_full_syntax_strings a
+          output_multiline_section_tight 'usage', a ; nil
+        end
+
         def get_full_syntax_strings
-          a = []
-          s = produce_full_main_syntax_string and a.push s
-          s = produce_full_auxiliary_syntax_string and a.push s
+          subject.write_full_syntax_strings a=[]
           a
         end
 
         def produce_full_main_syntax_string
-          y = [ action_invocation_string ]
+          y = [ subject_invocation_string ]
           a = any_main_syntax_string_parts and y.concat a
           y * SPACE_
         end
@@ -78,50 +81,100 @@ module Skylab::Brazen
           r
         end
 
-        def action_invocation_string
-          if @action_adapter
-            "#{ @invocation.invocation_string } #{ @action.name.as_slug }"
-          else
-            @invocation.invocation_string
-          end
-        end
-
         def any_option_glyphs
           sw_s_a = []
-          @op.top.list.each do |arg|
-            sw = arg.short.first
+          @op.top.list.each do |opt|
+            sw = opt.short.first
             SHORT_HELP__ == sw and next
-            tail = case arg
-            when ::OptionParser::Switch::RequiredArgument ; " X"
-            when ::OptionParser::Switch::NoArgument ;
-            when ::OptionParser::Switch::OptionalArgument ; " [X]"
-            else raise "unepxected shape: #{ sw.class }"
-            end
-            sw_s_a.push "[#{ sw }#{ tail }]"
+            sw_s_a.push "[#{ render_native_opt_switch_with_arg opt }]"
           end
           sw_s_a.length.nonzero? and sw_s_a
         end
         SHORT_HELP__ = '-h'.freeze
+
+        def render_native_opt_switch_with_arg opt
+          arity_i = argument_arity_from_native_optparse_switch opt
+          if :zero != arity_i
+            moniker = some_arg_moniker_for_switch opt
+          end
+          tail = render_argument_moniker_and_arity moniker, arity_i
+          sw = shortest_moniker_for_opt opt
+          "#{ sw }#{ tail }"
+        end
+
+        def as_opt_render_property prop
+          look_for = "--#{ prop.name.as_slug }"
+          found = @op.top.list.detect do |arg|
+            look_for == arg.long.first
+          end
+          if found
+            as_opt_render_property_when_found_opt prop, found
+          end
+        end
+
+        def as_opt_render_property_when_found_opt prop, opt
+          arity_i = argument_arity_from_native_optparse_switch opt
+          head = shortest_moniker_for_opt opt
+            ( opt.short ? opt.short : opt.long ).first
+          if :zero != arity_i
+            moniker = prop.argument_moniker
+            moniker ||= some_arg_moniker_for_switch opt
+          end
+          tail = render_argument_moniker_and_arity moniker, arity_i
+          "#{ head }#{ tail }"
+        end
+
+        def shortest_moniker_for_opt opt
+          ( opt.short ? opt.short : opt.long ).first  # #todo
+        end
+
+        def render_argument_moniker_and_arity moniker, arity_i
+          case arity_i
+          when :one ; " #{ moniker }"
+          when :zero
+          when :zero_or_one_placed ; " [#{ moniker }]"
+          when :zero_or_one_misplaced ; "[=#{ moniker }]"
+          else raise say_bad_shape arity_i
+          end
+        end
+
+        def say_bad_shape arity_i
+          "unepxected shape: #{ arity_i }"
+        end
+
+        def some_arg_moniker_for_switch  sw
+          'X'
+        end
+
+        def argument_arity_from_native_optparse_switch arg
+          case arg
+          when ::OptionParser::Switch::RequiredArgument ; :one
+          when ::OptionParser::Switch::NoArgument ; :zero
+          when ::OptionParser::Switch::PlacedArgument ; :zero_or_one_placed
+          when ::OptionParser::Switch::OptionalArgument ; :zero_or_one_misplaced
+          end
+        end
 
         def any_argument_glyphs
           @arg_a and arg_glyphs
         end
 
         def arg_glyphs
-          a = @arg_a.map do |prop|
-            if prop.has_custom_glyph
-              prop.custom_glyph
-            elsif prop.has_default
-              "[<#{ prop.name.as_slug }>]"
+          a = @arg_a.reduce [] do |m, prop|
+            s = if prop.has_custom_moniker
+              prop.custom_moniker
             else
               "<#{ prop.name.as_slug }>"
             end
+            if ! prop.is_actually_required
+              open = '[' ; close = ']'
+            end
+            if prop.takes_many_arguments
+              addendum = " [#{ s } [..]]"
+            end
+            m << "#{ open }#{ s }#{ addendum }#{ close }"
           end
           a.length.nonzero? and a
-        end
-
-        def produce_full_auxiliary_syntax_string
-          "#{ action_invocation_string } -h"
         end
 
         # ~ section rendering (description, options, arguments, child actions)
@@ -159,10 +212,18 @@ module Skylab::Brazen
         # ~ "interjections"
 
         def output_invite_to_general_help
-          s = action_invocation_string
+          s = subject_invocation_string
           express do
             "use #{ code "#{ s } -h" } for help"
           end
+        end
+
+        def subject_invocation_string
+          subject.invocation_string
+        end
+
+        def subject
+          ( @action_adapter || @invocation )
         end
 
         # ~ support

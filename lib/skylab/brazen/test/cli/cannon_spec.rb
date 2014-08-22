@@ -23,8 +23,10 @@ module Skylab::Brazen::TestSupport::CLI
 
     it "1.4)  one valid option-looking argument (help) - help screen" do
       invoke '-h'
-      expect_usage_line
+      expect_branch_usage_line
+      expect_branch_auxiliary_usage_line
       expect_maybe_a_blank_line
+
       expect_header_line 'actions'
       expect %r(\A  +-h, --help \[cmd\]  +this screen\.?)
       expect :styled, %r(\A  +init  +init a <workspace>)
@@ -32,23 +34,14 @@ module Skylab::Brazen::TestSupport::CLI
       expect %r(\A  +status  +get status of a workspace\.?)
       expect %r(\A  +workspace  +manage workspaces)
       expect_maybe_a_blank_line
-      expect :styled, /\Ause '?bzn -h <action>'? for help on that action\.?\b/
+
+      expect_branch_invite_line
       expect_succeeded
     end
 
     it "2.4x3) help with a good argument" do
       invoke '-h', 'ini'
       expect_help_screen_for_init
-    end
-
-    # ~ business
-
-    def expect_usage_line
-      expect :styled, 'usage: bzn <action> [..]'
-    end
-
-    def expect_invite_line
-      expect :styled, /\Ause '?bzn -h'? for help\z/
     end
 
     self::EXPECTED_ACTION_NAME_S_A = [ 'init', 'status', 'workspace' ].freeze

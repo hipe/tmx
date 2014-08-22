@@ -52,12 +52,30 @@ module Skylab::Brazen
           end
         end  # >>
 
+        def concat_by scn
+          active = self
+          self.class.new do
+            while true
+              x = active.gets
+              x and break
+              scn or break
+              active = scn
+              scn = nil
+            end
+            x
+          end
+        end
+
         def map_reduce_by & p
           self.class.map_reduce self, p
         end
 
         def map_by & p
           self.class.map self, p
+        end
+
+        def push_by * x_a
+          concat_by Scan.nonsparse_array x_a
         end
 
         def reduce_by & p

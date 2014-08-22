@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  module CLI
+  class CLI
 
     class Expression_Agent__
 

@@ -57,6 +57,10 @@ module Skylab::Brazen
       end
     end
 
+    def get_action_scanner
+      get_lower_action_scan
+    end
+
     def get_lower_action_scan
       acr = self.class.actn_class_reflection
       acr and acr.get_lower_action_class_scanner.map_by do |cls|

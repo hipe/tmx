@@ -10,60 +10,53 @@ module Skylab::Brazen::TestSupport::CLI
 
     # it "1.1)  strange argument"
 
+    with_invocation 'status'
+
     it "1.2)  strange option - ( E I )" do
-      invoke 'st', '-z'
+      invoke '-z'
       expect 'invalid option: -z'
-      expect_invite_line
+      expect_action_invite_line
       expect_errored
     end
 
     # it "1.3)  good argument"
 
-    it "1.4)  good option (help screen)" do
-      invoke 'st', '-h'
-      expect_help_screen_first_half
-      expect_header_line 'argument'
-      expect %r(\A[ ]{4}path[ ]{29}the location of the workspace)
-      expect :styled, /\A[ ]{37}it's really neat\z/
-      expect_maybe_a_blank_line
-      expect_header_line 'environment variable'
-      expect %r(\A[ ]{4}BRAZEN_MAX_NUM_DIRS[ ]{14}how far up )
-      expect_succeeded
+    context "action help screen" do
+
+      it "1.4)  good option (help screen)" do
+        invoke '-h'
+        expect_action_help_screen
+      end
+
+      def expect_description
+        expect :styled, %r(\Adescription: .+\bstatus\b)
+        expect_maybe_a_blank_line
+      end
+
+      def expect_these_options
+        expect_option :verbose
+        expect_option :help, %r(this screen)
+      end
+
+      def expect_these_arguments
+        expect_item :path, %r(\blocation\b.+), :styled, %r(\bneat\b)
+      end
+
+      def expect_environment_variables
+        expect_header_line 'environment variable'
+        expect_item :BRAZEN_MAX_NUM_DIRS, %r(\bhow far\b)
+      end
     end
 
     it "2)    extra argument - ( E U I )" do
-      invoke 'st', 'wing', 'wang'
+      invoke 'wing', 'wang'
       expect :styled, %r(\Aunexpected argument:? ['"]?wang['"]?)
-      expect_usage_line
-      expect_invite_line
+      expect_action_usage_line
+      expect_action_invite_line
     end
 
-    # ~ business
-
-
-    def expect_secondary_syntax_line
-      expect %r(\A[ ]{7}bzn status -h\z)
-    end
-
-    def expect_description_line
-      expect :styled, /\Adescription: get status of a workspace\b/
-    end
-
-    def expect_options
-      expect %r(\A[ ]{4}-v, --verbose)
-      expect %r(\A[ ]{4}-h, --help[ ]{23}this screen\z)
-    end
-
-    def expect_missing_required_property i
-      expect :styled, "missing required property <#{ i }>"
-    end
-
-    def expect_usage_line
-      expect :styled, /\Ausage: bzn status \[-v\] .*\[<path>\]\z/
-    end
-
-    def expect_invite_line
-      expect :styled, /\Ause '?bzn status -h'? for help\z/
+    def prop_syntax
+      status_prop_syntax
     end
   end
 end

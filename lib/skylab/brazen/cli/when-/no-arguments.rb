@@ -1,8 +1,8 @@
 module Skylab::Brazen
 
-  module CLI
+  class CLI
 
-    class When_::No_Arguments
+    class When_::No_Arguments < Simple_Executable_
 
       def initialize prop, help_renderer
         @prop = prop
@@ -13,7 +13,7 @@ module Skylab::Brazen
         o = @render
         prop = @prop
         o.express { "expecting #{ par prop }" }
-        o.output_usage_line
+        o.output_primary_usage_line
         o.output_invite_to_general_help
         GENERIC_ERROR_
       end

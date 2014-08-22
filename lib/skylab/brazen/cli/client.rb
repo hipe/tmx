@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  module CLI
+  class CLI
 
     # ~ #comport:face this whole file. (just to fit in 'tmx')
 

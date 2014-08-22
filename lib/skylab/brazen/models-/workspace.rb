@@ -53,19 +53,19 @@ module Skylab::Brazen
         filesystem_walk( :channel, :walker ).find_any_nearest_file_pathname
     end
 
-    def on_walker_start_directory_does_not_exist ev
+    def receive_walker_start_directory_does_not_exist ev
       send_event_structure ev ; nil
     end
 
-    def on_walker_start_directory_is_not_directory ev
+    def receive_walker_start_directory_is_not_directory ev
       send_event_structure ev ; nil
     end
 
-    def on_walker_file_not_found ev
+    def receive_walker_file_not_found ev
       send_event_structure ev ; nil
     end
 
-    def on_walker_found_is_not_file ev
+    def receive_walker_found_is_not_file ev
       send_event_structure ev ; nil
     end
 
@@ -96,19 +96,19 @@ module Skylab::Brazen
       nil
     end
 
-    def on_init_start_directory_does_not_exist ev
+    def receive_init_start_directory_does_not_exist ev
       send_event_structure ev ; nil
     end
 
-    def on_init_start_directory_is_not_directory ev
+    def receive_init_start_directory_is_not_directory ev
       send_event_structure ev ;  nil
     end
 
-    def on_init_found_is_not_file ev
+    def receive_init_found_is_not_file ev
       send_event_structure ev ; nil
     end
 
-    def on_init_file_not_found ev
+    def receive_init_file_not_found ev
       if @verbose
         _ev = ev.dup_with :is_positive, true
         send_event_structure _ev
@@ -251,11 +251,11 @@ module Skylab::Brazen
       def send_event * x_a, & p
         p ||= Brazen_::Entity::Event::Inferred_Message.to_proc
         ev = Brazen_::Entity::Event.inline_via_x_a_and_p x_a, p
-        m_i = :"on_#{ @channel }_#{ ev.terminal_channel_i }"
+        m_i = :"receive_#{ @channel }_#{ ev.terminal_channel_i }"
         if @listener.respond_to? m_i
           @listener.send m_i, ev
         else
-          @listener.send :"on_#{ @channel }_event", ev
+          @listener.send :"receive_#{ @channel }_event", ev
         end
       end
     end

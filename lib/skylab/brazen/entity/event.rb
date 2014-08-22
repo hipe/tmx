@@ -182,11 +182,11 @@ module Skylab::Brazen
 
         def send_event_structure ev
           @prefix or self._NO_PREFIX
-          m_i = :"on_#{ @prefix }_#{ ev.terminal_channel_i }"
+          m_i = :"receive_#{ @prefix }_#{ ev.terminal_channel_i }"
           if @listener.respond_to? m_i
             @listener.send m_i, ev
           else
-            @listener.send :"on_#{ @prefix }_event", ev
+            @listener.send :"receive_#{ @prefix }_event", ev
           end ; nil
         end
       end
@@ -207,7 +207,7 @@ module Skylab::Brazen
 
         def send_event_structure ev
           @prefix or self._NO_PREFIX
-          _m_i = :"on_#{ @prefix }_#{ ev.terminal_channel_i }"
+          _m_i = :"receive_#{ @prefix }_#{ ev.terminal_channel_i }"
           @listener.send _m_i, ev
         end
       end

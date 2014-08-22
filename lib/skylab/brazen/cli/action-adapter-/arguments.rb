@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  module CLI
+  class CLI
 
     class Action_Adapter_
 
@@ -151,31 +151,31 @@ module Skylab::Brazen
               r = @final_output_iambic ; @final_output_iambic = nil ; r
             end
           end
-        end
 
-        class Missing_
-          def initialize property
-            @property = property
+          class Missing_
+            def initialize property
+              @property = property
+            end
+            attr_reader :property
+            def terminal_channel_i
+              :missing
+            end
           end
-          attr_reader :property
-          def event_channel_i
-            :missing
-          end
-        end
 
-        class Extra_
-          def initialize x
-            @x = x
+          class Extra_
+            def initialize x
+              @x = x
+            end
+            attr_reader :x
+            def terminal_channel_i
+              :extra
+            end
           end
-          attr_reader :x
-          def event_channel_i
-            :extra
-          end
-        end
 
-        class Crazy_Scanner__ < Brazen_::Entity::Iambic_Scanner
-          attr_writer :d, :x_a_length
-          attr_reader :d
+          class Crazy_Scanner__ < Brazen_::Entity::Iambic_Scanner
+            attr_writer :d, :x_a_length
+            attr_reader :d
+          end
         end
 
     end

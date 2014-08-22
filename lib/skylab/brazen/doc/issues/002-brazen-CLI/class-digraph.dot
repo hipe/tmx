@@ -1,0 +1,13 @@
+digraph {
+
+Invocation__
+
+Action_Adapter__ -> Invocation__
+
+Branch_Invocation__ -> Invocation__
+
+Top_Invocation__ -> Branch_Invocation__
+
+Branch_Adapter__ -> Branch_Invocation__
+
+}

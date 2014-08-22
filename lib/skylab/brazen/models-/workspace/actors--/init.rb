@@ -30,8 +30,8 @@ module Skylab::Brazen
           :prefix, :config
       end
 
-      def on_config_wrote_file ev
-        @listener.send :"on_#{ @prefix }_event", ev
+      def receive_config_wrote_file ev
+        @listener.send :"receive_#{ @prefix }_event", ev
       end
     end
   end

@@ -1,509 +1,142 @@
 module Skylab::Brazen
 
-  module CLI
+  class CLI < ::Class.new ::Class.new  # see [#002]
 
     class << self
-      def new *a
-        CLI::Invocation__.new( *a )
+      alias_method :new_top_invocation, :new
+      def new * a
+        new_top_invocation Brazen_, * a
       end
       def pretty_path x
-        Expression_Agent__.pretty_path x
+        CLI::Expression_Agent__.pretty_path x
       end
     end
 
-    # ~ main CLI hand-made implementation
+    Top_Invocation__ = self
 
-    class Invocation__
+    Branch_Invocation__ = Top_Invocation__.superclass
 
-      def initialize i, o, e, mutable_invocation_string_parts=nil
-        @environment = @op = nil
-        @stdout = o ; @stderr = e
-        rslv_invocation_string mutable_invocation_string_parts
-        @node ||= Brazen_::Kernel_.new Brazen_
+    Invocation__ = Branch_Invocation__.superclass
+
+    class Top_Invocation__
+
+      def initialize * a
+        @environment = nil
+        @mod = a.first
+        @resources = Resources__.new a
       end
-      attr_writer :argv
-
-      def environment= x
-        @environment = x
-      end
-
-      def is_branch
-      end
-
-      def IO_three
-        [ nil, @stdout, @stderr ]
-      end
-
-      def get_invocation_str_a
-        @invocation_str_a.dup
-      end
-
-    private def rslv_invocation_string a
-        if a
-          a.last.nil? and a[ -1 ] = "brazen"  # bugfix for tmx -h
-          @invocation_str_a = a.freeze
-        else
-          @invocation_str_a ||= [ ::File.basename( $PROGRAM_NAME ) ].freeze
-        end ; nil
-      end
-
+      attr_writer :environment
       def invoke argv
-        @argv = argv
-        @properties_adapter = Properties_Adapter__.new argv, self
-        if @argv.length.zero?
-          invoke_when_no_arguments
-        elsif DASH_ == @argv.first.getbyte( 0 )
-          invoke_when_options
-        else
-          adapter = adapter_when_action_token
-          adapter && adapter.execution_receiver.execute
-          @exit_status
-        end
-      end
-
-    private  # ~ when no arguments
-
-      def invoke_when_no_arguments
-        _prop = props.fetch :action
-        CLI::When_::No_Arguments.new( _prop, hlp_renderer ).execute  # [#003]
-      end
-
-      def props
-        My_properties_model__[].properties
-      end
-
-      My_properties_model__ = -> do  # #experimental
-        p = -> do
-          x = class My_Properties_Model___
-            Brazen_::Model_::Entity[ self, -> do
-              o :required, :property, :action
-            end ]
-            self
-          end
-          p = -> { x } ; x
-        end
-        -> { p[] }
-      end.call
-
-      # ~ when options (,the stock option parser)
-
-      def invoke_when_options
-        o = get_op_p.call ; processors = @processors
-        begin
-          o.parse! @argv
-        rescue ::OptionParser::ParseError => e
-          processors.push when_parse_error e
-        end
-        @argv.length.nonzero? and processors.push when_unhanded_arguments
-        while (( processor = processors.shift ))
-          last_exit_status = processor.execute
-          last_exit_status.nonzero? and break
-        end
-        last_exit_status
-      end
-
-      def get_op_p
-        -> { @op || init_op ; @op }
-      end
-
-      def init_op
-        processors = []
-        o = CLI::Lib_::Option_parser[].new
-        o.on '-h', '--help [cmd]', "this screen" do |cmd_s|
-          processors.push when_help cmd_s
-        end
-        @op = o ; @processors = processors; nil
-      end
-
-      def when_help cmd_s
-        CLI::When_::Help.new cmd_s, hlp_renderer, self
-      end
-
-      def when_parse_error e
-        CLI::When_::Parse_Error.new e, hlp_renderer
-      end
-
-      def when_unhanded_arguments
-        CLI::When_::Unhandled_Arguments.new @argv, hlp_renderer
-      end
-
-      def hlp_renderer
-        @properties_adapter.help_renderer
-      end
-    end
-
-    # ~ interlude: tons of support classes
-
-    class Properties_Adapter__
-
-      def initialize argv, invocation, action_adapter=nil
-        kernel = node_kernel_class.new argv, action_adapter, invocation
-        @parse_context = kernel.build_parse_context
-      end
-
-      def node_kernel_class
-        self.class::Node_Kernel__
-      end
-
-      def expression_agnt
-        @parse_context.expression_ag
-      end
-
-      def help_renderer
-        @parse_context.help_renderer
-      end
-
-      attr_reader :parse_context
-
-      class Node_Kernel__
-
-        def initialize argv, action_adapter, invocation
-          @action_adapter = action_adapter
-          @argv = argv
-          @invocation = invocation
-          rslv_partitions
-        end
-
-        attr_reader :action_adapter, :argv, :invocation, :partitions
-
-      private def rslv_partitions
-          _scn = ( @action_adapter || @invocation ).get_property_scanner
-          @partitions = partitions_class.new _scn ; nil
-        end
-
-        def partitions_class
-          self.class::Partitions__
-        end
-
-        def action
-          ( @action_adapter || @invocation ).action
-        end
-
-        def expression_agent
-          @expag ||= Expression_Agent__.new @partitions
-        end
-
-        def any_option_parser_p
-          ( @action_adapter || @invocation ).any_optparse_p
-        end
-
-        def stderr
-          @invocation.stderr
-        end
-
-        def build_parse_context
-          if @action_adapter && ! @action_adapter.action.is_branch
-            Parse_Context__.new self
-          else
-            Branch_Parse_Context__.new self
-          end
-        end
-      end
-
-      class Node_Kernel__::Partitions__
-
-        def initialize scn
-          arg_a = env_a = opt_a = nil
-          while (( prop = scn.gets ))
-            if prop.can_be_from_environment
-              ( env_a ||= [] ).push prop
-            end
-            prop.can_be_from_argv or next
-            if prop.is_actually_required
-              ( arg_a ||= [] ).push prop
-            else
-              ( opt_a ||= [] ).push prop
-            end
-          end
-          # experimental aesthetics - fill the trailing optional arg "slot"
-          if opt_a && ! arg_a && opt_a.last.has_default
-            ( arg_a ||= [] ).push opt_a.pop
-            opt_a.length.zero? and opt_a = nil
-          end
-          @opt_a = opt_a.freeze
-          @arg_a = arg_a.freeze
-          @env_a = env_a.freeze
-          freeze
-        end
-
-        attr_reader :arg_a, :env_a, :opt_a
-
-        def populate_with_sections o
-          add_option_section o
-          @arg_a and add_arg_section o
-          @env_a and add_env_section o
-        end
-
-        def add_option_section o
-          o.add_section :ad_hoc_section, 'options' do |help|
-            help.output_option_parser_summary
-          end
-        end
-
-        def add_arg_section o
-          o.arg_a = @arg_a
-          o.add_section :item_section, 'argument', @arg_a ; nil
-        end
-
-        def add_env_section o
-          o.add_section :item_section, 'environment variable',
-            @env_a, & :environment_name_i
-        end
-
-        def rendering_method_name_for prop
-          if @opt_a and @opt_a.include? prop
-            :render_prop_as_option
-          elsif @arg_a and @arg_a.include? prop
-            :render_prop_as_argument
-          else
-            @env_a && @env_a.include?( prop ) or fail "sanity: #{prop.name_i}"
-            :render_prop_as_environment_variable
-          end
-        end
-      end
-    end
-
-    class Branch_Adapter__ < Properties_Adapter__
-
-      def initialize argv, invo, aa
-        super
-      end
-
-      def node_kernel_class
-        self.class::Branch_Node_Kernel__
-      end
-
-      class Branch_Node_Kernel__ < Node_Kernel__
-
-        def rslv_partitions
-          _scn = @action_adapter.action.get_lower_action_scan
-          @partitions = partitions_class.new _scn
-        end
-
-        def partitions_class
-          self.class::Branch_Partitions__
-        end
-
-        class Branch_Partitions__ < self::Partitions__
-
-          def initialize scn
-            @arg_a = ARG_A__
-            @opt_a = nil
-            @scn = scn
-          end
-          _action_arg = Brazen_::Model_::Entity::Property.new( :action ) do |p|
-            p << [ :required ]
-          end
-          class Custom_Glyph__
-            def initialize s
-              @custom_glyph = s
-            end
-            attr_reader :custom_glyph
-            def has_custom_glyph
-              true
-            end
-            def is_actually_required
-            end
-          end
-          _ellip = Custom_Glyph__.new '[..]'
-          ARG_A__ = [ _action_arg, _ellip ].freeze
-
-          def populate_with_sections o
-            add_option_section o
-            o.arg_a = ARG_A__
-            o.add_section :item_section, 'action', act_a ; nil
-          end
-
-          def rendering_method_name_for prop
-            super
-          end
-
-        private
-
-          def act_a
-            @act_a ||= collapse_act_a
-          end
-          def collapse_act_a
-            a = @scn.map_by do |action|
-              action
-            end.to_a.freeze
-            @scn = nil
-            a
-          end
-        end
-      end
-    end
-
-    class Invocation__  # ~ public API for nearby support classes
-
-      # ~ for processors (the "when" classes)
-
-      def find_matching_action_adapters_with_token s
-        fnd_matching_action_adapters_with_token s
-      end
-
-      def invoke_when_no_matching_action
-        invk_when_no_matching_action
-      end
-
-      def properties
-        props
-      end
-
-      # ~ for parse context
-
-      def environment
-        @environment || ::ENV
-      end
-
-      # ~ for help renderer
-
-      def invocation_string
-        @invocation_str_a * SPACE_
-      end
-
-      def render_syntax_string
-        prop = props.fetch :action
-        expr_ag.calculate { "#{ par prop } [..]" }
+        @resources.complete @environment || ::ENV, argv
+        resolve_app_kernel
+        resolve_properties
+        resolve_partitions
+        resolve_executable
+        @executable.receiver.send @executable.method_name, * @executable.args or
+        @exit_status
       end
     private
-      def expr_ag
-        @properties_adapter.expression_agnt
+      def call_executable exe
+        exe.receiver.send exe.method_name, * exe.args
       end
+      def resolve_app_kernel
+        @app_kernel = @mod.const_get( :Kernel_, false ).new @mod ; nil
+      end
+
     public
 
-      # ~ for kernel
-
       def action
+        @app_kernel
+      end
+
+      def action_adapter
+        nil
+      end
+
+      def invocation
         self
       end
 
-      def any_optparse_p
-        get_op_p
+      def write_invocation_string_parts y
+        y.concat @resources.invocation_s_a ; nil
       end
 
-      def get_property_scanner
-        props.to_value_scanner
+      def app_name
+        Callback_::Name.from_module( @mod ).as_slug  # etc.
       end
 
-      attr_reader :stderr
-    end
-
-    class Parse_Context__
-
-      def initialize kernel
-        @kernel = kernel
+      def has_description
       end
 
-      def expression_ag
-        @kernel.expression_agent
-      end
-
-      def help_renderer
-        @help_renderer ||= bld_help_renderer
-      end
-
-      def bld_help_renderer
-        _op = prdc_some_option_parser
-        Action_Adapter_::Help_Renderer.new _op, @kernel
-      end
-
-      def prdc_some_option_parser
-        if (( op_p = @kernel.any_option_parser_p  ))
-          op_p[]
-        else
-          bld_op
-        end
-      end
-
-      def bld_op
-        op = CLI::Lib_::Option_parser[].new
-        opt_a = @kernel.partitions.opt_a
-        opt_a and populate_option_parser_with_generated_options op, opt_a
-        populate_option_parser_with_universal_options op
-        op
-      end
-
-      def populate_option_parser_with_generated_options op, opt_a
-        h = build_unique_letter_hash opt_a
-        opt_a.each do |prop|
-          args = []
-          letter = h[ prop.name_i ]
-          letter and args.push "-#{ letter }"
-          base = "--#{ prop.name.as_slug }"
-          p = -> x do
-            @output_iambic.push prop.name_i, x
-          end
-          if prop.takes_argument
-            args.push "#{ base } #{ argument_label_for prop }"
-            p = -> x do
-              @did_set_h[ prop.name_i ] = true
-              @output_iambic.push prop.name_i, x
-            end
-          else
-            args.push base
-            p = -> _ do
-              @did_set_h[ prop.name_i ] = true
-              @output_iambic.push prop.name_i
-            end
-          end
-          if prop.has_description
-            args.concat prop.under_expression_agent_get_N_desc_lines(
-              @kernel.expression_agent )
-          end
-          op.on( * args, & p )
-        end ; nil
-      end
-
-      def build_unique_letter_hash opt_a
-        h = { } ; num_times_seen_h = ::Hash.new { |h_, k| h_[ k ] = 0 }
-        opt_a.each do |prop|
-          name_s = prop.name.as_variegated_string
-          d = name_s.getbyte 0
-          case num_times_seen_h[ d ] += 1
-          when 1
-            h[ prop.name_i ] = name_s[ 0, 1 ]
-          when 2
-            h.delete prop.name_i
-          end
-        end
-        h
-      end
-
-      def argument_label_for prop  # :+#hack
-        prop.name.as_variegated_string.split( UNDERSCORE_ ).last.upcase
-      end
-
-      def populate_option_parser_with_universal_options op
-        op.on '-h', '--help', 'this screen' do
-          @help_renderer.output_help_screen
-          @result = SUCCESS_
-        end ; nil
+      def set_exit_status d
+        @exit_status = d
       end
     end
 
-    class Invocation__  # ~ when action token
+    # ~
+
+    class Branch_Invocation__ < Invocation__
+
+      def resources
+        @resources
+      end
+
+    private
+      def resolve_properties
+        @properties = Properties__.new
+      end
+      def resolve_partitions
+        @partitions = Build_partitions__[ get_full_inferred_props_scan, self ]
+      end
+      def get_full_inferred_props_scan
+        scn = @properties.to_scan
+        scn.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :ellipsis
+      end
+    public
+
+      def receive_no_matching_action tok
+        @token = tok
+        resolve_executable_when_no_matching_action
+        call_executable @executable
+      end
+
+      def receive_multiple_matching_adapters aa_a
+        self._DO_ME
+      end
+
     private
 
-      def adapter_when_action_token
-        matching_actions = fnd_matching_action_adapters_with_token @argv.shift
-        case matching_actions.length
-        when 0
-          @exit_status = invk_when_no_matching_action
-        when 1
-          adapter = matching_actions.first.adapter_via_argv @argv
+      def resolve_executable
+        if argv.length.zero?
+          resolve_executable_when_no_arguments
+        elsif DASH_ == argv.first.getbyte( 0 )
+          resolve_executable_when_looks_like_option_for_first_argument
         else
-          @exit_status = invoke_when_ambiguous_matching_actions
+          resolve_executable_when_looks_like_action_for_first_argument
         end
-        adapter
+      end
+      def resolve_executable_when_no_arguments
+        @executable = CLI::When_::No_Arguments.new action_prop, help_renderer
+      end
+      def action_prop
+        @properties.fetch :action
+      end
+      def resolve_executable_when_looks_like_action_for_first_argument
+        @token = @resources.argv.shift
+        @adapter_a = find_matching_action_adapters_with_token @token
+        case 1 <=> @adapter_a.length
+        when  0 ; resolve_executable_when_one_matching_adapter
+        when  1 ; resolve_executable_when_no_matching_action
+        when -1 ; resolve_executable_when_multiple_matching_adapters
+        end     ; nil
       end
 
-      def fnd_matching_action_adapters_with_token tok
-        @token = tok
-        matching_actions = []
-        rx = /\A#{ ::Regexp.escape tok }/
+    public
+
+      def find_matching_action_adapters_with_token tok
+        matching_actions = [] ; rx = /\A#{ ::Regexp.escape tok }/
         scn = get_action_scn
-        while (( action = scn.gets ))
+        while action = scn.gets
           slug = action.name.as_slug
           if rx =~ slug
             if tok == slug
@@ -516,47 +149,225 @@ module Skylab::Brazen
         matching_actions
       end
 
-      def invk_when_no_matching_action
-        CLI::When_::No_Matching_Action.new( @token, hlp_renderer, self ).execute
-      end
-
-      def invoke_when_ambiguous_matching_actions
-        CLI::When_::Ambiguous_Matching_Actions.new( @token, self ).execute
-      end
-
-    public
-
-      # ~ in support of above
-
       def get_action_scn
-        @node.get_action_scanner.map_by do |action|
-          Action_Adapter_.new self, action
+        action.get_action_scanner.map_by do |action|
+          if action.is_branch
+            branch_class.new action
+          else
+            leaf_class.new action
+          end
         end
       end
 
-      def set_exit_status d
-        @exit_status = d ; nil
+      def leaf_class
+        Action_Adapter__
       end
 
-      # ~ general client-related services for ad-hoc agents
+      def branch_class
+        Branch_Adapter__
+      end
 
-      def app_name
-        ::File.basename @invocation_str_a.last
+    private
+      def resolve_executable_when_no_matching_action
+        @executable = CLI::When_::No_Matching_Action.new @token, help_renderer, self
+      end
+      def resolve_executable_when_looks_like_option_for_first_argument
+        prepare_to_parse_parameters
+        parse_options
+        @executable or resolve_executable_when_parsed_options
+      end
+      def resolve_executable_when_parsed_options
+        if @output_iambic.length.zero?
+          if argv.length.zero?
+            resolve_executable_when_no_arguments
+          else
+            resolve_executable_when_looks_like_action_for_first_argument
+          end
+        else
+          resolve_executable_when_successfully_parsed_options
+        end
+      end
+      def resolve_executable_when_successfully_parsed_options
+        a = [] ; scn = to_actual_parameters_scanner
+        scn.next
+        begin
+          i, x = scn.pair
+          cls = executable_class_via_option_property_name_i i
+          a.push cls.new( x, help_renderer, self )
+        end  while scn.next
+        @executable = Aggregate_Executable__.new a
+      end
+      def to_actual_parameters_scanner
+        Actual_Parameter_Scanner__.new @output_iambic, @properties
+      end
+      def resolve_executable_when_multiple_matching_adapters
+        @executable = CLI::When_::Ambiguous_Matching_Actions.new self._TODO
+      end
+      def resolve_executable_when_one_matching_adapter
+        adapter = @adapter_a.first
+        adapter.receive_frame self
+        @executable = adapter.via_argv_resolve_some_executable
       end
     end
 
+    # ~
 
+    Adapter_Methods__ = ::Module.new
 
-    class Action_Adapter_
+    class Action_Adapter__ < Invocation__
 
-      def initialize invocation, action
-        @action = action ; @invocation = invocation
+      include Adapter_Methods__
+
+    private
+      def resolve_properties
+        @properties = @action.class.properties ; nil
+      end
+      def resolve_partitions
+        @partitions = Build_partitions__[ get_full_inferred_props_scan, self ]
+      end
+      def get_full_inferred_props_scan
+        scn = @properties.to_scanner
+        scn.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :help
+      end
+    public
+      def receive_show_help otr
+        receive_frame otr
+        help_renderer.output_help_screen
+        SUCCESS_
+      end
+      def executable_wrapper_class
+        Executable_Wrapper__
+      end
+    private
+      def resolve_executable
+        prepare_to_parse_parameters
+        parse_options
+        @executable or resolve_executable_after_parsed_options
+      end
+      def resolve_executable_after_parsed_options
+        if @seen_h[ :help ]
+          resolve_executable_when_help_request
+        else
+          resolve_executable_when_any_args
+        end
+      end
+      def resolve_executable_when_help_request
+        a = []
+        a.push executable_class_via_option_property_name_i( :help ).
+           new( nil, help_renderer, self )
+        if argv.length.nonzero?
+          a.push CLI::When_::Unhandled_Arguments.
+            new argv, help_renderer
+        end
+        @executable = Aggregate_Executable__.new a
+      end
+    public def executable_class_for_help_option
+        When_Action_Help__
+      end
+      def resolve_executable_when_any_args
+        arg_a = @partitions.arg_a || EMPTY_A_
+        @arg_parse = Action_Adapter_::Arguments.new argv, arg_a
+        ev = @arg_parse.execute
+        if ev
+          resolve_executable_when_ARGV_parsing_error_event ev
+        else
+          resolve_executable_when_ARGV_parsed
+        end
+      end
+      def resolve_executable_when_ARGV_parsing_error_event ev
+        send :"resolve_executable_when_#{ ev.terminal_channel_i }_arguments", ev
+      end
+      def resolve_executable_when_missing_arguments ev
+        @executable = CLI::When_::Missing_Arguments.new ev, help_renderer
+      end
+      def resolve_executable_when_extra_arguments ev
+        @executable = CLI::When_::Extra_Arguments.new ev, help_renderer
       end
 
-      attr_reader :action
+      def resolve_executable_when_ARGV_parsed
+        @output_iambic.concat @arg_parse.release_result_iambic
+        @partitions.env_a and process_environment
+        @executable or resolve_executable_via_output_iambic
+      end
+
+      def process_environment
+        env = @resources.env
+        @partitions.env_a.each do |prop|
+          s = env[ prop.environment_name_i ]
+          s or next
+          @seen_h[ prop.name_i ] and next
+          @output_iambic.push prop.name_i, s
+        end ; nil
+      end
+
+      def resolve_executable_via_output_iambic
+
+        @executable = @action.
+          resolve_any_executable_via_iambic_and_adapter @output_iambic, self
+        if ! @executable
+          @executable = Value_Wrapper_Executable__.new GENERIC_ERROR_
+        end ; nil
+      end
+
+    public
+      def app_name
+        @parent.app_name
+      end
+
+      Autoloader_[ self ]
+    end
+
+    class Simple_Executable_
+      def receiver
+        self
+      end
+
+      def method_name
+        :execute
+      end
+
+      def args
+      end
+    end
+
+    class When_Action_Help__ < Simple_Executable_
+
+      def initialize _, help_renderer, _action_adapter
+        @help_renderer = help_renderer
+        _ and self._SANITY
+      end
+      def execute
+        @help_renderer.output_help_screen
+        SUCCESS_
+      end
+    end
+
+    class Branch_Adapter__ < Branch_Invocation__
+
+      include Adapter_Methods__
+
+      def receive_show_help otr
+        receive_frame otr
+        CLI::When_::Help.new( nil, help_renderer, self ).execute
+      end
+
+      def set_exit_status d
+        @parent.set_exit_status d
+      end
+    end
+
+    module Adapter_Methods__
+
+      def initialize action
+        @action = action
+      end
 
       def name
         @action.name
+      end
+
+      def is_visible
+        @action.is_visible
       end
 
       def has_description
@@ -567,119 +378,100 @@ module Skylab::Brazen
         @action.under_expression_agent_get_N_desc_lines exp, d
       end
 
-      def render_syntax_string
-        hlp_rndrr.produce_main_syntax_string
+      def receive_frame otr
+        @parent = otr
+        @resources = otr.resources
+        resolve_properties
+        resolve_partitions ; nil
       end
 
-      def is_visible
-        @action.is_visible
+      def via_argv_resolve_some_executable
+        resolve_executable
+        @executable
       end
 
-      # ~ for invocation
-
-      def adapter_via_argv argv
-        @properties_adapter = if @action.is_branch
-          Branch_Adapter__.new argv, @invocation, self
-        else
-          Properties_Adapter__.new argv, @invocation, self
-        end
-        @properties_adapter.produce_the_adapter
-      end
-
-      def help_rndrr
-        @properties_adapter.help_renderer
-      end
-
-      def execution_receiver
+      def action
         @action
       end
 
-      # ~ for parse context
-
-      def adapter_via_iambic x_a
-        @action.produce_adapter_via_iambic_and_adapter x_a, self
+      def action_adapter
+        self
       end
 
-      # ~ for kernel
-
-      def get_property_scanner
-        @action.get_property_scanner
+      def invocation
+        self
       end
 
-      def any_optparse_p  # in theory, a hook for building op manually
-      end
-
-      def stderr
-        @invocation.stderr
-      end
-
-      # ~ for ad-hoc business agents
-
-      def app_name
-        @invocation.app_name
-      end
-
-      # ~
-
-      def on_event ev
+      def receive_event ev
         ev_ = ev.to_event
         if ev_.has_tag :is_positive
           _ok = ev_.is_positive
           if _ok
             if ev_.has_tag :is_completion and ev_.is_completion
-              on_completion_event ev
+              receive_completion_event ev
             else
-              on_positive_event ev
+              receive_positive_event ev
             end
           else
-            on_negative_event ev
+            receive_negative_event ev
           end
         else
           send_event ev
         end
       end
 
-      def on_completion_event ev
-        set_ext_status SUCCESS_
-        a = render_event_lines ev
-        s = maybe_inflect_line_for_completion_via_event a.first, ev
-        s and a[ 0 ] = s
-        send_non_payload_event_lines a
-      end
-
-      def on_positive_event ev
+      def receive_positive_event ev
         ev_ = ev.to_event
-        if ev_.is_positive
-          set_ext_status SUCCESS_
-        else
-          set_ext_status some_err_code_for_event ev_
-        end
         a = render_event_lines ev
         s = maybe_inflect_line_for_positivity_via_event a.first, ev
         s and a[ 0 ] = s
         send_non_payload_event_lines a
+        d = ( SUCCESS_ if ev_.is_positive )
+        d ||= some_err_code_for_event ev_
+        set_exit_status d ; nil
       end
 
-      def on_negative_event ev
-        set_ext_status some_err_code_for_event ev
+      def receive_negative_event ev
         a = render_event_lines ev
         s = maybe_inflect_line_for_negativity_via_event a.first, ev
         s and a[ 0 ] = s
         send_non_payload_event_lines a
-        hlp_rndrr.output_invite_to_general_help
+        help_renderer.output_invite_to_general_help
+        set_exit_status some_err_code_for_event ev ; nil
+      end
+
+      def receive_completion_event ev
+        a = render_event_lines ev
+        s = maybe_inflect_line_for_completion_via_event a.first, ev
+        s and a[ 0 ] = s
+        send_non_payload_event_lines a
+        set_exit_status SUCCESS_ ; nil
+      end
+
+      def set_exit_status d
+        @parent.set_exit_status d
       end
 
     private
 
-      def send_event ev
-        _a = render_event_lines ev
-        send_non_payload_event_lines _a
+      def maybe_inflect_line_for_positivity_via_event s, ev
+        open, inside, close = unparenthesize s
+        n_s = ev.inflected_noun
+        v_s = ev.verb_lexeme.progressive
+        gerund_phrase = "#{ [ v_s, n_s ].compact * SPACE_ }"
+        inside_ = if HACK_IS_ONE_WORD_RX__ =~ inside
+          "#{ inside } #{ gerund_phrase }"
+        else
+          "while #{ gerund_phrase }, #{ inside }"
+        end
+        "#{ open }#{ inside_ }#{ close }"
       end
 
-      def render_event_lines ev
-        y = []
-        ev.render_all_lines_into_under y, expr_agent
-        y
+      def maybe_inflect_line_for_negativity_via_event s, ev
+        open, inside, close = unparenthesize s
+        v_s = ev.inflected_verb ; n_s = ev.inflected_noun
+        prefix = "couldn't #{ [ v_s, n_s ].compact * SPACE_ } because "
+        "#{ open }#{ prefix }#{ inside }#{ close }"
       end
 
       def maybe_inflect_line_for_completion_via_event s, ev
@@ -697,47 +489,20 @@ module Skylab::Brazen
           "#{ open }#{ prefix }#{ inside }#{ close }"
         end
       end
-
-      def maybe_inflect_line_for_positivity_via_event s, ev
-        open, inside, close = unparenthesize s
-        n_s = ev.inflected_noun
-        v_s = ev.verb_lexeme.progressive
-        gerund_phrase = "#{ [ v_s, n_s ].compact * SPACE_ }"
-        inside_ = if HACK_IS_ONE_WORD_RX__ =~ inside
-          "#{ inside } #{ gerund_phrase }"
-        else
-          "while #{ gerund_phrase }, #{ inside }"
-        end
-        "#{ open }#{ inside_ }#{ close }"
-      end
-
       HACK_IS_ONE_WORD_RX__ = /\A[a-z]+\z/
-
-      def maybe_inflect_line_for_negativity_via_event s, ev
-        open, inside, close = unparenthesize s
-        v_s = ev.inflected_verb ; n_s = ev.inflected_noun
-        prefix = "couldn't #{ [ v_s, n_s ].compact * SPACE_ } because "
-        "#{ open }#{ prefix }#{ inside }#{ close }"
-      end
 
       def unparenthesize s
         Brazen_::Lib_::Text[].unparenthesize_message_string s
+
+      end
+
+      def render_event_lines ev
+        ev.render_all_lines_into_under y=[], expression_agent
+        y
       end
 
       def send_non_payload_event_lines a
-        a.each( & hlp_rndrr.y.method( :<< ) ) ; nil
-      end
-
-      def expr_agent
-        @properties_adapter.expression_agnt
-      end
-
-      def hlp_rndrr
-        @properties_adapter.help_renderer
-      end
-
-      def set_ext_status d
-        @invocation.set_exit_status d ; nil
+        a.each( & help_renderer.y.method( :<< ) ) ; nil
       end
 
       def some_err_code_for_event ev
@@ -748,221 +513,477 @@ module Skylab::Brazen
         any_ext_status_for_chan_i ev.terminal_channel_i
       end
 
-      def some_ext_status_for_chan_i i
-        Brazen_::API.exit_statii.fetch i
-      end
-
       def any_ext_status_for_chan_i i
         Brazen_::API.exit_statii[ i ]
       end
-
-      Autoloader_[ self ]
     end
 
-    class Properties_Adapter__  # ~ produce the adapter
-      def produce_the_adapter
-        @parse_context.produce_adapter
+    # ~
+
+    class Invocation__
+
+      def expression_agent_class
+        CLI::Expression_Agent__
       end
-    end
 
-    class Parse_Context__  # ~ produce adapter (that is, parse everything)
+      def option_parser_class
+        CLI::Lib_::Option_parser[]
+      end
 
-      def produce_adapter
-        @argv = @kernel.argv ; @did_set_h = {} ; @output_iambic = []
-        result = parse_options help_renderer.op
-        result ||= parse_arguments
-        result ||= process_environment
-        if result
-          @kernel.invocation.set_exit_status result
-          NOTHING_
-        else
-          deliver_adapter
+      def receive_partitions partitions
+        @partitions = partitions ; nil
+      end
+
+      def invocation_string
+        write_invocation_string_parts y = []
+        y * SPACE_
+      end
+
+      def write_invocation_string_parts y
+        @parent.write_invocation_string_parts y
+        y << name.as_slug ; nil
+      end
+
+      def populate_option_parser_with_generated_opts op, opt_a
+        h = Build_unique_letter_hash__[ opt_a ]
+        opt_a.each do |prop|
+          args = []
+          letter = h[ prop.name_i ]
+          letter and args.push "-#{ letter }"
+          base = "--#{ prop.name.as_slug }"
+          if prop.takes_argument
+            if prop.argument_is_required
+              args.push "#{ base } #{ argument_label_for prop }"
+            else
+              args.push "#{ base } [#{ argument_label_for prop }]"
+            end
+            p = -> x do
+              @seen_h[ prop.name_i ] = true
+              @output_iambic.push prop.name_i, x
+            end
+          else
+            args.push base
+            p = -> _ do
+              @seen_h[ prop.name_i ] = true
+              @output_iambic.push prop.name_i
+            end
+          end
+          if prop.has_description
+            args.concat prop.
+              under_expression_agent_get_N_desc_lines expression_agent
+          end
+          op.on( * args, & p )
+        end ; nil
+      end
+
+      def populate_option_parser_with_universal_options op
+      end
+
+      def write_full_syntax_strings y
+        write_any_primary_syntax_string y
+        write_any_auxiliary_syntax_string y
+      end
+
+      def write_any_primary_syntax_string y
+        s = help_renderer.produce_full_main_syntax_string
+        s and y << s ; nil
+      end
+
+      def write_any_auxiliary_syntax_string y
+        help = get_full_inferred_props_scan.each.detect do |prop|
+          :help == prop.name_i
+        end
+        if help
+          ai_s = invocation_string
+          op_s = help_renderer.as_opt_render_property help
+          y << "#{ ai_s } #{ op_s }" ; nil
         end
       end
 
-    private  # ~ parse options
-
-      def deliver_adapter
-        @kernel.action_adapter.adapter_via_iambic @output_iambic
+      def argument_label_for prop
+        s = prop.argument_moniker
+        s or prop.name.as_variegated_string.split( UNDERSCORE_ ).last.upcase
       end
 
-      def parse_options op
-        @result = PROCEDE_
-        op.parse! @argv
-        @result
+      def prepare_to_parse_parameters
+        @executable = nil ; @output_iambic = [] ; @seen_h = {}
+      end
+
+      def parse_options
+        @op ||= option_parser
+        @op.parse! argv ; nil
       rescue ::OptionParser::ParseError => e
-        CLI::When_::Parse_Error.new( e, help_renderer ).execute
+        resolve_executable_when_parse_error e ; nil
       end
 
-      # ~ parse arguments
+      def option_parser
+        help_renderer.op
+      end
 
-      def parse_arguments
-        _arg_a = @kernel.partitions.arg_a || EMPTY_A_
-        parse = Action_Adapter_::Arguments.new @argv, _arg_a
-        error_event = parse.execute
-        if error_event
-          _meth_i = ARGV_ERROR_OP_H__.fetch error_event.event_channel_i
-          @kernel.invocation.send(
-            _meth_i, error_event, @kernel.action_adapter )
+      def executable_class_via_option_property_name_i i
+        m_i = :"executable_class_for_#{ i }_option"
+        if respond_to? m_i
+          send m_i
         else
-          _x_a = parse.release_result_iambic
-          @output_iambic.concat _x_a
-          PROCEDE_
+          i_ = Callback_::Name.from_variegated_symbol( i ).as_const
+          CLI::When_.const_get( i_, false )
         end
       end
 
-      EMPTY_A_ = [].freeze
-
-      ARGV_ERROR_OP_H__ = {
-        extra: :when_extra_ARGV_arguments_event,
-        missing: :when_missing_ARGV_arguments_event
-      }.freeze
-
-      # ~ process environment
-
-      def process_environment
-        @env_a = @kernel.partitions.env_a
-        @env_a and whn_env_a_prcss_environment
+      def resolve_executable_when_parse_error e
+        @executable = CLI::When_::Parse_Error.new e, help_renderer
       end
 
-      def whn_env_a_prcss_environment
-        env = @kernel.invocation.environment
-        @env_a.each do |prop|
-          @did_set_h[ prop.name_i ] and next
-          s = env[ prop.environment_name_i ]
-          s or next
-          @output_iambic.push prop.name_i, s
-        end
-        PROCEDE_
+      def expression_agent
+        @partitions.expression_agent
+      end
+
+      def partitions
+        @partitions
+      end
+
+      def properties
+        @properties
+      end
+
+      def stderr
+        @resources.serr
+      end
+
+    private
+
+      def argv
+        @resources.argv
+      end
+
+      def help_renderer
+        @partitions.help_renderer
       end
     end
 
-    class Branch_Parse_Context__ < Parse_Context__
+    # ~
 
-      def parse_options op
-        if @argv.length.nonzero? and DASH_ == @argv.first.getbyte( 0 )
-          super op
+    Actor_ = Lib_::Snag__[]::Model_::Actor
+
+    class Build_partitions__
+      Actor_[ self, :properties, :scn, :kernel ]
+      def execute
+        Partitions__.new do |p|
+          @kernel.receive_partitions p
+          @partitions = p
+          work
+        end
+        @partitions
+      end
+      def work
+        @arg_a = @env_a = @opt_a = @many_a = nil
+        d = 0 ; @original_index = {}
+        while prop = @scn.gets
+          @original_index[ prop.name_i ] = ( d += 1 )
+          if prop.can_be_from_environment
+            ( @env_a ||= [] ).push prop
+          end
+          prop.can_be_from_argv or next
+          if prop.is_actually_required
+            ( @arg_a ||= [] ).push prop
+          elsif prop.takes_many_arguments
+            ( @many_a ||= [] ).push prop
+          else
+            ( @opt_a ||= [] ).push prop
+          end
+        end
+        if @many_a
+          determine_placement_for_many
+        end
+        maybe_make_experimental_aesthetic_readjustment
+        @partitions.kernel = @kernel
+        @partitions.arg_a = @arg_a.freeze
+        @partitions.env_a = @env_a.freeze
+        @partitions.opt_a = @opt_a.freeze ; nil
+      end
+    private
+      def maybe_make_experimental_aesthetic_readjustment  # #note-575
+        if ! @many_a && @opt_a && ( ! @arg_a || @opt_a.last.takes_argument  ) # (a), (b) and (c)
+          make_experimental_aestethic_adjustment
         end
       end
 
-      def parse_arguments
-        if @argv.length.zero?
-          super
+      def make_experimental_aestethic_adjustment  # #note-600
+        d = @opt_a.length
+        while d.nonzero?
+          prop = @opt_a.fetch d -= 1
+          prop.takes_argument or next
+          STANDARD_BRANCH_PROPERTY_BOX__.has_name( prop.name_i ) and next
+          found = prop
+          break
+        end
+        if found
+          ( @arg_a ||= [] ).push found
+          @opt_a[ d, 1 ] = EMPTY_A_
+          @opt_a.length.zero? and @opt_a = nil
+        end ; nil
+      end
+
+      def determine_placement_for_many  # #note-600
+        if @arg_a
+          @arg_a.push @many_a.pop
+          re_order @arg_a
         else
-          parse_nonzero_length_arguments
+          @arg_a = [ @many_a.pop ]
+        end
+        if @many_a.length.nonzero?
+          @opt_a.concat @many_a
+          re_order @opt_a
+        end
+        @many_a = true
+      end
+
+      def re_order a
+        a.sort_by! do |prop|
+          @original_index.fetch prop.name_i
+        end ; nil
+      end
+    end
+
+    class Partitions__
+      def initialize
+        @expression_agent = @op = @help_renderer = nil
+        yield self
+        @expression_agent or resolve_expression_agent
+        @op or resolve_option_parser
+        @help_renderer or resolve_help_renderer
+      end
+      attr_accessor :opt_a, :arg_a, :env_a
+      attr_accessor :kernel
+      attr_reader :expression_agent, :help_renderer, :partitions
+    private
+
+      def resolve_expression_agent
+        @expression_agent = @kernel.expression_agent_class.new self ; nil
+      end
+
+      def resolve_option_parser
+        op = @kernel.option_parser_class.new
+        @opt_a and @kernel.populate_option_parser_with_generated_opts op, @opt_a
+        @kernel.populate_option_parser_with_universal_options op
+        @op = op ; nil
+      end
+
+      def resolve_help_renderer
+        CLI::Action_Adapter_::Help_Renderer.new @op, @kernel ; nil
+      end
+
+    public def receive_help_renderer o
+        @help_renderer = o
+        @opt_a and add_option_section o
+        @arg_a and add_arg_section o
+        @env_a and add_env_section o
+      end
+
+      def add_option_section o
+        o.add_section :ad_hoc_section, 'options' do |help|
+          help.output_option_parser_summary
         end
       end
 
-      def parse_nonzero_length_arguments
-        invoc = @kernel.invocation
-        s_a = invoc.get_invocation_str_a
-        s_a.push @kernel.action_adapter.name.as_slug
-        invoc_ = Branch_Invocation__.new( * invoc.IO_three, s_a )
-        _x = invoc_.adapter_from_argv @argv
-        if _x
-          self._DO_ME
+      def add_arg_section o
+        o.arg_a = @arg_a
+        o.add_section :item_section, 'argument', @arg_a ; nil
+      end
+
+      def add_env_section o
+        o.add_section :item_section, 'environment variable',
+          @env_a, & :environment_name_i
+      end
+
+    public
+
+      def rendering_method_name_for prop  # for expag
+        if @opt_a and @opt_a.include? prop
+          :render_prop_as_option
+        elsif @arg_a and @arg_a.include? prop
+          :render_prop_as_argument
         else
-          GENERIC_ERROR_
+          @env_a && @env_a.include?( prop ) or fail "sanity: #{prop.name_i}"
+          :render_prop_as_environment_variable
         end
       end
     end
 
-    class Branch_Invocation__ < Invocation__
-
-      def initialize i, o, e, invok_s_a
-        super
-      end
-      def adapter_from_argv argv
-        @argv = argv
-        @properties_adapter = Properties_Adapter__.new argv, self
-        adapter = adapter_when_action_token
-        adapter
-      end
-    end
-
-    class Invocation__  # ~ produce the adapter
-
-      def when_extra_ARGV_arguments_event ev, action_adptr
-        CLI::When_::Extra_Arguments.new( ev, action_adptr.help_rndrr ).execute
-      end
-
-      def when_missing_ARGV_arguments_event ev, action_adptr
-        CLI::When_::Missing_Arguments.new( ev, action_adptr.help_rndrr ).execute
-      end
-    end
-
-    class Expression_Agent__
-
-      def self.pretty_path x
-        self::Pretty_Path__.new( x ).execute
-      end
-
-      def initialize partitions
-        @partitions = partitions
-      end
-
-      alias_method :calculate, :instance_exec
-
-      def s x
-        x.respond_to?( :length ) and x = x.length
-        's' if 1 != x
-      end
-
-      GREEN__ = 32
-      STRONG__ = 1
-
-      def code string
-        "'#{ stylize CODE_STYLE__, string }'"
-      end
-      CODE_STYLE__ = [ GREEN__ ].freeze
-
-      def hdr string
-        stylize HIGHLIGHT_STYLE__, "#{ string }:"
-      end
-
-      def highlight string
-        stylize HIGHLIGHT_STYLE__, string
-      end
-      HIGHLIGHT_STYLE__ = [ STRONG__, GREEN__ ].freeze
-
-      def ick s
-        code s
-      end
-
-      def par prop
-        _unstyled = send @partitions.rendering_method_name_for( prop ), prop
-        highlight _unstyled
-      end
-
-      def render_prop_as_option prop
-        "--#{ prop.name.as_slug }"
-      end
-
-      def render_prop_as_argument prop
-        "<#{ prop.name.as_slug }>"
-      end
-
-      def render_prop_as_environment_variable prop
-        prop.environment_name_i
-      end
-
-      def pth s
-        if s.respond_to? :to_path
-          s = s.to_path
+    Build_unique_letter_hash__ = -> opt_a do
+      h = { } ; num_times_seen_h = ::Hash.new { |h_, k| h_[ k ] = 0 }
+      opt_a.each do |prop|
+        name_s = prop.name.as_variegated_string
+        d = name_s.getbyte 0
+        case num_times_seen_h[ d ] += 1
+        when 1
+          h[ prop.name_i ] = name_s[ 0, 1 ]
+        when 2
+          h.delete prop.name_i
         end
-        if DIR_SEP__ == s.getbyte( 0 )
-          self.class::Pretty_Path__.new( s ).execute
+      end
+      h
+    end
+
+    class Properties__
+      def initialize
+        @box = STANDARD_BRANCH_PROPERTY_BOX__
+      end
+      def fetch i
+        @box.fetch i
+      end
+      def to_scan
+        scn = @box.to_value_scanner
+        Entity_[].scan.new do
+          scn.gets
+        end
+      end
+    end
+
+    class Property__
+      def initialize name_i, * x_a
+        @argument_arity = :one
+        @custom_moniker = nil
+        @desc = nil
+        @can_be_from_argv = true
+        @name = Callback_::Name.from_variegated_symbol name_i
+        x_a.each_slice( 2 ) do |i, x|
+          instance_variable_set :"@#{ i }", x
+        end
+        freeze
+      end
+      attr_reader :desc, :name,
+        :argument_arity,
+        :argument_moniker,
+        :can_be_from_argv,
+        :can_be_from_environment,
+        :custom_moniker,
+        :is_required
+
+      alias_method :is_actually_required, :is_required
+
+      def name_i
+        @name.as_variegated_symbol
+      end
+
+      def has_custom_moniker
+        @custom_moniker
+      end
+
+      def has_description
+        @desc
+      end
+
+      def under_expression_agent_get_N_desc_lines expag, d=nil
+        Brazen_::Lib_::N_lines[].new( [], d, [ @desc ], expag ).execute
+      end
+
+      def takes_argument  # zero to many takes argument
+        :zero != @argument_arity
+      end
+
+      def argument_is_required
+        :one == @argument_arity or :one_to_many == @argument_arity
+      end
+
+      def takes_many_arguments
+        :zero_to_many == @argument_arity or :one_to_many == @argument_arity
+      end
+
+      def has_default
+      end
+    end
+
+    Entity_ = -> { Brazen_::Entity }
+
+    STANDARD_ACTION_PROPERTY_BOX__ = -> do
+      box = Entity_[].box.new
+      box.add :help, Property__.new( :help,
+        :argument_arity, :zero,
+        :desc, -> y do
+          y << "this screen"
+        end )
+      box.add :ellipsis, Property__.new( :ellipsis,
+        # :argument_arity, :zero_to_many,
+        :argument_arity, :zero_or_one,
+        :custom_moniker, '..' )
+
+      box.freeze
+    end.call
+
+    STANDARD_BRANCH_PROPERTY_BOX__ = -> do
+      box = Entity_[].box.new
+      box.add :action, Property__.new( :action, :is_required, true )
+      box.add :help, Property__.new( :help,
+        :argument_arity, :zero_or_one,
+        :argument_moniker, 'cmd',
+        :desc, -> y do
+          y << 'this screen (or help for action)'
+      end )
+      box.freeze
+    end.call
+
+    class Actual_Parameter_Scanner__
+      def initialize output_iambic, props
+        scn = Entity_[]::Iambic_Scanner.new 0, output_iambic
+        prop = i = x = nil
+        @prop_p = -> { prop }
+        @pair_p = -> { [ i, x ] }
+        @next_p = -> do
+          if scn.unparsed_exists
+            i = scn.gets_one
+            prop = props.fetch i
+            x = ( scn.gets_one if prop.takes_argument )
+            true
+          else
+            prop = i = x = nil
+          end
+        end
+      end
+      def next ; @next_p[] end
+      def pair ; @pair_p[] end
+      def prop ; @prop_p[] end
+    end
+
+    class Resources__
+      def initialize a
+        @mod, @sin, @sout, @serr, @s_a = a
+        if @s_a
+          @s_a.last.nil? and @s_a[ -1 ] = Callback_::Name.from_module( @mod ).as_slug
         else
-          s
+          @s_a = [ ::File.basename( $PROGRAM_NAME ) ].freeze
         end
       end
-      DIR_SEP__ = '/'.getbyte 0
-
-      def stylize style_d_a, string
-        "\e[#{ style_d_a.map( & :to_s ).join( ';' ) }m#{ string }\e[0m"
+      attr_reader :argv, :env, :sin, :sout, :serr, :mod
+      def complete env, argv
+        @argv = argv ; @env = env ; freeze ; nil
       end
+      def invocation_s_a
+        @s_a
+      end
+    end
 
-      Autoloader_[ self ]
+    Executable_Wrapper__ = ::Struct.new :receiver, :method_name, :args
+
+    class Value_Wrapper_Executable__ < Simple_Executable_
+      def initialize value
+        @execute = value
+      end
+      attr_reader :execute
+    end
+
+    class Aggregate_Executable__ < Simple_Executable_
+      def initialize a
+        @a = a
+      end
+      def execute
+        scn = Entity_[].scan_nonsparse_array @a
+        while exe = scn.gets
+          value = exe.receiver.send exe.method_name, * exe.args
+          value.nonzero? and break
+        end
+        value
+      end
     end
 
     module Lib_
@@ -973,6 +994,7 @@ module Skylab::Brazen
     end
 
     DASH_ = '-'.getbyte 0
+    EMPTY_A_ = [].freeze
     GENERIC_ERROR_ = 5
     NOTHING_ = PROCEDE_ = nil
     SUCCESS_ = 0

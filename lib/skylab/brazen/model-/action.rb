@@ -49,26 +49,28 @@ module Skylab::Brazen
       end
     end
 
-    def produce_adapter_via_iambic_and_adapter x_a, adapter
+    def resolve_any_executable_via_iambic_and_adapter x_a, adapter
       @client_adapter = adapter
       @error_count = 0
       process_iambic_fully x_a
       notificate :iambic_normalize_and_validate
-      @error_count.zero? and @client_adapter
+      if @error_count.zero?
+        adapter.executable_wrapper_class.new self, :execute
+      end
     end
 
-    def on_missing_required_props ev
-      on_negative_event ev
+    def receive_missing_required_props ev
+      receive_negative_event ev
     end
 
-    def on_error_event ev  # e.g ad-hoc normalization failure from spot [#012]
+    def receive_error_event ev  # e.g ad-hoc normalization failure from spot [#012]
       ev_ = listener.sign_event ev
-      on_negative_event ev_
+      receive_negative_event ev_
     end
 
-    def on_negative_event ev
+    def receive_negative_event ev
       @error_count += 1
-      @client_adapter.on_negative_event ev ; nil
+      @client_adapter.receive_negative_event ev ; nil
     end
 
     private

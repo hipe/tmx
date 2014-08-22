@@ -30,6 +30,8 @@ module Skylab::Brazen
           end
         end
 
+    o :meta_property, :argument_moniker
+
     o :meta_property, :default,
         :entity_class_hook, -> prop, cls do
           cls.add_iambic_event_listener :iambic_normalize_and_validate,
@@ -109,7 +111,15 @@ module Skylab::Brazen
         :one == @argument_arity
       end
 
-      def has_custom_glyph  # [#014] this is a smell here
+      def takes_many_arguments
+        :zero_to_many == @argument_arity or :one_to_many == @argument_arity
+      end
+
+      def argument_is_required
+        :one == @argument_arity or :one_to_many == @argument_arity
+      end
+
+      def has_custom_moniker  # [#014] this is a smell here
       end
 
       def << a
@@ -246,21 +256,21 @@ module Skylab::Brazen
     end
 
     def receive_event_on_channel ev, i
-      m = :"on_#{ ev.terminal_channel_i }_#{ i }"
+      m = :"receive_#{ ev.terminal_channel_i }_#{ i }"
       if respond_to? m
         send m, ev
       else
-        m = :"on_#{ i }_event"  # #this-spot :[#012]
+        m = :"receive_#{ i }_event"  # #this-spot :[#012]
         send m, ev
       end
     end
 
     def receive_event_structure ev
-      _m = :"on_#{ ev.terminal_channel_i }"
+      _m = :"receive_#{ ev.terminal_channel_i }"
       send _m, ev
     end
 
-    def on_missing_required_props ev
+    def receive_missing_required_props ev
       _s = ev.render_first_line_under Brazen_::API::EXPRESSION_AGENT
       raise ::ArgumentError, _s
     end

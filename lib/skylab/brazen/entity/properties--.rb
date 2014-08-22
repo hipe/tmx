@@ -56,9 +56,13 @@ module Skylab::Brazen
         end
       end
 
+      def to_scanner
+        to_value_scanner
+      end
+
       def to_value_scanner
         scn = @reader.property_method_nms_for_rd.to_value_scanner
-        Callback_::Scn.new do
+        Entity.scan.new do
           if (( m_i = scn.gets ))
             @reader.send m_i
           end

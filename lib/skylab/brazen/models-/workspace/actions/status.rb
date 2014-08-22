@@ -46,9 +46,9 @@ module Skylab::Brazen
 
     class Listener < Brazen_::Entity::Event::Listener_X
 
-      def on_workspace_event ev
+      def receive_workspace_event ev
         _ev = sign_event ev
-        @listener.on_positive_event _ev
+        @listener.receive_positive_event _ev
       end
     end
   end

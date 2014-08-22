@@ -1,8 +1,8 @@
 module Skylab::Brazen
 
-  module CLI
+  class CLI
 
-    class When_::Unhandled_Arguments
+    class When_::Unhandled_Arguments < Simple_Executable_
 
       def initialize args, help_renderer
         @args = args

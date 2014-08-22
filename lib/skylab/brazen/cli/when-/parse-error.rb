@@ -1,8 +1,8 @@
 module Skylab::Brazen
 
-  module CLI
+  class CLI
 
-    class When_::Parse_Error
+    class When_::Parse_Error < Simple_Executable_
 
       def initialize e, help_renderer
         @exception = e

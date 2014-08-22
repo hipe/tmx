@@ -7,6 +7,8 @@ module Skylab::Brazen::TestSupport::CLI
   Brazen_ = ::Skylab::Brazen
   TestSupport_ = ::Skylab::TestSupport
 
+  SPACE_ = Brazen_::SPACE_
+
   module CONSTANTS
     Brazen_ = Brazen_
     TestSupport_ = TestSupport_
@@ -14,14 +16,34 @@ module Skylab::Brazen::TestSupport::CLI
 
   extend TestSupport_::Quickie
 
+  module ModuleMethods
+
+    def fake_app_name
+      FAKE_APP_NAME__
+    end
+    FAKE_APP_NAME__ = 'bzn'.freeze
+
+    def with_invocation * _S_A_
+
+      _S_A_.freeze
+      define_method :sub_action_s_a do _S_A_ end
+
+      _RX_ = /\Ause '?bzn #{ _S_A_ * SPACE_ } -h'? for help\z/
+      define_method :localized_invite_line_rx do _RX_ end
+
+      _S_ = ( [ fake_app_name, * _S_A_ ] * SPACE_ ).freeze
+      define_method :invocation_string do _S_ end
+    end
+  end
+
   module InstanceMethods
 
     # ~ common business assertions
 
     def expect_branch_pattern_zero
       expect_expecting_action_line
-      expect_usage_line
-      expect_invite_line
+      expect_branch_usage_line
+      expect_action_invite_line
       expect_errored
     end
 
@@ -29,7 +51,7 @@ module Skylab::Brazen::TestSupport::CLI
       expect :styled, /\Aunrecognized action ['"]?fiffle['"]?\z/
       _rx = bld_known_actions_rx
       expect :styled, _rx
-      expect_invite_line
+      expect_action_invite_line
       expect_errored
     end
 
@@ -40,7 +62,7 @@ module Skylab::Brazen::TestSupport::CLI
 
     def expect_branch_pattern_one_two
       expect 'invalid option: -x'
-      expect_invite_line
+      expect_action_invite_line
       expect_errored
     end
 
@@ -48,18 +70,69 @@ module Skylab::Brazen::TestSupport::CLI
       expect :styled, 'expecting <action>'
     end
 
-    def expect_help_screen_first_half
-      expect_usage_line
-      expect_secondary_syntax_line
-
+    def expect_branch_help_screen_first_half
+      expect_branch_usage_line
+      expect_branch_secondary_syntax_line
       expect_maybe_a_blank_line
+
       expect_description_line
-
       expect_maybe_a_blank_line
-      expect_header_line 'options'
+    end
+
+    def expect_branch_help_screen_second_half
+      expect_header_line 'actions'
+      expect_these_actions
+      expect_maybe_a_blank_line
+
+      expect_branch_invite_line
+      expect_succeeded
+    end
+
+    def expect_action_help_screen
+      expect_action_usage_lines
+      expect_description
       expect_options
+      expect_arguments
+      expect_environment_variables
+      expect_succeeded
+    end
 
+    def expect_action_usage_lines
+      expect_action_usage_line
+      expect "#{ ' ' * 7 }#{ invocation_string } -h"
       expect_maybe_a_blank_line
+    end
+
+    def expect_action_usage_line
+      expect :styled, "usage: #{ invocation_string }#{ prop_syntax }"
+    end
+
+    def expect_description
+      expect :styled, "description: #{ description_body_copy }"
+      expect_maybe_a_blank_line
+    end
+
+    def expect_options
+      expect_header_line 'options'
+      expect_these_options
+      expect_maybe_a_blank_line
+    end
+
+    def expect_arguments
+      expect :styled, %r(\Aarguments?:\z)
+      expect_these_arguments
+      expect_maybe_a_blank_line
+    end
+
+    def expect_environment_variables
+    end
+
+    def expect_branch_usage_line
+      expect :styled, "usage: #{ invocation_string } <action> [..]"
+    end
+
+    def expect_branch_secondary_syntax_line
+      expect "#{ ' ' * 7 }#{ invocation_string } -h [cmd]"
     end
 
     def expect_help_screen_for_init
@@ -78,6 +151,22 @@ module Skylab::Brazen::TestSupport::CLI
       expect_header_line 'argument'
       expect %r(\A[ ]{4}path[ ]{7,}the dir)
       expect_succeeded
+    end
+
+    def status_prop_syntax
+      ' [-v] [<path>]'
+    end
+
+    def expect_branch_auxiliary_usage_line
+      expect "#{ ' ' * 7 }#{ invocation_string } -h [cmd]"
+    end
+
+    def expect_branch_invite_line
+      expect :styled, "use '#{ invocation_string } -h <action>' for help on that action."
+    end
+
+    def expect_action_invite_line
+      expect :styled, "use '#{ invocation_string } -h' for help"
     end
 
     def expect_errored_with i
@@ -112,6 +201,11 @@ module Skylab::Brazen::TestSupport::CLI
     attr_reader :do_debug
 
     def invoke * argv
+      a = sub_action_s_a and argv[ 0, 0 ] = a
+      invoke_via_argv argv
+    end
+
+    def invoke_with_no_prefix * argv
       invoke_via_argv argv
     end
 
@@ -136,6 +230,38 @@ module Skylab::Brazen::TestSupport::CLI
     end
 
     # ~ assertion phase
+
+    def expect_option i, rx=nil
+      if rx
+        _xtra_rxs = "[ ]{10,}.*#{ rx.source }.*"
+      end
+      s = i.to_s
+      expect %r(\A[ ]{4,}-#{ s[0] }, --#{ s }#{ _xtra_rxs }\z)
+    end
+
+    def expect_item i, * x_a
+      a = []
+      :styled == x_a.first and a.push x_a.shift
+      rx = x_a.shift
+      if rx
+        _xtra_rxs = ".*#{ rx.source }.*"
+      end
+      s = i.to_s
+      a.push %r(\A[ ]{4,}#{ ::Regexp.escape s }[ ]{10,}#{ _xtra_rxs }\z)
+      expect( * a )
+      while x_a.length.nonzero?
+        d = x_a.length
+        a.clear
+        :styled == x_a.first and a.push x_a.shift
+        rx = x_a.first
+        if rx
+          x_a.shift
+          a.push %r(\A[ ]{15,}.*#{ rx.source }.*\z)
+        end
+        d == x_a.length and raise ::ArgumentError, "#{ x_a.first.inspect }"
+        expect( * a )
+      end
+    end
 
     def expect * x_a
       load_expect_the_first_time
@@ -237,6 +363,14 @@ module Skylab::Brazen::TestSupport::CLI
     end
 
     attr_reader :expectation_scanner, :emission_scanner
+
+    def invocation_string
+      self.class.fake_app_name
+    end
+
+    def sub_action_s_a
+      nil
+    end
 
   end
 end
