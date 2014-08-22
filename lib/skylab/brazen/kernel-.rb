@@ -2,27 +2,20 @@ module Skylab::Brazen
 
   class Kernel_
 
-    class << self
-
-      def wrap_scanner s, & p
-        Scanner_Wrapper__.new s, p
-      end
-    end
-
-    def initialize mod, name_str
+    def initialize mod
       @module = mod
-      @name_string = name_str
     end
 
     def get_action_scanner
       mscn = get_model_scanner
       ascn = nil
-      Callback_::Scn.new do
+
+      Brazen_::Entity.scan.new do
         while true
           if ! ascn
             mdl = mscn.gets
             mdl or break
-            ascn = mdl.get_action_scanner
+            ascn = mdl.get_upper_action_scan
             ascn or next
           end
           x = ascn.gets
@@ -48,17 +41,6 @@ module Skylab::Brazen
 
     def models_mod
       @module.const_get :Models_, false
-    end
-
-    class Scanner_Wrapper__
-      def initialize scn,  p
-        @scn = scn ; @p = p
-      end
-      def gets
-        if x = @scn.gets
-          @p[ x ]
-        end
-      end
     end
   end
 end

@@ -43,7 +43,8 @@ module Skylab::Brazen
         o.section_boundary
         o.output_header 'actions'
         o.output_option_parser_summary
-        o.output_items_with_descriptions nil, @aa.actions.visible.to_a, 2
+        _a = @aa.get_action_scn.reduce_by( & :is_visible ).to_a
+        o.output_items_with_descriptions nil, _a, 2
         o.section_boundary
         prop = aa.properties.fetch :action
         o.express do

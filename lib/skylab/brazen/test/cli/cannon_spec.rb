@@ -8,25 +8,17 @@ module Skylab::Brazen::TestSupport::CLI
 
     it "  0)  no arguments - error / usage / invite" do
       invoke
-      expect :styled, 'expecting <action>'
-      expect_usage_line
-      expect_invite_line
-      expect_errored
+      expect_branch_pattern_zero
     end
 
     it "1.1)  one strange argument - error / list / invite" do
       invoke 'fiffle'
-      expect :styled, /\Aunrecognized action ['"]?fiffle['"]?\z/
-      expect :styled, /\Aknown actions are \('?init'?, '?status'?\b/
-      expect_invite_line
-      expect_errored
+      expect_branch_pattern_one_one
     end
 
     it "1.2)  one strange option-looking argument - error / invite" do
       invoke '-x'
-      expect 'invalid option: -x'
-      expect_invite_line
-      expect_errored
+      expect_branch_pattern_one_two
     end
 
     it "1.4)  one valid option-looking argument (help) - help screen" do
@@ -38,6 +30,7 @@ module Skylab::Brazen::TestSupport::CLI
       expect :styled, %r(\A  +init  +init a <workspace>)
       expect %r(\A  +this is the second line)
       expect %r(\A  +status  +get status of a workspace\.?)
+      expect %r(\A  +workspace  +manage workspaces)
       expect_maybe_a_blank_line
       expect :styled, /\Ause '?bzn -h <action>'? for help on that action\.?\b/
       expect_succeeded
@@ -57,5 +50,7 @@ module Skylab::Brazen::TestSupport::CLI
     def expect_invite_line
       expect :styled, /\Ause '?bzn -h'? for help\z/
     end
+
+    self::EXPECTED_ACTION_NAME_S_A = [ 'init', 'status', 'workspace' ].freeze
   end
 end

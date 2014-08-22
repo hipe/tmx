@@ -12,6 +12,22 @@ module Skylab::Brazen
         Box_
       end
 
+      def scan
+        Entity::Collection__::Scan
+      end
+
+      def scan_map scn, & p
+        Entity::Collection__::Scan.map scn, p
+      end
+
+      def scan_reduce scn, & p
+        Entity::Collection__::Scan.redude scn, p
+      end
+
+      def scan_nonsparse_array a
+        Entity::Collection__::Scan.nonsparse_array a
+      end
+
       def via_argument_list a
         Shell__.new.execute_via_argument_list a
       end
@@ -483,12 +499,7 @@ module Skylab::Brazen
       end
 
       def to_key_scanner
-        d = -1 ; last = @a.length - 1
-        Callback_::Scn.new do
-          if d < last
-            @a.fetch d += 1
-          end
-        end
+        Entity.scan_nonsparse_array @a
       end
 
       def to_value_scanner

@@ -15,22 +15,16 @@ module Skylab::Brazen
     end
 
     include Brazen_::Model_::Entity  # so we can override its behavior near events
+    include Interface_Element_Instance_Methdods__
 
     def initialize
     end
 
-    def name
-      self.class.name_function
+    def is_branch
     end
 
-    def has_description
-      ! self.class.description_block.nil?
-    end
-
-    def under_expression_agent_get_N_desc_lines expression_agent, d=nil
-      Brazen_::Lib_::N_lines[].
-        new( [], d, [ self.class.description_block ], expression_agent ).
-         execute
+    def is_visible
+      true
     end
 
     class << self

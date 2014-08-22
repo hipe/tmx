@@ -62,6 +62,8 @@ additional entry for itself.
 for 4), the model will supply one entry for each such action and one
 entry for itself.
 
+to summarize the above 4 points, the model node will promote itself iff
+it has a nonzero number of child nodes that did not promote themselves.
 
 
 ## :#three.

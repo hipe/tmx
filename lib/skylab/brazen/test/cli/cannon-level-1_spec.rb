@@ -21,15 +21,7 @@ module Skylab::Brazen::TestSupport::CLI
 
     it "1.4)  good option (help screen)" do
       invoke 'st', '-h'
-      expect_usage_line
-      expect %r(\A[ ]{7}bzn status -h\z)
-      expect_maybe_a_blank_line
-      expect :styled, /\Adescription: get status of a workspace\b/
-      expect_maybe_a_blank_line
-      expect_header_line 'options'
-      expect %r(\A[ ]{4}-v, --verbose)
-      expect %r(\A[ ]{4}-h, --help[ ]{23}this screen\z)
-      expect_maybe_a_blank_line
+      expect_help_screen_first_half
       expect_header_line 'argument'
       expect %r(\A[ ]{4}path[ ]{29}the location of the workspace)
       expect :styled, /\A[ ]{37}it's really neat\z/
@@ -47,6 +39,20 @@ module Skylab::Brazen::TestSupport::CLI
     end
 
     # ~ business
+
+
+    def expect_secondary_syntax_line
+      expect %r(\A[ ]{7}bzn status -h\z)
+    end
+
+    def expect_description_line
+      expect :styled, /\Adescription: get status of a workspace\b/
+    end
+
+    def expect_options
+      expect %r(\A[ ]{4}-v, --verbose)
+      expect %r(\A[ ]{4}-h, --help[ ]{23}this screen\z)
+    end
 
     def expect_missing_required_property i
       expect :styled, "missing required property <#{ i }>"

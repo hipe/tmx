@@ -16,16 +16,35 @@ module Skylab::Brazen
     class Invocation__
 
       def initialize i, o, e, mutable_invocation_string_parts=nil
-        init_mutable_invocation_string_parts mutable_invocation_string_parts
-        @stdout = o ; @stderr = e
         @environment = @op = nil
+        @stdout = o ; @stderr = e
+        rslv_invocation_string mutable_invocation_string_parts
+        @node ||= Brazen_::Kernel_.new Brazen_
       end
-      attr_writer :environment
+      attr_writer :argv
 
-      def init_mutable_invocation_string_parts a
-        a && a.last.nil? and a[ a.length - 1 ] = "brazen"  # bugfix for 'tmx -h'
-        a ||= [ $PROGRAM_NAME ]
-        @invocation_str_a = a.freeze ; nil
+      def environment= x
+        @environment = x
+      end
+
+      def is_branch
+      end
+
+      def IO_three
+        [ nil, @stdout, @stderr ]
+      end
+
+      def get_invocation_str_a
+        @invocation_str_a.dup
+      end
+
+    private def rslv_invocation_string a
+        if a
+          a.last.nil? and a[ -1 ] = "brazen"  # bugfix for tmx -h
+          @invocation_str_a = a.freeze
+        else
+          @invocation_str_a ||= [ ::File.basename( $PROGRAM_NAME ) ].freeze
+        end ; nil
       end
 
       def invoke argv
@@ -33,7 +52,7 @@ module Skylab::Brazen
         @properties_adapter = Properties_Adapter__.new argv, self
         if @argv.length.zero?
           invoke_when_no_arguments
-        elsif DASH__ == @argv.first.getbyte( 0 )
+        elsif DASH_ == @argv.first.getbyte( 0 )
           invoke_when_options
         else
           adapter = adapter_when_action_token
@@ -41,7 +60,6 @@ module Skylab::Brazen
           @exit_status
         end
       end
-      DASH__ = '-'.getbyte 0
 
     private  # ~ when no arguments
 
@@ -119,8 +137,12 @@ module Skylab::Brazen
     class Properties_Adapter__
 
       def initialize argv, invocation, action_adapter=nil
-        _kernel = Kernel__.new argv, action_adapter, invocation
-        @parse_context = Parse_Context__.new _kernel
+        kernel = node_kernel_class.new argv, action_adapter, invocation
+        @parse_context = kernel.build_parse_context
+      end
+
+      def node_kernel_class
+        self.class::Node_Kernel__
       end
 
       def expression_agnt
@@ -133,17 +155,25 @@ module Skylab::Brazen
 
       attr_reader :parse_context
 
-      class Kernel__
+      class Node_Kernel__
 
         def initialize argv, action_adapter, invocation
           @action_adapter = action_adapter
           @argv = argv
           @invocation = invocation
-          _scn = ( action_adapter || invocation ).get_property_scanner
-          @partitions = Partitions__.new _scn
+          rslv_partitions
         end
 
         attr_reader :action_adapter, :argv, :invocation, :partitions
+
+      private def rslv_partitions
+          _scn = ( @action_adapter || @invocation ).get_property_scanner
+          @partitions = partitions_class.new _scn ; nil
+        end
+
+        def partitions_class
+          self.class::Partitions__
+        end
 
         def action
           ( @action_adapter || @invocation ).action
@@ -160,9 +190,18 @@ module Skylab::Brazen
         def stderr
           @invocation.stderr
         end
+
+        def build_parse_context
+          if @action_adapter && ! @action_adapter.action.is_branch
+            Parse_Context__.new self
+          else
+            Branch_Parse_Context__.new self
+          end
+        end
       end
 
-      class Partitions__
+      class Node_Kernel__::Partitions__
+
         def initialize scn
           arg_a = env_a = opt_a = nil
           while (( prop = scn.gets ))
@@ -187,7 +226,29 @@ module Skylab::Brazen
           freeze
         end
 
-        attr_reader :env_a, :opt_a, :arg_a
+        attr_reader :arg_a, :env_a, :opt_a
+
+        def populate_with_sections o
+          add_option_section o
+          @arg_a and add_arg_section o
+          @env_a and add_env_section o
+        end
+
+        def add_option_section o
+          o.add_section :ad_hoc_section, 'options' do |help|
+            help.output_option_parser_summary
+          end
+        end
+
+        def add_arg_section o
+          o.arg_a = @arg_a
+          o.add_section :item_section, 'argument', @arg_a ; nil
+        end
+
+        def add_env_section o
+          o.add_section :item_section, 'environment variable',
+            @env_a, & :environment_name_i
+        end
 
         def rendering_method_name_for prop
           if @opt_a and @opt_a.include? prop
@@ -197,6 +258,77 @@ module Skylab::Brazen
           else
             @env_a && @env_a.include?( prop ) or fail "sanity: #{prop.name_i}"
             :render_prop_as_environment_variable
+          end
+        end
+      end
+    end
+
+    class Branch_Adapter__ < Properties_Adapter__
+
+      def initialize argv, invo, aa
+        super
+      end
+
+      def node_kernel_class
+        self.class::Branch_Node_Kernel__
+      end
+
+      class Branch_Node_Kernel__ < Node_Kernel__
+
+        def rslv_partitions
+          _scn = @action_adapter.action.get_lower_action_scan
+          @partitions = partitions_class.new _scn
+        end
+
+        def partitions_class
+          self.class::Branch_Partitions__
+        end
+
+        class Branch_Partitions__ < self::Partitions__
+
+          def initialize scn
+            @arg_a = ARG_A__
+            @opt_a = nil
+            @scn = scn
+          end
+          _action_arg = Brazen_::Model_::Entity::Property.new( :action ) do |p|
+            p << [ :required ]
+          end
+          class Custom_Glyph__
+            def initialize s
+              @custom_glyph = s
+            end
+            attr_reader :custom_glyph
+            def has_custom_glyph
+              true
+            end
+            def is_actually_required
+            end
+          end
+          _ellip = Custom_Glyph__.new '[..]'
+          ARG_A__ = [ _action_arg, _ellip ].freeze
+
+          def populate_with_sections o
+            add_option_section o
+            o.arg_a = ARG_A__
+            o.add_section :item_section, 'action', act_a ; nil
+          end
+
+          def rendering_method_name_for prop
+            super
+          end
+
+        private
+
+          def act_a
+            @act_a ||= collapse_act_a
+          end
+          def collapse_act_a
+            a = @scn.map_by do |action|
+              action
+            end.to_a.freeze
+            @scn = nil
+            a
           end
         end
       end
@@ -370,7 +502,7 @@ module Skylab::Brazen
         @token = tok
         matching_actions = []
         rx = /\A#{ ::Regexp.escape tok }/
-        scn = actions.get_scanner
+        scn = get_action_scn
         while (( action = scn.gets ))
           slug = action.name.as_slug
           if rx =~ slug
@@ -396,9 +528,10 @@ module Skylab::Brazen
 
       # ~ in support of above
 
-      def ___name
-        @name ||= Callback_::Name.from_variegated_symbol(
-          @invocation_str_a.last.intern )
+      def get_action_scn
+        @node.get_action_scanner.map_by do |action|
+          Action_Adapter_.new self, action
+        end
       end
 
       def set_exit_status d
@@ -410,35 +543,9 @@ module Skylab::Brazen
       def app_name
         ::File.basename @invocation_str_a.last
       end
-
-      # ~ deep API for mechanics agents
-
-      def actions
-        @actions ||= Actions__.new self, krnl
-      end
-    private
-      def krnl
-        @kernel ||= Brazen_::Kernel_.new( Brazen_, @invocation_str_a.last )
-      end
     end
 
-    class Actions__
-      def initialize invocation, krnl
-        @invocation = invocation ; @kernel = krnl
-      end
-      def visible
-        self
-      end
-      def to_a
-        a = [] ; scn = get_scanner ; r = nil
-        a.push r while r = scn.gets ; a
-      end
-      def get_scanner
-        Kernel_.wrap_scanner @kernel.get_action_scanner do |action|
-          Action_Adapter_.new @invocation, action
-        end
-      end
-    end
+
 
     class Action_Adapter_
 
@@ -464,10 +571,18 @@ module Skylab::Brazen
         hlp_rndrr.produce_main_syntax_string
       end
 
+      def is_visible
+        @action.is_visible
+      end
+
       # ~ for invocation
 
       def adapter_via_argv argv
-        @properties_adapter = Properties_Adapter__.new argv, @invocation, self
+        @properties_adapter = if @action.is_branch
+          Branch_Adapter__.new argv, @invocation, self
+        else
+          Properties_Adapter__.new argv, @invocation, self
+        end
         @properties_adapter.produce_the_adapter
       end
 
@@ -610,10 +725,7 @@ module Skylab::Brazen
       end
 
       def send_non_payload_event_lines a
-        _y = hlp_rndrr.y
-        a.each do |line|
-          _y << line
-        end ; nil
+        a.each( & hlp_rndrr.y.method( :<< ) ) ; nil
       end
 
       def expr_agent
@@ -657,19 +769,22 @@ module Skylab::Brazen
 
       def produce_adapter
         @argv = @kernel.argv ; @did_set_h = {} ; @output_iambic = []
-        _op = help_renderer.op
-        result = parse_options _op
+        result = parse_options help_renderer.op
         result ||= parse_arguments
         result ||= process_environment
         if result
           @kernel.invocation.set_exit_status result
           NOTHING_
         else
-          @kernel.action_adapter.adapter_via_iambic @output_iambic
+          deliver_adapter
         end
       end
 
     private  # ~ parse options
+
+      def deliver_adapter
+        @kernel.action_adapter.adapter_via_iambic @output_iambic
+      end
 
       def parse_options op
         @result = PROCEDE_
@@ -714,12 +829,54 @@ module Skylab::Brazen
         env = @kernel.invocation.environment
         @env_a.each do |prop|
           @did_set_h[ prop.name_i ] and next
-          prop.environment_name_i
           s = env[ prop.environment_name_i ]
           s or next
           @output_iambic.push prop.name_i, s
         end
         PROCEDE_
+      end
+    end
+
+    class Branch_Parse_Context__ < Parse_Context__
+
+      def parse_options op
+        if @argv.length.nonzero? and DASH_ == @argv.first.getbyte( 0 )
+          super op
+        end
+      end
+
+      def parse_arguments
+        if @argv.length.zero?
+          super
+        else
+          parse_nonzero_length_arguments
+        end
+      end
+
+      def parse_nonzero_length_arguments
+        invoc = @kernel.invocation
+        s_a = invoc.get_invocation_str_a
+        s_a.push @kernel.action_adapter.name.as_slug
+        invoc_ = Branch_Invocation__.new( * invoc.IO_three, s_a )
+        _x = invoc_.adapter_from_argv @argv
+        if _x
+          self._DO_ME
+        else
+          GENERIC_ERROR_
+        end
+      end
+    end
+
+    class Branch_Invocation__ < Invocation__
+
+      def initialize i, o, e, invok_s_a
+        super
+      end
+      def adapter_from_argv argv
+        @argv = argv
+        @properties_adapter = Properties_Adapter__.new argv, self
+        adapter = adapter_when_action_token
+        adapter
       end
     end
 
@@ -815,6 +972,7 @@ module Skylab::Brazen
       end
     end
 
+    DASH_ = '-'.getbyte 0
     GENERIC_ERROR_ = 5
     NOTHING_ = PROCEDE_ = nil
     SUCCESS_ = 0

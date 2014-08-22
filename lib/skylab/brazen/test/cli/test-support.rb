@@ -18,6 +18,50 @@ module Skylab::Brazen::TestSupport::CLI
 
     # ~ common business assertions
 
+    def expect_branch_pattern_zero
+      expect_expecting_action_line
+      expect_usage_line
+      expect_invite_line
+      expect_errored
+    end
+
+    def expect_branch_pattern_one_one
+      expect :styled, /\Aunrecognized action ['"]?fiffle['"]?\z/
+      _rx = bld_known_actions_rx
+      expect :styled, _rx
+      expect_invite_line
+      expect_errored
+    end
+
+    def bld_known_actions_rx
+      /\Aknown actions are \(#{ self.class::EXPECTED_ACTION_NAME_S_A.
+        map { |s| "'?#{ ::Regexp.escape s }'?" } * ', ' }\)\z/
+    end
+
+    def expect_branch_pattern_one_two
+      expect 'invalid option: -x'
+      expect_invite_line
+      expect_errored
+    end
+
+    def expect_expecting_action_line
+      expect :styled, 'expecting <action>'
+    end
+
+    def expect_help_screen_first_half
+      expect_usage_line
+      expect_secondary_syntax_line
+
+      expect_maybe_a_blank_line
+      expect_description_line
+
+      expect_maybe_a_blank_line
+      expect_header_line 'options'
+      expect_options
+
+      expect_maybe_a_blank_line
+    end
+
     def expect_help_screen_for_init
       expect :styled, 'usage: bzn init [-d] [-v] [<path>]'
       expect %r(\A[ ]{7}bzn init -h\z)

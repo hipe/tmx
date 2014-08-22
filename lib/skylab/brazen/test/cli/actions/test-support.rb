@@ -12,7 +12,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
 
   module ModuleMethods
 
-    def with_sub_action * s_a
+    def with_invocation * s_a
       s_a.freeze
       define_method :sub_action_s_a do s_a end
       _RX_ = /\Ause '?bzn #{ s_a * ' ' } -h'? for help\z/

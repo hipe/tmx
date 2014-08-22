@@ -30,6 +30,7 @@ module Skylab::Brazen
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
   Brazen_ = self
+  DONE_ = true
   EMPTY_S_ = ''.freeze
   Autoloader_[ Models_ = ::Module.new, :boxxy ]
   NILADIC_TRUTH_ = -> { true }

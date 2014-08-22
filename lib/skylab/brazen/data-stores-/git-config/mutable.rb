@@ -140,14 +140,8 @@ module Skylab::Brazen
         end
 
         def get_all_node_scanner
-          d = -1 ; last = @a.length - 1
-          Callback_::Scn.new do
-            if d < last
-              @a.fetch d += 1
-            end
-          end
+          Brazen_::Entity.scan_nonsparse_array @a
         end
-
 
         def count_number_of_nodes i
           @a.count do |x|

@@ -2,6 +2,13 @@ module Skylab::Brazen
 
   class Models_::Workspace < Brazen_::Model_
 
+    Brazen_::Model_::Entity[ self, -> do
+      o :desc, -> y do
+        y << "manage workspaces."
+      end
+
+    end ]
+
     class << self
 
       def filesystem_walk
@@ -15,8 +22,6 @@ module Skylab::Brazen
       def init x_a
         new( x_a ).init
       end
-
-      private :new
     end
 
     Brazen_::Model_::Actor[ self,
@@ -25,7 +30,11 @@ module Skylab::Brazen
 
     Brazen_::Entity::Event::Cascading_Prefixing_Sender[ self ]
 
-    def initialize x_a
+    def initialize x_a=nil
+      x_a and init_via_iambic_for_action x_a
+    end
+
+  private def init_via_iambic_for_action x_a
       @config_filename = nil
       @prefix = :workspace
       @max_num_dirs = nil

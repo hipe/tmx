@@ -9,25 +9,23 @@ module Skylab::Brazen
         def initialize op, kernel
           @action = kernel.action
           @action_adapter = kernel.action_adapter
-          @is_branch_view = true
           @expression_agent = kernel.expression_agent
           @invocation = kernel.invocation
           set_op op
-          set_parts kernel.partitions
+          @section_a = []
           @section_separator_p = -> { @y << nil }
           @y = ::Enumerator::Yielder.new( & kernel.stderr.method( :puts ) )
+          kernel.partitions.populate_with_sections self
           screen_boundary
         end
 
         attr_reader :expression_agent, :op, :y
 
+        attr_writer :arg_a
+
         def set_op op
           @op = op
           op and use_formatting_of_option_parser op ; nil
-        end
-
-        def set_parts parts
-          @arg_a = parts.arg_a ; @env_a = parts.env_a ; nil
         end
 
         def use_formatting_of_option_parser op
@@ -38,9 +36,7 @@ module Skylab::Brazen
         def output_help_screen
           output_usage
           @action.has_description and output_description
-          output_options
-          @arg_a and output_arguments
-          @env_a and output_environment_variables
+          @section_a.each( & method( :output_section ) )
           nil
         end
 
@@ -113,7 +109,9 @@ module Skylab::Brazen
 
         def arg_glyphs
           a = @arg_a.map do |prop|
-            if prop.has_default
+            if prop.has_custom_glyph
+              prop.custom_glyph
+            elsif prop.has_default
               "[<#{ prop.name.as_slug }>]"
             else
               "<#{ prop.name.as_slug }>"
@@ -126,7 +124,7 @@ module Skylab::Brazen
           "#{ action_invocation_string } -h"
         end
 
-        # ~ description, options, arguments & "interjections"
+        # ~ section rendering (description, options, arguments, child actions)
 
         def output_description
           section_boundary
@@ -134,26 +132,31 @@ module Skylab::Brazen
             under_expression_agent_get_N_desc_lines( @expression_agent ) ; nil
         end
 
-        def output_options
-          section_boundary
-          @y << @expression_agent.hdr( 'options' )
-          output_option_parser_summary ; nil
-        end
-
         def output_option_parser_summary
           @op.summarize @y ; nil
         end
 
-        def output_arguments
-          section_boundary
-          output_items_with_descriptions 'argument', @arg_a ; nil
+        def add_section rendering_method, * a, & p
+          @section_a.push Section__.new( rendering_method, a, p ) ; nil
+        end
+        Section__ = ::Struct.new :rendering_method_i, :arguments, :p
+
+        def output_section section
+          send section.rendering_method_i, * section.arguments, & section.p
         end
 
-        def output_environment_variables
+        def ad_hoc_section label_s, & p
           section_boundary
-          output_items_with_descriptions 'environment variable',
-            @env_a, & :environment_name_i ; nil
+          @y << @expression_agent.hdr( label_s )
+          p[ self ] ; nil
         end
+
+        def item_section label_s, item_a, & p
+          section_boundary
+          output_items_with_descriptions label_s, item_a, & p ; nil
+        end
+
+        # ~ "interjections"
 
         def output_invite_to_general_help
           s = action_invocation_string

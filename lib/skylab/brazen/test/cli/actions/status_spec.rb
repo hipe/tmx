@@ -6,7 +6,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
 
     extend TS_
 
-    with_sub_action 'status'
+    with_invocation 'status'
 
     var = 'max num dirs'
 

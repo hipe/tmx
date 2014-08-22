@@ -5,7 +5,8 @@ module Skylab::Brazen
   Entity = Brazen_::Entity[ -> do
 
     o :ad_hoc_processor, :desc, -> scan do
-      Entity::Add_description__[ scan ]
+      scan.scanner.advance_one  # `desc`
+      scan.reader.description_block = scan.scanner.gets_one ; nil
     end
 
     o :ad_hoc_processor, :inflect, -> scan do
@@ -106,6 +107,15 @@ module Skylab::Brazen
 
       def takes_argument
         :one == @argument_arity
+      end
+
+      def has_custom_glyph  # [#014] this is a smell here
+      end
+
+      def << a
+        @scan = Brazen_::Entity::Iambic_Scanner.new 0, a
+        process_iambic_fully
+        self
       end
 
     private
@@ -256,16 +266,6 @@ module Skylab::Brazen
     end
 
     # ~
-
-    class Add_description__
-
-      Model_::Actor[ self, :properties, :scan ]
-
-      def execute
-        @scan.scanner.advance_one  # `desc`
-        @scan.reader.description_block = @scan.scanner.gets_one ; nil
-      end
-    end
 
     class Customized_inflection__
 
