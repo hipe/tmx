@@ -40,16 +40,13 @@ module Skylab::Brazen
     def execute
       a = to_even_iambic
       a.push :prop, self.class.properties.fetch( :path )
-      a.push :listener, listener
+      a.push :listener, self
       Brazen_::Models_::Workspace.status a
     end
 
-    class Listener < Brazen_::Entity::Event::Listener_X
-
-      def receive_workspace_event ev
-        _ev = sign_event ev
-        @listener.receive_positive_event _ev
-      end
+    def receive_workspace_event ev
+      _ev = sign_event ev
+      @client_adapter.receive_positive_event _ev
     end
   end
   end

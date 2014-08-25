@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  module Data_Stores_::Git_Config
+  class Data_Stores_::Git_Config
 
     module Mutable  # see [#008]
 

@@ -28,11 +28,13 @@ module Skylab::Brazen::TestSupport::CLI
       expect_maybe_a_blank_line
 
       expect_header_line 'actions'
+
       expect %r(\A  +-h, --help \[cmd\]  +this screen\.?)
-      expect :styled, %r(\A  +init  +init a <workspace>)
-      expect %r(\A  +this is the second line)
-      expect %r(\A  +status  +get status of a workspace\.?)
-      expect %r(\A  +workspace  +manage workspaces)
+      expect_item :datastore, %r(\bmanage datastores\b)
+      expect_item :init, :styled, %r(\binit a <workspace>),
+        %r(\bthis is the second line of the init description\b)
+      expect_item :status, %r(\bstatus\b.+\bworkspace)
+      expect_item :workspace, %r(\bmanage workspaces\b)
       expect_maybe_a_blank_line
 
       expect_branch_invite_line
@@ -44,6 +46,6 @@ module Skylab::Brazen::TestSupport::CLI
       expect_help_screen_for_init
     end
 
-    self::EXPECTED_ACTION_NAME_S_A = [ 'init', 'status', 'workspace' ].freeze
+    self::EXPECTED_ACTION_NAME_S_A = [ 'datastore', 'init', 'status', 'workspace' ].freeze
   end
 end

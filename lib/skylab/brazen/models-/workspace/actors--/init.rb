@@ -15,7 +15,7 @@ module Skylab::Brazen
 
       def initialize x_a
         process_iambic_fully x_a
-        @prefix = :workspace
+        @channel = :workspace
       end
 
       def init
@@ -27,11 +27,11 @@ module Skylab::Brazen
 
         config.write_to_pathname pn, self,
           :is_dry, @is_dry,
-          :prefix, :config
+          :channel, :config
       end
 
       def receive_config_wrote_file ev
-        @listener.send :"receive_#{ @prefix }_event", ev
+        @listener.send :"receive_#{ @channel }_event", ev
       end
     end
   end

@@ -6,6 +6,8 @@ module Skylab::Brazen
 
     class << self
 
+      attr_accessor :custom_inflection, :description_block, :is_promoted
+
       def name_function
         @nf ||= begin
           extend Lib_::Name_function_methods[]
@@ -15,6 +17,9 @@ module Skylab::Brazen
     end
 
     include Brazen_::Model_::Entity  # so we can override its behavior near events
+
+    Brazen_::Entity::Event::Merciless_Prefixing_Sender[ self ]  # experimental default
+
     include Interface_Element_Instance_Methdods__
 
     def initialize
@@ -25,10 +30,6 @@ module Skylab::Brazen
 
     def is_visible
       true
-    end
-
-    class << self
-      attr_accessor :custom_inflection, :description_block, :is_promoted
     end
 
     def to_even_iambic
@@ -64,7 +65,7 @@ module Skylab::Brazen
     end
 
     def receive_error_event ev  # e.g ad-hoc normalization failure from spot [#012]
-      ev_ = listener.sign_event ev
+      ev_ = sign_event ev
       receive_negative_event ev_
     end
 
@@ -82,7 +83,37 @@ module Skylab::Brazen
     end
 
     def bld_listener
-      self.class::Listener.new @client_adapter, self.class
+      if self.class.const_defined? :Listener
+        self.class::Listener.new @client_adapter, self.class
+      else
+        self
+      end
+    end
+
+    # ~
+
+
+    def execute
+      ok = assert_workspace_exists
+      ok and if_workspace_exists
+    end
+
+    def assert_workspace_exists
+      _path = Brazen_::CLI::Property__.new :path, :argument_arity, :one
+      Brazen_::Models_::Workspace.status [ :client, :_FOO_, :listener, self,
+        :max_num_dirs, 1, :path, '.', :verbose, true, :prop, _path ]
+    end
+
+  public
+
+    def receive_workspace_file_not_found ev
+      receive_error_event ev
+      UNABLE_
+    end
+
+    def receive_workspace_event ev
+      receive_error_event ev
+      UNABLE_
     end
   end
   end

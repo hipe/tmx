@@ -1,13 +1,13 @@
 module Skylab::Brazen
 
-  module Data_Stores_::Git_Config
+  class Data_Stores_::Git_Config
 
     module Mutable
 
       class Actors__::Write
 
         Brazen_::Model_::Actor[ self, :properties,
-          :document, :is_dry, :listener, :prefix ]
+          :document, :is_dry, :listener, :channel ]
 
         Brazen_::Entity::Event::Merciless_Prefixing_Sender[ self ]
 

@@ -12,8 +12,12 @@ module Skylab::Brazen
         Box_
       end
 
-      def scan
-        Entity::Collection__::Scan
+      def scan & p
+        if p
+          Entity::Collection__::Scan.new( & p )
+        else
+          Entity::Collection__::Scan
+        end
       end
 
       def scan_map scn, & p

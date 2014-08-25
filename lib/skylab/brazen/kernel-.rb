@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Kernel_
+  class Kernel_  # [#015]
 
     def initialize mod
       @module = mod
@@ -31,6 +31,7 @@ module Skylab::Brazen
     def get_model_scanner
       mod = models_mod
       i_a = mod.constants
+      i_a.sort!  # #note-35
       d = -1 ; last = i_a.length - 1
       Callback_::Scn.new do
         if d < last

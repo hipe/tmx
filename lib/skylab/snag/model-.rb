@@ -187,7 +187,9 @@ module Skylab::Snag
           x_a[ d ] = mod
         end
         d = s_a.length
-        while STOP_INDEX__ < ( d -= 1 )
+        stop_index = const_defined?( :NAME_STOP_INDEX ) ?
+          self::NAME_STOP_INDEX : STOP_INDEX__
+        while stop_index < ( d -= 1 )
           mod = x_a.fetch d
           if ! mod.respond_to? :name_function
             TAXONOMIC_MODULE_RX__ =~ s_a.fetch( d ) and next

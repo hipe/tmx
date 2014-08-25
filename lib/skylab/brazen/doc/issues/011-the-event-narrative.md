@@ -6,8 +6,11 @@
 events should be thought of as immutable. if you want to change the
 properties of an event for whatever weird reason, use this.
 
-you cannot add new properties through this means. you will have to
-create another event for that.
+you cannot add new properties through this means, you can only determine
+what the values will be in your new event of the properties that exist
+in the first event. in order to add new propertes to a existing event,
+you could perhaps use `to_iambic` and add new properties and value to
+this array and build a new event from that.
 
 
 

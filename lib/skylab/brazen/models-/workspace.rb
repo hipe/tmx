@@ -2,7 +2,9 @@ module Skylab::Brazen
 
   class Models_::Workspace < Brazen_::Model_
 
-    Brazen_::Model_::Entity[ self, -> do
+    Model__ = Brazen_::Model_
+
+    Model__::Entity[ self, -> do
       o :desc, -> y do
         y << "manage workspaces."
       end
@@ -24,7 +26,7 @@ module Skylab::Brazen
       end
     end
 
-    Brazen_::Model_::Actor[ self,
+    Model__::Actor[ self,
       :properties, :client, :dry_run, :listener,
       :max_num_dirs, :path, :prop, :verbose ]
 
@@ -35,8 +37,8 @@ module Skylab::Brazen
     end
 
   private def init_via_iambic_for_action x_a
+      @channel = :workspace
       @config_filename = nil
-      @prefix = :workspace
       @max_num_dirs = nil
       process_iambic_fully x_a
     end
@@ -134,7 +136,7 @@ module Skylab::Brazen
 
     class Filesystem_Walk__  # re-write a subset of [#st-007] the tree walker
 
-      Brazen_::Model_::Actor[ self,
+      Model__::Actor[ self,
         :properties,
           :channel,
           :filename,
@@ -142,6 +144,8 @@ module Skylab::Brazen
           :any_max_num_dirs_to_look,
           :prop,
           :start_path ]
+
+      Brazen_::Entity::Event::Cascading_Prefixing_Sender[ self ]
 
       class << self
         def with * x_a
@@ -245,17 +249,6 @@ module Skylab::Brazen
             end
             y << "#{ ick o.filename } not found in #{ pth o.start_pathname}#{x}"
           end
-        end
-      end
-
-      def send_event * x_a, & p
-        p ||= Brazen_::Entity::Event::Inferred_Message.to_proc
-        ev = Brazen_::Entity::Event.inline_via_x_a_and_p x_a, p
-        m_i = :"receive_#{ @channel }_#{ ev.terminal_channel_i }"
-        if @listener.respond_to? m_i
-          @listener.send m_i, ev
-        else
-          @listener.send :"receive_#{ @channel }_event", ev
         end
       end
     end

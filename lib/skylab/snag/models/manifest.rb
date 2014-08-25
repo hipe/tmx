@@ -213,19 +213,19 @@ module Skylab::Snag
           @p = p
         end
 
-        def on_walk_start_directory_is_not_directory ev
+        def receive_walk_start_directory_is_not_directory ev
           @p[ ev ]
         end
 
-        def on_walk_start_directory_does_not_exist ev
+        def receive_walk_start_directory_does_not_exist ev
           @p[ ev ]
         end
 
-        def on_walk_found_is_not_file ev
+        def receive_walk_found_is_not_file ev
           @p[ ev ]
         end
 
-        def on_walk_file_not_found ev
+        def receive_walk_file_not_found ev
           @p[ ev ]
         end
       end

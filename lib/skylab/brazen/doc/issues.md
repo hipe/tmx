@@ -1,3 +1,4 @@
+[#015]       #doc-node: the kernel narrative ..
 [#014] #open this is a smell here
 [#013]       #doc-node: the model
 [#012]       #spot #in-situ

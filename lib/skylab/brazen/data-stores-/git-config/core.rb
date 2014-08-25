@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  module Data_Stores_::Git_Config
+  class Data_Stores_::Git_Config < Brazen_::Model_
 
     class << self
       def parse_string str, & p
@@ -8,6 +8,12 @@ module Skylab::Brazen
           with_input( String_Input_Adapter_, str ).parse
       end
     end
+
+    Brazen_::Model_::Entity[ self, -> do
+      o :desc, -> y do
+        y << "manage 'git config'-style datastores."
+      end
+    end ]
 
     ParseError = ::Class.new ::RuntimeError
 

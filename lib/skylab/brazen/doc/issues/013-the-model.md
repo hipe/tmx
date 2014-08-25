@@ -73,3 +73,13 @@ actions of the model are like the hands of the body. they reach out to
 touch things and bring them to the mouth to eat.
 
 the properties of the actions are like the fingers of the hand.
+
+
+
+
+
+## :#note-10
+
+copy-pasted from 'action'. models that do have any child actions may get
+'infected' by the child's name function function. but models that don't
+wont.

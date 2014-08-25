@@ -6,6 +6,12 @@ module Skylab::Brazen
 
       attr_accessor :custom_inflection, :description_block
 
+      def name_function  # #note-10
+        @nf ||= begin
+          extend Lib_::Name_function_methods[]
+          bld_name_function
+        end
+      end
     end
 
     Actor = Lib_::Snag__[]::Model_::Actor
@@ -25,6 +31,82 @@ module Skylab::Brazen
           new( [], d, [ self.class.description_block ], expression_agent ).
            execute
       end
+
+      def sign_event ev
+        ci = self.class.custom_inflection
+        nf = self.class.name_function
+        if ci
+          if verb_s = ci.verb
+            had_verb = true
+          end
+          noun_s = ci.noun
+        end
+        verb_s ||= nf.as_human
+        noun_s ||= for_event_signature_infer_noun had_verb
+        Entity_[]::Event::Signature_Wrapper.new verb_s, noun_s, ev
+      end
+    private
+
+      def for_event_signature_infer_noun had_verb  # [#011]:#note-210
+        noun_s = for_event_signature_infer_noun_from_parent_chain
+        noun_s || ( self.class.name_function.as_human if had_verb )
+      end
+
+      def for_event_signature_infer_noun_from_parent_chain
+        scn = for_event_signature_get_nounpart_scanner
+        deepest_noun_s = scn.gets
+        if deepest_noun_s
+          a = scn.each.to_a
+          a.reverse!
+          [ deepest_noun_s, * a ] * SPACE_
+        end
+      end
+
+      def for_event_signature_get_nounpart_scanner
+        scn = for_event_signature_build_parent_scanner
+        Entity_[].scan_map scn do |parent|
+          noun_s = if parent.respond_to? :custom_inflection
+            ci = parent.custom_inflection
+            ci && ci.noun
+          end
+          noun_s or for_event_signature_get_clean_noun_word_from_module parent
+        end
+      end
+
+      def for_event_signature_build_parent_scanner
+        nf = self.class.name_function
+        ( Callback_::Scn.new do
+          parent = nf.parent
+          nf = ( parent.name_function if parent )
+          parent
+        end )
+      end
+
+      def for_event_signature_get_clean_noun_word_from_module cls
+        nf = cls.name_function
+        s = nf.as_const.to_s
+        for_event_signature_remove_trailing_underscores s
+        for_event_signature_remove_interceding_underscores s
+        for_event_signature_depluralize s
+        nf.class.from_const( s ).as_human
+      end
+
+      def for_event_signature_remove_trailing_underscores s
+        s.gsub! TRAILING_UNDERSCORES_RX__, EMPTY_S_ ; s
+      end
+      TRAILING_UNDERSCORES_RX__ = /_+$/
+
+      def for_event_signature_remove_interceding_underscores s
+        s.gsub! INTERCEDING_UNDERSCORES_RX__ do
+          $1.downcase
+        end ; s
+      end
+      INTERCEDING_UNDERSCORES_RX__ = /_([A-Z])/
+
+      def for_event_signature_depluralize s
+        s.gsub! TRAILING_LETTER_S_RX__, EMPTY_S_ ; s
+      end
+      TRAILING_LETTER_S_RX__ = /s\z/
 
       self
     end
@@ -135,7 +217,5 @@ module Skylab::Brazen
           new( [], n, [ @cls.description_block ], exp ).execute
       end
     end
-
-    Entity_ = -> { Brazen_::Entity }
   end
 end

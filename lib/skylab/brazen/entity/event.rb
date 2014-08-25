@@ -43,6 +43,19 @@ module Skylab::Brazen
         dup.init_copy_with x_a
       end
 
+      def to_iambic
+        box = ivar_box
+        a = box.send :a ; h = box.send :h
+        y = ::Array.new a.length * 2
+        d = -1 ; last = a.length - 1
+        while d < last
+          d += 1
+          y[ d * 2 ] = a.fetch d
+          y[ d * 2 + 1 ] = instance_variable_get h.fetch a.fetch d
+        end
+        y
+      end
+
     protected( def init_copy_with x_a
         x_a.each_slice( 2 ) do |i, x|
           instance_variable_set ivar_box.fetch( i ), x
@@ -181,12 +194,12 @@ module Skylab::Brazen
         end
 
         def send_event_structure ev
-          @prefix or self._NO_PREFIX
-          m_i = :"receive_#{ @prefix }_#{ ev.terminal_channel_i }"
+          @channel or self._NO_CHANNEL
+          m_i = :"receive_#{ @channel }_#{ ev.terminal_channel_i }"
           if @listener.respond_to? m_i
             @listener.send m_i, ev
           else
-            @listener.send :"receive_#{ @prefix }_event", ev
+            @listener.send :"receive_#{ @channel }_event", ev
           end ; nil
         end
       end
@@ -206,49 +219,13 @@ module Skylab::Brazen
         end
 
         def send_event_structure ev
-          @prefix or self._NO_PREFIX
-          _m_i = :"receive_#{ @prefix }_#{ ev.terminal_channel_i }"
+          @channel or self._NO_CHANNEL
+          _m_i = :"receive_#{ @channel }_#{ ev.terminal_channel_i }"
           @listener.send _m_i, ev
         end
       end
 
-      class Listener_X
-
-        def initialize listener, cls
-          @cls = cls ; @listener = listener
-        end
-
-        def sign_event ev
-          _verb_s = inflected_verb
-          _noun_s = inflected_noun
-          Signature_Wrapper__.new _verb_s, _noun_s, ev
-        end
-      private
-
-        def inflected_verb
-          if custom_inflection and verb_s = @custom_inflection.verb
-            verb_s
-          else
-            @cls.name_function.as_human
-          end
-        end
-
-        def inflected_noun  # #note-210
-          if custom_inflection and noun_s = @custom_inflection.noun
-            noun_s
-          elsif prnt = @cls.name_function.parent
-            prnt.name_function.as_human
-          elsif @custom_inflection && @custom_inflection.verb
-            @cls.name_function.as_human
-          end
-        end
-
-        def custom_inflection
-          @custom_inflection ||= @cls.custom_inflection
-        end
-      end
-
-      class Signature_Wrapper__
+      class Signature_Wrapper
         def initialize verb_s, noun_s, ev
           @ev = ev
           @inflected_noun = noun_s
