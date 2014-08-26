@@ -59,8 +59,7 @@ module Skylab::Callback
         Scn.new do
           if d < last
             _stem_i = a.fetch d+= 1
-            _x = @normpath_lookup_p[ _stem_i ]
-            _x
+            @normpath_lookup_p[ _stem_i ]
           end
         end
       end

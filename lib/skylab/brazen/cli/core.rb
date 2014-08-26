@@ -226,8 +226,7 @@ module Skylab::Brazen
         @partitions = Build_partitions__[ get_full_inferred_props_scan, self ]
       end
       def get_full_inferred_props_scan
-        scn = @properties.to_scanner
-        scn.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :help
+        @properties.to_scan.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :help
       end
     public
       def receive_show_help otr

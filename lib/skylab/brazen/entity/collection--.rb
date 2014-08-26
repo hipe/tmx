@@ -39,6 +39,10 @@ module Skylab::Brazen
             end
           end
 
+          def random_access scn, meth_i
+            Collection__::Scan_With_Random_Access__.new scn, meth_i
+          end
+
           def reduce scn, p
             new do
               while true
@@ -94,6 +98,10 @@ module Skylab::Brazen
           else
             to_enum
           end
+        end
+
+        def with_random_access_keyed_to_method i
+          self.class.random_access self, i
         end
       end
     end

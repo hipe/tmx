@@ -1,25 +1,50 @@
 module Skylab::Brazen
 
   module Entity
+  module Collection__
 
-    class Properties__
+    class Scan_With_Random_Access__
 
-      def initialize reader
-        @reader = reader
+      def initialize scn, meth_i
+        @a = [] ; @h = {}
+        @d = -1
+        @done = false
+        @meth_i = meth_i
+        @scn = scn
       end
 
       def [] i
-        m_i = @reader.property_method_nms_for_rd[ i ]
-        m_i and @reader.send m_i
+        fetch i do end
       end
 
       def fetch i, &p
-        found = true
-        m_i = @reader.property_method_nms_for_rd.fetch i do
-          found = false
+        if @done
+          @h.fetch i, & p
+        elsif x = @h[ i ]
+          x
+        else
+          fetch_when_not_done i, p
         end
-        found or raise ::KeyError, "key not found: #{ i.inspect }"
-        @reader.send m_i
+      end
+
+      private def fetch_when_not_done i, p
+        scn = to_value_scanner
+        while x = scn.gets
+          if i == x.send( @meth_i )
+            break
+          end
+        end
+        if x
+          x
+        elsif p
+          if 1 == p.arity
+            p[ i ]
+          else
+            p[]
+          end
+        else
+          raise ::KeyError, "key not found: #{ i.inspect }"
+        end
       end
 
       def reduce_by i=nil
@@ -27,7 +52,7 @@ module Skylab::Brazen
           if block_given?
             scn = to_value_scanner
             ivar = :"@#{ i }"
-            while (( x = scn.gets ))
+            while x = scn.gets
               x.instance_variable_defined?( ivar ) and yield x
             end
           else
@@ -36,8 +61,9 @@ module Skylab::Brazen
         else
           ::Enumerator.new do |y|
             scn = to_value_scanner
-            while (( x = scn.gets ))
-              yield( x ) and y << x
+            while x = scn.gets
+              _b = yield x
+              _b and y << x
             end ; nil
           end
         end
@@ -49,10 +75,12 @@ module Skylab::Brazen
 
       def each_value
         if block_given?
-          scn = to_value_scanner ; x = nil
-          yield x while x = scn.gets ; nil
+          scn = to_value_scanner
+          while x = scn.gets
+            yield x
+          end ; nil
         else
-          enum_for :each_value
+          to_enum :each_value
         end
       end
 
@@ -61,13 +89,77 @@ module Skylab::Brazen
       end
 
       def to_value_scanner
-        scn = @reader.property_method_nms_for_rd.to_value_scanner
-        Entity.scan.new do
-          if (( m_i = scn.gets ))
-            @reader.send m_i
+        if @done
+          to_scanner_when_done Callback_::Scn
+        else
+          to_scanner_when_not_done Callback_::Scn
+        end
+      end
+
+      def to_scan
+        if @done
+          to_scanner_when_done Scan__[]
+        else
+          to_scanner_when_not_done Scan__[]
+        end
+      end
+
+    private
+
+      def to_scanner_when_done cls
+        d = -1 ; last = @last
+        cls.new do
+          if d < last
+            @h.fetch @a.fetch d += 1
           end
         end
       end
+
+      def to_scanner_when_not_done cls
+        d = -1
+        cls.new do
+          if @done
+            if d < @last
+              at_known_index d += 1
+            end
+          elsif d < @d
+            at_known_index d += 1
+          else
+            at_unknown_index d += 1
+          end
+        end
+      end
+
+      def at_known_index d
+        @h.fetch @a.fetch d
+      end
+
+      def at_unknown_index d
+        while @d < d
+          x = @scn.gets
+          if x
+            @d += 1
+            name_i = x.send @meth_i
+            did = nil
+            @h.fetch name_i do
+              did = true
+              @h[ name_i ] = x
+            end
+            did or raise ::KeyError, "won't clobber existing '#{ name_i }'"
+            @a.push name_i
+          else
+            @done = true
+            @length = @a.length
+            @last = @length - 1
+            x = nil
+            break
+          end
+        end
+        x
+      end
+
+      Scan__ = -> { Collection__::Scan }
     end
+  end
   end
 end

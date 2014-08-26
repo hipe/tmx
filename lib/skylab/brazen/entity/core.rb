@@ -382,7 +382,14 @@ module Skylab::Brazen
     module Proprietor_Methods__
 
       def properties
-        @properties ||= Entity::Properties__.new self
+        @properties ||= bld_properties
+      end
+
+      def bld_properties
+        _scn = property_method_nms_for_rd.to_value_scanner
+        Entity.scan.map( _scn, -> i do
+          send i
+        end ).with_random_access_keyed_to_method :name_i
       end
 
       def property_method_nms_for_rd
