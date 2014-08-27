@@ -52,7 +52,7 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
 
     p = -> do
 
-      Entity_ = Brazen_::Entity[ -> do
+      Entity_ = Entity_[][ -> do
 
         o :meta_property, :argument_arity,
             :enum, [ :zero, :one ],

@@ -1048,6 +1048,10 @@ module Skylab::Headless
 
     )
 
+    def indefinite_singular  # hacked for now, not integrated
+      "#{ NLP::EN::Minitesimal::An_[ @lemma ] }#{ @lemma }"
+    end
+
     as :singular do
       @lemma.dup
     end

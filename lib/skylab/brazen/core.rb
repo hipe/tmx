@@ -16,8 +16,8 @@ module Skylab::Brazen
     N_lines = -> do
       Brazen_::Entity::Event::N_Lines
     end
-    Name_function_methods = -> do
-      Snag__[]::Model_.name_function_methods
+    Name_function = -> do
+      Snag__[]::Model_
     end
     NLP = -> do
       Headless__[]::NLP
@@ -33,8 +33,10 @@ module Skylab::Brazen
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
+  ACHEIVED_ = true
   Brazen_ = self
   DONE_ = true
+  EMPTY_P_ = -> { }
   EMPTY_S_ = ''.freeze
   Entity_ = -> { Brazen_::Entity }
   Autoloader_[ Models_ = ::Module.new, :boxxy ]

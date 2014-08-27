@@ -27,10 +27,10 @@ module Skylab::Brazen
     end
 
     Model__::Actor[ self,
-      :properties, :client, :dry_run, :listener,
+      :properties, :client, :channel, :dry_run, :listener,
       :max_num_dirs, :path, :prop, :verbose ]
 
-    Brazen_::Entity::Event::Cascading_Prefixing_Sender[ self ]
+    Entity_[]::Event::Cascading_Prefixing_Sender[ self ]
 
     def initialize x_a=nil
       x_a and init_via_iambic_for_action x_a
@@ -46,8 +46,8 @@ module Skylab::Brazen
     CONFIG_FILENAME__ = 'brazen.conf'.freeze
 
     def status
-      ok = rslv_any_nearest_config_filename
-      ok && self._next_thing_
+      pn = rslv_any_nearest_config_filename
+      pn and status_when_OK pn
     end
 
     def rslv_any_nearest_config_filename
@@ -71,6 +71,11 @@ module Skylab::Brazen
       send_event_structure ev ; nil
     end
 
+    def status_when_OK pn
+      send_event :resource_exists, :pn, pn, :is_positive, true,
+        :is_completion, true
+    end
+
     def init
       @init_method = nil
       pn = filesystem_walk( :channel, :init, :any_max_num_dirs_to_look, 1 ).
@@ -85,6 +90,7 @@ module Skylab::Brazen
     def procede_with_init
       self.class::Actors__::Init.with(
         :app_name, @client.app_name,
+        :channel, @channel,
         :config_filename, @config_filename || CONFIG_FILENAME__,
         :is_dry, @dry_run,
         :listener, @listener,
@@ -145,7 +151,7 @@ module Skylab::Brazen
           :prop,
           :start_path ]
 
-      Brazen_::Entity::Event::Cascading_Prefixing_Sender[ self ]
+      Entity_[]::Event::Cascading_Prefixing_Sender[ self ]
 
       class << self
         def with * x_a

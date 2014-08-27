@@ -11,7 +11,7 @@ module Skylab::Brazen
         y << "this is the second line of the init description"
       end
 
-      o :inflect, :noun, 'workspace'
+      o :inflect, :noun, :lemma, :with_lemma, 'workspace'
 
       o :is_promoted
 

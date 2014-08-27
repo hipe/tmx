@@ -13,6 +13,6 @@ module Skylab::Brazen::TestSupport::Entity
   end
 
   Subject_ = -> do
-    Brazen_::Entity
+    Entity_[]
   end
 end

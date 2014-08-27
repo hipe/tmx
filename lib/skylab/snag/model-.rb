@@ -162,6 +162,9 @@ module Skylab::Snag
       def name_function_methods
         Name_Function_Methods__
       end
+      def name_function_class
+        Name_Function__
+      end
     end
 
     module Name_Function_Methods__  # infects upwards
@@ -198,7 +201,10 @@ module Skylab::Snag
           parent = mod
           break
         end
-        Name_Function__.new i, parent
+        name_function_class.new self, parent, i
+      end
+      def name_function_class
+        Name_Function__
       end
       STOP_INDEX__ = 3  # skylab snag cli actions foo actions bar
       TAXONOMIC_MODULE_RX__ = /\AActions_?\z/  # meh / wee
@@ -208,7 +214,7 @@ module Skylab::Snag
       class << self
         public :new
       end
-      def initialize const_i, parent
+      def initialize _mod, parent, const_i
         @parent = parent
         initialize_with_const_i const_i
       end

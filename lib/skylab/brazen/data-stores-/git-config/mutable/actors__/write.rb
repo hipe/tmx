@@ -9,7 +9,7 @@ module Skylab::Brazen
         Brazen_::Model_::Actor[ self, :properties,
           :document, :is_dry, :listener, :channel ]
 
-        Brazen_::Entity::Event::Merciless_Prefixing_Sender[ self ]
+        Entity_[]::Event::Merciless_Prefixing_Sender[ self ]
 
 
         def initialize pn, doc, listener, x_a

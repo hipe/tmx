@@ -13,6 +13,12 @@ module Skylab::Brazen
         @scn = scn
       end
 
+      def gets
+        if ! @done
+          at_unknown_index @d + 1
+        end
+      end
+
       def [] i
         fetch i do end
       end
@@ -45,6 +51,10 @@ module Skylab::Brazen
         else
           raise ::KeyError, "key not found: #{ i.inspect }"
         end
+      end
+
+      def concat_by scn
+        to_scan.concat_by( scn ).with_random_access_keyed_to_method @meth_i
       end
 
       def reduce_by i=nil

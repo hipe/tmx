@@ -6,16 +6,17 @@ module Skylab::Brazen
 
       Brazen_::Model_::Actor[ self, :properties,
         :app_name,
+        :channel,
         :config_filename,
         :is_dry,
         :listener,
         :path ]
 
-      Brazen_::Entity::Event::Merciless_Prefixing_Sender[ self ]
+      Entity_[]::Event::Merciless_Prefixing_Sender[ self ]
 
       def initialize x_a
         process_iambic_fully x_a
-        @channel = :workspace
+        @channel ||= :workspace
       end
 
       def init

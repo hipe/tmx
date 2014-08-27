@@ -71,6 +71,10 @@ module Skylab::Brazen
       def set_exit_status d
         @exit_status = d
       end
+
+      def retrieve_unbound_action_via_normalized_name i_a
+        @app_kernel.retrieve_unbound_action_via_normalized_name i_a
+      end
     end
 
     # ~
@@ -133,6 +137,22 @@ module Skylab::Brazen
 
     public
 
+      def retrieve_bound_action_via_normalized_name i_a
+        scn = get_action_scn
+        i = i_a.shift
+        while action = scn.gets
+          i == action.name.as_lowercase_with_underscores_symbol and
+            break( found = action )
+        end
+        found or raise ::KeyError, "not found: '#{ i }'"
+        found.receive_frame self
+        if i_a.length.zero?
+          found
+        else
+          found.retrieve_bound_action_via_normalized_name i_a
+        end
+      end
+
       def find_matching_action_adapters_with_token tok
         matching_actions = [] ; rx = /\A#{ ::Regexp.escape tok }/
         scn = get_action_scn
@@ -150,7 +170,7 @@ module Skylab::Brazen
       end
 
       def get_action_scn
-        action.get_action_scanner.map_by do |action|
+        action.get_action_scan.map_by do |action|
           if action.is_branch
             branch_class.new action
           else
@@ -226,7 +246,8 @@ module Skylab::Brazen
         @partitions = Build_partitions__[ get_full_inferred_props_scan, self ]
       end
       def get_full_inferred_props_scan
-        @properties.to_scan.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :help
+        scn = @properties.to_scan
+        scn.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :help
       end
     public
       def receive_show_help otr
@@ -311,6 +332,10 @@ module Skylab::Brazen
     public
       def app_name
         @parent.app_name
+      end
+
+      def receive_workspace_expectation_file_not_found ev
+        receive_event ev
       end
 
       Autoloader_[ self ]
@@ -401,6 +426,18 @@ module Skylab::Brazen
         self
       end
 
+      def retrieve_bound_action_via_normalized_name i_a
+        @parent.retrieve_bound_action_via_normalized_name i_a
+      end
+
+      def retrieve_unbound_action * i_a
+        @parent.retrieve_unbound_action_via_normalized_name i_a
+      end
+
+      def retrieve_unbound_action_via_normalized_name i_a
+        @parent.retrieve_unbound_action_via_normalized_name i_a
+      end
+
       def receive_event ev
         ev_ = ev.to_event
         if ev_.has_tag :is_positive
@@ -435,7 +472,7 @@ module Skylab::Brazen
         s = maybe_inflect_line_for_negativity_via_event a.first, ev
         s and a[ 0 ] = s
         send_non_payload_event_lines a
-        help_renderer.output_invite_to_general_help
+        send_some_kind_of_invitation ev
         set_exit_status some_err_code_for_event ev ; nil
       end
 
@@ -452,6 +489,15 @@ module Skylab::Brazen
       end
 
     private
+
+      def send_some_kind_of_invitation ev
+        ev_ = ev.to_event
+        if ev_.has_tag :invite_to_action
+          help_renderer.output_invite_to_particular_action ev_.invite_to_action
+        else
+          help_renderer.output_invite_to_general_help
+        end
+      end
 
       def maybe_inflect_line_for_positivity_via_event s, ev
         open, inside, close = unparenthesize s
@@ -584,8 +630,12 @@ module Skylab::Brazen
       end
 
       def write_any_primary_syntax_string y
-        s = help_renderer.produce_full_main_syntax_string
+        s = primary_syntax_string
         s and y << s ; nil
+      end
+
+      def primary_syntax_string
+        help_renderer.produce_full_main_syntax_string
       end
 
       def write_any_auxiliary_syntax_string y
@@ -892,8 +942,6 @@ module Skylab::Brazen
       def has_default
       end
     end
-
-    Entity_ = -> { Brazen_::Entity }
 
     STANDARD_ACTION_PROPERTY_BOX__ = -> do
       box = Entity_[].box.new

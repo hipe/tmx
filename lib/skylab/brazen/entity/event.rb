@@ -46,12 +46,13 @@ module Skylab::Brazen
       def to_iambic
         box = ivar_box
         a = box.send :a ; h = box.send :h
-        y = ::Array.new a.length * 2
+        y = ::Array.new 1 + a.length * 2
+        y[ 0 ] = terminal_channel_i
         d = -1 ; last = a.length - 1
         while d < last
           d += 1
-          y[ d * 2 ] = a.fetch d
-          y[ d * 2 + 1 ] = instance_variable_get h.fetch a.fetch d
+          y[ d * 2 + 1 ] = a.fetch d
+          y[ d * 2 + 2 ] = instance_variable_get h.fetch a.fetch d
         end
         y
       end
@@ -179,49 +180,57 @@ module Skylab::Brazen
         PN_RX__ = /(?:_|\A)pathname\z/
       end
 
+      module Base_Sender_Methods__
+      private
+        def send_event * x_a, & p
+          send_event_structure build_event_via_iambic_and_proc( x_a, p )
+        end
+        def build_event_via_iambic_and_proc x_a, p
+          Event.inline_via_x_a_and_p x_a, ( p || Inferred_Message.to_proc )
+        end
+        def send_structure_on_channel ev, chan_i
+          send_structure_on_channel_to_listener ev, chan_i, @listener
+        end
+        def send_structure_on_channel_to_listener ev, chan_i, listener
+          send_structure_with_method_to_listener ev,
+            :"receive_#{ chan_i }_#{ ev.terminal_channel_i }", listener
+        end
+        def send_structure_with_method ev, m_i
+          send_structure_with_method_to_listener ev, m_i, @listener
+        end
+        def send_structure_with_method_to_listener ev, m_i, listener
+          listener.send m_i, ev
+        end
+      end
+
       module Cascading_Prefixing_Sender
 
         def self.[] mod
-          mod.include self ; nil
+          mod.include Base_Sender_Methods__
+          mod.send :define_method, :send_event_structure, P__ ; nil
         end
 
-      private
-
-        def send_event * x_a, & p
-          p ||= Inferred_Message.to_proc
-          _ev = Event.inline_via_x_a_and_p x_a, p
-          send_event_structure _ev
-        end
-
-        def send_event_structure ev
+        P__ = -> ev do
           @channel or self._NO_CHANNEL
           m_i = :"receive_#{ @channel }_#{ ev.terminal_channel_i }"
           if @listener.respond_to? m_i
-            @listener.send m_i, ev
+            send_structure_with_method ev, m_i
           else
             @listener.send :"receive_#{ @channel }_event", ev
-          end ; nil
+          end
         end
       end
 
       module Merciless_Prefixing_Sender
 
         def self.[] mod
-          mod.include self ; nil
+          mod.include Base_Sender_Methods__
+          mod.send :define_method, :send_event_structure, P__ ; nil
         end
 
-      private
-
-        def send_event * x_a, & p
-          p ||= Inferred_Message.to_proc
-          _ev = Event.inline_via_x_a_and_p x_a, p
-          send_event_structure _ev
-        end
-
-        def send_event_structure ev
+        P__ = -> ev do
           @channel or self._NO_CHANNEL
-          _m_i = :"receive_#{ @channel }_#{ ev.terminal_channel_i }"
-          @listener.send _m_i, ev
+          send_structure_on_channel ev, @channel
         end
       end
 

@@ -8,47 +8,26 @@ module Skylab::Brazen
       o :desc, -> y do
         y << "manage couch datastores."
       end
+
+      o :description, -> y do
+        y << "the name of the database"
+      end,
+
+      :required, :property, :name
+
     end ]
 
-    Action__ = Brazen_::Data_Store_::Action
+    Action_Factory__ = Action_Factory.create_with self,
+      Brazen_::Data_Store_::Action, Entity__
 
     module Actions
 
-      class Add < Action__
-        Entity__[ self, -> do
-          o :desc, -> y do
-            y << "add a couch db."
-          end
+      Add = Action_Factory__.make :Add
 
-          o :description, -> y do
-            y << "the name of the database to add."
-          end,
-          :required, :property, :name,
+      Ls = Action_Factory__.make :List
 
-          :flag, :property, :dry_run
-        end ]
-      end
+      Rm = Action_Factory__.make :Remove
 
-      class Ls < Action__
-        Entity__[ self, -> do
-          o :desc, -> y do
-            y << "list couch db's."
-          end
-        end ]
-      end
-
-      class Rm < Action__
-        Entity__[ self, -> do
-          o :desc, -> y do
-            y << "remove a couch db."
-          end
-
-          o :description, -> y do
-            y << "the name of the database to add."
-          end
-          o :required, :property, :name
-        end ]
-      end
     end
   end
 end

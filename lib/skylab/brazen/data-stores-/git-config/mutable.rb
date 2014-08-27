@@ -140,7 +140,7 @@ module Skylab::Brazen
         end
 
         def get_all_node_scanner
-          Brazen_::Entity.scan_nonsparse_array @a
+          Entity_[].scan_nonsparse_array @a
         end
 
         def count_number_of_nodes i

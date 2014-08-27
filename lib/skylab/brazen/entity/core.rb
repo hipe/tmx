@@ -12,6 +12,10 @@ module Skylab::Brazen
         Box_
       end
 
+      def proprietor_methods
+        Proprietor_Methods__
+      end
+
       def scan & p
         if p
           Entity::Collection__::Scan.new( & p )
@@ -30,6 +34,10 @@ module Skylab::Brazen
 
       def scan_nonsparse_array a
         Entity::Collection__::Scan.nonsparse_array a
+      end
+
+      def scope_kernel
+        Scope_Kernel__
       end
 
       def via_argument_list a
@@ -168,6 +176,10 @@ module Skylab::Brazen
         prop = bld_prop_from_plan plan do |prp|
           prp.iambic_writer_method_proc = p
         end
+        add_property prop ; nil
+      end
+
+      def add_property prop
         define_iambic_writer_method_for_property prop
         accept_property prop ; nil
       end
@@ -382,10 +394,10 @@ module Skylab::Brazen
     module Proprietor_Methods__
 
       def properties
-        @properties ||= bld_properties
+        @properties ||= build_props
       end
 
-      def bld_properties
+      def build_props
         _scn = property_method_nms_for_rd.to_value_scanner
         Entity.scan.map( _scn, -> i do
           send i
@@ -735,8 +747,7 @@ module Skylab::Brazen
       end
 
       def prcss_iambic_passively
-        subject = property_proprietor
-        box = subject ? subject.property_method_nms_for_rd : MONADIC_EMPTINESS_
+        box, subject = iambic_methods_box_and_subject
         while @d < @x_a_length
           m_i = box[ @x_a[ @d ] ]
           m_i or break
@@ -746,16 +757,35 @@ module Skylab::Brazen
         self
       end
 
-      def via_scanner_process_iambic_passively
-        subject = property_proprietor
+      def via_scanner_process_some_iambic
+        box, subject = iambic_methods_box_and_subject
         scn = @scanner
-        box = subject ? subject.property_method_nms_for_rd : MONADIC_EMPTINESS_
+        m_i = box[ scn.current_token ]
+        m_i or raise ::ArgumentError, say_strange_iambic
+        scn.advance_one
+        send subject.send( m_i ).iambic_writer_method_name
+        prcss_iambic_passively_with_scn_subj_box scn, subject, box ; nil
+      end
+
+      def via_scanner_process_iambic_passively
+        box, subject = iambic_methods_box_and_subject
+        scn = @scanner
+        prcss_iambic_passively_with_scn_subj_box scn, subject, box ; nil
+      end
+
+      def prcss_iambic_passively_with_scn_subj_box scn, subject, box
         while scn.unparsed_exists
           m_i = box[ scn.current_token ]
           m_i or break
           scn.advance_one
           send subject.send( m_i ).iambic_writer_method_name
         end ; nil
+      end
+
+      def iambic_methods_box_and_subject
+        subject = property_proprietor
+        box = subject ? subject.property_method_nms_for_rd : MONADIC_EMPTINESS_
+        [ box, subject ]
       end
 
       def property_proprietor

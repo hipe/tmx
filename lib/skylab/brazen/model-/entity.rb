@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Model_
 
-  Entity = Brazen_::Entity[ -> do
+  Entity = Entity_[][ -> do
 
     o :ad_hoc_processor, :desc, -> scan do
       scan.scanner.advance_one  # `desc`
@@ -10,7 +10,8 @@ module Skylab::Brazen
     end
 
     o :ad_hoc_processor, :inflect, -> scan do
-      Entity::Customized_inflection__[ scan ]
+      scan.scanner.advance_one  # `inflect`
+      scan.reader.process_some_customized_inflection_behavior scan.scanner
     end
 
     o :ad_hoc_processor, :is_promoted, -> scan do
@@ -123,7 +124,7 @@ module Skylab::Brazen
       end
 
       def << a
-        @scan = Brazen_::Entity::Iambic_Scanner.new 0, a
+        @scan = Entity_[]::Iambic_Scanner.new 0, a
         process_iambic_fully
         self
       end
@@ -204,7 +205,7 @@ module Skylab::Brazen
             instance_variable_set ivar, x
           end,
           -> i, * x_a, p_ do
-            _ev = Brazen_::Entity::Event.inline_via_x_a_and_p x_a, p_
+            _ev = Entity_[]::Event.inline_via_x_a_and_p x_a, p_
             receive_event_on_channel _ev, i
           end ]
       end ; nil
@@ -251,7 +252,7 @@ module Skylab::Brazen
     end
 
     def receive_event * x_a, & p
-      _ev = Brazen_::Entity::Event.inline_via_x_a_and_p x_a, p
+      _ev = Entity_[]::Event.inline_via_x_a_and_p x_a, p
       receive_event_structure _ev
     end
 
@@ -276,35 +277,6 @@ module Skylab::Brazen
     end
 
     # ~
-
-    class Customized_inflection__
-
-      Model_::Actor[ self, :properties, :scan ]
-
-      attr_reader :noun, :verb
-
-      def execute
-        @scanner = @scan.scanner
-        @scanner.advance_one  # `inflect`
-        via_scanner_process_iambic_passively
-        @scan.reader.custom_inflection = self
-        @scan = @scanner = nil
-        freeze
-      end
-
-      Brazen_::Entity[ self, -> do
-
-        o :iambic_writer_method_name_suffix, :'='
-
-        def noun=
-          @noun = @scanner.gets_one.freeze
-        end
-
-        def verb=
-          @verb = @scanner.gets_one.freeze
-        end
-      end ]
-    end
   end
   end
 end

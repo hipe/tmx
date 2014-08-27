@@ -1,3 +1,5 @@
+[#017] #open environment variables need a general solution ..
+[#016]       #parent-node: [#013] the inferred inflection narrative ..
 [#015]       #doc-node: the kernel narrative ..
 [#014] #open this is a smell here
 [#013]       #doc-node: the model

@@ -218,6 +218,14 @@ module Skylab::Brazen
           end
         end
 
+        def output_invite_to_particular_action i_a
+          o = @action_adapter.retrieve_bound_action_via_normalized_name i_a
+          s = o.primary_syntax_string
+          express do
+            "use #{ code s }"
+          end
+        end
+
         def subject_invocation_string
           subject.invocation_string
         end

@@ -46,7 +46,11 @@ module Skylab::Brazen
 
     def receive_workspace_event ev
       _ev = sign_event ev
-      @client_adapter.receive_positive_event _ev
+      if ev.is_positive
+        @client_adapter.receive_event _ev
+      else
+        @client_adapter.receive_positive_event _ev
+      end
     end
   end
   end

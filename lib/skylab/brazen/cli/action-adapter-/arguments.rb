@@ -172,7 +172,7 @@ module Skylab::Brazen
             end
           end
 
-          class Crazy_Scanner__ < Brazen_::Entity::Iambic_Scanner
+          class Crazy_Scanner__ < Entity_[]::Iambic_Scanner
             attr_writer :d, :x_a_length
             attr_reader :d
           end

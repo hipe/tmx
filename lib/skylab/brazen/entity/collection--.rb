@@ -10,6 +10,24 @@ module Skylab::Brazen
 
         class << self
 
+          def expand scn, p
+            scn_ = nil
+            new do
+              while true
+                if ! scn_
+                  x = scn.gets
+                  x or break( scn = nil )
+                  scn_ = p[ x ]
+                end
+                x_ = scn_.gets
+                x_ and break
+                scn_ = nil
+                redo
+              end
+              x_
+            end
+          end
+
           def map scn, p
             new do
               x = scn.gets
@@ -68,6 +86,10 @@ module Skylab::Brazen
             end
             x
           end
+        end
+
+        def expand_by & p
+          self.class.expand self, p
         end
 
         def map_reduce_by & p

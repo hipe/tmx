@@ -4,23 +4,34 @@ module Skylab::Brazen
 
     class << self
 
-      attr_accessor :custom_inflection, :description_block
+      attr_accessor :description_block
 
-      def name_function  # #note-10
-        @nf ||= begin
-          extend Lib_::Name_function_methods[]
-          bld_name_function
-        end
+      def process_some_customized_inflection_behavior scanner
+        Process_customized_model_inflection_behavior__[ scanner, self ] ; nil
+      end
+
+      def custom_branch_inflection
+      end
+
+    private
+
+      def name_function_class
+        Model_Name_Function_
       end
     end
-
-    Actor = Lib_::Snag__[]::Model_::Actor
+    extend Lib_::Name_function[].name_function_methods
 
     include module Interface_Element_Instance_Methdods__
 
       def name
         self.class.name_function
       end
+
+      def is_visible
+        ! is_invisible
+      end
+
+      attr_reader :is_invisible
 
       def has_description
         ! self.class.description_block.nil?
@@ -33,80 +44,10 @@ module Skylab::Brazen
       end
 
       def sign_event ev
-        ci = self.class.custom_inflection
-        nf = self.class.name_function
-        if ci
-          if verb_s = ci.verb
-            had_verb = true
-          end
-          noun_s = ci.noun
-        end
-        verb_s ||= nf.as_human
-        noun_s ||= for_event_signature_infer_noun had_verb
-        Entity_[]::Event::Signature_Wrapper.new verb_s, noun_s, ev
+        nf = name
+        Entity_[]::Event::Signature_Wrapper.
+          new nf.inflected_verb, nf.inflected_noun, ev
       end
-    private
-
-      def for_event_signature_infer_noun had_verb  # [#011]:#note-210
-        noun_s = for_event_signature_infer_noun_from_parent_chain
-        noun_s || ( self.class.name_function.as_human if had_verb )
-      end
-
-      def for_event_signature_infer_noun_from_parent_chain
-        scn = for_event_signature_get_nounpart_scanner
-        deepest_noun_s = scn.gets
-        if deepest_noun_s
-          a = scn.each.to_a
-          a.reverse!
-          [ deepest_noun_s, * a ] * SPACE_
-        end
-      end
-
-      def for_event_signature_get_nounpart_scanner
-        scn = for_event_signature_build_parent_scanner
-        Entity_[].scan_map scn do |parent|
-          noun_s = if parent.respond_to? :custom_inflection
-            ci = parent.custom_inflection
-            ci && ci.noun
-          end
-          noun_s or for_event_signature_get_clean_noun_word_from_module parent
-        end
-      end
-
-      def for_event_signature_build_parent_scanner
-        nf = self.class.name_function
-        ( Callback_::Scn.new do
-          parent = nf.parent
-          nf = ( parent.name_function if parent )
-          parent
-        end )
-      end
-
-      def for_event_signature_get_clean_noun_word_from_module cls
-        nf = cls.name_function
-        s = nf.as_const.to_s
-        for_event_signature_remove_trailing_underscores s
-        for_event_signature_remove_interceding_underscores s
-        for_event_signature_depluralize s
-        nf.class.from_const( s ).as_human
-      end
-
-      def for_event_signature_remove_trailing_underscores s
-        s.gsub! TRAILING_UNDERSCORES_RX__, EMPTY_S_ ; s
-      end
-      TRAILING_UNDERSCORES_RX__ = /_+$/
-
-      def for_event_signature_remove_interceding_underscores s
-        s.gsub! INTERCEDING_UNDERSCORES_RX__ do
-          $1.downcase
-        end ; s
-      end
-      INTERCEDING_UNDERSCORES_RX__ = /_([A-Z])/
-
-      def for_event_signature_depluralize s
-        s.gsub! TRAILING_LETTER_S_RX__, EMPTY_S_ ; s
-      end
-      TRAILING_LETTER_S_RX__ = /s\z/
 
       self
     end
@@ -122,11 +63,12 @@ module Skylab::Brazen
     # ~ action scanning
 
     class << self
-      def get_upper_action_scan
+      def get_unbound_action_scan
+        get_unbound_upper_action_scan
+      end
+      def get_unbound_upper_action_scan
         acr = actn_class_reflection
-        acr and acr.get_upper_action_class_scanner.map_by do |cls|
-          cls.new
-        end
+        acr and acr.get_upper_action_class_scanner
       end
       def actn_class_reflection
         @did_reslolve_acr ||= init_action_class_reflection
@@ -139,7 +81,7 @@ module Skylab::Brazen
       end
     end
 
-    def get_action_scanner
+    def get_action_scan
       get_lower_action_scan
     end
 
@@ -149,6 +91,8 @@ module Skylab::Brazen
         cls.new
       end
     end
+
+    Actor = Lib_::Snag__[]::Model_::Actor
 
     class Build_any_action_class_reflection__
 
@@ -215,6 +159,72 @@ module Skylab::Brazen
       def under_expression_agent_get_N_desc_lines exp, n=nil
         Brazen_::Lib_::N_lines[].
           new( [], n, [ @cls.description_block ], exp ).execute
+      end
+    end
+
+    class Process_customized_model_inflection_behavior__
+      Actor[ self, :properties, :scanner, :cls ]
+      def execute
+        :noun == @scanner.current_token or raise ::ArgumentError, say_only
+        @scanner.advance_one
+        x = @scanner.current_token
+        if :with_lemma == x
+          @scanner.advance_one
+          x = @scanner.current_token
+        end
+        x.respond_to? :ascii_only? or raise ::ArgumentError, say_string
+        @scanner.advance_one
+        acpt Customized_Model_Inflection__.new x
+      end
+      def say_only
+        "the only kind of inflection a model may customize is 'noun' #{
+          }(had '#{ @scanner.current_token }')"
+      end
+      def say_string
+        "noun lemma must be a string (had #{ @scanner.current_token.inspect })"
+      end
+      def acpt _MODEL_INFLECTION_
+        @cls.send :define_singleton_method, :custom_branch_inflection do
+          _MODEL_INFLECTION_
+        end ; nil
+      end
+    end
+
+    class Customized_Model_Inflection__
+      def initialize s
+        @noun_lemma = s
+      end
+      attr_reader :noun_lemma
+    end
+
+    class Model_Name_Function_ < Lib_::Name_function[].name_function_class
+
+      def initialize cls, parent, const_i
+        @cls = cls
+        super
+      end
+
+      attr_reader :cls
+
+      def inflected_noun
+        inflection_kernel.inflected_noun
+      end
+
+      def noun_lexeme
+        inflection_kernel.noun_lexem
+      end
+
+    private
+      def inflection_kernel
+        @inflection_kernel ||= Model_::Inflection_Kernel__.for_model self
+      end
+    end
+
+    module Action_Factory
+      class << self
+        def create_with *a
+          Model_::Action_Factory__.new a
+        end
       end
     end
   end

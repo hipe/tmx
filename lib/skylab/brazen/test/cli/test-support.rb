@@ -16,6 +16,8 @@ module Skylab::Brazen::TestSupport::CLI
 
   extend TestSupport_::Quickie
 
+  Entity_ = Brazen_::Entity_
+
   module ModuleMethods
 
     def fake_app_name
@@ -270,8 +272,8 @@ module Skylab::Brazen::TestSupport::CLI
 
     def load_expect_the_first_time
       cls = self.class
-      cls.include Brazen_::Entity::Iambic_Methods_via_Scanner__,
-        Brazen_::Entity::Iambic_Methods__
+      cls.include Entity_[]::Iambic_Methods_via_Scanner__,
+        Entity_[]::Iambic_Methods__
       cls.send :define_method, :expect do |*x_a|
         expect_via_arg_list x_a
       end ; nil
@@ -345,7 +347,7 @@ module Skylab::Brazen::TestSupport::CLI
       if expectation_scanner
         @expectation_scanner.send :initialize, 0, x_a
       else
-        @expectation_scanner = Brazen_::Entity::Iambic_Scanner.new 0, x_a
+        @expectation_scanner = Entity_[]::Iambic_Scanner.new 0, x_a
       end
       @scan = @expectation_scanner ; nil
     end
@@ -353,7 +355,7 @@ module Skylab::Brazen::TestSupport::CLI
     def init_emission_scan
       if ! emission_scanner
         _em_a = build_baked_em_a
-        @emission_scanner = Brazen_::Entity::Iambic_Scanner.new 0, _em_a
+        @emission_scanner = Entity_[]::Iambic_Scanner.new 0, _em_a
       end
       @scan = @emission_scanner ; nil
     end
