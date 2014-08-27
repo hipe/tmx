@@ -19,6 +19,22 @@ module Skylab::Brazen
         end
       end
 
+      def get_names
+        @done or flush
+        @a.dup
+      end
+
+      def has_name i
+        if @done
+          @h.key? i
+        elsif @h.key? i
+          true
+        else
+          _x = fetch_when_not_done i, EMPTY_P_
+          _x and true
+        end
+      end
+
       def [] i
         fetch i do end
       end
@@ -142,6 +158,12 @@ module Skylab::Brazen
 
       def at_known_index d
         @h.fetch @a.fetch d
+      end
+
+      def flush
+        while ! @done
+          at_unknown_index @d + 1
+        end ; nil
       end
 
       def at_unknown_index d

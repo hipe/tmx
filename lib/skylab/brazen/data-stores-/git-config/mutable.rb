@@ -8,6 +8,12 @@ module Skylab::Brazen
         def new
           Document__.new
         end
+
+        def parse_path path_s, & p
+          Parse_Context__.new( p ).
+            with_input( Path_Input_Adapter_, path_s ).parse
+        end
+
         def parse_string str, & p
           Parse_Context__.new( p ).
             with_input( String_Input_Adapter_, str ).parse
@@ -100,6 +106,10 @@ module Skylab::Brazen
 
         def initialize
           @a = []
+        end
+
+        def is_empty
+          @a.length.zero?
         end
 
         def initialize_copy _otr_
@@ -500,6 +510,10 @@ module Skylab::Brazen
         end
 
         # ~ mutators
+
+        def clear_section
+          d = @a.length ; @a.clear ; d
+        end
 
         def []= i, x
           touch_assignment i, x

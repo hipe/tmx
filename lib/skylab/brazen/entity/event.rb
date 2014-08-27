@@ -127,6 +127,7 @@ module Skylab::Brazen
           if @do_first_line
             catch :__done_with_N_lines__ do
               @p_a.each do |p|
+                p ||= Inferred_Message.to_proc
                 @expag.calculate self, * a, & p
               end
             end
@@ -235,12 +236,19 @@ module Skylab::Brazen
       end
 
       class Signature_Wrapper
-        def initialize verb_s, noun_s, ev
-          @ev = ev
-          @inflected_noun = noun_s
-          @inflected_verb = verb_s
+        def initialize nf, ev
+          @ev = ev ; @nf = nf
         end
-        attr_reader :inflected_noun, :inflected_verb, :ev
+
+        attr_reader :ev
+
+        def inflected_verb
+          @nf.inflected_verb
+        end
+
+        def inflected_noun
+          @nf.inflected_noun
+        end
 
         def to_event
           @ev.to_event
@@ -255,7 +263,11 @@ module Skylab::Brazen
         end
 
         def verb_lexeme
-          @verb_lexeme ||= Lib_::NLP[]::EN::POS::Verb[ @inflected_verb ]
+          @nf.verb_lexeme
+        end
+
+        def noun_lexeme
+          @nf.noun_lexeme
         end
       end
     end

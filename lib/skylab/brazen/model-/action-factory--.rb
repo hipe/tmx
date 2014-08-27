@@ -51,6 +51,7 @@ module Skylab::Brazen
           o :flag, :property, :dry_run
           o :flag, :property, :verbose
         end ]
+        cls.include Add_Methods__
         cls
       end
 
@@ -92,6 +93,61 @@ module Skylab::Brazen
             nf = cls.name_function
             y << "#{ nf.inflected_verb } #{ nf.inflected_noun }"
           end
+        end
+      end
+
+      Semi_Generated_Instance_Methods__ = ::Module.new
+
+      module Add_Methods__
+        include Semi_Generated_Instance_Methods__
+
+        def if_workspace_exists
+          prepare_property_iambics
+          @ent = self.class.model_class.new @kernel
+          err = @ent.edit @action_x_a, @model_x_a
+          err || when_edited_OK
+        end
+      end
+
+      module Semi_Generated_Instance_Methods__
+      private
+
+        def prepare_property_iambics
+          model_props = self.class.model_class.properties
+          scn = self.class.properties.to_scanner
+          action_prop_x_a = [] ; model_prop_x_a = []
+          while prop = scn.gets
+            if model_props.has_name prop.name_i
+              if prop.takes_argument
+                model_prop_x_a.push prop.name_i,
+                  instance_variable_get( prop.name.as_ivar )
+              else
+                model_prop_x_a.push prop.name_i
+              end
+            else
+              action_prop_x_a.push prop.name.as_ivar,
+                instance_variable_get( prop.name.as_ivar )
+            end
+          end
+          action_prop_x_a.push :@listener, self, :@channel, :model
+          @action_x_a = action_prop_x_a ; @model_x_a = model_prop_x_a ; nil
+        end
+
+      public
+
+        def receive_model_error ev
+          _ev_ = sign_event ev
+          @client_adapter.receive_event _ev_
+        end
+
+        def receive_model_success ev
+          _ev_ = sign_event ev
+          @client_adapter.receive_event _ev_
+        end
+
+      private
+        def when_edited_OK
+          @ent.persist
         end
       end
     end

@@ -3,9 +3,28 @@ module Skylab::Brazen
   class Data_Stores_::Git_Config < Brazen_::Model_
 
     class << self
+
+      def build_collections kernel
+        Collections__.new kernel
+      end
+
+      def parse_path path_s, & p
+        Parse_Context_.new( p ).
+          with_input( Path_Input_Adapter__, path_s ).parse
+      end
+
       def parse_string str, & p
         Parse_Context_.new( p ).
           with_input( String_Input_Adapter_, str ).parse
+      end
+    end
+
+    class Collections__
+      def initialize kernel
+        @kernel = kernel
+      end
+      def persist_model_entity_in_collection ent, col
+        Git_Config_::Actors__::Persist[ ent, col, @kernel ]
       end
     end
 
@@ -136,6 +155,16 @@ module Skylab::Brazen
       end
 
       RX__ = /[^\r\n]*\r?\n|[^\r\n]+/
+    end
+
+    class Path_Input_Adapter_
+      def initialize path_s
+        @IO = ::File.open path_s, 'r'
+      end
+
+      def gets
+        @IO.gets
+      end
     end
 
     module Lib_
@@ -290,6 +319,7 @@ module Skylab::Brazen
     BACKSLASH_BACKSLASH_ = '\\\\'.freeze
     BACKSLASH_QUOTE_ = '\\"'.freeze
     CEASE_ = false
+    Git_Config_ = self
     PROCEDE_ = true
     QUOTE_= '"'.freeze
 

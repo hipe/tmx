@@ -19,6 +19,11 @@ module Skylab::Brazen
       scan.reader.is_promoted = true
     end
 
+    o :ad_hoc_processor, :persist_to, -> scan do
+      scan.scanner.advance_one
+      scan.reader.persist_to = scan.scanner.gets_one ; nil
+    end
+
     o :meta_property, :argument_arity,
         :enum, [ :zero, :one ],
         :default, :one,
@@ -140,6 +145,10 @@ module Skylab::Brazen
 
         o :iambic_writer_method_name_suffix, :'='
 
+        def ad_hoc_normalizer=
+          add_ad_hoc_normalizer( & iambic_property ) ; nil
+        end
+
         def description=
           x = iambic_property
           if x.respond_to? :ascii_only?
@@ -159,7 +168,7 @@ module Skylab::Brazen
         end
 
         def non_negative_integer=
-          add_ad_hoc_normalizer do |x, prop, val_p, ev_p|
+          add_ad_hoc_normalizer do |x, val_p, ev_p, prop|
             x.nil? or NORMALIZE_NON_NEGATIVE_INTEGER__[ x, prop, val_p, ev_p ]
           end
         end
@@ -200,14 +209,14 @@ module Skylab::Brazen
       ivar = prop.as_ivar
       prop.norm_p_a.each do |p|
         p[ ( instance_variable_get ivar if instance_variable_defined? ivar ),
-          prop,
           -> x do
             instance_variable_set ivar, x
           end,
           -> i, * x_a, p_ do
             _ev = Entity_[]::Event.inline_via_x_a_and_p x_a, p_
             receive_event_on_channel _ev, i
-          end ]
+          end,
+          prop ]
       end ; nil
     end
 
@@ -243,7 +252,7 @@ module Skylab::Brazen
   private
 
     def whine_about_missing_reqd_props miss_a
-      receive_event :missing_required_props,
+      receive_event :missing_required_properties,
           :is_positive, false, :miss_a, miss_a do |y, o|
         a = o.miss_a
         y << "missing required propert#{ 1 == a.length ? 'y' : 'ies' } #{
@@ -271,7 +280,7 @@ module Skylab::Brazen
       send _m, ev
     end
 
-    def receive_missing_required_props ev
+    def receive_missing_required_properties ev
       _s = ev.render_first_line_under Brazen_::API::EXPRESSION_AGENT
       raise ::ArgumentError, _s
     end

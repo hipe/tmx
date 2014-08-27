@@ -41,7 +41,7 @@ module Skylab::Brazen
       a = to_even_iambic
       a.push :prop, self.class.properties.fetch( :path )
       a.push :listener, self
-      Brazen_::Models_::Workspace.status a
+      Brazen_::Models_::Workspace.new( @kernel ).status a
     end
 
     def receive_workspace_event ev

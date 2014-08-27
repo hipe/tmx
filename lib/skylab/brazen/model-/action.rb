@@ -28,7 +28,8 @@ module Skylab::Brazen
 
     include Interface_Element_Instance_Methdods__
 
-    def initialize
+    def initialize kernel
+      @kernel = kernel
     end
 
     def is_branch
@@ -63,7 +64,7 @@ module Skylab::Brazen
       end
     end
 
-    def receive_missing_required_props ev
+    def receive_missing_required_properties ev
       receive_negative_event ev
     end
 
@@ -102,9 +103,10 @@ module Skylab::Brazen
 
     def expect_workspace_exists
       _path = Brazen_::CLI::Property__.new :path, :argument_arity, :one
-      Brazen_::Models_::Workspace.status [ :client, :_FOO_, :listener, self,
+      Brazen_::Models_::Workspace.new( @kernel ).status(
+        [ :client, :_FOO_, :listener, self,
         :channel, :workspace_expectation,
-        :max_num_dirs, 1, :path, '.', :verbose, true, :prop, _path ]
+        :max_num_dirs, 1, :path, '.', :verbose, true, :prop, _path ] )
     end
 
   public

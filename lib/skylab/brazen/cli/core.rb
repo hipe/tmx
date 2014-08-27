@@ -514,7 +514,8 @@ module Skylab::Brazen
 
       def maybe_inflect_line_for_negativity_via_event s, ev
         open, inside, close = unparenthesize s
-        v_s = ev.inflected_verb ; n_s = ev.inflected_noun
+        v_s = ev.inflected_verb
+        lex = ev.noun_lexeme and n_s = lex.lemma
         prefix = "couldn't #{ [ v_s, n_s ].compact * SPACE_ } because "
         "#{ open }#{ prefix }#{ inside }#{ close }"
       end

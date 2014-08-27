@@ -37,7 +37,7 @@ module Skylab::Brazen
       a.push :prop, self.class.properties.fetch( :path )
       a.push :client, @client_adapter
       a.push :listener, self
-      Brazen_::Models_::Workspace.init a
+      Brazen_::Models_::Workspace.new( @kernel ).edit a
     end
 
     def receive_workspace_event ev

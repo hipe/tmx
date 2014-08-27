@@ -4,7 +4,7 @@ module Skylab::Brazen
 
     class << self
 
-      attr_accessor :description_block
+      attr_accessor :description_block, :persist_to
 
       def process_some_customized_inflection_behavior scanner
         Process_customized_model_inflection_behavior__[ scanner, self ] ; nil
@@ -44,12 +44,14 @@ module Skylab::Brazen
       end
 
       def sign_event ev
-        nf = name
-        Entity_[]::Event::Signature_Wrapper.
-          new nf.inflected_verb, nf.inflected_noun, ev
+        Entity_[]::Event::Signature_Wrapper.new name, ev
       end
 
       self
+    end
+
+    def initialize kernel
+      @kernel = kernel
     end
 
     def is_branch
@@ -58,6 +60,59 @@ module Skylab::Brazen
 
     def is_visible
       true
+    end
+
+    # ~ common action implementations
+
+    def edit action_x_a, prop_x_a
+      action_x_a.each_slice( 2 ) do |ivar, x|
+        instance_variable_set ivar, x
+      end
+      @error_count = 0
+      process_iambic_fully prop_x_a
+      notificate :iambic_normalize_and_validate
+      @error_count.nonzero? and Brazen_::API.exit_statii.fetch( :generic_error )
+    end
+
+    def persist
+      i = self.class.persist_to
+      if :workspace == i
+        persist_to_workspace
+      else
+        persist_to_datastore i
+      end
+    end
+    private def persist_to_workspace
+      @kernel.models.workspaces.instance.persist_model_entity self
+    end
+
+    def property_value i
+      instance_variable_get self.class.properties.fetch( i ).as_ivar
+    end
+
+    def action_property_value i
+      ivar = :"@#{ i }"
+      instance_variable_defined?( ivar ) or raise "action prop not set: '#{ i }'"
+      instance_variable_get ivar
+    end
+
+    def receive_success_event ev
+      send_event_on_channel ev, :success
+    end
+
+    def receive_error_event ev
+      @error_count += 1
+      send_event_on_channel ev, :error
+    end
+
+    private def send_event_on_channel ev, i
+      tail_i = :"#{ @channel }_#{ i }"
+      m_i = :"receive_#{ ev.terminal_channel_i }_#{ tail_i }"
+      if @listener.respond_to? m_i
+        @listener.send m_i, ev
+      else
+        @listener.send :"receive_#{ tail_i }", ev
+      end
     end
 
     # ~ action scanning
@@ -88,7 +143,7 @@ module Skylab::Brazen
     def get_lower_action_scan
       acr = self.class.actn_class_reflection
       acr and acr.get_lower_action_class_scanner.map_by do |cls|
-        cls.new
+        cls.new @kernel
       end
     end
 
@@ -211,7 +266,7 @@ module Skylab::Brazen
       end
 
       def noun_lexeme
-        inflection_kernel.noun_lexem
+        inflection_kernel.noun_lexeme
       end
 
     private

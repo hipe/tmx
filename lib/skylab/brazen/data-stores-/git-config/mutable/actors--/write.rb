@@ -4,6 +4,8 @@ module Skylab::Brazen
 
     module Mutable
 
+      Actors__ = ::Module.new
+
       class Actors__::Write
 
         Brazen_::Model_::Actor[ self, :properties,
@@ -18,23 +20,14 @@ module Skylab::Brazen
         end
 
         def write
-          if @pn.exist?
-            update
-          else
-            create
-          end
-        end
-
-      private
-
-        def create
+          verb_i = @pn.exist? ? :update : :create
           scn = @document.get_line_scanner ; d = 0
           with_IO_opened_for_writing do |io|
             while (( line = scn.gets ))
               d += io.write line
             end
           end
-          send_wrote_file_event d, :create
+          send_wrote_file_event d, verb_i
         end
 
         def send_wrote_file_event d, verb_i

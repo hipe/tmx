@@ -2,6 +2,16 @@ module Skylab::Brazen
 
   class Models_::Workspace < Brazen_::Model_
 
+    class << self
+      def build_collections kernel
+        Collections__.new kernel
+      end
+
+      def filesystem_walk
+        Filesystem_Walk__
+      end
+    end
+
     Model__ = Brazen_::Model_
 
     Model__::Entity[ self, -> do
@@ -9,22 +19,8 @@ module Skylab::Brazen
         y << "manage workspaces."
       end
 
+      o :persist_to, :git_config
     end ]
-
-    class << self
-
-      def filesystem_walk
-        Filesystem_Walk__
-      end
-
-      def status x_a
-        new( x_a ).status
-      end
-
-      def init x_a
-        new( x_a ).init
-      end
-    end
 
     Model__::Actor[ self,
       :properties, :client, :channel, :dry_run, :listener,
@@ -32,8 +28,8 @@ module Skylab::Brazen
 
     Entity_[]::Event::Cascading_Prefixing_Sender[ self ]
 
-    def initialize x_a=nil
-      x_a and init_via_iambic_for_action x_a
+    def initialize kernel  # rewrite actor's
+      @kernel = kernel
     end
 
   private def init_via_iambic_for_action x_a
@@ -45,7 +41,8 @@ module Skylab::Brazen
 
     CONFIG_FILENAME__ = 'brazen.conf'.freeze
 
-    def status
+    def status a
+      init_via_iambic_for_action a
       pn = rslv_any_nearest_config_filename
       pn and status_when_OK pn
     end
@@ -53,6 +50,10 @@ module Skylab::Brazen
     def rslv_any_nearest_config_filename
       @any_nearest_config_filename =
         filesystem_walk( :channel, :walker ).find_any_nearest_file_pathname
+    end
+
+    def to_path
+      @any_nearest_config_filename.to_path
     end
 
     def receive_walker_start_directory_does_not_exist ev
@@ -72,11 +73,13 @@ module Skylab::Brazen
     end
 
     def status_when_OK pn
+      @kernel.models.workspaces.register_instance self, pn
       send_event :resource_exists, :pn, pn, :is_positive, true,
         :is_completion, true
     end
 
-    def init
+    def edit a
+      init_via_iambic_for_action a
       @init_method = nil
       pn = filesystem_walk( :channel, :init, :any_max_num_dirs_to_look, 1 ).
         find_any_nearest_file_pathname
@@ -256,6 +259,28 @@ module Skylab::Brazen
             y << "#{ ick o.filename } not found in #{ pth o.start_pathname}#{x}"
           end
         end
+      end
+    end
+
+    def persist_model_entity ent
+      ds = @kernel.datastores.send( self.class.persist_to )
+      ds.persist_model_entity_in_collection ent, self
+    end
+
+    class Collections__
+      def initialize kernel
+        @singleton = nil
+        @kernel = kernel
+      end
+      def name_i
+        :workspace
+      end
+      def register_instance ws, _pn
+        @singleton and raise "already have a singleton"
+        @singleton = ws ; nil
+      end
+      def instance
+        @singleton
       end
     end
   end
