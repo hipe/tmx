@@ -6,20 +6,20 @@ module Skylab::Brazen
 
       Actors__ = ::Module.new
 
-      class Actors__::Write
+      class Actors__::Persist
 
-        Brazen_::Model_::Actor[ self, :properties,
-          :document, :is_dry, :listener, :channel ]
+        Actor_[ self, :properties,
+          :pn, :document, :listener, :x_a, :is_dry, :channel ]
 
         Entity_[]::Event::Merciless_Prefixing_Sender[ self ]
 
-
-        def initialize pn, doc, listener, x_a
-          @document = doc ; @listener = listener ; @pn = pn
-          process_iambic_fully x_a
+        def initialize x_a
+          @pn, @document, @listener, @x_a, @is_dry, @channel = x_a
+          process_iambic_fully @x_a
+          @x_a = nil
         end
 
-        def write
+        def execute
           verb_i = @pn.exist? ? :update : :create
           scn = @document.get_line_scanner ; d = 0
           with_IO_opened_for_writing do |io|

@@ -132,7 +132,9 @@ module Skylab::Brazen
         end
 
         def inflected_noun
-          noun_lexeme.send noun_exponent_combination_i
+          if noun_lexeme
+            noun_lexeme.send noun_exponent_combination_i
+          end
         end
 
         def noun_exponent_combination_i
@@ -164,7 +166,7 @@ module Skylab::Brazen
         end
 
         def infer_noun_stem_when_node_is_topmost_node  # #note-170
-          if @ci.has_verb_lemma
+          if @ci && @ci.has_verb_lemma
             @nf.as_human
           end
         end

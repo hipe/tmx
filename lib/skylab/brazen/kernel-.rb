@@ -74,13 +74,17 @@ module Skylab::Brazen
         @cache_h = {}
       end
 
+      def [] i
+        @cache_h.fetch i do
+          cols = bld_shell( i ) and @cache_h[ i ] = cols
+        end
+      end
+
     private
 
       def bld_reader i
-        -> &p do
-          @cache_h.fetch i do
-            cols = bld_shell( i ) and @cache_h[ i ] = cols
-          end
+        -> do
+          self[ i ]
         end
       end
 

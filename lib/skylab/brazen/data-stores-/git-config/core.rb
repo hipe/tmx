@@ -10,7 +10,7 @@ module Skylab::Brazen
 
       def parse_path path_s, & p
         Parse_Context_.new( p ).
-          with_input( Path_Input_Adapter__, path_s ).parse
+          with_input( Path_Input_Adapter_, path_s ).parse
       end
 
       def parse_string str, & p
@@ -20,11 +20,21 @@ module Skylab::Brazen
     end
 
     class Collections__
+
       def initialize kernel
         @kernel = kernel
       end
-      def persist_model_entity_in_collection ent, col
+
+      def persist_entity_in_collection ent, col
         Git_Config_::Actors__::Persist[ ent, col, @kernel ]
+      end
+
+      def retrieve_entity_via_name_class_collection id_x, cls, col, no_p
+        Git_Config_::Actors__::Retrieve[ id_x, cls, col, no_p ]
+      end
+
+      def delete_entity_via_action_and_collection action, col
+        Git_Config_::Actors__::Delete[ action, col ]
       end
     end
 
@@ -195,6 +205,9 @@ module Skylab::Brazen
       def [] i
         idx = @h[ i ]
         idx && @a.fetch( idx )
+      end
+      def to_scan
+        Entity_[].scan_nonsparse_array @a
       end
       def map & p
         @a.map( & p )

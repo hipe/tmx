@@ -4,7 +4,7 @@ module Skylab::Brazen
 
     class Actors__::Init
 
-      Brazen_::Model_::Actor[ self, :properties,
+      Actor_[ self, :properties,
         :app_name,
         :channel,
         :config_filename,

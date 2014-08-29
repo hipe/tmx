@@ -40,6 +40,10 @@ module Skylab::Brazen
         x
       end
 
+      def val s
+        s.inspect
+      end
+
       self
     end.new
 

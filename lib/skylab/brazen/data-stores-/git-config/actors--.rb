@@ -2,194 +2,207 @@ module Skylab::Brazen
 
   class Data_Stores_::Git_Config
 
-    module Actors__
+    class Git_Config_Actor_ < Data_Store_::Actor
+    private
 
-      class Persist
+      def via_name_and_class_build_subsection_locator
+        Subsection_Locator__.
+          new Section_from_entity_class_[ @class ], "#{ @name_x }"
+      end
 
-        Brazen_::Model_::Actor[ self, :properties,
-          :entity,
-          :collection,
-          :kernel ]
+      def resolve_document_for_write
+        resolve_document_via_class Git_Config_::Mutable
+      end
 
-        Entity_[]::Event::Merciless_Prefixing_Sender[ self ]
-
-        def execute
-          @to_path = @collection.to_path ; @collection = nil
-          ok = prepare_values
-          ok &&= parse_file
-          ok &&= edit_file
-          ok && write_file
-          @result
+      def resolve_document_via_class cls
+        error = nil
+        @document = cls.parse_path @to_path do |ev|
+          error = ev ; nil
         end
-
-      private
-
-        def prepare_values
-          prepare_action_properties
-          i_a = @entity.class.properties.get_names
-          i_a.sort!
-          y = []
-          i_a.each do |i|
-            x = @entity.property_value i
-            x.nil? and next
-            y.push Property__.new( i, x )
-          end
-          if y.length.zero?
-            cannot_persist_entity_with_no_properties
-          else
-            @property_a = y
-            PROCEDE_
-          end
+        if error
+          resolve_result_via_parse_error error
+          UNABLE_
+        else
+          PROCEDE_
         end
-        Property__ = ::Struct.new :name_i, :value_x
+      end
 
-        def cannot_persist_entity_with_no_properties
-          finish_with_error :cannot_persist_entity_with_no_properties,
-            :entity, @entity, :is_positive, false
+      def via_document_and_ss_resolve_entity
+        ok = via_document_and_ss_resolve_section
+        ok && via_section_resolve_entity
+      end
+
+      def via_document_and_ss_resolve_section
+        scan = @document.sections.to_scan
+        s_i = @ss.section_s.intern ; ss_s = @ss.subsection_s
+        found = false ; count = 0 ; @section = nil
+        while sect = scan.gets
+          s_i == sect.normalized_name_i or next
+          count += 1
+          ss_s == sect.subsect_name_s or next
+          found = true
+          @section = sect
+          break
+        end
+        if found
+          ACHEIVED_
+        else
+          @count = count
+          _ev = build_retrieve_error
+          resolve_result_via_error _ev
           UNABLE_
         end
+      end
 
-        def prepare_action_properties
-          @dry_run = @entity.action_property_value :dry_run ; nil
-        end
+      def send_retrieve_error
+        _ev = build_retrieve_error
+        send_error _ev
+      end
 
-        def parse_file
-          error = nil
-          @document = Git_Config_::Mutable.parse_path @to_path do |ev|
-            error = ev ; nil
-          end
-          if error
-            process_error error
-            UNABLE_
+      def build_retrieve_error
+        build_event_via_iambic_and_proc [ :entity_not_found,
+          :description_s, @ss.to_description_s, :ss, @ss,
+            :entity_class, @class, :is_positive, false,
+              :count, @count ], -> y, o do
+          if o.count.zero?
+            y << "found no #{ ick o.ss.section_s } sections"
           else
-            PROCEDE_
+            y << "no #{ ick o.ss.subsection_s } section found in #{
+             }#{ o.count } #{ o.ss.section_s } section(s)"
           end
-        end
-
-        def process_error ev
-          x_a = ev.to_iambic
-          x_a.push :is_positive, false
-          path_s = @to_path
-          ev_ = Entity_[]::Event.inline_via_x_a_and_p x_a, -> y, o do
-            instance_exec y_=[], ev, & ev.message_proc
-            y << "failed to parse #{ pth path_s } - #{ y_ * LINE_SEP_ }"
-          end
-          finish_with_error_event ev_ ; nil
-        end
-
-        def edit_file
-          @ss = Construe_subsection__[ @entity ]
-          @section = @document.sections.touch_section( * @ss.to_a )
-          if @section.is_empty
-            edit_file_via_create_section
-          else
-            edit_file_via_update_section
-          end
-        end
-
-        def edit_file_via_create_section
-          @verb_i = :created
-          write_section
-        end
-
-        def edit_file_via_update_section
-          @verb_i = :updated
-          y = get_section_body_lines
-          @section.clear_section
-          write_section
-          y_ = get_section_body_lines
-          if y == y_
-            when_no_change_in_section
-            UNABLE_
-          else
-            write_section
-          end
-        end
-
-        def get_section_body_lines
-          scn = @section.get_body_line_scanner
-          y = [] ; x = nil ; y.push x while x = scn.gets ; y
-        end
-
-        def when_no_change_in_section
-          finish_with_error :no_change_in_entity,
-            :entity_description, @ss.to_description_s,
-            :entity, @entity, :is_positive, false
-        end
-
-        def write_section
-          @property_a.each do |prop|
-            @section[ prop.name_i ] = prop.value_x
-          end
-          ACHEIVED_
-        end
-
-        def write_file
-          @result = @document.write_to_pathname ::Pathname.new( @to_path ),
-            self, :is_dry, @dry_run, :channel, :the_document ; nil
-        end
-
-        def receive_the_document_wrote_file ev
-          x_a = ev.to_iambic
-          x_a.push :entity_verb_i, @verb_i
-          ev_ = build_event_with_iambic_and_p x_a, -> y, o do
-            instance_exec y_=[], ev, & ev.message_proc
-            y << "#{ o.entity_verb_i } entity. #{ y_ * LINE_SEP_ }"
-          end
-          @entity.receive_success_event ev_
-        end
-
-        def finish_with_error * x_a, & p
-          _ev = build_event_with_iambic_and_p x_a, p
-          finish_with_error_event _ev
-        end
-
-        def build_event_with_iambic_and_p x_a, p
-          Entity_[]::Event.inline_via_x_a_and_p x_a, p
-        end
-
-        def finish_with_error_event ev
-          @result = @entity.receive_error_event ev ; nil
         end
       end
 
-      class Construe_subsection__
+      def via_section_resolve_entity
+        x_a = [ NAME_, @section.subsect_name_s ]
+        scan = @section.assignments.to_scan
+        props = @class.properties
+        while ast = scan.gets
+          i = ast.normalized_name_i
+          prop = props.fetch i
+          if prop.takes_argument
+            x = ast.value_x
+            x_a.push i, x && "#{ x }"
+          else
+            if ast.value_x
+              x_a.push i
+            end
+          end
+        end
+        ent = @class.new @collection.kernel
+        ok = ent.marshal_load x_a, -> ev do
+          @result = @no_p[ ev ] ; UNABLE_
+        end
+        ok and @entity = ent
+        ok
+      end
 
-        Brazen_::Model_::Actor[ self, :properties, :entity ]
+      def resolve_result_via_parse_error ev
+        x_a = ev.to_iambic
+        x_a.push :is_positive, false
+        path_s = @to_path
+        ev_ = Entity_[]::Event.inline_via_x_a_and_p x_a, -> y, o do
+          instance_exec y_=[], ev, & ev.message_proc
+          y << "failed to parse #{ pth path_s } - #{ y_ * LINE_SEP_ }"
+        end
+        resolve_result_via_error ev_ ; nil
+      end
+
+      def resolve_result_via_write_file dry_run
+        @document.write_to_pathname ::Pathname.new( @to_path ),
+          self, :is_dry, @dry_run, :channel, :the_document
+        nil  # set your result in your callback
+      end
+    public
+      def receive_the_document_wrote_file ev  # set result
+        x_a = ev.to_iambic
+        x_a.push :entity_verb_i, @verb_i
+        ev_ = build_event_via_iambic_and_proc x_a, -> y, o do
+          instance_exec y_=[], ev, & ev.message_proc
+          y << "#{ o.entity_verb_i } entity. #{ y_ * LINE_SEP_ }"
+        end
+        listener.receive_success_event ev_
+        @result = ev.bytes ; nil
+      end
+    end
+
+    module Actors__
+
+      class Retrieve < Git_Config_Actor_
+
+        Actor_[ self, :properties,
+          :name_x, :class, :collection, :no_p ]
 
         def execute
-          work
-          @entity = nil
-          freeze
+          @to_path = @collection.to_path
+          @ss = via_name_and_class_build_subsection_locator
+          ok = rslv_document_for_read
+          ok &&= via_document_and_ss_resolve_entity
+          ok ? @entity : @result
         end
 
-        def to_a
-          [ @section_s, @subsection_s ]
-        end
-
-        def to_description_s
-          "#{ @section_s } #{ @subsection_s.inspect }"
-        end
       private
-        def work
-          rslv_section
-          rslv_subsection
+
+        def rslv_document_for_read
+          resolve_document_via_class Git_Config_
         end
 
-        def rslv_section
-          a = @entity.class.full_name_function
-          a_ = ::Array.new a.length
-          a_[0] = a.first.as_slug.gsub( /-|s-\z/, EMPTY_S_ )
-          a_[1..-1] = a[1..-1].map( & :as_slug )
-          @section_s = ( a_ * '-' ).freeze ; nil
-        end
-
-        def rslv_subsection
-          @subsection_s = @entity.property_value( :name ).dup.freeze ; nil
+        def resolve_result_via_error ev
+          @result = @no_p[ ev ] ; nil
         end
       end
-
-      LINE_SEP_ = "\n".freeze
     end
+
+    class Subsection_Locator__
+
+      def initialize s, ss
+        @section_s = s ; @subsection_s = ss
+      end
+
+      attr_reader :section_s, :subsection_s
+
+      def to_a
+        [ @section_s, @subsection_s ]
+      end
+
+      def to_description_s
+        "#{ @section_s } #{ @subsection_s.inspect }"
+      end
+    end
+
+    class Construe_subsection__ < Subsection_Locator__
+
+      Actor_[ self, :properties, :entity ]
+
+      def execute
+        work
+        @entity = nil
+        freeze
+      end
+
+    private
+      def work
+        rslv_section
+        rslv_subsection
+      end
+
+      def rslv_section
+        @section_s = Section_from_entity_class_[ @entity.class ].freeze
+      end
+
+      def rslv_subsection
+        @subsection_s = @entity.property_value( NAME_ ).dup.freeze ; nil
+      end
+    end
+
+    Section_from_entity_class_ = -> cls do
+      a = cls.full_name_function
+      a_ = ::Array.new a.length
+      a_[0] = a.first.as_slug.gsub( /-|s-\z/, EMPTY_S_ )
+      a_[1..-1] = a[1..-1].map( & :as_slug )
+      a_ * '-'
+    end
+
+    LINE_SEP_ = "\n".freeze
   end
 end

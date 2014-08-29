@@ -45,6 +45,28 @@ it's that simple.
 
 
 
+## :#note-075
+
+for the lazy. every action invocation may trigger multiple events, but
+will only result in one exit status. we derive the exit status from the
+events. how to reconcile the two is up to some debate:
+
+it may be that we set an exit status with each of several polarized events
+we receive (events where `is_positive` has been set to true or false). if
+this is the case, what are we to do if we once set an exit status to be
+some error code, and then set it to be 0 (success)? or if we once set it
+to be one error code, and then later set it to another?
+
+our "meh" solution for now is that in the case of collision, we
+effectively allow the exit status (error level if you prefer) to be
+increased but not decreased. at best it will prevent us from masking an
+error with a subsequent success. at worst it will mask less specific
+errors with more specific errors.
+
+the reason we use `instance_variable_defined?` instead of setting the
+exit status ivar to nil in the initialize method is so that it is left
+unset so we can more easily track when & where we fail to set it.
+
 
 
 ## :#note-575

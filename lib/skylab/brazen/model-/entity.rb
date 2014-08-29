@@ -222,7 +222,7 @@ module Skylab::Brazen
 
     def aply_dflt_value_if_necessary prop
       ivar = prop.as_ivar
-      if ! instance_variable_defined? ivar ||
+      if ! instance_variable_defined?( ivar ) ||
           instance_variable_get( ivar ).nil?
         instance_variable_set ivar, prop.default
       end ; nil

@@ -68,10 +68,11 @@ module Skylab::Brazen
         cls = begin_class
         @ent[ cls, -> do
           o :inflect, :verb, :with_lemma, 'remove'
-          o :required, :property, :name
+          o :required, :property, NAME_
           o :flag, :property, :dry_run
           o :flag, :property, :verbose
         end ]
+        cls.include Remove_Methods__
         cls
       end
 
@@ -109,8 +110,29 @@ module Skylab::Brazen
         end
       end
 
+      module Remove_Methods__
+        include Semi_Generated_Instance_Methods__
+
+        def if_workspace_exists
+          _cols = infer_collections_shell
+          _cols.delete_entity_via_action self
+        end
+      end
+
       module Semi_Generated_Instance_Methods__
       private
+
+        def infer_collections_shell
+          i_a = self.class.model_class.full_name_function.
+            map( & :as_lowercase_with_underscores_symbol )
+          if 1 == i_a.length
+            top = @kernel.models
+          elsif :data_stores_ == i_a.first  # because `Data_Stores_`
+            i_a.shift
+            top = @kernel.datastores
+          end
+          top[ i_a.first ]
+        end
 
         def prepare_property_iambics
           model_props = self.class.model_class.properties

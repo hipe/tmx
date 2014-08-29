@@ -13,6 +13,11 @@ module Skylab::Brazen
         @scn = scn
       end
 
+      def to_h
+        @done or flush
+        @h.dup
+      end
+
       def gets
         if ! @done
           at_unknown_index @d + 1

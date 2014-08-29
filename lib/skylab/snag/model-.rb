@@ -27,8 +27,14 @@ module Skylab::Snag
     # ~
 
     module Actor  # [#066]
+
       class << self
+
         def [] cls, * i_a
+          via_client_and_iambic cls, i_a
+        end
+
+        def via_client_and_iambic cls, i_a
           cls.extend MM__ ; cls.include self
           while i_a.length.nonzero?
             case i_a.first

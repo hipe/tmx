@@ -19,6 +19,7 @@ module Skylab::Brazen
         Model_Name_Function_
       end
     end
+
     extend Lib_::Name_function[].name_function_methods
 
     include module Interface_Element_Instance_Methdods__
@@ -43,8 +44,24 @@ module Skylab::Brazen
            execute
       end
 
+      def action_property_value i
+        ivar = :"@#{ i }"
+        instance_variable_defined?( ivar ) or raise "action prop not set: '#{ i }'"
+        instance_variable_get ivar
+      end
+
+    private
+
       def sign_event ev
         Entity_[]::Event::Signature_Wrapper.new name, ev
+      end
+
+      def build_event * x_a, & p
+        build_event_via_iambic_and_proc x_a, p
+      end
+
+      def build_event_via_iambic_and_proc x_a, p
+        Entity_[]::Event.inline_via_x_a_and_p x_a, p
       end
 
       self
@@ -62,7 +79,30 @@ module Skylab::Brazen
       true
     end
 
-    # ~ common action implementations
+    # ~ common action & persistence collaborators
+
+    def marshal_load x_a, no_p
+      @error_count = 0
+      @channel = :marshal_loading
+      @listener = Proc_to_Listener_Adapter__.new no_p
+      process_iambic_fully x_a
+      notificate :iambic_normalize_and_validate
+      if @error_count.nonzero?
+        @listener.last_result
+      else
+        ACHEIVED_
+      end
+    end
+
+    class Proc_to_Listener_Adapter__
+      def initialize p
+        @p = p
+      end
+      attr_reader :last_result
+      def receive_marshal_loading_error ev
+        @last_result = @p[ ev ] ; nil
+      end
+    end
 
     def edit action_x_a, prop_x_a
       action_x_a.each_slice( 2 ) do |ivar, x|
@@ -71,10 +111,12 @@ module Skylab::Brazen
       @error_count = 0
       process_iambic_fully prop_x_a
       notificate :iambic_normalize_and_validate
+      @was_valid_after_edit = @error_count.zero?
       @error_count.nonzero? and Brazen_::API.exit_statii.fetch( :generic_error )
     end
 
     def persist
+      @error_count = 0
       i = self.class.persist_to
       if :workspace == i
         persist_to_workspace
@@ -82,18 +124,36 @@ module Skylab::Brazen
         persist_to_datastore i
       end
     end
-    private def persist_to_workspace
-      @kernel.models.workspaces.instance.persist_model_entity self
+    attr_reader :came_from_persistence
+  private
+    def persist_to_workspace
+      @kernel.models.workspaces.instance.persist_entity self
+    end
+    def persist_to_datastore i
+      ds_i, locator_i = i.id2name.split( UNDERSCORE_, 2 ).map( & :intern )
+      ds = @kernel.datastores.send ds_i
+      ds.persist_entity_to_datastore self, locator_i
+    end
+  public
+
+    def to_iambic
+      scn = to_normalized_actual_property_scan ; y = []
+      while actual = scn.gets
+        y.push actual.name_i, actual.value_x
+      end ; y
     end
 
-    def property_value i
+    def to_normalized_actual_property_scan
+      i_a = self.class.properties.get_names
+      i_a.sort!
+      Entity_[].scan_nonsparse_array( i_a ).map_by do |i|
+        Actual_Property__.new i, property_value( i )
+      end
+    end
+    Actual_Property__ = ::Struct.new :name_i, :value_x
+
+    def property_value i  # #note-120
       instance_variable_get self.class.properties.fetch( i ).as_ivar
-    end
-
-    def action_property_value i
-      ivar = :"@#{ i }"
-      instance_variable_defined?( ivar ) or raise "action prop not set: '#{ i }'"
-      instance_variable_get ivar
     end
 
     def receive_success_event ev
@@ -105,7 +165,9 @@ module Skylab::Brazen
       send_event_on_channel ev, :error
     end
 
-    private def send_event_on_channel ev, i
+  private
+
+    def send_event_on_channel ev, i
       tail_i = :"#{ @channel }_#{ i }"
       m_i = :"receive_#{ ev.terminal_channel_i }_#{ tail_i }"
       if @listener.respond_to? m_i
@@ -114,6 +176,8 @@ module Skylab::Brazen
         @listener.send :"receive_#{ tail_i }", ev
       end
     end
+
+  public
 
     # ~ action scanning
 
@@ -147,11 +211,9 @@ module Skylab::Brazen
       end
     end
 
-    Actor = Lib_::Snag__[]::Model_::Actor
-
     class Build_any_action_class_reflection__
 
-      Actor[ self, :properties, :cls ]
+      Actor_[ self, :properties, :cls ]
 
       def execute
         has = @cls.const_defined? ACTIONS__, false  # #one
@@ -218,7 +280,7 @@ module Skylab::Brazen
     end
 
     class Process_customized_model_inflection_behavior__
-      Actor[ self, :properties, :scanner, :cls ]
+      Actor_[ self, :properties, :scanner, :cls ]
       def execute
         :noun == @scanner.current_token or raise ::ArgumentError, say_only
         @scanner.advance_one

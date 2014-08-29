@@ -32,8 +32,10 @@ module Skylab::Brazen
         resolve_properties
         resolve_partitions
         resolve_executable
-        @executable.receiver.send @executable.method_name, * @executable.args or
-        @exit_status
+        es =
+        @executable.receiver.send @executable.method_name, * @executable.args
+        flush_any_invitations
+        es or @exit_status
       end
     private
       def call_executable exe
@@ -68,12 +70,46 @@ module Skylab::Brazen
       def has_description
       end
 
-      def set_exit_status d
-        @exit_status = d
+      def receive_invitation ev, adapter
+        ( @invite_ev_a ||= [] ).push [ ev, adapter ] ; nil
+      end
+
+      attr_reader :invite_ev_a
+
+      def maybe_use_exit_status d  # #note-075
+        if ! instance_variable_defined? :@exit_status or @exit_status < d
+          @exit_status = d ; nil
+        end
       end
 
       def retrieve_unbound_action_via_normalized_name i_a
         @app_kernel.retrieve_unbound_action_via_normalized_name i_a
+      end
+
+    private
+
+      def flush_any_invitations
+        invite_ev_a and flush_invitations
+      end
+
+      def flush_invitations
+        seen_i_a_h = {} ; seen_general_h = {}
+        invite_ev_a.each do |ev, adapter|
+          ev_ = ev.to_event
+          if ev_.has_tag :invite_to_action
+            i_a = ev_.invite_to_action
+            seen_i_a_h.fetch i_a do
+              adapter.help_renderer.output_invite_to_particular_action i_a
+              seen_i_a_h[ i_a ] = true
+            end
+          else
+            i_a = adapter.action.class.full_name_function.map( & :as_lowercase_with_underscores_symbol )
+            seen_general_h.fetch i_a do
+              seen_general_h[ i_a ] = true
+              adapter.output_invite_to_general_help
+            end
+          end
+        end.clear
       end
     end
 
@@ -374,10 +410,6 @@ module Skylab::Brazen
         receive_frame otr
         CLI::When_::Help.new( nil, help_renderer, self ).execute
       end
-
-      def set_exit_status d
-        @parent.set_exit_status d
-      end
     end
 
     module Adapter_Methods__
@@ -461,19 +493,23 @@ module Skylab::Brazen
         a = render_event_lines ev
         s = maybe_inflect_line_for_positivity_via_event a.first, ev
         s and a[ 0 ] = s
-        send_non_payload_event_lines a
+        send_non_payload_event_lines_with_redundancy_filter a
         d = ( SUCCESS_ if ev_.is_positive )
         d ||= some_err_code_for_event ev_
-        set_exit_status d ; nil
+        maybe_use_exit_status d ; nil
       end
 
       def receive_negative_event ev
         a = render_event_lines ev
         s = maybe_inflect_line_for_negativity_via_event a.first, ev
         s and a[ 0 ] = s
-        send_non_payload_event_lines a
-        send_some_kind_of_invitation ev
-        set_exit_status some_err_code_for_event ev ; nil
+        send_non_payload_event_lines_with_redundancy_filter a
+        send_invitation ev
+        maybe_use_exit_status some_err_code_for_event ev ; nil
+      end
+
+      def receive_success_event ev
+        receive_completion_event ev  # while it works
       end
 
       def receive_completion_event ev
@@ -481,26 +517,32 @@ module Skylab::Brazen
         s = maybe_inflect_line_for_completion_via_event a.first, ev
         s and a[ 0 ] = s
         send_non_payload_event_lines a
-        set_exit_status SUCCESS_ ; nil
+        maybe_use_exit_status SUCCESS_ ; nil
       end
 
-      def set_exit_status d
-        @parent.set_exit_status d
+      def maybe_use_exit_status d
+        @parent.maybe_use_exit_status d
+      end
+
+      attr_reader :invite_ev_a
+
+      def receive_invitation ev, adapter
+        @parent.receive_invitation ev, adapter ; nil
+      end
+
+      def output_invite_to_general_help
+        help_renderer.output_invite_to_general_help
       end
 
     private
 
-      def send_some_kind_of_invitation ev
-        ev_ = ev.to_event
-        if ev_.has_tag :invite_to_action
-          help_renderer.output_invite_to_particular_action ev_.invite_to_action
-        else
-          help_renderer.output_invite_to_general_help
-        end
+      def send_invitation ev
+        @parent.receive_invitation ev, self
       end
 
       def maybe_inflect_line_for_positivity_via_event s, ev
         open, inside, close = unparenthesize s
+        downcase_first inside
         n_s = ev.inflected_noun
         v_s = ev.verb_lexeme.progressive
         gerund_phrase = "#{ [ v_s, n_s ].compact * SPACE_ }"
@@ -514,6 +556,7 @@ module Skylab::Brazen
 
       def maybe_inflect_line_for_negativity_via_event s, ev
         open, inside, close = unparenthesize s
+        downcase_first inside
         v_s = ev.inflected_verb
         lex = ev.noun_lexeme and n_s = lex.lemma
         prefix = "couldn't #{ [ v_s, n_s ].compact * SPACE_ } because "
@@ -522,6 +565,7 @@ module Skylab::Brazen
 
       def maybe_inflect_line_for_completion_via_event s, ev
         open, inside, close = unparenthesize s
+        downcase_first inside
         if HACK_IS_ONE_WORD_RX__ =~ inside
           maybe_inflect_line_for_positivity_via_event s, ev
         else
@@ -539,12 +583,29 @@ module Skylab::Brazen
 
       def unparenthesize s
         Brazen_::Lib_::Text[].unparenthesize_message_string s
-
       end
+
+      def downcase_first s
+        s and UCASE__.include? s.getbyte( 0 ) and s[ 0 ] = s[ 0 ].downcase
+      end
+      UCASE__ = 'A'.getbyte( 0 ) .. 'Z'.getbyte( 0 )
 
       def render_event_lines ev
         ev.render_all_lines_into_under y=[], expression_agent
         y
+      end
+
+      def send_non_payload_event_lines_with_redundancy_filter a
+        if 1 == a.length
+          s = redundancy_filter[ a.first ]
+          send_non_payload_event_lines [ s ]
+        else
+          send_non_payload_event_lines a
+        end
+      end
+
+      def redundancy_filter
+        @redundancy_filter ||= CLI::Redundancy_Filter__.new
       end
 
       def send_non_payload_event_lines a
@@ -614,12 +675,15 @@ module Skylab::Brazen
               @output_iambic.push prop.name_i
             end
           end
-          if prop.has_description
-            args.concat prop.
-              under_expression_agent_get_N_desc_lines expression_agent
-          end
+          prop.has_description and render_property_description args, prop
           op.on( * args, & p )
         end ; nil
+      end
+
+      def render_property_description a, prop
+        expag = expression_agent
+        expag.current_property = prop
+        a.concat prop.under_expression_agent_get_N_desc_lines expag ; nil
       end
 
       def populate_option_parser_with_universal_options op
@@ -700,20 +764,18 @@ module Skylab::Brazen
         @resources.serr
       end
 
+      def help_renderer
+        @partitions.help_renderer
+      end
+
     private
 
       def argv
         @resources.argv
       end
-
-      def help_renderer
-        @partitions.help_renderer
-      end
     end
 
     # ~
-
-    Actor_ = Lib_::Snag__[]::Model_::Actor
 
     class Build_partitions__
       Actor_[ self, :properties, :scn, :kernel ]

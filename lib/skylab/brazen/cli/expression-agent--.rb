@@ -15,6 +15,8 @@ module Skylab::Brazen
         @partitions = partitions
       end
 
+      attr_writer :current_property
+
       alias_method :calculate, :instance_exec
 
       def s x
@@ -48,6 +50,10 @@ module Skylab::Brazen
         highlight _unstyled
       end
 
+      def property_default
+        @current_property.default
+      end
+
       def render_prop_as_option prop
         "--#{ prop.name.as_slug }"
       end
@@ -71,6 +77,10 @@ module Skylab::Brazen
         end
       end
       DIR_SEP__ = '/'.getbyte 0
+
+      def val s
+        s.inspect
+      end
 
       def stylize style_d_a, string
         "\e[#{ style_d_a.map( & :to_s ).join( ';' ) }m#{ string }\e[0m"

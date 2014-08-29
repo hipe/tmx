@@ -22,7 +22,7 @@ module Skylab::Brazen
       o :persist_to, :git_config
     end ]
 
-    Model__::Actor[ self,
+    Actor_[ self,
       :properties, :client, :channel, :dry_run, :listener,
       :max_num_dirs, :path, :prop, :verbose ]
 
@@ -31,6 +31,8 @@ module Skylab::Brazen
     def initialize kernel  # rewrite actor's
       @kernel = kernel
     end
+
+    attr_reader :kernel  # used in unmarshalling for now
 
   private def init_via_iambic_for_action x_a
       @channel = :workspace
@@ -145,7 +147,7 @@ module Skylab::Brazen
 
     class Filesystem_Walk__  # re-write a subset of [#st-007] the tree walker
 
-      Model__::Actor[ self,
+      Actor_[ self,
         :properties,
           :channel,
           :filename,
@@ -262,9 +264,22 @@ module Skylab::Brazen
       end
     end
 
-    def persist_model_entity ent
-      ds = @kernel.datastores.send( self.class.persist_to )
-      ds.persist_model_entity_in_collection ent, self
+    def persist_entity ent
+      my_datastore.persist_entity_in_collection ent, self
+    end
+
+    def retrieve_entity_via_name_and_class id_x, cls, no_p
+      @error_count = 0
+      my_datastore.retrieve_entity_via_name_class_collection id_x, cls, self, no_p
+    end
+
+    def delete_entity_via_action action
+      @error_count = 0
+      my_datastore.delete_entity_via_action_and_collection action, self
+    end
+
+    def my_datastore
+      @mds ||= @kernel.datastores.send self.class.persist_to
     end
 
     class Collections__

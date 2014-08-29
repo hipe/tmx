@@ -190,9 +190,17 @@ module Skylab::Brazen
           end
         end
 
+        def get_node_scan i
+          get_node_scan_or_scanner Entity_[].scan, i
+        end
+
         def get_node_scanner i
+          get_node_scan_or_scanner Callback_::Scn, i
+        end
+
+        def get_node_scan_or_scanner cls, i
           d = 0 ; length = @a.length
-          Callback_::Scn.new do
+          cls.new do
             while d < length
               if i == @a[ d ].symbol_i
                 x = @a[ d ]
@@ -235,6 +243,10 @@ module Skylab::Brazen
           idx or self._SANITY
         end
 
+        def replace_children_with_this_array a
+          @a = a ; a.length
+        end
+
         # ~ more business-y, but still shared:
 
         def accept_blank_line_or_comment_line line_s
@@ -243,6 +255,7 @@ module Skylab::Brazen
       end
 
       class Document__ < Mutable_Collection_Kernel__
+
         def initialize
           super
           @sections = Sections__.new self
@@ -263,7 +276,7 @@ module Skylab::Brazen
         end
 
         def write_to_pathname pn, listener, * x_a
-          Mutable::Actors__::Write.new( pn, self, listener, x_a ).write
+          Mutable::Actors__::Persist[ pn, self, listener, x_a ]
         end
 
         # ~ for child agents only:
@@ -287,7 +300,10 @@ module Skylab::Brazen
         def map & p
           @parent.map_nodes self.class::SYMBOL_I, p
         end
-        def get_scanner
+        def to_scan
+          @parent.get_node_scan self.class::SYMBOL_I
+        end
+        def to_scanner
           @parent.get_node_scanner self.class::SYMBOL_I
         end
         def [] norm_name_i
@@ -298,7 +314,7 @@ module Skylab::Brazen
         # ~ the mutators
 
         def touch_comparable_item item, compare_p
-          scn = get_scanner
+          scn = to_scanner
           while (( x = scn.gets ))
             d = compare_p[ x ]
             case d
@@ -316,16 +332,47 @@ module Skylab::Brazen
             item
           end
         end
+
+        def delete_comparable_item x, compare_p, err_p
+          scn = to_scanner
+          keep_these = [] ; match_count = 0
+          while item = scn.gets
+            d = compare_p[ item ]
+            if d.zero?
+              match_count += 1
+            else
+              keep_these.push item
+            end
+          end
+          case 1 <=> match_count
+          when  0 ; delete_comparable_item_when_found keep_these
+          when  1 ; delete_comparable_item_when_not_found x, err_p
+          when -1 ; delete_comparable_item_when_many_matches math_count, x, err_p
+          end
+        end
+
+        def delete_comparable_item_when_found keep_these
+          @parent.replace_children_with_this_array keep_these
+        end
       end
 
       class Sections__ < Mutable_Collection_Shell__
         SYMBOL_I = :section_or_subsection
 
         def touch_section section_name_s, subsection_name_s=nil
-          section = Section_Or_Subsection__.new.
-            with_names section_name_s, subsection_name_s
+          section = bld_section section_name_s, subsection_name_s
           _compare_p = bld_compare section
           touch_comparable_item section, _compare_p
+        end
+
+        def delete_section section_name_s, subsection_name_s, err_p
+          section = bld_section section_name_s, subsection_name_s
+          _compare_p = bld_compare section
+          delete_comparable_item section, _compare_p, err_p
+        end
+
+        def bld_section s, s_
+          Section_Or_Subsection__.new.with_names s, s_
         end
 
         def bld_compare section

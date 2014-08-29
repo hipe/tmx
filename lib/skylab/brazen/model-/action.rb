@@ -21,6 +21,7 @@ module Skylab::Brazen
       end
     end
     extend Lib_::Name_function[].name_function_methods
+    NAME_STOP_INDEX = 2  # sl br models
 
     include Brazen_::Model_::Entity  # so we can override its behavior near events
 
@@ -66,6 +67,11 @@ module Skylab::Brazen
 
     def receive_missing_required_properties ev
       receive_negative_event ev
+    end
+
+    def receive_success_event ev
+      ev_ = sign_event ev
+      @client_adapter.receive_success_event ev_
     end
 
     def receive_error_event ev  # e.g ad-hoc normalization failure from spot [#012]
@@ -137,7 +143,7 @@ module Skylab::Brazen
 
     class Process_customized_action_inflection_behavior__
 
-      Actor[ self, :properties, :scanner, :cls ]
+      Actor_[ self, :properties, :scanner, :cls ]
 
       def execute
         @inflection = Customized_Action_Inflection__.new

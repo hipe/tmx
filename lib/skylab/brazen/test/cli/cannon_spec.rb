@@ -31,6 +31,7 @@ module Skylab::Brazen::TestSupport::CLI
 
       expect %r(\A  +-h, --help \[cmd\]  +this screen\.?)
       expect_item :datastore, %r(\bmanage datastores\b)
+      expect_item :source, %r(\bmanage sources\b)
       expect_item :init, :styled, %r(\binit a <workspace>),
         %r(\bthis is the second line of the init description\b)
       expect_item :status, %r(\bstatus\b.+\bworkspace)
@@ -46,6 +47,6 @@ module Skylab::Brazen::TestSupport::CLI
       expect_help_screen_for_init
     end
 
-    self::EXPECTED_ACTION_NAME_S_A = [ 'datastore', 'init', 'status', 'workspace' ].freeze
+    self::EXPECTED_ACTION_NAME_S_A = [ 'datastore', 'source', 'init', 'status', 'workspace' ].freeze
   end
 end

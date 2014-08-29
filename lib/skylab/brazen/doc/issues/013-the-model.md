@@ -83,3 +83,34 @@ the properties of the actions are like the fingers of the hand.
 copy-pasted from 'action'. models that do have any child actions may get
 'infected' by the child's name function function. but models that don't
 wont.
+
+
+
+
+## :#note-120 ("model ivars" #open :[#018])
+
+we say "actual property" with the exact sense of "actual"
+from [#mh-025], [#mh-024]:#formal-attributes-vs-actual-attributes.
+
+using ivars to hold actual properties where the ivar's name is unadorned
+will create problems and is not sustainable in the current
+implementation:
+
+imagine that we can enforce some naming rules for e.g property names may not
+start with underscores, and all of our mechanical ivars must. this is
+annoying because we don't want to limit the client from using meaningful
+leading underscores in her property names: she may have some business
+reasons to want to do this. also it's just ugly to have to read and
+write code with lots of leading underscores in ivar names. it is a
+limitation we should avoid.
+
+so let's accept as a given that the property namespace is and always
+will be wide-open.
+
+if we are to continue to want to appreciate the convenience of having
+actual properties stored in ivars, then we would have to go to the other
+extreme: somehow avoid using ivars entirely for anything mechanical.
+
+the workaround for this for now is to use `property_value` (and the
+separate but related `action_property_value`) for reading actual
+properties.
