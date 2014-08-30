@@ -35,8 +35,8 @@ module Skylab::Brazen
             :bytes, d,
             :is_completion, true,
             :is_dry, @is_dry,
+            :ok, true,
             :pn, @pn,
-            :is_positive, true,
             :verb_i, verb_i
           ) do |y, o|
             dry_ = ( "dry " if o.is_dry )

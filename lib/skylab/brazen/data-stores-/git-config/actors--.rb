@@ -62,7 +62,7 @@ module Skylab::Brazen
       def build_retrieve_error
         build_event_via_iambic_and_proc [ :entity_not_found,
           :description_s, @ss.to_description_s, :ss, @ss,
-            :entity_class, @class, :is_positive, false,
+            :entity_class, @class, :ok, false,
               :count, @count ], -> y, o do
           if o.count.zero?
             y << "found no #{ ick o.ss.section_s } sections"
@@ -99,7 +99,7 @@ module Skylab::Brazen
 
       def resolve_result_via_parse_error ev
         x_a = ev.to_iambic
-        x_a.push :is_positive, false
+        x_a.push :ok, UNABLE_
         path_s = @to_path
         ev_ = Entity_[]::Event.inline_via_x_a_and_p x_a, -> y, o do
           instance_exec y_=[], ev, & ev.message_proc

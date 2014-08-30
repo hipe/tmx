@@ -253,7 +253,7 @@ module Skylab::Brazen
 
     def whine_about_missing_reqd_props miss_a
       receive_event :missing_required_properties,
-          :is_positive, false, :miss_a, miss_a do |y, o|
+          :ok, false, :miss_a, miss_a do |y, o|
         a = o.miss_a
         y << "missing required propert#{ 1 == a.length ? 'y' : 'ies' } #{
           }#{ a.map { |prop| par prop } * ' and ' }"

@@ -25,7 +25,7 @@ module Skylab::Brazen
           val_p[ x ]
         else
           ev_p[ :error, :name_must_be_lowercase_alphanumeric_with_dashes,
-                :name_s, x, :is_positive, false, nil ]
+                :name_s, x, :ok, false, nil ]
         end ; nil
       end,
       :required,
@@ -49,7 +49,7 @@ module Skylab::Brazen
             val_p[ x ]
           else
             ev_p[ :error, :port_must_be_one_to_four_digits, :port_s, x,
-                  :is_positive, false, nil ]
+                  :ok, false, nil ]
           end
         end
       end,
@@ -313,7 +313,7 @@ module Skylab::Brazen
           response_body_to_event do |a, h|
             a[ 0 ] = @response.message.downcase.gsub( SPACE_, UNDERSCORE_ ).intern
             a.push :message, @response.message
-            a.push :is_positive, true, :is_completion, true
+            a.push :ok, ACHEIVED_, :is_completion, true
             a.concat x_a
             p ||= -> y, o do
               y << o.message
@@ -325,7 +325,7 @@ module Skylab::Brazen
         def response_body_to_error_event * x_a, & p
           response_body_to_event do |a, h|
             a[ 0 ] = h.fetch( 'error' ).intern
-            a.push :is_positive, false
+            a.push :ok, UNABLE_
             a.concat x_a
             p ||= -> y, o do
               y << ( o.reason || o.error )

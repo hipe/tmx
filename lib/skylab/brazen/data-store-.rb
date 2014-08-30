@@ -18,7 +18,7 @@ module Skylab::Brazen
       end
 
       def resolve_result_via_error_with * x_a, & p
-        x_a.push :is_positive, false
+        x_a.push :ok, UNABLE_
         _ev = build_event_via_iambic_and_proc x_a, p
         resolve_result_via_error _ev
       end

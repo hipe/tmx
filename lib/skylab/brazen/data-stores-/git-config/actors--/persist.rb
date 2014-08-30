@@ -44,7 +44,7 @@ module Skylab::Brazen
 
         def cannot_persist_entity_with_no_properties
           resolve_result_via_error :cannot_persist_entity_with_no_properties,
-            :entity, @entity, :is_positive, false
+            :entity, @entity, :ok, false
           UNABLE_
         end
 

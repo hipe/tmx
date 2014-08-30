@@ -50,7 +50,7 @@ module Skylab::Brazen
 
       def resolve_result_when_force_not_present
         force = @action.class.properties.fetch :force
-        _ev = build_event :missing_force, :is_positive, false do |y, o|
+        _ev = build_event :missing_force, :ok, false do |y, o|
           y << "missing required #{ par force }"
         end
         @result = listener.receive_error_event _ev ; nil

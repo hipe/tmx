@@ -1,4 +1,4 @@
-[#019] #open turn `is_positive` into `ok` to match HTTP responses
+[#019]       #done turn `is_positive` into `ok` to match HTTP responses
 [#018] #open #parent-node: [#013] "model ivars.."
 [#017] #open environment variables need a general solution ..
 [#016]       #parent-node: [#013] the inferred inflection narrative ..

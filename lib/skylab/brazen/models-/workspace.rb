@@ -76,7 +76,7 @@ module Skylab::Brazen
 
     def status_when_OK pn
       @kernel.models.workspaces.register_instance self, pn
-      send_event :resource_exists, :pn, pn, :is_positive, true,
+      send_event :resource_exists, :pn, pn, :ok, true,
         :is_completion, true
     end
 
@@ -105,7 +105,7 @@ module Skylab::Brazen
 
     def init_when_file_exists pn
       send_event :directory_already_has_config_file, :pathname, pn,
-        :is_positive, false, :prop, @prop
+        :ok, false, :prop, @prop
       nil
     end
 
@@ -123,7 +123,7 @@ module Skylab::Brazen
 
     def receive_init_file_not_found ev
       if @verbose
-        _ev = ev.dup_with :is_positive, true
+        _ev = ev.dup_with :ok, ACHEIVED_
         send_event_structure _ev
       end
       @init_method = :procede_with_init ; nil
@@ -198,13 +198,13 @@ module Skylab::Brazen
       def whn_start_directory_is_not_directory st
         send_event :start_directory_is_not_directory,
           :start_pathname, @start_pathname, :ftype, st.ftype,
-            :is_positive, false, :prop, @prop
+            :ok, false, :prop, @prop
       end
 
       def whn_start_directory_does_not_exist e
         send_event :start_directory_does_not_exist,
           :start_pathname, @start_pathname, :exception, e,
-            :is_positive, false, :prop, @prop
+            :ok, false, :prop, @prop
       end
 
       def fnd_any_nearest_file_pathname_when_start_pathname_exist
@@ -242,7 +242,7 @@ module Skylab::Brazen
 
       def whn_found_is_not_file st, found
         send_event :found_is_not_file, :ftype, st.ftype,
-            :is_positive, false, :pathname, found do |y, o|
+            :ok, false, :pathname, found do |y, o|
           y << "is #{ o.ftype }, must be file - #{ pth o.pathname }"
         end
       end
@@ -250,7 +250,7 @@ module Skylab::Brazen
       def whn_file_not_found count
         send_event :file_not_found, :filename, @filename,
             :num_dirs_looked, count, :start_pathname, @start_pathname,
-              :is_positive, false do |y, o|
+              :ok, false do |y, o|
           if o.num_dirs_looked.zero?
             y << "no directories were searched."
           else
