@@ -13,6 +13,11 @@ module Skylab::Brazen
         @scn = scn
       end
 
+      def to_a
+        @done or flush
+        @a.map { |i| @h.fetch i }
+      end
+
       def to_h
         @done or flush
         @h.dup

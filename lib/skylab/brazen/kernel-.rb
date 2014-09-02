@@ -61,22 +61,29 @@ module Skylab::Brazen
       @module.const_get :Models_, false
     end
 
-    class Things__
+    class Collections_Collection__
 
-      def initialize mod, kernel, suffix
+      def initialize mod, kernel
         @module = mod ; @kernel = kernel
-        sc = singleton_class
-        scn = mod.entry_tree.get_normpath_scanner  # go deep into [cb] API
-        while np = scn.gets
-          i = np.name_for_lookup.as_variegated_symbol
-          sc.send :define_method, :"#{ i }#{ suffix }", bld_reader( i )
-        end
         @cache_h = {}
       end
+
+      # none of our methods may end in 's'
 
       def [] i
         @cache_h.fetch i do
           cols = bld_shell( i ) and @cache_h[ i ] = cols
+        end
+      end
+
+      def retrieve_by_name i, no_p
+        @cache_h.fetch i do
+          ok, ev = retrieve_two_by_name i, no_p
+          if ok
+            @cache_h[ i ] = ok
+          else
+            no_p[ ev ]
+          end
         end
       end
 
@@ -91,19 +98,45 @@ module Skylab::Brazen
       def bld_shell i
         Autoloader_.const_reduce( [ i ], @module ).build_collections @kernel
       end
-    end
 
-    class DataStores__ < Things__
+      def retrieve_two_by_name i, no_p
+        ev = nil
+        mod = Autoloader_.const_reduce do |o|
+          o.from_module @module
+          o.const_path [ i ]
+          o.else do |e|
+            ev = Entity_[]::Event.wrap_universal_exception e ; UNABLE_
+          end
+        end
+        if mod
+          cols = mod.build_collections @kernel
+        end
+        [ cols, ev ]
+      end
 
-      def initialize kernel
-        super kernel.module.const_get( :Data_Stores_, false ), kernel, nil
+      def generate_producer_method_for_each_entry
+        suffix = 's'
+        sc = singleton_class
+        scn = @module.entry_tree.get_normpath_scanner  # go deep into [cb] API
+        while np = scn.gets
+          i = np.name_for_lookup.as_variegated_symbol
+          sc.send :define_method, :"#{ i }#{ suffix }", bld_reader( i )
+        end
       end
     end
 
-    class Models__ < Things__
+    class DataStores__ < Collections_Collection__
 
       def initialize kernel
-        super kernel.models_mod, kernel, :s
+        super kernel.module.const_get( :Data_Stores_, false ), kernel
+      end
+    end
+
+    class Models__ < Collections_Collection__
+
+      def initialize kernel
+        super kernel.models_mod, kernel
+        generate_producer_method_for_each_entry
       end
     end
   end

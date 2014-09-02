@@ -16,7 +16,7 @@ module Skylab::Brazen
     public
 
       def ensure_exists_when_201_created _
-        _ev = build_event :created_database, :description_s,
+        _ev = build_event_with :created_database, :description_s,
           @entity.description, * @entity.to_iambic, :ok, true
         @listener.receive_success_event _ev
       end

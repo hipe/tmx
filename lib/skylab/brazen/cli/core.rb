@@ -86,6 +86,10 @@ module Skylab::Brazen
         @app_kernel.retrieve_unbound_action_via_normalized_name i_a
       end
 
+      def payload_output_line_yielder
+        @poly ||= ::Enumerator::Yielder.new( & @resources.sout.method( :puts ) )
+      end
+
     private
 
       def flush_any_invitations
@@ -484,7 +488,7 @@ module Skylab::Brazen
             receive_negative_event ev
           end
         else
-          send_event ev
+          send_event ev  # not implemented! always set 'ok'
         end
       end
 
@@ -532,6 +536,10 @@ module Skylab::Brazen
 
       def output_invite_to_general_help
         help_renderer.output_invite_to_general_help
+      end
+
+      def payload_output_line_yielder
+        @parent.payload_output_line_yielder
       end
 
     private

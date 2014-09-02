@@ -76,7 +76,7 @@ module Skylab::Brazen
 
     def status_when_OK pn
       @kernel.models.workspaces.register_instance self, pn
-      send_event :resource_exists, :pn, pn, :ok, true,
+      send_event_with :resource_exists, :pn, pn, :ok, true,
         :is_completion, true
     end
 
@@ -104,7 +104,7 @@ module Skylab::Brazen
     end
 
     def init_when_file_exists pn
-      send_event :directory_already_has_config_file, :pathname, pn,
+      send_event_with :directory_already_has_config_file, :pathname, pn,
         :ok, false, :prop, @prop
       nil
     end
@@ -196,13 +196,13 @@ module Skylab::Brazen
       DIRECTORY_FTYPE__ = 'directory'.freeze
 
       def whn_start_directory_is_not_directory st
-        send_event :start_directory_is_not_directory,
+        send_event_with :start_directory_is_not_directory,
           :start_pathname, @start_pathname, :ftype, st.ftype,
             :ok, false, :prop, @prop
       end
 
       def whn_start_directory_does_not_exist e
-        send_event :start_directory_does_not_exist,
+        send_event_with :start_directory_does_not_exist,
           :start_pathname, @start_pathname, :exception, e,
             :ok, false, :prop, @prop
       end
@@ -241,14 +241,14 @@ module Skylab::Brazen
       FILE_FTYPE__ = 'file'.freeze
 
       def whn_found_is_not_file st, found
-        send_event :found_is_not_file, :ftype, st.ftype,
+        send_event_with :found_is_not_file, :ftype, st.ftype,
             :ok, false, :pathname, found do |y, o|
           y << "is #{ o.ftype }, must be file - #{ pth o.pathname }"
         end
       end
 
       def whn_file_not_found count
-        send_event :file_not_found, :filename, @filename,
+        send_event_with :file_not_found, :filename, @filename,
             :num_dirs_looked, count, :start_pathname, @start_pathname,
               :ok, false do |y, o|
           if o.num_dirs_looked.zero?
@@ -279,7 +279,7 @@ module Skylab::Brazen
     end
 
     def my_datastore
-      @mds ||= @kernel.datastores.send self.class.persist_to
+      @mds ||= @kernel.datastores[ self.class.persist_to ]
     end
 
     class Collections__

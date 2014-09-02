@@ -48,6 +48,8 @@ module Skylab::Brazen
 
     class Parse_Context_
 
+      include Entity_[]::Event::Builder_Methods
+
       def initialize p=nil
         @parse_error_handler_p = p
       end
@@ -83,7 +85,7 @@ module Skylab::Brazen
       def error_event i, col_number=nil
         d = ( col_number or @column_number ||= 1 )
         x_a = [ i, :line_number, @line_number, :column_number, d, :line, @line ]
-        ev = Entity_[]::Event.inline_via_x_a_and_p x_a, -> y, o do
+        ev = build_event_via_iambic_and_message_proc x_a, -> y, o do
           y << "#{ i.to_s.gsub( UNDERSCORE_, SPACE_ ) } #{
            }(#{ o.line_number }:#{ o.column_number })"
         end

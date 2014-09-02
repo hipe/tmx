@@ -60,10 +60,10 @@ module Skylab::Brazen
       end
 
       def build_retrieve_error
-        build_event_via_iambic_and_proc [ :entity_not_found,
+        build_event_with :entity_not_found,
           :description_s, @ss.to_description_s, :ss, @ss,
             :entity_class, @class, :ok, false,
-              :count, @count ], -> y, o do
+              :count, @count do |y, o|
           if o.count.zero?
             y << "found no #{ ick o.ss.section_s } sections"
           else
@@ -101,7 +101,7 @@ module Skylab::Brazen
         x_a = ev.to_iambic
         x_a.push :ok, UNABLE_
         path_s = @to_path
-        ev_ = Entity_[]::Event.inline_via_x_a_and_p x_a, -> y, o do
+        ev_ = build_event_via_iambic_and_message_proc x_a, -> y, o do
           instance_exec y_=[], ev, & ev.message_proc
           y << "failed to parse #{ pth path_s } - #{ y_ * LINE_SEP_ }"
         end
@@ -117,7 +117,7 @@ module Skylab::Brazen
       def receive_the_document_wrote_file ev  # set result
         x_a = ev.to_iambic
         x_a.push :entity_verb_i, @verb_i
-        ev_ = build_event_via_iambic_and_proc x_a, -> y, o do
+        ev_ = build_event_via_iambic x_a do |y, o|
           instance_exec y_=[], ev, & ev.message_proc
           y << "#{ o.entity_verb_i } entity. #{ y_ * LINE_SEP_ }"
         end

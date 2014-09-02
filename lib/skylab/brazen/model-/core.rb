@@ -6,6 +6,13 @@ module Skylab::Brazen
 
       attr_accessor :description_block, :persist_to
 
+      def build_collections kernel
+        if ! const_defined? :Collections__, false
+          const_set :Collections__, Collections_.new( self )
+        end
+        self::Collections__.new kernel
+      end
+
       def process_some_customized_inflection_behavior scanner
         Process_customized_model_inflection_behavior__[ scanner, self ] ; nil
       end
@@ -53,15 +60,7 @@ module Skylab::Brazen
     private
 
       def sign_event ev
-        Entity_[]::Event::Signature_Wrapper.new name, ev
-      end
-
-      def build_event * x_a, & p
-        build_event_via_iambic_and_proc x_a, p
-      end
-
-      def build_event_via_iambic_and_proc x_a, p
-        Entity_[]::Event.inline_via_x_a_and_p x_a, p
+        Model_::Event_Signature_Wrapper__.new name, ev
       end
 
       self
@@ -131,7 +130,7 @@ module Skylab::Brazen
     end
     def persist_to_datastore i
       ds_i, locator_i = i.id2name.split( UNDERSCORE_, 2 ).map( & :intern )
-      ds = @kernel.datastores.send ds_i
+      ds = @kernel.datastores[ ds_i ]
       ds.persist_entity_to_datastore self, locator_i
     end
   public
@@ -343,6 +342,42 @@ module Skylab::Brazen
           Model_::Action_Factory__.new a
         end
       end
+    end
+
+    class Collections_
+
+      class << self
+
+        alias_method :orig_new, :new
+
+        def new _MODEL_CLASS_
+          ::Class.new( self ).class_exec do
+            class << self
+              alias_method :new, :orig_new
+            end
+            define_method :model_class do _MODEL_CLASS_ end
+            self
+          end
+        end
+      end
+
+      def initialize kernel
+        @kernel = kernel
+      end
+
+      def name_i
+        model_class.name_function.as_lowercase_with_underscores_symbol
+      end
+
+      def build_collections_controller_for_channel_and_delegate i, x
+        collection_controller_class.new i, x, model_class, @kernel
+      end
+    private
+      def collection_controller_class
+        Collections_::Collections_Controller__
+      end
+
+      Autoloader_[ self ]
     end
   end
 end

@@ -6,7 +6,8 @@ module Skylab::Brazen
 
       def via_datastore_name_resolve_datastore
         ok = ACHEIVED_
-        @datastore = @kernel.datastores.couch.retrieve_entity_via_name @datastore_i, -> ev do
+        _ds = @kernel.datastores[ :couch ]
+        @datastore = _ds.retrieve_entity_via_name @datastore_i, -> ev do
           resolve_result_via_error ev
           ok = UNABLE_
         end

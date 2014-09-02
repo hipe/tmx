@@ -30,7 +30,7 @@ module Skylab::Brazen
     public
 
       def delete_datastore_when_dry_run _
-        @action.receive_success_event build_event( :pretend, :pretending, :pretending )
+        @action.receive_success_event build_event_with( :pretend, :pretending, :pretending )
         @result = nil
       end
 
@@ -50,7 +50,7 @@ module Skylab::Brazen
 
       def resolve_result_when_force_not_present
         force = @action.class.properties.fetch :force
-        _ev = build_event :missing_force, :ok, false do |y, o|
+        _ev = build_error_event_with :missing_force do |y, o|
           y << "missing required #{ par force }"
         end
         @result = listener.receive_error_event _ev ; nil

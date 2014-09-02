@@ -31,7 +31,7 @@ module Skylab::Brazen
         end
 
         def send_wrote_file_event d, verb_i
-          send_event( :wrote_file,
+          send_event_with( :wrote_file,
             :bytes, d,
             :is_completion, true,
             :is_dry, @is_dry,

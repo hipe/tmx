@@ -98,6 +98,10 @@ module Skylab::Brazen
       _HTTP_remote.put body, x_a
     end
 
+    def get uri_tail, * x_a
+      _HTTP_remote.get uri_tail, x_a
+    end
+
     def delete_datastore action_props, channel, delegate
       x_a = :action_props, action_props, :channel, channel,
         :delegate, delegate, :entity_identifier_strategy, :none
@@ -138,7 +142,7 @@ module Skylab::Brazen
           if x
             x
           else
-            no_p[ Entity_[]::Event.inline_via_x_a_and_p [ :no_connection ], nil ]
+            no_p[ build_event_with :no_connection ]
           end
         else
           error = nil
@@ -158,6 +162,10 @@ module Skylab::Brazen
         @cache_h.fetch i
         @cache_h.delete i
       end
+
+      def build_collection_controller * five
+        Couch_::Collection_Controller__.new five
+      end
     end
 
     class HTTP_Remote__
@@ -171,6 +179,13 @@ module Skylab::Brazen
       def put body_s, x_a
         x_a.unshift :body_s, body_s
         o = build_request_response :Put, x_a
+        o.send_and_receive
+        deliver_response o
+      end
+
+      def get uri_tail, x_a
+        x_a.unshift :URI_tail, uri_tail
+        o = build_request_response :Get, x_a
         o.send_and_receive
         deliver_response o
       end
@@ -207,7 +222,8 @@ module Skylab::Brazen
           :channel,
           :delegate,
           :entity_identifier,
-          :entity_identifier_strategy ]
+          :entity_identifier_strategy,
+          :URI_tail ]
 
         def initialize x_a, i, database, port, host, delegate
           @action_props = nil
@@ -239,18 +255,33 @@ module Skylab::Brazen
         end
 
         def resolve_entity_identifier_strategy
-          case @HTTP_method_i
-          when :Put
-            if @entity_identifier_strategy.nil?
-              @entity_identifier_strategy = :append_generated_UUID
-            end
-          end
-          @entity_identifier_strategy or self._DO_ME
+          send :"resolve_entity_identifier_strategy_for_#{ @HTTP_method_i }"
+        end
+
+        def resolve_entity_identifier_strategy_for_Put
+          if @entity_identifier_strategy.nil?
+            @entity_identifier_strategy = :append_generated_UUID
+          end ; nil
+        end
+
+        def resolve_entity_identifier_strategy_for_Get
+          @entity_identifier_strategy = :append_URI_tail ; nil
+        end
+
+        def resolve_entity_identifier_strategy_for_Delete
+          @entity_identifier_strategy or self._SANITY
         end
 
         def via_none_resolve_URI
           @URI_is_OK = true
           @URI_s = "/#{ @database }" ; nil
+        end
+
+        def via_append_URI_tail_resolve_URI
+          if @URI_tail
+            @URI_is_OK = true
+            @URI_s = "/#{ @database }/#{ @URI_tail }" ; nil
+          end
         end
 
         def via_entity_identifier_resolve_URI
@@ -313,12 +344,13 @@ module Skylab::Brazen
           response_body_to_event do |a, h|
             a[ 0 ] = @response.message.downcase.gsub( SPACE_, UNDERSCORE_ ).intern
             a.push :message, @response.message
-            a.push :ok, ACHEIVED_, :is_completion, true
+            h.key? 'ok' or a.push :ok, ACHEIVED_
+            a.push :is_completion, true
             a.concat x_a
             p ||= -> y, o do
               y << o.message
             end
-            Entity_[]::Event.inline_via_x_a_and_p a, p
+            build_event_via_iambic_and_message_proc a, p
           end
         end
 
@@ -330,7 +362,7 @@ module Skylab::Brazen
             p ||= -> y, o do
               y << ( o.reason || o.error )
             end
-            Entity_[]::Event.inline_via_x_a_and_p a, p
+            build_event_via_iambic_and_message_proc a, p
           end
         end
 

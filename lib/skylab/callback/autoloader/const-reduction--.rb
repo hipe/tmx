@@ -296,6 +296,9 @@ module Skylab::Callback
             received_name_i } )", received_name_i
         end
         attr_reader :module
+        def members
+          [ :name, :module ]
+        end
       end
 
       # ~

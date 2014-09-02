@@ -213,7 +213,7 @@ module Skylab::Brazen
             instance_variable_set ivar, x
           end,
           -> i, * x_a, p_ do
-            _ev = Entity_[]::Event.inline_via_x_a_and_p x_a, p_
+            _ev = build_event_via_iambic_and_message_proc x_a, p_
             receive_event_on_channel _ev, i
           end,
           prop ]
@@ -261,9 +261,11 @@ module Skylab::Brazen
     end
 
     def receive_event * x_a, & p
-      _ev = Entity_[]::Event.inline_via_x_a_and_p x_a, p
+      _ev = build_event_via_iambic_and_message_proc x_a, p
       receive_event_structure _ev
     end
+
+    include Entity_[]::Event::Builder_Methods
 
     def receive_event_on_channel ev, i
       m = :"receive_#{ ev.terminal_channel_i }_#{ i }"

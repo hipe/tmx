@@ -84,6 +84,10 @@ module Skylab::Brazen
       @client_adapter.receive_negative_event ev ; nil
     end
 
+    def payload_output_line_yielder
+      @client_adapter.payload_output_line_yielder
+    end
+
     private
 
     # ~
@@ -128,7 +132,7 @@ module Skylab::Brazen
     def receive_workspace_expectation_file_not_found ev
       x_a = ev.to_iambic
       x_a.push :invite_to_action, [ :init ]
-      ev_ = build_event_via_iambic_and_proc x_a, nil
+      ev_ = build_event_via_iambic x_a
       ev__ = sign_event ev_
       send_structure_on_channel_to_listener ev__,
         :workspace_expectation, @client_adapter

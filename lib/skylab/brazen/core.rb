@@ -39,6 +39,7 @@ module Skylab::Brazen
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
   Actor_ = -> cls, * x_a do
+    cls.include Entity_[]::Event::Builder_Methods
     Lib_::Snag__[]::Model_::Actor.via_client_and_iambic cls, x_a
   end
 

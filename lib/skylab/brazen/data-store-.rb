@@ -18,17 +18,8 @@ module Skylab::Brazen
       end
 
       def resolve_result_via_error_with * x_a, & p
-        x_a.push :ok, UNABLE_
-        _ev = build_event_via_iambic_and_proc x_a, p
+        _ev = build_error_event_via_mutable_iambic_and_message_proc x_a, p
         resolve_result_via_error _ev
-      end
-
-      def build_event * x_a, & p
-        build_event_via_iambic_and_proc x_a, p
-      end
-
-      def build_event_via_iambic_and_proc x_a, p
-        Entity_[]::Event.inline_via_x_a_and_p x_a, p
       end
 
       def resolve_result_via_error ev

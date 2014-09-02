@@ -8,10 +8,14 @@ module Skylab::Brazen
 
         alias_method :construct, :new
 
-        def inline_via_x_a_and_p x_a, p
+        def inline_via_iambic_and_message_proc x_a, p
           construct do
             init_via_x_a_and_p x_a, p
           end
+        end
+
+        def wrap_universal_exception e
+          Event::Wrappers__::Universal_exception[ e ]
         end
 
         private :new  # not implemented
@@ -156,23 +160,28 @@ module Skylab::Brazen
           maybe_pathify_item_x
           @y << "#{ @sp_as_s_a * SPACE_ } - #{ @item_x }" ; nil
         end
+
       private
+
         def maybe_replace_noun_phrase_with_prop
           if @o.has_member( :prop ) and find_verb_index
             _pretty = @expression_agent.par @o.prop
             @sp_as_s_a[ 0, @verb_index ] = [ _pretty ]
           end ; nil
         end
+
         def find_verb_index
           @verb_index = @sp_as_s_a.length.times.detect do |d|
             VERB_RX__ =~ @sp_as_s_a[ d ]
           end
         end
         VERB_RX__ = /\A(?:already|does|is)\z/  # etc as needed
+
         def rslv_item_x_from_first_member
           @first_member_i = @o.first_member
           @item_x = @o.send @first_member_i ; nil
         end
+
         def maybe_pathify_item_x
           if PN_RX__ =~ @first_member_i.to_s
             @item_x = @expression_agent.pth @item_x
@@ -181,13 +190,44 @@ module Skylab::Brazen
         PN_RX__ = /(?:_|\A)pathname\z/
       end
 
+      module Builder_Methods
+      private
+
+        def build_error_event_with * x_a, & p
+          build_error_event_via_mutable_iambic_and_message_proc x_a, p
+        end
+
+        def build_error_event_via_mutable_iambic_and_message_proc x_a, p
+          x_a.push :ok, false
+          build_event_via_iambic_and_message_proc x_a, p
+        end
+
+        def build_event_with * x_a, & p
+          build_event_via_iambic_and_message_proc x_a, p
+        end
+
+        def build_event_via_iambic x_a, & p
+          build_event_via_iambic_and_message_proc x_a, p
+        end
+
+        def build_event_via_iambic_and_message_proc x_a, p
+          p.nil? and p = default_event_message_proc_value
+          event_class.inline_via_iambic_and_message_proc x_a, p
+        end
+
+        def default_event_message_proc_value
+          Inferred_Message.to_proc
+        end
+
+        def event_class
+          Event
+        end
+      end
+
       module Base_Sender_Methods__
       private
-        def send_event * x_a, & p
-          send_event_structure build_event_via_iambic_and_proc( x_a, p )
-        end
-        def build_event_via_iambic_and_proc x_a, p
-          Event.inline_via_x_a_and_p x_a, ( p || Inferred_Message.to_proc )
+        def send_event_with * x_a, & p
+          send_event_structure build_event_via_iambic_and_message_proc( x_a, p )
         end
         def send_structure_on_channel ev, chan_i
           send_structure_on_channel_to_listener ev, chan_i, @listener
@@ -232,42 +272,6 @@ module Skylab::Brazen
         P__ = -> ev do
           @channel or self._NO_CHANNEL
           send_structure_on_channel ev, @channel
-        end
-      end
-
-      class Signature_Wrapper
-        def initialize nf, ev
-          @ev = ev ; @nf = nf
-        end
-
-        attr_reader :ev
-
-        def inflected_verb
-          @nf.inflected_verb
-        end
-
-        def inflected_noun
-          @nf.inflected_noun
-        end
-
-        def to_event
-          @ev.to_event
-        end
-
-        def terminal_channel_i
-          @ev.terminal_channel_i
-        end
-
-        def render_all_lines_into_under y, expag
-          @ev.render_all_lines_into_under y, expag
-        end
-
-        def verb_lexeme
-          @nf.verb_lexeme
-        end
-
-        def noun_lexeme
-          @nf.noun_lexeme
         end
       end
     end

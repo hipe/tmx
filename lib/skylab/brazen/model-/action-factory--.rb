@@ -61,6 +61,7 @@ module Skylab::Brazen
           o :inflect, :verb, :with_lemma, 'list', :noun, :plural
           o :flag, :property, :verbose
         end ]
+        cls.include List_Methods__
         cls
       end
 
@@ -107,6 +108,66 @@ module Skylab::Brazen
           @ent = self.class.model_class.new @kernel
           err = @ent.edit @action_x_a, @model_x_a
           err || when_edited_OK
+        end
+      end
+
+      module List_Methods__
+        include Semi_Generated_Instance_Methods__
+
+        def if_workspace_exists
+          @scan = resolve_entity_scan
+          @scan and via_scan_render_list
+        end
+
+      private
+
+        def resolve_entity_scan
+          _cols = infer_collections_shell
+          _cols_controller = _cols.
+            build_collections_controller_for_channel_and_delegate(
+              :the_collections, self )
+          col_controller = _cols_controller.produce_collection_controller
+          col_controller and col_controller.to_property_hash_scan
+        end
+
+        def via_scan_render_list
+          count = 0
+          props = self.class.model_class.properties.to_a
+          d = props.reduce 0 do |m, prop|
+            d_ = prop.name.as_human.length
+            m < d_ ? d_ : m
+          end
+          fmt = "%#{ d }s"
+          key_a = [] ; format_h = {}
+          props.each do |prop|
+            key_s = prop.name.as_lowercase_with_underscores_symbol.to_s
+            key_a.push key_s
+            format_h[ key_s ] = "#{ fmt % prop.name.as_human }: %s"
+          end
+          y = payload_output_line_yielder
+          output_entity = -> h do
+            count += 1
+            key_a.each do |key_s|
+              y << format_h.fetch( key_s ) % h.fetch( key_s )
+            end
+          end
+          if h = @scan.gets
+            output_entity[ h ]
+          end
+          while h = @scan.gets
+            y << '---'
+            output_entity[ h ]
+          end
+          ev = build_event_with :number_of_items_found, :count, count, :ok, true
+          ev_ = sign_event ev
+          @client_adapter.receive_event ev_
+        end
+      public
+        def receive_the_collection_info ev
+          @client_adapter.receive_event sign_event ev
+        end
+        def receive_the_collection_error ev
+          @client_adapter.receive_event sign_event ev
         end
       end
 
@@ -157,14 +218,16 @@ module Skylab::Brazen
 
       public
 
+        def receive_the_collections_error ev
+          receive_error_event ev
+        end
+
         def receive_model_error ev
-          _ev_ = sign_event ev
-          @client_adapter.receive_event _ev_
+          receive_error_event ev
         end
 
         def receive_model_success ev
-          _ev_ = sign_event ev
-          @client_adapter.receive_event _ev_
+          receive_success_event ev
         end
 
       private
