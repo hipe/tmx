@@ -193,7 +193,7 @@ module Skylab::CssConvert
     def dump_directives sexp
       keep_going = true
       if actual_parameters.dump_directives?
-        require 'pp'     # possible future fun with [#ta-043] svc # #todo
+        require 'pp'     # possible future fun with [#tm-043] svc # #todo
         ::PP.pp sexp, request_client.io_adapter.errstream
         keep_going = ! actual_parameters.dump_directives_and_exit?
       end

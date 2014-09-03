@@ -1,6 +1,6 @@
 # an introduction to regret :[#017]
 
-as the name suggests, you might really regret this. (this was [#ta-019].)
+as the name suggests, you might really regret this. (this was [#tm-019].)
 
 the Regret module is an alternate way to do something like rspec's
 shared_contexts but with an implementation that is in some ways more

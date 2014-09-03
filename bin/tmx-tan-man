@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../lib/skylab/tan-man/cli'
+require_relative '../lib/skylab/tan-man/core'
 
 Skylab::TanMan::CLI.new( $stdin, $stdout, $stderr ).invoke ARGV

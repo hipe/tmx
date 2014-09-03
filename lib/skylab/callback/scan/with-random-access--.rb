@@ -1,9 +1,8 @@
-module Skylab::Brazen
+module Skylab::Callback
 
-  module Entity
-  module Collection__
+  class Scan
 
-    class Scan_With_Random_Access__
+    class With_Random_Access__
 
       def initialize scn, meth_i
         @a = [] ; @h = {}
@@ -200,8 +199,7 @@ module Skylab::Brazen
         x
       end
 
-      Scan__ = -> { Collection__::Scan }
+      Scan__ = -> { Scan }
     end
-  end
   end
 end

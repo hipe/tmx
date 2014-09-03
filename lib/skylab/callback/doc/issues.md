@@ -1,3 +1,4 @@
+[#042]       #doc-node: the actor narrative ..
 [#041]       #parent-node: [#024] what are hybrid boxxy nodes?
 [#040]       #parent-node: [#023] the callback pattern
 [#039]       #parent-node: [#037] #in-situ the cb method naming conventions

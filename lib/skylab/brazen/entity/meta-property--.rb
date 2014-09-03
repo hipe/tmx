@@ -180,6 +180,10 @@ module Skylab::Brazen
           property_cls_for_wrt
         end
 
+        def set_property_class x
+          @reader.const_set :PROPERTY_CLASS__, x ; nil
+        end
+
         def property_cls_for_wrt
           @reader.module_exec do
             if const_defined? :PROPERTY_CLASS__, false

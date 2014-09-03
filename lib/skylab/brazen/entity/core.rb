@@ -8,32 +8,28 @@ module Skylab::Brazen
         via_argument_list a
       end
 
-      def box
-        Box_
-      end
-
       def proprietor_methods
         Proprietor_Methods__
       end
 
       def scan & p
         if p
-          Entity::Collection__::Scan.new( & p )
+          Callback_.scan.new( & p )
         else
-          Entity::Collection__::Scan
+          Callback_.scan
         end
       end
 
       def scan_map scn, & p
-        Entity::Collection__::Scan.map scn, p
+        Callback_.scan.map scn, p
       end
 
       def scan_reduce scn, & p
-        Entity::Collection__::Scan.redude scn, p
+        Callback_.scan.redude scn, p
       end
 
       def scan_nonsparse_array a
-        Entity::Collection__::Scan.nonsparse_array a
+        Callback_.scan.nonsparse_array a
       end
 
       def scope_kernel
@@ -104,7 +100,7 @@ module Skylab::Brazen
         mod = ::Module.new
         mod.const_set :Module_Methods, ::Module.new
         mod.extend Extension_Module_Methods__, Proprietor_Methods__
-        mod.send :include, Iambic_Methods__
+        mod.include Iambic_Methods__
         mod.const_set READ_BOX__, Box_.new
         krn = mod.init_property_scope_krnl
         krn.apply_p @p
@@ -120,7 +116,7 @@ module Skylab::Brazen
 
       def to_reader_apply_setup
         @reader.extend Proprietor_Methods__
-        @reader.send :include, Iambic_Methods__
+        @reader.include Iambic_Methods__
         @reader.const_defined? READ_BOX__ or
           @reader.const_set READ_BOX__, Box_.new
         nil
@@ -434,6 +430,10 @@ module Skylab::Brazen
         end ; nil
       end
 
+      def set_property_class x
+        metaproperty_kernel.set_property_class x
+      end
+
       def property_class_for_write
         metaproperty_kernel.property_class_for_write_impl
       end
@@ -463,146 +463,7 @@ module Skylab::Brazen
       end
     end
 
-    class Box_
-
-      def initialize
-        @a = [] ; @h = {}
-      end
-
-      def freeze
-        @a.freeze ; @h.freeze ; super
-      end
-
-      def initialize_copy _otr_
-        @a = @a.dup ; @h = @h.dup ; nil
-      end
-
-      def length
-        @a.length
-      end
-
-      def has_name i
-        @h.key? i
-      end
-
-      def index i
-        @a.index i
-      end
-
-      def first_name
-        @a.first
-      end
-
-      def fetch_at_position d
-        @h.fetch @a.fetch d
-      end
-
-      def fetch_name_at_position d
-        @a.fetch d
-      end
-
-      def fetch_pair_at_position d
-        [ @a.fetch( d ), @h.fetch( @a.fetch d ) ]
-      end
-
-      def get_names
-        @a.dup
-      end
-
-      def [] i
-        @h[ i ]
-      end
-
-      def fetch i, & p
-        @h.fetch i, & p
-      end
-
-      def at_position d
-        @h.fetch @a.fetch d
-      end
-
-      def to_key_scanner
-        Entity.scan_nonsparse_array @a
-      end
-
-      def to_value_scanner
-        d = -1 ; last = @a.length - 1
-        Callback_::Scn.new do
-          if d < last
-            @h.fetch @a.fetch d += 1
-          end
-        end
-      end
-
-      def each_name
-        @a.each do |i| yield i end ; nil
-      end
-
-      def each_value
-        @a.each do |i| yield @h.fetch( i ) end ; nil
-      end
-
-      def each_pair
-        @a.each do |i| yield i, @h.fetch( i ) end ; nil
-      end
-
-      # ~ mutators
-
-      def ensuring_same_values_merge_box! otr
-        a = otr.a ; h = otr.h
-        a.each do |i|
-          had = true
-          m_i = @h.fetch i do
-            had = false
-          end
-          if had
-            m_i == @h.fetch( i ) or raise "merge failure near #{ m_i }"
-          else
-            @a.push i ; @h[ i ] = h.fetch i
-          end
-        end ; nil
-      end
-
-      def add_if_not_has i, & p
-        @h.fetch i do
-          @a.push i
-          @h[ i ] = p.call
-        end ; nil
-      end
-
-      def add_or_replace i, x
-        @h.fetch i do
-          @a.push i
-        end
-        @h[ i ] = x ; nil
-      end
-
-      def add_or_assert i, x
-        has = true
-        x_ = @h.fetch i do
-          has = false
-        end
-        if has
-          x == x_ or raise "assertion failure - not equal: (#{ x }, #{ x_ })"
-          nil
-        else
-          @a.push i ; @h[ i ] = x ; true
-        end
-      end
-
-      def add i, x
-        had = true
-        @h.fetch i do had = nil ; @a.push i ; @h[ i ] = x end
-        had and raise ::KeyError, "won't clobber existing '#{ i }'"
-      end
-
-    protected
-      attr_reader :a, :h
-
-      def self.the_empty_box
-        @teb ||= new.freeze
-      end
-    end
+    Box_ = Callback_::Box
 
     class Method_Added_Muxer__  # from [mh] re-written
       class << self
@@ -963,8 +824,14 @@ module Skylab::Brazen
       end
 
       def when_one_length_arg_list_execute
-        @reader = @x_a.first
-        to_reader_apply_setup ; nil
+        x = @x_a.first
+        if x.respond_to? :call
+          @proc = @x_a.first
+          via_proc_build_new_extension_module
+        else
+          @reader = @x_a.first
+          to_reader_apply_setup
+        end
       end
 
       def to_reader_apply_setup
@@ -973,10 +840,27 @@ module Skylab::Brazen
         if ! @reader.const_defined? READ_BOX__  # before we do any includes
           @reader.const_set READ_BOX__, Box_.new
         end
-        @reader.send :include, @extension_module  # iambic methods too
+        @reader.include @extension_module  # iambic methods too
         _box = @reader.prop_mthd_names_for_write
         _box_ = @extension_module.property_method_nms_for_rd
         _box.ensuring_same_values_merge_box! _box_ ; nil
+      end
+
+      def via_proc_build_new_extension_module
+        mod = ::Module.new
+        mm = mod.const_set :Module_Methods, ::Module.new
+        mm.include @extension_module::Module_Methods
+        mod.extend Extension_Module_Methods__, Proprietor_Methods__
+        mod.include Iambic_Methods__
+
+        mod.const_set READ_BOX__, bx = Box_.new  # for now
+        mod.const_set WRITE_BOX__, bx
+
+        krn = mod.init_property_scope_krnl
+        krn.apply_p @proc
+        krn.end_scope
+        mod.property_scope_krnl = nil
+        mod
       end
     end
 

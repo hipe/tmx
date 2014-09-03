@@ -1,8 +1,4 @@
-module Skylab::Brazen
-
-  module Entity
-
-    module Collection__
+module Skylab::Callback
 
       class Scan < ::Proc
 
@@ -18,6 +14,7 @@ module Skylab::Brazen
                   x = scn.gets
                   x or break( scn = nil )
                   scn_ = p[ x ]
+                  scn_ or next  # can reduce too sure why not
                 end
                 x_ = scn_.gets
                 x_ and break
@@ -58,7 +55,7 @@ module Skylab::Brazen
           end
 
           def random_access scn, meth_i
-            Collection__::Scan_With_Random_Access__.new scn, meth_i
+            Callback_::Scan::With_Random_Access__.new scn, meth_i
           end
 
           def reduce scn, p
@@ -126,6 +123,4 @@ module Skylab::Brazen
           self.class.random_access self, i
         end
       end
-    end
-  end
 end

@@ -2,15 +2,246 @@ module Skylab ; end
 
 module Skylab::Callback
 
-  def self.[] mod, * x_a
-    self::Bundles.apply_iambic_on_client x_a, mod
+  class << self
+
+    def [] mod, * x_a
+      self::Bundles.apply_iambic_on_client x_a, mod
+    end
+
+    def scan
+      Callback_::Scan
+    end
   end
 
-  Autoloader = ::Module.new  # read [#024] the new autoloader narrative
+  module Actor  # see [#042] the actor narrative
+
+    class << self
+
+      def [] cls, * i_a
+        via_client_and_iambic cls, i_a
+      end
+
+      def via_client_and_iambic cls, i_a
+        cls.extend MM__ ; cls.include self
+        while i_a.length.nonzero?
+          case i_a.first
+          when :properties
+            i_a.shift
+            absrb_prps i_a, cls
+            break
+          else
+            raise ::ArgumentError, i_a.first
+          end
+        end ; nil
+      end
+    private
+      def absrb_prps i_a, cls
+        box = cls.actor_property_box_for_write
+        d = -1 ; last = i_a.length - 1 ; i = nil
+        box.add i = i_a.fetch( d += 1 ), :"@#{ i }" while d  < last ; nil
+      end
+    end
+
+    PROPERTY_BOX__ = :ACTOR_PROPERTY_BOX___
+
+    module MM__
+
+      def [] * x_a
+        new( x_a ).execute
+      end
+
+      def with * x_a
+        new x_a
+      end
+
+      define_method :actor_property_box_for_write, -> do
+        const = PROPERTY_BOX__
+        -> do
+          self.__actor_property_box_for_write__ ||= begin
+            if const_defined? const
+              const_get( const ).dup
+            else
+              const_set const, Callback_::Box.new
+            end
+          end
+        end
+      end.call
+
+      attr_accessor :__actor_property_box_for_write__
+    end
+
+    def initialize a
+      process_argument_list_fully a
+    end
+
+  private
+
+    def process_argument_list_fully a
+      box = actor_property_box
+      a.length.times do |d|
+        instance_variable_set box.fetch_at_position( d ), a.fetch( d )
+      end ; nil  # #etc
+    end
+
+    def process_iambic_fully x_a
+      box = actor_property_box
+      x_a.each_slice( 2 ) do |i, x|
+        instance_variable_set box.fetch( i ), x
+      end ; nil
+    end
+
+    def actor_property_box
+      self.class.const_get PROPERTY_BOX__
+    end
+  end
+
+  Callback_ = self
+
+  class Box
+
+    def initialize
+      @a = [] ; @h = {}
+    end
+
+    def freeze
+      @a.freeze ; @h.freeze ; super
+    end
+
+    def initialize_copy _otr_
+      @a = @a.dup ; @h = @h.dup ; nil
+    end
+
+    def length
+      @a.length
+    end
+
+    def has_name i
+      @h.key? i
+    end
+
+    def index i
+      @a.index i
+    end
+
+    def first_name
+      @a.first
+    end
+
+    def fetch_at_position d
+      @h.fetch @a.fetch d
+    end
+
+    def fetch_name_at_position d
+      @a.fetch d
+    end
+
+    def fetch_pair_at_position d
+      [ @a.fetch( d ), @h.fetch( @a.fetch d ) ]
+    end
+
+    def get_names
+      @a.dup
+    end
+
+    def [] i
+      @h[ i ]
+    end
+
+    def fetch i, & p
+      @h.fetch i, & p
+    end
+
+    def at_position d
+      @h.fetch @a.fetch d
+    end
+
+    def to_key_scanner
+      Callback_::Scan.nonsparse_array @a
+    end
+
+    def to_value_scanner
+      d = -1 ; last = @a.length - 1
+      Callback_::Scn.new do
+        if d < last
+          @h.fetch @a.fetch d += 1
+        end
+      end
+    end
+
+    def each_name
+      @a.each do |i| yield i end ; nil
+    end
+
+    def each_value
+      @a.each do |i| yield @h.fetch( i ) end ; nil
+    end
+
+    def each_pair
+      @a.each do |i| yield i, @h.fetch( i ) end ; nil
+    end
+
+    # ~ mutators
+
+    def ensuring_same_values_merge_box! otr
+      a = otr.a ; h = otr.h
+      a.each do |i|
+        had = true
+        m_i = @h.fetch i do
+          had = false
+        end
+        if had
+          m_i == @h.fetch( i ) or raise "merge failure near #{ m_i }"
+        else
+          @a.push i ; @h[ i ] = h.fetch i
+        end
+      end ; nil
+    end
+
+    def add_if_not_has i, & p
+      @h.fetch i do
+        @a.push i
+        @h[ i ] = p.call
+      end ; nil
+    end
+
+    def add_or_replace i, x
+      @h.fetch i do
+        @a.push i
+      end
+      @h[ i ] = x ; nil
+    end
+
+    def add_or_assert i, x
+      has = true
+      x_ = @h.fetch i do
+        has = false
+      end
+      if has
+        x == x_ or raise "assertion failure - not equal: (#{ x }, #{ x_ })"
+        nil
+      else
+        @a.push i ; @h[ i ] = x ; true
+      end
+    end
+
+    def add i, x
+      had = true
+      @h.fetch i do had = nil ; @a.push i ; @h[ i ] = x end
+      had and raise ::KeyError, "won't clobber existing '#{ i }'"
+    end
+
+  protected
+    attr_reader :a, :h
+
+    def self.the_empty_box
+      @teb ||= new.freeze
+    end
+  end
 
   # ~ the #employment story
 
-  module Autoloader
+  module Autoloader  # read [#024] the new autolaoder narrative
+
     class << self
       def [] mod, * x_a
         if x_a.length.zero?
@@ -733,7 +964,7 @@ module Skylab::Callback
           x = lookup_x_after_loaded
           if x.respond_to?( :dir_pathname ) &&
               x.dir_pathname != np.some_dir_pathname
-            np = Arbitrary_Normpath_.new( @mod, x.dir_pathname ).rslv
+            np = Autoloader::Actors__::Resolve_relpath[ @mod, x.dir_pathname ]
             np.assert_state :loaded
           end
           if np.value_is_known
@@ -743,52 +974,6 @@ module Skylab::Callback
           end
         end
         x
-      end
-    end
-
-    class Arbitrary_Normpath_
-      def initialize mod, dpn
-        @dpn = dpn ; @mod = mod
-      end
-      def rslv
-        @mine_a = @mod.dir_pathname.to_path.split PATH_SEP_
-        @theirs_a = @dpn.to_path.split PATH_SEP_
-        @same_a = []
-        begin
-          mine = @mine_a.shift
-          theirs = @theirs_a.shift
-          if mine == theirs
-            @same_a << mine
-          else
-            @mine_a.unshift mine ; @theirs_a.unshift theirs
-            break( is_different = true )
-          end
-        end while @mine_a.length.nonzero? && @theirs_a.length.nonzero?
-        if is_different
-          when_is_different
-        else
-          @mine_a.length.zero? or self._HOLE
-          @theirs_a.length.nonzero? or self._HOLE  # paths are same
-          when_only_theirs_is_left
-        end
-      end
-    private
-      def when_only_theirs_is_left
-        @theirs_a.reduce @mod.entry_tree do |et, s|
-          name = Name.from_slug s
-          _et = et.normpath_from_distilled name.as_distilled_stem
-          _et or et.add_imaginary_normpath_for_correct_name name
-        end
-      end
-      def when_is_different
-        const_a = @mod.name.split CONST_SEP_
-        const_a[ - ( @mine_a.length ) .. -1 ] = EMPTY_A_
-        _mod = const_a.reduce( ::Object ) { |m, s| m.const_get s, false }
-        _mod_ = Autoloader.const_reduce do |cr|
-          cr.from_module _mod
-          cr.const_path @theirs_a
-        end
-        _mod_.entry_tree
       end
     end
 
@@ -1242,8 +1427,6 @@ module Skylab::Callback
   end
 
   # ~ public and protected consts and any related public accessor methods
-
-  Callback_ = self
 
   CONST_SEP_ = '::'.freeze
 

@@ -9,41 +9,63 @@ module Skylab::Brazen
         module For
           module Face
             module Of
-              module Hot
+              class Hot
                 def self.[] kernel, token
-                  Client__
+                  Adapter___.make_adapter kernel, token
                 end
+
+                class Maker
+                  def initialize mod
+                    @mod = mod
+                  end
+
+                  def make_adapter kernel, token
+                    Adapter__.new @mod, kernel, token
+                  end
+                end
+
+                class Adapter__
+
+                  def initialize *a
+                    @mod, @given_NS_sheet, @parent_top_client = a
+                  end
+
+                  def call * a
+                    @parent_top_client_kernel, @given_slug = a
+                    self
+                  end
+
+                  def is_autonomous
+                    true
+                  end
+
+                  def is_visible
+                    true
+                  end
+
+                  def get_summary_a_from_sheet sht
+                  end
+
+                  def pre_execute
+                    self
+                  end
+
+                  def get_autonomous_quad argv
+                    s_a = @parent_top_client_kernel.
+                      get_normal_invocation_string_parts
+                    [ @mod::CLI.new( *
+                        @parent_top_client_kernel.three_streams, s_a ),
+                      :invoke,
+                      [ argv ],
+                      nil ]
+                  end
+                end
+
+                Adapter___ = Maker.new Brazen_
               end
             end
           end
         end
-      end
-    end
-
-    class Client__
-
-      def self.call kernel, token
-        a = kernel.get_normal_invocation_string_parts ; a.push token
-        Client__.new( * kernel.three_streams, a )
-      end
-
-      def pre_execute
-        self
-      end
-
-      def is_autonomous
-        true
-      end
-
-      def get_autonomous_quad argv
-        [ self, :invoke, [ argv ], nil ]  # receiver, method, args, block
-      end
-
-      def is_visible
-        true
-      end
-
-      def get_summary_a_from_sheet sht
       end
     end
   end

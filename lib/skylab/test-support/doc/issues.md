@@ -28,7 +28,7 @@
                exceptions) on individual test-failures like ::Rspec?
 [#008]       #tracking-tag quickie root invocation (runtime/context)
 [#007]       #tracking tag of simlar places with line / call_digraph_listeners structs
-[#006] #open test/all: redundancy points, maybe waits for [#ta-056]
+[#006] #open test/all: redundancy points, maybe waits for [#tm-056]
 [#005] #open #quickie #redundant s-tylize
 [#004] #open quickie: module names into fashion (and now narrative)
 [#003]       #done rename all_specs.rb -> all

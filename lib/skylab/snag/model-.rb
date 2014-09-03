@@ -26,86 +26,21 @@ module Skylab::Snag
 
     # ~
 
-    module Actor  # [#066]
+    module Actor
 
       class << self
-
         def [] cls, * i_a
           via_client_and_iambic cls, i_a
         end
 
         def via_client_and_iambic cls, i_a
-          cls.extend MM__ ; cls.include self
-          while i_a.length.nonzero?
-            case i_a.first
-            when :properties
-              i_a.shift
-              absrb_prps i_a, cls
-              break
-            else
-              raise ::ArgumentError, i_a.first
-            end
-          end ; nil
+          Callback_::Actor.via_client_and_iambic cls, i_a
+          cls.extend Name_Function_Methods__
+          cls.include self ; nil
         end
-      private
-        def absrb_prps i_a, cls
-          box = cls.actor_property_box_for_write
-          d = -1 ; last = i_a.length - 1 ; i = nil
-          box.add i = i_a.fetch( d += 1 ), :"@#{ i }" while d  < last ; nil
-        end
-      end
-
-      PROPERTY_BOX__ = :ACTOR_PROPERTY_BOX___
-
-      module MM__
-
-        def [] * x_a
-          new( x_a ).execute
-        end
-
-        def with * x_a
-          new x_a
-        end
-
-        define_method :actor_property_box_for_write, -> do
-          const = PROPERTY_BOX__
-          -> do
-            self.__actor_property_box_for_write__ ||= begin
-              if const_defined? const
-                const_get( const ).dup
-              else
-                const_set const, Snag_::Lib_::Entity[].box.new
-              end
-            end
-          end
-        end.call
-
-        attr_accessor :__actor_property_box_for_write__
-      end
-
-      def initialize a
-        process_argument_list_fully a
       end
 
     private
-
-      def process_argument_list_fully a
-        box = actor_property_box
-        a.length.times do |d|
-          instance_variable_set box.fetch_at_position( d ), a.fetch( d )
-        end ; nil  # #etc
-      end
-
-      def process_iambic_fully x_a
-        box = actor_property_box
-        x_a.each_slice( 2 ) do |i, x|
-          instance_variable_set box.fetch( i ), x
-        end ; nil
-      end
-
-      def actor_property_box
-        self.class.const_get PROPERTY_BOX__
-      end
 
       def send_info_event * x_a, & p
         _ev = build_and_sign_inline_event x_a, p
@@ -226,8 +161,6 @@ module Skylab::Snag
       end
       attr_reader :parent
     end
-
-    Actor::MM__.include Name_Function_Methods__
 
     # ~
 

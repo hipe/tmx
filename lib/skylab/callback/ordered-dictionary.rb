@@ -198,6 +198,6 @@ module Skylab::Callback
           @ordered_dictionary = box ; nil
         end
       end
-      Box__ = Callback_::Lib_::Entity[].box
+      Box__ = Callback_::Box
     end
 end

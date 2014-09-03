@@ -538,6 +538,11 @@ module Skylab::Brazen
         help_renderer.output_invite_to_general_help
       end
 
+      def receive_payload_event ev
+        _a = render_event_lines ev
+        send_payload_event_lines _a ; nil
+      end
+
       def payload_output_line_yielder
         @parent.payload_output_line_yielder
       end
@@ -614,6 +619,10 @@ module Skylab::Brazen
 
       def redundancy_filter
         @redundancy_filter ||= CLI::Redundancy_Filter__.new
+      end
+
+      def send_payload_event_lines a
+        a.each( & payload_output_line_yielder.method( :<< ) ) ; nil
       end
 
       def send_non_payload_event_lines a
@@ -1015,7 +1024,7 @@ module Skylab::Brazen
     end
 
     STANDARD_ACTION_PROPERTY_BOX__ = -> do
-      box = Entity_[].box.new
+      box = Callback_::Box.new
       box.add :help, Property__.new( :help,
         :argument_arity, :zero,
         :desc, -> y do
@@ -1030,7 +1039,7 @@ module Skylab::Brazen
     end.call
 
     STANDARD_BRANCH_PROPERTY_BOX__ = -> do
-      box = Entity_[].box.new
+      box = Callback_::Box.new
       box.add :action, Property__.new( :action, :is_required, true )
       box.add :help, Property__.new( :help,
         :argument_arity, :zero_or_one,

@@ -11,7 +11,7 @@ first, a quick history (most recent at top):
   |  Name                                    |  Identifier |  Approx. Start  |
   |  the [gv] isomorphic interface parameter |  [#gv-030]  |  2014-01-20     |
   |  the [hl] API parameter library          |  [#hl-130]  |  2013-12-19     |
-  |  the [ta] "config shell" (working title) |  [#ta-081]  |  2013-10-11     |
+  |  the [ta] "config shell" (working title) |  [#tm-081]  |  2013-10-11     |
   |  the [ba] field                          |  [#ba-003]  |  2013-04-11     |
   |  the [hl] parameter                      |  [#hl-009]  |  2012-08-29     |
   |  the [mh] formal attributes              |  [#024]     |  2011-09-11     |
@@ -97,7 +97,7 @@ to cram every meta-attribute that would ever be used into one scope, thinking
 mistakenly that it would somehow make life easier. it did not. a longterm
 goal is to absorb all the good parts of this into the above.
 
-(further discussion of this library is in [#ta-045] - tan-man at the time
+(further discussion of this library is in [#tm-045] - tan-man at the time
 of this writing straddled far into both libraries)
 
 
@@ -110,7 +110,7 @@ in meta-fields.
 
 ## frustraded by the diaspora, the solution was to add to it
 
-watch for upcoming "config shell" [#ta-081] that is lightweight, ground-up
+watch for upcoming "config shell" [#tm-081] that is lightweight, ground-up
 rewrite of basically all of the above. among other things, the novelty that
 this guy brings is:
   + meta-attributes *and* attributes are both modeled alongside each other
