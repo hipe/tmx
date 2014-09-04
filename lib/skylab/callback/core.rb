@@ -459,7 +459,7 @@ module Skylab::Callback
         @mod.autoloaderize_with_normpath_value @normpath, x
         x
       end
-      def lookup_x_after_loaded
+    public def lookup_x_after_loaded
         const_i = name_as_const
         if @mod.const_defined? const_i, false
           @mod.const_get const_i, false
@@ -477,7 +477,7 @@ module Skylab::Callback
       def fzzy_lookup one_p, zero_p=nil, many_p=nil  # assume no exact match
         fzzy_lookup_name_in_mod @name, @mod, one_p, zero_p, many_p
       end
-      def fzzy_lookup_name_in_mod name, mod, one_p=nil, zero_p=nil, many_p=nil
+    public( def fzzy_lookup_name_in_mod name, mod, one_p=nil, zero_p=nil, many_p=nil
         a = [] ; stem = name.as_distilled_stem
         mod.constants.each do |i|
           stem == Distill_[ i ] and a << i
@@ -487,7 +487,7 @@ module Skylab::Callback
         when  0 ; one_p ? one_p[ a.first ] : mod.const_get( a.first, false )
         when  1 ; many_p[ a ]
         end
-      end
+      end )
       def say_zero name, mod
         "#{ mod.name }::( ~ #{ name.as_slug } ) #{
           }must be but does not appear to be defined in #{
@@ -876,105 +876,15 @@ module Skylab::Callback
     class Const_Missing_
 
       def rslv_some_x_when_stowaway  # [cu] relies on this heavily
-        @stwy_core_load_relpath = @mod.stowaway_h[ @name.as_const ]
-        if @stwy_core_load_relpath.respond_to? :split
-          rslv_some_x_when_stowaway_via_relpath
+        x = @mod.stowaway_h.fetch @name.as_const
+        if x.respond_to? :split
+          Autoloader::Stowaway_Actors__::Produce_x[ self, x ]
         else
-          @stwy_core_load_relpath.call
+          x.call
         end
       end
-    private
-      def rslv_some_x_when_stowaway_via_relpath
-        @stwy_np_a = bld_stwy_normpath_a
-        load_stwy_file
-        finish_stwy_np_a
-        rslv_some_stwy_value
-      end
-      def bld_stwy_normpath_a  # #stow-1
-        s_a = @stwy_core_load_relpath.split PATH_SEP_
-        et = @stwy_et = @mod.entry_tree
-        @stwy_last = s_a.length - 1
-        d = 0 ; token = s_a.first ; mod = @mod
-        :not_loaded == @stwy_et.state_i and @stwy_et.change_state_to :loading
-        np_a = []
-        while DOT_DOT__ == token
-          const_s_a = mod.name.split CONST_SEP_
-          const_s_a.pop
-          mod = const_s_a.reduce( ::Object ) { |m, x| m.const_get x, false }
-          et = mod.entry_tree
-          np_a << et
-          token = s_a.fetch d += 1
-        end
-        begin
-          et_ = et.normpath_from_distilled Distill_[ token ]  # #todo:inelegant
-          et_ or fail "wat gives: #{ et.norm_pathname } (~ #{ token }) #{
-            }(for #{ @mod } ( ~ #{ @name.as_variegated_symbol } )"
-          :not_loaded == et_.state_i and et_.change_state_to :loading
-          np_a << et_
-          d == @stwy_last and break
-          token = s_a.fetch d += 1
-          et = et_
-        end while true
-        np_a
-      end
 
-      DOT_DOT__ = '..'.freeze
-
-      def load_stwy_file  # #stow-2
-        real_dpn = @mod.dir_pathname.join @stwy_core_load_relpath
-        if ! @stwy_et.normpath_from_distilled @name.as_distilled_stem
-          pn = real_dpn
-        end
-        np = @stwy_et.normpath_from_distilled @name.as_distilled_stem
-        np ||= @stwy_et.add_imaginary_normpath_for_correct_name @name, pn
-        :not_loaded == np.state_i and np.change_state_to :loading
-        np.assert_state :loading
-        @load_file_path = real_dpn.to_path
-        require @load_file_path
-        :loaded == @stwy_et.state_i or @stwy_et.change_state_to :loaded
-        @stwy_normpath = np ; nil
-      end
-
-      def finish_stwy_np_a
-        d = -1 ; mod = @mod
-        begin
-          np = @stwy_np_a.fetch d += 1
-          if np.value_is_known
-            x_ = np.known_value
-          else
-            np.change_state_to :loaded
-            is_broken = false ; const_i = nil
-            fzzy_lookup_name_in_mod np.name_for_lookup, mod,
-              -> c { const_i = c }, -> { is_broken = true }
-            is_broken and break
-            x_ = mod.const_get const_i, false
-            # as soon as one of these nodes it not defined, the chain of
-            # isomorphicisms is broken and we need not look any further
-            mod.autoloaderize_with_normpath_value np, x_
-          end
-          mod = x_
-        end while d < @stwy_last ; nil
-      end
-
-      def rslv_some_stwy_value
-        np = @stwy_normpath
-        if np.value_is_known
-          x = np.known_value
-        else
-          x = lookup_x_after_loaded
-          if x.respond_to?( :dir_pathname ) &&
-              x.dir_pathname != np.some_dir_pathname
-            np = Autoloader::Actors__::Resolve_relpath[ @mod, x.dir_pathname ]
-            np.assert_state :loaded
-          end
-          if np.value_is_known
-            x.entry_tree.object_id == np.object_id or self._SANITY
-          else
-            @mod.autoloaderize_with_normpath_value np, x
-          end
-        end
-        x
-      end
+      attr_reader :name, :mod
     end
 
     class Normpath_
