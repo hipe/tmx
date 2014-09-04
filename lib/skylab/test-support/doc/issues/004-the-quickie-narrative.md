@@ -76,11 +76,37 @@ if it's your idea of fun to read the whole thing .. we'll see..)
 
 
 
+
+## :#storypoint-10
+
+quickie ever running *must* be counter-conditional on ::RSpec even
+having loaded. we shudder at the thought of having to debug both running
+"at once".
+
+one way to hook into quickie is this: when you extend quickie on to a module
+it will hackishly rewrite this selfsame method based on the state of the
+ruby runtime at the time of first execution.
+
+the state we are checking for  specifically is the question of whether or not
+RSpec is in charge.
+
+
+
+
+## :#storypoint-25
+
+the way we implement our "service" is that we memoize a service instance
+once ever for the life of the ruby runtime.
+
+
+
+
 ## :#storypoint-285
 
 one client is creted per test run. it manages
 UI, parsing the request to run the tests, creating a test runtime,
 and initiating the test run on the object graph.
+
 
 
 

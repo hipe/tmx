@@ -55,12 +55,17 @@ module Skylab::TestSupport
       end
 
       def invoke argv
-        bm = QuicLib_::Function_chain[
-          -> { ready_plugins },
-          -> { parse_argv argv },
-          -> sig_a { resolve sig_a } ]
-
-        bm and bm.receiver.send bm.name
+        bc = QuicLib_::Function_chain[
+          -> do
+            ready_plugins
+          end, -> do
+            parse_argv argv
+          end, -> sig_a do
+            produce_bound_call_via_sig_a sig_a
+          end ]
+        bc and begin
+          bc.receiver.send bc.method_name, * bc.args
+        end
       end
 
       #  ~ services that plugins want ~
@@ -80,6 +85,13 @@ module Skylab::TestSupport
       def program_moniker
         @program_moniker or ::File.basename $PROGRAM_NAME
       end
+
+      def add_iambic x_a
+        @x_a_a ||= []
+        @x_a_a.push x_a ; nil
+      end
+
+      attr_reader :x_a_a
 
       def get_test_path_a  # #reach-down
         @plugins[ :run_recursive ].client.get_any_test_path_a
@@ -171,7 +183,7 @@ module Skylab::TestSupport
         end
       end
 
-      def resolve sig_a
+      def produce_bound_call_via_sig_a sig_a
         begin
           r, path = POSSIBLE_GRAPH_.reconcile_with_path_or_failure @y,
             :BEGINNING, :FINISHED, sig_a
@@ -182,7 +194,7 @@ module Skylab::TestSupport
             emit_eventpoint( current_eventpoint ) or break(( r = false ))
             (( from_pred = path_a.shift )) or break
             :EXECUTION == (( current_eventpoint = from_pred.to_i )) and
-              break(( r = resolve_executor ))  # hack for short stacks
+              break(( r = via_executor_produce_bound_call ))  # hack for short stacks
           end
         end while nil
         if false == r
@@ -192,10 +204,19 @@ module Skylab::TestSupport
         r
       end
 
-      def resolve_executor
-        e = Quickie::Execute__.new @y, get_test_path_a
+      def via_executor_produce_bound_call
+        e = Quickie::Execute__.new @y, get_test_path_a do |q|
+          x_a_a and set_quickie_options q
+        end
         e.be_verbose = @plugins[ :run_recursive ].client.be_verbose
-        (( @executor = e )).resolve
+        @executor = e
+        e.produce_bound_call
+      end
+
+      def set_quickie_options quickie
+        @x_a_a.each do |x_a|
+          quickie.with_iambic_phrase x_a
+        end ; nil
       end
 
       def emit_eventpoint eventpoint_i

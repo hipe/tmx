@@ -1,5 +1,9 @@
 # the real deal with expression agents :[#141]
 
+
+(the central document node for expression agents is [#fa-052]. this
+documnt is part of a related narrative, and is largely historical).
+
 ..picking up from where we left off in [#064] the CLI action core instance
 methods narrative:
 

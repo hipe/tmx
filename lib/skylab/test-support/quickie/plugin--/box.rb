@@ -73,6 +73,10 @@ module Skylab::TestSupport
         @host.replace_test_path_s_a path_s_a
       end
 
+      def add_iambic x_a
+        @host.add_iambic x_a ; nil
+      end
+
     private
 
       def ready_h  # assume @h is nil
@@ -224,6 +228,16 @@ module Skylab::TestSupport
           a = sig.input
           a.length.times.detect do |d|
             @rx =~ a.fetch( d )
+          end
+        end
+
+        def any_several_indexes_in_input sig
+          a = sig.input
+          a.length.times.reduce nil do |m, d|
+            if @rx =~ a.fetch( d )
+              m ||= []
+              m.push d
+            end ; m
           end
         end
       end

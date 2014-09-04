@@ -6,7 +6,7 @@ module Skylab::Headless
 
       # read [#140] the headless System narrative #section-3 - the introd..
 
-      a = [ ]  # everything added to this list will become a memoized proc
+      a = []  # everything added to this list will become a memoized proc
 
       a << :tmpdir_path << -> do
         System.defaults.tmpdir_pathname.to_s.freeze

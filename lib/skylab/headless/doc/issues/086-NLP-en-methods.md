@@ -15,7 +15,7 @@ producers, for shorter, more readable utterance templates.
 
 
 
-## how these methods handle numbers differently than their constituent functions
+## how :#these-methods handle numbers differently than their constituent functions
 
 multiple of these functions take a numerish as an argument. by "numerish"
 we mean "something we construe a count from" e.g an array is construed
@@ -27,13 +27,14 @@ subsequent calls that would otherwise take the same argument. this can
 make articulation code more readable, depending of course the natural
 language and the articulation. compare:
 
-  "#{ both a }the following thing#{ s a } #{ s a, :was } missing:"
+    "#{ both a }the following thing#{ s a } #{ s a, :was } missing:"
 
-  "#{ both a }the following thing#{ s } #{ s :was } missing:"
+    "#{ both a }the following thing#{ s } #{ s :was } missing:"
 
-the cost of this is storing the numerish in an in ivar, which is why
-these are methods and not functions. use with caution: no mechanism is
-here provided to "clear the cache" to safeguard you from
+the cost of this is that we store the numerish in an in ivar, which
+means the expression agent now has state, which is why these are methods
+and not functions. it is a trade-off: use with caution, because no
+mechanism is yet provided to "clear the cache" to safeguard you from
 unintentionally re-using a stale "numerish" in a syntactically
 external articulation.
 

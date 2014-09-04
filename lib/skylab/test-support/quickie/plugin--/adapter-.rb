@@ -40,6 +40,10 @@ module Skylab::TestSupport
         a
       end
 
+      def add_iambic x_a
+        @svc.add_iambic x_a ; nil
+      end
+
       def _svc  # #hacks-only
         @svc
       end

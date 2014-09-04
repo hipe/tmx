@@ -12,38 +12,38 @@ module Skylab::Headless
   end
 
   module Pen::InstanceMethods
-                                  # (trying to use these when appropriate:
-                        # http://www.w3schools.com/tags/tag_phrase_elements.asp)
 
-    def em s                      # style for emphasis
+    # follows [#fa-052]:#the-semantic-markup-guidelines
+
+    def em s
       s
     end
 
-    def hdr s                     # style as a header
+    def hdr s
       em s
     end
 
-    def h2 s                      # style as a smaller header
+    def h2 s
       hdr s
     end
 
     white_rx = /[[:space:]]/
 
-    define_method :human_escape do |s|         # like shellescape but for
-      white_rx =~ s ? s.inspect : s            # humans -- basically use quotes
-    end                                        # iff necessary (né smart_quotes)
+    define_method :human_escape do |s|
+      white_rx =~ s ? s.inspect : s
+    end
 
-    def ick s                     # style an invalid valid
+    def ick s
       s
     end
 
-    def kbd s                     # style as e.g kbd input, code
+    def kbd s
       em s
     end
 
-    def omg s                     # style an error (string or msg)
-      ick s                       # with excessive emphasis and
-    end                           # exuberance. not for use.
+    def omg s
+      ick s
+    end
 
     def plugin_host_metaservices  # see impl.
       @_phm ||= Pen::Experimental_::Plugin_Host_MetaServices_.new self

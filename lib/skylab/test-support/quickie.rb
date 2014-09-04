@@ -7,38 +7,30 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
 
   service = nil
 
-                                  # one way to hook into quickie is this:
-                                  # when you extend quickie on to a module
-  define_singleton_method :extended do |mod|  # #pattern [#sl-111] (sorta)
+  define_singleton_method :extended do |mod|  # #storypoint-10, :+[#sl-111]~
 
-    singleton_class.send :remove_method, :extended  # redefine it below..
+    singleton_class.send :remove_method, :extended
 
-                                  # it's going to rustle the service
-    if service[].quickie_has_reign  # only contort modules if no ::RSpec!
-      define_singleton_method :extended do |md|  # redefine this selfsame method
-        md.extend ModuleMethods   # just to show that we are serious -
-      end                         # this gets our m.m in its singleton ancestor
-      extended mod                # then (gulp) call self with this new
+    if service[].quickie_has_reign
+      define_singleton_method :extended do |md|
+        md.extend ModuleMethods
+      end
+      extended mod
     else
-      define_singleton_method :extended do |*| end  # otherwise to show that we
-                                  # are serious about *not* doing quickie
-    end                           # (b.c e.g ::RSpec is loaded)
-  end                             # NOTE Quickie ever running *must* be
-                                  # counter-conditional on ::RSpec even having
-                                  # loaded! i shudder at the thought of
-                                  # debugging that.
+      define_singleton_method :extended do |*| end
+    end
+  end
 
-                                  # so what is this `service` metioned above?
-  service = -> do                 # it is a true service, it gets memoized
+  service = -> do  # #storypoint-25
     svc = Quickie::Service.new nil, Lib_::Stdout[], Lib_::Stderr[]
-    svc.listen                    # and everything (but it could be tested
-    service = -> { svc }          # in isolation)
+    svc.listen
+    service = -> { svc }
     svc
   end
 
   define_singleton_method :service do service.call end
 
-  class Quickie::Service          # ( re-opens as necessary for narrative )
+  class Quickie::Service  # ( re-opens as necessary for narrative )
 
     def initialize _, o, e
       @paystream = o ; @infostream = e
@@ -55,10 +47,10 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
 
     def listen
       @is_listening and raise ::RuntimeError, "service is already listening."
-      @is_listening = true        # state machine-esque
+      @is_listening = true  # state machine-esque
       if (( @quickie_has_reign = ! defined? ::RSpec ))
         ::Kernel.module_exec do
-          def should predicate    # define `should` for the whole world
+          def should predicate  # define `should` for the whole world
             predicate.match self
           end
         end
@@ -122,7 +114,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
 
     def resolve_describe first_desc_line, * desc_a, &p
       desc_a.unshift first_desc_line
-      ctx = ::Class.new Quickie::Context       # 1 desc always == 1 context
+      ctx = ::Class.new Quickie::Context  # 1 desc always == 1 context
       Context_init__[ ctx, desc_a, nil, p ]
       if @client
         r = @client.add_context_class_and_resolve ctx
@@ -278,6 +270,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
 
   class Quickie::Client  # #storypoint-285
     def initialize y, root_context_class
+      @at_end_of_run_p_a = nil
       @tag_desc_h = @example_producer_p = @line_set = @or_p_a = nil
       @run_option_p_a = nil
       @root_context_class = root_context_class
@@ -301,7 +294,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
 
   private
 
-    #         ~ pre-order ~
+    #  ~ (in narrative pre-order)
 
     def parse_argv argv
       if parse_opts argv
@@ -328,6 +321,10 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
       @program_name ||= ::File.basename( $PROGRAM_NAME )
     end
 
+    def at_end_of_run &p
+      ( @at_end_of_run_p_a ||= [] ).push p ; nil
+    end
+
   private
 
     Stylize__ = -> do  # the stylize diaspora :[#005] of [#hl-029]
@@ -340,7 +337,6 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     end.call
 
     define_method :kbd, & Stylize__.curry[ :green ]
-    private :kbd
 
     def parse_opts argv
       option_parser.parse! argv
@@ -361,7 +357,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
       o = Library_::OptionParser.new
       o.on '-t', '--tag TAG[:VALUE]',
           '(tries to be like the option in rspec)' do |v|
-        process_tag_argument v
+        tag_shell.receive_tag_argument v
       end
       o.on '--line NUMBER', '(experiment)' do |v|
         process_line_argument v
@@ -372,27 +368,21 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
       o
     end
 
-    def process_tag_argument val
-      md = TAG_RX__.match val
-      if ! md
-        raise ::OptionParser::InvalidArgument
-      else
-        accept_tag_argument md
-      end
+    def tag_shell
+      @tag_shell ||= bld_tag_shell
     end
-    TAG_RX__ = /\A(?<not>~)?(?<tag>[^:]+)(?::(?<val>.+))?\z/
 
-    def accept_tag_argument md
-      no, tag_s, val_s = md.captures
-      tag_i = tag_s.intern
-      val_x = val_s ? val_s.intern : true
-      @tag_desc_h ||= { }
-      ( @tag_desc_h[ no ? :exclude : :include ] ||= [ ] ) << [ tag_i, val_x ]
-      add_or_p ( if no
-        -> tagset { val_x != tagset[ tag_i ] }
-      else
-        -> tagset { val_x == tagset[ tag_i ] }
-      end )
+    def bld_tag_shell
+      Tag_Shell.new :on_error, -> _ do
+        raise ::OptionParser::InvalidArgument
+      end,
+      :on_info_trio, method( :add_tag_description ),
+      :on_filter_proc, method( :add_or_p )
+    end
+
+    def add_tag_description include_or_exclude_i, tag_i, val_x
+      @tag_desc_h ||= {}
+      ( @tag_desc_h[ include_or_exclude_i ] ||= [] ).push [ tag_i, val_x ]
       @did_add_render_tag_run_options ||= begin
         add_run_option_renderer( & method( :render_tag_run_options ) )
         true
@@ -512,9 +502,9 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
 
       cache_branch = -> depth, ctx do
         if depth < bindex  # this is a branch that both we haven't seen yet
-          bindex = depth   # (ofc) and one that is at a higher level than
-        end                # the last branch we rendered, so if we end up
-                           # flushing the branches, be sure to include this one
+          bindex = depth  # (ofc) and one that is at a higher level than
+        end  # the last branch we rendered, so if we end up
+        # flushing the branches, be sure to include this one
         bcache[ depth ] = ctx
         nil
       end
@@ -524,7 +514,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
           render_branch[ depth, bcache.fetch( depth ) ]
         end
         bindex = d  # in the future, only render branches at this depth or >
-                    # unless we see a new branch that is <, then change it
+        # unless we see a new branch that is <, then change it
       end
 
       flush_h = {
@@ -647,6 +637,8 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
 
       y << stylize( f.zero? ? p.zero? ? :green : :yellow : :red, txt )
 
+      @at_end_of_run_p_a and @at_end_of_run_p_a.each( & :call )
+
       nil
     end
 
@@ -710,7 +702,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     end
   end
 
-  #         ~ facet 1 - predicates (core) ! ~
+  #  ~ facet 1 - predicates (core) !
 
   class Quickie::Predicate
 
@@ -861,7 +853,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     end
   end
 
-  #         ~ facet 2 - should `be_<foo>( )` method_missing hack ~
+  #  ~ facet 2 - should `be_<foo>( )` method_missing hack
 
   class Quickie::Context  # re-open it
 
@@ -957,7 +949,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     }
   end
 
-  #                       ~ facet 3 - before hooks ~
+  #  ~ facet 3 - before hooks
 
   Quickie::BEFORE_H_ = { each: :before_each, all: :before_all }.freeze
 
@@ -993,7 +985,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     end
   end
 
-  #                    ~ facet N - extrinsic API for hacks ~
+  #  ~ facet N - extrinsic API for hacks
 
   #  ~ facet N.1 - `do_not_invoke!`
 
@@ -1044,6 +1036,60 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
       @client = client ; nil
     end
     attr_reader :paystream, :infostream
+  end
+
+  # ~ intrinsic / extrinsic classes exposed for hax
+
+  class Tag_Shell
+
+    def initialize * x_a
+      @send_error_p = @send_info_trio_p = @send_filter_proc_p =
+      @send_pass_filter_proc_p = @send_no_pass_filter_proc_p = nil
+      d = -1 ; last = x_a.length - 1
+      while d < last
+        i = x_a.fetch d += 1
+        md = RX__.match i
+        md or raise ::ArgumentError, i
+        ivar = :"@send_#{ md[ 0 ] }_p"
+        instance_variable_get( ivar ).nil? or raise ::ArgumentError, i
+        instance_variable_set ivar, x_a.fetch( d += 1 )
+      end
+      @send_error_p ||= ev { raise ::ArgumentError, "#{ ev }" }
+      freeze
+    end
+
+    RX__ = /(?<=\A on_ )[_a-z]+\z/x
+
+    def receive_tag_argument s
+      md = TAG_RX__.match s
+      if md
+        no, tag_s, val_s = md.captures
+        yes = ! no ; tag_i = tag_s.intern ; val_x = val_s ? val_s.intern : true
+        build_and_send_tag_byproducts_via_three_parts yes, tag_i, val_x
+      else
+        @send_error_p[ "invalid tag expression: \"#{ s }\"" ]
+      end
+    end
+    TAG_RX__ = /\A(?<not>~)?(?<tag>[^:]+)(?::(?<val>.+))?\z/
+  private
+    def build_and_send_tag_byproducts_via_three_parts yes, tag_i, val_x
+      if @send_info_trio_p
+        r = @send_info_trio_p[ yes ? :include : :exclude, tag_i, val_x ]
+      end
+      if yes
+        p = -> tagset do
+          val_x == tagset[ tag_i ]
+        end
+        @send_pass_filter_proc_p and r = @send_pass_filter_proc_p[ p ]
+      else
+        p = -> tagset do
+          val_x != tagset[ tag_i ]
+        end
+        @send_no_pass_filter_proc_p and r = @send_no_pass_filter_proc_p[ p ]
+      end
+      @send_filter_proc_p and r = @send_filter_proc_p[ p ]
+      r
+    end
   end
 
   MONADIC_TRUTH_ = ts::MONADIC_TRUTH_

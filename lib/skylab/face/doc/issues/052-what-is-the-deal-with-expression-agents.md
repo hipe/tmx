@@ -1,14 +1,127 @@
 # what is the deal with expression agents? :[#052]
 
-the expression agent is the context in which your UI strings will be
-evaluated. it is an improvement on the (headless) pen [#084]. in fact it has
-the exact same mission statement, but a different name.
+
+in simplest terms the expression agent is the context in which your UI
+strings are evaluated to be rendered for your particular modality.
+
+it is also a placeholder for a much bigger idea that we don't fully
+develop here (yet).
+
+the expression agent as a concept is an improvement on [#hl-984] the
+headless pen. in fact, although under a different name it has the exact same
+mission statement:
 
 we just went and obliterated pen, and here is all that remains of its once
 vast empire: this one grain of sand: "Pen (at this level) is an experimental
 attempt to generalize and unify a subset of the interface-level string
-decorating functions so that the same utterances can be articulated aross
+decorating functions so that the same utterances can be articulated across
 multiple modalities to whatever extent possible :[#hl-084]"
+
+
+
+## :#the-semantic-markup-guideliness
+
+before going into anything deeper, for reference we here offer our list
+of commonly used tags (method names) provided by expression agents. this
+list is not prescriptive: implement only those tags that you want/need
+for your business concerns.
+
+(we sometimes look for good fits from
+  [html tags]:(http://www.w3schools.com/tags/tag_phrase_elements.asp) )
+
++ `and_` - render a list (i.e "union") with positive, inclusive inflection.
+
+         frequently for EN we employ an "oxford comma"-style approach
+         here, by saying "X, Y and Z". this is not the place for mapping:
+         the elements of the enumerable-ish argument should be already
+         rendered strings, or values ready to be coerced into strings.
+         just like `or_`, which is the same kind of thing but has a "one"
+         arity to it as opposed to "all" (i.e. "X, Y or Z" in EN).
+         the trailing underscore in the name `and_` (and `or_`) is
+         because `and` and `or` are keywords in the host programming
+         language.
+
++ `em` - style for emphasis, alla "*foo*" in markdown, or the eponymous
+         tag in HTML. less commonly used. frequently delegated to from
+         `hdr`.
+
++ `h2` - less commonly used. equivalent to the eponymous HTML tag. when a
+         header is desired that is less prominent than `hdr`.
+
++ `hdr` - alla HTML `<h1>`, for e.g. frequently will delegate to `em`.
+
++ `human_escape` - legacy. "smart quotes" as described in `val`.
+          basically use quotes IFF necessary (né smart_quotes).
+
++ `ick` - render an invalid value (for your business definition of invalid).
+          `x` is any value. distant ancestor of [#mh-050] the `strange`
+          family of renderers, which is a a sane choice of implementation
+          for this semantic tag in a black & white string-ish modality.
+          compare to `val`, in depicting `x` we frequently like to see
+          quotes around the string (when string) to make it look clinical,
+          like we are referring to some foreign other object.
+
++ `kbd` - style e.g keyboard input or code. use only when appropriate -
+          avoid use when issuing invitations to actions, instead opt for
+          a modality-agnostic means of doing this.
+
++ `lbl` - render a label for the property field of a business entity.
+          this tag will probably be subsumed by `par`.
+
++ `par` - render a parameter name given a symbol. allows you to
+          reference it by symbolic name without needing to know what its
+          surface manifestation is in the particular modality.  for e.g.,
+          when in a command-line modality, we frequently do the fun hack of
+          rendering command line parameters either as options or as
+          arguments (or as environment variables!) appropriately.
+          this tag will probably subsume `lbl`.
+          the (somewhat demanding) logic for this is tracked by [#hl-036].
+
++ `omg` - very legacy. "style an error with excessive & exuberant emphasis"
+          like `ick` but more emphatic, e.g renderd in red in CLI. eew.
+
++ `or_` - described at `and_`
+
++ `pth` - for security-ish reasons as well as aesthetics: when rendering
+          to many more porcelain-y contexts it looks too detailed to
+          render full filesystem paths; so with this tag we frequently
+          employ a variety of strategies to shorten them (usually using
+          the shorthand notations for current directory and home
+          directory ("." and "~" respectively)).
+          the legacy (and more formal) name for this is `escape_path`.
+
++ `s`   - passed a value that be resolved as a count-ish, hack the
+          letter `s` to hack-pluralize a singular into a plural for EN.
+          this same method, being one of [#hl-086]:#these-methods,
+          may be used to do much more, i.e inflecting other semantic
+          categories as well.
+
++ `val` - render a business value. if `lbl` (or `par`) represents one
+          side of a key-value pair, this is for the other. compare to
+          `ick`, here for strings we might do "smart quotes", i.e
+          quoting the string only if it has a space in it. for black and
+          whites, rendering `x` as-is is a common choice too, which
+          looks good nexted to a styled `lbl` (or `par`) tag, but can look
+          cluttered with styling of its own.
+
+
+    def em s ; pen.em s end       # style for emphasis
+
+    def human_escape s ; pen.human_escape s end  # usu. add quotes conditonally
+
+    def hdr s ; pen.hdr s end     # style as a header
+
+    def h2  s ; pen.h2  s end     # style as a smaller header
+
+    def ick s ; pen.ick s end     # style a usu. user-entered x that is invalid
+
+    def kbd s ; pen.kbd s end     # style e.g keyboard input or code
+
+    def omg s ; pen.omg s end     # style an error emphatically
+
+
+
+
 
 ## thoughts on usage
 
@@ -36,16 +149,16 @@ utterances "with" a pen:
 
 compare:
 
-  @y << "this looks #{ em 'really' } good"
-    # the `em` call above delegates to a pen (not seen).
+    @y << "this looks #{ em 'really' } good"
+      # the `em` call above delegates to a pen (not seen).
 
 to:
 
-  @y << some_expression_agent.calculate { "this looks #{ em 'really' } good" }
+    @y << some_expression_agent.calculate { "this looks #{ em 'really' } good" }
 
-more commonly wrapped as:
+sometimes wrapped as:
 
-  @y << say{ "this looks #{ em 'really' } good" }
+    @y << say{ "this looks #{ em 'really' } good" }
 
 the client is not coupled as tightly to the 'pen'-ish, and likewise where
 we make the utterances is not coupled as tightly to the client, which is
@@ -65,7 +178,9 @@ above we explained that we want to create a separation between the client
 objects that produce expressions from the methods that help to decorate those
 expressions. in this document we may refer to those methods as
 "business methods" because their particular names and composition will
-vary based on the particular business of the domain and modality.
+vary based on the particular business of the domain and modality
+(although we frequently draw from a frequent pool of "tags" that have
+emerged, see #the-semantic-markup-guidelines above).
 
 as a matter of design and principle all business methods of an expression
 agent are private. (this is the only differentiator between it and an
@@ -78,11 +193,11 @@ the reason is in how the expression agent is used: for readability we access
 the business methods of the expression agent within a block that is executed
 with the expression agent as the receiver. that is, we say:
 
-  @y << say { "i #{ em 'love' } this" }
+    @y << say { "i #{ em 'love' } this" }
 
 which is effectively:
 
-  @y << expression_agent.calculate { .. }
+    @y << expression_agent.calculate { .. }
 
 because of the way it is used, the expression agent doesn't *need* its
 business methods to be public. we therefor flip these methods private to

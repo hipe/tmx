@@ -51,6 +51,10 @@ module Skylab::Brazen
         @app_kernel
       end
 
+      def application_kernel
+        @app_kernel
+      end
+
       def action_adapter
         nil
       end
@@ -88,6 +92,10 @@ module Skylab::Brazen
 
       def payload_output_line_yielder
         @poly ||= ::Enumerator::Yielder.new( & @resources.sout.method( :puts ) )
+      end
+
+      def expression_agent_class
+        self.class.const_get :Expression_Agent__, false
       end
 
     private
@@ -543,6 +551,10 @@ module Skylab::Brazen
         send_payload_event_lines _a ; nil
       end
 
+      def expression_agent_class
+        @parent.expression_agent_class
+      end
+
       def payload_output_line_yielder
         @parent.payload_output_line_yielder
       end
@@ -645,10 +657,6 @@ module Skylab::Brazen
     # ~
 
     class Invocation__
-
-      def expression_agent_class
-        CLI::Expression_Agent__
-      end
 
       def option_parser_class
         CLI::Lib_::Option_parser[]

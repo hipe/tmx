@@ -66,29 +66,31 @@ module Skylab::Headless
 
       include Headless::Pen::InstanceMethods   # (see)
 
-      def em s                                 # style a header
-        stylize s, :strong, :green             # (`hdr` may delegate to this)
+      # the below methods follow [#fa-052]-#the-semantic-markup-guidelines
+
+      def em s
+        stylize s, :strong, :green
       end
 
-      def h2 s                                 # style a smaller header
+      def h2 s
         stylize s, :green
       end
 
-      def ick mixed                            # style an invalid value
+      def ick mixed
         %|"#{ mixed }"|
       end
 
-      def kbd s                                # style as e.g kbd input
-        stylize s, :green                      # or code
+      def kbd s
+        stylize s, :green
       end
 
-      def omg x                                # style an error with
-        x = x.to_s                             #  excessive & exuberant emphasis
-        x = x.inspect unless x.index TERM_SEPARATOR_STRING_ # (opposite human_escape)
-        stylize x, :strong, :red               # may be overkill
+      def omg x
+        x = x.to_s
+        x = x.inspect unless x.index TERM_SEPARATOR_STRING_
+        stylize x, :strong, :red
       end
 
-      def par x                                # simplified variant of [#036]
+      def par x
         kbd "<#{ x.to_s.gsub '_', '-' }>"
       end
 

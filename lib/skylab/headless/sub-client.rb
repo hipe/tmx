@@ -127,20 +127,35 @@ end
 
     # --- * ---
 
-    def em s ; pen.em s end       # style for emphasis
+    # the below methods follow [#fa-052]:#the-semantic-markup-guidelines
 
-    def human_escape s ; pen.human_escape s end  # usu. add quotes conditonally
+    def em s
+      pen.em s
+    end
 
-    def hdr s ; pen.hdr s end     # style as a header
+    def human_escape s
+      pen.human_escape s
+    end
 
-    def h2  s ; pen.h2  s end     # style as a smaller header
+    def hdr s
+      pen.hdr s
+    end
 
-    def ick s ; pen.ick s end     # style a usu. user-entered x that is invalid
+    def h2  s
+      pen.h2 s
+    end
 
-    def kbd s ; pen.kbd s end     # style e.g keyboard input or code
+    def ick s
+      pen.ick s
+    end
 
-    def omg s ; pen.omg s end     # style an error emphatically
+    def kbd s
+      pen.kbd s
+    end
 
+    def omg s
+      pen.omg s
+    end
   end
 
   EN_FUN = Headless_::Lib_::FUN_module[].new
