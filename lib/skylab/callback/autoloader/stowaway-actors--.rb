@@ -61,14 +61,23 @@ module Skylab::Callback
 
       def visit
         et = @et.normpath_from_distilled Distill_[ @token ]  # #todo:inelegant
-        et or fail "wat gives: #{ @et.norm_pathname } (~ #{ @token }) #{
-          }(for #{ @mod } ( ~ #{ @name.as_variegated_symbol } )"
+        if ! et
+          et = build_terminal_normpath
+        end
         :not_loaded == et.state_i and et.change_state_to :loading
         @np_a.push et
         et
       end
 
       DOT_DOT__ = '..'.freeze
+
+      def build_terminal_normpath
+        # et or fail "wat gives: #{ @et.norm_pathname } (~ #{ @token }) #{
+        #   }(for #{ @mod } ( ~ #{ @name.as_variegated_symbol } )"
+        slug = @name.as_slug
+        _dir_entry = Dir_Entry_.new slug
+        Entry_Tree_.new @et.norm_pathname, nil, _dir_entry
+      end
 
       def load_host_file  # #stow-2
         real_dpn = @mod.dir_pathname.join @core_relpath

@@ -508,14 +508,14 @@ module Skylab::Callback
           @dir_pn ||= parent_pn.join dir_entry.entry_s
           @norm_pathname ||= @dir_pn
         end
-        _np = @norm_pathname.to_path
+        # _np = @norm_pathname.to_path
         # $stderr.puts "#{ self.class::SNGL_LTR } PTH #{ _np }"
         SANITY_CHECK__[ @norm_pathname ]
         @parent_pn = parent_pn
         @state_i = :not_loaded
         @value_is_known = false
       end
-      def _  # #todo:during-development
+      def to_path  # #todo:during-development
         @norm_pathname.to_path
       end
       SANITY_CHECK__ = -> do

@@ -94,6 +94,7 @@ module Skylab::Callback::TestSupport::Autoloader
         _Face::TerstSerppert
       end
 
+
       if false  # integ
         _Face = TestLib_::Face__[]
         _Face::TestSupport
@@ -109,6 +110,16 @@ module Skylab::Callback::TestSupport::Autoloader
         _Face = TestLib_::Face__[]
         _TS = _Face::TestSupport
         _TS::CLI
+      end
+
+      it "entry trees get hackishly built" do
+        _TernMern = TS_::Fixtures::Frtrn_TM
+        _TernMern::Kernel_::YEP.should eql :yep
+      end
+
+      if false  # see if it integrates
+        require 'skylab/tan-man/core'
+        ::Skylab::TanMan::Kernel_
       end
 
       it "at the boundary of an integration with old :+[#027]" do
