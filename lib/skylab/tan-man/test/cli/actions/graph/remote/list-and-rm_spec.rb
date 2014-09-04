@@ -2,15 +2,15 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::CLI::Actions::Graph::Remote::List__
 
-  ::Skylab::TanMan::TestSupport::CLI::Actions::Graph::Remote[ TS__ = self ]
+  ::Skylab::TanMan::TestSupport::CLI::Actions::Graph::Remote[ TS_ = self ]
 
   include CONSTANTS
 
   extend TestSupport::Quickie
 
-  describe "[ts] CLI actions graph remote list, remove" do
+  describe "[ts] CLI actions graph remote list, remove", wip: true do
 
-    extend TS__
+    extend TS_
 
     it "N.X ( no local config file ) - whines" do
       simplified_client
@@ -67,7 +67,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph::Remote::List__
       nonstyled_info_line.should match( /updating.+done/ )
       expect_no_more_lines
       @result.should be_kind_of( ::Fixnum )
-      scn = api.invoke( [ :graph, :remote, :list ] ).result  # TanMan::API.debug!
+      scn = api.invoke( [ :graph, :remote, :list ] ).result  # TanMan_::API.debug!
       a = scn.to_a
       a.length.should eql( 1 )
       a[ 0 ].entity_key.should eql( '"jeepers.dot" remote script "oiseau.sh"' )

@@ -1,7 +1,10 @@
 require_relative '../test-support'
 
 # (reference: http://solnic.eu/2014/01/14/custom-rspec-2-matchers.html)
+
+if false
 RSpec::Matchers.define :be_sexp do |expected|
+
   match do |actual|
     not
     if /\ASexps\z/ !~ (_ = actual.class.to_s.split('::')[-2]) then
@@ -13,6 +16,7 @@ RSpec::Matchers.define :be_sexp do |expected|
   failure_message_for_should do |actual|
     @message or "unknown failure!"
   end
+end
 end
 
 module Skylab::TanMan::TestSupport::Models::DotFile::Parsing

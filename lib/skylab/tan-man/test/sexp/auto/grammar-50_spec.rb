@@ -1,6 +1,7 @@
 require_relative 'test-support'
 
-describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 50)" do
+describe "[tm] Sexp::Auto list pattern (grammar 50)", wip: true do
+
   extend ::Skylab::TanMan::TestSupport::Sexp::Auto
 
   using_grammar '50' do
@@ -11,6 +12,7 @@ describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 50)" do
         result.stmt_list.should eql(nil)
       end
     end
+
     using_input '100-one-arc.dot' do
       it_unparses_losslessly
       it "should not hiccup on whitespace" do
@@ -18,6 +20,7 @@ describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 50)" do
         a.first.unparse.should eql('Hello->World')
       end
     end
+
     using_input '200-two-arcs.dot' do
       it_unparses_losslessly
       it "does the list automagic" do
@@ -26,6 +29,7 @@ describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 50)" do
         a.last.unparse.should eql('biff->baz')
       end
     end
+
     using_input '300-three-arcs.dot' do
       it_unparses_losslessly
       it 'does the list automagic for three items' do
@@ -35,6 +39,7 @@ describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 50)" do
       end
     end
   end
+
   let(:a) do
     result = client.parse_file input_path
     result.stmt_list.stmts

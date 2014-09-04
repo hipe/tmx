@@ -2,10 +2,9 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::CLI::Actions::Graph::Tell
 
-  # Quickie enabled!
+  describe "[tm] CLI::Actions::Graph::Tell - tell the graph meaning", wip: true do
 
-  describe "#{ TanMan::CLI::Actions::Graph::Tell } - tell the graph meaning" do
-    extend ::Skylab::TanMan::TestSupport::CLI::Actions::Graph::Tell
+    extend TS_
 
 
     it "`foo means bar` assigns a heretofor unknown meaning (OMG OMG OMG)" do

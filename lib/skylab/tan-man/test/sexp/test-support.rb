@@ -1,19 +1,13 @@
 require_relative '../test-support'
 
 module Skylab::TanMan::TestSupport::Sexp
-  ::Skylab::TanMan::TestSupport[ Sexp_TestSupport = self ]
 
-  module CONSTANTS
-    Headless     = ::Skylab::Headless
-    TreetopTools = Headless::Services::TreetopTools
-  end
+  ::Skylab::TanMan::TestSupport[ TS_ = self ]
 
   include CONSTANTS
 
-  Headless = self::Headless       # so modules opened lexically inside of self
-                                  # can view this constant as a bareword inside
-                                  # their selves :/
-
+  TanMan_ = TanMan_
+  TestLib_ = TestLib_
 
   module ModuleMethods
     def using_grammar grammar_pathpart, *tags, &b
@@ -39,7 +33,7 @@ module Skylab::TanMan::TestSupport::Sexp
     end
 
     def infostream
-      Headless::System::IO.some_stderr_IO
+      TestLib_::Debug_IO[]
     end
 
     let :_input_fixtures_dir_pathname do
@@ -48,7 +42,7 @@ module Skylab::TanMan::TestSupport::Sexp
 
     -> do
 
-      constantize = Autoloader::FUN::Constantize
+      # constantize = Autoloader::FUN::Constantize
 
       rx = /\A(?<num>\d+(?:-\d+)*)(?:-(?<rest>.+))?\z/
 
@@ -69,7 +63,7 @@ module Skylab::TanMan::TestSupport::Sexp
     end
 
     let :_parser_clients_module do
-      Sexp_TestSupport::Grammars
+      TS_::Grammars
     end
 
     let :paystream do
@@ -79,5 +73,9 @@ module Skylab::TanMan::TestSupport::Sexp
     let :upstream do
       nil
     end
+  end
+
+  module Grammars
+
   end
 end

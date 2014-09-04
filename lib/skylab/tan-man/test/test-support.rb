@@ -1,36 +1,121 @@
 require_relative '../core'
 require 'skylab/test-support/core'
-require 'skylab/headless/test/test-support'
 
 module Skylab::TanMan::TestSupport
 
-  ::Skylab::TestSupport::Regret[ TanMan_TestSupport = self ]
+  ::Skylab::TestSupport::Regret[ self ]
+
+  TanMan_ = ::Skylab::TanMan
+
+  module TestLib_
+
+    memoize = -> p { p_ = -> { x = p[] ; p_ = -> { x } ; x } ; -> { p_[] } }
+
+    sidesys = TanMan_::Autoloader_.build_require_sidesystem_proc
+
+    Build_tmpdir_via_stem = -> s do
+      _path_s = Dev_tmpdir_pathname[].join( s ).to_path
+      Tmpdir[].new _path_s
+    end
+
+    CLI_client = -> x do
+      HL__[]::CLI::Client[ x ]
+    end
+
+    CLI_pen_minimal = -> do
+      HL__[]::CLI::Pen::Minimal.new
+    end
+
+    Class_creator_module_methods_module = -> mod do
+      mod.include MetaHell__[]::Class::Creator::ModuleMethods ; nil
+    end
+
+    Debug_IO = -> do
+      HL__[]::System::IO.some_stderr_IO
+    end
+
+    Dev_client = -> do
+      HL__[]::DEV::Client.new
+    end
+
+    Dev_tmpdir_pathname = -> do
+      HL__[]::System.defaults.dev_tmpdir_pathname
+    end
+
+    File_utils = memoize[ -> do
+      require 'fileutils' ; ::FileUtils
+    end ]
+
+    FU_client = -> do
+      HL__[]::IO::FU
+    end
+
+    HL__ = sidesys[ :Headless ]
+
+    IO_adapter_spy = -> do
+      HL__[]::TestSupport::IO_Adapter_Spy
+    end
+
+    JSON = memoize[ -> do
+      require 'json' ; ::JSON
+    end ]
+
+    Let = -> mod do
+      mod.extend MetaHell__[]::Let
+    end
+
+    MetaHell__ = sidesys[ :MetaHell ]
+
+    PP = memoize[ -> do
+      require 'pp' ; ::PP
+    end ]
+
+    Shellwords = memoize[ -> do
+      require 'shellwords' ; ::Shellwords
+    end ]
+
+    Three_IOs = -> do
+      HL__[]::System::IO.some_three_IOs
+    end
+
+    Tmpdir = -> do
+      TS__[]::Tmpdir
+    end
+
+    TS__ = sidesys[ :TestSupport ]
+
+    Unstyle_proc = -> do
+      HL__[]::CLI::Pen::FUN.unstyle
+    end
+
+    Unstyle_styled = -> s do
+      HL__[]::CLI::Pen::FUN.unstyle_styled[ s ]
+    end
+  end
 
   module CONSTANTS
-    Headless     = ::Skylab::Headless
-    MetaHell     = ::Skylab::MetaHell
-    TanMan       = ::Skylab::TanMan
+    TanMan_ = TanMan_
+    TestLib_ = TestLib_
     TestSupport  = ::Skylab::TestSupport
     TMPDIR_STEM  = 'tan-man'
-    TMPDIR = TestSupport::Tmpdir.
-      new( Headless::System.defaults.
-          dev_tmpdir_pathname.join( TMPDIR_STEM ).to_s )  # #todo
+    TMPDIR = TestLib_::Build_tmpdir_via_stem[ TMPDIR_STEM ]
   end
 
   include CONSTANTS # for use here, below
 
-  Autoloader = Autoloader ; TanMan = TanMan ; TMPDIR = TMPDIR  # #annoy
+  TMPDIR = TMPDIR  # #annoy
 
   # this is dodgy but should be ok as long as you accept that:
   # 1) you are assuming meta-attributes work and 2) the below is universe-wide!
   # 3) the below presents holes that need to be tested manually
+  if false
   -> o do
     o.local_conf_dirname = 'local-conf.d' # a more visible name
     o.local_conf_maxdepth = 1
     o.local_conf_startpath = -> { TMPDIR }
     o.global_conf_path = -> { TMPDIR.join 'global-conf-file' }
-  end.call TanMan::API
-
+  end.call TanMan_::API
+  end
 
   module ModuleMethods
 
@@ -56,6 +141,8 @@ module Skylab::TanMan::TestSupport
         module_eval(&b)
       end
     end
+
+    TestLib_::Class_creator_module_methods_module[ self ]
   end
 
 
@@ -110,13 +197,13 @@ module Skylab::TanMan::TestSupport
 
 
   module InstanceMethods
-    include CONSTANTS # to use MetaHell here ?
+
     include Tmpdir::InstanceMethods
 
     def clear_api_if_necessary
       if ! api_was_cleared
         @api_was_cleared = true
-        TanMan::Services.services.api.clear_all_services
+        TanMan_::Services.services.api.clear_all_services
       end
       nil
     end
@@ -128,9 +215,9 @@ module Skylab::TanMan::TestSupport
     end
 
     let :api do
-      api = TanMan::Services.services.api
+      api = TanMan_::Services.services.api
       if do_debug
-        TanMan::API.debug!
+        TanMan_::API.debug!
       end
       api
     end
@@ -140,8 +227,8 @@ module Skylab::TanMan::TestSupport
     end
 
     def build_client
-      client = Headless::DEV::Client.new
-      o = TanMan::TestSupport::ParserProxy.new client
+      client = TestLib_::Dev_client[].new
+      o = TanMan_::TestSupport::ParserProxy.new client
       o.verbose = -> { do_debug }
       if do_debug_parser_loading
         o.profile = true
@@ -214,13 +301,13 @@ module Skylab::TanMan::TestSupport
     let :output do
       o = TestSupport::IO::Spy::Group.new
       o.do_debug_proc = -> { do_debug }
-      o.line_filter! Headless::CLI::Pen::FUN.unstyle
+      o.line_filter! TestLib_::Unstyle_proc[]
       o
     end
 
     def prepare_local_conf_dir
       tmpdir = prepare_tanman_tmpdir
-      tmpdir.mkdir TanMan::API.local_conf_dirname
+      tmpdir.mkdir TanMan_::API.local_conf_dirname
       tmpdir # important
     end
 
@@ -238,9 +325,4 @@ module Skylab::TanMan::TestSupport
       end
     end
   end
-end
-
-
-if defined? ::RSpec # egads sorry -- for running CLI visual testing clients
-  require_relative 'for-rspec' # egads sorry - visual test hack
 end

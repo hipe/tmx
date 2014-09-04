@@ -1,13 +1,12 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
 ::Skylab::TestSupport::Quickie.enable_kernel_describe
 
 module Skylab::TanMan::TestSupport::API::Actions
 
-  describe "The #{ TanMan::API } action Remote Add", tanman: true,
-                                                 api_action: true do
+  describe "[tm] API action Remote Add", tanman: true, api_action: true, wip: true do
 
-    extend Actions_TestSupport
+    extend TS_
 
     action_name [:remote, :add]
 
@@ -67,9 +66,8 @@ module Skylab::TanMan::TestSupport::API::Actions
         a.length.should eql(1)
         a = a.to_a
         a.map!(&:to_a) # omg i'm so sorry
-        TanMan::TestSupport::Services::JSON || nil # ack!
         json = a.to_json
-        rows = TanMan::TestSupport::Services::JSON.parse json
+        rows = TestLib_::JSON[].parse json
         rows.length.should eql(1)
         rows.first.should eql(['fliz', 'flaz'])
       end

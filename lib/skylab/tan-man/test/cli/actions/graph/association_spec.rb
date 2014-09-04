@@ -2,11 +2,9 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::CLI::Actions::Graph
 
-  # Quickie enabled!
+  describe "[tm] CLI ::Actions::Graph association actions:", wip: true do
 
-  describe "#{ TanMan::CLI }::Actions::Graph association actions:"  do
-    extend TanMan::TestSupport::CLI::Actions::Graph
-
+    extend TanMan_::TestSupport::CLI::Actions::Graph
 
     it "`graph association add` works and adds a label!!" do
 

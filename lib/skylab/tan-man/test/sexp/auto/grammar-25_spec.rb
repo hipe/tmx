@@ -1,6 +1,7 @@
 require_relative 'test-support'
 
-describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 25)" do
+describe "[tm] Sexp::Auto list pattern (grammar 25)", wip: true do
+
   extend ::Skylab::TanMan::TestSupport::Sexp::Auto
 
   using_grammar '25' do
@@ -11,22 +12,27 @@ describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 25)" do
         result.stmt_list.should eql(nil)
       end
     end
+
     using_input '300-one-item' do
       it_unparses_losslessly
       it_yields_the_stmts 'zerp'
     end
+
     using_input '305-one-item-no-space' do
       it_unparses_losslessly
       it_yields_the_stmts 'zerp'
     end
+
     using_input '310-one-item-one-semi' do
       it_unparses_losslessly
       it_yields_the_stmts 'zerp'
     end
+
     using_input '500-two-items' do
       it_unparses_losslessly
       it_yields_the_stmts 'zerp', 'nerp'
     end
+
     using_input '800-three-items-mixed' do
       it_unparses_losslessly
       it_yields_the_stmts 'zerp', 'nerp', 'zerp'

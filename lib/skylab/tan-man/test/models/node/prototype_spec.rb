@@ -2,11 +2,9 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::Models::Node
 
-  # Quickie has arrived!
+  describe "[tm] TanMan_::Models::Node prototypes", wip: true do
 
-  describe "#{ Skylab::TanMan::Models::Node } prototypes" do
-    extend ::Skylab::TanMan::TestSupport::Models::Node
-
+    extend TS_
 
     using_input 'simple-prototype-and-graph-with/zero.dot' do
       it 'can add a node to zero nodes' do

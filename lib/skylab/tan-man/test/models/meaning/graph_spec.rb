@@ -2,13 +2,11 @@ require_relative 'graph/test-support'
 
 module Skylab::TanMan::TestSupport::Models::Meaning::Graph
 
-  # Quickie
-
-  describe "#{ TanMan::Models::Meaning::Graph } - #{
+  describe "[tm] Models::Meaning::Graph - #{
       }RESOLVING means turning a meaning into a list #{
-      }of one or more terminal meanings, So if if you try resolve" do
+      }of one or more terminal meanings, So if if you try resolve", wip: true do
 
-    extend TanMan::TestSupport::Models::Meaning::Graph
+    extend TanMan_::TestSupport::Models::Meaning::Graph
 
     context "with an empty graph" do
       let :graph do

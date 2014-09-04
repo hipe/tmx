@@ -13,11 +13,11 @@ module Skylab::TanMan::TestSupport::Models::Meaning::Graph
     def graph_from a_a
       ea = ::Enumerator.new do |y|
         a_a.each do |name, value|
-          y << TanMan::Models::Meaning.new( nil, name, value )
+          y << TanMan_::Models::Meaning.new( nil, name, value )
         end
         nil
       end
-      TanMan::Models::Meaning::Graph.new nil, ea
+      TanMan_::Models::Meaning::Graph.new nil, ea
     end
   end
 end

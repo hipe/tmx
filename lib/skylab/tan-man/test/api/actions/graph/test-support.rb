@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::TanMan::TestSupport::API::Actions::Graph
 
-  ::Skylab::TanMan::TestSupport::API::Actions[ TS__ = self ]
+  ::Skylab::TanMan::TestSupport::API::Actions[ TS_ = self ]
 
   include CONSTANTS
 

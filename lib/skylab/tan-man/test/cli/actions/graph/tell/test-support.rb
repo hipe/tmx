@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-
 module Skylab::TanMan::TestSupport::CLI::Actions::Graph::Tell
-  ::Skylab::TanMan::TestSupport::CLI::Actions::Graph[ self ]
+
+  ::Skylab::TanMan::TestSupport::CLI::Actions::Graph[ TS_ = self ]
 
   include CONSTANTS
 

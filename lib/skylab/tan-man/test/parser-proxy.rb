@@ -5,7 +5,7 @@ module Skylab::TanMan
     # a 'pure' parser thing that is divorced from our client controller
     # with a minimal amount of dedicated logic (the answer was yes)
 
-    include TanMan::Models::DotFile::Parser::InstanceMethods
+    include TanMan_::Models::DotFile::Parser::InstanceMethods
 
     public :parser
 
@@ -29,7 +29,7 @@ module Skylab::TanMan
       begin
         profile or break
         is =
-          input_adapter.type.is? TreetopTools::Parser::InputAdapter::Types::FILE
+          input_adapter.type.is? TestLib_::TTT[]::Parser::InputAdapter::Types::FILE
         is or break
         ms = parse_time_elapsed_seconds * 1000
         path = input_adapter.pathname.basename.to_s

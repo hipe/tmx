@@ -1,11 +1,10 @@
-require_relative 'test-support'
-
+require_relative '../test-support'
 
 module Skylab::TanMan::TestSupport::API::Actions
 
-  describe "The #{ TanMan::API } action Remote Rm", tanman: true,
-                                                api_action: true do
-    extend Actions_TestSupport
+  describe "[tm] API action Remote Rm", tanman: true, api_action: true, wip: true do
+
+    extend TS_
 
     action_name [:remote, :rm]
 

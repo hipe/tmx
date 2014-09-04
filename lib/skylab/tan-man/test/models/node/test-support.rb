@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::TanMan::TestSupport::Models::Node
 
-  ::Skylab::TanMan::TestSupport::Models[ Node_TestSupport = self ]
+  ::Skylab::TanMan::TestSupport::Models[ TS_ = self ]
 
   include CONSTANTS
 
@@ -11,11 +11,11 @@ module Skylab::TanMan::TestSupport::Models::Node
   module InstanceMethods
 
     def collection_class
-      TanMan::Models::Node::Collection
+      TanMan_::Models::Node::Collection
     end
 
     def _input_fixtures_dir_pathname
-      Node_TestSupport::Fixtures.dir_pathname
+      TS_::Fixtures.dir_pathname
     end
   end
 end

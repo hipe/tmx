@@ -2,9 +2,9 @@ require_relative '../test-support.rb'
 
 module Skylab::TanMan::TestSupport::API::Actions::Graph
 
-  describe "[ta] api actions graph starter list" do
+  describe "[tm] api actions graph starter list", wip: true do
 
-    extend TS__
+    extend TS_
 
     action_name %i( graph starter list )
 

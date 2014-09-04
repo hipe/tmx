@@ -2,11 +2,9 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::API
 
-  # Quickie.
+  describe "[tm] API", tanman: true, wip: true do
 
-  describe "The #{ TanMan::API } itself", tanman: true do
-
-    extend API_TestSupport
+    extend TS_
 
     it "is a persistent object" do
       ( !! api ).should eql( true )  # api.should be_trueish

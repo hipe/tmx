@@ -5,7 +5,7 @@ module Skylab::TanMan::TestSupport
     include ::Skylab::TanMan::TestSupport::Tmpdir::InstanceMethods
 
     def input str
-      argv = TanMan::TestSupport::Services::Shellwords.split str
+      argv = TestLib_::Shellwords[].split str
       self.result = cli.invoke argv
     end
 

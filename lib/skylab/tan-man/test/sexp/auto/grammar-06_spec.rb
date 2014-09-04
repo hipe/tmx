@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 06)" do
+describe "[tm] Sexp::Auto list pattern (grammar 06)", wip: true do
 
   extend ::Skylab::TanMan::TestSupport::Sexp::Auto
 
@@ -20,7 +20,9 @@ describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 06)" do
         o.should eql('aaaa')
       end
     end
+
     let(:rest) { result.e1 }
+
     using_input '200-nerp' do
       it_unparses_losslessly
       it 'the second element is array-like' do
@@ -34,6 +36,7 @@ describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 06)" do
         x.nerk.should eql('bbb2')
       end
     end
+
     using_input '300-nerp' do
       it_unparses_losslessly
       it 'lets you touch and see the final two members' do

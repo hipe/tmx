@@ -2,14 +2,12 @@ require_relative 'label/test-support'
 
 module Skylab::TanMan::TestSupport::Models::DotFile::Manipulating::Label
 
-  # Quickie compatible.
+  describe "[tm] TanMan_::Models::DotFile /manipulating/labels", wip: true do
 
-  describe "#{ Skylab::TanMan::Models::DotFile }/manipulating/labels" do
-
-    extend ::Skylab::TanMan::TestSupport::Models::DotFile::Manipulating::Label
-
+    extend TS_
 
     using_input '3.0-with-existing-label.dot' do
+
       it 'can change the value (rhs) of the label, escaping when necessary' do
         result.unparse.should eql( input_string )
 

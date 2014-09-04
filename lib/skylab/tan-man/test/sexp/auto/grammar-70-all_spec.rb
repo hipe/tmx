@@ -1,6 +1,7 @@
 require_relative 'test-support'
 
-describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammars 70*)" do
+describe "[tm] Sexp::Auto list pattern (grammars 70*)", wip: true do
+
   extend ::Skylab::TanMan::TestSupport::Sexp::Auto
 
   using_grammar '70-50-bughunt' do
@@ -10,6 +11,7 @@ describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammars 70*)" do
       end
     end
   end
+
   using_grammar '70-75-minimal-recursive-list' do
     using_input 'feep-forp' do
       it 'enumerates the nodes' do
@@ -20,6 +22,7 @@ describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammars 70*)" do
       end
     end
   end
+
   using_grammar '70-simple-recursive-list' do
     using_input '3-three' do
       it 'gets the agent names of each statement' do

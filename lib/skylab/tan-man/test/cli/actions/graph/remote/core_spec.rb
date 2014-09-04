@@ -2,15 +2,15 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::CLI::Actions::Graph::Remote::Core
 
-  ::Skylab::TanMan::TestSupport::CLI::Actions::Graph::Remote[ TS__ = self ]
+  ::Skylab::TanMan::TestSupport::CLI::Actions::Graph::Remote[ TS_ = self ]
 
   include CONSTANTS
 
   extend TestSupport::Quickie
 
-  describe "[ts]" do
+  describe "[ts] CLI action graph remote", wip: true do
 
-    extend TS__
+    extend TS_
 
     it "1.3 - help (postfix)" do
       invoke %w( g remote -h )

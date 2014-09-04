@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
 module Skylab::TanMan::TestSupport::Models::DotFile::Manipulating::Label
-  ::Skylab::TanMan::TestSupport::Models::DotFile::Manipulating[ self ]
-   Label_TestSupport = self
+
+  ::Skylab::TanMan::TestSupport::Models::DotFile::Manipulating[ TS_ = self ]
 
   include CONSTANTS
 
@@ -10,7 +10,7 @@ module Skylab::TanMan::TestSupport::Models::DotFile::Manipulating::Label
 
   module InstanceMethods
     let :_input_fixtures_dir_pathname do
-      Label_TestSupport::Fixtures.dir_pathname
+      TS_::Fixtures.dir_pathname
     end
   end
 end

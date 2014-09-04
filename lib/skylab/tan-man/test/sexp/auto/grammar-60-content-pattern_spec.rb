@@ -1,6 +1,7 @@
 require_relative 'test-support'
 
-describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 06)" do
+describe "[tm] Sexp::Auto list pattern (grammar 06)", wip: true do
+
   extend ::Skylab::TanMan::TestSupport::Sexp::Auto
 
   using_grammar '60-content-pattern' do

@@ -1,6 +1,7 @@
 require_relative 'test-support'
 
-describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 12)" do
+describe "[tm] Sexp::Auto list pattern (grammar 12)", wip: true do
+
   extend ::Skylab::TanMan::TestSupport::Sexp::Auto
 
   def self.it_trees_as arr, *tags
@@ -14,14 +15,17 @@ describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 12)" do
       it_unparses_losslessly
       it_trees_as [['aaaa']]
     end
+
     using_input '150-one-statement-two-exprs' do
       it_unparses_losslessly
       it_trees_as [['aaa3', 'bbb2']]
     end
+
     using_input '200-two-statements' do
       it_unparses_losslessly
       it_trees_as [['aaa'], ['bbb']]
     end
+
     using_input '300-two-statements-multiple-exprs' do
       it_unparses_losslessly
       it_trees_as [['aaa','aa','bb'], ['aa','bb'], ['a']]

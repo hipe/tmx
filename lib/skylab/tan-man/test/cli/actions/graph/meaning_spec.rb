@@ -2,11 +2,9 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::CLI::Actions::Graph
 
-  # Quickie enabled!
+  describe "[tm] CLI::Actions ::Graph::Meaning actions:", wip: true do
 
-  describe "#{ TanMan::CLI::Actions }::Graph::Meaning actions:" do
-
-    extend TanMan::TestSupport::CLI::Actions::Graph
+    extend TanMan_::TestSupport::CLI::Actions::Graph
 
     it "`graph meaning list` lists existing meanings found in comments!!!" do
 

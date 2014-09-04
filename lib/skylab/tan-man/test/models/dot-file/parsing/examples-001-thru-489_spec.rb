@@ -1,7 +1,7 @@
 require_relative 'test-support'
 
-describe "#{ Skylab::TanMan::Models::DotFile }#{
-  }/parsing/examples-001-thru-489" do
+
+describe "[tm] TanMan_::Models::DotFile parsing/examples-001-thru-489", wip: true do
 
   extend ::Skylab::TanMan::TestSupport::Models::DotFile::Parsing
 
@@ -11,17 +11,20 @@ describe "#{ Skylab::TanMan::Models::DotFile }#{
         result.should be_sexp(:graph)
       end
     end
+
     context "one line no spaces" do
       input 'digraph{}'
       it_unparses_losslessly
       it_yields_a_digraph_document_sexp
     end
+
     context "multiple lines lots of whitespace" do
       input " \n\n \tdigraph { \t } \n "
       it_unparses_losslessly
       it_yields_a_digraph_document_sexp
     end
   end
+
   context 'parsing a digraph with minimal content' do
     using_input '100-hello-world.dot' do
       it_unparses_losslessly
@@ -33,6 +36,7 @@ describe "#{ Skylab::TanMan::Models::DotFile }#{
         a.first.object_id.should eql(stmt.object_id)
       end
     end
+
     using_input '200.dot' do
       it_unparses_losslessly
       it 'can get 2 items' do
@@ -42,6 +46,7 @@ describe "#{ Skylab::TanMan::Models::DotFile }#{
         a.last.unparse.should eql('three->four')
       end
     end
+
     using_input '410-node-with-dbl-quotes.dot' do
       it 'unparses losslessly (custom)' do
         result.stmt_list.stmt.unparse.should eql('"node0"')
@@ -53,6 +58,7 @@ describe "#{ Skylab::TanMan::Models::DotFile }#{
         node_stmt[:node_id].id.content_text_value.should eql('node0')
       end
     end
+
     using_input '480-bughunt-reduction.dot' do
       it_unparses_losslessly
       it 'works' do

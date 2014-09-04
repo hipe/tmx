@@ -1,12 +1,10 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
+module Skylab::TanMan::TestSupport::API::Actions::Graph
 
-module Skylab::TanMan::TestSupport::API::Actions
+  describe "[tm] API action Graph Starter Set", tanman: true, api_action: true, wip: true do
 
-  describe "The #{ TanMan::API } action Graph Starter Set", tanman: true,
-                                                        api_action: true do
-
-   extend Actions_TestSupport
+   extend TS_
 
     action_name [:graph, :starter, :set]
 

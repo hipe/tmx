@@ -1,8 +1,7 @@
 require_relative 'test-support'
 
 
-describe "#{ Skylab::TanMan::Models::DotFile }#{
-  }/parsing/examples-490-699" do
+describe "[tm] TanMan_::Models::DotFile /parsing/examples-490-699", wip: true do
 
   extend ::Skylab::TanMan::TestSupport::Models::DotFile::Parsing
 
@@ -18,12 +17,14 @@ describe "#{ Skylab::TanMan::Models::DotFile }#{
       stmt.edge_rhs.recipient.id.content_text_value.should eql('node1')
     end
   end
+
   using_input '500-datastruct.dot' do
     it 'should parse and loslessly unparse this representative example' do
       (!! result).should eql(true)
       result.unparse.should eql(input_string)
     end
   end
+
   using_input '699-psg.dot' do
     it 'should parse this representative graph with HTML in it' do
       (!! result).should eql(true)

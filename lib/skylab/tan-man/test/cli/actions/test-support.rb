@@ -1,20 +1,15 @@
 require_relative '../test-support'
 
 module Skylab::TanMan::TestSupport::CLI::Actions
-  ::Skylab::TanMan::TestSupport::CLI[ Actions_TestSupport = self ]
+
+  ::Skylab::TanMan::TestSupport::CLI[ TS_ = self ]
 
   include CONSTANTS
-
-
-  if defined? ::RSpec             # ack - avoid loading rspec-depedant things
-    require_relative 'for-rspec'  # when we are running (e.g. visal tests)
-  end                             # without rspec -- we might be weening off
-
 
   module InstanceMethods
 
     def cd pathname, &block
-      fu = Headless::IO::FU.new -> msg do
+      fu = TestLib_::FU_client[].new -> msg do
         if do_debug
           TestSupport::Stderr_[].puts "    (tanmun vreeboze: #{ msg })"
         end
@@ -28,7 +23,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions
 
     def build_client
       spy = output # IO::Spy::Group
-      o = TanMan::CLI.new nil, spy.for( :paystream ), spy.for( :infostream )
+      o = TanMan_::CLI.new nil, spy.for( :paystream ), spy.for( :infostream )
       o.program_name = 'timmin'
       o
     end

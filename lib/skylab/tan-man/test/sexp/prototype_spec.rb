@@ -1,12 +1,10 @@
 require_relative 'prototype/test-support'
 
-# Quickie has arrived to this spec
-
 module Skylab::TanMan::TestSupport::Sexp::Prototype
-  describe "#{ TanMan::Sexp::Prototype } will be awesome" do
-  # a hiccup in indentation starts here for quickie :/
 
-  extend Prototype_TestSupport
+  describe "[tm] Sexp::Prototype will be awesome", wip: true do
+
+    extend TS_  # #borrow:one
 
   using_grammar '70-38-simplo' do
     using_input_string '', 'totally empty input string' do

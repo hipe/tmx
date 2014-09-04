@@ -1,15 +1,19 @@
 require_relative '../test-support'
 
 module ::Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
-  ::Skylab::TanMan::TestSupport::Sexp::Auto[ self ]
-  Recursive_Rule_TestSupport = self
+
+  ::Skylab::TanMan::TestSupport::Sexp::Auto[ TS_ = self ]
 
   include CONSTANTS
 
   extend TestSupport::Quickie
 
+  TestLib_ = TestLib_
+
   module ModuleMethods
+
     def give_stmt_list_a_prototype
+
       alias_method :_stmt_list, :stmt_list
       let :stmt_list do           # egads we duplicate a hack that occurs elsew.
         _stmt_list # kick
@@ -71,8 +75,10 @@ module ::Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
   end
 
   module Stmt_List_I_M
+
+    TestLib_::Let[ self ]
+
     include CONSTANTS
-    extend MetaHell::Let
 
     def go node_to_insert_string
       new_before_this = FUN.new_before_this[stmt_list, node_to_insert_string]

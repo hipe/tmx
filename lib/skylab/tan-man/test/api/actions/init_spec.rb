@@ -2,38 +2,37 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::API::Actions
 
-  TanMan::TestSupport::Services::JSON || nil # load it
+  describe "the [ta] API action Init", tanman: true, api_action: true, wip: true do
 
-  describe "the #{ TanMan::API } action Init", tanman: true,
-                                           api_action: true do
-
-    extend Actions_TestSupport
+    extend TS_
 
     action_name :init
 
     context "with some bad args" do
+
       let :event do
         api_invoke these: 'are', invalid: 'args'
         response.events.first
       end
 
-      context "event stream name" do
-        subject { event.stream_name }
-        specify { should eql(:error) }
+      it "event stream name" do
+        event.stream_name.should eql :error
       end
 
-      context "event message" do
-        subject { event.message }
-        specify { should match(/invalid action parameters: \(these, invalid\)/)}
+      it "event message" do
+        x = event.message
+        x.should match %r(\binvalid action parameters: \(these, invalid\))
       end
     end
 
     context "with regards to working or not working" do
-      before do
-        prepare_tanman_tmpdir
-      end
 
       context "when the folder isn't initted" do
+
+        before :each do
+          prepare_tanman_tmpdir
+        end
+
         it "works (with json formatting)" do
           api_invoke path: TMPDIR # not *from* tmpdir, path is argument
           response.success?.should eql( true )
@@ -42,8 +41,9 @@ module Skylab::TanMan::TestSupport::API::Actions
           event[ :stream_name ].should eql( :info )
           event[ :shape ].should eql( :textual )
           event[ :payload ].should match( /mkdir local-conf\.d/ )
-          json = ::JSON.pretty_generate response
-          unencoded_a = ::JSON.parse json
+          _JSON = TestLib_::JSON[]
+          json = _JSON.pretty_generate response
+          unencoded_a = _JSON.parse json
           unencoded_a.length.should eql( 2 )
           event = unencoded_a[ 0 ]
           event[ 'stream_name' ].should eql( 'info' )
@@ -53,7 +53,12 @@ module Skylab::TanMan::TestSupport::API::Actions
       end
 
       context "when the folder already initted" do
-        before { prepare_local_conf_dir }
+
+        before :each do
+          prepare_tanman_tmpdir
+          prepare_local_conf_dir
+        end
+
         it "will gracefully give a notice" do
           api_invoke path: TMPDIR # not *from* tmpdir
           response.events.length.should be_gte(1)
@@ -65,6 +70,11 @@ module Skylab::TanMan::TestSupport::API::Actions
       end
 
       context "when you pass it a path that does not exist" do
+
+        before :each do
+          prepare_tanman_tmpdir
+        end
+
         it "it derps" do
           path = TMPDIR.join( 'not-exist' ).to_s
           api_invoke path: path # not *from* tmpdir
@@ -78,6 +88,11 @@ module Skylab::TanMan::TestSupport::API::Actions
       end
 
       context "when you pass it a path that is a file not a folder" do
+
+        before :each do
+          prepare_tanman_tmpdir
+        end
+
         it "it derps" do
           TMPDIR.touch 'nerk'
           api_invoke path: TMPDIR.join('nerk') # not *from* tmpdir

@@ -2,11 +2,9 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::Models::Association
 
-  # Quickie enabled
+  describe "[tm] Models::Association associate", wip: true do
 
-
-  describe "#{ TanMan::Models::Association } associate" do
-    extend Association_TestSupport
+    extend TS_
 
     using_input '../../node/fixtures/simple-prototype-and-graph-with/zero-but-with-leading-space.dot' do
       it 'associates nodes when neither exists, creating them' do

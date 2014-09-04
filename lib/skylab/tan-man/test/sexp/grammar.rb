@@ -11,26 +11,33 @@ module Skylab::TanMan::TestSupport::Sexp
                                   # testing and dev.  remember we want to stay
                                   # clear of aritrary application code porcelain
 
+    extend module ModuleMethods
 
-    include CONSTANTS
+      TestLib_::Let[ self ]
 
-    Autoloader[ self ]            # we need it now for next line
-    extend self::ModuleMethods    # (autoloads the eponymous file here)
+      let :fixtures_dir_pathname do
+        dir_pathname.join('../fixtures').to_s
+      end
 
-    extend MetaHell::Let
+      let :grammars_module do
+        to_s.split('::')[0..-2].reduce(::Object) { |m, k| m.const_get k, false }
+      end
 
-    include TanMan::Models::DotFile::Parser::InstanceMethods # err msg porcelain
-    include TanMan::TestSupport::Tmpdir::InstanceMethods #prepared_tanman_tmpdir
+      self
+    end
 
-    Headless::CLI::Client[ self ]
+    include TanMan_::Models::DotFile::Parser::InstanceMethods # err msg porcelain
+    include TanMan_::TestSupport::Tmpdir::InstanceMethods #prepared_tanman_tmpdir
+
+    TestLib_::CLI_client[ self ]
 
     -> do
-      pen = Headless::CLI::Pen::Minimal.new
-      def pen.escape_path str
+      pen = TestLib_::CLI_pen_minimal[]
+      def pen.pth str
         "«#{ str }»"                # :+#guillemets just for fun and practice
       end
 
-      sin, sout, serr = Headless::System::IO.some_three_IOs
+      sin, sout, serr = TestLib_::Three_IOs[]
 
       define_method :initialize do |i=sin, o=sout, e=serr|
         # observe pattern [#sl-114]
@@ -109,7 +116,7 @@ module Skylab::TanMan::TestSupport::Sexp
         fail "must be a valid method name: #{eval_string.inspect}"
       end
       _ = result.send eval_string
-      TanMan::TestSupport::Services::PP.pp _, io_adapter.errstream
+      TestLib_::PP[].pp _, io_adapter.errstream
       true
     end
 
@@ -123,7 +130,7 @@ module Skylab::TanMan::TestSupport::Sexp
         if eval_string
           eval_string_run result
         else
-          TanMan::TestSupport::Services::PP.pp result, io_adapter.errstream
+          TestLib_::PP[].pp result, io_adatper.errstream
           true
         end
       end
@@ -137,7 +144,7 @@ module Skylab::TanMan::TestSupport::Sexp
       f = on_load_parser_info ||
         -> e { info "      (loading parser ^_^ #{ gsub_path_hack e.to_s })" }
 
-      TreetopTools::Parser::Load.new( self,
+      TestLib_::TTT[]::Parser::Load.new( self,
         -> o do
           force_overwrite and o.force_overwrite!
           o.generated_grammar_dir tmpdir_prepared
@@ -177,7 +184,7 @@ module Skylab::TanMan::TestSupport::Sexp
               self.upstream = build_file_input_adapter @pathname
               ok = true
             else
-              error "file not found: #{ escape_path @pathname }"
+              error "file not found: #{ pth @pathname }"
             end
           else
             error "can't have both STDIN and <pathspec>: #{ path }"
@@ -193,7 +200,7 @@ module Skylab::TanMan::TestSupport::Sexp
       /\A  #{ anchor_module_head }  (.+)  \z/x
     end
 
-    pathify_p = Autoloader::FUN::Pathify
+    pathify_p = :_TO_DO_ #  Autoloader::FUN::Pathify
 
     let :stem_path do
       pathify_p[ stem_const_rx.match(self.class.to_s)[1] ]
@@ -234,7 +241,7 @@ module Skylab::TanMan::TestSupport::Sexp
 
     def verbose_parsing= bool     # `verbose_parsing` as a concept is confined
       if bool                     # to this file for now!
-        TanMan::Sexp::Auto.do_debug = true
+        TanMan_::Sexp::Auto.do_debug = true
       end
     end
   end

@@ -1,20 +1,19 @@
-require_relative 'test-support'
-
+require_relative '../test-support'
 
 module Skylab::TanMan::TestSupport::API::Actions
 
-  describe "The #{ TanMan::API } action Remote List", tanman: true,
-                                                  api_action: true do
-    extend Actions_TestSupport
+  describe "[tm] API action Remote List", tanman: true, api_action: true, wip: true do
+
+    extend TS_
 
     action_name [:remote, :list]
 
-    before do
-      prepare_tanman_tmpdir
-    end
-
     context "when there are no conf dirs at all" do
-      before { prepared_tanman_tmpdir }
+
+      before :each do
+        prepared_tanman_tmpdir
+      end
+
       it "result is an error event explaining the situation" do
         api_invoke
         lone_error( /local conf dir not found/ )
@@ -22,7 +21,12 @@ module Skylab::TanMan::TestSupport::API::Actions
     end
 
     context "where there is a local conf dir" do
-      before { prepare_local_conf_dir }
+
+      before :each do
+        prepare_tanman_tmpdir
+        prepare_local_conf_dir
+      end
+
       it "result is an enumerator, no events" do
         api_invoke
         response.events.length.should eql(0)

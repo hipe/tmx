@@ -2,13 +2,9 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::CLI::Actions::Graph
 
-  # Quickie enabled!
-                                               # (we want to be sure it lazy
-  describe "#{ TanMan::CLI::Actions }::Graph::Node actions:" do # loads itself
-                                               # properly so don't load it
-                                               # here in the name)
+  describe "[tm] CLI::Actions ::Graph::Node actions:", wip: true do
 
-    extend TanMan::TestSupport::CLI::Actions::Graph
+    extend TanMan_::TestSupport::CLI::Actions::Graph
     context "`graph node add`" do
       it "to a empty 'digraph' -- makes up its own prototype!!" do
         using_dotfile 'digraph{}'

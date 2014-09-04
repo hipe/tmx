@@ -1,7 +1,8 @@
 require_relative '../test-support'
 
 module Skylab::TanMan::TestSupport::API::Actions
-  ::Skylab::TanMan::TestSupport::API[ Actions_TestSupport = self ] # #regret
+
+  ::Skylab::TanMan::TestSupport::API[ TS_ = self ] # #regret
 
   include CONSTANTS # for the spec itself
 
@@ -30,7 +31,7 @@ module Skylab::TanMan::TestSupport::API::Actions
     attr_reader :api_last_response # or the shorter `response` below
 
     def from_tmpdir &b
-      TanMan::TestSupport::Services::FileUtils.cd( prepared_tanman_tmpdir, & b )
+      TestLib_::File_utils[].cd prepared_tanman_tmpdir, & b
     end
 
     def lone_error regex
@@ -52,5 +53,3 @@ module Skylab::TanMan::TestSupport::API::Actions
     end
   end
 end
-
-defined? ::RSpec and require_relative 'for-rspec'

@@ -3,14 +3,17 @@ require_relative '../test-support'
 ::Skylab::TestSupport::Quickie.enable_kernel_describe
 
 module ::Skylab::TanMan::TestSupport::Sexp::Auto
+
   ::Skylab::TanMan::TestSupport::Sexp[ self ]
 
   module ModuleMethods
+
     def it_unparses_losslessly *tags
       it "unparses losslessly", *tags do
         result.unparse.should eql(normalized_input_string)
       end
     end
+
     def it_yields_the_stmts *items
       tags = ::Hash === items.last ? [items.pop] : [ ]
       it "yields the #{items.length} items", *tags do

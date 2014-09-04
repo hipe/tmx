@@ -2,20 +2,20 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::CLI::Actions
 
-  describe "The #{ TanMan } CLI action", tanman: true,
-                            cli_action: true do
-    extend Actions_TestSupport
+  describe "[tm] CLI action `remote`", tanman: true, cli_action: true, wip: true do
 
+    extend TS_
 
     paystream = :paystream ; infostream = :infostream
 
     context 'for remotes' do
 
-      before do
-        prepare_tanman_tmpdir              # TMPDIR.prepare
-      end
-
       context 'when there is no local config directory' do
+
+        before :each do
+          prepare_tanman_tmpdir
+        end
+
         it "cannot get added, whines about no directory" do
           input 'remote add bing bong'
           output_shift_is infostream,
@@ -34,9 +34,11 @@ module Skylab::TanMan::TestSupport::CLI::Actions
       end
 
       context 'when there is a local config directory' do
-        before do
-          prepare_local_conf_dir
-        end
+
+        context "-" do
+          before :each do
+            prepare_local_conf_dir
+          end
 
         it 'you can add a local remote' do
           input 'remote add bing bong'
@@ -44,8 +46,14 @@ module Skylab::TanMan::TestSupport::CLI::Actions
             'while ferp was adding remote: creating config .. done (146 bytes.)',
             true
         end
+        end
 
         context 'you can list the remotes' do
+
+          before :each do
+            prepare_local_conf_dir
+          end
+
           it 'when there are no remotes.' do
             input 'remote list'
             output_shift_only_is infostream,
@@ -61,7 +69,8 @@ module Skylab::TanMan::TestSupport::CLI::Actions
         end
 
         context 'when removing a remote' do
-          before do
+
+          before :each do
             input 'remote add foo bar'
             output.lines.clear
             input 'remote list'

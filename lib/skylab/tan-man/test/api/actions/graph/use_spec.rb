@@ -1,22 +1,16 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
+module Skylab::TanMan::TestSupport::API::Actions::Graph
 
-module Skylab::TanMan::TestSupport::API::Actions
+  describe "[tm] API action (graph) Use", tanman: true, api_action: true, wip: true do
 
-  # *NOTE* these tests really do create files so it is vital that
-  # you make sure to cd into the tmpdir (blown away and recreated for us
-  # on calls to `prepare_tanman_tmpdir`) for now!
-
-  describe "The #{ TanMan::API } action (graph) Use", tanman: true,
-                                          api_action: true do
-
-    extend Actions_TestSupport
+    extend TS_
 
     action_name [:graph, :use]
 
     context "when we are not initted" do
 
-      before do
+      before :each do
         prepare_tanman_tmpdir
       end
 
@@ -38,7 +32,7 @@ module Skylab::TanMan::TestSupport::API::Actions
 
     context "when we are initted" do
 
-      before do
+      before :each do
         prepare_local_conf_dir
       end
 

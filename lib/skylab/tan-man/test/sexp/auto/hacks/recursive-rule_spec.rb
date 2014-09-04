@@ -1,8 +1,10 @@
 require_relative 'test-support'
 
 module ::Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
-  describe "#{ TanMan::Sexp }::Auto hacks recursive rule - THE GAUNTLET" do
-    extend Recursive_Rule_TestSupport
+
+  describe "[tm] Sexp ::Auto hacks recursive rule - THE GAUNTLET", wip: true do
+
+    extend TS_
 
     context "with stmt_list" do
       include Stmt_List_I_M

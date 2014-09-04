@@ -2,11 +2,11 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::CLI
 
-  describe "#{ TanMan::CLI::Action } failed_sentence" do
+  describe "[tm] CLI::Action failed_sentence", wip: true do
 
     def self.o a, s, *t
       it "#{ s }", *t do
-        out_a = TanMan::CLI::Action.assemble_failed_a a
+        out_a = TanMan_::CLI::Action.assemble_failed_a a
         out_s = out_a * ' '
         out_s.should eql( s )
       end
@@ -34,12 +34,14 @@ module Skylab::TanMan::TestSupport::CLI
        "tanman trepidatious external services failed to delete connection"
   end
 
-  describe "#{ TanMan::CLI::Action } inflect_failure_reason" do
+  describe "[tm] CLI::Action inflect_failure_reason", wip: true do
 
-    extend CLI_TestSupport
+    extend TS_
 
-    klass :Action, extends: TanMan::CLI::Action do |o|
+    if false
+    klass :Action, extends: TanMan_::CLI::Action do |o|
       self::ACTIONS_ANCHOR_MODULE = o.Actions
+    end
     end
 
     modul :Actions do

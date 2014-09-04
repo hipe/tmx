@@ -2,9 +2,7 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::Models::Meaning
 
-  # Quickie compatible.
-
-  describe "#{ TanMan::Models::Meaning } core" do
+  describe "[tm] Models::Meaning core", wip: true do
 
     extend ::Skylab::TanMan::TestSupport::Models::Meaning
 
@@ -17,7 +15,7 @@ module Skylab::TanMan::TestSupport::Models::Meaning
       O
       stmt = graph._node_stmts.to_a.first
       alist = stmt.attr_list.content
-      alist.class.should eql( TanMan::Models::DotFile::Sexps::AList ) # meh
+      alist.class.should eql( TanMan_::Models::DotFile::Sexps::AList ) # meh
       alist._prototype = graph.class.parse :a_list, 'a=b, c=d'
       alist.unparse.should eql( 'label=barl' )
       alist._prototype.unparse.should eql( 'a=b, c=d' )

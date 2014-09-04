@@ -2,11 +2,9 @@ require_relative '../test-support'
 
 module Skylab::TanMan::TestSupport::CLI
 
-  ::Skylab::TanMan::TestSupport[ CLI_TestSupport = self ]
+  ::Skylab::TanMan::TestSupport[ TS_ = self ]
 
-  include CONSTANTS # so we can say TanMan in the spec's module
-
-  Headless = Headless
+  include CONSTANTS # so we can say TanMan_ in the spec's module
 
   extend TestSupport::Quickie
 
@@ -14,16 +12,15 @@ module Skylab::TanMan::TestSupport::CLI
 
     include CONSTANTS
 
-    include MetaHell::Class::Creator::ModuleMethods
   end
 
   module InstanceMethods
 
     include CONSTANTS
 
-    extend MetaHell::Let
+    # extend MetaHell::Let
 
-    include MetaHell::Class::Creator::InstanceMethods
+    # include MetaHell::Class::Creator::InstanceMethods
 
     def invoke * argv
       if 1 == argv.length and argv[ 0 ].respond_to?( :each_with_index )
@@ -55,12 +52,12 @@ module Skylab::TanMan::TestSupport::CLI
     end
 
     def meta_hell_anchor_module
-      CLI_TestSupport::Sandbox
+      TS_::Sandbox
     end
 
     let :action do
       k = klass
-      if ! k.ancestors.include? TanMan::CLI::Action
+      if ! k.ancestors.include? TanMan_::CLI::Action
         fail "sanity - klass looks funny: #{ k }"
       end
       client or fail 'client?'
@@ -70,7 +67,7 @@ module Skylab::TanMan::TestSupport::CLI
 
     let :cli do
       spy = output
-      o = TanMan::CLI.new nil, spy.for(:paystream), spy.for(:infostream)
+      o = TanMan_::CLI.new nil, spy.for(:paystream), spy.for(:infostream)
       o.program_name = 'ferp'
       o
     end
@@ -84,7 +81,7 @@ module Skylab::TanMan::TestSupport::CLI
     end
 
     def build_client
-      ioa = Headless::TestSupport::IO_Adapter_Spy.new
+      ioa = IO_adapter_spy[].new
       ioa.do_debug_proc = -> { do_debug }
       build_client_wired_with ioa
     end
@@ -109,7 +106,7 @@ module Skylab::TanMan::TestSupport::CLI
     end
 
     def build_client_wired_with ioa
-      o = TanMan::CLI.new :tanman_nosee_1, :tanman_nosee_2, :tanman_nosee_3
+      o = TanMan_::CLI.new :tanman_nosee_1, :tanman_nosee_2, :tanman_nosee_3
       o.program_name = 'tanmun'
       ioa_ = o.io_adapter
       ioa.pen = ioa_.pen
@@ -155,13 +152,13 @@ module Skylab::TanMan::TestSupport::CLI
     end
 
     def expect_line_is_styled line
-      unstyled = Headless::CLI::Pen::FUN.unstyle_styled[ line ]
+      unstyled = TestLib_::Unstyle_styled[ line ]
       unstyled or fail "expecting styled line, had - #{ line.inspect }"
       unstyled
     end
 
     def expect_line_is_not_styled line
-      unstyled = Headless::CLI::Pen::FUN.unstyle_styled[ line ]
+      unstyled = TestLib_::Unstyle_styled[ line ]
       unstyled and fail "expecting non-styled line, had - #{ line.inspect }"
       line
     end
