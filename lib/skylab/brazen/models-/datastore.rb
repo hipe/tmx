@@ -6,6 +6,8 @@ module Skylab::Brazen
       o :desc, -> y do
         y << "manage datastores."
       end
+
+      o :after, :workspace
     end ]
 
     class << self

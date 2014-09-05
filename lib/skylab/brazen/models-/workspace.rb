@@ -19,6 +19,8 @@ module Skylab::Brazen
         y << "manage workspaces."
       end
 
+      o :after, :status
+
       o :persist_to, :git_config
     end ]
 

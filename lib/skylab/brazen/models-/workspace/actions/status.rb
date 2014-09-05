@@ -14,6 +14,8 @@ module Skylab::Brazen
 
       o :is_promoted
 
+      o :after, :init
+
 
 
 

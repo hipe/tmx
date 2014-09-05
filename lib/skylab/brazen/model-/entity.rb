@@ -4,6 +4,11 @@ module Skylab::Brazen
 
   Entity = Entity_[][ -> do
 
+    o :ad_hoc_processor, :after, -> scan do
+      scan.scanner.advance_one
+      scan.reader.after_i = scan.scanner.gets_one ; nil
+    end
+
     o :ad_hoc_processor, :desc, -> scan do
       scan.scanner.advance_one  # `desc`
       scan.reader.description_block = scan.scanner.gets_one ; nil

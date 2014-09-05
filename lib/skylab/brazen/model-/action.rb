@@ -6,7 +6,7 @@ module Skylab::Brazen
 
     class << self
 
-      attr_accessor :description_block, :is_promoted
+      attr_accessor :after_i, :description_block, :is_promoted
 
       def process_some_customized_inflection_behavior scanner
         Process_customized_action_inflection_behavior__[ scanner, self ] ; nil

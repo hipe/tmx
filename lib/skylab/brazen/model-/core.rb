@@ -4,7 +4,7 @@ module Skylab::Brazen
 
     class << self
 
-      attr_accessor :description_block, :persist_to
+      attr_accessor :after_i, :description_block, :persist_to
 
       def build_collections kernel
         if ! const_defined? :Collections__, false

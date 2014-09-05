@@ -227,6 +227,10 @@ module Skylab::Brazen
         end
       end
 
+      def wrap_scanner_with_ordering_buffer scn
+        CLI::Actors__::Via_after_produce_ordered_scanner[ scn ]
+      end
+
       def leaf_class
         Action_Adapter__
       end

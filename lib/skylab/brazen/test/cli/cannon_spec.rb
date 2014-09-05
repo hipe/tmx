@@ -30,16 +30,36 @@ module Skylab::Brazen::TestSupport::CLI
       expect_header_line 'actions'
 
       expect %r(\A  +-h, --help \[cmd\]  +this screen\.?)
-      expect_item :datastore, %r(\bmanage datastores\b)
-      expect_item :source, %r(\bmanage sources\b)
-      expect_item :init, :styled, %r(\binit a <workspace>),
-        %r(\bthis is the second line of the init description\b)
-      expect_item :status, %r(\bstatus\b.+\bworkspace)
-      expect_item :workspace, %r(\bmanage workspaces\b)
+
+      self.class::EXPECTED_ACTION_NAME_S_A.each do |s|
+        send :"expect_#{ s }_item"
+      end
+
       expect_maybe_a_blank_line
 
       expect_branch_invite_line
       expect_succeeded
+    end
+
+    def expect_init_item
+      expect_item :init, :styled, %r(\binit a <workspace>),
+        %r(\bthis is the second line of the init description\b)
+    end
+
+    def expect_status_item
+      expect_item :status, %r(\bstatus\b.+\bworkspace)
+    end
+
+    def expect_workspace_item
+      expect_item :workspace, %r(\bmanage workspaces\b)
+    end
+
+    def expect_datastore_item
+      expect_item :datastore, %r(\bmanage datastores\b)
+    end
+
+    def expect_source_item
+      expect_item :source, %r(\bmanage sources\b)
     end
 
     it "2.4x3) help with a good argument" do
@@ -47,6 +67,6 @@ module Skylab::Brazen::TestSupport::CLI
       expect_help_screen_for_init
     end
 
-    self::EXPECTED_ACTION_NAME_S_A = [ 'datastore', 'source', 'init', 'status', 'workspace' ].freeze
+    self::EXPECTED_ACTION_NAME_S_A = [ 'init', 'status', 'workspace', 'datastore', 'source' ].freeze
   end
 end
