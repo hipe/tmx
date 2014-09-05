@@ -6,7 +6,7 @@ module ::Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   TestLib_ = TestLib_
 

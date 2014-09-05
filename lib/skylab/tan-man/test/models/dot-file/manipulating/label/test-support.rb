@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport::Models::DotFile::Manipulating::Label
 
   include CONSTANTS
 
-  extend TestSupport::Quickie # run some tests without rspec, just `ruby -w`
+  extend TestSupport_::Quickie # run some tests without rspec, just `ruby -w`
 
   module InstanceMethods
     let :_input_fixtures_dir_pathname do

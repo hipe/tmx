@@ -45,14 +45,13 @@ module Skylab::TanMan
     end
   end
 
-  class Kernel_ < Brazen_::Kernel_
+  class Kernel_ < Brazen_::Kernel_  # :[#083].
     def retrieve_property_value i
-      return 'term-merm'
-      # properties.retrieve_value i
+      properties.retrieve_value i
     end
   private
     def properties
-      @properties ||= self.class::Properties__.new
+      @properties ||= @module::Kernel__::Properties.new
     end
   end
 
@@ -67,6 +66,8 @@ module Skylab::TanMan
       extend Action_::MM
 
       self.is_promoted = true
+
+      self.after_i = :init
 
     desc "show the status of the config director{y|ies} active at the path."
 
@@ -111,6 +112,8 @@ module Skylab::TanMan
 
     desc "manage remotes."
 
+    self.after_i = :graph
+
     Actions = ::Module.new
 
   end
@@ -118,6 +121,8 @@ module Skylab::TanMan
   class Models_::Graph < Model_
 
     desc "with the current graph.."
+
+    self.after_i = :status
 
     Actions = ::Module.new
 

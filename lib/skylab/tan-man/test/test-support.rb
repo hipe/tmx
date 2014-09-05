@@ -42,6 +42,10 @@ module Skylab::TanMan::TestSupport
       HL__[]::System.defaults.dev_tmpdir_pathname
     end
 
+    Entity = -> do
+      TanMan_::Brazen_::Entity
+    end
+
     File_utils = memoize[ -> do
       require 'fileutils' ; ::FileUtils
     end ]
@@ -96,7 +100,7 @@ module Skylab::TanMan::TestSupport
   module CONSTANTS
     TanMan_ = TanMan_
     TestLib_ = TestLib_
-    TestSupport  = ::Skylab::TestSupport
+    TestSupport_  = ::Skylab::TestSupport
     TMPDIR_STEM  = 'tan-man'
     TMPDIR = TestLib_::Build_tmpdir_via_stem[ TMPDIR_STEM ]
   end
@@ -248,7 +252,7 @@ module Skylab::TanMan::TestSupport
     attr_accessor :do_debug
 
     def some_debug_stream
-      TestSupport::System.stderr
+      TestSupport_::System.stderr
     end
 
     attr_accessor :do_debug_parser_loading
@@ -299,7 +303,7 @@ module Skylab::TanMan::TestSupport
     end
 
     let :output do
-      o = TestSupport::IO::Spy::Group.new
+      o = TestSupport_::IO::Spy::Group.new
       o.do_debug_proc = -> { do_debug }
       o.line_filter! TestLib_::Unstyle_proc[]
       o

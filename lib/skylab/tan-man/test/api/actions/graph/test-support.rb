@@ -6,6 +6,6 @@ module Skylab::TanMan::TestSupport::API::Actions::Graph
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
 end

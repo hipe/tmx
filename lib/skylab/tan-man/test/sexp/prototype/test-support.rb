@@ -6,7 +6,7 @@ module ::Skylab::TanMan::TestSupport::Sexp::Prototype # #topic-module
 
   include CONSTANTS # so we can say `TanMan_` in our tests
 
-  extend TestSupport::Quickie # if you want it, load the spec file with ruby -w
+  extend TestSupport_::Quickie # if you want it, load the spec file with ruby -w
 
   module Grammars
 

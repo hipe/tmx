@@ -11,6 +11,7 @@ module Skylab::TanMan
   Autoloader_[ self ]
 
   ACHEIVED_ = true
+  stowaway :Entity_, 'models-'
   stowaway :Kernel_, 'models-'
 
 end

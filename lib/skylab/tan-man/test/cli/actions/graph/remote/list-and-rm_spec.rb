@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph::Remote::List__
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[ts] CLI actions graph remote list, remove", wip: true do
 

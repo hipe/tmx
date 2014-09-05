@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph::Remote::Core
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[ts] CLI action graph remote", wip: true do
 

@@ -1,6 +1,6 @@
 require_relative '../test-support'
 
-::Skylab::TestSupport::Quickie.enable_kernel_describe
+Skylab::TestSupport::Quickie.enable_kernel_describe
 
 module Skylab::TanMan::TestSupport::API::Actions
 

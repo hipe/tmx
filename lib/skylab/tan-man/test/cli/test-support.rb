@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport::CLI
 
   include CONSTANTS # so we can say TanMan_ in the spec's module
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   module ModuleMethods
 
@@ -92,7 +92,7 @@ module Skylab::TanMan::TestSupport::CLI
       build_client_wired_with ioa
     end
     #
-    class Spy__ < TestSupport::IO::Spy::Triad
+    class Spy__ < TestSupport_::IO::Spy::Triad
       def initialize
         super nil
       end

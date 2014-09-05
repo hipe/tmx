@@ -15,6 +15,9 @@ module Skylab::Brazen
       p_ = -> do x = p[] ; p_ = -> { x } ; x end ; -> { p_[] }
     end
     sidesys = Autoloader_.build_require_sidesystem_proc
+    EN_fun = -> do
+      Headless__[]::SubClient::EN_FUN
+    end
     Headless__ = sidesys[ :Headless ]
     JSON = memoize[ -> { require 'json' ; ::JSON  } ]
     N_lines = -> do

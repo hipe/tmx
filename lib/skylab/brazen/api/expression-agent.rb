@@ -10,13 +10,12 @@ module Skylab::Brazen
 
       alias_method :calculate, :instance_exec
 
-      def s x
-        x.respond_to?( :length ) and x = x.length
-        's' if 1 != x
+      def and_ x
+        context.and_ x
       end
 
-      def code string
-        "'#{ string }'"
+      def code s
+        ick s
       end
 
       def hdr string
@@ -28,7 +27,7 @@ module Skylab::Brazen
       end
 
       def ick x
-        code x
+        "'#{ x }'"
       end
 
       def par x
@@ -40,9 +39,30 @@ module Skylab::Brazen
         x
       end
 
+      def s count_x, lexeme_i=:s
+        context.s count_x, lexeme_i
+      end
+
       def val s
         s.inspect
       end
+
+      def context
+        @context ||= Lang_Ctx__[].new
+      end
+
+      Lang_Ctx__ = -> do
+        p = -> do
+          x = class Lang_Ctx___
+            i_a = [ :and_, :s ]
+            Brazen_::Lib_::EN_fun[][ self, :private, i_a ]
+            public( * i_a )
+            self
+          end
+          p = -> { x } ; x
+        end
+        -> { p[] }
+      end.call
 
       self
     end.new

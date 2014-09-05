@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph
 
   include CONSTANTS
 
-  extend TestSupport::Quickie     # Quickie enabled!
+  extend TestSupport_::Quickie     # Quickie enabled!
                                   # try just running indiv. files with 'ruby -w'
 
 

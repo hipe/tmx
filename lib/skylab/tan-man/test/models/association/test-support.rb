@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport::Models::Association
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   module InstanceMethods
 

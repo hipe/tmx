@@ -12,6 +12,13 @@ module Skylab::Brazen
         Proprietor_Methods__
       end
 
+      def say_unrecognized_properties a
+        Brazen_::API::EXPRESSION_AGENT.calculate do
+          _s_a = a.map( & method( :ick ) )
+          "unrecognized propert#{ s a, :y } #{ and_ _s_a }"
+        end
+      end
+
       def scan & p
         if p
           Callback_.scan.new( & p )
@@ -588,7 +595,7 @@ module Skylab::Brazen
       end
 
       def say_strange_iambic
-        "unrecognized property '#{ current_iambic_token }'"
+        Entity.say_unrecognized_properties [ current_iambic_token ]
       end
 
       def process_iambic_passively * a

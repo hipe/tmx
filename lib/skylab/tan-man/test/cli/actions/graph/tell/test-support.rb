@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph::Tell
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   module InstanceMethods
 

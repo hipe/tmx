@@ -1,3 +1,5 @@
+[#083]       #doc-node kernel
+[#082]       #parent-node: [#083] the kernel properties narrative ..
 [#081]       config shell (lost). part of [#mh-053]
 [#078]       #tracking-tag this spot with `const_set`
 [#077]       #done services.rb wat
@@ -47,17 +49,17 @@
 [#041] #watch i don't like how status is implemented with the arrays
 [#040]       #done make your own SubClient::InstanceMethods to DRY CLI & API
 [#039]       #done API::Whatever becomes MetaHell::Generic
-[#038]       #done text_styler away!
+[#038]       #done `text_styler` away!
 [#037]       #done reconceive stdout, stderr -> infostream, paystream, errstream
                .. (i.e. ("PIE" [#sl-113])
-[#036]       #done format_error -> inflect_failure_reason (and tests!)
-[#035]       #wont delegates_to go away as a smell (meh)
-[#034]       #done sort out root_runtime, client, parent_runtime, etc
-[#033]       #done full_action_name_parts becomes local_normal_name (action_name ..?)
+[#036]       #done `format_error` -> `inflect_failure_reason` (and tests!)
+[#035]       #wont `delegates_to` go away as a smell (meh)
+[#034]       #done sort out `root_runtime`, client, `parent_runtime`, etc
+[#033]       #done `full_action_name_parts` becomes `local_normal_name` (`action_name` ..?)
 [#032]       #done rename stdout, stderr
 [#031]       #done regretify all tests
 [#030]       #done reconceive api as a service
-[#029]       #done no more api knob (api.invoke -> api_invoke)
+[#029]       #done no more api knob (api.invoke -> `api_invoke`)
 [#028]       #bad-ticket any and all changes to CLI core client
 [#027]       overhaul to cli actions base class
 [#026]       #done API::InvocationMethods away!

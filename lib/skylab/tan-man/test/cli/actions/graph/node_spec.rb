@@ -5,6 +5,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph
   describe "[tm] CLI::Actions ::Graph::Node actions:", wip: true do
 
     extend TanMan_::TestSupport::CLI::Actions::Graph
+
     context "`graph node add`" do
       it "to a empty 'digraph' -- makes up its own prototype!!" do
         using_dotfile 'digraph{}'
