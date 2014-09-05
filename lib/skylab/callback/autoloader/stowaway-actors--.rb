@@ -190,8 +190,16 @@ module Skylab::Callback
       def when_only_theirs_is_left
         @imagined_a.reduce @mod.entry_tree do |et, s|
           name = Name.from_slug s
-          _et = et.normpath_from_distilled name.as_distilled_stem
-          _et or et.add_imaginary_normpath_for_correct_name name
+          i = name.as_distilled_stem
+          et_ = et.normpath_from_distilled i
+          if ! et_
+            et_ = et.imaginary_h[ i ]
+          end
+          if ! et_
+            et_ = et.add_imaginary_normpath_for_correct_name name
+          end
+          :loading == et_.state_i and et_.change_state_to :loaded
+          et_
         end
       end
 

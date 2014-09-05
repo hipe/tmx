@@ -895,16 +895,20 @@ module Skylab::Callback
     end
 
     class Entry_Tree_
+
       def add_imaginary_normpath_for_correct_name name, dpn=nil  # #stow-3
         h = ( @imaginary_h ||= {} )
-        h.key? name.as_const and self._NAME_COLLISION
-        et = Entry_Tree_.new @dir_pn, nil,
-            Dir_Entry_.new( name.as_slug ) do |et_|
+        i = name.as_distilled_stem
+        h.key? i and self._NAME_COLLISION
+        _dir_entry = Dir_Entry_.new name.as_slug
+        et = Entry_Tree_.new @dir_pn, nil, _dir_entry do |et_|
           dpn and et_.set_dir_pathname dpn
         end
-        h[ name.as_const ] = et
+        h[ i ] = et
         et
       end
+
+      attr_reader :imaginary_h
 
       def set_dir_pathname dpn
         @dir_pn = dpn ; nil

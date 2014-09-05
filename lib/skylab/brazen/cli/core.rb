@@ -386,6 +386,10 @@ module Skylab::Brazen
         @parent.app_name
       end
 
+      def application_kernel
+        @parent.application_kernel
+      end
+
       def receive_workspace_expectation_file_not_found ev
         receive_event ev
       end
@@ -553,6 +557,11 @@ module Skylab::Brazen
       def receive_payload_event ev
         _a = render_event_lines ev
         send_payload_event_lines _a ; nil
+      end
+
+      def receive_info_event ev
+        _a = render_event_lines ev
+        send_non_payload_event_lines _a ; nil
       end
 
       def expression_agent_class
