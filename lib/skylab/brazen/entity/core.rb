@@ -586,12 +586,19 @@ module Skylab::Brazen
 
       def process_iambic_fully * a
         prcss_iambic_passively_via_args a
-        unparsed_iambic_exists and raise ::ArgumentError, say_strange_iambic
-        self
+        if unparsed_iambic_exists
+          when_unparsed_iambic_exists
+        else
+          self
+        end
       end
 
       def unparsed_iambic_exists
         @d < @x_a_length
+      end
+
+      def when_unparsed_iambic_exists
+        raise ::ArgumentError, say_strange_iambic
       end
 
       def say_strange_iambic

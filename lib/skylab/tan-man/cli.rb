@@ -7,5 +7,9 @@ module Skylab::TanMan
         new_top_invocation TanMan_, * a
       end
     end
+
+    def resolve_app_kernel
+      @app_kernel = TanMan_::API.produce_application_kernel ; nil
+    end
   end
 end

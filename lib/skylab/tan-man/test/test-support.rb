@@ -107,7 +107,7 @@ module Skylab::TanMan::TestSupport
 
   include CONSTANTS # for use here, below
 
-  TMPDIR = TMPDIR  # #annoy
+  TestSupport_ = TestSupport_ ; TMPDIR = TMPDIR  # #annoy
 
   # this is dodgy but should be ok as long as you accept that:
   # 1) you are assuming meta-attributes work and 2) the below is universe-wide!
@@ -243,7 +243,7 @@ module Skylab::TanMan::TestSupport
       o
     end
 
-    def debug!                                 # (aliased to tanman_debug!)
+    def debug!
       self.do_debug = true
       self.do_debug_parser_loading = true
     end

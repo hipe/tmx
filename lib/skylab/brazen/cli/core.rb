@@ -504,7 +504,7 @@ module Skylab::Brazen
             receive_negative_event ev
           end
         else
-          send_event ev  # not implemented! always set 'ok'
+          receive_neutral_event ev
         end
       end
 
@@ -536,6 +536,12 @@ module Skylab::Brazen
         a = render_event_lines ev
         s = maybe_inflect_line_for_completion_via_event a.first, ev
         s and a[ 0 ] = s
+        send_non_payload_event_lines a
+        maybe_use_exit_status SUCCESS_ ; nil
+      end
+
+      def receive_neutral_event ev
+        a = render_event_lines ev
         send_non_payload_event_lines a
         maybe_use_exit_status SUCCESS_ ; nil
       end

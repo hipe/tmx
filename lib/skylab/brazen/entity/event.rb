@@ -157,7 +157,8 @@ module Skylab::Brazen
           @sp_as_s_a = @o.terminal_channel_i.to_s.split UNDERSCORE_
           maybe_replace_noun_phrase_with_prop
           rslv_item_x_from_first_member
-          maybe_pathify_item_x
+          did = maybe_pathify_item_x
+          did || maybe_clarity_item_x
           @y << "#{ @sp_as_s_a * SPACE_ } - #{ @item_x }" ; nil
         end
 
@@ -185,8 +186,16 @@ module Skylab::Brazen
         def maybe_pathify_item_x
           if PN_RX__ =~ @first_member_i.to_s
             @item_x = @expression_agent.pth @item_x
-          end ; nil
+            true
+          end
         end
+
+        def maybe_clarity_item_x
+          if @item_x.nil?
+            @item_x = "''" ; nil
+          end
+        end
+
         PN_RX__ = /(?:_|\A)pathname\z/
       end
 

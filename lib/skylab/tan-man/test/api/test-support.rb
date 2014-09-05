@@ -10,11 +10,8 @@ module Skylab::TanMan::TestSupport::API
 
   module InstanceMethods
 
-    def debug!                                 # (aliased to tanman_api_debug!)
-      tanman_debug!
-      TMPDIR.debug!
-      TanMan_::API.debug!
+    def debug!
+      super
     end
-    alias_method :tanman_api_debug!, :debug!
   end
 end

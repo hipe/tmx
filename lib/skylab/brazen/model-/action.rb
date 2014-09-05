@@ -58,11 +58,15 @@ module Skylab::Brazen
     def resolve_any_executable_via_iambic_and_adapter x_a, adapter
       @client_adapter = adapter
       @error_count = 0
-      process_iambic_fully x_a
-      notificate :iambic_normalize_and_validate
+      r = process_iambic_fully x_a
       if @error_count.zero?
-        adapter.executable_wrapper_class.new self, :execute
+        r = nil
+        notificate :iambic_normalize_and_validate
       end
+      if @error_count.zero?
+        r = adapter.executable_wrapper_class.new self, :execute
+      end
+      r
     end
 
     def receive_missing_required_properties ev

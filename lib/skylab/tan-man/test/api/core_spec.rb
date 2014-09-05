@@ -2,24 +2,37 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::API
 
-  describe "[tm] API", tanman: true, wip: true do
+  describe "[tm] API" do
 
-    extend TS_
+    extend TS_ ; TS_::Expect[ self ]
 
-    it "is a persistent object" do
-      ( !! api ).should eql( true )  # api.should be_trueish
-      oid = api.object_id
-      api.object_id.should eql( oid )
+    it "the API is called with `call` - the empty call reports as error" do
+      call_API
+      expect :failed, :no_such_action, "no such action - ''"
+      expect_failed
     end
 
-    context "when you invoke an action with an invalid name" do
-      it "the first event in the response events is an appropriate error" do
-        response = api.invoke :'not_an_action'
-        e = response.events.first
-        e.stream_name.should eql( :error )
-        e.message.should match(
-          /api name error : actions has no "not_an_action" action/i )
-      end
+    it "called with a strange name is a soft error" do
+      call_API :wazii, :wazoo
+      expect :failed, :no_such_action, "no such action - wazii"
+      expect_failed
+    end
+
+    it "xtra tokens on a ping" do
+      call_API :ping, :wahootey
+      expect :failed, :unrecognized_property, "unrecognized property 'wahootey'"
+      expect_failed
+    end
+
+    it "sing sing sing to me" do
+      call_API :ping
+      expect :neutral, :ping, "hello from (tm)."
+      expect_no_more_events
+      @result.should eql :hello_from_tan_man
+    end
+
+    def subject
+      TanMan_::API
     end
   end
 end

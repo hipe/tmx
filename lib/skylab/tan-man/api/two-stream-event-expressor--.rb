@@ -1,109 +1,57 @@
 module Skylab::TanMan
 
-  # We built out a sophisticated event-graph-laden codebase here well before
-  # we had the big epiphany of event factories - so, sadly we do late
-  # binding of an emission to its event class based on the shape of the
-  # payload. our hopes and dreams for this are tracked by [#076]
-
-  module API::Event
-  end
-
-  class API::Event::Stringular < PubSub::Event::Unified  # `is?`
-
-    class << self
-      alias_method :event, :new
-    end
-
-    include Core::Event::LingualMethods
-
-    def json_data
-      {
-        stream_name: stream_name,
-        shape: :textual,
-        payload: message
-      }
-    end
-
-  private
-
-    def initialize a, b, c=nil
-      super a, b
-      init_lingual c if c
-    end
-  end
-
-  class API::Event::Structural < PubSub::Event::Unified
-
-    # fill it with joy, fill it with sadness
-
-    include Core::Event::LingualMethods
-
-    -> do
-
-      monadic_a = [ ::String, ::TrueClass, ::Fixnum, ::Float ]
-
-      # hackish sanity check. just a sketch
-
-      define_method :json_data do
-        arr = self.class.members.reduce [] do |m, k|
-          x = send k
-          m << [ k, x ] if ! x || monadic_a.include?( x.class )
-          m
-        end
-        h = arr.length.zero? ? true : ::Hash[ arr ]
-        {
-          stream_name: stream_name,
-          shape: :structural,
-          payload: h
-        }
-      end
-    end.call
-  end
-
-  module API::Event::Mappings
-
-    String = API::Event::Stringular
-
-    Hash = PubSub::Event::Factory::Structural.new 20,
-      API::Event::Structural, API::Event::Structural  # base kls & box module
-
-  end
-
   module API
-    module Event
-      Rewrap = -> esg, stream_i, e do
 
-    # we want the same metadata values (and we will probably use the
-    # same produced class) (or if it's a textual event, we want the
-    # same text) but we need the unified event object to know
-    # about its event stream graph, and that graph will be different
-    # than that of the upstream event.
-    #
-    # (note this will break when you get a textual event. consider
-    # actually routing through the `late` factory!)
+    class Two_Stream_Event_Expressor__
 
-        if e.respond_to? :members
-          Struct_Wrap__.new esg, stream_i, e
+      def initialize * a
+        @out, @err, @expag = a
+      end
+
+      def receive_event ev
+        if ev.has_tag :ok
+          if ev.ok
+            recv_succes_event ev
+          else
+            recv_error_event ev
+          end
         else
-          API::Event::Mappings::Hash.event esg, stream_i, e.to_hash
+          recv_info_event ev
         end
       end
-      #
-      class Struct_Wrap__
-        def initialize _esg, stream_i, st
-          @stream_i = stream_i ; @struct = st
-          nil
+
+      def executable_wrapper_class
+        Bound_Call_
+      end
+
+      def app_name
+        'tm API'
+      end
+
+    private
+      def recv_succes_event ev
+        y = ::Enumerator::Yielder.new do |s|
+          @out.puts "OK: #{ s }"
         end
-        def is_event ; true end
-        def stream_name ; @stream_i end
-        def touched? ; false end
-        def render_under expr_ag
-          expr_ag.calculate( * @struct.to_a, & @struct.some_message_proc )
+        ev.render_all_lines_into_under y, @expag
+        OK_
+      end
+
+      def recv_error_event ev
+        y = ::Enumerator::Yielder.new do |s|
+          @err.puts "API call failed: #{ s }"
         end
+        ev.render_all_lines_into_under y, @expag
+        UNABLE_
+      end
+
+      def recv_info_event ev
+        y = ::Enumerator::Yielder.new do |s|
+          @err.puts s
+        end
+        ev.render_all_lines_into_under y, @expag
+        nil
       end
     end
   end
-
-  API::Event::Factory = PubSub::Event::Factory::Late.new(
-    API::Event::Mappings, API::Event::Rewrap )
 end

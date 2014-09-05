@@ -1,33 +1,130 @@
 module Skylab::TanMan
 
-  class API::Response < ::Struct.new :result, :events
+  module API
 
-    def add_event event
-      events.push event
-    end
+    class Produce_bound_call__
 
-    def error
-      events.detect { |e| e.is? :error }
-    end
+      Callback_::Actor[ self, :properties, :x_a, :p, :kernel, :mod ]
 
-    def success?                  # this is how you define it
-      ! error
-    end
+      TanMan_::Lib_::Event_builder[ self ]
 
-    def to_json state
-      as_array = events.map { |e| e.json_data }
-      json = as_array.to_json state
-      json
-    end
+      def execute
+        prepare_ivars
+        ok = resolve_action
+        ok && via_action_resolve_bound_call
+        @bound_call
+      end
 
-  private
+      def set_event_receiver x
+        @event_receiver_x = x ; nil
+      end
 
-    def initialize
-      super nil, [ ]
-    end
+    private
 
-    def json_data
-      events.map(& :json_data )
+      def prepare_ivars
+        @d = 0 ; @x_a_length = @x_a.length
+        @event_receiver_x = nil
+        @p and @p[ self ]
+        nil
+      end
+
+      def resolve_action
+        if has_more_tokens
+          via_current_tokens_resolve_action
+        else
+          whine_about_how_there_is_an_empty_iambic_argument_list
+        end
+      end
+
+      def whine_about_how_there_is_an_empty_iambic_argument_list
+        end_in_error_with :no_such_action, :action_name, nil
+      end
+
+      def via_current_tokens_resolve_action
+        @current_unbound_action_collection = @kernel
+        while true
+          ok = via_current_branch_resolve_action
+          ok or break
+          advance_one
+          @action.is_branch or break
+          if has_more_tokens
+            @current_unbound_action_collection = @action.class
+          else
+            when_name_is_too_short
+            ok = false
+            break
+          end
+        end
+        ok
+      end
+
+      def via_current_branch_resolve_action
+        scn = @current_unbound_action_collection.get_unbound_action_scan
+        i = current_token
+        while cls = scn.gets
+          i == cls.name_function.as_lowercase_with_underscores_symbol and break
+        end
+        if cls
+          @action = cls.new @kernel
+          OK_
+        else
+          when_no_action_at_this_step
+        end
+      end
+
+      def when_no_action_at_this_step
+        end_in_error_with :no_such_action, :action_name, current_token
+      end
+
+      def when_name_is_too_short
+        end_in_error_with :action_name_ends_on_branch_node,
+          :local_node_name, @action.name.as_lowercase_with_underscores_symbol
+      end
+
+      def via_action_resolve_bound_call
+        x_a = @x_a[ @d .. -1 ]
+        x = @action.resolve_any_executable_via_iambic_and_adapter x_a, event_receiver
+        if x
+          @bound_call = x
+          OK_
+        else
+          @bound_call = x
+        end
+      end
+
+      def has_more_tokens
+        @d != @x_a_length
+      end
+
+      def current_token
+        @x_a.fetch @d
+      end
+
+      def advance_one
+        @d += 1
+      end
+
+      def end_in_error_with * x_a, & p
+        _ev = build_error_event_via_mutable_iambic_and_message_proc x_a, p
+        result = send_event _ev
+        @bound_call = Bound_Call_.new IDENTITY_, :call, result
+        UNABLE_
+      end
+
+      def send_event ev
+        event_receiver.receive_event ev
+      end
+
+      def event_receiver
+        @event_receiver_x || rslv_some_event_receiver_x
+        @event_receiver_x
+      end
+
+      def rslv_some_event_receiver_x
+        _exp = API::Expression_Agent__.new @kernel
+        @event_receiver_x = API::Two_Stream_Event_Expressor__.
+          new( * TanMan_::Lib_::Two_streams[], _exp ) ; nil
+      end
     end
   end
 end

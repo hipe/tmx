@@ -33,12 +33,20 @@ module Skylab::TanMan
 
     private
 
-      def send_payload_event ev
-        @client_adapter.receive_payload_event ev
+      def when_unparsed_iambic_exists
+        msg = say_strange_iambic
+        _ev = build_error_event_with :unrecognized_property,
+            :current_iambic_token, current_iambic_token do |y, o|
+          y << msg
+        end
+        send_event _ev
       end
 
-      def send_info_event ev
-        @client_adapter.receive_info_event ev
+      def send_event ev
+        if ev.has_tag :ok and ! ev.ok
+          @error_count += 1
+        end
+        @client_adapter.receive_event ev
       end
 
       self
@@ -102,7 +110,7 @@ module Skylab::TanMan
         ev = build_event_with :ping do |y, o|
           y << "hello from #{ an }."
         end
-        send_info_event ev
+        send_event ev
         :hello_from_tan_man
       end
     end
