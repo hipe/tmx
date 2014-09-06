@@ -15,4 +15,3 @@ So, when the inevitable time comes that you need to get a numeric value
 from a sexp node, consider either making a to_i or to_f doohah in its
 extension module, *or* forgoing the above and dealing with the
 aforementioned possible lossiness.
-

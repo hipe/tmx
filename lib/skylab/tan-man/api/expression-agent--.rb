@@ -35,7 +35,10 @@ module Skylab::TanMan
       end
 
       def par x
-        "\"#{ x }\""
+        if ! ( x.respond_to? :ascii_only? or x.respond_to? :id2name )
+          x = x.name.as_lowercase_with_underscores_symbol
+        end
+        "'#{ x }'"
       end
 
       def pth s

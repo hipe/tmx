@@ -85,6 +85,13 @@ module Skylab::Callback
           end
         end
 
+        def detect & p
+          while x = gets
+            p[ x ] and break
+          end
+          x
+        end
+
         def expand_by & p
           self.class.expand self, p
         end

@@ -119,20 +119,34 @@ module Skylab::Brazen
       i = self.class.persist_to
       if :workspace == i
         persist_to_workspace
+      elsif i == name.as_lowercase_with_underscores_symbol
+        via_own_collection_controller_persist
       else
         persist_to_datastore i
       end
     end
     attr_reader :came_from_persistence
+
   private
+
     def persist_to_workspace
       @kernel.models.workspaces.instance.persist_entity self
     end
+
     def persist_to_datastore i
       ds_i, locator_i = i.id2name.split( UNDERSCORE_, 2 ).map( & :intern )
       ds = @kernel.datastores[ ds_i ]
       ds.persist_entity_to_datastore self, locator_i
     end
+
+    def via_own_collection_controller_persist
+      model_class = self.class
+      _action = @listener  # #todo
+      _args = [ :_self_, :persisting, _action, model_class, @kernel ]
+      _cc = model_class.const_get( :Collection_Controller__, false )[ _args ]
+      _cc.persist_entity self
+    end
+
   public
 
     def to_iambic
@@ -187,6 +201,10 @@ module Skylab::Brazen
       def get_unbound_upper_action_scan
         acr = actn_class_reflection
         acr and acr.get_upper_action_class_scanner
+      end
+      def get_unbound_lower_action_scan
+        acr = actn_class_reflection
+        acr and acr.get_lower_action_class_scanner
       end
       def actn_class_reflection
         @did_reslolve_acr ||= init_action_class_reflection
@@ -369,11 +387,15 @@ module Skylab::Brazen
         model_class.name_function.as_lowercase_with_underscores_symbol
       end
 
+      def build_collection_controller * a
+        model_class::Collection_Controller__[ a ]
+      end
+
       def build_collections_controller_for_channel_and_delegate i, x
-        collection_controller_class.new i, x, model_class, @kernel
+        collections_controller_class.new i, x, model_class, @kernel
       end
     private
-      def collection_controller_class
+      def collections_controller_class
         Collections_::Collections_Controller__
       end
 

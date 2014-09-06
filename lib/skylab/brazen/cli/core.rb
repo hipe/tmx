@@ -493,12 +493,13 @@ module Skylab::Brazen
       def receive_event ev
         ev_ = ev.to_event
         if ev_.has_tag :ok
-          _ok = ev_.ok
-          if _ok
+          if ev_.ok
             if ev_.has_tag :is_completion and ev_.is_completion
               receive_completion_event ev
-            else
+            elsif ev.verb_lexeme
               receive_positive_event ev
+            else
+              receive_payload_event ev
             end
           else
             receive_negative_event ev
@@ -511,7 +512,7 @@ module Skylab::Brazen
       def receive_positive_event ev
         ev_ = ev.to_event
         a = render_event_lines ev
-        s = maybe_inflect_line_for_positivity_via_event a.first, ev
+        s = inflect_line_for_positivity_via_event a.first, ev
         s and a[ 0 ] = s
         send_non_payload_event_lines_with_redundancy_filter a
         d = ( SUCCESS_ if ev_.ok )
@@ -585,6 +586,14 @@ module Skylab::Brazen
       end
 
       def maybe_inflect_line_for_positivity_via_event s, ev
+        if ev.verb_lexeme
+          inflect_line_for_positivity_via_event s, ev
+        else
+          s
+        end
+      end
+
+      def inflect_line_for_positivity_via_event s, ev
         open, inside, close = unparenthesize s
         downcase_first inside
         n_s = ev.inflected_noun

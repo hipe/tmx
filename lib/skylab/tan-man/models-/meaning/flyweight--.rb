@@ -1,11 +1,35 @@
 module Skylab::TanMan
 
-  class Models::Meaning::Flyweight
+  class Models_::Meaning
+
+  class Flyweight__
 
     def initialize
-      @indexed = nil
-      @scn = TanMan::Services::StringScanner.new ''
+      @indexed = @scn = nil
     end
+
+    attr_reader :start_pos, :end_pos
+    attr_reader :next_line_start_pos
+
+    def set! start, end_d, str
+      @indexed = nil
+      @start_pos = start ; @end_pos = end_d
+      if @scn
+        @scn.string = str
+      else
+        @scn = TanMan_::Lib_::String_scanner[].new str
+      end ; nil
+    end
+
+    def to_property_hash
+      @indexed or index!
+      h = VOLATILE_SINGLETON_H__ ; s = @scn.string
+      h[ NAME_ ] = s[ @name_range ]
+      h[ VALUE_ ] = s[ @value_range ]
+      h
+    end
+
+    VOLATILE_SINGLETON_H__ = { NAME_ => nil, VALUE_ => nil }
 
                                   # if you need to use the data in a flyweight
     def collapse request_client   # at any time other than during that iteration
@@ -20,7 +44,7 @@ module Skylab::TanMan
 
     def destroy error, success
       from = line_start
-      to = value_index.last + 1 # dos line endings whatever
+      to = value_range.last + 1 # dos line endings whatever
       new_string = @scn.string.dup
       new_string[ from .. to ] = ''
       old_len = @scn.string.length
@@ -43,34 +67,27 @@ module Skylab::TanMan
     end
 
     def name
-      @scn.string[ name_index ]
+      @scn.string[ name_range ]
     end
 
-    def name_index
+    def name_range
       index! unless @indexed
-      @name_index
+      @name_range
     end
 
-    def set! str, pos
-      @indexed = nil
-      @start_pos = pos
-      @scn.string = str
-      nil
-    end
 
-    attr_reader :start_pos
 
     def whole_string # for extreme hacking only
       @scn.string
     end
 
     def value
-      @scn.string[ value_index ]
+      @scn.string[ value_range ]
     end
 
-    def value_index
+    def value_range
       index! unless @indexed
-      @value_index
+      @value_range
     end
 
   private
@@ -90,9 +107,12 @@ module Skylab::TanMan
       value_start = @scn.pos
       @scn.skip( /[^\r\n]+/ ) or fail 'parse error - empty value?'
       value_end = @scn.pos - 1
-      @name_index = name_start .. name_end
-      @value_index = value_start .. value_end
+      @name_range = name_start .. name_end
+      @value_range = value_start .. value_end
+      @scn.skip( /\r?\n/ )
+      @next_line_start_pos = @scn.pos
       @indexed = true
     end
+  end
   end
 end

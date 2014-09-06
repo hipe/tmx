@@ -264,6 +264,10 @@ module Skylab::Brazen
           end
         end
       end
+
+      def listener
+        @listener
+      end
     end
 
     def persist_entity ent

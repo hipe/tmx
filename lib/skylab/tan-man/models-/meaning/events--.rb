@@ -33,14 +33,6 @@ module Skylab::TanMan
     end
   end
 
-  class Models::Meaning::Events::Different_Value_Already_Set <
-    Model::Event.new :name, :existing_value, :desired_value
-
-    def build_message
-      "there is already a meaning for #{ lbl name }"
-    end
-  end
-
   class Models::Meaning::Events::No_Starter <
     Model::Event.new :_ # meh
 
@@ -63,14 +55,6 @@ module Skylab::TanMan
     def build_message
       "#{ :present == tense ? 'found no existing' : 'there was no such' } #{
       }meaning to #{ verb }: #{ val name }"
-    end
-  end
-
-  class Models::Meaning::Events::Same_Value_Already_Set <
-    Model::Event.new :name
-
-    def build_message
-      "#{ lbl name } is already set to that value."
     end
   end
 end

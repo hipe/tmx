@@ -13,5 +13,6 @@ module Skylab::TanMan
   ACHEIVED_ = true
   stowaway :Entity_, 'models-'
   stowaway :Kernel_, 'models-'
+  UNABLE_ = false
 
 end

@@ -51,6 +51,10 @@ module Skylab::Brazen
             ::File.open @pn.to_path, 'w', & p  # WRITEMODE_
           end
         end
+
+        def listener
+          @listener
+        end
       end
     end
   end

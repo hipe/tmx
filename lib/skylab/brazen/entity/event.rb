@@ -14,6 +14,10 @@ module Skylab::Brazen
           end
         end
 
+        def prototype_via_iambic_and_message_proc x_a, p
+          Event::Prototype__.via_iambic_and_message_proc x_a, p
+        end
+
         def wrap_universal_exception e
           Event::Wrappers__::Universal_exception[ e ]
         end
@@ -61,12 +65,13 @@ module Skylab::Brazen
         y
       end
 
-    protected( def init_copy_with x_a
+    protected( def init_copy_with x_a  # #note-70
+        bx = ivar_box
         x_a.each_slice( 2 ) do |i, x|
-          instance_variable_set ivar_box.fetch( i ), x
+          instance_variable_set bx.fetch( i ), x
         end
         sc = singleton_class
-        ivar_box.each_name do |i|
+        bx.each_name do |i|
           sc.send :attr_reader, i
         end
         self
@@ -77,24 +82,30 @@ module Skylab::Brazen
       end
 
       def has_tag i
-        ivar_box[ i ]
+        reflection_box.has_name i
       end
 
-      def has_member i
-        ivar_box.has_name i
+      def first_tag_name
+        reflection_box.first_name
       end
 
-      def first_member
-        ivar_box.first_name
+      def tag_names
+        get_tag_names
       end
 
-      def members
-        ivar_box.get_names
+      def get_tag_names
+        reflection_box.get_names
       end
 
-    private def ivar_box
+    private
+      def ivar_box
         @__ivar_box__
       end
+
+      def reflection_box
+        @__ivar_box__
+      end
+    public
 
       def render_all_lines_into_under y, expression_agent
         render_into_yielder_N_lines_under y, nil, expression_agent
@@ -105,7 +116,7 @@ module Skylab::Brazen
       end
 
       def render_into_yielder_N_lines_under y, d, expag
-        N_Lines.new( y, d, [ @message_proc ], expag ).execute self
+        N_Lines.new( y, d, [ message_proc ], expag ).execute self
       end
 
       class N_Lines < ::Enumerator::Yielder
@@ -156,7 +167,7 @@ module Skylab::Brazen
         def execute
           @sp_as_s_a = @o.terminal_channel_i.to_s.split UNDERSCORE_
           maybe_replace_noun_phrase_with_prop
-          rslv_item_x_from_first_member
+          rslv_item_x_from_first_tag
           did = maybe_pathify_item_x
           did || maybe_clarity_item_x
           @y << "#{ @sp_as_s_a * SPACE_ } - #{ @item_x }" ; nil
@@ -165,7 +176,7 @@ module Skylab::Brazen
       private
 
         def maybe_replace_noun_phrase_with_prop
-          if @o.has_member( :prop ) and find_verb_index
+          if @o.has_tag( :prop ) and find_verb_index
             _pretty = @expression_agent.par @o.prop
             @sp_as_s_a[ 0, @verb_index ] = [ _pretty ]
           end ; nil
@@ -178,13 +189,13 @@ module Skylab::Brazen
         end
         VERB_RX__ = /\A(?:already|does|is)\z/  # etc as needed
 
-        def rslv_item_x_from_first_member
-          @first_member_i = @o.first_member
-          @item_x = @o.send @first_member_i ; nil
+        def rslv_item_x_from_first_tag
+          @first_tag_i = @o.first_tag_name
+          @item_x = @o.send @first_tag_i ; nil
         end
 
         def maybe_pathify_item_x
-          if PN_RX__ =~ @first_member_i.to_s
+          if PN_RX__ =~ @first_tag_i.to_s
             @item_x = @expression_agent.pth @item_x
             true
           end
@@ -206,8 +217,17 @@ module Skylab::Brazen
           build_error_event_via_mutable_iambic_and_message_proc x_a, p
         end
 
+        def build_success_event_with * x_a, & p
+          build_success_event_via_mutable_iambic_and_message_proc x_a, p
+        end
+
         def build_error_event_via_mutable_iambic_and_message_proc x_a, p
           x_a.push :ok, false
+          build_event_via_iambic_and_message_proc x_a, p
+        end
+
+        def build_success_event_via_mutable_iambic_and_message_proc x_a, p
+          x_a.push :ok, true
           build_event_via_iambic_and_message_proc x_a, p
         end
 
@@ -228,6 +248,10 @@ module Skylab::Brazen
           Inferred_Message.to_proc
         end
 
+        def build_event_prototype_with * x_a, & p
+          Event.prototype_via_iambic_and_message_proc x_a, p
+        end
+
         def event_class
           Event
         end
@@ -239,14 +263,14 @@ module Skylab::Brazen
           send_event_structure build_event_via_iambic_and_message_proc( x_a, p )
         end
         def send_structure_on_channel ev, chan_i
-          send_structure_on_channel_to_listener ev, chan_i, @listener
+          send_structure_on_channel_to_listener ev, chan_i, listener
         end
         def send_structure_on_channel_to_listener ev, chan_i, listener
           send_structure_with_method_to_listener ev,
             :"receive_#{ chan_i }_#{ ev.terminal_channel_i }", listener
         end
         def send_structure_with_method ev, m_i
-          send_structure_with_method_to_listener ev, m_i, @listener
+          send_structure_with_method_to_listener ev, m_i, listener
         end
         def send_structure_with_method_to_listener ev, m_i, listener
           listener.send m_i, ev

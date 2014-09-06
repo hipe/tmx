@@ -41,9 +41,12 @@ module Skylab::Brazen
       def make_Add
         cls = begin_class
         def cls.build_props
-          krnl = Entity_[].scope_kernel.new self, singleton_class
-          model_class.properties.each_value do |prop|
-            krnl.add_property prop
+          @do_not_add_model_class_properties_to_action_properties ||= begin
+            krnl = Entity_[].scope_kernel.new self, singleton_class
+            model_class.properties.each_value do |prop|
+              krnl.add_property prop
+            end
+            true
           end
           super
         end
@@ -109,14 +112,27 @@ module Skylab::Brazen
           err = @ent.edit @action_x_a, @model_x_a
           err || when_edited_OK
         end
+
+        def receive_persisting_event ev
+          @client_adapter.receive_event ev
+        end
       end
 
       module List_Methods__
         include Semi_Generated_Instance_Methods__
 
+        def initialize kernel
+          @channel ||= :listed
+          super
+        end
+
         def if_dependencies_are_met
           @scan = resolve_entity_scan
-          @scan and via_scan_render_list
+          @scan and via_scan_send_list
+        end
+
+        def receive_listed_item ev
+          @client_adapter.receive_event ev
         end
 
       private
@@ -130,38 +146,54 @@ module Skylab::Brazen
           col_controller and col_controller.to_property_hash_scan
         end
 
-        def via_scan_render_list
+        def via_scan_send_list
           count = 0
-          props = self.class.model_class.properties.to_a
-          d = props.reduce 0 do |m, prop|
-            d_ = prop.name.as_human.length
-            m < d_ ? d_ : m
+          item_event = build_item_event_builder
+          while h = @scan.gets
+            _ev = item_event[ count, h ]
+            count += 1
+            send_event_structure _ev
           end
-          fmt = "%#{ d }s"
+          _ev = build_success_event_with :number_of_items_found, :count, count
+          _ev_ = sign_event _ev
+          @client_adapter.receive_event _ev_
+        end
+
+        def build_item_event_builder
+          key_a, format_h = build_black_and_white_property_formatters
+          build_event_prototype_with :item,
+              :offset, nil, :flyweighted_h, nil, :ok, true do |y, o|
+            if o.offset.nonzero?
+              y << '---'
+            end
+            h = o.flyweighted_h
+            key_a.each do |key_s|
+              y << format_h.fetch( key_s ) % h.fetch( key_s )
+            end ; nil
+          end
+        end
+
+        def build_black_and_white_property_formatters
+          @prps = self.class.model_class.properties.to_a
+          fmt = produce_property_value_format_string
           key_a = [] ; format_h = {}
-          props.each do |prop|
+          @prps.each do |prop|
             key_s = prop.name.as_lowercase_with_underscores_symbol.to_s
             key_a.push key_s
             format_h[ key_s ] = "#{ fmt % prop.name.as_human }: %s"
           end
-          y = payload_output_line_yielder
-          output_entity = -> h do
-            count += 1
-            key_a.each do |key_s|
-              y << format_h.fetch( key_s ) % h.fetch( key_s )
-            end
-          end
-          if h = @scan.gets
-            output_entity[ h ]
-          end
-          while h = @scan.gets
-            y << '---'
-            output_entity[ h ]
-          end
-          ev = build_event_with :number_of_items_found, :count, count, :ok, true
-          ev_ = sign_event ev
-          @client_adapter.receive_event ev_
+          @prps = nil
+          [ key_a, format_h ]
         end
+
+        def produce_property_value_format_string
+          d = @prps.reduce 0 do |m, prop|
+            d_ = prop.name.as_human.length
+            m < d_ ? d_ : m
+          end
+          "%#{ d }s"
+        end
+
       public
         def receive_the_collection_info ev
           @client_adapter.receive_event sign_event ev

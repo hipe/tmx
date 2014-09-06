@@ -1,9 +1,7 @@
 module Skylab::TanMan
 
   Entity_ = Brazen_::Model_::Entity[ -> do
-    cls = ::Class.new
-    self::Property = cls
-    set_property_class cls
+
   end ]
 
   DESC_METHOD_ = -> s = nil, & p do
@@ -14,10 +12,39 @@ module Skylab::TanMan
     end ; nil
   end
 
+  Actor_ = -> cls, * a do
+    Callback_::Actor.via_client_and_iambic cls, a
+    cls.include TanMan_::Lib_::Entity[]::Event::Builder_Methods  ; nil
+  end
+
   class Model_ < Brazen_::Model_
 
     define_singleton_method :desc, DESC_METHOD_
 
+  end
+
+
+  Stubber_ = -> model do
+    -> i do
+      Stub__.new i do |x|
+        _action_cls = model::Actions__.const_get i, false
+        _action_cls.new x
+      end
+    end
+  end
+
+  class Stub__
+    def initialize name_i, & p
+      @p = p
+      @name_function = Callback_::Name.from_variegated_symbol name_i
+    end
+    def is_promoted
+      false
+    end
+    attr_reader :name_function
+    def new kernel
+      @p[ kernel ]
+    end
   end
 
   class Action_ < Brazen_::Model_::Action
@@ -53,9 +80,14 @@ module Skylab::TanMan
     end
   end
 
+
   class Kernel_ < Brazen_::Kernel_  # :[#083].
     def retrieve_property_value i
       properties.retrieve_value i
+    end
+
+    def datastores
+      models
     end
   private
     def properties
@@ -64,6 +96,7 @@ module Skylab::TanMan
   end
 
   Models_ = ::Module.new
+
 
   class Models_::Workspace < Brazen_::Models_::Workspace
 
@@ -138,6 +171,21 @@ module Skylab::TanMan
 
     desc "there's a lot you can tell about a man from his choice of words"
 
+    end
+  end
+
+  class Models_::Meaning < Model_
+
+    desc "manage meaning."
+
+    self.after_i = :graph
+
+    Stub_ = Stubber_[ self ]
+
+    module Actions
+      Add = Stub_[ :Add ]
+      Ls  = Stub_[ :Ls ]
+      Rm = Stub_[ :Rm ]
     end
   end
 end

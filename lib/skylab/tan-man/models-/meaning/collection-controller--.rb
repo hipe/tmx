@@ -1,9 +1,65 @@
 module Skylab::TanMan
 
-  class Models::Meaning::Collection
+  class Models_::Meaning
 
-    include Core::SubClient::InstanceMethods
+    class Collection_Controller__
 
+      def self.[] a
+        _, channel, delegate, _, kernel = a  # datastore name, model class
+        new channel, delegate, kernel
+      end
+
+      def initialize * a
+        @channel, @action, @kernel = a
+        @input_string = @action.action_property_value :input_string
+      end
+
+      def to_property_hash_scan
+        scan = build_scan
+        scan.map_by do |fly|
+          fly.to_property_hash
+        end
+      end
+
+      def persist_entity ent
+        _p = method :build_scan
+        _os = @action.action_property_value :output_string
+        Collection_Controller__::Persist[ ent, _os, _p, @channel, @action ]
+      end
+
+    private
+
+      def build_scan
+        scan = build_comment_line_scan
+        fly = Meaning_::Flyweight__.new
+        scan_ = scan.map_reduce_by do |line|
+          if ASSOCIATION_RX__ =~ line
+            fly.set!(
+              scan.last_start_position,
+              scan.last_end_position,
+              scan.source_string )
+            fly
+          end
+        end
+        scan_.parent_scan = scan
+        scan_
+      end
+      ASSOCIATION_RX__ = /\A[ \t]*[-a-z]+[ \t]*:/
+
+      def build_comment_line_scan
+        if @input_string
+          produce_comment_line_scan_via_mystery_string @input_string
+        else
+
+        end
+      end
+
+      def produce_comment_line_scan_via_mystery_string str
+        Models_::Comment::Line_Scan.of_mystery_string str
+      end
+    end
+
+    if false
     def apply node, meaning_ref, dry_run, verbose, error, success, info
       res = nil
       begin
@@ -15,28 +71,6 @@ module Skylab::TanMan
           update_attributes attrs, error, success
       end while nil
       res
-    end
-
-    def each &block
-      list.each(& block)
-    end
-
-    hack_rx = Models::Meaning::FUN.match_line_rx
-
-    define_method :list do
-      ::Enumerator.new do |y|
-        fly = Models::Meaning::Flyweight.new
-        sexp.comment_nodes.each do |str|
-          enum = Models::Comment::LineEnumerator.for str
-          enum.each do |line|
-            if hack_rx =~ line
-              fly.set! str, ( enum.scn.pos - line.length )
-              y << fly
-            end
-          end
-        end
-        nil
-      end
     end
 
     define_method :set do |
@@ -294,5 +328,7 @@ module Skylab::TanMan
         "interminable meaning - #{ o.reason }"
       end
     end
+    end
+
   end
 end

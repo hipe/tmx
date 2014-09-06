@@ -12,4 +12,3 @@ then you don't want to go and resort the list -- that would be rude.
 In such cases, try and make it look like you were trying to do the
 right thing and insert the item above the first item that you find
 that was lexically greater ("should come after") the new item.
-

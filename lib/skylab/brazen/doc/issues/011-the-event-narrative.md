@@ -11,3 +11,13 @@ what the values will be in your new event of the properties that exist
 in the first event. in order to add new propertes to a existing event,
 you could perhaps use `to_iambic` and add new properties and value to
 this array and build a new event from that.
+
+
+
+
+## :#note-70
+
+this is really ugly and awful to have to mutate the singleton class like
+this when you make a dup of an inline event. to support such an
+operation without as much ugliness, consider making [#023] a dedicated
+event class.

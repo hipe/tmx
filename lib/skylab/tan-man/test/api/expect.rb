@@ -40,11 +40,23 @@ module Skylab::TanMan::TestSupport
           @ev_a = []
         end
 
+        def receive_negative_event ev
+          ev.ok and self._WHERE
+          receive_event ev
+        end
+
         def receive_event ev
           @do_debug and express_event ev
+          ev_ = ev.to_event
+          if ev_.has_tag :flyweighted_h
+            ev.object_id == ev_.object_id or self._DO_ME
+            _h = ev_.flyweighted_h.dup
+            ev_ = ev_.dup_with :flyweighted_h, ev_.flyweighted_h.dup
+            ev = ev_
+          end
           @ev_a.push ev
-          if ev.has_tag :ok
-            ev.ok ? true : false
+          if ev_.has_tag :ok
+            ev_.ok ? true : false
           end
         end
 
@@ -63,8 +75,9 @@ module Skylab::TanMan::TestSupport
       private
 
         def express_event ev
-          @ev = ev ; @ok_s = ok_s ; @tci = ev.terminal_channel_i
-          @mems = "(#{ ev.members * ', ' })"
+          @ev = ev ; @ev_ = ev.to_event
+          @ok_s = ok_s ; @tci = ev.terminal_channel_i
+          @mems = "(#{ @ev_.tag_names * ', ' })"
           y = ::Enumerator::Yielder.new do |s|
             @debug_IO.puts "#{ @ok_s } #{ @tci } #{ @mems } - #{ s.inspect }"
           end
@@ -73,8 +86,9 @@ module Skylab::TanMan::TestSupport
         end
 
         def ok_s
-          if @ev.has_tag :ok
-            @ev.ok ? '(ok)' : '(not ok)'
+          ev_ = @ev.to_event
+          if ev_.has_tag :ok
+            ev_.ok ? '(ok)' : '(not ok)'
           else
             '(ok? not ok?)'
           end
@@ -84,12 +98,17 @@ module Skylab::TanMan::TestSupport
       module Test_Context_Methods__
 
         def expect * x_a, & p
-          Expect.new( x_a, p , self ) ; nil
+          Expect.new( x_a, p , self ).result
         end
 
         def expect_failed
           expect_no_more_events
           @result.should eql false
+        end
+
+        def expect_succeded
+          expect_no_more_events
+          @result.should eql true
         end
 
         def expect_no_more_events
@@ -107,19 +126,26 @@ module Skylab::TanMan::TestSupport
         def initialize *a
           @x_a, @p, @context = a
           @d = -1 ; @last_d = @x_a.length - 1
+          @will_pass = true
           expect_one_event
-          @ok && expect_channel
-          @ok && process_terminal_channel_i
-          @ok && process_message_bodies
+          @stay && expect_channel
+          @stay && process_terminal_channel_i
+          @stay && process_message_bodies
+          if @will_pass && @p
+            process_proc
+          end ; nil
         end
+
+        attr_reader :result
 
         def expect_one_event
           @ev = @context.event_receiver.gets
           if @ev
-            @ok = true
+            @ev_ = @ev.to_event
+            @stay = true
           else
-            @context.send :fail, "expected more events, had none."
-            @ok = false
+            @ev_ = nil
+            send_failure "expected more events, had none."
           end ; nil
         end
 
@@ -128,10 +154,9 @@ module Skylab::TanMan::TestSupport
         end
 
         def expect_OK_value_for_failed
-          if @ev.has_tag :ok
-            if @ev.ok
-              @context.send :fail, "was 'ok', expected not"
-              @ok = false
+          if @ev_.has_tag :ok
+            if @ev_.ok
+              send_failure "was 'ok', expected not"
             end
           else
             when_no_tag
@@ -139,25 +164,22 @@ module Skylab::TanMan::TestSupport
         end
 
         def expect_OK_value_for_succeeded
-          if @ev.has_tag :ok
-            if ! @ev.ok
-              @context.send :fail, "was not 'ok', exppected 'ok'"
-              @ok = false
+          if @ev_.has_tag :ok
+            if ! @ev_.ok
+              send_failure "was not 'ok', expected 'ok'"
             end
           else
-           when_no_tag
+            when_no_tag
           end
         end
 
         def when_no_tag
-          @context.send :fail, "did not have 'ok' tag"
-          @ok = false ; nil
+          send_failure "did not have 'ok' tag"
         end
 
         def expect_OK_value_for_neutral
           if @ev.has_tag :ok
-            @context.send :fail, "expected event not to have 'ok' tag"
-            @ok = false
+            send_failure "expected event not to have 'ok' tag"
           end
         end
 
@@ -169,10 +191,10 @@ module Skylab::TanMan::TestSupport
               @context.instance_exec do
                 exp.should eql act
               end
-              @ok = false
+              @stay = false
             end
           else
-            @ok = false
+            @stay = false
           end ; nil
         end
 
@@ -186,26 +208,34 @@ module Skylab::TanMan::TestSupport
                   @context.instance_exec do
                     act.should eql exp
                   end
-                  @ok = false
+                  @stay = false
                 end
               else
-                @context.send :fail, "unexpected extra line from #{
+                send_failure "unexpected extra line from #{
                   }rendering: #{ act.inspect }"
-                @ok = false
               end
             end
             @ev.render_all_lines_into_under y, _exp
           else
-            @ok = false
+            @stay = false
           end
         end
 
+        def process_proc
+          @result = @p[ @ev ] ; nil
+        end
+
         def unparsed_exists
-          @ok = @d != @last_d
+          @stay = @d != @last_d
         end
 
         def gets_one
           @x_a.fetch( @d += 1 )
+        end
+
+        def send_failure msg
+          @result = @stay = @will_pass = false
+          @context.send :fail, msg ; nil
         end
       end
     end

@@ -39,6 +39,5 @@ module Skylab::TanMan
     Bound_Call_ = ::Struct.new :receiver, :method_name, :args
     IDENTITY_ = -> x { x }
     OK_ = true
-    UNABLE_ = false
   end
 end

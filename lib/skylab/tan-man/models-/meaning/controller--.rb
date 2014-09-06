@@ -1,91 +1,68 @@
 module Skylab::TanMan
 
-  class Models::Meaning < ::Struct.new :name, :value # KEEP LIFE EASY
-                                               # let's always use only strings
+  class Models_::Meaning
 
-    include Core::SubClient::InstanceMethods
+    module Controller__
 
+      class Normalize_name
 
-    def collapse client_x  # we are not a flyweight, hack
-      @request_client and fail 'sanity'
-      client_notify client_x
-      self
-    end
+        Actor_[ self, :properties, :x, :val_p, :ev_p, :prop ]
 
-    match_line_rx = /\A[ \t]*[-a-z]+[ \t]*:/
-
-    valid_name_rx = /\A[a-z][-a-z0-9]*\z/
-
-    def duplicate_spacing! o                   # meh
-      o_x = o.line_start
-      its_width_to_colon = o.colon_pos - o_x
-      its_e2_width = o.colon_pos - (o.name_index.end + 1)
-      its_e0 = o.whole_string[ o_x .. o.name_index.begin - 1 ]
-      its_e0.gsub!( /[ \t]+\z/, '' )
-      @e0 = "#{ its_e0 }#{
-        ' ' * [ 0,
-      (its_width_to_colon - its_e2_width - name.length - its_e0.length)
-               ].max
-      }"
-      @e2 = ' ' * its_e2_width
-      @e4 = ' ' * ( o.value_index.begin - 1 - o.colon_pos )
-      nil
-    end
-
-    def line
-      "#{ @e0 }#{ name }#{ @e2 }:#{ @e4 }#{ value }\n"
-    end
-
-                                  # result is true or false per if the meaning
-                                  # is valid or invalid respectively. `error` is
-                                  # called one or more times iff invalid. `info`
-                                  # is called one or more times iff the value(s)
-                                  # are changed per normalization. `error` and`
-                                  # `info` receive strings for now, maybe events
-                                  # in the future.
-    nl_rx = /[\r\n]/
-
-    define_method :normalize! do |error, info|
-      res = false
-      begin
-        if valid_name_rx !~ name
-          error[ "invalid meaning name #{ ick name } - meaning names #{
-            }must start with a-z followed by [-a-z0-9]" ]
-          break
+        def execute
+          if VALID_NAME_RX__ =~ @x
+            @val_p[ @x ]
+          else
+            when_invalid
+          end
         end
-        if nl_rx =~ value
-          error[ "value cannot contain newlines." ]
-          break
+
+        def when_invalid
+          @ev_p[ :error, :invalid_meaning_name, :meaning_name, @x, -> y, o do
+            y << "invalid meaning name #{ ick o.meaning_name } - meaning names #{
+             }must start with a-z followd by [-a-z0-9]"
+          end ]
         end
-        use = value.strip
-        x = value.length - use.length
-        if x > 0
-          info[ "trimming #{ x } char#{ s x } #{
-            }of whitespace from value" ]
-          self[:value] = use
+
+        VALID_NAME_RX__ = /\A[a-z][-a-z0-9]*\z/
+      end
+
+      class Normalize_value
+
+        Actor_[ self, :properties, :x, :val_p, :ev_p, :prop ]
+
+        def execute
+          if NL_RX__ =~ @x
+            when_invalid
+          else
+            when_valid
+          end
         end
-        res = true
-      end while nil
-      res
-    end
+        NL_RX__ = /[\r\n]/
 
-    attr_reader :symbol           # exp - doesn't always feel right using only
-                                  # strings, despite what i may have said above
+        def when_invalid
+          @ev_p[ :error, :invalid_meaning_value, :meaning_value, @x,
+            -> y, o do
+              y << "value cannot contain newlines."
+            end ]
+        end
 
-    o = { }
-    o[:match_line_rx] = match_line_rx
-    o[:valid_name_rx] = valid_name_rx
-    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
+        def when_valid
+          s = @x.strip
+          d = @x.length - s.length
+          if d.nonzero?
+            report_strip d
+            @x = s
+          end
+          @val_p[ @x ]
+        end
 
-  private
-
-    def initialize client_x, name, value
-      self[:name] = name
-      @symbol = name.intern
-      self[:value] = value
-      @e0 = @e2 = @e4 = nil
-      init_headless_sub_client client_x  # we can't call to super b.c struct
-      nil
+        def report_strip d
+          @ev_p[ :info, :value_changed_during_normalization, -> y, o do
+            y << "trimming #{ d } char#{ s d } of whitespace from value"
+          end ]
+          @ev_p[ _ev ]
+        end
+      end
     end
   end
 end
