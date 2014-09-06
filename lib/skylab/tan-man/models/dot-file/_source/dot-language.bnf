@@ -1,4 +1,4 @@
-# bnf2treetop: set s e=':' g="Skylab::TanMan::Models::DotFile::DotLanguage" i=HandMadeSupplement:
+# bnf2treetop: set s e=':' g="Skylab::TanMan::Models_::DotFile::DotLanguage" i=HandMadeSupplement:
 #
 # Run this file to see its ouput with: bnf2treetop <path-to-this-file>
 #

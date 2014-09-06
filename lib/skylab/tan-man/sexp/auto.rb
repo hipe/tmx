@@ -12,13 +12,13 @@ module Skylab::TanMan
       alias_method :debug?, :do_debug
     end
 
-    self.debug_stream = Headless::CLI::IO.some_errstream_IO
+    @debug_stream = TanMan_::Lib_::Some_stderr[]
 
-    self.do_debug = true          # true until you know enough to find this line
+    @do_debug = true  # true until you know enough to find this line
 
-  end
+    CUSTOM_PARSE_TREE_METHOD_NAME__ = :tree
 
-  module Sexp::Auto::BuildMethods
+  extend( module BuildMethods
 
     # These Build Methods build sexps ("trees") from syntax nodes, possibly
     # creating sexp classes as necessary.
@@ -32,22 +32,25 @@ module Skylab::TanMan
       node2tree syntax_node, nil, nil # no class, no member_name
     end
 
-    constantize = Autoloader::FUN::Constantize
 
-    define_method :add_instance_methods do |tree_class|
-      if instance_methods_module
-        tree_class.send :include, instance_methods_module
+    ( define_method :add_instance_methods do |tree_class|
+      mod = instance_methods_module
+      if mod
+        tree_class.include mod
       end
-      im = [ :Sexp, :InstanceMethods, constantize[ tree_class.rule ] ].
-          reduce( tree_class.grammar.anchor_module ) do |m, x|
-        break if ! m.const_defined? x, false  # one end of [#078]
-        m.const_get x, false
+      a = [ :Sexp, :InstanceMethods,
+        TanMan_::Lib_::Constantize[ tree_class.rule ] ]
+
+      im = a.reduce tree_class.grammar.anchor_module do |m, i|
+        _ok = m.const_defined? i, false
+        _ok or break  # one end of [#078]
+        m.const_get i, false
       end
       if im
-        tree_class.send :include, im
+        tree_class.include im
       end
       nil
-    end
+    end )
 
     def build_element_names i # extent: * defs, 1 call
 
@@ -142,11 +145,11 @@ module Skylab::TanMan
     def sexp_builder_anchor_module # experimental
       Sexp::Auto
     end
-  end
 
-  Sexp::Auto.extend Sexp::Auto::BuildMethods  # e.g. Sexp::Auto[ foo ]
+    self
+  end )
 
-  module Sexp::Auto::ModuleMethods
+  module ModuleMethods
 
     # This module or descendant modules will be included by generated
     # Sexp ("tree") classes.
@@ -158,8 +161,8 @@ module Skylab::TanMan
     def element2tree element, member_i
       if ! element
         nil # typically as a trailing optional node
-      elsif element.respond_to? CUSTOM_PARSE_TREE_METHOD_NAME_
-        element.send CUSTOM_PARSE_TREE_METHOD_NAME_  # careful!
+      elsif element.respond_to? CUSTOM_PARSE_TREE_METHOD_NAME__
+        element.send CUSTOM_PARSE_TREE_METHOD_NAME__  # careful!
       else
         node2tree element, self, member_i
       end
@@ -199,7 +202,7 @@ module Skylab::TanMan
     end
   end
 
-  module Sexp::Auto::InstanceMethods
+  module InstanceMethods
 
     # For now, methods defined here must have names that do *not* match
     # /\A[_a-z][a-z0-9][a-z0-9_]*\z/  (i.e. all the methods you define here
@@ -280,9 +283,9 @@ module Skylab::TanMan
     end
   end
 
-  class Sexp::Auto::List < ::Array
+  class List < ::Array
 
-    include Sexp::Auto::InstanceMethods
+    include InstanceMethods
 
     def __dupe # #here
       other = self.class.new length
@@ -297,10 +300,11 @@ module Skylab::TanMan
 
   # --*--
 
-  My_Struct_ = TanMan::Services::Basic::Struct
+  My_Struct_ = TanMan_::Lib_::Basic_struct[]
 
-  Sexp::Auto::ContentTextValue = My_Struct_[ :content_text_value ]
-  class Sexp::Auto::ContentTextValue
+  ContentTextValue = My_Struct_[ :content_text_value ]
+
+  class ContentTextValue
 
     # Exeperimental: Use this as a sexp builder in your grammars (with []) where
     # you want to flatten a rule into its text value, but rather than use
@@ -312,7 +316,7 @@ module Skylab::TanMan
     # the text_value of the syntax node. Experimental!
     #
 
-    include Sexp::Auto::InstanceMethods
+    include InstanceMethods
 
     class << self
       def [] syntax_node
@@ -336,7 +340,7 @@ module Skylab::TanMan
 
   # --*--
 
-  class Sexp::Auto::Inference
+  class Inference
 
     def initialize extension_module_meta_a, member_i, _node, _parent_class,
         tree_class=nil # only used for hacks for now (experimental!!)
@@ -370,7 +374,7 @@ module Skylab::TanMan
       end
     end
 
-    custom_parse_tree_method_name = CUSTOM_PARSE_TREE_METHOD_NAME_
+    custom_parse_tree_method_name = CUSTOM_PARSE_TREE_METHOD_NAME__
 
     factory = -> node, parent_class, member_i do
       a = node.extension_modules
@@ -430,7 +434,7 @@ module Skylab::TanMan
     end
   end
 
-  class Sexp::Auto::Inference_WithConst < Sexp::Auto::Inference
+  class Inference_WithConst < Inference
 
     # What can we do with a node with one extension module?
 
@@ -529,7 +533,7 @@ module Skylab::TanMan
     end
   end
 
-  class Sexp::Auto::Inference_WithElements < Sexp::Auto::Inference_WithConst
+  class Inference_WithElements < Inference_WithConst
 
     def initialize *a, methods_idx
       @methods_idx = methods_idx
@@ -545,7 +549,7 @@ module Skylab::TanMan
     end
   end
 
-  class Sexp::Auto::ExtensionModuleMeta
+  class ExtensionModuleMeta
 
     # There are so many inflection-heavy hacks going on that it is useful
     # to have this wrapper around extension modules.  Note we flyweight them.
@@ -598,31 +602,35 @@ module Skylab::TanMan
 
   # --*--
 
-  module Sexp::Auto::Factories
-    # experimental namespace for 'static' factories
-  end
+  Factories = ::Module.new  # experimental namespace for 'static' factories
 
-  module Sexp::Auto::Factories::TextValue ; end
+  module Factories::TextValue
 
-  module Sexp::Auto::Factories::TextValue::Methods
-    def tree o
-      s = o._node.text_value
-      '' == s ? nil : s # easier boolean logic
+    extend module Methods
+
+      def tree o
+        s = o._node.text_value
+        s if EMPTY_S_ != s  # easier for boolean logic
+      end
+
+      self
     end
-    Sexp::Auto::Factories::TextValue.extend self
   end
 
   # --*--
 
-  module Sexp::Auto::Lossless
+module Lossless
+
     # "lossless" means the sexp can recreate faithfully (losslessly) the
     # entirety of the source input string.
     #
-  end
 
-  module Sexp::Auto::Lossless::BuildMethods ; include Sexp::Auto::BuildMethods
+  module BuildMethods
+
+    include Sexp::Auto::BuildMethods
 
     def build_element_names i # extent: * defs, 1 call
+
       # This is ridiculously sinful but useful (experimental, too):
       #
       # In theory, for any given syntax node that corresponds to a rule
@@ -666,14 +674,16 @@ module Skylab::TanMan
     end
   end
 
-  Sexp::Auto::Lossless.extend Sexp::Auto::Lossless::BuildMethods
+  extend BuildMethods
 
-  module Sexp::Auto::Lossless::ModuleMethods
+  module ModuleMethods
     include Sexp::Auto::ModuleMethods
   end
 
-  module Sexp::Auto::Lossless::InstanceMethods
+  module InstanceMethods
+
     include Sexp::Auto::InstanceMethods
+
     def unparse
       map do |child|
         case child
@@ -681,32 +691,34 @@ module Skylab::TanMan
         when ::String   ; child
         else            ; child.unparse
         end
-      end.join('')
+      end.join EMPTY_S_
     end
   end
 
-  class Sexp::Auto::Lossless::List < Sexp::Auto::List
+  class List < Sexp::Auto::List
     include Sexp::Auto::Lossless::InstanceMethods
   end
 
   # --*--
 
-  module Sexp::Auto::Lossless::Recursive end
+  Recursive = ::Module.new
 
-  module Sexp::Auto::Lossless::Recursive::BuildMethods
-    include Sexp::Auto::Lossless::BuildMethods
+  module Recursive::BuildMethods
 
-    Sexp::Auto::Lossless::Recursive.extend self # a toplevel entrypoint for
-                                                # these builder methods
+    include BuildMethods
+
+    Recursive.extend self # a toplevel entrypoint for these builder methods
 
     def sexp_builder_anchor_module
-      Sexp::Auto::Lossless::Recursive
+      Recursive
     end
   end
 
-  module Sexp::Auto::Lossless::Recursive::ModuleMethods
-    include Sexp::Auto::Lossless::ModuleMethods
-    include Sexp::Auto::Lossless::Recursive::BuildMethods # for #recursive call
+  module Recursive::ModuleMethods
+
+    include Lossless::ModuleMethods
+
+    include Lossless::Recursive::BuildMethods  # for #recursive call
 
     def tree inference # the #recursive call
       elements = inference._node.elements
@@ -715,7 +727,7 @@ module Skylab::TanMan
       _children = elements.zip(_members).map do |element, member_i|
         tree = element2tree element, member_i
         begin                                  # hack alert - for performance &
-          ::String === prev or break           # readability for now we do this
+          prev.respond_to?( :ascii_only? ) or break  # readability for now we do this
           prev.include? 'example' or break     # ugliness like so
           hack = Sexp::Prototype.match prev, tree, self, member_i
           hack or break                        # the hack might create a node
@@ -725,5 +737,7 @@ module Skylab::TanMan
       end
       new(* _children)
     end
+  end
+end
   end
 end

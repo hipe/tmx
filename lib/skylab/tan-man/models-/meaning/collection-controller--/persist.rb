@@ -156,7 +156,6 @@ module Skylab::TanMan
         end
 
         C_STYLE_OPEN_COMMENT_RX_ = /\A[ \t]*\/\*/
-        EMPTY_S_ = ''.freeze
         SPACE_ = ' '.freeze
         TRAILING_WHITESPACE_RX__ = /[ \t]+\z/
       end

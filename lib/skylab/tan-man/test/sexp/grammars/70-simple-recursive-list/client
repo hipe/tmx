@@ -2,8 +2,10 @@
 
 require_relative '../../test-support'
 
-module ::Skylab::TanMan::TestSupport::Sexp
+module Skylab::TanMan::TestSupport::Sexp
+
   class Grammars::Grammar70_SimpleRecursiveList < self::Grammar
+
     # everything is magic
   end
 end

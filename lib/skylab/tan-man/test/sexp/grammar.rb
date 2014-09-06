@@ -9,7 +9,7 @@ module Skylab::TanMan::TestSupport::Sexp
                                   # to our test grammars to make them executable
                                   # on the command line, crucial for visual
                                   # testing and dev.  remember we want to stay
-                                  # clear of aritrary application code porcelain
+                                  # clear of arbitrary application code porcelain
 
     extend module ModuleMethods
 
@@ -26,30 +26,45 @@ module Skylab::TanMan::TestSupport::Sexp
       self
     end
 
-    include TanMan_::Models::DotFile::Parser::InstanceMethods # err msg porcelain
-    include TanMan_::TestSupport::Tmpdir::InstanceMethods #prepared_tanman_tmpdir
+    include TanMan_::Models_::DotFile::Parser::InstanceMethods  # err msg porcelain
+    include TanMan_::TestSupport::Tmpdir::InstanceMethods  # prepared_tanman_tmpdir
 
     TestLib_::CLI_client[ self ]
 
-    -> do
-      pen = TestLib_::CLI_pen_minimal[]
-      def pen.pth str
-        "«#{ str }»"                # :+#guillemets just for fun and practice
+    def initialize sin, * two_IO  # :+[#sl-114]
+      two_IO.length.upto( 1 ) do |d|
+        two_IO[ d ] = IO_at_index__[ d + 1 ]
       end
 
-      sin, sout, serr = TestLib_::Three_IOs[]
+      @stdin = sin  # [#hl-022]
 
-      define_method :initialize do |i=sin, o=sout, e=serr|
-        # observe pattern [#sl-114]
+      self.io_adapter = build_IO_adapter nil, * two_IO, Pen__[]
 
-        @stdin = i                  # we keep this stream on deck but don't set
-                                    # upstream yet. it takes logix. [#hl-022]
-        self.io_adapter = build_IO_adapter nil, o, e, pen
-        super()
+      super()
+    end
+
+    IO_at_index__ = -> do
+      a = nil
+      -> d do
+        a ||= TestLib_::Three_IOs[]
+        a[ d ]
       end
     end.call
 
-    attr_accessor :force_overwrite
+    Pen__ = -> do
+      p = -> do
+         pen = TestLib_::CLI_pen_minimal[]
+        def pen.pth str
+          "«#{ str }»"  # :+#guillemets just for fun and practice
+        end
+        p = -> { pen } ; pen
+      end
+      -> { p[] }
+    end.call
+
+    attr_accessor :do_force_overwrite
+
+    attr_accessor :receive_parser_loading_info_p
 
 
     def invoke argv               # enhance headless with invite at the end
@@ -65,6 +80,8 @@ module Skylab::TanMan::TestSupport::Sexp
 
     #        ----*-  private methods, alphabetical  -*----
 
+    TestLib_::Let[ self ]
+
     let :anchor_dir_pathname do
       self.class.grammars_module.dir_pathname.join stem_path
     end
@@ -72,14 +89,18 @@ module Skylab::TanMan::TestSupport::Sexp
     num_rx = /\A([A-Za-z]+(?:::[A-Za-z]+)+)\d+[^:]+\z/
 
     define_method :anchor_module_head do
-      _md = num_rx.match(self.class.to_s) or fail("failed to infer#{
+      md = num_rx.match self.class.name
+      md or fail say_failed_amh
+      md[ 1 ]
+    end
+
+    def say_failed_amh
+      "failed to infer#{
         } anchor_module_head from this class name, expecting leading consts#{
         } without digits and the trailing const to have a digit in it#{
         } (You may need to implement your own hacky thing up the chain.)#{
-        } (Your thing: #{self.class})")
-      _md[1]
+        } (Your thing: #{ self.class })"
     end
-
 
     pathspec_syntax = '[ - | <filename> ]'
 
@@ -89,7 +110,7 @@ module Skylab::TanMan::TestSupport::Sexp
       op.separator "#{ em 'options:' }"
 
       op.on '-F', '--force', 'force overwrite of cached grammars (#dev)' do
-        param_queue.push [:force_overwrite, true]
+        param_queue.push [ :do_force_overwrite, true ]
       end
 
       op.on '-s <string>', "parse string instead of #{ pathspec_syntax }" do |v|
@@ -141,21 +162,28 @@ module Skylab::TanMan::TestSupport::Sexp
     end
 
     def load_parser_class
-      f = on_load_parser_info ||
-        -> e { info "      (loading parser ^_^ #{ gsub_path_hack e.to_s })" }
 
-      TestLib_::TTT[]::Parser::Load.new( self,
+      info_p = receive_parser_loading_info_p
+      info_p ||= -> s do
+        receive_info_string "      (loading parser ^_^ #{ s })"  # was gsub_path_hack
+      end
+
+      TanMan_::Lib_::TTT[]::Parser::Load.new( self,
         -> o do
-          force_overwrite and o.force_overwrite!
+          do_force_overwrite and o.force_overwrite!
           o.generated_grammar_dir tmpdir_prepared
           o.root_for_relative_paths anchor_dir_pathname
           grammars o
         end,
         ->(o) do
-          o.on_info(& f )
-          o.on_error { |e| fail("failed to load grammar: #{e}") }
+          o.on_info info_p
+          o.on_error method :fail
         end
       ).invoke
+    end
+
+    def receive_info_string s
+      @IO_adapter.errstream.puts s ; nil
     end
 
     define_method :resolve_upstream_status_tuple do  # #watch'ed by [#hl-022] for dry
@@ -196,25 +224,24 @@ module Skylab::TanMan::TestSupport::Sexp
       ok
     end
 
-    let :stem_const_rx do
-      /\A  #{ anchor_module_head }  (.+)  \z/x
-    end
-
-    pathify_p = :_TO_DO_ #  Autoloader::FUN::Pathify
-
     let :stem_path do
-      pathify_p[ stem_const_rx.match(self.class.to_s)[1] ]
+      _stem_const_rx = /\A  #{ anchor_module_head }  (.+)  \z/x
+      _md = _stem_const_rx.match self.class.name
+      _s = _md[ 1 ]
+      TanMan_::Callback_::Name.lib.pathify[ _s ]
     end
 
     def tmpdir_prepared
-      @tmpdir_prepared ||= begin
-        pn = prepared_tanman_tmpdir.join stem_path
-        td = prepared_tanman_tmpdir.class.new pn
-        if ! td.exist?
-          td.prepare # because parent gets rewritten once per runtime
-        end
-        td
+      @tmpdir_prepared ||= bld_tmpdir_prepared
+    end
+
+    def bld_tmpdir_prepared
+      pn = prepared_tanman_tmpdir.join stem_path
+      td = prepared_tanman_tmpdir.class.new pn
+      if ! td.exist?
+        td.prepare  # because parent gets rewritten once per runtime
       end
+      td
     end
 
     def upstream

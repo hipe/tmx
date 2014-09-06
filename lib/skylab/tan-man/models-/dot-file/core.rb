@@ -1,8 +1,15 @@
 module Skylab::TanMan
-  class Models::DotFile::Collection < ::Struct.new :using_pathname
-    include Core::SubClient::InstanceMethods
+
+  module Models_::DotFile
 
     CONFIG_PARAM = 'using_dotfile'
+
+    class << self
+      def get_unbound_upper_action_scan
+      end
+    end
+
+    if false
 
     def currently_using
       res = nil
@@ -55,14 +62,6 @@ module Skylab::TanMan
       end while nil
       res
     end
-
-    attr_accessor :verbose # compat
-
-  private
-
-    def initialize request_client
-      super
-      @currently_using = nil
     end
   end
 end

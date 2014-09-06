@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module ::Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
 
-  describe "[tm] Sexp ::Auto hacks recursive rule - THE GAUNTLET", wip: true do
+  describe "[tm] Sexp ::Auto hacks recursive rule - THE GAUNTLET", g: true do
 
     extend TS_
 

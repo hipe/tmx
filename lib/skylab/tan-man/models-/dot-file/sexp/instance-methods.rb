@@ -1,10 +1,10 @@
 module Skylab::TanMan
 
-  module Models::DotFile::Sexp::InstanceMethod # tell me if you get it
-                                               # pending a rename maybe
-  end
+  module Models_::DotFile
 
-  module Models::DotFile::Sexp::InstanceMethod::InstanceMethods
+    module Sexp::InstanceMethod
+
+      module InstanceMethods
 
     def _label2id_stem label_str
       md = /\A(?<stem>\w+)/.match label_str
@@ -20,9 +20,11 @@ module Skylab::TanMan
       fail "sanity - what such string is invalid? #{p.failure_reason}" if ! node
       self.class.element2tree node, member # note member might be nil
     end
-  end
 
-  module Models::DotFile::Sexp::InstanceMethods
+      end
+    end
+
+  module Sexp::InstanceMethods
 
     # #was-boxxy
 
@@ -33,11 +35,13 @@ module Skylab::TanMan
     # (as it should be!) of the idea of autoloading. experimental!
 
     def self.const_defined? const_str, look_up=true
-      super or const_probably_loadable? const_str
+      ok = super
+      if ! ok
+        entry_tree.normpath_from_distilled Callback_.distill[ const_str ]
+      end
     end
-  end
 
-  module Models::DotFile::Sexp::InstanceMethods::Comment
+  module Comment
 
     match_rx = %r{\A[[:space:]]*(?:#|/\*)} # #hack
 
@@ -48,19 +52,25 @@ module Skylab::TanMan
   # --*--
   # (modules that require more than 20 lines should be moved to their own file.)
 
-  module Models::DotFile::Sexp::InstanceMethods::DoubleQuotedString
+  module DoubleQuotedString
+
     def normalized_string
       content_text_value.gsub('\"', '"')
     end
+
     def normalized_string! string
       fail 'implement me' # at [#052]
     end
   end
 
-  module Models::DotFile::Sexp::InstanceMethods::EqualsStmt
-    include Models::DotFile::Sexp::InstanceMethod::InstanceMethods
+  module EqualsStmt
+
+    include Sexp::InstanceMethod::InstanceMethods
+
     def rhs= mixed
       self[:rhs] = _parse_id(mixed, :rhs)
     end
+  end
+  end
   end
 end

@@ -187,11 +187,11 @@ module Skylab::TanMan
     end
 
     def debug?
-      TanMan::Sexp::Auto.debug?
+      TanMan_::Sexp::Auto.debug?
     end
 
     def info msg
-      TanMan::Sexp::Auto.debug_stream.puts msg
+      TanMan_::Sexp::Auto.debug_stream.puts msg
     end
 
     def grammar

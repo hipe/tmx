@@ -30,12 +30,16 @@ module Skylab::TanMan::TestSupport
       mod.include MetaHell__[]::Class::Creator::ModuleMethods ; nil
     end
 
+    Constantize = -> x do
+      TanMan_::Callback_::Name.lib.constantize[ x ]
+    end
+
     Debug_IO = -> do
       HL__[]::System::IO.some_stderr_IO
     end
 
     Dev_client = -> do
-      HL__[]::DEV::Client.new
+      HL__[]::DEV::Client
     end
 
     Dev_tmpdir_pathname = -> do
@@ -101,7 +105,7 @@ module Skylab::TanMan::TestSupport
     TanMan_ = TanMan_
     TestLib_ = TestLib_
     TestSupport_  = ::Skylab::TestSupport
-    TMPDIR_STEM  = 'tan-man'
+    TMPDIR_STEM  = 'tina-man'
     TMPDIR = TestLib_::Build_tmpdir_via_stem[ TMPDIR_STEM ]
   end
 
@@ -128,11 +132,18 @@ module Skylab::TanMan::TestSupport
       let(:input_path_stem_to_use) { }
     end
 
-    def using_input input_path_stem, *tags, &b
+    def using_input input_path_stem, *tags, & p
+
       context "using input #{ input_path_stem }", *tags do
-        let( :input_path_stem_to_use ) { input_path_stem }
-        let( :input_string_to_use ) { }
-        module_eval(& b)
+
+        define_method :input_path_stem_to_use do
+          input_path_stem
+        end
+
+        define_method :input_string_to_use do
+        end
+
+        module_exec( & p )
       end
     end
 
@@ -214,8 +225,8 @@ module Skylab::TanMan::TestSupport
 
     attr_reader :api_was_cleared
 
-    def _build_normalized_input_pathname stem
-      __input_fixtures_dir_pathname.join stem
+    def build_normalized_input_pathname stem
+      top_input_fixtures_dir_pn.join stem
     end
 
     let :api do
@@ -231,16 +242,30 @@ module Skylab::TanMan::TestSupport
     end
 
     def build_client
-      client = TestLib_::Dev_client[].new
-      o = TanMan_::TestSupport::ParserProxy.new client
+      # client = TestLib_::Dev_client[].new
+      _client = Dev_Client__.new
+      o = TanMan_::TestSupport::ParserProxy.new _client
       o.verbose = -> { do_debug }
       if do_debug_parser_loading
         o.profile = true
       else
-        o.on_load_parser_info = ->(e) { }
+        o.receive_parser_loading_info_p = -> x do
+          if do_debug
+            some_debug_stream.puts "(xyzjk(#{ x }))"
+          end
+        end
         o.profile = false
       end
       o
+    end
+
+    class Dev_Client__
+      def parameter_label param, x=nil
+        "#{ param.name.as_method }#{ x and "[#{ x }]" }"
+      end
+      def escape_path x
+        "(xyzzy(#{ x.to_path }))"
+      end
     end
 
     def debug!
@@ -257,8 +282,8 @@ module Skylab::TanMan::TestSupport
 
     attr_accessor :do_debug_parser_loading
 
-    let :__input_fixtures_dir_pathname do
-      ::Pathname.new _input_fixtures_dir_pathname
+    def top_input_fixtures_dir_pn
+      @tifdpn ||= ::Pathname.new input_fixtures_dir_pathname
     end
 
     def input_path
@@ -273,18 +298,18 @@ module Skylab::TanMan::TestSupport
       normalized_input_string
     end
 
-    -> do
-      f = nil
-      define_method( :_my_before_all ) { f.call }
-      f = -> do
-        Tmpdir::FUN.get[ ]
-        f = -> { }
+    define_method :_my_before_all, -> do
+      p = -> do
+        Tmpdir::FUN.get[]
+        p = -> { }
       end
+      -> { p[] }
     end.call
 
     let :normalized_input_pathname do
-      if input_path_stem_to_use
-        _build_normalized_input_pathname input_path_stem_to_use
+      s = input_path_stem_to_use
+      if s
+        build_normalized_input_pathname s
       end
     end
 

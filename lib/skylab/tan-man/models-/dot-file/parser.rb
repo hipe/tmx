@@ -1,10 +1,16 @@
 module Skylab::TanMan
 
-  Models::DotFile::SyntaxNodes || nil           #preload (and see notes in..
-  Models::DotFile::Sexp::InstanceMethods || nil #preload  .. <- here aobut this)
+  module Models_::DotFile
 
-  module Models::DotFile::Parser::InstanceMethods
-    include TanMan::Parser::InstanceMethods
+    self::SyntaxNodes.class
+    self::Sexp::InstanceMethods.class
+
+    module Parser
+
+    module InstanceMethods
+
+      include TanMan_::Lib_::TTT[]::Parser::InstanceMethods
+
 
     ENTITY_NOUN_STEM = 'dot file'
 
@@ -12,43 +18,51 @@ module Skylab::TanMan
 
     def load_parser_class
 
-      on_info = on_load_parser_info
-      on_info ||= -> e do
+      on_info_p = receive_parser_loading_info_p
+      on_info_p ||= -> e do
         if verbose_dotfile_parsing
           info "#{ em '^_^' } #{ gsub_path_hack e.to_s }"
         end
       end
 
-      Headless::Services::TreetopTools::Parser::Load.new( self,
+      TanMan_::Lib_::TTT[]::Parser::Load.new( self,
         ->(o) do
           force_overwrite? and o.force_overwrite!
           o.generated_grammar_dir generated_grammar_dir
-          o.root_for_relative_paths ::File.expand_path('../..', __FILE__)
+          o.root_for_relative_paths Models_::DotFile.dir_pathname.to_path
           o.treetop_grammar 'dot-language-hand-made.treetop'
           o.treetop_grammar 'dot-language.generated.treetop'
         end,
         ->(o) do
-           o.on_info(& on_info)
+           o.on_info on_info_p
            o.on_error { |e| fail("failed to load grammar: #{e}") }
         end
       ).invoke
     end
 
-    # --*--
+    def force_overwrite?
+      false
+    end
+
+    def generated_grammar_dir
+      TanMan_::Lib_::Dev_tmpdir_pathname[].join( 'tina-man' ).to_path
+    end
 
     def excerpt_lines
-      scn = ::StringScanner.new(parser.input) # a ::StringIO is easier,
-      stop_at = parser.failure_line           # but this is more fun (powerful?)
+      scn = TanMan_::Lib_::String_scanner[].new parser.input
+      stop_at = parser.failure_line
       line_no = 0
       begin
         line_no += 1
-        line = scn.scan(/[^\r\n]*$\r?\n?/)
+        line = scn.scan LINE_CONTENT_RX__
       end until line_no >= stop_at
       margin = " #{ line_no }: "
       [ "#{ margin }#{ line.chomp }",
         "#{ ' ' * margin.length }#{ '-' * [0, parser.failure_column - 1].max }^"
       ]
     end
+
+    LINE_CONTENT_RX__ = (/[^\r\n]*$\r?\n?/)
 
     def expecting
       a = parser.terminal_failures
@@ -66,15 +80,6 @@ module Skylab::TanMan
       result
     end
 
-    def force_overwrite?
-      false
-    end
-
-    def generated_grammar_dir
-      '../../../../../tmp/tan-man'
-    end
-
-
     def parser_failure_reason
 
       in_file = -> do
@@ -89,6 +94,8 @@ module Skylab::TanMan
       end.call
 
       [ in_file, expecting, * excerpt_lines ].compact.join "\n"
+    end
+    end
     end
   end
 end

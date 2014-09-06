@@ -10,10 +10,16 @@ module Skylab::TanMan::TestSupport::Sexp
   TestLib_ = TestLib_
 
   module ModuleMethods
-    def using_grammar grammar_pathpart, *tags, &b
-      context "using grammar #{grammar_pathpart}", *tags do
-        let(:using_grammar_pathpart) { grammar_pathpart }
-        module_eval( &b )
+
+    def using_grammar grammar_pathpart, *tags, & p
+
+      context "using grammar #{ grammar_pathpart }", *tags do
+
+        define_method :using_grammar_pathpart do
+          grammar_pathpart
+        end
+
+        module_exec( & p )
       end
     end
   end
@@ -23,46 +29,50 @@ module Skylab::TanMan::TestSupport::Sexp
     alias_method :sexp_original_client, :client
 
     let :client do
-      o = _parser_client_module.new upstream, paystream, infostream
-      if do_debug_parser_loading
+      client = parser_client_module.new upstream, paystream, infostream
+      if do_debug_parser_loading  # :+#dbg
         # keep defaults i guess, for now
       else
-        o.on_load_parser_info = ->(e) { }
+        client.receive_parser_loading_info_p = -> s do
+          if do_debug
+            infostream.puts s
+          end
+        end
       end
-      o
+      client
     end
 
     def infostream
       TestLib_::Debug_IO[]
     end
 
-    let :_input_fixtures_dir_pathname do
-      _parser_client_module.fixtures_dir_pathname
+    def input_fixtures_dir_pathname
+      parser_client_module.fixtures_dir_pathname
     end
 
-    -> do
-
-      # constantize = Autoloader::FUN::Constantize
-
-      rx = /\A(?<num>\d+(?:-\d+)*)(?:-(?<rest>.+))?\z/
-
-      let :_parser_client_constant do
-        md = rx.match using_grammar_pathpart
-        if ! md then
-          fail "expected this to start with numbers - #{
-            }\"#{ using_grammar_pathpart }\""
-        else
-          "Grammar#{ md[:num].gsub '-', '_' }#{
-            }#{ "_#{ constantize[ md[:rest] ] }" if md[:rest] }".intern
-        end
+    let :parser_client_constant do
+      md = PCC_RX__.match using_grammar_pathpart
+      md or fail say_pcc
+      _id = md[ :num ].gsub '-', '_'
+      if md[ :rest ]
+        _end = "_#{ TestLib_::Constantize[ md[:rest] ] }"
       end
-    end.call
-
-    let :_parser_client_module do
-      _parser_clients_module.const_get _parser_client_constant, false
+      :"Grammar#{ _id }#{ _end }"
     end
 
-    let :_parser_clients_module do
+    PCC_RX__ = /\A(?<num>\d+(?:-\d+)*)(?:-(?<rest>.+))?\z/
+
+    def say_pcc
+      "expected this to start with numbers - \"#{ using_grammar_pathpart }\""
+    end
+
+    def parser_client_module
+      _mod = parser_clients_module
+      _i = parser_client_constant
+      _mod.const_get _i, false
+    end
+
+    def parser_clients_module
       TS_::Grammars
     end
 
@@ -75,7 +85,36 @@ module Skylab::TanMan::TestSupport::Sexp
     end
   end
 
-  module Grammars
+  GRAMMAR_MODULE_CONST_MISSING_METHOD_ = -> const_i do
+
+    # ad-hoc one-off for loading our grammars on-demandj
+
+    md = RX__.match const_i
+    num, rest = md.captures
+    a = [ num ]
+    if rest
+      a.push TanMan_::Callback_::Name.lib.pathify[ rest ]
+    end
+    _stem = a * '-'
+    pn = dir_pathname.join "#{ _stem }/client"
+
+    load pn.to_path
+
+    const_defined? const_i, false or
+      raise ::NameError, "where is #{ self }::#{ const_i }?"
+    mod = const_get const_i, false
+    mod.instance_variable_set :@dir_pathname, pn
+    mod
+  end
+
+  RX__ = /\AGrammar(?<num>[0-9]+)(?:_(?<rest>.+))?\z/
+
+
+  module Grammars  # [#023]
+
+    define_singleton_method :const_missing, GRAMMAR_MODULE_CONST_MISSING_METHOD_
+
+    TanMan_::Autoloader_[ self ]
 
   end
 end

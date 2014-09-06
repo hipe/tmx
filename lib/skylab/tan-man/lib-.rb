@@ -6,6 +6,20 @@ module Skylab::TanMan
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
+    BA__ = sidesys[ :Basic ]
+
+    Basic_struct = -> do
+      BA__[]::Struct
+    end
+
+    Constantize = -> x do
+      Callback_::Name.lib.constantize x
+    end
+
+    Dev_tmpdir_pathname = -> do
+      HL__[]::System.defaults.dev_tmpdir_pathname
+    end
+
     Entity = -> do
       Brazen_::Entity
     end
@@ -20,6 +34,10 @@ module Skylab::TanMan
 
     HL__ = sidesys[ :Headless ]
 
+    Some_stderr = -> do
+      HL__[]::System::IO.some_stderr_IO
+    end
+
     String_scanner = memoize[ -> do
       require 'strscan' ; ::StringScanner
     end ]
@@ -27,6 +45,12 @@ module Skylab::TanMan
     Two_streams = -> do
       HL__[]::System::IO.some_two_IOs
     end
+
+    TT = memoize[ -> do
+      require 'treetop' ; ::Treetop
+    end ]
+
+    TTT = sidesys[ :TreetopTools ]
 
   end
 end

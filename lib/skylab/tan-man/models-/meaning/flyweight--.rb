@@ -46,7 +46,7 @@ module Skylab::TanMan
       from = line_start
       to = value_range.last + 1 # dos line endings whatever
       new_string = @scn.string.dup
-      new_string[ from .. to ] = ''
+      new_string[ from .. to ] = EMPTY_S_
       old_len = @scn.string.length
       scn.string.replace( new_string )
       new_len = s@cn.string.length

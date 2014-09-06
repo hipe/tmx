@@ -37,7 +37,8 @@ module Skylab::TanMan::TestSupport::Models::DotFile::Parsing
   end
 
   module InstanceMethods
-    let :_input_fixtures_dir_pathname do
+
+    def input_fixtures_dir_pathname
       Parsing_TestSupport::Fixtures.dir_pathname
     end
   end
