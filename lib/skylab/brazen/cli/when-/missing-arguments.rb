@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class CLI
 
-    class When_::Missing_Arguments < Simple_Executable_
+    class When_::Missing_Arguments < Simple_Bound_Call_
 
       def initialize ev, help_renderer
         @property = ev.property

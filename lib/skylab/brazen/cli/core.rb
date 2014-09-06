@@ -31,14 +31,14 @@ module Skylab::Brazen
         resolve_app_kernel
         resolve_properties
         resolve_partitions
-        resolve_executable
+        resolve_bound_call
         es =
-        @executable.receiver.send @executable.method_name, * @executable.args
+        @bound_call.receiver.send @bound_call.method_name, * @bound_call.args
         flush_any_invitations
         es or @exit_status
       end
     private
-      def call_executable exe
+      def call_bound_call exe
         exe.receiver.send exe.method_name, * exe.args
       end
       def resolve_app_kernel
@@ -148,8 +148,8 @@ module Skylab::Brazen
 
       def receive_no_matching_action tok
         @token = tok
-        resolve_executable_when_no_matching_action
-        call_executable @executable
+        resolve_bound_call_when_no_matching_action
+        call_bound_call @bound_call
       end
 
       def receive_multiple_matching_adapters aa_a
@@ -158,28 +158,28 @@ module Skylab::Brazen
 
     private
 
-      def resolve_executable
+      def resolve_bound_call
         if argv.length.zero?
-          resolve_executable_when_no_arguments
+          resolve_bound_call_when_no_arguments
         elsif DASH_ == argv.first.getbyte( 0 )
-          resolve_executable_when_looks_like_option_for_first_argument
+          resolve_bound_call_when_looks_like_option_for_first_argument
         else
-          resolve_executable_when_looks_like_action_for_first_argument
+          resolve_bound_call_when_looks_like_action_for_first_argument
         end
       end
-      def resolve_executable_when_no_arguments
-        @executable = CLI::When_::No_Arguments.new action_prop, help_renderer
+      def resolve_bound_call_when_no_arguments
+        @bound_call = CLI::When_::No_Arguments.new action_prop, help_renderer
       end
       def action_prop
         @properties.fetch :action
       end
-      def resolve_executable_when_looks_like_action_for_first_argument
+      def resolve_bound_call_when_looks_like_action_for_first_argument
         @token = @resources.argv.shift
         @adapter_a = find_matching_action_adapters_with_token @token
         case 1 <=> @adapter_a.length
-        when  0 ; resolve_executable_when_one_matching_adapter
-        when  1 ; resolve_executable_when_no_matching_action
-        when -1 ; resolve_executable_when_multiple_matching_adapters
+        when  0 ; resolve_bound_call_when_one_matching_adapter
+        when  1 ; resolve_bound_call_when_no_matching_action
+        when -1 ; resolve_bound_call_when_multiple_matching_adapters
         end     ; nil
       end
 
@@ -240,45 +240,45 @@ module Skylab::Brazen
       end
 
     private
-      def resolve_executable_when_no_matching_action
-        @executable = CLI::When_::No_Matching_Action.new @token, help_renderer, self
+      def resolve_bound_call_when_no_matching_action
+        @bound_call = CLI::When_::No_Matching_Action.new @token, help_renderer, self
       end
-      def resolve_executable_when_looks_like_option_for_first_argument
+      def resolve_bound_call_when_looks_like_option_for_first_argument
         prepare_to_parse_parameters
         parse_options
-        @executable or resolve_executable_when_parsed_options
+        @bound_call or resolve_bound_call_when_parsed_options
       end
-      def resolve_executable_when_parsed_options
+      def resolve_bound_call_when_parsed_options
         if @output_iambic.length.zero?
           if argv.length.zero?
-            resolve_executable_when_no_arguments
+            resolve_bound_call_when_no_arguments
           else
-            resolve_executable_when_looks_like_action_for_first_argument
+            resolve_bound_call_when_looks_like_action_for_first_argument
           end
         else
-          resolve_executable_when_successfully_parsed_options
+          resolve_bound_call_when_successfully_parsed_options
         end
       end
-      def resolve_executable_when_successfully_parsed_options
+      def resolve_bound_call_when_successfully_parsed_options
         a = [] ; scn = to_actual_parameters_scanner
         scn.next
         begin
           i, x = scn.pair
-          cls = executable_class_via_option_property_name_i i
+          cls = bound_call_class_via_option_property_name_i i
           a.push cls.new( x, help_renderer, self )
         end  while scn.next
-        @executable = Aggregate_Executable__.new a
+        @bound_call = Aggregate_Bound_Call__.new a
       end
       def to_actual_parameters_scanner
         Actual_Parameter_Scanner__.new @output_iambic, @properties
       end
-      def resolve_executable_when_multiple_matching_adapters
-        @executable = CLI::When_::Ambiguous_Matching_Actions.new self._TODO
+      def resolve_bound_call_when_multiple_matching_adapters
+        @bound_call = CLI::When_::Ambiguous_Matching_Actions.new self._TODO
       end
-      def resolve_executable_when_one_matching_adapter
+      def resolve_bound_call_when_one_matching_adapter
         adapter = @adapter_a.first
         adapter.receive_frame self
-        @executable = adapter.via_argv_resolve_some_executable
+        @bound_call = adapter.via_argv_resolve_some_bound_call
       end
     end
 
@@ -307,59 +307,56 @@ module Skylab::Brazen
         help_renderer.output_help_screen
         SUCCESS_
       end
-      def executable_wrapper_class
-        Executable_Wrapper__
-      end
     private
-      def resolve_executable
+      def resolve_bound_call
         prepare_to_parse_parameters
         parse_options
-        @executable or resolve_executable_after_parsed_options
+        @bound_call or resolve_bound_call_after_parsed_options
       end
-      def resolve_executable_after_parsed_options
+      def resolve_bound_call_after_parsed_options
         if @seen_h[ :help ]
-          resolve_executable_when_help_request
+          resolve_bound_call_when_help_request
         else
-          resolve_executable_when_any_args
+          resolve_bound_call_when_any_args
         end
       end
-      def resolve_executable_when_help_request
+      def resolve_bound_call_when_help_request
         a = []
-        a.push executable_class_via_option_property_name_i( :help ).
+        a.push bound_call_class_via_option_property_name_i( :help ).
            new( nil, help_renderer, self )
         if argv.length.nonzero?
           a.push CLI::When_::Unhandled_Arguments.
             new argv, help_renderer
         end
-        @executable = Aggregate_Executable__.new a
+        @bound_call = Aggregate_Bound_Call__.new a
       end
-    public def executable_class_for_help_option
+    public def bound_call_class_for_help_option
         When_Action_Help__
       end
-      def resolve_executable_when_any_args
+      def resolve_bound_call_when_any_args
         arg_a = @partitions.arg_a || EMPTY_A_
         @arg_parse = Action_Adapter_::Arguments.new argv, arg_a
         ev = @arg_parse.execute
         if ev
-          resolve_executable_when_ARGV_parsing_error_event ev
+          resolve_bound_call_when_ARGV_parsing_error_event ev
         else
-          resolve_executable_when_ARGV_parsed
+          resolve_bound_call_when_ARGV_parsed
         end
       end
-      def resolve_executable_when_ARGV_parsing_error_event ev
-        send :"resolve_executable_when_#{ ev.terminal_channel_i }_arguments", ev
+      def resolve_bound_call_when_ARGV_parsing_error_event ev
+        send :"resolve_bound_call_when_#{ ev.terminal_channel_i }_arguments", ev
       end
-      def resolve_executable_when_missing_arguments ev
-        @executable = CLI::When_::Missing_Arguments.new ev, help_renderer
+      def resolve_bound_call_when_missing_arguments ev
+        @bound_call = CLI::When_::Missing_Arguments.new ev, help_renderer
       end
-      def resolve_executable_when_extra_arguments ev
-        @executable = CLI::When_::Extra_Arguments.new ev, help_renderer
+      def resolve_bound_call_when_extra_arguments ev
+        @bound_call = CLI::When_::Extra_Arguments.new ev, help_renderer
       end
 
-      def resolve_executable_when_ARGV_parsed
+      def resolve_bound_call_when_ARGV_parsed
         @output_iambic.concat @arg_parse.release_result_iambic
         @partitions.env_a and process_environment
-        @executable or resolve_executable_via_output_iambic
+        @bound_call or resolve_bound_call_via_output_iambic
       end
 
       def process_environment
@@ -372,12 +369,12 @@ module Skylab::Brazen
         end ; nil
       end
 
-      def resolve_executable_via_output_iambic
+      def resolve_bound_call_via_output_iambic
 
-        @executable = @action.
-          resolve_any_executable_via_iambic_and_adapter @output_iambic, self
-        if ! @executable
-          @executable = Value_Wrapper_Executable__.new GENERIC_ERROR_
+        @bound_call = @action.
+          produce_bound_call_via_iambic_and_delegate @output_iambic, self
+        if ! @bound_call
+          @bound_call = Value_Wrapper_Bound_Call__.new GENERIC_ERROR_
         end ; nil
       end
 
@@ -393,7 +390,7 @@ module Skylab::Brazen
       Autoloader_[ self ]
     end
 
-    class Simple_Executable_
+    class Simple_Bound_Call_
       def receiver
         self
       end
@@ -406,7 +403,7 @@ module Skylab::Brazen
       end
     end
 
-    class When_Action_Help__ < Simple_Executable_
+    class When_Action_Help__ < Simple_Bound_Call_
 
       def initialize _, help_renderer, _action_adapter
         @help_renderer = help_renderer
@@ -457,9 +454,9 @@ module Skylab::Brazen
         resolve_partitions ; nil
       end
 
-      def via_argv_resolve_some_executable
-        resolve_executable
-        @executable
+      def via_argv_resolve_some_bound_call
+        resolve_bound_call
+        @bound_call
       end
 
       def action
@@ -773,22 +770,22 @@ module Skylab::Brazen
       end
 
       def prepare_to_parse_parameters
-        @executable = nil ; @output_iambic = [] ; @seen_h = {}
+        @bound_call = nil ; @output_iambic = [] ; @seen_h = {}
       end
 
       def parse_options
         @op ||= option_parser
         @op.parse! argv ; nil
       rescue ::OptionParser::ParseError => e
-        resolve_executable_when_parse_error e ; nil
+        resolve_bound_call_when_parse_error e ; nil
       end
 
       def option_parser
         help_renderer.op
       end
 
-      def executable_class_via_option_property_name_i i
-        m_i = :"executable_class_for_#{ i }_option"
+      def bound_call_class_via_option_property_name_i i
+        m_i = :"bound_call_class_for_#{ i }_option"
         if respond_to? m_i
           send m_i
         else
@@ -797,8 +794,8 @@ module Skylab::Brazen
         end
       end
 
-      def resolve_executable_when_parse_error e
-        @executable = CLI::When_::Parse_Error.new e, help_renderer
+      def resolve_bound_call_when_parse_error e
+        @bound_call = CLI::When_::Parse_Error.new e, help_renderer
       end
 
       def expression_agent
@@ -1126,16 +1123,14 @@ module Skylab::Brazen
       end
     end
 
-    Executable_Wrapper__ = ::Struct.new :receiver, :method_name, :args
-
-    class Value_Wrapper_Executable__ < Simple_Executable_
+    class Value_Wrapper_Bound_Call__ < Simple_Bound_Call_
       def initialize value
         @execute = value
       end
       attr_reader :execute
     end
 
-    class Aggregate_Executable__ < Simple_Executable_
+    class Aggregate_Bound_Call__ < Simple_Bound_Call_
       def initialize a
         @a = a
       end

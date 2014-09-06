@@ -20,10 +20,6 @@ module Skylab::TanMan
         end
       end
 
-      def executable_wrapper_class
-        Bound_Call_
-      end
-
       def app_name
         'tm API'
       end

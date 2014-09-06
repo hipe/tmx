@@ -55,7 +55,7 @@ module Skylab::Brazen
       end
     end
 
-    def resolve_any_executable_via_iambic_and_adapter x_a, adapter
+    def produce_bound_call_via_iambic_and_delegate x_a, adapter
       @client_adapter = adapter
       @error_count = 0
       r = process_iambic_fully x_a
@@ -64,7 +64,7 @@ module Skylab::Brazen
         notificate :iambic_normalize_and_validate
       end
       if @error_count.zero?
-        r = adapter.executable_wrapper_class.new self, :execute
+        r = Brazen_.bound_call self, :execute
       end
       r
     end

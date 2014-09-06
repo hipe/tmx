@@ -82,7 +82,7 @@ module Skylab::TanMan
 
       def via_action_resolve_bound_call
         x_a = @x_a[ @d .. -1 ]
-        x = @action.resolve_any_executable_via_iambic_and_adapter x_a, event_receiver
+        x = @action.produce_bound_call_via_iambic_and_delegate x_a, event_receiver
         if x
           @bound_call = x
           OK_
@@ -106,7 +106,7 @@ module Skylab::TanMan
       def end_in_error_with * x_a, & p
         _ev = build_error_event_via_mutable_iambic_and_message_proc x_a, p
         result = send_event _ev
-        @bound_call = Bound_Call_.new IDENTITY_, :call, result
+        @bound_call = Brazen_.bound_call IDENTITY_, :call, result
         UNABLE_
       end
 

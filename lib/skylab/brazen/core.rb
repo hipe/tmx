@@ -3,6 +3,12 @@ require_relative '../callback/core'
 
 module Skylab::Brazen
 
+  class << self
+    def bound_call rcvr, method_name, args=nil
+      Bound_Call__.new rcvr, method_name, args
+    end
+  end
+
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
 
@@ -48,6 +54,7 @@ module Skylab::Brazen
 
   ACHEIVED_ = true
   Brazen_ = self
+  Bound_Call__ = ::Struct.new :receiver, :method_name, :args
   DONE_ = true
   EMPTY_P_ = -> { }
   EMPTY_S_ = ''.freeze

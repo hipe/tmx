@@ -64,10 +64,6 @@ module Skylab::TanMan::TestSupport
           @ev_a.shift
         end
 
-        def executable_wrapper_class
-          TanMan_::API::Bound_Call_
-        end
-
         def app_name
           "(tm)"
         end
