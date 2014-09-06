@@ -2,6 +2,8 @@ module Skylab::TanMan
 
   module Lib_
 
+    memoize = -> p { p_ = -> { x = p[] ; p_ = -> { x } ; x } ; -> { p_[] } }
+
     sidesys = Autoloader_.build_require_sidesystem_proc
 
     Entity = -> do
@@ -17,6 +19,10 @@ module Skylab::TanMan
     end
 
     HL__ = sidesys[ :Headless ]
+
+    String_scanner = memoize[ -> do
+      require 'strscan' ; ::StringScanner
+    end ]
 
     Two_streams = -> do
       HL__[]::System::IO.some_two_IOs

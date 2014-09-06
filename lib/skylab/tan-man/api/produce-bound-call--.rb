@@ -41,25 +41,24 @@ module Skylab::TanMan
       end
 
       def via_current_tokens_resolve_action
-        @current_unbound_action_collection = @kernel
+        @current_unbound_action_scan = @kernel.get_unbound_action_scan
         while true
           ok = via_current_branch_resolve_action
           ok or break
           advance_one
           @action.is_branch or break
-          if has_more_tokens
-            @current_unbound_action_collection = @action.class
-          else
+          if ! has_more_tokens
             when_name_is_too_short
             ok = false
             break
           end
+          @current_unbound_action_scan = @action.class.get_unbound_lower_action_scan
         end
         ok
       end
 
       def via_current_branch_resolve_action
-        scn = @current_unbound_action_collection.get_unbound_action_scan
+        scn = @current_unbound_action_scan
         i = current_token
         while cls = scn.gets
           i == cls.name_function.as_lowercase_with_underscores_symbol and break

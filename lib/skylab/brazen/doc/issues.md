@@ -1,3 +1,6 @@
+[#022] #open obliterate `receive_negative_event` and the rest - single
+             entrypoint is better. rely on `ok` : false
+[#021] #open scope kernel..
 [#020] #open  --help and --host
 [#019]       #done turn `is_positive` into `ok` to match HTTP responses
 [#018] #open #parent-node: [#013] "model ivars.."

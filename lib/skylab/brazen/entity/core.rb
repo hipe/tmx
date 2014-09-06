@@ -400,6 +400,10 @@ module Skylab::Brazen
         @properties ||= build_props
       end
 
+      def clear_properties
+        @properties = nil
+      end
+
       def build_props
         _scn = property_method_nms_for_rd.to_value_scanner
         Entity.scan.map( _scn, -> i do
@@ -866,6 +870,7 @@ module Skylab::Brazen
         mm.include @extension_module::Module_Methods
         mod.extend Extension_Module_Methods__, Proprietor_Methods__
         mod.include Iambic_Methods__
+        mod.include @extension_module
 
         mod.const_set READ_BOX__, bx = Box_.new  # for now
         mod.const_set WRITE_BOX__, bx

@@ -386,10 +386,6 @@ module Skylab::Brazen
         @parent.app_name
       end
 
-      def application_kernel
-        @parent.application_kernel
-      end
-
       def receive_workspace_expectation_file_not_found ev
         receive_event ev
       end
@@ -488,6 +484,10 @@ module Skylab::Brazen
 
       def retrieve_unbound_action_via_normalized_name i_a
         @parent.retrieve_unbound_action_via_normalized_name i_a
+      end
+
+      def application_kernel
+        @parent.application_kernel
       end
 
       def receive_event ev

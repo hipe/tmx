@@ -103,7 +103,7 @@ module Skylab::Brazen
       module Add_Methods__
         include Semi_Generated_Instance_Methods__
 
-        def if_workspace_exists
+        def if_dependencies_are_met
           prepare_property_iambics
           @ent = self.class.model_class.new @kernel
           err = @ent.edit @action_x_a, @model_x_a
@@ -114,7 +114,7 @@ module Skylab::Brazen
       module List_Methods__
         include Semi_Generated_Instance_Methods__
 
-        def if_workspace_exists
+        def if_dependencies_are_met
           @scan = resolve_entity_scan
           @scan and via_scan_render_list
         end
@@ -174,7 +174,7 @@ module Skylab::Brazen
       module Remove_Methods__
         include Semi_Generated_Instance_Methods__
 
-        def if_workspace_exists
+        def if_dependencies_are_met
           _cols = infer_collections_shell
           _cols.delete_entity_via_action self
         end

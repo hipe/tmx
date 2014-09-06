@@ -148,7 +148,7 @@ module Skylab::Snag
         Name_Function__
       end
       STOP_INDEX__ = 3  # skylab snag cli actions foo actions bar
-      TAXONOMIC_MODULE_RX__ = /\AActions_?\z/  # meh / wee
+      TAXONOMIC_MODULE_RX__ = /\AActions_{0,2}\z/  # meh / wee
     end
 
     class Name_Function__ < Callback_::Name

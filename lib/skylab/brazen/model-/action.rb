@@ -111,8 +111,12 @@ module Skylab::Brazen
     # ~
 
     def execute
-      ok = expect_workspace_exists
-      ok and if_workspace_exists
+      ok = expect_dependencies_are_met
+      ok and if_dependencies_are_met
+    end
+
+    def expect_dependencies_are_met
+      expect_workspace_exists
     end
 
     def expect_workspace_exists

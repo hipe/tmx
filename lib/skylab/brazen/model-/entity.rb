@@ -65,6 +65,7 @@ module Skylab::Brazen
         :entity_class_hook_once, -> cls do
 
           req_a = cls.properties.reduce_by( & :is_actually_required ).to_a.freeze
+          cls.clear_properties   # #open [#021]
 
           if req_a.length.nonzero?
 
