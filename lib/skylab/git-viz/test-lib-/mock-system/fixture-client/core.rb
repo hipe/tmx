@@ -74,7 +74,7 @@ module Skylab::GitViz
       end
 
       def parse_options
-        @result_code = PROCEDE_
+        @result_code = CONTINUE_
         @op.parse!
         @result_code
       rescue ::OptionParser::ParseError => e
@@ -179,7 +179,7 @@ module Skylab::GitViz
             @poll_timeout_milliseconds = new_timeout_seconds * 1000
             @y << "will try connecting again for plugin, #{
               }this time with a timeout of #{ timeout_s }.."
-            PROCEDE_
+            CONTINUE_
           else
             @y << "expected floating point number, but some plugin resulted #{
               }in #{ GitViz::Lib_::Ick[ new_timeout_seconds ] }"

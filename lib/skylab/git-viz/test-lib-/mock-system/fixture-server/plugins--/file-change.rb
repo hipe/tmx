@@ -28,7 +28,7 @@ module Skylab::GitViz
           listen_for_manifests_being_added_to_the_manifest_collection
         else
           @y << say_not_gonna_do_it
-          PROCEDE_
+          CONTINUE_
         end
       end
 
@@ -39,7 +39,7 @@ module Skylab::GitViz
       def listen_for_manifests_being_added_to_the_manifest_collection
         @responder.on_manifest_added( & method( :listen_to_file_of_manifest ) )
         @y<< say_gonna_do_it
-        PROCEDE_
+        CONTINUE_
       end
 
       def say_gonna_do_it
@@ -77,10 +77,10 @@ module Skylab::GitViz
 
       def on_shutdown
         if ! @be_on
-          PROCEDE_
+          CONTINUE_
         elsif @a.length.zero?
           @y << "(not listening to any files. nothing to do)"
-          PROCEDE_
+          CONTINUE_
         else
           shutdown_each_listener
         end
@@ -93,7 +93,7 @@ module Skylab::GitViz
           x = entry.listener.stop
           @raw_y << " done (#{ x.inspect })"
         end
-        PROCEDE_
+        CONTINUE_
       end
 
       class Entry__

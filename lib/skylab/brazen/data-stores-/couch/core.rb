@@ -67,7 +67,7 @@ module Skylab::Brazen
     module Actions
 
       class Add < Generated_Add__
-        def if_dependencies_are_met
+        def produce_any_result_when_dependencies_are_met
           super
           @ent.if_valid_ensure_exists
         end
@@ -80,7 +80,7 @@ module Skylab::Brazen
           o :description, -> y { y << 'always necessary for now.' },
             :flag, :property, :force
         end ]
-        def if_dependencies_are_met
+        def produce_any_result_when_dependencies_are_met
           Couch_::Actors__::Delete_datastore[ self, @kernel ]
         end
       end

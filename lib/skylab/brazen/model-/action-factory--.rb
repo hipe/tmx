@@ -104,13 +104,19 @@ module Skylab::Brazen
       Semi_Generated_Instance_Methods__ = ::Module.new
 
       module Add_Methods__
+
         include Semi_Generated_Instance_Methods__
 
-        def if_dependencies_are_met
+        def produce_any_result_when_dependencies_are_met
           prepare_property_iambics
           @ent = self.class.model_class.new @kernel
-          err = @ent.edit @action_x_a, @model_x_a
-          err || when_edited_OK
+          bc = @ent.produce_any_bound_call_edit_result_via_action_and_entity_iambics(
+            @action_x_a, @model_x_a )
+          if bc
+            bc.receier.send bc.method_name, * bc.args
+          else
+            produce_any_result_when_edited_OK
+          end
         end
 
         def receive_persisting_event ev
@@ -119,6 +125,7 @@ module Skylab::Brazen
       end
 
       module List_Methods__
+
         include Semi_Generated_Instance_Methods__
 
         def initialize kernel
@@ -126,7 +133,7 @@ module Skylab::Brazen
           super
         end
 
-        def if_dependencies_are_met
+        def produce_any_result_when_dependencies_are_met
           @scan = resolve_entity_scan
           @scan and via_scan_send_list
         end
@@ -204,9 +211,10 @@ module Skylab::Brazen
       end
 
       module Remove_Methods__
+
         include Semi_Generated_Instance_Methods__
 
-        def if_dependencies_are_met
+        def produce_any_result_when_dependencies_are_met
           _cols = infer_collections_shell
           _cols.delete_entity_via_action self
         end
@@ -263,8 +271,8 @@ module Skylab::Brazen
         end
 
       private
-        def when_edited_OK
-          @ent.persist
+        def produce_any_result_when_edited_OK
+          @ent.produce_any_persist_result
         end
       end
     end

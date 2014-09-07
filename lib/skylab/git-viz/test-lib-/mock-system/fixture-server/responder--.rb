@@ -40,7 +40,7 @@ module Skylab::GitViz
         def when_cleared_cache_for_item_tuple man_han
           @y << "#{ prefix }cleared #{ man_han.manifest_pathname } #{
             }from the cache (#{ man_han.manifest_summary })"
-          PROCEDE_
+          CONTINUE_
         end
         def when_error_for_clear_cache_for_man_pn pn, err
           x, inside, i = err.to_a

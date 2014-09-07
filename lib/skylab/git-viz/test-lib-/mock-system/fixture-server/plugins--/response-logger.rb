@@ -23,7 +23,7 @@ module Skylab::GitViz
       def on_options_parsed
         if /\A\d+\z/ =~ @max_width_s
           @max_width_d = @max_width_s.to_i
-          PROCEDE_
+          CONTINUE_
         else
           @y << "fatal: invalid --max-width: #{ @max_width_s.inspect }"
           GENERAL_ERROR_
@@ -46,7 +46,7 @@ module Skylab::GitViz
         end
         s = "#{ buffer_a * ', ' }#{ '[..]' if ! last_reached && limit_reached }"
         @y << "sending back an array of #{ last + 1 } string(s): [#{ s }]"
-        PROCEDE_
+        CONTINUE_
       end
     end
   end

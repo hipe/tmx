@@ -178,7 +178,7 @@ module Skylab::GitViz
             @cmd_as_non_unique_key_s_a << k
             @cmd_a_h[ k ] = []
           end ) << cmd
-          PROCEDE_
+          CONTINUE_
         end
       end
 
@@ -274,7 +274,7 @@ module Skylab::GitViz
             cmd.cmd_s = @key_s.freeze
             cmd.body_s_a = @chopped_body_line_s_a
             cmd.line_no = @start_line_no
-            PROCEDE_
+            CONTINUE_
           end ]  # result of the outstream callback is our result.
         end
       end
@@ -452,13 +452,13 @@ module Skylab::GitViz
         def scn_rest_of_serr_file
           @has_err_dumpfile = true
           scn_some_dumpfile_path -> s do
-            @err_dumpfile_s = s ; PROCEDE_
+            @err_dumpfile_s = s ; CONTINUE_
           end, method( :respond_with_general_parse_error )
         end
         def file=
           @has_out_dumpfile = true
           scn_some_dumpfile_path -> s do
-            @out_dumpfile_s = s ; PROCEDE_
+            @out_dumpfile_s = s ; CONTINUE_
           end, method( :respond_with_general_parse_error )
         end
         def scn_some_dumpfile_path yes_p, no_p
@@ -484,7 +484,7 @@ module Skylab::GitViz
         def scn_rest_of_JSON_object d
           @any_opt_s = @scn.string[ @scn.pos .. d ]
           @scn.pos = d + 1
-          PROCEDE_
+          CONTINUE_
         end
         def say_expecting_end_curly
           "found no '}' anywhere before end of string"
@@ -504,14 +504,14 @@ module Skylab::GitViz
         def accept_exitstatus_digit d
           @mock_wait_thread = Wait__.new do |w|
             w.value.exitstatus = d
-          end ; PROCEDE_
+          end ; CONTINUE_
         end
         def say_expecting_mixed_exitstatus
           "expected digit or e.g \"(foo?)\" or just \"?\""
         end
         def exitstatus_query_notify
           @exitstatus_is_query = true
-          @mock_wait_thread = :_query_ ; PROCEDE_
+          @mock_wait_thread = :_query_ ; CONTINUE_
         end
 
         # ~ freetags
@@ -537,7 +537,7 @@ module Skylab::GitViz
         end
         def scn_freetag_body
           if (( s = @scn.scan FREETAG_BODY_RX__ ))
-            @freetag_body = s ; PROCEDE_
+            @freetag_body = s ; CONTINUE_
           else
             respond_with_general_parse_error say_expecting_freetag_body
           end
@@ -549,7 +549,7 @@ module Skylab::GitViz
           ft = Mock_System::Manifest_Entry_::FreeTag.
             new @freetag_identifier, @freetag_body
           @freetag_body = @freetag_identifier = nil
-          ( @freetag_a ||= [] ) << ft ; PROCEDE_
+          ( @freetag_a ||= [] ) << ft ; CONTINUE_
         end
         # (end freetag)
 
@@ -557,12 +557,12 @@ module Skylab::GitViz
           if @any_opt_s
             prs_opt_s
           else
-            @any_opt_h = nil ; PROCEDE_
+            @any_opt_h = nil ; CONTINUE_
           end
         end
         def prs_opt_s
           h = GitViz::Lib_::JSON[].parse @any_opt_s, symbolize_names: true
-          @any_opt_h = h.freeze ; PROCEDE_
+          @any_opt_h = h.freeze ; CONTINUE_
         rescue GitViz::Lib_::JSON[]::ParserError => e
           respond_with_general_parse_error e.message
         end
@@ -624,19 +624,19 @@ module Skylab::GitViz
           if @has_err_dumpfile
             gt_scn_from_prototype_a @e_a
           else
-            EMPTY_SCN_
+            Callback_::Scn.the_empty_scanner
           end
         end
         def gt_some_mock_sout
           if @has_out_dumpfile
             gt_scn_from_prototype_a @o_a
           else
-            EMPTY_SCN_
+            Scn_.the_empty_scanner
           end
         end
         def gt_scn_from_prototype_a a
           a = a.dup
-          GitViz::Scn_.new do
+          Scn_.new do
             a.shift
           end
         end
@@ -824,7 +824,6 @@ module Skylab::GitViz
       end
 
       Mock_System = self
-      PROCEDE_ = nil
     end
   end
 end

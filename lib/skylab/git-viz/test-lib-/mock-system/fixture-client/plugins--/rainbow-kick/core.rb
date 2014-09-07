@@ -41,7 +41,7 @@ module Skylab::GitViz
             flip_result prepare_to_connect || resolve_connection
           else
             @y << "(not enabled)"
-            PROCEDE_
+            CONTINUE_
           end
         end
 
@@ -95,7 +95,7 @@ module Skylab::GitViz
           h[ :err ] = twice  # would work in spawn but not in open3)
           # h[ :unsetenv_others ] = true  # assume your environment is set
           @spawn_options = h
-          PROCEDE_
+          CONTINUE_
         end
 
         def resolve_connection

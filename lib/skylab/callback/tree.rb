@@ -232,7 +232,7 @@ module Skylab
       end
 
       def call_shorters_with_map * i_a, p  # see [#023]:#the-shorters-pattern
-        ec = PROCEDE_
+        ec = CONTINUE_
         x_a = rslv_any_shorters_leaf_callback_x_a i_a
         x_a and x_a.each do |x|
           ec = p[ x ]
@@ -242,7 +242,7 @@ module Skylab
       end
 
       def aggregate_any_shorts_with_map * i_a, p
-        y = PROCEDE_
+        y = nil
         x_a = rslv_any_shorters_leaf_callback_x_a i_a
         x_a and x_a.each do |x|
           ec = p[ x ]
@@ -433,7 +433,7 @@ module Skylab
         end
       end
 
-      PROCEDE_ = SILENT_ = nil
+      CONTINUE_ = SILENT_ = nil
     end
   end
 end

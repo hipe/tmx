@@ -23,7 +23,7 @@ module Skylab::GitViz
       end
 
       def resolve_context
-        init_context ; PROCEDE_
+        init_context ; CONTINUE_
       end
 
       def init_context
@@ -31,13 +31,13 @@ module Skylab::GitViz
       end
 
       def resolve_and_bind_reply_socket &p
-        init_reply_socket ; ec = PROCEDE_
+        init_reply_socket ; ec = CONTINUE_
         p and p[ @socket ].nonzero? and ec = when_setsockopt_failure
         ec || connect_reply_socket
       end
 
       def resolve_and_bind_request_socket &p
-        init_request_socket ; ec = PROCEDE_
+        init_request_socket ; ec = CONTINUE_
         p and p[ @socket ].nonzero? and ec = when_setsockopt_failure
         ec || connect_request_socket
       end

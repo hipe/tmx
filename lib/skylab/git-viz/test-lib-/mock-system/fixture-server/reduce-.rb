@@ -46,7 +46,7 @@ module Skylab::GitViz
       private
         def resolve_any_stat
           @stat = ::File.stat @mani_path
-          PROCEDE_
+          CONTINUE_
         rescue ::Errno::ENOENT => e
           bork e.message
         end
@@ -68,7 +68,7 @@ module Skylab::GitViz
         end
         def use_cached_mani_from_IO_cache mani
           @y << "(using cached manifest parse tree)"
-          @mani = mani ; PROCEDE_
+          @mani = mani ; CONTINUE_
         end
         def created_new_mani_from_IO_cache mani
           if (( @mani = mani )).entry_count.zero?
@@ -84,7 +84,7 @@ module Skylab::GitViz
         end
         def when_created_manifest_entry_count_is_nonzero
           @y << "parsed #{ @mani.manifest_summary } in #{ @pn }"
-          PROCEDE_
+          CONTINUE_
         end
         def parse_error_from_IO_cache pe
           render_parse_error_as_multiline pe
@@ -113,7 +113,7 @@ module Skylab::GitViz
               (( @cmd_wht_rx_ex_a ||= [] )) << [ rx_s, ex ] ; m
             end
           end
-          @cmd_wht_rx_ex_a ? when_regexp_exceptions : PROCEDE_
+          @cmd_wht_rx_ex_a ? when_regexp_exceptions : CONTINUE_
         end
 
         def attempt_regex rx_s, yes_p, no_p
@@ -138,7 +138,7 @@ module Skylab::GitViz
         def prepare_deterministic_query_params
           @cd_prefix = @request.chdir_prefix_white_filter
           @prefix_length = @cd_prefix.length
-          PROCEDE_
+          CONTINUE_
         end
 
         def reduce_with_manifest_when_prepared
@@ -169,7 +169,7 @@ module Skylab::GitViz
         def check_if_no_items_where_added
           if @added_count.zero?
             @response.add_iambicly_structured_statement :notice, say_none_found
-            PROCEDE_
+            CONTINUE_
           end
         end
 

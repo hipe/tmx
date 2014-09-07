@@ -287,7 +287,7 @@ module Skylab::TestSupport
     end
 
     CEASE_ = false
-    PROCEDE_ = nil
+    CONTINUE_ = nil
     SEP_ = '/'.freeze
   end
 end

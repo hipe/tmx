@@ -9,7 +9,7 @@ module Skylab::Brazen
         @x = ev.x
       end
 
-      def execute
+      def produce_any_result
         o = @render ; x = @x
         o.express do
           "unexpected argument #{ ick x }"

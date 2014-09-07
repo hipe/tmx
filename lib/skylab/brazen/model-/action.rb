@@ -64,7 +64,7 @@ module Skylab::Brazen
         notificate :iambic_normalize_and_validate
       end
       if @error_count.zero?
-        r = Brazen_.bound_call self, :execute
+        r = Brazen_.bound_call self, :produce_any_result
       end
       r
     end
@@ -110,9 +110,9 @@ module Skylab::Brazen
 
     # ~
 
-    def execute
+    def produce_any_result
       ok = expect_dependencies_are_met
-      ok and if_dependencies_are_met
+      ok and produce_any_result_when_dependencies_are_met
     end
 
     def expect_dependencies_are_met

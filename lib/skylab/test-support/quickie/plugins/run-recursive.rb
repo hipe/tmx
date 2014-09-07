@@ -82,7 +82,7 @@ module Skylab::TestSupport
 
       def replace_test_path_s_a path_s_a
         @test_path_a = path_s_a
-        PROCEDE_
+        CONTINUE_
       end
 
       def before_execution_eventpoint_notify

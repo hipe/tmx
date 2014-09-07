@@ -45,10 +45,10 @@ module Skylab::Brazen
 
     CONFIG_FILENAME__ = 'brazen.conf'.freeze
 
-    def status a
+    def produce_any_result_for_status a
       init_via_iambic_for_action a
       pn = rslv_any_nearest_config_filename
-      pn and status_when_OK pn
+      pn and produce_any_result_for_status_when_OK pn
     end
 
     def rslv_any_nearest_config_filename
@@ -76,19 +76,19 @@ module Skylab::Brazen
       send_event_structure ev ; nil
     end
 
-    def status_when_OK pn
+    def produce_any_result_for_status_when_OK pn
       @kernel.models.workspaces.register_instance self, pn
       send_event_with :resource_exists, :pn, pn, :ok, true,
         :is_completion, true
     end
 
-    def edit a
+    def produce_any_result_for_edit a
       init_via_iambic_for_action a
       @init_method = nil
       pn = filesystem_walk( :channel, :init, :any_max_num_dirs_to_look, 1 ).
         find_any_nearest_file_pathname
       if pn
-        init_when_file_exists pn
+        produce_any_result_for_init_when_file_exists pn
       elsif @init_method
         send @init_method
       end
@@ -105,7 +105,7 @@ module Skylab::Brazen
       ).init
     end
 
-    def init_when_file_exists pn
+    def produce_any_result_for_init_when_file_exists pn
       send_event_with :directory_already_has_config_file, :pathname, pn,
         :ok, false, :prop, @prop
       nil

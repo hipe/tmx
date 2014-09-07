@@ -33,8 +33,8 @@ module Skylab::TanMan
             :required, :property, :output_string
         end ]
 
-        def execute
-          if_dependencies_are_met
+        def produce_any_result
+          produce_any_result_when_dependencies_are_met
         end
       end
 
@@ -46,8 +46,8 @@ module Skylab::TanMan
           o :required, :property, :input_string
         end ]
 
-        def execute
-          if_dependencies_are_met
+        def produce_any_result
+          produce_any_result_when_dependencies_are_met
         end
       end
 

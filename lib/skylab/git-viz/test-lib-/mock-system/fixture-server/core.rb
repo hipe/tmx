@@ -370,7 +370,7 @@ module Skylab::GitViz
       GENERAL_ERROR_ = GENERAL_ERROR_
       MANIFEST_PARSE_ERROR_ = 36  # 3 -> m 9 -> p
       SILENT_ = SILENT_
-      PROCEDE_ = nil ; SUCCESS_ = 0
+      SUCCESS_ = 0
     end
   end
 end

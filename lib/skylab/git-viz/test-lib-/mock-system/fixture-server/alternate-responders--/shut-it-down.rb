@@ -53,7 +53,7 @@ module Skylab::GitViz
             sd.when_did_not do |msg|
               @y << "(#{ msg })"
               respond_with_error_message msg
-              PROCEDE_
+              CONTINUE_
             end
             sd.when_did do |msg|
               @y << msg

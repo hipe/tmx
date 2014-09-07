@@ -10,7 +10,7 @@ module Skylab::Brazen
         @help_renderer = help_renderer
       end
 
-      def execute
+      def produce_any_result
         if @any_cmd_string
           whn_command_string
         else

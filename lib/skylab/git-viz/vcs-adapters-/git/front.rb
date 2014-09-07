@@ -34,7 +34,5 @@ module Skylab::GitViz
 
     IMPLEMENTATION_DIR_ = '.git'.freeze
 
-    PROCEDE_ = true
-
   end
 end

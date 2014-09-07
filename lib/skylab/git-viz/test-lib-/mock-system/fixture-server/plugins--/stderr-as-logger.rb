@@ -44,7 +44,7 @@ module Skylab::GitViz
 
       def open_path
         @open_filehandle = @pathname.open 'a+'
-        PROCEDE_
+        CONTINUE_
       rescue ::StandardError => e
         @y << "can't open logfile: #{ e }"
         GENERAL_ERROR_
@@ -62,7 +62,7 @@ module Skylab::GitViz
           @original_stderr = prev_stderr
         end
         @serr_p[].puts "--- #{ my_name } started logging at #{ formatted_now }"
-        PROCEDE_
+        CONTINUE_
       end
 
     public

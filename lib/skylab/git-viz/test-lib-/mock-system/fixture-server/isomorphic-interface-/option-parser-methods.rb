@@ -23,7 +23,7 @@ module Skylab::GitViz
 
         def parse_options_with_option_parser
           @op.parse! @argv
-          do_exit_early ? code_for_early_exit : PROCEDE_
+          do_exit_early ? code_for_early_exit : CONTINUE_
         rescue ::OptionParser::ParseError => e
           when_option_parser_parse_error e
         end

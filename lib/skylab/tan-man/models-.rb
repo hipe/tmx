@@ -112,7 +112,7 @@ module Skylab::TanMan
 
     desc "show the status of the config director{y|ies} active at the path."
 
-      def execute
+      def produce_any_result
       end
     end
 
@@ -138,7 +138,7 @@ module Skylab::TanMan
 
       end ]
 
-      def execute
+      def produce_any_result
         an = @client_adapter.app_name.gsub Callback_::DASH_, Brazen_::SPACE_
         ev = build_event_with :ping do |y, o|
           y << "hello from #{ an }."

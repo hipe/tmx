@@ -55,6 +55,7 @@ module Skylab::Brazen
   ACHEIVED_ = true
   Brazen_ = self
   Bound_Call__ = ::Struct.new :receiver, :method_name, :args
+  CONTINUE_ = nil
   DONE_ = true
   EMPTY_P_ = -> { }
   EMPTY_S_ = ''.freeze

@@ -103,18 +103,26 @@ module Skylab::Brazen
       end
     end
 
-    def edit action_x_a, prop_x_a
+    def produce_any_bound_call_edit_result_via_action_and_entity_iambics(
+        action_x_a, prop_x_a )
+
       action_x_a.each_slice( 2 ) do |ivar, x|
         instance_variable_set ivar, x
       end
       @error_count = 0
       process_iambic_fully prop_x_a
       notificate :iambic_normalize_and_validate
-      @was_valid_after_edit = @error_count.zero?
-      @error_count.nonzero? and Brazen_::API.exit_statii.fetch( :generic_error )
+      if @error_count.zero?
+        @was_valid_after_edit = true
+        CONTINUE_
+      else
+        @was_valid_after_edit = false
+        _d = Brazen_::API.exit_statii.fetch :generic_error
+        Brazen_.bound_call -> { d_ }, :call
+      end
     end
 
-    def persist
+    def produce_any_persist_result
       @error_count = 0
       i = self.class.persist_to
       if :workspace == i

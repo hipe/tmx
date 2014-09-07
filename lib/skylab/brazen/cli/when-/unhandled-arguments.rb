@@ -9,7 +9,7 @@ module Skylab::Brazen
         @render = help_renderer
       end
 
-      def execute
+      def produce_any_result
         a = @args
         @render.express do
           "(unhandled argument#{ s a }: #{ a * ', ' })"

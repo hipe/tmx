@@ -39,11 +39,11 @@ module Skylab::Brazen
 
     end ]
 
-    def execute
+    def produce_any_result
       a = to_even_iambic
       a.push :prop, self.class.properties.fetch( :path )
       a.push :listener, self
-      Brazen_::Models_::Workspace.new( @kernel ).status a
+      Brazen_::Models_::Workspace.new( @kernel ).produce_any_result_for_status a
     end
 
     def receive_workspace_event ev

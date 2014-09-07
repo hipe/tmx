@@ -10,7 +10,7 @@ module Skylab::Brazen
         @token = token
       end
 
-      def execute
+      def produce_any_result
         o = @render ; token = @token
         scn = @invo.get_action_scn.reduce_by( & :is_visible )
         scn = @invo.wrap_scanner_with_ordering_buffer scn

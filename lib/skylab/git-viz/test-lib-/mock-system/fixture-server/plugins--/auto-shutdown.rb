@@ -67,7 +67,7 @@ module Skylab::GitViz
           init_verbosity_ivars
           @do_engage = true
           @sec_f = @seconds_s.to_f
-          PROCEDE_
+          CONTINUE_
         else
           @yy << "fatal: need positive integer for seconds, had #{
             }#{ @seconds_s.inspect }"
@@ -93,7 +93,7 @@ module Skylab::GitViz
         if @do_engage
           responder.on_response_started( & method( :response_started_notify ) )
         end
-        PROCEDE_  # #storypoint-45
+        CONTINUE_  # #storypoint-45
       end
     private
       def response_started_notify _response
@@ -125,7 +125,7 @@ module Skylab::GitViz
         if @do_test
           @context, @socket = @host.context_and_socket
         end
-        @do_engage ? attempt_to_start : PROCEDE_
+        @do_engage ? attempt_to_start : CONTINUE_
       end
     private
       def attempt_to_start
@@ -171,7 +171,7 @@ module Skylab::GitViz
           end ; nil
         end
         @do_debug and @y << "started thread (#{ @timer_thread })"
-        PROCEDE_
+        CONTINUE_
       end
 
       def when_timer_thread_throws_an_exception ex
@@ -236,7 +236,7 @@ module Skylab::GitViz
         else
           @y << "(has no timer thread to terminate)"
         end
-        PROCEDE_
+        CONTINUE_
       end
     private
       def terminate_current_timer_thread

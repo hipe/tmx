@@ -374,7 +374,7 @@ module Skylab::Brazen
         @bound_call = @action.
           produce_bound_call_via_iambic_and_delegate @output_iambic, self
         if ! @bound_call
-          @bound_call = Value_Wrapper_Bound_Call__.new GENERIC_ERROR_
+          @bound_call = Brazen_.bound_call -> { GENERIC_ERROR_ }, :call
         end ; nil
       end
 
@@ -396,7 +396,7 @@ module Skylab::Brazen
       end
 
       def method_name
-        :execute
+        :produce_any_result
       end
 
       def args
@@ -409,7 +409,7 @@ module Skylab::Brazen
         @help_renderer = help_renderer
         _ and self._SANITY
       end
-      def execute
+      def produce_any_result
         @help_renderer.output_help_screen
         SUCCESS_
       end
@@ -421,7 +421,7 @@ module Skylab::Brazen
 
       def receive_show_help otr
         receive_frame otr
-        CLI::When_::Help.new( nil, help_renderer, self ).execute
+        CLI::When_::Help.new( nil, help_renderer, self ).produce_any_result
       end
     end
 
@@ -1123,18 +1123,11 @@ module Skylab::Brazen
       end
     end
 
-    class Value_Wrapper_Bound_Call__ < Simple_Bound_Call_
-      def initialize value
-        @execute = value
-      end
-      attr_reader :execute
-    end
-
     class Aggregate_Bound_Call__ < Simple_Bound_Call_
       def initialize a
         @a = a
       end
-      def execute
+      def produce_any_result
         scn = Entity_[].scan_nonsparse_array @a
         while exe = scn.gets
           value = exe.receiver.send exe.method_name, * exe.args
@@ -1154,7 +1147,7 @@ module Skylab::Brazen
     DASH_ = '-'.getbyte 0
     EMPTY_A_ = [].freeze
     GENERIC_ERROR_ = 5
-    NOTHING_ = PROCEDE_ = nil
+    NOTHING_ = nil
     SUCCESS_ = 0
   end
 end

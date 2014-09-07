@@ -103,7 +103,7 @@ module Skylab::TestSupport
 
       def when_no_test_files
         @y << "(#{ flg } will have no effect because there are no spec files.)"
-        PROCEDE_
+        CONTINUE_
       end
 
       def when_depth_zero
@@ -211,7 +211,7 @@ module Skylab::TestSupport
       def when_everything_was_filtered
         report_everything_was_filtered
         @svc.replace_test_path_s_a EMPTY_A_
-        PROCEDE_
+        CONTINUE_
       end
 
       def report_everything_was_filtered
@@ -221,7 +221,7 @@ module Skylab::TestSupport
 
       def replace_list_with path_s_a
         @svc.replace_test_path_s_a path_s_a
-        PROCEDE_
+        CONTINUE_
       end
 
       def ick_arg

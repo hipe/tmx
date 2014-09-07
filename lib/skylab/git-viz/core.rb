@@ -11,17 +11,19 @@ module Skylab::GitViz
 
   Callback_Tree_ = Callback_::Tree
 
+  CONTINUE_ = nil
+
   EMPTY_A_ = [].freeze
 
   EMPTY_P_ = -> {}
 
-    Scn_ = Callback_::Scn
-
-  EMPTY_SCN_ = Scn_.new do end
-
   GitViz = self
 
   Name_ = Callback_::Name
+
+  PROCEDE_ = true
+
+  Scn_ = Callback_::Scn
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 

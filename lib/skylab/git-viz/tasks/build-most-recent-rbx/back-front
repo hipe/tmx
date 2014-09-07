@@ -79,7 +79,7 @@ module Skylab::GitViz::Tasks
       require 'open3' ; ::Open3
     end
 
-    PROCEDE_ = true ; CEASE_ = false
+    CEASE_ = false
   end
 
   Build_RBX.new( $stderr ).execute

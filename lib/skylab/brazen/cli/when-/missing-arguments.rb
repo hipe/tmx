@@ -9,8 +9,7 @@ module Skylab::Brazen
         @render = help_renderer
       end
 
-      def execute
-        o = @render ; prop = @property
+      def produce_any_result o = @render ; prop = @property
         o.express do
           "expecting #{ par prop }"
         end
