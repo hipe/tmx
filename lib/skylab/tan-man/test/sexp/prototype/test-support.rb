@@ -11,16 +11,12 @@ module ::Skylab::TanMan::TestSupport::Sexp::Prototype # #topic-module
   TanMan_ = TanMan_
 
   module Grammars
-
-    define_singleton_method :const_missing,
-      TanMan_::TestSupport::Sexp::GRAMMAR_MODULE_CONST_MISSING_METHOD_
-
     TanMan_::Autoloader_[ self ]
   end
 
   module InstanceMethods
 
-    def parser_clients_module
+    def grammars_module
       Grammars
     end
   end

@@ -10,8 +10,5 @@ module Skylab::TanMan::TestSupport::API
 
   module InstanceMethods
 
-    def debug!
-      super
-    end
   end
 end

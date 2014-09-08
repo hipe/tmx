@@ -35,10 +35,6 @@ module Skylab::CodeMolester
 
     Basic__ = sidesys[ :Basic ]
 
-    Basic_Fields = -> * x_a do
-      MetaHell__[]::Basic_Fields.via_iambic x_a
-    end
-
     Cache_pathname = memo[ -> do
       module CodeMolester::Cache
         define_singleton_method :pathname, (
@@ -109,10 +105,6 @@ module Skylab::CodeMolester
       Headless__[]::IO::Interceptors::Chunker::F.new p
     end
 
-    List_scanner = -> x do
-      Basic__[]::List::Scanner[ x ]
-    end
-
     MetaHell__ = sidesys[ :MetaHell ]
 
     Model_enhance = -> x, p do
@@ -153,10 +145,6 @@ module Skylab::CodeMolester
 
     Simple_shell = -> a do
       MetaHell__[]::Enhance::Shell.new a
-    end
-
-    Strange_proc = -> do
-      MetaHell__[].strange.to_proc
     end
 
     System_default_tmpdir_pathname = memo[ -> do

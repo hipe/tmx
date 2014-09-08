@@ -2,8 +2,6 @@ module Skylab::TanMan::TestSupport
 
   shared_context tanman: true do
 
-    include ::Skylab::TanMan::TestSupport::Tmpdir::InstanceMethods
-
     def input str
       argv = TestLib_::Shellwords[].split str
       self.result = cli.invoke argv

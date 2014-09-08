@@ -7,16 +7,18 @@ module Skylab::CssConvert
   CssConvert = self
   Headless_ = ::Skylab::Headless
 
+  Event_Sender_Methods_ = ::Module.new
+
   module Core
     # a namespace to hold modality-agnositc stuff
-  end
-
-
-  module Core::SubClient
+    module SubClient
+      include Event_Sender_Methods_
+    end
   end
 
 
   module Core::SubClient::InstanceMethods
+
     include Headless_::SubClient::InstanceMethods
 
   private
@@ -58,8 +60,8 @@ module Skylab::CssConvert
   private
 
     def version
-      call_digraph_listeners :payload, "#{ program_name } #{ CssConvert::VERSION }"
-      true
+      send_payload_message "#{ program_name } #{ CssConvert::VERSION }"
+      SUCCEEDED_
     end
   end
 
@@ -109,16 +111,18 @@ module Skylab::CssConvert
         result = :ok
       end while false
       if :error == result
-        call_digraph_listeners :help, usage_line
-        call_digraph_listeners :help, invite_line
+        send_help_message usage_line
+        send_help_message invite_line
       end
       exitstatus_for_i result
     end
 
-  protected  # #protected-not-private
-
     def actual_parameters
       @actual_parameters ||= formal_parameters_class.new
+    end
+
+    def expression_agent
+       @IO_adapter.pen
     end
 
   private
@@ -206,8 +210,15 @@ module Skylab::CssConvert
       Core::Params
     end
 
-    def pen_class
-      CLI::Pen # our own pen, just as a fun p.o.c.
+    def build_pen
+      CLI::Pen.new method( :escape_path )
+    end
+
+  public
+
+    def receive_string_on_channel s, i
+      s.respond_to?( :ascii_only? ) or fail "not string: #{ s.class }"
+      call_digraph_listeners i, s
     end
   end
 
@@ -217,13 +228,23 @@ module Skylab::CssConvert
 
 
   class CLI::Pen
+
     include Headless_::CLI::Pen::InstanceMethods
+
+    def initialize escape_path_p
+      @p = escape_path_p
+    end
+
     def em s
       stylize s, :strong, :cyan
     end
 
     def kbd s
       stylize s, :cyan
+    end
+
+    def pth x
+      @p[ x ]
     end
   end
 
@@ -240,13 +261,13 @@ module Skylab::CssConvert
       ( code_names - [ :strong ] ).each do |c|
         [[c], [:strong, c]].each do |a|
           s = "would you like some " <<
-            "#{pen.stylize(a.map(&:to_s).join(' '), *a)} with that?"
+            "#{pen.stylize(a.map(&:to_s).join( SPACE_ ), *a)} with that?"
           u = pen.unstyle(s)
-          fill = ' ' * [width - u.length, 0].max
-          call_digraph_listeners(:payload, "#{fill}#{s} - #{u}")
+          fill = SPACE_ * [ width - u.length, 0 ].max
+          send_payload_message "#{ fill }#{ s } - #{ u }"
         end
       end
-      true
+      SUCCEEDED_
     end
 
     def fixture test
@@ -255,7 +276,10 @@ module Skylab::CssConvert
       _basename = "#{test.name}-#{test.value}"
       fixture_path = FIXTURES_DIR.join(_basename).relative_path_from(_pwd)
       _try = "#{program_name} #{fixture_path}"
-      call_digraph_listeners(:info, "#{em 'try running this:'} #{_try}")
+      _msg = expression_agent.calculate do
+        "#{ em 'try running this:' } #{ _try }"
+      end
+      send_info_message _msg
     end
 
     def test name=nil
@@ -264,20 +288,46 @@ module Skylab::CssConvert
         list = VISUAL_TESTS.select { |t| r.match t.name }
       end
       if ! name or list.length > 1
-        fmt = '  %16s  -  %s'
-        (list || VISUAL_TESTS).each {|o|call_digraph_listeners(:payload, fmt % o.values_at(0..1))}
+        send_list_of_tests list || VISUAL_TESTS
       elsif list.empty?
-        call_digraph_listeners :error, "no such test #{name.inspect}"
-        call_digraph_listeners :info, invite_line
+        send_error_message "no such test #{ name.inspect }"
+        send_info_message invite_line
       else
         test = list.first
         send test.method, test
       end
     end
+
+    def send_list_of_tests a
+      fmt = '  %16s  -  %s'
+      a.each do |o|
+        send_payload_message fmt % o.values_at( 0..1 )
+      end ; nil
+    end
   end
 
   class CLI::Client
     include CLI::VisualTest::InstanceMethods
+  end
+
+  module Event_Sender_Methods_
+  private
+
+    def send_info_message s
+      send_string_on_channel s, :info
+    end
+
+    def send_payload_message s
+      send_string_on_channel s, :payload
+    end
+
+    def send_error_message s
+      send_string_on_channel s, :error
+    end
+
+    def send_help_method s
+      send_string_on_channel s, :help
+    end
   end
 
   Autoloader_ = ::Skylab::Callback::Autoloader
@@ -292,4 +342,7 @@ module Skylab::CssConvert
 
 
   # (:+[#su-001]:none)
+
+  SPACE_ = ' '.freeze
+  SUCCEEDED_ = true
 end

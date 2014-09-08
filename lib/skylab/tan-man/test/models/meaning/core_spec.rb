@@ -4,9 +4,7 @@ module Skylab::TanMan::TestSupport::Models::Meaning
 
   describe "[tm] Models::Meaning core" do
 
-    require TanMan_::TestSupport.dir_pathname.join( 'api/test-support' ).to_path
-
-    TanMan_::TestSupport::API::Expect[ self ]
+    TestLib_::API_expect[ self ]
 
     extend TS_
 

@@ -67,7 +67,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph::Remote::List__
       nonstyled_info_line.should match( /updating.+done/ )
       expect_no_more_lines
       @result.should be_kind_of( ::Fixnum )
-      scn = api.invoke( [ :graph, :remote, :list ] ).result  # TanMan_::API.debug!
+      scn = api.invoke( [ :graph, :remote, :list ] ).result
       a = scn.to_a
       a.length.should eql( 1 )
       a[ 0 ].entity_key.should eql( '"jeepers.dot" remote script "oiseau.sh"' )

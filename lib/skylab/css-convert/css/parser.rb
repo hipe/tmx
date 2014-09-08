@@ -1,6 +1,9 @@
 module Skylab::CssConvert
-  module CSS end
+
+  CSS = ::Module.new
+
   class CSS::Parser
+
     include CssConvert::Parser::InstanceMethods
 
                                   # maybe [#sl-115] clean up below
@@ -93,6 +96,10 @@ module Skylab::CssConvert
 
     def parser_parser_module_module
       PARSER_PARSER_MODULE_MODULE
+    end
+
+    def receive_parser_error_message s
+      error s
     end
   end
 end

@@ -11,12 +11,18 @@ describe "[tm] Sexp::Auto MANIPULULS", g: true do
     using_input_string 'fip ;  ', 'a one element input string' do
 
       context 'adds' do
+
         it 'before first' do
-          -> { result._insert_before!('fap', 'fip') }.should raise_error(
+          -> do
+            result._insert_before! 'fap', 'fip'
+          end.should raise_error(
             /cannot insert into a list with less than 2 items/i )
         end
+
         it 'before nil (append)' do
-          -> { result._insert_before!('fap', 'fip') }.should raise_error(
+          -> do
+            result._insert_before! 'fap', 'fip'
+          end.should raise_error(
             /cannot insert into a list with less than 2 items/i )
         end
       end
@@ -26,7 +32,7 @@ describe "[tm] Sexp::Auto MANIPULULS", g: true do
           removed = result._remove! 'fip'
           result.nodes.should eql([])
           removed.unparse.should eql('fip ;  ')
-          result.unparse.should eql('')
+          result.unparse.should eql ::Skylab::TanMan::EMPTY_S_
         end
       end
     end

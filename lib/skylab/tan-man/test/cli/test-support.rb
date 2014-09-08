@@ -12,6 +12,9 @@ module Skylab::TanMan::TestSupport::CLI
 
     include CONSTANTS
 
+    def klass i, *a, & p
+      # #todo
+    end
   end
 
   module InstanceMethods
@@ -26,7 +29,7 @@ module Skylab::TanMan::TestSupport::CLI
       if 1 == argv.length and argv[ 0 ].respond_to?( :each_with_index )
         argv = argv[ 0 ]
       end
-      do_debug and some_debug_stream.puts "(argv: #{ argv.inspect })"
+      do_debug and some_debug_IO.puts "(argv: #{ argv.inspect })"
       @result = simplified_client.invoke argv
     end
 

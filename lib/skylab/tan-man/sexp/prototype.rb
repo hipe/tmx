@@ -287,9 +287,9 @@ module Skylab::TanMan
       body = nil
       if lines.empty?
         debug? and info "strange -- multiline comment body expected for #{
-          }\"#{ @name_tokens.join ' ' }\""
+          }\"#{ @name_tokens.join SPACE_ }\""
       else
-        body = lines.join ''
+        body = lines.join EMPTY_S_
       end
       body
     end
@@ -343,7 +343,7 @@ module Skylab::TanMan
     define_method :attempt_to_scan_multiline_example_body! do
 
       @deindent ||= -> do                      # for this nerk we require that
-        if '' == line_header                   # the body of the example be
+        if EMPTY_S_ == line_header             # the body of the example be
           -> s { s }                           # indented to times two (2x)
         else                                   # that which the keyword was
           _rx = /^(?:#{ rex[ line_header ] }){2}/ # indented.  it sounds crazy
@@ -377,7 +377,7 @@ module Skylab::TanMan
           end                                  # de-indenting and etc.
         end
         if ! lines.empty?
-          res = lines.join ''
+          res = lines.join EMPTY_S_
         end
       end
       res

@@ -11,25 +11,61 @@ module Skylab::TreetopTools
   RuntimeError = ::Class.new ::RuntimeError
 
   module Lib_
+
+    memoize = -> p { p_ = -> { x = p[] ; p_ = -> { x } ; x } ; -> { p_[] } }
+
     sidesys = Autoloader_.build_require_sidesystem_proc
+
     Basic__ = sidesys[ :Basic ]
+
+    Basic_fields = -> * x_a do
+      MetaHell__[]::Basic_Fields.via_iambic x_a
+    end
+
+    Brazen__ = sidesys[ :Brazen ]
+
     CLI = -> do
       Headless__[]::CLI
     end
+
     CodeMolester__ = sidesys[ :CodeMolester ]
-    Const_pryer = -> do
-      CodeMolester__[]::ConstPryer
-    end
+
     Digraph = -> do
       Basic__[]::Digraph
     end
+
+    Event_builder = -> x do
+      x.include Brazen__[]::Entity::Event::Builder_Methods ; nil
+    end
+
+    File_utils = memoize[ -> { require 'fileutils' ; ::FileUtils } ]
+
     Headless__ = sidesys[ :Headless ]
+
+    List_scanner = -> x do
+      Basic__[]::List::Scanner[ x ]
+    end
+
+    MetaHell__ = sidesys[ :MetaHell ]
+
     Parameter = -> do
       Headless__[]::Parameter
     end
+
+    Strange_proc = -> do
+      MetaHell__[].strange.to_proc
+    end
+
+    String_scanner = memoize[ -> { require 'strscan' ; ::StringScanner } ]
+
     SubClient = -> do
       Headless__[]::SubClient
     end
+
+    Treetop = memoize[ -> do
+      # Autoloader_.require_quietly 'treetop'
+      require 'treetop' ; ::Treetop
+    end ]
   end
 
   module Parser  # #stowaway
@@ -49,7 +85,9 @@ module Skylab::TreetopTools
     end
   end
 
+  PROCEDE_ = true
   TreetopTools_ = self
+  UNABLE_ = false
 
   # ([#su-001] none.)
 end

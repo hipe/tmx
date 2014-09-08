@@ -42,6 +42,8 @@ module Skylab::TanMan
       require 'strscan' ; ::StringScanner
     end ]
 
+    Tmpdir_stem = memoize[ -> { 'tina-man'.freeze } ]
+
     Two_streams = -> do
       HL__[]::System::IO.some_two_IOs
     end

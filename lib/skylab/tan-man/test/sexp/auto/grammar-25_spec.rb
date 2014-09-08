@@ -8,7 +8,7 @@ describe "[tm] Sexp::Auto list pattern (grammar 25)", g: true do
     using_input '200-zero-items' do
       it_unparses_losslessly
       it "stmt_list is nil when you have zero items" do
-        result = client.parse_file input_path
+        result = produce_result
         result.stmt_list.should eql(nil)
       end
     end

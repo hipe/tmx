@@ -8,7 +8,7 @@ module ::Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
 
   extend TestSupport_::Quickie
 
-  TestLib_ = TestLib_
+  EMPTY_S_ = EMPTY_S_ ; TanMan_ = TanMan_ ; TestLib_ = TestLib_
 
   module ModuleMethods
 
@@ -35,7 +35,7 @@ module ::Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
     end
   end
 
-  o = { }
+  o = {}
 
   o[:new_before_this] = -> recursive_list, string do
     # [#071] repeated here just because it's easy and we want independence
@@ -57,12 +57,12 @@ module ::Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
   end
 
   module Attr_List_I_M
-    gs = nil
-    define_method :go do |asst_to_insert_string|
-      gs ||= sexp_original_client.parse_string 'digraph{}' # EGADS
-      if '' == with_string # hack an empty alist..
+
+    def go asst_to_insert_string
+      gs = graph_sexp
+      if EMPTY_S_ == with_string  # hack an empty alist..
         a_list = gs.class.parse :a_list, 'e=f'
-        a_list[:content] = nil # toss a perfectly good AList1
+        a_list[:content] = nil  # toss a perfectly good AList1
       else
         a_list = gs.class.parse :a_list, with_string
       end
@@ -71,6 +71,20 @@ module ::Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
       a_list._insert_before! asst_to_insert_string, new_before_this
       @actual_string = a_list.unparse
       nil
+    end
+
+    define_method :graph_sexp, -> do
+      _GRAPH_SEXP_ = nil
+      -> do
+        _GRAPH_SEXP_ ||= build_graph_sexp_once
+      end
+    end.call
+
+    def build_graph_sexp_once
+      TanMan_::Models_::DotFile.produce_document_via_parse do |parse|
+        parse.via_input_string 'digraph{}'
+        parse.subscribe( & method( :subscribe_to_parse_events ) )
+      end
     end
   end
 
@@ -87,11 +101,19 @@ module ::Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
       nil
     end
 
-    let :stmt_list do
-      x = sexp_original_client
-      full_document = "digraph{#{ with_string }}"
-      @graph_sexp = x.parse_string full_document
-      @graph_sexp.stmt_list
+    def stmt_list
+      @did_resolve_stmt_list ||= resolve_stmt_list
+      @stmt_list
+    end
+
+    def resolve_stmt_list
+      @graph_sexp = TanMan_::Models_::DotFile.
+        produce_document_via_parse do |parse|
+          parse.via_input_string "digraph{#{ with_string }}"
+          parse.subscribe( & method( :subscribe_to_parse_events ) )
+        end
+      @stmt_list = @graph_sexp.stmt_list
+      true
     end
   end
 end

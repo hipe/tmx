@@ -42,11 +42,11 @@ module Skylab::TanMan::TestSupport::CLI
     klass :Action, extends: TanMan_::CLI::Action do |o|
       self::ACTIONS_ANCHOR_MODULE = o.Actions
     end
-    end
 
     modul :Actions do
       @dir_pathname = :nope
       # #was-boxxy
+    end
     end
 
     event_struct = ::Struct.new :message

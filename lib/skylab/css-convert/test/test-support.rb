@@ -3,8 +3,8 @@ require_relative '../core'
 require 'skylab/headless/test/test-support' # gives us h.l core and t.s core
                                             # unstyle
 
-
 module Skylab::CssConvert::TestSupport
+
   ::Skylab::TestSupport::Regret[ CssConvert_TestSupport = self ]
 
 
@@ -19,12 +19,13 @@ module Skylab::CssConvert::TestSupport
   extend TestSupport_::Quickie
 
   module InstanceMethods
+
     include CONSTANTS
 
-    def build_parser klass
+    def build_parser cls
       client = cli_instance
       client.set! or fail "failed to bootstrap client! (defaults etc)" # ick
-      klass.new client
+      cls.new client
     end
 
     def cli_instance

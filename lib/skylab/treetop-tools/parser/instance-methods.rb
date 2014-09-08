@@ -1,66 +1,72 @@
 module Skylab::TreetopTools
 
-  module Parser::InstanceMethods
+  module Parser::InstanceMethods  # you must implement the #call-down's below
 
-    include Lib_::SubClient[]::InstanceMethods
+    Lib_::Event_builder[ self ]
 
-    def parse_file pn, opts=nil, &p
+    def parse_file pn, *a, &p
       _ia = build_file_input_adapter pn, &p
-      parse _ia, opts, &p
+      parse _ia, a, p
     end
+
   private
+
     def build_file_input_adapter *a, &p
       opts = if a.last.respond_to? :each_pair
         a.last.dup  # don't modify original
       else
-        a << (( _ = { } )) ; _
+        a << (( _ = {} )) ; _  # NOT 'EMPTY_H_' (it will get mutated)
       end
       opts.key? :entity_noun_stem or
         opts[ :entity_noun_stem ] = entity_noun_stem
       Parser::InputAdapters::File.new self, *a, &p
     end
+
     def entity_noun_stem
-      self.class::ENTITY_NOUN_STEM  # :+#call-down
+      'input'
     end
 
   public
 
-    def parse_stream io, opts=nil, &p
+    def parse_stream io, *a, &p
       _ia = build_stream_input_adapter io, &p
-      parse _ia, opts, &p
+      parse _ia, a, p
     end
-  private
-    def build_stream_input_adapter *a
+
+    private def build_stream_input_adapter *a
       Parser::InputAdapters::Stream.new self, *a
     end
 
-  public
-
-    def parse_string whole_string, opts=nil, &p
+    def parse_string whole_string, *a, &p
       _ia = build_string_input_adapter whole_string, &p
-      parse _ia, opts, &p
+      parse _ia, a, p
     end
+
   private
+
     def build_string_input_adapter *a
       Parser::InputAdapters::String.new self, *a
     end
 
-    # ~
-
-    def parse input_adapter, opts=nil
-      @input_adapter = input_adapter # #API
+    def parse input_adapter, a, p
+      @input_adapter = input_adapter  # :#API
       @parse_time_elapsed_seconds = nil
-      begin
-        load_grammars_if_necessary
-        opts and ( r = absorb_parse_opts!( opts ) or break )
-        string = input_adapter.resolve_whole_string or break( r = string )
-        p = parser or break( r = p )
+      p and self._TEST_ME
+      load_grammars_if_necessary
+      ok = true
+      a.length.nonzero? and ok = absorb_parse_opts!( * a )
+      ok &&= resolve_whole_string
+      ok &&= resolve_parser
+      ok and begin
         t = ::Time.now
-        r_ = p.parse string
+        x = @parser.parse @whole_string
         @parse_time_elapsed_seconds = ::Time.now - t
-        r = r_ ? parser_result( r_ ) : parser_failure
-      end while nil
-      r
+        if x
+          parser_result x
+        else
+          when_parse_failure
+        end
+      end
     end
 
     def load_grammars_if_necessary  # for the children
@@ -68,7 +74,17 @@ module Skylab::TreetopTools
 
     def absorb_parse_opts! opts  # for the children
       opts and fail "implement me: 'absorb_parse_opts!' - #{ opts.keys * ', '}"
-      true
+      PROCEDE_
+    end
+
+    def resolve_whole_string
+      @whole_string = @input_adapter.resolve_whole_string
+      @whole_string ? PROCEDE_ : @whole_string
+    end
+
+    def resolve_parser
+      parser
+      @parser ? PROCEDE_ : @parser
     end
 
     def parser
@@ -83,11 +99,18 @@ module Skylab::TreetopTools
       @parser_class ||= load_parser_class  # :+#call-down
     end
 
-    def parser_failure
-      _msg = parser_failure_reason
-      _msg ||= "Got nil from parser without a reason!"
-      error _msg  # :+#call-down
-      false
+    def when_parse_failure
+      _ev = build_parse_failure_event
+      receive_parse_failure_event _ev  # :+#call-down
+      UNABLE_
+    end
+
+    def build_parse_failure_event
+      msg = parser_failure_reason
+      msg ||= "Got nil from parser without a reason!"
+      build_error_event_with :parse_failed, :reason, msg do |y, o|
+        y << o.msg
+      end
     end
 
     def parser_failure_reason

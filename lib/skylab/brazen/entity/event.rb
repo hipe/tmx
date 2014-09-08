@@ -213,6 +213,10 @@ module Skylab::Brazen
       module Builder_Methods
       private
 
+        def build_info_event_with * x_a, & p
+          build_event_via_iambic_and_message_proc x_a, p
+        end
+
         def build_error_event_with * x_a, & p
           build_error_event_via_mutable_iambic_and_message_proc x_a, p
         end

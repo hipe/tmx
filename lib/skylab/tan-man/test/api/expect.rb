@@ -24,7 +24,7 @@ module Skylab::TanMan::TestSupport
         end
 
         def bld_event_receiver
-          Event_Receiver__.new ( do_debug && some_debug_stream )
+          Event_Receiver__.new ( do_debug && some_debug_IO )
         end
       end
 

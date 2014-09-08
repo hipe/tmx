@@ -8,7 +8,6 @@ module Skylab::TanMan::TestSupport::CLI::Actions
   describe "[tm] CLI action `status`", tanman: true, cli_action: true, wip: true do
 
     extend TS_
-    include Tmpdir::InstanceMethods
 
     def prepare_configs *whichs
       prepare_tanman_tmpdir

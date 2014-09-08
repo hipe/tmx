@@ -13,9 +13,9 @@ module Skylab::CssConvert
           error "this wasn not found : #{ escape_path pn } which was a #{ e }"
         end
       end
-      lp = css_parser.parse_file(left, &b)
-      rp = css_parser.parse_file(right, &b)
-      call_digraph_listeners(:info, "IMPLEMENT ME merge")
+      _lp = css_parser.parse_file(left, &b)
+      _rp = css_parser.parse_file(right, &b)
+      send_info_message "IMPLEMENT ME merge"
     end
     attr_reader :sexp
   private

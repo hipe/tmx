@@ -20,7 +20,7 @@ module Skylab::Bnf2Treetop::TestSupport
         outstream = ::Skylab::TestSupport::IO::Spy.standard
         cli = Bnf2Treetop::CLI.new(outstream, errstream)
         cli.program_name = 'bnf2treetop'
-        o = ::Struct.new(:debug_p, :err_p, :out_p).new # 'joystick'
+        o = ::Struct.new(:debug_p, :err_p, :out_p).new  # :+[#hl-078] "shell"
         o.debug_p = ->{ outstream.debug!; errstream.debug! }
         collapsed_p = -> do
           oo = ::Struct.new(:err, :out, :result).new

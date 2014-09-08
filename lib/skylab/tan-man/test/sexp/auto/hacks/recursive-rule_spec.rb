@@ -52,7 +52,7 @@ module ::Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
           go 'nazir=zenith'
           expect 'nazir=zenith'
         end
-        with ''
+        with EMPTY_S_
       end
       context "on one" do
         it "2.1 - one after one - uses comma and space" do

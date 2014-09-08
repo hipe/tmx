@@ -1,9 +1,8 @@
 module Skylab::TanMan
 
   module Statement::Parser::InstanceMethods
-    include TanMan::Parser::InstanceMethods
 
-    ENTITY_NOUN_STEM = 'statement'
+    include TanMan::Parser::InstanceMethods
 
   private
 
@@ -41,7 +40,7 @@ module Skylab::TanMan
       parse_string words_arr.join(' '), opts
     end
 
-    def parser_failure # might get dried : DRY #watch [#ttt-002]
+    def when_parse_failure  # might get dried : DRY #watch [#ttt-002]
       res = nil
       begin
         # parser.failure_reason, parser.failure_line, parser.failure_column
@@ -76,5 +75,16 @@ module Skylab::TanMan
       end
       res
     end
+
+    def receive_parser_error_message s
+      error s
+    end
+
+    def entity_noun_stem
+      ENTITY_NOUN_STEM__
+    end
+
+    ENTITY_NOUN_STEM__ = 'statement'.freeze
+
   end
 end

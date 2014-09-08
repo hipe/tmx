@@ -2,123 +2,117 @@
 
 module Skylab::TreetopTools
 
-  # #abstraction-candidate: this (in some form) might one day go up
-  # if it ever isn't painful to look at.
-
   DSL = ::Module.new
 
-  DSL::Client = ::Module.new
+  class DSL::Shell  # #the-shell-narrative
 
-  class DSL::Joystick
-
-    # A "Joystick" is our cute moniker for the object that forms the
-    # sole point of interface for a DSL. The entirety of the DSL
-    # consists of messages that can be sent to the object.  (Conversely,
-    # the interface of the Joystick *is* the DSL.)
-    #
-    # The developer would subclass this DSL::Joystick class and use
-    # (ahem) DSL of the parameter definer (e.g.) to define the desired DSL.
-    #
-    # An instance of this Joystick would then be passed to e.g. some
-    # user-provided block, during which the Joystick would "record" the
-    # information from the user, which is then retrivable later by the
-    # `__actual_parameters` method.
-    #
-    # (In this implementation, the 'actual parameters' is an object
-    # of a simple, custom-built struct built dynamically from the
-    # elements of the DSL.)
-
-    extend Lib_::Parameter[]::Definer::ModuleMethods # we do *not* want ..
+    extend Lib_::Parameter[]::Definer::ModuleMethods
 
     include Lib_::Parameter[]::Definer::InstanceMethods::ActualParametersIvar
 
-    def __actual_parameters       # we want to keep the namespace clear for
-      @actual_parameters          # the DSL
-    end
+    class << self  # #note-15
 
+      def actual_parameters_class
+        const_defined? AP__, false or init_actual_parameters_class
+        const_get AP__, false
+      end
 
-  private
+    private
 
-    def initialize
-      @actual_parameters = # (per ActualParametersIvar it must be this name)
-        self.class.build_actual_parameters
-    end
-  end
-
-  class << DSL::Joystick
-    const = :ActualParameters     # make a simple, custom actuals holder
-    define_method :build_actual_parameters do # that is just a struct whose
-      if const_defined? const, false # members are determined by the names
-        const_get const, false    # of the parameters of our DSL
-      else
-        k = ::Class.new( ::Struct.new(*
-          parameters.each.map(& :normalized_parameter_name ) ) )
-        k.class_eval do
+      def init_actual_parameters_class
+        _i_a = parameters.each.map( & :normalized_parameter_name )
+        cls = ::Struct.new( * _i_a )
+        cls.class_exec do
           include Lib_::Parameter[]::Definer::InstanceMethods::StructAdapter
           public :known?
         end
-        const_set const, k
-      end.new
+        const_set AP__, cls ; nil
+      end
+
+      AP__ = :ActualParameters
+    end
+
+    def initialize
+      @actual_parameters = self.class.actual_parameters_class.new
+    end
+
+    def __actual_parameters
+      @actual_parameters
     end
   end
 
-  class DSL::Client::Minimal # (used to be struct, too confusing w/ []=)
-    # You, the DSL Client, are the one that runs the client (user)'s
-    # block around your joystick instance, runs the validation etc,
-    # emits any errors, does any normalization, and then comes out at the
-    # other end with a `actual_parameters` structure that holds the client's
-    # (semi valid) request
+  DSL::Client = ::Module.new
 
-    Lib_::Parameter[][ self, :parameter_controller, :oldschool_parameter_error_structure_handler ]
+  class DSL::Client::Minimal  # #the-minimal-DSL-client-narrative
+
+    Lib_::Parameter[][ self, :parameter_controller,
+      :oldschool_parameter_error_structure_handler ]
 
     include Lib_::Parameter[]::Definer::InstanceMethods::IvarsAdapter
-                                  # once we absorb the dsl actuals, we might
-                                  # use this for reflection
-
-
-  private
 
     def initialize client_x, dsl_body_p, event_p
       @dsl_body_p, @event_p = dsl_body_p, event_p
       super client_x
     end
 
+  private
+
     def absrb_struct_into_ivars struct
       struct.members.each do |name|
         instance_variable_set "@#{ name }", struct[ name ]
       end
-      true
+      PROCEDE_
     end
 
-    def build_joystick
-      joystick_class.new
+    def build_shell
+      shell_class.new
     end
 
-    def call_body_and_absorb!     # the heart of the DSL pattern
-      r = false
-      begin
-        @joystick ||= build_joystick  # persist across bodies
-        @dsl_body_p[ @joystick ]
-        actuals = @joystick.__actual_parameters
-        set! nil, actuals or break # defaults, validation etc
+    def call_body_and_absorb!
+      @shell ||= build_shell  # persist across bodies
+      @dsl_body_p[ @shell ]
+      actuals = @shell.__actual_parameters
+      ok = set! nil, actuals
+      if ok
         absrb_struct_into_ivars actuals
-        r = true
-      end while false
-      r
+        PROCEDE_
+      else
+        UNABLE_
+      end
+    end
+
+    def call_digraph_listeners type, payload
+      callbacks[ type ][ payload ]
     end
 
     def callbacks
-      @callbacks ||= begin  # cheap, compartmentalized pub-sub
-        o = Lib_::Parameter[]::Definer.new do
-          param :error, hook: true, writer: true
-          param :info,  hook: true, writer: true
-          alias_method :on_error, :error # hm ..
-          alias_method :on_info, :info
-        end.new( & @event_p )
-        @event_p = nil
-        o.on_error ||= ->(msg) { fail("Couldn't #{verb} #{noun} -- #{msg}") }
-        o.on_info  ||= ->(msg) { some_infostream.puts("(⌒▽⌒)☆  #{ msg }  ლ(́◉◞౪◟◉‵ლ)") }
-        o
+      @callbacks ||= bld_callbacks
+    end
+
+    def bld_callbacks
+      o = Lib_::Parameter[]::Definer.new do
+        param :error, hook: true, writer: true
+        param :info,  hook: true, writer: true
+        alias_method :on_error, :error # hm ..
+        alias_method :on_info, :info
+      end.new( & @event_p )
+      # o.on_info = p  # #open [#004]
+      @event_p = nil
+      o.on_error ||= default_handle_error_message
+      o.on_info ||= default_handle_info_message
+      o
+    end
+
+    def default_handle_error_message
+      -> msg do
+        fail "Couldn't #{ verb } #{ noun } -- #{ msg }"
+      end
+    end
+
+    def default_handle_info_message
+      -> msg do
+        _msg_ = "(⌒▽⌒)☆  #{ msg }  ლ(́•◞౪◟•‵)ლ "
+        some_infostream.puts _msg_ ; nil
       end
     end
 
@@ -126,20 +120,22 @@ module Skylab::TreetopTools
       Lib_::CLI[]::IO.some_errstream_IO
     end
 
-    def call_digraph_listeners type, payload
-      callbacks[ type ][ payload ]  # to be cute we did this a different way
+    def formal_parameters
+      shell_class.parameters
     end
 
-    def formal_parameters         # you betcha those are our formal parameters
-      joystick_class.parameters
+    def shell_class
+      self.class.const_get :Shell__, false  # :+#hook-out
     end
 
-    def joystick_class
-      self.class.const_get :DSL, false # descendent classes should define this
+    def noun
+      NOUN__
     end
+    NOUN__ = "grammar".freeze
 
-    def noun ; 'grammar' end      # used in callback_h for val'n messages
-
-    def verb ; 'load' end         # used in callback_h for val'n messages
+    def verb
+      VERB__
+    end
+    VERB__ = "load".freeze
   end
 end

@@ -1,5 +1,7 @@
 # encoding: UTF-8
 
+self._THIS_FILE_HAS_BEEN_ # .. furloughed but is kept for possible future use
+
 require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::Sexp

@@ -133,7 +133,7 @@ module Skylab::TestSupport
     #
     Debug__ = ::Struct.new :condition_p, :emit_line_p
 
-    def line_filter! p  # when a line is resolved to be added to '@line_a'
+    def add_line_filter p  # when a line is resolved to be added to '@line_a'
       # send the string to all such 'p' in the order they were received
       # in a reduce operation such that each next 'p' receives the result of
       # the previous 'p'. the final result will be added to '@line_a'.

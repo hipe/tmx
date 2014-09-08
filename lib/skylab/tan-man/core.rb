@@ -14,6 +14,7 @@ module Skylab::TanMan
   EMPTY_S_ = ''.freeze
   stowaway :Entity_, 'models-'
   stowaway :Kernel_, 'models-'
+  SPACE_ = ' '.freeze
   UNABLE_ = false
 
 end

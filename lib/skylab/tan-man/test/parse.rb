@@ -1,54 +1,32 @@
-module Skylab::TanMan
+module Skylab::TanMan::TestSupport
 
-  class TestSupport::ParserProxy
+  class Parse < TanMan_::Models_::DotFile::Produce_document_via_parse__::Parse__
 
-    # the point of this (somewhat experimentally) is to see if we can have
-    # a 'pure' parser thing that is divorced from our client controller
-    # with a minimal amount of dedicated logic (the answer was yes)
+    # customize an ancillary component of our main business parser to work
+    # with our smaller ad-hoc grammars.
 
-    include TanMan_::Models_::DotFile::Parser::InstanceMethods
 
-    def initialize rc
-      @do_send_parser_loading_info = true
-      @verbose = nil
+    def initialize
+      @grammar_path_a = []
       super
     end
 
-
-    public :parser
-
-    attr_accessor :profile
-
-    attr_accessor :receive_parser_loading_info_p
-
-    attr_writer :verbose
-
-    def verbose_dotfile_parsing
-      @verbose and @verbose.call
+    def add_grammar_path s
+      @grammar_path_a.push s ; nil
     end
 
-    def parser_result result
-      @result = super
-      if profile
-        maybe_do_profile
-      end
-      @result
+    def add_grammar_paths_to_load o
+      @grammar_path_a.each do |s|
+        o.treetop_grammar s
+      end ; nil
     end
 
-  private
-
-    def maybe_do_profile
-      _is = input_adapter.type.
-        is? TestLib_::TTT[]::Parser::InputAdapter::Types::FILE
-      if _is
-        do_profile
-      end
+    def root_for_relative_paths_for_load
+      @root_for_relative_paths_for_load
     end
 
-    def do_profile
-      d = parse_time_elapsed_seconds * 1000
-      path = input_adapter.pathname.basename.to_s
-      send_info_string '      (%2.1f ms to parse %s)' % [ d, path ] ; nil
+    def set_root_for_relative_paths_for_load x
+      @root_for_relative_paths_for_load = x ; nil
     end
   end
 end

@@ -7,7 +7,7 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
     extend TS_  # #borrow:one
 
   using_grammar '70-38-simplo' do
-    using_input_string '', 'totally empty input string' do
+    using_input_string EMPTY_S_, 'totally empty input string' do
       it 'has no list controller' do
         result.node_list.should be_nil
       end

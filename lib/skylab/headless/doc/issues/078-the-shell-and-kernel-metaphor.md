@@ -32,13 +32,13 @@ are emergent for the current project, but my bear-out broader application.
 
 
 
-## `shells` (formerly "conduit")
+## `shells` (formerly "conduit", née "joystick")
 
 the "shell" construct is a popular choice for implementing the kind of DSL
 where all of the declaration happens inside of an `enhance` block. we
 typically create one such shell class for each such DSL. to "read the
 values in" that are in such an enhance block, we create one such shell
-object and instance_exec the block on it. in this way the expressions
+object and `instance_exec` the block on it. in this way the expressions
 available in the DSL exactly correspond to the public instance methods
 of the shell class.
 

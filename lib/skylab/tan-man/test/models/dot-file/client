@@ -14,7 +14,9 @@ module ::Skylab::TanMan::TestSupport::Models::DotFile
     o.treetop_grammar '../../../models/dot-file/dot-language.generated.treetop'
     end
 
-    def force_overwrite? ; true end
+    def do_force_overwrite
+      true
+    end
 
     def stem_path
       'dawt-file' # used to make a tmpdir dir

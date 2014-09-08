@@ -8,7 +8,7 @@ describe "[tm] Sexp::Auto list pattern (grammar 50)", g: true do
     using_input '010-empty-digraph-no-ws.dot' do
       it_unparses_losslessly
       it "stmt_list is nil" do
-        result = client.parse_file input_path
+        result = produce_result
         result.stmt_list.should eql(nil)
       end
     end
@@ -41,7 +41,7 @@ describe "[tm] Sexp::Auto list pattern (grammar 50)", g: true do
   end
 
   let(:a) do
-    result = client.parse_file input_path
+    result = produce_result
     result.stmt_list.stmts
   end
 end

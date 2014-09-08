@@ -7,8 +7,8 @@ describe "[tm] Sexp::Auto list pattern (grammar 06)", g: true do
   using_grammar '06' do
     using_input '100-nerp' do
       it 'does not blink (works 2 times in a row)' do
-        a = client.parse_string input_string
-        b = client.parse_string input_string
+        a = produce_result
+        b = produce_result
         a.class.rule.should eql(:nerks)
         a.class.should eql(b.class)
         ( a.object_id == b.object_id ).should eql( false )

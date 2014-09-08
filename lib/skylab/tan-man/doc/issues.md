@@ -1,3 +1,4 @@
+[#084]       #parent-node: [#model] the node model narrative ..
 [#083]       #doc-node kernel
 [#082]       #parent-node: [#083] the kernel properties narrative ..
 [#081]       config shell (lost). part of [#mh-053]
@@ -14,7 +15,7 @@
 [#068]       #done dot file controller is becoming a god object, also redesign
              the way it executes "tell"s, so it's not as much an action
              obj
-[#067]       #tracking-tag lexical stuff ..
+[#067]       #tracking-tag lexical ordering stuff ..
 [#066]       #done issue with adding a new node on an empty graph,
              new nodes should always come after `node` node
 [#065]       #done fuzzy manage dependency

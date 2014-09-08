@@ -33,7 +33,7 @@ module Skylab::TanMan::TestSupport::Models::DotFile::Manipulating::Label
 
       it 'can remove the label' do
         removed = result.stmt_list._remove! label_statement
-        pn = input_pathname.dirname.join '1.0-with-no-label.dot'
+        pn = normalized_input_pathname.dirname.join '1.0-with-no-label.dot'
         exp = pn.read
         result.unparse.should eql( exp )
         removed.unparse.should eql(

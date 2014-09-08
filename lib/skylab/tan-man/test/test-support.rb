@@ -3,7 +3,7 @@ require 'skylab/test-support/core'
 
 module Skylab::TanMan::TestSupport
 
-  ::Skylab::TestSupport::Regret[ self ]
+  ::Skylab::TestSupport::Regret[ TS_ = self ]
 
   TanMan_ = ::Skylab::TanMan
 
@@ -12,6 +12,14 @@ module Skylab::TanMan::TestSupport
     memoize = -> p { p_ = -> { x = p[] ; p_ = -> { x } ; x } ; -> { p_[] } }
 
     sidesys = TanMan_::Autoloader_.build_require_sidesystem_proc
+
+    API_expect = -> ctx_cls do
+
+      require TanMan_::TestSupport.dir_pathname.join( 'api/test-support' ).to_path
+
+      TanMan_::TestSupport::API::Expect[ ctx_cls ]
+
+    end
 
     Build_tmpdir_via_stem = -> s do
       _path_s = Dev_tmpdir_pathname[].join( s ).to_path
@@ -103,15 +111,16 @@ module Skylab::TanMan::TestSupport
 
   module CONSTANTS
     TanMan_ = TanMan_
+    EMPTY_S_ = TanMan_::EMPTY_S_
+    SPACE_ = TanMan_::SPACE_
     TestLib_ = TestLib_
     TestSupport_  = ::Skylab::TestSupport
-    TMPDIR_STEM  = 'tina-man'
-    TMPDIR = TestLib_::Build_tmpdir_via_stem[ TMPDIR_STEM ]
+    TMPDIR = TestLib_::Build_tmpdir_via_stem[ TanMan_::Lib_::Tmpdir_stem[] ]
   end
 
   include CONSTANTS # for use here, below
 
-  TestSupport_ = TestSupport_ ; TMPDIR = TMPDIR  # #annoy
+  TestSupport_ = TestSupport_ ; TMPDIR = TMPDIR
 
   # this is dodgy but should be ok as long as you accept that:
   # 1) you are assuming meta-attributes work and 2) the below is universe-wide!
@@ -127,231 +136,211 @@ module Skylab::TanMan::TestSupport
 
   module ModuleMethods
 
-    def input str
-      let(:input_string_to_use) { str }
-      let(:input_path_stem_to_use) { }
-    end
+    def using_grammar _GRAMMAR_PATHPART_ , *tags, & p
 
-    def using_input input_path_stem, *tags, & p
+      context "using grammar #{ _GRAMMAR_PATHPART_ }", *tags do
 
-      context "using input #{ input_path_stem }", *tags do
-
-        define_method :input_path_stem_to_use do
-          input_path_stem
-        end
-
-        define_method :input_string_to_use do
+        define_method :using_grammar do
+          _GRAMMAR_PATHPART_
         end
 
         module_exec( & p )
       end
     end
 
-    def using_input_string str, *tags, &b
-      desc = tags.shift if ::String === tags.first
-      desc ||= "using input string #{str.inspect}"
-      context(desc, *tags) do
-        let(:input_path_stem_to_use) { }
-        let(:input_string_to_use) { str }
-        module_eval(&b)
+    def using_input _STEM_, *tags, & p
+
+      context "using input #{ _STEM_ }", *tags do
+
+        define_method :produce_result_via_parse_method_i do
+          :via_parse_via_input_file_granule_produce_result
+        end
+
+        define_method :input_file_granule do
+          _STEM_
+        end
+
+        module_exec( & p )
       end
     end
 
-    TestLib_::Class_creator_module_methods_module[ self ]
-  end
+    def using_input_string _STR_, *tags, & p
 
-
-  module Tmpdir
-
-    o = { }
-
-    get = nil
-
-    prepare = -> do               # always re-create the tmpdir (blows the
-      TMPDIR.prepare              # old one and its contents away!).
-      get = -> { TMPDIR }         # Also memoize it into `get`
-      TMPDIR
-    end
-
-    get = -> do                   # get the last prepared tmpdir during the
-      prepare[ ]                  # lifetime of this ruby process, re-creating
-    end                           # it (preparing it) iff prepare was never yet
-                                  # called.
-    o[:prepare] = prepare
-
-    o[:get] = -> { get[] }
-
-    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
-
-  end
-
-
-  module Tmpdir::InstanceMethods
-
-    fun = Tmpdir::FUN
-
-    define_method :prepare_tanman_tmpdir do |patch=nil|
-      tmpdir = fun.prepare[ ]
-      if patch
-         tmpdir.patch patch
+      desc = if tags.first.respond_to? :ascii_only?
+        tags.shift
+      else
+        "using input string #{ _STR_.inspect }"
       end
-      tmpdir # important
+
+      context desc, * tags do
+
+        input _STR_
+
+        module_exec( & p )
+      end
     end
 
-    define_method :prepared_tanman_tmpdir, & fun.get
+    def input _STR_
 
-    def tanman_tmpdir
-      TMPDIR # less screaming in tests is good
+      define_method :produce_result_via_parse_method_i do
+        :via_parse_via_input_string_produce_result
+      end
+
+      define_method :input_string do
+        _STR_
+      end
     end
   end
-
-
-  module CONSTANTS
-    Tmpdir = Tmpdir
-  end
-
 
   module InstanceMethods
 
-    include Tmpdir::InstanceMethods
-
-    def clear_api_if_necessary
-      if ! api_was_cleared
-        @api_was_cleared = true
-        TanMan_::Services.services.api.clear_all_services
-      end
-      nil
-    end
-
-    attr_reader :api_was_cleared
-
-    def build_normalized_input_pathname stem
-      top_input_fixtures_dir_pn.join stem
-    end
-
-    let :api do
-      api = TanMan_::Services.services.api
-      if do_debug
-        TanMan_::API.debug!
-      end
-      api
-    end
-
-    def client
-      client ||= build_client
-    end
-
-    def build_client
-      # client = TestLib_::Dev_client[].new
-      _client = Dev_Client__.new
-      o = TanMan_::TestSupport::ParserProxy.new _client
-      o.verbose = -> { do_debug }
-      if do_debug_parser_loading
-        o.profile = true
-      else
-        o.receive_parser_loading_info_p = -> x do
-          if do_debug
-            some_debug_stream.puts "(xyzjk(#{ x }))"
-          end
-        end
-        o.profile = false
-      end
-      o
-    end
-
-    class Dev_Client__
-      def parameter_label param, x=nil
-        "#{ param.name.as_method }#{ x and "[#{ x }]" }"
-      end
-      def escape_path x
-        "(xyzzy(#{ x.to_path }))"
-      end
-    end
-
     def debug!
-      self.do_debug = true
-      self.do_debug_parser_loading = true
+      @do_debug = true
     end
-    alias_method :tanman_debug!, :debug!
 
     attr_accessor :do_debug
 
-    def some_debug_stream
+    def some_debug_IO
+      Some_debug_IO[]
+    end
+
+    Some_debug_IO = -> do
       TestSupport_::System.stderr
     end
 
-    attr_accessor :do_debug_parser_loading
-
-    def top_input_fixtures_dir_pn
-      @tifdpn ||= ::Pathname.new input_fixtures_dir_pathname
+    def result
+      @did_resolve_result ||= resolve_result
+      @result
     end
 
-    def input_path
-      normalized_input_pathname.to_s
+    def resolve_result
+      @result = produce_result
+      true
     end
 
-    def input_pathname
-      normalized_input_pathname
+    def produce_result
+      @did_prepare_to_produce_result ||= prepare_to_produce_result
+      produce_result_via_perform_parse
     end
 
-    def input_string
-      normalized_input_string
+    def prepare_to_produce_result
+      resolve_grammar_class
+      resolve_parse
+      true
     end
 
-    define_method :_my_before_all, -> do
+    def resolve_grammar_class
+      granule_s = using_grammar
+      mod = grammars_module
+      desired_module_const_i = bld_grammar_const granule_s
+      if ! mod.const_defined? desired_module_const_i
+        _BASE_PN_ = mod.dir_pathname.join granule_s
+        load _BASE_PN_.join( "client" ).to_path
+        was_not_defined = true
+      end
+      @grammar_class = mod.const_get desired_module_const_i, false
+      if was_not_defined
+        @grammar_class.define_singleton_method :dir_pathname do
+          _BASE_PN_
+        end
+      end ; nil
+    end
+
+    def bld_grammar_const granule_s
+      md = GRANULE_TO_CONST_RX__.match granule_s
+      _underscore_separated_zero_padded_integer_segment_sequence =
+        md[ :num ].gsub DASH_, UNDERSCORE_
+      rest_s = md[ :rest ] and rest_s = "_#{ TestLib_::Constantize[ rest_s ] }"
+      :"Grammar#{
+        _underscore_separated_zero_padded_integer_segment_sequence }#{ rest_s }"
+    end
+
+    DASH_ = '-'.freeze ; UNDERSCORE_ = '_'.freeze
+
+    GRANULE_TO_CONST_RX__ = /\A(?<num>\d+(?:-\d+)*)(?:-(?<rest>.+))?\z/
+
+    def resolve_parse
+      @parse = TS_::Parse.new do |parse|
+        parse.subscribe( & method( :subscribe_to_parse_events ) )
+        parse.set_root_for_relative_paths_for_load TS_.dir_pathname
+        _rel_pn = @grammar_class.dir_pathname.relative_path_from TS_.dir_pathname
+        parse.add_grammar_path _rel_pn.join( ALWAYS_G1__ ).to_path
+      end
+    end
+    ALWAYS_G1__ = 'g1.treetop'.freeze
+
+    def subscribe_to_parse_events o
+      o.delegate_to debugging_event_receiver
+      o.subscribe_to_parser_loading_error_event
+      o.subscribe_to_parser_error_event
+      if do_debug
+        o.subscribe_to_parser_loading_info_event
+      else
+        o.on_parser_loading_info_event do |ev|
+          # because #open [#ttt-004]
+        end
+      end ; nil
+    end
+
+    def debugging_event_receiver
+      Debugging_event_receiver__[]
+    end
+
+    Debugging_event_receiver__ = -> do
       p = -> do
-        Tmpdir::FUN.get[]
-        p = -> { }
+        x = Debugging_Event_Receiver__.new Some_debug_IO[], TS_::EXPRESSION_AGENT
+        p = -> { x } ; x
       end
       -> { p[] }
     end.call
 
-    let :normalized_input_pathname do
-      s = input_path_stem_to_use
-      if s
-        build_normalized_input_pathname s
+    class Debugging_Event_Receiver__
+      def initialize *a
+        @io, @expression_agent = a
       end
-    end
-
-    let :normalized_input_string do
-      if input_string_to_use
-        if normalized_input_pathname
-          fail('sanity - should not have both')
-        else
-          input_string_to_use
+      def receive_event ev
+        _y = ::Enumerator::Yielder.new do |s|
+          @io.puts "(dbg: #{ s })"
         end
-      elsif normalized_input_pathname
-        normalized_input_pathname.read
-      else
-        fail('sanity - should not have neither')
-      end
-    end
-
-    let :output do
-      o = TestSupport_::IO::Spy::Group.new
-      o.do_debug_proc = -> { do_debug }
-      o.line_filter! TestLib_::Unstyle_proc[]
-      o
-    end
-
-    def prepare_local_conf_dir
-      tmpdir = prepare_tanman_tmpdir
-      tmpdir.mkdir TanMan_::API.local_conf_dirname
-      tmpdir # important
-    end
-
-    let :result do
-      if normalized_input_pathname
-        if input_string_to_use
-          fail 'sanity - we have both'
-        else
-          client.parse_file normalized_input_pathname.to_s
+        ev.render_all_lines_into_under _y, @expression_agent
+        if ev.has_tag :ok
+          ev.ok
         end
-      elsif input_string_to_use
-        client.parse_string input_string_to_use
-      else
-        fail 'sanity - we have neither'
       end
+    end
+
+    def produce_result_via_perform_parse
+      send produce_result_via_parse_method_i
+    end
+
+    def via_parse_via_input_file_granule_produce_result
+      @parse.parse_file input_file_pathname
+    end
+
+    def via_parse_via_input_string_produce_result
+      @parse.parse_string input_string
+    end
+
+    def input_file_pathname
+      @input_file_pathname ||= build_input_file_pathname
+    end
+
+    def build_input_file_pathname
+      @grammar_class.dir_pathname.join "fixtures/#{ input_file_granule }"
+    end
+
+    # ~ used in assertions
+
+    def some_input_string
+      send :"some_input_string_when_#{ produce_result_via_parse_method_i }"
+    end
+
+    def some_input_string_when_via_parse_via_input_file_granule_produce_result
+      @input_file_pathname.read
+    end
+
+    def some_input_string_when_via_parse_via_input_string_produce_result
+      input_string
     end
   end
 end
