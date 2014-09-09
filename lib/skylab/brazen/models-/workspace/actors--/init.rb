@@ -14,12 +14,13 @@ module Skylab::Brazen
 
       Entity_[]::Event::Merciless_Prefixing_Sender[ self ]
 
-      def initialize x_a
-        process_iambic_fully x_a
+      def initialize
+        super
         @channel ||= :workspace
       end
 
-      def init
+      def execute
+
         pn = ::Pathname.new "#{ @path }/#{ @config_filename }"
 
         config = Brazen_::Data_Stores_::Git_Config::Mutable.new

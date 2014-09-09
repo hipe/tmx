@@ -21,6 +21,7 @@ module Skylab::Callback
         @do_assume_is_defined = false
         @do_result_in_n_and_v = false
         @do_result_in_n_and_v_for_step = false
+        @did_require = false
         @else_p = nil ; @try_these_const_method_i_a = ALL_CONST_METHOD_I_A__
       end
 
@@ -188,6 +189,12 @@ module Skylab::Callback
       end
       def rslv_some_result_from_correct_const i
         x = @mod.const_get i, false
+        if @did_require
+          @did_require = false
+          if @mod.respond_to? :autoloaderize_with_normpath_value
+            @mod.autoloaderize_with_normpath_value @normpath_that_was_required, x
+          end
+        end
         if @do_result_in_n_and_v_for_step
           [ i, x ]
         else
@@ -259,6 +266,8 @@ module Skylab::Callback
       end
       def rslv_some_result_by_loading_file_for_normpath file_normpath
         file_normpath.change_state_to :loaded
+        @did_require = true
+        @normpath_that_was_required = file_normpath
         _path = file_normpath.get_require_file_path
         require _path
         rslv_some_result_via_fuzzy_lookup

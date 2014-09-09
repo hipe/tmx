@@ -102,7 +102,7 @@ module Skylab::Brazen
         :is_dry, @dry_run,
         :delegate, @delegate,
         :path, @path
-      ).init
+      )
     end
 
     def produce_any_result_for_init_when_file_exists pn

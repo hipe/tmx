@@ -1,3 +1,5 @@
+[#029]       #doc-node the string node
+[#028]       #parent-node: [#029] the string template narrative ..
 [#027] #open aggregated articulation refactor
 [#026]       #doc-node the hash narrative ..
 [#025]       #doc-node #digraph the digraph narrative ..

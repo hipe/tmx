@@ -8,8 +8,12 @@ module Skylab::Callback
       self::Bundles.apply_iambic_on_client x_a, mod
     end
 
-    def scan
-      Callback_::Scan
+    def scan( & p )
+      if block_given?
+        Callback_::Scan.new( & p )
+      else
+        Callback_::Scan
+      end
     end
   end
 
@@ -46,12 +50,28 @@ module Skylab::Callback
 
     module MM__
 
-      def [] * x_a
-        new( x_a ).execute
+      def [] * a
+        new do
+          process_argument_list_fully a
+        end.execute
       end
 
-      def with * x_a
-        new x_a
+      def execute_via_arglist a
+        new do
+          process_argument_list_fully a
+        end.execute
+      end
+
+      def with * x_a  # #note-70
+        new do
+          process_iambic_fully x_a
+        end.execute
+      end
+
+      def execute_via_iambic x_a
+        new do
+          process_iambic_fully x_a
+        end.execute
       end
 
       define_method :actor_property_box_for_write, -> do
@@ -70,8 +90,8 @@ module Skylab::Callback
       attr_accessor :__actor_property_box_for_write__
     end
 
-    def initialize a
-      process_argument_list_fully a
+    def initialize & p
+      instance_exec( & p )
     end
 
   private

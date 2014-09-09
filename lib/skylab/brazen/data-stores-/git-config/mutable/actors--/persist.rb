@@ -13,8 +13,8 @@ module Skylab::Brazen
 
         Entity_[]::Event::Merciless_Prefixing_Sender[ self ]
 
-        def initialize x_a
-          @pn, @document, @delegate, @x_a, @is_dry, @channel = x_a
+        def initialize
+          super
           process_iambic_fully @x_a
           @x_a = nil
         end

@@ -8,13 +8,13 @@ module Skylab::TanMan
 
         :required,
         :ad_hoc_normalizer, -> * a do
-          Meaning_::Controller__::Normalize_name.new( a ).execute
+          Meaning_::Controller__::Normalize_name.execute_via_arglist a
         end,
         :property, :name,
 
         :required,
         :ad_hoc_normalizer, -> * a do
-          Meaning_::Controller__::Normalize_value.new( a ).execute
+          Meaning_::Controller__::Normalize_value.execute_via_arglist a
         end,
         :property, :value
 

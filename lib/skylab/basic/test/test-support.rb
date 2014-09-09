@@ -5,7 +5,7 @@ module Skylab::Basic
   module TestSupport
 
     module CONSTANTS
-      Basic = Basic
+      Basic = Basic_ = Basic
       TestSupport = Autoloader_.require_sidesystem :TestSupport
     end
 
