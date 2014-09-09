@@ -10,10 +10,10 @@ module Skylab::Snag
 
     attr_reader :upstream_output_line
 
-    def collapse listener
+    def collapse delegate
       @md or parse
       Models::ToDo.build( @md[ :full_source_line ], @md[ :line ], @md[ :path ],
-        @pattern_s, listener )
+        @pattern_s, delegate )
     end
 
     def is_valid

@@ -2,12 +2,12 @@ module Skylab::Snag
 
   class API::Actions::Nodes::Numbers::List < API::Action_
 
-    Listener = Snag_::Model_::Listener.
+    Delegate = Snag_::Model_::Delegate.
       new :error_event, :error_string,
         :info_event, :info_string,
         :output_line
 
-    Entity_[ self, :make_listener_properties, :make_sender_methods,
+    Entity_[ self, :make_delegate_properties, :make_sender_methods,
       :required, :property, :working_dir ]
 
     def if_nodes_execute

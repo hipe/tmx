@@ -16,8 +16,8 @@ module Skylab::Snag
         @kernel = Kernel__.new
         yield @kernel.method :get_scanner
       end
-      def listener= x
-        @kernel.listener= x
+      def delegate= x
+        @kernel.delegate= x
       end
       def nodes= x
         @kernel.nodes= x
@@ -31,7 +31,7 @@ module Skylab::Snag
       def initialize
       end
 
-      attr_writer :listener, :nodes
+      attr_writer :delegate, :nodes
 
       def get_scanner
         a = produce_every_node_with_a_doc_node_tag_or_parent_node_tag
@@ -51,7 +51,7 @@ module Skylab::Snag
         while (( node = scan.gets ))
           node.is_valid or next
           TAG_RX__ =~ node.first_line or next
-          y.push node.collapse @listener, :_no_API_client_
+          y.push node.collapse @delegate, :_no_API_client_
         end
         y
       end
@@ -86,7 +86,7 @@ module Skylab::Snag
       end
 
       def normalize_identifier_string s
-        Snag_::Models::Identifier.normalize s, @listener
+        Snag_::Models::Identifier.normalize s, @delegate
       end
 
       def when_multi_parent node

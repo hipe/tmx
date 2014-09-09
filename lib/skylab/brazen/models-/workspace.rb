@@ -25,7 +25,7 @@ module Skylab::Brazen
     end ]
 
     Actor_[ self,
-      :properties, :client, :channel, :dry_run, :listener,
+      :properties, :client, :channel, :dry_run, :delegate,
       :max_num_dirs, :path, :prop, :verbose ]
 
     Entity_[]::Event::Cascading_Prefixing_Sender[ self ]
@@ -100,7 +100,7 @@ module Skylab::Brazen
         :channel, @channel,
         :config_filename, @config_filename || CONFIG_FILENAME__,
         :is_dry, @dry_run,
-        :listener, @listener,
+        :delegate, @delegate,
         :path, @path
       ).init
     end
@@ -134,7 +134,7 @@ module Skylab::Brazen
     def filesystem_walk * x_a
       x_a_ = [ :start_path, @path, :filename, some_config_filename,
         :any_max_num_dirs_to_look, @max_num_dirs, :prop, @prop,
-        :listener, self, :channel, :walker ]
+        :delegate, self, :channel, :walker ]
       x_a_.concat x_a
       Filesystem_Walk__.with_iambic x_a_
     end
@@ -153,7 +153,7 @@ module Skylab::Brazen
         :properties,
           :channel,
           :filename,
-          :listener,
+          :delegate,
           :any_max_num_dirs_to_look,
           :prop,
           :start_path ]
@@ -265,8 +265,8 @@ module Skylab::Brazen
         end
       end
 
-      def listener
-        @listener
+      def delegate
+        @delegate
       end
     end
 

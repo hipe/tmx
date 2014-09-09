@@ -12,16 +12,16 @@ module Skylab::Snag
         Collections__.new _API_client
       end
 
-      def build_controller listener, _API_client
-        self::Controller__.new listener, _API_client
+      def build_controller delegate, _API_client
+        self::Controller__.new delegate, _API_client
       end
 
       def build_flyweight
         self::Flyweight__.new
       end
 
-      def build_valid_query query_sexp, max_count, listener
-        self::Query__.new_valid query_sexp, max_count, listener
+      def build_valid_query query_sexp, max_count, delegate
+        self::Query__.new_valid query_sexp, max_count, delegate
       end
 
       def build_scan_from_lines normalized_line_producer

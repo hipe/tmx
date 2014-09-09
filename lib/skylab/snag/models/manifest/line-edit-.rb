@@ -10,7 +10,7 @@ module Skylab::Snag
         :new_line_a,
         :verbose_x,
         :client,
-        :listener ]
+        :delegate ]
 
       def execute
         ok = prepare
@@ -25,11 +25,11 @@ module Skylab::Snag
         @manifest_file_pn = @manifest_file.pathname
         @fu = @client.build_file_utils(
           :be_verbose, @verbose_x,
-          :listener, @listener )
+          :delegate, @delegate )
         @tmpdir = @client.produce_tmpdir(
           :is_dry_run, @is_dry_run,
           :file_utils, @fu,
-          :listener, @listener )
+          :delegate, @delegate )
         @tmpold = @tmpdir.join 'issues.prev.md'
         @tmpnew = @tmpdir.join 'issues-next.md'
         ACHIEVED_
@@ -83,7 +83,7 @@ module Skylab::Snag
           is_multiple = true
         end
         @new_line_a.each do |line|
-          is_multiple and @listener.receive_info_line line
+          is_multiple and @delegate.receive_info_line line
           @write_line_p[ line ]
         end
         while (( line = @scn.gets ))

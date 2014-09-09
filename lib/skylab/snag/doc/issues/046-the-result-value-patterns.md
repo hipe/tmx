@@ -21,7 +21,7 @@ of callbacks don't affect our logic when we don't want them to.
 ### a callback's error result may be resulted as-is  :[#049]
 
 it may be convenient for callers to determine their own set of possible
-results via the listeners they pass in to the call.
+results via the delegates they pass in to the call.
 
 
 
@@ -53,19 +53,19 @@ whether or not a method will employ this convention.
 
 ### a false-ish from a success handler may be upgraded to true-ish :[#062]
 
-for a listener to produce a value as a result of delivering an event;
+for a delegate to produce a value as a result of delivering an event;
 this can be convenient but is not reliable.
 
 because its ability to do this depends on things like whether or not the
-listener is synchronous (on a given channel) and whether its downstream is
-one or multiple other listeners; i.e "the event model".
+delegate is synchronous (on a given channel) and whether its downstream is
+one or multiple other delegates; i.e "the event model".
 
-since at the time of this writing our listener may either be of the
+since at the time of this writing our delegate may either be of the
 "ordered dictionary" variety or it is an adapter from a digraph-style
 callback tree, we can't be sure that the result is meaningful.
 
 so what we do in such cases is that iff true-ish we assume the
-listener-produced result is meaninful, otherwise we "upgrade" the result
+delegate-produced result is meaninful, otherwise we "upgrade" the result
 to be meaninful (i.e the success value).
 
 

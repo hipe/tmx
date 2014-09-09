@@ -2,11 +2,11 @@ module Skylab::Snag
 
   module Model_  # [#067].
 
-    Listener = Callback_::Ordered_Dictionary.curry :suffix, nil
+    Delegate = Callback_::Ordered_Dictionary.curry :suffix, nil
 
-    Info_Error_Listener = Listener.new :info_event, :error_event
+    Info_Error_Delegate = Delegate.new :info_event, :error_event
 
-    THROWING_INFO_ERROR_LISTENER = Info_Error_Listener.new nil, -> ev do
+    THROWING_INFO_ERROR_delegate = Info_Error_Delegate.new nil, -> ev do
       y = []
       ev.render_all_lines_into_under y, Snag_::API::EXPRESSION_AGENT
       raise y * SPACE_
@@ -16,12 +16,12 @@ module Skylab::Snag
 
     class Controller
 
-      def initialize listener, _API_client
+      def initialize delegate, _API_client
         @API_client = _API_client
-        @listener = listener
+        @delegate = delegate
       end
 
-      attr_reader :listener
+      attr_reader :delegate
     end
 
     # ~
@@ -44,13 +44,13 @@ module Skylab::Snag
 
       def send_info_event * x_a, & p
         _ev = build_and_sign_inline_event x_a, p
-        @listener.receive_info_event _ev
+        @delegate.receive_info_event _ev
         NEUTRAL_
       end
 
       def send_error_event * x_a, & p
         _ev = build_and_sign_inline_event x_a, p
-        @listener.receive_error_event _ev
+        @delegate.receive_error_event _ev
         UNABLE_
       end
 

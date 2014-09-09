@@ -60,8 +60,8 @@ module Skylab::Snag
 
       # ~ for mutation & mutating agents
 
-      def build_controller listener
-        self.class::Controller__.new self, listener
+      def build_controller delegate
+        self.class::Controller__.new self, delegate
       end
 
       def get_body_s

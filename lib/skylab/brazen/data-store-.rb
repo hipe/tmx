@@ -23,11 +23,11 @@ module Skylab::Brazen
       end
 
       def resolve_result_via_error ev
-        @result = listener.receive_error_event ev ; nil
+        @result = delegate.receive_error_event ev ; nil
       end
 
       def resolve_result_via_success_event ev
-        @result = listener.receive_success_event ev ; nil
+        @result = delegate.receive_success_event ev ; nil
       end
     end
 

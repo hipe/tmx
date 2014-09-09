@@ -252,7 +252,7 @@ module Skylab::Brazen
                 instance_variable_get( prop.name.as_ivar )
             end
           end
-          action_prop_x_a.push :@listener, self, :@channel, :model
+          action_prop_x_a.push :@delegate, self, :@channel, :model
           @action_x_a = action_prop_x_a ; @model_x_a = model_prop_x_a ; nil
         end
 

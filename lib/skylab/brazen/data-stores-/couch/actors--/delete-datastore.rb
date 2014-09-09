@@ -53,10 +53,10 @@ module Skylab::Brazen
         _ev = build_error_event_with :missing_force do |y, o|
           y << "missing required #{ par force }"
         end
-        @result = listener.receive_error_event _ev ; nil
+        @result = delegate.receive_error_event _ev ; nil
       end
 
-      def listener
+      def delegate
         @action
       end
     end

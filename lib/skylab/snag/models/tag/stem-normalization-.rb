@@ -5,8 +5,8 @@ module Skylab::Snag
     class Stem_Normalization_
       # [#043] employs case sensitivity, [#017] results in callback's result
 
-      def initialize listener=Snag_::Model_::THROWING_INFO_ERROR_LISTENER
-        @listener = listener
+      def initialize delegate=Snag_::Model_::THROWING_INFO_ERROR_delegate
+        @delegate = delegate
       end
 
       attr_reader :result_of_last_callback_called, :stem_i
@@ -70,9 +70,9 @@ module Skylab::Snag
       end
 
       def value_changed
-        if @listener.info_event_p
+        if @delegate.info_event_p
           _ev = Changed__.new @unsanitized_stem_i, out_s.intern
-          @result_of_last_callback_called = @listener.receive_info_event _ev
+          @result_of_last_callback_called = @delegate.receive_info_event _ev
         end ; nil
       end
       Changed__ = Event_[].new :from_i, :to_i do
@@ -92,7 +92,7 @@ module Skylab::Snag
       end
 
       def result_in_error ev
-        @result_of_last_callback_called = @listener.receive_error_event ev
+        @result_of_last_callback_called = @delegate.receive_error_event ev
         nil
       end
     end

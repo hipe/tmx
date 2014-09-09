@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models::Node::Controller__ < Snag_::Model_::Controller  # see [#045]
 
-    def initialize listener, _API_client
+    def initialize delegate, _API_client
       @delineated = @do_prepend_open_tag = nil
       @do_prepend_open_tag_ws = true
       @error_count = 0
@@ -69,11 +69,11 @@ module Skylab::Snag
   public
 
     def close  # #narration-60
-      lstnr = @listener
+      lstnr = @delegate
       p = lstnr.method :receive_info_event
-      listener_ = Snag_::Model_::Info_Error_Listener.new p, p
-      rm_x = remove_tag :open, :listener, listener_
-      ad_x = add_tag :done, :prepend, :listener, listener_
+      delegate_ = Snag_::Model_::Info_Error_Delegate.new p, p
+      rm_x = remove_tag :open, :delegate, delegate_
+      ad_x = add_tag :done, :prepend, :delegate, delegate_
       if UNABLE_ == rm_x || UNABLE_ == ad_x
         UNABLE_
       else
@@ -146,7 +146,7 @@ module Skylab::Snag
     end
 
     def tags_controller
-      @tc ||= tags.build_controller tags_listener
+      @tc ||= tags.build_controller tags_delegate
     end
 
     def tags
@@ -154,12 +154,12 @@ module Skylab::Snag
     end
   private
 
-    def tags_listener
-      @tl ||= bld_tags_listener
+    def tags_delegate
+      @tl ||= bld_tags_delegate
     end
 
-    def bld_tags_listener
-      lstnr = @listener
+    def bld_tags_delegate
+      lstnr = @delegate
       Callback_::Ordered_Dictionary.inline.with( :suffix, nil ).inline(
         :error_event, lstnr.method( :receive_error_event ),
         :info_event, lstnr.method( :receive_info_event ),
@@ -178,7 +178,7 @@ module Skylab::Snag
         p = -> s_ { @extra_line_a.push s_ }
       end
       @valid = Delineate_message__[
-        extra_lines_header, line_width, @listener,
+        extra_lines_header, line_width, @delegate,
         max_lines, @message,
         @do_prepend_open_tag, @do_prepend_open_tag_ws,
         -> s { p[ s ] } ]
@@ -211,18 +211,18 @@ module Skylab::Snag
     end
 
     def send_error_string s
-      @listener.receive_error_string s
+      @delegate.receive_error_string s
     end
 
     def send_info_string s
-      @listener.receive_info_string s
+      @delegate.receive_info_string s
     end
 
     class Delineate_message__
 
       Snag_::Model_::Actor[ self,
         :properties, :extra_lines_header,
-        :line_width, :listener,
+        :line_width, :delegate,
         :max_lines, :message_s,
         :do_prepend_open_tag, :do_prepend_open_tag_ws,
         :y_p ]

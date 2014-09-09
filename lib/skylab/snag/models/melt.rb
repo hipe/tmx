@@ -16,17 +16,17 @@ module Skylab::Snag
 
     def initialize a
       @dry_run, @be_verbose, @paths, @pattern, @names, @working_dir,
-        listener, _API_client = a
+        delegate, _API_client = a
 
       @file_changes = []
       @todos = Snag_::Models::ToDo.build_scan @paths, @pattern, @names,
         :on_command_string, -> cmd_str do
           if @be_verbose
-            @listener.receive_info_line cmd_str
+            @delegate.receive_info_line cmd_str
           end
         end,
-        :on_error_event, listener.method( :receive_error_event )
-      super listener, _API_client
+        :on_error_event, delegate.method( :receive_error_event )
+      super delegate, _API_client
     end
 
     def melt
@@ -39,7 +39,7 @@ module Skylab::Snag
     def crt_open_nodes
       ok = ACHIEVED_
       @todos.each do |fly|
-        ok = fly.collapse @listener
+        ok = fly.collapse @delegate
         ok or break
         ok = add_open_node_for_todo_if_appropriate ok
         ok or break
@@ -99,11 +99,11 @@ module Skylab::Snag
                     message: todo.any_message_body_string,
                 working_dir: @working_dir
       }, -> o do
-        o.on_error_event @listener.method :receive_error_event
-        o.on_error_string @listener.method :receive_error_string
-        o.on_info_event @listener.method :receive_info_event
-        o.on_info_line @listener.method :receive_info_line
-        o.on_info_string @listener.method :receive_info_string
+        o.on_error_event @delegate.method :receive_error_event
+        o.on_error_string @delegate.method :receive_error_string
+        o.on_info_event @delegate.method :receive_info_event
+        o.on_info_line @delegate.method :receive_info_line
+        o.on_info_string @delegate.method :receive_info_string
         o.on_new_node { |nn| new_node = nn }
       end
       ok && new_node
@@ -269,15 +269,15 @@ module Skylab::Snag
     end
 
     def send_info_line s
-      @listener.receive_info_line s ; NEUTRAL_
+      @delegate.receive_info_line s ; NEUTRAL_
     end
 
     def send_info_string s
-      @listener.receive_info_string s ; NEUTRAL_
+      @delegate.receive_info_string s ; NEUTRAL_
     end
 
     def send_info_event ev
-      @listener.receive_info_event ev ; NEUTRAL_
+      @delegate.receive_info_event ev ; NEUTRAL_
     end
     end
   end

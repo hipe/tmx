@@ -36,10 +36,10 @@ question.
 
 we cut this gordian knot with 1) structured event classes in conjunction
 with 2) expression agents. the action (or its constituent actors/agents)
-need only send out to listeners structured event objects; it need not
+need only send out to delegates structured event objects; it need not
 concern itself with how to render them.
 
-when the listener (for e.g some kind of CLI invocation) receives the
+when the delegate (for e.g some kind of CLI invocation) receives the
 event it may render it to for e.g a string using an expression agent,
 but it is totally up to (and the primary concern of) the modality client
 (or whatever auxiliary invocation agent) to determine what, how and
@@ -61,14 +61,14 @@ to be used in those modalities that ultimately output strings.
 
 since the API "should" emit only structured data and not strings, the
 API "should not" typically need an expression agent, nor should it ever
-be sending strings to listeners.
+be sending strings to delegates.
 
 however, the scope at the commit at the time of this writing does not
 include enforcing our "new" policy of emitting only structured data from
 API actions (although that day is not far behind).
 
 hence as a segway to our new utopia, we still use expression agents in
-the API in conjunction with sending *strings* back to the listeners.
+the API in conjunction with sending *strings* back to the delegates.
 
 but (and this is my point) we write these string sending methods by hand
 rather than expect that the API actions include e.g 'info string' and
@@ -84,18 +84,18 @@ two string sender methods.
 ### bridging this gap: events :#note-136
 
 in the new event model all of the callbacks ("channels") pertinent to a
-given e.g action are encapsulated within a single listener object, whose
+given e.g action are encapsulated within a single delegate object, whose
 only purpose is to hold this aggregation and receive events around it,
 and send them out to somewhere else (or whatever).
 
 in the old event model we would either treat the action object itself as
-a listener or one-by-one pass its callbacks as arguments to various
+a delegate or one-by-one pass its callbacks as arguments to various
 calls.
 
 the newer way is better because separation of concerns.
 
 to go from old to new we need to end up with an object that looks like a
-new-style listener but sends what it receives off to the old-style
+new-style delegate but sends what it receives off to the old-style
 handlers.
 
 
@@ -128,7 +128,7 @@ operation to ignore "tanonomic streams" like these.
 ### :#note-25
 
 probably every API action subclass should have it in its graph that it
-`listeners_digraph` this (and so it does) because we
+`delegates_digraph` this (and so it does) because we
 `call_digraph_listeners errors` in `absorb_param_h` which they all
 use (i think..)
 

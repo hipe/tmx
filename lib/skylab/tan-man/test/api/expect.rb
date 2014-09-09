@@ -15,20 +15,20 @@ module Skylab::TanMan::TestSupport
 
         def call_API * x_a
           @result = subject.call( * x_a ) do |invocation|
-            invocation.set_event_receiver event_receiver
+            invocation.set_delegate delegate
           end
         end
 
-        def event_receiver
-          @event_receiver ||= bld_event_receiver
+        def delegate
+          @delegate ||= bld_delegate
         end
 
-        def bld_event_receiver
-          Event_Receiver__.new ( do_debug && some_debug_IO )
+        def bld_delegate
+          Delegate__.new ( do_debug && some_debug_IO )
         end
       end
 
-      class Event_Receiver__
+      class Delegate__
 
         def initialize dbg_IO
           if dbg_IO
@@ -108,7 +108,7 @@ module Skylab::TanMan::TestSupport
         end
 
         def expect_no_more_events
-          ev = event_receiver.gets
+          ev = delegate.gets
           if ev
             @context.send :fail, "expected no more events, had #{ ev.terminal_channel_i }"
           end ; nil
@@ -135,7 +135,7 @@ module Skylab::TanMan::TestSupport
         attr_reader :result
 
         def expect_one_event
-          @ev = @context.event_receiver.gets
+          @ev = @context.delegate.gets
           if @ev
             @ev_ = @ev.to_event
             @stay = true

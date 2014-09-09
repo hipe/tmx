@@ -138,25 +138,25 @@ module Skylab::Snag
 
     # ~ bridging the event gap [#note-136]
 
-    def to_listener
+    def to_delegate
       lstnr_to_digraph_proxy_class.new self
     end
     def lstnr_to_digraph_proxy_class
-      self.class.listener_to_digraph_proxy_cls
+      self.class.delegate_to_digraph_proxy_cls
     end
     class << self
-      define_method :listener_to_digraph_proxy_cls, -> do
-        i = :Listener_to_Digraph_Proxy___
+      define_method :delegate_to_digraph_proxy_cls, -> do
+        i = :Delegate_to_Digraph_Proxy___
         -> do
           if const_defined? i, false
             const_get i, false
           else
-            const_set i, bld_listener_to_digraph_proxy_class
+            const_set i, bld_delegate_to_digraph_proxy_class
           end
         end
       end.call
     private
-      def bld_listener_to_digraph_proxy_class
+      def bld_delegate_to_digraph_proxy_class
         i_a = chnnl_i_a
         ::Class.new.class_exec do
           def initialize act
@@ -178,7 +178,7 @@ module Skylab::Snag
       def make_sender_methods
         chnnl_i_a.each do |i|
           define_method :"send_#{ i }" do |x|
-            send_to_listener i, x
+            send_to_delegate i, x
           end
         end ; nil
       end
@@ -187,7 +187,7 @@ module Skylab::Snag
       end
     end
 
-    def send_to_listener i, x
+    def send_to_delegate i, x
       call_digraph_listeners i, x
     end
 
@@ -205,7 +205,7 @@ module Skylab::Snag
     end
 
     def if_nodes_execute
-      @node = @nodes.fetch_node @node_ref, to_listener
+      @node = @nodes.fetch_node @node_ref, to_delegate
       @node ? if_node_execute : UNABLE_  # we can't get errors back from digraph
     end
 
@@ -220,7 +220,7 @@ module Skylab::Snag
     def prdc_nodes
       @API_client.models.nodes.collection_for @working_dir do |ev|
         channel_i, ev_ = ev.unwrap
-        send_to_listener channel_i, ev_
+        send_to_delegate channel_i, ev_
         UNABLE_
       end
     end

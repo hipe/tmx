@@ -96,13 +96,13 @@ module Skylab::Brazen
 
     # ~
 
-    def listener
-      @listener ||= bld_listener
+    def delegate
+      @delegate ||= bld_delegate
     end
 
-    def bld_listener
-      if self.class.const_defined? :Listener
-        self.class::Listener.new @client_adapter, self.class
+    def bld_delegate
+      if self.class.const_defined? :Delegate
+        self.class::Delegate.new @client_adapter, self.class
       else
         self
       end
@@ -122,7 +122,7 @@ module Skylab::Brazen
     def expect_workspace_exists
       _path = Brazen_::CLI::Property__.new :path, :argument_arity, :one
       Brazen_::Models_::Workspace.new( @kernel ).status(
-        [ :client, :_FOO_, :listener, self,
+        [ :client, :_FOO_, :delegate, self,
         :channel, :workspace_expectation,
         :max_num_dirs, 1, :path, '.', :verbose, true, :prop, _path ] )
     end
@@ -142,7 +142,7 @@ module Skylab::Brazen
       x_a.push :invite_to_action, [ :init ]
       ev_ = build_event_via_iambic x_a
       ev__ = sign_event ev_
-      send_structure_on_channel_to_listener ev__,
+      send_structure_on_channel_to_delegate ev__,
         :workspace_expectation, @client_adapter
       UNABLE_
     end

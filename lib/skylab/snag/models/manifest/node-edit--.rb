@@ -9,7 +9,7 @@ module Skylab::Snag
         :field_i_a, [ :is_dry_run, :verbose_x ] ]
 
       def initialize x_a
-        @node, @client, @listener = x_a.shift 3
+        @node, @client, @delegate = x_a.shift 3
         x_a.length.nonzero? and absrb_iambic_fully x_a
       end
 
@@ -20,7 +20,7 @@ module Skylab::Snag
           :is_dry_run, @is_dry_run,
           :verbose_x, @verbose_x,
           :client, @client,
-          :listener, @listener ]
+          :delegate, @delegate ]
       end
     end
   end

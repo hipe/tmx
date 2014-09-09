@@ -108,7 +108,7 @@ module Skylab::Brazen
           ACHEIVED_
         end
 
-        def listener
+        def delegate
           @entity
         end
       end

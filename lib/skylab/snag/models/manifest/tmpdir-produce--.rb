@@ -8,7 +8,7 @@ module Skylab::Snag
         :file_utils,
         :is_dry_run,
         :tmpdir_pathname,
-        :listener ]
+        :delegate ]
 
       def execute
         if @tmpdir_pathname.exist?

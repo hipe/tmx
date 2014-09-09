@@ -121,7 +121,7 @@ module Skylab::Brazen
           instance_exec y_=[], ev, & ev.message_proc
           y << "#{ o.entity_verb_i } entity. #{ y_ * LINE_SEP_ }"
         end
-        listener.receive_success_event ev_
+        delegate.receive_success_event ev_
         @result = ev.bytes ; nil
       end
     end

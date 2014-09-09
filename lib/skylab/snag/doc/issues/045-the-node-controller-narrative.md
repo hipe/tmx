@@ -8,7 +8,7 @@ possibly removing any '#open' tag and possibly adding any '#done' tag.
 
 whether or not something is a failure depends on the definition of success..
 
-we build a new listener where the error and the info handlers are both
+we build a new delegate where the error and the info handlers are both
 references to the incoming info handler. we explain why below.
 
 if either of those operations was unable to complete because of error,

@@ -275,8 +275,8 @@ module Skylab::Brazen
           @a.push Blank_Line_Or_Comment_Line__.new "# #{ str }\n" ; nil
         end
 
-        def write_to_pathname pn, listener, * x_a
-          Mutable::Actors__::Persist[ pn, self, listener, x_a ]
+        def write_to_pathname pn, delegate, * x_a
+          Mutable::Actors__::Persist[ pn, self, delegate, x_a ]
         end
 
         # ~ for child agents only:
@@ -567,18 +567,18 @@ module Skylab::Brazen
           x
         end
 
-        def touch_assignment i, x, listener=nil
+        def touch_assignment i, x, delegate=nil
           ast = Assignment__.new.with_normal_name_and_value i, x
           otr = @assignments.touch_comparable_item ast, bld_compare( ast )
           if ast.object_id == otr.object_id
-            listener and listener.call :added
+            delegate and delegate.call :added
           else
             _x = otr.value_x
             if x == _x
-              listener and listener.call :no_change
+              delegate and delegate.call :no_change
             else
               otr.value_x = x
-              listener and listener.call :changed
+              delegate and delegate.call :changed
             end
           end
         end

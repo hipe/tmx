@@ -99,7 +99,7 @@ implementation if we ever need it.
 • `client` provides facilities needed by this agent like the manifest
            file, access to a tmpdir, acces to a file utils controller.
 
-• `listener` is per eventmodel
+• `delegate` is per eventmodel
 
 
 

@@ -270,7 +270,7 @@ module Skylab::TanMan::TestSupport
     ALWAYS_G1__ = 'g1.treetop'.freeze
 
     def subscribe_to_parse_events o
-      o.delegate_to debugging_event_receiver
+      o.delegate_to debugging_delegate
       o.subscribe_to_parser_loading_error_event
       o.subscribe_to_parser_error_event
       if do_debug
@@ -282,19 +282,19 @@ module Skylab::TanMan::TestSupport
       end ; nil
     end
 
-    def debugging_event_receiver
-      Debugging_event_receiver__[]
+    def debugging_delegate
+      Debugging_delegate__[]
     end
 
-    Debugging_event_receiver__ = -> do
+    Debugging_delegate__ = -> do
       p = -> do
-        x = Debugging_Event_Receiver__.new Some_debug_IO[], TS_::EXPRESSION_AGENT
+        x = Debugging_Delegate__.new Some_debug_IO[], TS_::EXPRESSION_AGENT
         p = -> { x } ; x
       end
       -> { p[] }
     end.call
 
-    class Debugging_Event_Receiver__
+    class Debugging_Delegate__
       def initialize *a
         @io, @expression_agent = a
       end

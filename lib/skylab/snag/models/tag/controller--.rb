@@ -5,7 +5,7 @@ module Skylab::Snag
     class Controller__  # a kernel - CAN HAVE INVALID PROPERTIES
 
       def initialize lstn
-        @listener = lstn
+        @delegate = lstn
       end
 
       attr_reader :last_callback_result
@@ -32,7 +32,7 @@ module Skylab::Snag
 
       def validate
         @is_validated = true
-        o = Tag_::Stem_Normalization_.new @listener
+        o = Tag_::Stem_Normalization_.new @delegate
         o.stem_i = @stem_i
         if o.is_valid
           @is_valid = true

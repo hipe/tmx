@@ -83,17 +83,17 @@ module Skylab::Brazen
     def marshal_load x_a, no_p
       @error_count = 0
       @channel = :marshal_loading
-      @listener = Proc_to_Listener_Adapter__.new no_p
+      @delegate = Proc_to_delegate_Adapter__.new no_p
       process_iambic_fully x_a
       notificate :iambic_normalize_and_validate
       if @error_count.nonzero?
-        @listener.last_result
+        @delegate.last_result
       else
         ACHEIVED_
       end
     end
 
-    class Proc_to_Listener_Adapter__
+    class Proc_to_delegate_Adapter__
       def initialize p
         @p = p
       end
@@ -149,7 +149,7 @@ module Skylab::Brazen
 
     def via_own_collection_controller_persist
       model_class = self.class
-      _action = @listener  # #todo
+      _action = @delegate  # #todo
       _args = [ :_self_, :persisting, _action, model_class, @kernel ]
       _cc = model_class.const_get( :Collection_Controller__, false )[ _args ]
       _cc.persist_entity self
@@ -191,10 +191,10 @@ module Skylab::Brazen
     def send_event_on_channel ev, i
       tail_i = :"#{ @channel }_#{ i }"
       m_i = :"receive_#{ ev.terminal_channel_i }_#{ tail_i }"
-      if @listener.respond_to? m_i
-        @listener.send m_i, ev
+      if @delegate.respond_to? m_i
+        @delegate.send m_i, ev
       else
-        @listener.send :"receive_#{ tail_i }", ev
+        @delegate.send :"receive_#{ tail_i }", ev
       end
     end
 

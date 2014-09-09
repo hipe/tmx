@@ -33,7 +33,7 @@ module Skylab::Snag
           send_info_line "(found #{ num } item#{ s num })"
         end
         if tree_level
-          tree = Build_tree__[ o, tree_level, listener ]
+          tree = Build_tree__[ o, tree_level, delegate ]
         else
           o.on_todo do |t|
             send_payload_line t.upstream_output_line

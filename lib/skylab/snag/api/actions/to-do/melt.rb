@@ -23,7 +23,7 @@ module Skylab::Snag
     def execute
       _melt = Snag_::Models::Melt.build_controller(
         @dry_run, @be_verbose, @paths, @pattern, @names, @working_dir,
-          to_listener, @API_client )
+          to_delegate, @API_client )
       _melt.melt
     end
 

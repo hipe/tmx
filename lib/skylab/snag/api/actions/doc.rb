@@ -4,11 +4,11 @@ module Skylab::Snag
 
   class API::Actions::Doc::Digraph < API::Action_
 
-    Listener = Snag_::Model_::Listener.
+    Delegate = Snag_::Model_::Delegate.
       new :error_event, :info_line
 
     Entity_[ self,
-      :make_listener_properties,
+      :make_delegate_properties,
       :property, :is_dry_run,
       :required, :property, :working_dir
     ]
@@ -19,7 +19,7 @@ module Skylab::Snag
 
     def if_nodes_execute
       Snag_::Models::Digraph.shell do |o|
-        o.listener = @listener
+        o.delegate = @delegate
         o.nodes = @nodes
       end
     end

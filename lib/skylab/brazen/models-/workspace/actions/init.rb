@@ -36,7 +36,7 @@ module Skylab::Brazen
       a = to_even_iambic
       a.push :prop, self.class.properties.fetch( :path )
       a.push :client, @client_adapter
-      a.push :listener, self
+      a.push :delegate, self
       Brazen_::Models_::Workspace.new( @kernel ).produce_any_result_for_edit a
     end
 

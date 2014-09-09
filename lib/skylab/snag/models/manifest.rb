@@ -44,13 +44,13 @@ module Skylab::Snag
     end
 
     def add_node node, dry_run, verbose_x
-      self::class::Node_add__[ node, agnt_adapter, node.listener,
+      self::class::Node_add__[ node, agnt_adapter, node.delegate,
         :is_dry_run, dry_run,
         :verbose_x, verbose_x ]
     end
 
     def change_node node, dry_run, verbose_x
-      self::class::Node_edit__[ node, agnt_adapter, node.listener,
+      self::class::Node_edit__[ node, agnt_adapter, node.delegate,
         :is_dry_run, dry_run,
         :verbose_x, verbose_x ]
     end
@@ -109,7 +109,7 @@ module Skylab::Snag
 
     class FU_curry__
 
-      Snag_::Lib_::Entity[][ self, :properties, :be_verbose, :listener ]
+      Snag_::Lib_::Entity[][ self, :properties, :be_verbose, :delegate ]
 
       def initialize x_a
         process_iambic_fully x_a
@@ -118,7 +118,7 @@ module Skylab::Snag
       def execute
         Snag_::Lib_::IO_FU[].new -> s do
           if @be_verbose
-            @listener.receive_info_event Hacky_Path_Event__.new s
+            @delegate.receive_info_event Hacky_Path_Event__.new s
           end
         end
       end
@@ -141,11 +141,11 @@ module Skylab::Snag
     private
 
       def bork_via_event ev
-        @listener.receive_error_event ev
+        @delegate.receive_error_event ev
       end
 
       def send_info_string s
-        @listener.receive_info_string s
+        @delegate.receive_info_string s
       end
     end
 
@@ -170,7 +170,7 @@ module Skylab::Snag
         end
         def lookup
           @config = @API_client
-          @listener = Walk_Listener__.new method :on_walk_error_event
+          @delegate = Walk_delegate__.new method :on_walk_error_event
           @did_fail = false
           @pathname = bld_walk.find_any_nearest_file_pathname
           if @did_fail
@@ -183,7 +183,7 @@ module Skylab::Snag
           Snag_::Lib_::Filesystem_walk[].with(
             :channel, :walk,
             :filename, @config.manifest_file,
-            :listener, @listener,
+            :delegate, @delegate,
             :any_max_num_dirs_to_look,
               @config.max_num_dirs_to_search_for_manifest_file,
             :prop, Lib_::Entity[]::Property__.new( :path ),
@@ -207,7 +207,7 @@ module Skylab::Snag
         alias_method :unwrap, :values
       end
 
-      class Walk_Listener__
+      class Walk_delegate__
 
         def initialize p
           @p = p

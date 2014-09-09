@@ -97,7 +97,7 @@ module Skylab::Brazen
         resolve_result_via_error _ev
       end
 
-      def listener
+      def delegate
         @entity
       end
     end

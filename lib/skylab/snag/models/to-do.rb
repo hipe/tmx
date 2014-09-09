@@ -23,7 +23,7 @@ module Skylab::Snag
     Snag_::Model_::Actor[ self ]
 
     def initialize a
-      @line, @line_number_string, @path, @pattern_s, @listener = a
+      @line, @line_number_string, @path, @pattern_s, @delegate = a
       @line_number = @line_number_string.to_i
       @pathname = ::Pathname.new @path
       ok = resolve_regex
@@ -92,7 +92,7 @@ module Skylab::Snag
   private
 
     def resolve_regex
-      @rx = Cache__[ @pattern_s, @listener ]
+      @rx = Cache__[ @pattern_s, @delegate ]
       @rx && ACHIEVED_
     end
 
@@ -151,9 +151,9 @@ module Skylab::Snag
 
     Cache__ = -> do
       h = {}
-      -> pattern_s, listener do
+      -> pattern_s, delegate do
         h.fetch pattern_s do |_|
-          h[ pattern_s ] = Build_regex__[ pattern_s, listener ]
+          h[ pattern_s ] = Build_regex__[ pattern_s, delegate ]
         end
       end
     end.call
@@ -161,7 +161,7 @@ module Skylab::Snag
     class Build_regex__  # #note-155
 
       Snag_::Model_::Actor[ self,
-        :properties, :pattern_s, :listener ]
+        :properties, :pattern_s, :delegate ]
 
       def execute
         @scn = Snag_::Library_::StringScanner.new @pattern_s

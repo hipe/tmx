@@ -8,7 +8,7 @@ module Skylab::Snag
 
       def initialize _API_client
         @API_client = _API_client
-        @listener = nil
+        @delegate = nil
       end
 
       def invoke_via_iambic x_a
@@ -91,8 +91,8 @@ module Skylab::Snag
 
         o :meta_property, :is_required
 
-        o :ad_hoc_processor, :make_listener_properties, -> x do
-          Make_Listener_Properties__.new( x ).go
+        o :ad_hoc_processor, :make_delegate_properties, -> x do
+          Make_Delegate_Properties__.new( x ).go
         end
 
         o :ad_hoc_processor, :make_sender_methods, -> x do
@@ -117,16 +117,16 @@ module Skylab::Snag
         end
       end
 
-      class Make_Listener_Properties__ < Ad_Hoc_Processor_
+      class Make_Delegate_Properties__ < Ad_Hoc_Processor_
         def go
           _ = @scn.gets_one  # name
           kernel = @scn.reader.property_scope_krnl
-          lcls = @scn.reader.const_get :Listener, false
+          lcls = @scn.reader.const_get :Delegate, false
           lcls.ordered_dictionary.each_value do |slot|
             i = :"on_#{ slot.name_i }"
             kernel.add_property_via_i i do
               instance_variable_set :"@#{ i }", :_provided_
-              some_listener.send slot.attr_writer_method_name, iambic_property
+              some_delegate.send slot.attr_writer_method_name, iambic_property
             end
           end
         end
@@ -136,25 +136,25 @@ module Skylab::Snag
         def go
           _ = @scn.gets_one  # name
           mod = @scn.reader
-          lcls = mod.const_get :Listener, false
+          lcls = mod.const_get :Delegate, false
           lcls.ordered_dictionary.each_value do |slot|
             m_i = :"send_#{ slot.name_i }"
             m_i_ = :"receive_#{ slot.name_i }"
             mod.send :define_method, m_i do |ev|
-              @listener.send m_i_, ev
+              @delegate.send m_i_, ev
             end
           end ; nil
         end
       end
 
-      def some_listener
-        @listener ||= self.class::Listener.new
+      def some_delegate
+        @delegate ||= self.class::Delegate.new
       end
 
       # ~ comport to business methods
 
-      def send_to_listener i, x
-        some_listener.send :"receive_#{ i }", x
+      def send_to_delegate i, x
+        some_delegate.send :"receive_#{ i }", x
       end
     end
   end

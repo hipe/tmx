@@ -15,15 +15,15 @@ module Skylab::TanMan
         @bound_call
       end
 
-      def set_event_receiver x
-        @event_receiver_x = x ; nil
+      def set_delegate x
+        @delegate_x = x ; nil
       end
 
     private
 
       def prepare_ivars
         @d = 0 ; @x_a_length = @x_a.length
-        @event_receiver_x = nil
+        @delegate_x = nil
         @p and @p[ self ]
         nil
       end
@@ -82,7 +82,7 @@ module Skylab::TanMan
 
       def via_action_resolve_bound_call
         x_a = @x_a[ @d .. -1 ]
-        x = @action.produce_bound_call_via_iambic_and_delegate x_a, event_receiver
+        x = @action.produce_bound_call_via_iambic_and_delegate x_a, delegate
         if x
           @bound_call = x
           OK_
@@ -111,17 +111,17 @@ module Skylab::TanMan
       end
 
       def send_event ev
-        event_receiver.receive_event ev
+        delegate.receive_event ev
       end
 
-      def event_receiver
-        @event_receiver_x || rslv_some_event_receiver_x
-        @event_receiver_x
+      def delegate
+        @delegate_x || rslv_some_delegate_x
+        @delegate_x
       end
 
-      def rslv_some_event_receiver_x
+      def rslv_some_delegate_x
         _exp = API::Expression_Agent__.new @kernel
-        @event_receiver_x = API::Two_Stream_Event_Expressor__.
+        @delegate_x = API::Two_Stream_Event_Expressor__.
           new( * TanMan_::Lib_::Two_streams[], _exp ) ; nil
       end
     end

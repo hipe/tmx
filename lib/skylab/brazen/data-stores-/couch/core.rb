@@ -90,7 +90,7 @@ module Skylab::Brazen
 
     def if_valid_ensure_exists
       if ! @dry_run && @was_valid_after_edit
-        Couch_::Actors__::Ensure_datastore_exists[ self, @listener ]
+        Couch_::Actors__::Ensure_datastore_exists[ self, @delegate ]
       end
     end
 

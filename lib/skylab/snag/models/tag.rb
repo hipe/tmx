@@ -15,8 +15,8 @@ module Skylab::Snag
         new Immutable_Kernel__.new.via_tag_s tag_s
       end
 
-      def normalize_stem_i stem_i, listener=Snag_::Model_::THROWING_INFO_ERROR_LISTENER
-        o = Tag_::Stem_Normalization_.new listener
+      def normalize_stem_i stem_i, delegate=Snag_::Model_::THROWING_INFO_ERROR_delegate
+        o = Tag_::Stem_Normalization_.new delegate
         o.stem_i = stem_i
         if o.is_valid
           o.stem_i

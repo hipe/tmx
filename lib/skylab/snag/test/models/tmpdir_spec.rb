@@ -58,11 +58,11 @@ module Skylab::Snag::TestSupport::Models::TD__
     def defaults
       [ :is_dry_run, false,
         :file_utils, file_utils_spy,
-        :listener, error_event_listener,
+        :delegate, error_event_delegate,
         :tmpdir_pathname, tmpdir_pathname ]
     end
 
-    let :error_event_listener do
+    let :error_event_delegate do
       @err_ev_a = []
       EE_L__.new do |ev|
         if do_debug

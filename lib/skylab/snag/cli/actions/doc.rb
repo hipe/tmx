@@ -74,7 +74,7 @@ module Skylab::Snag
       end
 
       def output_body_with_scanner
-        @oy = ::Enumerator::Yielder.new( & listener.method( :receive_payload_line ))
+        @oy = ::Enumerator::Yielder.new( & delegate.method( :receive_payload_line ))
         @ev = @scn.gets
         while @ev
           send @ev.terminal_channel_i

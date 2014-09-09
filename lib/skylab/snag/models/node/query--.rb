@@ -3,25 +3,25 @@ module Skylab::Snag
   class Models::Node::Query__
 
     class << self
-      def new_valid query_sexp, max_count, listener
-        o = new query_sexp, max_count, listener
+      def new_valid query_sexp, max_count, delegate
+        o = new query_sexp, max_count, delegate
         o.valid
       end
 
       private :new
     end
 
-    def initialize query_sexp, max_count, listener
+    def initialize query_sexp, max_count, delegate
       @counter = nil
       @error_count = 0
       @falseish = UNABLE_
-      @listener = listener  # before below
+      @delegate = delegate  # before below
       if max_count
         self.max_count = max_count
       else
         @max_count = nil
       end
-      qry = Query_Nodes_.new_valid query_sexp, listener
+      qry = Query_Nodes_.new_valid query_sexp, delegate
       if qry
         @query = qry
       else
@@ -86,22 +86,22 @@ module Skylab::Snag
   private
     def send_error_string s
       @error_count += 1
-      @listener.receive_error_string s
+      @delegate.receive_error_string s
     end
 
     module Query_Nodes_  # #borrow-indent
 
-    def self.new_valid query_sexp, listener
+    def self.new_valid query_sexp, delegate
       _cls = Autoloader_.const_reduce [ query_sexp.first ], self
-      _cls.new_valid query_sexp, listener
+      _cls.new_valid query_sexp, delegate
     end
 
     class And
 
-      def self.new_valid query_sexp, listener
+      def self.new_valid query_sexp, delegate
         a = query_sexp[ 1 .. -1 ].map do |x|
           klass = Autoloader_.const_reduce [ x.first ], Query_Nodes_
-          klass.new_valid x, listener
+          klass.new_valid x, delegate
         end
         if ! a.index { |x| ! x }
           if a.length < 2
@@ -128,7 +128,7 @@ module Skylab::Snag
 
     class All
 
-      def self.new_valid _sexp, _listener
+      def self.new_valid _sexp, _delegate
         ALL__
       end
 
@@ -150,11 +150,11 @@ module Skylab::Snag
 
     class HasTag
 
-      def self.new_valid sexp, listener
+      def self.new_valid sexp, delegate
         tag_i = sexp.fetch 1
         tag_i_ = Models::Tag.normalize_stem_i tag_i,
           -> ev do
-            listener.receive_error_event ev
+            delegate.receive_error_event ev
           end
         tag_i_ and new tag_i_
       end
@@ -180,9 +180,9 @@ module Skylab::Snag
 
     class IdentifierRef
 
-      def self.new_valid sexp, listener
+      def self.new_valid sexp, delegate
         identifier_body = sexp[1]  # prefixes might bite [#019]
-        normalized = Models::Identifier.normalize identifier_body, listener
+        normalized = Models::Identifier.normalize identifier_body, delegate
         normalized and new normalized
       end
 
@@ -204,7 +204,7 @@ module Skylab::Snag
 
     class Valid
 
-      def self.new_valid _sexp, _listener
+      def self.new_valid _sexp, _delegate
         VALID__
       end
 

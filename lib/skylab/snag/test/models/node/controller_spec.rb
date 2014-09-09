@@ -46,20 +46,20 @@ module Skylab::Snag::TestSupport::Models::Node
       end
     end
 
-    class Listener_Mock
+    class Delegate_Mock
       def receive_error_string pay
         Stderr_[].puts "WOW: #{ [ pay ].inspect }"
       end
       def receive_info_string pay
         Stderr_[].puts "OK: #{ pay }"
       end
-      def send_to_listener name, pay
+      def send_to_delegate name, pay
         Stderr_[].puts "WAT: #{ [ pay].inspect }"
       end
     end
 
     define_method :build_node do
-      node = Snag_::Models::Node.build_controller Listener_Mock.new, :_A_C_
+      node = Snag_::Models::Node.build_controller Delegate_Mock.new, :_A_C_
       node.instance_variable_set '@extra_lines_header', ''
       node
     end

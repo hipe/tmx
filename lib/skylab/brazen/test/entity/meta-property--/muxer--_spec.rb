@@ -26,7 +26,7 @@ module Skylab::Brazen::TestSupport::Entity::Muxer__
       x.class.should eql One_Doodley_Hah
     end
 
-    it "child has those of parent when add listener to parent early" do
+    it "child has those of parent when add delegate to parent early" do
 
       class Two_Parent
         Subject_[][ singleton_class, :MXR, :mx_for_write ]
@@ -46,7 +46,7 @@ module Skylab::Brazen::TestSupport::Entity::Muxer__
       x.class.should eql Two_Parent
     end
 
-    it "child gets parent listeners **at the time** (no child listeners)" do
+    it "child gets parent delegates **at the time** (no child delegates)" do
 
       class AtTime_Parent
         Subject_[][ singleton_class, :MXR, :mx_for_write ]
@@ -67,7 +67,7 @@ module Skylab::Brazen::TestSupport::Entity::Muxer__
       x.class.should eql AtTime_Child
     end
 
-    it "child gets parent listeners **at the time** (when write child)" do
+    it "child gets parent delegates **at the time** (when write child)" do
 
       class WrtChld_Parent
         Subject_[][ singleton_class, :MXR, :mx_for_write ]
@@ -116,7 +116,7 @@ module Skylab::Brazen::TestSupport::Entity::Muxer__
 
     end
 
-    it "child WILL GET parent listeners that are added \"late\"" do
+    it "child WILL GET parent delegates that are added \"late\"" do
 
       class Late_Parent
         Subject_[][ singleton_class, :MXR, :mx_for_write ]

@@ -9,7 +9,7 @@ module Skylab::Brazen
         :channel,
         :config_filename,
         :is_dry,
-        :listener,
+        :delegate,
         :path ]
 
       Entity_[]::Event::Merciless_Prefixing_Sender[ self ]
@@ -32,7 +32,7 @@ module Skylab::Brazen
       end
 
       def receive_config_wrote_file ev
-        @listener.send :"receive_#{ @channel }_event", ev
+        @delegate.send :"receive_#{ @channel }_event", ev
       end
     end
   end

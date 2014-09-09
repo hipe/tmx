@@ -29,7 +29,7 @@ module Skylab::Snag
         @do_prepend_open_tag,
         @dry_run,
         @be_verbose,
-        to_listener
+        to_delegate
     end
   end
 
@@ -76,7 +76,7 @@ module Skylab::Snag
 
     def from_any_OK_sexp_resolve_query
       @sexp ||= [ :valid ]
-      @query = @nodes.build_query @sexp, @max_count, to_listener
+      @query = @nodes.build_query @sexp, @max_count, to_delegate
       @query and ACHIEVED_
     end
 

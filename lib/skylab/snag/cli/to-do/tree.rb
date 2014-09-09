@@ -15,7 +15,7 @@ module Skylab::Snag
   class CLI::ToDo::Tree
 
     def initialize *a
-      @do_pretty, @listener = a
+      @do_pretty, @delegate = a
       @is_valid = true
       @glyphset_i = :wide  # narrow or wide
       @todo_a = []
@@ -26,7 +26,7 @@ module Skylab::Snag
     attr_writer :glyphset_i
 
     def if_valid_add_todo_to_tree todo
-      collapsed = todo.collapse @listener
+      collapsed = todo.collapse @delegate
       if collapsed
         @todo_a.push collapsed
       else
@@ -35,7 +35,7 @@ module Skylab::Snag
     end
 
     def render
-      rndr = Render__.new @do_pretty, @todo_a, @listener
+      rndr = Render__.new @do_pretty, @todo_a, @delegate
       rndr.glyphset_i = @glyphset_i
       rndr.render
     end
@@ -43,7 +43,7 @@ module Skylab::Snag
     class Render__
 
       def initialize *a
-        @do_pretty, @todo_a, @listener = a
+        @do_pretty, @todo_a, @delegate = a
         @glyphset_i = nil
       end
 
@@ -81,7 +81,7 @@ module Skylab::Snag
 
       def flush
         while (( line = @producer.gets ))
-          @listener.receive_payload_line line
+          @delegate.receive_payload_line line
         end
         NEUTRAL_
       end

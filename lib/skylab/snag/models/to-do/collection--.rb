@@ -13,13 +13,13 @@ module Skylab::Snag
 
   class Scan__  # #borrow:2
 
-    Listener = Snag_::Model_::Listener.new :command_string, :error_event
+    Delegate = Snag_::Model_::Delegate.new :command_string, :error_event
 
     Snag_::Model_::Actor[ self ]
 
     def initialize a  # paths patterns names
       @command = Snag_::Models::Find.new( * a.shift( 3 ) )
-      @listener = Listener.via_iambic a
+      @delegate = Delegate.via_iambic a
     end
 
     attr_reader :command, :exitstatus, :result, :seen_count
@@ -66,7 +66,7 @@ module Skylab::Snag
     def resolve_command_string
       @command.command -> cmd_s do
         @command_s = cmd_s
-        @listener.receive_command_string cmd_s
+        @delegate.receive_command_string cmd_s
         ACHIEVED_
       end, -> ev do
         send_error_event ev

@@ -35,7 +35,7 @@ module Skylab::Snag
 
           def when_already_exists
             _ev = bld_already_exists_event
-            _r = @listener.receive_error_event _ev
+            _r = @delegate.receive_error_event _ev
             _r  # :+[#049] whether this is an error is up to the caller
           end
 
@@ -61,7 +61,7 @@ module Skylab::Snag
 
           def when_added
             _ev = Added__.new @tag.render, verb_i
-            @listener.receive_info_event _ev
+            @delegate.receive_info_event _ev
             ACHIEVED_
           end
 
@@ -78,8 +78,8 @@ module Skylab::Snag
 
           Snag_::Lib_::Entity[][ self, -> do
 
-            def listener
-              merge_listener iambic_property
+            def delegate
+              merge_delegate iambic_property
             end
 
             def prepend

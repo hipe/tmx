@@ -45,7 +45,7 @@ module Skylab::Brazen
         end
       end
 
-      def listener
+      def delegate
         @action
       end
     end

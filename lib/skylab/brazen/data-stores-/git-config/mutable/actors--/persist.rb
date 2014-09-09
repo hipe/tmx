@@ -9,12 +9,12 @@ module Skylab::Brazen
       class Actors__::Persist
 
         Actor_[ self, :properties,
-          :pn, :document, :listener, :x_a, :is_dry, :channel ]
+          :pn, :document, :delegate, :x_a, :is_dry, :channel ]
 
         Entity_[]::Event::Merciless_Prefixing_Sender[ self ]
 
         def initialize x_a
-          @pn, @document, @listener, @x_a, @is_dry, @channel = x_a
+          @pn, @document, @delegate, @x_a, @is_dry, @channel = x_a
           process_iambic_fully @x_a
           @x_a = nil
         end
@@ -52,8 +52,8 @@ module Skylab::Brazen
           end
         end
 
-        def listener
-          @listener
+        def delegate
+          @delegate
         end
       end
     end

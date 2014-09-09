@@ -42,7 +42,7 @@ module Skylab::Brazen
     def produce_any_result
       a = to_even_iambic
       a.push :prop, self.class.properties.fetch( :path )
-      a.push :listener, self
+      a.push :delegate, self
       Brazen_::Models_::Workspace.new( @kernel ).produce_any_result_for_status a
     end
 

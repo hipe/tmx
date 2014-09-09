@@ -267,17 +267,17 @@ module Skylab::Brazen
           send_event_structure build_event_via_iambic_and_message_proc( x_a, p )
         end
         def send_structure_on_channel ev, chan_i
-          send_structure_on_channel_to_listener ev, chan_i, listener
+          send_structure_on_channel_to_delegate ev, chan_i, delegate
         end
-        def send_structure_on_channel_to_listener ev, chan_i, listener
-          send_structure_with_method_to_listener ev,
-            :"receive_#{ chan_i }_#{ ev.terminal_channel_i }", listener
+        def send_structure_on_channel_to_delegate ev, chan_i, delegate
+          send_structure_with_method_to_delegate ev,
+            :"receive_#{ chan_i }_#{ ev.terminal_channel_i }", delegate
         end
         def send_structure_with_method ev, m_i
-          send_structure_with_method_to_listener ev, m_i, listener
+          send_structure_with_method_to_delegate ev, m_i, delegate
         end
-        def send_structure_with_method_to_listener ev, m_i, listener
-          listener.send m_i, ev
+        def send_structure_with_method_to_delegate ev, m_i, delegate
+          delegate.send m_i, ev
         end
       end
 
@@ -291,10 +291,10 @@ module Skylab::Brazen
         P__ = -> ev do
           @channel or self._NO_CHANNEL
           m_i = :"receive_#{ @channel }_#{ ev.terminal_channel_i }"
-          if @listener.respond_to? m_i
+          if @delegate.respond_to? m_i
             send_structure_with_method ev, m_i
           else
-            @listener.send :"receive_#{ @channel }_event", ev
+            @delegate.send :"receive_#{ @channel }_event", ev
           end
         end
       end

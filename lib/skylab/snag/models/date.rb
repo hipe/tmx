@@ -3,12 +3,12 @@ module Skylab::Snag
   class Models::Date
 
     class << self
-      def normalize x, listener
+      def normalize x, delegate
         if RX__ =~ x
           x
         else
           _ev = new( x ).build_error_event
-          listener.receive_error_event _ev
+          delegate.receive_error_event _ev
           UNABLE_  # (used to be a :+[#017], no longer)
         end
       end

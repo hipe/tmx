@@ -30,7 +30,7 @@ module Skylab::Snag
 
           def when_not_found
             _ev = Not_Found__.new identifier, @tag.render
-            _r = @listener.receive_error_event _ev
+            _r = @delegate.receive_error_event _ev
             _r  # :+[#049] whether this is an error is up to the caller
           end
 
@@ -67,7 +67,7 @@ module Skylab::Snag
 
           def when_removed tag_s
             _ev = Removed__.new tag_s
-            @listener.receive_info_event _ev
+            @delegate.receive_info_event _ev
             ACHIEVED_
           end
 
@@ -78,8 +78,8 @@ module Skylab::Snag
           end
 
           Snag_::Lib_::Entity[][ self, -> do
-            def listener
-              merge_listener iambic_property
+            def delegate
+              merge_delegate iambic_property
             end
           end ]
         end

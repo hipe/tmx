@@ -30,7 +30,7 @@ module Skylab::TanMan
 
       def via_input_string_resolve_document
         doc = @kernel.models.dot_files.produce_document_via_string @input_s,
-          :event_receiver, @delegate
+          :delegate, @delegate
         if doc
           @document = doc ; OK_
         else

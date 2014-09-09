@@ -38,7 +38,7 @@ module Skylab::Snag
       end
 
       def receive_UI_line s
-        listener.receive_UI_line s
+        delegate.receive_UI_line s
       end
 
     private
@@ -54,7 +54,7 @@ module Skylab::Snag
       Fake_Formal_Parameter__ = ::Struct.new :name
 
       def send_UI_line s
-        listener.receive_UI_line s
+        delegate.receive_UI_line s
       end
 
       def handle_payload_line
@@ -66,7 +66,7 @@ module Skylab::Snag
       end
 
       def send_payload_line s
-        listener.receive_payload_line s
+        delegate.receive_payload_line s
       end
 
       def handle_info_line
@@ -82,7 +82,7 @@ module Skylab::Snag
       end
 
       def send_info_line s
-        listener.receive_info_line s
+        delegate.receive_info_line s
       end
 
       def handle_info_string
@@ -96,7 +96,7 @@ module Skylab::Snag
       end
 
       def receive_info_string s
-        listener.receive_info_string s
+        delegate.receive_info_string s
       end
 
       def handle_info_event
@@ -105,11 +105,11 @@ module Skylab::Snag
 
       def receive_inside_info_event ev
         _ev_ = sign_event ev
-        listener.receive_info_event _ev_
+        delegate.receive_info_event _ev_
       end
 
       protected def receive_info_event ev
-        listener.receive_info_event ev
+        delegate.receive_info_event ev
       end
 
       def handle_error_line
@@ -117,7 +117,7 @@ module Skylab::Snag
       end
 
       def receive_error_line s
-        listener.receive_error_line s
+        delegate.receive_error_line s
       end
 
       def handle_error_string
@@ -127,7 +127,7 @@ module Skylab::Snag
       def receive_error_string s
         ev = Snag_::Model_::Event.inflectable_via_string s
         inflect_inflectable_event ev
-        listener.receive_error_event ev
+        delegate.receive_error_event ev
       end
 
       def handle_error_event
@@ -136,14 +136,14 @@ module Skylab::Snag
 
       def receive_inside_error_event ev
         _ev_ = sign_event ev
-        listener.receive_error_event _ev_
+        delegate.receive_error_event _ev_
       end
 
       protected def receive_error_event ev
-        listener.receive_error_event ev
+        delegate.receive_error_event ev
       end
 
-      def listener
+      def delegate
         @request_client
       end
 
