@@ -5,7 +5,7 @@ module Skylab::TanMan
     class << self
 
       def build_collections kernel
-        Collections__.new kernel
+        DotFile_::Collections__.new kernel
       end
 
       def get_unbound_upper_action_scan
@@ -13,39 +13,6 @@ module Skylab::TanMan
 
       def produce_document_via_parse & p
         DotFile_::Produce_document_via_parse__[ p ]
-      end
-    end
-
-    module Document_Resolver_Methods
-      # you need @delgate (action), @kernel
-    private
-      def resolve_document
-        @input_s = @delegate.action_property_value :input_string
-        if @input_s
-          via_input_string_resolve_document
-        else
-          via_path_resolve_document
-        end
-      end
-
-      def via_input_string_resolve_document
-        doc = @kernel.models.dot_files.produce_document_via_string @input_s,
-          :delegate, @delegate
-        if doc
-          @document = doc ; OK_
-        else
-          doc
-        end
-      end
-    end
-
-    class Collections__
-      def initialize k
-        @kernel = k
-      end
-      def produce_document_via_string s, * x_a
-        x_a.push :string, s
-        DotFile_::Produce_Document__::Via_string.execute_via_iambic x_a
       end
     end
 

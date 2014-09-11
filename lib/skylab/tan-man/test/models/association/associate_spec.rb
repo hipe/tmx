@@ -36,10 +36,10 @@ module Skylab::TanMan::TestSupport::Models::Association
       it "adds edge statements in unobtrusive lexical-esque order, #{
            } with taxonomy and proximity" do
         result._edge_stmts.to_a.length.should eql( 3 )
-        result._node_stmts.to_a.length.should eql( 0 )
+        result.node_statements.length.should eql( 0 )
         controller.associate! 'feasly', 'teasly'
         result._edge_stmts.to_a.length.should eql( 4 )
-        result._node_stmts.to_a.length.should eql( 2 ) # it created one that it ..
+        result.node_statements.length.should eql( 2 ) # it created one that it ..
         exp = <<-O.unindent.strip
           */
           feasly [label=feasly]

@@ -1,23 +1,20 @@
 module Skylab::TanMan
-  module Models::Sexp
-    # (only events here!)
-  end
 
-  module Models::Sexp::Events
-    # all here.
-  end
+  module Models_::DotFile
 
-  TanMan::Model::Event || nil # (load it here, then it's prettier below)
+    Events_ = ::Module.new
 
-  class Models::Sexp::Events::Invalid_Characters <
-    Model::Event.new :chars
+    Events_::Invalid_Characters = TanMan_::Lib_::Event[].
 
-    def build_message
-      x = chars.length
-      "html-escaping support is currently very limited. the following #{
-      }character#{ s x } #{ s x, :is } not yet supported: #{
-        chars.map { |c| "#{ c.inspect } (#{ '%03d' % [ c.ord ] })" }.join ', '
-      }"
+        prototype_with :invalid_characters, :chars, nil, :ok, false do |y, o|
+
+      s_a = o.chars
+      d = s_a.length
+      _s_a_ = s_a.map { |s| "#{ s.inspect } (#{ '%03d' % [ s.ord ] })" } * ', '
+
+      y << "html-escaping support is currently very limited. the following #{
+       }character#{ s d } #{ s d, :is } not yet supported: #{ _s_a_ }"
+
     end
   end
 end

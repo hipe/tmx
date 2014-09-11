@@ -47,7 +47,7 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
         o.unparse.should eql( exp )
         result.unparse.split( "\n" ).last.should eql( exp )
         if false
-        o._insert_before! 'faeup', 'fooooop'
+        o._insert_item_before_item 'faeup', 'fooooop'
         o.unparse.should eql( 'faeioup ;  faeup ;  fooooop ;  fuuup' )
         end
       end

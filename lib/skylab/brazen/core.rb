@@ -7,6 +7,9 @@ module Skylab::Brazen
     def bound_call rcvr, method_name, args=nil
       Bound_Call__.new rcvr, method_name, args
     end
+    def model
+      Brazen_::Model_::LIB
+    end
   end
 
   Callback_ = ::Skylab::Callback

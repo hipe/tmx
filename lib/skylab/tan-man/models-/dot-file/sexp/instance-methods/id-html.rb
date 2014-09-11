@@ -32,7 +32,8 @@ module Skylab::TanMan
 
         if bad
           res = error[
-            Models::Sexp::Events::Invalid_Characters.new nil, bad.uniq ]
+            Models_::DotFile::Events_::Invalid_Characters.with :chars, bad.uniq
+          ]
           break
         end
         res = out
@@ -44,7 +45,7 @@ module Skylab::TanMan
       self[:content_text_value]
     end
 
-    def normalized_string! string
+    def set_normalized_string string
       string.include?('>>') and fail('haha not today my friend. not today.')
       self[:content_text_value] = string
     end

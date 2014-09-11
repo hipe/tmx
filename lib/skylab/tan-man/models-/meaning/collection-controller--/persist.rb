@@ -152,7 +152,12 @@ module Skylab::TanMan
         end
 
         def send_event ev
-          @action.send :"receive_#{ @channel }_event", ev ; nil
+          m_i = :"receive_#{ @channel }_event"
+          if @action.respond_to? m_i
+            @action.send m_i, ev
+          else
+            @action.receive_event ev
+          end ; nil
         end
 
         C_STYLE_OPEN_COMMENT_RX_ = /\A[ \t]*\/\*/

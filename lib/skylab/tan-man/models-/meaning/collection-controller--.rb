@@ -2,17 +2,29 @@ module Skylab::TanMan
 
   class Models_::Meaning
 
-    class Collection_Controller__
+    class Collection_Controller__  # #todo - push up
 
-      def self.[] a
-        _, channel, delegate, _, kernel = a  # datastore name, model class
-        new channel, delegate, kernel
+      class << self
+
+        def build_via_iambic x_a
+          new do
+            init_via_iambic x_a
+          end
+        end
       end
 
-      def initialize * a
-        @channel, @action, @kernel = a
-        @input_string = @action.action_property_value :input_string
+      Callback_::Actor[ self, :properties,
+        :datastore_i, :channel, :delegate, :model_class, :kernel ]
+
+      def initialize & p
+        instance_exec( & p )
       end
+    private
+      def init_via_iambic x_a
+        process_iambic_fully x_a
+        @input_string = @delegate.action_property_value :input_string
+      end
+    public
 
       def to_property_hash_scan
         scan = build_scan
@@ -23,8 +35,8 @@ module Skylab::TanMan
 
       def persist_entity ent
         _p = method :build_scan
-        _os = @action.action_property_value :output_string
-        Collection_Controller__::Persist[ ent, _os, _p, @channel, @action ]
+        _os = @delegate.action_property_value :output_string
+        Collection_Controller__::Persist[ ent, _os, _p, @channel, @delegate ]
       end
 
     private

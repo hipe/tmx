@@ -2,6 +2,14 @@ module Skylab::Brazen
 
   class Model_  # read [#013]
 
+    module LIB
+      class << self
+        def collections_controller
+          Model_::Collections_::Collections_Controller__
+        end
+      end
+    end
+
     class << self
 
       attr_accessor :after_i, :description_block, :persist_to
@@ -15,9 +23,6 @@ module Skylab::Brazen
 
       def process_some_customized_inflection_behavior scanner
         Process_customized_model_inflection_behavior__[ scanner, self ] ; nil
-      end
-
-      def custom_branch_inflection
       end
 
     private
@@ -51,23 +56,45 @@ module Skylab::Brazen
            execute
       end
 
+      def any_action_property_value i
+        ivar = :"@#{ i }"
+        if instance_variable_defined? ivar
+          instance_variable_get ivar
+        end
+      end
+
       def action_property_value i
         ivar = :"@#{ i }"
-        instance_variable_defined?( ivar ) or raise "action prop not set: '#{ i }'"
+        instance_variable_defined?( ivar ) or raise say_no_action_prop( i )
         instance_variable_get ivar
       end
 
     private
 
+      def say_no_action_prop i
+        "action prop not set: '#{ i }'"
+      end
+
       def sign_event ev
         Model_::Event_Signature_Wrapper__.new name, ev
+      end
+
+    public
+
+      def channel_and_delegate
+        [ @channel, @delegate ]
+      end
+
+      def channel_delegate_kernel
+        [ @channel, @delegate, @kernel ]
       end
 
       self
     end
 
-    def initialize kernel
+    def initialize kernel, & p
       @kernel = kernel
+      p and instance_exec( & p )
     end
 
     def is_branch
@@ -110,7 +137,10 @@ module Skylab::Brazen
         instance_variable_set ivar, x
       end
       @error_count = 0
-      process_iambic_fully prop_x_a
+      process_iambic_fully prop_x_a ; nil
+    end
+
+    def via_properties_produce_any_edit_result
       notificate :iambic_normalize_and_validate
       if @error_count.zero?
         @was_valid_after_edit = true
@@ -128,11 +158,12 @@ module Skylab::Brazen
       if :workspace == i
         persist_to_workspace
       elsif i == name.as_lowercase_with_underscores_symbol
-        via_own_collection_controller_persist
+        via_own_collections_controller_persist
       else
         persist_to_datastore i
       end
     end
+
     attr_reader :came_from_persistence
 
   private
@@ -147,12 +178,12 @@ module Skylab::Brazen
       ds.persist_entity_to_datastore self, locator_i
     end
 
-    def via_own_collection_controller_persist
-      model_class = self.class
-      _action = @delegate  # #todo
-      _args = [ :_self_, :persisting, _action, model_class, @kernel ]
-      _cc = model_class.const_get( :Collection_Controller__, false )[ _args ]
-      _cc.persist_entity self
+    def via_own_collections_controller_persist
+      collections.persist_entity self
+    end
+
+    def collections
+      @kernel.models[ name.as_lowercase_with_underscores_symbol ]
     end
 
   public
@@ -395,16 +426,36 @@ module Skylab::Brazen
         model_class.name_function.as_lowercase_with_underscores_symbol
       end
 
-      def build_collection_controller * a
-        model_class::Collection_Controller__[ a ]
+      def persist_entity entity
+        csc = via_entity_build_collections_controller entity
+        csc.persist_entity entity
+      end
+    private
+      def via_entity_build_collections_controller entity
+        build_collections_controller_for_channel_and_delegate( *
+          entity.channel_and_delegate )
+      end
+
+    public
+
+      def build_collection_controller_with * x_a
+        x_a.push :kernel, @kernel
+        collection_controller_class.build_via_iambic x_a
       end
 
       def build_collections_controller_for_channel_and_delegate i, x
         collections_controller_class.new i, x, model_class, @kernel
       end
+
     private
+
+      def collection_controller_class
+        model_class::Collection_Controller__
+      end
+
       def collections_controller_class
-        Collections_::Collections_Controller__
+        model_class::Actions.class  # support a devious #hack for now
+        model_class.collections_controller_class
       end
 
       Autoloader_[ self ]

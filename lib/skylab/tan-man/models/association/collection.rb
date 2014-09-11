@@ -342,7 +342,7 @@ module Skylab::TanMan
         elsif do_create || do_create.nil?
           edge_stmt = create source_node, target_node, params, error
           edge_stmt or break( res = edge_stmt )
-          graph_sexp.stmt_list._insert_before! edge_stmt, new_before_this
+          graph_sexp.stmt_list._insert_item_before_item edge_stmt, new_before_this
           res = if success
             success[ Models::Association::Events::Created.new self, edge_stmt ]
           else

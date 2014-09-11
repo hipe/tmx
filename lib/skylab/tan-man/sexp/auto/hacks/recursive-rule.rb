@@ -30,7 +30,7 @@ module Skylab::TanMan
     end
 
 
-    methods = [:_append!, :_insert_before!, :_items, :_remove!]
+    methods = [:_append!, :_insert_item_before_item, :_items, :_remove!]
 
     methods.push :_named_prototypes # this is *so* sketchy here #experimental
                                   # but still we want in the check below
@@ -70,9 +70,8 @@ module Skylab::TanMan
 
       next_node = if list then                # determining what is the next
         -> node do                            # node after a node is different
-          o = node[tail]                      # based on whether or not there
-          o &&= o[list]                       # is a tail getter
-          o
+          o = node[ tail ]                    # based on whether or not there
+          o && o[ list ]                      # is a tail getter
         end
       else
         -> node { node[tail] }
@@ -338,7 +337,7 @@ module Skylab::TanMan
 
 
 
-      tree_class.send :define_method, :_insert_before! do |new, new_before_this|
+      tree_class.send :define_method, :_insert_item_before_item do |new, new_before_this|
         existing_a = _nodes.to_a
                                                # (the `#`-marked calls below are
                                                # all #single-call, that is, they
@@ -385,7 +384,7 @@ module Skylab::TanMan
       end
 
 
-      tree_class.send :define_method, :_nodes do
+      tree_class.send :define_method, :_nodes do  # #open [#085]
         ::Enumerator.new do |y|
           if self[item] # else zero-width tree stub
             curr_node = self
@@ -395,6 +394,30 @@ module Skylab::TanMan
             end while curr_node
           end
           nil
+        end
+      end
+
+
+      tree_class.send :define_method, :to_scan do
+        subsequent_p = nil
+        p = -> do
+          if self[ item ]  # else zero-width tree stub
+            x = self
+            p = subsequent_p[ x ]
+          else
+            p = EMPTY_P_
+          end
+          x
+        end
+        subsequent_p = -> x do
+          -> do
+            x = next_node[ x ]
+            x or p = EMPTY_P_
+            x
+          end
+        end
+        Callback_.scan do
+          p[]
         end
       end
 
@@ -458,7 +481,7 @@ module Skylab::TanMan
   module Sexp::Auto::Hacks::RecursiveRule::SexpInstanceMethods
 
     def _append! new
-      _insert_before! new, nil
+      _insert_item_before_item new, nil
     end
 
     def list?

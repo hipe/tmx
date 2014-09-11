@@ -10,6 +10,10 @@ module Skylab::TanMan::TestSupport::Sexp
 
   module InstanceMethods
 
+    def node_s_a
+      @result.nodes
+    end
+
     def grammars_module
       TS_::Grammars
     end

@@ -4,40 +4,68 @@ module Skylab::TanMan
 
     include Models_::DotFile::Sexp::InstanceMethod::InstanceMethods
 
-    def _create_node_with_label label, error
-      # imagine you are the proto
-      res = nil
-      begin
-        node_stmt = __dupe
-        ok = node_stmt._set_label_of_prototype! label, error
-        ok or break( res = ok )
-        res = node_stmt
-      end while nil
-      res
+    def label_or_node_id_normalized_string
+      label || node_id_normalized_string
     end
 
     def label
-      _label_sexp[:content][:equals][:id].normalized_string
+      attr = _label_sexp
+      attr and attr[ :content ][ :equals ][ :id ].normalized_string
     end
 
     def _label_sexp
-      self[:attr_list][:content]._nodes.detect do |n|
-        n[:content][:id][:content_text_value] == 'label'
+      al = self[ :attr_list ]
+      if al
+        al[ :content ]._nodes.detect do |n|
+          n[ :content ][ :id ][ :content_text_value ] == LABEL__
+        end
       end
     end
 
+    LABEL__ = 'label'.freeze
 
-    def _set_label_of_prototype! label_string, error
-      res = nil
-      begin
-        equals = _label_sexp[:content][:equals]
-        str = equals[:id].normalized_string
+    def _create_node_with_label label, error
+      node_stmt = __dupe
+      ok = Set_label_of_new_node_made_from_prototype__[ label, node_stmt, error ]
+      ok && node_stmt
+    end
 
-        if TanMan::Services::Template.parameter? str, :label
-          s = equals[:id]._escape_string label_string, error
-          s or break( res = s )
+    def node_id  # #override # support for 'port' at [#051]
+      node_id_normalized_string.intern
+    end
 
-          out_s = TanMan::Services::Template.from_string( str )[ label: s ]
+    def node_id_normalized_string
+      self[ :node_id ][ :id ].normalized_string
+    end
+
+    def set_node_id node_id
+      node_id.respond_to?( :id2name ) or raise say_node_id_is_not_symbol( node_id )
+      self[ :node_id ][ :id ] = _parse_id node_id.id2name
+      ACHEIVED_
+    end
+
+    def say_node_id_is_not_symbol x
+      "sanity - no implicit conversion from #{ x.class } to Symbol for 'node_id'"
+    end
+
+    class Set_label_of_new_node_made_from_prototype__
+
+      Callback_::Actor[ self, :properties, :label, :node, :error_ev_p ]
+
+      def execute
+        @equals = @node._label_sexp[ :content ][ :equals ]
+        @str = @equals[ :id ].normalized_string
+        if TanMan_::Lib_::String_template[].string_has_parameter @str, :label
+          when_template_parameters
+        else
+          when_no_template_parameters
+        end
+      end
+
+      def when_template_parameters
+        s = @equals[ :id ]._escape_string @label, @error_ev_p
+        s and begin
+          out_s = TanMan_::Lib_::String_template[].from_string( @str )[ label: s ]
 
           # NOTE you lose information above -- you cannot now go back and re-
           # evaluate the template. What you could do is 1) either hold on to
@@ -45,23 +73,16 @@ module Skylab::TanMan
           # re-use it in future regenerations of the node (ick) or manipulate
           # the html with ICK NO THAT'S TERRIBLE
 
-          equals[:id].normalized_string! out_s # oh snap
-          res = equals[:id]
-        else
-          res = _parse_id label_string
-          equals[:id] = res
+          @equals[ :id ].set_normalized_string out_s
+          @equals[ :id ]
         end
-      end while nil
-      res
-    end
+      end
 
-    def node_id # #override # support for 'port' at [#051]
-      self[:node_id][:id].normalized_string.intern
-    end
-
-    def node_id! node_id
-      ::Symbol === node_id or fail("sanity: Symbol not #{node_id.class} please")
-      self[:node_id][:id] = _parse_id node_id.to_s
+      def when_no_template_parameters
+        x = @node._parse_id @label
+        @equals[ :id ] = x
+        x
+      end
     end
   end
 end

@@ -1,4 +1,6 @@
 module Skylab::TanMan
+
+  if false
   class Model::Event < ::Struct
     #
     # all here.
@@ -70,5 +72,6 @@ module Skylab::TanMan
         super # expert mode
       end
     end
+  end
   end
 end

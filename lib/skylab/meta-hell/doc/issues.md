@@ -2,11 +2,11 @@
 [#068]       #done rewrite contoured parsing to be unobtrusive
 [#067]       #done in contoured, absorption methods should be self-contained
 [#066]       #doc-point the metahell fields narrative ..
-[#065]       #done unify use of MetaHell_ not MetaHell
+[#065]       #done unify use of `MetaHell_` not MetaHell
 [#064]       #done fix syntax sharing
 [#063]       #done get rid of argful field parsers
 [#062]       #done get rid of ridiculous attempts at currying methods
-[#061]       #done promote fields out of fun
+[#061]       #code-node basic fields (was: promote fields out of fun)
 [#060]       #done separate general from specific "method touch"
 [#059]       #done get rid of all old autoloader dependencies at this node
 [#058]       #doc-point the "touch method" function ..
@@ -26,7 +26,7 @@
              (#re-purpoesd:once. original may have been lost.)
 [#046]       #doc-point extension nodes?
 [#045]       #tracking-tag track various #touchers in the wild
-[#044] #hole (was #autoloading: swap-in caller_locations( 1, 1 )[ 0 ].base_label)
+[#044] #hole (was #autoloading: swap-in `caller_locations( 1, 1 )[ 0 ].base_label)`
 [#043]       #boxxy the stemmy tree issue - try autoloading the value corresp.
                to the path "headless/nlp/en/levenshtein-.rb"
 [#042]       #doc-point introducting tagged argument lists (#iambics) ..

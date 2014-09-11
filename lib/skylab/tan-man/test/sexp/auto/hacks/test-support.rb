@@ -68,7 +68,7 @@ module ::Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
       end
       a_list._prototype = gs.class.parse :a_list, 'a=b, c=d'
       new_before_this = FUN.new_before_this[ a_list, asst_to_insert_string ]
-      a_list._insert_before! asst_to_insert_string, new_before_this
+      a_list._insert_item_before_item asst_to_insert_string, new_before_this
       @actual_string = a_list.unparse
       nil
     end
@@ -96,7 +96,7 @@ module ::Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
 
     def go node_to_insert_string
       new_before_this = FUN.new_before_this[stmt_list, node_to_insert_string]
-      stmt_list._insert_before! node_to_insert_string, new_before_this
+      stmt_list._insert_item_before_item node_to_insert_string, new_before_this
       @actual_string = stmt_list.unparse
       nil
     end

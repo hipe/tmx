@@ -21,7 +21,7 @@ module Skylab::TanMan
           @kernel.set_input_tuple :path, path ; nil
         end
 
-        def via_pathname pn
+        def via_input_pathname pn
           @kernel.set_input_tuple :pathname, pn ; nil
         end
 

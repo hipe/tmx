@@ -326,7 +326,12 @@ module Skylab::TanMan::TestSupport
     end
 
     def build_input_file_pathname
-      @grammar_class.dir_pathname.join "fixtures/#{ input_file_granule }"
+      module_with_subject_fixtures_node.dir_pathname.
+        join "fixtures/#{ input_file_granule }"
+    end
+
+    def module_with_subject_fixtures_node
+      @grammar_class
     end
 
     # ~ used in assertions
@@ -341,6 +346,12 @@ module Skylab::TanMan::TestSupport
 
     def some_input_string_when_via_parse_via_input_string_produce_result
       input_string
+    end
+
+    # ~ hook-outs to ancillary API's
+
+    def subject_API
+      TanMan_::API
     end
   end
 end

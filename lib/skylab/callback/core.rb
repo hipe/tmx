@@ -42,11 +42,12 @@ module Skylab::Callback
       def absrb_prps i_a, cls
         box = cls.actor_property_box_for_write
         d = -1 ; last = i_a.length - 1 ; i = nil
-        box.add i = i_a.fetch( d += 1 ), :"@#{ i }" while d  < last ; nil
+        box.add i = i_a.fetch( d += 1 ), :"@#{ i }" while d < last ; nil
       end
     end
 
-    PROPERTY_BOX__ = :ACTOR_PROPERTY_BOX___
+    BX__ = :ACTOR_PROPERTY_BOX___
+    D__ = :ACTOR_PROPERTY_BOX_LENGTH_MARKER_FOR_ARGLIST__
 
     module MM__
 
@@ -74,20 +75,47 @@ module Skylab::Callback
         end.execute
       end
 
-      define_method :actor_property_box_for_write, -> do
-        const = PROPERTY_BOX__
-        -> do
-          self.__actor_property_box_for_write__ ||= begin
-            if const_defined? const
-              const_get( const ).dup
-            else
-              const_set const, Callback_::Box.new
-            end
+      def actor_property_box_for_write
+        if const_defined? BX__
+          if const_defined? BX__, false
+            self._TEST_ME  # strange - re-opeing. should be OK
+            const_get BX__, false
+          else
+            bx = const_get BX__
+            const_set D__, bx.length
+            const_set BX__, bx.dup
           end
+        else
+          const_set D__, 0
+          const_set BX__, Box.new
         end
-      end.call
+      end
 
-      attr_accessor :__actor_property_box_for_write__
+      def actor_property_box_for_arglist
+        @actor_property_box_for_arglist ||= prdc_actor_prop_box_for_arglist
+      end
+
+    private
+
+      def prdc_actor_prop_box_for_arglist
+        d = const_get D__
+        if d.zero?
+          const_get BX__
+        else
+          build_property_box_slice_for_arglist
+        end
+      end
+
+      def build_property_box_slice_for_arglist
+        d = const_get D__
+        bx = const_get BX__
+        bx_ = bx.class.new
+        d.upto( bx.length - 1 ) do |d_|
+          i, ivar = bx.fetch_pair_at_position d_
+          bx_.add i, ivar
+        end
+        bx_
+      end
     end
 
     def initialize & p
@@ -97,21 +125,17 @@ module Skylab::Callback
   private
 
     def process_argument_list_fully a
-      box = actor_property_box
+      box = self.class.actor_property_box_for_arglist
       a.length.times do |d|
         instance_variable_set box.fetch_at_position( d ), a.fetch( d )
       end ; nil  # #etc
     end
 
     def process_iambic_fully x_a
-      box = actor_property_box
+      box = self.class.const_get BX__
       x_a.each_slice( 2 ) do |i, x|
         instance_variable_set box.fetch( i ), x
       end ; nil
-    end
-
-    def actor_property_box
-      self.class.const_get PROPERTY_BOX__
     end
   end
 
@@ -1444,5 +1468,4 @@ module Skylab::Callback
   require 'pathname'  # ~ eat our own dogfood, necessarily at the end
 
   Autoloader[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
-
 end

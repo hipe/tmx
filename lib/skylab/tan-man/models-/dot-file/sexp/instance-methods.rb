@@ -34,10 +34,9 @@ module Skylab::TanMan
     # We must do either one or the other because Sexp::Auto is unaware
     # (as it should be!) of the idea of autoloading. experimental!
 
-    def self.const_defined? const_str, look_up=true
-      ok = super
-      if ! ok
-        entry_tree.normpath_from_distilled Callback_.distill[ const_str ]
+    def self.const_defined? const_x, look_up=true
+      super or begin
+        entry_tree.normpath_from_distilled Callback_.distill[ const_x ]
       end
     end
 
@@ -58,7 +57,7 @@ module Skylab::TanMan
       content_text_value.gsub('\"', '"')
     end
 
-    def normalized_string! string
+    def set_normalized_string string
       fail 'implement me' # at [#052]
     end
   end

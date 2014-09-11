@@ -24,6 +24,10 @@ module Skylab::TanMan
       Brazen_::Entity
     end
 
+    Event = -> do
+      Brazen_::Entity::Event
+    end
+
     Event_builder = -> x do
       x.include Brazen_::Entity::Event::Builder_Methods ; nil
     end
@@ -41,6 +45,10 @@ module Skylab::TanMan
     String_scanner = memoize[ -> do
       require 'strscan' ; ::StringScanner
     end ]
+
+    String_template = -> do
+      BA__[]::String::Template
+    end
 
     Tmpdir_stem = memoize[ -> { 'tina-man'.freeze } ]
 

@@ -55,11 +55,11 @@ module Skylab::TanMan::TestSupport::Models::DotFile::Manipulating::Label
     def _can_set_and_create_the_label
       o = result
       o.get_label.nil?.should eql( true )
-      o.set_label! 'Zeepadeep doobop'
+      o.set_label 'Zeepadeep doobop'
       o.get_label.should eql('Zeepadeep doobop')
       full = o.unparse
       full.include?( 'label="Zeepadeep doobop"' ).should eql(true)
-      o.set_label! 'bipbap'
+      o.set_label 'bipbap'
       full = o.unparse
       full.include?( 'Zeep' ).should eql(false)
       # the ending should not look like this: "foo}\n"

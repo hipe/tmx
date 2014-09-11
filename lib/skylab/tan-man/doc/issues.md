@@ -1,3 +1,4 @@
+[#085] #open refactor _nodes to use to_scan
 [#084]       #parent-node: [#model] the node model narrative ..
 [#083]       #doc-node kernel
 [#082]       #parent-node: [#083] the kernel properties narrative ..
@@ -11,7 +12,7 @@
 [#072]       #done when returning false, use the terminal action node
 [#071]       #tracking-tag: shift from the `prototypes` paradigm to the 'meh'
 [#070]       #tracking-tag `create` flag as a triad: false, nil, trueish
-[#069]       #tracking-tag fuzzy-finging regexen - case insensitive?
+[#069]       #tracking-tag fuzzy-finding regexen - case insensitive?
 [#068]       #done dot file controller is becoming a god object, also redesign
              the way it executes "tell"s, so it's not as much an action
              obj
@@ -91,7 +92,8 @@
 [#011]       make sure complex prototypes can be used with nonzero length lists
 [#010]       #done 2012-10-27 associate two nodes
                1. sic, 2. redudantly, 3. agent not exist 4. target not exist
-[#009]       #done 2012-10-27 create a node
+[#009]       #doc-node: the node controller narrative ..
+             #repurposed: once. was: #done 2012-10-27 create a node
                1. with one template (3 permutations) 2. with another template (3 permutes)
 [#008]       #done 2012-10-10 #rename rename "nt" to "expression" / "rule"
 [#007]       #done #small #critical models/ dir generated during specs 2012-09-29

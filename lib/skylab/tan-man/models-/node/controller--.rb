@@ -1,8 +1,22 @@
 module Skylab::TanMan
 
-  class Models::Node::Controller
+  class Models_::Node
 
-    include Core::SubClient::InstanceMethods
+    module Controller__
+
+      class Normalize_name
+
+        Callback_::Actor[ self, :properties, :ent, :a ]
+
+        def execute
+          @x, @value_p, @event_with_p, @property = @a
+          @value_p[ @x ]
+        end
+      end
+
+    end
+
+    if false
 
     def initialize dot_file_controller, node_stmt
       super dot_file_controller
@@ -48,5 +62,6 @@ module Skylab::TanMan
     end
 
     alias_method :dot_file, :request_client
+    end
   end
 end

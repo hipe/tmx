@@ -1,21 +1,59 @@
 module Skylab::TanMan
-  class Models::DotFile::Controller
+
+  module Models_::DotFile
+
+    class Controller__  # see [#009]
+
+      def initialize *a
+        @graph_sexp, @channel, @delegate, @kernel = a
+      end
+
+      attr_reader :graph_sexp
+
+      def at_graph_sexp i
+        @graph_sexp.send i
+      end
+
+      def unparse_entire_document
+        @graph_sexp.unparse
+      end
+
+      def insert_stmt_before_stmt new, least_greater_neighbor
+        insert_stmt new, least_greater_neighbor
+      end
+
+      def insert_stmt new, new_before_this=nil  # #note-20
+        g = @graph_sexp
+        prototype = -> do
+          p = -> do
+            x = g.class.parse :stmt_list, "xyzzy_1\nxyzzy_2"
+            p = -> { x } ; x
+          end
+          -> { p[] }
+        end.call
+        empty_stmt_list = -> do
+          prototype[].__dupe except: [ :stmt, :tail ]
+        end
+        if ! g.stmt_list
+          g.stmt_list = empty_stmt_list[]
+        end
+        if ! g.stmt_list._prototype && ! g.stmt_list._items_count_exceeds( 1 )
+          g.stmt_list._prototype = prototype[]
+        end
+        g.stmt_list._insert_item_before_item new, new_before_this
+      end
+
+      def channel_and_delegate
+        [ @channel, @delegate ]
+      end
+
+    if false
     include Core::SubClient::InstanceMethods
     include Models::DotFile::Parser::InstanceMethods
 
     def add_association *a
       if associations
         associations.add_association(* a)
-      end
-    end
-
-    def add_node node_ref, dry_run, force, verbose, error, success
-      if nodes
-        # not currently meaningful = `dry_run`, `verbose`
-        nodes.add node_ref,
-                   ! force, # `do_fuzzy` for now, the inverse of force
-                     error,
-                   success
       end
     end
 
@@ -49,43 +87,6 @@ module Skylab::TanMan
 
     def graph_noun
       "#{ escape_path pathname }"
-    end
-
-                                  # leveraging the new 'meh' precept [#071]
-                                  # we do a fantastic hack in the case that
-                                  # we don't have either a stmt_list, and/or
-                                  # a prototype for the stmt_list - we add
-                                  # one here, with spacing decided here
-                                  # because meh! who really cares?
-
-    def insert_stmt new, new_before_this
-      o = self.sexp
-      proto = nil                 # a prototype is created here at most
-      prototype = -> do           # once per root stmt_list (presumably),
-        proto ||= begin           # but used in 2 ways
-          p = o.class.parse :stmt_list, "xyzzy_1\nxyzzy_2"
-          p
-        end
-      end
-      empty_stmt_list = -> do     # this is one of two ways we use the prototype
-        p = prototype[]
-        sl = p.__dupe except: [:stmt, :tail]
-        sl
-      end
-      if ! o.stmt_list
-        o.stmt_list = empty_stmt_list[]
-      end
-      if ! o.stmt_list._prototype && ! o.stmt_list._items_count_exceeds( 1 )
-        o.stmt_list._prototype = prototype[]
-      end
-      # sexp[:stmt_list] = sl_empty
-      o.stmt_list._insert_before! new, new_before_this
-    end
-
-    def list_nodes verbose, payload
-      if nodes
-        nodes.list verbose, payload
-      end
     end
 
     def meanings
@@ -187,7 +188,60 @@ module Skylab::TanMan
     def full_dotfile_pathname_for_subclient
       @pathname
     end
-  public
+    end
+
+      def maybe_persist
+        action = @delegate  # #todo
+        o = Persist_Adapters__.map_detect do |cls|
+          cls.match action
+        end
+        if o
+          o.init @channel, @delegate, @kernel
+          o.receive_rewritten_datastore_controller self
+        else
+          ACHEIVED_
+        end
+      end
+
+      module Persist_Adapters__
+        define_singleton_method :map_detect, -> do
+          p = -> &q do
+            _CLS_A_ = constants.map { |i| const_get i, false }
+            p = -> &q_ do
+              Callback_.scan.nonsparse_array( _CLS_A_ ).map_detect( & q_ )
+            end
+            p[ &q ]
+          end
+          -> &q { p[ &q ] }
+        end.call
+      end
+
+      module Persist_Adapters__
+
+        class String
+
+          def self.match o
+            s = o.any_action_property_value :output_string
+            s and new s
+          end
+
+          def initialize output_string
+            @output_string = output_string
+          end
+
+          def init * a
+            @channel, @delegate, @kernel = a ; nil
+          end
+
+          def receive_rewritten_datastore_controller o
+            @output_string.replace o.graph_sexp.unparse
+            ACHEIVED_
+          end
+        end
+      end
+
+    if false
+    public
 
 
     nl_rx = /\n/ # meh
@@ -230,13 +284,6 @@ module Skylab::TanMan
 
   private
 
-    def initialize request_client, dotfile_pathname
-      super request_client
-      @associations = nil
-      @nodes = nil
-      @pathname = dotfile_pathname
-    end
-
     def associations
       @associations ||= begin                  # #sexp-release
         if sexp = self.sexp
@@ -244,16 +291,6 @@ module Skylab::TanMan
         end
       end
     end
-
-    def nodes
-      @nodes ||= begin                         # #sexp-release
-        if sexp = self.sexp
-          Models::Node::Collection.new self, sexp
-        end
-      end
-    end
-
-    public :nodes # experimentally expose this (meaning cont)
 
     def write_commit string, dry_run, verbose
       res = nil
@@ -295,6 +332,9 @@ module Skylab::TanMan
         bytes
       end while nil
       res
+    end
+    end
+
     end
   end
 end

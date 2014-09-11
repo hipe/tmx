@@ -69,7 +69,17 @@ module Skylab::Callback
               x
             end
           end
+
+          def the_empty_scan
+            @tes ||= new do end
+          end
         end  # >>
+
+        def count
+          d = 0
+          d +=1 while gets
+          d
+        end
 
         def concat_by scn
           active = self
@@ -92,8 +102,19 @@ module Skylab::Callback
           x
         end
 
+        def map_detect & p
+          while x = gets
+            x_ = p[ x ] and break
+          end
+          x_
+        end
+
         def expand_by & p
           self.class.expand self, p
+        end
+
+        def map & p
+          to_enum.map( & p )
         end
 
         def map_reduce_by & p

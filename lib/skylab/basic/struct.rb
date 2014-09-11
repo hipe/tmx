@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  module Struct
+  module Struct  # [#030].
 
     # use it
     # like this

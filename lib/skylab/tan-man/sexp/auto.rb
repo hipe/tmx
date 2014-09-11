@@ -42,8 +42,8 @@ module Skylab::TanMan
         TanMan_::Lib_::Constantize[ tree_class.rule ] ]
 
       im = a.reduce tree_class.grammar.anchor_module do |m, i|
-        _ok = m.const_defined? i, false
-        _ok or break  # one end of [#078]
+        _ok = m.const_defined? i, false  # one end of [#078]
+        _ok or break
         m.const_get i, false
       end
       if im
@@ -329,7 +329,7 @@ module Skylab::TanMan
       @content_text_value
     end
 
-    def normalized_string! string
+    def set_normalized_string string
       fail 'implement me' # as [#053]
     end
 

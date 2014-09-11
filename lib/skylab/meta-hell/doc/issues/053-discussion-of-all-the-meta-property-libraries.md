@@ -1,20 +1,35 @@
 # discussion of all the meta-property libraries :[#053]
 
-(EDIT: we refer to these variously as "field libraries" or
-:#parameter-library'ies. portions of this
-document have been re-formatted so that the most recent items are at the top
-(that is, reverse-chronological order); an order it is recommened we follow
-for future such documents.)
+## introduction
+
+this is the world of :#parameter-library's, "field libraries", actors
+and entites.
+
+
+## a cursory overview
 
 first, a quick history (most recent at top):
 
-  |  Name                                    |  Identifier |  Approx. Start  |
-  |  the [gv] isomorphic interface parameter |  [#gv-030]  |  2014-01-20     |
-  |  the [hl] API parameter library          |  [#hl-130]  |  2013-12-19     |
-  |  the [ta] "config shell" (working title) |  [#tm-081]  |  2013-10-11     |
-  |  the [ba] field                          |  [#ba-003]  |  2013-04-11     |
-  |  the [hl] parameter                      |  [#hl-009]  |  2012-08-29     |
-  |  the [mh] formal attributes              |  [#024]     |  2011-09-11     |
+    [#cb-042] actors                                          2014-08-00
+
+    [#br-001] the entity library                              2014-07-22
+
+    [#gv-030] the isomorphic interace parameter               2014-01-20
+
+    [#hl-130] the API parameter library                       2013-12-19
+
+    [#tm-081] the "config shell" (working title) (lost)       2013-10-11
+
+    [#ba-030] the basic struct                                2013-07-21
+
+    [#mh-061] basic fields                                    2013-07-05
+
+    [#ba-003] the basic field                                 2013-04-11
+
+    [#hl-009] the headless parameter                          2012-08-29
+
+    [#mh-024] the metahell formal attributes                  2011-09-11
+
 
 annotation (most recent at top, start at bottom for a narrative):
   • [gv]'s is a clean rewrite of the below meant to be rbx-compatible

@@ -52,7 +52,7 @@ module Skylab::TanMan
 
       module Action_Methods__
 
-        def initialize client, x_a=MetaHell::EMPTY_A_
+        def initialize client, x_a=EMPTY_A_
           super()
           @client = client
           self[ x_a.shift ] = x_a.shift while x_a.length.nonzero?

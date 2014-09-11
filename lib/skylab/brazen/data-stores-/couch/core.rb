@@ -163,8 +163,8 @@ module Skylab::Brazen
         @cache_h.delete i
       end
 
-      def build_collection_controller * five
-        Couch_::Collection_Controller__.new five
+      def build_collection_controller * x_a
+        Couch_::Collection_Controller__.new x_a
       end
     end
 

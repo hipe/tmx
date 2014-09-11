@@ -2,28 +2,84 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::Models::Node
 
-  describe "[tm] TanMan_::Models::Node adding", wip: true do
+  describe "[tm] models node add" do
 
     extend TS_
 
+    it "ping the 'node add' action" do
+      call_API :node, :add, :ping
+      expect :succeeded, :ping_from_action, "ping from action - add"
+      expect_succeeded
+    end
+
+    it "add a minimal node to the minimal string" do
+      s = 'digraph{}'
+      add_name_to_string 'bae', s
+      expect :succeeded, :created, "created node 'bae'"
+      s.should eql 'digraph{bae [label=bae]}'
+      expect_succeeded
+    end
+
+    it "add one before" do
+      s = "digraph{ foo [label=foo]\n}"
+      add_name_to_string 'bar', s
+      expect :succeeded, :created, "created node 'bar'"
+      s.should eql "digraph{ bar [label=bar]\nfoo [label=foo]\n}"
+      expect_succeeded
+    end
+
+    it "add one after" do
+      s = "digraph{\n bar}"
+      add_name_to_string 'foo', s
+      expect :succeeded, :created, "created node 'foo'"
+      s.should eql "digraph{\n bar\nfoo [label=foo]}"
+      expect_succeeded
+    end
+
+    it "add one same - fails with event about node with same name" do
+      s = " digraph { zoz } "
+      add_name_to_string 'zoz', s
+      expect :failed, :exists, "node already existed: 'zoz'"
+      expect_failed
+    end
+
+    it "add one in between" do
+      s = " digraph { apple ; zoz ; } "
+      add_name_to_string 'menengitis', s
+      expect :succeeded, :created do |ev|
+        a = ev.tag_names
+        a.should be_include :ok
+        a.should be_include :node_stmt
+        ev.node_stmt.label.should eql 'menengitis'
+      end
+      s.should eql " digraph { apple ; menengitis [label=menengitis] ; zoz ; } "
+      expect_succeeded
+    end
+
+    def add_name_to_string name_s, s
+      call_API :node, :add, :name, name_s, :input_string, s, :output_string, s
+    end
+
     using_input 'simple-prototype-and-graph-with/zero.dot' do
+
       it 'adds a node to zero nodes' do
-        result.nodes.should eql( [] )
-        controller.node! 'feep'
-        a = result.nodes
-        a.length.should eql( 1 )
-        result.stmt_list.unparse.should eql( "feep [label=feep]\n" )
+        get_node_array.should eql TanMan_::EMPTY_A_
+        touch_node_via_label 'feep'
+        a = get_node_array
+        a.length.should eql 1
+        stmt_list.unparse.should eql "feep [label=feep]\n"
       end
 
       it "creates unique but natural node_ids" do
-        controller.node! 'milk the cow'
-        controller.node! 'milk the cat'
-        controller.node! 'MiLk the catfish'
-        result.nodes.map(& :node_id).should eql( [ :milk_3, :milk_2, :milk ] )
-        a = result.nodes.map(& :label)
-        a.shift.should eql( 'MiLk the catfish' )
-        a.shift.should eql( 'milk the cat' )
-        a.shift.should eql( 'milk the cow' )
+        touch_node_via_label 'milk the cow'
+        touch_node_via_label 'milk the cat'
+        touch_node_via_label 'MiLk the catfish'
+        get_node_scan.map( & :node_id ).
+          should eql [ :milk_3, :milk_2, :milk ]
+        a = get_node_scan.map( & :label )
+        a.shift.should eql 'MiLk the catfish'
+        a.shift.should eql 'milk the cat'
+        a.shift.should eql 'milk the cow'
       end
     end
 
@@ -33,19 +89,16 @@ module Skylab::TanMan::TestSupport::Models::Node
       -> do
         msg = <<-O.unindent.strip
           html-escaping support is currently very limited. #{
-          }the following characters are not yet supported: "\\t" (009), #{
+          }the following characters is not yet supported: "\\t" (009), #{
           }"\\n" (010), "\\u007F" (127)
         O
 
         it "when you try to use weird chars for labels - #{
           }\"#{ msg[ 0..96 ] }[..]\"" do
 
-          begin
-            controller.node! "\t\t\n\x7F"
-          rescue ::RuntimeError => e
-          end
-
-          e.message.should eql( msg )
+          touch_node_via_label "\t\t\n\x7F"
+          expect :failed, :invalid_characters, msg
+          expect_no_more_events
         end
       end.call
 
@@ -56,10 +109,10 @@ module Skylab::TanMan::TestSupport::Models::Node
         it "it will escape some chars - #{
           }this:(#{ input }) becomes : #{ output }" do
 
-          o = controller.node! input
+          o = touch_node_via_label input
           big_html_string = o.unparse
 
-          big_html_string.include?( output ).should eql(true)
+          big_html_string.should be_include output
         end
       end.call
     end

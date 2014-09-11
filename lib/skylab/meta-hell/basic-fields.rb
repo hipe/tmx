@@ -1,6 +1,6 @@
 module Skylab::MetaHell
 
-  module Basic_Fields
+  module Basic_Fields  # [#061].
 
     # the basic fields facility out of the box is a low-frills, low-level
     # means of defining "absorber" methods (frequently but not always

@@ -10,8 +10,8 @@ module Skylab::TanMan::TestSupport::Models::DotFile::Manipulating::Label
 
   module InstanceMethods
 
-    def input_fixtures_dir_pathname
-      TS_::Fixtures.dir_pathname
+    def module_with_subject_fixtures_node
+      TS_
     end
   end
 end

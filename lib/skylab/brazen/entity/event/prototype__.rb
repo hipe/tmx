@@ -7,17 +7,35 @@ module Skylab::Brazen
       class Prototype__ < self  # :[#023].
 
         class << self
-          def via_iambic_and_message_proc x_a, p
-            Build__[ x_a, p ]
+          def via_deflist_and_message_proc i_a, p
+            Build__[ i_a, p ]
           end
         end
 
         class Build__
 
-          Callback_::Actor[ self, :properties, :x_a, :message_proc ]
+          Callback_::Actor[ self, :properties, :deflist_a, :message_proc ]
 
           def execute
-            scn = Iambic_Scanner.new 0, @x_a
+            validate
+            work
+          end
+
+          def validate
+            len = @deflist_a.length
+            1 == len % 2 or raise ::ArgumentError, say_odd_number
+          end
+
+          def say_odd_number
+            "#{ @deflist_a.length } for odd number for deflist (#{ syntax_s })"
+          end
+
+          def syntax_s
+            "<term_chan> [, <name>, <val> [..]]"
+          end
+
+          def work
+            scn = Iambic_Scanner.new 0, @deflist_a
             cls = ::Class.new Prototype__
             _MESSAGE_PROC_ = @message_proc
             cls.class_exec do
@@ -49,9 +67,17 @@ module Skylab::Brazen
         end
 
         class << self
+
           def [] * x_a
             construct do
-              init_via_value_x_a x_a
+              init_via_value_list x_a
+              freeze
+            end
+          end
+
+          def with * x_a
+            construct do
+              init_via_even_iambic x_a
               freeze
             end
           end
@@ -62,7 +88,7 @@ module Skylab::Brazen
 
       private
 
-        def init_via_value_x_a x_a
+        def init_via_value_list x_a
           bx = reflection_box
           x_a.length.times do |d|
             instance_variable_set bx.at_position( d ).name_as_ivar, x_a.fetch( d )
@@ -70,8 +96,21 @@ module Skylab::Brazen
           x_a.length.upto( bx.length - 1 ) do |d|
             prop = bx.at_position d
             instance_variable_set prop.name_as_ivar, prop.default_value
-          end ; nil
-          # caller will probably freeze
+          end ; nil  # caller should freeze
+        end
+
+        def init_via_even_iambic x_a
+          seen_h = {}
+          bx = reflection_box
+          x_a.each_slice 2 do |i, x|
+            prop = bx.fetch i
+            seen_h[ i ] = true
+            instance_variable_set prop.name_as_ivar, x
+          end
+          bx.each_value do |prop|
+            seen_h[ prop.name_i ] and next
+            instance_variable_set prop.name_as_ivar, prop.default_value
+          end ; nil  # caller should freeze
         end
 
       protected

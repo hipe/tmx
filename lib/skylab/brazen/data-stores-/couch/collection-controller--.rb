@@ -6,11 +6,19 @@ module Skylab::Brazen
 
       # frontier class. will be abstracted later
 
-      def initialize five
-        @datastore_i, @channel, @delegate, @model_class, @kernel = five
+      def initialize x_a
+        a = []
+        x_a.each_slice 2 do |i, x|
+          a[ ST__[ i ] ] = x
+        end
+        @datastore_i, @channel, @delegate, @model_class, @kernel = a
         @did_resolve_connection = false
         @did_add_view_document = false
       end
+
+      ST__ = ::Struct.new(
+        :datastore_i, :channel, :delegate, :model_class, :kernel ).
+          new( * 5.times.to_a )
 
       def to_property_hash_scan
         require_connection

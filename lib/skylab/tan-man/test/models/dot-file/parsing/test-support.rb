@@ -21,7 +21,7 @@ end
 
 module Skylab::TanMan::TestSupport::Models::DotFile::Parsing
 
-  Skylab::TanMan::TestSupport::Models::DotFile[ Parsing_TestSupport = self ]
+  Skylab::TanMan::TestSupport::Models::DotFile[ TS_ = self ]
 
   def self.extended mod
     regret_extended_notify mod
@@ -38,8 +38,8 @@ module Skylab::TanMan::TestSupport::Models::DotFile::Parsing
 
   module InstanceMethods
 
-    def input_fixtures_dir_pathname
-      Parsing_TestSupport::Fixtures.dir_pathname
+    def module_with_subject_fixtures_node
+      TS_
     end
   end
 end

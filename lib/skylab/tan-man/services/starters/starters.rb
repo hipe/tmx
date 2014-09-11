@@ -50,7 +50,7 @@ module ::Skylab::TanMan
         d = -1 ; last = (( cx = box_module_dir_pathname.children )).length - 1
         (( p = -> do
           if last == d
-            p = MetaHell::EMPTY_P_
+            p = EMPTY_P_
             nil
           else
             fly.set cx[ d += 1 ]

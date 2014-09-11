@@ -2,6 +2,12 @@ module Skylab::TanMan
 
   class Models_::Meaning
 
+    class << self
+      def collections_controller_class
+        Brazen_.model.collections_controller
+      end
+    end
+
     Brazen_::Model_::Entity[ self, -> do
 
       o :persist_to, :meaning,

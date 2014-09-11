@@ -30,9 +30,5 @@ module Skylab::TanMan::TestSupport::API
       expect_no_more_events
       @result.should eql :hello_from_tan_man
     end
-
-    def subject
-      TanMan_::API
-    end
   end
 end

@@ -61,7 +61,8 @@ module Skylab::Callback
     end
 
     def initialize
-      @universal_receiver_method_name = nil
+      @do_use_subscription_channel_name = false
+      @channel_i = nil
       @is_h = {} ; @p_h = {}
     end
 
@@ -69,12 +70,11 @@ module Skylab::Callback
       @delegate = x ; nil
     end
 
-    def on_channel i
-      @universal_receiver_method_name = :"receive_#{ i }" ; nil
+    def use_channel_name_in_receiver_method_name i
+      @channel_i = i
     end
 
     def subscribe_all
-
       scan = chan_scan
       while chan = scan.gets
         @is_h[ chan.name_i ] = true
@@ -86,6 +86,10 @@ module Skylab::Callback
       while chan = scan.gets
         @is_h.delete chan.name_i
       end ; nil
+    end
+
+    def use_subscription_channel_name_in_receiver_method_name
+      @do_use_subscription_channel_name = true ; nil
     end
 
   private
@@ -116,10 +120,22 @@ module Skylab::Callback
     def send_event_on_chan ev, chan
       if p = @p_h[ chan.name_i ]
         p[ ev ]
-      elsif @universal_receiver_method_name
-        @delegate.send @universal_receiver_method_name, ev
       else
-        @delegate.receive_event ev
+        a = [ :receive ]
+        if @channel_i
+          a.push @channel_i
+        end
+        if @do_use_subscription_channel_name
+          a.push chan.name_i
+        else
+          a.push :event
+        end
+        m_i = a * UNDERSCORE_
+        if @delegate.respond_to? m_i
+          @delegate.send m_i, ev
+        else
+          @delegate.receive_event ev
+        end
       end
     end
 

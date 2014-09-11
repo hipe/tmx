@@ -13,6 +13,11 @@ module Skylab::Brazen
           @did_rslv_cc = false
         end
 
+        def persist_entity entity
+          produce_collection_controller
+          @cc.persist_entity entity
+        end
+
         def produce_collection_controller
           @did_rslv_cc or rslv_cc
           @cc
@@ -53,9 +58,11 @@ module Skylab::Brazen
         end
 
         def via_datastore_collections_resolve_collection_controller
-          @cc = @datastore_collections.build_collection_controller(
-            @datastore_i, :the_collection, @delegate, @model_class, @kernel )
-          ACHEIVED_
+          @cc = @datastore_collections.build_collection_controller_with(
+            :datastore_i, @datastore_i,
+            :channel, :the_collection, :delegate, @delegate,
+            :model_class, @model_class )
+          @cc ? ACHEIVED_ : UNABLE_
         end
 
         def send_error_with * x_a, & p

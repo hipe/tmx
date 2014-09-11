@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  module Entity
+  module Entity  # [#001]
 
     class << self
 

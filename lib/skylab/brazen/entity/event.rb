@@ -14,8 +14,12 @@ module Skylab::Brazen
           end
         end
 
-        def prototype_via_iambic_and_message_proc x_a, p
-          Event::Prototype__.via_iambic_and_message_proc x_a, p
+        def prototype_with * i_a, & p
+          prototype_via_deflist_and_message_proc i_a, p
+        end
+
+        def prototype_via_deflist_and_message_proc i_a, p
+          Event::Prototype__.via_deflist_and_message_proc i_a, p
         end
 
         def wrap_universal_exception e
@@ -252,8 +256,8 @@ module Skylab::Brazen
           Inferred_Message.to_proc
         end
 
-        def build_event_prototype_with * x_a, & p
-          Event.prototype_via_iambic_and_message_proc x_a, p
+        def build_event_prototype_with * deflist, & p
+          Event.prototype_via_deflist_and_message_proc deflist, p
         end
 
         def event_class

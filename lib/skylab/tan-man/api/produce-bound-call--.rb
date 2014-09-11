@@ -22,9 +22,13 @@ module Skylab::TanMan
     private
 
       def prepare_ivars
-        @d = 0 ; @x_a_length = @x_a.length
         @delegate_x = nil
         @p and @p[ self ]
+        if :delegate == @x_a[ -2 ]
+          @delegate_x = @x_a.pop
+          @x_a[ -1, 1 ] = EMPTY_A_
+        end
+        @d = 0 ; @x_a_length = @x_a.length
         nil
       end
 

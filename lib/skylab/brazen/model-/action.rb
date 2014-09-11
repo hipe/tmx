@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Model_
 
-  class Action
+  class Action  # see [#024]
 
     class << self
 
@@ -58,15 +58,24 @@ module Skylab::Brazen
     def produce_bound_call_via_iambic_and_delegate x_a, adapter
       @client_adapter = adapter
       @error_count = 0
-      r = process_iambic_fully x_a
+      cb = produce_any_bound_call_while_processing_iambic x_a
+      cb || via_properties_produce_any_bound_call
+    end
+
+    def produce_any_bound_call_while_processing_iambic x_a  # #note-70
+      process_iambic_fully x_a
+      CONTINUE_
+    end
+
+    def via_properties_produce_any_bound_call
       if @error_count.zero?
-        r = nil
         notificate :iambic_normalize_and_validate
       end
       if @error_count.zero?
-        r = Brazen_.bound_call self, :produce_any_result
+        Brazen_.bound_call self, :produce_any_result
+      else
+        UNABLE_
       end
-      r
     end
 
     def receive_missing_required_properties ev
@@ -121,7 +130,7 @@ module Skylab::Brazen
 
     def expect_workspace_exists
       _path = Brazen_::CLI::Property__.new :path, :argument_arity, :one
-      Brazen_::Models_::Workspace.new( @kernel ).status(
+      Brazen_::Models_::Workspace.new( @kernel ).produce_any_result_for_status(
         [ :client, :_FOO_, :delegate, self,
         :channel, :workspace_expectation,
         :max_num_dirs, 1, :path, '.', :verbose, true, :prop, _path ] )

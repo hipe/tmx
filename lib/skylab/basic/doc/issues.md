@@ -1,3 +1,4 @@
+[#030]       #code-node the basic struct
 [#029]       #doc-node the string node
 [#028]       #parent-node: [#029] the string template narrative ..
 [#027] #open aggregated articulation refactor

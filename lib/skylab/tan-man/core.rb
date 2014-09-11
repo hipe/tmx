@@ -11,6 +11,8 @@ module Skylab::TanMan
   Autoloader_[ self ]
 
   ACHEIVED_ = true
+  EMPTY_A_ = [].freeze
+  EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
   stowaway :Entity_, 'models-'
   stowaway :Kernel_, 'models-'

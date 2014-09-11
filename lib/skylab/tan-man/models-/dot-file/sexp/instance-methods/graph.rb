@@ -25,7 +25,9 @@ module Skylab::TanMan
     end
 
     def _edge_stmts
-      _stmt_enumerator { |stmt| :edge_stmt == stmt.class.rule }
+      _get_stmt_scan.reduce_by do |stmt|
+        :edge_stmt == stmt.class.rule
+      end
     end
 
     def _first_label_stmt
@@ -39,19 +41,7 @@ module Skylab::TanMan
       equals_stmt.rhs.normalized_string if equals_stmt
     end
 
-    def node_with_id id
-      _node_stmts.detect { |n| id == n.node_id }
-    end
-
-    def _node_stmts
-      _stmt_enumerator { |stmt| :node_stmt == stmt.class.rule }
-    end
-
-    def nodes
-      _node_stmts.to_a
-    end
-
-    def set_label! str
+    def set_label str
       equals_stmt = _first_label_stmt
       equals_stmt ||= begin
         proto = stmt_list._named_prototypes[:label]
@@ -61,9 +51,36 @@ module Skylab::TanMan
       end
       equals_stmt.rhs = str
       if created
-        stmt_list._insert_before! equals_stmt, _node_stmts.first
+        stmt_list._insert_item_before_item equals_stmt, node_statements.first
       else
         equals_stmt
+      end
+    end
+
+    def node_with_id id
+      nodes.detect do |stmt|
+        id == stmt.node_id
+      end
+    end
+
+    def nodes
+      node_statements.map_by do |stmt_list|
+        stmt_list.stmt
+      end
+    end
+
+    def node_statements
+      get_stmt_scan.reduce_by do |stmt_list|
+        :node_stmt == stmt_list.stmt.class.rule
+      end
+    end
+
+    def get_stmt_scan
+      sl = stmt_list
+      if sl
+        sl.to_scan
+      else
+        Callback_.scan.the_empty_scan
       end
     end
 

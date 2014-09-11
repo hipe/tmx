@@ -1,45 +1,96 @@
 module Skylab::TanMan
 
-  class Services::Tree
+  module Models_::DotFile
 
-    def initialize
-      @cache = { }
-    end
+    class Collections__
 
-    # experimentally holds parse trees in memory for different controllers
-    # to use! #experimental
-    # (thread safety is a boggling thought.)
+      def initialize k
+        @kernel = k
+      end
 
-    def clear_tree_service
-      @cache.clear
-      nil
-    end
+      def resolve_datastore_controller_via_entity entity, * x_a
+        x_a.push :entity, entity
+        Build_document_controller_via_entity__.execute_via_iambic x_a
+      end
 
-    def fetch normalized_pathname, &block
-      @cache.fetch normalized_pathname.to_s do |k|
-        if ! block
-          raise ::KeyError.exception "key not found #{ k.inspect }"
+      def resolve_datastore_controller_with * x_a
+        x_a.push :kernel, @kernel
+        Build_document_controller_with__.execute_via_iambic x_a
+      end
+
+      class Build_document_controller_with__
+
+        Callback_::Actor[ self, :properties,
+          :input_string, :output_string,
+          :input_pathname, :output_pathname,
+          :parsing_event_subscription,
+          :channel, :delegate, :kernel ]
+
+        def initialize
+          @input_string = @output_string = @output_pathname = nil
+          @parsing_event_subscription = nil
+          super
         end
-        block[ k, self ]
+
+        def execute
+          ok = via_input_resolve_graph_sexp
+          ok and via_graph_sexp_produce_document_controller
+        end
+
+        def via_input_resolve_graph_sexp
+          @subscribe = build_subscribe_proc
+          if @input_string
+            via_input_string_resolve_graph_sexp
+          else
+            via_input_pathname_resolve_graph_sexp
+          end
+        end
+
+        def build_subscribe_proc
+          -> o do
+            o.subscribe_all
+            o.use_subscription_channel_name_in_receiver_method_name
+            o.use_channel_name_in_receiver_method_name @channel
+            o.delegate_to @delegate
+            if @parsing_event_subscription
+              @parsing_event_subscription[ o ]
+            end ; nil
+          end
+        end
+
+        def via_input_pathname_resolve_graph_sexp
+          @graph_sexp = DotFile_.produce_document_via_parse do |parse|
+            parse.via_input_pathname @input_pathname
+            parse.subscribe( & @subscribe )
+          end
+          @graph_sexp && ACHEIVED_
+        end
+
+        def via_input_string_resolve_graph_sexp
+          @graph_sexp = DotFile_.produce_document_via_parse do |parse|
+            parse.via_input_string @input_string
+            parse.subscribe( & @subscribe )
+          end
+          @graph_sexp && ACHEIVED_
+        end
+
+        def via_graph_sexp_produce_document_controller
+          DotFile_::Controller__.new @graph_sexp, @channel, @delegate, @kernel
+        end
+      end
+
+      class Build_document_controller_via_entity__ < Build_document_controller_with__
+
+        Callback_::Actor[ self, :properties, :entity ]
+
+        def execute
+          @channel, @delegate, @kernel = @entity.channel_delegate_kernel
+          @input_string = @entity.any_action_property_value :input_string
+          @input_pathname = @entity.any_action_property_value :input_pathname
+          @entity = nil
+          super
+        end
       end
     end
-
-    def has? normalized_pathname
-      @cache.key? normalized_pathname.to_s
-    end
-
-    def remove normalized_pathname
-      has?( normalized_pathname ) or fail "didn't have #{ normalized_pathname }"
-      @cache.delete normalized_pathname.to_s
-    end
-
-    def set! normalized_pathname, value
-      k = normalized_pathname.to_s
-      @cache.key?(k) and raise ::KeyError.new("won't clobber existing : #{ k }")
-      @cache[k] = value
-      nil
-    end
-
-    # (nothing is private)
   end
 end

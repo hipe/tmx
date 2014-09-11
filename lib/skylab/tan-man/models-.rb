@@ -21,6 +21,27 @@ module Skylab::TanMan
 
     define_singleton_method :desc, DESC_METHOD_
 
+    class << self
+
+      def for_edit i, x, k, & p
+        o = new( k ) do
+          @channel = i ; @delegate = x
+        end
+        if p
+          o.edit( & p )
+        end
+        o
+      end
+    end
+
+    def edit & p
+      d = @error_count ||= 0
+      p[ self ]
+      notificate :iambic_normalize_and_validate
+      d == @error_count
+    end
+
+    attr_reader :error_count
   end
 
 
@@ -74,6 +95,17 @@ module Skylab::TanMan
           @error_count += 1
         end
         @client_adapter.receive_event ev
+      end
+
+    public
+
+      def receive_event ev
+        i = :"receive_#{ ev.terminal_channel_i }_event"
+        if respond_to? i
+          send i, ev
+        else
+          @client_adapter.receive_event ev
+        end
       end
 
       self
@@ -171,6 +203,25 @@ module Skylab::TanMan
 
     desc "there's a lot you can tell about a man from his choice of words"
 
+    end
+  end
+
+  class Models_::Node < Model_::Document_Entity
+
+    desc do |y|
+      y << "x."
+    end
+
+    class << self
+      def get_unbound_upper_action_scan
+        Callback_.scan.nonsparse_array [ self ]
+      end
+
+      alias_method :orig_gulas, :get_unbound_lower_action_scan
+      def get_unbound_lower_action_scan
+        self.const_get :Actions, false
+        get_unbound_lower_action_scan
+      end
     end
   end
 

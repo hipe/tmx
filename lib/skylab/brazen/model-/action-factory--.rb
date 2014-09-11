@@ -270,6 +270,10 @@ module Skylab::Brazen
           receive_success_event ev
         end
 
+        def receive_model_event ev
+          receive_event ev
+        end
+
       private
         def produce_any_result_when_edited_OK
           @ent.produce_any_persist_result

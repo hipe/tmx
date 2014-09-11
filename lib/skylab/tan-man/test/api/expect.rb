@@ -14,9 +14,8 @@ module Skylab::TanMan::TestSupport
       module Test_Context_Methods__
 
         def call_API * x_a
-          @result = subject.call( * x_a ) do |invocation|
-            invocation.set_delegate delegate
-          end
+          x_a.push :delegate, delegate
+          @result = subject_API.call( * x_a ) ; nil
         end
 
         def delegate
@@ -68,8 +67,6 @@ module Skylab::TanMan::TestSupport
           "(tm)"
         end
 
-      private
-
         def express_event ev
           @ev = ev ; @ev_ = ev.to_event
           @ok_s = ok_s ; @tci = ev.terminal_channel_i
@@ -80,6 +77,8 @@ module Skylab::TanMan::TestSupport
           ev.render_all_lines_into_under y, TanMan_::API::EXPRESSION_AGENT__
           nil
         end
+
+      private
 
         def ok_s
           ev_ = @ev.to_event
@@ -102,7 +101,7 @@ module Skylab::TanMan::TestSupport
           @result.should eql false
         end
 
-        def expect_succeded
+        def expect_succeeded
           expect_no_more_events
           @result.should eql true
         end
@@ -110,7 +109,7 @@ module Skylab::TanMan::TestSupport
         def expect_no_more_events
           ev = delegate.gets
           if ev
-            @context.send :fail, "expected no more events, had #{ ev.terminal_channel_i }"
+            fail "expected no more events, had #{ ev.terminal_channel_i }"
           end ; nil
         end
       end
@@ -170,7 +169,7 @@ module Skylab::TanMan::TestSupport
         end
 
         def when_no_tag
-          send_failure "did not have 'ok' tag"
+          send_failure "did not have 'ok' tag: '#{ @ev_.terminal_channel_i }'"
         end
 
         def expect_OK_value_for_neutral

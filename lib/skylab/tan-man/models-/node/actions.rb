@@ -1,6 +1,105 @@
 module Skylab::TanMan
-  module API::Actions::Graph::Node
+
+  class Models_::Node
+
+    class << self
+
+      def collections_controller_class
+        Node_::Collections_Controller__
+      end
+    end
+
+    Brazen_::Model_::Entity[ self, -> do
+
+      o :persist_to, :node,
+
+        :required,
+        :ad_hoc_normalizer, -> * a do
+          Node_::Controller__::Normalize_name[ self, a ]
+        end,
+        :property, :name
+
+    end ]
+
+    class << self
+
+      remove_method :get_unbound_lower_action_scan
+
+      alias_method :get_unbound_lower_action_scan, :orig_gulas
+
+    end
+
+    public :with
+
+    O__ = Action_Factory.create_with self, Action_, Entity_
+
+    module Actions
+
+      Add = O__.make :Add
+
+      class Add
+
+        Model_::Entity[ self, -> do
+          o :required, :property, :input_string,
+            :required, :property, :output_string,
+
+            :flag, :property, :ping
+
+        end ]
+
+        def produce_any_result
+          produce_any_result_when_dependencies_are_met
+        end
+
+        attr_reader :ping
+
+      private
+
+        def produce_any_bound_call_while_processing_iambic x_a
+          x = super
+          x or ping && do_ping
+        end
+
+        def do_ping
+          _ev = build_success_event_with :ping_from_action, :name_i,
+             name.as_lowercase_with_underscores_symbol
+          x = send_event _ev  # see #very-interesting
+          Brazen_.bound_call -> { x }, :call
+        end
+
+      public
+
+        def receive_model_parser_loading_info_event ev
+          # receive_event ev  #dbg
+        end
+      end
+
+      Ls = O__.make :List
+
+      class Ls
+
+        Model_::Entity[ self, -> do
+          o :required, :property, :input_string
+        end ]
+
+        def produce_any_result
+          produce_any_result_when_dependencies_are_met
+        end
+      end
+
+      Rm = O__.make :Remove
+
+    end
+
+    class Collections_Controller__ < Model_::Document_Entity::Collections_Controller
+
+    end
+
+    Node_ = self
+    STOP_ = false
   end
+
+  if false
 
   class API::Actions::Graph::Node::Add < API::Action
     extend API::Action::Parameter_Adapter
@@ -82,5 +181,6 @@ module Skylab::TanMan
       end while nil
       res
     end
+  end
   end
 end
