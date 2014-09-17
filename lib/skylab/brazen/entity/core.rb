@@ -8,6 +8,10 @@ module Skylab::Brazen
         via_argument_list a
       end
 
+      def iambic_scanner
+        Iambic_Scanner
+      end
+
       def proprietor_methods
         Proprietor_Methods__
       end

@@ -1,6 +1,6 @@
 require_relative '../test-support'
 
-module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable_Sections
+module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable
 
   ::Skylab::Brazen::TestSupport::Data_Stores_::Git_Config[ TS_ = self ]
 
@@ -39,7 +39,7 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable_Sections
         document_p = -> { doc } ; doc
       end
       define_method :__build_document__ do
-        document_p[].dup
+        document_p[].dup_via_parse_context parse_context
       end ; nil
     end
   end
@@ -58,6 +58,25 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable_Sections
 
     def super_subject
       Brazen_::Data_Stores_::Git_Config
+    end
+
+    def parse_context
+      @parse_context ||= bld_parse_context
+    end
+
+    def bld_parse_context
+      @ev_a = nil
+      Subject__[]::Pass_Thru_Parse__.with :receive_events_via_proc, -> ev do
+        if do_debug
+          debug_IO.puts ev.description
+        end
+        ( @ev_a ||= [] ).push ev
+        nil
+      end
+    end
+
+    def touch_section a, b=nil
+      document.sections.touch_section a, b
     end
 
     # ~ expectations

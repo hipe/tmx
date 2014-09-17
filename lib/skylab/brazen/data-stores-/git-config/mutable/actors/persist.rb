@@ -4,40 +4,50 @@ module Skylab::Brazen
 
     module Mutable
 
-      Actors__ = ::Module.new
-
-      class Actors__::Persist
+      class Actors::Persist
 
         Actor_[ self, :properties,
-          :pn, :document, :delegate, :x_a, :is_dry, :channel ]
+          :is_dry,
+          :pathname,
+          :document,
+          :event_receiver ]
 
-        Entity_[]::Event::Merciless_Prefixing_Sender[ self ]
+        def did_see i
+          instance_variable_defined? ivar_box.fetch i
+        end
 
-        def initialize
-          super
-          process_iambic_fully @x_a
-          @x_a = nil
+        def set_pathname pn
+          @pathname = pn ; nil
         end
 
         def execute
-          verb_i = @pn.exist? ? :update : :create
+          init_ivars
+          work
+        end
+
+      private
+
+        def init_ivars
+          @verb_i = @pathname.exist? ? :update : :create
+        end
+
+        def work
           scn = @document.get_line_scanner ; d = 0
           with_IO_opened_for_writing do |io|
-            while (( line = scn.gets ))
+            while line = scn.gets
               d += io.write line
             end
           end
-          send_wrote_file_event d, verb_i
+          send_wrote_file_event d
         end
 
-        def send_wrote_file_event d, verb_i
-          send_event_with( :wrote_file,
+        def send_wrote_file_event d
+          send_OK_event_with( :datastore_resource_commited_changes,
             :bytes, d,
             :is_completion, true,
             :is_dry, @is_dry,
-            :ok, true,
-            :pn, @pn,
-            :verb_i, verb_i
+            :pn, @pathname,
+            :verb_i, @verb_i
           ) do |y, o|
             dry_ = ( "dry " if o.is_dry )
             y << "#{ o.verb_i }d #{ pth o.pn } (#{ o.bytes } #{ dry_ }bytes)"
@@ -48,12 +58,14 @@ module Skylab::Brazen
           if @is_dry
             p[ Brazen_::Lib_::IO[]::DRY_STUB ]
           else
-            ::File.open @pn.to_path, 'w', & p  # WRITEMODE_
+            ::File.open @pathname.to_path, 'w', & p  # WRITEMODE_
           end
         end
 
-        def delegate
-          @delegate
+        def send_OK_event_with * x_a, & p  # #todo
+          x_a.push :ok, true
+          _ev = Entity_[]::Event.inline_via_iambic_and_message_proc x_a, p
+          @event_receiver.receive_event _ev
         end
       end
     end

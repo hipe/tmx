@@ -71,4 +71,14 @@ module Skylab::Brazen
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
 
+  class Via_Proc_Event_Receiver_  # #todo this is from the future
+
+    def initialize p
+      @p = p
+    end
+
+    def receive_event ev
+      @p[ ev ]
+    end
+  end
 end

@@ -4,106 +4,104 @@ module Skylab::Brazen
 
     class << self
 
-      def build_collections kernel
-        Collections__.new kernel
-      end
-
       def parse_path path_s, & p
-        Parse_Context_.new( p ).
-          with_input( Path_Input_Adapter_, path_s ).parse
+        Parse_[ :via_path, path_s, :receive_events_via_proc, p ]
       end
 
       def parse_string str, & p
-        Parse_Context_.new( p ).
-          with_input( String_Input_Adapter_, str ).parse
+        Parse_[ :via_string, str, :receive_events_via_proc, p ]
       end
     end
 
-    class Collections__
+    class Parse_  # the [#cb-B] "any result" pattern is employed.
 
-      def initialize kernel
-        @kernel = kernel
+      class << self
+        def [] *a
+          new( a ).execute
+        end
       end
 
-      def persist_entity_in_collection ent, col
-        Git_Config_::Actors__::Persist[ ent, col, @kernel ]
+      include Entity_[]::Event::Builder_Methods  # #todo
+
+      def initialize a
+        input_method_i, input_x, event_receiver_method_i, event_receiver_x = a
+        @input_id = Input_ID_.send input_method_i, input_x
+        @event_receiver = send event_receiver_method_i, event_receiver_x
       end
 
-      def retrieve_entity_via_name_class_collection id_x, cls, col, no_p
-        Git_Config_::Actors__::Retrieve[ id_x, cls, col, no_p ]
+    private def receive_events_via_proc p
+       build_evt_rcvr_via_p p
       end
 
-      def delete_entity_via_action_and_collection action, col
-        Git_Config_::Actors__::Delete[ action, col ]
-      end
-    end
-
-    Brazen_::Model_::Entity[ self, -> do
-      o :desc, -> y do
-        y << "manage 'git config'-style datastores."
-      end
-    end ]
-
-    ParseError = ::Class.new ::RuntimeError
-
-    class Parse_Context_
-
-      include Entity_[]::Event::Builder_Methods
-
-      def initialize p=nil
-        @parse_error_handler_p = p
+      def build_evt_rcvr_via_p p
+        p ||= -> ev do
+          _s = ev.render_first_line_under Brazen_::API::EXPRESSION_AGENT
+          raise ParseError, _s
+        end
+        Via_Proc_Event_Receiver_.new p
       end
 
-      def for_single_line s
-        @line = s
-        @line_number = 1
-        self
+      def execute
+        ok = prepare_for_parse
+        ok && execute_parse
+        @result
       end
 
-      def with_input adapter_cls, x
+      def prepare_for_parse
+        @column_number = nil
         @line_number = 0
-        @lines = adapter_cls.new x
-        self
+        @state_i = initial_state_i
+        @lines = @input_id.input_lines_adapter
+        resolve_document
       end
 
-      def parse
-        prepare_for_parse
+      def execute_parse
+        ok = PROCEDE_
         while @line = @lines.gets
           @line_number += 1
-          if BLANK_LINE_OR_COMMENT_RX_ =~ @line
-          else
-            send @state_i or break
-          end
+          BLANK_LINE_OR_COMMENT_RX_ =~ @line and next
+          ok = send @state_i
+          ok or break
         end
-        @document
+        if ok
+          @result = @document
+        end ; nil
       end
       BLANK_LINE_OR_COMMENT_RX_ = /\A[ ]*(?:\r?\n?\z|[#;])/
 
-      # ~ support is coming first before business b.c possible future fission
-
     private
-      def error_event i, col_number=nil
-        d = ( col_number or @column_number ||= 1 )
-        x_a = [ i, :line_number, @line_number, :column_number, d, :line, @line ]
-        ev = build_event_via_iambic_and_message_proc x_a, -> y, o do
-          y << "#{ i.to_s.gsub( UNDERSCORE_, SPACE_ ) } #{
+
+      def recv_error_i i, col_number=nil
+
+        col_number ||= @column_number || 1
+
+        _x_a = [ :config_parse_error,
+          :column_number, col_number,
+          :line_number, @line_number,
+          :line, @line,
+          :parse_error_category_i, i,
+          :ok, false,  # #todo
+          :reason, i.to_s.split( UNDERSCORE_ ).join( SPACE_ ) ]
+
+        _ev = build_event_via_iambic_and_message_proc _x_a, -> y, o do
+          y << "#{ o.reason } #{
            }(#{ o.line_number }:#{ o.column_number })"
         end
-        if @parse_error_handler_p
-          @document = @parse_error_handler_p[ ev ]
-          CEASE_
-        else
-          raise ParseError, ev.
-            render_first_line_under( Brazen_::API::EXPRESSION_AGENT )
-        end
+
+        @result = @event_receiver.receive_event _ev  # #todo
+
+        UNABLE_
       end
 
       # ~ business
 
-      def prepare_for_parse
-        @did_error = false
+      def initial_state_i
+        :when_before_section
+      end
+
+      def resolve_document
         @document = Document_.new
-        @state_i = :when_before_section
+        PROCEDE_
       end
 
       # ~
@@ -113,7 +111,7 @@ module Skylab::Brazen
         if @md
           accpt_section
         else
-          whn_not_section
+          recv_error_i :section_expected
         end
       end
       _NAME_RX = '[-A-Za-z0-9.]+'
@@ -131,10 +129,6 @@ module Skylab::Brazen
         PROCEDE_
       end
 
-      def whn_not_section
-        error_event :section_expected
-      end
-
       # ~
 
       def when_section_or_assignment
@@ -143,7 +137,7 @@ module Skylab::Brazen
         elsif (( @md = SECTION_RX__.match @line ))
           accpt_section
         else
-          error_event :assignment_or_section_expected
+          recv_error_i :assignment_or_section_expected
         end
       end
       ASSIGNMENT_LINE_RX__ = /\A[ ]*
@@ -154,6 +148,42 @@ module Skylab::Brazen
       def accpt_assignment
         @sect.assignments.accept_asmt Assignment_.new( * @md.captures )
         PROCEDE_
+      end
+    end
+
+    module Input_ID_
+      class << self
+        def via_string s
+          String_Input_Identifier__.new s
+        end
+
+        def via_path s
+          Path_Input_Identifier__.new s
+        end
+
+        def pass_thru x
+          Pass_Thru_Input_Identifier__.new x
+        end
+      end
+    end
+
+    class String_Input_Identifier__
+      def initialize s
+        @s = s
+      end
+
+      def input_lines_adapter
+        String_Input_Adapter_.new @s
+      end
+    end
+
+    class Path_Input_Identifier__
+      def initialize s
+        @path_s = s
+      end
+
+      def input_lines_adapter
+        Path_Input_Adapter_.new @path_s
       end
     end
 
@@ -314,7 +344,7 @@ module Skylab::Brazen
         s.gsub! QUOTE_, BACKSLASH_QUOTE_
         s.gsub! NEWLINE__, BACKSLASH_N__
         s.gsub! TAB__, BACKSLASH_T__
-        s.gsub! BACKSPACE__, BACKSLASH_B__
+        s.gsub! BACKSPACE__, BACKSLASH_B__ ; nil
       end
       BACKSLASH_BACKSLASH_BACKSLASH__ = '\\\\\\'  # the gsub arg uses '\' too :(
 
@@ -323,7 +353,7 @@ module Skylab::Brazen
         s.gsub! BACKSLASH_N__, NEWLINE__
         s.gsub! BACKSLASH_T__, TAB__
         s.gsub! BACKSLASH_B__, BACKSPACE__
-        s.gsub! BACKSLASH_BACKSLASH_, BACKSLASH_  # do this last, else etc
+        s.gsub! BACKSLASH_BACKSLASH_, BACKSLASH_ ; nil # do this last, else etc
       end
       BACKSLASH_N__ = '\n'.freeze ; NEWLINE__ = "\n".freeze
       BACKSLASH_T__ = '\t'.freeze ; TAB__ = "\t".freeze
@@ -335,6 +365,7 @@ module Skylab::Brazen
     BACKSLASH_QUOTE_ = '\\"'.freeze
     CEASE_ = false
     Git_Config_ = self
+    ParseError = ::Class.new ::RuntimeError
     PROCEDE_ = true
     QUOTE_= '"'.freeze
 

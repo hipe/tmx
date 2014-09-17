@@ -23,17 +23,25 @@ module Skylab::Brazen
 
         pn = ::Pathname.new "#{ @path }/#{ @config_filename }"
 
-        config = Brazen_::Data_Stores_::Git_Config::Mutable.new
+        config = Brazen_::Data_Stores_::Git_Config::Mutable.new -> ev do
+          if ev.ok
+            @delegate.receive_workspace_event ev
+          else
+            @delegate.receive_error_event ev
+          end
+        end  # #todo
+
         config.add_comment "created by #{ @app_name } #{
           }#{ ::Time.now.strftime '%Y-%m-%d %H:%M:%S' }"
 
-        config.write_to_pathname pn, self,
-          :is_dry, @is_dry,
-          :channel, :config
-      end
+        _evr = Via_Proc_Event_Receiver_.new -> ev do  # #todo
+          @delegate.send :"receive_#{ @channel }_event",  ev
+        end
 
-      def receive_config_wrote_file ev
-        @delegate.send :"receive_#{ @channel }_event", ev
+        config.write_to_pathname pn,
+          :is_dry, @is_dry,
+          :event_receiver, _evr
+
       end
     end
   end

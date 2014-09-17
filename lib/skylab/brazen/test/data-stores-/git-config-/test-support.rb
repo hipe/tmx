@@ -23,6 +23,25 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
       @document.sections.length.should be_zero
     end
 
+    def a_section_parses
+      with "[sectum]\n"
+      expect_config do |conf|
+        conf.sections.length.should eql 1
+        conf.sections.first.normalized_name_i.should eql :sectum
+      end
+    end
+
+    def a_section_and_a_comment_parses
+      with <<-HERE.gsub! MARGIN_RX__, EMPTY_S_
+        [scto]
+         # commo
+      HERE
+      expect_config do |conf|
+        conf.sections.length.should eql 1
+        conf.sections.first.normalized_name_i.should eql :scto
+      end
+    end
+
     def some_comments_and_one_section_parses
       with <<-HERE.gsub! MARGIN_RX__, EMPTY_S_
 
@@ -59,7 +78,7 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
     def a_bare_word_not_in_a_section_fails
       with 'moby'
       ev = subject.parse_string @input_string do |x| x end  # IDENTITY_
-      ev.terminal_channel_i.should eql :section_expected
+      ev.parse_error_category_i.should eql :section_expected
       ev.line_number.should eql 1
       ev.column_number.should eql 1
       ev.line.should eql 'moby'
@@ -71,7 +90,8 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
         foo=bar
       HERE
       expect_config do |conf|
-        ast = conf.sections[ :sect ].assignments.first
+        _sect = conf.sections[ :sect ]
+        ast = _sect.assignments.first
         ast.name_s.should eql 'foo'
         ast.value_x.should eql 'bar'
       end

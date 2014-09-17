@@ -1,26 +1,31 @@
 require_relative 'test-support'
 
-module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable_Sections
+module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable
 
   describe "[br] data stores: git config mutable sections" do
 
     extend TS_
+
+    TestLib_::Expect_Event[ self ]
 
     context "to an empty document" do
 
       with_empty_document
 
       it "add a section" do
-        touch_section 'foo'
+        x = touch_section 'foo'
         expect_document_content "[foo]\n"
+        expect_no_events
+        x.symbol_i.should eql :section_or_subsection
       end
 
       it "add a section with an invalid name" do
-        x = document.sections
-        -> do
-          x.touch_section 'foo_bar'
-        end.should raise_error super_subject::ParseError,
-          "invalid section name: \"foo_bar\""
+        _secs = document.sections
+        ok = _secs.touch_section 'foo_bar'
+        ok.should eql Brazen_::UNABLE_
+        expect_one_event :invalid_section_name do |ev|
+          ev.invalid_section_name.should eql 'foo_bar'
+        end
       end
 
       it "add a section with a subsection" do
@@ -29,11 +34,13 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable_Sections
       end
 
       it "add a section with a subsection with an invalid name" do
-        x = document.sections
-        -> do
-          x.touch_section 'foo', "bar\nbaz"
-        end.should raise_error super_subject::ParseError,
-          /\Aexpected subsection name \(1:7\)/
+        _secs = document.sections
+        ok = _secs.touch_section 'foo', "bar\nbaz"
+        expect_event :invalid_subsection_name do |ev|
+          ev.description.should match(
+            /\A\(\(subsection names can contain .+bar\\\\n/ )  # #todo
+        end
+        ok.should eql Brazen_::UNABLE_
       end
     end
 
@@ -99,10 +106,6 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable_Sections
         touch_section 'camma'
         expect_document_content "[beta]\n[camma]\n[delta]\n"
       end
-    end
-
-    def touch_section a, b=nil
-      document.sections.touch_section a, b
     end
   end
 end

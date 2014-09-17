@@ -2,51 +2,57 @@ module Skylab::Brazen
 
   class Data_Stores_::Git_Config
 
-    class Actors__::Delete < Git_Config_Actor_
+    Git_Config_::Actors__.class
 
-      Actor_[ self, :properties,
-        :action, :collection ]
+    module Mutable
 
-      def execute
-        init_ivars
-        ok = false
-        ok = resolve_document_for_write
-        ok &&= via_document_and_ss_resolve_entity
-        ok &&= delete_section_from_document
-        ok and resolve_result_via_write_file @action.action_property_value :dry_run
-        # 'ok' might be the number of remaining sections,
-        # @result might be the number of bytes written to the file
-        ok ? @entity : @result
-      end
+      Actors = ::Module.new
 
-    private
+      class Actors::Delete < Git_Config_Actor_
 
-      def init_ivars
-        @class = @action.class.model_class
-        @dry_run = @action.action_property_value :dry_run
-        @name_x = @action.action_property_value :name
-        @to_path = @collection.to_path
-        @ss = via_name_and_class_build_subsection_locator
-        @verb_i = :deleted
-      end
+        Actor_[ self, :properties,
+          :entity,
+          :document,
+          :event_receiver ]
 
-      def delete_section_from_document
-        sect_s = @ss.section_s
-        subs_s = @ss.subsection_s or self._TEST_ME
-        _compare_p = -> item do
-          d = sect_s <=> item.normalized_name_s
-          if d.nonzero? then d else
-            subs_s <=> item.subsect_name_s
+        def execute
+          ok = via_entity_resolve_subsection_identifier
+          ok &&= via_subsection_identifier_resolve_section
+          ok &&= via_section_delete_section
+          ok
+        end
+
+        def resolve_subsection_identifier
+          via_model_class_resolve_section_string
+          ok = via_bx_resolve_subsection_string
+          ok && via_both_strings_resolve_subsection_identifier
+        end
+
+        def via_bx_resolve_subsection_string
+          s = @bx.fetch NAME_
+          if s
+            s = s.strip  # b.c it has been frozen in the past
+            if s.length.nonzero?
+              @subsection_string = s
+              PROCEDE_
+            end
           end
         end
-        @document.sections.delete_comparable_item @ss, _compare_p, -> ev do
-          resolve_result_via_error ev
-          UNABLE_
-        end
-      end
 
-      def delegate
-        @action
+        def via_section_delete_section
+          ss = @subsection_identifier
+          sect_s, subs_s = ss.to_a
+          _compare_p = -> item do
+            d = sect_s <=> item.normalized_name_s
+            if d.nonzero? then d else
+              subs_s <=> item.subsect_name_s
+            end
+          end
+          @document.sections.delete_comparable_item ss, _compare_p, -> ev do
+            send_event ev
+            UNABLE_
+          end
+        end
       end
     end
   end

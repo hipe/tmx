@@ -111,6 +111,15 @@ module Skylab::Brazen
       end
     public
 
+      def description
+        s_a = []
+        _y = ::Enumerator::Yielder.new do |s|
+          s_a.push "(#{ s })"
+        end
+        render_all_lines_into_under _y, Event::EXPRESSION_AGENT__
+        "(#{ s_a * ', ' })"
+      end
+
       def render_all_lines_into_under y, expression_agent
         render_into_yielder_N_lines_under y, nil, expression_agent
       end
@@ -172,8 +181,9 @@ module Skylab::Brazen
           @sp_as_s_a = @o.terminal_channel_i.to_s.split UNDERSCORE_
           maybe_replace_noun_phrase_with_prop
           rslv_item_x_from_first_tag
-          did = maybe_pathify_item_x
-          did || maybe_clarity_item_x
+          did = maybe_describe_item_x
+          did ||= maybe_pathify_item_x
+          did || maybe_clarify_item_x
           @y << "#{ @sp_as_s_a * SPACE_ } - #{ @item_x }" ; nil
         end
 
@@ -198,14 +208,21 @@ module Skylab::Brazen
           @item_x = @o.send @first_tag_i ; nil
         end
 
-        def maybe_pathify_item_x
-          if PN_RX__ =~ @first_tag_i.to_s
-            @item_x = @expression_agent.pth @item_x
-            true
+        def maybe_describe_item_x
+          if @item_x.respond_to? :description
+            @item_x = @item_x.description
+            ACHEIVED_
           end
         end
 
-        def maybe_clarity_item_x
+        def maybe_pathify_item_x
+          if PN_RX__ =~ @first_tag_i.to_s
+            @item_x = @expression_agent.pth @item_x
+            ACHEIVED_
+          end
+        end
+
+        def maybe_clarify_item_x
           if @item_x.nil?
             @item_x = "''" ; nil
           end

@@ -14,6 +14,10 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
       expect_no_sections_from SPACE_
     end
 
+    it "a section and a comment parses" do
+      a_section_and_a_comment_parses
+    end
+
     it "some comments and one section parses" do
       some_comments_and_one_section_parses
     end

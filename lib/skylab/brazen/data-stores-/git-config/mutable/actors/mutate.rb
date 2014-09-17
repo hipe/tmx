@@ -2,31 +2,27 @@ module Skylab::Brazen
 
   class Data_Stores_::Git_Config
 
-    module Actors__
+    module Mutable
 
-      class Persist < Git_Config_Actor_
+    module Actors
+
+      class Mutate < Git_Config_Actor_
 
         Actor_[ self, :properties,
           :entity,
-          :collection,
-          :kernel ]
-
-        Entity_[]::Event::Merciless_Prefixing_Sender[ self ]
+          :mutable_document
+        ]
 
         def execute
-          @to_path = @collection.to_path ; @collection = nil
-          ok = prepare_values
-          ok &&= resolve_document_for_write
-          ok &&= edit_file
-          ok and resolve_result_via_write_file @dry_run
+          ok = resolve_properties
+          ok &&= via_entity_resolve_subsection_identifier
+          ok && edit_file
           @result
         end
 
       private
 
-        def prepare_values
-          via_entity_init_action_properties
-          instance_variable_defined?( :@dry_run ) or self._MISSING_ACTION_PROPERTY
+        def resolve_properties
           scn = @entity.to_normalized_actual_property_scan
           y = []
           while actual = scn.gets
@@ -43,13 +39,14 @@ module Skylab::Brazen
         end
 
         def cannot_persist_entity_with_no_properties
-          resolve_result_via_error :cannot_persist_entity_with_no_properties,
-            :entity, @entity, :ok, false
-          UNABLE_
+          send_not_OK_event_with :cannot_persist_entity_with_no_properties,
+            :entity, @entity do |y, o|
+              y << "cannot persist entity with no properties (#{ o.entity.class })"
+          end
+          @result = UNABLE_
         end
 
         def edit_file
-          @ss = Construe_subsection__[ @entity ]
           if @entity.came_from_persistence
             edit_file_via_update_section
           else
@@ -58,7 +55,8 @@ module Skylab::Brazen
         end
 
         def edit_file_via_create_section
-          @section = @document.sections.touch_section( * @ss.to_a )
+          _a = @subsection_identifier.to_a
+          @section = @mutable_document.sections.touch_section( * _a )
           if @section.is_empty
             edit_file_via_create_section_when_section_empty
           else
@@ -72,9 +70,10 @@ module Skylab::Brazen
         end
 
         def edit_file_via_create_section_when_section_not_empty
-          resolve_result_via_error_with :will_not_clobber_existing_entity,
-            :entity_description, @ss.to_description_s, :entity, @entity
-          UNABLE_
+          _s = @subsection_identifier.description
+          send_not_OK_event_with :will_not_clobber_existing_entity,
+            :entity_description, _s, :entity, @entity
+          @result = UNABLE_
         end
 
         def edit_file_via_update_section
@@ -96,22 +95,24 @@ module Skylab::Brazen
         end
 
         def when_no_change_in_section
-          resolve_result_via_error_with :no_change_in_entity,
-            :entity_description, @ss.to_description_s, :entity, @entity
-          UNABLE_
+          _s = @subsection_identifier.description
+          send_not_OK_event_with :no_change_in_entity,
+            :entity_description, _s, :entity, @entity
+          @result = UNABLE_
         end
 
         def write_section
           @property_a.each do |prop|
             @section[ prop.name_i ] = prop.value_x
           end
-          ACHEIVED_
+          @result = ACHEIVED_
         end
 
-        def delegate
+        def event_receiver
           @entity
         end
       end
+    end
     end
   end
 end

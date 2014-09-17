@@ -16,6 +16,16 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
       unparse.should eql SPACE_
     end
 
+    it "a section parses" do
+      a_section_parses
+      expect_unparses
+    end
+
+    it "a section and a comment parses" do
+      a_section_and_a_comment_parses
+      expect_unparses
+    end
+
     it "some comments and one section parses" do
       some_comments_and_one_section_parses
       expect_unparses
@@ -34,7 +44,8 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
     it "a bare word not in a section fails (with more detail)" do
       with 'moby'
       ev = subject.parse_string @input_string do |x| x end  # IDENTITY_
-      ev.terminal_channel_i.should eql :expected_open_square_bracket
+      ev.terminal_channel_i.should eql :config_parse_error
+      ev.parse_error_category_i.should eql :expected_open_square_bracket
       ev.line_number.should eql 1
       ev.column_number.should eql 1
       ev.line.should eql 'moby'
