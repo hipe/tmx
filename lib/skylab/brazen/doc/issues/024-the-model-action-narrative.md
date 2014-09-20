@@ -7,3 +7,15 @@ effectively short-circuit further processing while resulting in any
 aribtrary result value from a surface component, even false or nil;
 without beforehand knowing what the result scheme is from the surface
 modality.
+
+
+## #action-preconditions
+
+...
+
+
+
+## :#note-160
+
+we break the event barrier here because we haven't designed a better way
+around it.

@@ -6,6 +6,4 @@ the set of properties, the shell will be stale.
 
 the better fix for this is that the "scope kernel" is actually used as a
 true kernel and not a shell. we need a scope shell whose only interface
-is an "edit session". the edit session passes 
-
-
+is an "edit session". the edit session passes [..]

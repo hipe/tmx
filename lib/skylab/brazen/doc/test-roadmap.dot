@@ -1,0 +1,15 @@
+digraph g {
+
+/* we stopped being test-directed when we started muching with couch.
+   sadly it was too taxing on the larger system to deal with unit testing
+   relying on an external system like this. however, blah blah */
+
+drop_db_entity -> drop_datastore
+add_db_entity -> drop_db_entity
+add_src -> add_db_entity
+add_db_entity -> add_datastore
+list_src -> add_src
+rm_src -> list_src
+rm_src -> add_src
+
+}

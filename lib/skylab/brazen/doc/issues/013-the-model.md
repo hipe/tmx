@@ -34,7 +34,7 @@ appear in the action scan (collection) for this level. in fact it should
 not, because if all of its actions are promoted, it has no native-
 appearing actions of its own to manage.
 
-it is for this reason that the way we action scans over a particular
+it is for this reason that the way we do action scans over a particular
 model node may seem a bit odd:
 
 
@@ -52,9 +52,9 @@ of these four categories:
 4) the actions node has a mix of nodes that do and do not promote themselves.
 
 
-for 2), during "this" scan the model node will only supply one entry
-into the scan: itself. it is its own duty to present and dispatch its
-actions below that, but now is not the time for that.
+for 2), during this scan the model node will only supply one entry
+into the scan: itself. it has the duty to present and dispatch to its
+children actions, but now is not the time for that.
 
 for 3), the model will supply one entry for each such action, but no
 additional entry for itself.
@@ -62,7 +62,7 @@ additional entry for itself.
 for 4), the model will supply one entry for each such action and one
 entry for itself.
 
-to summarize the above 4 points, the model node will promote itself iff
+to summarize the above 4 points, the model node will promote itself IFF
 it has a nonzero number of child nodes that did not promote themselves.
 
 
@@ -83,6 +83,17 @@ the properties of the actions are like the fingers of the hand.
 copy-pasted from 'action'. models that do have any child actions may get
 'infected' by the child's name function function. but models that don't
 wont.
+
+
+
+
+## :#note-180
+
+do not set error count in the contructor. error count is set only when
+it is guaranteed to be written to during an edit session. this way, an
+error count of zero will always mean the entity is valid (provided we
+follow our own rules). setting the error count to zero here could result
+in us mistakenly thinking that an entity is valid.
 
 
 

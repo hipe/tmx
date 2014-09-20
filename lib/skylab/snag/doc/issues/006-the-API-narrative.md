@@ -11,8 +11,8 @@ lowest frame, that is the last-line-of-defense defaults for business
 constants or configuration values.
 
 2) it provides the "models" shell, which in turn provides shells with
-which the clients may make controllers, collections or collection
-controllers etc.
+which the clients may produce silos, silo controllers, collection
+controllers, entity controllers, etc.
 
 externally there is both the 'API' module and a class 'Client' within
 that module. internally they are the same class for one reason of

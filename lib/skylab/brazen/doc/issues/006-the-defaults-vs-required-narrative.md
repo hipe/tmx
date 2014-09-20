@@ -44,7 +44,7 @@ singular "normalize" eventpoint that all such hooks cohabitate.
 ## our solution
 
 rather than having "requiredness" have to know about "defaultedness"
-explicitly, we create this concept of "is_actually_required", to mean
+explicitly, we create this concept of `is_actually_required`, to mean
 "is required and has no default".  it's a bit of a workaround, but at
 least it is not as ugly and having the requiredness code directly know
 about the existence of defaultedness as a concept.
