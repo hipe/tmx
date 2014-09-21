@@ -46,48 +46,69 @@ module Skylab::Callback
       end
     end
 
-    BX__ = :ACTOR_PROPERTY_BOX___
+    BX_ = :ACTOR_PROPERTY_BOX___
     D__ = :ACTOR_PROPERTY_BOX_LENGTH_MARKER_FOR_ARGLIST__
 
     module MM__
 
       def [] * a
         new do
-          process_argument_list_fully a
+          process_arglist_fully a
         end.execute
       end
 
-      def execute_via_arglist a
+      def execute_via_arglist a, & p
         new do
-          process_argument_list_fully a
+          process_arglist_fully a
+          p and p[ self ]
         end.execute
       end
 
-      def with * x_a  # #note-70
-        new do
-          process_iambic_fully x_a
-        end.execute
-      end
-
-      def execute_via_iambic x_a
+      def with * x_a, & p  # #note-70
         new do
           process_iambic_fully x_a
+          p and p[ self ]
         end.execute
+      end
+
+      def execute_via_iambic x_a, & p
+        new do
+          process_iambic_fully x_a
+          p and p[ self ]
+        end.execute
+      end
+
+      def curry
+        -> * preset_arglist do
+          cls = ::Class.new self
+          cls.extend Actor::Curried__::Module_Methods
+          cls.include Actor::Curried__::Instance_Methods
+          cls.accept_arglist_for_curry preset_arglist
+          cls
+        end
+      end
+
+      def curry_with * x_a
+        cls = ::Class.new self
+        cls.extend Actor::Curried__::Module_Methods
+        cls.include Actor::Curried__::Instance_Methods
+        cls.accept_iambic_for_curry x_a
+        cls
       end
 
       def actor_property_box_for_write
-        if const_defined? BX__
-          if const_defined? BX__, false
+        if const_defined? BX_
+          if const_defined? BX_, false
             self._TEST_ME  # strange - re-opeing. should be OK
-            const_get BX__, false
+            const_get BX_, false
           else
-            bx = const_get BX__
+            bx = const_get BX_
             const_set D__, bx.length
-            const_set BX__, bx.dup
+            const_set BX_, bx.dup
           end
         else
           const_set D__, 0
-          const_set BX__, Box.new
+          const_set BX_, Box.new
         end
       end
 
@@ -100,7 +121,7 @@ module Skylab::Callback
       def prdc_actor_prop_box_for_arglist
         d = const_get D__
         if d.zero?
-          const_get BX__
+          const_get BX_
         else
           build_property_box_slice_for_arglist
         end
@@ -108,7 +129,7 @@ module Skylab::Callback
 
       def build_property_box_slice_for_arglist
         d = const_get D__
-        bx = const_get BX__
+        bx = const_get BX_
         bx_ = bx.class.new
         d.upto( bx.length - 1 ) do |d_|
           i, ivar = bx.fetch_pair_at_position d_
@@ -124,7 +145,7 @@ module Skylab::Callback
 
   private
 
-    def process_argument_list_fully a
+    def process_arglist_fully a
       box = self.class.actor_property_box_for_arglist
       a.length.times do |d|
         instance_variable_set box.fetch_at_position( d ), a.fetch( d )
@@ -132,10 +153,14 @@ module Skylab::Callback
     end
 
     def process_iambic_fully x_a
-      box = self.class.const_get BX__
+      box = self.class.const_get BX_
       x_a.each_slice( 2 ) do |i, x|
         instance_variable_set box.fetch( i ), x
       end ; nil
+    end
+
+    def ivar_box
+      self.class.const_get BX_
     end
   end
 
@@ -183,6 +208,10 @@ module Skylab::Callback
       [ @a.fetch( d ), @h.fetch( @a.fetch d ) ]
     end
 
+    def at * a
+      a.map( & @h.method( :[] ) )
+    end
+
     def get_names
       @a.dup
     end
@@ -206,6 +235,15 @@ module Skylab::Callback
     def to_value_scanner
       d = -1 ; last = @a.length - 1
       Callback_::Scn.new do
+        if d < last
+          @h.fetch @a.fetch d += 1
+        end
+      end
+    end
+
+    def to_value_scan
+      d  = -1 ; last = @a.length - 1
+      Callback_.scan do
         if d < last
           @h.fetch @a.fetch d += 1
         end
@@ -1139,6 +1177,8 @@ module Skylab::Callback
     end
   end
 
+  Autoloader[ Actor ]
+
   module Autoloader  # ~ service methods outside the immediate scope of a.l
     module Methods__
       def autoloaderize_with_filename_child_node fn, cn
@@ -1329,6 +1369,9 @@ module Skylab::Callback
     end
     def as_lowercase_with_underscores_symbol
       @a_lwus ||= build_lwus
+    end
+    def as_parts
+      @as_parts ||= as_variegated_string.split( UNDERSCORE_ ).freeze
     end
     def as_slug
       @as_slug ||= build_slug

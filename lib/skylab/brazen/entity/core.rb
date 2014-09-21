@@ -5,7 +5,7 @@ module Skylab::Brazen
     class << self
 
       def [] * a
-        via_argument_list a
+        via_arglist a
       end
 
       def iambic_scanner
@@ -47,14 +47,14 @@ module Skylab::Brazen
         Scope_Kernel__
       end
 
-      def via_argument_list a
-        Shell__.new.execute_via_argument_list a
+      def via_arglist a
+        Shell__.new.execute_via_arglist a
       end
     end
 
     class Common_Shell__  # read [#001] the entity enhancement narrrative
 
-      def execute_via_argument_list x_a
+      def execute_via_arglist x_a
         @d = 0 ; @x_a = x_a ; @x_a_length = x_a.length
         case @x_a_length <=> 1
         when  1 ; when_many_length_arg_list_execute
@@ -842,7 +842,7 @@ module Skylab::Brazen
 
       def execute_via_extmod_and_arglist extension_module, arg_list
         @extension_module = extension_module
-        execute_via_argument_list arg_list
+        execute_via_arglist arg_list
       end
 
       def when_one_length_arg_list_execute

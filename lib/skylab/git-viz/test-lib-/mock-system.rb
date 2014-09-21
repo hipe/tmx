@@ -430,7 +430,7 @@ module Skylab::GitViz
         def initialize s, a, path, line_no
           _s = GitViz::Lib_::Oxford_or[ a ]
           super "unexpected term. did you mean #{ _s }?",
-            path, "[..]#{ s }", line_no, COLUMN__
+            path, "#{ ELLIPSIS__ }#{ s }", line_no, COLUMN__
         end
         ELLIPSIS__ = '[..]'.freeze
         COLUMN__ = ELLIPSIS__.length + 1

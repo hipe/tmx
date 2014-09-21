@@ -62,7 +62,7 @@ named like local procs, that is:
 
 
 
-## actor patterns :[#A]
+## actor patterns :[#045]
 
 sometimes only a name and some documentation makes the difference
 between a perceived smell and a local design pattern. we have
@@ -79,7 +79,7 @@ related but separate points.
 
 
 
-### the "any result" pattern :[#B]
+### the "any result" pattern :[#046]
 
 if you specify (or are specified) that you follow the "any result"
 pattern then you must result in either your payload or the result of

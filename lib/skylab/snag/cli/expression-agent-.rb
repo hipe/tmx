@@ -27,12 +27,12 @@ module Skylab::Snag
       define_method :ick, -> do
         p = -> x do
           p = Snag_::Lib_::Strange[].to_proc.
-            curry[ A_REASONABLY_SHORT_LENGTH_FOR_A_STRING__ ]
+            curry[ A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_ ]
           p[ x ]
         end
         -> x { p[ x ] }
       end.call
-      A_REASONABLY_SHORT_LENGTH_FOR_A_STRING__ = 15
+      A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_ = 15
 
       define_method :kbd, o[ :green ]
 

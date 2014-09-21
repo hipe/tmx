@@ -18,7 +18,7 @@ module Skylab::MetaHell
 
       alias_method :call, :[]
 
-      def via_argument_list a
+      def via_arglist a
         @parse.dupe.call_notify a
       end
 

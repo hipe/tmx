@@ -18,7 +18,7 @@ module Skylab::MetaHell
       if a.length.zero?
         self::Series__
       else
-        self::Series__.via_argument_list a
+        self::Series__.via_arglist a
       end
     end
 

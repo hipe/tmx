@@ -1,6 +1,6 @@
 module Skylab::Callback
 
-      class Scan < ::Proc
+      class Scan < ::Proc  # [#044].
 
         alias_method :gets, :call
 
@@ -63,8 +63,8 @@ module Skylab::Callback
               while true
                 x = scn.gets
                 x or break
-                ok_ = p[ x ]
-                ok_ and break
+                _ok = p[ x ]
+                _ok and break
               end
               x
             end

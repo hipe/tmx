@@ -1,5 +1,6 @@
-[#B]         #parent-node: [#A] the "any result" pattern
-[#A]         #parent-node: [#042] actor patterns
+[#046]       #parent-node: [#045] the "any result" pattern
+[#045]       #parent-node: [#042] actor patterns
+[#044]       #doc-node: [the scan narrative]
 [#043]       #doc-node: the subscriptions narrative ..
 [#042]       #doc-node: the actor narrative ..
 [#041]       #parent-node: [#024] what are hybrid boxxy nodes?

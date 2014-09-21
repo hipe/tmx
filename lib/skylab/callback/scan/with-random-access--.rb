@@ -133,9 +133,9 @@ module Skylab::Callback
 
       def to_scan
         if @done
-          to_scanner_when_done Scan__[]
+          to_scanner_when_done Scan
         else
-          to_scanner_when_not_done Scan__[]
+          to_scanner_when_not_done Scan
         end
       end
 
@@ -198,8 +198,6 @@ module Skylab::Callback
         end
         x
       end
-
-      Scan__ = -> { Scan }
     end
   end
 end

@@ -90,7 +90,7 @@ module Skylab::Snag
       Brazen__[]::CLI.pretty_path x
     end
     Strange = -> * x_a do
-      MetaHell__[].strange.via_argument_list x_a
+      MetaHell__[].strange.via_arglist x_a
     end
     SubTree__ = sidesys[ :SubTree ]
     Text_patch = -> do

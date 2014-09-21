@@ -36,11 +36,11 @@ module Skylab::TanMan
         if has_more_tokens
           via_current_tokens_resolve_action
         else
-          whine_about_how_there_is_an_empty_iambic_argument_list
+          whine_about_how_there_is_an_empty_iambic_arglist
         end
       end
 
-      def whine_about_how_there_is_an_empty_iambic_argument_list
+      def whine_about_how_there_is_an_empty_iambic_arglist
         end_in_error_with :no_such_action, :action_name, nil
       end
 

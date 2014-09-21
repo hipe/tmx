@@ -154,7 +154,7 @@ module Skylab::Face  # read [#011] the top node narrative
     end
 
     Parse_series = -> * a do
-      MetaHell__[]::Parse.series.via_argument_list a
+      MetaHell__[]::Parse.series.via_arglist a
     end
 
     Plugin_lib = -> do

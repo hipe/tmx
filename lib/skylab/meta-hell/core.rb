@@ -52,7 +52,7 @@ module Skylab
     MONADIC_TRUTH_ = -> _ { true }
 
     def self.strange * a
-      MetaHell_::Strange__.via_argument_list a
+      MetaHell_::Strange__.via_arglist a
     end
   end
 end

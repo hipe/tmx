@@ -465,6 +465,13 @@ module Skylab::Snag
       self
     end
 
+    class << self
+
+      def ellipsify * x_a
+        self::Expression_Agent_::String_Math::Ellipsify.via_arglist x_a
+      end
+    end
+
     Client = self  # #tmx-compat
   end
 

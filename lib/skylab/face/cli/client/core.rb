@@ -1386,7 +1386,8 @@ module Skylab::Face
           count
         end
 
-        ellipsify = -> a, num do    # ellipsify final line conditionally  #todo this is redundant with [#hl-045]
+        ellipsify = -> a, num do    # ellipsify final line conditionally
+          # redundant with :+[#hl-045]. if it ever gives you trouble use that
           if 0 <= num && num < a.length  # assumes a's len is w/in 1 of num
             a.pop
             if a.length.nonzero?
