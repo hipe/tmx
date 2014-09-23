@@ -4,7 +4,7 @@ module Skylab::TanMan
 
     Events_ = ::Module.new
 
-    Events_::Invalid_Characters = TanMan_::Lib_::Event[].
+    Events_::Invalid_Characters = Event_[].
 
         prototype_with :invalid_characters, :chars, nil, :ok, false do |y, o|
 

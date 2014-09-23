@@ -108,7 +108,7 @@ module Skylab::TanMan::TestSupport::Models::Node
         ohai = touch_node_via_label 'yeti'
         ohai.object_id.should eql item.object_id
         number_of_nodes.should eql 3
-        expect :succeeded, :exists, "found existing node 'yeti'"
+        expect :OK, :exists, "found existing node 'yeti'"
         expect_no_more_events
       end
     end

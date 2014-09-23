@@ -8,14 +8,14 @@ module Skylab::TanMan::TestSupport::Models::Node
 
     it "ping the 'node add' action" do
       call_API :node, :add, :ping
-      expect :succeeded, :ping_from_action, "ping from action - add"
+      expect :OK, :ping_from_action, "ping from action - add"
       expect_succeeded
     end
 
     it "add a minimal node to the minimal string" do
       s = 'digraph{}'
       add_name_to_string 'bae', s
-      expect :succeeded, :created, "created node 'bae'"
+      expect :OK, :created, "created node 'bae'"
       s.should eql 'digraph{bae [label=bae]}'
       expect_succeeded
     end
@@ -23,7 +23,7 @@ module Skylab::TanMan::TestSupport::Models::Node
     it "add one before" do
       s = "digraph{ foo [label=foo]\n}"
       add_name_to_string 'bar', s
-      expect :succeeded, :created, "created node 'bar'"
+      expect :OK, :created, "created node 'bar'"
       s.should eql "digraph{ bar [label=bar]\nfoo [label=foo]\n}"
       expect_succeeded
     end
@@ -31,7 +31,7 @@ module Skylab::TanMan::TestSupport::Models::Node
     it "add one after" do
       s = "digraph{\n bar}"
       add_name_to_string 'foo', s
-      expect :succeeded, :created, "created node 'foo'"
+      expect :OK, :created, "created node 'foo'"
       s.should eql "digraph{\n bar\nfoo [label=foo]}"
       expect_succeeded
     end
@@ -39,14 +39,14 @@ module Skylab::TanMan::TestSupport::Models::Node
     it "add one same - fails with event about node with same name" do
       s = " digraph { zoz } "
       add_name_to_string 'zoz', s
-      expect :failed, :exists, "node already existed: 'zoz'"
+      expect :not_OK, :exists, "node already existed: 'zoz'"
       expect_failed
     end
 
     it "add one in between" do
       s = " digraph { apple ; zoz ; } "
       add_name_to_string 'menengitis', s
-      expect :succeeded, :created do |ev|
+      expect :OK, :created do |ev|
         a = ev.tag_names
         a.should be_include :ok
         a.should be_include :node_stmt
@@ -97,7 +97,7 @@ module Skylab::TanMan::TestSupport::Models::Node
           }\"#{ msg[ 0..96 ] }[..]\"" do
 
           touch_node_via_label "\t\t\n\x7F"
-          expect :failed, :invalid_characters, msg
+          expect :not_OK, :invalid_characters, msg
           expect_no_more_events
         end
       end.call

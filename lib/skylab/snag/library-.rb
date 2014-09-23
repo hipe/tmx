@@ -56,6 +56,9 @@ module Skylab::Snag
     Entity = -> do
       Brazen__[]::Entity
     end
+    Event = -> do
+      Brazen__[].event
+    end
     Filesystem_walk = -> do
       Brazen__[]::Models_::Workspace.filesystem_walk
     end

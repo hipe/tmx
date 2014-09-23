@@ -29,8 +29,10 @@ module Skylab::TreetopTools
     include Lib_::Parameter[]::Bound::InstanceMethods  # bound_parameters
 
     attr_reader( * Shell__.parameters.each.map(& :normalized_parameter_name ) )
+
+
                                   # for after call_body_and_absorb
-    Lib_::Event_builder[ self ]
+    Lib_::Event[].sender self
 
     def invoke
       ok = call_body_and_absorb!
@@ -327,7 +329,7 @@ module Skylab::TreetopTools
 
     def send_overwriting_event exist_g_a
       i = @force_overwrite ? :overwriting : :using
-      _ev = build_info_event_with i, :exist_g_a, exist_g_a do |y, o|
+      _ev = build_neutral_event_with i, :exist_g_a, exist_g_a do |y, o|
         _s_a = o.exist_g_a.map do |g|
           pth g.out_pn
         end
@@ -337,7 +339,7 @@ module Skylab::TreetopTools
     end
 
     def send_creating_event create_g_a
-      _ev = build_info_event_with :creating, :create_g_a, create_g_a do |y, o|
+      _ev = build_neutral_event_with :creating, :create_g_a, create_g_a do |y, o|
         _s_a = o.create_g_a.map do |g|
           pth g.out_pn
         end
@@ -347,7 +349,7 @@ module Skylab::TreetopTools
     end
 
     def send_none_event
-      _ev = build_info_event_with :none do |y, o|
+      _ev = build_neutral_event_with :none do |y, o|
         y << "none."
       end
       send_info_event _ev

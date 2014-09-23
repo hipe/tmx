@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   class Models_::Meaning
 
-    class Collection_Controller__  # #todo - push up
+    class Collection_Controller__ < Model_lib_[].collection_controller  # #todo - push up
 
       class << self
 
@@ -13,31 +13,28 @@ module Skylab::TanMan
         end
       end
 
-      Callback_::Actor[ self, :properties,
-        :datastore_i, :channel, :delegate, :model_class, :kernel ]
-
-      def initialize & p
-        instance_exec( & p )
+      def initialize
+        super
+        @input_string = @action.argument_value :input_string
       end
-    private
-      def init_via_iambic x_a
-        process_iambic_fully x_a
-        @input_string = @delegate.action_property_value :input_string
-      end
-    public
 
-      def to_property_hash_scan
-        scan = build_scan
-        scan.map_by do |fly|
-          fly.to_property_hash
+      # ~ create
+
+      def persist_entity ent, evr
+        _p = method :build_scan
+        _os = @action.argument_value :output_string
+        Meaning_::Actors__::Persist[ ent, _os, _p, evr ]
+      end
+
+      # ~ retrieve (many)
+
+      def entity_scan_via_class cls, evr
+        if model_class == cls  # just to punish those who dare defy us
+          build_scan
         end
       end
 
-      def persist_entity ent
-        _p = method :build_scan
-        _os = @delegate.action_property_value :output_string
-        Collection_Controller__::Persist[ ent, _os, _p, @channel, @delegate ]
-      end
+      # #todo: remove to_property_hash
 
     private
 

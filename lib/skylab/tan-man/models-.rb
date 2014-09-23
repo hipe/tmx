@@ -14,7 +14,7 @@ module Skylab::TanMan
 
   Actor_ = -> cls, * a do
     Callback_::Actor.via_client_and_iambic cls, a
-    cls.include TanMan_::Lib_::Entity[]::Event::Builder_Methods  ; nil
+    Event_[].sender cls ; nil
   end
 
   class Model_ < Brazen_::Model_
@@ -23,27 +23,17 @@ module Skylab::TanMan
 
     class << self
 
-      def for_edit i, x, k, & p
-        o = new( k ) do
-          @channel = i ; @delegate = x
-        end
-        if p
-          o.edit( & p )
-        end
-        o
+      def action_class
+        Action_
       end
-    end
 
-    def edit & p
-      d = @error_count ||= 0
-      p[ self ]
-      notificate :iambic_normalize_and_validate
-      d == @error_count
+      def entity_module
+        Entity_
+      end
     end
 
     attr_reader :error_count
   end
-
 
   Stubber_ = -> model do
     -> i do
@@ -58,6 +48,9 @@ module Skylab::TanMan
     def initialize name_i, & p
       @p = p
       @name_function = Callback_::Name.from_variegated_symbol name_i
+    end
+    def is_actionable
+      true
     end
     def is_promoted
       false
@@ -83,7 +76,7 @@ module Skylab::TanMan
 
       def when_unparsed_iambic_exists
         msg = say_strange_iambic
-        _ev = build_error_event_with :unrecognized_property,
+        _ev = build_not_OK_event_with :unrecognized_property,
             :current_iambic_token, current_iambic_token do |y, o|
           y << msg
         end
@@ -91,35 +84,38 @@ module Skylab::TanMan
       end
 
       def send_event ev
-        if ev.has_tag :ok and ! ev.ok
+        ev_ = ev.to_event
+        if ev_.has_tag :ok and ! ev_.ok
           @error_count += 1
         end
-        @client_adapter.receive_event ev
+        event_receiver.receive_event ev
       end
 
     public
 
       def receive_event ev
-        i = :"receive_#{ ev.terminal_channel_i }_event"
-        if respond_to? i
-          send i, ev
+        m_i = :"receive_#{ ev.terminal_channel_i }_event"
+        if respond_to? m_i
+          send m_i, ev
         else
-          @client_adapter.receive_event ev
+          event_receiver.receive_event ev
         end
+      end
+
+    private
+
+      def client_adapter
+        @event_receiver
       end
 
       self
     end
   end
 
-
   class Kernel_ < Brazen_::Kernel_  # :[#083].
+
     def retrieve_property_value i
       properties.retrieve_value i
-    end
-
-    def datastores
-      models
     end
   private
     def properties
@@ -127,8 +123,7 @@ module Skylab::TanMan
     end
   end
 
-  Models_ = ::Module.new
-
+  Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]
 
   class Models_::Workspace < Brazen_::Models_::Workspace
 
@@ -171,8 +166,8 @@ module Skylab::TanMan
       end ]
 
       def produce_any_result
-        an = @client_adapter.app_name.gsub Callback_::DASH_, Brazen_::SPACE_
-        ev = build_event_with :ping do |y, o|
+        an = client_adapter.app_name.gsub Callback_::DASH_, Brazen_::SPACE_
+        ev = build_neutral_event_with :ping do |y, o|
           y << "hello from #{ an }."
         end
         send_event ev

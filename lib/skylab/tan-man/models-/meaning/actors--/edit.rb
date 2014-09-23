@@ -2,9 +2,11 @@ module Skylab::TanMan
 
   class Models_::Meaning
 
-    module Controller__
+    module Actors__
 
-      class Normalize_name
+      Edit = ::Module.new
+
+      class Edit::Normalize_name
 
         Actor_[ self, :properties, :x, :val_p, :ev_p, :prop ]
 
@@ -26,7 +28,7 @@ module Skylab::TanMan
         VALID_NAME_RX__ = /\A[a-z][-a-z0-9]*\z/
       end
 
-      class Normalize_value
+      class Edit::Normalize_value
 
         Actor_[ self, :properties, :x, :val_p, :ev_p, :prop ]
 

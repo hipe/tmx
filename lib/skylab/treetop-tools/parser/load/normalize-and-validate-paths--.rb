@@ -6,7 +6,7 @@ module Skylab::TreetopTools
 
       Callback_::Actor[ self, :properties, :root_bp, :self ]
 
-      Lib_::Event_builder[ self ]
+      Lib_::Event[].sender self
 
       def execute
         @error_count = 0

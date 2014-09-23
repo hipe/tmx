@@ -1,6 +1,7 @@
 module Skylab::TanMan::TestSupport
 
-  class Parse < TanMan_::Models_::DotFile::Produce_document_via_parse__::Parse__
+  class Parse < TanMan_::Models_::DotFile::Actors__::Produce_document_via_parse::Parse__
+
 
     # customize an ancillary component of our main business parser to work
     # with our smaller ad-hoc grammars.

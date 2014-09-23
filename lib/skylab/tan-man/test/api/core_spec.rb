@@ -8,19 +8,19 @@ module Skylab::TanMan::TestSupport::API
 
     it "the API is called with `call` - the empty call reports as error" do
       call_API
-      expect :failed, :no_such_action, "no such action - ''"
+      expect :not_OK, :no_such_action, "no such action - ''"
       expect_failed
     end
 
     it "called with a strange name is a soft error" do
       call_API :wazii, :wazoo
-      expect :failed, :no_such_action, "no such action - wazii"
+      expect :not_OK, :no_such_action, "no such action - wazii"
       expect_failed
     end
 
     it "xtra tokens on a ping" do
       call_API :ping, :wahootey
-      expect :failed, :unrecognized_property, "unrecognized property 'wahootey'"
+      expect :not_OK, :unrecognized_property, "unrecognized property 'wahootey'"
       expect_failed
     end
 

@@ -2,29 +2,34 @@ module Skylab::TanMan
 
   module Models_::DotFile
 
-    class Collections__
+    module Actors__
 
-      def initialize k
-        @kernel = k
-      end
+      class Build_Document_Controller
 
-      def resolve_datastore_controller_via_entity entity, * x_a
-        x_a.push :entity, entity
-        Build_document_controller_via_entity__.execute_via_iambic x_a
-      end
+        class Via_action < self
 
-      def resolve_datastore_controller_with * x_a
-        x_a.push :kernel, @kernel
-        Build_document_controller_with__.execute_via_iambic x_a
-      end
+          Callback_::Actor[ self, :properties,
+            :action ]
 
-      class Build_document_controller_with__
+          def execute
+            @event_receiver, @kernel = @action.controller_nucleus.to_a
+
+            o = @action.argument_box ; @action = nil
+
+            @input_string = o[ :input_string ]
+            @input_pathname = o[ :input_pathname ]
+            @output_string = o[ :output_string ]
+            @output_pathname = o[ :output_pathname ]
+
+            super
+          end
+        end
 
         Callback_::Actor[ self, :properties,
           :input_string, :output_string,
           :input_pathname, :output_pathname,
           :parsing_event_subscription,
-          :channel, :delegate, :kernel ]
+          :event_receiver, :kernel ]
 
         def initialize
           @input_string = @output_string = @output_pathname = nil
@@ -50,8 +55,7 @@ module Skylab::TanMan
           -> o do
             o.subscribe_all
             o.use_subscription_channel_name_in_receiver_method_name
-            o.use_channel_name_in_receiver_method_name @channel
-            o.delegate_to @delegate
+            o.delegate_to @event_receiver
             if @parsing_event_subscription
               @parsing_event_subscription[ o ]
             end ; nil
@@ -75,20 +79,7 @@ module Skylab::TanMan
         end
 
         def via_graph_sexp_produce_document_controller
-          DotFile_::Controller__.new @graph_sexp, @channel, @delegate, @kernel
-        end
-      end
-
-      class Build_document_controller_via_entity__ < Build_document_controller_with__
-
-        Callback_::Actor[ self, :properties, :entity ]
-
-        def execute
-          @channel, @delegate, @kernel = @entity.channel_delegate_kernel
-          @input_string = @entity.any_action_property_value :input_string
-          @input_pathname = @entity.any_action_property_value :input_pathname
-          @entity = nil
-          super
+          DotFile_::Controller__.new @graph_sexp, @event_receiver, @kernel
         end
       end
     end

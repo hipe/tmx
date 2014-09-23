@@ -2,7 +2,7 @@ module Skylab::TreetopTools
 
   module Parser::InstanceMethods  # you must implement the #call-down's below
 
-    Lib_::Event_builder[ self ]
+    Lib_::Event[].sender self
 
     def parse_file pn, *a, &p
       _ia = build_file_input_adapter pn, &p

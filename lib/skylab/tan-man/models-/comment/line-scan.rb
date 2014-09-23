@@ -6,6 +6,8 @@ module Skylab::TanMan
       nil
     end
 
+    extend TanMan_::Lib_::Name_function[].name_function_methods
+
     module Line_Scan
 
       class << self

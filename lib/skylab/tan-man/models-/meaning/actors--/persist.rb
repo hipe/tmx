@@ -2,13 +2,13 @@ module Skylab::TanMan
 
   class Models_::Meaning
 
-    class Collection_Controller__
+      class Actors__::Persist
 
-      class Persist
-
-        Callback_::Actor[ self, :properties, :ent, :output_s, :scan_p, :channel, :action ]
-
-        TanMan_::Lib_::Event_builder[ self ]
+        Actor_[ self, :properties,
+          :ent,
+          :output_s,
+          :scan_p,
+          :event_receiver, :action ]
 
         def execute
           init_ivars
@@ -19,9 +19,9 @@ module Skylab::TanMan
       private
 
         def init_ivars
-          @name = @action.action_property_value :name
+          @name = @ent.property_value :name
           @new_line = nil
-          @value = @action.action_property_value :value
+          @value = @ent.property_value :value
         end
 
         def resolve_insertion_range
@@ -45,7 +45,7 @@ module Skylab::TanMan
           @scan = produce_fresh_scanner
           least_greater_name = nil
           while fly = @scan.gets
-            name = fly.name
+            name = fly.property_value :name
             case name <=> my_name
             when -1 ; greatest_lesser_name = name
             when  0 ; exact = fly ; break
@@ -56,7 +56,7 @@ module Skylab::TanMan
         end
 
         def when_exact_match_fly_resolve_insertion_range
-          _change_OK = :change == @action.name.as_lowercase_with_underscores_symbol  # #todo
+          _change_OK = :change == @ent.name.as_lowercase_with_underscores_symbol  # #todo
           if _change_OK
             when_change_OK
           else
@@ -78,8 +78,8 @@ module Skylab::TanMan
 
         def find_first_flyweight_with_name s
           @scan = produce_fresh_scanner
-          @scan.detect do |x|
-            s == x.name
+          @scan.detect do |ent|
+            s == ent.property_value( :name )
           end
         end
 
@@ -121,7 +121,7 @@ module Skylab::TanMan
         end
 
         def when_name_collision
-          value = @exact_match_fly.value
+          value = @exact_match_fly.property_value :value
           if value == @value
             when_no_change
           else
@@ -130,7 +130,7 @@ module Skylab::TanMan
         end
 
         def when_no_change
-          _ev = build_error_event_with :no_change,
+          _ev = build_not_OK_event_with :no_change,
               :name, @name, :value, @value do |y, o|
             y << "#{ lbl o.name } is already set to #{ val o.value }."
           end
@@ -138,12 +138,16 @@ module Skylab::TanMan
         end
 
         def when_will_not_clobber
-          _ev = build_error_event_with :name_collision,
-              :name, @name, :existing_value, @exact_match_fly.value,
+
+          _ev = build_not_OK_event_with :name_collision,
+              :name, @name,
+              :existing_value, @exact_match_fly.property_value( :value ),
               :replacement_value, @value do |y, o|
+
             y << "cannot set #{ lbl o.name } to #{ val o.replacement_value },#{
              } it is already set to #{ val o.existing_value }"
           end
+
           send_event _ev ; UNABLE_
         end
 
@@ -152,17 +156,12 @@ module Skylab::TanMan
         end
 
         def send_event ev
-          m_i = :"receive_#{ @channel }_event"
-          if @action.respond_to? m_i
-            @action.send m_i, ev
-          else
-            @action.receive_event ev
-          end ; nil
+          @event_receiver.receive_event ev ; nil
         end
 
         C_STYLE_OPEN_COMMENT_RX_ = /\A[ \t]*\/\*/
         TRAILING_WHITESPACE_RX__ = /[ \t]+\z/
       end
-    end
+
   end
 end

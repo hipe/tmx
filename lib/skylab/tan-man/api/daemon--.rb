@@ -9,14 +9,20 @@ module Skylab::TanMan
         bc and bc.receiver.send bc.method_name, * bc.args
       end
 
-      def produce_application_kernel
-        _API_daemon.produce_application_kernel
+      def application_kernel
+        _API_daemon.application_kernel
       end
 
     private
 
       def _API_daemon
         @API_daemon ||= Daemon__.new( TanMan_ )
+      end
+
+    public
+
+      def debug_IO
+        @debug_IO ||= TanMan_::Lib_::HL__[]::System::IO.some_stderr_IO
       end
     end
 
@@ -31,7 +37,7 @@ module Skylab::TanMan
         @mod::API::Produce_bound_call__[ x_a, p, @app_kernel, @mod ]
       end
 
-      def produce_application_kernel
+      def application_kernel
         @app_kernel
       end
     end

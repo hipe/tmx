@@ -4,14 +4,18 @@ module Skylab::TanMan
 
     class << self
 
-      def collections_controller_class
-        Node_::Collections_Controller__
+      # ~ the stack
+
+      def controller
+        self._YES
       end
     end
 
     Brazen_::Model_::Entity[ self, -> do
 
       o :persist_to, :node,
+
+        :preconditions, [ :dot_file ],
 
         :required,
         :ad_hoc_normalizer, -> * a do
@@ -29,13 +33,13 @@ module Skylab::TanMan
 
     end
 
-    public :with
+    # public :with
 
-    O__ = Action_Factory.create_with self, Action_, Entity_
+    Actions = make_action_making_actions_module
 
     module Actions
 
-      Add = O__.make :Add
+      Add = make_action_class :Add
 
       class Add
 
@@ -47,21 +51,18 @@ module Skylab::TanMan
 
         end ]
 
-        def produce_any_result
-          produce_any_result_when_dependencies_are_met
-        end
-
-        attr_reader :ping
-
       private
 
-        def produce_any_bound_call_while_processing_iambic x_a
-          x = super
-          x or ping && do_ping
+        def via_properties_produce_bound_call
+          if @argument_box[ :ping ]
+            bound_call_for_ping
+          else
+            super
+          end
         end
 
-        def do_ping
-          _ev = build_success_event_with :ping_from_action, :name_i,
+        def bound_call_for_ping
+          _ev = build_OK_event_with :ping_from_action, :name_i,
              name.as_lowercase_with_underscores_symbol
           x = send_event _ev  # see #very-interesting
           Brazen_.bound_call -> { x }, :call
@@ -74,24 +75,80 @@ module Skylab::TanMan
         end
       end
 
-      Ls = O__.make :List
+      Ls = make_action_class :List
 
       class Ls
 
         Model_::Entity[ self, -> do
           o :required, :property, :input_string
         end ]
-
-        def produce_any_result
-          produce_any_result_when_dependencies_are_met
-        end
       end
 
-      Rm = O__.make :Remove
+      Rm = make_action_class :Remove
 
     end
 
-    class Collections_Controller__ < Model_::Document_Entity::Collections_Controller
+    class Collection_Controller__ < Model_::Document_Entity::Collection_Controller
+
+      def unparse_entire_document
+        datastore_controller.unparse_entire_document
+      end
+
+      def retrieve_any_node_with_id i
+        get_node_scan.detect do |node|
+          i == node.node_id
+        end
+      end
+
+      def get_node_scan
+        datastore_controller.at_graph_sexp :nodes
+      end
+
+      def get_node_statement_scan
+        datastore_controller.at_graph_sexp :node_statements
+      end
+
+      def at_graph_sexp i
+        datastore_controller.at_graph_sexp i
+      end
+
+      def touch_node_via_label s
+        node = Node_.edited @event_receiver, @kernel do |o|
+          o.with :name, s
+        end
+        if node.error_count.zero?
+          produce_relevant_sexp_via_touch_entity node
+        end
+      end
+
+      def persist_entity entity, _event_receiver
+        ok = mutate_via_verb_and_entity :create, entity
+        ok and datastore_controller.persist_via_action @action
+      end
+
+      def produce_relevant_sexp_via_touch_entity entity
+        mutate_via_verb_and_entity :touch, entity
+      end
+
+      def mutate_via_verb_and_entity verb_i, entity
+        _dsc = datastore_controller
+        self.class::Mutate::Via_entity[
+          verb_i,
+          entity,
+          _dsc,
+          @event_receiver, @kernel ]
+      end
+
+    private
+
+      def datastore_controller
+        @preconditions.fetch :dot_file  # yes
+      end
+
+      Autoloader_[ self ]
+    end
+
+    class Silo_Controller__ < Model_::Document_Entity::Silo_Controller
 
     end
 

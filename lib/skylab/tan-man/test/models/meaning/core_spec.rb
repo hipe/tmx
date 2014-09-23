@@ -37,7 +37,7 @@ module Skylab::TanMan::TestSupport::Models::Meaning
     it "add will not clobber" do
       s = ' foo : x '
       insert_foo_bar_into s
-      expect :failed, :name_collision,
+      expect :not_OK, :name_collision,
         "cannot set 'foo' to \"bar\", it is already set to \"x \""
       expect_failed
     end
@@ -48,25 +48,32 @@ module Skylab::TanMan::TestSupport::Models::Meaning
 
     it "list when input string has no parsable lines" do
       call_API :meaning, :ls, :input_string, "jibber\njabber"
-      expect :succeeded, :number_of_items_found do |ev|
+      expect :OK, :number_of_items_found do |ev|
         ev.to_event.count.should be_zero
       end
       expect_succeeded
     end
 
     it "list when input string has parsable lines" do
+
       call_API :meaning, :ls, :input_string, " foo : fee \n fiffle: faffle"
-      expect :succeeded, :item do |ev|
-        ev.flyweighted_h[ 'name' ].should eql 'foo'
-        ev.flyweighted_h[ 'value' ].should eql 'fee '
+
+      expect :OK, :item do |ev|
+        ent = ev.flyweighted_entity
+        ent.property_value( :name ).should eql 'foo'
+        ent.property_value( :value ).should eql 'fee '
       end
-      expect :succeeded, :item do |ev|
-        ev.flyweighted_h[ 'name' ].should eql 'fiffle'
-        ev.flyweighted_h[ 'value' ].should eql 'faffle'
+
+      expect :OK, :item do |ev|
+        ent = ev.flyweighted_entity
+        ent.property_value( :name ).should eql 'fiffle'
+        ent.property_value( :value ).should eql 'faffle'
       end
-      expect :succeeded, :number_of_items_found do |ev|
+
+      expect :OK, :number_of_items_found do |ev|
         ev.to_event.count.should eql 2
       end
+
       expect_succeeded
     end
 

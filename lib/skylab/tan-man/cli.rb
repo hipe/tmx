@@ -9,7 +9,7 @@ module Skylab::TanMan
     end
 
     def resolve_app_kernel
-      @app_kernel = TanMan_::API.produce_application_kernel ; nil
+      @app_kernel = TanMan_::API.application_kernel ; nil
     end
   end
 end

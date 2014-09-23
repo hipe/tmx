@@ -2,28 +2,36 @@ require_relative 'prototype/test-support'
 
 module Skylab::TanMan::TestSupport::Sexp::Prototype
 
-  describe "[tm] Sexp::Prototype will be awesome", wip: true do
+  describe "[tm] Sexp::Prototype will be aw" do
 
     extend TS_  # #borrow:one
 
   using_grammar '70-38-simplo' do
+
     using_input_string EMPTY_S_, 'totally empty input string' do
+
       it 'has no list controller' do
         result.node_list.should be_nil
       end
     end
+
     using_input_string "\n\t  ", 'whitespace only input string' do
+
       it 'has no list controller' do
         result.node_list.should be_nil
       end
     end
+
     using_input_string 'fap;fip', 'two element input string' do
+
       it 'enumerates' do
         result.node_list.nodes
         result.node_list.nodes.should eql(['fap', 'fip'])
       end
     end
+
     using_input 'invalid-prototype' do
+
       it 'raises a runmun error at parse time' do
         ->{ result }.should raise_error(/when parsing .+prototype/)
       end
@@ -60,18 +68,26 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
   end
 
   using_grammar '70-75-with-prototype' do
+
     using_input_string 'beginning ending', 'zero' do
+
       it 'has no list controller' do
         result.node_list.should be_nil
       end
     end
+
     using_input_string 'beginning feep ending', 'one' do
+
       it('enumerates') { unparses.should eql(['feep']) }
     end
+
     using_input_string 'beginning fap;fep;fip ending', 'three' do
+
       it('enumerates') { unparses.should eql(['fap', 'fep', 'fip']) }
     end
+
     using_input 'primordial' do
+
       it 'appends a valid string as an item - BORKED - where are semis?' do
         o = result.node_list
         o.nil?.should eql( false )
@@ -82,6 +98,7 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
         o._append! 'fap'
         o.unparse.should eql( "fiiiiip;\nfap\n" ) # look what it did!
       end
+
       it 'raises an exception if you try to append an invalid string' do
         ->{ result.node_list._append!('fzzzp') }.should raise_error(
           /failed to parse item to insert/)

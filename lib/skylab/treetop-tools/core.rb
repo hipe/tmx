@@ -34,8 +34,8 @@ module Skylab::TreetopTools
       Basic__[]::Digraph
     end
 
-    Event_builder = -> x do
-      x.include Brazen__[]::Entity::Event::Builder_Methods ; nil
+    Event = -> do
+      Brazen__[]::Entity.event
     end
 
     File_utils = memoize[ -> { require 'fileutils' ; ::FileUtils } ]

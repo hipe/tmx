@@ -11,6 +11,26 @@ module Skylab::TanMan
     attr_reader :start_pos, :end_pos
     attr_reader :next_line_start_pos
 
+    def initialize_copy _otr_
+      @scn = @scn.dup
+      @scn.string = @scn.string.dup
+    end
+
+    def property_value i
+      @indexed or index!
+      send PROP_VAL_H__.fetch i
+    end
+
+    PROP_VAL_H__ = { name: :name_property_value, value: :value_property_value }
+
+    def name_property_value
+      @scn.string[ name_range ]
+    end
+
+    def value_property_value
+      @scn.string[ value_range ]
+    end
+
     def set! start, end_d, str
       @indexed = nil
       @start_pos = start ; @end_pos = end_d
@@ -21,22 +41,6 @@ module Skylab::TanMan
       end ; nil
     end
 
-    def to_property_hash
-      @indexed or index!
-      h = VOLATILE_SINGLETON_H__ ; s = @scn.string
-      h[ NAME_ ] = s[ @name_range ]
-      h[ VALUE_ ] = s[ @value_range ]
-      h
-    end
-
-    VOLATILE_SINGLETON_H__ = { NAME_ => nil, VALUE_ => nil }
-
-                                  # if you need to use the data in a flyweight
-    def collapse request_client   # at any time other than during that iteration
-      Models::Meaning.new request_client, name, value # you must
-    end                           # collapse it.  one day when we get retarded
-                                  # we might try to make them editable.
-
     def colon_pos
       index! unless @indexed
       @colon_pos
@@ -44,12 +48,12 @@ module Skylab::TanMan
 
     def destroy error, success
       from = line_start
-      to = value_range.last + 1 # dos line endings whatever
+      to = value_range.last + 1  # assume `NEWLINE_` is 1 char wide
       new_string = @scn.string.dup
       new_string[ from .. to ] = EMPTY_S_
       old_len = @scn.string.length
       scn.string.replace( new_string )
-      new_len = s@cn.string.length
+      new_len = @scn.string.length
       success[ old_len - new_len ]
     end
 
@@ -66,28 +70,18 @@ module Skylab::TanMan
       from
     end
 
-    def name
-      @scn.string[ name_range ]
-    end
-
     def name_range
       index! unless @indexed
       @name_range
     end
 
-
-
-    def whole_string # for extreme hacking only
-      @scn.string
-    end
-
-    def value
-      @scn.string[ value_range ]
-    end
-
     def value_range
       index! unless @indexed
       @value_range
+    end
+
+    def whole_string # for extreme hacking only
+      @scn.string
     end
 
   private

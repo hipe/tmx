@@ -2,7 +2,9 @@ module Skylab::TanMan
 
   module Models_::DotFile
 
-    module Produce_document_via_parse__
+  module Actors__
+
+    module Produce_document_via_parse
 
       def self.[] p
         kernel = Kernel__.new
@@ -180,7 +182,7 @@ module Skylab::TanMan
 
         def build_parse_failure_event
           a = build_parse_failure_iambic
-          build_error_event_via_mutable_iambic_and_message_proc( a, -> y, o do
+          build_not_OK_event_via_mutable_iambic_and_message_proc( a, -> y, o do
             line_col = "#{ o.line_no }:#{ o.line_col }"
             y << if o.has_tag :pn
               "In #{ pth o.pn }:#{ line_col }"
@@ -253,5 +255,6 @@ module Skylab::TanMan
         end
       end
     end
+  end
   end
 end

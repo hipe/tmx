@@ -9,9 +9,12 @@ module Skylab::TanMan
         Via_entity = self
 
         Callback_::Actor[ self, :properties,
-          :verb, :entity, :datastore, :channel, :delegate, :kernel ]
+          :verb,
+          :entity,
+          :datastore,
+          :event_receiver, :kernel ]
 
-        TanMan_::Lib_::Event_builder[ self ]
+        Event_[].sender self
 
         def execute
           init_ivars
@@ -272,7 +275,7 @@ module Skylab::TanMan
         end
 
         def when_ambiguous
-          _ev = build_error_event_with :ambiguous, :name_s, @name_s,
+          _ev = build_not_OK_event_with :ambiguous, :name_s, @name_s,
               :nodes, @fuzzy_matches_found do |y, o|
             _s_a = o.nodes.map do |n|
               lbl n.label_or_node_id_normalized_string
@@ -306,7 +309,7 @@ module Skylab::TanMan
         end
 
         def send_created_event_for_node node_stmt
-          _ev = build_success_event_with :created, :node_stmt, node_stmt do |y, o|
+          _ev = build_OK_event_with :created, :node_stmt, node_stmt do |y, o|
             y << "created node #{ lbl o.node_stmt.label }"
           end
           send_event _ev
@@ -319,7 +322,7 @@ module Skylab::TanMan
         end
 
         def build_match_not_found_event
-          build_error_event_with :match_not_found, :name_s, @name_s,
+          build_not_OK_event_with :match_not_found, :name_s, @name_s,
               :seen_count, @num_nodes_seen do |y, o|
             y << "couldn't find a node whose label starts with #{
              }#{ ick o.name_s } #{
@@ -335,13 +338,7 @@ module Skylab::TanMan
         end
 
         def send_event ev
-          @m_i ||= :"receive_#{ @channel }_event"
-          if @delegate.respond_to? @m_i
-            @delegate.send @m_i, ev
-          else
-            @delegate.receive_event ev
-          end
-          nil
+          @event_receiver.receive_event ev ; nil
         end
 
         POSITIVE_NOTHINGNESS_ = true

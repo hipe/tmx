@@ -4,8 +4,8 @@ module Skylab::TanMan
 
     class Controller__  # see [#009]
 
-      def initialize *a
-        @graph_sexp, @channel, @delegate, @kernel = a
+      def initialize gsp, er, k
+        @graph_sexp = gsp ; @event_receiver = er ; @kernel = k
       end
 
       attr_reader :graph_sexp
@@ -43,8 +43,12 @@ module Skylab::TanMan
         g.stmt_list._insert_item_before_item new, new_before_this
       end
 
-      def channel_and_delegate
-        [ @channel, @delegate ]
+      def provide_action_precondition _id, _g
+        self
+      end
+
+      def event_receiver
+        @event_receiver
       end
 
     if false
@@ -190,13 +194,14 @@ module Skylab::TanMan
     end
     end
 
-      def maybe_persist
-        action = @delegate  # #todo
+      def persist_via_action action
+
         o = Persist_Adapters__.map_detect do |cls|
           cls.match action
         end
+
         if o
-          o.init @channel, @delegate, @kernel
+          o.init @event_receiver, @kernel
           o.receive_rewritten_datastore_controller self
         else
           ACHEIVED_
@@ -220,22 +225,37 @@ module Skylab::TanMan
 
         class String
 
-          def self.match o
-            s = o.any_action_property_value :output_string
-            s and new s
+          class << self
+
+            def match o
+              s = o.argument_box[ :output_string ]
+              s and new s
+            end
           end
 
           def initialize output_string
             @output_string = output_string
           end
 
-          def init * a
-            @channel, @delegate, @kernel = a ; nil
+          def init event_receiver, kernel
+            @event_receiver = event_receiver
+            @kernel = kernel ; nil
           end
 
           def receive_rewritten_datastore_controller o
             @output_string.replace o.graph_sexp.unparse
             ACHEIVED_
+          end
+        end
+
+        class Pathname
+
+          class << self
+
+            def match o
+              s = o.argument_box[ :output_pathname ]
+              s and self._IT_WIL_BE_EASY
+            end
           end
         end
       end

@@ -34,7 +34,7 @@ module Skylab::TanMan
   end
   end
 
-      Exists = TanMan_::Lib_::Event[].prototype_with :exists,
+      Exists = Event_[].prototype_with :exists,
           :node_stmt, nil, :ok, nil do |y, o|
         _s = o.node_stmt.label_or_node_id_normalized_string
         if o.ok

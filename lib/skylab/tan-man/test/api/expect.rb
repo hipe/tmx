@@ -14,20 +14,20 @@ module Skylab::TanMan::TestSupport
       module Test_Context_Methods__
 
         def call_API * x_a
-          x_a.push :delegate, delegate
+          x_a.push :event_receiver, event_receiver
           @result = subject_API.call( * x_a ) ; nil
         end
 
-        def delegate
-          @delegate ||= bld_delegate
+        def event_receiver
+          @event_receiver||= bld_event_receiver
         end
 
-        def bld_delegate
-          Delegate__.new ( do_debug && some_debug_IO )
+        def bld_event_receiver
+          Event_Receiver__.new ( do_debug && some_debug_IO )
         end
       end
 
-      class Delegate__
+      class Event_Receiver__
 
         def initialize dbg_IO
           if dbg_IO
@@ -37,20 +37,35 @@ module Skylab::TanMan::TestSupport
             @do_debug = false
           end
           @ev_a = []
+          @p_a = nil
         end
 
-        def receive_negative_event ev
-          ev.ok and self._WHERE
-          receive_event ev
+        def add_event_pass_filter &p
+          ( @p_a ||= [] ).push p ; nil
         end
 
         def receive_event ev
+          if @p_a
+            d = @p_a.index do |p|
+              ! p[ ev ]
+            end
+          end
+          if d
+            prcss_supressed_event ev
+          else
+            prcss_passed_ev ev
+          end
+        end
+
+      private
+
+        def prcss_passed_ev ev
           @do_debug and express_event ev
           ev_ = ev.to_event
-          if ev_.has_tag :flyweighted_h
+          if ev_.has_tag :flyweighted_entity
             ev.object_id == ev_.object_id or self._DO_ME
-            _h = ev_.flyweighted_h.dup
-            ev_ = ev_.dup_with :flyweighted_h, ev_.flyweighted_h.dup
+            _ent = ev_.flyweighted_entity.dup
+            ev_ = ev_.dup_with :flyweighted_entity, _ent
             ev = ev_
           end
           @ev_a.push ev
@@ -58,6 +73,14 @@ module Skylab::TanMan::TestSupport
             ev_.ok ? true : false
           end
         end
+
+        def prcss_supressed_event ev
+          if @do_debug
+            express_event ev, "(suppressed by filter:) " ; nil
+          end
+        end
+
+      public
 
         def gets
           @ev_a.shift
@@ -67,12 +90,12 @@ module Skylab::TanMan::TestSupport
           "(tm)"
         end
 
-        def express_event ev
+        def express_event ev, comment=nil
           @ev = ev ; @ev_ = ev.to_event
           @ok_s = ok_s ; @tci = ev.terminal_channel_i
           @mems = "(#{ @ev_.tag_names * ', ' })"
           y = ::Enumerator::Yielder.new do |s|
-            @debug_IO.puts "#{ @ok_s } #{ @tci } #{ @mems } - #{ s.inspect }"
+            @debug_IO.puts "#{ comment }#{ @ok_s } #{ @tci } #{ @mems } - #{ s.inspect }"
           end
           ev.render_all_lines_into_under y, TanMan_::API::EXPRESSION_AGENT__
           nil
@@ -107,7 +130,7 @@ module Skylab::TanMan::TestSupport
         end
 
         def expect_no_more_events
-          ev = delegate.gets
+          ev = event_receiver.gets
           if ev
             fail "expected no more events, had #{ ev.terminal_channel_i }"
           end ; nil
@@ -123,7 +146,7 @@ module Skylab::TanMan::TestSupport
           @d = -1 ; @last_d = @x_a.length - 1
           @will_pass = true
           expect_one_event
-          @stay && expect_channel
+          @stay && expect_not_OK_or_OK
           @stay && process_terminal_channel_i
           @stay && process_message_bodies
           if @will_pass && @p
@@ -134,7 +157,7 @@ module Skylab::TanMan::TestSupport
         attr_reader :result
 
         def expect_one_event
-          @ev = @context.delegate.gets
+          @ev = @context.event_receiver.gets
           if @ev
             @ev_ = @ev.to_event
             @stay = true
@@ -144,11 +167,11 @@ module Skylab::TanMan::TestSupport
           end ; nil
         end
 
-        def expect_channel
-          send :"expect_OK_value_for_#{ gets_one }"
+        def expect_not_OK_or_OK
+          send :"expect_#{ gets_one }"
         end
 
-        def expect_OK_value_for_failed
+        def expect_not_OK
           if @ev_.has_tag :ok
             if @ev_.ok
               send_failure "was 'ok', expected not"
@@ -158,7 +181,7 @@ module Skylab::TanMan::TestSupport
           end
         end
 
-        def expect_OK_value_for_succeeded
+        def expect_OK
           if @ev_.has_tag :ok
             if ! @ev_.ok
               send_failure "was not 'ok', expected 'ok'"
@@ -172,7 +195,7 @@ module Skylab::TanMan::TestSupport
           send_failure "did not have 'ok' tag: '#{ @ev_.terminal_channel_i }'"
         end
 
-        def expect_OK_value_for_neutral
+        def expect_neutral
           if @ev.has_tag :ok
             send_failure "expected event not to have 'ok' tag"
           end

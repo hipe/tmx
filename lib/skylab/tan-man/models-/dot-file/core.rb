@@ -1,23 +1,72 @@
 module Skylab::TanMan
 
-  module Models_::DotFile
+  module Models_::DotFile  # cannot be a model subclass because treetop
+
+    extend TanMan_::Lib_::Name_function[].name_function_methods
 
     class << self
 
-      def build_collections kernel
-        DotFile_::Collections__.new kernel
+      def produce_document_via_parse & p
+        DotFile_::Actors__::Produce_document_via_parse[ p ]
       end
+
+      # ~
 
       def get_unbound_upper_action_scan
       end
 
-      def produce_document_via_parse & p
-        DotFile_::Produce_document_via_parse__[ p ]
+      def is_silo
+        true
+      end
+
+      # ~ the stack (we have to write them explicitly because treetop)
+
+      def collection_controller
+        Collection_Controller__
+      end
+
+      def silo_controller
+        Silo_Controller__
+      end
+
+      def silo
+        Silo__
+      end
+
+      # ~ support
+
+      def node_identifier
+        @nid ||= Brazen_::Node_Identifier_.via_symbol :dot_file
+      end
+
+      def preconditions
+        # for *now* the buck stops here, maybe one day 'workspace'
+      end
+
+      def persist_to
+        # same as above
+      end
+    end
+
+    Actions = ::Module.new
+
+    Collection_Controller__ = :_NONE_
+
+    class Silo_Controller__ < Model_lib_[].silo_controller
+
+      def provide_collection_controller_precon _id, graph
+        DotFile_::Actors__::Build_Document_Controller::Via_action[ graph.action ]
+      end
+    end
+
+    class Silo__ < Model_lib_[].silo
+
+      def model_class
+        DotFile_
       end
     end
 
     CONFIG_PARAM = 'using_dotfile'.freeze
-
     DotFile_ = self
 
     if false

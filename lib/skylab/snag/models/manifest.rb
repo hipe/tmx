@@ -165,9 +165,11 @@ module Skylab::Snag
       end
 
       class Build__
+
         def initialize *a
           @path, @yes_p, @no_p, @cache_h, @API_client = a
         end
+
         def lookup
           @config = @API_client
           @delegate = Walk_delegate__.new method :on_walk_error_event
@@ -179,16 +181,20 @@ module Skylab::Snag
             when_found
           end
         end
+
         def bld_walk
-          Snag_::Lib_::Filesystem_walk[].with(
-            :channel, :walk,
+
+          _evr = Snag_::Lib_::Event[].receiver.channeled.full :walk, @delegate
+
+          Snag_::Lib_::Filesystem_walk[].build_with(
             :filename, @config.manifest_file,
-            :delegate, @delegate,
             :any_max_num_dirs_to_look,
               @config.max_num_dirs_to_search_for_manifest_file,
             :prop, Lib_::Entity[]::Property__.new( :path ),
-            :start_path, @path )
+            :start_path, @path,
+            :event_receiver, _evr )
         end
+
         def on_walk_error_event ev
           o = Snag_::Model_::Event.inflectable_via_event ev
           o.inflected_verb = 'find'
@@ -196,6 +202,7 @@ module Skylab::Snag
           @ev = Routing_Wrapper__[ :error_event, o ]
           @did_fail = true ; nil
         end
+
         def when_found
           mani = Models::Manifest.new @API_client, @pathname
           @cache_h[ @path ] = mani
@@ -225,7 +232,7 @@ module Skylab::Snag
           @p[ ev ]
         end
 
-        def receive_walk_file_not_found ev
+        def receive_walk_resource_not_found ev
           @p[ ev ]
         end
       end

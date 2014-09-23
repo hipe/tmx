@@ -6,7 +6,7 @@ module Skylab::TanMan
 
       Callback_::Actor[ self, :properties, :x_a, :p, :kernel, :mod ]
 
-      TanMan_::Lib_::Event_builder[ self ]
+      Event_[].sender self
 
       def execute
         prepare_ivars
@@ -15,17 +15,18 @@ module Skylab::TanMan
         @bound_call
       end
 
-      def set_delegate x
-        @delegate_x = x ; nil
+      def set_event_receiver x
+        @event_receiver = x ; nil
       end
 
     private
 
       def prepare_ivars
-        @delegate_x = nil
+        @action = nil
+        @event_receiver = nil
         @p and @p[ self ]
-        if :delegate == @x_a[ -2 ]
-          @delegate_x = @x_a.pop
+        if :event_receiver == @x_a[ -2 ]
+          @event_receiver = @x_a.pop
           @x_a[ -1, 1 ] = EMPTY_A_
         end
         @d = 0 ; @x_a_length = @x_a.length
@@ -68,7 +69,9 @@ module Skylab::TanMan
           i == cls.name_function.as_lowercase_with_underscores_symbol and break
         end
         if cls
+          action = @action
           @action = cls.new @kernel
+          action and @action.accept_parent_node action
           OK_
         else
           when_no_action_at_this_step
@@ -86,7 +89,7 @@ module Skylab::TanMan
 
       def via_action_resolve_bound_call
         x_a = @x_a[ @d .. -1 ]
-        x = @action.produce_bound_call_via_iambic_and_delegate x_a, delegate
+        x = @action.bound_call_via_call x_a, event_receiver
         if x
           @bound_call = x
           OK_
@@ -108,24 +111,24 @@ module Skylab::TanMan
       end
 
       def end_in_error_with * x_a, & p
-        _ev = build_error_event_via_mutable_iambic_and_message_proc x_a, p
+        _ev = build_not_OK_event_via_mutable_iambic_and_message_proc x_a, p
         result = send_event _ev
         @bound_call = Brazen_.bound_call IDENTITY_, :call, result
         UNABLE_
       end
 
       def send_event ev
-        delegate.receive_event ev
+        event_receiver.receive_event ev
       end
 
-      def delegate
-        @delegate_x || rslv_some_delegate_x
-        @delegate_x
+      def event_receiver
+        @event_receiver || rslv_some_event_receiver
+        @event_receiver
       end
 
-      def rslv_some_delegate_x
+      def rslv_some_event_receiver
         _exp = API::Expression_Agent__.new @kernel
-        @delegate_x = API::Two_Stream_Event_Expressor__.
+        @event_receiver = API::Two_Stream_Event_Expressor__.
           new( * TanMan_::Lib_::Two_streams[], _exp ) ; nil
       end
     end

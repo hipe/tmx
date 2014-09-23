@@ -72,6 +72,8 @@ module Skylab::TanMan::TestSupport
       HL__[]::TestSupport::IO_Adapter_Spy
     end
 
+    NEWLINE_ = "\n".freeze
+
     JSON = memoize[ -> do
       require 'json' ; ::JSON
     end ]
@@ -152,8 +154,8 @@ module Skylab::TanMan::TestSupport
 
       context "using input #{ _STEM_ }", *tags do
 
-        define_method :produce_result_via_parse_method_i do
-          :via_parse_via_input_file_granule_produce_result
+        define_method :input_mechanism_i do
+          :input_file_granule
         end
 
         define_method :input_file_granule do
@@ -182,8 +184,8 @@ module Skylab::TanMan::TestSupport
 
     def input _STR_
 
-      define_method :produce_result_via_parse_method_i do
-        :via_parse_via_input_string_produce_result
+      define_method :input_mechanism_i do
+        :input_string
       end
 
       define_method :input_string do
@@ -270,7 +272,7 @@ module Skylab::TanMan::TestSupport
     ALWAYS_G1__ = 'g1.treetop'.freeze
 
     def subscribe_to_parse_events o
-      o.delegate_to debugging_delegate
+      o.delegate_to debugging_event_receiver
       o.subscribe_to_parser_loading_error_event
       o.subscribe_to_parser_error_event
       if do_debug
@@ -282,19 +284,19 @@ module Skylab::TanMan::TestSupport
       end ; nil
     end
 
-    def debugging_delegate
-      Debugging_delegate__[]
+    def debugging_event_receiver
+      Debugging_event_receiver__[]
     end
 
-    Debugging_delegate__ = -> do
+    Debugging_event_receiver__ = -> do
       p = -> do
-        x = Debugging_Delegate__.new Some_debug_IO[], TS_::EXPRESSION_AGENT
+        x = Debugging_Event_Receiver__.new Some_debug_IO[], TS_::EXPRESSION_AGENT
         p = -> { x } ; x
       end
       -> { p[] }
     end.call
 
-    class Debugging_Delegate__
+    class Debugging_Event_Receiver__
       def initialize *a
         @io, @expression_agent = a
       end
@@ -308,6 +310,8 @@ module Skylab::TanMan::TestSupport
         end
       end
     end
+
+    # ~ near input mechanism reification
 
     def produce_result_via_perform_parse
       send produce_result_via_parse_method_i
@@ -334,17 +338,31 @@ module Skylab::TanMan::TestSupport
       @grammar_class
     end
 
-    # ~ used in assertions
-
-    def some_input_string
-      send :"some_input_string_when_#{ produce_result_via_parse_method_i }"
+    def produce_result_via_parse_method_i
+      :"via_parse_via_#{ input_mechanism_i }_produce_result"
     end
 
-    def some_input_string_when_via_parse_via_input_file_granule_produce_result
+    def add_input_arguments_to_iambic x_a
+      send :"add_input_arguments_to_iambic_when_#{ input_mechanism_i }", x_a
+    end
+
+    def add_input_arguments_to_iambic_when_input_file_granule x_a
+      x_a.push :input_pathname, input_file_pathname ; nil
+    end
+
+    def add_input_arguments_to_iambic_when_input_string x_a
+      x_a.push :input_string, input_string ; nil
+    end
+
+    def some_input_string
+      send :"some_input_string_when_#{ input_mechanism_i }"
+    end
+
+    def some_input_string_when_input_file_granule
       @input_file_pathname.read
     end
 
-    def some_input_string_when_via_parse_via_input_string_produce_result
+    def some_input_string_when_input_string
       input_string
     end
 

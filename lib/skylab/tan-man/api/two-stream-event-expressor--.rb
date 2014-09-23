@@ -11,7 +11,7 @@ module Skylab::TanMan
       def receive_event ev
         if ev.has_tag :ok
           if ev.ok
-            recv_succes_event ev
+            recv_success_event ev
           else
             recv_error_event ev
           end
@@ -25,7 +25,7 @@ module Skylab::TanMan
       end
 
     private
-      def recv_succes_event ev
+      def recv_success_event ev
         y = ::Enumerator::Yielder.new do |s|
           @out.puts "OK: #{ s }"
         end

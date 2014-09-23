@@ -12,6 +12,8 @@ module Skylab::TanMan::TestSupport::Models::Node
 
   module InstanceMethods
 
+    CONSTANTS::Within_silo[ :node, self ]
+
     def stmt_list
       collection_controller.at_graph_sexp :stmt_list
     end
