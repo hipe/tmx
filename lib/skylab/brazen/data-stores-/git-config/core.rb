@@ -13,7 +13,85 @@ module Skylab::Brazen
       end
     end
 
-    class Parse_  # the [#cb-B] "any result" pattern is employed.
+    Actions = ::Module.new
+
+    def initialize *a
+      case a.length
+      when 1
+        kernel = a.first
+      when 3
+        @document, @event_receiver, kernel = a
+      end
+      super kernel
+    end
+
+    # ~ persist
+
+    def persist_entity entity, _event_receiver
+      ok = resolve_mutable_document
+      ok &&= Git_Config_::Mutable::Actors::Mutate[ entity, @mutable_document ]
+      ok and via_mutated_mutable_document_write_file_via_persisted_entity entity
+    end
+
+    # ~ retrieve (one)
+
+    def entity_via_identifier id, evr
+      Git_Config_::Actors__::Retrieve[ id, @document, evr, @kernel ]
+    end
+
+    # ~ retrieve (many)
+
+    def entity_scan_via_class cls, evr
+      Git_Config_::Actors__::Scan[ cls, @document, evr, @kernel ]
+    end
+
+    # ~ delete
+
+    def delete_entity entity, evr
+      ok = resolve_mutable_document
+      ok &&= Git_Config_::Mutable::Actors::Delete[ entity, @mutable_document, evr ]
+      ok and via_mutated_mutable_document_write_file_via_persisted_entity entity
+    end
+
+  private  # ~ verb support
+
+    def resolve_mutable_document
+      @did_resolve_mutable_document ||= rslv_mutable_document
+      @mutable_document_is_resolved
+    end
+
+    def rslv_mutable_document
+      if @document.is_mutable
+        @mutable_document = @document
+        @mutable_document_is_resolved = true
+      else
+        @mutable_document = Git_Config_::Mutable.
+          parse_input_id @document.input_id, self
+        @mutable_document_is_resolved = @mutable_document ? ACHEIVED_ : UNABLE_
+      end
+      if @mutable_document_is_resolved
+        @document = nil  # LOOK
+      end
+      ACHEIVED_
+    end
+
+    def via_mutated_mutable_document_write_file_via_persisted_entity entity
+      _is_dry = entity.any_parameter_value :dry_run
+      _pn = @mutable_document.input_id.to_pathname
+      Git_Config_::Mutable::Actors::Persist[ _is_dry, _pn, @mutable_document, entity ]
+    end
+
+    class Silo_Controller__ < Brazen_.model.silo_controller
+      def controller_as_datastore_via_entity x
+        document = Parse_[ :via_path, x.to_path,
+          :receive_events_via_event_receiver, @event_receiver ]
+        document and begin
+          Git_Config_.new document, @event_receiver, @kernel
+        end
+      end
+    end
+
+    class Parse_  # the [#cb-046] "any result" pattern is employed.
 
       class << self
         def [] *a
@@ -21,25 +99,35 @@ module Skylab::Brazen
         end
       end
 
-      include Entity_[]::Event::Builder_Methods  # #todo
+      Entity_[].event.sender self
 
       def initialize a
         input_method_i, input_x, event_receiver_method_i, event_receiver_x = a
-        @input_id = Input_ID_.send input_method_i, input_x
+        @input_id = Input_Identifier_.send input_method_i, input_x
         @event_receiver = send event_receiver_method_i, event_receiver_x
       end
 
-    private def receive_events_via_proc p
-       build_evt_rcvr_via_p p
+    private
+      def receive_events_via_proc p
+        build_evt_rcvr_via_p p
       end
 
-      def build_evt_rcvr_via_p p
-        p ||= -> ev do
+      public def build_evt_rcvr_via_p p
+        if p
+          p.respond_to?( :[] ) or raise ::ArgumentError, "[]: #{ p.class }"
+        else
+        p = -> ev do
           _s = ev.render_first_line_under Brazen_::API::EXPRESSION_AGENT
           raise ParseError, _s
         end
-        Via_Proc_Event_Receiver_.new p
+        end
+        Event_[].receiver.via_proc p
       end
+
+      def receive_events_via_event_receiver evr
+        evr
+      end
+    public
 
       def execute
         ok = prepare_for_parse
@@ -80,15 +168,17 @@ module Skylab::Brazen
           :line_number, @line_number,
           :line, @line,
           :parse_error_category_i, i,
-          :ok, false,  # #todo
           :reason, i.to_s.split( UNDERSCORE_ ).join( SPACE_ ) ]
 
-        _ev = build_event_via_iambic_and_message_proc _x_a, -> y, o do
+        _ev = build_not_OK_event_via_mutable_iambic_and_message_proc _x_a, -> y, o do
           y << "#{ o.reason } #{
            }(#{ o.line_number }:#{ o.column_number })"
         end
 
-        @result = @event_receiver.receive_event _ev  # #todo
+        # @result = @event_receiver.receive_event _ev  # #todo
+
+
+        @result = send_event _ev
 
         UNABLE_
       end
@@ -100,7 +190,7 @@ module Skylab::Brazen
       end
 
       def resolve_document
-        @document = Document_.new
+        @document = Document_.new @input_id
         PROCEDE_
       end
 
@@ -151,7 +241,7 @@ module Skylab::Brazen
       end
     end
 
-    module Input_ID_
+    module Input_Identifier_
       class << self
         def via_string s
           String_Input_Identifier__.new s
@@ -160,16 +250,16 @@ module Skylab::Brazen
         def via_path s
           Path_Input_Identifier__.new s
         end
-
-        def pass_thru x
-          Pass_Thru_Input_Identifier__.new x
-        end
       end
     end
 
     class String_Input_Identifier__
       def initialize s
         @s = s
+      end
+
+      def description_under _expr_
+        Lib_::Ellispify[ @s ].inspect
       end
 
       def input_lines_adapter
@@ -180,6 +270,17 @@ module Skylab::Brazen
     class Path_Input_Identifier__
       def initialize s
         @path_s = s
+      end
+
+      def to_pathname
+        @path_s and ::Pathname.new @path_s
+      end
+
+      def description_under expr
+        s = @path_s
+        expr.calculate do
+          pth s
+        end
       end
 
       def input_lines_adapter
@@ -218,10 +319,15 @@ module Skylab::Brazen
     end
 
     class Document_
-      def initialize
+      def initialize input_id
+        @input_id = input_id
         @sections = Sections__.new
       end
-      attr_reader :sections
+      attr_reader :input_id, :sections
+
+      def is_mutable
+        false
+      end
     end
 
     class Box__
@@ -239,7 +345,7 @@ module Skylab::Brazen
         idx && @a.fetch( idx )
       end
       def to_scan
-        Entity_[].scan_nonsparse_array @a
+        Scan_[].nonsparse_array @a
       end
       def map & p
         @a.map( & p )
@@ -291,7 +397,34 @@ module Skylab::Brazen
           raise ::NameError, "no such assignment '#{ i }'"
         end
       end
+
+      def each_normalized_pair
+        if block_given?
+          scn = to_normalized_actual_property_scan
+          while pair = scn.gets
+            yield( * pair.to_a )
+          end ; nil
+        else
+          to_enum :each_normalized_pair
+        end
+      end
+
+      def to_normalized_actual_property_scan
+        d = -1 ; last = @a.length - 1
+        Scan_[].new do
+          while d < last
+            d += 1
+            ast = @a.fetch d
+            # no 'symbol_i' here yet
+            x = Actual_Property__.new( ast.normalized_name_i, ast.value_x )
+            break
+          end
+          x
+        end
+      end
     end
+
+    Actual_Property__ = Brazen_.model.actual_property
 
     class Assignment_
       def initialize name_s, unparsed_value_s
@@ -342,7 +475,7 @@ module Skylab::Brazen
       def self.escape_value_string s
         s.gsub! BACKSLASH_, BACKSLASH_BACKSLASH_BACKSLASH__  # do first else etc
         s.gsub! QUOTE_, BACKSLASH_QUOTE_
-        s.gsub! NEWLINE__, BACKSLASH_N__
+        s.gsub! NEWLINE_, BACKSLASH_N__
         s.gsub! TAB__, BACKSLASH_T__
         s.gsub! BACKSPACE__, BACKSLASH_B__ ; nil
       end
@@ -350,12 +483,12 @@ module Skylab::Brazen
 
       def self.unescape_quoted_value_string s
         s.gsub! BACKSLASH_QUOTE_, QUOTE_
-        s.gsub! BACKSLASH_N__, NEWLINE__
+        s.gsub! BACKSLASH_N__, NEWLINE_
         s.gsub! BACKSLASH_T__, TAB__
         s.gsub! BACKSLASH_B__, BACKSPACE__
         s.gsub! BACKSLASH_BACKSLASH_, BACKSLASH_ ; nil # do this last, else etc
       end
-      BACKSLASH_N__ = '\n'.freeze ; NEWLINE__ = "\n".freeze
+      BACKSLASH_N__ = '\n'.freeze
       BACKSLASH_T__ = '\t'.freeze ; TAB__ = "\t".freeze
       BACKSLASH_B__ = '\b'.freeze ; BACKSPACE__ = "\b".freeze
     end
@@ -365,6 +498,7 @@ module Skylab::Brazen
     BACKSLASH_QUOTE_ = '\\"'.freeze
     CEASE_ = false
     Git_Config_ = self
+    NEWLINE_ = "\n".freeze
     ParseError = ::Class.new ::RuntimeError
     PROCEDE_ = true
     QUOTE_= '"'.freeze

@@ -1,178 +1,11 @@
 module Skylab::Brazen
 
-  class Data_Stores_::Couch < Brazen_::Data_Store_::Model_
-
-    class << self
-      def build_collections kernel
-        Collections__.new kernel
-      end
-    end
-
-    Entity__ = Brazen_::Model_::Entity
-
-    Entity__[ self, -> do
-      o :desc, -> y do
-        y << "manage couch datastores."
-      end
-
-      o :persist_to, :workspace
-
-      o :description, -> y do
-        y << "the name of the database"
-      end,
-      :ad_hoc_normalizer, -> x, val_p, ev_p, prop do
-        if /\A[-a-z0-9]+\z/ =~ x
-          val_p[ x ]
-        else
-          ev_p[ :error, :name_must_be_lowercase_alphanumeric_with_dashes,
-                :name_s, x, :ok, false, nil ]
-        end ; nil
-      end,
-      :required,
-      :property, :name
-
-
-      o :description, -> y do
-        y << "the HTTP host to connect to (default: #{ property_default })"
-      end,
-      :default, 'localhost',
-      :property, :host
-
-
-      o :description, -> y do
-        y << "the HTTP port to connect to (default: #{ property_default })"
-      end,
-      :default, '5984',
-      :ad_hoc_normalizer, -> x, val_p, ev_p, prop do
-        if x
-          if /\A[0-9]{1,4}\z/ =~ x
-            val_p[ x ]
-          else
-            ev_p[ :error, :port_must_be_one_to_four_digits, :port_s, x,
-                  :ok, false, nil ]
-          end
-        end
-      end,
-      :property, :port
-
-    end ]
-
-    Action_Factory__ = Action_Factory.create_with self,
-      Data_Store_::Action, Entity__
-
-    Generated_Add__ = Action_Factory__.make :Add
-
-    Generated_Rm__ = Action_Factory__.make :Remove
-
-    module Actions
-
-      class Add < Generated_Add__
-        def produce_any_result_when_dependencies_are_met
-          super
-          @ent.if_valid_ensure_exists
-        end
-      end
-
-      # Ls = Action_Factory__.make :List
-
-      class Rm < Generated_Rm__
-        Entity_[][ self, -> do
-          o :description, -> y { y << 'always necessary for now.' },
-            :flag, :property, :force
-        end ]
-        def produce_any_result_when_dependencies_are_met
-          Couch_::Actors__::Delete_datastore[ self, @kernel ]
-        end
-      end
-    end
-
-    # ~ for actors
-
-    def if_valid_ensure_exists
-      if ! @dry_run && @was_valid_after_edit
-        Couch_::Actors__::Ensure_datastore_exists[ self, @delegate ]
-      end
-    end
-
-    def put body, * x_a
-      _HTTP_remote.put body, x_a
-    end
-
-    def get uri_tail, * x_a
-      _HTTP_remote.get uri_tail, x_a
-    end
-
-    def delete_datastore action_props, channel, delegate
-      x_a = :action_props, action_props, :channel, channel,
-        :delegate, delegate, :entity_identifier_strategy, :none
-      _HTTP_remote.delete x_a
-    end
-
-    def description
-      "#{ @name } on #{ @host }:#{ @port }"
-    end
-
-  private
-
-    def _HTTP_remote
-      @HTTP_remote ||= HTTP_Remote__.new self, @name, @host, @port
-    end
-
-    class Collections__
-
-      def initialize kernel
-        @cache_h = {}
-        @kernel = kernel
-      end
-
-      def persist_entity_to_datastore ent, ds_i
-        Couch_::Actors__::Persist[ ent, ds_i, @kernel ]
-      end
-
-      def delete_entity_via_action act
-        Couch_::Actors__::Delete[ act, @kernel ]
-      end
-
-      def retrieve_entity_via_name name_i, no_p
-        had = true
-        x = @cache_h.fetch name_i do
-          had = false
-        end
-        if had
-          if x
-            x
-          else
-            no_p[ build_event_with :no_connection ]
-          end
-        else
-          error = nil
-          ds = Couch_::Actors__::Retrieve_datastore_entity[ name_i, @kernel, -> ev do
-            error = ev
-          end ]
-          if error
-            @cache_h[ name_i ] = UNABLE_
-            no_p[ error ]
-          else
-            @cache_h[ name_i ] = ds
-          end
-        end
-      end
-
-      def remove_cached_named_connection i
-        @cache_h.fetch i
-        @cache_h.delete i
-      end
-
-      def build_collection_controller * x_a
-        Couch_::Collection_Controller__.new x_a
-      end
-    end
+  class Data_Stores_::Couch
 
     class HTTP_Remote__
 
-      def initialize datastore, dbname, host, port
-        @database = dbname ; @delegate = datastore
-        @host = host ; @port = port
+      def initialize *a
+        @database, @port, @host = a
         freeze
       end
 
@@ -203,40 +36,38 @@ module Skylab::Brazen
       end
 
       def deliver_response o
-        s = o.response.message
-        if s
-          s.downcase! ; s.gsub! SPACE_, UNDERSCORE_
-        end
-        m_a = [ o.channel, WHEN_, o.response.code, s ]
-        m_a.compact!
-        m_i = m_a.join( UNDERSCORE_ ).intern
-        o.delegate.send m_i, o
+        o.response_receiver.receive_response o
       end
-      WHEN_ = 'when'.freeze
 
       class Request_Response__
 
-        Actor_[ self, :properties,
-          :action_props,
+        Entity_[][ self, :properties,
           :body_s,
-          :channel,
-          :delegate,
-          :entity_identifier,
+          :native_entity_identifier_s,
           :entity_identifier_strategy,
-          :URI_tail ]
+          :URI_tail,
+          :response_receiver ]
 
-        def initialize x_a, i, database, port, host, delegate
-          @action_props = nil
-          @body_s = nil ; @channel = nil
-          @database = database ; @delegate = delegate
+        Entity_[][ self, -> do
+          def add_HTTP_parameter
+            add_HTTP_param iambic_property, iambic_property
+          end
+        end ]
+
+        Brazen_.event.sender self  # actually just builds not sends
+
+        def initialize * a
+
+          x_a, @HTTP_method_i, @database, @port, @host, @event_receiver = a
+
+          @body_s = nil
           @entity_identifier_strategy = nil
-          @host = host ; @HTTP_method_i = i
-          @port = port
+          @HTTP_param_box = nil
           process_iambic_fully x_a
           @need_to_prepare_URI = true
         end
 
-        attr_reader :channel, :delegate
+        attr_reader :response_receiver
 
         def send_and_receive
           @need_to_prepare_URI && prepare_URI
@@ -246,6 +77,11 @@ module Skylab::Brazen
         end
 
       private
+
+        def add_HTTP_param i, x  # parse them late
+          bx = @HTTP_param_box ||= Box_.new
+          bx.add i, x ; nil
+        end
 
         def prepare_URI
           @need_to_prepare_URI = false
@@ -272,41 +108,48 @@ module Skylab::Brazen
           @entity_identifier_strategy or self._SANITY
         end
 
-        def via_none_resolve_URI
-          @URI_is_OK = true
-          @URI_s = "/#{ @database }" ; nil
+        def via___N_O_N_E___resolve_URI
+          rslv_URI_via_body "/#{ @database }" ; nil
         end
 
         def via_append_URI_tail_resolve_URI
-          if @URI_tail
-            @URI_is_OK = true
-            @URI_s = "/#{ @database }/#{ @URI_tail }" ; nil
+          if @URI_tail && @URI_tail.length.nonzero?
+            rslv_URI_via_body "/#{ @database }/#{ @URI_tail }"
+          else
+            @URI_is_OK = false
+          end ; nil
+        end
+
+        def via_native_entity_identifier_string_resolve_URI
+          s = @native_entity_identifier_s
+          if s && s.length.nonzero?
+            rslv_URI_via_body "/#{ @database }/#{ @native_entity_identifier_s }"
+          else
+            @URI_is_OK = false
           end
         end
 
-        def via_entity_identifier_resolve_URI
-          @URI_is_OK = @entity_identifier
-          @URI_s = "/#{ @database }/#{ @entity_identifier }" ; nil
-        end
-
         def via_append_generated_UUID_resolve_URI
+
           @req = Lib_::Net_HTTP[]::Get.new UUIDS_URL__
           @response = Lib_::Net_HTTP[].start @host, @port do |http|
             http.request @req
           end
+
           if OK_200__ == @response.code
             via_response_prepare_URI_with_generated_UUID
           else
             @URI_is_OK = false
           end ; nil
         end
+
         OK_200__ = '200'.freeze
+
         UUIDS_URL__ = '/_uuids'.freeze
 
         def via_response_prepare_URI_with_generated_UUID
           via_response_resolve_UUID
-          @URI_is_OK = true
-          @URI_s = "/#{ @database }/#{ @UUID }" ; nil
+          rslv_URI_via_body "/#{ @database }/#{ @UUID }" ; nil
         end
 
         def via_response_resolve_UUID
@@ -314,6 +157,36 @@ module Skylab::Brazen
           @UUID = h.fetch( UUIDS__ ).fetch 0 ; nil
         end
         UUIDS__ = 'uuids'.freeze
+
+
+        def rslv_URI_via_body s
+          @URI_s = s
+          if @HTTP_param_box
+            via_HTTP_param_box_rslv_URI
+          else
+            @URI_is_OK = true
+          end ; nil
+        end
+
+        def via_HTTP_param_box_rslv_URI
+          is_valid = true
+          ast_s_a = []
+          @HTTP_param_box.each_pair do |i, x|
+            if SIMPLE_SAFETY_RX__ !~ x
+              is_valid = false
+              break
+            end
+            ast_s_a.push "#{ i }=#{ x }"
+          end
+          if is_valid
+            @URI_s.concat "?#{ ast_s_a * '&' }"
+            @URI_is_OK = true
+          else
+            @URI_is_OK = false
+          end ; nil
+        end
+
+        SIMPLE_SAFETY_RX__ = /\A[-0-9a-z]+\z/
 
         def do_send_and_receive
           _cls = Lib_::Net_HTTP[].const_get @HTTP_method_i, false
@@ -341,10 +214,11 @@ module Skylab::Brazen
       public
 
         def response_body_to_completion_event * x_a, & p
-          response_body_to_event do |a, h|
+          rsp_body_to_event do |a, h|
             a[ 0 ] = @response.message.downcase.gsub( SPACE_, UNDERSCORE_ ).intern
             a.push :message, @response.message
-            h.key? 'ok' or a.push :ok, ACHEIVED_
+            h.key? OK__ or a.push :ok, ACHEIVED_
+            h.key? CODE__ or a.push :code, @response.code.to_i
             a.push :is_completion, true
             a.concat x_a
             p ||= -> y, o do
@@ -354,10 +228,11 @@ module Skylab::Brazen
           end
         end
 
-        def response_body_to_error_event * x_a, & p
-          response_body_to_event do |a, h|
+        def response_body_to_not_OK_event * x_a, & p
+          rsp_body_to_event do |a, h|
             a[ 0 ] = h.fetch( 'error' ).intern
             a.push :ok, UNABLE_
+            h.key? CODE__ or a.push :code, @response.code.to_i
             a.concat x_a
             p ||= -> y, o do
               y << ( o.reason || o.error )
@@ -365,8 +240,11 @@ module Skylab::Brazen
             build_event_via_iambic_and_message_proc a, p
           end
         end
+        CODE__ = 'code'.freeze ; OK__ = 'ok'.freeze
 
-        def response_body_to_event
+      private
+
+        def rsp_body_to_event  # needs block
           h = Lib_::JSON[].parse @response.body
           a = ::Array.new h.length * 2 + 1
           s_a = h.keys ; s_a.sort!
@@ -377,10 +255,67 @@ module Skylab::Brazen
           yield a, h
         end
 
+      public
+
         attr_reader :response
       end
+
+      class Respose_Receiver__
+
+        Actor_[ self, :properties, :channel ]
+
+        class << self
+
+          def via_iambic x_a
+            case x_a.length
+            when 0 ; self
+            when 1 ; new x_a.first
+            when 2 ; new x_a.pop, x_a.unshift( :channel )
+            else     new x_a.pop, x_a
+            end
+          end
+        end
+
+        def initialize delegate, x_a=nil
+          @channel = nil
+          x_a and process_iambic_fully x_a
+          @delegate = delegate
+        end
+
+        def with * x_a
+          dup.init_dup x_a
+        end
+      protected
+        def init_dup x_a
+          process_iambic_fully x_a
+          self
+        end
+      public
+
+        def receive_response o
+          s = o.response.message
+          if s
+            s.downcase! ; s.gsub! SPACE_, UNDERSCORE_
+          end
+          m_a = [ @channel, WHEN_, o.response.code, s ]
+          m_a.compact!
+          _m_i = m_a.join( UNDERSCORE_ ).intern
+          @delegate.send _m_i, o
+        end
+      end
+
+      WHEN_ = 'when'.freeze
+
+      class << self
+
+        # syntax: | <delegate> |
+        #           <channel> <delegate> |
+        #           [ <name>, <value> [..]] <delegate>
+
+        def response_receiver * x_a
+          Respose_Receiver__.via_iambic x_a
+        end
+      end
     end
-    Couch_ = self
-    Data_Store_ = Brazen_::Data_Store_
   end
 end

@@ -2,40 +2,108 @@ module Skylab::Brazen
 
   class Data_Stores_::Couch
 
-    class Couch_Actor_ < Data_Store_::Actor
-
-      def via_datastore_name_resolve_datastore
-        ok = ACHEIVED_
-        _ds = @kernel.datastores[ :couch ]
-        @datastore = _ds.retrieve_entity_via_name @datastore_i, -> ev do
-          resolve_result_via_error ev
-          ok = UNABLE_
-        end
-        ok
-      end
-    end
+    Couch_Actor_ = ::Class.new Brazen_::Data_Store_::Actor
 
     module Actors__
 
       class Retrieve_datastore_entity < Couch_Actor_
 
         Actor_[ self, :properties,
-          :name_i, :kernel, :no_p ]
+          :entity_identifier,
+          :datastore,
+          :event_receiver, :kernel ]
 
         def execute
-          _i = Couch_.persist_to
-          _cols = @kernel.models[ _i ]
-          col = _cols.instance
-          error = nil
-          entity = col.retrieve_entity_via_name_and_class @name_i, Couch_, -> ev do
-            error = ev ; nil
-          end
-          if error
-            @no_p[ error ]
-          else
-            entity
-          end
+          init_ivars
+          ok = via_entity_identifier_and_kernel_rslv_model_class
+          ok &&= via_entity_identifier_resolve_native_entity_identifier
+          ok &&= via_native_entity_identifier_rslv_payload_h
+          ok && via_payload_h_prdc_entity
         end
+
+      private
+
+        def init_ivars
+          init_response_receiver_for_self_on_channel :my_face
+        end
+
+        def via_native_entity_identifier_rslv_payload_h
+          @payload_h = @datastore.get @native_entity_identifier_s,
+            :response_receiver, @response_receiver
+          @payload_h ? PROCEDE_ : UNABLE_
+        end
+
+        def via_payload_h_prdc_entity
+
+          _h = @payload_h.fetch PROPERTIES__
+          _r = @payload_h.fetch REVISION__
+
+          @model_class.edited @event_receiver, @kernel do |o|
+            o.set_arg :couch_entity_revision, _r
+            o.with_unmarshalled_hash _h
+          end  # :+[#037] might be invalid
+        end
+
+        PROPERTIES__ = 'properties'.freeze ; REVISION__ = '_rev'.freeze
+
+      public
+
+        def my_face_when_404_object_not_found response
+          _ev =  response.response_body_to_not_OK_event :eid, @entity_identifier do |y, o|
+            y << "there is no #{ o.eid.silo_name_parts.reverse * SPACE_ }#{
+             } with the name #{ ick o.eid.entity_name_s }#{
+              } (#{ o.code } - entity not found)"
+          end
+          send_event _ev
+          UNABLE_
+        end
+      end
+    end
+
+    class Couch_Actor_
+    private
+
+      def init_response_receiver_for_self_on_channel i
+        @response_receiver = Couch_.HTTP_remote.response_receiver i, self ; nil
+      end
+
+      def via_entity_identifier_resolve_native_entity_identifier
+        @name_s = @entity_identifier.name_parts.last
+        if NATURAL_KEY_RX__ =~ @name_s
+          via_entity_identifier_when_valid_rslv_native_entity_identifier
+        else
+          when_name_not_valid
+        end
+      end
+
+      NATURAL_KEY_RX__ = /\A[-a-z0-9]+\z/
+
+      def when_name_not_valid
+        send_not_OK_with :name_is_invalid_as_a_natural_key, :name, @name_s
+        UNABLE_
+      end
+
+      def via_entity_identifier_and_kernel_rslv_model_class
+        @model_class = @kernel.model_class_via_identifier @entity_identifier, event_receiver
+        @model_class ? ACHEIVED_ : UNABLE_
+      end
+
+      def via_entity_identifier_when_valid_rslv_native_entity_identifier
+        @native_entity_identifier_s =
+          "#{  @entity_identifier.silo_slug }--#{  @entity_identifier.entity_name_s }"
+        ACHEIVED_
+      end
+
+    public
+
+      def my_face_when_200_ok o
+        _JSON.parse o.response.body
+      end
+
+    private
+
+      def _JSON
+        Lib_::JSON[]
       end
     end
   end

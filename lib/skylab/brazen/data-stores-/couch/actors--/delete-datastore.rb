@@ -5,59 +5,78 @@ module Skylab::Brazen
     class Actors__::Delete_datastore < Couch_Actor_
 
       Actor_[ self, :properties,
-        :action, :kernel ]
+        :entity,
+        :props,
+        :remote,
+        :event_receiver ]
 
       def execute
-        via_action_init_action_properties
-        @result = nil
-        @datastore_i = @action.action_property_value :name
-        ok = via_datastore_name_resolve_datastore
-        ok &&= via_datastore_resolve_result
-        Actors__::Delete_datastore_entity__[ @action, @kernel ]
-        @result
+        init_ivars
+        ok = check_force
+        ok && work
       end
 
     private
 
-      def via_datastore_resolve_result
-        if @action.action_property_value :force
-          @datastore.delete_datastore self, :delete_datastore, self
+      def init_ivars
+        @dry_run = @entity.any_parameter_value :dry_run
+        @has_force = @entity.any_parameter_value :force
+        @datastore_s = @entity.property_value :name
+        init_response_receiver_for_self_on_channel :delete_datastore
+        nil
+      end
+
+      def check_force
+        if @has_force
+          PROCEDE_
         else
-          resolve_result_when_force_not_present
+          when_force_not_present
+        end
+      end
+
+      def when_force_not_present
+        _ev = bld_missing_force_event
+        send_event _ev
+        UNABLE_
+      end
+
+      def bld_missing_force_event
+        _FORCE_ = @props.fetch :force
+        build_not_OK_event_with :missing_force do |y, o|
+           y << "missing required #{ par _FORCE_ }"
+        end
+      end
+
+      def work
+        if @dry_run
+          delete_datastore_when_dry_run nil
+          PROCEDE_
+        else
+          x_a = []
+          x_a.push :entity_identifier_strategy, :__N_O_N_E__
+          x_a.push :response_receiver, @response_receiver
+          @remote.delete x_a
         end
       end
 
     public
 
       def delete_datastore_when_dry_run _
-        @action.receive_success_event build_event_with( :pretend, :pretending, :pretending )
-        @result = nil
+        _ev = build_OK_event_with( :pretending_for_dry_run, :pretending, :pretending )
+        send_event _ev
+        nil
       end
 
       def delete_datastore_when_200_ok o
-        _ev = o.response_body_to_completion_event :name, @datastore_i do |y, ev|
+        _ev = o.response_body_to_completion_event :name, @datastore_s do |y, ev|
           y << "#{ ev.message } - removed datastore #{ val ev.name }"
         end
-        @result = @action.receive_success_event _ev ; nil
+        send_event _ev ; nil
       end
 
       def delete_datastore_when_404_object_not_found o
-        _ev = o.response_body_to_error_event
-        @result = @action.receive_error_event _ev ; nil
-      end
-
-    private
-
-      def resolve_result_when_force_not_present
-        force = @action.class.properties.fetch :force
-        _ev = build_error_event_with :missing_force do |y, o|
-          y << "missing required #{ par force }"
-        end
-        @result = delegate.receive_error_event _ev ; nil
-      end
-
-      def delegate
-        @action
+        _ev = o.response_body_to_not_OK_event
+        send_event _ev ; nil
       end
     end
   end

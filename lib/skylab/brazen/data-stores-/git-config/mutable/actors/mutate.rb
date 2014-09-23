@@ -15,7 +15,7 @@ module Skylab::Brazen
 
         def execute
           ok = resolve_properties
-          ok &&= via_entity_resolve_subsection_identifier
+          ok &&= via_entity_resolve_subsection_id
           ok && edit_file
           @result
         end
@@ -55,7 +55,7 @@ module Skylab::Brazen
         end
 
         def edit_file_via_create_section
-          _a = @subsection_identifier.to_a
+          _a = @subsection_id.to_a
           @section = @mutable_document.sections.touch_section( * _a )
           if @section.is_empty
             edit_file_via_create_section_when_section_empty
@@ -70,7 +70,7 @@ module Skylab::Brazen
         end
 
         def edit_file_via_create_section_when_section_not_empty
-          _s = @subsection_identifier.description
+          _s = @subsection_id.description
           send_not_OK_event_with :will_not_clobber_existing_entity,
             :entity_description, _s, :entity, @entity
           @result = UNABLE_
@@ -95,7 +95,7 @@ module Skylab::Brazen
         end
 
         def when_no_change_in_section
-          _s = @subsection_identifier.description
+          _s = @subsection_id.description
           send_not_OK_event_with :no_change_in_entity,
             :entity_description, _s, :entity, @entity
           @result = UNABLE_

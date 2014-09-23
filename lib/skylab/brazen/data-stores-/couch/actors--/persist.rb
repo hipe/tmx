@@ -5,99 +5,109 @@ module Skylab::Brazen
     class Actors__::Persist < Couch_Actor_
 
       Actor_[ self, :properties,
-        :entity, :datastore_i, :kernel ]
+        :entity,
+        :datastore ]
 
       def execute
-        ok = via_datastore_name_resolve_datastore
-        ok && init_ivars
-        ok &&= resolve_ivars
-        ok && via_datastore_resolve_result
-        @result
+        init_ivars
+        ok = rslv_ivars
+        ok && prdc_any_result
       end
 
     private
 
       def init_ivars
-        via_entity_init_action_properties
-        @entity_model_i = @entity.class.name_function.as_lowercase_with_underscores_symbol
-        @scn = @entity.to_normalized_actual_property_scan ; nil
+        @dry_run = @entity.any_parameter_value :dry_run
+        @property_scan = @entity.to_normalized_actual_property_scan
+        @response_receiver = me_as_response_receiver
+        nil
       end
 
-      def resolve_ivars
-        resolve_entity_identifier
+      def me_as_response_receiver
+        Couch_.HTTP_remote.response_receiver.new self
       end
 
-      def resolve_entity_identifier
-        @name = @entity.property_value :name
-        if NATURAL_KEY_RX__ =~ @name
-          _s_ = @entity.class.name_function.as_slug
-          @entity_identifier = "#{ _s_ }--#{ @name }"
-          ACHEIVED_
-        else
-          resolve_result_via_error_with :name_is_invalid_as_a_natural_key,
-            :name, @name
-          UNABLE_
-        end
+      def rslv_ivars
+        via_entity_rslv_native_entity_identifier
       end
-      NATURAL_KEY_RX__ = /\A[-a-z0-9]+\z/
 
-      def via_datastore_resolve_result
+      def via_entity_rslv_native_entity_identifier
+        ok = via_entity_resolve_entity_identifier
+        ok && via_entity_identifier_resolve_native_entity_identifier
+      end
+
+      def prdc_any_result
         if @entity.came_from_persistence
-          resolve_result_when_update
+          rslv_result_when_update
         else
-          resolve_result_when_create
+          rslv_result_when_create
         end
       end
 
-      def resolve_result_when_update
+      def rslv_result_when_update
         self._DO_ME
       end
 
-      def resolve_result_when_create
-        h = { entity_model: @entity_model_i, properties: ( h_ = {} ) }
-        while actual = @scn.gets
+      def rslv_result_when_create
+        _h = bld_entity_as_document_h
+        _s = _JSON.pretty_generate _h
+
+        @datastore.put _s,
+          :native_entity_identifier_s, @native_entity_identifier_s,
+          :entity_identifier_strategy, :native_entity_identifier_string,
+          :response_receiver, @response_receiver  # is some
+      end
+
+      def bld_entity_as_document_h
+
+        h = { entity_model: @entity_identifier.silo_name_i,
+              properties: ( h_ = {} ) }
+
+        while actual = @property_scan.gets
           h_[ actual.name_i ] = actual.value_x
         end
-        s = Lib_::JSON[].pretty_generate h
-        @datastore.put s, :delegate, self,
-          :entity_identifier, @entity_identifier,
-          :entity_identifier_strategy, :entity_identifier ; nil
+
+        h
       end
 
       def when_201_created o
         _ev = o.response_body_to_completion_event do |y, o_|
           y << "created #{ val o_.id } (rev: #{ val o_.rev })"
         end
-        resolve_result_via_success_event _ev
+        any_result_via_send _ev
       end
 
       def when_404_object_not_found o
         ds_i = @datastore_i.to_s
-        _ev = o.response_body_to_error_event do |y, ev|
+        _ev = o.response_body_to_not_OK_event do |y, ev|
           y << "there is no #{ val ds_i } couch datastore (#{ val ev.reason })"
         end
-        resolve_result_via_error _ev
+        any_result_via_send _ev
       end
 
       def when_409_conflict o
-        _eid = @entity_identifier
-        _ev = o.response_body_to_error_event :name, @name do |y, ev|
+        _eid = @native_entity_identifier_s
+        _ev = o.response_body_to_not_OK_event :name, _eid do |y, ev|
           y << "#{ val ev.name } is already taken as a name #{
            }(#{ o.response.code } #{ ev.reason })"
         end
-        resolve_result_via_error _ev
+        any_result_via_send _ev
       end
 
       def when_412_precondition_failed o
-        resolve_result_via_error o.response_body_to_error_event
+        any_result_via_send o.response_body_to_not_OK_event
       end
 
       def when_500_internal_server_error o
-        _ev = o.response_body_to_error_event
-        resolve_result_via_error _ev
+        _ev = o.response_body_to_not_OK_event
+        any_result_via_send _ev
       end
 
-      def delegate
+      def any_result_via_send ev
+        send_event ev
+      end
+
+      def event_receiver
         @entity
       end
     end

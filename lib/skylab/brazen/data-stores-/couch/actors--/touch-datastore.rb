@@ -2,28 +2,33 @@ module Skylab::Brazen
 
   class Data_Stores_::Couch
 
-    class Actors__::Ensure_datastore_exists < Data_Store_::Actor
+    class Actors__::Touch_datastore < Couch_Actor_
 
       Actor_[ self, :properties,
-        :entity, :delegate ]
+        :entity,
+        :event_receiver ]
 
       def execute
+        init_response_receiver_for_self_on_channel :ensure_exists
         @entity.put EMPTY_S_,
-          :entity_identifier_strategy, :none,
-          :channel, :ensure_exists, :delegate, self
+          :entity_identifier_strategy, :__N_O_N_E__,
+          :response_receiver, @response_receiver
       end
 
     public
 
       def ensure_exists_when_201_created _
-        _ev = build_event_with :created_database, :description_s,
-          @entity.description, * @entity.to_iambic, :ok, true
-        @delegate.receive_success_event _ev
+        _ev = build_OK_event_with :created_datastore, :description,
+          @entity.description, * @entity.to_even_iambic
+        send_event _ev
+        ACHEIVED_
       end
 
       def ensure_exists_when_412_precondition_failed o
-        _ev = o.response_body_to_error_event
-        @delegate.receive_error_event _ev
+        _ev = build_OK_event_with :datastore_exists, :description,
+          @entity.description, * @entity.to_even_iambic
+        send_event _ev
+        nil
       end
     end
   end

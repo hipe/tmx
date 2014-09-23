@@ -9,12 +9,13 @@ module Skylab::Brazen
     class Actors__::Retrieve < Git_Config_Actor_
 
       Actor_[ self, :properties,
-        :entity_identifier, :model_class, :document,
+        :entity_identifier,
+        :document,
         :event_receiver, :kernel ]
 
       def execute
-        ok = via_entity_identifier_resolve_subsection_identifier
-        ok && via_subsection_identifier_resolve_some_result
+        ok = via_entity_identifier_resolve_subsection_id
+        ok && via_subsection_id_resolve_some_result
         ok && @result
       end
     end
@@ -22,7 +23,8 @@ module Skylab::Brazen
     class Actors__::Scan < Git_Config_Actor_
 
       Actor_[ self, :properties,
-        :model_class, :document,
+        :model_class,
+        :document,
         :event_receiver, :kernel ]
 
       def execute
@@ -57,7 +59,10 @@ module Skylab::Brazen
         name_name_s = NAME_.to_s
         @section_scan.map_by do |sect|
           h = { name_name_s => sect.subsect_name_s }
-          sect.assignments.write_to_hash h
+          sect.assignments.each_normalized_pair do |i, x|
+            x or next
+            h[ i.id2name ] = "#{ x }"
+          end
           box.replace_hash h
           fly
         end
@@ -67,49 +72,49 @@ module Skylab::Brazen
     class Git_Config_Actor_
     private
 
-      def via_entity_identifier_resolve_subsection_identifier
+      def via_entity_identifier_resolve_subsection_id
         via_entity_identifier_resolve_both_strings
-        via_both_strings_resolve_subsection_identifier
+        via_both_strings_resolve_subsection_id
       end
 
       def via_entity_identifier_resolve_both_strings
         id = @entity_identifier
-        @section_string = id.silo_name_i.id2name.gsub UNDERSCORE_, DASH_
-        @subsection_string = id.entity_name_s ; nil
+        @section_s = id.silo_name_i.id2name.gsub UNDERSCORE_, DASH_
+        @subsection_s = id.entity_name_s ; nil
       end
 
-      def via_entity_resolve_subsection_identifier
+      def via_entity_resolve_subsection_id
         via_entity_resolve_model_class
         via_model_class_resolve_section_string
         via_entity_resolve_subsection_string
-        via_both_strings_resolve_subsection_identifier
+        via_both_strings_resolve_subsection_id
       end
 
       def via_model_class_resolve_section_string
-        @section_string = @model_class.
+        @section_s = @model_class.
           node_identifier.silo_name_i.id2name.gsub UNDERSCORE_, DASH_ ; nil
       end
 
       def via_entity_resolve_subsection_string
-        @subsection_string = @entity.local_entity_identifier_string ; nil
+        @subsection_s = @entity.local_entity_identifier_string ; nil
       end
 
-      def via_both_strings_resolve_subsection_identifier
-        @subsection_identifier = Subsection_Identifier_.
-          new @section_string, @subsection_string
+      def via_both_strings_resolve_subsection_id
+        @subsection_id = Subsection_Identifier_.
+          new @section_s, @subsection_s
         PROCEDE_
       end
 
-      def via_subsection_identifier_resolve_some_result
-        ok = via_subsection_identifier_resolve_section
-        ok &&= via_subsection_identifier_resolve_model_class
+      def via_subsection_id_resolve_some_result
+        ok = via_subsection_id_resolve_section
+        ok &&= via_subsection_id_resolve_model_class
         ok && via_section_and_model_class_resolve_result
         ok || @result = false
       end
 
-      def via_subsection_identifier_resolve_section
+      def via_subsection_id_resolve_section
         scan = @document.sections.to_scan
-        ss = @subsection_identifier
+        ss = @subsection_id
         s_i = ss.section_s.intern ; ss_s = ss.subsection_s
         found = false ; count = 0
         while sect = scan.gets
@@ -133,15 +138,15 @@ module Skylab::Brazen
 
         build_not_OK_event_with :entity_not_found,
           :count, @count,
-          :subsection_identifier, @subsection_identifier,
-          :document_locator, @document.identifier do |y, o|
+          :subsection_id, @subsection_id,
+          :input_id, @document.input_id do |y, o|
 
-          if o.document_locator
-            s = o.document_locator.render_first_line_under self
+          if o.input_id
+            s = o.input_id.description_under self
             s and loc_s = " in #{ s }"
           end
 
-          ss = o.subsection_identifier
+          ss = o.subsection_id
 
           if o.count.zero?
             y << "found no #{ ick ss.section_s } section#{ loc_s }"
@@ -152,12 +157,12 @@ module Skylab::Brazen
         end
       end
 
-      def via_subsection_identifier_resolve_model_class
-        _i = @subsection_identifier.to_silo_name_i
+      def via_subsection_id_resolve_model_class
+        _i = @subsection_id.to_silo_name_i
         _id = Node_Identifier_.via_symbol _i
-        cols = @kernel.collections_via_identifier _id, @event_receiver
-        if cols
-          @model_class = cols.model_class
+        silo = @kernel.silo_via_identifier _id, @event_receiver
+        if silo
+          @model_class = silo.model_class
           ACHEIVED_
         end
       end

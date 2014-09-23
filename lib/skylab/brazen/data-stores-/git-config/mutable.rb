@@ -6,8 +6,9 @@ module Skylab::Brazen
 
       class << self
 
-        def new p
-          _parse = Parse__.with :receive_events_via_proc, p
+        def new evr
+          evr.respond_to? :receive_event or raise ::ArgumentError
+          _parse = Parse__.with :receive_events_via_event_receiver, evr
           Document__.new _parse
         end
 
@@ -17,6 +18,11 @@ module Skylab::Brazen
 
         def parse_path path_s, & p
           Parse__[ :via_path, path_s, :receive_events_via_proc, p ]
+        end
+
+        def parse_input_id input_id, evr
+          Parse__[ :via_input_adapter, input_id,
+            :receive_events_via_event_receiver, evr ]
         end
       end
 
@@ -48,10 +54,13 @@ module Skylab::Brazen
             @receiver = x
           end
           def via_path x
-            @receiver.accept_input_ID Input_ID_.via_path x
+            @receiver.accept_input_ID Input_Identifier_.via_path x
           end
           def via_string x
-            @receiver.accept_input_ID Input_ID_.via_string x
+            @receiver.accept_input_ID Input_Identifier_.via_string x
+          end
+          def via_input_adapter x
+            @receiver.accept_input_ID x
           end
           def via_string_for_immediate_parse s
             @receiver.accept_string_for_immediate_scan s
@@ -194,7 +203,7 @@ module Skylab::Brazen
           nscn = get_all_node_scanner
           lscn = nil
           Callback_::Scn.new do
-            begin
+            while true
               if lscn
                 x = lscn.gets
                 x and break
@@ -203,13 +212,13 @@ module Skylab::Brazen
               node = nscn.gets
               node or break
               lscn = node.get_line_scanner
-            end while true
+            end
             x
           end
         end
 
         def get_all_node_scanner
-          Callback_::Scan.nonsparse_array @a  # #todo
+          Scan_[].nonsparse_array @a
         end
 
         def count_number_of_nodes i
@@ -270,6 +279,10 @@ module Skylab::Brazen
             x
           end
         end
+
+        def get_all_node_scan
+          Scan_[].nonsparse_array @a
+        end
       end
 
       module Mutable_Branch_Methods__
@@ -306,7 +319,9 @@ module Skylab::Brazen
         end
 
         def replace_children_with_this_array a
-          @a = a ; a.length
+          d = @a.length
+          @a = a
+          a.length - d
         end
       end
 
@@ -319,6 +334,10 @@ module Skylab::Brazen
           input_id and @input_id = input_id
           @parse = parse
           @sections_shell = Sections_Facade__.new self, parse
+        end
+
+        def input_id
+          @input_id
         end
 
         def dup_via_parse_context parse  # #when-and-how-we-duplicate
@@ -359,7 +378,8 @@ module Skylab::Brazen
         end
 
         def add_comment str
-          @a.push Blank_Line_Or_Comment_Line__.new "# #{ str }\n" ; nil
+          @a.push Blank_Line_Or_Comment_Line__.new "# #{ str }#{ NEWLINE_ }"
+          PROCEDE_
         end
 
         def write_to_pathname pn, * x_a
@@ -445,20 +465,20 @@ module Skylab::Brazen
         end
 
         def delete_comparable_item x, compare_p, err_p
-          scn = to_scanner
-          keep_these = [] ; match_count = 0
+          do_not_delete_these = [] ; will_delete_count = 0
+          scn = @collection_kernel.get_all_node_scan
           while item = scn.gets
             d = compare_p[ item ]
             if d.zero?
-              match_count += 1
+              will_delete_count += 1
             else
-              keep_these.push item
+              do_not_delete_these.push item
             end
           end
-          case 1 <=> match_count
-          when  0 ; delete_comparable_item_when_found keep_these
+          case 1 <=> will_delete_count
+          when  0 ; delete_comparable_item_when_found do_not_delete_these
           when  1 ; delete_comparable_item_when_not_found x, err_p
-          when -1 ; delete_comparable_item_when_many_matches math_count, x, err_p
+          when -1 ; delete_comparable_item_when_many_matches will_delete_count, x, err_p
           end
         end
 
@@ -572,12 +592,20 @@ module Skylab::Brazen
 
       public
 
+        def is_empty
+          @kernel.is_empty
+        end
+
         def symbol_i
           :section_or_subsection
         end
 
         def unparse_into_yielder y
           @kernel.unparse_into_yielder y
+        end
+
+        def get_line_scanner
+          @kernel.get_line_scanner
         end
 
         def normalized_name_i
@@ -626,14 +654,18 @@ module Skylab::Brazen
         def accept_asmt x
           @kernel.accept_asmt x
         end
+
+        def clear_section
+          @kernel.clear_section
+        end
       end
       OPEN_BRACE_RX_ = /[ ]*\[[ ]*/
 
-      Validates__ = ::Class.new
+      Event_Sending_Node__ = ::Class.new
 
-      Validates_Section_Names___ = ::Class.new Validates__
+      Section_Or_Subsection_Kernel__ = ::Class.new Event_Sending_Node__
 
-      class Section_Or_Subsection_Parse__ < Validates_Section_Names___
+      class Section_Or_Subsection_Parse__ < Section_Or_Subsection_Kernel__
 
         include Mutable_Branch_Methods__, Readable_Branch_Methods__
 
@@ -667,6 +699,10 @@ module Skylab::Brazen
         attr_reader :a
 
       public
+
+        def is_empty
+          @a.length.zero?
+        end
 
         def assignments
           @assignments_shell
@@ -782,9 +818,30 @@ module Skylab::Brazen
           end ; nil
         end
 
+        def get_line_scanner
+          p = -> do
+            x = @line
+            p = -> do
+              scn = get_body_line_scanner
+              p = -> do
+                scn.gets
+              end
+              scn.gets
+            end
+            x
+          end
+          Callback_::Scn.new do
+            p[]
+          end
+        end
+
         # ~ mutators
 
         def for_edit
+        end
+
+        def clear_section
+          d = @a.length ; @a.clear ; d
         end
 
         def aref_set i, x
@@ -798,7 +855,7 @@ module Skylab::Brazen
           _compare_p = bld_compare ast
           otr = @assignments_shell.touch_comparable_item ast, _compare_p
           if ast.object_id == otr.object_id
-            send_event_with :value_added, :new_assignment, ast
+            send_OK_event_with :added_value, :new_assignment, ast
           else
             send_changed_or_not_changed_event otr, ast
           end
@@ -815,17 +872,17 @@ module Skylab::Brazen
           _x = ast.value_x
           _x_ = otr.value_x
           if _x_ == _x
-            send_event_with :no_change_in_value, :existing_assignment, otr
+            send_OK_event_with :no_change_in_value, :existing_assignment, otr
           else
             previous_value = otr.value_x
             otr.value_x = ast.value_x
-            send_event_with :value_changed, :existing_assignment, otr,
+            send_OK_event_with :value_changed, :existing_assignment, otr,
               :previous_value, previous_value
           end
         end
       end
 
-      class Section_Or_Subsection_Literal__ < Validates_Section_Names___
+      class Section_Or_Subsection_Literal__ < Section_Or_Subsection_Kernel__
 
         def initialize s, s_, parse
           @parse = parse
@@ -833,24 +890,47 @@ module Skylab::Brazen
           @unsanitized_subsect_s = s_ ; nil
         end
 
+        def is_empty
+          true
+        end
+
         def for_edit
           unparse_into_yielder y=[]
           _parse = Parse__.with :via_string_for_immediate_parse, y * EMPTY_S_,
             :receive_events_via_event_receiver, @parse.event_receiver
           otr = Section_Or_Subsection_Parse__.new _parse
-          otr.parse or self._SANITY
+          otr.parse or self._SYNTAX_MISMATCH
           otr
         end
 
         def unparse_into_yielder y  # :+#arbitrary-styling
+          scn = get_line_scanner
+          while line = scn.gets
+            y << line
+          end ; nil
+        end
+
+        def get_line_scanner
+          p = -> do
+            line = rndr_line
+            p = EMPTY_P_
+            line
+          end
+          Callback_::Scn.new do
+            p[]
+          end
+        end
+      private
+        def rndr_line
           if @subsect_s
             s = @subsect_s.dup
             Section_.escape_subsection_name s
-            y << "[#{ @sect_s } \"#{ s }\"]#{ NEWLINE_ }"
+            "[#{ @sect_s } \"#{ s }\"]#{ NEWLINE_ }"
           else
-            y << "[#{ @sect_s }]#{ NEWLINE_ }"
-          end ; nil
+            "[#{ @sect_s }]#{ NEWLINE_ }"
+          end
         end
+      public
 
         def resolve
           if ANCHORED_SECTION_NAME_RX_ =~ @unsanitized_sect_s
@@ -913,7 +993,7 @@ module Skylab::Brazen
       SECTION_NAME_RX_ = /[-A-Za-z0-9.]+/
       ANCHORED_SECTION_NAME_RX_ = /\A#{ SECTION_NAME_RX_.source }\z/
 
-      class Validates_Section_Names___
+      class Section_Or_Subsection_Kernel__
 
         def normalized_name_i
           @normalized_sect_i
@@ -998,6 +1078,10 @@ module Skylab::Brazen
           @kernel.unparse_into_yielder y
         end
 
+        def get_line_scanner
+          @kernel.get_line_scanner
+        end
+
         def name_s
           @kernel.name_s
         end
@@ -1023,9 +1107,9 @@ module Skylab::Brazen
 
       AST_NAME_RX_ = /[A-Za-z][-0-9A-Za-z]*/
 
-      Mutable_Assignment___ = ::Class.new Validates__
+      Assignment_Kernel__ = ::Class.new Event_Sending_Node__
 
-      class Assignment_Parse__ < Mutable_Assignment___
+      class Assignment_Parse__ < Assignment_Kernel__
 
         def initialize parse
           @parse = parse
@@ -1271,7 +1355,7 @@ module Skylab::Brazen
         end
       end
 
-      class Assignment_Literal__ < Mutable_Assignment___
+      class Assignment_Literal__ < Assignment_Kernel__
 
         def initialize i, x, parse
           parse or raise "where"
@@ -1282,8 +1366,15 @@ module Skylab::Brazen
         end
 
         def unparse_into_yielder y  # :+#arbitrary-styling, this style is covered
+          _s = rndr_line
+          y << _s ; nil
+        end
+
+      private
+
+        def rndr_line
           _s = unmarshall_RHS_via_x @x
-          y << "#{ @i } =#{ _s }\n" ; nil
+          "#{ @i } =#{ _s }#{ NEWLINE_ }"
         end
 
       public
@@ -1332,11 +1423,16 @@ module Skylab::Brazen
         end
       end
 
-      class Mutable_Assignment___
+      class Assignment_Kernel__
+
+        def get_line_scanner
+          _line = rndr_line
+          Single_line_scanner__[ _line ]
+        end
 
         def set_value x
           if x.nil?
-            set_value_when_value_is_nil  # #todo
+            set_value_when_value_is_nil  # #open [#040]
           else
             accept_new_value x
           end
@@ -1346,7 +1442,7 @@ module Skylab::Brazen
 
         def unmarshall_RHS_via_x x
           if x.nil?
-            unmarshalled_RHS_when_nil  # #todo
+            unmarshalled_RHS_when_nil  # #open [#040]
           else
             unmarshalled_RHS_when_not_nil x
           end
@@ -1378,23 +1474,10 @@ module Skylab::Brazen
         SPECIAL_VALUE_CHARACTERS_RX__ = /[#;"\\\n\t\b]/
       end
 
-      class Validates__
+      class Event_Sending_Node__
       private
 
-        def send_not_OK_event_with * x_a, & p  # #todo x X
-          x_a.push :ok, false
-          send_event_via_iambic_and_message_proc x_a, p
-        end
-
-        def send_event_with * x_a, & p
-          send_event_via_iambic_and_message_proc x_a, p
-        end
-
-        def send_event_via_iambic_and_message_proc x_a, p
-          _ev = Entity_[]::Event.inline_via_iambic_and_message_proc x_a, p
-          event_receiver.receive_event _ev
-          nil
-        end
+        Event_[].sender self
 
         def event_receiver
           @parse
@@ -1432,7 +1515,6 @@ module Skylab::Brazen
         end
       end
 
-      NEWLINE_ = "\n".freeze  # #todo
       SPACE_RX_ = /[ ]*/
     end
   end

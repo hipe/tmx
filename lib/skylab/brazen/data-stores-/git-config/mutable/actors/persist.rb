@@ -61,12 +61,6 @@ module Skylab::Brazen
             ::File.open @pathname.to_path, 'w', & p  # WRITEMODE_
           end
         end
-
-        def send_OK_event_with * x_a, & p  # #todo
-          x_a.push :ok, true
-          _ev = Entity_[]::Event.inline_via_iambic_and_message_proc x_a, p
-          @event_receiver.receive_event _ev
-        end
       end
     end
   end

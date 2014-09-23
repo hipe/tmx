@@ -16,16 +16,16 @@ module Skylab::Brazen
           :event_receiver ]
 
         def execute
-          ok = via_entity_resolve_subsection_identifier
-          ok &&= via_subsection_identifier_resolve_section
+          ok = via_entity_resolve_subsection_id
+          ok &&= via_subsection_id_resolve_section
           ok &&= via_section_delete_section
           ok
         end
 
-        def resolve_subsection_identifier
+        def resolve_subsection_id
           via_model_class_resolve_section_string
           ok = via_bx_resolve_subsection_string
-          ok && via_both_strings_resolve_subsection_identifier
+          ok && via_both_strings_resolve_subsection_id
         end
 
         def via_bx_resolve_subsection_string
@@ -33,19 +33,23 @@ module Skylab::Brazen
           if s
             s = s.strip  # b.c it has been frozen in the past
             if s.length.nonzero?
-              @subsection_string = s
+              @subsection_s = s
               PROCEDE_
             end
           end
         end
 
         def via_section_delete_section
-          ss = @subsection_identifier
+          ss = @subsection_id
           sect_s, subs_s = ss.to_a
           _compare_p = -> item do
-            d = sect_s <=> item.normalized_name_s
-            if d.nonzero? then d else
-              subs_s <=> item.subsect_name_s
+            if :section_or_subsection == item.symbol_i
+              d = sect_s <=> item.normalized_name_s
+              if d.nonzero? then d else
+                subs_s <=> item.subsect_name_s
+              end
+            else
+              -1
             end
           end
           @document.sections.delete_comparable_item ss, _compare_p, -> ev do

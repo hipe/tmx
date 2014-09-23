@@ -1,103 +1,175 @@
 module Skylab::Brazen
 
-  class Data_Stores_::Couch
+  class Data_Stores_::Couch < Brazen_::Data_Store_::Model_  # see [#038]
 
-    class Collection_Controller__
+    Brazen_::Model_::Entity[ self, -> do
 
-      # frontier class. will be abstracted later
-
-      def initialize x_a
-        a = []
-        x_a.each_slice 2 do |i, x|
-          a[ ST__[ i ] ] = x
-        end
-        @datastore_i, @channel, @delegate, @model_class, @kernel = a
-        @did_resolve_connection = false
-        @did_add_view_document = false
+      o :desc, -> y do
+        y << "manage couch datastores."
       end
 
-      ST__ = ::Struct.new(
-        :datastore_i, :channel, :delegate, :model_class, :kernel ).
-          new( * 5.times.to_a )
+      o :persist_to, :workspace
 
-      def to_property_hash_scan
-        require_connection
-        @connection and via_connection_get_property_hash_scan
-      end
-
-    private
-
-      def via_connection_get_property_hash_scan
-        h = retrieve_payload
-        h and get_property_hash_scan_via_payload_h h
-      end
-
-      def retrieve_payload
-        _s = get_view_document_URI_tail
-        @connection.get _s, :delegate, self, :channel, :retrieve_payload
-      end
-
-      def retrieve_payload_when_200_ok o
-        Lib_::JSON[].parse o.response.body
-      end
-
-      def retrieve_payload_when_404_object_not_found o
-        if @did_add_view_document
-          ev = o.response_body_to_error_event
-          send_error ev ; nil
+      o :description, -> y do
+        y << "the name of the database"
+      end,
+      :ad_hoc_normalizer, -> x, val_p, ev_p, prop do
+        if /\A[-a-z0-9]+\z/ =~ x
+          val_p[ x ]
         else
-          @did_add_view_document = true
-          add_view_document
-        end
-      end
-
-      def add_view_document
-        _ick = { views: { vu1: { map: "function(doc) { #{
-        }if (doc.entity_model) { emit( doc.entity_model, doc.properties ); } }"
-        } } }
-        _body = Lib_::JSON[].pretty_generate _ick
-        @connection.put _body, :entity_identifier_strategy, :append_URI_tail,
-          :URI_tail, '_design/vu',
-          :delegate, self, :channel, :add_view_document
-      end
-
-      def add_view_document_when_201_created o
-        _ev = o.response_body_to_completion_event do |y, ev|
-          y << "added design document #{ val ev.id }"
-        end
-        @delegate.send :"receive_#{ @channel }_info", _ev
-        retrieve_payload  # "try again" i really hate this here.
-      end
-
-      def get_property_hash_scan_via_payload_h h
-        Entity_[].scan_nonsparse_array( h[ 'rows' ] ).map_by do |x|
-          x.fetch VALUE__
-        end
-      end
-      VALUE__ = 'value'.freeze
-
-      def get_view_document_URI_tail
-        _i = @model_class.name_function.as_lowercase_with_underscores_symbol
-        "_design/vu/_view/vu1?key=\"#{ _i }\""
-      end
-
-      def require_connection
-        @did_resolve_connection or resolve_connection
-        @connection
-      end
-
-      def resolve_connection
-        @did_resolve_connection = true
-        _cols = @kernel.datastores[ :couch ]
-        @connection =
-        _cols.retrieve_entity_via_name @datastore_i, -> ev do
-          send_error ev ; UNABLE_
+          ev_p[ :error, :name_must_be_lowercase_alphanumeric_with_dashes,
+                :name_s, x, :ok, false, nil ]
         end ; nil
-      end
+      end,
+      :required,
+      :property, :name
 
-      def send_error ev
-        @delegate.send :"receive_#{ @channel }_error", ev
+
+      o :description, -> y do
+        y << "the HTTP host to connect to (default: #{ property_default })"
+      end,
+      :default, 'localhost',
+      :property, :host
+
+
+      o :description, -> y do
+        y << "the HTTP port to connect to (default: #{ property_default })"
+      end,
+      :default, '5984',
+      :ad_hoc_normalizer, -> x, val_p, ev_p, prop do
+        if x
+          if /\A[0-9]{1,4}\z/ =~ x
+            val_p[ x ]
+          else
+            ev_p[ :error, :port_must_be_one_to_four_digits, :port_s, x,
+                  :ok, false, nil ]
+          end
+        end
+      end,
+      :property, :port
+
+    end ]
+
+    Actions = make_action_making_actions_module
+
+    module Actions
+
+      Add = make_action_class :Add
+
+      Ls = make_action_class :List
+
+      Rm = make_action_class :Remove do
+
+        Entity_[][ self, -> do
+          o :description, -> y { y << 'always necessary for now.' },
+            :flag, :property, :force
+        end ]
       end
     end
+
+    def description
+      o = @property_box
+      "#{ o[ :name ] } on #{ o[ :host ] }:#{ o[ :port ] }"
+    end
+
+    # ~ for create
+
+    def persist_entity entity, _event_receiver
+      Couch_::Actors__::Persist[ entity, self ]
+    end
+
+    def any_native_create_before_create_in_datastore
+      Couch_::Actors__::Touch_datastore[ self, @event_receiver ]
+      PROCEDE_  # #note-085
+    end
+
+    # ~ for retrieve (one)
+
+    def entity_via_identifier id, evr
+      Couch_::Actors__::Retrieve_datastore_entity[ id, self, evr, @kernel ]
+    end
+
+    # ~ for retrieve (list)
+
+    def entity_scan_via_class cls, evr
+      Couch_::Actors__::Scan.with :model_class, cls,
+        :datastore, self,
+        :event_receiver, evr, :kernel, @kernel
+    end
+
+    # ~ for delete entity
+
+    def delete_entity ent, evr
+      ok = ent.any_native_delete_before_delete_in_datastore evr
+      ok && Couch_::Actors__::Delete[ ent, self, evr ]
+    end
+
+    # ~ for delete self
+
+    def any_native_delete_before_delete_in_datastore evr
+      _remote = _HTTP_remote
+      _ok = Couch_::Actors__::Delete_datastore[
+        self, @action_formal_properties, _remote, evr ]
+      # NOTE we ignore the above - we want failure of the one not to prevent
+      # the other from proceding (otherwise you couldn't remove rogue records)
+      PROCEDE_
+    end
+
+    # ~ for actors
+
+    def put body, * x_a
+      _HTTP_remote.put body, x_a
+    end
+
+    def get uri_tail, * x_a
+      _HTTP_remote.get uri_tail, x_a
+    end
+
+    def delete uri_tail, * x_a
+      x_a.push :entity_identifier_strategy, :append_URI_tail
+      x_a.push :URI_tail, uri_tail
+      _HTTP_remote.delete x_a
+    end
+
+  private
+
+    def _HTTP_remote
+      @HTTP_remote ||= bld_HTTP_remote
+    end
+
+    def bld_HTTP_remote
+      Couch_.HTTP_remote.new( * @property_box.at( :name, :port, :host ) )
+    end
+
+  public  # ~ hook in's
+
+    def as_precondition_via_preconditions precons
+      @preconditions = precons
+      # (we used to touch the database here)
+      self
+    end
+
+    class Collection_Controller__ < Brazen_.model.collection_controller
+
+    end
+
+    class Silo_Controller__ < Brazen_.model.silo_controller
+
+      def wrap_action_precondition_not_resolved_from_identifier_event ev
+        x_a = ev.to_iambic
+        x_a.push :invite_to_action, [ :datastore, :couch, :add ]
+        build_event_via_iambic x_a, & ev.message_proc
+      end
+    end
+
+    class << self
+
+      def HTTP_remote
+        Couch_::HTTP_Remote__
+      end
+    end
+
+    Couch_ = self
+    Data_Store_ = Brazen_::Data_Store_
   end
 end
