@@ -2,11 +2,20 @@ module Skylab::Brazen
 
   module Entity
 
-    class Event  # see [#011]
+    class Event__  # see [#011]
 
       class << self
 
         alias_method :construct, :new
+
+        def sender x
+          x.include Sender_Methods__ ; nil
+        end
+
+        def inline_with * x_a, &p
+          p ||= Inferred_Message.to_proc
+          inline_via_iambic_and_message_proc x_a, p
+        end
 
         def inline_via_iambic_and_message_proc x_a, p
           construct do
@@ -14,19 +23,27 @@ module Skylab::Brazen
           end
         end
 
-        def prototype_with * i_a, & p
-          prototype_via_deflist_and_message_proc i_a, p
+        def prototype_with * x_a, & p
+          Event_::Prototype__.via_deflist_and_message_proc x_a, p
         end
 
-        def prototype_via_deflist_and_message_proc i_a, p
-          Event::Prototype__.via_deflist_and_message_proc i_a, p
+        def prototype
+          Event_::Prototype__
         end
 
-        def wrap_universal_exception e
-          Event::Wrappers__::Universal_exception[ e ]
+        def receiver & p
+          if p
+            Receiver__::Proc_Adapter__.new p
+          else
+            Receiver__
+          end
         end
 
-        private :new  # not implemented
+        def wrap
+          WRAP__
+        end
+
+        private :new  # #note-045
       end
 
       def initialize & p
@@ -35,7 +52,7 @@ module Skylab::Brazen
 
     private def init_via_x_a_and_p x_a, p
         @message_proc = p
-        scn = Iambic_Scanner.new 0, x_a
+        scn = Lib_::Iambic_scanner[].new 0, x_a
         @terminal_channel_i = scn.gets_one
         box = Box_.new
         sc = singleton_class
@@ -51,8 +68,8 @@ module Skylab::Brazen
 
       attr_reader :message_proc, :terminal_channel_i
 
-      def dup_with * x_a  # #note-25
-        dup.init_copy_with x_a
+      def dup_with * x_a, & p  # #note-25
+        dup.init_copy_via_iambic_and_message_proc x_a, p
       end
 
       def to_iambic
@@ -69,7 +86,7 @@ module Skylab::Brazen
         y
       end
 
-    protected( def init_copy_with x_a  # #note-70
+    protected( def init_copy_via_iambic_and_message_proc x_a, p  # #note-70
         bx = ivar_box
         x_a.each_slice( 2 ) do |i, x|
           instance_variable_set bx.fetch( i ), x
@@ -78,6 +95,7 @@ module Skylab::Brazen
         bx.each_name do |i|
           sc.send :attr_reader, i
         end
+        p and @message_proc = p
         self
       end )
 
@@ -116,7 +134,7 @@ module Skylab::Brazen
         _y = ::Enumerator::Yielder.new do |s|
           s_a.push "(#{ s })"
         end
-        render_all_lines_into_under _y, Event::EXPRESSION_AGENT__
+        render_all_lines_into_under _y, Event__::EXPRESSION_AGENT__
         "(#{ s_a * ', ' })"
       end
 
@@ -231,32 +249,50 @@ module Skylab::Brazen
         PN_RX__ = /(?:_|\A)pathname\z/
       end
 
-      module Builder_Methods
+      module Sender_Methods__
       private
 
-        def build_info_event_with * x_a, & p
+        def send_not_OK_event_with * x_a, & p
+          _ev = build_not_OK_event_via_mutable_iambic_and_message_proc x_a, p
+          _ev_ = wrap_event _ev
+          send_event _ev_
+        end
+
+        def send_neutral_event_with * x_a, & p
+          _ev = build_event_via_iambic_and_message_proc x_a, p
+          _ev_ = wrap_event _ev
+          send_event _ev_
+        end
+
+        def send_OK_event_with * x_a, & p
+          _ev = build_OK_event_via_mutable_iambic_and_message_proc x_a, p
+          _ev_ = wrap_event _ev
+          send_event _ev_
+        end
+
+        def wrap_event ev
+          ev
+        end
+
+        def build_not_OK_event_with * x_a, & p
+          build_not_OK_event_via_mutable_iambic_and_message_proc x_a, p
+        end
+
+        def build_neutral_event_with * x_a, & p
           build_event_via_iambic_and_message_proc x_a, p
         end
 
-        def build_error_event_with * x_a, & p
-          build_error_event_via_mutable_iambic_and_message_proc x_a, p
+        def build_OK_event_with * x_a, & p
+          build_OK_event_via_mutable_iambic_and_message_proc x_a, p
         end
 
-        def build_success_event_with * x_a, & p
-          build_success_event_via_mutable_iambic_and_message_proc x_a, p
-        end
-
-        def build_error_event_via_mutable_iambic_and_message_proc x_a, p
+        def build_not_OK_event_via_mutable_iambic_and_message_proc x_a, p
           x_a.push :ok, false
           build_event_via_iambic_and_message_proc x_a, p
         end
 
-        def build_success_event_via_mutable_iambic_and_message_proc x_a, p
+        def build_OK_event_via_mutable_iambic_and_message_proc x_a, p
           x_a.push :ok, true
-          build_event_via_iambic_and_message_proc x_a, p
-        end
-
-        def build_event_with * x_a, & p
           build_event_via_iambic_and_message_proc x_a, p
         end
 
@@ -273,65 +309,129 @@ module Skylab::Brazen
           Inferred_Message.to_proc
         end
 
-        def build_event_prototype_with * deflist, & p
-          Event.prototype_via_deflist_and_message_proc deflist, p
+        def make_event_prototype_with * deflist, & p
+          Event_.prototype.via_deflist_and_message_proc deflist, p
         end
 
         def event_class
-          Event
+          Event_
+        end
+
+        def send_event ev
+          event_receiver.receive_event ev
+        end
+
+        def event_receiver
+          @event_receiver
+        end
+
+        def _Event
+          Event__
         end
       end
 
-      module Base_Sender_Methods__
-      private
-        def send_event_with * x_a, & p
-          send_event_structure build_event_via_iambic_and_message_proc( x_a, p )
-        end
-        def send_structure_on_channel ev, chan_i
-          send_structure_on_channel_to_delegate ev, chan_i, delegate
-        end
-        def send_structure_on_channel_to_delegate ev, chan_i, delegate
-          send_structure_with_method_to_delegate ev,
-            :"receive_#{ chan_i }_#{ ev.terminal_channel_i }", delegate
-        end
-        def send_structure_with_method ev, m_i
-          send_structure_with_method_to_delegate ev, m_i, delegate
-        end
-        def send_structure_with_method_to_delegate ev, m_i, delegate
-          delegate.send m_i, ev
-        end
-      end
+      module Receiver__
 
-      module Cascading_Prefixing_Sender
-
-        def self.[] mod
-          mod.include Base_Sender_Methods__
-          mod.send :define_method, :send_event_structure, P__ ; nil
+        class << self
+          def channeled * a
+            if a.length.zero?
+              Channeled__
+            else
+              Channeled__.new a
+            end
+          end
+          def via_proc p
+            Proc_Adapter__.new p
+          end
         end
 
-        P__ = -> ev do
-          @channel or self._NO_CHANNEL
-          m_i = :"receive_#{ @channel }_#{ ev.terminal_channel_i }"
-          if @delegate.respond_to? m_i
-            send_structure_with_method ev, m_i
-          else
-            @delegate.send :"receive_#{ @channel }_event", ev
+        class Proc_Adapter__
+          def initialize p
+            @p = p
+          end
+          def receive_event ev
+            @p[ ev ]
+          end
+        end
+
+        class Channeled__
+
+          class << self
+            def full * a
+              if a.length.zero?
+                Full__
+              else
+                Full__.new a
+              end
+            end
+          end
+
+          def initialize a
+            @channel_i, @delegate = a
+            @m_i = build_channeled_event_meth_i
+          end
+
+          attr_reader :channel_i, :delegate  # hax
+
+          def receive_event ev
+            @delegate.send @m_i, ev
+          end
+
+        private
+
+          def build_channeled_event_meth_i
+            :"receive_#{ @channel_i }_event"
+          end
+
+          class Full__ < self
+
+            class << self
+              def cascading * a
+                Cascading__.new a
+              end
+            end
+
+            def initialize a
+              @channel_i, @delegate = a
+            end
+
+            def receive_event ev
+              _m_i = build_longest_meth_i_for_ev ev
+              @delegate.send _m_i, ev
+            end
+          private
+
+            def build_longest_meth_i_for_ev ev
+              :"receive_#{ @channel_i }_#{ ev.terminal_channel_i }"
+            end
+
+            class Cascading__ < self
+              def receive_event ev
+                m_i = build_longest_meth_i_for_ev ev
+                if @delegate.respond_to? m_i
+                  @delegate.send m_i, ev
+                else
+                  _m_i = build_channeled_event_meth_i
+                  @delegate.send _m_i, ev
+                end
+              end
+            end
           end
         end
       end
 
-      module Merciless_Prefixing_Sender
-
-        def self.[] mod
-          mod.include Base_Sender_Methods__
-          mod.send :define_method, :send_event_structure, P__ ; nil
-        end
-
-        P__ = -> ev do
-          @channel or self._NO_CHANNEL
-          send_structure_on_channel ev, @channel
+      module WRAP__
+        class << self
+          def exception *a
+            Event_::Wrappers__::Exception.execute_via_arglist a
+          end
+          def signature *a
+            Event_::Wrappers__::Signature.execute_via_arglist a
+          end
         end
       end
+
+      Event_ = self
     end
   end
 end

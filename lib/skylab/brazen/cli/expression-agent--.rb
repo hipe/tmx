@@ -5,9 +5,8 @@ module Skylab::Brazen
     class Expression_Agent__
 
       class << self
-
         def pretty_path x
-          self::Pretty_Path__.new( x ).execute
+          self::Pretty_Path__[ x ]
         end
       end
 
@@ -63,7 +62,7 @@ module Skylab::Brazen
       end
 
       def render_prop_as_environment_variable prop
-        prop.environment_name_i
+        prop.upcase_environment_name_i.id2name
       end
 
       def pth s
@@ -71,7 +70,7 @@ module Skylab::Brazen
           s = s.to_path
         end
         if DIR_SEP__ == s.getbyte( 0 )
-          self.class::Pretty_Path__.new( s ).execute
+          self.class::Pretty_Path__[ s ]
         else
           s
         end

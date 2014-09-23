@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   module Entity
 
-    class Event
+    class Event__
 
       class Prototype__ < self  # :[#023].
 
@@ -14,7 +14,9 @@ module Skylab::Brazen
 
         class Build__
 
-          Callback_::Actor[ self, :properties, :deflist_a, :message_proc ]
+          Callback_::Actor[ self, :properties,
+            :deflist_a,
+            :message_proc ]
 
           def execute
             validate
@@ -35,10 +37,11 @@ module Skylab::Brazen
           end
 
           def work
-            scn = Iambic_Scanner.new 0, @deflist_a
+            scn = Lib_::Iambic_scanner[].new 0, @deflist_a
             cls = ::Class.new Prototype__
             _MESSAGE_PROC_ = @message_proc
             cls.class_exec do
+              extend Module_Methods__
               _TERMINAL_CHANNEL_I_ = scn.gets_one
               define_method :terminal_channel_i do _TERMINAL_CHANNEL_I_ end
               define_method :message_proc do _MESSAGE_PROC_ end
@@ -66,7 +69,7 @@ module Skylab::Brazen
           attr_reader :name_i, :name_as_ivar, :default_value
         end
 
-        class << self
+        module Module_Methods__
 
           def [] * x_a
             construct do
@@ -81,9 +84,21 @@ module Skylab::Brazen
               freeze
             end
           end
+
+          def new_mutable * x_a
+            construct do
+              init_via_value_list x_a
+            end
+          end
         end
 
         def verb_lexeme
+        end
+
+        def replace_some_values * value_a
+          value_a.each_with_index do |x, d|
+            instance_variable_set ivar_box.at_position( d ), x
+          end ; nil
         end
 
       private
@@ -114,7 +129,8 @@ module Skylab::Brazen
         end
 
       protected
-        def init_copy_with x_a
+        def init_copy_via_iambic_and_message_proc x_a, p
+          p and raise ::ArgumentError, "message proc is immutable here"
           bx = ivar_box
           x_a.each_slice( 2 ) do |i, x|
             instance_variable_set bx.fetch( i ), x

@@ -23,7 +23,7 @@ module Skylab::Brazen
         :description, -> y do
           y << "how far up do we look?"
         end,
-        :property, :MAX_NUM_DIRS
+        :property, :max_num_dirs
 
 
       o :flag, :property, :verbose
@@ -34,26 +34,47 @@ module Skylab::Brazen
         :description, -> y do
           y << "it's #{ highlight 'really' } neat"
         end,
-        :required,
-        :property, :path
+        :required, :property, :path
 
     end ]
 
     def produce_any_result
-      a = to_even_iambic
-      a.push :prop, self.class.properties.fetch( :path )
-      a.push :delegate, self
-      Brazen_::Models_::Workspace.new( @kernel ).produce_any_result_for_status a
+      @prop = self.class.properties.fetch :path
+      @ws = Workspace_.edited self, @kernel do |o|
+        o.with_argument_box @argument_box
+        o.with :channel, :status,
+          :prop, @prop
+      end
+      @ws.error_count.zero? and work
     end
 
-    def receive_workspace_event ev
-      _ev = sign_event ev
-      if ev.ok
-        @client_adapter.receive_event _ev
-      else
-        @client_adapter.receive_positive_event _ev
-      end
+    def work
+      pn = @ws.execute
+      pn and when_pn
     end
+
+    def receive_status_resource_not_found ev
+      _ev = ev.dup_with :ok, ACHEIVED_
+      receive_event _ev ; nil
+    end
+
+    def receive_status_start_directory_does_not_exist ev
+      receive_event ev ; nil
+    end
+
+    def receive_status_start_directory_is_not_directory ev
+      receive_event ev ; nil
+    end
+
+    def receive_status_found_is_not_file ev
+      receive_event _ev ; nil
+    end
+
+    def when_pn
+      send_OK_event_with :resource_exists,
+        :pathname, @ws.pn, :is_completion, true
+    end
+
   end
   end
 end

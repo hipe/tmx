@@ -2,16 +2,15 @@ module Skylab::Brazen
 
   class Models_::Source < Brazen_::Model_
 
-    Entity__ = Brazen_::Model_::Entity
+    Brazen_.model_entity self do
 
-    Entity__[ self, -> do
       o :desc, -> y do
         y << "manage sources."
       end
 
       o :after, :datastore
 
-      o :persist_to, :couch_primary,
+      o :persist_to, :datastore_couch_primary,
 
       :required,
       :property, :name,
@@ -19,18 +18,17 @@ module Skylab::Brazen
       :required,
       :property, :url
 
-    end ]
+    end
 
-    Action_Factory__ = Action_Factory.create_with self,
-      Brazen_::Model_::Action, Entity__
+    Actions = make_action_making_actions_module
 
     module Actions
 
-      Add = Action_Factory__.make :Add
+      Add = make_action_class :Add
 
-      Ls = Action_Factory__.make :List
+      Ls = make_action_class :List
 
-      Rm = Action_Factory__.make :Remove
+      Rm = make_action_class :Remove
 
     end
   end

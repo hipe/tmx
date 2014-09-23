@@ -2,36 +2,13 @@ module Skylab::Brazen
 
   module Data_Store_
 
-    class Actor
-    private
-
-      def via_action_init_action_properties
-        init_action_properties_via @action
-      end
-
-      def via_entity_init_action_properties
-        init_action_properties_via @entity
-      end
-
-      def init_action_properties_via o
-        @dry_run = o.action_property_value :dry_run ; nil
-      end
-
-      def resolve_result_via_error_with * x_a, & p
-        _ev = build_error_event_via_mutable_iambic_and_message_proc x_a, p
-        resolve_result_via_error _ev
-      end
-
-      def resolve_result_via_error ev
-        @result = delegate.receive_error_event ev ; nil
-      end
-
-      def resolve_result_via_success_event ev
-        @result = delegate.receive_success_event ev ; nil
-      end
-    end
-
     class Model_ < Brazen_::Model_
+
+      class << self
+        def main_model_class
+          superclass.superclass
+        end
+      end
 
       NAME_STOP_INDEX = 1  # sl brzn datastore actions couch add
 
@@ -41,6 +18,20 @@ module Skylab::Brazen
 
       NAME_STOP_INDEX = 1
 
+    end
+
+    class Actor
+    private
+
+      def via_entity_resolve_model_class
+        @model_class = @entity.class ; nil
+      end
+
+      def via_entity_resolve_entity_identifier
+        @entity_identifier = @entity.class.node_identifier.
+          with_local_entity_identifier_string @entity.local_entity_identifier_string  # #todo
+        PROCEDE_
+      end
     end
   end
 end

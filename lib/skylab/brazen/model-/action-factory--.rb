@@ -6,22 +6,34 @@ module Skylab::Brazen
 
       class << self
 
-        def create_with a
-          new a
+        def make *a
+          new do
+            init_via_model_action_entity( * a )
+          end
         end
       end
 
-      def initialize a
-        @model_class, @cls1, @ent = a
-        make_class_two
+      def initialize & p
+        instance_exec( & p )
       end
+
     private
-      def make_class_two
+
+      def init_via_model_action_entity m_cls, a_cls, e_cls
+        @model_class = m_cls ; @cls1 = a_cls ; @ent = e_cls
+        resolve_cls2
+      end
+
+      def resolve_cls2
+
         @cls2 = const_set :Semi_Generated_Action, ::Class.new( @cls1 )
+
         _MODEL_CLASS_ = @model_class
+
         @cls2.class_exec do
 
           extend Entity_[].proprietor_methods  # before e.g `.bulid_props`
+
           class << self
             alias_method :build_action_props, :build_props
           end
@@ -32,23 +44,41 @@ module Skylab::Brazen
 
         end ; nil
       end
+
     public
 
-      def make i
-        send :"make_#{ i }"
+      def make_actions_module
+        mod = ::Module.new
+        _FACTORY_ = self
+        mod.define_singleton_method :make_action_class do |i, & p|
+          _FACTORY_.make_action_class_via_name_and_proc i, p
+        end
+        mod
       end
+
+      def make_action_class_via_name_and_proc i, p
+        cls = send :"make_#{ i }"
+        p and cls.class_exec( & p )
+        cls
+      end
+
+    private
 
       def make_Add
         cls = begin_class
-        def cls.build_props
-          @do_not_add_model_class_properties_to_action_properties ||= begin
+        class << cls
+          def build_props
+            @did_add_model_props_to_action_props ||= add_model_props_to_action_props
+            super
+          end
+        private
+          def add_model_props_to_action_props
             krnl = Entity_[].scope_kernel.new self, singleton_class
             model_class.properties.each_value do |prop|
               krnl.add_property prop
             end
             true
           end
-          super
         end
         @ent[ cls, -> do
           o :flag, :property, :dry_run
@@ -107,20 +137,67 @@ module Skylab::Brazen
 
         include Semi_Generated_Instance_Methods__
 
-        def produce_any_result_when_dependencies_are_met
-          prepare_property_iambics
-          @ent = self.class.model_class.new @kernel
-          bc = @ent.produce_any_bound_call_edit_result_via_action_and_entity_iambics(
-            @action_x_a, @model_x_a )
-          if bc
-            bc.receier.send bc.method_name, * bc.args
-          else
-            produce_any_result_when_edited_OK
-          end
+        def produce_any_result
+          ok = resolve_edited_entity
+          ok && via_edited_entity_produce_any_result
         end
 
-        def receive_persisting_event ev
-          @client_adapter.receive_event ev
+      private
+
+        def resolve_edited_entity
+          via_argument_box_resolve_edited_entity
+        end
+
+        def via_argument_box_resolve_edited_entity
+
+          if @parent_node
+
+            @parent_node.first_edit do |o|
+              o.with_event_receiver self
+              o.with_preconditions @preconditions
+              o.with_argument_box @argument_box
+            end
+            @edited_entity = @parent_node ; @parent_node = nil
+
+          else
+
+            @edited_entity = self.class.model_class.edited self, @kernel do |o|
+              o.with_preconditions @preconditions
+              o.with_argument_box @argument_box
+            end
+
+          end
+          PROCEDE_
+        end
+
+        def via_edited_entity_produce_any_result
+          bc = @edited_entity.any_bound_call_for_edit_result
+          if bc
+            bc.receiver.send bc.method_name, * bc.args
+          elsif @edited_entity.error_count.zero?
+            via_edited_entity_produce_any_persist_result_when_edited_OK
+          else
+            via_edited_entity_produce_any_result_when_edited_not_OK
+          end
+        end
+      public
+
+        def via_edited_entity_produce_any_persist_result_when_edited_not_OK
+
+          # typically "not OK" events were omitted, and with our result here
+          # being false-ish, the client will typically use the "not OK"-ness
+          # of the events to determine some final result (e.g exit status)
+
+          UNABLE_
+        end
+
+        def via_edited_entity_produce_any_persist_result_when_edited_OK
+          ok = @edited_entity.any_native_create_before_create_in_datastore
+          ok && @edited_entity.produce_any_persist_result
+        end
+
+        def receive_add_related_event ev
+          receive_event ev
         end
       end
 
@@ -129,13 +206,13 @@ module Skylab::Brazen
         include Semi_Generated_Instance_Methods__
 
         def initialize kernel
-          @channel ||= :listed
           super
+          @channel ||= :listed
         end
 
-        def produce_any_result_when_dependencies_are_met
-          @scan = resolve_entity_scan
-          @scan and via_scan_send_list
+        def produce_any_result
+          ok = rslv_entity_scan
+          ok && via_scan_send_list
         end
 
         def receive_listed_item ev
@@ -144,50 +221,62 @@ module Skylab::Brazen
 
       private
 
-        def resolve_entity_scan
-          _cols = infer_collections_shell
-          _cols_controller = _cols.
-            build_collections_controller_for_channel_and_delegate(
-              :the_collections, self )
-          col_controller = _cols_controller.produce_collection_controller
-          col_controller and col_controller.to_property_hash_scan
+        def rslv_entity_scan
+          @scan = datastore.entity_scan_via_class self.class.model_class, self
+          @scan and ACHEIVED_
         end
 
         def via_scan_send_list
-          count = 0
-          item_event = build_item_event_builder
-          while h = @scan.gets
-            _ev = item_event[ count, h ]
-            count += 1
-            send_event_structure _ev
+
+          _Item_Event = make_item_event_builder
+          item_index = -1
+
+          if flyweighted_entity = @scan.gets
+            item_index += 1
+            flyweighted_event = _Item_Event.new_mutable item_index, flyweighted_entity
+            send_event flyweighted_event
           end
-          _ev = build_success_event_with :number_of_items_found, :count, count
+
+          while @scan.gets
+            item_index += 1
+            flyweighted_event.replace_some_values item_index
+            send_event flyweighted_event
+          end
+
+          _ev = build_OK_event_with :number_of_items_found,
+            :count, ( item_index + 1 )
           _ev_ = sign_event _ev
-          @client_adapter.receive_event _ev_
+          send_event _ev_
         end
 
-        def build_item_event_builder
-          key_a, format_h = build_black_and_white_property_formatters
-          build_event_prototype_with :item,
-              :offset, nil, :flyweighted_h, nil, :ok, true do |y, o|
+        def make_item_event_builder
+
+          key_i_a, format_h = build_black_and_white_property_formatters
+
+          make_event_prototype_with :item,
+              :offset, nil, :flyweighted_entity, nil, :ok, true do |y, o|
+
             if o.offset.nonzero?
-              y << '---'
+              y << YAML_SEPARATOR__
             end
-            h = o.flyweighted_h
-            key_a.each do |key_s|
-              y << format_h.fetch( key_s ) % h.fetch( key_s )
+
+            key_i_a.each do |key_i|
+              _x = o.flyweighted_entity.property_value key_i
+              y << format_h.fetch( key_i ) % _x
             end ; nil
           end
         end
+
+        YAML_SEPARATOR__ = '---'.freeze
 
         def build_black_and_white_property_formatters
           @prps = self.class.model_class.properties.to_a
           fmt = produce_property_value_format_string
           key_a = [] ; format_h = {}
           @prps.each do |prop|
-            key_s = prop.name.as_lowercase_with_underscores_symbol.to_s
-            key_a.push key_s
-            format_h[ key_s ] = "#{ fmt % prop.name.as_human }: %s"
+            key_i = prop.name.as_lowercase_with_underscores_symbol
+            key_a.push key_i
+            format_h[ key_i ] = "#{ fmt % prop.name.as_human }: %s"
           end
           @prps = nil
           [ key_a, format_h ]
@@ -200,83 +289,117 @@ module Skylab::Brazen
           end
           "%#{ d }s"
         end
-
-      public
-        def receive_the_collection_info ev
-          @client_adapter.receive_event sign_event ev
-        end
-        def receive_the_collection_error ev
-          @client_adapter.receive_event sign_event ev
-        end
       end
 
       module Remove_Methods__
 
         include Semi_Generated_Instance_Methods__
 
-        def produce_any_result_when_dependencies_are_met
-          _cols = infer_collections_shell
-          _cols.delete_entity_via_action self
+        def produce_any_result
+          init_evr_for_delete
+          ok = via_evr_and_args_resolve_subject_entity
+          ok &&= via_evr_and_subject_entity_prepare_for_remove
+          ok && via_evr_and_subject_entity_delete_subject_entity
         end
-      end
 
-      module Semi_Generated_Instance_Methods__
+        def via_edited_entity_produce_any_persist_result_when_edited_OK
+          ok = @edited_entity.any_native_create_before_create_in_datastore
+          ok && @edited_entity.produce_any_persist_result
+        end
+
       private
 
-        def infer_collections_shell
-          i_a = self.class.model_class.full_name_function.
-            map( & :as_lowercase_with_underscores_symbol )
-          if 1 == i_a.length
-            top = @kernel.models
-          elsif :data_stores_ == i_a.first  # because `Data_Stores_`
-            i_a.shift
-            top = @kernel.datastores
-          end
-          top[ i_a.first ]
+        def init_evr_for_delete
+          @evr = _Event.receiver.channeled.full :while_deleting_entity, self ; nil
         end
 
-        def prepare_property_iambics
-          model_props = self.class.model_class.properties
-          scn = self.class.properties.to_scanner
-          action_prop_x_a = [] ; model_prop_x_a = []
-          while prop = scn.gets
-            if model_props.has_name prop.name_i
-              if prop.takes_argument
-                model_prop_x_a.push prop.name_i,
-                  instance_variable_get( prop.name.as_ivar )
-              else
-                model_prop_x_a.push prop.name_i
-              end
-            else
-              action_prop_x_a.push prop.name.as_ivar,
-                instance_variable_get( prop.name.as_ivar )
+        def via_evr_and_subject_entity_delete_subject_entity
+          datastore.delete_entity @subject_entity, @evr
+        end
+
+        def via_evr_and_subject_entity_prepare_for_remove
+          ok = via_subject_entity_send_parameters
+          ok &&= @subject_entity.any_native_delete_before_delete_in_datastore @evr
+        end
+
+        def via_subject_entity_send_parameters
+          i_a = @argument_box.get_names - @subject_entity.class.properties.get_names
+          @subject_entity.edit do |o|
+            o.action_formal_properties = self.class.properties
+            i_a.each do |i|
+              o.set_arg i, @argument_box.fetch( i )
             end
           end
-          action_prop_x_a.push :@delegate, self, :@channel, :model
-          @action_x_a = action_prop_x_a ; @model_x_a = model_prop_x_a ; nil
+          PROCEDE_
         end
 
       public
 
-        def receive_the_collections_error ev
-          receive_error_event ev
-        end
-
-        def receive_model_error ev
-          receive_error_event ev
-        end
-
-        def receive_model_success ev
-          receive_success_event ev
-        end
-
-        def receive_model_event ev
+        def receive_while_deleting_entity_method_not_implemented ev
           receive_event ev
         end
 
+        def receive_while_deleting_entity_entity_not_found ev
+          receive_event ev
+        end
+
+        def receive_while_deleting_entity_not_found ev  # #todo
+          receive_event ev
+        end
+
+        def receive_while_deleting_entity_missing_force ev
+          receive_event ev
+        end
+
+        def receive_while_deleting_entity_conflict ev
+          receive_event ev
+        end
+
+        def receive_while_deleting_entity_pretending_for_dry_run ev
+          receive_event ev
+        end
+
+        def receive_while_deleting_entity_datastore_resource_commited_changes ev
+          receive_event ev
+        end
+
+        def receive_while_deleting_entity_ok ev
+          receive_event ev
+        end
+      end
+
+      module Semi_Generated_Instance_Methods__
+
       private
-        def produce_any_result_when_edited_OK
-          @ent.produce_any_persist_result
+
+        def via_evr_and_args_resolve_subject_entity
+          ok = via_args_resolve_identifier
+          ok && via_evr_and_identifier_resolve_subject_entity
+        end
+
+        def via_args_resolve_identifier
+          _name_s = @argument_box.fetch NAME_
+          id = model_class.node_identifier.with_local_entity_identifier_string _name_s
+          @identifier = id
+          PROCEDE_
+        end
+
+        def via_evr_and_identifier_resolve_subject_entity
+          datastore
+          @subject_entity = @datastore.entity_via_identifier @identifier, @evr
+          @subject_entity ? PROCEDE_ : UNABLE_
+        end
+
+        def datastore
+          @datastore ||= prdc_ds
+        end
+
+        def prdc_ds
+          @preconditions.fetch self.class.model_class.persist_to.full_name_i
+        end
+
+        def model_class
+          self.class.model_class
         end
       end
     end

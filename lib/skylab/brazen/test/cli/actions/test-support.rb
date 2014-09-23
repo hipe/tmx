@@ -81,7 +81,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
     def prepare_invocation
       env = {}
       prepare_env env
-      @invocation.environment = env  # never use real life ::ENV !
+      @invocation.env = env  # never use real life ::ENV !
       path = from_directory
       if path
         file_utils.cd path
@@ -111,7 +111,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
     end
 
     def tmpdir
-      @td ||= TestLib_::Tempdir_pathname[ debug_IO ]
+      @td ||= TestLib_::Tempdir_pathname[ -> { do_debug }, debug_IO ]
     end
 
     # ~ business
@@ -126,8 +126,8 @@ module Skylab::Brazen::TestSupport::CLI::Actions
       expect :styled, localized_invite_line_rx
     end
 
-    def expect_exitstatus_for_file_not_found
-      expect_exitstatus_for :file_not_found
+    def expect_exitstatus_for_resource_not_found
+      expect_exitstatus_for :resource_not_found
     end
 
     def ick s
@@ -146,12 +146,6 @@ module Skylab::Brazen::TestSupport::CLI::Actions
   DASH_ = '-'.freeze ; UNDERSCORE_ = '_'.freeze
 
   module TestLib_
-    monadic_memoize = -> p do
-      p_ = -> x do
-        x_ = p[ x ] ; p_ = -> _ { x_ } ; x_
-      end
-      -> x { p_[ x ] }
-    end
     memoize = -> p do
       p_ = -> do
         x = p[] ; p_ = -> { x } ; x
@@ -189,13 +183,18 @@ module Skylab::Brazen::TestSupport::CLI::Actions
         self
       end
     end ]
-    Tempdir_pathname = monadic_memoize[ -> io do
-      require 'tmpdir'
-      pn = ::Pathname.new "#{ ::Dir.tmpdir }/brAzen"
-      if ! pn.exist?
-        File_utils[ io ].mkdir pn.to_path
+    Tempdir_pathname = -> do
+      p = -> do_dbg_p, io do
+        require 'tmpdir'
+        pn = ::Pathname.new "#{ ::Dir.tmpdir }/brAzen"
+        if ! pn.exist?
+          File_utils[ do_dbg_p, io ].mkdir pn.to_path
+        end
+        p = -> * do pn end ; pn
       end
-      pn
-    end ]
+      -> do_dbg_p, io do
+        p[ do_dbg_p, io ]
+      end
+    end.call
   end
 end

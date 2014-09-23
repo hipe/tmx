@@ -153,15 +153,15 @@ module Skylab::Snag
       def bld_reader name_i
         -> &p do
           @cache_h.fetch name_i do
-            cols = bld_shell name_i
-            cols and @cache_h[ name_i ] = cols
+            silo = bld_shell name_i
+            silo and @cache_h[ name_i ] = silo
           end
         end
       end
 
       def bld_shell name_i
         Autoloader_.const_reduce( [ name_i ], @module ).
-          build_collections @API_client
+          build_silo @API_client
       end
     end
 

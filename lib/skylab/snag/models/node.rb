@@ -8,8 +8,8 @@ module Skylab::Snag
         self::Collection__.new manifest, _API_client
       end
 
-      def build_collections _API_client
-        Collections__.new _API_client
+      def build_silo _API_client
+        Silo__.new _API_client
       end
 
       def build_controller delegate, _API_client
@@ -38,7 +38,7 @@ module Skylab::Snag
       MAX_LINES_PER_NODE__ = 2
     end
 
-    class Collections__
+    class Silo__
 
       def initialize _API_client
         @models = _API_client.models

@@ -1,11 +1,19 @@
 module Skylab::Brazen
 
-  class Model_
+  module Entity
 
-      class Event_Signature_Wrapper__
+    class Event__
 
-        def initialize nf, ev
-          @ev = ev ; @nf = nf
+      module Wrappers__
+
+      class Signature
+
+        def self.execute_via_arglist a
+          new a
+        end
+
+        def initialize a
+          @nf, @ev = a
         end
 
         attr_reader :ev
@@ -38,6 +46,7 @@ module Skylab::Brazen
           @nf.noun_lexeme
         end
       end
-
+      end
+    end
   end
 end

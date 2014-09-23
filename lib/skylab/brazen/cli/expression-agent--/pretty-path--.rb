@@ -6,12 +6,10 @@ module Skylab::Brazen
 
       class Pretty_Path__  # re-write [#hl-031]
 
-        def initialize s
-          @path = s
-          @path_length = @path.length
-        end
+        Callback_::Actor[ self, :properties, :path ]
 
         def execute
+          @path_length = @path.length
           maybe_find_home_match
           maybe_find_pwd_match
           if @home_did_match

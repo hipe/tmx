@@ -2,17 +2,17 @@ module Skylab::Brazen
 
   module Entity
 
-    class Event
+    class Event__
 
-      class Wrappers__::Universal_exception
+      class Wrappers__::Exception
 
         Actor_[ self, :properties,
           :exception ]
 
         def execute
           @iambic = [ produce_name_i, :exception, @exception ]
-          add_values_to_iambic
           e = @exception
+          e.respond_to? :members and add_values_to_iambic
           build_event_via_iambic @iambic do |y, o|
             y << e.message
           end
@@ -32,9 +32,6 @@ module Skylab::Brazen
             @iambic.push i, @exception.send( i )
           end ; nil
         end
-
-        include Event::Builder_Methods
-
       end
     end
   end

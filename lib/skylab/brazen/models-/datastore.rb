@@ -11,26 +11,23 @@ module Skylab::Brazen
     end ]
 
     class << self
+
+      def is_silo
+        false
+      end
+
       def get_unbound_upper_action_scan
-        fresh = true
-        Entity_[].scan.new do
-          if fresh
-            fresh = false
-            r = self
-          end
-          r
+        p = -> do
+          r = self ; p = EMPTY_P_ ; r
+        end
+        Scan_[].new do
+          p[]
         end
       end
-    end
 
-    def get_lower_action_scan
-      mod = Brazen_::Data_Stores_
-      i_a = mod.constants ; d = -1 ; last = i_a.length - 1
-      Entity_[].scan do
-        if d < last
-          _cls = mod.const_get i_a.fetch d += 1
-          _cls.new @kernel
-        end
+      def init_action_class_reflection
+        @acr = Model_::Lazy_Action_Class_Reflection.new self, Brazen_::Data_Stores_
+        true
       end
     end
   end

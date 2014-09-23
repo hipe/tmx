@@ -16,7 +16,7 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable
         sect = document.sections[ :foo ]
         sect[ :'is-on' ] = true
         expect_document_content "[foo]\nis-on = true\n"
-        expect_one_event :value_added do |ev|
+        expect_one_event :added_value do |ev|
           ast = ev.new_assignment
           ast.normalized_name_i.should eql :'is-on'
           ast.value_x.should eql true
@@ -26,7 +26,7 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable
       it "quotes will not be used if not necessary" do
         document.sections[ :foo ][ :hi ] = 'foo bar'
         expect_document_content "[foo]\nhi = foo bar\n"
-        expect_one_event :value_added do |ev|
+        expect_one_event :added_value do |ev|
           ast = ev.new_assignment
           ast.name_s.should eql 'hi'
           ast.value_x.should eql 'foo bar'
@@ -36,14 +36,14 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable
       it "quotes will be used if leading space" do
         document.sections[ :foo ][ :hi ] = ' foo'
         expect_document_content "[foo]\nhi = \" foo\"\n"
-        expect_one_event :value_added
+        expect_one_event :added_value
       end
 
       it "things get escaped" do
         _sect = document.sections[ :foo ]
         _sect[ :hi ] = "\\ \" \n \t \b"
         expect_document_content "[foo]\nhi = \"\\\\ \\\" \\n \\t \\b\"\n"
-        expect_one_event :value_added
+        expect_one_event :added_value
       end
     end
 

@@ -26,7 +26,7 @@ we hope to use natural keys and we hope that those fields are always named
 'name'. we hope never to support compound keys.
 
 for now we will assume natural keys, and hope that an entity can
-represent itself unambiguously with the combinaton of its name and its
+represent itself unambiguous,nly with the combinaton of its name and its
 model class (with emphasis on "for now").
 
 
@@ -76,8 +76,8 @@ and so, given all of the above, we have:
 probably be something like a symbol name of the model class and a string
 name for the entity's (natural key) `name` field value.
 
-not all silo are multi-model. a collection may be designed (or
-prouced) to hold only one kind of entity, in which case the identifier
+not all collection-like silos are multi-model. a collection may be designed
+(or produced) to hold only one kind of entity, in which case the identifier
 will only be used for its pertitnent part.
 
 
@@ -88,7 +88,7 @@ will only be used for its pertitnent part.
 (EDIT: before we even commited the document we changed the name to
 [nothing]).
 
-you might be wondering why we don't call thing "retrieve". but first:
+you might be wondering why we don't call the thing "retrieve". but first:
 
 we don't use "get" for reasons that will one day be [#hl-095] explained.
 

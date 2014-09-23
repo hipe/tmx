@@ -6,50 +6,115 @@ module Skylab::Brazen
 
       class << self
 
-        def establish_box * a
-          if a.first.length.nonzero?
-            if 3 == a.length
-              a.push Graph__.new
+        def establish_box_with * x_a
+          Resolution__.execute_via_iambic x_a
+        end
+      end
+
+      class Graph
+
+        def initialize action, evr, kernel
+          @action = action
+          @matrix_h = ::Hash.new do |h, k|
+            h[ k ] = ::Hash.new { |h_, k_| h_[ k_ ] = Node__.new }
+          end
+          @event_receiver = evr
+          @kernel = kernel
+        end
+
+        attr_reader :action
+
+        def touch lvl_i, id, silo
+          node = @matrix_h[ id.full_name_i ][ lvl_i ]
+          case node.state_i
+          when :OK
+            node.value_x
+          when :none
+            # touches do not change state, work does..
+            x = silo.send :"provide_#{ lvl_i }", id, self, @event_receiver
+            if x
+              if :none == node.state_i  # just kidding
+                node.state_i = :OK
+                node.value_x = x
+              end
             end
-            Establish_preconditions_box_recursive__.execute_via_arglist a
+            x
+          else
+            self._STATE_FAIL
           end
         end
+
+        def work is_self_p, lvl_i, id  # assumes state 'none'
+          silo = @kernel.silo_via_identifier id, @event_receiver
+          silo and begin
+            node = @matrix_h[ id.full_name_i ][ lvl_i ]
+            if is_self_p
+              x = is_self_p[ id, self, silo ]
+              if x
+                # what is returned when self is relied upon,
+                # do not cache for others to use
+                node.self_value_x = x
+                PROCEDE_
+              else
+                node.state_i = :NG
+                x
+              end
+            else
+              node.state_i = :processing
+              x = silo.send :"provide_#{ lvl_i }", id, self, @event_receiver
+              if x
+                node.state_i = :OK
+                node.value_x = x
+                PROCEDE_
+              else
+                node.state_i = :NG
+                x
+              end
+            end
+          end
+        end
+
+        def read_state lvl_i, id
+          @matrix_h[ id.full_name_i ][ lvl_i ].state_i
+        end
+
+        def fetch_value lvl_i, id
+          node = @matrix_h.fetch( id.full_name_i ).fetch( lvl_i )
+          node.value_x || node.self_value_x
+        end
+
+        class Node__
+          def initialize
+            @state_i = :none
+          end
+          attr_accessor :state_i
+          attr_accessor :value_x, :self_value_x
+        end
       end
 
-      class Graph__
-
-        def initialize
-          @state_h = {}
-          @value_h = {}
-        end
-
-        def fetch_value i
-          @value_h.fetch i
-        end
-
-        def with_state_of identifier, & p
-          p[ @state_h.fetch( identifier.full_name_i ) { :none }, self ]
-        end
-
-        def change_state_and_associate_value identifier, i, x
-          change_state identifier, i
-          @value_h[ identifier.full_name_i ] = x ; nil
-        end
-
-        def change_state identifier, i
-          @state_h[ identifier.full_name_i ] = i ; nil
-        end
-      end
-
-      class Establish_preconditions_box_recursive__
+      class Resolution__
 
         Actor_[ self, :properties,
-          :identifier_a, :event_receiver, :kernel, :graph ]
+          :self_identifier,
+          :identifier_a,
+          :on_self_reliance,
+          :graph,
+          :level_i,
+          :event_receiver ]
 
         def execute
+          if @identifier_a.length.nonzero?
+            @self_full_name_i = @self_identifier.full_name_i
+            step_on_each_identifier
+          end
+        end
+
+      private
+
+        def step_on_each_identifier
           ok = true
-          @identifier_a.each do |identifier|
-            @identifier = identifier
+          @identifier_a.each do |id|
+            @id = id
             ok = step
             ok or break
           end
@@ -57,52 +122,44 @@ module Skylab::Brazen
         end
 
         def step
-          @graph.with_state_of @identifier do |state_i, o|
-            case state_i
-            when :none
-              o.change_state @identifier, :processing
-              @g = o
-              process
-            when :processing
-              when_processing
-            when :OK
-              PROCEDE_
-            end
+          state_i = @graph.read_state @level_i, @id
+          case state_i
+
+          when :none
+            work
+
+          when :processing
+            raise "cyclic: #{ @level_i } #{ @id.full_name_i }"
+            when_processing
+
+          when :OK
+            PROCEDE_
+
+          else
+            self._NEVER
+
           end
         end
 
         def when_processing
           _ev = build_not_OK_event_with :cyclic_dependency_in_precondition_graph,
-            :model_name, @identifier.full_name_i
+            :model_name, @id.full_name_i
           @event_receiver.receive_event _ev
           UNABLE_
         end
 
-        def process
-          ok = rslv_cols_via_identifier
-          ok &&= rslv_ctlr_via_identifier_and_cols
-          ok && via_ctlr
-        end
-
-        def rslv_cols_via_identifier
-          @cols = @kernel.collections_via_identifier @identifier, @event_receiver
-          @cols ? PROCEDE_ : @cols
-        end
-
-        def rslv_ctlr_via_identifier_and_cols
-          @ctlr = @cols.produce_controller_as_precondition_via_id_and_graph @identifier, @graph, @event_receiver
-          @ctlr ? PROCEDE_ : @ctlr
-        end
-
-        def via_ctlr
-          @g.change_state_and_associate_value @identifier, :OK, @ctlr
-          PROCEDE_
+        def work
+          if @self_full_name_i == @id.full_name_i
+            @graph.work @on_self_reliance, @level_i, @id
+          else
+            @graph.work nil, @level_i, @id
+          end
         end
 
         def flush
           bx = Box_.new
           @identifier_a.each do |id|
-            bx.add id.full_name_i, @graph.fetch_value( id.full_name_i )
+            bx.add id.full_name_i, @graph.fetch_value( @level_i, id )
           end
           bx
         end

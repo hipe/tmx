@@ -5,43 +5,26 @@ module Skylab::Brazen
     class Actors__::Init
 
       Actor_[ self, :properties,
-        :app_name,
-        :channel,
-        :config_filename,
         :is_dry,
-        :delegate,
-        :path ]
-
-      Entity_[]::Event::Merciless_Prefixing_Sender[ self ]
-
-      def initialize
-        super
-        @channel ||= :workspace
-      end
+        :path,
+        :config_filename,
+        :app_name,
+        :event_receiver ]
 
       def execute
+        @document = Brazen_::Data_Stores_::Git_Config::Mutable.new @event_receiver
+        ok = to_document_add_comment
+        ok && write_document
+      end
 
-        pn = ::Pathname.new "#{ @path }/#{ @config_filename }"
-
-        config = Brazen_::Data_Stores_::Git_Config::Mutable.new -> ev do
-          if ev.ok
-            @delegate.receive_workspace_event ev
-          else
-            @delegate.receive_error_event ev
-          end
-        end  # #todo
-
-        config.add_comment "created by #{ @app_name } #{
+      def to_document_add_comment
+        @document.add_comment "created by #{ @app_name } #{
           }#{ ::Time.now.strftime '%Y-%m-%d %H:%M:%S' }"
+      end
 
-        _evr = Via_Proc_Event_Receiver_.new -> ev do  # #todo
-          @delegate.send :"receive_#{ @channel }_event",  ev
-        end
-
-        config.write_to_pathname pn,
-          :is_dry, @is_dry,
-          :event_receiver, _evr
-
+      def write_document
+        _pn = ::Pathname.new "#{ @path }/#{ @config_filename }"
+        @document.write_to_pathname _pn, :is_dry, @is_dry
       end
     end
   end

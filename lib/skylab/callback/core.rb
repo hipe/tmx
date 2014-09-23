@@ -71,6 +71,13 @@ module Skylab::Callback
         end.execute
       end
 
+      def build_with * x_a, & p
+        new do
+          process_iambic_fully x_a
+          p and p[ self ]
+        end
+      end
+
       def execute_via_iambic x_a, & p
         new do
           process_iambic_fully x_a
@@ -140,7 +147,8 @@ module Skylab::Callback
     end
 
     def initialize & p
-      instance_exec( & p )
+      p and instance_exec( & p )
+      super( & nil )
     end
 
   private

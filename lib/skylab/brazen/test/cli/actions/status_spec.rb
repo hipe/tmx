@@ -37,7 +37,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
       it "ok, but never does anything" do
         invoke '.'
         expect %r(\bno directories were searched\.\z)
-        expect_exitstatus_for_file_not_found
+        expect_exitstatus_for_resource_not_found
       end
     end
 
@@ -51,7 +51,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
           invoke '.'
           expect :styled,
             %r('#{ ::Regexp.escape filename }' not found in \. or 1 dir up\b)
-          expect_exitstatus_for_file_not_found
+          expect_exitstatus_for_resource_not_found
         end
       end
 
@@ -69,7 +69,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
 
         def expect_same_result
           expect :styled, %r('#{ ::Regexp.escape filename }' not found in \.)
-          expect_exitstatus_for_file_not_found
+          expect_exitstatus_for_resource_not_found
         end
       end
 
@@ -77,6 +77,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
         it "says as much" do
           invoke 'foozie'
           expect :styled, %r(#{ par 'path' } does not exist - ./foozie\z)
+          expect_action_invite_line
           expect_errored
         end
       end

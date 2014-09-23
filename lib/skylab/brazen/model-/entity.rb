@@ -29,14 +29,18 @@ module Skylab::Brazen
       scan.reader.persist_to = scan.scanner.gets_one ; nil
     end
 
+    o :ad_hoc_processor, :preconditions, -> scan do
+      scan.scanner.advance_one
+      scan.reader.precondition_controller_i_a = scan.scanner.gets_one ; nil
+    end
+
     o :meta_property, :argument_arity,
         :enum, [ :zero, :one ],
         :default, :one,
         :property_hook, -> prop do
           if :zero == prop.argument_arity
-            ivar = prop.as_ivar
             prop.iambic_writer_method_proc = -> do
-              instance_variable_set ivar, true ; nil
+              accept_entity_property_value prop, true ; nil
             end
           end
         end
@@ -76,9 +80,6 @@ module Skylab::Brazen
           end
         end
 
-    add_iambic_event_listener :iambic_normalize_and_validate, -> obj do
-      obj.nilify_all_ivars_not_defined
-    end
 
     property_class_for_write  # flush the above to get the below
 
@@ -94,8 +95,8 @@ module Skylab::Brazen
       attr_reader :ad_hoc_normalizer, :norm_p_a
       attr_reader :can_be_from_argv, :can_be_from_environment
 
-      def environment_name_i
-        "BRAZEN_#{ @name.as_variegated_symbol }"
+      def upcase_environment_name_i
+        :"BRAZEN_#{ @name.as_variegated_symbol.upcase }"
       end
 
       def has_default
@@ -135,7 +136,7 @@ module Skylab::Brazen
       end
 
       def << a
-        @scan = Entity_[]::Iambic_Scanner.new 0, a
+        @scan = Lib_::Iambic_scanner[].new 0, a
         process_iambic_fully
         self
       end
@@ -189,7 +190,7 @@ module Skylab::Brazen
         if md
           d = md[ 0 ].to_i
           if 0 > d
-            ev_p[ :error, :invalid_non_negative_integer, :x, d, :prop, prop,
+            ev_p[ :invalid_non_negative_integer, :x, d, :prop, prop,
               -> y, o do
                 y << "#{ par o.prop } must be non-negative, had #{ ick o.x }"
               end ]
@@ -197,7 +198,7 @@ module Skylab::Brazen
             val_p[ d ]
           end
         else
-          ev_p[ :error, :invalid_non_negative_integer, :x, x, :prop, prop,
+          ev_p[ :invalid_non_negative_integer, :x, x, :prop, prop,
             -> y, o do
               y << "#{ par o.prop } must be a non-negative integer, #{
                 }had #{ ick o.x }"
@@ -212,47 +213,38 @@ module Skylab::Brazen
   module Entity
 
     def aply_ad_hoc_normalizers prop  # this evolved from [#fa-019]
-      ivar = prop.as_ivar
+      i = prop.name_i
+      bx = actual_property_box_for_write
       prop.norm_p_a.each do |p|
-        p[ ( instance_variable_get ivar if instance_variable_defined? ivar ),
+        _x = bx.fetch i do end
+        p[ _x,
           -> x do
-            instance_variable_set ivar, x
+            bx.add_or_replace i, x ; nil
           end,
-          -> i, * x_a, p_ do
-            _ev = build_event_via_iambic_and_message_proc x_a, p_
-            receive_event_on_channel _ev, i
+          -> * x_a, p_ do
+            _ev = build_not_OK_event_via_mutable_iambic_and_message_proc x_a, p_
+            receive_event _ev
           end,
           prop ]
       end ; nil
     end
 
     def aply_dflt_value_if_necessary prop
-      ivar = prop.as_ivar
-      if ! instance_variable_defined?( ivar ) ||
-          instance_variable_get( ivar ).nil?
-        instance_variable_set ivar, prop.default
+      i = prop.name_i
+      bx = actual_property_box_for_write
+      if bx[ i ].nil?
+        bx.add_or_replace i, prop.default
       end ; nil
     end
 
     def check_for_missing_required_props req_a
+      bx = actual_property_box
       miss_a = req_a.reduce [] do |m, prop|
-        if instance_variable_defined? prop.as_ivar
-          x = instance_variable_get prop.as_ivar
-          x.nil? || EMPTY_S_ == x and m << prop
-        else
-          m << prop
-        end
+        x = bx.fetch prop.name_i do end
+        x.nil? || EMPTY_S_ == x and m << prop
         m
       end
       miss_a.length.nonzero? and whine_about_missing_reqd_props miss_a ; nil
-    end
-
-    def nilify_all_ivars_not_defined
-      self.class.properties.each_value do |prop|
-        if ! instance_variable_defined? prop.as_ivar
-          instance_variable_set prop.as_ivar, nil
-        end
-      end ; nil
     end
 
   private
@@ -271,7 +263,7 @@ module Skylab::Brazen
       receive_event_structure _ev
     end
 
-    include Entity_[]::Event::Builder_Methods
+    Event_[].sender self
 
     def receive_event_on_channel ev, i
       m = :"receive_#{ ev.terminal_channel_i }_#{ i }"
@@ -291,6 +283,35 @@ module Skylab::Brazen
     def receive_missing_required_properties ev
       _s = ev.render_first_line_under Brazen_::API::EXPRESSION_AGENT
       raise ::ArgumentError, _s
+    end
+
+    def via_properties_init_ivars
+      formal = self.class.properties
+      scn = formal.to_scan
+      while prop = scn.gets
+        i = prop.name_i
+        x = if @property_box.has_name i
+          @property_box.fetch  i
+        elsif @parameter_box.has_name i
+          @parameter_box.fetch i
+        else
+          nil
+        end
+        ivar = prop.as_ivar
+        if instance_variable_defined? ivar
+          x = instance_variable_get ivar
+          x.nil? or raise "HM: #{ ivar }"
+        end
+        instance_variable_set ivar, x
+      end ; nil
+    end
+
+    def accept_entity_property_value prop, x
+      actual_property_box_for_write.add prop.name_i, x ; nil
+    end
+
+    def actual_property_box_for_write
+      actual_property_box
     end
 
     # ~

@@ -74,7 +74,7 @@ module Skylab::Brazen
         missing_required_properties: ( d += 1 ),
         invalid_property_value: ( d += 1 ),
         extra_properties:  ( d += 1 ),
-        file_not_found: ( d += 1 ),
+        resource_not_found: ( d += 1 ),
         resource_exists: ( d += 1 )
       }.freeze
       define_method :[], & h.method( :[] )
@@ -83,5 +83,12 @@ module Skylab::Brazen
     end.new
 
     define_singleton_method :exit_statii do _ES_ end
+
+
+    class << self
+      def debug_IO
+        @debug_IO ||= Lib_::Headless__[]::System::IO.some_stderr_IO
+      end
+    end
   end
 end

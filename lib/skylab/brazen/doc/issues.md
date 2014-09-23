@@ -1,6 +1,7 @@
+[#044] #open graph has an action so maybe we don't need to pass it everywhere
 [#043]      #tracking-tag loading hacks
-[#042] #open see [#034] "make persit entity symmetrical with delete entity.."
-[#041] #open (in progress) rename "collections controller" to "silo controller"
+[#042]       #done make persit entity interface symmetrical with delete entity
+[#041]       #done rename "collections controller" to "silo controller"
 [#040] #open supplying nil as literal value
 [#039]       #tracking-tag whether and where we change case of env vars
 [#038]       #parent-node: [#010] the couch datastore narrative ..
@@ -21,7 +22,7 @@
 [#025]       #doc-node: the brazen four layer model model ..
 [#024]       #parent-node: [#025] the model action narrative ..
 [#023]       #parent-node: [#011] event prototype
-[#022] #open obliterate `receive_negative_event` and the rest - single
+[#022]       #done obliterate `receive_negative_event` and the rest - single
              entrypoint is better. rely on `ok` : false
 [#021] #open scope kernel ..
 [#020] #open  --help and --host

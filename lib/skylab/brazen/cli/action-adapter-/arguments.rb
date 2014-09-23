@@ -15,11 +15,11 @@ module Skylab::Brazen
           def execute
             validate_indexes_of_optional_arguments
             prepare_scanners
-            error_event = parse_any_required_arguments_off_beginning
-            error_event ||= parse_any_required_arguments_off_ending
-            error_event || parse_any_optional_arguments
-            error_event ||= complain_about_any_extra_arguments
-            error_event || finalize_success
+            ev = parse_any_required_arguments_off_beginning
+            ev ||= parse_any_required_arguments_off_ending
+            ev || parse_any_optional_arguments
+            ev ||= complain_about_any_extra_arguments
+            ev || finalize_success
           end
 
         private
@@ -172,7 +172,7 @@ module Skylab::Brazen
             end
           end
 
-          class Crazy_Scanner__ < Entity_[]::Iambic_Scanner
+          class Crazy_Scanner__ < Lib_::Iambic_scanner[]
             attr_writer :d, :x_a_length
             attr_reader :d
           end

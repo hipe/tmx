@@ -3,12 +3,18 @@ module Skylab::Brazen
   class CLI < ::Class.new ::Class.new  # see [#002]
 
     class << self
+
+      def expression_agent
+        CLI::Expression_Agent__
+      end
+
       alias_method :new_top_invocation, :new
       def new * a
         new_top_invocation Brazen_, * a
       end
+
       def pretty_path x
-        CLI::Expression_Agent__.pretty_path x
+        expression_agent.pretty_path x
       end
     end
 
@@ -21,13 +27,13 @@ module Skylab::Brazen
     class Top_Invocation__
 
       def initialize * a
-        @environment = nil
+        @env = nil
         @mod = a.first
         @resources = Resources__.new a
       end
-      attr_writer :environment
+      attr_writer :env
       def invoke argv
-        @resources.complete @environment || ::ENV, argv
+        @resources.complete @env || ::ENV, argv
         resolve_app_kernel
         resolve_properties
         resolve_partitions
@@ -86,8 +92,8 @@ module Skylab::Brazen
         end
       end
 
-      def retrieve_unbound_action_via_normalized_name i_a
-        @app_kernel.retrieve_unbound_action_via_normalized_name i_a
+      def unbound_action_via_normalized_name i_a
+        @app_kernel.unbound_action_via_normalized_name i_a
       end
 
       def payload_output_line_yielder
@@ -161,7 +167,7 @@ module Skylab::Brazen
       def resolve_bound_call
         if argv.length.zero?
           resolve_bound_call_when_no_arguments
-        elsif DASH_ == argv.first.getbyte( 0 )
+        elsif DASH_BYTE_ == argv.first.getbyte( 0 )
           resolve_bound_call_when_looks_like_option_for_first_argument
         else
           resolve_bound_call_when_looks_like_action_for_first_argument
@@ -186,26 +192,44 @@ module Skylab::Brazen
     public
 
       def retrieve_bound_action_via_normalized_name i_a
+        retrieve_bound_action_via_normalized_name_scan(
+          Lib_::Iambic_scanner[].new 0, i_a )
+      end
+
+      def retrieve_bound_action_via_normalized_name_scan xa_scan
         scn = get_action_scn
-        i = i_a.shift
+        i = xa_scan.gets_one
         while action = scn.gets
-          i == action.name.as_lowercase_with_underscores_symbol and
-            break( found = action )
+          if i == action.name.as_lowercase_with_underscores_symbol
+            found = action
+            break
+          end
         end
-        found or raise ::KeyError, "not found: '#{ i }'"
-        found.receive_frame self
-        if i_a.length.zero?
-          found
+        if found
+          found.receive_frame self
+          if xa_scan.unparsed_exists
+            found.retrieve_bound_action_via_normalized_name_scan xa_scan
+          else
+            found
+          end
         else
-          found.retrieve_bound_action_via_normalized_name i_a
+          raise ::KeyError, "not found: '#{ i }'"
         end
       end
 
       def find_matching_action_adapters_with_token tok
+        a = find_matching_action_classes_with_token tok
+        a.map! do |cls|
+          bld_adapter_via_action action.action_via_action_class cls
+        end
+        a
+      end
+
+      def find_matching_action_classes_with_token tok
         matching_actions = [] ; rx = /\A#{ ::Regexp.escape tok }/
-        scn = get_action_scn
+        scn = self.action.get_unbound_action_scan
         while action = scn.gets
-          slug = action.name.as_slug
+          slug = action.name_function.as_slug
           if rx =~ slug
             if tok == slug
               matching_actions.clear.push action
@@ -218,12 +242,16 @@ module Skylab::Brazen
       end
 
       def get_action_scn
-        action.get_action_scan.map_by do |action|
-          if action.is_branch
-            branch_class.new action
-          else
-            leaf_class.new action
-          end
+        scan = action.get_action_scan
+        scan and scan.map_by( & method( :bld_adapter_via_action ) )
+      end
+
+      def bld_adapter_via_action action
+        if action.is_branch
+          branch_class.new action
+        else
+          action.accept_parent_node self.action
+          leaf_class.new action
         end
       end
 
@@ -362,29 +390,23 @@ module Skylab::Brazen
       def process_environment
         env = @resources.env
         @partitions.env_a.each do |prop|
-          s = env[ prop.environment_name_i ]
+          s = env[ prop.upcase_environment_name_i.id2name ]
           s or next
-          @seen_h[ prop.name_i ] and next
-          @output_iambic.push prop.name_i, s
+          cased_i = prop.name_i.downcase  # [#039] casing
+          @seen_h[ cased_i ] and next
+          @output_iambic.push cased_i, s
         end ; nil
       end
 
       def resolve_bound_call_via_output_iambic
-
-        @bound_call = @action.
-          produce_bound_call_via_iambic_and_delegate @output_iambic, self
-        if ! @bound_call
-          @bound_call = Brazen_.bound_call -> { GENERIC_ERROR_ }, :call
-        end ; nil
+        @bound_call = @action.bound_call_via_call @output_iambic, self
+        @bound_call or self._SANITY
+        nil
       end
 
     public
       def app_name
         @parent.app_name
-      end
-
-      def receive_workspace_expectation_file_not_found ev
-        receive_event ev
       end
 
       Autoloader_[ self ]
@@ -476,11 +498,11 @@ module Skylab::Brazen
       end
 
       def retrieve_unbound_action * i_a
-        @parent.retrieve_unbound_action_via_normalized_name i_a
+        @parent.unbound_action_via_normalized_name i_a
       end
 
-      def retrieve_unbound_action_via_normalized_name i_a
-        @parent.retrieve_unbound_action_via_normalized_name i_a
+      def unbound_action_via_normalized_name i_a
+        @parent.unbound_action_via_normalized_name i_a
       end
 
       def application_kernel
@@ -512,7 +534,8 @@ module Skylab::Brazen
         s = inflect_line_for_positivity_via_event a.first, ev
         s and a[ 0 ] = s
         send_non_payload_event_lines_with_redundancy_filter a
-        d = ( SUCCESS_ if ev_.ok )
+        d = any_err_code_for_event ev_
+        d ||= ( SUCCESS_ if ev_.ok )
         d ||= some_err_code_for_event ev_
         maybe_use_exit_status d ; nil
       end
@@ -955,19 +978,48 @@ module Skylab::Brazen
 
       def add_env_section o
         o.add_section :item_section, 'environment variable',
-          @env_a, & :environment_name_i
+          @env_a, & :upcase_environment_name_i
       end
 
     public
 
       def rendering_method_name_for prop  # for expag
-        if @opt_a and @opt_a.include? prop
-          :render_prop_as_option
-        elsif @arg_a and @arg_a.include? prop
-          :render_prop_as_argument
+        category_i, = lookup_property prop
+        :"render_prop_as_#{ category_i }"
+      end
+
+    private
+
+      def lookup_property prop
+        i = prop.name_i
+        if opt = option_via_name( i )
+          [ :option, opt ]
+        elsif arg = argument_via_name( i )
+          [ :argument, arg ]
+        elsif env = environment_variable_via_name( i )
+          [ :environment_variable, env ]
         else
-          @env_a && @env_a.include?( prop ) or fail "sanity: #{prop.name_i}"
-          :render_prop_as_environment_variable
+          [ :unknown, prop ]
+        end
+      end
+
+      def option_via_name i
+        any_i_in_a i, @opt_a
+      end
+
+      def argument_via_name i
+        any_i_in_a i, @arg_a
+      end
+
+      def environment_variable_via_name i
+        any_i_in_a i, @env_a
+      end
+
+      def any_i_in_a i, a
+        if a
+          a.detect do |o|
+            i == o.name_i
+          end
         end
       end
     end
@@ -996,7 +1048,7 @@ module Skylab::Brazen
       end
       def to_scan
         scn = @box.to_value_scanner
-        Entity_[].scan.new do
+        Scan_[].new do
           scn.gets
         end
       end
@@ -1057,7 +1109,7 @@ module Skylab::Brazen
     end
 
     STANDARD_ACTION_PROPERTY_BOX__ = -> do
-      box = Callback_::Box.new
+      box = Box_.new
       box.add :help, Property__.new( :help,
         :argument_arity, :zero,
         :desc, -> y do
@@ -1072,7 +1124,7 @@ module Skylab::Brazen
     end.call
 
     STANDARD_BRANCH_PROPERTY_BOX__ = -> do
-      box = Callback_::Box.new
+      box = Box_.new
       box.add :action, Property__.new( :action, :is_required, true )
       box.add :help, Property__.new( :help,
         :argument_arity, :zero_or_one,
@@ -1085,7 +1137,7 @@ module Skylab::Brazen
 
     class Actual_Parameter_Scanner__
       def initialize output_iambic, props
-        scn = Entity_[]::Iambic_Scanner.new 0, output_iambic
+        scn = Lib_::Iambic_scanner[].new 0, output_iambic
         prop = i = x = nil
         @prop_p = -> { prop }
         @pair_p = -> { [ i, x ] }
@@ -1128,7 +1180,7 @@ module Skylab::Brazen
         @a = a
       end
       def produce_any_result
-        scn = Entity_[].scan_nonsparse_array @a
+        scn = Scan_[].nonsparse_array @a
         while exe = scn.gets
           value = exe.receiver.send exe.method_name, * exe.args
           value.nonzero? and break
@@ -1138,14 +1190,14 @@ module Skylab::Brazen
     end
 
     module Lib_
+      Iambic_scanner = Brazen_::Lib_::Iambic_scanner
       Option_parser = -> do
         require 'optparse'
         ::OptionParser
       end
     end
 
-    DASH_ = '-'.getbyte 0
-    EMPTY_A_ = [].freeze
+    DASH_BYTE_ = '-'.getbyte 0
     GENERIC_ERROR_ = 5
     NOTHING_ = nil
     SUCCESS_ = 0

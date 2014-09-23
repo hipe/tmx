@@ -25,7 +25,7 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable
       _x = sect[ :'fum-fum' ] = 'he he'
       expect_document_content "[foo]\n[wizzie]\nfum-fum = he he\n"
       _x.should eql 'he he'
-      expect_one_event :value_added do |ev|
+      expect_one_event :added_value do |ev|
         ev.new_assignment.normalized_name_i.should eql :'fum-fum'
         ev.new_assignment.value_x.should eql 'he he'
       end

@@ -33,17 +33,56 @@ module Skylab::Brazen
     end ]
 
     def produce_any_result
-      a = to_even_iambic
-      a.push :prop, self.class.properties.fetch( :path )
-      a.push :client, @client_adapter
-      a.push :delegate, self
-      Brazen_::Models_::Workspace.new( @kernel ).produce_any_result_for_edit a
+      @prop = self.class.properties.fetch :path
+      @ws = Workspace_.edited self, @kernel do |o|
+        o.with_argument_box @argument_box
+        o.with :prop, @prop,
+          :max_num_dirs, 1,
+          :app_name, @event_receiver.app_name,
+          :channel, :init
+      end
+      @ws.error_count.zero? and work
     end
 
-    def receive_workspace_event ev
-      _ev = sign_event ev
-      @client_adapter.receive_event _ev
+    def work
+      pn = @ws.execute
+      if pn
+        when_already
+      elsif @ok
+        flush
+      end
     end
+
+    def when_already
+      send_not_OK_event_with :directory_already_has_config_file,
+        :pathname, @ws.pn, :prop, @prop
+      nil
+    end
+
+    def receive_init_resource_not_found ev
+      if any_argument_value :verbose
+        _ev = ev.dup_with :ok, ACHEIVED_
+        receive_event _ev
+      end
+      @ok = true ; CONTINUE_
+    end
+
+    def receive_init_start_directory_does_not_exist ev
+      receive_event ev ; @ok = false
+    end
+
+    def receive_init_start_directory_is_not_directory ev
+      receive_event ev ; @ok = false
+    end
+
+    def receive_init_found_is_not_file ev
+      receive_event ev ; @ok = false
+    end
+
+    def flush
+      @ws.any_result_for_flush_for_init
+    end
+
   end
   end
 end

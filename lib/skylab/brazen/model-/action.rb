@@ -6,10 +6,35 @@ module Skylab::Brazen
 
     class << self
 
-      attr_accessor :after_i, :description_block, :is_promoted
+      def is_actionable
+        true
+      end
+
+      attr_accessor :after_i, :description_block, :is_promoted,
+        :precondition_controller_i_a
 
       def process_some_customized_inflection_behavior scanner
         Process_customized_action_inflection_behavior__[ scanner, self ] ; nil
+      end
+
+      def preconditions
+        @did_resolve_pcia ||= resolve_precondition_controller_identifer_a
+        @preconditions
+      end
+
+      def resolve_precondition_controller_identifer_a
+        @preconditions = if precondition_controller_i_a
+          @precondition_controller_i_a.map do |i|
+            Entity_Identifier__.via_symbol i
+          end
+        else
+          model_class.preconditions
+        end
+        true
+      end
+
+      def model_class
+        name_function.parent
       end
 
       def custom_action_inflection
@@ -20,12 +45,13 @@ module Skylab::Brazen
         Action_Name_Function__
       end
     end
+
     extend Lib_::Name_function[].name_function_methods
     NAME_STOP_INDEX = 2  # sl br models
 
-    include Brazen_::Model_::Entity  # so we can override its behavior near events
+    # whether or not you define properties we need to override methods
 
-    Entity_[]::Event::Merciless_Prefixing_Sender[ self ]  # experimental default
+    include Brazen_::Model_::Entity
 
     include Interface_Element_Instance_Methdods__
 
@@ -37,130 +63,156 @@ module Skylab::Brazen
       false
     end
 
-    def to_even_iambic
-      scn = get_property_scanner ; x_a = []
-      while (( prop = scn.gets ))
-        x_a.push prop.name.as_lowercase_with_underscores_symbol,
-          instance_variable_get( prop.as_ivar )
-      end
-      x_a
+  public
+
+    def bound_call_via_call x_a, ev_rcvr
+      @error_count ||= 0
+      @event_receiver = ev_rcvr
+      @argument_box = Box_.new
+      bc = any_bound_call_via_processing_iambic x_a
+      bc || via_properties_produce_bound_call
     end
 
-    def get_property_scanner
-      props = self.class.properties
-      if props
-        props.to_value_scanner
-      else
-        Callback_::Scn.the_empty_scanner
-      end
+  private
+
+    def any_bound_call_via_processing_iambic x_a
+      process_iambic_fully x_a ; nil
     end
 
-    def produce_bound_call_via_iambic_and_delegate x_a, adapter
-      @client_adapter = adapter
-      @error_count = 0
-      cb = produce_any_bound_call_while_processing_iambic x_a
-      cb || via_properties_produce_any_bound_call
-    end
-
-    def produce_any_bound_call_while_processing_iambic x_a  # #note-70
-      process_iambic_fully x_a
-      CONTINUE_
-    end
-
-    def via_properties_produce_any_bound_call
+    def via_properties_produce_bound_call
+      notificate :iambic_normalize_and_validate
       if @error_count.zero?
-        notificate :iambic_normalize_and_validate
-      end
-      if @error_count.zero?
-        Brazen_.bound_call self, :produce_any_result
+        prdc_bound_call_when_valid
       else
-        UNABLE_
+        prdc_bound_call_when_invalid
       end
     end
 
-    def receive_missing_required_properties ev
-      receive_negative_event ev
+    def prdc_bound_call_when_invalid
+      Brazen_.bound_call.via_value UNABLE_
     end
 
-    def receive_success_event ev
-      ev_ = sign_event ev
-      @client_adapter.receive_success_event ev_
+    def prdc_bound_call_when_valid
+      bc = prdc_any_bound_call_from_establish_preconditions
+      bc || prdc_bound_call_when_preconditions_are_met
     end
 
-    def receive_error_event ev  # e.g ad-hoc normalization failure from spot [#012]
-      ev_ = sign_event ev
-      receive_negative_event ev_
+    def prdc_any_bound_call_from_establish_preconditions
+      a = self.class.preconditions
+      if a && a.length.nonzero?
+        prdc_any_bc_when_preconds a
+      end
     end
 
-    def receive_negative_event ev
-      @error_count += 1
-      @client_adapter.receive_negative_event ev ; nil
-    end
+    def prdc_any_bc_when_preconds a  # eventually see #action-preconditions
 
-    def payload_output_line_yielder
-      @client_adapter.payload_output_line_yielder
-    end
+      _g = Model_::Preconditions_::Graph.new self, self, @kernel
 
-    private
+      _id = model_class.node_identifier
 
-    # ~
+      box = Model_::Preconditions_.establish_box_with(
+        :self_identifier, _id,
+        :identifier_a, a,
+        :on_self_reliance, method( :self_as_precondition ),
+        :graph, _g,
+        :level_i, :action_prcn,
+        :event_receiver, self )
 
-    def delegate
-      @delegate ||= bld_delegate
-    end
-
-    def bld_delegate
-      if self.class.const_defined? :Delegate
-        self.class::Delegate.new @client_adapter, self.class
+      if box
+        @preconditions = box
+        CONTINUE_
       else
-        self
+        Brazen_.bound_call.via_value box
       end
     end
 
-    # ~
-
-    def produce_any_result
-      ok = expect_dependencies_are_met
-      ok and produce_any_result_when_dependencies_are_met
+    def self_as_precondition id, g, silo
+      g.touch :collection_controller_prcn, id, silo
     end
 
-    def expect_dependencies_are_met
-      expect_workspace_exists
-    end
-
-    def expect_workspace_exists
-      _path = Brazen_::CLI::Property__.new :path, :argument_arity, :one
-      Brazen_::Models_::Workspace.new( @kernel ).produce_any_result_for_status(
-        [ :client, :_FOO_, :delegate, self,
-        :channel, :workspace_expectation,
-        :max_num_dirs, 1, :path, '.', :verbose, true, :prop, _path ] )
+    def prdc_bound_call_when_preconditions_are_met
+      Brazen_.bound_call self, :produce_any_result
     end
 
   public
 
-    def receive_workspace_expectation_resource_exists ev
-      if @verbose
-        ev_ = sign_event ev
-        @client_adapter.receive_positive_event ev_
+    def receive_event ev
+      if ev.has_tag :ok
+        if ev.ok
+          recv_OK_event ev
+        else
+          recv_not_OK_event ev
+        end
+      else
+        recv_neutral_evnt ev
       end
-      ACHEIVED_
     end
 
-    def receive_workspace_expectation_file_not_found ev
-      x_a = ev.to_iambic
-      x_a.push :invite_to_action, [ :init ]
-      ev_ = build_event_via_iambic x_a
-      ev__ = sign_event ev_
-      send_structure_on_channel_to_delegate ev__,
-        :workspace_expectation, @client_adapter
-      UNABLE_
+  private
+
+    def recv_OK_event ev
+      _ev_ = sign_event ev
+      send_event _ev_
     end
 
-    def receive_workspace_expectation_event ev
-      receive_error_event ev
-      UNABLE_
+    def recv_not_OK_event ev  # e.g ad-hoc normalization failure from spot [#012]
+      @error_count += 1
+      _ev_ = sign_event ev
+      send_event _ev_
     end
 
+    def recv_neutral_evnt ev
+      send_event ev
+    end
+
+    def wrap_event ev
+      sign_event ev
+    end
+
+  public
+    def any_argument_value i
+      @argument_box[ self.class.properties.fetch( i ).name_i ]
+    end
+
+    def argument_value i
+      @argument_box.fetch self.class.properties.fetch( i ).name_i
+    end
+  private
+
+    def actual_property_box
+      @argument_box
+    end
+
+    def model_class
+      self.class.model_class
+    end
+
+  public
+
+    def controller_nucleus  # :+#experimental
+      [ @event_receiver, @kernel ]
+    end
+
+    def argument_box
+      @argument_box
+    end
+
+    def accept_parent_node x
+      @parent_node = x ; nil
+    end
+
+    def payload_output_line_yielder  # #note-160
+      @event_receiver.payload_output_line_yielder
+    end
+
+    # ~ just in support of workspaces - will build out later
+
+    def start_path_for_workspace_search_when_precondition
+      ::Dir.pwd  # this should never happen in pure API land
+    end
+
+    def max_num_dirs_to_search_when_precondition
+    end
 
     class Process_customized_action_inflection_behavior__
 

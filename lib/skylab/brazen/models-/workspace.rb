@@ -3,189 +3,180 @@ module Skylab::Brazen
   class Models_::Workspace < Brazen_::Model_
 
     class << self
-      def build_collections kernel
-        Collections__.new kernel
-      end
-
       def filesystem_walk
         Filesystem_Walk__
       end
     end
 
-    Model__ = Brazen_::Model_
+    Brazen_::Model_::Entity[ self, -> do
 
-    Model__::Entity[ self, -> do
       o :desc, -> y do
         y << "manage workspaces."
-      end
+      end,
 
-      o :after, :status
+      :after, :status,
 
-      o :persist_to, :git_config
+      :persist_to, :datastore_git_config,
+
+      :preconditions, EMPTY_A_,
+
+      :flag, :property, :dry_run,
+
+      :flag, :property, :verbose,
+
+      :property, :max_num_dirs,
+
+      :property, :app_name,
+
+      :property, :prop,
+
+      :property, :path,
+
+      :property, :channel
+
     end ]
-
-    Actor_[ self,
-      :properties, :client, :channel, :dry_run, :delegate,
-      :max_num_dirs, :path, :prop, :verbose ]
-
-    Entity_[]::Event::Cascading_Prefixing_Sender[ self ]
-
-    def initialize kernel  # rewrite actor's
-      @kernel = kernel
-    end
-
-    attr_reader :kernel  # used in unmarshalling for now
-
-  private def init_via_iambic_for_action x_a
-      @channel = :workspace
-      @config_filename = nil
-      @max_num_dirs = nil
-      process_iambic_fully x_a
-    end
 
     CONFIG_FILENAME__ = 'brazen.conf'.freeze
 
-    def produce_any_result_for_status a
-      init_via_iambic_for_action a
-      pn = rslv_any_nearest_config_filename
-      pn and produce_any_result_for_status_when_OK pn
+    def initialize _
+      super
+      @config_filename = @verbose = nil
     end
 
-    def rslv_any_nearest_config_filename
-      @any_nearest_config_filename =
-        filesystem_walk( :channel, :walker ).find_any_nearest_file_pathname
-    end
+    def execute
+      via_properties_init_ivars
 
-    def to_path
-      @any_nearest_config_filename.to_path
-    end
-
-    def receive_walker_start_directory_does_not_exist ev
-      send_event_structure ev ; nil
-    end
-
-    def receive_walker_start_directory_is_not_directory ev
-      send_event_structure ev ; nil
-    end
-
-    def receive_walker_file_not_found ev
-      send_event_structure ev ; nil
-    end
-
-    def receive_walker_found_is_not_file ev
-      send_event_structure ev ; nil
-    end
-
-    def produce_any_result_for_status_when_OK pn
-      @kernel.models.workspaces.register_instance self, pn
-      send_event_with :resource_exists, :pn, pn, :ok, true,
-        :is_completion, true
-    end
-
-    def produce_any_result_for_edit a
-      init_via_iambic_for_action a
-      @init_method = nil
-      pn = filesystem_walk( :channel, :init, :any_max_num_dirs_to_look, 1 ).
-        find_any_nearest_file_pathname
-      if pn
-        produce_any_result_for_init_when_file_exists pn
-      elsif @init_method
-        send @init_method
+      _event_receiver = if @channel
+        _Event.receiver.channeled.full @channel, @event_receiver
+      else
+        @event_receiver
       end
+
+      @pn = Filesystem_Walk__.with :start_path, @path,
+        :any_max_num_dirs_to_look, @max_num_dirs,
+        :prop, @prop,
+        :filename, some_config_filename,
+        :event_receiver, _event_receiver
     end
 
-    def procede_with_init
+    attr_reader :pn
+
+    def any_result_for_flush_for_init
       self.class::Actors__::Init.with(
-        :app_name, @client.app_name,
-        :channel, @channel,
-        :config_filename, @config_filename || CONFIG_FILENAME__,
+        :app_name, @app_name,
+        :config_filename, some_config_filename,
         :is_dry, @dry_run,
-        :delegate, @delegate,
+        :event_receiver, @event_receiver,
         :path, @path
       )
     end
 
-    def produce_any_result_for_init_when_file_exists pn
-      send_event_with :directory_already_has_config_file, :pathname, pn,
-        :ok, false, :prop, @prop
-      nil
-    end
-
-    def receive_init_start_directory_does_not_exist ev
-      send_event_structure ev ; nil
-    end
-
-    def receive_init_start_directory_is_not_directory ev
-      send_event_structure ev ;  nil
-    end
-
-    def receive_init_found_is_not_file ev
-      send_event_structure ev ; nil
-    end
-
-    def receive_init_file_not_found ev
-      if @verbose
-        _ev = ev.dup_with :ok, ACHEIVED_
-        send_event_structure _ev
-      end
-      @init_method = :procede_with_init ; nil
-    end
-
-    def filesystem_walk * x_a
-      x_a_ = [ :start_path, @path, :filename, some_config_filename,
-        :any_max_num_dirs_to_look, @max_num_dirs, :prop, @prop,
-        :delegate, self, :channel, :walker ]
-      x_a_.concat x_a
-      Filesystem_Walk__.with_iambic x_a_
-    end
+  private
 
     def some_config_filename
       @config_filename || CONFIG_FILENAME__
+    end
+
+  public
+
+    def to_path
+      @pn.to_path
+    end
+
+    def provide_action_precondition _id, _g
+      self
     end
 
     module Actions
       Autoloader_[ self, :boxxy ]
     end
 
-    class Filesystem_Walk__  # re-write a subset of [#st-007] the tree walker
+    class Silo_Controller__ < Brazen_.model.silo_controller
 
-      Actor_[ self,
-        :properties,
-          :channel,
-          :filename,
-          :delegate,
-          :any_max_num_dirs_to_look,
-          :prop,
-          :start_path ]
-
-      Entity_[]::Event::Cascading_Prefixing_Sender[ self ]
-
-      class << self
-        def with * x_a
-          with_iambic x_a
+      def provide_collection_controller_precon _identifier, graph
+        action = @event_receiver
+        @verbose = if action.class.properties.has_name :verbose
+          action.any_argument_value :verbose
         end
-        def with_iambic x_a
-          new do init_via_iambic x_a end
+        s = action.start_path_for_workspace_search_when_precondition
+        d = action.max_num_dirs_to_search_when_precondition
+        _er = _Event.receiver.channeled.full.cascading :silo_controller_as_precondition, self
+        ws = Workspace_.edited _er, @kernel do |o|
+          o.with_arguments :verbose, @verbose
+          o.with :path, s, :max_num_dirs, d
         end
-        private :new
+        if ws.error_count.zero?
+          pn = ws.execute
+          pn and @ws = ws and via_ws_produce_any_ws_as_precon
+        end
       end
 
-      def initialize & p
-        instance_exec( & p )
-        freeze
+      def receive_silo_controller_as_precondition_config_parse_error ev
+        _ev_ = ev.dup_with do |y, o|
+          Workspace_::Actors__::Render_parse_error[ y, o, self ]
+        end
+        receive_event _ev_
+      end
+
+      def receive_silo_controller_as_precondition_resource_not_found ev
+        x_a = ev.to_iambic
+        x_a[ 0 ] = :workspace_not_found  # was 'resource_not_found'
+        x_a.push :invite_to_action, [ :init ]
+        ev_ = build_event_via_iambic x_a
+        send_event ev_
+        UNABLE_
+      end
+
+      def receive_silo_controller_as_precondition_resource_exists ev
+        ev.instance_variable_set :@ok, true  # meh  "the file already exists"
+        # if @event_receiver.any_argument_value :verbose
+        receive_event ev
+        # end ; nil
+      end
+
+      def receive_silo_controller_as_precondition_event ev  # because '.cascading'
+        receive_event ev
       end
 
     private
 
-      def init_via_iambic x_a
-        process_iambic_fully x_a
+      def via_ws_produce_any_ws_as_precon
+        if @verbose and
+          send_neutral_event_with :using_workspace, :config_pathname, @ws.pn
+        end
+        @ws
+      end
+    end
+
+    class Filesystem_Walk__  # re-write a subset of [#st-007] the tree walker
+
+      Actor_[ self,
+        :properties,
+          :filename,
+          :any_max_num_dirs_to_look,
+          :prop,
+          :start_path,
+          :event_receiver ]
+
+      def find_any_nearest_file_pathname  # :+#public-API
+        execute
+      end
+
+      def execute
+        normalize_ivars
+        work
+      end
+
+    private
+
+      def normalize_ivars
         if SLASH_ != @start_path.getbyte( 0 )
           @start_path = ::File.expand_path @start_path
         end
         @start_pathname = ::Pathname.new @start_path
       end
 
-    public def find_any_nearest_file_pathname
+      def work
         st = ::File::Stat.new @start_path
         if DIRECTORY_FTYPE__ == st.ftype
           fnd_any_nearest_file_pathname_when_start_pathname_exist
@@ -198,15 +189,15 @@ module Skylab::Brazen
       DIRECTORY_FTYPE__ = 'directory'.freeze
 
       def whn_start_directory_is_not_directory st
-        send_event_with :start_directory_is_not_directory,
+        send_not_OK_event_with :start_directory_is_not_directory,
           :start_pathname, @start_pathname, :ftype, st.ftype,
-            :ok, false, :prop, @prop
+            :prop, @prop
       end
 
       def whn_start_directory_does_not_exist e
-        send_event_with :start_directory_does_not_exist,
+        send_not_OK_event_with :start_directory_does_not_exist,
           :start_pathname, @start_pathname, :exception, e,
-            :ok, false, :prop, @prop
+            :prop, @prop
       end
 
       def fnd_any_nearest_file_pathname_when_start_pathname_exist
@@ -227,7 +218,7 @@ module Skylab::Brazen
         if found
           whn_found found
         else
-          whn_file_not_found count
+          whn_resource_not_found count
         end
       end
       TOP__ = '/'.freeze
@@ -243,16 +234,15 @@ module Skylab::Brazen
       FILE_FTYPE__ = 'file'.freeze
 
       def whn_found_is_not_file st, found
-        send_event_with :found_is_not_file, :ftype, st.ftype,
-            :ok, false, :pathname, found do |y, o|
+        send_not_OK_event_with :found_is_not_file, :ftype, st.ftype,
+            :pathname, found do |y, o|
           y << "is #{ o.ftype }, must be file - #{ pth o.pathname }"
         end
       end
 
-      def whn_file_not_found count
-        send_event_with :file_not_found, :filename, @filename,
-            :num_dirs_looked, count, :start_pathname, @start_pathname,
-              :ok, false do |y, o|
+      def whn_resource_not_found count
+        _ev = build_not_OK_event_with :resource_not_found, :filename, @filename,
+            :num_dirs_looked, count, :start_pathname, @start_pathname do |y, o|
           if o.num_dirs_looked.zero?
             y << "no directories were searched."
           else
@@ -263,46 +253,10 @@ module Skylab::Brazen
             y << "#{ ick o.filename } not found in #{ pth o.start_pathname}#{x}"
           end
         end
-      end
-
-      def delegate
-        @delegate
+        send_event _ev
       end
     end
 
-    def persist_entity ent
-      my_datastore.persist_entity_in_collection ent, self
-    end
-
-    def retrieve_entity_via_name_and_class id_x, cls, no_p
-      @error_count = 0
-      my_datastore.retrieve_entity_via_name_class_collection id_x, cls, self, no_p
-    end
-
-    def delete_entity_via_action action
-      @error_count = 0
-      my_datastore.delete_entity_via_action_and_collection action, self
-    end
-
-    def my_datastore
-      @mds ||= @kernel.datastores[ self.class.persist_to ]
-    end
-
-    class Collections__
-      def initialize kernel
-        @singleton = nil
-        @kernel = kernel
-      end
-      def name_i
-        :workspace
-      end
-      def register_instance ws, _pn
-        @singleton and raise "already have a singleton"
-        @singleton = ws ; nil
-      end
-      def instance
-        @singleton
-      end
-    end
+    Workspace_ = self
   end
 end

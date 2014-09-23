@@ -9,7 +9,16 @@ module Skylab::Brazen
         o :desc, -> y do
           y << "remove a workspace"
         end
+
+        o :flag, :property, :dry_run
       end ]
+
+      def produce_any_result
+        send_not_OK_event_with :not_yet_implemented do |y, o|
+          y << "removing workspaces is not yet implemented."
+        end
+        UNABLE_
+      end
     end
   end
 end

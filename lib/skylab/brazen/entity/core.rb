@@ -8,8 +8,12 @@ module Skylab::Brazen
         via_arglist a
       end
 
+      def event
+        self::Event__
+      end
+
       def iambic_scanner
-        Iambic_Scanner
+        Iambic_Scanner__
       end
 
       def proprietor_methods
@@ -21,26 +25,6 @@ module Skylab::Brazen
           _s_a = a.map( & method( :ick ) )
           "unrecognized propert#{ s a, :y } #{ and_ _s_a }"
         end
-      end
-
-      def scan & p
-        if p
-          Callback_.scan.new( & p )
-        else
-          Callback_.scan
-        end
-      end
-
-      def scan_map scn, & p
-        Callback_.scan.map scn, p
-      end
-
-      def scan_reduce scn, & p
-        Callback_.scan.redude scn, p
-      end
-
-      def scan_nonsparse_array a
-        Callback_.scan.nonsparse_array a
       end
 
       def scope_kernel
@@ -312,7 +296,7 @@ module Skylab::Brazen
       end
 
       def process_any_DSL d, x_a
-        @scan = Iambic_Scanner.new d, x_a
+        @scan = Lib_::Iambic_scanner[].new d, x_a
         prcss_scan_as_DSL_passively
         d = @scan.current_index ; @scan = nil ; d
       end
@@ -410,7 +394,7 @@ module Skylab::Brazen
 
       def build_props
         _scn = property_method_nms_for_rd.to_value_scanner
-        Entity.scan.map( _scn, -> i do
+        Scan_[].map( _scn, -> i do
           send i
         end ).with_random_access_keyed_to_method :name_i
       end
@@ -477,8 +461,6 @@ module Skylab::Brazen
         Scope_Kernel__.new self, singleton_class
       end
     end
-
-    Box_ = Callback_::Box
 
     class Method_Added_Muxer__  # from [mh] re-written
       class << self
@@ -550,9 +532,9 @@ module Skylab::Brazen
       end
 
       def bld_monadic_iambic_writer_method_proc
-        _IVAR_ = @name.as_ivar
+        _PROP_ = self
         -> do
-          instance_variable_set _IVAR_, iambic_property ; nil
+          accept_entity_property_value _PROP_, iambic_property ; nil
         end
       end
 
@@ -690,6 +672,10 @@ module Skylab::Brazen
         UNDEFINED_
       end
 
+      def accept_entity_property_value prop, x
+        instance_variable_set prop.name.as_ivar, x
+      end
+
       PROPERTY_CLASS__ = Property__  # delicate
     end
 
@@ -794,7 +780,7 @@ module Skylab::Brazen
       include Iambic_Methods_via_Scanner__
     end
 
-    class Iambic_Scanner
+    class Iambic_Scanner__
 
       def initialize d, x_a
         @d = d ; @x_a = x_a ; @x_a_length = @x_a.length

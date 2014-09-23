@@ -4,8 +4,8 @@ module Skylab::Snag
 
     class << self
 
-      def build_collections _API_client
-        Collections__.new _API_client
+      def build_silo _API_client
+        Silo__.new _API_client
       end
 
       def build_file pathname
@@ -149,7 +149,7 @@ module Skylab::Snag
       end
     end
 
-    class Collections__
+    class Silo__
 
       def initialize _API_client
         @API_client = _API_client
