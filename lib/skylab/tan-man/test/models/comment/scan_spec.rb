@@ -38,13 +38,13 @@ module Skylab::TanMan::TestSupport::Models::Scan__
     context "ordinary strings" do
 
       it "the empty string is NO lines" do
-        with ""
+        with EMPTY_S_
         expect
       end
 
       it "a single newline is ONE line" do
-        with "\n"
-        expect ""
+        with NEWLINE_
+        expect EMPTY_S_
       end
 
       it "one line" do
@@ -59,7 +59,7 @@ module Skylab::TanMan::TestSupport::Models::Scan__
 
       it "interceding blank lines are still there" do
         with "a\n\nc"
-        expect 'a', '', 'c'
+        expect 'a', EMPTY_S_, 'c'
       end
 
       use :of_string

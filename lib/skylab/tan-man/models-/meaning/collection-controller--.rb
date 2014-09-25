@@ -110,8 +110,8 @@ module Skylab::TanMan
             whole_string[ use_meaning.line_start, 0 ] = new_meaning.line
           else
             z = use_meaning.value_index.end + 1 # in the case that we are
-            if "\n" != whole_string[z]  # adding after the last item we may
-              whole_string[z, 0] = "\n" # (DOS meh) need to add a newline.
+            if NEWLINE_ != whole_string[z]  # adding after the last item we may
+              whole_string[z, 0] = NEWLINE_  # (DOS meh) need to add a newline.
             end
             whole_string[ z + 1, 0 ] = new_meaning.line
           end

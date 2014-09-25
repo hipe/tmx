@@ -1,9 +1,5 @@
 module Skylab::TanMan
 
-  Entity_ = Brazen_::Model_::Entity[ -> do
-
-  end ]
-
   DESC_METHOD_ = -> s = nil, & p do
     if s && ! p
       self.description_block = -> y { y << s }
@@ -11,6 +7,10 @@ module Skylab::TanMan
       self.description_block = p
     end ; nil
   end
+
+  Entity_ = Brazen_::Model_::Entity[ -> do
+
+  end ]
 
   Actor_ = -> cls, * a do
     Callback_::Actor.via_client_and_iambic cls, a
@@ -25,6 +25,23 @@ module Skylab::TanMan
 
       def action_class
         Action_
+      end
+
+      def autoload_actions
+
+        class << self
+
+          def get_unbound_upper_action_scan
+            Callback_.scan.nonsparse_array [ self ]
+          end
+
+          alias_method :orig_gulas, :get_unbound_lower_action_scan
+
+          def get_unbound_lower_action_scan
+            self.const_get :Actions, false
+            get_unbound_lower_action_scan
+          end
+        end
       end
 
       def entity_module
@@ -73,6 +90,13 @@ module Skylab::TanMan
     include module IM
 
     private
+
+      def bound_call_for_ping
+        _ev = build_OK_event_with :ping_from_action, :name_i,
+           name.as_lowercase_with_underscores_symbol
+        x = send_event _ev
+        Brazen_.bound_call -> { x }, :call
+      end
 
       def when_unparsed_iambic_exists
         msg = say_strange_iambic
@@ -207,17 +231,16 @@ module Skylab::TanMan
       y << "x."
     end
 
-    class << self
-      def get_unbound_upper_action_scan
-        Callback_.scan.nonsparse_array [ self ]
-      end
+    autoload_actions
+  end
 
-      alias_method :orig_gulas, :get_unbound_lower_action_scan
-      def get_unbound_lower_action_scan
-        self.const_get :Actions, false
-        get_unbound_lower_action_scan
-      end
+  class Models_::Association < Model_::Document_Entity
+
+    desc do |y|
+      y << "x."
     end
+
+    autoload_actions
   end
 
   class Models_::Meaning < Model_

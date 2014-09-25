@@ -60,7 +60,7 @@ module Skylab::TanMan
     def line_start
       from = @start_pos
       if from > 0
-        back = @scn.string.rindex( "\n", from - 1 )
+        back = @scn.string.rindex( NEWLINE_, from - 1 )
         if back
           from = back + 1
         else

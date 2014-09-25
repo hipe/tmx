@@ -75,7 +75,8 @@ module Skylab::SubTree
     argument_syntax '[<path> [..]]'
 
     def my_tree *path, _
-      i = @instream ; o = @outstream ; e = @errstream ; f = my_tree_front
+      i, o, e = @three_streams_p[]
+      f = my_tree_front
       if path.length.zero?
         path << ( ::Dir.pwd if i.tty? && ! @param_h[ :file ] )  # yes nil
       end

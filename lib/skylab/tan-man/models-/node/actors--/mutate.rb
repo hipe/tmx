@@ -2,9 +2,7 @@ module Skylab::TanMan
 
   class Models_::Node  # in [#084]
 
-    class Collection_Controller__
-
-      class Mutate
+      class Actors__::Mutate
 
         Via_entity = self
 
@@ -343,7 +341,7 @@ module Skylab::TanMan
 
         POSITIVE_NOTHINGNESS_ = true
       end
-    end
+
   end
 end
 if false

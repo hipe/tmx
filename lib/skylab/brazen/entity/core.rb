@@ -131,6 +131,38 @@ module Skylab::Brazen
         @x_a_a = []
       end
 
+      # ~
+
+      def accept_ad_hoc_processor
+        Entity::Ad_Hoc_Processor__.new @scan, @reader, @writer
+      end
+
+      def scan_anything_with_any_ad_hoc_processors
+        @ad_hocs_are_known or determine_if_ad_hocs_exist
+        @ad_hocs_exist and @ad_hoc_scan.scan_any
+      end
+
+      def determine_if_ad_hocs_exist
+        @ad_hocs_are_known = true
+        if @reader.const_defined? :AD_HOC_PROCESSORS__
+          @ad_hoc_scan = @reader::AD_HOC_PROCESSORS__.
+            build_scan @scan, @reader, @writer
+          @ad_hocs_exist = true
+        else
+          @ad_hocs_exist = false
+        end ; nil
+      end
+
+      # ~
+
+      def accept_reuse
+        @scan.gets_one.each do |prop|
+          add_property prop
+        end ; nil
+      end
+
+      # ~ direct interface & support
+
       def has_nonzero_length_iambic_queue
         @x_a_a.length.nonzero?
       end
@@ -300,7 +332,9 @@ module Skylab::Brazen
         prcss_scan_as_DSL_passively
         d = @scan.current_index ; @scan = nil ; d
       end
-    # ~
+
+      # ~
+
       attr_reader :meth_i, :reader, :scan
       attr_writer :prop
 
@@ -357,29 +391,6 @@ module Skylab::Brazen
           @lstnrs[ i ] = Box_.new
         end
       end
-
-      # ~
-
-      def accept_ad_hoc_processor
-        Entity::Ad_Hoc_Processor__.new @scan, @reader, @writer
-      end
-
-      def scan_anything_with_any_ad_hoc_processors
-        @ad_hocs_are_known or determine_if_ad_hocs_exist
-        @ad_hocs_exist and @ad_hoc_scan.scan_any
-      end
-
-      def determine_if_ad_hocs_exist
-        @ad_hocs_are_known = true
-        if @reader.const_defined? :AD_HOC_PROCESSORS__
-          @ad_hoc_scan = @reader::AD_HOC_PROCESSORS__.
-            build_scan @scan, @reader, @writer
-          @ad_hocs_exist = true
-        else
-          @ad_hocs_exist = false
-        end ; nil
-      end
-
     end
 
     module Proprietor_Methods__
@@ -774,6 +785,10 @@ module Skylab::Brazen
 
         def property
           @kernel.flush_because_prop_i iambic_property
+        end
+
+        def reuse
+          @kernel.accept_reuse
         end
       end ]
 

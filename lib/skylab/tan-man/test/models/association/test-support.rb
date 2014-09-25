@@ -19,7 +19,7 @@ module Skylab::TanMan::TestSupport::Models::Association
     end
 
     def lines
-      result.unparse.split "\n"
+      result.unparse.split NEWLINE_
     end
   end
 end

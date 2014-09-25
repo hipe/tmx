@@ -56,6 +56,7 @@ module Skylab::TanMan
 
     Meaning_ = self
     NAME_ = 'name'.freeze
+    NEWLINE_ = "\n".freeze
     VALUE_ = 'value'.freeze
 
   end

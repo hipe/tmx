@@ -6,8 +6,6 @@ module Skylab::TanMan::TestSupport::Models::Node
 
   include CONSTANTS
 
-  NEWLINE_ = "\n".freeze  # etc
-
   extend TestSupport_::Quickie
 
   module InstanceMethods

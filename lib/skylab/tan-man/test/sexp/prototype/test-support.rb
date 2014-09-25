@@ -10,6 +10,8 @@ module ::Skylab::TanMan::TestSupport::Sexp::Prototype # #topic-module
 
   TanMan_ = TanMan_
 
+  NEWLINE_ = NEWLINE_
+
   module Grammars
     TanMan_::Autoloader_[ self ]
   end

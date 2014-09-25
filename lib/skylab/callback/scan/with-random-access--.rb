@@ -44,6 +44,10 @@ module Skylab::Callback
         end
       end
 
+      def at * i_a
+        i_a.map( & method( :fetch ) )
+      end
+
       def [] i
         fetch i do end
       end

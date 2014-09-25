@@ -114,6 +114,7 @@ module Skylab::TanMan::TestSupport
   module CONSTANTS
     TanMan_ = TanMan_
     EMPTY_S_ = TanMan_::EMPTY_S_
+    NEWLINE_ = "\n".freeze
     SPACE_ = TanMan_::SPACE_
     TestLib_ = TestLib_
     TestSupport_  = ::Skylab::TestSupport

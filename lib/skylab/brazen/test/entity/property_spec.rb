@@ -77,6 +77,21 @@ module Skylab::Brazen::TestSupport::Entity
         expect P_In_Block_Props_B
       end
 
+      it "6) re-use properties with 'reuse'" do
+        class P_Reuse_Source
+          Subject_[][ self, -> do
+            o :property, :bar,
+              :property, :foo
+          end ]
+        end
+        class P_Reuse
+          Subject_[][ self, -> do
+            o :reuse, P_Reuse_Source.properties.at( :foo, :bar )
+          end ]
+        end
+        expect P_Reuse
+      end
+
       def expect cls
         subj = cls.new.send :with, :foo, :x, :bar, :y
         subj.instance_variable_get( :@foo ).should eql :x

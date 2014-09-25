@@ -183,7 +183,7 @@ module Skylab::TanMan::TestSupport::CLI
         @a = i_a
         @h = ::Hash[ i_a.length.times.map do |d|
           if (( x = val_a.fetch d ))
-            x = x.string.split( "\n" )
+            x = x.string.split( NEWLINE_ )
           end
           [ i_a.fetch( d ), x ]
         end ]

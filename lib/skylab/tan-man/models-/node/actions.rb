@@ -2,15 +2,6 @@ module Skylab::TanMan
 
   class Models_::Node
 
-    class << self
-
-      # ~ the stack
-
-      def controller
-        self._YES
-      end
-    end
-
     Brazen_::Model_::Entity[ self, -> do
 
       o :persist_to, :node,
@@ -33,8 +24,6 @@ module Skylab::TanMan
 
     end
 
-    # public :with
-
     Actions = make_action_making_actions_module
 
     module Actions
@@ -53,19 +42,12 @@ module Skylab::TanMan
 
       private
 
-        def via_properties_produce_bound_call
+        def via_arguments_produce_bound_call
           if @argument_box[ :ping ]
             bound_call_for_ping
           else
             super
           end
-        end
-
-        def bound_call_for_ping
-          _ev = build_OK_event_with :ping_from_action, :name_i,
-             name.as_lowercase_with_underscores_symbol
-          x = send_event _ev  # see #very-interesting
-          Brazen_.bound_call -> { x }, :call
         end
 
       public
@@ -132,7 +114,7 @@ module Skylab::TanMan
 
       def mutate_via_verb_and_entity verb_i, entity
         _dsc = datastore_controller
-        self.class::Mutate::Via_entity[
+        Node_::Actors__::Mutate::Via_entity[
           verb_i,
           entity,
           _dsc,
@@ -146,10 +128,6 @@ module Skylab::TanMan
       end
 
       Autoloader_[ self ]
-    end
-
-    class Silo_Controller__ < Model_::Document_Entity::Silo_Controller
-
     end
 
     Node_ = self

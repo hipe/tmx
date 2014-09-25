@@ -14,6 +14,10 @@ module Skylab::TanMan::TestSupport
       module Test_Context_Methods__
 
         def call_API * x_a
+          call_API_via_iambic x_a
+        end
+
+        def call_API_via_iambic x_a
           x_a.push :event_receiver, event_receiver
           @result = subject_API.call( * x_a ) ; nil
         end

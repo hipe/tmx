@@ -70,7 +70,7 @@ module Skylab::Brazen
       @event_receiver = ev_rcvr
       @argument_box = Box_.new
       bc = any_bound_call_via_processing_iambic x_a
-      bc || via_properties_produce_bound_call
+      bc || via_arguments_produce_bound_call
     end
 
   private
@@ -79,7 +79,7 @@ module Skylab::Brazen
       process_iambic_fully x_a ; nil
     end
 
-    def via_properties_produce_bound_call
+    def via_arguments_produce_bound_call
       notificate :iambic_normalize_and_validate
       if @error_count.zero?
         prdc_bound_call_when_valid

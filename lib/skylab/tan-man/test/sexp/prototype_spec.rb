@@ -2,7 +2,7 @@ require_relative 'prototype/test-support'
 
 module Skylab::TanMan::TestSupport::Sexp::Prototype
 
-  describe "[tm] Sexp::Prototype will be aw" do
+  describe "[tm] Sexp::Prototype will be awesome" do
 
     extend TS_  # #borrow:one
 
@@ -43,7 +43,7 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
         r = o._append! 'faeioup'
         o.object_id.should eql( r.object_id )
         o.unparse.should eql( 'faeioup' ) # no seaprator here
-        lines = result.unparse.split "\n"
+        lines = result.unparse.split NEWLINE_
         lines.length.should eql( 2 )
         lines.last.should eql( 'faeioup' )
         r = o._append! 'fooooop'
