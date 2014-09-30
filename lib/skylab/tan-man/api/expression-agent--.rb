@@ -11,7 +11,7 @@ module Skylab::TanMan
       alias_method :calculate, :instance_exec
 
       def and_ a
-        "(#{ a * ', ' })"
+        _NLP_actor.and a
       end
 
       def code s
@@ -32,6 +32,10 @@ module Skylab::TanMan
 
       def lbl x
         par x
+      end
+
+      def or_ a
+        _NLP_actor.or_ a
       end
 
       def par x
@@ -62,6 +66,22 @@ module Skylab::TanMan
       def val x
         x.inspect
       end
+
+      def _NLP_actor
+        @NLP_actor ||= NLP_actor__[].new
+      end
+
+      NLP_actor__ = -> do
+        p = -> do
+          class NLP_Actor___
+            i_a = [ :and_, :or_, :s ]
+            TanMan_::Lib_::EN_fun[][ self, :public, i_a ]
+          end
+          p = -> { NLP_Actor___ }
+          NLP_Actor___
+        end
+        -> { p[] }
+      end.call
 
       self
     end.new :_no_kernel_

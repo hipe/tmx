@@ -169,6 +169,12 @@ module Skylab::Brazen
       sign_event ev
     end
 
+    def get_actual_argument_scan
+      Scan_[].nonsparse_array( self.class.properties.get_names ).map_by do |i|
+        Actual_Property_.new i, any_argument_value( i )
+      end
+    end
+
   public
     def any_argument_value i
       @argument_box[ self.class.properties.fetch( i ).name_i ]

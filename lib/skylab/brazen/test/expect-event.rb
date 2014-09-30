@@ -1,17 +1,15 @@
-module Skylab::TanMan::TestSupport
+module Skylab::Brazen::TestSupport
 
-  module API
+  class Expect_Event
 
-    class Expect
+    class << self
 
-      class << self
-
-        def [] mod
-          mod.include Test_Context_Methods__ ; nil
-        end
+      def [] test_context_cls
+        test_context_cls.include Test_Context_Instance_Methods__ ; nil
       end
+    end
 
-      module Test_Context_Methods__
+      module Test_Context_Instance_Methods__
 
         def call_API * x_a
           call_API_via_iambic x_a
@@ -27,20 +25,167 @@ module Skylab::TanMan::TestSupport
         end
 
         def bld_event_receiver
-          Event_Receiver__.new ( do_debug && some_debug_IO )
+          @ev_a = nil
+          Event_Receiver__.new -> ev do
+            ( @ev_a ||= [] ).push ev ; nil
+          end, self
+        end
+
+        def expect_one_event * x_a, & p
+          expect_event_via_iambic_and_proc [ :shorthand, x_a ], p
+          expect_no_more_events
+        end
+
+        def expect_not_OK_event * x_a, & p
+          expect_event_via_iambic_and_proc [ :is_ok, false, :shorthand, x_a ], p
+        end
+
+        def expect_neutral_event * x_a, & p
+          expect_event_via_iambic_and_proc [ :is_ok, nil, :shorthand, x_a ], p
+        end
+
+        def expect_OK_event * x_a, & p
+          expect_event_via_iambic_and_proc [ :is_ok, true, :shorthand, x_a ], p
+        end
+
+        def expect_event * x_a, & p
+          expect_event_via_iambic_and_proc [ :shorthand, x_a ], p
+        end
+
+        def expect_event_via_iambic_and_proc x_a, p
+          exp = Expectation__.new x_a, p
+          exp.call_a.each do | method_i, args |
+            send method_i, * args
+          end ; nil
+        end
+
+        def expect_no_events
+          @ev_a.should be_nil
+        end
+
+        def expect_no_more_events
+          if @ev_a
+            if @ev_a.length.nonzero?
+              raise "expected no more events, has #{ @ev_a.first.description }"
+            end
+          end
+        end
+
+        def resolve_ev_by_expect_one_event
+          if @ev_a
+            if @ev_a.length.zero?
+              raise "expected event, had no more."
+            else
+              @ev = @ev_a.shift ; nil
+            end
+          else
+            raise "expected event, had none."
+          end
+        end
+
+        # ~ expectations along the different qualities of events
+
+        def via_ev_expect_terminal_channel_of i
+          @ev.terminal_channel_i.should eql i
+        end
+
+        def via_ev_expect_OK_value_of bool
+          ev = @ev.to_event
+          if bool.nil?
+            ev.has_tag( :ok ) and when_ev_has_OK_tag
+          elsif ev.has_tag :ok
+            if bool
+              ev.ok or when_ev_is_not_OK
+            else
+              ev.ok and when_ev_is_OK
+            end
+          else
+            when_ev_does_not_have_OK_tag
+          end
+        end
+
+        def when_ev_has_OK_tag
+          send_event_failure "expect event not to have 'ok' tag"
+        end
+
+        def when_ev_is_not_OK
+          send_event_failure "was not 'ok', expected 'ok'"
+        end
+
+        def when_ev_is_OK
+          send_event_failure "was 'ok', expected not"
+        end
+
+        def when_ev_does_not_have_OK_tag
+          send_event_failure "did not have 'ok' tag"
+        end
+
+        def via_ev_expect_codified_message_string s
+          s_ = expct_that_event_renders_as_one_string
+          s_ and s_.should eql s
+        end
+
+        def via_ev_expect_codified_message_string_via_regexp rx
+          s = expct_that_event_renders_as_one_string
+          s and s.should match rx
+        end
+
+        def expct_that_event_renders_as_one_string
+          @ev.render_all_lines_into_under s_a=[],
+            Brazen_::Event_[].codifying_expression_agent
+          1 == s_a.length or raise "expected 1 had #{ s_a.length } lines"
+          s_a.fetch 0
+        end
+
+        # ~ support and resolution
+
+        def send_event_failure msg
+          fail "#{ msg }: #{ @ev.terminal_channel_i }"
+        end
+
+        def via_ev_expect_via_proc p
+          p[ @ev ]
+        end
+
+        def expect_failed
+          expect_no_more_events
+          expect_failed_result
+        end
+
+        def expect_neutralled
+          expect_no_more_events
+          expect_neutral_result
+        end
+
+        def expect_succeeded
+          expect_no_more_events
+          expect_succeeded_result
+        end
+
+        def expect_failed_result
+          @result.should eql false
+        end
+
+        def expect_neutral_result
+          @result.should eql nil
+        end
+
+        def expect_succeeded_result
+          @result.should eql true
         end
       end
 
       class Event_Receiver__
 
-        def initialize dbg_IO
-          if dbg_IO
+        def initialize ev_p, test_context
+          @ev_p = ev_p
+          @test_context = test_context
+          if test_context.do_debug
             @do_debug = true
-            @debug_IO = dbg_IO
+            @debug_IO = test_context.debug_IO
           else
             @do_debug = false
           end
-          @ev_a = []
           @p_a = nil
         end
 
@@ -72,7 +217,7 @@ module Skylab::TanMan::TestSupport
             ev_ = ev_.dup_with :flyweighted_entity, _ent
             ev = ev_
           end
-          @ev_a.push ev
+          @ev_p[ ev ]
           if ev_.has_tag :ok
             ev_.ok ? true : false
           end
@@ -86,12 +231,8 @@ module Skylab::TanMan::TestSupport
 
       public
 
-        def gets
-          @ev_a.shift
-        end
-
         def app_name
-          "(tm)"
+          @test_context.app_name
         end
 
         def express_event ev, comment=nil
@@ -101,7 +242,7 @@ module Skylab::TanMan::TestSupport
           y = ::Enumerator::Yielder.new do |s|
             @debug_IO.puts "#{ comment }#{ @ok_s } #{ @tci } #{ @mems } - #{ s.inspect }"
           end
-          ev.render_all_lines_into_under y, TanMan_::API::EXPRESSION_AGENT__
+          ev.render_all_lines_into_under y, @test_context.event_expression_agent
           nil
         end
 
@@ -117,148 +258,48 @@ module Skylab::TanMan::TestSupport
         end
       end
 
-      module Test_Context_Methods__
 
-        def expect * x_a, & p
-          Expect.new( x_a, p , self ).result
-        end
+    Expectation__ = self
 
-        def expect_failed
-          expect_no_more_events
-          @result.should eql false
-        end
+    class Expectation__
 
-        def expect_succeeded
-          expect_no_more_events
-          @result.should eql true
+      def initialize x_a, p
+        @call_a = [ [ :resolve_ev_by_expect_one_event ] ]
+        @scn = Brazen_::Entity_[].iambic_scanner.new 0, x_a
+        while @scn.unparsed_exists
+          send @scn.gets_one
         end
-
-        def expect_no_more_events
-          ev = event_receiver.gets
-          if ev
-            fail "expected no more events, had #{ ev.terminal_channel_i }"
-          end ; nil
-        end
+        p and @call_a.push [ :via_ev_expect_via_proc, [ p ] ]
       end
 
-      Expect__ = self
+      attr_reader :call_a
 
-      class Expect__
+      def is_ok
+        @call_a.push [ :via_ev_expect_OK_value_of, [ @scn.gets_one ] ] ; nil
+      end
 
-        def initialize *a
-          @x_a, @p, @context = a
-          @d = -1 ; @last_d = @x_a.length - 1
-          @will_pass = true
-          expect_one_event
-          @stay && expect_not_OK_or_OK
-          @stay && process_terminal_channel_i
-          @stay && process_message_bodies
-          if @will_pass && @p
-            process_proc
-          end ; nil
-        end
+      def shorthand
+        scn = Brazen_::Entity_[].iambic_scanner.new 0, @scn.gets_one
+        scn.unparsed_exists and parse_shorthand scn
+      end
 
-        attr_reader :result
+      def parse_shorthand scn
+        @call_a.push [ :via_ev_expect_terminal_channel_of, [ scn.gets_one ] ]
 
-        def expect_one_event
-          @ev = @context.event_receiver.gets
-          if @ev
-            @ev_ = @ev.to_event
-            @stay = true
-          else
-            @ev_ = nil
-            send_failure "expected more events, had none."
-          end ; nil
-        end
-
-        def expect_not_OK_or_OK
-          send :"expect_#{ gets_one }"
-        end
-
-        def expect_not_OK
-          if @ev_.has_tag :ok
-            if @ev_.ok
-              send_failure "was 'ok', expected not"
-            end
-          else
-            when_no_tag
+        if scn.unparsed_exists
+          x = scn.current_token
+          if x.respond_to? :ascii_only?
+            @call_a.push [ :via_ev_expect_codified_message_string,
+              [ scn.gets_one ] ]
+          elsif x.respond_to? :named_captures
+            @call_a.push [ :via_ev_expect_codified_message_string_via_regexp,
+              [ scn.gets_one ] ]
           end
         end
 
-        def expect_OK
-          if @ev_.has_tag :ok
-            if ! @ev_.ok
-              send_failure "was not 'ok', expected 'ok'"
-            end
-          else
-            when_no_tag
-          end
-        end
-
-        def when_no_tag
-          send_failure "did not have 'ok' tag: '#{ @ev_.terminal_channel_i }'"
-        end
-
-        def expect_neutral
-          if @ev.has_tag :ok
-            send_failure "expected event not to have 'ok' tag"
-          end
-        end
-
-        def process_terminal_channel_i
-          if unparsed_exists
-            exp = gets_one
-            act = @ev.terminal_channel_i
-            if exp != act
-              @context.instance_exec do
-                exp.should eql act
-              end
-              @stay = false
-            end
-          else
-            @stay = false
-          end ; nil
-        end
-
-        def process_message_bodies
-          if unparsed_exists
-            _exp = TanMan_::API::EXPRESSION_AGENT__
-            y = ::Enumerator::Yielder.new do |act|
-              if unparsed_exists
-                exp = gets_one
-                if exp != act
-                  @context.instance_exec do
-                    act.should eql exp
-                  end
-                  @stay = false
-                end
-              else
-                send_failure "unexpected extra line from #{
-                  }rendering: #{ act.inspect }"
-              end
-            end
-            @ev.render_all_lines_into_under y, _exp
-          else
-            @stay = false
-          end
-        end
-
-        def process_proc
-          @result = @p[ @ev ] ; nil
-        end
-
-        def unparsed_exists
-          @stay = @d != @last_d
-        end
-
-        def gets_one
-          @x_a.fetch( @d += 1 )
-        end
-
-        def send_failure msg
-          @result = @stay = @will_pass = false
-          @context.send :fail, msg ; nil
-        end
+        if scn.unparsed_exists
+          raise ::ArgumentError, "unreasonable expectation: #{ scn.current_token }"
+        end ; nil
       end
     end
   end

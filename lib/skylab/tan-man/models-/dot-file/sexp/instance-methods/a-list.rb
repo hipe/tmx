@@ -4,7 +4,25 @@ module Skylab::TanMan
 
     include Models_::DotFile::Sexp::InstanceMethod::InstanceMethods
 
-    def _insert_assignment! sym, val
+    def _update_attributes attr_h, add_p=nil, change_p=nil
+      h = {}
+      as.each do |a|  # per recursive-rule, an a_list has many a's
+        h[ a.id.normalized_string.intern ] = a
+      end
+      _pairs = attr_h.map { |k, v| [ k.intern, v ] }
+      _pairs.each do |i, x|
+        if h.key? i
+          change_p and change_p[ i, h[ i ][ :equals ][ :id ].normalized_string, x ]
+          h[ i ][ :equals ][ :id ] = _parse_id x
+        else
+          add_p and add_p[ i, x ]
+          _insert_assignment i, x
+        end
+      end
+      ACHEIVED_
+    end
+
+    def _insert_assignment sym, val
       # because of the nature of the grammar, you are guaranteed to have at
       # least one item in the list. #algorithm:lexical *however* hacks
       # may occur where we have zero!! at these times you need a
@@ -39,24 +57,6 @@ module Skylab::TanMan
       new[:id] = _parse_id key_s
       new[:equals][:id] = _parse_id val.to_s
       _insert_item_before_item new, new_before_this_asst # nil ok for 2nd param
-    end
-
-    def _update_attributes! attrs, add=nil, change=nil
-      attrs = attrs.map { |k, v| [k.intern, v] } # normalize to arr of [sym, x]
-      h = { }
-      as.each do |a|              # per recursive-rule, an a_list has many a's
-        h[ a.id.normalized_string.intern ] = a
-      end
-      attrs.each do |k, v|
-        if h.key? k
-          change[ k, h[k][:equals][:id].normalized_string, v ] if change
-          h[k][:equals][:id] = _parse_id v
-        else
-          add[ k, v ] if add
-          _insert_assignment! k, v
-        end
-      end
-      true
     end
   end
 end

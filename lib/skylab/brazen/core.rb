@@ -127,6 +127,9 @@ module Skylab::Brazen
   SLASH_ = '/'.getbyte 0
   Scan_ = -> { Callback_::Scan }
   SPACE_ = ' '.freeze
+
+  stowaway :TestSupport, 'test/test-support'
+
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
 

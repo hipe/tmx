@@ -45,7 +45,7 @@ module Skylab::TanMan
       a_list = @node_stmt.attr_list.content
       a_list._prototype ||= a_list_prototype
       added = [] ; changed = []
-      a_list._update_attributes! attrs,
+      a_list._update_attributes attrs,
         -> name, val { added << [name, val] },
         -> name, old, new { changed << [name, old, new] }
       success[ Models::Node::Events::Attributes_Updated.new self,

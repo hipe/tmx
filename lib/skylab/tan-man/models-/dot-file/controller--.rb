@@ -194,42 +194,38 @@ module Skylab::TanMan
     end
     end
 
-      def persist_via_action action
-
-        o = Persist_Adapters__.map_detect do |cls|
-          cls.match action
-        end
-
-        if o
-          o.init @event_receiver, @kernel
-          o.receive_rewritten_datastore_controller self
-        else
-          ACHEIVED_
-        end
+      def persist_via_args arg
+        adapter = Persist_Adapters__.produce_via_argument arg
+        adapter.init @event_receiver, @kernel
+        adapter.receive_rewritten_datastore_controller self
       end
 
       module Persist_Adapters__
-        define_singleton_method :map_detect, -> do
-          p = -> &q do
-            _CLS_A_ = constants.map { |i| const_get i, false }
-            p = -> &q_ do
-              Callback_.scan.nonsparse_array( _CLS_A_ ).map_detect( & q_ )
-            end
-            p[ &q ]
+
+        class << self
+
+          def produce_via_argument arg
+            ftch_class_via_argument_name( arg.name_i ).build arg.value_x
           end
-          -> &q { p[ &q ] }
-        end.call
-      end
 
-      module Persist_Adapters__
+          define_method :ftch_class_via_argument_name, ( -> do
+            p = -> name_i do
+              mod = Persist_Adapters__
+              h = {}
+              mod.constants.each do |i|
+                h[ i.downcase ] = mod.const_get i, false
+              end
+              ( p = h.method :fetch )[ name_i ]
+            end
+            -> i { p[ i ] }
+          end ).call
+        end
 
-        class String
+        class Output_String
 
           class << self
-
-            def match o
-              s = o.argument_box[ :output_string ]
-              s and new s
+            def build x
+              new x
             end
           end
 
@@ -248,14 +244,16 @@ module Skylab::TanMan
           end
         end
 
-        class Pathname
+        class Ouput_Pathname
 
           class << self
-
-            def match o
-              s = o.argument_box[ :output_pathname ]
-              s and self._IT_WIL_BE_EASY
+            def build x
+              new x
             end
+          end
+
+          def initialize output_pathname
+            self._IT_WILL_BE_EASY
           end
         end
       end

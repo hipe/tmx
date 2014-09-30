@@ -159,13 +159,13 @@ module Skylab::TanMan
     # extent: solo def, 2 calls
 
     def element2tree element, member_i
-      if ! element
-        nil # typically as a trailing optional node
-      elsif element.respond_to? CUSTOM_PARSE_TREE_METHOD_NAME__
-        element.send CUSTOM_PARSE_TREE_METHOD_NAME__  # careful!
-      else
-        node2tree element, self, member_i
-      end
+      if element
+        if element.respond_to? CUSTOM_PARSE_TREE_METHOD_NAME__
+          element.send CUSTOM_PARSE_TREE_METHOD_NAME__  # careful!
+        else
+          node2tree element, self, member_i
+        end
+      end  # else typically is trailing optional node
     end
 
     attr_accessor :expression
@@ -175,21 +175,17 @@ module Skylab::TanMan
     def _members ; @_members ||= members.freeze end
     attr_accessor :members_of_interest
 
-    def parse rule, string, err=nil                   # for hacks
-      parser = grammar.build_parser_for_rule rule
+    def parse rule_i, string, err_p=nil  # for hacks
+      parser = grammar.build_parser_for_rule rule_i
       syn_node = parser.parse string
-      res = nil
       if syn_node
-        res = element2tree syn_node, "xyzzy_#{ rule }".intern
+        element2tree syn_node, :"xyzzy_#{ rule_i }"
+      elsif err_p
+        err_p[ parser ]
       else
-        if err
-          res = err[ parser ]
-        else
-          Stderr_[].puts "#{ self } parse failed - #{ parser.failure_reason }"
-          res = false
-        end
+        Stderr_[].puts "#{ self } parse failed - #{ parser.failure_reason }"
+        UNABLE_
       end
-      res
     end
 
     attr_accessor :rule

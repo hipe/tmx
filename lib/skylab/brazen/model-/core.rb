@@ -7,7 +7,7 @@ module Skylab::Brazen
       class << self
 
         def actual_property
-          Actual_Property__
+          Actual_Property_
         end
 
         def collection_controller
@@ -23,6 +23,8 @@ module Skylab::Brazen
         end
       end
     end
+
+    Actual_Property_ = ::Struct.new :name_i, :value_x
 
     class << self
 
@@ -234,10 +236,9 @@ module Skylab::Brazen
       i_a = self.class.properties.get_names
       i_a.sort!
       Scan_[].nonsparse_array( i_a ).map_by do |i|
-        Actual_Property__.new i, any_property_value( i )
+        Actual_Property_.new i, any_property_value( i )
       end
     end
-    Actual_Property__ = ::Struct.new :name_i, :value_x
 
     def parameter_value i
       @parameter_box.fetch i

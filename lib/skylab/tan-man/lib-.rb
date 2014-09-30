@@ -20,6 +20,10 @@ module Skylab::TanMan
       HL__[]::System.defaults.dev_tmpdir_pathname
     end
 
+    EN_fun = -> do
+      HL__[]::SubClient::EN_FUN
+    end
+
     Entity = -> do
       Brazen_::Entity
     end

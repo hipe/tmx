@@ -232,6 +232,14 @@ module Skylab::TanMan
     end
 
     autoload_actions
+
+    class << self
+      def touch
+        self::Actors__::Mutate::Touch
+      end
+    end
+
+    Node_ = self
   end
 
   class Models_::Association < Model_::Document_Entity

@@ -8,14 +8,14 @@ module Skylab::TanMan::TestSupport::Models::Node
 
     it "ping the 'node add' action" do
       call_API :node, :add, :ping
-      expect :OK, :ping_from_action, "ping from action - add"
+      expect_OK_event :ping_from_action, "ping from action - add"
       expect_succeeded
     end
 
     it "add a minimal node to the minimal string" do
       s = 'digraph{}'
       add_name_to_string 'bae', s
-      expect :OK, :created, "created node 'bae'"
+      expect_OK_event :created_node, 'created node (lbl "bae")'
       s.should eql 'digraph{bae [label=bae]}'
       expect_succeeded
     end
@@ -23,7 +23,7 @@ module Skylab::TanMan::TestSupport::Models::Node
     it "add one before" do
       s = "digraph{ foo [label=foo]\n}"
       add_name_to_string 'bar', s
-      expect :OK, :created, "created node 'bar'"
+      expect_OK_event :created_node, 'created node (lbl "bar")'
       s.should eql "digraph{ bar [label=bar]\nfoo [label=foo]\n}"
       expect_succeeded
     end
@@ -31,7 +31,7 @@ module Skylab::TanMan::TestSupport::Models::Node
     it "add one after" do
       s = "digraph{\n bar}"
       add_name_to_string 'foo', s
-      expect :OK, :created, "created node 'foo'"
+      expect_OK_event :created_node, 'created node (lbl "foo")'
       s.should eql "digraph{\n bar\nfoo [label=foo]}"
       expect_succeeded
     end
@@ -39,14 +39,14 @@ module Skylab::TanMan::TestSupport::Models::Node
     it "add one same - fails with event about node with same name" do
       s = " digraph { zoz } "
       add_name_to_string 'zoz', s
-      expect :not_OK, :exists, "node already existed: 'zoz'"
+      expect_not_OK_event :found_existing_node, 'node already existed: (lbl "zoz")'
       expect_failed
     end
 
     it "add one in between" do
       s = " digraph { apple ; zoz ; } "
       add_name_to_string 'menengitis', s
-      expect :OK, :created do |ev|
+      expect_OK_event :created_node do |ev|
         a = ev.tag_names
         a.should be_include :ok
         a.should be_include :node_stmt
@@ -89,7 +89,7 @@ module Skylab::TanMan::TestSupport::Models::Node
       -> do
         msg = <<-O.unindent.strip
           html-escaping support is currently very limited. #{
-          }the following characters is not yet supported: "\\t" (009), #{
+          }the following character(s 3) (s [3, :is]) not yet supported: "\\t" (009), #{
           }"\\n" (010), "\\u007F" (127)
         O
 
@@ -97,7 +97,7 @@ module Skylab::TanMan::TestSupport::Models::Node
           }\"#{ msg[ 0..96 ] }[..]\"" do
 
           touch_node_via_label "\t\t\n\x7F"
-          expect :not_OK, :invalid_characters, msg
+          expect_not_OK_event :invalid_characters, msg
           expect_no_more_events
         end
       end.call

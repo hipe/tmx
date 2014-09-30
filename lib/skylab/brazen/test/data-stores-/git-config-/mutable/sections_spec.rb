@@ -36,10 +36,9 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable
       it "add a section with a subsection with an invalid name" do
         _secs = document.sections
         ok = _secs.touch_section 'foo', "bar\nbaz"
-        expect_event :invalid_subsection_name do |ev|
-          ev.description.should match(
-            /\A\(\(subsection names can contain .+bar\\\\n/ )  # #todo
-        end
+        expect_event :invalid_subsection_name,
+          /\Asubsection names can contain any characters except newline #{
+           }\(\(ick "bar\\n"\)\)\z/
         ok.should eql Brazen_::UNABLE_
       end
     end

@@ -10,5 +10,10 @@ module Skylab::TanMan::TestSupport::API
 
   module InstanceMethods
 
+    def app_name
+      APP_NAME__
+    end
+    APP_NAME__ = '(tm)'.freeze
+
   end
 end

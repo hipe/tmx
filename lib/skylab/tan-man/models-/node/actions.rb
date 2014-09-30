@@ -33,8 +33,8 @@ module Skylab::TanMan
       class Add
 
         Model_::Entity[ self, -> do
-          o :required, :property, :input_string,
-            :required, :property, :output_string,
+
+          o :reuse, Model_::Document_Entity.IO_properties,
 
             :flag, :property, :ping
 
@@ -46,7 +46,8 @@ module Skylab::TanMan
           if @argument_box[ :ping ]
             bound_call_for_ping
           else
-            super
+            bc = any_bound_call_for_resolve_document_IO
+            bc or super
           end
         end
 
@@ -62,7 +63,9 @@ module Skylab::TanMan
       class Ls
 
         Model_::Entity[ self, -> do
-          o :required, :property, :input_string
+
+          o :reuse, Model_::Document_Entity.input_properties
+
         end ]
       end
 
@@ -71,10 +74,6 @@ module Skylab::TanMan
     end
 
     class Collection_Controller__ < Model_::Document_Entity::Collection_Controller
-
-      def unparse_entire_document
-        datastore_controller.unparse_entire_document
-      end
 
       def retrieve_any_node_with_id i
         get_node_scan.detect do |node|
@@ -105,7 +104,8 @@ module Skylab::TanMan
 
       def persist_entity entity, _event_receiver
         ok = mutate_via_verb_and_entity :create, entity
-        ok and datastore_controller.persist_via_action @action
+        ok and datastore_controller.persist_via_args( *
+          @action.output_related_arguments )
       end
 
       def produce_relevant_sexp_via_touch_entity entity
@@ -120,17 +120,7 @@ module Skylab::TanMan
           _dsc,
           @event_receiver, @kernel ]
       end
-
-    private
-
-      def datastore_controller
-        @preconditions.fetch :dot_file  # yes
-      end
-
-      Autoloader_[ self ]
     end
-
-    Node_ = self
     STOP_ = false
   end
 

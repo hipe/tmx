@@ -8,8 +8,8 @@ module Skylab::Brazen
 
         alias_method :construct, :new
 
-        def sender x
-          x.include Sender_Methods__ ; nil
+        def codifying_expression_agent
+          Event__::EXPRESSION_AGENT__
         end
 
         def inline_with * x_a, &p
@@ -37,6 +37,10 @@ module Skylab::Brazen
           else
             Receiver__
           end
+        end
+
+        def sender x
+          x.include Sender_Methods__ ; nil
         end
 
         def wrap
@@ -333,6 +337,7 @@ module Skylab::Brazen
       module Receiver__
 
         class << self
+
           def channeled * a
             if a.length.zero?
               Channeled__
@@ -340,8 +345,13 @@ module Skylab::Brazen
               Channeled__.new a
             end
           end
+
           def via_proc p
             Proc_Adapter__.new p
+          end
+
+          def map_reduce evr, & p
+            Map_Reduce__.new p, evr
           end
         end
 
@@ -351,6 +361,16 @@ module Skylab::Brazen
           end
           def receive_event ev
             @p[ ev ]
+          end
+        end
+
+        class Map_Reduce__
+          def initialize p, evr
+            @evr = evr ; @p = p
+          end
+          def receive_event ev
+            ev_ = @p[ ev ]
+            ev_ and @evr.receive_event ev_
           end
         end
 

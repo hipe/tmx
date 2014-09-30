@@ -4,15 +4,33 @@ module Skylab::TanMan
 
       class Actors__::Mutate
 
-        Via_entity = self
-
-        Callback_::Actor[ self, :properties,
-          :verb,
-          :entity,
-          :datastore,
-          :event_receiver, :kernel ]
-
         Event_[].sender self
+
+        class Touch < self
+
+          Callback_::Actor[ self, :properties,
+            :name,
+            :verb,  # 'create' | 'retrieve' | 'touch'
+            :datastore,
+            :event_receiver, :kernel ]
+
+          def resolve_name_string
+            @name_s = @name ; @name = nil ; nil
+          end
+        end
+
+        class Via_entity < self
+
+          Callback_::Actor[ self, :properties,
+            :verb,
+            :entity,
+            :datastore,
+            :event_receiver, :kernel ]
+
+          def resolve_name_string
+            @name_s = @entity.property_value :name ; nil
+          end
+        end
 
         def execute
           init_ivars
@@ -23,7 +41,7 @@ module Skylab::TanMan
       private
 
         def init_ivars
-          @name_s = @entity.property_value :name
+          resolve_name_string
           @graph_sexp = @datastore.graph_sexp
           @stmt_list = @graph_sexp.stmt_list
           send :"init_ivars_for_#{ @verb }"
@@ -307,7 +325,7 @@ module Skylab::TanMan
         end
 
         def send_created_event_for_node node_stmt
-          _ev = build_OK_event_with :created, :node_stmt, node_stmt do |y, o|
+          _ev = build_OK_event_with :created_node, :node_stmt, node_stmt do |y, o|
             y << "created node #{ lbl o.node_stmt.label }"
           end
           send_event _ev

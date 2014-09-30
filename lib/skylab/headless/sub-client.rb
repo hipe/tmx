@@ -162,23 +162,32 @@ end
 
   module EN_FUN  # see [#086]
 
-    def self.[] mod, * x_a
-      on_mod_via_iambic mod, x_a
-    end
+    class << self
 
-    def self.on_mod_via_iambic mod, x_a
-      :private == x_a[ 0 ] or fail "only `private` is supported for now #{
-        }(had #{ Headless_::Lib_::Strange[ x_a[ 0 ] ] })"
-      x_a.shift
-      1 == x_a.length or fail "expecting exactly one element, an array"
-      meth_i_a = [ * x_a.shift, :nlp_last_length, :set_nlp_last_length ]
-      h = @h
-      mod.module_exec do
-        meth_i_a.each do |meth_i|
-          define_method meth_i, & h.fetch( meth_i )
+      def [] mod, * x_a
+        on_mod_via_iambic mod, x_a
+      end
+
+      def on_mod_via_iambic mod, x_a
+
+        case x_a.first
+        when :private ; do_private = true
+        when :public ; nil
+        else  ; raise ::ArgumentError, "public or private, not: '#{ x_a.first }'"
         end
-        private( * meth_i_a )
-      end ; nil
+
+        2 == x_a.length or raise ::ArgumentError, "#{ x_a.length } for 2"
+
+        meth_i_a = [ * x_a.last, :nlp_last_length, :set_nlp_last_length ]
+
+        h = @h
+        mod.module_exec do
+          meth_i_a.each do |meth_i|
+            define_method meth_i, & h.fetch( meth_i )
+          end
+          do_private and private( * meth_i_a )
+        end ; nil
+      end
     end
 
     o = definer

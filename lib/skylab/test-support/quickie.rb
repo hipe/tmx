@@ -359,10 +359,13 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
           '(tries to be like the option in rspec)' do |v|
         tag_shell.receive_tag_argument v
       end
-      o.on '--line NUMBER', '(experiment)' do |v|
+      o.on '--line NUMBER', "run the example whose line number equals this" do |v|
         process_line_argument v
       end
-      o.on '--to NUMBER', '(experiment)' do |v|
+      o.on '--from NUMBER', "run the examples whose line number is >= this" do |v|
+        process_min_line_argument v
+      end
+      o.on '--to NUMBER', "run the examples whose line number is <= this" do |v|
         process_max_line_argument v
       end
       o
@@ -426,8 +429,21 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
       @line_set << d ; nil
     end
 
+    def process_min_line_argument s
+      accept_min_line_argument cnvrt_line_argument s
+    end
+
     def process_max_line_argument s
       accept_max_line_argument cnvrt_line_argument s
+    end
+
+    def accept_min_line_argument d
+      add_or_p -> tagset do
+        d <= tagset.lineno
+      end
+      add_run_option_renderer do |y|
+        y << "--from #{ d }"
+      end ; nil
     end
 
     def accept_max_line_argument d
@@ -1092,6 +1108,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     end
   end
 
+  EMPTY_S_ = ts::EMPTY_S_
   MONADIC_TRUTH_ = ts::MONADIC_TRUTH_
 
 end

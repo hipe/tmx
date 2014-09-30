@@ -54,9 +54,7 @@ module Skylab::Brazen
       Lang_Ctx__ = -> do
         p = -> do
           x = class Lang_Ctx___
-            i_a = [ :and_, :s ]
-            Brazen_::Lib_::EN_fun[][ self, :private, i_a ]
-            public( * i_a )
+            Brazen_::Lib_::EN_fun[][ self, :public, [ :and_, :s ] ]
             self
           end
           p = -> { x } ; x

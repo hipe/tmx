@@ -14,11 +14,7 @@ module Skylab::TanMan::TestSupport
     sidesys = TanMan_::Autoloader_.build_require_sidesystem_proc
 
     API_expect = -> ctx_cls do
-
-      require TanMan_::TestSupport.dir_pathname.join( 'api/test-support' ).to_path
-
-      TanMan_::TestSupport::API::Expect[ ctx_cls ]
-
+      TanMan_::Brazen_::TestSupport::Expect_Event[ ctx_cls ]
     end
 
     Build_tmpdir_via_stem = -> s do
@@ -203,12 +199,20 @@ module Skylab::TanMan::TestSupport
 
     attr_accessor :do_debug
 
+    def debug_IO
+      Some_debug_IO[]
+    end
+
     def some_debug_IO
       Some_debug_IO[]
     end
 
     Some_debug_IO = -> do
-      TestSupport_::System.stderr
+      TestSupport_.debug_IO
+    end
+
+    def event_expression_agent
+      TanMan_::API::EXPRESSION_AGENT__
     end
 
     def result
@@ -365,6 +369,11 @@ module Skylab::TanMan::TestSupport
 
     def some_input_string_when_input_string
       input_string
+    end
+
+    def add_output_arguments_to_iambic x_a
+      @output_s = ::String.new
+      x_a.push :output_string, @output_s ; nil
     end
 
     # ~ hook-outs to ancillary API's
