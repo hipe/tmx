@@ -13,7 +13,7 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
           def self.yep ; :_ok_ end
         end
         @box_DSL_class = class Cust_Box_DSL
-          Headless::CLI::Box[ self, :DSL, :leaf_action_base_class, Hi ]
+          Headless_::CLI::Box[ self, :DSL, :leaf_action_base_class, Hi ]
 
           def wippertail
           end

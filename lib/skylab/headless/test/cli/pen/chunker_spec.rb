@@ -6,15 +6,15 @@ module Skylab::Headless::TestSupport::CLI::Pen
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[hl] CLI pen chunker" do
 
-    stylize = Headless::CLI::Pen::FUN.stylize
+    stylize = Headless_::CLI::Pen::FUN.stylize
 
-    parse_styles = Headless::CLI::FUN::Parse_styles
+    parse_styles = Headless_::CLI::FUN::Parse_styles
 
-    unstyle_sexp = Headless::CLI::FUN::Unstyle_sexp
+    unstyle_sexp = Headless_::CLI::FUN::Unstyle_sexp
 
     it "look, wow" do
 
@@ -22,7 +22,7 @@ module Skylab::Headless::TestSupport::CLI::Pen
 
       sexp = parse_styles[ styl ]
 
-      enum = Headless::CLI::Pen::Chunker::Enumerator.new sexp
+      enum = Headless_::CLI::Pen::Chunker::Enumerator.new sexp
       parts = enum.to_a
       types, strings = parts.reduce [[],[]] do |(tp, st), pt|
         tp << pt[0][0]

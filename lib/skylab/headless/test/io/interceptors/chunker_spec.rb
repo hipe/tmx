@@ -1,11 +1,12 @@
 require_relative 'test-support'
 
 module ::Skylab::Headless::TestSupport::IO::Interceptors::Chunker
-  ::Skylab::Headless::TestSupport::IO::Interceptors[Chunker_TestSupport = self]
+
+  ::Skylab::Headless::TestSupport::IO::Interceptors[ TS_ = self ]
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   module InstanceMethods
     counter = 0
@@ -16,7 +17,7 @@ module ::Skylab::Headless::TestSupport::IO::Interceptors::Chunker
              else          ; 'CONST'
              end
       const = "#{ stem }_#{ counter += 1 }".intern
-      Chunker_TestSupport.const_set const, mod
+      TS_.const_set const, mod
       mod
     end
 
@@ -27,10 +28,10 @@ module ::Skylab::Headless::TestSupport::IO::Interceptors::Chunker
     end
   end
 
-  describe "#{ Headless::IO::Interceptors::Chunker }" do
-    extend Chunker_TestSupport
+  describe "#{Headless_::IO::Interceptors::Chunker }" do
+    extend TS_
 
-    let :klass do Headless::IO::Interceptors::Chunker end
+    let :klass do Headless_::IO::Interceptors::Chunker end
 
     it 'chunks' do
       a = [ ]

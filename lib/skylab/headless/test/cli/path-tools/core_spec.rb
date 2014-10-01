@@ -4,7 +4,7 @@ module Skylab::Headless::TestSupport::CLI
 
   describe "[hl] CLI path-tools" do
 
-    fun = Headless::CLI::PathTools::FUN
+    fun = Headless_::CLI::PathTools::FUN
 
     define_singleton_method :o do |str, capture, *tags|
       vp = if capture

@@ -2,10 +2,12 @@ require_relative 'test-support'
 
 module Skylab::Headless::TestSupport::IO::Interceptors
 
-  describe "#{ Headless::IO::Interceptors::Tee }" do
+  describe "[hl] IO interceptors tee" do
+
     context "with 2 downstreams" do
+
       it "dispatches the message out to both" do
-        tee = Headless::IO::Interceptors::Tee.new
+        tee = Headless_::IO::Interceptors::Tee.new
         tee[:foo] = ::StringIO.new
         tee[:bar] = ::StringIO.new
         tee.write('a')
@@ -18,7 +20,7 @@ module Skylab::Headless::TestSupport::IO::Interceptors
 
     context "with 0 downstreams" do
       it "does nothing" do
-        tee = Headless::IO::Interceptors::Tee.new
+        tee = Headless_::IO::Interceptors::Tee.new
         tee.write('a')
       end
     end

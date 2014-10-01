@@ -1,10 +1,10 @@
 require_relative 'test-support'
 
-describe "#{ Skylab::Headless::NLP::EN::Number }" do
+describe "[hl] NLP EN number" do
 
   extend ::Skylab::Headless::TestSupport::NLP
 
-  include self::Headless::NLP::EN::Number::Methods
+  include self::Headless_::NLP::EN::Number::Methods
 
   def self.does mixed, str
     let( :subject ) { send meth, mixed }

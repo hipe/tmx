@@ -80,7 +80,7 @@ module Skylab::TanMan
       if sl
         sl.to_scan
       else
-        Callback_.scan.the_empty_scan
+        Scan_[].the_empty_scan
       end
     end
 

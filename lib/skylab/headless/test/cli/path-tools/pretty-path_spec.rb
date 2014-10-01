@@ -7,7 +7,7 @@ describe "[hl] CLI path-tools pretty-path" do
 
   include ::Skylab::Headless # constants
 
-  fun = self::Headless::CLI::PathTools::FUN
+  fun = self::Headless_::CLI::PathTools::FUN
 
   @memo = { }
 

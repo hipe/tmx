@@ -2,13 +2,13 @@ require_relative '../test-support'
 
 module Skylab::Headless::TestSupport::NLP::EN
 
-  ::Skylab::Headless::TestSupport::NLP[ EN_TestSupport = self ] #regret, #courtesy
+  ::Skylab::Headless::TestSupport::NLP[ TS_ = self ] #regret, #courtesy
 
   include ::Skylab::Headless  # so you can say 'NLP'
   include CONSTANTS   # so you can say 'TS' (the right one!)
-  MetaHell_ = Headless::Library_::MetaHell
+  MetaHell_ = Headless_::Library_::MetaHell
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   module ModuleMethods
     include MetaHell_::Class::Creator::ModuleMethods

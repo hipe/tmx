@@ -4,10 +4,10 @@ module Skylab::Headless::TestSupport::IO::Interceptors
 
   ::Skylab::Headless::TestSupport::IO[ self ]
 
-  include CONSTANTS # so we can say Headless inside the describe block
+  include CONSTANTS # so we can say Headless_ inside the describe block
 
-  Headless::Library_.const_get :StringIO, false
+  Headless_::Library_.const_get :StringIO, false
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
 end

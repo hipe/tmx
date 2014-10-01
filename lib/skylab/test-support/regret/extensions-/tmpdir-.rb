@@ -5,10 +5,13 @@ module ::Skylab::TestSupport
     module Anchor_ModuleMethods
 
       def tmpdir
-        @tmpdir ||= begin
-          TestSupport_::Tmpdir.new path: tmpdir_pathname,
-            max_mkdirs: ( count_to_top + 1 ) # one for tmp/your-sub-product
-        end
+        @tmpdir ||= bld_tmpdir
+      end
+
+      def bld_tmpdir
+        TestSupport_::Lib_::Tmpdir[].new(
+          path: tmpdir_pathname,
+          max_mkdirs: ( count_to_top + 1 ) )  # one for tmp/your-sub-product
       end
 
       attr_writer :tmpdir_pathname

@@ -9,7 +9,7 @@ module Skylab::Headless::TestSupport::NLP::EN::Phrase
   include ::Skylab::Headless  # so you can say 'NLP' (before below!)
   include CONSTANTS  # so you can sat 'TS' (the right one!) (after above!)
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "#{ NLP::EN::POS } - Phrase" do
 

@@ -21,6 +21,10 @@ module Skylab::TestSupport  # :[#021].
     def debug_IO
       self::Lib_::Stderr[]
     end
+
+    def tmpdir
+      self::Lib_::Tmpdir[]
+    end
   end
 
   Callback_ = ::Skylab::Callback

@@ -6,7 +6,7 @@ module Skylab::Headless::TestSupport
     # in a *generic* (modality agnostic) way
 
     include CONSTANTS
-    include Headless::Client::InstanceMethods
+    include Headless_::Client::InstanceMethods
 
     USE_THIS_PEN = nil
 
@@ -14,6 +14,7 @@ module Skylab::Headless::TestSupport
       @debug = NILADIC_TRUTH_  # loud until proven quiet
       @use_this_pen = nil
     end
+    NILADIC_TRUTH_ = -> { true }
 
     attr_reader :debug
 
@@ -47,7 +48,7 @@ module Skylab::Headless::TestSupport
     def io_adapter
       @IO_adapter ||= begin
         pen = resolve_pen
-        o = Headless::TestSupport::IO_Adapter_Spy.new( * [ pen ].compact )
+        o = Headless_::TestSupport::IO_Adapter_Spy.new( * [ pen ].compact )
         o.do_debug_proc = -> { @debug.call }
         o
       end
@@ -70,7 +71,7 @@ module Skylab::Headless::TestSupport
     # ok sure, if you really need it
     attr_accessor :normalized_invocation_string
 
-    USE_THIS_PEN = -> { Headless::CLI::Pen::MINIMAL }
+    USE_THIS_PEN = -> {Headless_::CLI::Pen::MINIMAL }
 
 
     def initialize pen=nil

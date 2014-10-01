@@ -17,11 +17,8 @@ module Skylab::TanMan
     end ]
 
     class << self
-
       remove_method :get_unbound_lower_action_scan
-
       alias_method :get_unbound_lower_action_scan, :orig_gulas
-
     end
 
     Actions = make_action_making_actions_module

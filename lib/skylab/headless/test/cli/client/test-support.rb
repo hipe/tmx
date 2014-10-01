@@ -6,9 +6,9 @@ module Skylab::Headless::TestSupport::CLI::Client
 
   include CONSTANTS
 
-  Headless = Headless
+  Headless_ = Headless_
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   module ModuleMethods
 
@@ -49,7 +49,7 @@ module Skylab::Headless::TestSupport::CLI::Client
     end
 
     def build_three_streams_triad
-      t = TestSupport::IO::Spy::Triad.new( * stdin_spy )
+      t = TestSupport_::IO::Spy::Triad.new( * stdin_spy )
       do_debug and t.debug!
       t
     end
@@ -71,8 +71,8 @@ module Skylab::Headless::TestSupport::CLI::Client
       t = three_streams_triad
       @three_streams_triad = :_spent_
       t.outstream.string.length.zero? or fail "there was output to stderr? #{
-        } (\"#{ Headless::CLI::FUN::Ellipsify[ t.outstream.string ] }\")"
-      t.errstream.string.split Headless::LINE_SEPARATOR_STRING_
+        } (\"#{Headless_::CLI::FUN::Ellipsify[ t.outstream.string ] }\")"
+      t.errstream.string.split Headless_::LINE_SEPARATOR_STRING_
     end
   end
 end

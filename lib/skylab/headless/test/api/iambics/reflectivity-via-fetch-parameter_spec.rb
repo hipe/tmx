@@ -8,7 +8,7 @@ module Skylab::Headless::TestSupport::API::Iambics
 
       before :all do
         class Two_RVFP
-          Headless::API::Iambic_parameters[ self,
+          Headless_::API::Iambic_parameters[ self,
             :reflection_method_stem, :term,
             :params, :one, :two ]
         end

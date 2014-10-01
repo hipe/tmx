@@ -6,10 +6,10 @@ module Skylab::Headless::TestSupport::CLI::Option
 
   include CONSTANTS
 
-   Headless = Headless
+  Headless_ = Headless_
 
-   extend TestSupport::Quickie
+   extend TestSupport_::Quickie
 
-   Sandboxer = TestSupport::Sandbox::Spawner.new
+   Sandboxer = TestSupport_::Sandbox::Spawner.new
 
 end

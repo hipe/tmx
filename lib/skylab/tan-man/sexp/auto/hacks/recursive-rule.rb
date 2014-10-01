@@ -416,7 +416,7 @@ module Skylab::TanMan
             x
           end
         end
-        Callback_.scan do
+        Scan_.call do
           p[]
         end
       end

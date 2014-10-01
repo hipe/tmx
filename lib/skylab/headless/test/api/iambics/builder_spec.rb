@@ -8,7 +8,7 @@ module Skylab::Headless::TestSupport::API::Iambics
 
       module Iambics_IB
 
-        Headless::API::Iambic_builder[ self ]
+        Headless_::API::Iambic_builder[ self ]
 
         parameter__parse_class
         class Parameter::Parse

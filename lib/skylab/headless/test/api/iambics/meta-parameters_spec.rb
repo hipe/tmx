@@ -27,8 +27,8 @@ module Skylab::Headless::TestSupport::API::Iambics
         end
 
         ARITIES__ = (( module Arities
-          ONE = Headless::Arity.new 1, 1
-          ZERO_OR_ONE = Headless::Arity.new 0, 1
+          ONE = Headless_::Arity.new 1, 1
+          ZERO_OR_ONE = Headless_::Arity.new 0, 1
           { one: ONE, zero_or_one: ZERO_OR_ONE }.freeze
         end ))
 

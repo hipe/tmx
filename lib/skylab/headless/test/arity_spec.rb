@@ -6,18 +6,18 @@ module Skylab::Headless::TestSupport::Arity
 
   include CONSTANTS
 
-  Headless = ::Skylab::Headless
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
+  Headless_ = Headless_
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "a Skylab::Headless::Arity" do
 
     context "Space when sent" do
 
       before :all do
-        S = Headless::Arity::Space.create do
+        S = Headless_::Arity::Space.create do
           self::ZERO_OR_ONE = new 0, 1
           self::ONE_OR_MORE = new 1, nil
         end

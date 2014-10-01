@@ -6,9 +6,9 @@ module Skylab::Headless::TestSupport::CLI::Action::OP__
 
   include CONSTANTS
 
-  Headless = Headless
+  Headless_ = Headless_
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[hl] CLI action OP integration" do
 
@@ -18,7 +18,7 @@ module Skylab::Headless::TestSupport::CLI::Action::OP__
 
       with_action_class do
         class Nothing
-          Headless::CLI::Action[ self, :core_instance_methods ]
+          Headless_::CLI::Action[ self, :core_instance_methods ]
           self
         end
       end
@@ -42,7 +42,7 @@ module Skylab::Headless::TestSupport::CLI::Action::OP__
     context "action class with default action" do
       with_action_class do
         class Something
-          Headless::CLI::Action[ self,
+          Headless_::CLI::Action[ self,
             :core_instance_methods,
             :default_action, :foo ]
           def foo x
@@ -61,7 +61,7 @@ module Skylab::Headless::TestSupport::CLI::Action::OP__
     context "with o.p" do
       with_action_class do
         class Op_A
-          Headless::CLI::Action[ self,
+          Headless_::CLI::Action[ self,
             :core_instance_methods,
             :default_action, :bar ]
           def initialize * _
@@ -71,7 +71,7 @@ module Skylab::Headless::TestSupport::CLI::Action::OP__
           attr_reader :param_x_a
 
           def build_option_parser
-            op = Headless::Library_::OptionParser.new
+            op = Headless_::Library_::OptionParser.new
             op.on '-y', '--yes <hi>' do |x|
               @param_x_a.push :yes, x
             end
@@ -124,7 +124,7 @@ module Skylab::Headless::TestSupport::CLI::Action::OP__
         end
 
         class Dark_Action
-          Headless::CLI::Action[ self, :core_instance_methods,
+          Headless_::CLI::Action[ self, :core_instance_methods,
                                  :default_action, :zerp ]
           def build_option_parser
             Dark_OP.new

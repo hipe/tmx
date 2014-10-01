@@ -4,7 +4,7 @@ module Skylab::Headless::TestSupport::NLP::EN
 
   class MyAction
     include CONSTANTS
-    extend Headless::NLP::EN::API_Action_Inflection_Hack
+    extend Headless_::NLP::EN::API_Action_Inflection_Hack
   end
   module MyWidget # a noun
     class List < MyAction # a verb
@@ -14,11 +14,9 @@ module Skylab::Headless::TestSupport::NLP::EN
     end
   end
 
+  describe "[hl] NLP EN API action inflection hack (the class using it..)" do
 
-  describe "the class that extends #{
-    }#{ Headless::NLP::EN::API_Action_Inflection_Hack }" do
-
-    extend EN_TestSupport
+    extend TS_
 
     it "gets an inflection knobby" do
       [ MyAction.inflection.object_id,
@@ -64,10 +62,10 @@ module Skylab::Headless::TestSupport::NLP::EN
 
 
   describe "the industrious action class" do
-    extend EN_TestSupport
+    extend TS_
 
     klass :MyAwesomeAction do
-      extend Headless::NLP::EN::API_Action_Inflection_Hack
+      extend Headless_::NLP::EN::API_Action_Inflection_Hack
     end
     klass :Flugelhorn__Show, extends: :MyAwesomeAction do
       inflection.inflect.noun :plural

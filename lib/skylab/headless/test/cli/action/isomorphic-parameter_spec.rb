@@ -6,9 +6,9 @@ module Skylab::Headless::TestSupport::CLI::Action::Iso_Param__
 
   include CONSTANTS
 
-  Headless = Headless
+  Headless_ = Headless_
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   # :[#136] also covers arg syntax
 

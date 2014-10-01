@@ -6,7 +6,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Queue_Procs__
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[hl] CLI action queue - procs" do
 
@@ -51,7 +51,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Queue_Procs__
     end
 
     let :_OK do
-      Headless::CLI::Action::OK_  # do this late, don't load it early
+      Headless_::CLI::Action::OK_  # do this late, don't load it early
     end
 
     it "when queue is only one proc, will take argv args" do

@@ -71,7 +71,7 @@ module Skylab::Flex2Treetop::MyTestSupport
           h[ :infostream ] = dbg_IO
           h[ :verbose ] = true
         end
-        td = TestSupport::Tmpdir.new h
+        td = TestSupport.tmpdir.new h
         p = -> _ { td } ; td
       end
       -> dbg_IO_p { p[ dbg_IO_p ] }

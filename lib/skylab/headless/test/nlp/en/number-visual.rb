@@ -3,7 +3,7 @@ require_relative '../test-support'
 module Skylab::Headless::TestSupport::NLP
 
   # visual-test only! see also unit tests
-  fun = Headless::NLP::EN::Number::FUN
+  fun = Headless_::NLP::EN::Number::FUN
   number = fun.number
   num2ord = fun.num2ord
   method = nil

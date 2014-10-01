@@ -8,7 +8,7 @@ module Skylab::Headless::TestSupport::API::Iambics
 
       before :all do
         class Two_VIE
-          Headless::API::Iambic_parameters[ self, :params,
+          Headless_::API::Iambic_parameters[ self, :params,
             :one, :two ]
 
           def initialize * x_a

@@ -35,7 +35,7 @@ module Skylab::TanMan
         private
 
           def get_frame_scanner
-            Callback_.scan.nonsparse_array @a
+            Scan_[].nonsparse_array @a
           end
         end
 

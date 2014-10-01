@@ -6,14 +6,14 @@ module Skylab::Headless::TestSupport::CLI::Table
 
   include CONSTANTS
 
-  Headless = Headless ; Table = Headless::CLI::Table
+  Headless_ = Headless_ ; Table = Headless_::CLI::Table
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[hl] CLI table" do
 
     def outstream
-      @outstream ||= Headless::Library_::StringIO.new
+      @outstream ||= Headless_::Library_::StringIO.new
     end
 
     def outstr
@@ -146,9 +146,9 @@ module Skylab::Headless::TestSupport::CLI::Table
 
       a = []
       render_table row_enum, separator: "\t" do |o|
-        o.field!( :header ).style = Headless::CLI::Pen::MINIMAL.method(:hdr)
+        o.field!( :header ).style = Headless_::CLI::Pen::MINIMAL.method(:hdr)
         o.on_row do |txt|
-          a << Headless::CLI::Pen::FUN.unstyle[ txt ]
+          a <<Headless_::CLI::Pen::FUN.unstyle[ txt ]
         end
       end
       lengths = a.map { |s| s.match(/^[^\t]*/)[0].length }

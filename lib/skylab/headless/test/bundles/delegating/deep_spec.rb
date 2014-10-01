@@ -12,7 +12,7 @@ module Skylab::Headless::TestSupport::Bundles::Delegating
         end
 
         class Client_Simple_Deep
-          Headless::Delegating[ self, %i( foo bar ) ]
+          Headless_::Delegating[ self, %i( foo bar ) ]
           def initialize x
             @up_p = -> { x }  # do this yourself
           end
@@ -31,7 +31,7 @@ module Skylab::Headless::TestSupport::Bundles::Delegating
         end
 
         class Client_As_Deep
-          Headless::Delegating[ self,
+          Headless_::Delegating[ self,
                                 :to_method, :braff, :zack,
                                 :with_infix, :x_, :_y, :foo ]
 

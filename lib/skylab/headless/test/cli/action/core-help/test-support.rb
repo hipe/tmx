@@ -6,9 +6,9 @@ module Skylab::Headless::TestSupport::CLI::Action::Hlp__
 
   include CONSTANTS
 
-  Headless = Headless
+  Headless_ = Headless_
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   module ModuleMethods
     def client_cls_with_op const_i, & op_p
@@ -16,9 +16,9 @@ module Skylab::Headless::TestSupport::CLI::Action::Hlp__
       before :all do
         cls = TS__.const_set const_i, ::Class.new
         cls.class_exec do
-          Headless::CLI::Action[ self, :core_instance_methods ]
+          Headless_::CLI::Action[ self, :core_instance_methods ]
           define_method :build_option_parser, -> do
-            op = Headless::Library_::OptionParser.new
+            op = Headless_::Library_::OptionParser.new
             instance_exec op, & op_p
             op
           end

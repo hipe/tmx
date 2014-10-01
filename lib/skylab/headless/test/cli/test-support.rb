@@ -2,17 +2,17 @@ require_relative '../test-support'
 
 module Skylab::Headless::TestSupport::CLI
 
-  ::Skylab::Headless::TestSupport[ CLI_TestSupport = self ]
+  ::Skylab::Headless::TestSupport[ TS_ = self ]
 
   include CONSTANTS
 
   Autoloader_ = Autoloader_
-  Headless = Headless
+  Headless_ = Headless_
 
-  extend TestSupport::Quickie  # e.g sibling 'path tools'
+  extend TestSupport_::Quickie  # e.g sibling 'path tools'
 
   module CONSTANTS
-    Autoloader_ = Headless::Autoloader_
+    Autoloader_ = Headless_::Autoloader_
   end
 
   module InstanceMethods
@@ -49,7 +49,7 @@ module Skylab::Headless::TestSupport::CLI
 
     def from_workdir &p
       r = nil
-      Headless::Library_::FileUtils.cd workdir do
+      Headless_::Library_::FileUtils.cd workdir do
         r = p[]
       end ; r
     end
@@ -60,7 +60,7 @@ module Skylab::Headless::TestSupport::CLI
 
     Probably_existant_tmpdir__ = -> do
       p = -> do_debug do
-        td = CLI_TestSupport.tmpdir
+        td = TS_.tmpdir
         do_debug and td.debug!
         td.exist? or td.prepare
         p = -> _ { td } ; td  # not failsafe
@@ -106,14 +106,14 @@ module Skylab::Headless::TestSupport::CLI
     end
 
     def expect_that_this_line_is_styled_and_unstyle_it line
-      line_ = Headless::CLI::Pen::FUN::Unstyle_styled[ line ]
+      line_ = Headless_::CLI::Pen::FUN::Unstyle_styled[ line ]
       line_ or raise "expected line to be styled, was not: #{ line.inspect }"
       line_
     end
 
     def crunchify
       s = expect_at_least_one_more_serr_line
-      x = Headless::CLI::FUN::Parse_styles[ s ]
+      x = Headless_::CLI::FUN::Parse_styles[ s ]
       x or fail "expected styled string, had: #{ s.inspect }"
       y = []
       if :string == x.fetch( 0 ).first
@@ -164,7 +164,7 @@ module Skylab::Headless::TestSupport::CLI
       a_few_more.should be_include number_of_reamaining_stderr_lines
     end
 
-    define_method :a_few_more, Headless::Library_::Memoize[ -> { 1..2 } ]
+    define_method :a_few_more,Headless_::Library_::Memoize[ -> { 1..2 } ]
 
     def number_of_reamaining_stderr_lines
       serr_a.length
@@ -208,7 +208,7 @@ module Skylab::Headless::TestSupport::CLI
     end
     attr_reader :a
     def pen
-      Headless::CLI::Pen::MINIMAL
+      Headless_::CLI::Pen::MINIMAL
     end
     def emit_help_line_p
       emit_info_line_p

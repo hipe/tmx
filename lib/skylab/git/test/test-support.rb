@@ -86,7 +86,7 @@ module Skylab::Git::TestSupport
     end
 
     Tmpdir = -> do
-      TestSupport_::Tmpdir
+      TestSupport_.tmpdir
     end
 
     Tmpdir_pathname = -> do

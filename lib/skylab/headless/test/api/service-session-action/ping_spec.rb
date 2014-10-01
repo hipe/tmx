@@ -9,7 +9,7 @@ module Skylab::Headless::TestSupport::API::SSA__
     with_API_module do
       module API
 
-        Headless::API[ self, :with_service, :with_session, :with_actions ]
+        Headless_::API[ self, :with_service, :with_session, :with_actions ]
 
         action_class
         class Action
@@ -21,7 +21,7 @@ module Skylab::Headless::TestSupport::API::SSA__
         end
 
         class Services_For_API_Action__
-          Headless::Delegating[ self ]
+          Headless_::Delegating[ self ]
           delegating :to, :@service, :to_method, :object_id, :service_id
           delegating :to, :@session, %i( program_name )
           delegating :to, :@session, :to_method, :object_id, :session_id

@@ -6,7 +6,7 @@ module Skylab::Headless::TestSupport::CS__
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[hl] core client services" do
 
@@ -24,7 +24,7 @@ module Skylab::Headless::TestSupport::CS__
       BLUE = Blue.new
 
       before :all do
-        Client_Svcs = Headless::Client_Services.new :red, :blue do
+        Client_Svcs = Headless_::Client_Services.new :red, :blue do
           delegating :to, :@red, %i( r1 r2 )
           delegating :to, :@blue, :with_suffix, :_from_guy, %i( b1 )
         end

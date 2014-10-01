@@ -6,5 +6,5 @@ module Skylab::Headless::TestSupport::Text
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 end

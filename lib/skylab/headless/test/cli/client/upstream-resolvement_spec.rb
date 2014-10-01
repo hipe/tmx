@@ -10,7 +10,7 @@ module Skylab::Headless::TestSupport::CLI::Client
 
       with_client_class do
         class Foo_UR
-          Headless::CLI::Client[ self ]
+          Headless_::CLI::Client[ self ]
         private
           def default_action_i ; :hi end
           def hi flerp
@@ -45,7 +45,7 @@ module Skylab::Headless::TestSupport::CLI::Client
     context "two - wired for upstream resolvement" do
       with_client_class do
         class Bar_UR
-          Headless::CLI::Client[ self ]
+          Headless_::CLI::Client[ self ]
           def default_action_i ; :gerp end
           def gerp input_file_nombre=nil
             io = @IO_adapter.instream  ; m = []
@@ -102,7 +102,7 @@ module Skylab::Headless::TestSupport::CLI::Client
       context "with STDIN and filename" do
 
         def stdin_spy
-          TestSupport::IO::Spy::Triad::MOCK_NONINTERACTIVE_STDIN
+          TestSupport_::IO::Spy::Triad::MOCK_NONINTERACTIVE_STDIN
         end
 
         it "complains of ambiguity before checking for file existence - x" do
@@ -119,7 +119,7 @@ module Skylab::Headless::TestSupport::CLI::Client
       context "with STDIN only" do
 
         let :stdin_spy do
-          TestSupport::IO::Spy::Triad::Mock_Noninteractive_STDIN.
+          TestSupport_::IO::Spy::Triad::Mock_Noninteractive_STDIN.
             new [ "fiz\n", "faz\n" ]
         end
 

@@ -6,14 +6,14 @@ module Skylab::Headless::TestSupport::CLI::Option::Manual
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[hl] CLI option (manual)" do
 
     context "for now an option will derive things from long opt (..)" do
 
-      define_method :memoized_option, & Headless::Library_::Memoize[ -> do
-        Headless::CLI::Option.new_flyweight
+      define_method :memoized_option, &Headless_::Library_::Memoize[ -> do
+        Headless_::CLI::Option.new_flyweight
       end ]   # (it's generally bad and wrong to test this way but we are
       # forcing ourself to use the flyweight to see if we can trigger any
       # errors there, for now)
@@ -52,7 +52,7 @@ module Skylab::Headless::TestSupport::CLI::Option::Manual
 
         touched = nil
 
-        op = Headless::CLI::Option.on( '-a', '--apple <x>' ) { |x| touched = x }
+        op = Headless_::CLI::Option.on( '-a', '--apple <x>' ) { |x| touched = x }
 
         op.get_args.should eql( [ '-a', '--apple <x>' ] )
 
@@ -64,7 +64,7 @@ module Skylab::Headless::TestSupport::CLI::Option::Manual
       end
 
       def on *a, &b
-        Headless::CLI::Option.on( *a, &b )
+        Headless_::CLI::Option.on( *a, &b )
       end
 
       it "+ you can reflect into the description strings" do

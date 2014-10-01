@@ -6,11 +6,11 @@ module Skylab::Headless::TestSupport::Text::Patch
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[hl] text patch" do
 
-    patch = Headless::Text::Patch::Models::ContentPatch
+    patch = Headless_::Text::Patch::Models::ContentPatch
 
     context "changes (\"c\")" do
       it "two non-contiguous single lines" do

@@ -8,7 +8,7 @@ module Skylab::Headless::TestSupport::Bundles::Delegating
 
       class Client_Oldschool
 
-        Headless::Delegating[ self, :employ_the_DSL_method_called_delegates_to ]
+        Headless_::Delegating[ self, :employ_the_DSL_method_called_delegates_to ]
 
         delegates_to :morple, :downcase, :id2name
 

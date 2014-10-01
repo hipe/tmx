@@ -6,13 +6,13 @@ module Skylab::Headless::TestSupport::API::SSA__
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  Headless = Headless ; TestSupport = TestSupport
+  Headless_ = Headless_ ; TestSupport_ = TestSupport_
 
   module ModuleMethods
     def with_API_module & p
-      define_method :_API_module, Headless::Library_::Memoize[ p ]
+      define_method :_API_module, Headless_::Library_::Memoize[ p ]
     end
   end
 
@@ -31,7 +31,7 @@ module Skylab::Headless::TestSupport::API::SSA__
     end
 
     def build_IO_spy_group
-      grp = TestSupport::IO::Spy::Group.new
+      grp = TestSupport_::IO::Spy::Group.new
       grp.debug_IO = debug_IO
       grp.do_debug_proc = -> { do_debug }
       grp.add_stream :stdin, :_no_instream_
@@ -66,7 +66,7 @@ module Skylab::Headless::TestSupport::API::SSA__
     end
     def expect_no_more_lines
       bkd_emission_a.length.zero? or fail "expected no more lines had: #{
-        }#{ Headless_::Lib_::Strange[ @bkd_em_a.first ] }"
+        }#{Headless__::Lib_::Strange[ @bkd_em_a.first ] }"
     end
   end
 end

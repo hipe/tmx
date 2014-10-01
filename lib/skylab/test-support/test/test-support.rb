@@ -31,18 +31,20 @@ module Skylab::TestSupport::TestSupport
   end
 
   module TestLib_
+
     sidesys = TestSupport_::Autoloader_.build_require_sidesystem_proc
+
     Face_module = -> do
       TestSupport_::Lib_::Face__[]
     end
+
     Headless__ = ::Skylab::TestSupport::Lib_::Headless__
+
     System_pathnames_calculate = -> p do
       _pn = Subsystem__[]::PATHNAMES
       _pn.module_exec( & p )  # call it 'calculate' instead and #core-dump
     end
+
     Subsystem__ = sidesys[ :Subsystem ]
-    Tmpdir_pathname = -> do
-      Headless__[]::System.defaults.tmpdir_pathname
-    end
   end
 end

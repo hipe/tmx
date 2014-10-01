@@ -1,39 +1,40 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TestSupport::TestSupport::Tmpdir
+module Skylab::Headless::TestSupport::IO::Filesystem
 
-  include ::Skylab::TestSupport::TestSupport::CONSTANTS
+  ::Skylab::Headless::TestSupport::IO[ self ]
 
-  Tmpdir = TestSupport_::Tmpdir
+  include CONSTANTS
 
-  extend TestSupport_::Quickie     # rspec-like testing w/o rspec - try loading
-                                  # this file with 'ruby -w this/file.rb'
+  extend TestSupport_::Quickie
 
-  describe "[ts] tmpdir" do
+  TestLib_ = TestLib_
+
+  describe "[hl] IO filesystem tmpdir" do
 
     it "with no pathname - you get ::Dir.tmpdir for your system" do
-      tmpdir = Tmpdir.new
+      tmpdir = subject.new
       tmpdir.to_path.should eql ::Dir.tmpdir
     end
 
     it "relative path (don't!) - raises" do
-      tmpdir = Tmpdir.new 'TMPDIR-TEST-NEVER-SEE'
+      tmpdir = subject.new 'TMPDIR-TEST-NEVER-SEE'
       begin tmpdir.prepare ; rescue ::SecurityError => e ; end
       e.message.should match( /unsafe tmpdir name - \./ )
     end
 
     it "relative path (don't!), but in pwd tmp/ - raises" do
-      tmpdir = Tmpdir.new 'TMPDIR-TEST-NEVER-SEE', verbose: true
+      tmpdir = subject.new 'TMPDIR-TEST-NEVER-SEE', verbose: true
       from_here = anchor
       e = nil
-      TestSupport_::Library_::FileUtils.cd from_here do
+      fu.cd from_here do
         begin tmpdir.prepare ; rescue ::SecurityError => e ; end
       end
       e.message.should match( /unsafe tmpdir name - \./ )
     end
 
     it "path that would exceed max_mkdirs - raises" do
-      tmpdir = Tmpdir.new path: anchor.join('ts-foo/ts-bar')
+      tmpdir = subject.new path: anchor.join('ts-foo/ts-bar')
       begin tmpdir.prepare ; rescue ::SecurityError => e ; end
       e.message.should match(/won't make more than 1 dirs .+ts-foo must exist/)
     end
@@ -43,7 +44,7 @@ module Skylab::TestSupport::TestSupport::Tmpdir
       (clean = -> do
         fu.rmdir current
       end)[ ]
-      tmpdir = Tmpdir.new current
+      tmpdir = subject.new current
       a = tmpdir.prepare
       a.length.should eql(1)
       a.first.should eql(current.to_s)
@@ -58,7 +59,7 @@ module Skylab::TestSupport::TestSupport::Tmpdir
         fu.rmdir target
         fu.rmdir parent
       end)[ ]
-      tmpdir = Tmpdir.new target, max_mkdirs: 2
+      tmpdir = subject.new target, max_mkdirs: 2
       a = tmpdir.prepare
       target.exist?.should eql(true)
       a.length.should eql(1)
@@ -75,7 +76,7 @@ module Skylab::TestSupport::TestSupport::Tmpdir
         fu.rmdir parent
       end)[ ]
       fu.mkdir parent
-      tmpdir = Tmpdir.new target, max_mkdirs: 2
+      tmpdir = subject.new target, max_mkdirs: 2
       a = tmpdir.prepare
       a.length.should eql(1)
       a.first.should eql(target.to_s)
@@ -91,7 +92,7 @@ module Skylab::TestSupport::TestSupport::Tmpdir
       end)[ ]
       fu.mkdir target
       fu.touch target.join('some-file')
-      tmpdir = Tmpdir.new target
+      tmpdir = subject.new target
       target_file.exist?.should eql(true)
       tmpdir.prepare
       target.exist?.should eql(true)
@@ -105,26 +106,26 @@ module Skylab::TestSupport::TestSupport::Tmpdir
         target.exist? and fu.rm( target )
       end)[ ]
       fu.touch target
-      tmpdir = Tmpdir.new target, verbose: true
+      tmpdir = subject.new target, verbose: true
       begin tmpdir.prepare ; rescue ::Errno::ENOTDIR => e ; end
       e.message.should match( /Not a directory - .+ts-some-file/ )
       clean[ ]
     end
 
     it "some arbitrary unsafe path - stops you b/c exceeds max mkdirs" do
-      tmpdir = Tmpdir.new '/some/unholy/path'
+      tmpdir = subject.new '/some/unholy/path'
       begin tmpdir.prepare ; rescue ::SecurityError => e ; end
       e.message.should match( %r{won't make more than 1.+some/unholy must ex} )
     end
 
     it "same as above but you up the max_mkdirs - stops you b/c unsafe name" do
-      tmpdir = Tmpdir.new '/some/unholy/path', max_mkdirs: 4
+      tmpdir = subject.new '/some/unholy/path', max_mkdirs: 4
       begin tmpdir.prepare ; rescue ::SecurityError => e ; end
       e.message.should eql('unsafe tmpdir name - /')
     end
 
     it "a path at lvl 1 from root - unsafe name - stops you" do
-      tmpdir = Tmpdir.new '/unholy'
+      tmpdir = subject.new '/unholy'
       begin tmpdir.prepare ; rescue ::SecurityError => e ; end
       e.message.should match( /unsafe tmpdir name - \// )
     end
@@ -132,11 +133,15 @@ module Skylab::TestSupport::TestSupport::Tmpdir
     # --*--
 
     def anchor
-      TS_TS::TestLib_::Tmpdir_pathname[]
+      TestLib_::Tmpdir_pathname[]
     end
 
     def fu
-      TestSupport_::Library_::FileUtils
+      TestLib_::File_utils[]
+    end
+
+    def subject
+      Headless_::IO::Filesystem::Tmpdir
     end
   end
 end

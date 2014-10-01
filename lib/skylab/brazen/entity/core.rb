@@ -13,7 +13,7 @@ module Skylab::Brazen
       end
 
       def iambic_scanner
-        Iambic_Scanner__
+        Callback_.iambic_scanner
       end
 
       def proprietor_methods
@@ -797,37 +797,6 @@ module Skylab::Brazen
       end ]
 
       include Iambic_Methods_via_Scanner__
-    end
-
-    class Iambic_Scanner__
-
-      def initialize d, x_a
-        @d = d ; @x_a = x_a ; @x_a_length = @x_a.length
-      end
-
-      def unparsed_exists
-        @d != @x_a_length
-      end
-
-      def gets_one
-        x = current_token ; advance_one ; x
-      end
-
-      def current_token
-        @x_a.fetch @d
-      end
-
-      def previous_token
-        @x_a.fetch @d - 1
-      end
-
-      def current_index
-        @d
-      end
-
-      def advance_one
-        @d += 1 ; nil
-      end
     end
 
     # ~ extension API

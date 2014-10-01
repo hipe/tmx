@@ -10,7 +10,7 @@ module Skylab::Headless::TestSupport::CLI::Box
 
       box_class do
         class Frick
-          Headless::CLI::Box[ self, :core_instance_methods ]
+          Headless_::CLI::Box[ self, :core_instance_methods ]
         private
           def unbound_action_box
             self.class
@@ -44,7 +44,7 @@ module Skylab::Headless::TestSupport::CLI::Box
       box_class do
         class FudgeBox
 
-          Headless::CLI::Box[ self, :core_instance_methods ]
+          Headless_::CLI::Box[ self, :core_instance_methods ]
 
           define_singleton_method :each_const_value,
             Autoloader_.each_const_value_method
@@ -105,7 +105,7 @@ module Skylab::Headless::TestSupport::CLI::Box
 
       box_class do
         class Donk
-          Headless::CLI::Box[ self, :core_instance_methods ]
+          Headless_::CLI::Box[ self, :core_instance_methods ]
 
           def initialize * _
             @spy_a = []
@@ -123,11 +123,11 @@ module Skylab::Headless::TestSupport::CLI::Box
           end
 
           class FooBar < Action_Stub
-            @name_function = Headless::Name::Function::From::
+            @name_function = Headless_::Name::Function::From::
               Module_Anchored.new name, Donk.name
           end
           class BazzBiff < Action_Stub
-            @name_function = Headless::Name::Function::Full.
+            @name_function = Headless_::Name::Function::Full.
               from_normalized_name_path %i( never_see bazz_biff )
             def help_screen y
               y << "helo"

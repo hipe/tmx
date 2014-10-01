@@ -7,7 +7,7 @@ module Skylab::Headless
 
   o = ::Object.new
 
-  o.extend Headless::CLI::PathTools::InstanceMethods
+  o.extend Headless_::CLI::PathTools::InstanceMethods
 
   pwd = ::Dir.getwd
 

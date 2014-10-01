@@ -7,9 +7,9 @@ module Skylab::Headless::TestSupport::CLI::Box
   include CONSTANTS
 
   Autoloader_ = Autoloader_
-  Headless = Headless
+  Headless_ = Headless_
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   QUEUE_IVAR__ = CONSTANTS::QUEUE_IVAR = :@q_x_a
 

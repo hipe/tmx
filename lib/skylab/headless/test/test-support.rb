@@ -4,20 +4,20 @@ require 'skylab/test-support/core'
 
 module Skylab::Headless::TestSupport
 
-  ::Skylab::TestSupport::Regret[ Headless_TestSupport = self ]
+  ::Skylab::TestSupport::Regret[ TS_ = self ]
 
   module CONSTANTS
-    Headless = ::Skylab::Headless
-      Autoloader_ = Headless::Autoloader_
-    Headless_TestSupport = Headless_TestSupport
-    TestSupport = ::Skylab::TestSupport
+    Headless_ = ::Skylab::Headless
+      Autoloader_ = Headless_::Autoloader_
+    TestSupport_ = ::Skylab::TestSupport
   end
 
   include CONSTANTS
-  Headless = Headless ; TestSupport = TestSupport
+  Headless_ = Headless_
+  TestSupport_ = TestSupport_
 
   set_tmpdir_pathname do
-    Headless::System.defaults.dev_tmpdir_pathname.join 'hl'
+    Headless_::System.defaults.dev_tmpdir_pathname.join 'hl'
     #todo - when you take out the `dev_` above it fails
   end
 
@@ -35,35 +35,17 @@ module Skylab::Headless::TestSupport
     attr_accessor :do_debug
 
     def debug_IO
-      TestSupport::System.stderr
+      TestSupport_::System.stderr
     end
   end
 
-  module Library_  # :+[#su-001]:just-for-tests
-    h = {
-      Callback_TestSupport: -> do
-        require 'skylab/callback/test/test-support'
-        ::Skylab::Callback::TestSupport
-      end
-    }.freeze
+  module TestLib_  # :+[#su-001]:just-for-tests
 
-    define_singleton_method :const_missing do |k|
-      const_set k, h.fetch( k ).call
+    Callback_test_support = -> do
+      require 'skylab/callback/test/test-support'
+      Headless_::Callback_::TestSupport
     end
+
   end
-
-  CONSTANTS::FUN = -> do
-    o = { }
-
-    o[ :expect_text ] = -> emission do
-      txt = emission.payload_x
-      ::String === txt or fail "expected ::String had #{ txt.class }"
-      txt
-    end
-
-    ::Struct.new( * o.keys ).new( * o.values )
-  end.call
-
-  NILADIC_TRUTH_ = -> { true }
 
 end

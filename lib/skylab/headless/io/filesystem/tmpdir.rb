@@ -1,10 +1,10 @@
 # (predecessor to this line was poster-child beautification candidate [#bs-011])
 
-module Skylab::TestSupport
+module Skylab::Headless
 
-  class Tmpdir < ::Pathname  # #todo this should probably move to e.g [hl] IO b.c it is no longer used exclusively in testing
+  class IO::Filesystem::Tmpdir < ::Pathname  # #todo this should probably move to e.g [hl] IO b.c it is no longer used exclusively in testing
 
-    include TestSupport_::Library_::FileUtils
+    include Headless_::Library_::FileUtils
 
     def initialize * x_a  # [ <path_x> ] [ <opt_h> ]
       st = ST__.dup
@@ -15,9 +15,9 @@ module Skylab::TestSupport
         st[ :path ] and raise ::ArgumentError, "collision - `path`"
         st[ :path ] = x_a.pop
       end
-      x_a.length.zero? or raise ::ArgumentError, "#{ a.length } unparsed"
+      x_a.length.zero? or raise ::ArgumentError, "#{ x_a.length } unparsed"
       @infostream, @max_mkdirs, @is_noop, pth, @be_verbose = st.to_a
-      super pth || TestSupport_::Library_::Tmpdir.tmpdir
+      super pth || Headless_::Library_::Tmpdir.tmpdir
     end
 
     St__ = ::Struct.new :infostream, :max_mkdirs, :noop, :path, :verbose
@@ -55,7 +55,7 @@ module Skylab::TestSupport
     end
 
     def patch str
-      TestSupport_::Lib_::Text_patch[].directory str, to_s,
+      Headless_::Text::Patch.directory str, to_s,
         @is_noop, @be_verbose, -> e { info e }
       # (result is exit_status)
     end
@@ -220,7 +220,7 @@ module Skylab::TestSupport
     end
     #
     def info msg
-      (( @infostream ||= TestSupport_::Lib_::Stderr[] )).puts msg
+      (( @infostream ||= Headless_::Lib_::Stderr[] )).puts msg
     end
   end
 end

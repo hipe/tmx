@@ -93,7 +93,7 @@ module Skylab::TanMan::TestSupport
     end
 
     Tmpdir = -> do
-      TS__[]::Tmpdir
+      HL__[]::IO::Filesystem::Tmpdir
     end
 
     TS__ = sidesys[ :TestSupport ]

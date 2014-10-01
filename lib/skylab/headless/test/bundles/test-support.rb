@@ -10,8 +10,8 @@ module Skylab::Headless::TestSupport::Bundles
 
     include CONSTANTS
 
-    extend TestSupport::Quickie
+    extend TestSupport_::Quickie
 
-    Headless = Headless
+    Headless_ = Headless_
   end
 end

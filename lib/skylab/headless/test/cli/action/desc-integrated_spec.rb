@@ -6,7 +6,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Dsc_Intgrtd__
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[hl] CLI action desc integration" do
 

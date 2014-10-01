@@ -61,7 +61,7 @@ module Skylab::Brazen
     Headless__ = sidesys[ :Headless ]
 
     Iambic_scanner = -> do
-      Entity_[].iambic_scanner
+      Callback_.iambic_scanner
     end
 
     JSON = memoize[ -> { require 'json' ; ::JSON  } ]

@@ -6,7 +6,7 @@ module Skylab::Headless::TestSupport::CLI::Desc__
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[hl] CLI help sections" do
 
@@ -17,8 +17,8 @@ module Skylab::Headless::TestSupport::CLI::Desc__
     end
 
     def parse s
-      _scn = Headless::Library_::Basic::List::Scanner::For::String[ s ]
-      Headless::CLI::Action::Desc::Parse_sections[ @sections=[], _scn ] ; nil
+      _scn = Headless_::Library_::Basic::List::Scanner::For::String[ s ]
+      Headless_::CLI::Action::Desc::Parse_sections[ @sections=[], _scn ] ; nil
     end
 
     it "one normal line" do

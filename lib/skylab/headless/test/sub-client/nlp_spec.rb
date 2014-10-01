@@ -2,17 +2,17 @@ require_relative 'test-support'
 
 module ::Skylab::Headless::TestSupport::SubClient
 
-  describe "#{ Headless::SubClient } NLP" do
+  describe "[hl] sub-client NLP" do
 
-    extend SubClient_TestSupport
+    extend TS_
 
     def sc
       self.class.sc
     end
 
-    define_singleton_method :sc, & Headless::Library_::Memoize[ -> do
+    define_singleton_method :sc, & Headless_::Library_::Memoize[ -> do
       o = ::Object.new
-      o.extend Headless::SubClient::InstanceMethods
+      o.extend Headless_::SubClient::InstanceMethods
       o
     end ]
 

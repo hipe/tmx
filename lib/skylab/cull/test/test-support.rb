@@ -50,7 +50,7 @@ module Skylab::Cull::TestSupport
   define_singleton_method :sandboxed_tmpdir, Cull::Callback_.memoize[ -> do
     _path = Lib_::System_default_tmpdir_pathname[].
       join 'cull-sandboxes/cull-sandbox'
-    TestSupport::Tmpdir.new path: _path, max_mkdirs: 2
+    TestSupport.tmpdir.new path: _path, max_mkdirs: 2
       # we have to go deep to escape the 3 dir limit
   end ]
 

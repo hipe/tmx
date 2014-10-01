@@ -1,10 +1,10 @@
 require_relative '../test-support'
 
-describe "#{ ::Skylab::Headless::NLP::EN::Minitesimal } FUN" do
+describe "[hl] NLP EN minitesimal FUN" do
 
   extend ::Skylab::Headless::TestSupport::NLP
 
-  fun = self::Headless::NLP::EN::Minitesimal::FUN
+  fun = self::Headless_::NLP::EN::Minitesimal::FUN
 
   context "oxford_comma" do
 

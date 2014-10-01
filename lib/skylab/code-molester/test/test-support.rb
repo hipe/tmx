@@ -16,7 +16,7 @@ module Skylab::CodeMolester::TestSupport
 
   TestSupport::Regret[ CodeMolester_TestSupport = self ]
 
-  CONSTANTS::TMPDIR = TestSupport::Tmpdir.new(
+  CONSTANTS::TMPDIR = TestSupport.tmpdir.new(
     max_mkdirs: 2,
     path: Lib_::System_default_tmpdir_pathname[].join( 'co-mo' ),
     verbose: false )

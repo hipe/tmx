@@ -6,11 +6,11 @@ module Skylab::Headless::TestSupport::NLP::EN::Levenshtein
 
   include CONSTANTS
 
-  Headless = ::Skylab::Headless
+  Headless_ = ::Skylab::Headless
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[he] NLP::EN::Levenshtein" do
     context "we love levenshtein" do
@@ -18,7 +18,7 @@ module Skylab::Headless::TestSupport::NLP::EN::Levenshtein
       it "reduce a big list to a small list" do
         Sandbox_1.with self
         module Sandbox_1
-          Closest_items_to_item = Headless::NLP::EN::Levenshtein::
+          Closest_items_to_item = Headless_::NLP::EN::Levenshtein::
             With_conj_s_render_p_closest_n_items_a_item_x.
               curry[ ' or ', -> x { x.inspect }, 3 ]
           a = [ :zepphlyn, :beefer, :bizzle, :bejonculous, :wangton ]

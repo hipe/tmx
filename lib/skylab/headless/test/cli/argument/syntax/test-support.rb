@@ -6,9 +6,9 @@ module Skylab::Headless::TestSupport::CLI::Argument::Syntax
 
   include CONSTANTS
 
-  Headless = Headless
+  Headless_ = Headless_
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   module ModuleMethods
 
@@ -53,7 +53,7 @@ module Skylab::Headless::TestSupport::CLI::Argument::Syntax
 
     def execute
       @m = @x = nil  # miss / xtra
-      stx = Headless::CLI::Argument::Syntax::Isomorphic.new ruby_para_a
+      stx = Headless_::CLI::Argument::Syntax::Isomorphic.new ruby_para_a
       stx.process_args @actual_i_a do |o|
         o.on_missing do |ev|
           @m = ev ; false

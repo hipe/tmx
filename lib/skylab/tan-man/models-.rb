@@ -32,7 +32,7 @@ module Skylab::TanMan
         class << self
 
           def get_unbound_upper_action_scan
-            Callback_.scan.nonsparse_array [ self ]
+            Scan_[].nonsparse_array [ self ]
           end
 
           alias_method :orig_gulas, :get_unbound_lower_action_scan

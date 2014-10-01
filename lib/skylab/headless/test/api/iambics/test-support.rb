@@ -6,14 +6,16 @@ module Skylab::Headless::TestSupport::API::Iambics
 
   include CONSTANTS
 
-  EMPTY_A_ = Headless::EMPTY_A_ ; Headless = Headless
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
+  EMPTY_A_ = Headless_::EMPTY_A_
 
   DSL_method_name = :DSL_writer_method_name
 
   DSL = -> do
-    Headless::API::Iambic_parameters_DSL
+    Headless_::API::Iambic_parameters_DSL
   end
+
+  Headless_ = Headless_
 
 end

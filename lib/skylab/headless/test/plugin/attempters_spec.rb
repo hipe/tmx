@@ -10,7 +10,7 @@ module Skylab::Headless::TestSupport::Plugin
 
         class Fazoozle
 
-          Headless::Plugin::Host[ self ]
+          Headless_::Plugin::Host[ self ]
 
           def initialize
             m = method :raise

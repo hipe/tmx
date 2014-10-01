@@ -43,7 +43,7 @@ module Skylab::Basic::TestSupport::List::Scanner::For::Read
           h[ :verbose ] = true
           h[ :infostream ] = io
         end
-        td = TestSupport::Tmpdir.new h
+        td = TestSupport.tmpdir.new h
         td.exist? or td.prepare
         p = -> _ { td } ; td
       end

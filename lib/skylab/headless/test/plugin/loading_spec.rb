@@ -10,7 +10,7 @@ module Skylab::Headless::TestSupport::Plugin
 
         class Mandango
 
-          Headless::Plugin::Host[ self ]
+          Headless_::Plugin::Host[ self ]
           Callback::Autoloader[ self, TS__.dir_pathname.join( 'mandango' ) ]
 
           def initialize

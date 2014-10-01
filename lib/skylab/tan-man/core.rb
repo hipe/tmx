@@ -17,6 +17,15 @@ module Skylab::TanMan
   Event_ = -> { Brazen_::Entity.event }
   stowaway :Kernel_, 'models-'
   Model_lib_ = -> { Brazen_.model }
+
+  Scan_ = -> & p do
+    if p
+      Callback_.scan( & p )
+    else
+      Callback_.scan
+    end
+  end
+
   SPACE_ = ' '.freeze
   TanMan_ = self
   UNABLE_ = false

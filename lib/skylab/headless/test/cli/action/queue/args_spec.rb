@@ -6,7 +6,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Queue_Args__
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[hl] CLI action queue - args" do
 

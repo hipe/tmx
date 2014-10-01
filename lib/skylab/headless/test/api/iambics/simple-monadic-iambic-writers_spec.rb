@@ -8,7 +8,7 @@ module Skylab::Headless::TestSupport::API::Iambics
 
       before :all do
         class Foo_Basic
-          Headless::API::Simple_monadic_iambic_writers[ self,
+          Headless_::API::Simple_monadic_iambic_writers[ self,
             :jiang, :xiao, :qing ]
 
           def parse_this_passively * x_a
