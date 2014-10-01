@@ -24,6 +24,10 @@ module Skylab::TanMan
       HL__[]::SubClient::EN_FUN
     end
 
+    Ellipsify = -> do
+      Snag__[]::CLI.ellipsify
+    end
+
     Entity = -> do
       Brazen_::Entity
     end
@@ -37,6 +41,8 @@ module Skylab::TanMan
     Name_function = -> do
       Brazen_::Lib_::Name_function[]
     end
+
+    Snag__ = sidesys[ :Snag ]
 
     Some_stderr = -> do
       HL__[]::System::IO.some_stderr_IO

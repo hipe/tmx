@@ -21,7 +21,7 @@ module Skylab::Brazen::TestSupport
         end
 
         def event_receiver
-          @event_receiver||= bld_event_receiver
+          @event_receiver ||= bld_event_receiver
         end
 
         def bld_event_receiver

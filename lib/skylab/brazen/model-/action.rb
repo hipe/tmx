@@ -76,7 +76,10 @@ module Skylab::Brazen
   private
 
     def any_bound_call_via_processing_iambic x_a
-      process_iambic_fully x_a ; nil
+      process_iambic_fully x_a
+      if @error_count.nonzero?
+        Brazen_.bound_call.via_value UNABLE_
+      end
     end
 
     def via_arguments_produce_bound_call

@@ -231,10 +231,20 @@ module Skylab::Brazen
         end
 
         def maybe_describe_item_x
-          if @item_x.respond_to? :description
-            @item_x = @item_x.description
-            ACHEIVED_
+          ok = UNABLE_
+          if @item_x.respond_to? :description_under
+            s = @item_x.description_under @expression_agent
+            if s
+              @item_x = s ; ok = ACHEIVED_
+            end
           end
+          if ! ok and @item_x.respond_to? :description
+            s = @item_x.description
+            if s
+              @item_x = s ; ok = ACHEIVED_
+            end
+          end
+          ok
         end
 
         def maybe_pathify_item_x

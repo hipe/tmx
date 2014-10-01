@@ -67,19 +67,11 @@ module Skylab::Brazen
         :enum, [ :zero_or_one, :one ],
         :default, :zero_or_one,
         :entity_class_hook_once, -> cls do
-
-          req_a = cls.properties.reduce_by( & :is_actually_required ).to_a.freeze
-          cls.clear_properties   # #open [#021]
-
-          if req_a.length.nonzero?
-
-            cls.add_iambic_event_listener :iambic_normalize_and_validate,
-            -> obj do
-              obj.check_for_missing_required_props req_a ; nil
-            end
+          cls.add_iambic_event_listener :iambic_normalize_and_validate,
+          -> obj do
+            obj.check_for_missing_required_props
           end
         end
-
 
     property_class_for_write  # flush the above to get the below
 
@@ -237,8 +229,22 @@ module Skylab::Brazen
       end ; nil
     end
 
-    def check_for_missing_required_props req_a
+    const_get :Module_Methods, false  # sanity
+    module Module_Methods
+      def required_properties
+        @required_prop_a ||= bld_required_prop_a
+      end
+    private
+      def bld_required_prop_a
+        req_a = properties.reduce_by( & :is_actually_required ).to_a.freeze
+        clear_properties   # #open [#021]
+        req_a
+      end
+    end
+
+    def check_for_missing_required_props
       bx = actual_property_box
+      req_a = self.class.required_properties
       miss_a = req_a.reduce [] do |m, prop|
         x = bx.fetch prop.name_i do end
         x.nil? || EMPTY_S_ == x and m << prop

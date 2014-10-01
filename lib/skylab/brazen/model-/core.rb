@@ -777,6 +777,16 @@ module Skylab::Brazen
         end
       end
 
+      def persist_entity ent, evr
+        @dsc ||= datastore_controller
+        @dsc and via_dsc_persist_entity ent, evr
+      end
+
+      def delete_entity id_x, evr
+        @dsc ||= datastore_controller
+        @dsc and via_dsc_delete_entity id_x, evr
+      end
+
     private
 
       def prvd_act_prcn_when_entity id, _g

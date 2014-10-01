@@ -30,7 +30,7 @@ describe "[tm] Sexp::Auto MANIPULULS", g: true do
       context 'removes' do
 
         it 'the only (and hence last) element, yielding a stub' do
-          removed = result._remove! 'fip'
+          removed = result._remove_item 'fip'
           node_s_a.should eql ::Skylab::TanMan::EMPTY_A_
           removed.unparse.should eql 'fip ;  '
           result.unparse.should eql ::Skylab::TanMan::EMPTY_S_
@@ -67,14 +67,14 @@ describe "[tm] Sexp::Auto MANIPULULS", g: true do
       context 'removes' do
 
         it 'first, gives removed node, both unparse ok' do
-          removed = result._remove!('feep')
+          removed = result._remove_item 'feep'
           node_s_a.should eql ['forp']
           result.unparse.should eql "forp ; \n"
           removed.unparse.should eql 'feep ; '
         end
 
         it 'last, gives removed node, both unparse ok' do
-          removed = result._remove!('forp')
+          removed = result._remove_item 'forp'
           node_s_a.should eql [ 'feep' ]
           result.unparse.should eql 'feep ; '
           removed.unparse.should eql "forp ; \n"
@@ -110,14 +110,14 @@ describe "[tm] Sexp::Auto MANIPULULS", g: true do
       context 'removes' do
 
         it 'first, gives removed node, both unparse ok' do
-          removed = result._remove!('fap')
+          removed = result._remove_item 'fap'
           node_s_a.should eql ['fep', 'fip']
           result.unparse.should eql "fep ; fip ;\n "
           removed.unparse.should eql 'fap;'
         end
 
         it 'middle, gives removed node, both unparse ok' do
-          removed = result._remove!('fep')
+          removed = result._remove_item 'fep'
           node_s_a.should eql [ 'fap', 'fip' ]
           result.unparse.should eql "fap;fip ;\n "
           removed.unparse.should eql 'fep ; '

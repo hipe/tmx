@@ -320,6 +320,12 @@ module Skylab::Callback
       had and raise ::KeyError, "won't clobber existing '#{ i }'"
     end
 
+    def remove i
+      d = @a.index( i ) or raise ::KeyError, "key not found: #{ i.inspect }"
+      @a[ d, 1 ] = EMPTY_A_
+      @h.delete i
+    end
+
   protected
     attr_reader :a, :h
 

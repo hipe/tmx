@@ -2,45 +2,77 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::Models::Association
 
-  describe "[tm] Models::Association associate", wip: true do
+  describe "[tm] models association create" do
 
     extend TS_
 
+    it 'ping' do
+      call_API :association, :add, :ping
+      expect_OK_event :ping_from_action, 'ping from action - add'
+      expect_succeeded
+    end
+
+    context "when input cannot be resolved" do
+
+      it ".. because nothing provided" do
+        call_API :association, :add, :from_node_label, 'A', :to_node_label, 'B'
+        expect_not_OK_event :non_one_IO,
+          "need exactly 1 input-related argument, had 0 #{
+           }(provide (or_ [\"(par input_string)\", \"(par input_pathname)\"]))"
+        expect_failed
+      end
+    end
+
     using_input '../../node/fixtures/simple-prototype-and-graph-with/zero-but-with-leading-space.dot' do
+
       it 'associates nodes when neither exists, creating them' do
-        controller = self.controller
-        o = controller.associate! 'one', 'two'
-        o.unparse.should eql( 'one -> two' )
-        lines[-3..-1].should eql( [ "two [label=two]", "one -> two", "}" ] )
+        associate 'one', 'two'
+        expect_OK_event :created_node, 'created node (lbl "one")'
+        expect_OK_event :created_node, 'created node (lbl "two")'
+        expect_OK_event :created_association, 'created association: one -> two'
+        excerpt( -4 .. -1 ).should eql <<-O.unindent
+          one [label=one]
+          two [label=two]
+          one -> two
+          }
+        O
+        expect_succeeded
       end
     end
 
     using_input '2-nodes-0-edges.dot' do
-      it 'associates when first exists, second does not' do
-        r = controller.associate! 'alpha', 'peanut gallery'
-        lines[-3..-1].should eql(
-          ['peanut [label="peanut gallery"]', 'alpha -> peanut', '}' ])
-        r.should be_respond_to( :source_node_id )   # edge statement
+
+      it "associates when first exists, second does not" do
+        associate 'alpha', 'peanut gallery'
+        expect_OK_event :found_existing_node, 'found existing node (lbl "alpha")'
+        expect_OK_event :created_node
+        expect_OK_event :created_association
+        excerpt( -4 .. -2 ).should eql <<-O.unindent
+          alpha [label=alpha]
+          peanut [label="peanut gallery"]
+          alpha -> peanut
+        O
+        expect_succeeded
       end
     end
 
     using_input '2-nodes-1-edge.dot' do
+
       it 'does not associate again redundantly' do
-        result._edge_stmts.to_a.length.should eql( 1 )
-        controller.associate! 'alpha', 'gamma'
-        result._edge_stmts.to_a.length.should eql( 1 )
+        associate 'alpha', 'gamma'
+        @ev_a[ 0 .. -2 ] = TanMan_::EMPTY_A_  # hack ignore 3 events
+        expect_neutral_event :document_did_not_change
+        expect_neutralled
       end
     end
 
     using_input '0-nodes-3-edges.dot' do
+
       it "adds edge statements in unobtrusive lexical-esque order, #{
            } with taxonomy and proximity" do
-        result._edge_stmts.to_a.length.should eql( 3 )
-        result.node_statements.length.should eql( 0 )
-        controller.associate! 'feasly', 'teasly'
-        result._edge_stmts.to_a.length.should eql( 4 )
-        result.node_statements.length.should eql( 2 ) # it created one that it ..
-        exp = <<-O.unindent.strip
+
+        associate 'feasly', 'teasly'
+        excerpt( -8 .. -2 ).should eql <<-O.unindent
           */
           feasly [label=feasly]
           teasly [label=teasly]
@@ -48,63 +80,102 @@ module Skylab::TanMan::TestSupport::Models::Association
           feasly -> teasly
           gargoyle -> flargoyle
           ainsly -> fainsly
-          }
         O
-        act = lines[ -8..-1 ].join( "\n" ).strip
-        act.should eql( exp )
       end
     end
 
     using_input 'point-5-1-prototype.dot' do
+
       it 'uses any edge prototype called "edge_stmt"' do
-        controller.associate! 'foo', "bar's mother"
-        lines[-2].should eql(%(foo -> bar [ penwidth = 5 fontsize = 28 #{
-          }fontcolor = "black" label = "e" ]))
+        associate 'foo', "bar's mother"
+        excerpt( -2 .. -2 ).should eql(
+         "foo -> bar [ penwidth = 5 fontsize = 28 fontcolor = \"black\" label = \"e\" ]\n" )
+        expect_succeeded_result
       end
     end
-
-
 
     using_input 'point-5-2-named-prototypes.dot' do
 
-      -> do
-        msg = 'the stmt_list in xyzzy.dot has no prototype named "clancy"'
+      it "association prototype not found" do
+        associate 'a', 'b', :prototype, :clancy
+        expect_OK_event :created_node
+        expect_OK_event :created_node
+        expect_not_OK_event :association_prototype_not_found,
+          "the stmt_list has no prototype named (ick :clancy)"
+        expect_failed
+      end
 
-        it "if weird prototype name - #{ msg }" do
-          begin
-            controller.associate! 'a', 'b', prototype: :clancy
-          rescue ::RuntimeError => e
-          end
-          e.message.should eql( msg )
-        end
-      end.call
-
-
-      it 'lets you choose which of several edge prototypes' do
-        controller.associate! 'c', 'd', prototype: :fancy
-        controller.associate! 'b', 'a', prototype: :boring
-        lines[-7..-2].should eql(
-          ["a [label=a]", "b [label=b]", "c [label=c]", "d [label=d]",
-          "b -> a [this=is not=fancy]", "c -> d [this=style is=fancy]"] )
+      it "lets you choose which of several edge prototypes" do
+        associate 'c', 'd', :prototype, :fancy
+        associate_again 'b', 'a', :prototype, :boring
+        excerpt( -7 .. -2 ).should eql <<-O.unindent
+          a [label=a]
+          b [label=b]
+          c [label=c]
+          d [label=d]
+          b -> a [this=is not=fancy]
+          c -> d [this=style is=fancy]
+        O
       end
     end
 
-
     using_input 'point-5-1-prototype.dot' do
 
-      it 'lets you set attributes in the edge prototype (alphabeticesque)' do
-        controller.associate! 'a', 'b', attrs: { label: %<joe's mom: "jane"> }
-        str = / label =.*/ =~ lines[-2] ? $& : ''
-        str.should eql( %< label = "joe's mom: \\"jane\\"" ]> )
+      it "lets you set attributes in the edge prototype (alphabeticesque)" do
+        associate 'a', 'b', :attrs, { label: %<joe's mom: "jane"> }
+        excerpt( -2 .. -2 ).should eql <<-O.unindent
+          a -> b [ penwidth = 5 fontsize = 28 fontcolor = "black" label = "joe's mom: \\"jane\\"" ]
+        O
+        expect_succeeded_result
       end
 
-      it 'lets you set attributes not yet in the edge prototype' do
-        controller.associate! 'a', 'b', attrs: { politics: :radical }
-        lines[-2].should eql(
-          "a -> b [ penwidth = 5 fontsize = 28 #{
-            }fontcolor = \"black\" label = \"e\" politics = radical ]"
-        )
+      it "lets you set attributes not yet in the edge prototype" do
+        associate 'a', 'b', :attrs, { politics: :radical }
+        excerpt( -2 .. -2 ).should eql <<-O.unindent
+          a -> b [ penwidth = 5 fontsize = 28 fontcolor = "black" label = "e" politics = radical ]
+        O
+        expect_succeeded_result
       end
+    end
+
+    def associate src_s, tgt_s, * x_a_
+      x_a = [ :association, :add ]
+      add_input_arguments_to_iambic x_a
+      add_output_arguments_to_iambic x_a
+      x_a.push :from_node_label, src_s, :to_node_label, tgt_s
+      x_a_.length.nonzero? and x_a.concat x_a_
+      call_API_via_iambic x_a ; nil
+    end
+
+    def associate_again src_s, tgt_s, * x_a_
+      x_a = [ :association, :add ]
+      s = @output_s ; @output_s = ::String.new
+      x_a.push :input_string, s
+      x_a.push :output_string, @output_s
+      x_a.push :from_node_label, src_s, :to_node_label, tgt_s
+      x_a_.length.nonzero? and x_a.concat x_a_
+      call_API_via_iambic x_a ; nil
+    end
+
+    def excerpt range
+      s = @output_s ; d = s.length - 1
+      neg_count = 0 ; begin_d = range.begin ; end_d = range.end
+      0 > begin_d && 0 > end_d or self._DO_ME
+      a = []
+      while true
+        d_ = s.rindex NEWLINE_, d - 1
+        d_ or break
+        neg_count -= 1
+        if neg_count < begin_d
+          break
+        end
+        if neg_count <= end_d
+          a.push s[ ( d_ + 1 ) .. d ]
+        end
+        d = d_
+      end
+      a.reverse!
+      a * EMPTY_S_
     end
   end
 end

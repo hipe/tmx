@@ -6,15 +6,15 @@ module Skylab::TanMan
 
       class Collection_Controller < Brazen_.model.collection_controller
 
+      private
+
         def flush_maybe_changed_document_to_output_adapter did_mutate
           if did_mutate
-            flsh_changed_document_to_ouptut_adapter
+            flush_changed_document_to_ouptut_adapter
           else
             when_document_did_not_change
           end
         end
-
-     private
 
         def when_document_did_not_change
           _ev = build_neutral_event_with :document_did_not_change do |y, o|
@@ -23,7 +23,7 @@ module Skylab::TanMan
           send_event _ev
         end
 
-        def flsh_changed_document_to_ouptut_adapter
+        def flush_changed_document_to_ouptut_adapter
           datastore_controller.persist_via_args( *
             @action.output_related_arguments )
         end
@@ -59,6 +59,14 @@ module Skylab::TanMan
       class Action__ < Action_
 
         def output_related_arguments  # assumes partitioned
+          @output_argument_a
+        end
+
+        def input_arguments
+          @input_argument_a
+        end
+
+        def output_arguments
           @output_argument_a
         end
 

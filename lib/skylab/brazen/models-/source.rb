@@ -24,11 +24,11 @@ module Skylab::Brazen
 
     module Actions
 
-      Add = make_action_class :Add
+      Add = make_action_class :Create
 
       Ls = make_action_class :List
 
-      Rm = make_action_class :Remove
+      Rm = make_action_class :Delete
 
     end
   end

@@ -16,7 +16,7 @@ module Skylab::TanMan
     private
 
       def _API_daemon
-        @API_daemon ||= Daemon__.new( TanMan_ )
+        @API_daemon ||= Daemon__.new TanMan_
       end
 
     public

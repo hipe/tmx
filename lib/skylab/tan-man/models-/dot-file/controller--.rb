@@ -4,11 +4,31 @@ module Skylab::TanMan
 
     class Controller__  # see [#009]
 
-      def initialize gsp, er, k
-        @graph_sexp = gsp ; @event_receiver = er ; @kernel = k
+      def initialize gsp, input_arg, er, k
+        @graph_sexp = gsp ; @event_receiver = er
+        @input_arg = input_arg ; @kernel = k
       end
 
       attr_reader :graph_sexp
+
+      def description_under expag
+        send :"description_under_expag_when_#{ @input_arg.name_i }", expag
+      end
+    private
+      def description_under_expag_when_input_string expag
+        s = TanMan_::Lib_::Ellipsify[][ @input_arg.value_x ]
+        expag.calculate do
+          val s
+        end
+      end
+
+      def description_under_expag_when_input_pathname expag
+        pn = @input_arg.value_x
+        expag.calculate do
+          pth pn
+        end
+      end
+    public
 
       def at_graph_sexp i
         @graph_sexp.send i

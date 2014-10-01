@@ -64,27 +64,45 @@ module Skylab::Brazen
 
     private
 
-      def make_Add
+      def make_Create
+
         cls = begin_class
+
         class << cls
-          def build_props
-            @did_add_model_props_to_action_props ||= add_model_props_to_action_props
+
+          def property_method_nms_for_wrt
+            began_hack or hack
             super
           end
+
+          attr_reader :began_hack
+
         private
-          def add_model_props_to_action_props
+
+          def hack  # #open [#046] so fragile
+            @began_hack = true
+
             krnl = Entity_[].scope_kernel.new self, singleton_class
+
+            bx = const_get Brazen_::Entity::READ_BOX__
+            bx = bx.dup
+            const_set Brazen_::Entity::READ_BOX__, bx
+            const_set Brazen_::Entity::WRITE_BOX__, bx  # for below
+
             model_class.properties.each_value do |prop|
               krnl.add_property prop
             end
-            true
+
+            ACHEIVED_
           end
         end
+
         @ent[ cls, -> do
           o :flag, :property, :dry_run
           o :flag, :property, :verbose
         end ]
-        cls.include Add_Methods__
+
+        cls.include Create_Methods__
         cls
       end
 
@@ -98,7 +116,7 @@ module Skylab::Brazen
         cls
       end
 
-      def make_Remove
+      def make_Delete
         cls = begin_class
         @ent[ cls, -> do
           o :inflect, :verb, :with_lemma, 'remove'
@@ -106,7 +124,7 @@ module Skylab::Brazen
           o :flag, :property, :dry_run
           o :flag, :property, :verbose
         end ]
-        cls.include Remove_Methods__
+        cls.include Delete_Methods__
         cls
       end
 
@@ -133,7 +151,7 @@ module Skylab::Brazen
 
       Semi_Generated_Instance_Methods__ = ::Module.new
 
-      module Add_Methods__
+      module Create_Methods__
 
         include Semi_Generated_Instance_Methods__
 
@@ -291,7 +309,7 @@ module Skylab::Brazen
         end
       end
 
-      module Remove_Methods__
+      module Delete_Methods__
 
         include Semi_Generated_Instance_Methods__
 

@@ -35,7 +35,7 @@ module Skylab::TanMan
         def execute
           init_ivars
           find_neighbors
-          produce_relevant_sexp_via_create_or_mutate_or_destory
+          via_verb_produce_relevant_sexp
         end
 
       private
@@ -47,14 +47,22 @@ module Skylab::TanMan
           send :"init_ivars_for_#{ @verb }"
         end
 
-        def init_ivars_for_touch
-          @can_create = true
-          @do_fuzzy = false
-        end
-
         def init_ivars_for_create
           @can_create = true
           @do_fuzzy = false
+          @inner_verb = :tuch
+        end
+
+        def init_ivars_for_touch
+          @can_create = true
+          @do_fuzzy = false
+          @inner_verb = :tuch
+        end
+
+        def init_ivars_for_retrieve
+          @can_create = false
+          @do_fuzzy = false
+          @inner_verb = @verb
         end
 
         def find_neighbors
@@ -169,19 +177,34 @@ module Skylab::TanMan
           end ; nil
         end
 
-        def produce_relevant_sexp_via_create_or_mutate_or_destory
-          send :"produce_relevant_sexp_when_#{ @verb }"
+        def via_verb_produce_relevant_sexp
+          send :"produce_relevant_sexp_when_#{ @inner_verb }"
         end
 
-        def produce_relevant_sexp_when_touch
-          ok = produce_relevant_sexp_when_create
+        def produce_relevant_sexp_when_tuch
+          ok = resolve_relevant_sexp_when_tuch
           ok && @created_existing_or_destoryed_node
         end
 
-        def produce_relevant_sexp_when_create
+        def produce_relevant_sexp_when_retrieve
+          if @do_fuzzy
+            self._HOLE
+          elsif @exact_match_found
+            @exact_match_found
+          else
+            when_not_found
+          end
+        end
+
+        def resolve_relevant_sexp_when_tuch
           ok = resolve_new_node_without_id
           ok &&= to_new_node_apply_id
           ok && via_neighbors_and_new_node_insert_if_necessary
+        end
+
+        def when_not_found
+          _ev = build_not_OK_event_with :node_not_found, :label, @name_s
+          send_event _ev ; UNABLE_
         end
 
         def resolve_new_node_without_id
@@ -255,7 +278,7 @@ module Skylab::TanMan
           if @exact_match_found || @fuzzy_matches_found
             when_matches_exist
           elsif @can_create  # or nil
-            insert_when_create_and_no_matches
+            insert_when_touch_and_no_matches
           else
             when_match_not_found
           end
@@ -264,25 +287,35 @@ module Skylab::TanMan
         def when_matches_exist
           one = @exact_match_found || @fuzzy_matches_found.first  # CAREFUL
           if @can_create
-            send :"when_#{ @verb }_when_one_exists_already", one
+            send :"when_#{ @inner_verb }_when_one_exists_already", one
           elsif @exact_match_found || 1 == @fuzzy_matches_found.length
-            send :"when_#{ @verb }_when_one_exists_already", one
+            send :"when_#{ @inner_verb }_when_one_exists_already", one
           else
             when_ambiguous
           end
         end
 
-        def when_touch_when_one_exists_already one
+        def when_tuch_when_one_exists_already one
           @created_existing_or_destoryed_node = one  # OVERWRITE
-          _ev = Node_::Events__::Exists.with :node_stmt, one, :ok, true
+
+          _is_ok = send :"when_#{ @verb }_and_you_found_one_it_is_OK"
+
+          _ev = Node_::Events__::Found_Existing_Node.
+            with :node_stmt, one, :ok, _is_ok
           send_event _ev
-          POSITIVE_NOTHINGNESS_
+          if :create == @verb
+            UNABLE_
+          else
+            POSITIVE_NOTHINGNESS_
+          end
         end
 
-        def when_create_when_one_exists_already one
-          _ev = Node_::Events__::Exists.with :node_stmt, one, :ok, false
-          send_event _ev
-          UNABLE_
+        def when_create_and_you_found_one_it_is_OK
+          false
+        end
+
+        def when_touch_and_you_found_one_it_is_OK
+          true
         end
 
         def when_destroy_when_one_exists_already one
@@ -303,7 +336,7 @@ module Skylab::TanMan
           UNABLE_
         end
 
-        def insert_when_create_and_no_matches
+        def insert_when_touch_and_no_matches
           _least_greater_neighbor = @first_lexically_greater_node_stmt ||
             @first_non_node_stmt || @first_edge_stmt
           nd = @created_existing_or_destoryed_node

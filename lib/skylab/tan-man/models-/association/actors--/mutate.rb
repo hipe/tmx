@@ -1,44 +1,298 @@
 module Skylab::TanMan
-  class Models::Association::Collection
-    include Core::SubClient::InstanceMethods
 
-    def add_association source_ref, target_ref, label, error, success
-      param_h = label ? { attrs: { label: label } } : nil
-           res = prod source_ref,
-                      target_ref,
-                           false, # no do not create nodes
-                            true, # yes create assoc, we are here for this
-                         param_h,
-                            true, # always fuzzy for now
-                           error, # client handles error
-                         success, # client handles success
-                             nil  # hopefully there is no info, just the 2 above
-      res
-    end
+  class Models_::Association
 
-                                  # this is an older way to create associations
-                                  # which is stil totally fine. Quietly create
-                                  # the association with the parameters, if one
-                                  # does not already exist. unless error
-                                  # occured, should always result in edge_stmt
-    def associate! source_ref, target_ref, assoc_param_h=nil
+    class Actors__::Mutate
 
-           res = prod source_ref,
-                      target_ref,
-                             nil, # yes create nodes iff necessary
-                             nil, # yes create association iff necessary
-            (assoc_param_h||nil), # callee will validate this and use it
-                           false, # `do_fuzz` never (legacy compat for now)
-        -> e { raise e.message }, # turn these into exceptions (legacy compat.)
-                             nil, # don't call anything for success
-                             nil  # don't call anything for info
-      res
-    end
+      Actor_[ self, :properties,
+       :verb,  # 'touch' | 'delete'
+       :attrs,
+       :prototype_i,
+       :from_node_label, :to_node_label,
+       :datastore,
+       :event_receiver, :kernel ]
 
-                                  # if no associations found, result is always
-                                  # nil. if assocations found, if you provided
-                                  # a success[], is result, else is array of one
-                                  # or more edge stmts that were removed.
+      def execute
+        @parser = @datastore.graph_sexp.class
+        ok = rslv_stmt_list_and_scan
+        ok &&= find_nodes
+        ok &&= find_neighbor_associations
+        ok && work
+        @result
+      end
+
+    private
+
+      def rslv_stmt_list_and_scan
+        @stmt_list = @datastore.graph_sexp.stmt_list
+        if @stmt_list
+          @scan = @stmt_list.to_scan
+          ACHEIVED_
+        elsif :delete == @verb
+          when_no_stmt_list
+        else
+          self._HOLE
+        end
+      end
+
+      def when_no_stmt_list
+        _ev = build_not_OK_event_with :no_stmt_list, :datastore, @datastore
+        @result = send_event _ev ; UNABLE_
+      end
+
+      def find_nodes
+        _node_verb = send :"node_verb_when_#{ @verb }"
+        @touch_node_p = Models_::Node.touch.curry_with(
+          :verb, _node_verb,
+          :datastore, @datastore,
+          :event_receiver, @event_receiver,
+          :kernel, @kernel )
+
+        ok = rslv_from_node
+        ok &&= rslv_to_node
+        if ok
+          ACHEIVED_
+        else
+          @result = ok
+        end
+      end
+
+      def rslv_from_node
+        @from_node = @touch_node_p.with :name, @from_node_label
+        @from_node and ACHEIVED_
+      end
+
+      def rslv_to_node
+        @to_node = @touch_node_p.with :name, @to_node_label
+        @to_node and ACHEIVED_
+      end
+
+      def node_verb_when_touch
+        :touch
+      end
+
+      def node_verb_when_delete
+        :retrieve
+      end
+
+      def find_neighbor_associations
+        @least_greater_edge_stmt = nil
+        @greatest_lesser_edge_stmt = nil
+        @matched_stmt = nil
+        ok = ACHEIVED_
+        snid_s = @from_node.node_id.id2name
+        tnid_s = @to_node.node_id.id2name
+        while stmt_list = @scan.gets
+          stmt = stmt_list.stmt
+          if :edge_stmt == stmt.class.rule
+            snid_s_ = stmt.source_node_id.id2name
+            tnid_s_ = stmt.target_node_id.id2name
+            _d = snid_s <=> snid_s_
+            case _d
+            when -1  # subject should go before current
+              @least_greater_edge_stmt ||= stmt
+            when  0
+              _d_ = tnid_s <=> tnid_s_
+              case _d_
+              when -1 ; @least_greater_edge_stmt ||= stmt
+              when  0 ; ok = when_same( stmt ) ; break
+              when  1 ; @greatest_lesser_edge_stmt = stmt
+              end
+            when  1  # subject should go after current
+              @greatest_lesser_edge_stmt = stmt
+            end
+          end
+        end
+        ok
+      end
+
+      def when_same stmt
+        send :"when_same_when_#{ @verb }", stmt
+      end
+
+      def when_same_when_touch stmt
+        send_found_existing_event stmt
+        @result = stmt
+        UNABLE_
+      end
+
+      def when_same_when_delete stmt
+        @matched_stmt = stmt
+        ACHEIVED_
+      end
+
+      def send_found_existing_event stmt
+        _ev = build_OK_event_with :found_existing_association,
+            :edge_stmt, stmt do |y, o|
+          y << "found existing association: #{ stmt.unparse }"
+          # "assocation already exists: "
+        end
+        send_event _ev ; nil
+      end
+
+      def work
+        send :"work_when_#{ @verb }"
+      end
+
+      # ~ touch
+
+      def work_when_touch
+        ok = resolve_prototype
+        ok && via_prototype_make_association
+      end
+
+      def resolve_prototype
+        if @prototype_i
+          via_prototype_i_resolve_prototype
+        else
+          resolve_default_prototype
+        end
+      end
+
+      def via_prototype_i_resolve_prototype
+        @named_protos = @stmt_list._named_prototypes
+        if @named_protos
+          via_named_protos_resolve_prototype
+        else
+          when_no_protos
+        end
+      end
+
+      def when_no_protos
+        _ev = build_not_OK_event_with :association_prototypes_not_found do |y, o|
+          y << "the stmt_list does not have any prototypes"
+        end
+        @result = send_event _ev ; UNABLE_
+      end
+
+      def via_named_protos_resolve_prototype
+        @prototype = @named_protos[ @prototype_i ]
+        if @prototype
+          ACHEIVED_
+        else
+          when_no_proto
+        end
+      end
+
+      def when_no_proto
+        _ev = build_not_OK_event_with :association_prototype_not_found,
+            :prototype_i, @prototype_i do |y, o|
+          y << "the stmt_list has no prototype named #{ ick o.prototype_i }"
+        end
+        @result = send_event _ev ; UNABLE_
+      end
+
+      def resolve_default_prototype
+        np = @stmt_list._named_prototypes
+        if np
+          proto = np[ :edge_stmt ]
+        end
+        if proto
+          @prototype = proto ; ACHEIVED_
+        else
+          resolve_hardcoded_prototype
+        end
+      end
+
+      def resolve_hardcoded_prototype
+        @prototype = Proto__[ @parser ] and ACHEIVED_
+      end
+
+      Proto__ = -> do
+        p = -> parser do
+          x = parser.parse :edge_stmt, 'a -> b'  # note no `attr_list` here
+          p = -> _ { x }
+          x
+        end
+        -> prsr do
+          p[ prsr ]
+        end
+      end.call
+
+      def via_prototype_make_association
+        ok = resolve_edge_statement
+        ok and via_edge_stmt_make_association
+      end
+
+      def resolve_edge_statement
+        edge_stmt = @prototype.__dupe(
+          except: [ [ :agent, :id ], [ :edge_rhs, :recipient, :id ] ] )
+        edge_stmt.set_source_node_id @from_node.node_id
+        edge_stmt.set_target_node_id @to_node.node_id
+        @edge_stmt = edge_stmt
+        if @attrs
+          add_attrs_to_edge_stmt
+        else
+          ACHEIVED_
+        end
+      end
+
+      def add_attrs_to_edge_stmt
+        ok = in_edge_stmt_produce_attr_list
+        ok and @edge_stmt.attr_list.content._update_attributes @attrs
+      end
+
+      def in_edge_stmt_produce_attr_list
+        if @edge_stmt[ :attr_list ]
+          ACHEIVED_
+        else
+          to_edge_stmt_add_attr_list
+        end
+      end
+
+      def to_edge_stmt_add_attr_list
+        alp = @parser.parse :a_list, 'c=d, e=f'  # attr_list proto
+        ale = alp.class.new  # attr_list empty
+        ale._prototype = alp
+        atl = @parser.parse :attr_list, '[]'
+        atl[ :content ] = ale
+        @edge_stmt[ :attr_list ] = atl
+        ACHEIVED_
+      end
+
+      def via_edge_stmt_make_association
+        @stmt_list._insert_item_before_item @edge_stmt, @least_greater_edge_stmt  # #todo - do we need the other
+        # (result is stmt_list whose stmt is the argument)
+        _ev = build_OK_event_with :created_association,
+            :edge_stmt, @edge_stmt do |y, o|
+          y << "created association: #{ o.edge_stmt.unparse }"
+        end
+        @result = send_event _ev
+        ACHEIVED_
+      end
+
+      # ~ delete
+
+      def work_when_delete
+        if @matched_stmt
+          via_matched_stmt_work_when_delete
+        else
+          when_not_found
+        end
+      end
+
+      def when_not_found
+        _ev = build_not_OK_event_with :association_not_found,
+            :from_node, @from_node, :to_node, @to_node do |y, o|
+          _s = "#{ o.from_node.node_id } -> #{ o.to_node.node_id }"
+          y << "association not found: #{ code _s }"
+        end
+        @result = send_event _ev ; UNABLE_
+      end
+
+      def via_matched_stmt_work_when_delete
+        removed_item = @stmt_list._remove_item @matched_stmt
+        # result is structurally like argument, but different object. we discard
+        if removed_item
+          _ev = build_OK_event_with :deleted_association, :association, removed_item
+          @result = send_event _ev
+          nil
+        else
+          removed_item
+        end
+      end
+
+    if false  # #todo
     def destroy_all_associations node_id, _, success # i cannot fail
       res_a = each_associated_list_node( node_id ).to_a.reverse.map do |list|
         x = list._remove! list.stmt             # (reverse b/c deletes up
@@ -56,109 +310,6 @@ module Skylab::TanMan
         end
       end
       res
-    end
-
-    def set_dependency source_ref, target_ref, do_create, do_fuzz,
-      error, success, info
-
-      res = prod source_ref,
-                 target_ref,
-                  do_create, # up to caller whether to create (this flag for
-                  do_create, # both nodes and associations is munged together)
-                        nil, # we aren't using the assoc param here yet
-                    do_fuzz, # up to caller whether we do fuzzy dupe checking
-                      error, # caller handles error events
-                    success, # caller handles successs events
-                       info  # caller handles info events
-      res
-    end
-
-
-    def unset_dependency source_ref, target_ref, do_fuzz, error, success, info
-
-      res = prod source_ref,
-                 target_ref,
-                      false, # (no never create nodes here)
-                      false, # this value is necessary for destroy (create)
-                      false, # i'm so sorry, it was too tempting not to..
-                    do_fuzz, # whether to fuzzy match is up to caller
-                      error, # caller handles error events
-                    success, # caller handles success events - *REQUIRED* here
-                       info  # caller handles info events
-      res
-    end
-
-    attr_reader :graph_sexp
-
-  private
-
-    def initialize request_client, graph_sexp
-      super request_client
-      @nodes = nil
-      @graph_sexp = graph_sexp
-    end
-
-    def create source_node, target_node, params, error
-      res = nil
-      resolve_prototype = -> do
-        sl = graph_sexp.stmt_list
-        if params.prototype
-          if ! sl._named_prototypes
-            res = error[ Models::Association::Events::No_Prototypes.new(
-              self, graph_noun ) ]
-            break false
-          end
-          prot = sl._named_prototypes[ params.prototype ]
-          break( prot ) if prot
-          res = error[ Models::Association::Events::No_Prototype.new(
-            self, graph_noun, params.prototype ) ]
-          break false
-        end
-        if sl._named_prototypes
-          prot = sl._named_prototypes[:edge_stmt]
-          break( prot ) if prot
-        end
-        @_default_edge_stmt_prototype ||= begin # [#071]
-          p = sl.class.parse :edge_stmt, 'a -> b' # no attr_list here
-          p or fail 'sanity - hardcoded prototype parse failed'
-          p
-        end
-      end
-      begin
-        ptype = resolve_prototype[] or break
-        new = ptype.__dupe except: [[:agent, :id], [:edge_rhs, :recipient, :id]]
-        new.source_node_id! source_node.node_id
-        new.target_node_id! target_node.node_id
-        if params.attrs
-          if ! new[:attr_list] # get ready for a [#071] f*cef*ck #todo
-            atl = graph_sexp.class.parse :attr_list, '[]'
-            atl or fail 'sanity - hardcoded prototype parse failed'
-            alp = graph_sexp.class.parse :a_list, 'c=d, e=f' # attr_list proto
-            ale = alp.class.new                              # attr_list empty
-            ale._prototype = alp
-            atl[:content] = ale
-            new[:attr_list] = atl
-          end
-          new.attr_list.content._update_attributes! params.attrs
-          # (we just pretend the part after the ']' in attr list doesn't exist)
-        end
-        res = new
-      end while nil
-      res
-    end
-
-    def destroy edge_pairs, source_node, target_node, success
-      res = nil
-      edge_pairs.reverse.each do |node, item|
-        edge_stmt = node._remove! item
-        ev = Models::Association::Events::Disassociation_Success.new self,
-          source_node, target_node, edge_stmt
-        ev.message = "#{ lbl source_node.label } no longer depends #{
-          }on #{ lbl target_node.label } (removed this edge_stmt: #{
-          }#{ kbd edge_stmt.unparse })"
-        res = success[ ev ]
-      end
-      res # le sketch
     end
 
     def each_associated_list_node node_id
@@ -184,186 +335,7 @@ module Skylab::TanMan
         nil
       end
     end
-
-    def graph_noun
-      request_client.graph_noun
     end
-
-    def nodes
-      @nodes ||= request_client.send :nodes
-    end
-
-    association_params = ::Struct.new :attrs, :prototype
-
-    define_method :prod do
-      |source_ref, target_ref,
-        create_nodes, do_create,
-        assoc_param_h, do_fuzz,
-        error, success, info|
-
-      res = nil
-      begin
-        ok = true
-
-        params = association_params.new
-        if assoc_param_h
-          assoc_param_h.each { |k, v| params[k] = v } ; assoc_param_h = nil
-        elsif false == assoc_param_h
-          do_destroy = true # i'm so sorry
-        end
-
-        source_node, target_node = -> do       # --~ find nodes ~--
-
-          if success && (do_create || do_create.nil?)  # aggregate successes
-            sagg = TanMan::Model::Event::Aggregate.new # into one lump event
-            succes = -> e { sagg.list.push e }         # (but "exists" for read-
-          end                                          # onlies are too loud.)
-
-
-          eagg = TanMan::Model::Event::Aggregate.new # aggregate errors
-          erro = -> e { eagg.list.push e ; false }   # ick, nec
-
-          src = nodes.produce source_ref, create_nodes, do_fuzz, erro, succes
-          tgt = nodes.produce target_ref, create_nodes, do_fuzz, erro, succes
-
-          if ! ( src && tgt )                  # emit aggregated errors
-            ok = [src, tgt].include?( false ) ? false : nil # omg
-            if eagg.list.length.nonzero?
-              if ! eagg.list.index { |e| ! e.is? :'not-found' } # ling. hack
-                eagg2 = Models::Node::Events::Not_Founds.new self, eagg.list
-                eagg = eagg2
-              end
-              error[ eagg ]
-            end
-            break ok
-          end
-
-          if sagg  && sagg.list.length.nonzero? # emit aggregated successes
-            success[ sagg ]
-          end
-
-          [ src, tgt ]
-        end.call
-        ok or break( res = ok )
-
-                                               # --~ lexical pasta ~--
-        looking = do_create || do_create.nil?  #   else don't bother
-        keep_first_non_edge = nil              #   visible by not_looking[]
-        reverse_was_true = false
-        src = source_node.node_id
-        tgt = target_node.node_id
-
-        compare = -> do                        # --~ make a comparator ~--
-          if looking                           # this is the expensive version
-            src_s = src.to_s
-            tgt_s = tgt.to_s
-            -> stmt do
-              src_id = stmt.source_node_id
-              tgt_id = stmt.target_node_id
-              if ! reverse_was_true && src == tgt_id && tgt == src_id
-                reverse_was_true = true        # while we're being expensive
-              end                              # we do this cute thing
-              x = src_s <=> src_id.to_s
-              x = tgt_s <=> tgt_id.to_s if 0 == x
-              x
-            end
-          else                                 # and this is the cheap one
-            -> stmt do
-              src_id = stmt.source_node_id
-              tgt_id = stmt.target_node_id
-              if ! reverse_was_true && src == tgt_id && tgt == src_id
-                reverse_was_true = true         # ACK here too
-              end
-              0 if src_id == src && tgt_id == tgt
-            end
-          end
-        end
-        cmp = compare[ ]
-        not_looking = -> do                    # we switch from expensive to
-          looking = keep_first_non_edge = false # cheap when we an exact match
-          cmp = compare[ ]                     # or definite anchor, whichever
-        end
-
-
-
-        edge_pairs, new_before_this = -> do    # --~ find associations ~--
-          first_lexically_greater_edge = first_non_edge = nil
-          new_before_this = nil                # per [#067]..
-          prev_node = graph_sexp.stmt_list
-          a = graph_sexp.stmt_list._nodes.reduce( [ ] ) do |memo, stmt_list|
-            stmt = stmt_list.stmt
-            if :edge_stmt == stmt.class.rule
-              case cmp[ stmt ]
-              when nil                         # no match and no lexicals to do
-                                               #  just a short circuit
-              when  0
-                memo.push [ prev_node, stmt ]  # exact match, but there might
-                not_looking[ ] if looking      # (weirdly) be more so stay
-
-              when 1                           # new should come after this
-                keep_first_non_edge = true     # only set this here, once
-                                               # you've seen any nodes
-
-              when -1                          # this comes after new, this is
-                first_lexically_greater_edge = stmt # special
-                not_looking[ ]
-              end
-            elsif keep_first_non_edge
-              first_non_edge = stmt            # in case we found edges but
-              keep_first_non_edge = nil        # none lexically greater
-            end
-            prev_node = stmt_list
-            memo
-          end
-          [ a, ( first_lexically_greater_edge || first_non_edge ) ]
-        end.call
-
-                                               # --~ dénouement ~--
-        if edge_pairs.length.nonzero?
-          edge_stmt = -> { edge_pairs.first.last } # when you only care
-                                  # about the 1st result, and item not node
-
-                                  # in a `create` operation, it is always an
-          if do_create            # error to find any existing ones
-            ev = Models::Association::Events::Exists.new self, edge_stmt[]
-            res = error[ ev ]
-          elsif do_create.nil?    # the lazy create result should be the same
-            if info               # shape as the successful strict create,
-              ev = Models::Association::Events::Exists.new self, edge_stmt[], 1
-              info[ ev ]          # namely, the stmt created (or found)
-            end
-            res = edge_stmt[]
-          elsif do_destroy
-            res = destroy edge_pairs, source_node, target_node, success
-          else
-            res = edge_pairs      # *very* experimental -- might change!
-          end                     # a strict read-only operation: we don't
-                                  # use this yet afaik
-        elsif do_create || do_create.nil?
-          edge_stmt = create source_node, target_node, params, error
-          edge_stmt or break( res = edge_stmt )
-          graph_sexp.stmt_list._insert_item_before_item edge_stmt, new_before_this
-          res = if success
-            success[ Models::Association::Events::Created.new self, edge_stmt ]
-          else
-            edge_stmt
-          end
-        elsif error               # `do_create` was false and nothing was found,
-                                  # so if you set an error lambda boy howdy
-          ev = Models::Association::Events::Not_Associated.new self,
-            source_node, target_node, reverse_was_true
-
-          ev.message = "#{ lbl source_node.label } already does not #{
-            }depend on #{ lbl target_node.label }#{
-            }#{ if reverse_was_true
-                  " (but #{ lbl target_node.label } does depend on #{
-                    }#{ lbl source_node.label }!)"
-                 end }"
-
-          res = error[ ev ]
-        end
-      end while nil
-     res
     end
   end
 end

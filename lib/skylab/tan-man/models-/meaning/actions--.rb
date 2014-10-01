@@ -24,7 +24,7 @@ module Skylab::TanMan
 
     module Actions__
 
-      Add = make_action_class :Add
+      Add = make_action_class :Create
 
       class Add
 
@@ -43,7 +43,7 @@ module Skylab::TanMan
         end ]
       end
 
-      Rm = make_action_class :Remove
+      Rm = make_action_class :Delete
 
     end
 

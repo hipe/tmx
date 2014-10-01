@@ -42,18 +42,18 @@ module Skylab::TanMan::TestSupport::Models
       evr = event_receiver
       kernel = self.kernel
 
-      @action = Mock_Action__.new evr, kernel
+      _inp_a = send :"bld_input_args_when_#{ input_mechanism_i }"
 
-      send :"add_arg_when_#{ input_mechanism_i }"
+      @action = Mock_Action__.new _inp_a, evr, kernel
+
 
       _g = Brazen_::Model_::Preconditions_::Graph.new @action, evr, kernel
 
       @silo.provide_collection_controller_prcn _id, _g, evr
     end
 
-    def add_arg_when_input_file_granule
-      _pn = input_file_pathname
-      @action.argument_box.add :input_pathname, _pn ; nil
+    def bld_input_args_when_input_file_granule
+      [ Brazen_.model.actual_property.new( :input_pathname, input_file_pathname ) ]
     end
 
     def silo_controller
@@ -75,12 +75,13 @@ module Skylab::TanMan::TestSupport::Models
 
   class Mock_Action__
 
-    def initialize * a
-      @event_receiver, @kernel = a
-      @argument_box = Brazen_::Box_.new
+    def initialize inp_a, evr, k
+      @event_receiver = evr
+      @input_arguments = inp_a
+      @kernel = k
     end
 
-    attr_reader :argument_box
+    attr_reader :input_arguments
 
     def controller_nucleus
       [ @event_receiver, @kernel ]

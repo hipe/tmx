@@ -54,11 +54,11 @@ module Skylab::Brazen
 
     module Actions
 
-      Add = make_action_class :Add
+      Add = make_action_class :Create
 
       Ls = make_action_class :List
 
-      Rm = make_action_class :Remove do
+      Rm = make_action_class :Delete do
 
         Entity_[][ self, -> do
           o :description, -> y { y << 'always necessary for now.' },

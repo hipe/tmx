@@ -30,7 +30,7 @@ module Skylab::TanMan
     end
 
 
-    methods = [:_append!, :_insert_item_before_item, :_items, :_remove!]
+    methods = [ :_append!, :_insert_item_before_item, :_items, :_remove_item ]
 
     methods.push :_named_prototypes # this is *so* sketchy here #experimental
                                   # but still we want in the check below
@@ -285,7 +285,7 @@ module Skylab::TanMan
 
         # Having no `left` node means inserting at root -- b/c of the
         # structure of recursive rules this works out to be an *intense*
-        # hack, see _remove!
+        # hack, see _remove_item
         #
         # Specifically, (and remembering: a "node" *has* an "item"
         # (e.g. AList has AList1), the `new_list` we create actually
@@ -423,7 +423,7 @@ module Skylab::TanMan
 
 
 
-      tree_class.send :define_method, :_remove! do |search_item|
+      tree_class.send :define_method, :_remove_item do |search_item|
 
         parent = res = nil
 

@@ -28,7 +28,7 @@ module Skylab::TanMan
       begin
         assocs = dot_file.send :associations # give it here now
         assocs.destroy_all_associations @node_stmt.node_id, error, success
-        list = dot_file.sexp.stmt_list._remove! @node_stmt # raises if not found
+        list = dot_file.sexp.stmt_list._remove_item @node_stmt  # raises if not found
         stmt = list.stmt
         @node_stmt = nil # avoid shenanigans - also, prob the same as above
         if success

@@ -315,7 +315,7 @@ module Skylab::Brazen
       def accept_property _PROPERTY_
         i = _PROPERTY_.name_i
         m_i = :"produce_#{ i }_property"
-        @reader.prop_mthd_names_for_write.add_or_assert i, m_i
+        @reader.property_method_nms_for_wrt.add_or_assert i, m_i
         @writer.send :define_method, m_i do _PROPERTY_ end
         nil
       end
@@ -414,7 +414,7 @@ module Skylab::Brazen
         const_get READ_BOX__
       end
 
-      def prop_mthd_names_for_write
+      def property_method_nms_for_wrt
         if const_defined? WRITE_BOX__, false
           const_get WRITE_BOX__, false
         elsif const_defined? READ_BOX__, false
@@ -547,6 +547,10 @@ module Skylab::Brazen
         -> do
           accept_entity_property_value _PROP_, iambic_property ; nil
         end
+      end
+
+      def description
+        @name.as_variegated_symbol
       end
 
       def as_ivar
@@ -864,7 +868,7 @@ module Skylab::Brazen
           @reader.const_set READ_BOX__, Box_.new
         end
         @reader.include @extension_module  # iambic methods too
-        _box = @reader.prop_mthd_names_for_write
+        _box = @reader.property_method_nms_for_wrt
         _box_ = @extension_module.property_method_nms_for_rd
         _box.ensuring_same_values_merge_box! _box_ ; nil
       end

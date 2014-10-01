@@ -680,6 +680,10 @@ module Lossless
 
     include Sexp::Auto::InstanceMethods
 
+    def description
+      unparse
+    end
+
     def unparse
       map do |child|
         case child

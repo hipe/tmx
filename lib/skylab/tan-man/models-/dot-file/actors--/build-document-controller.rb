@@ -13,43 +13,35 @@ module Skylab::TanMan
 
           def execute
             @event_receiver, @kernel = @action.controller_nucleus.to_a
-
-            o = @action.argument_box
-
-            @input_string = o[ :input_string ]
-            @input_pathname = o[ :input_pathname ]
-            @output_string = o[ :output_string ]
-            @output_pathname = o[ :output_pathname ]
-
-            if @input_string || @input_pathname
+            ok = set_input_argument( * @action.input_arguments )
+            ok and begin
               @action = nil
               super
-            else
-              when_no_input
             end
           end
 
-          def when_no_input
-            a = @action.class.properties.at :input_string, :input_pathname
-            _ev = build_not_OK_event_with :cannot_resolve_input, :prop_a, a do |y, o|
-              _s_a = o.prop_a.map do |prop|
-                par prop
-              end
-              y << "cannot resolve input - need #{ or_ _s_a }"
+      private
+
+          def set_input_argument x
+            if x
+              @input_arg = x ; ACHEIVED_
+            else
+              when_no_IO :input
             end
-            send_event _ev
+          end
+
+          def when_no_IO i
+            _ev = build_not_OK_event_with :cannot_resolve_IO, :direction, i
+            send_event _ev ; UNABLE_
           end
         end
 
         Callback_::Actor[ self, :properties,
-          :input_string, :output_string,
-          :input_pathname, :output_pathname,
+          :input_arg,
           :parsing_event_subscription,
           :event_receiver, :kernel ]
 
         def initialize
-          @input_string = @input_pathname = nil
-          @output_string = @output_pathname = nil
           @parsing_event_subscription = nil
           super
         end
@@ -61,21 +53,8 @@ module Skylab::TanMan
 
         def via_input_resolve_graph_sexp
           @subscribe = build_subscribe_proc
-          if @input_string
-            via_input_string_resolve_graph_sexp
-          elsif @input_pathname
-            via_input_pathname_resolve_graph_sexp
-          else
-            when_no_input
-          end
-        end
-
-        def when_no_input
-          _ev = build_not_OK_event_with :cannot_resolve_input do |y, o|
-            y << "cannot resolve input - need  #{ par :input_string } or #{
-             }#{ par :input_pathname }"
-          end
-          send_event _ev
+          instance_variable_set :"@#{ @input_arg.name_i }", @input_arg.value_x
+          send :"via_#{ @input_arg.name_i }_resolve_graph_sexp"
         end
 
         def build_subscribe_proc
@@ -106,7 +85,7 @@ module Skylab::TanMan
         end
 
         def via_graph_sexp_produce_document_controller
-          DotFile_::Controller__.new @graph_sexp, @event_receiver, @kernel
+          DotFile_::Controller__.new @graph_sexp, @input_arg, @event_receiver, @kernel
         end
       end
     end
