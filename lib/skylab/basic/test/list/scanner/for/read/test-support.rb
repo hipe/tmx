@@ -38,14 +38,14 @@ module Skylab::Basic::TestSupport::List::Scanner::For::Read
 
     Resolve_some_tmpdir__ = -> do
       p = -> io do
-        h = { max_mkdirs: 2, path: TS__.tmpdir_pathname }
+        x_a = [ :max_mkdirs, 2, :path, TS__.tmpdir_pathname ]
         if io
-          h[ :verbose ] = true
-          h[ :infostream ] = io
+          x_a.push :be_verbose, true, :infostream, io
         end
-        td = TestSupport.tmpdir.new h
+        td = TestSupport.tmpdir.via_iambic x_a
         td.exist? or td.prepare
-        p = -> _ { td } ; td
+        p = -> _ { td }
+        td
       end
       -> io { p[ io ] }
     end.call

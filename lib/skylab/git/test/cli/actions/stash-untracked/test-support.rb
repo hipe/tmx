@@ -75,7 +75,7 @@ module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked
     GSU_Tmpdir__ = -> do
       p = -> do_dbg do
         _tdpn = TestLib_::Tmpdir_pathname[].join 'gsu-xyzzy'
-        _GSU_tmpdir = TestLib_::Tmpdir[].new _tdpn.to_s, max_mkdirs: 2
+        _GSU_tmpdir = TestLib_::Tmpdir[].new :path, _tdpn.to_s, :max_mkdirs, 2
         if do_dbg
           _GSU_tmpdir.debug!
         end

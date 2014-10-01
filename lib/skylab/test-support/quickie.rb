@@ -878,7 +878,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     define_method :method_missing do |meth, *args, &p|
       md = be_rx.match meth.to_s
       if md
-        _be_the_prediate_you_wish_to_see md, args, p
+        _be_the_predicate_you_wish_to_see md, args, p
       else
         super meth, *args, &p
       end
@@ -888,7 +888,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
 
     predicates = Quickie::Predicates ; empty_a = [ ].freeze  # ocd
 
-    define_method :_be_the_prediate_you_wish_to_see do |md, args, p|
+    define_method :_be_the_predicate_you_wish_to_see do |md, args, p|
       const = constantize_meth[ md.string ]
       if predicates.const_defined? const, false
         klass = predicates.const_get const, false

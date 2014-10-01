@@ -30,12 +30,22 @@ module Skylab::Headless
 
   module Lib_
     sidesys = Autoloader_.build_require_sidesystem_proc
+    Brazen__ = sidesys[ :Brazen ]
     Bundle = -> do
       MetaHell__[]::Bundle
     end
     DSL_DSL = -> mod, p do
       MetaHell__[]::DSL_DSL.enhance mod, &p
     end
+
+    Entity = -> * a do
+      if a.length.zero?
+        Brazen__[]::Entity
+      else
+        Brazen__[]::Entity.via_arglist a
+      end
+    end
+
     FUN_module = -> do
       MetaHell__[]::FUN::Module
     end

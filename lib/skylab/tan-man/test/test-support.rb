@@ -19,7 +19,7 @@ module Skylab::TanMan::TestSupport
 
     Build_tmpdir_via_stem = -> s do
       _path_s = Dev_tmpdir_pathname[].join( s ).to_path
-      Tmpdir[].new _path_s
+      Tmpdir[].new :path, _path_s
     end
 
     CLI_client = -> x do

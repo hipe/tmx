@@ -29,9 +29,9 @@ module Skylab::Dependency::TestSupport
     end
   end
 
-  tmpdir = TestSupport_.tmpdir.new TestLib_::Tmpdir_path[]
+  tmpdir = TestSupport_.tmpdir.new :path, TestLib_::Tmpdir_path[]
 
-  build_dir = TestSupport_.tmpdir.new tmpdir.join('build-dependency')
+  build_dir = TestSupport_.tmpdir.new :path, tmpdir.join( 'build-dependency' )
 
   fixtures_dir = Dependency_TestSupport.dir_pathname.join 'fixtures'
 

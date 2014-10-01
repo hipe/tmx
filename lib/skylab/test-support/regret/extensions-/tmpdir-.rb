@@ -10,8 +10,8 @@ module ::Skylab::TestSupport
 
       def bld_tmpdir
         TestSupport_::Lib_::Tmpdir[].new(
-          path: tmpdir_pathname,
-          max_mkdirs: ( count_to_top + 1 ) )  # one for tmp/your-sub-product
+          :path, tmpdir_pathname,
+          :max_mkdirs, ( count_to_top + 1 ) )  # one for tmp/your-sub-product
       end
 
       attr_writer :tmpdir_pathname

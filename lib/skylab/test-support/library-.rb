@@ -22,7 +22,6 @@ module Skylab::TestSupport
     o[ :Rack ] = gemlib
     o[ :StringIO ] = stdlib
     o[ :StringScanner ] = -> _ { require 'strscan' ; ::StringScanner }
-    o[ :Tmpdir ] = -> _ { require 'tmpdir' ; ::Dir }  # Dir.tmpdir
 
     def self.const_missing c
       const_set c, H_.fetch( c )[ c ]
@@ -70,14 +69,6 @@ module Skylab::TestSupport
 
     Enhancement_shell = -> * i_a do
       MetaHell__[]::Enhance::Shell.new i_a
-    end
-
-    Entity = -> * a do
-      if a.length.zero?
-        Brazen__[]::Entity
-      else
-        Brazen__[]::Entity.via_arglist a
-      end
     end
 
     Fields_contoured = -> mod, * x_a do

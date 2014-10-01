@@ -1,6 +1,8 @@
+[#161]       #doc-node the headless IO node
+[#160]       #parent-node: [#161] the tmpdir narrative ..
 [#159]       #node-identity: (e.g IO interceptors filter) #marker
 [#158]       what we did to get tall mixed stacks (`tall_spec`) to work
-[#157]       #doc-node: the file utils agent
+[#157]       #parent-node: [#161] the file utils agent
 [#156]       (reserved for a forthcoming entry about filenames)
 [#155]       (reserved for a forthcoming entry about const names)
 [#154]       #parent-node: [#095] the control flow method-naming idiomspace ..
@@ -23,7 +25,7 @@
 [#137]       #parent-node: [#126] the CLI box narrative ..
 [#136]       #test-node #in-situ
 [#135]       #parent-node: [#126] the CLI argument node narrative (#syntax) ..
-[#134]       #parent-node: [#133] (#cannon) "the canonical numbers for.."
+[#134]       #parent-node: [#133]  (#cannon) "the canonical numbers for.."
 [#133]       #parent-node: [#125] headless testing conventions ..
 [#132]       #in-situ the magical, multipurpose Event base class and variants
 [#131]       #parent-node: [#125] the notificate narrative ..
@@ -58,7 +60,7 @@
 [#105]       #parent-node: [#093] "the rule of business object variable.."
 [#104]       #parent-node: [#093] "list of variable name patterns.."
 [#103]       #parent-node: [#095] "list of method prefixes and suffixes.."
-[#102]       #parent-node: [#097] (our discussion of shape ..)
+[#102]       #parent-node: [#097]  (our discussion of shape ..)
 [#101]       #parent-node: [#095] name conventions for function constants ..
 [#100]       #parent-node: [#101] "multiple trailing underscores in.."
 [#099]       #parent-node: [#098] module visibility thru architected ..
@@ -172,14 +174,14 @@
 [#015]       #doc-node the CLI IO narrative #retrofitted
 [#014]       yacc2treetop
 [#013]       (#repurposed:once) the core node narrative ..
-[#012] #open redesign this with_client nonsense
+[#012] #open redesign this `with_client` nonsense
 [#011]       #done regrettify all tests in this subproduct
 [#010]       #repurposed:once the client tree model ..
 [#009]       #tracking-tag places where HL::Parameters show signs of strain; also general tracking of the node
-[#008]       P::C::I_M --> SC::I_M THIS WAS BAD see [#004], [#027]
+[#008]       `P::C::I_M` --> `SC::I_M` THIS WAS BAD see [#004], [#027]
 [#007]       #done use of Parameter::Set#list, unify with B-oxxy interface
 [#006]       #parent-node: [#sl-116], #facility-tracker `error_count`
-[#005]       unify concepts let sub-client trump rename parent_runtime par_clien
+[#005]       unify concepts let sub-client trump rename `parent_runtime` `par_client`
 [#004]       #doc-point the deprecation and rebirth of the sub-client pattern ..
 [#003]       #done #refactor: use en.rb in sub-client fo
 [#002]       #done 2012-08-29 #refactor : interceptors under one roof

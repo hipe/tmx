@@ -18,25 +18,33 @@ module Skylab::Headless::TestSupport::IO::Filesystem
     end
 
     it "relative path (don't!) - raises" do
-      tmpdir = subject.new 'TMPDIR-TEST-NEVER-SEE'
-      begin tmpdir.prepare ; rescue ::SecurityError => e ; end
-      e.message.should match( /unsafe tmpdir name - \./ )
+      tmpdir = subject.new :path, 'TMPDIR-TEST-NEVER-SEE'
+      begin
+        tmpdir.prepare
+      rescue ::SecurityError => e
+      end
+      e.message.should match %r(\Aunsafe tmpdir name - \.\z)
     end
 
     it "relative path (don't!), but in pwd tmp/ - raises" do
-      tmpdir = subject.new 'TMPDIR-TEST-NEVER-SEE', verbose: true
+      tmpdir = subject.new :path, 'TMPDIR-TEST-NEVER-SEE', :be_verbose, true
       from_here = anchor
       e = nil
       fu.cd from_here do
-        begin tmpdir.prepare ; rescue ::SecurityError => e ; end
+        begin tmpdir.prepare
+        rescue ::SecurityError => e
+        end
       end
       e.message.should match( /unsafe tmpdir name - \./ )
     end
 
     it "path that would exceed max_mkdirs - raises" do
-      tmpdir = subject.new path: anchor.join('ts-foo/ts-bar')
-      begin tmpdir.prepare ; rescue ::SecurityError => e ; end
-      e.message.should match(/won't make more than 1 dirs .+ts-foo must exist/)
+      _path = anchor.join 'ts-foo/ts-bar'
+      tmpdir = subject.new :path, _path
+      begin tmpdir.prepare
+      rescue ::SecurityError => e
+      end
+      e.message.should match %r(\Awon't make more than 1 dirs .+ts-foo must exist)
     end
 
     it "path 1 lvl down - works" do
@@ -44,7 +52,7 @@ module Skylab::Headless::TestSupport::IO::Filesystem
       (clean = -> do
         fu.rmdir current
       end)[ ]
-      tmpdir = subject.new current
+      tmpdir = subject.new :path, current
       a = tmpdir.prepare
       a.length.should eql(1)
       a.first.should eql(current.to_s)
@@ -59,7 +67,7 @@ module Skylab::Headless::TestSupport::IO::Filesystem
         fu.rmdir target
         fu.rmdir parent
       end)[ ]
-      tmpdir = subject.new target, max_mkdirs: 2
+      tmpdir = subject.new :path, target, :max_mkdirs, 2
       a = tmpdir.prepare
       target.exist?.should eql(true)
       a.length.should eql(1)
@@ -76,7 +84,7 @@ module Skylab::Headless::TestSupport::IO::Filesystem
         fu.rmdir parent
       end)[ ]
       fu.mkdir parent
-      tmpdir = subject.new target, max_mkdirs: 2
+      tmpdir = subject.new :path, target, :max_mkdirs, 2
       a = tmpdir.prepare
       a.length.should eql(1)
       a.first.should eql(target.to_s)
@@ -92,7 +100,7 @@ module Skylab::Headless::TestSupport::IO::Filesystem
       end)[ ]
       fu.mkdir target
       fu.touch target.join('some-file')
-      tmpdir = subject.new target
+      tmpdir = subject.new :path, target
       target_file.exist?.should eql(true)
       tmpdir.prepare
       target.exist?.should eql(true)
@@ -106,26 +114,26 @@ module Skylab::Headless::TestSupport::IO::Filesystem
         target.exist? and fu.rm( target )
       end)[ ]
       fu.touch target
-      tmpdir = subject.new target, verbose: true
+      tmpdir = subject.new :path, target, :be_verbose, true
       begin tmpdir.prepare ; rescue ::Errno::ENOTDIR => e ; end
       e.message.should match( /Not a directory - .+ts-some-file/ )
       clean[ ]
     end
 
     it "some arbitrary unsafe path - stops you b/c exceeds max mkdirs" do
-      tmpdir = subject.new '/some/unholy/path'
+      tmpdir = subject.new :path, '/some/unholy/path'
       begin tmpdir.prepare ; rescue ::SecurityError => e ; end
       e.message.should match( %r{won't make more than 1.+some/unholy must ex} )
     end
 
     it "same as above but you up the max_mkdirs - stops you b/c unsafe name" do
-      tmpdir = subject.new '/some/unholy/path', max_mkdirs: 4
+      tmpdir = subject.new :path, '/some/unholy/path', :max_mkdirs, 4
       begin tmpdir.prepare ; rescue ::SecurityError => e ; end
       e.message.should eql('unsafe tmpdir name - /')
     end
 
     it "a path at lvl 1 from root - unsafe name - stops you" do
-      tmpdir = subject.new '/unholy'
+      tmpdir = subject.new :path, '/unholy'
       begin tmpdir.prepare ; rescue ::SecurityError => e ; end
       e.message.should match( /unsafe tmpdir name - \// )
     end

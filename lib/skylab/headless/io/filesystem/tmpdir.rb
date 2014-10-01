@@ -2,42 +2,81 @@
 
 module Skylab::Headless
 
-  class IO::Filesystem::Tmpdir < ::Pathname  # #todo this should probably move to e.g [hl] IO b.c it is no longer used exclusively in testing
+  class IO::Filesystem::Tmpdir < ::Pathname
 
     include Headless_::Library_::FileUtils
 
-    def initialize * x_a  # [ <path_x> ] [ <opt_h> ]
-      st = ST__.dup
-      x_a[ -1 ].respond_to? :each_pair and
-        x_a.pop.each { |i, x| st[ i ] = x }
-      if (( x = x_a[ -1 ] )) &&
-          ( x.respond_to? :ascii_only? or x.respond_to? :sub_ext )
-        st[ :path ] and raise ::ArgumentError, "collision - `path`"
-        st[ :path ] = x_a.pop
+    Headless_::Lib_::Entity[ self, -> do
+
+      o :iambic_writer_method_name_suffix, :'=',
+
+        :property, :debug_IO,
+
+        :property, :max_mkdirs
+
+      def noop=
+        @is_noop = iambic_property
       end
-      x_a.length.zero? or raise ::ArgumentError, "#{ x_a.length } unparsed"
-      @infostream, @max_mkdirs, @is_noop, pth, @be_verbose = st.to_a
-      super pth || Headless_::Library_::Tmpdir.tmpdir
+
+      def path=
+        @path_x = iambic_property
+      end
+
+      o :property, :be_verbose
+
+    end ]
+
+    class << self
+
+      alias_method :via_iambic, :new
+
+      def new * x_a
+        via_iambic x_a
+      end
     end
 
-    St__ = ::Struct.new :infostream, :max_mkdirs, :noop, :path, :verbose
+    alias_method :omg, :initialize
 
-    ST__ = St__.new( nil, 1, false, nil, false ).freeze
+    def initialize x_a
+      ::Array === x_a or raise 'where'
+      1 == x_a.length and self._WHERE
+      @is_noop = false
+      @be_verbose = false
+      process_iambic_fully x_a
+      @debug_IO ||= Headless_::System::IO.some_stderr_IO
+      @max_mkdirs ||= 1
+      @path_x ||= Headless_::System.defaults.tmpdir_path
+      super @path_x
+      init_path_derivatives
+      freeze
+    end
 
-    def verbose!
-      debug! ; self
-    end
-    #
-    def debug!
-      self.verbose = true
-      nil
-    end
-    #
-    def verbose= x
-      @be_verbose = x
-    end
+    attr_reader :be_verbose
 
-    def copy pathname, dest_basename = nil
+    def with * x_a
+      otr = dup
+      otr.init_copy x_a
+      otr
+    end
+  protected
+    def init_copy x_a
+      process_iambic_fully 0, x_a
+      if @path_x
+        omg @path_x
+        @path_x = nil
+        init_path_derivatives
+      end
+      freeze
+    end
+  private
+    def init_path_derivatives
+      @path_x = nil
+      @path_s = to_path.freeze
+      @as_pathname = ::Pathname.new @path_s ; nil
+    end
+  public
+
+    def copy pathname, dest_basename=nil
       source = ::Pathname.new pathname.to_s
       dest = join( dest_basename || source.basename ) # where to? (basename)
       cp source.to_s, dest.to_s, noop: @is_noop, verbose: @be_verbose
@@ -50,30 +89,42 @@ module Skylab::Headless
       use_path = join( path_tail ).to_s
       a = ::FileUtils.mkdir use_path, o_h
       if a.respond_to?( :each_index ) and 1 == a.length
-        self.class.new a.first   # result is undefined, this is a secret experiment
+        ::Pathname.new a.first  # result is undefined, this is a secret experiment
       end
     end
 
-    def patch str
-      Headless_::Text::Patch.directory str, to_s,
-        @is_noop, @be_verbose, -> e { info e }
-      # (result is exit_status)
+    def patch str  # result is exit_status
+      Headless_::Text::Patch.directory str, to_path,
+        @is_noop, @be_verbose, method( :send_debug_string )
     end
 
     alias_method :tmpdir_original_touch, :touch
 
-    def touch file
-      pathname = join file
-      tmpdir_original_touch pathname.to_s, noop: @is_noop, verbose: @be_verbose
+    def touch path_tail
+      pathname = join path_tail
+      tmpdir_original_touch pathname.to_path, noop: @is_noop, verbose: @be_verbose
       pathname
     end
 
+    def write local_path, file_contents
+      pn = touch_r local_path
+      if pn
+        pn.open WRITEMODE_ do |fh|
+          fh.write file_contents
+        end
+        pn
+      end
+    end
+
     def touch_r files_x
+
       last_pathname = last_was_dir = true
-      touch_file = -> file do
-        SLASH__ == file.to_s.getbyte( 0 ) and
-          Raise__[ ::ArgumentError, "must be relative - #{ file }" ]
-        dest_path = join file
+      touch_file = -> path_tail do
+
+        SLASH__ == path_tail.to_s.getbyte( 0 ) and
+          Raise__[ ::ArgumentError, say_not_relative( path_tail ) ]
+
+        dest_path = join path_tail
         if SLASH__ == dest_path.to_s.getbyte( -1 )
           last_pathname = dest_dir = dest_path
           last_was_dir = true
@@ -88,89 +139,121 @@ module Skylab::Headless
           tmpdir_original_touch dest_file, noop: @is_noop, verbose: @be_verbose
         nil
       end
+
       if files_x.respond_to? :each_index
         files_x.each( & touch_file ) ; nil
       else
         touch_file[ files_x ]
         if last_was_dir
-          self.class.new last_pathname
+          with :path, last_pathname
         else
           last_pathname
         end
       end
     end
+
     SLASH__ = '/'.getbyte 0
 
-    def write local_path, file_contents
-      pathname = touch_r local_path
-      if pathname
-        pathname.open 'w' do |fh|
-          fh.write file_contents
-        end
-        pathname
-      end
+    def say_not_relative file
+      "must be relative - #{ file }"
     end
 
     def clear
-      prepare ; self
+      prepare
+      self
     end
 
-    def prepare  # by this selfsame definition a "preapared" testing tmpdir
-      # is one that is guaranteed to start out as empty (empty even of
-      # dotfiles (i.e "hidden files")). to this end if the path of this tmpdir
-      # object exists at the time this method is called it is asserted to be
-      # a directory and if that directory has a nonzero number of entries
-      # (including dotfiles) *** IT WILL BE `rm -rf`'d !! ***. all of this is
-      # of course contingent on filesystem permissions of which this facility
-      # is currently ignorant.
-      @path_s ||= to_s
-      if exist? then prepare_when_exist else prepare_when_not_exist end
+    def prepare  # #note-130
+      if exist?
+        prepare_when_exist
+      else
+        prepare_when_not_exist
+      end
     end
 
   private
 
     def prepare_when_exist
-      if ! directory?
+      if directory?
+        prepare_when_exists_and_is_directory
+      else
         Raise__[ ::Errno::ENOTDIR, @path_s ]
-      elsif Sanity_check_pathname__[ self ]
-        @path_a = ::Dir[ "#{ join '{*,.?*}' }" ]  # include dotfiles and '..'
-        (( len = @path_a.length )).zero? and
-          Raise__[ "sanity - should always have at least 1 element" ]
-        if 1 == len
-          prepare_when_directory_appears_empty
-        else
-          prepare_when_directory_has_entries
+      end
+    end
+
+    def prepare_when_exists_and_is_directory
+
+      if Sanity_check_pathname__[ self ]
+
+        path_a = ::Dir[ "#{ join '{*,.?*}' }" ]  # include dotfiles and '..'
+
+        d = path_a.length
+
+        d.zero? and Raise__[ say_no_elements ]
+
+        case 1 <=> d
+        when -1 ; prepare_when_directory_has_entries
+        when  0 ; prepare_when_directory_appears_empty path_a
+        when  1 ; Raise__[ say_no_elements ]
         end
       end
     end
-    #
-    def prepare_when_directory_appears_empty
-      '/..' == @path_a.fetch( 0 )[ -3 .. -1 ] or Raise__[ "sanity - #{
-        }expecting '..' (strange filesysteme?) - #{ @path_a[ 0 ] }" ]
-      if_verbose_say { "(already empty: #{ @path_s })" } ; nil
+
+    def say_no_elements
+      "sanity - should always have at least 1 element"
     end
-    #
-    def prepare_when_directory_has_entries
-      if_verbose_say { "rm -rf #{ @path_s }" }
-      if (( SAFETY_RX__ =~ @path_s or Raise__[ "is there no god?" ] ))  # 2x
-        remove_entry_secure @path_s  # TERRIFYING
-        ::FileUtils.mkdir @path_s, noop: @is_noop, verbose: @be_verbose  # result is array of selfsame path
+
+    def prepare_when_directory_appears_empty path_a
+      if SLASH_DOT_DOT__ == path_a.fetch( 0 )[ -3 .. -1 ]
+        if_verbose_say do
+          say_already_empty
+        end
+      else
+        Raise__[ say_strange_filesystem( path_a ) ]
       end
     end
-    #
-    def prepare_when_not_exist
-      sanity_check_self_for_mkdir and
-        mkdir_p @path_s, noop: @is_noop, verbose: @be_verbose
-    end
-    #
-    def sanity_check_self_for_mkdir
-      0 < @max_mkdirs or Raise__[ "max_mkdirs must be at least 1." ]
+    SLASH_DOT_DOT__ = '/..'.freeze
 
-      stack_a = [ ] ; pop_p = -> do
+    def say_strange_filename path_a
+      "sanity - expecting '..' (strange filesystem?) - #{ path_a.first }"
+    end
+
+    def say_already_empty
+      "(already empty: #{ @path_s })"
+    end
+
+    def prepare_when_directory_has_entries
+      if_verbose_say { say_rm_minus_rf }
+      if SAFETY_RX__ =~ @path_s
+        remove_entry_secure @path_s  # TERRIFYING
+        ::FileUtils.mkdir @path_s, noop: @is_noop, verbose: @be_verbose  # result is array of selfsame path
+      else
+        Raise__[ ask_if_there_is_a_god ]
+      end
+    end
+
+    def say_rm_minus_rf
+      "rm -rf #{ @path_s }"
+    end
+
+    def ask_if_there_is_a_god
+      "is there no god?"
+    end
+
+    def prepare_when_not_exist
+      if sanity_check_self_for_mkdir
+        mkdir_p @path_s, noop: @is_noop, verbose: @be_verbose
+      end
+    end
+
+    def sanity_check_self_for_mkdir
+      0 < @max_mkdirs or Raise__[ say_must_be_at_least ]
+
+      stack_a = [] ; pop_p = -> do
         curr_pn = self
         -> do
-          if ! ( curr_pn.root? || '.' == curr_pn.instance_variable_get( :@path ) )
-            stack_a << curr_pn.basename.to_s
+          if ! ( curr_pn.root? || DOT__ == curr_pn.instance_variable_get( :@path ) )
+            stack_a.push curr_pn.basename.to_s
             curr_pn = curr_pn.dirname
           end
         end
@@ -180,47 +263,73 @@ module Skylab::Headless
         ( x = pop_p[] ) ? x : ( break m )
       end
 
-      curr_pn.exist? or Raise__[ ::SecurityError, "won't make more than #{
-        }#{ @max_mkdirs } dirs - #{ curr_pn } must exist (increase your #{
-          }`max_mkdirs` when you construct #{ self.class }?)" ]
+      curr_pn.exist? or Raise__[ ::SecurityError, say_wont_make_more( curr_pn ) ]
 
       while ! stack_a.empty?
-        (( peek_pn = curr_pn.join stack_a.last )).exist? or break
+        peek_pn = curr_pn.join stack_a.last
+        peek_pn.exist? or break
         stack_a.pop
         curr_pn = peek_pn
       end
       Sanity_check_pathname__[ curr_pn ]
     end
-    #
-    Sanity_check_pathname__ = -> pn do
-      SAFETY_RX__ =~ pn.to_s or
-        Raise__[ ::SecurityError, "unsafe tmpdir name - #{ pn }" ]
+
+    DOT__ = '.'.freeze
+
+    def say_must_be_at_least
+      "max_mkdirs must be at least 1."
     end
-    #
+
+    def say_wont_make_more curr_pn
+      "won't make more than #{ @max_mkdirs } dirs - #{
+        }#{ curr_pn } must exist (increase your #{
+         }`max_mkdirs` when you construct #{ self.class }?)"
+    end
+
+    Sanity_check_pathname__ = -> pn do
+      if SAFETY_RX__ =~ pn.to_path
+        PROCEDE_
+      else
+        Raise__[ ::SecurityError, "unsafe tmpdir name - #{ pn }" ]
+        UNABLE_
+      end
+    end
+
     SAFETY_RX__ = %r{ / (?: tmp | T ) (?: / | \z ) }x
     # avoid doing 'rm -rf' on directories other than ones that match this rx
-    Raise__ = -> *a do  # it is possible that `raise` could be overridden
-      # (as ill-advised as that would be). to get "absolute certainty" in
-      # ruby is perhaps impossible, for even constants can be re-defined at
-      # runtime with only a warning (rendering this whole technique
-      # vulnerable); however we use this proc in a constant as a magical
-      # talisman aginst these concerns; because if we send a `raise` that
-      # does not cause a return, consequences could be disastrous, e.g
-      # doing an 'rm -rf' on the wrong directory.
-      nil.send :raise, * a  # ::Kernel can even be overridden, meh so can this method :/
-      false  # in case something is spectacularly wrong we check the result too
+
+    Raise__ = -> *a do  # #note-210
+      nil.send :raise, * a
+      UNABLE_
     end
 
     def if_verbose_say &p
       @be_verbose and fu_output_message( p.call ) ; nil
     end
-    #
+
     def fu_output_message msg
-      info msg
+      send_debug_string msg
     end
-    #
-    def info msg
-      (( @infostream ||= Headless_::Lib_::Stderr[] )).puts msg
+
+    def send_debug_string msg
+      @debug_IO.puts msg ; nil
     end
+
+  public
+
+    def basename
+      @as_pathname.basename
+    end
+
+    def dirname
+      @as_pathname.dirname
+    end
+
+    def join path_tail
+      @as_pathname.join path_tail
+    end
+
+    PROCEDE_ = true
+    UNABLE_ = false
   end
 end

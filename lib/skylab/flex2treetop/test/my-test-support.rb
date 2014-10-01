@@ -66,13 +66,14 @@ module Skylab::Flex2Treetop::MyTestSupport
     Tmpdir__ = -> do
       p = -> dbg_IO_p do
         _pn = Skylab_Headless::System.defaults.tmpdir_pathname.join 'f2tt'
-        h = { path: _pn }
-        if (( dbg_IO = dbg_IO_p[] ))
-          h[ :infostream ] = dbg_IO
-          h[ :verbose ] = true
+        x_a = [ :path, _pn ]
+        dbg_IO = dbg_IO_p[]
+        if dbg_IO
+          x_a.push :infostream, dbg_IO, :be_verbose, true
         end
-        td = TestSupport.tmpdir.new h
-        p = -> _ { td } ; td
+        td = TestSupport.tmpdir.via_iambic x_a
+        p = -> _ { td }
+        td
       end
       -> dbg_IO_p { p[ dbg_IO_p ] }
     end.call
