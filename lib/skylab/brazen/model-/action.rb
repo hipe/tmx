@@ -83,12 +83,16 @@ module Skylab::Brazen
     end
 
     def via_arguments_produce_bound_call
+      subsume_external_arguments
       notificate :iambic_normalize_and_validate
       if @error_count.zero?
         prdc_bound_call_when_valid
       else
         prdc_bound_call_when_invalid
       end
+    end
+
+    def subsume_external_arguments
     end
 
     def prdc_bound_call_when_invalid
@@ -174,11 +178,16 @@ module Skylab::Brazen
 
     def get_actual_argument_scan
       Scan_[].nonsparse_array( self.class.properties.get_names ).map_by do |i|
-        Actual_Property_.new i, any_argument_value( i )
+        Actual_Property_.new any_argument_value( i ), i
       end
     end
 
   public
+
+    def get_bound_argument i
+      Bound_Property_.new argument_value( i ), i, self.class.properties.fetch( i )
+    end
+
     def any_argument_value i
       @argument_box[ self.class.properties.fetch( i ).name_i ]
     end

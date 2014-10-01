@@ -24,7 +24,9 @@ module Skylab::Brazen
       end
     end
 
-    Actual_Property_ = ::Struct.new :name_i, :value_x
+    Actual_Property_ = ::Struct.new :value_x, :name_i
+
+    Bound_Property_ = ::Struct.new :value_x, :name_i, :property
 
     class << self
 
@@ -37,6 +39,10 @@ module Skylab::Brazen
 
       attr_accessor :after_i, :description_block, :precondition_controller_i_a
 
+      def local_entity_identifier_string
+        properties.fetch NAME_
+      end
+
       def new_flyweight evr, kern
         new kern do
           @event_receiver = evr
@@ -45,28 +51,40 @@ module Skylab::Brazen
       end
 
       def collection_controller
-        if const_defined? :Collection_Controller__, false
-          const_get :Collection_Controller__, false
-        else
-          const_set( :Collection_Controller__,
-            const_set( :Generated_Collection_Controller___,
-              ::Class.new( LIB.collection_controller ) ) )
+        if ! const_defined? :Collection_Controller__, false
+          if const_defined? :Collection_Controller__
+            self._DO_ME
+          else
+            cls = ::Class.new LIB.collection_controller
+            const_set :Generated_Collection_Controller___, cls
+            const_set :Collection_Controller__, cls
+          end
         end
+        const_get :Collection_Controller__, false
       end
 
       def silo_controller
-        if const_defined? :Silo_Controller__, false
-          const_get :Silo_Controller__, false
-        else
-          const_set( :Silo_Controller__,
-            const_set( :Generated_Silo_Controller__,
-              ::Class.new( LIB.silo_controller ) ) )
+        if ! const_defined? :Silo_Controller__, false
+          if const_defined? :Silo_Controller__
+            cls = ::Class.new const_get( :Silo_Controller__ )
+            const_set :Generated_Silo_Controller_Subclass___, cls
+            const_set :Silo_Controller__, cls
+          else
+            cls = ::Class.new LIB.silo_controller
+            const_set :Generated_Silo_Controller__, cls
+            const_set :Silo_Controller__, cls
+          end
         end
+        const_get :Silo_Controller__, false
       end
 
       def silo
         if ! const_defined? :Silo__, false
-          const_set :Silo__, Silo_.make( self )
+          if const_defined? :Silo__
+            const_set :Silo__, const_get( :Silo__ ).make( self )
+          else
+            const_set :Silo__, Silo_.make( self )
+          end
         end
         const_get :Silo__, false
       end
@@ -211,6 +229,10 @@ module Skylab::Brazen
       p and instance_exec( & p )
     end
 
+    def initialize_copy _otr_  # when entity is flyweight
+      @property_box = @property_box.dup
+    end
+
     # ~ multipurpose, simple readers
 
     attr_reader :any_bound_call_for_edit_result,
@@ -236,7 +258,7 @@ module Skylab::Brazen
       i_a = self.class.properties.get_names
       i_a.sort!
       Scan_[].nonsparse_array( i_a ).map_by do |i|
-        Actual_Property_.new i, any_property_value( i )
+        Actual_Property_.new any_property_value( i ), i
       end
     end
 
@@ -254,6 +276,20 @@ module Skylab::Brazen
 
     def any_property_value i
       @property_box[ i ]
+    end
+
+    def normalize_property_value_via_normal_entity prop, ent, evr
+      normal_x = ent.property_value prop.name_i
+      mine_x = property_value prop.name_i
+      if normal_x != mine_x
+        @property_box.replace prop.name_i, normal_x
+        _ev = build_OK_event_with :normalized_value, :prop, prop,
+            :previous_x, mine_x, :current_x, normal_x do |y, o|
+          y << "using #{ ick o.current_x } for #{ par o.prop } #{
+           }(was #{ ick o.previous_x })"
+        end
+        send_event _ev
+      end
     end
 
     def property_value i  # ( was #note-120 )
@@ -561,10 +597,14 @@ module Skylab::Brazen
       if @persist_to
         when_persist_to_rslv_expected_datastore
       else
-        @datastore_does_exist = false
-        when_expected_datastore_does_not_exist
+        when_no_persist_to_rslv_expected_datastore
       end
       ACHEIVED_
+    end
+
+    def when_no_persist_to_rslv_expected_datastore
+      @datastore_does_exist = false
+      when_expected_datastore_does_not_exist
     end
 
     def when_expected_datastore_does_not_exist
@@ -722,6 +762,11 @@ module Skylab::Brazen
         @h = h ; nil
       end
 
+      def [] i
+        s = @symbol_to_string_h[ i ]
+        s and @h[ s ]
+      end
+
       def fetch i, & p
         _s = @symbol_to_string_h[ i ]
         if _s
@@ -781,6 +826,84 @@ module Skylab::Brazen
         @dsc ||= datastore_controller
         @dsc and via_dsc_persist_entity ent, evr
       end
+
+    private
+
+      def normalize_entity_name_via_fuzzy_lookup ent, evr
+        ent_ = one_entity_via_fuzzy_lookup ent, evr
+        ent_ and begin
+          ent.normalize_property_value_via_normal_entity(
+            ent.class.local_entity_identifier_string, ent_, evr )
+          ACHEIVED_
+        end
+      end
+
+      def one_entity_via_fuzzy_lookup ent, evr
+        ent_a = matching_entities_via_fuzzy_lookup ent, evr
+        case 1 <=> ent_a.length
+        when  0
+          ent_a.fetch 0
+        when -1
+          one_entity_when_via_fuzzy_lookup_ambiguous ent_a, ent, evr  # #todo
+        when  1
+          one_entity_when_via_fuzzy_lookup_not_found ent, evr
+        end
+      end
+
+      def matching_entities_via_fuzzy_lookup ent, evr
+
+        against_s = ent.local_entity_identifier_string
+        rx = /\A#{ ::Regexp.escape against_s }/
+
+        a = [] ; scn = entity_scan_via_class ent.class, evr
+
+        while x = scn.gets
+          s = x.local_entity_identifier_string
+          rx =~ s or next
+          if against_s == s
+            a.clear.push x
+            break
+          else
+            a.push x.dup
+          end
+        end
+
+        a
+      end
+
+      def one_entity_when_via_fuzzy_lookup_not_found ent, evr
+
+        scn = entity_scan_via_class ent.class, evr
+
+        _a_few_ent_a = scn.take A_FEW__ do |x|
+          x.dup
+        end
+
+        _ev = build_not_OK_event_with :entity_not_found,
+            :ent, ent, :a_few_ent_a, _a_few_ent_a do |y, o|
+
+          human_s = ent.class.name_function.as_human
+
+          s_a = o.a_few_ent_a.map do |x|
+            val x.local_entity_identifier_string
+          end
+
+          y << "#{ human_s } not found: #{
+           }#{ ick o.ent.local_entity_identifier_string } #{
+            }(some known #{ human_s }#{ s s_a }: #{ s_a * ', ' })"
+
+        end
+        evr.receive_event _ev
+        UNABLE_
+      end
+
+      A_FEW__ = 3
+
+      def via_dsc_persist_entity ent, evr
+        @dsc.persist_entity ent, evr
+      end
+
+    public
 
       def delete_entity id_x, evr
         @dsc ||= datastore_controller
@@ -919,7 +1042,7 @@ module Skylab::Brazen
               :event_receiver, evr, :kernel, @kernel )
           end
         else
-          bld_base_silo_controller evr
+          build_silo_controller evr
         end
       end
 
@@ -928,10 +1051,10 @@ module Skylab::Brazen
       end
 
       def controller_as_datastore_via_entity entity, evr  # :+#public-API
-        bld_base_silo_controller( evr ).controller_as_datastore_via_entity entity
+        build_silo_controller( evr ).controller_as_datastore_via_entity entity
       end
 
-      def bld_base_silo_controller evr
+      def build_silo_controller evr
         model_class.silo_controller.build_with(
           :model_class, model_class,
           :event_receiver, evr, :kernel, @kernel )

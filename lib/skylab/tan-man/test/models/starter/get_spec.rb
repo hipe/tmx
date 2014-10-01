@@ -1,17 +1,17 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::TanMan::TestSupport::API::Actions::Graph
+module Skylab::TanMan::TestSupport::Models::Starter
 
-  describe "[tm] API action Graph Starter Get", tanman: true, api_action: true, wip: true do
+  describe "[tm] models starter get", wip: true do
 
-   extend TS_
+    extend TS_
 
-    action_name [ :graph, :starter, :get ]
+    false and action_name [ :graph, :starter, :get ]
 
     it "when set - \"starter is set to \"holy-nerp.dot\" in local config #{
         }file\" (and tons of metadata)" do
 
-      prepare_tanman_tmpdir <<-HERE.unindent
+      prepare_ws_tmpdir <<-HERE.unindent
         --- /dev/null
         +++ b/local-conf.d/config
         @@ -0,0 +1 @@
@@ -32,7 +32,7 @@ module Skylab::TanMan::TestSupport::API::Actions::Graph
     it "when not set - \"there is no starter set in local config file or #{
         }global config file\" (and metadata)"  do
 
-      prepare_tanman_tmpdir <<-HERE.unindent
+      prepare_ws_tmpdir <<-HERE.unindent
         --- /dev/null
         +++ b/local-conf.d/config
         @@ -0,0 +1 @@

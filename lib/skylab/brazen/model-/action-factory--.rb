@@ -377,7 +377,7 @@ module Skylab::Brazen
           receive_event ev
         end
 
-        def receive_while_deleting_entity_datastore_resource_commited_changes ev
+        def receive_while_deleting_entity_datastore_resource_committed_changes ev
           receive_event ev
         end
 

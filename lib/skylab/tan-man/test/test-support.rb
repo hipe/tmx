@@ -68,8 +68,6 @@ module Skylab::TanMan::TestSupport
       HL__[]::TestSupport::IO_Adapter_Spy
     end
 
-    NEWLINE_ = "\n".freeze
-
     JSON = memoize[ -> do
       require 'json' ; ::JSON
     end ]

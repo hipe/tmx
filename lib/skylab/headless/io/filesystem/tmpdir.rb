@@ -51,7 +51,7 @@ module Skylab::Headless
       freeze
     end
 
-    attr_reader :be_verbose
+    attr_reader :be_verbose, :to_pathname
 
     def with * x_a
       otr = dup
@@ -72,7 +72,7 @@ module Skylab::Headless
     def init_path_derivatives
       @path_x = nil
       @path_s = to_path.freeze
-      @as_pathname = ::Pathname.new @path_s ; nil
+      @to_pathname = ::Pathname.new @path_s ; nil
     end
   public
 
@@ -318,15 +318,15 @@ module Skylab::Headless
   public
 
     def basename
-      @as_pathname.basename
+      @to_pathname.basename
     end
 
     def dirname
-      @as_pathname.dirname
+      @to_pathname.dirname
     end
 
     def join path_tail
-      @as_pathname.join path_tail
+      @to_pathname.join path_tail
     end
 
     PROCEDE_ = true

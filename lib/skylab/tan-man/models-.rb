@@ -12,6 +12,12 @@ module Skylab::TanMan
 
   end ]
 
+  module Entity_
+    def receive_missing_required_properties ev
+      receive_missing_required_properties_softly ev  # #experimental
+    end
+  end
+
   Actor_ = -> cls, * a do
     Callback_::Actor.via_client_and_iambic cls, a
     Event_[].sender cls ; nil
@@ -35,11 +41,12 @@ module Skylab::TanMan
             Scan_[].nonsparse_array [ self ]
           end
 
-          alias_method :orig_gulas, :get_unbound_lower_action_scan
-
           def get_unbound_lower_action_scan
-            self.const_get :Actions, false
-            get_unbound_lower_action_scan
+            @did_load_actions ||= begin
+              self.const_get :Actions, false
+              true
+            end
+            super
           end
         end
       end
@@ -55,8 +62,7 @@ module Skylab::TanMan
   Stubber_ = -> model do
     -> i do
       Stub__.new i do |x|
-        _action_cls = model::Actions__.const_get i, false
-        _action_cls.new x
+        model::Actions__.const_get( i, false ).new x
       end
     end
   end
@@ -83,6 +89,15 @@ module Skylab::TanMan
     extend module MM
 
       define_method :desc, DESC_METHOD_
+
+      def use_workspace_as_datastore_controller
+
+        Entity_[ self, -> do
+          o :reuse, Models_::Workspace.properties_for_reuse
+        end ]
+
+        include Uses_Workspace_Action_Methods__
+      end
 
       self
     end
@@ -136,9 +151,24 @@ module Skylab::TanMan
     end
   end
 
+  module Uses_Workspace_Action_Methods__
+
+    def subsume_external_arguments
+      if ! @argument_box[ :config_filename ]
+        a = []
+        a.push @kernel.kernel_property_value :local_conf_config_name
+        a.push @kernel.kernel_property_value :local_conf_dirname
+        a.compact!
+        if a.length.nonzero?
+          @argument_box.add :config_filename, a.join( ::File::SEPARATOR )
+        end
+      end ; nil
+    end
+  end
+
   class Kernel_ < Brazen_::Kernel_  # :[#083].
 
-    def retrieve_property_value i
+    def kernel_property_value i
       properties.retrieve_value i
     end
   private
@@ -150,6 +180,28 @@ module Skylab::TanMan
   Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]
 
   class Models_::Workspace < Brazen_::Models_::Workspace
+
+    self.persist_to = :datastores_git_config
+
+    class << self
+
+      def properties_for_reuse
+        Xxx__[].properties.to_a
+      end
+      Xxx__ = -> do
+        p = -> do
+          class Xxx___
+            Entity_[ self, -> do
+              o :required, :property, :workspace_path,
+                :required, :property, :config_filename
+            end ]
+          end
+          p = -> { Xxx___ }
+          Xxx___
+        end
+        -> { p[] }
+      end.call
+    end
 
     Actions = ::Module.new
 
@@ -263,6 +315,22 @@ module Skylab::TanMan
       Add = Stub_[ :Add ]
       Ls  = Stub_[ :Ls ]
       Rm = Stub_[ :Rm ]
+    end
+  end
+
+  class Models_::Starter < Model_
+
+    autoload_actions
+  end
+
+  module Models_::Datastores
+
+    Actions = :_none_
+
+    module Nodes
+
+      Git_Config = Brazen_::Data_Stores_::Git_Config
+
     end
   end
 end

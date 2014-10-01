@@ -26,11 +26,14 @@ module Skylab::Brazen
           scn = @entity.to_normalized_actual_property_scan
           y = []
           while actual = scn.gets
-            NAME_ == actual.name_i and next
+            if NAME_ == actual.name_i
+              did_see_name = true
+              next
+            end
             actual.value_x.nil? and next
             y.push actual
           end
-          if y.length.zero?
+          if y.length.zero? && ! did_see_name
             cannot_persist_entity_with_no_properties
           else
             @property_a = y

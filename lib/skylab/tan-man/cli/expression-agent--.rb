@@ -13,7 +13,7 @@ module Skylab::TanMan
       alias_method :calculate, :instance_exec
 
       def property_value i
-        @kernel.retrieve_property_value i
+        @kernel.kernel_property_value i
       end
 
       def invoke_notify

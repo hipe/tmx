@@ -324,10 +324,23 @@ module Skylab::Callback
       had and raise ::KeyError, "won't clobber existing '#{ i }'"
     end
 
+    def replace i, x_
+      had = true
+      x = @h.fetch i do
+        had = false
+      end
+      had or raise ::KeyError, say_not_found( i )
+      @h[ i ] = x_ ; x
+    end
+
     def remove i
-      d = @a.index( i ) or raise ::KeyError, "key not found: #{ i.inspect }"
+      d = @a.index( i ) or raise ::KeyError, say_not_found( i )
       @a[ d, 1 ] = EMPTY_A_
       @h.delete i
+    end
+
+    private def say_not_found i
+      "key not found: #{ i.inspect }"
     end
 
   protected

@@ -156,26 +156,5 @@ module Skylab::TanMan::TestSupport::Models::Association
       x_a_.length.nonzero? and x_a.concat x_a_
       call_API_via_iambic x_a ; nil
     end
-
-    def excerpt range
-      s = @output_s ; d = s.length - 1
-      neg_count = 0 ; begin_d = range.begin ; end_d = range.end
-      0 > begin_d && 0 > end_d or self._DO_ME
-      a = []
-      while true
-        d_ = s.rindex NEWLINE_, d - 1
-        d_ or break
-        neg_count -= 1
-        if neg_count < begin_d
-          break
-        end
-        if neg_count <= end_d
-          a.push s[ ( d_ + 1 ) .. d ]
-        end
-        d = d_
-      end
-      a.reverse!
-      a * EMPTY_S_
-    end
   end
 end

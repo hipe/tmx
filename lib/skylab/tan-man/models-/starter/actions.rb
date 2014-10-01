@@ -1,102 +1,74 @@
-module ::Skylab::TanMan
+module Skylab::TanMan
 
-  class Services::Starters::Starters
+  class Models_::Starter
 
-    def starter                   # get the value from config
-      fetch services.config.fetch 'starter' do 'holy-smack.dot' end
+    Brazen_::Model_::Entity[ self, -> do
+
+      o :persist_to, :starter,
+
+        :property, :name
+
+    end ]
+
+    RELPATH__ = 'data-documents/starters'.freeze
+
+    class << self
+      def collection_controller
+        Collection_Controller__
+      end
     end
 
-    def fetch basename
-      box_module.fetch basename
+    Actions = make_action_making_actions_module
+
+    module Actions
+
+      Set = make_action_class :Create
+
+      class Set
+        use_workspace_as_datastore_controller
+      end
+
+      Ls = make_action_class :List
+
     end
 
-    def normalize name, error_info_hash_p
-      tries = []
-      found = -> do
-        try = -> p do
-          if p.exist?
-            p
-          else
-            tries.push p
-            nil
+    class Collection_Controller__ < Brazen_.model.collection_controller
+
+      def persist_entity ent, evr
+        ok = normalize_entity_name_via_fuzzy_lookup ent, evr
+        ok and super ent, evr
+      end
+
+      def datastore_controller
+        _silo = @kernel.silo_via_symbol :workspace
+        _silo.workspace_via_action @action
+      end
+
+      def entity_scan_via_class _cls_, evr
+
+        p = -> do
+
+          fly = Starter_.new_flyweight evr, @kernel
+          props = fly.properties
+
+          base_pn = TanMan_.dir_pathname.join RELPATH__
+          _pn_a = base_pn.children false
+
+          scan = Scan_[].nonsparse_array( _pn_a ).map_reduce_by do |pn|
+            props.replace_hash 'name' => pn.to_path
+            fly
           end
-        end
-        pathname = box_module_dir_pathname.join name
-        r = try[ pathname ]
-        if ! r and '' == pathname.extname
-          r = try[ pathname.sub_ext EXTNAME__ ]
-        end
-        r
-      end.call
-      if found
-        res = found.relative_path_from box_module_dir_pathname
-      else
-        a = tries.map(& :basename )
-        b = get_scanner.map( & :basename )
-        res = error_info_hash_p[
-          message:
-            "not found: #{ a.join ', ' }. Known starters: (#{ b.join ', ' })",
-          valid_names: b.map(& :to_s )
-        ]
-      end
-      res
-    end
-    #
-    EXTNAME__ = '.dot'.freeze
-
-    def get_scanner
-      p = -> do
-        fly = Fly__.new box_module_dir_pathname
-        d = -1 ; last = (( cx = box_module_dir_pathname.children )).length - 1
-        (( p = -> do
-          if last == d
-            p = EMPTY_P_
-            nil
-          else
-            fly.set cx[ d += 1 ]
+          p = -> do
+            scan.gets
           end
-        end )).call
-      end
-      Scanner__.new do p.call end
-    end
-    #
-    class Fly__
-      def initialize base_pn
-        @base_pn = base_pn
-      end
-      def set pn
-        @pn = pn
-        self
-      end
-      def basename
-        @pn.basename
-      end
-      def label
-        @pn.relative_path_from( @base_pn ).to_s
-      end
-    end
-    #
-    class Scanner__ < ::Proc
-      alias_method :gets, :call
-      def map &p
-        a = [ ] ; x = nil
-        a << p[ x ] while (( x = gets ))
-        a
-      end
-      def to_a
-        map( & MetaHell::IDENTITY_ )
+          scan.gets
+        end
+        Scan_.call do
+          p[]
+        end
       end
     end
 
-  private
-
-    def box_module_dir_pathname
-      box_module.dir_pathname
-    end
-
-    def box_module
-      TanMan::Starters
-    end
-
+    Starter_ = self
   end
 end

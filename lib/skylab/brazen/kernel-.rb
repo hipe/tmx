@@ -36,7 +36,9 @@ module Skylab::Brazen
 
     def get_unbound_action_scan
       get_model_scan.expand_by do |item|
-        item.get_unbound_upper_action_scan
+        if item.respond_to? :get_unbound_upper_action_scan
+          item.get_unbound_upper_action_scan
+        end  # else #is-ordinary-module
       end
     end
 
@@ -75,7 +77,7 @@ module Skylab::Brazen
 
     def silo_via_identifier id, evr=nil
       if id.is_resolved
-        prdc_collection id
+        prdc_silo id
       else
         cols_via_unresolved_id id, evr
       end
@@ -92,26 +94,26 @@ module Skylab::Brazen
         index += 1
         target_s = full_raw_s_a.fetch index
         if ! mod_a
-          mod_a = node.get_node_scan.to_a
+          mod_a = some_modules_array_via_mod node
           local_index = -1
         end
         local_index += 1
-        mod_a.each_with_index do |mod_, mod_idx|
-          parts = mod_.name_function.as_parts
-          if ! ( s = parts[ local_index ] and target_s == s )
-            mod_a[ mod_idx ] = nil
-          end
-        end
-        mod_a.compact!
+        reduce_search_space mod_a, local_index, target_s
         case 1 <=> mod_a.length
         when  0
           node = mod_a.fetch 0
-          _num_parts = node.name_function.as_parts.length
+          _num_parts = some_name_function_via_mod( node ).as_parts.length
           _start_of_next_part = index - local_index + _num_parts
           id.add_demarcation_index _start_of_next_part
-          if node.is_silo
+          _is_silo =
+          if node.respond_to? :is_silo
+            node.is_silo
+          else
+            false
+          end
+          if _is_silo
             id.bake node
-            result = prdc_collection id
+            result = prdc_silo id
             break
           else
             mod_a = nil
@@ -126,7 +128,39 @@ module Skylab::Brazen
       result
     end
 
-    def prdc_collection id
+    def reduce_search_space mod_a, local_index, target_s
+      mod_a.each_with_index do |mod, d|
+        s = some_name_function_via_mod( mod ).as_parts[ local_index ]
+        if ! ( s and target_s == s )
+          mod_a[ d ] = nil
+        end
+      end
+      mod_a.compact! ; nil
+    end
+
+    def some_name_function_via_mod mod
+      if mod.respond_to? :name_function
+        mod.name_function
+      else
+        @mod_nf_h ||= {}
+        @mod_nf_h.fetch mod do
+          @mod_nf_h[ mod ] = Callback_::Name.from_module mod
+        end
+      end
+    end
+
+    def some_modules_array_via_mod mod
+      if mod.respond_to? :get_node_scan
+        mod.get_node_scan.to_a
+      else
+        box_mod = mod.const_get :Nodes, false
+        box_mod.constants.map do |i|
+          box_mod.const_get i, false
+        end
+      end
+    end
+
+    def prdc_silo id
       ( @touch_silo_p ||= bld_touch_silo_p )[ id ]
     end
 
@@ -135,11 +169,15 @@ module Skylab::Brazen
       -> id do
         cache_h.fetch id.silo_name_i do
           id.value.const_get :Actions, false  # :+[#043] a loading hack
-          silo = id.value.silo.new self
+          silo = some_silo_via_mod id.value
           cache_h[ id.silo_name_i ] = silo
           silo
         end
       end
+    end
+
+    def some_silo_via_mod mod
+      mod.silo.new self
     end
 
     def bld_model_not_found_event id, s

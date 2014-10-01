@@ -85,7 +85,7 @@ will only be used for its pertitnent part.
 
 ### thoughts on the use of the verb "produce"
 
-(EDIT: before we even commited the document we changed the name to
+(EDIT: before we even committed the document we changed the name to
 [nothing]).
 
 you might be wondering why we don't call the thing "retrieve". but first:

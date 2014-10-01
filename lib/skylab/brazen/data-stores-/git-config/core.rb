@@ -416,7 +416,7 @@ module Skylab::Brazen
             d += 1
             ast = @a.fetch d
             # no 'symbol_i' here yet
-            x = Actual_Property__.new( ast.normalized_name_i, ast.value_x )
+            x = Actual_Property__.new( ast.value_x, ast.normalized_name_i )
             break
           end
           x

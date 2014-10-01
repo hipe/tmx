@@ -1,20 +1,28 @@
-require_relative '../test-support.rb'
+require_relative 'test-support'
 
-module Skylab::TanMan::TestSupport::API::Actions::Graph
+module Skylab::TanMan::TestSupport::Models::Starter
 
-  describe "[tm] api actions graph starter list", wip: true do
+  describe "[tm] models starter list" do
 
     extend TS_
 
-    action_name %i( graph starter list )
+    it "lists the two items, from the filesystem" do
 
-    it "ok" do
-      wat = api_invoke
-      ( 2..4 ).should be_include( wat.events.length )
-      r = wat.events.detect do |x|
-        /\A[-a-z]+\.dot\z/ !~ x.message
+      call_API :starter, :ls
+
+      expect_OK_event :item do |ev|
+        ev.flyweighted_entity.local_entity_identifier_string.should eql 'digraph.dot'
       end
-      r.should eql( nil )
+
+      expect_OK_event :item do |ev|
+        ev.flyweighted_entity.local_entity_identifier_string.should eql 'holy-smack.dot'
+      end
+
+      expect_OK_event :number_of_items_found do |ev|
+        ev.to_event.count.should eql 2
+      end
+
+      expect_succeeded
     end
   end
 end

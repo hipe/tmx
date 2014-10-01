@@ -1337,8 +1337,6 @@ module Skylab::Brazen
           @value_x = false
         end
 
-      private
-
         def accept_new_value x
           d = @name_start_index + @name_width + @equals_width
           s = unmarshall_RHS_via_x x
@@ -1352,6 +1350,11 @@ module Skylab::Brazen
             @line[ @value_start_index .. -1 ] = "#{ s[ 1 .. -1 ] }#{ NEWLINE_ }" # # assume #one-space
           end
           @line.freeze ; nil
+        end
+
+        def recv_err_i i  # #todo
+          @parse.receive_error_i_and_column i, @column_number
+          UNABLE_
         end
       end
 

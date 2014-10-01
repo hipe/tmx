@@ -10,7 +10,7 @@ module Skylab::TanMan
     def commit!
       :uncommitted == state or fail "won't commit the same hack twice"
       res = block.call
-      self.state = :commited
+      self.state = :committed
       res
     end
 

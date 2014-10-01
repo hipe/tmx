@@ -14,7 +14,7 @@ module Skylab::Callback
                   x = scn.gets
                   x or break( scn = nil )
                   scn_ = p[ x ]
-                  scn_ or next  # can reduce too sure why not
+                  scn_ or next  # can reduce too
                 end
                 x_ = scn_.gets
                 x_ and break
@@ -131,6 +131,22 @@ module Skylab::Callback
 
         def reduce_by & p
           self.class.reduce self, p
+        end
+
+        def take d, & p
+          a = []
+          count = 0
+          while count < d
+            x = gets
+            x or break
+            if p
+              x = p[ x ]
+              x or break
+            end
+            count += 1
+            x and a.push x
+          end
+          a
         end
 
         def to_a

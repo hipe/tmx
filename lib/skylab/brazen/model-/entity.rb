@@ -69,7 +69,10 @@ module Skylab::Brazen
         :entity_class_hook_once, -> cls do
           cls.add_iambic_event_listener :iambic_normalize_and_validate,
           -> obj do
-            obj.check_for_missing_required_props
+            if ! obj.began_checking_for_missing_required_props
+              obj.began_checking_for_missing_required_props = true
+              obj.check_for_missing_required_props
+            end
           end
         end
 
@@ -242,6 +245,8 @@ module Skylab::Brazen
       end
     end
 
+    attr_accessor :began_checking_for_missing_required_props
+
     def check_for_missing_required_props
       bx = actual_property_box
       req_a = self.class.required_properties
@@ -291,13 +296,18 @@ module Skylab::Brazen
       raise ::ArgumentError, _s
     end
 
+    def receive_missing_required_properties_softly ev
+      @error_count += 1
+      event_receiver.receive_event ev
+    end
+
     def via_properties_init_ivars
       formal = self.class.properties
       scn = formal.to_scan
       while prop = scn.gets
         i = prop.name_i
         x = if @property_box.has_name i
-          @property_box.fetch  i
+          @property_box.fetch i
         elsif @parameter_box.has_name i
           @parameter_box.fetch i
         else

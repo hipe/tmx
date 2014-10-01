@@ -26,24 +26,22 @@ module Skylab::Brazen
 
       :property, :max_num_dirs,
 
-      :property, :app_name,
-
-      :property, :prop,
+      :property, :config_filename,
 
       :property, :path,
 
-      :property, :channel
+      :property, :prop,
+
+      :property, :app_name,
+
+      :property, :channel  # #todo
 
     end ]
 
     CONFIG_FILENAME__ = 'brazen.conf'.freeze
 
-    def initialize _
-      super
-      @config_filename = @verbose = nil
-    end
-
     def execute
+
       via_properties_init_ivars
 
       _event_receiver = if @channel
@@ -93,22 +91,38 @@ module Skylab::Brazen
 
     class Silo_Controller__ < Brazen_.model.silo_controller
 
-      def provide_collection_controller_precon _identifier, graph
-        action = @event_receiver
-        @verbose = if action.class.properties.has_name :verbose
-          action.any_argument_value :verbose
-        end
-        s = action.start_path_for_workspace_search_when_precondition
-        d = action.max_num_dirs_to_search_when_precondition
-        _er = _Event.receiver.channeled.full.cascading :silo_controller_as_precondition, self
-        ws = Workspace_.edited _er, @kernel do |o|
+      def via_action_workspace
+        @action = @event_receiver
+        via_action_init_ivars
+        arg = @action.get_bound_argument :workspace_path
+
+        _cfn = @action.argument_box.fetch :config_filename  # #experimental
+
+        @ws = @model_class.edited @event_receiver, @kernel do |o|
           o.with_arguments :verbose, @verbose
-          o.with :path, s, :max_num_dirs, d
+          o.with :path, arg.value_x,
+            :prop, arg.property,
+            :max_num_dirs, 1,
+            :config_filename, _cfn
         end
-        if ws.error_count.zero?
-          pn = ws.execute
-          pn and @ws = ws and via_ws_produce_any_ws_as_precon
+
+        via_ws_workspace
+      end
+
+      def provide_collection_controller_precon _identifier, graph
+        @action = @event_receiver  # #todo
+        via_action_init_ivars
+        s = @action.start_path_for_workspace_search_when_precondition
+        d = @action.max_num_dirs_to_search_when_precondition
+        _er = _Event.receiver.channeled.full.cascading :silo_controller_as_precondition, self
+
+        @ws = @model_class.edited _er, @kernel do |o|
+          o.with_arguments :verbose, @verbose
+          o.with :path, s,
+            :max_num_dirs, d
         end
+
+        via_ws_workspace
       end
 
       def receive_silo_controller_as_precondition_config_parse_error ev
@@ -140,11 +154,32 @@ module Skylab::Brazen
 
     private
 
-      def via_ws_produce_any_ws_as_precon
-        if @verbose and
-          send_neutral_event_with :using_workspace, :config_pathname, @ws.pn
+      def via_action_init_ivars
+        @verbose = if @action.class.properties.has_name :verbose
+          @action.any_argument_value :verbose
+        end ; nil
+      end
+
+      def via_ws_workspace
+        if @ws.error_count.zero?
+          _ok = @ws.execute  # result is pn
+          _ok and begin
+            if @verbose
+              send_neutral_event_with :using_workspace, :config_pathname, @ws.pn
+            end
+            @ws
+          end
+        else
+          UNABLE_
         end
-        @ws
+      end
+    end
+
+    class Silo__ < Brazen_.model.silo.make( self )
+
+      def workspace_via_action action
+        _sc = build_silo_controller action
+        _sc.via_action_workspace
       end
     end
 

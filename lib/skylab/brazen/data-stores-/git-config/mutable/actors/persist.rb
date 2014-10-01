@@ -42,7 +42,7 @@ module Skylab::Brazen
         end
 
         def send_wrote_file_event d
-          send_OK_event_with( :datastore_resource_commited_changes,
+          send_OK_event_with( :datastore_resource_committed_changes,
             :bytes, d,
             :is_completion, true,
             :is_dry, @is_dry,
