@@ -85,7 +85,7 @@ module Skylab::Snag
         ev.inflected_noun = nnf && nnf.as_human
       end
 
-      Snag_::Model_.name_function self
+      extend NF_[].name_function_proprietor_methods
 
       Entity_ = Snag_::Lib_::Entity[][ -> do
 

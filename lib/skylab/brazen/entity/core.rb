@@ -21,7 +21,7 @@ module Skylab::Brazen
       end
 
       def say_unrecognized_properties a
-        Brazen_::API::EXPRESSION_AGENT.calculate do
+        Brazen_::API.expression_agent_instance.calculate do
           _s_a = a.map( & method( :ick ) )
           "unrecognized propert#{ s a, :y } #{ and_ _s_a }"
         end
@@ -32,13 +32,13 @@ module Skylab::Brazen
       end
 
       def via_arglist a
-        Shell__.new.execute_via_arglist a
+        Shell__.new.via_arglist a
       end
     end
 
     class Common_Shell__  # read [#001] the entity enhancement narrrative
 
-      def execute_via_arglist x_a
+      def via_arglist x_a
         @d = 0 ; @x_a = x_a ; @x_a_length = x_a.length
         case @x_a_length <=> 1
         when  1 ; when_many_length_arg_list_execute
@@ -664,7 +664,12 @@ module Skylab::Brazen
 
       def iambic_methods_box_and_subject
         subject = property_proprietor
-        box = subject ? subject.property_method_nms_for_rd : MONADIC_EMPTINESS_
+        if subject
+          if subject.respond_to? :property_method_nms_for_rd
+            box = subject.property_method_nms_for_rd
+          end
+        end
+        box ||= MONADIC_EMPTINESS_
         [ box, subject ]
       end
 
@@ -816,7 +821,7 @@ module Skylab::Brazen
 
       def execute_via_extmod_and_arglist extension_module, arg_list
         @extension_module = extension_module
-        execute_via_arglist arg_list
+        via_arglist arg_list
       end
 
       def when_one_length_arg_list_execute

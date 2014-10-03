@@ -393,7 +393,7 @@ module Skylab::Brazen
 
           x_a.push :document, self, :event_receiver, @parse.event_receiver
 
-          Mutable::Actors::Persist.execute_via_iambic x_a do |o|
+          Mutable::Actors::Persist.via_iambic x_a do |o|
             o.did_see :pathname or o.set_pathname @input_id.to_pathname
           end
         end

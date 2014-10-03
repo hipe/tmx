@@ -2,12 +2,6 @@ module Skylab::TanMan
 
   class Models_::Comment
 
-    def self.get_unbound_upper_action_scan
-      nil
-    end
-
-    extend TanMan_::Lib_::Name_function[].name_function_methods
-
     module Line_Scan
 
       class << self

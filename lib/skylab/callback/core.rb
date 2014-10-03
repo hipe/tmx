@@ -61,7 +61,7 @@ module Skylab::Callback
         end.execute
       end
 
-      def execute_via_arglist a, & p
+      def via_arglist a, & p
         new do
           process_arglist_fully a
           p and p[ self ]
@@ -82,7 +82,7 @@ module Skylab::Callback
         end
       end
 
-      def execute_via_iambic x_a, & p
+      def via_iambic x_a, & p
         new do
           process_iambic_fully x_a
           p and p[ self ]
@@ -240,13 +240,13 @@ module Skylab::Callback
       @h.fetch @a.fetch d
     end
 
-    def to_key_scanner
+    def to_key_scan
       Callback_::Scan.nonsparse_array @a
     end
 
     def to_value_scanner
       d = -1 ; last = @a.length - 1
-      Callback_::Scn.new do
+      Scn.new do
         if d < last
           @h.fetch @a.fetch d += 1
         end
@@ -254,13 +254,24 @@ module Skylab::Callback
     end
 
     def to_value_scan
-      d  = -1 ; last = @a.length - 1
+      d = -1 ; last = @a.length - 1
       Callback_.scan do
         if d < last
           @h.fetch @a.fetch d += 1
         end
       end
     end
+
+    def to_pair_scan
+      d = -1 ; last = @a.length - 1
+      Callback_.scan do
+        if d < last
+          i = @a.fetch d += 1
+          Pair__.new @h.fetch( i ), i
+        end
+      end
+    end
+    Pair__ = ::Struct.new :value_x, :name_i
 
     def each_name
       @a.each do |i| yield i end ; nil
@@ -291,6 +302,13 @@ module Skylab::Callback
       end ; nil
     end
 
+    def set i, x
+      @h.fetch i do
+        @a.push i
+      end
+      @h[ i ] = x ; nil
+    end
+
     def add_if_not_has i, & p
       @h.fetch i do
         @a.push i
@@ -298,23 +316,29 @@ module Skylab::Callback
       end ; nil
     end
 
-    def add_or_replace i, x
-      @h.fetch i do
-        @a.push i
-      end
-      @h[ i ] = x ; nil
-    end
-
-    def add_or_assert i, x
+    def add_or_assert i, x_
       has = true
-      x_ = @h.fetch i do
+      x = @h.fetch i do
         has = false
       end
       if has
         x == x_ or raise "assertion failure - not equal: (#{ x }, #{ x_ })"
         nil
       else
-        @a.push i ; @h[ i ] = x ; true
+        @a.push i ; @h[ i ] = x_ ; true
+      end
+    end
+
+    def add_or_replace i, add_p, replace_p
+      has = true
+      x = @h.fetch i do
+        has = false
+      end
+      if has
+        @h[ i ] = replace_p[ x ]
+      else
+        @a.push i
+        @h[ i ] = add_p.call
       end
     end
 
@@ -346,8 +370,15 @@ module Skylab::Callback
   protected
     attr_reader :a, :h
 
-    def self.the_empty_box
-      @teb ||= new.freeze
+    class << self
+
+      def the_empty_box
+        @teb ||= new.freeze
+      end
+
+      def pair
+        Pair__
+      end
     end
   end
 
@@ -1261,13 +1292,17 @@ module Skylab::Callback
 
       def build_require_sidesystem_proc * i_a
         proc_or_call_or_map i_a do |x|
-          Memoize_[ -> do require_sidesystem x end ]
+          memoize do
+            require_sidesystem x
+          end
         end
       end
 
       def build_require_stdlib_proc * i_a
         proc_or_call_or_map i_a do |x|
-          memoize { require_stdlib x }
+          memoize do
+            require_stdlib x
+          end
         end
       end
     private
@@ -1289,7 +1324,7 @@ module Skylab::Callback
       end
 
       def memoize *a, &p
-        Memoize_[ ( p ? a << p : a ).fetch a.length - 1 << 1 ]
+        Memoize_.via_arglist_and_proc a, p
       end
 
       def names_method
@@ -1492,6 +1527,10 @@ module Skylab::Callback
 
   # ~ public and protected consts and any related public accessor methods
 
+  def self.const_sep
+    CONST_SEP_
+  end
+
   CONST_SEP_ = '::'.freeze
 
   Constify_if_possible_ = -> do
@@ -1532,13 +1571,32 @@ module Skylab::Callback
 
   EMPTY_S_ = ''.freeze  # think of all the memory you'll save
 
-  def self.memoize
-    Memoize_
+  def self.memoize *a, &p
+    Memoize_.via_arglist_and_proc a, p
   end
 
-  Memoize_ = -> p do
-    p_ = -> { x = p[] ; p_ = -> { x } ; x }
-    -> { p_.call }
+  module Memoize_
+    class << self
+      def via_arglist_and_proc a, p
+        if a.length.zero?
+          if p
+            self[ p ]
+          else
+            self
+          end
+        else
+          p and a.push p
+          self[ a.fetch a.length - 1 << 1 ]
+        end
+      end
+
+      def [] p
+        p_ = -> do
+          x = p[] ; p_ = -> { x } ; x
+        end
+        -> { p_.call }
+      end
+    end
   end
 
   Oxford = -> separator, none, final_sep, a do

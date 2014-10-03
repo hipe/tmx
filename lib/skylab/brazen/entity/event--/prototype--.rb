@@ -92,9 +92,6 @@ module Skylab::Brazen
           end
         end
 
-        def verb_lexeme
-        end
-
         def replace_some_values * value_a
           value_a.each_with_index do |x, d|
             instance_variable_set ivar_box.at_position( d ), x

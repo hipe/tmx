@@ -79,7 +79,7 @@ module Skylab::TanMan::TestSupport::Models
     # ~ tmpdir
 
     def prepare_ws_tmpdir s
-      td = CONSTANTS::TMPDIR
+      td = TestLib_::Tmpdir[]
       if do_debug
         if ! td.be_verbose
           td = td.with :be_verbose, true, :debug_IO, debug_IO

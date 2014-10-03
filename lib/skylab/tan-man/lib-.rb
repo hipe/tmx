@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   module Lib_
 
-    memoize = -> p { p_ = -> { x = p[] ; p_ = -> { x } ; x } ; -> { p_[] } }
+    memoize = Callback_.memoize
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
@@ -38,10 +38,6 @@ module Skylab::TanMan
 
     HL__ = sidesys[ :Headless ]
 
-    Name_function = -> do
-      Brazen_::Lib_::Name_function[]
-    end
-
     Snag__ = sidesys[ :Snag ]
 
     Some_stderr = -> do
@@ -57,10 +53,6 @@ module Skylab::TanMan
     end
 
     Tmpdir_stem = memoize[ -> { 'tina-man'.freeze } ]
-
-    Two_streams = -> do
-      HL__[]::System::IO.some_two_IOs
-    end
 
     TT = memoize[ -> do
       require 'treetop' ; ::Treetop

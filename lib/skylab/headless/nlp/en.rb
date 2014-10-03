@@ -11,8 +11,7 @@ module Skylab::Headless
 
     EN = en_inflector.new
 
-    module EN::Minitesimal
-    end
+    EN::Minitesimal = ::Module.new
 
     EN::Minitesimal.const_set :Inflector_, en_inflector
 

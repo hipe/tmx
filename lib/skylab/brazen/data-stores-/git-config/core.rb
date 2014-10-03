@@ -25,6 +25,10 @@ module Skylab::Brazen
       super kernel
     end
 
+    def description_under expag
+      @document.description_under expag
+    end
+
     # ~ persist
 
     def persist_entity entity, _event_receiver
@@ -43,6 +47,10 @@ module Skylab::Brazen
 
     def entity_scan_via_class cls, evr
       Git_Config_::Actors__::Scan[ cls, @document, evr, @kernel ]
+    end
+
+    def section_scan evr
+      Git_Config_::Actors__::Scan[ nil, @document, evr, @kernel ]
     end
 
     # ~ delete
@@ -82,7 +90,16 @@ module Skylab::Brazen
     end
 
     class Silo_Controller__ < Brazen_.model.silo_controller
-      def controller_as_datastore_via_entity x
+
+      def provide_action_precondition _id, _g
+        self
+      end
+
+      def provide_collection_controller_precon _id, _g
+        self
+      end
+
+      def datastore_controller_via_entity x
         document = Parse_[ :via_path, x.to_path,
           :receive_events_via_event_receiver, @event_receiver ]
         document and begin
@@ -117,7 +134,7 @@ module Skylab::Brazen
           p.respond_to?( :[] ) or raise ::ArgumentError, "[]: #{ p.class }"
         else
         p = -> ev do
-          _s = ev.render_first_line_under Brazen_::API::EXPRESSION_AGENT
+          _s = ev.render_first_line_under Brazen_::API.expression_agent_instance
           raise ParseError, _s
         end
         end
@@ -327,6 +344,10 @@ module Skylab::Brazen
 
       def is_mutable
         false
+      end
+
+      def description_under expag
+        @input_id.description_under expag
       end
     end
 

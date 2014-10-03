@@ -2,8 +2,6 @@ module Skylab::TanMan
 
   module Models_::DotFile  # cannot be a model subclass because treetop
 
-    extend TanMan_::Lib_::Name_function[].name_function_methods
-
     class << self
 
       def produce_document_via_parse & p

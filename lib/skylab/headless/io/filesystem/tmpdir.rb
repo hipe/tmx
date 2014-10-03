@@ -39,7 +39,9 @@ module Skylab::Headless
 
     def initialize x_a
       ::Array === x_a or raise 'where'
-      1 == x_a.length and self._WHERE
+      if 1 == x_a.length
+        x_a.unshift :path
+      end
       @is_noop = false
       @be_verbose = false
       process_iambic_fully x_a

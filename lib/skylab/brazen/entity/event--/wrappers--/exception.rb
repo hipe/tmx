@@ -19,7 +19,7 @@ module Skylab::Brazen
         end
 
         def produce_name_i
-          s_a = @exception.class.name.split Callback_::CONST_SEP_
+          s_a = @exception.class.name.split Callback_.const_sep
           sub_slice = s_a[ -3, 2 ]
           sub_slice ||= s_a
           s_a_ = sub_slice.map { |s| s.sub TRAILING_UNDERSCORES_RX__, EMPTY_S_ }

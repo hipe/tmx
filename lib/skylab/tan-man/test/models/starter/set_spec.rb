@@ -15,8 +15,6 @@ module Skylab::TanMan::TestSupport::Models::Starter
         +using_starter=holy-foly.dot
       HERE
 
-      @ws_tmpdir = CONSTANTS::TMPDIR
-
       call_API :starter, :set, :name, 'wiz', :workspace_path, @ws_tmpdir.to_path
 
       expect_not_OK_event :entity_not_found do |ev|

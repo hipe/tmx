@@ -50,7 +50,9 @@ module Skylab::Brazen::TestSupport::CLI::Actions
 
     def expect_these_actions
       expect %r(\A[ ]{4,}-h, --help \[cmd\][ ]{10,}this screen \(or)
+      expect %r(\A[ ]{4,}ping\z)
       expect %r(\A[ ]{4,}rm[ ]{10,}removes? a workspace)
+      expect %r(\A[ ]{4,}summarize\z)
     end
 
     def expect_options
@@ -62,6 +64,6 @@ module Skylab::Brazen::TestSupport::CLI::Actions
       expect %r(\A[ ]{4,}rm[ ]{10,}removes? a workspace)i
     end
 
-    self::EXPECTED_ACTION_NAME_S_A = [ 'rm' ].freeze
+    self::EXPECTED_ACTION_NAME_S_A = [ 'ping', 'rm', 'summarize' ].freeze
   end
 end

@@ -1,8 +1,10 @@
-module Skylab::TanMan
+module Skylab::Brazen
 
   module API
 
-    class Two_Stream_Event_Expressor__
+    class Produce_bound_call__
+
+    class Two_Stream_Event_Expressor
 
       def initialize * a
         @out, @err, @expag = a
@@ -21,7 +23,7 @@ module Skylab::TanMan
       end
 
       def app_name
-        'tm API'
+        @expag.app_name
       end
 
     private
@@ -48,6 +50,9 @@ module Skylab::TanMan
         ev.render_all_lines_into_under y, @expag
         nil
       end
+
     end
+    end
+
   end
 end

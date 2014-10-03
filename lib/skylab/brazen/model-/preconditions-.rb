@@ -7,7 +7,7 @@ module Skylab::Brazen
       class << self
 
         def establish_box_with * x_a
-          Resolution__.execute_via_iambic x_a
+          Resolution__.via_iambic x_a
         end
       end
 
@@ -103,6 +103,7 @@ module Skylab::Brazen
           :event_receiver ]
 
         def execute
+
           if @identifier_a.length.nonzero?
             @self_full_name_i = @self_identifier.full_name_i
             step_on_each_identifier

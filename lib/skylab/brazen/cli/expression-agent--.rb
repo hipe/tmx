@@ -18,6 +18,10 @@ module Skylab::Brazen
 
       alias_method :calculate, :instance_exec
 
+      def app_name
+        Brazen_.name_function.as_human
+      end
+
       def s x
         x.respond_to?( :length ) and x = x.length
         's' if 1 != x
@@ -49,20 +53,12 @@ module Skylab::Brazen
         highlight _unstyled
       end
 
+      def plural_noun * a
+        _NLP_agent.plural_noun.via_arglist a
+      end
+
       def property_default
         @current_property.default
-      end
-
-      def render_prop_as_option prop
-        "--#{ prop.name.as_slug }"
-      end
-
-      def render_prop_as_argument prop
-        "<#{ prop.name.as_slug }>"
-      end
-
-      def render_prop_as_environment_variable prop
-        prop.upcase_environment_name_i.id2name
       end
 
       def pth s
@@ -77,12 +73,30 @@ module Skylab::Brazen
       end
       DIR_SEP__ = '/'.getbyte 0
 
+      def render_prop_as_option prop
+        "--#{ prop.name.as_slug }"
+      end
+
+      def render_prop_as_argument prop
+        "<#{ prop.name.as_slug }>"
+      end
+
+      def render_prop_as_environment_variable prop
+        prop.upcase_environment_name_i.id2name
+      end
+
       def val s
         s.inspect
       end
 
+      # ~ support
+
       def stylize style_d_a, string
         "\e[#{ style_d_a.map( & :to_s ).join( ';' ) }m#{ string }\e[0m"
+      end
+
+      def _NLP_agent
+        @NLP_agent ||= Brazen_::API.expression_agent_class.NLP_agent.new
       end
     end
   end

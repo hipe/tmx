@@ -11,12 +11,12 @@ module Skylab::Brazen
         alias_method :calculate, :instance_exec
 
         def method_missing i, * args
-          if 1 == args.length
-            _desc = dsc_x args.first
-          else
-            _desc = "[#{ args.map( & method( :dsc_x ) ) * ', ' }]"
+          _args = case 1 <=> args.length
+          when  1 ;
+          when  0 ; " #{ dsc_x args.first }"
+          when -1 ; " [#{ args.map( & method( :dsc_x ) ) * ', ' }]"
           end
-          "(#{ i } #{ _desc })"
+          "(#{ i }#{ _args })"
         end
 
         def dsc_x x

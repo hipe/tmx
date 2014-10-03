@@ -53,10 +53,12 @@ module Skylab::Brazen::TestSupport
         end
 
         def expect_event_via_iambic_and_proc x_a, p
+          @ev = nil
           exp = Expectation__.new x_a, p
           exp.call_a.each do | method_i, args |
             send method_i, * args
-          end ; nil
+          end
+          @ev
         end
 
         def expect_no_events
@@ -239,10 +241,22 @@ module Skylab::Brazen::TestSupport
           @ev = ev ; @ev_ = ev.to_event
           @ok_s = ok_s ; @tci = ev.terminal_channel_i
           @mems = "(#{ @ev_.tag_names * ', ' })"
-          y = ::Enumerator::Yielder.new do |s|
-            @debug_IO.puts "#{ comment }#{ @ok_s } #{ @tci } #{ @mems } - #{ s.inspect }"
+          io = @debug_IO
+          p = -> s do
+            header_s = "#{ comment }#{ @ok_s } #{ @tci } #{ @mems } - "
+            io.puts "#{ header_s }#{ s.inspect }"
+            p = -> s_ do
+              blank_s = Brazen_::SPACE_ * header_s.length
+              io.puts "#{ blank_s }#{ s_.inspect }"
+              p = -> s__ do
+                io.puts "#{ blank_s }#{ s__.inspect }"
+              end
+            end ; nil
           end
-          ev.render_all_lines_into_under y, @test_context.event_expression_agent
+          _y = ::Enumerator::Yielder.new do |s|
+            p[ s ]
+          end
+          ev.render_all_lines_into_under _y, @test_context.event_expression_agent
           nil
         end
 

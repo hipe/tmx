@@ -168,6 +168,10 @@ end
         on_mod_via_iambic mod, x_a
       end
 
+      def via_arglist a
+        on_mod_via_iambic a.shift, a
+      end
+
       def on_mod_via_iambic mod, x_a
 
         case x_a.first
@@ -267,13 +271,16 @@ end
       fun[].oxford_comma[ a, ' or ' ]
     end ]
 
+    o[ :plural_noun ] = -> do
+      Headless_::NLP::EN::POS.plural_noun
+    end
+
     o[:both] = memoize_length[ -> a do
       fun[].both[ a ]
     end ]
 
-    fun = -> do
-      # ( we've got to lazy-load it b.c of a circular dependency in the files )
-      x = Headless::NLP::EN::Minitesimal::FUN ; fun = -> { x } ; x
+    fun = Headless_::Callback_.memoize do  # necessary because circular dependency
+      Headless_::NLP::EN::Minitesimal::FUN
     end
 
   end

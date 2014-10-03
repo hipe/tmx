@@ -21,8 +21,20 @@ module Skylab::Brazen
       Brazen_::Model_::LIB
     end
 
-    def model_entity model_class, & p
-      Brazen_::Model_::Entity[ model_class, p ]
+    def model_entity * a, & p
+      if a.length.nonzero? || p
+        Brazen_::Model_::Entity[ * a, p ]
+      else
+        Brazen_::Model_::Entity
+      end
+    end
+
+    def name_library
+      NAME_LIBRARY__
+    end
+
+    def name_function
+      @nf ||= Callback_::Name.from_module self
     end
 
     def node_identifier
@@ -32,6 +44,95 @@ module Skylab::Brazen
 
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
+
+  module NAME_LIBRARY__
+
+    class << self
+
+      def name_function_class
+        Name_Function__
+      end
+
+      def name_function_proprietor_methods
+        Name_Function_Proprietor_Methods__
+      end
+
+      def surrounding_module mod
+        name_s = mod.name
+        name_s[ name_s.rindex( CONST_SEP__ ) .. -1 ] = EMPTY_S_
+        name_s.split( CONST_SEP__ ).reduce( ::Object ) do |m, s|
+          m.const_get s, false
+        end
+      end
+    end
+
+    module Name_Function_Proprietor_Methods__  # infects upwards
+
+      def name_function
+        @nf ||= bld_name_function
+      end
+
+      def full_name_function
+        @fnf ||= bld_full_name_function
+      end
+
+    private
+
+      def bld_full_name_function
+        y = [ nf = name_function ]
+        y.unshift nf while (( parent = nf.parent and nf = parent.name_function ))
+        y.freeze
+      end
+
+      def bld_name_function
+
+        stop_index = const_defined?( :NAME_STOP_INDEX ) ?
+          self::NAME_STOP_INDEX : STOP_INDEX__
+
+        s_a = name.split CONST_SEP__
+        i = s_a.pop.intern
+        x_a = ::Array.new s_a.length
+        mod = ::Object
+        s_a.each_with_index do |s, d|
+          mod = mod.const_get s, false
+          x_a[ d ] = mod
+        end
+        d = s_a.length
+
+        while stop_index < ( d -= 1 )
+          mod = x_a.fetch d
+          if ! mod.respond_to? :name_function
+            TAXONOMIC_MODULE_RX__ =~ s_a.fetch( d ) and next
+            mod.extend Name_Function_Proprietor_Methods__
+          end
+          parent = mod
+          break
+        end
+        name_function_class.new self, parent, i
+      end
+
+      def name_function_class
+        Name_Function__
+      end
+
+      STOP_INDEX__ = 3  # skylab snag cli actions foo actions bar
+
+      TAXONOMIC_MODULE_RX__ = /\AActions_{0,2}\z/  # meh / wee
+    end
+
+    class Name_Function__ < Callback_::Name
+      class << self
+        public :new
+      end
+      def initialize _mod, parent, const_i
+        @parent = parent
+        initialize_with_const_i const_i
+      end
+      attr_reader :parent
+    end
+
+    CONST_SEP__ = Callback_.const_sep
+  end
 
   module Data_Stores_
     class << self
@@ -44,9 +145,7 @@ module Skylab::Brazen
 
   module Lib_
 
-    memoize = -> p do
-      p_ = -> do x = p[] ; p_ = -> { x } ; x end ; -> { p_[] }
-    end
+    memoize = Callback_.memoize
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
@@ -55,10 +154,10 @@ module Skylab::Brazen
     end
 
     EN_fun = -> do
-      Headless__[]::SubClient::EN_FUN
+      HL__[]::SubClient::EN_FUN
     end
 
-    Headless__ = sidesys[ :Headless ]
+    HL__ = sidesys[ :Headless ]
 
     Iambic_scanner = -> do
       Callback_.iambic_scanner
@@ -70,24 +169,24 @@ module Skylab::Brazen
       Event_[]::N_Lines
     end
 
-    Name_function = -> do
-      Snag__[]::Model_
-    end
-
     Net_HTTP = memoize[ -> { require 'net/http' ; ::Net::HTTP } ]
 
     NLP = -> do
-      Headless__[]::NLP
+      HL__[]::NLP
     end
 
     IO = -> do
-      Headless__[]::IO
+      HL__[]::IO
     end
 
     Snag__ = sidesys[ :Snag ]
 
     Text = -> do
       Snag__[]::Text
+    end
+
+    Two_streams = -> do
+      HL__[]::System::IO.some_two_IOs
     end
   end
 
@@ -124,8 +223,8 @@ module Skylab::Brazen
   NAME_ = :name
   NILADIC_TRUTH_ = -> { true }
   PROCEDE_ = true
-  SLASH_ = '/'.getbyte 0
   Scan_ = -> { Callback_::Scan }
+  SLASH_ = '/'.getbyte 0
   SPACE_ = ' '.freeze
 
   stowaway :TestSupport, 'test/test-support'

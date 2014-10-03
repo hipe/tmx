@@ -4,7 +4,7 @@ module Skylab::Brazen
 
     module Small_Time_Actors__
 
-      class When_expected_datastore_not_indicated  # :+[#035] should probably not be UI-level
+      class When_datastore_not_indicated  # :+[#035] should probably not be UI-level
 
         Actor_[ self, :properties,
           :controller ]

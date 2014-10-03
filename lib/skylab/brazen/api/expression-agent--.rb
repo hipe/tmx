@@ -2,16 +2,26 @@ module Skylab::Brazen
 
   module API
 
-    EXPRESSION_AGENT = class Expression_Agent___
+    class Expression_Agent__
 
       # specifically we created this expression agent to render expressions
       # in "black & white" when we are rendering their messages
       # to be used in exception messages.
 
+      def initialize k
+        @app_name_p = -> do
+          k.app_name
+        end
+      end
+
       alias_method :calculate, :instance_exec
 
       def and_ x
-        context.and_ x
+        _NLP_agent.and_ x
+      end
+
+      def app_name
+        @app_name_p[]
       end
 
       def code s
@@ -35,57 +45,48 @@ module Skylab::Brazen
         "'#{ _string }'"
       end
 
+      def plural_noun * a
+        _NLP_agent.plural_noun.via_arglist a
+      end
+
       def pth x
-        x
+        "«#{ x }»"  # :+#guillemets
       end
 
       def s count_x, lexeme_i=:s
-        context.s count_x, lexeme_i
+        _NLP_agent.s count_x, lexeme_i
       end
 
       def val s
         s.inspect
       end
 
-      def context
-        @context ||= Lang_Ctx__[].new
+      def _NLP_agent
+        @context ||= self.class.NLP_agent.new
       end
 
-      Lang_Ctx__ = -> do
-        p = -> do
-          x = class Lang_Ctx___
-            Brazen_::Lib_::EN_fun[][ self, :public, [ :and_, :s ] ]
-            self
-          end
-          p = -> { x } ; x
+      class << self
+
+        def NLP_agent
+          const_get( :NLP_agent__, false ).call
         end
-        -> { p[] }
-      end.call
+      end
 
-      self
-    end.new
+      NLP_agent__ = Callback_.memoize do
+        NLP_Agent__ = LIB.make_NLP_agent :public, [ :and_, :plural_noun, :s ]
+      end
 
-    _ES_ = class Exit_Statii__
-      h = {
-        generic_error: ( d = 5 ),
-        error_as_specificed: ( d += 1 ),
-        missing_required_properties: ( d += 1 ),
-        invalid_property_value: ( d += 1 ),
-        extra_properties:  ( d += 1 ),
-        resource_not_found: ( d += 1 ),
-        resource_exists: ( d += 1 )
-      }.freeze
-      define_method :[], & h.method( :[] )
-      define_method :fetch, & h.method( :fetch )
-      self
-    end.new
+      module LIB
 
-    define_singleton_method :exit_statii do _ES_ end
+        class << self
 
-
-    class << self
-      def debug_IO
-        @debug_IO ||= Lib_::Headless__[]::System::IO.some_stderr_IO
+          def make_NLP_agent * x_a
+            cls = ::Class.new
+            x_a.unshift cls
+            Lib_::EN_fun[].via_arglist x_a
+            cls
+          end
+        end
       end
     end
   end

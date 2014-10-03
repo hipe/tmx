@@ -8,7 +8,7 @@ module Skylab::Brazen
 
       class Signature
 
-        def self.execute_via_arglist a
+        def self.via_arglist a
           new a
         end
 

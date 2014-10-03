@@ -24,9 +24,7 @@ module Skylab::Brazen
       end
     end
 
-    Actual_Property_ = ::Struct.new :value_x, :name_i
-
-    Bound_Property_ = ::Struct.new :value_x, :name_i, :property
+    Actual_Property_ = Callback_::Box.pair
 
     class << self
 
@@ -172,7 +170,7 @@ module Skylab::Brazen
       end
     end  # >>
 
-    extend Lib_::Name_function[].name_function_methods
+    extend Brazen_.name_library.name_function_proprietor_methods
 
     include module Interface_Element_Instance_Methdods__
 
@@ -447,7 +445,7 @@ module Skylab::Brazen
           if prop
             add_prop_iambic[ prop, x ]
           else
-            pbx.add_or_replace i, x
+            pbx.set i, x
           end ; nil
         end
 
@@ -551,11 +549,11 @@ module Skylab::Brazen
     # ~ create
 
     def produce_any_persist_result
-      expected_datastore_is_resolved and @datastore.persist_entity self, self
+      datastore_resolved_OK and @datastore.persist_entity self, self
     end
 
     def persist_entity x, evr
-      expected_datastore_is_resolved and @datastore.persist_entity x, evr
+      datastore_resolved_OK and @datastore.persist_entity x, evr
     end
 
     def any_native_create_before_create_in_datastore
@@ -565,19 +563,19 @@ module Skylab::Brazen
     # ~ retrive one
 
     def entity_via_identifier id_o, evr
-      expected_datastore_is_resolved and @datastore.entity_via_identifier id_o, evr
+      datastore_resolved_OK and @datastore.entity_via_identifier id_o, evr
     end
 
     # ~ retrieve (many)
 
     def entity_scan_via_class cls, evr
-      expected_datastore_is_resolved and @datastore.entity_scan_via_class cls, evr
+      datastore_resolved_OK and @datastore.entity_scan_via_class cls, evr
     end
 
     # ~ delete (anemic out-of-box implementation: pass the buck)
 
     def delete_entity entity, evr
-      expected_datastore_is_resolved and @datastore.delete_entity entity, evr
+      datastore_resolved_OK and @datastore.delete_entity entity, evr
     end
 
   private
@@ -586,48 +584,44 @@ module Skylab::Brazen
       PROCEDE_
     end
 
-    def expected_datastore_is_resolved
-      @did_check_that_expected_datastore_exists ||= rslv_expected_datastore
-      @datastore_does_exist
+    def datastore_resolved_OK
+      @did_attempt_to_resolve_datastore ||= rslv_datastore
+      @datastore_resolved_OK
     end
 
-    def rslv_expected_datastore
-      @did_check_that_expected_datastore_exists = true
+    def rslv_datastore
+      @did_attempt_to_resolve_datastore = true
       @persist_to ||= self.class.persist_to
       if @persist_to
-        when_persist_to_rslv_expected_datastore
+        via_persist_to_rslv_datastore
       else
-        when_no_persist_to_rslv_expected_datastore
+        when_no_persist_to_for_rslv_datastore
       end
       ACHEIVED_
     end
 
-    def when_no_persist_to_rslv_expected_datastore
-      @datastore_does_exist = false
-      when_expected_datastore_does_not_exist
+    def when_no_persist_to_for_rslv_datastore
+      @datastore_is_OK = false
+      Model_::Small_Time_Actors__::When_datastore_not_indicated[ self ]
     end
 
-    def when_expected_datastore_does_not_exist
-      Model_::Small_Time_Actors__::When_expected_datastore_not_indicated[ self ]
-    end
-
-    def when_persist_to_rslv_expected_datastore
+    def via_persist_to_rslv_datastore
       if preconditions
-        @datastore = @preconditions.fetch @persist_to.full_name_i
-        @datastore_does_exist = @datastore ? true : false
+        _intermediary = @preconditions.fetch @persist_to.full_name_i
+        @datastore = _intermediary.datastore_controller_via_entity self
+        @datastore_resolved_OK = @datastore ? true : false
       else
-        when_kernel_rslv_expected_datastore
+        via_kernel_rslv_datastore
       end ; nil
     end
 
-    def when_kernel_rslv_expected_datastore
+    def via_kernel_rslv_datastore
       silo = @kernel.silo_via_identifier @persist_to, @event_receiver
       if silo
-        @datastore = silo.
-          controller_as_datastore_via_entity self, @event_receiver
-        @datastore_does_exist = @datastore ? true : false
+        @datastore = silo.dsc_via_entity self, @event_receiver
+        @datastore_resolved_OK = @datastore ? true : false
       else
-        @datastore_does_exist = false
+        @datastore_resolved_OK = false
       end ; nil
     end
 
@@ -647,39 +641,23 @@ module Skylab::Brazen
 
  public  # ~ multipurpose internal readers & callbacks
 
+    def action_via_action_class cls
+      @kernel.action_via_action_class cls
+    end
+
     attr_reader :preconditions
 
     def properties
       @property_box
     end
 
+    def datastore  # for low-level actors
+      _ok = datastore_resolved_OK
+      _ok and @datastore
+    end
+
     def receive_event ev
       @event_receiver.receive_event ev
-    end
-
-    def action_via_action_class cls
-      @kernel.action_via_action_class cls
-    end
-
-    class Action_as_Item__
-
-      def initialize bound
-        @bound = bound
-        @cls = bound.class
-      end
-
-      def name
-        @bound.name
-      end
-
-      def has_description
-        @cls.description_block
-      end
-
-      def under_expression_agent_get_N_desc_lines exp, n=nil
-        Brazen_::Lib_::N_lines[].
-          new( [], n, [ @cls.description_block ], exp ).execute
-      end
     end
 
     class Process_customized_model_inflection_behavior__
@@ -725,7 +703,7 @@ module Skylab::Brazen
 
     end
 
-    class Model_Name_Function_ < Lib_::Name_function[].name_function_class
+    class Model_Name_Function_ < Brazen_.name_library.name_function_class
 
       def initialize cls, parent, const_i
         @cls = cls
@@ -820,6 +798,10 @@ module Skylab::Brazen
         else
           self
         end
+      end
+
+      def datastore_controller_via_entity _
+        self
       end
 
       def persist_entity ent, evr
@@ -1050,8 +1032,8 @@ module Skylab::Brazen
         silo
       end
 
-      def controller_as_datastore_via_entity entity, evr  # :+#public-API
-        build_silo_controller( evr ).controller_as_datastore_via_entity entity
+      def dsc_via_entity entity, evr
+        build_silo_controller( evr ).datastore_controller_via_entity entity
       end
 
       def build_silo_controller evr

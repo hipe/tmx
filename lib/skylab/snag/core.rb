@@ -18,6 +18,8 @@ module Skylab::Snag
 
   ACHIEVED_= true
 
+  Bzn__ = Autoloader_.build_require_sidesystem_proc :Brazen
+
   EMPTY_A_ = [].freeze
 
   EMPTY_P_ = -> { }
@@ -33,6 +35,10 @@ module Skylab::Snag
   LINE_SEP_ = "\n".freeze
 
   NEUTRAL_ = nil
+
+  NF_ = -> do
+    Bzn__[].name_library
+  end
 
   Snag_ = self
 

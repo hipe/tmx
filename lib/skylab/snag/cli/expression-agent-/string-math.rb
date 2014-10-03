@@ -17,7 +17,7 @@ module Skylab::Snag
               if x_a.length.zero?
                 self
               else
-                execute_via_arglist x_a
+                super
               end
             end
           end

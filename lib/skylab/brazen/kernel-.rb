@@ -7,6 +7,10 @@ module Skylab::Brazen
       @models_mod = mod.const_get :Models_, false
     end
 
+    def app_name
+      @module.name_function.as_human
+    end
+
     def do_debug
       # true
     end

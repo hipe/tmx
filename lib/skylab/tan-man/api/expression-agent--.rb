@@ -2,16 +2,20 @@ module Skylab::TanMan
 
   module API
 
-    EXPRESSION_AGENT__ =
     class Expression_Agent__  # follows [#fa-052]:#the-semantic-markup-guidelines
 
       def initialize k
+        # you could use kernel for ap,_name but we don't
       end
 
       alias_method :calculate, :instance_exec
 
       def and_ a
-        _NLP_actor.and a
+        _NLP_agent.and a
+      end
+
+      def app_name
+        TanMan_.name_function.as_human
       end
 
       def code s
@@ -35,7 +39,7 @@ module Skylab::TanMan
       end
 
       def or_ a
-        _NLP_actor.or_ a
+        _NLP_agent.or_ a
       end
 
       def par x
@@ -43,6 +47,10 @@ module Skylab::TanMan
           x = x.name.as_lowercase_with_underscores_symbol
         end
         "'#{ x }'"
+      end
+
+      def plural_noun * a
+        _NLP_agent.plural_noun.via_arglist
       end
 
       def pth s
@@ -67,23 +75,20 @@ module Skylab::TanMan
         x.inspect
       end
 
-      def _NLP_actor
-        @NLP_actor ||= NLP_actor__[].new
+      def _NLP_agent
+        @NLP_agent ||= NLP_agent__[].new
       end
 
-      NLP_actor__ = -> do
-        p = -> do
-          class NLP_Actor___
-            i_a = [ :and_, :or_, :s ]
-            TanMan_::Lib_::EN_fun[][ self, :public, i_a ]
-          end
-          p = -> { NLP_Actor___ }
-          NLP_Actor___
-        end
-        -> { p[] }
-      end.call
+      NLP_agent__ = Callback_.memoize do
+        Brazen_.expression_agent_library.make_NLP_agent :public,
+          [ :and_, :or_, :plural_noun, :s ]
+      end
 
-      self
-    end.new :_no_kernel_
+    end
+
+    # ~ stowaway
+
+    extend Brazen_::API.module_methods
+
   end
 end

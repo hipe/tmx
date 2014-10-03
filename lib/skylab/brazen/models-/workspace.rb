@@ -24,6 +24,7 @@ module Skylab::Brazen
 
       :flag, :property, :verbose,
 
+      :non_negative_integer,
       :property, :max_num_dirs,
 
       :property, :config_filename,
@@ -77,8 +78,25 @@ module Skylab::Brazen
 
   public
 
+    def description_under expag
+      if @datastore_resolved_OK
+        @datastore.description_under expag
+      elsif @pn
+        pn = @pn
+        expag.calculate do
+          pth pn
+        end
+      else
+        self.class.name_function.as_human
+      end
+    end
+
     def to_path
       @pn.to_path
+    end
+
+    def datastore_controller_via_entity _ent
+      self
     end
 
     def provide_action_precondition _id, _g
@@ -86,6 +104,18 @@ module Skylab::Brazen
     end
 
     module Actions
+
+      class Ping < Brazen_::Model_::Action
+
+        def produce_any_result
+          _ev = build_OK_event_with :ping do |y, o|
+            y << "hello from #{ app_name }"
+          end
+          send_event _ev
+          :_hello_from_brazen_
+        end
+      end
+
       Autoloader_[ self, :boxxy ]
     end
 

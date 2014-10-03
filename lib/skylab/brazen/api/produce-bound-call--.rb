@@ -1,10 +1,14 @@
-module Skylab::TanMan
+module Skylab::Brazen
 
   module API
 
     class Produce_bound_call__
 
-      Callback_::Actor[ self, :properties, :x_a, :p, :kernel, :mod ]
+      Callback_::Actor[ self, :properties,
+        :x_a,
+        :p,
+        :kernel,
+        :mod ]
 
       Event_[].sender self
 
@@ -127,9 +131,9 @@ module Skylab::TanMan
       end
 
       def rslv_some_event_receiver
-        _exp = API::Expression_Agent__.new @kernel
-        @event_receiver = API::Two_Stream_Event_Expressor__.
-          new( * TanMan_::Lib_::Two_streams[], _exp ) ; nil
+        _expag = @mod::API.expression_agent.new @kernel
+        @event_receiver = Produce_bound_call__::Two_Stream_Event_Expressor.
+          new( * Lib_::Two_streams[], _expag ) ; nil
       end
     end
   end

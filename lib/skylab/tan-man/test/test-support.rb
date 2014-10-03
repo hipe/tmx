@@ -9,17 +9,12 @@ module Skylab::TanMan::TestSupport
 
   module TestLib_
 
-    memoize = -> p { p_ = -> { x = p[] ; p_ = -> { x } ; x } ; -> { p_[] } }
+    memoize = TanMan_::Callback_.memoize
 
     sidesys = TanMan_::Autoloader_.build_require_sidesystem_proc
 
     API_expect = -> ctx_cls do
       TanMan_::Brazen_::TestSupport::Expect_Event[ ctx_cls ]
-    end
-
-    Build_tmpdir_via_stem = -> s do
-      _path_s = Dev_tmpdir_pathname[].join( s ).to_path
-      Tmpdir[].new :path, _path_s
     end
 
     CLI_client = -> x do
@@ -44,10 +39,6 @@ module Skylab::TanMan::TestSupport
 
     Dev_client = -> do
       HL__[]::DEV::Client
-    end
-
-    Dev_tmpdir_pathname = -> do
-      HL__[]::System.defaults.dev_tmpdir_pathname
     end
 
     Entity = -> do
@@ -90,9 +81,11 @@ module Skylab::TanMan::TestSupport
       HL__[]::System::IO.some_three_IOs
     end
 
-    Tmpdir = -> do
-      HL__[]::IO::Filesystem::Tmpdir
-    end
+    Tmpdir = memoize[ -> do
+      o = TanMan_::Lib_
+      HL__[]::IO::Filesystem::Tmpdir.
+        new o::Dev_tmpdir_pathname[].join( o::Tmpdir_stem[] ).to_path
+    end ]
 
     TS__ = sidesys[ :TestSupport ]
 
@@ -112,12 +105,11 @@ module Skylab::TanMan::TestSupport
     SPACE_ = TanMan_::SPACE_
     TestLib_ = TestLib_
     TestSupport_  = ::Skylab::TestSupport
-    TMPDIR = TestLib_::Build_tmpdir_via_stem[ TanMan_::Lib_::Tmpdir_stem[] ]
   end
 
   include CONSTANTS # for use here, below
 
-  TestSupport_ = TestSupport_ ; TMPDIR = TMPDIR
+  TestSupport_ = TestSupport_
 
   # this is dodgy but should be ok as long as you accept that:
   # 1) you are assuming meta-attributes work and 2) the below is universe-wide!
@@ -210,6 +202,7 @@ module Skylab::TanMan::TestSupport
     end
 
     def event_expression_agent
+      self._OR_DO_YOU_WANT_THE_other_one
       TanMan_::API::EXPRESSION_AGENT__
     end
 

@@ -35,7 +35,7 @@ module Skylab::Snag
 
         def via_client_and_iambic cls, i_a
           Callback_::Actor.via_client_and_iambic cls, i_a
-          cls.extend Name_Function_Methods__
+          cls.extend NF_[].name_function_proprietor_methods
           cls.include self ; nil
         end
       end
@@ -92,74 +92,6 @@ module Skylab::Snag
       end
       DEFAULT_INFERRED_VERB__ = 'build'.freeze
       Inferred_Stems__ = ::Struct.new :verb, :noun
-    end
-
-    # ~
-
-    class << self
-      def name_function mod
-        mod.extend Name_Function_Methods__ ; nil
-      end
-      def name_function_methods
-        Name_Function_Methods__
-      end
-      def name_function_class
-        Name_Function__
-      end
-    end
-
-    module Name_Function_Methods__  # infects upwards
-      def name_function
-        @nf ||= bld_name_function
-      end
-      def full_name_function
-        @fnf ||= bld_full_name_function
-      end
-    private
-      def bld_full_name_function
-        y = [ nf = name_function ]
-        y.unshift nf while (( parent = nf.parent and nf = parent.name_function ))
-        y.freeze
-      end
-      def bld_name_function
-        s_a = name.split Callback_::CONST_SEP_
-        i = s_a.pop.intern
-        x_a = ::Array.new s_a.length
-        mod = ::Object
-        s_a.each_with_index do |s, d|
-          mod = mod.const_get s, false
-          x_a[ d ] = mod
-        end
-        d = s_a.length
-        stop_index = const_defined?( :NAME_STOP_INDEX ) ?
-          self::NAME_STOP_INDEX : STOP_INDEX__
-        while stop_index < ( d -= 1 )
-          mod = x_a.fetch d
-          if ! mod.respond_to? :name_function
-            TAXONOMIC_MODULE_RX__ =~ s_a.fetch( d ) and next
-            mod.extend Name_Function_Methods__
-          end
-          parent = mod
-          break
-        end
-        name_function_class.new self, parent, i
-      end
-      def name_function_class
-        Name_Function__
-      end
-      STOP_INDEX__ = 3  # skylab snag cli actions foo actions bar
-      TAXONOMIC_MODULE_RX__ = /\AActions_{0,2}\z/  # meh / wee
-    end
-
-    class Name_Function__ < Callback_::Name
-      class << self
-        public :new
-      end
-      def initialize _mod, parent, const_i
-        @parent = parent
-        initialize_with_const_i const_i
-      end
-      attr_reader :parent
     end
 
     # ~

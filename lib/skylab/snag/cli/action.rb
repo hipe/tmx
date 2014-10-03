@@ -199,10 +199,10 @@ module Skylab::Snag
 
       class Leaf_Action__ < self
         extend Skylab::Headless::Action::Anchored_Name_MMs  # we will override it
-        Snag_::Model_.name_function self
+        extend NF_[].name_function_proprietor_methods
       end
 
-      Snag_::Model_.name_function self
+      extend NF_[].name_function_proprietor_methods
 
       class Box < self
 

@@ -9,9 +9,17 @@ without beforehand knowing what the result scheme is from the surface
 modality.
 
 
+
+
 ## #action-preconditions
 
-...
+see [#048] the preconditions graph for a (mandatory) introduction to
+preconditions.
+
+in its implementation the preconditions "pipeline" starts from the
+action. the action will not get to its body of execution (the part that
+you typically write) unless its preconditions are met.
+
 
 
 

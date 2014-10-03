@@ -1,8 +1,27 @@
-module Skylab::TanMan
+module Skylab::Brazen
 
   module API
 
     class << self
+
+      def expression_agent_class
+        const_get :Expression_Agent__, false
+      end
+
+      def expression_agent_instance
+        @expag ||= expression_agent_class.new application_kernel
+      end
+
+      def exit_statii
+        Exit_statii__[]
+      end
+
+      def module_methods
+        MM__
+      end
+    end
+
+    extend module MM__
 
       def call * x_a, & p
         bc = _API_daemon.produce_bound_call_via_iambic_and_proc x_a, p
@@ -16,14 +35,20 @@ module Skylab::TanMan
     private
 
       def _API_daemon
-        @API_daemon ||= Daemon__.new TanMan_
+        @API_daemon ||= bld_API_daemon
+      end
+
+      def bld_API_daemon
+        Daemon__.new Brazen_.name_library.surrounding_module self
       end
 
     public
 
       def debug_IO
-        @debug_IO ||= TanMan_::Lib_::HL__[]::System::IO.some_stderr_IO
+        @debug_IO ||= Lib_::HL__[]::System::IO.some_stderr_IO
       end
+
+      self
     end
 
     class Daemon__
@@ -34,12 +59,29 @@ module Skylab::TanMan
       end
 
       def produce_bound_call_via_iambic_and_proc x_a, p
-        @mod::API::Produce_bound_call__[ x_a, p, @app_kernel, @mod ]
+        API::Produce_bound_call__[ x_a, p, @app_kernel, @mod ]
       end
 
       def application_kernel
         @app_kernel
       end
+    end
+
+    Exit_statii__ = Callback_.memoize do
+      class Exit_Statii__
+        h = {
+          generic_error: ( d = 5 ),
+          error_as_specificed: ( d += 1 ),
+          missing_required_properties: ( d += 1 ),
+          invalid_property_value: ( d += 1 ),
+          extra_properties:  ( d += 1 ),
+          resource_not_found: ( d += 1 ),
+          resource_exists: ( d += 1 )
+        }.freeze
+        define_method :[], & h.method( :[] )
+        define_method :fetch, & h.method( :fetch )
+        self
+      end.new
     end
 
     IDENTITY_ = -> x { x }

@@ -320,14 +320,20 @@ module Skylab::Brazen
 
     private
       def resolve_properties
-        @properties = @action.class.properties ; nil
+        @properties = if @action.class.respond_to? :properties
+          @action.class.properties
+        end ; nil
       end
       def resolve_partitions
         @partitions = Build_partitions__[ get_full_inferred_props_scan, self ]
       end
       def get_full_inferred_props_scan
-        scn = @properties.to_scan
-        scn.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :help
+        scan = if @properties
+          @properties.to_scan
+        else
+          Scan_[].nonsparse_array EMPTY_A_
+        end
+        scan.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :help
       end
     public
       def receive_show_help otr
@@ -534,10 +540,7 @@ module Skylab::Brazen
         s = inflect_line_for_positivity_via_event a.first, ev
         s and a[ 0 ] = s
         send_non_payload_event_lines_with_redundancy_filter a
-        d = any_err_code_for_event ev_
-        d ||= ( SUCCESS_ if ev_.ok )
-        d ||= some_err_code_for_event ev_
-        maybe_use_exit_status d ; nil
+        maybe_use_exit_status_via_OK_or_not_OK_event ev_ ; nil
       end
 
       def receive_negative_event ev
@@ -567,10 +570,6 @@ module Skylab::Brazen
         maybe_use_exit_status SUCCESS_ ; nil
       end
 
-      def maybe_use_exit_status d
-        @parent.maybe_use_exit_status d
-      end
-
       attr_reader :invite_ev_a
 
       def receive_invitation ev, adapter
@@ -583,7 +582,8 @@ module Skylab::Brazen
 
       def receive_payload_event ev
         _a = render_event_lines ev
-        send_payload_event_lines _a ; nil
+        send_payload_event_lines _a
+        maybe_use_exit_status_via_OK_or_not_OK_event ev
       end
 
       def receive_info_event ev
@@ -689,8 +689,11 @@ module Skylab::Brazen
         a.each( & help_renderer.y.method( :<< ) ) ; nil
       end
 
-      def some_err_code_for_event ev
-        any_err_code_for_event( ev ) || GENERIC_ERROR_
+      def maybe_use_exit_status_via_OK_or_not_OK_event ev
+        d = any_err_code_for_event ev
+        d or ev.ok && ( d = SUCCESS_ )
+        d ||= some_err_code_for_event ev
+        maybe_use_exit_status d ; nil
       end
 
       def any_err_code_for_event ev
@@ -699,6 +702,14 @@ module Skylab::Brazen
 
       def any_ext_status_for_chan_i i
         Brazen_::API.exit_statii[ i ]
+      end
+
+      def some_err_code_for_event ev
+        any_err_code_for_event( ev ) || GENERIC_ERROR_
+      end
+
+      public def maybe_use_exit_status d
+        @parent.maybe_use_exit_status d
       end
     end
 

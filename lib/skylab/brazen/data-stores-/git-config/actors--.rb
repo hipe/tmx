@@ -28,12 +28,21 @@ module Skylab::Brazen
         :event_receiver, :kernel ]
 
       def execute
-        via_model_class_rslv_subsection_name_query
-        via_subsection_name_query_rslv_section_scan
-        via_section_scan_and_model_class_produce_entity_scan
+        rslv_subsection_name_query
+        via_any_subsection_name_query_rslv_section_scan
+        via_section_scan_produce_scan
       end
 
     private
+
+      def rslv_subsection_name_query
+        if @model_class
+          via_model_class_rslv_subsection_name_query
+        else
+          @subsection_name_query = nil
+          ACHEIVED_
+        end
+      end
 
       def via_model_class_rslv_subsection_name_query
         i = via_model_class_prdc_section_name_i
@@ -47,10 +56,30 @@ module Skylab::Brazen
           silo_name_i.id2name.gsub( UNDERSCORE_, DASH_ ).intern
       end
 
+      def via_any_subsection_name_query_rslv_section_scan
+        if @subsection_name_query.nil?
+          when_all_rslv_section_scan
+        else
+          via_subsection_name_query_rslv_section_scan
+        end
+      end
+
+      def when_all_rslv_section_scan
+        @section_scan = @document.sections.to_scan ; nil
+      end
+
       def via_subsection_name_query_rslv_section_scan
         @section_scan = @document.sections.to_scan.reduce_by do |x|
           @subsection_name_query.call x
         end ; nil
+      end
+
+      def via_section_scan_produce_scan
+        if @model_class
+          via_section_scan_and_model_class_produce_entity_scan
+        else
+          @section_scan
+        end
       end
 
       def via_section_scan_and_model_class_produce_entity_scan

@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Model_
 
-  Entity = Entity_[][ -> do
+  Entity = Entity_[][ -> do  # see [#047]
 
     o :ad_hoc_processor, :after, -> scan do
       scan.scanner.advance_one
@@ -67,13 +67,7 @@ module Skylab::Brazen
         :enum, [ :zero_or_one, :one ],
         :default, :zero_or_one,
         :entity_class_hook_once, -> cls do
-          cls.add_iambic_event_listener :iambic_normalize_and_validate,
-          -> obj do
-            if ! obj.began_checking_for_missing_required_props
-              obj.began_checking_for_missing_required_props = true
-              obj.check_for_missing_required_props
-            end
-          end
+          Entity::Add_check_for_missing_required_properties[ cls ]
         end
 
     property_class_for_write  # flush the above to get the below
@@ -180,32 +174,64 @@ module Skylab::Brazen
         end
       end
 
-      NORMALIZE_NON_NEGATIVE_INTEGER__ = -> x, prop, val_p, ev_p do
-        md = INTEGER_RX__.match x
-        if md
-          d = md[ 0 ].to_i
-          if 0 > d
-            ev_p[ :invalid_non_negative_integer, :x, d, :prop, prop,
-              -> y, o do
-                y << "#{ par o.prop } must be non-negative, had #{ ick o.x }"
-              end ]
+      class NORMALIZE_NON_NEGATIVE_INTEGER__
+
+        Callback_::Actor[ self, :properties,
+          :x, :prop, :val_p, :ev_p ]
+
+        def execute
+          if @x.respond_to? :bit_length
+            @d = @x
+            execute_via_integer
           else
-            val_p[ d ]
+            execute_when_not_integer
           end
-        else
-          ev_p[ :invalid_non_negative_integer, :x, x, :prop, prop,
+        end
+
+        def execute_when_not_integer
+          @md = INTEGER_RX__.match @x
+          if @md
+            execute_via_matchdata
+          else
+            when_did_not_match
+          end
+        end
+        INTEGER_RX__ = /\A-?\d+\z/
+
+        def when_did_not_match
+          @ev_p[ :invalid_non_negative_integer, :x, @x, :prop, @prop,
             -> y, o do
               y << "#{ par o.prop } must be a non-negative integer, #{
                 }had #{ ick o.x }"
           end ]
-        end ; nil
-      end
+        end
 
-      INTEGER_RX__ = /\A-?\d+\z/
+        def execute_via_matchdata
+          @d = @md[ 0 ].to_i
+          execute_via_integer
+        end
+
+        def execute_via_integer
+          if 0 > @d
+            when_negative
+          else
+            @val_p[ @d ]
+          end
+        end
+
+        def when_negative
+          @ev_p[ :invalid_non_negative_integer, :x, @d, :prop, @prop,
+            -> y, o do
+              y << "#{ par o.prop } must be non-negative, had #{ ick o.x }"
+            end ]
+        end
+      end
     end
   end ]
 
   module Entity
+
+    Event_[].sender self
 
     def aply_ad_hoc_normalizers prop  # this evolved from [#fa-019]
       i = prop.name_i
@@ -214,7 +240,7 @@ module Skylab::Brazen
         _x = bx.fetch i do end
         p[ _x,
           -> x do
-            bx.add_or_replace i, x ; nil
+            bx.set i, x ; nil
           end,
           -> * x_a, p_ do
             _ev = build_not_OK_event_via_mutable_iambic_and_message_proc x_a, p_
@@ -228,9 +254,40 @@ module Skylab::Brazen
       i = prop.name_i
       bx = actual_property_box_for_write
       if bx[ i ].nil?
-        bx.add_or_replace i, prop.default
+        bx.set i, prop.default
       end ; nil
     end
+
+    # ~ missing requireds check
+
+    Add_check_for_missing_required_properties = -> cls do
+      cls.add_iambic_event_listener :iambic_normalize_and_validate,
+        Check_for_missing_required_properties__
+    end
+
+    Check_for_missing_required_properties__ = -> obj do
+      if ! obj.began_checking_for_missing_required_props  # #note-240
+        obj.began_checking_for_missing_required_props = true
+        obj.check_for_missing_required_props
+      end
+    end
+
+    attr_accessor :began_checking_for_missing_required_props
+
+    def check_for_missing_required_props
+      miss_a = Scan_[].nonsparse_array( self.class.required_properties ).
+        map_reduce_by do |prop|
+          arg = get_bound_argument_via_property prop
+          if argument_is_missing arg
+            arg.property
+          end
+        end.to_a
+      if miss_a.length.nonzero?
+        whine_about_missing_reqd_props miss_a ; nil
+      end
+    end
+
+  private
 
     const_get :Module_Methods, false  # sanity
     module Module_Methods
@@ -245,54 +302,55 @@ module Skylab::Brazen
       end
     end
 
-    attr_accessor :began_checking_for_missing_required_props
-
-    def check_for_missing_required_props
-      bx = actual_property_box
-      req_a = self.class.required_properties
-      miss_a = req_a.reduce [] do |m, prop|
-        x = bx.fetch prop.name_i do end
-        x.nil? || EMPTY_S_ == x and m << prop
-        m
+    def get_bound_argument_via_property prop
+      had = true
+      x = actual_property_box.fetch prop.name_i do
+        had = false ; nil
       end
-      miss_a.length.nonzero? and whine_about_missing_reqd_props miss_a ; nil
+      Actual_And_Formal_Property__.new x, had, prop
     end
 
-  private
+    class Actual_And_Formal_Property__
+
+      def initialize * a
+        @value_x, @actuals_has_name, @property = a
+        freeze
+      end
+
+      attr_reader :value_x, :actuals_has_name, :property
+
+      def name_i
+        @property.name_i
+      end
+    end
+
+    def argument_is_missing arg
+      if arg.actuals_has_name
+        x = arg.value_x
+        if x.nil?
+          true
+        elsif EMPTY_S_ == x
+          true
+        end
+      else
+        true
+      end
+    end
 
     def whine_about_missing_reqd_props miss_a
-      receive_event_with :missing_required_properties,
-          :ok, false, :miss_a, miss_a do |y, o|
-        a = o.miss_a
-        y << "missing required propert#{ 1 == a.length ? 'y' : 'ies' } #{
-          }#{ a.map { |prop| par prop } * ' and ' }"
-      end ; nil
-    end
-
-    def receive_event_with * x_a, & p
-      _ev = build_event_via_iambic_and_message_proc x_a, p
-      receive_event_structure _ev
-    end
-
-    Event_[].sender self
-
-    def receive_event_on_channel ev, i
-      m = :"receive_#{ ev.terminal_channel_i }_#{ i }"
-      if respond_to? m
-        send m, ev
-      else
-        m = :"receive_#{ i }_event"  # #this-spot :[#012]
-        send m, ev
+      _ev = build_not_OK_event_with :missing_required_properties,
+          :miss_a, miss_a do |y, o|
+        s_a = o.miss_a.map do |prop|
+          par prop
+        end
+        y << "missing required propert#{ 1 == s_a.length ? 'y' : 'ies' } #{
+          }#{ s_a * ' and ' }"
       end
-    end
-
-    def receive_event_structure ev
-      _m = :"receive_#{ ev.terminal_channel_i }"
-      send _m, ev
+      receive_missing_required_properties _ev
     end
 
     def receive_missing_required_properties ev
-      _s = ev.render_first_line_under Brazen_::API::EXPRESSION_AGENT
+      _s = ev.render_first_line_under Brazen_::API.expression_agent_instance
       raise ::ArgumentError, _s
     end
 
@@ -300,6 +358,8 @@ module Skylab::Brazen
       @error_count += 1
       event_receiver.receive_event ev
     end
+
+    # ~
 
     def via_properties_init_ivars
       formal = self.class.properties
@@ -329,8 +389,6 @@ module Skylab::Brazen
     def actual_property_box_for_write
       actual_property_box
     end
-
-    # ~
   end
   end
 end

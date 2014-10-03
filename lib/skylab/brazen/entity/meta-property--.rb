@@ -131,7 +131,7 @@ module Skylab::Brazen
                 _MUXER_ = Muxer__.new
                 reader.const_set const_i, _MUXER_
                 if reader.respond_to? :method_added_mxr and
-                  mxr = reader.method_added_mxr
+                    mxr = reader.method_added_mxr
                   mxr.stop_listening  # kind of ick for now
                 end
                 reader.send :define_method, :notificate do |i|
@@ -268,12 +268,13 @@ module Skylab::Brazen
         end
       private
         def add_each_hook mp_i, p
-          ( @eaches_and_onces ||= Box_.new ).add_or_replace mp_i,
-            Hook__.new( :each, p ) ; nil
+          add_hook_o mp_i, Hook__.new( :each, p )
         end
         def add_once_hook mp_i, p
-          ( @eaches_and_onces ||= Box_.new ).add_or_replace mp_i,
-            Hook__.new( :once, p ) ; nil
+          add_hook_o mp_i, Hook__.new( :once, p )
+        end
+        def add_hook_o i, o
+          ( @eaches_and_onces ||= Box_.new ).set i, o ; nil
         end
         def add_prop_hook mp_i, p
           ( @props ||= Box_.new ).add mp_i, p ; nil
@@ -291,7 +292,7 @@ module Skylab::Brazen
         end
       private
         def partition_relevant_hooks reader, prop
-          box = @eaches_and_onces ; scn = box.to_key_scanner
+          box = @eaches_and_onces ; scn = box.to_key_scan
           i = scn.gets ; a = nil
           begin
             prop.send( i ).nil? and next  # or whatever

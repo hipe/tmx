@@ -12,6 +12,10 @@ module Skylab::TanMan
 
       alias_method :calculate, :instance_exec
 
+      def app_name
+        @kernel.app_name
+      end
+
       def property_value i
         @kernel.kernel_property_value i
       end
@@ -58,6 +62,10 @@ module Skylab::TanMan
         kbd "<#{ prop.name.as_slug.gsub '_', '-' }>"
       end
 
+      def plural_noun * a
+        _NLP_agent.plural_noun.via_arglist a
+      end
+
       def pth path_x
         FUN__.pretty_path[ path_x ]
       end
@@ -75,6 +83,10 @@ module Skylab::TanMan
 
       def stylize style_d_a, string
         "\e[#{ style_d_a.map( & :to_s ).join( ';' ) }m#{ string }\e[0m"
+      end
+
+      def _NLP_agent
+        @NLP_agent ||= TanMan_::API.expression_agent_class.NLP_agent.new
       end
     end
   end

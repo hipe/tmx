@@ -46,7 +46,7 @@ module Skylab::Brazen
       end
     end
 
-    extend Lib_::Name_function[].name_function_methods
+    extend Brazen_.name_library.name_function_proprietor_methods
     NAME_STOP_INDEX = 2  # sl br models
 
     # whether or not you define properties we need to override methods
@@ -111,7 +111,7 @@ module Skylab::Brazen
       end
     end
 
-    def prdc_any_bc_when_preconds a  # eventually see #action-preconditions
+    def prdc_any_bc_when_preconds a  # see #action-preconditions
 
       _g = Model_::Preconditions_::Graph.new self, self, @kernel
 
@@ -185,7 +185,7 @@ module Skylab::Brazen
   public
 
     def get_bound_argument i
-      Bound_Property_.new argument_value( i ), i, self.class.properties.fetch( i )
+      get_bound_argument_via_property self.class.properties.fetch i
     end
 
     def any_argument_value i

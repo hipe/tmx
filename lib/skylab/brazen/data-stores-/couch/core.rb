@@ -72,6 +72,10 @@ module Skylab::Brazen
       "#{ o[ :name ] } on #{ o[ :host ] }:#{ o[ :port ] }"
     end
 
+    def datastore_controller_via_entity _ent
+      self
+    end
+
     # ~ for create
 
     def persist_entity entity, _event_receiver

@@ -967,6 +967,10 @@ module Skylab::Headless
         @abbrev_box.merge! h ; nil
       end
       attr_reader :abbrev_box
+
+      def plural_noun
+        NLP::EN::Part_Of_Speech::Plural_noun__
+      end
     end
     @abbrev_box = {}
 
@@ -1057,8 +1061,13 @@ module Skylab::Headless
     end
 
     as :plural do
-      "#{ @lemma }s"
+      if ENDS_IN_Y__ =~ @lemma
+        @lemma.sub ENDS_IN_Y__, 'ies'
+      else
+        "#{ @lemma }s"
+      end
     end
+    ENDS_IN_Y__ = /y\z/i
 
     lexicon do |lexicn|
 
@@ -1202,6 +1211,29 @@ module Skylab::Headless
       @a = meh
     end
   end
-
   # END
+
+  module NLP::EN
+    module Part_Of_Speech
+
+      class Plural_noun__
+
+        Callback_::Actor[ self, :properties,
+          :lemma, :count ]
+
+        def initialize
+          @count = nil
+          super
+        end
+
+        def execute
+          if ! @count || 1 == @count
+            @lemma
+          else
+            POS::Noun[ @lemma ].plural
+          end
+        end
+      end
+    end
+  end
 end

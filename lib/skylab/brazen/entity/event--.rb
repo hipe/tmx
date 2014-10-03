@@ -48,7 +48,8 @@ module Skylab::Brazen
         end
 
         private :new  # #note-045
-      end
+
+      end # >>
 
       def initialize & p
         instance_exec( & p )
@@ -71,6 +72,9 @@ module Skylab::Brazen
       end
 
       attr_reader :message_proc, :terminal_channel_i
+
+      def verb_lexeme
+      end
 
       def dup_with * x_a, & p  # #note-25
         dup.init_copy_via_iambic_and_message_proc x_a, p
@@ -453,10 +457,10 @@ module Skylab::Brazen
       module WRAP__
         class << self
           def exception *a
-            Event_::Wrappers__::Exception.execute_via_arglist a
+            Event_::Wrappers__::Exception.via_arglist a
           end
           def signature *a
-            Event_::Wrappers__::Signature.execute_via_arglist a
+            Event_::Wrappers__::Signature.via_arglist a
           end
         end
       end
