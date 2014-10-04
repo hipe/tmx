@@ -4,7 +4,7 @@ module Skylab::TestSupport
 
     def initialize
       @debug = @debug_IO = nil
-      @line_a = [ ] ; @line_filter_p_a = nil
+      @line_a = [ ] ; @line_map_p_a = nil
       @k_a = [] ; @stream_h = { } ; nil
     end
 
@@ -69,21 +69,25 @@ module Skylab::TestSupport
   private
 
     def build_spy_for name_x, & init_p
+
       downstream_IO = TestSupport_::Library_::StringIO.new
-      filter = TestSupport_::Lib_::IO[]::Interceptors::Filter.new downstream_IO
-      filter.line_end = -> do
-        downstream_IO.rewind
-        str = downstream_IO.string.dup  # you gotta
-        downstream_IO.truncate 0
-        @line_filter_p_a and str = @line_filter_p_a.reduce( str ) { |x, p| p[x] }
-        line = Line__.new name_x, str
-        if @debug and @debug.condition_p[]
-          @debug.emit_line_p[ line ]
-        end
-        @line_a.push line ; nil
-      end
-      spy = IO::Spy.new  # not a standard one! we do things differently
-      spy[ :line_emitter ] = filter
+
+      _filter = TestSupport_::Lib_::IO[]::Interceptors::Filter.new(
+        :downstream_IO, downstream_IO,
+        :line_end_proc, -> do
+          downstream_IO.rewind
+          s = downstream_IO.string.dup  # you gotta
+          downstream_IO.truncate 0
+          @line_map_p_a and s = @line_map_p_a.reduce( s ) { |x, p| p[x] }
+          line = Line__.new name_x, s
+          if @debug and @debug.condition_p[]
+            @debug.emit_line_p[ line ]
+          end
+          @line_a.push line ; nil
+        end )
+
+      spy = IO::Spy.new :nonstandard
+      spy[ :line_emitter ] = _filter
       init_p and init_p[ spy ]
       spy
     end
@@ -133,11 +137,11 @@ module Skylab::TestSupport
     #
     Debug__ = ::Struct.new :condition_p, :emit_line_p
 
-    def add_line_filter p  # when a line is resolved to be added to '@line_a'
+    def add_line_map_proc p  # when a line is resolved to be added to '@line_a'
       # send the string to all such 'p' in the order they were received
       # in a reduce operation such that each next 'p' receives the result of
       # the previous 'p'. the final result will be added to '@line_a'.
-      ( @line_filter_p_a ||= [] ).push p
+      ( @line_map_p_a ||= [] ).push p
     end
 
     def unzip  # goofy fun. result: 2 parallel arrays: names and strings

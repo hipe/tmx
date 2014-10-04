@@ -8,4 +8,13 @@ module Skylab::TanMan::TestSupport::Models::Starter
 
   extend TestSupport_::Quickie
 
+  NEWLINE_ = NEWLINE_
+
+  module InstanceMethods
+
+    def cfn
+      CONFIG_FILENAME___
+    end
+    CONFIG_FILENAME___ = 'local-conf.d/config'.freeze
+  end
 end

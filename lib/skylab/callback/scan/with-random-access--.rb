@@ -48,6 +48,13 @@ module Skylab::Callback
         i_a.map( & method( :fetch ) )
       end
 
+      def at_position d
+        while ! @done && @d < d
+          at_unknown_index @d + 1
+        end
+        @h.fetch @a.fetch d
+      end
+
       def [] i
         fetch i do end
       end

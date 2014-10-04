@@ -33,7 +33,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
         send accessor # #kick #refactor
         box = send box_const
         ns = Bleeding::Namespace::Inferred.new box # #app-refactor
-        live = ns.build Callback_TestSupport_::Call_Digraph_Listeners_Spy.new.debug! # #app-refactor
+        live = ns.build Callback_TestSupport_::Call_Digraph_Listeners_Spy.new( :debug )
         kls = live.fetch action_token
         once = -> { kls }
         kls
@@ -69,11 +69,8 @@ module Skylab::Porcelain::TestSupport::Bleeding
     end
 
     def emit_spy
-      @emit_spy ||= begin
-        es = Callback_TestSupport_::Call_Digraph_Listeners_Spy.new
-        es.do_debug_proc = -> { do_debug }
-        es
-      end
+      @emit_spy ||= Callback_TestSupport_::Call_Digraph_Listeners_Spy.new(
+        :do_debug_proc, -> { do_debug } )
     end
   end
 end

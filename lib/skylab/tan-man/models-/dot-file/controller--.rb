@@ -260,7 +260,7 @@ module Skylab::TanMan
 
           def receive_rewritten_datastore_controller o
             @output_string.replace o.graph_sexp.unparse
-            ACHEIVED_
+            ACHIEVED_
           end
         end
 

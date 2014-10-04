@@ -1,49 +1,72 @@
-module Skylab::MetaHell
+module Skylab::Callback
 
-  class Proxy::Tee < ::BasicObject  # construct a tee like you would a struct
+  module Proxy
 
-    class << self
-      alias_method :metahell_original_new, :new
-    end
+    class Tee < ::BasicObject
 
-    next_id = -> do
-      id = 0
-      -> { id += 1 }
-    end.call
+      class << self
 
-    define_singleton_method :new do |method, * method_a, & cls_p |
+        alias_method :orig_new, :new
 
-      method_a.unshift method ; method = nil  # just for the syntax above.
-      method_a.freeze
-
-      ::Class.new( self ).class_exec do
-
-        class << self
-          alias_method :new, :metahell_original_new
+        def new * i_a, & p
+          via_arglist_and_proc i_a, p
         end
 
-        method_a.each do |m|
-          define_method m do |*a, &b|
-            @mux.dispatch m, a, b
+        def via_arglist a
+          via_arglist_and_proc a, nil
+        end
+
+        def via_arglist_and_proc _I_A_, cls_p
+
+          _I_A_.freeze
+
+          ::Class.new( self ).class_exec do
+
+            class << self
+              alias_method :new, :orig_new
+            end
+            define_singleton_method :method_names do
+              _I_A_
+            end
+
+            _I_A_.each do |i|
+              define_method i do | * x_a, & p |
+                @muxer.mux i, x_a, p
+              end
+            end
+
+            _TEE_ID_ = Next_id__[]
+            desc_p = -> do
+              "#<#{ name }:(tee #{ _TEE_ID_ })>"
+            end  # basic objects don't respond to `class`, basic objects don't care
+
+            define_method :initialize do
+              @muxer = Muxer__.new desc_p
+            end
+
+            _H_ = nil
+            define_method :respond_to? do |i|  # because we don't have `class`
+              _H_ ||= ::Hash[ _I_A_.map { |i_| [ i_, nil ] } ]
+              _H_.key? i
+            end
+
+            cls_p and class_exec( & cls_p )
+
+            self
           end
         end
 
-        define_singleton_method :method_names do
-          method_a
-        end
+        Next_id__ = -> do
+          id = 0
+          -> { id += 1 }
+        end.call
 
-        kls = self                # basic object don't respond to `class`
-                                  # basic object don't care
+      end # >>
 
-        define_method :initialize do |*a|
-          @mux = Proxy::Tee::Mux.new self, kls, next_id[], a
-        end
-
-        cls_p and class_exec( & cls_p )
-
-        self
+      def nil?  # if you are proxying to actual nil, go somewhere else
+        false
       end
-    end
+
 
     # as a compromise for readable code and easier debugging, we make it
     # hard for you to proxy out the following methods. alternatives include
@@ -52,74 +75,48 @@ module Skylab::MetaHell
     # were deemed unideal attotw.
     #
 
-    def [] k
-      @mux[k]
-    end
+      def [] i
+        @muxer.fetch i
+      end
 
-    def []= k, v
-      @mux[k] = v
-    end
-                                  # we will assume you don't want to proxy-
-    def to_s                      # out calls to to_s, and if you did you could
-      @mux.to_s
-    end
+      def []= i, x
+        @muxer.add i, x
+      end
 
-    alias_method :inspect, :to_s  # (makes errors more traceable)
+      def to_s
+        @muxer.description
+      end
 
-    def method sym
-      ::Proc.new do |*a, &b|
-        __send__ sym, *a, &b      # sorry, it is the best i can do
-      end                         # on short notice
-    end
-  end
+      alias_method :inspect, :to_s  # (makes errors more traceable)
 
-  class Proxy::Tee::Mux           # (internal dispatcher for proxy tee)
-
-    def [] k
-      @box.fetch k
-    end
-
-    def []= k, v                  # wrapper for non-clobbering store of a
-      @box.add k, v               # downstream
-      v
-    end
-
-    def dispatch method, args, func
-      res = seen = nil
-      @box.each do |x|            # (if the receiver is a ::BasicObject it
-        r = x.__send__ method, *args, &func # won't have plain old `send`)
-        seen ||= begin
-          res = r
-          true
+      def method i
+        -> * a, & p do
+          __send__ i, * a, & p
         end
       end
-      res
-    end
 
-    def to_s
-      "#<#{ @tee_class.to_s }:(tee #{ @tee_id })>"
-    end
+      class Muxer__ < Box
 
-  private
+        def initialize desc_p
+          super()
+          @desc_p = desc_p
+        end
 
-    def initialize tee, tee_class, tee_id, tee_args  # mutates tee_args
-      @tee, @tee_class, @tee_id = tee, tee_class, tee_id
-      @box = MetaHell_::Formal::Box.new
-      class << @box
-        public :fetch, :add
-      end
-      process_tee_args tee_args
-    end
+        def description
+          @desc_p.call
+        end
 
-    def process_tee_args a  # mutates tee args
-      if a.length.nonzero? and a.respond_to? :each
-        h = a.pop
-        h.each do |k, v|
-          @box.add k, v
+        def mux meth_i, a, p
+          d = -1 ; last = @a.length - 1
+          if d < last
+            first_x = @h.fetch( @a.fetch d += 1 ).__send__ meth_i, * a, & p
+          end
+          while d < last
+            @h.fetch( @a.fetch d += 1 ).__send__ meth_i, * a, & p
+          end
+          first_x
         end
       end
-      raise ::ArgumentError, "(#{ a.length + 1} for 1)" if a.length.nonzero?
-      nil
     end
   end
 end

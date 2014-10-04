@@ -8,9 +8,9 @@ module Skylab::Face::TestSupport::Plugin::Host::Proxy
 
   Face = ::Skylab::Face
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[fa] Plugin::Host::Proxy" do
     context "using `Face::Plugin::Host::Proxy`" do

@@ -78,7 +78,7 @@ module Skylab::TanMan::TestSupport::Models
 
     # ~ tmpdir
 
-    def prepare_ws_tmpdir s
+    def prepare_ws_tmpdir s=nil
       td = TestLib_::Tmpdir[]
       if do_debug
         if ! td.be_verbose
@@ -88,8 +88,14 @@ module Skylab::TanMan::TestSupport::Models
         self._IT_WILL_BE_EASY
       end
       td.prepare
-      td.patch s
+      if s
+        td.patch s
+      end
       @ws_tmpdir = td ; nil
+    end
+
+    def ws_tmpdir  # hacks
+      TestLib_::Tmpdir[]
     end
 
     # ~ output_s

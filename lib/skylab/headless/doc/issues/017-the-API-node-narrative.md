@@ -1,9 +1,12 @@
-# the API node narrative
+# the API node narrative  :[#017]
+
+(EDIT: [#br-049] takes what we learned from this and repalces it)
 
 broadly this is an experimental reconception of the [fa] API API, one that
 takes what we learned from there and tries to pare it down to have fewer
 moving parts. however this one was only distilled out of one small-sized
 application (f2tt) and so is not yet poised to replace [fa] whole hog.
+
 
 
 
@@ -53,5 +56,5 @@ off of that, otherwise base it off of where the enhancement came from.
 
 ## :#storypoint-30
 
-for reasons of simplicity, we use [#sl-134] "iambic" arrays as the request
+for reasons of simplicity, we use [#cb-046] "iambic" arrays as the request
 structure throughout this facility.

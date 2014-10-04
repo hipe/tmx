@@ -167,7 +167,6 @@ module Skylab::Face::TestSupport::CLI::Client::API_Integration::WNS
       end
 
       it '4 deep, corres api action, takes some params' do
-        debug!
         r = invoke 'gee', 'hee', 'jee', 'moon'
         r.should eql( "nice work sailor: moon" )
       end

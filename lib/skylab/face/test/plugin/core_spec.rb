@@ -1046,7 +1046,7 @@ module Skylab::Face::TestSupport::Plugin
       end
     end
 
-    TestSupport::Coverage::Muncher.munch '--cover', ::STDERR,
+    TestSupport_::Coverage::Muncher.munch '--cover', ::STDERR,
       -> do
         Face::Plugin.dir_pathname.to_s
       end, ::ARGV

@@ -36,22 +36,45 @@ instead to an IO::Spy that has as its only child member (listener) a :buffer
 that is a (e.g) ::StringIO. then in your test assertion ensure that the data
 in the buffer (::StringIO) is what you expect.
 
-IO::Spy objects with such a configuration are so common that a convenience
-method is provided that creates one such IO::Spy object: `IO::Spy.standard`
+IO::Spy objects with such a configuration are so common that using the
+`new` class method will build on such IO::Spy object.
 
   #todo example here using doc-test
 
-calling debug! on your IO::Spy is another convenience 'macro' that simply adds
-$s-tderr to the list of child listeners. this is essential when you are
-developing a new test or perhaps debugging a red one and you want to see
-real-time output of what data the stream is receiving. not that because
-the IO spy is at its core a multiplexer, whether or not you 'debug!' *should*
-have no effect on the data written to the buffer that you will test against.
 
-#todo - whether this is on the one hand a pure tee or on the other always
-consisting of at least an IO buffer, it is confusing and showing strain.
-survey if ever we do not make a s.s that is standard, and if not then bake it
-in and if so then subclass.
+
+## debugging options (:#note-030)
+
+during development, debugging or building a test; having the ability to
+see what is being written to a stream in real-time is sometimes
+essential. indeed this is part of the intended meaning in our word
+choice of "spy".
+
+the typical way we implement a "debug mode" for test insturment is by
+passing a `do_debug` boolean value and a `debug_IO` stream, and
+conditionally outputting messages of interest to the debug stream
+whenever an event of interest occurs and `do_debug` is true.
+
+here we take it one step further: we support a `do_debug_proc`: whenever
+an event of interest occurs, the proc is called. the true-ish-ness of
+the result determines whether the event of interest is written to the
+debug stream.
+
+so note that with this technique as opposed to the previous one,
+"debug mode" (as it were) can be effectively turned on or off during
+the lifetime of the test insturment, which may be useful to help zero-in
+on a problem spot during an especially noisy behavior.
+
+now, given that this is a multiplexer that muxes out to multiple
+IO-like streams already, it is too convenient not to leverage this
+facility to implement our debugging, simply by adding the `debug_IO` to
+be one of the downstreams of the muxer.
+
+so what we do is use the IO filter, wrapped *around* the debug IO, and
+we use the `do_debug_proc` to effectively turn the fitler "on" or "off"
+based on whether debugging is on or off at that moment.
+
+
 
 
 ## advantages that this holds over simpler alternatives ..

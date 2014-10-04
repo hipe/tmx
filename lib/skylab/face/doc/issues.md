@@ -70,12 +70,12 @@
 [#013]       #doc-point #parent:005 #initials:mf
                metafields are the light, they are the way ..
 [#012]       #doc-point the sacred four explained #parent:005
-[#011]       #doc-node the API top node narrative ..
+[#011]       #doc-node the [fa] top node narrative ..
                (formerly what became #it-003])
 [#010]       #doc-point modality clients vs. modal clients ..
 [#009] #hm   magic with allowing either CLI or CLI::Client for the client.
 [#008]       #doc-point expression templates (#i18n)..
-[#007]       #parent-node:[#011] the API library #initials:`api` ..
+[#007]       #parent-node:[#011] the API library #initials:`api`
 [#006]       #parent-node:[#011] CLI (API) revelation integration
 [#005]       #parent-node:[#011] introducing the entity library #initials:`el` ..
 [#004]       argument error hack

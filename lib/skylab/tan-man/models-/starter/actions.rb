@@ -10,13 +10,20 @@ module Skylab::TanMan
 
     end ]
 
-    RELPATH__ = 'data-documents/starters'.freeze
-
     class << self
       def collection_controller
         Collection_Controller__
       end
+
+      def dir_pn_instance
+        @dpn ||= TanMan_.dir_pathname.join RELPATH__
+      end
+
+      def write * x_a
+        Starter_::Actors__::Write.via_iambic x_a
+      end
     end
+    RELPATH__ = 'data-documents/starters'.freeze
 
     Actions = make_action_making_actions_module
 
@@ -30,6 +37,26 @@ module Skylab::TanMan
 
       Ls = make_action_class :List
 
+      class Get < Action_
+
+        use_workspace_as_datastore_controller
+
+        Entity_::Add_check_for_missing_required_properties[ self ]
+
+        include Brazen_.model.retrieve_methods
+
+        def produce_any_result
+          send_one_entity
+        end
+      end
+    end
+
+    def to_path
+      to_pathname.to_path
+    end
+
+    def to_pathname
+      @pn ||= Starter_.dir_pn_instance.join property_value :name
     end
 
     class Collection_Controller__ < Brazen_.model.collection_controller
@@ -51,7 +78,7 @@ module Skylab::TanMan
           fly = Starter_.new_flyweight evr, @kernel
           props = fly.properties
 
-          base_pn = TanMan_.dir_pathname.join RELPATH__
+          base_pn = Starter_.dir_pn_instance
           _pn_a = base_pn.children false
 
           scan = Scan_[].nonsparse_array( _pn_a ).map_reduce_by do |pn|

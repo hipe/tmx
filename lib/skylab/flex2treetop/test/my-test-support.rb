@@ -4,7 +4,6 @@ require 'skylab/test-support/core'
 module Skylab::Flex2Treetop::MyTestSupport
 
   Flex2Treetop = ::Skylab::Flex2Treetop
-  IO_Spy = ::Skylab::TestSupport::IO::Spy
   MyTestSupport = self
   Skylab_Headless = ::Skylab::Headless
   TestSupport = ::Skylab::TestSupport

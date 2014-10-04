@@ -132,11 +132,5 @@ module Skylab::Face::TestSupport::API::Normalizer_
     def build cls=agent_class
       cls.new infostream
     end
-
-    attr_reader :do_debug
-
-    def debug!
-      @do_debug = true
-    end
   end
 end

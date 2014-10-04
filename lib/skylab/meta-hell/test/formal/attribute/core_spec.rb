@@ -220,10 +220,9 @@ module ::Skylab::MetaHell::TestSupport::Formal::Attribute
       end
 
       def build_and_attach_to_emit_spy
-        es = MetaHell::Library_::Callback::Test::Call_Digraph_Listeners_Spy.new do |es_|
-          es_.debug_IO = debug_IO
-          es_.do_debug_proc = -> { do_debug }
-        end
+        es = MetaHell::Library_::Callback::Test::Call_Digraph_Listeners_Spy.new(
+          :do_debug_proc, -> { do_debug },
+          :debug_IO, debug_IO )
         @em_a = es.emission_a
         es
       end

@@ -24,5 +24,11 @@ module Skylab::Headless::TestSupport::IO::Interceptors
         tee.write('a')
       end
     end
+
+    it "responds to respond_to? appropriately (based on the list)" do
+      tee = Headless_::IO::Interceptors::Tee.new
+      tee.respond_to?( :foo ).should eql false
+      tee.respond_to?( :puts ).should eql true
+    end
   end
 end

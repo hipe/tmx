@@ -1,51 +1,148 @@
 module Skylab::Headless
 
-  class IO::Interceptors::Filter  # :[#159]
+  module IO
+
+    module Interceptors
+
+      class Filter  # :[#159]
 
     # intercept write-like messages intended for an ::IO, but do something
     # magical with the content. Don't forget to call flush! at the end.
 
-    include Headless::IO::Interceptors::Tee::Is_TTY_Instance_Methods
+        Headless_::Lib_::Entity[ self, -> do
 
-    def initialize downstream_IO
-      @check_for_line_boundaries = nil
-      @down_IO = downstream_IO
-      @line_begin_p = @line_end_p = nil
-      @prev_was_NL = true ; @puts_wrap_p_a = nil
-    end
+          o :iambic_writer_method_name_suffix, :'='
 
-    def downstream_IO
-      @down_IO
-    end
+          def line_begin_string=
+            s = iambic_property
+            s and set_line_begin_proc -> { @downstream_IO.write s }
+          end
 
-    def puts *a  # route everything through write()
+          def line_begin_proc=
+            p = iambic_property
+            p and set_line_begin_proc p
+          end
+
+          def line_end_proc=
+            p = iambic_property
+            p and set_line_end_proc p
+          end
+
+          def puts_map_proc=
+
+            # each data passed to puts will first be run through each filter
+            # in the order received in a reduce operation, the result being
+            # what is finally passed to puts
+
+            p = iambic_property
+            p and ( @puts_map_p_a ||= [] ).push p
+          end
+
+          o :properties,
+            :downstream_IO,
+            :niladic_pass_filter_proc
+
+        end ]
+
+        include Interceptors_::Tee::Is_TTY_Instance_Methods
+
+        def initialize * x_a
+
+          @check_for_line_boundaries = @line_begin_p = @line_end_p =
+            @niladic_pass_filter_proc = @puts_map_p_a = nil
+
+          @prev_was_NL = true
+
+          if 1 == x_a.length
+            x_a.unshift :downstream_IO
+          end
+
+          process_iambic_fully x_a
+
+          @niladic_pass_filter_proc ||= NILADIC_TRUTH_
+
+        end
+
+        def downstream_IO
+          @downstream_IO
+        end
+
+        %i( close closed? rewind truncate ).each do |i|
+          define_method i do |*a|
+            if @downstream_IO.respond_to? i
+              @downstream_IO.send i, *a
+            end
+          end
+        end
+
+        def puts *a
+          if do_pass
+            do_puts_via_a a
+          end
+        end
+
+        def << str
+          if do_pass
+            do_write str
+          end
+          self
+        end
+
+        def write str
+          if do_pass
+            do_write str
+          else
+            "#{ str }".length
+          end
+        end
+
+      private
+
+        def set_line_begin_proc p
+          set_line_proc :@line_begin_p, p ; nil
+        end
+
+        def set_line_end_proc p
+          set_line_proc :@line_end_p, p ; nil
+        end
+
+        def set_line_proc ivar, p
+          instance_variable_set ivar, p
+          @check_for_line_boundaries = true ; nil
+        end
+
+    def do_puts_via_a a
       a = a.flatten
-      a.length.zero? and a << EMPTY_STRING_
+      a.length.zero? and a.push EMPTY_STRING_
       a.each do |s|
-        if @puts_wrap_p_a
-          s = @puts_wrap_p_a.reduce( s ) { |m, p| p[ m ] }
+        if @puts_map_p_a
+          s = @puts_map_p_a.reduce( s ) { |m, p| p[ m ] }
         end
         s = s.to_s
-        NL__ == s[ -1 ] or s = "#{ s }#{ NL__ }"
-        write s
-      end ; nil  # per ::IO#puts, but consider it undefined.
+        if NEWLINE_CHAR__ != s.getbyte( -1 )
+          s = "#{ s }#{ NEWLINE_ }"
+        end
+        do_write s  # route everything through write()
+      end
+      nil  # per ::IO#puts, but consider it undefined.
     end
+    NEWLINE_CHAR__ = "\n".getbyte 0
 
-    def write str
+    def do_write str
       begin
         if str.length.zero? || ! @check_for_line_boundaries
-          break(( r = @down_IO.write str ))
+          break(( length = @downstream_IO.write str ))
         end
         was_NL = @prev_was_NL
-        @prev_was_NL = NL__ == str[ -1 ]
-        a = str.split NL__, -1
+        @prev_was_NL = NEWLINE_ == str[ -1 ]
+        a = str.split NEWLINE_, -1
         last_d = a.length - 1
         a.each_with_index do |s, d|
           is_not_first = d.nonzero?
           is_not_last = last_d != d
           has_width = s.length.nonzero?
           if is_not_first
-            @down_IO.write NL__
+            @downstream_IO.write NEWLINE_
             @line_end_p and @line_end_p[]
           end
           if is_not_first || was_NL and
@@ -53,47 +150,18 @@ module Skylab::Headless
             @line_begin_p[]
           end
           if has_width
-            @down_IO.write s
+            @downstream_IO.write s
           end
         end
-        r = str.length
+        length = str.length
       end while nil
-      r
-    end
-    alias_method :<<, :write
-
-    NL__ = "\n".freeze  # not #DOS-line-endings
-
-    def line_begin_string= s
-      self.line_begin_proc = -> { @down_IO.write s } ; s
+      length
     end
 
-    def line_begin_proc= p
-      add_line_hndlr :@line_begin_p, p ; p
-    end
+        NEWLINE_ = "\n".freeze  # not #DOS-line-endings
 
-    def puts_filter! p # each data passed to puts will first be run
-      # through each filter in the order received in a reduce operation,
-      # the result being what is finally passed to puts
-      (( @puts_wrap_p_a ||= [] )) << p ; nil
-    end
-
-    def line_end= p
-      add_line_hndlr :@line_end_p, p ; p
-    end
-
-  private
-    def add_line_hndlr ivar, p
-      instance_variable_get( ivar ).nil? or raise "#{ ivar } is write-once"
-      instance_variable_set ivar, p
-      @check_for_line_boundaries = true ; nil
-    end
-  public
-
-    %i( close closed? rewind truncate ).each do |i|
-      define_method i do |*a|
-        if @down_IO.respond_to? i
-          @down_IO.send i, *a
+        def do_pass
+          @niladic_pass_filter_proc.call
         end
       end
     end

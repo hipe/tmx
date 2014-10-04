@@ -9,7 +9,7 @@ module Skylab::TanMan
   Autoloader_[ self ]
 
   Brazen_ = ::Skylab::Brazen
-  ACHEIVED_ = true
+  ACHIEVED_ = true
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze

@@ -1,12 +1,15 @@
 module Skylab::Headless
 
-  class IO::Interceptors::Chunker
+  module IO
+
+  module Interceptors
+
+  class Chunker
 
     # chunker - scan each write of data and call_digraph_listeners it in chunks based on separator
 
-    def flush                     # call_digraph_listeners out any remaining data. any data
-                                  # in the buffer got there thru write and
-                                  # so it is guaranteed not to have newlines.
+    def flush  # send any remaining data. any data in the buffer got there
+      # through write and so is "guaranteed" not to have newlines.
       string = flush_both
       if string.length.nonzero?
         @scn.string = EMPTY_STRING_
@@ -50,5 +53,10 @@ module Skylab::Headless
       end while line
       nil
     end
+  end
+
+    Interceptors_ = self
+
+  end
   end
 end

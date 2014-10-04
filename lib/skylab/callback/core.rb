@@ -382,7 +382,7 @@ module Skylab::Callback
     end
   end
 
-  class Iambic_Scanner__
+  class Iambic_Scanner__  # :[#046]
 
     def initialize d, x_a
       @d = d ; @x_a = x_a ; @x_a_length = @x_a.length

@@ -102,7 +102,7 @@ module Skylab::Treemap
       str.to_s.gsub deny_rx, ''
     end
 
-    Plugins::R::API::Actions::Render::Tees_LTLT = MetaHell::Proxy::Tee.new :<<
+    Plugins::R::API::Actions::Render::Tees_LTLT = Callback_.tee.new :<<
 
     define_method :generate_script do         # just as a fun excercize we
                                               # separate how the lines are used

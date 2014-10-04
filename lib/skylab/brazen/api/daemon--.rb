@@ -1,16 +1,8 @@
 module Skylab::Brazen
 
-  module API
+  module API  # see [#050]
 
     class << self
-
-      def expression_agent_class
-        const_get :Expression_Agent__, false
-      end
-
-      def expression_agent_instance
-        @expag ||= expression_agent_class.new application_kernel
-      end
 
       def exit_statii
         Exit_statii__[]
@@ -18,6 +10,10 @@ module Skylab::Brazen
 
       def module_methods
         MM__
+      end
+
+      def expression_agent_instance  # #note-015
+        @expag ||= expression_agent_class.new application_kernel
       end
     end
 
@@ -46,6 +42,10 @@ module Skylab::Brazen
 
       def debug_IO
         @debug_IO ||= Lib_::HL__[]::System::IO.some_stderr_IO
+      end
+
+      def expression_agent_class
+        const_get :Expression_Agent__, false
       end
 
       self

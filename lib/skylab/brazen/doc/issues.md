@@ -1,12 +1,16 @@
+[#052]       #feature-tracker `path_hack`
+[#051]       #parent-node: [#050]
+[#050]       #doc-node the API narrative ..
+[#049]       #parent-node: [#cb-046] case study: iambic ordering hacks
 [#048]       #parent-node: [#024] "#action-preconditions.."
 [#047]       #parent-node: [#013] the model entity narrative
 [#046] #open so fragile this hack (entity properties to action props)
 [#045]       #tracking-tag when we wish we had meta-property reflection
-[#044] #open graph has an action so maybe we don't need to pass it everywhere
+[#044]       #done graph has an action so maybe we don't need to pass it everywhere
 [#043]      #tracking-tag loading hacks
 [#042]       #done make persit entity interface symmetrical with delete entity
 [#041]       #done rename "collections controller" to "silo controller"
-[#040] #open supplying nil as literal value
+[#040] #open in git-config, for set value, nil as literal value is undefined
 [#039]       #tracking-tag whether and where we change case of env vars
 [#038]       #parent-node: [#010] the couch datastore narrative ..
 [#037]       #parent-node: [#028] thoughts on unmarshalling with normalizaiton
@@ -36,7 +40,7 @@
 [#016]       #parent-node: [#013] the inferred inflection narrative ..
 [#015]       #doc-node: the kernel narrative ..
 [#014] #open `has_custom_moniker` is a smell to exist in entity.
-[#013]       #doc-node: the model
+[#013]       #parent-node: [#025] the model
 [#012]       #spot #in-situ
 [#011]       #parent-node: [#001] the event narrative ..
 [#010]       #doc-node: data stores

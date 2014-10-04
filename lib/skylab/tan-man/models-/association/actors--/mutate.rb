@@ -27,7 +27,7 @@ module Skylab::TanMan
         @stmt_list = @datastore.graph_sexp.stmt_list
         if @stmt_list
           @scan = @stmt_list.to_scan
-          ACHEIVED_
+          ACHIEVED_
         elsif :delete == @verb
           when_no_stmt_list
         else
@@ -51,7 +51,7 @@ module Skylab::TanMan
         ok = rslv_from_node
         ok &&= rslv_to_node
         if ok
-          ACHEIVED_
+          ACHIEVED_
         else
           @result = ok
         end
@@ -59,12 +59,12 @@ module Skylab::TanMan
 
       def rslv_from_node
         @from_node = @touch_node_p.with :name, @from_node_label
-        @from_node and ACHEIVED_
+        @from_node and ACHIEVED_
       end
 
       def rslv_to_node
         @to_node = @touch_node_p.with :name, @to_node_label
-        @to_node and ACHEIVED_
+        @to_node and ACHIEVED_
       end
 
       def node_verb_when_touch
@@ -79,7 +79,7 @@ module Skylab::TanMan
         @least_greater_edge_stmt = nil
         @greatest_lesser_edge_stmt = nil
         @matched_stmt = nil
-        ok = ACHEIVED_
+        ok = ACHIEVED_
         snid_s = @from_node.node_id.id2name
         tnid_s = @to_node.node_id.id2name
         while stmt_list = @scan.gets
@@ -118,7 +118,7 @@ module Skylab::TanMan
 
       def when_same_when_delete stmt
         @matched_stmt = stmt
-        ACHEIVED_
+        ACHIEVED_
       end
 
       def send_found_existing_event stmt
@@ -168,7 +168,7 @@ module Skylab::TanMan
       def via_named_protos_resolve_prototype
         @prototype = @named_protos[ @prototype_i ]
         if @prototype
-          ACHEIVED_
+          ACHIEVED_
         else
           when_no_proto
         end
@@ -188,14 +188,14 @@ module Skylab::TanMan
           proto = np[ :edge_stmt ]
         end
         if proto
-          @prototype = proto ; ACHEIVED_
+          @prototype = proto ; ACHIEVED_
         else
           resolve_hardcoded_prototype
         end
       end
 
       def resolve_hardcoded_prototype
-        @prototype = Proto__[ @parser ] and ACHEIVED_
+        @prototype = Proto__[ @parser ] and ACHIEVED_
       end
 
       Proto__ = -> do
@@ -223,7 +223,7 @@ module Skylab::TanMan
         if @attrs
           add_attrs_to_edge_stmt
         else
-          ACHEIVED_
+          ACHIEVED_
         end
       end
 
@@ -234,7 +234,7 @@ module Skylab::TanMan
 
       def in_edge_stmt_produce_attr_list
         if @edge_stmt[ :attr_list ]
-          ACHEIVED_
+          ACHIEVED_
         else
           to_edge_stmt_add_attr_list
         end
@@ -247,7 +247,7 @@ module Skylab::TanMan
         atl = @parser.parse :attr_list, '[]'
         atl[ :content ] = ale
         @edge_stmt[ :attr_list ] = atl
-        ACHEIVED_
+        ACHIEVED_
       end
 
       def via_edge_stmt_make_association
@@ -258,7 +258,7 @@ module Skylab::TanMan
           y << "created association: #{ o.edge_stmt.unparse }"
         end
         @result = send_event _ev
-        ACHEIVED_
+        ACHIEVED_
       end
 
       # ~ delete

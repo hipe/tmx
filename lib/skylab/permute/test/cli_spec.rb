@@ -3,19 +3,27 @@ require 'skylab/callback/test/test-support'  # keep here until needed elsewhere
 
 module Skylab::Permute::TestSupport::CLI  # (was [#ts-010])
 
-  include ::Skylab::Permute::TestSupport
+  ::Skylab::Permute::TestSupport[ TS_ = self ]
+
+  include CONSTANTS
+
+  Permute_ = Permute_
+  TestLib_ = TestLib_
 
 describe "[pe] CLI" do
+
+  extend TS_
 
   before :all do  # just a bad idea all around, but we want to see how it goes
     cli = Permute_::CLI.new
     cli.program_name = 'permoot'
-    spy = TestLib_::Spy[].new
+    spy = TestLib_::Spy[].new(
+      :debug_IO, debug_IO,
+      :do_debug_proc, -> { do_debug } )
     cli.singleton_class.send(:define_method, :call_digraph_listeners) do |type, payload|
       spy.call_digraph_listeners(type, payload)
     end
     @cli = cli ; @spy = spy
-    # spy.debug!
   end
 
   after { @spy.clear! } # you are so dumb

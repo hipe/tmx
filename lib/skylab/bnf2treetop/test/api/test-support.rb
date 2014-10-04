@@ -7,7 +7,6 @@ module Skylab::Bnf2Treetop::API::TestSupport
     end
   end
   module InstanceMethods
-    IO_Spy = ::Skylab::TestSupport::IO::Spy
 
     attr_reader :info
 

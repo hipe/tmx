@@ -104,7 +104,7 @@ module Skylab::TanMan  # (leave extra whitespacing below for [#bs-010])
     end
 
     rx = Headless::CLI::PathTools::FUN::ABSOLUTE_PATH_HACK_RX
-    define_method :gsub_path_hack do |str|
+    define_method :gsub_path_hack do |str|  # replaced by [#cb-052]
       res = str.gsub rx do
         escape_path "#{ $~[0] }" # (delegates to the modality-specific pen)
       end

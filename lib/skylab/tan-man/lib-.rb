@@ -44,6 +44,10 @@ module Skylab::TanMan
       HL__[]::System::IO.some_stderr_IO
     end
 
+    String_IO = memoize[ -> do
+      require 'stringio' ; ::StringIO
+    end ]
+
     String_scanner = memoize[ -> do
       require 'strscan' ; ::StringScanner
     end ]

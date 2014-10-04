@@ -9,7 +9,7 @@ module Skylab::Basic
       end
 
       def from_path path
-        new :pathanme, ( path ? ::Pathname.new( path.to_s ) : path )
+        new :pathname, ( path ? ::Pathname.new( path.to_s ) : path )
       end
 
       def from_string string
@@ -95,12 +95,16 @@ module Skylab::Basic
   public
 
     def call param_h
-      get_template_string.gsub( parameter_rx ) do
-        param = normalize_matched_parameter_name $1
-        if param_h.key? param
-          param_h[ param ]
+      template_string.gsub( parameter_rx ) do
+        param_i = normalize_matched_parameter_name $1
+        had = true
+        x = param_h.fetch param_i do
+          had = false
+        end
+        if had
+          x
         else
-          parametize param
+          parametize param_i
         end
       end
     end
@@ -155,7 +159,7 @@ module Skylab::Basic
 
       seen_h = {}
 
-      scn = Basic::Lib_::String_scanner[ get_template_string ]
+      scn = Basic::Lib_::String_scanner[ template_string ]
 
       Callback_.scan do
         while ! scn.eos?
@@ -223,22 +227,12 @@ module Skylab::Basic
       "sanity - parse hack failure"
     end
 
-    def get_template_string
+    def template_string
       if @string
         @string
       else
-        @pathname or fail say_no_template_string
-        @pathname.exist? or fail say_template_file_not_found
-        @pathame.read
+        @pathname.read
       end
-    end
-
-    def say_no_template_string
-      "template has no template string."
-    end
-
-    def say_template_file_not_found
-      "template file not found: #{ @pathname.to_path }"
     end
   end
 end

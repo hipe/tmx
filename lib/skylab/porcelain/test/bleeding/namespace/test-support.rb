@@ -62,8 +62,8 @@ module Skylab::Porcelain::TestSupport::Bleeding::Namespace
         mod = _ordinary_module
         act = Bleeding::Namespace::Inferred.new mod
         tok = self.token
-        spy = Callback_TestSupport_::Call_Digraph_Listeners_Spy.new
-        spy.do_debug_proc = -> { do_debug }
+        spy = Callback_TestSupport_::Call_Digraph_Listeners_Spy.new(
+          :do_debug_proc, -> { do_debug } )
         result = act.find tok do |o|
           o.on_ambiguous { |txt| spy.call_digraph_listeners :ambiguous, txt }
           o.on_not_found { |txt| spy.call_digraph_listeners :not_found, txt }

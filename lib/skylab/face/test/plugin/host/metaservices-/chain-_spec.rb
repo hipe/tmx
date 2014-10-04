@@ -8,9 +8,9 @@ module Skylab::Face::TestSupport::Plugin::Host::Metaservices_::Chain_
 
   Face = ::Skylab::Face
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[fa] Plugin::Host::Metaservices_::Chain_" do
     context "#experimental core of the whole headless world: this proxy." do

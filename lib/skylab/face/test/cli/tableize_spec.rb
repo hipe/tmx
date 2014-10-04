@@ -8,9 +8,9 @@ module Skylab::Face::TestSupport::CLI::Tableize
 
   Face = ::Skylab::Face
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[fa] CLI::Tableize" do
     context "`tableize` - deprecated, see  [#036]" do

@@ -395,6 +395,16 @@ module Skylab::Brazen
 
     module Proprietor_Methods__
 
+      def with * x_a, & p  # look like actor
+        did = false
+        ent = new do
+          did = true
+          process_iambic_fully x_a
+          p and p[ self ]
+        end
+        did and ent.execute
+      end
+
       def properties
         @properties ||= build_props
       end

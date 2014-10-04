@@ -71,6 +71,14 @@ module Skylab::TestSupport
       MetaHell__[]::Enhance::Shell.new i_a
     end
 
+    Entity = -> * a do
+      if a.length.zero?
+        Brazen__[]::Entity
+      else
+        Brazen__[]::Entity.via_arglist a
+      end
+    end
+
     Fields_contoured = -> mod, * x_a do
       MetaHell__[]::Fields.contoured.from_iambic_and_client x_a, mod
     end

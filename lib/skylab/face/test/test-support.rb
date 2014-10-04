@@ -3,9 +3,9 @@ require_relative '../core'
 module Skylab::Face::TestSupport
 
   Face_ = ::Skylab::Face
-  TestSupport = Face_::Autoloader_.require_sidesystem :TestSupport
-  TestSupport::Regret[ self ]
-  TestSupport::Sandbox::Host[ self ]
+  TestSupport_ = Face_::Autoloader_.require_sidesystem :TestSupport
+  TestSupport_::Regret[ self ]
+  TestSupport_::Sandbox::Host[ self ]
 
   TestLib_ = ::Module.new
 
@@ -13,7 +13,7 @@ module Skylab::Face::TestSupport
     Face_ = Face_  # the new preferred way
     Face = Face_  # necessary for compat with lots of doc-test generatees
     TestLib_ = TestLib_
-    TestSupport = ::Skylab::TestSupport
+    TestSupport_ = ::Skylab::TestSupport
   end
 
   extend ( module Methods_
@@ -46,11 +46,21 @@ module Skylab::Face::TestSupport
       @child.const_set :Sandbox, Face_::Autoloader_[ ::Module.new ]
       @child::Sandbox.dir_pathname
       @child::CONSTANTS.const_set :Sandbox, @child::Sandbox
-      @child.extend TestSupport::Quickie ; nil
+      @child.extend TestSupport_::Quickie ; nil
     end
   end  # #posterity the predecessor ('Common_setup_') 1st iambic?
 
   module InstanceMethods
+
+    def debug!
+      @do_debug = true
+    end
+
+    attr_reader :do_debug
+
+    def debug_IO
+      TestSupport_.debug_IO
+    end
 
     def only_line
       a = info_lines
@@ -81,9 +91,10 @@ module Skylab::Face::TestSupport
     end
 
     def build_infostream
-      io = TestSupport::IO::Spy.standard
-      do_debug and io.debug! 'info >>> '
-      io
+      TestSupport_::IO::Spy.new(
+        :do_debug_proc, -> { do_debug },
+        :debug_IO, debug_IO,
+        :debug_prefix, 'info >>> ' )
     end
   end
 

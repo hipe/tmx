@@ -8,9 +8,9 @@ module Skylab::Face::TestSupport::CLI::Lipstick
 
   Face = ::Skylab::Face
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[fa] CLI::Lipstick" do
     context "a \"lipstick\" is an abstract rendering entity whose job it is to render" do

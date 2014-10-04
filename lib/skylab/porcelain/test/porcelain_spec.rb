@@ -36,7 +36,7 @@ module Skylab::Porcelain::TestSupport
         end
       else
         if do_debug
-          @_stderr ||= TestSupport::IO::Spy.standard.debug!
+          @_stderr ||= TestSupport::IO::Spy.new :do_debug, true, :debug_IO, debug_IO
         end
         inst = kls.new nil, _stderr, _stderr
       end

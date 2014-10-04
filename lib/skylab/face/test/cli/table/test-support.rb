@@ -10,11 +10,11 @@ module Skylab::Face::TestSupport::CLI::Table
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   Face = Face
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   Subject__ = -> { Face::CLI::Table }
 

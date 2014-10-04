@@ -1,14 +1,10 @@
 module Skylab::Headless
 
-  IO::Interceptors::Tee = Headless_::Lib_::Proxy_tee[].new(
-    :<<,
-    :close,
-    :closed?,
-    :puts,
-    :read,
-    :rewind,                      # not all IO have this, us at own risk
-    :truncate,                    # idem
-    :write ) do
+  module IO
+
+  module Interceptors
+
+  Tee = Headless_::Lib_::Proxy_tee[].via_arglist IO_::METHOD_I_A_ do
 
     # Inspired by (but probably not that similar to) Perl's IO::Tee,
     # an IO::Interceptors::Tee is a simple multiplexer that intercepts
@@ -32,9 +28,9 @@ module Skylab::Headless
     end
   end
 
-  class IO::Interceptors::Tee
+  class Tee
 
-    include (( module Is_TTY_Instance_Methods
+    include( module Is_TTY_Instance_Methods
       # Mock whether or not this stream is an interactive terminal (see `IO#tty?`)
 
       def tty!
@@ -47,6 +43,8 @@ module Skylab::Headless
       alias_method :tty?, :is_tty
 
       self
-    end ))
+    end )
+  end
+  end
   end
 end

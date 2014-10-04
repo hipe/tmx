@@ -29,7 +29,7 @@ module Skylab::Brazen
         @action = nil
         @event_receiver = nil
         @p and @p[ self ]
-        if :event_receiver == @x_a[ -2 ]
+        if :event_receiver == @x_a[ -2 ]  # :[#049] case study: ordering hacks
           @event_receiver = @x_a.pop
           @x_a[ -1, 1 ] = EMPTY_A_
         end

@@ -40,8 +40,8 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree
 
     def start_front up=nil
       f = SubTree::API::Actions::My_Tree.new
-      @o = TestSupport::IO::Spy.standard
-      @e = TestSupport::IO::Spy.standard
+      @o = TestSupport::IO::Spy.new
+      @e = TestSupport::IO::Spy.new
       if do_debug
         @o.debug! 's-tdout; '
         @e.debug! 's-tderr: '

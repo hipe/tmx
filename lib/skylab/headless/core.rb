@@ -20,11 +20,11 @@ module Skylab::Headless  # ([#013] is reserved for a core node narrative - no st
   EMPTY_A_ = [].freeze
   Headless = self
   Headless_ = self
-  Autoloader_[ IO = ::Module.new ]
   IDENTITY_ = -> x { x }
   stowaway :Lib_, 'library-'
   LINE_SEPARATOR_STRING_ = "\n".freeze
   MONADIC_TRUTH_ = -> _ { true }
+  NILADIC_TRUTH_ = -> { true }
   Scn_ = Scn = Callback_::Scn
   TERM_SEPARATOR_STRING_ = ' '.freeze
   WRITEMODE_ = 'w'.freeze

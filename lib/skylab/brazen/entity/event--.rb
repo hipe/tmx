@@ -456,10 +456,17 @@ module Skylab::Brazen
 
       module WRAP__
         class << self
-          def exception *a
-            Event_::Wrappers__::Exception.via_arglist a
+          def exception *x_a
+            case 1 <=> x_a.length
+            when  0
+              Event_::Wrappers__::Exception.with( :exception, x_a.first ).execute
+            when -1
+              Event_::Wrappers__::Exception.via_iambic( x_a ).execute
+            when  1
+              Event_::Wrappers__::Exception
+            end
           end
-          def signature *a
+          def signature * a
             Event_::Wrappers__::Signature.via_arglist a
           end
         end

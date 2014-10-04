@@ -1,6 +1,19 @@
 module Skylab::Headless
 
-  module IO::Cache
+  module IO  # ~ stowaway
+
+    METHOD_I_A_ = [
+      :<<,
+      :close,
+      :closed?,
+      :puts,
+      :read,
+      :rewind,  # not all IO have this, us at own risk
+      :truncate,  # idem
+      :write
+    ].freeze
+
+  module Cache
 
     # (we almost made an `FS` node under `IO` but held back for now..)
 
@@ -97,7 +110,7 @@ module Skylab::Headless
       define_singleton_method :build_cache_pathname_function_for do |mod, &blk|
         filename = nil
         if blk
-          Shell_.new( -> x do
+          Shell__.new( -> x do
             if fn_rx =~ x
               filename = x
             else
@@ -140,16 +153,19 @@ module Skylab::Headless
       end
     end.call
 
-    class Shell_
+    class Shell__
+
+      def initialize abbrev_p
+        @abbrev_p = abbrev_p
+      end
 
       def abbrev x
-        @abbrev[ x ]
+        @abbrev_p[ x ]
         nil
       end
-
-      def initialize abbrev
-        @abbrev = abbrev
-      end
     end
+  end
+
+    IO_ = self
   end
 end

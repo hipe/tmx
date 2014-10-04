@@ -41,7 +41,7 @@ module Skylab::TanMan
     def set_node_id node_id
       node_id.respond_to?( :id2name ) or raise say_node_id_is_not_symbol( node_id )
       self[ :node_id ][ :id ] = _parse_id node_id.id2name
-      ACHEIVED_
+      ACHIEVED_
     end
 
     def say_node_id_is_not_symbol x

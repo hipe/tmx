@@ -16,8 +16,8 @@ module Skylab::Bnf2Treetop::TestSupport
     def invoke *argv, &output_p
       ::Hash === argv.last and tags = argv.pop # BE CAREFUL!!!!
       let(:_frame) do
-        errstream = ::Skylab::TestSupport::IO::Spy.standard
-        outstream = ::Skylab::TestSupport::IO::Spy.standard
+        errstream = ::Skylab::TestSupport::IO::Spy.new
+        outstream = ::Skylab::TestSupport::IO::Spy.new
         cli = Bnf2Treetop::CLI.new(outstream, errstream)
         cli.program_name = 'bnf2treetop'
         o = ::Struct.new(:debug_p, :err_p, :out_p).new  # :+[#hl-078] "shell"

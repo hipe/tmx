@@ -92,8 +92,7 @@ module Skylab::Treemap::TestSupport::CLI
 
     define_method :stream do
       @stream ||= begin
-        Stream_.new(
-          TestSupport::IO::Spy.standard, TestSupport::IO::Spy.standard )
+        Stream_.new( TestSupport::IO::Spy.new, TestSupport::IO::Spy.new )
       end
     end
 

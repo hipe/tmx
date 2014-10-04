@@ -72,7 +72,7 @@ module Skylab::Headless
       MetaHell__[]::FUN.private_attr_reader
     end
     Proxy_tee = -> do
-      MetaHell__[]::Proxy::Tee
+      Callback_::Proxy::Tee
     end
     Reasonably_short = -> do
       MetaHell__[].strange::A_REASONABLY_SHORT_LENGTH_FOR_A_STRING

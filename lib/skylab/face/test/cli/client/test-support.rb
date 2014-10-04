@@ -5,6 +5,7 @@ module Skylab::Face::TestSupport::CLI::Client
   ::Skylab::Face::TestSupport::CLI[ TS__ = self, :flight_of_stairs ]
 
   TestLib_ = ::Module.new
+
   module CONSTANTS
     CLI_Client_TS_ = TS__
     TestLib_.include self::TestLib_
@@ -15,12 +16,14 @@ module Skylab::Face::TestSupport::CLI::Client
 
   Sandbox = ::Module.new
 
-  TestSupport::Sandbox.enhance( Sandbox ).
+  TestSupport_ = TestSupport_
+
+  TestSupport_::Sandbox.enhance( Sandbox ).
     produce_subclasses_of -> { Face_::CLI::Client }
 
   Face_ = Face_
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   def self.bundles_class
     Bundles__
@@ -36,11 +39,9 @@ module Skylab::Face::TestSupport::CLI::Client
       @child.const_set :Face_, Face_
       @child.const_set :TS__, @child
       @child.include @parent::CONSTANTS
-      @child.extend TestSupport::Quickie
+      @child.extend TestSupport_::Quickie
     end
   end
-
-  TestSupport = TestSupport
 
   module TestLib_
     CLI_unstyle_proc = -> do
@@ -165,17 +166,11 @@ module Skylab::Face::TestSupport::CLI::Client
     end.call
 
     let :io_spy_triad do
-      t = TestSupport::IO::Spy::Triad.new nil  # making a fake stdin is on u
+      t = TestSupport_::IO::Spy::Triad.new nil  # making a fake stdin is on u
       if do_debug
         t.debug!
       end
       t
-    end
-
-    attr_reader :do_debug
-
-    def debug!
-      @do_debug = true
     end
 
     def only_line
@@ -196,12 +191,6 @@ module Skylab::Face::TestSupport::CLI::Client
     def build_info_lines
       io = @infostream ; @infostream = :spent
       io.string.split "\n"
-    end
-
-    def build_infostream
-      io = ::Skylab::TestSupport::IO::Spy.standard
-      do_debug and io.debug! 'info >>> '
-      io
     end
 
     def expect * exp_a
@@ -371,7 +360,7 @@ module Skylab::Face::TestSupport::CLI::Client
   CONSTANTS::Do_invoke_ = -> do
     if (( idx = ( argv = ::ARGV ).index '-x' ))
       argv[ idx ] = nil ; argv.compact!
-      TestSupport::Quickie.do_not_invoke!
+      TestSupport_::Quickie.do_not_invoke!
       true
     end
   end

@@ -40,8 +40,12 @@ module Skylab::Callback
       self::Headless__[]::CLI
     end
 
-    Entity = -> do
-      Brazen__[]::Entity
+    Entity = -> * a do
+      if a.length.zero?
+        Brazen__[]::Entity
+      else
+        Brazen__[]::Entity.via_arglist a
+      end
     end
 
     Formal_Box = -> do

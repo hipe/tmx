@@ -6,7 +6,7 @@ module Skylab::BeautySalon::TestSupport::CLI::Wrap_  # (no Actions node yet..)
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[bs] CLI wrap" do
 
@@ -17,7 +17,7 @@ module Skylab::BeautySalon::TestSupport::CLI::Wrap_  # (no Actions node yet..)
     end
 
     it "win" do
-      path = TestSupport::Data::Universal_Fixtures.dir_pathname.
+      path = TestSupport_::Data::Universal_Fixtures.dir_pathname.
         join "one-line.txt"
       invoke 'wrap', '-c14', '-v', path
       lines[:err].shift.should match( /line range union.+1.+infinity/i )

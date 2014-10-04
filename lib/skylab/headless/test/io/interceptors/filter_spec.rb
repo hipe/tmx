@@ -19,9 +19,11 @@ module Skylab::Headless::TestSupport::IO::Interceptors
     context "with a line boundary event handler" do
       let(:downstream) { ::StringIO.new }
       let(:stream) do
-        f = Headless_::IO::Interceptors::Filter.new downstream
-        f.line_begin_proc = -> { f.downstream_IO.write 'Z ' }
-        f
+        o = Headless_::IO::Interceptors::Filter.new(
+          :downstream_IO, downstream,
+          :line_begin_proc, -> do
+            o.downstream_IO.write 'Z '
+          end )
       end
       def self.assert input, output, *tags
         it("#{input.inspect} becomes #{output.inspect}", *tags) do
@@ -54,8 +56,11 @@ module Skylab::Headless::TestSupport::IO::Interceptors
     context "with a puts filter" do
       it "works with one filter" do
         downstream = ::StringIO.new
-        stream = Headless_::IO::Interceptors::Filter.new( downstream )
-        stream.puts_filter! -> x { "  << epic: #{ x } >>\n" }
+        stream = Headless_::IO::Interceptors::Filter.new(
+          :downstream_IO, downstream,
+          :puts_map_proc, -> x do
+            "  << epic: #{ x } >>\n"
+          end )
         stream.write 'a'
         downstream.string.should eql( 'a' )
         stream.puts( 'bcd' )

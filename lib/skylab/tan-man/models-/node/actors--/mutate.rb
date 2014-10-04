@@ -212,7 +212,7 @@ module Skylab::TanMan
           new = proto._create_node_with_label @name_s, handle_error
           if new
             @created_existing_or_destoryed_node = new
-            ACHEIVED_
+            ACHIEVED_
           else
             new
           end
@@ -263,7 +263,7 @@ module Skylab::TanMan
           while h.key? stem_i
             stem_i = :"#{ stem_s }_#{ d += 1 }"
           end
-          @new_node_id = stem_i ; ACHEIVED_
+          @new_node_id = stem_i ; ACHIEVED_
         end
 
         def via_neighbors_and_new_node_insert_if_necessary
@@ -345,7 +345,7 @@ module Skylab::TanMan
           node_stmt = new_stmt_list[ :stmt ]
           nd.object_id == node_stmt.object_id or self._SANITY
           send_created_event_for_node node_stmt
-          ACHEIVED_
+          ACHIEVED_
         end
 
         def insert_new_node_into_empty_list
@@ -354,7 +354,7 @@ module Skylab::TanMan
           node = stmt_list[ :stmt ]
           nd.object_id == node.object_id or self._SANITY
           send_created_event_for_node node
-          ACHEIVED_
+          ACHIEVED_
         end
 
         def send_created_event_for_node node_stmt

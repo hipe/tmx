@@ -11,6 +11,10 @@ module Skylab::Brazen
             init_via_model_action_entity( * a )
           end
         end
+
+        def retrieve_methods
+          Retrieve_Methods__
+        end
       end
 
       def initialize & p
@@ -119,7 +123,7 @@ module Skylab::Brazen
       def make_Delete
         cls = begin_class
         @ent[ cls, -> do
-          o :inflect, :verb, :with_lemma, 'remove'
+          o :inflect, :verb, :with_lemma, 'delete'
           o :required, :property, NAME_
           o :flag, :property, :dry_run
           o :flag, :property, :verbose
@@ -230,7 +234,7 @@ module Skylab::Brazen
 
         def produce_any_result
           ok = rslv_entity_scan
-          ok && via_scan_send_list
+          ok && via_entity_scan_send_list
         end
 
         def receive_listed_item ev
@@ -240,22 +244,22 @@ module Skylab::Brazen
       private
 
         def rslv_entity_scan
-          @scan = datastore.entity_scan_via_class self.class.model_class, self
-          @scan and ACHEIVED_
+          @entity_scan = datastore.entity_scan_via_class self.class.model_class, self
+          @entity_scan and ACHEIVED_
         end
 
-        def via_scan_send_list
+        def via_entity_scan_send_list
 
           _Item_Event = make_item_event_builder
           item_index = -1
 
-          if flyweighted_entity = @scan.gets
+          if flyweighted_entity = @entity_scan.gets
             item_index += 1
             flyweighted_event = _Item_Event.new_mutable item_index, flyweighted_entity
             send_event flyweighted_event
           end
 
-          while @scan.gets
+          while @entity_scan.gets
             item_index += 1
             flyweighted_event.replace_some_values item_index
             send_event flyweighted_event
@@ -306,6 +310,90 @@ module Skylab::Brazen
             m < d_ ? d_ : m
           end
           "%#{ d }s"
+        end
+      end
+
+      module Retrieve_Methods__
+
+        include Semi_Generated_Instance_Methods__
+
+      private
+
+        def send_one_entity
+          @datastore_controller = datastore.datastore_controller
+          @datastore_controller and begin
+            ok = via_dsc_for_one_resolve_entity
+            ok and via_entity_send_one
+          end
+        end
+
+        def via_dsc_for_one_resolve_entity
+          @entity_scan = @datastore_controller.entity_scan_via_class model_class, self
+          via_entity_scan_and_dsc_for_one_resolve_entity
+        end
+
+        def via_entity_scan_and_dsc_for_one_resolve_entity
+          one = @entity_scan.gets
+          if one
+            x = @entity_scan.gets
+            if x
+              had_many = true
+              one = x
+            end
+            while x = @entity_scan.gets
+              one = x
+            end
+            if had_many
+              via_dsc_for_one_resolve_entity_when_had_many_via_last one
+            else
+              @entity = one
+              ACHEIVED_
+            end
+          else
+            for_one_resolve_entity_when_had_none
+          end
+        end
+
+        def via_dsc_for_one_resolve_entity_when_had_many_via_last one
+          _ev = build_neutral_event_with :single_entity_resolved_with_ambiguity,
+              :model, model_class,
+              :describable_source, @datastore_controller do |y, o|
+
+            _lemma = o.model.name_function.as_human
+            _source = o.describable_source.description_under self
+
+            y << "in #{ _source } there is more than one #{ _lemma }. #{
+             }using the last one."
+          end
+
+          send_event _ev
+
+          @entity = one
+          ACHEIVED_
+        end
+
+        def for_one_resolve_entity_when_had_none
+          _ev = build_not_OK_event_with :entity_not_found,
+              :model, model_class,
+              :describable_source, @datastore_controller do |y, o|
+
+            _lemma = o.model.name_function.as_human
+            _source = o.describable_source.description_under self
+
+            y << "in #{ _source } there are no #{ plural_noun _lemma }"
+          end
+          send_event _ev
+          UNABLE_
+        end
+
+        def via_entity_send_one
+          _ev = build_OK_event_with :entity,
+              :entity, @entity, :is_completion, true do |y, o|
+
+            y << "#{ o.entity.class.name_function.as_human } is #{
+             } #{ ick o.entity.local_entity_identifier_string }"
+          end
+          receive_event _ev
         end
       end
 

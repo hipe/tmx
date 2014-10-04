@@ -54,9 +54,9 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest::RS_
     end
 
     def initial_writable_spy
-      TestSupport_::IO::Spy.standard do |io_|
-        do_debug and io_.debug!
-      end
+      TestSupport_::IO::Spy.new(
+        :do_debug_proc, -> { do_debug },
+        :debug_IO, debug_IO )
     end
 
     def build_baked_em_a

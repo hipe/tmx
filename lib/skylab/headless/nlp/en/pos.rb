@@ -1227,7 +1227,7 @@ module Skylab::Headless
         end
 
         def execute
-          if ! @count || 1 == @count
+          if @count && 1 == @count
             @lemma
           else
             POS::Noun[ @lemma ].plural

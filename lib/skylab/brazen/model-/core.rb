@@ -14,6 +14,10 @@ module Skylab::Brazen
           Collection_Controller_
         end
 
+        def retrieve_methods
+          Model_::Action_Factory__.retrieve_methods
+        end
+
         def silo_controller
           Model_::Silo_Controller_
         end

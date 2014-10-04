@@ -1,56 +1,95 @@
 module Skylab::TestSupport
 
-  module IO
-    Autoloader_[ self ]
-  end
+  IO = ::Module.new
 
   class IO::Spy < TestSupport_::Lib_::IO[]::Interceptors::Tee  # :[#023] ..
 
-    Autoloader_[ self, :methods ]
+    class Shell__  # too hard to do this in a basic object
 
-    def self.standard
-      io = new( BUFFER_I__ => TestSupport_::Library_::StringIO.new ).tty!
-      block_given? and yield io
-      io
+      TestSupport_::Lib_::Entity[ self, -> do
+
+        o :iambic_writer_method_name_suffix, :'='
+
+        def do_debug=
+          @do_debug_value_was_passed = true
+          @do_debug_x = iambic_property
+        end
+
+        def nonstandard=
+          @is_standard = false
+        end
+
+        o :properties, :debug_IO, :debug_prefix, :do_debug_proc,
+          :puts_map_proc
+
+      end ]
+
+      def initialize x_a
+        @is_standard = true
+        process_iambic_fully x_a
+      end
+
+      attr_reader( * properties.get_names )
+      attr_reader :do_debug_value_was_passed, :do_debug_x, :is_standard
+
     end
+
+    def initialize * x_a
+      o = Shell__.new x_a
+      @debug_IO = o.debug_IO
+      @debug_prefix = o.debug_prefix
+      @puts_map_proc = o.puts_map_proc
+      @do_debug_p = o.do_debug_proc
+      if o.do_debug_value_was_passed && ! @do_debug_p
+        x = o.do_debug_x
+        @do_debug_p = -> { x }
+      end
+
+      super()
+      tty!
+
+      if o.is_standard
+        @muxer.add BUFFER_I__, TestSupport_::Library_::StringIO.new
+      end
+
+      if @do_debug_p  # #note-030
+        add_debugging_downstream
+      end ; nil
+    end
+
+    # ~ stringIO buffer interaction
 
     def string  # assumes this constituent
       self[ BUFFER_I__ ].string
     end
 
     def clear_buffer
-      self[ BUFFER_I__ ].instance_exec do
-        rewind
-        truncate 0
-      end ; nil
-    end
-
-    def debug! prepend_x=nil
-      set_dbg_element DEBUG_I__, TestSupport_::Lib_::Stderr[], prepend_x ; self
-    end
-
-    def any_debug_IO_notify any_debug_IO
-      any_debug_IO and set_dbg_element DEBUG_I__, any_debug_IO, nil ; nil
-    end
-
-  private
-
-    def set_dbg_element element_i, down_IO, prepend_x
-      self[ element_i ] = prepend_x ? wrp_IO( prepend_x, down_IO ) : down_IO
+      io = self[ BUFFER_I__ ]
+      io.rewind
+      io.truncate 0
       nil
     end
 
-    def wrp_IO prepend_x, down_IO
-      io = TestSupport_::Lib_::IO[]::Interceptors::Filter.new down_IO
-      if prepend_x.respond_to? :call
-        io.puts_filter! prepend_x
-      else
-        io.line_begin_string = prepend_x
-      end
-      io
-    end
+    # ~ debugging
 
-  public
+    def add_debugging_downstream
+      _downstream_IO = @debug_IO || TestSupport_::Lib_::Stderr[]
+      @debug_IO = nil
+      if @debug_prefix
+        _line_begin_string = @debug_prefix
+        @debug_prefix = nil
+      end
+      if @puts_map_proc
+        _puts_map_proc = @puts_map_proc
+      end
+      _niladic_pass_filter_proc = @do_debug_p
+      _io = TestSupport_::Lib_::IO[]::Interceptors::Filter.new(
+        :downstream_IO, _downstream_IO,
+        :line_begin_string, _line_begin_string,
+        :niladic_pass_filter_proc, _niladic_pass_filter_proc,
+        :puts_map_proc, _puts_map_proc )
+      @muxer.add DEBUG_I__, _io ; nil
+    end
 
     BUFFER_I__ = :buffer ; DEBUG_I__ = :debug  # ok to open up if needed
 

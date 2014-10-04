@@ -4,8 +4,21 @@ require 'skylab/headless/test/test-support'
 
 module Skylab::Permute::TestSupport  # (was [#ts-010])
 
-  Permute_ = ::Skylab::Permute
-  Callback_ = Permute_::Callback_
+  TestLib_ = ::Module.new
+  module CONSTANTS
+    Callback_ = ::Skylab::Callback
+    Permute_ = ::Skylab::Permute
+    TestLib_ = TestLib_
+    TestSupport_ = ::Skylab::TestSupport
+  end
+
+  include CONSTANTS
+
+  Callback_ = Callback_
+
+  TestSupport_ = TestSupport_
+
+  TestSupport_::Regret[ self ]
 
   module TestLib_
 
@@ -17,6 +30,19 @@ module Skylab::Permute::TestSupport  # (was [#ts-010])
 
     Unstyle = -> do
       Headless__[]::CLI::Pen::FUN.unstyle
+    end
+  end
+
+  module InstanceMethods
+
+    def debug!
+      @do_debug = true
+    end
+
+    attr_reader :do_debug
+
+    def debug_IO
+      TestSupport_.debug_IO
     end
   end
 end

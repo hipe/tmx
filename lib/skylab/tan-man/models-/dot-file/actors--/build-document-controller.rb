@@ -24,7 +24,7 @@ module Skylab::TanMan
 
           def set_input_argument x
             if x
-              @input_arg = x ; ACHEIVED_
+              @input_arg = x ; ACHIEVED_
             else
               when_no_IO :input
             end
@@ -73,7 +73,7 @@ module Skylab::TanMan
             parse.via_input_pathname @input_pathname
             parse.subscribe( & @subscribe )
           end
-          @graph_sexp && ACHEIVED_
+          @graph_sexp && ACHIEVED_
         end
 
         def via_input_string_resolve_graph_sexp
@@ -81,7 +81,7 @@ module Skylab::TanMan
             parse.via_input_string @input_string
             parse.subscribe( & @subscribe )
           end
-          @graph_sexp && ACHEIVED_
+          @graph_sexp && ACHIEVED_
         end
 
         def via_graph_sexp_produce_document_controller

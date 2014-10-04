@@ -14,6 +14,8 @@ module Skylab::Headless::TestSupport
 
   include CONSTANTS
   Headless_ = Headless_
+  EMPTY_A_ = Headless_::EMPTY_A_
+  NILADIC_TRUTH_ = Headless_::NILADIC_TRUTH_
   TestSupport_ = TestSupport_
 
   set_tmpdir_pathname do
@@ -47,5 +49,4 @@ module Skylab::Headless::TestSupport
     end
 
   end
-
 end

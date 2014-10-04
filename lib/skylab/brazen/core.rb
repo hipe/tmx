@@ -13,6 +13,10 @@ module Skylab::Brazen
       end
     end
 
+    def expression_agent_library
+      API::Expression_Agent__::LIB
+    end
+
     def event
       Brazen_::Entity.event
     end

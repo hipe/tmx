@@ -14,7 +14,6 @@ module Skylab::Headless::TestSupport
       @debug = NILADIC_TRUTH_  # loud until proven quiet
       @use_this_pen = nil
     end
-    NILADIC_TRUTH_ = -> { true }
 
     attr_reader :debug
 
@@ -46,12 +45,14 @@ module Skylab::Headless::TestSupport
   private
 
     def io_adapter
-      @IO_adapter ||= begin
-        pen = resolve_pen
-        o = Headless_::TestSupport::IO_Adapter_Spy.new( * [ pen ].compact )
-        o.do_debug_proc = -> { @debug.call }
-        o
-      end
+      @IO_adapter ||= bld_IO_adapter
+    end
+
+    def bld_IO_adapter
+      _pen = resolve_pen
+      Headless_::TestSupport::IO_Adapter_Spy.new(
+        :pen, _pen,
+        :do_debug_proc, -> { @debug.call } )
     end
 
     def resolve_pen

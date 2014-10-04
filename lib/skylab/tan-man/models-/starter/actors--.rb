@@ -1,11 +1,67 @@
 module Skylab::TanMan
 
-  module Starters
-    # recursive autoloader should set dir_pathname here *right after*
-    # this file is loaded!
-    #
+  class Models_::Starter
 
-    cache = { }
+    module Actors__
+
+      class Write
+
+        Actor_[ self, :properties,
+          :io,
+          :value_fetcher,
+          :workspace_path, :config_filename,
+          :event_receiver ]
+
+        def execute
+          ok = TanMan_::API.call :starter, :get,
+            :workspace_path, @workspace_path,
+            :config_filename, @config_filename,
+            :event_receiver, self
+          ok and via_entity
+        end
+
+        def receive_event ev
+          if :entity == ev.terminal_channel_i
+            @entity = ev.entity
+            ACHIEVED_
+          else
+            @event_receiver.receive_event ev
+          end
+        end
+
+        def via_entity
+          _path = @entity.to_path
+          @template = TanMan_::Lib_::String_template[].from_path _path
+          via_template
+        end
+
+        def via_template
+          @output_s = @template.call @value_fetcher
+          via_output_s
+        rescue ::Errno::ENOENT => e
+          @enoent = e
+          via_enoent
+        end
+
+        def via_enoent
+          _ev = Lib_::Entity[].event.wrap.exception.with(
+            :path_hack,
+            :terminal_channel_i, :resource_not_found,
+            :exception, @enoent )
+          @event_receiver.receive_event _ev
+        end
+
+        def via_output_s
+          io = TanMan_::Lib_::String_IO[].new @output_s
+          d = 0
+          while s = io.gets
+            d += s.length
+            @io.puts s
+          end
+          d
+        end
+      end
+    end
 
 
     # For all strings `stem`, normalize it to a joined path and result in
@@ -19,8 +75,6 @@ module Skylab::TanMan
       end
       result
     end
-
-    singleton_class.send :alias_method, :[], :fetch
 
   end
 end

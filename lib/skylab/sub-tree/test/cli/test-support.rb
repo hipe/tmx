@@ -80,11 +80,8 @@ module Skylab::SubTree::TestSupport::CLI
     end
 
     def emit_spy
-      @emit_spy ||= begin
-        es = Callback_TestSupport_::Call_Digraph_Listeners_Spy.new
-        es.do_debug_proc = -> { do_debug }
-        es
-      end
+      @emit_spy ||= Callback_TestSupport_::Call_Digraph_Listeners_Spy.new(
+        :do_debug_proc, -> { do_debug } )
     end
 
     def line

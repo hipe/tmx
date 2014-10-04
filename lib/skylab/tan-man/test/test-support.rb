@@ -202,8 +202,7 @@ module Skylab::TanMan::TestSupport
     end
 
     def event_expression_agent
-      self._OR_DO_YOU_WANT_THE_other_one
-      TanMan_::API::EXPRESSION_AGENT__
+      TanMan_::API::expression_agent_instance
     end
 
     def result

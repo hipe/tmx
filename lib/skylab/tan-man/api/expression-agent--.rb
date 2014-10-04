@@ -2,6 +2,19 @@ module Skylab::TanMan
 
   module API
 
+    # ~ stowaway API-related things here for now
+
+    class << self
+
+      def expression_agent_instance  # :+[#051]
+        @expag ||= expression_agent_class.new application_kernel
+      end
+    end
+
+    extend Brazen_::API.module_methods
+
+    # ~
+
     class Expression_Agent__  # follows [#fa-052]:#the-semantic-markup-guidelines
 
       def initialize k
@@ -50,7 +63,7 @@ module Skylab::TanMan
       end
 
       def plural_noun * a
-        _NLP_agent.plural_noun.via_arglist
+        _NLP_agent.plural_noun.via_arglist a
       end
 
       def pth s
@@ -80,15 +93,10 @@ module Skylab::TanMan
       end
 
       NLP_agent__ = Callback_.memoize do
-        Brazen_.expression_agent_library.make_NLP_agent :public,
+        NLP_Agent__ = Brazen_.expression_agent_library.make_NLP_agent :public,
           [ :and_, :or_, :plural_noun, :s ]
       end
 
     end
-
-    # ~ stowaway
-
-    extend Brazen_::API.module_methods
-
   end
 end

@@ -29,7 +29,7 @@
 [#044] #hole (was #autoloading: swap-in `caller_locations( 1, 1 )[ 0 ].base_label)`
 [#043]       #boxxy the stemmy tree issue - try autoloading the value corresp.
                to the path "headless/nlp/en/levenshtein-.rb"
-[#042]       #doc-point introducting tagged argument lists (#iambics) ..
+[#042] #hole #moved-to:[#cb-046]  (was: #doc-point introducting tagged argument lists (#iambics) ..
 [#041]       #doc-node the core node narrative ..
 [#040]       #autoloading: convenient to have `const_missing` result in value
 [#039]       #deprecated `private_attr_reader`

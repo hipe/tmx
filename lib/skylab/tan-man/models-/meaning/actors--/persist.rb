@@ -67,13 +67,13 @@ module Skylab::TanMan
         def after_greatest_lesser_name_resolve_insertion_range
           @example = find_first_flyweight_with_name @greatest_lesser_name
           d = @example.next_line_start_pos
-          @insertion_range = d .. d-1 ; ACHEIVED_
+          @insertion_range = d .. d-1 ; ACHIEVED_
         end
 
         def before_least_greater_name_resolve_insertion_range
           @example = find_first_flyweight_with_name @least_greater_name
           d = @example.next_line_start_pos
-          @insertion_range = d .. d-1 ; ACHEIVED_
+          @insertion_range = d .. d-1 ; ACHIEVED_
         end
 
         def find_first_flyweight_with_name s
@@ -86,13 +86,13 @@ module Skylab::TanMan
         def when_no_neighbors_resolve_insertion_range
           @new_line = " #{ @name } : #{ @value }\n"
           d = @scan.last_end_position
-          @insertion_range = d .. d-1 ; ACHEIVED_
+          @insertion_range = d .. d-1 ; ACHIEVED_
         end
 
         def rewrite_string
           @new_line || resolve_new_line
           @output_s[ @insertion_range ] = @new_line
-          ACHEIVED_
+          ACHIEVED_
         end
 
         def resolve_new_line

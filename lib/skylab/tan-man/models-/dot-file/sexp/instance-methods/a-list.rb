@@ -19,7 +19,7 @@ module Skylab::TanMan
           _insert_assignment i, x
         end
       end
-      ACHEIVED_
+      ACHIEVED_
     end
 
     def _insert_assignment sym, val

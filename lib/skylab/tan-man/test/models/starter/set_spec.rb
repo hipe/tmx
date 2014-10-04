@@ -76,11 +76,5 @@ module Skylab::TanMan::TestSupport::Models::Starter
       line_a[ 0 ].should eql 'using-starter = fizzibble.dot'
       line_a[ 1 ].should eql '[starter "digraph.dot"]'
     end
-
-    def cfn
-      CONFIG_FILENAME___
-    end
-    CONFIG_FILENAME___ = 'local-conf.d/config'.freeze
-
   end
 end
