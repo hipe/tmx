@@ -1,9 +1,11 @@
 module Skylab::Headless
 
-  module Text::Patch          # using the host system's `patch` utility,
+  module Text::Patch  # [#162] #open, will re-write to be an actor
+    # using the host system's `patch` utility,
                                   # apply a patch to a file or directory on the
                                   # filesystem given
                                   # a string that contains the patch data.
+
 
     patch = -> patch_str, as, target_path, dry_run, verbose, info do
       res = nil

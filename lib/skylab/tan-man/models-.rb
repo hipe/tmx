@@ -1,12 +1,6 @@
 module Skylab::TanMan
 
-  DESC_METHOD_ = -> s = nil, & p do
-    if s && ! p
-      self.description_block = -> y { y << s }
-    elsif p
-      self.description_block = p
-    end ; nil
-  end
+  # ~ the stack
 
   Entity_ = Brazen_::Model_::Entity[ -> do
 
@@ -21,42 +15,6 @@ module Skylab::TanMan
   Actor_ = -> cls, * a do
     Callback_::Actor.via_client_and_iambic cls, a
     Event_[].sender cls ; nil
-  end
-
-  class Model_ < Brazen_::Model_
-
-    define_singleton_method :desc, DESC_METHOD_
-
-    class << self
-
-      def action_class
-        Action_
-      end
-
-      def autoload_actions
-
-        class << self
-
-          def get_unbound_upper_action_scan
-            Scan_[].nonsparse_array [ self ]
-          end
-
-          def get_unbound_lower_action_scan
-            @did_load_actions ||= begin
-              self.const_get :Actions, false
-              true
-            end
-            super
-          end
-        end
-      end
-
-      def entity_module
-        Entity_
-      end
-    end
-
-    attr_reader :error_count
   end
 
   Stubber_ = -> model do
@@ -84,23 +42,45 @@ module Skylab::TanMan
     end
   end
 
+  DESC_METHOD_ = -> s = nil, & p do
+    if s && ! p
+      self.description_block = -> y { y << s }
+    elsif p
+      self.description_block = p
+    end ; nil
+  end
+
   class Action_ < Brazen_::Model_::Action
 
-    extend module MM
+    extend( module MM
 
       define_method :desc, DESC_METHOD_
 
       def use_workspace_as_datastore_controller
 
         Entity_[ self, -> do
+
           o :reuse, Models_::Workspace.properties_for_reuse
+
         end ]
 
+        pc_a = model_class.preconditions
+        did_resolve_pcia and fail
+        @did_resolve_pcia = true
+        a = @preconditions = pc_a.dup
+        d = a.index do |pc|
+          :workspace == pc.full_name_i
+        end
+        if ! d
+          a.push Brazen_.node_identifier.via_symbol :workspace
+        end
+
         include Uses_Workspace_Action_Methods__
+
       end
 
       self
-    end
+    end )
 
     include module IM
 
@@ -143,9 +123,10 @@ module Skylab::TanMan
 
     private
 
-      def client_adapter
-        @event_receiver
+      def workspace_config_filename
+        WS_C_FN__
       end
+      WS_C_FN__ = '.tanman-workspace/conf'.freeze
 
       self
     end
@@ -160,11 +141,61 @@ module Skylab::TanMan
         a.push @kernel.kernel_property_value :local_conf_dirname
         a.compact!
         if a.length.nonzero?
-          @argument_box.add :config_filename, a.join( ::File::SEPARATOR )
+          @argument_box.add :config_filename, a.join( FILE_SEPARATOR_ )
         end
       end ; nil
     end
   end
+
+  class Model_ < Brazen_::Model_
+
+    define_singleton_method :desc, DESC_METHOD_
+
+    class << self
+
+      def action_class
+        Action_
+      end
+
+      def autoload_actions
+
+        class << self
+
+          def get_unbound_upper_action_scan
+            Scan_[].nonsparse_array [ self ]
+          end
+
+          def get_unbound_lower_action_scan
+            @did_load_actions ||= begin
+              self.const_get :Actions, false
+              true
+            end
+            super
+          end
+        end
+      end
+
+      def entity_module
+        Entity_
+      end
+    end
+
+    attr_reader :error_count
+  end
+
+  class Collection_Controller_ < Brazen_.model.collection_controller
+
+    class << self
+
+      def use_workspace_as_dsc
+
+        define_method :datastore_controller do
+          @kernel.silo_via_symbol( :workspace ).workspace_via_act @action
+        end
+      end
+    end
+  end
+
 
   class Kernel_ < Brazen_::Kernel_  # :[#083].
 
@@ -192,8 +223,8 @@ module Skylab::TanMan
         p = -> do
           class Xxx___
             Entity_[ self, -> do
-              o :required, :property, :workspace_path,
-                :required, :property, :config_filename
+              o :property, :workspace_path,
+                :property, :config_filename
             end ]
           end
           p = -> { Xxx___ }
@@ -242,13 +273,17 @@ module Skylab::TanMan
       end ]
 
       def produce_any_result
-        an = client_adapter.app_name.gsub Callback_::DASH_, Brazen_::SPACE_
+        an = @kernel.app_name.gsub Callback_::DASH_, TanMan_::SPACE_
         ev = build_neutral_event_with :ping do |y, o|
           y << "hello from #{ an }."
         end
         send_event ev
         :hello_from_tan_man
       end
+    end
+
+    def wsdpn
+      @wsdpn ||= @pn.dirname
     end
   end
 
@@ -266,15 +301,11 @@ module Skylab::TanMan
 
     desc "with the current graph.."
 
+    autoload_actions
+
     self.after_i = :status
 
-    Actions = ::Module.new
-
-    class Actions::Tell < Action_
-
-    desc "there's a lot you can tell about a man from his choice of words"
-
-    end
+    # desc "there's a lot you can tell about a man from his choice of words"
   end
 
   class Models_::Node < Model_::Document_Entity

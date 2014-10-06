@@ -4,10 +4,9 @@ module Skylab::TanMan
 
     module Actors__
 
-      class Write
+      class Produce_line_scanner
 
         Actor_[ self, :properties,
-          :io,
           :value_fetcher,
           :workspace_path, :config_filename,
           :event_receiver ]
@@ -52,13 +51,7 @@ module Skylab::TanMan
         end
 
         def via_output_s
-          io = TanMan_::Lib_::String_IO[].new @output_s
-          d = 0
-          while s = io.gets
-            d += s.length
-            @io.puts s
-          end
-          d
+          TanMan_::Lib_::String_IO[].new @output_s
         end
       end
     end

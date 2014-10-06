@@ -55,17 +55,25 @@ module Skylab::Headless
 
     attr_reader :be_verbose, :to_pathname
 
+    def tmpdir_via_join path_tail
+      otr = dup
+      otr.init_copy_with :path, join( path_tail ).to_path
+      otr
+    end
+
     def with * x_a
       otr = dup
-      otr.init_copy x_a
+      otr.init_copy_via_iambic x_a
       otr
     end
   protected
-    def init_copy x_a
+    def init_copy_with * x_a
+      init_copy_via_iambic x_a
+    end
+    def init_copy_via_iambic x_a
       process_iambic_fully 0, x_a
       if @path_x
         omg @path_x
-        @path_x = nil
         init_path_derivatives
       end
       freeze
@@ -325,10 +333,6 @@ module Skylab::Headless
 
     def dirname
       @to_pathname.dirname
-    end
-
-    def join path_tail
-      @to_pathname.join path_tail
     end
 
     PROCEDE_ = true

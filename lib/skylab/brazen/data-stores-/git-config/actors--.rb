@@ -119,6 +119,13 @@ module Skylab::Brazen
         via_both_strings_resolve_subsection_id
       end
 
+      def via_entity_resolve_subsection_id_via_entity_name s
+        via_entity_resolve_model_class
+        via_model_class_resolve_section_string
+        @subsection_s = s
+        via_both_strings_resolve_subsection_id
+      end
+
       def via_model_class_resolve_section_string
         @section_s = @model_class.
           node_identifier.silo_name_i.id2name.gsub UNDERSCORE_, DASH_ ; nil

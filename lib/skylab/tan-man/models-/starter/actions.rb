@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   class Models_::Starter
 
-    Brazen_::Model_::Entity[ self, -> do
+    Entity_[ self, -> do
 
       o :persist_to, :starter,
 
@@ -11,16 +11,13 @@ module Skylab::TanMan
     end ]
 
     class << self
-      def collection_controller
-        Collection_Controller__
-      end
 
       def dir_pn_instance
         @dpn ||= TanMan_.dir_pathname.join RELPATH__
       end
 
-      def write * x_a
-        Starter_::Actors__::Write.via_iambic x_a
+      def line_scanner * x_a
+        Starter_::Actors__::Produce_line_scanner.via_iambic x_a
       end
     end
     RELPATH__ = 'data-documents/starters'.freeze
@@ -59,16 +56,13 @@ module Skylab::TanMan
       @pn ||= Starter_.dir_pn_instance.join property_value :name
     end
 
-    class Collection_Controller__ < Brazen_.model.collection_controller
+    class Collection_Controller__ < Collection_Controller_
+
+      use_workspace_as_dsc
 
       def persist_entity ent, evr
         ok = normalize_entity_name_via_fuzzy_lookup ent, evr
         ok and super ent, evr
-      end
-
-      def datastore_controller
-        _silo = @kernel.silo_via_symbol :workspace
-        _silo.workspace_via_action @action
       end
 
       def entity_scan_via_class _cls_, evr

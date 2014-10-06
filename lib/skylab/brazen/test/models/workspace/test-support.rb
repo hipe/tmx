@@ -20,10 +20,6 @@ module Skylab::Brazen::TestSupport::Models::Workspace
 
     Brazen_::TestSupport::Expect_Event[ self ]
 
-    def cfn
-      Brazen_::Models_::Workspace::CONFIG_FILENAME__
-    end
-
     # ~ tmpdir
 
     def prepare_ws_tmpdir s=nil

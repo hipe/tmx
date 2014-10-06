@@ -6,16 +6,20 @@ module Skylab::TanMan::TestSupport::Models::Starter
 
     extend TS_
 
+    TanMan_::TestSupport::Expect_File_Content[ self ]
+
     it "when bad name - shows good names" do
 
       prepare_ws_tmpdir <<-HERE.unindent
         --- /dev/null
-        +++ b/local-conf.d/config
+        +++ b/#{ cfn }
         @@ -0,0 +1 @@
         +using_starter=holy-foly.dot
       HERE
 
-      call_API :starter, :set, :name, 'wiz', :workspace_path, @ws_tmpdir.to_path
+      call_API :starter, :set,
+        :name, 'wiz',
+        :workspace_path, @ws_pn.to_path, :config_filename, cfn
 
       expect_not_OK_event :entity_not_found do |ev|
         s_a = ev.a_few_ent_a.map( & :local_entity_identifier_string )
@@ -35,16 +39,21 @@ module Skylab::TanMan::TestSupport::Models::Starter
 
       prepare_ws_tmpdir <<-HERE.unindent
         --- /dev/null
-        +++ b/local-conf.d/config
+        +++ b/#{ cfn }
         @@ -0,0 +1 @@
         +using_starter=hoitus-toitus.dot
       HERE
 
       call_API :starter, :set, :name, 'digraph.dot',
-        :workspace_path, @ws_tmpdir.to_path,
+        :workspace_path, volatile_tmpdir.to_path,
         :config_filename, cfn
 
-      expect_not_OK_event :config_parse_error, "section expected (1:1)"
+      ev = expect_not_OK_event :config_parse_error
+      a = black_and_white_lines ev
+      a[ 0 ].should eql 'section expected in config:1:1'
+      a[ 1 ].should eql "  1: using_starter=hoitus-toitus.dot\n"
+      a[ 2 ].should eql "     ^"
+
       expect_failed
     end
 
@@ -52,17 +61,17 @@ module Skylab::TanMan::TestSupport::Models::Starter
 
       prepare_ws_tmpdir <<-HERE.unindent
         --- /dev/null
-        +++ b/local-conf.d/config
+        +++ b/#{ cfn }
         @@ -0,0 +1,2 @@
         +[ misc ]
         +using-starter = fizzibble.dot
       HERE
 
-      @pn = @ws_tmpdir.join cfn
+      @pn = @ws_pn.join cfn
 
       call_API :starter, :set, :name, 'digr',
-        :workspace_path, @ws_tmpdir.to_path,
-        :config_filename, 'local-conf.d/config'
+        :workspace_path, @ws_pn.to_path,
+        :config_filename, cfn
 
       expect_OK_event :normalized_value
       expect_OK_event :datastore_resource_committed_changes do |ev|

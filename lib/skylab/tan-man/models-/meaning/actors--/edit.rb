@@ -8,9 +8,13 @@ module Skylab::TanMan
 
       class Edit::Normalize_name
 
-        Actor_[ self, :properties, :x, :val_p, :ev_p, :prop ]
+        Actor_[ self, :properties,
+          :bound,
+          :val_p,
+          :ev_p ]
 
         def execute
+          @x = @bound.value_x
           if VALID_NAME_RX__ =~ @x
             @val_p[ @x ]
           else
@@ -30,9 +34,13 @@ module Skylab::TanMan
 
       class Edit::Normalize_value
 
-        Actor_[ self, :properties, :x, :val_p, :ev_p, :prop ]
+        Actor_[ self, :properties,
+          :bound,
+          :val_p,
+          :ev_p ]
 
         def execute
+          @x = @bound.value_x
           if NL_RX__ =~ @x
             when_invalid
           else

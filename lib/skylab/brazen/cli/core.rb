@@ -100,6 +100,14 @@ module Skylab::Brazen
         @poly ||= ::Enumerator::Yielder.new( & @resources.sout.method( :puts ) )
       end
 
+      def leaf_class
+        self.class::Action_Adapter__
+      end
+
+      def branch_class
+        self.class::Branch_Adapter__
+      end
+
       def expression_agent_class
         self.class.const_get :Expression_Agent__, false
       end
@@ -260,11 +268,11 @@ module Skylab::Brazen
       end
 
       def leaf_class
-        Action_Adapter__
+        @leaf_class ||= @parent.leaf_class
       end
 
       def branch_class
-        Branch_Adapter__
+        @branch_class ||= @parent.branch_class
       end
 
     private
@@ -405,7 +413,7 @@ module Skylab::Brazen
       end
 
       def resolve_bound_call_via_output_iambic
-        @bound_call = @action.bound_call_via_call @output_iambic, self
+        @bound_call = @action.bound_call_via_modality_call @output_iambic, self
         @bound_call or self._SANITY
         nil
       end
@@ -413,6 +421,13 @@ module Skylab::Brazen
     public
       def app_name
         @parent.app_name
+      end
+
+      # ~ experimental hard-coded hook-in method to support workspace resolution
+
+      def workspace_resolution_properties  # path, max_num_dirs, config_filename
+        yield :path, ::Dir.pwd
+        yield :max_num_dirs, -1 ; nil
       end
 
       Autoloader_[ self ]

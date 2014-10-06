@@ -6,18 +6,20 @@ module Skylab::Brazen
 
       Brazen_::Model_::Entity[ self, -> do
 
-        o :required, :property, :max_num_dirs
-
         o :required, :property, :path
 
       end ]
 
       def produce_any_result
 
+        bx = @argument_box
+
+        model_class.merge_workspace_resolution_properties_into_via bx, self
+
         @prop = self.class.properties.fetch :path
-        @ws = Workspace_.edited self, @kernel do |o|
+        @ws = model_class.edited self, @kernel do |o|
           o.with_preconditions @preconditions
-          o.with_argument_box @argument_box
+          o.with_argument_box bx
           o.with :prop, @prop
         end
         @ws.error_count.zero? and via_ws

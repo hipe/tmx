@@ -28,7 +28,7 @@ module Skylab::TanMan::TestSupport::API
 
     it "sing sing sing to me" do
       call_API :ping
-      expect_neutral_event :ping, "hello from (tm)."
+      expect_neutral_event :ping, "hello from tan man."
       expect_no_more_events
       @result.should eql :hello_from_tan_man
     end

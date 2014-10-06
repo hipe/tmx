@@ -459,9 +459,9 @@ module Skylab::Brazen
           def exception *x_a
             case 1 <=> x_a.length
             when  0
-              Event_::Wrappers__::Exception.with( :exception, x_a.first ).execute
+              Event_::Wrappers__::Exception.with :exception, x_a.first
             when -1
-              Event_::Wrappers__::Exception.via_iambic( x_a ).execute
+              Event_::Wrappers__::Exception.via_iambic x_a
             when  1
               Event_::Wrappers__::Exception
             end

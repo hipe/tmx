@@ -106,7 +106,61 @@ implementation if we ever need it.
 
 ## #note-73
 
-when you save a file in vi it appears to append a "\n" to the
-last line if there was not one already. we follow suit here when
-rewriting the manifest. however we leave the below in place in case
-we ever decide to revert back to the dumb way.
+when you save a file in vi it appears to append a "\n" to the last line
+if there was not one already. we follow suit here when rewriting the
+manifest. however we leave the below commented out comments in place for
+now in case we ever decide to revert back to the dumb way. but see the
+next section:
+
+
+## #line-terminators-versus-line-separators :[#020]
+
+more broadly this has applicability to writing text file in general: we
+may typically think of the newline sequence as a line "separator"; but
+in fact in UNIX land (and perhaps more broadly than that) the newline
+sequence is generally used as more of a line "terminator" than
+"separator" [1][1]. the difference is subtle but important: wheras a
+separator would separate lines, a terminator terminates every line,
+including the last one.
+
+
+### understanding the difference
+
+consider a file whose contents consist of one character, the "\n"
+newline character. when using "separator" semantics, this file could be
+said to have two lines -- two empty strings separated by the separator.
+
+whereas if we use terminator semantics, this file ("correctly") would be
+said to have one line -- one empty string terminated by the terminator.
+
+but then consider the null file, a file with no bytes. using separator
+semantics we would say that this file has one item, the empty string.
+wheras using terminator semantics the number of lines might be
+considered to be zero (because there are no terminators).
+
+but what about a file with one character (or more) and that character
+(or characters) is not or do not contain the newline sequence anywhere
+at all? using separator semantics we consider this file to have one
+item, whereas using terminator semantics this file might be considered
+to be invalid or undefined or have zero lines etc.
+
+
+### as it pertains to the behavior we implement
+
+where it matters we will typically implement a middle-groud behavior,
+where we employ terminator (not separator) semantics, but in cases where
+the trailing line item does not end in a newine sequence (that is, the
+file does not end in a newline sequence), we still consider it a line
+(and where it matters we will not automatically add the newline
+sequence ourselves, and where it matters we might).
+
+
+
+### references
+
+[1]: see `man git-log`, near "the final entry of a single-line format
+     will be properly terminated with a new line". the use of that term
+     "proper" is taken to support our claim.
+
+     also the behavior in editors like `vi` is taken as "evidence" that the
+     terminator semantics are more conventional than separator semantics.

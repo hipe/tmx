@@ -10,24 +10,24 @@ module Skylab::TanMan::TestSupport::Models::Starter
     it "'workspace_path' is required (currently)" do
       call_API :starter, :get
       expect_event :missing_required_properties do |ev|
-        ev.miss_a.first.name_i.should eql :workspace_path
+        ev.miss_a.first.name_i.should eql :path
       end
       expect_failed
     end
 
     it "when workspace path is illegitamate" do
-      prepare_ws_tmpdir
+      use_empty_ws
       call_API :starter, :get,
-        :workspace_path, @ws_tmpdir.join( 'xxx' ).to_path
+        :workspace_path, @ws_pn.join( 'xxx' ).to_path
       expect_event :start_directory_does_not_exist
       expect_failed
     end
 
     it "when workspace path does not have config filename" do
-      prepare_ws_tmpdir
+      use_empty_ws
       call_API :starter, :get,
-        :workspace_path, @ws_tmpdir.to_path
-      expect_event :resource_not_found
+        :workspace_path, @ws_pn.to_path
+      expect_event :workspace_not_found
       expect_failed
     end
 
@@ -35,13 +35,13 @@ module Skylab::TanMan::TestSupport::Models::Starter
 
       prepare_ws_tmpdir <<-O.unindent
         --- /dev/null
-        +++ b/local-conf.d/config
+        +++ b/#{ cfn }
         @@ -0,0 +1 @@
         +[ whatever ]
       O
 
       call_API :starter, :get,
-        :workspace_path, @ws_tmpdir.to_path, :config_filename, cfn
+        :workspace_path, @ws_pn.to_path, :config_filename, cfn
 
       ev = expect_not_OK_event :entity_not_found
       black_and_white( ev ).should eql 'in config there are no starters'
@@ -52,14 +52,14 @@ module Skylab::TanMan::TestSupport::Models::Starter
 
       prepare_ws_tmpdir <<-HERE.unindent
         --- /dev/null
-        +++ b/local-conf.d/config
+        +++ b/#{ cfn }
         @@ -0,0 +1,2 @@
         +[ starter "holodeck" ]
         +[ starter "holy-derp.dot" ]
       HERE
 
       call_API :starter, :get,
-        :workspace_path, @ws_tmpdir.to_path, :config_filename, cfn
+        :workspace_path, @ws_pn.to_path, :config_filename, cfn
 
       ev = expect_neutral_event :single_entity_resolved_with_ambiguity
 
@@ -79,18 +79,17 @@ module Skylab::TanMan::TestSupport::Models::Starter
 
         prepare_ws_tmpdir <<-O.unindent
           --- /dev/null
-          +++ a/local-conf.d/config
+          +++ a/#{ cfn }
           @@ -0,0 +1 @@
           +[ starter "digraphie" ]
         O
 
-        d = Subject_[].write(
-          :io, :_not_yet_here_,
+        scn = Subject_[].line_scanner(
           :value_fetcher, :_not_quite_to_here_,
-          :workspace_path, @ws_tmpdir.to_path, :config_filename, cfn,
+          :workspace_path, @ws_pn.to_path, :config_filename, cfn,
           :event_receiver, event_receiver )
 
-        d.should eql false
+        scn.should eql false
 
         ev = expect_not_OK_event :resource_not_found
         black_and_white( ev ).should eql "No such file or directory - digraphie"
@@ -102,18 +101,23 @@ module Skylab::TanMan::TestSupport::Models::Starter
 
         prepare_ws_tmpdir <<-O.unindent
           --- /dev/null
-          +++ a/local-conf.d/config
+          +++ a/#{ cfn }
           @@ -0,0 +1 @@
           +[ starter "digraph.dot" ]
         O
 
+        scn = Subject_[].line_scanner(
+          :value_fetcher, get_value_fetcher,
+          :workspace_path, @ws_pn.to_path, :config_filename, cfn,
+          :event_receiver, event_receiver )
+
+        d = 0
         io = _IO_spy
 
-        d = Subject_[].write(
-          :io, io,
-          :value_fetcher, get_value_fetcher,
-          :workspace_path, @ws_tmpdir.to_path, :config_filename, cfn,
-          :event_receiver, event_receiver )
+        while line = scn.gets
+          d += line.length
+          io.puts line
+        end
 
         ( 80 .. 1000 ).should be_include d  # the number of bytes written
 
@@ -128,11 +132,6 @@ module Skylab::TanMan::TestSupport::Models::Starter
       bx = TanMan_::Callback_::Box.new
       bx.add :created_on, 'CRTD ON'
       bx
-    end
-
-    def black_and_white ev
-      ev.render_all_lines_into_under y=[], TanMan_::API.expression_agent_instance
-      y.join NEWLINE_
     end
 
     def _IO_spy

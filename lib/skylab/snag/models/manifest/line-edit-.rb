@@ -61,10 +61,10 @@ module Skylab::Snag
       end
 
       Build_context_sensitive_line_writer__ = -> fh do
-        # sep = nil  # #note-73
+        # sep = nil  # #note-73, :+[#020]
         -> line do
           # fh.write "#{ sep }#{ line }"
-          # sep ||= "\n" # meh [#020]
+          # sep ||= "\n"
           fh.write "#{ line }#{ LINE_SEP_ }"
           nil
         end

@@ -185,15 +185,13 @@ module Skylab::Brazen
           :line_number, @line_number,
           :line, @line,
           :parse_error_category_i, i,
-          :reason, i.to_s.split( UNDERSCORE_ ).join( SPACE_ ) ]
+          :reason, i.to_s.split( UNDERSCORE_ ).join( SPACE_ ),
+          :input_identifier, @input_id ]
 
         _ev = build_not_OK_event_via_mutable_iambic_and_message_proc _x_a, -> y, o do
           y << "#{ o.reason } #{
            }(#{ o.line_number }:#{ o.column_number })"
         end
-
-        # @result = @event_receiver.receive_event _ev  # #todo
-
 
         @result = send_event _ev
 
@@ -287,6 +285,10 @@ module Skylab::Brazen
     class Path_Input_Identifier__
       def initialize s
         @path_s = s
+      end
+
+      def to_path
+        @path_s
       end
 
       def to_pathname

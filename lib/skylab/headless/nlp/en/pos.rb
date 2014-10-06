@@ -968,6 +968,10 @@ module Skylab::Headless
       end
       attr_reader :abbrev_box
 
+      def indefinite_noun
+        NLP::EN::Part_Of_Speech::Indefinite_noun__
+      end
+
       def plural_noun
         NLP::EN::Part_Of_Speech::Plural_noun__
       end
@@ -1215,6 +1219,16 @@ module Skylab::Headless
 
   module NLP::EN
     module Part_Of_Speech
+
+      class Indefinite_noun__
+
+        Callback_::Actor[ self, :properties,
+          :lemma ]
+
+        def execute
+          POS::Noun[ @lemma ].indefinite_singular
+        end
+      end
 
       class Plural_noun__
 

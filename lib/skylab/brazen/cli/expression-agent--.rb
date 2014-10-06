@@ -48,6 +48,10 @@ module Skylab::Brazen
         code s
       end
 
+      def indefinite_noun * a
+        _NLP_agent.indefinite_noun.via_arglist a
+      end
+
       def par prop
         _unstyled = send @partitions.rendering_method_name_for( prop ), prop
         highlight _unstyled
@@ -83,6 +87,10 @@ module Skylab::Brazen
 
       def render_prop_as_environment_variable prop
         prop.upcase_environment_name_i.id2name
+      end
+
+      def render_prop_as_unknown prop
+        "« #{ prop.name.as_human } »"  # :+#guillemets
       end
 
       def val s

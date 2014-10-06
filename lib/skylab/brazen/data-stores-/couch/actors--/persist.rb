@@ -18,7 +18,7 @@ module Skylab::Brazen
 
       def init_ivars
         @dry_run = @entity.any_parameter_value :dry_run
-        @property_scan = @entity.to_normalized_actual_property_scan
+        @property_scan = @entity.to_normalized_actual_property_scan_for_persist
         @response_receiver = me_as_response_receiver
         nil
       end

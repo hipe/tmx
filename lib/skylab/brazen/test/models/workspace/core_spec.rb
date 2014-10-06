@@ -44,7 +44,7 @@ module Skylab::Brazen::TestSupport::Models::Workspace
     it "summarize with empty path" do
       prepare_ws_tmpdir
       call_API :workspace, :summarize,
-        :path, @ws_tmpdir.to_path, :max_num_dirs, 1
+        :path, @ws_tmpdir.to_path
       expect_not_OK_event :resource_not_found
       expect_failed
     end
@@ -64,7 +64,7 @@ module Skylab::Brazen::TestSupport::Models::Workspace
       O
 
       call_API :workspace, :summarize,
-        :path, ws_tmpdir.to_path, :max_num_dirs, 1
+        :path, ws_tmpdir.to_path
 
       ev = expect_event :summary
       ev.render_all_lines_into_under y=[], event_expression_agent

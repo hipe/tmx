@@ -6,6 +6,8 @@ module Skylab::TanMan::TestSupport::Models::Association
 
     extend TS_
 
+    TanMan_::TestSupport::Expect_File_Content[ self ]
+
     it 'ping' do
       call_API :association, :add, :ping
       expect_OK_event :ping_from_action, 'ping from action - add'

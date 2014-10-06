@@ -64,14 +64,14 @@ module Skylab::TanMan::TestSupport::CLI::Actions
         lines.each do |line|
           fh.puts line
           if do_debug
-            TestSupport_::Stderr_[].puts "local-conf.d/config: #{ line }"
+            debug_IO.puts "#{ cfn }: #{ line }"
           end
         end
       end
     end
 
     def with_config_file_handle_and_get_pathname
-      pathname = tanman_tmpdir.touch_r 'local-conf.d/config'
+      pathname = tanman_tmpdir.touch_r cfn
       pathname.open( 'w' ) do |fh|
         yield fh
       end

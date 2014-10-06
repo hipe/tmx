@@ -237,10 +237,6 @@ module Skylab::Brazen
           ok && via_entity_scan_send_list
         end
 
-        def receive_listed_item ev
-          @client_adapter.receive_event ev
-        end
-
       private
 
         def rslv_entity_scan

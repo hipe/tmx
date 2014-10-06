@@ -9,35 +9,36 @@ module Skylab::Brazen
       o :desc, -> y do
         y << "init a #{ highlight '<workspace>' }"
         y << "this is the second line of the init description"
-      end
+      end,
 
-      o :inflect, :noun, :lemma, :with_lemma, 'workspace'
+      :inflect, :noun, :lemma, :with_lemma, 'workspace',
 
-      o :is_promoted
+      :is_promoted,
 
+      :flag, :property, :dry_run,
 
+      :flag, :property, :verbose,
 
-
-      o :flag, :property, :dry_run
-
-
-      o :flag, :property, :verbose
-
-
-      o :default, '.',
-        :description, -> y do
-          y << "the directory to init"
-        end,
-        :property, :path  # even though not alphabetical, leave at end
+      :default, '.',
+      :description, -> y do
+        y << "the directory to init"
+      end,
+      :property, :path  # even though not alphabetical, leave at end
 
     end ]
 
     def produce_any_result
+
+      bx = @argument_box
+
+      model_class.merge_workspace_resolution_properties_into_via bx, self
+
+      bx.replace :max_num_dirs, 1
+
       @prop = self.class.properties.fetch :path
-      @ws = Workspace_.edited self, @kernel do |o|
-        o.with_argument_box @argument_box
+      @ws = model_class.edited self, @kernel do |o|
+        o.with_argument_box bx
         o.with :prop, @prop,
-          :max_num_dirs, 1,
           :app_name, @event_receiver.app_name,
           :channel, :init
       end

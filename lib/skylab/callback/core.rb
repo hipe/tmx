@@ -267,11 +267,10 @@ module Skylab::Callback
       Callback_.scan do
         if d < last
           i = @a.fetch d += 1
-          Pair__.new @h.fetch( i ), i
+          Pair_.new @h.fetch( i ), i
         end
       end
     end
-    Pair__ = ::Struct.new :value_x, :name_i
 
     def each_name
       @a.each do |i| yield i end ; nil
@@ -357,6 +356,15 @@ module Skylab::Callback
       @h[ i ] = x_ ; x
     end
 
+    def replace_by i, & p
+      had = true
+      x = @h.fetch i do
+        had = false
+      end
+      had or raise ::KeyError, say_not_found( i )
+      @h[ i ] = p[ x ]
+    end
+
     def remove i
       d = @a.index( i ) or raise ::KeyError, say_not_found( i )
       @a[ d, 1 ] = EMPTY_A_
@@ -377,7 +385,7 @@ module Skylab::Callback
       end
 
       def pair
-        Pair__
+        Pair_
       end
     end
   end
@@ -410,6 +418,13 @@ module Skylab::Callback
 
     def advance_one
       @d += 1 ; nil
+    end
+  end
+
+  Pair_ = ::Struct.new :value_x, :name_i
+  class Pair_
+    def with_name_i i
+      self.class.new value_x, i
     end
   end
 

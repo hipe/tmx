@@ -15,7 +15,7 @@ module Skylab::Brazen
 
         def execute
           ok = resolve_properties
-          ok &&= via_entity_resolve_subsection_id
+          ok &&= via_entity_resolve_subsection_id_via_entity_name @name_x
           ok && edit_file
           @result
         end
@@ -23,21 +23,25 @@ module Skylab::Brazen
       private
 
         def resolve_properties
-          scn = @entity.to_normalized_actual_property_scan
-          y = []
-          while actual = scn.gets
-            if NAME_ == actual.name_i
+          scn = @entity.to_normalized_actual_property_scan_for_persist
+          body_pair_a = []
+          did_see_name = false
+          while pair = scn.gets
+            if NAME_ == pair.name_i
               did_see_name = true
+              @name_x = pair.value_x
               next
             end
-            actual.value_x.nil? and next
-            y.push actual
+            pair.value_x.nil? and next
+            body_pair_a.push pair
           end
-          if y.length.zero? && ! did_see_name
+          if did_see_name
+            @body_pair_a = body_pair_a  # zero length ok
+            PROCEDE_
+          elsif body_pair_a.length.zero?
             cannot_persist_entity_with_no_properties
           else
-            @property_a = y
-            PROCEDE_
+            self._CANNOT_persist_entity_with_no_name
           end
         end
 
@@ -105,8 +109,12 @@ module Skylab::Brazen
         end
 
         def write_section
-          @property_a.each do |prop|
-            @section[ prop.name_i ] = prop.value_x
+          @body_pair_a.each do |pair|
+            s = pair.name_i.to_s
+            if s.include? UNDERSCORE_
+              pair = pair.with_name_i s.gsub( UNDERSCORE_, DASH_ ).intern
+            end
+            @section[ pair.name_i ] = pair.value_x
           end
           @result = ACHEIVED_
         end

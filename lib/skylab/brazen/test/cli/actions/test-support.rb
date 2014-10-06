@@ -56,7 +56,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
     def from_directory_with_already_a_file
       from_directory do
         pn = tmpdir.join 'with-one-empty-file'
-        file_pn = pn.join filename
+        file_pn = pn.join cfn
         if ! file_pn.exist?
           if ! pn.exist?
             file_utils.mkdir pn.to_path
@@ -112,12 +112,6 @@ module Skylab::Brazen::TestSupport::CLI::Actions
 
     def tmpdir
       @td ||= TestLib_::Tempdir_pathname[ -> { do_debug }, debug_IO ]
-    end
-
-    # ~ business
-
-    def filename
-      Brazen_::Models_::Workspace::CONFIG_FILENAME__
     end
 
     # ~ expectation support

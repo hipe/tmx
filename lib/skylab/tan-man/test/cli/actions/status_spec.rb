@@ -14,11 +14,11 @@ module Skylab::TanMan::TestSupport::CLI::Actions
       whichs.each do |which|
         case which
         when :global
-          TMPDIR.touch('global-conf-file')
+          TMPDIR.touch 'global-conf-file'
         when :local_dir
-          TMPDIR.mkdir('local-conf.d')
+          TMPDIR.mkdir 'local-conf.d'
         when :local_file
-          TMPDIR.touch('local-conf.d/config')
+          TMPDIR.touch "#{ cfn }/config"
         else
           fail("no")
         end
@@ -63,7 +63,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions
         prepare_configs :local_dir
       end
       it 'should list the directory (*with a trailing slash*)' do
-        match_one('local ').should be_include('local-conf.d/')
+        match_one('local ').should be_include "#{ cfn }/"
       end
     end
 
@@ -72,7 +72,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions
         prepare_configs :local_dir, :local_file
       end
       it 'should herp a derp' do
-        match_one('local ').should be_include('local-conf.d/config')
+        match_one('local ').should be_include cfn
       end
     end
 

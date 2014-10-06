@@ -45,11 +45,13 @@
 [#026]       #done refactor porcelain tree
 [#025]       #done fix and cover todo tree
 [#024]       #done inconsistencies over writing terminal newlines in file
+               #parent-node: [#020]
 [#023]       #done refactor whatever
 [#022]       #done #gimmick thing that converts @todo's into issues!??
              2012-06-04   (formerly [#sl-097])
 [#021]       #parent-node:[#011] #tracking-tag - this conv. of indenting per `#open`
-[#020]       #tracking-tag newlines - places where they might bite
+[#020]       #parent-node:[#038] "newlines as terminators vs. separators.."
+             (#was: #tracking-tag newlines - places where they might bite)
 [#019]       #tracking-tag prefixes - places where they might bite
 [#018]       #done functionality, interface for closing an issue
 [#017]       #parent-node: [#046] a cb error result may be translated

@@ -32,7 +32,7 @@ module Skylab::TanMan
         end
         b or break
         cnt = collections.dot_file.currently_using or break
-        config_param = Models::DotFile::Collection::CONFIG_PARAM
+        config_param = Models::DotFile::Collection._USE_the_entity_node_identifier_maybe
         payload "#{ lbl config_param } (exists): #{ escape_path cnt.pathname }"
         res = true
       end while nil

@@ -49,6 +49,10 @@ module Skylab::TanMan
         "\"#{ x }\""
       end
 
+      def indefinite_noun * a
+        _NLP_agent.indefinite_noun.via_arglist a
+      end
+
       def kbd s
         stylize KEYBOARD_STYLE__, s
       end

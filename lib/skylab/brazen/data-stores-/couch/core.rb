@@ -13,7 +13,8 @@ module Skylab::Brazen
       o :description, -> y do
         y << "the name of the database"
       end,
-      :ad_hoc_normalizer, -> x, val_p, ev_p, prop do
+      :ad_hoc_normalizer, -> arg, val_p, ev_p do
+        x = arg.value_x
         if /\A[-a-z0-9]+\z/ =~ x
           val_p[ x ]
         else
@@ -36,7 +37,8 @@ module Skylab::Brazen
         y << "the HTTP port to connect to (default: #{ property_default })"
       end,
       :default, '5984',
-      :ad_hoc_normalizer, -> x, val_p, ev_p, prop do
+      :ad_hoc_normalizer, -> arg, val_p, ev_p do
+        x = arg.value_x
         if x
           if /\A[0-9]{1,4}\z/ =~ x
             val_p[ x ]

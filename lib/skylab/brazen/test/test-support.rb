@@ -34,9 +34,12 @@ module Skylab::Brazen::TestSupport
 
     def event_expression_agent
       @eea ||= begin
-        $stderr.puts "OHAI"
         Brazen_::API.expression_agent_class.new Brazen_::API.application_kernel
       end
+    end
+
+    def cfn
+      Brazen_::Models_::Workspace.config_filename
     end
   end
 

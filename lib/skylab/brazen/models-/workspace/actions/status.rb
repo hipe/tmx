@@ -16,18 +16,13 @@ module Skylab::Brazen
 
       o :after, :init
 
-
-
-
       o :environment, :non_negative_integer,
         :description, -> y do
           y << "how far up do we look?"
         end,
         :property, :max_num_dirs
 
-
       o :flag, :property, :verbose
-
 
       o :default, '.',
         :description, "the location of the workspace",
@@ -39,12 +34,19 @@ module Skylab::Brazen
     end ]
 
     def produce_any_result
-      @prop = self.class.properties.fetch :path
-      @ws = Workspace_.edited self, @kernel do |o|
-        o.with_argument_box @argument_box
+
+      bx = @argument_box
+
+      model_class.merge_workspace_resolution_properties_into_via bx, self
+
+      @ws = model_class.edited self, @kernel do |o|
+
+        o.with_argument_box bx
+
         o.with :channel, :status,
-          :prop, @prop
+          :prop, self.class.properties.fetch( :path )
       end
+
       @ws.error_count.zero? and work
     end
 

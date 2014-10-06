@@ -1,46 +1,91 @@
-module Skylab::TanMan::TestSupport
+module Skylab::TanMan
 
-  shared_context tanman: true do
+  class TestSupport::Expect_File_Content
 
-    def input str
-      argv = TestLib_::Shellwords[].split str
-      self.result = cli.invoke argv
+    # assumes @output_s
+
+    class << self
+      def [] test_context_class
+        test_context_class.include Test_Context_Instance_Methods__ ; nil
+      end
     end
 
-    def output_shift_is *assertions
-      output.lines.empty? and fail 'there is no output in the stack'
-      subject = output.lines.first
-      assertions.each do |assertion|
-        case assertion
-        when ::FalseClass ; result.should_not be_trueish
-        when ::Regexp     ; subject.string.should match(assertion)
-        when ::String     ; rx = /#{ ::Regexp.escape assertion }/
-                          ; subject.string.should match(rx) # better error msg
-        when ::Symbol     ; subject.stream_name.should eql(assertion)
-        when ::TrueClass  ; result.should be_trueish
-        else            ; fail("unrecognized assertion class: #{assertion}")
+    module Test_Context_Instance_Methods__
+
+      def excerpt range
+        excerpt_lines( range ) * EMPTY_S_
+      end
+
+      def excerpt_lines range
+        in_string_excerpt_range_of_lines @output_s, range
+      end
+
+      def in_string_excerpt_range_of_lines s, range
+        beg_d = range.begin
+        end_d = range.end
+        if beg_d < 0
+          if end_d < 0
+            excrpt_lines_from_end beg_d, end_d, s
+          else
+            false
+          end
+        elsif end_d >= 0
+          self._TO_DO_excrpt_lines_from_beginning
+        else
+          false
         end
-      end                         # result in subject, and change the stack
-      output.lines.shift          # only at the end
+      end
+
+      def excrpt_lines_from_end beg_d, end_d, s
+        if s.length.nonzero?
+          scn = backwards_index_scanner s, NEWLINE_
+          d = s.length - 1
+          if NEWLINE_ == s[ -1 ]  # [#sg-020] newline is terminator not separator
+            scn.gets
+          end
+          ( - ( end_d + 1 )).times do
+            d = scn.gets
+            d or break
+          end
+        end
+        y = nil
+        if d
+          ( end_d - beg_d + 1 ).times do
+            d_ = scn.gets
+            if d_
+              ( y ||= [] ).push s[ ( d_ + 1 ) .. d ]
+              d = d_
+            else
+              ( y ||= [] ).push s[ 0 .. d ]
+              break
+            end
+          end
+        end
+        if y
+          y.reverse!
+        end
+        y
+      end
+
+      def backwards_index_scanner s, sep
+        d = s.length - 1
+        p = -> do
+          r = s.rindex sep, d
+          if r
+            d = r - 1
+            if d < 0
+              p = EMPTY_P_
+            end
+            r
+          else
+            p = EMPTY_P_ ; r
+          end
+        end
+
+        Callback_::Scn.new do
+          p[]
+        end
+      end
     end
-
-    def output_shift_only_is *assertions
-      res = output_shift_is(*assertions)
-      output.lines.length.should eql(0)
-      res
-    end
-    attr_accessor :result
-  end
-end
-
-RSpec::Matchers.define :be_trueish do
-  match do |actual|
-    actual
-  end
-end
-
-RSpec::Matchers.define :be_gte do |expected|
-  match do |actual|
-    actual >= expected
   end
 end

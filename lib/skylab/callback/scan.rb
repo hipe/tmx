@@ -54,6 +54,10 @@ module Skylab::Callback
             end
           end
 
+          def pair
+            Pair_
+          end
+
           def random_access scn, meth_i
             Callback_::Scan::With_Random_Access__.new scn, meth_i
           end

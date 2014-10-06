@@ -43,6 +43,10 @@ module Skylab::TanMan
         val x
       end
 
+      def indefinite_noun * a
+        _NLP_agent.indefinite_noun.via_arglist a
+      end
+
       def kbd s
         s
       end
@@ -94,7 +98,7 @@ module Skylab::TanMan
 
       NLP_agent__ = Callback_.memoize do
         NLP_Agent__ = Brazen_.expression_agent_library.make_NLP_agent :public,
-          [ :and_, :or_, :plural_noun, :s ]
+          [ :and_, :indefinite_noun, :or_, :plural_noun, :s ]
       end
 
     end

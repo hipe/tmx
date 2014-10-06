@@ -267,6 +267,10 @@ end
       x and " #{ x }"
     end
 
+    o[ :indefinite_noun ] = -> do
+      Headless_::NLP::EN::POS.indefinite_noun
+    end
+
     o[:or_] = memoize_length[ -> a do
       fun[].oxford_comma[ a, ' or ' ]
     end ]

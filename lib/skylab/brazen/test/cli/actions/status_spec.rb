@@ -14,7 +14,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
       with_max_num_dirs 'potato'
       it "whines about non-integer environment variable" do
         invoke 'x'
-        expect :styled, /#{ env 'max-num-dirs' } must be a non-negative #{
+        expect :styled, /#{ env 'max-num-dirs' } must be an #{
           }integer, had #{ ick 'potato' }\z/
         expect_localized_invite_line
         expect_errored
@@ -50,7 +50,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
         it "finds nothing" do
           invoke '.'
           expect :styled,
-            %r('#{ ::Regexp.escape filename }' not found in \. or 1 dir up\b)
+            %r('#{ ::Regexp.escape cfn }' not found in \. or 1 dir up\b)
           expect_exitstatus_for_resource_not_found
         end
       end
@@ -68,7 +68,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
         end
 
         def expect_same_result
-          expect :styled, %r('#{ ::Regexp.escape filename }' not found in \.)
+          expect :styled, %r('#{ ::Regexp.escape cfn }' not found in \.)
           expect_exitstatus_for_resource_not_found
         end
       end

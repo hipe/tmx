@@ -14,6 +14,8 @@ module Skylab::TanMan::TestSupport::Models
 
   Brazen_ = TanMan_::Brazen_
 
+  Callback_ = TanMan_::Callback_
+
   module CONSTANTS
 
     Within_silo = -> silo_name_i, instance_methods_module do
@@ -76,10 +78,55 @@ module Skylab::TanMan::TestSupport::Models
       subject_API.application_kernel
     end
 
-    # ~ tmpdir
+    # ~ experimental additions to event assertions
+
+    def black_and_white ev
+      black_and_white_lines( ev ).join NEWLINE_
+    end
+
+    def black_and_white_lines ev
+      ev.render_all_lines_into_under y=[], event_expression_agent
+      y
+    end
+
+    # ~ tmpdir/workspace support
+
+    def use_empty_ws
+      td = verbosify_tmpdir empty_dir_pn
+      if Do_prepare_emtpy_tmpdir__[]
+        td.prepare
+      end
+      @ws_pn = td ; nil
+    end
+
+    Do_prepare_emtpy_tmpdir__ = -> do
+      p = -> do
+        p = NILADIC_EMPTINESS_
+        true
+      end
+      -> { p[] }
+    end.call
+
+    NILADIC_EMPTINESS_ = -> { }
+
+    def empty_dir_pn
+      TestLib_::Empty_dir_pn[]
+    end
 
     def prepare_ws_tmpdir s=nil
-      td = TestLib_::Tmpdir[]
+      td = verbosify_tmpdir volatile_tmpdir
+      td.prepare
+      if s
+        td.patch s
+      end
+      @ws_pn = td ; nil
+    end
+
+    def volatile_tmpdir
+      TestLib_::Volatile_tmpdir[]
+    end
+
+    def verbosify_tmpdir td
       if do_debug
         if ! td.be_verbose
           td = td.with :be_verbose, true, :debug_IO, debug_IO
@@ -87,39 +134,13 @@ module Skylab::TanMan::TestSupport::Models
       elsif td.be_verbose
         self._IT_WILL_BE_EASY
       end
-      td.prepare
-      if s
-        td.patch s
-      end
-      @ws_tmpdir = td ; nil
+      td
     end
 
-    def ws_tmpdir  # hacks
-      TestLib_::Tmpdir[]
+    def cfn
+      CONFIG_FILENAME___
     end
-
-    # ~ output_s
-
-    def excerpt range
-      s = @output_s ; d = s.length - 1
-      neg_count = 0 ; begin_d = range.begin ; end_d = range.end
-      0 > begin_d && 0 > end_d or self._DO_ME
-      a = []
-      while true
-        d_ = s.rindex NEWLINE_, d - 1
-        d_ or break
-        neg_count -= 1
-        if neg_count < begin_d
-          break
-        end
-        if neg_count <= end_d
-          a.push s[ ( d_ + 1 ) .. d ]
-        end
-        d = d_
-      end
-      a.reverse!
-      a * EMPTY_S_
-    end
+    CONFIG_FILENAME___ = 'local-conf.d/config'.freeze
   end
 
   class Mock_Action__

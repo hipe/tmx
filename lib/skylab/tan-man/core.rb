@@ -3,6 +3,12 @@ require 'skylab/brazen/core'
 
 module Skylab::TanMan
 
+  class << self
+    def name_function
+      @nf ||= Callback_::Name.from_module self
+    end
+  end
+
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
 
@@ -15,9 +21,10 @@ module Skylab::TanMan
   EMPTY_S_ = ''.freeze
   stowaway :Entity_, 'models-'
   Event_ = -> { Brazen_::Entity.event }
+  FILE_SEPARATOR_ = ::File::SEPARATOR
   stowaway :Kernel_, 'models-'
   Model_lib_ = -> { Brazen_.model }
-
+  NEWLINE_ = "\n".freeze
   Scan_ = -> & p do
     if p
       Callback_.scan( & p )

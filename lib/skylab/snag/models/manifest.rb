@@ -188,7 +188,7 @@ module Skylab::Snag
 
           Snag_::Lib_::Filesystem_walk[].build_with(
             :filename, @config.manifest_file,
-            :any_max_num_dirs_to_look,
+            :max_num_dirs_to_look,
               @config.max_num_dirs_to_search_for_manifest_file,
             :prop, Lib_::Entity[]::Property__.new( :path ),
             :start_path, @path,

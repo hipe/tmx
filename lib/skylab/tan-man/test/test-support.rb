@@ -17,6 +17,12 @@ module Skylab::TanMan::TestSupport
       TanMan_::Brazen_::TestSupport::Expect_Event[ ctx_cls ]
     end
 
+    Base_tmpdir__ = memoize[ -> do
+      o = TanMan_::Lib_
+      HL__[]::IO::Filesystem::Tmpdir.
+        new o::Dev_tmpdir_pathname[].join( o::Tmpdir_stem[] ).to_path
+    end ]
+
     CLI_client = -> x do
       HL__[]::CLI::Client[ x ]
     end
@@ -40,6 +46,10 @@ module Skylab::TanMan::TestSupport
     Dev_client = -> do
       HL__[]::DEV::Client
     end
+
+    Empty_dir_pn = memoize[ -> do
+      Base_tmpdir__[].tmpdir_via_join 'empty-tmpdir'
+    end ]
 
     Entity = -> do
       TanMan_::Brazen_::Entity
@@ -81,12 +91,6 @@ module Skylab::TanMan::TestSupport
       HL__[]::System::IO.some_three_IOs
     end
 
-    Tmpdir = memoize[ -> do
-      o = TanMan_::Lib_
-      HL__[]::IO::Filesystem::Tmpdir.
-        new o::Dev_tmpdir_pathname[].join( o::Tmpdir_stem[] ).to_path
-    end ]
-
     TS__ = sidesys[ :TestSupport ]
 
     Unstyle_proc = -> do
@@ -96,12 +100,16 @@ module Skylab::TanMan::TestSupport
     Unstyle_styled = -> s do
       HL__[]::CLI::Pen::FUN.unstyle_styled[ s ]
     end
+
+    Volatile_tmpdir = memoize[ -> do
+      Base_tmpdir__[].tmpdir_via_join 'volatile-tmpdir'
+    end ]
   end
 
   module CONSTANTS
     TanMan_ = TanMan_
     EMPTY_S_ = TanMan_::EMPTY_S_
-    NEWLINE_ = "\n".freeze
+    NEWLINE_ = TanMan_::NEWLINE_
     SPACE_ = TanMan_::SPACE_
     TestLib_ = TestLib_
     TestSupport_  = ::Skylab::TestSupport
@@ -110,18 +118,6 @@ module Skylab::TanMan::TestSupport
   include CONSTANTS # for use here, below
 
   TestSupport_ = TestSupport_
-
-  # this is dodgy but should be ok as long as you accept that:
-  # 1) you are assuming meta-attributes work and 2) the below is universe-wide!
-  # 3) the below presents holes that need to be tested manually
-  if false
-  -> o do
-    o.local_conf_dirname = 'local-conf.d' # a more visible name
-    o.local_conf_maxdepth = 1
-    o.local_conf_startpath = -> { TMPDIR }
-    o.global_conf_path = -> { TMPDIR.join 'global-conf-file' }
-  end.call TanMan_::API
-  end
 
   module ModuleMethods
 
@@ -371,5 +367,20 @@ module Skylab::TanMan::TestSupport
     def subject_API
       TanMan_::API
     end
+
+    # ~ misc business
+
+    def cfn
+      CONFIG_FILENAME_THAT_IS_NOT_A_DOTFILE_FOR_VISIBILITY__
+    end
+
+    def cdn
+      CONFIG_DIRNAME_THAT_IS_NOT_A_DOTFILE_FOR_VISIBILITY__
+    end
+
+    CONFIG_DIRNAME_THAT_IS_NOT_A_DOTFILE_FOR_VISIBILITY__ = 'local-conf.d'.freeze
+    CONFIG_FILENAME_THAT_IS_NOT_A_DOTFILE_FOR_VISIBILITY__ = "#{
+      CONFIG_DIRNAME_THAT_IS_NOT_A_DOTFILE_FOR_VISIBILITY__ }/conf.conf".freeze
+
   end
 end

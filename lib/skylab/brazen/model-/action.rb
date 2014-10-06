@@ -22,10 +22,12 @@ module Skylab::Brazen
         @preconditions
       end
 
+      attr_reader :did_resolve_pcia
+
       def resolve_precondition_controller_identifer_a
         @preconditions = if precondition_controller_i_a
           @precondition_controller_i_a.map do |i|
-            Entity_Identifier__.via_symbol i
+            Node_Identifier_.via_symbol i
           end
         else
           model_class.preconditions
@@ -64,6 +66,11 @@ module Skylab::Brazen
     end
 
   public
+
+    def bound_call_via_modality_call x_a, modality_action
+      @event_receiver_is_modality_adapter = true
+      bound_call_via_call x_a, modality_action
+    end
 
     def bound_call_via_call x_a, ev_rcvr
       @error_count ||= 0
@@ -182,10 +189,16 @@ module Skylab::Brazen
       end
     end
 
-  public
+  public  # public accessors for arguments & related experimentals
 
     def get_bound_argument i
-      get_bound_argument_via_property self.class.properties.fetch i
+      get_bound_property_via_property self.class.properties.fetch i
+    end
+
+    def any_argument_value_at_all i
+      if self.class.properties.has_name i
+        any_argument_value i
+      end
     end
 
     def any_argument_value i
@@ -195,6 +208,19 @@ module Skylab::Brazen
     def argument_value i
       @argument_box.fetch self.class.properties.fetch( i ).name_i
     end
+
+    def argument_box
+      @argument_box
+    end
+
+    def modality_adapter  # #experimental
+      if event_receiver_is_modality_adapter
+        @event_receiver
+      end
+    end
+
+    attr_reader :event_receiver_is_modality_adapter
+
   private
 
     def actual_property_box
@@ -211,25 +237,12 @@ module Skylab::Brazen
       [ @event_receiver, @kernel ]
     end
 
-    def argument_box
-      @argument_box
-    end
-
     def accept_parent_node x
       @parent_node = x ; nil
     end
 
     def payload_output_line_yielder  # #note-160
       @event_receiver.payload_output_line_yielder
-    end
-
-    # ~ just in support of workspaces - will build out later
-
-    def start_path_for_workspace_search_when_precondition
-      ::Dir.pwd  # this should never happen in pure API land
-    end
-
-    def max_num_dirs_to_search_when_precondition
     end
 
     class Process_customized_action_inflection_behavior__

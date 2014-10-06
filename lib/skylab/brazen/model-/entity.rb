@@ -31,7 +31,20 @@ module Skylab::Brazen
 
     o :ad_hoc_processor, :preconditions, -> scan do
       scan.scanner.advance_one
-      scan.reader.precondition_controller_i_a = scan.scanner.gets_one ; nil
+      a = scan.reader.precondition_controller_i_a
+      a_ = scan.scanner.gets_one
+      if a
+        self._COVER_ME
+      else
+        scan.reader.precondition_controller_i_a = a_
+      end ; nil
+    end
+
+    o :ad_hoc_processor, :precondition, -> scan do
+      scan.scanner.advance_one
+      i_a = ( scan.reader.precondition_controller_i_a ||= [] )
+      i = scan.scanner.gets_one
+      i_a.include?( i ) or i_a.push i ; nil
     end
 
     o :meta_property, :argument_arity,
@@ -163,9 +176,25 @@ module Skylab::Brazen
           @argument_arity = :zero
         end
 
+        def integer_greater_than_or_equal_to=
+          normalizer = Numeric_Normalizer__.new(
+            :number_set, :integer,
+            :minimum_value, iambic_property )
+          add_ad_hoc_normalizer do |arg, val_p, ev_p|
+            if ! arg.value_x.nil?
+              normalizer.normalize_via_three arg, val_p, ev_p
+            end
+          end
+        end
+
         def non_negative_integer=
-          add_ad_hoc_normalizer do |x, val_p, ev_p, prop|
-            x.nil? or NORMALIZE_NON_NEGATIVE_INTEGER__[ x, prop, val_p, ev_p ]
+          normalizer = Numeric_Normalizer__.new(
+            :number_set, :integer,
+            :minimum_value, 0 )
+          add_ad_hoc_normalizer do |arg, val_p, ev_p|
+            if ! arg.value_x.nil?
+              normalizer.normalize_via_three arg, val_p, ev_p
+            end
           end
         end
 
@@ -174,56 +203,106 @@ module Skylab::Brazen
         end
       end
 
-      class NORMALIZE_NON_NEGATIVE_INTEGER__
+      class Numeric_Normalizer__
 
         Callback_::Actor[ self, :properties,
-          :x, :prop, :val_p, :ev_p ]
+          :argument,
+          :new_value_p,
+          :event_p,
+          :number_set,  # symbol
+          :minimum_value ]
+
+        def initialize * x_a
+          process_iambic_fully x_a
+          freeze
+        end
+
+        protected def init_copy_with * x_a
+          process_iambic_fully x_a
+          @number_set ||= :floating_point_number
+        end
+
+        def normalize_via_three arg, val_p, ev_p
+          otr = dup
+          otr.init_copy_with :argument, arg, :new_value_p, val_p, :event_p, ev_p
+          otr.execute
+        end
 
         def execute
-          if @x.respond_to? :bit_length
-            @d = @x
-            execute_via_integer
+          @x = @argument.value_x  # might not have been provided. we don't care
+          ok = send @number_set
+          if ok and @minimum_value
+            ok = via_number_and_minimum_value_validate
+          end
+          if ok
+            @new_value_p[ @number ]
           else
-            execute_when_not_integer
+            @result
           end
         end
 
-        def execute_when_not_integer
+        def integer  # resolve number when number set is integer
+          if @x.respond_to? :bit_length
+            @number = @x
+            PROCEDE_
+          else
+            via_x_resolve_integer_for_number
+          end
+        end
+
+        def via_x_resolve_integer_for_number
           @md = INTEGER_RX__.match @x
           if @md
-            execute_via_matchdata
+            via_matchdata_resolve_integer_for_number
           else
-            when_did_not_match
+            @result = result_when_did_not_match
+            UNABLE_
           end
         end
         INTEGER_RX__ = /\A-?\d+\z/
 
-        def when_did_not_match
-          @ev_p[ :invalid_non_negative_integer, :x, @x, :prop, @prop,
-            -> y, o do
-              y << "#{ par o.prop } must be a non-negative integer, #{
-                }had #{ ick o.x }"
+        def result_when_did_not_match
+
+          @event_p[ :value_not_in_number_set,
+
+              :x, @x, :prop, @argument.property,
+              :number_set, @number_set, -> y, o do
+
+            y << "#{ par o.prop } must be #{
+             }#{ indefinite_noun o.number_set.id2name }, #{
+              }had #{ ick o.x }"
+
           end ]
         end
 
-        def execute_via_matchdata
-          @d = @md[ 0 ].to_i
-          execute_via_integer
+        def via_matchdata_resolve_integer_for_number
+          @number = @md[ 0 ].to_i
+          ACHEIVED_
         end
 
-        def execute_via_integer
-          if 0 > @d
-            when_negative
+        def via_number_and_minimum_value_validate
+          if @minimum_value <= @number
+            PROCEDE_
           else
-            @val_p[ @d ]
+            @result = result_when_number_is_too_small
+            UNABLE_
           end
         end
 
-        def when_negative
-          @ev_p[ :invalid_non_negative_integer, :x, @d, :prop, @prop,
-            -> y, o do
-              y << "#{ par o.prop } must be non-negative, had #{ ick o.x }"
-            end ]
+        def result_when_number_is_too_small
+
+          @event_p[ :number_too_small,
+
+              :number, @number, :minimum, @minimum_value,
+              :prop, @argument.property, -> y, o do
+
+            if o.minimum.zero?
+              y << "#{ par o.prop } must be non-negative, had #{ ick o.number }"
+            else
+              y << "#{ par o.prop } must be greater than or equal to #{
+               }#{ val o.minimum }, had #{ ick o.number }"
+            end
+          end ]
         end
       end
     end
@@ -234,19 +313,26 @@ module Skylab::Brazen
     Event_[].sender self
 
     def aply_ad_hoc_normalizers prop  # this evolved from [#fa-019]
-      i = prop.name_i
+
       bx = actual_property_box_for_write
-      prop.norm_p_a.each do |p|
-        _x = bx.fetch i do end
-        p[ _x,
-          -> x do
-            bx.set i, x ; nil
+
+      prop.norm_p_a.each do | three_p |
+
+        arg = get_bound_property_via_property prop
+          # at each step, value might have changed. ( [#053] bound is not truly bound )
+
+        three_p[ arg,
+
+          -> new_value_x do
+            bx.set arg.name_i, new_value_x ; nil
           end,
-          -> * x_a, p_ do
-            _ev = build_not_OK_event_via_mutable_iambic_and_message_proc x_a, p_
+
+          -> * x_a, p do
+            _ev = build_not_OK_event_via_mutable_iambic_and_message_proc x_a, p
+            @error_count += 1  # :+[#054]
             receive_event _ev
-          end,
-          prop ]
+          end ]
+
       end ; nil
     end
 
@@ -277,7 +363,7 @@ module Skylab::Brazen
     def check_for_missing_required_props
       miss_a = Scan_[].nonsparse_array( self.class.required_properties ).
         map_reduce_by do |prop|
-          arg = get_bound_argument_via_property prop
+          arg = get_bound_property_via_property prop
           if argument_is_missing arg
             arg.property
           end
@@ -302,7 +388,7 @@ module Skylab::Brazen
       end
     end
 
-    def get_bound_argument_via_property prop
+    def get_bound_property_via_property prop
       had = true
       x = actual_property_box.fetch prop.name_i do
         had = false ; nil

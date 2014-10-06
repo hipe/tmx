@@ -128,6 +128,8 @@ module Skylab::Brazen
         @preconditions
       end
 
+      attr_reader :did_resolve_pcia
+
       def resolve_precondition_controller_identifer_a
         if precondition_controller_i_a
           a = @precondition_controller_i_a.map do |i|
@@ -256,12 +258,26 @@ module Skylab::Brazen
       end ; y
     end
 
+    def to_normalized_actual_property_scan_for_persist
+      to_normalized_actual_property_scan
+    end
+
     def to_normalized_actual_property_scan
-      i_a = self.class.properties.get_names
-      i_a.sort!
-      Scan_[].nonsparse_array( i_a ).map_by do |i|
+      Scan_[].nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
         Actual_Property_.new any_property_value( i ), i
       end
+    end
+
+    def to_normalized_bound_property_scan
+      props = self.class.properties
+      Scan_[].nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
+        get_bound_property_via_property props.fetch i
+      end
+    end
+
+    def get_sorted_property_name_i_a
+      i_a = self.class.properties.get_names
+      i_a.sort! ; i_a
     end
 
     def parameter_value i
