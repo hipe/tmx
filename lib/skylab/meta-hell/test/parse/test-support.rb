@@ -6,10 +6,10 @@ module Skylab::MetaHell::TestSupport::Parse
 
   include CONSTANTS
 
-  MetaHell = MetaHell_
+  MetaHell_ = MetaHell_
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
 end

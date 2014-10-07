@@ -2,12 +2,12 @@ require_relative '../test-support'
 
 module Skylab::MetaHell::TestSupport::BasicFields
 
-  ::Skylab::MetaHell::TestSupport[ Basic_Fields_TestSupport = self ]
+  ::Skylab::MetaHell::TestSupport[ self ]
 
   include CONSTANTS
 
-  MetaHell = MetaHell
+  MetaHell_ = MetaHell_
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
 end

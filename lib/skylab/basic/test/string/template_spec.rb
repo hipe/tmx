@@ -2,11 +2,11 @@ require_relative '../test-support'
 
 module Skylab::Basic::TestSupport::String
 
-  ::Skylab::Basic::TestSupport[ String_TestSupport = self ]
+  ::Skylab::Basic::TestSupport[ self ]
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[ba] string template" do
 

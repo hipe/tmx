@@ -34,7 +34,7 @@ module Skylab::MetaHell
     #
     #     module MyApp
     #       class CLI::Client
-    #         MetaHell::Module::Accessors.enhance self do
+    #         MetaHell_::Module::Accessors.enhance self do
     #           public_methods do
     #             module_reader :api_client, '../../API/Client'
     #           end
@@ -61,7 +61,7 @@ module Skylab::MetaHell
     # like so
     #
     #     class Foo
-    #       MetaHell::Module::Accessors.enhance self do
+    #       MetaHell_::Module::Accessors.enhance self do
     #         private_module_autovivifier_reader :zapper, 'Ohai_',
     #           -> do  # when didn't exist
     #             m = ::Module.new

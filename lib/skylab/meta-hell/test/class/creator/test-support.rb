@@ -1,10 +1,10 @@
 require_relative '../test-support'
 
 module Skylab::MetaHell::TestSupport::Class::Creator
-  ::Skylab::MetaHell::TestSupport::Class[ self ] # #regret
-  Creator_TestSupport = self # courtesy
 
-  include CONSTANTS # for the spec
+  ::Skylab::MetaHell::TestSupport::Class[ TS_ = self ]
+
+  include CONSTANTS
 
   module ModuleMethods
     include CONSTANTS
@@ -24,7 +24,7 @@ module Skylab::MetaHell::TestSupport::Class::Creator
       let :klass do
         ::Class.new.class_eval do
           extend MetaHell_::Let  # #comport
-          extend MetaHell::Class::Creator
+          extend MetaHell_::Class::Creator
           let( :meta_hell_anchor_module ) { ::Module.new }
           class_exec(& f) if f
           self
@@ -36,6 +36,6 @@ module Skylab::MetaHell::TestSupport::Class::Creator
 
   module InstanceMethods
     include CONSTANTS
-    extend MetaHell::Let
+    extend MetaHell_::Let
   end
 end

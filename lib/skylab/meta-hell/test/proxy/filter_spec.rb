@@ -1,11 +1,12 @@
 require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::Proxy::Filter
-  ::Skylab::MetaHell::TestSupport::Proxy[ Filter_TestSupport = self ]
+
+  ::Skylab::MetaHell::TestSupport::Proxy[ self ]
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[mh] Proxy::Filter::Post" do
 
@@ -21,7 +22,7 @@ module Skylab::MetaHell::TestSupport::Proxy::Filter
         "inner-bang:(#{ x })"
       end
 
-      pxy_cls = MetaHell::Proxy::Filter::Post.new bang: -> x do
+      pxy_cls = MetaHell_::Proxy::Filter::Post.new bang: -> x do
         "outer-bang:(#{ x })"
       end
 

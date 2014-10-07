@@ -2,14 +2,14 @@ require_relative '../test-support'
 
 module Skylab::Basic::TestSupport::Hash
 
-  ::Skylab::Basic::TestSupport[ Hash_TestSupport = self ]
+  ::Skylab::Basic::TestSupport[ self ]
 
   include CONSTANTS
 
-  Basic = Basic
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
+  Basic_ = Basic_
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
 end

@@ -6,11 +6,11 @@ module Skylab::Basic::TestSupport::Hash::Order_Proxy
 
   include CONSTANTS
 
-  Basic = ::Skylab::Basic
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
+  Basic_ = Basic_
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[ba] Hash::Order_Proxy" do
     context "a proxy around a hash that tracks in order every key of every `aset` call" do
@@ -19,7 +19,7 @@ module Skylab::Basic::TestSupport::Hash::Order_Proxy
         Sandbox_1.with self
         module Sandbox_1
           h = { }
-          op = Basic::Hash::Order_Proxy.new h
+          op = Basic_::Hash::Order_Proxy.new h
 
           op[ :foo ] = :bar
           op[ :bing ] = :baz

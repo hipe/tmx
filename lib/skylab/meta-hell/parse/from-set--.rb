@@ -42,7 +42,7 @@ module Skylab::MetaHell
     # regardless of the input,
     # a parser with no nodes in it will always report 'no parse' and 'spent':
     #
-    #     P = MetaHell::Parse.from_set.curry[ :pool_procs, [ ] ]
+    #     P = MetaHell_::Parse.from_set.curry[ :pool_procs, [ ] ]
     #
     #     P[ argv = [] ]  # => [ false, true ]
     #     argv # => []
@@ -55,7 +55,7 @@ module Skylab::MetaHell
     # with parser with one node that reports it always matches & always spends
     # it always reports the same as a final result:
     #
-    #     P = MetaHell::Parse.from_set.curry[ :pool_procs, [
+    #     P = MetaHell_::Parse.from_set.curry[ :pool_procs, [
     #      -> _input {  [ true, true ] }
     #     ]]
     #
@@ -64,7 +64,7 @@ module Skylab::MetaHell
     # with a parser with one node that reports it never matches & always spends
     # it always reports the same as a final result:
     #
-    #     P = MetaHell::Parse.from_set.curry[ :pool_procs, [
+    #     P = MetaHell_::Parse.from_set.curry[ :pool_procs, [
     #       -> _input {  [ false, true ] }
     #     ]]
     #
@@ -83,7 +83,7 @@ module Skylab::MetaHell
     #       end
     #     end
     #
-    #     P = MetaHell::Parse.from_set.curry[ :pool_procs, [
+    #     P = MetaHell_::Parse.from_set.curry[ :pool_procs, [
     #       keyword[ 'foo' ],
     #       keyword[ 'bar' ],
     #       -> memo, argv do

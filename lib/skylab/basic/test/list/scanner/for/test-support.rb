@@ -2,18 +2,18 @@ require_relative '../test-support'
 
 module Skylab::Basic::TestSupport::List::Scanner::For
 
-  ::Skylab::Basic::TestSupport::List::Scanner[ TS__ = self ]
+  ::Skylab::Basic::TestSupport::List::Scanner[ self ]
 
   include CONSTANTS
 
-  Basic = Basic ; TestSupport = TestSupport
+  Basic_ = Basic_ ; TestSupport_ = TestSupport_
 
   set_tmpdir_pathname do
-    _pn = Basic::Lib_::Tmpdir_pathname[]
+    _pn = Basic_::Lib_::Tmpdir_pathname[]
     _pn.join 'skylab-basic'
   end
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
 
   module InstanceMethods
@@ -25,7 +25,7 @@ module Skylab::Basic::TestSupport::List::Scanner::For
     attr_reader :do_debug
 
     def debug_IO
-      Basic::Lib_::Some_stderr_IO[]
+      Basic_::Lib_::Some_stderr_IO[]
     end
   end
 end

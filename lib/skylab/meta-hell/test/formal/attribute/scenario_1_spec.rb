@@ -1,6 +1,6 @@
 require_relative '../test-support'
 
-module ::Skylab::MetaHell::TestSupport::Formal
+module Skylab::MetaHell::TestSupport::Formal
 
   # this is a somewhat built-out convolution we used to discover a wicked
   # trip-up we hit when refactoring attributes. it revealed how important
@@ -11,7 +11,7 @@ module ::Skylab::MetaHell::TestSupport::Formal
   build_modules = -> o do
 
     class o::Lib_Task
-      MetaHell::Formal::Attribute::DSL[ self ]
+      MetaHell_::Formal::Attribute::DSL[ self ]
     end
 
     class o::Task < o::Lib_Task
@@ -58,7 +58,7 @@ module ::Skylab::MetaHell::TestSupport::Formal
   end
 
   scenario_module = -> do
-    mod = Formal_TestSupport.const_set "MOD_#{ FUN.next_id[] }", ::Module.new
+    mod = TS_.const_set "MOD_#{ FUN.next_id[] }", ::Module.new
     build_modules[ mod ] # we could module_exec but it's not much prettier
     scenario_module = -> { mod }
     mod

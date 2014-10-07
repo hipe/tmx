@@ -10,7 +10,7 @@ module Skylab::MetaHell
     #       def one
     #       end
     #
-    #       MetaHell::Fields::From.methods(
+    #       MetaHell_::Fields::From.methods(
     #         :overriding, :argful, :destructive, :globbing, :absorber, :initialize
     #       ) do
     #         def two a
@@ -37,7 +37,7 @@ module Skylab::MetaHell
     #
     #     class Baz < Foo
     #
-    #       MetaHell::Fields::From.methods :argful do
+    #       MetaHell_::Fields::From.methods :argful do
     #         def four a
     #           @four_value = a.shift
     #         end
@@ -153,7 +153,7 @@ module Skylab::MetaHell
     # like so
     #
     #     class Foo
-    #       MetaHell::Fields::From.methods :use_o_DSL do
+    #       MetaHell_::Fields::From.methods :use_o_DSL do
     #
     #         o :desc, "a", "b"
     #         o :desc, "c"

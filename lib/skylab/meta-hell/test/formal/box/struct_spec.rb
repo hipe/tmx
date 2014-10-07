@@ -1,23 +1,23 @@
 require_relative 'test-support'
 
-module ::Skylab::MetaHell::TestSupport::Formal::Box::Struct
+module Skylab::MetaHell::TestSupport::Formal::Box::Struct
 
-  ::Skylab::MetaHell::TestSupport::Formal::Box[ TS__ = self ]
+  ::Skylab::MetaHell::TestSupport::Formal::Box[ TS_ = self ]
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[mh] formal box struct - from box" do
 
-    extend TS__
+    extend TS_
 
     define_method :struct, & MetaHell_::FUN.memoize[ -> do
       build_box_notify.to_struct
     end ]
 
     def self.build_box_notify
-      MetaHell::Formal::Box.
+      MetaHell_::Formal::Box.
         from_hash sure: :whaver, this: :that, ming: :mang
     end
 
@@ -61,7 +61,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box::Struct
       end
 
       it "it *will* allow you to overwrite vital methods, so be careful" do
-        struct = MetaHell::Formal::Box.from_hash( each: :peach ).to_struct
+        struct = MetaHell_::Formal::Box.from_hash( each: :peach ).to_struct
         struct.each.should eql( :peach )
       end
 
@@ -73,7 +73,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box::Struct
     context "if you try to create a struct from the empty box" do
 
       it "- borks because of real life" do
-        box = MetaHell::Formal::Box.new
+        box = MetaHell_::Formal::Box.new
         begin
           box.to_struct
         rescue ::ArgumentError => e
@@ -115,9 +115,9 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box::Struct
 
   describe "[mh] formal box struct - like tradtional struct" do
 
-    define_method :wiz_bang, & MetaHell::FUN.memoize[ -> do
-       MetaHell::Formal::Box.const_get :Struct, false
-       MetaHell::Formal::Box::Struct.new :wiz, :bang
+    define_method :wiz_bang, & MetaHell_::FUN.memoize[ -> do
+       MetaHell_::Formal::Box.const_get :Struct, false
+       MetaHell_::Formal::Box::Struct.new :wiz, :bang
     end ]
 
     it "try and construct it with wrong size - struct size differs (Argum.." do

@@ -4,7 +4,7 @@ module Skylab::MetaHell::TestSupport::Class::Creator
 
   describe "[mh] class creator instance methods" do
 
-    extend Creator_TestSupport
+    extend TS_
 
     context "minimal" do
       snip

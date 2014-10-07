@@ -6,12 +6,12 @@ module Skylab::Basic::TestSupport::Digraph::Holes__
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[ba] digraph node creation" do
 
     it "'node!' plain" do
-      di = Basic::Digraph.new
+      di = Basic_::Digraph.new
       di.node! :waz
       di.length.should eql 1
       di._a.should eql %i( waz )
@@ -20,10 +20,10 @@ module Skylab::Basic::TestSupport::Digraph::Holes__
     end
 
     it "'node!' with flavor" do
-      di = Basic::Digraph.new
+      di = Basic_::Digraph.new
       di.node! :waz, is: [ :wiff, :wengle ]
       di.node! :wengle, is: [ :waffle ]
-      io = Basic::Lib_::String_IO[]
+      io = Basic_::Lib_::String_IO[]
       di.describe_digraph :IO, io, :with_spaces, :with_solos
       _act = io.string
       _exp = <<-O.unindent.chop

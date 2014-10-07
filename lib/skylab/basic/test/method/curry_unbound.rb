@@ -6,9 +6,9 @@ module Skylab::Basic::TestSupport::Method::CU
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  Basic = Basic
+  Basic_ = Basic_
 
   describe "[ba] method curry unbound - good for ONE curry" do
 
@@ -20,7 +20,7 @@ module Skylab::Basic::TestSupport::Method::CU
           "(#{ bread }(#{ inside })#{ toothpick })"
         end
 
-        define_method :reuben, Basic::Method::Curry::Unbound.
+        define_method :reuben, Basic_::Method::Curry::Unbound.
           new( instance_method( :sandwich ) ).curry[ :rye ]
 
 
@@ -34,7 +34,7 @@ module Skylab::Basic::TestSupport::Method::CU
     it "arity is less than 1 - X" do
       -> do
         class Wazzerly
-          Basic::Method::Curry::Unbound.new instance_method :not_curriable
+          Basic_::Method::Curry::Unbound.new instance_method :not_curriable
         end
       end.should raise_error ::ArgumentError, /\bfor now, arity must be #{
         }greater than or equal to 1 \(had -2\)/

@@ -9,7 +9,7 @@ module Skylab::MetaHell::TestSupport::BasicFields
         Sandbox_1.with self
         module Sandbox_1
           class Foo
-            MetaHell::Basic_Fields.with :client, self,
+            MetaHell_::Basic_Fields.with :client, self,
               :globbing, :absorber, :initialize,
               :field_i_a, [ :ding, :bat ]
           end
@@ -52,7 +52,7 @@ module Skylab::MetaHell::TestSupport::BasicFields
         Sandbox_2.with self
         module Sandbox_2
           class Foo
-            MetaHell::Basic_Fields.with :client, self, :struct_like,
+            MetaHell_::Basic_Fields.with :client, self, :struct_like,
               :globbing, :absorber, :initialize,
               :field_i_a, [ :fiz, :faz ]
           end

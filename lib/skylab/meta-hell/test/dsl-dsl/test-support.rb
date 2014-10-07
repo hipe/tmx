@@ -6,10 +6,10 @@ module Skylab::MetaHell::TestSupport::DSL_DSL
 
   include CONSTANTS
 
-  MetaHell = ::Skylab::MetaHell
+  MetaHell_ = ::Skylab::MetaHell
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
 end

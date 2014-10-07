@@ -2,13 +2,13 @@ require_relative '../test-support'
 
 module Skylab::Basic::TestSupport::Field
 
-  ::Skylab::Basic::TestSupport[ Field_TestSupport = self ]
+  ::Skylab::Basic::TestSupport[ TS_ = self ]
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  Basic = Basic
+  Basic_ = Basic_
 
   module CONSTANTS::Sandbox
   end

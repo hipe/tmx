@@ -25,7 +25,7 @@ module Skylab::MetaHell
   # introductory example:
   #
   #     class Foo
-  #       MetaHell::DSL_DSL.enhance self do
+  #       MetaHell_::DSL_DSL.enhance self do
   #         atom :wiz                     # make an atomic (basic) field
   #       end                             # called `wiz`
   #
@@ -162,7 +162,7 @@ module Skylab::MetaHell
     # but note you use `foo.call` from the instance:
     #
     #     class Foo
-    #       MetaHell::DSL_DSL.enhance self do
+    #       MetaHell_::DSL_DSL.enhance self do
     #         block :zinger
     #       end
     #     end
@@ -183,7 +183,7 @@ module Skylab::MetaHell
     # in the instance in the same DSL-y way as in the class
     #
     #     class Foo
-    #       MetaHell::DSL_DSL.enhance self do
+    #       MetaHell_::DSL_DSL.enhance self do
     #         atom_accessor :with_name
     #       end
     #     end
@@ -199,7 +199,7 @@ module Skylab::MetaHell
   # you can attempt to make a DSL reusable and inheritable like so:
   #
   #     module Foo
-  #       MetaHell::DSL_DSL.enhance_module self do
+  #       MetaHell_::DSL_DSL.enhance_module self do
   #         atom :pik
   #       end
   #     end

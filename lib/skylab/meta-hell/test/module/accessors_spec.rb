@@ -6,11 +6,11 @@ module Skylab::MetaHell::TestSupport::Module::Accessors
 
   include CONSTANTS
 
-  MetaHell = ::Skylab::MetaHell
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
+  MetaHell_ = MetaHell_
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[mh] Module::Accessors" do
     context "a lightweight enhancer that for the module using it generates instance" do
@@ -42,7 +42,7 @@ module Skylab::MetaHell::TestSupport::Module::Accessors
         module Sandbox_1
           module MyApp
             class CLI::Client
-              MetaHell::Module::Accessors.enhance self do
+              MetaHell_::Module::Accessors.enhance self do
                 public_methods do
                   module_reader :api_client, '../../API/Client'
                 end
@@ -61,7 +61,7 @@ module Skylab::MetaHell::TestSupport::Module::Accessors
         Sandbox_2.with self
         module Sandbox_2
           class Foo
-            MetaHell::Module::Accessors.enhance self do
+            MetaHell_::Module::Accessors.enhance self do
               private_module_autovivifier_reader :zapper, 'Ohai_',
                 -> do  # when didn't exist
                   m = ::Module.new

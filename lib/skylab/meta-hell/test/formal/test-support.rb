@@ -1,13 +1,14 @@
 require_relative '../test-support'
 
-module ::Skylab::MetaHell::TestSupport::Formal
-  ::Skylab::MetaHell::TestSupport[ Formal_TestSupport = self ]
+module Skylab::MetaHell::TestSupport::Formal
+
+  ::Skylab::MetaHell::TestSupport[ TS_ = self ]
 
   include CONSTANTS
 
-  MetaHell = MetaHell # bc of metahell
+  MetaHell_ = MetaHell_ # bc of metahell
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   FUN = -> do
     o = { }
@@ -18,7 +19,7 @@ module ::Skylab::MetaHell::TestSupport::Formal
   end.call
 
   module CONSTANTS
-    Headless = MetaHell::Library_::Headless
+    Headless = MetaHell_::Library_::Headless
     FUN = FUN
   end
 

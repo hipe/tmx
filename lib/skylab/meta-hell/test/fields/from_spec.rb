@@ -6,11 +6,11 @@ module Skylab::MetaHell::TestSupport::Fields::From
 
   include CONSTANTS
 
-  MetaHell = ::Skylab::MetaHell
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
+  MetaHell_ = MetaHell_
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[mh] Fields::From" do
     context "let a class define its fields via particular methods it defines" do
@@ -23,7 +23,7 @@ module Skylab::MetaHell::TestSupport::Fields::From
             def one
             end
 
-            MetaHell::Fields::From.methods(
+            MetaHell_::Fields::From.methods(
               :overriding, :argful, :destructive, :globbing, :absorber, :initialize
             ) do
               def two a
@@ -58,7 +58,7 @@ module Skylab::MetaHell::TestSupport::Fields::From
         module Sandbox_1
           class Baz < Foo
 
-            MetaHell::Fields::From.methods :argful do
+            MetaHell_::Fields::From.methods :argful do
               def four a
                 @four_value = a.shift
               end
@@ -81,7 +81,7 @@ module Skylab::MetaHell::TestSupport::Fields::From
         Sandbox_2.with self
         module Sandbox_2
           class Foo
-            MetaHell::Fields::From.methods :use_o_DSL do
+            MetaHell_::Fields::From.methods :use_o_DSL do
 
               o :desc, "a", "b"
               o :desc, "c"

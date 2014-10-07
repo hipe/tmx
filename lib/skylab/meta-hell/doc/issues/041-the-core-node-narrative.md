@@ -9,7 +9,7 @@ by applications). it remains perhaps the most widespread and most ultimately
 depended-upon subsystem. while [ba] Basic is hot on its tail, [ba] will likely
 always serve as a compliment to it rather than ever being a replacement for it.
 
-the 'Meta' in MetaHell refers of course (?) to meta-programming. as is the
+the 'Meta' in MetaHell_ refers of course (?) to meta-programming. as is the
 trend with nodes with facetiously negative-sounding names ("regret"),
 MetaHell was brought into this world under a heavy shadow of suspicion, and
 wa
@@ -21,7 +21,7 @@ more than one subsystem.
 some of these were ill-founded experiments that served as a necessary
 sandboxes for craziness (the class- and module-creating DSLs, probably the
 first [mh] facility, still used in some tests somewhere but totally deprecated
-and a bad idea). but by and large, MetaHell is an OK thing.
+and a bad idea). but by and large, MetaHell_ is an OK thing.
 
 
 in roughly descending order of popularity, here are a few of its most

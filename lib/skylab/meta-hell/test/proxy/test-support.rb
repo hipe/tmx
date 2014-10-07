@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::MetaHell::TestSupport::Proxy
 
-  ::Skylab::MetaHell::TestSupport[ Proxy_TestSupport = self ]
+  ::Skylab::MetaHell::TestSupport[ TS_ = self ]
 
   ::Skylab::TestSupport::Sandbox::Host[ self ]
 
@@ -15,7 +15,7 @@ module Skylab::MetaHell::TestSupport::Proxy
 
   include CONSTANTS
 
-  extend TestSupport::Quickie  # brash
+  extend TestSupport_::Quickie  # brash
 
   -> do
     counter = 0

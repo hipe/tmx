@@ -6,24 +6,24 @@ module Skylab::Basic::TestSupport::Digraph::Core
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[ba] digraph" do
 
     it "here have an empty one" do
-      digraph = Basic::Digraph.new
+      digraph = Basic_::Digraph.new
       digraph.node_count.should eql( 0 )
     end
 
     it "here have one with one node" do
-      digraph = Basic::Digraph[ :solo ]
+      digraph = Basic_::Digraph[ :solo ]
       digraph.node_count.should eql( 1 )
       node = digraph.fetch :solo
       node.normalized_local_node_name.should eql( :solo )
     end
 
     it "here have the minimal graph" do
-      digraph = Basic::Digraph[ child: :parent ]
+      digraph = Basic_::Digraph[ child: :parent ]
       digraph.node_count.should eql( 2 )
       digraph.fetch( :child ).normalized_local_node_name.should eql( :child )
       digraph.fetch( :parent ).normalized_local_node_name.should eql( :parent )
@@ -34,7 +34,7 @@ module Skylab::Basic::TestSupport::Digraph::Core
     end
 
     it "hay your nodes can point to multiple parents" do
-      d = Basic::Digraph[ :fing, bing: :bong, bing_2: :bong,
+      d = Basic_::Digraph[ :fing, bing: :bong, bing_2: :bong,
                                      sing: [:song], wing: [:wrong, :dong] ]
       d.node_count.should eql( 9 )  # it didn't somehow double on on 'bong'
       d.fetch( :fing ).direct_association_target_names.should eql( nil )
@@ -45,7 +45,7 @@ module Skylab::Basic::TestSupport::Digraph::Core
     end
 
     plant = -> do
-      d = Basic::Digraph[ :plant, flower: :plant, bedillia: :flower ]
+      d = Basic_::Digraph[ :plant, flower: :plant, bedillia: :flower ]
       plant = -> { d }
       d
     end
@@ -53,7 +53,7 @@ module Skylab::Basic::TestSupport::Digraph::Core
     context "there are Formal::Box-like accessors you can use:" do
 
       it "did you know that you can use `has?`" do
-        d = Basic::Digraph[ :mineral, dog: :animal ]
+        d = Basic_::Digraph[ :mineral, dog: :animal ]
         (d.has?( :mineral ) && d.has?( :dog ) && d.has?( :animal )).should(
           eql( true ) )
         d.has?( :aardvark ).should eql( false )
@@ -77,7 +77,7 @@ module Skylab::Basic::TestSupport::Digraph::Core
     end
 
     big_one = -> do
-      d = Basic::Digraph[ animal: :thing, penguin: :animal,
+      d = Basic_::Digraph[ animal: :thing, penguin: :animal,
         mineral: :thing, tux: [ :penguin, :icon ], my_tux_sticker: :tux,
         icon: :symbol ]
       big_one = -> { d }
@@ -94,7 +94,7 @@ module Skylab::Basic::TestSupport::Digraph::Core
 
     context 'duping a graph -' do
       it 'makes a deep copy of the whole graph' do
-        d1 = Basic::Digraph[ :alpha, beta: :gamma, delta: [ :epsilon, :chi] ]
+        d1 = Basic_::Digraph[ :alpha, beta: :gamma, delta: [ :epsilon, :chi] ]
         d2 = d1.dupe
         d2.node_count.should eql( 6 )
         d2.fetch( :beta ).normalized_local_node_name.should eql( :beta )
@@ -106,7 +106,7 @@ module Skylab::Basic::TestSupport::Digraph::Core
 
     context 'clearing a graph - ' do
       it 'flatly removes the nodes from the graph' do
-        d = Basic::Digraph[ :one ]
+        d = Basic_::Digraph[ :one ]
         d.names.should eql( [ :one ] )
         d.node_count.should eql( 1 )
         d.clear.should eql( nil )  # returns nothing
@@ -143,11 +143,11 @@ module Skylab::Basic::TestSupport::Digraph::Core
 
     context "THE DIFFERENCE ENGINE" do
 
-      memoize = Basic::Lib_::Memoize
+      memoize = Basic_::Lib_::Memoize
 
       define_singleton_method :digraph do |meth, arr|
         define_method meth, & memoize[ -> do
-          Basic::Digraph[ * arr ]
+          Basic_::Digraph[ * arr ]
         end ]
       end
 

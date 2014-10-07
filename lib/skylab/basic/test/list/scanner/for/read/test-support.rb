@@ -6,9 +6,9 @@ module Skylab::Basic::TestSupport::List::Scanner::For::Read
 
   include CONSTANTS
 
-  TestSupport = TestSupport
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
+  TestSupport_ = TestSupport_
 
   module ModuleMethods
 
@@ -42,7 +42,7 @@ module Skylab::Basic::TestSupport::List::Scanner::For::Read
         if io
           x_a.push :be_verbose, true, :infostream, io
         end
-        td = TestSupport.tmpdir.via_iambic x_a
+        td = TestSupport_.tmpdir.via_iambic x_a
         td.exist? or td.prepare
         p = -> _ { td }
         td

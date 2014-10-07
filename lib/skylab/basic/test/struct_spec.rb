@@ -6,11 +6,11 @@ module Skylab::Basic::TestSupport::Struct
 
   include CONSTANTS
 
-  Basic = ::Skylab::Basic
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
+  Basic_ = Basic_
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[ba] Struct" do
     context "use it" do
@@ -18,7 +18,7 @@ module Skylab::Basic::TestSupport::Struct
       before :all do
         Sandbox_1.with self
         module Sandbox_1
-          Foo = Basic::Struct[ :nerp ]
+          Foo = Basic_::Struct[ :nerp ]
         end
       end
       it "like this" do

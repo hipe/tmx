@@ -6,20 +6,20 @@ module Skylab::MetaHell::TestSupport::Module::Core__
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  MetaHell = MetaHell
+  MetaHell_ = MetaHell_
 
   describe "[mh] Module" do
 
     context "Resolve" do
       it "o" do
-        mod = MetaHell::Module::Resolve[ '..', MetaHell::Module ]
-        mod.should eql MetaHell
+        mod = MetaHell_::Module::Resolve[ '..', MetaHell_::Module ]
+        mod.should eql MetaHell_
       end
 
       it "when you dotdot above a toplevel path - nil" do
-        mod = MetaHell::Module::Resolve[ '..', Skylab ]
+        mod = MetaHell_::Module::Resolve[ '..', Skylab ]
         mod.should be_nil
       end
     end
@@ -29,7 +29,7 @@ module Skylab::MetaHell::TestSupport::Module::Core__
       module Zinger
         @a = []
         class << self ; attr_reader :a end
-        define_singleton_method :push, MetaHell::Module::Mutex[ -> x do
+        define_singleton_method :push, MetaHell_::Module::Mutex[ -> x do
           @a <<  :"_#{ x }_"
         end ]
       end

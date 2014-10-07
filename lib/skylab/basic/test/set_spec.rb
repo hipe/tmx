@@ -1,19 +1,19 @@
 require_relative 'test-support'
 
-module ::Skylab::Basic::TestSupport::Set
+module Skylab::Basic::TestSupport::Set
 
   ::Skylab::Basic::TestSupport[ self ]
 
   include CONSTANTS
 
-  Basic = Basic
+  Basic_ = Basic_
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe '[ba] set normalization' do
 
     it "loads" do
-      Basic::Set
+      Basic_::Set
     end
 
     context "define-time failures" do
@@ -21,7 +21,7 @@ module ::Skylab::Basic::TestSupport::Set
       it "if you provide an array for 'with_members', must be frozen" do
         -> do
           class Wont_Work
-            Basic::Set[ self, :with_members, %i( foo bar ) ]
+            Basic_::Set[ self, :with_members, %i( foo bar ) ]
           end
         end.should raise_error( ::ArgumentError, %r{\bmust be frozen\b} )
       end
@@ -34,7 +34,7 @@ module ::Skylab::Basic::TestSupport::Set
     context "initialize_basic_set_with_hash" do
       before :all do
         class Foo
-          Basic::Set[ self,
+          Basic_::Set[ self,
             :with_members, %i( foo bar ).freeze,
             :initialize_basic_set_with_hash ]
           public :initialize_basic_set_with_hash
@@ -72,7 +72,7 @@ module ::Skylab::Basic::TestSupport::Set
       before :all do
         class Bar
           members_i = %i( foo bar )
-          Basic::Set[ self,
+          Basic_::Set[ self,
             :with_members, -> { members_i },
             :initialize_basic_set_with_iambic ]
           public :initialize_basic_set_with_iambic
@@ -116,7 +116,7 @@ module ::Skylab::Basic::TestSupport::Set
     context "error_count - aware" do
       before :all do
         class Error_Counting
-          Basic::Set[ self, :with_members, %i( foo bar ).freeze,
+          Basic_::Set[ self, :with_members, %i( foo bar ).freeze,
                       :initialize_basic_set_with_iambic ]
           public :initialize_basic_set_with_iambic
           def initialize
@@ -152,7 +152,7 @@ module ::Skylab::Basic::TestSupport::Set
     context "customize event handling with 'basic_set_bork_event_listener_p'" do
       before :all do
         class Borker
-          Basic::Set[ self, :with_members, %i( foo bar ).freeze,
+          Basic_::Set[ self, :with_members, %i( foo bar ).freeze,
                       :initialize_basic_set_with_iambic,
                       :basic_set_bork_event_listener_p, -> ev do
                         @error_cnt += 1
@@ -187,7 +187,7 @@ module ::Skylab::Basic::TestSupport::Set
 
       before :all do
         class Gotcha_Base
-          Basic::Set[ self, :with_members, -> do
+          Basic_::Set[ self, :with_members, -> do
             self.class::PURUMS
           end ]
         end

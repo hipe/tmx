@@ -9,7 +9,7 @@ module Skylab::Basic::TestSupport::List::Scanner::For::Read
     context "normal case" do
 
       it "when built with pathname - `gets` - works as expected" do  # mirror 2 others
-        scn = Basic::List::Scanner::For::Path[ pathname ]
+        scn = Basic_::List::Scanner::For::Path[ pathname ]
         scn.line_number.should be_nil
         _ = scn.gets
         _.should eql "one\n"
@@ -35,7 +35,7 @@ module Skylab::Basic::TestSupport::List::Scanner::For::Read
 
       it "o" do
         fh = pathname.open 'r'
-        scn = Basic::List::Scanner::For::Read.new fh, 5
+        scn = Basic_::List::Scanner::For::Read.new fh, 5
         scn.gets.should eql "abc\n"
         scn.line_number.should eql 1
         scn.gets.should eql "def\n"
@@ -67,17 +67,17 @@ module Skylab::Basic::TestSupport::List::Scanner::For::Read
       end
 
       it "o" do
-        scn = Basic::List::Scanner::For::Path[ pathname ]
+        scn = Basic_::List::Scanner::For::Path[ pathname ]
         shared_expectation scn
       end
 
       it "when page size is shorter than record - o" do
-        scn = Basic::List::Scanner::For::Path[ pathname, _STR.length - 1 ]
+        scn = Basic_::List::Scanner::For::Path[ pathname, _STR.length - 1 ]
         shared_expectation scn
       end
 
       it "when page size equals record size - o " do
-        scn = Basic::List::Scanner::For::Path[ pathname, _STR.length ]
+        scn = Basic_::List::Scanner::For::Path[ pathname, _STR.length ]
         shared_expectation scn
       end
 
@@ -97,7 +97,7 @@ module Skylab::Basic::TestSupport::List::Scanner::For::Read
       with "empty-lsfr.txt" do |o|
       end
       it "hi" do
-        scn = Basic::List::Scanner::For::Path[ pathname ]
+        scn = Basic_::List::Scanner::For::Path[ pathname ]
         scn.fh.closed?.should eql false
         scn.count.should be_zero
         _ = scn.gets

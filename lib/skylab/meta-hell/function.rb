@@ -2,14 +2,14 @@ module Skylab::MetaHell
 
   module Function
 
-    # `MetaHell::Function` can act as an enhancer that enhances a class via
+    # `MetaHell_::Function` can act as an enhancer that enhances a class via
     # enabling ivars that hold procs to act as methods of the object:
     #
     #     class Foo
     #       def initialize
     #         @bar = -> { :baz }
     #       end
-    #       MetaHell::Function self, :bar
+    #       MetaHell_::Function self, :bar
     #     end
     #
     #     Foo.new.bar  # => :baz
@@ -21,7 +21,7 @@ module Skylab::MetaHell
     #       def initialize
     #         @_secret = -> { :ting }
     #       end
-    #       MetaHell::Function self, :@_secret, :wahoo
+    #       MetaHell_::Function self, :@_secret, :wahoo
     #     end
     #
     #     Foo.new.wahoo  # => :ting
@@ -34,8 +34,8 @@ module Skylab::MetaHell
     #         @_go = -> { :yep }
     #         @_hi = -> x { "HI:#{ x }" }
     #       end
-    #       MetaHell::Function.enhance( self ).as_private_getter :@_go, :yep
-    #       MetaHell::Function.enhance( self ).as_public_method :_hi
+    #       MetaHell_::Function.enhance( self ).as_private_getter :@_go, :yep
+    #       MetaHell_::Function.enhance( self ).as_public_method :_hi
     #     end
     #
     #     f = Foo.new
@@ -111,7 +111,7 @@ module Skylab::MetaHell
   # Alternately you can use the struct-like producer to create an entire
   # class with this behavior like so:
   #
-  #     Wahoo = MetaHell::Function::Class.new :fief
+  #     Wahoo = MetaHell_::Function::Class.new :fief
   #     class Wahoo
   #       def initialize
   #         @fief = -> { :zap }

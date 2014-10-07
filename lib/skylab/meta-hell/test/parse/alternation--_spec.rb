@@ -6,11 +6,11 @@ module Skylab::MetaHell::TestSupport::Parse::Alternation__
 
   include CONSTANTS
 
-  MetaHell = ::Skylab::MetaHell
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
+  MetaHell_ = MetaHell_
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[mh] Parse::Alternation__" do
     context "a normative example" do
@@ -18,7 +18,7 @@ module Skylab::MetaHell::TestSupport::Parse::Alternation__
       it "like so" do
         Sandbox_1.with self
         module Sandbox_1
-          res = MetaHell::Parse.alternation[ [
+          res = MetaHell_::Parse.alternation[ [
             -> ix { :a == ix and :A },
             -> ix { :b == ix and :B } ],
             :b ]
@@ -32,7 +32,7 @@ module Skylab::MetaHell::TestSupport::Parse::Alternation__
       before :all do
         Sandbox_2.with self
         module Sandbox_2
-          P = MetaHell::Parse.alternation.curry[ :pool_procs, [
+          P = MetaHell_::Parse.alternation.curry[ :pool_procs, [
             -> ix { :a == ix and :A },
             -> ix { :b == ix and :B } ] ]
         end
@@ -56,7 +56,7 @@ module Skylab::MetaHell::TestSupport::Parse::Alternation__
       it "the empty parser always result in nil" do
         Sandbox_3.with self
         module Sandbox_3
-          P = MetaHell::Parse.alternation.curry[ :pool_procs, [] ]
+          P = MetaHell_::Parse.alternation.curry[ :pool_procs, [] ]
 
           P[ :bizzle ].should eql( nil )
         end
@@ -67,7 +67,7 @@ module Skylab::MetaHell::TestSupport::Parse::Alternation__
       before :all do
         Sandbox_4.with self
         module Sandbox_4
-          P = MetaHell::Parse.alternation.curry[ :pool_procs, [
+          P = MetaHell_::Parse.alternation.curry[ :pool_procs, [
             -> output_x, input_x do
               if :one == input_x.first
                 input_x.shift

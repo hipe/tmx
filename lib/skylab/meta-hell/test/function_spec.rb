@@ -6,14 +6,14 @@ module Skylab::MetaHell::TestSupport::Function
 
   include CONSTANTS
 
-  MetaHell = ::Skylab::MetaHell
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
+  MetaHell_ = MetaHell_
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[mh] Function" do
-    context "`MetaHell::Function` can act as an enhancer that enhances a class via" do
+    context "`MetaHell_::Function` can act as an enhancer that enhances a class via" do
       Sandbox_1 = Sandboxer.spawn
       it "enabling ivars that hold procs to act as methods of the object" do
         Sandbox_1.with self
@@ -22,7 +22,7 @@ module Skylab::MetaHell::TestSupport::Function
             def initialize
               @bar = -> { :baz }
             end
-            MetaHell::Function self, :bar
+            MetaHell_::Function self, :bar
           end
 
           Foo.new.bar.should eql( :baz )
@@ -38,7 +38,7 @@ module Skylab::MetaHell::TestSupport::Function
             def initialize
               @_secret = -> { :ting }
             end
-            MetaHell::Function self, :@_secret, :wahoo
+            MetaHell_::Function self, :@_secret, :wahoo
           end
 
           Foo.new.wahoo.should eql( :ting )
@@ -55,8 +55,8 @@ module Skylab::MetaHell::TestSupport::Function
               @_go = -> { :yep }
               @_hi = -> x { "HI:#{ x }" }
             end
-            MetaHell::Function.enhance( self ).as_private_getter :@_go, :yep
-            MetaHell::Function.enhance( self ).as_public_method :_hi
+            MetaHell_::Function.enhance( self ).as_private_getter :@_go, :yep
+            MetaHell_::Function.enhance( self ).as_public_method :_hi
           end
 
           f = Foo.new
@@ -74,7 +74,7 @@ module Skylab::MetaHell::TestSupport::Function
       it "class with this behavior like so" do
         Sandbox_4.with self
         module Sandbox_4
-          Wahoo = MetaHell::Function::Class.new :fief
+          Wahoo = MetaHell_::Function::Class.new :fief
           class Wahoo
             def initialize
               @fief = -> { :zap }

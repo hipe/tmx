@@ -1,12 +1,12 @@
 require_relative 'test-support'
 
-module ::Skylab::MetaHell::TestSupport::Formal::Attribute
+module Skylab::MetaHell::TestSupport::Formal::Attribute
 
   MetaHell_::Library_.kick :Set
 
   describe "[mh] formal attribute" do
 
-    extend TS__
+    extend TS_
 
     it "creates getter/setters on classes" do
       klass = one_such_class do
@@ -146,7 +146,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Attribute
       before :all do
 
         module Defining_Module
-          MetaHell::Formal::Attribute::Definer[ self ]
+          MetaHell_::Formal::Attribute::Definer[ self ]
           meta_attribute :regex do |name, meta|
             alias_method(after = "#{name}_after_regex=", "#{name}=")
             define_method("#{name}=") do |str|
@@ -164,7 +164,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Attribute
         end
 
         class Importing_Class
-          MetaHell::Formal::Attribute::Definer[ self ]
+          MetaHell_::Formal::Attribute::Definer[ self ]
           meta_attribute Defining_Module
           class << self
             public :meta_attributes
@@ -196,7 +196,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Attribute
 
       it "which transfers the same matr object to child (should be ok)" do
         _ = importing_class.meta_attributes[ :regex ]
-        _.should be_kind_of MetaHell::Formal::Attribute::Matr__
+        _.should be_kind_of MetaHell_::Formal::Attribute::Matr__
         importing_class.meta_attributes[:regex].object_id.should eql(defining_module.meta_attributes[:regex].object_id)
       end
 
@@ -220,7 +220,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Attribute
       end
 
       def build_and_attach_to_emit_spy
-        es = MetaHell::Library_::Callback::Test::Call_Digraph_Listeners_Spy.new(
+        es = MetaHell_::Library_::Callback::Test::Call_Digraph_Listeners_Spy.new(
           :do_debug_proc, -> { do_debug },
           :debug_IO, debug_IO )
         @em_a = es.emission_a

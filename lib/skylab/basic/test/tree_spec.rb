@@ -6,21 +6,21 @@ module Skylab::Basic::TestSupport::Tree
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  describe "#{ Basic::Tree } asks - what if trees were functional?" do
+  describe "[ba] tree asks - what if trees were functional?" do
 
     it "enumerator tree" do
 
-      tree = Basic::Tree.new :local_data_1 do |y|
+      tree = Basic_::Tree.new :local_data_1 do |y|
 
         y << :node_1
 
-        y << Basic::Tree.new do |yy|
+        y << Basic_::Tree.new do |yy|
 
           yy << :node_2_1
 
-          yy << ( Basic::Tree.new :local_data_3 do |yyy|
+          yy << ( Basic_::Tree.new :local_data_3 do |yyy|
             yyy << :node_3_1
             yyy << :node_3_2
           end )

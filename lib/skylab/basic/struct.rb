@@ -5,7 +5,7 @@ module Skylab::Basic
     # use it
     # like this
     #
-    #     Foo = Basic::Struct[ :nerp ]
+    #     Foo = Basic_::Struct[ :nerp ]
     #
     #     Foo.new.nerp  # => nil
     #

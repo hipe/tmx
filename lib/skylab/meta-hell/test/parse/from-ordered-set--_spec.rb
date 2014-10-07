@@ -6,11 +6,11 @@ module Skylab::MetaHell::TestSupport::Parse::FromOrderedSet__
 
   include CONSTANTS
 
-  MetaHell = ::Skylab::MetaHell
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
+  MetaHell_ = MetaHell_
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[mh] Parse::FromOrderedSet__" do
     context "\"from ordered set\" result is array of same length as `set_a`." do
@@ -18,7 +18,7 @@ module Skylab::MetaHell::TestSupport::Parse::FromOrderedSet__
       before :all do
         Sandbox_1.with self
         module Sandbox_1
-          PARSER = MetaHell::Parse.from_ordered_set.curry[
+          PARSER = MetaHell_::Parse.from_ordered_set.curry[
             :argv_scanners, [
               -> args { args.shift if args.first =~ /bill/i },
               -> args { if :hi == args.first then args.shift and :hello end }]]

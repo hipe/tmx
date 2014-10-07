@@ -6,11 +6,11 @@ module Skylab::MetaHell::TestSupport::Parse::FromSet__
 
   include CONSTANTS
 
-  MetaHell = ::Skylab::MetaHell
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
+  MetaHell_ = MetaHell_
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[mh] Parse::FromSet__" do
     context "more flexible, powerful and complex pool-based deterministic parsing" do
@@ -18,7 +18,7 @@ module Skylab::MetaHell::TestSupport::Parse::FromSet__
       before :all do
         Sandbox_1.with self
         module Sandbox_1
-          P = MetaHell::Parse.from_set.curry[ :pool_procs, [ ] ]
+          P = MetaHell_::Parse.from_set.curry[ :pool_procs, [ ] ]
         end
       end
       it "a parser with no nodes in it will always report 'no parse' and 'spent'" do
@@ -41,7 +41,7 @@ module Skylab::MetaHell::TestSupport::Parse::FromSet__
       it "it always reports the same as a final result" do
         Sandbox_2.with self
         module Sandbox_2
-          P = MetaHell::Parse.from_set.curry[ :pool_procs, [
+          P = MetaHell_::Parse.from_set.curry[ :pool_procs, [
            -> _input {  [ true, true ] }
           ]]
 
@@ -54,7 +54,7 @@ module Skylab::MetaHell::TestSupport::Parse::FromSet__
       it "it always reports the same as a final result" do
         Sandbox_3.with self
         module Sandbox_3
-          P = MetaHell::Parse.from_set.curry[ :pool_procs, [
+          P = MetaHell_::Parse.from_set.curry[ :pool_procs, [
             -> _input {  [ false, true ] }
           ]]
 
@@ -77,7 +77,7 @@ module Skylab::MetaHell::TestSupport::Parse::FromSet__
             end
           end
 
-          P = MetaHell::Parse.from_set.curry[ :pool_procs, [
+          P = MetaHell_::Parse.from_set.curry[ :pool_procs, [
             keyword[ 'foo' ],
             keyword[ 'bar' ],
             -> memo, argv do

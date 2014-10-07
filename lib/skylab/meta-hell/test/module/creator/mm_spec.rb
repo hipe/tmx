@@ -7,7 +7,7 @@ require_relative 'mm/test-support'
 # library itself here, hence they are very ugly, hence in a way, right here
 # in this very file is the darkest of all the circles of meta-hell.
 
-module ::Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
+module Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
 
 
   module Scenario_One
@@ -20,7 +20,7 @@ module ::Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
 
       module Ohai                 # ok so the crazy thing here is that what
         extend Module::Creator     # we are doing is making a *module* (not
-        extend MetaHell::Let      # a class) be the module definer here
+        extend MetaHell_::Let      # a class) be the module definer here
 
         modul :Wank do            # (this is the crazy crap that was working
           def worked ; end        # back before the first rewrite that we
@@ -29,7 +29,7 @@ module ::Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
 
       class Class                 # of untangling now.  Does this count as
         include Ohai              # literate programming?)
-        extend MetaHell::Let::ModuleMethods
+        extend MetaHell_::Let::ModuleMethods
 
         let(:meta_hell_anchor_module) { ::Module.new }
 
@@ -39,7 +39,7 @@ module ::Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
 
     end
 
-    F = MetaHell.lib.struct_from_hash o
+    F = MetaHell_.lib.struct_from_hash o
 
     done = FUN.done_p[ F ]         # this absurdity is just a sanity check
 
@@ -47,7 +47,7 @@ module ::Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
     describe "[mh] Module::Creator::ModuleMethods (*on* modules, #{
       }not classes" do
 
-      extend MM_TestSupport
+      extend TS_
 
       context "minimal" do
         it "a klass can include modules that have graphs, and work" do
@@ -61,23 +61,23 @@ module ::Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
 
 
   module Scenario_Two
-    X = MetaHell.lib.struct_from_hash(
+    X = MetaHell_.lib.struct_from_hash(
       :once => -> do
 
         module OneGuy
-          extend Module::Creator, MetaHell::Let
+          extend Module::Creator, MetaHell_::Let
           modul :Lawrence__Fishburne
 
         end
         module AnotherGuy
-          extend Module::Creator, MetaHell::Let
+          extend Module::Creator, MetaHell_::Let
           modul :Lawrence__Kasdan
           modul :Lawrence__Arabia
         end
         class SomeClass
           include OneGuy, AnotherGuy
 
-          extend MetaHell::Let::ModuleMethods
+          extend MetaHell_::Let::ModuleMethods
 
           let(:meta_hell_anchor_module) { ::Module.new }
         end
@@ -95,7 +95,7 @@ module ::Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
     describe "[mh] Module::Creator::ModuleMethods scenario 2 - #{
       }this is fucking amazing - composing different module graphs WTF" do
 
-      extend MM_TestSupport
+      extend TS_
 
       before(:all) { X.once[] }
 

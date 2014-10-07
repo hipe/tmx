@@ -6,11 +6,11 @@ module Skylab::Basic::TestSupport::List::Scanner::With::Peek
 
   include CONSTANTS
 
-  Basic = ::Skylab::Basic
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
+  Basic_ = Basic_
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[ba] List::Scanner::With::Peek" do
     context "list scanner with peek" do
@@ -18,8 +18,8 @@ module Skylab::Basic::TestSupport::List::Scanner::With::Peek
       it "like this" do
         Sandbox_1.with self
         module Sandbox_1
-          scn = Basic::List::Scanner[ %i( a b ) ]
-          Basic::List::Scanner::With[ scn, :peek ]
+          scn = Basic_::List::Scanner[ %i( a b ) ]
+          Basic_::List::Scanner::With[ scn, :peek ]
           scn.gets.should eql( :a )
           scn.peek.should eql( :b )
           scn.gets.should eql( :b )

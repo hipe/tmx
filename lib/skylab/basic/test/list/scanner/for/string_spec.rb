@@ -5,7 +5,7 @@ module Skylab::Basic::TestSupport::List::Scanner::For
   describe "[ba] list scanner for string" do
 
     it "when built with a string, works the same" do  # mirror 2 others
-      scn = Basic::List::Scanner::For::String[ "one C\ntwo C\n" ]
+      scn = Basic_::List::Scanner::For::String[ "one C\ntwo C\n" ]
       scn.line_number.should be_nil
       scn.gets.should eql "one C\n"
       scn.line_number.should eql 1
@@ -72,12 +72,12 @@ module Skylab::Basic::TestSupport::List::Scanner::For
     end
 
     def of str
-      Basic::List::Scanner::For::String[ str ]
+      Basic_::List::Scanner::For::String[ str ]
     end
 
     it "reverse" do
       str = "haha\n"
-      y = Basic::List::Scanner::For::String::Reverse[ str ]
+      y = Basic_::List::Scanner::For::String::Reverse[ str ]
       y << 'this'
       y << 'is what'
       str.should eql "haha\nthis\nis what"

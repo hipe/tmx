@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module ::Skylab::MetaHell::TestSupport::Class::Creator::ModuleMethods
+module Skylab::MetaHell::TestSupport::Class::Creator::ModuleMethods
 
   module MultipleDefiners_Scenario_One
 
@@ -9,8 +9,8 @@ module ::Skylab::MetaHell::TestSupport::Class::Creator::ModuleMethods
     o[:once] = -> do
 
       module Dingle
-        extend MetaHell::Class::Creator
-        extend MetaHell::Let
+        extend MetaHell_::Class::Creator
+        extend MetaHell_::Let
         klass :Alpha do
           def wrong ; end
         end
@@ -19,16 +19,16 @@ module ::Skylab::MetaHell::TestSupport::Class::Creator::ModuleMethods
       end
 
       module Fingle
-        extend MetaHell::Class::Creator
-        extend MetaHell::Let
+        extend MetaHell_::Class::Creator
+        extend MetaHell_::Let
         klass :Alpha do
           def right ; end
         end
       end
 
       class Weiner
-        extend MetaHell::Let
-        include MetaHell::Class::Creator::InstanceMethods
+        extend MetaHell_::Let
+        include MetaHell_::Class::Creator::InstanceMethods
         include Dingle
         include Fingle
         let( :meta_hell_anchor_module ) { ::Module.new }
@@ -38,7 +38,7 @@ module ::Skylab::MetaHell::TestSupport::Class::Creator::ModuleMethods
 
     end
 
-    FUN = MetaHell.lib.struct_from_hash o
+    FUN = MetaHell_.lib.struct_from_hash o
 
     describe "[mh] Class::Creator::ModuleMethods Multiple Definers #{
       } Scenario One -- our graph accross a real graph" do

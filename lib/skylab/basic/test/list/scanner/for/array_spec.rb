@@ -5,7 +5,7 @@ module Skylab::Basic::TestSupport::List::Scanner::For
   describe "[ba] list scanner for array" do
 
     it "when built with array of lines - `gets` - works the same" do  # mirror 2 others
-      scn = Basic::List::Scanner::For::Array.new [ "one B\n", "two B\n" ]
+      scn = Basic_::List::Scanner::For::Array.new [ "one B\n", "two B\n" ]
       scn.line_number.should be_nil
       scn.gets.should eql "one B\n"
       scn.line_number.should eql 1

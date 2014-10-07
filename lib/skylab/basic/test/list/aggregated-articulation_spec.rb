@@ -2,25 +2,25 @@ require_relative 'test-support'
 
 module Skylab::Basic::TestSupport::List::Aggregated
 
-  ::Skylab::Basic::TestSupport::List[ Aggregated_TestSupport = self ]
+  ::Skylab::Basic::TestSupport::List[ TS_ = self ]
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   module Sandbox
   end
 
   CONSTANTS::Sandbox = Sandbox  # mine and mine
 
-  describe "#{ Basic }::List::Aggregated::Articulation WAHOO" do
+  describe "[ba] list aggregated articulation WAHOO" do
 
-    extend Aggregated_TestSupport
+    extend TS_
 
     context "normal" do
 
       define_sandbox_constant :func do
-        Sandbox::F_1 = Basic::List::Aggregated.Articulation do
+        Sandbox::F_1 = Basic_::List::Aggregated.Articulation do
           template "{{ store }}{{ adj1 }} has the required {{ item }}#{
             } needed by {{ needer }}{{ adj2 }}"
           on_zero_items -> { "nothing happened." }

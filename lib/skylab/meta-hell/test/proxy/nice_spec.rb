@@ -4,12 +4,12 @@ module Skylab::MetaHell::TestSupport::Proxy
 
   describe "[mh] Proxy::Nice is nice" do
 
-    extend Proxy_TestSupport
+    extend TS_
 
     context "with a straight up-produced class" do
 
       define_sandbox_constant :bingo_kls do
-        Sandbox::Bingo = MetaHell::Proxy::Nice::Basic.new :moo, :mar
+        Sandbox::Bingo = MetaHell_::Proxy::Nice::Basic.new :moo, :mar
         class Sandbox::Bingo
           attr_reader :two
           def initialize one, two
@@ -30,7 +30,7 @@ module Skylab::MetaHell::TestSupport::Proxy
     context "with a subclass of a produced class" do
 
       define_sandbox_constant :fingo_kls do
-        class Sandbox::Fingo < MetaHell::Proxy::Nice::Basic.new :loo
+        class Sandbox::Fingo < MetaHell_::Proxy::Nice::Basic.new :loo
           attr_reader :liu
           def initialize liu
             @liu = liu
@@ -49,9 +49,9 @@ module Skylab::MetaHell::TestSupport::Proxy
 
     context "does it work if you don't subclass it?" do
 
-      define_method :klass, & MetaHell::FUN.memoize[ -> do
-        const = "KLS_#{ Proxy_TestSupport.next_id }"
-        kls = MetaHell::Proxy::Nice::Basic.new :weazel, :skeezel
+      define_method :klass, & MetaHell_::FUN.memoize[ -> do
+        const = "KLS_#{ TS_.next_id }"
+        kls = MetaHell_::Proxy::Nice::Basic.new :weazel, :skeezel
         kls.class_eval do
           def initialize w, s
             @alpha, @beta = w, s
@@ -62,7 +62,7 @@ module Skylab::MetaHell::TestSupport::Proxy
             :gamma
           end
         end
-        Proxy_TestSupport.const_set const, kls
+        TS_.const_set const, kls
         kls
       end ]
 

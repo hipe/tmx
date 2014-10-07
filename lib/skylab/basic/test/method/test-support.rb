@@ -6,10 +6,10 @@ module Skylab::Basic::TestSupport::Method
 
   include CONSTANTS
 
-  Basic = Basic
+  Basic_ = Basic_
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
 end

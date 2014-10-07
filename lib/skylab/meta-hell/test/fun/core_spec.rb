@@ -24,13 +24,13 @@ module Skylab::MetaHell::TestSupport::FUN
                 [ item1, item2 ]
               end
             end ]
-          s = MetaHell::FUN.seeded_function_chain[ 'cilantro',  * f_a ]
+          s = MetaHell_::FUN.seeded_function_chain[ 'cilantro',  * f_a ]
           s.should eql( 'i hate cilantro' )
-          s = MetaHell::FUN::seeded_function_chain[ 'carrots', * f_a ]
+          s = MetaHell_::FUN::seeded_function_chain[ 'carrots', * f_a ]
           s.should eql( "let's have carrots and potato" )
-          s = MetaHell::FUN.seeded_function_chain[ 'red', * f_a ]
+          s = MetaHell_::FUN.seeded_function_chain[ 'red', * f_a ]
           s.should eql( 'nope i hate tomato' )
-          x = MetaHell::FUN.seeded_function_chain[ 'blue', * f_a ]
+          x = MetaHell_::FUN.seeded_function_chain[ 'blue', * f_a ]
           x.should eql( [ 'blue', 'potato' ] )
         end
       end

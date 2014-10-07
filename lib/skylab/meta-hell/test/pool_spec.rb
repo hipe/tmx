@@ -2,23 +2,22 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::Pool
 
-  ::Skylab::MetaHell::TestSupport[ Pool_TestSupport = self ]
+  ::Skylab::MetaHell::TestSupport[ TS_ = self ]
 
   ::Skylab::TestSupport::Sandbox::Host[ self ]
 
-  module CONSTANTS::Sandbox
-  end
+  CONSTANTS::Sandbox = ::Module.new
 
   include CONSTANTS
 
-  MetaHell = MetaHell
+  MetaHell_ = MetaHell_
   Sandbox = Sandbox
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[mh] Pool" do
 
-    extend Pool_TestSupport
+    extend TS_
 
     context "'s block form" do
 
@@ -28,7 +27,7 @@ module Skylab::MetaHell::TestSupport::Pool
 
           class Sandbox::Wat
 
-            MetaHell::Pool.enhance( self ).with_with_instance
+            MetaHell_::Pool.enhance( self ).with_with_instance
 
             count = 0
             define_method :initialize do
@@ -87,7 +86,7 @@ module Skylab::MetaHell::TestSupport::Pool
 
         class Sandbox::How
           count = 0
-          MetaHell::Pool.enhance( self ).with_lease_and_release -> do
+          MetaHell_::Pool.enhance( self ).with_lease_and_release -> do
             o = new( count += 1 )
             o.message = "i am the #{ count }th nerk"
             o

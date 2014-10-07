@@ -1,11 +1,12 @@
 require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::Proxy::Functional
-  ::Skylab::MetaHell::TestSupport::Proxy[ Functional_TestSupport = self ]
+
+  ::Skylab::MetaHell::TestSupport::Proxy[ self ]
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[mh] Proxy::Function" do
 
@@ -14,7 +15,7 @@ module Skylab::MetaHell::TestSupport::Proxy::Functional
     def dee ; @dee_meyers end
 
     it "produces a class, like a struct. but construct pxy with a hash" do
-      kls = MetaHell::Proxy::Functional.new :foo, :bar
+      kls = MetaHell_::Proxy::Functional.new :foo, :bar
 
       pxy = kls.new foo: -> x { "#{ pee }-#{ x }-#{ dee }" },
                     bar: -> { @dee_meyers }
@@ -24,7 +25,7 @@ module Skylab::MetaHell::TestSupport::Proxy::Functional
     end
 
     it "but don't touch the sides" do
-      kls = MetaHell::Proxy::Functional.new :zerpie, :derkie, :tata
+      kls = MetaHell_::Proxy::Functional.new :zerpie, :derkie, :tata
 
       pred = proc do
         kls.new murphy: :bed

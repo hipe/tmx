@@ -1,21 +1,21 @@
 require_relative '../test-support'
 
-module ::Skylab::MetaHell::TestSupport::Formal::Attribute
+module Skylab::MetaHell::TestSupport::Formal::Attribute
 
-  ::Skylab::MetaHell::TestSupport::Formal[ TS__ = self ]
+  ::Skylab::MetaHell::TestSupport::Formal[ TS_ = self ]
 
   include CONSTANTS
 
-  MetaHell = MetaHell
+  MetaHell_ = MetaHell_
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   module Methods
     include CONSTANTS
     define_method :one_such_class do |&block|
-      kls = TS__.const_set "KLS_#{ FUN.next_id[] }", ::Class.new
+      kls = TS_.const_set "KLS_#{ FUN.next_id[] }", ::Class.new
       kls.class_eval do
-        MetaHell::Formal::Attribute::DSL[ self ]
+        MetaHell_::Formal::Attribute::DSL[ self ]
         class_exec(& block )
       end
       kls

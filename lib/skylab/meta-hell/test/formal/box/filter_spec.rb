@@ -1,10 +1,10 @@
 require_relative 'test-support'
 
-module ::Skylab::MetaHell::TestSupport::Formal::Box
+module Skylab::MetaHell::TestSupport::Formal::Box
 
   describe "[mh] formal box filter" do
 
-    extend TS__
+    extend TS_
 
     context "filters" do
 

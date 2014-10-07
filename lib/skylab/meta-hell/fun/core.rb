@@ -189,13 +189,13 @@ module Skylab::MetaHell
     #           [ item1, item2 ]
     #         end
     #       end ]
-    #     s = MetaHell::FUN.seeded_function_chain[ 'cilantro',  * f_a ]
+    #     s = MetaHell_::FUN.seeded_function_chain[ 'cilantro',  * f_a ]
     #     s  # => 'i hate cilantro'
-    #     s = MetaHell::FUN::seeded_function_chain[ 'carrots', * f_a ]
+    #     s = MetaHell_::FUN::seeded_function_chain[ 'carrots', * f_a ]
     #     s  # => "let's have carrots and potato"
-    #     s = MetaHell::FUN.seeded_function_chain[ 'red', * f_a ]
+    #     s = MetaHell_::FUN.seeded_function_chain[ 'red', * f_a ]
     #     s  # => 'nope i hate tomato'
-    #     x = MetaHell::FUN.seeded_function_chain[ 'blue', * f_a ]
+    #     x = MetaHell_::FUN.seeded_function_chain[ 'blue', * f_a ]
     #     x  # => [ 'blue', 'potato' ]
     #
     # Blue potato. everything should be perfectly clear now.

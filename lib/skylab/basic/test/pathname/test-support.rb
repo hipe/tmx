@@ -3,6 +3,6 @@ require_relative '../test-support'
 
 module Skylab::Basic::TestSupport::Pathname
 
-  ::Skylab::Basic::TestSupport[ Pathname_TestSupport = self ]
+  ::Skylab::Basic::TestSupport[ self ]
 
 end

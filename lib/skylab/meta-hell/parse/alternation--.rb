@@ -38,7 +38,7 @@ module Skylab::MetaHell
   # a normative example
   # like so:
   #
-  #     res = MetaHell::Parse.alternation[ [
+  #     res = MetaHell_::Parse.alternation[ [
   #       -> ix { :a == ix and :A },
   #       -> ix { :b == ix and :B } ],
   #       :b ]
@@ -49,7 +49,7 @@ module Skylab::MetaHell
   # it may be useful to curry your parser in one place
   # and then use it in another:
   #
-  #     P = MetaHell::Parse.alternation.curry[ :pool_procs, [
+  #     P = MetaHell_::Parse.alternation.curry[ :pool_procs, [
   #       -> ix { :a == ix and :A },
   #       -> ix { :b == ix and :B } ] ]
   #
@@ -64,14 +64,14 @@ module Skylab::MetaHell
   # the minimal case
   # the empty parser always result in nil
   #
-  #     P = MetaHell::Parse.alternation.curry[ :pool_procs, [] ]
+  #     P = MetaHell_::Parse.alternation.curry[ :pool_procs, [] ]
   #
   #     P[ :bizzle ]  # => nil
 
   # maintaining parse state (artibrary extra arguments)
   # like so:
   #
-  #     P = MetaHell::Parse.alternation.curry[ :pool_procs, [
+  #     P = MetaHell_::Parse.alternation.curry[ :pool_procs, [
   #       -> output_x, input_x do
   #         if :one == input_x.first
   #           input_x.shift

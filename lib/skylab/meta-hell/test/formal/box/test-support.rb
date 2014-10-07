@@ -1,12 +1,12 @@
 require_relative '../test-support'
 
-module ::Skylab::MetaHell::TestSupport::Formal::Box
+module Skylab::MetaHell::TestSupport::Formal::Box
 
-  ::Skylab::MetaHell::TestSupport::Formal[ TS__ = self ]
+  ::Skylab::MetaHell::TestSupport::Formal[ TS_ = self ]
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   module ModuleMethods
     include CONSTANTS

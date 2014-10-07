@@ -25,7 +25,7 @@ module Skylab::MetaHell
     # hack label
     # like so -
     #
-    #     P = MetaHell::Parse::Hack_label_
+    #     P = MetaHell_::Parse::Hack_label_
     #     P[ :@foo_bar_x ] # => "foo bar"
     #     P[ :some_method ]  # => "some method"
 
@@ -36,7 +36,7 @@ module Skylab::MetaHell
     # fuzzy matcher - partial match anchored to beginning
     # it's a proc that generates other procs
     #
-    #     P = MetaHell::Parse::Fuzzy_matcher_
+    #     P = MetaHell_::Parse::Fuzzy_matcher_
     #     Q = P[ 3, 'foobie' ]
     #
     #     Q[ 'f' ] # => nil

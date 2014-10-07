@@ -6,9 +6,9 @@ module Skylab::Basic::TestSupport::Range
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  describe "#{ Basic::Range }::Positive::Union" do
+  describe "#{ Basic_::Range }::Positive::Union" do
 
     context "prefix and postfix" do
 
@@ -140,7 +140,7 @@ module Skylab::Basic::TestSupport::Range
     end
 
     def with str
-      @unio = Basic::Range::Positive::Union.new
+      @unio = Basic_::Range::Positive::Union.new
       str.split( ',' ).each do |s|
         bg, ed = s.split '-'
         @unio.add ::Range.new( bg.to_i, ed.to_i )

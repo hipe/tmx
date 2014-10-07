@@ -6,9 +6,9 @@ module Skylab::MetaHell::TestSupport::DSL_DSL::Constant_Trouble
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  MetaHell = MetaHell
+  MetaHell_ = MetaHell_
 
   describe "[mh] DSL_DSL::Constant_Trouble" do
 
@@ -29,7 +29,7 @@ module Skylab::MetaHell::TestSupport::DSL_DSL::Constant_Trouble
                         # enhance you with.
           end
 
-          DSL = MetaHell::DSL_DSL::Constant_Trouble.
+          DSL = MetaHell_::DSL_DSL::Constant_Trouble.
             new :Blammo_, Blammo, [ :hip_hop, :horay ]
 
                         # you will get one called this that descends from
@@ -99,7 +99,7 @@ module Skylab::MetaHell::TestSupport::DSL_DSL::Constant_Trouble
       m = -> do
         module M2
           class Bongo
-            Enhancer_ = MetaHell::DSL_DSL::Constant_Trouble.
+            Enhancer_ = MetaHell_::DSL_DSL::Constant_Trouble.
               new :Bongo_, self, [ :wiptastik, :plastik ]
           end
           class Yours

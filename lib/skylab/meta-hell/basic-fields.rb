@@ -8,7 +8,7 @@ module Skylab::MetaHell
     # "iambic"-looking lists (either globbed or not globbed depending on you).
     #
     #     class Foo
-    #       MetaHell::Basic_Fields.with :client, self,
+    #       MetaHell_::Basic_Fields.with :client, self,
     #         :globbing, :absorber, :initialize,
     #         :field_i_a, [ :ding, :bat ]
     #     end
@@ -170,7 +170,7 @@ module Skylab::MetaHell
     # you get a `members` instance method
     #
     #     class Foo
-    #       MetaHell::Basic_Fields.with :client, self, :struct_like,
+    #       MetaHell_::Basic_Fields.with :client, self, :struct_like,
     #         :globbing, :absorber, :initialize,
     #         :field_i_a, [ :fiz, :faz ]
     #     end

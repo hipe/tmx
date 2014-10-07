@@ -1,16 +1,16 @@
 require_relative 'test-support'
 
-module ::Skylab::MetaHell::TestSupport::Formal::Attribute::Box
+module Skylab::MetaHell::TestSupport::Formal::Attribute::Box
 
-  ::Skylab::MetaHell::TestSupport::Formal::Attribute[ TS__ = self ]
+  ::Skylab::MetaHell::TestSupport::Formal::Attribute[ TS_ = self ]
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[mh] formal attribute box" do
 
-    extend TS__
+    extend TS_
 
     context "`with` - doesn't care about truthiness just has?" do
 
@@ -37,7 +37,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Attribute::Box
     context "`select` - " do
       memoize :box, -> do
         st = ::Struct.new :name, :ready, :flavor
-        box = MetaHell::Formal::Attribute::Box.new
+        box = MetaHell_::Formal::Attribute::Box.new
         class << box
           public :add
         end

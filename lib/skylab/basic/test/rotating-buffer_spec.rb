@@ -6,11 +6,11 @@ module Skylab::Basic::TestSupport::Rotating_Buffer
 
   include CONSTANTS
 
-  Basic = ::Skylab::Basic
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
+  Basic_ = Basic_
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[ba] Rotating_Buffer" do
     context "it's just like tivo" do
@@ -18,7 +18,7 @@ module Skylab::Basic::TestSupport::Rotating_Buffer
       it "like so" do
         Sandbox_1.with self
         module Sandbox_1
-          rotbuf = Basic::Rotating_Buffer.new 4
+          rotbuf = Basic_::Rotating_Buffer.new 4
           rotbuf << :a << :b << :c << :d << :e
           rotbuf[ 2 ].should eql( :d )
           rotbuf[ -1 ].should eql( :e )
@@ -36,7 +36,7 @@ module Skylab::Basic::TestSupport::Rotating_Buffer
       it "under buffer" do
         Sandbox_2.with self
         module Sandbox_2
-          rotbuf = Basic::Rotating_Buffer.new 5
+          rotbuf = Basic_::Rotating_Buffer.new 5
           rotbuf << :a << :b << :c
           rotbuf[ -3 .. -1 ].should eql( %i( a b c ) )
         end
@@ -47,7 +47,7 @@ module Skylab::Basic::TestSupport::Rotating_Buffer
       it "short buffers" do
         Sandbox_3.with self
         module Sandbox_3
-          r = Basic::Rotating_Buffer.new 3
+          r = Basic_::Rotating_Buffer.new 3
           r << :a << :b
           r.to_a.should eql( %i( a b ) )
         end
@@ -58,7 +58,7 @@ module Skylab::Basic::TestSupport::Rotating_Buffer
       it "cycled buffers" do
         Sandbox_4.with self
         module Sandbox_4
-          r = Basic::Rotating_Buffer.new 3
+          r = Basic_::Rotating_Buffer.new 3
           r << :a << :b << :c << :d
           r.to_a.should eql( %i( b c d ) )
         end

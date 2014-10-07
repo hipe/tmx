@@ -6,8 +6,8 @@ module Skylab::MetaHell::TestSupport::Parse::Series__
 
   include CONSTANTS
 
-  MetaHell_ = MetaHell = MetaHell_
+  MetaHell_ = MetaHell_
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
 end

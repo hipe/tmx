@@ -6,15 +6,15 @@ module Skylab::MetaHell::TestSupport::Parse::Series__::Intgrtn
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  MetaHell_ = MetaHell
+  MetaHell_ = MetaHell_
 
   describe "[mh] Parse::Series (integration spec)" do
 
     before :all do
       fields = MetaHell_::Parse::Fields
-      P_ = MetaHell::Parse::series.curry[
+      P_ = MetaHell_::Parse::series.curry[
         :syntax, :monikate, -> a { a * ' ' },
         :field, :monikate, -> s { "[ #{ s } ]" },
         :field, :moniker, '<integer>',
@@ -32,7 +32,7 @@ module Skylab::MetaHell::TestSupport::Parse::Series__::Intgrtn
       TS_.const_defined?( :Y_, false ) ?
         TS_.const_get( :Y_, false ) :
         TS_.const_set( :Y_, ::Enumerator::Yielder.
-          new( & TestSupport::System.stderr.method( :puts ) ) )
+          new( & TestSupport_.debug_IO.method( :puts ) ) )
     end
 
     def parse *argv

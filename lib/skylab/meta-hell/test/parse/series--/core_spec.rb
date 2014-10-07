@@ -9,7 +9,7 @@ module Skylab::MetaHell::TestSupport::Parse::Series__
         Sandbox_1.with self
         module Sandbox_1
           args = [ '30', 'other' ]
-          age, sex, loc =  MetaHell::Parse.series[ args,
+          age, sex, loc =  MetaHell_::Parse.series[ args,
             -> a { /\A\d+\z/ =~ a },
             -> s { /\A[mf]\z/i =~ s },
             -> l { /./ =~ l } ]
@@ -25,7 +25,7 @@ module Skylab::MetaHell::TestSupport::Parse::Series__
       before :all do
         Sandbox_2.with self
         module Sandbox_2
-          P = MetaHell::Parse.series.curry[
+          P = MetaHell_::Parse.series.curry[
             :token_matchers, [
               -> age do
                 /\A\d+\z/ =~ age
@@ -88,7 +88,7 @@ module Skylab::MetaHell::TestSupport::Parse::Series__
       it "indicate `token_scanners` instead of `token_matchers`" do
         Sandbox_3.with self
         module Sandbox_3
-          P = MetaHell::Parse.series.curry[
+          P = MetaHell_::Parse.series.curry[
             :token_scanners, [
               -> feet   { /\A\d+\z/ =~ feet and feet.to_i },
               -> inches { /\A\d+(?:\.\d+)?\z/ =~ inches and inches.to_f }

@@ -25,7 +25,7 @@ module Skylab::MetaHell::TestSupport
     end
 
     def subject s
-      MetaHell.strange s
+      MetaHell_.strange s
     end
   end
 end

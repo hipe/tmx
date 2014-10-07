@@ -8,7 +8,7 @@ module Skylab::MetaHell::TestSupport::Parse
       it "like so -" do
         Sandbox_1.with self
         module Sandbox_1
-          P = MetaHell::Parse::Hack_label_
+          P = MetaHell_::Parse::Hack_label_
           P[ :@foo_bar_x ].should eql( "foo bar" )
           P[ :some_method ].should eql( "some method" )
         end
@@ -19,7 +19,7 @@ module Skylab::MetaHell::TestSupport::Parse
       it "it's a proc that generates other procs" do
         Sandbox_2.with self
         module Sandbox_2
-          P = MetaHell::Parse::Fuzzy_matcher_
+          P = MetaHell_::Parse::Fuzzy_matcher_
           Q = P[ 3, 'foobie' ]
 
           Q[ 'f' ].should eql( nil )

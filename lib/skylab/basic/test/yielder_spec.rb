@@ -6,13 +6,13 @@ module Skylab::Basic::TestSupport::Yielder
 
   include CONSTANTS
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  describe "#{ Basic::Yielder}::Counting" do
+  describe "[ba] yielder counting" do
 
     it "counts" do
       yes = nil
-      y = Basic::Yielder::Counting.new do |msg|
+      y = Basic_::Yielder::Counting.new do |msg|
         yes = msg
       end
 

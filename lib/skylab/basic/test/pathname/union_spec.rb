@@ -6,11 +6,11 @@ module Skylab::Basic::TestSupport::Pathname::Union
 
   include CONSTANTS
 
-  Basic = ::Skylab::Basic
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
+  Basic_ = Basic_
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[ba] Pathname::Union" do
     context "progressive construction" do
@@ -18,7 +18,7 @@ module Skylab::Basic::TestSupport::Pathname::Union
       it "you can build up the union progressively, one path at at time" do
         Sandbox_1.with self
         module Sandbox_1
-          u = Basic::Pathname::Union.new
+          u = Basic_::Pathname::Union.new
           u.length.should eql( 0 )
           u << ::Pathname.new( '/foo/bar' )  # (internally converted to string)
           u.length.should eql( 1 )
@@ -33,7 +33,7 @@ module Skylab::Basic::TestSupport::Pathname::Union
       it "like so" do
         Sandbox_2.with self
         module Sandbox_2
-          u = Basic::Pathname::Union[ '/foo/bar', '/foo', '/biff/baz' ]
+          u = Basic_::Pathname::Union[ '/foo/bar', '/foo', '/biff/baz' ]
           u.length.should eql( 3 )
           e = u.normalize
           e.message_proc[].should eql( 'eliminating redundant entry /foo/bar which is covered by /foo' )
@@ -46,7 +46,7 @@ module Skylab::Basic::TestSupport::Pathname::Union
       it "like so" do
         Sandbox_3.with self
         module Sandbox_3
-          u = Basic::Pathname::Union[ '/foo/bar', '/foo', '/biff/baz' ]
+          u = Basic_::Pathname::Union[ '/foo/bar', '/foo', '/biff/baz' ]
           x = u.match '/no'
           x.should eql( nil )
           x = u.match '/biff/baz'
@@ -59,7 +59,7 @@ module Skylab::Basic::TestSupport::Pathname::Union
       it "result of `match` is the node that matched" do
         Sandbox_4.with self
         module Sandbox_4
-          u = Basic::Pathname::Union[ '/foo/bar', '/foo', '/biff/baz' ]
+          u = Basic_::Pathname::Union[ '/foo/bar', '/foo', '/biff/baz' ]
           x = u.match '/biff/baz/other'
           x.to_s.should eql( '/biff/baz' )
         end
@@ -70,7 +70,7 @@ module Skylab::Basic::TestSupport::Pathname::Union
       it "like so" do
         Sandbox_5.with self
         module Sandbox_5
-          u = Basic::Pathname::Union[ '/foo/bar', '/foo/baz/bing', '/foo', '/a', '/a/b', '/a/b/c' ]
+          u = Basic_::Pathname::Union[ '/foo/bar', '/foo/baz/bing', '/foo', '/a', '/a/b', '/a/b/c' ]
           u.normalize.message_proc[].should eql( "eliminating redundant entries /a/b and /a/b/c and /foo/bar and /foo/baz/bing which are covered by /a and /foo" )
         end
       end
