@@ -1,54 +1,58 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::Fields::ICAF_
+module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__::IWE
 
-  ::Skylab::MetaHell::TestSupport::Fields[ TS_ = self ]
+  ::Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__[ self ]
 
   include CONSTANTS
 
-  MetaHell = MetaHell
+  extend TestSupport_::Quickie
 
-  describe "[mh] FUN::Fields integrate contoured and from" do
+  Brazen_ = Brazen_ ; Subject_ = Subject_
+
+  describe "[br] properties stack common frame - integrate with entity" do
 
     before :all do
 
       class Foo
 
-        MetaHell::Fields.contoured[ self,
-          :field, :foo,
-          :required, :field, :bar ]
+        Subject_.call self,
+          :globbing, :processor, :initialize,
+          :readable, :field, :foo,
+          :required, :readable, :field, :bar
 
-      private
-        MetaHell::Fields::From.methods :argful do
-          def biz a
-            @biz_x = a.shift
+        Brazen_::Entity.call self, -> do
+          def biz
+            @biz_x = iambic_property
           end
         end
-       public
 
         attr_reader :biz_x
-
       end
     end
 
-    it "field names look good" do
-      Foo::FIELDS_._a.should eql( [ :foo, :bar, :biz ] )
+    it "loads" do
+    end
+
+    it "property names look good" do
+      Foo.properties.get_names.should eql [ :foo, :bar, :biz ]
     end
 
     it "required fields still bork" do
       -> do
         Foo.new
-      end.should raise_error( ::ArgumentError, /missing required argument - bar/ )
+      end.should raise_error ::ArgumentError,
+        /\Amissing required field - 'bar'/
     end
 
     it "works with all" do
       foo = Foo.new :biz, :B, :foo, :F, :bar, :A
-      [ foo.foo, foo.bar, foo.biz_x ].should eql( %i| F A B | )
+      [ foo.foo, foo.bar, foo.biz_x ].should eql %i| F A B |
     end
 
     it "works with one" do
       foo = Foo.new :bar, :A
-      [ foo.foo, foo.bar, foo.biz_x ].should eql( [ nil, :A, nil ] )
+      [ foo.foo, foo.bar, foo.biz_x ].should eql [ nil, :A, nil ]
     end
   end
 end

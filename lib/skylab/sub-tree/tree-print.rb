@@ -37,11 +37,10 @@ module Skylab::SubTree
     private
 
       def three_from_traversal glyphs_s_a, slug_s, xtra_s
-        glyphs_s_a.length.nonzero? and sp = SP__
+        glyphs_s_a.length.nonzero? and sp = SPACE_
         @out_line_p[ "#{ glyphs_s_a * '' }#{ sp }#{ slug_s }#{ xtra_s }" ]
         nil
       end
-      SP__ = ' '.freeze
     end
   end
 end

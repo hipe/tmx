@@ -53,9 +53,9 @@ an epic bughunt caused by a stale cache save for actually experiencing that.
 ## :#section-4 the IO node
 
 if ever we find that we are trying to run in an architectural context
-where we don't have access to all three of the _Standard_streams_, we want
-to have dependency leashes all going back to the same corral. also it's
-simply always bad to put globals in your code no matter what.
+where we don't have access to all three of the "standard streams"[1][1],
+we want to have dependency leashes all going back to the same corral.
+also it's simply always bad to put globals in your code no matter what.
 
 for the sake of being deterministic and a bit more robust, we assign the
 three streams to closure variables when this file first loads, in case some
@@ -67,4 +67,8 @@ expresses the arity, the semantics, and the shape (in order) so hopefully
 these names can resist seas of change for a long while.
 
 the IO singleton is also a module for now: although we are not yet using it
-as a module currently, we very well might one day.
+as a module currently, we might one day.
+
+
+
+[1]: http://wikipedia.com/Standard_streams  # #todo

@@ -26,6 +26,8 @@ module Skylab::MetaHell
 
     Callback__ = memo[ -> { Library_::Callback } ]
 
+    Brazen_ = Autoloader_.build_require_sidesystem_proc :Brazen
+
     Distill_proc = -> do
       Callback__[].distill
     end
@@ -36,6 +38,10 @@ module Skylab::MetaHell
 
     Levenshtein = -> do
       Library_::Headless::NLP::EN::Levenshtein
+    end
+
+    Method_added_muxer = -> *a do
+      Brazen_[].method_added_muxer.via_arglist a
     end
 
     Scn = -> do

@@ -11,7 +11,7 @@ module Skylab::SubTree
         @row_a.each do |row|
           g_a, slug, any_leaf = row.to_a
           cel_a = [ ]
-          cel_a << "#{ "#{ g_a * ' ' } " if g_a.length.nonzero? }#{
+          cel_a << "#{ "#{ g_a * SPACE_ } " if g_a.length.nonzero? }#{
             }#{ slug }"
           cel_a << ( if any_leaf
             (( fs = any_leaf.any_free_cel )) ? "  #{ fs }" : ''

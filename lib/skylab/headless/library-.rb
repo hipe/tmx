@@ -34,6 +34,9 @@ module Skylab::Headless
     Bundle = -> do
       MetaHell__[]::Bundle
     end
+    Properties_stack_frame = -> *a do
+      Brazen__[].properties_stack.common_frame.via_arglist a
+    end
     DSL_DSL = -> mod, p do
       MetaHell__[]::DSL_DSL.enhance mod, &p
     end

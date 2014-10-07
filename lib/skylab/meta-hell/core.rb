@@ -59,43 +59,6 @@ end
 
 module Skylab::MetaHell
 
-  class Method_Added_Muxer
-    # imagine having multiple subscribers to one method added event
-    def self.[] mod
-      me = self
-      mod.module_exec do
-        @method_added_muxer ||= begin  # ivar not const! boy howdy watch out
-          muxer = me.new self
-          singleton_class.instance_method( :method_added ).owner == self and
-            fail "sanity - won't overwrite existing method_added hook"
-          define_singleton_method :method_added, &
-            muxer.method( :method_added_notify )
-          muxer
-        end
-      end
-    end
-    def initialize mod
-      @mod = mod ; @p = nil
-    end
-    def in_block_each_method_added blk, & do_this
-      add_listener do_this
-      @mod.module_exec( & blk )
-      remove_listener do_this ; nil
-    end
-    def add_listener p
-      @p and fail "implement me - you expected this to actually mux?"
-      @p = p
-    end
-    def remove_listener _
-      @p = nil
-    end
-  private
-    def method_added_notify i
-      @p && @p[ i ]
-      nil
-    end
-  end
-
   module Bundle
 
     module Multiset

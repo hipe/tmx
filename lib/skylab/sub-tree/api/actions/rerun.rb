@@ -37,7 +37,7 @@ module Skylab::SubTree
 
     def rerun_file_paths
       File.exist?(@rerun) or return error("rerun file not found: #{@rerun.inspect}")
-      File.read(@rerun).split(' ').map do |path|
+      File.read(@rerun).split(SPACE_).map do |path|
         RerunFile.new(path)
       end
     end

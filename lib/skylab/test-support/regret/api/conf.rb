@@ -8,7 +8,7 @@ module Skylab::TestSupport::Regret::API
 
     DOC_TEST_DIR_ = 'test/doc-test'
 
-    DOC_TEST_FILES_FILE_ = 'data/files'
+    DOC_TEST_FILES_FILE_ = 'data-documents/files'
 
     def self.[] i
       const_get "#{ i.upcase }_", false

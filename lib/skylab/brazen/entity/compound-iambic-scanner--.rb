@@ -47,6 +47,14 @@ module Skylab::Brazen
           @d = @x_a = @x_a_length = nil
         end
       end
+
+      class Mutable_Iambic_Scanner < Lib_::Iambic_scanner[]
+
+        def puts_with * x_a  # #EXPERIMENTAL
+          @x_a[ @d, 0 ] = x_a
+          @x_a_length += x_a.length ; nil
+        end
+      end
     end
   end
 end

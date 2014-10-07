@@ -15,7 +15,7 @@ module Skylab::SubTree
     Build_vtuple_ = -> do
       p = -> do
         Vtuple_ = ::Struct.new( :volume, *
-          VERBOSE_SET_A.map { |s| :"#{ s.gsub ' ', '_' }" } )
+          VERBOSE_SET_A.map { |s| :"#{ s.gsub SPACE_, '_' }" } )
         (( p = -> { Vtuple_.new 0 } ))[]
       end
       -> { p.call }
@@ -176,7 +176,7 @@ module Skylab::SubTree
 
     def traverse_with_notification  # assume extensions
       u = @upstream ; t = @traversal
-      t.with  :out_p, @paystream.method( :puts )
+      t.with :out_p, @paystream.method( :puts )
       while (( line = u.gets ))
         line.chomp!
         lf = Leaf_.new line

@@ -39,6 +39,8 @@ module Skylab::SubTree
   Name_ = Callback_::Name
   SEP_ = '/'.freeze
 
+  SPACE_ = ' '.freeze
+
   Stop_at_pathname_ = -> do  # #todo
     rx = %r{\A[./]\z}  # hackishly - for all pn, parent eventually is this
     -> pn do

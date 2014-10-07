@@ -2,46 +2,60 @@ module Skylab::SubTree
 
   class API::Actions::My_Tree::Traversal_
 
-    Lib_::Contoured_fields[ self,
-      :globbing, :absorber, :with,
-      :private, :absorber, :absrb_iambic_fully,
+    Lib_::Properties_stack_frame.call self,
       :field, :sep,
       :field, :do_verbose_lines,
-      :field, :info_p ]
+      :field, :info_p
+
+    public :with
+
+    Lib_::Entity.call self, -> do
+
+      def out_p
+        p = iambic_property
+        @out_p = case p.arity
+        when 3     ; out_proc_when_arity_is_three p
+        when 2     ; out_proc_when_arity_is_two p
+        when 1, -1 ; out_proc_when_arity_is_one_or_glob p
+        else       ; when_out_proc_arity_is_strange p
+        end ; nil
+      end
+    end
 
   private
 
-    Lib_::Fields_from_methods[ -> do
-      def out_p
-        p = @iambic_scan.gets_one
-        @out_p = case p.arity
-        when 3 ; -> row_a do                   # glyphs, slug, extra
-          node = row_a.pop
-          p[ row_a, * node.to_a ]
-        end
-        when 2 ; -> row_a do                   # glyphs-slug, extra
-          node = row_a.pop
-          slug, extra_a = node.to_a
-          p[ "#{ "#{ row_a * ' ' } " if row_a.length.nonzero? }#{
-               }#{ slug }", extra_a ]
-        end
-        when -1, 1 ; -> row_a do               # glyphs-slug-extra
-          node = row_a.pop
-          p[ "#{ "#{ row_a * ' ' } " if row_a.length.nonzero? }#{
-               }#{ node.to_a.compact * ' ' }" ]
-          nil
-        end
-        else
-          raise ::ArgumentError, "unsupported `out_p` arity - #{ p.arity }"
-        end
-        nil
+    def out_proc_when_arity_is_three p  # glyphs, slug, extra
+      -> row_a do
+        node = row_a.pop
+        p[ row_a, * node.to_a ] ; nil
       end
-    end ]
+    end
+
+    def out_proc_when_arity_is_two  # glyphs-slug, extra
+      -> row_a do
+        node = row_a.pop
+        slug, extra_a = node.to_a
+        _x = "#{ "#{ row_a * SPACE_ } " if row_a.length.nonzero? }"
+        p[ "#{ _x }#{ slug }", extra_a ] ; nil
+      end
+    end
+
+    def out_proc_when_arity_is_one_or_glob p  # glyphs-slug-extra
+      -> row_a do
+        node = row_a.pop
+        _x = "#{ "#{ row_a * SPACE_ } " if row_a.length.nonzero? }"
+        p[ "#{ _x }#{ node.to_a.compact * SPACE_ }" ] ; nil
+      end
+    end
+
+    def when_out_proc_arity_is_strange p
+      raise ::ArgumentError, "unsupported `out_p` arity - #{ p.arity }"
+    end
 
     def initialize * x_a
       @curr_a = [] ; @matrix_a = [] ; @sep ||= SEP_
       @glyph_set = SubTree::Lib_::CLI_tree_glyph_sets[]::WIDE
-      absrb_iambic_fully x_a ; nil
+      process_iambic_fully x_a
     end
 
   public

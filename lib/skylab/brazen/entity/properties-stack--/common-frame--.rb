@@ -1,263 +1,239 @@
-module Skylab::MetaHell
+module Skylab::Brazen
 
-  module Fields
+  module Entity
 
-    module Contoured__
+    module Properties_Stack__
 
-      # use it
+      # ~ visiting
+      class << self
+
+        def common_frame * a
+          if a.length.zero?
+            self::Common_Frame__
+          else
+            self::Common_Frame__.via_arglist a
+          end
+        end
+      end
+      # ~
+
+      # use its memoized and non-memoized procs and inline methods
       # like so:
       #
       #     class Foo
-      #       MetaHell::Fields.contoured self,
-      #         :globbing, :absorber, :with,
-      #         :proc, :foo,
-      #         :memoized, :proc, :bar,
-      #         :method, :bif,
-      #         :memoized, :method, :baz
+      #       Brazen_.properties_stack.common_frame self,
+      #         :proc, :foo, -> do
+      #            d = 0
+      #            -> { d += 1 }
+      #         end.call,
+      #         :memoized, :proc, :bar, -> do
+      #           d = 0
+      #           -> { d += 1 }
+      #         end.call,
+      #         :inline_method, :bif, -> do
+      #           "_#{ foo }_"
+      #         end,
+      #         :memoized, :inline_method, :baz, -> do
+      #           "<#{ foo }>"
+      #         end
       #     end
       #
-      #     # one line #until:[#ts-032]
+      #     # one chunk #until:[#ts-032]
       #
-      #     foo = Foo.new ; foo.with :foo, -> { :yes } ; foo.foo  # => :yes
-      #
-      # and so:
-      #
-      #     @ohai = :hi
-      #     f = Foo.new ; f.with(  :foo, -> { 'x' },
-      #                              :bar, -> { "y:#{ @ohai }" },
-      #                              :bif, -> { "_#{ foo }_" },
-      #                              :baz, -> { "<#{ foo }>" } )
-      #     f.foo  # => 'x'
-      #     f.bar  # => 'y:hi'
-      #     f.bif  # => '_x_'
-      #     ( f.baz.object_id == f.baz.object_id )  # => true
-      #
-      #
+      #     foo = Foo.new
+      #     foo.foo  # => 1
+      #     foo.foo  # => 2
+      #     foo.bar  # => 1
+      #     foo.bar  # => 1
+      #     foo.bif  # => "_3_"
+      #     foo.bif  # => "_4_"
+      #     foo.baz  # => "<5>"
+      #     foo.baz  # => "<5>"
+      #     foo.baz.object_id  # => foo.baz.object_id
 
-      class << self
-        def [] client, *a
-          from_iambic_and_client a, client
-        end
-        def from_iambic_and_client a, client
-          Shell__.new( client ).with_iambic_absorbed_fully( a ).flush
-        end
-      end
 
-      class Shell__
+      Common_Frame__ = Entity[ -> do
 
-        def initialize client
-          @client = client
-          @field_box = nil
+        class << self  # "LIB" only (this node only)
+          def call * a
+            via_arglist a
+          end
         end
 
-        def with_iambic_absorbed_fully x_a
-          @d = 0 ; @x_a = x_a ; len = x_a.length
-          begin
-            m_i = OP_H__[ @x_a.fetch @d ]
-            if m_i
-              send m_i
+        o :meta_property, :read_technique_i,
+
+          :enum, [ :method, :inline_method, :proc, :reader, :no_reader ],
+
+          :entity_class_hook, -> prop, cls do
+            prop.write_to_reader cls
+          end,
+
+        :meta_property, :is_memoized,
+
+        :meta_property, :external_read_proc
+
+        property_class_for_write  # flush the above so we get the below
+
+        class self::Property
+
+          def initialize( * )
+            @reader_p_a = @read_technique_i = nil
+            super
+          end
+
+          def freeze
+            if ! @read_technique_i  # e.g in conjunction w/ pure Entity extension
+              @read_technique_i = :no_reader
+            end
+            execute
+            @reader_p_a and @reader_p_a.freeze
+            super
+          end
+
+          o do
+
+            o :iambic_writer_method_name_suffix, :'='
+
+            def memoized=
+              @is_memoized = true
+            end
+
+            def method=
+              @read_technique_i = :method
+              @scanner.puts_with :property
+            end
+
+            def inline_method=
+              name_i = iambic_property
+              @literal_proc = iambic_property
+              @read_technique_i = :inline_method
+              @scanner.puts_with :property, name_i
+            end
+
+            def proc=
+              name_i = iambic_property
+              @literal_proc = iambic_property
+              @read_technique_i = :proc
+              @scanner.puts_with :property, name_i
+            end
+          end
+
+          def execute
+            send :"when_read_technique_is_#{ @read_technique_i }"
+          end
+
+          # ~ proc
+
+          def when_read_technique_is_proc
+            _METH_I_ = @name.as_variegated_symbol
+            _MONADIC_P_ = if is_memoized
+              Callback_.memoize @literal_proc
             else
-              parse_absorber
+              @literal_proc
             end
-          end while @d < len
-          self
-        end
-        #
-        OP_H__ = {
-          field: :parse_field,
-          memoized: :parse_memoized,
-          method: :parse_method,
-          proc: :parse_proc,
-          required: :parse_required
-        }.freeze
-
-        def flush
-          @field_box or field_box
-          MetaHell_::Fields::Touch_const_with_dupe_for___[ -> _ do
-            p = Required_fields_check__[ @field_box ]
-            @client.facet_muxer.add_hook_listener :post_absorb, p
-            p
-          end, :CONTOURED_REQUIRED_CHECK_, @client ] ; nil
-        end
-        #
-        Required_fields_check__ = -> field_box do  # on dupe, rewrite the func
-          on_dupe_for = -> client do
-            Dupable_Proc__.new on_dupe_for, &
-              Req_check__[ client.const_get CONST__ ]
+            reader_p_a.push( -> cls do
+              cls.send :define_method, _METH_I_, _MONADIC_P_
+            end )
+            init_external_read_proc_to_use_eponymous_method
           end
-          Dupable_Proc__.new on_dupe_for, & Req_check__[ field_box ]
-        end
-        CONST__ = MetaHell_::Fields::CONST_
-        #
-        Req_check__ = -> field_box do
-          -> agent do
-            miss_a = field_box._a.reduce [] do |m, method_i|
-              (( fld = field_box.fetch method_i )).is_required or next m
-              agent.instance_variable_defined? fld.ivar and
-                ! agent.instance_variable_get( fld.ivar ).nil? and next m
-              m << fld
+
+          # ~ inline method
+
+          def when_read_technique_is_inline_method
+            if is_memoized
+              when_read_technique_is_memoized_inline_method
+            else
+              when_read_technique_is_non_memoized_inline_method
             end
-            miss_a.length.nonzero? and
-              Missing_required_fields_notify_[ agent, miss_a ]
-            nil
           end
-        end
-        #
-        class Dupable_Proc__ < ::Proc
-          class << self ; alias_method :[], :new end
-          def initialize on_dupe_for, &blk
-            super( &blk )
-            @on_dupe_for = on_dupe_for ; nil
+
+          def when_read_technique_is_non_memoized_inline_method
+            _METH_I_ = @name.as_variegated_symbol
+            reader_p_a.push( -> cls do
+              cls.send :define_method, _METH_I_, @literal_proc
+            end )
+            init_external_read_proc_to_use_eponymous_method
           end
-          def dupe_for x
-            @on_dupe_for[ x ]
-          end
-        end
-        #
-        Missing_required_fields_notify_ = -> agent, miss_a do  # etc
-          s, op, cp = 1 == miss_a.length ? EMPTY_A_ : %w[ s ( ) ]
-          raise ::ArgumentError, "missing required argument#{ s } - #{ op }#{
-            }#{ miss_a.map( & :method_i ) * ', ' }#{ cp }"
-          nil
-        end
 
-      private
-
-        def field_box
-          @field_box ||= bld_field_box
-        end
-
-        def bld_field_box
-          MetaHell_::Fields::Box_for.client @client
-        end
-
-        def parse_absorber
-          d, item = Fields::Absorber_Method_.unobtrusive_passive_scan @d, @x_a
-          d or raise ::ArgumentError, "unexpected token near '#{ @x_a[ @d ] }'"
-          item.apply_to_client @client
-          @d = d ; nil
-        end
-
-        def parse_proc
-          accept_name_and_add_proc_field.flush_to_client @client ; nil
-        end
-
-        def parse_method
-          accept_name_and_add_method_field.flush_to_client @client ; nil
-        end
-
-        def parse_memoized
-          parse_with_branch MEMOIZED_BRANCH__
-        end
-
-        MEMOIZED_BRANCH__ = {
-          proc: :parse_memoized_proc,
-          method: :parse_memoized_method }.freeze
-
-        def parse_with_branch h
-          send h.fetch @x_a.fetch @d += 1
-        end
-
-        def parse_memoized_proc
-          accept_name_and_add_proc_field do |fld|
-            fld.is_memoized = true
-          end.flush_to_client @client ; nil
-        end
-
-        def parse_memoized_method
-          accept_name_and_add_method_field do |fld|
-            fld.is_memoized = true
-          end.flush_to_client @client ; nil
-        end
-
-        def accept_name_and_add_proc_field &blk
-          accept_name_and_add_field_with_class_and_block Proc__, blk
-        end
-
-        def accept_name_and_add_method_field &blk
-          accept_name_and_add_field_with_class_and_block Method__, blk
-        end
-
-        def accept_name_and_add_field_with_class_and_block cls, p
-          field_bx = field_box
-          method_i = @x_a.fetch @d + 1
-          @d += 2
-          fld = cls.new method_i, p
-          field_bx.add method_i, fld
-          fld
-        end
-        # (was: [#062] "i just blue myself")
-      end
-
-      Aspect_ = MetaHell_::Fields::Aspect_  # until [#061]
-
-      class Procesque__ < Aspect_
-        def initialize( * )
-          @is_memoized = false
-          super
-        end
-        attr_accessor :is_memoized
-        def accept_into_client_scan client, scan
-          p = scan.gets_one
-          p.respond_to?( :call ) or fail "sanity - #{ p.class }"
-          client.instance_variable_set @ivar, p ; nil
-        end
-        alias_method :notify_client_of_scan, :accept_into_client_scan
-      end
-
-      class Proc__ < Procesque__
-        def flush_to_client client
-          ivar = @ivar
-          if @is_memoized
-            did = value = nil
-            client.send :define_method, @method_i do
-              if did then value else
-                did = true
-                value = instance_variable_get( ivar ).call  # etc
+          def when_read_technique_is_memoized_inline_method  # (was: [#062] "i just blue myself")
+            _METH_I = :"__NON_MEMOIZED_#{ @name.as_variegated_symbol }"
+            _METH_I_ = @name.as_variegated_symbol
+            _IVAR = :"@use_memoized_#{ @name.as_variegated_symbol }"
+            _IVAR_ = @name.as_ivar
+            _METH_P = -> do
+              if instance_variable_defined?( _IVAR ) and instance_variable_get( _IVAR )
+                instance_variable_get _IVAR_
+              else
+                instance_variable_set _IVAR, true
+                instance_variable_set _IVAR_, send( _METH_I )
               end
             end
-          else
-            client.send :define_method, @method_i do
-              instance_variable_get( ivar ).call  # etc
-            end
+            reader_p_a.push( -> cls do
+              cls.send :define_method, _METH_I, @literal_proc
+              cls.send :define_method, _METH_I_, _METH_P
+            end )
+            init_external_read_proc_to_use_eponymous_method
           end
-        end
-      end
 
-      class Method__ < Procesque__
-        def flush_to_client client
-          ivar = @ivar
-          if @is_memoized
-            did = value = nil
-            client.send :define_method, @method_i do
-              if did then value else
-                did = true
-                value = instance_exec( & instance_variable_get( ivar ) )
-              end
-            end
-          else
-            client.send :define_method, @method_i do
-              instance_exec( & instance_variable_get( ivar ) )  # etc
+          # ~ method
+
+          def when_read_technique_is_method
+            if is_memoized
+              raise ::ArgumentError, say_no_memo_meth
+            else
+              init_external_read_proc_to_use_eponymous_method ; nil
             end
           end
+
+          def say_no_memo_meth
+            "pre-existing methods cannot be memoized - won't overwrite #{
+             }original mehtod and won't allow original method and reader #{
+              }proc to have different behavior."
+          end
+
+        # ~ support
+
+          def write_to_reader cls
+            if @reader_p_a
+              cls.ignore_added_methods do
+                @reader_p_a.each do |p|
+                  p[ cls ]
+                end
+              end
+            end ; nil
+          end
+
+        private
+
+          def init_external_read_proc_to_use_eponymous_method
+            _METH_I = @name.as_variegated_symbol
+            @external_read_proc = -> entity do
+              entity.__send__ _METH_I
+            end ; nil
+          end
+
+          def reader_p_a
+            @reader_p_a ||= []
+          end
         end
-      end
+      end ]
 
     # [ `required` ] `field`s -
     #
-    # failing to pass a required field triggers an argument error
+    # failing to provide a required field triggers an argument error
     #
     #     class Foo
-    #       MetaHell::Fields.contoured self,
-    #         :overriding, :globbing, :absorber, :initialize,
-    #         :required, :field, :foo, :field, :bar
+    #       Brazen_.properties_stack.common_frame self,
+    #         :globbing, :processor, :initialize,
+    #         :required, :readable, :field, :foo,
+    #         :readable, :field, :bar
     #     end
     #
-    #     Foo.new  # => ArgumentError: missing required argument - foo
+    #     Foo.new  # => ArgumentError: missing required field - 'foo'
     #
     # passing nil is considered the same as not passing an argument
     #
-    #     Foo.new( :foo, nil )  # => ArgumentError: missing required argument - foo
+    #     Foo.new( :foo, nil )  # => ArgumentError: missing required field - 'foo'
     #
     # passing false is not the same as passing nil, passing false is valid.
     #
@@ -268,40 +244,269 @@ module Skylab::MetaHell
     #     Foo.new( :foo, :x, :bar, nil ).bar  # => nil
     #
 
-      class Field__ < Aspect_
-        attr_writer :is_required  # not pushed up yet
-        def flush_to_client client
-          client.send :attr_reader, @method_i
+      module Common_Frame__
+
+        def property_value name_i
+          prop = self.class.properties.fetch name_i
+          p = prop.external_read_proc
+          if p
+            p[ self ]
+          else
+            property_value_when_prop_not_readable prop
+          end
         end
-        def absorb_into_client_iambic client, x_a
-          client.instance_variable_set @ivar, x_a.shift ; nil
+
+      private
+
+        def val_via_prop prop
+          p = prop.external_read_proc
+          if p
+            p[ self ]
+          else
+            prop.internal_read_proc[ self ]
+          end
         end
-        def accept_into_client_scan client, scan
-          client.instance_variable_set @ivar, scan.gets_one ; nil
+
+        def property_value_when_prop_not_readable prop
+          _ev = build_not_OK_event_with :property_is_not_readable, :property, prop
+          send_event _ev
         end
-        def notify_client_of_scan client, scan
-          client.instance_variable_set @ivar, scan.gets_one ; nil
+
+        def build_not_OK_event_with * x_a, & p
+          x_a.push :ok, false
+          p ||= Entity.event::Inferred_Message.to_proc
+          Entity.event.inline_via_iambic_and_message_proc x_a, p
+        end
+
+        def send_event ev
+          ev.render_all_lines_into_under y=[], Brazen_::API.expression_agent_instance
+          _e_cls = if ev.has_tag :error_category
+            _name = Callback_::Name.from_variegated_symbol ev.error_category
+            ::Object.const_get _name.as_camelcase_const
+          else
+            ::RuntimeError
+          end
+          raise _e_cls, y * SPACE_
         end
       end
 
-      class Shell__
-      private
-        def parse_required
-          parse_with_branch REQUIRED_BRANCH__
-        end
-        REQUIRED_BRANCH__ = {
-          field: :parse_required_field }.freeze
+      module Common_Frame__
 
-        def parse_field
-          take_name_and_add_field.flush_to_client @client ; nil
+        Entity[ self, -> do
+
+          o :meta_property, :parameter_arity,
+
+            :enum, [ :zero_or_one, :one ],
+
+            :default, :zero_or_one,
+
+            :entity_class_hook, -> prop, cls do
+              if :one == prop.parameter_arity
+                cls.include When_Parameter_Arity_Of_One_Instance_Methods__  # might occur multiple times
+              end
+            end,
+
+          :ad_hoc_processor, :globbing, -> scan do
+            Processor__.via_scan scan
+          end,
+
+          :ad_hoc_processor, :processor, -> scan do
+            Processor__.via_scan scan
+          end,
+
+          :ad_hoc_processor, :actoresque, -> scan do
+            Actoresque__[ scan ]
+          end
+
+        end ]
+
+        class self::Property
+
+          o do
+
+            o :iambic_writer_method_name_suffix, :'='
+
+            def readable=
+              @read_technique_i = :reader
+            end
+
+            def required=
+              @parameter_arity = :one
+            end
+
+            def field=
+              if @read_technique_i.nil?
+                @read_technique_i = :no_reader
+              end
+              @scanner.puts_with :property
+            end
+          end
+
+          attr_reader :internal_read_proc
+
+          def is_required
+            :one == @parameter_arity
+          end
+
+          def when_read_technique_is_reader
+            _PROP_ = self
+            _METH_P = -> do
+              field_value_via_property _PROP_
+            end
+            _METH_I = @name.as_variegated_symbol
+            reader_p_a.push( -> cls do
+              cls.send :define_method, _METH_I, _METH_P
+            end )
+            init_external_read_proc_to_use_eponymous_method
+          end
+
+          def when_read_technique_is_no_reader
+            @internal_read_proc = -> entity do
+              entity.field_value_via_property self
+            end ; nil
+          end
         end
-        def parse_required_field
-          take_name_and_add_field do |fld|
-            fld.is_required = true
-          end.flush_to_client @client ; nil
+
+        def field_value_via_property prop
+          if instance_variable_defined? prop.as_ivar
+            instance_variable_get prop.as_ivar
+          end
         end
-        def take_name_and_add_field &blk
-          accept_name_and_add_field_with_class_and_block Field__, blk
+
+      private
+
+        def normalize_and_validate x
+          x
+        end
+
+        module When_Parameter_Arity_Of_One_Instance_Methods__
+
+          def normalize_and_validate x
+
+            miss_prop_a = self.class.properties.reduce_by do |prop|
+              prop.is_required or next
+              val_via_prop( prop ).nil?
+            end.to_a
+
+            if miss_prop_a.length.zero?
+              super
+            else
+              normalize_and_validate_when_missing_requireds miss_prop_a, x
+            end
+          end
+
+          def normalize_and_validate_when_missing_requireds miss_prop_a, x
+            _ev = build_not_OK_event_with :missing_required_properties,
+                :error_category, :argument_error,
+                :miss_a, miss_prop_a do |y, o|
+
+              s_a = o.miss_a.map do |prop|
+                par prop
+              end
+
+              1 == s_a.length or ( op, cp = %w[ ( ) ] )
+
+              _x = "#{ op }#{ s_a * ', ' }#{ cp }"
+
+              y << "missing required field#{ s s_a } - #{ _x }"
+            end
+            send_event _ev
+          end
+        end
+
+        class Actoresque__
+
+          Callback_::Actor[ self, :properties, :scan ]
+
+          def execute
+
+            @reader = @scan.reader
+
+            @reader.send :define_singleton_method, :[] do | * x_a |
+              new( x_a ).execute  # is `funcy_globless`
+            end
+
+            scanner = @scan.scanner
+            scanner.advance_one
+            scanner.puts_with :processor, :initialize
+
+          end
+        end
+
+        class Processor__  # rewrite of [#mh-060]
+
+          class << self
+
+            def via_scan scan
+              new( scan ).execute
+            end
+          end
+
+          Entity[ self, -> do
+
+            def globbing
+              @is_globbing = true
+            end
+
+            def processor
+              @is_complete = true
+              @method_i = iambic_property
+            end
+          end ]
+
+          include Entity.via_scanner_iambic_methods
+
+          def initialize scan
+            @reader = scan.reader
+            @scanner = scan.scanner
+            @is_complete = false
+            @is_globbing = false
+          end
+
+          def execute
+            process_iambic_passively
+            if @is_complete
+              via_reader_write
+            else
+              when_not_complete
+            end
+          end
+
+          def when_not_complete
+            raise ::ArgumentError, say_incomplete
+          end
+
+          def say_incomplete
+            if unparsed_iambic_exists
+              i = current_iambic_token
+              if i.respond_to? :id2name
+                context_s = " (near '#{ i }')"
+              end
+            end
+            "'processor' term is incomplete#{ context_s }"
+          end
+
+          def via_reader_write
+            if @is_globbing
+              @reader.send :define_method, @method_i do |*x_a|
+                @error_count ||= 0
+                x = process_iambic_fully x_a
+                if @error_count.zero?
+                  x = normalize_and_validate x
+                end
+                x
+              end
+            else
+              @reader.send :define_method, @method_i do |x_a|
+                @error_count ||= 0
+                x = process_iambic_fully x_a
+                if @error_count.zero?
+                  x = normalize_and_validate x
+                end
+                x
+              end
+            end
+          end
         end
       end
     end

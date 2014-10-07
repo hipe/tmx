@@ -79,8 +79,8 @@ module Skylab::TestSupport
       end
     end
 
-    Fields_contoured = -> mod, * x_a do
-      MetaHell__[]::Fields.contoured.from_iambic_and_client x_a, mod
+    Properties_stack_frame = -> * a do
+      Brazen__[].properties_stack.common_frame.via_arglist a
     end
 
     Funcy_globful = -> mod do

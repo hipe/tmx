@@ -272,8 +272,7 @@ module Skylab::Brazen::TestSupport::CLI
 
     def load_expect_the_first_time
       cls = self.class
-      cls.include Entity_[]::Iambic_Methods_via_Scanner__,
-        Entity_[]::Iambic_Methods__
+      cls.include Entity_[].via_scanner_iambic_methods
       cls.send :define_method, :expect do |*x_a|
         expect_via_arg_list x_a
       end ; nil
@@ -349,7 +348,7 @@ module Skylab::Brazen::TestSupport::CLI
       else
         @expectation_scanner = Entity_[].iambic_scanner.new 0, x_a
       end
-      @scan = @expectation_scanner ; nil
+      @scanner = @expectation_scanner ; nil
     end
 
     def init_emission_scan
@@ -357,7 +356,7 @@ module Skylab::Brazen::TestSupport::CLI
         _em_a = build_baked_em_a
         @emission_scanner = Entity_[].iambic_scanner.new 0, _em_a
       end
-      @scan = @emission_scanner ; nil
+      @scanner = @emission_scanner ; nil
     end
 
     def build_baked_em_a

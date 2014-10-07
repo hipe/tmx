@@ -143,7 +143,7 @@ module SubTree  # #borrow-one-indent - load this solo but it needs meta hell
 
     def prcr_any_pathname_from_file_line line
       line.chomp!
-      if line.include? SPACE__
+      if line.include? SPACE_
         prcr_any_pathname_when_line_includes_space line
       else
         @tpn.join_ line
@@ -151,13 +151,11 @@ module SubTree  # #borrow-one-indent - load this solo but it needs meta hell
     end
 
     def prcr_any_pathname_when_line_includes_space line
-      line, rest_s = line.split SPACE__, 2
+      line, rest_s = line.split SPACE_, 2
       pn = @tpn.join_ line
       pn.add_note :notice, "line had space", :line_had_space, :rest_s, rest_s
       pn
     end
-
-    SPACE__ = ' '.freeze
 
     class Pathname__ < ::Pathname
 
@@ -220,7 +218,7 @@ module SubTree  # #borrow-one-indent - load this solo but it needs meta hell
         a = build_difference
         say :notice, -> do
           "did not find any dirs named `#{ path }` around the #{
-          }dirs (#{ a * ' ' })"
+          }dirs (#{ a * SPACE_ })"
         end
         false
       end
@@ -262,7 +260,7 @@ module SubTree  # #borrow-one-indent - load this solo but it needs meta hell
         _big = -> do  # #todo:for:release
           p_a_.reduce( [] ) do |m, x|
             m << Distill__[ x ] if '' != x ; m
-          end * ' '
+          end * SPACE_
         end
         case top_norm_a.length
         when 0
@@ -330,7 +328,7 @@ module SubTree  # #borrow-one-indent - load this solo but it needs meta hell
           if do_big
             do_big = nil
             say :murmur, -> do
-              "(the normulated toplevel constants are: #{ c_h.keys * ' ' })"
+              "(the normulated toplevel constants are: #{ c_h.keys * SPACE_ })"
             end
           end
           false
@@ -351,12 +349,12 @@ module SubTree  # #borrow-one-indent - load this solo but it needs meta hell
           case a.length
           when 0
             break bork[ -> do
-              "\"#{ nerk }\" not found in (#{ npa * ' ' })"
+              "\"#{ nerk }\" not found in (#{ npa * SPACE_ })"
             end ]
           when 1  # fallthru
           else
             break bork[ -> do
-              "\"#{ nerk }\" found multiple times in (#{ npa * ' ' })"
+              "\"#{ nerk }\" found multiple times in (#{ npa * SPACE_ })"
             end ]
           end
           final_result[ c_a, c_h, nerk, p_a, a.fetch( 0 ) ]

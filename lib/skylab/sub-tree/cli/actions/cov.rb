@@ -146,7 +146,7 @@ module Skylab::SubTree
     def treeline_and_glyphage_for_card card
       n = card.node
       a, b = self.class.side_a.map { |s| n.tag_a.include? s }
-      glyphage = "[#{ a ? '+' : ' '}|#{ b ? '-' : ' ' }]"
+      glyphage = "[#{ a ? '+' : SPACE_}|#{ b ? '-' : SPACE_ }]"
       use_types = n.is_leaf ? n.tag_a : BRANCH_A_
       color_i = self.class.lookup_color_for_tag_a( use_types ) and
         glyphage = @expression_agent.stylize( color_i, glyphage )

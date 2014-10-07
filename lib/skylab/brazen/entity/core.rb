@@ -8,12 +8,28 @@ module Skylab::Brazen
         via_arglist a
       end
 
+      def call * a
+        via_arglist a
+      end
+
       def event
         self::Event__
       end
 
+      def via_scanner_iambic_methods
+        Via_Scanner_Iambic_Methods_
+      end
+
       def iambic_scanner
         Callback_.iambic_scanner
+      end
+
+      def method_added_muxer
+        Method_Added_Muxer__
+      end
+
+      def mutable_iambic_scanner
+        Entity::Compound_Iambic_Scanner__::Mutable_Iambic_Scanner
       end
 
       def proprietor_methods
@@ -134,7 +150,7 @@ module Skylab::Brazen
       # ~
 
       def accept_ad_hoc_processor
-        Entity::Ad_Hoc_Processor__.new @scan, @reader, @writer
+        Entity::Ad_Hoc_Processor__.new @scanner, @reader, @writer
       end
 
       def scan_anything_with_any_ad_hoc_processors
@@ -146,7 +162,7 @@ module Skylab::Brazen
         @ad_hocs_are_known = true
         if @reader.const_defined? :AD_HOC_PROCESSORS__
           @ad_hoc_scan = @reader::AD_HOC_PROCESSORS__.
-            build_scan @scan, @reader, @writer
+            build_scan @scanner, @reader, @writer
           @ad_hocs_exist = true
         else
           @ad_hocs_exist = false
@@ -156,7 +172,7 @@ module Skylab::Brazen
       # ~
 
       def accept_reuse
-        @scan.gets_one.each do |prop|
+        @scanner.gets_one.each do |prop|
           add_property prop
         end ; nil
       end
@@ -328,20 +344,20 @@ module Skylab::Brazen
       end
 
       def process_any_DSL d, x_a
-        @scan = Lib_::Iambic_scanner[].new d, x_a
+        @scanner = Lib_::Mutable_iambic_scanner[].new d, x_a
         prcss_scan_as_DSL_passively
-        d = @scan.current_index ; @scan = nil ; d
+        d = @scanner.current_index ; @scanner = nil ; d
       end
 
       # ~
 
-      attr_reader :meth_i, :reader, :scan
+      attr_reader :meth_i, :reader, :scanner
       attr_writer :prop
 
       def flush_iambic_queue
-        @scan = Entity::Compound_Iambic_Scanner__.new @x_a_a
+        @scanner = Entity::Compound_Iambic_Scanner__.new @x_a_a
         prcss_scan_as_DSL_fully
-        @x_a_a.clear ; @scan = nil
+        @x_a_a.clear ; @scanner = nil
       end
 
       def prcss_scan_as_DSL_fully
@@ -353,16 +369,16 @@ module Skylab::Brazen
       end
 
       def prcss_scan_as_DSL is_passive
-        dsl = DSL__.new self, @scan
+        dsl = DSL__.new self, @scanner
         begin
           dsl.execute
-          @scan.unparsed_exists or break
+          @scanner.unparsed_exists or break
           if is_passive
-            @scan.current_token.respond_to? :id2name or break
+            @scanner.current_token.respond_to? :id2name or break
           end
           _did = scan_anything_with_any_ad_hoc_processors
           _did or metaproperty_scanner.scan_some_DSL
-          @scan.unparsed_exists or break
+          @scanner.unparsed_exists or break
         end while true
       end
 
@@ -470,6 +486,18 @@ module Skylab::Brazen
         @mprop_kernel ||= Entity::Meta_Property__::Client_Kernel.new self
       end
 
+      def ignore_added_methods
+        mxr = method_added_mxr
+        if mxr
+          mxr.stop_listening
+        end
+        x = yield
+        if mxr
+          mxr.resume_listening
+        end
+        x
+      end
+
       attr_reader :method_added_mxr
 
       def add_iambic_event_listener i, p
@@ -493,6 +521,9 @@ module Skylab::Brazen
 
     class Method_Added_Muxer__  # from [mh] re-written
       class << self
+        def via_arglist a
+          self[ * a ]
+        end
         def [] mod
           me = self
           mod.module_exec do
@@ -665,12 +696,6 @@ module Skylab::Brazen
         prcss_iambic_passively_with_scn_subj_box scn, subject, box ; nil
       end
 
-      def via_scanner_process_iambic_passively
-        box, subject = iambic_methods_box_and_subject
-        scn = @scanner
-        prcss_iambic_passively_with_scn_subj_box scn, subject, box ; nil
-      end
-
       def prcss_iambic_passively_with_scn_subj_box scn, subject, box
         while scn.unparsed_exists
           m_i = box[ scn.current_token ]
@@ -721,11 +746,11 @@ module Skylab::Brazen
 
     UNDEFINED_ = nil
 
-    module Iambic_Methods_via_Scanner__
+    module Via_Scanner_Iambic_Methods_
       include Iambic_Methods__
 
-      def scan= x
-        @scan = x
+      def set_scanner x
+        @scanner = x
       end
 
     private
@@ -745,23 +770,23 @@ module Skylab::Brazen
       end
 
       def unparsed_iambic_exists
-        @scan.unparsed_exists
+        @scanner.unparsed_exists
       end
 
       def iambic_property
-        @scan.unparsed_exists or raise ::ArgumentError, say_missing_iambic_value
-        @scan.gets_one
+        @scanner.unparsed_exists or raise ::ArgumentError, say_missing_iambic_value
+        @scanner.gets_one
       end
       def say_missing_iambic_value
-        "expecting a value for '#{ @scan.previous_token }'"
+        "expecting a value for '#{ @scanner.previous_token }'"
       end
 
       def current_iambic_token
-        @scan.current_token
+        @scanner.current_token
       end
 
       def advance_iambic_scanner_by_one
-        @scan.advance_one
+        @scanner.advance_one
       end
     end
 
@@ -773,7 +798,7 @@ module Skylab::Brazen
 
     class Property__
       Entity[ self ]  # ~ property as entity
-      include Iambic_Methods_via_Scanner__
+      include Via_Scanner_Iambic_Methods_
       public :process_iambic_passively
     end
 
@@ -781,8 +806,8 @@ module Skylab::Brazen
 
     class DSL__
 
-      def initialize kernel, scan
-        @kernel = kernel ; @scan = scan
+      def initialize kernel, scanner
+        @kernel = kernel ; @scanner = scanner
       end
 
       def execute
@@ -801,13 +826,13 @@ module Skylab::Brazen
 
         def meta_property
           _pc = @kernel.reader.metaproperty_kernel.property_cls_for_wrt
-          Entity::Meta_Property__.new( @scan ).apply_to_property_class _pc
+          Entity::Meta_Property__.new( @scanner ).apply_to_property_class _pc
         end
 
         def properties
           begin
-            @kernel.flush_because_prop_i @scan.gets_one
-          end while @scan.unparsed_exists
+            @kernel.flush_because_prop_i @scanner.gets_one
+          end while @scanner.unparsed_exists
         end
 
         def property
@@ -819,7 +844,7 @@ module Skylab::Brazen
         end
       end ]
 
-      include Iambic_Methods_via_Scanner__
+      include Via_Scanner_Iambic_Methods_
     end
 
     # ~ extension API
@@ -827,8 +852,13 @@ module Skylab::Brazen
     module Extension_Module_Methods__
 
       def [] *a
+        via_arglist a
+      end
+
+      def via_arglist a
         Extension_Shell__.new.execute_via_extmod_and_arglist self, a
       end
+
     private
       def build_property_scope_krnl
         Scope_Kernel__.new self, const_get( :Module_Methods, false )

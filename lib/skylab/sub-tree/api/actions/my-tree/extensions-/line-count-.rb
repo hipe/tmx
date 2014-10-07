@@ -19,7 +19,7 @@ module Skylab::SubTree
           (( lf = row.any_leaf )) or next m
           m << lf
         end
-        cmd = "wc -l #{ leaves.map { |lf| lf.input_line.shellescape } * ' ' }"
+        cmd = "wc -l #{ leaves.map { |lf| lf.input_line.shellescape } * SPACE_ }"
         @verbose.volume.nonzero? and @infostream.puts cmd
         _, o, e, w = SubTree::Library_::Open3.popen3 cmd
         if (( err = e.read )) && '' != err

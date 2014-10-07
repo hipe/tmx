@@ -73,18 +73,25 @@ module Skylab::MetaHell
         end
 
         def execute
+
           prcss_iambic
+
           if @client_class.respond_to? :release_any_next_fld_attrs
             p = -> fld do
               x_a_a = @client_class.release_any_next_fld_attrs
               x_a_a and fld.x_a_a_full x_a_a ; nil
             end
           end
-          Method_Added_Muxer[ @definee ].in_block_each_method_added @p do |m|
+
+          _muxer = MetaHell_::Lib_::Method_added_muxer[ @definee ]
+          _muxer.for_each_method_added_in @p, -> m do
             @box.add m, Field_From_Method__.new( m, p )
           end ; nil
+
         end
+
       private
+
         def prcss_iambic
           if @i_a.length.zero?
             shell = DEFAULT_SHELL__.dup

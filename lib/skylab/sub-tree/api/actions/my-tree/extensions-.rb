@@ -16,7 +16,7 @@ module Skylab::SubTree
 
       def any_free_cel
         if @subcel_a
-          @subcel_a * ' '
+          @subcel_a * SPACE_
         end
       end
 

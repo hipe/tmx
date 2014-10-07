@@ -4,10 +4,10 @@ module Skylab::SubTree
 
     class Upstream_
 
-      Lib_::Contoured_fields[ self,
-        :overriding, :globbing, :absorber, :initialize,
+      Lib_::Properties_stack_frame.call self,
+        :globbing, :processor, :initialize,
         :required, :field, :be_verbose,
-        :required, :field, :info_p ]
+        :required, :field, :info_p
 
       class Enumerator_ < ::Enumerator
         def initialize enumeration_class, *build_args, &blk
@@ -20,6 +20,7 @@ module Skylab::SubTree
           @enumeration_class.new( y, @block, * @build_args ).execute
         end
       end
+
       class Enumeration_
         def initialize y, block
           @y = y ; @block = block
@@ -38,8 +39,8 @@ module Skylab::SubTree
 
       class From_::Filesystem_ < self
 
-        Lib_::Contoured_fields[ self,
-          :required, :field, :arg_pn ]
+        Lib_::Properties_stack_frame.call self,
+          :required, :field, :arg_pn
 
         def test_dir_pathnames
           Enumerator_.new Enumeration_, @arg_pn, @be_verbose, @info_p do

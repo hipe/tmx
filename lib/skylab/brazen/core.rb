@@ -21,6 +21,10 @@ module Skylab::Brazen
       Brazen_::Entity.event
     end
 
+    def method_added_muxer
+      Brazen_::Entity.method_added_muxer
+    end
+
     def model
       Brazen_::Model_::LIB
     end
@@ -43,6 +47,10 @@ module Skylab::Brazen
 
     def node_identifier
       Brazen_::Kernel_::Node_Identifier__
+    end
+
+    def properties_stack
+      Brazen_::Entity::Properties_Stack__
     end
   end
 
@@ -168,6 +176,10 @@ module Skylab::Brazen
     end
 
     JSON = memoize[ -> { require 'json' ; ::JSON  } ]
+
+    Mutable_iambic_scanner = -> do
+      Brazen_::Entity.mutable_iambic_scanner
+    end
 
     N_lines = -> do
       Event_[]::N_Lines

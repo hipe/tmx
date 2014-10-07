@@ -51,6 +51,8 @@ module Skylab::SubTree
       Basic__[]::Box
     end
 
+    Brazen__ = sidesys[ :Brazen ]
+
     Clear_pwd_cache = -> do
       Headless__[]::CLI::PathTools.clear
     end
@@ -87,8 +89,8 @@ module Skylab::SubTree
       Headless__[]::CLI::Tree::Glyphs
     end
 
-    Contoured_fields = -> client, * x_a do
-      MetaHell__[]::Fields.contoured.from_iambic_and_client x_a, client
+    Properties_stack_frame = -> * a do
+      Brazen__[].properties_stack.common_frame.via_arglist a
     end
 
     Distill_proc = -> do
@@ -101,6 +103,10 @@ module Skylab::SubTree
 
     Enhance_as_API_normalizer = -> x, * x_a do
       Face__[]::API::Normalizer_.enhance_client_class x, * x_a
+    end
+
+    Entity = -> * a do
+      Brazen__[]::Entity.via_arglist a
     end
 
     Entity_via_iambic = -> x_a do

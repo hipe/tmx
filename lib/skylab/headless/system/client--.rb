@@ -2,50 +2,40 @@ module Skylab::Headless
 
   module System
 
-    class Client__  # read [#014] #section-2 introduction to the client
-
-      def initialize
-        # ( here is where we would easily append user args )
-        absrb_iambic_fully DEFAULT_ARG_X_A__.dup  # until [#mh-068]
-        freeze ; nil
-      end
+    class Client__  # read [#140] #section-2 introduction to the client
 
       def which exe_name
-        SAFE_NAME_RX__ =~ exe_name or "invalid name: #{ exe_name }"
-        out = Headless::Library_::Open3.popen3 'which', exe_name do |_, o, e|
-          EMPTY_STRING_ == (( err = e.read )) or raise ::SystemCallError,
-            "unexpected response from `which` - #{ err }"
+        if SAFE_NAME_RX__ =~ exe_name
+          wch_exe_safe exe_name
+        else
+          false
+        end
+      end
+      SAFE_NAME_RX__ = /\A[-a-z0-9_]+\z/i
+
+    private
+
+      def wch_exe_safe exe_name
+        out = Headless_::Library_::Open3.popen3 'which', exe_name do |_, o, e|
+          err = e.read
+          if EMPTY_STRING_ != err
+            _msg = "unexpected response from `which` - #{ err }"
+            raise ::SystemCallError, _msg
+          end
           o.read.strip
         end
         out if EMPTY_STRING_ != out
       end
-      SAFE_NAME_RX__ = /\A[-a-z0-9_]+\z/i
 
+      Headless_::Lib_::Properties_stack_frame.call self,
 
-      defn_x_a = [ :absorber, :absrb_iambic_fully,
-        :passive, :absorber, :absorb_iambic_passively  # until [#mh-067]
-      ]
-      o = defn_x_a.method :push  # declarations
-      a = []  # definitions
+        :memoized, :readable, :proc, :any_home_directory_path, -> do
+          ::ENV[ 'HOME' ]
+        end,
 
-
-      o[ :memoized, :proc, :any_home_directory_path ]
-
-      a << :any_home_directory_path << -> do
-        ::ENV[ 'HOME' ]
-      end
-
-
-      o[ :memoized, :method, :any_home_directory_pathname ]
-
-      a << :any_home_directory_pathname << -> do
-        (( s = any_home_directory_path )) and ::Pathname.new( s )
-      end
-
-
-      MetaHell_::Fields.contoured.from_iambic_and_client defn_x_a, self
-
-      DEFAULT_ARG_X_A__ = a.freeze
+        :memoized, :inline_method, :any_home_directory_pathname, -> do
+          s = any_home_directory_path and ::Pathname.new( s )
+        end
 
     end
   end

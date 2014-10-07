@@ -11,30 +11,32 @@ module Skylab::Headless::TestSupport::System
   describe "[hl] system .." do
 
     it "tmpdir_pathname (memoized)" do
-      oid1 = Headless_::System.defaults.tmpdir_pathname
-      oid2 = Headless_::System.defaults.tmpdir_pathname
-      oid1.should eql( oid2 )
+      oid1 = subject.tmpdir_pathname
+      oid2 = subject.tmpdir_pathname
+      oid1.should eql oid2
     end
 
     it "tmpdir_path" do
-      sys_defaults.tmpdir_path.should eql( sys_defaults.tmpdir_pathname.to_s )
+      _build_it_manually = subject.tmpdir_pathname.to_path
+      subject.tmpdir_path.should eql _build_it_manually
     end
 
-    it "cache_pathname" do
-      bad_test = Headless_::System::Defaults__::CACHE_FILE__
-      sys_defaults.cache_pathname.join( "FOO" ).to_s.
-        should be_include( "#{ bad_test }/FOO" )
+    it "cache_pathname (bad test)" do
+      subject  # yes
+      fn = Subject_[]::Defaults___::CACHE_FILE__
+      subject.cache_pathname.join( "FOO" ).to_path.
+        should be_include( "#{ fn }/FOO" )
     end
 
-    def sys_defaults
-      Headless_::System.defaults
+    def subject
+      Subject_[].defaults
     end
 
     context "[hl] system instance-methods .." do
 
       it "does" do
         o = ::Object.new
-        o.extend Headless_::System::InstanceMethods
+        o.extend Subject_[]::InstanceMethods
         dodgy = o.instance_exec do
           system.which THE_STANDARD_EDITOR_
         end
@@ -50,15 +52,19 @@ module Skylab::Headless::TestSupport::System
       it "any_home_directory_path" do
         # #bad-test
         x1 = ::ENV[ 'HOME' ]
-        x2 = Headless_::System.system.any_home_directory_path
+        x2 = Subject_[].system.any_home_directory_path
         x2.should eql( x1 )
       end
 
       it "any_home_directory_pathname" do
-        s1 = Headless_::System.system.any_home_directory_pathname.join( 'X' ).to_s
+        s1 = Subject_[].system.any_home_directory_pathname.join( 'X' ).to_s
         s2 = "#{ ::ENV[ 'HOME' ] }/X"
         s1.should eql( s2 )
       end
+    end
+
+    Subject_ = -> do
+      Headless_::System
     end
   end
 end

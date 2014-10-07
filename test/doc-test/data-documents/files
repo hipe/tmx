@@ -7,6 +7,7 @@ lib/skylab/basic/method.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/basic/pathname/union.rb
 lib/skylab/basic/rotating-buffer.rb
 lib/skylab/basic/struct.rb
+lib/skylab/brazen/entity/properties-stack--/common-frame--.rb #branch-down-to-core #regret-setup:no
 lib/skylab/face/cli/lipstick.rb
 lib/skylab/face/cli/table.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/face/cli/tableize.rb
@@ -17,7 +18,6 @@ lib/skylab/headless/nlp/en/levenshtein.rb
 lib/skylab/information-tactics/levenshtein.rb
 lib/skylab/meta-hell/basic-fields.rb #branch-down-to-core #regret-setup:no
 lib/skylab/meta-hell/dsl-dsl/core.rb  #regret-setup:no
-lib/skylab/meta-hell/fields/contoured--.rb
 lib/skylab/meta-hell/fields/from.rb
 lib/skylab/meta-hell/fun/core.rb  #regret-setup:no
 lib/skylab/meta-hell/parse/core.rb  #regret-setup:no

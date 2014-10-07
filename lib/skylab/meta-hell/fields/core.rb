@@ -225,7 +225,7 @@ module Skylab::MetaHell
       end
     end
 
-    class Absorber_Method_ < Method_Characteristics__  # is [#060]
+    class Absorber_Method_ < Method_Characteristics__  # :[#060].
 
       def self.unobtrusive_passive_scan d, i_a
         if METHOD_OP_H__.key? i_a.fetch d
@@ -587,18 +587,6 @@ module Skylab::MetaHell
         (( @h ||= {} )[ i ] ||= [] ).push p ; nil
       end
     end
-
-    # ~
-
-    def self.contoured * x_a
-      if x_a.length.zero?
-        self::Contoured__
-      else
-        self::Contoured__.from_iambic_and_client x_a, x_a.shift
-      end
-    end
-
-    # ~
 
     CONST_ = :FIELDS_
 

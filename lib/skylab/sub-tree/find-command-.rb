@@ -35,14 +35,14 @@ module Skylab::SubTree
 
     def string
       if is_valid
-        y = [ "find #{ @path_a.map { |p| p.to_s.shellescape } * ' ' }" ]
+        y = [ "find #{ @path_a.map { |p| p.to_s.shellescape } * SPACE_ }" ]
         if @type_i
           y << "-type #{ @type_i }"
         end
         if @pattern_s
           y << "-name #{ pattern_s.shellescape }"
         end
-        y * ' '
+        y * SPACE_
       end
     end
 

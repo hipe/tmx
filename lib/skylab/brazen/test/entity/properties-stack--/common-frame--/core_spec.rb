@@ -1,53 +1,43 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::Fields::Contoured__
+module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__
 
-  ::Skylab::MetaHell::TestSupport::Fields[ self ]
-
-  include CONSTANTS
-
-  MetaHell = ::Skylab::MetaHell
-
-  extend TestSupport::Quickie
-
-  Sandboxer = TestSupport::Sandbox::Spawner.new
-
-  describe "[mh] Fields::Contoured__" do
-    context "use it" do
+  describe "[br] Entity::Properties_Stack__::Common_Frame__" do
+    context "use its memoized and non-memoized procs and inline methods" do
       Sandbox_1 = Sandboxer.spawn
-      before :all do
-        Sandbox_1.with self
-        module Sandbox_1
-          class Foo
-            MetaHell::Fields.contoured self,
-              :globbing, :absorber, :with,
-              :proc, :foo,
-              :memoized, :proc, :bar,
-              :method, :bif,
-              :memoized, :method, :baz
-          end
-
-          # one line #until:[#ts-032]
-        end
-      end
       it "like so" do
         Sandbox_1.with self
         module Sandbox_1
-          foo = Foo.new ; foo.with :foo, -> { :yes } ; foo.foo.should eql( :yes )
-        end
-      end
-      it "and so" do
-        Sandbox_1.with self
-        module Sandbox_1
-          @ohai = :hi
-          f = Foo.new ; f.with(  :foo, -> { 'x' },
-                                   :bar, -> { "y:#{ @ohai }" },
-                                   :bif, -> { "_#{ foo }_" },
-                                   :baz, -> { "<#{ foo }>" } )
-          f.foo.should eql( 'x' )
-          f.bar.should eql( 'y:hi' )
-          f.bif.should eql( '_x_' )
-          ( f.baz.object_id == f.baz.object_id ).should eql( true )
+          class Foo
+            Brazen_.properties_stack.common_frame self,
+              :proc, :foo, -> do
+                 d = 0
+                 -> { d += 1 }
+              end.call,
+              :memoized, :proc, :bar, -> do
+                d = 0
+                -> { d += 1 }
+              end.call,
+              :inline_method, :bif, -> do
+                "_#{ foo }_"
+              end,
+              :memoized, :inline_method, :baz, -> do
+                "<#{ foo }>"
+              end
+          end
+
+          # one chunk #until:[#ts-032]
+
+          foo = Foo.new
+          foo.foo.should eql( 1 )
+          foo.foo.should eql( 2 )
+          foo.bar.should eql( 1 )
+          foo.bar.should eql( 1 )
+          foo.bif.should eql( "_3_" )
+          foo.bif.should eql( "_4_" )
+          foo.baz.should eql( "<5>" )
+          foo.baz.should eql( "<5>" )
+          foo.baz.object_id.should eql( foo.baz.object_id )
         end
       end
     end
@@ -57,19 +47,20 @@ module Skylab::MetaHell::TestSupport::Fields::Contoured__
         Sandbox_2.with self
         module Sandbox_2
           class Foo
-            MetaHell::Fields.contoured self,
-              :overriding, :globbing, :absorber, :initialize,
-              :required, :field, :foo, :field, :bar
+            Brazen_.properties_stack.common_frame self,
+              :globbing, :processor, :initialize,
+              :required, :readable, :field, :foo,
+              :readable, :field, :bar
           end
         end
       end
-      it "failing to pass a required field triggers an argument error" do
+      it "failing to provide a required field triggers an argument error" do
         Sandbox_2.with self
         module Sandbox_2
           -> do
             Foo.new
           end.should raise_error( ArgumentError,
-                       ::Regexp.new( "\\Amissing\\ required\\ argument\\ \\-\\ foo\\z" ) )
+                       ::Regexp.new( "\\Amissing\\ required\\ field\\ \\-\\ 'foo'\\z" ) )
         end
       end
       it "passing nil is considered the same as not passing an argument" do
@@ -78,7 +69,7 @@ module Skylab::MetaHell::TestSupport::Fields::Contoured__
           -> do
             Foo.new( :foo, nil )
           end.should raise_error( ArgumentError,
-                       ::Regexp.new( "\\Amissing\\ required\\ argument\\ \\-\\ foo\\z" ) )
+                       ::Regexp.new( "\\Amissing\\ required\\ field\\ \\-\\ 'foo'\\z" ) )
         end
       end
       it "passing false is not the same as passing nil, passing false is valid." do

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-datadir="test/doc-test/data"
+datadir="test/doc-test/data-documents"
 if [[ ! -d "$datadir" ]] ; then
   echo "no data dir - $datadir"
   exit 1

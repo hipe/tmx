@@ -4,8 +4,8 @@ module Skylab::Brazen
 
     class Meta_Property__
 
-        def initialize scan
-          @scan = scan
+        def initialize scanner
+          @scanner = scanner
           @entity_class_hook_p = @entity_class_hook_once_p =
             @property_hook_p = nil
           @has_default_x = false
@@ -13,8 +13,8 @@ module Skylab::Brazen
           @as_ivar = :"@#{ @name_i }"
           @iambic_writer_method_name = :"#{ @name_i }="
           process_iambic_passively
-          @last_iambic_idx = @scan.current_index
-          @scan = nil
+          @last_iambic_idx = @scanner.current_index
+          @scanner = nil
           freeze
         end
 
@@ -100,13 +100,13 @@ module Skylab::Brazen
           end
 
         end ]
-        include Iambic_Methods_via_Scanner__
+        include Via_Scanner_Iambic_Methods_
 
 
       module Meta_Prop_IMs__
       private
         def say_bad_enum_value name_i, x
-          _a = self.class.properties[ :color ].enum_box.get_names
+          _a = self.class.properties.fetch( name_i ).enum_box.get_names
           "invalid #{ name_i } '#{ x }', expecting { #{ _a * " | " } }"
         end
       end
@@ -199,7 +199,7 @@ module Skylab::Brazen
 
       class Mprop_Scanner
 
-        include Iambic_Methods_via_Scanner__
+        include Via_Scanner_Iambic_Methods_
 
         def initialize scope_kernel
           @scope_kernel = scope_kernel
@@ -207,13 +207,13 @@ module Skylab::Brazen
 
         def scan_some_DSL
           pcls = @scope_kernel.reader::PROPERTY_CLASS__
-          @scan = @scope_kernel.scan
+          @scanner = @scope_kernel.scanner
           pcls.new do |prop|
             this_child_must_iambicly_scan_something prop
             @scope_kernel.prop = prop
             if unparsed_iambic_exists
               iambic_keyword :property
-              _prop_i = @scan.gets_one
+              _prop_i = @scanner.gets_one
               @scope_kernel.flush_because_prop_i _prop_i
             else
               plan = @scope_kernel.plan
@@ -226,11 +226,11 @@ module Skylab::Brazen
         end
       private
         def this_child_must_iambicly_scan_something o
-          o.scan = @scan
-          d = @scan.current_index
+          o.set_scanner @scanner
+          d = @scanner.current_index
           o.process_iambic_passively
-          d == @scan.current_index and raise ::ArgumentError, say_strange_iambic
-          o.scan = nil
+          d == @scanner.current_index and raise ::ArgumentError, say_strange_iambic
+          o.set_scanner nil
         end
 
         def say_expected_def
@@ -243,7 +243,7 @@ module Skylab::Brazen
         end
 
         def say_kw_not_x i
-          "expected #{ kw i } not #{ strange @scan.current_token }"
+          "expected #{ kw i } not #{ strange @scanner.current_token }"
         end
 
         def kw i

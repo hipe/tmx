@@ -138,7 +138,7 @@ module Skylab::Brazen
       end
 
       def << a
-        @scan = Lib_::Iambic_scanner[].new 0, a
+        @scanner = Lib_::Iambic_scanner[].new 0, a
         process_iambic_fully
         self
       end

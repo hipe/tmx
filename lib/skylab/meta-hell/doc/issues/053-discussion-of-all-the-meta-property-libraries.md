@@ -14,13 +14,15 @@ first, a quick history (most recent at top):
 
     [#br-001] the entity library                              2014-07-22
 
-    [#gv-030] the isomorphic interace parameter               2014-01-20
+    [#gv-030] the isomorphic interface parameter              2014-01-20
 
     [#hl-130] the API parameter library                       2013-12-19
 
     [#tm-081] the "config shell" (working title) (lost)       2013-10-11
 
     [#ba-030] the basic struct                                2013-07-21
+
+    [#br-058] Fields_ DSL --> "contoured fields" --> [br]     2013-07-18
 
     [#mh-061] basic fields                                    2013-07-05
 
