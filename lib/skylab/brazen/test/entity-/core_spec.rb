@@ -55,8 +55,7 @@ module Skylab::Brazen::TestSupport::Entity_
       it "missing, throws argument error with msg with same template as app!" do
         -> do
           subject_class.new.send :with, :bif, :x, :baz, :y
-        end.should raise_error ::ArgumentError,
-          "missing required properties 'foo' and 'bar'"
+        end.should raise_error ::ArgumentError, "missing required properties 'foo' and 'bar'"
       end
     end
 

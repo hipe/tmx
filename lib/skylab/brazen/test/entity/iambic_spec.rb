@@ -22,24 +22,24 @@ module Skylab::Brazen::TestSupport::Entity
           end ]
           attr_reader :foo_x, :bar_x
 
-          public :process_iambic_fully
+          public :process_iambic_fully, :with
         end
       end
 
       it "do parse one does work" do
-        Foo_Iamb.new.process_iambic_fully( [ :foo, :FOO ] ).foo_x.should eql :FOO
+        Foo_Iamb.new.with( :foo, :FOO ).foo_x.should eql :FOO
       end
 
       it "do parse two does work" do
         foo = Foo_Iamb.new
-        foo.process_iambic_fully( [ :foo, :FOO, :bar, :BAR ] )
+        foo.with :foo, :FOO, :bar, :BAR
         foo.foo_x.should eql :FOO
         foo.bar_x.should eql :BAR
       end
 
       it "do parse strange does not work" do
         -> do
-          Foo_Iamb.new.process_iambic_fully( [ :wiz ] )
+          Foo_Iamb.new.with :wiz
         end.should raise_error ::ArgumentError, unrec_rx( :wiz )
       end
 
@@ -50,7 +50,8 @@ module Skylab::Brazen::TestSupport::Entity
       end
 
       it "do parse none does work" do
-        Foo_Iamb.new.process_iambic_fully [].freeze
+        foo = Foo_Iamb.new
+        foo.process_iambic_fully Brazen_::EMPTY_A_
       end
     end
 
@@ -67,8 +68,7 @@ module Skylab::Brazen::TestSupport::Entity
         class FooI_PityVal
           Subject_[][ self, :iambic_writer_method_name_suffix ]
         end
-      end.should raise_error ::ArgumentError,
-        /\bexpecting a value for 'iambic_/
+      end.should raise_error ::ArgumentError, /\bexpecting a value for 'iambic_/
     end
 
     context "iambic writer postfix option (& introduction to using the DSL)" do

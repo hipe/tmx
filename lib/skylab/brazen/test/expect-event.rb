@@ -139,6 +139,15 @@ module Skylab::Brazen::TestSupport
           s_a.fetch 0
         end
 
+        def black_and_white ev
+          black_and_white_lines( ev ).join NEWLINE_
+        end
+
+        def black_and_white_lines ev
+          ev.render_all_lines_into_under y=[], event_expression_agent
+          y
+        end
+
         # ~ support and resolution
 
         def send_event_failure msg
@@ -316,5 +325,7 @@ module Skylab::Brazen::TestSupport
         end ; nil
       end
     end
+
+    NEWLINE_ = "\n".freeze
   end
 end

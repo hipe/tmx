@@ -34,6 +34,13 @@ this array and build a new event from that.
 
 
 
+# :#note-85
+
+as available. your event's message proc must adhere to the set of
+methods provided by the hard-coded expression agent used.
+
+
+
 
 ## :#note-70
 

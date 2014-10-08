@@ -22,7 +22,9 @@ module Skylab::TanMan::TestSupport::API
 
     it "xtra tokens on a ping" do
       call_API :ping, :wahootey
-      expect_not_OK_event :unrecognized_property, "unrecognized property 'wahootey'"
+      ev = expect_not_OK_event :extra_properties,
+        'unrecognized (plural_noun ["property", 1]) (and_ ["(ick :wahootey)"])'
+      black_and_white( ev ).should eql "unrecognized property :wahootey"
       expect_failed
     end
 
@@ -31,6 +33,15 @@ module Skylab::TanMan::TestSupport::API
       expect_neutral_event :ping, "hello from tan man."
       expect_no_more_events
       @result.should eql :hello_from_tan_man
+    end
+
+    context "kernel" do
+
+      it "a minimal properties stack integration test" do
+        subject_API.application_kernel.
+          kernel_property_value( :local_conf_maxdepth ).
+            should eql 1
+      end
     end
   end
 end

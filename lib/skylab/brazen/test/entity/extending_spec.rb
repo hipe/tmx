@@ -31,7 +31,9 @@ module Skylab::Brazen::TestSupport::Entity
 
           module self::Module_Methods
             def with * x_a
-              new.process_iambic_fully x_a
+              ent = new
+              ok = ent.process_iambic_fully x_a
+              ok and ent
             end
           end
 

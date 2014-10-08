@@ -2,20 +2,7 @@ module Skylab::Brazen
 
   module Entity
 
-    module Properties_Stack__
-
-      # ~ visiting
-      class << self
-
-        def common_frame * a
-          if a.length.zero?
-            self::Common_Frame__
-          else
-            self::Common_Frame__.via_arglist a
-          end
-        end
-      end
-      # ~
+    class Properties_Stack__
 
       # use its memoized and non-memoized procs and inline methods
       # like so:
@@ -246,6 +233,20 @@ module Skylab::Brazen
 
       module Common_Frame__
 
+        def any_all_names
+          all_names
+        end
+
+        def all_names
+          self.class.properties.get_names
+        end
+
+        def any_proprietor_of i
+          if self.class.properties.has_name i
+            self
+          end
+        end
+
         def property_value name_i
           prop = self.class.properties.fetch name_i
           p = prop.external_read_proc
@@ -279,14 +280,7 @@ module Skylab::Brazen
         end
 
         def send_event ev
-          ev.render_all_lines_into_under y=[], Brazen_::API.expression_agent_instance
-          _e_cls = if ev.has_tag :error_category
-            _name = Callback_::Name.from_variegated_symbol ev.error_category
-            ::Object.const_get _name.as_camelcase_const
-          else
-            ::RuntimeError
-          end
-          raise _e_cls, y * SPACE_
+          raise ev.to_exception
         end
       end
 

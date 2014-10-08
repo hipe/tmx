@@ -1,65 +1,76 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::TanMan::TestSupport::Kernel
+module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Core
 
-  ::Skylab::TanMan::TestSupport[ self ]
+  ::Skylab::Brazen::TestSupport::Entity::Properties_Stack__[ TS_ = self ]
 
   include CONSTANTS
 
   extend TestSupport_::Quickie
 
-  TestLib_ = TestLib_
+  describe "[br] properties stack" do
 
-  describe "[tm] kernel properties" do
+    extend TS_
 
-    it "loads" do
-      subject
+    Brazen_::TestSupport::Expect_Event[ self ]
+
+    it "the empty stack will never find anything" do
+      stack = Subject_[].new
+      stack.any_proprietor_of( :anything ).should be_nil
     end
 
-    context "with a subclass of the base" do
+    it "the stack with one frame produces the values it has" do
+      stack = Subject_[].new
+      stack.push_frame_with :foo, :Foo, :bar, :Bar
+      stack.property_value( :foo ).should eql :Foo
+      stack.property_value( :bar ).should eql :Bar
+    end
 
-      before :all do
-        class C1 < Subject_[]::Base__
-
-          TestLib_::Entity[][ self, -> do
-            j = 3
-            o :memoized, -> { j += 1 }, :property, :jay
-
-            o :memoized, -> { :base_zay }, :property, :zay
-          end ]
-        end
+    it "the first frame determines what names the subsequent frames may have" do
+      stack = Subject_[].new event_receiver
+      stack.push_frame_with :a, :X, :b, :Y
+      x = stack.push_frame_with :derp, :Z, :b, :B, :nerp, :Q
+      x.should eql false
+      expect_not_OK_event :extra_properties do |ev|
+        ev.name_i_a.should eql [ :derp, :nerp ]
       end
+      expect_no_more_events
+    end
 
-      it "subclassing the base works" do
-        o = C1.new
-        o.retrieve_value( :jay ).should eql 4
-        o.retrieve_value( :jay ).should eql 4
-      end
-
-      it "adding a config frame with extra formal properties raises arg error" do
-        o = C1.new
-        -> do
-          o.with_frame derp: :sherp, nerp: :flerp
-        end.should raise_error ::ArgumentError,
+    it "strange name frame with no event receiver will raise an exeption" do
+      stack = Subject_[].new
+      stack.push_frame_with :a, :X, :b, :Y
+      -> do
+        stack.push_frame_with :derp, :Z, :b, :B, :nerp, :Q
+      end.should raise_error ::ArgumentError,
           %r(\Aunrecognized properties 'derp' and 'nerp')
-      end
-
-      it "but add one with ok formals and stack works topmost one with prop" do
-        o = C1.new
-        j = 6
-        o_ = o.with_frame :jay, -> { "ok: #{ j += 1 }" }
-        o_.retrieve_value( :jay ).should eql 'ok: 7'
-        o_.retrieve_value( :jay ).should eql 'ok: 7'
-        o_.retrieve_value( :zay ).should eql :base_zay
-        o.retrieve_value( :jay ).should eql 4
-      end
     end
 
-    def subject
-      Subject_[]
+    it "topmost frame wins" do
+      stack = Subject_[].new
+      stack.push_frame_with :a, :A1, :b, :B1, :c, :C1
+      stack.push_frame_with :b, :B2, :c, :c2
+      stack.push_frame_with :c, :C3
+
+      stack.property_value( :a ).should eql :A1
+      stack.property_value( :b ).should eql :B2
+      stack.property_value( :c ).should eql :C3
     end
+
+    it "strange value when event receiver produces the same event as earlier" do
+      stack = Subject_[].new event_receiver
+      stack.push_frame_with :a, :A1, :b, :B1
+      stack.push_frame_with :b, :B2
+      x = stack.property_value :c
+      expect_not_OK_event :extra_properties do |ev|
+        ev.name_i_a.should eql [ :c ]
+      end
+      expect_no_more_events
+      x.should eql false
+    end
+
     Subject_ = -> do
-      TanMan_::Kernel__::Properties
+      Brazen_.properties_stack
     end
   end
 end

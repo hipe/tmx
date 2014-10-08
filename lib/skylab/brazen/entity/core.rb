@@ -32,15 +32,12 @@ module Skylab::Brazen
         Entity::Compound_Iambic_Scanner__::Mutable_Iambic_Scanner
       end
 
-      def proprietor_methods
-        Proprietor_Methods__
+      def properties_stack
+        self::Properties_Stack__
       end
 
-      def say_unrecognized_properties a
-        Brazen_::API.expression_agent_instance.calculate do
-          _s_a = a.map( & method( :ick ) )
-          "unrecognized propert#{ s a, :y } #{ and_ _s_a }"
-        end
+      def proprietor_methods
+        Proprietor_Methods__
       end
 
       def scope_kernel
@@ -88,7 +85,7 @@ module Skylab::Brazen
 
       def when_remaining_args_look_iambic_execute
         d = @kernel.process_any_DSL @d, @x_a
-        d == @d and raise ::ArgumentError, say_strange_iambic
+        d == @d and raise build_extra_iambic_event.to_exception
         @d = d
         @d < @x_a_length and when_remaining_args_do_not_look_iambic_execute
       end
@@ -227,10 +224,14 @@ module Skylab::Brazen
         plan_in_progress.meth_i = m_i
         if @x_a_a.length.nonzero?
           flush_iambic_queue
-          @plan and flush_bc_meth
+          if @plan
+            flush_bc_meth
+          else
+            ACHEIVED_
+          end
         else
           flush_bc_meth
-        end ; nil
+        end
       end
 
       def plan_in_progress
@@ -255,7 +256,11 @@ module Skylab::Brazen
           @plan.prop_i = @plan.meth_i
         end
         did_build = touch_and_accept_prop
-        did_build and finish_property
+        if did_build
+          finish_property
+        else
+          ACHEIVED_
+        end
       end
 
       def flush_because_prop_i prop_i
@@ -263,7 +268,11 @@ module Skylab::Brazen
         @plan.meth_i = generate_method_name_for_plan @plan
         did_build = touch_and_accept_prop
         define_iambic_writer_method_for_property @prop
-        did_build and finish_property
+        if did_build
+          finish_property
+        else
+          ACHEIVED_
+        end
       end
 
       def define_iambic_writer_method_for_property prop
@@ -341,6 +350,7 @@ module Skylab::Brazen
           @prop.class.hook_shell.process_relevant_later_hooks @reader, @prop
         end
         @prop = nil
+        ACHEIVED_
       end
 
       def process_any_DSL d, x_a
@@ -610,6 +620,14 @@ module Skylab::Brazen
         @name.as_variegated_symbol
       end
 
+      def receive_event ev
+        raise ev.to_exception
+      end
+    private
+      def build_not_OK_event_with * x_a, & p
+        Entity.event.build_not_OK_event_via_mutable_iambic_and_msg_proc x_a, p
+      end
+
       class << self
         def hook_shell_for_write
           @hook_shell ||= Meta_Property__::Hook_Shell.new self
@@ -633,30 +651,24 @@ module Skylab::Brazen
     private
 
       def with * a
-        process_iambic_fully 0, a
-        clear_all_iambic_ivars
-        self
+        ok = process_iambic_fully 0, a
+        if ok
+          clear_all_iambic_ivars
+          self
+        end
       end
 
       def process_iambic_fully * a
         prcss_iambic_passively_via_args a
         if unparsed_iambic_exists
-          when_unparsed_iambic_exists
+          when_extra_iambic
         else
-          self
+          ACHEIVED_
         end
       end
 
       def unparsed_iambic_exists
         @d < @x_a_length
-      end
-
-      def when_unparsed_iambic_exists
-        raise ::ArgumentError, say_strange_iambic
-      end
-
-      def say_strange_iambic
-        Entity.say_unrecognized_properties [ current_iambic_token ]
       end
 
       def process_iambic_passively * a
@@ -690,10 +702,13 @@ module Skylab::Brazen
         box, subject = iambic_methods_box_and_subject
         scn = @scanner
         m_i = box[ scn.current_token ]
-        m_i or raise ::ArgumentError, say_strange_iambic
-        scn.advance_one
-        send subject.send( m_i ).iambic_writer_method_name
-        prcss_iambic_passively_with_scn_subj_box scn, subject, box ; nil
+        if m_i
+          scn.advance_one
+          send subject.send( m_i ).iambic_writer_method_name
+          prcss_iambic_passively_with_scn_subj_box scn, subject, box
+        else
+          when_extra_iambic
+        end
       end
 
       def prcss_iambic_passively_with_scn_subj_box scn, subject, box
@@ -739,6 +754,20 @@ module Skylab::Brazen
         instance_variable_set prop.name.as_ivar, x
       end
 
+      def when_extra_iambic
+        _ev = build_extra_iambic_event
+        receive_extra_iambic _ev
+      end
+
+      def build_extra_iambic_event
+        _name_i_a = [ current_iambic_token ]
+        Entity.properties_stack.build_extra_properties_event _name_i_a
+      end
+
+      def receive_extra_iambic ev  # :+#public-API
+        raise ev.to_exception
+      end
+
       PROPERTY_CLASS__ = Property__  # delicate
     end
 
@@ -747,6 +776,7 @@ module Skylab::Brazen
     UNDEFINED_ = nil
 
     module Via_Scanner_Iambic_Methods_
+
       include Iambic_Methods__
 
       def set_scanner x
@@ -754,6 +784,7 @@ module Skylab::Brazen
       end
 
     private
+
       def prep_iambic_parse_via_args a
         a.length.zero? or raise ::ArgumentError, say_not_when_scan( a )
       end
@@ -774,11 +805,21 @@ module Skylab::Brazen
       end
 
       def iambic_property
-        @scanner.unparsed_exists or raise ::ArgumentError, say_missing_iambic_value
-        @scanner.gets_one
+        if @scanner.unparsed_exists
+          @scanner.gets_one
+        else
+          when_no_iambic_property
+        end
       end
-      def say_missing_iambic_value
-        "expecting a value for '#{ @scanner.previous_token }'"
+
+      def when_no_iambic_property
+        _ev = build_not_OK_event_with :missing_required_properties,
+            :previous_token, @scanner.previous_token,
+            :error_category, :argument_error do |y, o|
+
+          y << "expecting a value for #{ code o.previous_token }"
+        end
+        receive_event _ev
       end
 
       def current_iambic_token
@@ -845,6 +886,16 @@ module Skylab::Brazen
       end ]
 
       include Via_Scanner_Iambic_Methods_
+
+    private
+
+      def build_not_OK_event_with * x_a, & p
+        Entity.event.build_not_OK_event_via_mutable_iambic_and_msg_proc x_a, p
+      end
+
+      def receive_event ev
+        raise ev.to_exception
+      end
     end
 
     # ~ extension API

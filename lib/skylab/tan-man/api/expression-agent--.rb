@@ -24,7 +24,7 @@ module Skylab::TanMan
       alias_method :calculate, :instance_exec
 
       def and_ a
-        _NLP_agent.and a
+        _NLP_agent.and_ a
       end
 
       def app_name

@@ -59,8 +59,7 @@ module Skylab::Brazen::TestSupport::Entity
           class MPE_EOI_DURGY
             MPE_Extmod[ self, :aruty, :whatever, :durgy ]
           end
-        end.should raise_error ::ArgumentError,
-          /\bexpected 'property' not 'durgy'/
+        end.should raise_error ::ArgumentError, /\bexpected 'property' not 'durgy'/
       end
     end
   end

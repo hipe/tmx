@@ -93,13 +93,8 @@ module Skylab::TanMan
         Brazen_.bound_call -> { x }, :call
       end
 
-      def when_unparsed_iambic_exists
-        msg = say_strange_iambic
-        _ev = build_not_OK_event_with :unrecognized_property,
-            :current_iambic_token, current_iambic_token do |y, o|
-          y << msg
-        end
-        send_event _ev
+      def receive_extra_iambic ev
+        send_event ev
       end
 
       def send_event ev
@@ -196,17 +191,51 @@ module Skylab::TanMan
     end
   end
 
-
   class Kernel_ < Brazen_::Kernel_  # :[#083].
 
     def kernel_property_value i
-      properties.retrieve_value i
+      properties_stack.property_value i
     end
   private
-    def properties
-      @properties ||= @module::Kernel__::Properties.new
+    def properties_stack
+      @pstack ||= bld_pstack
+    end
+    def bld_pstack
+      stack = Brazen_.properties_stack.new
+      stack.push_frame Bottom_properties_frame__[]
+      stack
     end
   end
+
+  Bottom_properties_frame__ = Callback_.memoize[ -> do
+
+    class Bottom_Properties_Frame__
+
+      Brazen_.properties_stack.common_frame self,
+
+        :memoized, :proc, :starter_file, -> do
+          'holy-smack.dot'.freeze
+        end,
+
+        :memoized, :proc, :global_conf_path, -> do
+          TanMan_::Lib_::Home_directory_pathname[].join( 'tanman-config' ).to_path
+        end,
+
+        :memoized, :proc, :local_conf_config_name, -> do
+          'config'.freeze
+        end,
+
+        :memoized, :proc, :local_conf_dirname, -> do
+          '.tanman-workspace'.freeze
+        end,
+
+        :memoized, :proc, :local_conf_maxdepth, -> do
+          1
+        end
+    end
+
+    Bottom_Properties_Frame__.new
+  end ]
 
   Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]
 

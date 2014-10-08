@@ -43,23 +43,32 @@ module Skylab::Brazen
       private
 
         def aply_iambic_writers_to_property_class pc
-          ivar = @as_ivar
           enum = enum_box
           pc.send :attr_reader, @name_i
           if enum
-            pc.send :include, Meta_Prop_IMs__
-            name_i = @name_i
-            pc.send :define_method, @iambic_writer_method_name do
-              x = iambic_property
-              enum[ x ] or raise ::ArgumentError, say_bad_enum_value( name_i, x )
-              instance_variable_set ivar, x
-            end
+            when_enum_box pc, enum
           else
+            _IVAR = @as_ivar
             pc.send :define_method, @iambic_writer_method_name do
-              instance_variable_set ivar, iambic_property
+              instance_variable_set _IVAR, iambic_property
             end
           end
           nil
+        end
+
+        def when_enum_box pc, _ENUM_BOX
+          pc.include Meta_Prop_IMs__
+          _IVAR = @as_ivar ; _NAME_I = @name_i
+          pc.send :define_method, @iambic_writer_method_name do
+            x = iambic_property
+            if _ENUM_BOX[ x ]
+              instance_variable_set _IVAR, x
+              ACHEIVED_
+            else
+              when_bad_enum_value x, _NAME_I, _ENUM_BOX
+              UNABLE_
+            end
+          end
         end
 
         def aply_defaulting_behavior_to_property_class pc
@@ -105,9 +114,16 @@ module Skylab::Brazen
 
       module Meta_Prop_IMs__
       private
-        def say_bad_enum_value name_i, x
-          _a = self.class.properties.fetch( name_i ).enum_box.get_names
-          "invalid #{ name_i } '#{ x }', expecting { #{ _a * " | " } }"
+        def when_bad_enum_value x, name_i, enum_box
+          _ev = build_not_OK_event_with :invalid_property_value,
+            :x, x, :name_i, name_i,
+            :enum_box, enum_box,
+            :error_category, :argument_error do |y, o|
+              _a = o.enum_box.get_names
+              y << "invalid #{ o.name_i } #{ ick o.x }, #{
+               }expecting { #{ _a * ' | ' } }"
+          end
+          receive_event _ev
         end
       end
 
@@ -208,50 +224,83 @@ module Skylab::Brazen
         def scan_some_DSL
           pcls = @scope_kernel.reader::PROPERTY_CLASS__
           @scanner = @scope_kernel.scanner
+          ok = true
           pcls.new do |prop|
-            this_child_must_iambicly_scan_something prop
-            @scope_kernel.prop = prop
-            if unparsed_iambic_exists
-              iambic_keyword :property
-              _prop_i = @scanner.gets_one
-              @scope_kernel.flush_because_prop_i _prop_i
-            else
-              plan = @scope_kernel.plan
-              plan && plan.meth_i or
-                raise ::ArgumentError, say_expected_def
-              @scope_kernel.flush_bc_meth
-            end
+            ok = this_child_must_iambicly_scan_something prop
+            ok &&= when_this_child_scanned_something prop
           end
-          @scope_kernel.finish_property ; nil
+          ok && @scope_kernel.finish_property
         end
+
       private
+
         def this_child_must_iambicly_scan_something o
           o.set_scanner @scanner
           d = @scanner.current_index
           o.process_iambic_passively
-          d == @scanner.current_index and raise ::ArgumentError, say_strange_iambic
-          o.set_scanner nil
+          if d == @scanner.current_index
+            when_child_did_not_scan_something
+          else
+            o.set_scanner nil
+            ACHEIVED_
+          end
         end
 
-        def say_expected_def
-          "expected method definition at end of iambic input"
+        def when_child_did_not_scan_something
+          _ev = build_extra_iambic_event
+          receive_event _ev
+          UNABLE_
+        end
+
+        def when_this_child_scanned_something o
+          @scope_kernel.prop = o
+          if unparsed_iambic_exists
+            ok = iambic_keyword :property
+            ok and @scope_kernel.flush_because_prop_i @scanner.gets_one
+          else
+            plan = @scope_kernel.plan
+            if plan && plan.meth_i
+              @scope_kernel.flush_bc_meth
+            else
+              when_no_def
+            end
+          end
+        end
+
+        def when_no_def
+          _ev = build_not_OK_event_with :expected_method_definition,
+              :error_category, :argument_error do |y, o|
+            y << "expected method definition at end of iambic input"
+          end
+          receive_event _ev
         end
 
         def iambic_keyword i
-          i == current_iambic_token or raise ::ArgumentError, say_kw_not_x( i )
-          advance_iambic_scanner_by_one ; nil
+          if i == current_iambic_token
+            advance_iambic_scanner_by_one
+            ACHEIVED_
+          else
+            when_not_iambic_keyword i
+          end
         end
 
-        def say_kw_not_x i
-          "expected #{ kw i } not #{ strange @scanner.current_token }"
+        def when_not_iambic_keyword i
+          _ev = build_not_OK_event_with :expecting_keyword,
+              :keyword, i,
+              :x, current_iambic_token,
+              :error_category, :argument_error do |y, o|
+            y << "expected #{ code o.keyword } not #{ ick o.x }"
+          end
+          receive_event _ev
         end
 
-        def kw i
-          "'#{ i }'"
+        def build_not_OK_event_with * x_a, & p
+          Entity.event.build_not_OK_event_via_mutable_iambic_and_msg_proc x_a, p
         end
 
-        def strange i  # placeholder for [#mh-050]
-          "'#{ i }'"
+        def receive_event ev
+          _e = ev.to_exception
+          raise _e
         end
       end
 

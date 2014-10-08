@@ -78,17 +78,6 @@ module Skylab::TanMan::TestSupport::Models
       subject_API.application_kernel
     end
 
-    # ~ experimental additions to event assertions
-
-    def black_and_white ev
-      black_and_white_lines( ev ).join NEWLINE_
-    end
-
-    def black_and_white_lines ev
-      ev.render_all_lines_into_under y=[], event_expression_agent
-      y
-    end
-
     # ~ tmpdir/workspace support
 
     def use_empty_ws

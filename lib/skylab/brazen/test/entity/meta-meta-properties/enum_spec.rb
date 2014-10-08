@@ -57,8 +57,7 @@ module Skylab::Brazen::TestSupport::Entity
             end
           end ]
         end
-        end.should raise_error ::ArgumentError,
-          /\Ainvalid color 'red', expecting { green \| purple }/
+        end.should raise_error ::ArgumentError, /\Ainvalid color 'red', expecting { green \| purple }/
       end
     end
   end

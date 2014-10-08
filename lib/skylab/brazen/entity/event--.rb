@@ -8,6 +8,12 @@ module Skylab::Brazen
 
         alias_method :construct, :new
 
+        def build_not_OK_event_via_mutable_iambic_and_msg_proc x_a, p
+          x_a.push :ok, false
+          p ||= Inferred_Message.to_proc
+          inline_via_iambic_and_message_proc x_a, p
+        end
+
         def codifying_expression_agent
           Event__::EXPRESSION_AGENT__
         end
@@ -78,6 +84,17 @@ module Skylab::Brazen
 
       def dup_with * x_a, & p  # #note-25
         dup.init_copy_via_iambic_and_message_proc x_a, p
+      end
+
+      def to_exception  # #note-85
+        render_all_lines_into_under y=[], Brazen_::API.expression_agent_instance  # "black and white"
+        _e_cls = if has_tag :error_category
+          _name = Callback_::Name.from_variegated_symbol error_category
+          ::Object.const_get _name.as_camelcase_const
+        else
+          ::RuntimeError
+        end
+        _e_cls.new( y * SPACE_ )
       end
 
       def to_iambic

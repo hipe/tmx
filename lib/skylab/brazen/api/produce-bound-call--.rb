@@ -19,19 +19,16 @@ module Skylab::Brazen
         @bound_call
       end
 
-      def set_event_receiver x
-        @event_receiver = x ; nil
-      end
-
     private
 
       def prepare_ivars
         @action = nil
-        @event_receiver = nil
         @p and @p[ self ]
         if :event_receiver == @x_a[ -2 ]  # :[#049] case study: ordering hacks
-          @event_receiver = @x_a.pop
-          @x_a[ -1, 1 ] = EMPTY_A_
+          @event_receiver = @x_a.last
+          @x_a[ -2, 2 ] = EMPTY_A_
+        else
+          @event_receiver = nil
         end
         @d = 0 ; @x_a_length = @x_a.length
         nil

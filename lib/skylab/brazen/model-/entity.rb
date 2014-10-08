@@ -425,7 +425,8 @@ module Skylab::Brazen
 
     def whine_about_missing_reqd_props miss_a
       _ev = build_not_OK_event_with :missing_required_properties,
-          :miss_a, miss_a do |y, o|
+          :miss_a, miss_a,
+          :error_category, :argument_error do |y, o|
         s_a = o.miss_a.map do |prop|
           par prop
         end
@@ -436,8 +437,7 @@ module Skylab::Brazen
     end
 
     def receive_missing_required_properties ev
-      _s = ev.render_first_line_under Brazen_::API.expression_agent_instance
-      raise ::ArgumentError, _s
+      raise ev.to_exception
     end
 
     def receive_missing_required_properties_softly ev

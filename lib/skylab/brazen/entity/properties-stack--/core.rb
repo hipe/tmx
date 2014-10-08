@@ -1,90 +1,97 @@
-module Skylab::TanMan
+module Skylab::Brazen
 
-  class Kernel__
+  class Entity::Properties_Stack__
 
-    class Properties < ::Class.new( ::Class.new )  # see [#082]
+    class << self
 
-      Base__ = superclass  # #note-2
+      def build_extra_properties_event name_i_a
 
-      Base_ = Base__.superclass  # #note-1
+        Event_[].inline_with :extra_properties,
+            :name_i_a, name_i_a,
+            :error_category, :argument_error,
+            :ok, false do |y, o|
 
-      class Base__
+          s_a = o.name_i_a.map( & method( :ick ) )
 
-        TanMan_::Lib_::Entity[][ self, -> do
+          y << "unrecognized #{ plural_noun 'property', s_a.length }#{
+           } #{ and_ s_a }"
 
-          o :meta_property, :memoized,
-            :property_hook, -> prop do
-              prop.reader_method_name = :read_memoized_property
-              p = -> do
-                x = prop.memoized[] ; p = -> { x } ; x
-              end
-              prop.memoized_value_p = -> { p[] }
-            end
-
-          property_class_for_write
-          class self::Property
-            attr_accessor :reader_method_name, :memoized_value_p
-          end
-
-        end ]
-      end
-
-      TanMan_::Lib_::Entity[][ self, -> do
-
-        o :memoized, -> { 'holy-smack.dot' }, :property, :default_starter_file
-
-        o :memoized, -> do
-          TanMan_::Lib_::Home_directory_pathname[].join( 'tanman-config' ).to_s
-        end, :property, :global_conf_path
-
-        o :memoized, -> { 'config' }, :property, :local_conf_config_name
-
-        o :memoized, -> { '.tanman' }, :property, :local_conf_dirname
-
-        o :memoized, -> { }, :property, :local_conf_maxdepth
-
-      end ]
-
-      class Base__
-
-        def initialize
-          freeze
-        end
-
-        def names
-          self.class.properties.get_names
-        end
-
-        def any_retriever_for i
-          if self.class.properties.has_name i
-            self
-          end
-        end
-
-        def retrieve_value i
-          prop = self.class.properties.fetch i
-          send prop.reader_method_name, prop
-        end
-      private
-        def read_memoized_property prop
-          prop.memoized_value_p[]
         end
       end
 
-      class Base_
-
-        def with_frame * a
-          if 1 == a.length
-            h = a.first
-          else
-            h = {} ; a.each_slice( 2 ) { |i, x| h[ i ] = x }
-          end
-          _frame = Properties::Models__::Hash_Adapter.new h
-          Models__::Stack.new self do |stack|
-            stack.push_frame _frame
-          end
+      def common_frame * a
+        if a.length.zero?
+          self::Common_Frame__
+        else
+          self::Common_Frame__.via_arglist a
         end
       end
     end
+
+    def initialize event_receiver=nil
+      @a = []
+      @event_receiver = event_receiver
+      @d = -1
+    end
+
+    def property_value i
+      pptr = any_proprietor_of i
+      if pptr
+        pptr.property_value i
+      else
+        _ev = self.class.build_extra_properties_event [ i ]
+        send_event _ev
+      end
+    end
+
+    def any_proprietor_of i
+      d = @d
+      while -1 != d
+        x = @a.fetch( d ).any_proprietor_of i
+        x and break
+        d -= 1
+      end
+      x
+    end
+
+    def push_frame_with * x_a
+      push_frame Pstack_::Models__::Frame_via_iambic[ x_a ]
+    end
+
+    def push_frame x
+      ok = true
+      if @a.length.nonzero?
+        a = x.any_all_names
+        if a
+          xtra_a = a - @a.first.all_names
+          if xtra_a.length.nonzero?
+            when_xtra xtra_a
+            ok = false
+          end
+        end
+      end
+      if ok
+        @a.push x
+        @d += 1
+      end
+      ok
+    end
+
+  private
+
+    def when_xtra xtra_a
+      _ev = Pstack_.build_extra_properties_event xtra_a
+      send_event _ev
+    end
+
+    def send_event ev
+      if @event_receiver
+        @event_receiver.receive_event ev
+      else
+        raise ev.to_exception
+      end
+    end
+
+    Pstack_ = self
   end
 end
