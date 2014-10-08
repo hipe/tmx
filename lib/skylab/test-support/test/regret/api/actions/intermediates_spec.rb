@@ -6,11 +6,11 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::Intermediates
 
   include CONSTANTS
 
-  TestSupport = ::Skylab::TestSupport
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
+  TestSupport_ = TestSupport_
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[ts] Regret::API::Actions::Intermediates" do
     context "we can access the API" do
@@ -19,15 +19,15 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::Intermediates
         Sandbox_1.with self
         module Sandbox_1
           
-          HOME_ = TestSupport::Regret.dir_pathname
+          HOME_ = TestSupport_::Regret.dir_pathname
 
           # ( ignore this ENTIRE TEST SUPPORT INSIDE YOUR DOC-TEST )
           Intr_ = -> *a do
-            io = TestSupport::IO::Spy::Triad.new nil
+            io = TestSupport_::IO::Spy::Triad.new nil
             # io.debug!
             h = { out: io.outstream, err: io.errstream }
             0.step(a.length-1, 2).each { |d| h[a[d]] = a[d+1] }
-            r = TestSupport::Regret::API.invoke :intermediates, h
+            r = TestSupport_::Regret::API.invoke :intermediates, h
             out_a = io.outstream.string.split "\n"
             err_a = io.errstream.string.split "\n"
             [ r, out_a, err_a ]
@@ -37,7 +37,7 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::Intermediates
       it "through the `invoke` method" do
         Sandbox_1.with self
         module Sandbox_1
-          TestSupport::Regret::API.respond_to?( :invoke ).should eql( true )
+          TestSupport_::Regret::API.respond_to?( :invoke ).should eql( true )
         end
       end
       it "when the (absolute) path is not found" do
@@ -87,10 +87,10 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::Intermediates
       it "content looks ok" do
         Sandbox_1.with self
         module Sandbox_1
-          opn =  TestSupport::TestSupport.dir_pathname.
+          opn =  TestSupport_::TestSupport.dir_pathname.
             join( 'regret/code-fixtures-' )
           remove_entry_secure = -> do
-            TestSupport::Library_::FileUtils.remove_entry_secure opn.to_s
+            TestSupport_::Library_::FileUtils.remove_entry_secure opn.to_s
           end
           opn.exist? and remove_entry_secure[]
           in_pn = HOME_.join( 'code-fixtures-/asap/whootenany.rb' )

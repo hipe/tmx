@@ -37,6 +37,5 @@ module Skylab::TestSupport  # :[#021].
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
   stowaway :Lib_, 'library-'
-  stowaway :System, 'library-'
 
 end

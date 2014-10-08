@@ -6,11 +6,11 @@ module Skylab::InformationTactics::TestSupport::Levenshtein
 
   include CONSTANTS
 
-  InformationTactics = ::Skylab::InformationTactics
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
+  InformationTactics_ = InformationTactics_
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[it] Levenshtein" do
     context "levenshtein distance" do
@@ -19,7 +19,7 @@ module Skylab::InformationTactics::TestSupport::Levenshtein
         Sandbox_1.with self
         module Sandbox_1
           A_ = [ :apple, :banana, :ernana, :onono, :strawberry, :orange ]
-          a = InformationTactics::Levenshtein::Closest_n_items_to_item[ 3, A_, :bernono ]
+          a = InformationTactics_::Levenshtein::Closest_n_items_to_item[ 3, A_, :bernono ]
 
           a.should eql( [ :onono, :ernana, :banana ] )
         end

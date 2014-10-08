@@ -9,7 +9,7 @@ module Skylab::Headless
         # we love levenshtein
         # reduce a big list to a small list
         #
-        #     Closest_items_to_item = Headless::NLP::EN::Levenshtein::
+        #     Closest_items_to_item = Headless_::NLP::EN::Levenshtein::
         #       With_conj_s_render_p_closest_n_items_a_item_x.
         #         curry[ ' or ', -> x { x.inspect }, 3 ]
         #     a = [ :zepphlyn, :beefer, :bizzle, :bejonculous, :wangton ]

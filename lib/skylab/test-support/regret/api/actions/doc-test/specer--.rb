@@ -30,7 +30,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     #     # with four or more spaces, and its containing "SNIPPET" has the
     #     # magic equals predicate symbol in it somewhere.
     #
-    #     THIS_FILE_ = TestSupport::This_File[ __FILE__ ]
+    #     THIS_FILE_ = TestSupport_::This_File[ __FILE__ ]
     #     THIS_FILE_.contains( 'this comment gets included' )       # => true
     #
     #     THIS_FILE_.contains( '"this is the first line of a co' )  # => true

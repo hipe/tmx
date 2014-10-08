@@ -4,7 +4,7 @@ module Skylab::Face::TestSupport::API::Action::Normalize
 
   ::Skylab::Face::TestSupport::API::Action[ self, :sandboxes_et_al ]
 
-  describe "extend module x with Face::API and be normal" do
+  describe "extend module x with Face_::API and be normal" do
 
     extend TS__
 
@@ -12,8 +12,8 @@ module Skylab::Face::TestSupport::API::Action::Normalize
 
       define_sandbox_constant :nightclub do
         module Sandbox::Nightclub_1
-          Face::API[ self ]
-          class API::Actions::W < Face::API::Action
+          Face_::API[ self ]
+          class API::Actions::W < Face_::API::Action
             def normalize y, p_h
               if ! p_h
                 y << "no params provided"
@@ -30,7 +30,7 @@ module Skylab::Face::TestSupport::API::Action::Normalize
               @valid_p_h.map { |k, v| "#{ k }:#{ v }" } * ', '
             end
           end
-          Face::Autoloader_[ self ]
+          Face_::Autoloader_[ self ]
         end
       end
 
@@ -66,8 +66,8 @@ module Skylab::Face::TestSupport::API::Action::Normalize
 
       define_sandbox_constant :nightclub do
         module Sandbox::Nightclub_2
-          Face::API[ self ]
-          class API::Actions::Weee < Face::API::Action
+          Face_::API[ self ]
+          class API::Actions::Weee < Face_::API::Action
             params [ :email, :normalizer, -> y, x, z do
               if x.length < 3
                 y << "email is too short."
@@ -83,7 +83,7 @@ module Skylab::Face::TestSupport::API::Action::Normalize
               "okay(#{ @email })"
             end
           end
-          Face::Autoloader_[ self ]
+          Face_::Autoloader_[ self ]
         end
       end
 

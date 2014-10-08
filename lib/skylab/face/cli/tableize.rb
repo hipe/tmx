@@ -7,7 +7,7 @@ module Skylab::Face
     # `tableize` has been deprecated.  but here's a demo:
     #
     #     y = [ ]
-    #     Face::CLI::Tableize::FUN.tableize[
+    #     Face_::CLI::Tableize::FUN.tableize[
     #       [ food: 'donuts', drink: 'coffee' ], -> line { y << line } ]
     #
     #     y.shift   # => "|   Food  |   Drink |"

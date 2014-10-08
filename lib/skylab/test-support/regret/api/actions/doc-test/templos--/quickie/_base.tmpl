@@ -6,11 +6,11 @@ module {{ amod }}::TestSupport{{ bmod }}::{{ cmod }}
 
   include CONSTANTS
 
-  {{ acon }} = ::{{ amod }}
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
+  {{ acon }}_ = {{ acon }}_
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "{{ desc }}" do
 {{ body }}{{ cover }}

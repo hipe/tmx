@@ -1,12 +1,6 @@
 module Skylab::TestSupport
 
-  module System  # [#035]:the-system-node
-    class << self
-      def stderr
-        Lib_::Stderr[]
-      end
-    end
-  end
+  # (was [#035]:the-system-node)
 
   module Library_  #  :+[#su-001]
 

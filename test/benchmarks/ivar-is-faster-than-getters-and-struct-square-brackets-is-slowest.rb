@@ -45,7 +45,7 @@ module Skylab::Test::Struct_Members_Vs_Ivars_Etc_
   Test = ::Skylab::Test
 
   if ::ARGV.length.nonzero?
-    Test::TestSupport::System.stderr.puts "unpexpected argument(s), #{
+    Test::TestSupport.debug_IO.puts "unpexpected argument(s), #{
       }skipping benchmark: #{ ::ARGV * ' ' } (from #{ self })"
   else
 

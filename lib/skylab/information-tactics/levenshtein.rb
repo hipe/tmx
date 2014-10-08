@@ -4,7 +4,7 @@ module Skylab::InformationTactics
   # is kind of amazing
   #
   #     A_ = [ :apple, :banana, :ernana, :onono, :strawberry, :orange ]
-  #     a = InformationTactics::Levenshtein::Closest_n_items_to_item[ 3, A_, :bernono ]
+  #     a = InformationTactics_::Levenshtein::Closest_n_items_to_item[ 3, A_, :bernono ]
   #
   #     a  # => [ :onono, :ernana, :banana ]
 

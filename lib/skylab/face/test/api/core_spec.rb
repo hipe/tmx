@@ -4,7 +4,7 @@ module Skylab::Face::TestSupport::API::Core_
 
   ::Skylab::Face::TestSupport::API[ self, :sandboxes_et_al ]
 
-  describe "extend module x with Face::API and you get `x::API.invoke` that" do
+  describe "extend module x with Face_::API and you get `x::API.invoke` that" do
 
     extend TS__
 
@@ -12,7 +12,7 @@ module Skylab::Face::TestSupport::API::Core_
 
       define_sandbox_constant :nightclub do
         module Sandbox::Nightclub_1
-          Face::API[ self ]
+          Face_::API[ self ]
         end
       end
 
@@ -28,8 +28,8 @@ module Skylab::Face::TestSupport::API::Core_
 
       define_sandbox_constant :nightclub do
         module Sandbox::Nightclub_1_B
-          Face::API[ self ]
-          Face::Autoloader_[ self ]
+          Face_::API[ self ]
+          Face_::Autoloader_[ self ]
         end
       end
 
@@ -48,8 +48,8 @@ module Skylab::Face::TestSupport::API::Core_
           end
           module API::Actions
           end
-          Face::API[ self ]
-          Face::Autoloader_[ self ]
+          Face_::API[ self ]
+          Face_::Autoloader_[ self ]
         end
       end
 
@@ -64,12 +64,12 @@ module Skylab::Face::TestSupport::API::Core_
 
       define_sandbox_constant :nightclub do
         module Sandbox::Nightclub_3
-          Face::API[ self ]
+          Face_::API[ self ]
           module API::Actions
             class WahHoo
             end
           end
-          Face::Autoloader_[ self ]
+          Face_::Autoloader_[ self ]
         end
       end
 
@@ -85,13 +85,13 @@ module Skylab::Face::TestSupport::API::Core_
 
       define_sandbox_constant :nightclub do
         module Sandbox::Nightclub_4
-          Face::API[ self ]
+          Face_::API[ self ]
           class API::Actions::WahHoo
             def execute
               :yerp
             end
           end
-          Face::Autoloader_[ self ]
+          Face_::Autoloader_[ self ]
         end
       end
 

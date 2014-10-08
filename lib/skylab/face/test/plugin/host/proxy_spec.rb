@@ -6,20 +6,20 @@ module Skylab::Face::TestSupport::Plugin::Host::Proxy
 
   include CONSTANTS
 
-  Face = ::Skylab::Face
-
   extend TestSupport_::Quickie
+
+  Face_ = Face_
 
   Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[fa] Plugin::Host::Proxy" do
-    context "using `Face::Plugin::Host::Proxy`" do
+    context "using [fa] plugin host proxy" do
       Sandbox_1 = Sandboxer.spawn
       it "comprehensive example" do
         Sandbox_1.with self
         module Sandbox_1
           class Cheeky_CLI_Client
-            Face::Plugin::Host::Proxy.enhance self do
+            Face_::Plugin::Host::Proxy.enhance self do
               services :emphasize_text
             end
           private
@@ -29,7 +29,7 @@ module Skylab::Face::TestSupport::Plugin::Host::Proxy
           end
 
           class Cheeky_Web_Client
-            Face::Plugin::Host::Proxy.enhance self do
+            Face_::Plugin::Host::Proxy.enhance self do
               services [ :emphasize_text, :ivar ]
             end
             def initialize

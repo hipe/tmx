@@ -2,19 +2,21 @@ require_relative '../core'
 
 module Skylab::Face::TestSupport
 
-  Face_ = ::Skylab::Face
-  TestSupport_ = Face_::Autoloader_.require_sidesystem :TestSupport
-  TestSupport_::Regret[ self ]
-  TestSupport_::Sandbox::Host[ self ]
-
   TestLib_ = ::Module.new
 
   module CONSTANTS
-    Face_ = Face_  # the new preferred way
-    Face = Face_  # necessary for compat with lots of doc-test generatees
+    Face_ = ::Skylab::Face
     TestLib_ = TestLib_
     TestSupport_ = ::Skylab::TestSupport
   end
+
+  include CONSTANTS
+
+  Face_ = Face_
+
+  TestSupport_ = Face_::Autoloader_.require_sidesystem :TestSupport
+  TestSupport_::Regret[ self ]
+  TestSupport_::Sandbox::Host[ self ]
 
   extend ( module Methods_
     def apply_x_a_on_child_test_node x_a, child
@@ -42,7 +44,7 @@ module Skylab::Face::TestSupport
     def sandboxes_et_al=
       @child.const_set :TS__, @child
       @child.include @child.const_get( :CONSTANTS, false )
-      @child.const_set :Face, Face_
+      @child.const_set :Face_, Face_
       @child.const_set :Sandbox, Face_::Autoloader_[ ::Module.new ]
       @child::Sandbox.dir_pathname
       @child::CONSTANTS.const_set :Sandbox, @child::Sandbox

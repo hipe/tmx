@@ -12,10 +12,10 @@ module Skylab::Face::TestSupport::CLI::Table
 
   extend TestSupport_::Quickie
 
-  Face = Face
+  Face_ = Face_
 
   Sandboxer = TestSupport_::Sandbox::Spawner.new
 
-  Subject__ = -> { Face::CLI::Table }
+  Subject__ = -> { Face_::CLI::Table }
 
 end

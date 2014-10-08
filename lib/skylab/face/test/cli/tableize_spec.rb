@@ -6,9 +6,9 @@ module Skylab::Face::TestSupport::CLI::Tableize
 
   include CONSTANTS
 
-  Face = ::Skylab::Face
-
   extend TestSupport_::Quickie
+
+  Face_ = Face_
 
   Sandboxer = TestSupport_::Sandbox::Spawner.new
 
@@ -19,7 +19,7 @@ module Skylab::Face::TestSupport::CLI::Tableize
         Sandbox_1.with self
         module Sandbox_1
           y = [ ]
-          Face::CLI::Tableize::FUN.tableize[
+          Face_::CLI::Tableize::FUN.tableize[
             [ food: 'donuts', drink: 'coffee' ], -> line { y << line } ]
 
           y.shift.should eql( "|   Food  |   Drink |" )

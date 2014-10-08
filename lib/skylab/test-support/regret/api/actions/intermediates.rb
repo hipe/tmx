@@ -5,17 +5,17 @@ module Skylab::TestSupport::Regret::API
     # we can access the API
     # through the `invoke` method
     #
-    #     TestSupport::Regret::API.respond_to?( :invoke )  # => true
+    #     TestSupport_::Regret::API.respond_to?( :invoke )  # => true
     #
-    #     HOME_ = TestSupport::Regret.dir_pathname
+    #     HOME_ = TestSupport_::Regret.dir_pathname
     #
     #     # ( ignore this ENTIRE TEST SUPPORT INSIDE YOUR DOC-TEST )
     #     Intr_ = -> *a do
-    #       io = TestSupport::IO::Spy::Triad.new nil
+    #       io = TestSupport_::IO::Spy::Triad.new nil
     #       # io.debug!
     #       h = { out: io.outstream, err: io.errstream }
     #       0.step(a.length-1, 2).each { |d| h[a[d]] = a[d+1] }
-    #       r = TestSupport::Regret::API.invoke :intermediates, h
+    #       r = TestSupport_::Regret::API.invoke :intermediates, h
     #       out_a = io.outstream.string.split "\n"
     #       err_a = io.errstream.string.split "\n"
     #       [ r, out_a, err_a ]
@@ -57,10 +57,10 @@ module Skylab::TestSupport::Regret::API
     #     e.pop  # => 'ok.'
     #
     # content looks ok:
-    #     opn =  TestSupport::TestSupport.dir_pathname.
+    #     opn =  TestSupport_::TestSupport.dir_pathname.
     #       join( 'regret/code-fixtures-' )
     #     remove_entry_secure = -> do
-    #       TestSupport::Library_::FileUtils.remove_entry_secure opn.to_s
+    #       TestSupport_::Library_::FileUtils.remove_entry_secure opn.to_s
     #     end
     #     opn.exist? and remove_entry_secure[]
     #     in_pn = HOME_.join( 'code-fixtures-/asap/whootenany.rb' )

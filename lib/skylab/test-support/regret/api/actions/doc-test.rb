@@ -9,7 +9,7 @@ module Skylab::TestSupport::Regret::API
     # our handle on the whole regret API is the 'API' module itself,
     # which you can call `invoke` on:
     #
-    #     API = Skylab::TestSupport::Regret::API
+    #     API = TestSupport_::Regret::API
     #     # API.debug!
     #     API.invoke( :ping )  # => :hello_from_regret
     #
@@ -26,7 +26,7 @@ module Skylab::TestSupport::Regret::API
     # from these comments you are reading:
     #
     #     here = API::Actions::DocTest.dir_pathname.sub_ext '.rb'
-    #     output = TestSupport.dir_pathname.
+    #     output = TestSupport_.dir_pathname.
     #       join( 'test/regret/api/actions/doc-test_spec.rb')
     #     stat = output.stat ; size1 = stat.size ; ctime1 = stat.ctime
     #       # (this test assumes one such file already exists)

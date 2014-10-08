@@ -6,9 +6,9 @@ module Skylab::Face::TestSupport::CLI::Lipstick
 
   include CONSTANTS
 
-  Face = ::Skylab::Face
-
   extend TestSupport_::Quickie
+
+  Face_ = Face_
 
   Sandboxer = TestSupport_::Sandbox::Spawner.new
 
@@ -18,7 +18,7 @@ module Skylab::Face::TestSupport::CLI::Lipstick
       it "an illustration of the steps for building and using a lipstick" do
         Sandbox_1.with self
         module Sandbox_1
-          Lipstick = Face::CLI::Lipstick.new '*', :yellow, -> { 20 }
+          Lipstick = Face_::CLI::Lipstick.new '*', :yellow, -> { 20 }
             # we want to render yellow '*' characters. a fallback width
             # is the (quite narrow) 20 characters, for the whole pane "screen"
 
@@ -42,7 +42,7 @@ module Skylab::Face::TestSupport::CLI::Lipstick
       it "like so" do
         Sandbox_2.with self
         module Sandbox_2
-          Lipstick = Face::CLI::Lipstick.new [['+', :green],['-', :red]]
+          Lipstick = Face_::CLI::Lipstick.new [['+', :green],['-', :red]]
             # first arg is instead an array of "pen tuples"
             # we chose not to provide a 2nd arg (default width function).
 

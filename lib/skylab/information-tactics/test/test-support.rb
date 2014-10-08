@@ -7,9 +7,11 @@ module Skylab::InformationTactics::TestSupport
   ::Skylab::TestSupport::Regret[ self ]
 
   module CONSTANTS
-    InformationTactics = ::Skylab::InformationTactics
-    TestSupport = ::Skylab::TestSupport
+    InformationTactics_ = ::Skylab::InformationTactics
+    TestSupport_ = ::Skylab::TestSupport
   end
 
-  extend ::Skylab::TestSupport::Quickie
+  include CONSTANTS
+
+  extend TestSupport_::Quickie
 end

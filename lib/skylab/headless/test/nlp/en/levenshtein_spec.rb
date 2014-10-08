@@ -6,9 +6,9 @@ module Skylab::Headless::TestSupport::NLP::EN::Levenshtein
 
   include CONSTANTS
 
-  Headless_ = ::Skylab::Headless
-
   extend TestSupport_::Quickie
+
+  Headless_ = Headless_
 
   Sandboxer = TestSupport_::Sandbox::Spawner.new
 

@@ -6,11 +6,11 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest::Specer__
 
   include CONSTANTS
 
-  TestSupport = ::Skylab::TestSupport
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
+  TestSupport_ = TestSupport_
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[ts] Regret::API::Actions::DocTest::Specer__" do
     context "this is the first line of a comment block, to become a context desc" do
@@ -22,7 +22,7 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest::Specer__
           # with four or more spaces, and its containing "SNIPPET" has the
           # magic equals predicate symbol in it somewhere.
 
-          THIS_FILE_ = TestSupport::This_File[ __FILE__ ]
+          THIS_FILE_ = TestSupport_::This_File[ __FILE__ ]
         end
       end
       it "this third line will become the desc for this example" do

@@ -3,15 +3,15 @@ require_relative '../core'
 module Skylab::TestSupport::TestSupport
 
   TestSupport_ = ::Skylab::TestSupport
-  TS_TS = self
 
   module CONSTANTS
     EMPTY_A_ = TestSupport_::EMPTY_A_
     EMPTY_S_ = TestSupport_::EMPTY_S_
     Lib_ = TestSupport_::Lib_
     TestSupport_ = TestSupport_
-    TS_TS = TS_TS
   end
+
+  CONSTANTS::TS_TS_ = self
 
   include CONSTANTS
 

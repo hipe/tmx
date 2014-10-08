@@ -12,8 +12,8 @@ module Skylab::Face::TestSupport::API::Normalizer_
 
       before :all do
         class X_Requirer < Base_Magic
-          Face::API::Params_[ :client, self, :param, :x ]
-          Face::API::Normalizer_.enhance_client_class self, :all
+          Face_::API::Params_[ :client, self, :param, :x ]
+          Face_::API::Normalizer_.enhance_client_class self, :all
           def execute
             @x
           end
@@ -74,8 +74,8 @@ module Skylab::Face::TestSupport::API::Normalizer_
 
       before :all do
         class A_Requirer < Base_Magic
-          Face::API::Params_[ :client, self, :param, :arr, :arity, :one_or_more ]
-          Face::API::Normalizer_.enhance_client_class self, :all
+          Face_::API::Params_[ :client, self, :param, :arr, :arity, :one_or_more ]
+          Face_::API::Normalizer_.enhance_client_class self, :all
           def execute
             @arr
           end

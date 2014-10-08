@@ -6,11 +6,11 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible_::Articulator_
 
   include CONSTANTS
 
-  TestSupport = ::Skylab::TestSupport
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
+  TestSupport_ = TestSupport_
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[ts] Quickie::Possible_::Articulator_" do
     context "this generates a simple articulator class." do

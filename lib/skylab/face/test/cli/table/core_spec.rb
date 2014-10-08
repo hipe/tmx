@@ -8,7 +8,7 @@ module Skylab::Face::TestSupport::CLI::Table
       before :all do
         Sandbox_1.with self
         module Sandbox_1
-          Table = Face::CLI::Table
+          Table = Face_::CLI::Table
         end
       end
       it "with nothing renders nothing" do
@@ -64,7 +64,7 @@ module Skylab::Face::TestSupport::CLI::Table
       it "specify custom headers, separators, and output functions" do
         Sandbox_2.with self
         module Sandbox_2
-          Table = Face::CLI::Table
+          Table = Face_::CLI::Table
           a = []
           r = Table[ :field, 'Food', :field, 'Drink',
                      :left, '(', :sep, ',', :right, ')',
@@ -82,7 +82,7 @@ module Skylab::Face::TestSupport::CLI::Table
       it "like so : you can align `left` or `right` (ambiguity is possible)" do
         Sandbox_3.with self
         module Sandbox_3
-          str = Face::CLI::Table[
+          str = Face_::CLI::Table[
             :field, :right, :label, "Subproduct",
             :field, :left, :label, "num test files",
             :read_rows_from, [ [ 'face', 100 ], [ 'headless', 99 ] ] ]
@@ -101,7 +101,7 @@ module Skylab::Face::TestSupport::CLI::Table
       before :all do
         Sandbox_4.with self
         module Sandbox_4
-          P = Face::CLI::Table.curry :left, '<', :sep, ',', :right, '>'
+          P = Face_::CLI::Table.curry :left, '<', :sep, ',', :right, '>'
         end
       end
       it "and (perhaps modify it) and use it in another (CASCADING stylesheet like!)" do

@@ -28,7 +28,7 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest::RS_
     end
 
     it "(live test) \"special path\" (hashtags)" do  # :[#030]
-      _path = TS_TS::TestLib_::Face_module[].dir_pathname.to_path
+      _path = TS_TS_::TestLib_::Face_module[].dir_pathname.to_path
       invoke :recursive, path: _path, mode: :do_list
       rx = /#[-a-z]+/ ; hashtag_count = 0
       while (( em = shift_emission ))

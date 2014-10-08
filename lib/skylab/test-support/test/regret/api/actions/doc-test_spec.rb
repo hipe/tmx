@@ -6,11 +6,11 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest
 
   include CONSTANTS
 
-  TestSupport = ::Skylab::TestSupport
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
+  TestSupport_ = TestSupport_
 
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[ts] Regret::API::Actions::DocTest" do
     context "probably no one will ever find a reason to call our API directly" do
@@ -18,7 +18,7 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest
       before :all do
         Sandbox_1.with self
         module Sandbox_1
-          API = Skylab::TestSupport::Regret::API
+          API = TestSupport_::Regret::API
           # API.debug!
         end
       end
@@ -32,7 +32,7 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest
         Sandbox_1.with self
         module Sandbox_1
           here = API::Actions::DocTest.dir_pathname.sub_ext '.rb'
-          output = TestSupport.dir_pathname.
+          output = TestSupport_.dir_pathname.
             join( 'test/regret/api/actions/doc-test_spec.rb')
           stat = output.stat ; size1 = stat.size ; ctime1 = stat.ctime
             # (this test assumes one such file already exists)

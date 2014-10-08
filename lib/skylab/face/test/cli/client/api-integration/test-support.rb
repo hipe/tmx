@@ -11,15 +11,15 @@ module Skylab::Face::TestSupport::CLI::Client::API_Integration
   module CONSTANTS
 
     Curriable_build_ = -> field_box, param_h do  # this used to there
-      Face::CLI::Client::API_Integration_::OP_[
+      Face_::CLI::Client::API_Integration_::OP_[
         :field_box, field_box,
         :param_h, param_h,
-        :op, (( op = Face::Library_::OptionParser.new )) ]
+        :op, (( op = Face_::Library_::OptionParser.new )) ]
       op
     end
 
     CLI_expression_agent_ = -> do
-      Face::CLI::Client::API_Integration_::EXPRESSION_AGENT_
+      Face_::CLI::Client::API_Integration_::EXPRESSION_AGENT_
     end
   end
 

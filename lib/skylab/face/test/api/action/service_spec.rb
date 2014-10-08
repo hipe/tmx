@@ -4,7 +4,7 @@ module Skylab::Face::TestSupport::API::Action::Service
 
   ::Skylab::Face::TestSupport::API::Action[ self, :sandboxes_et_al ]
 
-  describe "extend module x with Face::API and use services" do
+  describe "extend module x with Face_::API and use services" do
 
     extend TS__
 
@@ -12,11 +12,11 @@ module Skylab::Face::TestSupport::API::Action::Service
 
       define_sandbox_constant :nc do
         module Sandbox::Nightclub_1
-          Face::API[ self ]
-          class API::Actions::W < Face::API::Action
+          Face_::API[ self ]
+          class API::Actions::W < Face_::API::Action
             services :nerk
           end
-          Face::Autoloader_[ self ]
+          Face_::Autoloader_[ self ]
         end
       end
 
@@ -28,7 +28,7 @@ module Skylab::Face::TestSupport::API::Action::Service
 
       def raise_this_error
         raise_error(
-          Face::Plugin::DeclarationError,
+          Face_::Plugin::DeclarationError,
           /Client has not declared the required service "nerk" declared #{
             }as needed by .+API::Actions::W\./
        )
@@ -39,20 +39,20 @@ module Skylab::Face::TestSupport::API::Action::Service
 
       define_sandbox_constant :nc do
         module Sandbox::Nightclub_2
-          Face::API[ self ]
+          Face_::API[ self ]
           class API::Client  # (re-open!)
-            Face::Plugin::Host.enhance self do
+            Face_::Plugin::Host.enhance self do
               services :nerk, :blerk
             end
           end
-          class API::Actions::W < Face::API::Action
+          class API::Actions::W < Face_::API::Action
             services :nerk
 
             def execute
               nerk
             end
           end
-          Face::Autoloader_[ self ]
+          Face_::Autoloader_[ self ]
         end
       end
 
@@ -68,9 +68,9 @@ module Skylab::Face::TestSupport::API::Action::Service
 
       define_sandbox_constant :nc do
         module Sandbox::Nightclub_3
-          Face::API[ self ]
+          Face_::API[ self ]
           class API::Client  # (re-open!)
-            Face::Plugin::Host.enhance self do
+            Face_::Plugin::Host.enhance self do
               services :nerk, :blerk
             end
 
@@ -78,14 +78,14 @@ module Skylab::Face::TestSupport::API::Action::Service
               :zeeple
             end
           end
-          class API::Actions::W < Face::API::Action
+          class API::Actions::W < Face_::API::Action
             services :nerk
 
             def execute
               "<yup:#{ nerk }>"
             end
           end
-          Face::Autoloader_[ self ]
+          Face_::Autoloader_[ self ]
         end
       end
 
@@ -98,9 +98,9 @@ module Skylab::Face::TestSupport::API::Action::Service
 
       define_sandbox_constant :nc do
         module Sandbox::Nightclub_4
-          Face::API[ self ]
+          Face_::API[ self ]
           class API::Client  # (re-open!)
-            Face::Plugin::Host.enhance self do
+            Face_::Plugin::Host.enhance self do
               services :blerk
             end
 
@@ -112,7 +112,7 @@ module Skylab::Face::TestSupport::API::Action::Service
             attr_reader :blerk
           end
 
-          class API::Actions::W < Face::API::Action
+          class API::Actions::W < Face_::API::Action
 
             services [ :blerk, :ivar ]
 
@@ -121,7 +121,7 @@ module Skylab::Face::TestSupport::API::Action::Service
             end
           end
 
-          class API::Actions::X < Face::API::Action
+          class API::Actions::X < Face_::API::Action
 
             services [ :blerk, :ivar, :@zoidberg ]
 
@@ -129,7 +129,7 @@ module Skylab::Face::TestSupport::API::Action::Service
               "<yup-x:#{ @zoidberg.call }>"
             end
           end
-          Face::Autoloader_[ self ]
+          Face_::Autoloader_[ self ]
         end
       end
 

@@ -4,7 +4,7 @@ module Skylab::Face::TestSupport::API::Action::Proc
 
   ::Skylab::Face::TestSupport::API::Action[ self, :sandboxes_et_al ]
 
-  describe "extend module x with Face::API and use procs for actions" do
+  describe "extend module x with Face_::API and use procs for actions" do
 
     extend TS__
 
@@ -12,11 +12,11 @@ module Skylab::Face::TestSupport::API::Action::Proc
 
       define_sandbox_constant :nightclub do
         module Sandbox::Nightclub_1
-          Face::API[ self ]
+          Face_::API[ self ]
           API::Actions::WahHoo = -> do
             :some_result
           end
-          Face::Autoloader_[ self ]
+          Face_::Autoloader_[ self ]
         end
       end
 
@@ -30,11 +30,11 @@ module Skylab::Face::TestSupport::API::Action::Proc
 
       define_sandbox_constant :nightclub do
         module Sandbox::Nightclub_2
-          Face::API[ self ]
+          Face_::API[ self ]
           API::Actions::WahHoo = -> wing, ding=:ohai do
             "<<wing:#{ wing },ding:#{ ding }>>"
           end
-          Face::Autoloader_[ self ]
+          Face_::Autoloader_[ self ]
         end
       end
 

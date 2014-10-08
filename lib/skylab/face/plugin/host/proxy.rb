@@ -8,11 +8,11 @@ module Skylab::Face
     # as a plugin host. now you get @plugin_host on initialize always.
     # this is :[#fa-010].
 
-    # using `Face::Plugin::Host::Proxy`:
+    # using [fa] plugin host proxy:
     # comprehensive example:
     #
     #     class Cheeky_CLI_Client
-    #       Face::Plugin::Host::Proxy.enhance self do
+    #       Face_::Plugin::Host::Proxy.enhance self do
     #         services :emphasize_text
     #       end
     #     private
@@ -22,7 +22,7 @@ module Skylab::Face
     #     end
     #
     #     class Cheeky_Web_Client
-    #       Face::Plugin::Host::Proxy.enhance self do
+    #       Face_::Plugin::Host::Proxy.enhance self do
     #         services [ :emphasize_text, :ivar ]
     #       end
     #       def initialize

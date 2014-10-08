@@ -16,13 +16,13 @@ module Skylab::Face::TestSupport::API::Action::Param_Set
             attr_accessor :last_msg  # like this, but i was tired of catching
           end                        # exceptions and testing their messages..
 
-          Face::API[ self ]
+          Face_::API[ self ]
 
-          class API::Actions::Pizzle < Face::API::Action
+          class API::Actions::Pizzle < Face_::API::Action
             params [ :where, :set, [ :here, :to_go ] ]
 
             def initialize
-              @expression_agent = Face::TestSupport::EXPRESSION_AGENT_STUB_
+              @expression_agent = Face_::TestSupport::EXPRESSION_AGENT_STUB_
             end
 
             attr_reader :msg_a
@@ -31,7 +31,7 @@ module Skylab::Face::TestSupport::API::Action::Param_Set
               Sandbox::Wizzle.last_msg = msg
             end
           end
-          Face::Autoloader_[ self ]
+          Face_::Autoloader_[ self ]
         end
       end
 

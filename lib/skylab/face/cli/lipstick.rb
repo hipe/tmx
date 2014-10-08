@@ -25,7 +25,7 @@ module Skylab::Face
     # simple, but are nonetheless separate currently. here is
     # an illustration of the steps for building and using a lipstick:
     #
-    #     Lipstick = Face::CLI::Lipstick.new '*', :yellow, -> { 20 }
+    #     Lipstick = Face_::CLI::Lipstick.new '*', :yellow, -> { 20 }
     #       # we want to render yellow '*' characters. a fallback width
     #       # is the (quite narrow) 20 characters, for the whole pane "screen"
     #
@@ -45,7 +45,7 @@ module Skylab::Face
     # You can also render compound "tuple ratios"
     # like so:
     #
-    #     Lipstick = Face::CLI::Lipstick.new [['+', :green],['-', :red]]
+    #     Lipstick = Face_::CLI::Lipstick.new [['+', :green],['-', :red]]
     #       # first arg is instead an array of "pen tuples"
     #       # we chose not to provide a 2nd arg (default width function).
     #

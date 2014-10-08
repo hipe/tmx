@@ -5,7 +5,7 @@ module Skylab::Face
     # a table
     # with nothing renders nothing
     #
-    #     Table = Face::CLI::Table
+    #     Table = Face_::CLI::Table
     #     Table[]  # => nil
     #
     # with one thing, must respond to each (in two dimensions)
@@ -125,7 +125,7 @@ module Skylab::Face
     # but wait there's more -
     # specify custom headers, separators, and output functions:
     #
-    #     Table = Face::CLI::Table
+    #     Table = Face_::CLI::Table
     #     a = []
     #     r = Table[ :field, 'Food', :field, 'Drink',
     #                :left, '(', :sep, ',', :right, ')',
@@ -188,7 +188,7 @@ module Skylab::Face
     # this syntax is "contoured" - fields themselves eat keywords
     # like so : you can align `left` or `right` (ambiguity is possible)
     #
-    #     str = Face::CLI::Table[
+    #     str = Face_::CLI::Table[
     #       :field, :right, :label, "Subproduct",
     #       :field, :left, :label, "num test files",
     #       :read_rows_from, [ [ 'face', 100 ], [ 'headless', 99 ] ] ]
@@ -557,7 +557,7 @@ module Skylab::Face
     # but the real fun begins with currying - curry a table in one place
     # and (perhaps modify it) and use it in another (CASCADING stylesheet like!)
     #
-    #     P = Face::CLI::Table.curry :left, '<', :sep, ',', :right, '>'
+    #     P = Face_::CLI::Table.curry :left, '<', :sep, ',', :right, '>'
     #
     #     P[ :sep, ';', :read_rows_from, [%w(a b), %w(c d)] ]  # => "<a;b>\n<c;d>\n"
     #

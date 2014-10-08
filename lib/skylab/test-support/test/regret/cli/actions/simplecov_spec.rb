@@ -20,7 +20,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Simplecov
 
   NILADIC_EMPTINESS_ = -> { }
 
-  TS_TS = TS_TS
+  TS_TS_ = TS_TS_
 
   describe "[ts] regret CLI action s simplecov" do
 
@@ -100,7 +100,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Simplecov
     end
 
     def visual
-      @visual ||= TS_TS.dir_pathname.join 'visual/regret'
+      @visual ||= TS_TS_.dir_pathname.join 'visual/regret'
     end
 
     def open2 cmd_a

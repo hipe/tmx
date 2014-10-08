@@ -12,13 +12,13 @@ module Skylab::Face::TestSupport::API::Action::Param
 
       define_sandbox_constant :nc do
         module Sandbox::Nightclub_1
-          Face::API[ self ]
-          class API::Actions::W < Face::API::Action
+          Face_::API[ self ]
+          class API::Actions::W < Face_::API::Action
             def execute
               :ok
             end
           end
-          Face::Autoloader_[ self ]
+          Face_::Autoloader_[ self ]
         end
       end
 
@@ -41,14 +41,14 @@ module Skylab::Face::TestSupport::API::Action::Param
 
       define_sandbox_constant :nc do
         module Sandbox::Nightclub_2
-          Face::API[ self ]
-          class API::Actions::W < Face::API::Action
+          Face_::API[ self ]
+          class API::Actions::W < Face_::API::Action
             params :hurf, :gurf
             def execute
               "<<h:#{ @hurf }, g:#{ @gurf }>>"
             end
           end
-          Face::Autoloader_[ self ]
+          Face_::Autoloader_[ self ]
         end
       end
 
@@ -91,8 +91,8 @@ module Skylab::Face::TestSupport::API::Action::Param
 
       define_sandbox_constant :nc do
         module Sandbox::Nightclub_3
-          Face::API[ self ]
-          class API::Actions::W < Face::API::Action
+          Face_::API[ self ]
+          class API::Actions::W < Face_::API::Action
             params [ :eeny, :arity, :one ],
                    [ :meeny, :arity, :zero_or_one ],
                    [ :hermione, :arity, :zero_or_one ]
@@ -101,7 +101,7 @@ module Skylab::Face::TestSupport::API::Action::Param
                 }, h:#{ @hermione.inspect }>>"
             end
           end
-          Face::Autoloader_[ self ]
+          Face_::Autoloader_[ self ]
         end
       end
 

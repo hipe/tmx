@@ -18,7 +18,7 @@ module Skylab::Face
     # usage:
     #
     #     class API_Client
-    #       Face::Plugin::Host.enhance self do
+    #       Face_::Plugin::Host.enhance self do
     #         services :show_a_path, :emphasize_text
     #       end
     #     private
@@ -31,7 +31,7 @@ module Skylab::Face
     #     end
     #
     #     class Modality_Client
-    #       Face::Plugin::Host::Proxy.enhance self do  # proxy, for grease
+    #       Face_::Plugin::Host::Proxy.enhance self do  # proxy, for grease
     #         services :show_a_path, :do_some_mode_thing
     #       end
     #       def _ph ; @plugin_host end
@@ -44,7 +44,7 @@ module Skylab::Face
     #       end
     #     end
     #
-    #     Chain_ = Face::Plugin::Host::Metaservices_::Chain_.new [
+    #     Chain_ = Face_::Plugin::Host::Metaservices_::Chain_.new [
     #       Modality_Client::Plugin_Host_::Plugin_Host_Metaservices_,
     #       API_Client::Plugin_Host_Metaservices_ ]
     #
@@ -67,7 +67,7 @@ module Skylab::Face
     #     msvcs.call_service( :show_a_path, '/foo/bar' ) # => '(safe path) bar'
     #                                                 # earliest thing in chain
     #
-    #     svcs = msvcs.build_proxy_for Face::Plugin::Metaservices_::OMNI_
+    #     svcs = msvcs.build_proxy_for Face_::Plugin::Metaservices_::OMNI_
     #
     #     svcs.do_some_mode_thing # => 'whatever'
     #     svcs.emphasize_text( 'hi' ) # => 'HI'

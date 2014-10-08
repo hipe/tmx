@@ -69,7 +69,7 @@ module Skylab::Face::TestSupport::CLI::Client
     MetaHell__ = Face_::Lib_::MetaHell__
 
     Sout_serr = -> do
-      sys = Face::Lib_::System_IO[]
+      sys = Face_::Lib_::System_IO[]
       [ sys.some_stderr_IO, sys.some_stderr_IO ]
     end
   end

@@ -12,14 +12,14 @@ module Skylab::Face::TestSupport::CLI::Client::Metastory
       modex = :CLI_
       context "from libville" do
         it "CLI (modality client baseclass)" do
-          Face::CLI::Client.metastory.modality_exponent.should eql modex
+          Face_::CLI::Client.metastory.modality_exponent.should eql modex
         end
         it "Namespace" do
-          Face::CLI::Client::Namespace_.
+          Face_::CLI::Client::Namespace_.
             metastory.modality_exponent.should eql modex
         end
         it "Command" do
-          Face::CLI::Client::Command_.
+          Face_::CLI::Client::Command_.
             metastory.modality_exponent.should eql modex
         end
       end
