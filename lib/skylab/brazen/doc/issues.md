@@ -1,3 +1,4 @@
+[#059]       #doc-node names
 [#058]       #parent-node: [#057] the default frame
 [#057]       #parent-node: [#001] the properties stack
 [#056]       #doc-node re-usable silos

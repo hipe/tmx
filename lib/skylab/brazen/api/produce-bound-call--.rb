@@ -24,7 +24,7 @@ module Skylab::Brazen
       def prepare_ivars
         @action = nil
         @p and @p[ self ]
-        if :event_receiver == @x_a[ -2 ]  # :[#049] case study: ordering hacks
+        if :event_receiver == @x_a[ -2 ]  # :+[#049] case study: ordering hacks
           @event_receiver = @x_a.last
           @x_a[ -2, 2 ] = EMPTY_A_
         else

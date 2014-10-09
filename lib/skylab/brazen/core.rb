@@ -233,7 +233,15 @@ module Skylab::Brazen
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> { }
   EMPTY_S_ = ''.freeze
-  Entity_ = -> { Brazen_::Entity }
+
+  Entity_ = -> * x_a do
+    if x_a.length.zero?
+      Brazen_::Entity
+    else
+      Brazen_::Entity.via_arglist x_a
+    end
+  end
+
   Event_ = -> { Brazen_::Entity.event }
   Autoloader_[ Models_ = ::Module.new, :boxxy ]
   NAME_ = :name

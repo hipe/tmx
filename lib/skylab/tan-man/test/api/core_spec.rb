@@ -10,13 +10,13 @@ module Skylab::TanMan::TestSupport::API
 
     it "the API is called with `call` - the empty call reports as error" do
       call_API
-      expect_not_OK_event :no_such_action, "no such action - ''"
+      expect_not_OK_event :no_such_action, "no such action - (ick nil)"
       expect_failed
     end
 
     it "called with a strange name is a soft error" do
       call_API :wazii, :wazoo
-      expect_not_OK_event :no_such_action, "no such action - wazii"
+      expect_not_OK_event :no_such_action, "no such action - (ick :wazii)"
       expect_failed
     end
 

@@ -2,13 +2,13 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::Models::Node
 
-  describe "[tm] models node add" do
+  describe "[tm] models node create" do
 
     extend TS_
 
     it "ping the 'node add' action" do
       call_API :node, :add, :ping
-      expect_OK_event :ping_from_action, "ping from action - add"
+      expect_OK_event :ping_from_action, "ping from action - (ick :add)"
       expect_succeeded
     end
 

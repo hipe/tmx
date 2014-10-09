@@ -421,20 +421,28 @@ module Skylab::Brazen
 
     module Proprietor_Methods__
 
-      # ~ look like actor (experiment)
+      # ~ look like actor - assembly required (experiment)
 
-      def with * x_a, & p  # look like actor
+      def with * x_a, & p
         via_iambic x_a, p
       end
 
       def via_iambic x_a, p=nil
-        did = false
+        ent = build_via_iambic x_a, p
+        ent && ent.execute
+      end
+
+      def build_with * x_a, & p
+        build_via_iambic x_a, p
+      end
+
+      def build_via_iambic x_a, p=nil
+        did = false ; ok = nil
         ent = new do
           did = true
-          process_iambic_fully x_a
-          p and p[ self ]
+          ok = process_iambic_fully x_a
         end
-        did and ent.execute
+        did && ok && ent
       end
 
       # ~

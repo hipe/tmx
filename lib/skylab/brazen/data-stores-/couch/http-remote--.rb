@@ -41,18 +41,18 @@ module Skylab::Brazen
 
       class Request_Response__
 
-        Entity_[][ self, :properties,
+        Entity_.call self, :properties,
           :body_s,
           :native_entity_identifier_s,
           :entity_identifier_strategy,
           :URI_tail,
-          :response_receiver ]
+          :response_receiver
 
-        Entity_[][ self, -> do
+        Entity_.call self, -> do
           def add_HTTP_parameter
             add_HTTP_param iambic_property, iambic_property
           end
-        end ]
+        end
 
         Brazen_.event.sender self  # actually just builds not sends
 

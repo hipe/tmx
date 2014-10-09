@@ -293,7 +293,7 @@ module Skylab::Brazen
         end ; nil
       end
 
-      Entity_[][ self, -> do
+      Entity_.call self, -> do
 
         o :iambic_writer_method_name_suffix, :'='
 
@@ -304,7 +304,7 @@ module Skylab::Brazen
         def verb=
           parse :verb
         end
-      end ]
+      end
     end
 
     class Customized_Action_Inflection__

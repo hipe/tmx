@@ -209,16 +209,19 @@ module Skylab::Brazen
 
       class Inferred_Message  # #experimental - you hate me now
 
-        define_singleton_method :to_proc, -> do
-          cls = self
-          -> y, o do
-            cls.new( y, self, o ).execute ; nil
+        class << self
+          def to_proc  # a message proc
+            _CLS_ = self
+            -> y, o do
+              _CLS_[ y, self, o ] ; nil
+            end
           end
         end
 
-        def initialize y, expag, o
-          @expression_agent = expag ; @o = o ; @y = y ; nil
-        end
+        Callback_::Actor[ self, :properties,
+          :y,
+          :expression_agent,
+          :o ]
 
         def execute
           @sp_as_s_a = @o.terminal_channel_i.to_s.split UNDERSCORE_
@@ -226,7 +229,7 @@ module Skylab::Brazen
           rslv_item_x_from_first_tag
           did = maybe_describe_item_x
           did ||= maybe_pathify_item_x
-          did || maybe_clarify_item_x
+          did || ickify_item_x
           @y << "#{ @sp_as_s_a * SPACE_ } - #{ @item_x }" ; nil
         end
 
@@ -244,7 +247,7 @@ module Skylab::Brazen
             VERB_RX__ =~ @sp_as_s_a[ d ]
           end
         end
-        VERB_RX__ = /\A(?:already|does|is)\z/  # etc as needed
+        VERB_RX__ = /\A(?:already|cannot|does|has|is)\z/  # etc as needed
 
         def rslv_item_x_from_first_tag
           @first_tag_i = @o.first_tag_name
@@ -256,13 +259,15 @@ module Skylab::Brazen
           if @item_x.respond_to? :description_under
             s = @item_x.description_under @expression_agent
             if s
-              @item_x = s ; ok = ACHEIVED_
+              @item_x = s
+              ok = ACHEIVED_
             end
           end
           if ! ok and @item_x.respond_to? :description
             s = @item_x.description
             if s
-              @item_x = s ; ok = ACHEIVED_
+              @item_x = s
+              ok = ACHEIVED_
             end
           end
           ok
@@ -270,15 +275,21 @@ module Skylab::Brazen
 
         def maybe_pathify_item_x
           if PN_RX__ =~ @first_tag_i.to_s
-            @item_x = @expression_agent.pth @item_x
+            x = @item_x
+            s = @expression_agent.calculate do
+              pth x
+            end
+            @item_x = s
             ACHEIVED_
           end
         end
 
-        def maybe_clarify_item_x
-          if @item_x.nil?
-            @item_x = "''" ; nil
+        def ickify_item_x
+          x = @item_x
+          s = @expression_agent.calculate do
+            ick x
           end
+          @item_x = s ; nil
         end
 
         PN_RX__ = /(?:_|\A)pathname\z/

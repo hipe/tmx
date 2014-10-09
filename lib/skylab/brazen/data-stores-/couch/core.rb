@@ -62,10 +62,10 @@ module Skylab::Brazen
 
       Rm = make_action_class :Delete do
 
-        Entity_[][ self, -> do
+        Entity_.call self, -> do
           o :description, -> y { y << 'always necessary for now.' },
             :flag, :property, :force
-        end ]
+        end
       end
     end
 

@@ -1,0 +1,231 @@
+module Skylab::Brazen
+
+  class Model_
+
+    module Entity
+
+      class Normalizers__::Filesystem_Path < Model_::Entity::Normalizer_
+
+        Entity_.call self, -> do
+
+          def absolute
+            @relative_is_OK = false
+          end
+
+          def relative
+            @absolute_is_OK = false
+          end
+
+          def downward_only
+            add_content_validation_against :dot_dot
+          end
+
+          def no_single_dots
+            add_content_validation_against :single_dot
+          end
+
+          def no_dotfiles
+            add_content_validation_against :dot_file
+          end
+        end
+
+        def initialize & p
+          @content_validation_is_required = false
+          @content_validation_is_activated = false
+          @disallow_h = nil
+          @absolute_is_OK = @relative_is_OK = true
+          instance_exec( & p )
+          freeze
+        end
+
+        def initialize_copy _otr_
+          @bad_box = @s_a = nil  # never carry these over for now
+          if @disallow_h
+            @disallow_h = @disallow_h.dup
+          end
+        end
+
+      private
+
+        def add_content_validation_against i
+          if ! @content_validation_is_activated
+            activate_content_validation
+          end
+          @disallow_h[ i ] = true ; nil
+        end
+
+        def activate_content_validation
+          @content_validation_is_activated = true
+          @content_validation_is_required = true
+          @disallow_h = {}
+        end
+
+      public
+
+        def normalize_via_three arg, ok_val_p, evr
+          otr = dup
+          otr.init_copy_via_three arg, ok_val_p, evr
+          otr.execute
+        end
+
+        protected def init_copy_via_three arg, ok_val_p, evr
+          @arg = arg
+          @OK_value_p = ok_val_p
+          @event_receiver = evr
+          init_event_proc ; nil
+        end
+
+        def execute
+          @value_x = @arg.value_x
+          @value_x and via_value_x
+        end
+
+      private
+
+        def via_value_x
+          @md = RX__.match @value_x
+          if @md
+            via_md
+          else
+            when_did_not_match
+          end
+          @result
+        end
+
+        def when_did_not_match
+          nope :path_cannot_contain_repeated_separators
+        end
+
+        def via_md
+          @body_s = @md[ :body ]
+          ok = validate_absolute_and_relative_and_empty
+          ok && maybe_validate_content
+        end
+
+        def validate_absolute_and_relative_and_empty
+          if @md[ :abs ]
+            @is_absolute = true
+            if @absolute_is_OK
+              PROCEDE_
+            else
+              when_absolute
+            end
+          elsif ! @body_s
+            when_empty
+          elsif @relative_is_OK
+            @is_absolute = false
+            PROCEDE_
+          else
+            when_relative
+          end
+        end
+
+        _SEP = ::Regexp.escape ::File::SEPARATOR
+        RX__ = %r<\A
+          (?<abs>#{ _SEP })?
+          (?<rest>
+             (?<body>
+               [^#{ _SEP }]+
+                 (?: #{ _SEP } [^#{ _SEP }]+ )*
+             )
+             (?<trailing> #{ _SEP })?
+          )?
+        \z>x
+
+        def when_absolute
+          nope :path_cannot_be_absolute
+        end
+
+        def when_relative
+          nope :path_cannot_be_relative
+        end
+
+        def when_empty
+          nope :path_cannot_be_empty
+        end
+
+        def maybe_validate_content
+          if @content_validation_is_required
+            validate_content
+          else
+            accept_arg_as_is
+          end
+        end
+
+        def validate_content
+          if @body_s
+            via_body_string_validate_content
+          else
+            # this should only ever occur with the root path
+            accept_arg_as_is
+          end
+        end
+
+        def via_body_string_validate_content
+          disallow_h = @disallow_h
+          @bad_box = nil
+          @s_a = @body_s.split ::File::SEPARATOR
+          @s_a.each_with_index do |s, d|
+            md = PART_RX__.match s
+            if ! md[ :other ]
+              if md[ :single_dot ]
+                if disallow_h[ :single_dot ]
+                  add_bad d, :single_dot
+                end
+              elsif md[ :dot_dot ]
+                if disallow_h[ :dot_dot ]
+                  add_bad d, :dot_dot
+                end
+              elsif md[ :dot_file ]
+                if disallow_h[ :dot_file ]
+                  add_bad d, :dot_file
+                end
+              end
+            end
+          end
+          if @bad_box
+            when_bad_box
+          else
+            accept_arg_as_is
+          end
+        end
+
+        PART_RX__ = /\A(?:
+          (?<single_dot> \. ) |
+          (?<dot_dot> \.\. ) |
+          (?<dot_file> \. .+ ) |
+          (?<other> .+ )
+        )\z/x
+
+        def add_bad d, i
+          @bad_box ||= Box_.new
+          @bad_box.add_if_not_has i do [] end
+          @bad_box.fetch( i ).push d ; nil
+        end
+
+        def when_bad_box
+          i = @bad_box.first_name  # for now we don't report every issue
+          nope :"path_cannot_contain_#{ i }"
+        end
+
+        # the above generates:
+        # path_cannot_contain_single_dot,
+        # path_cannot_contain_contain_dot_dot
+        # path_cannot_contain_contain_dot_file
+
+        def accept_arg_as_is
+          @result = @OK_value_p[ @arg.value_x ]
+          ACHEIVED_
+        end
+
+        def nope i
+          mxa = [ i,
+            :path, @value_x,
+            :prop, @arg.property ]
+          @result = send_not_OK_event_with_mutable_iambic_and_any_msg_p mxa
+          UNABLE_
+        end
+      end
+    end
+  end
+end

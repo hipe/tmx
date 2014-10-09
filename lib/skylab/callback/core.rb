@@ -89,6 +89,12 @@ module Skylab::Callback
         end.execute
       end
 
+      def build_via_iambic x_a
+        new do
+          process_iambic_fully x_a
+        end
+      end
+
       def curry
         -> * preset_arglist do
           cls = ::Class.new self
@@ -151,8 +157,8 @@ module Skylab::Callback
     end
 
     def initialize & p
-      p and instance_exec( & p )
       super( & nil )
+      p and instance_exec( & p )
     end
 
   private

@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Model_
 
-  Entity = Entity_[][ -> do  # see [#047]
+    Entity = Entity_.call -> do  # see [#047]
 
     o :ad_hoc_processor, :after, -> scan do
       scan.scanner.advance_one
@@ -177,9 +177,11 @@ module Skylab::Brazen
         end
 
         def integer_greater_than_or_equal_to=
-          normalizer = Numeric_Normalizer__.new(
+
+          normalizer = Model_::Entity.normalizers.numeric(
             :number_set, :integer,
-            :minimum_value, iambic_property )
+            :minimum, iambic_property )
+
           add_ad_hoc_normalizer do |arg, val_p, ev_p|
             if ! arg.value_x.nil?
               normalizer.normalize_via_three arg, val_p, ev_p
@@ -188,9 +190,11 @@ module Skylab::Brazen
         end
 
         def non_negative_integer=
-          normalizer = Numeric_Normalizer__.new(
+
+          normalizer = Model_::Entity.normalizers.numeric(
             :number_set, :integer,
-            :minimum_value, 0 )
+            :minimum, 0 )
+
           add_ad_hoc_normalizer do |arg, val_p, ev_p|
             if ! arg.value_x.nil?
               normalizer.normalize_via_three arg, val_p, ev_p
@@ -202,113 +206,20 @@ module Skylab::Brazen
           @parameter_arity = :one
         end
       end
-
-      class Numeric_Normalizer__
-
-        Callback_::Actor[ self, :properties,
-          :argument,
-          :new_value_p,
-          :event_p,
-          :number_set,  # symbol
-          :minimum_value ]
-
-        def initialize * x_a
-          process_iambic_fully x_a
-          freeze
-        end
-
-        protected def init_copy_with * x_a
-          process_iambic_fully x_a
-          @number_set ||= :floating_point_number
-        end
-
-        def normalize_via_three arg, val_p, ev_p
-          otr = dup
-          otr.init_copy_with :argument, arg, :new_value_p, val_p, :event_p, ev_p
-          otr.execute
-        end
-
-        def execute
-          @x = @argument.value_x  # might not have been provided. we don't care
-          ok = send @number_set
-          if ok and @minimum_value
-            ok = via_number_and_minimum_value_validate
-          end
-          if ok
-            @new_value_p[ @number ]
-          else
-            @result
-          end
-        end
-
-        def integer  # resolve number when number set is integer
-          if @x.respond_to? :bit_length
-            @number = @x
-            PROCEDE_
-          else
-            via_x_resolve_integer_for_number
-          end
-        end
-
-        def via_x_resolve_integer_for_number
-          @md = INTEGER_RX__.match @x
-          if @md
-            via_matchdata_resolve_integer_for_number
-          else
-            @result = result_when_did_not_match
-            UNABLE_
-          end
-        end
-        INTEGER_RX__ = /\A-?\d+\z/
-
-        def result_when_did_not_match
-
-          @event_p[ :value_not_in_number_set,
-
-              :x, @x, :prop, @argument.property,
-              :number_set, @number_set, -> y, o do
-
-            y << "#{ par o.prop } must be #{
-             }#{ indefinite_noun o.number_set.id2name }, #{
-              }had #{ ick o.x }"
-
-          end ]
-        end
-
-        def via_matchdata_resolve_integer_for_number
-          @number = @md[ 0 ].to_i
-          ACHEIVED_
-        end
-
-        def via_number_and_minimum_value_validate
-          if @minimum_value <= @number
-            PROCEDE_
-          else
-            @result = result_when_number_is_too_small
-            UNABLE_
-          end
-        end
-
-        def result_when_number_is_too_small
-
-          @event_p[ :number_too_small,
-
-              :number, @number, :minimum, @minimum_value,
-              :prop, @argument.property, -> y, o do
-
-            if o.minimum.zero?
-              y << "#{ par o.prop } must be non-negative, had #{ ick o.number }"
-            else
-              y << "#{ par o.prop } must be greater than or equal to #{
-               }#{ val o.minimum }, had #{ ick o.number }"
-            end
-          end ]
-        end
-      end
     end
-  end ]
+  end
 
   module Entity
+
+    class << self
+      def normalizers
+        Normalizers___[]
+      end
+
+      def trio
+        Trio__
+      end
+    end
 
     Event_[].sender self
 
@@ -328,7 +239,7 @@ module Skylab::Brazen
           end,
 
           -> * x_a, p do
-            _ev = build_not_OK_event_via_mutable_iambic_and_message_proc x_a, p
+            _ev = build_event_via_iambic_and_message_proc x_a, p
             @error_count += 1  # :+[#054]
             receive_event _ev
           end ]
@@ -373,8 +284,6 @@ module Skylab::Brazen
       end
     end
 
-  private
-
     const_get :Module_Methods, false  # sanity
     module Module_Methods
       def required_properties
@@ -388,15 +297,21 @@ module Skylab::Brazen
       end
     end
 
+    def get_bound_property name_i
+      get_bound_property_via_property self.class.properties.fetch name_i
+    end
+
+  private
+
     def get_bound_property_via_property prop
       had = true
       x = actual_property_box.fetch prop.name_i do
         had = false ; nil
       end
-      Actual_And_Formal_Property__.new x, had, prop
+      Trio__.new x, had, prop
     end
 
-    class Actual_And_Formal_Property__
+    class Trio__
 
       def initialize * a
         @value_x, @actuals_has_name, @property = a
@@ -475,6 +390,26 @@ module Skylab::Brazen
     def actual_property_box_for_write
       actual_property_box
     end
+
+    Normalizers___ = Callback_.memoize[ -> do
+      mod = Model_::Entity::Normalizers__
+      def_meth = mod.singleton_class.method :define_method
+      scn = mod.entry_tree.get_normpath_scanner
+      while normpath = scn.gets
+        name = normpath.name_for_lookup
+        def_meth.call name.as_variegated_symbol, -> _NAME do
+          -> * x_a do
+            if x_a.length.zero?
+              const_get _NAME.as_const, false
+            else
+              const_get( _NAME.as_const, false ).build_via_iambic x_a
+            end
+          end
+        end[ name ]
+      end
+      mod
+    end ]
+
   end
   end
 end

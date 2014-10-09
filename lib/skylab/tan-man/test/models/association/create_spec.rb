@@ -10,7 +10,7 @@ module Skylab::TanMan::TestSupport::Models::Association
 
     it 'ping' do
       call_API :association, :add, :ping
-      expect_OK_event :ping_from_action, 'ping from action - add'
+      expect_OK_event :ping_from_action, 'ping from action - (ick :add)'
       expect_succeeded
     end
 

@@ -1,28 +1,10 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::Brazen::TestSupport::Entity_
-
-  ::Skylab::Brazen::TestSupport[ T_S__ = self ]
-
-  include CONSTANTS
-
-  Brazen_ = Brazen_
-
-  extend TestSupport_::Quickie
-
-  module ModuleMethods
-    def with_class & blk
-      contxt = self
-      before :all do
-        _THE_CLASS_ = nil.instance_exec( & blk )
-        contxt.send :define_method, :subject_class do _THE_CLASS_ end
-      end
-    end
-  end
+module Skylab::Brazen::TestSupport::Model::Entity
 
   describe "[br] entity- can be used usefully not just for app actions but" do
 
-    extend T_S__
+    extend TS_
 
     context "for small ad-hoc agents too, for e.g when required properties" do
 
@@ -91,10 +73,6 @@ module Skylab::Brazen::TestSupport::Entity_
         o = subject_class.new.send :with, :foo, :bar
         o.bx.fetch( :foo ).should eql :bar
       end
-    end
-
-    Subject_ = -> do
-      Brazen_::Model_::Entity
     end
   end
 end
