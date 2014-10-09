@@ -21,6 +21,12 @@ module Skylab::Brazen
 
     attr_reader :module
 
+    def call * x_a, & p  # #note-25
+      bc = @module.const_get( :API, false )._API_daemon.
+        produce_bound_call_via_iambic_and_proc x_a, p
+      bc and bc.receiver.send bc.method_name, * bc.args
+    end
+
     def unbound_action_via_normalized_name i_a
       i_a.reduce self do |m, i|
         scn = m.get_unbound_action_scan

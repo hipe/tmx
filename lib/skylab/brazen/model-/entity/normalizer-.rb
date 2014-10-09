@@ -11,6 +11,10 @@ module Skylab::Brazen
           @event_p = nil
         end
 
+        def via_two arg, evr  # #experiment
+          normalize_via_three arg, IDENTITY_, evr
+        end
+
       private
 
         def normalize_self

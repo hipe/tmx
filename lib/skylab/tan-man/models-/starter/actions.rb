@@ -16,9 +16,6 @@ module Skylab::TanMan
         @dpn ||= TanMan_.dir_pathname.join RELPATH__
       end
 
-      def line_scanner * x_a
-        Starter_::Actors__::Produce_line_scanner.via_iambic x_a
-      end
     end
     RELPATH__ = 'data-documents/starters'.freeze
 
@@ -45,6 +42,10 @@ module Skylab::TanMan
         def produce_any_result
           send_one_entity
         end
+      end
+
+      Lines = Stub__.new :Lines do |k|
+        Starter_::Actions__::Lines.new k
       end
     end
 

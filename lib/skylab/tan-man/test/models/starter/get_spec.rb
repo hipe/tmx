@@ -84,11 +84,11 @@ module Skylab::TanMan::TestSupport::Models::Starter
           +[ starter "digraphie" ]
         O
 
-        scn = Subject_[].line_scanner(
+        call_API :starter, :lines,
           :value_fetcher, :_not_quite_to_here_,
-          :workspace_path, @ws_pn.to_path, :config_filename, cfn,
-          :event_receiver, event_receiver )
+          :workspace_path, @ws_pn.to_path, :config_filename, cfn
 
+        scn = @result
         scn.should eql false
 
         ev = expect_not_OK_event :resource_not_found
@@ -106,10 +106,10 @@ module Skylab::TanMan::TestSupport::Models::Starter
           +[ starter "digraph.dot" ]
         O
 
-        scn = Subject_[].line_scanner(
+        call_API :starter, :lines,
           :value_fetcher, get_value_fetcher,
-          :workspace_path, @ws_pn.to_path, :config_filename, cfn,
-          :event_receiver, event_receiver )
+          :workspace_path, @ws_pn.to_path, :config_filename, cfn
+        scn = @result
 
         d = 0
         io = _IO_spy
@@ -145,11 +145,6 @@ module Skylab::TanMan::TestSupport::Models::Starter
         :puts_map_proc, -> s do
           "« dbg: #{ s } »"  # #guillemets
         end )
-    end
-
-    Subject_ = TanMan_::Callback_.memoize do
-      TanMan_::Models_::Starter.const_get :Actions, false
-      TanMan_::Models_::Starter
     end
   end
 end

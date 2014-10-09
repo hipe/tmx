@@ -172,18 +172,32 @@ module Skylab::Brazen
     class Silo_Controller__ < Brazen_.model.silo_controller
 
       def provide_collection_controller_precon _id, graph
-        workspace_via_action graph.action
+        workspace_via_rising_action graph.action
       end
 
-      def workspace_via_action action
-        @verbose = action.any_argument_value_at_all :verbose
+      def workspace_via_rising_action action
+        @action = action
+        ws = via_action_produce_workspace_via_object_argument
+        ws || via_action_produce_workspace_via_workspace_silo
+      end
+
+      def workspace_via_risen_action action
+        action.preconditions.fetch :workspace
+      end
+
+      def via_action_produce_workspace_via_object_argument
+        @action.argument_box[ :workspace ]  # for internal API calls
+      end
+
+      def via_action_produce_workspace_via_workspace_silo
+        @verbose = @action.any_argument_value_at_all :verbose
         bx = Box_.new
-        @model_class.merge_workspace_resolution_properties_into_via bx, action
+        @model_class.merge_workspace_resolution_properties_into_via bx, @action
         _evr = _Event.receiver.channeled.full.cascading :ws_via_action, self
         @ws = @model_class.edited _evr, @kernel do |o|
           o.with_arguments :verbose, @verbose
           o.with_argument_box bx
-          o.with :prop, action.class.properties[ :workspace_path ]
+          o.with :prop, @action.class.properties[ :workspace_path ]
         end
         via_ws_workspace
       end
@@ -238,14 +252,6 @@ module Skylab::Brazen
         else
           UNABLE_
         end
-      end
-    end
-
-    class Silo__ < Brazen_.model.silo.make( self )
-
-      def workspace_via_act action
-        _sc = build_silo_controller action
-        _sc.workspace_via_action action
       end
     end
 

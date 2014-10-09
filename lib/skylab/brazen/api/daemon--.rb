@@ -28,11 +28,11 @@ module Skylab::Brazen
         _API_daemon.application_kernel
       end
 
-    private
-
       def _API_daemon
         @API_daemon ||= bld_API_daemon
       end
+
+    private
 
       def bld_API_daemon
         Daemon__.new Brazen_.name_library.surrounding_module self
@@ -84,7 +84,6 @@ module Skylab::Brazen
       end.new
     end
 
-    IDENTITY_ = -> x { x }
     OK_ = true
   end
 end

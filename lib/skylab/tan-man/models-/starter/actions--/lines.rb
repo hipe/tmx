@@ -2,19 +2,33 @@ module Skylab::TanMan
 
   class Models_::Starter
 
-    module Actors__
+    module Actions__
 
-      class Produce_line_scanner
+      class Lines < Action_
 
-        Actor_[ self, :properties,
-          :value_fetcher,
-          :workspace_path, :config_filename,
-          :event_receiver ]
+        Entity_[ self,
+          :required, :property, :value_fetcher,
+          :properties,
+          :use_default,
+          :workspace, :workspace_path, :config_filename ]
 
-        def execute
-          ok = TanMan_::API.call :starter, :get,
-            :workspace_path, @workspace_path,
-            :config_filename, @config_filename,
+        def produce_any_result
+          if @argument_box[ :use_default ]
+            via_default
+          else
+            via_workspace
+          end
+        end
+
+        def via_default
+        end
+
+        def via_workspace
+          bx = @argument_box
+          ok = @kernel.call :starter, :get,
+            :workspace, bx[ :workspace ],
+            :workspace_path, bx[ :workspace_path ],
+            :config_filename, bx[ :config_filename ],
             :event_receiver, self
           ok and via_entity
         end
@@ -29,25 +43,29 @@ module Skylab::TanMan
         end
 
         def via_entity
-          _path = @entity.to_path
-          @template = TanMan_::Lib_::String_template[].from_path _path
+          @path = @entity.to_path
+          via_path
+        end
+
+        def via_path
+          @template = TanMan_::Lib_::String_template[].from_path @path
           via_template
         end
 
         def via_template
-          @output_s = @template.call @value_fetcher
+          @output_s = @template.call @argument_box.fetch( :value_fetcher )
           via_output_s
         rescue ::Errno::ENOENT => e
           @enoent = e
-          via_enoent
+          when_enoent
         end
 
-        def via_enoent
+        def when_enoent
           _ev = Lib_::Entity[].event.wrap.exception.with(
             :path_hack,
             :terminal_channel_i, :resource_not_found,
             :exception, @enoent )
-          @event_receiver.receive_event _ev
+          receive_event _ev
         end
 
         def via_output_s
@@ -55,19 +73,5 @@ module Skylab::TanMan
         end
       end
     end
-
-
-    # For all strings `stem`, normalize it to a joined path and result in
-    # a template object representing the possible template file that is
-    # there, without checking if the file exists. caches results.
-    #
-    define_singleton_method :fetch do |stem|
-      pathname = dir_pathname.join stem # (it normalizes dotty paths)
-      result = cache.fetch pathname.to_s do |path|
-        cache[path] = TanMan::Services::Template.from_path path
-      end
-      result
-    end
-
   end
 end

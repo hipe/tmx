@@ -12,6 +12,18 @@ other parts of the model.
 
 
 
+
+## :#note-25
+
+this is questionable: the API is supposed to rely on the kernel but not
+the other way around. however the kernel is everywhere and we want to
+give the actions a way to make API calls without using the singleton
+directly (which has no guarantee of sticking around) so we use this
+means for now.
+
+
+
+
 ## :#note-40
 
 this is an area of some experimentation: the 'persist to' identifiers

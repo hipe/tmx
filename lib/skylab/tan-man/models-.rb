@@ -107,6 +107,10 @@ module Skylab::TanMan
 
     public
 
+      def krnl
+        @kernel
+      end
+
       def receive_event ev
         m_i = :"receive_#{ ev.terminal_channel_i }_event"
         if respond_to? m_i
@@ -130,7 +134,7 @@ module Skylab::TanMan
   module Uses_Workspace_Action_Methods__
 
     def subsume_external_arguments
-      if ! @argument_box[ :config_filename ]
+      if ! @argument_box[ :workspace ] && ! @argument_box[ :config_filename ]
         a = []
         a.push @kernel.kernel_property_value :local_conf_config_name
         a.push @kernel.kernel_property_value :local_conf_dirname
@@ -185,7 +189,9 @@ module Skylab::TanMan
       def use_workspace_as_dsc
 
         define_method :datastore_controller do
-          @kernel.silo_via_symbol( :workspace ).workspace_via_act @action
+
+          @action.preconditions.fetch :workspace
+
         end
       end
     end
@@ -216,6 +222,8 @@ module Skylab::TanMan
         :memoized, :proc, :starter_file, -> do
           'holy-smack.dot'.freeze
         end,
+
+        # ~ workspace resolution
 
         :memoized, :proc, :global_conf_path, -> do
           TanMan_::Lib_::Home_directory_pathname[].join( 'tanman-config' ).to_path
@@ -252,7 +260,8 @@ module Skylab::TanMan
         p = -> do
           class Xxx___
             Entity_[ self, -> do
-              o :property, :workspace_path,
+              o :property, :workspace,
+                :property, :workspace_path,
                 :property, :config_filename
             end ]
           end

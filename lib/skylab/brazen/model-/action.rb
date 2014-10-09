@@ -233,12 +233,16 @@ module Skylab::Brazen
 
   public
 
+    def accept_parent_node x
+      @parent_node = x ; nil
+    end
+
     def controller_nucleus  # :+#experimental
       [ @event_receiver, @kernel ]
     end
 
-    def accept_parent_node x
-      @parent_node = x ; nil
+    def preconditions  # for a collaborator that knows they exist & what they are
+      @preconditions
     end
 
     def payload_output_line_yielder  # #note-160

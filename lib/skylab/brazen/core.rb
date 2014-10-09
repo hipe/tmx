@@ -244,6 +244,7 @@ module Skylab::Brazen
 
   Event_ = -> { Brazen_::Entity.event }
   Autoloader_[ Models_ = ::Module.new, :boxxy ]
+  IDENTITY_ = -> x { x }
   NAME_ = :name
   NILADIC_TRUTH_ = -> { true }
   PROCEDE_ = true
