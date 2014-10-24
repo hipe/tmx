@@ -2,14 +2,17 @@ require_relative 'test-support'
 
 module Skylab::Dependency::TestSupport::Tasks
 
-  # (not Q-uickie - `before` used below)
+  # :+#not-quickie - nested `before`
 
-  describe TaskTypes::MkdirP do
+  describe "[de] task-types - mkdir p" do
 
-    extend Tasks_TestSupport
+    extend TS_
 
-    subject { TaskTypes::MkdirP }
-    let(:all) do
+    let :subject do
+      TaskTypes::MkdirP
+    end
+
+    let :all do
       lambda do |t|
         t.on_all do |e|
           debug_event e if do_debug
@@ -17,52 +20,85 @@ module Skylab::Dependency::TestSupport::Tasks
         end
       end
     end
+
     it "won't build an empty object" do
+      _rx = /unhandled event streams?.+all.+info/
       -> do
         subject.new
-      end.should raise_error( ::RuntimeError,
-        /unhandled event streams?.+all.+info/ )
+      end.should raise_error ::RuntimeError, _rx
     end
+
     context "as empty" do
-      subject do
+
+      let :subject do
         TaskTypes::MkdirP.new(&all)
       end
+
       it "whines about required arg missing if you try to run it" do
-        lambda { subject.invoke }.should(
-          raise_exception(RuntimeError, /missing required attributes?: .*mkdir_p/)
-        )
+        _rx = /missing required attributes?: .*mkdir_p/
+        -> do
+          subject.invoke
+        end.should raise_exception ::RuntimeError, _rx
       end
     end
+
     context "when the required parameters are present" do
-      let(:dir_arg) { "#{BUILD_DIR}/foo/bar" }
-      subject do
-        TaskTypes::MkdirP.new( :mkdir_p => dir_arg, &all)
+
+      let :dir_arg do
+        "#{ BUILD_DIR }/foo/bar"
       end
+
+      let :subject do
+        TaskTypes::MkdirP.new( :mkdir_p => dir_arg, &all )
+      end
+
       context "with regards to dry_run" do
-        before { subject.context = context }
-        context "by default" do
-          let( :context ) { { } }
-          it { should_not be_dry_run }
+
+        before :each do
+          subject.context = context
         end
+
+        context "by default" do
+
+          let( :context ) { { } }
+
+          it "o" do
+            should_not be_dry_run
+          end
+        end
+
         context "with dry run in context" do
+
           let( :context ) { { :dry_run => true } }
-          it { should be_dry_run }
+
+          it "o" do
+            should be_dry_run
+          end
+
           context "when invoked" do
+
             let( :stderr ) { "" }
-            before do
+
+            before :each do
               BUILD_DIR.prepare
             end
+
             context "a two-element do-hah" do
+
               context "with default max_depth" do
+
                 it "will not go because it is past max depth" do
                   subject.invoke
                   stderr.should match(/more than 1 levels? deep/)
                 end
               end
+
               context "with max_depth increased to two" do
-                subject do
+
+                let :subject do
                   TaskTypes::MkdirP.new(:mkdir_p => dir_arg, :max_depth => 2, &all)
                 end
+
                 it "will go becuase it is equal to max depth" do
                   subject.invoke
                   stderr.should match(%r{mkdir -p .*foo/bar})
@@ -75,4 +111,3 @@ module Skylab::Dependency::TestSupport::Tasks
     end
   end
 end
-

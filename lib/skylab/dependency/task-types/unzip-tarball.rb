@@ -3,8 +3,10 @@ module Skylab::Dependency
   class TaskTypes::UnzipTarball < Dep_::Task
 
     Dep_::Lib_::Open_2[ self ]
-    include Dep_::Lib_::CLI[]::PathTools::InstanceMethods
-    include Dep_::TaskTypes::TarballTo::CONSTANTS
+
+    include Dep_::Lib_::Path_tools[].instance_methods_module
+
+    include Dep_::TaskTypes::TarballTo::Constants
 
     attribute :unzip_tarball, :required => true, :pathname => true
     attribute :build_dir, :from_context => true, :pathname => true, :required => true

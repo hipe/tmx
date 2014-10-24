@@ -15,17 +15,27 @@ module Skylab::Dependency::TestSupport
   extend TestSupport_::Quickie
 
   module TestLib_
+
     sidesys = Autoloader_.build_require_sidesystem_proc
-    CLI = -> do
-      Headless__[]::CLI
+
+    CLI_lib = -> do
+      HL__[]::CLI
     end
-    Headless__ = sidesys[ :Headless ]
+
+    HL__ = sidesys[ :Headless ]
+
     Let = -> do
-      MetaHell__[]::Let
+      MH__[]::Let
     end
-    MetaHell__ = sidesys[ :MetaHell ]
+
+    MH__ = sidesys[ :MetaHell ]
+
+    System = -> do
+      HL__[].system
+    end
+
     Tmpdir_path = -> do
-      Headless__[]::System.defaults.tmpdir_path
+      System[].filesystem.tmpdir_path
     end
   end
 
@@ -39,11 +49,11 @@ module Skylab::Dependency::TestSupport
     log_level_i: :info, # (:info | :warn) e.g.
     pid_path: tmpdir
 
-  CONSTANTS::BUILD_DIR = build_dir # #bound
-  CONSTANTS::FIXTURES_DIR = fixtures_dir # #bound
-  CONSTANTS::FILE_SERVER = file_server # #bound
+  Constants::BUILD_DIR = build_dir # #bound
+  Constants::FIXTURES_DIR = fixtures_dir # #bound
+  Constants::FILE_SERVER = file_server # #bound
 
-  module CONSTANTS
+  module Constants
     Dep_ = Dep_
     TestSupport_ = TestSupport_
   end
@@ -51,7 +61,7 @@ module Skylab::Dependency::TestSupport
   module InstanceMethods
 
     extend TestLib_::Let[]::ModuleMethods
-    include TestLib_::CLI[]::Pen::Methods  # `unstyle`
+    include TestLib_::CLI_lib[].pen.style_methods_module  # `unstyle`
 
     def debug!
       @do_debug = true

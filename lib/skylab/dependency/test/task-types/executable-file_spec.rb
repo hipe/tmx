@@ -2,11 +2,9 @@ require_relative 'test-support'
 
 module Skylab::Dependency::TestSupport::Tasks
 
-  # Quickie!
+  describe "[de] task-types - executable file" do
 
-  describe TaskTypes::ExecutableFile do
-
-    extend Tasks_TestSupport
+    extend TS_
 
     let(:build_args) { { :executable_file => executable_file } }
 

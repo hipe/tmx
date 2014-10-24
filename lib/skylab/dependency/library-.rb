@@ -4,8 +4,8 @@ module Skylab::Dependency
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
-    CLI = -> do
-      Headless__[]::CLI
+    CLI_lib = -> do
+      HL__[]::CLI
     end
 
     CodeMolester__ = sidesys[ :CodeMolester ]
@@ -13,12 +13,12 @@ module Skylab::Dependency
     Face__ = sidesys[ :Face ]
 
     Home_dir_pn = -> do
-      Headless__[]::FUN.home_directory_pathname
+      System__[].environment.any_home_directory_pathname
     end
 
-    Headless__ = sidesys[ :Headless ]
+    HL__ = sidesys[ :Headless ]
 
-    MetaHell__ = sidesys[ :MetaHell ]
+    MH__ = sidesys[ :MetaHell ]
 
     Methodize = -> i do
       Callback_::Name.lib.methodize i
@@ -28,8 +28,12 @@ module Skylab::Dependency
       mod.send :include, Face__[]::Open2
     end
 
+    Path_tools = -> do
+      HL__[].system.filesystem.path_tools
+    end
+
     Proxy = -> do
-      MetaHell__[]::Proxy
+      MH__[]::Proxy
     end
 
     Sexp = -> do
@@ -38,8 +42,12 @@ module Skylab::Dependency
 
     Slake = sidesys[ :Slake ]
 
+    System = -> do
+      HL__[].system
+    end
+
     Writemode = -> do
-      Headless__[]::WRITEMODE_
+      HL__[]::WRITEMODE_
     end
   end
 

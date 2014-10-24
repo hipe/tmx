@@ -4,7 +4,7 @@ module Skylab::Dependency
 
     CLI_Commands = lambda do |_|
       o do |op, req|
-        extend Dep_::Lib_::CLI[]::PathTools::InstanceMethods
+        extend Dep_::Lib_::System[].filesystem.path_tools.instance_methods_module
         item_name = @parent.name
         syntax "#{ normalized_invocation_string } [opts] [<name> [<name> [..]]]"
         op.banner = <<-HERE.gsub(/^ +/, '')

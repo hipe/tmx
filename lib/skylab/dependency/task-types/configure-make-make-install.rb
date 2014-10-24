@@ -4,8 +4,8 @@ module Skylab::Dependency
 
     Dep_::Lib_::Open_2[ self ]
 
-    include Dep_::Lib_::CLI[]::PathTools::InstanceMethods
-    include Dep_::TaskTypes::TarballTo::CONSTANTS
+    include Dep_::Lib_::System[].filesystem.path_tools.instance_methods_module
+    include Dep_::TaskTypes::TarballTo::Constants
     attribute :configure_make_make_install
     attribute :prefix
     attribute :configure_with, :required => false

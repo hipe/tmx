@@ -2,11 +2,9 @@ require_relative 'test-support'
 
 module Skylab::Dependency::TestSupport::Tasks
 
-  # Quickie!
+  describe "[de] task-types version from spec" do
 
-  describe TaskTypes::VersionFrom do
-
-    extend Tasks_TestSupport
+    extend TS_
 
     let(:klass) { TaskTypes::VersionFrom }
     let(:log) { Dep_::Library_::StringIO.new }

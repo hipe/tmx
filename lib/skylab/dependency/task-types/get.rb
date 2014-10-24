@@ -6,7 +6,7 @@ module Skylab::Dependency
 
     Dep_::Lib_::Open_2[ self ]
 
-    include Dep_::Lib_::CLI[]::PathTools::InstanceMethods
+    include Dep_::Lib_::Path_tools[].instance_methods_module
 
     attribute :from
     attribute :get, :required => true

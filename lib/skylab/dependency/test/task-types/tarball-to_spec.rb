@@ -2,15 +2,17 @@ require_relative 'test-support'
 
 module Skylab::Dependency::TestSupport::Tasks
 
-  # (not Q-uickie - `before` used below)
+  # :+#not-quickie - nested `before` used
 
   describe TaskTypes::TarballTo do
 
-    extend Tasks_TestSupport
+    extend TS_
 
-    let(:context) { { :build_dir => BUILD_DIR.to_s } }
+    let :context do
+      { build_dir: BUILD_DIR.to_s }
+    end
 
-    subject do
+    let :subject do
       TaskTypes::TarballTo.new( build_args ) { |t| wire! t }
     end
 

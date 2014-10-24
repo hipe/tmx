@@ -2,11 +2,11 @@ require_relative 'test-support'
 
 module Skylab::Dependency::TestSupport::Tasks
 
-  # (not Q-uickie - `before` used below)
+  # :+#not-quickie - nested `before` used below
 
-  describe TaskTypes::Get do
+  describe "[de] task-types - get" do
 
-    extend Tasks_TestSupport
+    extend TS_
 
     let(:build_dir) { BUILD_DIR }
     let(:context) { { :build_dir => build_dir } }

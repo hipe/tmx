@@ -7,7 +7,7 @@ module Skylab::Dependency
     attribute :get, :required => false # actually see if we can ..
     listeners_digraph  :all, :shell => :all, :info => :all, :error => :all
 
-    module CONSTANTS
+    module Constants
       TARBALL_EXT = /\.tar\.(?:gz|bz2)|\.tgz/ # #bound
       TARBALL_EXTENSION = /(?:#{TARBALL_EXT.source})\z/ # #bound
     end

@@ -2,11 +2,9 @@ require_relative 'test-support'
 
 module Skylab::Dependency::TestSupport::Tasks
 
-  # Quickie!
+  describe "[de] task-types - executable" do
 
-  describe TaskTypes::Executable do
-
-    extend Tasks_TestSupport
+    extend TS_
 
     let(:context) { { } }
 

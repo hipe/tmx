@@ -2,7 +2,7 @@ module Skylab::Dependency
 
   class TaskTypes::MoveTo < Dep_::Task
 
-    include Dep_::Lib_::CLI[]::PathTools::InstanceMethods
+    include Dep_::Lib_::Path_tools[].instance_methods_module
     include Dep_::Library_::FileUtils
 
     # @todo look below etc

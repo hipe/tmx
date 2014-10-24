@@ -2,13 +2,13 @@ require_relative 'test-support'
 
 module Skylab::Dependency::TestSupport::Tasks
 
-  # (not Q-uickie - `before` used below)
+  # :+#not-quickie - nested `before` block used
 
-  describe TaskTypes::UnzipTarball do
+  describe "[de] task-types unzip tarball" do
 
-    extend Tasks_TestSupport
+    extend TS_
 
-    subject do
+    let :subject do
       TaskTypes::UnzipTarball.new( build_args ) { |t| wire! t }
     end
 

@@ -1,20 +1,20 @@
 require_relative '../test-support'
 
 module Skylab::Dependency::TestSupport::Tasks
-  ::Skylab::Dependency::TestSupport[ Tasks_TestSupport = self ] # #regret
 
-  module CONSTANTS
+  ::Skylab::Dependency::TestSupport[ TS_ = self ]
+
+  module Constants
     include Dep_
-    Dep_::TaskTypes && nil # :/
   end
 
-  include CONSTANTS # include them here for use in specs
+  include Constants  # include them here for use in specs
 
   extend TestSupport_::Quickie  # let's see..
 
   module InstanceMethods
 
-    include CONSTANTS # some want BUILD_DIR in the i_m's
+    include Constants  # some want BUILD_DIR in the i_m's
 
     def wire! o
       o.context = context
