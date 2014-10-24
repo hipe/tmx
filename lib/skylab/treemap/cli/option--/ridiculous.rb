@@ -1,32 +1,34 @@
 module Skylab::Treemap
 
-  module CLI::Option::Ridiculous
+  module CLI
+
+    module Option__
+
+      module Ridiculous
 
     # `Ridiculous` is the high-level entrypoint into this ridiculous library.
     # Extend your Headless-powered CLI::Action sublass with Ridiculous.
 
     def self.extended mod
-      mod.extend CLI::Option::Ridiculous::ModuleMethods
-      mod.send :include, CLI::Option::Ridiculous::InstanceMethods
+      mod.extend CLI::Option__::Ridiculous::ModuleMethods
+      mod.send :include, CLI::Option__::Ridiculous::InstanceMethods
     end
-  end
 
-  CLI::Option::Ridiculous::DSL = MetaHell::Proxy::Functional.new :more
-      # the DSL proxy is just for getting the `more` hook for now.
+        DSL = Lib_::Proxy_lib[].functional :more
+          # the DSL proxy is just for getting the `more` hook for now.
 
-  CLI::Option::Ridiculous::Dispatch = MetaHell::Proxy::Nice.new :'nil?',
-    :add_definition_block, :options, :'parse!'
+        Dispatch = Lib_::Proxy_lib[].nice :"nil?",
+          :add_definition_block, :options, :'parse!'
 
+        module ModuleMethods
 
-  module CLI::Option::Ridiculous::ModuleMethods
-
-    Headless::CLI::Action[ self, :DSL_methods ]
+    Treemap_::Lib_::Old_CLI_lib[].action self, :DSL_methods
 
     def option_parser             # just for resulting in a DSL for the `more`
       if block_given?
         super
       else
-        @option_parser_hookback ||= CLI::Option::Ridiculous::DSL.new(
+        @option_parser_hookback ||= CLI::Option__::Ridiculous::DSL.new(
           more: method( :option_parser_more )
         )
       end
@@ -43,11 +45,12 @@ module Skylab::Treemap
       end
       nil
     end
-  end
+        end
 
-  module CLI::Option::Ridiculous::InstanceMethods
+        module InstanceMethods
 
-    Headless::CLI::Action[ self, :core_instance_methods ]
+    Lib_::CLI_lib[].action self, :core_instance_methods
+
       # (taps you into the whole critical f.w of h.l, for e.g `invoke`)
 
     def option_parser &b          # so think about this for a minute..
@@ -88,7 +91,7 @@ module Skylab::Treemap
       _option_parser_ridiculous_host_is_initted and fail 'sanity'
       _option_parser_ridiculous_host_init
       if any_option_parser_p_a
-        CLI::Option::Ridiculous::Dispatch.new(
+        CLI::Option__::Ridiculous::Dispatch.new(
           :add_definition_block => method( :dispatch_definition_block ),
           :nil?                 => -> { false },
           :options              => -> { option_documenter.options },
@@ -118,7 +121,7 @@ module Skylab::Treemap
       if @option_documenter.nil?
         a, b = any_option_parser_p_a, option_parser_extension_blocks
         if a || b
-          od = @option_documenter = CLI::Option::Documenter.new( self )
+          od = @option_documenter = CLI::Option__::Documenter.new( self )
           # (note it is very important that you set the ivar right away.
           # the documenter runs the blocks and the blocks use the stylus
           # and the stylus checks for options and the options are in the
@@ -190,6 +193,9 @@ module Skylab::Treemap
     def has_formal_parameter norm
       option_documenter.has_formal_parameter norm
       # (and when you need to, one for args too)
+    end
+        end
+      end
     end
   end
 end

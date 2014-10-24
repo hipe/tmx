@@ -1,9 +1,9 @@
 module Skylab::Treemap
 
-  class CLI::Option
+  class CLI::Option__
     # an abstract nerk for derking your gerks
 
-    FUN = -> do
+    FUN__ = -> do
 
       o = { }
 
@@ -13,8 +13,7 @@ module Skylab::Treemap
 
       o[:parse] = -> do
 
-        long_rx, short_rx = Headless::CLI::Option::Constants.
-          values_at :LONG_RX, :SHORT_RX
+        long_rx, short_rx = Lib_::CLI_lib[].option.value_at :long_rx, :short_rx
 
         -> args do
           if ::Hash === args.last
@@ -44,7 +43,7 @@ module Skylab::Treemap
       x = ::Struct.new(* o.keys ).new ; o.each { |k, v| x[k] = v } ; x.freeze
     end.call
 
-    define_singleton_method :parse, & FUN.parse
+    define_singleton_method :parse, & FUN__.parse
 
     arg_a = [ :long_stem, :short_stem, :no_part, :long_rest, :short_rest ]
 

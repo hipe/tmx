@@ -20,6 +20,6 @@ module Skylab::Treemap
       end
     end
 
-    MetaHell::Function self, :last_number, :gets
+    MetaHell.function self, :last_number, :gets
   end
 end

@@ -41,8 +41,6 @@ module Skylab::Treemap
       nil
     end
 
-    include Headless::System::InstanceMethods  # `system.which`
-
     def error msg
       emit :error, msg
       @is_ready = false

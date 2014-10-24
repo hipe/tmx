@@ -102,7 +102,7 @@ module Skylab::Treemap
       str.to_s.gsub deny_rx, ''
     end
 
-    Plugins::R::API::Actions::Render::Tees_LTLT = Callback_.tee.new :<<
+    Plugins::R::API::Actions::Render::Tees_LTLT = Callback_::Proxy.tee.new :<<
 
     define_method :generate_script do         # just as a fun excercize we
                                               # separate how the lines are used
@@ -111,7 +111,7 @@ module Skylab::Treemap
         y = Plugins::R::API::Actions::Render::Tees_LTLT.new # a tee for fun and
         y[:lines] = @lines                    # flexibility (mostly fun.)
         if @the_rscript_is_the_payload        # if the remote host wants to
-          y[:downstream] = MetaHell::Proxy::Ad_Hoc :<< => @on_payline
+          y[ :downstream ] = Lib_::Proxy_lib[].inline :<<, @on_payline
                                               # see every line of the
                                               # script to do whatever with
                                               # as it is made, we way-over
@@ -191,7 +191,7 @@ module Skylab::Treemap
         inf = if @infostream then -> s { @infostream.write s } else
           -> s { emit :info_line, s }  # #todo
         end
-        select = Headless::IO::Upstream::Select.new
+        select = Headless::IO.select.new
         select.timeout_seconds = 0.3
         argv = [ @bridge.executable_path, '--vanilla' ]  # wat
         Headless::Services::Open3.popen3( *argv ) do |sin, sout, serr|

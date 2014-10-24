@@ -23,7 +23,7 @@ module Skylab::Treemap
 
   module CLI::Action::InstanceMethods  # might be borrowd by motes, cards, flies
 
-    Headless::CLI::Action[ self, :core_instance_methods ]  # the current favorite for # cli basics like `invoke`
+    Treemap_::Lib_::Old_CLI_lib[].action self, :core_instance_methods  # the current favorite for # cli basics like `invoke`
 
     include Treemap::Core::Action::InstanceMethods # brings in our own custom
                                   # subclient methods among other things
@@ -90,15 +90,15 @@ module Skylab::Treemap
     #         ~ because we are a class of action: ~
 
 
-    Headless::CLI::Action[ self,
-      :actions_anchor_module, -> { Treemap::CLI::Actions } ]
+    Treemap_::Lib_::Old_CLI_lib[].action self,
+      :actions_anchor_module, -> { Treemap::CLI::Actions }
 
     MODALITIES_ANCHOR_MODULE = Treemap  # actions can reach classes from
                                         # the rest of the system
 
     #         ~ for our event profile: ~
 
-    Headless::CLI::Action[ self, :core_instance_methods ]  # NOTE *that* ver. of `emit`
+    Treemap_::Lib_::Old_CLI_lib[].action self, :core_instance_methods  # NOTE *that* ver. of `emit`
 
 
     Callback_[ self, :employ_DSL_for_digraph_emitter ] # (child classes *must*
@@ -140,15 +140,18 @@ module Skylab::Treemap
 
     #      ~ (watch how we bend a huge new api to a huge old one:) ~
 
-    module Proxy
-    end
+    Proxy = ::Module.new
 
-    Proxy::Option_Syntax = MetaHell::Proxy::Functional.new(
+    Proxy::Option_Syntax = Lib_::Proxy_lib[].functional(
       :any?, :help, :options, :parse, :string )
 
                                   # mock a legcay o.syn with a hookback so
     def option_syntax             # we can get control back to here, a hack!
-      @option_syntax ||= Proxy::Option_Syntax.new(
+      @option_syntax ||= bld_osyn
+    end
+
+    def bld_osyn
+      Proxy::Option_Syntax.new(
         :options => method( :__option_syntax_options ),
         :parse => method( :__option_syntax_parse_legacy ),
         :string => method( :__option_syntax_string_legacy ),
@@ -266,8 +269,10 @@ module Skylab::Treemap
 
     #         ~ for when f.w is touching an adapter action raw ~
 
-    class LegPxy < MetaHell::Proxy::Nice.new :help, :resolve
-      def respond_to?(*) true end  # i want it all
+    LegPxy = Lib_::Proxy_lib[].nice :help, :resolve do
+      def respond_to? _  # +:[#057]
+        true
+      end
     end
 
     def __build_legacy_proxy

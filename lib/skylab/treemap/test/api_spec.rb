@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Treemap::TestSupport
 
-  describe "#{ Treemap::API }" do
+  describe "[tr] API", wip: true do  # #quickie: no
 
     context "inflection hack for the action of" do
 

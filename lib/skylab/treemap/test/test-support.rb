@@ -2,15 +2,16 @@ require_relative '../core'
 require 'skylab/headless/test/test-support'  # give me h.l core *and* t.s core!!
 
 module Skylab::Treemap::TestSupport
-  ::Skylab::TestSupport::Regret[ Treemap_TestSupport = self ]
 
-  module CONSTANTS
+  ::Skylab::TestSupport::Regret[ TS_ = self ]
+
+  module Constants
     Headless = ::Skylab::Headless
     TestSupport = ::Skylab::TestSupport
     Treemap = ::Skylab::Treemap
   end
 
-  include CONSTANTS
+  include Constants
 
   extend ::Skylab::TestSupport::Quickie
 

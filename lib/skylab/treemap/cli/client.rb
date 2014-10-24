@@ -54,9 +54,6 @@ module Skylab::Treemap
 
   private
 
-    define_singleton_method :private_attr_reader,
-      & MetaHell::FUN.private_attr_reader
-
     -> do
 
       signature_h = {
@@ -102,7 +99,7 @@ module Skylab::Treemap
 
     def actions                   # compat, was kind kewl
       @actions ||= begin
-        # Bleeding::Constants[ actions_box_module ] (just local no adapters)
+        # Bleeding::Constants_[ actions_box_module ] (just local no adapters)
         Bleeding::Actions[
           # actions_box_module,  # if you uncomment this, it hiccups the names # #todo
           Treemap::Adapter::Mote::Actions.new( self ),
@@ -121,8 +118,11 @@ module Skylab::Treemap
       self.class
     end
 
-    module_exec :stylus, & MetaHell::FUN.private_attr_accessor
-      # you have an obligation to make the buck stop here
+  public
+    attr_reader :stylus
+    private :stylus
+    attr_writer :stylus
+  private
 
     #         ~ fun with events ~
 
@@ -235,7 +235,9 @@ module Skylab::Treemap
       public :api_client
     end.call
 
-    private_attr_reader :infostream  # deep deep down something wants it
+  public
+    attr_reader :infostream
+  private
 
     #         ~ adapter services & buckstop experiments ~
 
@@ -274,7 +276,7 @@ module Skylab::Treemap
 
     def initialize host_module, const
       @host_module = host_module
-      @name = Headless::Name::Function::From::Constant.new const
+      @name = Treemap_::Lib_::Old_name_lib[].via_const const
     end
   end
 
@@ -285,7 +287,7 @@ module Skylab::Treemap
     def self.each &blk            # have some fun with lots of things
       @story ||= begin
         # story = Porcelain::Legacy::Story.new self
-        story = MetaHell::Formal::Box::Open.new
+        story = MetaHell::Formal::Box.open_box.new
         constants.each do |const|  # use boxxy, not necessarily loaded!
           story.add const, CLI::Action_Sheet.new( self, const )
         end

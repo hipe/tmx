@@ -2,7 +2,7 @@ module Skylab::Treemap
 
   class CLI::Actions::Render < CLI::Action
 
-    extend CLI::Option::Ridiculous  # headless cli action m.m and i.m too !
+    extend CLI::Option__::Ridiculous  # headless cli action m.m and i.m too !
                                   # fully wired for hacking from old and new
 
     include Treemap::Adapter::InstanceMethods::CLI_Action

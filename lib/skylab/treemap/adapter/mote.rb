@@ -1,8 +1,5 @@
 module Skylab::Treemap
 
-  module Adapter
-  end
-
   module Adapter::Mote
 
     # a "mote" is an experimental construct, something like a flyweight
@@ -18,7 +15,7 @@ module Skylab::Treemap
   end
 
 
-  class Adapter::Mote::Actions < MetaHell::Formal::Box::Open
+  class Adapter::Mote::Actions < MetaHell::Formal::Box.open_box
 
     include Treemap::Core::SubClient::InstanceMethods
 
@@ -70,7 +67,7 @@ module Skylab::Treemap
       nil
     end
 
-    MetaHell::Function.enhance( self ).as_public_getter :@rc, :mode_client
+    Treemap_::Lib_::Ivars_with_procs_as_methods[ self ].as_public_getter :@rc, :mode_client
 
     public :actions_const_get  # (child s.c only)
 
@@ -115,7 +112,7 @@ module Skylab::Treemap
       @is_visible = true
       if const
         @is_native = true
-        @name = Headless::Name::Function.from_const const
+        @name = Treemap_::Lib_::Old_name_lib[].via_const const
       else
         @is_native = false
         @name = nf

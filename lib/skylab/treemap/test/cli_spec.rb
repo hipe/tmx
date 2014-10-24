@@ -2,9 +2,9 @@ require_relative 'cli/test-support'
 
 module Skylab::Treemap::TestSupport::CLI
 
-  describe "The Treemap Module's CLI" do
+  describe "[tr] CLI", wip: true do  # #quickie: yes
 
-    extend CLI_TestSupport
+    extend TS_
 
     num_streams 2  # (hack to get debug! compat)
 

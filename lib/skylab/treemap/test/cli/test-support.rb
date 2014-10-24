@@ -2,9 +2,9 @@ require_relative '../test-support'
 
 module Skylab::Treemap::TestSupport::CLI
 
-  ::Skylab::Treemap::TestSupport[ CLI_TestSupport = self ]
+  ::Skylab::Treemap::TestSupport[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport::Quickie
 
@@ -19,7 +19,7 @@ module Skylab::Treemap::TestSupport::CLI
   end
 
   module InstanceMethods
-    include CONSTANTS  # `TestSupport` is called upon in i.m's
+    include Constants  # `TestSupport` is called upon in i.m's
 
     def _num_streams
       :set_number_of_streams_with_num_streams
@@ -52,11 +52,11 @@ module Skylab::Treemap::TestSupport::CLI
     end
 
     def streams
-      @streams ||= TestSupport::IO::Spy::Triad.new nil  # no $stdin
+      @streams ||= TestSupport::IO.spy.triad.new nil  # no $stdin
     end
 
     def styled str
-      Headless::CLI::Pen::FUN.unstyle_styled[ str ]
+      Lib_::CLI_lib[].pen.unstyle_styled str
     end
 
     def styld exp
@@ -85,16 +85,14 @@ module Skylab::Treemap::TestSupport::CLI
     end
 
     def _unstyle k
-      Headless::CLI::Pen::FUN.unstyle[ stream[k].string ]
+      Treemap_::Lib_::CLI_lib[].pen.unstyle stream[ k ].string
     end
 
-    Stream_ = ::Struct.new :sout, :serr
-
-    define_method :stream do
-      @stream ||= begin
-        Stream_.new( TestSupport::IO::Spy.new, TestSupport::IO::Spy.new )
-      end
+    def stream
+      @stream ||= Stream__.new( TestSupport::IO.spy.new, TestSupport::IO.spy.new )
     end
+
+    Stream__ = ::Struct.new :sout, :serr
 
     def tmx_cli # (was [#051] legacy test wiring)
       @tmx_cli ||= begin

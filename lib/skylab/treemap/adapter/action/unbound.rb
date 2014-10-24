@@ -8,7 +8,7 @@ module Skylab::Treemap
 
     include Treemap::CLI::Action::InstanceMethods  # we definately are this, first
 
-    extend Treemap::CLI::Option::Ridiculous  # (we have to o.p hack below)
+    extend Treemap::CLI::Option__::Ridiculous  # (we have to o.p hack below)
 
     include Adapter::InstanceMethods::Action  # `resolve_adapter`
 
@@ -31,8 +31,10 @@ module Skylab::Treemap
 
     #         1. (continud)
 
-    class LegPxy < MetaHell::Proxy::Nice.new :help, :resolve
-      def respond_to?(*) ; true end
+    LegPxy = Lib_::Proxy_lib[].nice :help, :resolve do
+      def respond_to? _  # :+[#057]
+        true
+      end
     end
 
     def build_legacy_proxy
@@ -74,9 +76,8 @@ module Skylab::Treemap
 
     def argument_syntax  # used in `usage_and_invite`
       @arg_params ||= [[:rest, :adapter_specific_arg]]
-      @argument_syntax ||= Headless::CLI::Argument::Syntax::Isomorphic.new(
-        @arg_params, nil
-      )
+      @argument_syntax ||= Lib_::CLI_lib[].argument.syntax.isomorphic(
+        @arg_params, nil )
     end
 
     def o  # you love it

@@ -2,12 +2,9 @@ require_relative 'test-support'
 
 module Skylab::Treemap::TestSupport::CLI
 
-  # Quickie.
+  describe "[tr] CLI options (the most ridonculous false requirements", wip: true do  # #quickie: yes
 
-  describe "#{ Treemap }::CLI - the most ridoncunculous #{
-    }false requirements EVAR.." do
-
-    extend CLI_TestSupport
+    extend TS_
 
     num_streams 3
 

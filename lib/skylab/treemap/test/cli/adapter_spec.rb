@@ -2,11 +2,9 @@ require_relative 'test-support'
 
 module Skylab::Treemap::TestSupport::CLI
 
-  # Quickie.
+  describe "[tr] CLI adapters", wip: true do  # quickie: no
 
-  describe "#{ Treemap }::CLI - adapters really!?" do
-
-    extend CLI_TestSupport
+    extend TS_
 
     num_streams 3
 

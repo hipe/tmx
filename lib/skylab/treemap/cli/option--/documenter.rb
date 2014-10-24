@@ -1,6 +1,6 @@
 module Skylab::Treemap
 
-  class CLI::Option::Documenter
+  class CLI::Option__::Documenter
 
   public
 
@@ -11,7 +11,7 @@ module Skylab::Treemap
     # parser definition blocks are being run so care must be taken with
     # lazy-instantiation of the option documenter (singular!).
 
-    Options = MetaHell::Proxy::Nice.new :fetch
+    Options = Lib_::Proxy_lib[].nice :fetch
 
     def options
       @options ||= Options.new fetch: method( :options_fetch )
@@ -80,8 +80,10 @@ module Skylab::Treemap
       # usually we store what is written to us
     end
 
-    class Pxy::Smrz < MetaHell::Proxy::Functional.new :summarize
-      def respond_to? x ; true end  # i want it all
+    Pxy::Smrz = Lib_::Proxy_lib[].function :summarize do
+      def respond_to?  # :+[#057]
+        true
+      end
     end
 
     def summarize(* args, &block )  # receive a call from the f.w
@@ -124,7 +126,7 @@ module Skylab::Treemap
       @model.summary_width = x    # use it to hold it sure why not. f.w needs it
     end
 
-    Pxy::Top = MetaHell::Proxy::Nice.new :list
+    Pxy::Top = Lib_::Proxy_lib[].nice :list
 
     def top
       @top_pxy ||= Pxy::Top.new list: method( :top_list )
@@ -145,11 +147,18 @@ module Skylab::Treemap
 
     # act like an action, but do 'census' style things
 
-    class Probe::Action < MetaHell::Proxy::Nice::Basic.new(
-      :read_param_h, :write_param_h, :write_param_queue
-    )
-      def hdr s ; s end           # we don't style things during 'census' probe
-      def more x ; [ ] end        # idem
+    Probe::Action = Lib_::Proxy_lib[].nice(
+        :read_param_h, :write_param_h, :write_param_queue ) do
+
+      # we don't style things during 'census' probe
+
+      def hdr s
+        s
+      end
+
+      def more _
+        EMPTY_A_
+      end
 
       def initialize read_param_h, write_param_h, write_param_queue
         @param_h = Probe::Hash.new read_param_h, write_param_h
@@ -158,14 +167,18 @@ module Skylab::Treemap
       end
     end
 
-    class Probe::Hash < MetaHell::Proxy::Nice.new :[], :[]=
-      def self.new read, write
-        super :[] => read, :[]= => write
+    Probe::Hash = Lib_::Proxy_lib[].nice :[], :[]= do
+      class << self
+        def new read, write
+          super :[], read, :[]=, write
+        end
       end
     end
 
-    class Probe::Model < MetaHell::Proxy::Nice.new :on, :separator
-      def respond_to? x ; true end
+    Probe::Model = Lib_::Proxy_lib[].nice :on, :separator do
+      def respond_to?  # :+[#057]
+        true
+      end
     end
 
     def initialize host
@@ -176,7 +189,7 @@ module Skylab::Treemap
       @host = host
       @model = ::OptionParser.new              # just for gathering data..
       @flip_box, @default_box, @option_box, @more_box = 4.times.map do
-        MetaHell::Formal::Box::Open.new
+        MetaHell::Formal::Box.open_box.new
       end
       param_h = { } ; param_queue = [ ]
       @census_probe = Probe::Action.new(
@@ -211,7 +224,7 @@ module Skylab::Treemap
 
     def option_definition_added *args, &block
       @model.on(* args, &block )
-      opt = CLI::Option.build_from_args args, nil, @fail  # no norm_name yet
+      opt = Lib_::CLI_lib[].via_args args, nil, @fail
       if opt
         if opt.weak_identifier
           if block  # no block iff cosmetic!
@@ -311,7 +324,7 @@ module Skylab::Treemap
 
     # (see long note at `summarize`)
 
-    class Pxy::Action < MetaHell::Proxy::Nice.new :hdr, :more
+    Pxy::Action = Lib_::Proxy_lib[].nice :hdr, :more do
       def initialize h
         super
         @param_h = { }
@@ -345,8 +358,9 @@ module Skylab::Treemap
       # we do at least 2 things to it.. (this is from a call of `summarize`
       # from the frameworks)
 
-      fun = Headless::CLI::Option::Parser::Scanner::FUN
-      mustache_rx = Basic::String::MUSTACHE_RX
+      fun = Lib_::CLI_lib[].option.parser.scanner
+
+      mustache_rx = Treemap_::Lib_::String_lib[].mustache_regexp
 
       define_method :summarize_switch do |sw, idx, args, blk|
         sw.summarize(* args ) do |line|  # (no how about *I'll* call it)
@@ -354,7 +368,7 @@ module Skylab::Treemap
             stem = $~[1].strip
             meth = "render_#{ stem }_for_option" # e.g. render_default_for_option
             # (we used to put $~[0] back, now we are loud with failure..)
-            wid = fun.weak_identifier_for_switch[ sw ]
+            wid = fun.weak_identifier_for_switch sw
             opt = options_fetch( @flip_box.fetch wid )
             s = @host.send meth, opt
             s ||= "(no #{ stem })"  # e.g "(no default)"  .. you could of course..
@@ -365,10 +379,11 @@ module Skylab::Treemap
       end
     end.call
 
-    class Pxy::Switch < MetaHell::Proxy::Functional.new :arg, :long,
-      :object_id, :short, :send
-
-      def respond_to? x ; true end  # i want it all
+    Pxy::Switch = Lib_::Proxy_lib[].functional(
+        :arg, :long, :object_id, :short, :send ) do
+      def respond_to?  # i want it all
+        true
+      end
     end
 
                                   # (probaby being used to render option syn.)
