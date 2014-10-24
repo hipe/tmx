@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module ::Skylab::Porcelain::TestSupport::Bleeding::Namespace # #po-008
+module Skylab::Porcelain::TestSupport::Bleeding::Namespace # #po-008
 
   describe "[po][bl] namespace resolving" do
 

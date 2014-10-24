@@ -1,15 +1,15 @@
 require_relative '../test-support'
 
-module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
+module Skylab::Porcelain::TestSupport::Bleeding::Runtime
   ::Skylab::Porcelain::TestSupport::Bleeding[ Runtime_TestSupport = self ]
 
-  include CONSTANTS # so we can say `Bleeding` (the right one) in specs!
+  include Constants # so we can say `Bleeding` (the right one) in specs!
 
   Bleeding = self::Bleeding # #annoy -- *necessary* for the six-month @_todo's
   TestLib_ = TestLib_
 
   class Frame < ::Struct.new :klass, :argv, :debug
-    include CONSTANTS
+    include Constants
     TestLib_::Let[ self ]
 
     let :client do
@@ -19,7 +19,7 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
     end
 
     let :parent_client do
-      Callback_TestSupport_::Call_Digraph_Listeners_Spy.new(
+      Callback_.test_support.call_digraph_listeners_spy.new(
         :do_debug_proc, -> { debug } )
     end
 
@@ -30,7 +30,7 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
   end
 
   module Runtime_InstanceMethods
-    include CONSTANTS
+    include Constants
 
     def initialize rt=nil
       self.parent = rt
@@ -38,7 +38,7 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
     end
   end
 
-  module CONSTANTS
+  module Constants
     Frame = Frame
     Runtime_InstanceMethods = Runtime_InstanceMethods
   end
@@ -70,7 +70,7 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
   end
 
   module InstanceMethods
-    include CONSTANTS
+    include Constants
 
     TestLib_::Let[ self ]
 
@@ -81,7 +81,7 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
     let :subject do
       # frame itself is memoized with the closure hack
       frame.result # trigger it, possibly re-accessing a self-memoized value
-      frame.parent_client.emission_a # from the Call_Digraph_Listeners_Spy
+      frame.parent_client.emission_a # from the Call_Digraph_Listeners_Spy__
     end
   end
 end

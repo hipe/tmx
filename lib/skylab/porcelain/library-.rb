@@ -13,13 +13,23 @@ module Skylab::Porcelain
   end
 
   module Lib_
+
     sidesys = Autoloader_.build_require_sidesystem_proc
-    CLI = -> do
-      Headless__[]::CLI
+
+    Bsc__ = sidesys[ :Basic ]
+
+    CLI_lib = -> do
+      HL__[]::CLI
     end
+
+    HL__ = sidesys[ :Headless ]
+
     NLP = -> do
-      Headless__[]::NLP
+      HL__[]::NLP
     end
-    Headless__ = Headless_ = sidesys[ :Headless ]
+
+    String_lib = -> do
+      Bsc__[]::String
+    end
   end
 end

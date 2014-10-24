@@ -1,6 +1,6 @@
 require_relative 'runtime/test-support'
 
-module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime # #po-008
+module Skylab::Porcelain::TestSupport::Bleeding::Runtime # #po-008
 
   describe "[po][bl] runtime" do
 

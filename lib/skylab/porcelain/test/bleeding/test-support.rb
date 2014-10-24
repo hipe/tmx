@@ -5,11 +5,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
 
   ::Skylab::Porcelain::TestSupport[ Bleeding_TestSupport = self ] # #regret
 
-  module CONSTANTS
-    Callback_TestSupport_ = Callback_::TestSupport
-  end
-
-  include CONSTANTS
+  include Constants
 
   TestLib_ = TestLib_
 
@@ -17,7 +13,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
     extend TestLib_::Module_creator[]
     include TestLib_::Class_creator[]
 
-    include CONSTANTS
+    include Constants
 
     def base_module!
       (const = constantize description) !~ /\A[A-Z][_a-zA-Z0-9]*\z/ and fail("oops: #{const.inspect}")
@@ -33,7 +29,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
         send accessor # #kick #refactor
         box = send box_const
         ns = Bleeding::Namespace::Inferred.new box # #app-refactor
-        live = ns.build Callback_TestSupport_::Call_Digraph_Listeners_Spy.new( :debug )
+        live = ns.build Callback_.test_support.call_digraph_listeners_spy.new( :debug )
         kls = live.fetch action_token
         once = -> { kls }
         kls
@@ -48,8 +44,8 @@ module Skylab::Porcelain::TestSupport::Bleeding
   end
 
   module InstanceMethods
-    include TestLib_::CLI[]::Pen::Methods
-    include CONSTANTS
+    include TestLib_::CLI_lib[].pen.style_methods_module
+    include Constants
 
     attr_reader :base_module
 
@@ -69,7 +65,11 @@ module Skylab::Porcelain::TestSupport::Bleeding
     end
 
     def emit_spy
-      @emit_spy ||= Callback_TestSupport_::Call_Digraph_Listeners_Spy.new(
+      @emit_spy ||= bld_emit_spy
+    end
+
+    def bld_emit_spy
+      Callback_.test_support.call_digraph_listeners_spy.new(
         :do_debug_proc, -> { do_debug } )
     end
   end

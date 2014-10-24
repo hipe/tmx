@@ -4,10 +4,12 @@ module Skylab::Porcelain::TestSupport::Bleeding::Namespace
 
   ::Skylab::Porcelain::TestSupport::Bleeding[ Namespace_TestSupport = self ]
 
-  include CONSTANTS  # so you can say b. from there
+  include Constants  # so you can say b. from there
 
   Bleeding = Bleeding  # so you can reach b. from inside a class defintion
                        # inside a memoized `let` in a spec.
+
+  Callback_ = Callback_
 
   TestLib_ = TestLib_
 
@@ -16,12 +18,12 @@ module Skylab::Porcelain::TestSupport::Bleeding::Namespace
     last_number = 0
 
     define_method :namespace do |&blk|
-      define_method :_ordinary_module, & TestLib_::Memoize[ -> do
+      define_method :_ordinary_module, ( Callback_.memoize do
         mod = ::Module.new  # (you're still not in the text instance ctxt btw)
         Namespace_TestSupport.const_set "Xyzzy#{ last_number += 1 }", mod
         mod.module_exec(& blk )
         mod
-      end ]  # (note that there is an i.m `namespace` that will call above)
+      end )  # (note that there is an i.m `namespace` that will call above)
     end
 
     def token token
@@ -62,7 +64,7 @@ module Skylab::Porcelain::TestSupport::Bleeding::Namespace
         mod = _ordinary_module
         act = Bleeding::Namespace::Inferred.new mod
         tok = self.token
-        spy = Callback_TestSupport_::Call_Digraph_Listeners_Spy.new(
+        spy = Callback_.test_support.call_digraph_listeners_spy.new(
           :do_debug_proc, -> { do_debug } )
         result = act.find tok do |o|
           o.on_ambiguous { |txt| spy.call_digraph_listeners :ambiguous, txt }

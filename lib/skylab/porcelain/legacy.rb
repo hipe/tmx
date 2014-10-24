@@ -8,27 +8,41 @@ module Skylab::Porcelain::Legacy
   Porcelain_ = ::Skylab::Porcelain
 
   module Lib_
+
     sidesys = Autoloader_.build_require_sidesystem_proc
+
     Arity = -> do
-      Headless__[]::Arity
+      HL__[]::Arity
     end
+
     Face__ = sidesys[ :Face ]
-    Formal_box = -> do
-      MetaHell__[]::Formal::Box
-    end
-    Headless__ = Porcelain_::Lib_::Headless_
-    MetaHell__ = sidesys[ :MetaHell ]
+
+    HL__ = Porcelain_::Lib_::HL__
+
+    MH__ = sidesys[ :MetaHell ]
+
     Method_in_mod = -> i, mod do
-      MetaHell__[]::FUN.module_defines_method_in_some_manner[ mod, i ]
+      MH__[].method_is_defined_by_module i, mod
     end
+
     Name = -> do
-      Headless__[]::Name
+      HL__[]::Name
     end
+
+    Old_box_lib = -> do
+      MH__[]::Formal::Box
+    end
+
+    Old_name_lib = -> do
+      HL__[]::Name
+    end
+
+    Proxy_lib = -> do
+      Callback_::Proxy
+    end
+
     Plugin = -> do
       Face__[]::Plugin
-    end
-    Proxy = -> do
-      MetaHell__[]::Proxy
     end
   end
 
@@ -384,7 +398,7 @@ module Skylab::Porcelain::Legacy
     def initialize story_host_module
       @story_host_module = story_host_module
       @action_sheet = nil
-      @action_box = Lib_::Formal_box[]::Open.new
+      @action_box = Lib_::Old_box_lib[].open_box.new
       @action_box.enumerator_class = Action::Enumerator
       @ancestors_seen_h = { }
       @do_fuzzy = true  # note this isn't used internally by this class
@@ -395,7 +409,7 @@ module Skylab::Porcelain::Legacy
   class Action  # used as namespace here, re-opends below as class
   end
 
-  class Action::Enumerator < Lib_::Formal_box[]::Enumerator # (used by story)
+  class Action::Enumerator < Lib_::Old_box_lib[].enumerator  # (used by story)
 
     def [] k  # actually just fetch - will throw on bad key
       @box_p.call.fetch k
@@ -422,7 +436,7 @@ module Skylab::Porcelain::Legacy
       new.instance_exec do
         @is_collapsed = true  # don't take an unbound method as a name
         name = action_class.name
-        @name_function = Lib_::Name[]::Function.from_const(
+        @name_function = Lib_::Old_name_lib[].via_const(
           name[ name.rindex(':') + 1  ..  -1] )
         @action_subclient = -> request_client do
           action_class.new request_client, self
@@ -511,7 +525,7 @@ module Skylab::Porcelain::Legacy
         fail "sanity - action sheet is already collapsed (frozen)"
       else
         @is_collapsed = true
-        @name_function = Lib_::Name[]::Function.new unbound_method.name
+        @name_function = Lib_::Old_name_lib[].via_symbol unbound_method.name
         @unbound_method = unbound_method
         self
       end
@@ -543,7 +557,7 @@ module Skylab::Porcelain::Legacy
       # (this will be borked if ever you actually need truly deep names -
       # h.l has to be better at something! (just kidding, it's better at a lot!)
 
-      @full_name_proc ||= Lib_::Name[]::Function::Full.new [ @name_function ]
+      @full_name_proc ||= Lib_::Old_name_lib[].qualified.new [ @name_function ]
     end
 
     #         ~ catalyzing ~
@@ -680,7 +694,7 @@ module Skylab::Porcelain::Legacy
               instance_exec op, &blk
             end
             h = false                                 # is '-h' defined?
-            ea = Porcelain_::Lib_::CLI[]::Option::Enumerator.new op
+            ea = Porcelain_::Lib_::CLI_lib[].option.enumerator op
             help_is_defined = ea.detect do |sw|
               if sw.respond_to? :short
                 h = true if ! h && sw.short.include?( '-h' )
@@ -706,9 +720,11 @@ module Skylab::Porcelain::Legacy
     end
 
     def option_parser_scanner     # (assumes @option_parser !)
-      @option_parser_scanner ||= begin
-        Porcelain_::Lib_::CLI[]::Option::Parser::Scanner.new @option_parser
-      end
+      @option_parser_scanner ||= bld_op_scanner
+    end
+
+    def bld_op_scanner
+      Porcelain_::Lib_::CLI_lib[].option.parser.scanner @option_parser
     end
 
     def resolve_queue  # assume nonzero length queue
@@ -858,7 +874,7 @@ module Skylab::Porcelain::Legacy
 
     def render_option_syntax
       if option_parser
-        ea = Porcelain_::Lib_::CLI[]::Option::Enumerator.new option_parser
+        ea = Porcelain_::Lib_::CLI_lib[].option.enumerator option_parser
         parts = ea.reduce [] do |m, sw|
           if sw.respond_to?( :short ) && @switch_is_visible[ sw ]
             m << "[#{ sw.short.first || sw.long.first }#{ sw.arg }]"
@@ -941,7 +957,7 @@ module Skylab::Porcelain::Legacy
       if ::Array === ref
         fail "implement me - deep paths" if 1 < ref.length
         ref = ref.first
-        ref = Lib_::Name[]::FUN::Slugulate[ ref ]
+        ref = Lib_::Old_name_lib[].slugulate ref
       end
       self.class.story.fetch_action_sheet ref, self.class.story.do_fuzzy,
         -> do
@@ -997,7 +1013,7 @@ module Skylab::Porcelain::Legacy
 
     include Namespace::InstanceMethods
 
-    include Porcelain_::Lib_::CLI[]::Pen::InstanceMethods
+    include Porcelain_::Lib_::CLI_lib[].pen.instance_methods_module
 
     def invoke argv  # mutates argv. standard 3-arg result.
       exit_code, method, args = resolve_argv argv
@@ -1276,7 +1292,7 @@ module Skylab::Porcelain::Legacy
     attr_reader :normalized_parameter_name  # needed by a `fetch`
 
     def slug
-      Lib_::Name[]::FUN::Slugulate[ @normalized_parameter_name ]
+      Lib_::Old_name_lib[].slugulate @normalized_parameter_name
     end
 
     def string
@@ -1587,7 +1603,7 @@ module Skylab::Porcelain::Legacy
 
       ::Symbol === normalized_local_ns_name or fail 'get with the future'
       s1 = delete_action_sheet!
-      nf = Lib_::Name[]::Function.new normalized_local_ns_name
+      nf = Lib_::Old_name_lib[].new normalized_local_ns_name
       s2 = s1.collapse_as_namespace nf,
         ext_ref, inline_def, xtra_h, @story_host_module
       @action_box.add s2.normalized_local_node_name, s2

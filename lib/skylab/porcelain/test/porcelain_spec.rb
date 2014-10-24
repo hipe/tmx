@@ -23,8 +23,7 @@ module Skylab::Porcelain::TestSupport
 
     let(:instance) do
       kls = klass
-      if TestLib_::Method_is_defined_by_module[
-          :listeners_digraph, kls.singleton_class ]
+      if TestLib_::Method_is_defined_by_module[ :listeners_graph, kls.singleton_class ]
         # test both ways of event wiring..
         inst = kls.new do |o|
           # (tombstone of a great [#bm-008] vector)
@@ -36,7 +35,7 @@ module Skylab::Porcelain::TestSupport
         end
       else
         if do_debug
-          @_stderr ||= TestSupport::IO::Spy.new :do_debug, true, :debug_IO, debug_IO
+          @_stderr ||= TestSupport::IO.spy( :do_debug, true, :debug_IO, debug_IO )
         end
         inst = kls.new nil, _stderr, _stderr
       end
@@ -226,7 +225,7 @@ module Skylab::Porcelain::TestSupport
         end # optional
         context "a syntax for arguments of" do
           let(:otherwise) { lambda { |msg| _stderr.puts msg ; false } }
-          pen = TestLib_::CLI[]::Pen::MINIMAL
+          pen = TestLib_::CLI_lib[].pen.minimal_instance
           define_method :pen do pen end
           context "zero-length" do
             let(:syntax) { Porcelain::Legacy::Argument::Syntax.from_string('').argument_syntax_subclient pen }

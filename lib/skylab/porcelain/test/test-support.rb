@@ -10,7 +10,7 @@ module Skylab::Porcelain::TestSupport
 
   TestLib_ = ::Module.new
 
-  module CONSTANTS
+  module Constants
     Bleeding = ::Skylab::Porcelain::Bleeding
     Callback_ = Callback_
     Porcelain = ::Skylab::Porcelain
@@ -18,39 +18,51 @@ module Skylab::Porcelain::TestSupport
     TestSupport = ::Skylab::TestSupport
   end
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport::Quickie
 
   module TestLib_
+
     sidesys = Autoloader_.build_require_sidesystem_proc
+
+    Bsc__ = sidesys[ :Basic ]
+
     Class_creator = -> do
-      MetaHell__[]::Class::Creator
+      MH__[]::Class::Creator
     end
-    CLI = -> do
-      Headless__[]::CLI
+
+    CLI_lib = -> do
+      HL__[]::CLI
     end
+
     Constantize_proc = -> do
       Callback_::Name.lib.constantize
     end
-    Headless__ = sidesys[ :Headless ]
+
+    HL__ = sidesys[ :Headless ]
+
     Let = -> mod do
-      mod.extend MetaHell__[]::Let
+      mod.extend MH__[]::Let
     end
-    Memoize = -> p do
-      MetaHell__[]::FUN.memoize[ p ]
-    end
-    MetaHell__ = sidesys[ :MetaHell ]
+
+    MH__ = sidesys[ :MetaHell ]
+
     Method_is_defined_by_module = -> i, mod do
-      MetaHell__[]::FUN.module_defines_method_in_some_manner[ mod, i ]
+      MH__[].method_is_defined_by_module i, mod
     end
+
     Module_creator = -> do
-      MetaHell__[]::Module::Creator
+      MH__[]::Module::Creator
+    end
+
+    String_lib = -> do
+      Bsc__[]::String
     end
   end
 
   module ModuleMethods
-    include CONSTANTS
+    include Constants
     include TestLib_::Class_creator[]::ModuleMethods  # klass etc
 
     define_method :constantize, & TestLib_::Constantize_proc[]
@@ -71,13 +83,12 @@ module Skylab::Porcelain::TestSupport
   end
 
   module InstanceMethods
-   include CONSTANTS
+   include Constants
    include TestLib_::Class_creator[]::InstanceMethods  # klass!
 
-   define_method :style_free, & TestLib_::CLI[]::Pen::FUN.unstyle
+   define_method :style_free, TestLib_::CLI_lib[].pen.unstyle
 
-   define_method :unstyle_styled,
-     & TestLib_::CLI[]::Pen::FUN.unstyle_styled
+   define_method :unstyle_styled, TestLib_::CLI_lib[].pen.unstyle_styled
 
    define_method :constantize, & TestLib_::Constantize_proc[]
 

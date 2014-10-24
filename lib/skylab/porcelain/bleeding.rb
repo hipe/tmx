@@ -18,7 +18,7 @@ module Skylab::Porcelain::Bleeding
 
   module Styles
     include Lib_::NLP[]::EN::Methods
-    include Porcelain_::Lib_::CLI[]::Pen::Methods
+    include Porcelain_::Lib_::CLI_lib[].pen.style_methods_module
     extend self
     def em(s)  ; stylize(s, :green         )   end
     def hdr(s) ; stylize(s, :strong, :green)   end
@@ -489,7 +489,7 @@ module Skylab::Porcelain::Bleeding
     alias_method :names, :_self # hook for stubbing
   end
 
-  class Constants < ActionEnumerator
+  class Constants_ < ActionEnumerator
 
     def init mod
       mod or fail 'sanity - where is mod'
@@ -723,7 +723,7 @@ module Skylab::Porcelain::Bleeding
     Adapter = Adapter # see above. monadic.
 
     def actions
-      Actions[ Constants[action_anchor_module], Officious.actions ]
+      Actions[ Constants_[action_anchor_module], Officious.actions ]
     end
 
     def action_anchor_module
@@ -821,7 +821,7 @@ module Skylab::Porcelain::Bleeding
     def actions
       action_anchor_module or fail "sanity - where is action_anchor_module - #{
         }call _namespace_inferred_init on construction"
-      c = Constants[action_anchor_module]
+      c = Constants_[ action_anchor_module ]
       o = Officious.actions
       x = Actions[c, o]
       x
@@ -849,7 +849,7 @@ module Skylab::Porcelain::Bleeding
 
   module Officious   # (imagine this is called 'Actions')
     def self.actions
-      Constants[self]
+      Constants_[ self ]
     end
   end
 
