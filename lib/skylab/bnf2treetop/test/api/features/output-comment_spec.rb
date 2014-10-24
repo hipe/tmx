@@ -1,9 +1,12 @@
 require_relative 'test-support'
 
-describe "#{::Skylab::Bnf2Treetop::API} feature \"output comment\"" do
+describe "[bnf2tt] API feature - output comment" do
+
   extend ::Skylab::Bnf2Treetop::API::Features::TestSupport
+
   it "passes-thru comments with the VERY EXPERIMENTAL #{
     }(output \"...\") syntax" do
+
     here = <<-HERE.unindent
       # this file is fed into bnf2treetop which gives (output "..") special meaning
       # (output "this grammar was generated")

@@ -1,6 +1,7 @@
 require_relative 'cli/test-support'
 
-describe "#{Skylab::Bnf2Treetop} CLI integration" do
+describe "[bnf2tt] CLI integration" do
+
   extend ::Skylab::Bnf2Treetop::TestSupport::CLI
 
   def error msg_re
@@ -22,7 +23,7 @@ describe "#{Skylab::Bnf2Treetop} CLI integration" do
 
   def options_listing
     unstyle(err.shift).should eql('options:')
-    (10..17).should cover(err.length)
+    ( 10..17 ).should be_include err.length
     err.detect { |s| /\A[[:space:]]/ !~ s }.should eql(nil)
   end
 
@@ -65,7 +66,7 @@ describe "#{Skylab::Bnf2Treetop} CLI integration" do
     invoke self::FIXTURES.join('xml-names.bnf').to_s
     it 'works!' do
       err.length.should eql(0)
-      (10..30).should cover(out.length) # e.g. 19
+      ( 10..30 ).should be_include out.length  # e.g. 19
       out.first.should eql('  rule name_start_char')
       out.last.should eql('  end')
     end

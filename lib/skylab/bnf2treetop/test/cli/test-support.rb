@@ -1,9 +1,23 @@
 require_relative '../test-support'
-require 'skylab/test-support/core' # IO::Spy
-require 'skylab/headless/core' # unstyle
 
 module Skylab::Bnf2Treetop::TestSupport
-  Bnf2Treetop = ::Skylab::Bnf2Treetop
+
+  BNF2TT_ = ::Skylab::Bnf2Treetop
+  Callback_ = ::Skylab::Callback
+  TestSupport_ = ::Skylab::TestSupport
+
+  module TestLib_
+
+    sidesys = Callback_::Autoloader.build_require_sidesystem_proc
+
+    CLI_lib = -> do
+      HL__[]::CLI
+    end
+
+    HL__ = sidesys[ :Headless ]
+
+  end
+
   module CLI
     def self.extended mod
       mod.module_eval do
@@ -16,9 +30,9 @@ module Skylab::Bnf2Treetop::TestSupport
     def invoke *argv, &output_p
       ::Hash === argv.last and tags = argv.pop # BE CAREFUL!!!!
       let(:_frame) do
-        errstream = ::Skylab::TestSupport::IO::Spy.new
-        outstream = ::Skylab::TestSupport::IO::Spy.new
-        cli = Bnf2Treetop::CLI.new(outstream, errstream)
+        errstream = TestSupport_::IO.spy.new
+        outstream = TestSupport_::IO.spy.new
+        cli = BNF2TT_::CLI.new(outstream, errstream)
         cli.program_name = 'bnf2treetop'
         o = ::Struct.new(:debug_p, :err_p, :out_p).new  # :+[#hl-078] "shell"
         o.debug_p = ->{ outstream.debug!; errstream.debug! }
@@ -60,6 +74,8 @@ module Skylab::Bnf2Treetop::TestSupport
     def err    ; _frame.err_p.call   end
     def out    ; _frame.out_p.call   end
 
-    define_method :unstyle, & ::Skylab::Headless::CLI::Pen::FUN.unstyle
+    def unstyle x
+      TestLib_::CLI_lib[].pen.unstyle x
+    end
   end
 end

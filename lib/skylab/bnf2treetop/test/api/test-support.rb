@@ -1,11 +1,13 @@
 require_relative '../test-support'
 
 module Skylab::Bnf2Treetop::API::TestSupport
+
   def self.extended mod
     mod.module_eval do
       include InstanceMethods
     end
   end
+
   module InstanceMethods
 
     attr_reader :info

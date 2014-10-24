@@ -1,7 +1,9 @@
 require_relative 'test-support'
 
-describe "#{::Skylab::Bnf2Treetop::API} feature \"modeline\"" do
+describe "[bnf2tt] API feature - modeline" do
+
   extend ::Skylab::Bnf2Treetop::API::Features::TestSupport
+
   it "lets you use any command-line options also as \"modeline\" params" do
     here = <<-HERE.unindent
       # bnf2treetop: set s e=\':\' g="Foo::BarBiff::Baz":
