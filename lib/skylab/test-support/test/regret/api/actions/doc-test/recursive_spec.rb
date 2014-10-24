@@ -54,7 +54,7 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest::RS_
     end
 
     def initial_writable_spy
-      TestSupport_::IO::Spy.new(
+      TestSupport_::IO.spy.new(
         :do_debug_proc, -> { do_debug },
         :debug_IO, debug_IO )
     end

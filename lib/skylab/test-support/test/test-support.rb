@@ -4,16 +4,16 @@ module Skylab::TestSupport::TestSupport
 
   TestSupport_ = ::Skylab::TestSupport
 
-  module CONSTANTS
+  module Constants
     EMPTY_A_ = TestSupport_::EMPTY_A_
     EMPTY_S_ = TestSupport_::EMPTY_S_
     Lib_ = TestSupport_::Lib_
     TestSupport_ = TestSupport_
   end
 
-  CONSTANTS::TS_TS_ = self
+  Constants::TS_TS_ = self
 
-  include CONSTANTS
+  include Constants
 
   TestSupport_::Regret[ self ]
 
@@ -32,19 +32,16 @@ module Skylab::TestSupport::TestSupport
 
   module TestLib_
 
-    sidesys = TestSupport_::Autoloader_.build_require_sidesystem_proc
-
     Face_module = -> do
       TestSupport_::Lib_::Face__[]
     end
 
-    Headless__ = ::Skylab::TestSupport::Lib_::Headless__
-
-    System_pathnames_calculate = -> p do
-      _pn = Subsystem__[]::PATHNAMES
-      _pn.module_exec( & p )  # call it 'calculate' instead and #core-dump
+    Supernode_binfile = -> do
+      TestSupport_::Autoloader_.require_sidesystem( :TMX ).supernode_binfile
     end
 
-    Subsystem__ = sidesys[ :Subsystem ]
+    System = -> do
+      TestSupport_::Lib_::System[]
+    end
   end
 end

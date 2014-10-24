@@ -4,7 +4,7 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest::Specer__
 
   ::Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

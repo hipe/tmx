@@ -51,7 +51,7 @@ module Skylab::TestSupport
         end
       end
 
-      Dash_ = QuicLib_::CLI_starts_with_dash
+      Dash_ = QuicLib_::CLI_lib[].option.starts_with_dash
 
       def beginning_eventpoint_notify
         # at our notification of the beginning, we do the work that needs
@@ -113,8 +113,7 @@ module Skylab::TestSupport
 
       def my_get_any_test_path_a
         found_all = true ; lg = local_glob
-        p = QuicLib_::String[]::FUN::
-          Build_proc_for_string_ends_with_string[ _spec_rb ]
+        p = QuicLib_::String_lib[].build_proc_for_string_ends_with_string _spec_rb
         path_a = @input_path_a.reduce [] do |m, path|
           if p[ path ]
             m << path
@@ -137,7 +136,7 @@ module Skylab::TestSupport
       end
 
       def _spec_rb
-        TestSupport_::FUN::Spec_rb[]
+        TestSupport_.spec_rb
       end
 
       def files_not_found path

@@ -36,7 +36,7 @@ module Skylab::TestSupport
 
       def money_for_single_path
         @last_s = @lcbp_a.fetch( -1 )
-        @tail_s = TestSupport_::FUN::Spec_rb[]
+        @tail_s = TestSupport_.spec_rb
         @rx = /#{ ::Regexp.escape @tail_s }\z/
         if @rx !~ @tail_s
           when_tail_part_did_not_match

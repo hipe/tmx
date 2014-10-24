@@ -1,4 +1,4 @@
-module ::Skylab::TestSupport
+module Skylab::TestSupport
 
   module Regret
 

@@ -26,7 +26,7 @@ of events on these channels with respect to each other, as opposed to
 that which may group the events first by channel, and then by order.
 
 this node manages a group of special stream spies, creating each one in turn
-with `IO::Spy::Group#for` with a name you choose for each stream spy.
+with `IO.spy.group#for` with a name you choose for each stream spy.
 
 When any of those stream-likes gets written to (with `<<`, `write`, `puts`,
 e.g) and that data has a newline in it, this puppy will create a "line"

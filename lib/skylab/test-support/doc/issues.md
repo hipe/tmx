@@ -32,5 +32,5 @@
 [#005] #open #quickie #redundant s-tylize
 [#004] #open quickie: module names into fashion (and now narrative)
 [#003]       #done rename `all_specs.rb` -> all
-[#002]       #done CONSTANTS too
+[#002]       #done Constants too
 [#001]       #done regret

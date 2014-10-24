@@ -19,7 +19,8 @@ module Skylab::TestSupport::Regret::API
     end
 
     def get_template i
-      Lib_::Template[ self.class.dir_pathname.join( "#{ i }#{ EXT__ }" ).read ]
+      Lib_::String_lib[].template.from_path(
+        self.class.dir_pathname.join "#{ i }#{ EXT__ }" )
     end
 
     # ~ option support & hook-outs
@@ -196,9 +197,7 @@ module Skylab::TestSupport::Regret::API
       end
     end
 
-    FUN = ::Module
-
-    FUN::Descify = -> do
+    define_singleton_method :descify, -> do
       rx = /:\z/
       -> str do
         no_colon = str.gsub rx, EMPTY_S_

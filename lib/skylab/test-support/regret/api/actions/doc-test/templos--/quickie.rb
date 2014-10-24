@@ -37,20 +37,27 @@ module Skylab::TestSupport::Regret::API
     def initialize snitch, base_mod, c_a, b_a
       @snitch = snitch
 
-      ctxt = tstt = beft =
-        rtma = rbma = rlma = nil  # memoize articulators just for the snarks
+      ctxt = tstt = beft = nil
 
-      rlma = RegretLib_::Memoize[ -> do
-        mgn = tstt.first_margin_for :code
-        mgn =~ /\A[ ]+\z/ or fail "sanity - clean margin? #{ mgn.inspect }"
-        RegretLib_::List[]::Marginated::Articulation.new do
-          any_subsequent_items -> s do
-            if s.length.zero? then "\n" else
-              "\n#{ mgn }#{ s }"  # don't add trailing spaces
+      rlma = Callback_.memoize do
+
+        _MARGIN = tstt.first_margin_for :code
+
+        Callback_::Scn.articulators.eventing(
+          :any_subsequent_items, -> y, x do
+            if x.length.zero?
+              y << NEWLINE_
+            else
+              y << "#{ NEWLINE_ }#{ _MARGIN }#{ x }"  # don't add trailing spaces
             end
-          end
-        end
-      end ]
+          end,
+          :y, [],
+          :flush, -> y do
+            x = y * EMPTY_S_
+            y.clear
+            x
+          end )
+      end
 
       render_before = -> befor, cnum do
         beft[
@@ -72,27 +79,27 @@ module Skylab::TestSupport::Regret::API
         example: render_example }.freeze
 
       render_tests = -> blk, cnum do
-        y = ( rtma ||= RegretLib_::List[]::Marginated::Articulation.new "\n" )
+        y = Resolve_newline_line_joiner__[]
         part_a = self.class::Context__::Part_.resolve_parts blk, rlma
         part_a.each do |part|
-          y << template_h.fetch( part.template_i )[ part, cnum ]
+          y.puts template_h.fetch( part.template_i )[ part, cnum ]
         end
         y.flush
       end
 
       context_descify = -> blk, num do
         if blk.first_other
-          API::Support::Templo_::FUN::Descify[ blk.first_other ]
+          API::Support::Templo_.descify blk.first_other
         else
           "context #{ num }".inspect
         end
       end
 
       render_body = -> do
-        y = ( rbma ||= RegretLib_::List[]::Marginated::Articulation.new "\n" )
+        y = Resolve_newline_line_joiner__[]
         b_a.each do |blk|
           num = y.count + 1
-          y << ctxt[
+          y.puts ctxt[
             num: num,
             dsc: context_descify[ blk, num ],
             body: render_tests[ blk, num ]
@@ -162,6 +169,21 @@ module Skylab::TestSupport::Regret::API
     end.call
 
     OPTION_PROCEDE__ = nil
+
+    Resolve_newline_line_joiner__ = Callback_.memoize do  # SO DODGY but fun
+      Callback_::Scn.articulators.eventing(
+        :any_subsequent_items, -> y, x do
+          y.push "#{ NEWLINE_ }#{ x }" ; nil
+        end,
+        :y, [],
+        :flush, -> y do
+          x = y * EMPTY_S_
+          y.clear
+          x
+        end
+      )
+    end
+
     SUCCESS_EXITSTATUS__ = 0
     SUCCEEDED__ = true
 

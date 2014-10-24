@@ -235,30 +235,26 @@ module Skylab::TestSupport
 
     module QuicLib_
 
-      Basic__ = TestSupport_::Lib_::Basic__
+      Bsc__ = TestSupport_::Lib_::Bsc__
 
-      CLI_basic_switch_index = -> sw do
-        Headless__[]::CLI::Option::FUN.basic_switch_index_curry[ sw ]
-      end
-
-      CLI_starts_with_dash = -> s do
-        Headless__[]::CLI::Option::FUN.starts_with_dash[ s ]
+      CLI_lib = -> do
+        HL__[]::CLI
       end
 
       EN_number = -> d do
-        Headless__[]::NLP::EN::Number::FUN.number[ d ]
+        HL__[]::NLP::EN::Number.number d
       end
 
       Function_chain = -> * p_a do
-        MetaHell__[]::FUN::Function_chain_[ p_a, nil ]
+        MH__[].function_chain[ p_a, nil ]
       end
 
-      Headless__ = TestSupport_::Lib_::Headless__
+      HL__ = TestSupport_::Lib_::HL__
 
-      MetaHell__ = TestSupport_::Lib_::MetaHell__
+      MH__ = TestSupport_::Lib_::MH__
 
       Name_const_basename = -> s do
-        Headless__[]::Name::FUN::Const_basename[ s ]
+        HL__[]::Name.const_basename s
       end
 
       Match_test_dir_proc = -> do
@@ -270,13 +266,13 @@ module Skylab::TestSupport
       Oxford_or = Callback_::Oxford_or
 
       Pretty_path = -> x do
-        Headless__[]::CLI::PathTools::FUN::Pretty_path[ x ]
+        HL__[].system.file_system.path_toosl.pretty_path x
       end
 
       Scanner = Lib_::Scanner
 
-      String = -> do
-        Basic__[]::String
+      String_lib = -> do
+        Bsc__[]::String
       end
 
       SubTree__ = Autoloader_.build_require_sidesystem_proc :SubTree

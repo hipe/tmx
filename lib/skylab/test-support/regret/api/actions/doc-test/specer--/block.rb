@@ -1,6 +1,6 @@
 class Skylab::TestSupport::Regret::API::Actions::DocTest
 
-  Specer__::Block = RegretLib_::Procs_as_methods[ :accept, :flush ]
+  Specer__::Block = RegretLib_::Ivars_with_procs_as_methods[].new :accept, :flush
 
   class Specer__::Block
 

@@ -183,7 +183,7 @@ module Skylab::TestSupport
         /\A\d+\z/ =~ pid_s or break warn( "pid file content is not a #{
           }digit: #{ pid_s.inspect }" )
         cmd = "ps -p #{ pid_s } -o%cpu -ostat"
-        hack_a = `#{ cmd }`.strip.split "\n"  # [#sl-120]
+        hack_a = `#{ cmd }`.strip.split NEWLINE_  # [#sl-120]
         header = hack_a.shift
         '%CPU STAT' == header or break warn( "failed to parse first line #{
           }of ps response - #{ header.inspect }" )

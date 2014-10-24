@@ -13,6 +13,11 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
 
     attr_reader :line, :no, :col
 
+
+    def clear_for_pool
+      # be careful
+    end
+
     -> do
       fmt = '%3d'
       define_method :describe do
@@ -30,7 +35,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     end
   end
 
-  Comment_::Scanner_ = RegretLib_::Procs_as_methods.call :gets do
+  Comment_::Scanner_ = RegretLib_::Ivars_with_procs_as_methods[].new :gets do
     class << self
       alias_method :[], :new
     end

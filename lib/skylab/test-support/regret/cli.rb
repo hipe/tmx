@@ -146,10 +146,10 @@ module Skylab::TestSupport
     end
 
     def say_bad_keys bad_a
-      RegretLib_::EN[ -> do
+      RegretLib_::EN_calculate.call do
        "the #{ and_ bad_a.map( & Cleanup_hack__ ) } option#{ s } #{
          }#{ s :is } not supported with the recursive option."
-      end ]
+      end
     end
 
     WHITE_A__ = %i( core_basename do_force recursive_o vtuple ).freeze
@@ -169,8 +169,8 @@ module Skylab::TestSupport
   public
 
     option_parser do |o|
-      o.separator "\n#{ hi 'description:' } make intermediate test files."
-      o.separator "always safe to run - never clobbers.\n\n"
+      o.separator "#{ NEWLINE_ }#{ hi 'description:' } make intermediate test files."
+      o.separator "always safe to run - never clobbers.#{ NEWLINE_ }#{ NEWLINE_ }"
       o.separator "#{ hi 'options:' }"
 
       @param_h[:do_preview] = nil

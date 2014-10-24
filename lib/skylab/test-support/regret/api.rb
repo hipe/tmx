@@ -13,93 +13,123 @@ module Skylab::TestSupport
       EMPTY_S_ = EMPTY_S_
       Lib_ = TestSupport_::Lib_
       Library_ = TestSupport_::Library_
+      NEWLINE_ = TestSupport_::NEWLINE_
       Plugin_ = TestSupport_::Lib_::Heavy_plugin[]
       Regret = Regret
       TestSupport_ = TestSupport_
       WRITEMODE_ = 'w'.freeze
 
       module RegretLib_
+
+        sidesys = TestSupport_::Autoloader_.build_require_sidesystem_proc
+
         Autoloader = -> do
           Autoloader_
         end
-        Basic__ = Lib_::Basic__
+
+        Bsc__ = Lib_::Bsc__
+
         Basic_Fields = -> * x_a do
-          MetaHell__[]::Basic_Fields.via_iambic x_a
+          MH__[]::Basic_Fields.via_iambic x_a
         end
+
         Box = Lib_::Box
-        CLI_stylify = -> a, x do
-          Headless__[]::CLI::Pen::FUN::Stylify[ a, x ]
+
+        CLI_lib = -> do
+          HL__[]::CLI
         end
-        Define_methods_for_procs_in_ivars = -> mod, * i_a do
-          MetaHell__[]::Function.define_public_methods_on_client i_a, mod
-        end
+
         Dev_null = -> do
-          Headless__[]::IO::DRY_STUB
+          HL__[]::IO.dry_stub_instance
         end
-        EN = -> p do
-          Headless__[]::NLP::EN.calculate( & p )
+
+        EN_calculate = -> & p do
+          HL__[].expression_agent.NLP_EN_agent.calcuate( & p )
         end
+
         EN_add_methods = -> mod, * x_a do
-          Headless__[]::SubClient::EN_FUN.on_mod_via_iambic mod, x_a
+          HL__[].expression_agent.NLP_EN_methods.on_mod_via_iambic mod, x_a
         end
+
         Field_exponent_proc = -> do
-          MetaHell__[]::Parse::Fields::Exponent
+          MH__[]::Parse.fields.exponent
         end
+
         Hashtag_scanner = -> s do
           Snag__[]::Models::Hashtag.scanner s
         end
-        Headless__ = Lib_::Headless__
+
+        HL__ = Lib_::HL__
+
         Ick = -> x do
-          MetaHell__[].strange x
+          MH__[].strange x
         end
-        List = -> do
-          Basic__[]::List
+
+        Ivars_with_procs_as_methods = -> * a do
+          MH__[]::Ivars_with_Procs_as_Methods.via_arglist a
         end
-        Levenshtein = -> sep, p, d, a, s do
-          Headless__[]::NLP::EN::Levenshtein::
-            With_conj_s_render_p_closest_n_items_a_item_x[ sep, p, d, a, s ]
+
+        IT__ = sidesys[ :InformationTactics ]
+
+        Levenshtein = -> do
+          IT__[]::Levenshtein
         end
-        Memoize = -> p do
-          Callback_.memoize[ p ]
-        end
-        MetaHell__ = Lib_::MetaHell__
+
+        MH__ = Lib_::MH__
+
         Name_normal_to_slug = -> i do
-          Headless__[]::Name::FUN::Slugulate[ i ]
+          HL__[]::Name.slugulate( i )
         end
+
         Name_slug_to_const = -> s do
-          s_ = Headless__[]::Name::FUN::Metholate[ s ]
+          s_ = HL__[]::Name.metholate( s )
           s_[ 0 ] = s_[ 0 ].upcase
           s_.intern
         end
+
         Name_symbol_to_label = -> i do
-          Headless__[]::Name::FUN::Labelize[ i ].downcase
+          HL__[]::Name.labelize( i ).downcase
         end
+
         Oxford_or = TestSupport_::Callback_::Oxford_or
+
         Parse_alternation = -> do
-          MetaHell__[]::Parse.alternation
+          MH__[]::Parse.alternation
         end
-        sidesys = TestSupport_::Autoloader_.build_require_sidesystem_proc
+
+        Patch_lib = -> do
+          System[].patch
+        end
+
         Path_tools_clear = -> do
-          Headless__[]::CLI::PathTools.clear
+          HL__[].system.filesystem.path_tools.clear
         end
+
         Pathname_union = -> a do
-          Basic__[]::Pathname::Union[ * a ]
+          Bsc__[]::Pathname::Union[ * a ]
         end
+
         Pool = -> mod do
-          MetaHell__[]::Pool.enhance mod
+          MH__[]::Pool.enhance mod
         end
+
         Pretty_path_proc = -> do
-          Headless__[]::CLI::PathTools::FUN.pretty_path
+          HL__[].system.filesystem.path_tools.pretty_path
         end
-        Procs_as_methods = Lib_::Procs_as_methods
+
         Scanner = Lib_::Scanner
+
         Snag__ = sidesys[ :Snag ]
+
         Struct = Lib_::Struct
+
+        System = -> do
+          HL__[].system
+        end
+
         SubTree__ = sidesys[ :SubTree ]
 
-        Text_patch = -> do
-          Headless__[]::Text::Patch
-        end
+
         Tree_walker = -> * x_a do
           SubTree__[]::Walker.new x_a
         end

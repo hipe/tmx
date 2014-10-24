@@ -1,8 +1,34 @@
 module Skylab::TestSupport
 
-  IO = ::Module.new
+  module IO  # ~ stowaway
 
-  class IO::Spy < TestSupport_::Lib_::IO[]::Interceptors::Tee  # :[#023] ..
+    class << self
+      def spy * a
+        if a.length.zero?
+          Spy__
+        else
+          Spy__.new( * a )
+        end
+      end
+    end
+  end
+
+  class IO::Spy__ < TestSupport_::Lib_::IO[]::Mappers::Tee  # :[#023] ..
+
+    class << self
+
+      def group
+        Spy_::Group__
+      end
+
+      def triad * a
+        if a.length.zero?
+          Spy_::Triad__
+        else
+          Spy_::Triad__.new( * a )
+        end
+      end
+    end
 
     class Shell__  # too hard to do this in a basic object
 
@@ -83,7 +109,7 @@ module Skylab::TestSupport
         _puts_map_proc = @puts_map_proc
       end
       _niladic_pass_filter_proc = @do_debug_p
-      _io = TestSupport_::Lib_::IO[]::Interceptors::Filter.new(
+      _io = TestSupport_::Lib_::IO[]::Mappers::Filter.new(
         :downstream_IO, _downstream_IO,
         :line_begin_string, _line_begin_string,
         :niladic_pass_filter_proc, _niladic_pass_filter_proc,
@@ -91,7 +117,9 @@ module Skylab::TestSupport
       @muxer.add DEBUG_I__, _io ; nil
     end
 
-    BUFFER_I__ = :buffer ; DEBUG_I__ = :debug  # ok to open up if needed
+    BUFFER_I__ = :buffer
+    DEBUG_I__ = :debug  # ok to open up if needed
+    Spy_ = self
 
   end
 end

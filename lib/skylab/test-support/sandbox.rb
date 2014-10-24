@@ -107,7 +107,7 @@ module Skylab::TestSupport::Sandbox
 
   Shell_ = Lib_::Enhancement_shell[ :kiss_with, :produce_subclasses_of ]
 
-  Kernel_ = Lib_::Procs_as_methods.call :flush do
+  Kernel_ = Lib_::Ivars_with_procs_as_methods[].new :flush do
 
     def initialize sb_mod, kiss_with, superklass
       @flush = -> do
@@ -139,7 +139,7 @@ module Skylab::TestSupport::Sandbox
     end
   end
 
-  Host::Kernel_ = Lib_::Procs_as_methods.call :flush do
+  Host::Kernel_ = Lib_::Ivars_with_procs_as_methods[].new :flush do
 
     def initialize anchor_mod
 
@@ -166,13 +166,13 @@ module Skylab::TestSupport::Sandbox
 
       engine = self
       @define_sandbox_constant_proc = -> do
-        -> i, &b do
+        -> i, & block_p do
           x = nil
           p = -> do
             p = nil
             sb = self::Sandbox
             list_a = sb.constants
-            b.call  # execute this in its original context.
+            block_p[]  # execute this in its original context.
             list_b = sb.constants - list_a
             list_b.length.zero? and fail "no constants were added to #{
               }#{ sb } by block - #{ b }"
@@ -202,8 +202,8 @@ module Skylab::TestSupport::Sandbox
       end
     end
 
-    Lib_::Proc_as_method[ self ].
-      as_public_getter :define_sandbox_constant_proc   # grease
+    Lib_::Ivars_with_procs_as_methods[ self ].
+      as_public_getter :define_sandbox_constant_proc  # grease
 
   end
 end

@@ -198,8 +198,8 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     end
 
     def infr_unloaded_anchored_const_a_from_tail_path
-      Regret::FUN::Const_inferer__[
-        :tail_path, @tail_path, :notice_p, -> s { @snitch.notice { s } } ]
+      Regret.infer_const :tail_path, @tail_path,
+        :notice_p, -> s { @snitch.notice { s } }
     end
 
     def rslv_corrected_anchored_const_a_from_c_a

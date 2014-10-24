@@ -2,15 +2,22 @@ module Skylab::TestSupport
 
   module Regret  # read [#017] the introduction to regret
 
-    def self.[] mod
+    class << self
+
+      def [] mod
       if ! mod.respond_to? :dir_pathname  # #storypoint-35
-        s_a = mod.name.split CONST_SEP_
+        s_a = mod.name.split CONST_SEP_  # rewrite of :+[#ba-034]
         s_a.pop
         _parent_mod = s_a.reduce( ::Object ) { |m, s| m.const_get s, false }
         Autoloader_[ mod, _parent_mod.dir_pathname.join( TEST_DIR_FILENAME__ ) ]
       end
       mod.extend Anchor_ModuleMethods
       mod.initialize_for_regret_with_parent_anchor_mod nil
+      end
+
+      def infer_const * x_a
+        Regret_::Infer_const__[ * x_a ]
+      end
     end
 
     TEST_DIR_FILENAME__ = 'test'.freeze
@@ -21,7 +28,7 @@ module Skylab::TestSupport
         if ! mod.respond_to? :dir_pathname
           n = mod.name
           _const = n[ n.rindex( ':' ) + 1 .. -1 ]
-          _filename = Callback_::Name.from_const( _const ).as_slug
+          _filename = Callback_::Name.via_const( _const ).as_slug
           autoloaderize_with_filename_child_node _filename, mod
         end
         mod.extend Anchor_ModuleMethods
@@ -50,7 +57,7 @@ module Skylab::TestSupport
 
         o = Bump_module__.curry[ self ]
 
-        o[ :CONSTANTS, -> do
+        o[ :Constants, -> do
           pam and include pam.constants_module
         end ]
 
@@ -79,7 +86,7 @@ module Skylab::TestSupport
     # ~ as parent
 
       def constants_module
-        const_get :CONSTANTS, false
+        const_get :Constants, false
       end
 
       def instance_methods_module
@@ -140,6 +147,7 @@ module Skylab::TestSupport
     Autoloader_ = Autoloader_
     CONST_SEP_ = '::'.freeze
     NEAREST__ = :nearest_test_node
+    Regret_ = self
 
   end
 end

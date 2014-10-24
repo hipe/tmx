@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module ::Skylab::TestSupport::TestSupport::Quickie
+module Skylab::TestSupport::TestSupport::Quickie
 
   TestSupport_ = ::Skylab::TestSupport
   TestSupport_::TestSupport[ Quickie_TestSupport = self ]

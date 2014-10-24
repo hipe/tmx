@@ -1,16 +1,31 @@
 module Skylab::TestSupport
 
-  class IO::Spy::Triad < ::Struct.new :instream, :outstream, :errstream
+  class IO::Spy__::Triad__ < ::Struct.new :instream, :outstream, :errstream
 
     # see [#020] a comparison of different IO spy aggregations
     # the TL;DR is that this class may be deprecated.
+
+    class << self
+
+      def mock_noninteractive_STDIN_class
+        Mock_Noninteractive_STDIN__
+      end
+
+      def mock_noninteractive_STDIN_instance
+        MOCK_NONINTERACTIVE_STDIN__
+      end
+
+      def mock_interactive_STDIN_instance
+        MOCK_INTERACTIVE_STDIN__
+      end
+    end
 
     def initialize *three
       @do_debug = nil
       three.length > 3 and raise ::ArgumentError, "it's three bro"
       1.upto( 3 ) do |len|  # (allow caller to pass intentional nils..)
         if three.length < len
-          three[ len - 1 ] = ::Skylab::TestSupport::IO::Spy.new
+          three[ len - 1 ] = TestSupport_::IO.spy.new
         end
       end
       super
@@ -18,10 +33,12 @@ module Skylab::TestSupport
 
     attr_reader :do_debug  # just to see if you called `debug!`
 
-    def debug! prepend=nil
+    def debug! prepnd=nil
       @do_debug = true
-      values.each do |v|
-        v.debug!( prepend ) if v
+      values.each do |x|
+        if x and x.respond_to?( :debug! )
+          x.debug! prepnd
+        end
       end
       nil
     end
@@ -31,7 +48,7 @@ module Skylab::TestSupport
       nil
     end
 
-    MOCK_INTERACTIVE_STDIN =
+    MOCK_INTERACTIVE_STDIN__ =
     class Stub_Interactive_STDIN__
       def tty?
         true
@@ -41,7 +58,7 @@ module Skylab::TestSupport
       self
     end.new
 
-    MOCK_NONINTERACTIVE_STDIN =
+    MOCK_NONINTERACTIVE_STDIN__ =
     class Stub_Noninteractive_STDIN__ < Stub_Interactive_STDIN__
       def tty?
         false
@@ -49,7 +66,7 @@ module Skylab::TestSupport
       self
     end.new
 
-    class Mock_Noninteractive_STDIN < Stub_Noninteractive_STDIN__
+    class Mock_Noninteractive_STDIN__ < Stub_Noninteractive_STDIN__
       def initialize a  # mutates a
         @a = a ; nil
       end

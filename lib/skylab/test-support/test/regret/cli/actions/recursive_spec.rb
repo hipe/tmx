@@ -13,7 +13,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Recursiv
 
   parent[ TS__ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

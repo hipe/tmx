@@ -35,7 +35,7 @@ module Skylab::TestSupport
         end
 
         def code x
-          RegretLib_::CLI_stylify[ [ :green ], x ]
+          RegretLib_::CLI_lib[].pen.stylize x, :green
         end
 
         def par i  # proof of concept - has problems
@@ -121,9 +121,14 @@ module Skylab::TestSupport
               "parameter not found: #{ RegretLib_::Ick[ @i ] }. #{
                 }did you mean #{ _or }? (#{ @bound.class })"
             end
+
             def say_lev_or
-              RegretLib_::Levenshtein[
-                ' or ', -> x { "'#{ x }'" }, 5, @box.get_names, @i ]
+              RegretLib_::Levenshtein.with(
+                :item, @i,
+                :closest_N_items, 5,
+                :items, @box.get_names,
+                :item_proc, -> x { "'#{ x }'" },
+                :aggregation_proc, -> a { a * ' or ' } )
             end
           end
         end

@@ -1,6 +1,6 @@
 module Skylab::TestSupport
 
-  class IO::Spy::Group  # read the related [#023] IO spy composite..narrative
+  class IO::Spy__::Group__  # read the related [#023] IO spy composite..narrative
 
     def initialize
       @debug = @debug_IO = nil
@@ -72,7 +72,7 @@ module Skylab::TestSupport
 
       downstream_IO = TestSupport_::Library_::StringIO.new
 
-      _filter = TestSupport_::Lib_::IO[]::Interceptors::Filter.new(
+      _filter = TestSupport_::Lib_::IO[]::Mappers::Filter.new(
         :downstream_IO, downstream_IO,
         :line_end_proc, -> do
           downstream_IO.rewind
@@ -86,7 +86,7 @@ module Skylab::TestSupport
           @line_a.push line ; nil
         end )
 
-      spy = IO::Spy.new :nonstandard
+      spy = IO.spy :nonstandard
       spy[ :line_emitter ] = _filter
       init_p and init_p[ spy ]
       spy

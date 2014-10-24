@@ -16,8 +16,8 @@ to interface with this node directly.
 
 (a sizeable introduction occurs in [#020] IO spy aggregations compared ..)
 
-A IO::Spy is a simple multiplexer that multiplexes out a subset of the
-instance methods of the IO module out to an ordered hash of listeners. IO::Spy
+An IO spy is a simple multiplexer that multiplexes out a subset of the
+instance methods of the IO module out to an ordered hash of listeners. IO spy
 is vital for automated testing, when you need to 'spy' on for e.g. an output
 stream to ensure that certain data is being written to it.
 
@@ -32,12 +32,12 @@ e.g to s-tdout or s-tdere:
     @out.puts "ohai"
 
 in the part of your test where you build your client, assign those variables
-instead to an IO::Spy that has as its only child member (listener) a :buffer
+instead to an IO spy that has as its only child member (listener) a :buffer
 that is a (e.g) ::StringIO. then in your test assertion ensure that the data
 in the buffer (::StringIO) is what you expect.
 
-IO::Spy objects with such a configuration are so common that using the
-`new` class method will build on such IO::Spy object.
+IO spy objects with such a configuration are so common that using the
+`new` class method will build on such IO spy object.
 
   #todo example here using doc-test
 

@@ -34,11 +34,11 @@ module Skylab::TestSupport::Regret::API
         cur_a = []
         step[] while step
         if cur_a.length.zero?
-          requ = "require_relative ../core\n\n"
+          requ = "require_relative ../core#{ NEWLINE_ }#{ NEWLINE_ }"
           bles = '::Skylab::TestSupport::Regret'
           cmd = cr_a.fetch( -1 )
         else
-          requ = "require_relative '../test-support'\n\n"
+          requ = "require_relative '../test-support'#{ NEWLINE_ }#{ NEWLINE_ }"
           cmd = cur_a.fetch( -1 )
           cmod = "::#{ cmd }"
           bles = "::#{ amod }::TestSupport"

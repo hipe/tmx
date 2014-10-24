@@ -76,7 +76,7 @@ module Skylab
     end
 
     def execute argv
-      FUN.without_warning[ -> { require 'simplecov' } ]
+      SimpleCov_.without_warning -> { require 'simplecov' }
       # we assume that the first arg element is a loadable path. we shift it
       # off so that the remaining argv attempts to mimic the argv that the
       # script would have seen if it were invoked with ruby or as an exeuctable.
@@ -101,7 +101,25 @@ module Skylab
       require xp  # we used to use `load`
     end
 
-    o = { }
+    o = -> i, p do
+      if p.arity.zero?
+        define_singleton_method i do
+          p.call  # call it with its original context, not ours
+        end
+      else
+        define_singleton_method i do | * x_a |
+          if x_a.length.zero?
+            p
+          else
+            p[ * x_a ]
+          end
+        end
+      end ; nil
+    end
+
+    class << o
+      alias_method :[]=, :call
+    end
 
     o[:without_warning] = -> f do  # as seen in [#mh-028]
       x = $VERBOSE ; $VERBOSE = false
@@ -153,12 +171,10 @@ module Skylab
       @program_name || $PROGRAM_NAME
     end
 
-    FUN = ::Struct.new( * o.keys ).new( * o.values )
-
     def self.load_into_host
       # assume we have just been autoloaded by the parent node
       # place ourselves in the appropriate location in that graph
-      mod = HOST_C_A_.reduce( ::Object ) do |m, c|
+      mod = HOST_C_A_.reduce( ::Object ) do |m, c|  # rewrite :+[#ba-034]
         m.const_get c, false
       end
       mod.const_set :Simplecov, self
@@ -167,6 +183,8 @@ module Skylab
     end
 
     HOST_C_A_ = %i| Skylab TestSupport Regret CLI Actions |
+
+    SimpleCov_ = self
 
   end
 end

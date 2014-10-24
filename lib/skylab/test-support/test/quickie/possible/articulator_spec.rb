@@ -4,7 +4,7 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible_::Articulator_
 
   ::Skylab::TestSupport::TestSupport::Quickie::Possible_[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

@@ -2,36 +2,31 @@ module Skylab
 
   module TestSupport
 
-    # this fun may be relied upon by coverage facilities which might need to
-    # load as early as reasonably possible in the whole sequence hence this
-    # is a "no fun" zone - we can't assume anything else has been loaded,
-    # nor should we load anything else.
+    module Init  # this node may be loaded before even the core file for
+      # this subsystem is loaded so that these constants can be used to
+      # generate test coverage, where that coverage may even be for
+      # arbitrary nodes in this subystem (other than this one). so don't
+      # pull in any other files from this one, and don't expect to have
+      # any accesss to any subsystem facilities here.
 
-    FUN = class Fun__ < ::Module  # #transitional
-      self
-    end.new
-
-    module FUN
-
-      # these are just here for now as logical placeholders..
-      # it could be made more extensible. as they are now they are just one
-      # step up from duplicating the literals througout the universe.
-
-      Spec_rb = -> do
-        s = '_spec.rb'.freeze
-        -> { s }
+      define_singleton_method :spec_rb, -> do
+        p = -> do
+          x = '_spec.rb'.freeze  # or look up in a config file
+          p = -> { x }
+          x
+        end
+        -> { p[] }
       end.call
-      class TestSupport::Fun__  # #transitional
-        def _spec_rb ; Spec_rb end
-      end
 
-      Test_support_filenames = -> do  # #transitional
-        a = %w( test-support.rb' ).freeze
-        -> { a }
+      define_singleton_method :test_support_filenames, -> do
+        p = -> do
+          x = [ 'test-support.rb'.freeze ].freeze
+          p = -> { x }
+          x
+        end
+        -> { p[] }
       end.call
-      class TestSupport::Fun__
-        def test_support_filenames ; Test_support_filenames end
-      end
+
     end
   end
 end

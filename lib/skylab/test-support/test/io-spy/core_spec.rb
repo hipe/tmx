@@ -4,7 +4,7 @@ module Skylab::TestSupport::TestSupport::IO_Spy::Core
 
   ::Skylab::TestSupport::TestSupport::IO_Spy[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
@@ -40,7 +40,7 @@ module Skylab::TestSupport::TestSupport::IO_Spy::Core
 
     end
 
-    Subject_ = -> { TestSupport_::IO::Spy }
+    Subject_ = -> { TestSupport_::IO.spy }
 
   end
 end

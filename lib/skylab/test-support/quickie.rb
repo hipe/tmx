@@ -3,6 +3,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
   ts = ::Skylab::TestSupport
   Lib_ = ts::Lib_
   Library_ = ts::Library_
+  NEWLINE_ = ts::NEWLINE_
   Quickie = self
 
   service = nil
@@ -604,7 +605,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
 
     def commence
       if @run_option_p_a
-        @y << "Run options:#{ render_run_options }\n\n"
+        @y << "Run options:#{ render_run_options }#{ NEWLINE_ }#{ NEWLINE_ }"
       end
       nil
     end
@@ -617,7 +618,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
       if 1 == y.length
         " #{ y[ 0 ] }"
       else
-        [ EMPTY_S_, * y ] * "\n  "
+        [ EMPTY_S_, * y ] * "#{ NEWLINE_ } "
       end
     end
 
@@ -639,7 +640,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
         if @or_p_a
           y << "All examples were filtered out"
         else
-          y << "No examples found.\n\n"  # <- trying to look like r.s there
+          y << "No examples found.#{ NEWLINE_ }#{ NEWLINE_ }"  # <- trying to look like r.s there
         end
       end
 

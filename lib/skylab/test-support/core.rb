@@ -14,12 +14,17 @@ require_relative '../callback/core'
 module Skylab::TestSupport  # :[#021].
 
   class << self
+
     def constant i
       self::Constants__.const_get i, false
     end
 
     def debug_IO
       self::Lib_::Stderr[]
+    end
+
+    def spec_rb
+      TestSupport_::Init.spec_rb
     end
 
     def tmpdir
@@ -29,13 +34,14 @@ module Skylab::TestSupport  # :[#021].
 
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
-  EMPTY_A_ = [].freeze
-  EMPTY_S_ = ''.freeze
-  MONADIC_TRUTH_ = -> _ { true }
-  TestSupport_ = self  # there is another module called ::SL::TS::TS
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
+  EMPTY_A_ = [].freeze
+  EMPTY_S_ = ''.freeze
   stowaway :Lib_, 'library-'
+  MONADIC_TRUTH_ = -> _ { true }
+  NEWLINE_ = "\n".freeze
+  TestSupport_ = self  # there is another module called ::SL::TS::TS
 
 end

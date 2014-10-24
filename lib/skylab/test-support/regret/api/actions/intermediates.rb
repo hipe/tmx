@@ -11,7 +11,7 @@ module Skylab::TestSupport::Regret::API
     #
     #     # ( ignore this ENTIRE TEST SUPPORT INSIDE YOUR DOC-TEST )
     #     Intr_ = -> *a do
-    #       io = TestSupport_::IO::Spy::Triad.new nil
+    #       io = TestSupport_::IO.spy.triad.new nil
     #       # io.debug!
     #       h = { out: io.outstream, err: io.errstream }
     #       0.step(a.length-1, 2).each { |d| h[a[d]] = a[d+1] }

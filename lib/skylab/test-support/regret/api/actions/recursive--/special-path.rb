@@ -130,10 +130,20 @@ module Skylab::TestSupport::Regret::API
       end
 
       def say_insane_explication stem_hashtag_s
-        _a = Hashtag_Bundles__.constants.map( & Const_2_hashtag_s_ )
-        _or_s = RegretLib_::Levenshtein[ ' or ', ::Proc.new( & :inspect ), 3,
-          _a, stem_hashtag_s ]
+        _or_s = say_lev stem_hashtag_s
         "unrecognized hashtag #{ stem_hashtag_s }. did you mean #{ _or_s }?"
+      end
+
+      def say_lev stem_hashtag_s
+
+        _items = Hashtag_Bundles__.constants.map( & Const_2_hashtag_s_ )
+
+        RegretLib_::Levenshtein[].with(
+          :item, stem_hashtag_s,
+          :items, _items,
+          :closest_N_items, 3,
+          :item_proc, ::Proc.new( & :inspect ),
+          :aggregation_proc, -> a { a * ' or ' } )
       end
 
       Const_2_hashtag_s_ = -> const_i do

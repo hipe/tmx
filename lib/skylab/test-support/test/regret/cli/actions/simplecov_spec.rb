@@ -10,7 +10,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Simplecov
     SUT_TEST_SUPPORT_MODULE_HANDLE_ = TS__
   end
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

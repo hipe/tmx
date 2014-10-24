@@ -192,7 +192,7 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
       self.class.members
     end
 
-    Lib_::Define_methods_for_procs_in_ivars[ self, :@aref, :[] ]
+    Lib_::Ivars_with_procs_as_methods[ self, :@aref, :[] ]
 
     def make_snitch io, *expression_agent  # #storypoint-195
       self.class.get_snitch_class.new self, io, *expression_agent
@@ -245,7 +245,7 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
       self.class.members
     end
 
-    Lib_::Define_methods_for_procs_in_ivars[ self,
+    Lib_::Ivars_with_procs_as_methods[ self,
       :write, :puts, :say, :is, :@puts, :<<, :event, :y ]
         # (reminder: ":@foo, :bar" means "use proc in @foo for method 'bar')
   end

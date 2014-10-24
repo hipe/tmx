@@ -4,7 +4,7 @@ module Skylab::TestSupport::TestSupport::IO_Spy::Group
 
   ::Skylab::TestSupport::TestSupport::IO_Spy[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
@@ -23,6 +23,6 @@ module Skylab::TestSupport::TestSupport::IO_Spy::Group
       g.lines.map(&:string).join( EMPTY_S_ ).should eql("r1\nb1\nb2\nr2\n")
     end
 
-    Subject_ = -> { TestSupport_::IO::Spy::Group }
+    Subject_ = -> { TestSupport_::IO.spy.group }
   end
 end

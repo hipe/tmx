@@ -38,7 +38,7 @@ modules have the following in common. every TestSupport module:
   • the test node module's InstanceMethods module responds to `let` in the
     r-spec way.
 
-  • the test node module has a CONSTANTS module that forms a central place to
+  • the test node module has a Constants module that forms a central place to
     hold business constants to help with running tests (usually at least the
     subproduct front module).
 
@@ -230,11 +230,11 @@ would get if anchor modules included their parent anchor modules. i bet it's
 crystal clear now, eh!?
 
 if you want constants to be "inherited down" from one anchor module to
-another, the place to do that is e.g. in a module called CONSTANTS that
-resides in your anchor module. you would then include that CONSTANTS module in
+another, the place to do that is e.g. in a module called Constants that
+resides in your anchor module. you would then include that Constants module in
 your I_M or your M_M as appropriate. in flux!  this way it is a) opt-in
 whether which modules at a particular node (file) are getting which constants
 in their chain and b) for a given product which (er) constants should *be* in
-CONSTANTS in the first place.
+Constants in the first place.
 
 (now, experimentally, we are doing the above)

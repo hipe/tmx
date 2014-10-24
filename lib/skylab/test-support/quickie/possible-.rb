@@ -22,7 +22,7 @@ module Skylab::TestSupport
         def to_text
           a = [ ]
           render_text_lines_to a.method( :<< )
-          a * "\n"
+          a * NEWLINE_
         end
 
         def render_text_lines_to p

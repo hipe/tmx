@@ -2,9 +2,7 @@ module Skylab::TestSupport
 
   module Regret
 
-    module FUN
-
-      class Const_inferer__
+      class Infer_const__
 
         # given an anchorized locally absolute path to a ruby file, infer
         # what the constant array to it might be, e.g for "foo/bar-baz/bif.rb"
@@ -39,8 +37,6 @@ module Skylab::TestSupport
           }#{ ::Regexp.escape Autoloader_::EXTNAME } \z/x
 
         Constantify_ = Lib_::Name_sanitize_for_constantize_file_proc[]
-
       end
-    end
   end
 end

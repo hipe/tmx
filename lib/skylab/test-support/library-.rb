@@ -41,12 +41,12 @@ module Skylab::TestSupport
       Face__[]::API::Normalizer_
     end
 
-    Basic__ = sidesys[ :Basic ]
+    Bsc__ = sidesys[ :Basic ]
 
-    Brazen__ = sidesys[ :Brazen ]
+    Bzn__ = sidesys[ :Brazen ]
 
     Box = -> do
-      Basic__[]::Box.new
+      Bsc__[]::Box.new
     end
 
     CLI_client_base_class = -> do
@@ -62,32 +62,32 @@ module Skylab::TestSupport
     end
 
     Enhancement_shell = -> * i_a do
-      MetaHell__[]::Enhance::Shell.new i_a
+      MH__[]::Enhance::Shell.new i_a
     end
 
     Entity = -> * a do
       if a.length.zero?
-        Brazen__[]::Entity
+        Bzn__[]::Entity
       else
-        Brazen__[]::Entity.via_arglist a
+        Bzn__[]::Entity.via_arglist a
       end
     end
 
     Properties_stack_frame = -> * a do
-      Brazen__[].properties_stack.common_frame.via_arglist a
+      Bzn__[].properties_stack.common_frame.via_arglist a
     end
 
     Funcy_globful = -> mod do
-      MetaHell__[].funcy_globful mod
+      MH__[].funcy_globful mod
     end
 
     Funcy_globless = -> mod do
-      MetaHell__[].funcy_globless mod
+      MH__[].funcy_globless mod
     end
 
     Face__ = sidesys[ :Face ]
 
-    Headless__ = sidesys[ :Headless ]
+    HL__ = sidesys[ :Headless ]
 
     Heavy_plugin = -> do
       Face__[]::Plugin
@@ -97,20 +97,24 @@ module Skylab::TestSupport
       Callback_.iambic_scanner
     end
 
+    Ivars_with_procs_as_methods = -> * a do
+      MH__[]::Ivars_with_Procs_as_Methods.via_arglist a
+    end
+
     IO = -> do
-      Headless__[]::IO
+      HL__[]::IO
     end
 
     Let = -> do
-      MetaHell__[]::Let
+      MH__[]::Let
     end
 
     Let_methods = -> mod do
-      mod.extend MetaHell__[]::Let::ModuleMethods
-      mod.include MetaHell__[]::Let::InstanceMethods
+      mod.extend MH__[]::Let::ModuleMethods
+      mod.include MH__[]::Let::InstanceMethods
     end
 
-    MetaHell__ = sidesys[ :MetaHell ]
+    MH__ = sidesys[ :MetaHell ]
 
     Name_from_const_to_method = -> i do
       Callback_::Name.lib.methodize i
@@ -128,16 +132,8 @@ module Skylab::TestSupport
       Callback_::Name.lib.constantize_sanitize_file
     end
 
-    Procs_as_methods = -> * i_a, & p do
-      MetaHell__[]::Function::Class.from_i_a_and_p i_a, p
-    end
-
-    Proc_as_method = -> mod do
-      MetaHell__[]::Function.enhance mod
-    end
-
     Scanner = -> x do
-      Basic__[]::List::Scanner[ x ]
+      Callback_::Scn.try_convert x
     end
 
     Stderr = -> { ::STDERR }
@@ -149,16 +145,20 @@ module Skylab::TestSupport
       ::Skylab
     end ]
 
-    Struct = -> * i_a do
-      Basic__[]::Struct.from_i_a i_a
+    String_lib = -> do
+      Bsc__[]::String
     end
 
-    Template = -> s do
-      Basic__[]::String::Template.from_string s
+    Struct = -> * i_a do
+      Bsc__[]::Struct.make_via_arglist i_a
+    end
+
+    System = -> do
+      HL__[].system
     end
 
     Tmpdir = -> do
-      Headless__[]::IO::Filesystem::Tmpdir
+      System[].filesystem.tmpdir
     end
   end
 end
