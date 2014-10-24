@@ -23,10 +23,14 @@ module Skylab::Permute
       Bleeding__[]::Runtime
     end
 
-    Headless__ = sidesys[ :Headless ]
+    CLI_lib = -> do
+      HL__[]::CLI
+    end
+
+    HL__ = sidesys[ :Headless ]
 
     Table = -> do
-      Headless__[]::CLI::Table
+      HL__[]::CLI::Table
     end
   end
 

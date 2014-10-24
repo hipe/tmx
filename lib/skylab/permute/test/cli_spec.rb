@@ -5,12 +5,12 @@ module Skylab::Permute::TestSupport::CLI  # (was [#ts-010])
 
   ::Skylab::Permute::TestSupport[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   Permute_ = Permute_
   TestLib_ = TestLib_
 
-describe "[pe] CLI" do
+describe "[pe] CLI" do  # :+#no-quickie because `after`
 
   extend TS_
 

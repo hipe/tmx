@@ -5,14 +5,17 @@ require 'skylab/headless/test/test-support'
 module Skylab::Permute::TestSupport  # (was [#ts-010])
 
   TestLib_ = ::Module.new
-  module CONSTANTS
+
+  module Constants
     Callback_ = ::Skylab::Callback
     Permute_ = ::Skylab::Permute
     TestLib_ = TestLib_
     TestSupport_ = ::Skylab::TestSupport
   end
 
-  include CONSTANTS
+  include Constants
+
+  # (no quickie - `after`)
 
   Callback_ = Callback_
 
@@ -22,14 +25,14 @@ module Skylab::Permute::TestSupport  # (was [#ts-010])
 
   module TestLib_
 
-    Headless__ = Callback_::Autoloader.build_require_sidesystem_proc :Headless
+    HL__ = Callback_::Autoloader.build_require_sidesystem_proc :Headless
 
     Spy = -> do
-      Callback_::TestSupport::Call_Digraph_Listeners_Spy
+      Callback_.test_support.call_digraph_listeners_spy
     end
 
     Unstyle = -> do
-      Headless__[]::CLI::Pen::FUN.unstyle
+      HL__[]::CLI.pen.unstyle
     end
   end
 
