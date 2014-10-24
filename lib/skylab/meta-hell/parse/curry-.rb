@@ -30,13 +30,15 @@ module Skylab::MetaHell
       end
 
       def get_value
-        Touch_value_class_[ @parse.some_constantspace_mod, @parse ].new
+        Touch_value_class__[ @parse.some_constantspace_mod, @parse ].new
       end
-      #
-      Touch_value_class_ = MetaHell_::FUN::Touch_constant_.
-        curry[ false, -> parse do
+
+      Touch_value_class__ = MetaHell_.touch_const.curry[
+        false,  # do not inherit
+        -> parse do
           Parse::Field::Values.new parse._field_a
-        end, :Parse_Value_ ]
+        end,
+        :Parse_Value_ ]
 
       def curry
         -> * x_a do
@@ -66,13 +68,17 @@ module Skylab::MetaHell
     end
 
     class Parse__
+
       def initialize input_a
+
         @abstract_field_list = @call_p = @constantspace_mod =
           @default_field = @do_glob_extra_args = @exhaustion_p = @syntax = nil
-        @state_mutex =
-            MetaHell_::Library_::Basic::Mutex::Write_Once.new :state_mutex
+
+        @state_mutex = MetaHell_::Lib_::Mutex_lib[].write_once.new :state_mutex
+
           # state encompasses input and output. various algorithms may handle
           # input and output together or separately, but we ensure that etc.
+
         absrb_iambic_fully input_a ; nil
       end
 
@@ -116,18 +122,20 @@ module Skylab::MetaHell
       end
     private
       def say_extra x
-        "unrecognized element: #{ MetaHell_.strange x }#{ any_context }#{
-          }#{ Lev__[ field_box.get_names, x ] if x.respond_to? :id2name }"
+        if x.respond_to? :id2name
+          _did_you_mean = " - did you mean #{ say_lev x }?"
+        end
+        "unrecognized element: #{ MetaHell_.strange x }#{ any_context }"
       end
-      #
-      Lev__ = -> a, x do
-        " - did you mean #{ Lev___[ a, x ] }?"
+
+      def say_lev x
+        MetaHell_::Lib_::Levenshtein[].with(
+          :item, x,
+          :items, field_box.get_names,
+          :closest_N_items, 3,
+          :aggregation_proc, -> a { a * ' or ' } )
       end
-      #
-      Lev___ = -> a, x do
-        MetaHell_::Lib_::Levenshtein[]::
-          Or_with_closest_n_items_to_item[ 3, a, x ]
-      end
+
       def any_context
         y = []
         1 < @d and y.push say_prev @x_a.fetch @d - 2

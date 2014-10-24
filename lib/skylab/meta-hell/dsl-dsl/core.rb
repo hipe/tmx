@@ -88,8 +88,9 @@ module Skylab::MetaHell
     nil
   end
 
-  Story_ = MetaHell_::Function::Class.new( :atom, :atom_accessor,
-                                          :list, :block )
+  Story_ = MetaHell_::Ivars_with_Procs_as_Methods.new(
+    :atom, :atom_accessor, :list, :block )
+
   class Story_
 
     # (the implementation of the DSL DSL)
@@ -225,7 +226,7 @@ module Skylab::MetaHell
     nil
   end
 
-  Enhance_Module_Adapter_ = MetaHell_::Function::Class.new(
+  Enhance_Module_Adapter_ = MetaHell_::Ivars_with_Procs_as_Methods.new(
     :add_field, :add_or_change_value )
   class Enhance_Module_Adapter_
     def initialize

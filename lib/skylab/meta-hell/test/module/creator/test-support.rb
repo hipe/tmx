@@ -4,10 +4,10 @@ module Skylab::MetaHell::TestSupport::Module::Creator
 
   ::Skylab::MetaHell::TestSupport::Module[ TS_ = self ]
 
-  include CONSTANTS # for the spec
+  include Constants
 
   module ModuleMethods
-    include CONSTANTS
+    include Constants
     def snip &f
       let :klass do
         ::Class.new.class_eval do

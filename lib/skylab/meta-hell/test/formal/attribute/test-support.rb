@@ -4,21 +4,28 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute
 
   ::Skylab::MetaHell::TestSupport::Formal[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   MetaHell_ = MetaHell_
+
+  Formal_TS_ = Formal_TS_
+
+  MetaHell_::Lib_::Stdlib_set[]
 
   extend TestSupport_::Quickie
 
   module Methods
-    include CONSTANTS
-    define_method :one_such_class do |&block|
-      kls = TS_.const_set "KLS_#{ FUN.next_id[] }", ::Class.new
-      kls.class_eval do
+
+    include Constants
+
+    def one_such_class & p
+      _const_i = :"KLS_#{ Formal_TS_.next_id }"
+      _cls = TS_.const_set _const_i, ::Class.new
+      _cls.class_exec do
         MetaHell_::Formal::Attribute::DSL[ self ]
-        class_exec(& block )
+        class_exec( & p )
+        self
       end
-      kls
     end
   end
 

@@ -4,10 +4,10 @@ module Skylab::MetaHell::TestSupport::Class::Creator
 
   ::Skylab::MetaHell::TestSupport::Class[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   module ModuleMethods
-    include CONSTANTS
+    include Constants
     def borks msg
       it "raises error with message - #{ msg }" do
         -> do
@@ -35,7 +35,7 @@ module Skylab::MetaHell::TestSupport::Class::Creator
 
 
   module InstanceMethods
-    include CONSTANTS
+    include Constants
     extend MetaHell_::Let
   end
 end

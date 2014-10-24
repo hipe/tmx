@@ -5,14 +5,73 @@ module Skylab
 
   module MetaHell  # welcome to meta hell. please read [#041] #storypoint-005
 
+    class << self
+
+      def function_chain * a
+        if a.length.zero?
+          MetaHell_::Lib__::Function_chain
+        else
+          MetaHell_::Lib__::Function_chain[ a, a.shift ]
+        end
+      end
+
+      def funcy_globful cls
+        def cls.[] * x_a
+          new( * x_a ).execute
+        end
+      end
+
+      def funcy_globless cls
+        def cls.[] * x_a
+          new( x_a ).execute
+        end
+      end
+
+      def import_contants from_mod, i_a, to_mod
+        MetaHell_::Lib__::Import_constants[ from_mod, i_a, to_mod ]
+      end
+
+      def import_methods from_mod, i_a, priv_pub, to_mod
+        MetaHell_::Lib__::Import_methods[ from_mod, i_a, priv_pub, to_mod ]
+      end
+
+      def method_is_defined_by_module i, mod
+        mod.method_defined? i or mod.private_method_defined? i
+      end
+
+      def say_not_found k, a
+        MetaHell_::Lib__::Say_not_found[ a, k ]
+      end
+
+      def strange * a
+        MetaHell_::Strange__.via_arglist a
+      end
+
+      def struct_via_hash h  # :#deprecated
+        ::Struct.new( * h.keys ).new( * h.values )
+      end
+
+      def touch_const * a
+        if a.length.zero?
+          MetaHell_::Lib__::Touch_const
+        else
+          MetaHell_::Lib__::Touch_const[ * a ]
+        end
+      end
+
+      def touch_const_reader a, b, c, d, e
+        MetaHell_::Lib__::Touch_const_reader[ a, b, c, d, e ]
+      end
+
+      def without_warning & p
+        MetaHell__::Lib__::Without_warning[ p ]
+      end
+    end
+
     Callback_ = ::Skylab::Callback
       Autoloader_ = ::Skylab::Callback::Autoloader
 
     Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
-
-    class Aset_ < ::Proc  # "aset" = "array set" ("[]="), from ruby source
-      alias_method :[]=, :call
-    end
 
     DASH_ = '-'.getbyte 0
 
@@ -20,40 +79,14 @@ module Skylab
 
     EMPTY_P_ = -> { }
 
-    stowaway :Fields, 'fields/core'
-
-    def self.Function host, *rest
-      self::Function._make_methods host, :public, :method, rest
-    end
-
-    def self.funcy_globful cls
-      def cls.[] * x_a
-        new( * x_a ).execute
-      end
-    end
-
-    def self.funcy_globless cls
-      def cls.[] * x_a
-        new( x_a ).execute
-      end
-    end
-
     IDENTITY_ = -> x { x }
-
-    def self.lib
-      self::FUN::LIB
-    end
-
-    stowaway :Lib_, 'library-'
 
     MetaHell_ = self
 
     MONADIC_EMPTINESS_ = -> _ { }
+
     MONADIC_TRUTH_ = -> _ { true }
 
-    def self.strange * a
-      MetaHell_::Strange__.via_arglist a
-    end
   end
 end
 
@@ -97,11 +130,11 @@ module Skylab::MetaHell
       UCASE_RANGE__ = 'A'.getbyte( 0 ) .. 'Z'.getbyte( 0 )
       #
       def handle_bundle_not_found h, k  # :+#bundle-multiset-API
-        raise ::KeyError, say_bundle_not_found( h.keys, k )
+        raise ::KeyError, say_bundle_not_found( k, h.keys )
       end
-      #
-      def say_bundle_not_found a, k  # :+#bundle-multiset-API
-        MetaHell_::FUN::Say_not_found[ a, k ]
+
+      def say_bundle_not_found k, a  # :+#bundle-multiset-API
+        MetaHell_.say_not_found k, a
       end
 
     public
@@ -144,7 +177,7 @@ module Skylab::MetaHell
       def build_hard_bundle_fetcher  # #bundle-multiset-API
         soft_bundle_fetcher  # kick
         -> i do
-          const_i = @h[ i ] or raise ::KeyError, say_bundle_not_found( @a, i )
+          const_i = @h[ i ] or raise ::KeyError, say_bundle_not_found( i, @a )
           const_get const_i, false
         end
       end
@@ -202,7 +235,7 @@ module Skylab::MetaHell
           end
         end
         def initialize( * )
-          @key_set = MetaHell_::Library_::Set.new
+          @key_set = MetaHell_::Lib_::Stdlib_set[].new
           super
         end
         def keys
@@ -261,14 +294,6 @@ module Skylab::MetaHell
       def []
         @p.call
       end
-    end
-  end
-end
-module Skylab::MetaHell
-  module DelegatesTo
-    def self.extended mod
-      $stderr.puts "\e[34mDEPRECATID\e[0m"  # #todo:during-merge
-      MetaHell_::Library_::Headless::Delegating[ mod, :employ_the_DSL_method_called_delegates_to ]
     end
   end
 end

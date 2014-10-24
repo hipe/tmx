@@ -4,7 +4,7 @@ module Skylab::MetaHell::TestSupport::Parse::Alternation__
 
   ::Skylab::MetaHell::TestSupport::Parse[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

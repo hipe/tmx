@@ -2,29 +2,30 @@ require_relative '../test-support'
 
 module Skylab::MetaHell::TestSupport::Formal
 
-  ::Skylab::MetaHell::TestSupport[ TS_ = self ]
+  ::Skylab::MetaHell::TestSupport[ Formal_TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   MetaHell_ = MetaHell_ # bc of metahell
 
   extend TestSupport_::Quickie
 
-  FUN = -> do
-    o = { }
-    counter = 0
-    o[:next_id] = -> { counter += 1 }
-    st = Struct.new(* o.keys ).new ; o.each { |k, v| st[k] = v } ; st.freeze
-    st
-  end.call
+  class << self
 
-  module CONSTANTS
-    Headless = MetaHell_::Library_::Headless
-    FUN = FUN
+    define_method :next_id, -> do
+      d = 0
+      -> do
+        d += 1
+      end
+    end.call
+  end
+
+  module Constants
+    Formal_TS_ = Formal_TS_
   end
 
   module ModuleMethods
-    include CONSTANTS
+    include Constants
     def subject func
       memoize :subject, func
       nil

@@ -4,7 +4,7 @@ module Skylab::MetaHell::TestSupport::Formal::Box::Struct
 
   ::Skylab::MetaHell::TestSupport::Formal::Box[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
@@ -12,13 +12,13 @@ module Skylab::MetaHell::TestSupport::Formal::Box::Struct
 
     extend TS_
 
-    define_method :struct, & MetaHell_::FUN.memoize[ -> do
+    define_method :struct, ( Callback_.memoize do
       build_box_notify.to_struct
-    end ]
+    end )
 
     def self.build_box_notify
       MetaHell_::Formal::Box.
-        from_hash sure: :whaver, this: :that, ming: :mang
+        via_hash sure: :whaver, this: :that, ming: :mang
     end
 
     def build_box
@@ -61,7 +61,7 @@ module Skylab::MetaHell::TestSupport::Formal::Box::Struct
       end
 
       it "it *will* allow you to overwrite vital methods, so be careful" do
-        struct = MetaHell_::Formal::Box.from_hash( each: :peach ).to_struct
+        struct = MetaHell_::Formal::Box.via_hash( each: :peach ).to_struct
         struct.each.should eql( :peach )
       end
 
@@ -115,10 +115,9 @@ module Skylab::MetaHell::TestSupport::Formal::Box::Struct
 
   describe "[mh] formal box struct - like tradtional struct" do
 
-    define_method :wiz_bang, & MetaHell_::FUN.memoize[ -> do
-       MetaHell_::Formal::Box.const_get :Struct, false
-       MetaHell_::Formal::Box::Struct.new :wiz, :bang
-    end ]
+    define_method :wiz_bang, ( Callback_.memoize do
+      MetaHell_::Formal::Box.struct.new :wiz, :bang
+    end )
 
     it "try and construct it with wrong size - struct size differs (Argum.." do
       begin

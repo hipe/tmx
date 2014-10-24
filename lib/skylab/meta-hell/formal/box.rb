@@ -4,30 +4,48 @@ module Skylab::MetaHell
 
     # ~ fun ways to create a box
 
-    def self.from_hash h  # #storypoint-40
-      box = new
-      box.instance_exec do
-        h.each do |k, v|
-          add k, v
-        end
-      end
-      box
-    end
+    class << self
 
-    def self.from_iambic *x_a
-      from_iambic_a x_a
-    end
-
-    def self.from_iambic_a x_a
-      box = new
-      ( x_a.length % 2 ).zero? or fail 'sanity - odd number of args'
-      box.instance_exec do
-        0.step( x_a.length - 1, 2 ).each do |i|
-          add x_a[ i ], x_a[ i + 1 ]
-        end
+      def enumerator
+        Box_::Enumerator__
       end
-      box
-    end
+
+      def open_box
+        Box_::Open__
+      end
+
+      def struct
+        Box_::Struct__
+      end
+
+      def via_hash h  # #storypoint-40
+        box = new
+        box.instance_exec do
+          h.each do |k, v|
+            add k, v
+          end
+        end
+        box
+      end
+
+      def with_items * x_a
+        via_item_iambic x_a
+      end
+
+    private
+
+      def via_item_iambic x_a
+        box = new
+        ( x_a.length % 2 ).zero? or fail 'sanity - odd number of args'
+        box.instance_exec do
+          0.step( x_a.length - 1, 2 ).each do |i|
+            add x_a[ i ], x_a[ i + 1 ]
+          end
+        end
+        box
+      end
+    end  # >>
+    Box_ = self
   end
 
   Formal::Box::InstanceMethods = ::Module.new
@@ -114,7 +132,7 @@ module Skylab::MetaHell
     end
 
     def _deep_each p  # this has bells and whistles at the expense of frames
-      ( @enumerator_class || Formal::Box::Enumerator ).new( -> y do
+      ( @enumerator_class || Formal::Box::Enumerator__ ).new( -> y do
         @order.each do |k|
           y.yield k, @hash.fetch( k ) # always give the yielder 3 args (norm'd)
         end
@@ -142,9 +160,19 @@ module Skylab::MetaHell
       end
     end
 
+    def to_pair_scan
+      d = -1 ; last = @order.length - 1 ; _Pair = Callback_::Box.pair
+      Callback_.scan do
+        if d < last
+          i = @order.fetch d += 1
+          _Pair.new @hash.fetch( i ), i
+        end
+      end
+    end
+
     def get_value_scanner
       d = -1 ; last = @order.length - 1
-      MetaHell_::Lib_::Scn[].new do
+      Callback_::Scn.new do
         if d < last
           @hash.fetch @order.fetch d += 1 or raise "can't scan: false-ish value"
         end
@@ -245,8 +273,7 @@ module Skylab::MetaHell
     end
 
     def produce_struct_class
-      Formal::Box.const_get( :Struct, false ).
-        produce_struct_class_from_box self
+      Formal::Box::Struct__.produce_struct_class_from_box self
     end
 
     # ~ #storypoint-245, :+[#021] a custom implementation
@@ -414,7 +441,7 @@ module Skylab::MetaHell
     # ~
   end
 
-  class Formal::Box::Open < Formal::Box
+  class Formal::Box::Open__ < Formal::Box
 
     def self.hash_controller hash  # be careful, you can easily corrupt things
       around_hash hash
@@ -435,7 +462,7 @@ module Skylab::MetaHell
     attr_writer :enumerator_class # #exp
   end
 
-  class Formal::Box::Enumerator < ::Enumerator  # #storypoint-405
+  class Formal::Box::Enumerator__ < ::Enumerator  # #storypoint-405
 
     alias_method :metahell_original_initialize, :initialize
 

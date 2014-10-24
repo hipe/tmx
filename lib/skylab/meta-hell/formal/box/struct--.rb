@@ -1,6 +1,6 @@
 module Skylab::MetaHell
 
-  class Formal::Box::Struct < ::Struct  # all documentation [#054]
+  class Formal::Box::Struct__ < ::Struct  # all documentation [#054]
 
     include Formal::Box::InstanceMethods::Readers
 
@@ -74,6 +74,6 @@ module Skylab::MetaHell
         end )
     end
     #
-    Hash_Pxy__ = MetaHell_::Proxy::Nice.new( * %i| key? fetch dup | )
+    Hash_Pxy__ = MetaHell_::Lib_::Proxy_lib[].nice :key?, :fetch, :dup
   end
 end

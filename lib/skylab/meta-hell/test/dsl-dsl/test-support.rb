@@ -4,7 +4,7 @@ module Skylab::MetaHell::TestSupport::DSL_DSL
 
   ::Skylab::MetaHell::TestSupport[ self ]
 
-  include CONSTANTS
+  include Constants
 
   MetaHell_ = ::Skylab::MetaHell
 

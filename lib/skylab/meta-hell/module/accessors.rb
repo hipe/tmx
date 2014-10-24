@@ -1,6 +1,10 @@
 module Skylab::MetaHell
 
+  Module = ::Module.new  # ~ stowaway
+
   module Module::Accessors
+
+    # (see also the simpler [#ba-034])
 
     # a lightweight enhancer that for the module using it generates instance
     # methods for that module each of which access a particular "significant
@@ -118,7 +122,10 @@ module Skylab::MetaHell
             if instance_variable_defined? ivar
               instance_variable_get ivar
             else
-              md = Module::Resolve_[ create_blk, path, mod[ self ] ]
+
+              md = MetaHell_::Lib_::Module_lib[].
+                touch_value_via_relative_path mod[ self ], path, create_blk
+
               if extend_blk
                 md.module_exec( & extend_blk )  # future i am sorry
               end

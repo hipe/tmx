@@ -24,7 +24,7 @@ module Skylab::MetaHell
     #
     # like so:
     #
-    #     PARSER = MetaHell_::Parse.from_ordered_set.curry[
+    #     PARSER = MetaHell_::Parse.via_ordered_set.curry[
     #       :argv_scanners, [
     #         -> args { args.shift if args.first =~ /bill/i },
     #         -> args { if :hi == args.first then args.shift and :hello end }]]
@@ -54,7 +54,7 @@ module Skylab::MetaHell
     #     argv.length  # => 3
     #
 
-    From_Ordered_Set__ = Parse::Curry_[
+    Via_ordered_set__ = Parse::Curry_[
       :algorithm, -> parse, argv do
         set_a = parse.normal_argv_proc_a
         len = set_a.length

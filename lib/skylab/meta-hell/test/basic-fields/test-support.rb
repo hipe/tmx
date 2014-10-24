@@ -4,7 +4,7 @@ module Skylab::MetaHell::TestSupport::BasicFields
 
   ::Skylab::MetaHell::TestSupport[ self ]
 
-  include CONSTANTS
+  include Constants
 
   MetaHell_ = MetaHell_
 

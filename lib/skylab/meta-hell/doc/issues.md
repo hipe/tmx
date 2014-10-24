@@ -12,7 +12,7 @@
 [#058]       #doc-point the "touch method" function ..
 [#057] #hole (moved to [#ts-035]. was: the library narrative)
 [#056]       #node-tracker :#contoured-fields
-[#055]       #doc-point the module node narrative ..
+[#055] #hole (moved to to [#ba-034]. was: #doc-point the module node narrative)
 [#054]       #formal-box:struct #doc-point (all notes)..
 [#053]       #doc-point "discussion of all the meta-properties.."
 [#053]       #in-situ
@@ -73,7 +73,7 @@
 [#011]       #doc-node the fun parse curry narrative ..
              (#re-purposed:once, became [#su-001])
 [#010]       #done pull in D-elegatesTo from porcelain!
-[#009]       #done hen you made plastic you didn't know about `define_singleton_method`
+[#009]       #done when you made plastic you didn't know about `define_singleton_method`
 [#008]       #done after etc, consider pulling in Let
 [#007] #open push up logic for autoviv. of superklassen maybe? (at least test)
 [#006]       #note core dumps happen here with super

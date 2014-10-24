@@ -4,7 +4,7 @@ module Skylab::MetaHell::TestSupport::Parse::F_VS_
 
   ::Skylab::MetaHell::TestSupport::Parse[ self ]
 
-  include CONSTANTS
+  include Constants
 
   MetaHell_ = MetaHell_
 
@@ -12,7 +12,7 @@ module Skylab::MetaHell::TestSupport::Parse::F_VS_
 
     before :all do
       module Bazzle
-        flag = MetaHell_::Parse::Fields::Flag
+        flag = MetaHell_::Parse.fields.flag
         BRANCH_ = MetaHell_::Parse.alternation.curry[
           :syntax, :monikate, -> a { a * ' | ' },
           :field, flag,

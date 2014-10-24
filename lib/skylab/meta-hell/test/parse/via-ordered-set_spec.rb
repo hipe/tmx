@@ -4,7 +4,7 @@ module Skylab::MetaHell::TestSupport::Parse::FromOrderedSet__
 
   ::Skylab::MetaHell::TestSupport::Parse[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
@@ -18,7 +18,7 @@ module Skylab::MetaHell::TestSupport::Parse::FromOrderedSet__
       before :all do
         Sandbox_1.with self
         module Sandbox_1
-          PARSER = MetaHell_::Parse.from_ordered_set.curry[
+          PARSER = MetaHell_::Parse.via_ordered_set.curry[
             :argv_scanners, [
               -> args { args.shift if args.first =~ /bill/i },
               -> args { if :hi == args.first then args.shift and :hello end }]]

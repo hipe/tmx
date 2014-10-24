@@ -128,20 +128,20 @@ module Skylab::MetaHell
         end
       end
       def bld_fld_box
-        MetaHell_::Library_::Basic::Box.new
+        MetaHell_::Lib_::Meso_box_lib[].new
       end
     end
 
     # ~ #curry-friendly support procs
 
     Touch_const_with_dupe_for___ = -> p, c, mod do
-      MetaHell_::FUN::Touch_constant_[ false, -> _ do
+      MetaHell_.touch_const false, -> _ do
         if mod.const_defined? c
           mod.const_get( c ).dupe_for mod
         else
           p[ mod ]
         end
-      end, c, mod, nil ]
+      end, c, mod, nil
     end
 
     Touch_singleton_method____ = -> priv_pub, m, p, client do  # #curry-friendly
@@ -434,12 +434,15 @@ module Skylab::MetaHell
       def say_unexpected_iambic
         x = @iambic_scan.first_unparsed_arg
         _a = field_box.get_names
-        "unrecognized keyword #{ MetaHell_::Lib_::Strange[ x ] }#{
-         } - did you mean #{ Lev__[ _a, x ] }?"
+        "unrecognized keyword #{ MetaHell_.strange x }#{
+         } - did you mean #{ say_lev x, _a }?"
       end
-      Lev__ = -> a, x do
-        MetaHell_::Library_::Headless::NLP::EN::Levenshtein::
-          Or_with_closest_n_items_to_item.curry[ 3, a, x ]
+      def say_lev x, a
+        MetaHell_::Lib_::Levenshtein[].with(
+          :item, x,
+          :items, a,
+          :closest_N_items, 3,
+          :aggregation_proc, -> a_ { a_ * ' or ' } )
       end
     public
       def post_absorb_iambic_args_notify

@@ -1,4 +1,6 @@
-require_relative '../../../core'
+require_relative '../../test-support'  # the top one in subsystem
+
+::Skylab::MetaHell::TestSupport::TestSupport_::Quickie.enable_kernel_describe
 
 describe "[mh] parse series (periphery)" do
 

@@ -9,60 +9,54 @@ require_relative 'mm/test-support'
 
 module Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
 
-
   module Scenario_One
 
-    o = { }
+    Once__ = Callback_.memoize do  # we want something more explicit than before( :all ) for now
 
-    done = nil
+      module Some_Module_Definer_Methods
+        extend Module::Creator
+        extend MetaHell_::Let
 
-    o[:once] = -> do
+        modul :Wank do
+          def worked
+          end
+        end
+      end
 
-      module Ohai                 # ok so the crazy thing here is that what
-        extend Module::Creator     # we are doing is making a *module* (not
-        extend MetaHell_::Let      # a class) be the module definer here
-
-        modul :Wank do            # (this is the crazy crap that was working
-          def worked ; end        # back before the first rewrite that we
-        end                       # totally borked and didn't understand
-      end                         # how we borked, and are in the middle
-
-      class Class                 # of untangling now.  Does this count as
-        include Ohai              # literate programming?)
+      class Class
+        include Some_Module_Definer_Methods
         extend MetaHell_::Let::ModuleMethods
 
-        let(:meta_hell_anchor_module) { ::Module.new }
+        let :meta_hell_anchor_module do
+          ::Module.new
+        end
 
       end
 
-      done[ :once ]
-
+      :__done__
     end
-
-    F = MetaHell_.lib.struct_from_hash o
-
-    done = FUN.done_p[ F ]         # this absurdity is just a sanity check
-
 
     describe "[mh] Module::Creator::ModuleMethods (*on* modules, #{
       }not classes" do
 
-      extend TS_
+      extend MC_MM_TS_
 
       context "minimal" do
+
         it "a klass can include modules that have graphs, and work" do
-          # we want more fine-grained control than before(:all) for now ..
-          F.once[]
-          Class.new._Wank.instance_methods.should eql([:worked])
+
+          Once__[]
+
+          Class.new._Wank.instance_methods.should eql [ :worked ]
+
         end
       end
     end
   end
 
-
   module Scenario_Two
-    X = MetaHell_.lib.struct_from_hash(
-      :once => -> do
+
+      Once__ = Callback_.memoize do
 
         module OneGuy
           extend Module::Creator, MetaHell_::Let
@@ -81,11 +75,9 @@ module Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
 
           let(:meta_hell_anchor_module) { ::Module.new }
         end
-        X.done[ :once ]
-      end,
 
-     :done => ->( name ) { X[name] = FUN.done_msg_p[ name ] }
-    )
+      :__dne__
+      end
 
                                   # (interestingly look how rspec reports
                                   # the below module name when you run
@@ -95,9 +87,11 @@ module Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
     describe "[mh] Module::Creator::ModuleMethods scenario 2 - #{
       }this is fucking amazing - composing different module graphs WTF" do
 
-      extend TS_
+      extend MC_MM_TS_
 
-      before(:all) { X.once[] }
+      before :all do
+        Once__[]
+      end
 
       it "amazingly works sort of under composition with some kicking" do
         o = SomeClass.new

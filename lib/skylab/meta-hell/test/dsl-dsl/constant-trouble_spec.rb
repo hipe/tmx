@@ -4,7 +4,7 @@ module Skylab::MetaHell::TestSupport::DSL_DSL::Constant_Trouble
 
   ::Skylab::MetaHell::TestSupport::DSL_DSL[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

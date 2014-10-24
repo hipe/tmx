@@ -4,7 +4,7 @@ module Skylab::MetaHell::TestSupport::Formal::Box::Extr_
 
   ::Skylab::MetaHell::TestSupport::Formal::Box[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
@@ -14,7 +14,7 @@ module Skylab::MetaHell::TestSupport::Formal::Box::Extr_
 
     it "(Open) you can make a \"hash controller\" around an existing hash" do
       h = { foo: :bar }
-      box = Box::Open.hash_controller h
+      box = Box.open_box.hash_controller h
       box.add :biz, :baffle
       h.keys.sort.map { |i| [ i, h[i] ] }.
         should eql( [ [ :biz, :baffle ], [ :foo, :bar ] ] )
@@ -23,7 +23,7 @@ module Skylab::MetaHell::TestSupport::Formal::Box::Extr_
     Field_ = ::Struct.new :name_i, :label
 
     it "box map - array map makes new arrays, so .." do
-      field_box = Box::Open.new
+      field_box = Box.open_box.new
       field_box.add :foo, Field_[ :foo, "the Foo" ]
       field_box.add :bar, Field_[ :foo, "the Bar" ]
       label_box = field_box.each.box_map( & :label )
@@ -33,14 +33,14 @@ module Skylab::MetaHell::TestSupport::Formal::Box::Extr_
     end
 
     it "an arity of 3 is not supported for each" do
-      box = Box.from_iambic :foo, :one, :bar, :two
+      box = Box.with_items :foo, :one, :bar, :two
       -> do
         box.each { |a, b, c| }
       end.should raise_error( ::ArgumentError, /arity not supported: 3\z/ )
     end
 
     it "freezing is what it sounds like" do
-      box = Box::Open.from_iambic :foo, :two
+      box = Box.open_box.with_items :foo, :two
       box.add :bar, :two
       box.freeze
       -> do
@@ -49,7 +49,7 @@ module Skylab::MetaHell::TestSupport::Formal::Box::Extr_
     end
 
     it "partition_where_name_in!" do
-      one = Box::Open.from_iambic :eeny, :E, :meeny, :M, :miney, :I, :moe, :O
+      one = Box.open_box.with_items :eeny, :E, :meeny, :M, :miney, :I, :moe, :O
       two = one.partition_where_name_in! :eeny, :miney
       one._order.should eql( [ :meeny, :moe ] )
       one.values.should eql( [ :M, :O ] )
@@ -58,14 +58,14 @@ module Skylab::MetaHell::TestSupport::Formal::Box::Extr_
     end
 
     it "clear" do
-      one = Box::Open.from_iambic :x, :y, :z, :q
+      one = Box.open_box.with_items :x, :y, :z, :q
       one.clear.should eql( nil )
       one.length.should eql( 0 )
       one.instance_variable_get( :@hash ).length.should eql( 0 )
     end
 
     it "sort_names_by!" do
-      box = Box::Open.from_iambic :z, :Z, :x, :X, :y, :Y
+      box = Box::open_box.with_items :z, :Z, :x, :X, :y, :Y
       desired_order = [ :x, :z, :y ]
       box.sort_names_by!( & desired_order.method( :index ) )
       box._order.should eql( desired_order )
@@ -73,14 +73,14 @@ module Skylab::MetaHell::TestSupport::Formal::Box::Extr_
 
     it "to_hash" do
       h1 = { a: :A, b: :B }
-      box = Box.from_hash h1
+      box = Box.via_hash h1
       h2 = box.to_hash
       h1.should eql( h2 )
       ( h1.object_id == h2.object_id ).should eql( false )
     end
 
     it "invert" do
-      box = Box.from_hash a: :A, b: :B
+      box = Box.via_hash a: :A, b: :B
       box_ = box.invert
       box_._order.should eql( [ :A, :B ] )
       box_.values.should eql( [ :a, :b ] )
@@ -99,7 +99,7 @@ module Skylab::MetaHell::TestSupport::Formal::Box::Extr_
         end
       end
 
-      MY_BOX_ = MyBox.from_iambic :foo, Field_[ :foo, 'the Foo' ],
+      MY_BOX_ = MyBox.with_items :foo, Field_[ :foo, 'the Foo' ],
                                   :bar, Field_[ :bar, 'the Bar' ]
 
       it "needs improvement" do
@@ -130,7 +130,7 @@ module Skylab::MetaHell::TestSupport::Formal::Box::Extr_
     end
 
     it "fetch_at_position, last" do
-      box = Box.from_iambic :foo, :F, :bar, :B, :baz, :Z
+      box = Box.with_items :foo, :F, :bar, :B, :baz, :Z
       box.fetch_at_position( 0 ).should eql( :F )
       box.fetch_at_position( 1 ).should eql( :B )
       box.fetch_at_position( 2 ) { :Y }.should eql( :Z )
@@ -143,7 +143,7 @@ module Skylab::MetaHell::TestSupport::Formal::Box::Extr_
     end
 
     it "hax, hax, hax-hax-hax-hax" do
-      box = Box.from_iambic :foo, :F
+      box = Box.with_items :foo, :F
       a, h = box._raw_constituency
       a.each { |i| h[ i ] = :"_#{ h[ i ] }_" }
       box.to_a.should eql( [ :_F_ ] )

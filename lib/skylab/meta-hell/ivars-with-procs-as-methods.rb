@@ -1,15 +1,15 @@
 module Skylab::MetaHell
 
-  module Function
+  module Ivars_with_Procs_as_Methods
 
-    # `MetaHell_::Function` can act as an enhancer that enhances a class via
+    # can act as an enhancer that enhances a class via
     # enabling ivars that hold procs to act as methods of the object:
     #
     #     class Foo
     #       def initialize
     #         @bar = -> { :baz }
     #       end
-    #       MetaHell_::Function self, :bar
+    #       Subject_[ self, :bar ]
     #     end
     #
     #     Foo.new.bar  # => :baz
@@ -21,7 +21,7 @@ module Skylab::MetaHell
     #       def initialize
     #         @_secret = -> { :ting }
     #       end
-    #       MetaHell_::Function self, :@_secret, :wahoo
+    #       Subject_[ self, :@_secret, :wahoo ]
     #     end
     #
     #     Foo.new.wahoo  # => :ting
@@ -31,114 +31,125 @@ module Skylab::MetaHell
     #
     #     class Foo
     #       def initialize
-    #         @_go = -> { :yep }
+    #         @_go = -> { :thats_right }
     #         @_hi = -> x { "HI:#{ x }" }
     #       end
-    #       MetaHell_::Function.enhance( self ).as_private_getter :@_go, :yep
-    #       MetaHell_::Function.enhance( self ).as_public_method :_hi
+    #
+    #       Subject_[ self ].as_public_method :_hi
+    #
+    #       Subject_[ self ].as_private_getter :@_go, :yep
+    #
     #     end
     #
     #     f = Foo.new
     #
-    #     f._hi 'X' #=> "HI:X"
-    #     f.yep # => NoMethodError: private method `yep' called for ..
+    #     foo._hi 'X' #=> "HI:X"
+    #     foo.yep  # => NoMethodError: private method `yep' called for ..
+    #     foo.send( :yep )  # => :thats_right
     #
 
-    def self.define_public_methods_on_client i_a, mod
-      _make_methods mod, :public, :method, i_a
+    # Alternately you can use the struct-like producer to create an entire
+    # class with this behavior like so:
+    #
+    #     Wahoo = Subject_[].new :fief do
+    #       def initialize
+    #         @fief = -> { :zap }
+    #       end
+    #     end
+    #     Wahoo.new.fief  # => :zap
+    #
+    # enjoy!
+
+    class << self
+
+      def [] * a
+        via_arglist a
+      end
+
+      def call * a
+        via_arglist a
+      end
+
+      def new * i_a, & p
+        cls = ::Class.new Base__
+        via_client_and_iambic cls, i_a
+        p and cls.class_exec( & p )
+        cls
+      end
+
+      def via_arglist a
+        case 1 <=> a.length
+        when -1 ; via_client_and_iambic a.shift, a
+        when  0 ; shell_for a.first
+        else    ; MetaHell_::Ivars_with_Procs_as_Methods
+        end
+      end
+
+    private
+
+      def shell_for mod
+        One_Shot_Shell__.new do |ppp, gm, i_a|
+          define_methods mod, ppp, gm, i_a
+        end
+      end
+
+      def via_client_and_iambic mod, i_a
+        define_methods mod, :public, :method, i_a
+      end
     end
 
-    # `self._make_methods` - mutates `i_a`.
+    Base__ = ::Class.new  # just helps you track the origins of things
 
-    -> do
+    class One_Shot_Shell__
 
-      h = {
-        getter: -> ivar, meth do
-          define_method meth do
+      def initialize & p
+        @p = p
+      end
+
+      %i| public private |.each do |ii|
+        %i| getter method |.each do |jj|
+          define_method "as_#{ ii }_#{ jj }" do |*a|
+            @p[ ii, jj, a ]
+          end
+        end
+      end
+    end
+
+    define_singleton_method :define_methods, -> do
+
+      _OP_H = {
+        getter: -> ivar, meth_i do
+          define_method meth_i do
             instance_variable_get( ivar ).call
           end
         end,
-        method: -> ivar, meth do
-          define_method meth do |*a, &b|
-            instance_variable_get( ivar ).call( *a, &b )
+        method: -> ivar, meth_i do
+          define_method meth_i do |*a, &p|
+            instance_variable_get( ivar ).call( *a, &p )
           end
         end
       }
 
-      define_singleton_method :_make_methods do |
-            host, public_or_private_i, getter_or_method_i, i_a |
+      -> mod, public_or_private_i, getter_or_method_i, i_a do
         gets = -> { i_a.shift }
-        host.module_exec do
+        ( mod.module_exec do
           while i = gets[]
-            if '@' == i[ 0 ]  # sorry purists
+            if AT__ == i[ 0 ]
               ivar = i
-              meth = gets[] or fail "sanity - method expected after #{ ivar }"
+              meth_i = gets[]
+              meth_i or raise ::ArgumentError, "method expected after #{ ivar }"
             else
-              meth = i
+              meth_i = i
               ivar = :"@#{ i }"
             end
-            module_exec ivar, meth, & h.fetch( getter_or_method_i )
-            send public_or_private_i, meth
+            module_exec ivar, meth_i, & _OP_H.fetch( getter_or_method_i )
+            send public_or_private_i, meth_i
           end
-        end
-        nil
+        end ) ; nil
       end
     end.call
 
-    def self.enhance host
-      block_given? and raise ::ArgumentError, "sanity - not yet supported"
-      Shell_One_Shot_.new -> ppp, gm, i_a do
-        _make_methods host, ppp, gm, i_a
-      end
-    end
-  end
+    AT__ = '@'.freeze
 
-  class Function::Shell_One_Shot_
-
-    def initialize f
-      @f = f
-    end
-
-    %i| public private |.each do |ii|
-      %i| getter method |.each do |jj|
-        define_method "as_#{ ii }_#{ jj }" do |*a|
-          @f[ ii, jj, a ]
-        end
-      end
-    end
-  end
-
-  # Alternately you can use the struct-like producer to create an entire
-  # class with this behavior like so:
-  #
-  #     Wahoo = MetaHell_::Function::Class.new :fief
-  #     class Wahoo
-  #       def initialize
-  #         @fief = -> { :zap }
-  #       end
-  #     end
-  #     Wahoo.new.fief  # => :zap
-  #
-  # enjoy!
-
-  class Function::Class
-    class << self
-      alias_method :orig_new, :new
-
-      def new * i_a, & cls_p
-        from_i_a_and_p i_a, cls_p
-      end
-
-      def from_i_a_and_p i_a, cls_p
-        ::Class.new( self ).class_exec do
-          class << self
-            alias_method :new, :orig_new
-          end
-          MetaHell_.Function self, * i_a
-          cls_p and class_exec( & cls_p )
-          self
-        end
-      end
-    end
   end
 end

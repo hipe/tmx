@@ -2,23 +2,13 @@ require_relative '../test-support'
 
 module Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
 
-  ::Skylab::MetaHell::TestSupport::Module::Creator[ TS_ = self ]
+  ::Skylab::MetaHell::TestSupport::Module::Creator[ MC_MM_TS_ = self ]
 
-  include CONSTANTS
+  Callback_ = Callback_
 
-  MetaHell_ = MetaHell_ # #annoying
-  Module = Module # #annoying
+  MetaHell_ = MetaHell_
 
-  FUN = MetaHell_.lib.struct_from_hash(
-    :done_p => -> struct do
-      -> name do
-        struct[name] = FUN.done_msg_p[ name ]
-      end
-    end,
-    :done_msg_p => -> name do
-      -> do
-        Stderr_[].puts "NEVER AGAIN: #{name}"  # just a sanity check
-      end
-    end
-  )
+  Module = MetaHell_::Module  # only for nostalgic posterity and a sanity check
+    # do we not follow [#hl-079] a const name with trailing underscores
+
 end

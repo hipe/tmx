@@ -2,10 +2,9 @@ module Skylab::MetaHell
 
   module Parse
 
-    module Fields
+    module Fields__
 
-      Exponent = MetaHell_::Library_::Basic::
-        Struct[ :i, :long, :short, :first_desc_line ]
+      Exponent = MetaHell_::Lib_::Struct_lib[].new :i, :long, :short, :first_desc_line
 
       # the term 'exponent' is meant in the "Grammatical_category" sense.
       # similar but not the same as a flag. this was early-abstracted

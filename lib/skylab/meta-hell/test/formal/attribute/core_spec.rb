@@ -2,8 +2,6 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::Formal::Attribute
 
-  MetaHell_::Library_.kick :Set
-
   describe "[mh] formal attribute" do
 
     extend TS_
@@ -220,9 +218,12 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute
       end
 
       def build_and_attach_to_emit_spy
-        es = MetaHell_::Library_::Callback::Test::Call_Digraph_Listeners_Spy.new(
-          :do_debug_proc, -> { do_debug },
-          :debug_IO, debug_IO )
+
+        es = MetaHell_::Lib_::Event_lib[].test_support.
+          call_digraph_listeners_spy(
+            :do_debug_proc, -> { do_debug },
+            :debug_IO, debug_IO )
+
         @em_a = es.emission_a
         es
       end

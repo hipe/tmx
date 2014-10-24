@@ -6,9 +6,9 @@ module Skylab::MetaHell::TestSupport::Pool
 
   ::Skylab::TestSupport::Sandbox::Host[ self ]
 
-  CONSTANTS::Sandbox = ::Module.new
+  Constants::Sandbox = ::Module.new
 
-  include CONSTANTS
+  include Constants
 
   MetaHell_ = MetaHell_
   Sandbox = Sandbox
@@ -85,7 +85,9 @@ module Skylab::MetaHell::TestSupport::Pool
       it "uses `lease` and `release` to yield the same objects from a pool" do
 
         class Sandbox::How
+
           count = 0
+
           MetaHell_::Pool.enhance( self ).with_lease_and_release -> do
             o = new( count += 1 )
             o.message = "i am the #{ count }th nerk"
@@ -98,6 +100,10 @@ module Skylab::MetaHell::TestSupport::Pool
 
           def initialize cnt
             @pessage = "which came after #{ cnt - 1 }"
+          end
+
+          def clear_for_pool
+            # leave @pessage as-is
           end
 
           def say

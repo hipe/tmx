@@ -1,9 +1,9 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::FUN
+module Skylab::MetaHell::TestSupport::Lib
 
-  describe "[mh] FUN" do
-    context "`seeded_function_chain` - given a stack of functions and one seed value," do
+  describe "[mh] lib" do
+    context "`function_chain` - given a stack of functions and one seed value," do
       Sandbox_1 = Sandboxer.spawn
       it "opaque but comprehensive example" do
         Sandbox_1.with self
@@ -24,13 +24,13 @@ module Skylab::MetaHell::TestSupport::FUN
                 [ item1, item2 ]
               end
             end ]
-          s = MetaHell_::FUN.seeded_function_chain[ 'cilantro',  * f_a ]
+          s = MetaHell_.function_chain 'cilantro',  * f_a
           s.should eql( 'i hate cilantro' )
-          s = MetaHell_::FUN::seeded_function_chain[ 'carrots', * f_a ]
+          s = MetaHell_.function_chain 'carrots', * f_a
           s.should eql( "let's have carrots and potato" )
-          s = MetaHell_::FUN.seeded_function_chain[ 'red', * f_a ]
+          s = MetaHell_.function_chain 'red', * f_a
           s.should eql( 'nope i hate tomato' )
-          x = MetaHell_::FUN.seeded_function_chain[ 'blue', * f_a ]
+          x = MetaHell_.function_chain 'blue', * f_a
           x.should eql( [ 'blue', 'potato' ] )
         end
       end

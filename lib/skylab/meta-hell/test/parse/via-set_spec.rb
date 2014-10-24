@@ -4,7 +4,7 @@ module Skylab::MetaHell::TestSupport::Parse::FromSet__
 
   ::Skylab::MetaHell::TestSupport::Parse[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
@@ -18,7 +18,7 @@ module Skylab::MetaHell::TestSupport::Parse::FromSet__
       before :all do
         Sandbox_1.with self
         module Sandbox_1
-          P = MetaHell_::Parse.from_set.curry[ :pool_procs, [ ] ]
+          P = MetaHell_::Parse.via_set.curry[ :pool_procs, [ ] ]
         end
       end
       it "a parser with no nodes in it will always report 'no parse' and 'spent'" do
@@ -41,7 +41,7 @@ module Skylab::MetaHell::TestSupport::Parse::FromSet__
       it "it always reports the same as a final result" do
         Sandbox_2.with self
         module Sandbox_2
-          P = MetaHell_::Parse.from_set.curry[ :pool_procs, [
+          P = MetaHell_::Parse.via_set.curry[ :pool_procs, [
            -> _input {  [ true, true ] }
           ]]
 
@@ -54,7 +54,7 @@ module Skylab::MetaHell::TestSupport::Parse::FromSet__
       it "it always reports the same as a final result" do
         Sandbox_3.with self
         module Sandbox_3
-          P = MetaHell_::Parse.from_set.curry[ :pool_procs, [
+          P = MetaHell_::Parse.via_set.curry[ :pool_procs, [
             -> _input {  [ false, true ] }
           ]]
 
@@ -77,7 +77,7 @@ module Skylab::MetaHell::TestSupport::Parse::FromSet__
             end
           end
 
-          P = MetaHell_::Parse.from_set.curry[ :pool_procs, [
+          P = MetaHell_::Parse.via_set.curry[ :pool_procs, [
             keyword[ 'foo' ],
             keyword[ 'bar' ],
             -> memo, argv do

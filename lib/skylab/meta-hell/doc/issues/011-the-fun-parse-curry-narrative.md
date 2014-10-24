@@ -1,4 +1,4 @@
-# the FUN parse curry narrative :[#011]
+# the F-UN parse curry narrative :[#011]
 
 ## :#storypoint-5
 

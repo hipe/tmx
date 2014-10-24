@@ -4,7 +4,7 @@ module Skylab::MetaHell::TestSupport::Parse::Series__::Intgrtn
 
   ::Skylab::MetaHell::TestSupport::Parse::Series__[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
@@ -13,12 +13,12 @@ module Skylab::MetaHell::TestSupport::Parse::Series__::Intgrtn
   describe "[mh] Parse::Series (integration spec)" do
 
     before :all do
-      fields = MetaHell_::Parse::Fields
+      fields = MetaHell_::Parse.fields
       P_ = MetaHell_::Parse::series.curry[
         :syntax, :monikate, -> a { a * ' ' },
         :field, :monikate, -> s { "[ #{ s } ]" },
         :field, :moniker, '<integer>',
-        :token_scanner, fields::Int::Scan_token,
+        :token_scanner, fields.int.scan_token,
         :field, * fields::Flag[ :random ].to_a,
         :prepend_to_uncurried_queue, :exhaustion
       ]

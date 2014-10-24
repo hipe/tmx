@@ -4,12 +4,12 @@ module Skylab::MetaHell::TestSupport::Formal::Box
 
   ::Skylab::MetaHell::TestSupport::Formal[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
   module ModuleMethods
-    include CONSTANTS
+    include Constants
 
     def new_modified_box
       box = MetaHell_::Formal::Box.new

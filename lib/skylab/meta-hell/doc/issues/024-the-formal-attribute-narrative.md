@@ -1,4 +1,4 @@
-# the formal attribtue narrative :[#024]
+# the formal attribute narrative :[#024]
 
 FOREWORD: this puppy is very old. it was rewritten once then lost in the fire,
 and has since been obviated several times by other efforts. however, some time
@@ -37,7 +37,7 @@ To represent an associated set of such formal attributes, we use a
 attributes. Think of it as an overwrought method signature, or formal function
 parameters, or a regular expression etc, or superset definition, or map-reduce
 operation on all possible data etc wat. If the name "box" throws you off, just
-read it as "collection" whenevee you see it.
+read it as "collection" whenever you see it.
 
 To dig down even deeper, this library also lets you (requires you maybe) to
 stipulate the ways you define attributes themselves.

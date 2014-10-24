@@ -4,9 +4,7 @@ module Skylab::MetaHell::TestSupport::Class::Creator::ModuleMethods
 
   module MultipleDefiners_Scenario_One
 
-    o = { }
-
-    o[:once] = -> do
+    Once__ = Callback_.memoize do
 
       module Dingle
         extend MetaHell_::Class::Creator
@@ -34,16 +32,15 @@ module Skylab::MetaHell::TestSupport::Class::Creator::ModuleMethods
         let( :meta_hell_anchor_module ) { ::Module.new }
       end
 
-      FUN[:once] = -> { Stderr_[].puts "NOPE: scenario one is done" }
-
+      :_did_
     end
-
-    FUN = MetaHell_.lib.struct_from_hash o
 
     describe "[mh] Class::Creator::ModuleMethods Multiple Definers #{
       } Scenario One -- our graph accross a real graph" do
 
-      before( :all ) { FUN.once[] }
+      before :all do
+        Once__[]
+      end
 
       it "lets you override an entire node (definition) in a parent graph" do
         w = Weiner.new

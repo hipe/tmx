@@ -4,7 +4,7 @@ module Skylab::MetaHell::TestSupport::Module::Accessors
 
   ::Skylab::MetaHell::TestSupport::Module[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

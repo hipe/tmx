@@ -58,7 +58,7 @@ module Skylab::MetaHell::TestSupport::Formal
   end
 
   scenario_module = -> do
-    mod = TS_.const_set "MOD_#{ FUN.next_id[] }", ::Module.new
+    mod = Formal_TS_.const_set :"MOD_#{ Formal_TS_.next_id }", ::Module.new
     build_modules[ mod ] # we could module_exec but it's not much prettier
     scenario_module = -> { mod }
     mod

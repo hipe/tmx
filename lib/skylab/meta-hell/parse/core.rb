@@ -2,52 +2,55 @@ module Skylab::MetaHell
 
   module Parse
 
-    def self.alternation
-      self::Alternation__
-    end
+    class << self
 
-    def self.from_ordered_set
-      self::From_Ordered_Set__
-    end
-
-    def self.from_set
-      self::From_Set__
-    end
-
-    def self.series * a
-      if a.length.zero?
-        self::Series__
-      else
-        self::Series__.via_arglist a
+      def alternation
+        Parse_::Alternation__
       end
-    end
 
-    # hack label
-    # like so -
-    #
-    #     P = MetaHell_::Parse::Hack_label_
-    #     P[ :@foo_bar_x ] # => "foo bar"
-    #     P[ :some_method ]  # => "some method"
+      def fields
+        Parse_::Fields__
+      end
 
-    Hack_label_ = -> ivar_i do
-      MetaHell_::Library_::Headless::Name::FUN::Labelize[ ivar_i ].downcase
+      def fuzzy_matcher * a
+        if a.length.zero?
+          Fuzzy_matcher_
+        else
+          Fuzzy_matcher_[ * a ]
+        end
+      end
+
+      def hack_label
+        Hack_label_
+      end
+
+      def series * a
+        if a.length.zero?
+          self::Series__
+        else
+          self::Series__.via_arglist a
+        end
+      end
+
+      def via_ordered_set
+        Parse_::Via_Ordered_Set__
+      end
+
+      def via_set
+        Parse_::Via_Set__
+      end
     end
 
     # fuzzy matcher - partial match anchored to beginning
     # it's a proc that generates other procs
     #
-    #     P = MetaHell_::Parse::Fuzzy_matcher_
-    #     Q = P[ 3, 'foobie' ]
+    #     p = Subject_[].fuzzy_matcher 3, 'foobie'
     #
-    #     Q[ 'f' ] # => nil
-    #     Q[ 'foo' ]  # => true
-    #     Q[ 'foob' ]  # => true
-    #     Q[ 'foobie-doobie' ]  # => nil
+    #     p[ 'f' ] # => nil
+    #     p[ 'foo' ]  # => true
+    #     p[ 'foob' ]  # => true
+    #     p[ 'foobie-doobie' ]  # => nil
     #
-
-    def self.fuzzy_matcher
-      Fuzzy_matcher_
-    end
 
     Fuzzy_matcher_ = -> min, moniker do
       min ||= 1
@@ -60,15 +63,58 @@ module Skylab::MetaHell
       end
     end
 
-    module Fields
+    # hack label
+    # like so -
+    #
+    #     p = Subject_[].hack_label
+    #
+    #     p[ :@foo_bar_x ]  # => "foo bar"
+    #     p[ :some_method ]  # => "some method"
+
+    Hack_label_ = -> ivar_i do
+      MetaHell_::Lib_::Old_name_lib[].labelize( ivar_i ).downcase
+    end
+
+    module Fields__
+
+      class << self
+
+        def exponent
+          Fields__::Exponent
+        end
+
+        def flag * a
+          if a.length.zero?
+            Fields__::Flag
+          else
+            Fields__::Flag.via_arglist a
+          end
+        end
+
+        def int
+          Fields__::Int
+        end
+      end
+
       module Int
-        Scan_token = -> tok do
+
+        class << self
+
+          def scan_token
+            Scan_token__
+          end
+        end
+
+        Scan_token__ = -> tok do
           RX__ =~ tok and tok.to_i
         end
+
         RX__ = /\A\d+\z/
       end
 
       Autoloader_[ self ]
     end
+
+    Parse_ = self
   end
 end

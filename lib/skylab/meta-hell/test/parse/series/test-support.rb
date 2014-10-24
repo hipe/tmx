@@ -4,7 +4,7 @@ module Skylab::MetaHell::TestSupport::Parse::Series__
 
   ::Skylab::MetaHell::TestSupport::Parse[ self ]
 
-  include CONSTANTS
+  include Constants
 
   MetaHell_ = MetaHell_
 

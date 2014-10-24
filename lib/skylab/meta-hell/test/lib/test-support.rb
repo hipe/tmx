@@ -1,21 +1,15 @@
 require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport
+module Skylab::MetaHell::TestSupport::Lib
 
-  module FUN
+  ::Skylab::MetaHell::TestSupport[ self ]
 
-    ::Skylab::MetaHell::TestSupport[ self ]
+  include Constants
 
-    include CONSTANTS
+  extend TestSupport_::Quickie
 
-    extend TestSupport_::Quickie
+  MetaHell_ = MetaHell_
 
-    MetaHell_ = MetaHell_
-
-    Sandboxer = TestSupport_::Sandbox::Spawner.new
-
-  end
-
-  Fun = FUN  # #todo
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
 end

@@ -1,19 +1,9 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::Function
+module Skylab::MetaHell::TestSupport::Ivars_with_Procs_as_Methods
 
-  ::Skylab::MetaHell::TestSupport[ self ]
-
-  include CONSTANTS
-
-  extend TestSupport_::Quickie
-
-  MetaHell_ = MetaHell_
-
-  Sandboxer = TestSupport_::Sandbox::Spawner.new
-
-  describe "[mh] Function" do
-    context "`MetaHell_::Function` can act as an enhancer that enhances a class via" do
+  describe "[mh] via procs methods" do
+    context "can act as an enhancer that enhances a class via" do
       Sandbox_1 = Sandboxer.spawn
       it "enabling ivars that hold procs to act as methods of the object" do
         Sandbox_1.with self
@@ -22,7 +12,7 @@ module Skylab::MetaHell::TestSupport::Function
             def initialize
               @bar = -> { :baz }
             end
-            MetaHell_::Function self, :bar
+            Subject_[ self, :bar ]
           end
 
           Foo.new.bar.should eql( :baz )
@@ -38,7 +28,7 @@ module Skylab::MetaHell::TestSupport::Function
             def initialize
               @_secret = -> { :ting }
             end
-            MetaHell_::Function self, :@_secret, :wahoo
+            Subject_[ self, :@_secret, :wahoo ]
           end
 
           Foo.new.wahoo.should eql( :ting )
@@ -52,20 +42,21 @@ module Skylab::MetaHell::TestSupport::Function
         module Sandbox_3
           class Foo
             def initialize
-              @_go = -> { :yep }
+              @_go = -> { :thats_right }
               @_hi = -> x { "HI:#{ x }" }
             end
-            MetaHell_::Function.enhance( self ).as_private_getter :@_go, :yep
-            MetaHell_::Function.enhance( self ).as_public_method :_hi
+            Subject_[ self ].as_public_method :_hi
+            Subject_[ self ].as_private_getter :@_go, :yep
           end
 
-          f = Foo.new
+          foo = Foo.new
 
-          f._hi 'X' #=> "HI:X"
+          foo._hi 'X' #=> "HI:X"
           -> do
-            f.yep
+            foo.yep
           end.should raise_error( NoMethodError,
                        ::Regexp.new( "\\Aprivate\\ method\\ `yep'\\ called\\ for" ) )
+          foo.send( :yep ).should eql :thats_right
         end
       end
     end
@@ -74,8 +65,7 @@ module Skylab::MetaHell::TestSupport::Function
       it "class with this behavior like so" do
         Sandbox_4.with self
         module Sandbox_4
-          Wahoo = MetaHell_::Function::Class.new :fief
-          class Wahoo
+          Wahoo = Subject_[].new :fief do
             def initialize
               @fief = -> { :zap }
             end

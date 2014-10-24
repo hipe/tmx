@@ -2,9 +2,18 @@ module Skylab::MetaHell
 
   module Parse
 
-    class Fields::Flag < Parse::Field_
+    class Fields__::Flag < Parse::Field_
 
-      class << self ; alias_method :[], :new end
+      class << self
+
+        def [] * a
+          new( * a )
+        end
+
+        def via_arglist a
+          new( * a )
+        end
+      end
 
       VM_ = [ :moniker, :first_desc_line ].freeze
 

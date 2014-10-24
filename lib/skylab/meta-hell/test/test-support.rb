@@ -6,25 +6,26 @@ module Skylab::MetaHell::TestSupport
   ::Skylab::TestSupport::Regret[ self ]
   ::Skylab::TestSupport::Quickie.enable_kernel_describe
 
-  module CONSTANTS
+  module Constants
     MetaHell_ = ::Skylab::MetaHell
+      Callback_ =  MetaHell_::Callback_
     TestSupport_ = ::Skylab::TestSupport
   end
 
-  include CONSTANTS
+  include Constants
 
+  Callback_ = Callback_
   MetaHell_ = MetaHell_
 
   module ModuleMethods
-    include CONSTANTS
+    include Constants
     def memoize name_i, p
-      define_method name_i, & MetaHell_::FUN.memoize[ p ]
-      nil
+      define_method name_i, MetaHell_::Callback_.memoize( p ) ; nil
     end
   end
 
   module InstanceMethods
-    include CONSTANTS
+    include Constants
     extend MetaHell_::Let
 
     def debug!
@@ -34,7 +35,7 @@ module Skylab::MetaHell::TestSupport
     attr_reader :do_debug
 
     def debug_IO
-      MetaHell_::Library_::Headless::System::IO.some_stderr_IO
+      TestSupport_.debug_IO
     end
 
     let :o do

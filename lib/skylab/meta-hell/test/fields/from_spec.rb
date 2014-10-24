@@ -4,7 +4,7 @@ module Skylab::MetaHell::TestSupport::Fields::From
 
   ::Skylab::MetaHell::TestSupport::Fields[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
@@ -12,7 +12,7 @@ module Skylab::MetaHell::TestSupport::Fields::From
 
   Sandboxer = TestSupport_::Sandbox::Spawner.new
 
-  describe "[mh] Fields::From" do
+  describe "[mh] fields from" do
     context "let a class define its fields via particular methods it defines" do
       Sandbox_1 = Sandboxer.spawn
       before :all do
@@ -71,7 +71,7 @@ module Skylab::MetaHell::TestSupport::Fields::From
           -> do
             Foo.new( :four, "frick" )
           end.should raise_error( ArgumentError,
-                       ::Regexp.new( "\\Aunrecognized\\ keyword\\ 'four'\\ \\-\\ did\\ you\\ mean\\ two\\?\\z" ) )
+                        ::Regexp.new( "\\Aunrecognized\\ keyword\\ 'four'\\ \\-\\ did\\ you\\ mean\\ two\\?\\z" ) )
         end
       end
     end

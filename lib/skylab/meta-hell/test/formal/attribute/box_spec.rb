@@ -4,7 +4,7 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute::Box
 
   ::Skylab::MetaHell::TestSupport::Formal::Attribute[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
