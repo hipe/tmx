@@ -2,29 +2,45 @@ require_relative '../core'
 
 module Skylab::Callback::TestSupport
 
+  class << self
+    def call_digraph_listeners_spy *a
+      if a.length.zero?
+        TS_::Call_Digraph_Listeners_Spy__
+      else
+        TS_::Call_Digraph_Listeners_Spy__.new( * a )
+      end
+    end
+  end
+
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
 
-  module CONSTANTS
+  module Constants
     Callback_ = Callback_
-    Callback = Callback_
     TestSupport_ = Callback_::Autoloader.require_sidesystem :TestSupport
   end
 
   Autoloader_[ self, Callback_.dir_pathname.join( 'test' ) ]
 
-  CONSTANTS::TestSupport_::Regret[ self ]
+  include Constants
+
+  TestSupport_::Regret[ TS_ = self ]
+
+  TestSupport_ = TestSupport_
 
   module InstanceMethods
 
-    -> do
-      p = -> do
-        pn = Callback_::TestSupport.dir_pathname.join 'fixtures'
-        p = -> { pn } ; pn
-      end
-      define_method :fixtures_dir_pn do
-        p[]
-      end
-    end.call
+    def debug!
+      @do_debug = true ; nil
+    end
+    attr_reader :do_debug
+
+    def debug_IO
+      TestSupport_.debug_IO
+    end
+
+    define_method :fixtures_dir_pn, Callback_.memoize[ -> do
+      Callback_::TestSupport.dir_pathname.join 'fixtures'
+    end ]
   end
 end

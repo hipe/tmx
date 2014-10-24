@@ -8,7 +8,7 @@ module Skylab::Callback::TestSupport::Listener
 
     before :all do
 
-      Mofo_CFDM = Callback::Listener::Class_from_diadic_matrix[
+      Mofo_CFDM = Callback_::Listener::Class_from_diadic_matrix[
         %i( info error ), %i( string line ) ]
 
 

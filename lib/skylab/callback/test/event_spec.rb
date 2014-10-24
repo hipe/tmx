@@ -4,11 +4,11 @@ module Skylab::Callback::TestSupport::Event_Tests__
 
   ::Skylab::Callback::TestSupport[ self ]
 
-  include CONSTANTS
+  include Constants
 
-  Callback = Callback
+  Callback_ = Callback_
 
-  Callback::Lib_::Quickie[ self ]
+  Callback_::Lib_::Quickie[ self ]
 
   describe "[cb] event" do
 
@@ -20,7 +20,7 @@ module Skylab::Callback::TestSupport::Event_Tests__
     end
 
     def subject_class
-      Callback::TestSupport::Event::Assertion
+      Callback_::TestSupport::Event::Assertion
     end
 
     context "the empty assertion against" do
@@ -328,14 +328,14 @@ module Skylab::Callback::TestSupport::Event_Tests__
 
     def build_event stream_name, *rest
       # (a necessarily much simpler version than the one found in p.s)
-      Callback::Event::Unified.new false, stream_name, *rest  # (no event graph)
+      Callback_::Event::Unified.new false, stream_name, *rest  # (no event graph)
     end
 
     def build_text_event stream_name, text
       TextEvent__.new false, stream_name, text
     end
     #
-    class TextEvent__ < Callback::Event::Unified
+    class TextEvent__ < Callback_::Event::Unified
 
       def initialize esg, stream_name, text
         super esg, stream_name

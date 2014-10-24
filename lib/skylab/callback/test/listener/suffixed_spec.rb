@@ -35,7 +35,7 @@ module Skylab::Callback::TestSupport::Listener
     end
 
     def build_listener
-      Callback::Listener::Suffixed[ :from_agent, client ]
+      Callback_::Listener::Suffixed[ :from_agent, client ]
     end
     def build_client
       @a = []

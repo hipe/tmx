@@ -4,7 +4,7 @@ module Skylab::Callback::Test::Name::CMP_
 
   ::Skylab::Callback::Test::Name[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

@@ -116,8 +116,7 @@ module Skylab::Callback
     end
 
     Build_init_method__ = -> do
-      default_proc = Callback_::Lib_::Basic_Hash[]::
-        Loquacious_default_proc.curry[ 'stream' ]
+      default_proc = Callback_::Lib_::Hash_lib[].loquacious_default_proc.curry[ 'stream' ]
       -> h do
         h.default_proc ||= default_proc
         @simple_IO_manifold_h = h ; nil

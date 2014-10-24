@@ -4,7 +4,7 @@ module Skylab::Callback::TestSupport::OD__
 
   ::Skylab::Callback::TestSupport[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

@@ -15,7 +15,7 @@ module Skylab::Callback
           et = entry_tree
           stem_p = fuzzy_stem_cache
           have_h = ::Hash[ a.map { |i| [ stem_p[ i ], true ] } ]
-          scn = et ? et.get_normpath_scanner : Scn.the_empty_scanner
+          scn = et ? et.to_scan : Scn.the_empty_scanner
           y = []
           while (( np = scn.gets ))
             have_h[ stem_p[ np.corename_as_const ] ] and next
@@ -41,7 +41,7 @@ module Skylab::Callback
     private
       def const_might_load_boxxily i
         et = entry_tree ; found = false
-        scn = et ? et.get_normpath_scanner : Scn.the_empty_scanner
+        scn = et ? et.to_scan : Scn.the_empty_scanner
         stem = Distill_[ i ]
         while (( np = scn.gets ))
           stem == np.corename_as_distilled_stem or next
@@ -49,19 +49,6 @@ module Skylab::Callback
           np.assert_state :loaded
         end
         found
-      end
-    end
-
-    class Entry_Tree_  # ~ #the-fuzzily-unique-entry-scanner
-      def get_normpath_scanner  # (#fuzzy-sibling-pairs)
-        @did_index_all ||= index_all
-        a = @stem_i_a ; d = -1 ; last = a.length - 1
-        Scn.new do
-          if d < last
-            _stem_i = a.fetch d+= 1
-            @normpath_lookup_p[ _stem_i ]
-          end
-        end
       end
     end
 
@@ -94,7 +81,7 @@ module Skylab::Callback
 
       module Names__
         p = -> do
-          class Fly__ < Callback_::Lib_::Name[]::Function::From::Constant
+          class Fly__ < Callback_::Lib_::Old_name_lib[].via_const
             alias_method :replace_with_constant_i, :initialize
             public :replace_with_constant_i
             def initialize ; end

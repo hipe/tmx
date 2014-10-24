@@ -10,7 +10,7 @@ module Skylab::Callback::TestSupport::Autoloader
 
         module TS_::Fixtures::One
           LoL = :weird_casing
-          Callback::Autoloader[ self, :boxxy ]
+          Subject_[ self, :boxxy ]
         end
       end
 
@@ -36,7 +36,7 @@ module Skylab::Callback::TestSupport::Autoloader
       before :all do
         module TS_::Fuxtures
           Wazlo = :heya
-          Callback::Autoloader[ self, :boxxy ]
+          Subject_[ self, :boxxy ]
         end
       end
 
@@ -61,7 +61,7 @@ module Skylab::Callback::TestSupport::Autoloader
     context "if one of the expected consts is not set in the file" do
       before :all do
         module TS_::Fixtures::Two
-          Callback::Autoloader[ self, :boxxy ]
+          Subject_[ self, :boxxy ]
         end
       end
       it "it will say it is defined, and then BOOM - X" do
@@ -84,7 +84,7 @@ module Skylab::Callback::TestSupport::Autoloader
 
       before :all do
         module TS_::Fixtures::Three
-          Callback::Autoloader[ self, :boxxy ]
+          Subject_[ self, :boxxy ]
         end
       end
 
@@ -101,7 +101,7 @@ module Skylab::Callback::TestSupport::Autoloader
     context "when there is a fuzzy pair (file and folder) of entries" do
       before :all do
         module TS_::Boxxy::Fixtures::One
-          Callback::Autoloader[ self, :boxxy ]
+          Subject_[ self, :boxxy ]
         end
       end
       it "it works" do

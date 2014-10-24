@@ -96,7 +96,7 @@ module Skylab::Callback
       end
 
       def cnst_fetch i, & p
-        name = Name.from_variegated_symbol i
+        name = Name.via_variegated_symbol i
         const_i = name.as_const
         if @const_h[ const_i ]
           @box_mod.const_get const_i, false

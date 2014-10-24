@@ -1,16 +1,15 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::Proxy
+module Skylab::Callback::TestSupport::Proxy
 
-  describe "[mh] Proxy::Nice is nice" do
+  describe "[cb] proxy - nice" do
 
     extend TS_
 
     context "with a straight up-produced class" do
 
       define_sandbox_constant :bingo_kls do
-        Sandbox::Bingo = MetaHell_::Proxy::Nice::Basic.new :moo, :mar
-        class Sandbox::Bingo
+        Sandbox::Bingo = Subject_[].nice :moo, :mar do
           attr_reader :two
           def initialize one, two
             @two = [ one, two ]
@@ -20,9 +19,9 @@ module Skylab::MetaHell::TestSupport::Proxy
 
       it "class / construct / inspect" do
         x = bingo_kls.new moo: 'x1', mar: 'x2'
-        ( Sandbox::Bingo == x.class ).should eql( true )
+        x.class.should eql Sandbox::Bingo
         x.inspect.should eql(
-          '#<Skylab::MetaHell::TestSupport::Proxy::Sandbox::Bingo moo, mar>' )
+          '#<Skylab::Callback::TestSupport::Proxy::Sandbox::Bingo moo, mar>' )
         x.two.should eql( [ 'x1', 'x2' ] )
       end
     end
@@ -30,7 +29,7 @@ module Skylab::MetaHell::TestSupport::Proxy
     context "with a subclass of a produced class" do
 
       define_sandbox_constant :fingo_kls do
-        class Sandbox::Fingo < MetaHell_::Proxy::Nice::Basic.new :loo
+        Sandbox::Fingo = Subject_[].nice :loo do
           attr_reader :liu
           def initialize liu
             @liu = liu
@@ -40,48 +39,10 @@ module Skylab::MetaHell::TestSupport::Proxy
 
       it "construct / class / inspect" do
         foo = fingo_kls.new loo: 'y'
-        ( Sandbox::Fingo == foo.class ).should eql( true )
+        foo.class.should eql Sandbox::Fingo
         foo.inspect.should eql(
-          '#<Skylab::MetaHell::TestSupport::Proxy::Sandbox::Fingo loo>' )
+          '#<Skylab::Callback::TestSupport::Proxy::Sandbox::Fingo loo>' )
         foo.liu.should eql( 'y' )
-      end
-    end
-
-    context "does it work if you don't subclass it?" do
-
-      define_method :klass, & MetaHell_::FUN.memoize[ -> do
-        const = "KLS_#{ TS_.next_id }"
-        kls = MetaHell_::Proxy::Nice::Basic.new :weazel, :skeezel
-        kls.class_eval do
-          def initialize w, s
-            @alpha, @beta = w, s
-          end
-          def go
-            @alpha.call
-            @beta.call 'ohai'
-            :gamma
-          end
-        end
-        TS_.const_set const, kls
-        kls
-      end ]
-
-      it "does not work like a functional proxy" do
-        klass.name.should be_include( 'TestSupport::Proxy::KLS' )
-        wzl = szl = nil
-        proxy_object = klass.new(
-          weazel: -> { wzl = :yep },
-          skeezel: -> x { szl = "moink : #{ x }" }
-        )
-        begin
-          proxy_object.weazel
-        rescue ::NoMethodError => e
-        end
-        e.message.should match( /\Aundefined method `weazel' for/ )
-
-        proxy_object.go.should eql( :gamma )
-        wzl.should eql( :yep )
-        szl.should eql( "moink : ohai" )
       end
     end
   end

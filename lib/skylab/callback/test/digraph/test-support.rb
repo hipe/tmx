@@ -4,15 +4,15 @@ module Skylab::Callback::TestSupport::Digraph
 
   ::Skylab::Callback::TestSupport[ Digraph_TestSupport = self ] # #regret
 
-  include CONSTANTS
+  include Constants
 
-  Callback = Callback
+  Callback_ = Callback_
 
-  Callback::Lib_::Quickie[ self ]
+  Callback_::Lib_::Quickie[ self ]
 
   module ModuleMethods
-    include CONSTANTS
-    include Callback::Lib_::Class[]::Creator::ModuleMethods
+    include Constants
+    include Callback_::Lib_::Class[]::Creator::ModuleMethods
 
     def inside &b                 # define the dsl-ish klass body to be somthing
       b or fail 'give a block'    # other than nothing (below)
@@ -20,16 +20,16 @@ module Skylab::Callback::TestSupport::Digraph
     end
 
     def memoize name, func
-      define_method name, & Callback::Lib_::Memoize[ func ]
+      define_method name, & Callback_::Lib_::Memoize[ func ]
       nil
     end
   end
 
   module InstanceMethods
 
-    extend Callback::Lib_::Let[]::ModuleMethods
+    extend Callback_::Lib_::Let[]::ModuleMethods
 
-    include Callback::Lib_::Class[]::Creator::InstanceMethods
+    include Callback_::Lib_::Class[]::Creator::InstanceMethods
 
     let :meta_hell_anchor_module do ::Module.new end
 
@@ -39,7 +39,7 @@ module Skylab::Callback::TestSupport::Digraph
       blk = inside                # make a Callback empowered class and nerk it
       kls = Digraph_TestSupport.const_set "KLS_#{ counter += 1 }", ::Class.new
       kls.class_exec do
-        Callback[ self, :employ_DSL_for_digraph_emitter ]
+        Callback_[ self, :employ_DSL_for_digraph_emitter ]
         public :call_digraph_listeners  # [#002] public for testing
         class_exec(& blk ) if blk
       end

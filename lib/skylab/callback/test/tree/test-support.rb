@@ -4,10 +4,10 @@ module Skylab::Callback::TestSupport::Tree
 
   ::Skylab::Callback::TestSupport[ self ]
 
-  include CONSTANTS
+  include Constants
 
-  Callback = Callback
+  Callback_ = Callback_
 
-  Callback::Lib_::Quickie[ self ]
+  Callback_::Lib_::Quickie[ self ]
 
 end

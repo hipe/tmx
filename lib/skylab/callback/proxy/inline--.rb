@@ -1,43 +1,73 @@
-module Skylab::MetaHell
+module Skylab::Callback
 
-  class Proxy::Ad_Hoc < ::BasicObject
+  module Proxy
 
-    # #experimental - for quick and dirty hacks or experimentation,
-    # simply takes a hash-like whose keys are presumed to represent method
-    # names and whose values are presumed to be functions, and make and
-    # object out of it.
-    #
-    # (Alternate names for this that have been or are being considered
-    # or have been used for this are / were: `Generic`, `Plastic`, `Dynamic`.
-    # kind of amusing, actually)
-    #
-    # (This was the orignal home of [#009] - it was developed right before
-    # we found out about define_singleton_method, but it stays b/c it's actually
-    # a bit clearer to read than hacks like *that*. If for no other reason
-    # it might be only slighly more useful than using ::Object because it leads
-    # you here to read this.) (hm..)
-    #
+    class Inline__ < ::BasicObject
 
-    class << self
-      alias_method :[], :new
-    end
+      # produce a proxy "inline" from a hash-like whose values are procs:
+      #
+      #     pxy = Subject_[].inline(
+      #       :foo, -> x { "bar: #{ x }" },
+      #       :biz, -> { :baz } )
+      #
+      #     pxy.foo :wee  # => "bar wee"
+      #
+      #     pxy.biz  # => :baz
+      #
+      # (was [#mh-009] - this is essentially a convenience wrapper around
+      # `define_singelton_method`.)
+      #
+      # (past names for this include:
+      #   `generic`, `plastic`, `dynamic`, `ad_hoc`)
 
-  private
-
-    def initialize h
-      singleton_class = class << self
-        self
+      class << self
+        def via_arglist a, & p
+          new a, p
+        end
       end
-      singleton_class.class_exec do
-        if ! h.key? :inspect
-          define_method :inspect do
-            "<##{ Proxy::Ad_Hoc }:(#{ h.keys.join ', ' })>"
+
+    private
+
+      def initialize x_a, convenience_p
+
+        pairs_scn = Try_convert_iambic_to_pairs_scan_[ x_a ]
+
+        _I_A = []
+
+        add = -> do
+          class << self  # because basic object
+            self
+          end.class_exec do
+            -> i, p do
+              _I_A.push i
+              define_method i, -> * a, & p_ do
+                p[ * a, & p ]  # call the proc in its original context
+              end
+            end
+          end
+        end.call
+
+        while pair = pairs_scn.gets
+          i, p = pair
+          add[ i, p ]
+          if :inspect == i
+            did_inspect = true
+            break
           end
         end
-        h.each do |k, func|
-          define_method k do |*a, &b|          # necessary to do in these two
-            func[ *a, &b ]                     # steps because we want to call
-          end                                  # the proc in its original ctxt
+
+        if did_inspect
+          while pair = pairs_scn.gets
+            add[ * pair ]
+          end
+        else
+          add[ :inspect, -> do
+            "<##{ Inline__ }:(#{ _I_A * ', ' })>"
+          end ]
+        end
+
+        if convenience_p
+          instance_exec( & convenience_p )
         end
       end
     end

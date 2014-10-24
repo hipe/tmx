@@ -1,6 +1,6 @@
 module Skylab::Callback::TestSupport
 
-  class Call_Digraph_Listeners_Spy  # read [#022] the narrative  #storypoint-1
+  class Call_Digraph_Listeners_Spy__  # read [#022] the narrative  #storypoint-1
 
     Callback_::Lib_::Entity[ self, -> do
 

@@ -4,7 +4,14 @@ module Skylab::Callback
 
   class CLI  # NOTE "this node in its scope is not related to pub-s.." [#018]
 
-    Callback_::Lib_::CLI[]::Client[ self,
+    class << self
+
+      def option
+        CLI::Option__
+      end
+    end
+
+    Callback_::Lib_::CLI_lib[]::Client[ self,
       :three_streams_notify,
       :DSL ]  # don't add DSL till end b.c of it's method_added hook
 
@@ -104,7 +111,9 @@ module Skylab::Callback
       p[:do_show_backtrace] = false
     end
 
-    option_parser_class -> { CLI::Option::Parser::Fire }
+    option_parser_class -> do
+      CLI.option.parser.fire
+    end
 
     append_syntax(
       '[ -- ( <payload_string> | --name-1 <val-1> [ --n-2 <v2> [..]] ) ]' )

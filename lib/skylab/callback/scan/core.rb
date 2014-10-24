@@ -1,10 +1,29 @@
 module Skylab::Callback
 
-      class Scan < ::Proc  # [#044].
+      class Scan < ::Proc  # see [#044]
 
         alias_method :gets, :call
 
         class << self
+
+          def concat scan, scan_
+            active = scan
+            subsequent = scan_
+            new do
+              while true
+                x = active.gets
+                x and break
+                subsequent or break
+                active = subsequent
+                subsequent = nil
+              end
+              x
+            end
+          end
+
+          def the_empty_scan
+            @tes ||= new do end
+          end
 
           def expand scn, p
             scn_ = nil
@@ -23,6 +42,10 @@ module Skylab::Callback
               end
               x_
             end
+          end
+
+          def immutable_with_random_access
+            Scan_::Immutable_with_Random_Access__
           end
 
           def map scn, p
@@ -45,21 +68,12 @@ module Skylab::Callback
             end
           end
 
-          def nonsparse_array a
-            d = -1 ; last = a.length - 1
-            new do
-              if d < last
-                a.fetch d += 1
-              end
-            end
+          def mutable_with_random_access
+            Scan_::Mutable_with_Random_Access__
           end
 
           def pair
             Pair_
-          end
-
-          def random_access scn, meth_i
-            Callback_::Scan::With_Random_Access__.new scn, meth_i
           end
 
           def reduce scn, p
@@ -74,9 +88,44 @@ module Skylab::Callback
             end
           end
 
-          def the_empty_scan
-            @tes ||= new do end
+          def via_item x, & p
+            p_ = -> do
+              p_ = EMPTY_P_
+              x
+            end
+            scan = new do
+              p_[]
+            end
+            p and scan = scan.map_reduce_by( & p )
+            scan
           end
+
+          def via_nonsparse_array a, & p
+            d = -1 ; last = a.length - 1
+            scan = new do
+              if d < last
+                a.fetch d += 1
+              end
+            end
+            p and scan = scan.map_reduce_by( & p )
+            scan
+          end
+
+          def via_times num_times, & p
+            d = -1 ; last = num_times - 1
+            scan = new do
+              if d < last
+                d += 1
+              end
+            end
+            p and scan = scan.map_reduce_by( & p )
+            scan
+          end
+
+          def with_random_access
+            Scan_::With_Random_Access__
+          end
+
         end  # >>
 
         def count
@@ -85,15 +134,15 @@ module Skylab::Callback
           d
         end
 
-        def concat_by scn
+        def concat_by scan
           active = self
           self.class.new do
             while true
               x = active.gets
               x and break
-              scn or break
-              active = scn
-              scn = nil
+              scan or break
+              active = scan
+              scan = nil
             end
             x
           end
@@ -104,6 +153,10 @@ module Skylab::Callback
             p[ x ] and break
           end
           x
+        end
+
+        def immutable_with_random_access_keyed_to_method i, * x_a
+          Scan_::Immutable_with_Random_Access__.new self, i, x_a
         end
 
         def map_detect & p
@@ -130,7 +183,7 @@ module Skylab::Callback
         end
 
         def push_by * x_a
-          concat_by Scan.nonsparse_array x_a
+          concat_by Scan.via_nonsparse_array x_a
         end
 
         def reduce_by & p
@@ -167,8 +220,6 @@ module Skylab::Callback
           end
         end
 
-        def with_random_access_keyed_to_method i
-          self.class.random_access self, i
-        end
+        Scan_ = self
       end
 end

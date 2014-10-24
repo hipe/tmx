@@ -30,7 +30,7 @@ module Skylab::Callback::TestSupport::Listener
     end
 
     def build_listener
-      Callback::Listener::From_digraph_emitter[ emitter ]
+      Callback_::Listener::From_digraph_emitter[ emitter ]
     end
 
     def build_digraph_emitter

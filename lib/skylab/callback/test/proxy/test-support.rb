@@ -1,24 +1,31 @@
 require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport::Proxy
+module Skylab::Callback::TestSupport::Proxy
 
-  ::Skylab::MetaHell::TestSupport[ TS_ = self ]
+  ::Skylab::Callback::TestSupport[ TS_ = self ]
 
-  ::Skylab::TestSupport::Sandbox::Host[ self ]
+  define_singleton_method :next_id, -> do
+    counter = 0
+    -> do
+      counter += 1
+    end
+  end.call
 
-  module Sandbox
-  end
+  include Constants
 
-  module CONSTANTS
+  extend TestSupport_::Quickie
+
+  TestSupport_::Sandbox::Host[ self ]
+
+  Sandbox = ::Module.new
+
+  Sandbox.name  # covered :(
+
+  module Constants
     Sandbox = Sandbox
   end
 
-  include CONSTANTS
-
-  extend TestSupport_::Quickie  # brash
-
-  -> do
-    counter = 0
-    define_singleton_method :next_id do counter += 1 end
-  end.call
+  Subject_ = -> do
+    Callback_::Proxy
+  end
 end

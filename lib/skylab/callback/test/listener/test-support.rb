@@ -4,11 +4,11 @@ module Skylab::Callback::TestSupport::Listener
 
   ::Skylab::Callback::TestSupport[ TS__ = self ]
 
-  include CONSTANTS
+  include Constants
 
-  Callback = Callback
+  Callback_ = Callback_
 
-  Callback::Lib_::Quickie[ self ]
+  Callback_::Lib_::Quickie[ self ]
 
   module InstanceMethods
     def client

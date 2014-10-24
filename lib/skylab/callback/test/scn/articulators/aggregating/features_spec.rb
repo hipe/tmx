@@ -1,53 +1,150 @@
 require_relative 'test-support'
 
-module Skylab::Basic::TestSupport::List::Aggregated
+module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
 
-  ::Skylab::Basic::TestSupport::List[ TS_ = self ]
-
-  include CONSTANTS
-
-  extend TestSupport_::Quickie
-
-  module Sandbox
-  end
-
-  CONSTANTS::Sandbox = Sandbox  # mine and mine
-
-  describe "[ba] list aggregated articulation WAHOO" do
+  describe "[cb] scn articulators - aggregating (features)" do
 
     extend TS_
 
-    context "normal" do
+    context "expander (when no input)" do
 
-      define_sandbox_constant :func do
-        Sandbox::F_1 = Basic_::List::Aggregated.Articulation do
-          template "{{ store }}{{ adj1 }} has the required {{ item }}#{
-            } needed by {{ needer }}{{ adj2 }}"
-          on_zero_items -> { "nothing happened." }
-          aggregate do
-            item -> a do
-              if 1 == a.length then "item \"#{ a.fetch 0 }\""
-              else                  "items (#{ a * ', ' })" end
-            end
-          end
-          on_first_mention do
-            store needer -> x do
-              x.to_s.upcase
-            end
-            _flush -> x='WAT' do  # #todo:next
-              "#{ x }."
-            end
-          end
-          on_subsequent_mentions do
-            store  -> { 'it' }
-            adj1   -> { ' also' }
-            needer -> { 'that needer' }
-            adj2   -> { ' too' }
-            _flush -> x='WHOSE' do  # #todo:next
-              " #{ x }."
-            end
-          end
-        end
+      before :all do
+
+        FT_Exp = Subject_.call(
+
+          :on_zero_items, -> y do
+            y << 'nerp'
+          end,
+
+          :template, "{{ wazzah }}" )
+
+      end
+
+      it "loads" do
+      end
+
+      it "zero items" do
+        expect_line 'nerp'
+        expect_no_more_lines
+      end
+
+      it "one item" do
+        push 'wizzie'
+        expect_line 'wizzie'
+        expect_no_more_lines
+      end
+
+      def subject
+        FT_Exp
+      end
+    end
+
+    context "on fist mention" do
+
+      before :all do
+        FT_OFM = Subject_.call(
+          :template, '{{ who-hah }} {{ nec }}',
+
+          :'who-hah', :on_first_mention, -> y, x do
+            y << ( x.gsub( /([aeiou])/ ) {  '%c' % ( $1.ord + 6 ) } ).upcase
+          end )
+      end
+
+      it "loads" do
+      end
+
+      it "works." do
+        push 'ding', 'dung'
+        push 'ding', 'dong'
+        expect_line 'DONG dung'
+        expect_line 'ding dong'
+        expect_no_more_lines
+      end
+
+      def subject
+        FT_OFM
+      end
+    end
+
+    context "derivative fields" do
+
+      before :all do
+
+        FT_Of = Subject_.call(
+
+          :template, '{{ np }}{{ vp }}{{ adv }}',
+
+          :adv, :on_subsequent_mentions_of, :field, :vp, -> y, _ do
+            y << ' also'
+          end )
+      end
+
+      it "loads" do
+      end
+
+      it "works" do
+        push 'i', ' want candy', 'no see 1'
+        push 'you', ' want candy', 'no see 2'
+        expect_line 'i want candy'
+        expect_line 'you want candy also'
+        expect_no_more_lines
+      end
+
+      def subject
+        FT_Of
+      end
+    end
+
+    context "impetus example" do
+
+      before :all do
+
+        Art = Subject_.call(
+
+          :on_zero_items, -> y do
+            y << "nothing happened."
+          end,
+
+          :template, "{{ store }}{{ adv }} has the required {{ item }}#{
+            } needed by {{ needer }}{{ adv2 }}.",
+
+            :store,
+              :on_first_mention, -> y, x do
+                y << x.to_s.upcase
+              end,
+              :on_subsequent_mentions, -> y, x do
+                y << 'it'
+              end,
+
+            :adv,
+              :on_subsequent_mentions_of, :field, :store, -> y, _ do
+                y << " also"
+              end,
+
+            :item,
+              :on_first_mention, -> y, x do
+                y << "item \"#{ x }\""
+              end,
+              :aggregate, -> y, a do
+                y << "items (#{ a * ', ' })"
+              end,
+
+            :needer,
+              :on_first_mention, -> y, x do
+                y << x.to_s.upcase
+              end,
+              :on_subsequent_mentions, -> y, x do
+                y << 'that needer too'
+              end,
+
+            :adv2,
+              :on_subsequent_mentions_of, :field, :store, -> y, _ do
+                y << ' too'
+              end )
+
+      end
+
+      it "loads" do
       end
 
       it "none - \"nothing happened\"" do
@@ -78,21 +175,31 @@ module Skylab::Basic::TestSupport::List::Aggregated
         push 'clojure', 'danky', 'me'
         push 'scala',   'panky', 'me'
         flush "CLOJURE has the required items (wanky, danky) needed by ME. #{
-         }SCALA also has the required item \"panky\" needed by that needer too."
+          }SCALA has the required item \"panky\" needed by that needer too."
       end
 
-      Frame_ = ::Struct.new :store, :item, :needer
-
-      attr_reader :queue_a
-
-      def push *store_item_needer
-        ( @queue_a ||= [ ] ) << Frame_[ * store_item_needer ]
-        nil
+      def push one, two, three  # LOOK
+        super one, :_no_see_for_adv_, two, three, :_no_see_for_adv2_
       end
 
-      def flush exp
-        act = func.call( queue_a || [ ] )
-        act.should eql( exp )
+      def flush expected_string
+        s_a = nil
+        s = output_scn.gets
+        if s
+          s_a = [ s ]
+          while s = @output_scn.gets
+            s_a.push SPACE_
+            s_a.push s
+          end
+        end
+        if s_a
+          output_s = s_a.join Callback_::EMPTY_S_
+        end
+        output_s.should eql expected_string
+      end
+
+      def subject
+        Art
       end
     end
   end

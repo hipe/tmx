@@ -8,8 +8,12 @@ module Skylab::Callback
       self::Bundles.apply_iambic_on_client x_a, mod
     end
 
+    def pair
+      Pair_
+    end
+
     def iambic_scanner
-      Iambic_Scanner__
+      Iambic_Scanner_
     end
 
     def scan( & p )
@@ -19,6 +23,10 @@ module Skylab::Callback
         Callback_::Scan
       end
     end
+
+    def test_support
+      Callback_::Test
+    end
   end
 
   module Actor  # see [#042] the actor narrative
@@ -26,6 +34,10 @@ module Skylab::Callback
     class << self
 
       def [] cls, * i_a
+        via_client_and_iambic cls, i_a
+      end
+
+      def call cls, * i_a
         via_client_and_iambic cls, i_a
       end
 
@@ -247,7 +259,7 @@ module Skylab::Callback
     end
 
     def to_key_scan
-      Callback_::Scan.nonsparse_array @a
+      Callback_::Scan.via_nonsparse_array @a
     end
 
     def to_value_scanner
@@ -396,7 +408,7 @@ module Skylab::Callback
     end
   end
 
-  class Iambic_Scanner__  # :[#046]
+  class Iambic_Scanner_  # :[#046]
 
     def initialize d, x_a
       @d = d ; @x_a = x_a ; @x_a_length = @x_a.length
@@ -591,9 +603,8 @@ module Skylab::Callback
       end
       def orient_for_autoloader
         s_a = name.split CONST_SEP_
-        @autoloader_name = Name.from_const s_a.pop
-        @autoloader_parent_module =
-          s_a.reduce( ::Object ) { |m, s| m.const_get s, false }
+        @autoloader_name = Name.via_const s_a.pop
+        @autoloader_parent_module = Module_path_value_via_parts[ s_a ]
         true
       end
     end
@@ -608,7 +619,7 @@ module Skylab::Callback
 
     class Const_Missing_
       def initialize mod, i
-        @name = Name.any_valid_from_const(i) || Name.from_variegated_symbol(i)
+        @name = Name.any_valid_via_const( i ) || Name.via_variegated_symbol( i )
         @mod = mod ; nil
       end
       def resolve_some_x
@@ -705,8 +716,6 @@ module Skylab::Callback
           @dir_pn ||= parent_pn.join dir_entry.entry_s
           @norm_pathname ||= @dir_pn
         end
-        # _np = @norm_pathname.to_path
-        # $stderr.puts "#{ self.class::SNGL_LTR } PTH #{ _np }"
         SANITY_CHECK__[ @norm_pathname ]
         @parent_pn = parent_pn
         @state_i = :not_loaded
@@ -766,6 +775,17 @@ module Skylab::Callback
     end
 
     class Entry_Tree_ < Normpath_  # read [#024]:introduction-to-the-entry-tree
+
+      def to_scan  # :+#public-API, #the-fuzzily-unique-entry-scanner, #fuzzy-sibling-pairs
+        @did_index_all ||= index_all
+        a = @stem_i_a ; d = -1 ; last = a.length - 1
+        Callback_.scan do
+          if d < last
+            @normpath_lookup_p[ a.fetch d += 1 ]
+          end
+        end
+      end
+
       def get_load_file_path
         if @h.key? CORE_FILE_
           @norm_pathname.join( CORE_FILE_ ).to_path
@@ -773,9 +793,11 @@ module Skylab::Callback
           super
         end
       end
+
       def some_dir_pathname
         @dir_pn or self._NO_DIR_PATHNAME
       end
+
       SNGL_LTR = 'D'.freeze
     end
 
@@ -863,17 +885,12 @@ module Skylab::Callback
       -> pn do
         et = h[ pn.dirname ]
         if et
-          # $stderr.puts "WOWING: #{ pn }"
           et_ = et.normpath_from_distilled Distill_[ pn.basename.to_path ]
         end
         if et_
           et_
         else
           h.fetch pn do
-            if %r(face/cli$) =~ pn.to_path
-              fail 'where'
-            end
-            # $stderr.puts "BUILDING: #{ pn }"
             h[ pn ] = Entry_Tree_.new pn.dirname, nil,
               Dir_Entry_.new( pn.basename.to_path )
           end
@@ -1085,9 +1102,19 @@ module Skylab::Callback
     end
 
     class Normpath_
+
       attr_reader :norm_pathname
+
+      def name_i  # :+#public-API
+        name_for_lookup.as_variegated_symbol
+      end
+
+      def name  # :+#public-API
+        name_for_lookup
+      end
+
       def name_for_lookup
-        @nm ||= Name.from_slug ( @file_entry || @dir_entry ).corename
+        @nm ||= Name.via_slug ( @file_entry || @dir_entry ).corename
       end
     end
 
@@ -1311,7 +1338,7 @@ module Skylab::Callback
         a.map { |i| @at_h.fetch( i ) { @at_h[ i ] = method i } }
       end
 
-      def build_require_sidesystem_proc * i_a
+      def build_require_sidesystem_proc * i_a  # #open [#053]
         proc_or_call_or_map i_a do |x|
           memoize do
             require_sidesystem x
@@ -1374,7 +1401,7 @@ module Skylab::Callback
           x = Callback_.dir_pathname.dirname.to_path ; sl_path = -> { x } ; x
         end
         execute_require = -> const_i do
-          _stem = Name.from_const( const_i ).as_slug
+          _stem = Name.via_const( const_i ).as_slug
           require "#{ sl_path[] }/#{ _stem }/core" ; nil
         end
         resolve_some_sidesystem = -> const_i do
@@ -1400,33 +1427,42 @@ module Skylab::Callback
   class Name  # will freeze any string it is constructed with
     # this only supports the simplified inflection necessary for this app.
     class << self
-      def any_valid_from_const const_i
-        VALID_CONST_RX__ =~ const_i and
-          allocate_with :initialize_with_const_i, const_i
-      end
+
       def is_valid_const const_i
         VALID_CONST_RX__ =~ const_i
       end
-      def from_module mod
-        allocate_with :initialize_with_const_i,
-          mod.name.split( CONST_SEP_ ).last
+
+      def lib
+        Callback_::Name__
       end
-      def from_const const_i
+
+      def any_valid_via_const const_i
+        VALID_CONST_RX__ =~ const_i and
+          allocate_with :initialize_with_const_i, const_i
+      end
+
+      def via_const const_i
         VALID_CONST_RX__ =~ const_i or raise ::NameError, say_wrong( const_i )
         allocate_with :initialize_with_const_i, const_i
       end
-      def from_human human_s
+
+      def via_human human_s
         allocate_with :initialize_with_human, human_s
       end
-      def from_local_pathname pn
-        allocate_with :initialize_with_local_pathname, pn
+
+      def via_module mod
+        allocate_with :initialize_with_const_i,
+          mod.name.split( CONST_SEP_ ).last
       end
-      def from_slug s
+
+      def via_slug s
         allocate_with :initialize_with_slug, s
       end
-      def from_variegated_symbol i
+
+      def via_variegated_symbol i
         allocate_with :initialize_with_variegated_symbol, i
       end
+
       private :new
     private
       def say_wrong const_i
@@ -1446,10 +1482,6 @@ module Skylab::Callback
     def initialize_with_human human_s
       @as_human = human_s.freeze
       @as_slug = human_s.gsub( SPACE__, DASH_ ).downcase.freeze
-      initialize
-    end
-    def initialize_with_local_pathname pn
-      @as_slug = pn.sub_ext( THE_EMPTY_STRING__ ).to_path.freeze
       initialize
     end
     def initialize_with_slug s
@@ -1535,9 +1567,7 @@ module Skylab::Callback
       @as_const = Constify_if_possible_[ as_variegated_symbol.to_s ]
     end
 
-    def self.lib
-      Callback_::Name__
-    end
+
 
     NORMALIZE_CONST_RX__ = /(?<=[a-z])(?=[A-Z])/
     SLUGIFY_CONST_RX__ = /[A-Z](?=[a-z])/
@@ -1620,6 +1650,12 @@ module Skylab::Callback
     end
   end
 
+  Module_path_value_via_parts = -> x_a do  # :+[#ba-034]
+    x_a.reduce ::Object do |mod, x|
+      mod.const_get x, false
+    end
+  end
+
   Oxford = -> separator, none, final_sep, a do
     if a.length.zero?
       none
@@ -1641,11 +1677,40 @@ module Skylab::Callback
 
   PATH_SEP_ = '/'.freeze
 
-  class Scn < ::Proc
-    alias_method :gets, :call
-    def self.the_empty_scanner
-      @_tes ||= new do end
+  class Scn < ::Proc  # see [#049]
+
+    class << self
+
+      def aggregate * scn_a
+        Callback_::Scn__::Aggregate.new scn_a
+      end
+
+      def articulators
+        Callback_::Scn__::Articulators
+      end
+
+      def the_empty_scanner
+        @_tes_ ||= new do end
+      end
+
+      def multi_step * x_a
+        if x_a.length.zero?
+          Callback_::Scn__::Multi_Step__
+        else
+          Callback_::Scn__::Multi_Step__.build_via_iambic x_a
+        end
+      end
+
+      def peek
+        Callback_::Scn__::Peek__
+      end
+
+      def try_convert x
+        Callback_::Scn__.try_convert x
+      end
     end
+
+    alias_method :gets, :call
   end
 
   UNDERSCORE_ = '_'.freeze

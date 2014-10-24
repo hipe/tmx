@@ -1,12 +1,12 @@
 require_relative 'test-support'
 
-module ::Skylab::Callback::TestSupport::Digraph::Specificity
+module Skylab::Callback::TestSupport::Digraph::Specificity
 
   ::Skylab::Callback::TestSupport::Digraph[ Specificity_TestSupport = self ]
 
-  include CONSTANTS
+  include Constants
 
-  Callback::Lib_::Quickie[ self ]
+  Callback_::Lib_::Quickie[ self ]
 
   describe "[cb] digraph specificity" do
 
@@ -37,7 +37,7 @@ module ::Skylab::Callback::TestSupport::Digraph::Specificity
       define_method :length do length end
 
       define_singleton_method :whence do |&blk|  # scope `length`
-        memoized_frame = Callback::Lib_::Memoize[ -> do
+        memoized_frame = Callback_::Lib_::Memoize[ -> do
           a = ::Array.new length
           z = blk[ a ]  # use `call` not `instance_eval` for sane arch.
           [ a, z ]
@@ -85,7 +85,7 @@ module ::Skylab::Callback::TestSupport::Digraph::Specificity
       #         [H]
 
         whence do |a|
-          z = Callback::TestSupport::Fixtures::ZigZag.new
+          z = Callback_::TestSupport::Fixtures::ZigZag.new
           z.with_specificity do
             z.on_hacking do |e|
               touch[ a, :h, e ]
@@ -133,7 +133,7 @@ module ::Skylab::Callback::TestSupport::Digraph::Specificity
       #          H
 
         whence do |a|
-          z = Callback::TestSupport::Fixtures::ZigZag.new
+          z = Callback_::TestSupport::Fixtures::ZigZag.new
           z.with_specificity do
             z.on_pleasure do |e|
               touch[ a, :p, e ]
@@ -170,7 +170,7 @@ module ::Skylab::Callback::TestSupport::Digraph::Specificity
       #         [H]
 
         whence do |a|
-          z = Callback::TestSupport::Fixtures::ZigZag.new
+          z = Callback_::TestSupport::Fixtures::ZigZag.new
           z.with_specificity do
             z.on_hacking do |e|
               touch[ a, :h, e ]
@@ -220,7 +220,7 @@ module ::Skylab::Callback::TestSupport::Digraph::Specificity
       #          H
 
         whence do |a|
-          z = Callback::TestSupport::Fixtures::ZigZag.new
+          z = Callback_::TestSupport::Fixtures::ZigZag.new
           z.with_specificity do
             z.on_business do |e|
               touch[ a, :b, e ]

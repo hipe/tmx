@@ -1,6 +1,6 @@
-# the FUN narrative :[#026]
+# the F-UN narrative :[#026]
 
-(even when there is no FUN, this is still a place to document the functions
+(even when there is no F-UN, this is still a place to document the functions
 of the public API of [cb])
 
 

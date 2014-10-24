@@ -4,100 +4,112 @@ module Skylab::Callback
 
     sidesys = Autoloader.build_require_sidesystem_proc
 
-    Basic__ = sidesys[ :Basic ]
+    Bsc__ = sidesys[ :Basic ]
 
-    Basic_Digraph = -> do
-      self::Basic__[]::Digraph
+    Digraph_lib = -> do
+      Bsc__[]::Digraph
     end
 
-    Basic_Hash = -> do
-      self::Basic__[]::Hash
+    Boxlike_as_proxy_to_hash = -> h do
+      Old_box_lib[].open_box.hash_controller h
     end
-
-    Basic_List = -> do
-      self::Basic__[]::List
-    end
-
-    Basic_String = -> do
-      self::Basic__[]::String
-    end
-
-    Brazen__ = sidesys[ :Brazen ]
 
     Bundle_Item_Grammar = -> do
-      self::MetaHell__[]::Bundle::Item_Grammar
+      MH__[]::Bundle::Item_Grammar
     end
 
     Bundle_Multiset = -> x do
-      self::MetaHell__[]::Bundle::Multiset[ x ]
+      MH__[]::Bundle::Multiset[ x ]
     end
+
+    Bzn__ = sidesys[ :Brazen ]
 
     Class = -> do
-      self::MetaHell__[]::Class
+      MH__[]::Class
     end
 
-    CLI = -> do
-      self::Headless__[]::CLI
+    CLI_lib = -> do
+      HL__[]::CLI
+    end
+
+    Enhancement_shell = -> a do
+      MH__[]::Enhance::Shell.new a
     end
 
     Entity = -> * a do
       if a.length.zero?
-        Brazen__[]::Entity
+        Bzn__[]::Entity
       else
-        Brazen__[]::Entity.via_arglist a
+        Bzn__[]::Entity.via_arglist a
       end
     end
 
-    Formal_Box = -> do
-      self::MetaHell__[]::Formal::Box
+    Enum_lib = -> do
+      Bsc__[]::Enumerator
     end
 
-    Function = -> do
-      self::MetaHell__[]::Function
+    Hash_lib = -> do
+      Bsc__[]::Hash
     end
 
-    Headless__ = sidesys[ :Headless ]
+    HL__ = sidesys[ :Headless ]
+
+    IO_lib = -> do
+      HL__[]::IO
+    end
+
+    Ivars_with_procs_as_methods = -> * a do
+      MH__[]::Ivars_with_Procs_as_Methods.via_arglist a
+    end
 
     Let = -> do
-      self::MetaHell__[]::Let
+      MH__[]::Let
     end
 
-    MetaHell__ = sidesys[ :MetaHell ]
+    List_lib = -> do
+      Bsc__[]::List
+    end
+
+    MH__ = sidesys[ :MetaHell ]
 
     Memoize = Memoize_  # as you like it
 
-    Name = -> do
-      self::Headless__[]::Name
+    Module_lib = -> do
+      Bsc__[]::Module
     end
 
     Num2ord = -> x do
-      self::Headless__[]::NLP::EN::Number::Num2ord[ x ]
+      HL__[]::NLP::EN::Number::Num2ord[ x ]
     end
 
-    Open_Box = -> do
-      self::MetaHell__[]::Formal::Box::Open
+    Old_box_lib = -> do
+      MH__[]::Formal::Box
     end
 
-    OptionParser = -> do
-      require 'optparse' ; ::OptionParser
+    Old_name_lib = -> do
+      HL__[]::Name
     end
 
     Quickie = -> x do
-      x.extend self::TestSupport__[]::Quickie
+      x.extend TestSupport__[]::Quickie
     end
 
     Scn = -> & p do
-      self::Headless__[]::Scn.new( & p )
+      HL__[]::Scn.new( & p )
     end
 
     Some_stderr = -> do
-      self::Headless__[]::System::IO.some_stderr_IO
+      HL__[]::System::IO.some_stderr_IO
+    end
+
+    Stdlib_option_parser = -> do
+      require 'optparse' ; ::OptionParser
     end
 
     Strange = -> do
       p = -> x do
         _LENGTH_OF_A_LONG_LINE = 120
-        p = MetaHell__[].strange.curry[ _LENGTH_OF_A_LONG_LINE ]
+        p = MH__[].strange.curry[ _LENGTH_OF_A_LONG_LINE ]
         p[ x ]
       end
       -> x { p[ x ] }
@@ -107,14 +119,18 @@ module Skylab::Callback
       require 'strscan' ; ::StringScanner
     end
 
-    TestSupport_ = TestSupport__ = sidesys[ :TestSupport ]
-
-    Unstyle_styled = -> s do
-      self::Headless__[]::CLI::Pen::FUN::Unstyle_styled[ s ]
+    String_lib = -> do
+      Bsc__[]::String
     end
 
+    Struct_lib = -> do
+      Bsc__[]::Struct
+    end
+
+    TestSupport_ = TestSupport__ = sidesys[ :TestSupport ]
+
     Writemode = -> do
-      self::Headless__[]::WRITEMODE_
+      HL__[]::WRITEMODE_
     end
   end
 end

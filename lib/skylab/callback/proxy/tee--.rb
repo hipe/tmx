@@ -2,18 +2,22 @@ module Skylab::Callback
 
   module Proxy
 
-    class Tee < ::BasicObject
+    class Tee__ < ::BasicObject
 
       class << self
 
         alias_method :orig_new, :new
 
-        def new * i_a, & p
-          via_arglist_and_proc i_a, p
+        def new * a, & p
+          via_arglist_and_proc a, p
         end
 
-        def via_arglist a
-          via_arglist_and_proc a, nil
+        def via_arglist a, & p
+          if a.length.nonzero? || p
+            via_arglist_and_proc a, p
+          else
+            self
+          end
         end
 
         def via_arglist_and_proc _I_A_, cls_p

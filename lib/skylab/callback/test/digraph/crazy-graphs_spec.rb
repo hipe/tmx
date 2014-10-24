@@ -1,19 +1,19 @@
 require_relative 'test-support'
 
-module ::Skylab::Callback::TestSupport::Digraph
+module Skylab::Callback::TestSupport::Digraph
 
   describe "[cb] digraph crazy graphs" do
 
-    extend ::Skylab::Callback::TestSupport::Digraph
+    extend Callback_::TestSupport::Digraph
 
     context "class Gamma extends mod Alpha which defines a graph" do  # #todo below could be etc
       modul :Alpha do
-        Callback[ self, :employ_DSL_for_digraph_emitter ]
+        Callback_[ self, :employ_DSL_for_digraph_emitter ]
         listeners_digraph :alpha
         public :call_digraph_listeners # [#002] public for testing
       end
       klass :Gamma do |o|
-        Callback[ self, :extend_digraph_emitter_module_methods ]
+        Callback_[ self, :extend_digraph_emitter_module_methods ]
         include o.Alpha
       end
 
@@ -27,7 +27,7 @@ module ::Skylab::Callback::TestSupport::Digraph
 
     context "class D extends G which includes B which includes A which etc" do
       modul :Alpha do
-        Callback[ self, :employ_DSL_for_digraph_emitter ]
+        Callback_[ self, :employ_DSL_for_digraph_emitter ]
         listeners_digraph :alpha
         public :call_digraph_listeners # [#002] public for testing
       end
@@ -35,7 +35,7 @@ module ::Skylab::Callback::TestSupport::Digraph
         include o.Alpha
       end
       klass :Gamma do |o|
-        Callback[ self, :extend_digraph_emitter_module_methods ]
+        Callback_[ self, :extend_digraph_emitter_module_methods ]
         include o.Beta
       end
       klass :Delta, extends: :Gamma

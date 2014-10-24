@@ -4,7 +4,7 @@ module Skylab::Callback::TestSupport::Proxy::Tee
 
   ::Skylab::Callback::TestSupport::Proxy[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
@@ -75,7 +75,7 @@ module Skylab::Callback::TestSupport::Proxy::Tee
     end
 
     Subject_ = -> do
-      Callback_::Proxy::Tee
+      Callback_::Proxy.tee
     end
   end
 end

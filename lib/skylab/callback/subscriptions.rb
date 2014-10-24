@@ -140,7 +140,7 @@ module Skylab::Callback
     end
 
     def chan_scan
-      Callback_.scan.nonsparse_array self.class::CHANNEL_A__
+      Callback_.scan.via_nonsparse_array self.class::CHANNEL_A__
     end
   end
 end

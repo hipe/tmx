@@ -1,42 +1,81 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::Proxy::Functional
+module Skylab::Callback::TestSupport::Proxy
 
-  ::Skylab::MetaHell::TestSupport::Proxy[ self ]
+  describe "[cb] proxy - functional" do
 
-  include CONSTANTS
+    context "one." do
 
-  extend TestSupport_::Quickie
-
-  describe "[mh] Proxy::Function" do
-
-    def pee ; 'wee' end
-
-    def dee ; @dee_meyers end
-
-    it "produces a class, like a struct. but construct pxy with a hash" do
-      kls = MetaHell_::Proxy::Functional.new :foo, :bar
-
-      pxy = kls.new foo: -> x { "#{ pee }-#{ x }-#{ dee }" },
-                    bar: -> { @dee_meyers }
-      @dee_meyers = 'who'
-      pxy.foo( 'y' ).should eql( 'wee-y-who' )
-      pxy.bar.should eql( 'who' )
-    end
-
-    it "but don't touch the sides" do
-      kls = MetaHell_::Proxy::Functional.new :zerpie, :derkie, :tata
-
-      pred = proc do
-        kls.new murphy: :bed
+      before :all do
+        Pxy::One = Subject_[].functional :foo, :bar
       end
 
-      pred.should raise_error( ::KeyError, /key not found: :murphy/ )
+      it "makes" do
+      end
 
-      proc do
-        kls.new zerpie: :herpie
-      end.should raise_error( ::ArgumentError,
-        /you must provide \(a\) function\(s\) for - \(derkie, tata\)/ )
+      it "build a proxy from proxy class with a hash" do
+
+        pxy = Pxy::One.new foo: -> x { "#{ pee }-#{ x }-#{ dee }" },
+                           bar: -> { @dee_meyers }
+        @dee_meyers = 'who'
+
+        pxy.foo( 'y' ).should eql 'wee-y-who'
+        pxy.bar.should eql 'who'
+      end
+
+      it "build it from a literal iambic" do
+        pxy = Pxy::One.new :foo, -> { :A }, :bar, -> { @b }
+        @b = :B
+        pxy.foo.should eql :A
+        pxy.bar.should eql :B
+      end
+
+      def pee
+        'wee'
+      end
+
+      def dee
+        @dee_meyers
+      end
+
     end
+
+    context "two." do
+
+      before :all do
+        Pxy::Two = Subject_[].functional :zerpie, :derkie, :tata do
+          def hi
+            :"__#{ hello }__"
+          end
+        end
+
+        class Pxy::Two
+          def hello
+            :hej
+          end
+        end
+      end
+
+      it "raises key error on extra" do
+        _rx = /\Akey not found: :murphy/
+        -> do
+          Pxy::Two.new :murphy, :bed
+        end.should raise_error ::KeyError, _rx
+      end
+
+      it "raises argument error on missing" do
+        _rx = /\Amissing required proxy function definition\(s\): \(derkie, tata\)\z/
+        -> do
+          Pxy::Two.new zerpie: :herpie
+        end.should raise_error ::ArgumentError, _rx
+      end
+
+      it "you can add more stuff in an arbitrary definition block" do
+        pxy = Pxy::Two.new :zerpie, nil, :derkie, nil, :tata, nil
+        pxy.hi.should eql :__hej__
+      end
+    end
+
+    Pxy = ::Module.new
   end
 end

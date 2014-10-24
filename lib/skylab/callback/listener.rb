@@ -29,8 +29,7 @@ module Skylab::Callback
         make_OK_hash = -> moniker_s, i_a do
           h = ::Hash[ i_a.map { |i| [ i, true ] } ]
           h.default_proc =
-            Callback_::Lib_::
-              Basic_Hash[]::Loquacious_default_proc.curry[ moniker_s ]
+            Callback_::Lib_::Hash_lib[].loquacious_default_proc.curry[ moniker_s ]
           h
         end
         ok_shape = make_OK_hash[ 'shape', shape_i_a ]

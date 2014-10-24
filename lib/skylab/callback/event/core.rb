@@ -44,7 +44,7 @@ module Skylab::Callback
 
       undef_method :to_s  # for now this is here to catch mistakes loudly
 
-      Callback_::Lib_::Function[].enhance( self ).
+      Callback_::Lib_::Ivars_with_procs_as_methods[ self ].
         as_private_getter :@event_stream_graph_p, :event_stream_graph
 
       def touch!

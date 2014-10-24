@@ -122,7 +122,7 @@ module Skylab::Callback
         @step_OK = procure_valid_name_from_const_x && step_with_valid_name
       end
       def procure_valid_name_from_const_x
-        @name = Name.from_variegated_symbol @const_x
+        @name = Name.via_variegated_symbol @const_x
         @name.as_const or cannot_construe_valid_const
       end
       def cannot_construe_valid_const

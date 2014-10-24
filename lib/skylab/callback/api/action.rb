@@ -16,7 +16,7 @@ module Skylab::Callback
       end
     private
       def bld_name_function
-        Callback_::Lib_::Name[]::Function::From::Constant.from_name name
+        Callback_::Lib_::Old_name_lib[].via_const.via_module_name name
       end
     end
 
@@ -127,7 +127,7 @@ module Skylab::Callback
         if @modul
           md = modul_rx.match( @modul )
           if md
-            const_a = md[:inner].split '::'
+            const_a = md[ :inner ].split CONST_SEP_
             load_module const_a
           else
             error "doesn't look like a class or module constant - #{ @modul }"
@@ -138,26 +138,26 @@ module Skylab::Callback
       end
     end.call
 
+
     def load_module const_a
-      res = true
-      kls = const_a.reduce ::Object do |m, c|
-        if ! m.const_defined? c, false
-          info "(tries to load #{ m }::#{ c } with `const_get`..)"
-        end
+      ok = true
+      cls = Callback_::Lib_::Module_lib[].value_via_parts const_a do |const, mod|
+        info "(tries to load #{ mod }::#{ const } with `const_get`..)"
         if @do_show_backtrace
-          m.const_get c, false
+          mod.const_get const, false
         else
           begin
-            m.const_get c, false
+            mod.const_get const, false
           rescue ::NameError => e
-            break( res = load_module_fancy_error m, c, e )
+            ok = false
+            load_module_fancy_error mod, const, e
           end
         end
       end
-      if res
-        @mod = kls
+      if ok
+        @mod = cls
       end
-      res
+      ok
     end
 
     -> do

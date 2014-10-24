@@ -55,11 +55,11 @@ module Skylab::Callback
   private
 
     def logical_box
-      @logical_box ||= Callback_::Lib_::Open_Box[].hash_controller @logical_h
+      @logical_box ||= Callback_::Lib_::Boxlike_as_proxy_to_hash[ @logical_h ]
     end
 
     def physical_box
-      @physical_box ||= Callback_::Lib_::Open_Box[].hash_controller @physical_h
+      @physical_box ||= Callback_::Lib_::Boxlike_as_proxy_to_hash[ @physical_h ]
     end
   end
 end

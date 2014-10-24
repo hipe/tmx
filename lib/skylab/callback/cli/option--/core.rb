@@ -4,21 +4,34 @@ module Skylab::Callback
   # rather it is part of a s super experimental high-tech precision debugging
   # tool..
 
-  module CLI::Option
-  end
+  class CLI
 
-  module CLI::Option::Parser
-  end
+    module Option__
 
-  class CLI::Option::Parser::Fire < Lib_::OptionParser[]
+      class << self
+
+        def parser
+          Parser__
+        end
+      end
+
+      module Parser__
+
+        class << self
+          def fire
+            Fire__
+          end
+        end
+
+        class Fire__ < Lib_::Stdlib_option_parser[]
 
     # do our hacky custom parse yay
     def parse! argv, &setback
-      argv_rest = CLI::Option::Parser::Stop.parse! argv
+      argv_rest = Stop__.parse! argv
       res = super argv, & nil  # result is always..
       if argv_rest
         ok = true ; errmsg = nil
-        opendata = CLI::Option::Parser::Open.parse argv_rest, -> e do
+        opendata = Open__.parse argv_rest, -> e do
           ok = false
           errmsg = e
         end
@@ -30,17 +43,18 @@ module Skylab::Callback
       end
       res
     end
-  end
+        end
 
-  module CLI::Option::Parser::Open
+        module Open__
+
     # experiment in parsing
     def self.parse argv, err
-      scn = CLI::Option::Scanner.new argv, err
+      scn = Option__::Scanner.new argv, err
       if scn.eos? then nil
       elsif scn.last? and scn.looks_like_arg?
         [ :string, scn.current ]
       else
-        box = Callback_::Lib_::Formal_Box[]::Open.new
+        box = Callback_::Lib_::Old_box_lib[]::Open.new
         valid = nil
         begin
           valid = false
@@ -60,9 +74,9 @@ module Skylab::Callback
         end
       end
     end
-  end
+        end
 
-  module CLI::Option::Parser::Stop
+        module Stop__
 
     # iff `argv` has any first '--' occuring in it (alone as a token) then
     # mutate argv: parse-out the '--' and any tokens that follow it
@@ -80,6 +94,10 @@ module Skylab::Callback
         argv[ idx .. -1 ] = []
       end
       argv_rest
+    end
+
+        end
+      end
     end
   end
 end

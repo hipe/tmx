@@ -9,7 +9,7 @@ module Skylab::Callback::TestSupport::Listener
     before :all do
 
       class Goofis_EM
-        Callback::Listener[ self, :emission_matrix, %i( inf err ), %i( ln str ) ]
+        Callback_::Listener[ self, :emission_matrix, %i( inf err ), %i( ln str ) ]
 
         def initialize listener
           @listener = listener

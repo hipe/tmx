@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Callback::Test::Name::EE__
 
-  extend ::Skylab::Callback::TestSupport::CONSTANTS::TestSupport_::Quickie
+  extend ::Skylab::Callback::TestSupport::Constants::TestSupport_::Quickie
 
   describe "[ca] name extname experiment" do
 

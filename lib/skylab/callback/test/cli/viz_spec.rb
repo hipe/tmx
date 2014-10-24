@@ -4,18 +4,18 @@ module Skylab::Callback::TestSupport::CLI::Viz
 
   ::Skylab::Callback::TestSupport::CLI[ TS__ = self ]
 
-  include CONSTANTS
+  include Constants
 
-  Callback::Lib_::Quickie[ self ]
+  Callback_::Lib_::Quickie[ self ]
 
   describe "[cb] viz" do
 
     extend TS__
 
     it "with the ideal case - works" do
-      g = Callback::Lib_::TestSupport_[]::IO::Spy::Triad.new nil
+      g = Callback_::Lib_::TestSupport_[]::IO.spy.triad nil
       # g.debug!
-      c = Callback::CLI.new( * g.values )
+      c = Callback_::CLI.new( * g.values )
       c.send :program_name=, 'pzb'
       argv = [ 'viz', fixtures_dir_pn.join( 'who-hah' ).to_s ]
       r = c.invoke argv

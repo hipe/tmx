@@ -2,13 +2,95 @@ module Skylab::Callback
 
   module Name__  # legacy algorithms
 
-    def self.at * i_a
-      i_a.map( & method( :send ) )
-    end
+    -> at, sc, bo do  # sc = singleton class   bo = both
 
-    def self.guess_dir
-      GUESS_DIR_P__
-    end
+      bo[ :callframe_path_rx ] = -> do
+        CALLFRAME_PATH_RX__
+      end
+
+      at[ :constantize ] = -> do
+        CONSTANTIZE__
+      end
+
+      sc[ :constantize ] = -> * a do
+        if a.length.zero?
+          CONSTANTIZE__
+        else
+          CONSTANTIZE__[ *a ]
+        end
+      end
+
+      bo[ :constantize_sanitize_file ] = -> do
+        SANITIZE_FILE_
+      end
+
+      bo[ :guess_dir ] = -> do
+        GUESS_DIR_P__
+      end
+
+      at[ :methodize ] = -> do
+        METHODIZE__
+      end
+
+      sc[ :methodize ] = -> * a do
+        if a.length.zero?
+          METHODIZE__
+        else
+          METHODIZE__[ *a ]
+        end
+      end
+
+      at[ :pathify ] = -> do
+        PATHIFY_
+      end
+
+      sc[ :pathify ] = -> * a do
+        if a.length.zero?
+          PATHIFY_
+        else
+          PATHIFY_[ *a ]
+        end
+      end
+
+      bo[ :pathify_name ] = -> do
+        PATHIFY_NAME__
+      end
+
+    end.call( * ( -> do
+
+      o = ::Class.new( ::Proc )
+      o.send :alias_method, :[]=, :call
+      Proc_for_DSL__ = o  # or not
+
+      _AT_BOX = Callback_::Box.new
+
+      at = o.new do |i, p|
+        _AT_BOX.add i, p
+        nil
+      end
+
+      sc = o.new do |i, p|
+        define_singleton_method i, p
+        nil
+      end
+
+      bo = o.new do |i, p|
+        at.call i, p
+        sc.call i, p
+        nil
+      end
+
+      define_singleton_method :at do | * i_a |
+        i_a.map do |i|
+          _AT_BOX.fetch( i )[]
+        end
+      end
+
+      [ at, sc, bo ]
+    end ).call )
+
+
+
     GUESS_DIR_P__ = -> do
 
       tok_rx = %r{\A(?:(?<rest>(?:(?!=::).)+)::)?(?:::)?(?<curr>[^:]+)\z}
@@ -32,24 +114,14 @@ module Skylab::Callback
         end
       end
     end.call
-    def self.callframe_path_rx
-      CALLFRAME_PATH_RX__
-    end
+
     CALLFRAME_PATH_RX__ = /^(?<path>.+)(?=:\d+:in[ ]`)/x
 
-
-    def self.constantize *a
-      if a.length.zero?
-        CONSTANTIZE__
-      else
-        CONSTANTIZE__[ *a ]
-      end
-    end
     CONSTANTIZE__ = module Constantize__
       p = -> path_x do
         path_x.to_s.gsub( BLACK_RX__, EMPTY_S_ ).
           split( FILE_SEP__, -1 ).
-            map( & SANITIZE_FILE_P_ ) * CONST_SEP_
+            map( & SANITIZE_FILE_ ) * CONST_SEP_
       end
       BLACK_RX__ = %r{ #{ ::Regexp.escape Autoloader::EXTNAME }\z |
         (?<=/)/+ | (?<=[-_ ])[-_ ]+ | [^-_ /a-z0-9]+ }ix
@@ -57,11 +129,7 @@ module Skylab::Callback
       p
     end
 
-
-    def self.constantize_sanitize_file
-      SANITIZE_FILE_P_
-    end
-    SANITIZE_FILE_P_ = module Sanitize_File__
+    SANITIZE_FILE_ = module Sanitize_File__
       p = -> part_s do
         part_s.gsub( PART_RX__ ).each do
           # for each parts (still being attached to any separator)
@@ -83,14 +151,6 @@ module Skylab::Callback
       p
     end
 
-
-    def self.methodize *a
-      if a.length.zero?
-        METHODIZE__
-      else
-        METHODIZE__[ *a ]
-      end
-    end
     METHODIZE__ = module Methodize__
       p = -> str do
         str.to_s.gsub( PART_RX__ ) { "#{ SEP__ }#{ $1 || $2 }" }.
@@ -102,14 +162,6 @@ module Skylab::Callback
       p
     end
 
-
-    def self.pathify *a
-      if a.length.zero?
-        PATHIFY_
-      else
-        PATHIFY_[ *a ]
-      end
-    end
     PATHIFY_ = module Pathify__
       p = -> const_x do
         const_x.to_s.gsub( PART_RX__ ) { "-#{ $1 || $2 }" }.
@@ -120,14 +172,9 @@ module Skylab::Callback
       p
     end
 
-
-    def self.pathify_name
-      PATHIFY_NAME__
-    end
     PATHIFY_NAME__ = -> const_name_s do
       PATHIFY_[ const_name_s.gsub CONST_SEP_, PATH_SEP_ ]
     end
-
 
     CONST_PART_SEP_ = '_'.freeze
   end

@@ -1,5 +1,7 @@
 module Skylab::Callback
 
+  # #todo - this is still needed and it's not pretty
+
   # it is necessary (for both visual tests and actual usage) for e.g
   # `[cb] digraph viz` to be able to go from path to constant, and this is the
   # easiest way to achieve that given the break in the isomorphicism between

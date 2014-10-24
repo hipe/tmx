@@ -1,4 +1,4 @@
-# the "lib" adapter layer narrative
+# the internal lib node narrative :[#052]
 
 ## about this document
 

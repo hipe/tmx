@@ -1,17 +1,6 @@
 module Skylab::Callback
 
-  module Digraph  # READ [#019] #storypoint-1
-
-    def self.extended mod  # #sl-111 :+#deprecation:until-universal-integration
-      $stderr.puts "#{ Em__[ "`extend Callback::Digraph` is deprecated NOW" ] } - #{
-        }replace this line with `Callback[ self, :employ_DSL_for_digraph_emitter ]` #{
-         }or the like"  # #todo:during-merge remove this
-      Callback_[ mod, :employ_DSL_for_digraph_emitter ] ; nil
-    end
-    Em__ = -> s do
-      "\e[33m#{ s }\e[0m"
-    end
-  end
+  Digraph = ::Module.new  # READ [#019] #storypoint-1
 
   module Digraph::MMs  # techincally visible to above, but :+#API-private
 
@@ -22,7 +11,7 @@ module Skylab::Callback
   private
 
     def build_event_stream_graph  # #storypoint-2
-      scn = Callback_::Lib_::Basic_List[]::Scanner[ ancestors ]
+      scn = Callback_::Scn.try_convert ancestors
       cur = found_a = nil
       nil while ( cur = scn.rgets ) && ::Object != cur
       chk = -> do
@@ -110,9 +99,9 @@ module Skylab::Callback
     end
   end  # module methods
 
-  Digraph::Stream__ = ::Class.new Callback_::Lib_::Basic_Digraph[]::Node
+  Digraph::Stream__ = ::Class.new Callback_::Lib_::Digraph_lib[].node_class
 
-  class Digraph::Stream_Digraph__ < Callback_::Lib_::Basic_Digraph[]
+  class Digraph::Stream_Digraph__ < Callback_::Lib_::Digraph_lib[]
 
     def initialize
       @taxonomic_stream_i_a = nil
@@ -376,7 +365,7 @@ module Skylab::Callback
     end
   end
 
-  class Digraph::Listeners__ < Callback_::Lib_::Formal_Box[]
+  class Digraph::Listeners__ < Callback_::Lib_::Old_box_lib[]
 
     def initialize
       @current_group_id = @group_frame_h = @is_in_group = nil

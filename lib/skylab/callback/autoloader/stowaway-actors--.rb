@@ -38,7 +38,7 @@ module Skylab::Callback
         go_downwards
       end
 
-      def go_upwards
+      def go_upwards  # similar to [#ba-034] but don't touch this :P
         mod = @mod
         while DOT_DOT__ == @token
           const_s_a = mod.name.split CONST_SEP_
@@ -189,7 +189,7 @@ module Skylab::Callback
 
       def when_only_theirs_is_left
         @imagined_a.reduce @mod.entry_tree do |et, s|
-          name = Name.from_slug s
+          name = Name.via_slug s
           i = name.as_distilled_stem
           et_ = et.normpath_from_distilled i
           if ! et_
@@ -203,10 +203,10 @@ module Skylab::Callback
         end
       end
 
-      def when_is_different
+      def when_is_different  # near :+[#ba-034]
         const_a = @mod.name.split CONST_SEP_
         const_a[ - ( @existant_a.length ) .. -1 ] = EMPTY_A_
-        _mod = const_a.reduce( ::Object ) { |m, s| m.const_get s, false }
+        _mod = Module_path_value_via_parts[ const_a ]
         _mod_ = Autoloader.const_reduce do |cr|
           cr.from_module _mod
           cr.const_path @imagined_a

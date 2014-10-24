@@ -1,6 +1,23 @@
-# the scanners narratives :[#022]
+# the scanners narratives :[#049]
 
-## introdocution
+## introduction
+
+a "scn" (short for "scanner") is and always will be an object that
+responds to `gets` and results in a true-ish object if the scanner has
+any more items to give, or false-ish if it is all out of items.
+
+a "scn" is intentionally minimal: formally it is and always will be
+defined by this one method only. see [#044] "scan" that builds on this.
+
+this particular implementation of "scn" simply aliases the `call` method
+of the Proc class to `gets`.
+
+(point of history: this document was formerly [#ba-022] but we
+gravitated the nexus of scanning up to this library because of its
+growing universality.)
+
+
+## background
 
 the scanning metaphor has become favorite way to implement "producers" (or
 even just to represent lists abstractly) in a general way.
@@ -97,72 +114,3 @@ enumerators are still good for all the things that they are good for, so
 don't use a scanner when an enumerator is a better fit. our point in this
 article is just to say that the scanner is a better choice for a universal
 way to model iteration, for the kinds of iterating we generally do.
-
-
-
-## :[#023] the array scanner narrative
-
-in theory the array can be mutated mid-scan, but this is not tested so assume
-it will not work right off the bat. internally this just maintains two
-indexes, one from the begnining and one from the end; and checks current array
-length against these two at every `gets` or `rgets`.
-
-(leave this line intact, this is when we flipped it back - as soon as the
-number of functions outnumbered the number of [i]vars it started to feel
-silly. however we might one day go back and compare the one vs.  the other
-with [#bm-001])
-
-
-
-## :[#004] the list scanner for read
-
-### implementation
-
-just for fun we implement our own double-buffering. yes, OS IO is better at
-this generally, but we do it ourselves just as an excercize, and in case we
-ever want to have arbitrarily complex critera for what constitues a record
-and record separator.
-
-also as an excercize, this is written in functional soup: the only instance
-variables that we employ are either procs that operate within a closure, or
-they are auxiliary service accessors (i.e not part of the core algorithm or
-operation). all of our public methods simply wrap these procs (or again are
-auxiliary).
-
-
-
-### usage
-
-just like when calling `gets` on an IO, each call to `gets` result in each
-next line from the IO, without ever adding or removing its own newlines, but
-the resultant line will end in a newline sequence if one existed in the file.
-
-`count` will tell you how many lines have been read by gets (0 when the object
-is first created, 1 after you have successfully `gets`'ed one line, etc).
-
-`gets` will result in `nil` (possibly at the first call) when the IO has no
-more bytes left to give. `gets` can be called any number of subsequent times
-and will continue to be `nil`.
-
-
-** NOTE **
-
-the filehandle is closed by this scanner at any first such occurence of the
-end of the file being reached, but NOTE it will not be closed otherwise.
-
-
-
-## :[#024] the string scanner narrative
-
-minimal abstract enumeration and scanning of the lines of a string.
-+ quacks like a simple scanner
-+ better than plain old ::Enumerator b.c you can call `next` (gets)
-    without catching the ::StopIteration.
-+ future-proof: maybe it uses ::S-tringScanner internally, maybe not.
-
-
-### the 'reverse' scannner
-
-it is just a clever way of building a yielder that expects to be given with
-`yield` or `<<` a sequence of zero or more lines that do not contain
-newlines.

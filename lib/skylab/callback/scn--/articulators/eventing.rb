@@ -1,52 +1,179 @@
-module Skylab::Basic
+module Skylab::Callback
 
-  module List::Evented::Articulation
+  module Scn__
 
-    # (things that make us think of this when we see them :[#015])
+    class Articulators::Eventing  # :[#047].
 
-    def self.[] enum, def_blk
+      Callback_::Actor.call self, :properties,
+        :gets_under,
+        :always_at_the_beginning,
+        :iff_zero_items,
+        :any_first_item,
+        :any_subsequent_items,
+        :at_the_end_iff_nonzero_items,
+        :y,
+        :flush
 
-      enum.respond_to? :next or enum = List::To::Enum[ enum ]
+      def initialize
+        init_ivars
+        super
+        sanity_checks
+        defaults
+      end
 
-      line = nil ; count = 0
-      gets = -> do
-        begin
-          line = enum.next
-          count += 1
-          true
-        rescue ::StopIteration
-          line = nil
-          nil
+      attr_reader :count
+
+      def with * x_a
+        otr = dup
+        otr.init_copy x_a
+        otr
+      end
+
+      def initialize_copy _otr_
+        @did_hack_gets_under = false
+        @gets_under = nil
+      end
+
+    protected
+
+      def init_copy x_a
+        process_iambic_fully x_a
+        nil
+      end
+
+    private
+
+      def init_ivars
+        @always_at_the_beginning = @any_first_item = nil
+        @at_the_end_iff_nonzero_items = nil
+        @count = 0 ; @gets_under = nil
+        @iff_zero_items = nil
+        @method_i = :receive_first_gets
+        @output_x = nil ; @y = nil
+      end
+
+      def sanity_checks
+        if @gets_under
+          @gets_under.respond_to?( :gets ) or raise ::ArgumentError, "signature changed"
         end
       end
 
-      call = -> f, *a do
-        f[ *a ] if f
+      def defaults
+        @any_first_item.nil? and @any_first_item = DEFAULT_FIRST_ITEM__ ; nil
       end
 
-      o = Shell_.to_struct def_blk
-      call[ o.always_at_the_beginning ]
-      if gets[]
-        call[ o.any_first_item, line ]
-        while gets[]
-          call[ o.any_subsequent_items, line ]
+      DEFAULT_FIRST_ITEM__ = -> y, x do
+        y << x ; nil
+      end
+
+      def receive_first_gets
+        @y ||= produce_yieldee_when_in_scan_mode
+        if @always_at_the_beginning
+          @always_at_the_beginning[ @y ]
         end
-      else
-        call[ o.iff_zero_items ]
-      end
-      if count.nonzero?
-        call[ o.at_the_end_iff_nonzero_items ]
+        x = @gets_under.gets
+        if x
+          first_item x
+        else
+          @method_i = :noop
+          if @iff_zero_items
+            @iff_zero_items[ @y ]
+            @output_x and flush_one_output_item
+          end
+        end
       end
 
-      count
+      def produce_yieldee_when_in_scan_mode
+        # note that this is a closure that binds to this context and will
+        # not survive the trip "correctly" if you dup this object.
+        ::Enumerator::Yielder.new do |x|
+          @output_x ||= ::String.new
+          @output_x.concat x ; nil
+        end
+      end
+
+      def noop
+        nil  # (just to say hello to step-debugger)
+      end
+
+      def first_item x
+        @count += 1
+        @method_i = :receive_subsequent_gets
+        @any_first_item[ @y, x ]
+        @output_x and flush_one_output_item
+      end
+
+      def receive_subsequent_gets
+        x = @gets_under.gets
+        if x
+          subsequent_item x
+        else
+          @method_i = :noop
+          if @at_the_end_iff_nonzero_items
+            @at_the_end_iff_nonzero_items[ @y ]
+          end
+          @output_x and flush_one_output_item
+        end
+      end
+
+      def subsequent_item x
+        @count += 1
+        @any_subsequent_items[ @y, x ]
+        @output_x and flush_one_output_item
+      end
+
+      def flush_one_output_item
+        x = @output_x ; @output_x = nil ; x
+      end
+
+    public
+
+      def gets
+        send @method_i
+      end
+
+    # ~ experimental buffering mode:
+
+      def flush
+        puts nil
+        x = @flush[ @y ]
+        @count = 0
+        x
+      end
+
+      def puts x
+        @did_hack_gets_under ||= hack_gets_under
+        @x = x
+        send @method_i
+      end
+
+    private
+
+      def hack_gets_under
+        @gets_under = Gets_Proxy__.new do
+          x = @x ; @x = nil ; x
+        end
+        @y or init_ivars_when_in_buffer_mode
+        true
+      end
+
+      class Gets_Proxy__ < ::Proc
+        alias_method :gets, :call
+      end
+
+      def init_ivars_when_in_buffer_mode
+        @y = ::Enumerator::Yielder.new do |x|
+          @buffer_x ||= ::String.new
+          @buffer_x.concat x
+        end
+        @flush ||= produce_flush_proc ; nil
+      end
+
+      def produce_flush_proc
+        -> y do
+          x = @buffer_x ; @buffer_x = nil ; x
+        end
+      end
     end
-
-    Shell_ = Basic::Lib_::Enhancement_shell[ %i(
-      always_at_the_beginning
-      iff_zero_items
-      any_first_item
-      any_subsequent_items
-      at_the_end_iff_nonzero_items
-    ) ]
   end
 end

@@ -4,7 +4,7 @@ module Skylab::Callback::TestSupport::Name::Guess_dir_path
 
   ::Skylab::Callback::TestSupport::Name[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

@@ -1,61 +1,139 @@
-module Skylab::MetaHell
+module Skylab::Callback
 
-  class Proxy::Functional < ::BasicObject
+  module Proxy
 
-    # like Ad_Hoc (see) but produces a ::Class instance rather than a
-    # ::BasicObject instance. Define one as you would a ::Struct, and then
-    # construct objects of it simliar to as you construct a ::Struct (but
-    # passing it a ::Hash always) - this resulting object is your proxy
-    # object.
-    #
-    # You might choose to use this rather than the Ad_Hoc variety because you
-    # like the look or feel of having a statically defined nerk in your derk.
+    class Functional__ < ::BasicObject
 
-    VERBOTEN_RX = /\Ainitialize\z/  # reasons
+      # whereas "inline" creates a proxy "inline" by mutating a singleton
+      # class, this makes a (BasicObject subclass) proxy class in one step
+      # that you instantiate in another step:
+      #
+      #     My_Proxy = Subject_[].functional :foo, :bar
+      #
+      #     pxy = My_Proxy.new :foo, -> x { "bar: #{ x } }, :baz, -> { :BAZ }
+      #
+      #     pxy.foo :wee  #=> "bar wee"
+      #     pxy.baz  # => :BAZ
 
-    class << self
-      alias_method :metahell_original_new, :new
-    end
+      class << self
+        def via_arglist a, & p
+          Actor__[ a, p, self ]
+        end
+      end
 
-    me = self
+      class Actor__
 
-    define_singleton_method :new do |*name_a, &blk|
-      me == self or ::Kernel.raise "must not be subclassed directly - #{ me }"
-      ::Class.new( self ).class_exec do
-        member_a = self::MEMBER_A_ = name_a.freeze
-        member_h = ::Hash[ member_a.map.with_index.to_a ]
-        functn_h = ::Hash[ member_a.map { |x| [ x, nil ] } ]
-        remain_a = 0.upto( member_a.length - 1 ).to_a
+        Callback_::Actor.call self, :properties,
+          :i_a, :p, :base_class
 
-        class << self
-          alias_method :new, :metahell_original_new
+        def execute
+          begin_class
+          resolve_box
+          finish_class
+          @p and @class.class_exec( & @p )
+          @class
         end
 
-        member_a.each do |name|
-          VERBOTEN_RX =~ name and ::Kernel.raise "verboten - #{ name }"
-          define_method name do |*a, &b|
-            @__func_h.fetch( name )[ *a, &b ]
-          end
+      private
+
+        def begin_class
+          @class = ::Class.new @base_class ; nil
         end
 
-        define_method :initialize do |h|
-          @__func_h = functn_h.dup
-          rmn_a = remain_a.dup
-          h.each do |k, v|
-            rmn_a[ member_h.fetch k ] = nil
-            @__func_h[ k ] = v
+        def resolve_box
+          resolve_members
+          @box = Callback_::Box.new
+          @member_i_a.each do |i|
+            @box.add i, i
           end
-          rmn_a.compact!
-          rmn_a.length.nonzero? and ::Kernel.raise ::ArgumentError,
-            "when constructing your proxy instance you must provide #{
-            }(a) function(s) for - #{
-            }(#{ rmn_a.map { |idx| member_a.fetch idx } * ', ' })"
           nil
         end
 
-        blk and class_exec( & blk )
+        def resolve_members
+          @member_i_a = [ * @base_class.const_get( CONST_ ).send( :a ), * @i_a ]
+          nil
+        end
 
-        self
+        def finish_class
+          _BOX = @box
+          @class.const_set CONST_, _BOX
+          @class.send :define_method, :__functional_proxy_property_box__ do
+            _BOX
+          end
+          @box.send( :a ).each do |i|
+            @class.send :define_method, i do | * a, & p |
+              @__proxy_kernel__.method_proc( i )[ * a, & p ]
+            end
+          end
+          nil
+        end
+      end
+
+      CONST_ = :FUNCTIONAL_PROXY_PROPERTY_BOX__
+
+      const_set CONST_, Callback_::Box.the_empty_box
+
+      def initialize * x_a
+        @__proxy_kernel__ = Kernel_.new __functional_proxy_property_box__
+        @__proxy_kernel__.process_iambic_fully x_a
+      end
+
+      class Kernel_
+
+        def initialize box
+          @box = box
+          @p_h = {}
+        end
+
+        def process_arglist_fully p_a
+          begin_process
+          resolve_pairs_scan_via_arglist p_a
+          finish_process
+        end
+
+        def process_iambic_fully x_a
+          begin_process
+          resolve_pairs_scan_via_iambic x_a
+          finish_process
+        end
+
+        def method_proc i
+          @p_h.fetch i
+        end
+
+      private
+
+        def begin_process
+          @missing_h = ::Hash[ @box.send( :a ).map { |i| [ i, nil ] } ] ; nil
+        end
+
+        def resolve_pairs_scan_via_iambic x_a
+          @pairs_scan = Try_convert_iambic_to_pairs_scan_[ x_a ] ; nil
+        end
+
+        def resolve_pairs_scan_via_arglist p_a
+          @pairs_scan = Callback_.scan.via_times( p_a.length ) do |d|
+            [ @box.at_position( d ), p_a.fetch( d ) ]
+          end ; nil
+        end
+
+        def finish_process
+          @pairs_scan.each do |i, p|
+            @p_h[ @box.fetch i ] = p
+            @missing_h.delete i
+          end
+          if @missing_h.length.nonzero?
+            when_missing @missing_h.keys
+          end
+        end
+
+        def when_missing i_a
+          ::Kernel.raise ::ArgumentError, say_missing( i_a )
+        end
+
+        def say_missing i_a
+          "missing required proxy function definition(s): (#{ i_a * ', ' })"
+        end
       end
     end
   end

@@ -1,6 +1,12 @@
 module Skylab::Callback
 
-  class CLI::Option::Scanner
+  module CLI
+
+    module Option__
+
+      module Parser__
+
+        class Scanner__
 
     # there are others like it, but this one is [#008]. and the best.
     # (in contrast to h.l's [#hl-053] this simply parses e.g an ARGV as
@@ -27,8 +33,9 @@ module Skylab::Callback
     #         ~ what does it look like? ~
     -> do
 
-      opt_rx, long_rx = Callback_::Lib_::CLI[]::Option::Constants.
-        values_at :OPT_RX, :LONG_RX
+      opt_rx, long_rx =
+
+        Callback_::Lib_::CLI_lib[].option.values_at :opt_rx, :long_rx
 
       [ [ :long, -> do
             md = long_rx.match current
@@ -76,7 +83,11 @@ module Skylab::Callback
       @argv = argv
       @last = argv.length - 1
       @err = err
-      @opt = Callback_::Lib_::CLI[]::Option.new_flyweight
+      @opt = Callback_::Lib_::CLI[].option.new_flyweight
+    end
+
+        end
+      end
     end
   end
 end

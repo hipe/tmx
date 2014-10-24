@@ -47,11 +47,6 @@ module Skylab::Callback::TestSupport::Autoloader
         TS_::Fixtures::Thrtn_Herdless::Terxt
       end
 
-      it "2. inter" do  # integration of above
-        _HL = TestLib_::Headless__[]
-        _HL::Text
-      end
-
       it "4. for a branch node, load any file (like even core.rb)" do
         TS_::Fixtures::NINE::Peripheral.should eql :_nine_
       end
@@ -93,7 +88,6 @@ module Skylab::Callback::TestSupport::Autoloader
         _Face = TS_::Fixtures::Elvn_Ferce
         _Face::TerstSerppert
       end
-
 
       if false  # integ
         _Face = TestLib_::Face__[]
