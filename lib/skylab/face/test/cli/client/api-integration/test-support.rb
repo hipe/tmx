@@ -8,7 +8,7 @@ module Skylab::Face::TestSupport::CLI::Client::API_Integration
     parent_anchor_module.bundles_class
   end
 
-  module CONSTANTS
+  module Constants
 
     Curriable_build_ = -> field_box, param_h do  # this used to there
       Face_::CLI::Client::API_Integration_::OP_[

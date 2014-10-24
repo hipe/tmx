@@ -4,7 +4,7 @@ module Skylab::Face::TestSupport::API::Action::Service
 
   ::Skylab::Face::TestSupport::API::Action[ self, :sandboxes_et_al ]
 
-  describe "extend module x with Face_::API and use services" do
+  describe "[fa] API action service - extend module x with Face_::API and use services" do
 
     extend TS__
 
@@ -30,7 +30,7 @@ module Skylab::Face::TestSupport::API::Action::Service
         raise_error(
           Face_::Plugin::DeclarationError,
           /Client has not declared the required service "nerk" declared #{
-            }as needed by .+API::Actions::W\./
+            }as needed by .+API::Actions::W/
        )
       end
     end

@@ -79,7 +79,7 @@
 [#006]       #parent-node:[#011] CLI (API) revelation integration
 [#005]       #parent-node:[#011] introducing the entity library #initials:`el` ..
 [#004]       argument error hack
-[#003] #open Face::Open2 is superseded by [hl]::IO::Upstream::Select
+[#003] #open Face::Open2 is superseded by [hl] IO select
 [#002]       #done path-tools to e.g. headless
 [#001]       #postponed shorten wide lines #open #depends-on:sl-104
 [#sl-100.100.500] 2012-06-08 #open index all features

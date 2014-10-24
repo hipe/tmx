@@ -3,7 +3,7 @@ require 'open3'
 module Skylab::Face
 
   # read both stdout and stderr of a system command without blocking
-  # (this is superseded by [#hl-048] [hl]:IO::Upstream::Select,
+  # (this is superseded by [#hl-048] [hl] IO select,
   # and was probably its inspiration without knowing it)
   #
 

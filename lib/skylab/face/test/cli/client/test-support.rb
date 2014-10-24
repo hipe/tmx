@@ -6,13 +6,13 @@ module Skylab::Face::TestSupport::CLI::Client
 
   TestLib_ = ::Module.new
 
-  module CONSTANTS
+  module Constants
     CLI_Client_TS_ = TS__
     TestLib_.include self::TestLib_
     TestLib_ = TestLib_
   end
 
-  include CONSTANTS
+  include Constants
 
   Sandbox = ::Module.new
 
@@ -33,40 +33,33 @@ module Skylab::Face::TestSupport::CLI::Client
     def CLI_sandbox=
       send :CLI_party=
       @child.const_set :Sandbox, ::Module.new
-      @child::CONSTANTS.const_set :Sandbox, @child::Sandbox
+      @child::Constants.const_set :Sandbox, @child::Sandbox
     end
     def CLI_party=
       @child.const_set :Face_, Face_
       @child.const_set :TS__, @child
-      @child.include @parent::CONSTANTS
+      @child.include @parent::Constants
       @child.extend TestSupport_::Quickie
     end
   end
 
   module TestLib_
-    CLI_unstyle_proc = -> do
-      Headless__[]::CLI::Pen::FUN.unstyle
-    end
 
-    CLI_simple_style_rx = -> do
-      Headless__[]::CLI::Pen::SIMPLE_STYLE_RX
-    end
-
-    CLI_unstyle_styled_proc = -> do
-      Headless__[]::CLI::Pen::FUN::Unstyle_styled
+    CLI_lib = -> do
+      HL__[]::CLI
     end
 
     DSL_DSL = -> x, p do
-      MetaHell__[]::DSL_DSL.enhance_module x, & p
+      MH__[]::DSL_DSL.enhance_module x, & p
     end
 
-    Headless__ = Face_::Lib_::Headless__
+    HL__ = Face_::Lib_::HL__
 
     Let = -> mod do
-      mod.extend MetaHell__[]::Let
+      mod.extend MH__[]::Let
     end
 
-    MetaHell__ = Face_::Lib_::MetaHell__
+    MH__ = Face_::Lib_::MH__
 
     Sout_serr = -> do
       sys = Face_::Lib_::System_IO[]
@@ -85,7 +78,7 @@ module Skylab::Face::TestSupport::CLI::Client
 
   module ModuleMethods
 
-    include CONSTANTS
+    include Constants
 
     TestLib_::Let[ self ]
 
@@ -140,7 +133,7 @@ module Skylab::Face::TestSupport::CLI::Client
 
   module InstanceMethods
 
-    include CONSTANTS
+    include Constants
 
     def invoke *argv
       argv.flatten! 1
@@ -166,7 +159,7 @@ module Skylab::Face::TestSupport::CLI::Client
     end.call
 
     let :io_spy_triad do
-      t = TestSupport_::IO::Spy::Triad.new nil  # making a fake stdin is on u
+      t = TestSupport_::IO.spy.triad nil  # making a fake stdin is on u
       if do_debug
         t.debug!
       end
@@ -245,9 +238,9 @@ module Skylab::Face::TestSupport::CLI::Client
       end
     end
 
-    define_method :unstyle, TestLib_::CLI_unstyle_proc[]
+    define_method :unstyle, TestLib_::CLI_lib[].pen.unstyle
 
-    define_method :unstyle_styled, TestLib_::CLI_unstyle_styled_proc[]
+    define_method :unstyle_styled, TestLib_::CLI_lib[].pen.unstyle_styled
 
     def expect_styled line
       text = unstyle_styled line
@@ -326,7 +319,7 @@ module Skylab::Face::TestSupport::CLI::Client
 
     -> do  # `expect_nonstyled_line`
 
-      simple_style_rx = TestLib_::CLI_simple_style_rx[]
+      simple_style_rx = TestLib_::CLI_lib[].pen.simple_style_rx
 
       define_method :expect_nonstyled_line do |rx, idx_ref=true, sn=:err|
         line = expect_line idx_ref, sn
@@ -357,7 +350,7 @@ module Skylab::Face::TestSupport::CLI::Client
     end
   end
 
-  CONSTANTS::Do_invoke_ = -> do
+  Constants::Do_invoke_ = -> do
     if (( idx = ( argv = ::ARGV ).index '-x' ))
       argv[ idx ] = nil ; argv.compact!
       TestSupport_::Quickie.do_not_invoke!

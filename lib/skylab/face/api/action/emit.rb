@@ -23,7 +23,8 @@ module Skylab::Face
 
       emits = -> kls do
         orig_emits = kls.method( :listeners_digraph ).unbind
-        Lib_::Module_mutex_proc[][ -> *a, &b do
+
+        Lib_::Module_lib[].mutex( :listeners_digraph, -> * a, & b do
           orig_emits.bind( self ).call( *a, &b )
           @event_stream_graph.names.each do |i|
             define_method i do |x|
@@ -32,7 +33,7 @@ module Skylab::Face
             end
           end
           nil
-        end, :listeners_digraph ]
+        end )
       end
     end.call
 

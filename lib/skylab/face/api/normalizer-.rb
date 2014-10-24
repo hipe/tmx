@@ -286,8 +286,8 @@ module Skylab::Face
       ok
     end
 
-    Hack_label = -> name_i do
-      Chomp_sing_ltr_sfx_[ name_i ].gsub '_', ' '
+    Hack_label = -> name_i do  # :+#deprecated for [#hl-088]
+      Chomp_sing_ltr_sfx_[ name_i ].gsub UNDERSCORE_, SPACE_
     end
     #
     Chomp_sing_ltr_sfx_ = API::Procs::Chomp_single_letter_suffix
@@ -323,7 +323,7 @@ module Skylab::Face
           REASONABLY_SHORT__ = 10
 
           def lbl x
-            Callback_::Name.from_variegated_symbol( x ).as_human
+            Callback_::Name.via_variegated_symbol( x ).as_human
           end
         end
         p = -> { Expression_Agent__ }

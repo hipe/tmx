@@ -1,8 +1,30 @@
-# (this is kept here as a ghost if you ever want to try and do forensics
-# on where it went)
+module Skylab::Face
 
-Skylab::Face::CLI::External_Dependencies = :_tombstone_
+  module CLI
 
-# it may be the case that with the newest autoloader:
-#   • we need to create an expected node
-#   • the casing and scheme for each const may be prescriptive
+    class << self
+
+      def reparenthesize
+        self::Client::Reparenthesize
+      end
+
+      def stylify
+        Lib_::CLI_lib[].pen.stylify
+      end
+
+      def tableize rows, p=nil, opts={}, & p_
+        a = [ p, p_ ]
+        a.compact!
+        p = a.fetch a.length - 1 << 1
+        CLI::Tableize__[ opts, p, rows ]
+      end
+    end
+
+    module Lib_
+
+      include Face_::Lib_
+
+    end
+  end
+end
+# this file used to be Skylab::Face::CLI::External_Dependencies. #tombstone

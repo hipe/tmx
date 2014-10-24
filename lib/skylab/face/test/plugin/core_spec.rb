@@ -196,11 +196,11 @@ module Skylab::Face::TestSupport::Plugin
       before :each do anchor_module end
 
       it "when pi wants nonexistent svc - borks like mork at attach time" do
+        _rx = /\bPH has not declared the required services \(feep, meep\) #{
+            }declared as needed by .+\bPI/
         -> do
           host.send :attach_hot_plugin, M14::PI_A.new
-        end.should raise_error( Plugin_::DeclarationError,
-          /\bPH has not declared the required services \(feep, meep\) #{
-            }declared as needed by .+\bPI/ )
+        end.should raise_error Plugin_::DeclarationError, _rx
       end
     end
 

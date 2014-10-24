@@ -4,7 +4,7 @@ module Skylab::Face::TestSupport::CLI::Lipstick
 
   ::Skylab::Face::TestSupport::CLI[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

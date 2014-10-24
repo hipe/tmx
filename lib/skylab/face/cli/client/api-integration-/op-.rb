@@ -49,13 +49,13 @@ module Skylab::Face
       Normal_to_opt_arg_ = -> i do
         # hack :foo_bar_s into "<bar>", e.g. :primary_email_s # => "<email>"
         s = Chmp_sing_ltr_sfx_[ i ]
-        As_arg_raw_[ s[ ( (( i = s.rindex '_' )) ? i + 1 : 0 ) .. -1 ] ]
+        As_arg_raw_[ s[ ( (( i = s.rindex UNDERSCORE_ )) ? i + 1 : 0 ) .. -1 ] ]
       end
       #
       Chmp_sing_ltr_sfx_, As_arg_raw_ = Face_::API::Procs.
         at :Chomp_single_letter_suffix, :Local_normal_name_as_argument_raw
       #
-      Option = Face_::CLI::Client::Lib_::Option_model_class[]
+      Option = Face_::Lib_::CLI_lib[].option.model
 
       def add_desc opt, fld
         y = []

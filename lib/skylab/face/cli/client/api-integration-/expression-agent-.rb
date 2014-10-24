@@ -1,4 +1,6 @@
-class Skylab::Face::CLI::Client
+module Skylab::Face
+
+  class CLI::Client
 
   module API_Integration_  # see [#052] what is the deal with exp
 
@@ -12,7 +14,7 @@ class Skylab::Face::CLI::Client
 
     private  # ( make things public as necessary )
 
-      define_method :kbd, Lib_::Stylify_proc[].curry[%i( green )]
+    define_method :kbd, Lib_::CLI_lib[].pen.stylify.curry[ %i( green ) ]
 
       def par_nonstyled fld
         if fld.respond_to? :id2name
@@ -22,19 +24,21 @@ class Skylab::Face::CLI::Client
         end
         p[ i ]
       end
-      #
+
       As_arg_ = -> i do
         As_arg__[ Chmp_[ i ] ]
       end
-      #
+
       As_arg__, Chmp_ = Face_::API::Procs.
         at :Local_normal_name_as_argument_raw, :Chomp_single_letter_suffix
-      #
+
       As_long_ = -> i do
-        Lib_::Option_local_normal_name_as_long[ Chmp_[ i ] ]
+        Lib_::CLI_lib[].option.local_normal_name_as_long i
       end
 
       self
     end )).new
+
+  end
   end
 end

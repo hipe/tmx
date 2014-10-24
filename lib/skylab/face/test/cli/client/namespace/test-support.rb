@@ -4,7 +4,7 @@ module Skylab::Face::TestSupport::CLI::Client::Namespace
 
   ::Skylab::Face::TestSupport::CLI::Client[ self, :flight_of_stairs ]
 
-  module CONSTANTS
+  module Constants
     Sandbox = CLI_Client_TS_::Sandbox  # please be careful
   end
 

@@ -90,14 +90,14 @@ module Skylab::Face
     end
   end
 
-  CLI::Lipstick::Class__ = Lib_::Procs_as_methods[ :cook_rendering_proc ]
+  CLI::Lipstick::Class__ = Lib_::Ivars_with_procs_as_methods[].new :cook_rendering_proc
 
   class CLI::Lipstick::Class__
 
     GLYPH_FALLBACK = '.'
     PANE_WIDTH_FALLBACK = 72
 
-    Pen_ = Lib_::Procs_as_methods[ :cook ]
+    Pen_ = Lib_::Ivars_with_procs_as_methods[].new :cook
 
     class Pen_
       def initialize glyph, color
@@ -110,7 +110,7 @@ module Skylab::Face
         @cook = -> my_room do
           # `normalized_float` below must be nil or btwn 0.0 and 1.0 inclusive
           styliz = if color
-            CLI::Lib_::Stylify_proc[].curry[ [ color ] ]
+            CLI::Lib_::CLI_lib[].pen.stylify.curry[ [ color ] ]
           else IDENTITY_ end
           -> normalized_float do
             if normalized_float  # allow nil to mean "don't do it"
@@ -171,7 +171,7 @@ module Skylab::Face
           if 0.0 <= tot && tot <= 1.0   # if the sum of your normalized floats
             penlen.times.map do |idx|   # is outside of unit range: NOTHING.
               render_a.fetch( idx ).call normalized_float_a.fetch( idx )
-            end * ''
+            end * EMPTY_S_
           end
         end
       end

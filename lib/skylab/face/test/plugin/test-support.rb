@@ -4,7 +4,7 @@ module Skylab::Face::TestSupport::Plugin
 
   ::Skylab::Face::TestSupport[ self ]
 
-  include CONSTANTS
+  include Constants
 
   Face_ = Face_
 

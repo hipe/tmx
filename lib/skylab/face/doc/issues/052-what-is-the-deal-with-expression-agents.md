@@ -272,3 +272,20 @@ the reason we made "expression services" separate from "expression agents" is..
 but they should be considered deprectated. this is why our (at the time of
 writing) headless expression services-related modules have two underscores
 at the end of there name - as a reminder that they are deprecated.
+
+
+
+## notes
+
+### :#note-br-10
+
+using the expression agent singleton is for hacks and one-offs. the
+expression agent has a long-running NLP agent holds state of the speech
+situation. when using the expression agent singleton, it just as likely
+as not that it is holding state from a speech situation prior to yours;
+resulting in behavior that may appear non-deterministic and may cause
+to fail flickeringly and in a manner hard to track down.
+
+we intentionally do not offer any cache clearing facilities: this would
+be a step in the wrong direction. in a mature application each action will
+create its own expression agent instance.

@@ -1,13 +1,13 @@
 module Skylab::Face
 
-  module CLI::Tableize  # :+#deprecation:until-cull
+  CLI::Tableize__ = -> opts, line_p, rows do  # :+#deprecation:until-cull
 
     # `tableize` - deprecated, see  [#036]
     #
     # `tableize` has been deprecated.  but here's a demo:
     #
     #     y = [ ]
-    #     Face_::CLI::Tableize::FUN.tableize[
+    #     Face_::CLI.tableize(
     #       [ food: 'donuts', drink: 'coffee' ], -> line { y << line } ]
     #
     #     y.shift   # => "|   Food  |   Drink |"
@@ -15,10 +15,6 @@ module Skylab::Face
     #     y.length  # => 0
     #
 
-    o = { }
-
-    o[:tableize] = ->( rows, opts = {}, f, &blk) do
-      line_p = ( a = [ f, blk ].compact ).fetch( ( a.length - 1 ) * 2 )
       opts = { show_header: true }.merge(opts)
       keys_order = []
       max_h = ::Hash.new { |h, k| keys_order.push(k) ; h[k] = 0 }
@@ -27,7 +23,7 @@ module Skylab::Face
       end
       if opts[:show_header]
         label_p = ->(k) do
-          l = k.to_s.gsub('_', ' ').capitalize
+          l = k.to_s.gsub( UNDERSCORE_, SPACE_ ).capitalize
           l.length > max_h[k] and max_h[k] = l.length
           l
         end
@@ -40,8 +36,5 @@ module Skylab::Face
         }#{right}")
       end
       nil
-    end
-
-    FUN = ::Struct.new( * o.keys ).new( * o.values )
   end
 end

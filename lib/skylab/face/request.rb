@@ -41,7 +41,7 @@ module Skylab::Face
       attr_reader :value
       def intern
         @label or return nil
-        @label.downcase.gsub(/[^_a-z0-9]/, '_').intern
+        @label.downcase.gsub( /[^_a-z0-9]/, UNDERSCORE_ ).intern
       end
       def set_response str
         @value = str

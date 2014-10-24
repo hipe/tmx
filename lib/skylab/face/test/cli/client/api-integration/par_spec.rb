@@ -19,7 +19,7 @@ module Skylab::Face::TestSupport::CLI::Client::API_Integration::Par
             :param, :secondary_email, :arity, :zero_or_one ]
 
           define_singleton_method :build_op, &
-            CONSTANTS::Curriable_build_.curry[ field_box ]
+            Constants::Curriable_build_.curry[ field_box ]
 
           def execute
             "f:#{ Shorten_email[ @favorite_email ] },s:#{
@@ -131,11 +131,11 @@ module Skylab::Face::TestSupport::CLI::Client::API_Integration::Par
 
       def build_op
         init_expression_agent_for_cli
-        CONSTANTS::Curriable_build_[ field_box, @param_h ]
+        Constants::Curriable_build_[ field_box, @param_h ]
       end
 
       def init_expression_agent_for_cli  # eew
-        @expression_agent ||= CONSTANTS::CLI_expression_agent_[]
+        @expression_agent ||= Constants::CLI_expression_agent_[]
         nil
       end
 

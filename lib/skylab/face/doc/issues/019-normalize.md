@@ -1,3 +1,75 @@
+(we cram two different doc-nodes in here for now with the intention of
+one day assimilating the older one into the newer one.)
+
+# the new normal :[#ba-037]
+
+## introduction
+
+
+we have finally arrived at a normalization API we are happy with. here
+we sing about it. you may be looking for the old [fa] normalization
+document. that is the second half of this document.
+
+
+
+
+## normalizing vs. validation
+
+in our universe normalization is a superset of validation. validation
+sounds like "is it valid?" and suggests that it results in a boolean
+value of "yes" or "no". normalization is that and more (potentially). an
+act of normalization can tranform the input value into a different value
+when there is a business (or platform) need to do so (provided that the
+input value is valid enough to be normalized).
+
+in practice in the shape facilities provided by [ba] most normalizer
+facilities do not actually tranform values, they just validate. but
+nonetheless we maintain a uniform interface for these two related
+operations, and use the name that is more correct (that of the superset).
+
+the most interesting part of the normalization has to do with emission
+of events. typically this is done when an input value is invalid or
+perhaps even when the input value is valid but gets normalized.
+
+
+
+
+
+## normal normalizers
+
+in the normal case a normalizer will be implemented something like a
+specialized actor. the full lifecycle of normalization can be broken up
+conceptually into two parts (at least):
+
+    1) defining the formal property
+    2) normalizing the actual property against the formal
+
+this pairing of ideas relates exactly to the discussion of [#mh-025] formal
+vs. actual values.
+
+conceptually you can think of the formal property as a formal set of all
+valid values for your field. or if you prefer you can think of it as a
+grammar, a regular expression, a procedural chain of validation and
+tranformation functions that you write, etc.
+
+
+
+
+## a plastic distinction between normalizer class and object thru currying
+
+the paradigm behind a "prototype-based" object-oriented language like
+Javascript is of course different than the idea behind class-based OOP:
+with prototypes there is a fuzzier distinction between what is a class
+and what is an object. a class is essentially an object that gets duped
+to make other objects. this different perspective has interesting
+ramifications that we find useful to leverage specifically in this domain
+of normalization.
+
+
+
+
+
+
 # the field-level custom normalization API :[#019]
 
 This is the field-level normalization API.

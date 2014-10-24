@@ -7,7 +7,7 @@ module Skylab::Face::TestSupport::CLI::Client::API_Integration::WOU
   describe "[fa] CLI client API integration - with ouroboros" do
 
     extend CLI_Client_TS_
-    extend TS__  # so CONSTANTS (Sandbox) is visible in i.m's
+    extend TS__  # so Constants (Sandbox) is visible in i.m's
 
     context "make sure ouroborous is ok when doing `api`" do
       define_sandbox_constant :application_module do

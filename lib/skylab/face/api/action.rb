@@ -4,7 +4,7 @@ module Skylab::Face
 
     # ~ section 2 events
 
-    mutex = Lib_::Module_mutex_proc[]  # #storypoint-10
+    mutex = Lib_::Module_lib[].mutex  # #storypoint-10
 
     def has_emit_facet  # #storypoint-15
       true
@@ -45,9 +45,9 @@ module Skylab::Face
       false
     end
 
-    define_singleton_method :services, & mutex[ -> *a do
+    define_singleton_method :services, mutex[ :services, -> *a do
       API::Action::Service[ self, a ]
-    end, :services ]
+    end ]
 
     # ~ section 4 parameters & normalization
 
@@ -92,7 +92,7 @@ module Skylab::Face
       private :_meta_param_a
     end
 
-    define_singleton_method :params, & mutex[ ->( * a ) do
+    define_singleton_method :params, & mutex[ :params, ->( * a ) do
       # if you call this with empty `a`, it is the same as not calling it,
       # which gives you The empty field box above.
       if a.length.nonzero?
@@ -104,7 +104,7 @@ module Skylab::Face
           self, a, _meta_param_a )
         nil
       end
-    end, :params ]
+    end ]
 
     API::Normalizer_.enhance_client_class self, :conventional
       # needed whether params or no

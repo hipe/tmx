@@ -52,13 +52,13 @@ module Skylab::Face
 
     -> do
 
-      _Param_Field = Param_Field_[]
-      r = _Param_Field::N_Meta_Resolver_.new
+      field_lib = Param_Field_[]
+      r = field_lib.N_meta_resolver.new
       r.push nil  # [#049] - sadly necessary to get the field class for now
       r.push METAFIELD_A_A_, nil, -> x do
         Param_ = x
       end
-      r.seed _Param_Field::Meta_Field_Factory_
+      r.seed field_lib.meta_field_factory
       r.flush or fail "sanity"  # (result is stack size)
 
     end.call
@@ -67,16 +67,16 @@ module Skylab::Face
         meta_param_a  # fulfill [#026]
       # assume behind module mutex & `param_a` looks right structurally.
 
-      _Param_Field = Param_Field_[]
-      _Param_Field::Box.enhance client do
+      field_lib = Param_Field_[]
+      field_lib.box.via_client client do
         field_class_instance_methods -> { Param_IMs }
         meta_fields( * METAFIELD_A_A_, * meta_param_a )
         fields( * param_a )
       end
 
-      _Param_Field::Reflection.enhance( client ).with client
+      field_lib.reflection.enhance( client ).with client
 
-      client.send :include, Action_IMs_
+      client.include Action_IMs_
 
       nil
     end
@@ -142,7 +142,7 @@ module Skylab::Face
 
       def initialize x_a
         @meta_param_x_a = @param_class = nil
-        @params = Param_Field_[]::Box.new
+        @params = Param_Field_[].box.new
         absrb_iambic_fully x_a ; nil
       end
 
@@ -181,12 +181,12 @@ module Skylab::Face
       def produce_param_class
         _Param_Field = Param_Field_[]
         param_class = nil
-        r = _Param_Field::N_Meta_Resolver_.new
+        r = _Param_Field.N_meta_resolver.new
         r.push nil  # [#049]
         r.push [ * METAFIELD_A_A_, * @meta_param_x_a ], nil, -> x do
           param_class = x
         end
-        r.seed _Param_Field::Meta_Field_Factory_
+        r.seed _Param_Field.meta_field_factory
         r.flush
         @client_mod.const_set :Param_, param_class
         Make_Include_and_or_Stow_2_Contour_IMs_[ param_class ]

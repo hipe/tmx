@@ -7,7 +7,7 @@ module Skylab::Face::TestSupport::CLI::Client::API_Integration::WNS
   describe "[fa] CLI client API integration - with namespace" do
 
     extend CLI_Client_TS_
-    extend TS__  # so CONSTANTS (Sandbox) is visible in i.m's
+    extend TS__  # so Constants (Sandbox) is visible in i.m's
 
     context "some basic tests of touching cli actions 3 and 4 levels deep" do
       define_sandbox_constant :application_module do

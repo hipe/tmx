@@ -17,6 +17,7 @@ module Skylab::Face
     X_Kernel__ = CLI_Kernel_
 
     module Lib_
+
       include CLI::Lib_
 
       Call_frame_rx = -> do
@@ -28,40 +29,8 @@ module Skylab::Face
         -> { p[] }
       end.call
 
-      Chunker_enumerator = -> sexp do
-        Headless__[]::CLI::Pen::Chunker::Enumerator.new sexp
-      end
-
-      Option_enumerator = -> op do
-        Headless__[]::CLI::Option::Enumerator.new op
-      end
-
-      Option_local_normal_name_as_long = -> i do
-        Headless__[]::CLI::Option::Local_normal_name_as_long[ i ]
-      end
-
-      Option_model_class = -> do
-        Headless__[]::CLI::Option::Model_  # #todo
-      end
-
-      Option_parser_scanner = -> op do
-        Headless__[]::CLI::Option::Parser::Scanner.new op
-      end
-
-      Option_flyweight = -> do
-        Headless__[]::CLI::Option.new_flyweight
-      end
-
-      Parse_styles = -> s do
-        Headless__[]::CLI::FUN::Parse_styles[ s ]
-      end
-
-      Requity_brackets = -> i do
-        Headless__[]::CLI::Argument::FUN::Reqity_brackets[ i ]
-      end
-
-      Unstyle_sexp = -> s do
-        Headless__[]::CLI::FUN::Unstyle_sexp[ s ]
+      CLI_lib = -> do
+        HL__[]::CLI
       end
     end
 
@@ -128,7 +97,7 @@ module Skylab::Face
             node.apply_default_argv( argv ) if argv.length.zero? &&
               node.has_default_argv
             argv.length.zero? and break( ok, cmd = true, node )
-            if DASH_ == argv.fetch( 0 ).getbyte( 0 )
+            if DASH_BYTE_ == argv.fetch( 0 ).getbyte( 0 )
               ok, _ok, r, *rest = node.process_options argv
               _ok or throw :break_two  # this allows an opt to act cmd-like
               argv.length.zero? and break( ok, cmd = true, node )  # repeat!
@@ -165,7 +134,7 @@ module Skylab::Face
         end
       end
 
-      DASH_ = '-'.getbyte 0
+      DASH_BYTE_ = DASH_.getbyte 0
 
       # `init_cli_surface` #called-by self.class only. [#040] explains it all.
       # so this is that weird place where we fan-out these resources upwards
@@ -911,21 +880,23 @@ module Skylab::Face
             x = opt.as_shortest_full_parameter_signifier or next m
             m << "[#{ x }]"
           end
-          a * ' ' if a.length.nonzero?
+          a * SPACE_ if a.length.nonzero?
         end
       end
 
       def each_option  # assumes that @op (when constructed) will be an o.p
-        @op_enum ||= begin
-          @op.nil? and init_op
-          opt = Lib_::Option_flyweight[]
-          ea = Lib_::Option_enumerator[ @op ]
-          ea.filter = -> sw do
-            opt.replace_with_switch sw
-            opt
-          end
-          ea
+        @op_enum ||= bld_option_enumerator
+      end
+
+      def bld_option_enumerator
+        @op.nil? and init_op
+        fly = Lib_::CLI_lib[].option.new_flyweight
+        _scan = Lib_::CLI_lib[].option.scan op
+        _scan_ = _scan.map_by do |sw|
+          fly.replace_with_switch sw
+          fly
         end
+        _scan_.each
       end
 
       def options  # #called-by self `parameters`
@@ -933,13 +904,13 @@ module Skylab::Face
           scn = nil ; op_x = option_parser ? @op : Empty_A_
           Face_::Options.new(
             fetch: -> ref, &blk do
-              scn ||= Lib_::Option_parser_scanner[ op_x ]
+              scn ||= Face_::Lib_::CLI_lib[].option.parser.scanner op_x
               scn.fetch ref, &blk
             end  )
         end.call
       end
 
-      Face_::Options = Lib_::Nice_proxy[ :fetch ]
+      Face_::Options = Lib_::Proxy_lib[].functional :fetch
 
     end
 
@@ -1106,7 +1077,7 @@ module Skylab::Face
         self
       end
       def normal_invocation_string               # #in-narrative
-        get_normal_invocation_string_parts * ' '
+        get_normal_invocation_string_parts * SPACE_
       end
       def get_normal_invocation_string_parts     # #in-narrative
         parent_services.get_normal_invocation_string_parts << name.as_slug
@@ -1189,7 +1160,7 @@ module Skylab::Face
           end )
       end
 
-      Face_::Parameters = Lib_::Nice_proxy[ :fetch ]  # only here b.c etc
+      Face_::Parameters = Lib_::Proxy_lib[].nice :fetch  # only here b.c etc
 
       # `subcmd_help` - #result-is-tuple. a hook for the benefit of both child
       # classes and nodes - it corrals help requests coming in from 2 places:
@@ -1252,8 +1223,8 @@ module Skylab::Face
         if @sheet.command_tree && has_partially_visible_op
           if (( tos = terminal_option_syntax ))
             y = get_normal_invocation_string_parts
-            y.unshift( ' ' * usage_header_text.length )
-            [ ( y << tos ) * ' ' ]
+            y.unshift( SPACE_ * usage_header_text.length )
+            [ ( y << tos ) * SPACE_ ]
           end
         end
       end
@@ -1293,7 +1264,7 @@ module Skylab::Face
             else
               y << "#{ mar }#{ hi( fmt % item.hdr ) }#{ item.lines.first }"
               item.lines[ 1 .. -1 ].each do |line|
-                y << "#{ mar }#{ fmt % '' }#{ line }"
+                y << "#{ mar }#{ fmt % EMPTY_S_ }#{ line }"
               end
             end
           end
@@ -1309,7 +1280,7 @@ module Skylab::Face
       private
       def parse_xtra_margin scn
         x = scn.fetchs
-        ::Fixnum === x and x = ( ' ' * x ).freeze  # meh
+        ::Fixnum === x and x = ( SPACE_ * x ).freeze  # meh
         defer_set :margin, x
         nil
       end
@@ -1350,7 +1321,7 @@ module Skylab::Face
         if name_a.length <= 1
           first = name_a.fetch 0
         else
-          first = name_a[ 0 .. -2 ] * ' '
+          first = name_a[ 0 .. -2 ] * SPACE_
           rest = " #{ name_a[ -1 ] }"
         end
         y << "Try #{ hi "#{ first } -h#{ rest }" } for help."
@@ -1404,10 +1375,10 @@ module Skylab::Face
 
           h = {
             string: -> m, x, _ do
-              m << Lib_::Unstyle_sexp[ x ] ; nil
+              m << Lib_::CLI_lib[].unstyle_sexp( x ) ; nil
             end,
             style: -> m, x, usg_hdr_txt do
-              s = Lib_::Unstyle_sexp[ x ]
+              s = Lib_::CLI_lib[].unstyle_sexp x
               # ICK only let a header through if it says "usage:" ICK
               m << s if usg_hdr_txt == s || header_rx !~ s
               nil
@@ -1415,19 +1386,19 @@ module Skylab::Face
           }.freeze
 
           -> sexp, usg_hdr_txt do
-            ea = Lib_::Chunker_enumerator[ sexp ]
+            ea = Lib_::CLI_lib[].pen.chunker.scan( sexp ).each
             a = ea.reduce [] do |m, x|
               h.fetch( x[0][0] )[ m, x, usg_hdr_txt ]
               m
             end
-            ( a * '' ).strip  # (we are re-joining a broken up string)
+            ( a * EMPTY_S_ ).strip  # (we are re-joining a broken up string)
           end
         end.call
 
         restyle = -> a, usg_hdr_txt do
           a.length.times do |idx|
             line = a[ idx ]
-            sexp = Lib_::Parse_styles[ line ]
+            sexp = Lib_::CLI_lib[].parse_styles line
             if sexp
               a[ idx ] = restyle_sexp[ sexp, usg_hdr_txt ]
             else
@@ -1577,7 +1548,7 @@ module Skylab::Face
         a = get_normal_invocation_string_parts  # sneaky use of this
         a << x if ( x = option_syntax )
         a << x if ( x = argument_syntax )
-        a * ' '
+        a * SPACE_
       end
 
       def argument_syntax
@@ -1591,10 +1562,12 @@ module Skylab::Face
       def build_any_isomorphic_argument_syntax
         para_a = parent_services.get_command_parameters @sheet
         part_a = para_a.reduce [] do |m, x|
-          a, z = Lib_::Requity_brackets[ x[ 0 ] ]
-          m << "#{ a }<#{ Lib_::Name_slugulate[ x[1] ] }>#{ z }"
+          ob, cb = Lib_::CLI_lib[].argument.reqity_brackets x.first
+          m.push "#{ ob }<#{ Lib_::Name_slugulate[ x.last ] }>#{ cb }"
         end
-        part_a * ' ' if part_a.length.nonzero?
+        if part_a.length.nonzero?
+          part_a * SPACE_
+        end
       end
 
       def description_section y
@@ -1632,7 +1605,7 @@ module Skylab::Face
         @queue_a ||= [ ]
         if ! x then @queue_a << :help else
           args = [ x ]  # cutely scoop any subsequent args off argv.
-          while @argv.length.nonzero? and '-' != @argv[0][0]
+          while @argv.length.nonzero? and DASH_ != @argv[0][0]
             args << @argv.shift
           end
           @queue_a << [ :subcommand_help, * args ]

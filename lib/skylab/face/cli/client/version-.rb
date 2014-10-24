@@ -41,7 +41,7 @@ module Skylab::Face
                 y = [ ]
                 x = @mechanics.normal_invocation_string and y << x
                 x = self.class.get_version and y << x
-                y.length.nonzero? and @out.puts( y.join( ' ' ) )
+                y.length.nonzero? and @out.puts( y.join( SPACE_ ) )
                 @argv.length.nonzero? || @queue_a.length.nonzero?
                   # stay (keep processing args) if either of these.
               end

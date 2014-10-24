@@ -8,7 +8,7 @@ module Skylab::Face::TestSupport::CLI::Table
     parent_anchor_module.bundles_class
   end
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

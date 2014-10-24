@@ -2,19 +2,18 @@ require_relative '../core'
 
 module Skylab::Face::TestSupport
 
+  Face_ = ::Skylab::Face
   TestLib_ = ::Module.new
+  TestSupport_ = Face_::Autoloader_.require_sidesystem :TestSupport
 
-  module CONSTANTS
+  module Constants
     Face_ = ::Skylab::Face
     TestLib_ = TestLib_
-    TestSupport_ = ::Skylab::TestSupport
+    TestSupport_ = TestSupport_
   end
 
-  include CONSTANTS
+  include Constants
 
-  Face_ = Face_
-
-  TestSupport_ = Face_::Autoloader_.require_sidesystem :TestSupport
   TestSupport_::Regret[ self ]
   TestSupport_::Sandbox::Host[ self ]
 
@@ -43,11 +42,11 @@ module Skylab::Face::TestSupport
     end
     def sandboxes_et_al=
       @child.const_set :TS__, @child
-      @child.include @child.const_get( :CONSTANTS, false )
+      @child.include @child.const_get( :Constants, false )
       @child.const_set :Face_, Face_
       @child.const_set :Sandbox, Face_::Autoloader_[ ::Module.new ]
       @child::Sandbox.dir_pathname
-      @child::CONSTANTS.const_set :Sandbox, @child::Sandbox
+      @child::Constants.const_set :Sandbox, @child::Sandbox
       @child.extend TestSupport_::Quickie ; nil
     end
   end  # #posterity the predecessor ('Common_setup_') 1st iambic?
@@ -93,7 +92,7 @@ module Skylab::Face::TestSupport
     end
 
     def build_infostream
-      TestSupport_::IO::Spy.new(
+      TestSupport_::IO.spy(
         :do_debug_proc, -> { do_debug },
         :debug_IO, debug_IO,
         :debug_prefix, 'info >>> ' )

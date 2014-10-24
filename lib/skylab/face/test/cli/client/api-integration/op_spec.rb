@@ -28,7 +28,7 @@ module Skylab::Face::TestSupport::CLI::Client::API_Integration::OP_
             :argument_arity, :zero ]
 
         define_singleton_method :build_op, &
-          CONSTANTS::Curriable_build_.curry[ self::FIELDS_ ]
+          Constants::Curriable_build_.curry[ self::FIELDS_ ]
       end
     end
 
@@ -146,7 +146,7 @@ module Skylab::Face::TestSupport::CLI::Client::API_Integration::OP_
           :param, :wiffle, :arity, :zero_or_one, :desc, "one", :desc, "two" ]
 
         define_singleton_method :build_op, &
-          CONSTANTS::Curriable_build_.curry[ self::FIELDS_ ]
+          Constants::Curriable_build_.curry[ self::FIELDS_ ]
       end
 
       it "what happens? - the second overwrites the first" do

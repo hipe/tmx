@@ -14,11 +14,11 @@ class Skylab::Face::CLI::Client
       end
     end
 
-    Ouroboros_Sheet_ = Lib_::Nice_proxy[ :name, :set_a, :is_ok,
+    Ouroboros_Sheet_ = Lib_::Proxy_lib[].nice :name, :set_a, :is_ok,
       :do_include, :is_prenatal, :all_aliases,
       :desc_proc_a, :command_tree, :option_sheet_a,
       :has_default_argv, :has_option_sheets, :fetch_constituent,
-      :default_argv_value, :defers_invisibility ]
+      :default_argv_value, :defers_invisibility
 
     class Ouroboros_Sheet < Ouroboros_Sheet_
 
@@ -43,7 +43,7 @@ class Skylab::Face::CLI::Client
         )
       end
 
-      def initialize h
+      def initialize( * )
         super
         @hotm = nil
       end

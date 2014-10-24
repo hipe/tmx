@@ -4,7 +4,7 @@ module Skylab::Face::TestSupport::Plugin::Host::Proxy
 
   ::Skylab::Face::TestSupport::Plugin::Host[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

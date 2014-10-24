@@ -2,6 +2,29 @@ require_relative '../callback/core'
 
 module Skylab::Face  # read [#011] the top node narrative
 
+  class << self
+
+    def three_streams
+      [ stdin, stdout, stderr ]
+    end
+
+    def stdin
+      Lib_::System_IO.some_stdin_IO
+    end
+
+    def stdout
+      Lib_::System_IO.some_stdout_IO
+    end
+
+    def stderr
+      Lib_::System_IO.some_stderr_IO
+    end
+
+    def program_basename
+      @pbn ||= ::File.basename $PROGRAM_NAME
+    end
+  end
+
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
 
@@ -16,27 +39,6 @@ module Skylab::Face  # read [#011] the top node narrative
 
   Face_ = self
   Lib_ = ::Module.new
-
-  module CLI
-
-    def self.reparenthesize
-      self::Client::Reparenthesize
-    end
-
-    def self.stylify
-      Lib_::Stylify_proc
-    end
-
-    module Lib_
-      include Face_::Lib_
-      Stylify_proc = -> do
-        Headless__[]::CLI::Pen::FUN::Stylify
-      end
-      include Face_::Lib_
-    end
-
-    Autoloader_[ self ]
-  end
 
   module Library_  # :+[#su-001]
 
@@ -58,29 +60,33 @@ module Skylab::Face  # read [#011] the top node narrative
     memo, sidesys = Autoloader_.at :memoize, :build_require_sidesystem_proc
 
     Arity_space_create = -> p, p_ do
-      Headless__[]::Arity::Space.create p, & p_
+      HL__[]::Arity::Space.create p, & p_
     end
 
     Basic_Fields = -> * x_a do
-      MetaHell__[]::Basic_Fields.via_iambic x_a
+      MH__[]::Basic_Fields.via_iambic x_a
     end
 
-    Basic__ = sidesys[ :Basic ]
+    Bsc__ = sidesys[ :Basic ]
 
     Box = -> do
-      Basic__[]::Box
+      Bsc__[]::Box
+    end
+
+    CLI_lib = -> do
+      HL__[]::CLI
     end
 
     Counting_yielder = -> p do
-      Basic__[]::Yielder::Counting.new( & p )
+      Bsc__[]::Yielder::Counting.new( & p )
     end
 
     DSL_DSL_story = -> * a do
-      MetaHell__[]::DSL_DSL::Story_.new( * a )
+      MH__[]::DSL_DSL::Story_.new( * a )
     end
 
     EN_add_private_methods_to_module = -> i_a, mod do
-      Headless__[]::SubClient::EN_FUN[ mod, :private, i_a ]
+      HL__[].expression_agent.NLP_EN_methods[ mod, :private, i_a ]
     end
 
     EN_oxford_or = -> s_a do
@@ -88,101 +94,93 @@ module Skylab::Face  # read [#011] the top node narrative
     end
 
     Field_box_enhance = -> x, p do
-      Basic__[]::Field::Box.enhance x, & p
+      Bsc__[]::Field.box.via_client_and_proc x, p
     end
 
     Field_class = -> do
-      Basic__[]::Field
+      Bsc__[]::Field
     end
 
     Fields = -> mod, * field_i_a do
-      MetaHell__[]::Basic_Fields.with :client, mod,
+      MH__[]::Basic_Fields.with :client, mod,
         :globbing, :absorber, :initialize,
         :field_i_a, field_i_a
     end
 
     Fields_from_methods = -> *a, p do
-      MetaHell__[]::Fields::From.methods.iambic_and_block a, p
+      MH__[]::Fields::From.methods.iambic_and_block a, p
     end
 
     Funcy_globful = -> mod do
-      MetaHell__[].funcy_globful mod
+      MH__[].funcy_globful mod
     end
 
-    Headless__ = sidesys[ :Headless ]
+    HL__ = sidesys[ :Headless ]
 
-    MetaHell__ = sidesys[ :MetaHell ]
+    Ivars_with_procs_as_methods = -> do
+      MH__[]::Ivars_with_Procs_as_Methods
+    end
 
-    Module_mutex_proc = -> do
-      MetaHell__[]::Module::Mutex
+    MH__ = sidesys[ :MetaHell ]
+
+    Module_lib = -> do
+      Bsc__[]::Module
     end
 
     Module_accessors = -> x, p=nil do
-      MetaHell__[]::Module::Accessors.enhance x, & p
+      MH__[]::Module::Accessors.enhance x, & p
     end
 
     Name_from_constant = -> i do
-      Headless__[]::Name::Function::From::Constant.new i
+      HL__[]::Name.via_const i
     end
 
     Name_from_symbol = -> i do
-      Headless__[]::Name::Function.new i
+      HL__[]::Name.via_symbol i
     end
 
     Name_module_moniker = -> x do
-      Headless__[]::Name::FUN::Module_moniker[ x ]
+      Old_name_lib[].module_moniker x
     end
 
     Name_slugulate = -> i do
-      Callback_::Name.from_variegated_symbol( i ).as_slug
-    end
-
-    Nice_proxy = -> * i_a do
-      MetaHell__[]::Proxy::Nice.new( * i_a )
-    end
-
-    NLP_aggregated_list_articulation = -> a, p do
-      Basic__[]::List::Aggregated::Articulation a, & p
-    end
-
-    NLP_evented_list_articulation = -> a, p do
-      Basic__[]::List::Evented::Articulation a, & p
+      Callback_::Name.via_variegated_symbol( i ).as_slug
     end
 
     Open_box = -> do
-      MetaHell__[]::Formal::Box::Open.new
+      MH__[]::Formal::Box.open_box.new
     end
 
     Parse_series = -> * a do
-      MetaHell__[]::Parse.series.via_arglist a
+      MH__[]::Parse.series.via_arglist a
     end
 
     Plugin_lib = -> do
       Face_::Plugin
     end
 
-    Procs_as_methods = -> * i_a do
-      MetaHell__[]::Function::Class.new( * i_a )
+    Proxy_lib = -> do
+      Callback_::Proxy
     end
 
     Scanner_for_array = -> a do
-      Basic__[]::List::Scanner::For::Array.new a
+      Bsc__[]::List.line_scanner a
     end
 
     Strange_proc = -> do
-      MetaHell__[].strange.to_proc
+      MH__[].strange.to_proc
+    end
+
+    String_lib = -> do
+      Bsc__[]::String
     end
 
     System_IO = memo[ -> do
-      Headless__[]::System::IO
+      HL__[].system.IO
     end ]
 
-    Text_is_perhaps_a_sentence = -> s do
-      Headless__[]::CLI::FUN::Looks_like_sentence[ s ]
-    end
-
     Touch_proc = -> do
-      MetaHell__[]::Module::Accessors::Touch
+      MH__[]::Module::Accessors::Touch
     end
   end
 
@@ -454,10 +452,10 @@ module Skylab::Face  # read [#011] the top node narrative
         def collapse ; end
       public
         def new * formal_a
-          from_iambic formal_a
+          via_iambic formal_a
         end
       end
-      def self.from_iambic formal_a
+      def self.via_iambic formal_a
         ::Class.new( self ).class_exec do
           @formal_arg_a = formal_a
           def self.collapse
@@ -511,12 +509,19 @@ module Skylab::Face  # read [#011] the top node narrative
       end
     end
 
+  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+
+  DASH_ = '-'.freeze
+
+  EMPTY_S_ = ''.freeze
 
   Name_ = Callback_::Name
 
   MONADIC_TRUTH_ = -> _ { true }
 
-  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+  SPACE_ = ' '.freeze
+
+  UNDERSCORE_ = '_'.freeze
 
   stowaway :TestSupport, 'test/test-support'  # [#045] part of our public API
 end

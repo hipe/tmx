@@ -1,42 +1,84 @@
 module Skylab::Face
 
-  class Plugin::Metaservices_::Service_::Missing_
+  module Plugin
 
-    def initialize
-      raw_a = @raw_queue_a = [ ]
-      @message_proc = -> do  # [#it-002] NLP aggregation experiment
-        Lib_::NLP_aggregated_list_articulation[ raw_a, -> do
-          template "{{ hst }}{{ adj1 }} has not declared the required #{
-            }{{ service_i }} declared as needed by {{ pi }}{{ adj2 }}"
-          on_zero_items -> { "everything was ok." }
-          aggregate do
-            service_i -> a do
-              if 1 == a.length then "service \"#{ a.fetch 0 }\""
-              else                  "services (#{ a * ', ' })" end
+    class Metaservices_
+
+      Actors = ::Module.new
+
+      class Actors::Missing
+
+        def initialize
+          @raw_queue_a = []
+          @message_proc = bld_message_proc
+        end
+
+        attr_reader :message_proc
+
+        def host_lacks_service_for_plugin host_metasvcs, svc_i, plugin_metasvcs
+          @raw_queue_a.push(
+            [ :hst, host_metasvcs, :service_i, svc_i, :pi, plugin_metasvcs ] )
+          nil
+        end
+
+      private
+
+        def bld_message_proc  # [#it-002] NLP aggregation experiment
+          -> do
+
+            common_first = -> y, x do
+              y << x.moniker
             end
+
+            _scn = Callback_::Scn.articulators.aggregating(
+
+              :on_zero_items, -> y do
+                y << "everything was ok."
+              end,
+
+              :template, "{{ hst }}{{ adj1 }} has not declared the required #{
+                }{{ service_i }} declared as needed by {{ pi }}{{ adj2 }}",
+
+              :service_i,
+                :aggregate, -> y, a do
+                  y << "services (#{ a * ', ' })"
+                end,
+                :on_first_mention, -> y, o do
+                  y << "service \"#{ o }\""
+                end,
+
+              :hst,
+                :on_first_mention, common_first,
+                :on_subsequent_mentions, -> y, o do
+                  y << 'it'
+                end,
+
+              :adj1,
+                :on_subsequent_mentions_of, :field, :hst, -> y, _ do
+                  y << ' also'
+                end,
+
+              :pi,
+                :on_first_mention, common_first,
+                :on_subsequent_mentions, -> y, _ do
+                  y << 'that puggie'
+                end,
+
+              :adj2,
+                :on_subsequent_mentions_of, :field, :pi, -> y, _ do
+                  y << ' either'
+                end )
+
+            _upstream_scn = Callback_.scan.via_nonsparse_array @raw_queue_a
+            scn_ = _scn.map_reduce_under _upstream_scn
+            s_a = []
+            while s = scn_.gets
+              s_a.push s
+            end
+            s_a * '. '
           end
-          on_first_mention do
-            hst pi -> x { x.moniker }
-            _flush -> x='WAT' { "#{ x }." }
-          end
-          on_subsequent_mentions do
-            hst        -> { 'it' }
-            adj1       -> { ' also' }
-            pi         -> { 'that puggie' }
-            adj2       -> { ' either' }
-            _flush     -> x { " #{ x }." }
-          end
-        end ]
+        end
       end
     end
-
-    def host_lacks_service_for_plugin host_metasvcs, svc_i, plugin_metasvcs
-      @raw_queue_a << Item_[ host_metasvcs, svc_i, plugin_metasvcs ]
-      nil
-    end
-
-    Item_ = ::Struct.new :hst, :service_i, :pi
-
-    attr_reader :message_proc
   end
 end

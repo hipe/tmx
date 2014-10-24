@@ -40,7 +40,7 @@ module Skylab::Face::CLI::Client
         act_class.new h
       end
 
-      Shell_A = Lib_::Nice_proxy[ :didactic_invocation_string, :send ]
+      Shell_A = Lib_::Proxy_lib[].nice :didactic_invocation_string, :send
 
     end.call
   end

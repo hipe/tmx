@@ -4,7 +4,7 @@ module Skylab::Face::TestSupport::API::Core_
 
   ::Skylab::Face::TestSupport::API[ self, :sandboxes_et_al ]
 
-  describe "extend module x with Face_::API and you get `x::API.invoke` that" do
+  describe "[fa] API core - extend module x with Face_::API and you get `x::API.invoke` that" do
 
     extend TS__
 

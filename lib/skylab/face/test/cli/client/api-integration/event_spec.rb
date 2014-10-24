@@ -7,7 +7,7 @@ module Skylab::Face::TestSupport::CLI::Client::API_Integration::Event
   describe "[fa] CLI client API event integration" do
 
     extend CLI_Client_TS_
-    extend TS__  # so CONSTANTS (Sandbox) is visible in i.m's
+    extend TS__  # so Constants (Sandbox) is visible in i.m's
 
     context "does the thing with event names and the `on_` pattern" do
       define_sandbox_constant :application_module do

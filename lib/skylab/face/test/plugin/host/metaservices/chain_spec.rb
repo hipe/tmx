@@ -4,7 +4,7 @@ module Skylab::Face::TestSupport::Plugin::Host::Metaservices_::Chain_
 
   ::Skylab::Face::TestSupport::Plugin::Host::Metaservices_[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

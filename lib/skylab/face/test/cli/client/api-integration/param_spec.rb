@@ -7,7 +7,7 @@ module Skylab::Face::TestSupport::CLI::Client::API_Integration::Param
   describe "[fa] CLI client API integration - param" do
 
     extend CLI_Client_TS_
-    extend TS__  # so CONSTANTS (Sandbox) is visible in i.m's
+    extend TS__  # so Constants (Sandbox) is visible in i.m's
 
     context "this is testing both API and CLI integration ..." do
       define_sandbox_constant :application_module do

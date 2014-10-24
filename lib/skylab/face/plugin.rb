@@ -592,8 +592,8 @@ module Skylab::Face
             absorb_metaservices_service host_metasvcs, @h.fetch( i )
           next
         end
-        ( err ||= Plugin::Metaservices_::Service_::Missing_.new ).
-          host_lacks_service_for_plugin host_metasvcs, i, plugin_metasvcs
+        err ||= Plugin::Metaservices_::Actors::Missing.new
+        err.host_lacks_service_for_plugin host_metasvcs, i, plugin_metasvcs
       end
       err and raise Plugin::DeclarationError, err.message_proc[]
       nil
