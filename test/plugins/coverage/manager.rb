@@ -31,7 +31,7 @@ module Skylab::Test
     # be mutated. idx is the index of the e.g `--c-overage` switch.
 
     def start y, argv, idx
-      require LIB_SKYLAB_PN_[].join( 'test-support/fun' ).to_s
+      require LIB_SKYLAB_PN_[].join( 'test-support/init' ).to_path
         # the above is the last require before we (_we_) are started.
       begin
         state! :starting
@@ -42,10 +42,11 @@ module Skylab::Test
         ok, res = start_simplecov y, sn
         ok or break
         @black_x = -> do  # do this after starting above just as grease
-          rx = ::Regexp.method :escape ; fun = ::Skylab::TestSupport::FUN
+          fun = ::Skylab::TestSupport::Init
+          rx = ::Regexp.method :escape
           Black_Rx_Matcher_.new(  # could stand to be more extensible
             %r{ (?:
-              #{ rx[ fun::Spec_rb[] ] }
+              #{ rx[ fun.spec.rb ] }
                 |
               (?: \A | / )
               (?: #{  fun::Test_support_filenames[].map( & rx ) * '|' } )

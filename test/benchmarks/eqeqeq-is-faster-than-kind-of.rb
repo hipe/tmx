@@ -10,7 +10,7 @@ TIMES = 400_000  # this number is few enough so that you can see this
   # thing working right away and get a rough sense for the comparision.
   # a larger number will yield more precision.
 
-class Alt < Test::Benchmark::Alternative
+class Alt < Test_::Benchmark::Alternative
   def val
     if rand >= 0.5
       1
@@ -27,7 +27,7 @@ alts << Alt[ "==",       -> { ::Fixnum == val.class } ]
 
 _tests = lambda do
 
-  alt_ = ::Class.new( Test::Benchmark::Alternative ).class_exec do
+  alt_ = ::Class.new( Test_::Benchmark::Alternative ).class_exec do
     def initialize alt, val
       super( * alt.to_a )
       @val = val
@@ -61,10 +61,10 @@ _make_bm_jobs = ->(x) {
   alts.each { |a| x.report(a.label) { t.times { a.execute } } }
 }
 
-Test::Benchmark.selftest_argparse[ -> do
+Test_::Benchmark.selftest_argparse[ -> do
   _tests[]
 end, -> do
-  Test::Benchmark.bmbm( & _make_bm_jobs )
+  Test_::Benchmark.bmbm( & _make_bm_jobs )
 end ]
 
 end end  # indent lost 2 x

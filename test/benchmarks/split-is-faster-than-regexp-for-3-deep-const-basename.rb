@@ -15,7 +15,7 @@ module Foo
   end
 end
 
-alt = Test::Benchmark::Alternative
+alt = Test_::Benchmark::Alternative
 mod = Foo::BarBaz::BiffoBazzo
 mod_str = mod.to_s
 
@@ -35,11 +35,11 @@ test_that_benchmark_blocks_are_correct = -> do
   end
 end
 
-Test::Benchmark.selftest_argparse[ -> do
+Test_::Benchmark.selftest_argparse[ -> do
   test_that_benchmark_blocks_are_correct[]
 end, -> do
   t = TIMES
-  Test::Benchmark.bmbm do |bm|
+  Test_::Benchmark.bmbm do |bm|
      alts.each do |a|
        bm.report a.label do
          t.times do

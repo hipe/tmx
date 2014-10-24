@@ -10,56 +10,48 @@ module Skylab::Test
     sidesys, stdlib = Autoloader_.at :build_require_sidesystem_proc,
       :build_require_stdlib_proc
 
-    Basic__ = sidesys[ :Basic ]
+    Bsc__ = sidesys[ :Basic ]
 
     Basic_Mutex = -> do
-      Basic__[]::Mutex
+      Bsc__[]::Mutex
     end
 
     Basic_Tree = -> do
-      Basic__[]::Tree
+      Bsc__[]::Tree
     end
 
-    CLI_curriable_stylize_proc = -> do
-      Headless__[]::CLI::Pen::FUN::Stylify
-    end
-
-    CLI_option = -> do  # e.g ::on, Merger, Parser
-      Headless__[]::CLI::Option
+    CLI_lib = -> do
+      HL__[]::CLI
     end
 
     CLI_table = -> * x_a do
       Face__[]::CLI::Table.via_iambic x_a
     end
 
-    EN_calculate = -> p do
-      Headless__[]::NLP::EN.calculate( & p )
+    EN_calculate = -> & p do
+      HL__[].expression_agent.NLP_EN_agent.calculate( & p )
     end
 
     Face__ = sidesys[ :Face ]
 
-    Headless__ = sidesys[ :Headless ]
+    HL__ = sidesys[ :Headless ]
 
     Heavy_plugin = -> do
       Face__[]::Plugin
     end
 
-    MetaHell__ = sidesys[ :MetaHell ]
+    MH__ = sidesys[ :MetaHell ]
 
     Oxford_and = -> a do
       Callback_::Oxford_and[ a ]
     end
 
-    Parse_field = -> do
-      MetaHell__[]::Parse::Field
-    end
-
-    Parse_series = -> do
-      MetaHell__[]::Parse.series
+    Parse_lib = -> do
+      MH__[]::Parse
     end
 
     Pretty_path_proc = -> do
-      Headless__[]::CLI::PathTools::FUN::Pretty_path
+      HL__[].system.filesystem.path_tools.pretty_path
     end
 
     Reparenthesize = -> p, msg do
@@ -69,13 +61,13 @@ module Skylab::Test
     Set = stdlib[ :Set ]
 
     Spec_rb = -> do
-      TestSupport__[]::FUN::Spec_rb[]
+      TestSupport__[].spec_rb
     end
 
     TestSupport__ = sidesys[ :TestSupport ]
 
-    Touch_constant = -> do
-      MetaHell__[]::FUN::Touch_constant_
+    Touch_const = -> do
+      MH__[].touch_const
     end
   end
 
@@ -83,7 +75,7 @@ module Skylab::Test
 
   Stderr_ = -> { $stderr }  # resources should not be accessed as contants
                             # or globals from within application code
-  Test = self
+  Test_ = self
 
   UNIVERSAL_TEST_DIR_RELPATH_ = 'test'.freeze
 

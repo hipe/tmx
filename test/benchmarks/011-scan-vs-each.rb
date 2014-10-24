@@ -74,14 +74,14 @@ module Skylab::Test
       end
     end
 
-    Test::Benchmark.selftest_argparse[ -> y do
+    Test_::Benchmark.selftest_argparse[ -> y do
       number_of_times = 1
       some_action = -> x { $stderr.puts "OK - #{ x }" }
-      invoke[ Test::Benchmark::Mock_.new y ]
+      invoke[ Test_::Benchmark::Mock_.new y ]
     end, -> do
       number_of_times = TIMES__
       some_action = -> _ { }
-      invoke[ Test::Benchmark ]
+      invoke[ Test_::Benchmark ]
     end ]
   end
 end

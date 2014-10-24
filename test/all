@@ -42,13 +42,13 @@ require_relative 'core'
 
 module Skylab::Test
 
-  Plugin_ = Test::Lib_::Heavy_plugin[]
+  Plugin_ = Test_::Lib_::Heavy_plugin[]
 
   class Front_Mechanics_  # a "headless" client, conceptually
 
     Plugin_::Host.enhance self do
 
-      plugin_box_module -> { Test::Plugins }
+      plugin_box_module -> { Test_::Plugins }
 
       eventpoints( * %i|
         available_actions
@@ -88,7 +88,7 @@ module Skylab::Test
       # (like #this-spot), we now have to load the rest of it explicitly
       # because the rest of it won't load via  autoloading [#te-002]
 
-      require "#{ Test::Plugins::Coverage.dir_pathname }/core"
+      require "#{ Test_::Plugins::Coverage.dir_pathname }/core"
       super
     end
 
@@ -216,9 +216,9 @@ module Skylab::Test
 
     def say_nonempty_queue &blk
       i = @last_action_name_i ; a = @queue_a
-      @info_y << ( Test::Lib_::EN_calculate[ -> do
+      @info_y << ( Test_::Lib_::EN_calculate.call do
         instance_exec i, a, &blk
-      end ] )
+      end )
       nil
     end
 
@@ -235,8 +235,16 @@ module Skylab::Test
     end
   end
 
-  module Merge_Options_  # (re-opens below)
+  class << self  # is Test_
+    define_method :adapters, ( Callback_.memoize do
+      mod = Test_::Adapters_ = Test_::Adapter_.collection.new
+      Autoloader_[ mod ]
+      mod.dir_pathname
+      mod
+    end )
   end
+
+  Merge_Options_ = ::Module.new
 
   class CLI < Front_Mechanics_  # (separation of concerns)
 
@@ -250,14 +258,14 @@ module Skylab::Test
       @paystream, @infostream = sout, serr
       @info_y = ::Enumerator::Yielder.new( & @infostream.method( :puts ) )
       @em = -> s { "\e[1;32m#{ s }\e[0m" }
-      @pretty_path = Test::Lib_::Pretty_path_proc[]
+      @pretty_path = Test_::Lib_::Pretty_path_proc[]
       nil
     end
 
     def invoke argv
       begin
         @argv = argv
-        r = Queue_Resolver_.new( self ).execute or break
+        r = Queue_Resolver__.new( self ).execute or break
         r = ready or break
         r = execute_each_action_on_queue
         if r and true != r  # :[#007] the significance of the result value
@@ -298,7 +306,7 @@ module Skylab::Test
       o.separator "#{ em 'Options:' }"
       merge_options o, -> merger do
         merger.add(
-          Test::Lib_::CLI_option[].on( '-h', '--help', 'this screen.' ) do
+          Test_::Lib_::CLI_lib[].option.on( '-h', '--help', 'this screen.' ) do
             @queue_a << :help
           end )
       end
@@ -370,7 +378,7 @@ module Skylab::Test
       EXP_AG_P_[ nil ]
     end
 
-    EXP_AG_P_ = Test::Lib_::Touch_constant[].
+    EXP_AG_P_ = Test_::Lib_::Touch_const[].
       curry[ false, -> _ { Expression_Agent_.new }, :EXPR_AGENT_, self ]
 
     class Expression_Agent_
@@ -391,20 +399,22 @@ module Skylab::Test
         1 == a.length ? " #{ a[0] }" : "\n#{ a * "\n" }"
       end
       def or_ a
-        Test::Lib_::Oxford_and[ a ]
+        Test_::Lib_::Oxford_and[ a ]
       end
       def par i
         "<#{ i.to_s.gsub '_', '-' }>"
       end
     private
       def curry x
-        Test::Lib_::CLI_curriable_stylize_proc[].curry[ [ * x ] ]
+        Test_::Lib_::CLI_lib[].pen.stylify.curry[ [ * x ] ]
       end
     end
 
     def any_adapter_services_for adapter_i
-      (( @adapter_mod_h ||= { } )).fetch adapter_i do |i|
-        if (( adapter_mod = ::Skylab::Test::Adapters[ adapter_i ] ))
+      @adapter_mod_h ||= {}
+      @adapter_mod_h.fetch adapter_i do
+        adapter_mod = Test_.adapters[ adapter_i ]
+        if adapter_mod
           any_client = adapter_mod.const_get( :Services_, false ).
             new adapter_mod, fetch_hot_plugin_by_name( :subtree ).services
         end
@@ -413,7 +423,7 @@ module Skylab::Test
     end
   end
 
-  class Queue_Resolver_  # parsing argv and resolving an "action queue" for
+  class Queue_Resolver__  # parsing argv and resolving an "action queue" for
     # this thing is super annoying because some plugins are passive (they
     # do *not* assume responsibility for processing all of the request) or
     # they are active (they must be able to short-circuit the parent node's
@@ -543,7 +553,7 @@ module Skylab::Test
     end
   end
 
-  module Merge_Options_
+  module Merge_Options_  # protected not private
 
     # because we are crazy and we have plugins with plugins ..
 
@@ -553,12 +563,12 @@ module Skylab::Test
     # aggregate option parser.
 
     def merge_options up_op, at_end=nil, ctx_a=nil
-      _CLI_Option = Test::Lib_::CLI_option[]
+      option_lib = Test_::Lib_::CLI_lib[].option
       ep = plugin_host_metaservices.eventpoints.fetch :available_options
-      merger = _CLI_Option::Merger.new Anchorized_moniker_
+      merger = option_lib.merger.new Anchorized_moniker__
       hot_plugin_a.each do |pi|
         if pi.plugin_metaservices.subscribed_to_eventpoint? ep.normal
-          rec = _CLI_Option::Parser::Recorder.new do |opt|
+          rec = option_lib.parser.recorder do |opt|
             merger.add opt, * [ * ctx_a, pi ]
           end
           pi.send ep.as_method_name, rec, ctx_a
@@ -568,7 +578,7 @@ module Skylab::Test
       merger.write up_op
       nil
     end
-    Anchorized_moniker_ = -> * cx_a do
+    Anchorized_moniker__ = -> * cx_a do
 
       # for a plugin that itself has plugins, its desc lines will qualify
       # themselves multiple times without the below check #whew

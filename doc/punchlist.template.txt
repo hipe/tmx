@@ -1,0 +1,40 @@
+information-tactics q [ ]
+
+flex2treetop        q [ ]
+yacc2treetop        q [ ]
+bnf2treetop         q [ ]
+css-convert         q [ ]
+
+treetop-tools       q [ ]
+code-molester       Q [ ]
+
+dependency          Q [ ]
+slake               Q [ ]
+
+slicer              q [ ]
+beauty-salon        q [ ]
+cull                q [ ]
+
+permute             Q [ ]
+file-metrics        q [ ]
+
+git                 Q [ ]
+git-viz (item 16)   q [ ]
+
+sub-tree            q [ ]
+snag                q [ ]
+
+tan-man             q [ ]
+treemap             Q [ ]
+
+face                q [ ]
+porcelain           Q [ ]
+
+brazen              q [ ]
+callback            q [ ]
+headless            Q [ ]
+basic               q [ ]
+meta-hell           q [ ]
+
+test-support        q [ ]
+tmx                 q [ ]

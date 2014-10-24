@@ -2,8 +2,6 @@ module Skylab::Test
 
   class Plugins::Divide
 
-    Test = Test  # so visible from children
-
     Divide = self
 
     Plugin_.enhance self do

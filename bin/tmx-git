@@ -4,6 +4,6 @@
 
 require_relative '../lib/skylab/git/core'
 
-module ::Skylab::Git
+module Skylab::Git
   Git::CLI.new( Stdin_[], Stdout_[], Stderr_[] ).invoke ::ARGV
 end

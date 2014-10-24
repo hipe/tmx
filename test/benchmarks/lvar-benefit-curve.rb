@@ -22,7 +22,7 @@ module Skylab::Test
       attr_reader :times, :label, :alt_a, :do_skip
     end
 
-    A_ = Test::Benchmark::Alternative
+    A_ = Test_::Benchmark::Alternative
 
     obj = ::Object.new
 
@@ -64,7 +64,7 @@ module Skylab::Test
     end
 
     invoke = -> y, is_real do
-      bmrk = is_real ? Test::Benchmark : Test::Benchmark::Mock_.new( y )
+      bmrk = is_real ? Test_::Benchmark : Test_::Benchmark::Mock_.new( y )
       GROUP_A_.each_with_index do |g, idx|
         g.do_skip and next
         y << nil << nil
@@ -82,7 +82,7 @@ module Skylab::Test
       end
     end
 
-    Test::Benchmark.selftest_argparse[ -> y do
+    Test_::Benchmark.selftest_argparse[ -> y do
       invoke[ y, false ]
     end, -> y do
       invoke[ y, true ]

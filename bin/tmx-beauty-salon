@@ -2,4 +2,4 @@
 
 require_relative '../lib/skylab/beauty-salon/core'
 
-Skylab::BeautySalon::CLI.new( nil, $stdout, $stderr ).invoke ARGV
+Skylab::BeautySalon::CLI.new( $stdin, $stdout, $stderr ).invoke ARGV

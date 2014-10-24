@@ -42,16 +42,17 @@ module Skylab::Test
         end
       end
 
-      fields = Test::Lib_::Parse_fields[]
+      _Parse = Test_::Lib_::Parse_lib[]
 
-      Syntax_ = Test::Lib_::Parse_series[].curry[
+      fields = _Parse.fields
+
+      Syntax_ = _Parse.series.curry[
         :syntax, :monikate, -> a { a * ' ' },
         :field, :monikate, -> s { "[ #{ s } ]" },
         :field, :moniker, '<integer>',
-        :token_scanner, fields::Int::Scan_token,
-        :field, * fields::Flag[ :random ].to_a,
-        :prepend_to_uncurried_queue, :exhaustion
-      ]
+        :token_scanner, fields.int.scan_token,
+        :field, * fields.flag( :random ).to_a,
+        :prepend_to_uncurried_queue, :exhaustion ]
 
       def execute
         @execute.call

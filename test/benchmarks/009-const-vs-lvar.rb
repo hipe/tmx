@@ -41,10 +41,10 @@ module Skylab::Test
       end
     end
 
-    Test::Benchmark.selftest_argparse[ -> y do
-      invoke[ Test::Benchmark::Mock_.new y ]
+    Test_::Benchmark.selftest_argparse[ -> y do
+      invoke[ Test_::Benchmark::Mock_.new y ]
     end, -> do
-      invoke[ Test::Benchmark ]
+      invoke[ Test_::Benchmark ]
     end ]
   end
 end

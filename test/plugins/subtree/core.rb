@@ -101,7 +101,7 @@ module Skylab::Test
 
     def initialize( * )
       super
-      @sort_mtx = Lib_::Basic_Mutex[]::Write_Once.new
+      @sort_mtx = Lib_::Basic_Mutex[].write_once.new
     end
 
   private
@@ -244,7 +244,7 @@ module Skylab::Test
         end
         [ * arg_a,
           ::Enumerator::Yielder.new do |msg|
-            iy << Test::Lib_::Reparenthesize[ say, msg ]
+            iy << Test_::Lib_::Reparenthesize[ say, msg ]
           end,
           ::Enumerator::Yielder.new do |msg|
             ok = false
@@ -310,7 +310,7 @@ module Skylab::Test
       def build_p
         hublen = (( hub_pn = @project_hub_pn )).to_s.length + 1
         ::Pathname.glob( hub_pn.join(
-          "*/#{ UNIVERSAL_TEST_DIR_RELPATH_ }/**/*#{ Test::Lib_::Spec_rb[] }"
+          "*/#{ UNIVERSAL_TEST_DIR_RELPATH_ }/**/*#{ Test_::Lib_::Spec_rb[] }"
         )).group_by do |pn|
           FIRST_DIR_RX_.match( pn.to_s, hublen ).to_s.intern
         end.method :[]

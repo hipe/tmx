@@ -1,8 +1,19 @@
 module Skylab::Test
 
-  module Adapter
+  module Adapter_
 
-    class Collection < ::Module
+    class << self
+
+      def anchor_module mod
+        Anchor_Module__[ mod ]
+      end
+
+      def collection
+        Collection__
+      end
+    end
+
+    class Collection__ < ::Module
 
       def [] dirname_i  # ('name error' behavior undefined for now)
         ( @cache_h ||= { } ).fetch dirname_i do |i|
@@ -39,14 +50,14 @@ module Skylab::Test
       end
     end
 
-    module Anchor_Module
+    module Anchor_Module__
 
       def self.[] mod
-        mod.extend Methods_
+        mod.extend Methods__
         nil
       end
 
-      module Methods_
+      module Methods__
 
         attr_reader :moniker
 

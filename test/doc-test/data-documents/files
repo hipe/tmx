@@ -1,6 +1,6 @@
-lib/skylab/basic/hash.rb  #branch-down-to-core  #regret-setup:no
+lib/skylab/basic/hash/core.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/basic/hash/order-proxy.rb
-lib/skylab/basic/hash/pair-enumerator.rb
+lib/skylab/basic/list/core.rb  #output-filename: pairs/core_spec.rb  #regret-setup: no  #look-for-ts
 lib/skylab/basic/list/scanner.rb
 lib/skylab/basic/list/scanner/with/peek.rb
 lib/skylab/basic/method.rb  #branch-down-to-core  #regret-setup:no
@@ -8,13 +8,16 @@ lib/skylab/basic/pathname/union.rb
 lib/skylab/basic/rotating-buffer.rb
 lib/skylab/basic/struct.rb
 lib/skylab/brazen/entity/properties-stack--/common-frame--.rb #branch-down-to-core #regret-setup:no
+lib/skylab/callback/proxy/inline--.rb  #branch-down-to-core  #regret-setup: no
+lib/skylab/callback/proxy/functional--.rb  #branch-down-to-core  #regret-setup: no
+lib/skylab/callback/proxy/functional--/nice--.rb   #branch-down-to-core  #regret-setup: no
 lib/skylab/face/cli/lipstick.rb
 lib/skylab/face/cli/table.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/face/cli/tableize.rb
 lib/skylab/face/plugin/host/metaservices-/chain-.rb
 lib/skylab/face/plugin/host/proxy.rb
 lib/skylab/headless/cli/option.rb  #branch-down-to-core  #regret-setup:no
-lib/skylab/headless/nlp/en/levenshtein.rb
+lib/skylab/headless/system--/services--/filesystem/cache--.rb  #branch-down-to-core #regret-setup:no
 lib/skylab/information-tactics/levenshtein.rb
 lib/skylab/meta-hell/basic-fields.rb #branch-down-to-core #regret-setup:no
 lib/skylab/meta-hell/dsl-dsl/core.rb  #regret-setup:no

@@ -53,7 +53,7 @@ module Skylab::Test
 
     def req
       _req -> do
-        Test::Adapters[ :rspec ].load_core_if_necessary
+        Test_.adapters[ :rspec ].load_core_if_necessary
           # without this, quickie runs the tests.
       end
     end

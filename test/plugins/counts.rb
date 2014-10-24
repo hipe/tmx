@@ -57,7 +57,7 @@ module Skylab::Test
         total_line_extra = [ nil ]
         do_meter = true
       end
-      Test::Lib_::CLI_table[
+      Test_::Lib_::CLI_table[
         :field, 'subproduct',
         :field, 'num test files',
         * field_extra,
@@ -86,7 +86,7 @@ module Skylab::Test
     end
   private
     def bld_max_share_meter_args
-      _width = Test::Lib_::CLI_table[].some_screen_width
+      _width = Test_::Lib_::CLI_table[].some_screen_width
       [ :target_width, _width, :field, :fill,
         :cel_renderer_builder, :max_share_meter ]
     end

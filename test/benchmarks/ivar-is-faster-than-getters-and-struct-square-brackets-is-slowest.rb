@@ -42,10 +42,10 @@ module Skylab::Test::Struct_Members_Vs_Ivars_Etc_
     end
   end
 
-  Test = ::Skylab::Test
+  Test_ = ::Skylab::Test
 
   if ::ARGV.length.nonzero?
-    Test::TestSupport.debug_IO.puts "unpexpected argument(s), #{
+    Test_::TestSupport.debug_IO.puts "unpexpected argument(s), #{
       }skipping benchmark: #{ ::ARGV * ' ' } (from #{ self })"
   else
 

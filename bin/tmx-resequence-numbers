@@ -58,6 +58,15 @@ exit( -> sin, sout, serr, argv, program_name do
 
   is_dry = false
 
+  _CLI_lib = -> do
+    p = -> do
+      x = subsystem[ :Headless ]::CLI
+      p = -> { x }
+      x
+    end
+    -> { p[] }
+  end.call
+
   op = ::OptionParser.new do |op_|
     op_.on '-h', '--help', 'this screen.' do
       pen[].calculate do
@@ -66,10 +75,14 @@ exit( -> sin, sout, serr, argv, program_name do
         y << "#{ lbl _USAGE }#{ prog_name[] } #{ usage_syntax[] }"
         y << nil
 
-        require_relative '../lib/skylab'
-        hl = subsystem[ :Headless ]
-        _cols = [ hl::CLI::FUN::Cols[ -> { _DEFAULT_COLS } ], _MAX_COLS ].min
-        yy = hl::CLI::Word_Wrap.curry '', _cols, y
+        _String_lib = subsystem[ :Basic ]::String
+
+        _a = []
+        _a.push _CLI_lib[].cols -> { _DEFAULT_COLS }
+        _a.push _MAX_COLS
+        _cols = _a.min
+
+        yy = _String_lib.math.word_wrappers.crazy.curry '', _cols, y
 
         y << "#{ lbl 'description:' }"
         yy.indent = _INDENT
@@ -226,7 +239,7 @@ exit( -> sin, sout, serr, argv, program_name do
 
   fh_0 = file_a[ 0 ]
   occurrences_by_lineno, map_h = -> do
-    scn = subsystem[ :Headless ]::CLI::FUN::Occurrence_scanner[ regex, fh_0 ]
+    scn = _CLI_lib[].occurrence_scanner regex, fh_0
     seen_h = { } ; mp_h = { }
     occ_by_lineno = ::Hash.new { |h, k| h[ k ] = [] }
     while (( occ = scn.call ))
@@ -339,7 +352,7 @@ exit( -> sin, sout, serr, argv, program_name do
 
   edit = _File_Edit.new(
     :be_verbose, be_verbose,
-    :build_OC, subsystem[ :Headless ]::CLI::FUN::Occurrence_scanner,
+    :build_OK, _CLI_lib[].occurrence_scanner,
     :map_h, map_h,
     :nope_exitstatus, _NOPE,
     :regex, regex,
