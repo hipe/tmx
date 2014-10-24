@@ -1,12 +1,15 @@
 require_relative 'test-support'
 
-module ::Skylab::Yacc2Treetop::TestSupport::CLI
+module Skylab::Yacc2Treetop::TestSupport::CLI
+
   include InstanceMethods  # for constants (1.9.2 to 1.9.3)
 # ..
 
-describe "#{::Skylab::Yacc2Treetop} CLI integration" do
+describe "[y2tt] CLI integration" do
+
   extend ::Skylab::Yacc2Treetop::TestSupport::CLI
-  self::Yacc2Treetop = ::Skylab::Yacc2Treetop
+
+  self::Y2TT_ = ::Skylab::Yacc2Treetop
 
   context 'doing nothing' do
     invoke
@@ -24,7 +27,7 @@ describe "#{::Skylab::Yacc2Treetop} CLI integration" do
     it 'writes usage, option listing to stderr' do
       out.length.should eql(0)
       unstyle(err.shift).should match(USAGE_RX)
-      (5..15).should  cover(err.length)
+      (5..15).should be_include err.length
       err.last.should match(/\A    [ ]*[^ ]/) # any option listing
     end
   end
@@ -55,7 +58,7 @@ describe "#{::Skylab::Yacc2Treetop} CLI integration" do
     invoke self::FIXTURES.join('060.choice-parse.y3').to_s
     it 'writes a treetop grammar to stdout' do
       err.length.should eql(0)
-      (4..4).should cover(out.length)
+      (4..4).should be_include out.length
       out.first.should eql('( type_selector / universal )')
     end
   end

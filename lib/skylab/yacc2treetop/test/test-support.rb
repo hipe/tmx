@@ -1,10 +1,14 @@
 load ::File.expand_path( '../../../../../bin/tmx-yacc2treetop', __FILE__ )
 require_relative '../..'
 require 'skylab/test-support/core'
-require 'skylab/headless/core' # unstyle
+require 'skylab/headless/core'  # unstyle
+
+Skylab::TestSupport::Quickie.enable_kernel_describe
 
 module Skylab::Yacc2Treetop::TestSupport
-  Yacc2Treetop = ::Skylab::Yacc2Treetop
+
+  Y2TT_ = ::Skylab::Yacc2Treetop
+
   module CLI
     def self.extended mod
       mod.module_eval do
@@ -13,12 +17,13 @@ module Skylab::Yacc2Treetop::TestSupport
       end
     end
   end
+
   module CLI::ModuleMethods
     def invoke *argv
       let(:_frame) do
-        errstream = ::Skylab::TestSupport::IO::Spy.new
-        outstream = ::Skylab::TestSupport::IO::Spy.new
-        cli = Yacc2Treetop::CLI.new(outstream, errstream)
+        errstream = ::Skylab::TestSupport::IO.spy.new
+        outstream = ::Skylab::TestSupport::IO.spy.new
+        cli = Y2TT_::CLI.new(outstream, errstream)
         cli.program_name = 'yacc2treetop'
         o = ::Struct.new(:debug_p, :err_p, :out_p).new  # :+[#hl-078] "shell"
         o.debug_p = ->{ outstream.debug!; errstream.debug! }
@@ -50,6 +55,6 @@ module Skylab::Yacc2Treetop::TestSupport
       err.size.should eql(0)
     end
 
-    define_method :unstyle, & ::Skylab::Headless::CLI::Pen::FUN.unstyle
+    define_method :unstyle, & ::Skylab::Headless::CLI.pen.unstyle
   end
 end
