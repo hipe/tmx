@@ -4,9 +4,9 @@ module Skylab::FileMetrics::TestSupport::CLI
 
   # Quickie.
 
-  describe "#{ FileMetrics }::CLI" do
+  describe "[fm] CLI" do
 
-    extend CLI_TestSupport
+    extend TS_
 
     exptng = 'line-count or dirs or ext'  # string *and* rx fragment
 
@@ -57,7 +57,7 @@ module Skylab::FileMetrics::TestSupport::CLI
       it does do
         invoke argv
         x = whole_err_string
-        str = Lib_::Unstyle_styled[ x ]
+        str = TestLib_::CLI_lib[].pen.unstyle_styled x
         str.should match( /^usage: fm line-count (?:\[[^\[]+){7,}/ )
         str.should match( /^description:.+usage:.+options:.+/m )
       end

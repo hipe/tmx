@@ -6,7 +6,7 @@ module Skylab::FileMetrics
   module TestSupport
     ::Skylab::TestSupport::Regret[ self ]
 
-    module CONSTANTS
+    module Constants
       FileMetrics = ::Skylab::FileMetrics
       Lib_ = FileMetrics::Lib_
       TestSupport = ::Skylab::TestSupport

@@ -1,4 +1,5 @@
-require_relative '../callback/core'
+require_relative '..'
+require 'skylab/callback/core'
 
 module Skylab::FileMetrics
 
@@ -33,30 +34,26 @@ module Skylab::FileMetrics
 
     memo, sidesys = Autoloader_.at :memoize, :build_require_sidesystem_proc
 
-    Add_methods_for_the_procs_in_the_ivars = -> mod, * i_a do
-      MetaHell__[]::Function mod, * i_a
-    end
-
-    Basic__ = sidesys[ :Basic ]
+    Bsc__ = sidesys[ :Basic ]
 
     CLI_lipstick = -> *a do
       Face__[]::CLI::Lipstick.new( * a )
     end
 
     DSL_DSL_enhance_module = -> x, p do
-      MetaHell__[]::DSL_DSL.enhance_module x, & p
+      MH__[]::DSL_DSL.enhance_module x, & p
+    end
+
+    EN_agent = -> do
+      HL__[].expression_agent.NLP_EN_agent
     end
 
     EN_conjuction_phrase = -> a do
       NLP_EN__[]::POS::Conjunction_::Phrase_.new( * a )
     end
 
-    EN_inflect_proc = -> do
-      NLP_EN__[]::Minitesimal::FUN.inflect
-    end
-
     EN_number = -> x do
-      NLP_EN__[]::Number::FUN.number[ x ]
+      NLP_EN__[]::Number.number x
     end
 
     EN_verb_phrase = -> h do
@@ -66,35 +63,43 @@ module Skylab::FileMetrics
     Face_top = Face__ = sidesys[ :Face ]
 
     Formal_box_class = -> do
-      MetaHell__[]::Formal::Box
+      MH__[]::Formal::Box
     end
 
-    Headless__ = sidesys[ :Headless ]
+    HL__ = sidesys[ :Headless ]
+
+    Ivars_with_procs_as_methods = -> * a do
+      MH__[]::Ivars_with_Procs_as_Methods.via_arglist a
+    end
 
     Let = -> do
-      MetaHell__[]::Let
+      MH__[]::Let
     end
 
-    MetaHell__ = sidesys[ :MetaHell ]
-
-    Nice_proxy = -> * a do
-      MetaHell__[]::Proxy::Nice.from_i_a_and_p a, nil
-    end
+    MH__ = sidesys[ :MetaHell ]
 
     NLP_EN__ = memo[ -> do
-      Headless__[]::NLP::EN
+      HL__[]::NLP::EN
     end ]
 
     Open_box = -> do
-      MetaHell__[]::Formal::Box::Open.new
+      MH__[]::Formal::Box.open_box.new
+    end
+
+    Proxy_lib = -> do
+      Callback_::Proxy
+    end
+
+    Nice_proxy = -> * a do
+      MH__[]::Proxy.nice.via_arglist a
     end
 
     Reverse_string_scanner = -> s do
-      Basic__[]::List::Scanner::For::String::Reverse[ s ]
+      Bsc__[]::String.line_scanner.reverse s
     end
 
     Select = -> do
-      Headless__[]::IO::Upstream::Select.new
+      HL__[]::IO.select.new
     end
 
     Shellescape_path = memo[ -> do
@@ -107,11 +112,6 @@ module Skylab::FileMetrics
     System_open2 = -> mod do
       mod.include Face__[]::Open2
     end
-
-    Unstyle_styled = -> x do
-      Headless__[]::CLI::Pen::FUN.unstyle_styled[ x ]
-    end
-
   end
 
   Face_ = Lib_::Face_top[]

@@ -124,11 +124,12 @@ module Skylab::FileMetrics
       # produce programatically all the permutations of utterances:
       # "including A and B", "including A and excluding B", "excluding A and B"
       # and at least 1 other..
+      # this is either (#todo use [#cb-050]) or ( :+[#cb-056] )
 
       build_prattle_space = -> do
         noun_h = { blank_lines: 'blank line', comment_lines: 'comment line' }
         verb_h = { include: 'include', exclude: 'exclude' }
-        interface = Lib_::Nice_proxy[ :conjunction_phrase ]
+        interface = Lib_::Proxy_lib[].nice :conjunction_phrase
         -> do
           predicate_box = Lib_::Open_box[]
           aggregate = -> verb_sym, noun_sym do

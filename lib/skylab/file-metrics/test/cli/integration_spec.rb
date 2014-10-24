@@ -4,9 +4,9 @@ module Skylab::FileMetrics::TestSupport::CLI
 
   # Quickie - but NOTE it gets whacky b.c of ncurses!
 
-  describe "#{ FileMetrics }::CLI - integration" do
+  describe "[fm] CLI - integration" do
 
-    extend CLI_TestSupport
+    extend TS_
 
     floor = 4 #  OMG this test fails if you run them in a
       # terminal screen that is too narrow  # #todo

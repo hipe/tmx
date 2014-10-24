@@ -4,9 +4,9 @@ require 'skylab/face/test/cli/test-support'
 module Skylab::FileMetrics::TestSupport::CLI
 
   ::Skylab::FileMetrics::Face_::TestSupport::CLI::Client[ self ]  # KRAY
-  ::Skylab::FileMetrics::TestSupport[ CLI_TestSupport = self ]
+  ::Skylab::FileMetrics::TestSupport[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   Lib_ = Lib_
 
@@ -14,7 +14,7 @@ module Skylab::FileMetrics::TestSupport::CLI
 
   module ModuleMethods
 
-    include CONSTANTS
+    include Constants
 
     def client_class
       FileMetrics::CLI
@@ -24,7 +24,7 @@ module Skylab::FileMetrics::TestSupport::CLI
 
   module InstanceMethods
 
-    include CONSTANTS
+    include Constants
 
     def program_name
       'fm'
@@ -77,5 +77,12 @@ module Skylab::FileMetrics::TestSupport::CLI
         nil
       end
     end.call
+  end
+
+  module TestLib_
+
+    CLI_lib = -> do
+      Lib_::HL__[]::CLI
+    end
   end
 end

@@ -49,7 +49,7 @@ module Skylab::FileMetrics
       )
     end
 
-    CelPxy_ = Lib_::Nice_proxy[ :length, :respond_to?, :normalized_scalar ]
+    CelPxy_ = Lib_::Proxy_lib[].nice :length, :respond_to?, :normalized_scalar
 
     def sum_of sym
       each_child.map(& sym ).reduce :+

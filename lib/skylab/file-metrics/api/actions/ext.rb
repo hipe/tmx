@@ -10,7 +10,7 @@ module Skylab::FileMetrics
 
     -> do
 
-      inflect = nil
+      _NLP_EN_agent = nil
 
       define_method :run do ||
         res = false
@@ -35,10 +35,10 @@ module Skylab::FileMetrics
             count.collapse_and_distribute or break
             render_table count, @ui.err
             if single_a
-              @ui.err.puts inflect[ -> {
+              @ui.err.puts( _NLP_EN_agent.calculate do
                 "(* only occuring once #{ s single_a, :was }: #{
                   }#{ and_ single_a })"
-              } ]
+              end )
             end
             res = true
           end
@@ -46,7 +46,7 @@ module Skylab::FileMetrics
         res
       end
 
-      inflect = Lib_::EN_inflect_proc[]
+      _NLP_EN_agent = Lib_::EN_agent[]
 
     end.call
 

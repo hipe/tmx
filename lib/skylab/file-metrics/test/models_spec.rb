@@ -2,13 +2,13 @@ require_relative 'test-support'
 
 module Skylab::FileMetrics::TestSupport::Models
 
-  ::Skylab::FileMetrics::TestSupport[ Models_TestSupport = self ]
+  ::Skylab::FileMetrics::TestSupport[ TS_ = self ]
 
   module Sandbox
     ::Skylab::TestSupport::Sandbox.enhance( self ).kiss_with 'KLS_'
   end
 
-  include CONSTANTS
+  include Constants
 
   Lib_ = Lib_
 
@@ -18,12 +18,12 @@ module Skylab::FileMetrics::TestSupport::Models
 
   module ModuleMethods
 
-    include CONSTANTS
+    include Constants
 
     extend Lib_::Let[]
 
     let :klass do
-      Models_TestSupport::Sandbox.kiss with_klass_value.call
+      TS_::Sandbox.kiss with_klass_value.call
     end
   end
 
@@ -38,9 +38,9 @@ module Skylab::FileMetrics::TestSupport::Models
 
   extend TestSupport::Quickie
 
-  describe "#{ FileMetrics }::Models - Node::Structure" do
+  describe "[fm] models" do
 
-    extend Models_TestSupport
+    extend TS_
 
     context "a produced subclass with one field" do
 
