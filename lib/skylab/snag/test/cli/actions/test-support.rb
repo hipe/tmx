@@ -4,12 +4,12 @@ module Skylab::Snag::TestSupport::CLI::Actions
 
   ::Skylab::Snag::TestSupport::CLI[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
   module ModuleMethods
-    include CONSTANTS
+    include Constants
     def manifest_file
       Snag_::API.manifest_file
     end

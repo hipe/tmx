@@ -113,6 +113,7 @@ now in case we ever decide to revert back to the dumb way. but see the
 next section:
 
 
+
 ## #line-terminators-versus-line-separators :[#020]
 
 more broadly this has applicability to writing text file in general: we
@@ -122,6 +123,13 @@ sequence is generally used as more of a line "terminator" than
 "separator" [1][1]. the difference is subtle but important: wheras a
 separator would separate lines, a terminator terminates every line,
 including the last one.
+
+from the manpage for the wc utility [2][2]
+
+   A line is defined as a string of characters delimited by a <newline>
+   character.  Characters beyond the final <newline> character will not
+   be included in the line count.
+
 
 
 ### understanding the difference
@@ -145,6 +153,7 @@ item, whereas using terminator semantics this file might be considered
 to be invalid or undefined or have zero lines etc.
 
 
+
 ### as it pertains to the behavior we implement
 
 where it matters we will typically implement a middle-groud behavior,
@@ -164,3 +173,5 @@ sequence ourselves, and where it matters we might).
 
      also the behavior in editors like `vi` is taken as "evidence" that the
      terminator semantics are more conventional than separator semantics.
+
+[2]: BSD `wc` February 23, 2005

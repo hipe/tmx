@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport::Models::Hashtag__
 
   ::Skylab::Snag::TestSupport::Models[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport::Models
 
   ::Skylab::Snag::TestSupport[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

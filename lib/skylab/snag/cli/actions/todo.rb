@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class CLI::Actions::Todo < CLI::Action::Box
+  class CLI::Actions::Todo < CLI::Action_::Box
 
     box.desc 'actions that work with TODO-like tags'
 

@@ -168,13 +168,19 @@ module Skylab::Snag
     end
 
     def flsh_nonzero_file_changes
+
       first = @file_changes.first
-      lines = Snag_::Library_::Basic::List::Scanner::For::Path[ first.pathname ]
-      patch = Snag_::Lib_::Text_patch[]::Models::ContentPatch.new lines
+
+      lines = Snag_::Lib_::System[].filesystem.line_scanner_via_path first.pathname.to_path
+
+      patch_lib = Snag_::Lib_::Patch_lib[]
+
+      patch = patch_lib.new lines
+
       @file_changes.each do |todo|
         patch.change_line todo.line_number, todo.replacement_line
       end
-      ok = Snag_::Lib_::Text_patch[].file patch.render_simple,
+      ok = patch_lib.file patch.render_simple,
         first.path, @dry_run, @be_verbose, method( :send_info_line )
       if ok  # typically an exit_code, like 0
         send_info_line say_summary_of_changes_in_file

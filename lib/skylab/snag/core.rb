@@ -18,6 +18,8 @@ module Skylab::Snag
 
   ACHIEVED_= true
 
+  Bsc__ = Autoloader_.build_require_sidesystem_proc :Basic
+
   Bzn__ = Autoloader_.build_require_sidesystem_proc :Brazen
 
   EMPTY_A_ = [].freeze

@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class CLI::Actions::Nodes < CLI::Action::Box
+  class CLI::Actions::Nodes < CLI::Action_::Box
 
     box.desc 'make the magic happen'
 
@@ -67,7 +67,7 @@ module Skylab::Snag
       end
     end
 
-    option_parser_class CLI::Option::Parser  # use the custom one
+    option_parser_class CLI::Option_Parser__  # use the custom one
 
     # (this function was original conception point of #doc-point [#sl-102])
 

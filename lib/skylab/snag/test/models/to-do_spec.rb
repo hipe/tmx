@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport::Models::ToDo__
 
   ::Skylab::Snag::TestSupport::Models[ TS__ = self ]
 
-  include CONSTANTS ; extend TestSupport_::Quickie
+  include Constants ; extend TestSupport_::Quickie
 
   describe "[sg] models to-do" do
 

@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class CLI  # read [#052]
 
-    Snag_::Lib_::CLI[]::Client[ self,
+    Snag_::Lib_::CLI_lib[]::Client[ self,
       :client_instance_methods, :three_streams_notify ]
 
     def initialize up, pay, info  # #storypoint-5 "strictify" the signature
@@ -11,7 +11,7 @@ module Skylab::Snag
     end
 
     def invoke argv
-      Snag_::Lib_::CLI_path_tools[].clear  # see
+      Snag_::Lib_::Path_tools[].clear  # see
       x = super argv
       if UNABLE_ ==  x
         send_error_string "(a low-level error occured.)"
@@ -200,7 +200,7 @@ module Skylab::Snag
     end
 
     def unparenthesize_message_string s
-      Snag_::Text.unparenthesize_message_string s
+      Snag_::Lib_::String_lib[].unparenthesize_message_string s
     end
 
     def render_event ev
@@ -302,13 +302,13 @@ module Skylab::Snag
 
     Callback_::Autoloader[ self ]
 
-    option_parser_class CLI::Option::Parser
+    option_parser_class CLI::Option_Parser__
 
     argument_syntax '[<message>]'
 
     def open message=nil, param_h
       # for fun we do a tricky dynamic syntax
-      pbox = Snag_::Lib_::Formal_box[]::Open.from_hash param_h ; param_h = nil
+      pbox = Snag_::Lib_::Old_box_lib[].open_box.via_hash param_h ; param_h = nil
       msg_p = -> is_opening do                   # i hope you enjoyed this
         a_b = [ 'opening issues', 'listing open issues' ]
         is_opening and a_b.reverse!
@@ -463,13 +463,6 @@ module Skylab::Snag
       end
 
       self
-    end
-
-    class << self
-
-      def ellipsify * x_a
-        self::Expression_Agent_::String_Math::Ellipsify.via_arglist x_a
-      end
     end
 
     Client = self  # #tmx-compat

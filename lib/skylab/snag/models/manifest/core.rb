@@ -127,7 +127,7 @@ module Skylab::Snag
     Hacky_Path_Event__ = Snag_::Model_::Event.new :line do
       message_proc do |y, o|  # escape things that look like abs paths
         y << ( o.line.gsub(
-          Snag_::Lib_::CLI[]::PathTools::FUN::ABSOLUTE_PATH_HACK_RX
+          Snag_::Lib_::Path_tools[].absolute_path_hack_rx
         ) do
           pth ::Pathname.new $~[ 0 ]
         end )

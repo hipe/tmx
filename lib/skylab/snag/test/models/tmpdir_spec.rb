@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport::Models::TD__
 
   ::Skylab::Snag::TestSupport::Models[ TS__ = self ]
 
-  include CONSTANTS ; extend TestSupport_::Quickie
+  include Constants ; extend TestSupport_::Quickie
 
   describe "[sg] models tmpdir" do  # location of this file is intentional
 

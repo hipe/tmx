@@ -134,7 +134,9 @@ module Skylab::Snag
         @path_style_a = [ :strong, :green ].freeze
         @tag_style_a = [ :reverse, :yellow ].freeze  # #etc
         @fun = -> do
-          fun = Snag_::Lib_::CLI[]::PEN::FUN ; @fun = -> { fun } ; fun
+          fun = Snag_::Lib_::CLI_lib[].pen
+          @fun = -> { fun }
+          fun
         end
       end
 
@@ -189,7 +191,7 @@ module Skylab::Snag
       end
 
       def stylize s, a
-        @fun[]::Stylify[ a, s ]
+        @fun[].stylify a, s
       end
 
       def unstyle s

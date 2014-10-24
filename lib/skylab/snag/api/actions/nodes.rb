@@ -103,9 +103,9 @@ module Skylab::Snag
         nil
       end
       @y = if @be_verbose
-        render_node_as_yaml
+        bld_yamlizing_node_yieldee
       else
-        render_node_tersely
+        bld_terse_node_yieldee
       end
       in_scan_render_nodes
     end
@@ -115,7 +115,7 @@ module Skylab::Snag
         }with any other search criteria"
     end
 
-    def render_node_tersely
+    def bld_terse_node_yieldee
       m = @lines.method( :<< )
       ::Enumerator::Yielder.new do |n|
         @lines << n.first_line
@@ -124,11 +124,16 @@ module Skylab::Snag
       end
     end
 
-    def render_node_as_yaml
-      o = Snag_::Text_::Yamlization.new FIELD_NAMES__
-      o.on_text_line(& @lines.method( :<< ) )
-      o
+    def bld_yamlizing_node_yieldee
+      downstream_yielder = Snag_::Lib_::String_lib[].yamlizer.build_with(
+        :output_line_yielder, @lines,
+        :field_names, FIELD_NAMES__ )
+
+      ::Enumerator::Yielder.new do | node |
+        downstream_yielder << node.yaml_data_pairs
+      end
     end
+
     FIELD_NAMES__ = Snag_::Models::Node.main_field_names
 
     def in_scan_render_nodes

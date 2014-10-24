@@ -26,87 +26,131 @@ module Skylab::Snag
   end
 
   module Lib_
+
     sidesys = Autoloader_.build_require_sidesystem_proc
+
+    A_short_length = -> do
+      Bsc__[]::String.a_reasonably_short_length_for_a_string
+    end
+
+    Bsc__ = sidesys[ :Basic ]
+
     Basic_Fields = -> * x_a do
       if x_a.length.zero?
-        MetaHell__[]::Basic_Fields
+        MH__[]::Basic_Fields
       else
-        MetaHell__[]::Basic_Fields.via_iambic x_a
+        MH__[]::Basic_Fields.via_iambic x_a
       end
     end
-    Brazen__ = sidesys[ :Brazen ]
-    CLI = -> do
-      Headless__[]::CLI
-    end
+
+    Bzn__ = sidesys[ :Brazen ]
+
     CLI_legacy_DSL = -> mod do
       Porcelain__[]::Legacy::DSL[ mod ]
     end
-    CLI_path_tools = -> do
-      Headless__[]::CLI::PathTools
+
+    CLI_lib = -> do
+      HL__[]::CLI
     end
+
     Dev_null = -> do
-      Headless__[]::IO::DRY_STUB
+      HL__[]::IO.dry_stub_instance
     end
+
     EN_mini = -> do
-      NLP[]::EN::Minitesimal
+      NLP[]::EN
     end
-    EN_FUN = -> mod, * x_a do
-      Headless__[]::SubClient::EN_FUN.on_mod_via_iambic mod, x_a
+
+    FU_lib = -> do
+      HL__[]::IO.fu
     end
+
+    NLP_EN_methods = -> mod, * x_a do
+      HL__[].expression_agent.NLP_EN_methods.on_mod_via_iambic mod, x_a
+    end
+
     Entity = -> do
-      Brazen__[]::Entity
+      Bzn__[]::Entity
     end
+
     Event = -> do
-      Brazen__[].event
+      Bzn__[].event
     end
+
     Filesystem_walk = -> do
-      Brazen__[]::Models_::Workspace.filesystem_walk
+      Bzn__[]::Models_::Workspace.filesystem_walk
     end
+
     Funcy_globless = -> x do
-      MetaHell__[].funcy_globless x
+      MH__[].funcy_globless x
     end
+
     Formal_attribute = -> do
-      MetaHell__[]::Formal::Attribute
+      MH__[]::Formal::Attribute
     end
-    Formal_box = -> do
-      MetaHell__[]::Formal::Box
-    end
-    Headless__ = sidesys[ :Headless ]
+
+    HL__ = sidesys[ :Headless ]
+
     IO_FU = -> do
-      Headless__[]::IO::FU
+      HL__[]::IO.fu
     end
+
     Name = -> do
-      Headless__[]::Name
+      HL__[]::Name
     end
+
     NLP = -> do
-      Headless__[]::NLP
+      HL__[]::NLP
     end
-    Memoize = -> p do
-      MetaHell__[]::FUN.memoize[ p ]
-    end
-    MetaHell__ = sidesys[ :MetaHell ]
+
+    MH__ = sidesys[ :MetaHell ]
     Model_event = -> mod do
-      Headless__[]::Model::Event.apply_on_client mod
+      HL__[]::Model::Event.apply_on_client mod
     end
+
+    Old_box_lib = -> do
+      MH__[]::Formal::Box
+    end
+
+    Patch_lib = -> do
+      System[].patch
+    end
+
+    Path_tools = -> do
+      System[].filesystem.path_tools
+    end
+
     Porcelain__ = sidesys[ :Porcelain ]
+
     Pretty_path = -> x do
-      Brazen__[]::CLI.pretty_path x
+      Bzn__[]::CLI.pretty_path x
     end
+
     Strange = -> * x_a do
-      MetaHell__[].strange.via_arglist x_a
+      MH__[].strange.via_arglist x_a
     end
+
+    String_lib = -> do
+      Bsc__[]::String
+    end
+
     SubTree__ = sidesys[ :SubTree ]
-    Text_patch = -> do
-      Headless__[]::Text::Patch
+
+    System = -> do
+      HL__[].system
     end
+
     Tmpdir_pathname = -> do
-      Headless__[]::System.defaults.tmpdir_pathname
+      System[].filesystem.tmpdir_pathname
     end
+
     Tree = -> do
       SubTree__[]::Tree
     end
+
     Writemode = -> do
-      Headless__[]::WRITEMODE_
+      HL__[]::WRITEMODE_
     end
+
   end
 end

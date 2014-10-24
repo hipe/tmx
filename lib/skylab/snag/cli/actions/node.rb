@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class CLI::Actions::Node < CLI::Action::Box
+  class CLI::Actions::Node < CLI::Action_::Box
 
     box.desc 'actions that act on a given node'
 
@@ -25,7 +25,7 @@ module Skylab::Snag
     end
   end
 
-  class CLI::Actions::Node::Actions::Tags < CLI::Action::Box
+  class CLI::Actions::Node::Actions::Tags < CLI::Action_::Box
 
     box.desc 'actions for tags on a given node'
 

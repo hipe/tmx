@@ -4,9 +4,11 @@ module Skylab::Snag::TestSupport::CLI
 
   ::Skylab::Snag::TestSupport[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
+
+  Callback_ = Callback_
 
   TestLib_ = TestLib_
 
@@ -92,9 +94,9 @@ module Skylab::Snag::TestSupport::CLI
         memo_frame.output
       end
 
-      define_method :memo_frame, TestLib_::Memoize[ -> do
+      define_method :memo_frame, ( Callback_.memoize do
         Memo_Frame__.new _ = Output__[], Client__[ _ ]
-      end ]
+      end )
     end
   end
 
@@ -181,10 +183,8 @@ module Skylab::Snag::TestSupport::CLI
   LEGACY_SUCCESS_CODE__ = 0
 
   Output__ = -> do
-    output = TestSupport_::IO::Spy::Group.new
-    output.add_line_map_proc -> s do
-      Snag_::Lib_::CLI[]::PEN::FUN.unstyle[ s ]
-    end
+    output = TestSupport_::IO.spy.group.new
+    output.add_line_map_proc Snag_::Lib_::CLI_lib[].pen.unstyle
     output
   end
 

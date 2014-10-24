@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class CLI::Actions::Doc < CLI::Action::Box
+  class CLI::Actions::Doc < CLI::Action_::Box
 
     box.desc 'documentation generation.'
 
