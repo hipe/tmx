@@ -2,9 +2,6 @@ module Skylab::Flex2Treetop::MyTestSupport
 
   class Line_Source__
 
-    Basic = Flex2Treetop::Lib_::Basic[]
-    MetaHell = ::Skylab::MetaHell
-
     def initialize debug_IO, &p
       @crrnt_chopped_line_scanner = nil
       @debug_IO = debug_IO
@@ -22,7 +19,7 @@ module Skylab::Flex2Treetop::MyTestSupport
     end
 
     def bld_chopped_line_scanner_for_channel chan_i
-      Chopped_Line_Peeking_Channel_Scanner__.new @debug_IO, chan_i, @emission_a
+      Chopped_line_peeking_channel_scanner__[ @emission_a, @debug_IO, chan_i ]
     end
   public
 
@@ -65,7 +62,7 @@ module Skylab::Flex2Treetop::MyTestSupport
     end
   private
     def bld_IO_chopped_line_scanner io
-      Chopped_Line_Peeking_IO_Scanner__.new @debug_IO, io
+      Chopped_line_peeking_IO_scanner__[ io, @debug_IO ]
     end
   public
 
@@ -90,7 +87,7 @@ module Skylab::Flex2Treetop::MyTestSupport
         @d = d ; @scn = scn ; nil
       end
       def execute
-        buff = Basic::Rotating_Buffer[ @d ]
+        buff = TestLib_::Rotating_buffer[ @d ]
         count = 0
         while true
           line = @scn.gets
@@ -106,7 +103,7 @@ module Skylab::Flex2Treetop::MyTestSupport
     end
 
     def bld_chopped_lines_scanner_from_ary buff_a
-      Chopped_Line_Peeking_Ary_Scanner__.new @debug_IO, buff_a
+      Chopped_line_peeking_ary_scanner__[ buff_a, @debug_IO ]
     end
 
   public
@@ -124,7 +121,6 @@ module Skylab::Flex2Treetop::MyTestSupport
     end
 
     def skip_all_contiguous_emissions_on_channel chan_i
-      chan_i == @crrnt_chopped_line_scanner.chan_i or self._DO_ME
       count = 0
       while @crrnt_chopped_line_scanner.gets
         count += 1
@@ -134,10 +130,6 @@ module Skylab::Flex2Treetop::MyTestSupport
 
     def peek_any_chopped_line
       @crrnt_chopped_line_scanner.peek
-    end
-
-    def close
-      @crrnt_chopped_line_scanner.close
     end
 
   private
@@ -155,84 +147,63 @@ module Skylab::Flex2Treetop::MyTestSupport
       @crrnt_chopped_line_scanner.chan_i
     end
 
-    Scanner_with_debug__ = -> cls do
-      cls.class_exec( & Scanner_with_debug___ )
+    Chopped_line_peeking_channel_scanner__ = -> em_a, debug_IO, chan_i do
+
+      _scn = Callback_::Scn.new do
+
+        if em_a.length.nonzero? && chan_i == em_a.first.stream_name
+          str = em_a.shift.string
+          str.chop! or fail "empty string?"
+          str
+        end
+      end
+
+      Finish_scn__[ _scn, debug_IO, chan_i ]
     end
-    Scanner_with_debug___ = -> do
-      alias_method :gets_before_debug, :gets
-      def gets
-        x = gets_before_debug
-        x and @debug_IO and @debug_IO.puts [ chan_i, x ].inspect
+
+    Chopped_line_peeking_IO_scanner__ = -> io, debug_IO do
+
+      p = -> do
+        s = io.gets
+        if s
+          s.chop! or fail "empty line without terminating newline?"
+          s
+        else
+          io.close
+          p = NILADIC_EMPTINESS_
+          nil
+        end
+      end
+
+      _scn = Callback_::Scn.new do
+        p[]
+      end
+
+      Finish_scn__[ _scn, debug_IO, :_file_IO_handle_ ]
+    end
+
+    NILADIC_EMPTINESS_ = -> {}
+
+    Chopped_line_peeking_ary_scanner__ = -> a, debug_IO do
+      _scn = Callback_.scan.via_nonsparse_array a
+      Finish_scn__[ _scn, debug_IO, :ary ]
+    end
+
+    Finish_scn__ = -> scn, debug_IO, chan_i do
+      scn_ = if debug_IO
+        Callback_.scan.map scn, Debug_map__[ chan_i, debug_IO ]
+      else
+        scn
+      end
+
+      Callback_::Scn.peek.gets_under scn_
+    end
+
+    Debug_map__ = -> chan_i, io do
+      -> x do
+        io.puts [ chan_i, x ].inspect
         x
       end
-    end
-
-    class Chopped_Line_Peeking_Channel_Scanner__
-
-      def initialize debug_IO, chan_i, em_a
-        @gets_p = -> do
-          if em_a.length.nonzero? and chan_i == em_a.first.stream_name
-            em_a.shift.string.chop! or fail "empty string?"
-          end
-        end
-        @chan_i = chan_i ; @debug_IO = debug_IO ; nil
-      end
-
-      def gets
-        @gets_p.call
-      end
-
-      attr_reader :chan_i
-
-      Basic::List::Scanner::With[ self, :peek ]
-      Scanner_with_debug__[ self ]
-    end
-
-    class Chopped_Line_Peeking_IO_Scanner__
-
-      def initialize debug_IO, io
-        @gets_p = -> do
-          s = io.gets
-          if s
-            s.chop! or fail "empty line without terminating newline?"
-          else
-            io.close ; @gets_p = MetaHell::EMPTY_P_ ; nil
-          end
-        end
-        @close_p = -> do
-          io.close ; nil
-        end
-        @debug_IO = debug_IO ; nil
-      end
-
-      def gets
-        @gets_p[]
-      end
-
-      def close
-        @close_p[]
-      end
-
-      def chan_i
-        :_file_IO_handle_
-      end
-
-      Basic::List::Scanner::With[ self, :peek ]
-      Scanner_with_debug__[ self ]
-    end
-
-    class Chopped_Line_Peeking_Ary_Scanner__ < Basic::List::Scanner::For::Array
-
-      def initialize debug_IO, ary
-        super ary
-        @debug_IO = debug_IO ; nil
-      end
-
-      def chan_i
-        :ary
-      end
-
-      Scanner_with_debug__[ self ]
     end
   end
 end

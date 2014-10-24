@@ -24,7 +24,7 @@ module Skylab::Flex2Treetop::MyTestSupport
       end
       def bld_CLI_client
         _grp = _IO_spy_group
-        cli = Flex2Treetop::CLI.new( * _grp.to_a )
+        cli = F2TT_::CLI.new( * _grp.to_a )
         cli.program_name = PROGNAME_
         cli
       end

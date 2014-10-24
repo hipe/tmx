@@ -38,7 +38,7 @@ module Skylab::Flex2Treetop::MyTestSupport
       end
 
       def _API_invoke * x_a
-        @result = Flex2Treetop::API.invoke x_a[ 0 ],
+        @result = F2TT_::API.invoke x_a[ 0 ],
           :program_name, PROGNAME,
           :errstream, _IO_spy_group[ :stderr ], * x_a[ 1 .. -1 ]
       end

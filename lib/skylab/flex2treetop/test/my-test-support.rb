@@ -3,14 +3,37 @@ require 'skylab/test-support/core'
 
 module Skylab::Flex2Treetop::MyTestSupport
 
-  Flex2Treetop = ::Skylab::Flex2Treetop
+  Callback_ = ::Skylab::Callback
+  F2TT_ = ::Skylab::Flex2Treetop
   MyTestSupport = self
-  Skylab_Headless = ::Skylab::Headless
   TestSupport = ::Skylab::TestSupport
 
-  Flex2Treetop::Autoloader_[ self, Flex2Treetop.dir_pathname.join( 'test' ) ]
+  Callback_::Autoloader[ self, F2TT_.dir_pathname.join( 'test' ) ]
 
   extend TestSupport::Quickie
+
+  module TestLib_
+
+    sidesys = Callback_::Autoloader.build_require_sidesystem_proc
+
+    Bsc__ = sidesys[ :Basic ]
+
+    HL__ = sidesys[ :Headless ]
+
+    MH__ = sidesys[ :MetaHell ]
+
+    Rotating_buffer = -> d do
+      Bsc__[]::Rotating_Buffer[ d ]
+    end
+
+    Strange = -> x do
+      MH__[].strange x
+    end
+
+    System = -> do
+      HL__[].system
+    end
+  end
 
   # for #posterity we are keeping the below name which is mythically
   # believed to be the origin of the idea for the whole Headless library
@@ -26,7 +49,7 @@ module Skylab::Flex2Treetop::MyTestSupport
       end
       attr_reader :do_debug
       def debug_IO
-        Skylab_Headless::System::IO.some_stderr_IO
+        TestLib_::System[].IO.some_stderr_IO
       end
 
       def _IO_spy_group
@@ -34,7 +57,7 @@ module Skylab::Flex2Treetop::MyTestSupport
       end
 
       def build_IO_spy_group
-        grp = TestSupport::IO::Spy::Group.new
+        grp = TestSupport::IO.spy.group.new
         grp.debug_IO = debug_IO
         grp.do_debug_proc = -> { do_debug }
         grp.add_stream :stdin do |io|
@@ -52,7 +75,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
     module ModuleMethods
       def fixture name_i
-        _path_s = Flex2Treetop::FIXTURE_H__.fetch name_i
+        _path_s = F2TT_::FIXTURE_H__.fetch name_i
         ::Skylab.dir_pathname.join( _path_s ).to_s
       end
     end
@@ -64,13 +87,13 @@ module Skylab::Flex2Treetop::MyTestSupport
     end
     Tmpdir__ = -> do
       p = -> dbg_IO_p do
-        _pn = Skylab_Headless::System.defaults.tmpdir_pathname.join 'f2tt'
+        _pn = TestLib_::System[].filesystem.tmpdir_pathname.join 'f2tt'
         x_a = [ :path, _pn ]
         dbg_IO = dbg_IO_p[]
         if dbg_IO
           x_a.push :infostream, dbg_IO, :be_verbose, true
         end
-        td = TestSupport.tmpdir.via_iambic x_a
+        td = TestSupport.tmpdir.build_via_iambic x_a
         p = -> _ { td }
         td
       end
@@ -85,8 +108,7 @@ module Skylab::Flex2Treetop::MyTestSupport
         if x_a.length.nonzero? && :styled == x_a.first
           x_a.shift ; do_expect_styled = true
         end
-        x_a.length.zero? or
-          fail "unexpected #{ Skylab_Headless.inspect x_a.first }"
+        x_a.length.zero? or fail say_unexpected( x_a.first )
         line = gets_some_chopped_line  # #storypoint-050
         do_expect_styled and line = expct_styled( line )
         if string_matcher_x.respond_to? :named_captures
@@ -95,9 +117,13 @@ module Skylab::Flex2Treetop::MyTestSupport
           line.should eql string_matcher_x
         end ; nil
       end
-      #
+
+      def say_unexpected x
+        "unexpected #{ TestLib_::Strange[ x ] }"
+      end
+
       def expct_styled line
-        Skylab_Headless::CLI::Pen::FUN::Unstyle_styled[ line ] or
+        F2TT_::Lib_::CLI_lib[].pen.unstyle_styled( line ) or
           fail "expected styled, was not: #{ line }"
       end
 
@@ -183,8 +209,7 @@ module Skylab::Flex2Treetop::MyTestSupport
         @result.should eql true
       end
 
-      define_method :_EM,
-        Skylab_Headless::CLI::Pen::FUN::Stylify.curry[ %i( yellow ) ]
+      define_method :_EM, F2TT_::Lib_::CLI_lib[].pen.stylify.curry[ %i( yellow ) ]
     end
   end
   XX = '@ rb_file_s_stat '.freeze  # 2.1.0 added this
