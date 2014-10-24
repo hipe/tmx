@@ -9,11 +9,15 @@ module Skylab::Slake
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
   module Lib_  # :+[#su-001]
+
     sidesys = Autoloader_.build_require_sidesystem_proc
+
     Formal_attribute = -> do
-      MetaHell__[]::Formal::Attribute
+      MH__[]::Formal::Attribute
     end
-    MetaHell__ = sidesys[ :MetaHell ]
+
+    MH__ = sidesys[ :MetaHell ]
+
     StringIO = -> do
       require 'stringio' ; ::StringIO
     end

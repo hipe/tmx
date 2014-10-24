@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module ::Skylab  # [#ts-010]
+module Skylab  # [#ts-010]
 
   TestSupport::Quickie.enable_kernel_describe
 
