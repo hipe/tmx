@@ -1,16 +1,14 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Headless::TestSupport::Text::Patch
+module Skylab::Headless::TestSupport::System::Services
 
-  ::Skylab::Headless::TestSupport::Text[ self ]
+  describe "[hl] system services patch" do
 
-  include CONSTANTS
+    extend TS_
 
-  extend TestSupport_::Quickie
-
-  describe "[hl] text patch" do
-
-    patch = Headless_::Text::Patch::Models::ContentPatch
+    it 'loads' do
+      patch
+    end
 
     context "changes (\"c\")" do
       it "two non-contiguous single lines" do
@@ -105,6 +103,10 @@ module Skylab::Headless::TestSupport::Text::Patch
         p.change_lines 3...3, [ 'three' ]
         p.render_simple.should eql( "2a3\n> three\n" )
       end
+    end
+
+    def patch
+      subject.patch
     end
   end
 end

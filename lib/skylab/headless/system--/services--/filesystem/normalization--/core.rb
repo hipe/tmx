@@ -6,7 +6,7 @@ module Skylab::CodeMolester
     def write
       yield(e = WriteEventKnob.new)
       valid? or return e[:invalid, invalid_reason]
-      EMPTY_STRING_ == (content = self.content) and return e[:empty_contents]
+      EMPTY_S_ == (content = self.content) and return e[:empty_contents]
       if exist?
         content == read and return e[:no_change]
         writable? or return e[:not_writable]

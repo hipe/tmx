@@ -1,37 +1,107 @@
 module Skylab::Headless
 
-  module Name  # read [#152] the name narrative  # #storypoint-5
+  class Name  # read [#152] the name narrative  # #storypoint-5
 
-    module FUN  # #storypoint-10
+    class << self
 
-      Local_normal_name_from_module = -> mod do
-        Normify[ Const_basename[ mod.name ] ]
+      def qualified
+        Qualified__
       end
 
-      Const_basename = -> name_s do
+      def humanize s
+        s = s.dup
+        Mutate_camelcase_string_by_humanizing__[ s ]
+        s
+      end
+
+      def instance_methods
+        I_M_Legacy_Compat__
+      end
+
+      def variegated_human_symbol_via_variable_name_symbol name_i
+        s = name_i.id2name
+        Mutate_string_by_chomping_any_trailing_name_convention_suffixes__[ s ]
+        s.downcase.intern
+      end
+
+      def via_module_name_anchored_in_module_name s, s_
+        Via_anchored_in_module_name_module_name__[ s_, s ]
+      end
+
+      def via_const * a
+        if a.length.zero?
+          Via_Const__
+        else
+          Via_Const__.new( a.shift.intern, * a )
+        end
+      end
+
+      def via_symbol i
+        Name_.new i
+      end
+    end
+
+    # #storypoint-10
+
+      Local_normal_name_from_module__ = -> mod do
+        Normify__[ Const_basename__[ mod.name ] ]
+      end
+
+      Const_basename__ = -> name_s do
         idx = name_s.rindex COLON_
         idx ? name_s[ idx + 1 .. -1 ] : name_s
       end
 
-      Constantify = -> do  # make a normalized symbol look like a const
+      Constantify__ = -> do  # make a normalized symbol look like a const
         rx = /(?:^|[-_])([a-z])/
         -> x { x.to_s.gsub( rx ) { $~[1].upcase } }
       end.call
 
-      Labelize = -> do  # :+[#088]
-        rx =  /\A@|_[a-z]\z/ ; rx_ = /\A[a-z]/
-        -> i do
-          i.to_s.gsub( rx, EMPTY_STRING_ ).
-            gsub( UNDERSCORE_, TERM_SEPARATOR_STRING_ ).sub( rx_, & :upcase )
+      Labelize__ = -> do  # :+[#088]
+        -> ivar_i do
+          s = ivar_i.id2name
+          Mutate_string_by_chomping_any_leading_at_character__[ s ]
+          Mutate_string_by_chomping_any_trailing_name_convention_suffixes__[ s ]
+          s.gsub! UNDERSCORE_, SPACE_
+          Ucfirst__[ s ]
         end
       end.call
 
-      Metholate = -> i do  # in case your normal is a slug for some reason
+      Mutate_camelcase_string_by_humanizing__ = -> do
+        rx = /([a-z])([A-Z])/
+        -> s do
+          s.gsub!( rx ) { "#{ $1 }#{ SPACE_ }#{ $2 }" }
+          s.downcase! ; nil
+        end
+      end.call
+
+      Mutate_string_by_chomping_any_leading_at_character__ = -> do
+        rx = /\A@/
+        -> s do
+          s.sub! rx, EMPTY_S_ ; nil
+        end
+      end.call
+
+      Mutate_string_by_chomping_any_trailing_name_convention_suffixes__ = -> do
+        rx = /(?<=[a-z]{2}) (?:  (?:_[a-z])+_* | _+  )  \z/ix
+        -> s do
+          s.sub! rx, EMPTY_S_ ; nil
+        end
+      end.call
+
+      Ucfirst__ = -> do
+        rx = /\A[a-z]/
+        -> s do
+          s.sub rx, & :upcase
+        end
+      end.call
+
+      Metholate__ = -> i do  # in case your normal is a slug for some reason
         i.to_s.gsub DASH_S_, UNDERSCORE_
       end
 
-      Module_moniker_ = -> num_parts, mod do
-        s_a = mod.name.split DOUBLE_COLON_
+      Module_moniker___ = -> num_parts, mod do
+        s_a = mod.name.split CONST_SEP_
         _s_a_ = if ! num_parts then s_a
         elsif num_parts.respond_to? :cover?
           s_a[ num_parts ]
@@ -41,78 +111,105 @@ module Skylab::Headless
           s_a[ - num_parts .. -1 ]  # whether positive or negative
         end
         _s_a_.map do |s|
-          Naturalize[ Normify[ s ] ]
+          Naturalize__[ Normify__[ s ] ]
         end * TERM_SEPARATOR_STRING_
       end
 
-      Module_moniker = Module_moniker_.curry[ 1 ]
+      Module_moniker__ = Module_moniker___.curry[ 1 ]
 
-      Naturalize = -> do  # for normals only. handle dashy normals
+      Naturalize__ = -> i do  # for normals only. handle dashy or underscored normals
+        s = i.id2name
+        Mutate_string_by_humanizing_word_separators__[ s ]
+        s
+      end
+
+      Mutate_string_by_humanizing_word_separators__ = -> do
         rx = %r([-_])
-        -> i do
-          i.to_s.gsub rx, TERM_SEPARATOR_STRING_
+        -> s do
+          s.gsub! rx, SPACE_
+          nil
         end
       end.call
 
-      Normify = -> do  # make a const-looking string be normalized. :+[#081]
+      Normify__ = -> do  # make a const-looking string be normalized. :+[#081]
         rx = /(?<=[a-z])(?=[A-Z])|_|(?<=[A-Z])(?=[A-Z][a-z])/
         -> x do
           x.to_s.gsub( rx ) { UNDERSCORE_ }.downcase.intern
         end
       end.call
 
-      Slugulate = -> i do  # for normals only. centralize this simple transform.
+      Slugulate__ = -> i do  # for normals only. centralize this simple transform.
         i.to_s.gsub UNDERSCORE_, DASH_S_
+      end
+
+    o = -> i, p do
+      define_singleton_method i do | * a |
+        if a.length.zero?
+          p
+        else
+          p[ * a ]
+        end
       end
     end
 
-    COLON_ = ':'.freeze ; DASH_S_ = '-'.freeze ;  # there is another 'DASH_'
-    DOUBLE_COLON_ = '::'.freeze ; UNDERSCORE_ = '_'.freeze
+    o[ :const_basename, Const_basename__ ]
 
-    class Function
+    o[ :constantify, Constantify__ ]
+
+    o[ :labelize, Labelize__ ]
+
+    o[ :local_normal_name_from_module, Local_normal_name_from_module__ ]
+
+    o[ :metholate, Metholate__ ]
+
+    o[ :module_moniker, Module_moniker___ ]
+
+    o[ :naturalize, Naturalize__ ]
+
+    o[ :normify, Normify__ ]
+
+    o[ :slugulate, Slugulate__ ]
+
+    DASH_S_ = '-'.freeze ;  # there is another 'DASH_'
+
+    UNDERSCORE_ = '_'.freeze
 
       def initialize local_normal_i
-        @local_normal = local_normal_i
+        @local_normal_i = local_normal_i
       end
 
-      attr_reader :local_normal
-
-      include module InstanceMethods
+      def local_normal
+        @local_normal_i
+      end
 
         def as_const
-          Name::FUN::Constantify[ local_normal ].intern
+          Constantify__[ @local_normal_i ].intern
         end
 
         def as_method  # #storypoint-15
-          Name::FUN::Metholate[ local_normal ].intern
+          Metholate__[ @local_normal_i ].intern
         end
 
         def as_natural
-          Name::FUN::Naturalize[ local_normal ]
+          Naturalize__[ @local_normal_i ]
         end
 
         def as_slug
-          Name::FUN::Slugulate[ local_normal ]
+          Slugulate__[ @local_normal_i ]
         end
 
-        self
-      end
+      class Via_Const__ < self  # #storypoint-30
 
-      def self.from_const const_s
-        self::From::Constant.new const_s
-      end
+        class << self
 
-      From = ::Module.new
-
-      class From::Constant < self  # #storypoint-30
-
-        def self.from_name const_name_s
-          new FUN::Const_basename[ const_name_s ].intern
+          def via_module_name const_name_s
+            new Const_basename__[ const_name_s ].intern
+          end
         end
 
         def initialize const_i  # symbol! :[#032] :+#API-lock this signature.
-          @const = const_i
-          @local_normal = Headless::Name::FUN::Normify[ const_i ] ; nil
+          @const_i = const_i
+          @local_normal_i = Normify__[ const_i ] ; nil
         end
 
         # ~ :+[#mh-021] typical base class implementation:
@@ -124,12 +221,13 @@ module Skylab::Headless
         end
       protected
         def get_args_for_copy
-          [ @const, @local_normal ]
+          [ @const, @local_normal_i ]
         end
       private
         def init_copy const_i, local_normal_i
-          @const = const_i ; @local_normal = local_normal_i ; nil
+          @const = const_i ; @local_normal_i = local_normal_i ; nil
         end
+
         # ~
 
       public
@@ -137,14 +235,40 @@ module Skylab::Headless
         alias_method :local_slug, :as_slug
 
         def as_const
-          @const
+          @const_i
         end
       end
 
-      class Full  # #storypoint-55
+      Via_anchored_in_module_name_module_name__ = -> s, s_ do  # #storypoint-105  # :+#curry-friendly
 
-        def self.from_normalized_name_path a
-          new a.map( & Function.method( :new ) )
+        # the first arg is the one that existed first - the surrounding module
+
+        if 0 != s_.index( s )
+          raise "sanity - #{ s } does not contain #{ s_ }"
+        end
+
+        _name_a = if s == s_
+          EMPTY_A_
+        else
+          s_[ s.length + 2 .. -1 ].split( CONST_SEP_ ).reduce [] do |m, c|
+            m.push Via_Const__.new( c.intern ).freeze
+            # freeze each name because we expose them individually
+          end
+        end
+
+        Qualified__.new _name_a
+      end
+
+      class Qualified__  # #storypoint-55
+
+        class << self
+
+          def via_symbol_list name_i_a
+            _name_a = name_i_a.map do |i|
+              Name_.new i
+            end
+            new _name_a
+          end
         end
 
         def initialize a  # please provide an array of name functions
@@ -168,21 +292,10 @@ module Skylab::Headless
         end
       end
 
-      class From::Module_Anchored <  Full  # #storypoint-105
-
-        def initialize n2, n1  # n2 - your module name  n1 - box module name
-          0 == n2.index( n1 ) or raise "sanity - #{ n1 } does not contain #{ n2 }"
-          name_a = if n2 == n1
-            EMPTY_A_
-          else
-            n2[ n1.length + 2 .. -1 ].split( '::' ).reduce [] do |m, c|
-              m << Name::Function::From::Constant.new( c ).freeze
-            end  # we freeze b.c we reveal the elements
-          end
-          super name_a
-          nil
-        end
-      end
+    module I_M_Legacy_Compat__
     end
+
+    Name_ = self
+
   end
 end

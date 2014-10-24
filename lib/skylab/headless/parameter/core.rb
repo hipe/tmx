@@ -154,8 +154,7 @@ module Skylab::Headless
     end
   end
 
-
-  class Parameter::Set < Headless_::Lib_::Formal_box[]
+  class Parameter::Set < Headless_::Lib_::Old_box_lib[]
 
     def initialize host
       host.respond_to? :formal_parameter_class or
@@ -249,7 +248,7 @@ module Skylab::Headless
     end
 
     def name
-      @name ||= Headless::Name::Function.new @normalized_parameter_name
+      @name ||= Headless_::Name.new @normalized_parameter_name
     end
 
     attr_reader :normalized_parameter_name
@@ -321,7 +320,7 @@ module Skylab::Headless
       def! :dsl= do |flags| # ( :list | :value ) [ :reader ]
         flags = [flags] if ::Symbol === flags
         list_or_value = ( %i( value list ) & flags ).
-          join( EMPTY_STRING_ ).intern  # ick
+          join( EMPTY_S_ ).intern  # ick
         reader = flags.include?(:reader)
         case list_or_value
         when :list

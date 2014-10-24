@@ -1,12 +1,21 @@
 module Skylab::Headless
 
-  IO::Interceptors::Chunker::F = Headless_::Lib_::Function_class[].
-    new( :flush, :write ) do
+  module IO
 
-    # #todo
+    module Mappers
+
+      module Chunkers
+
+        Functional = Headless_::Lib_::Ivars_with_procs_as_methods[].
+            new :flush, :write do
+
+          def << x
+            write x
+            self
+          end
 
     def initialize f
-      sep = "\n"
+      sep = NEWLINE_
       cache_a = [ ]
       @write = -> str do
         if str.length.nonzero?
@@ -16,7 +25,7 @@ module Skylab::Headless
             cache_a << str.dup
           else
             cache_a << str[ 0 .. idx ]  # including separator
-            f[ cache_a * EMPTY_STRING_ ]
+            f[ cache_a * EMPTY_S_ ]
             cache_a.clear
             off = idx + 1
             while off < len
@@ -33,9 +42,10 @@ module Skylab::Headless
         end
         nil
       end
+
       @flush = -> do
         if cache_a.length.nonzero?
-          s = cache_a * EMPTY_STRING_
+          s = cache_a * EMPTY_S_
           cache_a.clear
           f[ s ]
           s.length
@@ -44,6 +54,8 @@ module Skylab::Headless
       nil
     end
 
-    alias_method :<<, :write
+        end
+      end
+    end
   end
 end

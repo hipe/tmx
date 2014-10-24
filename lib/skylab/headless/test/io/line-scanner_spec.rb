@@ -1,15 +1,15 @@
-require_relative 'read/test-support'
+require_relative 'line-scanner/test-support'
 
-module Skylab::Basic::TestSupport::List::Scanner::For::Read
+module Skylab::Headless::TestSupport::IO::Line_Scanner
 
-  describe "[ba] list scanner for file " do
+  describe "[hl] IO line scanner" do
 
-    extend TS__
+    extend TS_
 
     context "normal case" do
 
       it "when built with pathname - `gets` - works as expected" do  # mirror 2 others
-        scn = Basic_::List::Scanner::For::Path[ pathname ]
+        scn = subject_via_pathname pathname
         scn.line_number.should be_nil
         _ = scn.gets
         _.should eql "one\n"
@@ -35,7 +35,7 @@ module Skylab::Basic::TestSupport::List::Scanner::For::Read
 
       it "o" do
         fh = pathname.open 'r'
-        scn = Basic_::List::Scanner::For::Read.new fh, 5
+        scn = subject_via_filehandle fh, 5
         scn.gets.should eql "abc\n"
         scn.line_number.should eql 1
         scn.gets.should eql "def\n"
@@ -58,7 +58,7 @@ module Skylab::Basic::TestSupport::List::Scanner::For::Read
       end
     end
 
-    context "file with no newline NOTE we use the `wc` definition of line!" do
+    context "file with no newline NOTE we use the `wc` definition of line!" do  # :+[#sg-020]
 
       _STR = 'there is no newline at the end of this line'.freeze
 
@@ -67,17 +67,17 @@ module Skylab::Basic::TestSupport::List::Scanner::For::Read
       end
 
       it "o" do
-        scn = Basic_::List::Scanner::For::Path[ pathname ]
+        scn = subject_via_pathname pathname
         shared_expectation scn
       end
 
       it "when page size is shorter than record - o" do
-        scn = Basic_::List::Scanner::For::Path[ pathname, _STR.length - 1 ]
+        scn = subject_via_pathname pathname, _STR.length - 1
         shared_expectation scn
       end
 
       it "when page size equals record size - o " do
-        scn = Basic_::List::Scanner::For::Path[ pathname, _STR.length ]
+        scn = subject_via_pathname pathname, _STR.length
         shared_expectation scn
       end
 
@@ -97,7 +97,7 @@ module Skylab::Basic::TestSupport::List::Scanner::For::Read
       with "empty-lsfr.txt" do |o|
       end
       it "hi" do
-        scn = Basic_::List::Scanner::For::Path[ pathname ]
+        scn = subject_via_pathname pathname
         scn.fh.closed?.should eql false
         scn.count.should be_zero
         _ = scn.gets

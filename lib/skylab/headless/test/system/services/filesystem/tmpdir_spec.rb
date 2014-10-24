@@ -1,16 +1,10 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::Headless::TestSupport::IO::Filesystem
-
-  ::Skylab::Headless::TestSupport::IO[ self ]
-
-  include CONSTANTS
-
-  extend TestSupport_::Quickie
-
-  TestLib_ = TestLib_
+module Skylab::Headless::TestSupport::System::Services::Filesystem
 
   describe "[hl] IO filesystem tmpdir" do
+
+    extend TS_
 
     it "with no pathname - you get ::Dir.tmpdir for your system" do
       tmpdir = subject.new
@@ -18,7 +12,7 @@ module Skylab::Headless::TestSupport::IO::Filesystem
     end
 
     it "relative path (don't!) - raises" do
-      tmpdir = subject.new :path, 'TMPDIR-TEST-NEVER-SEE'
+      tmpdir = subject :path, 'TMPDIR-TEST-NEVER-SEE'
       begin
         tmpdir.prepare
       rescue ::SecurityError => e
@@ -138,8 +132,6 @@ module Skylab::Headless::TestSupport::IO::Filesystem
       e.message.should match( /unsafe tmpdir name - \// )
     end
 
-    # --*--
-
     def anchor
       TestLib_::Tmpdir_pathname[]
     end
@@ -148,8 +140,12 @@ module Skylab::Headless::TestSupport::IO::Filesystem
       TestLib_::File_utils[]
     end
 
-    def subject
-      Headless_::IO::Filesystem::Tmpdir
+    def subject * x_a
+      if x_a.length.zero?
+        super().tmpdir
+      else
+        super().tmpdir( * x_a )
+      end
     end
   end
 end

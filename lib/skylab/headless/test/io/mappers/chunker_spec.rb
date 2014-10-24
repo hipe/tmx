@@ -1,10 +1,10 @@
 require_relative 'test-support'
 
-module ::Skylab::Headless::TestSupport::IO::Interceptors::Chunker
+module Skylab::Headless::TestSupport::IO::Mappers::Chunker
 
-  ::Skylab::Headless::TestSupport::IO::Interceptors[ TS_ = self ]
+  ::Skylab::Headless::TestSupport::IO::Mappers[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
@@ -28,10 +28,13 @@ module ::Skylab::Headless::TestSupport::IO::Interceptors::Chunker
     end
   end
 
-  describe "#{Headless_::IO::Interceptors::Chunker }" do
+  describe "[hl] IO interceptors chunker common" do
+
     extend TS_
 
-    let :klass do Headless_::IO::Interceptors::Chunker end
+    let :klass do
+      Headless_::IO::Mappers::Chunkers::Common
+    end
 
     it 'chunks' do
       a = [ ]

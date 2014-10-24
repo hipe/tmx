@@ -7,7 +7,7 @@ module Skylab::Headless::TestSupport::NLP::EN::Phrase
   # le Quickie.
 
   include ::Skylab::Headless  # so you can say 'NLP' (before below!)
-  include CONSTANTS  # so you can sat 'TS' (the right one!) (after above!)
+  include Constants  # so you can sat 'TS' (the right one!) (after above!)
 
   extend TestSupport_::Quickie
 

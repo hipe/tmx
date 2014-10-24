@@ -1,8 +1,8 @@
 module Skylab::Headless
 
-  IO::Upstream::Select = Headless_::Lib_::Function_class[].new( :select ) do
+  module IO
 
-    self::MAXLEN__ = 4096  # (2 ** 12), the number of bytes in about 50 lines
+  Select__ = Headless_::Lib_::Ivars_with_procs_as_methods[].new :select do
 
     # Select - a chunking, multstream `select` wrapper
     #
@@ -64,7 +64,7 @@ module Skylab::Headless
           raise ::ArgumentError, "attempted to add multiple listeners #{
             }to one stream - this is not yet supported - #{ io }"
         else
-          down_h[ io.to_i ] = Headless::IO::Interceptors::Chunker.new line
+          down_h[ io.to_i ] = Headless_::IO::Mappers::Chunkers::Common.new line
           up_a << io
         end
       end
@@ -150,5 +150,8 @@ module Skylab::Headless
         valid[ 1.0 * x ]
       end
     end
+
+    self::MAXLEN__ = MAXLEN_
+  end
   end
 end

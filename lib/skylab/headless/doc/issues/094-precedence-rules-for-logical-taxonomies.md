@@ -17,7 +17,7 @@ as the "skylab taxonomy".
 so in the general case, when we speak of a "node" in the context of a skylab
 taxonomy we are spekaing of some ruby object that exists as a constant
 somewhere in this tree of constants, whose rootmost node is the toplevel
-module ::Skylab.
+module Skylab.
 
 the reason we say "node" and not "module", "class" or "constant" is twofold:
 for one, "node" encompasses all of these meanings without specifying

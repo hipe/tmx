@@ -1,3 +1,4 @@
+if false
 require File.expand_path('../test-support', __FILE__)
 require File.expand_path('../../file-services', __FILE__)
 
@@ -25,4 +26,5 @@ module Skylab::CodeMolester
     |         |         |      |        |
     TABLE
   end
+end
 end

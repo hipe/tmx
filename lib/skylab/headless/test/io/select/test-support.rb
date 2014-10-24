@@ -1,9 +1,9 @@
 require_relative '../test-support'
 
-module Skylab::Headless::TestSupport::IO::Upstream::Select
+module Skylab::Headless::TestSupport::IO::Select
 
-  ::Skylab::Headless::TestSupport::IO::Upstream[ TS_ = self ]
+  ::Skylab::Headless::TestSupport::IO[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
 end

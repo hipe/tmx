@@ -1,17 +1,17 @@
 require_relative '../test-support'
 
-describe "[hl] NLP EN minitesimal FUN" do
+describe "[hl] NLP EN minitesimal" do
 
   extend ::Skylab::Headless::TestSupport::NLP
 
-  fun = self::Headless_::NLP::EN::Minitesimal::FUN
+  fun = self::Headless_::NLP::EN
 
   context "oxford_comma" do
 
     o = -> s, *a do
       t = [(a.pop if ::Hash === a.last)].compact
       it "#{s}", *t do
-        so = fun.oxford_comma[ a ]
+        so = fun.oxford_comma a
         so.should eql(s)
       end
     end
@@ -34,8 +34,8 @@ describe "[hl] NLP EN minitesimal FUN" do
     define_method :s, & fun.s
 
     define_method :_and do |a|
-      x = fun.oxford_comma[ a ]
-      x and " #{ x }"
+      x = fun.oxford_comma a
+      x && " #{ x }"
     end
 
     # ( has a complimentary test in `nlp_spec.rb` )

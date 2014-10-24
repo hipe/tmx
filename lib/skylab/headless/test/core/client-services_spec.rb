@@ -4,7 +4,7 @@ module Skylab::Headless::TestSupport::CS__
 
   ::Skylab::Headless::TestSupport[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

@@ -1,13 +1,18 @@
 module Skylab::Headless
 
-  class Text::Patch::Models::ContentPatch  # builds a patch progressively.
+  module System__
 
-    def initialize content_x
+    class Services__::Patch
+
+      class Models__::ContentPatch  # builds a patch progressively.
+
+    def initialize patch_content_x
       @chunks = []
-      if ! content_x.respond_to? :gets
-        content_x = Headless::Library_::Basic::List::Scanner[ content_x ]
+      @lines = if patch_content_x.respond_to? :gets
+        patch_content_x
+      else
+        Callback_::Scn.try_convert patch_content_x
       end
-      @lines = content_x
       @offset = 0 ; nil
     end
 
@@ -23,7 +28,7 @@ module Skylab::Headless
       if range.exclude_end?
         fail "`exclude_end?` ranges must be zero-width" unless rbeg == rend
       end
-      chunk = Text::Patch::Models::Chunk.new
+      chunk = Patch_::Models__::Chunk.new
       line = @lines.gets
       fail 'range begin too low' if @lines.line_number > rbeg
       line = @lines.gets while line && @lines.line_number < rbeg
@@ -57,7 +62,7 @@ module Skylab::Headless
     end
 
     def render_simple
-      io = Headless::Library_::StringIO.new
+      io = Headless_::Library_::StringIO.new
       write_simple io
       io.rewind
       io.read
@@ -77,10 +82,10 @@ module Skylab::Headless
           lf = c.left.length.nonzero?
           rt = c.right.length.nonzero?
           letter = if lf
-                     if rt then 'c' else 'd' end
-                   elsif rt then 'a'
-                   else fail 'wahooo'
-                   end
+            if rt then 'c' else 'd' end
+            elsif rt then 'a'
+            else fail 'wahooo'
+          end
           io.puts(
             "#{ range[ c.left.range ] }#{letter}#{ range[ c.right.range ] }" )
           c.left.lines.each do |l|
@@ -95,5 +100,8 @@ module Skylab::Headless
       end
 
     end.call
+
+      end
+    end
   end
 end

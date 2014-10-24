@@ -1,7 +1,9 @@
 require_relative 'test-support'
 
-describe ::Skylab::Headless::NLP::EN::Methods do
-  describe "oxford_commma" do
+describe Skylab::Headless::NLP::EN::Methods do
+
+  describe "[hl] NLP EN methods (oxford comma)" do  # :+#not-quickie because specify
+
     include ::Skylab::Headless::NLP::EN::Methods
     let(:subject) { oxford_comma arr }
     context(a = %w()) do

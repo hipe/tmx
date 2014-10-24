@@ -1,6 +1,10 @@
 module Skylab::Headless
 
-  class Text::Patch::Models::Chunk
+  module System__
+
+    class Services__::Patch
+
+  class Models__::Chunk
 
     attr_reader :left
     attr_reader :right
@@ -8,12 +12,12 @@ module Skylab::Headless
   private
 
     def initialize
-      @left = Side.new
-      @right = Side.new
+      @left = Side__.new
+      @right = Side__.new
     end
-  end
 
-  class Text::Patch::Models::Chunk::Side
+
+  class Side__
 
     def << line
       @range.inc!
@@ -38,12 +42,11 @@ module Skylab::Headless
   private
 
     def initialize
-      @range = Range.new
+      @range = Range__.new
       @lines = []
     end
-  end
 
-  class Text::Patch::Models::Chunk::Side::Range
+  class Range__
 
     attr_reader :begin
 
@@ -62,6 +65,12 @@ module Skylab::Headless
     def initialize
       @begin = nil
       @end = nil
+    end
+
+  end  # Range__
+  end  # Side__
+  end  # Chunk__
+
     end
   end
 end

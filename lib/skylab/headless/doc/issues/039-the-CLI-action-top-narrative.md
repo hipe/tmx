@@ -24,18 +24,13 @@ was lost.
 
 ## :#storypoint-7 (these constants)
 
-the use of variants of these constants thoughout the CLI node exemplifies
-nicely the use of our [#050] name conventions: because it ends in an 'X' it
-signifies that the "caller" does not know anything about the shape of these
-values and must use them accordingly. you will see variants of these constants
-appear variously with zero, one or two trailing underscores and these each
-have [#100] precise meanings.
+per [#050] name conventions, the terminating 'X' in these constant names
+signifies that the caller does not know anything about the shape of these
+values and must behave around them accordingly.  i.e if we change these
+values here nothing within the library should behave any differently.
 
-they exist as "public" constants here because while [#126] we do not have a
-central, shared general CLI node by design, we think it is ok to share these
-constants throughout our sibling nodes; and that is happening here and not
-elsewhere because in practice almost all our sibling nodes will exist with
-the topic node having been loaded already.
+to review, the trailing uderscore means [#079] they are protected
+constants, and not part of our public API.
 
 
 

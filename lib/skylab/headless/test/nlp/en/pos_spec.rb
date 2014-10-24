@@ -2,13 +2,13 @@ require_relative 'test-support'
 
 module Skylab::Headless::TestSupport::NLP::EN
 
-  # le Quickie.
+  describe "[hl] NLP EN POS" do
 
-  describe "#{ NLP::EN::POS }" do
+    context "NLP EN POS noun" do
 
-    context "#{ NLP::EN::POS::Noun }" do
-
-      let :subject do NLP::EN::POS::Noun[ 'foot' ] end
+      let :subject do
+        Subject_[]::POS::Noun[ 'foot' ]
+      end
 
       it "default inflection is singular" do
         subject.lemma.should eql( 'foot' )
@@ -29,29 +29,35 @@ module Skylab::Headless::TestSupport::NLP::EN
       end
     end
 
-    context "#{ NLP::EN::POS::Verb }" do
+    context "NLP EN POS verb" do
+
       context "`preterite`" do
+
         it "when not ends in 'e' - adds an 'ed'" do
-          v = NLP::EN::POS::Verb[ 'add' ]
+          v = subject::Verb[ 'add' ]
           v.preterite.should eql( 'added' )
         end
 
         it "when ends in 'e' - adds a 'd'" do
-          v = NLP::EN::POS::Verb[ 'realize' ]
+          v = subject::Verb[ 'realize' ]
           v.preterite.should eql( 'realized' )
         end
       end
 
       context "`progressive`" do
         it "if ends in 'e', drops it" do
-          v = NLP::EN::POS::Verb[ 'mate' ]
+          v = subject::Verb[ 'mate' ]
           v.progressive.should eql( 'mating' )
         end
 
         it "but normally, just adds 'ing'" do
-          v = NLP::EN::POS::Verb[ 'do' ]
+          v = subject::Verb[ 'do' ]
           v.progressive.should eql( 'doing' )
         end
+      end
+
+      def subject
+        Subject_[]::POS
       end
     end
   end

@@ -4,7 +4,7 @@ module Skylab::Headless::TestSupport::API::Iambics
 
   ::Skylab::Headless::TestSupport::API[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

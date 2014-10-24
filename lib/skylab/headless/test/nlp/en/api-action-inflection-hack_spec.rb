@@ -1,22 +1,33 @@
 require_relative 'test-support'
 
-module Skylab::Headless::TestSupport::NLP::EN
+module Skylab::Headless::TestSupport::NLP::EN::AAIH
 
-  class MyAction
-    include CONSTANTS
-    extend Headless_::NLP::EN::API_Action_Inflection_Hack
-  end
-  module MyWidget # a noun
-    class List < MyAction # a verb
-      inflection.inflect.noun :plural
-    end
-    class Add < MyAction # a verb
-    end
-  end
+  ::Skylab::Headless::TestSupport::NLP::EN[ TS_ = self ]
 
-  describe "[hl] NLP EN API action inflection hack (the class using it..)" do
+  include Constants
+
+  extend TestSupport_::Quickie
+
+  Headless_ = Headless_
+
+  describe "[hl] NLP EN API action inflection hack (the class using it..)" do  # :+#no-quickie because subject
 
     extend TS_
+
+    before :all do
+
+      class MyAction
+        extend Headless_::NLP::EN::API_Action_Inflection_Hack
+      end
+
+      module MyWidget # a noun
+        class List < MyAction # a verb
+          inflection.inflect.noun :plural
+        end
+        class Add < MyAction # a verb
+        end
+      end
+    end
 
     it "gets an inflection knobby" do
       [ MyAction.inflection.object_id,
@@ -26,11 +37,9 @@ module Skylab::Headless::TestSupport::NLP::EN
       ].uniq.length.should eql(3)
     end
 
-
-
     context "that, assuming that actions are named after verbs" do
       context "infers what the verb is and lets you inflect on it" do
-        context "e.g. with #{MyWidget::Add}" do
+        context "e.g. with #add" do
           let(:klass) { MyWidget::Add }
           context "the progressive form of it" do
             subject { klass.inflection.lexemes.verb.progressive }
@@ -39,7 +48,6 @@ module Skylab::Headless::TestSupport::NLP::EN
         end
       end
     end
-
 
     context("and further assuming that the surround modules of said actions",
       "are named after nouns, and you tell it which verbs deal with single or plural nouns") do
@@ -55,38 +63,46 @@ module Skylab::Headless::TestSupport::NLP::EN
       context "it's dumb to ask the base class for its inflection ",
         "but let's see what happens" do
         let(:inflection) { MyAction.inflection }
-         specify { should eql("my actioning en") }
+          specify { should eql("my actioning aaih") }  # AAIH -> this module
       end
     end
   end
 
-
   describe "the industrious action class" do
     extend TS_
 
-    klass :MyAwesomeAction do
-      extend Headless_::NLP::EN::API_Action_Inflection_Hack
+    before :all do
+
+      class MyAwesomeAction
+        extend Headless_::NLP::EN::API_Action_Inflection_Hack
+      end
+
+      module Flugelhorn
+        class Show < MyAwesomeAction
+          inflection.inflect.noun :plural
+        end
+        class Edit < MyAwesomeAction
+          inflection.inflect.noun :singular
+        end
+        class TheDerpAction < MyAwesomeAction
+
+        end
+      end
     end
-    klass :Flugelhorn__Show, extends: :MyAwesomeAction do
-      inflection.inflect.noun :plural
-    end
-    klass :Flugelhorn__Edit, extends: :MyAwesomeAction do
-      inflection.inflect.noun :singular
-    end
-    klass :Flugelhorn__TheDerpAction, extends: :MyAwesomeAction
+
     let(:subject) do
       action.inflection.inflected.noun
     end
     it "when specified as singular" do
-      action = _Flugelhorn__Edit
+      action = Flugelhorn::Edit
       action.inflection.inflected.noun.should eql('flugelhorn')
     end
     context "when specified as plural" do
-      let(:action) { Flugelhorn__Show() }
+      let(:action) { Flugelhorn::Show }
       specify { should eql("flugelhorns") }
     end
     context "when not specified it will use the singular" do
-      let(:action) { Flugelhorn__TheDerpAction() }
+      let(:action) { Flugelhorn::TheDerpAction }
       specify { should eql(action.inflection.lexemes.noun.singular) }
     end
   end

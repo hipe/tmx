@@ -2,7 +2,9 @@ module Skylab::Headless
 
   module IO
 
-    module Interceptors
+    module Mappers
+
+      Autoloader_[ Interceptors_ = self ]  # ~ stowaway, a.l needed in this file!
 
       class Filter  # :[#159]
 
@@ -113,7 +115,7 @@ module Skylab::Headless
 
     def do_puts_via_a a
       a = a.flatten
-      a.length.zero? and a.push EMPTY_STRING_
+      a.length.zero? and a.push EMPTY_S_
       a.each do |s|
         if @puts_map_p_a
           s = @puts_map_p_a.reduce( s ) { |m, p| p[ m ] }
@@ -126,7 +128,7 @@ module Skylab::Headless
       end
       nil  # per ::IO#puts, but consider it undefined.
     end
-    NEWLINE_CHAR__ = "\n".getbyte 0
+    NEWLINE_CHAR__ = NEWLINE_.getbyte 0
 
     def do_write str
       begin
@@ -157,8 +159,6 @@ module Skylab::Headless
       end while nil
       length
     end
-
-        NEWLINE_ = "\n".freeze  # not #DOS-line-endings
 
         def do_pass
           @niladic_pass_filter_proc.call

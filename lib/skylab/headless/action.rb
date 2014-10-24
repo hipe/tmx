@@ -37,7 +37,7 @@ module Skylab::Headless
       end
 
       Client_services = -> x_a do
-        module_exec x_a, & Headless::Client_Services.to_proc
+        module_exec x_a, & Headless_::Client_Services.to_proc
       end
 
       Core_instance_methods = -> _ do
@@ -45,11 +45,11 @@ module Skylab::Headless
       end
 
       Expressive_agent = -> _ do
-        module_exec _, & Headless::Pen::Bundles::Expressive_agent.to_proc
+        module_exec _, & Headless_::Pen::Bundles::Expressive_agent.to_proc
       end
 
       Inflection = -> _ do
-        extend Headless::NLP::EN::API_Action_Inflection_Hack ; nil
+        extend Headless_::NLP::EN::API_Action_Inflection_Hack ; nil
       end
 
       Headless_::Lib_::Bundle[]::Multiset[ self ]
@@ -69,8 +69,8 @@ module Skylab::Headless
       end
 
       def name_function
-        @name_function ||= Headless::Name::Function::From::Module_Anchored.
-          new name, actions_anchor_module.name
+        @name_function ||= Headless_::Name.from_anchored_module name,
+          actions_anchor_module.name
       end
 
       alias_method :full_name_proc, :name_function # #hook-out legacy
@@ -88,7 +88,7 @@ module Skylab::Headless
 
     module IMs
 
-      include Headless::SubClient::InstanceMethods
+      include Headless_::SubClient::InstanceMethods
 
       # read [#138] the action narrative #storypoint-1
 

@@ -1,18 +1,74 @@
 module Skylab::Headless
 
-  module CLI::PathTools  # read [#031] the path tools narrative
+  module System__
 
-    def self.clear
-      FUN.clear[]
-    end
-  end
+    class Services__::Filesystem
 
-  module CLI::PathTools::FUN
+    module Path_Tools__  # #open [#031] new will move here, clobber this  read [#031] the path tools narrative
 
-    # read [#031]:#the-issue-with-pretty-path-and-caching
+      class << self
+
+        def absolute_path_hack_rx
+          ABSOLUTE_PATH_HACK_RX__
+        end
+
+        def escape_path path
+          Escape_path__[ path ]
+        end
+
+        define_method :expand_tilde, -> do
+
+          rx = /\A~(?=\/|\z)/  # (a tilde at the beginning of the string
+            # followed by either a forward slash or the end of the line)
+
+          -> path_string do
+            path_string.sub rx do
+              Headless_.system.environment.any_home_directory_path || $~[ 0 ]
+            end
+          end
+        end.call
+
+        def contract_tilde path_s
+
+          home_s = Headless_.system.environment.any_home_directory_path
+
+          if home_s && path_s.index( home_s ).zero? and
+              home_s.length == path_s.length || '/' == path_s[ home_s.length ]
+            "~#{ path_s[ home_s.length .. - 1 ] }"
+          else
+            path_s
+          end
+        end
+
+        def instance_methods_module
+          IM__
+        end
+
+        def pretty_path_safe x
+          clear
+          pretty_path x
+        end
+
+        def clear
+          Clear__[]
+        end
+
+        def pretty_path * a
+          if a.length.zero?
+            Pretty_path__
+          else
+            Pretty_path__[ * a ]
+          end
+        end
+      end
+
+      ABSOLUTE_PATH_HACK_RX__ =
+        %r{ (?<= \A | [[:space:]'",] )  (?: / [^[:space:]'",]+ )+ }x
+        # used hackishly by some subproducs. see spec
+
 
     home__ = -> do
-      Headless::FUN.home_directory_path[]
+      Headless_.system.environment.any_home_directory_path
     end
 
     pwd__ = -> do
@@ -63,18 +119,9 @@ module Skylab::Headless
       end
     end
 
-    memo = -> f do
-      get = -> do
-        x = f[]
-        get = -> { x }
-        x
-      end
-      -> do
-        get[]
-      end
-    end
+    memo = Callback_.memoize
 
-    pretty_path_ = -> home_, home_rx_, pwd_, pwd_rx_ do
+    Pretty_path____ = -> home_, home_rx_, pwd_, pwd_rx_ do
       home =    memo[ home_ ]
       home_rx = memo[ -> { home_rx_[ home ] } ]
       pwd =     memo[ pwd_ ]
@@ -92,90 +139,36 @@ module Skylab::Headless
     clear = -> h=nil, p=nil do
       h ||= home__
       p ||= pwd__
-      pretty_path = pretty_path_[ h, home_rx__, p, pwd_rx__ ]
+      pretty_path = Pretty_path____[ h, home_rx__, p, pwd_rx__ ]
     end
 
     clear[]
 
     # -- * --
 
-    ABSOLUTE_PATH_HACK_RX =
-      rx = %r{ (?<= \A | [[:space:]'",] )  (?: / [^[:space:]'",]+ )+ }x
-      # used hackishly by some subproducs. see spec
-
-    member_a = [ ]
-    o = -> member_i, p do
-      define_singleton_method member_i do p end
-      member_a << member_i
-      nil
-    end
-
-    class << o
-      alias_method :[]=, :[]
-    end
-
-    o[:clear] = clear
-
-    o[:escape_path] = -> path do
-      path = path.to_s
-      if / |\$|'/ =~ path
-        Headless::Library_::Shellwords.shellescape path
-      else
-        path
+      Clear__ = -> * a do
+        clear[ * a ]
       end
-    end
 
-    o[:memo] = memo
+      Pretty_path__ = -> x do
+        pretty_path[ x ]
+      end
 
-    o[:pretty_path] = Pretty_path = -> path do
-      pretty_path[ path ]                     # because the function changes!
-    end
-
-    o[:pretty_path_safe] = -> path do
-      clear[ ]
-      pretty_path[ path ]
-    end
-
-    o[:pretty_path_] = pretty_path_            # expose the algo for testing
-
-    o[:expand_tilde] = -> do                   # careful - is le hack
-
-      rx = /\A~(?=\/|\z)/  # (a tilde at the beginning of the string
-        # followed by either a forward slash or the end of the line)
-
-      -> path_string do
-        path_string.sub rx do
-          Headless::FUN.home_directory_path[] || $~[0]
+      Escape_path__ = -> path do
+        path = "#{ path }"
+        if / |\$|'/ =~ path
+          Headless_::Library_::Shellwords.shellescape path
+        else
+          path
         end
       end
-    end.call
 
-    # `contract_tilde` - the opposite of `expand_tilde` - replace a substring
-    # of the path with "~" where appropriate.
-    # #todo - this is not, but might could be, used in ta
-
-    o[:contract_tilde] = -> path_string do
-      rs = path_string
-      pth = Headless::FUN.home_directory_path[]
-      if pth && path_string.index( pth ).zero? && (  # ick, meh
-        pth.length == path_string.length || '/' == path_string[ pth.length ] )
-        rs = "~#{ path_string[ pth.length .. - 1 ] }"
+      module IM__
+        define_method :escape_path, Escape_path__
+        define_method :pretty_path, Pretty_path__
       end
-      rs
+
     end
-
-    member_a.freeze
-    define_singleton_method :members do member_a end
-
-  end
-
-  module CLI::PathTools::InstanceMethods
-
-    fun = CLI::PathTools::FUN
-
-    define_method :escape_path, & fun.escape_path
-
-    define_method :pretty_path, & fun.pretty_path
-
+    end
   end
 end

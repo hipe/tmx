@@ -66,7 +66,7 @@ module Skylab::Headless
         r and @svc_h[ i ] = r ; r
       end
       def rslv_svc_via_method i
-        Headless::Client_Services::Service_Resolved_As_Bound_Method.
+        Headless_::Client_Services::Service_Resolved_As_Bound_Method.
           new method i
       end
     end

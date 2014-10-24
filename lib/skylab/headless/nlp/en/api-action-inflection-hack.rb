@@ -1,4 +1,4 @@
-module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
+module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack  # seed [#018].  was: [#sl-123] exempt
 
   # This is a weird old (and fun) #experiment that is salvaged from porcelain.
   # Watch for it to cross-fertilize with instances of action inflection
@@ -12,7 +12,9 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
 
   Headless_ = ::Skylab::Headless
 
-  EMPTY_STRING_ = Headless_::EMPTY_STRING_
+  CONST_SEP_ = Headless_::CONST_SEP_
+
+  EMPTY_S_ = Headless_::EMPTY_S_
 
   NLP = Headless_::NLP # (future-proof parts in case not [#sl-123])
 
@@ -30,30 +32,46 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
       mod.send :include, Dupe::InstanceMethods
     end
 
-    def dupes *a
-      @dupes ||= begin
-         anc = Dupe::FUN.detect_ancestor_respond_to[ self, :dupes ]
-         if anc
-           dupes = anc.dupes.dup
-         else
-           dupes = [ ]
-         end
-         dupes
-      end
+    def dupes * a
+      @dupes ||= bld_dupe_array
       @dupes.concat( a - @dupes )
     end
 
     attr_writer :dupes
 
-    o = { }
-
-    o[:detect_ancestor_respond_to] = -> klass, method do
-      # will need to change if we want to support modules
-      klass.ancestors[1..-1].detect { |m| m.respond_to? method }
+    private def bld_dupe_array
+      anc = Dupe.detect_ancestor_respond_to self, :dupes
+      if anc
+        acn.dupes.dup
+      else
+        []
+      end
     end
 
-    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
+    -> o do
 
+      o[ :detect_ancestor_respond_to ] = -> klass, method_i do
+        # will need to change if we want to support modules
+        klass.ancestors[ 1 .. -1 ].detect do |mod|
+          mod.respond_to? method_i
+        end
+      end
+
+    end.call -> do
+      o = -> i, p do
+        define_singleton_method i, -> * a do
+          if a.length.zero?
+            p
+          else
+            p[ * a ]
+          end
+        end
+      end
+      class << o
+        alias_method :[]=, :call
+      end
+      o
+    end.call
   end
 
   module Dupe::InstanceMethods
@@ -101,44 +119,25 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
 
     extend Dupe
 
-    rx = /([a-z])([A-Z])/
-
-    humanize = -> str do
-      str.gsub( rx ){ "#{$1} #{$2}" }.downcase
+    def noun
+      @noun ||= bld_noun
     end
-                                  # automagic is not without its price: in
-                                  # order to infer a noun stem from your
-                                  # action class name, we will start by assuming
-                                  # it is in either the second- or third-to-
-    define_method :noun do        # last 'name piece.' (assumption [#018])
-      @noun ||= begin             # To find the appropriate action constants
-        seen = [ ] ; hop = false  # for the noun, we crawl down the entire
-        name_pieces.reduce( ::Object ) do |m, x| # const tree and back up again
-          m.const_defined?( x, false ) or break
-          y = m.const_get x, false # part-way bc of [#035] - if there is a
-          seen.push y             # pure box module, (that is, a module whose
-          y                       # only purpose is to be a clean namespace
-        end                       # to hold only constituent items), then such
-        ok = seen.length.zero?
-        ok ||= -> do              # modules usually do *not* have business
-          res = seen[-2]          # semantics - that is, they sometimes do *not*
-          begin                   # have a meaningful name as far as we're
-            o = seen[-3] or break # concerned here. So if there is such a
-            o.respond_to?( :unbound_action_box ) or break # module, we want to
-            o.unbound_action_box == res or break # `hop` over it, thereby
-            hop = true            # not using it as a basis for our
-          end while nil           # noun stem, but rather the const above it
-          true
-        end.call
-        if ok
-          word = humanize[ name_pieces[ hop ? -3 : -2 ] ]
-          if 's' == word[-1]      # #singularize hack
-            word = word.sub( /s\z/, EMPTY_STRING_ )
-          end
-          NLP::EN::POS::Noun[ word ]
+
+    def bld_noun  # #note-130
+      chain = Headless_::Lib_::Module_lib[].chain_via_module @klass
+      mod = chain[ -2 ].value_x
+      mod_ = chain[ -3 ].value_x
+      if mod_ && mod_.respond_to?( :unbound_action_box )
+        if mod == mod_.unbound_action_box
+          do_hop = true
         end
       end
+      word = Headless_::Name.humanize( chain[ do_hop ? -3 : -2 ].name_i.to_s )
+      word.gsub! PLURAL_RX__, EMPTY_S_  # :+#singularize-hack
+      NLP::EN::POS::Noun[ word ]
     end
+
+    PLURAL_RX__ = /s\z/
 
     def noun= x
       self.dupes |= [:noun] # duplicate this setting down to subclasses
@@ -150,7 +149,7 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
     end
 
     define_method :verb do
-      @verb ||= NLP::EN::POS::Verb[ humanize[ name_pieces.last ] ]
+      @verb ||= NLP::EN::POS::Verb[ Headless_::Name.humanize( name_pieces.last ) ]
     end
 
     def verb= x
@@ -171,7 +170,7 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
     end
 
     def name_pieces
-      @name_pieces ||= @klass.to_s.split '::'
+      @name_pieces ||= @klass.to_s.split CONST_SEP_
     end
   end
 
@@ -238,7 +237,7 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
 
     def initialize klass
       @klass = klass
-      anc = Dupe::FUN.detect_ancestor_respond_to[ klass, :inflection ]
+      anc = Dupe.detect_ancestor_respond_to klass, :inflection
       if anc
         dupe! anc.inflection
       end

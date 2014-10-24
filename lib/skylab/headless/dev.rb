@@ -5,7 +5,7 @@ module Skylab::Headless
     # to get things running, for tests etc
   end
 
-  class DEV::Pen < Headless::CLI::Pen::Minimal
+  class DEV::Pen < Headless_::CLI.pen.minimal_class
     def escape_path x
       x.to_s
     end
@@ -13,14 +13,13 @@ module Skylab::Headless
 
   class DEV::Client
 
-    include Headless::Client::InstanceMethods
+    include Headless_::Client::InstanceMethods
 
   private
-
-    O__, E__= Headless::System::IO.some_two_IOs
+    O__, E__ = Headles_.system.IO.some_two_IOs
 
     def initialize i=nil, o=O__, e=E__, pen=DEV::Pen.new
-      self.io_adapter = Headless::CLI::IO::Adapter::Minimal.
+      self.io_adapter = Headless_::CLI::IO::Adapter::Minimal.
         new i, o, e, pen ; nil
     end
   end

@@ -1,10 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::Headless::TestSupport::CLI
+module Skylab::Headless::TestSupport::System::Services::Filesystem::Path_Tools
 
   describe "[hl] CLI path-tools" do
-
-    fun = Headless_::CLI::PathTools::FUN
 
     define_singleton_method :o do |str, capture, *tags|
       vp = if capture
@@ -14,9 +12,11 @@ module Skylab::Headless::TestSupport::CLI
       end
 
       it "in '#{ str }' it #{ vp }", *tags do
-        md = fun::ABSOLUTE_PATH_HACK_RX.match str
+
+        md = Headless_.system.filesystem.path_tools.absolute_path_hack_rx.match str
+
         if capture
-          md[0].should eql( capture )
+          md[0].should eql capture
         else
           md.should be_nil
         end

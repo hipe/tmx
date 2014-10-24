@@ -1,7 +1,11 @@
-module Skylab::Headless::NLP::EN::Number
+module Skylab::Headless
 
-  -> o do                         # A scope to hold what is effectively
-                                  # private constants.
+  module NLP
+
+    module EN::Number
+
+  -> o do
+
     arr = [
       %w(zero),
       %w(one first x),
@@ -20,9 +24,9 @@ module Skylab::Headless::NLP::EN::Number
 
     _TERM_SEPARATOR_STRING = ::Skylab::Headless::TERM_SEPARATOR_STRING_
 
-
-    big = [nil, nil, nil, 'hundred',
-           'thousand', nil, nil, 'million', nil, nil, 'billion'] # and so on
+    big = [ nil, nil, nil, 'hundred', 'thousand',
+            nil, nil, 'million',
+            nil, nil, 'billion' ]  # and so on
 
     number = -> x do
       x % 1 == 0 && x >= 0 or return x # positive integers only
@@ -40,9 +44,9 @@ module Skylab::Headless::NLP::EN::Number
       end.compact * _TERM_SEPARATOR_STRING
     end
 
-    o[:number] = number
+    o[ :number ] = number
 
-    o[:num2ord] = Num2ord = -> x do
+    o[ :num2ord ] = Num2ord = -> x do
       return x unless x % 1 == 0 && x > 0 # positive integers only
       mod = x % (m = 100)
       if mod >= arr.length and !(13..19).include? mod
@@ -57,22 +61,29 @@ module Skylab::Headless::NLP::EN::Number
       end
     end
 
-  end.call( h = { } )
+  end.call -> do
+    o = -> i, p do
+      define_singleton_method i do | * a |
+        if a.length.zero?
+          p
+        else
+          p[ * a ]
+        end
+      end ; nil
+    end
+    class << o
+      alias_method :[]=, :call
+    end
+    o
+  end.call
 
-  FUN = ::Struct.new(* h.keys ).new ; h.each { |k, v| FUN[k] = v }
-                                  # Take a hash full of functions and
-                                  # make it a struct full of functions (a
-                                  # much better public interface for at least
-                                  # two resasons).
+      Number_ = self
 
+      module Methods
+        define_method :number, Number_.number
+        define_method :num2ord, Number_.num2ord
+      end
 
-  module Methods                  # a version of some of our functions as
-                                  # instance methods.  Use them as ModuleMethods
-                                  # or InstanceMethods, up to you.
-
-    define_method :number, & FUN.number
-
-    define_method :num2ord, & FUN.num2ord
-
-  end
+    end  # EN::Number
+  end  # NLP
 end

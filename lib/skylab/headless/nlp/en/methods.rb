@@ -6,19 +6,15 @@ module Skylab::Headless
       mod.include self
     end
 
-    fun = NLP::EN::Minitesimal::FUN
+    fun = NLP::EN
 
-    define_method :an, & fun.an
-
-    define_method :oxford_comma, & fun.oxford_comma
-
-    alias_method :and_, :oxford_comma
-
-    def or_ a
-      oxford_comma a, ' or '
+    [ :an, :oxford_comma, :s ].each do |i|
+      define_method i, fun[ i ]
     end
 
-    define_method :s, & fun.s
+    define_method :and_, fun.oxford_comma.curry[ ', ', ' and ' ]
+
+    define_method :or_, fun.oxford_comma.curry[ ', ', ' or ' ]
 
       # this is its power:
       #

@@ -64,7 +64,7 @@ module Skylab::Headless
       end
 
       def index
-        bx = Headless::Library_::Basic::Box.new
+        bx = Headless_::Lib_::Meso_box_lib[].new
         constants.each do |c|
           ar = const_get c, false
           bx.add ar.local_normal_name, ar
@@ -92,7 +92,7 @@ module Skylab::Headless
     end
   private
     def bld_lnf
-      Headless::Name::Function.new local_normal_name
+      Headless_::Name.new local_normal_name
     end
   public
 
@@ -102,7 +102,7 @@ module Skylab::Headless
   private
     def bld_lnn
       n = name
-      n[ n.rindex( '::' ) + 2 .. -1 ].downcase.intern
+      n[ n.rindex( CONST_SEP_ ) + 2 .. -1 ].downcase.intern
     end
   public
 

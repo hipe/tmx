@@ -6,20 +6,23 @@ module Skylab::Headless::TestSupport
 
   ::Skylab::TestSupport::Regret[ TS_ = self ]
 
-  module CONSTANTS
+  TestLib_ = ::Module.new
+
+  module Constants
     Headless_ = ::Skylab::Headless
       Autoloader_ = Headless_::Autoloader_
+    TestLib_ = TestLib_
     TestSupport_ = ::Skylab::TestSupport
   end
 
-  include CONSTANTS
+  include Constants
   Headless_ = Headless_
   EMPTY_A_ = Headless_::EMPTY_A_
   NILADIC_TRUTH_ = Headless_::NILADIC_TRUTH_
   TestSupport_ = TestSupport_
 
   set_tmpdir_pathname do
-    Headless_::System.defaults.dev_tmpdir_pathname.join 'hl'
+    Headless_.system.defaults.dev_tmpdir_pathname.join 'hl'
     #todo - when you take out the `dev_` above it fails
   end
 
@@ -44,9 +47,7 @@ module Skylab::Headless::TestSupport
   module TestLib_  # :+[#su-001]:just-for-tests
 
     Callback_test_support = -> do
-      require 'skylab/callback/test/test-support'
-      Headless_::Callback_::TestSupport
+      Headless_::Callback_.test_support
     end
-
   end
 end

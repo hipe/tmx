@@ -1,3 +1,9 @@
+[#168]       #doc-node option scan ..
+[#167]       #parent-node: [#098] "name conventions for classes.."
+[#166]       #parent-node: [#098] "name conventions for non-class modules.."
+[#165] #open unify the new post-F-UN strategties
+[#164]       #parent-node: [#161] the IO line scannar narrative ..
+[#163] #open merge ellipsify with [#ba-032]
 [#162] #open re-write patch to be an actor
 [#161]       #doc-node the headless IO node
 [#160]       #parent-node: [#161] the tmpdir narrative ..
@@ -48,7 +54,7 @@
 [#116]       #parent-node: [#050] "vectors of concern defined.."
 [#115]       #biliographic-reference: the Wikipedia page on _Idiom_
               (the text cited is from user Glane23 from 2010-03-11)
-[#114]       #parent-node: [#097] name conventions for constant values ..
+[#114]       #parent-node: [#097] name conventions for const values..
 [#113]       #parent-node: [#091] "the meaning of node in this context.."
 [#112]       #parent-node: [#106] "a list of idioms.."
 [#111]       #parent-node: [#093] "the idiomacy of plural noun phrases.."
@@ -61,16 +67,15 @@
 [#105]       #parent-node: [#093] "the rule of business object variable.."
 [#104]       #parent-node: [#093] "list of variable name patterns.."
 [#103]       #parent-node: [#095] "list of method prefixes and suffixes.."
-[#102]       #parent-node: [#097]  (our discussion of shape ..)
-[#101]       #parent-node: [#095] name conventions for function constants ..
-[#100]       #parent-node: [#101] "multiple trailing underscores in.."
+[#102]       #parent-node: [#097] "the way shape is reflected in.."
+[#101]       #parent-node: [#097] "the name conventions for proc-like consts.."
+[#100] #hole (was: #parent-node: [#097] "multiple trailing underscores in..")
 [#099]       #parent-node: [#098] module visibility thru architected ..
-[#098]       #parent-node: [#097] module name conventions ..
+[#098]       #parent-node: [#097] module name conventions..
 [#097]       #parent-node: [#050] name conventions for constants ..
-               (#todo merge this into [#079])
 [#096]       #parent-node: [#098] "verbish names are used for verbish.."
 [#095]       #parent-node: [#050] name conventions for functions and ..
-[#094]       #parent-node: [#095] ObjectiveC/Cocoa semantics for get_* ..
+[#094]       #parent-node: [#095] ObjectiveC/Cocoa semantics for `get_*` ..
 [#093]       #parent-node: [#050] name conventions for variables ..
 [#092]       #doc-node POS .. (historically, lost in fire: "change is certain")
 [#091]       #doc-point precedence rules for logical taxonomies ..
@@ -85,11 +90,11 @@
                "what is the deal with expression agents")
 [#083]       #node-tracker: name function (and #in-situ comment)
 [#082]       #done adapter for face of hot (kind of [#054])
-[#081]       #doc-point the norm* family of functions..
+[#081]       #doc-point the `norm*` family of functions..
 [#080]       #doc-point `facet`s are like IoC/dependency injection #plugins ..
-[#079]       #name-convention: modules whose name ends in an `Underscore_`
-             are API private - knowledge of their shape or existence must not
-             be necessary outside of the node they reside in.
+[#079]       #parent-node: [#097] constants whose name ends in one or more
+             underscores are API private - knowledge of their shape or
+             existence must not be necessary outside of thir parent node.
 [#078]       #doc-point shells, stories and kernels
 [#077]       #doc-point the plugin narrative ..
 [#076]       #parent:070 #future-feature enable/disable a particular plugin
@@ -147,7 +152,8 @@
               `normalized_invocation_string`
 [#033]       #function-point #tracking-tag #node-tracker `desc` (and docs)
 [#032]       #done #low-priority do we care about our call-stack height for CLI?
-[#031]       #parent-node: [#xxx] the path-tools narrative
+[#031] #open new path-tools will move here and clobber old
+             (formerly: #parent-node: [#xxx] the path-tools narrative)
              (formerly: #done a petition to get escape_path pushed up here)
 [#030]       #done the raw dog experiment
 [#029] #open `stylize` as any of two of these happen: [#gs-004] [#bn-005]
@@ -169,7 +175,7 @@
                and consistent signatures within modalities
 [#019]       #pattern #convention iff CLI action invoke is false, invite
                (referred to now as the "common triad" #doc-point) ..
-[#018]       #tracking-tag API action inflection
+[#018]       #doc-node the API action inflection hack narrative ..
 [#017]       #doc-point the API node narrative ..
 [#016] #open #low-priority dynamic uncolorize payload stream when ! tty?
 [#015]       #doc-node the CLI IO narrative #retrofitted

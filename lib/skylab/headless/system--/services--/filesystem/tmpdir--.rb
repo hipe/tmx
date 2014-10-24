@@ -2,7 +2,11 @@
 
 module Skylab::Headless
 
-  class IO::Filesystem::Tmpdir < ::Pathname
+  module System__
+
+    class Services__::Filesystem
+
+      class Tmpdir__ < ::Pathname
 
     include Headless_::Library_::FileUtils
 
@@ -26,29 +30,24 @@ module Skylab::Headless
 
     end ]
 
-    class << self
+    alias_method :init_pathname, :initialize
 
-      alias_method :via_iambic, :new
-
-      def new * x_a
-        via_iambic x_a
-      end
-    end
-
-    alias_method :omg, :initialize
-
-    def initialize x_a
-      ::Array === x_a or raise 'where'
-      if 1 == x_a.length
-        x_a.unshift :path
-      end
+    def initialize * x_a, & p
       @is_noop = false
       @be_verbose = false
-      process_iambic_fully x_a
-      @debug_IO ||= Headless_::System::IO.some_stderr_IO
+
+      if x_a.length.nonzero?
+        process_iambic_fully x_a
+      end
+
+      if p  # prolly mutex w/ above
+        instance_exec( & p )
+      end
+
+      @debug_IO ||= Headless_.system.IO.some_stderr_IO
       @max_mkdirs ||= 1
-      @path_x ||= Headless_::System.defaults.tmpdir_path
-      super @path_x
+      @path_x ||= Headless_.system.filesystem.tmpdir_path
+      super @path_x, & nil
       init_path_derivatives
       freeze
     end
@@ -73,7 +72,7 @@ module Skylab::Headless
     def init_copy_via_iambic x_a
       process_iambic_fully 0, x_a
       if @path_x
-        omg @path_x
+        init_pathname @path_x
         init_path_derivatives
       end
       freeze
@@ -104,7 +103,7 @@ module Skylab::Headless
     end
 
     def patch str  # result is exit_status
-      Headless_::Text::Patch.directory str, to_path,
+      Headless_.system.patch.directory str, to_path,
         @is_noop, @be_verbose, method( :send_debug_string )
     end
 
@@ -173,11 +172,27 @@ module Skylab::Headless
       self
     end
 
-    def prepare  # #note-130
+    def prepare  # #note-130  # :+[#hl-022] filesystem expectation
       if exist?
         prepare_when_exist
       else
         prepare_when_not_exist
+      end
+    end
+
+    def prepare_when_not_exist  # :+#public-API
+      if sanity_check_self_for_mkdir
+        mkdir_p @path_s, noop: @is_noop, verbose: @be_verbose
+      end
+    end
+
+    def _OMG_
+      if_verbose_say { say_rm_minus_rf }
+      if SAFETY_RX__ =~ @path_s
+        remove_entry_secure @path_s  # TERRIFYING (result is nil)
+        PROCEDE_
+      else
+        Raise__[ ask_if_there_is_a_god ]
       end
     end
 
@@ -233,12 +248,9 @@ module Skylab::Headless
     end
 
     def prepare_when_directory_has_entries
-      if_verbose_say { say_rm_minus_rf }
-      if SAFETY_RX__ =~ @path_s
-        remove_entry_secure @path_s  # TERRIFYING
+      ok = _OMG_
+      ok and begin
         ::FileUtils.mkdir @path_s, noop: @is_noop, verbose: @be_verbose  # result is array of selfsame path
-      else
-        Raise__[ ask_if_there_is_a_god ]
       end
     end
 
@@ -248,12 +260,6 @@ module Skylab::Headless
 
     def ask_if_there_is_a_god
       "is there no god?"
-    end
-
-    def prepare_when_not_exist
-      if sanity_check_self_for_mkdir
-        mkdir_p @path_s, noop: @is_noop, verbose: @be_verbose
-      end
     end
 
     def sanity_check_self_for_mkdir
@@ -281,6 +287,7 @@ module Skylab::Headless
         stack_a.pop
         curr_pn = peek_pn
       end
+
       Sanity_check_pathname__[ curr_pn ]
     end
 
@@ -335,7 +342,7 @@ module Skylab::Headless
       @to_pathname.dirname
     end
 
-    PROCEDE_ = true
-    UNABLE_ = false
+      end
+    end
   end
 end

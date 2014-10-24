@@ -17,17 +17,45 @@ uses throughout the system until we figure out what the 'Right Way' is.
 
 
 
-## :#section-2 introduction to the client
+
+## :#note-40
+
+when args are pased and the service isn't available we fail hard by
+raising an exception. this is an explanation of why.
+
+when args are passed and the service is available, it is shorthand for
+sending those args to the `call` method of the service. it is totally up
+to the service what the semantics are of the result value.
+
+in cases where the service isn't available, if we were to result in e.g
+`false`, there would be no telling whether that value came from the service
+or came as a result of the service not being available. hence, in order
+to avoid a potentially catastrophic loss of meaning with the result
+value, in cases where args are passed and the service isn't available we
+must take more drastic measures than e.g merely resulting in false.
+
+if there is any doubt whether the service will be available check first
+by accessing the service itself before using its `call` method.
+
+
+
+
+## :#section-2 introduction to the front client
 
 we implement the methods and services of the "system" through this private
 client class because given how bad singletons are for testing and for
 sofware design in general, this will get our code from both sides used to
 the idea of accessing and delivering these values through some sort of
-agent.
+agent, albeit one that perhaps now in its current form is not much
+different than a singleton.
 
 
 
 ## :#section-3 introduction to the defaults node
+
+this is a higher-level service that for many of its properties relies on
+other lower-level services and maps certain of their pathname
+properties in some way. at once point we said about this node:
 
 this is the ugliest node of the whole thing but at least it's all in one
 place. (it's not ugly from an implementation perspective. it's beautiful

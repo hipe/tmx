@@ -4,12 +4,12 @@ module Skylab::Headless::TestSupport::Parameter
 
   ::Skylab::Headless::TestSupport[ self ]
 
-  module CONSTANTS
+  module Constants
     Parameter = Headless_::Parameter
   end
 
   module ModuleMethods
-    include CONSTANTS
+    include Constants
 
     def with &b                   # define the class body you will use in
       @klass = ::Class.new.class_exec do      # the frame

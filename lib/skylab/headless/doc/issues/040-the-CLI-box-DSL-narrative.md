@@ -30,7 +30,8 @@ implementation of this idea.
 to get pseudo-formal for a second, the grammar ends up looking something like:
 
     class Foo
-      Headless::CLI::Box[ self, :DSL ]  # EXAMPLE - not yet implemetned #todo:during-merge
+
+      Headless_::CLI::Box[ self, :DSL ]  # EXAMPLE - not yet implemetned #todo:during-merge
 
       NODE_DEFINITION *
 

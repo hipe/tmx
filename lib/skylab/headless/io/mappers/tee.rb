@@ -2,12 +2,12 @@ module Skylab::Headless
 
   module IO
 
-  module Interceptors
+  module Mappers
 
-  Tee = Headless_::Lib_::Proxy_tee[].via_arglist IO_::METHOD_I_A_ do
+  Tee = Headless_::Lib_::Proxy_lib[].tee.via_arglist IO_::METHOD_I_A_
 
     # Inspired by (but probably not that similar to) Perl's IO::Tee,
-    # an IO::Interceptors::Tee is a simple multiplexer that intercepts
+    # an IO::Mappers::Tee is a simple multiplexer that intercepts
     # and multiplexes out a subset of the messages that an ::IO stream
     # receives.
     #
@@ -15,18 +15,6 @@ module Skylab::Headless
     # of an ordered hash; that is, the order in which they were added is
     # remembered and they are retrieved by their key, usually a symbol.
     # (we refer to this structure as a "box".)
-
-    -> do
-      kls = self
-      define_method :respond_to? do |m|
-        kls.method_names.include? m.intern
-      end
-    end.call
-
-    def nil?
-      false
-    end
-  end
 
   class Tee
 

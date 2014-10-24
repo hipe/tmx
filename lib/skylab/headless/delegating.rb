@@ -18,7 +18,7 @@ module Skylab::Headless
 
     to_proc = -> x_a=nil do
       if x_a and x_a.length.nonzero?
-        Headless::Bundles__::Delegating::Absorb_Passivley[ x_a, self ]
+        Headless_::Bundles__::Delegating::Absorb_Passivley[ x_a, self ]
       else
         module_exec( & Init_as_reflective_delegating_client__ )
       end ; nil
@@ -122,7 +122,7 @@ module Skylab::Headless
       end
     private
       def rslv_some_builder_with_if
-        Headless::Bundles__::Delegating::
+        Headless_::Bundles__::Delegating::
           Builder_with_if[ @if_p, rslv_some_builder_without_if ]
       end
       def rslv_some_builder_without_if

@@ -1,88 +1,10 @@
-require_relative '../test-support'
-require_relative 'for-rspec' # sorry
+require_relative 'test-support'
 
-# NOTE rspec-only currently :/ #todo
+Skylab::TestSupport::Quickie.enable_kernel_describe
 
 describe "[hl] CLI path-tools pretty-path" do
 
-  include ::Skylab::Headless # constants
-
-  fun = self::Headless_::CLI::PathTools::FUN
-
-  @memo = { }
-
-  singleton_class.send :attr_reader, :memo
-
-  define_singleton_method :frame do |&b|
-    memo.clear
-    instance_exec( &b )
-  end
-
-  get_set = -> name, *a do
-    case a.length
-    when 0 ; memo.fetch name
-    when 1 ; memo[name] = a.first
-    else   ; fail 'no'
-    end
-  end
-
-  define_singleton_method :home do |*a|
-    get_set[ :home, *a ]
-  end
-
-  define_singleton_method :pwd do |*a|
-    get_set[ :pwd, *a ]
-  end
-
-  define_singleton_method :exemplifying do |s, *t, &b|
-    home = memo[:home] # nil ok
-    pwd = memo[:pwd] # nil ok
-    _home = -> do
-      home # acccesses this once per frame! -- could be tested
-    end
-    _pwd = -> do
-      pwd # accesses this once per frame! -- could be tested
-    end
-    before_ = -> do
-      fun.clear[ _home, _pwd ]
-    end
-    context s, *t do
-      before :all do
-        before_[]
-      end
-      instance_exec( &b )
-    end
-  end
-
-
-  my_pathname = ::Class.new( ::Pathname )      # this is for testing and is not
-  my_pathname.class_eval do                    # recommended for an application
-    include ::Skylab::Headless::CLI::PathTools::InstanceMethods # -- it is poor
-    def pretty                                 # separation of concerns to rely
-      pretty_path to_s                         # on a pathname to decide how to
-    end                                        # render itself.
-  end
-
-  define_singleton_method :o do |input, expected, *a|
-
-    vp = if input == expected
-      'does not change'
-    else
-      "prettifies to #{ expected.inspect }"
-    end
-
-
-    it "#{ input.inspect } #{ vp }", *a  do
-
-      pn = my_pathname.new input
-      pn.should prettify_to( expected )
-
-    end
-
-  end
-
-  # --*--
-
+  extend Skylab::Headless::TestSupport::System::Services::Filesystem::Path_Tools::Pretty_Path
 
   frame do
     home '/home/rms'
@@ -143,7 +65,6 @@ describe "[hl] CLI path-tools pretty-path" do
       o 'home/rms',               'home/rms'
     end
   end
-
 
   frame do
     home '/home/rms'

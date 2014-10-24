@@ -1,13 +1,11 @@
-require_relative '../../../core'
+require_relative '../../../../../../core'
 
 module Skylab::Headless
 
   # try running this from various locations, both inside and outside of
   # your home dir
 
-  o = ::Object.new
-
-  o.extend Headless_::CLI::PathTools::InstanceMethods
+  o = Headless_.system.filesystem.path_tools
 
   pwd = ::Dir.getwd
 

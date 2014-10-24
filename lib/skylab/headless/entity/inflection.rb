@@ -27,7 +27,7 @@ module Skylab::Headless
 
     def initialize full_name_proc
       stem = full_name_proc.map( :as_natural ) * TERM_SEPARATOR_STRING_
-      @production = Headless::NLP::EN::POS::Noun.produce stem
+      @production = Headless_::NLP::EN::POS::Noun.produce stem
     end
 
     def singular

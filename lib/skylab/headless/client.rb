@@ -16,10 +16,10 @@ module Skylab::Headless
 
     module Bundles
       Client_services = -> x_a do
-        module_exec x_a, & Headless::Client_Services.to_proc ; nil
+        module_exec x_a, & Headless_::Client_Services.to_proc ; nil
       end
       Parameter_controller = -> _ do
-        Headless::Parameter[ self, :parameter_controller ]
+        Headless_::Parameter[ self, :parameter_controller ]
       end
       Headless_::Lib_::Bundle[]::Multiset[ self ]
     end
@@ -27,7 +27,7 @@ module Skylab::Headless
 
   module Client::InstanceMethods
 
-    include Headless::SubClient::InstanceMethods
+    include Headless_::SubClient::InstanceMethods
 
   private
 

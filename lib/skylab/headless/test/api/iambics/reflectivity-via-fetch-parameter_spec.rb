@@ -28,10 +28,10 @@ module Skylab::Headless::TestSupport::API::Iambics
       end
 
       it "fetch nonexistant without an else block - (LEVENSHTEIN YAY.) X" do
+        _s = "there is no such term 'three' - did you mean 'one' or 'two'?"
         -> do
           Two_RVFP.fetch_term :three
-        end.should raise_error ::NameError,
-          "there is no such term 'three' - did you mean 'one' or 'two'?"
+        end.should raise_error ::NameError, _s
       end
 
       it "fetch nonexistant with an else block - o" do

@@ -1,8 +1,29 @@
 module Skylab::Headless::SubClient
 
-  Headless = ::Skylab::Headless
-  Headless_ = Headless
-  include Headless
+  Headless_ = ::Skylab::Headless
+
+  include Headless_
+
+  class << self
+
+    def expression_agent
+      Expression_Agent__
+    end
+  end
+
+  module Expression_Agent__
+
+    class << self
+
+      def NLP_EN_agent
+        NLP_EN_expression_agent_instance__[]
+      end
+
+      def NLP_EN_methods
+        NLP_EN_Methods__
+      end
+    end
+  end
 
   module InstanceMethods
 
@@ -11,9 +32,6 @@ module Skylab::Headless::SubClient
     # `init_headless_sub_client`
 
   private
-
-    define_singleton_method :private_attr_reader, &
-      Headless_::Lib_::Private_attr_reader[]
 
     def initialize client_x=nil  # XXX #transitional only #todo
       @error_count = 0
@@ -70,7 +88,7 @@ end
         }do you need to implement it for that class)?"
     end
 
-    module Headless::SubClient    # we can't define constants here
+    module Headless_::SubClient    # we can't define constants here
       BLOCK_ = 'block '.freeze    # it might be a box module.
       BLK_R_ = 0 ... BLOCK_.length
     end
@@ -93,7 +111,9 @@ end
     end                           # "perfect abstraction" but may still cause
                                   # you pain if you're not careful.
 
-    private_attr_reader :error_count
+    public def error_count
+      @error_count
+    end
 
                                   # there is no absolutely no guarantee that
                                   # that out of the box this is reflective
@@ -158,9 +178,25 @@ end
     end
   end
 
-  EN_FUN = Headless_::Lib_::FUN_module[].new
+  NLP_EN_expression_agent_instance__ = Callback_.memoize do
 
-  module EN_FUN  # see [#086]
+    class NLP_EN_Expression_Agent_Instance__
+
+      alias_method :calculate, :instance_exec
+
+      methods = NLP_EN_Methods__.struct
+
+    private
+
+      [ :and_, :or_, :s, :nlp_last_length, :set_nlp_last_length ].each do | i |
+        define_method i, methods[ i ]
+      end
+
+      self
+    end.new
+  end
+
+  module NLP_EN_Methods__  # see [#086]
 
     class << self
 
@@ -172,125 +208,160 @@ end
         on_mod_via_iambic a.shift, a
       end
 
+      def each_pair & p
+        @struct.each_pair( & p )
+      end
+
       def on_mod_via_iambic mod, x_a
 
         case x_a.first
         when :private ; do_private = true
         when :public ; nil
-        else  ; raise ::ArgumentError, "public or private, not: '#{ x_a.first }'"
+        else ; raise ::ArgumentError, "public or private, not: '#{ x_a.first }'"
         end
 
         2 == x_a.length or raise ::ArgumentError, "#{ x_a.length } for 2"
 
         meth_i_a = [ * x_a.last, :nlp_last_length, :set_nlp_last_length ]
 
-        h = @h
+        o = @struct
+
         mod.module_exec do
           meth_i_a.each do |meth_i|
-            define_method meth_i, & h.fetch( meth_i )
+            define_method meth_i, o[ meth_i ]
           end
           do_private and private( * meth_i_a )
         end ; nil
       end
+
+      attr_reader :struct
     end
 
-    o = definer
+    -> do
 
-    bump_numerish = fun = nil
+      o = -> do
+        @i_a = [] ; @p_a = []
+        o_ = -> i, p do
+          @i_a.push i ; @p_a.push p ; nil
+        end
+        class << o_
+          alias_method :[]=, :call
+        end
+        o_
+      end.call
 
-    %i| an an_ |.each do |i|
-      o[ i ] = -> lemma, numerish=false do
+      bump_numerish = _EN = nil
+
+      %i| an an_ |.each do |i|
+        o[ i ] = -> lemma, numerish=false do
+          instance_exec numerish, -> nmrsh do
+            _EN[][ i ][ lemma, nmrsh ]
+          end, & bump_numerish
+        end
+      end
+
+      o[ :_non_one ] = -> numerish=nil do  # for nlp hacks, leading space iff not 1
         instance_exec numerish, -> nmrsh do
-          fun[][ i ][ lemma, nmrsh ]
+          " #{ nmrsh }" if 1 != nmrsh
         end, & bump_numerish
       end
-    end
 
-    o[:_non_one] = -> numerish=nil do  # for nlp hacks, leading space iff not 1
-      instance_exec numerish, -> nmrsh do
-        " #{ nmrsh }" if 1 != nmrsh
-      end, & bump_numerish
-    end
-
-    o[:s] = -> * args do  # [length] [lexeme_i]
-      len_x, lexeme_i = Headless_::Lib_::Parse_series[ args,
-        -> x { ! x.respond_to? :id2name }, # defer it
-        -> x { x.respond_to? :id2name } ]
-      lexeme_i ||= :s  # when `len_x` is nil it means "use memoized"
-      p = if :identity == lexeme_i
-        IDENTITY_
-      else
-        -> len_x_ do
-          fun[].s[ len_x_, lexeme_i ]
-        end
-      end
-      instance_exec len_x, p, & bump_numerish
-    end
-
-    bump_numerish = -> numerish_x, p do
-      if numerish_x
-        if numerish_x.respond_to? :length
-          numerish = numerish_x.length
+      o[ :s ] = -> * args do  # [length] [lexeme_i]
+        len_x, lexeme_i = Headless_::Lib_::Parse_series[ args,
+          -> x { ! x.respond_to? :id2name }, # defer it
+          -> x { x.respond_to? :id2name } ]
+        lexeme_i ||= :s  # when `len_x` is nil it means "use memoized"
+        p = if :identity == lexeme_i
+          IDENTITY_
         else
-          numerish = numerish_x
+          -> len_x_ do
+            _EN[].s len_x_, lexeme_i
+          end
         end
-        set_nlp_last_length numerish
-      elsif false == numerish_x
-        numerish = false
-      else
-        numerish = nlp_last_length
+        instance_exec len_x, p, & bump_numerish
       end
-      instance_exec numerish, & p
-    end
 
-    o[:nlp_last_length] = -> do
-      @nlp_last_length
-    end
-
-    o[:set_nlp_last_length] = -> x do   # (because to_struct creates getters
-      @nlp_last_length = x              # and setters for each of its methods
-    end                                 # you can't have your nerk end with '=')
-
-    memoize_length = -> p do
-      -> a do
-        set_nlp_last_length a.length
-        instance_exec a, &p
+      bump_numerish = -> numerish_x, p do
+        if numerish_x
+          if numerish_x.respond_to? :length
+            numerish = numerish_x.length
+          else
+            numerish = numerish_x
+          end
+          set_nlp_last_length numerish
+        elsif false == numerish_x
+          numerish = false
+        else
+          numerish = nlp_last_length
+        end
+        instance_exec numerish, & p
       end
-    end
 
-    o[:and_] = memoize_length[ -> a do
-      fun[].oxford_comma[ a, ' and ' ]
-    end ]
+      memoize_length = -> p do
+        -> a do
+          set_nlp_last_length a.length
+          instance_exec a, &p
+        end
+      end
 
-    o[:_and] = -> a do  # (when you want the leading space conditionally on etc)
-      x = self.and_ a
-      x and " #{ x }"
-    end
+      o[ :nlp_last_length ] = -> do
+        @nlp_last_length
+      end
 
-    o[ :indefinite_noun ] = -> do
-      Headless_::NLP::EN::POS.indefinite_noun
-    end
+      o[ :set_nlp_last_length ] = -> x do   # (because to_struct creates getters
+        @nlp_last_length = x              # and setters for each of its methods
+      end                                 # you can't have your nerk end with '=')
 
-    o[:or_] = memoize_length[ -> a do
-      fun[].oxford_comma[ a, ' or ' ]
-    end ]
+      o[ :_and ] = -> a do  # (when you want the leading space conditionally on etc)
+        x = and_ a
+        x and " #{ x }"
+      end
 
-    o[ :plural_noun ] = -> do
-      Headless_::NLP::EN::POS.plural_noun
-    end
+      o[ :and_ ] = memoize_length[ -> a do
+        And__[ a ]
+      end ]
 
-    o[:both] = memoize_length[ -> a do
-      fun[].both[ a ]
-    end ]
+      o[ :indefinite_noun ] = -> do
+        Headless_::NLP::EN::POS.indefinite_noun
+      end
 
-    fun = Headless_::Callback_.memoize do  # necessary because circular dependency
-      Headless_::NLP::EN::Minitesimal::FUN
-    end
+      o[ :or_ ] = memoize_length[ -> a do
+        Or__[ a ]
+      end ]
 
+      o[ :plural_noun ] = -> do
+        Headless_::NLP::EN::POS.plural_noun
+      end
+
+      o[ :both ] = memoize_length[ -> a do
+        _EN[].both a
+      end ]
+
+      bld_oxford_comma = -> sep do
+        p = -> a do
+          p = _EN[].oxford_comma.curry[ ', ', sep ]
+          p[ a ]
+        end
+        -> a do
+          p[ a ]
+        end
+      end
+
+      And__ = bld_oxford_comma[ ' and ' ]
+      Or__ = bld_oxford_comma[ ' or ' ]
+
+      _EN = Headless_::Callback_.memoize do  # necessary because circular dependency
+        Headless_::NLP::EN
+      end
+
+      @struct = ::Struct.new( * @i_a ).new( * @p_a )
+      @i_a = @p_a = nil
+
+    end.call
   end
 
   module InstanceMethods
-    EN_FUN.each_pair do |method_name, body|
+    NLP_EN_Methods__.each_pair do | method_name, body |
       define_method method_name, &body
       protected method_name  # #protected-not-private
     end

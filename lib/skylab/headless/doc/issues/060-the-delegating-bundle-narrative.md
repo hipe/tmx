@@ -54,7 +54,7 @@ kingdom of complexity you see before you.
 
 ### :#storypoint-025 an introduction to the shallow node
 
-the "shallow node" (`Headless::Delegating`) constitutes the implementation of
+the "shallow node" (`[hl] delegating`) constitutes the implementation of
 the 90% use-case for delegation in contemporary new code. primarily we see
 (and should see) this distribution limited to the short implementations of
 "client services" nodes and the like for reasons explained in the into.
@@ -126,7 +126,7 @@ we put under composition insomuch as all bundles have mutable syntax.
 this node specifically implements all of the 'delegating'-related needs not
 covered in the headles core node. the sub-facilities not covered there are
 specifically any of the facilities that are reached by providing iambic
-arguments to the brackets ("employement") method (`Headless::Delegating[..]`).
+arguments to the brackets ("employement") method ([hl]  delegating).
 
 we typically leverage the 'delegating' facility through the DSL methods
 `delegate` and `delegating` because by and large we use delegation when

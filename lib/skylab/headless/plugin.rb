@@ -9,7 +9,7 @@ module Skylab
         cls.include Host_Instance_Methods__ ; nil
       end
 
-      Callback = Headless::Library_::Callback
+      Callback = Headless_::Library_::Callback
 
       module Host_Module_Methods__
 
@@ -37,7 +37,7 @@ module Skylab
           shell = plugin_conduit_cls.new @y, self
           box_mod = plugin_box_module
           box_mod.constants.each do |const_i|
-            name = Callback::Name.from_const const_i
+            name = Callback_::Name.via_const const_i
             WHITE_SLUG_RX__ =~ name.as_slug or next
             cond = shell.curry name
             plugin = box_mod.const_get( name.as_const, false ).new cond
@@ -90,7 +90,7 @@ module Skylab
         end
 
         def init_option_parser_by_aggregating_plugin_options
-          @op = Headless::Library_::OptionParser.new
+          @op = Headless_::Library_::OptionParser.new
           write_plugin_host_option_parser_options  # :+#hook-out
           write_plugin_option_parser_options @op
           write_plugin_host_option_parser_help_option  # :+#hook-out

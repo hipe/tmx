@@ -1,13 +1,14 @@
 module Skylab::Headless
 
-  class IO::FU  # :[#157] FileUtils reconceived as a controller-like "agent"
+  class IO::FU__  # :[#157] FileUtils reconceived as a controller-like "agent"
     # that is by default verbose whose output is bound to the proc passed
     # in its construction. ('p' will receive each message string.)
 
-    include Headless::Library_::FileUtils
+    include Headless_::Library_::FileUtils
 
     def initialize *a, & p
-      @p = ( p ? a << p : a ).fetch( a.length - 1 << 1 )
+      p and a.push p
+      @p = a.fetch( a.length - 1 << 1 )
     end
 
     ::FileUtils.collect_method( :verbose ).each do | meth_i |

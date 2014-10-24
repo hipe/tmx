@@ -16,4 +16,4 @@
   here expressly adds anything to the CLI node "itself" except modules that
   define themselves into it. this is by design, to encourage modularity and
   indepence of the sub-node. we want this to act as a library more than a
-  framework.
+  framework.  :[#126]

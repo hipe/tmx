@@ -1,10 +1,10 @@
 require_relative '../test-support'
 
-module Skylab::Headless::TestSupport::IO::Interceptors
+module Skylab::Headless::TestSupport::IO::Mappers
 
   ::Skylab::Headless::TestSupport::IO[ self ]
 
-  include CONSTANTS # so we can say Headless_ inside the describe block
+  include Constants # so we can say Headless_ inside the describe block
 
   Headless_::Library_.const_get :StringIO, false
 

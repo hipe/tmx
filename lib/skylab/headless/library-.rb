@@ -5,7 +5,6 @@ module Skylab::Headless
     stdlib, sidesys = Autoloader_.at :require_stdlib, :require_sidesystem
 
     o = { }
-    o[ :Basic ] = sidesys
     o[ :CodeMolester ] = sidesys
     o[ :FileUtils ] = stdlib
     o[ :InformationTactics ] = o[ :MetaHell ] = sidesys
@@ -29,59 +28,99 @@ module Skylab::Headless
   end
 
   module Lib_
+
     sidesys = Autoloader_.build_require_sidesystem_proc
-    Brazen__ = sidesys[ :Brazen ]
+
+    Bsc__ = sidesys[ :Basic ]
+
+    Meso_box_lib = -> do
+      Bsc__[]::Box
+    end
+
+    Bzn__ = sidesys[ :Brazen ]
+
     Bundle = -> do
-      MetaHell__[]::Bundle
+      MH__[]::Bundle
     end
-    Properties_stack_frame = -> *a do
-      Brazen__[].properties_stack.common_frame.via_arglist a
-    end
+
     DSL_DSL = -> mod, p do
-      MetaHell__[]::DSL_DSL.enhance mod, &p
+      MH__[]::DSL_DSL.enhance mod, &p
     end
 
     Entity = -> * a do
       if a.length.zero?
-        Brazen__[]::Entity
+        Bzn__[]::Entity
       else
-        Brazen__[]::Entity.via_arglist a
+        Bzn__[]::Entity.via_arglist a
       end
     end
 
-    FUN_module = -> do
-      MetaHell__[]::FUN::Module
+    Enumerator_lib = -> do
+      Bsc__[]::Enumerator
     end
-    Formal_box = -> do
-      MetaHell__[]::Formal::Box
+
+    Event_lib = -> do
+      Bzn__[].event
     end
-    Function_class = -> do
-      MetaHell__[]::Function::Class
-    end
+
     Funcy_globful = -> cls do
-      MetaHell__[].funcy_globful cls
+      MH__[].funcy_globful cls
     end
-    MetaHell__ = sidesys[ :MetaHell ]
-    Module_resolve = -> path_s, mod do
-      MetaHell__[]::Module::Resolve[ path_s, mod ]
+
+    IT__ = sidesys[ :InformationTactics ]
+
+    Ivars_with_procs_as_methods = -> * a do
+      MH__[]::Ivars_with_Procs_as_Methods.via_arglist a
     end
+
+    Levenshtein = -> do
+      IT__[]::Levenshtein
+    end
+
+    List_lib = -> do
+      Bsc__[]::List
+    end
+
+    MH__ = sidesys[ :MetaHell ]
+
+    Method_lib = -> do
+      Bsc__[]::Method
+    end
+
+    Module_lib = -> do
+      Bsc__[]::Module
+    end
+
+    Old_box_lib = -> do
+      MH__[]::Formal::Box
+    end
+
     Parse_series = -> * a do
-      MetaHell__[]::Parse.series.via_arglist a
+      MH__[]::Parse.series.via_arglist a
     end
+
+    Properties_stack_frame = -> *a do
+      Bzn__[].properties_stack.common_frame.via_arglist a
+    end
+
     Pool = -> do
-      MetaHell__[]::Pool
+      MH__[]::Pool
     end
-    Private_attr_reader = -> do
-      MetaHell__[]::FUN.private_attr_reader
+
+    Proxy_lib = -> do
+      Callback_::Proxy
     end
-    Proxy_tee = -> do
-      Callback_::Proxy::Tee
-    end
+
     Reasonably_short = -> do
-      MetaHell__[].strange::A_REASONABLY_SHORT_LENGTH_FOR_A_STRING
+      MH__[].strange::A_REASONABLY_SHORT_LENGTH_FOR_A_STRING
     end
+
     Strange = -> x do
-      MetaHell__[].strange x
+      MH__[].strange x
+    end
+
+    String_lib = -> do
+      Bsc__[]::String
     end
   end
 end

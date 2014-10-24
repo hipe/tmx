@@ -1,6 +1,6 @@
 module Skylab::Headless::TestSupport
 
-  class IO_Adapter_Spy < TestLib_::Callback_test_support[]::Call_Digraph_Listeners_Spy
+  class IO_Adapter_Spy < TestLib_::Callback_test_support[].call_digraph_listeners_spy
 
     # Used (at the time of this writing ouside of this product) for doing
     # call_digraph_listeners-spy-style testing of our all-important IO::Adapter, which is like

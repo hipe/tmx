@@ -5,7 +5,7 @@ module Skylab::Headless::TestSupport
     # use for call_digraph_listeners-spy-style testing of application code (e.g controllers)
     # in a *generic* (modality agnostic) way
 
-    include CONSTANTS
+    include Constants
     include Headless_::Client::InstanceMethods
 
     USE_THIS_PEN = nil
@@ -72,8 +72,9 @@ module Skylab::Headless::TestSupport
     # ok sure, if you really need it
     attr_accessor :normalized_invocation_string
 
-    USE_THIS_PEN = -> {Headless_::CLI::Pen::MINIMAL }
-
+    USE_THIS_PEN = -> do
+      Headless_::CLI.pen.minimal_instance
+    end
 
     def initialize pen=nil
       @use_this_pen = pen

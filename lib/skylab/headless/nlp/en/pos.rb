@@ -53,9 +53,10 @@ module Skylab::Headless
     def self.grammatical_categories h
 
       @category_box ||= begin
-        @form_box     = Headless_::Lib_::Formal_box[]::Open.new
-        @exponent_box = Headless_::Lib_::Formal_box[]::Open.new
-                        Headless_::Lib_::Formal_box[]::Open.new  # NOTE look.
+        cls = Headless_::Lib_::Old_box_lib[].open_box
+        @form_box = cls.new
+        @exponent_box = cls.new
+        cls.new  # eew
       end
 
       h.each do |cat_sym, exponent_a|
@@ -83,7 +84,7 @@ module Skylab::Headless
         nil
       end
 
-      @box = Headless_::Lib_::Formal_box[]::Open.new
+      @box = Headless_::Lib_::Old_box_lib[].open_box.new
 
       class << self
         attr_reader :box
@@ -317,7 +318,7 @@ module Skylab::Headless
 
     # (watch for similarities with `self.as`)
     def add_irregular_forms form_h
-      @irregular_box ||= Headless_::Lib_::Formal_box[]::Open.new if form_h.any?
+      @irregular_box ||= Headless_::Lib_::Old_box_lib[].open_box.new if form_h.any?
       form_h.each do |combination_x, surface_form|
         c = self.class.build_immutable_combination combination_x
         instance_variable_set c.ivar,  # allow nils
@@ -388,8 +389,8 @@ module Skylab::Headless
 
       def initialize pos_class
         @pos_class = pos_class
-        @monadic_form_box = Headless_::Lib_::Formal_box[]::Open.new
-        @monadic_lemma_box = Headless_::Lib_::Formal_box[]::Open.new
+        @monadic_form_box = Headless_::Lib_::Old_box_lib[].open_box.new
+        @monadic_lemma_box = Headless_::Lib_::Old_box_lib[].open_box.new
         @last_lemmaless_id = 0
       end
       private :initialize
@@ -793,7 +794,7 @@ module Skylab::Headless
         end.call
         ea << self
         membership_st =
-          parts.unshift(part).reduce Headless_::Lib_::Formal_box[]::Open.new do |bx, x|
+          parts.unshift(part).reduce Headless_::Lib_::Old_box_lib[].open_box.new do |bx, x|
             bx.add x, Membership_.new( x, NLP::EN::POS.abbrev_box.fetch( x ) )
             bx
           end.to_struct
@@ -867,7 +868,7 @@ module Skylab::Headless
     def string
       y = [ ]
       render y
-      y * ' '  # meh for now, 2x [#068]
+      y * SPACE_  # meh for now, 2x [#068]
     end
 
     def parts
@@ -1057,7 +1058,7 @@ module Skylab::Headless
     )
 
     def indefinite_singular  # hacked for now, not integrated
-      "#{ NLP::EN::Minitesimal::An_[ @lemma ] }#{ @lemma }"
+      "#{ NLP::EN.an @lemma }#{ @lemma }"
     end
 
     as :singular do

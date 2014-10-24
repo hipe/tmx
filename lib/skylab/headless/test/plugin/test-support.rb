@@ -4,7 +4,7 @@ module Skylab::Headless::TestSupport::Plugin
 
   ::Skylab::Headless::TestSupport[ TS__ = self ]
 
-  include CONSTANTS
+  include Constants
 
   Headless_ = Headless_
   Callback = Headless_::Library_::Callback

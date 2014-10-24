@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::Headless::TestSupport::IO::Interceptors
+module Skylab::Headless::TestSupport::IO::Mappers
 
   describe "[hl] IO interceptors filter" do
 
@@ -8,7 +8,7 @@ module Skylab::Headless::TestSupport::IO::Interceptors
 
       it "leaves brittany alone" do
         downstream = ::StringIO.new
-        stream = Headless_::IO::Interceptors::Filter.new(downstream)
+        stream = Headless_::IO::Mappers::Filter.new(downstream)
         stream.write('a')
         downstream.string.should eql('a')
         stream.puts('b')
@@ -19,7 +19,7 @@ module Skylab::Headless::TestSupport::IO::Interceptors
     context "with a line boundary event handler" do
       let(:downstream) { ::StringIO.new }
       let(:stream) do
-        o = Headless_::IO::Interceptors::Filter.new(
+        o = Headless_::IO::Mappers::Filter.new(
           :downstream_IO, downstream,
           :line_begin_proc, -> do
             o.downstream_IO.write 'Z '
@@ -56,7 +56,7 @@ module Skylab::Headless::TestSupport::IO::Interceptors
     context "with a puts filter" do
       it "works with one filter" do
         downstream = ::StringIO.new
-        stream = Headless_::IO::Interceptors::Filter.new(
+        stream = Headless_::IO::Mappers::Filter.new(
           :downstream_IO, downstream,
           :puts_map_proc, -> x do
             "  << epic: #{ x } >>\n"

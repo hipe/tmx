@@ -10,23 +10,40 @@ end
 
 module Skylab::Headless  # ([#013] is reserved for a core node narrative - no storypoints yet)
 
+  class << self
+
+    def expression_agent
+      Headless_::SubClient.expression_agent
+    end
+
+    def system
+      @system ||= Headless_::System__::Front.new
+    end
+  end
+
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
+  COLON_ = ':'.freeze
+  CONST_SEP_ = '::'.freeze
   DASH_ = '-'.getbyte 0
-  EMPTY_STRING_ = ''.freeze
   EMPTY_A_ = [].freeze
-  Headless = self
+  EMPTY_P_ = -> {}
+  EMPTY_S_ = ''.freeze
   Headless_ = self
   IDENTITY_ = -> x { x }
   stowaway :Lib_, 'library-'
   LINE_SEPARATOR_STRING_ = "\n".freeze
+  MONADIC_EMPTINESS_ = -> _ {}
   MONADIC_TRUTH_ = -> _ { true }
+  NEWLINE_ = LINE_SEPARATOR_STRING_
   NILADIC_TRUTH_ = -> { true }
+  READ_MODE_ = 'r'.freeze
   Scn_ = Scn = Callback_::Scn
-  TERM_SEPARATOR_STRING_ = ' '.freeze
+  SPACE_ = ' '.freeze
+  TERM_SEPARATOR_STRING_ = SPACE_
   WRITEMODE_ = 'w'.freeze
 
 end

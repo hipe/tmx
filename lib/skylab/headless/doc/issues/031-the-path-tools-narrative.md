@@ -3,7 +3,7 @@
 
 ## :#the-issue-with-pretty-path-and-caching
 
-pretty_path is designed to scale well to a large number of filepaths scrolling
+`pretty_path` is designed to scale to a large number of filepaths scrolling
 by, possibly thousands. it generates regexen to match paths that contain `pwd`
 and `$HOME` at their heads. to read the value of `pwd` and build a regex anew
 each time it needs to prettify a path does not scale well to large numbers of
@@ -20,4 +20,4 @@ that the current working directory changes and the time that they use
 
 (if the above is a showstopper, the below can be pretty easily bent
 to for example take a boolean "clear cache" flag parameter
-to pretty_path) ..
+to `pretty_path`) ..

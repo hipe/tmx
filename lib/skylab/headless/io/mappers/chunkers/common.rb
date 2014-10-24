@@ -2,61 +2,60 @@ module Skylab::Headless
 
   module IO
 
-  module Interceptors
+    module Mappers
 
-  class Chunker
+      module Chunkers
 
-    # chunker - scan each write of data and call_digraph_listeners it in chunks based on separator
+        class Common
 
-    def flush  # send any remaining data. any data in the buffer got there
-      # through write and so is "guaranteed" not to have newlines.
-      string = flush_both
-      if string.length.nonzero?
-        @scn.string = EMPTY_STRING_
-        @func[ string ]
+          # map reduce/expand upstream chunks of data into downstream lines
+
+          def initialize p
+            @buffer = Headless_::Library_::StringIO.new
+            @p = p
+            @scn = Headless_::Library_::StringScanner.new EMPTY_S_
+            @separator = NEWLINE_
+            @separator_rx = /#{ ::Regexp.escape @separator }/
+          end
+
+          def write data
+            @buffer.write data
+            if @buffer.string.index @separator
+              flush_buffer
+            end
+            nil
+          end
+
+          def flush  # send any remaining data. any data in the buffer got there
+            # through write and so is "guaranteed" not to have newlines.
+            s = flush_both
+            if s.length.nonzero?
+              @scn.string = EMPTY_S_
+              @p[ s ]
+            end
+            nil
+          end
+
+        private
+
+          def flush_buffer
+            @scn.string = flush_both
+            line = @scn.scan_until @separator_rx
+            begin
+              @p[ line ]
+              line = @scn.scan_until @separator_rx
+            end while line
+            nil
+          end
+
+          def flush_both
+            s = "#{ @scn.rest }#{ @buffer.string }"
+            @buffer.rewind
+            @buffer.truncate 0
+            s
+          end
+        end
       end
-      nil
     end
-
-    def write data
-      @buffer.write data
-      if @buffer.string.index @separator
-        flush_buffer
-      end
-      nil
-    end
-
-  private
-
-    def initialize func
-      @buffer = Headless::Library_::StringIO.new
-      @separator = "\n"
-      @separator_rx = /#{ ::Regexp.escape @separator }/
-      @scn = Headless::Library_::StringScanner.new EMPTY_STRING_
-      @func = func
-    end
-
-    def flush_both
-      string = "#{ @scn.rest }#{ @buffer.string }"
-      @buffer.rewind
-      @buffer.truncate 0
-      string
-    end
-                                               # you are here because there
-                                               # is a separator in the nerk
-    def flush_buffer
-      @scn.string = flush_both
-      line = @scn.scan_until @separator_rx
-      begin
-        @func[ line ]
-        line = @scn.scan_until @separator_rx
-      end while line
-      nil
-    end
-  end
-
-    Interceptors_ = self
-
-  end
   end
 end

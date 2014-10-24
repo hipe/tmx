@@ -2,11 +2,30 @@ module Skylab::Headless
 
   module API  # read [#017] the API node narrative (was (historical) [#010])
 
-    def self.[] mod, * x_a
-      Bundles__.apply_iambic_on_client x_a, mod ; nil
+    class << self
+
+      def [] mod, * x_a
+        via_client_and_iambic mod, x_a
+      end
+
+      def iambic_builder cls
+        Iambic_builder[ cls ] ; nil
+      end
+
+      def simple_monadic_iambic_writers mod, * i_a
+        Simple_monadic_iambic_writers.via_client_and_iambic mod, i_a
+      end
+
+      def via_arglist x_a
+        via_client_and_iambic x_a.shift, x_a
+      end
+
+      def via_client_and_iambic mod, x_a
+        Bundles__.apply_iambic_on_client x_a, mod ; nil
+      end
     end
 
-    Headless.const_get :Library_, false
+    Headless_.const_get :Library_, false
 
     module Bundles__
       # ~ in dependency order!
@@ -34,7 +53,7 @@ module Skylab::Headless
       x.respond_to? :dir_pathname and x.dir_pathname
     end
     Rslv_Dpn__ = -> do  # #storypoint-25
-      parent = Headless_::Lib_::Module_resolve[ '..', self ]
+      parent = Headless_::Lib_::Module_lib[].value_via_relative_path self, '..'
       parent and Has_dpn__[ parent ] or fail "no support for toplevel modules"
       Autoloader_[ self ] ; nil
     end
@@ -119,8 +138,19 @@ module Skylab::Headless
 
     module Simple_monadic_iambic_writers  # :[#130].
 
-      def self.[] mod, * i_a
-        mod.module_exec i_a, & Bundle__
+      class << self
+
+        def [] * x_a
+          via_arglist x_a
+        end
+
+        def via_arglist x_a
+          via_client_and_iambic x_a.shift, x_a
+        end
+
+        def via_client_and_iambic mod, i_a
+          mod.module_exec i_a, & Bundle__
+        end
       end
 
       Bundle__ = -> i_a do
@@ -543,13 +573,21 @@ module Skylab::Headless
       end
       #
       Say_fetch_param_name_er__ = -> param_i do
+
         inspect_p = Headless_::Lib_::Strange
-        _member_i_a = const_get CONST_A__
-        _phrase = Headless::NLP::EN::Levenshtein::
-          With_conj_s_render_p_closest_n_items_a_item_x[ ' or ',
-            inspect_p, A_FEW__, _member_i_a, param_i ]
+
+        _phrase = Headless_::Lib_::Levenshtein[].with(
+          :item, param_i,
+          :closest_N_items, A_FEW__,
+          :items, const_get( CONST_A__ ),
+          :aggregation_proc, -> a do
+            a * ' or '
+          end,
+          :item_proc, inspect_p )
+
         _rmeth_i = const_get RMETH_
-        _n = Headless::Name::FUN::Naturalize[ _rmeth_i ]
+
+        _n = Headless_::Name.naturalize _rmeth_i
         "there is no such #{ _n } #{ inspect_p[ param_i ] } - #{
           }did you mean #{ _phrase }?"
       end
@@ -558,7 +596,7 @@ module Skylab::Headless
       Get_box__ = -> do
         a = const_get CONST_A__ ; h = const_get CONST_H__
         h_ = ::Hash[ a.map { |i| [ i, send( h[ i ] ) ] } ]
-        Library_::Basic::Box.from_a_and_h a, h_
+        Headless_::Lib_::Meso_box_lib[].from_a_and_h a, h_
       end
 
       Get_scanner__ = -> do
@@ -656,7 +694,7 @@ module Skylab::Headless
       end
     private
       def rslv_errstream
-        @errstream ||= Headless::System::IO.some_stderr_IO ; nil
+        @errstream ||= Headless_.system.IO.some_stderr_IO ; nil
       end
       def rslv_unbound_action_box
         @unbound_action_box ||= self.class::API_MODULE::Actions
@@ -733,7 +771,7 @@ module Skylab::Headless
           @name_function ||= bld_name_function
         end
         def bld_name_function
-          Headless::Name::Function::From::Constant.from_name name
+          Headless_::Name.via_const.via_module_name name
         end
       end
     end

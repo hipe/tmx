@@ -1,13 +1,13 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::Headless::TestSupport::NLP
+module Skylab::Headless::TestSupport::NLP::EN
 
   # visual-test only! see also unit tests
-  fun = Headless_::NLP::EN::Number::FUN
+  fun = Headless_::NLP::EN::Number
   number = fun.number
   num2ord = fun.num2ord
   method = nil
-  stderr = Stderr_[]
+  stderr = TestSupport_.debug_IO
   print = ->(x) { stderr.puts("#{'%9d' % [x]}:-->#{ method[ x ] }<--") }
   [
     ->(x) { number[ x ] },

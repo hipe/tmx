@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module ::Skylab::Headless::TestSupport::SubClient
+module Skylab::Headless::TestSupport::SubClient
 
   describe "[hl] sub-client NLP" do
 

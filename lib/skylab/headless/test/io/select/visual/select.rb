@@ -2,7 +2,7 @@
 
 require_relative '../test-support'
 
-module Skylab::Headless::TestSupport::IO::Upstream::Select
+module Skylab::Headless::TestSupport::IO::Select
 
   stderr = ::Skylab::TestSupport.debug_IO
 
@@ -10,7 +10,7 @@ module Skylab::Headless::TestSupport::IO::Upstream::Select
 
   Headless_::Library_::FileUtils.cd from_dir, verbose: true do
 
-    select = Headless_::IO::Upstream::Select.new
+    select = Headless_::IO.select.new
     select.timeout_seconds = 0.3
 
     Headless_::Library_::Open4.open4 'sh' do |pid, sin, sout, serr|

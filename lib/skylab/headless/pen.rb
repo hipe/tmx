@@ -51,7 +51,7 @@ module Skylab::Headless
 
     alias_method :calculate, :instance_exec
 
-    Headless::SubClient::EN_FUN[ self, :private, %i( s ) ]
+    Headless_.expression_agent.NLP_EN_methods[ self, :private, [ :s ] ]
 
   end
 

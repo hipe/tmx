@@ -1,27 +1,32 @@
-module Skylab::Basic
+module Skylab::Headless
 
-  class List::Scanner
+  module IO
 
-    For::Read = Basic::Lib_::Functional_methods[ :count, :gets, :line_number ]
-    class For::Read
+    Line_Scanner__ = Headless_::Lib_::Ivars_with_procs_as_methods[].new :count, :gets, :line_number
 
-      MAXLEN__ = 4096  # 2**12, or the number of bytes in about 50 lines
+    class Line_Scanner__  # read [#164]
 
-      # read [#004] (in [#022]) the scanner for read narrative
-
-      def initialize fh, maxlen=MAXLEN__
-        buffer = '' ; buffer_is_loaded = nil ; count = 0 ; gets = scn = nil
+      def initialize fh, maxlen=nil
+        maxlen ||= MAXLEN_
+        buffer = ''
+        buffer_is_loaded = nil
+        count = 0
+        gets = scn = nil
         advance_scanner = -> do
-          scn = Basic::Lib_::String_scanner[ buffer ]
+          scn = Headless_::Library_::StringScanner.new buffer
           advance_scanner = -> do
             scn.string = buffer ; nil
           end ; nil
         end
         advance = -> do
-          advance_scanner[] ; buffer = '' ;  buffer_is_loaded = true
+          advance_scanner[]
+          buffer = ''
+          buffer_is_loaded = true
         end
         finish = -> do
-          gets = EMPTY_P_ ; fh.close ; false
+          gets = EMPTY_P_
+          fh.close
+          false
         end
         load_buffer = -> do
           buffer_ = fh.read maxlen, buffer
@@ -38,10 +43,10 @@ module Skylab::Basic
         gets = -> do
           begin
             buffer_is_loaded or load_buffer[] or break
-            line_part = scn.scan LINE_RX_
+            line_part = scn.scan LINE_RX__
             line_part or next( buffer_is_loaded = false )
             absorb_line_part[ line_part ]
-            line_part.include? NEWLINE_SEQUENCE__ and break( count += 1 )
+            line_part.include? NEWLINE_ and break( count += 1 )
           end while true
           r = current_line ; current_line = nil ; r
         end
@@ -61,7 +66,8 @@ module Skylab::Basic
 
       attr_reader :fh, :pathname
 
-      NEWLINE_SEQUENCE__ = "\n".freeze
+      LINE_RX__ = Headless_::Lib_::String_lib[].regex_for_line_scanning
+
     end
   end
 end

@@ -1,16 +1,18 @@
 require_relative 'test-support'
 
-describe 'If you have an object "object" that has a ' <<
-  "#{::Skylab::Headless::Parameter} \"foo\"" do
+describe "[hl] parameter builder - with an object w/ param 'foo'" do
+
+  # (no quickie because nested `before`)
 
   extend ::Skylab::Headless::TestSupport::Parameter
+
   context 'and "foo" has the property of e.g. "builder: :foo_p"' do
     with do
       param :roland_808, builder: :roland_808_p
       attr_accessor :roland_808_p
     end
     frame do
-      before do
+      before :each do
         @num_times = 0
         object.roland_808_p = -> { "lawrence fishburne #{@num_times += 1}" }
       end
@@ -28,7 +30,7 @@ describe 'If you have an object "object" that has a ' <<
         end
       end
       context 'but when the parameter value is trueish' do
-        before do
+        before :each do
           object.send(:[]=, :roland_808, :tha_synth)
         end
         it '"object.foo" will not call the builder proc ' do

@@ -1,5 +1,7 @@
 require_relative 'test-support'
 
+::Skylab::Headless::TestSupport::TestSupport_::Quickie.enable_kernel_describe
+
 describe "[hl] parameter reader-writer-accesor (with param 'foo'..)" do
 
   extend ::Skylab::Headless::TestSupport::Parameter

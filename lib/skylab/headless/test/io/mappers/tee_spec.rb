@@ -1,13 +1,13 @@
 require_relative 'test-support'
 
-module Skylab::Headless::TestSupport::IO::Interceptors
+module Skylab::Headless::TestSupport::IO::Mappers
 
   describe "[hl] IO interceptors tee" do
 
     context "with 2 downstreams" do
 
       it "dispatches the message out to both" do
-        tee = Headless_::IO::Interceptors::Tee.new
+        tee = Headless_::IO::Mappers::Tee.new
         tee[:foo] = ::StringIO.new
         tee[:bar] = ::StringIO.new
         tee.write('a')
@@ -20,13 +20,13 @@ module Skylab::Headless::TestSupport::IO::Interceptors
 
     context "with 0 downstreams" do
       it "does nothing" do
-        tee = Headless_::IO::Interceptors::Tee.new
+        tee = Headless_::IO::Mappers::Tee.new
         tee.write('a')
       end
     end
 
     it "responds to respond_to? appropriately (based on the list)" do
-      tee = Headless_::IO::Interceptors::Tee.new
+      tee = Headless_::IO::Mappers::Tee.new
       tee.respond_to?( :foo ).should eql false
       tee.respond_to?( :puts ).should eql true
     end

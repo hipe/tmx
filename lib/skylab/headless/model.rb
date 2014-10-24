@@ -26,7 +26,8 @@ module Skylab::Headless
   module Model::Event::ModuleMethods
 
     def name_function
-      @nf ||= Headless::Name::From::Module_Anchored self, self::EVENTS_ANCHOR_MODULE
+      @nf ||= Headless_::Name.via_module_name_anchored_in_module_name(
+        self, self::EVENTS_ANCHOR_MODULE )
     end
 
     def event_anchored_normal_name

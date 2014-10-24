@@ -11,7 +11,7 @@ digraph {
     learn_c [label="learn C somehow"]
 */
 
-label="Headless Now"
+label="[hl] Now"
 
 #                 blue : fillcolor="#b5d5fb"
 #                 done : finished
