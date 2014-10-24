@@ -1,4 +1,4 @@
-require_relative 'common-frame--/test-support'
+require_relative 'common-frame/test-support'
 
 module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__
 

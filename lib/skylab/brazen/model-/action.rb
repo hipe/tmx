@@ -30,7 +30,8 @@ module Skylab::Brazen
             Node_Identifier_.via_symbol i
           end
         else
-          model_class.preconditions
+          mc = model_class
+          mc and mc.preconditions
         end
         true
       end
@@ -145,7 +146,7 @@ module Skylab::Brazen
     end
 
     def prdc_bound_call_when_preconditions_are_met
-      Brazen_.bound_call self, :produce_any_result
+      Brazen_.bound_call nil, self, :produce_any_result
     end
 
   public
@@ -184,7 +185,7 @@ module Skylab::Brazen
     end
 
     def get_actual_argument_scan
-      Scan_[].nonsparse_array( self.class.properties.get_names ).map_by do |i|
+      Scan_[].via_nonsparse_array( self.class.properties.get_names ).map_by do |i|
         Actual_Property_.new any_argument_value( i ), i
       end
     end
@@ -222,6 +223,14 @@ module Skylab::Brazen
     attr_reader :event_receiver_is_modality_adapter
 
   private
+
+    def primary_box
+      @argument_box
+    end
+
+    def any_secondary_box  # #todo - this is during development only. in future result in nil
+      Callback_::Box.the_empty_box
+    end
 
     def actual_property_box
       @argument_box

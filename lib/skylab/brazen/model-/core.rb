@@ -6,12 +6,20 @@ module Skylab::Brazen
 
       class << self
 
+        def action_class
+          Model_::Action
+        end
+
         def actual_property
           Actual_Property_
         end
 
         def collection_controller
           Collection_Controller_
+        end
+
+        def name_function_class
+          Model_Name_Function_
         end
 
         def retrieve_methods
@@ -263,14 +271,14 @@ module Skylab::Brazen
     end
 
     def to_normalized_actual_property_scan
-      Scan_[].nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
+      Scan_[].via_nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
         Actual_Property_.new any_property_value( i ), i
       end
     end
 
     def to_normalized_bound_property_scan
       props = self.class.properties
-      Scan_[].nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
+      Scan_[].via_nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
         get_bound_property_via_property props.fetch i
       end
     end
@@ -386,17 +394,17 @@ module Skylab::Brazen
 
       def get_upper_action_cls_scan
         @did ||= work
-        Scan_[].nonsparse_array @up_a
+        Scan_[].via_nonsparse_array @up_a
       end
 
       def get_lower_action_cls_scan
         @did ||= work
-        Scan_[].nonsparse_array @down_a
+        Scan_[].via_nonsparse_array @down_a
       end
 
       def get_node_scan
         @did ||= work
-        Scan_[].nonsparse_array @all_a
+        Scan_[].via_nonsparse_array @all_a
       end
 
       def all_a
@@ -411,6 +419,10 @@ module Skylab::Brazen
         @all_a = [] ; @up_a = [] ; @down_a = []
         i_a.each do |i|
           cls = @mod.const_get i, false
+          if ! cls.respond_to? :name
+            cls = try_convert_to_node_like_via_mixed cls, i
+            cls or next
+          end
           @all_a.push cls
           if cls.is_actionable
             if cls.is_promoted
@@ -424,6 +436,12 @@ module Skylab::Brazen
           @up_a.push @cls
         end
         DONE_
+      end
+
+      def try_convert_to_node_like_via_mixed x, i
+        if x.respond_to? :call
+          Model_::Node_via_Proc._DO_ME_like_an_action x, i
+        end
       end
     end
 
@@ -556,14 +574,6 @@ module Skylab::Brazen
       self
     end
 
-    def set_any_bound_call_for_edit_result x, *a
-      if a.length.zero?
-        @any_bound_call_for_edit_result = x
-      else
-        @any_bound_call_for_edit_result = Brazen_.bound_call( x, * a )
-      end ; nil
-    end
-
   public
 
     # ~ create
@@ -649,6 +659,14 @@ module Skylab::Brazen
 
     def actual_property_box
       @property_box
+    end
+
+    def primary_box
+      @property_box
+    end
+
+    def any_secondary_box
+      @parameter_box
     end
 
     def silo

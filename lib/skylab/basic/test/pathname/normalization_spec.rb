@@ -6,7 +6,7 @@ module Skylab::Brazen::TestSupport::Model::Entity::Normalizers::FSP
 
   Parent_[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

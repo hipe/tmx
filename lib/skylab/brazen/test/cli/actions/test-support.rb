@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
 
   ::Skylab::Brazen::TestSupport::CLI[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

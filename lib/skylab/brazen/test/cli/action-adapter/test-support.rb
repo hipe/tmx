@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
 
   ::Skylab::Brazen::TestSupport::CLI[ T_S__ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
@@ -24,9 +24,9 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
   module InstanceMethods
 
     def with * x_a
-      @parse = Brazen_::CLI::Action_Adapter_::Arguments.
-        new x_a, arg_a
-      @result = @parse.execute
+      _n11n = Brazen_::CLI::Action_Adapter_::Arguments.normalization arg_a
+      @normalization = _n11n.with_x x_a
+      @result = @normalization.execute
     end
 
     def expect_failure event_channel_i, x_i
@@ -43,7 +43,7 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
     end
 
     def expect_success * x_a
-      a = @parse.release_result_iambic
+      a = @normalization.release_result_iambic
       a.should eql x_a
     end
   end

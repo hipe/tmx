@@ -19,11 +19,22 @@ module Skylab::Brazen
         attr_reader :ev
 
         def inflected_verb
-          @nf.inflected_verb
+          if @nf.respond_to? :inflected_verb
+            @nf.inflected_verb
+          else
+            @nf.as_human
+          end
         end
 
         def inflected_noun
-          @nf.inflected_noun
+          if @nf.respond_to? :inflected_noun
+            @nf.inflected_noun
+          else
+            prnt = @nf.parent
+            if prnt
+              @nf.as_human
+            end
+          end
         end
 
         def to_event

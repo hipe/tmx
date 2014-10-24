@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable
 
   ::Skylab::Brazen::TestSupport::Data_Stores_::Git_Config[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

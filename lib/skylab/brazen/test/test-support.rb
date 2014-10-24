@@ -3,6 +3,13 @@ require 'skylab/test-support/core'
 
 module Skylab::Brazen::TestSupport
 
+  class << self
+
+    def expect_event x
+      Brazen_::TestSupport::Expect_Event[ x ]
+    end
+  end
+
   TestSupport_ = ::Skylab::TestSupport
 
   TestSupport_::Regret[ TS_ = self ]
@@ -11,7 +18,7 @@ module Skylab::Brazen::TestSupport
 
   TestLib_ = ::Module.new
 
-  module CONSTANTS
+  module Constants
     Brazen_ = Brazen_
     EMPTY_S_ = ''.freeze
     Entity_ = Brazen_::Entity_
@@ -52,9 +59,9 @@ module Skylab::Brazen::TestSupport
     end
 
     Tmpdir = memoize[ -> do
-      o = Brazen_::Lib_::HL__[]
-      o::IO::Filesystem::Tmpdir.new(
-        o::System.defaults.dev_tmpdir_pathname.join( 'brzn' ).to_path )
+      sys = Brazen_::Lib_::System[]
+      _path = sys.defaults.dev_tmpdir_pathname.join( 'brzn' ).to_path
+      sys.filesystem.tmpdir :path, _path
     end ]
 
   end

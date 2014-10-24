@@ -6,6 +6,12 @@ module Skylab::Brazen
 
       class Normalizers__::Numeric < Model_::Entity::Normalizer_
 
+        class << self
+          def instance
+            @inst ||= new
+          end
+        end
+
         Callback_::Actor[ self, :properties,
           :argument,
           :OK_value_p,

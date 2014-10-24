@@ -178,7 +178,7 @@ module Skylab::Brazen
 
         def integer_greater_than_or_equal_to=
 
-          normalizer = Model_::Entity.normalizers.numeric(
+          normalizer = Model_::Entity.normalizers.number(
             :number_set, :integer,
             :minimum, iambic_property )
 
@@ -191,7 +191,7 @@ module Skylab::Brazen
 
         def non_negative_integer=
 
-          normalizer = Model_::Entity.normalizers.numeric(
+          normalizer = Model_::Entity.normalizers.number(
             :number_set, :integer,
             :minimum, 0 )
 
@@ -212,12 +212,13 @@ module Skylab::Brazen
   module Entity
 
     class << self
+
       def normalizers
-        Normalizers___[]
+        Brazen_::Lib_::Bsc_[].normalizers
       end
 
       def trio
-        Trio__
+        Brazen_::Lib_::Trio[]
       end
     end
 
@@ -272,7 +273,7 @@ module Skylab::Brazen
     attr_accessor :began_checking_for_missing_required_props
 
     def check_for_missing_required_props
-      miss_a = Scan_[].nonsparse_array( self.class.required_properties ).
+      miss_a = Scan_[].via_nonsparse_array( self.class.required_properties ).
         map_reduce_by do |prop|
           arg = get_bound_property_via_property prop
           if argument_is_missing arg
@@ -297,34 +298,6 @@ module Skylab::Brazen
       end
     end
 
-    def get_bound_property name_i
-      get_bound_property_via_property self.class.properties.fetch name_i
-    end
-
-  private
-
-    def get_bound_property_via_property prop
-      had = true
-      x = actual_property_box.fetch prop.name_i do
-        had = false ; nil
-      end
-      Trio__.new x, had, prop
-    end
-
-    class Trio__
-
-      def initialize * a
-        @value_x, @actuals_has_name, @property = a
-        freeze
-      end
-
-      attr_reader :value_x, :actuals_has_name, :property
-
-      def name_i
-        @property.name_i
-      end
-    end
-
     def argument_is_missing arg
       if arg.actuals_has_name
         x = arg.value_x
@@ -339,15 +312,7 @@ module Skylab::Brazen
     end
 
     def whine_about_missing_reqd_props miss_a
-      _ev = build_not_OK_event_with :missing_required_properties,
-          :miss_a, miss_a,
-          :error_category, :argument_error do |y, o|
-        s_a = o.miss_a.map do |prop|
-          par prop
-        end
-        y << "missing required propert#{ 1 == s_a.length ? 'y' : 'ies' } #{
-          }#{ s_a * ' and ' }"
-      end
+      _ev = Brazen_::Entity.properties_stack.build_missing_required_properties_event( miss_a )
       receive_missing_required_properties _ev
     end
 
@@ -362,25 +327,34 @@ module Skylab::Brazen
 
     # ~
 
-    def via_properties_init_ivars
+    def via_properties_init_ivars  # #note-360
       formal = self.class.properties
       scn = formal.to_scan
+
+      stack = Brazen_::Entity.properties_stack.new nil, formal.get_names  # could pass evr
+      bx = any_secondary_box
+      bx and stack.push_frame_via_box bx
+      stack.push_frame_via_box primary_box
+
       while prop = scn.gets
         i = prop.name_i
-        x = if @property_box.has_name i
-          @property_box.fetch i
-        elsif @parameter_box.has_name i
-          @parameter_box.fetch i
-        else
-          nil
+        pptr = stack.any_proprietor_of i
+        x = if pptr
+          pptr.property_value i
         end
         ivar = prop.as_ivar
-        if instance_variable_defined? ivar
-          x = instance_variable_get ivar
-          x.nil? or raise "HM: #{ ivar }"
+        is_defined = instance_variable_defined? ivar
+        is_defined and x_ = instance_variable_get( ivar )
+        if is_defined && ! x_.nil?
+          raise say_wont_clobber_ivar( x_, ivar )
+        else
+          instance_variable_set ivar, x
         end
-        instance_variable_set ivar, x
       end ; nil
+    end
+
+    def say_wont_clobber_ivar x, ivar
+      "sanity - won't clobber existing #{ ivar } - #{ Brazen_::Lib_::Strange[ x ] }"
     end
 
     def accept_entity_property_value prop, x
@@ -390,26 +364,6 @@ module Skylab::Brazen
     def actual_property_box_for_write
       actual_property_box
     end
-
-    Normalizers___ = Callback_.memoize[ -> do
-      mod = Model_::Entity::Normalizers__
-      def_meth = mod.singleton_class.method :define_method
-      scn = mod.entry_tree.get_normpath_scanner
-      while normpath = scn.gets
-        name = normpath.name_for_lookup
-        def_meth.call name.as_variegated_symbol, -> _NAME do
-          -> * x_a do
-            if x_a.length.zero?
-              const_get _NAME.as_const, false
-            else
-              const_get( _NAME.as_const, false ).build_via_iambic x_a
-            end
-          end
-        end[ name ]
-      end
-      mod
-    end ]
-
   end
   end
 end

@@ -10,7 +10,7 @@ module Skylab::Brazen::TestSupport::Models::Workspace
 
   ::Skylab::Brazen::TestSupport::Models[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

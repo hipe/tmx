@@ -44,6 +44,10 @@ module Skylab::Brazen
         _NLP_agent.indefinite_noun.via_arglist a
       end
 
+      def or_ x
+        _NLP_agent.or_ x
+      end
+
       def par x
         _string = x.respond_to?( :ascii_only? ) ? x : x.name.as_slug
         "'#{ _string }'"
@@ -78,7 +82,7 @@ module Skylab::Brazen
 
       NLP_agent__ = Callback_.memoize do
         NLP_Agent__ = LIB.make_NLP_agent :public,
-          [ :and_, :indefinite_noun, :plural_noun, :s ]
+          [ :and_, :indefinite_noun, :or_, :plural_noun, :s ]
       end
 
       module LIB
@@ -88,7 +92,7 @@ module Skylab::Brazen
           def make_NLP_agent * x_a
             cls = ::Class.new
             x_a.unshift cls
-            Lib_::EN_fun[].via_arglist x_a
+            Lib_::NLP_EN_methods[].via_arglist x_a
             cls
           end
         end

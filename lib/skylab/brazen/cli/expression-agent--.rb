@@ -5,6 +5,11 @@ module Skylab::Brazen
     class Expression_Agent__
 
       class << self
+
+        def instance  # see #note-br-10 in [#fa-052]. this is for hacks
+          @inst ||= Singleton_instance__[]
+        end
+
         def pretty_path x
           self::Pretty_Path__[ x ]
         end
@@ -50,6 +55,10 @@ module Skylab::Brazen
 
       def indefinite_noun * a
         _NLP_agent.indefinite_noun.via_arglist a
+      end
+
+      def or_ x
+        _NLP_agent.or_ x
       end
 
       def par prop
@@ -105,6 +114,15 @@ module Skylab::Brazen
 
       def _NLP_agent
         @NLP_agent ||= Brazen_::API.expression_agent_class.NLP_agent.new
+      end
+
+      Singleton_instance__ = Callback_.memoize do
+        _partitions = Brazen_::Lib_::Proxy_lib[].
+          inline :rendering_method_name_for, -> prp do
+            :render_prop_as_unknown
+          end
+
+        new _partitions
       end
     end
   end

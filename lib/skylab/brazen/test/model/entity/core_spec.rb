@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Brazen::TestSupport::Model::Entity
 
-  describe "[br] entity- can be used usefully not just for app actions but" do
+  describe "[br] model entity - can be used usefully not just for app actions but" do
 
     extend TS_
 

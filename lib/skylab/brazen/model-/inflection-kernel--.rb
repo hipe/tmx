@@ -89,7 +89,7 @@ module Skylab::Brazen
           remove_trailing_underscores s
           remove_interceding_underscores s
           depluralize s
-          nf.class.from_const( s ).as_human
+          nf.class.via_const( s ).as_human
         end
 
         def remove_trailing_underscores s

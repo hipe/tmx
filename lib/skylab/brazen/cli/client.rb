@@ -35,19 +35,7 @@ module Skylab::Brazen
                     self
                   end
 
-                  def is_autonomous
-                    true
-                  end
-
-                  def is_visible
-                    true
-                  end
-
                   def get_summary_a_from_sheet sht
-                  end
-
-                  def pre_execute
-                    self
                   end
 
                   def get_autonomous_quad argv
@@ -58,6 +46,22 @@ module Skylab::Brazen
                       :invoke,
                       [ argv ],
                       nil ]
+                  end
+
+                  def is_autonomous
+                    true
+                  end
+
+                  def is_visible
+                    true
+                  end
+
+                  def name
+                    @given_NS_sheet.name
+                  end
+
+                  def pre_execute
+                    self
                   end
                 end
 

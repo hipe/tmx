@@ -4,22 +4,33 @@ module Skylab::Brazen
 
     class Action_Adapter_
 
-        class Arguments
+      module Arguments
 
-          def initialize argv, arg_a
-            @arg_a = arg_a ; @argv = argv
-            @early_output_segment = @middle_output_segment =
-              @late_output_segment = nil
+        class << self
+
+          def normalization * a
+            if a.length.zero?
+              Normalization_
+            else
+              Normalization_.new( * a )
+            end
+          end
+        end
+
+        class Normalization_
+
+          class << self
+
+            def via * x_a
+              Arguments::Normalization_Via__.via_iambic x_a
+            end
           end
 
-          def execute
+          def initialize prp_a
+            @arg_a = prp_a
+            @early_output_segment = @middle_output_segment =
+              @late_output_segment = nil
             validate_indexes_of_optional_arguments
-            prepare_scanners
-            ev = parse_any_required_arguments_off_beginning
-            ev ||= parse_any_required_arguments_off_ending
-            ev || parse_any_optional_arguments
-            ev ||= complain_about_any_extra_arguments
-            ev || finalize_success
           end
 
         private
@@ -48,11 +59,41 @@ module Skylab::Brazen
             }'#{ @arg_a.fetch( m.last ).name_i }'"
           end
 
+        public
+
+          def normalize_via_x argv
+            otr = with_x argv
+            otr.execute
+          end
+
+          def with_x argv
+            otr = dup
+            otr.init_copy_via_x argv
+            otr
+          end
+
+        protected
+
+          def init_copy_via_x argv
+            @argv = argv ; nil
+          end
+
+        public
+
+          def execute
+            prepare_scanners
+            ev = parse_any_required_arguments_off_beginning
+            ev ||= parse_any_required_arguments_off_ending
+            ev || parse_any_optional_arguments
+            ev ||= complain_about_any_extra_arguments
+            ev || finalize_success
+          end
+
           def prepare_scanners
             @arg_a_scan = Crazy_Scanner__.new 0, @arg_a
             @argv_scan = Crazy_Scanner__.new 0, @argv
           end
-
+        private
           def parse_any_required_arguments_off_beginning
             num_leading_required_args = if @indexes_of_optional_arguments
               @indexes_of_optional_arguments.first
@@ -177,7 +218,7 @@ module Skylab::Brazen
             attr_reader :d
           end
         end
-
+      end
     end
   end
 end

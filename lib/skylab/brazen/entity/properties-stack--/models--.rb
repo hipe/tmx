@@ -4,6 +4,14 @@ module Skylab::Brazen
 
     module Models__
 
+      Frame_via_Box__ = ::Class.new
+
+      Frame_via_box = Frame_via_Box__.method :new
+
+      Frame_via_Hash__ = ::Class.new
+
+      Frame_via_hash = Frame_via_Hash__.method :new
+
       Frame_via_iambic = -> x_a do
         h = {}
         x_a.each_slice 2 do |i, x|
@@ -12,8 +20,35 @@ module Skylab::Brazen
         Frame_via_hash[ h ]
       end
 
-      Frame_via_hash = -> h do
-        Frame_via_Hash__.new h
+      Name_Frame__ = ::Class.new
+
+      Name_frame_via_namelist = Name_Frame__.method :new
+
+      # ~
+
+      class Frame_via_Box__
+
+        def initialize bx
+          @bx = bx
+        end
+
+        def any_all_names
+          @bx.send :a
+        end
+
+        def all_names
+          @bx.send :a
+        end
+
+        def any_proprietor_of i
+          if @bx.has_name i
+            self
+          end
+        end
+
+        def property_value i
+          @bx.fetch i
+        end
       end
 
       class Frame_via_Hash__
@@ -39,6 +74,26 @@ module Skylab::Brazen
 
         def property_value i
           @h.fetch i
+        end
+      end
+
+      class Name_Frame__
+
+        def initialize i_a  # mutates
+          @i_a = i_a.freeze
+          @h = ::Hash[ i_a.map { |i| [ i, nil ] } ]
+        end
+
+        def all_names
+          @i_a
+        end
+
+        def any_proprietor_of i
+          nil
+        end
+
+        def property_value i
+          raise ::KeyError
         end
       end
     end

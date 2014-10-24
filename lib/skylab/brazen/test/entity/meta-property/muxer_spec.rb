@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport::Entity::Muxer__
 
   ::Skylab::Brazen::TestSupport::Entity[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

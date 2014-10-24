@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__::
 
   ::Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

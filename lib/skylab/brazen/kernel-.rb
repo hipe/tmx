@@ -62,9 +62,18 @@ module Skylab::Brazen
       @const_i_a ||= prdc_sorted_const_i_a
       d = -1 ; last = @const_i_a.length - 1
       Scan_[].new do
-        if d < last
-          @models_mod.const_get @const_i_a.fetch( d += 1 ), false
+        while d < last
+          d += 1
+          i = @const_i_a.fetch d
+          x = @models_mod.const_get i, false
+          if x.respond_to? :name
+            mod_like = x
+            break
+          end
+          mod_like = try_convert_to_node_like_via_mixed x, i, @models_mod
+          mod_like and break
         end
+        mod_like
       end
     end
 
@@ -72,6 +81,12 @@ module Skylab::Brazen
       i_a = @models_mod.constants
       i_a.sort!  # #note-35
       i_a
+    end
+
+    def try_convert_to_node_like_via_mixed x, i, mod
+      if x.respond_to? :call
+        Brazen_::Model_::Node_via_Proc.produce_nodelike x, i, mod
+      end
     end
 
   public  # ~ silo production
@@ -154,7 +169,7 @@ module Skylab::Brazen
       else
         @mod_nf_h ||= {}
         @mod_nf_h.fetch mod do
-          @mod_nf_h[ mod ] = Callback_::Name.from_module mod
+          @mod_nf_h[ mod ] = Callback_::Name.via_module mod
         end
       end
     end

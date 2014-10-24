@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__
 
   ::Skylab::Brazen::TestSupport::Entity::Properties_Stack__[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
@@ -12,7 +12,7 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__
 
   Sandboxer = TestSupport_::Sandbox::Spawner.new
 
-  module CONSTANTS
+  module Constants
 
     Subject_ = -> * a do
       if a.length.zero?

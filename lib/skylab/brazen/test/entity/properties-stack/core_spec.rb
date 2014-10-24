@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Core
 
   ::Skylab::Brazen::TestSupport::Entity::Properties_Stack__[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

@@ -4,8 +4,16 @@ module Skylab::Brazen
 
     class << self
 
-      def expression_agent
+      def arguments
+        CLI::Action_Adapter_::Arguments
+      end
+
+      def expression_agent_class
         CLI::Expression_Agent__
+      end
+
+      def expression_agent_instance
+        CLI::Expression_Agent__.instance
       end
 
       alias_method :new_top_invocation, :new
@@ -14,7 +22,7 @@ module Skylab::Brazen
       end
 
       def pretty_path x
-        expression_agent.pretty_path x
+        expression_agent_class.pretty_path x
       end
     end
 
@@ -74,7 +82,7 @@ module Skylab::Brazen
       end
 
       def app_name
-        Callback_::Name.from_module( @mod ).as_slug  # etc.
+        Callback_::Name.via_module( @mod ).as_slug  # etc.
       end
 
       def has_description
@@ -339,7 +347,7 @@ module Skylab::Brazen
         scan = if @properties
           @properties.to_scan
         else
-          Scan_[].nonsparse_array EMPTY_A_
+          Scan_[].via_nonsparse_array EMPTY_A_
         end
         scan.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :help
       end
@@ -376,8 +384,9 @@ module Skylab::Brazen
         When_Action_Help__
       end
       def resolve_bound_call_when_any_args
-        arg_a = @partitions.arg_a || EMPTY_A_
-        @arg_parse = Action_Adapter_::Arguments.new argv, arg_a
+        _n11n = Action_Adapter_::Arguments.normalization(
+          @partitions.arg_a || EMPTY_A_ )
+        @arg_parse = _n11n.with_x argv
         ev = @arg_parse.execute
         if ev
           resolve_bound_call_when_ARGV_parsing_error_event ev
@@ -670,7 +679,7 @@ module Skylab::Brazen
       HACK_IS_ONE_WORD_RX__ = /\A[a-z]+\z/
 
       def unparenthesize s
-        Brazen_::Lib_::Text[].unparenthesize_message_string s
+        Brazen_::Lib_::String_lib[].unparenthesize_message_string s
       end
 
       def downcase_first s
@@ -838,7 +847,7 @@ module Skylab::Brazen
         if respond_to? m_i
           send m_i
         else
-          i_ = Callback_::Name.from_variegated_symbol( i ).as_const
+          i_ = Callback_::Name.via_variegated_symbol( i ).as_const
           CLI::When_.const_get( i_, false )
         end
       end
@@ -1086,7 +1095,7 @@ module Skylab::Brazen
         @custom_moniker = nil
         @desc = nil
         @can_be_from_argv = true
-        @name = Callback_::Name.from_variegated_symbol name_i
+        @name = Callback_::Name.via_variegated_symbol name_i
         x_a.each_slice( 2 ) do |i, x|
           instance_variable_set :"@#{ i }", x
         end
@@ -1187,7 +1196,7 @@ module Skylab::Brazen
       def initialize a
         @mod, @sin, @sout, @serr, @s_a = a
         if @s_a
-          @s_a.last.nil? and @s_a[ -1 ] = Callback_::Name.from_module( @mod ).as_slug
+          @s_a.last.nil? and @s_a[ -1 ] = Callback_::Name.via_module( @mod ).as_slug
         else
           @s_a = [ ::File.basename( $PROGRAM_NAME ) ].freeze
         end
@@ -1206,7 +1215,7 @@ module Skylab::Brazen
         @a = a
       end
       def produce_any_result
-        scn = Scan_[].nonsparse_array @a
+        scn = Scan_[].via_nonsparse_array @a
         while exe = scn.gets
           value = exe.receiver.send exe.method_name, * exe.args
           value.nonzero? and break

@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport::Model::Entity::Normalizers
 
   ::Skylab::Brazen::TestSupport::Model::Entity[ self ]
 
-  include CONSTANTS
+  include Constants
 
   Brazen_ = Brazen_
 
@@ -14,7 +14,7 @@ module Skylab::Brazen::TestSupport::Model::Entity::Normalizers
     Brazen_.model_entity.normalizers
   end
 
-  module CONSTANTS
+  module Constants
     Subject_ = Subject_
   end
 
@@ -99,7 +99,7 @@ module Skylab::Brazen::TestSupport::Model::Entity::Normalizers
         def via_3 value_x, actuals_has_name, any_name_i
 
           _prop = if any_name_i
-            Mock_Property__.new Callback_::Name.from_variegated_symbol name_i
+            Mock_Property__.new Callback_::Name.via_variegated_symbol name_i
           else
             MOCK_PROPERTY__
           end
@@ -125,7 +125,7 @@ module Skylab::Brazen::TestSupport::Model::Entity::Normalizers
           @nm
         end
       end
-      MOCK_PROPERTY__ = Mock_Property__.new Callback_::Name.from_variegated_symbol :your_value
+      MOCK_PROPERTY__ = Mock_Property__.new Callback_::Name.via_variegated_symbol :your_value
 
       self
     end

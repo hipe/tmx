@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport::Model::Entity::Normalizers::Numeric
 
   ::Skylab::Brazen::TestSupport::Model::Entity::Normalizers[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

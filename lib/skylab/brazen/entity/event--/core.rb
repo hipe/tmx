@@ -87,14 +87,7 @@ module Skylab::Brazen
       end
 
       def to_exception  # #note-85
-        render_all_lines_into_under y=[], Brazen_::API.expression_agent_instance  # "black and white"
-        _e_cls = if has_tag :error_category
-          _name = Callback_::Name.from_variegated_symbol error_category
-          ::Object.const_get _name.as_camelcase_const
-        else
-          ::RuntimeError
-        end
-        _e_cls.new( y * SPACE_ )
+        Event__::Unwrappers__::Exception[ self ]
       end
 
       def to_iambic
@@ -483,7 +476,9 @@ module Skylab::Brazen
       end
 
       module WRAP__
+
         class << self
+
           def exception *x_a
             case 1 <=> x_a.length
             when  0
@@ -494,6 +489,11 @@ module Skylab::Brazen
               Event_::Wrappers__::Exception
             end
           end
+
+          def members
+            [ :exception, :signature ]
+          end
+
           def signature * a
             Event_::Wrappers__::Signature.via_arglist a
           end

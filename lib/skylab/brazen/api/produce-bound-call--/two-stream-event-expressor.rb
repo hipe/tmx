@@ -11,8 +11,9 @@ module Skylab::Brazen
       end
 
       def receive_event ev
-        if ev.has_tag :ok
-          if ev.ok
+        ev_ = ev.to_event
+        if ev_.has_tag :ok
+          if ev_.ok
             recv_success_event ev
           else
             recv_error_event ev
@@ -27,6 +28,7 @@ module Skylab::Brazen
       end
 
     private
+
       def recv_success_event ev
         y = ::Enumerator::Yielder.new do |s|
           @out.puts "OK: #{ s }"
@@ -36,10 +38,22 @@ module Skylab::Brazen
       end
 
       def recv_error_event ev
+
+        if ev.respond_to? :inflected_verb
+          n_s = ev.inflected_noun
+          v_s = ev.inflected_verb
+          a = [ n_s, v_s ]
+          a.compact!
+          if a.length.nonzero?
+            _to = " to \"#{ a * SPACE_ }\""
+          end
+        end
+
         y = ::Enumerator::Yielder.new do |s|
-          @err.puts "API call failed: #{ s }"
+          @err.puts "API call#{ _to } failed: #{ s }"
         end
         ev.render_all_lines_into_under y, @expag
+
         UNABLE_
       end
 

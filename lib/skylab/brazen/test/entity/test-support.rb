@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport::Entity
 
   ::Skylab::Brazen::TestSupport[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

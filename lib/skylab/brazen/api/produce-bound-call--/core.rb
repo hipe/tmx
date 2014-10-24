@@ -114,7 +114,7 @@ module Skylab::Brazen
       def end_in_error_with * x_a, & p
         _ev = build_not_OK_event_via_mutable_iambic_and_message_proc x_a, p
         result = send_event _ev
-        @bound_call = Brazen_.bound_call IDENTITY_, :call, result
+        @bound_call = Brazen_.bound_call.via_value result
         UNABLE_
       end
 
@@ -128,7 +128,7 @@ module Skylab::Brazen
       end
 
       def rslv_some_event_receiver
-        _expag = @mod::API.expression_agent.new @kernel
+        _expag = @mod::API.expression_agent_class.new @kernel
         @event_receiver = Produce_bound_call__::Two_Stream_Event_Expressor.
           new( * Lib_::Two_streams[], _expag ) ; nil
       end

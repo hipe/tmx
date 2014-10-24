@@ -31,18 +31,19 @@ module Skylab::Brazen
 
     def model_entity * a, & p
       if a.length.nonzero? || p
-        Brazen_::Model_::Entity[ * a, p ]
+        p and a.push p
+        Brazen_::Model_::Entity.via_arglist a
       else
         Brazen_::Model_::Entity
       end
     end
 
     def name_library
-      NAME_LIBRARY__
+      NAME_LIBRARY_
     end
 
     def name_function
-      @nf ||= Callback_::Name.from_module self
+      @nf ||= Callback_::Name.via_module self
     end
 
     def node_identifier
@@ -52,12 +53,17 @@ module Skylab::Brazen
     def properties_stack
       Brazen_::Entity::Properties_Stack__
     end
+
+    def test_support
+      require_relative 'test/test-support'
+      Brazen_::TestSupport
+    end
   end
 
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
 
-  module NAME_LIBRARY__
+  module NAME_LIBRARY_
 
     class << self
 
@@ -70,11 +76,7 @@ module Skylab::Brazen
       end
 
       def surrounding_module mod
-        name_s = mod.name
-        name_s[ name_s.rindex( CONST_SEP__ ) .. -1 ] = EMPTY_S_
-        name_s.split( CONST_SEP__ ).reduce( ::Object ) do |m, s|
-          m.const_get s, false
-        end
+        Brazen_::Lib_::Module_lib[].value_via_relative_path mod, '..'
       end
     end
 
@@ -97,24 +99,19 @@ module Skylab::Brazen
       end
 
       def bld_name_function
+        stop_index = some_name_stop_index
 
-        stop_index = const_defined?( :NAME_STOP_INDEX ) ?
-          self::NAME_STOP_INDEX : STOP_INDEX__
-
-        s_a = name.split CONST_SEP__
+        s_a = name.split CONST_SEP_
         i = s_a.pop.intern
-        x_a = ::Array.new s_a.length
-        mod = ::Object
-        s_a.each_with_index do |s, d|
-          mod = mod.const_get s, false
-          x_a[ d ] = mod
-        end
-        d = s_a.length
 
-        while stop_index < ( d -= 1 )
-          mod = x_a.fetch d
+        chain = Brazen_::Lib_::Module_lib[].chain_via_parts s_a
+        d = chain.length
+
+        while stop_index < ( d -= 1 )  # find nearest relevant parent
+          pair = chain.fetch d
+          mod = pair.value_x
           if ! mod.respond_to? :name_function
-            TAXONOMIC_MODULE_RX__ =~ s_a.fetch( d ) and next
+            TAXONOMIC_MODULE_RX__ =~ pair.name_i and next
             mod.extend Name_Function_Proprietor_Methods__
           end
           parent = mod
@@ -123,11 +120,19 @@ module Skylab::Brazen
         name_function_class.new self, parent, i
       end
 
+      def some_name_stop_index
+        if const_defined? :NAME_STOP_INDEX
+          self::NAME_STOP_INDEX
+        else
+          DEFAULT_STOP_INDEX__
+        end
+      end
+
       def name_function_class
         Name_Function__
       end
 
-      STOP_INDEX__ = 3  # skylab snag cli actions foo actions bar
+      DEFAULT_STOP_INDEX__ = 3  # skylab snag cli actions foo actions bar
 
       TAXONOMIC_MODULE_RX__ = /\AActions_{0,2}\z/  # meh / wee
     end
@@ -142,8 +147,6 @@ module Skylab::Brazen
       end
       attr_reader :parent
     end
-
-    CONST_SEP__ = Callback_.const_sep
   end
 
   module Data_Stores_
@@ -161,12 +164,14 @@ module Skylab::Brazen
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
+    Bsc_ = sidesys[ :Basic ]
+
     Ellipsify = -> * x_a do
       Snag__[]::CLI.ellipsify.via_arglist x_a
     end
 
-    EN_fun = -> do
-      HL__[]::SubClient::EN_FUN
+    NLP_EN_methods = -> do
+      HL__[].expression_agent.NLP_EN_methods
     end
 
     HL__ = sidesys[ :Headless ]
@@ -175,7 +180,15 @@ module Skylab::Brazen
       Callback_.iambic_scanner
     end
 
+    IO = -> do
+      HL__[]::IO
+    end
+
     JSON = memoize[ -> { require 'json' ; ::JSON  } ]
+
+    Module_lib = -> do
+      Bsc_[]::Module
+    end
 
     Mutable_iambic_scanner = -> do
       Brazen_::Entity.mutable_iambic_scanner
@@ -191,18 +204,34 @@ module Skylab::Brazen
       HL__[]::NLP
     end
 
-    IO = -> do
-      HL__[]::IO
+    Old_name_lib = -> do
+      HL__[]::Name
+    end
+
+    Proxy_lib = -> do
+      Callback_::Proxy
     end
 
     Snag__ = sidesys[ :Snag ]
 
-    Text = -> do
-      Snag__[]::Text
+    Strange = -> x do
+      Autoloader_.require_sidesystem( :MetaHell ).strange x  # #todo
+    end
+
+    String_lib = -> do
+      Bsc_[]::String
+    end
+
+    System = -> do
+      HL__[].system
+    end
+
+    Trio = -> do
+      Bsc_[].trio
     end
 
     Two_streams = -> do
-      HL__[]::System::IO.some_two_IOs
+      System[].IO.some_two_IOs
     end
   end
 
@@ -216,18 +245,23 @@ module Skylab::Brazen
   ACHEIVED_ = true
   Brazen_ = self
 
-  Bound_Call__ = ::Struct.new :receiver, :method_name, :args
-  class << Bound_Call__
-    def the_empty_call
-      @tec ||= new EMPTY_P_, :call
-    end
-    def via_value x
-      new -> { x }, :call
+  Bound_Call__ = ::Struct.new :args, :receiver, :method_name do  # volatility order (subjective)
+
+    class << self
+
+      def the_empty_call
+        @tec ||= new EMPTY_P_, :call
+      end
+
+      def via_value x
+        new nil, -> { x }, :call
+      end
     end
   end
 
   Box_ = Callback_::Box
   CONTINUE_ = nil
+  CONST_SEP_ = Callback_.const_sep
   DASH_ = '-'.freeze
   DONE_ = true
   EMPTY_A_ = [].freeze

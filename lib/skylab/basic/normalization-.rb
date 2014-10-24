@@ -36,8 +36,7 @@ module Skylab::Brazen
         def init_event_proc_when_evr
           _EVR = @event_receiver ; @event_receiver = nil  # this is the only access
           @event_p = -> * x_a, msg_p do
-            msg_p ||= Event_[]::Inferred_Message.to_proc
-            _ev = Event_[].inline_via_iambic_and_message_proc x_a, msg_p
+            _ev = bld_ev x_a, msg_p
             _EVR.receive_event _ev
           end ; nil
         end
@@ -52,7 +51,17 @@ module Skylab::Brazen
           else
             x_a.push :ok, false
           end
-          @event_p[ * x_a, any_msg_p ]
+          if 1 == @event_p.arity
+            _ev = bld_ev x_a, any_msg_p
+            @event_p[ _ev ]
+          else
+            @event_p[ * x_a, any_msg_p ]
+          end
+        end
+
+        def bld_ev x_a, msg_p
+          msg_p ||= Event_[]::Inferred_Message.to_proc
+          Event_[].inline_via_iambic_and_message_proc x_a, msg_p
         end
       end
     end

@@ -122,7 +122,7 @@ module Skylab::Brazen
 
       def merge_workspace_resolution_properties_into_via bx, action  # #note-120
 
-        scn = Scan_[].nonsparse_array INNER_OUTER_A__
+        scn = Scan_[].via_nonsparse_array INNER_OUTER_A__
         while pair = scn.gets
           inner_i, outer_i = pair
           if ! bx[ inner_i ]

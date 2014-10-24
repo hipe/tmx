@@ -10,7 +10,7 @@ module Skylab::Brazen::TestSupport::Model::Entity
 
   ::Skylab::Brazen::TestSupport::Model[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   Brazen_ = Brazen_
 

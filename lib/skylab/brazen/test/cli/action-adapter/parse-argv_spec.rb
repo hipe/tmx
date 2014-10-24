@@ -19,11 +19,12 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
         end
       end
 
-      it "they raise a runtime error at parse time (not declaration time!)" do
+      it "they raise a runtime error at either declare or parse time" do
+        _s = "optional argument 'baz' must but did not #{
+          }occur immediately after optional argument 'foo'"
         -> do
           with
-        end.should raise_error "optional argument 'baz' must but did not #{
-          }occur immediately after optional argument 'foo'"
+        end.should raise_error _s
       end
     end
 

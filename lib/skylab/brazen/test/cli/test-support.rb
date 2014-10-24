@@ -9,7 +9,7 @@ module Skylab::Brazen::TestSupport::CLI
 
   SPACE_ = Brazen_::SPACE_
 
-  module CONSTANTS
+  module Constants
     Brazen_ = Brazen_
     TestSupport_ = TestSupport_
   end
@@ -212,7 +212,7 @@ module Skylab::Brazen::TestSupport::CLI
     end
 
     def invoke_via_argv argv
-      grp = TestSupport_::IO::Spy::Group.new
+      grp = TestSupport_::IO.spy.group.new
       grp.do_debug_proc = -> { do_debug }
       grp.debug_IO = debug_IO
       grp.add_stream :i, :_no_instream_

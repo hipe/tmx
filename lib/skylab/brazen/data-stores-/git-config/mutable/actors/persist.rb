@@ -56,7 +56,7 @@ module Skylab::Brazen
 
         def with_IO_opened_for_writing & p
           if @is_dry
-            p[ Brazen_::Lib_::IO[]::DRY_STUB ]
+            p[ Brazen_::Lib_::IO[].dry_stub_instance ]
           else
             ::File.open @pathname.to_path, 'w', & p  # WRITEMODE_
           end

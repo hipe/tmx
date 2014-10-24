@@ -218,7 +218,7 @@ module Skylab::Brazen
         end
 
         def get_all_node_scanner
-          Scan_[].nonsparse_array @a
+          Scan_[].via_nonsparse_array @a
         end
 
         def count_number_of_nodes i
@@ -281,7 +281,7 @@ module Skylab::Brazen
         end
 
         def get_all_node_scan
-          Scan_[].nonsparse_array @a
+          Scan_[].via_nonsparse_array @a
         end
       end
 

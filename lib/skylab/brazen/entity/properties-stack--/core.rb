@@ -4,19 +4,12 @@ module Skylab::Brazen
 
     class << self
 
-      def build_extra_properties_event name_i_a
+      def build_extra_properties_event *a
+        Build_extra_properties_event__[ *a ]
+      end
 
-        Event_[].inline_with :extra_properties,
-            :name_i_a, name_i_a,
-            :error_category, :argument_error,
-            :ok, false do |y, o|
-
-          s_a = o.name_i_a.map( & method( :ick ) )
-
-          y << "unrecognized #{ plural_noun 'property', s_a.length }#{
-           } #{ and_ s_a }"
-
-        end
+      def build_missing_required_properties_event *a
+        Build_missing_required_properties_event__[ *a ]
       end
 
       def common_frame * a
@@ -28,10 +21,15 @@ module Skylab::Brazen
       end
     end
 
-    def initialize event_receiver=nil
+    DEFAULT_PROPERTY_LEMMA__ = 'property'.freeze
+
+    def initialize event_receiver=nil, namelist=nil
       @a = []
       @event_receiver = event_receiver
       @d = -1
+      if namelist
+        push_frame Pstack_::Models__::Name_frame_via_namelist[ namelist ]
+      end
     end
 
     def property_value i
@@ -56,6 +54,10 @@ module Skylab::Brazen
 
     def push_frame_with * x_a
       push_frame Pstack_::Models__::Frame_via_iambic[ x_a ]
+    end
+
+    def push_frame_via_box bx
+      push_frame Pstack_::Models__::Frame_via_box[ bx ]
     end
 
     def push_frame x
@@ -89,6 +91,62 @@ module Skylab::Brazen
         @event_receiver.receive_event ev
       else
         raise ev.to_exception
+      end
+    end
+
+    # ~
+
+    Bound_properties = -> bp_p, properties do
+      properties.to_scan.map_by do |prop|
+        bp_p[ prop ]
+      end.immutable_with_random_access_keyed_to_method :name_i
+    end
+
+    Build_extra_properties_event__ = -> name_i_a, did_you_mean_i_a=nil, lemma=nil, adj=nil do
+
+      Event_[].inline_with :extra_properties,
+          :name_i_a, name_i_a,
+          :did_you_mean_i_a, did_you_mean_i_a,
+          :lemma, lemma,
+          :error_category, :argument_error,
+          :ok, false do |y, o|
+
+        s_a = o.name_i_a.map( & method( :ick ) )
+
+        _lemma = o.lemma || DEFAULT_PROPERTY_LEMMA__
+
+        if adj.nil?
+          adj_ = "unrecognized "
+        elsif adj
+          adj_ = "#{ adj } "
+        end
+
+        y << "#{ adj_ }#{ plural_noun _lemma, s_a.length }#{
+          } #{ and_ s_a }"
+
+        if o.did_you_mean_i_a
+          _s_a_ = o.did_you_mean_i_a.map( & method( :code ) )
+          y << "did you mean #{ or_ _s_a_ }?"
+        end
+      end
+    end
+
+    Build_missing_required_properties_event__ = -> miss_a, lemma=nil do
+
+      Event_[].inline_with :missing_required_properties,
+          :miss_a, miss_a,
+          :lemma, lemma,
+          :error_category, :argument_error,
+          :ok, false do |y, o|
+
+        s_a = o.miss_a.map do |prop|
+          par prop
+        end
+
+        _lemma = o.lemma || DEFAULT_PROPERTY_LEMMA__
+
+        y << "missing required #{ plural_noun _lemma, s_a.length } #{
+          }#{ and_ s_a }"
       end
     end
 

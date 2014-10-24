@@ -70,13 +70,15 @@ module Skylab::Brazen
     Exit_statii__ = Callback_.memoize do
       class Exit_Statii__
         h = {
+          # order matters: more specific error codes may trump more general ones
           generic_error: ( d = 5 ),
           error_as_specificed: ( d += 1 ),
-          missing_required_properties: ( d += 1 ),
           invalid_property_value: ( d += 1 ),
-          extra_properties:  ( d += 1 ),
+          extra_properties: ( d += 1 ),
+          missing_required_properties: ( d += 1 ),
+          actual_property_is_outside_of_formal_property_set: ( d += 1 ),
           resource_not_found: ( d += 1 ),
-          resource_exists: ( d += 1 )
+          resource_exists: ( d += 1 ),
         }.freeze
         define_method :[], & h.method( :[] )
         define_method :fetch, & h.method( :fetch )

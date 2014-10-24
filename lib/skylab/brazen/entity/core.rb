@@ -456,10 +456,9 @@ module Skylab::Brazen
       end
 
       def build_props
-        _scn = property_method_nms_for_rd.to_value_scanner
-        Scan_[].map( _scn, -> i do
+        ( property_method_nms_for_rd.to_value_scan.map_by do |i|
           send i
-        end ).with_random_access_keyed_to_method :name_i
+        end.immutable_with_random_access_keyed_to_method :name_i )
       end
 
       def property_method_nms_for_rd
@@ -597,7 +596,7 @@ module Skylab::Brazen
       attr_accessor :iambic_writer_method_proc
 
       def set_prop_i_and_iambic_writer_method_name prop_i, meth_i=nil
-        @name = Callback_::Name.from_variegated_symbol prop_i
+        @name = Callback_::Name.via_variegated_symbol prop_i
         @iambic_writer_method_name = meth_i ; nil
       end
 
@@ -753,6 +752,10 @@ module Skylab::Brazen
         @x_a.fetch @d
       end
 
+      def advance_iambic_scanner_by_one
+        @d += 1
+      end
+
       def clear_all_iambic_ivars
         @d = @x_a = @x_a_length = nil
         UNDEFINED_
@@ -768,12 +771,30 @@ module Skylab::Brazen
       end
 
       def build_extra_iambic_event
-        _name_i_a = [ current_iambic_token ]
-        Entity.properties_stack.build_extra_properties_event _name_i_a
+        build_extra_iambic_event_via [ current_iambic_token ]
+      end
+
+      def build_extra_iambic_event_via name_i_a, did_you_mean_i_a=nil
+        Entity.properties_stack.build_extra_properties_event name_i_a, did_you_mean_i_a
       end
 
       def receive_extra_iambic ev  # :+#public-API
         raise ev.to_exception
+      end
+
+      # ~ experimental property reflection API
+
+      def bound_properties
+        @bp ||= Entity::Properties_Stack__::Bound_properties[
+          method( :get_bound_property_via_property ), self.class.properties ]
+      end
+
+      def get_bound_property_via_property prop
+        had = true
+        x = actual_property_box.fetch prop.name_i do
+          had = false ; nil
+        end
+        Brazen_::Lib_::Trio[].new x, had, prop
       end
 
       PROPERTY_CLASS__ = Property__  # delicate
