@@ -4,12 +4,12 @@ module Skylab::TanMan::TestSupport::CLI::Actions
 
   ::Skylab::TanMan::TestSupport::CLI[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   module InstanceMethods
 
     def cd pathname, &block
-      fu = TestLib_::FU_client[].new -> msg do
+      fu = TestLib_::FU_lib[].new -> msg do
         if do_debug
           TestSupport_::Stderr_[].puts "    (tanmun vreeboze: #{ msg })"
         end
@@ -22,15 +22,13 @@ module Skylab::TanMan::TestSupport::CLI::Actions
     end
 
     def build_client
-      spy = output # IO::Spy::Group
+      spy = output  # is a [ts] IO spy group
       o = TanMan_::CLI.new nil, spy.for( :paystream ), spy.for( :infostream )
       o.program_name = 'timmin'
       o
     end
 
-
     attr_reader :dotfile_pathname
-
 
     def using_dotfile str
       clear_and_prepare

@@ -4,7 +4,7 @@ module Skylab::TanMan::TestSupport::Models::Meaning
 
   ::Skylab::TanMan::TestSupport::Models[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

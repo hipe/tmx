@@ -48,7 +48,7 @@ module Skylab::TanMan
         end
 
         def via_path
-          @template = TanMan_::Lib_::String_template[].from_path @path
+          @template = TanMan_::Lib_::String_lib[].template.from_path @path
           via_template
         end
 

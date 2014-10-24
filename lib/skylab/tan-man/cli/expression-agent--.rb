@@ -21,10 +21,8 @@ module Skylab::TanMan
       end
 
       def invoke_notify
-        FUN__.clear[]
+        TanMan_::Lib_::Old_path_tools[].clear
       end
-      #
-      # FUN__ = Headless::CLI::PathTools::FUN
 
     private
 

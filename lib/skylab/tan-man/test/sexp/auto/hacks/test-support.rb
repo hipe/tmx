@@ -1,10 +1,10 @@
 require_relative '../test-support'
 
-module ::Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
+module Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
 
   ::Skylab::TanMan::TestSupport::Sexp::Auto[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
@@ -35,17 +35,6 @@ module ::Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
     end
   end
 
-  o = {}
-
-  o[:new_before_this] = -> recursive_list, string do
-    # [#071] repeated here just because it's easy and we want independence
-    recursive_list._items.detect do |item|
-      -1 == ( string <=> item.unparse )
-    end
-  end
-
-  FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
-
   module InstanceMethods
     attr_reader :actual_string
 
@@ -67,7 +56,7 @@ module ::Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
         a_list = gs.class.parse :a_list, with_string
       end
       a_list._prototype = gs.class.parse :a_list, 'a=b, c=d'
-      new_before_this = FUN.new_before_this[ a_list, asst_to_insert_string ]
+      new_before_this = New_before_this__[ a_list, asst_to_insert_string ]
       a_list._insert_item_before_item asst_to_insert_string, new_before_this
       @actual_string = a_list.unparse
       nil
@@ -82,6 +71,7 @@ module ::Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
 
     def build_graph_sexp_once
       TanMan_::Models_::DotFile.produce_document_via_parse do |parse|
+        parse.generated_grammar_dir_path existent_testing_GGD_path
         parse.via_input_string 'digraph{}'
         parse.subscribe( & method( :subscribe_to_parse_events ) )
       end
@@ -92,10 +82,10 @@ module ::Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
 
     TestLib_::Let[ self ]
 
-    include CONSTANTS
+    include Constants
 
     def go node_to_insert_string
-      new_before_this = FUN.new_before_this[stmt_list, node_to_insert_string]
+      new_before_this = New_before_this__[ stmt_list, node_to_insert_string ]
       stmt_list._insert_item_before_item node_to_insert_string, new_before_this
       @actual_string = stmt_list.unparse
       nil
@@ -107,13 +97,23 @@ module ::Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
     end
 
     def resolve_stmt_list
-      @graph_sexp = TanMan_::Models_::DotFile.
-        produce_document_via_parse do |parse|
+
+      @graph_sexp = TanMan_::Models_::DotFile.produce_document_via_parse do |parse|
+          parse.generated_grammar_dir_path existent_testing_GGD_path
           parse.via_input_string "digraph{#{ with_string }}"
           parse.subscribe( & method( :subscribe_to_parse_events ) )
         end
+
       @stmt_list = @graph_sexp.stmt_list
       true
     end
   end
+
+  New_before_this__ = -> recursive_list, string do
+    # [#071] repeated here just because it's easy and we want independence
+    recursive_list._items.detect do |item|
+      -1 == ( string <=> item.unparse )
+    end
+  end
+
 end

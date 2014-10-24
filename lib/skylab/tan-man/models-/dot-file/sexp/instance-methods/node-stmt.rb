@@ -55,7 +55,7 @@ module Skylab::TanMan
       def execute
         @equals = @node._label_sexp[ :content ][ :equals ]
         @str = @equals[ :id ].normalized_string
-        if TanMan_::Lib_::String_template[].string_has_parameter @str, :label
+        if TanMan_::Lib_::String_lib[].template.string_has_parameter @str, :label
           when_template_parameters
         else
           when_no_template_parameters
@@ -65,7 +65,8 @@ module Skylab::TanMan
       def when_template_parameters
         s = @equals[ :id ]._escape_string @label, @error_ev_p
         s and begin
-          out_s = TanMan_::Lib_::String_template[].from_string( @str )[ label: s ]
+          _tmpl = TanMan_::Lib_::String_lib[].template.from_string @str
+          out_s = _tmpl.call label: s
 
           # NOTE you lose information above -- you cannot now go back and re-
           # evaluate the template. What you could do is 1) either hold on to

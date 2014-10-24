@@ -58,10 +58,12 @@ module Skylab::TanMan  # (leave extra whitespacing below for [#bs-010])
       pen.escape_path(* a)        # but tan-man apparently thinks it has
     end                           # special needs.)
 
+    if false  # (was 'fuzzy_fetch')
+
                                   # generic fuzzy finder
                                   # `match` receives each item and should result
                                   # in 1 when exact match, zero / falseish when
-    fuzzy_fetch = -> enum, match, not_found, ambiguous, fly_collapse=nil do
+    _fuzzy_fetch = -> enum, match, not_found, ambiguous, fly_collapse=nil do
       fly_collapse ||= IDENTITY_  # no match or other when partial match.
       exact = exact_found = nil   # short-circuit on first exact match,
       count = 0                   # that is result. otherwise `not_found` or
@@ -93,17 +95,14 @@ module Skylab::TanMan  # (leave extra whitespacing below for [#bs-010])
       end
       res
     end
-
-    define_method :fuzzy_fetch, & fuzzy_fetch
-
-    o = { fuzzy_fetch: fuzzy_fetch }
-    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
+    end
 
     def hdr s                     # how do we render headers (e.g. in report
       em s                        # tables?)
     end
 
-    rx = Headless::CLI::PathTools::FUN::ABSOLUTE_PATH_HACK_RX
+    rx = TanMan_::Lib_::Path_tools[].absolute_path_hack_rx
+
     define_method :gsub_path_hack do |str|  # replaced by [#cb-052]
       res = str.gsub rx do
         escape_path "#{ $~[0] }" # (delegates to the modality-specific pen)

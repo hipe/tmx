@@ -28,17 +28,20 @@ module Skylab::TanMan
   class Stub__
     def initialize name_i, & p
       @p = p
-      @name_function = Callback_::Name.from_variegated_symbol name_i
+      @name_function = Callback_::Name.via_variegated_symbol name_i
     end
+    attr_reader :name_function
     def is_actionable
       true
     end
     def is_promoted
       false
     end
-    attr_reader :name_function
     def new kernel
       @p[ kernel ]
+    end
+    def name
+      self._ONLY_TO_LOOK_LIKE_A_MODULE  # #todo
     end
   end
 
@@ -89,8 +92,8 @@ module Skylab::TanMan
       def bound_call_for_ping
         _ev = build_OK_event_with :ping_from_action, :name_i,
            name.as_lowercase_with_underscores_symbol
-        x = send_event _ev
-        Brazen_.bound_call -> { x }, :call
+        _x = send_event _ev
+        Brazen_.bound_call.via_value _x
       end
 
       def receive_extra_iambic ev
@@ -161,7 +164,7 @@ module Skylab::TanMan
         class << self
 
           def get_unbound_upper_action_scan
-            Scan_[].nonsparse_array [ self ]
+            Scan_[].via_nonsparse_array [ self ]
           end
 
           def get_unbound_lower_action_scan
@@ -401,5 +404,9 @@ module Skylab::TanMan
       Git_Config = Brazen_::Data_Stores_::Git_Config
 
     end
+  end
+
+  Models_::Paths = -> path_i, verb_i, call do
+    Models_::Internal_::Paths[ path_i, verb_i, call ]
   end
 end

@@ -4,28 +4,20 @@ module Skylab::TanMan
 
     memoize = Callback_.memoize
 
-    sidesys = Autoloader_.build_require_sidesystem_proc
+    sidesys, stdlib = Autoloader_.at :build_require_sidesystem_proc, :build_require_stdlib_proc
 
-    BA__ = sidesys[ :Basic ]
+    Bsc__ = sidesys[ :Basic ]
 
     Basic_struct = -> do
-      BA__[]::Struct
+      Bsc__[]::Struct
     end
 
     Constantize = -> x do
       Callback_::Name.lib.constantize x
     end
 
-    Dev_tmpdir_pathname = -> do
-      HL__[]::System.defaults.dev_tmpdir_pathname
-    end
-
-    EN_fun = -> do
-      HL__[]::SubClient::EN_FUN
-    end
-
     Ellipsify = -> do
-      Snag__[]::CLI.ellipsify
+      Sg__[]::CLI.ellipsify
     end
 
     Entity = -> do
@@ -33,27 +25,49 @@ module Skylab::TanMan
     end
 
     Home_directory_pathname = -> do
-      HL__[]::System.system.any_home_directory_pathname
+      System[].environment.any_home_directory_pathname
     end
 
     HL__ = sidesys[ :Headless ]
 
-    Snag__ = sidesys[ :Snag ]
+    Module_lib = -> do
+      Bsc__[]::Module
+    end
+
+    NLP_EN_methods = -> do
+      HL__[].expression_agent.NLP_EN_methods
+    end
+
+    Path_tools = -> do
+      HL__[].system.filesystem.path_tools
+    end
+
+    Pretty_print = stdlib[ :PP ]
+
+    Proxy_lib = -> do
+      Callback_::Proxy
+    end
+
+    Sg__ = sidesys[ :Snag ]
 
     Some_stderr = -> do
-      HL__[]::System::IO.some_stderr_IO
+      System[].IO.some_stderr_IO
     end
 
     String_IO = memoize[ -> do
       require 'stringio' ; ::StringIO
     end ]
 
+    String_lib = -> do
+      Bsc__[]::String
+    end
+
     String_scanner = memoize[ -> do
       require 'strscan' ; ::StringScanner
     end ]
 
-    String_template = -> do
-      BA__[]::String::Template
+    System = -> do
+      HL__[].system
     end
 
     Tmpdir_stem = memoize[ -> { 'tina-man'.freeze } ]

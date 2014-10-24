@@ -98,8 +98,11 @@ module Skylab::TanMan
       begin
         sexp = self.sexp or break # emitted
         if verbose
-          TanMan::Services::PP.pp sexp,
-            TanMan::Services::Headless::System::IO.some_stderr_IO
+
+          TanMan_::Lib_::Pretty_print[].pp(
+            sexp,
+            TanMan_::System[].IO.some_stderr_IO )
+
           s = ::Pathname.new( __FILE__ ).relative_path_from TanMan.dir_pathname
           info "(from #{ s })"
         else
@@ -361,7 +364,7 @@ module Skylab::TanMan
           info( a.join ', ' )
         end
         break if no_change
-        fu = Headless::IO::FU.new -> msg do
+        fu = Lib_::FU_lib[].new -> msg do
           if verbose
             info( gsub_path_hack msg )
           end

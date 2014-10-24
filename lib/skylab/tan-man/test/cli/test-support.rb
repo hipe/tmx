@@ -4,13 +4,13 @@ module Skylab::TanMan::TestSupport::CLI
 
   ::Skylab::TanMan::TestSupport[ TS_ = self ]
 
-  include CONSTANTS # so we can say TanMan_ in the spec's module
+  include Constants # so we can say TanMan_ in the spec's module
 
   extend TestSupport_::Quickie
 
   module ModuleMethods
 
-    include CONSTANTS
+    include Constants
 
     def klass i, *a, & p
       # #todo
@@ -19,7 +19,7 @@ module Skylab::TanMan::TestSupport::CLI
 
   module InstanceMethods
 
-    include CONSTANTS
+    include Constants
 
     # extend MetaHell::Let
 
@@ -95,7 +95,7 @@ module Skylab::TanMan::TestSupport::CLI
       build_client_wired_with ioa
     end
     #
-    class Spy__ < TestSupport_::IO::Spy::Triad
+    class Spy__ < TestSupport_::IO.spy.triad
       def initialize
         super nil
       end
@@ -155,13 +155,13 @@ module Skylab::TanMan::TestSupport::CLI
     end
 
     def expect_line_is_styled line
-      unstyled = TestLib_::Unstyle_styled[ line ]
+      unstyled = TestLib_::CLI_lib[].pen.unstyle_style line
       unstyled or fail "expecting styled line, had - #{ line.inspect }"
       unstyled
     end
 
     def expect_line_is_not_styled line
-      unstyled = TestLib_::Unstyle_styled[ line ]
+      unstyled = TestLib_::CLI_lib[].pen.unstyle_styled line
       unstyled and fail "expecting non-styled line, had - #{ line.inspect }"
       line
     end

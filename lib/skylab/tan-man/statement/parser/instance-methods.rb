@@ -14,7 +14,7 @@ module Skylab::TanMan
       true                        # important
     end
 
-    def load_parser_class
+    def produce_parser_class  # #hook-out for [ttt]
       on_info_p = receive_parser_loading_info_p
       on_info_p ||= -> e do
         if verbose

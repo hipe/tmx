@@ -4,7 +4,7 @@ module Skylab::TanMan::TestSupport::Models::DotFile::Manipulating::Label
 
   ::Skylab::TanMan::TestSupport::Models::DotFile::Manipulating[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie # run some tests without rspec, just `ruby -w`
 

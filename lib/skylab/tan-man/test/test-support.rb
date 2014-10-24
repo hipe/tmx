@@ -7,6 +7,13 @@ module Skylab::TanMan::TestSupport
 
   TanMan_ = ::Skylab::TanMan
 
+  class << self
+
+    def tmpdir_pathname
+      @tdpn ||= TanMan_::Lib_::System[].defaults.dev_tmpdir_pathname.join 'tm-testing'
+    end
+  end
+
   module TestLib_
 
     memoize = TanMan_::Callback_.memoize
@@ -17,18 +24,16 @@ module Skylab::TanMan::TestSupport
       TanMan_::Brazen_::TestSupport::Expect_Event[ ctx_cls ]
     end
 
+    Bsc__ = sidesys[ :Basic ]
+
     Base_tmpdir__ = memoize[ -> do
-      o = TanMan_::Lib_
-      HL__[]::IO::Filesystem::Tmpdir.
-        new o::Dev_tmpdir_pathname[].join( o::Tmpdir_stem[] ).to_path
+      TanMan_::Lib_::System[].filesystem.tmpdir(
+        :path, TS_.tmpdir_pathname.to_path,
+        :max_mkdirs, 1 )
     end ]
 
-    CLI_client = -> x do
-      HL__[]::CLI::Client[ x ]
-    end
-
-    CLI_pen_minimal = -> do
-      HL__[]::CLI::Pen::Minimal.new
+    CLI_lib = -> do
+      HL__[]::CLI
     end
 
     Class_creator_module_methods_module = -> mod do
@@ -40,7 +45,7 @@ module Skylab::TanMan::TestSupport
     end
 
     Debug_IO = -> do
-      HL__[]::System::IO.some_stderr_IO
+      HL__[].system.IO.some_stderr_IO
     end
 
     Dev_client = -> do
@@ -48,7 +53,8 @@ module Skylab::TanMan::TestSupport
     end
 
     Empty_dir_pn = memoize[ -> do
-      Base_tmpdir__[].tmpdir_via_join 'empty-tmpdir'
+      Base_tmpdir__[].tmpdir_via_join( 'empty-tmpdir' ).
+        with :max_mkdirs, 2
     end ]
 
     Entity = -> do
@@ -59,8 +65,8 @@ module Skylab::TanMan::TestSupport
       require 'fileutils' ; ::FileUtils
     end ]
 
-    FU_client = -> do
-      HL__[]::IO::FU
+    FU_lib = -> do
+      HL__[]::IO.fu
     end
 
     HL__ = sidesys[ :Headless ]
@@ -83,30 +89,28 @@ module Skylab::TanMan::TestSupport
       require 'pp' ; ::PP
     end ]
 
+    String_lib = -> do
+      Bsc__[]::String
+    end
+
     Shellwords = memoize[ -> do
       require 'shellwords' ; ::Shellwords
     end ]
 
     Three_IOs = -> do
-      HL__[]::System::IO.some_three_IOs
+      HL__[].system.IO.some_three_IOs
     end
 
     TS__ = sidesys[ :TestSupport ]
 
-    Unstyle_proc = -> do
-      HL__[]::CLI::Pen::FUN.unstyle
-    end
-
-    Unstyle_styled = -> s do
-      HL__[]::CLI::Pen::FUN.unstyle_styled[ s ]
-    end
-
     Volatile_tmpdir = memoize[ -> do
-      Base_tmpdir__[].tmpdir_via_join 'volatile-tmpdir'
+      Base_tmpdir__[].tmpdir_via_join( 'volatile-tmpdir' ).with(
+        :max_mkdirs, 2 )
     end ]
   end
 
-  module CONSTANTS
+  module Constants
+    Callback_ = TanMan_::Callback_
     TanMan_ = TanMan_
     EMPTY_S_ = TanMan_::EMPTY_S_
     NEWLINE_ = TanMan_::NEWLINE_
@@ -115,7 +119,9 @@ module Skylab::TanMan::TestSupport
     TestSupport_  = ::Skylab::TestSupport
   end
 
-  include CONSTANTS # for use here, below
+  include Constants # for use here, below
+
+  Callback_ = Callback_
 
   TestSupport_ = TestSupport_
 
@@ -253,7 +259,11 @@ module Skylab::TanMan::TestSupport
     GRANULE_TO_CONST_RX__ = /\A(?<num>\d+(?:-\d+)*)(?:-(?<rest>.+))?\z/
 
     def resolve_parse
+
+      _path = existent_testing_GGD_path
+
       @parse = TS_::Parse.new do |parse|
+        parse.generated_grammar_dir_path _path
         parse.subscribe( & method( :subscribe_to_parse_events ) )
         parse.set_root_for_relative_paths_for_load TS_.dir_pathname
         _rel_pn = @grammar_class.dir_pathname.relative_path_from TS_.dir_pathname
@@ -279,28 +289,58 @@ module Skylab::TanMan::TestSupport
       Debugging_event_receiver__[]
     end
 
-    Debugging_event_receiver__ = -> do
-      p = -> do
-        x = Debugging_Event_Receiver__.new Some_debug_IO[], TS_::EXPRESSION_AGENT
-        p = -> { x } ; x
-      end
-      -> { p[] }
-    end.call
+    Debugging_event_receiver__ = Callback_.memoize do
+      Debugging_Event_Receiver__.new Some_debug_IO[], TS_::EXPRESSION_AGENT
+    end
 
     class Debugging_Event_Receiver__
       def initialize *a
         @io, @expression_agent = a
       end
       def receive_event ev
-        _y = ::Enumerator::Yielder.new do |s|
+        y = ::Enumerator::Yielder.new do |s|
           @io.puts "(dbg: #{ s })"
         end
-        ev.render_all_lines_into_under _y, @expression_agent
-        if ev.has_tag :ok
-          ev.ok
+        if ::String === ev
+          y << "(WAS STRING: #{ ev })"
+        else
+          ev.render_all_lines_into_under y, @expression_agent
+          if ev.has_tag :ok
+            ev.ok
+          end
         end
       end
     end
+
+    def existent_testing_GGD_path
+      path = Memoized_GGD_path__[]
+      path || Memoize_GGD_path__[ do_debug, debug_IO ]
+    end
+
+    -> do
+
+      _PATH = nil
+
+      Memoized_GGD_path__ = -> { _PATH }
+
+      Memoize_GGD_path__ = -> do_debug, debug_IO do
+
+        pn = TS_.tmpdir_pathname.join 'grammerz'
+        _PATH = pn.to_path
+
+        if ! pn.exist?
+
+          _tmpdir = TanMan_::Lib_::System[].filesystem.tmpdir :path, path,
+            :be_verbose, do_debug,
+            :debug_IO, debug_IO,
+            :max_mkdirs, 2
+
+          _tmpdir.prepare_when_not_exist
+        end
+
+        _PATH
+      end
+    end.call
 
     # ~ near input mechanism reification
 

@@ -563,12 +563,11 @@ module Skylab::TanMan
     end
 
     def anchor_module
-      @anchor_module ||=
-        _parts[0..-3].reduce ::Object do |m, x| m.const_get x, false end
+      @anchor_module ||= bld_anchor_mod
     end
 
     def grammar_const
-      _parts[-2]
+      prts[ -2 ]
     end
 
     def grammar_module
@@ -582,7 +581,7 @@ module Skylab::TanMan
     attr_reader :module
 
     def tail_const
-      @tail_const ||= _parts[-1].intern
+      @tail_const ||= prts.last.intern
     end
 
     def tail_stem
@@ -591,10 +590,16 @@ module Skylab::TanMan
 
   private
 
-    def _parts
-      @_parts ||= @module.to_s.split( '::' )
+    def bld_anchor_mod
+      TanMan_::Lib_::Module_lib[].value_via_parts_and_relative_path prts, '../..'
+    end
+
+    def prts
+      @prts ||= @module.name.split CONST_SEP_
     end
   end
+
+  CONST_SEP_ = '::'.freeze
 
   # --*--
 

@@ -1,6 +1,7 @@
 # [#bs-010] poster child (used to be!)
 
 module Skylab::TanMan
+
   module Sexp::Prototype
 
     # Check out this wondrously obtuse, undoubtedly insane but gloriously
@@ -16,25 +17,39 @@ module Skylab::TanMan
     # lurking in this library!! SO FACEPALMING!!!!!!!!11111
 
 
-    o = { }
 
-    o[:keyword] = 'example'
+    class << self
 
-    o[:blank_rx] = /\A[[:space:]]*\z/
+      def blank_rx
+        BLANK_RX__
+      end
+      BLANK_RX__ = /\A[[:space:]]*\z/
 
-    o[:line_rx] = / [^\r\n]* \r? \n  |  [^\r\n]+ \r? \n? /x
+      def keyword
+        KEYWORD__
+      end
+      KEYWORD__ = 'example'.freeze
 
-    o[:rex] = ->( str ) { ::Regexp.escape str }
+      def line_rx
+        TanMan_::Lib_::String_lib[].regex_for_line_scanning
+      end
 
-    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
+      def rex * a
+        if a.length.zero?
+          ::Regexp.method :escape
+        else
+          ::Regexp.excape( * a )
+        end
+      end
 
+    end
   end
 
 
 
   class << Sexp::Prototype
 
-    keyword = Sexp::Prototype::FUN.keyword
+    keyword = Sexp::Prototype.keyword
 
     define_method :match  do |prev_tree, curr_tree, tree_class, member|
       res = nil
@@ -122,7 +137,7 @@ module Skylab::TanMan
       res
     end
 
-    fun = Sexp::Prototype::FUN
+    fun = Sexp::Prototype
 
     define_method :attempt_to_process_example_body! do
       result = nil
@@ -264,7 +279,7 @@ module Skylab::TanMan
 
   private
 
-    fun = Sexp::Prototype::FUN
+    fun = Sexp::Prototype
     blank_rx = fun.blank_rx
     line_rx = fun.line_rx
 
@@ -335,7 +350,7 @@ module Skylab::TanMan
 
   private
 
-    fun = Sexp::Prototype::FUN
+    fun = Sexp::Prototype
     rex = fun.rex
     line_rx = fun.line_rx
     end_of_multiline_rx = %r{ . (?= \*/ | ^[ \t]*$ ) }mx # explained below

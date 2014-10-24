@@ -76,7 +76,7 @@ module Skylab::TanMan
           base_pn = Starter_.dir_pn_instance
           _pn_a = base_pn.children false
 
-          scan = Scan_[].nonsparse_array( _pn_a ).map_reduce_by do |pn|
+          scan = Scan_[].via_nonsparse_array( _pn_a ).map_reduce_by do |pn|
             props.replace_hash 'name' => pn.to_path
             fly
           end

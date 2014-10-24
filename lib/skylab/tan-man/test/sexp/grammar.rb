@@ -22,7 +22,7 @@ module Skylab::TanMan::TestSupport::Sexp
       end
 
       let :grammars_module do
-        to_s.split('::')[0..-2].reduce(::Object) { |m, k| m.const_get k, false }
+        ::Skylab::TanMan::Lib_::Module_lib[].expand_path_via_module '..', self
       end
 
       self
@@ -31,7 +31,7 @@ module Skylab::TanMan::TestSupport::Sexp
     include TanMan_::Models_::DotFile::Parser::InstanceMethods  # err msg porcelain
     include TanMan_::TestSupport::Tmpdir::InstanceMethods  # prepared_tanman_tmpdir
 
-    TestLib_::CLI_client[ self ]
+    TestLib_::CLI_lib[].client self
 
     def initialize sin, * two_IO  # :+[#sl-114]
       two_IO.length.upto( 1 ) do |d|
@@ -55,7 +55,7 @@ module Skylab::TanMan::TestSupport::Sexp
 
     Pen__ = -> do
       p = -> do
-         pen = TestLib_::CLI_pen_minimal[]
+        pen = TestLib_::CLI_lib[].pen.minimal_class.new
         def pen.pth str
           "«#{ str }»"  # :+#guillemets just for fun and practice
         end
@@ -163,7 +163,7 @@ module Skylab::TanMan::TestSupport::Sexp
       o.treetop_grammar 'g1.treetop'
     end
 
-    def load_parser_class
+    def produce_parser_class
 
       info_p = receive_parser_loading_info_p
       info_p ||= -> s do

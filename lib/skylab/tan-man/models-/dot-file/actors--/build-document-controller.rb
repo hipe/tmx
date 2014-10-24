@@ -70,6 +70,7 @@ module Skylab::TanMan
 
         def via_input_pathname_resolve_graph_sexp
           @graph_sexp = DotFile_.produce_document_via_parse do |parse|
+            parse.generated_grammar_dir_path _GGD_path
             parse.via_input_pathname @input_pathname
             parse.subscribe( & @subscribe )
           end
@@ -78,10 +79,15 @@ module Skylab::TanMan
 
         def via_input_string_resolve_graph_sexp
           @graph_sexp = DotFile_.produce_document_via_parse do |parse|
+            parse.generated_grammar_dir_path _GGD_path
             parse.via_input_string @input_string
             parse.subscribe( & @subscribe )
           end
           @graph_sexp && ACHIEVED_
+        end
+
+        def _GGD_path
+          @kernel.call :paths, :generated_grammar_dir, :retrieve
         end
 
         def via_graph_sexp_produce_document_controller

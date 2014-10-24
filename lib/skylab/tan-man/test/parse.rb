@@ -12,6 +12,10 @@ module Skylab::TanMan::TestSupport
       super
     end
 
+    def produce_parser_class  # we don't memoize the result here. parent does
+      build_parser_class
+    end
+
     def add_grammar_path s
       @grammar_path_a.push s ; nil
     end

@@ -4,7 +4,7 @@ module Skylab::TanMan::TestSupport::Sexp
 
   ::Skylab::TanMan::TestSupport[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   TanMan_ = TanMan_ ; TestLib_ = TestLib_
 

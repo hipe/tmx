@@ -5,8 +5,24 @@ module Skylab::TanMan
     # assumes @output_s
 
     class << self
+
       def [] test_context_class
         test_context_class.include Test_Context_Instance_Methods__ ; nil
+      end
+
+      def shell output_s
+        Shell__.new output_s
+      end
+    end
+
+    Test_Context_Instance_Methods__ = ::Module.new
+
+    class Shell__
+
+      include Test_Context_Instance_Methods__
+
+      def initialize s
+        @output_s = s
       end
     end
 
@@ -30,10 +46,40 @@ module Skylab::TanMan
             false
           end
         elsif end_d >= 0
-          self._TO_DO_excrpt_lines_from_beginning
+          excrpt_lines_from_beginning beg_d, end_d, s
         else
           false
         end
+      end
+
+      def excrpt_lines_from_beginning beg_d, end_d, s
+
+        _RX = TestSupport::TestLib_::String_lib[].regex_for_line_scanning
+
+        scnr = TanMan_::Lib_::String_scanner[].new s
+
+        y = []
+        current_line_index = 0
+        while current_line_index < beg_d
+          current_index += 1
+          if ! scnr.skip _RX
+            y = false
+            break
+          end
+        end
+        if y
+          while current_line_index <= end_d
+            current_line_index += 1
+            s = scnr.scan _RX
+            if s
+              y.push s
+            else
+              y = false
+              break
+            end
+          end
+        end
+        y
       end
 
       def excrpt_lines_from_end beg_d, end_d, s

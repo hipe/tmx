@@ -1,10 +1,10 @@
 require_relative '../test-support'
 
-module ::Skylab::TanMan::TestSupport::Sexp::Prototype # #topic-module
+module Skylab::TanMan::TestSupport::Sexp::Prototype # #topic-module
 
   ::Skylab::TanMan::TestSupport::Sexp[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie  # if you want it, load the spec file with ruby -w
 

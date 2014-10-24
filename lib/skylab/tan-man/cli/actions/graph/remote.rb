@@ -22,7 +22,7 @@ module Skylab::TanMan
       ARGUMENT_SYNTAX__
     end
 
-    ARGUMENT_SYNTAX__ = Headless::CLI::Argument::Syntax.DSL do
+    ARGUMENT_SYNTAX__ = Lib_::CLI_lib[].argument.syntax.DSL do
       o :optional, :literal, 'node-names'
       alternation do
         series do

@@ -4,7 +4,7 @@ module Skylab::TanMan::TestSupport::API::Actions::Graph
 
   ::Skylab::TanMan::TestSupport::API::Actions[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

@@ -2,21 +2,27 @@ module Skylab::TanMan
 
   module Models_::DotFile
 
+    # #todo this whole node needs a simplification rewrite. make it one actor.
+
   module Actors__
 
     module Produce_document_via_parse
 
       def self.[] p
-        kernel = Kernel__.new
-        shell = Shell__.new kernel
+        kernel = Call_Kernel__.new
+        shell = Call_Shell__.new kernel
         p[ shell ]
         kernel.result
       end
 
-      class Shell__ < ::BasicObject
+      class Call_Shell__ < ::BasicObject
 
         def initialize kernel
           @kernel = kernel
+        end
+
+        def generated_grammar_dir_path path
+          @kernel.set_generated_grammar_dir_path path
         end
 
         def via_path path
@@ -36,14 +42,19 @@ module Skylab::TanMan
         end
       end
 
-      class Kernel__
+      class Call_Kernel__
 
         def initialize
           @subscribe_p_a = []
+          @generated_grammar_dir_path = nil
           @result_has_been_resolved = false
         end
 
         attr_reader :subscribe_p_a
+
+        def set_generated_grammar_dir_path x
+          @generated_grammar_dir_path = x ; nil
+        end
 
         def set_input_tuple i, x
           @input_i = i ; @input_x = x ; nil
@@ -59,6 +70,7 @@ module Skylab::TanMan
         def resolve_result
           @result_has_been_resolved = true
           @parse = Parse__.new do |parse|
+            parse.generated_grammar_dir_path @generated_grammar_dir_path
             @subscribe_p_a.each do |p|
               parse.subscribe( & p )
             end
@@ -96,6 +108,10 @@ module Skylab::TanMan
           yield self
         end
 
+        def generated_grammar_dir_path x
+          @generated_grammar_dir_path = x ; nil
+        end
+
         def subscribe
           yield @conduit
         end
@@ -106,12 +122,22 @@ module Skylab::TanMan
 
       private
 
-        def load_parser_class
+        def produce_parser_class  # :#hook-out to [ttt]
+          cls = Memoized_parser_class__[]
+          cls || Memoize_parser_class__[ build_parser_class ]
+        end
 
+        -> do
+          cls = nil
+          Memoized_parser_class__ = -> { cls }
+          Memoize_parser_class__ = -> x { cls = x ; x }
+        end.call
+
+        def build_parser_class
           TanMan_::Lib_::TTT[]::Parser::Load.new( self,
             -> o do
               do_force_overwrite_for_load and o.force_overwrite!
-              o.generated_grammar_dir generated_grammar_dir_for_load
+              o.generated_grammar_dir @generated_grammar_dir_path
               o.root_for_relative_paths root_for_relative_paths_for_load
               add_grammar_paths_to_load o
             end,
@@ -134,15 +160,6 @@ module Skylab::TanMan
         def do_force_overwrite_for_load
           @do_force_overwrite_for_load
         end
-
-        def generated_grammar_dir_for_load
-          GGDFL__
-        end
-
-        GGDFL__ = -> do
-          _s = TanMan_::Lib_::Tmpdir_stem[]
-          TanMan_::Lib_::Dev_tmpdir_pathname[].join( _s ).to_path
-        end.call
 
         def root_for_relative_paths_for_load
           Models_::DotFile.dir_pathname.to_path
@@ -178,6 +195,10 @@ module Skylab::TanMan
             result = "expecting #{ inside }"
           end while nil
           result
+        end
+
+        def receive_parse_failure_event ev
+          raise ev.to_exception  # #todo
         end
 
         def build_parse_failure_event

@@ -4,7 +4,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph::Tell
 
   ::Skylab::TanMan::TestSupport::CLI::Actions::Graph[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

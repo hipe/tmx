@@ -4,8 +4,12 @@ require 'skylab/brazen/core'
 module Skylab::TanMan
 
   class << self
+    def expect_file_content
+      require 'skylab/tan-man/test/test-support'
+      TanMan_::TestSupport::Expect_File_Content
+    end
     def name_function
-      @nf ||= Callback_::Name.from_module self
+      @nf ||= Callback_::Name.via_module self
     end
   end
 

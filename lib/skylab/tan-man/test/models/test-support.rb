@@ -4,7 +4,7 @@ module Skylab::TanMan::TestSupport::Models
 
   ::Skylab::TanMan::TestSupport[ self ]
 
-  include CONSTANTS
+  include Constants
 
   EMPTY_S_ = EMPTY_S_
 
@@ -16,7 +16,7 @@ module Skylab::TanMan::TestSupport::Models
 
   Callback_ = TanMan_::Callback_
 
-  module CONSTANTS
+  module Constants
 
     Within_silo = -> silo_name_i, instance_methods_module do
       _NODE_ID_ = Brazen_.node_identifier.via_symbol silo_name_i
@@ -82,13 +82,13 @@ module Skylab::TanMan::TestSupport::Models
 
     def use_empty_ws
       td = verbosify_tmpdir empty_dir_pn
-      if Do_prepare_emtpy_tmpdir__[]
+      if Do_prepare_empty_tmpdir__[]
         td.prepare
       end
       @ws_pn = td ; nil
     end
 
-    Do_prepare_emtpy_tmpdir__ = -> do
+    Do_prepare_empty_tmpdir__ = -> do
       p = -> do
         p = NILADIC_EMPTINESS_
         true

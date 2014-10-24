@@ -4,13 +4,13 @@ module Skylab::TanMan::TestSupport::Models::Node
 
   ::Skylab::TanMan::TestSupport::Models[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
   module InstanceMethods
 
-    CONSTANTS::Within_silo[ :node, self ]
+    Constants::Within_silo[ :node, self ]
 
     def stmt_list
       collection_controller.at_graph_sexp :stmt_list

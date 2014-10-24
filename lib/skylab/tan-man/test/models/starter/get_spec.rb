@@ -139,7 +139,7 @@ module Skylab::TanMan::TestSupport::Models::Starter
     end
 
     def bld_IO_spy
-      TestSupport_::IO::Spy.new(
+      TestSupport_::IO.spy(
         :do_debug_proc, -> { do_debug },
         :debug_IO, debug_IO,
         :puts_map_proc, -> s do

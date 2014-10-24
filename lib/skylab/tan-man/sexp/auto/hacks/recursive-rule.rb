@@ -10,7 +10,7 @@ module Skylab::TanMan
     extend Sexp::Auto::Hack::ModuleMethods
 
 
-    list_rx = Sexp::Auto::Hack::FUN.list_rx  # ( any name that ends in "_list" )
+    list_rx = Sexp::Auto::Hack.list_rx  # ( any name that ends in "_list" )
 
     define_singleton_method :match do |i|
       if i.has_members_of_interest

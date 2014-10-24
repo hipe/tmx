@@ -4,7 +4,7 @@ module Skylab::TanMan::TestSupport::API::Actions
 
   ::Skylab::TanMan::TestSupport::API[ TS_ = self ] # #regret
 
-  include CONSTANTS # for the spec itself
+  include Constants # for the spec itself
 
   module ModuleMethods
     def action_name action_name

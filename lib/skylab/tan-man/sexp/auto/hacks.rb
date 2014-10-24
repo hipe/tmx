@@ -25,12 +25,12 @@ module Skylab::TanMan
 
   class Sexp::Auto::Hack
 
-    o = { }                                    # like constants
-
-    o[:list_rx] = /\A(?<stem>.+)_list\z/
-
-    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
-
+    class << self
+      def list_rx
+        LIST_RX__
+      end
+      LIST_RX__ = /\A(?<stem>.+)_list\z/
+    end
   end
 
 
@@ -93,7 +93,7 @@ module Skylab::TanMan
     end
 
 
-    list_rx = Sexp::Auto::Hack::FUN.list_rx
+    list_rx = Sexp::Auto::Hack.list_rx
 
     define_singleton_method :enhance do |i| # `i` for "inference"
       tree_class = i.tree_class

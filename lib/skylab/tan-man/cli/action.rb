@@ -29,7 +29,7 @@ module Skylab::TanMan
         while x = a.shift
           mod = mod.const_get x, false
           if use
-            o.push Autoloader::FUN::Methodize[ x ]
+            o.push TanMan_::Old_name_lib[].methodize x
           else
             use = true
           end
@@ -163,8 +163,8 @@ module Skylab::TanMan
       on_call_to_action do |e|
         if ! e.touched?
           e.touch!
-          msg = TanMan::Services::
-            Template[ e.template, action: act( e.action_class ) ]
+          msg = TanMan_::Lib_::String_lib[].template[
+            e.template, action: act( e.action_class ) ]
           emit :help, msg  # if something else is listening to *this* ..
         end
         nil

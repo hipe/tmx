@@ -4,7 +4,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph::Remote::List__
 
   ::Skylab::TanMan::TestSupport::CLI::Actions::Graph::Remote[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

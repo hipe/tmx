@@ -62,7 +62,7 @@ module Skylab::TanMan
       end
     end
 
-    CircleHash = MetaHell::Proxy::Nice.new :[], :[]=, :fetch
+    CircleHash = TanMan_::Lib_::Proxy_lib[].nice :[], :[]=, :fetch
 
     class Models::Meaning::Interminable
       attr_reader :trail_a, :reason
@@ -98,7 +98,7 @@ module Skylab::TanMan
         end
       end
 
-      valid_name_rx = Models::Meaning::FUN.valid_name_rx
+      valid_name_rx = Models::Meaning.valid_name_rx
                                                # centralize this hack -
       looks_like_terminal = -> value do        # a meaning looks like a
         valid_name_rx !~ value                 # terminal definition iff
