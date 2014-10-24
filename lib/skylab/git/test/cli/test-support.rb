@@ -4,14 +4,14 @@ module Skylab::Git::TestSupport::CLI
 
   ::Skylab::Git::TestSupport[ self ]
 
-  include CONSTANTS
+  include Constants
 
   ERR_I__ = :errstream
   Git_ = Git_
   OUT_I__ = :outstream
   TestLib_ = TestLib_
 
-  module CONSTANTS
+  module Constants
     ERR_I = ERR_I__
     OUT_I = OUT_I__
   end
@@ -77,11 +77,11 @@ module Skylab::Git::TestSupport::CLI
       s
     end
 
-    pen = Git_::Lib_::CLI[]::Pen
+    pen = Git_::Lib_::CLI_lib[].pen
 
-    STYLE_RX__ = pen::SIMPLE_STYLE_RX
+    STYLE_RX__ = pen.simple_style_rx
 
-    pen::FUN.each_pair_at %i( unstyle_styled ), & method( :define_method )
+    pen.each_pair_at :unstyle_styled, & method( :define_method )
 
     def contiguous_string_from_lines_on i
       line_a = bkd_a

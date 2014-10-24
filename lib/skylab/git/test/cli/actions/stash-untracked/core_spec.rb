@@ -4,7 +4,7 @@ module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked::Core__
 
   ::Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked[ TS__ = self ]
 
-  include CONSTANTS
+  include Constants
 
   OUT_I = OUT_I ; ERR_I = ERR_I
 

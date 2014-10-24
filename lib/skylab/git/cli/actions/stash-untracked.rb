@@ -132,14 +132,14 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
   end
 
-  Lib_CLI_ = Git_::Lib_::CLI[]
+  CLI_lib_ = Git_::Lib_::CLI_lib[]
 
   class CLI
 
     Sub_client__[ self,
       :service_terminal, :service_module, -> { Services__ } ]
 
-    Lib_CLI_::Client[ self, :client_services,
+    CLI_lib_::Client[ self, :client_services,
                            :three_streams_notify, :client_instance_methods ]
 
     def initialize i, o, e
@@ -152,9 +152,9 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     def pen_class
       Expression_Agent__
     end
-    class Expression_Agent__ < Lib_CLI_::Pen::Minimal
+    class Expression_Agent__ < CLI_lib_.pen.minimal_class
       def escape_path x
-        Lib_CLI_::PathTools::FUN.pretty_path[ x.to_s ]
+        Git_::Lib_::Path_tools[].pretty_path x.to_s
       end
     end
   public
@@ -286,7 +286,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
     #                 ~ DSL line of demarcation ~
 
-    Lib_CLI_::Client[ self, :DSL ]
+    CLI_lib_::Client[ self, :DSL ]
 
     option_parser do |o|
       o.separator " description: ping."
@@ -477,7 +477,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
 
     def invoke par_h
-      Lib_CLI_::PathTools.clear  # #storypoint-8.5
+      Git_::Lib_::Path_tools[].clear  # #storypoint-8.5
       r = resolve_hub par_h
       r &&= initialize_basic_set_with_hash par_h
       r && execute
@@ -580,7 +580,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
           call_digraph_listeners i, str.gsub( RX__ ) { escape_path $~[ 0 ] }
         end
     end
-    RX__ = Lib_CLI_::PathTools::FUN::ABSOLUTE_PATH_HACK_RX
+    RX__ = Git_::Lib_::Path_tools[].absolute_path_hack_rx
 
   end
 
@@ -1159,7 +1159,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
   end
 
-  define_singleton_method :stylize, & Git_::Lib_::CLI[]::Pen::FUN.stylize  # #posterity for below ancient lines
+  define_singleton_method :stylize, Git_::Lib_::CLI_lib[].pen.stylize  # #posterity for the below ancient lines
 
   PATCH_STYLE_P_A__ = [
     ->(s) { stylize(s, :strong, :red) },

@@ -135,4 +135,4 @@ of-the-art dependency injection. these are the model properties it exhibits:
 # :#storypoint-10 (placeholder)
 
 
-(in the fire we lost [#hl-088], something about wiring)
+(in the fire we lost old [#hl-088], something about wiring)

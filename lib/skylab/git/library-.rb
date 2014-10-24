@@ -16,78 +16,103 @@ module Skylab::Git
   end
 
   module Lib_
+
     sidesys = Autoloader_.build_require_sidesystem_proc
+
     Action = -> client, * x_a do
-      Headless__[]::Action.apply_iambic_on_client x_a, client
+      HL__[]::Action.apply_iambic_on_client x_a, client
     end
-    Basic__ = sidesys[ :Basic ]
+
+    Bsc__ = sidesys[ :Basic ]
+
     Basic_Fields = -> * x_a do
       if x_a.length.zero?
-        MetaHell__[]::Basic_Fields
+        MH__[]::Basic_Fields
       else
-        MetaHell__[]::Basic_Fields.via_iambic x_a
+        MH__[]::Basic_Fields.via_iambic x_a
       end
     end
+
     Box = -> do
-      Basic__[]::Box
+      Bsc__[]::Box
     end
+
     Bin_pathname = -> do
-      Headless__[]::System.defaults.bin_pathname
+      HL__[]::System.defaults.bin_pathname
     end
+
     Bundle = -> do
-      MetaHell__[]::Bundle
+      MH__[]::Bundle
     end
-    CLI = -> do
-      Headless__[]::CLI
+
+    CLI_lib = -> do
+      HL__[]::CLI
     end
+
     CLI_program_basename = -> do
-      Face__[]::FUN.program_basename[]
+      Face__[].program_basename
     end
+
     CLI_std_two = -> do
-      o = Face__[]::FUN
-      [ o::Stdout[], o::Stderr[] ]
+      Face__[].stdout_stderr
     end
+
     Client = -> client, * x_a do
-      Headless__[]::Client.apply_iambic_on_client x_a, client
+      HL__[]::Client.apply_iambic_on_client x_a, client
     end
+
     Face__ = sidesys[ :Face ]
-    FUN_module = -> do
-      MetaHell__[]::FUN::Module
-    end
+
     Funcy_globful = -> x do
-      MetaHell__[].funcy_globful x
+      MH__[].funcy_globful x
     end
+
     Funcy_globless = -> x do
-      MetaHell__[].funcy_globless x
+      MH__[].funcy_globless x
     end
+
     Fuzzy_matcher = -> x, y do
-      MetaHell__[]::Parse.fuzzy_matcher[ x, y ]
+      MH__[]::Parse.fuzzy_matcher[ x, y ]
     end
-    Headless__ = sidesys[ :Headless ]
+
+    HL__ = sidesys[ :Headless ]
+
     IO_FU = -> do
-      Headless__[]::IO::FU
+      HL__[]::IO.fu
     end
-    MetaHell__ = sidesys[ :MetaHell ]
+
+    MH__ = sidesys[ :MetaHell ]
+
+    Path_tools = -> do
+      HL__[].system.filesystem.path_tools
+    end
+
     Plugin = -> do
-      Headless__[]::Plugin
+      HL__[]::Plugin
     end
+
     Scanner = -> x do
-      Basic__[]::List::Scanner[ x ]
+      Callback_::Scn.try_convert x
     end
+
     Scn = -> do
       Callback_::Scn
     end
+
     Service_terminal = -> do
-      Headless__[]::Service_Terminal
+      HL__[]::Service_Terminal
     end
+
     Set = -> do
-      Basic__[]::Set
+      Bsc__[]::Set
     end
+
     Struct = -> * i_a do
-      Basic__[]::Struct.from_i_a i_a
+      Bsc__[]::Struct.make_via_arglist i_a
     end
+
     Word_wrap = -> do
-      Headless__[]::Text::Word_Wrap
+      Bsc__[]::String.word_wrap
     end
   end
 end

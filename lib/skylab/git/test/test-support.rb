@@ -10,7 +10,7 @@ module Skylab::Git::TestSupport
 
   TestSupport_::Regret[ self ]
 
-  module CONSTANTS
+  module Constants
     Git_ = Git_
     TestSupport_ = TestSupport_
     TestLib_ = TestLib_
@@ -73,16 +73,20 @@ module Skylab::Git::TestSupport
     end
   end
 
-  module CONSTANTS::TestLib_
+  module Constants::TestLib_
 
-    Headless__ = Git_::Lib_::Headless__
+    HL__ = Git_::Lib_::HL__
 
     IO_spy_group = -> do
-      TestSupport_::IO::Spy::Group
+      TestSupport_::IO.spy.group
     end
 
     Stderr = -> do
       TestSupport_::System.stderr
+    end
+
+    System = -> do
+      HL__[].system
     end
 
     Tmpdir = -> do
@@ -90,7 +94,7 @@ module Skylab::Git::TestSupport
     end
 
     Tmpdir_pathname = -> do
-      Headless__[]::System.defaults.tmpdir_pathname.join 'gsu-xyzzy'
+      System[].filesystem.tmpdir_pathname.join 'gsu-xyzzy'
     end
   end
 end

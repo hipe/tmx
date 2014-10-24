@@ -239,7 +239,7 @@ exit( -> sin, sout, serr, argv, program_name do
         es ? nil : true
       end
       define_method :prepare_SCM_checker do
-        p = subsystem[ :Git ]::FUN::SCM_check
+        p = subsystem[ :Git ].check_SCM
         @check_SCM = -> file_s do
           p[ @y, [ file_s ], :be_verbose, true, :when_status, -> do
             @y << "skipping: #{ prgnm[] } cannot make the following change #{

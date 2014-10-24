@@ -4,13 +4,13 @@ module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked
 
   ::Skylab::Git::TestSupport::CLI::Actions[ self ]
 
-  module CONSTANTS
+  module Constants
     GSU = -> do
       Git_::CLI::Actions::Stash_Untracked
     end
     WAZZLE = 'wazzle'.freeze
   end
-  include CONSTANTS
+  include Constants
   Git_ = Git_
   GSU = GSU
   TestLib_ = TestLib_

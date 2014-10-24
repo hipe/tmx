@@ -8,7 +8,7 @@ module Skylab::Git::TestSupport::API::Actions::Spread
 
   ::Skylab::Git::TestSupport[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

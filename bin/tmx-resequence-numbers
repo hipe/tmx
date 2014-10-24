@@ -208,11 +208,11 @@ exit( -> sin, sout, serr, argv, program_name do
   be_verbose = _ALWAYS_VERBOSE
 
   check_SCM = -> do
-   subsystem[ :Git ]::FUN::SCM_check[ y, file_a_,
-    :be_verbose, be_verbose, :when_status, -> do
+    subsystem[ :Git ].check_SCM y, file_a,
+      :be_verbose, be_verbose, :when_status, -> do
       y << "#{ prog_name[] } will not procede because of this."
       _NOPE
-    end ]
+    end
   end
   es = check_SCM[] and break es
 

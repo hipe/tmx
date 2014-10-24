@@ -58,7 +58,8 @@ module Skylab::Git
     end
 
     def hi msg
-      ( @hi ||= Git_::Lib_::CLI[]::Pen::FUN::Stylify.curry[ [ :green ] ] )[ msg ]
+      @hi ||= Git_::Lib_::CLI_lib[].pen.stylify.curry[ [ :green ] ]
+      @hi[ msg ]
     end
 
     def get_y

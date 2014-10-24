@@ -4,13 +4,11 @@ module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked::List__
 
   ::Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked[ TS__ = self ]
 
-  # ( no Q_uickie because of `.stub`-ing below )
-
-  include CONSTANTS
+  include Constants
 
   GSU = GSU ; OUT_I = OUT_I
 
-  describe "[gi] CLI actions gsu list" do
+  describe "[gi] CLI actions gsu list" do  # :+#no-quickie-because: `.stub`-ing
 
     extend TS__
 

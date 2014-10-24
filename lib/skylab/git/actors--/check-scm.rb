@@ -1,8 +1,6 @@
 module Skylab::Git
 
-  FUN = Git_::Lib_::FUN_module[].new
-
-  class FUN::SCM_check
+  class Actors__::Check_SCM
 
     define_singleton_method :[], -> y, file_a, * x_a do
       new( y, file_a, x_a ).execute

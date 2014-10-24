@@ -164,11 +164,11 @@ exit -> argv, stdin, stdout, stderr, program_name do
       }or input from stdin" ]
 
     check_SCM = -> do
-      subsystem[ :Git ]::FUN::SCM_check[ y, file_a,
+      subsystem[ :Git ].check_SCM y, file_a,
         :be_verbose, be_verbose, :when_status, -> do
           y << "#{ progname[] } will not procede because of this."
           _NO
-        end ]
+        end
     end
     es = check_SCM[] and break es
 

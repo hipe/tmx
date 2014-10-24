@@ -74,7 +74,7 @@ module Skylab::Git
     NUM_NUM_ = "( <num> <num> | #{ EL_ } )"
 
     Hi_ = -> msg do
-      @hi ||= Git_::Lib_::CLI[]::Pen::FUN::Stylify.curry[ [ :green ] ]
+      @hi ||= Git_::Lib_::CLI_lib[].pen.stylify.curry[ [ :green ] ]
       @hi[ msg ]
     end
 
