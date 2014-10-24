@@ -35,20 +35,24 @@ module Skylab::Cull
     sidesys, stdlib = Autoloader_.at :build_require_sidesystem_proc,
       :build_require_stdlib_proc
 
-    Headless__ = sidesys[ :Headless ]
-
     FileUtils = stdlib[ :FileUtils ]
 
+    HL__ = sidesys[ :Headless ]
+
     Name_slugulate = -> i do
-      Callback_::Name.from_variegated_symbol( i ).as_slug
+      Callback_::Name.via_variegated_symbol( i ).as_slug
     end
 
-    System_default_tmpdir_pathname = -> do
-      Headless__[]::System.defaults.tmpdir_pathname
+    System__ = -> do
+      HL__[].system
+    end
+
+    System_tmpdir_pathname = -> do
+      System__[].filesystem.tmpdir_pathname
     end
 
     Pretty_path_safe = -> x do
-      Headless__[]::CLI::PathTools::FUN.pretty_path_safe[ x ]
+      System__[].filesystem.path_tools.pretty_path_safe x
     end
   end
 

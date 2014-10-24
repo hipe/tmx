@@ -8,7 +8,7 @@ module Skylab::Cull
 
       fields( [ :name,  :required, :regex, /\A[a-z][-a-z0-9]+\z/ ],
               [ :url,   :required, :body ],
-              [ :tags,  :body, :list,
+              [ :tag_a, :body, :list,
                         :ivar, :tag_a,
                         :regex, /\A[-_a-z0-9]+\z/,
                         :rx_fail_predicate_tmpl, "contains invalid character, #{

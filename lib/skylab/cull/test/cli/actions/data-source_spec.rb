@@ -2,15 +2,15 @@ require_relative 'test-support'
 
 module Skylab::Cull::TestSupport::CLI::Actions::DataSource
 
-  ::Skylab::Cull::TestSupport::CLI::Actions[ DataSource_TS_ = self ]
+  ::Skylab::Cull::TestSupport::CLI::Actions[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport::Quickie
 
-  describe "#{ Cull }::CLI::Actions::DataSource" do
+  describe "[cu] CLI actions - data source" do
 
-    extend DataSource_TS_
+    extend TS_
 
     as :no, /\Awtvr data-source list: no config file in the 3 dirs #{
       }starting from \.\z/, :nonstyled
@@ -77,7 +77,7 @@ module Skylab::Cull::TestSupport::CLI::Actions::DataSource
     end
 
     as :invalid_aggregate, /\Awtvr data-source add: name was #{
-      }invalid\. tags\[0\] contains #{
+      }invalid\. tag_a\[0\] contains #{
       }invalid character, must be lowercase alphanumeric for now #{
       }\(had "one,two"\)\.\z/, :nonstyled
 

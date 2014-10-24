@@ -4,7 +4,7 @@ module Skylab::Cull::TestSupport
 
   describe "[cu]" do
 
-    extend Cull_TestSupport
+    extend TS_
 
     as :exp, /\AExpecting init/, :styled
     as :inv, /\ATry wtvr -h \[sub-cmd\] for help\.\z/i, :styled

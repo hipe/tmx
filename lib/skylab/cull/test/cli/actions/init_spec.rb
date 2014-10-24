@@ -2,15 +2,15 @@ require_relative 'test-support'
 
 module Skylab::Cull::TestSupport::CLI::Actions::Init
 
-  ::Skylab::Cull::TestSupport::CLI::Actions[ Init_TS_ = self ]
+  ::Skylab::Cull::TestSupport::CLI::Actions[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport::Quickie
 
-  describe "#{ Cull }::CLI::Actions::Init" do
+  describe "[cu] CLI actions - init" do
 
-    extend Init_TS_
+    extend TS_
 
     as :creating_done,
       %r{creating #{ PN_ } \.\. done \(\d\d bytes\)\.\z}i, :nonstyled

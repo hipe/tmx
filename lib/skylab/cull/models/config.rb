@@ -2,9 +2,9 @@ module Skylab::Cull
 
   module Models::Config
 
-    Collection = CodeMolester::Model::Config::Collection
+    Collection = CodeMolester::Models::Config::Collection
 
-    Controller = CodeMolester::Model::Config::Controller
+    Controller = CodeMolester::Models::Config::Controller
 
   end
 end

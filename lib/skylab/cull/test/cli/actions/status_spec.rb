@@ -2,15 +2,15 @@ require_relative 'test-support'
 
 module Skylab::Cull::TestSupport::CLI::Actions::Status
 
-  ::Skylab::Cull::TestSupport::CLI::Actions[ Init_TS_ = self ]
+  ::Skylab::Cull::TestSupport::CLI::Actions[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport::Quickie
 
-  describe "#{ Cull }::CLI::Actions::Status" do
+  describe "[cu] CLI actions - status" do
 
-    extend Init_TS_
+    extend TS_
 
     as :no_cull, /\Ano cull config file found in \. or 3 levels up\.\z/, :nonstyled
     as :invite_specific, /\Atry wtvr status -h for help\.\z/i, :styled

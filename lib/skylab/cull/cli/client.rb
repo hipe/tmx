@@ -126,8 +126,15 @@ module Skylab::Cull
     end
 
     def on_entity_event e
-      str = instance_exec( & e.payload_a.fetch( 0 ).message_proc )
-      @y << "#{ last_invocation_string }: #{ str }"
+      ev = e.payload_a.fetch 0
+      p = ev.message_proc
+      _str = if p.arity.zero?
+        instance_exec( & p )
+      else
+        _expag = ::Skylab::Brazen::API.expression_agent_instance
+        _expag.instance_exec( * ev.to_a, & p )
+      end
+      @y << "#{ last_invocation_string }: #{ _str }"
       nil
     end
 
