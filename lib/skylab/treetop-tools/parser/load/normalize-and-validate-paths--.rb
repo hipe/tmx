@@ -2,24 +2,26 @@ module Skylab::TreetopTools
 
   class Parser::Load
 
-    class Normalize_and_validate_paths__
+    class Normalize_and_validate_paths__  # :+[#hl-022] filesystem expectations
 
-      Callback_::Actor[ self, :properties, :root_bp, :self ]
+      Callback_::Actor.call self, :properties,
+        :root_bp,
+        :event_receiver  # and proprietor
 
-      Lib_::Event[].sender self
+      Lib_::Event_lib[].sender self
 
       def execute
-        @error_count = 0
         resolve_pathname_actual_a
+        ok = nil
         @pathname_actual_a.each do |bp|
           ok = process_bound_property bp
           ok or break
         end
-        @error_count.zero?
+        ok
       end
 
       def resolve_pathname_actual_a
-        @pathname_actual_a = @self.bound_parameters.where do |bp|
+        @pathname_actual_a = @event_receiver.bound_parameters.where do |bp|
           if bp.known? :pathname
             bp[ :pathname ]
           end
@@ -110,7 +112,7 @@ module Skylab::TreetopTools
 
       def send_not_abspath_error prop
         prop_ = @root_bp
-        _ev = build_error_event_with :not_absolute_path, :prop, prop do |y, o|
+        _ev = build_not_OK_event_with :not_absolute_path, :prop, prop do |y, o|
           y << "#{ prop_.normalized_parameter_name } must be an absolute #{
             }path in order to expand paths like #{ prop.label }"
         end
@@ -119,7 +121,7 @@ module Skylab::TreetopTools
 
       def send_no_anchor_error prop
         prop_ = @root_bp
-        _ev = build_error_event_with :no_anchor_path do |y, o|
+        _ev = build_not_OK_event_with :no_anchor_path do |y, o|
           y << "#{ prop_.normalized_parameter_name } must be set #{
             }in order to support a relative path like #{ prop.label }!"
         end
@@ -127,21 +129,21 @@ module Skylab::TreetopTools
       end
 
       def send_not_directory_error prop
-        _ev = build_error_event_with :not_a_directory, :prop, prop do |y, o|
+        _ev = build_not_OK_event_with :not_a_directory, :prop, prop do |y, o|
           y << "#{ o.prop.label } is not a directory: #{ pth prop.value }"
         end
         send_error_event _ev
       end
 
       def send_not_found_error prop
-        _ev = build_error_event_with :not_found, :prop, prop do |y, o|
+        _ev = build_not_OK_event_with :not_found, :prop, prop do |y, o|
           y << "#{ prop.label } not found: #{ pth prop.value }"
         end
         send_error_event _ev
       end
 
       def send_error_event ev
-        @self.receive_error_event ev
+        @event_receiver.receive_error_event ev
       end
     end
   end

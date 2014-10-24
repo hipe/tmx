@@ -1,8 +1,8 @@
 module Skylab::TreetopTools
 
-  module Parser::InstanceMethods  # you must implement the #call-down's below
+  module Parser::InstanceMethods  # you must implement the #hook-out's below
 
-    Lib_::Event[].sender self
+    Lib_::Event_lib[].sender self
 
     def parse_file pn, *a, &p
       _ia = build_file_input_adapter pn, &p
@@ -96,19 +96,19 @@ module Skylab::TreetopTools
     end
 
     def parser_class
-      @parser_class ||= load_parser_class  # :+#call-down
+      @parser_class ||= produce_parser_class  # :+#hook-out
     end
 
     def when_parse_failure
       _ev = build_parse_failure_event
-      receive_parse_failure_event _ev  # :+#call-down
+      receive_parse_failure_event _ev  # :+#hook-out
       UNABLE_
     end
 
     def build_parse_failure_event
       msg = parser_failure_reason
       msg ||= "Got nil from parser without a reason!"
-      build_error_event_with :parse_failed, :reason, msg do |y, o|
+      build_not_OK_event_with :parse_failed, :reason, msg do |y, o|
         y << o.msg
       end
     end

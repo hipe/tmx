@@ -16,50 +16,50 @@ module Skylab::TreetopTools
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
-    Basic__ = sidesys[ :Basic ]
+    Bsc__ = sidesys[ :Basic ]
 
     Basic_fields = -> * x_a do
-      MetaHell__[]::Basic_Fields.via_iambic x_a
+      MH__[]::Basic_Fields.via_iambic x_a
     end
 
-    Brazen__ = sidesys[ :Brazen ]
+    Bzn__ = sidesys[ :Brazen ]
 
     CLI = -> do
-      Headless__[]::CLI
+      HL__[]::CLI
     end
 
     CodeMolester__ = sidesys[ :CodeMolester ]
 
     Digraph = -> do
-      Basic__[]::Digraph
+      Bsc__[]::Digraph
     end
 
-    Event = -> do
-      Brazen__[]::Entity.event
+    Event_lib = -> do
+      Bzn__[]::Entity.event
     end
 
     File_utils = memoize[ -> { require 'fileutils' ; ::FileUtils } ]
 
-    Headless__ = sidesys[ :Headless ]
+    HL__ = sidesys[ :Headless ]
 
     List_scanner = -> x do
-      Basic__[]::List::Scanner[ x ]
+      Callback_::Scn.try_convert x
     end
 
-    MetaHell__ = sidesys[ :MetaHell ]
+    MH__ = sidesys[ :MetaHell ]
 
     Parameter = -> do
-      Headless__[]::Parameter
+      HL__[]::Parameter
     end
 
     Strange_proc = -> do
-      MetaHell__[].strange.to_proc
+      MH__[].strange.to_proc
     end
 
     String_scanner = memoize[ -> { require 'strscan' ; ::StringScanner } ]
 
     SubClient = -> do
-      Headless__[]::SubClient
+      HL__[]::SubClient
     end
 
     Treetop = memoize[ -> do
