@@ -1,6 +1,6 @@
 require_relative '../test-support'
 
-module Skylab::GitViz::TestSupport::VCS_Adapters_::Git::Repo_
+module Skylab::GitViz::TestSupport::VCS_Adapters::Git::Repo
 
   describe "[gv] VCS adapters git repo commit build" do
 

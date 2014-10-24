@@ -2,24 +2,24 @@ require_relative '../core'
 
 module Skylab::GitViz::TestSupport
 
-  module CONSTANTS
+  module Constants
     GitViz = ::Skylab::GitViz
     o = GitViz::Lib_
     TestSupport = o::TestSupport[]
     TS_ = GitViz::TestSupport
   end
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport::Quickie
 
-  GitViz = GitViz ; TS__ = self
-
   TestSupport::Regret[ self ]
+
+  GitViz = GitViz ; TS__ = self
 
   module ModuleMethods
     def use i
-      const_i = GitViz::Name_.from_variegated_symbol( i ).as_const
+      const_i = GitViz::Name_.via_variegated_symbol( i ).as_const
       mod = nearest_test_node
       while true
         if mod.const_defined? const_i, false
@@ -92,11 +92,20 @@ module Skylab::GitViz::TestSupport
     end
   end
 
+  Autoloader_ = GitViz::Autoloader_
+
+  Autoloader_[ self, :boxxy,  GitViz.dir_pathname.join( 'test' ) ]
+
   module Messages
     PATH_IS_FILE = "path is file, must have directory".freeze
   end
 
-  _pn = GitViz.dir_pathname.join 'test'
-  GitViz::Autoloader_[ self, :boxxy, _pn ]
+  module VCS_Adapters  # ~ stowaway
+    module Git
+      Autoloader_[ Fixtures = ::Module.new ]
 
+      Autoloader_[ self ]
+    end
+    Autoloader_[ self ]
+  end
 end

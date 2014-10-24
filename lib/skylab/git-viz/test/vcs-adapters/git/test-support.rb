@@ -1,24 +1,20 @@
 require_relative '../../test-support'
 
-module Skylab::GitViz::TestSupport::VCS_Adapters_
+module Skylab::GitViz::TestSupport::VCS_Adapters
 
   ::Skylab::GitViz::TestSupport[ self ]
 
 end
 
-module Skylab::GitViz::TestSupport::VCS_Adapters_::Git
+module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
-  ::Skylab::GitViz::TestSupport::VCS_Adapters_[ TS__ = self ]
+  ::Skylab::GitViz::TestSupport::VCS_Adapters[ TS__ = self ]
 
-  include CONSTANTS
+  include Constants
 
   GitViz = GitViz
 
   extend TestSupport::Quickie
-
-  module Fixtures
-    GitViz::Autoloader_[ self ]
-  end
 
   module InstanceMethods
 

@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::GitViz::TestSupport::VCS_Adapters_::Git::Repo_::Hist_Tree__
+module Skylab::GitViz::TestSupport::VCS_Adapters::Git::Repo::Hist_Tree
 
   describe "[gv] vcs adapters git repo hist-tree bunch build" do
 

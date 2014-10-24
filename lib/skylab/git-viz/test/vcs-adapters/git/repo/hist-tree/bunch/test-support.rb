@@ -1,10 +1,10 @@
 require_relative '../../test-support'
 
-module Skylab::GitViz::TestSupport::VCS_Adapters_::Git::Repo_::Hist_Tree__
+module Skylab::GitViz::TestSupport::VCS_Adapters::Git::Repo::Hist_Tree
 
-  ::Skylab::GitViz::TestSupport::VCS_Adapters_::Git::Repo_[ TS__ = self ]
+  ::Skylab::GitViz::TestSupport::VCS_Adapters::Git::Repo[ TS__ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport::Quickie
 

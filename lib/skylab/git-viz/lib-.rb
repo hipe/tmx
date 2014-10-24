@@ -15,7 +15,7 @@ module Skylab::GitViz
         memo[ -> do
           /\Arbx\b/i =~ ::RUBY_ENGINE and raise "cannot load '#{ i }' in rbx!"
           skylab_top[]
-          require "skylab/#{ Name_.from_const( i ).as_slug }/core"
+          require "skylab/#{ Name_.via_const( i ).as_slug }/core"
           ::Skylab.const_get i, false
         end ]
       end
@@ -23,81 +23,98 @@ module Skylab::GitViz
 
     # ~ universe modules, sidesystem facilities and short procs all as procs
 
-    Basic__ = wall[ :Basic ]
+    Bsc__ = wall[ :Basic ]
 
     Basic_Set = -> * a do
-      self::Basic__[]::Set[ * a ]
+      Bsc__[]::Set[ * a ]
     end
 
     CLI_legacy_DSL = -> mod do
       Porcelain__[]::Legacy::DSL[ mod ]
     end
 
+    CLI_lib = -> do
+      HL__[]::CLI
+    end
+
     DateTime = memo[ -> do require 'date' ; ::DateTime end ]
 
     Formal_attribute_definer = -> mod do
-      self::MetaHell__[]::Formal::Attribute::Definer[ mod ] ; nil
+      MH__[]::Formal::Attribute::Definer[ mod ] ; nil
     end
 
     Grit = memo[ -> do require 'grit' ; ::Grit end ]
 
-    Headless = Headless__ = sidesys[ :Headless ]
+    HL__ = sidesys[ :Headless ]
 
     Ick = -> x do  # this one is not behind a wall, but #todo:when-ba-purifies
       x.inspect  # placeholder for the future from the past
     end
 
     JSON = stdlib[ :JSON ]
+
     Listen = gem[ :Listen ]
 
     Local_normal_name_from_module = -> x do
-      self::Headless__[]::Name::FUN::Local_normal_name_from_module[ x ]
+      Old_name_lib[].local_normal_name_from_module x
     end
 
     Memoize = Callback_.memoize
-    MetaHell__ = wall[ :MetaHell ]
+
+    MH__ = wall[ :MetaHell ]
+
     MD5 = memo[ -> do require 'digest/md5' ; ::Digest::MD5 end ]
+
+    Old_name_lib = -> do
+      HL__[]::Name
+    end
+
     Open3 = stdlib[ :Open3 ]
+
     OptionParser = memo[ -> do require 'optparse' ; ::OptionParser end ]
 
     oxford = Callback_::Oxford
+
     Oxford_or = oxford.curry[ ', ', '[none]', ' or ' ]
+
     Oxford_and = oxford.curry[ ', ', '[none]', ' and ' ]
 
-    Plugin = -> { self::Headless__[]::Plugin }
+    Plugin = -> { HL__[]::Plugin }
+
     Porcelain__ = wall[ :Porcelain ]
 
     Power_Scanner = -> * x_a do
-      self::Basic__[]::List::Scanner::Power.from_iambic x_a
+      Callback_::Scn.multi_step.build_via_iambic x_a
     end
 
     Set = stdlib[ :Set ]
+
     Shellwords = stdlib[ :Shellwords ]
 
     Simple_monadic_iambic_writers = -> * a do
-      self::Headless__[]::API::Simple_monadic_iambic_writers[ * a ]
+      HL__[]::API::Simple_monadic_iambic_writers[ * a ]
     end
 
     Some_stderr_IO = -> do
-      self::Headless__[]::System::IO.some_stderr_IO
+      System[].IO.some_stderr_IO
     end
 
     Strange = -> x do
-      MetaHell__[].strange 120, x
+      MH__[].strange 120, x
     end
 
     StringScanner = memo[ -> do require 'strscan' ; ::StringScanner end ]
 
     SubTree__ = sidesys[ :SubTree ]
 
+    System = -> do
+      HL__[].system
+    end
+
     TestSupport = wall[ :TestSupport ]
 
     Tree = -> do
       SubTree__[]::Tree
-    end
-
-    Unstyle_styled = -> x do
-      self::Headless__[]::CLI::Pen::FUN::Unstyle_styled[ x ]
     end
 
     ZMQ = memo[ -> do require 'ffi-rzmq' ; ::ZMQ end ]

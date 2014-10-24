@@ -33,26 +33,15 @@ module Skylab::GitViz::TestSupport
       end
 
       def expect i, s
-        _name = GitViz::Name_.from_const i
+        _name = GitViz::Name_.via_const i
         _name.as_doc_slug.should eql s
-      end
-    end
-
-    context "from local pathname" do
-
-      memoize :name do
-        GitViz::Name_.from_local_pathname ::Pathname.new 'foo-bar'
-      end
-
-      it "as_const" do
-        name.as_const.should eql :Foo_Bar
       end
     end
 
     context "from variegated symbol" do
 
       memoize :name do
-        GitViz::Name_.from_variegated_symbol :merk_FS
+        GitViz::Name_.via_variegated_symbol :merk_FS
       end
 
       it "as_const" do

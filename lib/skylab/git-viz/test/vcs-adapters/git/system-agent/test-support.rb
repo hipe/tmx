@@ -1,11 +1,11 @@
 require_relative '../test-support'
 
-module Skylab::GitViz::TestSupport::VCS_Adapters_::Git::System_Agent_
+module Skylab::GitViz::TestSupport::VCS_Adapters::Git::System_Agent
 
-  Parent_TS__ = ::Skylab::GitViz::TestSupport::VCS_Adapters_::Git
+  Parent_TS__ = ::Skylab::GitViz::TestSupport::VCS_Adapters::Git
   Parent_TS__[ TS__ = self ]
 
-  include CONSTANTS
+  include Constants
 
   GitViz = GitViz
 

@@ -25,7 +25,7 @@ module Skylab::GitViz
       end
 
       def prepare_VCS_resouces_for_mocks
-        fixtures_mod = GitViz::TestSupport::VCS_Adapters_::Git::Fixtures
+        fixtures_mod = GitViz::TestSupport::VCS_Adapters::Git::Fixtures
         _mock_FS = GitViz::Test_Lib_::Mock_FS::In_module[ fixtures_mod ]
         _mock_pn = _mock_FS.touch_pn @pathname.to_path
         @x_a.push :pathname, _mock_pn

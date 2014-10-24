@@ -4,7 +4,7 @@ module Skylab::GitViz::TestSupport::API
 
   ::Skylab::GitViz::TestSupport[ TS__ = self ]
 
-  include CONSTANTS
+  include Constants
 
   GitViz = GitViz
 
@@ -20,7 +20,7 @@ module Skylab::GitViz::TestSupport::API
     end
 
     def bld_emit_spy
-      GitViz::Callback_::Test::Call_Digraph_Listeners_Spy.new(
+      GitViz::Callback_.test_support.call_digraph_listeners_spy(
         :debug_IO, debug_IO,
         :do_debug_proc, -> { do_debug } )
     end

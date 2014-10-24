@@ -123,7 +123,7 @@ module Skylab::GitViz
 
       def rslv_some_VCS_front
         vcs_adapter_i = some_VCS_adapter_name
-        _const = Name_.from_variegated_symbol( vcs_adapter_i ).as_const
+        _const = Name_.via_variegated_symbol( vcs_adapter_i ).as_const
         vcs_mod = @VCS_adapters_module.const_get _const, false
         vcs_mod::Front.new vcs_mod, @VCS_listener do |front|
           front.set_system_conduit @system_conduit

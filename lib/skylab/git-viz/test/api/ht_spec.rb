@@ -87,7 +87,7 @@ module Skylab::GitViz::TestSupport::API
     end
 
     def fixtures_module
-      GitViz::TestSupport::VCS_Adapters_::Git::Fixtures
+      GitViz::TestSupport::VCS_Adapters::Git::Fixtures
     end
   end
 end

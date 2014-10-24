@@ -27,7 +27,7 @@ module Skylab::GitViz
       end
       def execute
         _i = resolve_some_locator_x
-        _const_i = Name_.from_variegated_symbol( _i ).as_const
+        _const_i = Name_.via_variegated_symbol( _i ).as_const
         API::Actions__.const_get _const_i, false
       end
     private

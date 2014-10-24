@@ -22,7 +22,7 @@ module Skylab::GitViz
       GitViz::Lib_::Local_normal_name_from_module[ self ]
     end
 
-    GitViz::Lib_::Headless[]::Client[ self,
+    GitViz::Lib_::CLI_lib[]::Client[ self,
       :client_services,
         :named, :svcs_for_API_action,
         :named, :listnr_for_VCS_front ]

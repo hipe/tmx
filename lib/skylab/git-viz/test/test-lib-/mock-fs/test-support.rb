@@ -4,7 +4,7 @@ module Skylab::GitViz::TestSupport::Test_Lib_::Mock_FS
 
   ::Skylab::GitViz::TestSupport::Test_Lib_[ TS__ = self ]
 
-  include CONSTANTS
+  include Constants
 
   Mock_FS_Parent_Module__ = GitViz::Test_Lib_
 

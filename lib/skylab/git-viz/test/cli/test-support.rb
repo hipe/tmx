@@ -4,11 +4,11 @@ module Skylab::GitViz::TestSupport::CLI
 
   ::Skylab::GitViz::TestSupport[ TS__ = self ]
 
-  module CONSTANTS
+  module Constants
     PROGNAME_ = 'gv'.freeze
   end
 
-  include CONSTANTS
+  include Constants
 
   GitViz = GitViz ; PROGNAME_ = PROGNAME_ ; TestSupport = TestSupport
 
@@ -40,7 +40,7 @@ module Skylab::GitViz::TestSupport::CLI
     end
 
     def bld_IO_spy_group
-      grp = TestSupport::IO::Spy::Group.new
+      grp = TestSupport::IO.spy.group.new
       grp.debug_IO = debug_IO
       grp.do_debug_proc = -> { do_debug }
       grp.add_stream :i, :_no_instream_

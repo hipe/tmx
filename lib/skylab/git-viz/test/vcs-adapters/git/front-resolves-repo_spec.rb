@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::GitViz::TestSupport::VCS_Adapters_::Git
+module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
   describe "[gv] VCS adapters git front resolves repo" do
 

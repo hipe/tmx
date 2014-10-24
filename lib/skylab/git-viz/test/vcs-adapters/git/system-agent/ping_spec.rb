@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::GitViz::TestSupport::VCS_Adapters_::Git::System_Agent_
+module Skylab::GitViz::TestSupport::VCS_Adapters::Git::System_Agent
 
   describe "[gv] VCS adapters git system agent spec" do
 

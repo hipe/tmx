@@ -4,7 +4,7 @@ module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System
 
   ::Skylab::GitViz::TestSupport[ TS__ = self ]
 
-  include CONSTANTS
+  include Constants
 
   GitViz = GitViz
 

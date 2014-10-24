@@ -52,13 +52,13 @@ module Skylab::GitViz
 
     def disptch_to_CLI_action
       _i = @legacy_last_hot._sheet._name.local_normal
-      _const_i = Name_.from_variegated_symbol( _i ).as_const
+      _const_i = Name_.via_variegated_symbol( _i ).as_const
       _unbnd = CLI::Actions__.const_get _const_i, false
       _bound = _unbnd.new( svcs_for_CLI_action )
       _bound.invoke_with_iambic @param_x_a
     end
 
-    GitViz::Lib_::Headless[]::Client[ self,
+    GitViz::Lib_::CLI_lib[]::Client[ self,
       :client_services,
         :named, :svcs_for_CLI_action ]
 
