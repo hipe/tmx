@@ -3,27 +3,62 @@ module Skylab::InformationTactics
   # levenshtein distance
   # is kind of amazing
   #
-  #     A_ = [ :apple, :banana, :ernana, :onono, :strawberry, :orange ]
-  #     a = InformationTactics_::Levenshtein::Closest_n_items_to_item[ 3, A_, :bernono ]
-  #
-  #     a  # => [ :onono, :ernana, :banana ]
+  #     a = [ :apple, :banana, :ernana, :onono, :strawberry, :orange ]
+  #     a_ = Subject_[].with(
+  #       :item, :bernono,
+  #       :items, a,
+  #       :closest_N_items, 3 )
+  #     a_  # => [ :onono, :ernana, :banana ]
 
-  module Levenshtein
+  class Levenshtein
 
-    InformationTactics::Library_.touch :Levenshtein
+    Callback_::Actor.call self, :properties,
+      :item,
+      :items,
+      :closest_N_items,
+      :aggregation_proc,
+      :item_proc
 
-    Closest_n_items_to_item = -> closest_n, pool_a, outside_x do  # #curry-friendly
-      outside_s = outside_x.to_s
-
-      item_a = pool_a.reduce [] do |m, x|
-        dist_d = ::Levenshtein.distance x.to_s, outside_s
-        m << Item__[ x, dist_d ]
-      end
-
-      item_a.sort_by!( & :distance_d )
-      item_a[ 0, closest_n ].map( & :x )
+    def initialize
+      super
+      @aggregation_proc ||= IDENTITY_
+      @item_proc ||= IDENTITY_
     end
-    #
-    Item__ = ::Struct.new :x, :distance_d
+
+    def execute
+      if @item && @items && @closest_N_items
+        via_OK_ivars_execute
+      else
+        false
+      end
+    end
+
+  private
+
+    def via_OK_ivars_execute
+      extra_s = @item.to_s
+      item_a = []
+      @items.each do |item_x|
+        item_a.push(
+          Item__.new(
+            item_x,
+            ::Levenshtein.distance( item_x.to_s, extra_s ) ) )
+      end
+      item_a.sort_by!( & :distance_d )
+      @item_a = item_a
+      via_sorted_items
+    end
+
+    def via_sorted_items
+      _sub_slice_item_a = @item_a[ 0, @closest_N_items ]
+      _value_x_a = _sub_slice_item_a.map do |item|
+        @item_proc[ item.item_x ]
+      end
+      @aggregation_proc[ _value_x_a ]
+    end
+
+    Item__ = ::Struct.new :item_x, :distance_d
+
+    IT_::Library_.touch :Levenshtein
   end
 end

@@ -2,18 +2,29 @@ module Skylab::InformationTactics
 
   module Library_  # :+[#su-001]
 
-    gemlib = stdlib = Autoloader_.method :require_stdlib
+    class << self
 
-    o = { }
-    o[ :Levenshtein ] = gemlib
-    o[ :Time ] = stdlib
-
-    define_singleton_method :const_missing do |const_i|
-      const_set const_i, o.fetch( const_i )[ const_i ]
+      def touch i
+        if ! const_defined? i, false
+          const_get i, false
+        end ; nil
+      end
     end
 
-    def self.touch i
-      const_defined?( i, false ) or const_get( i, false ) ; nil
-    end
+    -> o do
+
+      gemlib = stdlib = Autoloader_.method :require_stdlib
+
+      o[ :Levenshtein ] = gemlib
+
+      o[ :Time ] = stdlib
+
+    end.call -> do
+      o = {}
+      define_singleton_method :const_missing do |i|
+        const_set i, o.fetch( i )[ i ]
+      end
+      o
+    end.call
   end
 end

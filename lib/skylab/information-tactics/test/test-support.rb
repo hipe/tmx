@@ -6,12 +6,12 @@ module Skylab::InformationTactics::TestSupport
 
   ::Skylab::TestSupport::Regret[ self ]
 
-  module CONSTANTS
-    InformationTactics_ = ::Skylab::InformationTactics
+  module Constants
+    IT_ = ::Skylab::InformationTactics
     TestSupport_ = ::Skylab::TestSupport
   end
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 end

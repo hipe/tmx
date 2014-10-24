@@ -4,11 +4,11 @@ module Skylab::InformationTactics::TestSupport::Levenshtein
 
   ::Skylab::InformationTactics::TestSupport[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
-  InformationTactics_ = InformationTactics_
+  IT_ = IT_
 
   Sandboxer = TestSupport_::Sandbox::Spawner.new
 
@@ -18,12 +18,18 @@ module Skylab::InformationTactics::TestSupport::Levenshtein
       it "is kind of amazing" do
         Sandbox_1.with self
         module Sandbox_1
-          A_ = [ :apple, :banana, :ernana, :onono, :strawberry, :orange ]
-          a = InformationTactics_::Levenshtein::Closest_n_items_to_item[ 3, A_, :bernono ]
-
-          a.should eql( [ :onono, :ernana, :banana ] )
+          a = [ :apple, :banana, :ernana, :onono, :strawberry, :orange ]
+          a_ = Subject_[].with(
+            :item, :bernono,
+            :items, a,
+            :closest_N_items, 3 )
+          a_.should eql( [ :onono, :ernana, :banana ] )
         end
       end
+    end
+
+    Subject_ = -> do
+      IT_::Levenshtein
     end
   end
 end
