@@ -16,11 +16,9 @@ module Skylab::Headless
       Headless_::Lib_::Bundle[]::Multiset[ self ]
     end
 
-    CEASE_X__ = CLI::Action::CEASE_X
-
     module IMs_
 
-      include CLI::Action::IMs
+      include CLI::Action_::IMs
 
       def is_leaf  # #hook-in to the o.p facility
         false
@@ -38,7 +36,7 @@ module Skylab::Headless
         disp = disptch_p[ self, action, args ]
         disp and begin
           r = disp.bound_receiver.send disp.dispatchee_method_i, * disp.args
-          CEASE_X__ == r and r = dsptch_failed( disp )
+          CEASE_X_ == r and r = dsptch_failed( disp )
           r
         end
       end
@@ -86,7 +84,7 @@ module Skylab::Headless
       def dsptch_failed disp
         s = disp.bound_receiver.invite_line
         s and help_yielder << s
-        CEASE_X__
+        CEASE_X_
       end
     public
       def bound_action_was_created_for_disptch disp  # :+#API-private hook-in
@@ -96,7 +94,9 @@ module Skylab::Headless
     end
 
     class Dispatch__
-      Headless::Lib_::Funcy_globful[ self ]
+
+      Headless_::Lib_::Funcy_globful[ self ]
+
       def initialize client, action_s, arg_s_a
         @action_s = action_s ; @arg_s_a = arg_s_a ; @client = client ; nil
       end
@@ -104,7 +104,7 @@ module Skylab::Headless
         @bound
       end
       def dispatchee_method_i
-        CLI::Action::INVOKE_METHOD_I
+        CLI::Action_::INVOKE_METHOD_I
       end
       def args
         [ @arg_s_a ]  # per the signature of the invoke method
@@ -198,7 +198,7 @@ module Skylab::Headless
       def render_any_hlp_addtn y
         super
         if s = any_invite_line_as_bx
-          y << EMPTY_STRING_  # #assume-previous-line-above
+          y << EMPTY_S_  # #assume-previous-line-above
           y << s ; nil
         end
       end
@@ -240,10 +240,10 @@ module Skylab::Headless
       def strt_actions_section d
         hdr_s = say :chld_acts
         _plural_s = say { "#{ hdr_s }#{ s d }" }  # don't format or stylize
-        CLI::Action::Desc::Section.new _plural_s, []
+        CLI::Action_.desc.section _plural_s, []
       end
 
-      CLI::Box::LEXICON_ = CLI::Box::LEXICON__ = CLI::Action::LEXICON__
+      CLI::Box::LEXICON_ = CLI::Box::LEXICON__ = CLI::Action_::LEXICON__
         # #storypoint-130
 
       LEXICON__.add do |lx|
@@ -257,9 +257,11 @@ module Skylab::Headless
     # ~ private #hook-out's for client
 
       def enqueue_help_as_box cmd_s=nil  # #storypoint-145
-        if ! cmd_s && CLI::Option::Constants::OPT_RX !~ @argv.first
+
+        if ! cmd_s && CLI.option.opt_rx !~ @argv.first
           cmd_s = @argv.shift
         end
+
         enqueue_with_args :help, cmd_s
       end
 
@@ -301,8 +303,9 @@ module Skylab::Headless
       end
     end
 
+    CEASE_X_ = CLI::Action_::CEASE_X_
     DISPATCH_METHOD_I_ = :dsptch
-    OK_ = true
+    PROCEDE_X_ = CLI::Action_::PROCEDE_X_
 
   end
 end

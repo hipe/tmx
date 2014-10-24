@@ -123,12 +123,13 @@ module Skylab::Headless::TestSupport::CLI::Box
           end
 
           class FooBar < Action_Stub
-            @name_function = Headless_::Name::Function::From::
-              Module_Anchored.new name, Donk.name
+            @name_function = Headless_::Name.
+              via_module_name_anchored_in_module_name name, Donk.name
           end
           class BazzBiff < Action_Stub
-            @name_function = Headless_::Name::Function::Full.
-              from_normalized_name_path %i( never_see bazz_biff )
+            @name_function = Headless_::Name.qualified.
+              via_symbol_list( [ :never_see, :bazz_biff ] )
+
             def help_screen y
               y << "helo"
               :_terff_

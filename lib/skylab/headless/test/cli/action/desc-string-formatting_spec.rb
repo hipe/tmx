@@ -4,11 +4,11 @@ module Skylab::Headless::TestSupport::CLI::Desc__
 
   ::Skylab::Headless::TestSupport::CLI::Action[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
-  describe "[hl] CLI help sections" do
+  describe "[hl] CLI action desc string formatting" do
 
     it "no lines" do
       parse <<-O
@@ -17,8 +17,8 @@ module Skylab::Headless::TestSupport::CLI::Desc__
     end
 
     def parse s
-      _scn = Headless_::Library_::Basic::List::Scanner::For::String[ s ]
-      Headless_::CLI::Action::Desc::Parse_sections[ @sections=[], _scn ] ; nil
+      _scn = Headless_::Lib_::String_lib[].line_scanner s
+      Headless_::CLI.action.desc.parse_sections @sections=[], _scn ; nil
     end
 
     it "one normal line" do

@@ -2,11 +2,22 @@ module Skylab::Headless
 
   module CLI::Client  # read [#089] the CLI client narrative #storypoint-5
 
-    def self.[] mod, * x_a
-      if x_a.length.zero?
-        x_a.concat DEFAULT_BUNDLES_X_A__
+    class << self
+
+      def [] mod, * x_a
+        via_client_and_iambic mod, x_a
       end
-      Bundles_.apply_iambic_on_client x_a, mod
+
+      def via_arglist a
+        via_client_and_iambic a.shift, a
+      end
+
+      def via_client_and_iambic mod, x_a
+        if x_a.length.zero?
+          x_a.concat DEFAULT_BUNDLES_X_A__
+        end
+        Bundles_.apply_iambic_on_client x_a, mod
+      end
     end
 
     DEFAULT_BUNDLES_X_A__ = %i( client_instance_methods )
@@ -15,7 +26,7 @@ module Skylab::Headless
 
       Actions_anchor_module = -> x_a do
         module_exec x_a, &
-          Headless::Action::Bundles::Actions_anchor_module.to_proc
+          Headless_::Action::Bundles::Actions_anchor_module.to_proc
       end
 
       Client_instance_methods = -> _ do
@@ -23,7 +34,7 @@ module Skylab::Headless
       end
 
       Client_services = -> x_a do
-        module_exec x_a, & Headless::Client::Bundles::Client_services.to_proc
+        module_exec x_a, & Headless_::Client::Bundles::Client_services.to_proc
       end
 
       DSL = -> _ do
@@ -57,7 +68,7 @@ module Skylab::Headless
 
     module IMs__
 
-      include Headless::Client::InstanceMethods, CLI::Action::IMs
+      include Headless_::Client::InstanceMethods, CLI::Action_::IMs
 
       def initialize *a
         @program_name = nil
@@ -68,7 +79,7 @@ module Skylab::Headless
       attr_writer :program_name  # public for ouroboros [#054]
 
       CLI::Client::INITIALIZE_P_H__ = {
-        0 => -> _ { },  # MONADIC_EMPTINESS_
+        0 => MONADIC_EMPTINESS_,
         3 => -> a do
           @IO_adapter = build_IO_adapter( * a )
         end }.freeze
@@ -80,16 +91,16 @@ module Skylab::Headless
         _IO_adapter_class.new i, o, e, pen
       end
 
-      def dflt_sin ; Headless::CLI::IO.instream end
-      def dflt_sout ; Headless::CLI::IO.outstream end
-      def dflt_serr ; Headless::CLI::IO.errstream end
+      def dflt_sin ; Headless_::CLI::IO.instream end
+      def dflt_sout ; Headless_::CLI::IO.outstream end
+      def dflt_serr ; Headless_::CLI::IO.errstream end
 
       def pen_class  # #hook-out
-        CLI::Pen::Minimal
+        CLI.pen.minimal_class
       end
 
       def _IO_adapter_class
-        Headless::CLI::IO::Adapter::Minimal
+        Headless_::CLI::IO::Adapter::Minimal
       end
 
       # ~ :#hook-in's #topper-stopper's #buck-stop whatever
@@ -151,7 +162,7 @@ module Skylab::Headless
       def parameter_label x, idx=nil  # [#036] explains it all, somewhat
         idx = "[#{ idx }]" if idx
         if ::Symbol === x
-          stem = Headless::Name::FUN::Slugulate[ x ]
+          stem = Headless_::Name.slugulate x
         else
           stem = x.name.as_slug  # errors please
         end
@@ -176,7 +187,7 @@ module Skylab::Headless
       module IMs__
       private
         def build_option_parser  # #storypoint-925
-          op = Headless::Library_::OptionParser.new
+          op = Headless_::Library_::OptionParser.new
           p_a = self.class.any_option_parser_p_a
           p_a and apply_p_a_on_op p_a, op
           _yes = op_looks_like_it_defines_its_own_help op
@@ -199,6 +210,8 @@ module Skylab::Headless
       end
     end
 
+    CEASE_X_ = CLI::Action_::CEASE_X_
+
     module Adapter  # #stowaway for [#054] ouroboros
       Autoloader_[ self ]
     end
@@ -210,14 +223,7 @@ module Skylab::Headless
     module IMs__
       Adapter = Adapter  # covered
     end
-  end
 
-  module CLI::Action
-
-    module CLI::Client
-
-      # ~ "import" some API-private consts as "services"
-
-    end
+    PROCEDE_X_ = CLI::Action_::PROCEDE_X_
   end
 end

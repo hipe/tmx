@@ -2,13 +2,17 @@ require_relative '../test-support'
 
 module Skylab::Headless::TestSupport::CLI::Action::Hlp__
 
-  ::Skylab::Headless::TestSupport::CLI::Action[ TS__ = self ]
+  Parent_TS_ = ::Skylab::Headless::TestSupport::CLI::Action
 
-  include CONSTANTS
+  Parent_TS_[ TS__ = self ]
+
+  include Constants
 
   Headless_ = Headless_
 
   extend TestSupport_::Quickie
+
+  Parent_Subject_ = Parent_TS_::Subject_
 
   module ModuleMethods
     def client_cls_with_op const_i, & op_p
@@ -16,7 +20,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Hlp__
       before :all do
         cls = TS__.const_set const_i, ::Class.new
         cls.class_exec do
-          Headless_::CLI::Action[ self, :core_instance_methods ]
+          Parent_Subject_[ self, :core_instance_methods ]
           define_method :build_option_parser, -> do
             op = Headless_::Library_::OptionParser.new
             instance_exec op, & op_p

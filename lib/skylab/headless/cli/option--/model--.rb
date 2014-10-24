@@ -1,59 +1,70 @@
 module Skylab::Headless
 
-  module CLI::Option
+  module CLI::Option__
 
-    class Model_
+    class Model__
 
       # for reflection of options, not for parsing.
 
       class << self
+
+        def build_via_switch sw
+          new do
+            @args = @long_sexp = nil
+            replace_with_switch sw
+          end
+        end
+
+        def new_flyweight
+          new do
+            @long_sexp = nil  # the micro-lith. everything stems from this.
+            @args = nil  # ignore this here, used for compat. with other form
+          end
+        end
+
+        def new_semi_mutable_from_normal_name i
+          m = Semi_Mutable__.new Option_.local_normal_name_as_long i
+          m.set_norm_short_str Local_normal_name_as_short__[ i ]
+          m
+        end
+
+        def on *a, &b
+          new do
+            @norm_short_str = @long_sexp = @sexp = nil
+            @args = a
+            @block = b
+          end
+        end
+
         private :new
       end
 
-      def self.new_flyweight
-        allocate.instance_exec do
-          @long_sexp = nil  # the micro-lith. everything stems from this.
-          @args = nil  # ignore this here, used for compat. with other form
-          self
-        end
-      end
-
-      def self.new_semi_mutable_from_normal_name i
-        m = Semi_Mutable_.new Local_normal_name_as_long[ i ]
-        m.set_norm_short_str Local_normal_name_as_short_[ i ]
-        m
-      end
-
-      Local_normal_name_as_short_ = -> i do
+      Local_normal_name_as_short__ = -> i do
         "-#{ i[ 0 ] }"
       end
 
-      def self.on *a, &b
-        allocate.instance_exec do
-          @norm_short_str = @long_sexp = @sexp = nil
-          @args = a
-          @block = b
-          self
-        end
+      def initialize & p
+        instance_exec( & p )
       end
 
       #  ~ flyweight replacers - WARNING: ignorant of `args` & `block` ~
 
       def replace_with_long_rx_matchdata md
         @norm_short_str = @norm_long_str = nil
-        @long_sexp and Option::Long_.release @long_sexp
-        @long_sexp = Option::Long_.lease_from_matchdata md
+        @long_sexp and Option_::Long_.release @long_sexp
+        @long_sexp = Option_::Long_.lease_from_matchdata md
         nil
       end
 
       def replace_with_switch sw
-        replace_with_normal_args( ( sw.short.first if sw.short ),
-          ( "#{ sw.long.first }#{ sw.arg }" if sw.long && sw.long.first ) )
+        sw.short and _short = sw.short.first
+        sw.long && sw.long.first and _long = "#{ sw.long.first }#{ sw.arg }"
+        replace_with_normal_args _short, _long
         nil
       end
 
       def replace_with_normal_args norm_short_str, norm_long_str
-        @long_sexp &&= Option::Long_.release @long_sexp
+        @long_sexp &&= Option_::Long_.release @long_sexp
         @norm_short_str = norm_short_str || false
         @norm_long_str = norm_long_str || false
         nil
@@ -91,7 +102,7 @@ module Skylab::Headless
 
       def normalized_parameter_name   # #parameter-reflection-API
         if long_sexp
-          Option::FUN.normize[ @long_sexp.stem ]
+          Option_.normize @long_sexp.stem
         else
           @long_sexp  # #meaningful-false
         end
@@ -103,8 +114,8 @@ module Skylab::Headless
             touch
           else
             @long_sexp = if @norm_long_str
-              Option::Long_.lease_from_matchdata(
-                Option::Constants::LONG_RX.match( @norm_long_str ) )
+              Option_::Long_.lease_from_matchdata(
+                LONG_RX__.match( @norm_long_str ) )
             else
               false
             end
@@ -179,18 +190,19 @@ module Skylab::Headless
     private
 
       def touch  # @args -> @norm_short_str @long_sexp @sexp
-        sexp = Headless::Library_::CodeMolester::Sexp[ :opt ]
+        o = Headless_::Library_::CodeMolester::Sexp
+        sexp = o[ :opt ]
         h = { }
         add = -> k, v do
           ( h[ k ] ||= [ ] ) << sexp.length
-          sexp << [ k, v ]
+          sexp << o[ k, v ]
         end
         @args.each do |x|
           if x.respond_to? :ascii_only?
-            if Option::Constants::SIMPLE_SHORT_RX =~ x
+            if SIMPLE_SHORT_RX__ =~ x
               add[ :short_full, x ]
-            elsif Option::Constants::LONG_RX =~ x
-              add[ :long_sexp, Option::Long_.lease_from_matchdata( $~ ) ]
+            elsif LONG_RX__ =~ x
+              add[ :long_sexp, Option_::Long_.lease_from_matchdata( $~ ) ]
             else
               add[ :desc, x ]
             end
@@ -207,10 +219,10 @@ module Skylab::Headless
         @sexp = sexp
         nil
       end
-      EMPTY_SEP__ = EMPTY_STRING_
-    end
+      EMPTY_SEP__ = EMPTY_S_
 
-    class Semi_Mutable_ < Model_
+
+    class Semi_Mutable__ < self
 
       class << self
         public :new
@@ -255,6 +267,11 @@ module Skylab::Headless
         @desc_a and a.concat @desc_a
         a
       end
+    end
+
+      LONG_RX__ = Option_.long_rx
+      SIMPLE_SHORT_RX__ = Option_.simple_short_rx
+
     end
   end
 end

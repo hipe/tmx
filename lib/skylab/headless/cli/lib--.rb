@@ -1,13 +1,11 @@
 module Skylab::Headless
 
-  CLI::FUN = Headless_::Lib_::FUN_module[].new
-
-  module CLI::FUN
+  module CLI::Lib__
 
     Parse_styles = -> do
       # Parse a string with ascii styles into an S-expression.
 
-      sexp = Headless::Library_::CodeMolester::Sexp
+      sexp = Headless_::Library_::CodeMolester::Sexp
 
       rx = /\A (?<string>[^\e]+)?  \e\[
         (?<digits> \d+  (?: ; \d+ )* )  m  (?<rest> .*) \z/mx
@@ -34,14 +32,14 @@ module Skylab::Headless
       -> sexp do
         sexp.reduce [] do |m, sxp|
           m << h.fetch( sxp.first ).call( sxp )
-        end.join EMPTY_STRING_
+        end.join EMPTY_S_
       end
     end.call
 
     Unstyle_sexp = -> sx do
       sx.reduce [] do |m, x|
         :string == x.first and m << x[ 1 ] ; m
-      end.join EMPTY_STRING_
+      end.join EMPTY_S_
     end
 
     left_peeker_hack = -> summary_width do     # i'm sorry -- there was no
@@ -61,7 +59,7 @@ module Skylab::Headless
             l = left.last.length + s.length
             l += x.arg.length if 1 == left.length && x.arg
             l >= max and sopts.length.nonzeor? and
-              left << EMPTY_STRING_
+              left << EMPTY_S_
             _sep = left.last.length.zero? ? ( TERM_SEPARATOR_STRING_ * 4 ) :
               ', '
             left.last << _sep << s
@@ -77,7 +75,7 @@ module Skylab::Headless
     Summary_width = -> option_parser, max=0 do  # find the width of the widest
       # content that will go in column A in the help screen of this o.p
       left_peek = left_peeker_hack[ option_parser.summary_width ]
-      CLI::Option::Enumerator.new( option_parser ).reduce max do |m, x|
+      CLI.option.enumerator( option_parser ).reduce max do | m, x |
         if x.respond_to? :summarize
           left_peek.call( x ) do |str|
             str.length > m and m = str.length
@@ -87,7 +85,7 @@ module Skylab::Headless
       end
     end
 
-    # ( the below curry chain exemplifies [#101] name conventioons for.. )
+    # (below might be :+[#101] name conventions for etc.)
 
     Ellipsify__ = -> glyph, limit, string do
       if string.length <= limit
@@ -109,13 +107,6 @@ module Skylab::Headless
 
     Ellipsify = Ellipsify_.curry[ Headless_::Lib_::Reasonably_short[] ]
 
-    Looks_like_sentence = -> do
-      punctuation_character_rx = /[.?!]/
-      -> str do
-        str.length.nonzero? and str[ -1 ] =~ punctuation_character_rx
-      end
-    end.call
-
     Cols = -> do
       cols_p = -> else_p do
         begin require 'ncurses' ; rescue ::LoadError => e ; end
@@ -131,5 +122,6 @@ module Skylab::Headless
       end
       -> else_p { cols_p[ else_p ] }
     end.call
+
   end
 end

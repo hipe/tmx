@@ -1,8 +1,8 @@
 module Skylab::Headless
 
-  module CLI::Action
+  module CLI::Action_
 
-    class Queue__  # part of [#143] (but the main logic is in action base i.m)
+    class Queue_  # part of [#143] (but the main logic is in action base i.m)
 
       def initialize a
         a or raise ::ArgumentError, "queue must be build by now"
@@ -93,14 +93,14 @@ module Skylab::Headless
         end
 
         def use_client_to_validate_proc_syntax_against actual_x_a
-          stx = CLI::Argument::Syntax::Isomorphic.new @frame_x.parameters
+          stx = CLI.argument.syntax.isomorphic @frame_x.parameters
           r = @client.with_arg_stx_prcss_args stx, actual_x_a
           r and [ OK_, @frame_x.method( :call ), actual_x_a ]
         end
 
         def resolve_for_frame
           arg_a = @frame_x.arg_a ; bound_meth = @client.method @frame_x.meth_i
-          stx = CLI::Argument::Syntax::Isomorphic.new bound_meth.parameters
+          stx = CLI.argument.syntax.isomorphic bound_meth.parameters
           r = @client.with_arg_stx_prcss_args stx, arg_a
           r and [ OK_, bound_meth, arg_a ]
         end

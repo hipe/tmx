@@ -1,8 +1,27 @@
 module Skylab::Headless
 
-  class CLI::Argument   # might be joined by sister CLI::Option one day..
+  class CLI::Argument_   # might be joined by sister CLI::Option one day..
 
     # read [#135] the CLI argument node narrative #storypoint-1
+
+    class << self
+
+      def reqity_brackets i
+        Reqity_brackets__[ i ]
+      end
+
+      def syntax * a
+        if a.length.zero?
+          Syntax__
+        else
+          Syntax__.new( * a )
+        end
+      end
+
+      def missing i, a, set
+        Missing_[ i, a, set ]
+      end
+    end
 
     def initialize formal, reqity
       @fprm = formal ; @reqity = reqity ; nil
@@ -19,7 +38,7 @@ module Skylab::Headless
     end
 
     def name
-      @name ||= Headless::Name::Function.new @fprm.normalized_parameter_name
+      @name ||= Headless_::Name.via_symbol @fprm.normalized_parameter_name
     end
 
     #  ~ all #hook-out to #parameter-reflection-API
@@ -44,21 +63,36 @@ module Skylab::Headless
       false
     end
 
-    module FUN
 
-      Reqity_brackets = {
-        opt:  [ '[', ']'      ],
-        req:  [ '',  ''       ],
-        rest: [ '[', ' [..]]' ],
-        req_group: [ '{', '}' ]  # #storypoint-2 block is not represen..
-      }.each { |_, a| a.each( & :freeze).freeze }.freeze.method :fetch
+    Reqity_brackets__ = {
+      opt:  [ '[', ']'      ],
+      req:  [ '',  ''       ],
+      rest: [ '[', ' [..]]' ],
+      req_group: [ '{', '}' ]  # #storypoint-2 block is not represen..
+    }.freeze.each_value do |a|
+      a.freeze.each( & :freeze )
+    end.method :fetch
 
-    end
 
-    class Syntax  # (in Arg) #abstract-base-class
+    class Syntax__  # (in Arg) #abstract-base-class
 
-      def self.DSL & p
-        self::DSL.DSL_notify_with_p p
+      class << self
+
+        def DSL & p
+          self::DSL__.receive_p  p
+        end
+
+        def isomorphic * a
+          if a.length.zero?
+            Isomorphic__
+          else
+            Isomorphic__.new( * a )
+          end
+        end
+
+        def validate
+          Validate__
+        end
       end
 
       def initialize farg_a
@@ -145,13 +179,13 @@ module Skylab::Headless
 
       Autoloader_[ self ]  # we are a #stowaway but we have childs that need a.l
 
-      class Isomorphic < self  # in Syntax
+      class Isomorphic__ < self  # in Syntax__
 
         def initialize ruby_param_a, formal_p=nil
           _farg_a = ruby_param_a.reduce [] do |m, (opt_req_rest_i, name_i)|
             formal_p and fp = formal_p[ name_i ]
-            fp ||= Headless::Parameter.new nil, name_i
-            m << CLI::Argument.new( fp, opt_req_rest_i )
+            fp ||= Headless_::Parameter.new nil, name_i
+            m.push CLI.argument( fp, opt_req_rest_i )
           end
           super _farg_a
         end
@@ -161,16 +195,16 @@ module Skylab::Headless
         end
       end
 
-      Validate = Headless::Parameter::Definer.new do
+      Validate__ = Headless_::Parameter::Definer.new do
         param :on_missing, hook: true
         param :on_extra, hook: true
         param :on_result_struct, hook: true  # we won't use it but others might
       end
 
-      class Isomorphic_Validate__  # in Syntax
+      class Isomorphic_Validate__  # in Syntax__
         def initialize farg_a, event_p, act_a, stx
           @act_a = act_a ; @farg_a = farg_a
-          @hooks = Validate.new( & event_p ) ; @stx = stx ; nil
+          @hooks = Validate__.new( & event_p ) ; @stx = stx ; nil
         end
         def execute
           calculate_valid_range
@@ -199,7 +233,7 @@ module Skylab::Headless
         end
         def when_missing
           _farg_a = Missing_Calculation__.new( @farg_a, @act_a.length ).execute
-          _stx = Syntax.new _farg_a
+          _stx = Syntax__.new _farg_a
           _ev = Missing_[ :vertical, _stx, nil, @stx ]
           @hooks.on_missing[ _ev ]
         end
@@ -208,16 +242,16 @@ module Skylab::Headless
           _ev = Extra_[ _s_a ]
           @hooks.on_extra[ _ev ]
         end
-      end  # in Syntax
+      end  # in Syntax__
     end # in Argument
-    Missing_ = Headless::Event.
+    Missing_ = Headless_::Event.
       new :orientation_i, :syntax_slice, :any_at_token_set, :any_full_syntax
 
-    Extra_ = Headless::Event.new :s_a  # :#API-private (and above)
+    Extra_ = Headless_::Event.new :s_a  # :#API-private (and above)
 
-    class CLI::Argument
+    class CLI::Argument_
 
-      class Syntax
+      class Syntax__
 
         class Range_Calcuation__
           def initialize farg_a

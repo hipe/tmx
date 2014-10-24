@@ -11,12 +11,12 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
       before :all do
 
         module CLI0_Action_InstanceMethods
-          CLI_[]::Action[ self, :core_instance_methods ]
+          CLI_[].action self, :core_instance_methods
         end
 
         class CLI0_Action
           ACTIONS_ANCHOR_MODULE = -> { CLI0_Actions }
-          CLI_[]::Action[ self, :DSL ]
+          CLI_[].action self, :DSL
           include CLI0_Action_InstanceMethods
         end
 

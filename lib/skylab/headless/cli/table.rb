@@ -40,7 +40,7 @@ module Skylab::Headless::CLI::Table
     # --*--
     def initialize
       @head = @tail = @separator = nil
-      @field_box = Headless_::Lib_::Formal_box[]::Open.new
+      @field_box = Headless_::Lib_::Old_box_lib[].open_box.new
     end
   end
 
@@ -221,7 +221,7 @@ module Skylab::Headless::CLI::Table
 
     def ancestor_names_recursive
       @ancestor_names_recursive ||= begin
-        box = Headless_::Lib_::Formal_box[]::Open.new
+        box = Headless_::Lib_::Old_box_lib[].open_box.new
         _ancestor_names_recursive box
         box.names
       end
@@ -245,9 +245,9 @@ module Skylab::Headless::CLI::Table
 
   module Table::Cels
 
-    parse_styles   = Headless_::CLI::FUN::Parse_styles
-    unparse_styles = Headless_::CLI::FUN::Unparse_styles
-    unstyle      = Headless_::CLI::Pen::FUN.unstyle
+    parse_styles   = Headless_::CLI.parse_styles
+    unparse_styles = Headless_::CLI.unparse_styles
+    unstyle      = Headless_::CLI.pen.unstyle
     hackable_a = [ :style, :string, :style ]
 
     common = -> fld do
@@ -313,7 +313,9 @@ module Skylab::Headless::CLI::Table
     # --*--
 
     blank_rx = Table::Cels::BLANK.rx
-    unstyle = Headless_::CLI::Pen::FUN.unstyle
+
+    unstyle = Headless_::CLI.pen.unstyle
+
     start_type = Table::Cels::INTEGER
     float_detail_rx = Table::Cel::FLOAT_DETAIL_RX
 

@@ -4,14 +4,14 @@ module Skylab::Headless::TestSupport::CLI::Box
 
   ::Skylab::Headless::TestSupport::CLI[ TS__ = self ]
 
-  include CONSTANTS
+  include Constants
 
   Autoloader_ = Autoloader_
   Headless_ = Headless_
 
   extend TestSupport_::Quickie
 
-  QUEUE_IVAR__ = CONSTANTS::QUEUE_IVAR = :@q_x_a
+  QUEUE_IVAR__ = Constants::QUEUE_IVAR = :@q_x_a
 
 
   module ModuleMethods
@@ -28,7 +28,7 @@ module Skylab::Headless::TestSupport::CLI::Box
   module InstanceMethods
 
     def invoke * s_a
-      _a = CONSTANTS::Normalize_argv[ s_a ]
+      _a = Constants::Normalize_argv[ s_a ]
       _ag = box_action
       @result = _ag.invoke _a
       nil

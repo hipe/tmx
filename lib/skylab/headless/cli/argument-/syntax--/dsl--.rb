@@ -1,12 +1,15 @@
 module Skylab::Headless
 
-  class CLI::Argument::Syntax
+  class CLI::Argument_::Syntax__
 
-    module DSL  # read [#142] the CLI argument syntax DSL  #storypoint-5
+    module DSL__  # read [#142] the CLI argument syntax DSL  #storypoint-5
 
-      def self.DSL_notify_with_p p
-        (( srs = Series__.new )).p_notify p
-        Front__.new srs
+      class << self
+        def receive_p p
+          srs = Series__.new
+          srs.p_notify p
+          Front__.new srs
+        end
       end
 
       class Front__ < ::Module
@@ -29,12 +32,12 @@ module Skylab::Headless
 
         def process_args a, &p
           p[ hooks = Hooks__.new ]
-          bx = Headless::Library_::Basic::Box.new
+          bx = Headless_::Lib_::Meso_box_lib[].new
           parse = Parse__.new( hooks, bx, a )
           r = @series.parse_notify parse
           if r
             if a.length.nonzero?
-              r = parse.trigger_extra CLI::Argument::Extra_[ a ]
+              r = parse.trigger_extra CLI.argument.exrtra a
             else
               parse.success_notify_with_struct_class result_struct_class
             end
@@ -50,7 +53,7 @@ module Skylab::Headless
           end
         end
         def init_result_struct_class
-          bx = Headless::Library_::Basic::Box.new
+          bx = Headless_::Lib_::Meso_box_lib[].new
           y = ::Enumerator::Yielder.new do |i|
             bx.has?( i ) or bx.add i, nil
           end
@@ -176,9 +179,9 @@ module Skylab::Headless
             true
           else
             # #storypoint-105
-            any_tok and _any_at_token_set = Headless::Library_::Set[ any_tok ]
-            _stx = CLI::Argument::Syntax.new [ self ]
-            _ev = CLI::Argument::Missing_[ :vertical, _stx, _any_at_token_set ]
+            any_tok and _any_at_token_set = Headless_::Library_::Set[ any_tok ]
+            _stx = CLI.argument.syntax [ self ]
+            _ev = CLI.argument.missing :vertical, _stx, _any_at_token_set
             parse.trigger_missing _ev
           end
         end
@@ -328,7 +331,7 @@ module Skylab::Headless
         end
 
         def perform_failure_a_into_parse fail_a, parse
-          big_a = [ ] ; tok_set = Headless::Library_::Set.new
+          big_a = [ ] ; tok_set = Headless_::Library_::Set.new
           fail_a.each do |prs_rec|
             emit_a = prs_rec.emitted_a
             1 == emit_a.length or fail 'test me'
@@ -339,9 +342,9 @@ module Skylab::Headless
               (( ats = e.any_at_token_set )) and tok_set.merge ats
             end
           end
-          _stx_slice = CLI::Argument::Syntax.new big_a
+          _stx_slice = CLI.argument.syntax big_a
           _tok_set = ( tok_set if tok_set.length.nonzero? )
-          _ev = CLI::Argument::Missing_[ :horizontal, _stx_slice, _tok_set ]
+          _ev = CLI.argument.missing :horizontal, _stx_slice, _tok_set
           parse.trigger_missing _ev
         end
       end
@@ -397,15 +400,15 @@ module Skylab::Headless
       end
 
       on_rx = /(?<=\Aon_)/
-      Hooks__ = Headless::Event::Hooks.new( *
-        CLI::Argument::Syntax::Validate.parameters.names.map do |i|
+      Hooks__ = Headless_::Event::Hooks.new( *
+        CLI.argument.syntax.validate.parameters.names.map do |i|
           on_rx.match( i ).post_match.intern
         end )
 
       class Parse_Recorder__ < Parse__
         def initialize upstream
           @a = upstream.duplicate_a
-          @box = Headless::Library_::Basic::Box.new
+          @box = Headless_::Lib_::Meso_box_lib[].new
           @emitted_a = []
         end
 

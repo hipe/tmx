@@ -1,6 +1,6 @@
 module Skylab::Headless
 
-  class CLI::Option::Aggregation
+  class CLI::Option__::Aggregation__
 
     # for the option parser merger / aggregation hack.
 
@@ -21,7 +21,7 @@ module Skylab::Headless
     def two_sets opt
       A_.map do |i|
         ea = opt.send i
-        Headless::Library_::Set[ * (
+        Headless_::Library_::Set[ * (
           ea ? ea.to_a : [ ]
         ) ]
       end

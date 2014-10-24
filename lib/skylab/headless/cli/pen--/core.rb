@@ -1,70 +1,157 @@
 module Skylab::Headless
 
-  module CLI::Pen  # [#084]
+  module CLI::Pen__  # [#084]
 
-    FUN = Headless_::Lib_::FUN_module[].new
-    module FUN
+    class << self
 
-      o = definer
-
-      o[ :stylize ] = -> str, * style_a do
-        Stylify[ style_a, str ]
+      def chunker
+        Pen_::Chunker__
       end
-      #
-      Stylify = -> style_a, str do
-        "\e[#{ style_a.map { |s| CODE_H__[s] }.compact * ';' }m#{ str }\e[0m"
+
+      def each_pair_at * i_a, & p
+        METHODS__.each_pair_at_via_arglist i_a, & p
       end
-      #
-      CODE_H__ = ::Hash[ [ [ :strong, 1 ], [ :reverse, 7 ] ].
+
+      def instance_methods_module
+        Instance_Methods__
+      end
+
+      def minimal_class
+        Minimal__
+      end
+
+      def minimal_instance
+        MINIMAL__
+      end
+
+      def simple_style_rx
+        SIMPLE_STYLE_RX__
+      end
+
+      def style_methods_module
+        Style_Methods__
+      end
+
+      def stylify *a
+        if a.length.zero?
+          Stylify__
+        else
+          Stylify__[ * a ]
+        end
+      end
+
+      def stylize * a
+        if a.length.zero?
+          Stylize__
+        else
+          Stylize__[ * a ]
+        end
+      end
+
+      def unstyle * a
+        if a.length.zero?
+          Unstyle__
+        else
+          Unstyle__[ * a ]
+        end
+      end
+
+      def unstyle_styled * a
+        if a.length.zero?
+          Unstyle_styled__
+        else
+          Unstyle_styled__[ * a ]
+        end
+      end
+    end
+
+    # ~
+
+    Stylize__ = -> s, * i_a do
+      Stylify__[ i_a, s ]
+    end
+
+    Stylify__ = -> style_a, str do
+      "\e[#{ style_a.map { |i| CODE_H__.fetch i }.compact * ';' }m#{ str }\e[0m"
+    end
+
+    CODE_H__ = ::Hash[ [ [ :strong, 1 ], [ :reverse, 7 ] ].
         concat [ :red, :green, :yellow, :blue, :purple, :cyan, :white ].
           each.with_index.map { |v, i| [ v, i + 31 ] } ]
             # ascii-table.com/ansi-escape-sequences.php  (red = 31, etc)
 
-      o[ :unstyle ] = -> str do                # the safer alternative, for when
-        Unstyle_styled[ str ] || str           # you don't care whether it was
-      end                                      # stylzed in the first place
-      #
-      Unstyle_styled = -> str do  # nil IFF str.to_s is not already styled
-        str.to_s.dup.gsub! SIMPLE_STYLE_RX, EMPTY_STRING_
+    CODE_I_A__ = CODE_H__.keys.freeze
+
+    Unstyle__ = -> s do
+      Unstyle_styled__[ s ] || s
+    end
+
+    Unstyle_styled__ = -> str do
+      str.dup.gsub! SIMPLE_STYLE_RX__, EMPTY_S_
+    end
+
+    SIMPLE_STYLE_RX__ = /\e  \[  \d+  (?: ; \d+ )*  m  /x
+
+    # ~
+
+    METHODS__ = -> do
+      i_a = [] ; p_a = []
+      o = -> i, p do
+        i_a.push i ; p_a.push p
       end
-      o[ :unstyle_styled ] = Unstyle_styled
+      o.singleton_class.send :alias_method, :[]=, :call
 
-      # see also CLI::FUN for extended support for working with styles
-    end
+      o[ :stylize ] = Stylize__
 
-    SIMPLE_STYLE_RX = /\e  \[  \d+  (?: ; \d+ )*  m  /x
+      o[ :unstyle ] = Unstyle__
 
-    Define_stylize_methods__ = -> do
+      o[ :unstyle_styled ] = Unstyle_styled__
 
-      define_method :stylize, & FUN.stylize
+      ::Struct.new( * i_a ).new( * p_a )
+    end.call
 
-      define_method :unstyle, & FUN.unstyle
+    class << METHODS__
 
-      define_method :unstyle_styled, & FUN::Unstyle_styled
+      def each_pair_at * i_a, & p
+        each_pair_at_via_arglist i_a, & p
+      end
 
-    end
-    #
-    CODE_NAME_A = FUN::CODE_H__.keys.freeze
-    #
-    module Methods  # API-public access to what amounts to instance-method-
-      # versions of a subset of the FUN functions - if for e.g. you want
-      # `stylize` or `unstyle` and you don't want to pollute your namespace
-      # or coupling with all of the view-y-style names of Pen::I_M. note,
-      # however, that this is still low-level: avoid calling `stylize` in
-      # application code when you can instead use existing, modality-portable
-      # styles.
-
-      module_exec( & Define_stylize_methods__ )
-
-      ( CODE_NAME_A - [ :strong ] ).each do |c|   # away at [#pl-013]
-        define_method c do |s| stylize s, c end
-        define_method c.to_s.upcase do |s| stylize s, :strong, c end
+      def each_pair_at_via_arglist i_a
+        if block_given?
+          i_a.each do |i|
+            yield i, self[ i ]
+          end ; nil
+        else
+          enum_for :each_pair_at_via_arglist, i_a
+        end
       end
     end
 
-    module InstanceMethods
+    # ~
 
-      include Headless::Pen::InstanceMethods   # (see)
+    module Style_Methods__
+
+      METHODS__.each_pair_at :stylize, :unstyle, & method( :define_method )
+
+      if false  # #todo
+
+      ( CODE_I_A__ - [ :strong ] ).each do |i|   # away at [#pl-013]
+
+        define_method i do |s|
+          stylize s, i
+        end
+
+        define_method i.upcase do |s|
+          stylize s, :strong, i
+        end
+      end
+
+      end
+    end
+
+    module Instance_Methods__
+
+      include Headless_::Pen::InstanceMethods   # (see)
 
       # the below methods follow [#fa-052]-#the-semantic-markup-guidelines
 
@@ -100,15 +187,17 @@ module Skylab::Headless
 
       # def `val` - how may votes? (1: sg) [#051]
 
-      module_exec( & Define_stylize_methods__ )
+      METHODS__.each_pair_at :stylize, & method( :define_method )
 
     end
 
-    class Minimal
-      include InstanceMethods
+    class Minimal__
+      include Instance_Methods__
     end
 
-    SERVICES = MINIMAL = Minimal.new
+    MINIMAL__ = Minimal__.new
+
+    Pen_ = self
 
   end
 end

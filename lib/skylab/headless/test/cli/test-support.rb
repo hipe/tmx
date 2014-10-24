@@ -4,20 +4,20 @@ module Skylab::Headless::TestSupport::CLI
 
   ::Skylab::Headless::TestSupport[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   Autoloader_ = Autoloader_
   Headless_ = Headless_
 
   extend TestSupport_::Quickie  # e.g sibling 'path tools'
 
-  module CONSTANTS
+  module Constants
     Autoloader_ = Headless_::Autoloader_
   end
 
   module InstanceMethods
 
-    CONSTANTS::Normalize_argv = -> x_a do
+    Constants::Normalize_argv = -> x_a do
       1 == x_a.length and a = ::Array.try_convert( x_a.first )
       a || x_a
     end
@@ -43,7 +43,7 @@ module Skylab::Headless::TestSupport::CLI
 
   module InstanceMethods
 
-    include CONSTANTS
+    include Constants
 
     # ~ test-phase support
 
@@ -106,14 +106,14 @@ module Skylab::Headless::TestSupport::CLI
     end
 
     def expect_that_this_line_is_styled_and_unstyle_it line
-      line_ = Headless_::CLI::Pen::FUN::Unstyle_styled[ line ]
+      line_ = Headless_::CLI.pen.unstyle_styled line
       line_ or raise "expected line to be styled, was not: #{ line.inspect }"
       line_
     end
 
     def crunchify
       s = expect_at_least_one_more_serr_line
-      x = Headless_::CLI::FUN::Parse_styles[ s ]
+      x = Headless_::CLI.parse_styles s
       x or fail "expected styled string, had: #{ s.inspect }"
       y = []
       if :string == x.fetch( 0 ).first
@@ -208,7 +208,7 @@ module Skylab::Headless::TestSupport::CLI
     end
     attr_reader :a
     def pen
-      Headless_::CLI::Pen::MINIMAL
+      Headless_::CLI.pen.minimal_instance
     end
     def emit_help_line_p
       emit_info_line_p
@@ -227,5 +227,9 @@ module Skylab::Headless::TestSupport::CLI
     def release
       r = @a ; @a = :_released_ ; r
     end
+  end
+
+  Subject_ = -> do
+    Headless_::CLI
   end
 end

@@ -1,72 +1,67 @@
 module Skylab::Headless
 
-  CLI::Option::Parser::Scanner = Headless_::Lib_::Function_class[].new :gets
+  module CLI::Option__
 
-  class CLI::Option::Parser::Scanner  # for quick ::OptionParser hacks
-                                  # (emigrated in from ancient tr, aged well)
-                                  # this class and idea is tracked by [#053])
+    module Parser__
 
-    -> do # `fetch`
+      class Scanner__ < Callback_.scan.immutable_with_random_access  # :+[#053]
 
-      reduce_a = nil
+        # a custom scanner class (has random access with caching) made just
+        # for option parsers, specifically for querying for a specific option
+        # based on its normalized name (e.g 'dry_run') and resulting in an
+        # abstract option ("model") object that can reflect on meta-info about
+        # the object; like whether it takes arguments, what its shortname is,
+        # etc.
 
-      define_method :fetch do |query_x, *a, &b|
-        query = if query_x.respond_to? :call then query_x else
-          -> param do query_x == param.normalized_parameter_name end
+        class << self
+
+          def [] op_x
+            _scan = Option_.scan op_x
+            _scan_ = _scan.map_by do |sw|
+              Option_.build_via_switch sw
+            end
+            build_with :scn, _scan_, :key_method_name, :normalized_parameter_name
+          end
+
+          def weak_identifier_for_switch sw
+            Weak_identifier_for_switch__[ sw ]
+          end
         end
-        otherwise = reduce_a.fetch( ( b ? ( a << b ) : a ).length ).call a
-        while x = gets
-          break( found = x ) if query[ x ]
-        end
-        if found then found else
-          otherwise ||= -> { raise ::KeyError, 'item matching query not found.'}
-          otherwise[]
-        end
-      end
-      reduce_a = [ -> _ { }, -> a { a[0] } ].freeze # distills 1 item from args
-    end.call
 
-  private
-
-    def initialize enum
-      ea = if enum.respond_to?( :each ) then enum else
-        CLI::Option::Enumerator.new enum
-      end
-      fly = CLI::Option.new_flyweight
-      @gets = -> do
-        begin
-          sw = ea.next
-          fly.replace_with_switch sw
-          fly
-        rescue ::StopIteration
-          @gets = -> { }
-          nil
+        def fetch query_x, & p
+          if query_x.respond_to? :id2name
+            super query_x, & p
+          else
+            raise ::TypeError, say_not_symbol( query_x )  # or build back in
+          end
         end
+
+        def say_not_symbol x
+          "no implicit convertion of #{ Headless_::Lib_::Strange[ x ] } to symbol"
+        end
+
+        Weak_identifier_for_switch__ = -> do
+
+          long_rx, short_rx = CLI.option.values_at :long_rx, :short_rx
+
+          -> sw, else_p=nil do
+            stem = if sw.long.length.nonzero?
+              md = long_rx.match sw.long.first
+              md && "--#{ md[ :long_stem ] }"
+            else
+              md = short_rx.match sw.short.first
+              md && "-#{ md[ :short_stem ] }"
+            end
+            if stem
+              stem
+            elsif else_p
+              else_p[]
+            else
+              raise ::RuntimeError, "can't infer weak identifier from switch"
+            end
+          end
+        end.call
       end
     end
-
-    FUN = -> do
-
-      long_rx, short_rx = CLI::Option::Constants.
-        values_at :LONG_RX, :SHORT_RX
-
-      # (used elsewhere, here as courtesy and for proper semantic taxonomy)
-
-      ::Struct.new( :weak_identifier_for_switch )[
-        -> sw, otherwise=nil do
-          stem = if sw.long.length.nonzero?
-            md = long_rx.match sw.long.first
-            md && "--#{ md[:long_stem] }"
-          else
-            md = short_rx.match sw.short.first
-            md && "-#{ md[:short_stem] }"
-          end
-          if stem then stem
-          elsif otherwise then otherwise[ ] else
-            raise ::RuntimeError, "can't infer weak identifier from switch"
-          end
-        end
-      ].freeze
-    end.call
   end
 end

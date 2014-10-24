@@ -4,7 +4,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Dsc_Intgrtd__
 
   ::Skylab::Headless::TestSupport::CLI::Action[ TS__ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

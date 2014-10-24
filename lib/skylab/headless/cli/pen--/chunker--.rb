@@ -1,6 +1,20 @@
 module Skylab::Headless
 
-  CLI::Pen::Chunker = Headless_::Lib_::Function_class[].new :gets do
+  module CLI::Pen__
+
+    Chunker__ = Headless_::Lib_::Ivars_with_procs_as_methods[].new :gets
+
+    class Chunker__
+
+      class << self
+
+        def scan sexp
+          scn = Chunker__.new sexp
+          Callback_.scan do
+            scn.gets
+          end
+        end
+      end
 
   private
 
@@ -41,7 +55,7 @@ module Skylab::Headless
       define_method :initialize do |sexp|
         state = :initial
         hot = true
-        scn = Headless::Library_::Basic::List::Scanner::For::Array.new sexp
+        scn = Headless_::Lib_::List_lib[].line_scanner sexp
         building = nil
 
         fetch = -> x do
@@ -99,20 +113,6 @@ module Skylab::Headless
         end
       end
     end.call
-  end
-
-  class Headless::CLI::Pen::Chunker::Enumerator < ::Enumerator
-
-  private
-
-    def initialize sexp
-      super(& -> y do
-        scn = CLI::Pen::Chunker.new sexp
-        while x = scn.gets
-          y << x
-        end
-        nil
-      end)
     end
   end
 end

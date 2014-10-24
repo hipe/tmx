@@ -2,11 +2,11 @@ module Skylab::Headless
 
   module CLI
 
-    module Action
+    module Action_
 
       module IMs  # see [#064] the CLI action core instance m.. #storypoint-5
 
-        include Headless::Action::IMs
+        include Headless_::Action::IMs
 
         def initialize * _
           @has_od = @option_parser = @param_queue_a = nil
@@ -34,8 +34,7 @@ module Skylab::Headless
           end
           r
         end
-        Action::OK_ = true  # #storypoint-20 because our namespace is sens.
-        Action::INVOKE_METHOD_I = :invoke
+        Action_::INVOKE_METHOD_I = :invoke
       private
         def parse_opts a  # #storypoint-25
           if a.length.zero? or is_branch && DASH_ != a[0].getbyte(0) or ! op
@@ -71,13 +70,13 @@ module Skylab::Headless
           op
         end ; protected :begin_option_parser
         def option_parser_cls
-          Headless::Library_::OptionParser
+          Headless_::Library_::OptionParser
         end
         def prs_opts_from_nonzero_length_argv_when_op a
           @option_parser.parse! a do |p|
             instance_exec( & p )  # :#hook-in for custom o.p
           end ; OK_
-        rescue Headless::Library_::OptionParser::ParseError => e
+        rescue Headless_::Library_::OptionParser::ParseError => e
           prs_opts_when_parse_error e
         end
         def prs_opts_when_parse_error e
@@ -148,9 +147,8 @@ module Skylab::Headless
         alias_method :stylize_hdr, :stlz_hdr  # #storypoint-100
 
         def frmt_hdr_s header_s
-          "#{ header_s }#{ COLON__ unless COLON__ == header_s[ -1 ] }"
+          "#{ header_s }#{ COLON_ unless COLON_ == header_s[ -1 ] }"
         end
-        Action::COLON__ = ':'.freeze
 
         #  ~ stepping into expressing agent facility for a moment
 
@@ -178,9 +176,9 @@ module Skylab::Headless
           LEXICON__  # defined near at first write
         end
 
-        CLI::Action::LEXICON__ = class Action::Lexicon__  # #storypoint-155
+        Action_::LEXICON__ = class Action_::Lexicon__  # #storypoint-20, #storypoint-155
           def initialize
-            @bx = Headless::Library_::Basic::Box.new
+            @bx = Headless_::Lib_::Meso_box_lib[].new
             @is_collapsed = false ; @p_a = [] ; nil
           end
           def fetch_default_values_at_i_a i_a
@@ -235,7 +233,7 @@ module Skylab::Headless
         end
       private
         def bld_name_func
-          Headless::Name::Function::From::Constant.from_name self.class.name
+          Headless_::Name.via_const.via_module_name self.class.name
         end
 
         # ~ stepping out of names and into o.p rendering
@@ -263,7 +261,7 @@ module Skylab::Headless
         def visible_ops  # #storypoint-320
           ::Enumerator.new do |y|
             p = swtch_wth_obj_id_is_visible_p
-            CLI::Option::Enumerator.new( option_documenter ).each do |sw|
+            CLI.option.enumerator( option_documenter ).each do | sw |
               sw.respond_to?( :short ) && p[ sw.object_id ] and y << sw
             end ; nil
           end
@@ -322,12 +320,12 @@ module Skylab::Headless
 
         def bld_q_for_wrt
           @q_x_a ||= bld_initial_queue
-          CLI::Action::Queue__.new @q_x_a
+          CLI::Action_::Queue_.new @q_x_a
         end
 
         def bld_q_for_rd
           @q_x_a ||= bld_default_queue
-          CLI::Action::Queue__.new @q_x_a
+          CLI::Action_::Queue_.new @q_x_a
         end
 
         def argument_syntax_for_action_i meth_x  # #storypoint-415 :#hook-in
@@ -342,8 +340,9 @@ module Skylab::Headless
         end
 
         def build_arg_stx meth_i
-          CLI::Argument::Syntax::Isomorphic.
-            new method( meth_i ).parameters, formal_parameters  # f.p nil ok
+          CLI.argument.syntax.isomorphic(
+            method( meth_i ).parameters,
+            formal_parameters )  # f.p nil ok
         end
 
         def render_argument_stx stx, em_range=nil  # #storypoint-435
@@ -380,7 +379,7 @@ module Skylab::Headless
         end
 
         def rndr_rqty_brckts reqity_i
-          CLI::Argument::FUN::Reqity_brackets[ reqity_i ]
+          CLI::Argument_.reqity_brackets reqity_i
         end
 
         def apnd_any_cstm_stx y  # #storypoint-460
@@ -474,7 +473,10 @@ module Skylab::Headless
         def cllps_upstream
           @upstrm_is_collapsed = true
           ok, x = resolve_upstream_status_tuple
-          @upstrm_status_x = case ok when PROCEDE_X_, CEASE_X_ ; ok else x end
+          @upstrm_status_x = case ok
+            when PROCEDE_X_, CEASE_X_ ; ok
+            else x
+          end
         end
 
         def resolve_upstream_status_tuple  # #storypoint-835
@@ -492,7 +494,7 @@ module Skylab::Headless
           @q_x_a.fetch 0
         end
 
-        class Action::Bound_Task__ < Headless::Library_::Basic::Method::Curry
+        class Action_::Bound_Task__ < Headless_::Lib_::Method_lib[].curry
           alias_method :replace, :initialize ; public :replace
           def initialize bm, arg_a, p
             super bm, arg_a ; @p = p ; nil
@@ -503,7 +505,7 @@ module Skylab::Headless
           end
         end
 
-        Action::Value_As_Task__ = -> x do
+        Action_::Value_As_Task__ = -> x do
           bt = Bound_Task__.new nil, nil, -> { x }
           bt.replace bt.method( :close ), nil
           bt
@@ -558,10 +560,10 @@ module Skylab::Headless
         end
 
         def hndl_missing_args e
-          send HMA_OP_H__.fetch( e.orientation_i ), e
+          send Action_::HMA_OP_H__.fetch( e.orientation_i ), e
         end
         #
-        Action::HMA_OP_H__ = { vertical: :hndl_missing_args_vertical,
+        Action_::HMA_OP_H__ = { vertical: :hndl_missing_args_vertical,
           horizontal: :hndl_missing_args_horizontal }.freeze
 
         def hndl_missing_args_vertical e
@@ -601,10 +603,10 @@ module Skylab::Headless
         end
 
         def render_grp_s_a_as_i a, i
-          a * CLI::Action::SEPARATOR_GLYPH_H__.fetch( i )
+          a * CLI::Action_::SEPARATOR_GLYPH_H__.fetch( i )
         end ; public :render_grp_s_a_as_i
         #
-        CLI::Action::SEPARATOR_GLYPH_H__ = {
+        CLI::Action_::SEPARATOR_GLYPH_H__ = {
           series: TERM_SEPARATOR_STRING_,
           alternation: '|' }.freeze
 
@@ -668,7 +670,7 @@ module Skylab::Headless
         end
 
         def build_node_stry
-          CLI::Action::Desc::Story[ self ]
+          CLI::Action_.desc.story self
         end
 
       public
@@ -685,7 +687,7 @@ module Skylab::Headless
       private
 
         def help_description y  # #storypoint-1050
-          y << EMPTY_STRING_  # #assume-previous-line-above
+          y << EMPTY_S_  # #assume-previous-line-above
           case @node_stry.desc_lines_count <=> 1
           when  0 ; s = render_single_description_line and y << s
           when  1 ; render_multiline_description y ; nil ; end
@@ -724,10 +726,10 @@ module Skylab::Headless
 
         def rslv_some_summary_indent_s
           has_op_docmtr and si = option_documenter.summary_indent
-          si || DEFAULT_SUMMARY_INDENT__
+          si || Action_::DEFAULT_SUMMARY_INDENT__
         end
 
-        Action::DEFAULT_SUMMARY_INDENT__ = ( TERM_SEPARATOR_STRING_ * 2 ).freeze
+        Action_::DEFAULT_SUMMARY_INDENT__ = ( TERM_SEPARATOR_STRING_ * 2 ).freeze
 
         def render_any_hlp_opts y
           if has_op_docmtr
@@ -737,7 +739,7 @@ module Skylab::Headless
 
         def rndr_hlp_opts y
           od = option_documenter
-          _w = Action::FUN::Summary_width[ od, col_A_mx_wdth ]
+          _w = Action_.summary_width od, col_A_mx_wdth
           od.summary_width = _w
           help_options y
         end
@@ -764,7 +766,7 @@ module Skylab::Headless
         end
 
         def help_options y  # #storypoint-1095, assume o.d
-          y << EMPTY_STRING_  # #assume-previous-line-above
+          y << EMPTY_S_  # #assume-previous-line-above
           op = option_documenter
           _will_summarize = op.top.list.detect do |x|
             x.respond_to? :summarize
@@ -804,7 +806,7 @@ module Skylab::Headless
             :stlz_hdr_p, method( :stlz_hdr )
         end
 
-        class Action::Help_Section_Renderer__
+        class Action_::Help_Section_Renderer__
           def initialize * x_a
             begin
               i, x = x_a.shift 2
@@ -826,7 +828,7 @@ module Skylab::Headless
                     y << "#{ ind }#{ h2 a[ 1 ] }"
                   end
                 else
-                  y << "#{ ind }#{ fmt % EMPTY_STRING_ }#{ a[ 2 ] }"
+                  y << "#{ ind }#{ fmt % EMPTY_S_ }#{ a[ 2 ] }"
                 end
               end }
             end
@@ -841,7 +843,7 @@ module Skylab::Headless
           end
         public
           def << section
-            @y << EMPTY_STRING_  # #assume-previous-line-above
+            @y << EMPTY_S_  # #assume-previous-line-above
             s = section.header and @y << "#{ @stlz_hdr_p[ s ] }"
             section.lines.each do |line|
               @line_type_op_h.fetch( line.first )[ line ]
@@ -862,14 +864,14 @@ module Skylab::Headless
         def smry_ln_from_op
           od = option_documenter
           if (( s = ::String.try_convert od.top.list.first ))
-            s_ = CLI::Pen::FUN.unstyle[ s ]
-            s_.gsub STRIP_DESCRIPTION_LABEL_RX__, EMPTY_STRING_
+            s_ = CLI.pen.unstyle s
+            s_.gsub STRIP_DESCRIPTION_LABEL_RX__, EMPTY_S_
           else
-            CLI::Pen::FUN.unstyle[ usage_line ]
+            CLI.pen.unstyle usage_line
           end
         end
 
-        Action::STRIP_DESCRIPTION_LABEL_RX__ = /\A[ \t]*description:?[ \t]*/i
+        Action_::STRIP_DESCRIPTION_LABEL_RX__ = /\A[ \t]*description:?[ \t]*/i
 
         # ~ `parameters` - abstract reflection and rendering
 

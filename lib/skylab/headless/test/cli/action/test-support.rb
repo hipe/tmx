@@ -4,7 +4,7 @@ module Skylab::Headless::TestSupport::CLI::Action
 
   ::Skylab::Headless::TestSupport::CLI[ self ]
 
-  include CONSTANTS
+  include Constants
 
   Headless_ = Headless_ ; TestSupport_ = TestSupport_
 
@@ -25,7 +25,7 @@ module Skylab::Headless::TestSupport::CLI::Action
     def dfn_actncls_with_i_and_p cls_i, cls_p
       define_method :action_class, Headless_::Library_::Memoize[ -> do
         cls = start_class cls_i
-        Headless_::CLI::Action[ cls, :core_instance_methods ]
+        Subject_[ cls, :core_instance_methods ]
         cls.class_exec( & cls_p ) ; cls
       end ]
     end
@@ -34,7 +34,7 @@ module Skylab::Headless::TestSupport::CLI::Action
       define_method :action_class, Headless_::Library_::Memoize[ -> do
         cls = start_class cls_i
         cls.instance_variable_set :@dir_pathname, false
-        Headless_::CLI::Action[ cls, :DSL, :core_instance_methods ]
+        Subject_[ cls, :DSL, :core_instance_methods ]
         cls.class_exec( & cls_p ) ; cls
       end ]
     end
@@ -47,7 +47,7 @@ module Skylab::Headless::TestSupport::CLI::Action
   module InstanceMethods
 
     def invoke * x_a
-      _a = CONSTANTS::Normalize_argv[ x_a ]
+      _a = Constants::Normalize_argv[ x_a ]
       _ag = action
       @result = _ag.invoke _a
     end
@@ -64,6 +64,14 @@ module Skylab::Headless::TestSupport::CLI::Action
 
     def serr_a_bake_notify
       @mock_client.release
+    end
+  end
+
+  Subject_ = -> *a do
+    if a.length.zero?
+      Headless_::CLI.action
+    else
+      Headless_::CLI.action( * a )
     end
   end
 end

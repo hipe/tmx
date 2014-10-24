@@ -4,7 +4,7 @@ module Skylab::Headless::TestSupport::CLI::Table
 
   ::Skylab::Headless::TestSupport::CLI[ self ]
 
-  include CONSTANTS
+  include Constants
 
   Headless_ = Headless_ ; Table = Headless_::CLI::Table
 
@@ -146,9 +146,10 @@ module Skylab::Headless::TestSupport::CLI::Table
 
       a = []
       render_table row_enum, separator: "\t" do |o|
-        o.field!( :header ).style = Headless_::CLI::Pen::MINIMAL.method(:hdr)
+        o.field!( :header ).style =
+          Headless_::CLI.pen.minimal_instance.method :hdr
         o.on_row do |txt|
-          a <<Headless_::CLI::Pen::FUN.unstyle[ txt ]
+          a.push Headless_::CLI.pen.unstyle txt
         end
       end
       lengths = a.map { |s| s.match(/^[^\t]*/)[0].length }

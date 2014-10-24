@@ -1,31 +1,58 @@
 # encoding: UTF-8
 module Skylab::Headless
 
-  CLI::Tree::Glyph = ::Struct.new :normalized_glyph_name
+  module CLI::Tree__
 
-  module CLI::Tree::Glyph::Sets
+    class << self
 
-    WIDE = {                      # (these styles came to us later, and are
-      blank:     '   ',           # based off of the glyphs used in
-      crook:     '└──',           # Steve Baker et. al's `tree` unix utility.)
-      pipe:      '│  ',
-      separator: '/',
-      tee:       '├──'
-    }
+      def glyph_sets_module
+        Glyph_::Sets
+      end
 
-    NARROW = {
-      blank:     '  ',
-      crook:     ' └',
-      pipe:      ' │',
-      separator: '/',
-      tee:       ' ├'
-    }
+      def glyphs
+        Glyphs__
+      end
+    end
 
-    # freeze each of the strings in case someone
-    # accidentally mutates them (happened once or twice)
+    Glyph_ = ::Struct.new :normalized_glyph_name
 
-    constants.each do |i|
-      const_get( i, false ).values.each( & :freeze )
+    class Glyph_
+
+      module Sets
+
+        NARROW = {
+          blank:     '  ',
+          crook:     ' └',
+          pipe:      ' │',
+          separator: '/',
+          tee:       ' ├'
+        }
+
+        WIDE = {             # (these styles came to us later, and are
+          blank:     '   ',  #  based off of the glyphs used in
+          crook:     '└──',  #  Steve Baker et. al's `tree` unix utility.)
+          pipe:      '│  ',
+          separator: '/',
+          tee:       '├──'
+        }
+
+        constants.each do |i|
+          const_get( i, false ).freeze.values.each( & :freeze )
+        end
+      end
+    end
+
+    module Glyphs__
+
+      define_singleton_method :each_const_value, Autoloader_.each_const_value_method
+
+      -> g do
+        BLANK     = g.new :blank
+        CROOK     = g.new :crook
+        PIPE      = g.new :pipe
+        SEPARATOR = g.new :separator
+        TEE       = g.new :tee
+      end.call Glyph_
     end
   end
 end

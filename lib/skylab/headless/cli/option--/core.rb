@@ -1,76 +1,142 @@
 module Skylab::Headless
 
-  module CLI::Option
+  module CLI::Option__
 
     class << self
 
+      def aggregation
+        Option_::Aggregation__
+      end
+
+      def basic_switch_index_curry switch_s
+        Option_::Basic__::Switch_index_curry[ switch_s ]
+      end
+
+      def build_via_switch sw
+        Option_::Model__.build_via_switch sw
+      end
+
+      def enumerator x
+        scan( x ).each
+      end
+
+      def local_normal_name_as_long i
+        Local_normal_name_as_long__[ i ]
+      end
+
+      def long_rx
+        LONG_RX__
+      end
+
+      def merger
+        Option_::Merger__
+      end
+
+      def model
+        Option_::Model__
+      end
+
       def on *a, &p
-        const_get( :Model_, false ).on( *a, &p )
+        const_get( :Model__, false ).on( *a, &p )
       end
 
       def new_flyweight
-        const_get( :Model_, false ).new_flyweight
+        const_get( :Model__, false ).new_flyweight
+      end
+
+      def normize stem_s
+        Normize__[ stem_s ]
+      end
+
+      def opt_rx
+        OPT_RX__
+      end
+
+      def parser
+        Option_::Parser__
+      end
+
+      def scan x
+        Option_::Scan__[ x ]
+      end
+
+      def simple_short_rx
+        SIMPLE_SHORT_RX__
+      end
+
+      def starts_with_dash * a
+        if a.length.zero?
+          Starts_with_dash__
+        else
+          Starts_with_dash__[ * a ]
+        end
+      end
+
+      def values_at * i_a
+        o = @value_struct
+        i_a.map do |i|
+          o[ i ]
+        end
       end
     end
 
-    FUN = Headless_::Lib_::FUN_module[].new
-
-    Autoloader_[ FUN ]  # we need to a.l children
-
-    o = FUN.send :definer
-
-    Local_normal_name_as_long = -> i do
-      "--#{ i.to_s.gsub '_', '-' }"
+    Local_normal_name_as_long__ = -> i do
+      "--#{ i.id2name.gsub UNDERSCORE_, DASH_ }"
     end
 
-    o[:normize] = -> x do  # part of [#081] family
-      x.gsub( '-', '_' ).downcase.intern
+    Normize__ = -> s do  # :+[#081]
+      s.gsub( DASH_, UNDERSCORE_ ).downcase.intern
     end
 
-    o[:starts_with_dash] = -> tok do
-      DASH_ == tok.getbyte( 0 )
+    DASH_ = '-'.freeze
+
+    DASH_BYTE__ = DASH_.getbyte 0
+
+    LONG_RX__ = /\A
+      -- (?<no_part> \[no-\] )?
+         (?<long_stem> [^\[\]=\s]{2,} )
+         (?<long_rest> .+ )?
+    \z/x   # names pursuant to `replace_with_long_rx_matchdata`
+
+    Option_ = self
+
+    OPT_RX__ = /\A-/
+
+    SHORT_RX__ =  /\A
+      -  (?<short_stem> [^-\[= ] )
+         (?<short_rest> [-\[= ].* )?
+    \z/x
+
+    SIMPLE_SHORT_RX__ = /\A-[^-]/
+
+    Starts_with_dash__ = -> s do
+      DASH_BYTE__ == s.getbyte( 0 )
     end
 
-    x = FUN.send :predefiner
+    UNDERSCORE_ = '_'.freeze
+
+    @value_struct = -> do  # :+[#165]
+      i_a = [] ; i_a_ = []
+      o = -> i, i_ do
+        i_a.push i ; i_a_.push i_ ; nil
+      end
+      o.singleton_class.send :alias_method, :[]=, :call
+
+      o[ :long_rx ] = LONG_RX__
+
+      o[ :short_rx ] = SHORT_RX__
+
+      ::Struct.new( * i_a ).new( * i_a_ )
+    end.call
 
     # hack to see if a basic switch is present
     # like this
     #
-    #     P = Headless_::CLI::Option::FUN.basic_switch_index_curry[ '--foom' ]
+    #     P = Subject_[].basic_switch_index_curry '--foom'
     #     P[ [ 'abc' ] ]  # => nil
     #     P[ [ 'abc', '--fo', 'def' ] ]  # => 1
     #     P[ [ '--foomer', '-fap', '-f', '--foom' ] ]  # => 2
 
-    x[:basic_switch_index_curry] = [ :Basic_ ]
 
-
-    class Constants_Module__ < ::Module
-      def values_at * i_a
-        i_a.map { |i| const_get i, false }
-      end
-    end
-
-    Constants = Constants_Module__.new
-
-    module Constants
-
-      OPT_RX = /\A-/
-
-      SIMPLE_SHORT_RX = /\A-[^-]/
-
-      SHORT_RX =  /\A
-        -  (?<short_stem> [^-\[= ] )
-           (?<short_rest> [-\[= ].* )?
-      \z/x
-
-      LONG_RX = /\A
-        -- (?<no_part> \[no-\] )?
-           (?<long_stem> [^\[\]=\s]{2,} )
-           (?<long_rest> .+ )?
-      \z/x   # names pursuant to `replace_with_long_rx_matchdata`
-
-    end
-
-    Option = self
   end
 end

@@ -1,25 +1,143 @@
 module Skylab::Headless
 
-  module CLI::Action  # #storypoint-5 in [#039] the CLI action narrative
+  module CLI
 
-    CEASE_X = false ; PROCEDE_X = true  # #storypoint-7
+    class << self  # ~ :#stowaway
 
-    def self.[] mod, * x_a
-      Bundles__.apply_iambic_on_client x_a, mod
+      def action * a
+        if a.length.zero?
+          Action_
+        else
+          Action_.via_arglist a
+        end
+      end
+
+      def argument * a
+        if a.length.zero?
+          CLI::Argument_
+        else
+          CLI::Argument_.new( * a )
+        end
+      end
+
+      def client * a
+        CLI::Client.via_arglist a
+      end
+
+      def cols * a
+        if a.length.zero?
+          CLI::Lib__::Cols
+        else
+          CLI::Lib__::Cols[ * a ]
+        end
+      end
+
+      def ellipsify * a  # #todo: will merge into [#ba-032]
+        case a.length
+        when  0 ; CLI::Lib__::Ellipsify__
+        when  1 ; CLI::Lib__::Ellipsify[ * a ]
+        when  2 ; CLI::Lib__::Ellipsify_[ * a ]
+        else    ; CLI::Lib__::Ellipsify__[ * a ]
+        end
+      end
+
+      def occurrence_scanner * a
+        if a.length.zero?
+          CLI::Lib__::Occurrence_scanner
+        else
+          CLI::Lib__::Occurrence_scanner[ * a ]
+        end
+      end
+
+      def option
+        CLI::Option__
+      end
+
+      def parse_styles * a
+        if a.length.zero?
+          CLI::Lib__::Parse_styles
+        else
+          CLI::Lib__::Parse_styles[ * a ]
+        end
+      end
+
+      def pen
+        CLI::Pen__
+      end
+
+      def summary_width * a
+        if a.length.zero?
+          CLI::Lib__::Summary_width
+        else
+          CLI::Lib__::Summary_width[ * a ]
+        end
+      end
+
+      def tree
+        CLI::Tree__
+      end
+
+      def unstyle_sexp * a
+        if a.length.zero?
+          CLI::Lib__::Unstyle_sexp
+        else
+          CLI::Lib__::Unstyle_sexp[ * a ]
+        end
+      end
+
+      def unstyle_styled * a
+        CLI.pen.unstyle_styled( * a )
+      end
+
+      def unparse_styles * a
+        if a.length.zero?
+          CLI::Lib__::Unparse_styles
+        else
+          CLI::Lib__::Unparse_styles[ * a ]
+        end
+      end
+    end  # >>
+  end
+
+  module CLI::Action_  # #storypoint-5 in [#039] the CLI action narrative
+
+    class << self
+
+      def [] mod, * x_a
+        via_client_and_iambic mod, x_a
+      end
+
+      def desc
+        Action_::Desc__
+      end
+
+      def summary_width op, max=0  # hack a peek into the o.p to
+        # decide how wide to make column A (one space comes from the o.p)
+        _max_d = CLI.summary_width op, max
+        _max_d + op.summary_indent.length - 1
+      end
+
+      def via_arglist a
+        via_client_and_iambic a.shift, a
+      end
+
+      def via_client_and_iambic mod, x_a
+        Bundles__.apply_iambic_on_client x_a, mod
+      end
     end
 
     module Bundles__
       Actions_anchor_module = -> x_a do
-        module_exec x_a, & Headless::Action::Bundles::Actions_anchor_module
+        module_exec x_a, & Headless_::Action::Bundles::Actions_anchor_module
       end
       Anchored_names = -> x_a do
-        module_exec x_a, & Headless::Action::Bundles::Anchored_names
+        module_exec x_a, & Headless_::Action::Bundles::Anchored_names
       end
       Client_services = -> x_a do
-        module_exec x_a, & Headless::Action::Bundles::Client_services
+        module_exec x_a, & Headless_::Action::Bundles::Client_services
       end
       Core_instance_methods = -> _ do
-        include CLI::Action::IMs ; nil
+        include CLI::Action_::IMs ; nil
       end
       Default_action = -> x_a do
         module_exec x_a.shift, & Define_default_action_as_method_i__
@@ -31,10 +149,10 @@ module Skylab::Headless
         include DSL_Meths ; nil
       end
       Expressive_agent = -> x_a do
-        module_exec x_a, & Headless::Action::Bundles::Expressive_agent
+        module_exec x_a, & Headless_::Action::Bundles::Expressive_agent
       end
       Inflection = -> x_a do
-        module_exec x_a, & Headless::Action::Bundles::Inflection
+        module_exec x_a, & Headless_::Action::Bundles::Inflection
       end
       Headless_::Lib_::Bundle[]::Multiset[ self ]
     end
@@ -65,7 +183,7 @@ module Skylab::Headless
           line_a.length.zero? and raise "expecting either arguments or #{
             }block for this DSL-ish writer"
           p = -> y do
-            line_a.each( & y.method( :yield ) )
+            line_a.each( & y.method( :<< ) )
           end
         end
         (( @any_description_p_a ||= [] )) << p ; nil
@@ -83,17 +201,10 @@ module Skylab::Headless
       private :default_action_i ; nil
     end
 
-    CEASE_X_ = CEASE_X ; PROCEDE_X_ = PROCEDE_X
+    Action_ = self
+    CEASE_X_ = false  # #storypoint-7 in [#039]
+    OK_ = true
+    PROCEDE_X_ = true
 
-    # ~ #orphanage
-
-    module FUN
-
-      Summary_width = -> op, max=0 do  # hack a peek into the o.p to
-        # decide how wide to make column A (one space comes from the o.p)
-        _max_d = CLI::FUN::Summary_width[ op, max ]
-        _max_d + op.summary_indent.length - 1
-      end
-    end
   end
 end

@@ -1,15 +1,34 @@
 module Skylab::Headless
 
-  module CLI::Action::Desc  #  read [#033] the section par..
+  module CLI::Action_::Desc__  #  read [#033] the section par..
 
-    Section = ::Struct.new( :header, :lines ) do
+    class << self
+
+      def parse_sections sec_a, line_a
+        Parse_sections__[ sec_a, line_a ]
+      end
+
+      def section * a
+        Section__.new( * a )
+      end
+
+      def story x
+        Story__[ x ]
+      end
+    end
+
+    Section__ = ::Struct.new( :header, :lines ) do
       def any_nonzero_length_line_a
         (( a = lines )).length.nonzero? and a
       end
     end
 
-    class Story
-      class << self ; alias_method :[], :new end
+    class Story__
+
+      class << self
+        alias_method :[], :new
+      end
+
       def initialize node
         @client = node
         resolve_desc_lines_and_sections
@@ -51,14 +70,14 @@ module Skylab::Headless
         p_a and build_producer_from_p_a p_a
       end
       def build_producer_from_p_a p_a
-        Headless::Library_::Basic::List::Scanner::For.block do |y|
-          p_a.each do |p|
-            @client.instance_exec y, & p
-          end ; nil
+        Callback_.scan.via_nonsparse_array( p_a ).expand_by do |p|
+          y = []
+          @client.instance_exec y, & p
+          Callback_.scan.via_nonsparse_array y
         end
       end
       def absorb_desc_lines_and_sections_from_raw_lines_producer producer
-        Parse_sections[ @writable_sect_a, producer ]
+        Parse_sections__[ @writable_sect_a, producer ]
         @writable_sect_a.length.zero? or absorb_any_first_section_as_desc_a
         nil
       end
@@ -101,10 +120,10 @@ module Skylab::Headless
 
     item_rx_h = ::Hash.new { |h, k| h[k] = /\A {#{ k },}(.+)\z/ }  # cache rx
 
-    Parse_sections = -> sections, lines do
+    Parse_sections__ = -> sections, lines do
       stat = state_h[ :initial ]  # (var meaning change!!)
       section = line = nil
-      push = -> { sections << ( section = Section.new nil, [] )  }
+      push = -> { sections << ( section = Section__.new nil, [] )  }
       trigger_h = {
         desc:    -> { push[] ; section.lines << [ :line, line ] },
         section: -> { push[] ; section.header = line },

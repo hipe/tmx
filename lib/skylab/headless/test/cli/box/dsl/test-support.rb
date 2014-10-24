@@ -4,7 +4,7 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
 
   ::Skylab::Headless::TestSupport::CLI::Box[ TS__ = self ]
 
-  include CONSTANTS
+  include Constants
 
   Headless_ = Headless_ ; QUEUE_IVAR__ = QUEUE_IVAR
 

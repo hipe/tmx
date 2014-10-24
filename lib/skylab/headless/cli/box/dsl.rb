@@ -9,7 +9,7 @@ module Skylab::Headless
           if ! private_method_defined? DISPATCH_METHOD_I_
             Box[ self, :core_instance_methods ]
           end
-          extend CLI::Action::DSL_Meths
+          extend CLI::Action_::DSL_Meths
           module_exec( & Preserve_box_property_methods__ )
           extend MMs__ ; include IMs__
           :leaf_action_base_class == x_a.first and x_a.shift and
@@ -69,7 +69,7 @@ module Skylab::Headless
           attr_reader :crrnt_open_action_cls
         private
           def fnsh_active_action i
-            _const_i = Headless::Name::FUN::Constantify[ i ].intern
+            _const_i = Headless_::Name.constantify( i ).intern
             unbound_action_box.const_set _const_i, rls_some_open_action_class
           end
           def rls_some_open_action_class
@@ -95,8 +95,10 @@ module Skylab::Headless
         end  # box m.m's
 
         module Leaf_MMs__
-          include CLI::Action::DSL_Meths
-          include Headless::Action::Anchored_Name_MMs
+
+          include CLI::Action_::DSL_Meths
+
+          include Headless_::Action::Anchored_Name_MMs
         end
 
         module IMs__
@@ -128,7 +130,7 @@ module Skylab::Headless
             @argv, = disp.args
             befor = queue_len
             x = parse_opts @argv
-            if PROCEDE_X__ != x
+            if PROCEDE_X_ != x
               Value_Dispatch_[ x ]
             elsif befor == queue_len
               crt_dispatch_for_bound_downtree
@@ -172,7 +174,7 @@ module Skylab::Headless
             def bound_receiver ; self end
             def dispatchee_method_i ; :noop end
             def args ; EMPTY_A_ end
-            def noop ; PROCEDE_X__ end
+            def noop ; PROCEDE_X_ end
             self
           end.new
 
@@ -189,7 +191,7 @@ module Skylab::Headless
 
           def invk_when_engaged
             r = invoke
-            CEASE_X__ == r and r = nil  # don't double up the errmsgs
+            CEASE_X_ == r and r = nil  # don't double up the errmsgs
             r
           end
         end
@@ -198,7 +200,7 @@ module Skylab::Headless
           new :bound_receiver, :dispatchee_method_i, :args
 
         module Leaf_IMs__
-          include CLI::Action::IMs
+          include CLI::Action_::IMs
           def any_op
             op
           end
@@ -266,7 +268,7 @@ module Skylab::Headless
               hlp_screen_as_engaged_box y
             else
               bound = rslv_bound_action_for_help chld_x
-              bound ? hlp_screen_for_bound_child( y,  bound ) : CEASE_X__
+              bound ? hlp_screen_for_bound_child( y,  bound ) : CEASE_X_
             end
           end
           def hlp_screen_for_bound_child y, bound
@@ -363,7 +365,7 @@ module Skylab::Headless
           end
           def bld_arg_syntax
             _i_a_a = instance_method( DISPATCH_METHOD_I_ ).parameters
-            CLI::Argument::Syntax::Isomorphic.new _i_a_a
+            CLI.argument.syntax.isomorphic _i_a_a
           end
         end
 
@@ -388,6 +390,8 @@ module Skylab::Headless
             [ OK_, _meth, a ]
           end
         end
+
+        OK_ = CLI::Action_::OK_
 
         # #storypoint-505: the auxiliaries, the 'DSL' part of the DSL
 
@@ -455,9 +459,6 @@ module Skylab::Headless
             end ; nil
           end
         end
-
-        CEASE_X__ = CLI::Action::CEASE_X ; PROCEDE_X__ = CLI::Action::PROCEDE_X
-
       end  # DSL
     end  # Box
   end  # CLI

@@ -4,7 +4,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Queue_Procs__
 
   ::Skylab::Headless::TestSupport::CLI::Action[ TS__ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
@@ -40,19 +40,17 @@ module Skylab::Headless::TestSupport::CLI::Action::Queue_Procs__
 
     it "but as long as things result in OK they are executed" do
       y = []
-      action.enqueue -> { y << :_one_ ; _OK }
-      @action.enqueue -> { y << :_two_ ; _OK }
+      ok = _OK
+      action.enqueue -> { y << :_one_ ; ok }
+      @action.enqueue -> { y << :_two_ ; ok }
       @action.enqueue -> { y << :_three_ ; :__OK__ }
-      @action.enqueue -> { y << :_four__ ; _OK }
+      @action.enqueue -> { y << :_four__ ; ok }
       invoke
       y.should eql %i( _one_ _two_ _three_ )
       expect_no_more_serr_lines
       @result.should eql :__OK__
     end
 
-    let :_OK do
-      Headless_::CLI::Action::OK_  # do this late, don't load it early
-    end
 
     it "when queue is only one proc, will take argv args" do
       y = []
@@ -65,12 +63,17 @@ module Skylab::Headless::TestSupport::CLI::Action::Queue_Procs__
 
     it "when multiple procs, only last one takes argv ags" do
       y = []
-      action.enqueue -> { y << :hi; _OK }
+      ok = _OK
+      action.enqueue -> { y << :hi; ok }
       action.enqueue -> hey { y << hey ; :_hey_ }
       debug!
       invoke 'HEY'
       y.should eql [ :hi, 'HEY' ]
       @result.should eql :_hey_
+    end
+
+    def _OK
+      Headless_::CLI.action::OK_
     end
 
     context "complaining about arguments" do

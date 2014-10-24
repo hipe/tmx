@@ -4,12 +4,15 @@ module Skylab::Headless::TestSupport::CLI::Option
 
   ::Skylab::Headless::TestSupport::CLI[ self ]
 
-  include CONSTANTS
+  include Constants
+
+  extend TestSupport_::Quickie
 
   Headless_ = Headless_
 
-   extend TestSupport_::Quickie
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
-   Sandboxer = TestSupport_::Sandbox::Spawner.new
-
+  Subject_ = -> do
+    Headless_::CLI.option
+  end
 end

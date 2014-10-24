@@ -11,19 +11,19 @@ module Skylab::Headless
       end
 
       def some_instream_IO
-        Headless::System::IO.some_stdin_IO
+        Headless_.system.IO.some_stdin_IO
       end
 
       def some_outstream_IO
-        Headless::System::IO.some_stdout_IO
+        Headless_.system.IO.some_stdout_IO
       end
 
       def some_errstream_IO
-        Headless::System::IO.some_stderr_IO
+        Headless_.system.IO.some_stderr_IO
       end
 
       def three_streams
-        Headless::System::IO.some_three_streams
+        Headless_.system.IO.some_three_streams
       end
 
       self
@@ -35,7 +35,7 @@ module Skylab::Headless
 
         class Minimal
 
-          def initialize i, o, e, pen=CLI::Pen::MINIMAL  # storypoint-10
+          def initialize i, o, e, pen=CLI.pen.minimal_instance  # storypoint-10
             @instream = i ; @outstream = o ; @errstream = e ; @pen = pen ; nil
           end
 

@@ -4,7 +4,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Iso_Param__
 
   ::Skylab::Headless::TestSupport::CLI::Action[ TS__ = self ]
 
-  include CONSTANTS
+  include Constants
 
   Headless_ = Headless_
 

@@ -1,6 +1,6 @@
 module Skylab::Headless
 
-  class CLI::Option::Merger
+  class CLI::Option__::Merger__
 
     # for doing wild experiments (so far seen in treemap and test/all)
     # of merging multiple options with the same normalized switches
@@ -55,7 +55,7 @@ module Skylab::Headless
         merge = -> exist_idx, src, info_a do
           tgt = a.fetch exist_idx
           if tgt.is_option
-            tgt = Headless::CLI::Option::Aggregation.new(
+            tgt = CLI.option.aggregation.new(
               tgt, desc, err, orig_info_a.fetch( exist_idx ) )
             a[ exist_idx ] = tgt
           end

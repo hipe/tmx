@@ -2,11 +2,15 @@ require_relative 'test-support'
 
 module Skylab::Headless::TestSupport::CLI::Action::OP__
 
-  ::Skylab::Headless::TestSupport::CLI::Action[ TS__ = self ]
+  Parent_TS_ = ::Skylab::Headless::TestSupport::CLI::Action
 
-  include CONSTANTS
+  Parent_TS_[ TS__ = self ]
+
+  include Constants
 
   Headless_ = Headless_
+
+  Parent_Subject_ = Parent_TS_::Subject_
 
   extend TestSupport_::Quickie
 
@@ -18,7 +22,7 @@ module Skylab::Headless::TestSupport::CLI::Action::OP__
 
       with_action_class do
         class Nothing
-          Headless_::CLI::Action[ self, :core_instance_methods ]
+          Parent_Subject_[ self, :core_instance_methods ]
           self
         end
       end
@@ -42,7 +46,7 @@ module Skylab::Headless::TestSupport::CLI::Action::OP__
     context "action class with default action" do
       with_action_class do
         class Something
-          Headless_::CLI::Action[ self,
+          Parent_Subject_[ self,
             :core_instance_methods,
             :default_action, :foo ]
           def foo x
@@ -61,7 +65,7 @@ module Skylab::Headless::TestSupport::CLI::Action::OP__
     context "with o.p" do
       with_action_class do
         class Op_A
-          Headless_::CLI::Action[ self,
+          Parent_Subject_[ self,
             :core_instance_methods,
             :default_action, :bar ]
           def initialize * _
@@ -124,7 +128,7 @@ module Skylab::Headless::TestSupport::CLI::Action::OP__
         end
 
         class Dark_Action
-          Headless_::CLI::Action[ self, :core_instance_methods,
+          Parent_Subject_[ self, :core_instance_methods,
                                  :default_action, :zerp ]
           def build_option_parser
             Dark_OP.new

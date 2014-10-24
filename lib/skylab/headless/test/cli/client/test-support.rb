@@ -4,7 +4,7 @@ module Skylab::Headless::TestSupport::CLI::Client
 
   ::Skylab::Headless::TestSupport::CLI[ TS__ = self ]
 
-  include CONSTANTS
+  include Constants
 
   Headless_ = Headless_
 
@@ -26,7 +26,7 @@ module Skylab::Headless::TestSupport::CLI::Client
     # ~ test phase
 
     def invoke * x_a
-      _a = CONSTANTS::Normalize_argv[ x_a ]
+      _a = Constants::Normalize_argv[ x_a ]
       _cli = client
       @result = _cli.invoke _a ; nil
     end
@@ -49,7 +49,7 @@ module Skylab::Headless::TestSupport::CLI::Client
     end
 
     def build_three_streams_triad
-      t = TestSupport_::IO::Spy::Triad.new( * stdin_spy )
+      t = TestSupport_::IO.spy.triad.new( * stdin_spy )
       do_debug and t.debug!
       t
     end
@@ -70,9 +70,13 @@ module Skylab::Headless::TestSupport::CLI::Client
     def serr_a_bake_notify  #hook-out
       t = three_streams_triad
       @three_streams_triad = :_spent_
-      t.outstream.string.length.zero? or fail "there was output to stderr? #{
-        } (\"#{Headless_::CLI::FUN::Ellipsify[ t.outstream.string ] }\")"
+      t.outstream.string.length.zero? or fail say_output( t )
       t.errstream.string.split Headless_::LINE_SEPARATOR_STRING_
+    end
+
+    def say_output t
+      _s = Headless_::CLI.ellipsify t.outstream.string
+      "there was output to stderr? \"#{ _s }\")"
     end
   end
 end
