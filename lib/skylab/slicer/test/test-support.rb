@@ -5,19 +5,19 @@ module Skylab::Slicer::TestSupport
 
   ::Skylab::TestSupport::Regret[ Slicer_TestSupport = self ]
 
-  module CONSTANTS
+  module Constants
     Slicer_ = ::Skylab::Slicer
     TestSupport = ::Skylab::TestSupport
   end
 
-  include CONSTANTS
+  include Constants
 
   Slicer_::Lib_::Face__[]::TestSupport::CLI::Client[ self ]
 
   extend TestSupport::Quickie
 
   module ModuleMethods
-    include CONSTANTS
+    include Constants
     def client_class
       Slicer_::CLI::Client
     end
