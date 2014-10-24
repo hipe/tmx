@@ -4,6 +4,41 @@ require 'skylab/callback/core'
 module Skylab::TMX
 
   Callback_ = ::Skylab::Callback
+
+  -> o, h do
+
+    o[ :bin_pathname ] = Callback_.memoize do
+      Autoloader_.require_sidesystem( :Headless ).system.defaults.bin_pathname
+    end
+
+    o[ :binfile_prefix ] = Callback_.memoize do
+      'tmx-'.freeze
+    end
+
+    o[ :supernode_binfile ] = Callback_.memoize do
+      'tmx'.freeze
+    end
+
+    h
+  end.call( * -> do
+
+    h = {}
+    o = -> i, p do
+      singleton_class.send :define_method, i, p
+      h[ i ] = p
+    end
+    o.singleton_class.send :alias_method, :[]=, :call
+    [ o, h ]
+
+  end.call ).tap do |h|
+
+    define_singleton_method( :at ) do |* i_a|
+      i_a.map do |i|
+        h.fetch( i ).call
+      end
+    end
+  end
+
     Autoloader_ = Callback_::Autoloader
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
@@ -29,12 +64,11 @@ module Skylab::TMX
     end
     Face__ = sidesys[ :Face ]
     MetaHell__ = sidesys[ :MetaHell ]
+    Proxy_lib = -> do
+      Callback_::Proxy
+    end
     Pathnames = -> do
       Subsystem__[]::PATHNAMES
-    end
-    Subsystem__ = sidesys[ :Subsystem ]
-    Proxy = -> do
-      MetaHell__[]::Proxy
     end
   end
 

@@ -75,7 +75,7 @@ module Skylab::TMX
       MONADIC_TRUTH__ = -> _ { true }
     end
 
-    Toucher_ = Lib_::Proxy[]::Nice.new :touch
+    Toucher_ = Lib_::Proxy_lib[].nice :touch
 
       # it "touchs" a command node (e.g. namespace) into life as it is needed.
 

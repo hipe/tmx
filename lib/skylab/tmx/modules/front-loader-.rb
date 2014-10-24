@@ -9,7 +9,7 @@ module Skylab::TMX
       :'regret' => :hop
     }.freeze
 
-    BIN_PN_, PREFIX_ = TMX::Lib_::Pathnames[].at :bin, :binfile_prefix
+    BIN_PN_, PREFIX_ = TMX.at :bin_pathname, :binfile_prefix
 
     INITIALS_RX_ = /(?<=^|-)./  # "foo-bar".scan( rx )  # => ['f', 'b']
 

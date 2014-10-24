@@ -4,7 +4,7 @@ module Skylab::TMX::TestSupport::CLI::Arch
 
   ::Skylab::TMX::TestSupport::CLI[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport::Quickie
 

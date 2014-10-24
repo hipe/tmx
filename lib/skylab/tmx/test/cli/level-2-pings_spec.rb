@@ -4,7 +4,7 @@ module Skylab::TMX::TestSupport::CLI::L2P
 
   ::Skylab::TMX::TestSupport::CLI[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport::Quickie
 
@@ -123,9 +123,11 @@ module Skylab::TMX::TestSupport::CLI::L2P
     end
 
     def capture3 i, ping_arg, exitstatus
-      argv = ::Skylab::Subsystem::PATHNAMES.calculate do
-        [ bin.join( supernode_binfile ).to_s , i.to_s, ping_arg ]
-      end
+
+      argv = [
+        TMX.bin_pathname.join( TMX.supernode_binfile ).to_path,
+        i.id2name, ping_arg ]
+
       o, e, st = TestSupport::Library_::Open3.capture3( * argv )
       o.should eql ''
       e.should eql( "#{ hellomsg i }\n" )

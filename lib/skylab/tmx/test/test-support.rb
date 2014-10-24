@@ -5,7 +5,7 @@ module Skylab::TMX::TestSupport
 
   ::Skylab::TestSupport::Regret[ self ]
 
-  module CONSTANTS
+  module Constants
     TMX_ = ::Skylab::TMX
     Face_ = TMX_::Lib_::Face__[]
     TestSupport = ::Skylab::TestSupport

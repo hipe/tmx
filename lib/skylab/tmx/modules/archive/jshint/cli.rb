@@ -20,7 +20,7 @@ module Skylab::TMX
   end
 end
 
-module ::Skylab::TMX::Modules::Jshint
+module Skylab::TMX::Modules::Jshint
   class Plumbing
     def run
       require 'json'
@@ -31,4 +31,3 @@ module ::Skylab::TMX::Modules::Jshint
     end
   end
 end
-

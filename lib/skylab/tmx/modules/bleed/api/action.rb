@@ -47,8 +47,8 @@ module Skylab
       yield self
     end
 
-    [ :contract_tilde, :expand_tilde ].each do |m|
-      define_method m, & Headless::CLI::PathTools::FUN[ m ]
+    Headless_.system.filesystem.path_tools.pairs_at :contract_tilde, :expand_tilde do |i, p|
+      define_method i, p
     end
 
     def config_get_path
@@ -85,7 +85,8 @@ module Skylab
       escape_path config.path
     end
 
-    define_method :escape_path, & Headless::CLI::PathTools::FUN.pretty_path
+    define_method :escape_path, Headless_.system.filesystem.path_tools.pretty_path
+
       # (points for you if you see the smell)
 
     def config_read   # assumes config exist, emits error
