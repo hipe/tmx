@@ -4,7 +4,7 @@ module Skylab::BeautySalon::TestSupport::CLI::Wrap_  # (no Actions node yet..)
 
   ::Skylab::BeautySalon::TestSupport::CLI[ Wrap_TestSupport = self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
@@ -13,7 +13,7 @@ module Skylab::BeautySalon::TestSupport::CLI::Wrap_  # (no Actions node yet..)
     extend Wrap_TestSupport
 
     def self.client_class
-      BeautySalon_::CLI::Client
+      BS_::CLI::Client
     end
 
     it "win" do

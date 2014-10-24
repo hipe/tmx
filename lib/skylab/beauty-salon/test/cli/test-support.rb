@@ -4,8 +4,8 @@ module Skylab::BeautySalon::TestSupport::CLI
 
   ::Skylab::BeautySalon::TestSupport[ self ]
 
-  include CONSTANTS
+  include Constants
 
-  BeautySalon_::Lib_::Face__[]::TestSupport::CLI::Client[ self ]
+  BS_::Lib_::Face__[]::TestSupport::CLI::Client[ self ]
 
 end

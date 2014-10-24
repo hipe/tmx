@@ -1,3 +1,4 @@
+[#014]       #doc-node the `deliterate` utility
 [#013]       the problem with functions ..
 [#012]       #doc-point "private fold method" defined and explored..
 [#011]       #idea - terrible: results of rcov used to eliminate
@@ -5,7 +6,7 @@
 [#010] #open sl/test-support/tmpdir is a great subject
              (this has become more generally a #tracking-tag for same.)
 [#009]       #backburner unwrap -- terrible idea
-[#008] #open index all the vectors of porcelain/test/porcelain_spec.rb
+[#008] #open index all the vectors of `porcelain/test/porcelain_spec.rb`
 [#007] #open (put this information somewhere) there is ..
 [#006] #open 2012-10-28 #chore get ideas from skylab.rb, flatten to issues
 [#005] #open 2012-09-02 #feature (:convert => 'this') (to: 'this') (and ..)

@@ -6,7 +6,7 @@ module Skylab::BeautySalon
     end
   end
 
-  class CLI::Client < BeautySalon_::Lib_::CLI_Client[]
+  class CLI::Client < BS_::Lib_::Old_CLI_lib[]::Client
 
     def initialize( * )
       super
@@ -38,7 +38,7 @@ module Skylab::BeautySalon
 
       o.separator "#{ hi 'description:' }"
 
-      o.separator <<-HERE.gsub( /^ {6}/, '' )
+      o.separator <<-HERE.gsub( /^ {6}/, EMPTY_S_ )
         outputs to stdout (unless stated otherwise) the selected lines
         after having applied the hacky wrap filter to it (effectively re-
         breaking the lines so they are flush-left ragged right, and all
@@ -99,6 +99,36 @@ module Skylab::BeautySalon
       api file
     end
 
+    option_parser do |o|
+      @x_a ||= []
+      @action ||= BS_::Models_::Deliterate.new :_no_kernel_
+      @action.write_options o
+      nil
+    end
+
+    def deliterate file=nil, from_line, to_line
+      x_a = ( @x_a ||= [] )
+      if file
+        x_a.push :input_path, file
+      else
+        x_a.push :input_stream, @sin
+      end
+      _out_y = ::Enumerator::Yielder.new do |s|
+        @out.write s
+      end
+      x_a.push :comment_line_yieldee, @y
+      x_a.push :code_line_yieldee, _out_y
+      x_a.push :from_line, from_line, :to_line, to_line
+      @action ||= BS_::Models_::Deliterate.new :_no_kernel_
+      _evr = BS_::Lib_::Proxy_lib[].inline :receive_event, -> ev do
+        ev.render_all_lines_into_under @y,
+          BS_::Lib_::Brazen[]::CLI.expression_agent_instance
+        false
+      end
+      bc = @action.bound_call_via_call x_a, _evr
+      bc and bc.receiver.send( bc.method_name, * bc.args )
+    end
+
   private
   dsl_off
 
@@ -124,7 +154,7 @@ module Skylab::BeautySalon
       nil
     end
 
-    BeautySalon_::Lib_::Plugin[]::Host::Proxy.enhance self do  # at the end b.c..
+    BS_::Lib_::Plugin[]::Host::Proxy.enhance self do  # at the end b.c..
 
       services [ :ostream, :ivar, :@out ],
                [ :estream, :ivar, :@err ]

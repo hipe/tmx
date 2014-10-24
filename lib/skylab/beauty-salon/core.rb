@@ -3,7 +3,8 @@ require 'skylab/callback/core'
 
 module Skylab::BeautySalon
 
-  Autoloader_ = ::Skylab::Callback::Autoloader
+  Callback_ = ::Skylab::Callback
+    Autoloader_ = Callback_::Autoloader
 
   module Lib_
 
@@ -13,49 +14,58 @@ module Skylab::BeautySalon
       Face__[]::API::Action
     end
 
-    Basic__ = sidesys[ :Basic ]
+    Brazen = sidesys[ :Brazen ]
 
-    CLI_Client = -> do
-      Face__[]::CLI::Client
-    end
+    Bsc__ = sidesys[ :Basic ]
 
-    Ellipsify = -> do
-      Headless__[]::CLI::FUN::Ellipsify_
+    CLI_lib = -> do
+      HL__[]::CLI
     end
 
     Face__ = sidesys[ :Face ]
 
-    Function_class = -> do
-      MetaHell__[]::Function::Class
-    end
+    HL__ = sidesys[ :Headless ]
 
-    Headless__ = sidesys[ :Headless ]
+    Ivars_with_procs_as_methods = -> do
+      MH__[]::Ivars_with_Procs_as_Methods
+    end
 
     List_scanner = -> x do
-      Basic__[]::List::Scanner[ x ]
+      Callback_::Scn.try_convert x
     end
 
-    MetaHell__ = sidesys[ :MetaHell ]
+    MH__ = sidesys[ :MetaHell ]
+
+    Old_CLI_lib = -> do
+      Face__[]::CLI
+    end
 
     Plugin = -> do
       Face__[]::Plugin
     end
 
-    Positive_range = -> do
-      Basic__[]::Range::Positive
+    Range_lib = -> do
+      Bsc__[]::Range
+    end
+
+    Proxy_lib = -> do
+      Callback_::Proxy
     end
 
     Token_buffer = -> x, y do
-      Basic__[]::Token::Buffer.new x, y
+      Bsc__[]::Token::Buffer.new x, y
     end
   end
 
   # (:+[#su-001]:none)
 
-  BeautySalon_ = self
-
-  IDENTITY_ = -> x { x }          # for fun we track this
-
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+
+  ACHEIVED_ = true
+  BS_ = self
+  EMPTY_S_ = ''.freeze
+  IDENTITY_ = -> x { x }          # for fun we track this
+  READ_MODE_ = 'r'.freeze
+  UNABLE_ = false
 
 end
