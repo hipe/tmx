@@ -1,5 +1,5 @@
 module Hipe
-module CssConvert
+module CSS_Convert
 module CssParsing
 
 # attempt to semi-faithfully implement http://www.w3.org/TR/css3-selectors/

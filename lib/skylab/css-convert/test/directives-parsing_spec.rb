@@ -1,7 +1,8 @@
 require_relative 'test-support'
 
-describe "#{::Skylab::CssConvert} when parsing directives" do
-  extend ::Skylab::CssConvert::TestSupport
+describe "[cssc] when parsing directives" do
+
+  extend ::Skylab::CSS_Convert::TestSupport
 
   it "should parse platonic ideal" do
     tree = parse_directives_in_file(fixture_path('001-platonic-ideal.txt'))
@@ -15,7 +16,7 @@ describe "#{::Skylab::CssConvert} when parsing directives" do
     su[:right].should eql(".pre")
     ls.size.should eql(4)
     [['.keyword','.k'],['.default','.nc'],['.keyword','.p'],['.keyword', nil]].
-      should == ls[0..3].map{ |x| [x[:left], x[:right]] }
+      should eql ls[0..3].map{ |x| [x[:left], x[:right]] }
   end
 
   it "should parse with a minimal set of directives" do

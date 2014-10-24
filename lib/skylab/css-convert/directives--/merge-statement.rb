@@ -1,6 +1,16 @@
-module Skylab::CssConvert
-  class Directives::MergeStatement
-    include Core::SubClient::InstanceMethods
+module Skylab::CSS_Convert
+
+  class Directives__::MergeStatement
+
+    include Core::SubClient_::InstanceMethods
+
+    def initialize request_client, sexp
+      super(request_client)
+      @sexp = sexp
+    end
+
+    attr_reader :sexp
+
     def invoke
       left, right = @sexp[:styles_in_files].children(:left, :right)
       if @sexp[:in_the_folder]
@@ -17,14 +27,11 @@ module Skylab::CssConvert
       _rp = css_parser.parse_file(right, &b)
       send_info_message "IMPLEMENT ME merge"
     end
-    attr_reader :sexp
+
   private
+
     def css_parser
-      @css_parser ||= CssConvert::CSS::Parser.new request_client
-    end
-    def initialize request_client, sexp
-      super(request_client)
-      @sexp = sexp
+      @css_parser ||= CSSC_::CSS_::Parser.new request_client
     end
   end
 end

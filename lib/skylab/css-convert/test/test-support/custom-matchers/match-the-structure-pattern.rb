@@ -1,7 +1,7 @@
 require 'pp'
 require 'stringio'
 
-module Skylab::CssConvert
+module Skylab::CSS_Convert
   module TestSupport end
   module TestSupport::CustomMatchers end
   module TestSupport::CustomMatchers::Functions
@@ -25,7 +25,7 @@ module Skylab::CssConvert
 end
 
 RSpec::Matchers.define :match_the_structure_pattern do |expected|
-  extend ::Skylab::CssConvert::TestSupport::CustomMatchers::Functions
+  extend ::Skylab::CSS_Convert::TestSupport::CustomMatchers::Functions
   match do |actual|
     expected.inspect == distilled_structure(actual).inspect
   end

@@ -1,5 +1,5 @@
 module Skylab
-  module CssConvert
+  module CSS_Convert
     module Grammars
       grammar Common
         rule literal

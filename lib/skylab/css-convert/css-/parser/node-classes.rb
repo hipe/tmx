@@ -1,4 +1,4 @@
-module Skylab::CssConvert::CssParsing::CustomTree
+module Skylab::CSS_Convert::CssParsing::CustomTree
   class CustomTree < ::Array
     class << self
       def [] (*a)
@@ -20,12 +20,12 @@ module Skylab::CssConvert::CssParsing::CustomTree
     end
   end
 end
-module Skylab::CssConvert::CssParsing::CssFile
+module Skylab::CSS_Convert::CssParsing::CssFile
   class MyNode < Treetop::Runtime::SyntaxNode; end
   class CssFile < MyNode; end
   class CStyleComment < MyNode; end
   class StyleBlock < MyNode; end
-  class Directive < MyNode; end
+  class Directive__ < MyNode; end
   class Selectors < MyNode; end
   class Selector < MyNode; end
   class ElementSelector < MyNode; end

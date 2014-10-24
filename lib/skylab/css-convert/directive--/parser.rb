@@ -1,27 +1,27 @@
-module Skylab::CssConvert
+module Skylab::CSS_Convert
 
   module Grammars
 
-    module Directive
-      S = CssConvert::Parser::Sexpesque
+    module Directive__
+      S = CSSC_::Parser_::Sexpesque
     end
   end
 
-  class Directive::Parser
+  class Directive__::Parser
 
-    include CssConvert::Parser::InstanceMethods
+    include CSSC_::Parser_::InstanceMethods
 
   private
 
-    def load_parser_class
+    def produce_parser_class
       load_parser_class_with do |o|
-        o.enhance_parser_with(
-          CssConvert::Parser::Extlib::InstanceMethods )
+        o.enhance_parser_with CSSC_::Parser_::Extlib::InstanceMethods
         actual_parameters.force_overwrite? and o.force_overwrite!
+        o.root_for_relative_paths CSSC_.dir_pathname
         o.generated_grammar_dir "#{ actual_parameters.tmpdir_relative }"
-        o.root_for_relative_paths CssConvert.dir_pathname
-        o.treetop_grammar 'directive/parser/common.treetop'
-        o.treetop_grammar 'directive/parser/directive.treetop'
+        head_pn = Directive__::Parser.dir_pathname
+        o.treetop_grammar head_pn.join( 'common.treetop' ).to_path
+        o.treetop_grammar head_pn.join( 'directive.treetop' ).to_path
       end
     end
 

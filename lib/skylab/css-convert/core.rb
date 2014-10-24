@@ -2,9 +2,31 @@ require_relative '..'
 require 'skylab/callback/core'
 require 'skylab/headless/core'
 
-module Skylab::CssConvert
+module Skylab::CSS_Convert
 
-  CssConvert = self
+  Callback_ = ::Skylab::Callback
+
+    Autoloader_ = Callback_::Autoloader
+
+  module Lib_  # (:+[#su-001]:none)
+
+    sidesys = Autoloader_.build_require_sidesystem_proc
+
+    CLI_lib = -> do
+      HL__[]::CLI
+    end
+
+    HL__ = sidesys[ :Headless ]
+
+    Old_name_lib = -> do
+      HL__[]::Name
+    end
+
+    Path_tools = -> do
+      HL__[].system.filesystem.path_tools
+    end
+  end
+
   Headless_ = ::Skylab::Headless
 
   Event_Sender_Methods_ = ::Module.new
@@ -16,7 +38,6 @@ module Skylab::CssConvert
     end
   end
 
-
   module Core::SubClient::InstanceMethods
 
     include Headless_::SubClient::InstanceMethods
@@ -27,7 +48,6 @@ module Skylab::CssConvert
       request_client.escape_path x
     end
   end
-
 
   class Core::Params < ::Hash
 
@@ -44,12 +64,10 @@ module Skylab::CssConvert
     param :tmpdir_relative, default: '../../../tmp', accessor: true
   end
 
-
   module Core::Client
     # even though there is only one modality for now, we put non-CLI
     # specific things here just for clarity
   end
-
 
   module Core::Client::InstanceMethods
 
@@ -60,7 +78,7 @@ module Skylab::CssConvert
   private
 
     def version
-      send_payload_message "#{ program_name } #{ CssConvert::VERSION }"
+      send_payload_message "#{ program_name } #{ CSSC_::VERSION }"
       SUCCEEDED_
     end
   end
@@ -100,13 +118,13 @@ module Skylab::CssConvert
       begin
         set! or break
         # resolve_instream_status_tuple or break
-        p = CssConvert::Directive::Parser.new self
+        p = CSSC_::Directive__::Parser.new self
         d = p.parse_stream( io_adapter.instream ) or break
         if ! dump_directives d
           result = :ok
           break
         end
-        r = CssConvert::Directive::Runner.new self
+        r = CSSC_::Directive__::Runner.new self
         r.invoke d or break
         result = :ok
       end while false
@@ -204,7 +222,7 @@ module Skylab::CssConvert
       keep_going
     end
 
-    define_method :escape_path, & Headless_::CLI::PathTools::FUN.pretty_path
+    define_method :escape_path, Lib_::Path_tools[].pretty_path
 
     def formal_parameters_class
       Core::Params
@@ -222,14 +240,11 @@ module Skylab::CssConvert
     end
   end
 
-
-  module CLI::IO
-  end
-
+  CLI::IO = ::Module.new
 
   class CLI::Pen
 
-    include Headless_::CLI::Pen::InstanceMethods
+    include Lib_::CLI_lib[].pen.instance_methods_module
 
     def initialize escape_path_p
       @p = escape_path_p
@@ -248,16 +263,13 @@ module Skylab::CssConvert
     end
   end
 
-
-  module CLI::VisualTest
-  end
-
+  CLI::VisualTest = ::Module.new
 
   module CLI::VisualTest::InstanceMethods
   private
     def color_test _
       pen = io_adapter.pen ; width = 50
-      code_names = Headless_::CLI::Pen::CODE_NAME_A
+      code_names = Lib_::CLI_lib[].pen.code_name_a
       ( code_names - [ :strong ] ).each do |c|
         [[c], [:strong, c]].each do |a|
           s = "would you like some " <<
@@ -285,10 +297,10 @@ module Skylab::CssConvert
     def test name=nil
       if name
         r = /\A#{::Regexp.escape(name)}/
-        list = VISUAL_TESTS.select { |t| r.match t.name }
+        list = VISUAL_TESTS_[].select { |t| r.match t.name }
       end
       if ! name or list.length > 1
-        send_list_of_tests list || VISUAL_TESTS
+        send_list_of_tests list || VISUAL_TESTS_[]
       elsif list.empty?
         send_error_message "no such test #{ name.inspect }"
         send_info_message invite_line
@@ -330,19 +342,19 @@ module Skylab::CssConvert
     end
   end
 
-  Autoloader_ = ::Skylab::Callback::Autoloader
-  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+  Autoloader_[ CSSC_ = self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
-  FIXTURES_DIR = CssConvert.dir_pathname.join('test/fixtures')
-  VISUAL_TESTS = o = []
-  test = ::Struct.new(:name, :value, :method)
-  o << test.new('color test', 'see what the CLI colors look like.', :color_test)
-  o << test.new('001', 'platonic-ideal.txt', :fixture)
-  o << test.new('002', 'minitessimal.txt', :fixture)
-
-
-  # (:+[#su-001]:none)
+  FIXTURES_DIR = CSSC_.dir_pathname.join('test/fixtures')
 
   SPACE_ = ' '.freeze
+
   SUCCEEDED_ = true
+
+  VISUAL_TESTS_ = Callback_.memoize do
+    o = []
+    o.push test.new( 'color test', 'see what the CLI colors look like.', :color_test )
+    o.push test.new( '001', 'platonic-ideal.txt', :fixture )
+    o.push tst.new( '002', 'minitessimal.txt', :fixture )
+    o
+  end
 end

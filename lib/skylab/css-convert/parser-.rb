@@ -1,12 +1,12 @@
 require 'skylab/treetop-tools/core'
 
-module Skylab::CssConvert
+module Skylab::CSS_Convert
 
-  Parser = ::Module.new
+  Parser_ = ::Module.new
 
-  Parser::Extlib = ::Module.new
+  Parser_::Extlib = ::Module.new
 
-  module Parser::Extlib::InstanceMethods  # #watched for dry at [#ttt-002]
+  module Parser_::Extlib::InstanceMethods  # #watched for dry at [#ttt-002]
 
     def self.override
       [ :failure_reason ]
@@ -38,7 +38,7 @@ module Skylab::CssConvert
     end
   end
 
-  module Parser::InstanceMethods
+  module Parser_::InstanceMethods
 
     include ::Skylab::TreetopTools::Parser::InstanceMethods
 
@@ -74,8 +74,18 @@ module Skylab::CssConvert
 
     def handle_error
       -> ev do
-        fail "failed to load grammarz: #{ ev }"
+        _e = if ev.respond_to? :to_exception
+          ev.to_exception
+        else
+          ::RuntimeError.new "failed to load grammarz: #{ ev }"
+        end
+        raise _e
       end
+    end
+
+    def parameter_label param, d=nil  # while subclient
+      d and _tail = "[#{ d }]"
+      "«#{ param.name.as_method }#{ _tail }»"  # :+#guillemets
     end
 
     include Event_Sender_Methods_
@@ -83,9 +93,10 @@ module Skylab::CssConvert
     def send_string_on_channel s, i
       @delegate.receive_string_on_channel s, i
     end
+
   end
 
-  class Parser::Sexpesque < ::Array
+  class Parser_::Sexpesque < ::Array
 
     alias_method :node_name, :first
 

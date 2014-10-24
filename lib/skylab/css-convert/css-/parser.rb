@@ -1,10 +1,10 @@
-module Skylab::CssConvert
+module Skylab::CSS_Convert
 
-  CSS = ::Module.new
+  CSS_ = ::Module.new
 
-  class CSS::Parser
+  class CSS_::Parser_
 
-    include CssConvert::Parser::InstanceMethods
+    include CSSC_::Parser_::InstanceMethods
 
                                   # maybe [#sl-115] clean up below
 
@@ -57,8 +57,8 @@ module Skylab::CssConvert
       actuals = actual_parameters
       f = actuals[:force_overwrite]
       v = actuals[:verbose]
-      indir  = CssConvert.dir_pathname.join 'css/parser'
-      outdir = CssConvert.dir_pathname.join actuals[:tmpdir_relative]
+      indir  = CSSC_.dir_pathname.join 'css/parser'
+      outdir = CSSC_.dir_pathname.join actuals[:tmpdir_relative]
       PARSERS.each do |parser|
         parser[:on] or next
         parser = ParserMeta.new(parser.merge(indir: indir, outdir: outdir))
@@ -86,7 +86,7 @@ module Skylab::CssConvert
     def parser_parser_module const
       unless parser_parser_module_module.const_defined?(const)
         tail = PARSER_PARSERS[const][:path]
-        path = CssConvert.dir_pathname.join tail
+        path = CSSC_.dir_pathname.join tail
         load path.to_s
       end
       parser_parser_module_module.const_get const, false

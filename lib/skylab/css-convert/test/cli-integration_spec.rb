@@ -1,10 +1,10 @@
 require_relative 'test-support'
 
-module Skylab::CssConvert::TestSupport
+module Skylab::CSS_Convert::TestSupport
 
-  describe "Skylab::CssConvert CLI" do
+  describe "[cssc] CLI integration" do
 
-    extend CssConvert_TestSupport
+    extend TS_
 
     alias_method :u, :unstyle
 
@@ -12,7 +12,7 @@ module Skylab::CssConvert::TestSupport
 
     let :stderr do
       raw = client.send( :io_adapter ).errstream[ :buffer ].string
-      clean = Headless_::CLI::Pen::FUN.unstyle[ raw ]
+      clean = CSSC_::Lib_::CLI_lib[].pen.unstyle raw
       clean.split "\n"
     end
 
