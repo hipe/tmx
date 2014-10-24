@@ -1,29 +1,35 @@
-module Skylab::CodeMolester::Config::File::Entity
+module Skylab::CodeMolester
 
-  class Entity::Flyweight
+  module Config
 
-    include Entity::Model::InstanceMethods
+    module File
+
+      module Entity
+
+        class Flyweight
+
+          include Entity_::Model::InstanceMethods
 
     singleton_class.send :alias_method, :cm_new, :new
 
-    def self.produce story
+    def self.produce _STORY
 
       ::Class.new( self ).class_exec do
 
         singleton_class.send :alias_method, :new, :cm_new
 
-        define_method :entity_story do story end
+        define_method :entity_story do _STORY end
 
-        Lib_::Field_reflection_enhance[ self ].with story.host_module
+        Lib_::Field_reflection_enhance[ self ].with _STORY.host_module
 
-        Lib_::Add_the_pool_method_known_as_with_instance[ self ]
+        Lib_::Pool_lib[].enhance( self ).with_with_instance_optionally
 
         self
       end
     end
 
     def initialize
-      @string_box = Lib_::Open_box[]
+      @string_box = Lib_::Old_box_lib[].open_box.new
       @fld_box = field_box  # meh
       @miss_a = [ ] ; @xtra_a = [ ] ; @nbp_a = [ ] ; @issue_x_a = [ ]
       @had_issues = nil
@@ -37,6 +43,7 @@ module Skylab::CodeMolester::Config::File::Entity
       @is_raw = true
       @entity_name_x = entity_name_x
       @section_sexp = section_sexp
+      nil
     end
 
     def clear_for_pool
@@ -47,7 +54,7 @@ module Skylab::CodeMolester::Config::File::Entity
       @entity_name_x
     end
 
-    Invalid = Lib_::Model_event[].new do |miss_a, xtra_a, issue_x_a|
+    Invalid = Lib_::Old_event_lib[].new do |miss_a, xtra_a, issue_x_a|
       a = [ ]
       join = -> ar { ar.map { |x| "\"#{ x }\"" } * ', ' }
       if miss_a
@@ -62,7 +69,6 @@ module Skylab::CodeMolester::Config::File::Entity
       a * ' and '
     end
 
-    # `if_valid` -
     # when the particular instance this flyweight represents at this moment
     # is indexed in the call to `index` below, we do *rudimentary* validation
     # on the "record" that was just read - we merely set `miss_a` and
@@ -73,7 +79,7 @@ module Skylab::CodeMolester::Config::File::Entity
     # needing to tag your entities with an API version that's probably the
     # point at which you have outgrown this library!)
 
-    -> do  # `if_valid` -
+    -> do
       no = -> {}  # 'EMPTY_P_'
       sig_h = {
         [ 0, true ] => -> _blk { [ MONADIC_TRUTH_, no ] },
@@ -81,7 +87,7 @@ module Skylab::CodeMolester::Config::File::Entity
         [ 1, true ] => -> if_yes, _blk { [ if_yes, no ] },
         [ 2, true ] => -> if_yes, if_no, _blk { [ if_yes, if_no ] }
       }
-      define_method :if_valid do |*a, &b|
+      define_method :normalize_via_yes_or_no do |*a, &b|
         if_yes, if_no = sig_h.fetch( [ a.length, b.nil? ] )[ *a, b ]
         index if @is_raw
         if @had_issues
@@ -92,20 +98,20 @@ module Skylab::CodeMolester::Config::File::Entity
       end
     end.call
 
-    def flush_issues f
-      r = nil
-      if ! f
-        # nothing
-      elsif f.arity.zero?
-        r = f[ ]
-      else
-        r = f[ Invalid[
-          miss_a: ( @miss_a.dup if @miss_a.length.nonzero? ),
-          xtra_a: ( @xtra_a.dup if @xtra_a.length.nonzero? ),
-          issue_x_a: ( @issue_x_a.dup if @issue_x_a.length.nonzero? ) ] ]
+    def flush_issues p
+      if p
+        if p.arity.zero?
+          x = p[]
+        else
+          _ev = Invalid[
+            :miss_a, ( @miss_a.dup if @miss_a.length.nonzero? ),
+            :xtra_a, ( @xtra_a.dup if @xtra_a.length.nonzero? ),
+            :issue_x_a, ( @issue_x_a.dup if @issue_x_a.length.nonzero? ) ]
+          x = p[ _ev ]
+        end
       end
       @had_issues = nil ; @miss_a.clear ; @xtra_a.clear ; @issue_x_a.clear
-      r
+      x
     end
 
     def index
@@ -114,34 +120,52 @@ module Skylab::CodeMolester::Config::File::Entity
         @string_box.add :name, @entity_name_x  # aesthetics
       end
       if sx
-        sx.children :assignment_line do |al|
-          al.with_scanner do |scn|
-            _k = scn.scan( :name ).fetch( 1 ).gsub( '-', '_' ).intern
-            _v = scn.scan( :value ).fetch( 1 )
-            if :name == _k
-              @had_issues = true
-              @issue_x_a << "can't have `name` as a body field name - #{
-                }ignoring #{ _v.inspect }"
-            else
-              @string_box.add _k, _v
-            end
+        add_assignment_names_and_values_to_string_box sx
+      end
+      check_for_missing_required_fields
+      check_for_extra_fields
+      @is_raw = false
+      nil
+    end
+
+    def add_assignment_names_and_values_to_string_box sx
+      sx.children :assignment_line do |al|
+        al.via_scan_calculate do |scn|
+          _k = scn.scan( :name ).fetch( 1 ).gsub( DASH_, UNDERSCORE_ ).intern
+          _v = scn.scan( :value ).fetch( 1 )
+          if :name == _k
+            @had_issues = true
+            add_issues_about_name_field _v
+          else
+            @string_box.add _k, _v
           end
         end
-      end
+      end ; nil
+    end
+
+    def add_issues_about_name_field x
+      @issue_x_a << "can't have `name` as a body field name - #{
+        }ignoring #{ x.inspect }" ; nil
+    end
+
+    def check_for_missing_required_fields
       required_field_names.each do |i|
         if ! @string_box.has? i
           @miss_a << i
           @had_issues = true
         end
-      end
+      end ; nil
+    end
+
+    def check_for_extra_fields
       @string_box._order.each do |i|
         if ! @fld_box.has? i
           @xtra_a << i
           @had_issues = true
         end
-      end
-      @is_raw = false
+      end ; nil
     end
+
 
     # `get_normalized_head_and_body_pairs` - #comport for `jsonesque`:
     # the idea is there is a valid universal internal representation of
@@ -164,7 +188,7 @@ module Skylab::CodeMolester::Config::File::Entity
     -> do  # `_get_normalized_pairs` - do not re-write these.
            # they lose whitespace formatting. also there are some gothas #todo
 
-      scn = CodeMolester::Library_::StringScanner.new ''
+      scn = CM_::Library_::StringScanner.new EMPTY_S_
       white = /[ \t]+/
       a = [ ]
       lit_rx = /(?:true|false)\b/
@@ -218,5 +242,9 @@ module Skylab::CodeMolester::Config::File::Entity
         nil
       end
     end.call
+
+        end
+      end
+    end
   end
 end

@@ -1,27 +1,50 @@
 require_relative '../core'
 
-module Skylab::CodeMolester
-  Autoloader_.require_sidesystem :TestSupport
-end
+Skylab::CodeMolester::Autoloader_.require_sidesystem :TestSupport
 
 module Skylab::CodeMolester::TestSupport
 
-  module CONSTANTS
-    CodeMolester = ::Skylab::CodeMolester
-    Lib_ = CodeMolester::Lib_
-    TestSupport = ::Skylab::TestSupport
+  TestLib_ = ::Module.new
+
+  module Constants
+    CM_ = ::Skylab::CodeMolester
+    Lib_ = CM_::Lib_
+    TestSupport_ = ::Skylab::TestSupport
   end
 
-  include CONSTANTS
+  include Constants
 
-  TestSupport::Regret[ CodeMolester_TestSupport = self ]
+  TestSupport_::Regret[ self ]
 
-  CONSTANTS::TMPDIR = TestSupport.tmpdir.new(
-    :max_mkdirs, 2,
-    :path, Lib_::System_default_tmpdir_pathname[].join( 'co-mo' ),
-    :be_verbose, false )
+  TestSupport_::Quickie.enable_kernel_describe
+
+  CM_ = CM_
+
+  Constants::Tmpdir_instance_ = CM_::Callback_.memoize do
+    TestSupport_.tmpdir.new(
+      :max_mkdirs, 2,
+      :path, Lib_::System_default_tmpdir_pathname[].join( 'co-mo' ),
+      :be_verbose, false )
+  end
 
   module InstanceMethods
-    include CONSTANTS # refer to constants from i.m's
+
+    include Constants # refer to constants from i.m's
+
+    def debug!
+      @do_debug = true ; nil
+    end
+
+    attr_reader :do_debug
+
+    def debug_IO
+      TestSupport_.debug_IO
+    end
+  end
+
+  module TestLib_
+    Expect_file_content = -> do
+      CM_::Autoloader_.require_sidesystem( :TanMan ).expect_file_content
+    end
   end
 end

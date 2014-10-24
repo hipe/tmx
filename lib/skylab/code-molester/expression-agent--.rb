@@ -13,7 +13,7 @@ module Skylab::CodeMolester
     def escape_path_iambic_notify p
       @escape_path_p = p ; nil
     end
-    def escape_path pn
+    def pth pn
       @escape_path_p[ pn ]
     end
   end

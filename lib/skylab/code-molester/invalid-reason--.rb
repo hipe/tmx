@@ -21,7 +21,7 @@ module Skylab::CodeMolester
     end
     #
     def render_with * x_a
-      CodeMolester::Expression_Agent__.new( x_a ).
+      CM_::Expression_Agent__.new( x_a ).
         instance_exec( * to_a, & message_proc )
     end
     #
@@ -41,7 +41,7 @@ module Skylab::CodeMolester
         excerpt = input_s[ line_begin_idx .. min_index ].inspect
       end
       if pn
-        y << "in #{ escape_path pn }:#{ line_number }"
+        y << "in #{ pth pn }:#{ line_number }"
         if excerpt
           y << "at the end of #{ excerpt }"
         else
@@ -57,7 +57,7 @@ module Skylab::CodeMolester
 
     # result : start_idx_of_line, line_number (1-indexed), line_width
     Line_info__ = -> string, seek_idx do
-      scn = CodeMolester::Library_::StringScanner.new string
+      scn = CM_::Library_::StringScanner.new string
       at_idx = -1
       line_idx = 0
       content = nil

@@ -1,0 +1,37 @@
+digraph {
+
+/* content items (classes) & their relationships of constitution */
+
+file [shape=box]
+
+nosecs [shape=box]
+
+sections [shape=box]
+
+section [shape=box]
+
+assignment_line [shape=box label="assignment\nline"]
+
+file->nosecs [label="has one"]
+
+file->sections [label="has one"]
+
+sections->section [label="has many"]
+
+section->assignment_line [label="has many"]
+
+nosecs->assignment_line [label="has many"]
+
+/* behaviors */
+
+vpm [shape=circle label="value\nproprietor"]
+
+/* item behaviors */
+
+file->vpm [label="acts like"]
+
+nosecs->vpm [label="acts like"]
+
+section->vpm [label="acts like"]
+
+}

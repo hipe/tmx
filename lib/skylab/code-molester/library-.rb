@@ -29,126 +29,129 @@ module Skylab::CodeMolester
 
     memo, sidesys = Autoloader_.at :memoize, :build_require_sidesystem_proc
 
-    Add_the_pool_method_known_as_with_instance = -> x do
-      MetaHell__[]::Pool.enhance( x ).with_with_instance
-    end
-
-    Basic__ = sidesys[ :Basic ]
+    Bsc__ = sidesys[ :Basic ]
 
     Cache_pathname = memo[ -> do
-      module CodeMolester::Cache
-        define_singleton_method :pathname, (
-          IO_cache[].build_cache_pathname_function_for self do
-            abbrev 'cm'
-          end )
+      module CM_::Cache
+        _p = Cache_pathname_lib[].cache_pathname_proc_via_module(
+          self, :abbrev, 'cm' )
+        define_singleton_method :pathname, _p
         self
       end.pathname
     end ]
 
     Cache_pathname_base = -> do
-      Headless__[]::System.defaults.cache_pathname
+      System[].defaults.cache_pathname
+    end
+
+    Cache_pathname_lib = -> do
+      System[].filesystem.cache
     end
 
     CLI_errstream_IO = -> do
-      Headless__[]::CLI::IO.some_errstream_IO
+      HL__[]::CLI::IO.some_errstream_IO
     end
 
     Constant_trouble = -> do
-      MetaHell__[]::DSL_DSL::Constant_Trouble
+      MH__[]::DSL_DSL::Constant_Trouble
     end
 
     Delegating = -> mod, *a  do
-      Headless__[]::Delegating.apply_iambic_on_client a, mod
+      HL__[]::Delegating.apply_iambic_on_client a, mod
     end
 
     Dry_IO_stub = -> do
-      Headless__[]::IO::DRY_STUB
+      HL__[]::IO.dry_stub_instance
     end
 
     Entity_inflection = -> mod_name do
-      Headless__[]::Entity::Inflection.new mod_name
-    end
-
-    Evented_list_articulation = -> x, p do
-      Basic__[]::List::Evented::Articulation x, & p
+      HL__[]::Entity::Inflection.new mod_name
     end
 
     Face__ = sidesys[ :Face ]
 
     Field_box_enhance = -> x, p do
-      Basic__[]::Field::Box.enhance x, & p
+      Bsc__[]::Field.box.via_client_and_proc x, p
     end
 
     Field_reflection = -> x do
-      Basic__[]::Field::Reflection[ x ]
+      Bsc__[]::Field.reflection[ x ]
     end
 
     Field_reflection_enhance = -> x do
-      Basic__[]::Field::Reflection.enhance x
+      Bsc__[]::Field.reflection.enhance x
     end
 
-    File_utils = -> p do
-      Headless__[]::IO::FU.new p
+    FU_lib = -> do
+      HL__[]::IO.fu
     end
 
-    Headless__ = sidesys[ :Headless ]
+    HL__ = sidesys[ :Headless ]
 
-    Hash_functions = -> do
-      Basic__[]::Hash::FUN
-    end
-
-    IO_cache = -> do
-      Headless__[]::IO::Cache
+    Hash_lib = -> do
+      Bsc__[]::Hash
     end
 
     IO_chunker_yielder = -> p do
-      Headless__[]::IO::Interceptors::Chunker::F.new p
+      HL__[]::IO::Mappers::Chunkers::Functional.new p
     end
 
-    MetaHell__ = sidesys[ :MetaHell ]
+    Ivars_with_procs_as_methods = -> *a do
+      MH__[]::Ivars_with_Procs_as_Methods.via_arglist a
+    end
+
+    MH__ = sidesys[ :MetaHell ]
 
     Model_enhance = -> x, p do
       Face__[]::Model.enhance x, & p
     end
 
-    Model_event = -> do
-      Face__[]::Model::Event
-    end
-
     Module_accessors = -> do
-      MetaHell__[]::Module::Accessors
+      MH__[]::Module::Accessors
     end
 
-    Module_mutex = -> p do
-      MetaHell__[]::Module::Mutex[ p ]
-    end
-
-    Mustache_rx = -> do
-      Basic__[]::String::MUSTACHE_RX
-    end
-
-    Name_function = -> do
-      Headless__[]::Name::Function
+    Module_lib = -> do
+      Bsc__[]::Module
     end
 
     NLP_EN_methods = -> mod do
-      Headless__[]::NLP::EN::Methods[ mod ]
+      HL__[]::NLP::EN::Methods[ mod ]
     end
 
-    Open_box = -> do
-      MetaHell__[]::Formal::Box::Open.new
+    Old_box_lib = -> do
+      MH__[]::Formal::Box
     end
 
-    Procs_as_methods = -> * i_a, & p do
-      MetaHell__[]::Function::Class.from_i_a_and_p i_a, p
+    Old_event_lib = -> do
+      Face__[]::Model::Event
+    end
+
+    Old_name_lib = -> do
+      HL__[]::Name
+    end
+
+    Pool_lib = -> do
+      MH__[]::Pool
+    end
+
+    Strange = -> x do
+      MH__[].strange x
     end
 
     Simple_shell = -> a do
-      MetaHell__[]::Enhance::Shell.new a
+      MH__[]::Enhance::Shell.new a
+    end
+
+    String_lib = -> do
+      Bsc__[]::String
     end
 
     System_default_tmpdir_pathname = memo[ -> do
-      Headless__[]::System.defaults.tmpdir_pathname.join 'co-mo'
+      System[].filesystem.tmpdir_pathname.join 'co-mo'
     end ]
+
+    System = -> do
+      HL__[].system
+    end
   end
 end

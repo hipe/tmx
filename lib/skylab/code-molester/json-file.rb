@@ -1,4 +1,4 @@
-module ::Skylab::CodeMolester
+module Skylab::CodeMolester
   class JsonFile
     def initialize path
       @path = path
@@ -6,7 +6,7 @@ module ::Skylab::CodeMolester
         _data = nil
         begin
           s = ::File.read @path
-          _data = CodeMolester::Library_::JSON.parse s
+          _data = CM_::Library_::JSON.parse s
           @data = _data
         rescue ::JSON::ParserError => e
           @last_parser_error = e

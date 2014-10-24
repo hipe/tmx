@@ -1,6 +1,10 @@
 module Skylab::CodeMolester
 
-  class Config::File::Model
+  module Config
+
+  module File
+
+  class Model
 
     module Foofer # (ignore)
 
@@ -11,40 +15,70 @@ module Skylab::CodeMolester
       listeners_digraph wizzle: :paazle
     end
 
-    def initialize * x_a
-      st = normalize_initialize_args x_a
-      path, @content_x, @entity_noun_stem = st.to_a
+    class << self
+
+      def build_with * x_a
+        build_via_iambic x_a
+      end
+
+      def build_via_iambic x_a
+        if 1 == x_a.length
+          raise ::ArgumentError, "no more '#{ x_a.first.class }' arguments supported - pls change to iambic"
+        end
+        new do
+          process_iambic_fully x_a
+        end
+      end
+
+      private :new
+    end
+
+    def initialize & p
+      instance_exec( & p )
+    end
+
+  private
+
+    def process_iambic_fully x_a
+      st = St__.new
+      x_a.each_slice 2 do |i, x|
+        st[ i ] = x
+      end
+      path, @content_x, @entity_noun_stem = st.values
       if path
-        @pathname = nil ; self.path = path
+        @pathname = nil
+        self.path = path
       else
         @cached_pn_exist = nil
         @pathname = path
       end
-      @invalid_reason = nil ; @pathname_was_read = nil ; @is_valid = nil
-      nil
-    end
-  private
-    def normalize_initialize_args x_a
-      st = St__.new
-      case x_a.length
-      when 0
-      when 1 ; x_a[ 0 ].each_pair do |i, x| st[ i ] = x end
-      else   ; begin st[ x_a.shift ] = x_a.shift end while x_a.length.nonzero?
-      end
-      st
+      @invalid_reason = nil
+      @pathname_was_read = nil
+      @is_valid = nil
     end
     #
     St__ = ::Struct.new :path, :string, :entity_noun_stem
+
   public
 
     attr_reader :entity_noun_stem, :pathname
 
-    Lib_::Delegating[ self,
+    Lib_::Delegating.call self,
+
       :to, :sexp, :if, -> { valid? },
-        %i( [] content_items get_section_scanner_with_map_reduce_p
-            key? sections set_mixed value_items ),
+
+        [ :content_items,
+          :has_name,
+          :sections,
+          :set_mixed_at_name,
+          :value_items ],
+
+      :to, :sexp, :to_method, :aref, :if, -> { valid? }, :[],
+
       :to, :@pathname, :if, -> { @pathname },
-        %i( dirname exist? writable? ) ]
+        [ :dirname,
+          :exist?,
+          :writable? ]
 
     def fetch name_i_or_s, &p  # #comport to #box-API
       name_s = name_i_or_s.to_s
@@ -57,7 +91,7 @@ module Skylab::CodeMolester
     end
 
     def []= kx, vx
-      sexp.set_mixed kx, vx
+      sexp.set_mixed_at_name vx, kx
       vx
     end
 
@@ -106,8 +140,12 @@ module Skylab::CodeMolester
       @is_valid and @content_x.unparse
     end
 
-    def if_valid yes_p, no_p
-      if valid? then yes_p[ self ] else no_p[ @invalid_reason ] end
+    def normalize_via_yes_or_no yes_p, no_p
+      if valid?
+        yes_p[ self ]
+      else
+        no_p[ @invalid_reason ]
+      end
     end
 
     def valid?
@@ -142,7 +180,7 @@ module Skylab::CodeMolester
     end
 
     def determine_valid_via_execute_parse
-      parser = Config::File::Parser.instance
+      parser = Config_::File::Parser.instance
       r = parser.parse @content_x
       if r
         @content_x = r.sexp  # goes from being a string to a sexp
@@ -151,7 +189,7 @@ module Skylab::CodeMolester
       else
         # (leave content as the invalid string)
         ( @pathname && @pathname_was_read ) and use_pn = @pathname
-        @invalid_reason = CodeMolester::Invalid_Reason__.new parser, use_pn
+        @invalid_reason = CM_::Invalid_Reason__.new parser, use_pn
         @is_valid = false
       end
       nil
@@ -387,5 +425,9 @@ module Skylab::CodeMolester
       end
       res_a || EMPTY_A_
     end
+
+  end
+    File_ = self
+  end
   end
 end

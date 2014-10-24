@@ -1,6 +1,10 @@
 module Skylab::CodeMolester
 
-  class Model::Config::Controller
+  module Models
+
+    module Config
+
+      class Controller
 
     # immutable
 
@@ -10,44 +14,40 @@ module Skylab::CodeMolester
 
     end ]
 
-    Event__ = Lib_::Model_event[]
-
-    # `new_valid` - poka yoke. there is no public `new` (#experimental)
-
-    def self.new_valid init_blk, obj_if_ok, if_no
-      r = nil
-      begin
-        init_blk[ st = New_Valid_.new ]
-        st.pathname or break r = if_no[ Missing_Argument_[ :pathname ] ]
-        inst = new( * st.values )
-        r = inst.if_valid obj_if_ok, if_no
-      end while nil
-      r
-    end
-
-    New_Valid_ = ::Struct.new :pathname
-      # (these member values in order will be flattened and passed to `new` )
-
-    Missing_Argument_ = Event__.new do |i|
-      "`#{ i }` is required"
-    end
-
     class << self
+
+      def new_valid p, _OK_p, not_OK_p  # poka yoke. there is no public `new`
+        st = Shell_for_New_Valid__.new
+        p[ st ]
+        if st.pathname
+          new( * st.values ).normalize_via_yes_or_no _OK_p, not_OK_p
+        else
+          not_OK_p[ Missing_Argument__[ :name_i, :pathname ] ]
+        end
+      end
+
       private :new
     end
 
-    def initialize pathname
-      @file = CodeMolester::Config::File::Model.new path: pathname
-      freeze
-      nil
+    Shell_for_New_Valid__ = ::Struct.new :pathname
+
+    Missing_Argument__ = Event_.new do |name_i|
+      "`#{ name_i }` is required"
     end
 
-    attr_reader :file
+    def initialize pn
+      @file_model = CM_::Config::File::Model.build_with :path, pn
+      freeze
+    end
 
-    def if_valid yes, no
-      @file.if_valid -> _file do
-        yes[ self ]  # pattern maybe
-      end, no
+    def file
+      @file_model
+    end
+
+    def normalize_via_yes_or_no yes_p, no_p
+      @file_model.normalize_via_yes_or_no -> _file do
+        yes_p[ self ]  # pattern maybe
+      end, no_p
     end
 
     # `create` - create the formerly nonexistent config file with
@@ -59,28 +59,31 @@ module Skylab::CodeMolester
     # result is number of bytes or the relevant event object.
 
     def create opt_h, event_h
-      f = @file
+      o = @file_model
       couldnt = event_h.fetch :couldnt
       alt = [ -> {
-        if f.exist?
-          -> { couldnt[ Exists_[ pn: f.pathname ] ] }
+        if o.exist?
+          -> { couldnt[ Exists__[ :pn, o.pathname ] ] }
         end }
       ].reduce nil do |_, p|
         x = p[] and break x
       end
       if alt then alt.call else
-        f.sections['foo'] = { }
-        f.sections['foo']['bar'] = 'baz'  # #todo
+        o.sections['foo'] = {}
+        o.sections['foo']['bar'] = 'baz'  # #todo
         write opt_h, event_h
       end
     end
 
-    _i_a = %i( unpack_equal unpack_superset unpack_subset repack_difference )
-    Lib_::Hash_functions[].pairs_at _i_a  do |i, p|
-      define_method i, p ; private i
-    end
+  private
 
-    Exists_ = Event__.new do |pn|
+    Lib_::Hash_lib[].pairs_at(
+      :unpack_equal, :unpack_superset,
+      & method( :define_method ) )
+
+  public
+
+    Exists__ = Event_.new do |pn|
       "exists, skipping - #{ @pth[ pn ] }"
     end
 
@@ -92,50 +95,19 @@ module Skylab::CodeMolester
     #               * please see `write` downstream
 
     def insert_valid_entity ent, opt_h, event_h
-      couldnt, could = unpack_subset event_h, :couldnt, :could
-      section_name = "#{ ent.config_file_section_name } #{
-        }#{ ent.natural_key.inspect }"
-      this_before_me, rsn = -> sct do
-        sct or break
-        sct.reduce nil do |(tbm, _), s|
-          cmp = section_name <=> s.section_name
-          if -1 == cmp
-            break
-          elsif 1 == cmp
-            tbm = s
-          else
-            break nil, Collision_[ ent: ent ]
-          end
-          next tbm, _
-        end
-      end.call @file.sections
-      if rsn then couldnt[ rsn ] else
-        @file.sections.insert_after section_name,
-          ::Hash[ ent.rendered_config_pairs.to_a ],
-          this_before_me
-        could[ Inserted_[ item: ent ] ]
-        write opt_h, repack_difference( event_h, :could )
-      end
+      Config_::Actors_::Create[ ent, opt_h, event_h, @file_model, self ]
     end
 
-    Collision_ = Event__.new do |ent|
-      "#{ ent.inflection.lexemes.noun.singular } already exists, #{
-        }won't clobber - #{ ent.natural_key }"
-    end
 
-    Inserted_ = Event__.new do |item|
-      "inserted into list - #{ item.natural_key.inspect }"
-    end
-
-    Wrap_ = Event__.new do |upstream|
+    Wrap_ = Event_.new do |upstream|
       upstream.message_proc[]
     end
 
-    Text_ = Event__.new do |text|
+    Text_ = Event_.new do |text|
       text
     end
 
-    Invalid_ = Event__.new do |rsn_o|
+    Invalid_ = Event_.new do |rsn_o|
       rsn_o.render
     end
 
@@ -152,11 +124,11 @@ module Skylab::CodeMolester
     def write opt_h, event_h
       couldnt, befor, after, all, pth = unpack_superset event_h,
         :couldnt, :before, :after, :all, :pth
-      is_dry_run, = unpack_equal opt_h, :is_dry_run ; f = @file
+      is_dry_run, = unpack_equal opt_h, :is_dry_run ; f = @file_model
       alt = [
         -> {
           if ! f.valid?
-            -> { couldnt[ Invalid_[ rsn_o: f.invalid_reason ] ] }
+            -> { couldnt[ Invalid_[ :rsn_o, f.invalid_reason ] ] }
           end }
       ].reduce( nil ) { |_, p| x = p[] and break x }
       if alt then alt.call else
@@ -169,6 +141,8 @@ module Skylab::CodeMolester
           w.dry_run = is_dry_run
           w.escape_path = pth
         end
+      end
+    end
       end
     end
   end

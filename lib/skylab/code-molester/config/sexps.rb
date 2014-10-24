@@ -1,350 +1,286 @@
 module Skylab::CodeMolester
 
-module Config  # #borrow-one-indent
-                                  # if you somehow got here without sexp
-  S = self::Sexp                  # load it here and now / shorten it
-                                  # we especially need it for registering
+  module Config
 
-  module Sexps                    # isn't it nice to see a plain old module
-  end                             # so docile
+    module Sexps
 
-  class Sexps::Enumerator < ::Enumerator
+      # (for a visual depiction of this-esque, open doc/sexps.dot in graph-viz)
 
-    def each &blk
-      if 2 != blk.arity then super else
-        super do |l|
-          blk[ l.key, l.value ]
+      Value_Proprietor_Methods__ = ::Module.new
+
+      class FileSexp < Sexp_
+
+        register :file
+
+        include Value_Proprietor_Methods__
+
+        # ~ mutators
+
+        def set_mixed_at_name x, name_x
+          content_items[ name_x ] = x ; nil
         end
-      end
-    end
 
-  private
-
-    def initialize host, &blk
-      @host = host
-      super( & blk )
-    end
-
-    def host ; @host end
-  end
-
-  class Sexps::Enumerator::Hashish < Sexps::Enumerator
-
-    def [] k
-      item = detect do |i|
-        k == i.key
-      end
-      if item
-        item.value
-      end
-    end
-
-    def keys
-      map( & :key )
-    end
-
-    def []= k, v
-      @host.set_mixed k, v
-    end
-  end
-
-  class Sexps::Enumerator::Hashish::Sections < Sexps::Enumerator::Hashish
-
-    Lib_::Delegating[ self, :employ_the_DSL_method_called_delegates_to ]
-
-    def [] k
-      detect do |i|
-        k == i.item_name
-      end
-    end
-
-    -> do  # `set_section_with_hash`  ( a.k.a `[]=` ), `insert_after`
-
-      append_to_parent = nil
-      define_method :set_section_with_hash do |key, body_data_pairs|
-        if ! body_data_pairs.respond_to? :each_pair
-          raise ::ArgumentError, "When assigning to an entire section, #{
-            }expected hash-like, had #{ body_data_pairs.class }"
-        end
-        sec = self[ key ] || append_to_parent[ @host, key ]
-        body_data_pairs.each_pair do |k, v|
-          sec[ k.to_s ] = v
-        end
-        sec
-      end
-
-      create = nil
-      define_method :insert_after do |sect_name, body_data_pairs, before|
-        sec = create[ sect_name, @host, body_data_pairs ]
-        @host.insert_after sect_name, sec, before
-      end
-
-      define_method :append_section do |sect_name, body_data_pairs=nil|
-        sec = create[ sect_name, @host, body_data_pairs ]
-        @host << sec  # pray
-        sec
-      end
-
-      append_to_parent = -> parent, name do
-        sect = create[ name, parent ]
-        # parent.push "\n" # this probably breaks syntax, let's see if it's ok
-        # SEE TESTS re above)
-        parent << sect
-        sect
-      end
-
-      create = -> name, parent, body_data_pairs=nil do
-        tmpl = parent.rchild :section
-        if tmpl
-          sl = tmpl.child( :header ).child( :section_line )
-          s0 = sl[1]
-          s1 = sl[3][1]
-        else
-          s0 = '['
-          s1 = ']'
-        end
-        sec = S[ :section,
-          S[ :header,
-            S[ :section_line, s0, S[ :name, name.to_s ], S[ :n_3, s1 ] ]
-          ],
-          S[ :items, "\n" ]
-        ]
-        if body_data_pairs
-          body_data_pairs.each_pair do |k, v|
-            k = k.to_s  # it is time
-            sec[ k ] = v
+        def add_via_mixed_and_string x, s
+          if x.respond_to? :each_pair
+            sections_sexp.add_via_pairs_and_string x, s
+          else
+            nosecs_sexp.add_via_value_and_string x, s
           end
         end
-        sec
-      end
 
-      alias_method :[]=, :set_section_with_hash
-
-    end.call
-
-    delegates_to :host, :remove
-  end
-
-  class Sexps::ContentItemBranch < Sexp
-
-    # note that for now this is hard-coded to assume string and not symbol keys!
-    # (the test below cannot simply test for Fixnum-based key b/c it also must
-    # take ranges)
-
-    def [] kx, *kxa  # ::Array supports arguments like arr[ 0, 1 ]
-      if kxa.length.zero? and kx.respond_to? :ascii_only?
-        lookup_with_s_else_p kx, false
-      else
-        super
-      end
-    end
-
-    def lookup_with_s_else_p key_s, any_else_p  # like fetch, but leave it alone (for ary)
-      sx = content_items.detect do |sexp|
-        key_s == sexp.item_name
-      end
-      if sx
-        if sx.item_leaf?
-          sx.item_value
-        else
-          sx
+        def replace_via_new_mixed_and_old_value_and_name x_, x, name_x
+          # (live dangerously for now - assume nosecs, not section)
+          nosecs_sexp.replace_via_new_mixed_and_old_value_and_name x_, x, name_x
         end
-      elsif any_else_p
-        any_else_p[]
-      elsif false != any_else_p
-        raise ::KeyError.exception "key not found: #{ key_s.inspect }"
-      end
-    end
 
-    def []= kx, *kxa, v
-      if kxa.length.zero? and kx.respond_to? :ascii_only?
-        set_mixed kx, v
-        v
-      else
-        super
-      end
-    end
-
-    def item_leaf?
-      false
-    end
-
-    def key? name
-      !! content_items.detect { |ii| name == ii.item_name }
-    end
-
-    def set_mixed name_str, x
-      if x.respond_to? :each_pair
-        sections.set_section_with_hash name_str, x
-      else
-        item = content_items.detect do |i|
-          name_str == i.item_name
+        def insert_pairs_and_name_immediately_after_section pairs, name_s, sec
+          Config_::Actors__::Set_section_via_hash[ pairs, name_s, sec, sections_sexp ]
         end
-        if item
-          _update_value item, x
-        else
-          _create_value name_str, x
+
+        # ~ readers
+
+        def has_name x
+          content_items.has_name x
+        end
+
+        def aref s
+          if s.respond_to? :ascii_only?
+            content_items[ s ]
+          else
+            raise ::TypeError, say_not_string( s )
+          end
+        end
+
+        def value_items
+          nosecs_sexp.value_items
+        end
+
+        def sections  # :+#covered-by:cu
+          content_items
+        end
+
+        def content_items
+          @ci ||= Content_items__[].new self
+        end
+
+        def to_content_item_scan
+          _scan = nosecs_sexp.to_content_item_scan
+          _scan_ = sections_sexp.to_content_item_scan
+          Callback_.scan.concat _scan, _scan_
+        end
+
+        def nosecs_sexp
+          self[ 1 ]
+        end
+
+        def sections_sexp
+          self[ 2 ]
         end
       end
-    end
 
-    def value_items
-      Sexps::Enumerator::Hashish.new self do |y|
-        _assignments_sexp.children(:assignment_line).each do |sx|
-          y << sx
+      class Nosecs < Sexp_
+
+        register :nosecs
+
+        def prepend_comment line
+          x = build_comment_line line
+          if x
+            self[ 1, 0 ] = [ x ]
+          end
+          x
         end
-      end
-    end
 
-    def any_names_notify
-      set = CodeMolester::Library_::Set.new
-      value_items.each do |sx|
-        set.add? sx.item_name
-      end
-      if set.length.nonzero? then set.to_a end
-    end
-  end
-
-  class Sexps::FileSexp < Sexps::ContentItemBranch
-    Sexp[:file] = self
-    delegates_to :nosecs, :prepend_comment
-    # delegates_to :sections, :append_comment # e.g.
-    def _assignments_sexp
-      self[1]
-    end
-    def content_items
-      a = self[1]
-      a2 = a.content_items
-      b = self[2]
-      b2 = b.content_items
-      [*a2, *b2]
-      # [*self[1].content_items, *self[2].content_items]
-    end
-    def _create_value name, value
-      # we could try try dynamically add the node if necessary, but it
-      # is less hacky to just assume it is there.  "Should" be there for all such valid trees.
-      sec = nosecs or fail "Invalid file sexp: child not found: nosecs"
-      Sexps::AssignmentLine.create name, value, sec
-      nil
-    end
-    def nosecs
-      child :nosecs
-    end
-    def sections
-      child( :sections ).enumerator
-    end
-
-    def get_section_scanner_with_map_reduce_p p
-      child( :sections ).get_scanner_with_map_reduce_p p
-    end
-
-    def _update_value assmt, value
-      assmt.set_item_value value
-    end
-
-    MEMBER_I_A__ = %i( nosecs sections ).freeze
-  end
-
-  class Sexps::Nosecs < Sexps::ContentItemBranch
-
-    Sexp[:nosecs] = self
-
-    def content_items
-      select_children :assignment_line
-    end
-
-    def prepend_comment line
-      o = build_comment_line(line) or return false
-      self[ 1, 0 ] = [o] # supreme hackery
-      o
-    end
-
-    MEMBER_I_A__ = %i( content_items ).freeze
-  end
-
-  class Sexps::Sections < Sexp
-
-    Sexp[:sections] = self
-
-    def enumerator
-      Sexps::Enumerator::Hashish::Sections.new self do |y|
-        select_children( :section ).each do |sx|
-          y << sx
+        def add_via_value_and_string x, name_s
+          if x.respond_to? :ascii_only?
+            add_via_string_and_string x, name_s
+          else
+            raise ::ArgumentError, say_not_string( x )
+          end
         end
-      end
-    end
 
-    alias_method :content_items, :enumerator
-
-    def insert_after sect_name, item, before_sexp
-      if before_sexp
-        here = before_sexp.section_name
-        pos = nil
-        with_scanner_for_symbol :section do |scn|
-          while x = scn.gets
-            if here == x.section_name
-              pos = scn.pos
-              break
+        def add_via_string_and_string value_s, name_s
+          _three = via_scan_calculate do |scn|
+            lookup_three_indexes_via_scan_for_name scn, name_s, -> x do
+              x.respond_to?( :symbol_i ) or next
+              :assignment_line == x.symbol_i or next
+              true
             end
           end
+          set_via_three( * _three, value_s, name_s )
         end
-        pos or raise ::KeyError, "after? - #{ here }"
-      else
-        pos = 0  # insert after this position (strict sexps)
+
+        def set_via_three lesser_d, target_d, greater_d, value_s, name_s
+          if target_d
+            self[ target_d ].set_item_value x
+          else
+            _d = if lesser_d
+              lesser_d + 1
+            elsif greater_d
+              greater_d
+            end
+            Config_::Actors__::Add_assignment[ value_s, name_s, _d, self ]
+          end ; nil
+        end
+
+        def replace_via_new_mixed_and_old_value_and_name x_, x, name_x
+          if name_x.respond_to? :ascii_only?
+            replace_via_new_mixed_and_old_value_and_string x_, x, name_x
+          else
+            raise ::TypeError, say_not_string( name_x )
+          end
+        end
+
+        def replace_via_new_mixed_and_old_value_and_string x_, x, name_x
+          x.set_item_value x_; nil
+        end
+
+        # ~
+
+        def value_items
+          @vi ||= Content_items__[].new self
+        end
+
+        def to_content_item_scan
+          produce_scan_for :assignment_line
+        end
       end
-      self[ pos + 1 , 0 ] = [ item ]
+
+      class Sections < Sexp_
+
+        register :sections
+
+        def add_via_pairs_and_string pairs, name_s
+          Config_::Actors__::Set_section_via_hash[ pairs, name_s, false, self ]
+        end
+
+        def to_content_item_scan
+          produce_scan_for nil
+        end
+
+        def lookup_three_indexes name_s
+          via_scan_calculate do |scn|
+            lookup_three_indexes_via_scan_for_name scn, name_s
+          end
+        end
+      end
+
+      class Section < Sexp_
+
+        register :section
+
+        include Value_Proprietor_Methods__
+
+        # ~ mutators
+
+        def add_via_mixed_and_string x, s
+          if x.respond_to? :ascii_only?
+            add_via_string_and_string x, s
+          else
+            raise ::ArgumentError, say_not_string( x )
+          end
+        end
+
+        def set_mixed_at_name x, name_x
+          if x.respond_to? :ascii_only?
+            if name_x.respond_to? :ascii_only?
+              set_via_string_and_string x, name_x
+            elsif name_x.respond_to? :id2name
+              set_via_string_and_string x, name_x.id2name
+            else
+              raise ::TypeError, say_not_string( name_x )
+            end
+          else
+            raise ::ArgumentError, say_not_string( x )
+          end
+        end
+
+        def add_via_string_and_string value_s, name_s
+          set_via_string_and_string value_s, name_s
+        end
+
+        def set_via_string_and_string value_s, name_s
+          _three = value_items_sexp.via_scan_calculate do |scn|
+            lookup_three_indexes_via_scan_for_name scn, name_s, -> x do
+              x.respond_to?( :symbol_i ) or next
+              :assignment_line == x.symbol_i or next
+              true
+            end
+          end
+          set_via_three( * _three, value_s, name_s )
+        end
+
+        def set_via_three lesser_d, target_d, greater_d, value_s, name_s
+          if target_d
+            self[ target_d ].set_item_value x
+          else
+            _d = if lesser_d
+              lesser_d + 1
+            elsif greater_d
+              greater_d
+            end
+            Config_::Actors__::Add_assignment[ value_s, name_s, _d, value_items_sexp ]
+          end ; nil
+        end
+
+        # ~ readers
+
+        def item_leaf?
+          false
+        end
+
+        def key
+          item_name
+        end
+
+        def section_name
+          item_name
+        end
+
+        def item_name
+          self[1][1][2][1]
+        end
+
+        def item_name= str
+          self[1][1][2][1] = str
+        end
+
+        alias_method :section_name=, :item_name=
+
+        def item_value
+          @vi ||= Section_shell__[].new self
+        end
+
+        def to_content_item_scan
+          value_items_sexp.produce_scan_for :assignment_line
+        end
+
+        def value_items_sexp
+          self[ 2 ]
+        end
+
+        # ~ mut
+      end
+
+
+  class AssignmentLine < Sexp_
+
+    register :assignment_line
+
+    class << self
+      def indent_string
+        INDENT_STRING__
+      end
+    end
+    INDENT_STRING__ = '  '.freeze
+
+    def set_item_value value
+      self[VALUE][1] = value.to_s
       nil
     end
 
-    MEMBER_I_A__ = %i( content_items ).freeze
-  end
-
-  class Sexps::Section < Sexps::ContentItemBranch
-
-    def key
-      item_name
-    end
-
-    Sexp[:section] = self
-    def content_items
-      self[2].select_children :assignment_line
-    end
-    def _create_value name, value
-      # see comment at other implementation of this method
-      items = child :items
-      items or fail "Invalid section sexp: child not found: items"
-      Sexps::AssignmentLine.create(name, value, items)
-    end
-    def item_leaf?
-      false
-    end
-    def item_name
-      self[1][1][2][1]
-    end
-    alias_method :section_name, :item_name
-    def item_name= str
-      self[1][1][2][1] = str
-    end
-    alias_method :section_name=, :item_name=
-    def _update_value assmt, value # c/p
-      assmt.set_item_value value
-    end
-
-    MEMBER_I_A__ = %i( section_name content_items )
-  end
-
-  class Sexps::Section
-
-    # (used to have hellof builders here, but it was an API liability)
-
-  end
-
-  class Sexps::AssignmentLine < Sexp
-    Sexp[:assignment_line] = self
     NAME = 2
     VALUE = 4
     TRAILING_WHITESACE = 5
-    @default_indent = '  '
     def item_leaf?
       true
     end
@@ -356,35 +292,76 @@ module Config  # #borrow-one-indent
       self[NAME][1]
     end
     alias_method :key, :item_name  # #comport
-    def set_item_value value
-      self[VALUE][1] = value.to_s
-    end
+
     MEMBER_I_A__ = %i( item_name item_value ).freeze
   end
 
-  class << Sexps::AssignmentLine
-    def create name, value, parent
-      # use the whitespace formatting of the previous item if you can
-      tmpl = parent.rchild :assignment_line
-      if tmpl
-        # anything?
-      else
-        tmpl = [nil, default_indent, nil, ' = ', nil]
-      end
-      al = self[:assignment_line, tmpl[1], S[:name, name.to_s], tmpl[3], S[:value, value.to_s]]
-      if parent.size > 1 and parent.last.respond_to?(:symbol_name) and :assignment_line == parent.last.symbol_name
-        parent.push "\n" # this is so bad
-      end
-      parent.push al
-      parent.push "\n" # per the grammar
-      nil
-    end
-    attr_accessor :default_indent
-  end
+      class Comment < Sexp_
 
-  class Sexps::Comment < Sexp
-    Sexp[:comment] = self
-    # node_reader :body
+        register :comment
+
+        # node_reader :body
+
+      end
+
+      Content_items__ = Callback_.memoize do
+
+        class Content_Items__ < Callback_.scan.mutable_with_random_access
+
+          def initialize sexp
+            super sexp.method( :to_content_item_scan ), :item_name
+            @sexp = sexp
+          end
+
+          def map_aref_value x
+            x.item_value
+          end
+
+          def add_via_mixed_and_name x, name_x
+            @sexp.add_via_mixed_and_name x, name_x
+          end
+
+          def replace_via_new_mixed_and_old_value_and_name  x_, x, name_x
+            @sexp.replace_via_new_mixed_and_old_value_and_name x_, x, name_x
+          end
+
+          def unparse
+            @sexp.unparse
+          end
+
+          def to_scan  # :+#covered-by:cu
+            @scan_p.call
+          end
+
+          self
+        end
+      end
+
+      Section_shell__ = Callback_.memoize do
+
+        class Section_Shell__ < Content_items__[]
+
+          def section_name
+            @sexp.section_name
+          end
+
+          self
+        end
+      end
+
+      module Value_Proprietor_Methods__
+
+        def add_via_mixed_and_name x, name_x
+          if name_x.respond_to? :ascii_only?
+            add_via_mixed_and_string x, name_x
+          else
+            raise ::TypeError, say_not_string( s )
+          end
+        end
+      end
+
+      Sexps_ = self
+
+    end
   end
-end # #pay-one-back
 end

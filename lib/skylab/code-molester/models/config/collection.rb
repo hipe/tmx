@@ -1,6 +1,12 @@
 module Skylab::CodeMolester
 
-  class Model::Config::Collection
+  module Models
+
+    module Config  # ~ stowaway
+
+      Event_ = Lib_::Old_event_lib[]
+
+      class Collection
 
     Lib_::Model_enhance[ self, -> do
 
@@ -13,8 +19,6 @@ module Skylab::CodeMolester
       | )
 
     end ]
-
-    Event__ = Lib_::Model_event[]
 
     # `create`
     #   + `field_h`  - (exactly):
@@ -43,10 +47,12 @@ module Skylab::CodeMolester
       end
     end
 
-    _i_a = %i( unpack_equal unpack_superset )
-    Lib_::Hash_functions[].pairs_at _i_a do |i, p|
-      define_method i, p ; private i
-    end
+  private
+
+    Lib_::Hash_lib[].pairs_at :unpack_equal, :unpack_superset,
+      & method( :define_method )
+
+  public
 
     # `find_nearest_config_file_path`
     #
@@ -90,34 +96,38 @@ module Skylab::CodeMolester
       end
     end
 
-    module Events
-    end
-
-    Events::No = Event__.new do |num_tries, start_pn|
+    No__ = Event_.new do |num_tries, start_pn|
       "no config file in the #{ num_tries } dirs starting #{
       }from #{ @pth[ start_pn ] }"
     end
 
-    def if_config yes, no
-      if has_model_instance :config then yes[ ]
+    def if_config yes_p, no_p  # #todo this is so much worse than [br]
+      if has_model_instance :config
+        yes_p
       else
         find_nearest_config_file_path( nil, nil,
           -> found_pn do
             set_new_valid_model_instance :config, -> c do
               c.pathname = found_pn
-            end, yes, no
+            end, yes_p, no_p
           end,
           -> num_tries, start_pn do
-            no ||= -> { false }
-            if 1 != no.arity then no[] else
-              no[ Events::No[
-                num_tries: num_tries,
-                start_pn: start_pn
+            no_p ||= -> { false }
+            if 1 == no_p.arity
+              no_p[ No__[
+                :num_tries, num_tries,
+                :start_pn, start_pn
               ] ]
+            else
+              no_p[]
             end
           end
         )
       end
+    end
+      end
+
+      Config_ = self
     end
   end
 end

@@ -1,22 +1,28 @@
-module Skylab::CodeMolester::Config::File::Entity
+module Skylab::CodeMolester
 
-  module Entity::Controller
+  module Config
+
+    module File
+
+      module Entity
+
+        module Controller
 
     def self.enhance controller_class, & def_blk
 
-      stct = Shell_::struct.new
-      Shell_.new( -> w { stct[ :with ] = w },
+      stct = Shell__::struct.new
+      Shell__.new( -> w { stct[ :with ] = w },
                     ->   { stct[ :add  ] = true }
 
       ).instance_exec( & def_blk )
-      flsh = Kernel_.new( controller_class, * stct.to_a )
+      flsh = Kernel__.new( controller_class, * stct.to_a )
       flsh.flush
 
     end
 
-    Shell_ = Lib_::Simple_shell[ %i( with add ) ]
+    Shell__ = Lib_::Simple_shell[ %i( with add ) ]
 
-    class Kernel_
+    class Kernel__
 
       def initialize controller_class, fld_box_host_mod, do_add
         @target = controller_class
@@ -56,19 +62,17 @@ module Skylab::CodeMolester::Config::File::Entity
       end
 
       def add
-        @target.send :include, Entity::Controller::Add_
+        @target.include Add__
       end
-      private :add
     end
-  end
 
-  module Entity::Controller::Common_
-    include Entity::Model::InstanceMethods
-  end
+    module Common__
+      include Entity_::Model::InstanceMethods
+    end
 
-  module Entity::Controller::Add_
+  module Add__
 
-    include Entity::Controller::Common_
+    include Common__
 
     def if_init_valid field_h, opt_h, if_yes, if_no
       ok = e = nil
@@ -82,54 +86,55 @@ module Skylab::CodeMolester::Config::File::Entity
       e ? if_no[ e ] : if_yes[ ok ]
     end
 
-    # `rendered_config_pairs` - this is what gets actually written to the
-    # file. the value part of the tuple should be the raw string to be
-    # written after the equals sign -- no further escaping will be
-    # performed.
 
-    -> do
-      a = [ ]
-      define_method :rendered_config_pairs do
-        ::Enumerator.new do |y|
-          skip_me = entity_story.natural_key_field_name
-          @string_box.each do |nn, str|
-            skip_me == nn and next
-            fld = field_box.fetch nn
-            if fld.is_list and str.respond_to? :each
-              str.each do |s|
-                _get_escape_string_token a, fld, s
+            def rendered_surface_pairs
+              skip_me = entity_story.natural_key_field_name
+              upstream = @string_box.to_pair_scan
+              y = []
+              Callback_.scan do
+                begin
+                  pair = upstream.gets
+                  pair or break
+                  i = pair.name_i
+                  skip_me == i and redo
+                  fld = field_box.fetch i
+                  upstream_x = pair.value_x
+                  if fld.is_list and upstream_x.respond_to? :each
+                    upstream_x.each do |s|
+                      marshal y, s, fld
+                    end
+                  else
+                    marshal y, upstream_x, fld
+                  end
+                  if y.length.zero?
+                    redo
+                  end
+                  pair.value_x = y * ', '  # yeah sure why not, b/c we can
+                  y.clear
+                end while false
+                pair  # just for fun we result in the pair but ..
+              end.immutable_with_random_access_keyed_to_method :name_i,
+                :each_pair_mapper, -> pair do
+                  [ pair.name_i, pair.value_x.value_x ]  # .. then we have 2 pairs
+                end
+            end
+
+          private
+
+            def marshal y, x, fld
+              _s = if ESCAPE_ME_CHARACTER_RX__ =~ x
+                "\"#{
+                   x.gsub ESCAPE_ME_CHARACTER_RX__ do
+                     "\\#{ $~[ 0 ] }"
+                   end
+                }\""
+              else
+                x
               end
-            else
-              _get_escape_string_token a, fld, str
+              y << _s ; nil
             end
-            if a.length.nonzero?
-              y.yield nn, "#{ a * ', ' }"
-              a.clear
-            end
-          end
-          nil
-        end
-      end
-    end.call
+            ESCAPE_ME_CHARACTER_RX__ = /[\"]/
 
-  private
-
-    -> do
-      rx = /[\"]/
-      define_method :_get_escape_string_token do |a, fld, str|
-        ::String === str or fail "sanity - don't use normalized values here -#{
-          } #{ str.class }"
-        outstr = if rx =~ str
-          "\"#{ str.gsub( rx ) { "\\#{ $~[ 0 ] }" } }\""
-        else
-          str  # even with e.g spaces!
-        end
-        a << outstr
-        nil
-      end
-    end.call
-
-    # `normalize_field_keys`
 
     def normalize_field_keys
       once_h = ::Hash[ field_box.map do |fld|
@@ -148,19 +153,17 @@ module Skylab::CodeMolester::Config::File::Entity
         end
       end
       if xtra_h
-        Extra_[ xtra_h: xtra_h ]
+        Extra__[ :xtra_h, xtra_h ]
       end
     end
 
-    Lib_::Hash_functions[].pairs_at :repack_difference do |i, p|
-      define_method i, p
-    end
+    Lib_::Hash_lib[].pairs_at :repack_difference, & method( :define_method )
 
     join = -> a do
       a.map { |x| "\"#{ x }\"" } * ', '
     end
 
-    Extra_ = Entity::Event.new do |xtra_h|
+    Extra__ = Event_.new do |xtra_h|
       "unexpected field(s) - #{ join[ xtra_h.keys ] }"
     end
 
@@ -174,20 +177,20 @@ module Skylab::CodeMolester::Config::File::Entity
         m
       end
       if miss_a.length.nonzero?
-        Missing_[ miss_o_a: miss_a ]
+        Missing__[ :miss_o_a, miss_a ]
       end
     end
 
-    Missing_ = Entity::Event.new do |miss_o_a|
+    Missing__ = Event_.new do |miss_o_a|
       "missing required field(s) - #{ join[ miss_o_a.map(& :local_normal_name )]}"
     end
 
     def normalize_fields
       did = nil
-      @string_box ||= ( did = true ) && Lib_::Open_box[]
+      @string_box ||= ( did = true ) && Lib_::Old_box_lib[].open_box.new
       did or fail "sanity"
       @nerk_a = nil
-      a = Entity::Event::Aggregation.new
+      a = Event_::Aggregation.new
       @field_h.each do |k, v|
         a << ( pound field_box[ k ], v )
       end
@@ -243,20 +246,41 @@ module Skylab::CodeMolester::Config::File::Entity
         pound[ v, -> { ' ' } ]  # eek  - allow "foo[0] did .." vs "foo did"
       end
       if error_a
-        Invalid_[ pred_a: error_a, field: fld ]
+        Invalid__[ :predicate_s_a, error_a, :field, fld ]
       end
     end
 
-    Invalid_ = Entity::Event.new do |pred_a, field|
-      o = ''
+    Invalid__ = Event_.new do |predicate_s_a, field|
+
       lbl = field.local_normal_name.id2name  # #todo
-      Lib_::Evented_list_articulation[ pred_a, -> do
-        always_at_the_beginning      ->     { o << "#{ lbl }" }
-        iff_zero_items               ->     { o << "was fine." }
-        any_first_item               ->   s { o << "#{ s }." }
-        any_subsequent_items         ->   s { o << "#{ lbl }#{ s }." }
-      end ]
-      o
+
+      _upstream_scan = Callback_::Scan.via_nonsparse_array predicate_s_a
+
+      scn = Callback_::Scn.articulators.eventing(
+
+        :gets_under, _upstream_scan,
+
+        :always_at_the_beginning, -> y do
+          y << "#{ lbl }"
+        end,
+
+        :iff_zero_items, -> y do
+          y << " was fine."
+        end,
+
+        :any_first_item, -> y, s do
+          y << "#{ s }."
+        end,
+
+        :any_subsequent_items, -> y, s do
+          y << "#{ lbl }#{ s }."
+        end )
+
+      s_a = []
+      while s = scn.gets
+        s_a.push s
+      end
+      s_a * SPACE_
     end
 
     def pound_regexp fld  # assume `regex`
@@ -274,17 +298,18 @@ module Skylab::CodeMolester::Config::File::Entity
     end
   end
 
-  module Entity::Controller::Common_
+  module Common__
 
-    def render_template tmpl_str, fld, x
+    private def render_template tmpl_str, fld, x
+
       h = {
         ick: -> { "\"#{ x }\"" }
       }
-      tmpl_str.gsub Lib_::Mustache_rx[] do
+
+      tmpl_str.gsub Lib_::String_lib[].mustache_regexp do
         h.fetch( $~[1].intern ).call
       end
     end
-    private :render_template
 
     def config_file_section_name
       entity_story.config_section_name
@@ -296,6 +321,10 @@ module Skylab::CodeMolester::Config::File::Entity
 
     def natural_key
       @string_box.fetch entity_story.natural_key_field_name
+    end
+  end  #+8end
+        end
+      end
     end
   end
 end

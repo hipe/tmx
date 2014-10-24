@@ -2,11 +2,9 @@ require_relative 'test-support'
 
 module Skylab::CodeMolester::TestSupport::Config::File
 
-  extend TestSupport::Quickie  # try running this file just with `ruby -w`
-
   describe "[cm] config file events" do
 
-    extend File_TestSupport
+    extend TS_
 
     def self.expect desc, exp, *tags, &block
       it "#{ desc } - #{ exp }", *tags do
@@ -17,7 +15,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
     context "reading a file that doesn't exist" do
 
       let :o do
-        config_file_new path: tmpdir.join( 'not-exist.conf' )
+        build_config_file_with :path, tmpdir.join( 'not-exist.conf' )
       end
 
       expect "out of the box, does not tell you full pathnames",
@@ -41,9 +39,9 @@ module Skylab::CodeMolester::TestSupport::Config::File
 
     context "try to read a file when the path is actually a directory" do
 
-      let :o do
+      before :each do
         tmpdir.clear.mkdir 'some-dir' # sorry
-        config_file_new path: tmpdir.join( 'some-dir' )
+        init_o_with :path, tmpdir.join( 'some-dir' )
       end
 
       it "out of the box, raises a runtime error" do
@@ -80,7 +78,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
         +who hah pow
       HERE
 
-      config_file_new path: tmpdir.join('boeuf.conf')
+      init_o_with :path, tmpdir.join('boeuf.conf')
       b = o.valid?
       b.should eql(false)
       str = o.invalid_reason.to_s
@@ -90,8 +88,8 @@ module Skylab::CodeMolester::TestSupport::Config::File
     end
 
     expect "when string (not on disk) is invalid at line 1 column 1",
-      'Expecting "#", "\n" or "[" at the beginning of line 1' do |x|
-      config_file_new string: '@foo = bar'
+      'Expecting "#", "\n" or "[" at the beginning of line 1', f: true do |x|
+      init_o_with :string, '@foo = bar'
       b = o.valid?
       b.should eql(false)
       str = o.invalid_reason.to_s
@@ -101,13 +99,13 @@ module Skylab::CodeMolester::TestSupport::Config::File
     context "on the use of `modified?`" do
 
       it "do not ask this of instances with no pathname" do
-        config_file_new string: 'foo = bar'
+        init_o_with :string, 'foo = bar'
         ->{ o.modified? }.should raise_error( ::RuntimeError,
           /it is meaningless to ask/ )
       end
 
       it "do not ask this of instances that are not valid" do
-        config_file_new string: '@foo = bar', path: tmpdir.join( 'some.conf' )
+        init_o_with :string, '@foo = bar', :path, tmpdir.join( 'some.conf' )
         ->{ o.modified? }.should raise_error( ::RuntimeError,
           /the wrong question to ask/ )
       end
@@ -116,8 +114,8 @@ module Skylab::CodeMolester::TestSupport::Config::File
     context "valid string provided, path doesn't exist" do
 
       let :o do
-        config_file_new path: pathname.to_s,
-          string: "one = two\nthree = \"four five\""
+        build_config_file_with :path, pathname.to_s,
+          :string, "one = two\nthree = \"four five\""
       end
 
       let :pathname do
@@ -134,9 +132,11 @@ module Skylab::CodeMolester::TestSupport::Config::File
     end
 
     context "creating a new file" do
+
       context "when the object is (or would be) valid" do
+
         let :o do
-          config_file_new string: 'foo=bar', path: path
+          build_config_file_with :string, 'foo=bar', :path, path
         end
 
         context "when the target path does not exist" do
@@ -209,7 +209,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
       context "when the object is not valid" do
 
         let :o do
-          config_file_new string: '@foo=bar', path: '/never/see'
+          build_config_file_with :string, '@foo=bar', :path, '/never/see'
         end
 
         it "won't even let you try to write the thing, before it looks at fs" do
@@ -240,7 +240,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
       context "when both path and string, and path existed" do
         it 'raises an exception talking about "won\'t overwrite"' do
           prepare_wiz_conf
-          config_file_new path: path, string: 'wiff=waff'
+          init_o_with :path, path, :string, 'wiff=waff'
           o.valid?.should eql(true)
           ->{ o.write }.should raise_error( ::RuntimeError,
             /won't overwrite a pathname that was not first read/i
@@ -253,7 +253,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
         it "`write` works with no event handlers, result is bytes" do
           prepare_wiz_conf
           path.exist?.should eql(true)
-          config_file_new path: path
+          init_o_with :path, path
           o.exist?.should eql(true)
           o['foo'].should eql('bar')
           o['foo'] = 'baz'
@@ -266,7 +266,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
 
         it "`write` works with event handlers" do
           prepare_wiz_conf
-          config_file_new path: path
+          init_o_with :path, path
           o['foo'] = 'boffo'
           str = ''
           res = o.write do |w|

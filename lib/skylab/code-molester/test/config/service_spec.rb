@@ -6,19 +6,19 @@ module Skylab::CodeMolester::TestSupport::Config::Service
 
   ::Skylab::CodeMolester::TestSupport::Config[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  CodeMolester = CodeMolester
+  CM_ = CM_
 
-  describe "#{ CodeMolester }::Config::Service" do
+  describe "[cm] config service" do
 
     context "provide some arguments" do
       m = -> do
         module M1
           class Client
-            CodeMolester::Config::Service.enhance self do
+            CM_::Config::Service.enhance self do
               filename 'foo.config'
               search_num_dirs do 3 end
             end
@@ -39,7 +39,7 @@ module Skylab::CodeMolester::TestSupport::Config::Service
       m = -> do
         module M2
           class Client
-            CodeMolester::Config::Service.enhance self
+            CM_::Config::Service.enhance self
           end
         end
         m = -> { }
@@ -60,7 +60,7 @@ module Skylab::CodeMolester::TestSupport::Config::Service
       m = -> do
         module M3
           class Client
-            CodeMolester::Config::Service.enhance self do
+            CM_::Config::Service.enhance self do
               search_start_path '/wizzo'
             end
           end

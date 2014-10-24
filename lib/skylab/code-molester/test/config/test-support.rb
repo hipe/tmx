@@ -4,21 +4,23 @@ module Skylab::CodeMolester::TestSupport::Config
 
   ::Skylab::CodeMolester::TestSupport[ self ]
 
-  module CONSTANTS
+  module Constants
     SE_ = ::STDERR
     Do_invoke_ = -> do
       a = ::ARGV
       if (( idx = a.index '-x' ))
         a[ idx ] = nil
         a.compact!
-        TestSupport::Quickie.do_not_invoke!
+        TestSupport_::Quickie.do_not_invoke!
         true
       end
     end
   end
 
-  include CONSTANTS
+  include Constants
 
-  TestSupport::Quickie.enable_kernel_describe
+  TestSupport_::Quickie.enable_kernel_describe
+
+  CM_ = CM_
 
 end

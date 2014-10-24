@@ -1,4 +1,6 @@
-module Skylab::CodeMolester::Config::File::Entity
+module Skylab::CodeMolester
+
+  module Config::File::Entity
 
   METAFIELDS_BASE_ = [
 
@@ -50,27 +52,44 @@ module Skylab::CodeMolester::Config::File::Entity
   #         ~ import a lot of constants because we are special ~
 
 
-  CodeMolester = ::Skylab::CodeMolester
+  class << self
 
-  Lib_ = CodeMolester::Lib_
-
-  Event = Lib_::Model_event[]  # or a subclass
-
-  Entity = self  # the usual hiccup, for readabilty
-
-  #         ~ define the enhancement "contained DSL" ~
-
-  module Entity
-    def self.enhance target, &def_blk
+    def enhance target, & p
       flsh = Kernel_.new target
       Shell_.new(
         ->( *a ) do
           flsh.concat_fields a
         end
-      ).instance_exec( & def_blk )
+      ).instance_exec( & p )
       flsh.flush
     end
+
+    define_method :hack_model_name_from_constant, -> do
+
+      str = '::Models::'.freeze
+
+      len = str.length
+
+      -> mod do
+        n = mod.name
+        a = ( n[ ( n.rindex str ) + len .. -1 ] ).split CONST_SEP_
+        a.length.nonzero? or fail "sanity - hack failed (#{ n })"
+        _name_a = a.map do |s|
+          Lib_::Old_name_lib[].via_const s.intern
+        end
+        Lib_::Old_name_lib[].qualified.new _name_a
+      end
+    end.call
   end
+
+  CONST_SEP_ = '::'.freeze
+
+  Event_ = Lib_::Old_event_lib[]  # or a subclass
+
+
+  #         ~ define the enhancement "contained DSL" ~
+
+
 
   Shell_ = Lib_::Simple_shell[ %i( fields ) ]
 
@@ -113,5 +132,10 @@ module Skylab::CodeMolester::Config::File::Entity
     def flush
       @flush.[]
     end
+  end
+
+    DASH_ = '-'.freeze
+    Entity_ = self
+    UNDERSCORE_ = '_'.freeze
   end
 end

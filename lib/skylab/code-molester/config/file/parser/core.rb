@@ -1,13 +1,10 @@
 module Skylab::CodeMolester
 
   module Config
-    Config = self  # #stowaway - hiccuping this constant gives us the best
-    # of multiple worlds - it is visible from inside the generated treetop
-    # parser symbol actions, we don't need a very deep scope tree there,
-    # and it will then transparently autoload lazily the desired node classes.
-  end
 
-  module Config::File::Parser
+    module File
+
+      module Parser
 
     # the actual mechanics of parsing the file is of course handled by
     # treetop. this module exists, then, only to manage how and whether
@@ -39,7 +36,7 @@ module Skylab::CodeMolester
       # ::Skylab::TreetopTools, but should not be abstracted out of this
       # here until it feels stable.
 
-      parent_module = Config
+      parent_module = Config_
 
       const = :FileParser  # treetop appends the 'Parser' for us.
 
@@ -62,23 +59,19 @@ module Skylab::CodeMolester
         end
       end
 
-      path_part = "config/file/parser/version-#{
-        ::File.read( "#{ __dir__ }/parser/VERSION" ).chomp
-      }.rb"
-
         # both the the input path (the hand-written .tt file)
         # *and* the output path (the generated parser class)
         # will be derived from the above.
 
       compile_parser = nil
       load_parser_class = -> do
-        o_pn = Lib_::Cache_pathname[].join path_part
+        o_pn = Lib_::Cache_pathname[].join Path_part__[]
         if o_pn.exist?
           debug and y << "using cached parser - #{ o_pn }"
         else
           compile_parser[ o_pn ] or break  # (result is num bytes)
         end
-        CodeMolester::Library_.touch :Treetop  # load it late, close to where it is used
+        CM_::Library_.touch :Treetop  # load it late, close to where it is used
         load o_pn.to_s
         parent_module.const_defined? const, false or fail "we expected but #{
           }did not see #{ parent_module }::#{ const } in #{ o_pn }"
@@ -88,9 +81,9 @@ module Skylab::CodeMolester
       mkdir_p = nil
       compile_parser = -> o_pn do
 
-        i_pn = CodeMolester.dir_pathname.join( path_part ).  # hack around
+        i_pn = CM_.dir_pathname.join( Path_part__[] ).  # hack around
           dirname.join( 'grammar.treetop' )                  #   'version-'
-        cmp = CodeMolester::Library_::Treetop::Compiler::GrammarCompiler.new
+        cmp = CM_::Library_::Treetop::Compiler::GrammarCompiler.new
         ovr = o_pn.exist?  # even if we never overwrite we don't know that here.
         if debug
           y << "#{ ovr ? 'overwriting existing' : 'creating new' } #{
@@ -113,11 +106,11 @@ module Skylab::CodeMolester
         Lib_::Cache_pathname[].exist? or fail "sanity"
         relpath = d_pn.relative_path_from Lib_::Cache_pathname[]
         a = num_occurences[ relpath.to_s, '/' ]
-        b = num_occurences[ path_part, '/' ]
+        b = num_occurences[ Path_part__[], '/' ]
         ( a < b ) or fail "sanity - #{ a } dirs to create for #{ b - 1 }"
-        Lib_::File_utils[ -> msg do
+        Lib_::FU_lib[].new do |msg|
           debug and y << msg
-        end ].mkdir_p d_pn.to_s
+        end.mkdir_p d_pn.to_s
       end
 
       num_occurences = -> str, substr do
@@ -138,10 +131,23 @@ module Skylab::CodeMolester
     -> do  # kinda hacky to do this here but we want it self-contained ..
       env_var = 'SKYLAB_CM_DEBUG'
       val = ::ENV[ env_var ]
-      if val && '' != val
+      if val && EMPTY_S_ != val
         y << "#{ env_var }=#{ val.inspect }"
         self.do_debug = true
       end
     end.call
+
+        Path_part__ = Callback_.memoize do
+          head_pn = Parser_.dir_pathname
+          version_s = head_pn.join( 'VERSION' ).read
+          version_s.chomp!
+          _full_pn = head_pn.join "version-#{ version_s }#{ Autoloader_::EXTNAME }"
+          _full_pn.relative_path_from( CM_.dir_pathname ).to_path
+        end
+
+        Parser_ = self
+
+      end
+    end
   end
 end

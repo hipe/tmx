@@ -1,4 +1,4 @@
-module ::Skylab::CodeMolester
+module Skylab::CodeMolester
 
   module Sexp::Auto
 
@@ -87,7 +87,7 @@ module ::Skylab::CodeMolester
   end
 end
 
-module ::Skylab::CodeMolester::Sexp::Auto
+module Skylab::CodeMolester::Sexp::Auto
 
   EXPAND = { 't' => :terminal, 'n' => :nonterminal, 'w' => :whitespace }
   Ele = Struct.new(:method, :type, :index, :name)
@@ -160,7 +160,7 @@ module ::Skylab::CodeMolester::Sexp::Auto
         sp = node.sexp
         if ::String === sp
           sexp.push sp
-        elsif sexp.symbol_name == sp.symbol_name
+        elsif sexp.symbol_i == sp.symbol_i
           sexp.concat sp[1..-1]
         else
           sexp.push sp

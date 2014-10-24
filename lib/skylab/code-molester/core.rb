@@ -5,25 +5,29 @@ module Skylab::CodeMolester
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
 
-  def self.cache_pathname
-    self::Lib_::Cache_pathname_base[]
-  end
-
-  CodeMolester = self
-  EMPTY_A_ = [].freeze
-  MONADIC_TRUTH_ = -> _ { true }
-
-  module Model
-    Autoloader_[ self ]
-    stowaway :Event, 'config/controller'
+  class << self
+    def cache_pathname
+      CM_::Lib_::Cache_pathname_base[]
+    end
   end
 
   module Config
     Autoloader_[ self ]  # b.c of builtin class of same name :/
+    Config_ = self
+    Config = self  # for now for prettier treetop grammars
   end
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
+  CM_ = self
+  DID_ = true
+  EMPTY_A_ = [].freeze
+  EMPTY_S_ = ''.freeze
   stowaway :Lib_, 'library-'
+  MONADIC_TRUTH_ = -> _ { true }
+  NEWLINE_ = "\n".freeze
+  NILADIC_EMPTINESS_ = -> { false }
+  SPACE_ = ' '.freeze
+  UNABLE_ = false
 
 end

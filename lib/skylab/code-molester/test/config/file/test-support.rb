@@ -1,29 +1,75 @@
 require_relative '../test-support'
 
-
 module Skylab::CodeMolester::TestSupport::Config::File
-  ::Skylab::CodeMolester::TestSupport::Config[ File_TestSupport = self ]
 
+  ::Skylab::CodeMolester::TestSupport::Config[ TS_ = self ]
 
-  include self::CONSTANTS # so we can say C_M from the body of our specs
+  include Constants
+
+  extend TestSupport_::Quickie
+
+  CM_ = CM_
 
   module InstanceMethods
-    include CONSTANTS # so we can say C_M from within i.m's below
 
-    def config_file_new *a
-      @o = CodeMolester::Config::File::Model.new(* a)
-    end
-
-
-    def debug!
-      CodeMolester::Config::File.do_debug = true
-    end
-
+    include Constants
 
     attr_reader :o
 
-    def tmpdir
-      TMPDIR
+    let :subject do
+      config_file_class.build_with :path, path, :string, input_string
+    end
+
+    def config
+      @config ||= bld_config
+    end
+
+    def bld_config
+      config_file_class.build_with :path, path, :string, content
+    end
+
+    def path
+    end
+
+    def input_string
+    end
+
+    def init_o_with * x_a
+      @o = config_file_class.build_via_iambic x_a ; nil
+    end
+
+    def build_config_file_with * x_a
+      config_file_class.build_via_iambic x_a
+    end
+
+    def config_file_class
+      CM_::Config::File::Model
+    end
+
+    let :tmpdir do
+      tmpdir = Tmpdir_instance_[]
+      b = do_debug ; b_ = tmpdir.be_verbose
+      if b && ! b_ or b_ && ! b
+        tmpdir = tmpdir.with :be_verbose, b, :debug_IO, debug_IO
+      end
+      tmpdir
+    end
+
+    def parses_and_unparses_OK
+      parses_OK
+      unparses_OK
+    end
+
+    def parses_OK
+      config.invalid_reason.should be_nil
+      config.should be_valid
+    end
+
+    def unparses_OK
+      sx = config.sexp
+      s = sx.unparse
+      s_ = content
+      s.should eql s_
     end
   end
 end
