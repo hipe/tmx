@@ -4,158 +4,160 @@ module Skylab::SubTree
 
     class Merge_
 
-      module FUN
+      module Actors__
 
-        modi = -> *a do
-          a.map do |x|
-            mo = Get_MO_[ x ]
-            :no_match == mo.type_ish_i and raise "implement me - there is #{
-              }no MO yet for #{ x.class }"
-            mo
-          end
-        end
+        class Merge  # an experiment about merging two arbitrary objects
+          # based on their "shape" - two ints get added together, two lists
+          # get concatted, an int onto a list gets pushed, a list onto an
+          # int is not supported, etc.
 
-        merge = -> merge_which_i, x1, x2 do
-          mo1, mo2 = modi[ x1, x2 ]
-          (( p = mo1.send merge_which_i )) or raise "#{ MC_ }#{
-            }'#{ mo1.type_ish_i }' doesn't `#{ merge_which_i }`"
-          p[ x1, mo2, x2 ]
-        end
+          Callback_::Actor[ self, :properties,
+            :merge_which_i, :x, :x_ ]
 
-        MC_ = "merge conflict - ".freeze
-
-        o = -> k, p do
-          define_singleton_method k do p end
-        end
-
-        class << o
-          alias_method :[]=, :[]
-        end
-
-        o[:merge_atomic] = -> x1, x2 do
-          merge[ :merge_atomic, x1, x2 ]
-        end
-
-        o[:merge_one_dimensional] = -> x1, x2 do
-          merge[ :merge_one_dimensional, x1, x2 ]
-        end
-
-        o[:merge_union] = -> x1, x2 do
-          merge[ :merge_union, x1, x2 ]
-        end
-
-        class Modus_Operandus_
-
-          Entity_[ self, :fields, :type_ish_i, :match, :dupe,
-           :merge_atomic, :merge_one_dimensional,
-           :merge_union ]
-
-          class << self
-            def build_with * x_a
-              x_a.unshift :type_ish_i
-              new x_a
+          def execute
+            @mo = produce_modus_for_mixed @x
+            @mo_ = produce_modus_for_mixed @x_
+            p = @mo.send @merge_which_i
+            if p
+              p[ @x, @mo_, @x_ ]
+            else
+              raise ::ArgumentError, say_does_not_merge
             end
-            private :new
           end
 
-          attr_reader :type_ish_i, :match, :dupe, :merge_atomic,
-            :merge_one_dimensional, :merge_union
+        private
 
-        end
+          def say_does_not_merge
+            "#{ PREFIX__ }'#{ @mo.shape_i }' doesn't `#{ @merge_which_i }`"
+          end
 
-        MODI_OPERANDI_A_ = -> do
+          def produce_modus_for_mixed x
+            mo = MODI_OPERANDI_A__.detect do |mo_|
+              mo_.match[ x ]
+            end
+            if :no_match == mo.shape_i
+              raise say_implement_me x
+            else
+              mo
+            end
+          end
 
-          identity = IDENTITY_
+          def say_implement_me x
+            "implement me - there is no modus operandus yet for #{ x.class }"
+          end
+
+        MODI_OPERANDI_A__ = -> do
 
           an = -> x do
-            an = SubTree_::Lib_::NLP[]::EN::Minitesimal::FUN.an
-            an[ x ]
+            "#{ SubTree_::Lib_::NLP_EN_lib[].an x }#{ x }"
           end
 
           say_merge_conflict = -> xx, yx do
-            "#{ MC_ }won't merge #{ an[ xx ] } into #{ an[ yx ] }"
+            "#{ PREFIX__ }won't merge #{ an[ xx ] } into #{ an[ yx ] }"
           end
 
           merge_numeric = -> int_flot do
             -> x, mo, y do
-              case mo.type_ish_i
+              case mo.shape_i
               when :nil   ; x
               when :int   ; x + y
               when :float ; y + x
-              else        ; raise say_merge_conflict[ mo.type_ish_i, int_flot ]
+              else        ; raise say_merge_conflict[ mo.shape_i, int_flot ]
               end
             end
           end
 
-          o = Modus_Operandus_.method :build_with
+          result_a = []
 
-          [ o[ :nil,
-               :match, -> x { x.nil? },
-               :merge_atomic, -> _, mo, y do
-                         mo.dupe[ y ]
-                       end,
-               :dupe, identity
-            ],
-            o[ :bool,
-               :match, -> x do
-                         case x
-                         when ::FalseClass, ::TrueClass; true
-                         end
-                       end,
-               :merge_atomic, -> x, mo, y do
-                         case mo.type_ish_i
-                         when :nil  ; x
-                         when :bool ; x == y or
-                           raise say_merge_conflict[ "boolean #{ y }", x ]
-                         else
-                           raise say_merge_conflict[ mo.type_ish_i, 'bool' ]
-                         end
-                       end,
-              :dupe, identity
-            ],
-            o[ :int,
-               :match, -> x do ::Integer === x end,
-               :merge_atomic, merge_numeric[ :int ],
-               :dupe, identity
-            ],
-            o[ :float,
-               :match, -> x do ::Float === x end,
-               :merge_atomic, merge_numeric[ :float ],
-               :dupe, identity
-            ],
-            o[ :list,
-               :match, -> x do x.respond_to? :each_index end,
-               :merge_one_dimensional, -> x, mo, y do
-                         List_check_[ mo, y ]
-                         x + y
-                       end,
-               :merge_union, -> x, mo, y do
-                         List_check_[ mo, y ]
-                         x | y
-                       end
-            ],
-            o[ :no_match,
-               :match, -> _ do true end
-            ]
-          ]
+          o = -> * x_a do
+            result_a.push Modus_Operandus__.new x_a ; nil
+          end
+
+          class Modus_Operandus__
+
+            Entity_[ self, :fields,
+              :shape_i,
+              :match,
+              :dupe,
+              :merge_atomic,
+              :merge_one_dimensional,
+              :merge_union ]
+
+            attr_reader :shape_i, :match, :dupe, :merge_atomic,
+              :merge_one_dimensional, :merge_union
+
+          end
+
+          o[ :shape_i, :nil,
+             :match, -> x { x.nil? },
+             :merge_atomic, -> _, mo, y do
+               mo.dupe[ y ]
+             end,
+             :dupe, IDENTITY_ ]
+
+          o[ :shape_i, :bool,
+             :match, -> x do
+               case x
+               when ::FalseClass, ::TrueClass; true
+               end
+             end,
+             :merge_atomic, -> x, mo, y do
+               case mo.shape_i
+               when :nil  ; x
+               when :bool ; x == y or
+                 raise ::ArgumentError, say_merge_conflict[ "boolean #{ y }", x ]
+               else
+                 raise ::ArgumentError, say_merge_conflict[ mo.shape_i, 'bool' ]
+               end
+             end,
+             :dupe, IDENTITY_ ]
+
+          o[ :shape_i, :int,
+             :match, -> x do
+               ::Integer === x
+             end,
+             :merge_atomic, merge_numeric[ :int ],
+             :dupe, IDENTITY_ ]
+
+          o[ :shape_i, :float,
+             :match, -> x do
+               ::Float === x
+             end,
+             :merge_atomic, merge_numeric[ :float ],
+             :dupe, IDENTITY_ ]
+
+          o[ :shape_i, :list,
+             :match, -> x do
+               x.respond_to? :each_index
+             end,
+             :merge_one_dimensional, -> x, mo, y do
+               List_check__[ mo, y ]
+               x + y
+             end,
+             :merge_union, -> x, mo, y do
+               List_check__[ mo, y ]
+               x | y
+             end ]
+
+          o[ :shape_i, :no_match,
+             :match, -> _ do
+               true
+              end ]
+
+          result_a
+
         end.call
 
-        List_check_ =  -> mo, y do
-                         :list == mo.type_ish_i or raise "#{ MC_ }#{
-                         }no strategy yet created for merging a #{
-                         }#{ mo.type_ish_i }into this list."
-                       end
+        List_check__ =  -> mo, y do
+          if :list != mo.shape_i
+            raise "#{ PREFIX__ }no strategy yet created for merging a #{
+              }#{ mo.shape_i }into this list."
+          end
+        end
 
-        Get_MO_ = -> do
-          f_a = MODI_OPERANDI_A_.map do |mo|
-            -> x do
-              mo.match[ x ] ? [ false, mo ] : [ true, x ]
-            end
-          end
-          -> x do
-            SubTree_::Lib_::Function_chain[ f_a, [ x ] ]
-          end
-        end.call
+        PREFIX__ = "merge conflict - ".freeze
+
+        end
       end
     end
   end

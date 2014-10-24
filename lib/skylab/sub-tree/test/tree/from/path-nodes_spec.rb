@@ -4,9 +4,9 @@ module Skylab::SubTree::TestSupport::Tree::From_PN__
 
   ::Skylab::SubTree::TestSupport::Tree[ TS__ = self ]
 
-  include CONSTANTS
+  include Constants
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[st] tree from path nodes" do
 

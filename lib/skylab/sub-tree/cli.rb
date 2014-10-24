@@ -38,20 +38,19 @@ module Skylab::SubTree
           alias_method :calculate, :instance_exec
         private
           SubTree::Lib_::EN_add_methods[ self, :private, %i( s ) ]
-          o = Lib_::CLI_stylify_proc[].curry
+          o = Lib_::CLI_lib[].pen.stylify.curry
           define_method :em, o[ %i( green ) ]
           define_method :escape_path, Lib_::Pretty_path_proc[]
           define_method :ick, Lib_::Strange_proc[].curry[ 60 ]
         public
-          def stylize *a
-            _s = a.pop
-            SubTree::Lib_::CLI_stylify[ a, _s ]
+          def stylize * a
+            SubTree_::Lib_::CLI_lib[].pen.stylify a, a.pop
           end
         end
         r = Expression_Agent__.method :new ; p = -> { r } ; r
       end
       define_singleton_method :some_expression_agent,
-        Lib_::Touch_constant_reader[
+        Lib_::Touch_const_reader[
           true, p[], :EXPRESSION_AGENT__, self, :_no_arg_ ]
     end.call
 
@@ -209,7 +208,7 @@ module Skylab::SubTree
 
     def cov path=nil, _opts
       @param_h[ :path ] = path
-      _const = Name_.from_variegated_symbol( :cov ).as_const
+      _const = Name_.via_variegated_symbol( :cov ).as_const
       hot = CLI::Actions.const_get( _const, false ).new.
         init_for_invocation get_services
       if false == (( r = hot.invoke @param_h ))

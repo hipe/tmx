@@ -6,7 +6,7 @@ describe "[st] CLI core" do
 
   extend ts::CLI
 
-  _PN = ts::CLI::CONSTANTS::PN_
+  _PN = ts::CLI::Constants::PN_
 
   acts_rx = /\{.+rerun\|ping\}/
   actions = acts_rx.source

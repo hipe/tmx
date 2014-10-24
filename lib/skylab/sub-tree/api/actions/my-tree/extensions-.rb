@@ -68,7 +68,7 @@ module Skylab::SubTree
           x_a = [ :local_normal_name, i, :infostream, @infostream,
                 :verbose, @verbose  ]
           true == val or x_a << :arg_value << val  # only when interesting
-          _name = Name_.from_variegated_symbol :"#{ i }_"
+          _name = Name_.via_variegated_symbol :"#{ i }_"
           _class = self.class.const_get _name.as_const, false
           ag = _class.new x_a
           index_notifiee ag

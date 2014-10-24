@@ -2,7 +2,7 @@
 
 require_relative 'rendering/test-support'
 
-module ::Skylab::SubTree::TestSupport::API::Actions::My_Tree::Rendering
+module Skylab::SubTree::TestSupport::API::Actions::My_Tree::Rendering
 
 describe "[st] API actions my-tree" do  # historic hiccup #borrow-one-indent
 

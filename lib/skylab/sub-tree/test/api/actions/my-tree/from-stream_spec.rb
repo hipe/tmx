@@ -9,11 +9,11 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree
     NIL_A_ = NIL_A_
 
     it "expag loads" do
-      SubTree::API::Actions::My_Tree::EXPRESSION_AGENT_
+      SubTree_::API::Actions::My_Tree::EXPRESSION_AGENT_
     end
 
     it "expag renders a thing" do
-      _s = SubTree::API::Actions::My_Tree::EXPRESSION_AGENT_.calculate do
+      _s = SubTree_::API::Actions::My_Tree::EXPRESSION_AGENT_.calculate do
         a = [ par( 'foo_bar' ), par( 'biz' ) ]
         "#{ both( a ) }#{ and_ a } are ok."
       end
@@ -77,7 +77,7 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree
 
     it "from good path (using find) - pretty (well done)" do
       f = start_front.with_parameters :path_a, %w( one ) ; r = nil
-      SubTree::Library_::FileUtils.cd fixtures_dir_pn do
+      SubTree_::Library_::FileUtils.cd fixtures_dir_pn do
         r = f.flush
       end
       @e.string.should be_empty

@@ -8,58 +8,42 @@ Skylab::TestSupport::Quickie.enable_kernel_describe
 
 module Skylab::SubTree::TestSupport
 
-  module CONSTANTS
-    SubTree = ::Skylab::SubTree
-    SubTree_ = SubTree
-    TestSupport = ::Skylab::TestSupport
+  module Constants
+    Callback_ = ::Skylab::Callback
+    SubTree_ = ::Skylab::SubTree
+    TestSupport_ = ::Skylab::TestSupport
   end
 
-  include CONSTANTS
+  include Constants
 
-  TestSupport = TestSupport
+  TestSupport_ = TestSupport_
 
-  TestSupport::Regret[ self ]
+  TestSupport_::Regret[ self ]
 
-  module Testlib_
+  module TestLib_
 
     sidesys = ::Skylab::SubTree::Autoloader_.
       method :build_require_sidesystem_proc
 
-    Headless__ = sidesys[ :Headless ]
+    HL__ = sidesys[ :Headless ]
 
-    CLI_stylify = -> a, b do
-      ::Skylab::SubTree::Lib_::CLI_stylify[ a, b ]
+    CLI_lib = -> do
+      HL__[]::CLI
     end
 
     Face_ = sidesys[ :Face ]
 
-    Parse_styles = -> s do  # TL
-      Headless__[]::CLI::FUN::Parse_styles[ s ]
-    end
-
     Stderr = -> do
-      TestSupport.debug_IO
-    end
-
-    Unstyle_proc = -> do
-      Headless__[]::CLI::Pen::FUN.unstyle
-    end
-
-    Unstyle_styled = -> x do
-      Headless__[]::CLI::Pen::FUN::Unstyle_styled[ x ]
-    end
-
-    Unstyle_style_proc = -> do
-      Headless__[]::CLI::Pen::FUN::Unstyle_styled
+      TestSupport_.debug_IO
     end
   end
 
-  CONSTANTS::Testlib_ = Testlib_
+  Constants::TestLib_ = TestLib_
 
   module InstanceMethods
 
     def debug_stream
-      TestSupport.debug_IO
+      TestSupport_.debug_IO
     end
 
     attr_reader :do_debug

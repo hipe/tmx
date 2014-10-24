@@ -4,9 +4,9 @@ module Skylab::SubTree::TestSupport::Tree::Traversal_Scanner
 
   ::Skylab::SubTree::TestSupport::Tree[ self ]
 
-  include CONSTANTS
+  include Constants
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   describe "[st] tree traversal scanner" do
 
@@ -55,7 +55,7 @@ module Skylab::SubTree::TestSupport::Tree::Traversal_Scanner
     end
 
     def get_enumerator
-      ::Enumerator::Yielder.new( & TestSupport.debug_IO.stderr.method( :puts ) )
+      ::Enumerator::Yielder.new( & TestSupport_.debug_IO.stderr.method( :puts ) )
     end
 
     def fp * x_a

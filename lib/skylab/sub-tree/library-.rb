@@ -29,68 +29,52 @@ module Skylab::SubTree
       Face__[]::API::Params_.via_iambic x_a
     end
 
-    Basic__ = sidesys[ :Basic ]
+    Bsc__ = sidesys[ :Basic ]
 
     Basic_fields = -> * x_a do
       if x_a.length.zero?
-        MetaHell__[]::Basic_Fields
+        MH__[]::Basic_Fields
       else
-        MetaHell__[]::Basic_Fields.via_iambic x_a
+        MH__[]::Basic_Fields.via_iambic x_a
       end
     end
 
     Bound_field_reflection_class = -> do
-      Basic__[]::Field::Reflection::Bound_
+      Bsc__[]::Field.reflection.bound
     end
 
     Box = -> do
-      Basic__[]::Box.new
+      Bsc__[]::Box.new
     end
 
     Box_class = -> do
-      Basic__[]::Box
+      Bsc__[]::Box
     end
 
-    Brazen__ = sidesys[ :Brazen ]
+    Bzn__ = sidesys[ :Brazen ]
 
     Clear_pwd_cache = -> do
-      Headless__[]::CLI::PathTools.clear
+      System[].filesystem.path_tools.clear
     end
 
     CLI_DSL = -> mod do
       Porcelain__[]::Legacy::DSL[ mod ]
     end
 
+    CLI_lib = -> do
+      HL__[]::CLI
+    end
+
     CLI_lipstick = -> * x_a do
-      Face__[]::CLI::Lipstick.new( * x_a )
-    end
-
-    CLI_pen = -> do
-      Headless__[]::CLI::Pen::SERVICES
-    end
-
-    CLI_stylify = -> a, b do
-      Headless__[]::CLI::Pen::FUN::Stylify[ a, b ]
-    end
-
-    CLI_stylify_proc = -> do
-      Headless__[]::CLI::Pen::FUN::Stylify
+      Face__[]::CLI.lipstick.new( * x_a )
     end
 
     CLI_table = -> * x_a do
       Face__[]::CLI::Table.via_iambic x_a
     end
 
-    CLI_tree_glyph_sets = -> do
-      Headless__[]::CLI::Tree::Glyph::Sets
-    end
-
-    CLI_tree_glyphs = -> do
-      Headless__[]::CLI::Tree::Glyphs
-    end
-
     Properties_stack_frame = -> * a do
-      Brazen__[].properties_stack.common_frame.via_arglist a
+      Bzn__[].properties_stack.common_frame.via_arglist a
     end
 
     Distill_proc = -> do
@@ -98,7 +82,7 @@ module Skylab::SubTree
     end
 
     EN_add_methods = -> * i_a do
-      Headless__[]::SubClient::EN_FUN[ * i_a ]
+      HL__[].expression_agent.NLP_EN_methods.via_arglist i_a
     end
 
     Enhance_as_API_normalizer = -> x, * x_a do
@@ -106,7 +90,7 @@ module Skylab::SubTree
     end
 
     Entity = -> * a do
-      Brazen__[]::Entity.via_arglist a
+      Bzn__[]::Entity.via_arglist a
     end
 
     Entity_via_iambic = -> x_a do
@@ -126,55 +110,55 @@ module Skylab::SubTree
     end
 
     Fields_from_methods = -> *a, p do
-      MetaHell__[]::Fields::From.methods.iambic_and_block a, p
-    end
-
-    Function_chain = -> x, y do
-      MetaHell__[]::FUN::Function_chain_[ x, y ]
+      MH__[]::Fields::From.methods.iambic_and_block a, p
     end
 
     Funcy_globful = -> x do
-      MetaHell__[].funcy_globful x
+      MH__[].funcy_globful x
     end
 
     Funcy_globless = -> x do
-      MetaHell__[].funcy_globless x
+      MH__[].funcy_globless x
     end
 
     Hack_label_proc = -> do
       Face__[]::API::Normalizer_::Hack_label
     end
 
-    Headless__ = sidesys[ :Headless ]
+    HL__ = sidesys[ :Headless ]
 
     Iambic = -> * x_a do
-      Face__[]::Iambic.from_iambic x_a
+      Face__[]::Iambic.via_iambic x_a
     end
 
     InformationTactics__ = sidesys[ :InformationTactics ]
 
-    MetaHell__ = sidesys[ :MetaHell ]
+    MH__ = sidesys[ :MetaHell ]
 
-    NLP = -> do
-      Headless__[]::NLP
+    Method_lib = -> do
+      Bsc__[]::Method
+    end
+
+    NLP_EN_lib = -> do
+      HL__[]::NLP::EN
     end
 
     Order_proxy = -> x do
-      Basic__[]::Hash::Order_Proxy.new x
+      Bsc__[]::Hash::Order_Proxy.new x
     end
 
     Porcelain__ = sidesys[ :Porcelain ]
 
     Power_Scanner = -> * x_a do
-      Basic__[]::List::Scanner::Power.from_iambic x_a
+      Callback_::Scn.multi_step.build_via_iambic x_a
     end
 
     Pretty_path_proc = -> do
-      Headless__[]::CLI::PathTools::FUN::Pretty_path
+      System[].filesystem.path_tools.pretty_path
     end
 
     Spec_rb = -> do
-      TestSupport__[]::FUN::Spec_rb[]
+      TestSupport__[].spec_rb
     end
 
     Stock_API_expression_agent = -> do
@@ -182,15 +166,19 @@ module Skylab::SubTree
     end
 
     Strange_proc = -> do
-      MetaHell__[].strange.to_proc
+      MH__[].strange.to_proc
     end
 
     Struct = -> * i_a do
-      Basic__[]::Struct.from_i_a i_a
+      Bsc__[]::Struct.make_via_arglist i_a
     end
 
     Summarize_time = -> x do
       InformationTactics__[]::Summarize::Time[ x ]
+    end
+
+    System = -> do
+      HL__[].system
     end
 
     Test_dir_name_a = -> do
@@ -199,17 +187,13 @@ module Skylab::SubTree
 
     TestSupport__ = sidesys[ :TestSupport ]
 
-    Touch_constant_reader = -> * a do
-      MetaHell__[]::FUN::Touch_constant_reader_[ *a ]
+    Touch_const_reader = -> * a do
+      MH__[].touch_const_reader( * a )
     end
 
     Treelib__ = memo[ -> do
       Porcelain__[]::Tree
     end ]
-
-    Unbound_method_curry = -> x do
-      Basic__[]::Method::Curry::Unbound.new x
-    end
 
     Write_isomorphic_option_parser_options = -> * a do
       Face__[]::CLI::Client::API_Integration_::OP_.new( * a ).execute

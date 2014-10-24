@@ -4,15 +4,15 @@ module Skylab::SubTree::TestSupport::Tree_Print
 
   ::Skylab::SubTree::TestSupport[ TS__ = self ]
 
-  SubTree = ::Skylab::SubTree
+  SubTree_ = ::Skylab::SubTree
 
   describe "[st] tree-print" do
 
     extend TS__
 
     it "o" do
-      io = SubTree::Library_::StringIO.new
-      SubTree::Tree_Print.tree_print get_object, io, :do_verbose_lines,
+      io = SubTree_::Library_::StringIO.new
+      SubTree_::Tree_Print.tree_print get_object, io, :do_verbose_lines,
         do_debug, :info_p, debug_stream.method( :puts )
       _exp = <<-HERE.unindent
         one

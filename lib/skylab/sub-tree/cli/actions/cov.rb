@@ -69,7 +69,7 @@ module Skylab::SubTree
          :error, -> { method :error_notify },
           :info,  -> { method :info_notify } ]
     #
-    p = Lib_::Unbound_method_curry[ instance_method :emit_from_parent ]
+    p = Lib_::Method_lib[].curry.unbound instance_method :emit_from_parent
     #
     define_method :_error_notify, & p.curry[ :error ]
     #

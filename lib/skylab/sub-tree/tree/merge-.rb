@@ -6,6 +6,17 @@ module Skylab::SubTree
 
       Entity_[ self, :fields, :client, :other, :key_proc, :attr_a ]
 
+      class << self
+
+        def merge_atomic x1, x2
+          Merge_::Actors__::Merge[ :merge_atomic, x1, x2 ]
+        end
+
+        def merge_one_dimensional x1, x2
+          Merge_::Actors__::Merge[ :merge_one_dimensional, x1, x2 ]
+        end
+      end
+
       def execute
         @attr_a ||= @client.merge_attr_a
         descend @client, @other
@@ -24,6 +35,13 @@ module Skylab::SubTree
       METH_H_ = ::Hash.new do |h, k|
         h[k] = :"destructive_merge_#{ k }_notify"
       end
+
+      # .. and then from the above, get called back by:
+
+      def merge_union x1, x2
+        Merge_::Actors__::Merge[ :merge_union, x1, x2 ]
+      end
+
 
       # this algorithm consists of transferring destructively and recursively
       # all the nodes from a source node (which we will call "remote") into
@@ -103,12 +121,6 @@ module Skylab::SubTree
         ks.key_a.object_id == rka.object_id or fail "sanity"
         bm.merge_keyset_to_item ks, new_remote_id
         nil
-      end
-
-      # ~ services this this provides as an "algorithm" strucure
-
-      def merge_union a1, a2
-        Merge_::FUN.merge_union[ a1, a2 ]
       end
     end
   end

@@ -4,15 +4,15 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree::Rendering
 
   ::Skylab::SubTree::TestSupport::API::Actions::My_Tree[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
-  SubTree = SubTree
+  extend TestSupport_::Quickie
 
-  extend TestSupport::Quickie
+  SubTree_ = SubTree_
 
   module InstanceMethods
 
-    include CONSTANTS
+    include Constants
 
     def with str
       @with = str.unindent.chomp
@@ -20,10 +20,11 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree::Rendering
     end
 
     def makes str
-      o = TestSupport::IO::Spy.new
-      e = ( do_debug and debug_stream )
+      o = TestSupport_::IO.spy(
+        :do_debug_proc, -> { do_debug },
+        :debug_IO, debug_stream )
       do_debug and o.debug! "s-tdout: "
-      t = SubTree::API::Actions::My_Tree::Traversal_.new(
+      t = SubTree_::API::Actions::My_Tree::Traversal_.new(
         :out_p, o.method( :puts ),
         :do_verbose_lines, do_debug,
         :info_p, ( do_debug and e.method( :puts ) ) )

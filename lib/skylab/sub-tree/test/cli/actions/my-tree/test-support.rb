@@ -2,8 +2,17 @@ require_relative '../test-support'
 
 module Skylab::SubTree::TestSupport::CLI::Actions::My_Tree
 
-  _Face_TS = ::Skylab::SubTree::TestSupport::Testlib_::Face_[]::TestSupport
-  _Face_TS::CLI::Client[ self ]  # do this first
+  _Face_TS = ::Skylab::SubTree::TestSupport::TestLib_::Face_[]::TestSupport
+  _Face_TS::CLI::Client[ MY_Tree_TS_ = self ]  # do this first
+
+  class << self
+
+    def expect_text emission
+      txt = emission.payload_x
+      txt.respond_to?( :ascii_only? ) or fail "expected text had #{ txt.class }"
+      txt
+    end
+  end
 
   module InstanceMethods
     alias_method :super_invoke, :invoke  # hackily grab this
@@ -14,15 +23,9 @@ module Skylab::SubTree::TestSupport::CLI::Actions::My_Tree
 
   set_command_parts_for_system_under_test 'my-tree'  # we are the top
 
-  include CONSTANTS
+  include Constants
 
-  extend TestSupport::Quickie
-
-  FUN = ::Struct.new( :expect_text ).new( -> emission do
-    txt = emission.payload_x
-    txt.respond_to?( :ascii_only? ) or fail "expected text had #{ txt.class }"
-    txt
-  end )
+  extend TestSupport_::Quickie
 
   module InstanceMethods
 

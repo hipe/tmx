@@ -5,16 +5,15 @@ module Skylab::SubTree::TestSupport::CLI
 
   ::Skylab::SubTree::TestSupport[ self ]  # #regret
 
-  module CONSTANTS
-    Callback_TestSupport_ = ::Skylab::Callback::TestSupport
+  module Constants
     PN_ = 'sub-tree'.freeze
   end
 
-  Testlib_ = CONSTANTS::Testlib_
+  TestLib_ = Constants::TestLib_
 
   module InstanceMethods
 
-    include CONSTANTS # access SubTree from within i.m's in the specs
+    include Constants # access SubTree_ from within i.m's in the specs
 
     # (in pre-order from the first test.)
 
@@ -32,7 +31,7 @@ module Skylab::SubTree::TestSupport::CLI
     attr_reader :result
 
     -> do
-      stderr = TestSupport.debug_IO
+      stderr = TestSupport_.debug_IO
 
       define_method :dputs do |x|
         stderr.puts x
@@ -64,7 +63,7 @@ module Skylab::SubTree::TestSupport::CLI
     def build_client_for_both  # adapted from [fa] (the lib)
       # sadly this has to wire the thing both ways to catch op parse error e's
       @io_mode = :both ; @names = [ ]
-      t = @triad_spy = TestSupport::IO::Spy::Triad.new nil  # no fake stin
+      t = @triad_spy = TestSupport_::IO.spy.triad nil  # no fake stin
       do_debug and t.debug!
       es = emit_spy
       client_class.new sin: t.instream, out: t.outstream, err: t.errstream,
@@ -76,20 +75,24 @@ module Skylab::SubTree::TestSupport::CLI
     end
 
     def client_class
-      SubTree::CLI::Client
+      SubTree_::CLI::Client
     end
 
     def emit_spy
-      @emit_spy ||= Callback_TestSupport_::Call_Digraph_Listeners_Spy.new(
+      @emit_spy ||= bld_emit_spy
+    end
+
+    def bld_emit_spy
+      Callback_.test_support.call_digraph_listeners_spy(
         :do_debug_proc, -> { do_debug } )
     end
 
     def line
-      line_thru Testlib_::Unstyle_proc[]
+      line_thru TestLib_::CLI_lib[].pen.unstyle
     end
 
     def styled
-      line_thru Testlib_::Unstyle_style_proc[]
+      line_thru TestLib_::CLI_lib[].pen.unstyle_styled
     end
 
     def nonstyled
@@ -97,8 +100,8 @@ module Skylab::SubTree::TestSupport::CLI
     end
 
     Assert_nonstyled_ = -> s do
-      (( x = Testlib_::Parse_styles[ s ] )) and fail "line was #{
-        }styled, should not have been - #{ x }"
+      x = TestLib_::CLI_lib[].parse_styles s
+      x and fail "line was styled, should not have been - #{ x }"
       s
     end
 
@@ -108,7 +111,7 @@ module Skylab::SubTree::TestSupport::CLI
         @names.push e.stream_name
         ev = e.payload_x
         _s = if ev.respond_to? :ascii_only? then ev else
-          _exag = SubTree::CLI.some_expression_agent
+          _exag = SubTree_::CLI.some_expression_agent
           _exag.calculate( * ev.a, & ev.p )
         end
         p[ _s ]
@@ -123,13 +126,13 @@ module Skylab::SubTree::TestSupport::CLI
     def any_blanks
       while @emission_a.length.nonzero?
         e = @emission_a.fetch 0
-        EMPTY_STRING_ == e.payload_x or break
+        EMPTY_S_ == e.payload_x or break
         @emission_a.shift
       end
       nil
     end
     #
-    EMPTY_STRING_ = ''.freeze
+    EMPTY_S_ = ''.freeze
 
     def header str
       styled.should eql( str )
@@ -140,7 +143,8 @@ module Skylab::SubTree::TestSupport::CLI
       styled.should match( rx )
       while @emission_a.length.nonzero?
         e = @emission_a.fetch 0
-        if (( s = Testlib_::Unstyle_styled[ e.payload_x ] ))  # if it's styled
+        s = TestLib_::CLI_lib[].pen.unstyle_styled e.payload_x
+        if s  # if it's styled
           if rx =~ s
             @emission_a.shift
             next
@@ -188,8 +192,8 @@ module Skylab::SubTree::TestSupport::CLI
     Emission_ = ::Struct.new :stream_name, :payload_x
 
     def cd path, &block
-      SubTree::Lib_::Clear_pwd_cache[]
-      SubTree::Library_::FileUtils.cd path, verbose: do_debug, &block
+      SubTree_::Lib_::Clear_pwd_cache[]
+      SubTree_::Library_::FileUtils.cd path, verbose: do_debug, &block
     end
   end
 end

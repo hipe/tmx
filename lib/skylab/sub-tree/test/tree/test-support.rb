@@ -4,9 +4,9 @@ module Skylab::SubTree::TestSupport::Tree
 
   ::Skylab::SubTree::TestSupport[ self ]
 
-  include CONSTANTS
+  include Constants
 
-  module CONSTANTS
+  module Constants
     Subject_ = -> do
       SubTree_::Tree
     end

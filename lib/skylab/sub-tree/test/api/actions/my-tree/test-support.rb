@@ -12,9 +12,9 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree
 
   ::Skylab::SubTree::TestSupport[ TS_ = self ]
 
-  include CONSTANTS
+  include Constants
 
-  module CONSTANTS
+  module Constants
 
     NIL_A_ = [ nil ].freeze
 
@@ -27,10 +27,10 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree
 
   end
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  SubTree = SubTree
-  TestSupport = TestSupport
+  SubTree_ = SubTree_
+  TestSupport_ = TestSupport_
 
   module InstanceMethods
 
@@ -39,9 +39,9 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree
     end
 
     def start_front up=nil
-      f = SubTree::API::Actions::My_Tree.new
-      @o = TestSupport::IO::Spy.new
-      @e = TestSupport::IO::Spy.new
+      f = SubTree_::API::Actions::My_Tree.new
+      @o = TestSupport_::IO.spy.new
+      @e = TestSupport_::IO.spy.new
       if do_debug
         @o.debug! 's-tdout; '
         @e.debug! 's-tderr: '
@@ -53,7 +53,7 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree
       Fixtures_dir_pn_.call
     end
     Fixtures_dir_pn_ = -> do
-      SubTree::Test_Fixtures.dir_pathname
+      SubTree_::Test_Fixtures.dir_pathname
     end
 
     def line

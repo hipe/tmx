@@ -17,7 +17,7 @@ module Skylab::SubTree
         head_s = self::ACTIONS_ANCHOR_MODULE.name ; my_s = name
         0 == my_s.index( head_s ) or fail "sanity"
         my_s[ head_s.length + 2 .. -1 ].split( '::' ).map do |const_s|
-          Name_.from_const( const_s ).as_variegated_symbol
+          Name_.via_const( const_s ).as_variegated_symbol
         end.freeze
       end
     end

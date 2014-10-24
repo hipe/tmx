@@ -11,7 +11,7 @@ module Skylab::SubTree
     def corresponding_api_action_class
       i_a = anchored_normal_name
       1 == i_a.length or self._DO_ME
-      _name = Name_.from_variegated_symbol i_a.last
+      _name = Name_.via_variegated_symbol i_a.last
       SubTree::API::Actions.const_get _name.as_const, false
     end
 

@@ -6,7 +6,7 @@ module Skylab::SubTree::TestSupport::CLI::Actions::Cov
 
   ::Skylab::SubTree::TestSupport::CLI::Actions[ self ]
 
-  include CONSTANTS
+  include Constants
 
   PN_.class
 
@@ -14,8 +14,10 @@ module Skylab::SubTree::TestSupport::CLI::Actions::Cov
 
   RELATIVE_TESTDIR_NO_DOT_ = "#{ PN_ }/test"
 
+  TestSupport_ = TestSupport_
+
   Abs_testdir_ = -> do
-    SubTree.dir_pathname.join( 'test' ).to_s
+    SubTree_.dir_pathname.join( 'test' ).to_s
   end
 
   # (this used to be home to "dark hack" [#ts-010] but we modernized it)
@@ -23,7 +25,7 @@ module Skylab::SubTree::TestSupport::CLI::Actions::Cov
 # lose indent 1x
 describe "[st] CLI actions cov" do
 
-  extend SubTree::TestSupport::CLI
+  extend SubTree_::TestSupport::CLI
 
   text = -> x do
     txt = x.payload_x
@@ -32,7 +34,7 @@ describe "[st] CLI actions cov" do
   end
 
   srbrx, srbrx2 = -> do
-    rx = ::Regexp.escape TestSupport::FUN::Spec_rb[]
+    rx = ::Regexp.escape TestSupport_.spec_rb
     [ /#{ rx }\z/, %r{\A\./#{ PN_ }/.+#{ rx }\z} ]
   end.call
 
@@ -41,7 +43,7 @@ describe "[st] CLI actions cov" do
   end
 
   it "show a list of matched test files only." do
-    cd SubTree.dir_pathname.dirname do         # cd to lib/skylab ..
+    cd SubTree_.dir_pathname.dirname do         # cd to lib/skylab ..
       argv CMD_, '-l', "./#{ PN_ }/test"       # and ask about this subproduct
     end                                        # itself. (yes this is a self-
                                                # referential test ^_^)
@@ -77,13 +79,13 @@ describe "[st] CLI actions cov" do
   end
 
   it "Couldn't find test directory: foo/bar/[test|spec|features]" do
-    a = CMD_, SubTree.dir_pathname.join( 'models' ).to_s
+    a = CMD_, SubTree_.dir_pathname.join( 'models' ).to_s
     argv( * a )
     line.should match(/\ACouldn't find test directory.+\[test\|spec\|features/)
-    result.should eql SubTree::CLI::EXITSTATUS_FOR_ERRROR__
+    result.should eql SubTree_::CLI::EXITSTATUS_FOR_ERRROR__
   end
 
-  FIXTRS_ = SubTree.dir_pathname.join( 'test-fixtures' )
+  FIXTRS_ = SubTree_.dir_pathname.join( 'test-fixtures' )
 
   context "basic" do
 
@@ -105,11 +107,12 @@ describe "[st] CLI actions cov" do
     end
   end
 
-  Testlib_::Stderr[].puts Testlib_::CLI_stylify[ [ :red ], "    <<< SKIPPING COV TREE INTEGRATION >>>" ]
+  TestLib_::Stderr[].puts TestLib_::CLI_lib[].pen.stylize(
+    "    <<< SKIPPING COV TREE INTEGRATION >>>", :red )
 
   false and it "LOOK AT THAT BEAUTIFUL COV TREE" do
     debug!
-    cd SubTree.dir_pathname.dirname.to_s do
+    cd SubTree_.dir_pathname.dirname.to_s do
       argv CMD_, RELATIVE_TESTDIR_NO_DOT_
     end
     line.should match(/\A#{ PN_ }, (?:#{ PN_ }\/)?test +\[\+\|-\]\z/)
