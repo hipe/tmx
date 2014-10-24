@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  module Field::Reflection::For::Class
+  module Field::Reflection__::For_class__
 
     # an #experimental generic method-added hack divorced from parent node
 
@@ -63,13 +63,13 @@ module Skylab::Basic
 
       def _get_fields y
         @derived_field_i_a.each do |i|
-          y << Derived_Field_.new( i )
+          y << Derived_Field__.new( i )
         end
         y
       end
     end
 
-    class Derived_Field_
+    class Derived_Field__
       def initialize normal
         @normal = normal
       end

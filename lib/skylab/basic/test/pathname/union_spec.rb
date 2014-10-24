@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport::Pathname::Union
 
   ::Skylab::Basic::TestSupport::Pathname[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
@@ -71,7 +71,7 @@ module Skylab::Basic::TestSupport::Pathname::Union
         Sandbox_5.with self
         module Sandbox_5
           u = Basic_::Pathname::Union[ '/foo/bar', '/foo/baz/bing', '/foo', '/a', '/a/b', '/a/b/c' ]
-          u.normalize.message_proc[].should eql( "eliminating redundant entries /a/b and /a/b/c and /foo/bar and /foo/baz/bing which are covered by /a and /foo" )
+          u.normalize.message_proc[].should eql( "eliminating redundant entries /a/b and /a/b/c which are covered by /a. eliminating redundant entries /foo/bar and /foo/baz/bing which are covered by /foo." )
         end
       end
     end

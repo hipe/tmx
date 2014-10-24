@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport::Tree
 
   ::Skylab::Basic::TestSupport[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

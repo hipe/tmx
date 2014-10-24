@@ -1,62 +1,181 @@
-module Skylab::MetaHell
+module Skylab::Basic
 
   module Module
 
-    Resolve__ = -> else_p, create_p, path_s, mod do
-      path_a = mod.name.split CONST_SEP__
-      delt_a = path_s.split FILE_SEP__
-      while part = delt_a.shift
-        if BACK_TOKEN__ == part
-          path_a.pop
+    class << self
+
+      def chain_via_module mod
+        Chain_via_parts__[ mod.name.split CONST_SEP_ ]
+      end
+
+      def chain_via_parts s_a
+        Chain_via_parts__[ s_a ]
+      end
+
+      def mutex *a
+        if a.length.zero?
+          Mutex__
         else
-          path_a.push part
+          Mutex__.via_arglist a
         end
       end
-      if path_a.length.nonzero?
-        path_a.reduce ::Object do |m, s|
-          if m.const_defined? s, false
-            m.const_get s, false
-          elsif create_p
-            m.const_set s, create_p.call
-          elsif else_p
-            break else_p[]
+
+      def touch_value_via_relative_path mod, path, create_p
+        o = Touch__.new mod
+        o.create_p = create_p
+        o.relative_path = path
+        o.execute
+      end
+
+      def value_via_parts i_a, & p
+        if p
+          o = Touch__.new ::Object
+          o.else_p = p
+          o.relative_path_parts = i_a
+          o.execute
+        else
+          Callback_::Module_path_value_via_parts[ i_a ]
+        end
+      end
+
+      def value_via_parts_and_relative_path prts, path_s
+        o = Touch__.new
+        o.starting_module_parts = prts
+        o.relative_path = path_s
+        o.execute
+      end
+
+      def value_via_relative_path mod, path
+        o = Touch__.new mod
+        o.relative_path = path
+        o.execute
+      end
+    end  # >>
+
+    Chain_via_parts__ = -> s_a do
+      _Pair = Callback_.pair
+      pair_a = ::Array.new s_a.length
+      mod = ::Object
+      s_a.each_with_index do |s, d|
+        mod = mod.const_get s, false
+        pair_a[ d ] = _Pair.new( mod, s.intern )
+      end
+      pair_a
+    end
+
+    class Touch__
+
+      def initialize starting_mod=nil
+        @create_p = @else_p = nil
+        @starting_module = starting_mod
+        @starting_module_parts = nil
+      end
+
+      attr_writer :create_p, :else_p,
+        :relative_path_parts, :starting_module_parts
+
+      def relative_path= s
+        @relative_path_parts = s.split( PATH_SEP_RX__ ) ; nil
+      end
+
+      def execute
+        @normal_path_parts = build_normal_path_parts
+        via_normal_path_parts_execute
+      end
+
+    private
+
+      def build_normal_path_parts
+        real_parts = if @starting_module_parts
+          @starting_module_parts.dup
+        elsif ::Object == @starting_module   # not necessary, just algorithmic aesthetic
+          []
+        else
+          @starting_module.name.split CONST_SEP_
+        end
+        @relative_path_parts.length.times do |d|
+          s = @relative_path_parts.fetch d
+          if BACK_TOKEN_ == s
+            real_parts.pop
           else
-            m.const_get s, false  # trigger the error, presumably
+            real_parts.push s
           end
+        end
+        real_parts
+      end
+
+      def via_normal_path_parts_execute
+        m = ::Object ; path_a = @normal_path_parts
+        d = -1 ; last = path_a.length - 1
+        while d != last
+          d += 1
+          s = path_a.fetch d
+          if m.const_defined? s, false
+            x = m.const_get s, false
+            m = x
+          elsif @create_p and last == d
+            x = m.const_set s, @create_p.call  # #experimental: signature may change
+            break
+          elsif @else_p
+            x = @else_p[ s, m ]
+            m = x  # KEEP GOING covered.
+          else
+            x = m.const_get s, false  # trigger the error, presumably
+            m = x
+          end
+        end
+        x
+      end
+    end
+
+    class Mutex__  #storypoint-55
+
+      Callback_::Actor.call self, :properties,
+        :method_name,
+        :proc
+
+      def process_arglist_fully a
+        process_arglist_fully_with_args( * a )
+      end
+
+      def process_arglist_fully_with_args method_name=nil, p
+        @method_name = method_name
+        @proc = p ; nil
+      end
+
+      def execute
+        actor = self
+        mut_h = {}
+        p = @proc
+        -> *a do  # assume self is a client module
+          d = object_id
+          did = x = nil
+          mut_h.fetch d do
+            mut_h[ d ] = did = true
+            x = module_exec( *a, & p )
+          end
+          if did
+            x
+          else
+            raise actor.say_failure self
+          end
+        end
+      end
+
+      def say_failure mod
+        if @method_name
+          "module mutex failure - cannot call `#{ @method_name }` more #{
+          }than once on a #{ mod }"
+        else
+          "module mutex failure - #{ mod }"
         end
       end
     end
 
-    Resolve_ = Resolve__.curry[ nil ]
-    Resolve = Resolve_.curry[ nil ]
+    BACK_TOKEN_ = '..'.freeze
+    CONST_SEP_ = '::'.freeze
+    PATH_SEP_RX__ = %r(::|/)
 
-    BACK_TOKEN__ = '..'.freeze
-    CONST_SEP__ = '::'.freeze
-    FILE_SEP__ = '/'.freeze
-
-    -> do  # #storypoint-55
-      o = ::Module.new
-      Mutex = -> p, method_name=nil do
-        mut_h = { }
-        -> *a do  # self should be a client module.
-          r = did =  nil
-          mut_h.fetch object_id do
-            mut_h[ object_id ] = did = true
-            r = module_exec( *a, & p )
-          end
-          did or raise o::Say_failure[ self, method_name ]
-          r
-        end
-      end
-      o::Say_failure = -> mod, method_name do
-        if method_name
-          "#{ o::Me[] } failure - cannot call `#{ method_name }` more #{
-          }than once on a #{ mod }"
-        else
-          "#{ o::Me[] } failure - #{ mod }"
-        end
-      end
-      o::Me = -> { "#{ Module }::Mutex" }
-    end.call
+    Module_ = self
   end
 end

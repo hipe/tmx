@@ -2,7 +2,24 @@ module Skylab::Basic
 
   module Method
 
-    class Curry
+    class << self
+
+      def curry
+        Curry__
+      end
+    end
+
+    class Curry__
+
+      class << self
+        def unbound * a
+          if a.length.zero?
+            Unbound__
+          else
+            Unbound__.new( * a )
+          end
+        end
+      end
 
       # a method curry binds arguments to a bound method
       # like so:
@@ -14,7 +31,7 @@ module Skylab::Basic
       #     end
       #
       #     foo = Foo.new
-      #     mc = Basic::Method::Curry.new foo.method(:bar), [ 'yes', 'sir' ]
+      #     mc = Basic_::Method.curry.new foo.method(:bar), [ 'yes', 'sir' ]
       #     r = mc.receiver.send mc.method_name, * mc.arguments
       #     r  # => "ok:yessir"
 
@@ -45,7 +62,7 @@ module Skylab::Basic
       #     foo = Foo.new
       #
       #     p = -> *a do
-      #       mc = Basic::Method::Curry.new foo.method(:bar), a
+      #       mc = Basic_::Method.curry.new foo.method(:bar), a
       #       errmsg = nil
       #       mc.validate_arity do |o|
       #         errmsg = "no: #{ o.actual } for #{ o.expected }"
@@ -91,7 +108,7 @@ module Skylab::Basic
         Arity.from_parameters parameters
       end
 
-      class Unbound
+      class Unbound__
         def initialize um
           0 < um.arity or raise ::ArgumentError, "for now, arity must be #{
             }greater than or equal to 1 (had #{ um.arity }) for method #{

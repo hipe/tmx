@@ -1,16 +1,6 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Basic::TestSupport::Hash::Pair_Enumerator
-
-  ::Skylab::Basic::TestSupport::Hash[ self ]
-
-  include CONSTANTS
-
-  extend TestSupport_::Quickie
-
-  Basic_ = Basic_
-
-  Sandboxer = TestSupport_::Sandbox::Spawner.new
+module Skylab::Basic::TestSupport::List
 
   describe "[ba] Hash::Pair_Enumerator" do
     context "usage: you must construct it with an array with an even number of args." do
@@ -18,16 +8,7 @@ module Skylab::Basic::TestSupport::Hash::Pair_Enumerator
       it "failure to do so will result in immediate argument error raisal" do
         Sandbox_1.with self
         module Sandbox_1
-          -> do
-            Basic_::Hash::Pair_Enumerator.new( [ :a, :b, :c ] )
-          end.should raise_error( ArgumentError,
-                       ::Regexp.new( "\\Aodd\\ number\\ of\\ arguments" ) )
-        end
-      end
-      it "iterate over those elements using `each_pair` as if it were a hash" do
-        Sandbox_1.with self
-        module Sandbox_1
-          ea = Basic_::Hash::Pair_Enumerator.new [ :a, :b, :c, :d ]
+          ea = Subject_[].build_each_pairable_via_even_iambic [ :a, :b, :c, :d ]
           ::Hash[ ea.each_pair.to_a ].should eql( { a: :b, c: :d } )
         end
       end

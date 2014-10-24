@@ -2,13 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Basic::TestSupport::Range
 
-  ::Skylab::Basic::TestSupport[ self ]
-
-  include CONSTANTS
-
-  extend TestSupport_::Quickie
-
-  describe "#{ Basic_::Range }::Positive::Union" do
+  describe "[ba] range - positive union" do
 
     context "prefix and postfix" do
 
@@ -140,11 +134,11 @@ module Skylab::Basic::TestSupport::Range
     end
 
     def with str
-      @unio = Basic_::Range::Positive::Union.new
+      @unio = Subject_[]::Positive::Union.new
       str.split( ',' ).each do |s|
         bg, ed = s.split '-'
         @unio.add ::Range.new( bg.to_i, ed.to_i )
-      end
+      end ; nil
     end
 
     def expect str

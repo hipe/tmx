@@ -1,6 +1,8 @@
 module Skylab::Basic
 
-  class String::Template  # see [#028]
+  module String
+
+  class Template__  # see [#028]
 
     class << self
 
@@ -87,9 +89,9 @@ module Skylab::Basic
     end
 
     def say_extra i_a
-      Basic::Lib_::EN_inflect[ -> do
+      Basic_::Lib_::NLP_EN_agent[].calculate do
         "no member#{ s i_a } #{ or_( i_a.map { |x| "'#{ x }'" } ) } in struct"
-      end ]
+      end
     end
 
   public
@@ -114,7 +116,7 @@ module Skylab::Basic
   private
 
     def parameter_rx
-      Basic_::String::MUSTACHE_RX
+      Basic_::String.mustache_regexp
     end
 
     define_method :parametize, parametize
@@ -159,7 +161,7 @@ module Skylab::Basic
 
       seen_h = {}
 
-      scn = Basic::Lib_::String_scanner[ template_string ]
+      scn = Basic_::Lib_::String_scanner[ template_string ]
 
       Callback_.scan do
         while ! scn.eos?
@@ -180,9 +182,12 @@ module Skylab::Basic
       end
     end
 
-    Param__ = ::Struct.new :surface, :local_normal_name, :offset, :_margin
+    Param__ = ::Struct.new :surface, :local_normal_name, :offset, :_margin do
 
-    Margin_Engine__ = Basic::Lib_::Functional_methods.call :give, :take do
+      alias_method :name_i, :local_normal_name
+    end
+
+    Margin_Engine__ = Basic_::Lib_::Ivars_with_procs_as_methods[].new :give, :take do
 
       def initialize
 
@@ -234,5 +239,6 @@ module Skylab::Basic
         @pathname.read
       end
     end
+  end
   end
 end

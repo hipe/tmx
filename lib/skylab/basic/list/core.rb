@@ -1,33 +1,45 @@
 module Skylab::Basic
 
-  class Hash::Pair_Enumerator < Basic::List::Scanner::For::Array
+  module List
 
-    # usage: you must construct it with an array with an even number of args.
-    # failure to do so will result in immediate argument error raisal:
-    #
-    #     Basic::Hash::Pair_Enumerator.new( [ :a, :b, :c ] ) # => ArgumentError: odd number of arguments..
-    #
-    # so do it right, and you can
-    # iterate over those elements using `each_pair` as if it were a hash:
-    #
-    #     ea = Basic::Hash::Pair_Enumerator.new [ :a, :b, :c, :d ]
-    #     ::Hash[ ea.each_pair.to_a ] # => { a: :b, c: :d }
-    #
-    # that is all.
+    class << self
 
-    def initialize a
-      ( a.length % 2 ).zero? or raise ::ArgumentError, "odd number #{
-        }of arguments for Hash-like"
-      super
-    end
+      def build_each_pairable_via_even_iambic a
+        Build_each_pairable_via_even_iambic__[ a ]
+      end
 
-    def each_pair &blk
-      ea = ::Enumerator.new do |y|
-        while ! eos?
-          y.yield fetchs, fetchs
+      def line_scanner * a
+        if a.length.zero?
+          List_::Line_Scanner__
+        else
+          List_::Line_Scanner__.new( * a )
         end
       end
-      blk ? ea.each( & blk ) : ea
+
+      def pairs_scan_via_even_iambic a
+        Build_pairs_scan_via_even_iambic__[ a ]
+      end
     end
+
+    Build_each_pairable_via_even_iambic__ = -> a do
+      Callback_::Scanner.build_each_pairable_via_pairs_scanner_proc do
+        Build_pairs_scan_via_even_iambic__[ a ]
+      end
+    end
+
+    Build_pairs_scan_via_even_iambic__ = -> a do
+      Callback_.scan.via_times( a.length / 2 ).map_by do |d|
+        d = d << 1
+        [ a.fetch( d ), a.fetch( d + 1 ) ]
+      end
+    end
+
+    # `build_each_pairable_via_even_iambic`
+    # like so:
+    #
+    #     ea = Subject_[].build_each_pairable_via_even_iambic [ :a, :b, :c, :d ]
+    #     ::Hash[ ea.each_pair.to_a ]  # => { a: :b, c: :d }
+
+    List_ = self
   end
 end

@@ -9,7 +9,7 @@ module Skylab::Basic::TestSupport::Hash
         Sandbox_1.with self
         module Sandbox_1
           h = { foo: 'bar', biff: 'baz' }
-          h.default_proc = Basic_::Hash::Loquacious_default_proc.
+          h.default_proc = Basic_::Hash.loquacious_default_proc.
             curry[ 'beefel' ]
           -> do
             h[ :luhrmann ]
@@ -24,20 +24,9 @@ module Skylab::Basic::TestSupport::Hash
         Sandbox_2.with self
         module Sandbox_2
           h = { age: 2, name: "me" }
-          name, age = Basic_::Hash::FUN::Unpack_equal[ h, :name, :age ]
+          name, age = Basic_::Hash.unpack_equal h, :name, :age
           name.should eql( "me" )
           age.should eql( 2 )
-        end
-      end
-    end
-    context "'pairs_at' is like 'values_at' and 'each_pair' combined" do
-      Sandbox_3 = Sandboxer.spawn
-      it "and note that it methodizes the names as a rule" do
-        Sandbox_3.with self
-        module Sandbox_3
-          fun = Basic_::Hash::FUN
-          _a = fun.pairs_at( :unpack_subset ).to_a
-          _a.should eql( [ [ :unpack_subset, fun::Unpack_subset ] ] )
         end
       end
     end

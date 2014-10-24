@@ -1,6 +1,19 @@
 module Skylab::Basic
 
-  class self::Mutex::Hash
+  module Mutex  # ~ stowaway
+
+    class << self
+
+      def hash
+        Hash__
+      end
+
+      def write_once
+        Mutex_::Write_Once__
+      end
+    end
+
+  class Hash__
 
     def initialize &blk
       @h = { }
@@ -19,5 +32,8 @@ module Skylab::Basic
       end
       did or @collision_proc[ k_x, holding, by_x ]
     end
+  end
+
+    Mutex_ = self
   end
 end

@@ -15,7 +15,7 @@ module Skylab::Basic::TestSupport::Method
           end
 
           foo = Foo.new
-          mc = Basic_::Method::Curry.new foo.method(:bar), [ 'yes', 'sir' ]
+          mc = Basic_::Method.curry.new foo.method(:bar), [ 'yes', 'sir' ]
           r = mc.receiver.send mc.method_name, * mc.arguments
           r.should eql( "ok:yessir" )
         end
@@ -35,7 +35,7 @@ module Skylab::Basic::TestSupport::Method
           foo = Foo.new
 
           p = -> *a do
-            mc = Basic_::Method::Curry.new foo.method(:bar), a
+            mc = Basic_::Method.curry.new foo.method(:bar), a
             errmsg = nil
             mc.validate_arity do |o|
               errmsg = "no: #{ o.actual } for #{ o.expected }"

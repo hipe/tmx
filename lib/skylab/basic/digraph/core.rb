@@ -1,10 +1,24 @@
 module Skylab::Basic
 
-  class Basic::Digraph  # (reopens below)
-    # relevant: http://en.wikipedia.org/wiki/Tree_(data_structure)
-  end
+  class Digraph
 
-  class Basic::Digraph::Node  # (#stowaway)
+    # relevant: http://en.wikipedia.org/wiki/Tree_(data_structure)
+
+    class << self
+
+      def node_class
+        Node__
+      end
+    end
+
+  class Node__
+
+    class << self
+
+      def bound g, i
+        Node__::Bound__.new g, i
+      end
+    end
 
     def initialize nln
       @has_associations = nil
@@ -38,7 +52,7 @@ module Skylab::Basic
 
     def absorb_association name_i
       @has_associations ||= true
-      @associations ||= Basic::Lib_::Formal_Box_Open[].new
+      @associations ||= Basic_::Lib_::Old_box_lib[].open_box.new
       @associations.has? name_i or @associations.add name_i, true
       nil
     end
@@ -60,8 +74,6 @@ module Skylab::Basic
     Autoloader_[ self ]
   end
 
-  class Basic::Digraph  # #todo - don't you wish you were a box!?
-
     def self.[] *a
       g = new
       g.absorb_nodes a
@@ -69,8 +81,8 @@ module Skylab::Basic
     end
 
     def initialize
-      @order = [ ] ; @hash = { }
-      @node_class ||= Basic::Digraph::Node
+      @order = [] ; @hash = {}  # #open [#033]
+      @node_class ||= Basic_::Digraph.node_class
     end
 
     # ~ :+[#mh-021] typical base class implementation:
@@ -104,7 +116,7 @@ module Skylab::Basic
     end
 
     def describe_digraph * x_a
-      Basic::Digraph::Describe__.new( self, x_a ).execute
+      Basic_::Digraph::Describe__.new( self, x_a ).execute
     end
 
     def fetch name_i, &b
@@ -215,7 +227,7 @@ module Skylab::Basic
     def node! name_i, predicate_h=nil  # #storypoint-55
       absrb_nd name_i, predicate_h
       bnd_h.fetch name_i do |k|
-        @bnd_h[ k ] = Basic::Digraph::Node::Bound.new self, k
+        @bnd_h[ k ] = Node__.bound self, k
       end
     end
   private

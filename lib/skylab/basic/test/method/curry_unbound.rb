@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport::Method::CU
 
   ::Skylab::Basic::TestSupport::Method[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
@@ -20,7 +20,7 @@ module Skylab::Basic::TestSupport::Method::CU
           "(#{ bread }(#{ inside })#{ toothpick })"
         end
 
-        define_method :reuben, Basic_::Method::Curry::Unbound.
+        define_method :reuben, Parent_Subject_[].unbound.
           new( instance_method( :sandwich ) ).curry[ :rye ]
 
 
@@ -34,7 +34,7 @@ module Skylab::Basic::TestSupport::Method::CU
     it "arity is less than 1 - X" do
       -> do
         class Wazzerly
-          Basic_::Method::Curry::Unbound.new instance_method :not_curriable
+          Parent_Subject_[].unbound instance_method :not_curiable
         end
       end.should raise_error ::ArgumentError, /\bfor now, arity must be #{
         }greater than or equal to 1 \(had -2\)/
@@ -57,6 +57,10 @@ module Skylab::Basic::TestSupport::Method::CU
     it "just right - o" do
       _s = WAZZERLY.reuben :saukerkraut, :toothpick
       _s.should eql '(rye(saukerkraut)toothpick)'
+    end
+
+    Parent_Subject_ = -> do
+      Basic_::Method.curry
     end
   end
 end

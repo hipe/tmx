@@ -6,7 +6,7 @@ module Skylab::Basic
     # for dark hacks
     #
     #     h = { }
-    #     op = Basic::Hash::Order_Proxy.new h
+    #     op = Subject_[].new h
     #
     #     op[ :foo ] = :bar
     #     op[ :bing ] = :baz

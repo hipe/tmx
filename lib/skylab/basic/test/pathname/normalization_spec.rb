@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::Brazen::TestSupport::Model::Entity::Normalizers::FSP
+module Skylab::Basic::TestSupport::Pathname::N11n
 
-  Parent_ = ::Skylab::Brazen::TestSupport::Model::Entity::Normalizers
+  Parent_ = ::Skylab::Basic::TestSupport::Pathname
 
   Parent_[ TS_ = self ]
 
@@ -10,16 +10,13 @@ module Skylab::Brazen::TestSupport::Model::Entity::Normalizers::FSP
 
   extend TestSupport_::Quickie
 
-  Subject_ = -> do
-    _ = Parent_::Subject_[]
-    _.filesystem_path
-  end
+  describe "[ba] pathname normalization" do
 
-  describe "[br] model entity normalizers filesystem-path" do
+    TestLib_::Expect_event[ self ]
+
+    TestLib_::Expect_normalization[ self ]
 
     extend TS_
-
-    Brazen_::TestSupport::Expect_Event[ self ]
 
     it "loads" do
       subject
@@ -33,7 +30,7 @@ module Skylab::Brazen::TestSupport::Model::Entity::Normalizers::FSP
     context "the empty normalizer" do
 
       before :all do
-        Empty = Subject_[].build_via_iambic Brazen_::EMPTY_A_
+        Empty = Subject_[].build_via_iambic Basic_::EMPTY_A_
       end
 
       it "against nil does nothing - checking required-ness is outside of scope" do
@@ -49,7 +46,7 @@ module Skylab::Brazen::TestSupport::Model::Entity::Normalizers::FSP
       end
 
       it 'against the empty string - "your value cannot be empty" (ever)' do
-        use_event_receiver_against Brazen_::EMPTY_S_
+        use_event_receiver_against Basic_::EMPTY_S_
         output_value_was_not_written
         @result_x.should eql false
         expect_event :path_cannot_be_empty,
@@ -219,6 +216,10 @@ module Skylab::Brazen::TestSupport::Model::Entity::Normalizers::FSP
       else
         Subject_[].build_via_iambic x_a
       end
+    end
+
+    Subject_ = -> do
+      Basic_::Pathname.normalization
     end
   end
 end

@@ -1,6 +1,10 @@
 module Skylab::Basic
 
-  class Basic::Digraph::Node::Bound
+  class Digraph
+
+    class Node__
+
+      class Bound__
 
     def initialize graph, name
       @graph_ref = -> { graph }
@@ -20,6 +24,9 @@ module Skylab::Basic
           @graph_ref.call.indirect_association_targets_include(
             @normalized_local_node_name, sym )
         end
+      end
+    end
+
       end
     end
   end

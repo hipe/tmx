@@ -8,7 +8,7 @@ module Skylab::Basic::TestSupport::Field
 
     context "foundations" do
       it "(the basics of making sure the classes loaded)" do
-        Basic_::Field::Box
+        Basic_::Field.box
       end
     end
 
@@ -18,7 +18,7 @@ module Skylab::Basic::TestSupport::Field
 
         module Sandbox::Mod_0
 
-          Basic_::Field::Box.enhance self do
+          Basic_::Field.box self do
 
             meta_fields [ :required, :reflective ]
 
@@ -36,7 +36,7 @@ module Skylab::Basic::TestSupport::Field
 
         module Sandbox::Mod_1
 
-          Basic_::Field::Box.enhance self do
+          Basic_::Field.box self do
 
             meta_fields :important, :fun
 
@@ -68,7 +68,7 @@ module Skylab::Basic::TestSupport::Field
 
       define_sandbox_constant :Mod_2 do
         module Sandbox::Mod_2
-          Basic_::Field::Box.enhance self do
+          Basic_::Field.box self do
             fields [ :name, :required ]
             meta_fields :gadzooks
           end
@@ -85,7 +85,7 @@ module Skylab::Basic::TestSupport::Field
 
       define_sandbox_constant :Mod_2_2 do
         module Sandbox::Mod_2_2
-          Basic_::Field::Box.enhance self do
+          Basic_::Field.box self do
             meta_fields [ :wanktastic, :merbles ]
           end
         end
@@ -104,7 +104,7 @@ module Skylab::Basic::TestSupport::Field
 
       define_sandbox_constant :Mod_3 do
         module Sandbox::Mod_3
-          Basic_::Field::Box.enhance self do
+          Basic_::Field.box self do
 
             meta_fields [ :range, :property ], :urgent
 

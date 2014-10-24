@@ -1,33 +1,31 @@
 module Skylab::Basic
 
-  class List::Scanner
+  module Enumerator
 
-    module For
+    class << self
 
-      def self.block & p
-
-        Enumerator.new ::Enumerator.new( & p )
-
-      end
-
-      class Enumerator  # wrap an enumerator to act like a mimimal scanner
-
-        def initialize enum
-          @gets_p = -> do
-            enum.next
-          end
-        end
-
-        def gets
-          @gets_p.call
-        rescue ::StopIteration
-          @gets_p = EMPTY_P_ ; nil
+      def line_scanner * a, & p
+        if p
+          Line_Scanner__.new ::Enumerator.new( * a, & p )
+        elsif a.length.zero?
+          Line_Scanner__
+        else
+          Line_Scanner__.new( * a )
         end
       end
+    end
 
-      Path = -> path_x, * a do
-        _open_filehandle = ::File.open "#{ path_x }", 'r'
-        For::Read.new _open_filehandle, * a
+    class Line_Scanner__
+
+      def initialize enum
+        @p = enum.method :next
+      end
+
+      def gets
+        @p.call
+      rescue ::StopIteration
+        @p = EMPTY_P_
+        nil
       end
     end
   end

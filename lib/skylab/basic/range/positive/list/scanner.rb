@@ -44,7 +44,7 @@ module Skylab::Basic
 
       reset[]
 
-      scn = Basic::Lib_::Empty_string_scanner[]
+      scn = Basic_::Lib_::Empty_string_scanner[]
 
       @set_string = -> x do
         reset[]
@@ -89,8 +89,9 @@ module Skylab::Basic
       @set_unexpected_proc = -> x {  up = x }
     end
 
-    Basic::Lib_::Function[ self, :@set_unexpected_proc, :unexpected_proc=,
-      :@set_string, :string=, :gets ]
+    Basic_::Lib_::Ivars_with_procs_as_methods[ self,
+      :@set_unexpected_proc, :unexpected_proc=,
+        :@set_string, :string=, :gets ]
 
   end
 end

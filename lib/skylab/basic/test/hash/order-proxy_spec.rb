@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport::Hash::Order_Proxy
 
   ::Skylab::Basic::TestSupport::Hash[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

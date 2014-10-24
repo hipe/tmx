@@ -1,11 +1,15 @@
 require_relative 'test-support'
 
-module Skylab::Basic::TestSupport::List::Scanner::For
+module Skylab::Basic::TestSupport::String
 
   describe "[ba] list scanner for string" do
 
+    it "loads" do
+      subject
+    end
+
     it "when built with a string, works the same" do  # mirror 2 others
-      scn = Basic_::List::Scanner::For::String[ "one C\ntwo C\n" ]
+      scn = of "one C\ntwo C\n"
       scn.line_number.should be_nil
       scn.gets.should eql "one C\n"
       scn.line_number.should eql 1
@@ -71,16 +75,22 @@ module Skylab::Basic::TestSupport::List::Scanner::For
       scn.line_number.should eql 3
     end
 
-    def of str
-      Basic_::List::Scanner::For::String[ str ]
-    end
-
     it "reverse" do
       str = "haha\n"
-      y = Basic_::List::Scanner::For::String::Reverse[ str ]
+      y = subject.reverse str
       y << 'this'
       y << 'is what'
       str.should eql "haha\nthis\nis what"
     end
+
+    def subject( * a )
+      if a.length.zero?
+        Basic_::String.line_scanner
+      else
+        Basic_::String.line_scanner( * a )
+      end
+    end
+
+    alias_method :of, :subject
   end
 end

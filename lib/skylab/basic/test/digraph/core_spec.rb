@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport::Digraph::Core
 
   ::Skylab::Basic::TestSupport::Digraph[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

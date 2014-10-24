@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport::Rotating_Buffer
 
   ::Skylab::Basic::TestSupport[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 

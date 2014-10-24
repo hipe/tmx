@@ -1,18 +1,20 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Brazen::TestSupport::Model::Entity::Normalizers::Numeric
+module Skylab::Basic::TestSupport::Numeric
 
-  ::Skylab::Brazen::TestSupport::Model::Entity::Normalizers[ TS_ = self ]
+  ::Skylab::Basic::TestSupport[ TS_ = self ]
 
   include Constants
 
   extend TestSupport_::Quickie
 
-  describe "[br] model entity normalizers numeric" do
+  describe "[br] number normalization" do
+
+    TestLib_::Expect_event[ self ]
+
+    TestLib_::Expect_normalization[ self ]
 
     extend TS_
-
-    Brazen_::TestSupport::Expect_Event[ self ]
 
     it "loads" do
       subject
@@ -21,7 +23,7 @@ module Skylab::Brazen::TestSupport::Model::Entity::Normalizers::Numeric
     context "the normalizer with no args" do
 
       before :all do
-        With_Nothing = Subject_[].numeric.build_via_iambic Brazen_::EMPTY_A_
+        With_Nothing = Subject_[].build_via_iambic Basic_::EMPTY_A_
       end
 
       it "builds" do
@@ -76,8 +78,7 @@ module Skylab::Brazen::TestSupport::Model::Entity::Normalizers::Numeric
     context "the normalizer with a minimum" do
 
       before :all do
-        _Numeric = Subject_[].numeric
-        Min = _Numeric.build_with :minimum, -3
+        Min = Subject_[].build_with :minimum, -3
       end
 
       it "when input is below minimum (string)" do
@@ -122,9 +123,9 @@ module Skylab::Brazen::TestSupport::Model::Entity::Normalizers::Numeric
 
     def subject * x_a
       if x_a.length.zero?
-        Subject_[].numeric
+        Subject_[]
       else
-        Subject_[].numeric.build_via_iambic x_a
+        Subject_[].build_via_iambic x_a
       end
     end
 
@@ -132,5 +133,8 @@ module Skylab::Brazen::TestSupport::Model::Entity::Normalizers::Numeric
       :value_not_in_number_set
     end
 
+    Subject_ = -> do
+      Basic_::Number.normalization
+    end
   end
 end

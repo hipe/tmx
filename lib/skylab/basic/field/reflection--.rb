@@ -1,33 +1,41 @@
-module Skylab::Basic::Field::Reflection
+module Skylab::Basic
 
-  Basic = ::Skylab::Basic
+  class Field
 
-  Reflection = self
+    module Reflection__
 
-  module Reflection
+      class << self
 
-    def self.enhance target
-      flsh = Kernel_.new target
-      cond = Shell_.new( -> host do
-        flsh.host = host
-      end )
-      if block_given?
-        raise ::ArgumentError, "this contained DSL only employs the #{
-          }one-off shooter for currently (do not use blocks. call #{
-          }`with` on the result of the enhance() call.)"
-      else
-        Shell_::One_Shot_.new cond, -> { flsh.flush }
+        def [] cls
+          Reflection__::For_class__[ cls ]
+        end
+
+        def bound
+          Bound__
+        end
+
+        def enhance target
+          krnl = Kernel__.new target
+          cond = Shell__.new( -> host do
+            krnl.host = host
+          end )
+          if block_given?
+            raise ::ArgumentError, say_no_block
+          else
+            Shell__::One_Shot_.new cond, -> { krnl.flush }
+          end
+        end
+
+        def say_no_block
+          "this contained DSL only employs the one-off shooter for #{
+            }currently (do not use blocks. call `with` on the result of #{
+             }the enhance() call.)"
+        end
       end
-    end
 
-    def self.[] kls  # i'm sorry
-      self::For::Class[ kls ]
-    end
-  end
+      Shell__ = Basic_::Lib_::Enhancement_shell[ %i( with ) ]
 
-  Shell_ = Basic::Lib_::Enhancement_shell[ %i( with ) ]
-
-  Kernel_ = Basic::Lib_::Functional_methods.call :flush do
+  Kernel__ = Basic_::Lib_::Ivars_with_procs_as_methods[].new :flush do
 
     def initialize target
       @host = nil
@@ -55,7 +63,7 @@ module Skylab::Basic::Field::Reflection
 
         ::Module.new.module_exec do
 
-          include Reflection::InstanceMethods
+          include Instance_Methods__
 
           host::METAFIELDS_.each do |mf|
             mf.is_reflective or next
@@ -81,18 +89,15 @@ module Skylab::Basic::Field::Reflection
       nil
     end
   end
+    end  # reflection
 
-  Field = Basic::Field
+    Binary__::Meta_Field__.send :alias_method, :binary_predicate, :as_is_predicate
 
-  class Field::Binary::Meta_Field_
-    alias_method :binary_predicate, :as_is_predicate
-  end
+    Property__::Meta_Field__.send :alias_method, :binary_predicate, :as_has_predicate
 
-  class Field::Property::Meta_Field_
-    alias_method :binary_predicate, :as_has_predicate
-  end
+    module Reflection__
 
-  module Reflection::InstanceMethods
+  module Instance_Methods__
 
     # (this module augments a module with generated methods.)
 
@@ -127,29 +132,29 @@ module Skylab::Basic::Field::Reflection
     def fields_bound_to_ivars_which predicate
       ::Enumerator.new do |y|
         field_box.fields_which( predicate ).each do |fld|
-          y << Bound_.new( fld, ->{ instance_variable_get fld.as_host_ivar } )
+          y << Bound__.new( fld, ->{ instance_variable_get fld.as_host_ivar } )
         end
         nil
       end
     end
   end
 
-  class Bound_
+  class Bound__
+
+    def initialize field, value_p
+      @field = field ; @value_p = value_p
+    end
 
     attr_reader :field
+
+    Basic_::Lib_::Ivars_with_procs_as_methods[ self, :@value_p, :value ]
 
     def local_normal_name
       @field.local_normal_name
     end
-
-    Basic::Lib_::Function[ self, :@value_p, :value ]
-
-    def initialize field, value_p
-      @field, @value_p = field, value_p
-    end
   end
 
-  module Box_Methods  # LOOK
+  module Box_Methods__  # LOOK
 
     #    ~ implement the reflection, the core of the whole thing ~
     #       NOTE this is acheived (for now) by monkeypatching,
@@ -190,15 +195,15 @@ module Skylab::Basic::Field::Reflection
     end
   end
 
-  # NOTE monkeypatching within the library..
+    end  # reflection
 
-  class Basic::Field
+    # NOTE monkeypatching within the library..
+
     def is_exist  # convenience for selecting all fields
       true
     end
-  end
 
-  class Basic::Field::Box  # NOTE reopen!
-    include Box_Methods
-  end
+    Box__.include Reflection__::Box_Methods__
+
+  end  # field
 end

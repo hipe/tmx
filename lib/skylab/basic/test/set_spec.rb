@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport::Set
 
   ::Skylab::Basic::TestSupport[ self ]
 
-  include CONSTANTS
+  include Constants
 
   Basic_ = Basic_
 

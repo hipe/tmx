@@ -1,15 +1,17 @@
 require_relative '../test-support'
 
-module Skylab::Basic::TestSupport::Method
+module Skylab::Basic::TestSupport::String
 
   ::Skylab::Basic::TestSupport[ self ]
 
   include Constants
 
-  Basic_ = Basic_
-
   extend TestSupport_::Quickie
 
-  Sandboxer = TestSupport_::Sandbox::Spawner.new
+  module Constants
+    EMPTY_S_ = Basic_::String::EMPTY_S_
+  end
+
+  EMPTY_S_ = EMPTY_S_
 
 end

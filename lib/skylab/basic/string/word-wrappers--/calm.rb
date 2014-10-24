@@ -1,8 +1,8 @@
-module Skylab::Headless
+module Skylab::Basic
 
-  module Text
+  module String
 
-    class Word_Wrap
+    class Word_Wrappers__::Calm
 
       class << self
         alias_method :curry, :new
@@ -120,9 +120,6 @@ module Skylab::Headless
           stop
         end
       end
-
-      EMPTY_S_ = ''.freeze ; SPACE_ = ' '.freeze
-
     end
   end
 end

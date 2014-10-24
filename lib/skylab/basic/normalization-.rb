@@ -1,10 +1,6 @@
-module Skylab::Brazen
+module Skylab::Basic
 
-  class Model_
-
-    module Entity
-
-      class Normalizer_
+      class Normalization_
 
         def initialize
           @event_receiver = nil
@@ -63,7 +59,10 @@ module Skylab::Brazen
           msg_p ||= Event_[]::Inferred_Message.to_proc
           Event_[].inline_via_iambic_and_message_proc x_a, msg_p
         end
+
+        Event_ = -> do
+          Basic_::Lib_::Event[]
+        end
       end
-    end
-  end
+
 end

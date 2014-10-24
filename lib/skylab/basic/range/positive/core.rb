@@ -1,6 +1,8 @@
 module Skylab::Basic
 
-  class self::Range::Positive
+  module Range
+
+    class Positive
 
     def initialize one, two
       one < 1 and raise "no: #{ one }"
@@ -25,5 +27,6 @@ module Skylab::Basic
 
     UNBOUNDED = new 1, INFINITY
 
+    end
   end
 end

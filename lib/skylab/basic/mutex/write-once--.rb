@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  class Mutex::Write_Once
+  class Mutex::Write_Once__
 
     def initialize name_x=nil
       @name_x = name_x

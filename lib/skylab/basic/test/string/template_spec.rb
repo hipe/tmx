@@ -1,14 +1,12 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
 module Skylab::Basic::TestSupport::String
 
-  ::Skylab::Basic::TestSupport[ self ]
-
-  include CONSTANTS
-
-  extend TestSupport_::Quickie
-
   describe "[ba] string template" do
+
+    it "loads" do
+      subject
+    end
 
     context "nifty function pasta for update_members'ing of structs" do
 
@@ -98,9 +96,7 @@ module Skylab::Basic::TestSupport::String
     end
 
     def subject
-      Basic_::String::Template
+      Basic_::String.template
     end
-
-    EMPTY_S_ = ''.freeze
   end
 end

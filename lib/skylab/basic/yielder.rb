@@ -23,7 +23,7 @@ module Skylab::Basic
       }accomodate these new Yielder methods - #{ ( i_a_ - i_a ).inspect }"
 
     # LOOK we write the below literally just for whatever, readability,
-    # but be careful! the below show parallel i_a above
+    # but be careful! the below should parallel i_a above
 
     def yield( * )
       @count += 1

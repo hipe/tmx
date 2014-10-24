@@ -1,20 +1,31 @@
-module Skylab::Brazen
+module Skylab::Basic
 
-  class Model_
+  module Number
 
-    module Entity
+    class << self
 
-      class Normalizers__::Numeric < Model_::Entity::Normalizer_
+      def normalization
+        Number_::Normalization__
+      end
+    end  # >>
+
+
+      class Normalization__ < Basic_::Normalization_
 
         class << self
+
           def instance
             @inst ||= new
+          end
+
+          def via_arguments x_a
+            build_via_iambic x_a  # for now no inline ..
           end
         end
 
         Callback_::Actor[ self, :properties,
           :argument,
-          :OK_value_p,
+          :as_normal_value,
           :event_receiver,
           :number_set,  # symbol
           :minimum ]
@@ -39,7 +50,7 @@ module Skylab::Brazen
         def normalize_via_three arg, val_p, evr_x
           otr = dup
           otr.init_copy_with :argument, arg,
-            :OK_value_p, val_p,
+            :as_normal_value, val_p,
             :event_receiver, evr_x
           otr.execute
         end
@@ -51,7 +62,7 @@ module Skylab::Brazen
             ok = via_number_and_minimum_validate
           end
           if ok
-            @OK_value_p[ @number ]
+            @as_normal_value[ @number ]
           else
             @result
           end
@@ -125,6 +136,7 @@ module Skylab::Brazen
           end
         end
       end
-    end
+
+    Number_ = self
   end
 end

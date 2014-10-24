@@ -1,52 +1,79 @@
-class Skylab::Basic::Field
+module Skylab::Basic
 
-  Basic = ::Skylab::Basic
+  class Field  # see [#003]
 
-  Field = self  # :[#003]
+    # ~ narrative pre-order with aesthetic pyramiding
 
-  #         ~ narrative pre-order with aesthetic pyramiding ~
+    class << self
 
-  class Field::Box < Basic::Lib_::Formal_Box_Open[]
-
-    def self.[] *a
-      b = new
-      a.each do |fld|
-        b.accept fld
-      end
-      b
-    end
-
-    def self.enhance host_mod, & def_blk
-
-      build_into host_mod, def_blk
-
-      host_mod.define_singleton_method :field_box do
-        const_get :FIELDS_, false
+      def box * a, & p
+        if a.length.zero?
+          Box__
+        else
+          Box__.via_client_and_proc( * a, p )
+        end
       end
 
+      def meta_field_factory
+        Meta_Field_Factory__
+      end
+
+      def N_meta_resolver
+        N_Meta_Resolver__
+      end
+
+      def reflection
+        Field_::Reflection__
+      end
     end
 
-    def self.build_into host_mod, def_blk
+  class Box__ < Basic_::Lib_::Old_box_lib[].open_box
 
-      flsh = Kernel_.new host_mod, self
+    class << self
 
-      Shell_.new( ->( * meta_f_a ) { flsh.concat_metafields meta_f_a },
-                    ->( * fields_a ) { flsh.concat_fields fields_a },
-                    ->( f          ) { flsh.field_class_instance_methods f },
-                  ).
-        instance_exec( & def_blk )
+      def [] * a
+        bx = new
+        a.each do |fld|
+          bx.accept fld
+        end
+        bx
+      end
 
-      flsh.flush
+      def via_client mod, & p
+        via_client_and_proc mod, p
+      end
+
+      def via_client_and_proc mod, p
+
+        build_into mod, p
+        mod.define_singleton_method :field_box do
+          const_get :FIELDS_, false
+        end
+      end
+
+      def build_into mod, p
+
+        krnl = Kernel__.new mod, self
+
+        _shell = Shell__.
+          new  -> * meta_p_a { krnl.concat_metafields meta_p_a },
+            -> * field_a { krnl.concat_fields field_a },
+            -> p_ { krnl.field_class_instance_methods p_ }
+
+        _shell.instance_exec( & p )
+
+        krnl.flush
+      end
     end
+  end  # ..
 
-    Shell_ = Basic::Lib_::Enhancement_shell[ %i(
-      meta_fields
-      fields
-      field_class_instance_methods
-    ) ]
-  end   # ( `Field::Box` reopens below .. )
+  Shell__ = Basic_::Lib_::Enhancement_shell[ %i(
+    meta_fields
+    fields
+    field_class_instance_methods
+  ) ]
 
-  class Kernel_
+  class Kernel__
 
     def initialize host_mod, box_kls
       @metafield_a = [ ] ; @field_a = nil ; @im = nil
@@ -76,7 +103,7 @@ class Skylab::Basic::Field
       field_a = @field_a ; @field_a = nil
       metafield_a = @metafield_a ; @metafield_a = nil
 
-      n_meta_resolver = N_Meta_Resolver_.new
+      n_meta_resolver = N_Meta_Resolver__.new
 
       field_a ||= [ ]  # one day we might try to skip over empty field box..
       n_meta_resolver.push field_a, -> x do
@@ -90,13 +117,13 @@ class Skylab::Basic::Field
         @target.const_set :FIELD_, x
       end
 
-      n_meta_resolver.seed Meta_Field_Factory_
+      n_meta_resolver.seed Meta_Field_Factory__
 
       n_meta_resolver.flush
     end
   end
 
-  class N_Meta_Resolver_  # this is the implementation of [#013]
+  class N_Meta_Resolver__  # this is the implementation of [#013]
 
     def initialize
       @stack = [ ]
@@ -134,18 +161,17 @@ class Skylab::Basic::Field
     end
   end
 
-  module Produce_
-  end
+  Produce_Methods__ = ::Module.new
 
-  class Field::Box
-    include Produce_
+  class Box__
+    include Produce_Methods__
 
     def produce base=Field
       produce_field_class base, self
     end
   end
 
-  module Produce_  # #todo - cleanup - (it is hard to follow what the base
+  module Produce_Methods__  # #todo - cleanup - (it is hard to follow what the base
                    # class is)
 
     def produce_field_class base, box
@@ -158,7 +184,7 @@ class Skylab::Basic::Field
         def initialize( (*x_a), depth=1 )
           super( * x_a[ 0..0 ] )
           if 1 < x_a.length
-            scn = Basic::List::Scanner[ x_a ]
+            scn = Basic_::List.line_scanner x_a
             scn.gets  # toss first match that was handled above
             begin
               i = scn.gets
@@ -172,7 +198,7 @@ class Skylab::Basic::Field
     end
   end
 
-  class Field
+  # (you are in the field class)
 
     def initialize nn
       @local_normal_name = nn
@@ -183,12 +209,12 @@ class Skylab::Basic::Field
     class << self
 
       def make_field_box field_a, depth
-        b = Field::Box.new
+        bx = Box__.new
         field_a.each do | x |
           fld = make_field x, depth
-          b.accept fld
+          bx.accept fld
         end
-        b
+        bx
       end
 
       def make_field x_a, depth
@@ -219,7 +245,7 @@ class Skylab::Basic::Field
     def as_host_ivar
       @as_host_ivar ||= :"@#{ @local_normal_name }"
     end
-  end
+
 
   # each metafield a user defines will be built using one of two classes,
   # based on the meta meta fields of that meta field: - the meta meta
@@ -227,11 +253,12 @@ class Skylab::Basic::Field
   # its inflection is different (`has_foo` instead of `is_foo`). we implement
   # this different logic with classes and a simple factory pattern.
 
-  module Binary                          # binary was the first and is still
-  end                                    # the brightest star. this here is
+  Binary__ = ::Module.new
+                                         # binary was the first and is still
+                                         # the brightest star. this here is
                                          # its simple base impl.
                                          # (we need a basic binary field class
-  class Binary::Field < Field            # separate from the metafield class
+  class Binary__::Field__ < self         # separate from the metafield class
                                          # because binary fields are used to..
     def enhance mod
       i = as_is_predicate
@@ -258,7 +285,7 @@ class Skylab::Basic::Field
     end
   end
 
-  class Hook_Meta_Meta_Field_ < Binary::Field
+  class Hook_Meta_Meta_Field__ < Binary__::Field__
 
     def initialize
       super :hook
@@ -273,19 +300,19 @@ class Skylab::Basic::Field
     end
   end
 
-  meta_meta_field_box = Field::Box[
-    Binary::Field.new( :reflective ),  # this is the first ever Field instance
-    Binary::Field.new( :property ),
-    Hook_Meta_Meta_Field_.new
+  meta_meta_field_box = Box__[
+    Binary__::Field__.new( :reflective ),  # this is the first ever Field instance
+    Binary__::Field__.new( :property ),
+    Hook_Meta_Meta_Field__.new
   ]
 
-  Binary::Meta_Field_ = meta_meta_field_box.produce Binary::Field
+  Binary__::Meta_Field__ = meta_meta_field_box.produce Binary__::Field__
 
-  module Property
-  end
+  Property__ = ::Module.new
 
-  Property::Meta_Field_ = meta_meta_field_box.produce
-  class Property::Meta_Field_
+  Property__::Meta_Field__ = meta_meta_field_box.produce
+
+  class Property__::Meta_Field__
 
     def enhance mod
       i = as_has_predicate
@@ -350,7 +377,7 @@ class Skylab::Basic::Field
     def hook_notify name_x, p
       (( @hook_box ||= begin
         @has_hooks = true
-        Basic::Box.new
+        Basic_::Box.new
       end )).add name_x, p
       nil
     end
@@ -358,19 +385,22 @@ class Skylab::Basic::Field
     attr_reader :has_hooks
   end
 
-  class Meta_Field_Factory_ < Field  # (we just want some of its class methods)
+  class Meta_Field_Factory__ < self  # (we just want some of its class methods)
 
     def self.make_field( (*x_a), depth )  # we need a factory
-      H_[ x_a[ 1 ] || :binary ].make_field x_a, depth
+      H__[ x_a[ 1 ] || :binary ].make_field x_a, depth
     end
-    H_ = {
-      binary: Binary::Meta_Field_,
-      reflective: Binary::Meta_Field_,
-      property: Property::Meta_Field_
+    H__ = {
+      binary: Binary__::Meta_Field__,
+      reflective: Binary__::Meta_Field__,
+      property: Property__::Meta_Field__
     }
-    H_.default_proc = -> _, k do
+    H__.default_proc = -> _, k do
       raise ::KeyError, "no such meta-meta-field \"#{ k }\""
     end
-    H_.freeze
+    H__.freeze
+  end
+
+    Field_ = self
   end
 end

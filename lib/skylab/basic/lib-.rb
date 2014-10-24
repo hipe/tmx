@@ -5,64 +5,83 @@ module Skylab::Basic
     memo, sidesys, stdlib = Autoloader_.at :memoize,
       :build_require_sidesystem_proc, :build_require_stdlib_proc
 
+    Bzn_ = sidesys[ :Brazen ]
+
     Bundle_Directory = -> mod do
-      MetaHell__[]::Bundle::Directory[ mod ]
+      MH__[]::Bundle::Directory[ mod ]
     end
 
     Bundle_Multiset = -> mod do
-      MetaHell__[]::Bundle::Multiset[ mod ]
+      MH__[]::Bundle::Multiset[ mod ]
     end
 
-    Ellipsify_proc = -> do
-      Headless__[]::CLI::FUN::Ellipsify_
+    CLI_lib = -> do
+      HL__[]::CLI
     end
 
     Empty_string_scanner = -> do
       StringScanner__[].new ''
     end
 
-    EN_inflect = -> p do
-      Headless__[]::NLP::EN::Minitesimal::FUN.inflect[ p ]
-    end
-
     Enhancement_shell = -> a do
-      MetaHell__[]::Enhance::Shell.new a
+      MH__[]::Enhance::Shell.new a
     end
 
-    Formal_Box_Open = -> do
-      MetaHell__[]::Formal::Box::Open
+    Entity = -> * x_a, & p do
+      p and x_a.push p
+      if x_a.length.nonzero?
+        Bzn_[]::Entity.via_arglist x_a
+      else
+        Bzn_[]::Entity
+      end
+    end
+
+    Event = -> do
+      Bzn_[].event
     end
 
     Funcy_globful = -> x do
-      MetaHell__[].funcy_globful x
+      MH__[].funcy_globful x
     end
 
-    Function = -> host, * m_i_a do
-      MetaHell__[]::Function._make_methods host, :public, :method, m_i_a
-    end
-
-    Functional_methods = -> * a, & p do
-      MetaHell__[]::Function::Class.new( * a, & p )
-    end
-
-    Headless__ = sidesys[ :Headless ]
+    HL__ = sidesys[ :Headless ]
 
     Iambic_parameters = -> * i_a do
-      Headless__[]::API::Iambic_parameters[ * i_a ]
+      HL__[]::API::Iambic_parameters[ * i_a ]
+    end
+
+    IO_lib = -> do
+      HL__[]::IO
+    end
+
+    Ivars_with_procs_as_methods = -> * a do
+      MH__[]::Ivars_with_Procs_as_Methods.via_arglist a
     end
 
     Memoize = -> x do
       Callback_.memoize[ x ]
     end
 
-    MetaHell__ = sidesys[ :MetaHell ]
+    MH__ = sidesys[ :MetaHell ]
+
+    NLP_EN_agent = -> do
+      HL__[].expression_agent.NLP_EN_agent
+    end
+
+    Old_box_lib = -> do
+      MH__[]::Formal::Box
+    end
 
     Oxford_or = -> a do
       Callback_::Oxford_or[ a ]
     end
 
     Pool = -> x do
-      MetaHell__[]::Pool.enhance x
+      MH__[]::Pool.enhance x
+    end
+
+    Scn_lib = -> do
+      Callback_::Scn
     end
 
     Set = -> * a do
@@ -72,11 +91,11 @@ module Skylab::Basic
     Set__ = stdlib[ :Set ]
 
     Some_stderr_IO = -> do
-      Headless__[]::System::IO.some_stderr_IO
+      HL__[]::System::IO.some_stderr_IO
     end
 
     Strange = -> x do
-      MetaHell__[].strange x
+      MH__[].strange x
     end
 
     String_IO = -> do
@@ -90,9 +109,5 @@ module Skylab::Basic
     end
 
     StringScanner__ = memo[ -> do require 'strscan' ; ::StringScanner end ]
-
-    Tmpdir_pathname = -> do
-      Headless__[]::System.defaults.tmpdir_pathname
-    end
   end
 end

@@ -1,6 +1,8 @@
-module Skylab::Headless
+module Skylab::Basic
 
-  class CLI::Word_Wrap < ::Enumerator::Yielder
+  module String
+
+    class Word_Wrappers__::Crazy < ::Enumerator::Yielder
 
     def initialize p, set_indent_p, flush_p
       @flush_p = flush_p ; @set_indent_p = set_indent_p
@@ -41,7 +43,7 @@ module Skylab::Headless
         end
         process_input_line = -> input_line do
           input_line or fail 'never'
-          _sx = CLI::FUN::Parse_styles[ input_line ]
+          _sx = Basic_::Lib_::CLI_lib[].parse_styles input_line
           _sx ||= [[ :string, input_line ]]
           scn = build_word_scanner[ _sx ]
           while (( word = scn.gets ))
@@ -68,7 +70,7 @@ module Skylab::Headless
 
       _Word = ::Struct.new :any_style_d, :string, :is_space
 
-      _SPACE_WORD = _Word.new nil, TERM_SEPARATOR_STRING_, true
+      _SPACE_WORD = _Word.new nil, SPACE_, true
 
       scan_string = scan_style = skip_final_style = nil
       build_word_scanner = -> sx do
@@ -185,7 +187,7 @@ module Skylab::Headless
               else
                 word.string
               end
-            end.join EMPTY_STRING_
+            end.join EMPTY_S_
             @word_a.clear ; @width = 0
             line
           end
@@ -268,5 +270,7 @@ module Skylab::Headless
       build_wrapping_indenter
 
     end ).call
+
+    end
   end
 end

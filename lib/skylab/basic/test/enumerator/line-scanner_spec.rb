@@ -1,11 +1,18 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Basic::TestSupport::List::Scanner::For
+module Skylab::Basic::TestSupport::Enumerator
+
+ ::Skylab::Basic::TestSupport[ self ]
+
+ include Constants
+
+ extend TestSupport_::Quickie
 
   describe "[ba] list scanner for enumerator" do
 
     it "minimal monaic" do
-      scn = Basic_::List::Scanner::For.block do |y|
+
+      scn = subject do |y|
         y << :_one_
       end
       scn.gets.should eql :_one_
@@ -14,7 +21,8 @@ module Skylab::Basic::TestSupport::List::Scanner::For
     end
 
     it "i can't believe this works" do
-      scn = Basic_::List::Scanner::For.block do |y|
+
+      scn = subject do |y|
         y << :a ; y << :b ; y << :c ; nil
       end
       scn.gets.should eql :a
@@ -22,6 +30,10 @@ module Skylab::Basic::TestSupport::List::Scanner::For
       scn.gets.should eql :c
       scn.gets.should be_nil
       scn.gets.should be_nil
+    end
+
+    def subject & p
+      Basic_::Enumerator.line_scanner( & p )
     end
   end
 end

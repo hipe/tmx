@@ -40,10 +40,11 @@ module Skylab::Basic
 
     A_RATHER_SHORT_LENGTH_FOR_A_STRING__ = 8
 
-    Ellipsatize__ = Basic::Lib_::Ellipsify_proc[].
+    Ellipsatize__ = Basic_::Lib_::CLI_lib[].ellipsify.
       curry[ A_RATHER_SHORT_LENGTH_FOR_A_STRING__ ]
 
-    Basic::Lib_::Function[ self, :gets, :@gets_proc, :gets_proc= ]
+    Basic_::Lib_::Ivars_with_procs_as_methods[ self,
+      :gets, :@gets_proc, :gets_proc= ]
 
   end
 end

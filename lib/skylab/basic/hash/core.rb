@@ -2,42 +2,53 @@ module Skylab::Basic
 
   module Hash  # read [#026] the hash narrative #storypoint-005 introduction
 
-    Loquacious_default_proc = -> moniker, h, k do
+    class << self
+
+      def pairs_at * i_a, & p
+        METHODS__.pairs_at_via_names i_a, & p
+      end
+
+      def pairs_scan h
+        a = h.keys
+        Callback_.scan.via_times( a.length ).map_by do |d|
+          [ a.fetch( d ), h.fetch( a.fetch d ) ]
+        end
+      end
+    end
+
+    Loquacious_default_proc__ = -> moniker, h, k do
 
       # the loquacious default proc
       # can be used like so:
       #     h = { foo: 'bar', biff: 'baz' }
-      #     h.default_proc = Basic::Hash::Loquacious_default_proc.
-      #       curry[ 'beefel' ]
+      #     h.default_proc = Subject_[].loquacious_default_proc.curry[ 'beefel' ]
       #     h[ :luhrmann ]  # => KeyError: no such beefel 'luhrmann'. did you mean 'foo' or 'biff'?
 
       _msg = "no such #{ moniker } #{ Basic_::Lib_::Strange[ k ] }. #{
         }did you mean #{
-          Basic::Lib_::Oxford_or[ h.keys.map( & Lib_::Strange ) ] }?"
+          Basic_::Lib_::Oxford_or[ h.keys.map( & Lib_::Strange ) ] }?"
       raise ::KeyError, _msg
     end
-
-    module FUN
 
       # read [#026] the hash narrative # #storypoint-105
       # but here's the gist of it:
       #
       #     h = { age: 2, name: "me" }
-      #     name, age = Basic::Hash::FUN::Unpack_equal[ h, :name, :age ]
+      #     name, age = Basic_::Hash__.unpack_equal h, :name, :age
       #     name  # => "me"
       #     age  # => 2
 
-      Unpack_equal = -> h, * k_a do
+      Unpack_equal__ = -> h, * k_a do
         Validate_superset__[ h, k_a ]
-        Unpack_subset[ h, *k_a ]
+        Unpack_subset__[ h, *k_a ]
       end
 
-      Unpack_superset = -> h, * k_a do
+      Unpack_superset__ = -> h, * k_a do
         Validate_superset__[ h, k_a ]
-        Unpack_intersect[ h, *k_a ]
+        Unpack_intersect__[ h, *k_a ]
       end
 
-      Unpack_subset = -> h, * k_a do
+      Unpack_subset__ = -> h, * k_a do
         k_a.map { |k| h.fetch k }
       end
 
@@ -46,47 +57,56 @@ module Skylab::Basic
           "unrecognized key(s) - (#{ xtra_a.map( & :inspect ) * ', ' })"
       end
 
-      Unpack_intersect = -> h, * k_a do
+      Unpack_intersect__ = -> h, * k_a do
         k_a.map { |k| h.fetch k do end }
       end
 
-      Repack_difference = -> h, * k_a do
+      Repack_difference__ = -> h, * k_a do
         ::Hash[ ( h.keys - k_a ).map { |i| [ i, h.fetch( i ) ] } ]
       end
 
-      # 'pairs_at' is like 'values_at' and 'each_pair' combined
-      # and note that it methodizes the names as a rule
-      #
-      #     fun = Basic::Hash::FUN
-      #     _a = fun.pairs_at( :unpack_subset ).to_a
-      #     _a  # => [ [ :unpack_subset, fun::Unpack_subset ] ]
+    -> do  # ~ singleton methods
 
-      class << self
-        def pairs_at * i_a
-          if block_given?
-            1 == i_a.length and x = ::Array.try_convert( i_a.first ) and i_a = x
-            h = index_h
-            i_a.each do |i|
-              yield i, h.fetch( i )
-            end ; nil
-          else
-            to_enum :pairs_at, * i_a
-          end
-        end
-        def [] i
-          index_h.fetch i
-        end
-      private
-        def index_h
-          @idx_h ||= bld_idx
-        end
-        def bld_idx
-          ::Hash[ constants.map do |i|
-            str = i.id2name
-            str[ 0 ] = str[ 0 ].downcase
-            [ str.intern, const_get( i ) ]
-          end ]
-        end
+      o = -> i, p do
+        define_singleton_method i, p
+      end
+      o.singleton_class.send :alias_method, :[]=, :call
+
+      o[ :loquacious_default_proc ] = -> do
+        Loquacious_default_proc__
+      end
+
+      o[ :unpack_equal ] = Unpack_equal__
+
+    end.call
+
+    METHODS__ = -> do  # ~ #+:cherry-pickable method definitions
+
+      i_a = [] ; p_a = []
+      o = -> i, p do
+        i_a.push i ; p_a.push p
+      end
+      o.singleton_class.send :alias_method, :[]=, :call
+
+      o[ :repack_difference ] = Repack_difference__
+
+      o[ :unpack_equal ] = Unpack_equal__
+
+      o[ :unpack_subset ] = Unpack_subset__
+
+      o[ :unpack_superset ] = Unpack_superset__
+
+      ::Struct.new( * i_a ).new( * p_a )
+
+    end.call
+
+    def METHODS__.pairs_at_via_names i_a
+      if block_given?
+        i_a.each do |i|
+          yield i, self[ i ]
+        end ; nil
+      else
+        enum_for :pairs_at_via_names, i_a
       end
     end
   end

@@ -1,12 +1,12 @@
-module Skylab::Brazen
+module Skylab::Basic
 
-  class Model_
+  module Pathname
 
-    module Entity
+      class Normalization__ < Basic_::Normalization_
 
-      class Normalizers__::Filesystem_Path < Model_::Entity::Normalizer_
+        # do not let this seep into the scope of [#hl-022]. do not use FS here
 
-        Entity_.call self, -> do
+        Basic_::Lib_::Entity.call self do
 
           def absolute
             @relative_is_OK = false
@@ -70,7 +70,7 @@ module Skylab::Brazen
 
         protected def init_copy_via_three arg, ok_val_p, evr
           @arg = arg
-          @OK_value_p = ok_val_p
+          @as_normal_value = ok_val_p
           @event_receiver = evr
           init_event_proc ; nil
         end
@@ -198,7 +198,7 @@ module Skylab::Brazen
         )\z/x
 
         def add_bad d, i
-          @bad_box ||= Box_.new
+          @bad_box ||= Callback_::Box.new
           @bad_box.add_if_not_has i do [] end
           @bad_box.fetch( i ).push d ; nil
         end
@@ -214,7 +214,7 @@ module Skylab::Brazen
         # path_cannot_contain_contain_dot_file
 
         def accept_arg_as_is
-          @result = @OK_value_p[ @arg.value_x ]
+          @result = @as_normal_value[ @arg.value_x ]
           ACHEIVED_
         end
 
@@ -226,6 +226,5 @@ module Skylab::Brazen
           UNABLE_
         end
       end
-    end
   end
 end

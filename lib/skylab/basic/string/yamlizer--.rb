@@ -1,44 +1,40 @@
-module Skylab::Snag
+module Skylab::Basic
 
-  class Text_::Yamlization
+  module String
 
-    Callback_[ self, :employ_DSL_for_digraph_emitter ]
+      class Yamlizer__  # for now covered by [sg]  #todo
 
-    listeners_digraph :text_line
+        Callback_::Actor.call self, :properties,
+          :output_line_yielder,
+          :field_names
 
-    event_factory -> _, __, x do
-      x
-    end
+        def initialize
+          super
+          init_format
+        end
 
-    def initialize field_names
-      _maxlen = field_names.reduce( 0 ) do |m, i|
-        x = i.to_s.length
-        m > x ? m : x
+      private
+
+        def init_format
+          _maxlen = @field_names.reduce( 0 ) do |m, i|
+            x = i.to_s.length
+            m > x ? m : x
+          end
+          @fmt = "%-#{ _maxlen }s" ; nil
+        end
+
+      public
+
+        def << pairs
+          @output_line_yielder << BAR__
+          pairs.each_pair do |i, s|
+            @output_line_yielder << "#{ @fmt % i } : #{ s }"
+          end
+          self
+        end
+
+        BAR__ = '---'.freeze
       end
-      @fmt = "%-#{ _maxlen }s" ; nil
-    end
 
-    def << record
-
-      @y << '---'
-
-      record.yaml_data_pairs.each do |field_name, string_value|
-        @y << "#{ @fmt % field_name } : #{ string_value }"
-      end
-
-      nil
-    end
-
-    # (hack to fail loudly when nothing is listening|)
-
-    m = instance_method :on_text_line
-
-    define_method :on_text_line do |*a, &b|
-      @y ||= ::Enumerator::Yielder.new do |txt|
-        call_digraph_listeners :text_line, txt
-        nil
-      end
-      m.bind( self ).call( *a, &b )
-    end
   end
 end

@@ -1,14 +1,12 @@
 require_relative 'test-support'
 
-module Skylab::Snag::TestSupport::Unparenthesize__
+module Skylab::Basic::TestSupport::String
 
-  ::Skylab::Snag::TestSupport[ self ]
+  describe "[ba] string unparenthesize (and core)" do
 
-  include CONSTANTS
-
-  extend TestSupport_::Quickie
-
-  describe '[sg] text (unparenthesize)' do
+    it "loads" do
+      Basic_::String
+    end
 
     it 'empty string - no match' do
       subject( '' ).should be_nil
@@ -36,9 +34,10 @@ module Skylab::Snag::TestSupport::Unparenthesize__
     end
 
     def subject s
-      md = Snag_::Text::Unparenthesize_message_string__::
-        UNPARENTHESIZE_RX__.match s
-      md and [ md[ :open ], md[ :body ], md[ :close ] ]  # not 'captures'
+      md = Basic_::String.unparenthesize_message_string::UNPARENTHESIZE_RX__.match s
+      if md
+        [ md[ :open ], md[ :body ], md[ :close ] ]  # not 'captures'
+      end
     end
   end
 end

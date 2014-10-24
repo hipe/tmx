@@ -1,24 +1,17 @@
-require_relative '../test-support'
+module Skylab::Basic
 
-module Skylab::Brazen::TestSupport::Model::Entity::Normalizers
+  module TestSupport
 
-  ::Skylab::Brazen::TestSupport::Model::Entity[ self ]
+    module Expect_Normalization
 
-  include Constants
+      class << self
+        def [] test_ctxt_cls
+          test_ctxt_cls.include Instance_Methods__
+        end
+      end  # >>
 
-  Brazen_ = Brazen_
 
-  Callback_ = Brazen_::Callback_
-
-  Subject_ = -> do
-    Brazen_.model_entity.normalizers
-  end
-
-  module Constants
-    Subject_ = Subject_
-  end
-
-  module InstanceMethods
+  module Instance_Methods__
 
     def use_event_receiver_against x
       use_two x, event_receiver ; nil
@@ -104,7 +97,7 @@ module Skylab::Brazen::TestSupport::Model::Entity::Normalizers
             MOCK_PROPERTY__
           end
 
-          Brazen_.model_entity.trio.new value_x, actuals_has_name, _prop
+          Basic_.trio.new value_x, actuals_has_name, _prop
         end
       end
 
@@ -130,4 +123,7 @@ module Skylab::Brazen::TestSupport::Model::Entity::Normalizers
       self
     end
   end ]
+
+    end
+  end
 end

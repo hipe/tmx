@@ -9,7 +9,7 @@ module Skylab::Basic
     # it's just like tivo
     # like so
     #
-    #     rotbuf = Basic::Rotating_Buffer.new 4
+    #     rotbuf = Subject_[].new 4
     #     rotbuf << :a << :b << :c << :d << :e
     #     rotbuf[ 2 ] # =>  :d
     #     rotbuf[ -1 ] # =>  :e
@@ -23,7 +23,7 @@ module Skylab::Basic
     # and when you are
     # under buffer
     #
-    #     rotbuf = Basic::Rotating_Buffer.new 5
+    #     rotbuf = Subject_[].new 5
     #     rotbuf << :a << :b << :c
     #     rotbuf[ -3 .. -1 ]  # => %i( a b c )
 
@@ -43,14 +43,14 @@ module Skylab::Basic
     # 'to_a' works on
     # short buffers
     #
-    #     r = Basic::Rotating_Buffer.new 3
+    #     r = Subject_[].new 3
     #     r << :a << :b
     #     r.to_a  # => %i( a b )
 
     # 'to_a' works on
     # cycled buffers
     #
-    #     r = Basic::Rotating_Buffer.new 3
+    #     r = Subject_[].new 3
     #     r << :a << :b << :c << :d
     #     r.to_a  # => %i( b c d )
     #

@@ -1,19 +1,26 @@
 module Skylab::Basic
 
-  class List::Scanner
+  module String
 
-    class For::String  # read [#024] (in [@022]) the string scanner narrative
+    class Line_Scanner__  # read [#024] (in [#022]) the string scanner narrative
 
       class << self
-        alias_method :[], :new
-        private :new
+
+        def reverse s
+          if block_given?
+            yield Reverse__[ s ]
+          else
+            Reverse__[ s ]
+          end
+        end
       end
 
       def initialize s
         @count = 0
-        scn = Basic::Lib_::String_scanner[ s ]
+        scn = Basic_::Lib_::String_scanner[ s ]
         @gets_p = -> do
-          if (( s = scn.scan LINE_RX_ ))
+          s = scn.scan LINE_RX__
+          if s
             @count += 1
             s
           else
@@ -31,20 +38,16 @@ module Skylab::Basic
         @count.nonzero?
       end
 
-      # ~
+      LINE_RX__ = String.regex_for_line_scanning
 
-      def self.Reverse mutable_string
-        yield Reverse[ mutable_string ] ; nil
-      end
-
-      Reverse = -> mutable_string do
+      Reverse__ = -> mutable_string do
         is_first = true
         ::Enumerator::Yielder.new do |line|
           if is_first
             is_first = false
             mutable_string.concat line
           else
-            mutable_string.concat "\n#{ line }"
+            mutable_string.concat "#{ NEWLINE_ }#{ line }"
           end ; nil
         end
       end

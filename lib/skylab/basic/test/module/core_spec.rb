@@ -1,45 +1,60 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport::Module::Core__
+module Skylab::Basic::TestSupport::Module
 
-  ::Skylab::MetaHell::TestSupport::Module[ self ]
+  ::Skylab::Basic::TestSupport[ self ]
 
-  include CONSTANTS
+  include Constants
 
   extend TestSupport_::Quickie
 
-  MetaHell_ = MetaHell_
+  Basic_ = Basic_
 
-  describe "[mh] Module" do
+  describe "[ba] Module" do
 
-    context "Resolve" do
-      it "o" do
-        mod = MetaHell_::Module::Resolve[ '..', MetaHell_::Module ]
-        mod.should eql MetaHell_
+    context "value via relative path" do
+
+      it "loads" do
+        Basic_::Module
+      end
+
+      it "ok" do
+        mod = subject Basic_::Module, '..'
+        mod.should eql Basic_
       end
 
       it "when you dotdot above a toplevel path - nil" do
-        mod = MetaHell_::Module::Resolve[ '..', Skylab ]
+        mod = subject ::Skylab, '..'
         mod.should be_nil
+      end
+
+      def subject mod, path
+        Basic_::Module.value_via_relative_path mod, path
       end
     end
 
     it "Mutex" do
 
       module Zinger
+
         @a = []
-        class << self ; attr_reader :a end
-        define_singleton_method :push, MetaHell_::Module::Mutex[ -> x do
+
+        class << self
+          attr_reader :a
+        end
+
+        define_singleton_method :push, Basic_::Module.mutex( -> x do
           @a <<  :"_#{ x }_"
-        end ]
+        end )
+
       end
 
       Zinger.push :x
       Zinger.a.should eql %i( _x_ )
+      _rx = /\bmodule mutex failure .+\bZinger\b/
       -> do
         Zinger.push :y
-      end.should raise_error ::RuntimeError,
-        /\bMutex failure .+\bZinger\b/
+      end.should raise_error ::RuntimeError, _rx
 
     end
   end
