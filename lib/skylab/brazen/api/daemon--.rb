@@ -15,6 +15,10 @@ module Skylab::Brazen
       def expression_agent_instance  # #note-015
         @expag ||= expression_agent_class.new application_kernel
       end
+
+      def two_stream_event_expressor
+        API::Produce_bound_call__::Two_Stream_Event_Expressor
+      end
     end
 
     extend module MM__

@@ -108,7 +108,7 @@ module Skylab::CodeMolester
         a = num_occurences[ relpath.to_s, '/' ]
         b = num_occurences[ Path_part__[], '/' ]
         ( a < b ) or fail "sanity - #{ a } dirs to create for #{ b - 1 }"
-        Lib_::FU_lib[].new do |msg|
+        Lib_::FUC[].new do |msg|
           debug and y << msg
         end.mkdir_p d_pn.to_s
       end

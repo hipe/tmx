@@ -61,7 +61,7 @@ module Skylab::Brazen
 
         public
 
-          def normalize_via_x argv
+          def any_error_event_via_validate_x argv
             otr = with_x argv
             otr.execute
           end

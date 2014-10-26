@@ -132,6 +132,10 @@ module Skylab::TestSupport
       Callback_::Name.lib.constantize_sanitize_file
     end
 
+    Proxy_lib = -> do
+      Callback_::Proxy
+    end
+
     Scanner = -> x do
       Callback_::Scn.try_convert x
     end

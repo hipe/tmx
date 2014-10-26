@@ -7,6 +7,7 @@ module Skylab::CSS_Convert
     end
   end
 
+
   class Directive__::Parser
 
     include CSSC_::Parser_::InstanceMethods
@@ -14,16 +15,30 @@ module Skylab::CSS_Convert
   private
 
     def produce_parser_class
+
+      ggd = DIR_N11N__.normalize actual_parameters.tmpdir_absolute do |ev|
+        @delegate.receive_event ev
+        UNABLE_
+      end
+
+      ggd and produce_parser_class_via_generate_grammar_dir ggd
+    end
+
+    def produce_parser_class_via_generate_grammar_dir ggd
+      _relpath_root = Directive__::Parser.dir_pathname
       load_parser_class_with do |o|
         o.enhance_parser_with CSSC_::Parser_::Extlib::InstanceMethods
         actual_parameters.force_overwrite? and o.force_overwrite!
-        o.root_for_relative_paths CSSC_.dir_pathname
-        o.generated_grammar_dir "#{ actual_parameters.tmpdir_relative }"
-        head_pn = Directive__::Parser.dir_pathname
-        o.treetop_grammar head_pn.join( 'common.treetop' ).to_path
-        o.treetop_grammar head_pn.join( 'directive.treetop' ).to_path
+        o.treetop_grammar 'common.treetop'
+        o.treetop_grammar 'directive.treetop'
+        o.root_for_relative_paths _relpath_root
+        o.generated_grammar_dir ggd.to_path
       end
+
     end
+
+    DIR_N11N__ = Headless_.system.filesystem.normalization.
+      existent_directory :create_if_not_exist, :max_mkdirs, 1
 
     def entity_noun_stem
       ENS__

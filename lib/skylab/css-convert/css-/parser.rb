@@ -58,7 +58,7 @@ module Skylab::CSS_Convert
       f = actuals[:force_overwrite]
       v = actuals[:verbose]
       indir  = CSSC_.dir_pathname.join 'css/parser'
-      outdir = CSSC_.dir_pathname.join actuals[:tmpdir_relative]
+      outdir = CSSC_.dir_pathname.join actuals[ :tmpdir_absolute ]
       PARSERS.each do |parser|
         parser[:on] or next
         parser = ParserMeta.new(parser.merge(indir: indir, outdir: outdir))

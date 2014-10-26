@@ -67,7 +67,7 @@ module Skylab::Basic  # introduction at [#020]
     end.new
   end
 
-  class Trio_
+  class Trio_  # :[#038].
 
     def initialize * a
       @value_x, @actuals_has_name, @property = a

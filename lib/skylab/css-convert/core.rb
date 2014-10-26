@@ -61,7 +61,8 @@ module Skylab::CSS_Convert
     param :dump_directives, boolean: true
     param :dump_directives_and_exit, boolean: true
     param :force_overwrite, boolean: true
-    param :tmpdir_relative, default: '../../../tmp', accessor: true
+    param :tmpdir_absolute, accessor: true,
+      default: Headless_.system.defaults.dev_tmpdir_pathname.join( 'css-cnvrt' )
   end
 
   module Core::Client
@@ -74,6 +75,19 @@ module Skylab::CSS_Convert
     include Core::SubClient::InstanceMethods
 
     Headless_::Parameter[ self, :parameter_controller, :oldschool_parameter_error_structure_handler ]
+
+    def receive_event ev
+      scn = ev.scan_for_render_lines_under expression_agent
+      ok = ev.ok || ev.ok.nil?
+      while line = scn.gets  # usually one line
+        if ok
+          x = info line
+        else
+          x = error line
+        end
+      end
+      x
+    end
 
   private
 
@@ -140,7 +154,7 @@ module Skylab::CSS_Convert
     end
 
     def expression_agent
-       @IO_adapter.pen
+      @IO_adapter.pen
     end
 
   private
@@ -261,6 +275,15 @@ module Skylab::CSS_Convert
     def pth x
       @p[ x ]
     end
+
+    def indefinite_noun s  # meh for now
+      if STARTS_WITH_VOWEL_RX__ =~ s
+        "an #{ s }"
+      else
+        "a #{ s }"
+      end
+    end
+    STARTS_WITH_VOWEL_RX__ = /\A[aeiouy]/i
   end
 
   CLI::VisualTest = ::Module.new
@@ -349,6 +372,8 @@ module Skylab::CSS_Convert
   SPACE_ = ' '.freeze
 
   SUCCEEDED_ = true
+
+  UNABLE_ = false
 
   VISUAL_TESTS_ = Callback_.memoize do
     o = []

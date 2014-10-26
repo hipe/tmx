@@ -26,6 +26,7 @@ module Skylab::Headless  # ([#013] is reserved for a core node narrative - no st
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
+  ACHEIVED_ = true
   COLON_ = ':'.freeze
   CONST_SEP_ = '::'.freeze
   DASH_ = '-'.getbyte 0
@@ -40,10 +41,12 @@ module Skylab::Headless  # ([#013] is reserved for a core node narrative - no st
   MONADIC_TRUTH_ = -> _ { true }
   NEWLINE_ = LINE_SEPARATOR_STRING_
   NILADIC_TRUTH_ = -> { true }
+  PROCEDE_ = true
   READ_MODE_ = 'r'.freeze
   Scn_ = Scn = Callback_::Scn
   SPACE_ = ' '.freeze
   TERM_SEPARATOR_STRING_ = SPACE_
   WRITEMODE_ = 'w'.freeze
+  UNABLE_ = false
 
 end

@@ -12,10 +12,6 @@ module Skylab::Headless
         IO_::Line_Scanner__.new io, num_bytes
       end
 
-      def fu
-        IO_::FU__
-      end
-
       def select
         IO_::Select__
       end

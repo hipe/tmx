@@ -45,7 +45,7 @@ module Skylab::TanMan::TestSupport
     end
 
     Debug_IO = -> do
-      HL__[].system.IO.some_stderr_IO
+      System[].IO.some_stderr_IO
     end
 
     Dev_client = -> do
@@ -65,8 +65,8 @@ module Skylab::TanMan::TestSupport
       require 'fileutils' ; ::FileUtils
     end ]
 
-    FU_lib = -> do
-      HL__[]::IO.fu
+    FUC = -> do
+      System[].filesystem.file_utils_controller
     end
 
     HL__ = sidesys[ :Headless ]
@@ -96,6 +96,10 @@ module Skylab::TanMan::TestSupport
     Shellwords = memoize[ -> do
       require 'shellwords' ; ::Shellwords
     end ]
+
+    System = -> do
+      HL__[].system
+    end
 
     Three_IOs = -> do
       HL__[].system.IO.some_three_IOs

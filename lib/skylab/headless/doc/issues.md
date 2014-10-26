@@ -1,3 +1,4 @@
+[#169]       #doc-node [ IO mapppers tee ]
 [#168]       #doc-node option scan ..
 [#167]       #parent-node: [#098] "name conventions for classes.."
 [#166]       #parent-node: [#098] "name conventions for non-class modules.."

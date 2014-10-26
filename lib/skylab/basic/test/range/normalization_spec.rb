@@ -113,10 +113,10 @@ module Skylab::Basic::TestSupport::Range::N11n
           VALID_RANGE.is_valid( 'foobi' ).should eql true
         end
 
-        it "`normalize_via_x` for the \"via one\" mode" do
-          x = VALID_RANGE.normalize_via_x 'barbie'
+        it "`any_error_event_via_validate_x` for the \"via one\" mode" do
+          x = VALID_RANGE.any_error_event_via_validate_x 'barbie'
           x.should be_nil
-          ev = VALID_RANGE.normalize_via_x 'Zee'
+          ev = VALID_RANGE.any_error_event_via_validate_x 'Zee'
           ev.terminal_channel_i.should(
             eql :actual_property_is_outside_of_formal_property_set )
         end

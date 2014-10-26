@@ -61,10 +61,6 @@ module Skylab::Snag
       NLP[]::EN
     end
 
-    FU_lib = -> do
-      HL__[]::IO.fu
-    end
-
     NLP_EN_methods = -> mod, * x_a do
       HL__[].expression_agent.NLP_EN_methods.on_mod_via_iambic mod, x_a
     end
@@ -75,6 +71,10 @@ module Skylab::Snag
 
     Event = -> do
       Bzn__[].event
+    end
+
+    FUC = -> do
+      System[].filesystem.file_utils_controller
     end
 
     Filesystem_walk = -> do
@@ -90,10 +90,6 @@ module Skylab::Snag
     end
 
     HL__ = sidesys[ :Headless ]
-
-    IO_FU = -> do
-      HL__[]::IO.fu
-    end
 
     Name = -> do
       HL__[]::Name

@@ -9,7 +9,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions
   module InstanceMethods
 
     def cd pathname, &block
-      fu = TestLib_::FU_lib[].new -> msg do
+      fu = TestLib_::FUC[].new -> msg do
         if do_debug
           TestSupport_::Stderr_[].puts "    (tanmun vreeboze: #{ msg })"
         end

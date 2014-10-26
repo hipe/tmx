@@ -118,7 +118,7 @@ module Skylab::Brazen
           param_a[ -1, 1 ] = EMPTY_A_  # always 1 arg for the call used #here
 
           _n11n = Brazen_::CLI.arguments.normalization.via :parameters, param_a
-          any_custom_err = _n11n.normalize_via_x x_a
+          any_custom_err = _n11n.any_error_event_via_validate_x x_a
 
           if any_custom_err
             bc_when_custom_error any_custom_err

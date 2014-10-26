@@ -53,7 +53,8 @@ module Skylab::Headless
       case as
       when :dir
         cmd.push '-p1'
-        fu = Headless_::IO.fu.new( verbose ? info : MONADIC_EMPTINESS_ )
+        _message_proc = verbose ? info : MONADIC_EMPTINESS_
+        fu = Headless_.system.filesystem.file_utils_controller.new _message_proc
         fu.cd target_path do
           exec[]
         end

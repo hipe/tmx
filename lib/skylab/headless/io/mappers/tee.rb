@@ -4,7 +4,7 @@ module Skylab::Headless
 
   module Mappers
 
-  Tee = Headless_::Lib_::Proxy_lib[].tee.via_arglist IO_::METHOD_I_A_
+  Tee = Headless_::Lib_::Proxy_lib[].tee.via_arglist IO_::METHOD_I_A_  # :[#169].
 
     # Inspired by (but probably not that similar to) Perl's IO::Tee,
     # an IO::Mappers::Tee is a simple multiplexer that intercepts

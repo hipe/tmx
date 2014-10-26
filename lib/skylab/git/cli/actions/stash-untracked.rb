@@ -619,7 +619,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
   private
     def build_FU_agent
-      Git_::Lib_::IO_FU[].new -> msg do
+      Git_::Lib_::FUC[].new -> msg do
         emit_info_line "# #{ msg }"
       end
     end

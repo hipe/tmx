@@ -12,6 +12,10 @@ module Skylab::Callback
         Proxy_::Inline__.via_arglist a, & p
       end
 
+      def members  # :+[#br-061]
+        [ :functional, :inline, :nice, :tee ]
+      end
+
       def nice * a, & p
         Proxy_::Functional__::Nice__.via_arglist a, & p
       end

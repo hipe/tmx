@@ -364,7 +364,7 @@ module Skylab::TanMan
           info( a.join ', ' )
         end
         break if no_change
-        fu = Lib_::FU_lib[].new -> msg do
+        fu = Lib_::FUC[].new -> msg do
           if verbose
             info( gsub_path_hack msg )
           end

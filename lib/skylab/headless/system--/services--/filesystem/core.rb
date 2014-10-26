@@ -12,12 +12,24 @@ module Skylab::Headless
         Filesystem_::Cache__
       end
 
+      def file_utils_controller & p
+        if p
+          Filesystem_::File_Utils_Controller__.new p
+        else
+          Filesystem_::File_Utils_Controller__
+        end
+      end
+
       def line_scanner_via_path path, num_bytes=nil
         Headless_::IO.line_scanner ::File.open( path, READ_MODE_ ), num_bytes
       end
 
       def line_scanner_via_pathname pn, num_bytes=nil
         Headless_::IO.line_scanner pn.open( READ_MODE_ ), num_bytes
+      end
+
+      def normalization
+        Filesystem_::Normalization__
       end
 
       def path_tools

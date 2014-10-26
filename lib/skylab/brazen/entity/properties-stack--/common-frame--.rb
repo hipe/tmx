@@ -237,6 +237,10 @@ module Skylab::Brazen
           all_names
         end
 
+        def members  # :+[#br-061]
+          all_names
+        end
+
         def all_names
           self.class.properties.get_names
         end

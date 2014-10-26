@@ -35,13 +35,42 @@ module Skylab::TestSupport
 
     def debug! prepnd=nil
       @do_debug = true
-      values.each do |x|
-        if x and x.respond_to?( :debug! )
+      members.each do |i|
+        x = self[ i ]
+        x or next
+        if x.respond_to? :debug!
           x.debug! prepnd
+        else  # assume it is an [#hl-169] IO tee. ignoring `prepnd` for now
+          x[ :debug ] = Prefixed_debugging_IO__[ i, TestSupport_.debug_IO ]
         end
       end
       nil
     end
+
+    Prefixed_debugging_IO__ = -> do
+      p = -> i, io do
+        Prefixed_Debugging_IO__ = TestSupport_::Lib_::Proxy_lib[].nice :puts, :write, :<<
+        p = -> i_, io_ do
+          fmt = -> x do
+            "(#{ i_ }: #{ x.inspect })"
+          end
+          me = Prefixed_Debugging_IO__.new :<<, -> x do
+              io_ << fmt[ x ] ; me
+            end,
+            :puts, -> x do
+              io_.puts fmt[ x ]
+            end,
+            :write, -> x do
+              io_.write fmt[ x ]
+              x.length
+            end
+        end
+        p[ i, io ]
+      end
+      -> i, io do
+        p[ i, io ]
+      end
+    end.call
 
     def clear_buffers
       values.each( & :clear_buffer )

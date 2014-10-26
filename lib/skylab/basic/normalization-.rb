@@ -7,7 +7,7 @@ module Skylab::Basic
           @event_p = nil
         end
 
-        def via_two arg, evr  # #experiment
+        def normalize_via_two arg, evr  # #experiment
           normalize_via_three arg, IDENTITY_, evr
         end
 

@@ -116,7 +116,7 @@ module Skylab::Snag
       end
 
       def execute
-        Snag_::Lib_::IO_FU[].new -> s do
+        Snag_::Lib_::FUC[].new -> s do
           if @be_verbose
             @delegate.receive_info_event Hacky_Path_Event__.new s
           end

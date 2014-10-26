@@ -45,15 +45,11 @@ module Skylab::Flex2Treetop
 
     MH__ = sidesys[ :MetaHell ]
 
+    OptionParser = -> { require 'optparse' ; ::OptionParser }
+
     Strange = -> x do
       MH__[].strange x
     end
-
-    IO_lib = -> do
-      HL__[]::IO
-    end
-
-    OptionParser = -> { require 'optparse' ; ::OptionParser }
 
     String_lib = -> do
       Bsc__[]::String
@@ -62,6 +58,10 @@ module Skylab::Flex2Treetop
     StringScanner = -> { require 'strscan' ; ::StringScanner }
 
     Stdib_tmpdir = -> { require 'tmpdir' ; ::Dir }
+
+    System = -> do
+      HL__[].system
+    end
   end
 
   module CLI
@@ -772,7 +772,7 @@ module Skylab::Flex2Treetop
       end ; nil
     end
     def bld_file_utils
-      Lib_::IO_lib[].fu.new do |msg|
+      Lib_::System[].filesystem.file_utils_controller.new do |msg|
         emit_info_line "(futils:) #{ msg }" ; nil
       end
     end

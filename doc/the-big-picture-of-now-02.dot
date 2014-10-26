@@ -1,21 +1,13 @@
 digraph {
 
-  big [label="the biggest\nrefactor ever"]
-
   022 [label="[#hl-022]\nFS unification"]
 
   lib [label="librification"]
 
   dct [label="new doctest features"]
 
-  xyz [label="CONSTANTS\nto Constants"]
+  annoy [label="rename\n`info`, `error`"]
 
-  022->big
-
-  lib->big
-
-  dct->big
-
-  xyz->big
+  022->annoy
 
 }

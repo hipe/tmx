@@ -47,10 +47,11 @@ module Skylab::Headless
       MH__[]::DSL_DSL.enhance mod, &p
     end
 
-    Entity = -> * a do
-      if a.length.zero?
+    Entity = -> * a, & p do
+      if a.length.zero? && ! p
         Bzn__[]::Entity
       else
+        p and a.push p
         Bzn__[]::Entity.via_arglist a
       end
     end

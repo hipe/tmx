@@ -12,6 +12,37 @@ document. that is the second half of this document.
 
 
 
+## a broad view
+
+broadly we conceive of normalization as both the process and modeling
+therebehind of taking a given input data, determining whether or not it
+is a member of the formal set of data defined by the particular
+"formal value" for this "field", and then if valid potentially transforming
+the argument data and somehow making this result value available.
+
+as it would turn out, this conception of normalization is so broad that
+it arguably encompases all of computing in our universe. this is an
+isomorphicism we play with here and there to put this normalization
+API to perhaps surprising use in some places, for example the possible
+transformation and resoultion of resources on the filesystem or even on
+the network.
+
+for what is a "URL" but a formal definition of some resource that you
+expect to exist? if, given the input state (that is, the state of the
+internet at this moment) the resource does not exist or cannot be reached,
+it perhaps makes sense to approach this problem like other normalization
+problems provided that the abstraction is not too leaky.
+
+even an HTTP "PUT" operation can be conceived of as a normalization. you
+model the formal behavior that you would like to occur (send a request,
+get a certain kind of response) and then you apply it to actual values and
+respond to the results declaratively rather than imperatively.
+
+for now this is a merely a fun thought experiment but we intend to turn
+it into something far more embarassing than that..
+
+
+
 
 ## normalizing vs. validation
 
@@ -66,6 +97,83 @@ ramifications that we find useful to leverage specifically in this domain
 of normalization.
 
 
+
+
+## the superset of normalization methods
+
+not all formal values can support all the below signatures of validation
+method. typically which ones you may want to implement depend on whether
+or not your field can validly be `nil` or `false`, and whether or not
+your normalization potentially needs to transform the argument value (that
+is, "normalization" in the traditional, formal sense).
+
+
+  + `normalize` - argument is mixed argument x. if x is valid, result is
+       x or a normalized transformation of x. informational events about
+       for e.g transformation cannot be emitted. if x is invalid,
+       the event is converted to an exception and raised.
+
+       although this reads well, its use is discouraged except for cases
+       where invalid arguments are truly exceptional, i.e this is
+       appropriate for sanity checks but not for UI-level validation.
+
+       (except wait, there's more: pass an error proc as an optional
+       block and now this works perhaps identically to
+       `normalize_via_two` below except that in this case here the first
+       argument is not a [#ba-038].
+
+
+  + `normalize_argument` - same as above but argument is a [#ba-038],
+       whose metadata may be useful to make more attractive-sounding
+       UI decoration in the generation of events.
+
+
+  + `any_error_event_via_validate_x` - normalizations that offer this
+       method may not ever perform transformations: mixed argument either
+       is valid or isn't. if it is valid result must be `nil` (not false).
+       if is isn't result is an error event.
+
+
+  + `normalize_via_two` - first argument is a [#ba-038],
+       second argument is an event proc. if argument is valid, apply
+       any normalization and result is the normalized value. if argument
+       is invalid the event proc receives the event and result is the
+       result of the callback.
+
+       it is the responsibility of the caller to ensure that the
+       semantic space of these two values doesn't collide. for e.g this
+       method is not recommended to be used for fields whose valid value
+       may be false-ish unless you flip error flags in your event
+       receiver accordingly.
+
+
+  + `normalize_via_three` - this is the universal form from which
+       possibly all others can be derived as determined by the formal
+       space of your value. first argument is a [#ba-038] argument object.
+       second argument is a proc that will receive a (potentially
+       normalized) valid value based off the first argument. the third
+       argument is an object that responds to `receive_event` or a proc.
+       this third argument may receive one or more error events if the
+       argument is invalid. it may also receive informational events
+       about any transformations that were performed.
+
+       formally the only way to know whether the argument was valid or
+       not is whether or not the proc in the *second* argument is called
+       (not the third argument) because it is not formally mandated that
+       normalizations necessarily produce events ever, although it is
+       strongly encouraged always to produce an error event as appropriate.
+
+
+
+## a summary of the above in a table
+
+    method name                    | can xform?| falseish allowed? | raises e? |
+    normalize [argument]           |       yes |               yes |       yes |
+    any_error_event_via_validate_x |        no |               yes |        no |
+    normalize_via_{ two | three }  |       yes |              yes* |        no |
+
+
+* care must be taken to deal with fields that can validly be `false` / `nil`.
 
 
 

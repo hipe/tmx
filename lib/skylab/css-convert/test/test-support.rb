@@ -21,6 +21,12 @@ module Skylab::CSS_Convert::TestSupport
 
     include Constants
 
+    def debug!
+      @do_debug = true
+    end
+
+    attr_reader :do_debug
+
     def build_parser cls
       client = cli_instance
       client.set! or fail "failed to bootstrap client! (defaults etc)" # ick
@@ -33,18 +39,10 @@ module Skylab::CSS_Convert::TestSupport
         _a = streams.values
         app = CSSC_::CLI.new( * _a )
         app.send :program_name=, 'nerk'
-        if do_debug
-          streams.values.each { |io| io.debug! if io }
-        end
+        do_debug and streams.debug!
         app
       end
     end
-
-    def debug!
-      @do_debug = true
-    end
-
-    attr_reader :do_debug
 
     def fixture_path tail
       CSSC_.dir_pathname.join('test/fixtures', tail)

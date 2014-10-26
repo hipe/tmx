@@ -96,7 +96,7 @@ module Skylab::BeautySalon
       ok = true
       integer = Brazen_.model_entity.normalizers.numeric.instance
       @range.each do |bp|
-        d = integer.via_two bp, @error_p
+        d = integer.normalize_via_two bp, @error_p
         if d
           bp.value_x = d
         else

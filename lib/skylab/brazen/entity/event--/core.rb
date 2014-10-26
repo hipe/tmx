@@ -129,6 +129,10 @@ module Skylab::Brazen
         reflection_box.first_name
       end
 
+      def members  # :+[#061]
+        get_tag_names
+      end
+
       def tag_names
         get_tag_names
       end
@@ -198,6 +202,16 @@ module Skylab::Brazen
           end
           @y
         end
+      end
+
+      def scan_for_render_lines_under expag
+        # with threads we could do this one line at a time but meh
+        s_a = []
+        y = ::Enumerator::Yielder.new do |s|
+          s_a.push s
+        end
+        expag.calculate y, self, & @message_proc
+        Callback_.scan.via_nonsparse_array s_a
       end
 
       class Inferred_Message  # #experimental - you hate me now
@@ -488,6 +502,10 @@ module Skylab::Brazen
             when  1
               Event_::Wrappers__::Exception
             end
+          end
+
+          def file_utils_message s
+            Event_::Wrappers__::File_utils_message[ s ]
           end
 
           def members

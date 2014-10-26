@@ -89,7 +89,7 @@ module Skylab::Basic
         otr.execute_is_valid
       end
 
-      def normalize_via_x x
+      def any_error_event_via_validate_x x
         otr = dup
         otr.init_copy_with :x, x
         otr.via_one_normalize
