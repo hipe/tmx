@@ -66,20 +66,29 @@ module Skylab::SubTree
     end
     #
     Services_For_API_Action_ = SubTree::Lib_::Iambic[
-         :error, -> { method :error_notify },
-          :info,  -> { method :info_notify } ]
-    #
+      :receive_error_event, -> { method :error_event_notify },
+      :receive_error_string, -> { method :error_string_notify },
+      :receive_info_string,  -> { method :info_string_notify } ]
+
     p = Lib_::Method_lib[].curry.unbound instance_method :emit_from_parent
-    #
-    define_method :_error_notify, & p.curry[ :error ]
-    #
-    def error_notify message_x
+
+    def error_event_notify e
       @error_count += 1
-      _error_notify message_x
+      _error_event_notify e
       nil
     end
-    #
-    define_method :info_notify, & p.curry[ :info ]
+
+    define_method :_error_event_notify, & p.curry[ :error_event ]
+
+    def error_string_notify s
+      @error_count += 1
+      _error_string_notify s
+      nil
+    end
+
+    define_method :_error_string_notify, & p.curry[ :error_string ]
+
+    define_method :info_string_notify, & p.curry[ :info_string ]
 
     def some_expression_agent
       SubTree::CLI.some_expression_agent
@@ -88,7 +97,7 @@ module Skylab::SubTree
     def list_as_list o
       o.on_test_file do |e|
         full_pathname = e.hub.get_sub_hub_pn.join e.short_pathname
-        payload "#{ full_pathname }"           # (why use e-scape_path? it
+        send_payload_string "#{ full_pathname }"           # (why use e-scape_path? it
       end                                      # looks fine just to use the path
       show_number o                            # header that the user provided.)
       nil
@@ -96,12 +105,12 @@ module Skylab::SubTree
 
     def list_as_test_tree_shallow o
       o.on_hub_point do |ap|
-        payload "#{ ap.path_moniker_stem }/"
+        send_payload_string "#{ ap.path_moniker_stem }/"
       end
       o.on_test_file do |e|
         test_file_relative_pathname =
           e.hub.relative_path_to e.short_pathname
-        payload "  #{ test_file_relative_pathname }"  # indented with '  '
+        send_payload_string "  #{ test_file_relative_pathname }"  # indented with '  '
       end
       show_number o
       nil
@@ -109,9 +118,10 @@ module Skylab::SubTree
 
     def show_number o
       o.on_number_of_test_files do |d|
-        info_notify( some_expression_agent.calculate do
+        _s = some_expression_agent.calculate do
           "(#{ d } test file#{ s d } total)"
-        end )
+        end
+        info_string_notify _s
         nil
       end
       nil
@@ -136,12 +146,12 @@ module Skylab::SubTree
       max = a_a.reduce 0 do |m, x| m < (( y = x.first.length )) ? y : m end
       fmt = "%-#{ max }s  %s"
       a_a.each do |a|
-        payload fmt % a
+        send_payload_string fmt % a
       end
       true
     end
     #
-    define_method :payload, & p.curry[ :payload ]
+    define_method :send_payload_string, & p.curry[ :payload_string ]
     #
     def treeline_and_glyphage_for_card card
       n = card.node

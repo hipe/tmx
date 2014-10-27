@@ -102,7 +102,7 @@ module Skylab::SubTree
     private
 
       def bork msg
-        @emit_p[ :error, msg ]
+        @emit_p[ :error_string, msg ]
         @did_bork = true
         false
       end

@@ -19,15 +19,15 @@ module Skylab::TanMan
              nil,  # `do_create` - create iff necessary
             true,  # fuzzy is always on for now :/
           -> e do  # error
-            error e.to_h
+            send_error_mixed e.to_h
             false
           end,
           -> e do  # success
-            info e.to_h
+            send_info_mixed e.to_h
             true
           end,
           -> e do  # info
-            info e.to_h
+            send_info_mixed e.to_h
             nil
           end
         if res
@@ -54,16 +54,16 @@ module Skylab::TanMan
             true, # fuzzy match is alwyas on for now
 
           -> e do # error
-            error e.to_h
+            send_error_mixed e.to_h
           end,
 
           -> e do # success
-            info e.to_h
+            send_info_mixed e.to_h
             true
           end,
 
-          -> e do # info
-            info e.to_h
+          -> e do  # info
+            send_info_mixed e.to_h
           end
 
         if write

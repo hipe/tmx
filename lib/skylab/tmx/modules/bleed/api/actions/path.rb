@@ -30,12 +30,12 @@ module Skylab::TMX::Modules::Bleed::API
         prev = config['bleed']['path']
         if prev
           if prev == path
-            info "no change to path - #{ path }"
+            send_info_string "no change to path - #{ path }"
             break
           end
-          info "changing bleed.path from #{ prev.inspect } to #{ path.inspect }"
+          send_info_string "changing bleed.path from #{ prev.inspect } to #{ path.inspect }"
         else
-          info "adding bleed.path value to #{ config_path } - #{ path.inspect }"
+          send_info_string "adding bleed.path value to #{ config_path } - #{ path.inspect }"
         end
         config['bleed']['path'] = path
         res = config_write

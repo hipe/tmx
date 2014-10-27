@@ -17,11 +17,11 @@ module Skylab::Treemap
     def with_adapter_api_action func
       res = false
       begin
-        @adapter_name or break( error "adapter name not set" )
+        @adapter_name or break( send_error_string "adapter name not set" )
         res = resolve_adapter( @adapter_name ) or break
         res = res.item.resolve_api_action_class( normalized_action_name,
           -> e do
-            error e
+            send_error_string e
           end )
         action = @adapter_action_cache.fetch( res ) do |k|
           @adapter_action_cache[ k ] = k.new self

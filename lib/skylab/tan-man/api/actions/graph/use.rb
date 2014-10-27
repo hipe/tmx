@@ -23,12 +23,12 @@ module Skylab::TanMan
         end
         if idx
           self[:path] = tries[idx]
-          info "using #{ escape_path path }"
+          send_info_string "using #{ escape_path path }"
           result = true
         else
           self[:path] = tries.last
           if 1 < tries.length
-            info "(adding #{ extname } extension because that's what god wants)"
+            send_info_string "(adding #{ extname } extension because that's what god wants)"
           end
           result = create_path
           result or break
@@ -48,18 +48,18 @@ module Skylab::TanMan
       begin
         if path.exist? # #pattern [#049]
           if path.directory?
-            error "cannot create, is directory: #{ path }"
+            send_error_string "cannot create, is directory: #{ path }"
           else
-            error "cannot create, already exists: #{ path }"
+            send_error_string "cannot create, already exists: #{ path }"
           end
           break
         elsif path.dirname.exist?
           if ! path.dirname.directory?
-            error "cannot create, is not directory: #{ path.dirname }"
+            send_error_string "cannot create, is not directory: #{ path.dirname }"
             break
           end
         else
-          error "cannot create, directory does not exist: #{ path.dirname }"
+          send_error_string "cannot create, directory does not exist: #{ path.dirname }"
           break
         end
         starter = collections.starter.using_starter or break # emits
@@ -67,7 +67,7 @@ module Skylab::TanMan
         content = starter.call created_on: ::Time.now.utc.to_s
         bytes = nil
         path.open( WRITEMODE_ ) { |fh| bytes = fh.write content }
-        info "wrote #{ path }#{ t } (#{ bytes } bytes)."
+        send_info_string "wrote #{ path }#{ t } (#{ bytes } bytes)."
         result = bytes
       end while nil
       result

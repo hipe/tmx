@@ -66,8 +66,8 @@ module Skylab::Bnf2Treetop
   module Headless end
   module Headless::Client_InstanceMethods
   private
-    def error msg ; emit(:error, msg) ; false end
-    def info msg ; emit(:info, msg) end
+    def send_error_string msg ; emit(:error, msg) ; false end
+    def send_info_string msg ; emit(:info, msg) end
     def or_  list ; oxford_comma(list, ' or ') end
     def oxford_comma items, last_glue = ' and ', rest_glue = ', '
       items.zip(
@@ -315,14 +315,14 @@ module Skylab::Bnf2Treetop
     end
     CONTEXT = 20
     def fail_with_context msg
-      info msg
+      send_info_string msg
       after = scn.peek CONTEXT
       before = scn.string[ [0, scn.pos - CONTEXT].max ... scn.pos ]
       clean_p = ->(s) { s.gsub("\n", ' ') }
       before = clean_p[before] ; after = clean_p[after]
-      info "at: #{ before }#{ after }"
-      info "----#{ '-' * before.length }^"
-      scn.eos? and info("(before end of input)")
+      send_info_string "at: #{ before }#{ after }"
+      send_info_string "----#{ '-' * before.length }^"
+      scn.eos? and send_info_string("(before end of input)")
       throw :stop, false
     end
     # Don't advance scan pointer, just check if the first line has a modeline
@@ -336,7 +336,7 @@ module Skylab::Bnf2Treetop
             true == v ? n : "#{ n }=#{ /[ \t=:]/ =~ v ? v.inspect : v }"
           end.join(' ')
         end
-        info "(using file's modeline parameters: #{ list_p[modelines] })"
+        send_info_string "(using file's modeline parameters: #{ list_p[modelines] })"
         begin # this is all porcelain, grouped only for semantics
           order = [ ]
           values = (modelines + invocation_parameters).reduce(
@@ -344,7 +344,7 @@ module Skylab::Bnf2Treetop
           ) { |m, pair| m[pair.first].push pair.last ; m }
           a = order.select{|k| 1 < values[k].length}.map{|k| [k, values[k][1]]}
           if ! a.empty?
-            info( "(modeline parameter#{s_ a} overridden by #{
+            send_info_string( "(modeline parameter#{s_ a} overridden by #{
               }invocation parameter#{s_ a}: #{ list_p[a] })" )
           end
         end
@@ -360,7 +360,7 @@ module Skylab::Bnf2Treetop
       scn.skip(COMMENT_BEGIN_RX) or return # first line is not a comment
       scn.skip_until(/[ \t]bnf2treetop:[ \t]*set?[ \t]/) or return
       fail_p = ->(msg) do
-        error("failed to parse modeline: #{msg} at #{scn.peek(10).inspect}")
+        send_error_string("failed to parse modeline: #{msg} at #{scn.peek(10).inspect}")
       end
       sexp = []
       loop do
@@ -382,7 +382,7 @@ module Skylab::Bnf2Treetop
       sexp.map do |name, *a|
         matcher = /\A#{ ::Regexp.escape name }#{ '\z' if 1 < name.length }/
         fp = formal_parameters.detect { |_fp| _fp.name.to_s =~ matcher } or
-          return error("No such parameter #{name.inspect} (in modeline)")
+          return send_error_string("No such parameter #{name.inspect} (in modeline)")
         [fp.name, a.empty? ? true : a.first]
       end
     end
@@ -414,7 +414,7 @@ module Skylab::Bnf2Treetop
     def grammar_prepare
       @g_money = grammar.split('::').map do |s|
         CONST_RX =~ s or begin
-          info "invalid ruby constant name #{s.inspect}, try e.g. 'FooBar_123'"
+          send_info_string "invalid ruby constant name #{s.inspect}, try e.g. 'FooBar_123'"
           throw :stop, false
         end
         s
@@ -439,7 +439,7 @@ module Skylab::Bnf2Treetop
     end
     def include_prepare
       if nope = include.detect { |x| CONSTANT_RX !~ x }
-        info "your include term looks funny: #{nope.inspect}"
+        send_info_string "your include term looks funny: #{nope.inspect}"
         throw :stop, false
       end
     end

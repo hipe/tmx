@@ -65,7 +65,7 @@ module Skylab::TreetopTools
     def file_is_dir
       f = events.on_file_is_dir
       f ||= -> pathname, entity do
-        error "expecting #{ entity }, had directory: #{
+        send_error_string "expecting #{ entity }, had directory: #{
           }#{ escape_path upstream }"
       end
       f[ pathname, entity_noun_stem ]
@@ -75,7 +75,7 @@ module Skylab::TreetopTools
     def file_not_found
       f = events.on_file_not_found
       f ||= -> pathname, entity do
-        error "#{ entity } not found: #{ escape_path  pathname }"
+        send_error_string "#{ entity } not found: #{ escape_path  pathname }"
       end
       f[ pathname, entity_noun_stem ]
       nil

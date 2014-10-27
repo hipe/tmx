@@ -54,7 +54,7 @@ module Skylab::TestSupport
       ">>> (#{ moniker } #{ e.stream_name } - #{ e.text })"
     end
 
-    def error msg
+    def send_error_string msg
       call_digraph_listeners :error, msg
       false
     end
@@ -64,13 +64,13 @@ module Skylab::TestSupport
       false
     end
 
-    def info msg
+    def send_info_string msg
       call_digraph_listeners :info, msg
       nil
     end
 
     def fu_output_message msg  # #comport with ruby stdlib file utils
-      info msg
+      send_info_string msg
     end
 
     def moniker
@@ -121,9 +121,9 @@ module Skylab::TestSupport
 
     def start_unless_running
       -> do  # #result-block
-        fetch_pid_pathname { |m| error "can't start server - #{ m }" } or
+        fetch_pid_pathname { |m| send_error_string "can't start server - #{ m }" } or
           break false
-        (( p = any_pid_of_known_already_running_process )) and break info(
+        (( p = any_pid_of_known_already_running_process )) and break send_info_string(
           "using already running server process - (pid #{ p } in #{
             }#{ @pid_pathname.basename })." )
         start  # result is pid
@@ -144,7 +144,7 @@ module Skylab::TestSupport
     end
 
     def init_pid_pathname er
-      pn = nil ; bork = -> msg { ( er || method( :error ) )[ msg ] }
+      pn = nil ; bork = -> msg { ( er || method( :send_error_string ) )[ msg ] }
       r = -> do  # #result-block
         @pid_path_arg or break bork[ "pid_path arg was not set" ]
         dirname, basename = Dirname_basename_[ @pid_path_arg ]
@@ -195,7 +195,7 @@ module Skylab::TestSupport
     end
 
     def remove_stale_pid_file
-      info "removing stale pid file - #{ @pid_pathname.basename }"
+      send_info_string "removing stale pid file - #{ @pid_pathname.basename }"
       rm @pid_pathname.to_s, verbose: true
       nil
     end
@@ -203,14 +203,14 @@ module Skylab::TestSupport
     def start
       begin
         fetch_ok_filesystem_status do |e|
-          error "can't start server - #{ e }"
+          send_error_string "can't start server - #{ e }"
         end or break
         rack_app or break
         rack_handler or break
         @port && @pid_pathname && @rack_handler && @rack_app or fail "sanity"
         p = fork do
           pid = ::Process.pid
-          info "writing new pid file - #{ @pid_pathname.basename } #{
+          send_info_string "writing new pid file - #{ @pid_pathname.basename } #{
             } (pid: #{ pid })"
           @pid_pathname.open( 'w' ) { |o| o.write pid }
           set_interrupt_handler
@@ -220,7 +220,7 @@ module Skylab::TestSupport
         end
         p or break
         ::Process.detach p
-        info "parent process has parent process id : #{ ::Process.pid }#{
+        send_info_string "parent process has parent process id : #{ ::Process.pid }#{
           } and child id: #{ p }"
         r = p
       end while nil
@@ -236,7 +236,7 @@ module Skylab::TestSupport
 
     def fetch_ok_filesystem_status &er
       begin
-        bork = -> msg { ( er || method( :error ) )[ msg ] }
+        bork = -> msg { ( er || method( :send_error_string ) )[ msg ] }
         pid_pathname or break bork[ "failed to resolve pid pathname." ]
         @pid_pathname.dirname.writable? or break bork[ "not writable: #{
           }#{ @pid_pathname.dirname }" ]
@@ -264,7 +264,7 @@ module Skylab::TestSupport
     end
 
     def build_rack_app
-      info "building rack app (doc_root: #{ @doc_root } port: #{ @port })"
+      send_info_string "building rack app (doc_root: #{ @doc_root } port: #{ @port })"
       doc_root_ = @doc_root
       builder = ::Rack::Builder.new do
         use ::Rack::CommonLogger

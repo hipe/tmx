@@ -77,7 +77,7 @@ module Skylab::TanMan
         end
         break if ! ready? # emits info
         if ! using_pathname
-          info "no using_pathname!" # strange
+          send_info_string "no using_pathname!" # strange
           break
         end
         # (at the time of this writing the controllers.dot_file seems to
@@ -103,7 +103,7 @@ module Skylab::TanMan
           end
           if ! o.known? config_param
             if no_param then no_param[ config_param ] else
-              error "no '#{ config_param }' value is set in config(s)" # no inv.
+              send_error_string "no '#{ config_param }' value is set in config(s)" # no inv.
             end
             break
           end
@@ -114,7 +114,7 @@ module Skylab::TanMan
           res = true
         else
           if no_file then no_file[ using_pathname ] else
-            error "dotfile must exist: #{ escape_path using_pathname }"
+            send_error_string "dotfile must exist: #{ escape_path using_pathname }"
           end
         end
       end while nil

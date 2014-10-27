@@ -51,15 +51,15 @@ module Skylab::Callback
       nil
     end
 
-    def error msg
+    def send_error_string msg
       @error_count += 1
       puts_to_channel_line :err, msg  # it looks nicer to have these be w/o prefix
       false
     end
 
-    def info msg
+    def send_info_string msg
       a, m, b = ( /\A\((.+)\)\z/ =~ msg ) ? ['(', $~[1], ')'] : [nil, msg, nil]
-      puts_to_channel_line :info, "#{ a }#{ prefix }#{ m }#{ b }"
+      puts_to_channel_line :send_info_string, "#{ a }#{ prefix }#{ m }#{ b }"
       nil
     end
 
@@ -82,7 +82,7 @@ module Skylab::Callback
         m
       end
       if missing.length.zero? then true else
-        error "#{ prefix }missing required paramer(s): (#{ missing.join ', ' })"
+        send_error_string "#{ prefix }missing required paramer(s): (#{ missing.join ', ' })"
         nil
       end
     end
@@ -99,16 +99,16 @@ module Skylab::Callback
             pn = pn.sub_ext ''
             rs = require "#{ pn }"
             if false == rs
-              info "(using loaded - #{ file })"
+              send_info_string "(using loaded - #{ file })"
             else
-              info "(loaded - #{ file })"
+              send_info_string "(loaded - #{ file })"
             end
           else
-            break( res = error "file not found: #{ pn }" )
+            break( res = send_error_string "file not found: #{ pn }" )
           end
         end
       else
-        error "required - `files`"
+        send_error_string "required - `files`"
       end
     end
 
@@ -130,10 +130,10 @@ module Skylab::Callback
             const_a = md[ :inner ].split CONST_SEP_
             load_module const_a
           else
-            error "doesn't look like a class or module constant - #{ @modul }"
+            send_error_string "doesn't look like a class or module constant - #{ @modul }"
           end
         else
-          error "required - `modul`"
+          send_error_string "required - `modul`"
         end
       end
     end.call
@@ -142,7 +142,7 @@ module Skylab::Callback
     def load_module const_a
       ok = true
       cls = Callback_::Lib_::Module_lib[].value_via_parts const_a do |const, mod|
-        info "(tries to load #{ mod }::#{ const } with `const_get`..)"
+        send_info_string "(tries to load #{ mod }::#{ const } with `const_get`..)"
         if @do_show_backtrace
           mod.const_get const, false
         else
@@ -165,7 +165,7 @@ module Skylab::Callback
       max_line_width =  120
 
       define_method :load_module_fancy_error do |m, c, e|
-        info "failed to load the constant with const_get:"
+        send_info_string "failed to load the constant with const_get:"
         @infostream.puts "  #{ e }"
         a = m.constants
         if a.length.zero?

@@ -12,7 +12,7 @@ module Skylab::Headless
         private
         def parameter_error_structure ev
           _msg = instance_exec( * ev.to_a, & ev.message_proc )
-          error _msg
+          send_error_string _msg
         end
       end
       Parameter_controller = -> a do
@@ -359,9 +359,9 @@ module Skylab::Headless
           if enum.include? val
             valid_p[ val ]
           else
-           _with_client do # slated to be improved [#012]
-             error("#{ val.inspect } is an invalid value " <<
-               "for #{ parameter_label param }")
+           _with_client do  # slated to be improved [#012]
+             send_error_string "#{ val.inspect } is an invalid value #{
+               }for #{ parameter_label param }"
             end
           end
         end

@@ -20,7 +20,7 @@ module Skylab::CSS_Convert
       b = -> o do
         o.on_file_not_found do |pn, e|
           pn or fail "where is pn?"
-          error "this wasn not found : #{ escape_path pn } which was a #{ e }"
+          send_error_string "this wasn not found : #{ escape_path pn } which was a #{ e }"
         end
       end
       _lp = css_parser.parse_file(left, &b)

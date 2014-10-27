@@ -129,7 +129,9 @@ module Skylab::SubTree
       o.on '-- HEAD[~N]', 'will become `git diff HEAD~<n> --numstat' do |x|
         old = @param_h[ :mode_a ]
         @param_h[ :mode_a ] = [ :git_diff, x ]
-        old and call_digraph_listeners( :error, "(clobbering \"#{ old.last }\")" )
+        if old
+          call_digraph_listeners :error_string, "(clobbering \"#{ old.last }\")"
+        end
       end
 
     end
@@ -169,7 +171,7 @@ module Skylab::SubTree
     end
 
     def bork msg
-      call_digraph_listeners :error, msg
+      call_digraph_listeners :error_string, msg
       invite
       nil
     end

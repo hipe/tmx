@@ -3,8 +3,9 @@ module Skylab::SubTree
   class API::Actions::Cov < API::Action
 
     listeners_digraph hub_point: :datapoint,
-                    error: :datapoint,
-                     info: :datapoint,
+              error_event: :datapoint,
+             error_string: :datapoint,
+              info_string: :datapoint,
      number_of_test_files: :datapoint,
                 test_file: :structural,
            tree_line_card: :datapoint,
@@ -20,9 +21,11 @@ module Skylab::SubTree
     end
 
     def init_for_invocation_with_services svcs
-      ep, ip = svcs.at :error, :info
-      ip and on_info ip
-      ep and on_error ep
+      ree, res, ris = svcs.at(
+        :receive_error_event, :receive_error_string, :receive_info_string )
+      ree and on_error_event ree
+      res and on_error_string res
+      ris and on_info_string ris
       self
     end
 
@@ -55,7 +58,7 @@ module Skylab::SubTree
     def normalize_arg_pn x
       use_x = x || ''
       begin
-        (( md = STRIP_TRAILING_RX_.match use_x )) or break error "your #{
+        (( md = STRIP_TRAILING_RX_.match use_x )) or break send_error_string "your #{
           }path looks funny - #{ x.inspect }"
         @arg_pn = ::Pathname.new md[ :no_trailing ]
       end while nil
@@ -102,7 +105,7 @@ module Skylab::SubTree
             end )
           nil
         end
-        error err if err
+        send_error_string err if err
         nil
       end
     end
@@ -121,12 +124,12 @@ module Skylab::SubTree
     end
 
     def get_info_p
-      -> s { call_digraph_listeners :info, s }
+      -> s { call_digraph_listeners :info_string, s }
     end
 
     def tree
       if hub_a.length.zero?
-        error No_Directory__.new @arg_pn
+        send_error_event No_Directory__.new @arg_pn
         false
       else
         self.class::Treeer_[ :hub_a, hub_a, :arg_pn, @arg_pn,
@@ -134,7 +137,7 @@ module Skylab::SubTree
       end
     end
 
-    class Message_
+    class Message_  # wow this looks like an early version of [#br-011]
       class << self ; alias_method :orig_new, :new end
       def self.new &p
         ::Class.new self do

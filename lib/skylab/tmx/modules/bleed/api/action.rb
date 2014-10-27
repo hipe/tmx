@@ -92,13 +92,13 @@ module Skylab
     def config_read   # assumes config exist, emits error
       config.read do |ev|
         ev[:invalid] = -> reason_string do
-          error "#{ reason_string }"
+          send_error_string "#{ reason_string }"
         end
         ev[:is_not_file] = -> pn, type do
-          error "expected file had #{ type } - #{ pn }"
+          send_error_string "expected file had #{ type } - #{ pn }"
         end
         ev[:no_ent] = -> pn do
-          error "config file not found - #{ pn }"
+          send_error_string "config file not found - #{ pn }"
         end
         ev[:error] = method :error  # future-proof
       end
@@ -117,11 +117,11 @@ module Skylab
         end
 
         w.on_error do |e|
-          error e.message
+          send_error_string e.message
         end
 
         w.on_no_change do |e|
-          info e.message
+          send_info_string e.message
         end
 
         w.if_unhandled_non_taxonomic_streams method( :raise )

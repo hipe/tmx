@@ -314,8 +314,8 @@ module Skylab::Test
     end
 
     def help  # via :help
-      info option_parser.banner
-      option_parser.summarize { |s| info s }
+      send_info_string option_parser.banner
+      option_parser.summarize { |s| send_info_string s }
       nil  # <- whether you do nil or true here determines queue etc
     end
 
@@ -327,8 +327,8 @@ module Skylab::Test
 
     def usage msg
       emit_to_channel_line :error, msg
-      info usage_line
-      info "See #{ em "#{ program_name } -h" } for more help."
+      send_info_string usage_line
+      send_info_string "See #{ em "#{ program_name } -h" } for more help."
       false
     end
 
@@ -336,7 +336,7 @@ module Skylab::Test
       @emit_to_channel_line_p[ type, data ]
     end
 
-    def info msg
+    def send_info_string msg
       emit_to_channel_line :info, msg
       nil
     end

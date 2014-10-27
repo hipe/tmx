@@ -31,7 +31,7 @@ module Skylab::Snag
         o.on_info_string handle_inside_info_string
         o.on_new_node -> node do
           # oops the manifest takes care of it
-          # info "added #{ node.identifier.render } #{ node_msg_smry node }"
+          # send_info_string "added #{ node.identifier.render } #{ node_msg_smry node }"
         end
        nil
       end

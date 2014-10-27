@@ -124,7 +124,7 @@ module Skylab::TanMan
       if a.length.zero?
         true
       else
-        error "missing required attribute#{ s a }: #{
+        send_error_string "missing required attribute#{ s a }: #{
           }#{ and_( a.map { |o| "#{ kbd o.label_string }" } ) }" # if..
           # this borks on you just change it to `local_normal_name`
         false

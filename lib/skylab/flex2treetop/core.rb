@@ -561,7 +561,7 @@ module Skylab::Flex2Treetop
       end
     end
 
-    class Resolve_IO__  # :+#tributary-agent
+    class Resolve_IO__  # :+#tributary-agent  poster-child for :+[#hl-022]
 
       Lib_::Funcy_globful[ self ]
 

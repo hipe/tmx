@@ -13,14 +13,14 @@ module Skylab::Treemap
     def activate
       begin
         if @is_active
-          info "already active"
+          send_info_line "already active"
           break
         end
         @executable_path = system.which @executable_name
         if @executable_path
           @is_active = true
         else
-          error "executable by this name is not in #{
+          send_error_line "executable by this name is not in #{
             }the PATH: \"#{ @executable_name }\""
         end
       end while nil
@@ -41,12 +41,12 @@ module Skylab::Treemap
       nil
     end
 
-    def error msg
+    def send_error_line msg
       emit :error, msg
       @is_ready = false
     end
 
-    def info msg
+    def send_info_line msg
       emit :info, msg
       nil
     end

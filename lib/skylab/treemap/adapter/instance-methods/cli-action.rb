@@ -22,7 +22,7 @@ module Skylab::Treemap
           true
         end
       end, -> failed do
-        info failed
+        send_info_line failed
         usage_and_invite nil, "about #{ em name.as_slug } help for #{
           }a particular adapter."
         nil

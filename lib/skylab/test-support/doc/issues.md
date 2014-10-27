@@ -1,3 +1,4 @@
+[#036] #open make lexical scope deeper in quickie main document.
 [#035]       #parent-node:[#021] the system narrative ..
 [#034] #open #doc-test core.rb
 [#033] #open if you un-orphanize core.rb it presents an issue with autoloader

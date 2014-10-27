@@ -36,13 +36,13 @@ module Skylab::Callback
       @pathname = ::Pathname.new( @path ).expand_path
       slpn = ::Skylab.dir_pathname
       if 0 != @pathname.to_s.index( slpn.to_s )
-        error "expected #{ @pathname } to be under #{ slpn }"
+        send_error_string "expected #{ @pathname } to be under #{ slpn }"
       else
         @pathname.relative_path_from slpn
       end
     end
 
-    def error msg
+    def send_error_string msg
       @infostream.puts "#{ @prefix }#{ msg }"
       false
     end
@@ -55,7 +55,7 @@ module Skylab::Callback
 
     def load_anchor_mod
       if @tok_a.length.zero?
-        error "expecting more than just #{ @subp.inspect } for a file!"
+        send_error_string "expecting more than just #{ @subp.inspect } for a file!"
       else
         Autoloader.const_reduce do |cr|
           cr.const_path [ @subp, * @tok_a ]
@@ -69,14 +69,14 @@ module Skylab::Callback
       if API::Looks_like_digraph_module_[ @anchor_mod ]
         [ @anchor_mod ]
       elsif depth.zero?
-        error "can't procede - does not respond to `listeners_digraph` - #{ @anchor_mod }"
+        send_error_string "can't procede - does not respond to `listeners_digraph` - #{ @anchor_mod }"
       else
         @child_relconst_a = []
         @relname = "#{ @anchor_mod.name }::"
         res = _scan_the_depths @anchor_mod, depth - 1
         if res then res else
           len = @child_relconst_a.length
-          error "did not find a module that `listeners_digraph` among ::#{ @anchor_mod } #{
+          send_error_string "did not find a module that `listeners_digraph` among ::#{ @anchor_mod } #{
             }or its #{ len } loaded #{ 1 == len ? 'child' : 'children' } #{
             }#{ depth } #{ }level#{ 's' if depth != 1 } #{
             }below it#{ if len.nonzero? then ": (#{

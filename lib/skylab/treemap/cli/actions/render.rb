@@ -118,14 +118,14 @@ module Skylab::Treemap
       a.on_pdf do |e|
         if @do_exec
           if a.stop_is_requested_before :exec_open_eventpoint
-            info "(stop was requested before executing opening of pdf.)"
+            send_info_string "(stop was requested before executing opening of pdf.)"
           else
             if e.path.exist?
-              info "calling exec() to open the pdf (!) - #{ escape_path e.path }"
+              send_info_line "calling exec() to open the pdf (!) - #{ escape_path e.path }"
               cmd = "open #{ e.path }"
               exec cmd
             else
-              error "expected pdf output not found: #{ escape_path e.path }"
+              send_error_line "expected pdf output not found: #{ escape_path e.path }"
             end
           end
         end
@@ -152,7 +152,7 @@ module Skylab::Treemap
         idx = @param_queue.index :stop  # nil ok
         if idx
           if 0 == idx
-            error "#{ param :stop } must come somewhere after at #{
+            send_error_string "#{ param :stop } must come somewhere after at #{
               }least one of #{ or_ a_order.map{ |x| param x } }"
             break
           end

@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::CodeMolester::TestSupport::Config::File
 
-  describe "[cm] config file edge (actualy just old rspec-only tests)" do
+  describe "[cm] config file edge (actualy just old rspec-only tests)" do  # :+#rspec-only because: specify is too crazy
 
     extend TS_
 

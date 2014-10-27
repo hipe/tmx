@@ -4,7 +4,7 @@ module Skylab::Git
 
     def initialize i, o, e
       @y = ::Enumerator::Yielder.new( & e.method( :puts ) )
-      @snitch = Support_::Snitch_.new @y, self
+      @snitch = Support__::Snitch.new @y, self
       @o = o  # the output stream
       @program_name = @is_finished = nil
     end
@@ -207,30 +207,29 @@ module Skylab::Git
       end
     end
 
-    module Support_
-      class Snitch_  # snitches are tracked by [#fa-051]
+    module Support__
+
+      class Snitch  # snitches are tracked by [#fa-051]
+
         def initialize y, expression_agent
           @y = y
           @expression_agent = expression_agent
         end
+
         attr_reader :y
-        def info &blk
-          @y << render_line( blk )
-          nil  # important
-        end
-        def warn &blk
-          @y << "warning - #{ render_line blk }"
-          nil  # important
-        end
-        def error &blk
+
+        def receive_error_string & blk
           @y  << "error - #{ render_line blk }"
           false  # important
         end
+
         def multiline_note &blk
           @expression_agent.instance_exec @y, &blk
           nil
         end
+
       private
+
         def render_line blk
           @expression_agent.instance_exec( & blk )  # see snitches elsewhere
         end
@@ -251,14 +250,24 @@ module Skylab::Git
             # we use the first line to determine whether the input list has
             # the margin that git puts there #hack-alert or is some (e.g
             # hand-written) list
-            line = scn.gets or
-              break( snitch.error { "there were no input lines" } )
+            line = scn.gets
+            if ! line
+              x = snitch.receive_error_string do
+                "there were no input lines"
+              end
+              break x
+            end
             parse = Line_parser_[ line ]
             branch_a = [ ]
             begin
               a = parse[ line ] and branch_a << Branch_[ * a ]
             end while (( line = scn.gets ))
-            branch_a.length.zero? and break snitch.error { "no lines matched" }
+            if branch_a.length.zero?
+              x = snitch.receive_error_string do
+                "no lines matched"
+              end
+              break x
+            end
             allocate.instance_exec do
               initialize snitch
               init_from_branch_a branch_a
@@ -390,7 +399,9 @@ module Skylab::Git
         private
 
           def bork msg
-            @snitch.error { msg }
+            @snitch.receive_error_string do
+              msg
+            end
             false
           end
 

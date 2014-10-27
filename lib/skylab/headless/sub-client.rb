@@ -104,9 +104,13 @@ end
       nil                         # it's just never a good idea.  ever.)
     end
 
-    def error s                   # be extra careful around methods that
+    def send_error_string s
+      send_error s
+    end
+
+    def send_error x              # be extra careful around methods that
       @error_count += 1           # affect or are expected to affect the
-      call_digraph_listeners :error, s              # validity of your sub-client!
+      call_digraph_listeners :error, x  # validity of your sub-client!
       false                       # this implementation is the result of a
     end                           # "perfect abstraction" but may still cause
                                   # you pain if you're not careful.
@@ -127,7 +131,11 @@ end
       request_client.send :io_adapter # the streams, e.g. the instream
     end
 
-    def info x                    # provided as a convenience for this
+    def send_info_string s
+      send_info s
+    end
+
+    def send_info x               # provided as a convenience for this
       call_digraph_listeners :info, x               # extremely common implementation
       nil                         # (note that `x` might be an `h`)
     end
@@ -136,7 +144,7 @@ end
       request_client.send :parameter_label, x, *rest
     end
 
-    def payload x                 # provided as a convenience for this common
+    def send_payload x            # provided as a convenience for this common
       call_digraph_listeners :payload, x            # emitter "macro" -- not all sub-clients
       nil                         # will necessarily call_digraph_listeners this.
     end

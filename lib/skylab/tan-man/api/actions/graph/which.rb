@@ -12,21 +12,21 @@ module Skylab::TanMan
         col = collections.dot_file
         b = col.ready? -> o do
           if :no_config_dir == o.stream_name
-            info "#{ o.message } - #{ o.dirname }"
+            send_info_string "#{ o.message } - #{ o.dirname }"
             emit :call_to_action, template: "try {{action}} to create it",
                               action_class: API::Actions::Init # #ref [#059]
           else
-            info o.message
+            send_info_string o.message
             res = false # meh
           end
         end,
         -> no_param do
-          info "there is no #{ lbl no_param } value in the config"
+          send_info_string "there is no #{ lbl no_param } value in the config"
           emit :call_to_action, template: 'use {{action}} to create one',
                             action_class: API::Actions::Graph::Use #ref [#059]
         end,
         -> no_file do
-          info "dotfile does not exist: #{ escape_path no_file }"
+          send_info_string "dotfile does not exist: #{ escape_path no_file }"
           emit :call_to_action, template: 'use {{action}} to create it',
                             action_class: API::Actions::Graph::Use #ref [#059]
         end

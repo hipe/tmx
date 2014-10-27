@@ -144,10 +144,10 @@ module Skylab::TanMan::TestSupport::Sexp
     end
 
     def execute
-      info "(parsing upstream which is a #{ upstream.class })"
-      info "(parser is #{ parser.class })"
+      send_info_string "(parsing upstream which is a #{ upstream.class })"
+      send_info_string "(parser is #{ parser.class })"
       result = parse upstream
-      info "OK, WE GOT (after #{ 1000 * parse_time_elapsed_seconds
+      send_info_string "OK, WE GOT (after #{ 1000 * parse_time_elapsed_seconds
         } ms): #{ result.class }"
       if result
         if eval_string
@@ -195,14 +195,14 @@ module Skylab::TanMan::TestSupport::Sexp
           if argv.empty?
             ok = true
           else
-            error "Upstream already resolved. #{
+            send_error_string "Upstream already resolved. #{
               }Expecting zero args, had #{ argv.length }: #{argv.first.inspect}"
           end
         elsif 1 == argv.length
           path = argv.shift
           if '-' == path
             if @stdin.tty?
-              error "expecting STDIN to be a readable stream, was tty."
+              send_error_string "expecting STDIN to be a readable stream, was tty."
             else
               self.upstream = build_stream_input_adapter @stdin
               @stdin = nil
@@ -214,13 +214,13 @@ module Skylab::TanMan::TestSupport::Sexp
               self.upstream = build_file_input_adapter @pathname
               ok = true
             else
-              error "file not found: #{ pth @pathname }"
+              send_error_string "file not found: #{ pth @pathname }"
             end
           else
-            error "can't have both STDIN and <pathspec>: #{ path }"
+            send_error_string "can't have both STDIN and <pathspec>: #{ path }"
           end
         else
-          error "expecting #{ pathspec_syntax }, had #{ argv.length } args."
+          send_error_string "expecting #{ pathspec_syntax }, had #{ argv.length } args."
         end
       end while nil
       ok
@@ -260,7 +260,7 @@ module Skylab::TanMan::TestSupport::Sexp
 
     def upstream_string= str
       if upstream
-        error "can't set upstream string, upstream is already set - #{
+        send_error_string "can't set upstream string, upstream is already set - #{
           }#{ str.inspect }"
       else
         self.upstream = build_string_input_adapter str

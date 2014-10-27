@@ -195,7 +195,7 @@ module Skylab::CodeMolester
       nil
     end
 
-    def read & p
+    def read & p  # :+[#hl-022] for sure
       @pathname or raise "cannot read - no pathname associated with this #{ noun }"
       st = Read__.new ; p and p[ st ]
       esc_p = st.escape_path

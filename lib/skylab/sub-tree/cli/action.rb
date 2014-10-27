@@ -19,8 +19,15 @@ module Skylab::SubTree
       if message_x.respond_to? :render_with
         message_x = message_x.render_with some_expression_agent
       end
-      @cli_client_emit_p[ stream_i, message_x ]
+      @cli_client_emit_p[ MAP_HACK_H__.fetch( stream_i ), message_x ]
       nil
     end
+
+    MAP_HACK_H__ =  {  # bridge while #open [#009]
+      error_event: :error,  # won't fly in real world
+      info_string: :info,
+      payload_string: :payload
+    }
+
   end
 end

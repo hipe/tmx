@@ -4,6 +4,8 @@ module Skylab::CodeMolester::TestSupport
 
 describe "[cm] sexp auto" do
 
+  ::Skylab::TestSupport::Quickie.apply_experimental_specify_hack self
+
   cache = { }                     # avoid warnings about etc. don't worry,
                                   # cacheing like this is *always* fine
 
@@ -83,10 +85,22 @@ describe "[cm] sexp auto" do
     context "because the grammar is more complex, stuff starts to happen magically" do
 
       context 'the sexp for the string "mary"' do
-        let(:input) { "mary" }
-        let(:expected) { [:person_name, [:first, "mary"], [:last, '']] }
-        specify { should eql(expected) }
-        specify { should be_kind_of CM_::Sexp } # !
+
+        let :input do
+          "mary"
+        end
+
+        let :expected do
+          [ :person_name, [ :first, "mary" ], [ :last, '' ] ]
+        end
+
+        specify do
+          should eql expected
+        end
+
+        specify do
+          should be_kind_of CM_::Sexp
+        end
       end
 
       context 'the sexp for the string "joe bob" (note it is sub-optimal)' do
@@ -120,9 +134,10 @@ describe "[cm] sexp auto" do
     end
 
     it "(the treetop grammar parses inputs like normal)" do
-      parser.parse('mary').should_not be_nil
-      parser.parse('joe bob').should_not be_nil
-      parser.parse('joe bob briggs').should be_nil
+      o = parser
+      o.parse( 'mary' ).nil?.should eql false
+      o.parse( 'joe bob' ).nil?.should eql false
+      o.parse( 'joe bob briggs' ).should be_nil
     end
 
     context "because the grammar is broken up more optimally" do

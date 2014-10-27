@@ -82,7 +82,7 @@ module Skylab::TanMan
         end
 
         o.global_invalid = -> e do
-          if err then err[ e ] else error e end
+          if err then err[ e ] else send_error_string e end
         end
 
         o.local_invalid = o.global_invalid
@@ -98,14 +98,14 @@ module Skylab::TanMan
         o.on_write = -> e { write_resource e.touch!.resource }
         o.on_all   = -> e { emit e unless e.touched? }
         o.on_remote_not_found do |e|
-          error "couldn't find a remote named #{ e.remote_name.inspect }"
+          send_error_string "couldn't find a remote named #{ e.remote_name.inspect }"
           a = remotes.map { |r| kbd r.name }
           rc = e.resources_count
           x = "#{ s a, :no }known remote#{s a} #{s a, :is} #{ and_ a }".strip
           x = "#{x} in #{ s rc, :this }#{" #{ rc }" unless 1==rc }#{
               } searched config resource#{ s rc }." # #linguitastic
           e.touch!
-          info x
+          send_info_string x
         end
       end
     end
@@ -160,7 +160,7 @@ module Skylab::TanMan
 
       resource.write_with_is_dry is_dry do |w|
 
-        w.on_error(& method( :error ) ) # propagate the text msg up
+        w.on_error(& method( :send_error_string ) ) # propagate the text msg up
 
         w.on_before_create w.on_before_update -> o do  # first part of msg
           serr.write o.message_proc[]
@@ -171,7 +171,7 @@ module Skylab::TanMan
         end
 
         w.on_no_change do |txt|
-          info txt
+          send_info_string txt
         end
 
         w.if_unhandled_non_taxonomic_streams method( :raise )
@@ -190,15 +190,15 @@ module Skylab::TanMan
         if resource.key? name
           before = resource[name]
           if value == before
-            info "#{ name } already set to #{ before.inspect }"
+            send_info_string "#{ name } already set to #{ before.inspect }"
             true
           else
-            info "changing #{name} from #{ before.inspect } to #{value.inspect}"
+            send_info_string "changing #{name} from #{ before.inspect } to #{value.inspect}"
             resource[name] = value
             write_resource resource
           end
         else
-          info "creating #{ name } value: #{ value.inspect }"
+          send_info_string "creating #{ name } value: #{ value.inspect }"
           resource[name] = value
           write_resource resource
         end

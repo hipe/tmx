@@ -19,19 +19,19 @@ module Skylab::TanMan
       @dir ||= path.join(local_conf_dirname)
     end
 
-    def execute
+    def execute  # :+[#hl-022]
       if dir.exist?
         if dir.directory?
           skip "already exists, skipping: #{ escape_path dir }"
         else
-          error "is not a directory, must be: #{ escape_path dir }"
+          send_error_string "is not a directory, must be: #{ escape_path dir }"
         end
       elsif ! path.exist?
-        error "directory must exist: #{ escape_path path }"
+        send_error_string "directory must exist: #{ escape_path path }"
       elsif path.file?
-        error "path was file, not directory: #{ escape_path path }"
+        send_error_string "path was file, not directory: #{ escape_path path }"
       elsif ! path.writable?
-        error "cannot write, parent directory not writable: #{
+        send_error_string "cannot write, parent directory not writable: #{
           }#{ escape_path path }"
       else
         mkdir dir, :verbose => true, :noop => dry_run? # see svcs fu !

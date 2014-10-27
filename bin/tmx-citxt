@@ -63,7 +63,7 @@ module Skylab::CI_Txt
         head_pathname = @git_dir_pathname.join 'HEAD'
         content = head_pathname.read
         unless ref_rx =~ content
-          error "failed to read content of #{ escape_path head_pathanme }"
+          send_error_string "failed to read content of #{ escape_path head_pathanme }"
           res = false
           break
         end
@@ -112,13 +112,13 @@ module Skylab::CI_Txt
         use_dir = nil
         if @dir_pathname_raw
           if ! dir_pathname_expanded.directory?
-            error "#{ em param_label } must be directory: #{ @dir_pathname_raw }"
+            send_error_string "#{ em param_label } must be directory: #{ @dir_pathname_raw }"
             break( res = false )
           end
           inside = dir_pathname_expanded.to_s
           outside = @git_dir_pathname.dirname.to_s
           if 0 != inside.index( outside )
-            error "#{ inside } must be inside #{ outside }"
+            send_error_string "#{ inside } must be inside #{ outside }"
             break( res = false )
           end
           use_dir = dir_pathname_expanded
@@ -131,7 +131,7 @@ module Skylab::CI_Txt
         end
         branch_name = self.branch_name or break
         first_line = "[##{ branch_name }]"
-        info( first_line ) if @be_verbose
+        send_info_string( first_line ) if @be_verbose
         bytes = nil
         if @is_dry_run
           bytes = 0
@@ -140,7 +140,7 @@ module Skylab::CI_Txt
             bytes = fh.write "#{ first_line }\n\n  + " # etc
           end
         end
-        info "created #{ escape_path pathname } (#{ bytes } bytes)"
+        send_info_string "created #{ escape_path pathname } (#{ bytes } bytes)"
         res = pathname
       end while nil
       res
@@ -168,7 +168,7 @@ module Skylab::CI_Txt
               break
             end
           end
-          info "using #{ escape_path existing }"
+          send_info_string "using #{ escape_path existing }"
         else
           existing = create_initial_file
           existing or break( res = existing )
@@ -176,7 +176,7 @@ module Skylab::CI_Txt
         editor = ::ENV['EDITOR'] || 'vi'
         cmd = "#{ editor } #{ escape_path existing }"
         if @is_dry_run
-          info "would have executed `#{ cmd }`"
+          send_info_string "would have executed `#{ cmd }`"
         else
           exec cmd
         end
@@ -227,7 +227,7 @@ module Skylab::CI_Txt
         end
       end
       if ! found
-        error "couldn't find #{ em git_dir_basename } directory anywhere from #{
+        send_error_string "couldn't find #{ em git_dir_basename } directory anywhere from #{
           }pwd (\"#{ pwd }\") up to \"/\" (#{ seen.length } dirs)"
       end
       found
@@ -241,7 +241,7 @@ module Skylab::CI_Txt
       if dir_pathname_expanded == existing.dirname
         true
       else
-        error "couldn't reconcile filenames - #{
+        send_error_string "couldn't reconcile filenames - #{
         }you specified a #{ em param_label } (#{ @dir_pathname_raw }), #{
         }but an existing #{ filename } was found (#{ escape_path existing }) #{
         }and it was not in that directory. Either don't specify the path or #{
@@ -282,7 +282,7 @@ module Skylab::CI_Txt
       nil
     end
 
-    def error msg
+    def send_error_string msg
       emit :error, "couldn't #{ em program_name } - #{ msg }"
       false
     end
@@ -291,7 +291,7 @@ module Skylab::CI_Txt
       pathname.relative_path_from( @pwd ).to_s
     end
 
-    def info msg
+    def send_info_string msg
       emit :info, "#{ em program_name } #{ msg }"
       nil
     end

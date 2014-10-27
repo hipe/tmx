@@ -10,7 +10,7 @@ for one thing the file either does or does not already exist, and for these
 two states we will variously use the verbs `update` or `create` respectively
 in various symbols below.
 
-we call_digraph_listeners separate events immediately `before` and immediately `after` the file
+we emit separate events immediately `before` and immediately `after` the file
 is written to, which, when events on such streams are received by the caller
 that has a CLI modality, they are frequently written out as one line in two
 parts, with the reasoning that it is useful to see separately that the file
@@ -23,7 +23,7 @@ thrown by the filesystem.)
 the four symbols introduced above (`create`, `update`, `before`, `after`)
 exist as taxonomic streams, and then additionally one stream each for the
 four permutations of the two "exponents" for each of the two "categories"
-exists ("before_create", "after_update") etc.
+exists (`before_create`, `after_update`) etc.
 
 ("taxonomic streams" are streams that exist only to categorize other streams
 (kind of like folders, more like tags). they are useful if you wanted

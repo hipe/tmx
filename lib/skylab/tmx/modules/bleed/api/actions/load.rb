@@ -14,11 +14,11 @@ module Skylab::TMX::Modules::Bleed::API
           dir_pth = config_get_path or break
           dir_pn = ::Pathname.new expand_tilde( dir_pth )
           if ! dir_pn.exist?
-            break( error "not a directory, won't add to PATH: #{ dir_pn }" )
+            break( send_error_string "not a directory, won't add to PATH: #{ dir_pn }" )
           end
           script_pn = dir_pn.join script_path
           if ! script_pn.exist?
-            break error "expected to exist, didn't - #{ script_pn }"
+            break send_error_string "expected to exist, didn't - #{ script_pn }"
           end
           require 'open3'  # meh
           ::Open3.popen3( script_pn.to_s ) do |sin, sout, serr, thread|

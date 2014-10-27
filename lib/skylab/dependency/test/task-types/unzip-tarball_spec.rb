@@ -2,9 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Dependency::TestSupport::Tasks
 
-  # :+#not-quickie - nested `before` block used
-
-  describe "[de] task-types unzip tarball" do
+  describe "[de] task-types unzip tarball" do   # :+#no-quickie because: nested `before`
 
     extend TS_
 

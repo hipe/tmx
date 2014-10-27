@@ -9,7 +9,7 @@ treetop-tools       q [ ]
 code-molester       Q [ ]
 
 dependency          Q [ ]
-slake               Q [ ]
+slake               q [ ]
 
 slicer              q [ ]
 beauty-salon        q [ ]
@@ -32,7 +32,7 @@ porcelain           Q [ ]
 
 brazen              q [ ]
 callback            q [ ]
-headless            Q [ ]
+headless            q [ ]
 basic               q [ ]
 meta-hell           q [ ]
 

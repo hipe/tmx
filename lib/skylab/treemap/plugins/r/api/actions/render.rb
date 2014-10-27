@@ -76,12 +76,12 @@ module Skylab::Treemap
 
     def bridge
       @bridge ||= Plugins::R::Bridge.new do |o|
-        o.on_info(& method(:info) )
-        o.on_error(& method(:error))
+        o.on_info( & method( :send_info_line ) )
+        o.on_error( & method( :send_error_line ) )
       end
     end
 
-    def error msg, metadata=nil
+    def send_error_line msg, metadata=nil
       @on_failure[ msg, metadata ]
       false
     end
@@ -130,7 +130,7 @@ module Skylab::Treemap
       res
     end
 
-    def info msg
+    def send_info_line msg
       @on_info[ msg ] if @on_info
       nil
     end
@@ -155,18 +155,18 @@ module Skylab::Treemap
 
     def normalize_csv_path
       @csv_in_pathname.exist? or begin
-        error "couldn't find csv", path: @csv_in_pathname
+        send_error_string "couldn't find csv", path: @csv_in_pathname
       end
     end
 
     def normalize_tmpdir
       if @tmpdir.is_normalized
-        info "tmpdir already normalized."
+        send_info_string "tmpdir already normalized."
         true
       elsif @tmpdir.normalize # emits events to upstream client
         true
       else
-        error "failed to normalized tmpdir", path: @tmpdir
+        send_error_string "failed to normalized tmpdir", path: @tmpdir
         false
       end
     end

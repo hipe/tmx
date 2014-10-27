@@ -1,24 +1,23 @@
 require_relative '../test-support'
 
-module Skylab::Headless::TestSupport::NLP::EN::Phrase
+module Skylab::Headless::TestSupport::NLP::EN::POS
 
-  ::Skylab::Headless::TestSupport::NLP::EN[ self ]
+  Parent_ = ::Skylab::Headless::TestSupport::NLP::EN
 
-  # le Quickie.
+  Parent_[ self ]
 
-  include ::Skylab::Headless  # so you can say 'NLP' (before below!)
-  include Constants  # so you can sat 'TS' (the right one!) (after above!)
+  include Constants
 
   extend TestSupport_::Quickie
 
-  describe "#{ NLP::EN::POS } - Phrase" do
+  describe "[hl] NLP EN POS - phrase" do
 
     context "lexemes and productions" do
 
-      context "a regular verb cojugates" do
+      context "a regular verb conjugates" do
 
         it "as lemma - string is persistent and immutable" do
-          v = NLP::EN::POS::Verb.produce 'look'
+          v = Parent_subject_[]::Verb.produce 'look'
           v.string.should eql( 'look' )
           oid = v.string.object_id
           v.string.object_id.should eql( oid )
@@ -28,16 +27,16 @@ module Skylab::Headless::TestSupport::NLP::EN::Phrase
         end
 
         it "(lexicon caches every new lexeme for now)" do
-          p1 = NLP::EN::POS::Verb.produce 'bizzle'
+          p1 = Parent_subject_[]::Verb.produce 'bizzle'
           s1 = p1.string
-          p2 = NLP::EN::POS::Verb.produce 'bizzle'
+          p2 = Parent_subject_[]::Verb.produce 'bizzle'
           s2 = p2.string
           ( p1.object_id == p2.object_id ).should eql( false )
           ( s1.object_id == s2.object_id ).should eql( true )  # same lexeme
         end
 
         let :production do
-          NLP::EN::POS::Verb.produce 'look'
+          Parent_subject_[]::Verb.produce 'look'
         end
 
         it "preterite" do
@@ -60,13 +59,13 @@ module Skylab::Headless::TestSupport::NLP::EN::Phrase
       context "an irregular verb conjugates (from a lexicon)" do
 
         it "lemma" do
-          x = NLP::EN::POS::Verb.produce 'have'
+          x = Parent_subject_[]::Verb.produce 'have'
           x.string.should eql( 'have' )
         end
 
         it "you can look it up with a conjugated form - works as expected" do
-          neato = NLP::EN::POS::Verb.produce 'has'
-          meato = NLP::EN::POS::Verb.produce 'have'
+          neato = Parent_subject_[]::Verb.produce 'has'
+          meato = Parent_subject_[]::Verb.produce 'have'
           neato.string.should eql( 'has' )
           meato.string.should eql( 'have' )
           both = [ neato, meato ]
@@ -78,7 +77,7 @@ module Skylab::Headless::TestSupport::NLP::EN::Phrase
         end
 
         let :production do
-          NLP::EN::POS::Verb.produce 'have'
+          Parent_subject_[]::Verb.produce 'have'
         end
 
         it "preterite, third singular" do
@@ -94,12 +93,12 @@ module Skylab::Headless::TestSupport::NLP::EN::Phrase
     context "combinatorily inflective lexemes (The Pronoun)" do
 
       it "a pronoun remembers its surface form" do
-        p = NLP::EN::POS::Noun.produce 'I'
+        p = Parent_subject_[]::Noun.produce 'I'
         p.string.should eql( 'I' )
       end
 
       let :her do
-        NLP::EN::POS::Noun.produce 'her'
+        Parent_subject_[]::Noun.produce 'her'
       end
 
       it "set a grammatical category to a bad exponent - key error" do
@@ -119,7 +118,7 @@ module Skylab::Headless::TestSupport::NLP::EN::Phrase
       end
 
       it "FUZZY GRAMMATICAL CATEGORY STATE (unknown) - ALTERNATION" do
-        p = NLP::EN::POS::Noun.produce 'he'
+        p = Parent_subject_[]::Noun.produce 'he'
         p.string.should eql( 'he' )
         p.gender = nil
         x = p.string
@@ -141,7 +140,7 @@ module Skylab::Headless::TestSupport::NLP::EN::Phrase
 
         # #todo - loosen this test or eliminate it later. it's a joist
         it "builds a tagged POS tree from tagged input" do
-          sp = NLP::EN::POS::Sentence::Phrase.new np: 'I', vp: 'think'
+          sp = Subject_[].new np: 'I', vp: 'think'
           sp.np.n.lexeme_class.should eql( sp.np.n.class.lexeme_class )
           sp.np.n.lexeme_class::Production || nil  # should not raise
           c = combi[ sp.np.n ]
@@ -154,7 +153,7 @@ module Skylab::Headless::TestSupport::NLP::EN::Phrase
         end
 
         let :sp do
-          NLP::EN::POS::Sentence::Phrase.new np: 'I', vp: 'think'
+          Subject_[].new np: 'I', vp: 'think'
         end
 
         it "renders" do
@@ -179,8 +178,9 @@ module Skylab::Headless::TestSupport::NLP::EN::Phrase
     end
 
     context "subject verb agreement" do
+
       let :sp do
-        NLP::EN::POS::Sentence::Phrase.new np: 'I', vp: 'balk'
+        Subject_[].new np: 'I', vp: 'balk'
       end
 
       it "verb agrees with subject (sorta hacked)" do
@@ -193,8 +193,9 @@ module Skylab::Headless::TestSupport::NLP::EN::Phrase
     end
 
     context "original target use case" do
+
       let :sp do
-        NLP::EN::POS::Sentence::Phrase.new np: 'julie',
+        Subject_[].new np: 'julie',
           vp: { v: 'has', np: 'aspiration' }
       end
 
@@ -207,6 +208,16 @@ module Skylab::Headless::TestSupport::NLP::EN::Phrase
         sp.vp.np.number = :plural
         sp.string.should eql( 'julie had aspirations' )
       end
+    end
+
+    grandparent_subject = Subject_
+
+    Parent_subject_ = -> do
+      grandparent_subject[]::POS
+    end
+
+    Subject_ = -> do
+      Parent_subject_[]::Sentence::Phrase
     end
   end
 end

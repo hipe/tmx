@@ -7,7 +7,7 @@ require 'bundler'
   stderr = $stderr
   enum = nil
 
-  define_method :info do |*msgs, &blk|
+  define_method :send_info_string do |*msgs, &blk|
     enum ||= ::Enumerator::Yielder.new { |msg| stderr.puts "(#{ msg })" }
     msgs.each { |msg| enum << msg }
     blk and blk[ enum ]
@@ -19,7 +19,7 @@ end.call
 begin
   Bundler.setup :default, :development
 rescue Bundler::BundlerError => e
-  info do |i|
+  send_info_string do |i|
     i << e.message
     i << "Run `bundle install` to install missing gems"
   end
@@ -62,7 +62,7 @@ RDoc::Task.new do |rdoc|
   if vpn.exist?
     rdoc.title = "tmx #{ vpn.read.chomp }"
   else
-    info "version unknown because no such path - #{ vpn }"
+    send_info_string "version unknown because no such path - #{ vpn }"
     rdoc.title = "tmx"
   end
 end

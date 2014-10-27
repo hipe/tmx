@@ -97,7 +97,7 @@ module Skylab::Treemap
         forml, actul = formal.names, param_h.keys
         good, bad = [:&, :-].map { |x| actul.send x, forml } # 1. check for and
         if bad.length.nonzero?                             # short circuit if
-          error "unrecognized parameter#{ s bad }: #{      # any bad keys.
+          send_error_string "unrecognized parameter#{ s bad }: #{      # any bad keys.
             }#{ and_ bad.map{ |k| param k } }"
           break
         end                                                # 2. absorb provided
@@ -111,7 +111,7 @@ module Skylab::Treemap
           m
         end
         if a.length.nonzero?
-          error "missing required parameter#{ s a } - #{
+          send_error_string "missing required parameter#{ s a } - #{
             }#{ and_ a.map { |o| param o.first } }"
           break
         end
@@ -144,13 +144,13 @@ module Skylab::Treemap
 
     # parts of the system seem to think they are special
 
-    def error text, *annot
+    def send_errr_line text, *annot
       @error_count += 1
       emit :error, text, *annot
       false
     end
 
-    def info text, *annot  # they think the rules don't apply
+    def send_info_line text, *annot  # they think the rules don't apply
       emit :info, text, *annot
       false
     end
@@ -187,7 +187,7 @@ module Skylab::Treemap
           y
         end
         errors.clear
-        error "#{ param fattr_norm_name } #{ phrase_a.join ' and it ' }"
+        send_error_string "#{ param fattr_norm_name } #{ phrase_a.join ' and it ' }"
       end
       @validation_errors.clear
       nil

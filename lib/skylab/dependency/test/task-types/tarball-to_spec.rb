@@ -2,9 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Dependency::TestSupport::Tasks
 
-  # :+#not-quickie - nested `before` used
-
-  describe TaskTypes::TarballTo do
+  describe "[de] task-types - tarball to " do  # :+#no-quickie because: nested `before`
 
     extend TS_
 

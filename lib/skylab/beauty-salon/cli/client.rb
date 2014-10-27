@@ -133,7 +133,7 @@ module Skylab::BeautySalon
   dsl_off
 
 
-    def on_info e
+    def on_info_string e  # meh
       msg = e.payload_a.fetch 0
       if '(' == msg[ 0 ]
         a, b = '(', ')' ; msg = msg[ 1 .. -2 ]

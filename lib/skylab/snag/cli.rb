@@ -364,7 +364,7 @@ module Skylab::Snag
         o.on_error_string handle_error_string
         o.on_info_event handle_inside_info_event
         o.on_info_string handle_info_line
-        o.on_invalid_node { |e| info invalid_node_message( e ) }
+        o.on_invalid_node { |e| send_info_string invalid_node_message( e ) }
         o.on_output_line handle_payload_line
       end
     end

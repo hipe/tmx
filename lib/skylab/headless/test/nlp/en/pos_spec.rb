@@ -4,7 +4,7 @@ module Skylab::Headless::TestSupport::NLP::EN
 
   describe "[hl] NLP EN POS" do
 
-    context "NLP EN POS noun" do
+    context "noun" do
 
       let :subject do
         Subject_[]::POS::Noun[ 'foot' ]
@@ -29,7 +29,7 @@ module Skylab::Headless::TestSupport::NLP::EN
       end
     end
 
-    context "NLP EN POS verb" do
+    context "verb" do
 
       context "`preterite`" do
 

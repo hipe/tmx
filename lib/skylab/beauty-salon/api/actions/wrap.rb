@@ -9,7 +9,7 @@ module Skylab::BeautySalon
            [ :do_number_the_lines, :arity, :zero_or_one ],
            [ :file, :arity, :one ]
 
-    listeners_digraph :info_line, :info, :normalization_failure_line_notify
+    listeners_digraph :info_line, :info_string, :normalization_failure_line_notify
 
     services [ :ostream, :ivar ] , [ :estream, :ivar ]
 
@@ -37,9 +37,9 @@ module Skylab::BeautySalon
           end
         end
         ok or break
-        @scn.count.zero? and info "(file had no lines - #{ @file })"
+        @scn.count.zero? and info_string "(file had no lines - #{ @file })"
         if ! @did_engage
-          info "(the lines of the file (#{
+          info_string "(the lines of the file (#{
             @scn.count.zero? ? 'none' : "1-#{ @scn.count }" }) did not #{
             }intersect with the selected lines (#{
             }#{ @line_range_union.describe }))"
@@ -135,7 +135,7 @@ module Skylab::BeautySalon
       else
         @paystream = @ostream
       end
-      @be_verbose and info "line range union: (#{ @line_range_union.describe })"
+      @be_verbose and info_string "line range union: (#{ @line_range_union.describe })"
       @engage_head = nil
       if @do_preview and @be_verbose and @do_number_the_lines
         @engage_head = "     + "  # ick

@@ -86,7 +86,7 @@ module Skylab::Treemap
         res = tick_eventpoint( :csv_eventpoint ) or break
         res = csv_to_treemap or break
         res = tick_eventpoint( :tree_eventpoint ) or break
-        info "finished."
+        send_info_line "finished."
         emit :pdf, path: @outpath
         res = true
       end while nil
@@ -102,7 +102,7 @@ module Skylab::Treemap
         curr_bytes = csv_tmp_pathname.read
         next_bytes = Treemap::Services::File::CSV::Render[ @tree ]
         yes = ! next_bytes || next_bytes != curr_bytes
-        yes or info '(no change in csv. skipping)'
+        yes or send_info_line '(no change in csv. skipping)'
         yes
       end
     end
@@ -112,18 +112,18 @@ module Skylab::Treemap
       begin
         param_h = {
                    csv_inpath: csv_tmp_pathname,
-                         info: method( :info ),
+                         send_info_line: method( :send_info_line ),
                    stop_at: @stop_at,
                         title: title,
                        tmpdir: tmpdir,
                            #--*--
                       payline: method( :payload_line ),
                       success: -> msg, metadata do
-                                 info "generated treemap: #{ msg }",
+                                 send_info_line "generated treemap: #{ msg }",
                                  metadata
                                end,
                       failure: -> msg, metadata do
-                                 error "failed to generate treemap: #{ msg }",
+                                 send_error_line "failed to generate treemap: #{ msg }",
                                  metadata
                                end
         }
@@ -147,7 +147,7 @@ module Skylab::Treemap
       if formal_attributes.has? attr
         true
       else
-        error "sorry, the adapter #{ em adapter_box.hot_name } #{
+        send_error_line "sorry, the adapter #{ em adapter_box.hot_name } #{
           }failed to load #{ kbd attr }, which is an attribute this #{
           }logic requires."
         false
@@ -157,7 +157,7 @@ module Skylab::Treemap
     def inpath_to_tree
       begin
         res = Treemap::Services::File::Indented::Parse[ formal_attributes,
-          char, inpath, stylus, -> e { error e } ]
+          char, inpath, stylus, -> e { send_error_line e } ]
         res or break
         @tree = res
         res = true
@@ -181,7 +181,7 @@ module Skylab::Treemap
       if inpath.exist?
         true
       else
-        error "couldn't find input file", path: inpath
+        send_error_line "couldn't find input file", path: inpath
         false
       end
     end
@@ -201,7 +201,7 @@ module Skylab::Treemap
           b
         end
         if outpn.is_missing_required_force
-          error "outpath exists, won't overwrite without #{
+          send_error_line "outpath exists, won't overwrite without #{
             }#{ param :force }", path: outpn
           res = false
           break
@@ -240,7 +240,7 @@ module Skylab::Treemap
       when 1
         @stop_at ||= stops_requested.first.stop_at if do_induce
       else
-        error "there are #{ len } stops requested, choose one: #{
+        send_error_line "there are #{ len } stops requested, choose one: #{
           stops_requested.map do |fattr|
             stem = param fattr
             if fattr.stop_is_induced
@@ -297,7 +297,7 @@ module Skylab::Treemap
           parts = [ param( :stop ) ]
           parts << "(induced)" if fattr.stop_is_induced
           parts << "after #{ param fattr }"
-          info "(stopping because #{ parts.join ' ' })" # (was [#052] borked)
+          send_info_line "(stopping because #{ parts.join ' ' })" # (was [#052] borked)
           res = nil                 # stop execution with nothing to report
         when 1
           res = true              # the stop comes later
@@ -328,13 +328,13 @@ module Skylab::Treemap
         path = path.call if path.respond_to? :call
         Treemap::Models::Pathname::Tmpdir.new path do |o|
           o.on_created do |e|
-            info "created directory", path: e.path
+            send_info_line "created directory", path: e.path
           end
           o.on_exists do |e|
-            info "using #{ escape_path e.path }"
+            send_info_line "using #{ escape_path e.path }"
           end
           o.on_failure do |e|
-            error "failed to make tmpdir - #{ e }"
+            send_error_line "failed to make tmpdir - #{ e }"
           end
         end
       end
@@ -342,7 +342,7 @@ module Skylab::Treemap
 
     def with_adapter_instance &block  # this will go straight up to somewhere
       res = adapter_box.fetch_hot_instance do |e|
-        error "no adapter currently selected - #{ e }"
+        send_error_line "no adapter currently selected - #{ e }"
         false
       end
       if res
@@ -363,10 +363,10 @@ module Skylab::Treemap
             res = block[ fh ]
           end
           if ! res
-            error "had an issue in writing csv file", path: csv_tmp_pathname
+            send_error_line "had an issue in writing csv file", path: csv_tmp_pathname
             break
           end
-          info "#{ did_overwrite ? 'overwrote' : 'wrote' } #{
+          send_info_line "#{ did_overwrite ? 'overwrote' : 'wrote' } #{
             }(#{ res.num_lines } lines)", path: csv_tmp_pathname
           res = true
         end

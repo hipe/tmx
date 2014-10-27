@@ -240,7 +240,7 @@ module Skylab::TanMan
       parse = -> str do
         syn_node = p.parse str
         if ! syn_node
-          error "failed to parse #{ val str } - #{ p.failure_reason }"
+          send_error_string "failed to parse #{ val str } - #{ p.failure_reason }"
           emit :help, "try again after fixing the above syntax errors"
           ok = false ; res = nil
         end
@@ -262,7 +262,7 @@ module Skylab::TanMan
           "#{ ick attr } was defined #{ predicates.join ' and ' } #{
           }- which one is right?"
         end
-        error "there are unresolvable conflicts in meaning - #{
+        send_error_string "there are unresolvable conflicts in meaning - #{
           }#{ sentences.join '. ' }"
         emit :help, "try again after you decide"
         ok = false ; res = nil
@@ -308,7 +308,7 @@ module Skylab::TanMan
     def resolve_meaning meaning
       graph = Models::Meaning::Graph.new self, list  # yes a one-off
       meaning_a = graph.resolve_meaning_strings meaning.name, -> interm do
-        error describe_interminable_meaning( interm )
+        send_error_string describe_interminable_meaning interm
         emit :help, "perhaps address these issues with your meaning #{
           }graph and try again."
       end

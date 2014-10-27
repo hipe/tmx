@@ -15,18 +15,18 @@ module Skylab::TanMan
           if pathname.exist?
             if pathname.directory?
               # (we do not escape_path below, just use user-provided string)
-              error "is directory, expecting dotfile: #{ pathname }"
+              send_error_string "is directory, expecting dotfile: #{ pathname }"
               res = false
               break
             end
           else
-            error "dotfile file not found: #{ pathname }"
+            send_error_string "dotfile file not found: #{ pathname }"
             res = false
             break
           end
         elsif collections.dot_file.ready?
           pathname = collections.dot_file.using_pathname
-          info "using value set in config: #{ escape_path pathname }"
+          send_info_string "using value set in config: #{ escape_path pathname }"
           self.path = nil # done using it - avoid confusion
         else
           emit :call_to_action, action_class: API::Actions::Graph::Use,

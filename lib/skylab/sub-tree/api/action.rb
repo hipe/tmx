@@ -28,9 +28,9 @@ module Skylab::SubTree
 
   private
 
-    def error message_x
+    def send_error_event ev
       @error_was_emitted ||= true
-      call_digraph_listeners :error, message_x
+      call_digraph_listeners :error_event, ev
       false
     end
   end

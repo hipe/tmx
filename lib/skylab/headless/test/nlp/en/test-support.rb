@@ -12,11 +12,9 @@ module Skylab::Headless::TestSupport::NLP::EN
 
   Headless_ = Headless_
 
-  MetaHell_ = Headless_::Library_::MetaHell
-
   module ModuleMethods
 
-    include MetaHell_::Class::Creator::ModuleMethods
+    include Headless_::Lib_::MH__[]::Class::Creator::ModuleMethods  # #todo :+#will-sunset
 
   end
 
@@ -27,7 +25,7 @@ module Skylab::Headless::TestSupport::NLP::EN
     end
   end
 
-  Subject_ = -> do
+  Constants::Subject_ = -> do
     Headless_::NLP::EN
   end
 end

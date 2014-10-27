@@ -6,8 +6,6 @@ digraph {
 
   dct [label="new doctest features"]
 
-  annoy [label="rename\n`info`, `error`"]
-
-  022->annoy
+  st_009 [label="[st] cov\ngut events"]
 
 }

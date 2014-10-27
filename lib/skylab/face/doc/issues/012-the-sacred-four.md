@@ -11,8 +11,8 @@ controller) methods. they are (in this order):
 
 1) "fields"
 2) "options"
-3) "if_ok"
-4) "if_not_ok"
+3) `if_ok`
+4) `if_not_ok`
 
 the first two are usually (but not necessarily) hashes and the last
 two are callbacks. beyond that the details of the "spec" remain sketchy.

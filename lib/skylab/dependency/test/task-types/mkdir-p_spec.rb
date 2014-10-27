@@ -2,9 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Dependency::TestSupport::Tasks
 
-  # :+#not-quickie - nested `before`
-
-  describe "[de] task-types - mkdir p" do
+  describe "[de] task-types - mkdir p" do  # :+#no-quickie because: nested `before`
 
     extend TS_
 

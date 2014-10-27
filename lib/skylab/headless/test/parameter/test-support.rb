@@ -8,7 +8,10 @@ module Skylab::Headless::TestSupport::Parameter
     Parameter = Headless_::Parameter
   end
 
+  Constants::TestSupport_::Quickie.enable_kernel_describe
+
   module ModuleMethods
+
     include Constants
 
     def with &b                   # define the class body you will use in

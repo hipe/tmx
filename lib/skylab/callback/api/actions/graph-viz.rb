@@ -57,7 +57,7 @@ module Skylab::Callback
           path = @files.fetch 0
           part_a = path.split '/'
           idx = part_a.index filename
-          idx or break error "expected #{ filename.inspect } to occur in #{
+          idx or break send_error_string "expected #{ filename.inspect } to occur in #{
             }path but it did not - #{ path }"
           true
         end
@@ -65,13 +65,13 @@ module Skylab::Callback
         toplevel_const = -> do
           pn = ::Pathname.new(
             "#{ part_a[ 0 .. idx ] * '/' }#{ Autoloader::EXTNAME }" )
-          pn.exist? or break error( "expected to exist but did not - #{
+          pn.exist? or break send_error_string( "expected to exist but did not - #{
             }#{ pn }" )
           if ! ::Object.const_defined? @root_constant
             load pn
           end
           if ! ::Object.const_defined? @root_constant
-            break error( "toplevel constants #{ @root_constant.inspect } #{
+            break send_error_string( "toplevel constants #{ @root_constant.inspect } #{
              }not defined after loading file - #{ pn }" )
           end
           true
@@ -133,14 +133,14 @@ module Skylab::Callback
       if job_a.length.nonzero?
         if bad_a
           bad_a.each do |j|
-            info "#{ j.mod } #{ j.invalid_reasons.join ' and ' } - skipping"
+            send_info_string "#{ j.mod } #{ j.invalid_reasons.join ' and ' } - skipping"
           end
         end
         @job_a = job_a
         true
       else
         bad_a.each do |j|  # this implicitly expects @mod_a to be nonzero length
-          error "#{ j.mod } #{ j.invalid_reasons.join ' and ' }"
+          send_error_string "#{ j.mod } #{ j.invalid_reasons.join ' and ' }"
         end
         false
       end
@@ -220,7 +220,7 @@ module Skylab::Callback
         if pn.exist?
           if ok_to_clobber_rx !~ pn.to_s
             if ! @use_force
-              error "#{ prefix }won't overwrite without force - #{ pn }"
+              send_error_string "#{ prefix }won't overwrite without force - #{ pn }"
             end
           end
         end
@@ -259,9 +259,9 @@ module Skylab::Callback
           pay.close
           @infostream.puts "done.)"
         end
-        info "(got #{ num } lines from #{ job.mod }##{ meth }#describe)"
+        send_info_string "(got #{ num } lines from #{ job.mod }##{ meth }#describe)"
       else
-        error "`#{ @event_stream_graph.class }#describe` was falseish"
+        send_error_string "`#{ @event_stream_graph.class }#describe` was falseish"
       end
       nil
     end

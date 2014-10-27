@@ -125,7 +125,7 @@ module Skylab::TanMan
         # 'example' [ name_token [..]] rule_name { ':' | eol }
 
         if ! grammar.has_rule name_tokens.last
-          debug? and info "#{ grammar.grammar_const } grammar has no #{
+          debug? and send_info_string "#{ grammar.grammar_const } grammar has no #{
             }#{ name_tokens.last.inspect } rule" # given how far we've come, it
           break                                # might be useful to get feedback
         end
@@ -205,7 +205,7 @@ module Skylab::TanMan
       TanMan_::Sexp::Auto.debug?
     end
 
-    def info msg
+    def send_info_string msg
       TanMan_::Sexp::Auto.debug_stream.puts msg
     end
 
@@ -223,7 +223,7 @@ module Skylab::TanMan
         when 1 ; str = @name_tokens[0]         # name alone, and have not
         when 2 ; str = @name_tokens[0]         # defined how to handle long
         else
-          info "sorry - we have not yet designed support for multi-#{
+          send_info_string "sorry - we have not yet designed support for multi-#{
             }word names yet - \"#{ @name_tokens.join ' ' }\""
           res = false
         end
@@ -301,7 +301,7 @@ module Skylab::TanMan
       end while nil
       body = nil
       if lines.empty?
-        debug? and info "strange -- multiline comment body expected for #{
+        debug? and send_info_string "strange -- multiline comment body expected for #{
           }\"#{ @name_tokens.join SPACE_ }\""
       else
         body = lines.join EMPTY_S_

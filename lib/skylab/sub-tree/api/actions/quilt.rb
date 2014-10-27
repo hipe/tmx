@@ -46,8 +46,8 @@ module Skylab
 
     # below this line are candidates
 
-    def info msg
-      call_digraph_listeners :info, msg
+    def send_info_string msg
+      call_digraph_listeners :info_string, msg
     end
     def call_digraph_listeners type, msg
       _IO[ :out == type ? :outstream : :errstream  ].puts msg ; nil

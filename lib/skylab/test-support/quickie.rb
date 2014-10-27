@@ -477,7 +477,9 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
           if ex.block
             rt.tick_example
             ctx = ex.context.new rt
-            ex.has_before_each and ex.run_before_each ctx
+            if ex.has_before_each
+              ex.run_before_each ctx
+            end
             ctx.instance_exec(& ex.block )
           else
             rt.tick_pending
@@ -968,37 +970,44 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
 
   #  ~ facet 3 - before hooks
 
-  Quickie::BEFORE_H_ = { each: :before_each, all: :before_all }.freeze
+  module Quickie  # LOOK while #open [#036]
 
-  class Quickie::Context
-    def self.before i, &blk
-      send Quickie::BEFORE_H_[ i ], blk
-    end
-    def self.before_each blk
-      const_defined?( :BEFORE_EACH_PROC_ ) and raise "sorry - in the #{
-        }intereset of simplicity there is not yet support for nested #{
-        }before( :each | :all ) blocks.."
-      const_set :BEFORE_EACH_PROC_, blk
-      nil
-    end
-    def self.before_all blk
-      before_each -> do
-        if blk
-          blk.call
-          blk = nil  # so dirty yet so pure
+    class Context
+      class << self
+        def before which_i, & p
+          send BEFORE_H__.fetch( which_i ), p
         end
-        nil
+      private
+        def bfr_all p
+          p_ = -> do
+            p.call  # LOOK you get NO text context - maybe diff than rspec
+            p_ = EMPTY_P_
+          end
+          bfr_each -> do  # so dirty yet so pure
+            p_[]
+          end
+        end
+        def bfr_each p
+          const_defined?( :BEFORE_EACH_PROC_ ) and raise say_no_nested_before
+          const_set :BEFORE_EACH_PROC_, p ; nil
+        end
+        def say_no_nested_before
+          "sorry - in the intereset of simplicity there is not yet #{
+           }support for nested before( :each | :all ) blocks.."
+        end
       end
     end
-  end
 
-  class Quickie::Example
-    def has_before_each
-      @context.const_defined? :BEFORE_EACH_PROC_
-    end
-    def run_before_each ctx  # assume `has_before_each`
-      ctx.instance_exec( & @context::BEFORE_EACH_PROC_ )
-      nil
+    BEFORE_H__ = { each: :bfr_each, all: :bfr_all }.freeze
+
+    class Example
+      def has_before_each
+        @context.const_defined? :BEFORE_EACH_PROC_
+      end
+      def run_before_each ctx  # assume `has_before_each`
+        ctx.instance_exec( & @context::BEFORE_EACH_PROC_ )
+        nil
+      end
     end
   end
 
@@ -1053,6 +1062,12 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
       @client = client ; nil
     end
     attr_reader :paystream, :infostream
+  end
+
+  #  ~ N.3
+
+  def Quickie.apply_experimental_specify_hack test_context_class
+    Quickie::Specify__.apply_if_not_defined test_context_class
   end
 
   # ~ intrinsic / extrinsic classes exposed for hax

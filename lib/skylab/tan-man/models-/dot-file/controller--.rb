@@ -104,9 +104,9 @@ module Skylab::TanMan
             TanMan_::System[].IO.some_stderr_IO )
 
           s = ::Pathname.new( __FILE__ ).relative_path_from TanMan.dir_pathname
-          info "(from #{ s })"
+          send_info_string "(from #{ s })"
         else
-          info "#{ escape_path pathname } looks good : #{ sexp.class }"
+          send_info_string "#{ escape_path pathname } looks good : #{ sexp.class }"
         end
       end while nil
       res
@@ -299,26 +299,26 @@ module Skylab::TanMan
       begin
         next_string = sexp.unparse
         if ! pathname.exist?
-          error "strange - #{graph_noun} didn't previously exist - won't write"
+          send_error_string "strange - #{graph_noun} didn't previously exist - won't write"
           break # or just raise
         end
         pathname.exist? or fail 'sanity'
         prev_string = pathname.read
         if prev_string == next_string
-          info "(no changes in #{ graph_noun } - nothing to save.)"
+          send_info_string "(no changes in #{ graph_noun } - nothing to save.)"
           break
         end
         num_a = num_lines[ prev_string ]
         num_b = num_lines[ next_string ]
         if num_b < num_a && ! force
-          error "ok to reduce number of lines in #{
+          send_error_string "ok to reduce number of lines in #{
             }#{ escape_path pathname } from #{ num_a } to #{ num_b }? #{
             }If so, use #{ par :force }."
           break # IMPORTANT!
         end
         bytes = write_commit next_string, dry_run, verbose
         break if ! bytes
-        info "wrote #{ escape_path pathname } (#{ bytes } bytes)"
+        send_info_string "wrote #{ escape_path pathname } (#{ bytes } bytes)"
       end while nil
       bytes
     end
@@ -341,11 +341,11 @@ module Skylab::TanMan
         temp.open( 'w' ) { |fh| bytes = fh.write string }
         diff = services.diff.diff pathname, temp, nil,
           -> e do
-            error e
+            send_error_string e
           end,
           -> i do
             if verbose
-              info( gsub_path_hack i ) # e.g. `diff --normal `...
+              send_info_string( gsub_path_hack i ) # e.g. `diff --normal `...
             end
           end
         break( res = diff ) if ! diff
@@ -361,12 +361,12 @@ module Skylab::TanMan
           a.push "no lines added or removed!"
         end
         if verbose
-          info( a.join ', ' )
+          send_info_string( a.join ', ' )
         end
         break if no_change
         fu = Lib_::FUC[].new -> msg do
           if verbose
-            info( gsub_path_hack msg )
+            send_info_string( gsub_path_hack msg )
           end
         end
         fu.mv temp, pathname, noop: dry_run

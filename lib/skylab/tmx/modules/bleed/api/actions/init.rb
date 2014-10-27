@@ -8,7 +8,7 @@ module Skylab
     def invoke
 
       if config.exist?
-        info "exists, won't overwrite - #{ escape_path config.path }"
+        send_info_string "exists, won't overwrite - #{ escape_path config.path }"
         nil
       else
 
