@@ -81,9 +81,9 @@ module Skylab::CSS_Convert
       ok = ev.ok || ev.ok.nil?
       while line = scn.gets  # usually one line
         if ok
-          x = info line
+          x = send_info_string line
         else
-          x = error line
+          x = send_error_string line
         end
       end
       x

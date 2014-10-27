@@ -15,6 +15,8 @@ module Skylab::Brazen
         if ev_.has_tag :ok
           if ev_.ok
             recv_success_event ev
+          elsif ev_.ok.nil?
+            recv_neutral_event ev
           else
             recv_error_event ev
           end
@@ -58,6 +60,10 @@ module Skylab::Brazen
       end
 
       def recv_info_event ev
+        recv_neutral_event ev
+      end
+
+      def recv_neutral_event ev
         y = ::Enumerator::Yielder.new do |s|
           @err.puts s
         end

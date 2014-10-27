@@ -14,8 +14,7 @@ module Skylab::Headless
               new do
                 process_iambic_fully x_a
                 clear_all_iambic_ivars
-                produce_mixed_result
-              end
+              end.produce_mixed_result
             end
           end
 
@@ -274,6 +273,8 @@ module Skylab::Headless
           def via_path_send_normal_value
             if @as_normal_value.arity.zero?
               @as_normal_value[]
+            elsif @is_dry_run
+              @as_normal_value[ Mock_Dir__.new @path ]
             else
               @as_normal_value[ ::Dir.new @path ]
             end
@@ -287,6 +288,8 @@ module Skylab::Headless
           def send_event ev
             @on_event[ ev ]
           end
+
+          Mock_Dir__ = ::Struct.new :to_path
 
           DIR_FTYPE__ = 'directory'.freeze
         end

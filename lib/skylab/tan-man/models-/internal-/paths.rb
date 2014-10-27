@@ -41,7 +41,7 @@ module Skylab::TanMan
       def retrieve_generated_grammar_dir_path
         td = Memoized_GGD_tmpdir__[]
         td ||= Memoize_GGD_tmpdir__[ build_GGD_tmpdir ]
-        td.to_path
+        td and td.to_path
       end
 
       -> do
@@ -53,49 +53,31 @@ module Skylab::TanMan
       end.call
 
       def build_GGD_tmpdir
-        resolve_GGD_tmpdir
-        if ! @GGD_tmpdir.exist?   # :+[#hl-022] will get you
-          @GGD_tmpdir.prepare_when_not_exist
-        end
-        @GGD_tmpdir
-      end
 
-      def resolve_GGD_tmpdir
-        via_library_init_ivars
         _app_tmpdir_path = app_tmpdir_path
-        _debug_IO_pxy = debug_IO_proxy
 
-        @GGD_tmpdir = @filesystem.tmpdir :path, _app_tmpdir_path,
-          :be_verbose, true,
-          :debug_IO, _debug_IO_pxy,
-          :max_mkdirs, 1
-        nil
+        TanMan_::Lib_::System[].filesystem.normalization.existent_directory(
+          :path, _app_tmpdir_path,
+          :on_event, -> ev do
+            ev = ev.with_message_string_mapper MSG_MAP__
+            @call.event_receiver.receive_event ev
+            UNABLE_  # info events won't ride all the way out
+          end,
+          :create_if_not_exist,
+          :max_mkdirs, 1 )  # you may make the [tm] directory only.
       end
 
-      def via_library_init_ivars
-        @lib = TanMan_::Lib_
-        @sys = @lib::System[]
-        @filesystem = @sys.filesystem
+      MSG_MAP__ = -> s do
+        "#{ highlight 'while resolving [tm] generated grammar dir' }: #{ s }"
       end
 
       def app_tmpdir_path
-        _tmpdir_head_pathname = @sys.defaults.dev_tmpdir_pathname
-        _stem = @lib::Tmpdir_stem[]
+        lib = TanMan_::Lib_
+
+        _tmpdir_head_pathname = lib::System[].defaults.dev_tmpdir_pathname
+        _stem = lib::Tmpdir_stem[]
+
         _tmpdir_head_pathname.join( _stem ).to_path
-      end
-
-      def debug_IO_proxy
-
-        @lib::Proxy_lib[].inline :puts, -> s do
-
-          _ev = Event_[].inline_with :tmpdir_message,
-              :message_string, s do |y, o|
-
-            y << "« while loading grammar » #{ o.message_string }"  # :+#guillemets
-          end
-
-          @call.event_receiver.receive_event _ev
-        end
       end
     end
   end

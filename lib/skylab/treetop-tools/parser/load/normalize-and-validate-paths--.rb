@@ -2,7 +2,7 @@ module Skylab::TreetopTools
 
   class Parser::Load
 
-    class Normalize_and_validate_paths__  # :+[#hl-022] filesystem expectations
+    class Normalize_and_validate_paths__  # maybe :+[#hl-022] in future (filesystem expectations)
 
       Callback_::Actor.call self, :properties,
         :root_bp,

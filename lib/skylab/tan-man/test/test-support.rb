@@ -334,7 +334,7 @@ module Skylab::TanMan::TestSupport
 
         if ! pn.exist?
 
-          _tmpdir = TanMan_::Lib_::System[].filesystem.tmpdir :path, path,
+          _tmpdir = TanMan_::Lib_::System[].filesystem.tmpdir :path, _PATH,
             :be_verbose, do_debug,
             :debug_IO, debug_IO,
             :max_mkdirs, 2

@@ -15,7 +15,7 @@ module Skylab::Brazen
         end
 
         def codifying_expression_agent
-          Event__::EXPRESSION_AGENT__
+          Event_::EXPRESSION_AGENT__
         end
 
         def inline_with * x_a, &p
@@ -82,12 +82,22 @@ module Skylab::Brazen
       def verb_lexeme
       end
 
+      def to_event
+        self  # the top
+      end
+
+      def with_message_string_mapper p
+        dup_with( & Event_::Small_Time_Actors__::
+          Produce_new_message_proc_from_map_reducer_and_old_message_proc[
+            p, message_proc ] )
+      end
+
       def dup_with * x_a, & p  # #note-25
         dup.init_copy_via_iambic_and_message_proc x_a, p
       end
 
       def to_exception  # #note-85
-        Event__::Unwrappers__::Exception[ self ]
+        Event_::Unwrappers__::Exception[ self ]
       end
 
       def to_iambic
@@ -116,10 +126,6 @@ module Skylab::Brazen
         p and @message_proc = p
         self
       end )
-
-      def to_event
-        self  # the top
-      end
 
       def has_tag i
         reflection_box.has_name i
@@ -156,7 +162,7 @@ module Skylab::Brazen
         _y = ::Enumerator::Yielder.new do |s|
           s_a.push "(#{ s })"
         end
-        render_all_lines_into_under _y, Event__::EXPRESSION_AGENT__
+        render_all_lines_into_under _y, Event_::EXPRESSION_AGENT__
         "(#{ s_a * ', ' })"
       end
 
@@ -379,7 +385,7 @@ module Skylab::Brazen
         end
 
         def _Event
-          Event__
+          Event_
         end
       end
 

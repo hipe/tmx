@@ -38,7 +38,7 @@ module Skylab::TanMan::TestSupport::Sexp
         two_IO[ d ] = IO_at_index__[ d + 1 ]
       end
 
-      @stdin = sin  # [#hl-022]
+      @stdin = sin
 
       self.io_adapter = build_IO_adapter nil, * two_IO, Pen__[]
 
@@ -188,7 +188,8 @@ module Skylab::TanMan::TestSupport::Sexp
       @IO_adapter.errstream.puts s ; nil
     end
 
-    define_method :resolve_upstream_status_tuple do  # #watch'ed by [#hl-022] for dry
+    define_method :resolve_upstream_status_tuple do
+      fail 'YES'  # #todo - is this ever used any more? IFF so, :+[#hl-022]
       ok = false                  # [#hl-023] exit-code aware, [#019] invite
       begin
         if upstream

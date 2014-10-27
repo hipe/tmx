@@ -419,21 +419,23 @@ module Skylab::Flex2Treetop
       Iambics_[ self,
         :params,
         * parameter_members,  # #storypoint-315
-        :case_sensitive, %i( flag @is_case_sensitive ),
-        :clear_generated_files, %i( flag @do_clear_files ),
-        :endpoint_is_FS_parser, %i( flag @endpoint_is_FS_parser ),
+        :case_sensitive, [ :flag, :"@is_case_sensitive" ],
+        :clear_generated_files, [ :flag, :"@do_clear_files" ],
+        :endpoint_is_FS_parser, [ :flag, :"@endpoint_is_FS_parser" ],
         :flexfile, [ :write_with, Pathname_writer__ ],
-        :force, %i( flag @force_is_present ),
+        :force, [ :flag, :"@force_is_present" ],
         :FS_parser_dir, [ :write_with, Pathname_writer__, :optional ],
         :emit_info_line_p,
         :emit_info_string_p,
-        :paystream_via, %w( has_custom_writer ),
+        :paystream_via, [ :has_custom_writer ],
         :pp_IO_for_show_sexp,
-        :show_sexp_only, %i( flag @do_show_sexp_only ),
-        :use_FS_parser, %i( flag @do_use_FS_parser ),
+        :show_sexp_only, [ :flag, :"@do_show_sexp_only" ],
+        :use_FS_parser, [ :flag, :"@do_use_FS_parser" ],
         :verbose, [ :flag, :@be_verbose, :default, true ],
-        :wrap_in_grammar_s, %i( optional ) ]
+        :wrap_in_grammar_s, [ :optional ] ]
+
       private
+
         def paystream_via=  # a diadic term
           @paystream_via = :_provided_
           case (( type_i = @x_a.shift ))

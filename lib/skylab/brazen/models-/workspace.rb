@@ -331,7 +331,7 @@ module Skylab::Brazen
       end
       TOP__ = '/'.freeze
 
-      def whn_found found  # :+[#hl-022] maybe
+      def whn_found found  # maybe later :+[#hl-022]
         st = found.stat  # there is risk
         if FILE_FTYPE__ == st.ftype
           found

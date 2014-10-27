@@ -43,6 +43,10 @@ module Skylab::TanMan
       end
       HEADER_STYLE__ = [ strong, green ].freeze
 
+      def highlight string
+        "** #{ string } **"
+      end
+
       def ick x
         "\"#{ x }\""
       end

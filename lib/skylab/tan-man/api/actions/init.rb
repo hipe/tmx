@@ -19,7 +19,7 @@ module Skylab::TanMan
       @dir ||= path.join(local_conf_dirname)
     end
 
-    def execute  # :+[#hl-022]
+    def execute  # (when we get back to this action), :+[#hl-022]
       if dir.exist?
         if dir.directory?
           skip "already exists, skipping: #{ escape_path dir }"

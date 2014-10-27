@@ -39,6 +39,10 @@ module Skylab::TanMan
         s
       end
 
+      def highlight string
+        "** #{ string } **"
+      end
+
       def ick x
         val x
       end

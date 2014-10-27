@@ -32,7 +32,13 @@ for your business concerns.
 + `and_` - render a list (i.e "union") with positive, inclusive inflection.
 
          frequently for EN we employ an "oxford comma"-style approach
-         here, by saying "X, Y and Z". this is not the place for mapping:
+         here, by saying "X, Y and Z". (although note that our surface
+         expression here does not actually *employ* the oxford comma,
+         which any educated person will tell you looks dumb and is never
+         necessary -- we use the name because it's a cute reference to
+         that one song)
+
+         this is not the place for mapping:
          the elements of the enumerable-ish argument should be already
          rendered strings, or values ready to be coerced into strings.
          just like `or_`, which is the same kind of thing but has a "one"
@@ -49,6 +55,9 @@ for your business concerns.
          header is desired that is less prominent than `hdr`.
 
 + `hdr` - alla HTML `<h1>`, for e.g. frequently will delegate to `em`.
+
++ `highlight` - highlight something emphatically, more than `em`. we may
+         assimilate this into `em`.
 
 + `human_escape` - legacy. "smart quotes" as described in `val`.
           basically use quotes IFF necessary (né smart_quotes).
