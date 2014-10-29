@@ -10,7 +10,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
       it "0    with no args - explain what's expected" do
         invoke
-        expect :styled, /\Aexpecting: <flexfile>\z/
+        expect :styled, /\Aexpecting <flexfile> or STDIN\z/
         expect :styled, /\Ause .+ for help\z/
         expect_failed
       end
@@ -62,7 +62,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
       it "1.1  with one giberrsh arg - explain that file is not found" do
         invoke 'not-there.txt'
-        expect %r(file.+not found.+not-there\.txt)
+        expect %r(\ANo such file or directory - .+\bnot-there\.txt\b)
         expect_invite
       end
 

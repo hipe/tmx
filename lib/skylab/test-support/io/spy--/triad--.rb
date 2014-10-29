@@ -79,6 +79,9 @@ module Skylab::TestSupport
 
     MOCK_INTERACTIVE_STDIN__ =
     class Stub_Interactive_STDIN__
+      def closed?
+        false
+      end
       def tty?
         true
       end

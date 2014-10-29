@@ -231,7 +231,7 @@ module Skylab::Callback
     def render_graph job
       pay = if @do_write_files
         @infostream.write "(#{ prefix }writing #{ job.outpathname } .."
-        job.outpathname.open WRITEMODE_
+        job.outpathname.open WRITE_MODE_
       else
         @paystream
       end
@@ -265,7 +265,7 @@ module Skylab::Callback
       end
       nil
     end
-    WRITEMODE_ = Callback_::Lib_::Writemode[]
+    WRITE_MODE_ = Callback_::Lib_::Writemode[]
 
     def conclude_jobs
       if @error_count.zero?  # just to be sure

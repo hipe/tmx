@@ -2,9 +2,10 @@
 
 # the purpose and scope of this document..
 
-..is to present the concept of "node" and "taxonomy", and then the concept of
-"axis" on top of then. we then enumerate all known axes and then propose
+..is to present the concept of "node" and "taxonomy", and then the concept
+of "axis" on top of them. we then enumerate all known axes and then propose
 an order of precedence for those axes.
+
 
 # understanding the meaning of "node" in this context
 
@@ -25,18 +26,20 @@ specifically which is meant. this is done intentionally because often a node
 that was once a class then becomes a module, or a node that was once a module
 gets reduced down to a simple enhancer proc; or the other direction, etc.
 by saying "node" we emphasize that the particular shape of the node is not
-important; that what we are emphasizing it where it fits logically into the
-larger taxonomy without having to think about the unimportant detail of its
-particular shape.
+important; that what we are emphasizing it where it fits taxonomicaly into
+the larger hierarchy without having to think about the unimportant detail
+of its particular shape.
 
 a second, more general reason we like the term "node" is because it evokes
 graph theory and maybe even trees; and this frame of mind is useful when
 speaking of the skylab taxonomy for reasons we may explore below.
 
+
 # the axes enumerated
 
-in the skylab universe we will speak of "axes" (as in the plural of "axis", not
-"axe"). they may be though of as "aspects", probably always aspects for nodes.
+in the skylab universe we will speak of "axes" (as in the plural of "axis",
+not "axe"). they may be though of as "aspects", probably always aspects for
+nodes.
 
 one important axis that we touched on already above is that of "subsystem."
 very early in the life of skylab we made the design choice that each part of
@@ -71,6 +74,10 @@ related to one feature or a group of related features, usually one that was
 loaded all at once & lazily (on-demand). we may now see individual "facets"
 (as a logical unit) that are comprised of multiple bundles. anyway, "facet"
 is itself an "axis".
+
+(as well there are (perhaps unrelated) [#080], [#fa-025] other treatments
+of this term "facet".)
+
 
 ## a precedence order proposed
 

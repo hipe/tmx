@@ -88,10 +88,6 @@ module Skylab::Headless
       s.gsub( DASH_, UNDERSCORE_ ).downcase.intern
     end
 
-    DASH_ = '-'.freeze
-
-    DASH_BYTE__ = DASH_.getbyte 0
-
     LONG_RX__ = /\A
       -- (?<no_part> \[no-\] )?
          (?<long_stem> [^\[\]=\s]{2,} )
@@ -110,10 +106,8 @@ module Skylab::Headless
     SIMPLE_SHORT_RX__ = /\A-[^-]/
 
     Starts_with_dash__ = -> s do
-      DASH_BYTE__ == s.getbyte( 0 )
+      DASH_BYTE_ == s.getbyte( 0 )
     end
-
-    UNDERSCORE_ = '_'.freeze
 
     @value_struct = -> do  # :+[#165]
       i_a = [] ; i_a_ = []

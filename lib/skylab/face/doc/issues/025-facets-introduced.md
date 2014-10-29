@@ -1,5 +1,7 @@
 # facets introduced :[#025]
 
+(#todo between [#hl-080] and this, one will assimilate the other.)
+
 a `facet` as it has come to mean in the context of the Face API API is a
 particular "domain of responsibility" for the API as it pertains to the Client
 (maybe modal, maybe amodal) and the Action.
@@ -45,9 +47,9 @@ note from the above list at least two things:
 1) each item in the above list correspond to one *transition* in the API
 Action lifecycle, namely:
 
-  `call_digraph_listeners` corresponds to the `listeners_digraph` DSL method that defines the event stream
-    graph for the API action, and which when listened to brings the
-    action into a `wired` state.
+  `call_digraph_listeners` corresponds to the `listeners_digraph` DSL
+    method that defines the event stream graph for the API action, and
+    which when listened to brings the action into a `wired` state.
 
   `service` corresponds to the `services` DSL method that defines the services
     the API Action (conceptualized as a plugin) declares as needing from its

@@ -1,5 +1,11 @@
 # name conventions :[#050]
 
+(EDIT: this document is old. it is still 95% relevant but could use some
+cleanup near style :+#todo. the child nodes of this node is where it gets
+more interesting).
+
+
+
 ## some thoughts on the name `name`
 
 Don't use it. As a complete variable or method name, "name" is so vague

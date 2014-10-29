@@ -45,10 +45,10 @@ module Hipe
         ])
         tmpout_model = File.join(tmpdir, 'genned-model.rb')
         str = Cmd.ui_pop_read
-        File.open( tmpout_model, WRITEMODE_ ){ |fh| fh.write str }
+        File.open( tmpout_model, WRITE_MODE_ ){ |fh| fh.write str }
         assert_model_file tmpout_model
       end
-      WRITEMODE_ = Headless::WRITEMODE_
+      WRITE_MODE_ = Headless::WRITE_MODE_
 
       def assert_model_file outfile
         require 'dm-core'

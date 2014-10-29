@@ -66,7 +66,7 @@ module Skylab::TestSupport::Regret::API
 
     def absorb_any_services_from_parameters_notify param_h
       if (( outpath_x = param_h.delete :output_path ))
-        fh = ::File.open "#{ outpath_x }", WRITEMODE_
+        fh = ::File.open "#{ outpath_x }", WRITE_MODE_
         accept_value_as_service fh, :out
       end
     end

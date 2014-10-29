@@ -118,7 +118,7 @@ module Skylab::Headless
     def write local_path, file_contents
       pn = touch_r local_path
       if pn
-        pn.open WRITEMODE_ do |fh|
+        pn.open WRITE_MODE_ do |fh|
           fh.write file_contents
         end
         pn

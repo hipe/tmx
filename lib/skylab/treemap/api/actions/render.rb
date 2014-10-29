@@ -359,7 +359,7 @@ module Skylab::Treemap
         else
           res = tmpdir.normalize or break
           did_overwrite = csv_tmp_pathname.exist?
-          csv_tmp_pathname.open WRITEMODE_ do |fh|
+          csv_tmp_pathname.open WRITE_MODE_ do |fh|
             res = block[ fh ]
           end
           if ! res

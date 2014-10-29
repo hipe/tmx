@@ -1,129 +1,154 @@
 module Skylab::Headless
 
-  module CLI::Client
+  module System__
 
-    class Bundles__::Resolve_upstream  # read [#022] CLI upstr..
+    class Services__::Filesystem
 
-      Headless_::Lib_::Funcy_globful[ self ]
+      class Normalization__
 
-      def initialize client
-        # #todo:during-merge use schlurp
-        @argv = client.instance_variable_get :@argv
-        @argv or fail 'sanity'
-        @err_p = client.method :emit_error_line
-        @get_stx_p = client.method :argument_syntax_for_action_i
-        @par_lbl_p = client.method :parameter_label
-        @IO_adptr = client.instance_variable_get :@IO_adapter
-        @instream = @IO_adptr.instream
-        @relevant_action_i = client.send :default_action_i
-        @result = CEASE_X_ ; nil
-      end
+        class Upstream_IO__ < self  # see [#022]
 
-      def execute
-        @argv_d = @argv.length.zero? ? NO_ARGV__ : SOME_ARGV__
-        @term_d = ( ! @instream || @instream.tty? ) ? INTERACTIVE__ : NONINTERACTIVE__
-        decide
-      end
-    private
-      def decide
-        case @argv_d | @term_d
-        when NONINTERACTIVE__ | NO_ARGV__ ; try_instream
-        when INTERACTIVE__ | NO_ARGV__ ; try_argv
-        when INTERACTIVE__ | SOME_ARGV__ ; try_argv
-        when NONINTERACTIVE__ | SOME_ARGV__ ; ambiguous
-        else wat end
-      end
-      NO_ARGV__ = NONINTERACTIVE__ = 0 ; SOME_ARGV__ = 1 ; INTERACTIVE__ = 2
-      def try_instream
-        PROCEDE_X_  # nothing to do.
-      end
+          class << self
 
-      def ambiguous
-        emit_error_string say_ambiguous  # #storypoint-20
-        CEASE_X_
-      end
-      def say_ambiguous
-        "cannot resolve ambiguous upstream modality paradigms -- #{
-          }both STDIN and #{ infile_moniker } appear to be present."
-      end
-      def try_argv
-        case @argv.length <=> 1
-        when -1 ; when_argv_length_is_zero
-        when  0 ; when_argv_length_is_one
-        when  1 ; when_argv_length_greater_than_one
+            def mixed_via_iambic x_a
+              new do
+                process_iambic_fully x_a
+                clear_all_iambic_ivars
+              end.produce_mixed_result
+            end
+          end
+
+          Entity_[ self, -> do
+
+            o :iambic_writer_method_name_suffix, :"="
+
+            def path_arg=  # LOOK at trio, not a value
+              @do_execute = true
+              @path_arg = iambic_property
+            end
+
+            o :properties, :instream, :on_event
+          end ]
+
+          Event_.sender self
+
+          def initialize & p
+            @clobber_is_OK = true   # always true for now
+            @do_execute = false
+            @instream = nil
+            instance_exec( & p )
+            @as_normal_value ||= IDENTITY_
+          end
+
+          def produce_mixed_result
+            if @do_execute
+              execute  # is an inline normalization
+            else
+              freeze  # is a curried normalization (not implemented yet)
+            end
+          end
+
+        private
+
+          def execute
+            if @instream
+              when_formal_both
+            else
+              when_formal_path
+            end
+          end
+
+          def when_formal_both
+            if @path_arg.actuals_has_name
+              if instream_is_noninteractive_and_open
+                when_actual_both
+              else
+                when_actual_path
+              end
+            elsif instream_is_noninteractive_and_open
+              when_actual_instream
+            else
+              when_actual_neither
+            end
+          end
+
+          def when_formal_path
+            if @path_arg.actuals_has_name
+              when_actual_path
+            else
+              when_path_not_provided
+            end
+          end
+
+          def when_actual_both  # #storypoint-20
+            _ev = build_not_OK_event_with :ambiguous_upstream_arguments,
+                :path_arg, @path_arg do |y, o|
+
+              _prop = o.path_arg.property
+
+              y << "ambiguous upstream arguments - cannot read from both #{
+                }STDIN and #{ par _prop }"
+            end
+            send_event _ev
+          end
+
+          def when_actual_neither
+            _ev = build_not_OK_event_with :missing_required_properties,
+                :path_property, @path_arg.property do |y, o|
+              y << "expecting #{ par o.path_property } or STDIN"
+            end
+            send_event _ev
+          end
+
+          def when_path_not_provided
+            _ev = build_not_OK_event_with :missing_required_properties,
+                :path_property, @path_arg.property do |y, o|
+              y << "expecting #{ par o.path_property }"
+            end
+            send_event _ev
+          end
+
+          def when_actual_instream
+            @as_normal_value[ @instream ]
+          end
+
+          def when_actual_path
+            @path = @path_arg.value_x
+            path_exists_and_set_stat_and_stat_error @path
+            if @stat
+              when_stat
+            else
+              _ev = Event_.wrap.exception @stat_e, :path_hack
+              @on_event[ _ev ]
+            end
+          end
+
+          def when_stat
+            if FILE_FTYPE_ == @stat.ftype
+              via_path_open_file
+            else
+              _ev = via_stat_and_path_build_wrong_ftype_event FILE_FTYPE_
+              @on_event[ _ev ]
+            end
+          end
+
+          def via_path_open_file
+            _io = ::File.open @path, READ_MODE_
+            @as_normal_value[ _io ]  # :#open-filehandle-1 - don't loose track
+          rescue ::SystemCallError => e  # Errno::EISDIR, Errno::ENOENT etc
+            _ev = Event_.wrap.exception e, :path_hack
+            @on_event[ _ev ]
+          end
+
+          def instream_is_noninteractive_and_open
+            ! ( @instream.tty? || @instream.closed? )
+          end
+
+          def send_event ev
+            @on_event[ ev ]
+          end
         end
       end
-      def when_argv_length_is_zero
-        emit_error_string "expecting: #{ infile_moniker }"
-        CEASE_X_
-      end
-      def when_argv_length_greater_than_one
-        emit_error_string say_too_much_arg
-        CEASE_X_
-      end
-      def say_too_much_arg  # #todo:during-merge
-        d = @argv.length
-        "unexpected argument#{ 's' unless 1 == d }: #{
-         @argv.map( & :inspect ) * TERM_SEPARATOR_STRING_ }. #{
-          }expecting #{ infile_moniker }"
-      end
-      def when_argv_length_is_one
-        @pathname = ::Pathname.new @argv.first  # note we do not shift
-        attempt_to_open_pathname
-      end
-      def attempt_to_open_pathname
-        @stat = @pathname.stat
-        when_pathname_exist
-      rescue ::Errno::ENOENT => @e
-        when_pathname_not_exist
-      end
-      def when_pathname_not_exist
-        emit_error_string say_not_found
-        CEASE_X_
-      end
-      def say_not_found
-        "#{ infile_moniker } not found: #{ @pathname }"
-      end
-      def when_pathname_exist
-        if FILE_S__ == @stat.ftype
-          when_pathname_is_file
-        else
-          when_pathname_is_not_file
-        end
-      end
-      FILE_S__ = 'file'.freeze
-      def when_pathname_is_not_file
-        emit_error_string say_is_not_file
-        CEASE_X_
-      end
-      def say_is_not_file
-        "#{ infile_moniker } is #{ @stat.ftype }: #{ @pathname }"
-      end
-      def when_pathname_is_file
-        current_IO = @IO_adptr.instream
-        current_IO && ! current_IO.tty? && ! current_IO.closed? and
-          fail "sanity - won't overwrite existing open instream"
-       @IO_adptr.instream = @pathname.open READ_MODE_
-         # the above is #open-filehandle-1 --  don't loose track!
-       PROCEDE_X_
-      end
-
-      # ~
-
-      def emit_error_string s
-        @err_p[ s ] ; nil
-      end
-
-      def infile_moniker  # #todo:during-merge use expag instead
-        # a hack to show whatever same label would be used in e.g. missing arg
-        _stx = @get_stx_p[ @relevant_action_i ]
-        _par = _stx.fetch_argument_at_index 0 do end
-        if _par
-          @par_lbl_p[ _par ]
-        else
-          'input-file'  # #todo
-        end
-      end  # (the above code as-is is a case study for :+[#bs-012])
     end
   end
 end

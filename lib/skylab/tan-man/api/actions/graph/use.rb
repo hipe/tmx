@@ -66,7 +66,7 @@ module Skylab::TanMan
         t = " using starter #{ starter.pathname.basename }"
         content = starter.call created_on: ::Time.now.utc.to_s
         bytes = nil
-        path.open( WRITEMODE_ ) { |fh| bytes = fh.write content }
+        path.open( WRITE_MODE_ ) { |fh| bytes = fh.write content }
         send_info_string "wrote #{ path }#{ t } (#{ bytes } bytes)."
         result = bytes
       end while nil

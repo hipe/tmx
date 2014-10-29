@@ -8,7 +8,7 @@ module Skylab::Git::TestSupport::CLI::Actions::Stash_Untracked::List__
 
   GSU = GSU ; OUT_I = OUT_I
 
-  describe "[gi] CLI actions gsu list" do  # :+#no-quickie-because: `.stub`-ing
+  describe "[gi] CLI actions gsu list" do  # :+#no-quickie because: `.stub`-ing
 
     extend TS__
 

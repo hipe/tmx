@@ -4,16 +4,50 @@ module Skylab::Headless
 
     class Services__::Filesystem
 
-      module Normalization__
+      class Normalization__
 
         class << self
 
           def existent_directory * x_a
             Normalization__::Existent_Directory__.mixed_via_iambic x_a
           end
+
+          def upstream_IO * x_a
+            Normalization__::Upstream_IO__.mixed_via_iambic x_a
+          end
         end  # >>
 
-        Event_  = Headless_::Lib_::Event_lib[]
+      private
+
+        def path_exists_and_set_stat_and_stat_error path
+          @stat = ::File.stat path
+          @stat_e = nil
+          ACHIEVED_
+        rescue ::Errno::ENOENT, Errno::ENOTDIR => @stat_e  # #todo assimilate the others
+          @stat = nil
+          UNABLE_
+        end
+
+        def via_stat_and_path_build_wrong_ftype_event expected_ftype_s
+          build_not_OK_event_with :wrong_ftype,
+              :actual_ftype, @stat.ftype,
+              :expected_ftype, expected_ftype_s,
+              :path, @path do |y, o|
+
+            y << "#{ pth o.path } exists but is not #{
+             }#{ indefinite_noun o.expected_ftype }, #{
+              }it is #{ indefinite_noun o.actual_ftype }"
+          end
+        end
+
+        DIR_FTYPE_ = 'directory'.freeze
+
+        Entity_ = Headless_::Lib_::Entity[]
+
+        Event_ = Entity_.event
+
+        FILE_FTYPE_ = 'file'.freeze
+
       end
     end
   end

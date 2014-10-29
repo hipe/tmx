@@ -67,7 +67,7 @@ module Skylab::Treemap
   MetaHell = ::Skylab::MetaHell
   Treemap = self
   Treemap_ = self
-  WRITEMODE_ = 'w'.freeze
+  WRITE_MODE_ = 'w'.freeze
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 end

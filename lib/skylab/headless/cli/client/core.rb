@@ -153,8 +153,9 @@ module Skylab::Headless
 
       # ~ #storypoint-305 agent-like facety-things
 
-      def resolve_instream_status_tuple   # #storypoint-310
-        CLI::Client::Bundles__::Resolve_upstream[ self ]
+      def common_resolve_IO_adapter_instream  # #storypoint-310  # :+#hook-in courtesy method
+        _stx = argument_syntax_for_action_i default_action_i
+        Client_::Actors__::Resolve_instream[ @argv, @IO_adapter, _stx, self ]
       end
 
       # ~ things that will turn into services  # #todo:during-merge
@@ -210,8 +211,6 @@ module Skylab::Headless
       end
     end
 
-    CEASE_X_ = CLI::Action_::CEASE_X_
-
     module Adapter  # #stowaway for [#054] ouroboros
       Autoloader_[ self ]
     end
@@ -219,6 +218,10 @@ module Skylab::Headless
     module Bundles__  # #stowaway
       Autoloader_[ self ]
     end
+
+    CEASE_X_ = CLI::Action_::CEASE_X_
+
+    Client_ = self
 
     module IMs__
       Adapter = Adapter  # covered

@@ -1,5 +1,7 @@
 # facets are.. :[#080]
 
+(#todo between [#fa-025] and this one will assimilate the other.)
+
 facets are like inversion of control / dependency injection 'plugins', but
 not always as clean. we leverage ruby's re-openable classes for dependency
 injection. sometimes they are loaded (in different files) dynamically,

@@ -188,7 +188,7 @@ module Skylab::TanMan::TestSupport::Sexp
       @IO_adapter.errstream.puts s ; nil
     end
 
-    define_method :resolve_upstream_status_tuple do
+    define_method :resovle_upstream do
       fail 'YES'  # #todo - is this ever used any more? IFF so, :+[#hl-022]
       ok = false                  # [#hl-023] exit-code aware, [#019] invite
       begin

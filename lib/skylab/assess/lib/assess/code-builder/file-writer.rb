@@ -51,7 +51,7 @@ module Hipe
             )
           end
         end
-        WRITEMODE_ = Headless::WRITEMODE_
+        WRITE_MODE_ = Headless::WRITE_MODE_
       end
     end
   end

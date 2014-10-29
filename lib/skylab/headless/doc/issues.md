@@ -49,7 +49,7 @@
 [#122]       #parent-node: [#050] a list of hash tags and their tentative m..
 [#121]       #parent-node: [#120] "bundle as method definitions macro.."
 [#120]       #parent-node: [#090] patterns for developing bundles ..
-[#119]       #parent-node: [#095] the method naming shibboleth (#placeholder)
+[#119]       #parent-node: [#095] the method naming shibboleth
 [#118]       #parent-node: [#092] "memberhood" defined
 [#117]       #parent-node: [#069] what does "application" even mean?
 [#116]       #parent-node: [#050] "vectors of concern defined.."
@@ -63,7 +63,7 @@
 [#109]       #parent-node: [#050] "noise.."
 [#108]       #parent-node: [#093] on structural isomorphicisms to the
               natural language syntactic structures ..
-[#107]       #parent-ndoe: [#095] the relationship btwn verb phrases and ..
+[#107] #hole (was : #parent-ndoe: [#095] the relationship btwn verb phrases and .. )
 [#106]       #parent-node: [#050] idioms grow from ubiquity ..
 [#105]       #parent-node: [#093] "the rule of business object variable.."
 [#104]       #parent-node: [#093] "list of variable name patterns.."
@@ -94,8 +94,9 @@
 [#081]       #doc-point the `norm*` family of functions..
 [#080]       #doc-point `facet`s are like IoC/dependency injection #plugins ..
 [#079]       #parent-node: [#097] constants whose name ends in one or more
-             underscores are API private - knowledge of their shape or
-             existence must not be necessary outside of thir parent node.
+             underscores ("trailing underscores") are API private -
+             there must be no knowledge of their existence outside of
+             their parent node.
 [#078]       #doc-point shells, stories and kernels
 [#077]       #doc-point the plugin narrative ..
 [#076]       #parent:070 #future-feature enable/disable a particular plugin

@@ -1,5 +1,71 @@
 # the CLI upstream resolution narrative :[#022]
 
+
+## synopsis
+
+given one [#ba-038] "arg" for a path (whose actual value is possibly
+false-ish), and zero or one actual value for an "instream", resolve one
+stream open for reading.
+
+
+
+
+## interface theory
+
+there is what the user passes to your action and then there is what
+your action passes to this actor, which is [#mh-024] different:
+
+your action passes to this actor zero or one instream (the IO object,
+typically STDIN); and one [#ba-038] argument "trio" modeling both
+the user's actual argument value for the `path` (if any was provided)
+as well as modeling the formal value of the `path` (that is, metadata
+about the field (like its name function) for use in event emission).
+
+the actor assumes a different "input grammar" for your action based on
+whether or not you pass the instream (typically STDIN): if you pass it,
+it is assumed that your action will process *either* noninteractive STDIN
+*or* a file. if you don't pass an instream, the actor assumes that your
+input grammar is simply a single argument for the infile path name,
+whose actual value is a path that should be opened for reading.
+
+if (per what your action passes to the actor) your grammar is such that
+you accept either STDIN or a path, when the instream and the actual value
+for path are processed, input will be disambiguated (do we use STDIN or
+path?) and, in case of either ambiguity or effectively missing argument(s)
+an error event is emitted:
+
+if any actual argument for path is present, this will make it "look" as
+though it is supposed to be used. the instream "looks" as though it is
+supposed to be used if it is present and non-interactive and open.
+
+if in the actual arguments both "look" is if they are supposed to be used,
+this is classified as ambiguous input and the result is an event emission
+modelling the same.
+
+if the argument instream is resolved unambiguousy as the one that is to be
+used, the result is a call to the "success callback" (`as_normal_value`)
+being passed this selfsame IO object that was passed in as an argument.
+since the success callback defaults to the identity function, if a success
+callback was not provided the final result of the actor in this case
+is this IO object itself.
+
+if the path is resolved unabiguously as the one that is to be used,
+from this path the actor will attempt to produce a filehandle open for
+reading. what are considered to be the commonest IO exceptions (file not
+found, path is not file (e.g is directory)) are caught and the final
+result is the emission of this exception turned somehow into an error event.
+
+whether or not other system call exceptions related to this IO operation
+will be corralled and turned into event emissions is formally undefined
+(but they probably will be).
+
+if the system call succeeds and the path is successfully opened for
+reading, the final result of the actor will likewise be a call to the
+success callback with this new IO object, open for reading.
+
+
+
+
 :#storypoint-10 introduction
 
 premature as it may be, this is an (old) attempt to distill this commmon

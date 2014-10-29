@@ -170,7 +170,7 @@ module Skylab::TestSupport::Regret::API
         @err.write io.read
       else
         @err.write "(writing #{ @pth[ pn ] } .." ; bytes = nil
-        ( @is_dry_run ? Dev_null_[] : pn ).open WRITEMODE_ do |fh|
+        ( @is_dry_run ? Dev_null_[] : pn ).open WRITE_MODE_ do |fh|
           bytes = fh.write io.read
         end
         @err.puts " done (#{ bytes }#{ ' fake' if @is_dry_run } bytes))"
@@ -179,7 +179,7 @@ module Skylab::TestSupport::Regret::API
       true
     end
     Dev_null_ = API::RegretLib_::Dev_null
-    WRITEMODE_ = API::WRITEMODE_
+    WRITE_MODE_ = API::WRITE_MODE_
 
     def say volume, msg_p
       snitch.say volume, msg_p

@@ -145,7 +145,7 @@ module Skylab::Snag
     end
 
     Writemode = -> do
-      HL__[]::WRITEMODE_
+      HL__[]::WRITE_MODE_
     end
 
   end

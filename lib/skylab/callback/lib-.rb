@@ -130,7 +130,7 @@ module Skylab::Callback
     TestSupport_ = TestSupport__ = sidesys[ :TestSupport ]
 
     Writemode = -> do
-      HL__[]::WRITEMODE_
+      HL__[]::WRITE_MODE_
     end
   end
 end

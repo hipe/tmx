@@ -131,7 +131,6 @@ module Skylab::CSS_Convert
       result = :error
       begin
         set! or break
-        # resolve_instream_status_tuple or break
         p = CSSC_::Directive__::Parser.new self
         d = p.parse_stream( io_adapter.instream ) or break
         if ! dump_directives d
@@ -159,8 +158,8 @@ module Skylab::CSS_Convert
 
   private
 
-    def resolve_upstream_status_tuple  # NOTE will change
-      resolve_instream_status_tuple
+    def resolve_IO_adapter_instream
+      common_resolve_IO_adapter_instream
     end
 
     def build_option_parser

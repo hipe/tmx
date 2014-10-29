@@ -37,12 +37,13 @@ module Skylab::Headless
         Action_::INVOKE_METHOD_I = :invoke
       private
         def parse_opts a  # #storypoint-25
-          if a.length.zero? or is_branch && DASH_ != a[0].getbyte(0) or ! op
+          if a.length.zero? or is_branch && DASH_BYTE_ != a[0].getbyte(0) or ! op
             OK_
           else
             prs_opts_from_nonzero_length_argv_when_op a
           end
         end
+
         # #storypoint-30 ugly names are used here
         def option_prsr  # :#API-private
           op
@@ -101,6 +102,27 @@ module Skylab::Headless
         def bld_hlp_yldr
           ::Enumerator::Yielder.new( & emit_help_line_p )
         end
+
+      public
+
+        def receive_event ev  # experimenal bridge to the future
+          # in practice most events have only one line so..
+          scan = ev.scan_for_render_lines_under expression_agent
+          while line = scan.gets
+            if ev.ok
+              emit_info_line line
+              x = ACHIEVED_
+            elsif ev.ok.nil?
+              emit_info_line line
+            else
+              emit_error_line line
+              x = UNABLE_
+            end
+          end
+          x
+        end
+
+      private
 
         def emit_error_line s
           emit_info_line s
@@ -472,14 +494,10 @@ module Skylab::Headless
 
         def cllps_upstream
           @upstrm_is_collapsed = true
-          ok, x = resolve_upstream_status_tuple
-          @upstrm_status_x = case ok
-            when PROCEDE_X_, CEASE_X_ ; ok
-            else x
-          end
+          resolve_IO_adapter_instream
         end
 
-        def resolve_upstream_status_tuple  # #storypoint-835
+        def resolve_IO_adapter_instream  # #storypoint-835
           OK_
         end
 

@@ -20,7 +20,7 @@ module Skylab::CodeMolester
       end
       bytes = nil
       if do_write
-        File.open( to_s, WRITEMODE_ ) { |fh| bytes = fh.write(content) }
+        File.open( to_s, WRITE_MODE_ ) { |fh| bytes = fh.write(content) }
         e[:write_rewrite_end, bytes]
       end
       bytes

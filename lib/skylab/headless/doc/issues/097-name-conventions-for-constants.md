@@ -1,6 +1,6 @@
 # name conventions for constants :[#097]
 
-(this is a ground-up re-write of a document "lost in the fire".)
+(this is a ground-up re-write of a document "lost in the [#084] fire".)
 
 ## introduction
 
@@ -10,7 +10,7 @@ something like:
 
     [A-Z][_A-Za-z0-9]*
 
-(we will typically say "const" instead of "constant" universally,
+(we will now typically say "const" instead of "constant" universally,
 because ruby itself uses this abbreviation in its method names.)
 
 
@@ -29,7 +29,7 @@ the name we choose will assume different "inflection" based on whether,
 variously, it references [#166] a non-class module, [#167] a class,
 [#101] a proc or proc-like, or [#114] any other value not in that list.
 we will present the conventions here in order from "smallest" to "biggest",
-idiomatically.
+idiomatically:
 
 
 
@@ -44,7 +44,7 @@ constituent words are separated by underscores:
 the above is an example of a const that holds a regex.
 
 in practice, we will often see our const names containing one or more
-[#079] trailing underscores because of [[#165]].
+[#079] trailing underscores because of [[#165]] "rounded API's".
 
 that is all.
 
@@ -112,7 +112,8 @@ a const name indicates how private the value is:
 
 #### a const with no trailing uderscores is..
 
-.. part of the surrounding node's public API.
+.. part of the surrounding node's public API. (for a review of what we
+mean by "node" see [#094].)
 
 this means that the characters that make up this const's name and the
 sematics of what this this const references must not change during this

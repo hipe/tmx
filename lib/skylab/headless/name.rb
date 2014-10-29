@@ -97,7 +97,7 @@ module Skylab::Headless
       end.call
 
       Metholate__ = -> i do  # in case your normal is a slug for some reason
-        i.to_s.gsub DASH_S_, UNDERSCORE_
+        i.to_s.gsub DASH_, UNDERSCORE_
       end
 
       Module_moniker___ = -> num_parts, mod do
@@ -139,7 +139,7 @@ module Skylab::Headless
       end.call
 
       Slugulate__ = -> i do  # for normals only. centralize this simple transform.
-        i.to_s.gsub UNDERSCORE_, DASH_S_
+        i.to_s.gsub UNDERSCORE_, DASH_
       end
 
     o = -> i, p do
@@ -169,10 +169,6 @@ module Skylab::Headless
     o[ :normify, Normify__ ]
 
     o[ :slugulate, Slugulate__ ]
-
-    DASH_S_ = '-'.freeze ;  # there is another 'DASH_'
-
-    UNDERSCORE_ = '_'.freeze
 
       def initialize local_normal_i
         @local_normal_i = local_normal_i

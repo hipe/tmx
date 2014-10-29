@@ -280,7 +280,7 @@ module Skylab::TestSupport::Regret::API
       bytes = nil
       @io.rewind
       opener = @is_dry_run ? RegretLib_::Dev_null[] : @opn
-      opener.open WRITEMODE_ do |fh|
+      opener.open WRITE_MODE_ do |fh|
         bytes = fh.write @io.read
       end
       @err.puts ">>> #{ @pth[ @opn ] } written (#{ bytes }#{

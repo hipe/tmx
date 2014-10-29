@@ -4,9 +4,9 @@ module Skylab::Headless
 
     class Services__::Filesystem
 
-      module Normalization__
+      class Normalization__
 
-        class Existent_Directory__
+        class Existent_Directory__ < self
 
           class << self
 
@@ -104,7 +104,7 @@ module Skylab::Headless
           end
 
           def when_existent_path_is_strange
-            send_event via_stat_and_path_build_wrong_ftype_event DIR_FTYPE__
+            send_event via_stat_and_path_build_wrong_ftype_event DIR_FTYPE_
           end
 
           def when_no_stat
@@ -199,17 +199,8 @@ module Skylab::Headless
         private
 
           def when_strange_ftype
-            _ev = via_stat_and_pn_build_wrong_ftype_event DIR_FTYPE__
+            _ev = via_stat_and_pn_build_wrong_ftype_event DIR_FTYPE_
             unable_because_event _ev
-          end
-
-          def path_exists_and_set_stat_and_stat_error path
-            @stat = ::File.stat path
-            @stat_e = nil
-            ACHEIVED_
-          rescue ::Errno::ENOENT, Errno::ENOTDIR => @stat_e  # #todo assimilate the others
-            @stat = nil
-            UNABLE_
           end
 
           def build_path_too_deep_event
@@ -228,19 +219,7 @@ module Skylab::Headless
           end
 
           def via_no_ent_stat_error_build_event
-            Event_.wrap.exception :exception, @stat_e, :path_hack
-          end
-
-          def via_stat_and_path_build_wrong_ftype_event expected_ftype_s
-            build_not_OK_event_with :wrong_ftype,
-                :actual_ftype, @stat.ftype,
-                :expected_ftype, expected_ftype_s,
-                :path, @path do |y, o|
-
-              y << "#{ pth o.path } exists but is not #{
-               }#{ indefinite_noun o.expected_ftype }, #{
-                }it is #{ indefinite_noun o.actual_ftype }"
-            end
+            Event_.wrap.exception @stat_e, :path_hack
           end
 
           def via_stat_and_pn_build_wrong_ftype_event expected_ftype_s
@@ -259,7 +238,7 @@ module Skylab::Headless
           end
 
           def via_strange_stat_error_build_event
-            _ev = Event_.wrap.exception :exception, @stat_e, :path_hack
+            _ev = Event_.wrap.exception @stat_e, :path_hack
             i_a = _ev.to_iambic
             # (we used to add more members here, now we don't)
             Event_.inline_via_iambic_and_message_proc i_a, -> y, o do
@@ -290,8 +269,6 @@ module Skylab::Headless
           end
 
           Mock_Dir__ = ::Struct.new :to_path
-
-          DIR_FTYPE__ = 'directory'.freeze
         end
       end
     end

@@ -500,13 +500,12 @@ module Skylab::Brazen
         class << self
 
           def exception *x_a
-            case 1 <=> x_a.length
-            when  0
-              Event_::Wrappers__::Exception.with :exception, x_a.first
-            when -1
-              Event_::Wrappers__::Exception.via_iambic x_a
-            when  1
+            if x_a.length.zero?
               Event_::Wrappers__::Exception
+            else
+              # implement an :+[#cb-057] ideal mixed syntax
+              x_a[ 0, 0 ] = [ :exception ]
+              Event_::Wrappers__::Exception.via_iambic x_a
             end
           end
 

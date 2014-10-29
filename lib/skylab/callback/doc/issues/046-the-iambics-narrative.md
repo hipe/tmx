@@ -77,6 +77,11 @@ after the above call takes this one ("positional") required argument
 note that while strictly speaking there are five actual arguments
 being sent to this method call, but conceptually there are three.
 
+(a syntax like this that has *one* required argument and accepts zero or
+one "literal iambic" as the remainder of the arguments (that is, possibly
+many arguments that will be parsed with an iambic syntax); we call this
+an "ideal mixed syntax" :[057].)
+
 
 
 a method that supports iambic arguments can look on the surface like the
@@ -161,7 +166,7 @@ or two arguments, we would like you take those arguments iambically.
   so, unlike with a hash in this scenario where a sender could explicitly
   overwrite values in an argument hash that it is preparing, with an
   iambic in this scenario the sender should only prepend or append new
-  name-value pairs on to the exiting iambic (if that).
+  name-value pairs on to the existing mutable iambic (if that).
 
   upon receiving such an iambic, it is the receiver that gets to decide
   whether these multiple values should be treated as parts of a list or

@@ -250,7 +250,7 @@ between one way and the other trivially) so the point might be moot.
   associated with it, the number being constrained by the
   `categorization exponent arity` of the `category`.
 
-[5] - "Grammatical_category" (wikipedia)
+[5] - `Grammatical_category` (wikipedia)
 [6] - "Exponent_(linguistics)"
 [7] - "Grammatical_gender"
 
@@ -354,7 +354,7 @@ clear below, the `meta-categorization` of 'continuity' is useful because of
 the different sets of functions it suggests for instances tagged by its
 different `exponents`)
 
-[8] - "Digital_physics" (wikipedia)
+[8] - `Digital_physics` (wikipedia)
 
 now, to place `discrete` and `continuous` into our existing framework
 pseudo-formally, we will attempt something interesting and fun:

@@ -19,8 +19,12 @@ module Skylab::Headless::SubClient
         NLP_EN_expression_agent_instance__[]
       end
 
-      def NLP_EN_methods
-        NLP_EN_Methods__
+      def NLP_EN_methods * x_a
+        if x_a.length.zero?
+          NLP_EN_Methods__
+        else
+          NLP_EN_Methods__.via_arglist x_a
+        end
       end
     end
   end

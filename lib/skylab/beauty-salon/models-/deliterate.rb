@@ -127,7 +127,7 @@ module Skylab::BeautySalon
       @input_stream = ::File.open @input_path, READ_MODE_
       @input_stream && ACHEIVED_
     rescue ::Errno::ENOENT => e
-      _ev = Brazen_.event.wrap.exception :exception, e,
+      _ev = Brazen_.event.wrap.exception e,
         :path_hack, :terminal_channel_i, :resource_not_found
       receive_event _ev
       UNABLE_

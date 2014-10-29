@@ -1,5 +1,18 @@
 # the CLI client narrative :[#089]
 
+
+# about this document
+
+this document is largely historical. do not start new projects with this
+CLI. at the time of this writing the current "leader" for CLI is in [br].
+when we say "historical" we mean it - this document contains
+early glints of ideas that came to more fruition later, so it's fun to
+keep around for this reason.
+
+also this document will see updates as this legacy node gets refactored and
+maintained.
+
+
 ## :#storypoint-5 introduction
 
 welcome to the CLI client. if you are reading this you may also enjoy
@@ -41,9 +54,20 @@ non-core facilities.
 
 ## :#storypoint-310
 
-for now the way you access this facility is by calling this method from
-inside the appropriate #hook-in method that resolves the instream status
-tuple. see the instream node, which has its own narrative.
+this method is a "courtesy #hook-in" which means it is not called
+explicitly anywhere; you have to call it yourself. this method is
+typically leveraged by simply providing this method call as the only
+line of the body of one particular other method, one that is a
+`#hook-in`-able method (that is, a method that has a default implementation
+but which is explicitly expected to be optionally overridden and so part of
+the public API of this node).
+
+the CLI of some older applications may use this as sort of a universal
+default way to resolve the upstream IO; when this IO might be a file on
+the filesystem, or it might be the STDIN.
+
+#todo this result signature is obtuse - we can't even document it yet.
+
 
 
 
@@ -90,11 +114,11 @@ very lastly we employ our own m.m's and i.m's -- which may be implemented as
 #bundle-as-method-definition-macros -- because that is the most specific
 thing of all in all of this (besides whatever the human client writes
 in the client class). because we know that the outstream has added a
-'method_added' listener, we turn the DSL off when our method macro adds
+`method_added` listener, we turn the DSL off when our method macro adds
 methods (which in theory shouldn't be necessary but feels nicer).
 
 this is a concern that is relevant to everywhere that we employ bundles
-after employing a DSL that uses a 'method_added' hook.
+after employing a DSL that uses a `method_added` hook.
 
 
 

@@ -22,7 +22,7 @@ module Skylab::CSS_Convert::TestSupport
 
     it "with no args, gives warm, inviting message" do
       client.invoke([]).should eql(-1)
-      stderr.shift.should be_include('expecting: <directives-file>')
+      stderr.shift.should match %r(\Aexpecting <directives-file> or STDIN\z)
       u(stderr.shift).should match(usage_re)
       u(stderr.shift).should match(invite_re)
       stderr.length.should eql(0)
@@ -46,7 +46,7 @@ module Skylab::CSS_Convert::TestSupport
     end
 
     define_method :expect_whine_about_directives_file_not_found do
-      stderr.shift.should match(/<directives-file> not found: .+not-there.txt/)
+      stderr.shift.should match %r(\ANo such file or directory - .+\bnot-there\.txt\b)
       u(stderr.shift).should match(usage_re)
       u(stderr.shift).should match(invite_re)
       stderr.length.should eql(0)

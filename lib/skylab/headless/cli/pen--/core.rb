@@ -178,11 +178,21 @@ module Skylab::Headless
       end
 
       def par x
-        kbd "<#{ x.to_s.gsub '_', '-' }>"
+        _slug = if x.respond_to? :name
+          x.name.as_slug
+        else
+          x.id2name.gsub UNDERSCORE_, DASH_
+        end
+        kbd "<#{ _slug }>"
       end
 
       def param i
         i
+      end
+
+      def pth x
+        x.respond_to? :to_path and x = x.to_path
+        "«#{ ::File.basename "#{ x }" }»"  # :+#guillemets
       end
 
       # def `val` - how may votes? (1: sg) [#051]

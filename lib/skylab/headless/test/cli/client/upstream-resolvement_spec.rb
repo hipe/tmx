@@ -56,8 +56,8 @@ module Skylab::Headless::TestSupport::CLI::Client
             :_wazzle_
           end
         private
-          def resolve_upstream_status_tuple
-            resolve_instream_status_tuple
+          def resolve_IO_adapter_instream
+            common_resolve_IO_adapter_instream
           end
           self
         end
@@ -65,7 +65,7 @@ module Skylab::Headless::TestSupport::CLI::Client
 
       it "no arg - x" do
         invoke
-        expect :styled, /\Aexpecting:? <input-file-nombre>\z/
+        expect :styled, /\Aexpecting <input-file-nombre> or STDIN\z/
         expect_failed
       end
 
@@ -73,7 +73,7 @@ module Skylab::Headless::TestSupport::CLI::Client
         from_workdir do
           invoke 'not-there.txt'
         end
-        expect :styled, '<input-file-nombre> not found: not-there.txt'
+        expect %r(No such file or directory - .+\bnot-there\.txt\b)
         expect_failed
       end
 
@@ -82,8 +82,7 @@ module Skylab::Headless::TestSupport::CLI::Client
         from_workdir do
           invoke MAZZLE_DAZZLE__
         end
-        expect :styled,
-          /\binput.file.nombre[^ ]* is directory: mazzle-dazzle\b/
+        expect %r(\Wmazzle-dazzle\W exists but is not a file, it is a directory\z)
         expect_failed
       end
       MAZZLE_DAZZLE__ = 'mazzle-dazzle'
@@ -108,8 +107,8 @@ module Skylab::Headless::TestSupport::CLI::Client
         it "complains of ambiguity before checking for file existence - x" do
           invoke 'whatever'
           _exp = <<-HERE.gsub( %r(\n^[ ]+), ' ' ).strip!
-            cannot resolve ambiguous upstream modality paradigms --
-            both STDIN and <input-file-nombre> appear to be present.
+            ambiguous upstream arguments - cannot read from both
+            STDIN and <input-file-nombre>
           HERE
           expect :styled, _exp
           expect_failed

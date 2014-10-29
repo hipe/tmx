@@ -17,7 +17,7 @@ module Skylab::TestSupport
       Plugin_ = TestSupport_::Lib_::Heavy_plugin[]
       Regret = Regret
       TestSupport_ = TestSupport_
-      WRITEMODE_ = 'w'.freeze
+      WRITE_MODE_ = 'w'.freeze
 
       module RegretLib_
 

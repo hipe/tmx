@@ -1,5 +1,8 @@
 # the control-flow method-naming idiomspace :[#0154]
 
+(EDIT: the meaning of the `resolve_` prefix has changed subtly,
+necessitating a rewrite for this document #todo)
+
 the overblown title of this article is a formal way of saying something like
 this: if a method results in true-ish then it means keep going. otherwise
 (and it follows that the method result is false-ish), then it means stop now.
@@ -33,9 +36,9 @@ below.
 
 ### the plain old "resolve_" (alternately: "attempt_[to_]") prefix
 
-the plain old "resolve_" method (that is, any method whose name starts with
-"resolve_" (or the #de-vowelated form "rslv_") and is not followed by "some_"
-or "any_") must be used to conveny that:
+the plain old `resolve_` method (that is, any method whose name starts with
+`resolve_` (or the #de-vowelated form `rslv_`) and is not followed by `some_`
+or `any_`) must be used to conveny that:
 
   • your method will succeed or fail
   • its success or failure must be reflected in its result value
@@ -45,12 +48,15 @@ or "any_") must be used to conveny that:
       in ruby are not here prescribed. conversely we may one day proscribe
       this practice.
   • you must not piggy-back and have the result value double as a meaningful
-    busines value. (consider "resolve_any_" for this, explained below.)
+    busines value.
 
 calling such a method may effect arbitrary side-effects:
 
-  • it may call_digraph_listeners events or otherwise effect behavioral side-effects, for e.g
-    to indicate that the desired value or object could not be resolved.
+  • it should be ass
+
+  • it may `call_digraph_listeners` events or otherwise effect behavioral
+    side-effects, for e.g to indicate that the desired value or object could
+    not be resolved.
   • these methods often but not always have some business objects or values
     that they were used to .. resolve. such values *must* be stored to ivars
     in this case as appropriate: they cannot be returned as a result value.
@@ -89,7 +95,7 @@ but we cannot use the same form to cover these different signatures, that
 leads to ambiguity, which is our anathema.
 
 so we needed some form to cover this other signature, and no other form was
-availble that did not sound awkward (we considereed "attempt_resolve_" for
+availble that did not sound awkward (we considereed `attempt_resolve_` for
 this.) but since "some" and "any" are already constructions in broad use by us
 and they cover the semantics more precisely, we tighted the meaning of plain
 old "resolve_" down to this.
@@ -117,16 +123,16 @@ now:
 
 
 
-### "resolve_some_"
+### `resolve_some_`
 
 in contrast to plain old "resolve_", the business payload of a call to a
-"resolve_some_"-style method is in its result value.
+`resolve_some_`-style method is in its result value.
 
 the "some" in any method is generally an assertion that under normal, non-
 exceptional circumstances the method call must be expected always to result
 in some true-ish value.
 
-• similar to a "build_" method described below, using this form in your method
+• similar to a `build_` method described below, using this form in your method
   name is a promise that your method either results in the stated object
   or value, or raises an exception (directly or effectively) in such case that
   it cannot.
@@ -134,15 +140,15 @@ in some true-ish value.
 • the method body of such a method must not assign any resolved value to
   an ivar. the caller is free to do this as appropriate.
 
-• as to whether this method may call_digraph_listeners behavior side-effects such as
-  emitting events, see discussion below.
+• as to whether this method may `call_digraph_listeners` behavior
+  side-effects such as emitting events, see discussion below.
 
-the reason you would say "resolve_some_" and not "build_" is because maybe
+the reason you would say `resolve_some_` and not `build_` is because maybe
 this method is not constructing a new object itself, but rather getting it
 from somewhere else or from some (potentially deep) logic tree, or just
 looking it up somewhere.
 
-the reason you would say "resolve_some_" as opposed to the plain noun form of
+the reason you would say `resolve_some_` as opposed to the plain noun form of
 the thing you are yielding is because you want to emphasize that this is not
 memoized to an ivar, that is, that the work involded in yielding the target
 value will be executed again if this method is called agiain.
@@ -151,14 +157,14 @@ this method may effect behavior side-effects (like emitting events).
 
 
 
-### "resolve_any_"
+### `resolve_any_`
 
-in contrast to "resolve_some_", it is within the scope of "normal" for a
-"resolve_any_" to result in false-ish if a resultant object is not available
+in contrast to `resolve_some_`, it is within the scope of "normal" for a
+`resolve_any_` to result in false-ish if a resultant object is not available
 or applicable. the caller must assume responsibility for the possibility that
 the call resulted in false-ish.
 
-in contrast to a plain old "resolve_", the business payload of this method
+in contrast to a plain old `resolve_`, the business payload of this method
 call is its result value.
 
 • the method may result in a false-ish which is an indication that no such
@@ -166,8 +172,8 @@ call is its result value.
 
 • the method itself must not set any ivars (but its callees may).
 
-• as to whether this method may call_digraph_listeners behavior side-effects such as
-  emitting events, see discussion below.
+• as to whether this method may `call_digraph_listeners` behavior
+  side-effects such as emitting events, see discussion below.
 
 
 
@@ -191,9 +197,9 @@ methods are usually used rather than ideological design principles.)
 the short answer is "probably yes." because calling any form of a "resolve"
 method generally means you are doing some non-deterministic or (perhaps only
 slightly) non-trivial amount of work, then there is always a chance that you
-will want to call_digraph_listeners informational events (if for exaple you want to state
-explicitly that you are loading some default object because one was not
-stipulated specifically in the request.)
+will want to `call_digraph_listeners` informational events (if for example
+you want to state explicitly that you are loading some default object because
+one was not stipulated specifically in the request.)
 
 certainly in the case of plain old resolve, it would be too limiting to not
 allow the emission of events, because these methods are generally modeled to
@@ -291,18 +297,22 @@ must follow every point of this criteria:
 if there is is a chance that this building will result in a non-exceptional
 failure and the method may result in e.g false-ish and/or effect behavioral
 side-effects then this is not a builder method but a "resolver", specically
-it sounds like a "resolve_any_*" as presented in [#154] the control flow
+it sounds like a `resolve_any_*` as presented in [#154] the control flow
 method naming idiomspace.
 
 
 
-### the "begin_" prefix
+### the `begin_` prefix
 
 semantically this is a "sub-step" of a "build".
 
 currently a "begin"-style method may either result in or set an ivar to an
 object that has "begun" being built but has not "finished" being built.
 often it is the caller that is expected to finish the building of the object.
+perhaps sadly the complement to `begin_` is not `end_` but `finish_`
+(for now). this is because `end_` may mistakenly communicate that we are
+done with the subject object, when it fact it is only finished being
+built.
 
 
 #### history
@@ -311,6 +321,5 @@ we used to use the stem "create" for this, but this practice was eliminated
 as a convention and replaced with "begin" because of its potential for
 confusion with "build".
 
-we used to use the stem "start" for this, but this practice was eliminited
-because of its potential for confusion with the operation of starting a
-long-running daemon process, something we would like to do one day.
+we say `begin_` and not `start_` because `start_` is reserved for
+meaning to start a long-running process like a daemon.

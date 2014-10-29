@@ -33,6 +33,8 @@ module Skylab::Headless
 
     Bsc__ = sidesys[ :Basic ]
 
+    Bsc_ = Bsc__
+
     Meso_box_lib = -> do
       Bsc__[]::Box
     end

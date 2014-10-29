@@ -259,10 +259,10 @@ module Skylab::Flex2Treetop
       API.invoke_with_iambic x_a
     end
 
-    def resolve_upstream_status_tuple  # #hook-in to [hl], up for chopping soon
-      r = resolve_instream_status_tuple
-      r or help_yielder << invite_line
-      r
+    def resolve_IO_adapter_instream  # #hook-in to [hl]
+      ok = common_resolve_IO_adapter_instream
+      ok or help_yielder << invite_line
+      ok
     end
   end
 
@@ -544,7 +544,7 @@ module Skylab::Flex2Treetop
         @pay_IO
       end
       def rslv_any_outstream_when_path
-        @pay_pn.open WRITEMODE_
+        @pay_pn.open WRITE_MODE_
       end
 
       def resolve_some_outstream_moniker
@@ -802,7 +802,7 @@ module Skylab::Flex2Treetop
 
     def any_endpoint_from_write_grammar_file  y
       bytes = nil
-      @grammar_pathname.open WRITEMODE_ do |fh|
+      @grammar_pathname.open WRITE_MODE_ do |fh|
         bytes = fh.write TREETOP_GRAMMAR__
       end
       y << "wrote #{ @grammar_pathname } (#{ bytes } bytes)." ; nil
@@ -1518,7 +1518,7 @@ module Skylab::Flex2Treetop
   CEASE__ = false ; PROCEDE__ = true
   DIR_FTYPE_ = 'directory'.freeze
   FILE_FTYPE_ = 'file'.freeze
-  WRITEMODE_ = 'w'.freeze
+  WRITE_MODE_ = 'w'.freeze
   TERM_SEPARATOR_STRING_ = ' '.freeze
 
   ENHANCE_PARSER_CLASS_P__ = -> do
