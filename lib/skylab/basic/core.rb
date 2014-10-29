@@ -69,6 +69,12 @@ module Skylab::Basic  # introduction at [#020]
 
   class Trio_  # :[#038].
 
+    class << self
+      def via_value_and_variegated_symbol x, i
+        new x, true, Callback_::Name.via_variegated_symbol( i )
+      end
+    end
+
     def initialize * a
       @value_x, @actuals_has_name, @property = a
       freeze

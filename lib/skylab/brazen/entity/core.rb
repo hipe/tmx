@@ -748,6 +748,10 @@ module Skylab::Brazen
         x
       end
 
+      def replace_current_iambic_token & p
+        @x_a[ @d ] = p[ current_iambic_token ] ; nil
+      end
+
       def current_iambic_token
         @x_a.fetch @d
       end

@@ -195,51 +195,68 @@ module Skylab::CodeMolester
       nil
     end
 
-    def read & p  # :+[#hl-022] for sure
-      @pathname or raise "cannot read - no pathname associated with this #{ noun }"
-      st = Read__.new ; p and p[ st ]
-      esc_p = st.escape_path
-      st.escape_path = -> pn_x do
-        esc_p && esc_p.respond_to?( :escape_path ) and never  # #todo
-        esc_p ||= Default_escape_path__
-        esc_p[ pn_x ]
-      end
-      if cached_pathname_exist
-        r = read_when_path_exist st
+    public def read & p
+      read = Read__.new
+      p and p[ read ]
+      error_x = nil
+      io = CM_::Lib_::System[].filesystem.normalization.upstream_IO(
+        :path, @pathname.to_path,
+        :on_event, -> ev do
+          error_x = read.receive_event ev
+          false
+        end )
+      if io
+        read_via_open_IO_and_read io, read
       else
-        r = read_when_path_not_exist st
+        error_x
       end
-      r
-    end ; public :read
-    #
-    Read__ = ::Struct.new :error, :read_error, :no_ent, :is_not_file,
-      :invalid, :escape_path
-    #
-    Default_escape_path__ = -> pn { pn.basename }  # a nice safe common denom.
-
-    def read_when_path_exist st
-      stat = @pathname.stat
-      if 'file' == stat.ftype
-        r = read_when_is_file st
-      else
-        r = read_when_is_not_file st, stat
-      end
-      r
     end
 
-    def read_when_is_file st
-      content_s = @pathname.read
+    class Read__  # experimental interface "shell" for [#hl-022]:read
+      def initialize
+        @error, @invalid, @is_not_file, @no_ent, @read_error = nil
+      end
+      attr_accessor :error, :invalid, :is_not_file, :no_ent, :read_error
+
+      def receive_event ev
+        send :"receive_#{ ev.terminal_channel_i }", ev
+      end
+
+      def receive_errno_enoent ev
+        ( @no_ent || @read_error || @error || dflt )[ ev ]
+      end
+
+      def receive_wrong_ftype ev
+        ( @is_not_file || @read_error || @error || dflt )[ ev ]
+      end
+
+    private
+      def dflt
+        -> ev do
+          if ev.has_tag :exception
+            raise ev.exception
+          else
+            raise ev.to_exception
+          end
+        end
+      end
+    end
+
+    def read_via_open_IO_and_read io, read
+      content_s = io.read
       clear_everything_but_pathname_identity_related
       @pathname_was_read = true
       @content_x = content_s  # lest infinite call stack, set this ..
-      r = if valid?  # .. before you call this, per #here
-        true
-      elsif (( p = st.invalid || st.error ))
-        p[ @invalid_reason ]
+      if valid?  # .. before you call this, per #here
+        DID_
       else
-        false
+        p = read.invalid || read.error
+        if p
+          p[ @invalid_reason ]
+        else
+          UNABLE_
+        end
       end
-      r
     end
 
     def clear
@@ -251,26 +268,9 @@ module Skylab::CodeMolester
       @content_x = @invalid_reason = @pathname_was_read = @is_valid = nil
     end
 
-    def read_when_is_not_file st, stat
-      p = st.is_not_file || st.read_error || st.error
-      p ||= -> pn, ftype do
-        raise "expected #{ noun } to be of type 'file', had #{ ftype } #{
-          }- #{ st.escape_path[ pn ] }"
-      end
-      p[ @pathname, stat.ftype ]
-    end
-
-    def read_when_path_not_exist st
-      p = st.no_ent || st.read_error || st.error || -> pn do
-        raise ::Errno::ENOENT.exception "#{ st.escape_path[ pn ] }"
-        # the class itself writes "No such file or directory - #{ .. }" for us
-      end
-      p[ @pathname ]
-    end
-
   public
 
-    def write &p
+    def write &p  # :+[#hl-022]:write
       write_with_is_dry false, &p
     end
 
@@ -289,6 +289,8 @@ module Skylab::CodeMolester
       end
       r
     end
+
+    Default_escape_path__ = -> pn { pn.basename }  # #todo will be away soon
 
     Write__ = Callback_::Digraph.new
     class Write__  # `write` is very evented [#006]

@@ -22,6 +22,14 @@ module Skylab::Headless
 
             o :iambic_writer_method_name_suffix, :"="
 
+            def path=
+              replace_current_iambic_token do |path|
+                Headless_::Lib_::Bsc_[].trio.
+                  via_value_and_variegated_symbol path, :path
+              end
+              send :path_arg=
+            end
+
             def path_arg=  # LOOK at trio, not a value
               @do_execute = true
               @path_arg = iambic_property

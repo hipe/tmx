@@ -31,6 +31,8 @@ module Skylab::CodeMolester
 
     Bsc__ = sidesys[ :Basic ]
 
+    Bsc_ = Bsc__
+
     Cache_pathname = memo[ -> do
       module CM_::Cache
         _p = Cache_pathname_lib[].cache_pathname_proc_via_module(

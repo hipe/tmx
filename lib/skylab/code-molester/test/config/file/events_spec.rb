@@ -18,22 +18,23 @@ module Skylab::CodeMolester::TestSupport::Config::File
         build_config_file_with :path, tmpdir.join( 'not-exist.conf' )
       end
 
-      expect "out of the box, does not tell you full pathnames",
-        'No such file or directory - not-exist.conf' do |exp|
-
-        begin o.read { |o| } ; rescue ::Errno::ENOENT => e ; end
-        e.message.should eql( exp )
+      it "out of the box, you see full paths in the exception msg" do
+        _rx = %r(\ANo such file or directory .+/not-exist\.conf\z)
+        -> do
+          o.read
+        end.should raise_error ::Errno::ENOENT, _rx
       end
 
-      it "with a custom `escape_path` lamda, display e.g. full pathnames" do
-        begin
-          o.read do |o|
-            o.escape_path = ->( pn ) { "--> #{ pn.to_s } <--" }
+      it "capture such events" do
+        s = nil
+        x = o.read do |o|
+          o.no_ent = -> ev do
+            s = ev.pathname.basename.to_s
+            :_jeepers_
           end
-        rescue ::Errno::ENOENT => e
         end
-        e.message.should match(
-          %r{\ANo such file or directory - --> .+co-mo/not-exist.conf <--\z} )
+        s.should eql 'not-exist.conf'
+        x.should eql :_jeepers_
       end
     end
 
@@ -45,17 +46,19 @@ module Skylab::CodeMolester::TestSupport::Config::File
       end
 
       it "out of the box, raises a runtime error" do
-        -> { o.valid? }.should raise_error(
-          ::RuntimeError,
-          /expected config file to be of type 'file', had directory - some-dir/
-        )
+
+        _rx = %r(.+/some-dir\W exists but is not a file, it is a directory\b)
+
+        -> do
+          o.valid?
+        end.should raise_error _rx
       end
 
-      it "if you defined a custom hander for read_error, result is that" do
+      it "if you defined a custom handler for read_error, result is that" do
         str = nil
-        res = o.read do |x|
-          x.read_error = -> pathname, type do
-            str = "oh noes: #{ pathname.basename } was #{ type }"
+        res = o.read do |on|
+          on.read_error = -> ev do
+            str = "oh noes: #{ ::File.basename( ev.path ) } was #{ ev.actual_ftype }"
             :nope
           end
         end
@@ -88,7 +91,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
     end
 
     expect "when string (not on disk) is invalid at line 1 column 1",
-      'Expecting "#", "\n" or "[" at the beginning of line 1', f: true do |x|
+      'Expecting "#", "\n" or "[" at the beginning of line 1' do |x|
       init_o_with :string, '@foo = bar'
       b = o.valid?
       b.should eql(false)
