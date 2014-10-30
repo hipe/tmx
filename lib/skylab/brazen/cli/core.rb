@@ -542,7 +542,11 @@ module Skylab::Brazen
       def receive_event ev
         ev_ = ev.to_event
         if ev_.has_tag :ok
-          if ev_.ok
+          has_OK_tag = true
+          x = ev_.ok
+        end
+        if has_OK_tag && ! x.nil?
+          if x
             if ev_.has_tag :is_completion and ev_.is_completion
               receive_completion_event ev
             elsif ev.verb_lexeme
@@ -654,9 +658,11 @@ module Skylab::Brazen
       def maybe_inflect_line_for_negativity_via_event s, ev
         open, inside, close = unparenthesize s
         downcase_first inside
-        v_s = ev.inflected_verb
-        lex = ev.noun_lexeme and n_s = lex.lemma
-        prefix = "couldn't #{ [ v_s, n_s ].compact * SPACE_ } because "
+        if ev.respond_to? :inflected_verb
+          v_s = ev.inflected_verb
+          lex = ev.noun_lexeme and n_s = lex.lemma
+          prefix = "couldn't #{ [ v_s, n_s ].compact * SPACE_ } because "
+        end
         "#{ open }#{ prefix }#{ inside }#{ close }"
       end
 

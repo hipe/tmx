@@ -26,7 +26,7 @@ module Skylab::TreetopTools
 
       res = -> do                 # move our state forward from :pathname
         if :pathname == state     # to :open, dealing with errors that might
-          if ! pathname.exist?    # occur ([#hl-022] pattern, watch for dry)
+          if ! pathname.exist?    # occur ( :+[#hl-022]:read:#todo )
             break file_not_found
           end
           if pathname.directory?

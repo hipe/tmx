@@ -8,7 +8,7 @@ module Skylab::Cull::TestSupport
   ::Skylab::TestSupport::Regret[ TS_ = self ]
 
   module Constants
-    Cull = ::Skylab::Cull
+    Cull_ = ::Skylab::Cull
     Face = ::Skylab::Face
     TestSupport = ::Skylab::TestSupport
     PN_ = '(?:\./)?\.cullconfig'
@@ -16,22 +16,21 @@ module Skylab::Cull::TestSupport
 
   include Constants
 
-  Cull = Cull
+  Cull_ = Cull_
 
   Face::TestSupport::CLI::Client[ self ]
 
-  Lib_ = Cull::Lib_
-
+  Lib_ = Cull_::Lib_
   extend TestSupport::Quickie
 
   module Fixtures  # #stowaway
     module Directories
-      Cull::Autoloader_[ self ]
+      Cull_::Autoloader_[ self ]
     end
     module Patches
-      Cull::Autoloader_[ self ]
+      Cull_::Autoloader_[ self ]
     end
-    Cull::Autoloader_[ self ]
+    Cull_::Autoloader_[ self ]
   end
 
   module ModuleMethods
@@ -39,7 +38,7 @@ module Skylab::Cull::TestSupport
     include Constants
 
     def client_class
-      Cull::CLI  # not actually!
+      Cull_::CLI  # not actually!
     end
 
     def sandboxed_tmpdir
@@ -47,7 +46,7 @@ module Skylab::Cull::TestSupport
     end
   end
 
-  define_singleton_method :sandboxed_tmpdir, Cull::Callback_.memoize[ -> do
+  define_singleton_method :sandboxed_tmpdir, Cull_::Callback_.memoize[ -> do
     _path = Lib_::System_tmpdir_pathname[].
       join 'cull-sandboxes/cull-sandbox'
     TestSupport.tmpdir.new :path, _path, :max_mkdirs, 2
@@ -88,7 +87,7 @@ module Skylab::Cull::TestSupport
       end
 
       x = nil
-      Cull::Lib_::FileUtils[].cd "#{ use_pn }" do |_dir|
+      Cull_::Lib_::FileUtils[].cd "#{ use_pn }" do |_dir|
         x = p.call
       end
       x

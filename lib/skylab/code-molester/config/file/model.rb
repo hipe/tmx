@@ -37,6 +37,8 @@ module Skylab::CodeMolester
       instance_exec( & p )
     end
 
+    CM_::Lib_::New_event_lib[].sender self
+
   private
 
     def process_iambic_fully x_a
@@ -268,51 +270,165 @@ module Skylab::CodeMolester
       @content_x = @invalid_reason = @pathname_was_read = @is_valid = nil
     end
 
-  public
 
-    def write &p  # :+[#hl-022]:write
-      write_with_is_dry false, &p
-    end
-
-    def write_with_is_dry is_dry, &p
-      w = Write__.new ; p and p[ w ] ; is_dry and w.is_dry_notify
-      w.escape_path ||= Default_escape_path__
-      @pathname or raise "cannot write - #{
-        }no pathname associated with this #{ noun }"
-      valid? or raise "attempt to write invalid #{ noun } - check if valid? first"
-      if cached_pathname_exist
-        @pathname_was_read or fail "sanity - won't overwrite a pathname #{
-          }that was not first read"
-        r = write_when_update w
+    public def write &p
+      w = Write__.new
+      p and p[ w ]
+      if valid?
+        if cached_pathname_exist && ! @pathname_was_read
+          wrt_when_multiple_models w
+        else
+          wrt_when_valid w
+        end
       else
-        r = write_when_create w
+        wrt_when_invalid w
       end
-      r
     end
 
-    Default_escape_path__ = -> pn { pn.basename }  # #todo will be away soon
+    def wrt_when_invalid w
+
+      _ev = build_not_OK_event_with :invalid,
+          :subject_noun, noun do |y, o|
+
+        y << "attempt to write invalid #{ o.subject_noun } - #{
+          }check if valid? first"
+
+      end
+      w.call_digraph_listeners :error, _ev
+      UNABLE_
+    end
+
+    def wrt_when_multiple_models w
+      _ev = build_not_OK_event_with :multiple_models,
+          :path, @pathname.to_path do |y, o|
+        y << "sanity - won't overwrite a path that was not first read"
+      end
+      w.call_digraph_listeners :error, _ev
+      UNABLE_
+    end
+
+    def wrt_when_valid w
+      @write_verb_i = nil
+      not_OK_ev = nil
+      io = CM_::Lib_::System[].filesystem.normalization.downstream_IO(
+        :is_dry_run, w.is_dry,
+        :path, @pathname.to_path,
+        :on_event, -> ev do
+          if ev.ok || ev.ok.nil?
+            send :"wrt_when_#{ ev.terminal_channel_i }", ev, w
+          else
+            not_OK_ev = ev
+            UNABLE_
+          end
+        end )
+      if io
+        send :"wrt_when_#{ @write_verb_i }", io, w
+      else
+        wrt_when_not_OK not_OK_ev, w
+      end
+    end
+
+    def wrt_when_not_OK ev, w
+      w.call_digraph_listeners :error, ev
+      UNABLE_
+    end
+
+    def wrt_when_before_probably_creating_new_file ev, w
+      @write_verb_i = :create
+      w.call_digraph_listeners :before_create, resource: self,
+        renderable: ev
+      nil
+    end
+
+    def wrt_when_before_editing_existing_file ev, w
+      @write_verb_i = :update
+      @size = ev.stat.size
+      w.call_digraph_listeners :before_update, resource: self,
+        renderable: ev
+      nil
+    end
+
+    def wrt_when_create io, w
+      s = string
+      bytes = io.write s
+      io.close
+      wrt_after_create w, bytes
+    end
+
+    def wrt_after_create w, bytes
+      _ev = bld_after_created_or_updated_event w, bytes, :create
+      w.call_digraph_listeners :after_create, _ev
+      bytes
+    end
+
+    def wrt_when_update io, w
+      s_ = string
+      if @size == s_.length
+        s = io.read
+        is_same = s_ == s
+      end
+      if is_same
+        io.close
+        wrt_update_when_no_change w
+      else
+        io.rewind
+        io.truncate 0
+        bytes = io.write s_
+        io.close
+        wrt_after_update w, bytes
+      end
+    end
+
+    def wrt_after_update w, bytes
+      _ev = bld_after_created_or_updated_event w, bytes, :update
+      w.call_digraph_listeners :after_update, _ev
+      bytes
+    end
+
+    def wrt_update_when_no_change w
+      _ev = build_neutral_event_with :no_change,
+          :path, @pathname.to_path do |y, o|
+        y << "no change: #{ pth o.path }"
+      end
+      w.call_digraph_listeners :no_change, _ev
+      nil
+    end
+
+    def bld_after_created_or_updated_event w, bytes, i
+
+      build_OK_event_with :"after_#{ i }",  # after_create, after_update
+          :bytes, bytes, :is_dry, w.is_dry,
+          :path, @pathname.to_path, :which_i, i do |y, o|
+
+        o.is_dry and _dry = ' dry'
+
+        _preterite = preterite_verb o.which_i
+
+        y << "#{ _preterite } #{ pth o.path } (#{ o.bytes }#{ _dry } bytes)"
+      end
+    end
 
     Write__ = Callback_::Digraph.new
+
     class Write__  # `write` is very evented [#006]
 
-      taxonomic_streams :all, :structural, :text, :notice, :before, :after
+      taxonomic_streams :all, :data, :structural, :text, :notice, :before, :after
 
-      listeners_digraph error: [ :text, :all ],
+      listeners_digraph error: [ :data, :all ],  # cleaned up at #open [#009]
         notice: [ :text, :all ], before: :all, after: :all,
         before_update: [ :structural, :before, :notice ],
-        after_update: [ :structural, :after, :notice ],
+        after_update: [ :data, :after, :notice ],
         before_create: [ :structural, :before, :notice ],
-        after_create: [ :structural, :after, :notice ],
-        no_change: [ :notice, :text ]
+        after_create: [ :data, :after, :notice ],
+        no_change: [ :data, :notice ]
 
       event_factory -> { Callback_::Event::Factory::Isomorphic.new Events__ }
 
       attr_accessor :dry_run
-      alias_method :is_dry_run, :dry_run
-      attr_accessor :escape_path
+      alias_method :is_dry, :dry_run
 
-      def is_dry_notify
-        @dry_run = true
+      def is_dry= x
+        @dry_run = x
       end
 
       module Events___
@@ -320,84 +436,23 @@ module Skylab::CodeMolester
       end
 
       module Events__
-        Text = Callback_::Event::Factory::Datapoint
+        Data = -> digraph, chan_i, ev  do
+          ev
+        end
+        Data.singleton_class.send :alias_method, :event, :call
         Structural = Callback_::Event::Factory::Structural.new 2, nil, Events___
+        Text = Callback_::Event::Factory::Datapoint
       end
     end
 
   private
 
-    def write_when_create w
-      begin
-        @cached_pn_exist = nil
-        before_create w
-
+    if false  # non re-integrated behavior  #todo
         (( dn = @pathname.dirname )).exist? or raise "parent directory #{
           }does not exist, will not write - #{ @pathname.dirname }"
 
         dn.writable? or raise "parent directory is not writable, #{
           }will not write - #{ @pathname }"
-
-          # somewhat arbitrarily the above are not considered UI-level errors
-          # hence they use neither the emitter nor `escape_path` (for now)
-
-        bytes = nil
-        ( w.is_dry_run ? Lib_::Dry_IO_stub[] : @pathname ).open 'a' do |fh|
-          bytes = fh.write string  # 'a' not 'w' to fail gloriously
-        end
-        @cached_pn_exist = true  # hopefully ok, might bite
-
-        after_create w, bytes
-        r = bytes
-      end while nil
-      r
-    end
-
-    def before_create w
-      w.call_digraph_listeners :before_create, resource: self,
-        message_proc: -> { "creating #{ w.escape_path[ @pathname ] }" } ; nil
-    end
-
-    def after_create w, bytes
-      w.call_digraph_listeners :after_create, bytes: bytes, is_dry: w.is_dry_run,
-        message_proc: -> do
-          "created #{ w.escape_path[ @pathname ] } (#{ bytes }#{
-            }#{ " dry" if w.is_dry_run } bytes)"
-        end ; nil
-    end
-
-    def write_when_update w
-      begin
-        str = string ; is_dry = w.is_dry_run  # thread safety HA
-        str == @pathname.read and break( update_when_no_change w )  # #twice
-        before_update w
-        @pathname.writable? or raise "path is not writable, cannot #{
-          }write - #{ @pathname }"
-        bytes = nil
-        ( is_dry ? Lib_::Dry_IO_stub[] : @pathname ).open 'w' do |fh|
-          bytes = fh.write str
-        end
-        after_update w, bytes
-        r = bytes
-      end while nil
-      r
-    end
-
-    def update_when_no_change w
-      w.call_digraph_listeners :no_change, "no change: #{ w.escape_path[ @pathname ] }" ; nil
-    end
-
-    def before_update w
-      w.call_digraph_listeners :before_update, resource: self,
-        message_proc: -> { "updating #{ w.escape_path[ @pathname ] }" } ; nil
-    end
-
-    def after_update w, bytes
-      w.call_digraph_listeners :after_update, bytes: bytes, is_dry: w.is_dry_run,
-        message_proc: -> do
-          "updated #{ w.escape_path[ @pathname ] } (#{ bytes }#{
-            }#{ ' dry' if w.is_dry_run } bytes)"
-        end ; nil
     end
 
   public
@@ -412,13 +467,12 @@ module Skylab::CodeMolester
       # than the empty string so that we avoid writing empty file to disk
       str = string
       if cached_pathname_exist
-        r = str == @pathname.read  # #twice
+        str == @pathname.read  # #twice
       elsif str.length.zero?
-        r = false
+        false
       else
-        r = true
+        true
       end
-      r
     end
 
     def some_names_notify

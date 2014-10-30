@@ -79,6 +79,12 @@ module Skylab::Brazen
 
       class CallLike__
 
+        class << self
+          def after_i
+            # for now
+          end
+        end
+
         def initialize k, action_class_like
           @action_class_like = action_class_like
           @kernel = k
@@ -92,6 +98,21 @@ module Skylab::Brazen
 
         def is_branch
           false  # for now
+        end
+
+        def is_visible
+          true  # for now
+        end
+
+        def accept_parent_node _
+        end
+
+        def name
+          @action_class_like.name_function
+        end
+
+        def has_description
+          # for now
         end
 
         def bound_call_via_call x_a, er

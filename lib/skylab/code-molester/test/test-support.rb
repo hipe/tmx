@@ -42,9 +42,15 @@ module Skylab::CodeMolester::TestSupport
     end
   end
 
-  module TestLib_
+  module Constants::TestLib_
+
+    Bzn = -> do
+      CM_::Lib_::Bzn__[]
+    end
+
     Expect_file_content = -> do
       CM_::Autoloader_.require_sidesystem( :TanMan ).expect_file_content
     end
+
   end
 end

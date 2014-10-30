@@ -33,6 +33,8 @@ module Skylab::CodeMolester
 
     Bsc_ = Bsc__
 
+    Bzn__ = sidesys[ :Brazen ]
+
     Cache_pathname = memo[ -> do
       module CM_::Cache
         _p = Cache_pathname_lib[].cache_pathname_proc_via_module(
@@ -60,10 +62,6 @@ module Skylab::CodeMolester
 
     Delegating = -> mod, *a  do
       HL__[]::Delegating.apply_iambic_on_client a, mod
-    end
-
-    Dry_IO_stub = -> do
-      HL__[]::IO.dry_stub_instance
     end
 
     Entity_inflection = -> mod_name do
@@ -114,6 +112,10 @@ module Skylab::CodeMolester
 
     Module_lib = -> do
       Bsc__[]::Module
+    end
+
+    New_event_lib = -> do
+      Bzn__[].event
     end
 
     NLP_EN_methods = -> mod do

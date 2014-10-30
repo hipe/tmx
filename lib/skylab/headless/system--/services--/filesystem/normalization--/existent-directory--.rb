@@ -40,8 +40,6 @@ module Skylab::Headless
               :max_mkdirs
           end
 
-         Event_.sender self
-
           def initialize & p
             @on_event = @as_normal_value = nil
             @do_create_if_not_exist = nil
@@ -262,10 +260,6 @@ module Skylab::Headless
           def unable_because_event ev
             @result = send_event ev
             UNABLE_
-          end
-
-          def send_event ev
-            @on_event[ ev ]
           end
 
           Mock_Dir__ = ::Struct.new :to_path

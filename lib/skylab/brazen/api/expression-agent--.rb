@@ -57,6 +57,10 @@ module Skylab::Brazen
         _NLP_agent.plural_noun.via_arglist a
       end
 
+      def preterite_verb lemma_i
+        _NLP_agent.preterite_verb[ lemma_i.id2name ]
+      end
+
       def pth x
         "«#{ x }»"  # :+#guillemets
       end
@@ -82,7 +86,7 @@ module Skylab::Brazen
 
       NLP_agent__ = Callback_.memoize do
         NLP_Agent__ = LIB.make_NLP_agent :public,
-          [ :and_, :indefinite_noun, :or_, :plural_noun, :s ]
+          [ :and_, :indefinite_noun, :or_, :plural_noun, :preterite_verb, :s ]
       end
 
       module LIB

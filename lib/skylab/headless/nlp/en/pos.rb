@@ -976,6 +976,10 @@ module Skylab::Headless
       def plural_noun
         NLP::EN::Part_Of_Speech::Plural_noun__
       end
+
+      def preterite_verb
+        NLP::EN::Part_Of_Speech::Preterite_verb__
+      end
     end
     @abbrev_box = {}
 
@@ -1219,6 +1223,7 @@ module Skylab::Headless
   # END
 
   module NLP::EN
+
     module Part_Of_Speech
 
       class Indefinite_noun__
@@ -1248,6 +1253,10 @@ module Skylab::Headless
             POS::Noun[ @lemma ].plural
           end
         end
+      end
+
+      Preterite_verb__ = -> lemma_i do
+        POS::Verb[ lemma_i ].preterite
       end
     end
   end

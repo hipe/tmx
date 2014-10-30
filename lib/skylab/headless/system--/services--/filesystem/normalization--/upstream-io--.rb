@@ -18,7 +18,7 @@ module Skylab::Headless
             end
           end
 
-          Entity_[ self, -> do
+          Entity_.call self do
 
             o :iambic_writer_method_name_suffix, :"="
 
@@ -35,15 +35,18 @@ module Skylab::Headless
               @path_arg = iambic_property
             end
 
-            o :properties, :instream, :on_event
-          end ]
+            def only_apply_expectation_that_path_is_file=
+              @is_only_path_ftype_expectation = true
+            end
 
-          Event_.sender self
+            o :properties, :instream, :on_event
+          end
 
           def initialize & p
             @clobber_is_OK = true   # always true for now
             @do_execute = false
             @instream = nil
+            @is_only_path_ftype_expectation = false
             instance_exec( & p )
             @as_normal_value ||= IDENTITY_
           end
@@ -133,10 +136,18 @@ module Skylab::Headless
 
           def when_stat
             if FILE_FTYPE_ == @stat.ftype
-              via_path_open_file
+              when_stat_is_file
             else
               _ev = via_stat_and_path_build_wrong_ftype_event FILE_FTYPE_
               @on_event[ _ev ]
+            end
+          end
+
+          def when_stat_is_file
+            if @is_only_path_ftype_expectation
+              @as_normal_value[ ACHIEVED_ ]
+            else
+              via_path_open_file
             end
           end
 
@@ -150,10 +161,6 @@ module Skylab::Headless
 
           def instream_is_noninteractive_and_open
             ! ( @instream.tty? || @instream.closed? )
-          end
-
-          def send_event ev
-            @on_event[ ev ]
           end
         end
       end

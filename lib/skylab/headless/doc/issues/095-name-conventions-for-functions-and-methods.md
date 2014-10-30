@@ -30,17 +30,22 @@ better this time.
   of some particular DSL or another. this method *may* have side effects.
   [#141] expression agents are exemplary of this.
 
++ `call` - for proc-like objects (typically [#cb-045] actors or
+  [#br-001] entities), must do the same as `[]` for this object.
+  in these kind of objects, arguments are a (non-iambic) (positional)
+  arglist. must not be used for non-proc-like classes. :+[#020]
+
 + `execute` has a strict API meaning for a lot of our libraries as the
   one #hook-out method the client must supply. it must take no
   arguments. [#cb-042] actors exemplify these semantics, as well as many
   of the base-classes called something like "action" in many of our
-  frameworks.
+  frameworks :+[#020]
 
 + `[_]from[_]` - this meaning is explicitly not defined conventionally.
   use "from" how you like, but do not use it if you can use `via`.
 
 + `get_` - result is the result object of having allocated new memory
-  for and initializing an object that is either of a native "primitive
+  for and initialized an object that is either of a native "primitive
   data structure or type" or a ubiquitous low-level utilty class (scan,
   box, hash, array etc). see [#094] dedicated section on this. this method
   must have no side-effects.
@@ -48,7 +53,7 @@ better this time.
 + `flush` is our "go-to" name for something that cannot fail and
   produces the "payload result" of the [#cb-042], "actor-ish" perhaps
   with some irreversable internal side-effects that make this method not
-  idempotent (but perhaps not).
+  idempotent (but perhaps yet idempotent).
 
 + `init_` has at least two distinct meanings: 1) as `init` it is a
   specialized initializer when it is not practical or possible to use
@@ -61,6 +66,11 @@ better this time.
   initting those ivars that cannot in the current state fail to be
   initted.
 
++ `invoke` - deprecated as a bareword method name. used a lot in legacy
+  frameworks to be an entrypoint method that takes arguments. it is
+  deprecated because it expresses neither what it accepts or what shape
+  its result is. :+[#020]
+
 + `produce_`, `_produce[_]` - result is the subject object as described
   by the rest of the method name. whether or not new memory is being
   allocated for this object is explicitly undefined (contrast with `build_`
@@ -70,9 +80,15 @@ better this time.
 
 + `resolve_` - has a dedicated [#154] document that needs a rewrite.
 
++ `run_` - this is reserved for starting a long-running process, so in
+  practice it is rarely used on this platform :+[#020].
+
 + `via_` will one day have its own section #todo
 
-+ `_with` - must have no side-effects on the receiver.
++ `with` - arguments must be treated as a literal [#cb-046] iambic phrase.
+  must have no side-effects on the receiver, instead the result must be
+  a dup of the receiver that has been transformed as is described by the
+  iambic argument phrase.
   (use the never-been-used-before `_who_has` to mutate the receiver.)
 
 + `work` is our "go-to" name for the interesting body of ..er.. work
@@ -83,7 +99,7 @@ better this time.
   is exactly that as described by the name of the containing class.
 
 + `to_`, `_to_` - the second form is explicitly not defined conventionally
-  here.  use it as you would like to naturally. (but use `via` instead if
+  here. use it as you would like to naturally. (but use `via` instead if
   you can, because whereas `bar_via_foo()` is unambiguous,
   `foo_to_bar` is ambiguous with respect to whether the argument
   is `foo`, `bar`, or both.
@@ -99,12 +115,24 @@ better this time.
 ### the `get_` prefix semantics as a nod to an ObjC convention :[#094]
 
 it is perhaps a misunderstanding of the convention, but we base these
-semantics off of something we read in the hilleglas book (#todo)
+semantics off of something we read in the hilleglas book: "In the common
+idioms of Objective-C, a method prefixed with `get` takes an address
+where data can be copied. [..]" [3][3]  We take a very liberal
+interpretatin of this convention to make it one of ours: whereas in the
+Obj-C case the `get_` method presumably allocates memory to carry out
+the said copying, we use the `get_` prefix to apply more broadly to all
+of those to all of those methods that allocate memory towards their result
+object and are not already covered by `build_` (that is, the simpler
+ones).
 
 
 
 
 ## the method naming shibbloleth :[#119]
+
+this convention is not pretty, but that is not its point: it evolved
+pragmatically (and quite suddenly) as a way to build code optimized for
+malleability by being faster to refactor.
 
 this is a bit of a contentious pattern, but one we find utility from:
 for certain kinds of classes/modules, we may abbreviate certain words of
@@ -123,7 +151,7 @@ explained below.
 the fundamental rubric is this: if a method name has one or more words
 that is abbreviated (not including idiomatic or business acronyms like
 "IO", "HTTP" etc), then this abbreviation indicates that the method is
-variously API private or API protected in some what (what these mean is
+variously API private or API protected in some way (what these mean is
 explained below).
 
 conjunctive words (whether conventional themselves or not) like "and",
@@ -218,7 +246,7 @@ explained below.
 
 (mnemonic: if the hard to read part is at the beginning of the method,
 it says "turn back now", i.e it is more private than if the hard-to-read
-part is at the end.)
+part is at the end, hence private not protected.)
 
 if the method is not abbreviated at all, it *may* mean that the method
 is part of this node's public API, depending on what kind of node it is:
@@ -228,7 +256,7 @@ and that method does not employ the abbreviated forms of the words, this
 method is part of the node's public API if (not IFF) this same node
 employs one or more of other categories of visibility (i.e `protected`
 and/or `private`) elsewhere in the node as evinced by the presence of
-abbreviations of some of the words of the method names.
+abbreviations of some of the words of some of the method names.
 
 conversely, **abbreviations may not be used anywhere in the method
 names of this universe unless they are in exhibition of the semantics of
@@ -241,7 +269,17 @@ to decode whether or not the abbreviation took place in the first or
 second half will probably require some apriori knowledge: you may have
 to know (or be able to infer) what the "stem words" were in the first
 place, and which of the words are un-abbreviated not because of our
-"first-half/last-half" dichotomy, but because they are unabbrevable.
+"first-half/last-half" dichotomy, but because they are unabbrevable:
+
+
+    build_rdbl_IO
+
+
+the obsurely abbreviated form of "readable" above comes as the middle
+word in a method name with three words. but because we know that the
+word "IO" cannot be abbreviated, then we know that the word that was
+abbreviated was effectively at the end, making this an API-protected
+method as opposed to an API-private one.
 
 for methods with more than two abbrevable words, it is recommended
 that you only abbreviate at most one word (unless you are being
@@ -254,15 +292,21 @@ private or protected method with respect to the node's API.
 
 a method with only one abbrevable word may not employ this convention
 unless the method has more than one word and the abbrevable word falls
-cleary on one "half" or the other and it falls on the correct half that
-expresses the level of visibility the method is designed with.
+clearly on one "half" or the other and it falls on the correct half that
+expresses the level of visibility the method is designed with:
+
+    build_IO       # an API-public-looking form
+    bld_IO         # the API-private form
+    (none)         # you can't make an API-protected form
+    build_IO_obj   # ..unless you hack it by adding an extra word
 
 a method with zero abbrevable words cannot (of course) employ this
-convention at all, but by a proof to be offered in the future (#todo) we
-will demonstrate how any "short" method name can be expanded to one
-sufficiently long enough to employ this convention.
+convention at all, but as is hinted at above, sometimes you can hack the
+name around to make it fit with the convention (and methods with only
+one word in their name should probably be avoided generally anyway
+except for those few idiomatic ones we have).
 
-as for what these levels of privacy actually mean, this is the subject
+as for what these levels of visibility actually mean, this is the subject
 of the following section.
 
 
@@ -271,7 +315,7 @@ of the following section.
 ## what do "API public", "API protected" and "API private" mean?
 
 (spoiler alert for the eager and precocious: these three levels of
-visibiy have semantics similar but not the same to the three levels of
+visibiy have semantics similar but not the same as the three levels of
 visibility decribed by [#079] the trailing underscore convention for
 const names.)
 
@@ -290,7 +334,7 @@ or an API module mixed-in, the client node needs to know whether the
 private and protected methods of that API node are stable and reliably
 free from behavioral change given this version of the API, just as much
 as it would be with a public method (but broadly this hits on what
-we now consider a :+#smell discussed #here).
+we may sometimes consider a :+#smell discussed #here).
 
 "API protected" and "API private" methods are decidedly outside of the
 domain of semantic versioning: if a method is "API private" it means
@@ -311,8 +355,11 @@ we employ this convention because in the short-term it is valuable to
 do so: when we see what looks like an API-private method, we know that we
 must not call it if we are outside of the node, and that if we are inside
 the node (refactoring/debugging/featuring it) we are allowed to change
-its signature, its name, or even delete it altogether (and the same
-kind of thing if it is a protected method, only with its broader scope).
+its signature, its name, or even delete it altogether.
+
+this same dynamic applies to an API protected method, except that it has a
+larger scope of dependency, and so more things can break when you change
+it; and you can take that scope into account as you consider changing it.
 
 in practice this has proven compellingly valuable during refactoring - we
 know immediately by looking at a method (either definition or call) what
@@ -322,10 +369,43 @@ if we try and change it.
 however, (and we aren't sure yet), this entire name convention may just
 be a bandaid over a deeper problem for which there is a simpler
 solution: in short the solution may be smaller nodes (classes and
-modules). [#cb-042] actors have proven useful to this end. the more we
-employ small actors ,n,n
+modules). [#cb-042] actors have proven useful to this end: when viewed
+logically actors have no public methods -- they are interacted with like
+procs. actors have a single exitpoint method (`execute`) and so since no
+one outside of the actor can call the actor's methods anyway, there is no
+need to indicate the level of visibility of the methods: they are all
+effectively API-private so we don't need to obscure them with
+abbreviations at all.
+
+so in theory the more we employ lots of small actors rather than god-
+classes and modules, the less we need to use this convention. (but even
+in new code, it hasn't gone away completely yet!)
 
 
+
+
+## the plasticity of visibility and the utility therein.
+
+keep in mind, too, that it is generally trivial to "open up" an
+API-private method into an API-protected one: you simply search and
+replace the name within the current file only. (remeber, by defintion a
+change to an API-private method will be restricted one file.)
+
+to change a method from API-protected to API-public is accordingly less
+trivial but perhaps still trivial because (again by definition) your
+changes will be restricted to the scope that is associated with
+API-private-ness as defined above.
+
+so if you ever find yourself wanting to use a method that is
+"inaccessible" to you by the rules of this three-tiered method
+API-visibility, it is not the case that you should avoid using this
+method. rather, simply open it up as necessary.
+
+if with every new method you write you start by making it API private
+and then open it up one level as you need to, method by method as your
+system grows, what you end up is the de-facto public and protected API's
+of all your classes as they evolved emergently. this is how this convention
+came about in the first place, was as a means to this end.
 
 
 
@@ -333,8 +413,13 @@ employ small actors ,n,n
 ## references
 
 [1]: http://semver.org
+
 [2] : "abbrevable" is an abbreviation of "abbreviable" which is an
      abbreviation of "abbreviatable", which is a neologism meaning "a
      word that can be abbreviated by the rules described herein." we,
      like the general public, will not use these terms outside of this
      document.
+
+[3] _Cocoa Programing for Mac OS X_, fourth edition, Aaron Hellegas &
+    Adam Premble, 2012 Pearson Education, Inc. (page 79, ¶ starting with
+    "Most Java programmers would name this method `foo`"

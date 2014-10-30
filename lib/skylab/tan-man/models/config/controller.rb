@@ -158,7 +158,9 @@ module Skylab::TanMan
 
       serr = infostream # a special case
 
-      resource.write_with_is_dry is_dry do |w|
+      resource.write do |w|
+
+        w.is_dry = is_dry
 
         w.on_error(& method( :send_error_string ) ) # propagate the text msg up
 

@@ -178,6 +178,16 @@ module Skylab::Brazen
         N_Lines.new( y, d, [ message_proc ], expag ).execute self
       end
 
+      def scan_for_render_lines_under expag
+        # with threads we could do this one line at a time but meh
+        s_a = []
+        y = ::Enumerator::Yielder.new do |s|
+          s_a.push s
+        end
+        expag.calculate y, self, & @message_proc
+        Callback_.scan.via_nonsparse_array s_a
+      end
+
       class N_Lines < ::Enumerator::Yielder
 
         def initialize y, n, p_a, expag
@@ -208,16 +218,6 @@ module Skylab::Brazen
           end
           @y
         end
-      end
-
-      def scan_for_render_lines_under expag
-        # with threads we could do this one line at a time but meh
-        s_a = []
-        y = ::Enumerator::Yielder.new do |s|
-          s_a.push s
-        end
-        expag.calculate y, self, & @message_proc
-        Callback_.scan.via_nonsparse_array s_a
       end
 
       class Inferred_Message  # #experimental - you hate me now
@@ -338,6 +338,7 @@ module Skylab::Brazen
         end
 
         def build_neutral_event_with * x_a, & p
+          x_a.push :ok, nil
           build_event_via_iambic_and_message_proc x_a, p
         end
 

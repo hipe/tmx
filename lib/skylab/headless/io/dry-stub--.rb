@@ -16,6 +16,11 @@ module Skylab::Headless
         "#{ s }".length
       end
 
+      def close
+        # there is risk of this silently succeeding when it should have
+        # failed per state, but meh we would have to remove the singleton  #open [#170]
+      end
+
     private
 
       def say_fail mode_s

@@ -189,7 +189,7 @@ module Skylab::TanMan::TestSupport::Sexp
     end
 
     define_method :resovle_upstream do
-      fail 'YES'  # #todo - is this ever used any more? IFF so, :+[#hl-022]
+      fail 'YES'  #  :+[#hl-022]:read:#todo IFF this is ever used
       ok = false                  # [#hl-023] exit-code aware, [#019] invite
       begin
         if upstream

@@ -8,6 +8,10 @@ module Skylab::Headless
 
         class << self
 
+          def downstream_IO * x_a
+            Normalization__::Downstream_IO__.mixed_via_iambic x_a
+          end
+
           def existent_directory * x_a
             Normalization__::Existent_Directory__.mixed_via_iambic x_a
           end
@@ -40,11 +44,17 @@ module Skylab::Headless
           end
         end
 
+        def send_event ev
+          @on_event[ ev ]
+        end
+
         DIR_FTYPE_ = 'directory'.freeze
 
         Entity_ = Headless_::Lib_::Entity[]
 
         Event_ = Entity_.event
+
+        Event_.sender self
 
         FILE_FTYPE_ = 'file'.freeze
 

@@ -8,8 +8,8 @@ module Skylab::Brazen
         via_arglist a
       end
 
-      def call * a
-        via_arglist a
+      def call * a, & p
+        via_arglist a, & p
       end
 
       def event
@@ -44,7 +44,8 @@ module Skylab::Brazen
         Scope_Kernel__
       end
 
-      def via_arglist a
+      def via_arglist a, & p
+        p and a.push p
         Shell__.new.via_arglist a
       end
     end

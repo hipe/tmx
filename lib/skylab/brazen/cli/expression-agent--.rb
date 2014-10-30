@@ -70,6 +70,10 @@ module Skylab::Brazen
         _NLP_agent.plural_noun.via_arglist a
       end
 
+      def preterite_verb lemma_i
+        _NLP_agent.preterite_verb[ lemma_i.id2name ]
+      end
+
       def property_default
         @current_property.default
       end

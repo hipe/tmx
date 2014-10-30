@@ -119,3 +119,29 @@ sentence that we jumped over to writing [#139] the perfect agent interaction
 model.
 
 so this would serve as a good prototyping ground for that.
+
+
+
+## write
+
+(this is for this other normalization, stowed away into here for now.)
+
+### :#note-076
+
+it is certainly possible that between the time when we take the "stat"
+"snapshot" of the file and when we try to open the file that the file
+may change or have been removed (or permissions may have changed so it
+is not writable, and so-on: between then and now, assume that in this
+interim literally anything that can happen on a filesystem may have
+happened).
+
+there may be multiple places with similar such issues here and in the
+sibling nodes.
+
+the existing logic may or may not account for that, but at least we
+have it corralled into one place where it "should" be, and we have it
+bookmarked for the future here, and it is hopefully abstracted away enough
+not to affect the sorroundiing system too much.
+
+code with filesystem locks always reads terribly and looks tangled and
+bound so we are avoiding it if we can..

@@ -27,8 +27,7 @@ module Skylab::Cull
         couldnt: method( :couldnt_event ),
         before: method( :before ),
         after: method( :after ),
-        all: method( :all ),
-        pth: @pth
+        all: method( :all )
     end
   end
 end

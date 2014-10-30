@@ -21,6 +21,7 @@ module Skylab::TanMan
             y << "document did not change."
           end
           send_event _ev
+          nil
         end
 
         def flush_changed_document_to_ouptut_adapter

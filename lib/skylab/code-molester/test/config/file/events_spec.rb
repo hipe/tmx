@@ -143,7 +143,9 @@ module Skylab::CodeMolester::TestSupport::Config::File
         end
 
         context "when the target path does not exist" do
+
           context "when the containing dir exists" do
+
             let :path do
               tmpdir.join 'some.conf'
             end
@@ -161,20 +163,21 @@ module Skylab::CodeMolester::TestSupport::Config::File
               path.exist?.should eql(false)
               str1 = '' ; ohai = str2 = nil
               res = o.write do |w|
-                w.escape_path = ->( pn ) { "~~{ #{ pn.basename } }~~" }
                 w.on_before_create do |e|
                   ohai = e.resource.pathname.basename.to_s
-                  str1 << e.message_proc[]
+                  str1.concat render_as_codified e.renderable
                 end
-                w.on_after_create do |e|
-                  str1 << " .. done (#{ e.bytes } bytes)."
-                  str2 = e.message_proc[]
+                w.on_after_create do |ev|
+                  str1 << " .. done (#{ ev.bytes } bytes)."
+                  str2 = black_and_white ev
                 end
               end
               ohai.should eql('some.conf')
               res.should eql(7) # the number of bytes written!
-              str1.should eql('creating ~~{ some.conf }~~ .. done (7 bytes).')
-              str2.should eql('created ~~{ some.conf }~~ (7 bytes)')
+
+              str1.should match %r(\Acreating \(pth "[^"]+"\) \.\. done \(#{ num_bytes } bytes\)\.\z)
+              str2.should match %r(\Acreated «[^»]+» \(7 bytes\)\z)
+
               path.exist?.should eql( true )
             end
 
@@ -183,28 +186,45 @@ module Skylab::CodeMolester::TestSupport::Config::File
               path.exist?.should eql( false )
               yep = nil
               o = self.o
-              $path = path
               bytes = o.write do |w|
                 w.dry_run = true
-                w.on_after_create do |e|
-                  yep = e.message_proc[]
+                w.on_after_create do |ev|
+                  yep = black_and_white ev
                 end
               end
               bytes.should be_kind_of( ::Fixnum )
-              yep.should match( /created some.conf \(\d+ dry bytes\)/ )
+              yep.should match %r(\Acreated «[^»]+» \(#{ num_bytes } dry bytes\)\z)
               path.exist?.should eql( false )
             end
           end
 
           context "when the containing dir does not exist" do
+
             let :path do
               tmpdir.join 'some-dir-not-there/some.conf'
             end
 
-            it "raises runtime error" do
-              ->{ o.write }.should raise_error( ::RuntimeError,
-               /parent directory does not exist, will not write.+co-mo/ )
+            it "does not raise a runtime error - just results in false" do
+              x = o.write
+              x.should eql false
             end
+
+            it "you may want to set error handler (#todo the UI msg is unhelpful here)" do
+              s = nil
+              x = o.write do |w|
+                w.on_error do |ev|
+                  s = black_and_white ev
+                  :_not_seen_
+                end
+              end
+              x.should eql false
+              # _rx = /parent directory does not exist, will not write.+co-mo/
+              s.should match %r(\ANo such file or directory - «[^»]+»\z)
+            end
+          end
+
+          def num_bytes
+            7
           end
         end
       end
@@ -216,8 +236,13 @@ module Skylab::CodeMolester::TestSupport::Config::File
         end
 
         it "won't even let you try to write the thing, before it looks at fs" do
-          -> { o.write }.should raise_error( ::RuntimeError,
-                                            /attempt to write invalid/ )
+          s = nil
+          o.write do |w|
+            w.on_error do |ev|
+              s = black_and_white ev
+            end
+          end
+          s.should match %r(\battempt to write invalid\b)
         end
       end
     end
@@ -241,13 +266,19 @@ module Skylab::CodeMolester::TestSupport::Config::File
       end
 
       context "when both path and string, and path existed" do
+
         it 'raises an exception talking about "won\'t overwrite"' do
           prepare_wiz_conf
           init_o_with :path, path, :string, 'wiff=waff'
           o.valid?.should eql(true)
-          ->{ o.write }.should raise_error( ::RuntimeError,
-            /won't overwrite a pathname that was not first read/i
-          )
+          s = nil
+          x = o.write do |w|
+            w.on_error do |ev|
+              s = black_and_white ev
+            end
+          end
+          x.should eql false
+          s.should match %r(\Asanity - won't overwrite a path that was not first read\b)
         end
       end
 
@@ -262,8 +293,15 @@ module Skylab::CodeMolester::TestSupport::Config::File
           o['foo'] = 'baz'
           o['foo'].should eql('baz')
           o.string.should eql("foo=baz\n")
-          b = o.write
-          b.should eql(8)
+
+          s = nil
+          x = o.write do |w|
+            w.on_error do |ev|
+              s = black_and_white ev
+            end
+          end
+          s.should be_nil
+          x.should eql 8
           o.pathname.read.should eql("foo=baz\n")
         end
 

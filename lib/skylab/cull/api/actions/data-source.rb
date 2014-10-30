@@ -8,7 +8,7 @@ module Skylab::Cull
 
     params  # no params
 
-    services :model, [ :pth, :ivar ]
+    services :model
 
     listeners_digraph :payload_line, couldnt: :entity_event
 
@@ -31,7 +31,7 @@ module Skylab::Cull
            [ :tag_a,      :arity, :zero_or_more, :ds ],
            [ :is_dry_run, :arity, :zero_or_one, :argument_arity, :zero ]
 
-    services :model, [ :pth, :ivar ]
+    services :model
 
     listeners_digraph :before, :after, :all,
       could: :entity_event, couldnt: :entity_event
@@ -44,8 +44,7 @@ module Skylab::Cull
         couldnt: method( :couldnt ),
         before: method( :before ),
         after: method( :after ),
-        all: method( :all ),
-        pth: @pth
+        all: method( :all )
     end
   end
 end

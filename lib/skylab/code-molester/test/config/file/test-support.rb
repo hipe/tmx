@@ -10,6 +10,8 @@ module Skylab::CodeMolester::TestSupport::Config::File
 
   CM_ = CM_
 
+  TestLib_ = TestLib_
+
   module InstanceMethods
 
     include Constants
@@ -70,6 +72,19 @@ module Skylab::CodeMolester::TestSupport::Config::File
       s = sx.unparse
       s_ = content
       s.should eql s_
+    end
+
+    def black_and_white ev
+      join_with_newlines_under ev, TestLib_::Bzn[]::API.expression_agent_instance
+    end
+
+    def render_as_codified ev
+      join_with_newlines_under ev, TestLib_::Bzn[].event.codifying_expression_agent
+    end
+
+    def join_with_newlines_under ev, expag
+      scan = ev.scan_for_render_lines_under expag
+      scan.to_a.join CM_::NEWLINE_
     end
   end
 end

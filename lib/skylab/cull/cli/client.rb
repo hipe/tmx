@@ -101,7 +101,12 @@ module Skylab::Cull
     end
 
     def on_before e
-      @err.write "#{ e.payload_a.fetch( 0 ).message_proc[] } .."
+      _native_ev = e.payload_a.first
+      _ev = _native_ev.renderable
+      scan = _ev.scan_for_render_lines_under expression_agent
+      while s = scan.gets
+        @err.write "#{ s } .."
+      end
       nil
     end
 
@@ -128,11 +133,11 @@ module Skylab::Cull
     def on_entity_event e
       ev = e.payload_a.fetch 0
       p = ev.message_proc
+      _expag = expression_agent
       _str = if p.arity.zero?
-        instance_exec( & p )
+        _expag.calculate( & p )
       else
-        _expag = ::Skylab::Brazen::API.expression_agent_instance
-        _expag.instance_exec( * ev.to_a, & p )
+        _expag.calculate( * ev.to_a, & p )
       end
       @y << "#{ last_invocation_string }: #{ _str }"
       nil
@@ -143,6 +148,34 @@ module Skylab::Cull
     Face::Plugin::Host::Proxy.enhance self do  # ditto [#ri-002]
       services [ :pth, :ivar ]  # api actions want to know how to render a path
                                 # and we get a private method `plugin_host`
+    end
+
+    def expression_agent
+      @expag ||= Expression_agent_class__[].new @pth
+    end
+
+    Expression_agent_class__ = Callback_.memoize do
+
+      class Expag__
+
+        def initialize pth
+          @pth = pth
+        end
+
+        include Cull_::Lib_::HL__[]::SubClient::InstanceMethods  # :+#experimental
+
+        alias_method :calculate, :instance_exec
+
+        def escape_path x
+          @pth[ x ]
+        end
+
+        def pth x
+          @pth[ x ]
+        end
+
+        self
+      end
     end
   end
 end

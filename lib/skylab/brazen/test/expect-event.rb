@@ -94,20 +94,27 @@ module Skylab::Brazen::TestSupport
         def via_ev_expect_OK_value_of bool
           ev = @ev.to_event
           if bool.nil?
-            ev.has_tag( :ok ) and when_ev_has_OK_tag
-          elsif ev.has_tag :ok
-            if bool
-              ev.ok or when_ev_is_not_OK
+            if ev.has_tag :ok
+              if ! ev.ok.nil?
+                when_ev_OK_value_is_not_nil ev.ok
+              end
             else
-              ev.ok and when_ev_is_OK
+              self._TO_DO
+            end
+          elsif ev.has_tag :ok
+            x = ev.ok
+            if bool
+              x or when_ev_is_not_OK
+            else
+              x and when_ev_is_OK
             end
           else
             when_ev_does_not_have_OK_tag
           end
         end
 
-        def when_ev_has_OK_tag
-          send_event_failure "expect event not to have 'ok' tag"
+        def when_ev_OK_value_is_not_nil x
+          send_event_failure "expected OK value of `nil`, had #{ x.inspect }"
         end
 
         def when_ev_is_not_OK
@@ -178,7 +185,7 @@ module Skylab::Brazen::TestSupport
         end
 
         def expect_neutral_result
-          @result.should eql nil
+          @result.should be_nil
         end
 
         def expect_succeeded_result
@@ -230,7 +237,7 @@ module Skylab::Brazen::TestSupport
           end
           @ev_p[ ev ]
           if ev_.has_tag :ok
-            ev_.ok ? true : false
+            ev_.ok
           end
         end
 
@@ -274,7 +281,12 @@ module Skylab::Brazen::TestSupport
         def ok_s
           ev_ = @ev.to_event
           if ev_.has_tag :ok
-            ev_.ok ? '(ok)' : '(not ok)'
+            x = ev_.ok
+            if x.nil?
+              '(neutral)'
+            else
+              x ? '(ok)' : '(not ok)'
+            end
           else
             '(ok? not ok?)'
           end

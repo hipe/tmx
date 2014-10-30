@@ -333,6 +333,10 @@ end
         And__[ a ]
       end ]
 
+      o[ :both ] = memoize_length[ -> a do
+        _EN[].both a
+      end ]
+
       o[ :indefinite_noun ] = -> do
         Headless_::NLP::EN::POS.indefinite_noun
       end
@@ -345,9 +349,9 @@ end
         Headless_::NLP::EN::POS.plural_noun
       end
 
-      o[ :both ] = memoize_length[ -> a do
-        _EN[].both a
-      end ]
+      o[ :preterite_verb ] = -> do
+        Headless_::NLP::EN::POS.preterite_verb
+      end
 
       bld_oxford_comma = -> sep do
         p = -> a do

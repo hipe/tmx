@@ -63,7 +63,10 @@ module Skylab::CodeMolester
       couldnt = event_h.fetch :couldnt
       alt = [ -> {
         if o.exist?
-          -> { couldnt[ Exists__[ :pn, o.pathname ] ] }
+          -> do
+            _ev = Exists__[ :pn, o.pathname ]
+            couldnt[ _ev ]
+          end
         end }
       ].reduce nil do |_, p|
         x = p[] and break x
@@ -84,7 +87,7 @@ module Skylab::CodeMolester
   public
 
     Exists__ = Event_.new do |pn|
-      "exists, skipping - #{ @pth[ pn ] }"
+      "exists, skipping - #{ escape_path pn.to_path }"
     end
 
     # `insert_valid_entity` -
@@ -119,27 +122,27 @@ module Skylab::CodeMolester
     #     + `before` - called with e. immediatly before create/update
     #     + `after` - called with e. immediatly after create/update
     #     + `all` - future-proofing catch all not in above
-    #     + `pth` - an `escape_path`-like for your modality
 
     def write opt_h, event_h
-      couldnt, befor, after, all, pth = unpack_superset event_h,
-        :couldnt, :before, :after, :all, :pth
-      is_dry_run, = unpack_equal opt_h, :is_dry_run ; f = @file_model
+      couldnt, befor, after, all = unpack_superset event_h,
+        :couldnt, :before, :after, :all
+      is_dry_run, = unpack_equal opt_h, :is_dry_run ; fm = @file_model
       alt = [
         -> {
-          if ! f.valid?
-            -> { couldnt[ Invalid_[ :rsn_o, f.invalid_reason ] ] }
+          if ! fm.valid?
+            -> { couldnt[ Invalid_[ :rsn_o, fm.invalid_reason ] ] }
           end }
       ].reduce( nil ) { |_, p| x = p[] and break x }
-      if alt then alt.call else
-        f.write do |w|
+      if alt
+        alt.call
+      else
+        fm.write do |w|
           w.with_specificity do
             w.on_before befor
             w.on_after after
             w.on_all all
           end
           w.dry_run = is_dry_run
-          w.escape_path = pth
         end
       end
     end

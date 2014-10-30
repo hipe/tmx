@@ -7,7 +7,7 @@ module Skylab::Cull
   couple = Autoloader_.method :require_sidesystem
 
   CodeMolester = couple[ :CodeMolester ]
-  Cull = self
+  Cull_ = self
   Face = couple[ :Face ]
 
   module CLI

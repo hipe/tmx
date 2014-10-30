@@ -172,7 +172,7 @@ module Skylab::Headless
       self
     end
 
-    def prepare  # #note-130  # :+[#hl-022] filesystem expectation
+    def prepare  # #note-130, keep eye on :+[#hl-022]:directory
       if exist?
         prepare_when_exist
       else

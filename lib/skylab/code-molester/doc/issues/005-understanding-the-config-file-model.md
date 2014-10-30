@@ -2,6 +2,8 @@
 
 ## `write` is very evented :[#006]
 
+(historical note, this was the original inspiration-point for [#hl-022].)
+
 `write` - because so many different interesting things can happen when we
 set out to write a file, we have a custom emitter class that models this
 event graph that callers can use to hook into these event streams.
@@ -41,9 +43,8 @@ this big graph of streams is best viewed with `[cb] viz`, a command-
 line tool that is part of [cb] and works in conjunction with graph-viz
 to display this graph visually.
 
-(incidentally this and its two constituent implementation methods
-is becoming the poster-child wet-dream of [#hl-022], which seeks
-- possibly in vain - to dry up this prevalent pattern..)
+
+
 
 
 ## the meaning of `modified` :[#004]

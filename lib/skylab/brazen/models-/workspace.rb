@@ -320,8 +320,9 @@ module Skylab::Brazen
           count += 1
           try = pn.join @filename
           try.exist? and break( found = try )
-          TOP__ == pn.instance_variable_get( :@path ) and break
-          pn = pn.dirname
+          pn_ = pn.dirname
+          pn_ == pn and break  # we've reached the top - the root path
+          pn = pn_
         end
         if found
           whn_found found
@@ -329,23 +330,16 @@ module Skylab::Brazen
           whn_resource_not_found count
         end
       end
-      TOP__ = '/'.freeze
 
-      def whn_found found  # maybe later :+[#hl-022]
-        st = found.stat  # there is risk
-        if FILE_FTYPE__ == st.ftype
-          found
-        else
-          whn_found_is_not_file st, found
-        end
-      end
-      FILE_FTYPE__ = 'file'.freeze
-
-      def whn_found_is_not_file st, found
-        send_not_OK_event_with :found_is_not_file, :ftype, st.ftype,
-            :pathname, found do |y, o|
-          y << "is #{ o.ftype }, must be file - #{ pth o.pathname }"
-        end
+      def whn_found found
+        ok = Brazen_::Lib_::System[].filesystem.normalization.upstream_IO(
+          :only_apply_expectation_that_path_is_file,
+          :path, found.to_path,
+          :on_event, -> ev do
+            send_event ev
+            UNABLE_
+          end )
+        ok && found
       end
 
       def whn_resource_not_found count
