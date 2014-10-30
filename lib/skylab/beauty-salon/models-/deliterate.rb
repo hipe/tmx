@@ -94,7 +94,7 @@ module Skylab::BeautySalon
 
     def normalize_as_integers
       ok = true
-      integer = Brazen_.model_entity.normalizers.numeric.instance
+      integer = Brazen_.model_entity.normalizers.number.instance
       @range.each do |bp|
         d = integer.normalize_via_two bp, @error_p
         if d

@@ -9,6 +9,11 @@ module Skylab::Basic
       def normalization
         Range_::Normalization__
       end
+
+      def normalize arg, * x_a, event_p
+        x_a.push :arg, arg, :on_event, event_p
+        Range_::Normalization__.via_iambic x_a
+      end
     end
 
     Range_ = self

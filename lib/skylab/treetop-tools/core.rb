@@ -62,6 +62,10 @@ module Skylab::TreetopTools
       HL__[]::SubClient
     end
 
+    System = -> do
+      HL__[].system
+    end
+
     Treetop = memoize[ -> do
       # Autoloader_.require_quietly 'treetop'
       require 'treetop' ; ::Treetop

@@ -5,11 +5,15 @@ module Skylab::TreetopTools
     include Lib_::SubClient[]::InstanceMethods
 
     def initialize request_client, upstream, opts=nil, &block
-      self.block = block
-      self.request_client = request_client
-      self.state = :initial
-      self.upstream = upstream
-      opts and opts.each { |k, v| send("#{k}=", v) }
+      @block = block
+      @request_client = request_client
+      @state = :initial
+      @upstream = upstream
+      if opts
+        opts.each_pair do |i, x|
+          send :"#{ i }=", x
+        end
+      end
     end
 
     attr_accessor :block

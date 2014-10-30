@@ -8,7 +8,7 @@ module Skylab::TreetopTools
       'input string'
     end
 
-    def resolve_whole_string
+    def whole_string
       upstream.kind_of?( ::String ) ? upstream :
         error( "expecting String, had: #{ upstream.inspect }" )
     end

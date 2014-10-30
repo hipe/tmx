@@ -2,83 +2,61 @@ module Skylab::TreetopTools
 
   class Parser::InputAdapters::File < Parser::InputAdapters::Stream
 
-    def default_entity_noun_stem
-      'input file'
-    end
-
     attr_reader :pathname
-
-    def resolve_whole_string
-
-      if :initial == state        # if necessary, turn the `upstream` from a
-        case upstream             # "pathspec" (::String or ::Pathname) into
-        when ::String             # an open stream (!) setting @pathname, and
-          pn = ::Pathname.new upstream.to_s # call_digraph_listeners appropriate errors if we
-        when ::Pathname           # cannot open the file.  This moves our state
-          pn = upstream           # from :initial to :pathname
-        else
-          fail "expecting pathname string or pathmame, had #{ upstream.class }"
-        end
-        @pathname = pn
-        self.upstream = nil
-        self.state = :pathname
-      end
-
-      res = -> do                 # move our state forward from :pathname
-        if :pathname == state     # to :open, dealing with errors that might
-          if ! pathname.exist?    # occur ( :+[#hl-022]:read:#todo )
-            break file_not_found
-          end
-          if pathname.directory?
-            break file_is_dir
-          end
-          self.upstream = pathname.open 'r'
-          self.state = :open
-        end
-        super # or we might later decide to handle broken pipes here
-      end.call
-      res
-    end
 
     def type
       Parser::InputAdapter::Types::FILE
     end
 
-  private
-
-    EVENTS = Lib_::Parameter[]::Definer.new do
-      param :on_file_is_dir,    hook: true, writer: true
-      param :on_file_not_found, hook: true, writer: true
+    def default_entity_noun_stem
+      'input file'
     end
 
-    def events
-      @events ||= begin
-        block = self.block
-        block ||= ->(p) do
-          p.on_file_is_dir    { |e| fail("file is dir: #{pathname}") }
-          p.on_file_not_found { |e| fail("file not found: #{pathname}") }
-        end
-        EVENTS.new(&block)
+    def whole_string
+      ok = true
+
+      if :initial == @state
+        ok = whn_initial_state_move_state
+      end
+
+      if ok && :pathname == @state
+        ok = whn_pathname_state_move_state
+      end
+
+      ok && super
+    end
+
+    def whn_initial_state_move_state
+
+      if @upstream.respond_to? :ascii_only?
+        pn = ::Pathname.new @upstream
+      elsif @upstream.respond_to? :relative_path_from
+        pn = @upstream
+      end
+
+      if pn
+        @pathname = pn
+        @upstream = nil
+        @state = :pathname
+        PROCEDE_
+      else
+        raise "expecting pathname string or pathmame, had #{ upstream.class }"
       end
     end
 
-    def file_is_dir
-      f = events.on_file_is_dir
-      f ||= -> pathname, entity do
-        send_error_string "expecting #{ entity }, had directory: #{
-          }#{ escape_path upstream }"
-      end
-      f[ pathname, entity_noun_stem ]
-      nil
-    end
+    def whn_pathname_state_move_state
 
-    def file_not_found
-      f = events.on_file_not_found
-      f ||= -> pathname, entity do
-        send_error_string "#{ entity } not found: #{ escape_path  pathname }"
+      io = TreetopTools_::Lib_::System[].filesystem.normalization.upstream_IO(
+        :path, @pathname.to_path,
+        :on_event, -> ev do
+          receive_event ev  # :+#hook-out
+          UNABLE_
+        end )
+      io and begin
+        @upstream = io
+        @state = :open
+        PROCEDE_
       end
-      f[ pathname, entity_noun_stem ]
-      nil
     end
   end
 end

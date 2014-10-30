@@ -55,7 +55,7 @@ module Skylab::TreetopTools
       load_grammars_if_necessary
       ok = true
       a.length.nonzero? and ok = absorb_parse_opts!( * a )
-      ok &&= resolve_whole_string
+      ok &&= rslv_whole_string
       ok &&= resolve_parser
       ok and begin
         t = ::Time.now
@@ -77,8 +77,8 @@ module Skylab::TreetopTools
       PROCEDE_
     end
 
-    def resolve_whole_string
-      @whole_string = @input_adapter.resolve_whole_string
+    def rslv_whole_string
+      @whole_string = @input_adapter.whole_string
       @whole_string ? PROCEDE_ : @whole_string
     end
 
