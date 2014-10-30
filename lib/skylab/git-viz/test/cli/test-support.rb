@@ -10,9 +10,11 @@ module Skylab::GitViz::TestSupport::CLI
 
   include Constants
 
-  GitViz = GitViz ; PROGNAME_ = PROGNAME_ ; TestSupport = TestSupport
+  GitViz_ = GitViz_
+  PROGNAME_ = PROGNAME_
+  TestSupport_ = TestSupport_
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   module InstanceMethods
 
@@ -28,7 +30,7 @@ module Skylab::GitViz::TestSupport::CLI
 
     def build_client
       grp = _IO_spy_group
-      cli = GitViz::CLI::Client.new( * grp.values_at( :i, :o, :e ) )
+      cli = GitViz_::CLI::Client.new( * grp.values_at( :i, :o, :e ) )
       cli.program_name = PROGNAME__
       cli
     end
@@ -40,7 +42,7 @@ module Skylab::GitViz::TestSupport::CLI
     end
 
     def bld_IO_spy_group
-      grp = TestSupport::IO.spy.group.new
+      grp = TestSupport_::IO.spy.group.new
       grp.debug_IO = debug_IO
       grp.do_debug_proc = -> { do_debug }
       grp.add_stream :i, :_no_instream_
@@ -51,8 +53,8 @@ module Skylab::GitViz::TestSupport::CLI
 
     # ~ assertion phase
     def expect_expecting_line_with_action_subset * i_a
-      _s_a = i_a.map { |i| i.id2name.gsub( '_', '-' ) }
-      subset = GitViz::Lib_::Set[].new _s_a
+      _s_a = i_a.map { |i| i.id2name.gsub( GitViz_::UNDERSCORE_, GitViz_::DASH_ ) }
+      subset = GitViz_::Lib_::Set[].new _s_a
       expect_expecting_line do
         _s_a_ = @md[ :altrntn ].split( / *\| */ )
         superset = ::Set.new _s_a_

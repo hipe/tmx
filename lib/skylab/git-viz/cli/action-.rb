@@ -29,15 +29,17 @@ module Skylab::GitViz
 
     svcs_for_API_action_class
     class Svcs_For_API_Action
-      def call_any_listener * i_a, & p
-        @up_p[].send :"#{ i_a * '_' }_from_API_action", p[] ; nil
+      def maybe_receive_event * i_a, & p
+        x = p ? p[] : i_a.pop
+        @up_p[].send :"#{ i_a * UNDERSCORE_ }_from_API_action", x ; nil
       end
     end
 
     listnr_for_VCS_front_class
     class Listnr_For_VCS_Front
-      def call_any_listener * i_a, & p
-        @up_p[].send :"#{ i_a * '_' }_from_VCS", p[]
+      def maybe_receive_event * i_a, & p
+        x = p ? p[] : i_a.pop
+        @up_p[].send :"#{ i_a * UNDERSCORE_ }_from_VCS", x
       end
     end
 

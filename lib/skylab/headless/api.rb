@@ -12,8 +12,8 @@ module Skylab::Headless
         Iambic_builder[ cls ] ; nil
       end
 
-      def simple_monadic_iambic_writers mod, * i_a
-        Simple_monadic_iambic_writers.via_client_and_iambic mod, i_a
+      def simple_monadic_iambic_writers
+        Simple_monadic_iambic_writers
       end
 
       def via_arglist x_a
@@ -145,10 +145,10 @@ module Skylab::Headless
         end
 
         def via_arglist x_a
-          via_client_and_iambic x_a.shift, x_a
+          via_client_and_symlist x_a.shift, x_a
         end
 
-        def via_client_and_iambic mod, i_a
+        def via_client_and_symlist mod, i_a
           mod.module_exec i_a, & Bundle__
         end
       end

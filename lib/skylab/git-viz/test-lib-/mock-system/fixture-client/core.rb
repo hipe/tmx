@@ -319,12 +319,14 @@ module Skylab::GitViz
       end
       def when_2_fields
         chan_i = @a_.first.intern ; x = @a_.last
-        @listener.call_any_listener chan_i, :string do x end ; nil
+        @listener.maybe_receive_event chan_i, :string, x
+        nil
       end
       def when_many_fields
         chan_i = @a_.shift.intern ; shape_i = @a_.shift.intern
         form_i = @a_.shift.intern ; rest_a = @a_ ; @a_ = nil
-        @listener.call_any_listener chan_i, shape_i, form_i do rest_a end ; nil
+        @listener.maybe_receive_event chan_i, shape_i, form_i, rest_a
+        nil
       end
       def flush
         case @rc_a.length <=> 1
@@ -354,7 +356,7 @@ module Skylab::GitViz
         @rc_a.detect( & :nonzero? ) or self.___logic_error___
       end
       def emit_debug_string & p
-        @listener.call_any_listener :debug, :string, & p ; nil
+        @listener.maybe_receive_event :debug, :string, & p ; nil
       end
     end
 
@@ -366,11 +368,16 @@ module Skylab::GitViz
         end
         yield( @h = p[] ) ; nil
       end
-      def call_any_listener * i_a
+      def maybe_receive_event * i_a, & p
+        x = if p
+          p[]
+        else
+          i_a.pop
+        end
         _p = i_a.reduce @h do |m, i|
           m.fetch( i ) { } or raise ::KeyError, say_no_callback( i, i_a )
         end
-        _p.call yield
+        _p.call x
       end
 
       def say_no_callback i, i_a

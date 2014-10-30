@@ -230,7 +230,7 @@ module Skylab::TestSupport
         end
 
         def bld_generic_listener_p
-          Callback_::Listener::Proc_As_Listener.new do |e|
+          Callback_::Selective_listener.via_proc do |e|
             if @vtuple[ e.volume ]
               @err.puts instance_exec( & e.message_proc )
               true

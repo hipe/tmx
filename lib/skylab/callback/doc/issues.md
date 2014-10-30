@@ -39,7 +39,7 @@
 [#020]       #in-situ
 [#019]       #parent-node: [#034] the digraph narrative ..
 [#018]       #parent-node: [#019] the CLI node narrative
-[#017]       #parent-node: [#034] the listener node
+[#017]       #parent-node: [#034] the selective listener node
 [#016]       #done iambify extension interface
 [#015]       #nichepoint "event factory structural" (there are others..)
 [#014]       #parent-node:[#019] the reflection API

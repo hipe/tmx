@@ -824,6 +824,7 @@ module Skylab::GitViz
       end
 
       Mock_System = self
+
     end
   end
 end

@@ -1,9 +1,38 @@
 module Skylab::Callback
 
-  module Listener  # :[#017]
+  module Selective_Listener  # :[#017]
 
-    def self.[] mod, * x_a
-      Bundles__.apply_iambic_on_client x_a, mod ; nil
+    class << self
+
+      def call mod, * x_a
+        Bundles__.apply_iambic_on_client x_a, mod ; nil
+      end
+
+      alias_method :[], :call
+
+      def flattening x
+        Flattening__.new x
+      end
+
+      def make_via_didactic_matrix a, a_
+        Make_via_didactic_matrix__[ a, a_ ]
+      end
+
+      def spy_proxy & p
+        Spy_Proxy__.new( & p )
+      end
+
+      def suffixed o, i
+        Suffixed__.new o, i
+      end
+
+      def via_digraph_emitter x
+        Via_digraph_emitter__.new x
+      end
+
+      def via_proc & p
+        Via_Proc__.new( & p )
+      end
     end
 
     module Bundles__
@@ -13,7 +42,7 @@ module Skylab::Callback
           a_.each do |i_|
             m_i = :"emit_#{ i }_#{ i_ }"
             define_method m_i do |x|
-              @listener.call_any_listener i, i_ do x end
+              @listener.maybe_receive_event i, i_, x
             end ; private m_i
           end
         end ; nil
@@ -21,56 +50,33 @@ module Skylab::Callback
       Callback_::Lib_::Bundle_Multiset[ self ]
     end
 
-    Class_from_diadic_matrix = -> channel_i_a, shape_i_a do
+    Make_via_didactic_matrix__ = -> channel_i_a, shape_i_a do
+
       ::Class.new.class_exec do
+
         def initialize emitter
           @emitter = emitter ; nil
         end
+
         make_OK_hash = -> moniker_s, i_a do
           h = ::Hash[ i_a.map { |i| [ i, true ] } ]
           h.default_proc =
             Callback_::Lib_::Hash_lib[].loquacious_default_proc.curry[ moniker_s ]
           h
         end
+
         ok_shape = make_OK_hash[ 'shape', shape_i_a ]
-        define_method :call_any_listener do |chan_i, shape_i, & p|
-          ok_shape[ shape_i ]
-          @emitter.call_digraph_listeners chan_i, p.call
+
+        define_method :maybe_receive_event do |chan_i, * x_a, & p|
+          x = p ? p.call : x_a.pop
+          ok_shape[ * x_a ]
+          @emitter.call_digraph_listeners chan_i, x
         end
         self
       end
     end
 
-    From_digraph_emitter = class From_emitter__
-      def self.[] emitter
-        new emitter
-      end
-      def initialize emitter
-        @call_p = -> i_a, p do
-          _event_x = p.call
-          args = [ * i_a, _event_x ]
-          emitter.send :call_digraph_listeners, * args  # remove the 'send' i dare you
-        end ; nil
-      end
-      def call_any_listener * a, & p
-        @call_p[ a, p ]
-      end
-      self
-    end
-
-    class Suffixed
-      def self.[] * a
-        new( * a )
-      end
-      def initialize sffx_i, down
-        @down_p = -> { down } ; @sffx_i = sffx_i ; nil
-      end
-      def call_any_listener * i_a, & p
-        @down_p[].send [ * i_a, @sffx_i ].join( '_' ).intern, p.call
-      end
-    end
-
-    class Spy_Proxy
+    class Spy_Proxy__
 
       def initialize
         yield self
@@ -84,12 +90,12 @@ module Skylab::Callback
       attr_writer :debug_IO, :do_debug_proc,
         :emission_a, :inspect_emission_proc
 
-      def call_any_listener * i_a, & p
-        x = p[]
+      def maybe_receive_event * i_a, & p
+        x = p ? p.call : i_a.pop
         if @do_debug_proc && @do_debug_proc[]
           @debug_IO.puts @inspect_emission_proc[ i_a, x ]
         end
-        @emission_a << Emission__.new( i_a.freeze, x ) ; nil
+        @emission_a << Emission___.new( i_a.freeze, x ) ; nil
       end
     private
       def inspect_emission_channel_and_payload i_a, x
@@ -97,7 +103,7 @@ module Skylab::Callback
       end
     end
 
-    class Emission__
+    class Emission___
 
       def initialize i_a, x
         i_a.frozen? or fail "i_a must be frozen"
@@ -110,8 +116,56 @@ module Skylab::Callback
       alias_method :channel_x, :channel_i_a
     end
 
-    class Proc_As_Listener < ::Proc
-      alias_method :call_any_listener, :call
+    class Flattening__
+
+      def initialize x
+        @down_x = x
+      end
+
+      def maybe_receive_event * i_a, & p
+        x = p ? p.call : i_a.pop
+        @down_x.send ( i_a * UNDERSCORE_ ), x
+      end
+    end
+
+    class Suffixed__
+
+      def initialize down_x, sffx_i
+        @down_p = -> do
+          down_x
+        end
+        @sffx_i = sffx_i
+      end
+
+      def maybe_receive_event * i_a, & p
+        x = p ? p.call : i_a.pop
+        @down_p[].send [ * i_a, @sffx_i ].join( UNDERSCORE_ ).intern, x
+      end
+    end
+
+    class Via_digraph_emitter__
+
+      def initialize emitter_x
+
+        @normal_p = -> i_a, x do
+
+          emitter_x.send :call_digraph_listeners, * i_a, x  # remove the 'send' i dare you
+
+        end ; nil
+      end
+
+      def maybe_receive_event * i_a, & p
+        x = if p
+          p.call
+        else
+          i_a.pop
+        end
+        @normal_p[ i_a, x ]
+      end
+    end
+
+    class Via_Proc__ < ::Proc
+      alias_method :maybe_receive_event, :call
     end
   end
 end

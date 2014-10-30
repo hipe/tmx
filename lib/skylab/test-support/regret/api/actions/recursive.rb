@@ -107,7 +107,7 @@ module Skylab::TestSupport::Regret::API
     end
 
     def bld_special_path_listener
-      TestSupport_::Callback_::Listener::Suffixed[ :from_special, self ]
+      TestSupport_::Callback_::Selective_listener.suffixed self, :from_special
     end
 
     Special_Path__ = -> * x_a do

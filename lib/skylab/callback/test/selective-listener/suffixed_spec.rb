@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::Callback::TestSupport::Listener
+module Skylab::Callback::TestSupport::Selective_Listener
 
-  describe "[cb] listener suffixed" do
+  describe "[cb] selective listener - suffixed" do
 
     extend TS__
 
@@ -22,21 +22,22 @@ module Skylab::Callback::TestSupport::Listener
     end
 
     it "makes a listener that sends method calls downwards w suffix - o" do
-      listener.call_any_listener :wazzozle do :x end
-      @listener.call_any_listener :wiff, :waff do :z end
+      listener.maybe_receive_event :wazzozle, :x
+      @listener.maybe_receive_event :wiff, :waff, :z
       @a.should eql %i( wzzzl x wff wff z )
     end
 
     it "when an unsupported channel name is emitted - X" do
       -> do
-        listener.call_any_listener :montoya do :_no_see_ end
+        listener.maybe_receive_event :montoya, :_no_see_
       end.should raise_error ::NoMethodError,
         /\bundefined method `montoya_from_agent'/
     end
 
     def build_listener
-      Callback_::Listener::Suffixed[ :from_agent, client ]
+      Subject_[].suffixed client, :from_agent
     end
+
     def build_client
       @a = []
       Client_SFFXD.new @a

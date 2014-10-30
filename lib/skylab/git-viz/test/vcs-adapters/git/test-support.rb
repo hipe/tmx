@@ -12,9 +12,9 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
   include Constants
 
-  GitViz = GitViz
+  GitViz_ = GitViz_
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   module InstanceMethods
 
@@ -23,7 +23,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
     end
 
     def build_front
-      front_class.new GitViz::VCS_Adapters_::Git, listener do |f|
+      front_class.new GitViz_::VCS_Adapters_::Git, listener do |f|
         f.set_system_conduit system_conduit
       end
     end
@@ -49,7 +49,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
     end
 
     def _VCS_adapter_module
-      GitViz::VCS_Adapters_::Git
+      GitViz_::VCS_Adapters_::Git
     end
   end
 end

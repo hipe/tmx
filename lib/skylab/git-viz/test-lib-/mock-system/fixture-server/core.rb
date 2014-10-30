@@ -186,9 +186,10 @@ module Skylab::GitViz
 
       def is_server_directive
         ok = @buffer_a.length.nonzero?
-        ok &&= DASH__ != @buffer_a.fetch( 0 ).getbyte( 0 )
+        ok &&= DASH_BYTE_ != @buffer_a.fetch( 0 ).getbyte( 0 )
         ok && can_and_do_preprocess_server_directive
-      end ; DASH__ = '-'.getbyte 0
+      end
+      DASH_BYTE_ = DASH_.getbyte 0
 
       def can_and_do_preprocess_server_directive
         _human = @buffer_a.fetch 0

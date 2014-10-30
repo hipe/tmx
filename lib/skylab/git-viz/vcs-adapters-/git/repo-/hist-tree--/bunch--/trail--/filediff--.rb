@@ -44,7 +44,7 @@ module Skylab::GitViz
             PROCEDE_
           end
           def when_no  # this is here to catch [#035] this issue
-            @listener.call_any_listener :info, :string,
+            @listener.maybe_receive_event :info, :string,
               :omitting_informational_commitpoint do
                 "'#{ @filediff.SHA.to_string }' appears only to be #{
                   }informational in regards to #{ @norm_path }"

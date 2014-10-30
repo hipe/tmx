@@ -761,6 +761,10 @@ module Skylab::Brazen
         @d += 1
       end
 
+      def flush_remaining_iambic
+        a = @x_a[ @d .. -1 ] ; @d = @x_a_length ; a
+      end
+
       def clear_all_iambic_ivars
         @d = @x_a = @x_a_length = nil
         UNDEFINED_

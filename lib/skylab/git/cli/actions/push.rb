@@ -253,7 +253,8 @@ module TmxGit
         sync_report_data = @manifest.sync_report_data
         ks = sync_report_data.keys.map(&:to_s).sort.map(&:to_sym)
         ks.each do |k|
-          _info "summary: #{k.to_s.gsub('_', ' ')}: (#{sync_report_data[k].join(', ')})"
+          _s = k.to_s.gsub UNDERSCORE_, SPACE_
+          _info "summary: #{ _s }: (#{ sync_report_data[k].join( ', ' ) })"
         end
       end
       def _err msg

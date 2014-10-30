@@ -446,7 +446,7 @@ module Skylab::Callback
         end
 
         def to_listener
-          Callback_::Listener::From_digraph_emitter[ self ]
+          Callback_::Selective_Listener.via_digraph_emitter self
         end
 
         p and class_exec( & p )

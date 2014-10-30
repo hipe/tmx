@@ -6,12 +6,15 @@ require_relative '../callback/core'
 module Skylab::GitViz
 
   Autoloader_ = ::Skylab::Callback::Autoloader
+    Callback_ = ::Skylab::Callback
 
-  Callback_ = ::Skylab::Callback
+  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
   Callback_Tree_ = Callback_::Tree
 
   CONTINUE_ = nil
+
+  DASH_ = '-'.freeze
 
   EMPTY_A_ = [].freeze
 
@@ -25,6 +28,8 @@ module Skylab::GitViz
 
   Scn_ = Callback_::Scn
 
-  Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+  SPACE_ = ' '.freeze
+
+  UNDERSCORE_ = '_'.freeze
 
 end

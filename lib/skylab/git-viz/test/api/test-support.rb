@@ -6,9 +6,9 @@ module Skylab::GitViz::TestSupport::API
 
   include Constants
 
-  GitViz = GitViz
+  GitViz_ = GitViz_
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   module InstanceMethods
 
@@ -16,11 +16,11 @@ module Skylab::GitViz::TestSupport::API
       @emit_spy = bld_emit_spy
       x_a[ 1, 0 ] = [ :listener, bld_listener_around( @emit_spy ) ]
       x_a.unshift :API_action_locator_x
-      @result = GitViz::API.invoke_with_iambic x_a ; nil
+      @result = GitViz_::API.invoke_with_iambic x_a ; nil
     end
 
     def bld_emit_spy
-      GitViz::Callback_.test_support.call_digraph_listeners_spy(
+      GitViz_::Callback_.test_support.call_digraph_listeners_spy(
         :debug_IO, debug_IO,
         :do_debug_proc, -> { do_debug } )
     end
@@ -34,9 +34,9 @@ module Skylab::GitViz::TestSupport::API
       Common_shape_listener__[].new emitter
     end
 
-    Common_shape_listener__ = GitViz::Lib_::Memoize[ -> do
-      GitViz::Callback_::
-        Listener::Class_from_diadic_matrix[ %i( info ), %i( line ) ]
+    Common_shape_listener__ = GitViz_::Lib_::Memoize[ -> do
+      GitViz_::Callback_::Selective_listener.
+        make_via_didactic_matrix [ :info ], [ :line ]
     end ]
 
     def expect_result_for_failure  # #hook-out

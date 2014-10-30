@@ -7,7 +7,7 @@ module Skylab::GitViz::TestSupport::API
     extend TS__ ; use :expect
 
     it "loads" do
-      GitViz::API
+      GitViz_::API
     end
 
     it "ping with strange parameters - X" do

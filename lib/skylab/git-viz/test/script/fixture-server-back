@@ -47,11 +47,11 @@ module Skylab::GitViz
     end
   private
     def bld_manifest
-      GitViz::Test_Lib_::Mock_System::Fixture_Server::Responder__.new @y
+      GitViz_::Test_Lib_::Mock_System::Fixture_Server::Responder__.new @y
     end
 
-    Autoloader_[ ( GitViz::TestSupport = ::Module.new ),  # eek: hack to avoid
-      GitViz.dir_pathname.join( 'test' ) ]  # loading  crufty, unnec. t.s
+    Autoloader_[ ( GitViz_::TestSupport = ::Module.new ),  # eek: hack to avoid
+      GitViz_.dir_pathname.join( 'test' ) ]  # loading  crufty, unnec. t.s
 
     self
   end.new( $stderr, ::ARGV ).execute

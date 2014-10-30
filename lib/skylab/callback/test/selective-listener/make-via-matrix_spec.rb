@@ -1,16 +1,14 @@
 require_relative 'test-support'
 
-module Skylab::Callback::TestSupport::Listener
+module Skylab::Callback::TestSupport::Selective_Listener
 
-  describe "[cb] listener from didactic matrix" do
+  describe "[cb] selective listener - make via didactic matrix" do
 
     extend TS__
 
     before :all do
 
-      Mofo_CFDM = Callback_::Listener::Class_from_diadic_matrix[
-        %i( info error ), %i( string line ) ]
-
+      Mofo_CFDM = Subject_[].make_via_didactic_matrix [ :info, :error ], [ :string, :line ]
 
       class Digraph_CFDM
         def initialize a
@@ -23,7 +21,7 @@ module Skylab::Callback::TestSupport::Listener
     end
 
     it "when shape term is valid, it is simply ignored - o" do
-      listener.call_any_listener :info, :line do :hi end
+      listener.maybe_receive_event :info, :line, :hi
       @a.should eql %i( info hi )
     end
 
@@ -32,7 +30,7 @@ module Skylab::Callback::TestSupport::Listener
 
       it "#{ msg } - X" do
         -> do
-          listener.call_any_listener :info, :event do :hi end
+          listener.maybe_receive_event :info, :event, :hi
         end.should raise_error ::KeyError, msg
       end
     end.call

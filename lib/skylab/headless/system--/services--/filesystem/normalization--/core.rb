@@ -21,6 +21,20 @@ module Skylab::Headless
           end
         end  # >>
 
+        module Common_Module_Methods_
+
+          def mixed_via_iambic x_a
+            if x_a.length.zero?
+              self
+            else
+              new do
+                process_iambic_fully x_a
+                clear_all_iambic_ivars
+              end.produce_mixed_result
+            end
+          end
+        end
+
       private
 
         def path_exists_and_set_stat_and_stat_error path

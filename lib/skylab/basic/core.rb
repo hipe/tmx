@@ -20,26 +20,32 @@ module Skylab::Basic  # introduction at [#020]
   Callback_ = ::Skylab::Callback
 
   Default_property_instance__ = Callback_.memoize do
+    Minimal_Property__.via_variegated_symbol :argument
+  end
 
-    class Property___  # for onw
+  class Minimal_Property__
 
-      def initialize name
-        @name = name
-        freeze
-      end
+    class << self
 
-      attr_reader :name
-
-      def name_i
-        @name.as_variegated_symbol
-      end
-
-      def description
-        "« #{ @name.as_slug } »"  # :+#guillemets
+      def via_variegated_symbol i
+        new Callback_::Name.via_variegated_symbol i
       end
     end
 
-    Property___.new Callback_::Name.via_variegated_symbol( :argument )
+    def initialize name
+      @name = name
+      freeze
+    end
+
+    attr_reader :name
+
+    def name_i
+      @name.as_variegated_symbol
+    end
+
+    def description
+      "« #{ @name.as_slug } »"  # :+#guillemets
+    end
   end
 
   Normalizers_instance__ = Callback_.memoize do
@@ -70,9 +76,13 @@ module Skylab::Basic  # introduction at [#020]
   class Trio_  # :[#038].
 
     class << self
+
       def via_value_and_variegated_symbol x, i
-        new x, true, Callback_::Name.via_variegated_symbol( i )
+        new x, true, Minimal_Property__.via_variegated_symbol( i )
       end
+
+      alias_method :via_x_and_i, :via_value_and_variegated_symbol
+
     end
 
     def initialize * a

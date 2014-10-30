@@ -33,7 +33,7 @@ module Skylab::GitViz::TestSupport
       end
 
       def expect i, s
-        _name = GitViz::Name_.via_const i
+        _name = GitViz_::Name_.via_const i
         _name.as_doc_slug.should eql s
       end
     end
@@ -41,7 +41,7 @@ module Skylab::GitViz::TestSupport
     context "from variegated symbol" do
 
       memoize :name do
-        GitViz::Name_.via_variegated_symbol :merk_FS
+        GitViz_::Name_.via_variegated_symbol :merk_FS
       end
 
       it "as_const" do

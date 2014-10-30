@@ -1,15 +1,17 @@
 require_relative 'test-support'
 
-module Skylab::Callback::TestSupport::Listener
+module Skylab::Callback::TestSupport::Selective_Listener
 
-  describe "[cb] listener emission matrix" do
+  describe "[cb] selective listener - emission matrix" do
 
     extend TS__
 
     before :all do
 
       class Goofis_EM
-        Callback_::Listener[ self, :emission_matrix, %i( inf err ), %i( ln str ) ]
+
+        Subject_.call self,
+          :emission_matrix, [ :inf, :err ], [ :ln, :str ]
 
         def initialize listener
           @listener = listener
@@ -20,8 +22,10 @@ module Skylab::Callback::TestSupport::Listener
         def initialize a
           @a = a ; nil
         end
-        def call_any_listener * i_a, & p
-          i_a << p.call
+        def maybe_receive_event * i_a, & p
+          if p
+            i_a.push p.call
+          end
           @a.concat i_a ; nil
         end
       end

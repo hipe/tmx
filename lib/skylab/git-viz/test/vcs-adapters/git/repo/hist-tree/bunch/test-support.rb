@@ -6,6 +6,6 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git::Repo::Hist_Tree
 
   include Constants
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
 end

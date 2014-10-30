@@ -3,23 +3,23 @@ require_relative '../core'
 module Skylab::GitViz::TestSupport
 
   module Constants
-    GitViz = ::Skylab::GitViz
-    o = GitViz::Lib_
-    TestSupport = o::TestSupport[]
-    TS_ = GitViz::TestSupport
+    GitViz_ = ::Skylab::GitViz
+    o = GitViz_::Lib_
+    TestSupport_ = o::Test_support[]
+    TS_ = GitViz_::TestSupport
   end
 
   include Constants
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  TestSupport::Regret[ self ]
+  TestSupport_::Regret[ self ]
 
-  GitViz = GitViz ; TS__ = self
+  GitViz_ = GitViz_ ; TS__ = self
 
   module ModuleMethods
     def use i
-      const_i = GitViz::Name_.via_variegated_symbol( i ).as_const
+      const_i = GitViz_::Name_.via_variegated_symbol( i ).as_const
       mod = nearest_test_node
       while true
         if mod.const_defined? const_i, false
@@ -30,7 +30,7 @@ module Skylab::GitViz::TestSupport
         if mod_
           mod = mod_
         else
-          found_mod = GitViz::Test_Lib_.const_get const_i, false
+          found_mod = GitViz_::Test_Lib_.const_get const_i, false
           break
         end
       end
@@ -45,7 +45,7 @@ module Skylab::GitViz::TestSupport
     end
     attr_reader :do_debug
     def debug_IO
-      GitViz::Lib_::Some_stderr_IO[]
+      GitViz_::Lib_::Some_stderr_IO[]
     end
 
     def listener
@@ -53,7 +53,7 @@ module Skylab::GitViz::TestSupport
     end
 
     def build_listener
-      GitViz::Callback_::Listener::Spy_Proxy.new do |spy|
+      GitViz_::Callback_::Selective_listener.spy_proxy do |spy|
         spy.emission_a = @baked_em_a = []
         spy.inspect_emission_proc =
           method :inspect_emission_channel_and_payload
@@ -63,7 +63,7 @@ module Skylab::GitViz::TestSupport
     end
 
     def inspect_emission_channel_and_payload i_a, x
-      "#{ i_a.inspect }: #{ GitViz::Test_Lib_::Strange[ x ] }"
+      "#{ i_a.inspect }: #{ GitViz_::Test_Lib_::Strange[ x ] }"
     end
 
     def baked_em_a  # #hook-out: 'expect'
@@ -92,9 +92,9 @@ module Skylab::GitViz::TestSupport
     end
   end
 
-  Autoloader_ = GitViz::Autoloader_
+  Autoloader_ = GitViz_::Autoloader_
 
-  Autoloader_[ self, :boxxy,  GitViz.dir_pathname.join( 'test' ) ]
+  Autoloader_[ self, :boxxy,  GitViz_.dir_pathname.join( 'test' ) ]
 
   module Messages
     PATH_IS_FILE = "path is file, must have directory".freeze

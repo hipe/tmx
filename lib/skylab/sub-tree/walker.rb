@@ -413,7 +413,7 @@ module SubTree  # #borrow-one-indent - load this solo but it needs meta hell
     #               ~ non-topical private (section 3) ~
 
     def say volume, msg_func
-      @listener.call_any_listener Event__.new( volume, msg_func )
+      @listener.maybe_receive_event Event__.new( volume, msg_func )
       nil
     end
     private :say

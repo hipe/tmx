@@ -19,7 +19,12 @@ module Skylab::Git
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
+  DASH_ = '-'.freeze
+
   Git_ = self
 
   stowaway :Lib_, 'library-'
+
+  UNDERSCORE_ = '_'.freeze
+
 end

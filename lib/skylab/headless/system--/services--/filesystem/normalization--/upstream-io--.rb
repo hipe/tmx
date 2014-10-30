@@ -8,31 +8,22 @@ module Skylab::Headless
 
         class Upstream_IO__ < self  # see [#022]
 
-          class << self
-
-            def mixed_via_iambic x_a
-              new do
-                process_iambic_fully x_a
-                clear_all_iambic_ivars
-              end.produce_mixed_result
-            end
-          end
+          extend Common_Module_Methods_
 
           Entity_.call self do
 
             o :iambic_writer_method_name_suffix, :"="
 
             def path=
-              replace_current_iambic_token do |path|
-                Headless_::Lib_::Bsc_[].trio.
-                  via_value_and_variegated_symbol path, :path
-              end
-              send :path_arg=
+              @do_execute = true
+              @path_arg = Headless_::Lib_::Bsc_[].
+                trio.via_x_and_i iambic_property, :path ; nil
             end
 
-            def path_arg=  # LOOK at trio, not a value
+            def path_arg=  # LOOK a trio, not a value
               @do_execute = true
               @path_arg = iambic_property
+              @path_arg_was_explicit = true
             end
 
             def only_apply_expectation_that_path_is_file=
@@ -43,10 +34,10 @@ module Skylab::Headless
           end
 
           def initialize & p
-            @clobber_is_OK = true   # always true for now
             @do_execute = false
             @instream = nil
             @is_only_path_ftype_expectation = false
+            @path_arg_was_explicit = false
             instance_exec( & p )
             @as_normal_value ||= IDENTITY_
           end
@@ -81,6 +72,10 @@ module Skylab::Headless
             else
               when_actual_neither
             end
+          end
+
+          def instream_is_noninteractive_and_open
+            ! ( @instream.tty? || @instream.closed? )
           end
 
           def when_formal_path
@@ -129,9 +124,12 @@ module Skylab::Headless
             if @stat
               when_stat
             else
-              _ev = Event_.wrap.exception @stat_e, :path_hack
-              @on_event[ _ev ]
+              when_no_stat
             end
+          end
+
+          def when_no_stat
+            @on_event[ wrap_exception @stat_e ]
           end
 
           def when_stat
@@ -152,15 +150,36 @@ module Skylab::Headless
           end
 
           def via_path_open_file
-            _io = ::File.open @path, READ_MODE_
-            @as_normal_value[ _io ]  # :#open-filehandle-1 - don't loose track
-          rescue ::SystemCallError => e  # Errno::EISDIR, Errno::ENOENT etc
-            _ev = Event_.wrap.exception e, :path_hack
-            @on_event[ _ev ]
+            set_IO_and_e
+            if @IO
+              @as_normal_value[ @IO ]
+            else
+              @on_event[ wrap_excetion @e ]
+            end
           end
 
-          def instream_is_noninteractive_and_open
-            ! ( @instream.tty? || @instream.closed? )
+          def set_IO_and_e
+            @IO = ::File.open @path, READ_MODE_  # :#open-filehandle-1 - don't loose track
+            @e = nil
+            nil
+          rescue ::SystemCallError => @e  # Errno::EISDIR, Errno::ENOENT etc
+            @IO = false
+            nil
+          end
+
+          def wrap_exception e
+
+            if @path_arg_was_explicit
+              _xtra = [ :search_and_replace_hack,
+                %r(\bfile or directory\b),
+                -> o do
+                  par o.path_arg.property
+                end ]
+            end
+
+            Event_.wrap.exception e, :path_hack, * _xtra,
+              :properties, :path_arg, @path_arg
+
           end
         end
       end

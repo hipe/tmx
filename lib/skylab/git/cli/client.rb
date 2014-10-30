@@ -44,7 +44,8 @@ module Skylab::Git
         unbound = unbound::CLI
       end
       bound = unbound.new @sin, @out, @err
-      bound.program_name = progname_for i.id2name.gsub( '_', '-' ).downcase
+      _slug = i.id2name.gsub( UNDERSCORE_, DASH_ ).downcase
+      bound.program_name = progname_for _slug
       block_given? and yield bound
       bound
     end
@@ -103,7 +104,7 @@ module Skylab::Git
 
     const_set :A_, [] ; const_set :H_, { }
     a.each do |i|
-      moniker = i.to_s.gsub '_', '-'
+      moniker = i.to_s.gsub UNDERSCORE_, DASH_
       A_ << moniker
       H_[ moniker ] = i
     end

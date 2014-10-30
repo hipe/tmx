@@ -10,7 +10,7 @@ module Skylab::GitViz
           head.frozen? or head = head.dup.freeze
           ! body or body.frozen? or body = body.dup.freeze
           @body_s = body ; @identifier_s = head
-          @normal_stem_i = head[ 1 .. -1 ].gsub( '-', '_' ).intern
+          @normal_stem_i = head[ 1 .. -1 ].gsub( DASH_, UNDERSCORE_ ).intern
           freeze
         end
         attr_reader :body_s, :normal_stem_i, :identifier_s

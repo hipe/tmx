@@ -75,7 +75,7 @@ module Skylab::GitViz::TestSupport::API
 
     def common_x_a
       listener
-      [ :hist_tree, :VCS_adapters_module,  GitViz::VCS_Adapters_,
+      [ :hist_tree, :VCS_adapters_module,  GitViz_::VCS_Adapters_,
          :VCS_adapter_name, :git, :VCS_listener, @listener ]
     end
 
@@ -87,7 +87,7 @@ module Skylab::GitViz::TestSupport::API
     end
 
     def fixtures_module
-      GitViz::TestSupport::VCS_Adapters::Git::Fixtures
+      GitViz_::TestSupport::VCS_Adapters::Git::Fixtures
     end
   end
 end

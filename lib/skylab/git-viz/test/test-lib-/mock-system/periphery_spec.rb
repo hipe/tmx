@@ -25,7 +25,7 @@ module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System
       end
 
       def get_manifest_path
-        GitViz.dir_pathname.join( 'not-exist.manifest' ).to_path
+        GitViz_.dir_pathname.join( 'not-exist.manifest' ).to_path
       end
     end
 
@@ -65,7 +65,7 @@ module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System
         execute
         expect_that_the_request_string_was_echoed
         expect :error, :iambic, :manifest_parse, :unexpected_term_parse_error
-        expect_errored( GitViz::Test_Lib_::
+        expect_errored( GitViz_::Test_Lib_::
           Mock_System::Fixture_Server::MANIFEST_PARSE_ERROR_ )
       end
 
@@ -75,7 +75,7 @@ module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System
     end
 
     let :mani do
-      GitViz::Test_Lib_::
+      GitViz_::Test_Lib_::
         Mock_System::Fixture_Server::Responder__.new stderr_yielder
     end
 
@@ -133,7 +133,7 @@ module Skylab::GitViz::TestSupport::Test_Lib_::Mock_System
     end
 
     def test_support_prefix_pathname
-      TestSupport::Data::Universal_Fixtures.dir_pathname
+      TS_::Data::Universal_Fixtures.dir_pathname
     end
   end
 end

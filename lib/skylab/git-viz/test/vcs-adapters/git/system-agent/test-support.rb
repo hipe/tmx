@@ -7,11 +7,11 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git::System_Agent
 
   include Constants
 
-  GitViz = GitViz
+  GitViz_ = GitViz_
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
-  GitViz::TestSupport::Testable_Client::DSL[ self ]
+  GitViz_::TestSupport::Testable_Client::DSL[ self ]
 
   module InstanceMethods
 
@@ -24,7 +24,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git::System_Agent
   end
 
   testable_client_class :testable_system_agent_class do
-    class Testable_System_Agent < GitViz::VCS_Adapters_::Git::System_Agent_
+    class Testable_System_Agent < GitViz_::VCS_Adapters_::Git::System_Agent_
       public :get_any_nonzero_count_output_line_scanner_from_cmd
       self
     end

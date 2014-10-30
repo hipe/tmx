@@ -142,7 +142,7 @@ module Skylab::GitViz
             takes_at_least_one_arg_notify
           end
           def as_human_moniker  # in lieu of expression agents
-            "#{ @param_i.to_s.gsub '_', ' ' }"
+            "#{ @param_i.to_s.gsub UNDERSCORE_, SPACE_ }"
           end
         private
           def absorb_iambic x_a, & p
@@ -169,7 +169,6 @@ module Skylab::GitViz
             @param_i = @x_a.shift
             nil
           end
-          UNDERSCORE__ = '_'.freeze ; DASH__ = '-'.freeze
           def say_expecting_name
             "expecting parameter name, had no more terms to parse"
           end
@@ -200,7 +199,7 @@ module Skylab::GitViz
             @ivar = :"@#{ hungarian_i }"
             @attr_reader_method_name = hungarian_i
             @CLI_moniker_s =
-              "--#{ @param_i.to_s.gsub UNDERSCORE__, DASH__ }".freeze ; nil
+              "--#{ @param_i.to_s.gsub UNDERSCORE_, DASH_ }".freeze ; nil
           end
           def set_final_arity_when_begin_is_one_and_end_is_not_specified
             @takes_exactly_one_argument = true

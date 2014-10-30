@@ -8,15 +8,7 @@ module Skylab::Headless
 
         class Downstream_IO__ < self  # see [#022]:##write
 
-          class << self
-
-            def mixed_via_iambic x_a
-              new do
-                process_iambic_fully x_a
-                clear_all_iambic_ivars
-              end.produce_mixed_result
-            end
-          end
+          extend Common_Module_Methods_
 
           Entity_.call self do
 
@@ -28,13 +20,23 @@ module Skylab::Headless
                 via_value_and_variegated_symbol iambic_property, :path
             end
 
-            o :properties, :is_dry_run, :on_event, :outstream
+            def outstream=
+              @do_execute = true
+              @outstream = iambic_property
+            end
+
+            o :properties, :last_looks, :force_arg,
+                :is_dry_run, :on_event
 
           end
 
           def initialize & p
+            @do_execute = false
+            @force_arg = nil
             @is_dry_run = false
+            @last_looks = nil
             @outstream = nil
+            @path_arg = nil
             instance_exec( & p )
             @as_normal_value ||= IDENTITY_
           end
@@ -48,12 +50,14 @@ module Skylab::Headless
           end
 
           def execute
-            @path = @path_arg.value_x
+            @path = if @path_arg
+              @path_arg.value_x
+            end
             if @path
               via_path
             elsif @outstream
               @as_normal_value[ @outstream ]
-            else
+            elsif @path_arg
               when_neither
             end
           end
@@ -75,51 +79,130 @@ module Skylab::Headless
             end
           end
 
-          def when_stat
-
-            _ev = build_neutral_event_with :before_editing_existing_file,
-                :path, @path, :stat, @stat do |y, o|
-
-              if o.stat.size.zero?
-                _zero_note = " empty file"
-              end
-
-              y << "updating#{ _zero_note } #{ pth o.path }#{ _zero_note }"
-            end
-
-            send_event _ev
-
-            _io = if @is_dry_run
-              Headless_::IO.dry_stub_instance
+          def when_no_stat
+            snd_creating_event
+            if @is_dry_run
+              @as_normal_value[ Headless_::IO.dry_stub_instance ]
             else
-              ::File.open @path, 'r+'
+              via_hopefully_still_available_path_open_file
             end
-
-            @as_normal_value[ _io ]
           end
 
-          def when_no_stat
-
-            _ev = build_neutral_event_with :before_probably_creating_new_file,
-                :path, @path do |y, o|
-
-              y << "creating #{ pth o.path }"
+          def when_stat
+            if @force_arg
+              if @force_arg.value_x
+                when_stat_is_file_OK_to_overwrite
+              else
+                via_force_arg_not_OK_to_overwrite
+              end
+            else
+              when_stat_is_file_OK_to_overwrite
             end
-            send_event _ev
+          end
+
+          def via_force_arg_not_OK_to_overwrite
+
+            _ev = build_not_OK_event_with :missing_required_permission,
+                :force_arg, @force_arg, :path_arg, @path_arg do |y, o|
+
+              y << "#{ par o.path_arg.property } #{
+               }exists, won't overwrite without #{
+                }#{ par o.force_arg.property }: #{
+                 }#{ pth o.path_arg.value_x }"
+            end
+
+            @on_event[ _ev ]
+          end
+
+          def when_stat_is_file_OK_to_overwrite
+            snd_updating_event
 
             if @is_dry_run
               @as_normal_value[ Headless_::IO.dry_stub_instance ]
             else
-              via_path_open_file
+              via_hopefully_still_occupied_path_open_file
             end
           end
 
-          def via_path_open_file
-            _io = ::File.open @path, WRITE_MODE_
-            @as_normal_value[ _io ]
-          rescue ::SystemCallError => e  # Errno::ENOENT, Errno::ENOENT
-            _ev = Event_.wrap.exception e, :path_hack
-            @on_event[ _ev ]
+          # ~ pairs
+
+          def snd_creating_event
+            _ev = build_neutral_event_with :before_probably_creating_new_file,
+                :path_arg, @path_arg do |y, o|
+
+              y << "creating #{ pth o.path_arg.value_x }"
+            end
+            send_event _ev ; nil
+          end
+
+          def snd_updating_event
+            _ev = build_neutral_event_with :before_editing_existing_file,
+                :path_arg, @path_arg, :stat, @stat do |y, o|
+
+              if o.stat.size.zero?
+                _zero_note = " empty file"
+              end
+              _path = o.path_arg.value_x
+
+              y << "updating#{ _zero_note } #{ pth _path }#{ _zero_note }"
+            end
+            send_event _ev ; nil
+          end
+
+          def via_hopefully_still_available_path_open_file
+            set_IO_and_exception_via_open_mode WRITE_MODE_
+            if @IO
+              @as_normal_value[ @IO ]
+            else
+              @on_event[ wrap_exception @e ]
+            end
+          end
+
+          def via_hopefully_still_occupied_path_open_file
+            set_IO_and_exception_via_open_mode 'r+'
+            if @e
+              @on_event[ wrap_exception @e ]
+            else
+              if @last_looks
+                via_IO_last_looks
+              else
+                @as_normal_value[ @IO ]
+              end
+            end
+          end
+
+          # ~ support
+
+          def when_last_looks
+            _ev = build_neutral_event_with :for_last_looks,
+              :IO, @IO, :path, @path, :stat, @stat
+
+            is_ok = false
+            x = @last_looks.call _ev, -> do
+              is_ok = true ; nil
+            end, -> ev do
+              @on_event[ ev ]
+            end
+            if is_ok
+              @IO.rewind
+              @as_normal_value[ @IO ]
+            else
+              @IO.close
+              x
+            end
+          end
+
+          def set_IO_and_exception_via_open_mode s
+            @IO = ::File.open @path, s
+            @e = nil
+          rescue ::SystemCallError => @e  # Errno::EISDIR, Errno::ENOENT etc
+            @IO = false
+            nil
+          end
+
+          def wrap_exception e
+            Event_.wrap.exception e, :path_hack,
+              :properties, :path_arg, @path_arg
           end
         end
       end

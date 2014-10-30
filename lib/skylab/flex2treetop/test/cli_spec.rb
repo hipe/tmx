@@ -62,7 +62,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
       it "1.1  with one giberrsh arg - explain that file is not found" do
         invoke 'not-there.txt'
-        expect %r(\ANo such file or directory - .+\bnot-there\.txt\b)
+        expect :styled, %r(\ANo such <flexfile> - «not-there\.txt»\z)
         expect_invite
       end
 

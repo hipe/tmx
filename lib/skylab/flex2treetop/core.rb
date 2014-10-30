@@ -27,7 +27,9 @@ module Skylab::Flex2Treetop
       end
     end
 
-    Bsc__  = sidesys[ :Basic ]
+    Bsc_  = sidesys[ :Basic ]
+
+    Bzn_ = sidesys[ :Brazen ]
 
     CLI_lib = -> do
       HL__[]::CLI
@@ -47,12 +49,16 @@ module Skylab::Flex2Treetop
 
     OptionParser = -> { require 'optparse' ; ::OptionParser }
 
+    Pathname_lib = -> do
+      Bsc_[]::Pathname
+    end
+
     Strange = -> x do
       MH__[].strange x
     end
 
     String_lib = -> do
-      Bsc__[]::String
+      Bsc_[]::String
     end
 
     StringScanner = -> { require 'strscan' ; ::StringScanner }
@@ -175,7 +181,7 @@ module Skylab::Flex2Treetop
 
     def show_flex2tt_tt_grammar
       @IO_adapter.outstream.write TREETOP_GRAMMAR__
-      PROCEDE__
+      PROCEDE_
     end
 
     def show_tests
@@ -190,7 +196,7 @@ module Skylab::Flex2Treetop
           emit_error_line "( missing example - fix this - #{ rel_pn })"
         end
       end
-      PROCEDE__
+      PROCEDE_
     end
 
     def version
@@ -405,13 +411,9 @@ module Skylab::Flex2Treetop
     Pathname_writer__ = -> param do
       ivar = param.ivar
       -> do
-        x = @x_a.shift and x = Convert_to_pathname_if_necessary__[ x ]
+        x = Lib_::Pathname_lib[].try_convert @x_a.shift
         instance_variable_set ivar, x ; nil
       end
-    end
-
-    Convert_to_pathname_if_necessary__ = -> x do
-      x and ( x.respond_to?( :relative_path_from ) ? x : ::Pathname.new( x ) )
     end
 
     class Actions::Translate < Action
@@ -422,7 +424,7 @@ module Skylab::Flex2Treetop
         :case_sensitive, [ :flag, :"@is_case_sensitive" ],
         :clear_generated_files, [ :flag, :"@do_clear_files" ],
         :endpoint_is_FS_parser, [ :flag, :"@endpoint_is_FS_parser" ],
-        :flexfile, [ :write_with, Pathname_writer__ ],
+        :flexfile,
         :force, [ :flag, :"@force_is_present" ],
         :FS_parser_dir, [ :write_with, Pathname_writer__, :optional ],
         :emit_info_line_p,
@@ -444,78 +446,148 @@ module Skylab::Flex2Treetop
           else raise ::ArgumentError, "no: '#{ type_i }'"
           end ; nil
         end
-      public
+
+    public
 
       def execute
-        endpoint_symbol = resolve_some_endpoint_symbol_for_paystream
-        if :_procede_ == endpoint_symbol
-          endpoint_symbol = resolve_endpoint_symbol_when_IO_resolved
-        end
-        endpoint_symbol
+        @sl = Callback_::Selective_Listener.flattening self
+        ok = rslv_upstream_IO
+        ok &&= maybe_rslv_payload_IO
+        ok && when_upstream_and_downstrem
+        @result_i
       end
 
     private
 
-      def resolve_some_endpoint_symbol_for_paystream
-        send :"rslv_IO_when_#{ @pay_i }"
+      def rslv_upstream_IO
+        x_a = []
+        x_a.push :path_arg, Lib_::Bsc_[].trio.via_x_and_i( @flexfile, :flexfile )
+        x_a.push :on_event, flattener_event_receiver_proc_for( :rslv_up_IO )
+        io = Lib_::System[].filesystem.normalization.upstream_IO.mixed_via_iambic x_a
+        if io
+          @upstream_IO = io
+          PROCEDE_
+        end
       end
 
-      def rslv_IO_when_path
-        pay_x = @pay_x ; @pay_x = @pay_IO = nil
-        @pay_pn = Convert_to_pathname_if_necessary__[ pay_x ]
-        _listener = Yes_No_Listener_[ self, :IO_resolved, :cannot_resolve_IO ]
-        _endpoint_symbol = Resolve_IO__[ :force_is_present, @force_is_present,
-          :infile, @flexfile, :listener, _listener, :out_pn, @pay_pn ]
-        _endpoint_symbol
+      def maybe_rslv_payload_IO
+        if @do_show_sexp_only || @do_use_FS_parser
+          @verb_s = :_no_verb_
+          @payload_IO = :_no_outstream_
+          PROCEDE_
+        else
+          rslv_payload_IO
+        end
       end
 
-      def rslv_IO_when_IO
-        @verb_s = "outputting"
-        @pay_IO = @pay_x ; @pay_x = @pay_pn = nil
-        :_procede_
+      def rslv_payload_IO
+        x_a = []
+        send :"when_payload_shape_is_#{ @pay_i }", x_a
+        x_a.push :on_event, flattener_event_receiver_proc_for( :rslv_pay_IO )
+        x_a.push :force_arg, bld_force_arg
+        x_a.push :last_looks, method( :last_looks )
+        io = Lib_::System[].filesystem.normalization.downstream_IO.mixed_via_iambic x_a
+        if io
+          @payload_IO = io
+          PROCEDE_
+        end
       end
 
-      def cannot_resolve_IO_infile_is_not_file ev
-        emit_error_string "was #{ ev.ftype } not file - #{ @flexfile }"
-        :not_file
+      def when_payload_shape_is_path x_a
+        x_a.push :path, @pay_x
       end
 
-      def cannot_resolve_IO_infile_not_found ev
-        emit_error_string "#{ ev.message }"
-        :not_found
+      def when_payload_shape_is_IO x_a
+        @verb_s = 'outputting'
+        x_a.push :outstream, @pay_x
       end
 
-      def cannot_resolve_IO_outfile_does_not_appear_generated_string ev
-        emit_error_string "won't overwrite, does not appear generated - #{
-          }#{ @pay_pn }"
-        :modified
+      def bld_force_arg
+        Lib_::Bsc_[].trio.via_value_and_variegated_symbol @force_is_present, :force
       end
 
-      def cannot_resolve_IO_outfile_exists_and_force_is_not_present ev
-        emit_error_string(
-          "exists, won't overwrite without force: #{ ev.to_path }" )
-        :exists
+      def last_looks ev, ok_p, ev_p
+        if AUTOGENERATED_RX =~ first_line
+          ev.stat.size.zero? and snd_zero_overwrite_event( ev )
+          ok_p[]
+        else
+          bld_looks_handmade_event ev
+          ev_p[ _ev ]
+        end
       end
 
-      def IO_resolved_when_outfile_empty ev
-        emit_info_line "(overwriting empty file: #{ ev.to_path })"
-        send :IO_resolved_when_overwriting_non_empty_file, ev
+      def snd_zero_overwrite_event ev
+        _ev = Lib_::Bzn_[].event.inline_with :zero_length,
+            :path, ev.path do |y, o|
+          y << "(overwriting empty file: #{ pth o.path })"
+        end
+        receive_event _ev ; nil
       end
 
-      def IO_resolved_when_overwriting_non_empty_file ev
-        @verb_s = 'overwriting'
-        :_procede_
+      def bld_looks_handmade_event ev
+        Lib_::Bzn_[].event.inline_with :looks_handmade,
+            :path, ev.path, :ok, false do |y, o|
+          y << "won't overwrite, does not appear generated - #{
+           }#{ pth o.path }"
+        end
       end
 
-      def IO_resolved_when_outfile_not_exist ev
+      def rslv_up_IO_not_OK_errno_enoent ev
+        receive_event ev
+        @result_i = :not_found
+        UNABLE_
+      end
+
+      def rslv_up_IO_not_OK_wrong_ftype ev
+        receive_event ev
+        @result_i = :not_file
+        UNABLE_
+      end
+
+      def rslv_pay_IO_before_probably_creating_new_file ev
         @verb_s = 'creating'
-        :_procede_
       end
 
-      def resolve_endpoint_symbol_when_IO_resolved
-        _outstream = resolve_any_outstream
+      def rslv_pay_IO_before_editing_existing_file ev
+        @verb_s = 'overwriting'
+      end
+
+      def rslv_pay_IO_not_OK_missing_required_permission ev
+        receive_event ev
+        @result_i = :exists
+        UNABLE_
+      end
+
+      def rslv_pay_IO_not_OK_errno_eisdir ev
+        receive_event ev
+        @result_i = :not_file
+        UNABLE_
+      end
+
+      def rslv_pay_IO_not_OK_errno_enoent ev
+        receive_event ev
+        @result_i = :not_found
+        UNABLE_
+      end
+
+      def rslv_pay_IO_not_OK_looks_handmade ev
+        receive_event ev
+        @result_i = :will_not_clobber_existing_ostensibly_handmade_outfile
+        UNABLE_
+      end
+
+      def flattener_event_receiver_proc_for i
+        -> ev do
+          if ! ev.ok.nil?
+            i_ = ev.ok ? :OK : :not_OK
+          end
+          @sl.maybe_receive_event i, * i_, ev.terminal_channel_i, ev
+        end
+      end
+
+      def when_upstream_and_downstrem
         _outstream_moniker = resolve_some_outstream_moniker
-        Translate__[
+        i = Translate__[
           :be_verbose, @be_verbose,
           :do_clear_files, @do_clear_files,
           :do_show_sexp_only, @do_show_sexp_only,
@@ -524,127 +596,48 @@ module Skylab::Flex2Treetop
           :emit_info_string_p, @emit_info_string_p,
           :endpoint_is_FS_parser, @endpoint_is_FS_parser,
           :FS_parser_dir, @FS_parser_dir,
-          :instream, @flexfile.open( 'r' ),
-          :instream_moniker, @flexfile.to_path,
-          :outstream, _outstream,
+          :instream, @upstream_IO,
+          :instream_moniker, @flexfile,
+          :outstream, @payload_IO,
           :outstream_moniker, _outstream_moniker,
           :pp_IO_for_show_sexp, @pp_IO_for_show_sexp,
           :verb_s, @verb_s,
           :wrap_in_grammar_s, @wrap_in_grammar_s ]
-      end
-
-      def resolve_any_outstream
-        if is_nonstandard_endpoint
-          :_no_outstream_
-        else
-          send :"rslv_any_outstream_when_#{ @pay_i }"
+        if i
+          @result_i = i ; nil
         end
-      end
-      def rslv_any_outstream_when_IO
-        @pay_IO
-      end
-      def rslv_any_outstream_when_path
-        @pay_pn.open WRITE_MODE_
       end
 
       def resolve_some_outstream_moniker
         send :"rslv_some_outstream_moniker_when_#{ @pay_i }"
       end
+
       def rslv_some_outstream_moniker_when_path
-        @pay_pn.to_path
+        @pay_x
       end
+
       def rslv_some_outstream_moniker_when_IO
         PAYSTREAM__
       end
       PAYSTREAM__ = "«paystream»".freeze  # :+#guillemets
 
-      def is_nonstandard_endpoint
-        @do_show_sexp_only || @endpoint_is_FS_parser
-      end
-    end
-
-    class Resolve_IO__  # :+#tributary-agent  poster-child for :+[#hl-022]:write:#todo
-
-      Lib_::Funcy_globful[ self ]
-
-      Lib_::API_lib[].simple_monadic_iambic_writers self,
-        :force_is_present, :infile, :listener, :out_pn
-
-      def initialize * x_a
-        absorb_iambic_fully x_a ; nil
-      end
-      def execute
-        @infile_stat = @infile.stat
-        when_infile_exist
-      rescue ::Errno::ENOENT => e
-        when_infile_not_exist e
-      end
-    private
-      def when_infile_not_exist e
-        call_digraph_listeners :no, :infile_not_found do e end
-      end
-      def when_infile_exist
-        if FILE_FTYPE_ == @infile_stat.ftype
-          when_infile_is_file
-        else
-          call_digraph_listeners :no, :infile_is_not_file do @infile_stat end
+      def receive_event ev
+        scan = ev.scan_for_render_lines_under expression_agent
+        while line = scan.gets
+          if ev.ok
+            x = emit_info_string line
+          else
+            x = emit_error_string line
+          end
         end
+        x
       end
-      def when_infile_is_file
-        @outfile_stat = @out_pn.stat
-        when_outfile_exist
-      rescue ::Errno::ENOENT
-        when_outfile_not_exist
-      end
-      def when_outfile_not_exist
-        call_digraph_listeners :yes, :when_outfile_not_exist do @out_pn end
-      end
-      def when_outfile_exist
-        if FILE_FTYPE_ == @outfile_stat.ftype
-          when_outfile_is_file
-        else
-          call_digraph_listeners :no, :outfile_is_not_file do @outfile_stat end
-        end
-      end
-      def when_outfile_is_file
-        if @outfile_stat.size.zero?
-          call_digraph_listeners :yes, :when_outfile_empty do @out_pn end
-        else
-          when_outfile_nonzero_length
-        end
-      end
-      def when_outfile_nonzero_length
-        if @force_is_present
-          when_force
-        else
-          call_digraph_listeners :no, :outfile_exists_and_force_is_not_present do @out_pn end
-        end
-      end
-      def when_force
-        @out_pn.open( 'r' ) do |fh| @first_line = fh.gets end
-        if AUTOGENERATED_RX =~ @first_line
-          call_digraph_listeners :yes, :when_overwriting_non_empty_file do @out_pn end
-        else
-          call_digraph_listeners :no, :outfile_does_not_appear_generated do @first_line end
-        end
-      end
-      def call_digraph_listeners * i_a, &p
-        @listener.call_any_listener( * i_a, & p )
-      end
-    end
 
-    CEASE__ = false ; PROCEDE__ = true
-  end
-
-  Yes_No_Listener_ = -> listener, yes_i, no_i do
-    map_h = { yes: yes_i, no: no_i }
-    Proc_As_Listener_.new do |* i_a, & p|
-      i_a[ 0 ] = map_h.fetch i_a.first
-      listener.send :"#{ i_a * '_' }", p.call
+      def expression_agent
+        Lib_::Bzn_[]::API.expression_agent_instance
+      end
     end
   end
-
-  Proc_As_Listener_ = Callback_::Listener::Proc_As_Listener
 
   Assert_open_stream__ = -> param do
     ivar = param.ivar ; par_i = param.param_i
@@ -663,7 +656,7 @@ module Skylab::Flex2Treetop
     end
   end
 
-  Translate__ = Class_as_function__[ -> do class Translate____
+Translate__ = Class_as_function__[ -> do class Translate____
 
     Iambics_[ self, :params,
       :be_verbose,
@@ -705,10 +698,10 @@ module Skylab::Flex2Treetop
         _p = Assert_open_stream__[ param ]
         instance_exec( & _p )
       else
-        _outstream = @x_a.shift
-        :_no_outstream_ == _outstream or raise ::ArgumentError,
-          "pass no #{ param.param_i } when 'do_show_sexp_only'"
-        @outstream = _outstream  # still it must pass arity check
+        x = @x_a.shift
+        :_no_outstream_ == x or raise ::ArgumentError,
+          "pass no #{ param.param_i } when nonconventional endpoint (#{ x })"
+        @outstream = x  # still it must pass arity check
       end ; nil
     end
 
@@ -773,6 +766,7 @@ module Skylab::Flex2Treetop
         fu.rm pn.to_path
       end ; nil
     end
+
     def bld_file_utils
       Lib_::System[].filesystem.file_utils_controller.new do |msg|
         emit_info_line "(futils:) #{ msg }" ; nil
@@ -810,7 +804,7 @@ module Skylab::Flex2Treetop
 
     def any_endpoint_from_finish_recompile y
       y << "writing #{ @compiled_grammar_pathname }."
-      emit_info_string y * TERM_SEPARATOR_STRING_
+      emit_info_string y * SPACE_
       bytes = Svcs__::Treetop[]::Compiler::GrammarCompiler.
         new.compile @grammar_pathname.to_path,
           @compiled_grammar_pathname.to_path
@@ -924,8 +918,8 @@ module Skylab::Flex2Treetop
     end
 
     def parser_class
-      if Flex2Treetop.const_defined? :Parser___
-        Flex2Treetop::Parser___
+      if F2TT_.const_defined? :Parser___
+        F2TT_::Parser___
       else
         bld_and_set_parser_class
       end
@@ -933,8 +927,8 @@ module Skylab::Flex2Treetop
 
     def bld_and_set_parser_class
       defined? FlexFileParser or load_treetop_grammar  # #storypoint-510
-      cls = Flex2Treetop.const_set :Parser___, ::Class.new( FlexFileParser )
-      cls.class_exec( & ENHANCE_PARSER_CLASS_P__ )
+      cls = F2TT_.const_set :Parser___, ::Class.new( FlexFileParser )
+      cls.class_exec( & Enhance_parser_class__ )
       cls
     end
 
@@ -946,6 +940,7 @@ module Skylab::Flex2Treetop
       emit_error_string say_no_parse_result
       :parse_failure
     end
+
     def say_no_parse_result
       @parser.failure_reason || "Got nil from parse without reason"
     end
@@ -957,10 +952,12 @@ module Skylab::Flex2Treetop
         endpoint_symbol_when_execute_translation
       end
     end
+
     def endpoint_symbol_when_show_sexp
       Svcs__::PP[].pp @parser_result_x.sexp, @pp_IO_for_show_sexp
       :showed_sexp
     end
+
     def endpoint_symbol_when_execute_translation
       @outstream.puts autogenerated_line
       _i = @parser_result_x.sexp.translate build_translation_client
@@ -1004,12 +1001,15 @@ module Skylab::Flex2Treetop
       def case_insensitive_notify
         @is_case_sensitive = false ; nil
       end
+
       def translate_name x
         x  # could be used to add prefixes etc
       end
+
       def emit_info_line s
         @emit_info_line_p[ s ] ; nil
       end
+
       def wrap_in_grammar_s
         @wrap_in_g_s
       end
@@ -1114,6 +1114,7 @@ module Skylab::Flex2Treetop
       end
       cx
     end
+
     def at_compile str
       res = []
       s = Lib_::StringScanner[].new(str)
@@ -1130,6 +1131,7 @@ module Skylab::Flex2Treetop
       end until s.eos?
       res
     end
+
     def sexp_at str
       # (n = at(str)) ? n.sexp : nil
       n = at(str) or return nil
@@ -1137,9 +1139,11 @@ module Skylab::Flex2Treetop
       n.text_value == '' and return nil
       fail("where is sexp for n")
     end
+
     def sexps_at str
       ats(str).map(&:sexp)
     end
+
     def composite_sexp my_name, *children
       with_names = {}
       children.each do |name|
@@ -1158,20 +1162,23 @@ module Skylab::Flex2Treetop
         Sexpesque.hashy(my_name, with_names)
       end
     end
+
     def list_sexp *foos
       foos.compact!
       foos # yeah, that's all this does
     end
+
     def auto_sexp
       if respond_to?(:sexp_class)
         sexp_class.from_syntax_node(sexp_class.node_name, self)
       elsif ! elements.nil? && elements.index{ |n| n.respond_to?(:sexp) }
         cx = elements.map{ |n| n.respond_to?(:sexp) ? n.sexp : n.text_value }
-        ::Skylab::Flex2Treetop::AutoSexp.traditional(guess_node_name, *cx)
+        F2TT_::AutoSexp.traditional(guess_node_name, *cx)
       else
-        ::Skylab::Flex2Treetop::AutoSexp.traditional(guess_node_name, text_value)
+        F2TT_::AutoSexp.traditional(guess_node_name, text_value)
       end
     end
+
     def guess_node_name
       a = singleton_class.ancestors
       modul = a.detect do |mod|
@@ -1182,6 +1189,7 @@ module Skylab::Flex2Treetop
       md or raise "hack failed - failed to match against #{ modul.name.inspect}"
       md[ 0 ].gsub(/([a-z])([A-Z])/){ "#{$1}_#{$2}" }.downcase.intern
     end
+
     def singleton_class
       @sc ||= class << self; self end
     end
@@ -1221,26 +1229,29 @@ module Skylab::Flex2Treetop
         _name = translate_name @rule_name
         bldr = builder
         bldr.rule_declaration _name do
-          bldr.write ONE_SINGLE_SPACE__ * bldr.level
+          bldr.write SPACE_ * bldr.level
           @pattern_like.translate @request_client
           bldr.newline
         end
       end
+
       def translate_name *a
         @request_client.translate_name( * a )
       end
+
       def builder
         @request_client.builder
       end
     end
   end
-  ONE_SINGLE_SPACE__ = ' '.freeze
+
   module RuleWriter::InstanceMethods
     def write_rule request_client
       yield( build = RuleWriter::Rule.new(request_client) )
       build.write
     end
   end
+
   class FileSexp < Sexpesque  # :file
 
     def translate client
@@ -1260,7 +1271,7 @@ module Skylab::Flex2Treetop
       const_rxs = '[A-Z][_A-Za-z0-9]*'
       /\A#{ const_rxs }(?:::#{ const_rxs })*\z/ =~ @grammar_s or begin
         @client.emit_info_line say_invalid_grammar_namespace
-        CEASE__
+        UNABLE_
       end
     end
 
@@ -1330,16 +1341,20 @@ module Skylab::Flex2Treetop
       def bounded min, max
         min == '0' ? new('..', max) : new(min, '..', max)
       end
+
       def unbounded min
         new min, '..'
       end
+
       def exactly int
         new int
       end
     end
+
     def initialize *parts
       @parts = parts
     end
+
     def translate client
       client.builder.write " #{ @parts.join '' }"
     end
@@ -1373,6 +1388,7 @@ module Skylab::Flex2Treetop
         nil
       end
     end
+
     def from_constant client, const
       write_rule(client) do |m|
         m.rule_name = const
@@ -1514,14 +1530,13 @@ module Skylab::Flex2Treetop
     Treetop = o[ -> do require 'treetop' ; ::Treetop end ]
   end
 
-  AUTOGENERATED_RX = /autogenerated by flex2treetop/i  # (was [#008])
-  CEASE__ = false ; PROCEDE__ = true
-  DIR_FTYPE_ = 'directory'.freeze
-  FILE_FTYPE_ = 'file'.freeze
-  WRITE_MODE_ = 'w'.freeze
-  TERM_SEPARATOR_STRING_ = ' '.freeze
+  # ~ constants
 
-  ENHANCE_PARSER_CLASS_P__ = -> do
+  AUTOGENERATED_RX = /autogenerated by flex2treetop/i  # (was [#008])
+
+  DIR_FTYPE_ = 'directory'.freeze
+
+  Enhance_parser_class__ = -> do  # (if you edit this heavily, move it up)
     # CompiledParser#failure_reason overridden for less context
     def failure_reason
       return nil unless (tf = terminal_failures) && tf.size > 0
@@ -1549,10 +1564,21 @@ module Skylab::Flex2Treetop
     end
   end
 
-  Flex2Treetop = self
-end
+  F2TT_ = self
 
-Skylab::Flex2Treetop::TREETOP_GRAMMAR__ = <<'GRAMMAR'
+  FILE_FTYPE_ = 'file'.freeze
+
+  PROCEDE_ = true
+
+  SPACE_ = ' '.freeze
+
+  READ_MODE_ = 'r'.freeze
+
+  UNABLE_ = false
+
+  WRITE_MODE_ = 'w'.freeze
+
+  TREETOP_GRAMMAR__ = <<'GRAMMAR'
 # The 'pattern' rule below is a subset of the grammar grammar described at
 #   http://flex.sourceforge.net/manual/Patterns.html.
 #   Note that not all constructs are supported, only those necessary
@@ -1729,3 +1755,4 @@ end
 end
 end
 GRAMMAR
+end

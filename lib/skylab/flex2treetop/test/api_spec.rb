@@ -50,7 +50,8 @@ module Skylab::Flex2Treetop::MyTestSupport
           * emitters,
           :flexfile, tmpdir.join( 'not-there.flex' ).to_path,
           * outpath( '_no_see_' )
-        expect %r(\bNo such file or directory #{ XX }- .+\bnot-there\.flex\z)i
+
+        expect %r(\bNo such 'flexfile' - «[^»]+not-there\.flex»\z)
         expect_no_more_lines
         @result.should eql :not_found
       end
@@ -61,18 +62,30 @@ module Skylab::Flex2Treetop::MyTestSupport
           * emitters,
           * outpath( '_meh_' ),
           :flexfile, td_.to_path
-        expect %r(was directory not file - .+\bsome-dir/\z)i
+        expect %r(\A«[^»]+some-dir/» exists but is not a file, it is a directory\b)
         @result.should eql :not_file
       end
 
-      it "infile found, outfile exist and force not present" do
+      it "infile exist, outfile exist and force not present" do
         _out_pn = tmpdir.clear.write 'outie.rb', 'some content'
         _API_invoke :translate,
           :flexfile, mini,
           * emitters,
           * outpath( _out_pn )
-        expect %r(\bexists, won't overwrite without force: .+\boutie\.rb\z)
+        expect %r(\A'path' exists, won't overwrite without 'force': .+\boutie\b)
         @result.should eql :exists
+      end
+
+      it "infile exist, outfile not file" do
+        _in_pn = tmpdir.clear.write 'innie', 'xx'
+        _out_pn = tmpdir.touch_r 'some-dir/'
+        _API_invoke :translate,
+          :flexfile, _in_pn.to_path,
+          * emitters,
+          * outpath( _out_pn ),
+          :force
+        expect %r(\AIs a directory -.+\bsome-dir\b)
+        @result.should eql :not_file
       end
     end
 
@@ -186,7 +199,7 @@ module Skylab::Flex2Treetop::MyTestSupport
     context "option - show sexp" do
 
       it "o" do
-        o = tmpdir.join 'no-really-never-make-this.rb'
+        o = tmpdir.clear.join 'no-really-never-make-this.rb'
         _API_invoke :translate,
           :show_sexp_only,
           * emitters,

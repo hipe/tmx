@@ -7,7 +7,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git::Repo
 
   include Constants
 
-  extend TestSupport::Quickie
+  extend TestSupport_::Quickie
 
   module InstanceMethods
 

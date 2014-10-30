@@ -116,7 +116,8 @@ module Skylab::GitViz
       end
 
       def report_the_difference reason_i, delta
-        @y << "countdown re-started because #{ reason_i.to_s.gsub '_', ' ' } #{
+        _s = reason_i.id2name.gsub UNDERSCORE_, SPACE_
+        @y << "countdown re-started because #{ _s } #{
           }(had #{ say_time @sec_f - delta } left on clock)"
       end
 

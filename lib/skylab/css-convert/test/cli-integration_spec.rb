@@ -46,7 +46,7 @@ module Skylab::CSS_Convert::TestSupport
     end
 
     define_method :expect_whine_about_directives_file_not_found do
-      stderr.shift.should match %r(\ANo such file or directory - .+\bnot-there\.txt\b)
+      stderr.shift.should match %r(\ANo such <directives-file> - .+\bnot-there\.txt\b)
       u(stderr.shift).should match(usage_re)
       u(stderr.shift).should match(invite_re)
       stderr.length.should eql(0)

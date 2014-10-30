@@ -91,8 +91,8 @@ module Skylab::GitViz
 
     Shellwords = stdlib[ :Shellwords ]
 
-    Simple_monadic_iambic_writers = -> * a do
-      HL__[]::API::Simple_monadic_iambic_writers[ * a ]
+    Simple_monadic_iambic_writers = -> client, * i_a do
+      HL__[]::API::Simple_monadic_iambic_writers.via_client_and_symlist client, i_a
     end
 
     Some_stderr_IO = -> do
@@ -111,7 +111,7 @@ module Skylab::GitViz
       HL__[].system
     end
 
-    TestSupport = wall[ :TestSupport ]
+    Test_support = wall[ :TestSupport ]
 
     Tree = -> do
       SubTree__[]::Tree

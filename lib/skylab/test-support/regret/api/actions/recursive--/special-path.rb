@@ -4,8 +4,8 @@ module Skylab::TestSupport::Regret::API
 
     class Special_Path
 
-      TestSupport_::Callback_::Listener[ self,
-        :emission_matrix, %i( error ), %i( string ) ]
+      TestSupport_::Callback_::Selective_listener.call self,
+        :emission_matrix, [ :error ], [ :string ]
 
       module Hashtag_Bundles__
         Branch_down_to_core = -> do

@@ -73,7 +73,7 @@ module Skylab::Headless::TestSupport::CLI::Client
         from_workdir do
           invoke 'not-there.txt'
         end
-        expect %r(No such file or directory - .+\bnot-there\.txt\b)
+        expect :styled, %r(\ANo such <input-file-nombre> - «not-there\.txt»)
         expect_failed
       end
 

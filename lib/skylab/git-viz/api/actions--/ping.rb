@@ -24,7 +24,7 @@ module Skylab::GitViz
     def exec_normally
       msg = "hello from git viz.".freeze
       if @on_channel
-        @listener.call_any_listener @on_channel, :line do msg end
+        @listener.maybe_receive_event @on_channel, :line, msg
       else
         @y << msg
       end

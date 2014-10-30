@@ -30,8 +30,10 @@ module Skylab::Dependency::TestSupport
     it "whines on ambiguity" do
       ui = UI::Tee.new silent: true
       str = "abc1.2.3def4.5"
-      sexp = Dep_::Version.parse_string_with_version(str) do |o|
-        o.on_error { |e| ui.err.puts e.text }
+      sexp = Dep_::Version.parse_string_with_version str do |o|
+        o.on_error do |e|
+          ui.err.puts e.text
+        end
       end
       sexp.should eql( false )
       ui.err_string.strip.should eql("multiple version strings matched in string: \"abc1.2.3def4.5\"")

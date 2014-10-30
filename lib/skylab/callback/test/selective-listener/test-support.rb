@@ -1,6 +1,6 @@
 require_relative '../test-support'
 
-module Skylab::Callback::TestSupport::Listener
+module Skylab::Callback::TestSupport::Selective_Listener
 
   ::Skylab::Callback::TestSupport[ TS__ = self ]
 
@@ -22,6 +22,14 @@ module Skylab::Callback::TestSupport::Listener
     end
     def subject
       @subject ||= build_subject
+    end
+  end
+
+  Subject_ = -> * x_a do
+    if x_a.length.zero?
+      Callback_::Selective_Listener
+    else
+      Callback_::Selective_Listener[ * x_a ]
     end
   end
 end

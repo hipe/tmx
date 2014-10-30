@@ -7,11 +7,11 @@ module Skylab::GitViz::TestSupport::CLI
     extend TS__ ; use :expect
 
     it "loads" do
-      GitViz::CLI
+      GitViz_::CLI
     end
 
     it "builds a client (manually)" do
-      GitViz::CLI::Client.new nil, nil, nil
+      GitViz_::CLI::Client.new nil, nil, nil
     end
 
     it "builds a client (canonically)" do

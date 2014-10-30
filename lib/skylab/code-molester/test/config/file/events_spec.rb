@@ -29,7 +29,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
         s = nil
         x = o.read do |o|
           o.no_ent = -> ev do
-            s = ev.pathname.basename.to_s
+            s = ::File.basename( ev.path )
             :_jeepers_
           end
         end

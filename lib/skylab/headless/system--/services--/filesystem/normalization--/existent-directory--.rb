@@ -8,17 +8,9 @@ module Skylab::Headless
 
         class Existent_Directory__ < self
 
-          class << self
+          extend Common_Module_Methods_
 
-            def mixed_via_iambic x_a
-              new do
-                process_iambic_fully x_a
-                clear_all_iambic_ivars
-              end.produce_mixed_result
-            end
-          end
-
-          Headless_::Lib_::Entity.call self do
+          Entity_.call self do
 
             o :iambic_writer_method_name_suffix, :'='
 
