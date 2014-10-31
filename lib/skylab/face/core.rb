@@ -519,6 +519,8 @@ module Skylab::Face  # read [#011] the top node narrative
 
   MONADIC_TRUTH_ = -> _ { true }
 
+  NILADIC_EMPTINESS_ = -> { }
+
   SPACE_ = ' '.freeze
 
   UNDERSCORE_ = '_'.freeze

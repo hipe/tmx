@@ -1,40 +1,44 @@
 require_relative 'test-support'
 
-module Skylab::Headless::TestSupport::API::SSA__
+module Skylab::Headless::TestSupport::API
 
-  describe "[hl] API service, session & action" do
+  describe "[hl] API - ping" do
 
-    extend TS__
+    extend TS_
 
     with_API_module do
+
       module API
 
         Headless_::API[ self, :with_service, :with_session, :with_actions ]
 
         action_class
+
         class Action
-          def initialize x_a
-            super
-            @client = Services_For_API_Action__.new @service, @session
-            @service = @session = nil
+
+          def initialize seed
+            @client = Services_for_API_Action__.new seed.session, seed.service
+            super seed.iambic
+            @errstream ||= seed.errstream
           end
         end
 
-        class Services_For_API_Action__
+        class Services_for_API_Action__
           Headless_::Delegating[ self ]
           delegating :to, :@service, :to_method, :object_id, :service_id
           delegating :to, :@session, %i( program_name )
           delegating :to, :@session, :to_method, :object_id, :session_id
 
-          def initialize service, session
+          def initialize session, service
             @service = service ; @session = session ; nil
           end
         end
 
         class Actions::Ping < Action
 
-          params :say_hello_to_my_little_errstream,
-            %i( has_custom_writer ivar @do_say_hello )
+          o :simple, :properties,
+            :iambic_writer_method_to_be_provided, :ivar, :@do_say_hello,
+              :say_hello_to_my_little_errstream
 
           def execute
             if @do_say_hello
@@ -43,15 +47,19 @@ module Skylab::Headless::TestSupport::API::SSA__
               get_ping_data
             end
           end
+
         private
+
           def get_ping_data
             Ping_Data__.new( @client.service_id, @client.session_id, object_id )
           end
+
           Ping_Data__ = ::Struct.new :service_id, :session_id, :action_id
 
           def say_hello_to_my_little_errstream=
-            @x_a.shift ; @do_say_hello = true ; nil
+            @do_say_hello = true
           end
+
           def say_hello
             @errstream.puts "helo"
             :_hello_
@@ -62,7 +70,7 @@ module Skylab::Headless::TestSupport::API::SSA__
         class Session
         private
           def program_name=
-            @service._CHANGE_PROGRAM_NAME! @x_a.shift ; nil
+            @service._CHANGE_PROGRAM_NAME! iambic_property
           end
         public
           def program_name

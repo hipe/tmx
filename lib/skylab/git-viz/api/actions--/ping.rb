@@ -7,7 +7,7 @@ module Skylab::GitViz
     attribute :how_wide, default: '90 feet'
     attribute :on_channel, argument_arity: :one, writer: false
 
-    def initialize x_a
+    def initialize
       @go_the_distance = @on_channel = nil
       super
       @y = build_yielder_for :info, :line

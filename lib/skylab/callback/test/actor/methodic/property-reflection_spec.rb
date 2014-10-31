@@ -1,42 +1,52 @@
 require_relative 'test-support'
 
-module Skylab::Headless::TestSupport::API::Iambics
+module Skylab::Callback::TestSupport::Actor::Methodic::PR
 
-  describe "[hl] API iambics - reflectivity via 'fetch_parameter'" do
+  Parent_TS_ = Skylab::Callback::TestSupport::Actor::Methodic
 
-    context "monadic two with custom meta-parameter name" do
+  Parent_TS_[ self ]
+
+  include Constants
+
+  extend TestSupport_::Quickie
+
+  Grandparent_Subject_ = Parent_TS_::Parent_subject_
+
+  describe "[cb] actor - methodic - property reflection" do
+
+    context "two unadorned monadic properties" do
 
       before :all do
-        class Two_RVFP
-          Headless_::API::Iambic_parameters[ self,
-            :reflection_method_stem, :term,
-            :params, :one, :two ]
+
+        class A
+          Grandparent_Subject_[].methodic self, :simple, :properties,
+            :properties, :one, :two
         end
       end
 
       it "loads" do
       end
 
-      it "fetch existant - o" do
-        x = Two_RVFP.fetch_term :two
-        x.param_i.should eql :two
+      it "`<actor>.properties.fetch` with a symbol name, against a good name" do
+        prop = A.properties.fetch :two
+        prop.name_i.should eql :two
       end
 
-      it "fetch existant with an else block - o" do
-        x = Two_RVFP.fetch_term :one do :never_see end
-        x.param_i.should eql :one
+      it "with an else block has no effect, same result as above" do
+        prop = A.properties.fetch :one do :_no_see_ end
+        prop.name_i.should eql :one
       end
 
-      it "fetch nonexistant without an else block - (LEVENSHTEIN YAY.) X" do
-        _s = "there is no such term 'three' - did you mean 'one' or 'two'?"
+      it "fetch nonexistent term without an else block - key error" do
+        _rx = %r(\Akey not found: :three\b)
         -> do
-          Two_RVFP.fetch_term :three
-        end.should raise_error ::NameError, _s
+          A.properties.fetch :three
+        end.should raise_error ::KeyError, _rx
       end
 
-      it "fetch nonexistant with an else block - o" do
-        x = Two_RVFP.fetch_term :four do :x end
-        x.should eql :x
+      it "fetch a nonexistent term with an else block - your block is called" do
+        prop = A.properties.fetch :four do :_see_ end
+        prop.should eql :_see_
       end
     end
   end

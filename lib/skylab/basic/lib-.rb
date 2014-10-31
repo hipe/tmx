@@ -46,10 +46,6 @@ module Skylab::Basic
 
     HL__ = sidesys[ :Headless ]
 
-    Iambic_parameters = -> * i_a do
-      HL__[]::API::Iambic_parameters[ * i_a ]
-    end
-
     IO_lib = -> do
       HL__[]::IO
     end

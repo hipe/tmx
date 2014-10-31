@@ -86,7 +86,7 @@ module Skylab::Brazen
 
       def when_remaining_args_look_iambic_execute
         d = @kernel.process_any_DSL @d, @x_a
-        d == @d and raise build_extra_iambic_event.to_exception
+        d == @d and raise via_current_token_build_extra_iambic_event.to_exception
         @d = d
         @d < @x_a_length and when_remaining_args_do_not_look_iambic_execute
       end
@@ -775,11 +775,11 @@ module Skylab::Brazen
       end
 
       def when_extra_iambic
-        _ev = build_extra_iambic_event
+        _ev = via_current_token_build_extra_iambic_event
         receive_extra_iambic _ev
       end
 
-      def build_extra_iambic_event
+      def via_current_token_build_extra_iambic_event
         build_extra_iambic_event_via [ current_iambic_token ]
       end
 

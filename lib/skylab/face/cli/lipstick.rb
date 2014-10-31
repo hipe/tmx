@@ -86,7 +86,7 @@ module Skylab::Face
     end
 
     def self.cols
-      80  # #ncurses
+      # #ncurses
     end
   end
 
@@ -94,14 +94,14 @@ module Skylab::Face
 
   class CLI::Lipstick::Class__
 
-    GLYPH_FALLBACK = '.'
-    PANE_WIDTH_FALLBACK = 72
+    DEFAULT_GLYPH__ = '.'
+    FINAL_DEFAULT_WIDTH__ = 72
 
     Pen_ = Lib_::Ivars_with_procs_as_methods[].new :cook
 
     class Pen_
       def initialize glyph, color
-        glyph ||= GLYPH_FALLBACK
+        glyph ||= DEFAULT_GLYPH__
         1 == glyph.length or raise "glyph must be of length 1 (had #{
           }#{ glyph.inspect })"
         norm = -> x do
@@ -130,7 +130,7 @@ module Skylab::Face
     def initialize *args
       if args.length.nonzero? and args.fetch( 0 ).respond_to?(:each_with_index)
         tuple_a = args.shift
-        default_width, = Lib_::Parse_series[ args,
+        user_default_width, = Lib_::Parse_series[ args,
           -> x { x.respond_to? :call } ]
         pen_a = tuple_a.map do |tpl_a|
           Pen_.new( * Lib_::Parse_series[ tpl_a,
@@ -138,19 +138,20 @@ module Skylab::Face
             -> x { x.respond_to? :id2name } ] )
         end
       else
-        glyph, color, default_width = Lib_::Parse_series[ args,
+        glyph, color, user_default_width = Lib_::Parse_series[ args,
           -> x { x.respond_to? :ascii_only? },
           -> x { x.respond_to? :id2name },
           -> x { x.respond_to? :call } ]
         pen_a = [ Pen_.new( glyph, color ) ]
       end
-      default_width ||= -> { PANE_WIDTH_FALLBACK }
+      user_default_width ||= NILADIC_EMPTINESS_
       min_room = 4 ; margin = 1 ; penlen = pen_a.length
       @cook_rendering_proc = -> col_width_a, cols=nil, seplen=nil do
         seplen ||= 0
         render_a = -> do
           my_room = -> do
-            pane_width = cols || CLI::Lipstick.cols || default_width[]
+            pane_width = cols || CLI::Lipstick.cols
+            pane_width ||= user_default_width[] || FINAL_DEFAULT_WIDTH__
             width_before_lipstick = col_width_a.reduce( :+ ) +
               ( [ col_width_a.length - 1, 0 ].max * seplen )
             # minus one because it's a separator, minus one b.c we don't count

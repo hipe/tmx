@@ -17,7 +17,9 @@ module Skylab::GitViz
         attr_reader :default_channel_i
 
         def expect * x_a, &p
-          ::Array.try_convert( x_a.first ) and x_a.unshift :on_channel_i_a
+          if ::Array.try_convert x_a.first
+            x_a.unshift :on_channel_i_a
+          end
           @expectation = Expectation__.new x_a, p
           @em = shift_some_emission
           if @expectation.on_channel_i
@@ -106,29 +108,46 @@ module Skylab::GitViz
 
       class Expectation__
 
-        GitViz::Lib_::Simple_monadic_iambic_writers[ self,
-          :on_channel_i, :on_channel_i_a ]
+        Callback_::Actor.methodic self, :properties,
+          :on_channel_i, :on_channel_i_a
 
         attr_reader :any_finally_proc, :any_matcher_method_name,
           :is_styled, :matcher_x,
           :on_channel_i, :on_channel_i_a
 
         def initialize x_a, p
-          absorb_iambic_passively x_a
+          process_iambic_passively x_a
           absrb_any_matcher
           @any_finally_proc = p ; nil
         end
+
       private
+
         def styled=
           @is_styled = true ; nil
         end
+
         def absrb_any_matcher
-          @x_a.length.zero? or absrb_some_matcher
+          if unparsed_iambic_exists
+            absrb_some_matcher
+          end
         end
+
         def absrb_some_matcher
-          @matcher_x = @x_a.shift
-          @x_a.length.zero? or raise ::ArgumentError, "unexpected iambic: #{
-            }#{ Inspect_[ @x_a.first ] }"
+          @matcher_x = iambic_property
+          if unparsed_iambic_exists
+            when_unexpected
+          else
+            post_absrb_matcher
+          end
+        end
+
+        def when_unexpected
+          _say =  "unexpected iambic: #{ Inspect_[ current_iambic_token ] }"
+          raise ::ArgumentError, _say
+        end
+
+        def post_absrb_matcher
           if @matcher_x.respond_to? :named_captures
             @any_matcher_method_name = :expect_match_with_rx
           elsif @matcher_x.respond_to? :ascii_only?

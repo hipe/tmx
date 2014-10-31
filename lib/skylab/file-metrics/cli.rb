@@ -178,7 +178,7 @@ module Skylab::FileMetrics
       end
     # lost indent
 
-    Lipstick = Lib_::CLI_lipstick[ '+', :green, -> { 80 } ]
+    Lipstick = Lib_::CLI_lipstick[ '+', :green, -> { 160 } ]
 
     class Lipstick::Class_
 

@@ -11,10 +11,10 @@ module Skylab::GitViz::TestSupport::API
     end
 
     it "ping with strange parameters - X" do
+      _rx = %r(\Aunrecognized property 'not_an_arg')
       -> do
         invoke_API :ping, :not_an_arg, :_no_see_
-      end.should raise_error ::ArgumentError,
-        /\Aunexpected iambic term 'not_an_arg'\z/
+      end.should raise_error ::ArgumentError, _rx
     end
 
     it "simple ping" do

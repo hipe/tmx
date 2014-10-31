@@ -30,6 +30,8 @@ module Skylab::GitViz
 
   SPACE_ = ' '.freeze
 
+  UNABLE_ = false
+
   UNDERSCORE_ = '_'.freeze
 
 end

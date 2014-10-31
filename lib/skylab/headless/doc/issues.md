@@ -38,8 +38,8 @@
 [#133]       #parent-node: [#125] headless testing conventions ..
 [#132]       #in-situ the magical, multipurpose Event base class and variants
 [#131]       #parent-node: [#125] the notificate narrative ..
-[#130] #open this is redundant with actors. assimilate
-             #parent-node: [#017] our own hand-rolled parameter library
+[#130] #hole (#re-purposed:twice. is now [#cb-058])
+             was: #parent-node: [#017] our own hand-rolled parameter library
              #parent-in-universe: [#mh-053]
              (#re-purposed: once. before above, was what became [#su-001])
 [#129]       #parent-node: [#126] headless CLI client DSL narrative

@@ -41,6 +41,10 @@ module Skylab::Callback
         via_client_and_iambic cls, i_a
       end
 
+      def methodic cls, * i_a
+        Actor::Methodic__.via_client_and_iambic cls, i_a
+      end
+
       def via_client_and_iambic cls, i_a
         cls.extend MM__ ; cls.include self
         while i_a.length.nonzero?
@@ -187,6 +191,22 @@ module Skylab::Callback
       x_a.each_slice( 2 ) do |i, x|
         instance_variable_set box.fetch( i ), x
       end ; nil
+    end
+
+    def process_iambic_passively x_a
+      box = self.class.const_get BX_
+      d = -2 ; last = x_a.length - 2
+      while d < last
+        d += 2
+        ivar = box[ x_a.fetch( d ) ]
+        if ivar
+          instance_variable_set ivar, x_a.fetch( d + 1 )
+        else
+          x = d
+          break
+        end
+      end
+      x
     end
 
     def ivar_box

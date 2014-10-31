@@ -6,6 +6,4 @@ digraph {
 
   st_009 [label="[st] cov\ngut events"]
 
-  xx [label="[hl] simple monadic\niambic writers"]
-
 }

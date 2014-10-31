@@ -131,11 +131,12 @@ module Skylab::Brazen
       end
     end
 
-    Build_missing_required_properties_event__ = -> miss_a, lemma=nil do
+    Build_missing_required_properties_event__ = -> miss_a, lemma=nil, nv=nil do
 
       Event_[].inline_with :missing_required_properties,
           :miss_a, miss_a,
           :lemma, lemma,
+          :nv, nv,
           :error_category, :argument_error,
           :ok, false do |y, o|
 
@@ -143,9 +144,13 @@ module Skylab::Brazen
           par prop
         end
 
+        if o.nv
+          _nv = "#{ o.nv }#{ SPACE_ }"
+        end
+
         _lemma = o.lemma || DEFAULT_PROPERTY_LEMMA__
 
-        y << "missing required #{ plural_noun _lemma, s_a.length } #{
+        y << "#{ _nv }missing required #{ plural_noun _lemma, s_a.length } #{
           }#{ and_ s_a }"
       end
     end

@@ -4,13 +4,15 @@ module Skylab::Basic
 
     class Describe__
 
-      Basic_::Lib_::Iambic_parameters[ self, :params,
+      Callback_::Actor.methodic self, :simple, :properties,
         :IO,
-        :with_solos, %i( argument_arity zero ivar @do_solos ),
-        :with_spaces, %i( argument_arity zero ivar @do_spaces ) ]
+        :argument_arity, :zero, :ivar, :@do_solos, :with_solos,
+        :argument_arity, :zero, :ivar, :@do_spaces, :with_spaces
+
 
       def initialize g, x_a
-        nilify_and_absorb_iambic_fully x_a
+        process_iambic_fully x_a
+        nilify_uninitialized_ivars
         @associations = g.send :node_assctns
         init_IO
         @is_first_line = true  # (write the newlines at the beginning not end for reasons)

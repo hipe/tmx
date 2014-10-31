@@ -16,7 +16,7 @@ first, a quick history (most recent at top):
 
     [#gv-030] the isomorphic interface parameter              2014-01-20
 
-    [#hl-130] the API parameter library                       2013-12-19
+    [#cb-058] methodic actors                                 2013-12-19
 
     [#tm-081] the "config shell" (working title) (lost)       2013-10-11
 
@@ -34,12 +34,50 @@ first, a quick history (most recent at top):
 
 
 annotation (most recent at top, start at bottom for a narrative):
+  • [cb] actor is and always will be minimal.
+  • [br] entity started out clean, got heavy, is most popular for bus. model
   • [gv]'s is a clean rewrite of the below meant to be rbx-compatible
   • borrowing from that but as a small standalone rewrite was [hl] API params
   • then, during the "headless earthquake" of late 2013.. (well, read below)
   • then there was the basic "field" [#ba-003]
   • then there was the headless "parameter" [#hl-009]
   • first, there was the metahell "formal attributes" [#024]
+
+
+
+## a comparison of our favorite solutions & favorite categories
+
+                | actor                 |     methodic actor |     entity
+
+what does it do | actor leaves your     | although we one did not do it this
+to your ivar    | ivar namespace alone  | way, these two maintain ivar(s)
+namespace?      | completely except for | modeling the current iambic scan
+                | your business ivars   | which is convenient for IWM's (belo)
+
+property        | actor does not model  | has a base class   | its base p.class
+objects?        | field meta-data with  | that it itself a   | is intentional
+                | these, it has a box   | lithe methodic     | minimal
+                | that maps names to    | actor. modeling    |
+                | ivars and models an   | some common m.p's  |
+                | order, and that's all
+
+customizing     | actor does not doa    | you manipulate the | manipulate
+your property   | anything like this    | p.class subclass   | directly, or use
+objects (e.g    | at all. by design     | directly           | a crazy DSL. this
+for declarative | it is kept minimally  |                    | thing  models
+instead of im-  | simple                |                    | meta-meta-
+perative        |                       |                    | properties.
+algorithms)     |
+
+
+hooks?          |             no way    | you can write some | an overwrought
+                |                       | arbitrary logic    | hooking DSL
+                |                       | inside your prop   | to trigger
+                |                       | for e.g when       | logic when
+                                        | metaprops come in  | m.p's come
+
+
+
 
 
 ## more in-depth comments about the particular implementations
@@ -79,7 +117,7 @@ as an afterthought for our interface specs.
 
 
 
-### the headless API parameter library
+### [#cb-058] methodic actors (was "the headless API parameter library")
 
 this was a small, standalone, clean ground-up rewrite of a parameter library
 for the pursposes of this re-imagined headless API (it was abstracted out
@@ -90,6 +128,8 @@ borrowing from its immediate predecessor, it features:
   • extensible meta-paramters via a DSL for sub-classing the parse
     class and writing your own writers, and perhaps sublcassing the
     parameter class.
+
+it's undergoing a ground-up rewrite putting it at the head of the pack.
 
 
 

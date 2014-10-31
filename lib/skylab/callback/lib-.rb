@@ -66,9 +66,15 @@ module Skylab::Callback
       MH__[]::Let
     end
 
+    Levenshtein = -> do
+      IT__[]::Levenshtein
+    end
+
     List_lib = -> do
       Bsc__[]::List
     end
+
+    IT__ = sidesys[ :InformationTactics ]
 
     MH__ = sidesys[ :MetaHell ]
 

@@ -1,3 +1,4 @@
+[#011] #open update event model
 [#010]       #parent-node: [#008] the specs narrative ..
 [#009]       #parent-node: [#008] the idea of endpoint symbols..
 [#008]       (#re-appropriated:once) #doc-node the narrative ..

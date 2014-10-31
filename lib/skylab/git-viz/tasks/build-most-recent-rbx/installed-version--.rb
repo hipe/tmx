@@ -41,7 +41,7 @@ module Skylab::GitViz::Tasks
       def resolve_when_zero
         if @count.zero?
           @y << "strange! no rubies known by rbenv?"
-          CEASE_
+          UNABLE_
         else
           @y << "of #{ @count } rubie(s) installed, none were '#{ PREFIX__ }'"
           Result__.new false

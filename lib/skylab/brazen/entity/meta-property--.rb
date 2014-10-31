@@ -247,7 +247,7 @@ module Skylab::Brazen
         end
 
         def when_child_did_not_scan_something
-          _ev = build_extra_iambic_event
+          _ev = via_current_token_build_extra_iambic_event
           receive_event _ev
           UNABLE_
         end

@@ -2,20 +2,35 @@ module Skylab::GitViz
 
   module API
 
-    class Action_  # read the API action narrative [#003]
+    class Action_  # see [#003]
 
-      def self.[] * x_a
-        new( x_a ).execute
+      class << self
+
+        def [] * x_a
+          act = new
+          ok = act.rcv_iambic x_a
+          ok and act.execute
+        end
       end
 
-      GitViz::Lib_::Simple_monadic_iambic_writers[ self ]
+      Callback_::Actor.methodic self
 
-      def initialize x_a
-        self.class.defaults.each_pair do |k, v|
-          send :"#{ k }=", v
+      def initialize
+        self.class.defaults.each_pair do |i, x|
+          send :"#{ i }=", x
         end
-        absorb_iambic_fully x_a
-        super()
+        super
+      end
+
+      def rcv_iambic x_a
+        prcss_iambic_passively x_a
+        if x_a.length.zero?
+          PROCEDE_
+        else
+          _ev = build_extra_iambic_event_via x_a[ 0, 1 ]
+          receive_extra_iambic _ev
+          UNABLE_
+        end
       end
 
       # #storypoint-20, #storypoint-25
@@ -28,16 +43,17 @@ module Skylab::GitViz
 
       attr_writer( * a ) ; private( * a.map { |i| :"#{ i }=" } )
 
-    private
-
-      def absorb_iambic_passively x_a  # #storypoint-30
+      def prcss_iambic_passively x_a  # #storypoint-30
         atrs = self.class.attributes
         @x_a = x_a
-        white_p = self.class.method :private_method_defined?
+        pass_p = self.class.method :private_method_defined?
         while x_a.length.nonzero?
-          i = x_a.first ; w_i = :"#{ i }="
-          white_p[ w_i ] or break ; x_a.shift
-          aa_i = if (( atr = atrs.fetch i do end ))
+          i = x_a.first
+          w_i = :"#{ i }="
+          pass_p[ w_i ] or break
+          x_a.shift
+          atr = atrs.fetch i do end
+          aa_i = if atr
             atr.is? :argument_arity
           end
           if aa_i

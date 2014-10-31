@@ -2,12 +2,6 @@ require_relative '../callback/core'
 
 module Skylab::Flex2Treetop
 
-  FIXTURE_H__ = {
-    mini:     'flex2treetop/test/fixtures/mini.flex',
-    tokens:   'css-convert/css/parser/tokens.flex',
-    fixthix:  'flex2treetop/test/fixtures/fixthis.flex'
-  }.freeze
-
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
 
@@ -33,10 +27,6 @@ module Skylab::Flex2Treetop
 
     CLI_lib = -> do
       HL__[]::CLI
-    end
-
-    Delegating = -> cls do
-      HL__[]::Delegating[ cls ]
     end
 
     Funcy_globful = -> x do
@@ -272,53 +262,92 @@ module Skylab::Flex2Treetop
     end
   end
 
-  module Iambics_  # #storypoint-210
+  module Local_Actor_  # #storypoint-210
 
-    Lib_::API_lib[].iambic_builder self
+    Callback_::Actor.methodic self, :simple, :properties
 
-    parameter__parse_class
+    property_class_for_write
 
-    class Parameter
-      class Parse
-      private
-        def flag=
-          @param.argument_arity_i = :zero
-          @param.ivar = @x_a.shift
-          send :optional= ; nil
-        end
-        def optional=
-          @param.parameter_arity_i = :zero_or_one ; nil
-        end
+    class Property
+
+      def initialize( * )
+        @argument_arity = :one
+        @parameter_arity = :one
+        super
       end
-      attr_accessor :parameter_arity_i
-    end
-    instance_methods_module
-    module Instance_Methods
-      PROTOTYPE_PARAMETER = Parameter.new do |p|
-        p.argument_arity_i = :one
-        p.has_generated_writer = true
-        p.parameter_arity_i = :one
-      end
+
+      attr_reader :default_proc
+
     private
-      def initialize_with_iambic x_a
-        nilify_and_absorb_iambic_fully x_a
-        assert_parameter_arity
-      end
-      def assert_parameter_arity
-        scn = self.class.get_parameter_scanner ; y = nil
-        while (( param = scn.gets ))
-          :one == param.parameter_arity_i or next
-          x = instance_variable_get param.ivar
-          x.nil? or next
-          ( y ||= [] ) << param
+
+      def default=
+        _X = iambic_property
+        @default_proc = -> do
+          _X
         end
-        y and raise ::ArgumentError, "'#{ moniker_for_errmsg }' #{
-          }is missing the required iambic parameter(s) #{
-           }#{ y.map { |p| "'#{ p.param_i }'" } * ' and ' }" ; nil
       end
-      def moniker_for_errmsg
-        o = F2TT_::Lib_::Old_name_lib[]
-        o.naturalize o.normify o.const_basename self.class.name
+
+      def flag=
+        @argument_arity = :zero
+        send :optional=
+      end
+
+      def optional=
+        @parameter_arity = :zero_or_one
+      end
+    end
+
+  private
+
+    def init_via_iambic x_a
+      process_iambic_fully x_a
+      nrmlz
+    end
+
+    def nrmlz  # #note-320 (new)
+      scn = self.class.properties.to_scan
+      miss_a = []
+      while prop = scn.gets
+        ivar = prop.as_ivar
+        x = if instance_variable_defined? ivar
+          instance_variable_get ivar
+        else
+          instance_variable_set ivar, nil
+        end
+        if x.nil?
+          if prop.default_proc
+            x = prop.default_proc[]
+            instance_variable_set ivar, x
+          end
+        end
+        if prop.is_required && x.nil?
+          miss_a.push prop
+        end
+      end
+      if miss_a.length.nonzero?
+        _ev = bld_missing_event miss_a
+        raise _ev.to_exception
+      end
+    end
+
+    def bld_missing_event miss_a
+      Lib_::Bzn_[]::Entity.properties_stack.
+        build_missing_required_properties_event(
+          miss_a, 'iambic parameter', "'#{ moniker_for_errmsg }' is" )
+    end
+
+    def moniker_for_errmsg
+      o = F2TT_::Lib_::Old_name_lib[]
+      o.naturalize o.normify o.const_basename self.class.name
+    end
+
+    module_methods_module_for_write
+
+    module ModuleMethods
+      def required_properties_scan
+        properties.to_scan.reduce_by do |prop|
+          prop.is_required
+        end
       end
     end
   end
@@ -330,38 +359,50 @@ module Skylab::Flex2Treetop
     action_class
     class Action
 
-      parameter_members
-      def initialize x_a
-        initialize_with_iambic x_a
-        @client = Services_For_API_Action__.new @service, @session
-        @service = @session = nil  # #storypoint-250
+      Local_Actor_[ self, :simple, :properties ]
+
+      # parameter_members
+
+      def initialize seed
+        # we implement our own hacking of program name and
+        # errstream thru the ick argument iambic for now
+
+        @client = Services_for_API_Action__.new seed.session, seed.service
+        # #storypoint-250 - don't access session directly
+
+        @errstream = seed.session.errstream  # #open [#011]
+
+        init_via_iambic seed.iambic
+
         super()
       end
+
     private
-      def initialize_with_iambic x_a
-        nilify_and_absorb_iambic_fully x_a
-      end
+
       def emit_error_string s
         @errstream.puts s ; nil
       end
+
       def emit_info_line s
         @errstream.puts s ; nil
       end
     end
 
-    class Services_For_API_Action__
+    class Services_for_API_Action__
 
-      Lib_::Delegating[ self ]
-
-      delegating :to, :@session, %i( program_name )
-
-      def initialize service, session
+      def initialize session, service
         @service = service ; @session = session ; nil
+      end
+
+      def program_name
+        @session.program_name
       end
     end
 
     class Actions::Ping < Action
-      params :arg_1, [ :ivar, :@arg_x ]
+
+      o :simple, :properties,
+          :ivar, :@arg_x, :arg_1
 
       def execute
         @errstream.puts "helo:(#{ @arg_x })"
@@ -371,7 +412,8 @@ module Skylab::Flex2Treetop
 
     class Actions::Version < Action
 
-      params :bare, %i( argument_arity zero )
+      o :simple, :properties,
+          :flag, :bare
 
       def execute
         if @bare
@@ -384,9 +426,10 @@ module Skylab::Flex2Treetop
 
     session_class
     class Session
+      attr_reader :errstream
     private
       def program_name=
-        @service._CHANGE_PROGRAM_NAME! @x_a.shift ; nil
+        @service._CHANGE_PROGRAM_NAME! iambic_property
       end
     public
       def program_name
@@ -408,43 +451,48 @@ module Skylab::Flex2Treetop
       end
     end
 
-    Pathname_writer__ = -> param do
-      ivar = param.ivar
+    Pathname_writer__ = -> prop do
+      ivar = prop.as_ivar
       -> do
-        x = Lib_::Pathname_lib[].try_convert @x_a.shift
-        instance_variable_set ivar, x ; nil
+        x = Lib_::Pathname_lib[].try_convert iambic_property
+        instance_variable_set ivar, x
       end
     end
 
     class Actions::Translate < Action
 
-      Iambics_[ self,
-        :params,
-        * parameter_members,  # #storypoint-315
-        :case_sensitive, [ :flag, :"@is_case_sensitive" ],
-        :clear_generated_files, [ :flag, :"@do_clear_files" ],
-        :endpoint_is_FS_parser, [ :flag, :"@endpoint_is_FS_parser" ],
+      o :simple, :properties,
+        # * parameter_members,  # #storypoint-315
+        :flag, :ivar, :@is_case_sensitive, :case_sensitive,
+        :flag, :ivar, :@do_clear_files, :clear_generated_files,
+        :flag, :endpoint_is_FS_parser,
         :flexfile,
-        :force, [ :flag, :"@force_is_present" ],
-        :FS_parser_dir, [ :write_with, Pathname_writer__, :optional ],
+        :flag, :ivar, :@force_is_present, :force,
+        :optional, :iambic_writer_method_proc_proc, Pathname_writer__, :FS_parser_dir,
         :emit_info_line_p,
         :emit_info_string_p,
-        :paystream_via, [ :has_custom_writer ],
+        :iambic_writer_method_to_be_provided, :paystream_via,
         :pp_IO_for_show_sexp,
-        :show_sexp_only, [ :flag, :"@do_show_sexp_only" ],
-        :use_FS_parser, [ :flag, :"@do_use_FS_parser" ],
-        :verbose, [ :flag, :@be_verbose, :default, true ],
-        :wrap_in_grammar_s, [ :optional ] ]
+        :flag, :ivar, :@do_show_sexp_only, :show_sexp_only,
+        :flag, :ivar, :@do_use_FS_parser, :use_FS_parser,
+        :flag, :default, true, :ivar, :@be_verbose, :verbose,
+        :optional, :wrap_in_grammar_s
 
       private
 
         def paystream_via=  # a diadic term
           @paystream_via = :_provided_
-          case (( type_i = @x_a.shift ))
-          when :IO   ; @pay_i = :IO   ; @pay_x = @x_a.shift
-          when :path ; @pay_i = :path ; @pay_x = @x_a.shift
-          else raise ::ArgumentError, "no: '#{ type_i }'"
-          end ; nil
+          type_i = iambic_property
+          case type_i
+          when :IO
+            @pay_i = :IO
+            @pay_x = iambic_property
+          when :path
+            @pay_i = :path
+            @pay_x = iambic_property
+          else
+            raise ::ArgumentError, "no: '#{ type_i }'"
+          end
         end
 
     public
@@ -639,13 +687,17 @@ module Skylab::Flex2Treetop
     end
   end
 
-  Assert_open_stream__ = -> param do
-    ivar = param.ivar ; par_i = param.param_i
+  Assert_open_stream__ = -> prop do
+    ivar = prop.as_ivar
+    name_i = prop.name_i
     -> do
-      x = @x_a.shift
-      x && ! x.closed? or raise ::ArgumentError, "for '#{ par_i }' #{
-        }need open stream, had #{ Lib_::Strange[ x ] }"
-      instance_variable_set ivar, x ; nil
+      x = iambic_property
+      if x && ! x.closed?
+        instance_variable_set ivar, x
+      else
+        raise ::ArgumentError, "for '#{ name_i }' #{
+          }need open stream, had #{ Lib_::Strange[ x ] }"
+      end
     end
   end
 
@@ -658,25 +710,25 @@ module Skylab::Flex2Treetop
 
 Translate__ = Class_as_function__[ -> do class Translate____
 
-    Iambics_[ self, :params,
+    Local_Actor_.call self, :simple, :properties,
       :be_verbose,
-      :do_clear_files, %i( optional ),
-      :do_show_sexp_only, %i( optional ),
-      :do_use_FS_parser, %i( optional ),
+      :optional, :do_clear_files,
+      :optional, :do_show_sexp_only,
+      :optional, :do_use_FS_parser,
       :emit_info_line_p,
       :emit_info_string_p,
-      :endpoint_is_FS_parser, %i( optional ),
-      :FS_parser_dir, %i( optional ),
-      :instream,  [ :write_with, Assert_open_stream__ ],
+      :optional, :endpoint_is_FS_parser,
+      :optional, :FS_parser_dir,
+      :iambic_writer_method_proc_proc, Assert_open_stream__, :instream,
       :instream_moniker,
-      :outstream, %i( has_custom_writer ),
+      :iambic_writer_method_to_be_provided, :outstream,
       :outstream_moniker,
       :pp_IO_for_show_sexp,
       :verb_s,
-      :wrap_in_grammar_s, %i( optional ) ]
+      :optional, :wrap_in_grammar_s
 
     def initialize x_a
-      initialize_with_iambic x_a
+      init_via_iambic x_a
       super()
     end
 
@@ -693,15 +745,18 @@ Translate__ = Class_as_function__[ -> do class Translate____
     end
 
     def outstream=
-      param = self.class.fetch_parameter :outstream
+      prop = self.class.properties.fetch :outstream
       if is_conventional_endpoint
-        _p = Assert_open_stream__[ param ]
+        _p = Assert_open_stream__[ prop ]
         instance_exec( & _p )
       else
-        x = @x_a.shift
-        :_no_outstream_ == x or raise ::ArgumentError,
-          "pass no #{ param.param_i } when nonconventional endpoint (#{ x })"
-        @outstream = x  # still it must pass arity check
+        x = iambic_property
+        if :_no_outstream_ == x
+          @outstream = x  # still it must pass arity check
+        else
+          raise ::ArgumentError,
+            "pass no #{ prop.name_i } when nonconventional endpoint (#{ x })"
+        end
       end ; nil
     end
 
@@ -881,17 +936,17 @@ Translate__ = Class_as_function__[ -> do class Translate____
 
   class Translate_Stream__
 
-    Iambics_[ self, :params,
-      :do_show_sexp_only, %i( optional ),
+    Local_Actor_.call self, :simple, :properties,
+      :optional, :do_show_sexp_only,
       :emit_info_line_p,
       :emit_info_string_p,
       :instream,
       :outstream,
       :pp_IO_for_show_sexp,
-      :wrap_in_grammar_s, %i( optional ) ]
+      :optional, :wrap_in_grammar_s
 
     def initialize x_a
-      initialize_with_iambic x_a
+      init_via_iambic x_a
       super()
     end
 
@@ -1563,6 +1618,12 @@ Translate__ = Class_as_function__[ -> do class Translate____
       end.join("\n")
     end
   end
+
+  FIXTURE_H__ = {
+    mini:     'flex2treetop/test/fixtures/mini.flex',
+    tokens:   'css-convert/css/parser/tokens.flex',
+    fixthix:  'flex2treetop/test/fixtures/fixthis.flex'
+  }.freeze
 
   F2TT_ = self
 

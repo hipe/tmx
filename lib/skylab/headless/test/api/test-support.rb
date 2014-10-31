@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::Headless::TestSupport::API::SSA__
+module Skylab::Headless::TestSupport::API
 
-  ::Skylab::Headless::TestSupport::API[ TS__ = self ]
+  ::Skylab::Headless::TestSupport[ TS_ = self ]
 
   include Constants
 

@@ -2,6 +2,4 @@
 
 require_relative '../lib/skylab/file-metrics/core'
 
-::Skylab::FileMetrics::CLI.
-  new( * ::Skylab::Face::FUN.three_streams[] ).
-    invoke ::ARGV
+::Skylab::FileMetrics::CLI.new( $stdin, $stdout, $stderr ).invoke ::ARGV

@@ -70,14 +70,8 @@ module Skylab::Headless
       MH__[].funcy_globful cls
     end
 
-    IT__ = sidesys[ :InformationTactics ]
-
     Ivars_with_procs_as_methods = -> * a do
       MH__[]::Ivars_with_Procs_as_Methods.via_arglist a
-    end
-
-    Levenshtein = -> do
-      IT__[]::Levenshtein
     end
 
     List_lib = -> do

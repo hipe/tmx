@@ -7,11 +7,28 @@ this is headless's experimental new spin on [#fa-013] "meta-fields" (or
 from late 2012). as this works and takes shape we will document it over there.
 for now it is a #frontier-hack.
 
+and then a year later it moved to [cb] and became a clean ground-up
+re-write of a middleground between very simple actors and very complex
+entites.
+
+
+## :#note-320
+
+ya know it's funny i really gotta tell ya somethin', we hate writing
+and re-writing this same kind of normalization logic for every
+application (nil out ivars, apply defaults, whine about missing
+requireds), but the alternative (so far) has been the bloated and obtuse
+[cb] enitity property hooks API. hand-writing these 20 lines each time
+may just be worth the cost savings.
+
+also we could just push this method itself upwards..
+
+
 
 
 ## :#storypoint-250
 
-in this application the the sole way that an action may access any method of
+in this application the sole way that an action may access any method of
 the service or session is through the "client" façade. this is to future-proof
 the whole thing, so we have a clear, "pure-interface" layer that shows us what
 the action needs from the surrounding system so that changes that must occur
