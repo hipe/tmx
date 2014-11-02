@@ -38,6 +38,12 @@ module Skylab::Basic
         end
       end
 
+      def value_via_module_and_relative_parts mod, const_x_a
+        o = Touch__.new mod
+        o.relative_path_parts = const_x_a
+        o.execute
+      end
+
       def value_via_parts_and_relative_path prts, path_s
         o = Touch__.new
         o.starting_module_parts = prts
@@ -120,7 +126,7 @@ module Skylab::Basic
             x = @else_p[ s, m ]
             m = x  # KEEP GOING covered.
           else
-            x = m.const_get s, false  # trigger the error, presumably
+            x = m.const_get s, false  # trigger the error or trip a.l
             m = x
           end
         end

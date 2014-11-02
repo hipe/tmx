@@ -23,6 +23,10 @@ module Skylab::Brazen
           inline_via_iambic_and_message_proc x_a, p
         end
 
+        def inline_via_iambic x_a
+          inline_via_iambic_and_message_proc x_a, Inferred_Message.to_proc
+        end
+
         def inline_via_iambic_and_message_proc x_a, p
           construct do
             init_via_x_a_and_p x_a, p

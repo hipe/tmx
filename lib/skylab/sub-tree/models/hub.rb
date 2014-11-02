@@ -4,8 +4,12 @@ module Skylab::SubTree
 
     Lib_::Basic_fields[ :client, self,
       :absorber, :absrb_iambic_fully,
-      :field_i_a, [ :test_dir_pn, :sub_path_a, :local_test_pathname_ea,
-                   :lister_p, :info_tree_p ] ]
+      :field_i_a, [
+        :test_dir_pn,
+        :sub_path_a,
+        :local_test_pathname_scan_proc,
+        :list_behavior_proc,
+        :info_tree_p ] ]
 
     def initialize *x_a  # #yes-globbed
       @did_show_debubbing_output = false
@@ -13,21 +17,49 @@ module Skylab::SubTree
       absrb_iambic_fully x_a ; nil
     end
 
-    def get_tree_combined
-      prepare
-      code_tree_notify(( c = build_code_tree ))
-      test_tree_notify(( t = build_test_tree c ))
-      if ! @did_show_debubbing_output
-        perform_destructive_merge c, t
-        c
+    attr_reader :test_dir_pn
+
+    def sub_hub_pathname
+      @sub_hub_pn ||= rslv_sub_hub_pn
+    end
+
+    def rslv_sub_hub_pn
+      if @sub_path_a
+        @test_dir_pn.join @sub_path_a.join( SEP_ )
+      else
+        @test_dir_pn
       end
     end
 
+    def to_local_test_pathname_scan
+      @local_test_pathname_scan_proc.call
+    end
+
+    def description
+      "(hub: #{ @sub_path_a })"
+    end
+
+    def local_test_pathname_a
+      @local_test_pathname_a ||= collapse_local_test_pathnames
+    end
+
+    def build_combined_tree
+      prepare
+      ct =  build_code_tree
+      code_tree_notify ct
+      tt = build_test_tree ct
+      test_tree_notify tt
+      if ! @did_show_debubbing_output
+        perform_destructive_merge ct, tt
+        ct
+      end
+    end
   private
 
     def prepare
       @did_show_debugging_output = false
-      @lister = @lister_p.call
+      @list_behavior = @list_behavior_proc.call
+      nil
     end
 
     def code_tree_notify t
@@ -39,7 +71,7 @@ module Skylab::SubTree
     end
 
     def tree_notify i, t
-      if (( @lister && @lister.do_list_tree( i ) ))
+      if @list_behavior.do_list_tree_for i
         @did_show_debubbing_output = true
         @info_tree_p[ LABEL_H_.fetch( i ), t ]
       end
@@ -67,12 +99,11 @@ module Skylab::SubTree
     end
 
     def get_code_path_a
-      self.class::Code_glob_[ :app_hub_pn, app_hub_pn,
-        :test_dir_pn, @test_dir_pn, :sub_path_a, @sub_path_a ]
-    end
-
-    def app_hub_pn
-      @app_hub_pn ||= @test_dir_pn.dirname
+      _ = app_hub_pn
+      Hub_::Code_glob_[
+        :app_hub_pn, _,
+        :test_dir_pn, @test_dir_pn,
+        :sub_path_a, @sub_path_a ]
     end
 
     def build_test_tree code_tree
@@ -90,12 +121,12 @@ module Skylab::SubTree
         fail "sanity - non-stem tree?"
       end
       s = ct.slug
-      if ! t.is_under_isomorphic_key s
-        fail 'where?'  # #todo
-        t.add_isomorphic_key_with_metakey s, :codeish
-          # hack an association of the two trees if necessary
-      end
+      t.is_under_isomorphic_key( s ) or self._SANITY  # see history
       t
+    end
+
+    def app_hub_pn
+      @app_hub_pn ||= @test_dir_pn.dirname
     end
 
     def get_test_path_a
@@ -103,18 +134,19 @@ module Skylab::SubTree
         @test_dir_pn, @sub_path_a, local_test_pathname_a ]
     end
 
-    def local_test_pathname_a
-      @local_test_pathname_a ||= @local_test_pathname_ea.to_a.freeze
+    def collapse_local_test_pathnames
+      _scan = @local_test_pathname_scan_proc.call
+      _scan.to_a.freeze
     end
 
     EXTNAME_ = Autoloader_::EXTNAME
 
     def perform_destructive_merge c, t
-      c.destructive_merge t, :key_proc, KEY_PROC_
+      c.destructive_merge t, :key_proc, KEY_PROC
       nil
     end
 
-    KEY_PROC_ = -> n do
+    KEY_PROC = -> n do
       if ! n.has_tag :test
         n.slug
       else
@@ -129,19 +161,11 @@ module Skylab::SubTree
 
   public  #   ~ auxiliary services ~
 
-    def get_sub_hub_pn
-      if @sub_path_a
-        @test_dir_pn.join @sub_path_a.join( SEP_ )
-      else
-        @test_dir_pn
-      end
-    end
+
 
     #  ~ dubious services ~
 
-    def path_moniker_stem
-      @test_dir_pn.to_s
-    end
+
 
     def _local_test_pathname_a
       local_test_pathname_a
@@ -155,5 +179,7 @@ module Skylab::SubTree
       end
       r
     end
+
+    Hub_ = self
   end
 end

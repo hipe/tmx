@@ -4,6 +4,10 @@ module Skylab::Callback
 
     class << self
 
+      def common i, & p
+        COMMON__.fetch( i ).call p
+      end
+
       def functional * a, & p
         Proxy_::Functional__.via_arglist a, & p
       end
@@ -32,6 +36,12 @@ module Skylab::Callback
         Callback_::Lib_::List_lib[].pairs_scan_via_even_iambic x_a
       end
     end
+
+    COMMON__ = {
+      :<< => -> p do
+        ::Enumerator::Yielder.new( & p )
+      end
+    }
 
     Proxy_ = self
   end

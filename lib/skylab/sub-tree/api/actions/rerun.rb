@@ -1,4 +1,4 @@
-fail 'not on your life'  # #todo
+self._NOT_USED  # here for referece
 
 module Skylab::SubTree
 

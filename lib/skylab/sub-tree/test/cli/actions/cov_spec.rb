@@ -8,7 +8,7 @@ module Skylab::SubTree::TestSupport::CLI::Actions::Cov
 
   include Constants
 
-  PN_.class
+  Callback_ = Callback_
 
   CMD_ = 'cov'.freeze
 
@@ -38,50 +38,89 @@ describe "[st] CLI actions cov" do
     [ /#{ rx }\z/, %r{\A\./#{ PN_ }/.+#{ rx }\z} ]
   end.call
 
+  test_files_in_hub_rx = %r(\b\d+ test files in hub\b)
+
+  test_files_in_total_rx = %r(\b\d+ test files in all\b)
+
   def expect_no_more_lines
     @emit_spy.emission_a.length.zero? or fail "expected no more lines"
   end
 
   it "show a list of matched test files only." do
-    cd SubTree_.dir_pathname.dirname do         # cd to lib/skylab ..
-      argv CMD_, '-l', "./#{ PN_ }/test"       # and ask about this subproduct
-    end                                        # itself. (yes this is a self-
-                                               # referential test ^_^)
-                                               # each one of the returned
-    while e = emission_a.shift                 # events that is a payload
-      if :payload == e.stream_name             # should be a "line" that is
-        text[ e ].should match( srbrx2 )       # a path
-      else                                     # that is relative to where
-        e.stream_name.should eql( :info )      # we ran it from. This last
-        text[ e ].should match(/\d test files total/) # event should be an :info
-        emission_a.should be_empty              # that tells us the number of
-        break                                  # files.
-      end
+
+    # cd into lib/skylab and ask about this subproduct itself. (yes this is
+    # a self-referential test ^_^) each one of the returned events that is a
+    # payload should be a "line" that is a path that is relative to where we
+    # ran it from. This last event should be an :info that tells us the
+    # number of files.
+
+    cd SubTree_.dir_pathname.dirname do
+      argv CMD_, '-l', "./#{ PN_ }/test"
     end
 
-    result.should eql( 0 )
+    scn = Callback_::Scan.via_nonsparse_array emission_a
+    em = scn.gets
+    em.stream_name.should eql :payload
+
+    begin
+
+      s = text[ em ]
+      s.should match srbrx2
+
+      em = scn.gets
+      if :payload == em.stream_name
+        redo
+      end
+
+      em.stream_name.should eql :info
+      s = text[ em ]
+      s.should match test_files_in_hub_rx
+
+      em = scn.gets
+      if :payload == em.stream_name
+        redo
+      end
+    end while false
+
+    em.stream_name.should eql :info
+    text[ em ].should match test_files_in_total_rx
+
+    em = scn.gets
+    em.should be_nil
+
+    result.should eql 0
   end
 
   it "show a shallow tree of matched test files only." do
     argv CMD_, '-s', Abs_testdir_[]
-    while e = emission_a.shift
-      if :payload == e.stream_name
-        if /\A[^ ]/ =~ text[ e ]
-          text[ e ].should match(/\/test\/\z/) # silly
-        else
-          text[ e ].should match( srbrx )
-        end
-      else
-        e.stream_name.should eql( :info )
-        text[ e ].should match(/\d test files total/)
+    scn = Callback_::Scan.via_nonsparse_array emission_a
+    em = scn.gets
+    em.stream_name.should eql :payload
+    text[ em ].should match %r(\A/.+/test\z)  # first line is test dir abspath
+    em = scn.gets
+    em.stream_name.should eql :payload
+    begin
+      text[ em ].should match srbrx
+      em = scn.gets
+      if :payload == em.stream_name
+        redo
       end
-    end
+    end while false
+    em.stream_name.should eql :info
+    text[ em ].should match test_files_in_hub_rx
+    em = scn.gets
+    em.stream_name.should eql :info
+    text[ em ].should match test_files_in_total_rx
+    em = scn.gets
+    em.should be_nil
+    result.should eql 0
   end
 
   it "Couldn't find test directory: foo/bar/[test|spec|features]" do
     a = CMD_, SubTree_.dir_pathname.join( 'models' ).to_s
     argv( * a )
-    line.should match(/\ACouldn't find test directory.+\[test\|spec\|features/)
+    # NOTE :+#bad-test direcotry is relatived to whatever CWD is
+    line.should match %r(\bCouldn't find test directory: .+/models/\[test\|spec\|features\b)
     result.should eql SubTree_::CLI::EXITSTATUS_FOR_ERRROR__
   end
 

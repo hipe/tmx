@@ -353,6 +353,10 @@ end
         Headless_::NLP::EN::POS.preterite_verb
       end
 
+      o[ :progressive_verb ] = -> do
+        Headless_::NLP::EN::POS.progressive_verb
+      end
+
       bld_oxford_comma = -> sep do
         p = -> a do
           p = _EN[].oxford_comma.curry[ ', ', sep ]

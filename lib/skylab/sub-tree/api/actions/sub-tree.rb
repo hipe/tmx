@@ -3,7 +3,7 @@ module Skylab::SubTree
   class API::Actions::Sub_Tree
 
     Entity_[ self,
-      :fields, :err, :in_dir, :out_dir, :list, :do_force, :is_dry_run ]
+      :properties, :err, :in_dir, :out_dir, :list, :do_force, :is_dry_run ]
 
     def execute
       -> do  # #result-block

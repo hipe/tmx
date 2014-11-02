@@ -55,7 +55,7 @@ module Skylab::Snag::TestSupport::CLI
         c.full_text.should be_include(
           'usage: sn0g todo [<action>] [<args> [..]]' )
         c.full_text.should be_include( 'sub-action help' )
-        c.full_text.should be_include( 'melt is insanity' )
+        c.full_text.should be_include( 'EXPERIMENTAL' )
       end
     end
 

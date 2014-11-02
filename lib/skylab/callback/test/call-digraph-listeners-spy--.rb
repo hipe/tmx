@@ -35,7 +35,7 @@ module Skylab::Callback::TestSupport
       @emission_a.push Emission__.new( stream, payload_x )
       if @do_debug_proc.call
         o = @emission_a.last
-        debug_IO.puts [ o.stream_name, o.payload_x ].inspect
+        @debug_IO.puts [ o.stream_name, o.payload_x ].inspect
       end ; nil
     end
 

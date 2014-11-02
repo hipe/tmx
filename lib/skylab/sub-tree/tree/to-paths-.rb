@@ -4,7 +4,7 @@ module Skylab::SubTree
 
     class To_paths_
 
-      Entity_[ self, :fields, :client ]
+      Entity_[ self, :properties, :client ]
 
       def execute
         @path_separator = @client.path_separator

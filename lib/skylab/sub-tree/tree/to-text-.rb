@@ -4,7 +4,7 @@ module Skylab::SubTree
 
     class To_text_
 
-      Entity_[ self, :fields, :client ]
+      Entity_[ self, :properties, :client ]
 
       def execute
         lines = get_lines_ea

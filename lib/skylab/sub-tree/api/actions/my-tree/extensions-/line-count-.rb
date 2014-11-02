@@ -6,7 +6,7 @@ module Skylab::SubTree
 
     class Line_Count_
 
-      Entity_[ self, :fields, :local_normal_name, :infostream, :verbose ]
+      Entity_[ self, :properties, :local_normal_name, :infostream, :verbose ]
 
       attr_reader :local_normal_name
 

@@ -150,7 +150,11 @@ module Skylab::Snag
 
       def build_cache
         scn = @tree.get_traversal_scanner :glyphset_x, @glyphset_i ; y = []
-        while (( card = scn.gets ))
+        card = scn.gets
+        if card.node.children_count.zero?
+          card = nil
+        end
+        while card
           node = card.node
           _line_node_slug = stylize node.slug,
             node.is_branch ? @path_style_a : @line_num_style_a
@@ -160,6 +164,7 @@ module Skylab::Snag
           if node.is_leaf && node.todo
             item.todo = node.todo
           end
+          card = scn.gets
         end
         @cache_a = y ; nil
       end

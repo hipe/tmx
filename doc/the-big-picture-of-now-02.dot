@@ -4,6 +4,10 @@ digraph {
 
   dct [label="new doctest features"]
 
-  st_009 [label="[st] cov\ngut events"]
+  ev [label="event factory"]
 
+  cu [label="revamp cull"]
+
+  cu->lib
+  ev->cu
 }

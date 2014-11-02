@@ -1,0 +1,27 @@
+digraph g {
+
+/*
+
+list of things we want to cull :[#003]
+
+  + there are at leaast 3 ways to do API
+  + there are at least 3 box libs
+  + there are numerous CLI ibs
+  + there are numerous event base classes
+  + there are two name libs
+  + there are numerous param base classes
+  + there are quite numerous param libs
+
+*/
+
+  API
+  Box
+  CLI
+  Event
+  Name
+  Property
+  Param [ label="param\nlib" ]
+
+  Param -> Property
+
+}

@@ -2,32 +2,158 @@ module Skylab::SubTree
 
   class CLI::Action
 
-    SubTree::Core::Action::Anchored_Normal_Name_[ self ]
+    extend SubTree_::Lib_::Bzn_[].name_library.name_function_proprietor_methods
 
-    ACTIONS_ANCHOR_MODULE = SubTree::CLI::Actions
+    Event_ = Lib_::Bzn_[].event
+
+    def init_for_invocation_via_services svcs
+      @app_mod = SubTree_
+      @infostream, @CLI_receive_pair = svcs.at :errstream, :emit_proc
+      self
+    end
+
+    def invoke_via_iambic x_a
+      ok = receive_iambic x_a
+      ok &&= bound_call
+      ok and ok.receiver.send ok.method_name, * ok.args
+    end
 
   private
 
-    def corresponding_api_action_class
-      i_a = anchored_normal_name
-      1 == i_a.length or self._DO_ME
-      _name = Name_.via_variegated_symbol i_a.last
-      SubTree::API::Actions.const_get _name.as_const, false
+    def receive_iambic x_a
+      ok = process_iambic_fully x_a
+      ok &&= via_default_proc_and_is_required_normalize
+      ok && normalize
     end
 
-    def emit_from_parent stream_i, message_x
-      if message_x.respond_to? :render_with
-        message_x = message_x.render_with some_expression_agent
+    def process_iambic_fully x_a
+      @local_iambic = x_a
+      PROCEDE_
+    end
+
+    def via_default_proc_and_is_required_normalize
+      PROCEDE_
+    end
+
+    def normalize
+      PROCEDE_
+    end
+
+    def bound_call
+      act = build_corresponding_API_action
+      act and act.bound_call_via_call @local_iambic, event_receiver_for_API
+    end
+
+    def event_receiver_for_API
+      self
+    end
+
+    def build_corresponding_API_action
+      @API_action_class = corresponding_API_action_class
+      @API_action_class.new do
+        is_API_action
       end
-      @cli_client_emit_p[ MAP_HACK_H__.fetch( stream_i ), message_x ]
-      nil
     end
 
-    MAP_HACK_H__ =  {  # bridge while #open [#009]
-      error_event: :error,  # won't fly in real world
-      info_string: :info,
-      payload_string: :payload
-    }
+    def corresponding_API_action_class
+      SubTree_::Lib_::Module_lib[].value_via_module_and_relative_parts(
+        @app_mod::API::Actions, qualified_const_path )
+    end
 
+    def qualified_const_path
+      nf  = self.class.name_function
+      full = [ nf ]
+      nf_ = nf
+      while nf_ = nf_.parent
+        full.push nf_
+      end
+      full.reverse!
+      full.map( & :as_const )
+    end
+
+  public
+
+    def receive_event ev  # bridge from new to old events
+      if ev.ok
+        receive_payload_event ev  # :+#hook-out
+      elsif ev.ok.nil?
+        receive_info_event ev
+      else
+        receive_error_event ev
+      end
+    end
+
+  private
+
+    def receive_info_event ev
+      m_i = :"receive_info_#{ ev.terminal_channel_i }"
+      if respond_to? m_i
+        send m_i, ev
+      else
+        default_receive_info_event ev
+      end
+    end
+
+    def default_receive_info_event ev
+      send_lines ev, :info do |s|
+        qualify_info_string s
+      end
+    end
+
+    def receive_error_event ev
+      send_lines ev, :error do |s|
+        qualify_error_string s
+      end
+    end
+
+    def qualify_info_string s
+      did = true
+      @did_info ||= begin
+        did = false ; true
+      end
+      if did
+        "..and #{ s }"
+      else
+        qualify_info_string_first_time s
+      end
+    end
+
+    def qualify_info_string_first_time s
+      v = name.as_human
+      _v_ = expression_agent.calculate do
+        progressive_verb v
+      end
+      "while #{ _v_ }, #{ s }"
+    end
+
+    def qualify_error_string s
+      "won't #{ name.as_human } because #{ s }"
+    end
+
+    def name
+      self.class.name_function
+    end
+
+    def send_lines ev, i, & map_p
+      map_p ||= IDENTITY_
+      _y = Callback_::Proxy.common :<< do |s|
+        _s_ = map_p[ s ]
+        @CLI_receive_pair[ i, _s_ ]
+      end
+      ev.render_all_lines_into_under _y, expression_agent
+      ev.ok
+    end
+
+    def send_info_string s
+      @CLI_receive_pair[ :info, s ]
+    end
+
+    def send_payload_string s
+      @CLI_receive_pair[ :payload, s ]
+    end
+
+    def expression_agent
+      @expag ||= SubTree_::Lib_::Bzn_[]::CLI.expression_agent_instance  # #open [#013]
+    end
   end
 end

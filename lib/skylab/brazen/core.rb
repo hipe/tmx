@@ -204,6 +204,10 @@ module Skylab::Brazen
       HL__[]::NLP
     end
 
+    Old_CLI_lib = -> do
+      HL__[]::CLI
+    end
+
     Old_name_lib = -> do
       HL__[]::Name
     end

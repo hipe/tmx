@@ -2,7 +2,7 @@ module Skylab::SubTree
 
   class Tree::Traversal
 
-    # Tree::Entity_[ self, :fields, :crook, :pipe, :tee ]
+    # Tree::Entity_[ self, :properties, :crook, :pipe, :tee ]
 
     def initialize
       @glyphset_x = nil
@@ -29,6 +29,7 @@ module Skylab::SubTree
       def keys
         FIELD_A_
       end
+      alias_method :members, :keys
       def fetch i
         instance_variable_get IVAR_H_.fetch( i )
       end

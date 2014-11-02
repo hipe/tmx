@@ -4,7 +4,7 @@ module Skylab::SubTree
 
     class Merge_  # ( part of the [#mh-014] diaspora )
 
-      Entity_[ self, :fields, :client, :other, :key_proc, :attr_a ]
+      Entity_[ self, :properties, :client, :other, :key_proc, :attr_a ]
 
       class << self
 

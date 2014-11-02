@@ -66,7 +66,7 @@ module Skylab::Callback::TestSupport::Actor::Methodic
         x = foo.parse_these_fully :jiang, :J, :xiao, :X
         foo.jiang.should eql :J
         foo.xiao.should eql :X
-        x.should be_nil
+        x.should eql true
       end
 
       it "when 'fully' - unrecognzied term results in argument error" do

@@ -35,7 +35,7 @@ module Skylab::Callback
         end
 
         def template
-          @nucleus.template = Callback_::Lib_::String_lib[].template.from_string iambic_property
+          @nucleus.template = Callback_::Lib_::String_lib[].template.via_string iambic_property
           via_template_parse_rest_of_input
         end
       end

@@ -78,7 +78,7 @@ module Skylab::SubTree
         end, :normalizer, Normalize_verbose_flags    ]
 
     def write_option_parser_to o
-      ex_ag = some_expression_agent
+      ex_ag = expression_agent
       SubTree::Lib_::Write_isomorphic_option_parser_options[
         :field_box, field_box, :any_expression_agent, ex_ag,
         :param_h, order_proxy, :op, o ]
@@ -261,16 +261,16 @@ module Skylab::SubTree
 
     def mention x
       p = x.respond_to?( :call ) ? x : -> { x }
-      msg = some_expression_agent.calculate( & p )
+      msg = expression_agent.calculate( & p )
       @infostream.puts msg
       nil
     end
 
-    def some_expression_agent
+    def expression_agent
       @expression_agent || self.class::EXPRESSION_AGENT_
     end
 
-    alias_method :any_expression_agent, :some_expression_agent
+    alias_method :any_expression_agent, :expression_agent
 
     class Upstream_resolver_ < Lib_::Struct[ :upstream, :path_a, :file,
       :pattern, :say_p_p, :change_upstream_p, :cmd_s_p, :exit_status_p_p ]

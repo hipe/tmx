@@ -1547,6 +1547,9 @@ module Skylab::Callback
     def as_slug
       @as_slug ||= build_slug
     end
+    def as_trimmed_variegated_symbol
+      @as_trimmed_variegated_symbol ||= build_trimmed_variegated_symbol
+    end
     def as_variegated_string
       @as_variegated_string ||= as_variegated_symbol.id2name.freeze
     end
@@ -1559,7 +1562,10 @@ module Skylab::Callback
         gsub( UNDERSCORE_, DASH_ ).freeze
     end
     def build_human
-      as_slug.gsub( DASH_, SPACE__ ).freeze
+      s = as_slug.dup
+      s.gsub! TRAILING_DASHES_RX__, EMPTY_S_
+      s.gsub! DASH_, SPACE__
+      s.freeze
     end
     def build_lwus
       as_slug.gsub( DASH_, UNDERSCORE_ ).downcase.intern
@@ -1571,7 +1577,15 @@ module Skylab::Callback
       as_normalized_const.gsub( UNDERSCORE_, DASH_ ).downcase.freeze
     end
     def build_variegated_symbol
-      as_slug.gsub( DASH_, UNDERSCORE_ ).intern
+      s = as_slug.dup
+      s.gsub! DASH_, UNDERSCORE_
+      s.intern
+    end
+    def build_trimmed_variegated_symbol
+      s = as_slug.dup
+      s.gsub! TRAILING_DASHES_RX__, EMPTY_S_
+      s.gsub! DASH_, UNDERSCORE_
+      s.intern
     end
     def as_normalized_const
       as_const.to_s.gsub NORMALIZE_CONST_RX__, UNDERSCORE_
@@ -1587,11 +1601,10 @@ module Skylab::Callback
       @as_const = Constify_if_possible_[ as_variegated_symbol.to_s ]
     end
 
-
-
     NORMALIZE_CONST_RX__ = /(?<=[a-z])(?=[A-Z])/
     SLUGIFY_CONST_RX__ = /[A-Z](?=[a-z])/
     SPACE__ = ' '.freeze
+    TRAILING_DASHES_RX__ = /-+\z/
     THE_EMPTY_STRING__ = ''.freeze
     VALID_CONST_RX__ = /\A[A-Z][A-Z_a-z0-9]*\z/
   end

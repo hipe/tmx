@@ -37,11 +37,14 @@ module Skylab::SubTree
   stowaway :Lib_, 'library-'
 
   Name_ = Callback_::Name
+
+  PROCEDE_ = true
+
   SEP_ = '/'.freeze
 
   SPACE_ = ' '.freeze
 
-  Stop_at_pathname_ = -> do  # #todo
+  Stop_at_pathname_ = -> do  #  # #open [#014] - - don't use this any more, ..
     rx = %r{\A[./]\z}  # hackishly - for all pn, parent eventually is this
     -> pn do
       rx =~ pn.instance_variable_get( :@path )
@@ -50,5 +53,7 @@ module Skylab::SubTree
 
   SubTree = self
   SubTree_ = self
+
+  UNABLE_ = false
 
 end

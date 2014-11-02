@@ -5,7 +5,7 @@ module Skylab::TestSupport
 
   module Constants__
 
-    TEST_DIR_NAME_A = %w( test spec features ).freeze
+    TEST_DIR_NAME_A = %w( test spec features ).freeze  # :+#public-API as strings
 
   end
 end

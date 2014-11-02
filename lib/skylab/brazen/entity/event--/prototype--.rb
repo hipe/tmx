@@ -78,16 +78,23 @@ module Skylab::Brazen
             end
           end
 
-          def with * x_a
+          def new_mutable * x_a
             construct do
-              init_via_even_iambic x_a
+              init_via_value_list x_a
+            end
+          end
+
+          def via_arglist a
+            construct do
+              init_via_value_list a
               freeze
             end
           end
 
-          def new_mutable * x_a
+          def with * x_a
             construct do
-              init_via_value_list x_a
+              init_via_even_iambic x_a
+              freeze
             end
           end
         end

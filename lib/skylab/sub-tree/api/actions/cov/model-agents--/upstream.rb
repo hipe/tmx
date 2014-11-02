@@ -2,103 +2,149 @@ module Skylab::SubTree
 
   class API::Actions::Cov
 
-    class Upstream_
+    class Model_Agents__::Upstream
 
       Lib_::Properties_stack_frame.call self,
         :globbing, :processor, :initialize,
         :required, :field, :be_verbose,
-        :required, :field, :info_p
+        :required, :field, :on_event
 
-      class Enumerator_ < ::Enumerator
-        def initialize enumeration_class, *build_args, &blk
-          @enumeration_class = enumeration_class
-          @build_args = build_args ; @block = blk
-          super( & method( :each_notify ) )
-        end
-      private
-        def each_notify y
-          @enumeration_class.new( y, @block, * @build_args ).execute
-        end
-      end
+      class Via_Filesystem < self
 
-      class Enumeration_
-        def initialize y, block
-          @y = y ; @block = block
+        Lib_::Properties_stack_frame.call self,
+          :required, :field, :path
+
+        attr_reader :sub_path_array
+
+        def test_dir_pathnames
+          ok = is_directory
+          ok &&= look_at_current_node_as_test_directory
+          ok &&= look_upwards_for_test_directory
+          ok && find_with_find
+          @result
         end
-        def execute
-          instance_exec( & @block )
-        end
+
       private
-        def done x
-          @y << x
+
+        def is_directory
+          stat_and_stat_e
+          if @stat
+            when_stat
+          else
+            send_event No_Such_Directory_[ @stat_e, @path ].to_event
+            @result = UNABLE_
+          end
+        end
+
+        No_Such_Directory_ = Message_.new do |stat_e, path|
+          "no such directory: #{ pth path }"
+        end
+
+        def stat_and_stat_e
+          @stat = ::File.stat @path
+          @stat_e = nil
+        rescue ::SystemCallError => @stat_e
+          @stat = nil
+        end
+
+        def when_stat
+          if 'directory' == @stat.ftype
+            PROCEDE_
+          else
+            send_event No_Single_File_Support_[ @path ].to_event
+            @result = UNABLE_
+          end
+        end
+
+        No_Single_File_Support_ = Message_.new do |path|
+          "single file trees not yet implemented #{
+            }(for #{ pth path })"
+        end
+
+        def look_at_current_node_as_test_directory
+          # if pn looks like foo/bar/test we are done
+          @pn = ::Pathname.new @path
+          bn_s = @pn.basename.to_path
+          if TEST_DIR_NAME_A_.include? bn_s
+            @result = Callback_::Scan.via_item @pn
+            CEASE_
+          else
+            PROCEDE_
+          end
+        end
+
+        def look_upwards_for_test_directory
+          if SOFT_RX_ =~ @path  # don't bother looking unless test dir string
+            do_look_upwards  # is in path (but note it is not a hard match)
+          else
+            PROCEDE_
+          end
+        end
+
+        def do_look_upwards
+          pn = ::Pathname.new @path
+          seen_a = []
+          found = false
+          loop do
+            bn = pn.basename
+            bn_s = bn.to_path
+            if HARD_RX_ =~ bn_s  # is the test dir?
+              break found = true
+            end
+            seen_a.push bn_s
+            pn_ = pn.dirname
+            pn_ == pn and break
+            pn = pn_
+          end
+          if found
+            seen_a.reverse!
+            @sub_path_array = seen_a
+            @result = Callback_::Scan.via_item pn
+            CEASE_
+          else
+            PROCEDE_
+          end
+        end
+
+        def find_with_find
+          @result = Cov_::Actors__::Find.with(
+            :path, @path,
+            :selective_listener, selective_listener_for_find )
+          nil
+        end
+
+        def selective_listener_for_find
+          Callback_::Selective_Listener.methodic self, :prefix, :find
+        end
+
+        def send_event ev
+          @on_event[ ev ]
+        end
+
+      public
+
+        def is_subscribed_to_find_error
+          true
+        end
+
+        def is_subscribed_to_find_info
+          @be_verbose
+        end
+
+        def receive_find_info ev
+          send_event ev
           nil
         end
       end
 
-      From_ = ::Module.new
+      CEASE_ = false  # like "UNABLE_" but semantically not an error
 
-      class From_::Filesystem_ < self
+      SOFT_RX_ = %r{(?:#{
+        TEST_DIR_NAME_A_.map( & ::Regexp.method( :escape ) ) * '|'
+      })}
 
-        Lib_::Properties_stack_frame.call self,
-          :required, :field, :arg_pn
+      HARD_RX_ = %r{ \A #{ SOFT_RX_.source } \z }x
 
-        def test_dir_pathnames
-          Enumerator_.new Enumeration_, @arg_pn, @be_verbose, @info_p do
-            -> do
-              (( pn = @arg_pn )).exist? or break No_Such_Directory_[ pn ]
-              pn.directory? or break No_Single_File_Support_[ pn ]
-              TEST_DIR_NAME_A_.include? pn.basename.to_s and break done( pn )
-                # if pn looks like foo/bar/test we are done
-              (( pn_ = mutate_if_test_subnode )) and break done( pn_ )
-                # if pn looks like foo/bar/test then we are done
-              find_with_find
-            end.call
-          end
-        end
-
-        class Enumeration_ < Enumeration_
-          def initialize y, block, arg_pn, be_verbose, info_p
-            super y, block
-            @arg_pn = arg_pn ; @be_verbose = be_verbose ; @info_p = info_p
-          end
-        private
-          def find_with_find
-            error_message = nil
-            ok = Cov::Finder_[ :yielder, @y, :find_in_pn, @arg_pn,
-              :info_p, @info_p, :be_verbose, @be_verbose,
-              :error_p, -> errmsg { error_message = errmsg } ]
-            Error_String_[ error_messgae] if ! ok
-          end
-
-          def mutate_if_test_subnode
-            begin
-              SOFT_RX_ =~ @arg_pn.to_s or break    # is test dir in the path?
-              curr = @arg_pn ; seen_a = [ ] ; found = false
-              until Stop_at_pathname_[ curr ]
-                bn = curr.basename
-                HARD_RX_ =~ bn.to_s and break( found = true )  # is the test dir?
-                seen_a << bn.to_s
-                curr = curr.dirname
-              end
-              found or break
-              @sub_path_a and fail "sanity"  # #todo - when?
-              @sub_path_a = seen_a.reverse # empty iff test dir was first dir
-              r = curr
-            end while nil
-            r
-          end
-        end
-
-        No_Such_Directory_ = Message_.new do |pn|
-          "no such directory: #{ ick escape_path pn }"
-        end
-
-        No_Single_File_Support_ = Message_.new do |pn|
-          "single file trees not yet implemented #{
-            }(for #{ ick escape_path pn })"
-        end
-
-      end
     end
   end
 end

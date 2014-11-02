@@ -2,11 +2,12 @@ module Skylab::Callback
 
   module Actor
 
-    module Methodic__  # :[#058].
+    module Methodic__  # see [#058]
 
       class << self
 
         def via_client_and_iambic mod, i_a
+          mod.extend Module_Methods__
           mod.include Instance_Methods__
           if i_a.length.nonzero?
             i = i_a.first
@@ -38,6 +39,21 @@ module Skylab::Callback
           raise _ev.to_exception
         end
       end  # >>
+
+      module Module_Methods__
+
+        # (experimental variations on the theme, but we should DRY these)
+
+        def build_via_iambic x_a
+          seen = false
+          ok = true
+          x = new do
+            seen = true
+            ok = process_iambic_fully x_a
+          end
+          seen && ok && x
+        end
+      end
 
       module Algorithmic_Methods__
 
@@ -91,6 +107,8 @@ module Skylab::Callback
           process_iambic_passively x_a
           if unparsed_iambic_exists
             when_extra_iambic
+          else
+            ACHEIVED_
           end
         end
 
@@ -161,11 +179,11 @@ module Skylab::Callback
           :parameter_arity
 
         include Via_Scanner_Iambic_Methods__
+
       private
         def property=
           @keep_scanning = false
         end
-
       public
 
         def initialize scn=nil, & p
@@ -338,24 +356,6 @@ module Skylab::Callback
             end.immutable_with_random_access_keyed_to_method :name_i
           end
         end
-
-        module Proprietor_Instance_Methods__
-
-          def initialize & p
-            super( & nil )
-            p and instance_exec( & p )
-          end
-
-        private
-
-          def nilify_uninitialized_ivars  # :+#courtesy
-            scn = self.class.properties.to_scan
-            while prop = scn.gets
-              instance_variable_defined? prop.as_ivar and next
-              instance_variable_set prop.as_ivar, nil
-            end
-          end
-        end
       end
 
       class Stranger_
@@ -489,7 +489,7 @@ module Skylab::Callback
             Methodic__.via_client_and_iambic @client, @x_a
           end
         end
-      end
+      end  # Simple__
 
       class Simple_Property__
       private
@@ -504,9 +504,70 @@ module Skylab::Callback
         end
       end
 
+      # ~ courtesies (not part of central operation, here b.c they are common)
+
+      class Simple__
+
+        module Proprietor_Instance_Methods__
+
+          def initialize & p  # :+#courtesy
+            super( & nil )
+            p and instance_exec( & p )
+          end
+
+        private
+
+          def via_default_proc_and_is_required_normalize  # #note-515, :+#courtesy
+            scn = self.class.properties.to_scan
+            miss_a = nil
+            while prop = scn.gets
+              ivar = prop.as_ivar
+              x = if instance_variable_defined? ivar
+                instance_variable_get ivar
+              else
+                instance_variable_set ivar, nil
+              end
+              if x.nil? && prop.default_proc
+                x = prop.default_proc[]
+                instance_variable_set ivar, x
+              end
+              if prop.is_required && x.nil?
+                ( miss_a ||= [] ).push prop
+              end
+            end
+            if miss_a
+              _ev = build_missing_required_properties_event miss_a
+              receive_missing_required_properties _ev
+              UNABLE_
+            else
+              ACHEIVED_
+            end
+          end
+
+          def build_missing_required_properties_event miss_a
+            Callback_::Lib_::Entity[].properties_stack.
+              build_missing_required_properties_event( miss_a )
+          end
+
+          def receive_missing_required_properties ev
+            raise ev.to_exception
+          end
+
+          def nilify_uninitialized_ivars  # :+#courtesy
+            scn = self.class.properties.to_scan
+            while prop = scn.gets
+              instance_variable_defined? prop.as_ivar and next
+              instance_variable_set prop.as_ivar, nil
+            end
+          end
+        end
+      end
+
+      ACHEIVED_ = true
       BX_ = :PROPERTIES_FOR_WRITE__
       MM_ = :ModuleMethods  # is Module_Methods in [bz] ent
       PC_ = :Property  # is PROPERTY_CLASS__ in [bz] ent
+      UNABLE_ = false
     end
   end
 end

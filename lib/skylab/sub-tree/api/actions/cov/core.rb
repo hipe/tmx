@@ -2,176 +2,237 @@ module Skylab::SubTree
 
   class API::Actions::Cov < API::Action
 
-    listeners_digraph hub_point: :datapoint,
-              error_event: :datapoint,
-             error_string: :datapoint,
-              info_string: :datapoint,
-     number_of_test_files: :datapoint,
-                test_file: :structural,
-           tree_line_card: :datapoint,
-                info_tree: :structural
+    Local_Actor_.call self, :simple, :properties,
 
+      :iambic_writer_method_to_be_provided, :ivar, :@list_as_a, :list_as,
 
-    SubTree_::Lib_::Basic_fields[ :client, self,
-      :absorber, :absrb_iambic_fully,
-      :field_i_a, [ :list_as, :path, :be_verbose ]]
+      :required, :path,
+
+      :flag, :ivar, :@be_verbose, :verbose
+
+    Event_ = SubTree_::Lib_::Event_lib[]
 
     def initialize
-      @error_was_emitted = @sub_path_a = @lister = nil
-    end
-
-    def init_for_invocation_with_services svcs
-      ree, res, ris = svcs.at(
-        :receive_error_event, :receive_error_string, :receive_info_string )
-      ree and on_error_event ree
-      res and on_error_string res
-      ris and on_info_string ris
-      self
-    end
-
-    def prepare * x_a
-      absrb_iambic_fully x_a
-      normalize_arg_pn @path
-      if ! @error_was_emitted && @list_as
-        normalize_list_as
-      end ; nil
-    end
-
-    def execute
-      if ! @error_was_emitted
-        if @list_as
-          r = execute_lister_and_resolve
-          r and r = send( r )  # e.g `tree` - same as below
-        else
-          r = tree
-        end
-      end
-      r
-    end
-
-    def get_mutex_list_as
-      @lister and @lister.get_mutex_list_as
+      @list_as_a = []
+      super
     end
 
   private
 
-    def normalize_arg_pn x
-      use_x = x || ''
-      begin
-        (( md = STRIP_TRAILING_RX_.match use_x )) or break send_error_string "your #{
-          }path looks funny - #{ x.inspect }"
-        @arg_pn = ::Pathname.new md[ :no_trailing ]
-      end while nil
-      nil
+    # API action hook-(out/in)s we implement are `normalize`, `execute`
+
+    def list_as=
+      @list_as_a.push iambic_property
+    end
+
+    def normalize
+      ok = nrmlz_path
+      ok && resolve_list_behavior
+    end
+
+    def nrmlz_path
+      md = STRIP_TRAILING_RX_.match @path
+      if md
+        @path = md[ :no_trailing ]
+        PROCEDE_
+      else
+        whine_about_invalid :path, '{{ noun }} looks funny: {{ x }}'
+      end
     end
 
     STRIP_TRAILING_RX_ = %r{ \A (?<no_trailing> / | .* [^/] ) /* \z }x
 
-    def normalize_list_as
-      @lister = self.class::Lister_.new :emit_p, method( :call_digraph_listeners ),
-        :list_as, @list_as, :hubs, hub_a,
-        :did_error_p, -> { @error_was_emitted }
-      @lister.normalize
+    def resolve_list_behavior
+      @hub_a = bld_hub_a
+      @hub_a and via_hub_array_resolve_list_behavior
     end
 
-    def execute_lister_and_resolve
-      @lister.execute_and_resolve
-    end
+    # ~ build hub array
 
-    def hub_a
-      @hub_a ||= get_hubs.to_a
-    end
-
-    def get_hubs
-      ::Enumerator.new do |y|
-        err = upstream.test_dir_pathnames.each do |dir|
-          baseglob = GLOB_H_.fetch dir.basename.to_s
-          sub_dir = dir
-          @sub_path_a and sub_dir = dir.join( @sub_path_a * SEP_ )
-          glob = sub_dir.join( "**/#{ baseglob }" ).to_s
-          y << SubTree::Models::Hub.new(
-            :test_dir_pn, dir,
-            :sub_path_a, @sub_path_a,
-            :lister_p, -> { @lister },
-            :info_tree_p, -> label, tree do
-              call_digraph_listeners :info_tree, label: label, tree: tree
-            end,
-            :local_test_pathname_ea, ::Enumerator.new do |yy|
-              ::Dir[ glob ].each do |path|
-                spec_pathname = ::Pathname.new path
-                shortpath = spec_pathname.relative_path_from sub_dir
-                yy << shortpath
-              end
-            end )
-          nil
+    def bld_hub_a
+      us = bld_upstream
+      @sub_path_a = us.sub_path_array
+      scn = us.test_dir_pathnames
+      scn and begin
+        @hub_yieldee = []
+        while @test_dir_pn = scn.gets
+          via_test_dir_pn
         end
-        send_error_string err if err
-        nil
+        a = @hub_yieldee ; @hub_yieldee = @test_dir_pn = nil ; a
       end
     end
-    #
+
+    def bld_upstream
+      Cov_::Model_Agents__::Upstream::Via_Filesystem.new :path, @path,
+        :be_verbose, ( @be_verbose || false ), # is strict about validation
+        :on_event, -> ev do
+          @event_receiver.receive_event ev
+        end
+    end
+
+    def via_test_dir_pn
+      dpn = @test_dir_pn
+      baseglob = GLOB_H_.fetch dpn.basename.to_s
+      sub_dir = if @sub_path_a
+        dpn.join( @sub_path_a * SEP_ )
+      else
+        dpn
+      end
+      _glob = sub_dir.join( "**/#{ baseglob }" ).to_s
+      yield_hub_object dpn, _glob, sub_dir
+      nil
+    end
+
     GLOB_H_ = SubTree::PATH.glob_h
 
-    def upstream
-      @upstream ||= begin
-        if @arg_pn
-          self.class::Upstream_::From_::Filesystem_.new :arg_pn, @arg_pn,
-            :info_p, get_info_p, :be_verbose, ( @be_verbose || false )
-        else
-          fail "implement me"
-        end
-      end
+    def yield_hub_object dpn, glob, sub_dir
+      _hub = SubTree_::Models::Hub.new(
+        :test_dir_pn, dpn,
+        :sub_path_a, @sub_path_a,
+        :list_behavior_proc, -> do
+          @list_behavior
+        end,
+        :info_tree_p, -> label, tree do
+          receive_info_tree label, tree
+        end,
+        :local_test_pathname_scan_proc, -> do
+          entry_a = ::Dir[ glob ]
+          Callback_::Scan.via_nonsparse_array entry_a do |entry_s|
+            _spec_pn = ::Pathname.new entry_s
+            _spec_pn.relative_path_from sub_dir
+          end
+        end )
+      @hub_yieldee.push _hub
+      nil
     end
 
-    def get_info_p
-      -> s { call_digraph_listeners :info_string, s }
+    # ~
+
+    def via_hub_array_resolve_list_behavior
+
+      @list_behavior = Cov_::Actors__::Build_list_behavior.with(
+        :hubs, @hub_a,
+        :argument_symbol_list, @list_as_a,
+        :on_event, -> ev do
+          send_event ev
+          nil
+        end )
+      @list_behavior ? ACHIEVED_ : UNABLE_
     end
 
-    def tree
-      if hub_a.length.zero?
-        send_error_event No_Directory__.new @arg_pn
-        false
+
+    # ~ HERE ~
+
+    def execute
+      @list_as = @list_behavior.special_format_symbol
+      if @list_as
+        when_special_format_execute
       else
-        self.class::Treeer_[ :hub_a, hub_a, :arg_pn, @arg_pn,
-          :card_p, -> card { call_digraph_listeners :tree_line_card, card } ]
+        when_tree_execute
       end
     end
+
+    def when_special_format_execute  # assume list_behavior is normal
+      @list_behavior.resolve_and_send_events
+      nil
+    end
+
+    def when_tree_execute
+      if @hub_a.length.zero?
+        when_no_directory
+      else
+        Cov_::Actors__::Produce_uber_tree.with(
+          :path, @path,
+          :hub_a, @hub_a,
+          :on_event, -> ev do
+            send_event ev  # tree card, done with tree
+          end )
+      end
+    end
+
+    def when_no_directory
+      send_event No_Directory__[ @path ].to_event
+      UNABLE_
+    end
+
+  public
+
+    # ~ event receiver methods
 
     class Message_  # wow this looks like an early version of [#br-011]
-      class << self ; alias_method :orig_new, :new end
-      def self.new &p
-        ::Class.new self do
-          const_set :P__, p
-          class << self ; alias_method :new, :orig_new end
-          self
+
+      class << self
+
+        alias_method :orig_new, :new
+
+        def new & p
+          ::Class.new self do
+            extend Module_Methods__
+            class << self
+              alias_method :new, :orig_new
+              private :new
+            end
+            const_set :P__, p
+            self
+          end
         end
       end
-      def initialize * a
-        @a = a ; nil
+
+      module Module_Methods__
+
+        def [] * a
+          new do
+            @a = a
+          end
+        end
+
+        def build_via_arglist a
+          new do
+            @a = a
+          end
+        end
       end
+
+      def initialize & p
+        instance_exec( & p )
+      end
+
       attr_reader :a
-      def p ; self.class::P__ end
+
+      def p
+        self.class::P__
+      end
+
+      def to_event
+        x_a = [ Callback_::Name.via_module( self.class ).as_trimmed_variegated_symbol ]
+        _NAME_I_A = []
+        p.parameters.each_with_index do |(_, i), d|
+          _NAME_I_A.push i
+          x_a.push i, @a.fetch( d )
+        end
+        x_a.push :original_message_proc, p
+        x_a.push :ok, false  # meh
+        SubTree_::Lib_::Event_lib[].inline_via_iambic_and_message_proc x_a, -> y, o do
+          x_a = ( _NAME_I_A.map do |i|
+            o.send i
+          end )
+          y << instance_exec( * x_a, & o.original_message_proc )
+        end
+      end
     end
 
-    No_Directory__ = Message_.new do |pn|
-      "Couldn't find test directory: #{ ick escape_path(
-        pn.join SubTree::PATH.test_dir_names_moniker ) }"
+    No_Directory__ = Message_.new do |path|
+      pn = ::Pathname.new path
+      pn_ = pn.join SubTree::PATH.test_dir_names_moniker
+      "Couldn't find test directory: #{ pth pn_ }"
     end
 
-    def say * actual_arg_a, & p
-      fail 'whet'
-      Messages_[ p ].new( * actual_arg_a )
-    end
+    ACHIEVED_ = true
+
+    Cov_ = self
+
+    Data_Event_ = Data_Event_
 
     TEST_DIR_NAME_A_ = SubTree_::Lib_::Test_dir_name_a[]
-    #
-    SOFT_RX_ = %r{(?:#{
-      TEST_DIR_NAME_A_.map( & ::Regexp.method( :escape ) ) * '|'
-    })}
-    #
-    HARD_RX_ = %r{ \A #{ SOFT_RX_.source } \z }x
-
-    Cov = self
-
   end
 end

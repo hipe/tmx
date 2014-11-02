@@ -4,16 +4,17 @@ module Skylab::SubTree
 
   class CLI
 
-  private
-
     Callback_[ self, :employ_DSL_for_digraph_emitter ]  # do this before you extend
       # legacy, it gives you a graph
 
-    def mutex name_i, value_i
-      @param_h[ name_i ] ||= [ ]
-      @param_h[ name_i ] << value_i
-      nil
+    listeners_digraph event: :all
+
+    def initialize( * )
+      @local_iambic = []
+      super
     end
+
+  private
 
     def get_services
       Client_Services_.new self
@@ -29,6 +30,12 @@ module Skylab::SubTree
 
     def pen
       SubTree::Lib_::CLI_pen[]
+    end
+
+  private
+
+    def expression_agent
+      self.class.expression_agent
     end
 
     -> do
@@ -49,10 +56,12 @@ module Skylab::SubTree
         end
         r = Expression_Agent__.method :new ; p = -> { r } ; r
       end
-      define_singleton_method :some_expression_agent,
+      define_singleton_method :expression_agent,
         Lib_::Touch_const_reader[
           true, p[], :EXPRESSION_AGENT__, self, :_no_arg_ ]
     end.call
+
+  public
 
     # --*--                         DSL ZONE                              --*--
 
@@ -182,42 +191,48 @@ module Skylab::SubTree
     desc "  * test files with corresponding application files appear as green."
     desc "  * application files with no corresponding test files appear as red."
 
-    argument_syntax '[<path>]'
+    argument_syntax '<path>'
 
     option_parser do |o|
 
       o.on '-l', '--list', "show a list of matched test files only." do
-        mutex :list_as, :list
+        @local_iambic.push :list_as, :list
       end
 
       o.on '-s', '--shallow', "show a shallow tree of matched test #{
           }files only." do
-        mutex :list_as, :test_tree_shallow
+        @local_iambic.push :list_as, :test_tree_shallow
       end
 
       -> do
+
         h = { 'c' => :code, 't' => :test }.freeze
+
         o.on '-t', '--tree <c|t>', "show a debugging tree of the raw #{
             }[c]ode and/or [t]est only." do |tc|
-          mutex :list_as, h.fetch( tc, & :intern )
+
+          _x = h.fetch( tc, & :intern )
+          @local_iambic.push :list_as, _x
         end
       end.call
 
       o.on '-v', '--verbose', 'verbose (debugging) output' do
-        @param_h[:be_verbose] = true
+        @local_iambic.push :verbose
       end
     end
 
-    def cov path=nil, _opts
-      @param_h[ :path ] = path
+    def cov path, _opts
+      @local_iambic.push :path, path
       _const = Name_.via_variegated_symbol( :cov ).as_const
-      hot = CLI::Actions.const_get( _const, false ).new.
-        init_for_invocation get_services
-      if false == (( r = hot.invoke @param_h ))
+      _cls = CLI::Actions.const_get _const, false
+      _act = _cls.new
+      hot = _act.init_for_invocation_via_services get_services
+      x = hot.invoke_via_iambic @local_iambic
+      if false == x
         invite
-        r = exitstatus_for_error
+        x = exitstatus_for_error
       end
-      r
+      x
     end
 
     # --*--

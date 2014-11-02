@@ -51,7 +51,7 @@ module Skylab::SubTree
       Bsc__[]::Box
     end
 
-    Bzn__ = sidesys[ :Brazen ]
+    Bzn_ = sidesys[ :Brazen ]
 
     Clear_pwd_cache = -> do
       System[].filesystem.path_tools.clear
@@ -74,7 +74,7 @@ module Skylab::SubTree
     end
 
     Properties_stack_frame = -> * a do
-      Bzn__[].properties_stack.common_frame.via_arglist a
+      Bzn_[].properties_stack.common_frame.via_arglist a
     end
 
     Distill_proc = -> do
@@ -90,18 +90,22 @@ module Skylab::SubTree
     end
 
     Entity = -> * a do
-      Bzn__[]::Entity.via_arglist a
+      Bzn_[]::Entity.via_arglist a
     end
 
     Entity_via_iambic = -> x_a do
       client = x_a.fetch 0
-      :fields == x_a.fetch( 1 ) or raise ::ArgumentError
+      :properties == x_a.fetch( 1 ) or raise ::ArgumentError
       x_a[ 0, 2 ] = EMPTY_A__
       Basic_fields[ :client, client,
         :absorber, :initialize,
         :field_i_a, x_a ]
     end
     EMPTY_A__ = [].freeze  # etc
+
+    Event_lib = -> do
+      Bzn_[].event
+    end
 
     Face__ = sidesys[ :Face ]
 
@@ -139,6 +143,10 @@ module Skylab::SubTree
       Bsc__[]::Method
     end
 
+    Module_lib = -> do
+      Bsc__[]::Module
+    end
+
     NLP_EN_lib = -> do
       HL__[]::NLP::EN
     end
@@ -167,6 +175,10 @@ module Skylab::SubTree
 
     Strange_proc = -> do
       MH__[].strange.to_proc
+    end
+
+    String_lib = -> do
+      Bsc__[]::String
     end
 
     Struct = -> * i_a do

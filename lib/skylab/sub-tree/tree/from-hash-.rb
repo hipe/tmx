@@ -4,7 +4,7 @@ module Skylab::SubTree
 
     class From_hash_
 
-      Entity_[ self, :fields, :client, :hash ]
+      Entity_[ self, :properties, :client, :hash ]
 
       def execute
         work @client.new, @hash

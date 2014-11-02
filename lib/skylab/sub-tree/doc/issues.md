@@ -1,4 +1,9 @@
-[#009] #open gut the fucked up event model of `cov`
+[#014] #open - don't use this any more, use pn
+[#013] #open was SubTree::CLI.expression_agent  but it sucks so hard
+[#012] #open change this to reduce when it works
+[#011] #open - cover this
+[#010] #open in cov replace olschool [mh] basic fields with actors
+[#009]       #done gut the fucked up event model of `cov`
 [#008]       #done immigrate [#po-018] tree
 [#007]       #node-tracker: the tree walker
 [#006]       #doc-node the my tree narrative ..

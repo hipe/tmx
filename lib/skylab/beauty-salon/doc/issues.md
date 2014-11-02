@@ -1,3 +1,4 @@
+[#015]       "ok chains" instead of "begin ; end while nil" hacks
 [#014]       #doc-node the `deliterate` utility
 [#013]       the problem with functions ..
 [#012]       #doc-point "private fold method" defined and explored..

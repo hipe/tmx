@@ -7,8 +7,8 @@ module Skylab::SubTree
       mod.include Instance_Methods__ ; nil
     end
 
-    Entity_ = -> client, _fields_, * i_a do
-      :fields == _fields_ or raise ::ArgumentError, "'fields' not '#{ _fields_ }'"
+    Entity_ = -> client, _props_, * i_a do
+      :properties == _props_ or raise ::ArgumentError, "'properties' not '#{ _fields_ }'"
       SubTree_::Lib_::Funcy_globless[ client ]
       def client.call_via_iambic x_a
         new( x_a ).execute
@@ -47,7 +47,7 @@ module Skylab::SubTree
     module Instance_Methods__
 
       class Construction_
-        Entity_[ self, :fields, :slug, :name_services ]
+        Entity_[ self, :properties, :slug, :name_services ]
         attr_reader :slug, :name_services
       end
 

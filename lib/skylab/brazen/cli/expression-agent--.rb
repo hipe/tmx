@@ -23,6 +23,10 @@ module Skylab::Brazen
 
       alias_method :calculate, :instance_exec
 
+      def and_ a
+        _NLP_agent.and_ a
+      end
+
       def app_name
         Brazen_.name_function.as_human
       end
@@ -36,16 +40,16 @@ module Skylab::Brazen
       STRONG__ = 1
 
       def code string
-        "'#{ stylize CODE_STYLE__, string }'"
+        "'#{ styl CODE_STYLE__, string }'"
       end
       CODE_STYLE__ = [ GREEN__ ].freeze
 
       def hdr string
-        stylize HIGHLIGHT_STYLE__, "#{ string }:"
+        styl HIGHLIGHT_STYLE__, "#{ string }:"
       end
 
       def highlight string
-        stylize HIGHLIGHT_STYLE__, string
+        styl HIGHLIGHT_STYLE__, string
       end
       HIGHLIGHT_STYLE__ = [ STRONG__, GREEN__ ].freeze
 
@@ -72,6 +76,10 @@ module Skylab::Brazen
 
       def preterite_verb lemma_i
         _NLP_agent.preterite_verb[ lemma_i.id2name ]
+      end
+
+      def progressive_verb lemma_i
+        _NLP_agent.progressive_verb[ lemma_i ]
       end
 
       def property_default
@@ -106,13 +114,17 @@ module Skylab::Brazen
         "« #{ prop.name.as_human } »"  # :+#guillemets
       end
 
+      public def stylize s, * i_a
+        Brazen_::Lib_::Old_CLI_lib[].pen.stylify i_a, s
+      end
+
       def val s
         s.inspect
       end
 
       # ~ support
 
-      def stylize style_d_a, string
+      def styl style_d_a, string
         "\e[#{ style_d_a.map( & :to_s ).join( ';' ) }m#{ string }\e[0m"
       end
 

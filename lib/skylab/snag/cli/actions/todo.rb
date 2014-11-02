@@ -54,7 +54,7 @@ module Skylab::Snag
       tree
     end
 
-    desc "melt is insanity"
+    desc "EXPERIMENTAL - edit files in place by turning TODO's into issues"
 
     option_parser do |o|
       dry_run_option o

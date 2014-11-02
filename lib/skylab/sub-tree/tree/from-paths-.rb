@@ -4,7 +4,7 @@ module Skylab::SubTree
 
     class From_paths_
 
-      Entity_[ self, :fields, :client, :paths, :init_node ]
+      Entity_[ self, :properties, :client, :paths, :init_node ]
 
       def execute
         root = @client.new :name_services, @client.new

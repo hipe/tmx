@@ -19,7 +19,7 @@ module Skylab::TestSupport::Regret::API
     end
 
     def get_template i
-      Lib_::String_lib[].template.from_path(
+      Lib_::String_lib[].template.via_path(
         self.class.dir_pathname.join "#{ i }#{ EXT__ }" )
     end
 

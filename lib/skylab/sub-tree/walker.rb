@@ -8,6 +8,8 @@ module SubTree  # #borrow-one-indent - load this solo but it needs meta hell
 
     # experimental interface, pub-sub-like, *somewhat*
 
+    # #deprecated for [br], see [#cu-003]
+
     def self.new * a
       if 1 == a.length
         super a.first
@@ -37,7 +39,7 @@ module SubTree  # #borrow-one-indent - load this solo but it needs meta hell
     attr_reader :pn, :top
 
     def set_path x
-      @path = x  # #todo:during:3
+      @path = x
       @pn = ::Pathname.new x
       @pn.absolute? or resolve_some_absolute_path ; nil
     end
@@ -257,7 +259,7 @@ module SubTree  # #borrow-one-indent - load this solo but it needs meta hell
       end
 
       report_error = -> p_a_, top_norm_a do
-        _big = -> do  # #todo:for:release
+        _big = -> do
           p_a_.reduce( [] ) do |m, x|
             m << Distill__[ x ] if '' != x ; m
           end * SPACE_

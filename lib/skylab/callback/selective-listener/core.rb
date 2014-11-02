@@ -18,6 +18,11 @@ module Skylab::Callback
         Make_via_didactic_matrix__[ a, a_ ]
       end
 
+      def methodic delegate, * x_a
+        x_a.push :delegate, delegate
+        Selective_Listener_::Methodic__.build_via_iambic x_a
+      end
+
       def spy_proxy & p
         Spy_Proxy__.new( & p )
       end
@@ -167,5 +172,7 @@ module Skylab::Callback
     class Via_Proc__ < ::Proc
       alias_method :maybe_receive_event, :call
     end
+
+    Selective_Listener_ = self
   end
 end

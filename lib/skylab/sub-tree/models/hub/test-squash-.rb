@@ -14,7 +14,7 @@ module Skylab::SubTree
 
       Lib_::Funcy_globless[ self ]
 
-      Entity_[ self, :fields, :app_hub_pn, :test_dir_pn, :tree ]
+      Entity_[ self, :properties, :app_hub_pn, :test_dir_pn, :tree ]
 
       def execute
         @test_dir_path_is_monadic = ! @test_dir_pn.to_s.include?( SEP_ )

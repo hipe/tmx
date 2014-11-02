@@ -75,7 +75,7 @@ module Skylab::SubTree
 
           class Modus_Operandus__
 
-            Entity_[ self, :fields,
+            Entity_[ self, :properties,
               :shape_i,
               :match,
               :dupe,

@@ -7,14 +7,14 @@ module Skylab::Basic
     class << self
 
       def [] template_str, param_h
-        from_string( template_str ).call param_h
+        via_string( template_str ).call param_h
       end
 
-      def from_path path
+      def via_path path
         new :pathname, ( path ? ::Pathname.new( path.to_s ) : path )
       end
 
-      def from_string string
+      def via_string string
         new :string, string
       end
 

@@ -4,7 +4,7 @@ module Skylab::SubTree
 
     class Fetch_or_create_
 
-      Entity_[ self, :fields,
+      Entity_[ self, :properties,
         :client,
         :do_create,
         :else_p,

@@ -84,7 +84,8 @@ module Skylab::SubTree::TestSupport::CLI
 
     def bld_emit_spy
       Callback_.test_support.call_digraph_listeners_spy(
-        :do_debug_proc, -> { do_debug } )
+        :do_debug_proc, -> { do_debug },
+        :debug_IO, debug_stream )
     end
 
     def line
@@ -111,7 +112,7 @@ module Skylab::SubTree::TestSupport::CLI
         @names.push e.stream_name
         ev = e.payload_x
         _s = if ev.respond_to? :ascii_only? then ev else
-          _exag = SubTree_::CLI.some_expression_agent
+          _exag = SubTree_::CLI.expression_agent
           _exag.calculate( * ev.a, & ev.p )
         end
         p[ _s ]

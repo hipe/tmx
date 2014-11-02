@@ -301,36 +301,10 @@ module Skylab::Flex2Treetop
 
     def init_via_iambic x_a
       process_iambic_fully x_a
-      nrmlz
+      via_default_proc_and_is_required_normalize
     end
 
-    def nrmlz  # #note-320 (new)
-      scn = self.class.properties.to_scan
-      miss_a = []
-      while prop = scn.gets
-        ivar = prop.as_ivar
-        x = if instance_variable_defined? ivar
-          instance_variable_get ivar
-        else
-          instance_variable_set ivar, nil
-        end
-        if x.nil?
-          if prop.default_proc
-            x = prop.default_proc[]
-            instance_variable_set ivar, x
-          end
-        end
-        if prop.is_required && x.nil?
-          miss_a.push prop
-        end
-      end
-      if miss_a.length.nonzero?
-        _ev = bld_missing_event miss_a
-        raise _ev.to_exception
-      end
-    end
-
-    def bld_missing_event miss_a
+    def build_missing_required_properties_event miss_a  # #hook-in->[cb]
       Lib_::Bzn_[]::Entity.properties_stack.
         build_missing_required_properties_event(
           miss_a, 'iambic parameter', "'#{ moniker_for_errmsg }' is" )
