@@ -41,7 +41,7 @@ module Skylab::Brazen
 
         def via_section_delete_section
           ss = @subsection_id
-          sect_s, subs_s = ss.to_a
+          subs_s, sect_s = ss.to_a
           _compare_p = -> item do
             if :section_or_subsection == item.symbol_i
               d = sect_s <=> item.normalized_name_s

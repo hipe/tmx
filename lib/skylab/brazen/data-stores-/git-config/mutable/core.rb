@@ -107,7 +107,7 @@ module Skylab::Brazen
         end
 
         def when_before_section  # the starting state (only), set by parent
-          sect = Section_Or_Subsection__.via_parse self
+          sect = Section_or_Subsection__.via_parse self
           sect and begin
             accept_sect sect
             PROCEDE_
@@ -115,7 +115,7 @@ module Skylab::Brazen
         end
 
         def when_section_or_assignment
-          sect = Section_Or_Subsection__.peek_via_parse self
+          sect = Section_or_Subsection__.peek_via_parse self
           if sect
             sect.parse_after_peek and begin
               accept_sect sect
@@ -491,24 +491,25 @@ module Skylab::Brazen
 
         SYMBOL_I = :section_or_subsection
 
-        def touch_section section_name_s, subsection_name_s=nil
-          section = bld_section section_name_s, subsection_name_s
+        def touch_section subsect_s=nil, sect_s
+          section = bld_section subsect_s, sect_s
           section and begin
             _compare_p = bld_compare section
             touch_comparable_item section, _compare_p
           end
         end
 
-        def delete_section section_name_s, subsection_name_s, err_p
-          section = bld_section section_name_s, subsection_name_s
+        def delete_section subsect_s, sect_s, err_p
+          self._NOT_COVERED   # #todo
+          section = bld_section subsect_s, sect_s
           section and begin
             _compare_p = bld_compare section
             delete_comparable_item section, _compare_p, err_p
           end
         end
 
-        def bld_section s, s_
-          Section_Or_Subsection__.via_literals s, s_, @parse
+        def bld_section subsect_s, sect_s
+          Section_or_Subsection__.via_literals subsect_s, sect_s, @parse
         end
 
         def bld_compare section
@@ -542,12 +543,12 @@ module Skylab::Brazen
         end
       end
 
-      class Section_Or_Subsection__
+      class Section_or_Subsection__
 
         class << self
 
           def via_parse parse
-            branch = Section_Or_Subsection_Parse__.new parse
+            branch = Section_or_Subsection_Parse__.new parse
             branch.parse and begin
               new branch
             end
@@ -556,14 +557,14 @@ module Skylab::Brazen
           def peek_via_parse parse
             d = parse.string_scanner.skip OPEN_BRACE_RX_
             if d
-              branch = Section_Or_Subsection_Parse__.new parse
+              branch = Section_or_Subsection_Parse__.new parse
               branch.receive_peek_width d
               new branch
             end
           end
 
-          def via_literals s, s_, parse
-            kernel = Section_Or_Subsection_Literal__.new s, s_, parse
+          def via_literals subsect_s, sect_s, parse=nil
+            kernel = Section_or_Subsection_Literal__.new subsect_s, sect_s, parse
             kernel.resolve and begin
               new kernel
             end
@@ -663,9 +664,9 @@ module Skylab::Brazen
 
       Event_Sending_Node__ = ::Class.new
 
-      Section_Or_Subsection_Kernel__ = ::Class.new Event_Sending_Node__
+      Section_or_Subsection_Kernel__ = ::Class.new Event_Sending_Node__
 
-      class Section_Or_Subsection_Parse__ < Section_Or_Subsection_Kernel__
+      class Section_or_Subsection_Parse__ < Section_or_Subsection_Kernel__
 
         include Mutable_Branch_Methods__, Readable_Branch_Methods__
 
@@ -882,12 +883,12 @@ module Skylab::Brazen
         end
       end
 
-      class Section_Or_Subsection_Literal__ < Section_Or_Subsection_Kernel__
+      class Section_or_Subsection_Literal__ < Section_or_Subsection_Kernel__
 
-        def initialize s, s_, parse
+        def initialize subsect_s, sect_s, parse
           @parse = parse
-          @unsanitized_sect_s = s
-          @unsanitized_subsect_s = s_ ; nil
+          @unsanitized_sect_s = sect_s
+          @unsanitized_subsect_s = subsect_s
         end
 
         def is_empty
@@ -898,7 +899,7 @@ module Skylab::Brazen
           unparse_into_yielder y=[]
           _parse = Parse__.with :via_string_for_immediate_parse, y * EMPTY_S_,
             :receive_events_via_event_receiver, @parse.event_receiver
-          otr = Section_Or_Subsection_Parse__.new _parse
+          otr = Section_or_Subsection_Parse__.new _parse
           otr.parse or self._SYNTAX_MISMATCH
           otr
         end
@@ -988,12 +989,20 @@ module Skylab::Brazen
           @normalized_sect_s = @sect_s.downcase
           @normalized_name_i = @normalized_sect_s.intern ; nil
         end
+
+        def send_event ev
+          if event_receiver
+            super
+          else
+            raise ev.to_exception
+          end
+        end
       end
 
       SECTION_NAME_RX_ = /[-A-Za-z0-9.]+/
       ANCHORED_SECTION_NAME_RX_ = /\A#{ SECTION_NAME_RX_.source }\z/
 
-      class Section_Or_Subsection_Kernel__
+      class Section_or_Subsection_Kernel__
 
         def normalized_name_i
           @normalized_sect_i

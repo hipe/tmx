@@ -29,13 +29,13 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable
       end
 
       it "add a section with a subsection" do
-        touch_section 'foo', 'bar'
+        touch_section 'bar', 'foo'
         expect_document_content "[foo \"bar\"]\n"
       end
 
       it "add a section with a subsection with an invalid name" do
         _secs = document.sections
-        ok = _secs.touch_section 'foo', "bar\nbaz"
+        ok = _secs.touch_section "bar\nbaz", 'foo'
         expect_event :invalid_subsection_name,
           /\Asubsection names can contain any characters except newline #{
            }\(\(ick "bar\\n"\)\)\z/
@@ -72,7 +72,7 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable
       with_a_document_with_one_subsection_called_foo_bar
 
       it "add a subsection that comes before (because ss)" do
-        touch_section 'foo', 'baq'
+        touch_section 'baq', 'foo'
         expect_document_content "[foo \"baq\"]\n[foo \"bar\"]\n"
       end
 
@@ -82,12 +82,12 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable
       end
 
       it "add the same subsection" do
-        touch_section 'foo', 'bar'
+        touch_section 'bar', 'foo'
         expect_document_content "[foo \"bar\"]\n"
       end
 
       it "add a subsection that comes after" do
-        touch_section 'foo', 'baz'
+        touch_section 'baz', 'foo'
         expect_document_content "[foo \"bar\"]\n[foo \"baz\"]\n"
       end
 

@@ -243,7 +243,7 @@ module Skylab::Brazen
       attr_reader :section_s, :subsection_s, :escaped_subsection_s
 
       def to_a
-        [ @section_s, @subsection_s ]
+        [ @subsection_s, @section_s ]
       end
 
       def to_silo_name_i

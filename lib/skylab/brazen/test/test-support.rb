@@ -16,6 +16,8 @@ module Skylab::Brazen::TestSupport
 
   Brazen_ = ::Skylab::Brazen
 
+  Callback_ = Brazen_::Callback_
+
   TestLib_ = ::Module.new
 
   module Constants
@@ -58,11 +60,18 @@ module Skylab::Brazen::TestSupport
       TS_::Expect_Event[ test_context_cls ]
     end
 
+    Fileutils = Callback_.memoize do
+      require 'fileutils'
+      ::FileUtils
+    end
+
     Tmpdir = memoize[ -> do
       sys = Brazen_::Lib_::System[]
       _path = sys.defaults.dev_tmpdir_pathname.join( 'brzn' ).to_path
       sys.filesystem.tmpdir :path, _path
     end ]
+
+    System = Brazen_::Lib_::System
 
   end
 end
