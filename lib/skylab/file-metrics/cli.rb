@@ -111,7 +111,7 @@ module Skylab::FileMetrics
           @ui ||= UI.new @out, @err
           _const_i = Callback_::Name.via_variegated_symbol( name_i ).
             as_camelcase_const
-          _cls = FileMetrics::API::Actions.const_get _const_i, false
+          _cls = FM_::API::Actions.const_get _const_i, false
           _cls.run @ui, @param_h
         end
         private :api_call

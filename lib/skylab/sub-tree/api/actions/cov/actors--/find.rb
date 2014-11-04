@@ -4,7 +4,7 @@ module Skylab::SubTree
 
   class API::Actions::Cov
 
-    class Actors__::Find  # :+[#sl-118] first scan-based implementation
+    class Actors__::Find  # :+[#hl-171] first scan-based implementation
 
       Callback_::Actor.call self, :properties,
         :path,

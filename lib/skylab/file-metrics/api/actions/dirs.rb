@@ -7,7 +7,7 @@ module Skylab::FileMetrics
     include API::Common::InstanceMethods
 
     def run
-      c = FileMetrics::Models::Count.new("folders summary")
+      c = FM_::Models::Count.new("folders summary")
       find_cmd = build_find_dirs_command
       @req[:show_commands] and @ui.err.puts(find_cmd)
       dirs = %x{#{find_cmd}}.split("\n")
@@ -49,7 +49,7 @@ module Skylab::FileMetrics
 
     # (we are trying to keep some ancient code for posterity for now ..)
     module Models
-      Count = FileMetrics::Models::Count.subclass :num_files,
+      Count = FM_::Models::Count.subclass :num_files,
         :num_lines, :total_share, :max_share, :lipstick_float, :lipstick
     end
 
@@ -58,7 +58,7 @@ module Skylab::FileMetrics
   private
 
     def build_find_dirs_command
-      Library_::Find.valid( -> c do
+      FM_::Lib_::System[].filesystem.find.valid( -> c do
         c.add_path @req[:path]
         c.concat_skip_dirs @req[:exclude_dirs]
         c.concat_names @req[:include_names]
@@ -84,7 +84,7 @@ module Skylab::FileMetrics
             [ :total_share,         prerender: percent ],
             [ :max_share,           prerender: percent ],
             [ :lipstick_float,      :noop ],
-            [ :lipstick,            FileMetrics::CLI::Lipstick.instance.field_h ]
+            [ :lipstick,            FM_::CLI::Lipstick.instance.field_h ]
           ]
           field[:label].summary -> do
             'Total: '

@@ -2,7 +2,7 @@ module Skylab::SubTree
 
   SubTree::Library_.touch :Shellwords
 
-  class Find_Command_  # [#sl-118]
+  class Find_Command_  # :+[#hl-171]
 
     def initialize
       @error_p ||= -> msg { raise msg }

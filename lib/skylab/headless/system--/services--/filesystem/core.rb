@@ -20,6 +20,10 @@ module Skylab::Headless
         end
       end
 
+      def find
+        Filesystem_::Find__
+      end
+
       def line_scanner_via_path path, num_bytes=nil
         Headless_::IO.line_scanner ::File.open( path, READ_MODE_ ), num_bytes
       end

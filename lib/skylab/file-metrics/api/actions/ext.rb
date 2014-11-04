@@ -52,7 +52,7 @@ module Skylab::FileMetrics
 
   private
 
-    Count = FileMetrics::Models::Count.subclass :total_share, :max_share,
+    Count = FM_::Models::Count.subclass :total_share, :max_share,
       :lipstick_float, :lipstick
 
     Count_ = ::Struct.new :extension, :count
@@ -145,7 +145,7 @@ module Skylab::FileMetrics
             [ :total_share,         prerender: percent ],
             [ :max_share,           prerender: percent ],
             [ :lipstick_float,      :noop ],
-            [ :lipstick,            FileMetrics::CLI::Lipstick.instance.field_h ]
+            [ :lipstick,            FM_::CLI::Lipstick.instance.field_h ]
           ]
         end
       end

@@ -21,7 +21,7 @@ module Skylab::FileMetrics::TestSupport::CLI
       expt_desc "header / first line / summary line"
 
       memoize_output_lines do
-        FileMetrics::Library_::FileUtils.cd FileMetrics.dir_pathname.to_s do
+        FM_::Library_::FileUtils.cd FM_.dir_pathname.to_s do
           invoke [ 'lc', '.' ]  # le dorky [#006], [#007]
         end
       end
@@ -56,7 +56,7 @@ module Skylab::FileMetrics::TestSupport::CLI
       expt_desc 'header looks good'
 
       memoize_output_lines do
-        FileMetrics::Library_::FileUtils.cd FileMetrics.dir_pathname.to_s do
+        FM_::Library_::FileUtils.cd FM_.dir_pathname.to_s do
           invoke [ 'ext', '.' ]  # more dorky [#006], [#007]
         end
       end
@@ -72,7 +72,7 @@ module Skylab::FileMetrics::TestSupport::CLI
         arr.length.should eql( 5 )
         lbl, num, pc1, pc2, lip = arr
         lbl.should eql( '*.rb' )
-        expect_integer num, 15..18  # greetings from the past
+        expect_integer num, 14..14  # greetings from the past
         expect_percent pc1
         expect_percent pc2, 100.0
         expect_pluses lip, floor..MAX_NUM_PLUSES__
@@ -92,7 +92,7 @@ module Skylab::FileMetrics::TestSupport::CLI
       ptrn '2.3x3'
 
       memoize_output_lines do
-        FileMetrics::Library_::FileUtils.cd( FileMetrics.dir_pathname.to_s ) do
+        FM_::Library_::FileUtils.cd( FM_.dir_pathname.to_s ) do
           invoke [ 'dirs', '.' ]  # still dorky [#006], [#007]
         end
       end

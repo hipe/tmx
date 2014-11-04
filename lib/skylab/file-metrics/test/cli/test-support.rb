@@ -17,7 +17,7 @@ module Skylab::FileMetrics::TestSupport::CLI
     include Constants
 
     def client_class
-      FileMetrics::CLI
+      FM_::CLI
     end
 
   end

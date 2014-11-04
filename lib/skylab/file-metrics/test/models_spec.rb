@@ -45,7 +45,7 @@ module Skylab::FileMetrics::TestSupport::Models
     context "a produced subclass with one field" do
 
       with_klass do
-        FileMetrics::Model::Node::Structure.new :foo
+        FM_::Model::Node::Structure.new :foo
       end
 
       it "trying to pass too many args - arg error" do
@@ -71,7 +71,7 @@ module Skylab::FileMetrics::TestSupport::Models
     context "a produced subclass with multiple fields" do
 
       with_klass do
-        FileMetrics::Model::Node::Structure.new :fee, :fi, :fo, :fum
+        FM_::Model::Node::Structure.new :fee, :fi, :fo, :fum
       end
 
       it "internally, nils are set for all fields" do
@@ -101,7 +101,7 @@ module Skylab::FileMetrics::TestSupport::Models
 
       it "does" do
         kls1 = ::Class.new(
-          FileMetrics::Model::Node::Structure.new :foo, :bar )
+          FM_::Model::Node::Structure.new :foo, :bar )
 
         Sandbox.kiss kls1
 

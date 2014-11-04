@@ -109,6 +109,10 @@ module Skylab::FileMetrics
       end
     end ]
 
+    System = -> do
+      HL__[].system
+    end
+
     System_open2 = -> mod do
       mod.include Face__[]::Open2
     end
@@ -116,7 +120,7 @@ module Skylab::FileMetrics
 
   Face_ = Lib_::Face_top[]
 
-  FileMetrics = self
+  FM_ = self
 
   MONADIC_TRUTH_ = -> _ { true }
 

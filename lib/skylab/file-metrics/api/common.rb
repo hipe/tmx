@@ -30,7 +30,7 @@ module Skylab::FileMetrics
     end
 
     def build_find_files_command path_a
-      FileMetrics::Library_::Find.valid -> c do
+      FM_::Lib_::System[].filesystem.find.valid -> c do
         c.concat_paths path_a
         c.concat_skip_dirs @req[:exclude_dirs]
         c.concat_names @req[:include_names]
@@ -45,7 +45,7 @@ module Skylab::FileMetrics
 
     def stdout_lines command_string, y
       tsa_limit = ( @tsa_limit ||= 0.33 )  # tsa = time since activity
-      FileMetrics::Library_::Open3.popen3 command_string do |_, sout, serr|
+      FM_::Library_::Open3.popen3 command_string do |_, sout, serr|
         er = nil
         select = Lib_::Select[]
         select.timeout_seconds = 5.0  # exaggerated amount for fun

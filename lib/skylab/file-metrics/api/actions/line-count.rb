@@ -27,7 +27,7 @@ module Skylab::FileMetrics
       res
     end
 
-    LineCount = FileMetrics::Models::Count.subclass :total_share, :max_share,
+    LineCount = FM_::Models::Count.subclass :total_share, :max_share,
       :lipstick, :lipstick_float
 
   private
@@ -75,7 +75,7 @@ module Skylab::FileMetrics
             [ :total_share,         prerender: percent ],
             [ :max_share,           prerender: percent ],
             [ :lipstick_float,      :noop ],
-            [ :lipstick,            FileMetrics::CLI::Lipstick.instance.field_h ]
+            [ :lipstick,            FM_::CLI::Lipstick.instance.field_h ]
           ]
           field[:label].summary -> do
               "Total: #{ count.child_count }"

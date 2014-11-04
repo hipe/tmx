@@ -1,3 +1,4 @@
+[#171]       [ the find command ]
 [#170] #open stateful IO dry stub so that `close` is better mocked
 [#169]       #doc-node [ IO mapppers tee ]
 [#168]       #doc-node option scan ..

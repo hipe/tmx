@@ -1,6 +1,10 @@
-module Skylab::FileMetrics
+module Skylab::Headless
 
-  class Library_::Find # [#sl-118] one day they will be unified
+  module System__
+
+    class Services__::Filesystem
+
+      class Find__  # :[#171].
 
     class << self
       private :new
@@ -88,7 +92,7 @@ module Skylab::FileMetrics
 
     -> do  # `string`
 
-      shellescape_path = Lib_::Shellescape_path[]
+      shellescape_path = ::Skylab::FileMetrics::Lib_::Shellescape_path[]  # this will go away IMMEDIATELY
 
       define_method :string do
         part_a = [ "find" ]
@@ -115,5 +119,7 @@ module Skylab::FileMetrics
     # undef_method :to_s  # catches errors, we should be explicit
     alias_method :to_s, :string  # so we can keep some charming legacy code
 
+      end
+    end
   end
 end
