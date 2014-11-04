@@ -107,9 +107,15 @@ module Skylab::SubTree
         end
 
         def find_with_find
-          @result = Cov_::Actors__::Find.with(
+          @result = SubTree_::Lib_::System[].filesystem.find(
             :path, @path,
-            :selective_listener, selective_listener_for_find )
+            :freeform_query_infix, '-type dir',
+            :filenames, TEST_DIR_NAME_A_,
+            :on_event_selectively,
+              selective_listener_for_find.method( :maybe_receive_event ),
+            :as_normal_value, -> command do
+              command.to_scan
+            end )
           nil
         end
 

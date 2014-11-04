@@ -103,6 +103,12 @@ module Skylab::Headless
           @any_valid_command_string
         end
 
+        def to_scan
+          @any_valid_command_string and begin
+            Find__::Build_scan__[ @on_event_selectively, @any_valid_command_string ]
+          end
+        end
+
       private
 
         def filename=
@@ -162,8 +168,12 @@ module Skylab::Headless
           nil
         end
 
-        Command_String_Event__ = Headless_::Lib_::Event_lib[].
-          data_event_class_factory.new :command_string
+        Command_String_Event__ = Headless_::Lib_::Event_lib[].prototype_with(
+
+            :command_string, :command_string, nil, :ok, nil ) do |y, o|
+
+          y << "generated `find` command: #{ o.command_string }"
+        end
 
         module Command_String_Building_Methods__
 
