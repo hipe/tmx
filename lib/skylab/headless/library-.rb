@@ -112,6 +112,11 @@ module Skylab::Headless
       MH__[].strange::A_REASONABLY_SHORT_LENGTH_FOR_A_STRING
     end
 
+    Shellwords = Callback_.memoize do
+      require 'shellwords'
+      ::Shellwords
+    end
+
     Strange = -> x do
       MH__[].strange x
     end

@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  module Pathname
+  module Pathname  # see [#004]
 
     class << self
 

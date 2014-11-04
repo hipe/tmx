@@ -8,9 +8,8 @@ module Skylab::FileMetrics
 
     def run
       c = FM_::Models::Count.new("folders summary")
-      find_cmd = build_find_dirs_command
-      @req[:show_commands] and @ui.err.puts(find_cmd)
-      dirs = %x{#{find_cmd}}.split("\n")
+      _find_cmd_s = build_find_dirs_command_string
+      dirs = %x{#{ _find_cmd_s }}.split "\n"  # :NEWLINE_.
       if @req[:show_files_list] || @req.fetch( :debug_volume )
         @ui.err.puts( dirs )
       end
@@ -57,15 +56,26 @@ module Skylab::FileMetrics
 
   private
 
-    def build_find_dirs_command
-      FM_::Lib_::System[].filesystem.find.valid( -> c do
-        c.add_path @req[:path]
-        c.concat_skip_dirs @req[:exclude_dirs]
-        c.concat_names @req[:include_names]
-        c.extra = '-a -maxdepth 1 -type d'
-      end, -> msg do
-        fail "no - #{ msg }"
-      end ).string
+    def build_find_dirs_command_string
+
+      FM_::Lib_::System[].filesystem.find(
+        :path, @req[ :path ],
+        :ignore_dirs, @req[ :exclude_dirs ],
+        :filenames, @req[ :include_names ],
+        :freeform_query_infix, '-a -maxdepth 1 -type d',
+        :on_event_selectively, -> i, * _, & p do
+          if :info == i
+            if @req[ :show_commands ]
+              _ev = p[]
+              @ui.err.puts _ev.command_string
+            end
+          else
+            raise ev.to_exception
+          end
+        end,
+        :as_normal_value, -> command do
+          command.string
+        end )
     end
 
     -> do  # `render_table`

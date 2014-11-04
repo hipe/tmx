@@ -30,12 +30,19 @@ module Skylab::FileMetrics
     end
 
     def build_find_files_command path_a
-      FM_::Lib_::System[].filesystem.find.valid -> c do
-        c.concat_paths path_a
-        c.concat_skip_dirs @req[:exclude_dirs]
-        c.concat_names @req[:include_names]
-        c.extra = '-not -type d'
-      end, method( :error )
+
+      FM_::Lib_::System[].filesystem.find(
+        :paths, path_a,
+        :ignore_dirs, @req[ :exclude_dirs ],
+        :filenames, @req[ :include_names ],
+        :freeform_query_infix, '-not -type d',
+        :as_normal_value, -> x { x }, # :IDENTITY_.
+        :on_event_selectively, -> i, *_, & p do
+          if :info != i
+            _ev = p.call
+            error _ev  # #todo
+          end
+        end )
     end
 
     # `stdout_lines` - write each (chomped) line of stdout that results from

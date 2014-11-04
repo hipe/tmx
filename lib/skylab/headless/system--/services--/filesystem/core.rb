@@ -2,7 +2,7 @@ module Skylab::Headless
 
   module System__
 
-    class Services__::Filesystem
+    class Services__::Filesystem  # :[#130].
 
       def initialize system
         @system = system
@@ -20,8 +20,8 @@ module Skylab::Headless
         end
       end
 
-      def find
-        Filesystem_::Find__
+      def find * x_a
+        Filesystem_::Find__.mixed_via_iambic x_a
       end
 
       def line_scanner_via_path path, num_bytes=nil

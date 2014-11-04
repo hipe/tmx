@@ -144,7 +144,7 @@ module Skylab::Headless
               end
               _path = o.path_arg.value_x
 
-              y << "updating#{ _zero_note } #{ pth _path }#{ _zero_note }"
+              y << "updating#{ _zero_note } #{ pth _path }"
             end
             send_event _ev ; nil
           end

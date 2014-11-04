@@ -1,7 +1,7 @@
 # encoding: UTF-8
 module Skylab::Headless
 
-  module CLI::Tree__
+  module CLI::Tree__  # :[#172].
 
     class << self
 
