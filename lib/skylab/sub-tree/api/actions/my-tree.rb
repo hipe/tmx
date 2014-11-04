@@ -2,7 +2,7 @@ module Skylab::SubTree
 
   class API::Actions::My_Tree
 
-    SubTree::Lib_::Enhance_as_API_normalizer[ self, :all ]
+    SubTree_::Lib_::Enhance_as_API_normalizer[ self, :all ]
 
     Lib_::Basic_fields[ :client, self,
       :absorber, :absrb_iambic_fully,
@@ -24,7 +24,7 @@ module Skylab::SubTree
       vt = Build_vtuple_[] ; xtra_a = nil
       x and x.each do |str|
         str ||= 'v'                              # then '-v' bare
-        str.split( '' ).each do |s|
+        str.split( EMPTY_S_ ).each do |s|
           if (( idx = VSA_.index s ))
             if vt[ idx ] then vt[ idx ] += 1 else vt[ idx ] = 1 end
           else ( xtra_a ||= [ ] ) << s end
@@ -34,7 +34,7 @@ module Skylab::SubTree
         rest_a =
         (1...(VSA_.length)).reduce( [] ) { |m, d| vt[d] or m << VSA_[ d ] ; m }
         rest_a.unshift VSA_[ 0 ]
-        bad = xtra_a * ''
+        bad = xtra_a * EMPTY_S_
         @expression_agent.calculate do
           y << "#{ ick bad } #{ s bad.length, :is } not #{ s :a}valid letter#{
             }#{ s } for #{ par :verbose } - expecting #{
@@ -46,7 +46,7 @@ module Skylab::SubTree
       nil  # when field is optional, response "shouldn't" matter
     end
 
-    SubTree::Lib_::API_Params[ :client, self,
+    SubTree_::Lib_::API_Params[ :client, self,
 
       :meta_param, :extension,
 
@@ -79,7 +79,7 @@ module Skylab::SubTree
 
     def write_option_parser_to o
       ex_ag = expression_agent
-      SubTree::Lib_::Write_isomorphic_option_parser_options[
+      SubTree_::Lib_::Write_isomorphic_option_parser_options[
         :field_box, field_box, :any_expression_agent, ex_ag,
         :param_h, order_proxy, :op, o ]
       ex_ag.instance_exec do
@@ -325,14 +325,30 @@ module Skylab::SubTree
       end
 
       def resolve_upstream_from_path
-        cmd = SubTree::Find_Command_.new
-        cmd.concat_paths @path_a
-        @pattern and cmd.set_pattern_s @pattern
-        if ! (( cmd_s = cmd.string )) then false else
+
+        if @pattern
+          pattern_part = [ :filename, @pattern ]
+        end
+
+        cmd_s = SubTree_::Lib_::System[].filesystem.find(
+          :paths, @path_a,
+          * pattern_part,
+          :freeform_query_infix, '-type file',
+          :as_normal_value, -> cmd do
+            cmd.string
+          end,
+          :on_event_selectively, -> i, * _, & ev_p do
+            if :info != i
+              raise ev_p[].to_exception
+            end
+          end )
+
+        if cmd_s
           @cmd_s_p[ cmd_s ]
-          i, o, e, t = SubTree::Library_::Open3.popen3 cmd_s
+          i, o, e, t = SubTree_::Library_::Open3.popen3 cmd_s
           i.close
-          if (( s = e.read )) && '' != s
+          s = e.read
+          if s && s.length.nonzero?
             o.close
             bork "#{ s.chomp } (exitstatus #{ t.value.exitstatus })"
           else
@@ -341,6 +357,8 @@ module Skylab::SubTree
             @change_upstream_p[ o ]
             true
           end
+        else
+          UNABLE_
         end
       end
 

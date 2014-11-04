@@ -6,7 +6,7 @@ module Skylab::SubTree
 
     attr_writer :rerun
 
-    glob_h = SubTree::PATH.glob_h
+    glob_h = SubTree_::PATH.glob_h
 
     define_method :tree_to_render do
       rerun_ = rerun_file_paths or return false

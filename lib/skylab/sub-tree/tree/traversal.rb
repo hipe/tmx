@@ -108,7 +108,7 @@ module Skylab::SubTree
 
     def prefix card
       if card.level  # no prefix on root node
-        "#{ @prefix_stack_a * '' }#{ card.is_last ? crook : tee }"
+        "#{ @prefix_stack_a * EMPTY_S_ }#{ card.is_last ? crook : tee }"
       end
     end
 

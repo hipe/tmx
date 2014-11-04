@@ -71,7 +71,7 @@ module Skylab::SubTree
       @event_receiver.receive_event ev
     end
 
-    Data_Event_ = SubTree::Lib_::Event_lib[].data_event_class_factory
+    Data_Event_ = SubTree_::Lib_::Event_lib[].data_event_class_factory
 
     module Local_Actor_
 

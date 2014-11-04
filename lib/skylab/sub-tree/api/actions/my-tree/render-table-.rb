@@ -14,15 +14,15 @@ module Skylab::SubTree
           cel_a << "#{ "#{ g_a * SPACE_ } " if g_a.length.nonzero? }#{
             }#{ slug }"
           cel_a << ( if any_leaf
-            (( fs = any_leaf.any_free_cel )) ? "  #{ fs }" : ''
-          else '' end )
+            (( fs = any_leaf.any_free_cel )) ? "  #{ fs }" : EMPTY_S_
+          else EMPTY_S_ end )
           row_a << cel_a
         end
-        SubTree::Lib_::CLI_table[
+        SubTree_::Lib_::CLI_table[
           :field, :id, :glyphs_and_slug, :left,
           :field, :id, :xtra, :left,
           :show_header, false,
-          :left, '', :sep, '', :right, '',
+          :left, EMPTY_S_, :sep, EMPTY_S_, :right, EMPTY_S_,
           :read_rows_from, row_a,
           :write_lines_to, @paystream.method( :puts ) ]
         nil

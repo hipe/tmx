@@ -1,6 +1,4 @@
-module Skylab
-
-module SubTree  # #borrow-one-indent - load this solo but it needs meta hell
+module Skylab::SubTree
 
   class Walker  # :[#007] this is the tree walker (was [#ts-019])
 
@@ -111,7 +109,7 @@ module SubTree  # #borrow-one-indent - load this solo but it needs meta hell
     attr_reader :files_file_pn
 
     def pathnames
-      SubTree::Lib_::Power_Scanner[ :init, -> do
+      SubTree_::Lib_::Power_Scanner[ :init, -> do
         files_file_pn && top_pn or fail "sanity"
         @tpn = Pathname__.new @top_pn
         rwnd_files_file_IO
@@ -185,7 +183,7 @@ module SubTree  # #borrow-one-indent - load this solo but it needs meta hell
 
     def subtree_pathnames
       path = scn = slice = nil
-      SubTree::Lib_::Power_Scanner[ :init, -> do
+      SubTree_::Lib_::Power_Scanner[ :init, -> do
         path = @pn.instance_variable_get :@path
         _length = path.length - SEPWIDTH_
         slice = 0 .. _length
@@ -243,7 +241,7 @@ module SubTree  # #borrow-one-indent - load this solo but it needs meta hell
     attr_reader :module
 
     def build_difference
-      self.class.subtract( @xpn, @top_pn ).sub_ext( '' ).to_s.
+      self.class.subtract( @xpn, @top_pn ).sub_ext( EMPTY_S_ ).to_s.
         split( ::Pathname::SEPARATOR_LIST )
     end
     private :build_difference
@@ -261,7 +259,7 @@ module SubTree  # #borrow-one-indent - load this solo but it needs meta hell
       report_error = -> p_a_, top_norm_a do
         _big = -> do
           p_a_.reduce( [] ) do |m, x|
-            m << Distill__[ x ] if '' != x ; m
+            m << Distill__[ x ] if EMPTY_S_ != x ; m
           end * SPACE_
         end
         case top_norm_a.length
@@ -298,7 +296,7 @@ module SubTree  # #borrow-one-indent - load this solo but it needs meta hell
             top_norm_a << [ top_norm, p_a.length - 1 ]
           end
           p_a.pop
-          if p_a.empty? || '' == p_a.last
+          if p_a.empty? || EMPTY_S_ == p_a.last
             break
           end
         end while true
@@ -370,7 +368,7 @@ module SubTree  # #borrow-one-indent - load this solo but it needs meta hell
             [ Distill__[ i ], idx ]
           end ]
         xp = @xpn = @pn.expand_path
-        p_a = xp.sub_ext( '' ).to_s.split slash
+        p_a = xp.sub_ext( EMPTY_S_ ).to_s.split slash
         mod, pn = if @top
           instance_exec p_a, c_a, c_h, @top, &know_top
         else
@@ -387,7 +385,7 @@ module SubTree  # #borrow-one-indent - load this solo but it needs meta hell
 
     Distill__ = -> do
       p = -> x do
-        ( p = SubTree::Lib_::Distill_proc[] )[ x ]
+        ( p = SubTree_::Lib_::Distill_proc[] )[ x ]
       end
       -> x { p[ x ] }
     end.call
@@ -426,5 +424,4 @@ module SubTree  # #borrow-one-indent - load this solo but it needs meta hell
       @vt
     end
   end
-end  # #pay-one-back
 end

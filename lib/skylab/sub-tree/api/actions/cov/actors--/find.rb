@@ -1,6 +1,6 @@
 module Skylab::SubTree
 
-  SubTree::Library_::Shellwords.class  # #kick
+  SubTree_::Library_::Shellwords.class  # #kick
 
   class API::Actions::Cov
 
@@ -46,7 +46,7 @@ module Skylab::SubTree
 
       def via_command_execute
         p = -> do
-          _, sout, serr = SubTree::Library_::Open3.popen3 @command_s
+          _, sout, serr = SubTree_::Library_::Open3.popen3 @command_s
           error_s = serr.read
           if error_s.length.zero?
             p = -> do

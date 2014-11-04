@@ -2,7 +2,7 @@ module Skylab::SubTree
 
   class API::Actions::My_Tree::Extensions_
 
-    SubTree::Library_.touch :Shellwords
+    SubTree_::Library_.touch :Shellwords
 
     class Line_Count_
 
@@ -21,8 +21,8 @@ module Skylab::SubTree
         end
         cmd = "wc -l #{ leaves.map { |lf| lf.input_line.shellescape } * SPACE_ }"
         @verbose.volume.nonzero? and @infostream.puts cmd
-        _, o, e, w = SubTree::Library_::Open3.popen3 cmd
-        if (( err = e.read )) && '' != err
+        _, o, e, w = SubTree_::Library_::Open3.popen3 cmd
+        if (( err = e.read )) && EMPTY_S_ != err
           o.read  # toss
           es = w.value.exitstatus
           @infostream.puts "(find (existatus #{ es }) wrote to #{

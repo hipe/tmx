@@ -51,7 +51,7 @@ module Skylab::SubTree
       false
     end
 
-    include SubTree::Library_::FileUtils
+    include SubTree_::Library_::FileUtils
 
     def process_pair in_pn, out_pn
       -> do  # #result-block

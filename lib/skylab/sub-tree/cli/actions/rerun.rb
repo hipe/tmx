@@ -1,6 +1,6 @@
 module Skylab::SubTree
 
-  SubTree::Library_.touch :Set
+  SubTree_::Library_.touch :Set
 
   class CLI::Actions::Rerun < CLI::Actions::Cov
 

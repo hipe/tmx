@@ -32,6 +32,8 @@ module Skylab::SubTree
 
   EMPTY_P_ = -> { }
 
+  EMPTY_S_ = ''.freeze
+
   IDENTITY_ = -> x { x }
 
   stowaway :Lib_, 'library-'
@@ -51,7 +53,6 @@ module Skylab::SubTree
     end
   end.call
 
-  SubTree = self
   SubTree_ = self
 
   UNABLE_ = false

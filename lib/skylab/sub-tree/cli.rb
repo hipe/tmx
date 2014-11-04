@@ -20,7 +20,7 @@ module Skylab::SubTree
       Client_Services_.new self
     end
 
-    Client_Services_ = SubTree::Lib_::Iambic[
+    Client_Services_ = SubTree_::Lib_::Iambic[
           :emit_proc, -> { method :call_digraph_listeners },
           :instream, -> { some_upstream },
           :errstream, -> { some_infostream },
@@ -29,7 +29,7 @@ module Skylab::SubTree
   public
 
     def pen
-      SubTree::Lib_::CLI_pen[]
+      SubTree_::Lib_::CLI_pen[]
     end
 
   private
@@ -44,7 +44,7 @@ module Skylab::SubTree
           def initialize _ ; end
           alias_method :calculate, :instance_exec
         private
-          SubTree::Lib_::EN_add_methods[ self, :private, %i( s ) ]
+          SubTree_::Lib_::EN_add_methods[ self, :private, %i( s ) ]
           o = Lib_::CLI_lib[].pen.stylify.curry
           define_method :em, o[ %i( green ) ]
           define_method :escape_path, Lib_::Pretty_path_proc[]
@@ -74,7 +74,7 @@ module Skylab::SubTree
     option_parser do |o|
       front = my_tree_front
       front.with_properties( :param_h, @param_h, :expression_agent,
-        SubTree::Lib_::Field_front_expression_agent[
+        SubTree_::Lib_::Field_front_expression_agent[
           front.field_box, Lib_::Stock_API_expression_agent[] ]
       )
       front.write_option_parser_to o ; nil
@@ -103,7 +103,7 @@ module Skylab::SubTree
   private
 
     def my_tree_front
-      @my_tree_front ||= SubTree::API::Actions::My_Tree.new
+      @my_tree_front ||= SubTree_::API::Actions::My_Tree.new
     end
 
   public
@@ -118,7 +118,7 @@ module Skylab::SubTree
     argument_syntax '<in-dir> <out-dir> <list>'
 
     def st in_dir, out_dir, list, param_h
-      SubTree::API::Actions::Sub_Tree.new( :err, some_infostream,
+      SubTree_::API::Actions::Sub_Tree.new( :err, some_infostream,
         :is_dry_run, false, :do_force, param_h[:do_force],
         :in_dir, in_dir, :out_dir, out_dir, :list, list ).execute
     end
@@ -129,10 +129,10 @@ module Skylab::SubTree
 
       o.separator "#{ hdr 'stdin usage:' }"
       o.separator "   or: <git-command> | #{ pn[] } <prefix>"
-      o.separator ''
+      o.separator EMPTY_S_
       o.separator "#{ hdr 'typical usage:' }"
       o.separator "    #{ clr[ "git diff --numstat HEAD~1 | #{ pn[] } lib/skylab" ] }"
-      o.separator ''
+      o.separator EMPTY_S_
       o.separator "#{ hdr 'options:' }"
 
       o.on '-- HEAD[~N]', 'will become `git diff HEAD~<n> --numstat' do |x|
@@ -147,7 +147,7 @@ module Skylab::SubTree
 
     desc( -> do
       p = -> do
-        SubTree::API::Actions::Dirstat.get_desc
+        SubTree_::API::Actions::Dirstat.get_desc
       end
       p.singleton_class.send :alias_method, :to_s, :call
       p
@@ -172,7 +172,7 @@ module Skylab::SubTree
     end
 
     def execute_dirstat a
-      SubTree::API::Actions::Dirstat.new(
+      SubTree_::API::Actions::Dirstat.new(
         :sin, @instream, :sout, @paystream, :serr, @errstream,
         :program_name, @legacy_last_hot.send( :normalized_invocation_string ),
         * a

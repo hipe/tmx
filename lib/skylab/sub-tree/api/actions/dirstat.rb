@@ -49,7 +49,7 @@ module Skylab::SubTree
         }, had #{ x.inspect }" ]
       $~[1] or x = "HEAD~1"  # meh
       cmd = "git diff --numstat #{ x }"
-      _, o, e, w = SubTree::Library_::Open3.popen3 cmd
+      _, o, e, w = SubTree_::Library_::Open3.popen3 cmd
       es = w.value.exitstatus ; 0 == es or break bork[ "got exitstatus #{
         }#{ es } from command - #{ cmd }" ]
       err_s = e.read
@@ -128,7 +128,7 @@ module Skylab::SubTree
       sp = '  '
       p = -> do
         tbl_width = ( fmt % [ 0, 0.0, '', ''] ).length
-        SubTree::Lib_::CLI_lipstick[ [[ '+', :green ], [ '-', :red  ]] ].
+        SubTree_::Lib_::CLI_lipstick[ [[ '+', :green ], [ '-', :red  ]] ].
           instance.cook_rendering_proc( [ tbl_width ], nil, sp.length )
           # (if you want it to be `git diff --stat`-like, change `nil` to `80`)
       end.call

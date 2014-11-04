@@ -71,7 +71,7 @@ module Skylab::SubTree
         uber_t
       end
 
-      KEY_PROC__ = SubTree::Models::Hub::KEY_PROC
+      KEY_PROC__ = SubTree_::Models::Hub::KEY_PROC
     end
   end
 end

@@ -14,7 +14,7 @@ module Skylab::SubTree
       def initialize out_line_p, x_a
         @stack_label_x_a = []
         @out_line_p = out_line_p
-        @traversal = SubTree::API::Actions::My_Tree::Traversal_.
+        @traversal = SubTree_::API::Actions::My_Tree::Traversal_.
           new :out_p, method( :three_from_traversal ), * x_a
       end
 
@@ -38,7 +38,7 @@ module Skylab::SubTree
 
       def three_from_traversal glyphs_s_a, slug_s, xtra_s
         glyphs_s_a.length.nonzero? and sp = SPACE_
-        @out_line_p[ "#{ glyphs_s_a * '' }#{ sp }#{ slug_s }#{ xtra_s }" ]
+        @out_line_p[ "#{ glyphs_s_a * EMPTY_S_ }#{ sp }#{ slug_s }#{ xtra_s }" ]
         nil
       end
     end

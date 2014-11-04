@@ -16,7 +16,7 @@ module Skylab::SubTree
       def work node, prefix=nil, is_root=false
         has_children = node.has_children
         if prefix || ! is_root
-          @a << pathinate( [ prefix, node.slug, ( '' if has_children ) ] )
+          @a << pathinate( [ prefix, node.slug, ( EMPTY_S_ if has_children ) ] )
         end
         if has_children
           prefix_ = ( pathinate [ prefix, node.slug ] if ! is_root )

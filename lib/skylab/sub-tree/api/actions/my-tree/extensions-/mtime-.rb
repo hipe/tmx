@@ -4,12 +4,12 @@ module Skylab::SubTree
 
     class Extensions_::Mtime_
 
-      SubTree::Lib_::Basic_fields[ :client, self,
+      SubTree_::Lib_::Basic_fields[ :client, self,
         :absorber, :absrb_iambic_fully,
         :field_i_a, [ :local_normal_name, :infostream, :verbose ]]
 
       def initialize x_a
-        @now_t = SubTree::Library_::Time.new  # doesn't get cleared anywhere
+        @now_t = SubTree_::Library_::Time.new  # doesn't get cleared anywhere
         absrb_iambic_fully x_a ; nil
       end
 

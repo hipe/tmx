@@ -83,7 +83,7 @@ module Skylab::SubTree
       nil
     end
 
-    GLOB_H_ = SubTree::PATH.glob_h
+    GLOB_H_ = SubTree_::PATH.glob_h
 
     def yield_hub_object dpn, glob, sub_dir
       _hub = SubTree_::Models::Hub.new(
@@ -159,7 +159,7 @@ module Skylab::SubTree
 
     No_Directory__ = Message_.new do |path|
       pn = ::Pathname.new path
-      pn_ = pn.join SubTree::PATH.test_dir_names_moniker
+      pn_ = pn.join SubTree_::PATH.test_dir_names_moniker
       "Couldn't find test directory: #{ pth pn_ }"
     end
 

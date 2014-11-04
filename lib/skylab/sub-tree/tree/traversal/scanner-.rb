@@ -90,7 +90,7 @@ module Skylab::SubTree
           @longevity_a[ x ] ? @blank : @pipe
         end
         tail = card.is_last ? @crook : @tee
-        "#{ a * '' }#{ tail }"
+        "#{ a * EMPTY_S_ }#{ tail }"
       end
     end
 

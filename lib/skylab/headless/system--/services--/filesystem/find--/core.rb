@@ -226,4 +226,5 @@ module Skylab::Headless
     end
   end
 end
-# #posterity #tombstone `collapse` was an early ancestor of the n11n pattenrn
+# :+#posterity :+#tombstone `collapse` was an early ancestor of the n11n pattern
+# :+#posterity :+#tombstone the find node that used to be in [st] deleted
