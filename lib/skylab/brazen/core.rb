@@ -13,6 +13,10 @@ module Skylab::Brazen
       end
     end
 
+    def cfg
+      Brazen_::Data_Stores_::Git_Config
+    end
+
     def expression_agent_library
       API::Expression_Agent__::LIB
     end

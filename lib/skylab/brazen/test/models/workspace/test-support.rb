@@ -23,15 +23,7 @@ module Skylab::Brazen::TestSupport::Models::Workspace
     # ~ tmpdir
 
     def prepare_ws_tmpdir s=nil
-      td = TS_::TestLib_::Tmpdir[]
-      if do_debug
-        if ! td.be_verbose
-          td = td.with :be_verbose, true, :debug_IO, debug_IO
-        end
-      elsif td.be_verbose
-        self._IT_WILL_BE_EASY
-      end
-      td.prepare
+      td = prepared_tmpdir
       if s
         td.patch s
       end

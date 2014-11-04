@@ -41,6 +41,19 @@ module Skylab::Brazen::TestSupport
       TestSupport_.debug_IO
     end
 
+    def prepared_tmpdir
+      td = TS_::TestLib_::Tmpdir[]
+      if do_debug
+        if ! td.be_verbose
+          td = td.with :be_verbose, true, :debug_IO, debug_IO
+        end
+      elsif td.be_verbose
+        self._IT_WILL_BE_EASY
+      end
+      td.prepare
+      td
+    end
+
     def event_expression_agent
       @eea ||= begin
         Brazen_::API.expression_agent_class.new Brazen_::API.application_kernel

@@ -10,7 +10,7 @@ module Skylab::Brazen
           :is_dry,
           :pathname,
           :document,
-          :event_receiver ]
+          :on_event_selectively ]
 
         def did_see i
           instance_variable_defined? ivar_box.fetch i
@@ -38,11 +38,13 @@ module Skylab::Brazen
               d += io.write line
             end
           end
-          send_wrote_file_event d
+          @on_event_selectively.call :info, :success do
+            build_wrote_file_event d
+          end
         end
 
-        def send_wrote_file_event d
-          send_OK_event_with( :datastore_resource_committed_changes,
+        def build_wrote_file_event d
+          build_OK_event_with( :datastore_resource_committed_changes,
             :bytes, d,
             :is_completion, true,
             :is_dry, @is_dry,

@@ -46,11 +46,17 @@ module Skylab::Brazen
         end
 
         def cannot_persist_entity_with_no_properties
-          send_not_OK_event_with :cannot_persist_entity_with_no_properties,
+          maybe_send_event :error, :cannot_persist_entity_with_no_properties do
+            bld_cannot_persist_entity_with_no_properties_event
+          end
+          @result = UNABLE_
+        end
+
+        def bld_cannot_persist_entity_with_no_properties_event
+          build_not_OK_event_with :cannot_persist_entity_with_no_properties,
             :entity, @entity do |y, o|
               y << "cannot persist entity with no properties (#{ o.entity.class })"
           end
-          @result = UNABLE_
         end
 
         def edit_file
@@ -77,10 +83,16 @@ module Skylab::Brazen
         end
 
         def edit_file_via_create_section_when_section_not_empty
-          _s = @subsection_id.description
-          send_not_OK_event_with :will_not_clobber_existing_entity,
-            :entity_description, _s, :entity, @entity
+          maybe_send_event :error, :will_not_clobber_existing_entity do
+            bld_will_not_clobber_existing_entity_event
+          end
           @result = UNABLE_
+        end
+
+        def bld_will_not_clobber_existing_entity_event
+          _s = @subsection_id.description
+          build_not_OK_event_with :will_not_clobber_existing_entity,
+            :entity_description, _s, :entity, @entity
         end
 
         def edit_file_via_update_section
@@ -102,10 +114,16 @@ module Skylab::Brazen
         end
 
         def when_no_change_in_section
-          _s = @subsection_id.description
-          send_not_OK_event_with :no_change_in_entity,
-            :entity_description, _s, :entity, @entity
+          maybe_send_event :error, :no_change_in_entity do
+            bld_no_change_in_section_event
+          end
           @result = UNABLE_
+        end
+
+        def bld_no_change_in_section_event
+          _s = @subsection_id.description
+          build_not_OK_event_with :no_change_in_entity,
+            :entity_description, _s, :entity, @entity
         end
 
         def write_section

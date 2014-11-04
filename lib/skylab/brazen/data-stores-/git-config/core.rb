@@ -11,6 +11,14 @@ module Skylab::Brazen
       def parse_string str, & p
         Parse_[ :via_string, str, :receive_events_via_proc, p ]
       end
+
+      def read io, & p
+        Parse_[ :via_stream, io, :receive_events_via_proc, p ]
+      end
+
+      def write * a
+        Git_Config_::Actors__::Write.via_arglist a
+      end
     end
 
     Actions = ::Module.new
@@ -86,7 +94,11 @@ module Skylab::Brazen
     def via_mutated_mutable_document_write_file_via_persisted_entity entity
       _is_dry = entity.any_parameter_value :dry_run
       _pn = @mutable_document.input_id.to_pathname
-      Git_Config_::Mutable::Actors::Persist[ _is_dry, _pn, @mutable_document, entity ]
+      _on_event_selectively = -> *, & ev_p do
+        entity.receive_event ev_p[]
+      end
+      Git_Config_::Mutable::Actors::Persist[
+        _is_dry, _pn, @mutable_document, _on_event_selectively ]
     end
 
     class Silo_Controller__ < Brazen_.model.silo_controller
@@ -121,28 +133,31 @@ module Skylab::Brazen
       def initialize a
         input_method_i, input_x, event_receiver_method_i, event_receiver_x = a
         @input_id = Input_Identifier_.send input_method_i, input_x
-        @event_receiver = send event_receiver_method_i, event_receiver_x
+        @on_event_selectively = send event_receiver_method_i, event_receiver_x
       end
 
     private
-      def receive_events_via_proc p
-        build_evt_rcvr_via_p p
-      end
 
-      public def build_evt_rcvr_via_p p
-        if p
-          p.respond_to?( :[] ) or raise ::ArgumentError, "[]: #{ p.class }"
+      def receive_events_via_proc recv_p
+        if recv_p
+          -> *, & ev_p do
+            recv_p[ ev_p[] ]
+          end
         else
-        p = -> ev do
-          _s = ev.render_first_line_under Brazen_::API.expression_agent_instance
-          raise ParseError, _s
+          -> i, *, & ev_p do
+            if :info != i
+              _ev = ev_p[]
+              _s = ev.render_first_line_under Brazen_::API.expression_agent_instance
+              raise ParseError, _s
+            end
+          end
         end
-        end
-        Event_[].receiver.via_proc p
       end
 
       def receive_events_via_event_receiver evr
-        evr
+        -> *, & ev_p do
+          evr.receive_event ev_p[]
+        end
       end
     public
 
@@ -178,6 +193,15 @@ module Skylab::Brazen
 
       def recv_error_i i, col_number=nil
 
+        @result = @on_event_selectively.call :error, :config_parse_error do
+          bld_config_parse_error i, col_number
+        end
+
+        UNABLE_
+      end
+
+      def bld_config_parse_error i, col_number
+
         col_number ||= @column_number || 1
 
         _x_a = [ :config_parse_error,
@@ -188,14 +212,10 @@ module Skylab::Brazen
           :reason, i.to_s.split( UNDERSCORE_ ).join( SPACE_ ),
           :input_identifier, @input_id ]
 
-        _ev = build_not_OK_event_via_mutable_iambic_and_message_proc _x_a, -> y, o do
+        build_not_OK_event_via_mutable_iambic_and_message_proc _x_a, -> y, o do
           y << "#{ o.reason } #{
            }(#{ o.line_number }:#{ o.column_number })"
         end
-
-        @result = send_event _ev
-
-        UNABLE_
       end
 
       # ~ business
@@ -225,7 +245,8 @@ module Skylab::Brazen
         (?:[ ]+"(?<subsect>(?:[^\n"\\]+|\\["\\])+)")?[ ]*\][ ]*\r?\n?\z/x
 
       def accpt_section
-        if (( ss = @md[ :subsect ] ))
+        ss = @md[ :subsect ]
+        if ss
           Section_.unescape_subsection_name ss
         end
         @sect = Section_.new @md[ :name ], ss
@@ -237,7 +258,8 @@ module Skylab::Brazen
       # ~
 
       def when_section_or_assignment
-        if (( @md = ASSIGNMENT_LINE_RX__.match @line ))
+        @md = ASSIGNMENT_LINE_RX__.match @line
+        if @md
           accpt_assignment
         elsif (( @md = SECTION_RX__.match @line ))
           accpt_section
@@ -257,7 +279,13 @@ module Skylab::Brazen
     end
 
     module Input_Identifier_
+
       class << self
+
+        def via_stream io
+          Stream_Input_Identifier__.new io
+        end
+
         def via_string s
           String_Input_Identifier__.new s
         end
@@ -265,6 +293,28 @@ module Skylab::Brazen
         def via_path s
           Path_Input_Identifier__.new s
         end
+      end
+    end
+
+    class Stream_Input_Identifier__
+
+      def initialize io
+        @io = io
+      end
+
+      def description_under expag
+        if @io.respond_to? :path
+          path = @io.path
+          expag.calculate do
+            pth path
+          end
+        else
+         "«input stream»"  # :+#guillemets
+        end
+      end
+
+      def input_lines_adapter
+        @io
       end
     end
 
@@ -338,10 +388,12 @@ module Skylab::Brazen
     end
 
     class Document_
+
       def initialize input_id
         @input_id = input_id
         @sections = Sections__.new
       end
+
       attr_reader :input_id, :sections
 
       def is_mutable

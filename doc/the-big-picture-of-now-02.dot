@@ -8,6 +8,9 @@ digraph {
 
   cu [label="revamp cull"]
 
+  sr [label="search and replace"]
+
   cu->lib
   ev->cu
+  lib->sr
 }

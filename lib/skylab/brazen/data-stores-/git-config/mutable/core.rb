@@ -38,7 +38,9 @@ module Skylab::Brazen
           absorb_even_iambic_fully a
         end
 
-        attr_reader :event_receiver
+        def on_event_selectively
+          @on_event_selectively
+        end
 
       private
 
@@ -66,11 +68,17 @@ module Skylab::Brazen
             @receiver.accept_string_for_immediate_scan s
           end
           def receive_events_via_proc p
-            _evr = @receiver.build_evt_rcvr_via_p p
-            @receiver.accept_event_receiver _evr ; nil
+            @receiver.accept_on_event_selectively -> *, & ev_p do
+              p[ ev_p[] ]
+            end ; nil
           end
           def receive_events_via_event_receiver x
-            @receiver.accept_event_receiver x ; nil
+            @receiver.accept_on_event_selectively -> *, & ev_p do
+              x.receive_event ev_p[]
+            end ; nil
+          end
+          def receive_events_selectively p
+            @receiver.accept_on_event_selectively p ; nil
           end
         end
 
@@ -140,11 +148,16 @@ module Skylab::Brazen
           @scn = Lib_::String_scanner[].new s ; nil
         end
 
-        def accept_event_receiver x
-          @event_receiver = x ; nil
+        def accept_on_event_selectively p
+          @on_event_selectively = p ; nil
+        end
+
+        def maybe_receive_event_pair i_a, ev_p
+          @on_event_selectively[ * i_a, & ev_p ]
         end
 
         def receive_event ev
+          self._WHERE
           @event_receiver.receive_event ev
         end
 
@@ -179,6 +192,10 @@ module Skylab::Brazen
           def with * x_a
             new x_a
           end
+        end
+
+        def on_event_selectively
+          @on_event_selectively
         end
       end
 
@@ -391,7 +408,8 @@ module Skylab::Brazen
 
           x_a.first.respond_to?( :id2name ) or raise ::ArgumentError, "where"
 
-          x_a.push :document, self, :event_receiver, @parse.event_receiver
+          x_a.push :document, self,
+            :on_event_selectively, @parse.on_event_selectively
 
           Mutable::Actors::Persist.via_iambic x_a do |o|
             o.did_see :pathname or o.set_pathname @input_id.to_pathname
@@ -856,9 +874,15 @@ module Skylab::Brazen
           _compare_p = bld_compare ast
           otr = @assignments_shell.touch_comparable_item ast, _compare_p
           if ast.object_id == otr.object_id
-            send_OK_event_with :added_value, :new_assignment, ast
+            maybe_send_added_value_event ast
           else
-            send_changed_or_not_changed_event otr, ast
+            apply_change_and_maybe_send_event otr, ast
+          end
+        end
+
+        def maybe_send_added_value_event ast
+          maybe_send_event :info, :related_to_assignment_change do
+            build_OK_event_with :added_value, :new_assignment, ast
           end
         end
 
@@ -869,16 +893,28 @@ module Skylab::Brazen
           end
         end
 
-        def send_changed_or_not_changed_event otr, ast
+        def apply_change_and_maybe_send_event otr, ast
           _x = ast.value_x
           _x_ = otr.value_x
           if _x_ == _x
-            send_OK_event_with :no_change_in_value, :existing_assignment, otr
+            maybe_send_assignment_no_change_event otr
           else
-            previous_value = otr.value_x
+            prev_x = otr.value_x
             otr.value_x = ast.value_x
-            send_OK_event_with :value_changed, :existing_assignment, otr,
-              :previous_value, previous_value
+            maybe_send_assignment_change_event otr, prev_x
+          end
+        end
+
+        def maybe_send_assignment_no_change_event otr
+          maybe_send_event :info, :related_to_assignment_change do
+            build_OK_event_with :no_change_in_value, :existing_assignment, otr
+          end
+        end
+
+        def maybe_send_assignment_change_event otr, prev_x
+          maybe_send_event :info, :related_to_assignment_change do
+            build_OK_event_with :value_changed, :existing_assignment, otr,
+              :previous_value, prev_x
           end
         end
       end
@@ -896,9 +932,14 @@ module Skylab::Brazen
         end
 
         def for_edit
+
           unparse_into_yielder y=[]
-          _parse = Parse__.with :via_string_for_immediate_parse, y * EMPTY_S_,
-            :receive_events_via_event_receiver, @parse.event_receiver
+
+          _parse = Parse__.with :via_string_for_immediate_parse,
+            y * EMPTY_S_,
+            :receive_events_selectively,
+            @parse.on_event_selectively
+
           otr = Section_or_Subsection_Parse__.new _parse
           otr.parse or self._SYNTAX_MISMATCH
           otr
@@ -938,22 +979,29 @@ module Skylab::Brazen
             @sect_s = @unsanitized_sect_s ; @unsanitized_sect_s = nil
             rslv_subsect_s
           else
-            send_invalid_section_name_error
+            maybe_send_invalid_section_name_error
+            UNABLE_
           end
         end
 
       private
 
-        def send_invalid_section_name_error
-          send_not_OK_event_with :invalid_section_name, :invalid_section_name,
+        def maybe_send_invalid_section_name_error
+          maybe_send_event :error, :invalid_section_name do
+            bld_invalid_section_name_event
+          end
+        end
+
+        def bld_invalid_section_name_event
+          build_not_OK_event_with :invalid_section_name, :invalid_section_name,
             @unsanitized_sect_s
-          UNABLE_
         end
 
         def rslv_subsect_s
           ok = if @unsanitized_subsect_s
             if @unsanitized_subsect_s.include? NEWLINE_
-              send_invalid_subsection_name_error
+              maybe_send_invalid_subsection_name_error
+              UNABLE_
             else
               @subsect_s = @unsanitized_subsect_s ; @unsanitized_subsect_s = nil
               PROCEDE_
@@ -968,8 +1016,14 @@ module Skylab::Brazen
           end
         end
 
-        def send_invalid_subsection_name_error
-          send_not_OK_event_with :invalid_subsection_name, :invalid_subsection_name,
+        def maybe_send_invalid_subsection_name_error
+          maybe_send_event :error, :invalid_subsection_name do
+            bld_invalid_subsection_name_event
+          end
+        end
+
+        def bld_invalid_subsection_name_event
+          build_not_OK_event_with :invalid_subsection_name, :invalid_subsection_name,
             @unsanitized_subsect_s do |y, o|
               s = o.invalid_subsection_name
               d = s.index NEWLINE_
@@ -982,7 +1036,6 @@ module Skylab::Brazen
               y << "subsection names #{
                 }can contain any characters except newline (#{ ick _excerpt })"
           end
-          UNABLE_
         end
 
         def rslv_names
@@ -990,8 +1043,9 @@ module Skylab::Brazen
           @normalized_name_i = @normalized_sect_s.intern ; nil
         end
 
-        def send_event ev
-          if event_receiver
+        def send_event ev  # _DOG_EAR
+          self._NO_MORE
+          if event_receiver  # _DOG_EAR
             super
           else
             raise ev.to_exception
@@ -1411,17 +1465,19 @@ module Skylab::Brazen
           if AST_NAME_RX__ =~ @i.id2name
             rslv_value
           else
-            send_variable_name_error
+            maybe_send_variable_name_error
+            UNABLE_
           end
         end
         AST_NAME_RX__ = /\A#{ AST_NAME_RX_.source }\z/
 
       private
 
-        def send_variable_name_error
-          send_not_OK_event_with :invalid_variable_name,
-            :invalid_variable_name, @i.id2name
-          UNABLE_
+        def maybe_send_variable_name_error
+          maybe_send_event :error, :invalid_variable_name do
+            build_not_OK_event_with :invalid_variable_name,
+              :invalid_variable_name, @i.id2name
+          end ; nil
         end
 
         def rslv_value
@@ -1491,8 +1547,8 @@ module Skylab::Brazen
 
         Event_[].sender self
 
-        def event_receiver
-          @parse
+        def maybe_send_event * i_a, & ev_p
+          @parse.maybe_receive_event_pair i_a, ev_p
         end
       end
 

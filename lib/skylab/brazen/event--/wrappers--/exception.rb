@@ -110,7 +110,7 @@ module Skylab::Brazen
         end
 
         UNMAPPED_MESSAGE_PROC__ = -> y, o do
-          y << o.exception_message
+          y << o.exception.message
         end
 
         def via_exception_add_members_to_edit

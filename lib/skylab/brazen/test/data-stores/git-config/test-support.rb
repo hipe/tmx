@@ -14,6 +14,12 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
 
   extend TestSupport_::Quickie
 
+  module Constants
+    Callback_ = Brazen_::Callback_
+  end
+
+  Callback_ = Callback_
+
   EMPTY_S_ = EMPTY_S_
 
   module InstanceMethods

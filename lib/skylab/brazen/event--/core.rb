@@ -412,21 +412,8 @@ module Skylab::Brazen
             end
           end
 
-          def via_proc p
-            Proc_Adapter__.new p
-          end
-
           def map_reduce evr, & p
             Map_Reduce__.new p, evr
-          end
-        end
-
-        class Proc_Adapter__
-          def initialize p
-            @p = p
-          end
-          def receive_event ev
-            @p[ ev ]
           end
         end
 

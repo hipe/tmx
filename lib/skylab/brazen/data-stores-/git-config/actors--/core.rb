@@ -165,7 +165,9 @@ module Skylab::Brazen
           ACHEIVED_
         else
           @count = count
-          send_event build_entity_not_found_event
+          maybe_send_event :error, :entity_not_found do
+            build_entity_not_found_event
+          end
           UNABLE_
         end
       end
