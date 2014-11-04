@@ -279,8 +279,8 @@ module Skylab::Brazen
 
         def build_not_OK_event_with * x_a, & p
           x_a.push :ok, false
-          p ||= Entity.event::Inferred_Message.to_proc
-          Entity.event.inline_via_iambic_and_message_proc x_a, p
+          p ||= Brazen_.event::Inferred_Message.to_proc
+          Brazen_.event.inline_via_iambic_and_message_proc x_a, p
         end
 
         def send_event ev

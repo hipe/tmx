@@ -1,7 +1,5 @@
 module Skylab::Brazen
 
-  module Entity
-
     class Event__  # see [#011]
 
       class << self
@@ -530,5 +528,4 @@ module Skylab::Brazen
 
       Event_ = self
     end
-  end
 end

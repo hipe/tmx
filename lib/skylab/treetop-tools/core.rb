@@ -35,7 +35,7 @@ module Skylab::TreetopTools
     end
 
     Event_lib = -> do
-      Bzn__[]::Entity.event
+      Bzn__[].event
     end
 
     File_utils = memoize[ -> { require 'fileutils' ; ::FileUtils } ]

@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::Brazen::TestSupport::Entity::Event::Wrap_FU_msg
+module Skylab::Brazen::TestSupport::Event::Wrap_FU_msg
 
-  ::Skylab::Brazen::TestSupport::Entity::Event[ self ]
+  ::Skylab::Brazen::TestSupport::Event[ self ]
 
   include Constants
 
@@ -45,7 +45,7 @@ module Skylab::Brazen::TestSupport::Entity::Event::Wrap_FU_msg
     end
 
     Subject_ = -> do
-      Brazen_::Entity::Event__::Wrappers__::File_utils_message::PATH_HACK_RX__
+      Brazen_.event::Wrappers__::File_utils_message::PATH_HACK_RX__
     end
   end
 end

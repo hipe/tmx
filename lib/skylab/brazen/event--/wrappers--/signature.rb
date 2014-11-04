@@ -1,10 +1,8 @@
 module Skylab::Brazen
 
-  module Entity
+  class Event__
 
-    class Event__
-
-      module Wrappers__
+    module Wrappers__
 
       class Signature
 
@@ -56,7 +54,6 @@ module Skylab::Brazen
         def noun_lexeme
           @nf.noun_lexeme
         end
-      end
       end
     end
   end

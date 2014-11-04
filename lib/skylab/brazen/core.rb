@@ -18,7 +18,7 @@ module Skylab::Brazen
     end
 
     def event
-      Brazen_::Entity.event
+      Brazen_::Event__
     end
 
     def method_added_muxer
@@ -280,7 +280,7 @@ module Skylab::Brazen
     end
   end
 
-  Event_ = -> { Brazen_::Entity.event }
+  Event_ = -> { Brazen_.event }
   Autoloader_[ Models_ = ::Module.new, :boxxy ]
   IDENTITY_ = -> x { x }
   NAME_ = :name

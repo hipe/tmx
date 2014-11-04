@@ -1,7 +1,5 @@
 module Skylab::Brazen
 
-  module Entity
-
     class Event__
 
       class Wrappers__::Exception
@@ -160,5 +158,4 @@ module Skylab::Brazen
         end
       end
     end
-  end
 end

@@ -295,7 +295,7 @@ module Skylab::Brazen
         end
 
         def build_not_OK_event_with * x_a, & p
-          Entity.event.build_not_OK_event_via_mutable_iambic_and_msg_proc x_a, p
+          Brazen_.event.build_not_OK_event_via_mutable_iambic_and_msg_proc x_a, p
         end
 
         def receive_event ev

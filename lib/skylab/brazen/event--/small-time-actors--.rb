@@ -1,7 +1,5 @@
 module Skylab::Brazen
 
-  module Entity
-
     class Event__
 
       module Small_Time_Actors__
@@ -25,5 +23,4 @@ module Skylab::Brazen
         end
       end
     end
-  end
 end

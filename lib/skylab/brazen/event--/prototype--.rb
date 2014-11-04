@@ -1,7 +1,5 @@
 module Skylab::Brazen
 
-  module Entity
-
     class Event__
 
       class Prototype__ < self  # :[#023].
@@ -161,5 +159,4 @@ module Skylab::Brazen
         end
       end
     end
-  end
 end

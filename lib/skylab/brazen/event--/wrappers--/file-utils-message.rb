@@ -1,7 +1,5 @@
 module Skylab::Brazen
 
-  module Entity
-
     class Event__
 
       class Wrappers__::File_utils_message
@@ -101,5 +99,4 @@ module Skylab::Brazen
         end
       end
     end
-  end
 end

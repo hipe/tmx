@@ -1,7 +1,5 @@
 module Skylab::Brazen
 
-  module Entity
-
     class Event__
 
       class Unwrappers__::Exception
@@ -46,5 +44,4 @@ module Skylab::Brazen
         end
       end
     end
-  end
 end

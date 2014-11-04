@@ -1,7 +1,5 @@
 module Skylab::Brazen
 
-  module Entity
-
     class Event__
 
       EXPRESSION_AGENT__ = ( class Expression_Agent__ < ::Object
@@ -50,5 +48,4 @@ module Skylab::Brazen
         self
       end ).new
     end
-  end
 end
