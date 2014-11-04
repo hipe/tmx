@@ -155,71 +155,7 @@ module Skylab::SubTree
       UNABLE_
     end
 
-  public
-
-    # ~ event receiver methods
-
-    class Message_  # wow this looks like an early version of [#br-011]
-
-      class << self
-
-        alias_method :orig_new, :new
-
-        def new & p
-          ::Class.new self do
-            extend Module_Methods__
-            class << self
-              alias_method :new, :orig_new
-              private :new
-            end
-            const_set :P__, p
-            self
-          end
-        end
-      end
-
-      module Module_Methods__
-
-        def [] * a
-          new do
-            @a = a
-          end
-        end
-
-        def build_via_arglist a
-          new do
-            @a = a
-          end
-        end
-      end
-
-      def initialize & p
-        instance_exec( & p )
-      end
-
-      attr_reader :a
-
-      def p
-        self.class::P__
-      end
-
-      def to_event
-        x_a = [ Callback_::Name.via_module( self.class ).as_trimmed_variegated_symbol ]
-        _NAME_I_A = []
-        p.parameters.each_with_index do |(_, i), d|
-          _NAME_I_A.push i
-          x_a.push i, @a.fetch( d )
-        end
-        x_a.push :original_message_proc, p
-        x_a.push :ok, false  # meh
-        SubTree_::Lib_::Event_lib[].inline_via_iambic_and_message_proc x_a, -> y, o do
-          x_a = ( _NAME_I_A.map do |i|
-            o.send i
-          end )
-          y << instance_exec( * x_a, & o.original_message_proc )
-        end
-      end
-    end
+    Message_ = SubTree_::Lib_::Event_lib[].message_class_factory
 
     No_Directory__ = Message_.new do |path|
       pn = ::Pathname.new path

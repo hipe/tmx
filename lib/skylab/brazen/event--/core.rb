@@ -16,6 +16,10 @@ module Skylab::Brazen
           Event_::EXPRESSION_AGENT__
         end
 
+        def data_event_class_factory
+          Event_::Class_Factories__::Data_Event
+        end
+
         def inline_with * x_a, &p
           p ||= Inferred_Message.to_proc
           inline_via_iambic_and_message_proc x_a, p
@@ -29,6 +33,10 @@ module Skylab::Brazen
           construct do
             init_via_x_a_and_p x_a, p
           end
+        end
+
+        def message_class_factory
+          Event_::Class_Factories__::Message
         end
 
         def prototype_with * x_a, & p

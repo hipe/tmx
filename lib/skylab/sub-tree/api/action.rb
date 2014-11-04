@@ -71,54 +71,7 @@ module Skylab::SubTree
       @event_receiver.receive_event ev
     end
 
-    module Data_Event_
-
-      class << self
-        def new * i_a
-          ::Module.new.module_exec do
-            extend Module_Methods__
-            i_a.freeze
-            define_singleton_method :members do
-              i_a
-            end
-            self
-          end
-        end
-      end  # >>
-
-      module Module_Methods__
-
-        def [] * a
-          build_via_arglist a
-        end
-
-        def build_via_arglist a
-          evnt_class.via_arglist a
-        end
-
-      private
-
-        def evnt_class
-          @evnt_cls ||= bld_event_class
-        end
-
-        def bld_event_class
-          x_a = [ name_i ]
-          members.each do |i|
-            x_a.push i, nil
-          end
-          x_a.push :ok, true
-          ecls = SubTree_::Lib_::Event_lib[].
-            prototype.via_deflist_and_message_proc x_a, nil
-          const_set :Event___, ecls
-          ecls
-        end
-
-        def name_i
-          Callback_::Name.via_module( self ).as_trimmed_variegated_symbol
-        end
-      end
-    end
+    Data_Event_ = SubTree::Lib_::Event_lib[].data_event_class_factory
 
     module Local_Actor_
 
