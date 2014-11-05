@@ -24,6 +24,10 @@ module Skylab::Headless
         Filesystem_::Find__.mixed_via_iambic x_a
       end
 
+      def grep * x_a
+        Filesystem_::Grep__.mixed_via_iambic x_a
+      end
+
       def line_scanner_via_path path, num_bytes=nil
         Headless_::IO.line_scanner ::File.open( path, READ_MODE_ ), num_bytes
       end

@@ -6,6 +6,10 @@ module Skylab::Basic
       def marshal_load s, & error_proc
         Marshal_load__[ s, error_proc ]
       end
+
+      def options_via_regexp rx
+        Options__.new rx.options
+      end
     end
 
     class Marshal_load__
@@ -63,6 +67,18 @@ module Skylab::Basic
       def value_is_known
         ! @rx.nil?
       end
+    end
+
+    class Options__
+
+      def initialize d
+        @is_ignorecase = ( ::Regexp::IGNORECASE & d ).nonzero?
+        @is_multiline = ( ::Regexp::MULTILINE & d ).nonzero?
+        @is_extended = ( ::Regexp::EXTENDED & d ).nonzero?
+        freeze
+      end
+
+      attr_reader :is_ignorecase, :is_multiline, :is_extended
     end
   end
 end
