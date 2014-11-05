@@ -110,7 +110,7 @@ module Skylab::Basic  # introduction at [#020]
   Autoloader_ = Callback_::Autoloader
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
-  ACHEIVED_ = true
+  ACHIEVED_ = true
   Basic_ = self
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> {}

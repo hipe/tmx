@@ -55,8 +55,8 @@ module Skylab::SubTree
       scn = us.test_dir_pathnames
       scn and begin
         @hub_yieldee = []
-        while @test_dir_pn = scn.gets
-          via_test_dir_pn
+        while @child_path = scn.gets
+          via_child_path
         end
         a = @hub_yieldee ; @hub_yieldee = @test_dir_pn = nil ; a
       end
@@ -70,8 +70,8 @@ module Skylab::SubTree
         end
     end
 
-    def via_test_dir_pn
-      dpn = @test_dir_pn
+    def via_child_path
+      dpn = ::Pathname.new @child_path
       baseglob = GLOB_H_.fetch dpn.basename.to_s
       sub_dir = if @sub_path_a
         dpn.join( @sub_path_a * SEP_ )

@@ -19,6 +19,10 @@ module Skylab::Headless
           def upstream_IO * x_a
             Normalization__::Upstream_IO__.mixed_via_iambic x_a
           end
+
+          def unlink_file * x_a
+            Normalization__::Unlink_File__.mixed_via_iambic x_a
+          end
         end  # >>
 
         module Common_Module_Methods_

@@ -2,7 +2,7 @@
                to `Foo_.lib.bar_BAZ`..
 [#018]       [ why we like immutability ]
 [#017]       "dreams of unification" is at [#cu-003]
-[#016]       [ the search and replace narrative ]
+[#016]       the search and replace narrative ..
 [#015]       "ok chains" instead of "begin ; end while nil" hacks
 [#014]       #doc-node the `deliterate` utility
 [#013]       the problem with functions ..

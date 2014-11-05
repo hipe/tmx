@@ -459,7 +459,7 @@ module Skylab::Callback
     end
   end
 
-  Pair_ = ::Struct.new :value_x, :name_i
+  Pair_ = ::Struct.new :value_x, :name_i  # :[#055].
   class Pair_
     def with_name_i i
       self.class.new value_x, i

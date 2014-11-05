@@ -21,7 +21,7 @@ module Skylab::Headless
               x = sout.gets
               if x
                 x.chomp!
-                x = ::Pathname.new x  # #experimental
+                x  # :+#experimental
               else
                 p  = EMPTY_P_
               end

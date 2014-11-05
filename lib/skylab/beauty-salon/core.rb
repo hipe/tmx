@@ -52,6 +52,14 @@ module Skylab::BeautySalon
       Callback_::Proxy
     end
 
+    Regexp_lib = -> do
+      Bsc__[]::Regexp
+    end
+
+    System = -> do
+      HL__[].system
+    end
+
     Token_buffer = -> x, y do
       Bsc__[]::Token::Buffer.new x, y
     end
@@ -61,11 +69,13 @@ module Skylab::BeautySalon
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
-  ACHEIVED_ = true
+  ACHIEVED_ = true
   BS_ = self
   EMPTY_S_ = ''.freeze
   IDENTITY_ = -> x { x }          # for fun we track this
   READ_MODE_ = 'r'.freeze
+  PROCEDE_ = true
+  SPACE_ = ' '.freeze
   UNABLE_ = false
 
 end

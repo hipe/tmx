@@ -108,7 +108,7 @@ module Skylab::Basic
 
         def via_matchdata_resolve_integer_for_number
           @number = @md[ 0 ].to_i
-          ACHEIVED_
+          ACHIEVED_
         end
 
         def via_number_and_minimum_validate

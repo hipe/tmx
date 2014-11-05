@@ -7,7 +7,7 @@ formatted to fit this screen, but it otherwise often historic.
 
 
 
-## :#storypoint-5 introduction (:#formal-attributes-vs-actual-attributes)
+## :#storypoint-5 introduction (:#formal-attributes-vs-actual-attributes) :[#025]
 
 (the fate of this node is discussed at [#053] "discussion of the..")
 
@@ -24,7 +24,7 @@ with "age" e.g. being the "attribute name" and "35" being the
 Now, when dealing with attributes you might want to speak in terms of them in
 the abstract -- not those actual values, but other occurences of particular
 values for those attributes. We use the word "formal" to distinguish this
-meaning, in contrast to "actual" attributes :[#025].
+meaning, in contrast to "actual" attributes.
 
 For example we might want to define 'formal attributes' that define some
 superset of recognizable or allowable names (and possibly values) for the

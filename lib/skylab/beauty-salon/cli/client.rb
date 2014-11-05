@@ -129,6 +129,16 @@ module Skylab::BeautySalon
       bc and bc.receiver.send( bc.method_name, * bc.args )
     end
 
+    option_parser do |o|
+      @action ||= BS_::Models_::Search_and_Replace.new
+      @action.write_options o
+      nil
+    end
+
+    def search_and_replace
+      BS_::Models_::Search_and_Replace.new( @sin, @out, @err ).run
+    end
+
   private
   dsl_off
 

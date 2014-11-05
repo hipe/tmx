@@ -319,7 +319,6 @@ module Skylab::BeautySalon
           ( a * EMPTY_S_ )
         end
       end
-      SPACE_ = ' '.freeze
 
       CONNECTOR_RX__ = /-\z/
     end

@@ -215,7 +215,7 @@ module Skylab::Basic
 
         def accept_arg_as_is
           @result = @as_normal_value[ @arg.value_x ]
-          ACHEIVED_
+          ACHIEVED_
         end
 
         def nope i

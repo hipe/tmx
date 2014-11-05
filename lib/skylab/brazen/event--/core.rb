@@ -6,12 +6,6 @@ module Skylab::Brazen
 
         alias_method :construct, :new
 
-        def build_not_OK_event_via_mutable_iambic_and_msg_proc x_a, p
-          x_a.push :ok, false
-          p ||= Inferred_Message.to_proc
-          inline_via_iambic_and_message_proc x_a, p
-        end
-
         def codifying_expression_agent
           Event_::EXPRESSION_AGENT__
         end
@@ -20,13 +14,31 @@ module Skylab::Brazen
           Event_::Class_Factories__::Data_Event
         end
 
-        def inline_with * x_a, &p
+        def inline_neutral_with * x_a, & p
+          x_a.push :ok, nil
+          inline_via_iambic_and_any_message_proc_to_be_defaulted x_a, p
+        end
+
+        def inline_not_OK_with * x_a, & p
+          inline_not_OK_via_mutable_iambic_and_message_proc x_a, p
+        end
+
+        def inline_not_OK_via_mutable_iambic_and_message_proc x_a, p
+          x_a.push :ok, false
+          inline_via_iambic_and_any_message_proc_to_be_defaulted x_a, p
+        end
+
+        def inline_via_iambic_and_any_message_proc_to_be_defaulted x_a, p
           p ||= Inferred_Message.to_proc
           inline_via_iambic_and_message_proc x_a, p
         end
 
+        def inline_with * x_a, &p
+          inline_via_iambic_and_any_message_proc_to_be_defaulted x_a, p
+        end
+
         def inline_via_iambic x_a
-          inline_via_iambic_and_message_proc x_a, Inferred_Message.to_proc
+          inline_via_iambic_and_any_message_proc_to_be_defaulted x_a, nil
         end
 
         def inline_via_iambic_and_message_proc x_a, p
@@ -194,7 +206,7 @@ module Skylab::Brazen
         y = ::Enumerator::Yielder.new do |s|
           s_a.push s
         end
-        expag.calculate y, self, & @message_proc
+        expag.calculate y, self, & message_proc
         Callback_.scan.via_nonsparse_array s_a
       end
 
