@@ -22,6 +22,10 @@ module Skylab::BeautySalon
       HL__[]::CLI
     end
 
+    Event_lib = -> do
+      Brazen[].event
+    end
+
     Face__ = sidesys[ :Face ]
 
     HL__ = sidesys[ :Headless ]
@@ -40,6 +44,11 @@ module Skylab::BeautySalon
       Face__[]::CLI
     end
 
+    Open3 = Callback_.memoize do
+      require 'open3'
+      ::Open3
+    end
+
     Plugin = -> do
       Face__[]::Plugin
     end
@@ -54,6 +63,11 @@ module Skylab::BeautySalon
 
     Regexp_lib = -> do
       Bsc__[]::Regexp
+    end
+
+    Shellwords = -> do
+      require 'shellwords'
+      ::Shellwords
     end
 
     System = -> do
@@ -71,6 +85,7 @@ module Skylab::BeautySalon
 
   ACHIEVED_ = true
   BS_ = self
+  EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
   IDENTITY_ = -> x { x }          # for fun we track this
   READ_MODE_ = 'r'.freeze

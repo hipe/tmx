@@ -4,6 +4,10 @@ module Skylab::Brazen
 
     class Common_Agent_
 
+      # :+#hook-out's; (methods you need to implement in your child class)
+      #
+      #   `to_body_item_value_string` - false-ish means do not display
+
       def initialize x
         @name ||= infer_name
         @sin = x.sin
@@ -34,6 +38,10 @@ module Skylab::Brazen
         # will get called every time before this nodes gets "focus"
         @did_prepare_for_UI ||= prepare_for_UI
         nil
+      end
+
+      def is_executable
+        true
       end
 
       def execute
@@ -214,9 +222,7 @@ module Skylab::Brazen
 
     class Leaf_Agent < Common_Agent_
 
-      # :+#hook-out's:
-      #
-      #   `to_body_item_value_string` - false-ish means do not display
+      # :+#hook-out's: (in addition to those listed in parent class)
       #
       #   `value_is_known` - will be used for prompt behavior, perhaps
       #                      used by custom branch nodes
@@ -234,10 +240,6 @@ module Skylab::Brazen
       #
       #   `marshal_load` - result in booleanish indicating success. if unable,
       #                    yield an event to the block if you want.
-
-      def is_executable
-        true
-      end
 
     private
 

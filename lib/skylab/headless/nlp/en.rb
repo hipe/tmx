@@ -75,6 +75,7 @@ module Skylab::Headless
         inflected = {
               a: [ 'no ', 'a ' ],  # no birds  / a bird   / birds
              an: [ 'no ', 'an ' ],  # no errors / an error / errors
+             es: [ 'es', nil, 'es' ],  # matches / match
            exis: [ 'exist', 'is', 'are' ],
              is: [ 'are', 'is', 'are' ],
              no: [ 'no ', 'the only ' ],

@@ -93,12 +93,13 @@ module Skylab::BeautySalon
       def initialize x
         super x
         @children = [
-          sa = Search_Agent__.new( self ),
+          Search_Agent__.new( self ),
           Replace_Agent__.new( self ),
-          da = Dir_Agent__.new( self ),
-          fa = Files_Agent__.new( self ),
-          Preview_Agent__.new( sa, da, fa, self ),
-          Quit_Agent__.new( self ) ]
+          Dirs_Agent__.new( self ),
+          Files_Agent__.new( self ),
+          pa = Preview_Agent__.new( self ),
+          Quit_Agent_.new( self ) ]
+        pa.orient_self
         @persist_path = '.search-and-replace/current-search.conf'
         retrieve_values_from_FS_if_exist
         @is_first_display = true
@@ -171,6 +172,7 @@ module Skylab::BeautySalon
       end
 
       def marshal_load s, & p
+        s.gsub! "\b", 'b'  # awful #open [#020]
         @rx = BS_::Lib_::Regexp_lib[].marshal_load s do |ev|
           p[ wrap_marshal_load_event ev ]
           UNABLE_
@@ -187,6 +189,12 @@ module Skylab::BeautySalon
 
       def value_is_known
         ! @rx.nil?
+      end
+
+      # ~ for children
+
+      def regexp
+        @rx
       end
     end
 
@@ -319,7 +327,7 @@ module Skylab::BeautySalon
 
     LIST_HACK_SEPARATOR_RX__ = /[ \t]+/
 
-    class Dir_Agent__ < Leaf_Agent_
+    class Dirs_Agent__ < Leaf_Agent_
 
       include List_Hack_Methods__
 
@@ -339,36 +347,71 @@ module Skylab::BeautySalon
 
     class Preview_Agent__ < Branch_Agent_
 
-      def initialize sa, fa, da, x
-        @dir_agent = da
-        @files_agent = fa
-        @search_agent = sa
-        super x
+      def initialize x
+        super
+      end
+
+      def orient_self
+        @parent_files_agent = @parent[ :files ]
+        @parent_dirs_agent = @parent[ :dirs ]
+        nil
       end
 
       def prepare_for_UI
+        mod = S_and_R_::Preview_Agent_Children__
+        @my_files_agent = mod::Files_Agent.new self
+        matches_agent = mod::Matches_Agent.new self
+        matches_agent.orient_self
         @children = [
           Up_Agent_.new( self ),
-          S_and_R_::Preview_Agent_Children__::Files_Agent.new( self ),
-          Quit_Agent__.new( self ) ]
+          @my_files_agent,
+          matches_agent,
+          Quit_Agent_.new( self ) ]
+
+        @my_files_agent.orient_self
         DONE_
       end
 
       def display_description
-        @y << nil
-        @y << "preview the list of files matched, as well as execute"
-        @y << nil
+        display_any_find_command
+        @serr.puts
       end
 
       def is_executable
-        @files_agent.value_is_known &&
-          @dir_agent.value_is_known
+        @parent_files_agent.value_is_known &&
+          @parent_dirs_agent.value_is_known
       end
 
       def to_body_item_value_string
       end
 
       def to_marshal_pair
+      end
+
+      def prompt
+        @serr.puts  # :+#aesthetics - our items list is too busy, needs more space :/
+        super
+      end
+
+    private
+
+      def display_any_find_command
+        @my_files_agent.build_command do |i, i_, *, & ev_p|
+          ev = ev_p[]
+          if :info == i && :command_string == i_
+            @serr.puts
+            @serr.puts "current find command: #{ ev.command_string }"
+          else
+            send_event ev
+          end
+        end
+        nil
+      end
+
+    public  # ~ for children only
+
+      def lower_files_agent
+        @my_files_agent
       end
     end
 
@@ -382,7 +425,7 @@ module Skylab::BeautySalon
       end
     end
 
-    class Quit_Agent__ < Leaf_Agent_
+    class Quit_Agent_ < Leaf_Agent_
 
       def to_body_item_value_string
       end

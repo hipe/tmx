@@ -119,8 +119,14 @@ module Skylab::Headless
       private
 
         def via_command_string_produce_scan
+          produce_scan_via_command_string @command_string
+        end
+
+      public
+
+        def produce_scan_via_command_string command_string
           p = -> do
-            _, o, e = Headless_::Library_::Open3.popen3 @command_string
+            _, o, e = Headless_::Library_::Open3.popen3 command_string
             err_s = e.gets
             if err_s && err_s.length.nonzero?
               o.close
