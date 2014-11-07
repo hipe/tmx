@@ -30,7 +30,7 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
         @session.expect_line_eventually %r(\A[ ]+ruby[ ])
 
         @session.puts 'grep'
-        @session.expect_line_eventually %r(\A[ ]+replace[ ])
+        @session.expect_line_eventually %r(\A[ ]+matches[ ])
 
         @session.gets.should eql "\n"
 

@@ -86,4 +86,14 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
     BS_::Lib_::System[].defaults.bin_pathname.
       join( 'tmx-beauty-salon search-and-r' ).to_path
   end
+
+  Subject_ = -> do
+    BS_::Models_::Search_and_Replace
+  end
+end
+
+module Skylab::BeautySalon::TestSupport::Models
+
+  S_and_R = Search_and_Replace
+
 end

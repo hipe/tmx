@@ -7,9 +7,9 @@ module Skylab::BeautySalon
     class Preview_Agent_Children__::Files_Agent < Leaf_Agent_
 
       def orient_self
-        o = @parent.parent
-        @dirs_agent = o[ :dirs ]
-        @files_agent = o[ :files ]
+        h = @parent.parent.current_child_hashtable
+        @dirs_field = h.fetch :dirs
+        @files_field = h.fetch :files
         nil
       end
 
@@ -32,8 +32,8 @@ module Skylab::BeautySalon
     private
 
       def refresh_values
-        @glob_list = @files_agent.glob_list
-        @path_list = @dirs_agent.path_list
+        @glob_list = @files_field.glob_list
+        @path_list = @dirs_field.path_list
         @glob_list && @glob_list.length.nonzero? &&
           @path_list && @path_list.length.nonzero?
       end
@@ -61,7 +61,7 @@ module Skylab::BeautySalon
         expression_agent.calculate do
           y << "(#{ count } file#{ s count } total)"
         end
-        change_agent_to @parent  # necessary, else loop forever
+        change_focus_to @parent  # necessary, else loop forever
       end
     end
 
@@ -112,7 +112,7 @@ module Skylab::BeautySalon
 
       def execute
         @group.activate name_i
-        change_agent_to @parent
+        change_focus_to @parent
       end
 
       def activate
@@ -130,7 +130,7 @@ module Skylab::BeautySalon
 
       def orient_self
         @fa = @parent.lower_files_agent
-        @sa = @parent.parent[ :search ]
+        @sa = @parent.regexp_field
         nil
       end
 
@@ -144,22 +144,22 @@ module Skylab::BeautySalon
         @sa.value_is_known
       end
 
-      def prepare_for_UI
-        @files_agent_group = group = Group_Controller_.new [ :grep, :ruby ], self
+      def prepare_UI
+        @paths_agent_group = group = Group_Controller_.new [ :grep, :ruby ], self
+        @grep_agent = Grep_Agent__.new group, self
         @children = [
           Up_Agent_.new( self ),
-          Grep_Agent__.new( group, self ),
+          @grep_agent,
           Ruby_Agent__.new( group, self ),
           Files_Agent__.new( self ),
-          ca = Counts_Agent__.new( self ),
+          Counts_Agent__.new( self ),
           Matches_Agent__.new( self ),
-          Replace_Agent__.new( self ),
+          # Replace_Agent__.new( self ),
           Quit_Agent_.new( self ) ]
-        ca.orient_self
         ACHIEVED_
       end
 
-      attr_reader :files_agent_group
+      attr_reader :paths_agent_group, :grep_agent
 
       def display_body  # :+#aesthetics :/
         @serr.puts
@@ -189,9 +189,11 @@ module Skylab::BeautySalon
 
         def refresh_ivars
           ok = refresh_upstream_path_scan
-          @regex = @parent.parent.parent[ :search ].regexp
+          @regex = @parent.regexp_field.regexp
           @regex && ok
         end
+
+        attr_reader :regex
 
         def refresh_upstream_path_scan
           cmd = @parent.parent[ :files ].build_command do end
@@ -221,11 +223,11 @@ module Skylab::BeautySalon
         end
       end
 
-      class Similar__ < Leaf_Agent_
+      class Paths_Depender__ < Leaf_Agent_
 
         def initialize x
           super
-          @files_agent_group = @parent.files_agent_group
+          @paths_agent_group = @parent.paths_agent_group
         end
 
         def to_body_item_value_string
@@ -235,20 +237,20 @@ module Skylab::BeautySalon
         end
 
         def is_executable
-          @files_agent_group.has_active_toggle
+          @paths_agent_group.has_active_toggle
         end
       end
 
-      class Files_Agent__ < Similar__
+      class Files_Agent__ < Paths_Depender__
 
         def to_body_item_value_string_if_executable
           'list the matching filenames (but not the strings)'
         end
 
         def execute
-          @scan = @files_agent_group.active_toggle.build_path_scan
+          @scan = @paths_agent_group.active_toggle.build_path_scan
           @scan and via_scan
-          change_agent_to @parent
+          change_focus_to @parent
         end
 
       private
@@ -269,10 +271,11 @@ module Skylab::BeautySalon
         end
       end
 
-      class Counts_Agent__ < Branch_Agent_
+      class Counts_Agent__ < Branch_Agent_  # (grep only)
 
-        def orient_self
-          @grep_agent = @parent[ :grep ]
+        def initialize x
+          super
+          @grep_agent = @parent.grep_agent
         end
 
         def to_body_item_value_string
@@ -288,7 +291,7 @@ module Skylab::BeautySalon
         def execute
           @scan = @grep_agent.build_counts_scan
           @scan and via_scan
-          change_agent_to @parent
+          change_focus_to @parent
         end
 
       private
@@ -311,17 +314,56 @@ module Skylab::BeautySalon
         end
       end
 
-      class Matches_Agent__ < Similar__
+      class Matches_Depender__ < Paths_Depender__
+
+        def execute
+          if resolve_file_scan
+            execute_via_file_scan
+          else
+            change_focus_to @parent
+          end
+        end
+
+      private
+
+        def resolve_file_scan
+          ok = refresh_file_scan_ivars
+          ok && via_file_scan_ivars_resolve_file_scan
+        end
+
+        def refresh_file_scan_ivars
+          @path_scan = @paths_agent_group.active_toggle.build_path_scan
+          @regex = @parent.regexp_field.regexp
+          @path_scan && @regex && ACHIEVED_
+        end
+      end
+
+      class Matches_Agent__ < Matches_Depender__
 
         def to_body_item_value_string_if_executable
           'see the matching strings (not just files)'
         end
-      end
 
-      class Replace_Agent__ < Similar__
+        def execute_via_file_scan
+          while file = @file_scan.gets
+            scn = file.to_read_only_match_scan
+            while match = scn.gets
+              @serr.puts match.render_line
+            end
+          end
+          change_focus_to @parent
+        end
 
-        def to_body_item_value_string_if_executable
-          'yeah.'
+        def via_file_scan_ivars_resolve_file_scan
+          @file_scan = S_and_R_::Actors_::Build_file_scan.with(
+            :upstream_path_scan, @path_scan,
+            :ruby_regexp, @regex,
+            :do_highlight, @serr.tty?,
+            :read_only,
+            :on_event_selectively, -> *, & ev_p do
+              send_event ev_p[]
+            end )
+          @file_scan && ACHIEVED_
         end
       end
     end

@@ -7,6 +7,7 @@ module Skylab::BeautySalon::TestSupport
 
   module Constants
     BS_ = ::Skylab::BeautySalon
+    Callback_ = BS_::Callback_
     TestSupport_ = ::Skylab::TestSupport
   end
 

@@ -22,8 +22,14 @@ module Skylab::BeautySalon
       o.separator 'description:'
 
       o.separator <<-O.gsub %r(^ {8}), EMPTY_S_
-        ridiculous interactive search and replace.
-        uses ruby to edit the files
+
+        ridiculous interactive search and replace: in a simple interactive
+        terminal session, build your transformation progressively.
+        then execute the tranformation, which can apply the edit-in-place
+        changes one-by-one with yes/no confirmation. the main data elements
+        of your transformation are persistent, being progressively written
+        to a file for future re-use or prehaps editing.
+
       O
 
     end
@@ -36,7 +42,7 @@ module Skylab::BeautySalon
       @agent.exitstautus
     end
 
-    # #hook-out to look like a zerk parent agent
+    # #hook-out that every zerk top node must implement
 
     attr_reader :primary_UI_yielder
 
@@ -46,9 +52,10 @@ module Skylab::BeautySalon
       false
     end
 
-    def change_agent_to agent
-      @agent = agent
-      STAY_
+    def change_focus_to cx
+      cx.before_focus
+      @agent = cx
+      cx.when_focus
     end
 
     # ~ the agents
@@ -78,10 +85,35 @@ module Skylab::BeautySalon
       def expression_agent
         BS_::Lib_::Brazen[]::API.expression_agent_instance
       end
+
+      def prepare_UI
+        ACHIEVED_
+      end
+
+    public
+
+      def before_focus
+        @last_prepare_UI_was_OK ||= prepare_UI
+      end
+
+      def when_focus
+        AS_IS_
+      end
     end
 
     class Branch_Agent_ < Zerk_::Branch_Agent
+
       include Agent_Methods__
+
+    public  # ~ as parent we receive these from children
+
+      def regexp_field
+        @parent.regexp_field
+      end
+
+      def current_child_hashtable
+        @_curr_chld_h ||= build_child_hashtable.freeze
+      end
     end
 
     class Leaf_Agent_ < Zerk_::Leaf_Agent
@@ -93,7 +125,7 @@ module Skylab::BeautySalon
       def initialize x
         super x
         @children = [
-          Search_Agent__.new( self ),
+          @regexp_field = Search_Agent__.new( self ),
           Replace_Agent__.new( self ),
           Dirs_Agent__.new( self ),
           Files_Agent__.new( self ),
@@ -120,6 +152,11 @@ module Skylab::BeautySalon
         @y << "(display, edit, and execute the details of your search)"
         nil
       end
+
+    public
+
+      attr_reader :regexp_field
+
     end
 
     class Search_Agent__ < Leaf_Agent_
@@ -162,7 +199,7 @@ module Skylab::BeautySalon
       rescue ::RegexpError => @e
         _ = Callback_::Name.via_module( @e.class ).as_human
         @y << "#{ _ }: #{ @e.message }"
-        STAY_
+        AS_IS_
       end
 
       def to_marshal_pair
@@ -270,7 +307,7 @@ module Skylab::BeautySalon
 
       def prompt_when_value
         @serr.write "new #{ noun } (nothing to cancel, space(s) to remove): "
-        STAY_
+        AS_IS_
       end
 
       def when_entered_nonzero_length_blank_string
@@ -352,12 +389,16 @@ module Skylab::BeautySalon
       end
 
       def orient_self
-        @parent_files_agent = @parent[ :files ]
-        @parent_dirs_agent = @parent[ :dirs ]
+        h = @parent.current_child_hashtable
+        @parent_files_agent = h.fetch :files
+        @parent_dirs_agent = h.fetch :dirs
+        @regexp_agent = h.fetch :search
         nil
       end
 
-      def prepare_for_UI
+      attr_reader :regexp_agent
+
+      def prepare_UI
         mod = S_and_R_::Preview_Agent_Children__
         @my_files_agent = mod::Files_Agent.new self
         matches_agent = mod::Matches_Agent.new self
@@ -417,11 +458,32 @@ module Skylab::BeautySalon
 
     class Up_Agent_ < Leaf_Agent_
 
+      def initialize times=2, x
+        @times = times
+        super x
+      end
+
       def to_body_item_value_string
       end
 
+      def when_focus
+        execute
+      end
+
       def execute
-        change_agent_to @parent.parent
+        scn = Callback_.scan.via_times @times
+        if scn.gets
+          current = @parent
+        end
+        while scn.gets
+          current = current.parent
+        end
+        if current
+          change_focus_to current  # disreagard signal, assumed "as is"
+          :_UP_
+        else
+          UNABLE_
+        end
       end
     end
 
@@ -430,11 +492,8 @@ module Skylab::BeautySalon
       def to_body_item_value_string
       end
 
-      def prompt
-      end
-
-      def block_for_response
-        DONE_
+      def when_focus
+        execute
       end
 
       def display_panel
@@ -444,13 +503,16 @@ module Skylab::BeautySalon
         DONE_
       end
 
+      def prompt
+      end
+
       def to_marshal_pair
       end
     end
 
+    AS_IS_ = Zerk_::AS_IS_SIGNAL
     DONE_ = nil
     NONE_S_ = Zerk_::NONE_S
     S_and_R_ = self
-    STAY_ = true
   end
 end

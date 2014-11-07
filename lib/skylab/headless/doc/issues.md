@@ -50,6 +50,7 @@
 [#128]       #in-situ (?) hard-coded in-project tmpdir path!
 [#126]       #parent-node: [#125] headless CLI component & theory narratives ..
 [#125]       #doc-point headless component, facet, & theory narratives
+             (see also [#br-063] emergent interfaces through isomorphicism)
 [#124]       #i18n thought and touch tracker
 [#123]       one-line / multi-line #behavior-tracker
 [#122]       #parent-node: [#050] a list of hash tags and their tentative m..

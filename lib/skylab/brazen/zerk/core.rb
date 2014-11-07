@@ -9,19 +9,26 @@ module Skylab::Brazen
       #   `to_body_item_value_string` - false-ish means do not display
 
       def initialize x
-        @name ||= infer_name
+        @name ||= self.class.name_function
         @sin = x.sin
         @serr = x.serr
         @parent = x
         @y = x.primary_UI_yielder
       end
-    private
-      def infer_name
-        _const = Callback_::Name.via_module( self.class ).as_const
+
+    class << self
+      def name_function
+        @nf ||= bld_inferred_name_function
+      end
+
+      def bld_inferred_name_function
+        _const = Callback_::Name.via_module( self ).as_const
         _cnst = RX__.match( _const )[ 0 ]
         Callback_::Name.via_const _cnst
       end
       RX__ = /\A.+(?=_Agent_*\z)/
+    end
+
     public
 
       # ~ resources & metadata that parent will ask of you as a child
@@ -32,12 +39,6 @@ module Skylab::Brazen
 
       def slug
         @name.as_slug
-      end
-
-      def before_UI
-        # will get called every time before this nodes gets "focus"
-        @did_prepare_for_UI ||= prepare_for_UI
-        nil
       end
 
       def is_executable
@@ -54,10 +55,6 @@ module Skylab::Brazen
       end
 
     private
-
-      def prepare_for_UI
-        ACHEIVED_
-      end
 
       def display_panel
         display_separator
@@ -102,6 +99,10 @@ module Skylab::Brazen
 
       # `prompt` defined by child classes
 
+      def block_for_response
+        receive_mutable_input_line @sin.gets
+      end
+
     public
 
       # ~ resources, metadata & methods that children will ask of you as parent
@@ -116,16 +117,15 @@ module Skylab::Brazen
         true
       end
 
-      def change_agent_to x
-        @parent.change_agent_to x
+      def change_focus_to x
+        @parent.change_focus_to x
       end
     end
 
     class Branch_Agent < Common_Agent_
     private
 
-      def block_for_response
-        s = @sin.gets
+      def receive_mutable_input_line s
         s.strip!
         rx = /\A#{ ::Regexp.escape s }/i
         cx_a = []
@@ -150,19 +150,17 @@ module Skylab::Brazen
 
       def when_ambiguous cx_a
         @y << "did you mean #{ cx_a.map( & :slug ) * ' or ' } ?"
-        STAY_
+        AS_IS_
       end
 
       def when_none s
         @y << "unrecognized command: #{ s.inspect }"
         @y << "please enter #{ build_prompt_line }"
-        STAY_
+        AS_IS_
       end
 
       def when_one cx
-        cx.before_UI
-        @parent.change_agent_to cx
-        STAY_
+        @parent.change_focus_to cx
       end
 
       def display_body
@@ -183,22 +181,34 @@ module Skylab::Brazen
 
       def prompt
         @serr.write "#{ build_prompt_line }: "
-        STAY_
+        AS_IS_
       end
 
-      def build_prompt_line
-        # #todo this is not yet done in the smart way
-        s_a = []
+      def build_prompt_line  # #note-190
+        a = []
         @children.each do |cx|
           cx.is_executable or next
-          first, rest = cx.slug.split RX__
-          s_a.push "[#{ first }]#{ rest }"
+          a.push cx.slug
         end
-        s_a * SPACE_
+
+        Brazen_::Lib_::Bsc_[]::Hash.determine_hotstrings( a ).map do | o |
+          if o
+            "[#{ o.hotstring }]#{ o.rest }"
+          end
+          # if one string is a head-anchored substring of the other it is
+          # always ambiguous, not displayed except we produce nil as a clue
+        end * SPACE_
       end
-      RX__ = /(?<=\A.)/
 
     public
+
+      def build_child_hashtable  # :+#courtesy
+        h = {}
+        @children.each do |cx|
+          h[ cx.name_i ] = cx
+        end
+        h
+      end
 
       def [] name_i  # :+#courtesy
         @children.detect do |cx|
@@ -236,7 +246,7 @@ module Skylab::Brazen
       #                    the value. result is not regarded.
       #
       #   `to_marshal_pair` - false-ish means "do not persist". must look
-      #                       like [#cb-055] pair. justification at #note-022.
+      #                       like [#cb-055] pair. justification at #note-222.
       #
       #   `marshal_load` - result in booleanish indicating success. if unable,
       #                    yield an event to the block if you want.
@@ -255,12 +265,12 @@ module Skylab::Brazen
 
       def prompt_when_value  #:+public-API
         @serr.write "new #{ noun } (nothing to cancel): "
-        STAY_
+        AS_IS_
       end
 
       def prompt_when_no_value
         @serr.write "#{ noun } (nothing to cancel): "
-        STAY_
+        AS_IS_
       end
 
       def noun
@@ -271,12 +281,8 @@ module Skylab::Brazen
 
       # ~ blocking for & processing the response
 
-      def block_for_response
-        @line = @sin.gets
-        when_entered
-      end
-
-      def when_entered
+      def receive_mutable_input_line line
+        @line = line
         @line.chomp!
         if @line.length.zero?
           when_entered_zero_length_string
@@ -307,7 +313,7 @@ module Skylab::Brazen
 
       def when_cancelled
         @y << "edit #{ slug } cancelled."
-        change_agent_to @parent
+        change_focus_to @parent
       end
 
       def when_deleted  # :+#courtesy
@@ -317,7 +323,7 @@ module Skylab::Brazen
           when_value_changed
         else
           @y << "cannot delete #{ slug } value"
-          STAY_
+          AS_IS_
         end
       end
 
@@ -326,26 +332,19 @@ module Skylab::Brazen
         if ok
           when_value_changed
         else
-          STAY_
+          AS_IS_
         end
       end
 
       def when_value_changed
         try_to_persist  # for now we procede whether or not it succeeds
-        change_agent_to @parent
+        change_focus_to @parent
       end
 
       # ~ persistence stuff for leaf nodes
 
       def try_to_persist
         @parent.receive_try_to_persist
-      end
-
-      public def to_pair_for_persist
-        x = marshal_dump
-        if ! x.nil?
-          Callback_.pair.new x, name_i
-        end
       end
     end
 
@@ -373,10 +372,12 @@ module Skylab::Brazen
         :on_event_selectively, method( :maybe_receive_persist_event ) )
     end
 
+    AS_IS_ = :_AS_IS_
+    AS_IS_SIGNAL = AS_IS_
     ACHEIVED_ = true  # #todo this will be the virgin voyage of [#bs-016]
     NONE_S = '(none)'.freeze
     NOTHING_TO_DO_ = nil
-    STAY_ = true
+
     Zerk_ = self
   end
 end
