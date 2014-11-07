@@ -12,4 +12,7 @@ module Skylab::Basic::TestSupport::Hash
 
   Sandboxer = TestSupport_::Sandbox::Spawner.new
 
+  Subject_ = -> do
+    Basic_::Hash
+  end
 end

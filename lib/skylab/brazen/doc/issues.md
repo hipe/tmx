@@ -1,3 +1,5 @@
+[#063]       [ isomorphicisms and emergent interfaces ]
+               [fa] near [#fa-006], [#gv-030] sets the stage nicely)
 [#062]       #doc-node the zerk narrative ..
 [#061]       #tracking-tag `members` as a universal thing
 [#060] #open issue with parsing properties
