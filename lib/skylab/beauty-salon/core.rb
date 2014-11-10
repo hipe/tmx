@@ -88,6 +88,7 @@ module Skylab::BeautySalon
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
   IDENTITY_ = -> x { x }          # for fun we track this
+  NEWLINE_ = "\n"
   READ_MODE_ = 'r'.freeze
   PROCEDE_ = true
   SPACE_ = ' '.freeze

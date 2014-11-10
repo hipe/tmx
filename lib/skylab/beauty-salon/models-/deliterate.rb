@@ -249,8 +249,6 @@ module Skylab::BeautySalon
       end ; nil
     end
 
-    NEWLINE_ = "\n".freeze
-
     def receive_comment_string string
       cs = Comment_String__.new string, @pos
       if cs.is_effectively_empty
