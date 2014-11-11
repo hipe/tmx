@@ -4,18 +4,16 @@ module Skylab::BeautySalon::TestSupport::Models::S_and_R::Actors_BFS
 
   describe "[bs] models - S & R - models - read only file session " do
 
+    extend TS_
+
     it "BFS loads" do
       Subject_[]
     end
 
     it "normal - (unlike grep it only highlights the first match on a given single line" do
 
-      _path = TestSupport_::Data::Universal_Fixtures.
-        dir_pathname.join( 'three-lines.txt' ).to_path
-
-      _scn = Callback_.scan.via_item _path
-
-      file_session_scan = Subject_[].with :upstream_path_scan, _scn,
+      file_session_scan = Subject_[].with :upstream_path_scan,
+        build_scan_for_single_path_to_file_with_three_lines,
         :ruby_regexp, /\bwazoozle\b/i,
         :read_only
 

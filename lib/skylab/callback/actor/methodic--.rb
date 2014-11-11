@@ -181,13 +181,20 @@ module Skylab::Callback
         include Via_Scanner_Iambic_Methods__
 
       private
+
+        def ignore=
+          @parameter_arity = nil
+        end
+
         def property=
           @keep_scanning = false
         end
+
       public
 
         def initialize scn=nil, & p
           @iambic_writer_method_proc_is_generated = true
+          @parameter_arity = :zero_or_one
           if scn
             @scanner = scn
             @keep_scanning = true
@@ -200,7 +207,6 @@ module Skylab::Callback
             instance_exec( & p )
           end
           @argument_arity ||= :one
-          @parameter_arity ||= :zero_or_one
           freeze
         end
 
@@ -220,7 +226,11 @@ module Skylab::Callback
 
         def iambic_writer_method_proc
           if @iambic_writer_method_proc_is_generated
-            send :"iambic_writer_method_proc_when_arity_is_#{ @argument_arity }"
+            if @parameter_arity
+              send :"iambic_writer_method_proc_when_arity_is_#{ @argument_arity }"
+            else
+              IAMBIC_WRITER_METHOD_BODY_WHEN_IGNORE_H__.fetch @argument_arity
+            end
           elsif @iambic_writer_method_proc_proc
             @iambic_writer_method_proc_proc[ self ]
           end
@@ -242,6 +252,15 @@ module Skylab::Callback
           end
         end
       end
+
+      IAMBIC_WRITER_METHOD_BODY_WHEN_IGNORE_H__ = {
+        zero: -> do
+          # nothing.
+        end,
+        one: -> do
+          iambic_property ; nil
+        end
+      }.freeze
 
       class Simple__
 

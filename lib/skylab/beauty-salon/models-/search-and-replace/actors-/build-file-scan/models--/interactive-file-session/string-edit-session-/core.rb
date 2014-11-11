@@ -16,13 +16,24 @@ module Skylab::BeautySalon
             @done = @string_length == @pos
           end
 
-          attr_reader :string
+          def set_file_metadata * a
+            @ordinal, @path = a ; nil
+          end
+
+          def members
+            [ :ordinal, :path, :ruby_regexp ]
+          end
+
+          attr_reader :ordinal, :path, :ruby_regexp, :string
+
+          def match_count
+            @done or find_all_matches
+            @match_a.length
+          end
 
           def match_at_index d
             if 0 > d
-              if ! @done
-                nil while gets_match
-              end
+              @done or find_all_matches
             elsif ! @done && @match_a.length <= d
               try_advance_to d
             end
@@ -30,6 +41,11 @@ module Skylab::BeautySalon
           end
 
         private
+
+          def find_all_matches
+            nil while gets_match
+            nil
+          end
 
           def try_advance_to d
             stop_length = d + 1

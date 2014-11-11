@@ -4,6 +4,8 @@ module Skylab::BeautySalon::TestSupport::Models::S_and_R::Actors_BFS
 
   describe "[bs] models - S & R - models - string edit session" do
 
+    extend TS_
+
     context "modeled as a list of string segments separated by match segments" do
 
       it "the match segements are determined lazily" do
@@ -47,8 +49,6 @@ module Skylab::BeautySalon::TestSupport::Models::S_and_R::Actors_BFS
         es.gets_match.should be_nil
       end
     end
-
-    UNINDENT_RX_ = %r(^[ ]+)
 
     context "replacements, context & output lines" do
 
@@ -273,11 +273,6 @@ module Skylab::BeautySalon::TestSupport::Models::S_and_R::Actors_BFS
           JIM zam JOM
           ziff JUP zaff
         O
-      end
-
-      def unindent s
-        s.gsub! UNINDENT_RX_, BS_::EMPTY_S_
-        s
       end
     end
 

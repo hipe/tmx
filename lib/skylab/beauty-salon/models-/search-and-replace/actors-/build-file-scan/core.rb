@@ -10,6 +10,8 @@ module Skylab::BeautySalon
         :iambic_writer_method_to_be_provided, :ruby_regexp,
         :iambic_writer_method_to_be_provided, :do_highlight,
         :iambic_writer_method_to_be_provided, :read_only,
+        :iambic_writer_method_to_be_provided, :for_interactive_search_and_replace,
+        :iambic_writer_method_to_be_provided, :max_file_size_for_multiline_mode,
         :property, :on_event_selectively
 
       class << self
@@ -39,6 +41,14 @@ module Skylab::BeautySalon
 
       def read_only=
         @currier = Self_::Models__::Read_Only_File_Session
+      end
+
+      def for_interactive_search_and_replace=
+        @currier = Self_::Models__::Interactive_File_Session
+      end
+
+      def max_file_size_for_multiline_mode=
+        @currier_x_a.push :max_file_size_for_multiline_mode, iambic_property
       end
 
     public

@@ -70,6 +70,11 @@ module Skylab::BeautySalon
       ::Shellwords
     end
 
+    String_scanner = Callback_.memoize do
+      require 'strscan'
+      ::StringScanner
+    end
+
     System = -> do
       HL__[].system
     end

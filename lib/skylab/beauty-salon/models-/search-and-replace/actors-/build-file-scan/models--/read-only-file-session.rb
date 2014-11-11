@@ -18,10 +18,11 @@ module Skylab::BeautySalon
         class Producer__
 
           Callback_::Actor.methodic self, :simple, :properties,
-            :properties,
-              :ruby_regexp,
-              :do_highlight,
-              :on_event_selectively
+
+            :property, :ruby_regexp,
+            :property, :do_highlight,
+            :ignore, :max_file_size_for_multiline_mode,
+            :property, :on_event_selectively
 
 
           def initialize

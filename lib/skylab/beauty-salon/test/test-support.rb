@@ -5,15 +5,20 @@ module Skylab::BeautySalon::TestSupport
 
   ::Skylab::TestSupport::Regret[ self ]
 
+  TestLib_ = ::Module.new
+
   module Constants
     BS_ = ::Skylab::BeautySalon
     Callback_ = BS_::Callback_
+    TestLib_ = TestLib_
     TestSupport_ = ::Skylab::TestSupport
   end
 
   include Constants
 
   TestSupport_ = TestSupport_
+
+  BS_ = BS_
 
   module InstanceMethods
 
@@ -54,4 +59,12 @@ module Skylab::BeautySalon::TestSupport
 
     end
   end.call
+
+  module TestLib_
+
+    Expect_event = -> test_context_mod do
+      BS_::Lib_::Brazen[].test_support::Expect_Event[ test_context_mod ]
+    end
+
+  end
 end

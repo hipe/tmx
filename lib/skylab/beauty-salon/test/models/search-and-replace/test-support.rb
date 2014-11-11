@@ -1,6 +1,5 @@
 require_relative '../../test-support'
 
-
 module Skylab::BeautySalon::TestSupport::Models
 
   ::Skylab::BeautySalon::TestSupport[ self ]
@@ -25,6 +24,13 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
       @session = Session__.new( self, path ).start
       nil
     end
+
+    def unindent s
+      s.gsub! UNINDENT_RX__, BS_::EMPTY_S_
+      s
+    end
+    UNINDENT_RX__ = %r(^[ ]+)
+
   end
 
   class Session__

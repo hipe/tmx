@@ -140,10 +140,16 @@ module Skylab::Brazen::TestSupport
         end
 
         def expct_that_event_renders_as_one_string
-          @ev.render_all_lines_into_under s_a=[],
-            Brazen_::Event_[].codifying_expression_agent
-          1 == s_a.length or raise "expected 1 had #{ s_a.length } lines"
-          s_a.fetch 0
+          @ev.render_all_lines_into_under s_a=[], expression_agent_for_expect_event
+          if 1 == s_a.length
+            s_a.fetch 0
+          else
+            s_a * NEWLINE_  # meh
+          end
+        end
+
+        def expression_agent_for_expect_event
+          Brazen_::Event_[].codifying_expression_agent
         end
 
         def black_and_white ev

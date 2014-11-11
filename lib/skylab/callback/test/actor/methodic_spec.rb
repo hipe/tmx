@@ -108,6 +108,25 @@ module Skylab::Callback::TestSupport::Actor::Methodic
       end
     end
 
+    context "`ignore`" do
+
+      before :all do
+        class X_2
+          Parent_subject_[].methodic self, :simple, :properties,
+            :ignore, :property, :foo,
+            :property, :bar
+        end
+      end
+
+      it "ignores" do
+        x = X_2.new do
+          process_iambic_fully [ :foo, :_no_see_, :bar, :BAR ]
+        end
+        x.instance_variables.include?( :@foo ).should eql false
+        x.instance_variable_get( :@bar ).should eql :BAR
+      end
+    end
+
     context "`properties` (again) works like elsewhere, a flat list" do
 
       before :all do
@@ -138,6 +157,7 @@ module Skylab::Callback::TestSupport::Actor::Methodic
         _i_a.should eql [ :argument_artiy, :parameter_arity ]
       end
     end
+
     context "overcome syntax with the (now optional) `property` keyword" do
 
       before :all do
