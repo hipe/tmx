@@ -67,8 +67,12 @@ module Skylab::TanMan
           :max_mkdirs, 1 )  # you may make the [tm] directory only.
       end
 
-      MSG_MAP__ = -> s do
-        "#{ highlight 'while resolving [tm] generated grammar dir' }: #{ s }"
+      MSG_MAP__ = -> s, line_index, * do
+        if line_index.zero?
+          "#{ highlight 'while resolving [tm] generated grammar dir' }: #{ s }"
+        else
+          s
+        end
       end
 
       def app_tmpdir_path

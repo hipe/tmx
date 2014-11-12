@@ -1,4 +1,6 @@
-[#085] #open refactor _nodes to use to_scan
+[#086] #open on first test run with an empty "[tmx root]/tmp/", the
+               event of creating the tmpdir breaks the comprehensive test run
+[#085] #open refactor `_nodes` to use `to_scan`
 [#084]       #parent-node: [#model] the node model narrative ..
 [#083]       #doc-node kernel
 [#082]       #parent-node: [#083] the kernel properties narrative ..

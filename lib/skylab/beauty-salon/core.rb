@@ -26,6 +26,11 @@ module Skylab::BeautySalon
       Brazen[].event
     end
 
+    File_utils = Callback_.memoize do
+      require 'fileutils'
+      ::FileUtils
+    end
+
     Face__ = sidesys[ :Face ]
 
     HL__ = sidesys[ :Headless ]
@@ -98,5 +103,6 @@ module Skylab::BeautySalon
   PROCEDE_ = true
   SPACE_ = ' '.freeze
   UNABLE_ = false
+  WRITE_MODE_ = 'w'.freeze
 
 end

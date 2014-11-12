@@ -83,7 +83,7 @@ module Skylab::CodeMolester
     end
 
     FUC = -> do
-      System[].fileystem.file_utils_controller
+      System[].filesystem.file_utils_controller
     end
 
     HL__ = sidesys[ :Headless ]

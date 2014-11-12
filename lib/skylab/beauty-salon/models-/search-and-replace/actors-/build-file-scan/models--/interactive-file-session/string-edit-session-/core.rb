@@ -26,6 +26,13 @@ module Skylab::BeautySalon
 
           attr_reader :ordinal, :path, :ruby_regexp, :string
 
+          def has_at_least_one_match
+            if @match_a.length.zero? && ! @done
+              gets_match
+            end
+            @match_a.length.nonzero?
+          end
+
           def match_count
             @done or find_all_matches
             @match_a.length
@@ -81,6 +88,32 @@ module Skylab::BeautySalon
             match
           end
 
+        public
+
+          def line_number_of_byte_offset d
+            # (etc for static strings a b-tree lookup would be "better" but meh)
+            string_length = @string.length
+            if -1 < d && d < string_length
+              line_number = 0
+              beg_pos = 0
+              begin
+                delim_pos = @string.index NEWLINE_, beg_pos
+                if ! delim_pos
+                  if d >= beg_pos  # don't act like `wc -l` - contrary to
+                    # [#sg-020], if there are non-delimited trailing bytes
+                    # and `d` is on that "line", we count it as a line.
+                    line_number += 1
+                  end
+                  break
+                end
+                line_number += 1
+                d <= delim_pos and break
+                beg_pos = delim_pos + 1
+              end while beg_pos < string_length
+              line_number
+            end
+          end
+
           class Match__
 
             def initialize *a
@@ -89,7 +122,15 @@ module Skylab::BeautySalon
             end
 
             def members
-              [ :begin, :next_begin, :md, :match_index ]
+              [ :begin, :next_begin, :first_line_number, :md, :match_index ]
+            end
+
+            def ordinal
+              @match_index + 1
+            end
+
+            def first_line_number
+              @parent.line_number_of_byte_offset @begin
             end
 
             attr_reader :begin, :next_begin, :md
@@ -98,10 +139,23 @@ module Skylab::BeautySalon
 
             attr_reader :match_index
 
+            def has_previous_match
+              @match_index.nonzero?
+            end
+
             def previous_match
               if @match_index.nonzero?
                 @parent.match_at_index @match_index - 1
               end
+            end
+
+            def next_disengaged_match
+              d = @match_index
+              begin
+                match = @parent.match_at_index( d += 1 )
+                match or break
+              end while match.replacement_is_engaged
+              match
             end
 
             def next_engaged_match
@@ -111,6 +165,14 @@ module Skylab::BeautySalon
                 match or break
               end until match.replacement_is_engaged
               match
+            end
+
+            def has_next_match
+              @next_match_existence_is_known ||= begin
+                @has_next_match = next_match ? true : false
+                true
+              end
+              @has_next_match
             end
 
             def next_match
@@ -123,6 +185,10 @@ module Skylab::BeautySalon
               @replacement_is_engaged = true
               @replacement_string = x
               nil
+            end
+
+            def disengage_replacement
+              @replacement_is_engaged = false
             end
 
             def to_replacement_segment_scan_proc

@@ -10,8 +10,11 @@ module Skylab::Brazen
 
           -> y, o do
 
+            line_index = -1
+
             y_ = ::Enumerator::Yielder.new do |s|
-              s_ = instance_exec s, & map_reduce_p
+              line_index += 1
+              s_ = instance_exec s, line_index, & map_reduce_p
               if s_
                 y << s_
               end

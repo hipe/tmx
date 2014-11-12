@@ -17,6 +17,7 @@ module Skylab::BeautySalon
       end
 
       def execute
+        @ok = true
         @result = nil
         until @scn.eos?
           normal = @scn.scan NORMAL_RX__
@@ -30,7 +31,7 @@ module Skylab::BeautySalon
             self._SANITY
           end
         end
-        @scn.eos? and flush
+        @ok and flush
         @result
       end
 
@@ -108,7 +109,7 @@ module Skylab::BeautySalon
           end,
           :on_event_selectively, -> * i_a, & ev_p do
             @result = @on_event_selectively[ * i_a, & ev_p ]
-            UNABLE_
+            @ok = UNABLE_
           end )
       end
 
@@ -116,7 +117,7 @@ module Skylab::BeautySalon
         @result = @on_event_selectively.call :replace_function_parse_error do
           Self_::Parse_error__[ * x_a, @scn ]
         end
-        UNABLE_
+        @ok = UNABLE_
       end
 
       def flush
@@ -135,6 +136,14 @@ module Skylab::BeautySalon
         end
 
         def call md
+          @string
+        end
+
+        def marshal_dump
+          @string
+        end
+
+        def as_text
           @string
         end
       end

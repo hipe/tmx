@@ -26,6 +26,10 @@ module Skylab::Headless
         @path_x = iambic_property
       end
 
+      def verbose=  # #open [#174] waiting for [#cb] fix (this should go after next)
+        @be_verbose = true
+      end
+
       o :property, :be_verbose
 
     end ]

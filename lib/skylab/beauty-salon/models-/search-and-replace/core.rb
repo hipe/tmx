@@ -35,7 +35,7 @@ module Skylab::BeautySalon
     end
 
     def run
-      @agent = Search_Agent_Agent__.new self
+      @agent = Search_and_Replace_Agent__.new self
       begin
         ok = @agent.execute
       end while ok
@@ -62,6 +62,16 @@ module Skylab::BeautySalon
 
     module Agent_Methods__
 
+      # ~ as child we might receive these from parent
+
+      def before_focus
+        @last_prepare_UI_was_OK ||= prepare_UI
+      end
+
+      def when_focus
+        AS_IS_SIGNAL_
+      end
+
     private
 
       def send_event ev
@@ -69,15 +79,15 @@ module Skylab::BeautySalon
         s = scan.gets
         if false == ev.ok
           @serr.puts "#{ @name.as_human } error: #{ s }"
-          while s = scan.gets
-            @serr.puts "  #{ s }"
-          end
-          UNABLE_
         else
           @serr.puts "#{ @name.as_human } node #{ s }"
-          while s = scan.gets
-            @serr.puts "  #{ s }"
-          end
+        end
+        while s = scan.gets
+          @serr.puts "  #{ s }"
+        end
+        if false == ev.ok
+          UNABLE_
+        else
           PROCEDE_
         end
       end
@@ -90,15 +100,25 @@ module Skylab::BeautySalon
         ACHIEVED_
       end
 
-    public
+    public  # ~ as a parent we might receive these from children
 
-      def before_focus
-        @last_prepare_UI_was_OK ||= prepare_UI
+      def regexp_field
+        @parent.regexp_field
       end
 
-      def when_focus
-        AS_IS_
+      def replace_field
+        @parent.replace_field
       end
+
+      def work_dir
+        @parent.work_dir
+      end
+    end
+
+    class Agent_ < Zerk_::Common_Agent
+
+      include Agent_Methods__
+
     end
 
     class Branch_Agent_ < Zerk_::Branch_Agent
@@ -107,32 +127,31 @@ module Skylab::BeautySalon
 
     public  # ~ as parent we receive these from children
 
-      def regexp_field
-        @parent.regexp_field
-      end
-
       def current_child_hashtable
         @_curr_chld_h ||= build_child_hashtable.freeze
       end
     end
 
     class Leaf_Agent_ < Zerk_::Leaf_Agent
+
       include Agent_Methods__
+
     end
 
-    class Search_Agent_Agent__ < Branch_Agent_
+    class Search_and_Replace_Agent__ < Branch_Agent_
 
       def initialize x
         super x
         @children = [
-          @regexp_field = Search_Agent__.new( self ),
-          Replace_Agent__.new( self ),
-          Dirs_Agent__.new( self ),
-          Files_Agent__.new( self ),
-          pa = Preview_Agent__.new( self ),
-          Quit_Agent_.new( self ) ]
+          @regexp_field = Search_Field__.new( self ),
+          @replace_field = Replace_Field__.new( self ),
+          Dirs_Field__.new( self ),
+          Files_Field__.new( self ),
+          pa = Preview_Button__.new( self ),
+          Quit_Button_.new( self ) ]
         pa.orient_self
-        @persist_path = '.search-and-replace/current-search.conf'
+        @work_dir = '.search-and-replace'
+        @persist_path = "#{ @work_dir }/current-search.conf"
         retrieve_values_from_FS_if_exist
         @is_first_display = true
       end
@@ -155,11 +174,11 @@ module Skylab::BeautySalon
 
     public
 
-      attr_reader :regexp_field
+      attr_reader :regexp_field, :replace_field, :work_dir
 
     end
 
-    class Search_Agent__ < Leaf_Agent_
+    class Search_Field__ < Leaf_Agent_
 
       def initialize x
         @rx = nil
@@ -199,7 +218,7 @@ module Skylab::BeautySalon
       rescue ::RegexpError => @e
         _ = Callback_::Name.via_module( @e.class ).as_human
         @y << "#{ _ }: #{ @e.message }"
-        AS_IS_
+        AS_IS_SIGNAL_
       end
 
       def to_marshal_pair
@@ -217,13 +236,6 @@ module Skylab::BeautySalon
         @rx and ACHIEVED_
       end
 
-      def wrap_marshal_load_event ev
-        noun_ = noun
-        ev.with_message_string_mapper -> s do
-          "(failed to unmarshal #{ noun_ }: #{ s })"
-        end
-      end
-
       def value_is_known
         ! @rx.nil?
       end
@@ -235,16 +247,20 @@ module Skylab::BeautySalon
       end
     end
 
-    class Replace_Agent__ < Leaf_Agent_
+    class Replace_Field__ < Leaf_Agent_
 
       def initialize x
-        @xxx = nil
+        @o = nil
         super
       end
 
+      def replace_function
+        @o
+      end
+
       def to_body_item_value_string
-        if @xxx
-          @xxx
+        if @o
+          @o.as_text
         else
           NONE_S_
         end
@@ -255,28 +271,38 @@ module Skylab::BeautySalon
       end
 
       def via_line_know_value
-        @xxx = @line
-        ACHIEVED_
+        s = @line ; @line = nil
+        @o = S_and_R_::Actors_::Build_replace_function[ s, -> * a , & ev_p do
+          send_event ev_p[]
+          nil
+        end ]
+        @o ? ACHIEVED_ : UNABLE_
       end
 
       def unknow_value
-        @xxx = nil
+        @o = nil
         ACHIEVED_
       end
 
       def to_marshal_pair
-        if @xxx
-          Callback_.pair.new @xxx, name_i
+        if @o
+          Callback_.pair.new @o.marshal_dump, name_i
         end
       end
 
-      def marshal_load x, & ep
-        @xxx = x
-        ACHIEVED_
+      def marshal_load s, & ep
+
+        @o = S_and_R_::Actors_::Build_replace_function[ s, -> *, & ev_p do
+          _ev = ev_p[]
+          ep[ _ev ]
+          UNABLE_
+        end ]
+
+        @o ? ACHIEVED_ : UNABLE_
       end
 
       def value_is_known
-        ! @xxx.nil?
+        ! @o.nil?
       end
     end
 
@@ -307,7 +333,7 @@ module Skylab::BeautySalon
 
       def prompt_when_value
         @serr.write "new #{ noun } (nothing to cancel, space(s) to remove): "
-        AS_IS_
+        AS_IS_SIGNAL_
       end
 
       def when_entered_nonzero_length_blank_string
@@ -364,7 +390,7 @@ module Skylab::BeautySalon
 
     LIST_HACK_SEPARATOR_RX__ = /[ \t]+/
 
-    class Dirs_Agent__ < Leaf_Agent_
+    class Dirs_Field__ < Leaf_Agent_
 
       include List_Hack_Methods__
 
@@ -373,7 +399,7 @@ module Skylab::BeautySalon
       end
     end
 
-    class Files_Agent__ < Leaf_Agent_
+    class Files_Field__ < Leaf_Agent_
 
       include List_Hack_Methods__
 
@@ -382,7 +408,7 @@ module Skylab::BeautySalon
       end
     end
 
-    class Preview_Agent__ < Branch_Agent_
+    class Preview_Button__ < Branch_Agent_
 
       def initialize x
         super
@@ -404,10 +430,10 @@ module Skylab::BeautySalon
         matches_agent = mod::Matches_Agent.new self
         matches_agent.orient_self
         @children = [
-          Up_Agent_.new( self ),
+          Up_Button_.new( self ),
           @my_files_agent,
           matches_agent,
-          Quit_Agent_.new( self ) ]
+          Quit_Button_.new( self ) ]
 
         @my_files_agent.orient_self
         DONE_
@@ -456,7 +482,7 @@ module Skylab::BeautySalon
       end
     end
 
-    class Up_Agent_ < Leaf_Agent_
+    class Up_Button_ < Leaf_Agent_
 
       def initialize times=2, x
         @times = times
@@ -479,15 +505,15 @@ module Skylab::BeautySalon
           current = current.parent
         end
         if current
-          change_focus_to current  # disreagard signal, assumed "as is"
-          :_UP_
+          change_focus_to current
+          AS_IS_SIGNAL_
         else
           UNABLE_
         end
       end
     end
 
-    class Quit_Agent_ < Leaf_Agent_
+    class Quit_Button_ < Leaf_Agent_
 
       def to_body_item_value_string
       end
@@ -510,9 +536,12 @@ module Skylab::BeautySalon
       end
     end
 
-    AS_IS_ = Zerk_::AS_IS_SIGNAL
+    AS_IS_SIGNAL_ = Zerk_::AS_IS_SIGNAL
     DONE_ = nil
+    FINISHED_SIGNAL_ = :finished_signal
+    NEXT_FILE_SIGNAL_ = :next_file_signal
     NONE_S_ = Zerk_::NONE_S
     S_and_R_ = self
+    STAY_WITH_FILE_SIGNAL_ = :stay_with_file_signal
   end
 end

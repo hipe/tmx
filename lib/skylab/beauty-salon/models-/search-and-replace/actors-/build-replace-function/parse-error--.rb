@@ -8,7 +8,7 @@ module Skylab::BeautySalon
 
         prototype_with :replace_function_parse_error, :expecting, nil,
 
-            :near_excerpt, nil do |y, o|
+            :near_excerpt, nil, :ok, false do |y, o|
 
           _s_a = o.expecting.map do |x|
 

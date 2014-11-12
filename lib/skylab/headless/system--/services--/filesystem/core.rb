@@ -36,6 +36,10 @@ module Skylab::Headless
         Headless_::IO.line_scanner pn.open( READ_MODE_ ), num_bytes
       end
 
+      def members
+        self.class.instance_methods false  # neat
+      end
+
       def normalization
         Filesystem_::Normalization__
       end

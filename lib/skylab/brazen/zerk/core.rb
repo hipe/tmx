@@ -2,9 +2,9 @@ module Skylab::Brazen
 
   module Zerk  # see [#062]
 
-    class Common_Agent_
+    class Common_Agent
 
-      # :+#hook-out's; (methods you need to implement in your child class)
+      # :+#hook-out's: (methods you need to implement in your child class)
       #
       #   `to_body_item_value_string` - false-ish means do not display
 
@@ -26,7 +26,7 @@ module Skylab::Brazen
         _cnst = RX__.match( _const )[ 0 ]
         Callback_::Name.via_const _cnst
       end
-      RX__ = /\A.+(?=_Agent_*\z)/
+      RX__ = /\A.+(?=_(?:Agent|Boolean|Button|Field)_*\z)/  # :+#experimental
     end
 
     public
@@ -122,7 +122,7 @@ module Skylab::Brazen
       end
     end
 
-    class Branch_Agent < Common_Agent_
+    class Branch_Agent < Common_Agent
     private
 
       def receive_mutable_input_line s
@@ -230,7 +230,7 @@ module Skylab::Brazen
       end
     end
 
-    class Leaf_Agent < Common_Agent_
+    class Leaf_Agent < Common_Agent
 
       # :+#hook-out's: (in addition to those listed in parent class)
       #
@@ -273,11 +273,12 @@ module Skylab::Brazen
         AS_IS_
       end
 
-      def noun
-        self.class.const_get :NOUN___
+      public def noun
+        s = self.class::NOUN___
+        s || "'#{ @name.as_human }' value"
       end
 
-      NOUN___ = 'value'
+      NOUN___ = nil
 
       # ~ blocking for & processing the response
 
@@ -350,12 +351,10 @@ module Skylab::Brazen
 
     class Persistence_Actor_
     private
-      def write_event_to_serr ev
-        scan = line_scan_for_event ev
-        while line = scan.gets
-          @serr.puts line
-        end
-        nil
+      def receive_persistence_error ev
+        @on_event_selectively.call :error do
+          ev
+        end ; nil
       end
 
       def line_scan_for_event ev
@@ -372,7 +371,7 @@ module Skylab::Brazen
         :on_event_selectively, method( :maybe_receive_persist_event ) )
     end
 
-    AS_IS_ = :_AS_IS_
+    AS_IS_ = :as_is_signal
     AS_IS_SIGNAL = AS_IS_
     ACHEIVED_ = true  # #todo this will be the virgin voyage of [#bs-016]
     NONE_S = '(none)'.freeze

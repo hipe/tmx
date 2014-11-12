@@ -95,7 +95,6 @@ module Skylab::BeautySalon
       end
 
       def take_nonzero_length_escaped_paths_chunk
-
         path = @upstream_path_scan.gets
         if path
           y = [ @shellwords.escape( path ) ]

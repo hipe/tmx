@@ -17,7 +17,7 @@ module Skylab::Callback
       end
 
       def members  # :+[#br-061]
-        [ :functional, :inline, :nice, :tee ]
+        [ :common, :functional, :inline, :nice, :tee ]
       end
 
       def nice * a, & p

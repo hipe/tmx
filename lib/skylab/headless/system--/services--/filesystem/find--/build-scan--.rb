@@ -12,28 +12,33 @@ module Skylab::Headless
 
         :on_event_selectively, :valid_command_s
 
+      # try to read from the process's STDOUT *first* before seeing if
+      # there's # STDERR to read. if you read from STDERR it might block
+      # if it hasn't yet closed the other stream.
+
       def execute
         p = -> do
-          _, sout, serr = Headless_::Library_::Open3.popen3 @valid_command_s
-          error_s = serr.read
-          if error_s.length.zero?
-            p = -> do
-              x = sout.gets
-              if x
-                x.chomp!
-                x  # :+#experimental
-              else
-                p  = EMPTY_P_
+          _, o, e = Headless_::Library_::Open3.popen3 @valid_command_s
+          p = -> do
+            s = o.gets
+            if s  # then no error on first try
+              s.chomp!  # :+#experimental
+              s
+            else
+              s_ = e.gets
+              while s_
+                s_.chomp!
+                maybe_send_error_via_find_error_string s_
+                result = UNABLE_
+                s_ = e.gets
               end
-              x
+              p = -> { result }
+              result
             end
-            p.call
-          else
-            maybe_send_error_via_find_error_string error_s
-            p = -> { UNABLE_ }
-            UNABLE_
           end
+          p[]
         end
+
         Callback_.scan do
           p[]
         end
@@ -50,7 +55,6 @@ module Skylab::Headless
       end
     end
   end
-
     end
   end
 end

@@ -132,10 +132,14 @@ module Skylab::Brazen
 
       protected
         def init_copy_via_iambic_and_message_proc x_a, p
-          p and raise ::ArgumentError, "message proc is immutable here"
           bx = ivar_box
           x_a.each_slice( 2 ) do |i, x|
             instance_variable_set bx.fetch( i ), x
+          end
+          if p  # or whtever
+            define_singleton_method :message_proc do
+              p
+            end
           end
           self
         end

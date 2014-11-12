@@ -16,7 +16,7 @@ module Skylab::Brazen
             if :errno_enoent == ev.terminal_channel_i
               NOTHING_TO_DO_
             else
-              write_event_to_serr ev
+              receive_persistence_error ev
               ev.ok
             end
           end )
@@ -29,7 +29,7 @@ module Skylab::Brazen
 
       def via_IO
         _doc = Brazen_.cfg.read @up_IO do |ev|
-          write_event_to_serr ev  # or whatever
+          receive_persistence_error ev
           UNABLE_
         end
         _doc and begin
@@ -80,7 +80,15 @@ module Skylab::Brazen
 
       def via_child
         @child.marshal_load @ast.value_x do |ev|
-          write_event_to_serr ev
+          noun = @child.noun
+          _ev_ = ev.with_message_string_mapper -> s, line_index do
+            if line_index.zero?
+              "couldn't unmarshal #{ noun }: #{ s }"
+            else
+              s
+            end
+          end
+          receive_persistence_error _ev_
           UNABLE_
         end
       end

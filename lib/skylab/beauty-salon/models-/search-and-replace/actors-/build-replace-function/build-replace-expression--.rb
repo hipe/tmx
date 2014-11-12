@@ -27,6 +27,14 @@ module Skylab::BeautySalon
             @d = capture_identifier.to_i
           end
 
+          def marshal_dump
+            "{{ $#{ @capture_identifier }#{ @method_call_chain.map do |s|
+              ".#{ s }"
+            end.join EMPTY_S_ } }}"
+          end
+
+          alias_method :as_text, :marshal_dump
+
           def call md
             @method_call_chain.reduce md[ @d ] do | x, method_s |
               __send__ method_s, x
@@ -40,6 +48,7 @@ module Skylab::BeautySalon
           def upcase s
             s.upcase
           end
+
         end
       end
     end

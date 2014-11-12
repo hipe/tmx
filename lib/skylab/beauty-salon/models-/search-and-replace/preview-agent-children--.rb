@@ -100,7 +100,7 @@ module Skylab::BeautySalon
       end
     end
 
-    class Toggle_ < Leaf_Agent_
+    class Boolean_ < Leaf_Agent_
 
       def initialize group, parent
         @group = group
@@ -146,20 +146,20 @@ module Skylab::BeautySalon
 
       def prepare_UI
         @paths_agent_group = group = Group_Controller_.new [ :grep, :ruby ], self
-        @grep_agent = Grep_Agent__.new group, self
+        @grep_state = Grep_Boolean__.new group, self
         @children = [
-          Up_Agent_.new( self ),
-          @grep_agent,
-          Ruby_Agent__.new( group, self ),
+          Up_Button_.new( self ),
+          @grep_state,
+          Ruby_Boolean__.new( group, self ),
           Files_Agent__.new( self ),
           Counts_Agent__.new( self ),
           Matches_Agent__.new( self ),
-          # Replace_Agent__.new( self ),
-          Quit_Agent_.new( self ) ]
+          Replace_Agent__.new( self ),
+          Quit_Button_.new( self ) ]
         ACHIEVED_
       end
 
-      attr_reader :paths_agent_group, :grep_agent
+      attr_reader :paths_agent_group, :grep_state
 
       def display_body  # :+#aesthetics :/
         @serr.puts
@@ -167,7 +167,7 @@ module Skylab::BeautySalon
         @serr.puts
       end
 
-      class Grep_Agent__ < Toggle_
+      class Grep_Boolean__ < Boolean_
 
         def to_body_item_value_string
           if @is_activated
@@ -212,7 +212,7 @@ module Skylab::BeautySalon
         end
       end
 
-      class Ruby_Agent__ < Toggle_
+      class Ruby_Boolean__ < Boolean_
 
         def to_body_item_value_string
           if @is_activated
@@ -223,7 +223,7 @@ module Skylab::BeautySalon
         end
       end
 
-      class Paths_Depender__ < Leaf_Agent_
+      class Paths_Depender__ < Agent_
 
         def initialize x
           super
@@ -275,7 +275,7 @@ module Skylab::BeautySalon
 
         def initialize x
           super
-          @grep_agent = @parent.grep_agent
+          @grep_state = @parent.grep_state
         end
 
         def to_body_item_value_string
@@ -285,11 +285,11 @@ module Skylab::BeautySalon
         end
 
         def is_executable
-          @grep_agent.is_activated
+          @grep_state.is_activated
         end
 
         def execute
-          @scan = @grep_agent.build_counts_scan
+          @scan = @grep_state.build_counts_scan
           @scan and via_scan
           change_focus_to @parent
         end
@@ -364,6 +364,107 @@ module Skylab::BeautySalon
               send_event ev_p[]
             end )
           @file_scan && ACHIEVED_
+        end
+      end
+
+      class Replace_Agent__ < Matches_Depender__
+
+        def to_body_item_value_string_if_executable
+          "begin interactive search and replace yay!"
+        end
+
+        def is_executable
+          super and  # from paths depender
+            @parent.replace_field.value_is_known
+        end
+
+        def via_file_scan_ivars_resolve_file_scan
+          @file_scan = S_and_R_::Actors_::Build_file_scan.with(
+            :for_interactive_search_and_replace,
+            :upstream_path_scan, @path_scan,
+            :ruby_regexp, @regex,
+            :do_highlight, @serr.tty?,
+            :on_event_selectively, -> *, & ev_p do
+              send_event ev_p[]
+            end )
+          @file_scan && ACHIEVED_
+        end
+
+        def execute_via_file_scan
+          @current_file_ES = @file_scan.gets
+          @next_file_ES = @file_scan.gets
+          if @current_file_ES
+            when_one_file
+          else
+            when_no_files
+          end
+        end
+
+      private
+
+        def when_one_file
+          @edit_file_agent = nil
+          begin
+            @stay_in_loop = false
+            @edit_file_agent ||= build_edit_file_agent
+            signal = change_focus_to @edit_file_agent
+            if AS_IS_SIGNAL_ == signal
+              signal = @edit_file_agent.execute  # probably blocks waiting for input
+            end
+            if signal
+              send :"when_#{ signal }"
+            else
+              @result = signal
+            end
+          end while @stay_in_loop
+          @result
+        end
+
+        def build_edit_file_agent
+          S_and_R_::Edit_File_Agent__.new @current_file_ES,
+            @next_file_ES ? true : false,
+            self
+        end
+
+        # ~ signals
+
+        def when_as_is_signal  # you will get this e.g when the agent
+          # receives ambiguous or unresolvable input (and reports it).
+          # in such cases we want to stay truly as-is, which means:
+          when_stay_with_file_signal
+        end
+
+
+        def when_finished_signal
+          @serr.puts "finished."
+          @result = nil
+          nil
+        end
+
+        def when_next_file_signal
+          @edit_file_agent = nil
+          @current_file_ES = @next_file_ES
+          if @current_file_ES
+            @stay_in_loop = true
+            @next_file_ES = @file_scan.gets
+          else
+            @result = when_no_files
+            @next_file_ES = nil
+          end
+          nil
+        end
+
+        def when_stay_with_file_signal
+          @stay_in_loop = true
+          nil
+        end
+
+        # ~ end signals
+
+        def when_no_files
+          @serr.puts
+          @serr.puts "                     (no matching files found)"  # example of smelly but prettier UI string
+          change_focus_to @parent
         end
       end
     end

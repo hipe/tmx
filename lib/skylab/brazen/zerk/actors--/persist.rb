@@ -51,7 +51,7 @@ module Skylab::Brazen
           :create_if_not_exist,
           :max_mkdirs, 1,
           :on_event, -> ev do
-            write_event_to_serr ev
+            receive_persistence_error ev
             ev.ok  # propagate 'false' in case this is failure
           end )
         _dir ? ACHEIVED_ : UNABLE_

@@ -52,6 +52,7 @@ module Skylab::Brazen
         end
 
         def prototype_with * x_a, & p
+          p ||= Inferred_Message.to_proc
           Event_::Prototype__.via_deflist_and_message_proc x_a, p
         end
 

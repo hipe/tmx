@@ -1,3 +1,4 @@
+[#174] #open waiting for [#cb-060] property parsing issue
 [#173]       #parent-node: [#14] the grep narrative ..
 [#172]       #parent-node: [#126]  [ CLI tree glyphs ]
 [#171]       #parent-node: [#140] the find narrative ..
