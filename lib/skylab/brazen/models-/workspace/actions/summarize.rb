@@ -40,7 +40,7 @@ module Skylab::Brazen
         @box = Box_.new
         one = -> { 1 } ; increment = -> d { d + 1 }
         while sect = @scn.gets
-          _i = sect.normalized_name_i
+          _i = sect.external_normal_name_symbol
           @box.add_or_replace _i, one, increment
         end
         via_box

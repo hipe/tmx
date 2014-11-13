@@ -18,7 +18,7 @@ module Skylab::Brazen
       end
 
       def resolve_section
-        _prs = Mock_Parse__.new -> i, * _, & p do
+        _prs = Mock_Parse__.new -> i, * _, & ev_p do
           if :info != i
             raise ev_p[].to_exception
           end

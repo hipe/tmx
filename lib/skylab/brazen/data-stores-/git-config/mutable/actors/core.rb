@@ -44,7 +44,7 @@ module Skylab::Brazen
           subs_s, sect_s = ss.to_a
           _compare_p = -> item do
             if :section_or_subsection == item.symbol_i
-              d = sect_s <=> item.normalized_name_s
+              d = sect_s <=> item.internal_normal_name_string
               if d.nonzero? then d else
                 subs_s <=> item.subsect_name_s
               end

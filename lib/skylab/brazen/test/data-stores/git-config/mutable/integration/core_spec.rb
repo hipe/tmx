@@ -26,7 +26,7 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable
       expect_document_content "[foo]\n[wizzie]\nfum-fum = he he\n"
       _x.should eql 'he he'
       expect_one_event :added_value do |ev|
-        ev.new_assignment.normalized_name_i.should eql :'fum-fum'
+        ev.new_assignment.external_normal_name_symbol.should eql :fum_fum
         ev.new_assignment.value_x.should eql 'he he'
       end
     end

@@ -10,7 +10,13 @@ digraph {
 
   sr [label="search and replace"]
 
+  st [label="sticky 2nd\nform"]
+
+  fu [label="function\nAPI"]
+
   cu->lib
   ev->cu
   lib->sr
+  sr->st
+  sr->fu
 }

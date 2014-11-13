@@ -18,7 +18,7 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable
         expect_document_content "[foo]\nis-on = true\n"
         expect_one_event :added_value do |ev|
           ast = ev.new_assignment
-          ast.normalized_name_i.should eql :'is-on'
+          ast.external_normal_name_symbol.should eql :is_on
           ast.value_x.should eql true
         end
       end
@@ -28,7 +28,7 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable
         expect_document_content "[foo]\nhi = foo bar\n"
         expect_one_event :added_value do |ev|
           ast = ev.new_assignment
-          ast.name_s.should eql 'hi'
+          ast.internal_normal_name_string.should eql 'hi'
           ast.value_x.should eql 'foo bar'
         end
       end

@@ -257,7 +257,7 @@ module Skylab::Brazen
         def aref_node_with_norm_name_i symbol_i, norm_i
           scn = get_node_scanner symbol_i
           while node = scn.gets
-            if norm_i == node.normalized_name_i
+            if norm_i == node.external_normal_name_symbol
               found = node ; break
             end
           end
@@ -531,7 +531,7 @@ module Skylab::Brazen
         end
 
         def bld_compare section
-          normalized_name_s = section.normalized_name_s
+          normalized_name_s = section.internal_normal_name_string
           subsection_name_s = section.subsect_name_s
           if subsection_name_s
             bld_compare_name_and_ss_name normalized_name_s, subsection_name_s
@@ -542,7 +542,7 @@ module Skylab::Brazen
 
         def bld_compare_name_and_ss_name normalized_name_s, subsection_name_s
           -> x do
-            d = x.normalized_name_s <=> normalized_name_s
+            d = x.internal_normal_name_string <=> normalized_name_s
             if d.zero?
               if x.subsect_name_s
                 x.subsect_name_s <=> subsection_name_s
@@ -553,7 +553,7 @@ module Skylab::Brazen
 
         def bld_compare_name normalized_name_s
           -> x do
-            d = x.normalized_name_s <=> normalized_name_s
+            d = x.internal_normal_name_string <=> normalized_name_s
             if d.zero?
               x.subsect_name_s ? 1 : 0
             else d end
@@ -627,16 +627,12 @@ module Skylab::Brazen
           @kernel.get_line_scanner
         end
 
-        def normalized_name_i
-          @kernel.normalized_name_i
+        def external_normal_name_symbol
+          @kernel.external_normal_name_symbol
         end
 
-        def normalized_name_s
-          @kernel.normalized_name_s
-        end
-
-        def name_s
-          @kernel.name_s
+        def internal_normal_name_string
+          @kernel.internal_normal_name_string
         end
 
         def subsect_name_s
@@ -887,9 +883,9 @@ module Skylab::Brazen
         end
 
         def bld_compare ast
-          norm_s = ast.normalized_name_s
+          norm_s = ast.internal_normal_name_string
           -> x do
-            x.normalized_name_s <=> norm_s
+            x.internal_normal_name_string <=> norm_s
           end
         end
 
@@ -1040,7 +1036,7 @@ module Skylab::Brazen
 
         def rslv_names
           @normalized_sect_s = @sect_s.downcase
-          @normalized_name_i = @normalized_sect_s.intern ; nil
+          @external_normal_name_symbol = @normalized_sect_s.intern ; nil
         end
 
         def send_event ev  # _DOG_EAR
@@ -1058,16 +1054,12 @@ module Skylab::Brazen
 
       class Section_or_Subsection_Kernel__
 
-        def normalized_name_i
+        def external_normal_name_symbol
           @normalized_sect_i
         end
 
-        def normalized_name_s
+        def internal_normal_name_string
           @normalized_sect_s
-        end
-
-        def name_s
-          @sect_s
         end
 
         def subsect_name_s
@@ -1096,8 +1088,8 @@ module Skylab::Brazen
             end
           end
 
-          def via_literal x, y, parse
-            ast = Assignment_Literal__.new x, y, parse
+          def via_literal i, x, parse
+            ast = Assignment_Literal__.new i, x, parse
             ast.resolve and begin
               new ast
             end
@@ -1130,11 +1122,11 @@ module Skylab::Brazen
         end
 
         def description
-          "(name: #{ name_s } value: #{ value_x.inspect })"
+          "(name: #{ internal_normal_name_string } value: #{ value_x.inspect })"
         end
 
-        def normalized_name_i
-          @kernel.normalized_name_i
+        def external_normal_name_symbol
+          @kernel.external_normal_name_symbol
         end
 
         def unparse_into_yielder y
@@ -1145,12 +1137,8 @@ module Skylab::Brazen
           @kernel.get_line_scanner
         end
 
-        def name_s
-          @kernel.name_s
-        end
-
-        def normalized_name_s
-          @kernel.normalized_name_s
+        def internal_normal_name_string
+          @kernel.internal_normal_name_string
         end
 
         def value_when_is_result_of_aref_lookup
@@ -1349,9 +1337,9 @@ module Skylab::Brazen
         THE_REST_RX_ = /[ ]*(?:[#;]|\r?\n?\z)/
 
         def rslv_names
-          @name_s = @line[ @name_start_index, @name_width ]
-          @normalized_name_s = @name_s.downcase
-          @normalized_name_i = @normalized_name_s.intern ; nil
+          _received_name_s = @line[ @name_start_index, @name_width ]
+          @internal_normal_name_string = _received_name_s.downcase
+          @external_normal_name_symbol = @internal_normal_name_string.intern ; nil
         end
 
       public
@@ -1364,16 +1352,12 @@ module Skylab::Brazen
           y << @line ; nil
         end
 
-        def normalized_name_i
-          @normalized_name_i
+        def external_normal_name_symbol
+          @external_normal_name_symbol
         end
 
-        def normalized_name_s
-          @normalized_name_s
-        end
-
-        def name_s
-          @name_s
+        def internal_normal_name_string
+          @internal_normal_name_string
         end
 
         def value_x
@@ -1423,46 +1407,26 @@ module Skylab::Brazen
 
       class Assignment_Literal__ < Assignment_Kernel__
 
-        def initialize i, x, parse
-          parse or raise "where"
-          @unsanitized_x = x
-          @i = i
+        def initialize variegated_i, x, parse
+          parse or raise ::ArgumentError
           @parse = parse
-          @s = i.id2name
+          @unsanitized_x = x
+          @variegated_i = variegated_i
         end
 
-        def unparse_into_yielder y  # :+#arbitrary-styling, this style is covered
-          _s = rndr_line
-          y << _s ; nil
+        def external_normal_name_symbol
+          @enns ||= @variegated_i.id2name.
+            gsub( DASH_, UNDERSCORE_ ).downcase.intern
         end
 
-      private
-
-        def rndr_line
-          _s = unmarshall_RHS_via_x @x
-          "#{ @i } =#{ _s }#{ NEWLINE_ }"
-        end
-
-      public
-
-        def name_s
-          @s
-        end
-
-        def normalized_name_s
-          @s
-        end
-
-        def normalized_name_i
-          @i
-        end
-
-        def value_x
-          @x
+        def internal_normal_name_string
+          @inns or raise 'not set'
         end
 
         def resolve
-          if AST_NAME_RX__ =~ @i.id2name
+          s = @variegated_i.id2name
+          if AST_NAME_RX__ =~ s
+            @inns = s
             rslv_value
           else
             maybe_send_variable_name_error
@@ -1473,17 +1437,37 @@ module Skylab::Brazen
 
       private
 
+        def rslv_value
+          x = @unsanitized_x
+          @unsanitized_x = nil
+          set_value x
+        end
+
         def maybe_send_variable_name_error
           maybe_send_event :error, :invalid_variable_name do
             build_not_OK_event_with :invalid_variable_name,
-              :invalid_variable_name, @i.id2name
+              :invalid_variable_name, @variegated_i.id2name
           end ; nil
         end
 
-        def rslv_value
-          x = @unsanitized_x ; @unsanitized_x = nil
-          set_value x
+      public
+
+        def value_x
+          @x
         end
+
+        def unparse_into_yielder y  # :+#arbitrary-styling, this style is covered
+          y << rndr_line ; nil
+        end
+
+      private
+
+        def rndr_line
+          _s = unmarshall_RHS_via_x @x
+          "#{ internal_normal_name_string } =#{ _s }#{ NEWLINE_ }"
+        end
+
+      public
 
         def accept_new_value x
           @x = x

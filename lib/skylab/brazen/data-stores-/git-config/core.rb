@@ -429,7 +429,7 @@ module Skylab::Brazen
 
     class Sections__ < Box__
       def accept_sect sect
-        @h[ sect.normalized_name_i ] = @a.length
+        @h[ sect.external_normal_name_symbol ] = @a.length
         @a.push sect ; nil
       end
     end
@@ -447,20 +447,22 @@ module Skylab::Brazen
       end
 
       def initialize name_s, subsect_name_s
-        @name_s = name_s.freeze
+        @internal_normal_name_string = name_s.freeze
         @subsect_name_s = ( subsect_name_s.freeze if subsect_name_s )
         @assignments = Assignments__.new
-        @normalized_name_i = @name_s.downcase.intern
+        @external_normal_name_symbol = @internal_normal_name_string.downcase.intern
       end
 
-      attr_reader :name_s, :subsect_name_s
-      attr_reader :normalized_name_i
-      attr_reader :assignments
+      attr_reader :assignments,
+        :external_normal_name_symbol,
+        :internal_normal_name_string,
+        :subsect_name_s
     end
 
     class Assignments__ < Box__
+
       def accept_asmt asmt
-        @h[ asmt.normalized_name_i ] = @a.length
+        @h[ asmt.internal_normal_name_symbol ] = @a.length
         @a.push asmt ; nil
       end
 
@@ -491,7 +493,7 @@ module Skylab::Brazen
             d += 1
             ast = @a.fetch d
             # no 'symbol_i' here yet
-            x = Actual_Property__.new( ast.value_x, ast.normalized_name_i )
+            x = Actual_Property__.new( ast.value_x, ast.external_normal_name_symbol )
             break
           end
           x
@@ -502,13 +504,24 @@ module Skylab::Brazen
     Actual_Property__ = Brazen_.model.actual_property
 
     class Assignment_
+
       def initialize name_s, unparsed_value_s
-        @name_s = name_s ; @unparsed_value_s = unparsed_value_s
-        @normalized_name_i = @name_s.downcase.intern
+        @internal_normal_name_string = name_s
+        @unparsed_value_s = unparsed_value_s
         @is_parsed = false
       end
-      attr_reader :name_s, :unparsed_value_s
-      attr_reader :normalized_name_i
+
+      attr_reader :internal_normal_name_string, :unparsed_value_s
+
+      def external_normal_name_symbol
+        # uppercase is OK but convert dashes to underscores
+        @enn_i ||= @internal_normal_name_string.gsub( DASH_, UNDERSCORE_ ).intern
+      end
+
+      def internal_normal_name_symbol
+        # per spec but might change
+        @inn_i ||= @internal_normal_name_string.downcase.intern
+      end
 
       def value_x
         @is_parsed or parse

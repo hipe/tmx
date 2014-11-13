@@ -97,7 +97,7 @@ to review, and delineate explicitly some relationships that were only implied:
 
   a `categorization` is the application of one `category` to one `instance`.
 
-  one `instace` may have multiple `categorizations`.
+  one `instance` may have multiple `categorizations`.
 
   one `category`, through its multiple `categorizations`, can be associated
   with multiple `instances`.

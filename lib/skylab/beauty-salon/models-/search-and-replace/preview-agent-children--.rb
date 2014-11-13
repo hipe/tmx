@@ -2,14 +2,13 @@ module Skylab::BeautySalon
 
   class Models_::Search_and_Replace
 
-    Preview_Agent_Children__ = ::Module.new
+    Preview_Agent_Children__ = ::Module.new  # notes stowed away in [#016]
 
     class Preview_Agent_Children__::Files_Agent < Leaf_Agent_
 
       def orient_self
-        h = @parent.parent.current_child_hashtable
-        @dirs_field = h.fetch :dirs
-        @files_field = h.fetch :files
+        @dirs_field = @parent.dirs_field
+        @files_field = @parent.files_field
         nil
       end
 
@@ -65,38 +64,102 @@ module Skylab::BeautySalon
       end
     end
 
-    class Group_Controller_
+    class Boolean_Group_Controller_
 
-      def initialize i_a, node
-        @active_toggle = nil
-        @has_active_toggle = false
+      def initialize i_a, group_name_i, node
+        @active_boolean = nil
+        @group_name = Callback_::Name.via_variegated_symbol group_name_i
+        @has_active_boolean = false
         @i_a = i_a
         @node = node
       end
 
-      attr_reader :active_toggle, :has_active_toggle
+      attr_reader :active_boolean, :has_active_boolean
 
       def activate name_i
-        @active_toggle = @has_active_toggle = nil
+        change_did_occur = maybe_activate name_i
+        if change_did_occur
+          when_changed
+        else
+          when_not_changed
+        end
+      end
+
+    private
+
+      def maybe_activate name_i  # no not trigger persistence from here
+        @active_boolean = @has_active_boolean = nil
+        change_did_occur = false
+        @first = nil
         @i_a.each do |i|
-          toggle = @node[ i ]
+          boolean = @node[ i ]
+          @first ||= boolean
           if name_i == i
-            _ok = if toggle.is_activated
-              true
+            if boolean.is_activated
+              ok = true
             else
-              toggle.activate
+              ok = boolean.receive_activation
+              if ok
+                change_did_occur = true
+              end
             end
-            if _ok
-              @has_active_toggle = true
-              @active_toggle = toggle
+            if ok
+              @has_active_boolean = true
+              @active_boolean = boolean
             end
-          else
-            if toggle.is_activated
-              toggle.deactivate
-            end
+          elsif boolean.is_activated
+            _ok = boolean.receive_deactivation
+            _ok and change_did_occur = true
           end
         end
-        nil
+        change_did_occur
+      end
+
+      def when_not_changed
+        @node.change_focus_to @node
+      end
+
+      def when_changed
+        @node.receive_branch_changed_notification
+        @node.change_focus_to @node
+      end
+
+    public  # #note-122
+
+      def is_executable
+      end
+
+      def marshal_load name_of_active_child_string, & ev_p
+        name_i = name_of_active_child_string.intern
+        _ok = @node.has_name name_i
+        if _ok
+          _change_did_occur = maybe_activate name_i
+          _change_did_occur  # kinda nasty - this becomes 'OK'
+        else
+          when_marshal_load_fail name_i, ev_p
+        end
+      end
+
+      def name_i
+        @group_name.as_variegated_symbol
+      end
+
+      def to_body_item_value_string
+      end
+
+      def to_marshal_pair
+        if @has_active_boolean
+          Callback_.pair.new @active_boolean.name_i, @group_name.as_slug.intern
+        end
+      end
+
+    private
+
+      def when_marshal_load_fail name_i, ev_p
+        ev_p.call :error, :marshal_load_error do
+          self._ETC  # #todo
+        end
+        UNABLE_
       end
     end
 
@@ -112,17 +175,19 @@ module Skylab::BeautySalon
 
       def execute
         @group.activate name_i
-        change_focus_to @parent
       end
 
-      def activate
+      def receive_activation
         @is_activated = true
         ACHIEVED_
       end
 
-      def deactivate
+      def receive_deactivation
         @is_activated = false
         ACHIEVED_
+      end
+
+      def to_marshal_pair  # the group controller does this
       end
     end
 
@@ -145,26 +210,43 @@ module Skylab::BeautySalon
       end
 
       def prepare_UI
-        @paths_agent_group = group = Group_Controller_.new [ :grep, :ruby ], self
-        @grep_state = Grep_Boolean__.new group, self
+        grp = Boolean_Group_Controller_.new [ :grep, :ruby ], :grep_via, self
+        @paths_agent_group = grp
+        gbf = Grep_Boolean__.new grp, self
+        @grep_boolean_field = gbf
+        _rbf = Ruby_Boolean__.new grp, self
+
         @children = [
           Up_Button_.new( self ),
-          @grep_state,
-          Ruby_Boolean__.new( group, self ),
+          gbf,
+          _rbf,
           Files_Agent__.new( self ),
           Counts_Agent__.new( self ),
           Matches_Agent__.new( self ),
           Replace_Agent__.new( self ),
-          Quit_Button_.new( self ) ]
+          Quit_Button_.new( self ),
+          grp ]
+
+        retrieve_values_from_FS_if_exist
         ACHIEVED_
       end
 
-      attr_reader :paths_agent_group, :grep_state
+      attr_reader :paths_agent_group, :grep_boolean_field
 
       def display_body  # :+#aesthetics :/
         @serr.puts
         super
         @serr.puts
+      end
+
+      def to_marshal_pair
+      end
+
+      # ~ public API for children calling up to us as parent
+
+      def receive_branch_changed_notification
+        receive_try_to_persist
+        nil
       end
 
       class Grep_Boolean__ < Boolean_
@@ -237,7 +319,7 @@ module Skylab::BeautySalon
         end
 
         def is_executable
-          @paths_agent_group.has_active_toggle
+          @paths_agent_group.has_active_boolean
         end
       end
 
@@ -248,7 +330,7 @@ module Skylab::BeautySalon
         end
 
         def execute
-          @scan = @paths_agent_group.active_toggle.build_path_scan
+          @scan = @paths_agent_group.active_boolean.build_path_scan
           @scan and via_scan
           change_focus_to @parent
         end
@@ -269,13 +351,17 @@ module Skylab::BeautySalon
           end
           nil
         end
+
+      public
+        def to_marshal_pair
+        end
       end
 
       class Counts_Agent__ < Branch_Agent_  # (grep only)
 
         def initialize x
           super
-          @grep_state = @parent.grep_state
+          @grep_boolean_field = @parent.grep_boolean_field
         end
 
         def to_body_item_value_string
@@ -285,11 +371,11 @@ module Skylab::BeautySalon
         end
 
         def is_executable
-          @grep_state.is_activated
+          @grep_boolean_field.is_activated
         end
 
         def execute
-          @scan = @grep_state.build_counts_scan
+          @scan = @grep_boolean_field.build_counts_scan
           @scan and via_scan
           change_focus_to @parent
         end
@@ -312,6 +398,10 @@ module Skylab::BeautySalon
           end
           nil
         end
+
+      public
+        def to_marshal_pair
+        end
       end
 
       class Matches_Depender__ < Paths_Depender__
@@ -332,7 +422,7 @@ module Skylab::BeautySalon
         end
 
         def refresh_file_scan_ivars
-          @path_scan = @paths_agent_group.active_toggle.build_path_scan
+          @path_scan = @paths_agent_group.active_boolean.build_path_scan
           @regex = @parent.regexp_field.regexp
           @path_scan && @regex && ACHIEVED_
         end
@@ -364,6 +454,9 @@ module Skylab::BeautySalon
               send_event ev_p[]
             end )
           @file_scan && ACHIEVED_
+        end
+
+        def to_marshal_pair
         end
       end
 
@@ -398,6 +491,9 @@ module Skylab::BeautySalon
           else
             when_no_files
           end
+        end
+
+        def to_marshal_pair
         end
 
       private

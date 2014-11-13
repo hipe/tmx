@@ -18,6 +18,10 @@ module Skylab::Brazen
         ok && via_subsection_id_resolve_some_result
         ok && @result
       end
+
+      def maybe_send_event *, & ev_p
+        @event_receiver.receive_event ev_p[]
+      end
     end
 
     class Actors__::Scan < Git_Config_Actor_
@@ -47,7 +51,7 @@ module Skylab::Brazen
       def via_model_class_rslv_subsection_name_query
         i = via_model_class_prdc_section_name_i
         @subsection_name_query = -> sect do
-          i == sect.normalized_name_i
+          i == sect.external_normal_name_symbol
         end ; nil
       end
 
@@ -154,7 +158,7 @@ module Skylab::Brazen
         s_i = ss.section_s.intern ; ss_s = ss.subsection_s
         found = false ; count = 0
         while sect = scan.gets
-          s_i == sect.normalized_name_i or next
+          s_i == sect.external_normal_name_symbol or next
           count += 1
           ss_s == sect.subsect_name_s or next
           found = true
@@ -210,7 +214,7 @@ module Skylab::Brazen
         scan = @section.assignments.to_scan
         props = @model_class.properties
         while ast = scan.gets
-          i = ast.normalized_name_i
+          i = ast.external_normal_name_symbol
           prop = props.fetch i
           if prop.takes_argument
             x = ast.value_x

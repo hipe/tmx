@@ -28,12 +28,12 @@ module Skylab::Brazen
       end
 
       def via_IO
-        _doc = Brazen_.cfg.read @up_IO do |ev|
+        doc = Brazen_.cfg.read @up_IO do |ev|
           receive_persistence_error ev
           UNABLE_
         end
-        _doc and begin
-          @section = _doc.sections.first
+        doc and begin
+          @section = doc.sections.first
           if @section
             via_section
           else
@@ -58,6 +58,7 @@ module Skylab::Brazen
       end
 
       def via_assignments
+        init_child_name_map
         scn = @assignments.to_scan
         while @ast = scn.gets
           ok = via_ast
@@ -66,16 +67,31 @@ module Skylab::Brazen
         ok
       end
 
-      def via_ast
-        name_i = @ast.normalized_name_i
-        @child = @children.detect do |cx|
-          name_i == cx.name_i
+      def init_child_name_map
+        # for now we go ahead and hash it all even though lots
+        # of nodes here may not be persistable (buttons etc)
+        h = {}
+        @children.each do |cx|
+          h[ cx.name_i ] = cx
         end
+        @child_via_normal_name_h = h ; nil
+      end
+
+      def via_ast
+        @name_i = @ast.external_normal_name_symbol
+        @child = @child_via_normal_name_h[ @name_i ]
         if @child
           via_child
         else
-          UNABLE_
+          when_no_such_node
         end
+      end
+
+      def when_no_such_node
+        @on_event_selectively.call :error do
+          Brazen_.event.inline_not_OK_with :no_such_node, :name_symbol, @name_i
+        end
+        UNABLE_
       end
 
       def via_child

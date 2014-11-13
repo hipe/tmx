@@ -216,17 +216,45 @@ module Skylab::Brazen
         end
       end
 
-    private
-
-      # ~ persistence stuff for branch node
-
-      def retrieve_values_from_FS_if_exist  # :+#courtesy
-        Zerk_::Actors__::Retrieve[
-          @persist_path, @children, method( :maybe_receive_persist_event ) ]
+      def has_name name_i  # :+#courtesy
+        @children.index do |cx|
+          name_i == cx.name_i
+        end
       end
 
-      def maybe_receive_persist_event i, *_, & ev_p
-        send_event ev_p[]
+      # ~ persistence stuff for branch node :+#courtesy
+
+      def receive_try_to_persist
+        Zerk_::Actors__::Persist.with(
+          :path, persist_path,
+          :children, @children,
+          :serr, @serr,
+          :on_event_selectively, -> *, & ev_p do
+            send_event ev_p[]
+          end )
+      end
+
+    private
+
+      def retrieve_values_from_FS_if_exist
+        Zerk_::Actors__::Retrieve[
+          persist_path,
+          @children,
+          -> *, & ev_p do
+            send_event ev_p[]
+          end ]
+      end
+
+      def persist_path
+        @persist_path ||= build_persist_path
+      end
+
+      def build_persist_path
+        "#{ work_dir }/current-#{ persist_filename }-form.conf"
+      end
+
+      def persist_filename
+        @name.as_slug
       end
     end
 
@@ -361,14 +389,6 @@ module Skylab::Brazen
         _expag = Brazen_::API.expression_agent_instance
         ev.scan_for_render_lines_under _expag
       end
-    end
-
-    RECEIVE_TRY_TO_PERSIST_METHOD = -> do
-      Zerk_::Actors__::Persist.with(
-        :path, @persist_path,
-        :children, @children,
-        :serr, @serr,
-        :on_event_selectively, method( :maybe_receive_persist_event ) )
     end
 
     AS_IS_ = :as_is_signal

@@ -33,7 +33,7 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
       with "[sectum]\n"
       expect_config do |conf|
         conf.sections.length.should eql 1
-        conf.sections.first.normalized_name_i.should eql :sectum
+        conf.sections.first.external_normal_name_symbol.should eql :sectum
       end
     end
 
@@ -44,7 +44,7 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
       HERE
       expect_config do |conf|
         conf.sections.length.should eql 1
-        conf.sections.first.normalized_name_i.should eql :scto
+        conf.sections.first.external_normal_name_symbol.should eql :scto
       end
     end
 
@@ -58,7 +58,7 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
       HERE
       expect_config do |conf|
         conf.sections.length.should eql 1
-        conf.sections.first.normalized_name_i.should eql :scton
+        conf.sections.first.external_normal_name_symbol.should eql :scton
       end
     end
 
@@ -66,7 +66,7 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
       with '[ -.secto-2014.08 "foo \\" \\\\ " ]'
       expect_config do |conf|
         sect = conf.sections.first
-        sect.name_s.should eql '-.secto-2014.08'
+        sect.internal_normal_name_string.should eql '-.secto-2014.08'
         sect.subsect_name_s.should eql 'foo " \\ '
       end
     end
@@ -77,7 +77,7 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
         [WiZ]
       HERE
       expect_config do |conf|
-        conf.sections.map { |x| x.normalized_name_i }.should eql [ :wiz, :wiz ]
+        conf.sections.map { |x| x.external_normal_name_symbol }.should eql [ :wiz, :wiz ]
       end
     end
 
@@ -98,7 +98,7 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
       expect_config do |conf|
         _sect = conf.sections[ :sect ]
         ast = _sect.assignments.first
-        ast.name_s.should eql 'foo'
+        ast.internal_normal_name_string.should eql 'foo'
         ast.value_x.should eql 'bar'
       end
     end

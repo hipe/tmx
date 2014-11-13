@@ -145,18 +145,15 @@ module Skylab::BeautySalon
         @children = [
           @regexp_field = Search_Field__.new( self ),
           @replace_field = Replace_Field__.new( self ),
-          Dirs_Field__.new( self ),
-          Files_Field__.new( self ),
-          pa = Preview_Button__.new( self ),
+          @dirs_field = Dirs_Field__.new( self ),
+          @files_field = Files_Field__.new( self ),
+          pa = Preview_Agent__.new( self ),
           Quit_Button_.new( self ) ]
         pa.orient_self
         @work_dir = '.search-and-replace'
-        @persist_path = "#{ @work_dir }/current-search.conf"
         retrieve_values_from_FS_if_exist
         @is_first_display = true
       end
-
-      define_method :receive_try_to_persist, Zerk_::RECEIVE_TRY_TO_PERSIST_METHOD
 
       def display_separator
         if @is_first_display
@@ -174,7 +171,7 @@ module Skylab::BeautySalon
 
     public
 
-      attr_reader :regexp_field, :replace_field, :work_dir
+      attr_reader :dirs_field, :files_field, :regexp_field, :replace_field, :work_dir
 
     end
 
@@ -408,21 +405,18 @@ module Skylab::BeautySalon
       end
     end
 
-    class Preview_Button__ < Branch_Agent_
+    class Preview_Agent__ < Branch_Agent_
 
       def initialize x
         super
       end
 
       def orient_self
-        h = @parent.current_child_hashtable
-        @parent_files_agent = h.fetch :files
-        @parent_dirs_agent = h.fetch :dirs
-        @regexp_agent = h.fetch :search
+        @parent_files_field = @parent.files_field
+        @parent_dirs_field = @parent.dirs_field
+        @regexp_field = @parent.regexp_field
         nil
       end
-
-      attr_reader :regexp_agent
 
       def prepare_UI
         mod = S_and_R_::Preview_Agent_Children__
@@ -445,8 +439,8 @@ module Skylab::BeautySalon
       end
 
       def is_executable
-        @parent_files_agent.value_is_known &&
-          @parent_dirs_agent.value_is_known
+        @parent_files_field.value_is_known &&
+          @parent_dirs_field.value_is_known
       end
 
       def to_body_item_value_string
@@ -476,6 +470,14 @@ module Skylab::BeautySalon
       end
 
     public  # ~ for children only
+
+      def dirs_field
+        @parent_dirs_field
+      end
+
+      def files_field
+        @parent_files_field
+      end
 
       def lower_files_agent
         @my_files_agent
@@ -510,6 +512,9 @@ module Skylab::BeautySalon
         else
           UNABLE_
         end
+      end
+
+      def to_marshal_pair  # if it's in a branch node that persists itself
       end
     end
 

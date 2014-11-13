@@ -137,8 +137,9 @@ module Skylab::Brazen
           @result = ACHEIVED_
         end
 
-        def event_receiver
-          @entity
+        def maybe_send_event *, & ev_p
+          _ev = ev_p[]
+          @entity.receive_event _ev
         end
       end
     end
