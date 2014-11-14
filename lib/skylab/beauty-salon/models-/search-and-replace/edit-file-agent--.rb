@@ -2,7 +2,7 @@ module Skylab::BeautySalon
 
   class Models_::Search_and_Replace
 
-    class Edit_File_Agent__ < Branch_Agent_  # notes are stowed away in [#016]
+    class Edit_File_Agent__ < Branch_  # notes are stowed away in [#016]
 
       def initialize edit_session, has_next_file, x
         super x
@@ -31,13 +31,15 @@ module Skylab::BeautySalon
       end
 
       def add_children_when_matches
-        @children.push Previous_Button__.new self
-        @children.push Yes_Button__.new self
-        @children.push Undo_Button__.new self
-        @children.push Next_Match_Button__.new self
-        @children.push All_Remaining_in_File_Button__.new self
-        @children.push Skip_Remaining_in_File_Button__.new self
-        @children.push Done_with_File_Button__.new self
+        a = @children
+        a.push Previous_Button__.new self
+        a.push Yes_Button__.new self
+        a.push Undo_Button__.new self
+        a.push Next_Match_Button__.new self
+        a.push All_Remaining_in_File_Button__.new self
+        a.push Skip_Remaining_in_File_Button__.new self
+        a.push Done_with_File_Button__.new self
+        nil
       end
 
       def refresh_button_visibilities
@@ -285,7 +287,7 @@ module Skylab::BeautySalon
         end )
       end
 
-      class Button_ < Leaf_Agent_
+      class Button_ < Field_
 
         def when_focus
           execute

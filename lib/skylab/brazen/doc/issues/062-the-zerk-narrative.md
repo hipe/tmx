@@ -166,3 +166,147 @@ means "this is the marshalled value".
 agents that never persist can simply define the hook-out method with an
 empty body. this is better than doing this with `marshal_dump` would have
 ambiguous semantics.
+
+
+
+
+## :#note-branch
+
+a branch node
+
+  • has children nodes
+  • has visual representation when interactive
+  • consumes upstream input, blocks when interactive
+  • does not have a value of its own
+  • does not itself persist, but helps children marshal and unmarshal
+
+the branch node's main purpose is as a creator of a namespace (useful
+for both interactive and non-interactive modes) and (when interactive)
+a way to break large "forms" into smaller "forms".
+
+
+
+
+## :#note-fields
+
+a field node
+
+  • does not have children nodes
+  • has visual representation when interactive
+  • consumes upstream input, blocks when interactive
+  • has a value that is known or not known
+  • may persist per implementation
+
+the field must be implemented by the application to take user- or
+marhshalled data and convert it (as possible) to an internal
+representation. there is as yet no out-of-the-box support, for example,
+for a simple string field because one has not yet been useful to have on
+its own.
+
+
+
+
+## :#note-button
+
+currently "button" does not have formal representation in the code
+other than the fact that some node classes include the word "button" in
+their name. despite this the following criteria *must* be met and the
+following considerations should be taken into account to call anything
+a "button" in a zerk mezo-interface:
+
+a button node
+
+  • does not have children nodes
+  • has visual representation when interactive
+  • consumes upstream input *only when interactive*, never blocks
+  • does not itself have a value
+  • hence does not persist
+
+currently a button exists only to drive program flow (e.g navigation)
+and must have significance only for interactive modes. otherwise (in
+the non-interactive mode) it must be that every button exist vestigially
+but is not required for operation and must never be reachable (the
+framework will be built for this: do not use or support the use of button
+names anywhere in non-interactive requests.)
+
+the only known classes of button that exist currently are "up" and
+"quit". neither of these are useful (or used) in non-interactive modes.
+
+a "boolean node" (described below) "feels like" a button in how it
+manifests in the UI (for interactive mode) but is categorized
+differently because of its a) relevance to the non-interactive mode and
+b) the fact that it is part of a composition that (unlike a button) has
+a value that can be persisted, etc.
+
+
+
+
+## :#note-bool
+
+a boolean node
+
+  • does not have children nodes
+  • has visual representation when interactive
+  • consumes upstream input but never blocks
+  • has a value that is known or not known
+  • may persist currently only thru an "enumeration group"
+  • its value when known is either `true` or `false`, making it a special
+      kind of "tagged union" of "unit type" of type theory; or
+      "enumerated type" in computer science.
+
+currently boolean nodes are only used to implement "enumeration group" (see).
+this was formerly called "toggle', named after one way we see this sort
+of field manifest in GUI's. (another such surface representation in
+another modality is as a "flag".)
+
+
+
+
+## :#note-enum
+
+an enumeration group
+
+  • has children nodes effectively (but this may not be relevant)
+  • does not itself have visual representation (its constituents do)
+  • does not itself consume upstream input, and so never blocks
+  • has a value that is known or not known
+  • has a persistence implementation
+  • currently, its value when known is a symbolic representation of which
+    one of its children is "activated"
+
+this is an implementation of what we know as an "enumerated type" in
+computer science or (maybe?) a "sum type" in type theory. we see this
+sort of field manifest in GUI interfaces variously as "radio button" groups
+or "selects" ("drop-downs") (the common kind that lets you chose only one
+of its elements); among perhaps other surface representations.
+
+we implement this (and conceive of it) in what may seem like a strange
+way: we see an enumeration as a grouping of boolean nodes whereby only
+one of those nodes may have the "true" value at any given time (and
+possibly none of them have it).
+
+(this isomorphicism is further explored in "the axiom of binary
+convertability" in [#it-003]: an enum field may be represented generally
+and losslessly as a group of boolean fields whose truth is mutually
+exclusive, and the converse is true; hence they are two different
+surface representations of a deeper structure.)
+
+we will refer to the one boolean node that has the true value as having
+been "activated".
+
+as for implementing persistence for this whole grouping, it is convenient
+(if somewhat awkward) to implement it this way: the boolean nodes
+themselves do not persist individually. they effectively report up to this
+parent node when their value changes, and so the parent redundantly keeps
+track of which node is activated. to persist all possible (valid) states of
+this grouping it is only ever necessary to represent which particular
+child (if any) is activated. we do this with a symbolic (string)
+representation of the activated child node using its normal name, and we
+can likewise unmarshal the grouping's state thru this same means.
+
+this is why this group structure is itself modeled to "look like" a node:
+to the branch parent that persists this node reports a persistence pair
+just like any other persisting child ("field") does: it gives its own name
+for the group and for its value it gives the symbolic name of the activated
+node. (when no child is activated, it results in `nil` for the pair
+message.)

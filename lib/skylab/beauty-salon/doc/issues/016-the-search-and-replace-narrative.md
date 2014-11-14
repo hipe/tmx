@@ -239,20 +239,3 @@ individual constituency:
     the file nd be done with it.
 
 this whole note reveals a smell and opened up [#022].
-
-
-
-
-## (notes from another child node)
-
-### #note-122
-
-experimentally this node acts like an agent node - although it does not
-render itself to the screen directly (its children do autonomously),
-nor does it directly receive user input, it manages the marshaing and
-unmarshaling of all the children at once into one field.
-
-indeed by a thing that is probably "the axiom of binary convertability"
-in [#it-003], this is how in this modality we model something like an
-"enum", "radio button group", "select" etc which can be thought of as a
-single field.

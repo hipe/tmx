@@ -263,10 +263,14 @@ module Skylab::Brazen
           @sp_as_s_a = @o.terminal_channel_i.to_s.split UNDERSCORE_
           maybe_replace_noun_phrase_with_prop
           rslv_item_x_from_first_tag
-          did = maybe_describe_item_x
-          did ||= maybe_pathify_item_x
-          did || ickify_item_x
-          @y << "#{ @sp_as_s_a * SPACE_ } - #{ @item_x }" ; nil
+          if @has_first_tag
+            did = maybe_describe_item_x
+            did ||= maybe_pathify_item_x
+            did || ickify_item_x
+            @y << "#{ @sp_as_s_a * SPACE_ } - #{ @item_x }"
+          else
+            @y << "#{ @sp_as_s_a * SPACE_ }"
+          end ; nil
         end
 
       private
@@ -286,8 +290,14 @@ module Skylab::Brazen
         VERB_RX__ = /\A(?:already|cannot|does|has|is)\z/  # etc as needed
 
         def rslv_item_x_from_first_tag
-          @first_tag_i = @o.first_tag_name
-          @item_x = @o.send @first_tag_i ; nil
+          i = @o.first_tag_name
+          if i && :ok != i  # ick
+            @has_first_tag = true
+            @first_tag_i = i
+            @item_x = @o.send @first_tag_i
+          else
+            @has_first_tag = false
+          end ; nil
         end
 
         def maybe_describe_item_x

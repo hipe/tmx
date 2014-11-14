@@ -4,7 +4,7 @@ module Skylab::BeautySalon
 
     Preview_Agent_Children__ = ::Module.new  # notes stowed away in [#016]
 
-    class Preview_Agent_Children__::Files_Agent < Leaf_Agent_
+    class Preview_Agent_Children__::Files_Agent < Field_
 
       def orient_self
         @dirs_field = @parent.dirs_field
@@ -64,134 +64,7 @@ module Skylab::BeautySalon
       end
     end
 
-    class Boolean_Group_Controller_
-
-      def initialize i_a, group_name_i, node
-        @active_boolean = nil
-        @group_name = Callback_::Name.via_variegated_symbol group_name_i
-        @has_active_boolean = false
-        @i_a = i_a
-        @node = node
-      end
-
-      attr_reader :active_boolean, :has_active_boolean
-
-      def activate name_i
-        change_did_occur = maybe_activate name_i
-        if change_did_occur
-          when_changed
-        else
-          when_not_changed
-        end
-      end
-
-    private
-
-      def maybe_activate name_i  # no not trigger persistence from here
-        @active_boolean = @has_active_boolean = nil
-        change_did_occur = false
-        @first = nil
-        @i_a.each do |i|
-          boolean = @node[ i ]
-          @first ||= boolean
-          if name_i == i
-            if boolean.is_activated
-              ok = true
-            else
-              ok = boolean.receive_activation
-              if ok
-                change_did_occur = true
-              end
-            end
-            if ok
-              @has_active_boolean = true
-              @active_boolean = boolean
-            end
-          elsif boolean.is_activated
-            _ok = boolean.receive_deactivation
-            _ok and change_did_occur = true
-          end
-        end
-        change_did_occur
-      end
-
-      def when_not_changed
-        @node.change_focus_to @node
-      end
-
-      def when_changed
-        @node.receive_branch_changed_notification
-        @node.change_focus_to @node
-      end
-
-    public  # #note-122
-
-      def is_executable
-      end
-
-      def marshal_load name_of_active_child_string, & ev_p
-        name_i = name_of_active_child_string.intern
-        _ok = @node.has_name name_i
-        if _ok
-          _change_did_occur = maybe_activate name_i
-          _change_did_occur  # kinda nasty - this becomes 'OK'
-        else
-          when_marshal_load_fail name_i, ev_p
-        end
-      end
-
-      def name_i
-        @group_name.as_variegated_symbol
-      end
-
-      def to_body_item_value_string
-      end
-
-      def to_marshal_pair
-        if @has_active_boolean
-          Callback_.pair.new @active_boolean.name_i, @group_name.as_slug.intern
-        end
-      end
-
-    private
-
-      def when_marshal_load_fail name_i, ev_p
-        ev_p.call :error, :marshal_load_error do
-          self._ETC  # #todo
-        end
-        UNABLE_
-      end
-    end
-
-    class Boolean_ < Leaf_Agent_
-
-      def initialize group, parent
-        @group = group
-        @is_activated = false
-        super parent
-      end
-
-      attr_reader :is_activated
-
-      def execute
-        @group.activate name_i
-      end
-
-      def receive_activation
-        @is_activated = true
-        ACHIEVED_
-      end
-
-      def receive_deactivation
-        @is_activated = false
-        ACHIEVED_
-      end
-
-      def to_marshal_pair  # the group controller does this
-      end
-    end
-
-    class Preview_Agent_Children__::Matches_Agent < Branch_Agent_
+    class Preview_Agent_Children__::Matches_Agent < Branch_
 
       def orient_self
         @fa = @parent.lower_files_agent
@@ -210,7 +83,7 @@ module Skylab::BeautySalon
       end
 
       def prepare_UI
-        grp = Boolean_Group_Controller_.new [ :grep, :ruby ], :grep_via, self
+        grp = Zerk_::Enumeration_Group.new [ :grep, :ruby ], :grep_via, self
         @paths_agent_group = grp
         gbf = Grep_Boolean__.new grp, self
         @grep_boolean_field = gbf
@@ -249,7 +122,9 @@ module Skylab::BeautySalon
         nil
       end
 
-      class Grep_Boolean__ < Boolean_
+      class Grep_Boolean__ < Zerk_::Boolean
+
+        include Agent_Methods_
 
         def to_body_item_value_string
           if @is_activated
@@ -294,7 +169,9 @@ module Skylab::BeautySalon
         end
       end
 
-      class Ruby_Boolean__ < Boolean_
+      class Ruby_Boolean__ < Zerk_::Boolean
+
+        include Agent_Methods_
 
         def to_body_item_value_string
           if @is_activated
@@ -302,6 +179,12 @@ module Skylab::BeautySalon
           else
             "(turn on using ruby (not grep) to find matching files)"
           end
+        end
+
+        def build_path_scan
+          send_event BS_::Lib_::Event_lib[].inline_not_OK_with(
+            :not_yet_implemented, :method_name, :build_path_scan )
+          UNABLE_
         end
       end
 
@@ -357,7 +240,7 @@ module Skylab::BeautySalon
         end
       end
 
-      class Counts_Agent__ < Branch_Agent_  # (grep only)
+      class Counts_Agent__ < Branch_  # (grep only)
 
         def initialize x
           super

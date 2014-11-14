@@ -60,16 +60,12 @@ module Skylab::BeautySalon
 
     # ~ the agents
 
-    module Agent_Methods__
+    module Agent_Methods_
 
       # ~ as child we might receive these from parent
 
       def before_focus
         @last_prepare_UI_was_OK ||= prepare_UI
-      end
-
-      def when_focus
-        AS_IS_SIGNAL_
       end
 
     private
@@ -117,28 +113,27 @@ module Skylab::BeautySalon
 
     class Agent_ < Zerk_::Common_Agent
 
-      include Agent_Methods__
+      include Agent_Methods_
 
     end
 
-    class Branch_Agent_ < Zerk_::Branch_Agent
+    class Branch_ < Zerk_::Branch_Node
 
-      include Agent_Methods__
-
-    public  # ~ as parent we receive these from children
-
-      def current_child_hashtable
-        @_curr_chld_h ||= build_child_hashtable.freeze
-      end
-    end
-
-    class Leaf_Agent_ < Zerk_::Leaf_Agent
-
-      include Agent_Methods__
+      include Agent_Methods_
 
     end
 
-    class Search_and_Replace_Agent__ < Branch_Agent_
+    class Field_ < Zerk_::Field
+
+      include Agent_Methods_
+
+    end
+
+    Up_Button_ = Zerk_::Up_Button
+
+    Quit_Button_ = Zerk_::Quit_Button
+
+    class Search_and_Replace_Agent__ < Branch_
 
       def initialize x
         super x
@@ -175,7 +170,7 @@ module Skylab::BeautySalon
 
     end
 
-    class Search_Field__ < Leaf_Agent_
+    class Search_Field__ < Field_
 
       def initialize x
         @rx = nil
@@ -244,7 +239,7 @@ module Skylab::BeautySalon
       end
     end
 
-    class Replace_Field__ < Leaf_Agent_
+    class Replace_Field__ < Field_
 
       def initialize x
         @o = nil
@@ -382,12 +377,12 @@ module Skylab::BeautySalon
       "for now, multiple values can be separated with one or more spaces."
 
     THATS_COMING__ = -> s do
-      "and for now, there is no support for spaces in #{ s } list but that's coming.."
+      "and for now, there is no support for spaces in #{ s } list but that's coming.."  # #open [#023]
     end
 
     LIST_HACK_SEPARATOR_RX__ = /[ \t]+/
 
-    class Dirs_Field__ < Leaf_Agent_
+    class Dirs_Field__ < Field_
 
       include List_Hack_Methods__
 
@@ -396,7 +391,7 @@ module Skylab::BeautySalon
       end
     end
 
-    class Files_Field__ < Leaf_Agent_
+    class Files_Field__ < Field_
 
       include List_Hack_Methods__
 
@@ -405,7 +400,7 @@ module Skylab::BeautySalon
       end
     end
 
-    class Preview_Agent__ < Branch_Agent_
+    class Preview_Agent__ < Branch_
 
       def initialize x
         super
@@ -481,63 +476,6 @@ module Skylab::BeautySalon
 
       def lower_files_agent
         @my_files_agent
-      end
-    end
-
-    class Up_Button_ < Leaf_Agent_
-
-      def initialize times=2, x
-        @times = times
-        super x
-      end
-
-      def to_body_item_value_string
-      end
-
-      def when_focus
-        execute
-      end
-
-      def execute
-        scn = Callback_.scan.via_times @times
-        if scn.gets
-          current = @parent
-        end
-        while scn.gets
-          current = current.parent
-        end
-        if current
-          change_focus_to current
-          AS_IS_SIGNAL_
-        else
-          UNABLE_
-        end
-      end
-
-      def to_marshal_pair  # if it's in a branch node that persists itself
-      end
-    end
-
-    class Quit_Button_ < Leaf_Agent_
-
-      def to_body_item_value_string
-      end
-
-      def when_focus
-        execute
-      end
-
-      def display_panel
-        # if you overwrote `execute` you wouldn't see the amusingly useless nav
-        super
-        @y << 'goodbye.'
-        DONE_
-      end
-
-      def prompt
-      end
-
-      def to_marshal_pair
       end
     end
 

@@ -31,7 +31,7 @@ module Skylab::Brazen
 
     public
 
-      # ~ resources & metadata that parent will ask of you as a child
+      # ~ messages parent will send to you as child
 
       def name_i
         @name.as_variegated_symbol
@@ -39,6 +39,13 @@ module Skylab::Brazen
 
       def slug
         @name.as_slug
+      end
+
+      def before_focus  # :+#courtesy (means it is not used here)
+      end
+
+      def when_focus  # :+#courtesy
+        AS_IS_SIGNAL
       end
 
       def is_executable
@@ -122,7 +129,7 @@ module Skylab::Brazen
       end
     end
 
-    class Branch_Agent < Common_Agent
+    class Branch_Node < Common_Agent  # see #note-branch
     private
 
       def receive_mutable_input_line s
@@ -150,13 +157,13 @@ module Skylab::Brazen
 
       def when_ambiguous cx_a
         @y << "did you mean #{ cx_a.map( & :slug ) * ' or ' } ?"
-        AS_IS_
+        AS_IS_SIGNAL
       end
 
       def when_none s
         @y << "unrecognized command: #{ s.inspect }"
         @y << "please enter #{ build_prompt_line }"
-        AS_IS_
+        AS_IS_SIGNAL
       end
 
       def when_one cx
@@ -181,7 +188,7 @@ module Skylab::Brazen
 
       def prompt
         @serr.write "#{ build_prompt_line }: "
-        AS_IS_
+        AS_IS_SIGNAL
       end
 
       def build_prompt_line  # #note-190
@@ -201,14 +208,6 @@ module Skylab::Brazen
       end
 
     public
-
-      def build_child_hashtable  # :+#courtesy
-        h = {}
-        @children.each do |cx|
-          h[ cx.name_i ] = cx
-        end
-        h
-      end
 
       def [] name_i  # :+#courtesy
         @children.detect do |cx|
@@ -258,7 +257,7 @@ module Skylab::Brazen
       end
     end
 
-    class Leaf_Agent < Common_Agent
+    class Field < Common_Agent  # see #note-field
 
       # :+#hook-out's: (in addition to those listed in parent class)
       #
@@ -293,12 +292,12 @@ module Skylab::Brazen
 
       def prompt_when_value  #:+public-API
         @serr.write "new #{ noun } (nothing to cancel): "
-        AS_IS_
+        AS_IS_SIGNAL
       end
 
       def prompt_when_no_value
         @serr.write "#{ noun } (nothing to cancel): "
-        AS_IS_
+        AS_IS_SIGNAL
       end
 
       public def noun
@@ -352,7 +351,7 @@ module Skylab::Brazen
           when_value_changed
         else
           @y << "cannot delete #{ slug } value"
-          AS_IS_
+          AS_IS_SIGNAL
         end
       end
 
@@ -361,7 +360,7 @@ module Skylab::Brazen
         if ok
           when_value_changed
         else
-          AS_IS_
+          AS_IS_SIGNAL
         end
       end
 
@@ -374,6 +373,91 @@ module Skylab::Brazen
 
       def try_to_persist
         @parent.receive_try_to_persist
+      end
+    end
+
+    class Boolean < Common_Agent  # see #note-bool
+
+      def initialize group, parent
+        @group = group
+        @is_activated = false
+        super parent
+      end
+
+      attr_reader :is_activated
+
+      def execute
+        @group.activate name_i
+      end
+
+      def receive_activation
+        @is_activated = true
+        ACHIEVED_
+      end
+
+      def receive_deactivation
+        @is_activated = false
+        ACHIEVED_
+      end
+
+      def to_marshal_pair  # the group controller does this
+      end
+    end
+
+    class Up_Button < Common_Agent  # :+#note-button
+
+      def initialize times=2, x
+        @times = times
+        super x
+      end
+
+      def to_body_item_value_string
+      end
+
+      def when_focus
+        execute
+      end
+
+      def execute
+        scn = Callback_.scan.via_times @times
+        if scn.gets
+          current = @parent
+        end
+        while scn.gets
+          current = current.parent
+        end
+        if current
+          change_focus_to current
+          AS_IS_SIGNAL
+        else
+          UNABLE_
+        end
+      end
+
+      def to_marshal_pair  # if it's in a branch node that persists itself
+      end
+    end
+
+    class Quit_Button < Common_Agent  # :+#note-button
+
+      def to_body_item_value_string
+      end
+
+      def when_focus
+        execute
+      end
+
+      def display_panel
+        # if you overwrote `execute` you wouldn't see the amusingly useless nav
+        super
+        @y << 'goodbye.'
+        FINISHED_SIGNAL
+      end
+
+      def prompt
+      end
+
+      def to_marshal_pair
       end
     end
 
@@ -391,9 +475,9 @@ module Skylab::Brazen
       end
     end
 
-    AS_IS_ = :as_is_signal
-    AS_IS_SIGNAL = AS_IS_
+    AS_IS_SIGNAL = :as_is_signal
     ACHEIVED_ = true  # #todo this will be the virgin voyage of [#bs-016]
+    FINISHED_SIGNAL = nil
     NONE_S = '(none)'.freeze
     NOTHING_TO_DO_ = nil
 

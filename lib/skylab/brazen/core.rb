@@ -251,6 +251,7 @@ module Skylab::Brazen
   end
 
   ACHEIVED_ = true
+  ACHIEVED_ = true
   Brazen_ = self
 
   Bound_Call__ = ::Struct.new :args, :receiver, :method_name do  # volatility order (subjective)

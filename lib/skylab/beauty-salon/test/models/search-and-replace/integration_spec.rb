@@ -10,39 +10,44 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
 
       _LAST_ITEM_RX = %r(\A[ ]+files[ ])
 
-      it "testing interactivity is fragile but possible" do
+      it "testing interactivity is possble but cumbersome" do
 
         start_session existent_tmpdir_path
+        o = @session
+        o.expect_line_eventually _LAST_ITEM_RX
 
-        @session.expect_line_eventually _LAST_ITEM_RX
-        @session.puts 'search'
-        @session.puts '\bhinkenlooper\b'
-        @session.puts 'dir'
-        @session.puts TS_.dir_pathname.to_path
-        @session.puts 'file'
-        @session.puts '*.rb'
-        @session.expect_line_eventually _LAST_ITEM_RX
+        o.puts 'search'
+        o.puts '\bhinkenlooper\b'
 
-        @session.puts 'preview'
-        @session.expect_line_eventually %r(\A[ ]+matches[ ])
+        o.puts 'dirs'
+        o.puts TS_.dir_pathname.to_path
+        o.expect_line_eventually _LAST_ITEM_RX
 
-        @session.puts 'matches'
-        @session.expect_line_eventually %r(\A[ ]+ruby[ ])
+        o.puts 'files'
+        o.puts '*.rb'
+        o.expect_line_eventually _LAST_ITEM_RX
 
-        @session.puts 'grep'
-        @session.expect_line_eventually %r(\A[ ]+matches[ ])
+        o.puts 'preview'
+        o.expect_line_eventually %r(\A[ ]+matches[ ])
 
-        @session.gets.should eql "\n"
+        o.puts 'matches'
+        o.expect_line_eventually %r(\A[ ]+ruby[ ])
 
-        @session.puts 'counts'
+        o.puts 'grep'
+        o.expect_line_eventually %r(\A[ ]+grep[ ]+ON\b)
+        o.expect_line_eventually %r(\A[ ]+matches[ ])
 
-        line = @session.gets
+        o.gets.should eql "\n"
+
+        o.puts 'counts'
+
+        line = o.gets
         line.should match %r(\bgrep -E\b)
 
-        line = @session.gets
+        line = o.gets
         line.chop!
 
-        totals = @session.gets
+        totals = o.gets
         totals.chop!
 
         # hinkenlooper
@@ -54,7 +59,7 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
 
         line.should eql expect_line
 
-        @session.close
+        o.close
 
       end
     end
