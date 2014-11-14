@@ -35,7 +35,7 @@ module Skylab::BeautySalon
     end
 
     def run
-      @agent = Search_and_Replace_Agent__.new self
+      @agent = Search_and_Replace_Node__.new self
       begin
         ok = @agent.execute
       end while ok
@@ -60,7 +60,7 @@ module Skylab::BeautySalon
 
     # ~ the agents
 
-    module Agent_Methods_
+    module Node_Methods_
 
       # ~ as child we might receive these from parent
 
@@ -111,21 +111,21 @@ module Skylab::BeautySalon
       end
     end
 
-    class Agent_ < Zerk_::Common_Agent
+    class Node_ < Zerk_::Common_Node
 
-      include Agent_Methods_
+      include Node_Methods_
 
     end
 
     class Branch_ < Zerk_::Branch_Node
 
-      include Agent_Methods_
+      include Node_Methods_
 
     end
 
     class Field_ < Zerk_::Field
 
-      include Agent_Methods_
+      include Node_Methods_
 
     end
 
@@ -133,7 +133,7 @@ module Skylab::BeautySalon
 
     Quit_Button_ = Zerk_::Quit_Button
 
-    class Search_and_Replace_Agent__ < Branch_
+    class Search_and_Replace_Node__ < Branch_
 
       def initialize x
         super x
@@ -142,7 +142,7 @@ module Skylab::BeautySalon
           @replace_field = Replace_Field__.new( self ),
           @dirs_field = Dirs_Field__.new( self ),
           @files_field = Files_Field__.new( self ),
-          pa = Preview_Agent__.new( self ),
+          pa = Preview_Node__.new( self ),
           Quit_Button_.new( self ) ]
         pa.orient_self
         @work_dir = '.search-and-replace'
@@ -400,7 +400,7 @@ module Skylab::BeautySalon
       end
     end
 
-    class Preview_Agent__ < Branch_
+    class Preview_Node__ < Branch_
 
       def initialize x
         super
@@ -415,8 +415,8 @@ module Skylab::BeautySalon
 
       def prepare_UI
         mod = S_and_R_::Preview_Agent_Children__
-        @my_files_agent = mod::Files_Agent.new self
-        matches_agent = mod::Matches_Agent.new self
+        @my_files_agent = mod::Files_Node.new self
+        matches_agent = mod::Matches_Node.new self
         matches_agent.orient_self
         @children = [
           Up_Button_.new( self ),

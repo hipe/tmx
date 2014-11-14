@@ -14,9 +14,12 @@ digraph {
 
   fu [label="function\nAPI"]
 
+  API [label="zerk\nAPI API"]
+
   cu->lib
   ev->cu
   lib->sr
   sr->st
   sr->fu
+  fu->API
 }

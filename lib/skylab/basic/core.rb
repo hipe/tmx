@@ -8,6 +8,10 @@ module Skylab::Basic  # introduction at [#020]
       Default_property_instance__[]
     end
 
+    def minimal_property name
+      Minimal_Property__.new name
+    end
+
     def normalizers
       Normalizers_instance__[]
     end

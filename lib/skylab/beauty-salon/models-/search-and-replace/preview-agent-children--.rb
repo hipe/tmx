@@ -4,7 +4,7 @@ module Skylab::BeautySalon
 
     Preview_Agent_Children__ = ::Module.new  # notes stowed away in [#016]
 
-    class Preview_Agent_Children__::Files_Agent < Field_
+    class Preview_Agent_Children__::Files_Node < Field_
 
       def orient_self
         @dirs_field = @parent.dirs_field
@@ -64,7 +64,7 @@ module Skylab::BeautySalon
       end
     end
 
-    class Preview_Agent_Children__::Matches_Agent < Branch_
+    class Preview_Agent_Children__::Matches_Node < Branch_
 
       def orient_self
         @fa = @parent.lower_files_agent
@@ -93,10 +93,10 @@ module Skylab::BeautySalon
           Up_Button_.new( self ),
           gbf,
           _rbf,
-          Files_Agent__.new( self ),
-          Counts_Agent__.new( self ),
-          Matches_Agent__.new( self ),
-          Replace_Agent__.new( self ),
+          Files_Node__.new( self ),
+          Counts_Node__.new( self ),
+          Matches_Node__.new( self ),
+          Replace_Node__.new( self ),
           Quit_Button_.new( self ),
           grp ]
 
@@ -124,7 +124,7 @@ module Skylab::BeautySalon
 
       class Grep_Boolean__ < Zerk_::Boolean
 
-        include Agent_Methods_
+        include Node_Methods_
 
         def to_body_item_value_string
           if @is_activated
@@ -171,7 +171,7 @@ module Skylab::BeautySalon
 
       class Ruby_Boolean__ < Zerk_::Boolean
 
-        include Agent_Methods_
+        include Node_Methods_
 
         def to_body_item_value_string
           if @is_activated
@@ -188,7 +188,7 @@ module Skylab::BeautySalon
         end
       end
 
-      class Paths_Depender__ < Agent_
+      class Paths_Depender__ < Node_
 
         def initialize x
           super
@@ -206,7 +206,7 @@ module Skylab::BeautySalon
         end
       end
 
-      class Files_Agent__ < Paths_Depender__
+      class Files_Node__ < Paths_Depender__
 
         def to_body_item_value_string_if_executable
           'list the matching filenames (but not the strings)'
@@ -240,7 +240,7 @@ module Skylab::BeautySalon
         end
       end
 
-      class Counts_Agent__ < Branch_  # (grep only)
+      class Counts_Node__ < Branch_  # (grep only)
 
         def initialize x
           super
@@ -311,7 +311,7 @@ module Skylab::BeautySalon
         end
       end
 
-      class Matches_Agent__ < Matches_Depender__
+      class Matches_Node__ < Matches_Depender__
 
         def to_body_item_value_string_if_executable
           'see the matching strings (not just files)'
@@ -343,7 +343,7 @@ module Skylab::BeautySalon
         end
       end
 
-      class Replace_Agent__ < Matches_Depender__
+      class Replace_Node__ < Matches_Depender__
 
         def to_body_item_value_string_if_executable
           "begin interactive search and replace yay!"
@@ -400,7 +400,7 @@ module Skylab::BeautySalon
         end
 
         def build_edit_file_agent
-          S_and_R_::Edit_File_Agent__.new @current_file_ES,
+          S_and_R_::Edit_File_Node__.new @current_file_ES,
             @next_file_ES ? true : false,
             self
         end

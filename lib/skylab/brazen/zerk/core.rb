@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   module Zerk  # see [#062]
 
-    class Common_Agent
+    class Common_Node
 
       # :+#hook-out's: (methods you need to implement in your child class)
       #
@@ -26,7 +26,7 @@ module Skylab::Brazen
         _cnst = RX__.match( _const )[ 0 ]
         Callback_::Name.via_const _cnst
       end
-      RX__ = /\A.+(?=_(?:Agent|Boolean|Button|Field)_*\z)/  # :+#experimental
+      RX__ = /\A.+(?=_(?:Agent|Branch|Boolean|Button|Field|Node)_*\z)/  # :+#experimental
     end
 
     public
@@ -48,8 +48,20 @@ module Skylab::Brazen
         AS_IS_SIGNAL
       end
 
+      def is_branch  # used for non-interactive mode
+        false
+      end
+
       def is_executable
         true
+      end
+
+      def is_navigational  # used in non-interactive mode
+        false
+      end
+
+      def is_terminal_node  # used in non-interactive mode
+        false
       end
 
       def execute
@@ -112,13 +124,9 @@ module Skylab::Brazen
 
     public
 
-      # ~ resources, metadata & methods that children will ask of you as parent
+      # ~ messages children will send to you as a parent
 
       attr_reader :parent, :sin, :serr
-
-      def primary_UI_yielder
-        @y
-      end
 
       def is_agent
         true
@@ -127,9 +135,40 @@ module Skylab::Brazen
       def change_focus_to x
         @parent.change_focus_to x
       end
+
+      def primary_UI_yielder
+        @y
+      end
+
+      def receive_event ev
+        @parent.receive_event ev
+      end
+
+    private
+
+      def build_not_OK_event_with * x_a, & p
+        Brazen_.event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, p
+      end
+
+      def build_OK_event_with * x_a, & p
+        Brazen_.event.inline_OK_via_mutable_iambic_and_message_proc x_a, p
+      end
+
+      def send_event ev
+        @parent.receive_event ev
+      end
     end
 
-    class Branch_Node < Common_Agent  # see #note-branch
+    class Branch_Node < Common_Node  # see #note-branch
+
+      def is_branch
+        true
+      end
+
+      def child_stream
+        Callback_.scan.via_nonsparse_array @children
+      end
+
     private
 
       def receive_mutable_input_line s
@@ -257,7 +296,7 @@ module Skylab::Brazen
       end
     end
 
-    class Field < Common_Agent  # see #note-field
+    class Field < Common_Node  # see #note-field
 
       # :+#hook-out's: (in addition to those listed in parent class)
       #
@@ -278,7 +317,26 @@ module Skylab::Brazen
       #   `marshal_load` - result in booleanish indicating success. if unable,
       #                    yield an event to the block if you want.
 
+
+      def execute_via_iambic_stream stream
+        if stream.unparsed_exists
+          execute_via_nonempty_iambic_stream stream
+        else
+          send_request_ended_prematurely_event
+          UNABLE_
+        end
+      end
+
     private
+
+      def send_request_ended_prematurely_event
+        _ev = build_not_OK_event_with :request_ended_prematurely,
+            :name, @name do |y, o|
+          _prop = Brazen_::Lib_::Bsc_[].minimal_property o.name
+          y << "request ended prematurely - expecting value for #{ par _prop }"
+        end
+        send_event _ev
+      end
 
       # ~ displaying the prompt
 
@@ -376,9 +434,9 @@ module Skylab::Brazen
       end
     end
 
-    class Boolean < Common_Agent  # see #note-bool
+    class Boolean < Common_Node  # see #note-bool
 
-      def initialize group, parent
+      def initialize group=nil, parent
         @group = group
         @is_activated = false
         super parent
@@ -386,8 +444,24 @@ module Skylab::Brazen
 
       attr_reader :is_activated
 
+      def execute_via_iambic_stream _
+        if @group
+          @group.activate name
+        elsif @is_activated
+          ACHIEVED_
+        else
+          receive_activation
+        end
+      end
+
       def execute
-        @group.activate name_i
+        if @group
+          @group.activate name_i
+        elsif @is_activated
+          receive_activation
+        else
+          receive_deactivation
+        end
       end
 
       def receive_activation
@@ -400,15 +474,24 @@ module Skylab::Brazen
         ACHIEVED_
       end
 
-      def to_marshal_pair  # the group controller does this
+      def to_marshal_pair
+        if @group
+          nil  # the group controller does this
+        elsif @is_activated
+          Callback_.pair.new :yes, name_i
+        end
       end
     end
 
-    class Up_Button < Common_Agent  # :+#note-button
+    class Up_Button < Common_Node  # :+#note-button
 
       def initialize times=2, x
         @times = times
         super x
+      end
+
+      def is_navigational
+        true
       end
 
       def to_body_item_value_string
@@ -438,7 +521,11 @@ module Skylab::Brazen
       end
     end
 
-    class Quit_Button < Common_Agent  # :+#note-button
+    class Quit_Button < Common_Node  # :+#note-button
+
+      def is_navigational
+        true
+      end
 
       def to_body_item_value_string
       end
