@@ -2,7 +2,7 @@
 
 ## introduction
 
-the name "zerk" is a portmanteau of "jerk" and "zork"; "zork" out of
+the name "zerk" is a portmanteau of "zork" and "jerk"; "zork" out of
 deference to the seminal text-adventure, and "jerk" just because.
 
 "zerk" is meant to be a
@@ -10,6 +10,9 @@ deference to the seminal text-adventure, and "jerk" just because.
   • lightweight (out of the box)
   • reusable library
   • for making *interactive*, *command-line* programs.
+
+as an unintended side-effect is has become an interesting alternative
+means to make non-interactive API's as well.
 
 
 
@@ -96,7 +99,8 @@ both as an exercisize and out of convenience, we play with the idea of a
 invocations of the application.
 
 for now this is done by writing the form's state to a simple text file
-using our "git-config" library, which seems to work well enough.
+using our "git-config" library, which seems to work well enough despite
+one [#064] known issue.
 
 for now we re-write the "entire" text file each time the user enters a
 new valid value for a leaf node, which is convenient for us preserving
@@ -121,9 +125,50 @@ terminal-based UI; but what zerk does *not* concern itself with is:
 
 for now, we don't even provide out-of-the-box defaults. for each of your
 leaf classes you will have to make these decisions for yourself. this is
-largely because that so far, with our frontier application it has proven
-futile to try and assume any defauls for these, given how polymorphic
+largely because so far, with our frontier application it has proven
+futile to try and assume any defaults for these, given how polymorphic
 our data fields are.
+
+
+
+
+## :#note-70
+
+this optional hook-in method is for any node that has some non-trivial
+building to do before it is displayed to screen (or before it processes
+a non-interactive token stream). typically this won't concern field-like
+and button-like nodes.
+
+this is intended to relieve us from building the entire application tree
+at the start of every invocation: typically a branch node will hook into
+this method to build its children lazily (and probably only once). this
+way every branch node's composition recurses only lazily, relieving
+system resources.
+
+by the application "driver" (event loop, invocation implementation etc)
+that calls it, this method should be called IFF the node "can receive
+focus". this is not a place to report failure: that should happen at the
+previous hook-in or the next one. hence there is no meaning associated
+with the result.
+
+
+
+
+## :#note-185
+
+
+
+with this default behavior it is the parent that decides whether or not
+the event would be of interest based on some sort of criteria or logic;
+for example based on the channel prefix (the `i_a`), or perhaps based on
+no criteria at all: maybe it accepts all events unconditionally, or
+likewise none.
+
+if and only if the parent does want the event, we (the child) sign the
+event with our name here at the entrypoint before passing it on up.
+this way the event's message is qualified only with the node name at the
+entrypoint, yet it is (some) parent node gets to decide how to emit the
+event outwards.
 
 
 

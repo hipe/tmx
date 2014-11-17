@@ -17,8 +17,9 @@ module Skylab::Headless
       # if it hasn't yet closed the other stream.
 
       def execute
+        thread = nil
         p = -> do
-          _, o, e = Headless_::Library_::Open3.popen3 @valid_command_s
+          _, o, e, thread = Headless_::Library_::Open3.popen3 @valid_command_s
           p = -> do
             s = o.gets
             if s  # then no error on first try
@@ -41,6 +42,11 @@ module Skylab::Headless
 
         Callback_.scan do
           p[]
+        end.with_signal_handlers :release_resource, -> do
+          if thread && thread.alive?
+            thread.exit
+          end
+          ACHIEVED_
         end
       end
 

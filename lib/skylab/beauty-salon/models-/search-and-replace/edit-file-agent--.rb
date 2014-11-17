@@ -2,7 +2,7 @@ module Skylab::BeautySalon
 
   class Models_::Search_and_Replace
 
-    class Edit_File_Node__ < Branch_  # notes are stowed away in [#016]
+    class Edit_File_Agent__ < Branch_  # notes are stowed away in [#016]
 
       def initialize edit_session, has_next_file, x
         super x
@@ -19,14 +19,26 @@ module Skylab::BeautySalon
 
     private
 
-      def prepare_UI
+      def prepare_for_focus
+
         refresh_button_visibilities
-        @children = [ Up_Button_.new( 3, self ) ]
+
+        @children = []
+
+        @children.push( Up_Button_.new( 3, self ) do
+          @parent.go_up
+        end )
+
         if @has_at_least_one_match
           add_children_when_matches
         end
+
         @children.push Next_File_Button__.new self
-        @children.push Quit_Button_.new self
+
+        @children.push( Quit_Button_.new( self ) do
+          @parent.release_resources
+        end )
+
         ACHIEVED_
       end
 
@@ -241,40 +253,40 @@ module Skylab::BeautySalon
       def engage_replacement_of_current_match  # assume: replace function..
         # ..value is known, current match exists.
         # we could weirdly cache the replacement string and re-use it but meh
-        _func = @parent.replace_field.replace_function
-        new_string = _func.call @cm.md
+        new_string = @parent.replace_field.replace_function.call @cm.md
         if new_string
           @cm.set_replacement_string new_string
           refresh_button_visibilities
           # we stay here so the user can see the change that occurred
-        end  # we hope that the function emitted a reason
-        nil
+          ACHIEVED_
+        else
+          new_string
+        end
+        # if your function resulted in false-ish, hopefullly it emitted a
+        # reason. in the future we may give it a callback interface and allow
+        # it to decide to stay despite an abnormal course of behavior
       end
 
       def disengage_replacement_of_current_match
         @cm.disengage_replacement
         refresh_button_visibilities
-        nil
+        ACHIEVED_
       end
 
       def go_to_next_match
         @cm = @cm.next_match
         refresh_button_visibilities
-        nil
+        ACHIEVED_
       end
 
       def go_to_previous_match
         @cm = @cm.previous_match
         refresh_button_visibilities
-        nil
+        ACHIEVED_
       end
 
-      def next_file_or_finished_signal
-        if @has_next_file
-          NEXT_FILE_SIGNAL_
-        else
-          FINISHED_SIGNAL_
-        end
+      def next_file_or_finished
+        @parent.next_file_or_finished
       end
 
       def write_any_changed_file
@@ -282,19 +294,27 @@ module Skylab::BeautySalon
           :edit_session, @es,
           :work_dir_path, work_dir,
           :is_dry_run, false,  # etc.
-          :on_event_selectively, -> *, & ev_p do
-            send_event ev_p[]  # result matters!
+          :on_event_selectively, -> * i_a, & ev_p do
+            ev = ev_p[]
+            maybe_send_event_via_channel i_a do
+              ev
+            end
+            if ev.ok || ev.ok.nil?  # result matters: report 'OK'
+              ACHIEVED_  # even if no write occured.
+            else
+              ev.ok
+            end
         end )
       end
 
       class Button_ < Field_
 
-        def when_focus
-          execute
+        def is_navigational
+          true
         end
 
-        def execute
-          change_focus_to @parent
+        def receive_focus
+          @parent.change_focus_to @parent
           nil
         end
 
@@ -308,115 +328,94 @@ module Skylab::BeautySalon
       # ~ button agents - where applicable assume parent node has current match
 
       class Previous_Button__ < Button_
-        def is_executable
+
+        def can_receive_focus
           @parent.do_show_previous_button
         end
 
-        def execute
+        def receive_focus
           super
           @parent.go_to_previous_match
-          STAY_WITH_FILE_SIGNAL_
         end
       end
 
       class Yes_Button__ < Button_
-        def is_executable
+
+        def can_receive_focus
           @parent.do_show_yes_button
         end
 
-        def execute
-          super  # always shed focus
+        def receive_focus
+          super
           @parent.engage_replacement_of_current_match
-          STAY_WITH_FILE_SIGNAL_  # (so you can see the change)
         end
       end
 
       class Undo_Button__ < Button_
-        def is_executable
+
+        def can_receive_focus
           @parent.do_show_undo_button
         end
 
-        def execute
+        def receive_focus
           super
           @parent.disengage_replacement_of_current_match
-          STAY_WITH_FILE_SIGNAL_
         end
       end
 
       class Next_Match_Button__ < Button_
-        def is_executable
+
+        def can_receive_focus
           @parent.do_show_next_match_button
         end
 
-        def execute
+        def receive_focus
           super
           @parent.go_to_next_match
-          STAY_WITH_FILE_SIGNAL_
         end
       end
 
       class All_Remaining_in_File_Button__ < Button_
-        def is_executable
+
+        def can_receive_focus
           @parent.do_show_all_remaining_button
         end
 
-        def execute
+        def receive_focus
           super
-          ok = @parent.engage_all_remaining_matches
-          ok &&= write_any_changed_file
-          if ok
-            STAY_WITH_FILE_SIGNAL_  # -OR- @parent.next_file_or_finished_signal
+          @parent.engage_all_remaining_matches
+          # for now we do not `write_any_changed_file` nor do we
+          # `next_file_or_finished` - we want the user to be able to review
+          # the changes before navigating elsewhere (an action which itself
+          # should initiate the file write when appropriate).
+        end
+      end
+
+      class Same_Button___ < Button_  # see #note-321
+        def receive_focus
+          if write_any_changed_file
+            @parent.next_file_or_finished
           else
-            STAY_WITH_FILE_SIGNAL_
+            super
           end
         end
       end
 
-      class Next_File_Button__ < Button_  # see #note-321
-
-        def is_executable
+      class Next_File_Button__ < Same_Button___
+        def can_receive_focus
           @parent.do_show_next_file_button
         end
-
-        def execute
-          super
-          if write_any_changed_file
-            NEXT_FILE_SIGNAL_
-          else
-            STAY_WITH_FILE_SIGNAL_
-          end
-        end
       end
 
-      class Skip_Remaining_in_File_Button__ < Button_  # see #note-321
-
-        def is_executable
+      class Skip_Remaining_in_File_Button__ < Same_Button___
+        def can_receive_focus
           @parent.do_show_skip_remaining_in_file_button
         end
-
-        def execute
-          super
-          if write_any_changed_file
-            @parent.next_file_or_finished_signal
-          else
-            STAY_WITH_FILE_SIGNAL_
-          end
-        end
       end
 
-      class Done_with_File_Button__ < Button_  # see #note-321
-
-        def is_executable
+      class Done_with_File_Button__ < Same_Button___
+        def can_receive_focus
           @parent.do_show_done_with_file_button
-        end
-
-        def execute
-          super
-          if write_any_changed_file
-            @parent.next_file_or_finished_signal
-          else
-            STAY_WITH_FILE_SIGNAL_
-          end
         end
       end
     end

@@ -65,7 +65,7 @@ module Skylab::Brazen::TestSupport::Zerk::API
 
           class Field_Field < Zerk_::Field
 
-            def execute_via_nonempty_iambic_stream stream
+            def against_nonempty_iambic_stream stream
               @s = stream.gets_one
               true
             end
@@ -86,7 +86,7 @@ module Skylab::Brazen::TestSupport::Zerk::API
               true
             end
 
-            def execute_via_iambic_stream _
+            def receive_iambic_stream _
 
               be = @parent[ :be_excited ].is_activated
               s = @parent[ :field ].s
@@ -96,7 +96,11 @@ module Skylab::Brazen::TestSupport::Zerk::API
                 be and s_.upcase!
                 y << s_
               end
-              send_event _ev
+
+              @parent.handle_event_selectively_via_channel.call nil do
+                _ev
+              end
+
               true
             end
           end
@@ -143,7 +147,7 @@ module Skylab::Brazen::TestSupport::Zerk::API
         with_branch_with M2::Field_Field
         @result = call :field
         expect_not_OK_event :request_ended_prematurely,
-          "request ended prematurely - expecting value for (par « field »)"
+          "field error: request ended prematurely - expecting value for (par « field »)"
         expect_failed
       end
 
@@ -157,6 +161,7 @@ module Skylab::Brazen::TestSupport::Zerk::API
       it "ok let's see the money" do
         @result = call :field, :x, :be_excited, :go
         expect_OK_event :yep, "HELLO X"
+        unwrap_result
         expect_succeeded
       end
 
@@ -168,7 +173,13 @@ module Skylab::Brazen::TestSupport::Zerk::API
         @branch = x
         @result = call :foofie, :field, :y, :go
         expect_OK_event :yep, "hello y"
+        unwrap_result
         expect_succeeded
+      end
+
+      def unwrap_result
+        @result = @result.receiver.send @result.method_name, * @result.args
+        nil
       end
 
       def with_branch_with * cls_a

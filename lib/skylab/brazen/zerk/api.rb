@@ -15,6 +15,7 @@ module Skylab::Brazen
       def initialize x_a, branch
         @scan = Callback_.iambic_scanner.new 0, x_a
         @node = branch
+        @node.before_focus
         nil
       end
 
@@ -39,13 +40,13 @@ module Skylab::Brazen
         if @node.is_branch
           via_token_and_branch_node_step
         else
-          when_did_not_terminate_at_leaf_node
+          when_did_not_terminate_at_leaf_node  # ever called?
         end
       end
 
       def via_token_and_branch_node_step
         node = @node[ @token ]
-        if node && ! node.is_navigational
+        if node && ! node.is_navigational && node.can_receive_focus
           @scan.advance_one
           @node_ = node
           via_second_node_step
@@ -57,6 +58,7 @@ module Skylab::Brazen
       def via_second_node_step
         if @node_.is_branch
           @node = @node_ ; @node_ = nil
+          @node.before_focus
           PROCEDE_  # bubble back up to the main loop
         else
           when_second_node_is_leaf
@@ -64,20 +66,21 @@ module Skylab::Brazen
       end
 
       def when_second_node_is_leaf
-        ok = @node_.execute_via_iambic_stream @scan
-        if ok
-          if @node_.is_terminal_node
-            @reached_terminal_node = true
-          end
+        x = @node_.receive_iambic_stream @scan
+        if @node_.is_terminal_node
+          @reached_terminal_node = true
+          @result = Brazen_.bound_call.via_value x
+          ok = ACHIEVED_
         else
-          @result = ok
+          @result = x
+          ok = x
         end
         ok
       end
 
       def when_input_is_exhausted
         if @reached_terminal_node
-          ACHIEVED_
+          @result
         elsif @node.is_branch
           when_terminated_at_branch_node
         else
@@ -86,8 +89,15 @@ module Skylab::Brazen
       end
 
       def when_child_not_found
+        @result = maybe_send_event :error do
+          build_child_not_found_event
+        end
+        UNABLE_
+      end
 
-        _ev = build_not_OK_event_with :child_not_found,
+      def build_child_not_found_event
+
+        build_not_OK_event_with :child_not_found,
             :name_i, @token,
             :did_you_mean_i_a, childs.map( & :name_i ) do |y, o|
 
@@ -98,19 +108,18 @@ module Skylab::Brazen
           y << "child not found: #{ ick o.name_i } - did you mean #{
             }#{ or_ _s_a }?"
         end
-        unable_because _ev
-      end
-
-      def when_did_not_terminate_at_leaf_node
-
-        _ev = build_not_OK_event_with :xxx
-
-        unable_because _ev
       end
 
       def when_terminated_at_branch_node
+        @result = maybe_send_event :error do
+          build_request_ended_prematurely_event
+        end
+        UNABLE_
+      end
 
-        _ev = build_not_OK_event_with :request_ended_prematurely,
+      def build_request_ended_prematurely_event
+
+        build_not_OK_event_with :request_ended_prematurely,
           :name_i, @node.name_i,
           :did_you_mean_i_a, childs.map( & :name_i ) do |y, o|
 
@@ -119,24 +128,18 @@ module Skylab::Brazen
           end
 
           y << "premature end of '#{ o.name_i }' request - #{
-           }did you mean #{ or_ _s_a }?"
+            }did you mean #{ or_ _s_a }?"
         end
-        unable_because _ev
       end
 
       def childs
         @node.child_stream.reduce_by do |cx|
-          cx.is_executable && ! cx.is_navigational
+          cx.can_receive_focus && ! cx.is_navigational
         end.to_a
       end
 
-      def unable_because ev
-        @result = send_event ev
-        UNABLE_
-      end
-
-      def event_receiver
-        @node
+      def maybe_send_event * i_a, & ev_p
+        @node.maybe_receive_unsigned_event_via_channel i_a, & ev_p
       end
     end
   end

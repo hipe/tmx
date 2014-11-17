@@ -2,9 +2,13 @@ module Skylab::BeautySalon
 
   class Models_::Search_and_Replace
 
-    Preview_Agent_Children__ = ::Module.new  # notes stowed away in [#016]
+    Preview_Agent_Children__ = ::Module.new  # notes stowed away in [#016] (as 2)
 
     class Preview_Agent_Children__::Files_Node < Field_
+
+      def is_terminal_node
+        true
+      end
 
       def orient_self
         @dirs_field = @parent.dirs_field
@@ -12,14 +16,12 @@ module Skylab::BeautySalon
         nil
       end
 
-      def to_body_item_value_string
+      def to_body_item_value_string_when_can_receive_focus
         "previews all files matched by the `find` query"
       end
 
-      def execute
-        @cmd = build_command do | *, & ev_p |
-          send_event ev_p[]
-        end
+      def receive_focus
+        resolve_command
         @cmd && via_command_execute
       end
 
@@ -29,6 +31,13 @@ module Skylab::BeautySalon
       end
 
     private
+
+      alias_method :against_empty_iambic_stream, :receive_focus
+
+      def resolve_command
+        @cmd = build_command( & handle_unsigned_event_selectively )
+        nil
+      end
 
       def refresh_values
         @glob_list = @files_field.glob_list
@@ -41,13 +50,18 @@ module Skylab::BeautySalon
         BS_::Lib_::System[].filesystem.find(
           :filenames, @glob_list,
           :paths, @path_list,
+          :freeform_query_infix, '-type f',
           :on_event_selectively, maybe_p,
           :as_normal_value, IDENTITY_ )
       end
 
       def via_command_execute
         @scan = @cmd.to_scan
-        @scan and via_scan
+        if @is_interactive
+          @scan and via_scan
+        else
+          @scan
+        end
       end
 
       def via_scan
@@ -61,6 +75,7 @@ module Skylab::BeautySalon
           y << "(#{ count } file#{ s count } total)"
         end
         change_focus_to @parent  # necessary, else loop forever
+        ACHIEVED_
       end
     end
 
@@ -68,21 +83,19 @@ module Skylab::BeautySalon
 
       def orient_self
         @fa = @parent.lower_files_agent
-        @sa = @parent.regexp_field
+        @rf = @parent.regexp_field
         nil
       end
 
-      def to_body_item_value_string
-        if is_executable
-          "different ways to achieve, manipulate matching files, strings"
-        end
+      def to_body_item_value_string_when_can_receive_focus
+        "different ways to achieve, manipulate matching files, strings"
       end
 
-      def is_executable
-        @sa.value_is_known
+      def can_receive_focus
+        @rf.value_is_known
       end
 
-      def prepare_UI
+      def prepare_for_focus
         grp = Zerk_::Enumeration_Group.new [ :grep, :ruby ], :grep_via, self
         @paths_agent_group = grp
         gbf = Grep_Boolean__.new grp, self
@@ -100,7 +113,10 @@ module Skylab::BeautySalon
           Quit_Button_.new( self ),
           grp ]
 
-        retrieve_values_from_FS_if_exist
+        if @is_interactive
+          retrieve_values_from_FS_if_exist
+        end
+
         ACHIEVED_
       end
 
@@ -118,7 +134,9 @@ module Skylab::BeautySalon
       # ~ public API for children calling up to us as parent
 
       def receive_branch_changed_notification
-        receive_try_to_persist
+        if @is_interactive
+          receive_try_to_persist
+        end
         nil
       end
 
@@ -163,9 +181,11 @@ module Skylab::BeautySalon
             :upstream_path_scan, @upstream_path_scan,
             :ruby_regexp, @regex,
             :mode, mode_i,
-            :on_event_selectively, -> *, & ev_p do
-              send_event ev_p[]
-            end )
+            :on_event_selectively, handle_unsigned_event_selectively )
+        end
+
+        def release_resources
+          @upstream_path_scan.receive_signal :release_resource
         end
       end
 
@@ -182,43 +202,45 @@ module Skylab::BeautySalon
         end
 
         def build_path_scan
-          send_event BS_::Lib_::Event_lib[].inline_not_OK_with(
-            :not_yet_implemented, :method_name, :build_path_scan )
+          maybe_send_event :error do
+            BS_::Lib_::Event_lib[].inline_not_OK_with(
+              :not_yet_implemented, :method_name, :build_path_scan )
+          end
           UNABLE_
         end
       end
 
-      class Paths_Depender__ < Node_
+      class Files_Node__ < Node_
 
         def initialize x
           super
           @paths_agent_group = @parent.paths_agent_group
         end
 
-        def to_body_item_value_string
-          if is_executable
-            to_body_item_value_string_if_executable
-          end
-        end
-
-        def is_executable
-          @paths_agent_group.has_active_boolean
-        end
-      end
-
-      class Files_Node__ < Paths_Depender__
-
-        def to_body_item_value_string_if_executable
+        def to_body_item_value_string_when_can_receive_focus
           'list the matching filenames (but not the strings)'
         end
 
-        def execute
-          @scan = @paths_agent_group.active_boolean.build_path_scan
+        def can_receive_focus
+          @paths_agent_group.has_active_boolean
+        end
+
+        def is_terminal_node
+          true
+        end
+
+        def receive_focus
+          @scan = against_empty_iambic_stream
           @scan and via_scan
           change_focus_to @parent
+          ACHIEVED_
         end
 
       private
+
+        def against_empty_iambic_stream
+          @paths_agent_group.active_boolean.build_path_scan
+        end
 
         def via_scan
           count = 0
@@ -240,30 +262,37 @@ module Skylab::BeautySalon
         end
       end
 
-      class Counts_Node__ < Branch_  # (grep only)
+      class Counts_Node__ < Node_  # (grep only)
 
         def initialize x
           super
           @grep_boolean_field = @parent.grep_boolean_field
         end
 
-        def to_body_item_value_string
-          if is_executable
-            "the grep --count option - \"Only a count of selected lines ..\""
-          end
+        def is_terminal_node
+          true
         end
 
-        def is_executable
+        def to_body_item_value_string_when_can_receive_focus
+          "the grep --count option - \"Only a count of selected lines ..\""
+        end
+
+        def can_receive_focus
           @grep_boolean_field.is_activated
         end
 
-        def execute
+        def receive_focus
           @scan = @grep_boolean_field.build_counts_scan
           @scan and via_scan
           change_focus_to @parent
+          ACHIEVED_
         end
 
       private
+
+        def against_empty_iambic_stream
+          @grep_boolean_field.build_counts_scan
+        end
 
         def via_scan
           match_count = file_count = 0
@@ -287,37 +316,63 @@ module Skylab::BeautySalon
         end
       end
 
-      class Matches_Depender__ < Paths_Depender__
+      class Matches_Node__ < Node_
 
-        def execute
-          if resolve_file_scan
-            execute_via_file_scan
-          else
-            change_focus_to @parent
-          end
+        def initialize x
+          super
+          @paths_agent_group = @parent.paths_agent_group
+        end
+
+        def can_receive_focus
+          @paths_agent_group.has_active_boolean
+        end
+
+        def is_terminal_node
+          true
+        end
+
+        def to_body_item_value_string_when_can_receive_focus
+          'see the matching strings (not just files)'
+        end
+
+        def receive_focus
+          resolve_file_scan && execute_via_file_scan_when_interactive
+        end
+
+        def to_marshal_pair
         end
 
       private
 
-        def resolve_file_scan
-          ok = refresh_file_scan_ivars
-          ok && via_file_scan_ivars_resolve_file_scan
+        def against_empty_iambic_stream
+          resolve_file_scan && execute_via_file_scan_when_non_interactive
         end
 
-        def refresh_file_scan_ivars
+        def resolve_file_scan
+          rslv_file_scan_ivars && via_file_scan_ivars_resolve_file_scan
+        end
+
+        def rslv_file_scan_ivars
           @path_scan = @paths_agent_group.active_boolean.build_path_scan
           @regex = @parent.regexp_field.regexp
           @path_scan && @regex && ACHIEVED_
         end
-      end
 
-      class Matches_Node__ < Matches_Depender__
-
-        def to_body_item_value_string_if_executable
-          'see the matching strings (not just files)'
+        def via_file_scan_ivars_resolve_file_scan
+          @file_scan = S_and_R_::Actors_::Build_file_scan.with(
+            :upstream_path_scan, @path_scan,
+            :ruby_regexp, @regex,
+            :do_highlight, ( @is_interactive && @serr.tty? ),
+            for_interactive_search_and_replace_or_read_only,
+            :on_event_selectively, handle_unsigned_event_selectively )
+          @file_scan && ACHIEVED_
         end
 
-        def execute_via_file_scan
+        def for_interactive_search_and_replace_or_read_only
+          :read_only
+        end
+
+        def execute_via_file_scan_when_interactive
           while file = @file_scan.gets
             scn = file.to_read_only_match_scan
             while match = scn.gets
@@ -325,125 +380,135 @@ module Skylab::BeautySalon
             end
           end
           change_focus_to @parent
+          ACHIEVED_
         end
 
-        def via_file_scan_ivars_resolve_file_scan
-          @file_scan = S_and_R_::Actors_::Build_file_scan.with(
-            :upstream_path_scan, @path_scan,
-            :ruby_regexp, @regex,
-            :do_highlight, @serr.tty?,
-            :read_only,
-            :on_event_selectively, -> *, & ev_p do
-              send_event ev_p[]
-            end )
-          @file_scan && ACHIEVED_
-        end
-
-        def to_marshal_pair
+        def execute_via_file_scan_when_non_interactive
+          @file_scan.expand_by do |file|
+            file.to_read_only_match_scan
+          end
         end
       end
 
-      class Replace_Node__ < Matches_Depender__
+      class Replace_Node__ < Matches_Node__
 
-        def to_body_item_value_string_if_executable
+        def to_body_item_value_string_when_can_receive_focus
           "begin interactive search and replace yay!"
         end
 
-        def is_executable
-          super and  # from paths depender
-            @parent.replace_field.value_is_known
-        end
-
-        def via_file_scan_ivars_resolve_file_scan
-          @file_scan = S_and_R_::Actors_::Build_file_scan.with(
-            :for_interactive_search_and_replace,
-            :upstream_path_scan, @path_scan,
-            :ruby_regexp, @regex,
-            :do_highlight, @serr.tty?,
-            :on_event_selectively, -> *, & ev_p do
-              send_event ev_p[]
-            end )
-          @file_scan && ACHIEVED_
-        end
-
-        def execute_via_file_scan
-          @current_file_ES = @file_scan.gets
-          @next_file_ES = @file_scan.gets
-          if @current_file_ES
-            when_one_file
-          else
-            when_no_files
-          end
+        def can_receive_focus
+          super && @parent.replace_field.value_is_known
         end
 
         def to_marshal_pair
+        end
+
+        def receive_focus  # #note-372
+          ok = super
+          if ok
+            while @node_with_focus
+              @node_with_focus.before_focus
+              ok = @node_with_focus.receive_focus
+              ok or break
+            end
+          end
+          ok
+        end
+
+        # ~ API for children
+
+        def change_focus_to x
+          @node_with_focus = x
+          nil
+        end
+
+        def next_file_or_finished
+          if @next_file_ES
+            @current_file_ES = @next_file_ES
+            @next_file_ES = @file_scan.gets
+            @node_with_focus = build_edit_file_agent
+            ACHIEVED_
+          else
+            @y << "finished."
+            FINISHED_
+          end
+        end
+
+        def go_up
+          release_resources  # might fail but we ignore anyway
+          @node_with_focus = nil  # we break out of our own loop with this
+
+          # and in the parent loop we don't want to be doing "replace" any more
+          @parent.change_focus_to @parent
+          ACHIEVED_
+        end
+
+        def release_resources
+          ok = @paths_agent_group.active_boolean.release_resources
+          ok_ = @path_scan.receive_signal :release_resource
+          ok && ok_ and begin
+            if @is_interactive
+              @y << "(released any `find` or `grep` resources.)"
+            end
+            ACHIEVED_
+          end
         end
 
       private
 
-        def when_one_file
-          @edit_file_agent = nil
-          begin
-            @stay_in_loop = false
-            @edit_file_agent ||= build_edit_file_agent
-            signal = change_focus_to @edit_file_agent
-            if AS_IS_SIGNAL_ == signal
-              signal = @edit_file_agent.execute  # probably blocks waiting for input
+        def execute_via_file_scan_when_interactive
+          @current_file_ES = @file_scan.gets
+          @next_file_ES = @file_scan.gets
+          if @current_file_ES
+            when_files
+          else
+            when_no_file
+          end
+        end
+
+        def execute_via_file_scan_when_non_interactive
+          func = @parent.replace_field.replace_function
+          tmpdir_path = BS_::Lib_::System[].defaults.dev_tmpdir_path
+          @file_scan.expand_by do |edit_session|
+            Callback_.scan do
+              match = edit_session.gets_match
+              if match
+                string = func.call match.md
+                if string
+                  match.set_replacement_string string
+                end
+                match
+              else
+                S_and_R_::Actors_::Write_any_changed_file.with(
+                  :edit_session, edit_session,
+                  :work_dir_path, tmpdir_path,
+                  :is_dry_run, false,
+                  :on_event_selectively, handle_unsigned_event_selectively )
+                nil
+              end
             end
-            if signal
-              send :"when_#{ signal }"
-            else
-              @result = signal
-            end
-          end while @stay_in_loop
-          @result
+          end
+        end
+
+        def for_interactive_search_and_replace_or_read_only
+          :for_interactive_search_and_replace
+        end
+
+        def when_no_files
+          @y << "no files."
+          change_focus_to @parent
+          ACHIEVED_
+        end
+
+        def when_files
+          @node_with_focus = build_edit_file_agent
+          ACHIEVED_
         end
 
         def build_edit_file_agent
-          S_and_R_::Edit_File_Node__.new @current_file_ES,
+          S_and_R_::Edit_File_Agent__.new @current_file_ES,
             @next_file_ES ? true : false,
             self
-        end
-
-        # ~ signals
-
-        def when_as_is_signal  # you will get this e.g when the agent
-          # receives ambiguous or unresolvable input (and reports it).
-          # in such cases we want to stay truly as-is, which means:
-          when_stay_with_file_signal
-        end
-
-
-        def when_finished_signal
-          @serr.puts "finished."
-          @result = nil
-          nil
-        end
-
-        def when_next_file_signal
-          @edit_file_agent = nil
-          @current_file_ES = @next_file_ES
-          if @current_file_ES
-            @stay_in_loop = true
-            @next_file_ES = @file_scan.gets
-          else
-            @result = when_no_files
-            @next_file_ES = nil
-          end
-          nil
-        end
-
-        def when_stay_with_file_signal
-          @stay_in_loop = true
-          nil
-        end
-
-        # ~ end signals
-
-        def when_no_files
-          @serr.puts
-          @serr.puts "                     (no matching files found)"  # example of smelly but prettier UI string
-          change_focus_to @parent
         end
       end
     end

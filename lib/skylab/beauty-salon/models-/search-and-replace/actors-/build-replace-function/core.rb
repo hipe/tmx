@@ -125,8 +125,6 @@ module Skylab::BeautySalon
         nil
       end
 
-      ACHIEVED_ = true
-
       DIGIT_RX__ = /\d+/
 
       class Normal_String__

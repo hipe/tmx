@@ -23,9 +23,11 @@ module Skylab::BeautySalon::TestSupport
   module InstanceMethods
 
     def existent_tmpdir_path
-      pn = Memoized_tmpdir__[]
-      pn ||= Memoize_tmpdir__[ do_debug, debug_IO ]
-      pn.to_path
+      existent_tmpdir.to_path
+    end
+
+    def existent_tmpdir
+      Memoized_tmpdir__[] || Memoize_tmpdir__[ do_debug, debug_IO ]
     end
 
     def debug!
@@ -40,7 +42,9 @@ module Skylab::BeautySalon::TestSupport
   end
 
   -> do
+
     _TMPDIR = nil
+
     Memoized_tmpdir__ = -> do
       _TMPDIR
     end

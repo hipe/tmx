@@ -239,3 +239,30 @@ individual constituency:
     the file nd be done with it.
 
 this whole note reveals a smell and opened up [#022].
+
+
+
+
+### #note-372
+
+in interactive mode when you are "within" this node it can behave as
+though it has persistent state (that is, be "sticky"): the file being
+edited can change the "current file" in this node and so on. each time
+focus returns to this node it may need to be holding state from the
+previous time it had focus: namely, the file it should be editing
+around.
+
+however if you ever ascend above this node we do *not* want its state to
+be sticky: if you go "up" and come back down again, we want it to have
+the appearance of being a fresh "session", starting again from the first
+file. (this is an arbitrary design decision and hypothetically could
+change.)
+
+as such experimentally the way we accomplish this for now is for this
+node to maintain its own run loop similar to (but maybe or maybe not the
+same as) the run loop at the very top of the application.
+
+"quit" is always easy because we just result in false-ish and it bubbles
+all the up out of the request stack. with "up", however, it is tricker:
+we release resources, break out of our own loop, and neded to change
+the focus of the main loop.

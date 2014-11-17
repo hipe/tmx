@@ -1,3 +1,4 @@
+[#059] #open #parent-node: [#044] "signal processing scans.."
 [#058]       #parent-node: [#042] methodic actor (was: [#hl-130]) :+[#mh-058]..
 [#057]       #parent-node: [#046] "the ideal mixed syntax.."
 [#056]       #parent-node: [#050] track similar things

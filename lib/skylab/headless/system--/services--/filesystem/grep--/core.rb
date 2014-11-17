@@ -125,8 +125,9 @@ module Skylab::Headless
       public
 
         def produce_scan_via_command_string command_string
+          thread = nil
           p = -> do
-            _, o, e = Headless_::Library_::Open3.popen3 command_string
+            _, o, e, thread = Headless_::Library_::Open3.popen3 command_string
             err_s = e.gets
             if err_s && err_s.length.nonzero?
               o.close
@@ -148,6 +149,11 @@ module Skylab::Headless
           end
           Callback_.scan do
             p[]
+          end.with_signal_handlers :release_resource, -> do
+            if thread && thread.alive?
+              thread.exit
+            end
+            ACHIEVED_
           end
         end
 

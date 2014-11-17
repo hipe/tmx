@@ -69,6 +69,7 @@ module Skylab::BeautySalon
       Count_Item__ = ::Struct.new :path, :count
 
       def via_command_head_when_paths
+        scn = nil
         p = -> do
           scn = produce_next_scan
           p = -> do
@@ -83,6 +84,12 @@ module Skylab::BeautySalon
         end
         Callback_.scan do
           p[]
+        end.with_signal_handlers :release_resource, -> do
+          if scn
+            scn.receive_signal :release_resource
+          else
+            ACHIEVED_
+          end
         end
       end
 

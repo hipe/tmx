@@ -130,13 +130,13 @@ module Skylab::BeautySalon
     end
 
     option_parser do |o|
-      @action ||= BS_::Models_::Search_and_Replace.new
-      @action.write_options o
+      @client = BS_::Models_::Search_and_Replace.client_for_three @sin, @out, @err
+      @client.write_options o
       nil
     end
 
     def search_and_replace
-      BS_::Models_::Search_and_Replace.new( @sin, @out, @err ).run
+      @client.run
     end
 
   private

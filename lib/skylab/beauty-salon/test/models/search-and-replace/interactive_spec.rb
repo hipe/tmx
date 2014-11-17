@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
 
-  describe "[bs] search and replace" do
+  describe "[bs] search and replace - interactive" do
 
     extend TS_
 

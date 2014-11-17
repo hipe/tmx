@@ -1,4 +1,4 @@
-# name conventions for functions and methods :[#05]
+# name conventions for functions and methods :[#095]
 
 
 ## introduction
@@ -71,6 +71,8 @@ better this time.
   deprecated because it expresses neither what it accepts or what shape
   its result is. :+[#020]
 
++ `on_` see [#175] method naming conventions around events below.
+
 + `produce_`, `_produce[_]` - result is the subject object as described
   by the rest of the method name. whether or not new memory is being
   allocated for this object is explicitly undefined (contrast with `build_`
@@ -84,6 +86,14 @@ better this time.
   practice it is rarely used on this platform :+[#020].
 
 + `via_` will one day have its own section #todo
+
++ `when_`, `_when_` - often takes no arguments, must be private when using
+  this convention: this starts the name of a method whose role is as a node
+  in a logical branch tree (if X then `when_foo` else `when_bar` etc).
+  the rest of the method name is a natural description of the condition
+  (`when_password_is_correct`, `when_wrong_password` etc to prefernce).
+  use is encouraged along with other conventions, in which case the word
+  may get bumped off the front of the method name (`via_X_when_Y`).
 
 + `with` - arguments must be treated as a literal [#cb-046] iambic phrase.
   must have no side-effects on the receiver, instead the result must be
@@ -124,6 +134,118 @@ the said copying, we use the `get_` prefix to apply more broadly to all
 of those to all of those methods that allocate memory towards their result
 object and are not already covered by `build_` (that is, the simpler
 ones).
+
+
+
+
+## naming conventions around events :[#175]
+
+because most of these are method naming conventions we put this node
+here but there are some that are not.
+
++ "handle" - this word must be used in the method name IFF that method
+  takes no arguments and results in a proc form of an event handler.
+  we do not define the signature of the event handler proc here.
+  we do not proscribe a method visibility here - use the visibility that
+  is appropriate for the method.
+
+  these methods will often constitute a "getter" to provide a proc that
+  will be consumed by a "setter" or named iambic term whose name starts
+  with (see below) `on_`.
+
+
+
++ `maybe_receive_event` - this has a fixed signature and is the
+   preferred way for an object to expose event reception.
+
+
+
++ `on_` - this looks good as an iambic property name in an argument
+  stream or setter method in a DSL for setting handler procs, but
+  otherwise we don't like it for public method names, per the below
+  rule about "receive". we now discourage `on_error`, `on_info` etc
+  and rather prefer something like `on_event_selectively` where the
+  caller does the dispatching herself (see `receive` below).
+
++ `on_event` as a named argument this is what to use if your event model
+  is non-selective, but we prefer (see below) `on_event_selectively`).
+  do not use this for a method name unless it is an old-fashioned DSL
+  setter.
+
++ `on_event_selectively` as a named argument this is now the preferred
+  means of passing event handler from caller to actor. do not use this
+  name for a method name unless it is an old-fashioned DSL setter.
+
+
+
++ "receive" - this word must be used in the method name IFF that method
+  constitutes an exposed means of [selectively] receiving event
+  objects or other arbitrary event-driven data or .. events.
+
+  ergo these methods must be public. for private methods that are
+  conditional branch nodes of for example a public "receive" method,
+  see `when_` above.
+
+  "semantic routing" of the event is the concern of the receiver not
+  the sender: whether a given event is interpreted as for example
+  informational vs. an error vs. a payload event is ultimately a product
+  of the design of the event receiver. indeed, the same kind of event
+  can be interpreted variously as error or not based on circumstances
+  that are the private concern of the receiver (for example, action).
+
+  as such we discourage sematically charged names like `receive_info`
+  and `receive_error`. just use `receive_event` and let the receiver
+  sort it out.
+
+  it is necessary to mention that in practice for convenience and "tight
+  code" the receiver often falls back on the value in the `ok` tag of
+  the event to determine its semantics which effectively lets the sender
+  steer the handling of the event in these cases - but this must not be
+  assumed to be always the case - ultimately it is the receiver that gets
+  to make the final judgement on how an event is to be interpreted.
+
+  it is fine to use this prefix for methods that signify and/or pass
+  events between familiar, ad-hoc or low-level objects:
+  `receive_prepared_foobric` where "foobric" is some business-specific
+  concern, or even events without metadata (`receive_termination_signal`).
+
+  see #signing below.
+
+
+
+
++ `receive_event` - this is the old-schoool, simpler, non-conditional
+  form of exposed event reception method. it has a fixed, monadic
+  signature of one argument (the event) and cannot take blocks.
+
+
+
+
+
++ "send" - this word must be used in the method name (but must never be
+  the only word) IFF that method privately sends an event object outward
+  from "inside" itself.
+
+  ergo these methods must be private. if you want a public method that
+  receives events, see "receive" above.
+
+  typical examples implementations of such a method include sending an
+  event "upwards" by calling the `receive_event` method of a parent node,
+  or sending an event "outward" to a modality adapter.
+
+  see #signing below.
+
+
+
+
+### :#signing
+
+when we use the verb "sign" in the context of events we mean the process
+of in some way adding more context to an event to make it clearer for
+example under what action it occurred. we are not yet sure whether it
+makes more sense to "sign" an event in a sender method or a receiver
+method; so as such we are encouraging the use of more descrptive names
+for methods that sign the events they produce or transform.
 
 
 

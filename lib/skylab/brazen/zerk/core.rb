@@ -6,54 +6,50 @@ module Skylab::Brazen
 
       # :+#hook-out's: (methods you need to implement in your child class)
       #
-      #   `to_body_item_value_string` - false-ish means do not display
+      #   `to_body_item_value_string_when_can_receive_focus` - false-ish means do not display
 
       def initialize x
         @name ||= self.class.name_function
-        @sin = x.sin
-        @serr = x.serr
         @parent = x
-        @y = x.primary_UI_yielder
+        if x.is_interactive
+          @is_interactive = true
+          @sin = x.sin
+          @serr = x.serr
+          @y = x.primary_UI_yielder
+        else
+          @is_interactive = false
+        end
       end
 
-    class << self
-      def name_function
-        @nf ||= bld_inferred_name_function
+      class << self
+
+        def name_function
+          @nf ||= bld_inferred_name_function
+        end
+
+        def bld_inferred_name_function
+          _const = Callback_::Name.via_module( self ).as_const
+          _cnst = RX__.match( _const )[ 0 ]
+          Callback_::Name.via_const _cnst
+        end
+        RX__ = /\A.+(?=_(?:Agent|Branch|Boolean|Button|Field|Node)_*\z)/  # :+#experimental
+
       end
 
-      def bld_inferred_name_function
-        _const = Callback_::Name.via_module( self ).as_const
-        _cnst = RX__.match( _const )[ 0 ]
-        Callback_::Name.via_const _cnst
-      end
-      RX__ = /\A.+(?=_(?:Agent|Branch|Boolean|Button|Field|Node)_*\z)/  # :+#experimental
-    end
+      # ~ messages received as child from parent
 
-    public
+      # ~~ boolean reflectors (alphabetical)
 
-      # ~ messages parent will send to you as child
-
-      def name_i
-        @name.as_variegated_symbol
-      end
-
-      def slug
-        @name.as_slug
-      end
-
-      def before_focus  # :+#courtesy (means it is not used here)
-      end
-
-      def when_focus  # :+#courtesy
-        AS_IS_SIGNAL
+      def can_receive_focus
+        true
       end
 
       def is_branch  # used for non-interactive mode
         false
       end
 
-      def is_executable
-        true
+      def is_interactive
+        @is_interactive
       end
 
       def is_navigational  # used in non-interactive mode
@@ -64,16 +60,50 @@ module Skylab::Brazen
         false
       end
 
-      def execute
+      # ~~ getters of symbols & strings (little to big)
+
+      def name_i
+        @name.as_variegated_symbol
+      end
+
+      def slug
+        @name.as_slug
+      end
+
+      def to_body_item_value_string
+        if can_receive_focus
+          to_body_item_value_string_when_can_receive_focus
+        end
+      end
+
+      # ~~ interactive program flow hook-ins (chronological)
+
+      def before_focus  # #note-70
+        nil
+      end
+
+      def receive_focus
         ok = display_panel
         ok && block_for_response
       end
 
-      def exitstautus
+      def exitstatus
         0
       end
 
+      # ~~ hook-ins for non-interactive
+
+      def receive_iambic_stream stream
+        if stream.unparsed_exists
+          against_nonempty_iambic_stream stream
+        else
+          against_empty_iambic_stream
+        end
+      end
+
     private
+
+      # ~~ support for interactive behavior
 
       def display_panel
         display_separator
@@ -122,29 +152,83 @@ module Skylab::Brazen
         receive_mutable_input_line @sin.gets
       end
 
+      # ~~ support for non-interactive behavior
+
+      def against_nonempty_iambic_stream stream  # this is the default
+        # behavior for terminal ("do something") nodes.. tossed here just b/c.
+
+        maybe_send_event :error do
+          build_extra_properties_event stream
+        end
+        UNABLE_
+      end
+
+      def build_extra_properties_event stream
+        Brazen_::Entity.properties_stack.
+          build_extra_properties_event [ stream.current_token ], nil, 'iambic token'
+      end
+
     public
 
-      # ~ messages children will send to you as a parent
+      # ~ messages received as parent from child
 
-      attr_reader :parent, :sin, :serr
+      # ~~ boolean reflectors
 
       def is_agent
         true
+      end
+
+      # ~~ resources in support of UI, events, and program flow
+
+      attr_reader :parent, :serr, :sin
+
+      def primary_UI_yielder
+        @y
       end
 
       def change_focus_to x
         @parent.change_focus_to x
       end
 
-      def primary_UI_yielder
-        @y
+      # ~ sending & receiving events, public interface & support
+      #
+      #   follows [#hl-175] name conventions. see #note-185
+
+      def maybe_receive_unsigned_event_via_channel i_a, & ev_p  # for familiars
+        maybe_send_event_via_channel i_a, & ev_p
       end
 
-      def receive_event ev
-        @parent.receive_event ev
+      def handle_event_selectively_via_channel  # for children
+        @parent.handle_event_selectively_via_channel
       end
 
     private
+
+      def handle_unsigned_event_selectively
+        @HUES_p ||= method :maybe_send_event
+      end
+
+      def maybe_send_event * i_a, & ev_p
+        maybe_send_event_via_channel i_a, & ev_p
+      end
+
+      def maybe_send_event_via_channel i_a, & ev_p
+        @parent.handle_event_selectively_via_channel.call i_a do
+          ev = ev_p[]
+          _NAME = @name
+          ev.with_message_string_mapper -> s, d do
+            if d.zero?
+              if ev.ok || ev.ok.nil?
+                "#{ _NAME.as_human } node #{ s }"
+              else
+                "#{ _NAME.as_human } error: #{ s }"
+              end
+            else
+              "  #{ s }"
+            end
+          end
+        end
+      end
 
       def build_not_OK_event_with * x_a, & p
         Brazen_.event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, p
@@ -152,10 +236,6 @@ module Skylab::Brazen
 
       def build_OK_event_with * x_a, & p
         Brazen_.event.inline_OK_via_mutable_iambic_and_message_proc x_a, p
-      end
-
-      def send_event ev
-        @parent.receive_event ev
       end
     end
 
@@ -176,7 +256,7 @@ module Skylab::Brazen
         rx = /\A#{ ::Regexp.escape s }/i
         cx_a = []
         @children.each do |cx|
-          cx.is_executable or next
+          cx.can_receive_focus or next
           rx =~ cx.slug or next
           if s == cx.slug
             cx_a.clear.push cx
@@ -195,18 +275,19 @@ module Skylab::Brazen
       end
 
       def when_ambiguous cx_a
-        @y << "did you mean #{ cx_a.map( & :slug ) * ' or ' } ?"
-        AS_IS_SIGNAL
+        @y << "did you mean #{ cx_a.map( & :slug ) * ' or ' }?"
+        PROCEDE_
       end
 
       def when_none s
         @y << "unrecognized command: #{ s.inspect }"
         @y << "please enter #{ build_prompt_line }"
-        AS_IS_SIGNAL
+        PROCEDE_
       end
 
       def when_one cx
         @parent.change_focus_to cx
+        ACHIEVED_
       end
 
       def display_body
@@ -227,13 +308,13 @@ module Skylab::Brazen
 
       def prompt
         @serr.write "#{ build_prompt_line }: "
-        AS_IS_SIGNAL
+        PROCEDE_
       end
 
       def build_prompt_line  # #note-190
         a = []
         @children.each do |cx|
-          cx.is_executable or next
+          cx.can_receive_focus or next
           a.push cx.slug
         end
 
@@ -267,9 +348,7 @@ module Skylab::Brazen
           :path, persist_path,
           :children, @children,
           :serr, @serr,
-          :on_event_selectively, -> *, & ev_p do
-            send_event ev_p[]
-          end )
+          :on_event_selectively, handle_unsigned_event_selectively )
       end
 
     private
@@ -278,9 +357,7 @@ module Skylab::Brazen
         Zerk_::Actors__::Retrieve[
           persist_path,
           @children,
-          -> *, & ev_p do
-            send_event ev_p[]
-          end ]
+          handle_unsigned_event_selectively ]
       end
 
       def persist_path
@@ -318,24 +395,21 @@ module Skylab::Brazen
       #                    yield an event to the block if you want.
 
 
-      def execute_via_iambic_stream stream
-        if stream.unparsed_exists
-          execute_via_nonempty_iambic_stream stream
-        else
-          send_request_ended_prematurely_event
-          UNABLE_
-        end
-      end
-
     private
 
-      def send_request_ended_prematurely_event
-        _ev = build_not_OK_event_with :request_ended_prematurely,
+      def against_empty_iambic_stream
+        maybe_send_event :error do
+          build_request_ended_prematurely_event
+        end
+        UNABLE_
+      end
+
+      def build_request_ended_prematurely_event
+        build_not_OK_event_with :request_ended_prematurely,
             :name, @name do |y, o|
           _prop = Brazen_::Lib_::Bsc_[].minimal_property o.name
           y << "request ended prematurely - expecting value for #{ par _prop }"
         end
-        send_event _ev
       end
 
       # ~ displaying the prompt
@@ -350,12 +424,12 @@ module Skylab::Brazen
 
       def prompt_when_value  #:+public-API
         @serr.write "new #{ noun } (nothing to cancel): "
-        AS_IS_SIGNAL
+        PROCEDE_
       end
 
       def prompt_when_no_value
         @serr.write "#{ noun } (nothing to cancel): "
-        AS_IS_SIGNAL
+        PROCEDE_
       end
 
       public def noun
@@ -400,6 +474,7 @@ module Skylab::Brazen
       def when_cancelled
         @y << "edit #{ slug } cancelled."
         change_focus_to @parent
+        ACHIEVED_
       end
 
       def when_deleted  # :+#courtesy
@@ -409,7 +484,7 @@ module Skylab::Brazen
           when_value_changed
         else
           @y << "cannot delete #{ slug } value"
-          AS_IS_SIGNAL
+          PROCEDE_
         end
       end
 
@@ -418,13 +493,16 @@ module Skylab::Brazen
         if ok
           when_value_changed
         else
-          AS_IS_SIGNAL
+          PROCEDE_
         end
       end
 
       def when_value_changed
-        try_to_persist  # for now we procede whether or not it succeeds
-        change_focus_to @parent
+        if @is_interactive
+          try_to_persist  # for now we procede whether or not it succeeds
+          change_focus_to @parent
+          ACHEIVED_
+        end
       end
 
       # ~ persistence stuff for leaf nodes
@@ -444,23 +522,23 @@ module Skylab::Brazen
 
       attr_reader :is_activated
 
-      def execute_via_iambic_stream _
-        if @group
-          @group.activate name
-        elsif @is_activated
-          ACHIEVED_
-        else
-          receive_activation
-        end
-      end
-
-      def execute
+      def receive_focus
         if @group
           @group.activate name_i
         elsif @is_activated
           receive_activation
         else
           receive_deactivation
+        end
+      end
+
+      def receive_iambic_stream _
+        if @group
+          @group.activate name_i
+        elsif @is_activated
+          ACHIEVED_
+        else
+          receive_activation
         end
       end
 
@@ -485,8 +563,9 @@ module Skylab::Brazen
 
     class Up_Button < Common_Node  # :+#note-button
 
-      def initialize times=2, x
+      def initialize times=2, x, & p
         @times = times
+        @hook_p = p
         super x
       end
 
@@ -497,11 +576,7 @@ module Skylab::Brazen
       def to_body_item_value_string
       end
 
-      def when_focus
-        execute
-      end
-
-      def execute
+      def receive_focus
         scn = Callback_.scan.via_times @times
         if scn.gets
           current = @parent
@@ -511,7 +586,11 @@ module Skylab::Brazen
         end
         if current
           change_focus_to current
-          AS_IS_SIGNAL
+          if @hook_p
+            @hook_p[]
+          else
+            ACHIEVED_
+          end
         else
           UNABLE_
         end
@@ -523,6 +602,11 @@ module Skylab::Brazen
 
     class Quit_Button < Common_Node  # :+#note-button
 
+      def initialize * a , & p
+        @hook_p = p
+        super( * a, & nil )
+      end
+
       def is_navigational
         true
       end
@@ -530,15 +614,20 @@ module Skylab::Brazen
       def to_body_item_value_string
       end
 
-      def when_focus
-        execute
-      end
-
       def display_panel
-        # if you overwrote `execute` you wouldn't see the amusingly useless nav
-        super
-        @y << 'goodbye.'
-        FINISHED_SIGNAL
+        # we override this and not `receive_focus` so we see the amusingly useless nav
+        if @hook_p
+          ok = @hook_p[]
+        else
+          ok = true
+        end
+        if ok
+          super
+          @y << 'goodbye.'
+          FINISHED_
+        else
+          PROCEDE_
+        end
       end
 
       def prompt
@@ -548,23 +637,8 @@ module Skylab::Brazen
       end
     end
 
-    class Persistence_Actor_
-    private
-      def receive_persistence_error ev
-        @on_event_selectively.call :error do
-          ev
-        end ; nil
-      end
-
-      def line_scan_for_event ev
-        _expag = Brazen_::API.expression_agent_instance
-        ev.scan_for_render_lines_under _expag
-      end
-    end
-
-    AS_IS_SIGNAL = :as_is_signal
     ACHEIVED_ = true  # #todo this will be the virgin voyage of [#bs-016]
-    FINISHED_SIGNAL = nil
+    FINISHED_ = nil
     NONE_S = '(none)'.freeze
     NOTHING_TO_DO_ = nil
 

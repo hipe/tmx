@@ -38,25 +38,16 @@ module Skylab::Brazen::TestSupport::Zerk
 
   class Mock_Parent__
 
-    def initialize ev_p
-      @ev_p = ev_p
+    def initialize recv_p
+      @handle_event_selectively_via_channel = -> _, & ev_p do
+        recv_p[ ev_p[] ]
+      end
     end
 
-    def primary_UI_yielder
-      :_do_not_use_primary_UI_yielder_here_
-    end
+    attr_reader :handle_event_selectively_via_channel
 
-    def serr
-      :_do_not_use_standard_error_here_
-    end
-
-    def sin
-      :_do_not_use_standard_in_here_
-    end
-
-    def receive_event ev
-      @ev_p[ ev ]
-      ev.ok
+    def is_interactive
+      false
     end
   end
 end

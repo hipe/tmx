@@ -1,3 +1,4 @@
+[#064] #open marshal issue near regexps with escape-looking sequences
 [#063]       [ isomorphicisms and emergent interfaces ]
                [fa] near [#fa-006], [#gv-030] sets the stage nicely)
 [#062]       #doc-node the zerk narrative ..

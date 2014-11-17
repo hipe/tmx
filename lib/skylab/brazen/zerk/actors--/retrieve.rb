@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   module Zerk
 
-    class Actors__::Retrieve < Persistence_Actor_
+    class Actors__::Retrieve
 
       Callback_::Actor.call self, :properties,
         :path,
@@ -16,7 +16,7 @@ module Skylab::Brazen
             if :errno_enoent == ev.terminal_channel_i
               NOTHING_TO_DO_
             else
-              receive_persistence_error ev
+              maybe_send_persistence_error ev
               ev.ok
             end
           end )
@@ -29,7 +29,9 @@ module Skylab::Brazen
 
       def via_IO
         doc = Brazen_.cfg.read @up_IO do |ev|
-          receive_persistence_error ev
+          @on_event_selectively.call :error do
+            ev
+          end
           UNABLE_
         end
         doc and begin
@@ -104,8 +106,14 @@ module Skylab::Brazen
               s
             end
           end
-          receive_persistence_error _ev_
+          maybe_send_persistence_error _ev_
           UNABLE_
+        end
+      end
+
+      def maybe_send_persistence_error ev
+        @on_event_selectively.call :error do
+          ev
         end
       end
     end

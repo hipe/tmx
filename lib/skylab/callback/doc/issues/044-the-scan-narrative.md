@@ -49,3 +49,27 @@ yet seen all the keys. use the existing scanner we are wrapped around
 *from the current position it is in*, keep grabbing items off of it until
 either we find the item being sought or we run out of items, all the while
 storing each item and its key.
+
+
+
+
+## signal processing scans :[#059]
+
+this is a bit of a hack to allow us to perform what amounts to calling
+an arbitrary proc in order to for example release the resources that are
+behind a stream before we have reached the end of the stream.
+
+apologies to real life signal-processing. this is a goofball experiment:
+we want to associate with our glorified proc a dictionary of callbacks.
+in order for the topic proc to go thru its many transformations (maps,
+reduces etc) all the while carrying with it these same callbak procs, we
+deem it easiest to make (what is effectively) a singleton class for each
+such topic proc. this way during transformations it does the right thing
+automatically, because each object that spawns off of this one has the
+same class with the same dictionary (struct) inside of it.
+
+this is #open because the way we accomplish this although "simple" in
+terms of how easy it was to implement is ugly because it creates a new
+class for each such instance and gives that class a procedurally
+generated name achieved by incrementing an integer. this would be awful
+if this were in a long running process and should be corrected somehow.

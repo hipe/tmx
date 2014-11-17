@@ -2,101 +2,162 @@ module Skylab::BeautySalon
 
   class Models_::Search_and_Replace  # see [#016]
 
-    Brazen_ = BS_::Lib_::Brazen[]
+    class << self
 
-    Zerk_ = Brazen_::Zerk
-
-    def initialize * three
-      if three.length.nonzero?
-        @sin, _, @serr = three
-        @primary_UI_yielder = ::Enumerator::Yielder.new do |s|
-          @serr.puts s
-        end
+      def client_for_three * a
+        Interactive_CLI__.new a
       end
     end
 
-    def write_options o
+    class Interactive_CLI__
 
-      o.separator EMPTY_S_
+      def initialize three
 
-      o.separator 'description:'
+        @handle_event_selectively_via_channel = -> _, & ev_p do
+          ev = ev_p[]
+          ev.render_all_lines_into_under @primary_UI_yielder, expression_agent
+          ev.ok  # always propagate this - some logic relies on the false-ish-ness
+        end
 
-      o.separator <<-O.gsub %r(^ {8}), EMPTY_S_
+        @primary_UI_yielder = ::Enumerator::Yielder.new do |s|
+          @serr.puts s
+        end
 
-        ridiculous interactive search and replace: in a simple interactive
-        terminal session, build your transformation progressively.
-        then execute the tranformation, which can apply the edit-in-place
-        changes one-by-one with yes/no confirmation. the main data elements
-        of your transformation are persistent, being progressively written
-        to a file for future re-use or prehaps editing.
+        @sin, _, @serr = three
+      end
 
-      O
+      def write_options o
 
+        o.separator EMPTY_S_
+
+        o.separator 'description:'
+
+        o.separator <<-O.gsub %r(^ {8}), EMPTY_S_
+
+          ridiculous interactive search and replace: in a simple interactive
+          terminal session, build your transformation progressively.
+          then execute the tranformation, which can apply the edit-in-place
+          changes one-by-one with yes/no confirmation. the main data elements
+          of your transformation are persistent, being progressively written
+          to a file for future re-use or prehaps editing.
+
+        O
+
+      end
+
+      def run
+        @node_with_focus = Search_and_Replace_Node__.new self
+        begin
+          @node_with_focus.before_focus
+          ok = @node_with_focus.receive_focus
+        end while ok
+        @node_with_focus.exitstatus
+      end
+
+      # ~ messages received as zerk parent from zerk child (#hook-outs)
+
+      # ~~ reflectors
+
+      def is_agent
+        false
+      end
+
+      def is_interactive
+        true
+      end
+
+      # ~~ program flow
+
+      def change_focus_to cx
+        @node_with_focus = cx
+        nil
+      end
+
+      # ~~ resources in support of events & UI
+
+      attr_reader(
+        :handle_event_selectively_via_channel,
+        :primary_UI_yielder,
+        :serr,
+        :sin )
+
+      def expression_agent
+        BS_::Lib_::Brazen[]::API.expression_agent_instance
+      end
     end
 
-    def run
-      @agent = Search_and_Replace_Node__.new self
-      begin
-        ok = @agent.execute
-      end while ok
-      @agent.exitstautus
-    end
+    class API
 
-    # #hook-out that every zerk top node must implement
+      class << self
 
-    attr_reader :primary_UI_yielder
+        def call * x_a
+          bc = new( x_a ).resolve_bound_call
+          bc and begin
+            bc.receiver.send bc.method_name, * bc.args
+          end
+        end
 
-    attr_reader :sin, :serr
+        def final_fallback_stdout_and_stderr
+          [ $stdout, $stderr ]
+        end
+      end
 
-    def is_agent
-      false
-    end
+      def initialize x_a
+        @x_a = x_a
+      end
 
-    def change_focus_to cx
-      cx.before_focus
-      @agent = cx
-      cx.when_focus
+      def resolve_bound_call
+        Zerk_::API.produce_bound_call @x_a, (
+          Search_and_Replace_Node__.new Top__.new produce_event_handler )
+      end
+
+      def produce_event_handler
+        if :on_event_selectively == @x_a[ -2 ]
+          globbing_p = @x_a.last
+          @x_a[ -2, 2 ] = EMPTY_A_
+          -> i_a, & ev_p do
+            globbing_p[ * i_a, & ev_p ]
+          end
+        else
+          Final_fallback_on_event_selectively_via_channel__[ *
+            self.class.final_fallback_stdout_and_stderr ]
+        end
+      end
+
+      Final_fallback_on_event_selectively_via_channel__ = -> sout, serr do
+        lib = BS_::Lib_::Brazen[]::API
+        evr = lib.two_stream_event_expressor.new(
+          sout, serr, lib.expression_agent_instance )
+        -> _, & ev_p do
+          evr.receive_event ev_p[]
+        end
+      end
+
+      class Top__
+
+        def initialize p
+          @handle_event_selectively_via_channel = p
+        end
+
+        attr_reader :handle_event_selectively_via_channel
+
+        def is_interactive
+          false
+        end
+      end
     end
 
     # ~ the agents
 
     module Node_Methods_
 
-      # ~ as child we might receive these from parent
+      # ~ messages received as child from parent
 
-      def before_focus
-        @last_prepare_UI_was_OK ||= prepare_UI
-      end
-
-    private
-
-      def send_event ev
-        scan = ev.scan_for_render_lines_under expression_agent
-        s = scan.gets
-        if false == ev.ok
-          @serr.puts "#{ @name.as_human } error: #{ s }"
-        else
-          @serr.puts "#{ @name.as_human } node #{ s }"
-        end
-        while s = scan.gets
-          @serr.puts "  #{ s }"
-        end
-        if false == ev.ok
-          UNABLE_
-        else
-          PROCEDE_
-        end
-      end
-
-      def expression_agent
-        BS_::Lib_::Brazen[]::API.expression_agent_instance
-      end
-
-      def prepare_UI
+      def prepare_for_focus
         ACHIEVED_
       end
 
-    public  # ~ as a parent we might receive these from children
+      # ~ messages received as parent from children
 
       def regexp_field
         @parent.regexp_field
@@ -109,7 +170,15 @@ module Skylab::BeautySalon
       def work_dir
         @parent.work_dir
       end
+
+      def expression_agent
+        @parent.expression_agent
+      end
     end
+
+    Brazen_ = BS_::Lib_::Brazen[]
+
+    Zerk_ = Brazen_::Zerk
 
     class Node_ < Zerk_::Common_Node
 
@@ -121,6 +190,10 @@ module Skylab::BeautySalon
 
       include Node_Methods_
 
+      def before_focus
+        @last_prepare_focus_was_OK ||= prepare_for_focus
+        nil
+      end
     end
 
     class Field_ < Zerk_::Field
@@ -136,18 +209,29 @@ module Skylab::BeautySalon
     class Search_and_Replace_Node__ < Branch_
 
       def initialize x
-        super x
+        super
+        @work_dir = '.search-and-replace'
+      end
+
+      def prepare_for_focus
+
         @children = [
           @regexp_field = Search_Field__.new( self ),
           @replace_field = Replace_Field__.new( self ),
           @dirs_field = Dirs_Field__.new( self ),
           @files_field = Files_Field__.new( self ),
-          pa = Preview_Node__.new( self ),
+          pn = Preview_Node__.new( self ),
           Quit_Button_.new( self ) ]
-        pa.orient_self
-        @work_dir = '.search-and-replace'
-        retrieve_values_from_FS_if_exist
+
+        pn.orient_self
+
         @is_first_display = true
+
+        if @is_interactive
+          retrieve_values_from_FS_if_exist
+        end
+
+        ACHIEVED_
       end
 
       def display_separator
@@ -166,7 +250,8 @@ module Skylab::BeautySalon
 
     public
 
-      attr_reader :dirs_field, :files_field, :regexp_field, :replace_field, :work_dir
+      attr_reader :dirs_field, :files_field, :regexp_field,
+        :replace_field, :work_dir
 
     end
 
@@ -204,13 +289,18 @@ module Skylab::BeautySalon
         ACHIEVED_
       end
 
+      def against_nonempty_iambic_stream scan
+        @rx = scan.gets_one
+        ACHIEVED_
+      end
+
       def via_line_know_value
         @rx = ::Regexp.new @line
         ACHIEVED_
       rescue ::RegexpError => @e
         _ = Callback_::Name.via_module( @e.class ).as_human
         @y << "#{ _ }: #{ @e.message }"
-        AS_IS_SIGNAL_
+        PROCEDE_
       end
 
       def to_marshal_pair
@@ -262,12 +352,18 @@ module Skylab::BeautySalon
         when_deleted
       end
 
+      def against_nonempty_iambic_stream scan
+        know_via_string scan.gets_one
+      end
+
       def via_line_know_value
         s = @line ; @line = nil
-        @o = S_and_R_::Actors_::Build_replace_function[ s, -> * a , & ev_p do
-          send_event ev_p[]
-          nil
-        end ]
+        know_via_string s
+      end
+
+      def know_via_string s
+        @o = S_and_R_::Actors_::Build_replace_function[
+          s, handle_unsigned_event_selectively ]
         @o ? ACHIEVED_ : UNABLE_
       end
 
@@ -325,11 +421,24 @@ module Skylab::BeautySalon
 
       def prompt_when_value
         @serr.write "new #{ noun } (nothing to cancel, space(s) to remove): "
-        AS_IS_SIGNAL_
+        PROCEDE_
       end
 
       def when_entered_nonzero_length_blank_string
         when_deleted
+      end
+
+      def against_nonempty_iambic_stream scan
+        s = scan.gets_one
+        if SOME_SPACE_RX_ =~ s
+          maybe_send_event :error do
+            build_not_OK_event_with :only_single_item_for_now, :s, s
+          end
+          UNABLE_
+        else
+          @a = [ s ]
+          ACHIEVED_
+        end
       end
 
       def via_line_know_value
@@ -413,7 +522,7 @@ module Skylab::BeautySalon
         nil
       end
 
-      def prepare_UI
+      def prepare_for_focus
         mod = S_and_R_::Preview_Agent_Children__
         @my_files_agent = mod::Files_Node.new self
         matches_agent = mod::Matches_Node.new self
@@ -425,7 +534,7 @@ module Skylab::BeautySalon
           Quit_Button_.new( self ) ]
 
         @my_files_agent.orient_self
-        DONE_
+        ACHIEVED_
       end
 
       def display_description
@@ -433,7 +542,7 @@ module Skylab::BeautySalon
         @serr.puts
       end
 
-      def is_executable
+      def can_receive_focus
         @parent_files_field.value_is_known &&
           @parent_dirs_field.value_is_known
       end
@@ -452,13 +561,15 @@ module Skylab::BeautySalon
     private
 
       def display_any_find_command
-        @my_files_agent.build_command do |i, i_, *, & ev_p|
+        @my_files_agent.build_command do | * i_a, & ev_p|
           ev = ev_p[]
-          if :info == i && :command_string == i_
+          if :info == i_a.first && :command_string == i_a[ 1 ]
             @serr.puts
             @serr.puts "current find command: #{ ev.command_string }"
           else
-            send_event ev
+            maybe_send_event_via_channel i_a do
+              ev
+            end
           end
         end
         nil
@@ -479,12 +590,9 @@ module Skylab::BeautySalon
       end
     end
 
-    AS_IS_SIGNAL_ = Zerk_::AS_IS_SIGNAL
-    DONE_ = nil
-    FINISHED_SIGNAL_ = :finished_signal
-    NEXT_FILE_SIGNAL_ = :next_file_signal
+    EMPTY_A_ = [].freeze
+    FINISHED_ = nil
     NONE_S_ = Zerk_::NONE_S
     S_and_R_ = self
-    STAY_WITH_FILE_SIGNAL_ = :stay_with_file_signal
   end
 end

@@ -6,10 +6,11 @@ module Skylab::Brazen
 
       def initialize i_a, group_name_i, branch
         @active_boolean = nil
+        @branch = branch
         @group_name = Callback_::Name.via_variegated_symbol group_name_i
         @has_active_boolean = false
         @i_a = i_a
-        @branch = branch
+        @is_interactive = branch.is_interactive
       end
 
       attr_reader :active_boolean, :has_active_boolean
@@ -54,17 +55,25 @@ module Skylab::Brazen
       end
 
       def when_not_changed
-        @branch.change_focus_to @branch
+        if @is_interactive
+          @branch.change_focus_to @branch
+        end
+        PROCEDE_
       end
+
 
       def when_changed
         @branch.receive_branch_changed_notification
-        @branch.change_focus_to @branch
+        if @is_interactive
+          @branch.change_focus_to @branch
+        end
+        PROCEDE_
       end
 
     public
 
-      def is_executable
+      def can_receive_focus
+        false
       end
 
       def marshal_load name_of_active_child_string, & ev_p

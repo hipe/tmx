@@ -2,16 +2,7 @@ module Skylab::Callback
 
   class Scan
 
-    class With_Signal_Processing__ < self
-
-      # apologies to real life signal-processing. this is a goofball experiment:
-      # we want to associate with our glorified proc a dictionary of callbacks.
-      # in order for the topic proc to go thru its many transformations (maps,
-      # reduces etc) all the while carrying with it these same callbak procs,
-      # we deem it easiet to make (what is effectively) a singleton class for
-      # each such topic proc. this way during transformations it does the
-      # right thing automatically, because each object that spawns off of this
-      # one has the same class with the same dictionary (struct) inside of it.
+    class With_Signal_Processing__ < self  # read #open [#059] (in [#044])
 
       class << self
 

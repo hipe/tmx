@@ -20,10 +20,58 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
 
   module InstanceMethods
 
+    # ~ setup
+
+    def start_tmpdir
+      td = existent_tmpdir
+      @tmpdir = td.with(
+        :path, td.join( 'haha-dir' ).to_path,
+        :be_verbose, do_debug,
+        :debug_IO, debug_IO )
+      nil
+    end
+
+    def to_tmpdir_add_wazoozle_file
+      @tmpdir.write 'ok-whatever-wazoozle.txt', unindent( <<-O )
+        ok oh my geez --> HAHA <--
+      O
+      nil
+    end
+
+    def start_tmpdir_SKIP
+      @tmpdir = existent_tmpdir.join 'haha-dir'
+      nil
+    end
+
+    # ~ interactive run
+
     def start_session path
       @session = Session__.new( self, path ).start
       nil
     end
+
+    # ~ non-interactive run
+
+    def call_API * x_a
+      evr = event_receiver
+      x_a.push :on_event_selectively, -> * , & ev_p do
+        ev = ev_p[]
+        evr.receive_event ev
+        ev.ok
+      end
+      @result = _API.call( * x_a )
+      nil
+    end
+
+    def _API
+      Subject_[]::API
+    end
+
+    def event_expression_agent
+      BS_::Lib_::Brazen[]::API.expression_agent_instance
+    end
+
+    # ~ assertion support
 
     def unindent s
       s.gsub! UNINDENT_RX__, BS_::EMPTY_S_
@@ -96,6 +144,11 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
   Subject_ = -> do
     BS_::Models_::Search_and_Replace
   end
+
+  SLASH_ = '/'.freeze
+
+  THREE_LINES_FILE_ = 'three-lines.txt'.freeze
+
 end
 
 module Skylab::BeautySalon::TestSupport::Models

@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   module Zerk
 
-    class Actors__::Persist < Persistence_Actor_
+    class Actors__::Persist
 
       Callback_::Actor.call self, :properties,
         :path,
@@ -51,7 +51,9 @@ module Skylab::Brazen
           :create_if_not_exist,
           :max_mkdirs, 1,
           :on_event, -> ev do
-            receive_persistence_error ev
+            @on_event_selectively.call do
+              ev
+            end
             ev.ok  # propagate 'false' in case this is failure
           end )
         _dir ? ACHEIVED_ : UNABLE_
@@ -72,6 +74,10 @@ module Skylab::Brazen
         else
           UNABLE_
         end
+      end
+
+      def line_scan_for_event ev
+        ev.scan_for_render_lines_under Brazen_::API.expression_agent_instance
       end
 
       def via_down_IO_write
