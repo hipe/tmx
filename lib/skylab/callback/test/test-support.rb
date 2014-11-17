@@ -24,6 +24,8 @@ module Skylab::Callback::TestSupport
 
   include Constants
 
+  extend TestSupport_::Quickie
+
   TestSupport_::Regret[ TS_ = self ]
 
   TestSupport_ = TestSupport_

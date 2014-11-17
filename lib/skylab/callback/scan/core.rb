@@ -220,6 +220,10 @@ module Skylab::Callback
           end
         end
 
+        def with_signal_handlers * pairs
+          Scan_::With_Signal_Processing__[ self, pairs ]
+        end
+
         Scan_ = self
       end
 end
