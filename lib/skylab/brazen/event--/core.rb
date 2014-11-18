@@ -415,6 +415,10 @@ module Skylab::Brazen
           Event_
         end
 
+        def maybe_send_event * i_a, & ev_p
+          @on_event_selectively.call( * i_a, & ev_p )
+        end
+
         def send_event ev
           event_receiver.receive_event ev
         end

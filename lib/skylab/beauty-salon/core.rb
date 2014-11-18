@@ -75,6 +75,8 @@ module Skylab::BeautySalon
       ::Shellwords
     end
 
+    ST__ = sidesys[ :SubTree ]
+
     String_scanner = Callback_.memoize do
       require 'strscan'
       ::StringScanner
@@ -87,6 +89,10 @@ module Skylab::BeautySalon
     Token_buffer = -> x, y do
       Bsc__[]::Token::Buffer.new x, y
     end
+
+    Tree_lib = -> do
+      ST__[]::Tree
+    end
   end
 
   # (:+[#su-001]:none)
@@ -95,6 +101,7 @@ module Skylab::BeautySalon
 
   ACHIEVED_ = true
   BS_ = self
+  CONST_SEP_ = '::'.freeze
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
   IDENTITY_ = -> x { x }          # for fun we track this

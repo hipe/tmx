@@ -1,71 +1,253 @@
-module Skylab::MetaHell
+module Skylab::BeautySalon
 
-  module Boxxy
+  class Models_::Search_and_Replace
 
-    module Peeker_
+    class Actors_::Build_replace_function
 
-      # absurd - read the first few lines of a file (not load it, that might
-      # break autoloading) to determine the correct casing of its constants.
-      # dark hacks only.
+      class Hack_guess_module_tree__
 
-      Tug = -> tug do
-        any_expensive_correction = nil
-        tug.respond_to? :autovivify_proc_notify or fail ::ArgumentError,
-          "your module has an unsupported tug class (do you need MAARS?) - #{
-            }had #{ tug.class } for #{ tug.mod }"
-        tug.autovivify_proc_notify -> do
-          cmd_s = Build_find_command__[ tug ]
-          _, o, e, w = MetaHell_::Library_::Open3.popen3 cmd_s
-          d = w.value.exitstatus
-          0 == d or fail "sanity - exitstatus from cmd? #{ d.inspect }"
-          err_s = e.read ; out_s = o.read
-          err_s.length.zero? or fail "sanity - err from cmd? #{err_s.inspect}"
-          if out_s.length.nonzero?
-            any_expensive_correction =
-              Any_correction_from_massive_hack__[ tug, out_s.chomp ]
+        # the darkest of all hacks in this universe - we brought this file
+        # back from four months in oblivion (where it belonged) and re-wrote
+        # it completely: it tries to infer the "module tree" expressed by the
+        # code in a file.
+
+        # this is "useful" here because we want a user-defined file to
+        # have any arbitary taxonomy of nested modules in it (that is, a
+        # "module tree"), yet still we want to be able to find the one
+        # function (stored in a const) we are looking for.
+
+        # we jump through these nasty hoops because we don't want to
+        # contribute to the equally nasty problem of polluting (or dictating
+        # the use of) namespaces - let the user decide which namespaces to
+        # use (if any), we just want the "leaf" we are loooking for, and
+        # don't know where to look.
+
+        # yes there are other ways to "solve" this "problem", but none of
+        # them felt sufficiently isomorphic or sufficiently zero-config.
+
+        # this, however, will certainly fail if the assumed conventions
+        # aren't followed in the file.
+
+
+        class << self
+          def [] * a
+            new( a ).execute
           end
-          # then do what parent does
-          tug.mod.const_set tug.const, tug.build_autovivified_module
         end
-        any_other_correction = Tug_and_get_any_correction_[ tug, nil ]
-        if any_expensive_correction
-          any_other_correction and fail "sanity - why did the other correct it?"
-          any_expensive_correction
-        else
-          any_other_correction
-        end
-      end
 
-      Build_find_command__ = -> tug do
-        MetaHell_::Library_.kick :Shellwords
-        "find #{ tug.branch_pathname.to_s.shellescape } -type f #{
-          }-name #{ "*#{ Autoloader::EXTNAME }".shellescape } | head -n 1"
-      end
+        BS_::Lib_::Event_lib[].sender self
 
-      Any_correction_from_massive_hack__ = -> tug, path do
-        c_a = MetaHell_::Library_::CodeMolester::Const_Pryer[ path ]
-        # the file that was found with `find` is of arbitrary depth.
-        shorter = tug.branch_pathname.to_s
-        path[ 0, shorter.length ] == shorter or fail "sanity"
-        depth = Number_of_occurences_in_haystack_of_needle__[
-          path[ shorter.length .. -1 ], '/' ]
-        depth.times { c_a.pop }
-        c_a.length.zero? and fail "sanity"
-        any_expensive_correction = nil
-        if c_a.last != tug.const
-          tug.correction_notification( any_expensive_correction =  c_a.last )
+        def initialize a
+          @path, @on_event_selectively = a
+          @stack = [] ; @tops = []
         end
-        any_expensive_correction
-      end
 
-      Number_of_occurences_in_haystack_of_needle__ = -> str, char do
-        # because `scan` wastes memory HA
-        d = 0 ; cnt = 0 ; len = str.length ; ln = char.length
-        while d < len
-          idx = str.index( char, d ) or break
-          cnt += 1 ; d = idx + ln
+        def execute
+          @io = ::File.open @path, READ_MODE_
+          @line = @io.gets
+          if @line
+            main_loop
+          else
+            when_empty_file
+          end
         end
-        cnt
+
+        def when_empty_file
+          maybe_send_event :error do
+            build_not_OK_event_with :file_was_empty, :path, @path
+          end
+          UNABLE_
+        end
+
+        def main_loop
+          @ok = true
+          begin
+
+            @md = MODULE_LINE_RX_.match @line
+
+            if @md
+              _ = when_module
+              _ ? redo : break
+            end
+
+            @md = END_LINE_RX_.match @line
+
+            if @md
+              _ = when_end_line
+              _ ? redo : break
+            end
+
+            _ = advance_line
+            _ ? redo : break
+
+          end while nil
+
+          @ok and finish
+        end
+
+        END_LINE_RX_ = /\A(?<space>[[:space:]]*)end\b/
+
+        _ = '[A-Z][A-Za-z0-9_]*'
+
+        MODULE_LINE_RX_ = /\A(?<space>[[:space:]]*)(?:module|class)[ ](?<name>#{ _ }(?:::#{ _ })*)\b/
+
+        def when_module
+          @stack.push Module_Item__.via_matchdata @md
+          advance_line
+        end
+
+        def when_end_line
+          if @stack.length.zero?
+            self._WHEN_empty_stack_and_encountered_end
+          else
+            @top = @stack.last
+            when_end_line_normal
+          end
+        end
+
+        class Module_Item__
+
+          class << self
+
+            def via_matchdata md
+              new md
+            end
+          end
+
+          def initialize md
+            @space, name_s = md.captures
+            @name_s_a = name_s.split CONST_SEP_
+            @cx_a = nil
+          end
+
+          attr_reader :name_s_a, :space
+
+          def has_children
+            ! @cx_a.nil?
+          end
+
+          def children
+            @cx_a
+          end
+
+          def add_child x
+            @cx_a ||= []
+            @cx_a.push x ; nil
+          end
+        end
+
+        def when_end_line_normal
+          case @top.space.length <=> @md[ :space ].length
+          when -1 ; when_end_is_deeper
+          when  0 ; when_end_is_same_level
+          when  1 ; when_end_is_shallower
+          end
+        end
+
+        def when_end_is_deeper
+          advance_line
+        end
+
+        def when_end_is_same_level
+          if @top.space == @md[ :space ]
+            top = @top
+            @stack.pop
+            @top = @stack.last
+            if @stack.length.zero?
+              @tops.push top
+            else
+              @top.add_child top
+            end
+            advance_line
+          else
+            self._WHEN_whitespace_convention_change
+          end
+        end
+
+        def advance_line
+          @line = @io.gets
+          @line and PROCEDE_
+        end
+
+        def finish
+          if @stack.length.zero?
+            finish_normal
+          else
+            self._WHEN_unclosed_modules
+          end
+        end
+
+        def finish_normal
+          @treelib  = BS_::Lib_::Tree_lib[]
+          @from_tree = @treelib.new
+          @to_node = @from_tree
+          @from_children = @tops
+          via_from_children
+          @to_node = @from_children = @stack = @tops = nil
+          via_from_tree
+        end
+
+        def via_from_children
+          prev_to_node = @to_node
+          @from_children.each do |child|
+            child.name_s_a.each do |name_s|
+              _cx = @to_node.fetch_or_create :path, [ name_s.intern ]
+              @to_node = _cx
+            end
+            if child.has_children
+              @from_children = child.children
+              via_from_children
+            end
+            @to_node = prev_to_node
+          end ; nil
+        end
+
+        def via_from_tree
+          scn = @from_tree.get_traversal_scanner
+          const_i_a = []
+          final = Node__.new( nil, nil )
+          parent_a = [ final ]
+          scn.gets  # always discard the root
+          while card = scn.gets
+            idx = card.level - 1
+            const_i_a[ idx ] = card.node.slug
+            parent = parent_a.fetch idx
+            box = Node__.new const_i_a[ 0, card.level ], parent
+            parent.add box.name_i, box
+            parent_a[ card.level ] = box
+          end
+          final
+        end
+
+        class Node__ < Callback_::Box
+
+          def initialize const_i_a, parent
+            super()
+            const_i_a and @const_i_a = const_i_a
+            if parent
+              @has_parent = true
+              @parent = parent
+            end
+          end
+
+          attr_reader :const_i_a, :has_parent, :parent
+
+          attr_accessor :value
+
+          def name_i
+            @const_i_a.last
+          end
+
+          def traverse & p
+            if @a.length.nonzero?
+              @h.values.each do |x|
+                p[ x ]
+                x.traverse( & p )
+              end
+            end
+            nil
+          end
+        end
       end
     end
   end
