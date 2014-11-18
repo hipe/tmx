@@ -8,7 +8,9 @@ digraph {
 
   cu [label="revamp cull"]
 
-  sr [label="search and replace"]
+  sr [label="search and replace" style=filled]
+
+  al [label="\"all\" action" style=filled]
 
   st [label="sticky 2nd\nform" style=filled]
 
@@ -22,4 +24,5 @@ digraph {
   sr->st
   sr->fu
   fu->API
+  sr->al
 }

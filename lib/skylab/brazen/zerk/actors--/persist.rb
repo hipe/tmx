@@ -56,7 +56,7 @@ module Skylab::Brazen
             end
             ev.ok  # propagate 'false' in case this is failure
           end )
-        _dir ? ACHEIVED_ : UNABLE_
+        _dir ? ACHIEVED_ : UNABLE_
       end
 
       def write  # assume any dirname of path exists and is a directory
@@ -90,7 +90,7 @@ module Skylab::Brazen
         if ok
           @down_IO.close
           @serr.puts " done."
-          ACHEIVED_
+          ACHIEVED_
         else
           @down_IO.close
           @serr.puts " failed."

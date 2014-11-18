@@ -83,12 +83,12 @@ module Skylab::Brazen
       else
         @mutable_document = Git_Config_::Mutable.
           parse_input_id @document.input_id, self
-        @mutable_document_is_resolved = @mutable_document ? ACHEIVED_ : UNABLE_
+        @mutable_document_is_resolved = @mutable_document ? ACHIEVED_ : UNABLE_
       end
       if @mutable_document_is_resolved
         @document = nil  # LOOK
       end
-      ACHEIVED_
+      ACHIEVED_
     end
 
     def via_mutated_mutable_document_write_file_via_persisted_entity entity

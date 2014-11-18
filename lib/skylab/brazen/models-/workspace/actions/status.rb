@@ -56,7 +56,7 @@ module Skylab::Brazen
     end
 
     def receive_status_resource_not_found ev
-      _ev = ev.dup_with :ok, ACHEIVED_
+      _ev = ev.dup_with :ok, ACHIEVED_
       receive_event _ev ; nil
     end
 

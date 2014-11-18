@@ -311,14 +311,14 @@ module Skylab::Brazen
             s = @item_x.description_under @expression_agent
             if s
               @item_x = s
-              ok = ACHEIVED_
+              ok = ACHIEVED_
             end
           end
           if ! ok and @item_x.respond_to? :description
             s = @item_x.description
             if s
               @item_x = s
-              ok = ACHEIVED_
+              ok = ACHIEVED_
             end
           end
           ok
@@ -331,7 +331,7 @@ module Skylab::Brazen
               pth x
             end
             @item_x = s
-            ACHEIVED_
+            ACHIEVED_
           end
         end
 

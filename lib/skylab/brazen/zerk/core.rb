@@ -253,7 +253,7 @@ module Skylab::Brazen
 
       def receive_mutable_input_line s
         s.strip!
-        rx = /\A#{ ::Regexp.escape s }/i
+        rx = /\A#{ ::Regexp.escape s }/
         cx_a = []
         @children.each do |cx|
           cx.can_receive_focus or next
@@ -501,7 +501,7 @@ module Skylab::Brazen
         if @is_interactive
           try_to_persist  # for now we procede whether or not it succeeds
           change_focus_to @parent
-          ACHEIVED_
+          ACHIEVED_
         end
       end
 
@@ -637,7 +637,7 @@ module Skylab::Brazen
       end
     end
 
-    ACHEIVED_ = true  # #todo this will be the virgin voyage of [#bs-016]
+    ACHIEVED_ = true  # #todo this will be the virgin voyage of [#bs-016]
     FINISHED_ = nil
     NONE_S = '(none)'.freeze
     NOTHING_TO_DO_ = nil

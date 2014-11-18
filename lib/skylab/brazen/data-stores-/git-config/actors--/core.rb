@@ -44,7 +44,7 @@ module Skylab::Brazen
           via_model_class_rslv_subsection_name_query
         else
           @subsection_name_query = nil
-          ACHEIVED_
+          ACHIEVED_
         end
       end
 
@@ -166,7 +166,7 @@ module Skylab::Brazen
           break
         end
         if found
-          ACHEIVED_
+          ACHIEVED_
         else
           @count = count
           maybe_send_event :error, :entity_not_found do
@@ -205,7 +205,7 @@ module Skylab::Brazen
         silo = @kernel.silo_via_identifier _id, @event_receiver
         if silo
           @model_class = silo.model_class
-          ACHEIVED_
+          ACHIEVED_
         end
       end
 

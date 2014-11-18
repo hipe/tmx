@@ -62,7 +62,7 @@ module Skylab::Brazen
 
     def receive_init_resource_not_found ev
       if any_argument_value :verbose
-        _ev = ev.dup_with :ok, ACHEIVED_
+        _ev = ev.dup_with :ok, ACHIEVED_
         receive_event _ev
       end
       @ok = true ; CONTINUE_

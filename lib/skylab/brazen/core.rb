@@ -250,7 +250,6 @@ module Skylab::Brazen
     Event_[].sender cls ; nil
   end
 
-  ACHEIVED_ = true
   ACHIEVED_ = true
   Brazen_ = self
 

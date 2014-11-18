@@ -63,7 +63,7 @@ module Skylab::Brazen
             x = iambic_property
             if _ENUM_BOX[ x ]
               instance_variable_set _IVAR, x
-              ACHEIVED_
+              ACHIEVED_
             else
               when_bad_enum_value x, _NAME_I, _ENUM_BOX
               UNABLE_
@@ -242,7 +242,7 @@ module Skylab::Brazen
             when_child_did_not_scan_something
           else
             o.set_scanner nil
-            ACHEIVED_
+            ACHIEVED_
           end
         end
 
@@ -278,7 +278,7 @@ module Skylab::Brazen
         def iambic_keyword i
           if i == current_iambic_token
             advance_iambic_scanner_by_one
-            ACHEIVED_
+            ACHIEVED_
           else
             when_not_iambic_keyword i
           end

@@ -134,7 +134,7 @@ module Skylab::Brazen
             end
             @section[ pair.name_i ] = pair.value_x
           end
-          @result = ACHEIVED_
+          @result = ACHIEVED_
         end
 
         def maybe_send_event *, & ev_p

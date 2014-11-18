@@ -228,7 +228,7 @@ module Skylab::Brazen
           if @plan
             flush_bc_meth
           else
-            ACHEIVED_
+            ACHIEVED_
           end
         else
           flush_bc_meth
@@ -260,7 +260,7 @@ module Skylab::Brazen
         if did_build
           finish_property
         else
-          ACHEIVED_
+          ACHIEVED_
         end
       end
 
@@ -272,7 +272,7 @@ module Skylab::Brazen
         if did_build
           finish_property
         else
-          ACHEIVED_
+          ACHIEVED_
         end
       end
 
@@ -351,7 +351,7 @@ module Skylab::Brazen
           @prop.class.hook_shell.process_relevant_later_hooks @reader, @prop
         end
         @prop = nil
-        ACHEIVED_
+        ACHIEVED_
       end
 
       def process_any_DSL d, x_a
@@ -671,7 +671,7 @@ module Skylab::Brazen
         if unparsed_iambic_exists
           when_extra_iambic
         else
-          ACHEIVED_
+          ACHIEVED_
         end
       end
 

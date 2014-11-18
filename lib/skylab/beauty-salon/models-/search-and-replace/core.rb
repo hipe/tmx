@@ -37,9 +37,23 @@ module Skylab::BeautySalon
           ridiculous interactive search and replace: in a simple interactive
           terminal session, build your transformation progressively.
           then execute the tranformation, which can apply the edit-in-place
-          changes one-by-one with yes/no confirmation. the main data elements
-          of your transformation are persistent, being progressively written
-          to a file for future re-use or prehaps editing.
+          changes one-by-one with yes/no confirmation, or all at once
+          non-interactively.
+
+          the main data elements of your transformation are persistent,
+          being progressively written to a file in a simple, human readable
+          format for future re-use or prehaps even hackish manual editing.
+
+          there is an undocumented custom function API so you can write
+          arbitrary code to express your transformation.
+
+          ALWAYS BACK UP YOUR TREE (e.g in version control) before using
+          this! once the old file has been replaced with the new file there
+          is no undo. although we like to think of this software as stable,
+          it certainly hasn't been used for enough different cases for that
+          categorization yet!
+
+          there is a known issue with files with multibyte characters.
 
         O
 

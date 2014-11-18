@@ -85,13 +85,13 @@ module Skylab::Brazen
 
       def via_entity_identifier_and_kernel_rslv_model_class
         @model_class = @kernel.model_class_via_identifier @entity_identifier, event_receiver
-        @model_class ? ACHEIVED_ : UNABLE_
+        @model_class ? ACHIEVED_ : UNABLE_
       end
 
       def via_entity_identifier_when_valid_rslv_native_entity_identifier
         @native_entity_identifier_s =
           "#{  @entity_identifier.silo_slug }--#{  @entity_identifier.entity_name_s }"
-        ACHEIVED_
+        ACHIEVED_
       end
 
     public

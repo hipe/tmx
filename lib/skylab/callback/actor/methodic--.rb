@@ -108,7 +108,7 @@ module Skylab::Callback
           if unparsed_iambic_exists
             when_extra_iambic
           else
-            ACHEIVED_
+            ACHIEVED_
           end
         end
 
@@ -559,7 +559,7 @@ module Skylab::Callback
               receive_missing_required_properties _ev
               UNABLE_
             else
-              ACHEIVED_
+              ACHIEVED_
             end
           end
 
@@ -582,7 +582,7 @@ module Skylab::Callback
         end
       end
 
-      ACHEIVED_ = true
+      ACHIEVED_ = true
       BX_ = :PROPERTIES_FOR_WRITE__
       MM_ = :ModuleMethods  # is Module_Methods in [bz] ent
       PC_ = :Property  # is PROPERTY_CLASS__ in [bz] ent

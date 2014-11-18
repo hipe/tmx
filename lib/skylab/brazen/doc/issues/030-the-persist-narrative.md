@@ -21,7 +21,7 @@ kind). but we are not here to write the next killer ORM (for now).
 
 that is all. if we are using the necessary elements of our model model
 then hopefully reflection will make all the magic happen. we expect that
-the result value will be `ACHEIVED_` (that is, `true`) if this works and
+the result value will be `ACHIEVED_` (that is, `true`) if this works and
 if it doesn't we will send an event and the result will be whatever your
 result was from your `receive_event` method.
 

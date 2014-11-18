@@ -434,6 +434,90 @@ module Skylab::BeautySalon
           end
         end
 
+        def engage_all_remaining_matches_in_all_remaining_files_via match_d, es  # big ball of meh
+
+          @is_interactive and @serr.puts
+
+          func = replace_function
+          oes = @parent.handle_event_selectively_via_channel
+          write_file = curry_file_writer work_dir
+          ok = true
+          file_count = 0
+
+          begin  # while edit session with at least one match
+
+            file_count += 1
+            match = es.match_at_index match_d
+            seen_match_count = used_match_count = 0
+
+            begin  # while match
+
+              seen_match_count += 1
+              string = func.call match.md
+              if string
+                used_match_count += 1
+                match.set_replacement_string string
+              end
+
+              match = es.match_at_index( match_d += 1 )
+
+            end while match
+
+            ok = write_file.call es, -> * i_a, & ev_p do
+              oes.call i_a do
+                ev = ev_p[]
+                if :changed_file == ev.terminal_channel_i
+                  ev = add_changes_info_to_event(
+                    used_match_count, seen_match_count, file_count, ev )
+                end
+                ev
+              end
+            end
+            ok or break
+
+            begin
+              es = @file_scan.gets
+              es or break
+            end until es.has_at_least_one_match
+
+            es or break
+            match_d = 0
+
+          end while true
+
+          if @is_interactive
+            y = @y
+            expression_agent.calculate do
+              y << "finished (#{ file_count } #{ plural_noun 'file', file_count } total)."
+            end
+            change_focus_to nil
+            @parent.change_focus_to @parent
+          end
+
+          ok
+        end
+
+      private
+
+        def add_changes_info_to_event used_match_d, seen_match_d, file_d, ev
+
+          ev = ev.with_message_string_mapper -> msg, d do
+            if d.zero?
+              _changes = if used_match_d == seen_match_d
+                "#{ used_match_d } #{ plural_noun 'change', seen_match_d }"
+              else
+                "#{ used_match_d } of #{ seen_match_d } #{
+                  }#{ plural_noun 'match', seen_match_d }"
+              end
+              "file #{ file_d }: #{ _changes }. #{ msg }"
+            else
+              msg
+            end
+          end
+        end
+
+      public
+
         def go_up
           release_resources  # might fail but we ignore anyway
           @node_with_focus = nil  # we break out of our own loop with this
@@ -467,8 +551,13 @@ module Skylab::BeautySalon
         end
 
         def execute_via_file_scan_when_non_interactive
-          func = @parent.replace_field.replace_function
-          tmpdir_path = BS_::Lib_::System[].defaults.dev_tmpdir_path
+
+          func = replace_function
+
+          write_file = curry_file_writer(
+            BS_::Lib_::System[].defaults.dev_tmpdir_path,
+            handle_unsigned_event_selectively )
+
           @file_scan.expand_by do |edit_session|
             Callback_.scan do
               match = edit_session.gets_match
@@ -479,15 +568,25 @@ module Skylab::BeautySalon
                 end
                 match
               else
-                S_and_R_::Actors_::Write_any_changed_file.with(
-                  :edit_session, edit_session,
-                  :work_dir_path, tmpdir_path,
-                  :is_dry_run, false,
-                  :on_event_selectively, handle_unsigned_event_selectively )
+                write_file.call edit_session
                 nil
               end
             end
           end
+        end
+
+        def curry_file_writer tmpdir_path, oes=nil
+          -> edit_session, oes_=oes do
+            S_and_R_::Actors_::Write_any_changed_file.with(
+              :edit_session, edit_session,
+              :work_dir_path, tmpdir_path,
+              :is_dry_run, false,
+              :on_event_selectively, oes_ )
+          end
+        end
+
+        def replace_function
+          @parent.replace_field.replace_function
         end
 
         def for_interactive_search_and_replace_or_read_only

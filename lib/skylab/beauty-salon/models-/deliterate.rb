@@ -117,7 +117,7 @@ module Skylab::BeautySalon
 
     def resolve_input_stream
       if @input_stream
-        ACHEIVED_
+        ACHIEVED_
       else
         via_input_path_resolve_input_stream
       end
@@ -125,7 +125,7 @@ module Skylab::BeautySalon
 
     def via_input_path_resolve_input_stream
       @input_stream = ::File.open @input_path, READ_MODE_
-      @input_stream && ACHEIVED_
+      @input_stream && ACHIEVED_
     rescue ::Errno::ENOENT => e
       _ev = Brazen_.event.wrap.exception e,
         :path_hack, :terminal_channel_i, :resource_not_found

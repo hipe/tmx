@@ -35,6 +35,8 @@ module Skylab::BeautySalon
 
         @children.push Next_File_Button__.new self
 
+        @children.push All_Remaining_in_All_Files_Button__.new self
+
         @children.push( Quit_Button_.new( self ) do
           @parent.release_resources
         end )
@@ -55,6 +57,7 @@ module Skylab::BeautySalon
       end
 
       def refresh_button_visibilities
+        @do_show_all_files_button = false
         @do_show_all_remaining_button = false
         @do_show_done_with_file_button = false
         @do_show_next_file_button = false
@@ -69,6 +72,10 @@ module Skylab::BeautySalon
       end
 
       def via_current_match_activate_button_visibilities
+
+        if @has_next_file
+          @do_show_all_files_button = true
+        end
 
         if @cm.has_next_match
 
@@ -203,6 +210,7 @@ module Skylab::BeautySalon
       end
 
       attr_reader(
+        :do_show_all_files_button,
         :do_show_all_remaining_button,
         :do_show_done_with_file_button,
         :do_show_next_file_button,
@@ -248,6 +256,10 @@ module Skylab::BeautySalon
 
         refresh_button_visibilities
         ok
+      end
+
+      def engage_all_remaining_matches_in_all_remaining_files
+        @parent.engage_all_remaining_matches_in_all_remaining_files_via @cm.match_index, @es
       end
 
       def engage_replacement_of_current_match  # assume: replace function..
@@ -416,6 +428,23 @@ module Skylab::BeautySalon
       class Done_with_File_Button__ < Same_Button___
         def can_receive_focus
           @parent.do_show_done_with_file_button
+        end
+      end
+
+      class All_Remaining_in_All_Files_Button__ < Button_
+
+        def initialize x
+          super
+          s = @name.as_slug
+          @name = Callback_::Name.via_slug "#{ s[ 0 ].upcase }#{ s[ 1 .. -1 ] }"
+        end
+
+        def can_receive_focus
+          @parent.do_show_all_files_button
+        end
+
+        def receive_focus
+          @parent.engage_all_remaining_matches_in_all_remaining_files
         end
       end
     end

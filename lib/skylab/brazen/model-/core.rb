@@ -148,7 +148,7 @@ module Skylab::Brazen
           a = [ @persist_to ]
         end
         @preconditions = a  # can be nil
-        ACHEIVED_
+        ACHIEVED_
       end
 
       def process_some_customized_inflection_behavior scanner
@@ -627,7 +627,7 @@ module Skylab::Brazen
       else
         when_no_persist_to_for_rslv_datastore
       end
-      ACHEIVED_
+      ACHIEVED_
     end
 
     def when_no_persist_to_for_rslv_datastore
@@ -854,7 +854,7 @@ module Skylab::Brazen
         ent_ and begin
           ent.normalize_property_value_via_normal_entity(
             ent.class.local_entity_identifier_string, ent_, evr )
-          ACHEIVED_
+          ACHIEVED_
         end
       end
 

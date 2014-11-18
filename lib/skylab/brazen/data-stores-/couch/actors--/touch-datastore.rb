@@ -21,7 +21,7 @@ module Skylab::Brazen
         _ev = build_OK_event_with :created_datastore, :description,
           @entity.description, * @entity.to_even_iambic
         send_event _ev
-        ACHEIVED_
+        ACHIEVED_
       end
 
       def ensure_exists_when_412_precondition_failed o

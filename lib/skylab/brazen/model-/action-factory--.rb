@@ -97,7 +97,7 @@ module Skylab::Brazen
               krnl.add_property prop
             end
 
-            ACHEIVED_
+            ACHIEVED_
           end
         end
 
@@ -241,7 +241,7 @@ module Skylab::Brazen
 
         def rslv_entity_scan
           @entity_scan = datastore.entity_scan_via_class self.class.model_class, self
-          @entity_scan and ACHEIVED_
+          @entity_scan and ACHIEVED_
         end
 
         def via_entity_scan_send_list
@@ -343,7 +343,7 @@ module Skylab::Brazen
               via_dsc_for_one_resolve_entity_when_had_many_via_last one
             else
               @entity = one
-              ACHEIVED_
+              ACHIEVED_
             end
           else
             for_one_resolve_entity_when_had_none
@@ -365,7 +365,7 @@ module Skylab::Brazen
           send_event _ev
 
           @entity = one
-          ACHEIVED_
+          ACHIEVED_
         end
 
         def for_one_resolve_entity_when_had_none

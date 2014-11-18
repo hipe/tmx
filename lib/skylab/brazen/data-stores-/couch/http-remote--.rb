@@ -217,7 +217,7 @@ module Skylab::Brazen
           rsp_body_to_event do |a, h|
             a[ 0 ] = @response.message.downcase.gsub( SPACE_, UNDERSCORE_ ).intern
             a.push :message, @response.message
-            h.key? OK__ or a.push :ok, ACHEIVED_
+            h.key? OK__ or a.push :ok, ACHIEVED_
             h.key? CODE__ or a.push :code, @response.code.to_i
             a.push :is_completion, true
             a.concat x_a
