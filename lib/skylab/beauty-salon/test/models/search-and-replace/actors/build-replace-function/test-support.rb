@@ -15,6 +15,7 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace::Repl
     def rf replace_function_string
       @replace_function = Parent_TS_::Subject_[]::Actors_::Build_replace_function[
         replace_function_string,
+        :_no_work_dir_,
         -> *, & ev_p do
           @ev_a ||= []
           @ev_a.push ev_p[]

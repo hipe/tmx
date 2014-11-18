@@ -342,6 +342,10 @@ module Skylab::Headless
       @to_pathname.basename
     end
 
+    def children with_directory=false
+      @to_pathname.children with_directory
+    end
+
     def dirname
       @to_pathname.dirname
     end

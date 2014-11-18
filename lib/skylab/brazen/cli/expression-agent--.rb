@@ -31,9 +31,8 @@ module Skylab::Brazen
         Brazen_.name_function.as_human
       end
 
-      def s x
-        x.respond_to?( :length ) and x = x.length
-        's' if 1 != x
+      def s * x_a
+        _NLP_agent.s( * x_a )
       end
 
       GREEN__ = 32

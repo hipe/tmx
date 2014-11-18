@@ -26,8 +26,12 @@ module Skylab::BeautySalon
         # them felt sufficiently isomorphic or sufficiently zero-config.
 
         # this, however, will certainly fail if the assumed conventions
-        # aren't followed in the file.
+        # aren't followed in the input file.
 
+        # #todo - this unnecessarily makes three trees to make one - we
+        # could just make the one from the start. setting out we thought
+        # we should try to use [st] before writing it off. [ba]'s tree
+        # is goofy and could stand for a rewrite.
 
         class << self
           def [] * a

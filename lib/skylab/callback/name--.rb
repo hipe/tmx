@@ -157,7 +157,7 @@ module Skylab::Callback
           gsub( BLACK_RX__, SEP__ ).downcase.intern
       end
       PART_RX__ = /(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z])/
-      SEP__ = '_'.freeze
+      SEP__ = UNDERSCORE_
       BLACK_RX__ = /[^a-z0-9]+/i
       p
     end
@@ -168,7 +168,7 @@ module Skylab::Callback
           gsub( CONST_PART_SEP_, PART_SEP__ ).downcase
       end
       PART_RX__ = /(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-rt-z])/
-      PART_SEP__ = '-'.freeze
+      PART_SEP__ = DASH_
       p
     end
 
@@ -176,6 +176,6 @@ module Skylab::Callback
       PATHIFY_[ const_name_s.gsub CONST_SEP_, PATH_SEP_ ]
     end
 
-    CONST_PART_SEP_ = '_'.freeze
+    CONST_PART_SEP_ = UNDERSCORE_
   end
 end

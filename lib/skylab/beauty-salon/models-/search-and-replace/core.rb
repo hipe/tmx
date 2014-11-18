@@ -363,7 +363,7 @@ module Skylab::BeautySalon
 
       def know_via_string s
         @o = S_and_R_::Actors_::Build_replace_function[
-          s, handle_unsigned_event_selectively ]
+          s, work_dir, handle_unsigned_event_selectively ]
         @o ? ACHIEVED_ : UNABLE_
       end
 
@@ -380,7 +380,7 @@ module Skylab::BeautySalon
 
       def marshal_load s, & ep
 
-        @o = S_and_R_::Actors_::Build_replace_function[ s, -> *, & ev_p do
+        @o = S_and_R_::Actors_::Build_replace_function[ s, work_dir, -> *, & ev_p do
           _ev = ev_p[]
           ep[ _ev ]
           UNABLE_

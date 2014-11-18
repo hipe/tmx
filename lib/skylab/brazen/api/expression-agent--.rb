@@ -69,8 +69,8 @@ module Skylab::Brazen
         "«#{ x }»"  # :+#guillemets
       end
 
-      def s count_x, lexeme_i=:s
-        _NLP_agent.s count_x, lexeme_i
+      def s * x_a
+        _NLP_agent.s( * x_a )
       end
 
       def val s

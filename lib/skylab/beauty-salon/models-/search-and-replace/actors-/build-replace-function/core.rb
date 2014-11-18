@@ -5,13 +5,13 @@ module Skylab::BeautySalon
     class Actors_::Build_replace_function
 
       class << self
-        def [] s, p
-          new( s, p ).execute
+        def [] * a
+          new( a ).execute
         end
       end
 
-      def initialize string, p
-        @on_event_selectively = p
+      def initialize a
+        string, @work_dir, @on_event_selectively = a
         @scn = BS_::Lib_::String_scanner[].new string
         @a = []
       end
@@ -87,7 +87,7 @@ module Skylab::BeautySalon
             if ! @scn.skip CLOSE_RX_
               ok = expected '.', CLOSE_BRACE_EXPRESSION__
             end
-            ok and accept_thing d, m_a
+            ok and accept_thing d, m_a  # sets @ok
           end
           ok
         else
@@ -103,6 +103,7 @@ module Skylab::BeautySalon
         Self_::Build_replace_expression__.with(
           :capture_identifier, d,
           :method_call_chain, s_a,
+          :work_dir, @work_dir,
           :as_normal_value, -> x do
             @a.push x
             ACHIEVED_

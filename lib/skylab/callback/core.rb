@@ -1623,7 +1623,7 @@ module Skylab::Callback
     -> s do
       if white_rx =~ s
         s_ = s.gsub( gsub_rx ) do
-          "#{ '_' * $~[1].length }#{ $~[2].upcase if $~[2] }"
+          "#{ UNDERSCORE_ * $~[1].length }#{ $~[2].upcase if $~[2] }"
         end
         s_[0] = s_[0].upcase
         s_.intern
@@ -1637,11 +1637,13 @@ module Skylab::Callback
     Distill_
   end
 
+  UNDERSCORE_ = '_'.freeze
+
   Distill_ = -> do  # [#026]:#the-distill-function  :+[#bm-002]
     black_rx = /[-_ ]+(?=[^-_])/  # preserve final trailing underscores & dashes
-    dash = '-'.getbyte 0
+    dash = DASH_.getbyte 0
     empty_s = ''.freeze
-    undr = '_'.getbyte 0
+    undr = UNDERSCORE_.getbyte 0
     -> x do
       s = x.to_s.gsub black_rx, empty_s
       d = 0 ; s.setbyte d, undr while dash == s.getbyte( d -= 1 )
@@ -1745,8 +1747,6 @@ module Skylab::Callback
 
     alias_method :gets, :call
   end
-
-  UNDERSCORE_ = '_'.freeze
 
   require 'pathname'  # ~ eat our own dogfood, necessarily at the end
 

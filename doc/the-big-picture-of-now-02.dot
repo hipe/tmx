@@ -10,11 +10,11 @@ digraph {
 
   sr [label="search and replace"]
 
-  st [label="sticky 2nd\nform"]
+  st [label="sticky 2nd\nform" style=filled]
 
-  fu [label="function\nAPI"]
+  fu [label="function\nAPI" style=filled]
 
-  API [label="zerk\nAPI API"]
+  API [label="zerk\nAPI API" style=filled]
 
   cu->lib
   ev->cu

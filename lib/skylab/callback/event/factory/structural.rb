@@ -98,7 +98,7 @@ module Skylab::Callback
 
       define_method :box_module= do |box_mod|
         @produce_event_class_hookback = -> key_a, kls do
-          const = key_a.map{ |sym| constantify[ sym ] }.join( '_' ).intern
+          const = key_a.map{ |sym| constantify[ sym ] }.join( UNDERSCORE_ ).intern
           if box_mod.const_defined? const, false
             raise ::RuntimeError, "collision with pre-existing const:#{
               }#{ box_mod }::#{ const } - be sure that your factories exist #{
