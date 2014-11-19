@@ -99,8 +99,8 @@ both as an exercisize and out of convenience, we play with the idea of a
 invocations of the application.
 
 for now this is done by writing the form's state to a simple text file
-using our "git-config" library, which seems to work well enough despite
-one [#064] known issue.
+using our "git-config" library, which seems to work well enough for this
+(until we get into regexen with tricky characters [#065])
 
 for now we re-write the "entire" text file each time the user enters a
 new valid value for a leaf node, which is convenient for us preserving

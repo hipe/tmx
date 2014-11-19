@@ -1,14 +1,14 @@
 require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport::Data_Stores_
+module Skylab::Brazen::TestSupport::Data_Stores
 
   ::Skylab::Brazen::TestSupport[ self ]
 
 end
 
-module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
+module Skylab::Brazen::TestSupport::Data_Stores::Git_Config
 
-  ::Skylab::Brazen::TestSupport::Data_Stores_[ TS_ = self ]
+  ::Skylab::Brazen::TestSupport::Data_Stores[ TS_ = self ]
 
   include Constants
 
@@ -137,6 +137,9 @@ module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config
     end
 
     MARGIN_RX__ = /^[ ]{8}/
+  end
 
+  Subject_ = -> do
+    Brazen_::Data_Stores_::Git_Config
   end
 end

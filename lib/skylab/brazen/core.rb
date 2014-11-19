@@ -226,6 +226,11 @@ module Skylab::Brazen
       Autoloader_.require_sidesystem( :MetaHell ).strange x  # #todo
     end
 
+    String_IO = -> do
+      require 'stringio'
+      ::StringIO
+    end
+
     String_lib = -> do
       Bsc_[]::String
     end
@@ -288,6 +293,7 @@ module Skylab::Brazen
   Autoloader_[ Models_ = ::Module.new, :boxxy ]
   IDENTITY_ = -> x { x }
   NAME_ = :name
+  NEWLINE_ = "\n".freeze
   NILADIC_TRUTH_ = -> { true }
   PROCEDE_ = true
   Scan_ = -> { Callback_::Scan }

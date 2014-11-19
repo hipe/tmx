@@ -242,7 +242,7 @@ module Skylab::Brazen
 
       def initialize s, ss
         @section_s = s ; @subsection_s = ss
-        Section_.escape_subsection_name(
+        Section_.mutate_subsection_name_for_marshal(
           @escaped_subsection_s = ss.dup )
       end
 

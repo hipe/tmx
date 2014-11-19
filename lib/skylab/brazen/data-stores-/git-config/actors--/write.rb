@@ -47,7 +47,7 @@ module Skylab::Brazen
         ok
       end
 
-      Mock_Parse__ = ::Struct.new :on_event_selectively
+      Mock_Parse__ = ::Struct.new :handle_event_selectively
     end
   end
 end

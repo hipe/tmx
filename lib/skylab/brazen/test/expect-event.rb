@@ -344,6 +344,6 @@ module Skylab::Brazen::TestSupport
       end
     end
 
-    NEWLINE_ = "\n".freeze
+    NEWLINE_ = Brazen_::NEWLINE_
   end
 end

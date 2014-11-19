@@ -324,7 +324,6 @@ module Skylab::BeautySalon
       end
 
       def marshal_load s, & p
-        s.gsub! "\b", 'b'  # awful #open [#020]
         @rx = BS_._lib.regexp_lib.marshal_load s do |ev|
           p[ wrap_marshal_load_event ev ]
           UNABLE_

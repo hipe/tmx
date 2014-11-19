@@ -87,4 +87,8 @@ module Skylab::Brazen::TestSupport
     System = Brazen_::Lib_::System
 
   end
+
+  module Fixtures
+    Callback_::Autoloader[ self ]
+  end
 end

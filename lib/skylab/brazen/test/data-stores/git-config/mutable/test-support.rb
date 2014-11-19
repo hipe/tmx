@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::Brazen::TestSupport::Data_Stores_::Git_Config::Mutable
+module Skylab::Brazen::TestSupport::Data_Stores::Git_Config::Mutable
 
-  ::Skylab::Brazen::TestSupport::Data_Stores_::Git_Config[ TS_ = self ]
+  ::Skylab::Brazen::TestSupport::Data_Stores::Git_Config[ TS_ = self ]
 
   include Constants
 

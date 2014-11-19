@@ -247,7 +247,7 @@ module Skylab::Brazen
       def accpt_section
         ss = @md[ :subsect ]
         if ss
-          Section_.unescape_subsection_name ss
+          Section_.mutate_subsection_name_for_unmarshal ss
         end
         @sect = Section_.new @md[ :name ], ss
         @document.sections.accept_sect @sect
@@ -273,7 +273,7 @@ module Skylab::Brazen
       \r?\n?/x
 
       def accpt_assignment
-        @sect.assignments.accept_asmt Assignment_.new( * @md.captures )
+        @sect.assignments.accept_asmt Assignment_.new( * @md.captures, @on_event_selectively )
         PROCEDE_
       end
     end
@@ -436,14 +436,17 @@ module Skylab::Brazen
 
     class Section_
 
-      def self.escape_subsection_name s
-        s.gsub! BACKSLASH_, BACKSLASH_BACKSLASH_  # do this first
-        s.gsub! QUOTE_, BACKSLASH_QUOTE_ ; nil
-      end
+      class << self
 
-      def self.unescape_subsection_name s
-        s.gsub! BACKSLASH_QUOTE_, QUOTE_
-        s.gsub! BACKSLASH_BACKSLASH_, BACKSLASH_ ; nil
+        def mutate_subsection_name_for_marshal s
+          s.gsub! BACKSLASH_, BACKSLASH_BACKSLASH_  # do this first
+          s.gsub! QUOTE_, BACKSLASH_QUOTE_ ; nil
+        end
+
+        def mutate_subsection_name_for_unmarshal s
+          s.gsub! BACKSLASH_QUOTE_, QUOTE_
+          s.gsub! BACKSLASH_BACKSLASH_, BACKSLASH_ ; nil
+        end
       end
 
       def initialize name_s, subsect_name_s
@@ -505,13 +508,14 @@ module Skylab::Brazen
 
     class Assignment_
 
-      def initialize name_s, unparsed_value_s
+      def initialize name_s, marshaled_s, oes
         @internal_normal_name_string = name_s
-        @unparsed_value_s = unparsed_value_s
-        @is_parsed = false
+        @marshaled_s = marshaled_s
+        @did_unmarshal = false
+        @on_event_selectively = oes
       end
 
-      attr_reader :internal_normal_name_string, :unparsed_value_s
+      attr_reader :internal_normal_name_string, :marshaled_s
 
       def external_normal_name_symbol
         # uppercase is OK but convert dashes to underscores
@@ -524,24 +528,27 @@ module Skylab::Brazen
       end
 
       def value_x
-        @is_parsed or parse
+        @did_unmarshal or unmarshal
         @value_x
       end
 
-      def parse
-        @is_parsed = true
-        if Q__ == @unparsed_value_s.getbyte( 0 )
-          parse_quoted_string
-        elsif (( @md = INTEGER_RX__.match @unparsed_value_s ))
+      def unmarshal
+        @did_unmarshal = true
+        if Q__ == @marshaled_s.getbyte( 0 )
+          unmarshal_quoted_string
+        elsif (( @md = INTEGER_RX__.match @marshaled_s ))
           @value_x = @md[ 0 ].to_i
-        elsif TRUE_RX__ =~ @unparsed_value_s
+        elsif TRUE_RX__ =~ @marshaled_s
           @value_x = true
-        elsif FALSE_RX__ =~ @unparsed_value_s
+        elsif FALSE_RX__ =~ @marshaled_s
           @value_x = false
         else
-          @md = ALL_OTHERS_RX__.match @unparsed_value_s
-          @md or fail "sanity: #{ @unparsed_value_s.inspect }"
-          @value_x = @md[ 0 ]
+          @md = ALL_OTHERS_RX__.match @marshaled_s
+          @md or fail "sanity: #{ @marshaled_s.inspect }"
+          s = @md[ 0 ]
+          if self.class.mutate_value_string_for_unmarshal s, @on_event_selectively
+            @value_x = s
+          end
         end ; nil
       end
       Q__ = '"'.getbyte 0
@@ -551,34 +558,81 @@ module Skylab::Brazen
       FALSE_RX__ = /\A(?:no|false|off)#{ _REST_OF_LINE_ }/i
       ALL_OTHERS_RX__ = /\A[^ ;#]+(?:[ ]+[^ ;#]+)*#{ _REST_OF_LINE_ }/i
 
-      def parse_quoted_string
-        @md = QUOTED_STRING_RX__.match @unparsed_value_s
-        @md or raise ParseError, "huh? #{ @unparsed_value_s.inspect }"
-        @value_x = @md[0]
-        self.class.unescape_quoted_value_string @value_x
+      def unmarshal_quoted_string
+        @md = QUOTED_STRING_RX__.match @marshaled_s
+        @md or raise ParseError, "huh? #{ @marshaled_s.inspect }"
+        s = @md[ 0 ]
+        if self.class.mutate_value_string_for_unmarshal s, @on_event_selectively
+          @value_x = s
+        end
         nil
       end
       QUOTED_STRING_RX__ = /(?<=\A")(?:\\"|[^"])*(?="[ ]*(?:[;#]|\z))/
 
-      def self.escape_value_string s
-        s.gsub! BACKSLASH_, BACKSLASH_BACKSLASH_BACKSLASH__  # do first else etc
-        s.gsub! QUOTE_, BACKSLASH_QUOTE_
-        s.gsub! NEWLINE_, BACKSLASH_N__
-        s.gsub! TAB__, BACKSLASH_T__
-        s.gsub! BACKSPACE__, BACKSLASH_B__ ; nil
-      end
-      BACKSLASH_BACKSLASH_BACKSLASH__ = '\\\\\\'  # the gsub arg uses '\' too :(
+      class << self
 
-      def self.unescape_quoted_value_string s
-        s.gsub! BACKSLASH_QUOTE_, QUOTE_
-        s.gsub! BACKSLASH_N__, NEWLINE_
-        s.gsub! BACKSLASH_T__, TAB__
-        s.gsub! BACKSLASH_B__, BACKSPACE__
-        s.gsub! BACKSLASH_BACKSLASH_, BACKSLASH_ ; nil # do this last, else etc
+        def mutate_value_string_for_marshal s
+          # this logic is lifted term-by-term from the git config manpage
+          _quotes_are_necessary = QUOTES_ARE_NECESSARY_RX__ =~ s
+          s.gsub! ESCAPE_THESE_SOMEOHOW_RX__ do
+            ESCAPE_STRATEGY_MAP__.fetch( $~[ 0 ].getbyte( 0 ) )[ $~[ 0 ] ]
+          end
+          if _quotes_are_necessary
+            s[ 0, 0 ] = '"'
+            s[ s.length ] = '"'
+          end
+          nil
+        end
+
+        QUOTES_ARE_NECESSARY_RX__ = %r(
+          \A[[:space:]]   |  # if any leading whitespace
+            [[:space:]]\z |  # if any trailing whitespace
+             [#;]            # if the variable contains comment characters
+        )x
+
+        ESCAPE_THESE_SOMEOHOW_RX__ = /["\\\n\t\b]/
+
+        backslash = -> s do
+          "\\#{ s }"
+        end
+
+        ESCAPE_STRATEGY_MAP__ = {
+          '"'.getbyte( 0 ) => backslash,
+          '\\'.getbyte( 0 ) => backslash,
+          "\n".getbyte( 0 ) => backslash,  # spec offers 2 ways, we chose 1
+          "\t".getbyte( 0 ) => -> _ { '\t' },
+          "\b".getbyte( 0 ) => -> _ { '\b' }
+        }.freeze
+
+        def mutate_value_string_for_unmarshal string, oes
+          ok = true
+          string.gsub! UNESCAPE_THESE_SOMEHOW_RX__ do
+            s = $~[ 1 ]  # is empty string IFF backslash was at end of line
+            p = UNESCAPE_STRAEGY_MAP__[ s.getbyte 0 ]
+            if p
+              _otr = p[ s ]
+              _otr
+            else
+              oes.call :error, :invalid_escape_sequence do
+                build_invalid_escape_sequence_event $~[ 0 ]  # #todo
+              end
+              ok = false
+              s  # put the string "back in" as-is
+            end
+          end
+          ok
+        end
+
+        UNESCAPE_THESE_SOMEHOW_RX__ = /\\(.?)/
+
+        UNESCAPE_STRAEGY_MAP__ = {
+          '"'.getbyte( 0 ) => IDENTITY_,
+          '\\'.getbyte( 0 ) => IDENTITY_,
+          'n'.getbyte( 0 ) => -> _ { "\n" },
+          't'.getbyte( 0 ) => -> _ { "\t" },
+          'b'.getbyte( 0 ) => -> _ { "\b" }
+        }.freeze
       end
-      BACKSLASH_N__ = '\n'.freeze
-      BACKSLASH_T__ = '\t'.freeze ; TAB__ = "\t".freeze
-      BACKSLASH_B__ = '\b'.freeze ; BACKSPACE__ = "\b".freeze
     end
 
     BACKSLASH_ = '\\'.freeze
@@ -586,7 +640,6 @@ module Skylab::Brazen
     BACKSLASH_QUOTE_ = '\\"'.freeze
     CEASE_ = false
     Git_Config_ = self
-    NEWLINE_ = "\n".freeze
     ParseError = ::Class.new ::RuntimeError
     PROCEDE_ = true
     QUOTE_= '"'.freeze

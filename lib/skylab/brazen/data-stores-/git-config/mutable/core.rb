@@ -38,7 +38,7 @@ module Skylab::Brazen
           absorb_even_iambic_fully a
         end
 
-        def on_event_selectively
+        def handle_event_selectively
           @on_event_selectively
         end
 
@@ -152,7 +152,7 @@ module Skylab::Brazen
           @on_event_selectively = p ; nil
         end
 
-        def maybe_receive_event_pair i_a, ev_p
+        def maybe_receive_event_via_channel i_a, & ev_p
           @on_event_selectively[ * i_a, & ev_p ]
         end
 
@@ -409,7 +409,7 @@ module Skylab::Brazen
           x_a.first.respond_to?( :id2name ) or raise ::ArgumentError, "where"
 
           x_a.push :document, self,
-            :on_event_selectively, @parse.on_event_selectively
+            :on_event_selectively, @parse.handle_event_selectively
 
           Mutable::Actors::Persist.via_iambic x_a do |o|
             o.did_see :pathname or o.set_pathname @input_id.to_pathname
@@ -812,7 +812,7 @@ module Skylab::Brazen
           s = @line[
             @name_start_index + @name_width + @subsection_leader_width,
             @subsection_name_width ]
-          Section_.unescape_subsection_name s
+          Section_.mutate_subsection_name_for_unmarshal s
           s
         end
 
@@ -934,7 +934,7 @@ module Skylab::Brazen
           _parse = Parse__.with :via_string_for_immediate_parse,
             y * EMPTY_S_,
             :receive_events_selectively,
-            @parse.on_event_selectively
+            @parse.handle_event_selectively
 
           otr = Section_or_Subsection_Parse__.new _parse
           otr.parse or self._SYNTAX_MISMATCH
@@ -962,7 +962,7 @@ module Skylab::Brazen
         def rndr_line
           if @subsect_s
             s = @subsect_s.dup
-            Section_.escape_subsection_name s
+            Section_.mutate_subsection_name_for_marshal s
             "[#{ @sect_s } \"#{ s }\"]#{ NEWLINE_ }"
           else
             "[#{ @sect_s }]#{ NEWLINE_ }"
@@ -1297,11 +1297,15 @@ module Skylab::Brazen
             d = @scn.skip QUOTED_REST_RX__
             if d
               @scn.pos += 1  # because the rx doesn't include the close quote
-              contents_s = @scn.string[ @column_number - 1, d ]
+              s = @scn.string[ @column_number - 1, d ]
               @column_number += ( d + 1 )  # skip over the close quote
-              Assignment_.unescape_quoted_value_string contents_s
-              @seg_s_a.push contents_s
-              PROCEDE_
+              if Assignment_.mutate_value_string_for_unmarshal(
+                  s, @parse.handle_event_selectively )
+                @seg_s_a.push s
+                PROCEDE_
+              else
+                UNABLE_
+              end
             else
               recv_err_i :end_quote_not_found_anywhere_before_end_of_line
             end
@@ -1386,7 +1390,7 @@ module Skylab::Brazen
 
         def accept_new_value x
           d = @name_start_index + @name_width + @equals_width
-          s = unmarshall_RHS_via_x x
+          s = marshal_RHS_via_x x
           @line = @line.dup
           # we never create a line with trailing space. but if there is some
           # arbitrary number of spaces between the '=' and the value, we
@@ -1463,7 +1467,7 @@ module Skylab::Brazen
       private
 
         def rndr_line
-          _s = unmarshall_RHS_via_x @x
+          _s = marshal_RHS_via_x @x
           "#{ internal_normal_name_string } =#{ _s }#{ NEWLINE_ }"
         end
 
@@ -1492,38 +1496,35 @@ module Skylab::Brazen
 
       private
 
-        def unmarshall_RHS_via_x x
+        def marshal_RHS_via_x x
           if x.nil?
-            unmarshalled_RHS_when_nil  # #open [#040]
+            marshaled_RHS_when_nil  # #open [#040]
           else
-            unmarshalled_RHS_when_not_nil x
+            marshal_RHS_when_not_nil x
           end
         end
 
-        def unmarshalled_RHS_when_not_nil x
+        def marshal_RHS_when_not_nil x
           if x.respond_to? :ascii_only?
-            unmarshalled_RHS_when_string x
+            marshal_RHS_when_string x
           else
-            unmarshalled_RHS_when_not_nil_or_string x
+            marshal_RHS_when_not_nil_or_string x
           end
         end
 
-        def unmarshalled_RHS_when_not_nil_or_string x
+        def marshal_RHS_when_not_nil_or_string x
           " #{ x }"  # pray for boolean, integer or float
         end
 
-        def unmarshalled_RHS_when_string s  # :#one-space
-          if LEADING_WS_RX__ =~ s || TRAILING_WS_RX__ =~ s ||
-            SPECIAL_VALUE_CHARACTERS_RX__ =~ s
-            s = s.dup
-            Assignment_.escape_value_string s
-            " \"#{ s }\""
+        def marshal_RHS_when_string s  # :#one-space
+          s = s.dup
+          Assignment_.mutate_value_string_for_marshal s
+          if s.length.zero?
+            s
           else
             " #{ s }"
           end
         end
-        LEADING_WS_RX__ = /\A[ \t]+/ ; TRAILING_WS_RX__ = /[ \t]+\z/
-        SPECIAL_VALUE_CHARACTERS_RX__ = /[#;"\\\n\t\b]/
       end
 
       class Event_Sending_Node__
@@ -1532,7 +1533,7 @@ module Skylab::Brazen
         Event_[].sender self
 
         def maybe_send_event * i_a, & ev_p
-          @parse.maybe_receive_event_pair i_a, ev_p
+          @parse.maybe_receive_event_via_channel i_a, & ev_p
         end
       end
 
