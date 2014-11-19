@@ -69,10 +69,10 @@ module Skylab::Face
     end
 
     class Executable_Request_
-      Lib_::Basic_Fields[ :client, self, :struct_like,
+      LIB_.basic_fields :client, self, :struct_like,
         :absorber, :initialize,
         :field_i_a, [ :name_i_a, :param_h, :expression_agent_p,
-          :event_listener, :service_provider_p ]]
+          :event_listener, :service_provider_p ]
     end
 
     def get_reflective_action i_a  # for documentation, not execution
@@ -136,7 +136,7 @@ module Skylab::Face
       @conf ||= module_with_conf.conf
     end
 
-    Lib_::Module_accessors[ self, ->  do  # #storypoint-120
+    LIB_.module_accessors self, -> do  # #storypoint-120
 
       private_module_autovivifier_reader :module_with_conf, '../..', nil, nil
 
@@ -147,7 +147,7 @@ module Skylab::Face
           # if it's not already an autoloader (of any kind?), enhance it
           respond_to? :dir_pathname or Autoloader_[ self, :boxxy ]
         end
-    end ]
+    end
 
     def wire_for_expression ex, o
 
@@ -195,7 +195,7 @@ module Skylab::Face
     end
 
     def bld_msvcs_chain_cls two_msvcs
-      Lib_::Plugin_lib[].
+      LIB_.plugin_lib.
         build_metaservices_chain_from_class_a two_msvcs.map( & :class )
     end
 
@@ -217,21 +217,21 @@ module Skylab::Face
 
     def build_counting_message_yielder_for ex
       ex.instance_exec do  # emitting call below might be private
-        Lib_::Counting_yielder[
+        LIB_.counting_yielder(
           if respond_to? :normalization_failure_line_notify
             method :normalization_failure_line_notify
           else
             -> msg do
               raise ::ArgumentError, msg
             end
-          end ]
+          end )
       end
     end
 
     #                  ~ API client enhancement API ~            ( section 2 )
     # #storypoint-210
 
-    Lib_::Plugin_lib[]::Host.enhance self
+    LIB_.plugin_lib::Host.enhance self
 
 
     #                ~ experimental revelation services ~        ( section 3 )
@@ -284,11 +284,11 @@ module Skylab::Face
       def initialize host
         @host = host
         @story = nil
-        @box = Lib_::Open_box[]
+        @box = LIB_.open_box
       end
 
       def _dsl_dsl blk
-        @story ||= Lib_::DSL_DSL_story[ @host.singleton_class, @host, self ]
+        @story ||= LIB_.DSL_DSL_story @host.singleton_class, @host, self
         @story.instance_exec( &blk )
         nil
       end

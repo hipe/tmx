@@ -14,7 +14,7 @@ module Skylab::Face
 
     private  # ( make things public as necessary )
 
-    define_method :kbd, Lib_::CLI_lib[].pen.stylify.curry[ %i( green ) ]
+    define_method :kbd, LIB_.CLI_lib.pen.stylify.curry[ %i( green ) ]
 
       def par_nonstyled fld
         if fld.respond_to? :id2name
@@ -33,7 +33,7 @@ module Skylab::Face
         at :Local_normal_name_as_argument_raw, :Chomp_single_letter_suffix
 
       As_long_ = -> i do
-        Lib_::CLI_lib[].option.local_normal_name_as_long i
+        LIB_.CLI_lib.option.local_normal_name_as_long i
       end
 
       self

@@ -9,7 +9,7 @@ module Skylab::Face
       end
 
       def stylify
-        Lib_::CLI_lib[].pen.stylify
+        LIB_.CLI_lib.pen.stylify
       end
 
       def tableize rows, p=nil, opts={}, & p_

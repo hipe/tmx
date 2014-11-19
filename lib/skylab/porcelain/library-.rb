@@ -32,4 +32,6 @@ module Skylab::Porcelain
       Bsc__[]::String
     end
   end
+
+  LIB_ = _lib
 end

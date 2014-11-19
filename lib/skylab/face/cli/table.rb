@@ -87,9 +87,9 @@ module Skylab::Face
         # assume it is a rows enumerator.
         @x_a.unshift :read_rows_from ; nil
       end
-    Face_::Lib_::Fields_from_methods[ :niladic, :absorber, :absrb, -> do
+    LIB_.fields_from_methods :niladic, :absorber, :absrb, -> do
       def field
-        bx = (( @field_box ||= Lib_::Box[].new ))
+        bx = (( @field_box ||= LIB_.box.new ))
         shell = Field_Shell__.new @d, @x_a, bx
         @d = shell.d
       end
@@ -119,7 +119,7 @@ module Skylab::Face
       def write_lines_to
         @kernel.write_lines_to = iambic_property
       end
-    end ]
+    end
     end
 
     # but wait there's more -
@@ -152,7 +152,7 @@ module Skylab::Face
         bx.add @field.name_i, @field ; nil
       end
       attr_reader :d
-      Lib_::Fields_from_methods[
+      LIB_.fields_from_methods(
         :niladic, :passive, :absorber, :absrb_passive,
       -> do
         def cel_renderer_builder
@@ -182,7 +182,7 @@ module Skylab::Face
         def right
           @field.align_i = :right
         end
-      end ]
+      end )
     end
 
     # this syntax is "contoured" - fields themselves eat keywords

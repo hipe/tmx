@@ -48,7 +48,7 @@ module Skylab::Face
             "for now, all 'max share meter' columns must be 'fill' columns."
           end
 
-        Face_::Lib_::Fields_from_methods[ :absorber, :absrb_iambic_fully, -> do
+        LIB_.fields_from_methods :absorber, :absrb_iambic_fully, -> do
           def from_right
             @is_from_right = true
           end
@@ -58,7 +58,7 @@ module Skylab::Face
           def background_glyph
             @background_glyph = iambic_property
           end
-        end ]
+        end
 
         public
           def to_proc

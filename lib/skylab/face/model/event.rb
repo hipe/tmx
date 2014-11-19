@@ -97,7 +97,7 @@ module Skylab::Face
           end,
           :any_subsequent_items, -> y, o do
             s = o.message_proc[]
-            _sep = if Lib_::String_lib[].looks_like_sentence s
+            _sep = if LIB_.string_lib.looks_like_sentence s
                SPACE_
             else
               ' - '

@@ -13,12 +13,13 @@ module Skylab::Porcelain::Bleeding
       mod.extend MetaHell__[]::Let
     end
     MetaHell__ = sidesys[ :MetaHell ]
-    NLP = Porcelain_::Lib_::NLP
   end
 
+  NLP_ = Porcelain_._lib.NLP
+
   module Styles
-    include Lib_::NLP[]::EN::Methods
-    include Porcelain_::Lib_::CLI_lib[].pen.style_methods_module
+    include NLP_::EN::Methods
+    include Porcelain_._lib.CLI_lib.pen.style_methods_module
     extend self
     def em(s)  ; stylize(s, :green         )   end
     def hdr(s) ; stylize(s, :strong, :green)   end

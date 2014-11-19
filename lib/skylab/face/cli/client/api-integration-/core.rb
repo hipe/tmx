@@ -89,13 +89,13 @@ module Skylab::Face
         end
       end
 
-      Lib_::Module_accessors[ self, -> do
+      LIB_.module_accessors self, -> do
         private_methods do
           # we are Mine::CLI::Client::Kernel
           module_reader :parent_shell_module, '..'
           module_reader :application_module, '../../../'
         end
-      end ]
+      end
 
       # `check_for_unhandled_non_taxonomic_streams_for_api` - this might
       # necessitate that the client class defines an API::Action base class that
@@ -160,9 +160,9 @@ module Skylab::Face
       end
 
       class Executable_Request_
-        Lib_::Basic_Fields[ :client, self, :struct_like,
+        LIB_.basic_fields :client, self, :struct_like,
           :absorber, :initialize,
-          :field_i_a, [ :name_x, :param_x, :expression_agent_p ] ]
+          :field_i_a, [ :name_x, :param_x, :expression_agent_p ]
       end
 
       undef_method :get_api_executable_with  # #loader-stub

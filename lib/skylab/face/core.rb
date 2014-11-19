@@ -4,24 +4,8 @@ module Skylab::Face  # read [#011] the top node narrative
 
   class << self
 
-    def three_streams
-      [ stdin, stdout, stderr ]
-    end
-
-    def stdin
-      Lib_::System_IO.some_stdin_IO
-    end
-
-    def stdout
-      Lib_::System_IO.some_stdout_IO
-    end
-
-    def stderr
-      Lib_::System_IO.some_stderr_IO
-    end
-
-    def program_basename
-      @pbn ||= ::File.basename $PROGRAM_NAME
+    def _lib
+      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
     end
   end
 
@@ -36,9 +20,6 @@ module Skylab::Face  # read [#011] the top node narrative
 
     Autoloader_[ self ]
   end
-
-  Face_ = self
-  Lib_ = ::Module.new
 
   module Library_  # :+[#su-001]
 
@@ -63,7 +44,7 @@ module Skylab::Face  # read [#011] the top node narrative
       HL__[]::Arity::Space.create p, & p_
     end
 
-    Basic_Fields = -> * x_a do
+    Basic_fields = -> * x_a do
       MH__[]::Basic_Fields.via_iambic x_a
     end
 
@@ -183,6 +164,8 @@ module Skylab::Face  # read [#011] the top node narrative
       MH__[]::Module::Accessors::Touch
     end
   end
+
+  LIB_ = _lib
 
   Some_ = -> x { x && x.length.nonzero? }
 
@@ -461,7 +444,7 @@ module Skylab::Face  # read [#011] the top node narrative
           def self.collapse
             super
             a = @formal_arg_a ; @formal_arg_a = nil
-            box = const_set :SERVICES_, Lib_::Box[].new
+            box = const_set :SERVICES_, LIB_.box.new
             begin
               box.add (( i = a.shift )), a.shift
               define_method( i ) { self[ i ] }
@@ -514,6 +497,8 @@ module Skylab::Face  # read [#011] the top node narrative
   DASH_ = '-'.freeze
 
   EMPTY_S_ = ''.freeze
+
+  Face_ = self
 
   Name_ = Callback_::Name
 

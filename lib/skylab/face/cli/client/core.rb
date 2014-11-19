@@ -239,7 +239,7 @@ module Skylab::Face
           # n-amespace is defined with a block (these all happen elsewhere)
           # watch for this becoming a case for two child classes of a shared
           # base class..
-          @box = Lib_::Open_box[]
+          @box = LIB_.open_box
           @surface_mod = -> { surface_mod }
           @surface_mod_origin_i = :module
           @node_open = false ; @methods_need_to_be_indexed = true
@@ -598,7 +598,7 @@ module Skylab::Face
       end
 
       -> do  # `name`  # #called-by command and children to be `name`
-        p = -> x { Lib_::Name_from_symbol[ x ] }
+        p = -> x { LIB_.name_from_symbol x }
         h = {
           none: -> _ { false },
           method: p,
@@ -621,7 +621,7 @@ module Skylab::Face
       #      `name` that memoizes its result to `@name`
 
       def initialize name_i  # hacks only!
-        @name = Lib_::Name_from_symbol[ name_i ] ; nil
+        @name = LIB_.name_from_symbol name_i ; nil
       end
 
       #  ~ section 1 - public instance methods ~
@@ -890,8 +890,8 @@ module Skylab::Face
 
       def bld_option_enumerator
         @op.nil? and init_op
-        fly = Lib_::CLI_lib[].option.new_flyweight
-        _scan = Lib_::CLI_lib[].option.scan op
+        fly = LIB_.CLI_lib.option.new_flyweight
+        _scan = LIB_.CLI_lib.option.scan op
         _scan_ = _scan.map_by do |sw|
           fly.replace_with_switch sw
           fly
@@ -904,13 +904,13 @@ module Skylab::Face
           scn = nil ; op_x = option_parser ? @op : Empty_A_
           Face_::Options.new(
             fetch: -> ref, &blk do
-              scn ||= Face_::Lib_::CLI_lib[].option.parser.scanner op_x
+              scn ||= LIB_.CLI_lib.option.parser.scanner op_x
               scn.fetch ref, &blk
             end  )
         end.call
       end
 
-      Face_::Options = Lib_::Proxy_lib[].functional :fetch
+      Face_::Options = LIB_.proxy_lib.functional :fetch
 
     end
 
@@ -1160,7 +1160,7 @@ module Skylab::Face
           end )
       end
 
-      Face_::Parameters = Lib_::Proxy_lib[].nice :fetch  # only here b.c etc
+      Face_::Parameters = LIB_.proxy_lib.nice :fetch  # only here b.c etc
 
       # `subcmd_help` - #result-is-tuple. a hook for the benefit of both child
       # classes and nodes - it corrals help requests coming in from 2 places:
@@ -1375,10 +1375,10 @@ module Skylab::Face
 
           h = {
             string: -> m, x, _ do
-              m << Lib_::CLI_lib[].unstyle_sexp( x ) ; nil
+              m << LIB_.CLI_lib.unstyle_sexp( x ) ; nil
             end,
             style: -> m, x, usg_hdr_txt do
-              s = Lib_::CLI_lib[].unstyle_sexp x
+              s = LIB_.CLI_lib.unstyle_sexp x
               # ICK only let a header through if it says "usage:" ICK
               m << s if usg_hdr_txt == s || header_rx !~ s
               nil
@@ -1386,7 +1386,7 @@ module Skylab::Face
           }.freeze
 
           -> sexp, usg_hdr_txt do
-            ea = Lib_::CLI_lib[].pen.chunker.scan( sexp ).each
+            ea = LIB_.CLI_lib.pen.chunker.scan( sexp ).each
             a = ea.reduce [] do |m, x|
               h.fetch( x[0][0] )[ m, x, usg_hdr_txt ]
               m
@@ -1398,7 +1398,7 @@ module Skylab::Face
         restyle = -> a, usg_hdr_txt do
           a.length.times do |idx|
             line = a[ idx ]
-            sexp = Lib_::CLI_lib[].parse_styles line
+            sexp = LIB_.CLI_lib.parse_styles line
             if sexp
               a[ idx ] = restyle_sexp[ sexp, usg_hdr_txt ]
             else
@@ -1562,8 +1562,8 @@ module Skylab::Face
       def build_any_isomorphic_argument_syntax
         para_a = parent_services.get_command_parameters @sheet
         part_a = para_a.reduce [] do |m, x|
-          ob, cb = Lib_::CLI_lib[].argument.reqity_brackets x.first
-          m.push "#{ ob }<#{ Lib_::Name_slugulate[ x.last ] }>#{ cb }"
+          ob, cb = LIB_.CLI_lib.argument.reqity_brackets x.first
+          m.push "#{ ob }<#{ LIB_.name_slugulate x.last }>#{ cb }"
         end
         if part_a.length.nonzero?
           part_a * SPACE_

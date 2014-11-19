@@ -3,7 +3,7 @@ module Skylab::Face
   module API::Client::Model  # read [#057] the API client model .. #intro
 
     def self.[] host
-      Lib_::Plugin_lib[]::Host.enhance host do
+      LIB_.plugin_lib::Host.enhance host do
         services( * %i(
           has_model_instance
           set_new_valid_model_instance
@@ -17,7 +17,7 @@ module Skylab::Face
 
   module API::Client::Model::InstanceMethods
 
-    Lib_::Module_accessors[ self ].
+    LIB_.module_accessors( self ).
         private_module_reader( :models_module, '../../Models' ) do
       respond_to? :dir_pathname or Autoloader_[ self, :boxxy ]
     end

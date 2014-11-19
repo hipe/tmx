@@ -6,7 +6,7 @@ module Skylab::Face
     # fulfill [#026]. assumes it is behind a module mutex.
 
     def self.[] target_mod, x_a
-      Lib_::Plugin_lib[].enhance target_mod do
+      LIB_.plugin_lib.enhance target_mod do
         services_used( * x_a )
       end
       target_mod.send :include, API::Action::Service::Instance_Methods_

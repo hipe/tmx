@@ -4,13 +4,13 @@ module Skylab::Face
 
     class OP_
 
-      Lib_::Funcy_globful[ self ]
+      LIB_.funcy_globful self
 
-      Lib_::Fields[ self, :field_box, :any_expression_agent, :param_h, :op ]
+      LIB_.fields self, :field_box, :any_expression_agent, :param_h, :op
 
       def execute
         @short_h = { }
-        @opt_box = Lib_::Box[].new
+        @opt_box = LIB_.box.new
         @field_box.values.each do |fld|
           fld.is_required and next
           opt = build_option_with_resolved_short_and_long fld
@@ -55,7 +55,7 @@ module Skylab::Face
       Chmp_sing_ltr_sfx_, As_arg_raw_ = Face_::API::Procs.
         at :Chomp_single_letter_suffix, :Local_normal_name_as_argument_raw
       #
-      Option = Face_::Lib_::CLI_lib[].option.model
+      Option = LIB_.CLI_lib.option.model
 
       def add_desc opt, fld
         y = []

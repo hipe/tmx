@@ -92,9 +92,9 @@ module Skylab::Face
 
       # mutates param_h [#019] [#bl-013] [#sl-116]
 
-      Lib_::Basic_Fields[ :client, self,
+      LIB_.basic_fields :client, self,
         :globbing, :absorber, :initialize, :field_i_a,
-        %i( any_expression_agent field_box notice_yielder notifiee param_h ) ]
+        %i( any_expression_agent field_box notice_yielder notifiee param_h )
 
       def execute
         resolve_notifiers
@@ -276,7 +276,7 @@ module Skylab::Face
       # final flushing.
 
       @y ||= ::Enumerator::Yielder.new( & @infostream.method( :puts ) )
-      cy = Lib_::Counting_yielder[ @y.method :<< ]
+      cy = LIB_.counting_yielder @y.method :<<
       _fb = field_box ; _exag = any_expression_agent
       _norm = Normalization_.new :field_box, _fb, :notifiee, self,
         :any_expression_agent, _exag, :notice_yielder, cy,
@@ -301,7 +301,7 @@ module Skylab::Face
 
         class Expression_Agent__
 
-          Lib_::EN_add_private_methods_to_module[ %i( s and_ or_ both ), self ]
+          LIB_.EN_add_private_methods_to_module %i( s and_ or_ both ), self
 
 
         private
@@ -318,7 +318,7 @@ module Skylab::Face
           define_method :hack_label, & Hack_label
 
           def ick x
-            Face_::Lib_::Strange_proc[][ REASONABLY_SHORT__, x ]
+            LIB_.strange_proc[ REASONABLY_SHORT__, x ]
           end
           REASONABLY_SHORT__ = 10
 

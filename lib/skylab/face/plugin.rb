@@ -285,7 +285,7 @@ module Skylab::Face
     end
   end
 
-  Plugin::Box_ = Lib_::Box[]
+  Plugin::Box_ = LIB_.box
 
   Plugin::DeclarationError = ::Class.new ::RuntimeError
 
@@ -297,8 +297,8 @@ module Skylab::Face
   end
 
   Plugin::Say_unexp_tok_ = -> cls, hh, k do
-    "unexpected token #{ k.inspect }, expecting #{ Lib_::EN_oxford_or[
-      hh.keys.map( & :inspect ) ] } for defining this #{ cls }"
+    "unexpected token #{ k.inspect }, expecting #{ LIB_.EN_oxford_or(
+      hh.keys.map( & :inspect ) ) } for defining this #{ cls }"
   end
 
   # ~ facet 2 - services ~
@@ -844,7 +844,7 @@ module Skylab::Face
       mod = box.const_get const, false  # (below is pursuant to [#077])
       host.attach_hot_plugin_with_name_proc(
         ( ::Class == mod.class ? mod : mod.const_get( :Client, false ) ).new,
-        Lib_::Name_from_constant[ const ] )
+        LIB_.name_from_constant( const ) )
     end
   end
 

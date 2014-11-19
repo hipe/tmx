@@ -118,25 +118,25 @@ module Skylab::Face
 
     p = -> space, x do
       _a = space.each.map { |ar| "'#{ ar.local_name_function.local_normal }'" }
-      _or = Lib_::EN_oxford_or[ _a ]
-      _for = Lib_::Name_module_moniker[ space ]
+      _or = LIB_.EN_oxford_or _a
+      _for = LIB_.name_module_moniker space
       _msg = "'#{ x }' is not a recognized arity of the #{ _for } - #{
         }did you mean #{ _or }?"
       raise ::NameError, _msg
     end
 
-    Parameter_Arities_ = Lib_::Arity_space_create[ p, -> do
+    Parameter_Arities_ = LIB_.arity_space_create p, -> do
       self::ZERO_OR_ONE = new 0, 1
       self::ZERO_OR_MORE = new 0, nil
       self::ONE = new 1, 1
       self::ONE_OR_MORE = new 1, nil
-    end ]
+    end
 
-    Argument_Arities_ = Lib_::Arity_space_create[ p, -> do
+    Argument_Arities_ = LIB_.arity_space_create p, -> do
       self::ZERO = new 0, 0
       self::ZERO_OR_MORE = new 0, nil
       self::ONE = new 1, 1
-    end ]
+    end
 
     class Contour_Parse__
 
@@ -153,7 +153,7 @@ module Skylab::Face
       end
 
       private
-      Lib_::Fields_from_methods[ :absorber, :absrb_iambic_fully, -> do
+      LIB_.fields_from_methods :absorber, :absrb_iambic_fully, -> do
 
         def client
           @client_mod = iambic_property ; nil
@@ -172,7 +172,7 @@ module Skylab::Face
           @d = param.d
           nil
         end
-      end ]
+      end
 
       def bake_param_class
         @param_class = @meta_param_x_a ? produce_param_class : Param_
@@ -200,7 +200,7 @@ module Skylab::Face
       client.send :include, im_mod
       client.send :include, Param_IMs
       client.send :attr_accessor, :d
-      Lib_::Fields_from_methods[
+      LIB_.fields_from_methods(
         :field_box_const, :FIELDS_FOR_PARSING__,  # FIELDS_ is taken
         :definee_module, im_mod,
         :client_class, client,
@@ -214,7 +214,7 @@ module Skylab::Face
             Define_flag_writer__[ im_mod, fld ]
           end
         end
-      end ] ; nil
+      end ) ; nil
     end
 
     Define_property_writer__ = -> mod, fld do

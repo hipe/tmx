@@ -111,7 +111,7 @@ module Skylab::Face
             end
           end ; nil
         end
-      Face_::Lib_::Fields_from_methods[ :niladic, :passive, :absorber, :absrb,
+      LIB_.fields_from_methods :niladic, :passive, :absorber, :absrb,
           -> do
         def parts
           @fill.parts_x = iambic_property
@@ -119,7 +119,7 @@ module Skylab::Face
         def with
           @fill.with_x = iambic_property
         end
-      end ]
+      end
       end
 
       class Fill__

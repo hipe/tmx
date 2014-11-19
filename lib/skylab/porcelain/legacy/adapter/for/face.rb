@@ -6,7 +6,7 @@ module Skylab::Porcelain::Legacy
     end
   end
 
-  Adapter::For::Face::Of::Hot = Lib_::Proxy_lib[].nice(
+  Adapter::For::Face::Of::Hot = LIB_.proxy_lib.nice(
     :is_visible, :name, :get_summary_a_from_sheet, :help,  # for doc index
     :set_a, :respond_to?, :invokee, :pre_execute
       # for `get_executable` and `invoke`

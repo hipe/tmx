@@ -62,7 +62,7 @@ module Skylab::Face::TestSupport::CLI::Client
     MH__ = Face_::Lib_::MH__
 
     Sout_serr = -> do
-      sys = Face_::Lib_::System_IO[]
+      sys = LIB_.system_IO
       [ sys.some_stderr_IO, sys.some_stderr_IO ]
     end
   end

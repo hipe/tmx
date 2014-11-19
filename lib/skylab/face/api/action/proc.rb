@@ -9,13 +9,13 @@ module Skylab::Face
         def initialize p
           @keys_provided_set = @param_h = nil
           @proc = p ; @mod = Module.new
-          Lib_::Field_box_enhance[ @mod, -> do
+          LIB_.field_box_enhance @mod, -> do
             field_class_instance_methods -> { API::Params_::Param_IMs }
             meta_fields( * API::Params_::METAFIELD_A_A_ )
             fields( * p.parameters.map do |opt_req_rest, i|
               [ i, * H_.fetch( opt_req_rest ) ]
             end )
-          end ]
+          end
         end
         H_ = {  # map parameters as ruby reports them to fields as we
           opt: [ :arity, :zero_or_one ],  # describe them

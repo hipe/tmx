@@ -4,7 +4,7 @@ module Skylab::Face
 
     # ~ section 2 events
 
-    mutex = Lib_::Module_lib[].mutex  # #storypoint-10
+    mutex = LIB_.module_lib.mutex  # #storypoint-10
 
     def has_emit_facet  # #storypoint-15
       true
@@ -62,12 +62,12 @@ module Skylab::Face
     def field_box
       EMPTY_FIELD_BOX__
     end
-    EMPTY_FIELD_BOX__ = Lib_::Box[].new.freeze
+    EMPTY_FIELD_BOX__ = LIB_.box.new.freeze
 
   public
 
     def absorb_params_using_message_yielder y, *a
-      yy = Lib_::Counting_yielder[ y.method :<< ]
+      yy = LIB_.counting_yielder y.method :<<
       bx = field_box
       while a.length.nonzero?
         i = a.shift ; x = a.fetch 0 ; a.shift

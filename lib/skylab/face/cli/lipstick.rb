@@ -90,14 +90,14 @@ module Skylab::Face
     end
   end
 
-  CLI::Lipstick::Class__ = Lib_::Ivars_with_procs_as_methods[].new :cook_rendering_proc
+  CLI::Lipstick::Class__ = LIB_.ivars_with_procs_as_methods.new :cook_rendering_proc
 
   class CLI::Lipstick::Class__
 
     DEFAULT_GLYPH__ = '.'
     FINAL_DEFAULT_WIDTH__ = 72
 
-    Pen_ = Lib_::Ivars_with_procs_as_methods[].new :cook
+    Pen_ = LIB_.ivars_with_procs_as_methods.new :cook
 
     class Pen_
       def initialize glyph, color
@@ -110,7 +110,7 @@ module Skylab::Face
         @cook = -> my_room do
           # `normalized_float` below must be nil or btwn 0.0 and 1.0 inclusive
           styliz = if color
-            CLI::Lib_::CLI_lib[].pen.stylify.curry[ [ color ] ]
+            LIB_.CLI_lib.pen.stylify.curry[ [ color ] ]
           else IDENTITY_ end
           -> normalized_float do
             if normalized_float  # allow nil to mean "don't do it"
@@ -128,22 +128,30 @@ module Skylab::Face
     #
 
     def initialize *args
+
+      pen_a =
       if args.length.nonzero? and args.fetch( 0 ).respond_to?(:each_with_index)
-        tuple_a = args.shift
-        user_default_width, = Lib_::Parse_series[ args,
-          -> x { x.respond_to? :call } ]
-        pen_a = tuple_a.map do |tpl_a|
-          Pen_.new( * Lib_::Parse_series[ tpl_a,
+        _tuple_a = args.shift
+
+        user_default_width, = LIB_.parse_series args,
+          -> x { x.respond_to? :call }
+
+        _tuple_a.map do |tpl_a|
+
+          Pen_.new( * LIB_.parse_series( tpl_a,
             -> x { x.respond_to? :ascii_only? },
-            -> x { x.respond_to? :id2name } ] )
+            -> x { x.respond_to? :id2name } ) )
         end
       else
-        glyph, color, user_default_width = Lib_::Parse_series[ args,
+
+        glyph, color, user_default_width = LIB_.parse_series args,
           -> x { x.respond_to? :ascii_only? },
           -> x { x.respond_to? :id2name },
-          -> x { x.respond_to? :call } ]
-        pen_a = [ Pen_.new( glyph, color ) ]
+          -> x { x.respond_to? :call }
+
+        [ Pen_.new( glyph, color ) ]
       end
+
       user_default_width ||= NILADIC_EMPTINESS_
       min_room = 4 ; margin = 1 ; penlen = pen_a.length
       @cook_rendering_proc = -> col_width_a, cols=nil, seplen=nil do
