@@ -6,7 +6,7 @@ module Skylab::FileMetrics
 
     include API::Common::InstanceMethods
 
-    Lib_::System_open2[ self ]
+    LIB_.system_open2 self
 
     -> do
 
@@ -46,7 +46,7 @@ module Skylab::FileMetrics
         res
       end
 
-      _NLP_EN_agent = Lib_::EN_agent[]
+      _NLP_EN_agent = LIB_.EN_agent
 
     end.call
 

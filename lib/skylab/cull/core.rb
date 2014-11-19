@@ -27,15 +27,18 @@ module Skylab::Cull
     Autoloader_[ self, :boxxy ]  # peek to find client
   end
 
-
   Models = Autoloader_[ ::Module.new, :boxxy ]
+
+  def self._lib
+    @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+  end
 
   module Lib_  # :+[#su-001]
 
     sidesys, stdlib = Autoloader_.at :build_require_sidesystem_proc,
       :build_require_stdlib_proc
 
-    FileUtils = stdlib[ :FileUtils ]
+    File_utils = stdlib[ :FileUtils ]
 
     HL__ = sidesys[ :Headless ]
 

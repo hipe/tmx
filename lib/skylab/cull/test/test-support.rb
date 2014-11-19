@@ -20,7 +20,8 @@ module Skylab::Cull::TestSupport
 
   Face::TestSupport::CLI::Client[ self ]
 
-  Lib_ = Cull_::Lib_
+  LIB_ = Cull_._lib
+
   extend TestSupport::Quickie
 
   module Fixtures  # #stowaway
@@ -47,7 +48,7 @@ module Skylab::Cull::TestSupport
   end
 
   define_singleton_method :sandboxed_tmpdir, Cull_::Callback_.memoize[ -> do
-    _path = Lib_::System_tmpdir_pathname[].
+    _path = LIB_.system_tmpdir_pathname.
       join 'cull-sandboxes/cull-sandbox'
     TestSupport.tmpdir.new :path, _path, :max_mkdirs, 2
       # we have to go deep to escape the 3 dir limit
@@ -71,7 +72,7 @@ module Skylab::Cull::TestSupport
 
     def from_inside_fixture_directory i, & p
       _from_inside p, TS_::Fixtures::Directories.dir_pathname.
-        join( Lib_::Name_slugulate[ i ] ), false
+        join( LIB_.name_slugulate i ), false
     end
 
     def _from_inside p, dir_pn, do_use_fixture, fixture_i=nil
@@ -87,7 +88,7 @@ module Skylab::Cull::TestSupport
       end
 
       x = nil
-      Cull_::Lib_::FileUtils[].cd "#{ use_pn }" do |_dir|
+      Cull_._lib.file_utils.cd "#{ use_pn }" do |_dir|
         x = p.call
       end
       x
@@ -98,7 +99,7 @@ module Skylab::Cull::TestSupport
     end
 
     def load_fixture_into_tmpdir fixture_i, tmpdir
-      _patch = "#{ Lib_::Name_slugulate[ fixture_i ] }.patch"
+      _patch = "#{ LIB_.name_slugulate fixture_i }.patch"
       _pn = TS_::Fixtures::Patches.dir_pathname.join _patch
       st = tmpdir.patch( _pn.read ).exitstatus
       if st.nonzero?

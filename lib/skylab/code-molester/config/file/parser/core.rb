@@ -65,7 +65,7 @@ module Skylab::CodeMolester
 
       compile_parser = nil
       load_parser_class = -> do
-        o_pn = Lib_::Cache_pathname[].join Path_part__[]
+        o_pn = LIB_.cache_pathname.join Path_part__[]
         if o_pn.exist?
           debug and y << "using cached parser - #{ o_pn }"
         else
@@ -103,12 +103,12 @@ module Skylab::CodeMolester
       mkdir_p = -> d_pn do
         # the number of dirs you have to create should not exceed the
         # number of dirs present in `path_part`
-        Lib_::Cache_pathname[].exist? or fail "sanity"
-        relpath = d_pn.relative_path_from Lib_::Cache_pathname[]
+        LIB_.cache_pathname.exist? or fail "sanity"
+        relpath = d_pn.relative_path_from LIB_.cache_pathname
         a = num_occurences[ relpath.to_s, '/' ]
         b = num_occurences[ Path_part__[], '/' ]
         ( a < b ) or fail "sanity - #{ a } dirs to create for #{ b - 1 }"
-        Lib_::FUC[].new do |msg|
+        LIB_.FUC.new do |msg|
           debug and y << msg
         end.mkdir_p d_pn.to_s
       end
@@ -121,7 +121,7 @@ module Skylab::CodeMolester
       end
 
       y = -> do
-        stderr = Lib_::CLI_errstream_IO
+        stderr = LIB_.CLI_errstream_IO
         ::Enumerator::Yielder.new { |msg| stderr.puts "cm: #{ msg }" }
       end.call
 

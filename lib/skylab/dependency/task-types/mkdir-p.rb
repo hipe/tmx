@@ -15,7 +15,7 @@ module Skylab::Dependency
       @context ||= (args[:context] || {})
       valid? or fail(invalid_reason)
 
-      _n11n = Dep_::Lib_::System[].filesystem.normalization
+      _n11n = Dep_._lib.system.filesystem.normalization
 
       did_send_event = nil
       x = _n11n.existent_directory :path, mkdir_p,

@@ -6,9 +6,9 @@ module Skylab::TreetopTools
 
   class DSL::Shell  # #the-shell-narrative
 
-    extend Lib_::Parameter[]::Definer::ModuleMethods
+    extend LIB_.parameter::Definer::ModuleMethods
 
-    include Lib_::Parameter[]::Definer::InstanceMethods::ActualParametersIvar
+    include LIB_.parameter::Definer::InstanceMethods::ActualParametersIvar
 
     class << self  # #note-15
 
@@ -23,7 +23,7 @@ module Skylab::TreetopTools
         _i_a = parameters.each.map( & :normalized_parameter_name )
         cls = ::Struct.new( * _i_a )
         cls.class_exec do
-          include Lib_::Parameter[]::Definer::InstanceMethods::StructAdapter
+          include LIB_.parameter::Definer::InstanceMethods::StructAdapter
           public :known?
         end
         const_set AP__, cls ; nil
@@ -45,10 +45,10 @@ module Skylab::TreetopTools
 
   class DSL::Client::Minimal  # #the-minimal-DSL-client-narrative
 
-    Lib_::Parameter[][ self, :parameter_controller,
+    LIB_.parameter[ self, :parameter_controller,
       :oldschool_parameter_error_structure_handler ]
 
-    include Lib_::Parameter[]::Definer::InstanceMethods::IvarsAdapter
+    include LIB_.parameter::Definer::InstanceMethods::IvarsAdapter
 
     def initialize client_x, dsl_body_p, event_p
       @dsl_body_p, @event_p = dsl_body_p, event_p
@@ -90,7 +90,7 @@ module Skylab::TreetopTools
     end
 
     def bld_callbacks
-      o = Lib_::Parameter[]::Definer.new do
+      o = LIB_.parameter::Definer.new do
         param :error, hook: true, writer: true
         param :info,  hook: true, writer: true
         alias_method :on_error, :error # hm ..
@@ -117,7 +117,7 @@ module Skylab::TreetopTools
     end
 
     def some_infostream
-      Lib_::CLI[]::IO.some_errstream_IO
+      LIB_.CLI::IO.some_errstream_IO
     end
 
     def formal_parameters

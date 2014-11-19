@@ -3,17 +3,22 @@ require 'skylab/callback/core'
 
 module Skylab::Slicer
 
-  Autoloader_ = ::Skylab::Callback::Autoloader
+  Callback_ = ::Skylab::Callback
+    Autoloader_ = Callback_::Autoloader
+
+  def self._lib
+    @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+  end
 
   module Lib_  # :+[#su-001]
 
     sidesys, = Autoloader_.at :build_require_sidesystem_proc
 
-    API_Action = -> do
+    API_action = -> do
       Face__[]::API::Action
     end
 
-    CLI_Client = -> do
+    CLI_client = -> do
       Face__[]::CLI::Client
     end
 

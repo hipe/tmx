@@ -37,7 +37,7 @@ module Skylab::CodeMolester
       instance_exec( & p )
     end
 
-    CM_::Lib_::New_event_lib[].sender self
+    CM_._lib.new_event_lib.sender self
 
   private
 
@@ -65,7 +65,7 @@ module Skylab::CodeMolester
 
     attr_reader :entity_noun_stem, :pathname
 
-    Lib_::Delegating.call self,
+    LIB_.delegating self,
 
       :to, :sexp, :if, -> { valid? },
 
@@ -201,7 +201,7 @@ module Skylab::CodeMolester
       read = Read__.new
       p and p[ read ]
       error_x = nil
-      io = CM_::Lib_::System[].filesystem.normalization.upstream_IO(
+      io = CM_._lib.system.filesystem.normalization.upstream_IO(
         :path, @pathname.to_path,
         :on_event, -> ev do
           error_x = read.receive_event ev
@@ -310,7 +310,7 @@ module Skylab::CodeMolester
     def wrt_when_valid w
       @write_verb_i = nil
       not_OK_ev = nil
-      io = CM_::Lib_::System[].filesystem.normalization.downstream_IO(
+      io = CM_._lib.system.filesystem.normalization.downstream_IO(
         :is_dry_run, w.is_dry,
         :path, @pathname.to_path,
         :on_event, -> ev do

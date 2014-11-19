@@ -26,13 +26,13 @@ module Skylab::TreetopTools
 
   class Parser::Load
 
-    include Lib_::Parameter[]::Bound::InstanceMethods  # bound_parameters
+    include LIB_.parameter::Bound::InstanceMethods  # bound_parameters
 
     attr_reader( * Shell__.parameters.each.map(& :normalized_parameter_name ) )
 
 
                                   # for after call_body_and_absorb
-    Lib_::Event_lib[].sender self
+    LIB_.event_lib.sender self
 
     def invoke
       ok = call_body_and_absorb!
@@ -109,7 +109,7 @@ module Skylab::TreetopTools
     def load_or_generate_grammar_files
       via_grammars_summarize
       if @grammar_a.length.nonzero?
-        Lib_::Treetop[]
+        LIB_.treetop
       end
       ok = PROCEDE_
       @grammar_a.each do |g|
@@ -369,7 +369,7 @@ module Skylab::TreetopTools
     end
 
     def file_utils
-      Lib_::File_utils[]
+      LIB_.file_utils
     end
 
 

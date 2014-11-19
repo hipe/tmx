@@ -2,7 +2,7 @@ module Skylab::Dependency
 
   class TaskTypes::Executable < Dep_::Task
 
-    Dep_::Lib_::Open_2[ self ]
+    Dep_._lib.open_2 self
 
     attribute :executable, :required => true
 

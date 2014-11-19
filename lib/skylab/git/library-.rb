@@ -25,7 +25,7 @@ module Skylab::Git
 
     Bsc__ = sidesys[ :Basic ]
 
-    Basic_Fields = -> * x_a do
+    Basic_fields = -> * x_a do
       if x_a.length.zero?
         MH__[]::Basic_Fields
       else

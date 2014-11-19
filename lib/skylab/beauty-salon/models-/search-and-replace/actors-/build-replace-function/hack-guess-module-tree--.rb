@@ -102,7 +102,8 @@ module Skylab::BeautySalon
 
         def when_end_line
           if @stack.length.zero?
-            self._WHEN_empty_stack_and_encountered_end
+            # no modules or classes found in file. not an error.
+            nil
           else
             @top = @stack.last
             when_end_line_normal
@@ -175,10 +176,18 @@ module Skylab::BeautySalon
 
         def finish
           if @stack.length.zero?
-            finish_normal
+            if @tops.length.zero?
+              when_no_tops
+            else
+              finish_normal
+            end
           else
             self._WHEN_unclosed_modules
           end
+        end
+
+        def when_no_tops
+          Node__.new( nil, nil )
         end
 
         def finish_normal

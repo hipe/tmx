@@ -159,4 +159,6 @@ module Skylab::CodeMolester
     end ]
 
   end
+
+  LIB_ = _lib
 end

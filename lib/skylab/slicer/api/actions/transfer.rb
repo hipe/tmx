@@ -1,6 +1,6 @@
 module Skylab::Slicer
 
-  class API::Actions::Transfer < Slicer_::Lib_::API_Action[]
+  class API::Actions::Transfer < Slicer_._lib.API_action
 
     params :dry_run
 

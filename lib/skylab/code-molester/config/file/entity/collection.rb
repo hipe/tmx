@@ -31,7 +31,7 @@ module Skylab::CodeMolester
             end
           end  # >>
 
-    Shell__ = CM_::Lib_::Simple_shell[ %i( with add list_as_json ) ]
+    Shell__ = CM_._lib.simple_shell %i( with add list_as_json )
 
     class Kernel__
 
@@ -64,9 +64,9 @@ module Skylab::CodeMolester
       end
 
       def register_for_config_services
-        Lib_::Model_enhance[ @target, -> do
+        LIB_.model_enhance @target, -> do
           services_used :configs, :config, :model
-        end ]
+        end
       end
 
       private :register_for_config_services
@@ -100,7 +100,7 @@ module Skylab::CodeMolester
     end
 
     def inflection
-      @inflection ||= CM_::Lib_::Entity_inflection[ name ]
+      @inflection ||= CM_._lib.entity_inflection name
     end
 
     def name

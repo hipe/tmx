@@ -4,11 +4,11 @@ module Skylab::CodeMolester
 
     module Config  # ~ stowaway
 
-      Event_ = Lib_::Old_event_lib[]
+      Event_ = LIB_.old_event_lib
 
       class Collection
 
-    Lib_::Model_enhance[ self, -> do
+    LIB_.model_enhance self, -> do
 
       services_used( * %i|
         has_model_instance
@@ -18,7 +18,7 @@ module Skylab::CodeMolester
         config_get_search_start_pathname
       | )
 
-    end ]
+    end
 
     # `create`
     #   + `field_h`  - (exactly):
@@ -49,7 +49,7 @@ module Skylab::CodeMolester
 
   private
 
-    Lib_::Hash_lib[].pairs_at :unpack_equal, :unpack_superset,
+    LIB_.hash_lib.pairs_at :unpack_equal, :unpack_superset,
       & method( :define_method )
 
   public

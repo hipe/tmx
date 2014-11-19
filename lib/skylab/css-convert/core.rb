@@ -8,6 +8,10 @@ module Skylab::CSS_Convert
 
     Autoloader_ = Callback_::Autoloader
 
+  def self._lib
+    @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+  end
+
   module Lib_  # (:+[#su-001]:none)
 
     sidesys = Autoloader_.build_require_sidesystem_proc
@@ -26,6 +30,8 @@ module Skylab::CSS_Convert
       HL__[].system.filesystem.path_tools
     end
   end
+
+  LIB_ = _lib
 
   Headless_ = ::Skylab::Headless
 
@@ -235,7 +241,7 @@ module Skylab::CSS_Convert
       keep_going
     end
 
-    define_method :escape_path, Lib_::Path_tools[].pretty_path
+    define_method :escape_path, LIB_.path_tools.pretty_path
 
     def formal_parameters_class
       Core::Params
@@ -257,7 +263,7 @@ module Skylab::CSS_Convert
 
   class CLI::Pen
 
-    include Lib_::CLI_lib[].pen.instance_methods_module
+    include LIB_.CLI_lib.pen.instance_methods_module
 
     def initialize escape_path_p
       @p = escape_path_p
@@ -291,7 +297,7 @@ module Skylab::CSS_Convert
   private
     def color_test _
       pen = io_adapter.pen ; width = 50
-      code_names = Lib_::CLI_lib[].pen.code_name_a
+      code_names = LIB_.CLI_lib.pen.code_name_a
       ( code_names - [ :strong ] ).each do |c|
         [[c], [:strong, c]].each do |a|
           s = "would you like some " <<

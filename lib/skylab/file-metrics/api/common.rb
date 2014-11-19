@@ -31,7 +31,7 @@ module Skylab::FileMetrics
 
     def build_find_files_command path_a
 
-      FM_::Lib_::System[].filesystem.find(
+      FM_._lib.system.filesystem.find(
         :paths, path_a,
         :ignore_dirs, @req[ :exclude_dirs ],
         :filenames, @req[ :include_names ],
@@ -54,7 +54,7 @@ module Skylab::FileMetrics
       tsa_limit = ( @tsa_limit ||= 0.33 )  # tsa = time since activity
       FM_::Library_::Open3.popen3 command_string do |_, sout, serr|
         er = nil
-        select = Lib_::Select[]
+        select = LIB_.select
         select.timeout_seconds = 5.0  # exaggerated amount for fun
 
         num_souts = 0
@@ -136,9 +136,9 @@ module Skylab::FileMetrics
       build_prattle_space = -> do
         noun_h = { blank_lines: 'blank line', comment_lines: 'comment line' }
         verb_h = { include: 'include', exclude: 'exclude' }
-        interface = Lib_::Proxy_lib[].nice :conjunction_phrase
+        interface = LIB_.proxy_lib.nice :conjunction_phrase
         -> do
-          predicate_box = Lib_::Open_box[]
+          predicate_box = LIB_.open_box
           aggregate = -> verb_sym, noun_sym do
             predicate_box.if? verb_sym, -> vp do
               vp << noun_h.fetch( noun_sym )
@@ -160,7 +160,7 @@ module Skylab::FileMetrics
              -> sym { aggregate[ :exclude, sym ] },  # `excl`
              interface.new(                          # `prattle`
               conjunction_phrase: -> do
-                cp ||= Lib_::EN_conjuction_phrase[ predicate_box.values ]
+                cp ||= LIB_.EN_conjuction_phrase predicate_box.values
               end )
           ]
         end
@@ -241,7 +241,7 @@ module Skylab::FileMetrics
       count
     end
 
-    define_method :shellescape_path, Lib_::Shellescape_path[]
+    define_method :shellescape_path, LIB_.shellescape_path
     private :shellescape_path
 
     def rndr_tbl out, count, design

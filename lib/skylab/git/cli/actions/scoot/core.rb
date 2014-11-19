@@ -1077,7 +1077,7 @@ module Skylab::Git
       end
     end
 
-    Scn_ = Git_::Lib_::Scn[]
+    Scn_ = Git_._lib.scn
 
     class Dry_Run_Sys_Cond_Mock_
       def popen3 * a
@@ -1111,7 +1111,7 @@ module Skylab::Git
     # ~ plugins setup
 
     class Client_
-      Git_::Lib_::Plugin[]::Host[ self ]
+      Git_._lib.plugin::Host[ self ]
       o = build_mutable_callback_tree_specification
       o.default_pattern :listeners
       o << :on_build_option_parser
@@ -1188,7 +1188,7 @@ module Skylab::Git
     # ~ general small support
 
     Word_Wrap_ = -> ind_s, col_d, y do
-      Git_::Lib_::Word_wrap[].curry ind_s, col_d, y
+      Git_._lib.word_wrap.curry ind_s, col_d, y
     end
 
     CEASE_ = false

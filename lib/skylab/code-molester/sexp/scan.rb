@@ -17,7 +17,7 @@ module Skylab::CodeMolester
         end
       end
 
-      CM_::Lib_::Pool_lib[].enhance( self ).with_with_instance_optionally
+      CM_._lib.pool_lib.enhance( self ).with_with_instance_optionally
 
       def initialize k
         @k = k

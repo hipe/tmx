@@ -2,7 +2,7 @@ module Skylab::Dependency
 
   class TaskTypes::VersionFrom < Dep_::Task
 
-    Dep_::Lib_::Open_2[ self ]
+    Dep_._lib.open_2 self
 
     attribute :must_be_in_range
     attribute :parse_with

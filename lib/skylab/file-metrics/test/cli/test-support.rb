@@ -8,7 +8,7 @@ module Skylab::FileMetrics::TestSupport::CLI
 
   include Constants
 
-  Lib_ = Lib_
+  FM_ = FM_
 
   extend TestSupport::Quickie
 
@@ -82,7 +82,7 @@ module Skylab::FileMetrics::TestSupport::CLI
   module TestLib_
 
     CLI_lib = -> do
-      Lib_::HL__[]::CLI
+      FM_::Lib_::HL__[]::CLI
     end
   end
 end

@@ -20,16 +20,16 @@ module Skylab::CodeMolester
 
         define_method :entity_story do _STORY end
 
-        Lib_::Field_reflection_enhance[ self ].with _STORY.host_module
+        LIB_.field_reflection_enhance( self ).with _STORY.host_module
 
-        Lib_::Pool_lib[].enhance( self ).with_with_instance_optionally
+        LIB_.pool_lib.enhance( self ).with_with_instance_optionally
 
         self
       end
     end
 
     def initialize
-      @string_box = Lib_::Old_box_lib[].open_box.new
+      @string_box = LIB_.old_box_lib.open_box.new
       @fld_box = field_box  # meh
       @miss_a = [ ] ; @xtra_a = [ ] ; @nbp_a = [ ] ; @issue_x_a = [ ]
       @had_issues = nil
@@ -54,7 +54,7 @@ module Skylab::CodeMolester
       @entity_name_x
     end
 
-    Invalid = Lib_::Old_event_lib[].new do |miss_a, xtra_a, issue_x_a|
+    Invalid = LIB_.old_event_lib.new do |miss_a, xtra_a, issue_x_a|
       a = [ ]
       join = -> ar { ar.map { |x| "\"#{ x }\"" } * ', ' }
       if miss_a

@@ -1,6 +1,6 @@
 module Skylab::Dependency
 
-  class Task < Dep_::Lib_::Slake[]::Task
+  class Task < Dep_._lib.slake::Task
 
     attribute_metadata_class do
       def [] k ; fetch( k ) { } end # soften it
@@ -18,9 +18,9 @@ module Skylab::Dependency
 
     event_class Callback_::Event::Textual  # can be made more complicated..
 
-    include Dep_::Lib_::Path_tools[].instance_methods_module
+    include Dep_._lib.path_tools.instance_methods_module
 
-    include Dep_::Lib_::CLI_lib[].pen.instance_methods_module  # `stylize`
+    include Dep_._lib.CLI_lib.pen.instance_methods_module  # `stylize`
 
     def hi str ; stylize str, :strong, :green end
 

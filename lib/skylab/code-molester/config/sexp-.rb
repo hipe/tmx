@@ -4,7 +4,7 @@ module Skylab::CodeMolester
 
     class Sexp_ < CM_::Sexp
 
-      Lib_::Delegating[ self, :employ_the_DSL_method_called_delegates_to ]
+      LIB_.delegating self, :employ_the_DSL_method_called_delegates_to
 
       CM_::Sexp::Registrar[ self ]
 
@@ -35,7 +35,7 @@ module Skylab::CodeMolester
       end
 
       private def say_not_string x
-        _ = CM_::Lib_::Strange[ x ]
+        _ = CM_._lib.strange x
         "no implicit conversion of #{ _ } into String"
       end
     end

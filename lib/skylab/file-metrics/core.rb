@@ -30,6 +30,10 @@ module Skylab::FileMetrics
     Autoloader_[ self ]
   end
 
+  def self._lib
+    @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+  end
+
   module Lib_
 
     memo, sidesys = Autoloader_.at :memoize, :build_require_sidesystem_proc
@@ -118,11 +122,14 @@ module Skylab::FileMetrics
     end
   end
 
-  Face_ = Lib_::Face_top[]
-
   FM_ = self
+
+  LIB_ = FM_._lib
+
+  Face_ = LIB_.face_top
 
   MONADIC_TRUTH_ = -> _ { true }
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
+
 end

@@ -6,6 +6,10 @@ module Skylab::Permute
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
 
+  def self._lib
+    @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+  end
+
   module Lib_  # (:+[#su-001])
 
     memo, sidesys, req = Autoloader_.at :memoize,

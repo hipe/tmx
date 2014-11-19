@@ -55,11 +55,11 @@ module Skylab::Git
     end
 
     def program_name
-      @program_name || Git_::Lib_::CLI_program_basename[]
+      @program_name || Git_._lib.CLI_program_basename
     end
 
     def hi msg
-      @hi ||= Git_::Lib_::CLI_lib[].pen.stylify.curry[ [ :green ] ]
+      @hi ||= Git_._lib.CLI_lib.pen.stylify.curry[ [ :green ] ]
       @hi[ msg ]
     end
 
@@ -74,7 +74,7 @@ module Skylab::Git
     end
 
     def head argv
-      load Git_::Lib_::Bin_pathname[].join 'tmx-git-head'
+      load Git_._lib.bin_pathname.join 'tmx-git-head'
       _progname = "#{ program_name } head"
       Git_::CLI::Actions::Head[ get_y, _progname, argv ]
     end

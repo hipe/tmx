@@ -60,7 +60,7 @@ module Skylab::FileMetrics
           not_yet_set = volume_a.detect { |k| ! req[ k ] }
           if not_yet_set then req[ not_yet_set ] = true else
             @did_emit_verbose_max_volume_notice ||= begin
-              s = Lib_::EN_number[ volume_a.length ]
+              s = LIB_.EN_number volume_a.length
               @err.puts "(#{ s } is the max number of -v.)"
               true
             end
@@ -171,14 +171,14 @@ module Skylab::FileMetrics
       def op_common_tail
         # massive but semi-elegant hack, #goof-on wheel greasing.
         s = command.op.banner
-        y = Lib_::Reverse_string_scanner[ s ]
+        y = LIB_.reverse_string_scanner s
         y << ''
         command.usage y
         y << "\n#{ hi 'options:' }\n" ; nil
       end
     # lost indent
 
-    Lipstick = Lib_::CLI_lipstick[ '+', :green, -> { 160 } ]
+    Lipstick = LIB_.CLI_lipstick( '+', :green, -> { 160 } )
 
     class Lipstick::Class_
 

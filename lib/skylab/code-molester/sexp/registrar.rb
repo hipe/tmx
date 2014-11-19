@@ -10,7 +10,7 @@ module Skylab::CodeMolester
         mod.module_exec :register, & Enhance__ ; nil
       end
 
-      Enhance__ = CM_::Lib_::Module_lib[].mutex( -> method_name_i do
+      Enhance__ = CM_._lib.module_lib.mutex( -> method_name_i do
 
         _ME = self
         _REGISTRY_H = {}

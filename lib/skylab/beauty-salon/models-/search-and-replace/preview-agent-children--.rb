@@ -250,6 +250,7 @@ module Skylab::BeautySalon
             @serr.puts line
             line = @scan.gets
           end
+          @serr.puts
           y = @y
           expression_agent.calculate do
             y << "(#{ count } file#{ s count } total)"
@@ -303,6 +304,7 @@ module Skylab::BeautySalon
             @serr.puts "#{ item.path }:#{ item.count }"
             item = @scan.gets
           end
+          @serr.puts
           y = @y
           expression_agent.calculate do
             y << "(#{ match_count } match#{ s match_count, :es } #{
@@ -373,12 +375,26 @@ module Skylab::BeautySalon
         end
 
         def execute_via_file_scan_when_interactive
-          while file = @file_scan.gets
+
+          @serr.puts  # :+#aesthetics :/
+
+          file = @file_scan.gets
+          if file
+            did_see = true
+          end
+
+          while file
             scn = file.to_read_only_match_scan
             while match = scn.gets
               @serr.puts match.render_line
             end
+            file = @file_scan.gets
           end
+
+          if ! did_see
+            @y << "no files match against the pattern."
+          end
+
           change_focus_to @parent
           ACHIEVED_
         end
@@ -550,6 +566,14 @@ module Skylab::BeautySalon
           end
         end
 
+        def when_no_file
+          @serr.puts
+          @y << "no matching files."
+          change_focus_to nil
+          @parent.change_focus_to @parent
+          ACHIEVED_
+        end
+
         def execute_via_file_scan_when_non_interactive
 
           func = replace_function
@@ -594,6 +618,7 @@ module Skylab::BeautySalon
         end
 
         def when_no_files
+          @serr.puts
           @y << "no files."
           change_focus_to @parent
           ACHIEVED_

@@ -16,6 +16,10 @@ module Skylab::Callback
       Iambic_Scanner_
     end
 
+    def produce_library_shell_via_library_and_app_modules lib_mod, app_mod
+      Callback_::Librication__[ lib_mod, app_mod ]
+    end
+
     def scan( & p )
       if block_given?
         Callback_::Scan.new( & p )

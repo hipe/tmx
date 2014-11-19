@@ -15,4 +15,9 @@ module Skylab::Dependency
   module TaskTypes
     Autoloader_[ self ]
   end
+
+  def self._lib
+    @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+      self::Lib_, self )
+  end
 end

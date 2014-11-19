@@ -41,7 +41,7 @@ module Skylab::BeautySalon
           end
 
           def marshal_dump
-            "{{ $#{ @capture_identifier }#{ @method_call_chain.map do |s|
+            "{{ $#{ @d }#{ @method_call_chain.map do |s|
               ".#{ s }"
             end.join EMPTY_S_ } }}"
           end
@@ -180,10 +180,12 @@ module Skylab::BeautySalon
               @func = Autoloader_.const_reduce [ @custom_i ], node.value do end
               @func and break
             end
+            if ! @func  # search at toplevel
+              @func = Autoloader_.const_reduce [ @custom_i ], ::Object do end
+            end
             if @func
               when_func
             else
-              # #todo - we need to code for if the function is in the toplevel
               self._WHEN_func_not_found
             end
           end

@@ -2,7 +2,7 @@ module Skylab::CodeMolester
 
   class Expression_Agent__
 
-    Lib_::NLP_EN_methods[ self ]  # or_
+    LIB_.NLP_EN_methods self  # or_
 
     def initialize x_a
       @escape_path_p = nil

@@ -11,8 +11,12 @@ module Skylab::Git
         Git_::Actors__::Check_SCM[ * a ]
       end
     end
-  end
 
+    def _lib
+      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+        self::Lib_, self )
+    end
+  end
 
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader

@@ -10,6 +10,10 @@ module Skylab::TreetopTools
 
   RuntimeError = ::Class.new ::RuntimeError
 
+  def self._lib
+    @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+  end
+
   module Lib_
 
     memoize = -> p { p_ = -> { x = p[] ; p_ = -> { x } ; x } ; -> { p_[] } }
@@ -58,7 +62,7 @@ module Skylab::TreetopTools
 
     String_scanner = memoize[ -> { require 'strscan' ; ::StringScanner } ]
 
-    SubClient = -> do
+    Sub_client = -> do
       HL__[]::SubClient
     end
 
@@ -72,11 +76,13 @@ module Skylab::TreetopTools
     end ]
   end
 
+  LIB_ = _lib
+
   module Parser  # #stowaway
     Autoloader_[ self ]
   end
 
-  class Parameter < Lib_::Parameter[]
+  class Parameter < LIB_.parameter
     param :dir, boolean: true
     param :exist, enum: [:must], accessor: true
 

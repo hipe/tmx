@@ -7,7 +7,12 @@ module Skylab::CodeMolester
 
   class << self
     def cache_pathname
-      CM_::Lib_::Cache_pathname_base[]
+      CM_._lib.cache_pathname_base
+    end
+
+    def _lib
+      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+        self::Lib_, self )
     end
   end
 

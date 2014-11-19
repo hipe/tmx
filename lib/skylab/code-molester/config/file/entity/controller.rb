@@ -20,7 +20,7 @@ module Skylab::CodeMolester
 
     end
 
-    Shell__ = Lib_::Simple_shell[ %i( with add ) ]
+    Shell__ = LIB_.simple_shell %i( with add )
 
     class Kernel__
 
@@ -43,11 +43,11 @@ module Skylab::CodeMolester
     private
 
       def fields
-        Lib_::Field_reflection_enhance[ @target ].with @field_mod
+        LIB_.field_reflection_enhance( @target ).with @field_mod
       end
 
       def module_accessors
-        Lib_::Module_accessors[].enhance @target do
+        LIB_.module_accessors.enhance @target do
           private_methods do
             module_reader :collection_module, '../Collection'
           end
@@ -56,9 +56,9 @@ module Skylab::CodeMolester
       end
 
       def register_for_config_services
-        Lib_::Model_enhance[ @target, -> do
+        LIB_.model_enhance @target, -> do
           services_used :configs, :config
-        end ]
+        end
       end
 
       def add
@@ -157,7 +157,7 @@ module Skylab::CodeMolester
       end
     end
 
-    Lib_::Hash_lib[].pairs_at :repack_difference, & method( :define_method )
+    LIB_.hash_lib.pairs_at :repack_difference, & method( :define_method )
 
     join = -> a do
       a.map { |x| "\"#{ x }\"" } * ', '
@@ -187,7 +187,7 @@ module Skylab::CodeMolester
 
     def normalize_fields
       did = nil
-      @string_box ||= ( did = true ) && Lib_::Old_box_lib[].open_box.new
+      @string_box ||= ( did = true ) && LIB_.old_box_lib.open_box.new
       did or fail "sanity"
       @nerk_a = nil
       a = Event_::Aggregation.new
@@ -306,7 +306,7 @@ module Skylab::CodeMolester
         ick: -> { "\"#{ x }\"" }
       }
 
-      tmpl_str.gsub Lib_::String_lib[].mustache_regexp do
+      tmpl_str.gsub LIB_.string_lib.mustache_regexp do
         h.fetch( $~[1].intern ).call
       end
     end

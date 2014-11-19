@@ -75,23 +75,23 @@ module Skylab::CodeMolester
         a = ( n[ ( n.rindex str ) + len .. -1 ] ).split CONST_SEP_
         a.length.nonzero? or fail "sanity - hack failed (#{ n })"
         _name_a = a.map do |s|
-          Lib_::Old_name_lib[].via_const s.intern
+          LIB_.old_name_lib.via_const s.intern
         end
-        Lib_::Old_name_lib[].qualified.new _name_a
+        LIB_.old_name_lib.qualified.new _name_a
       end
     end.call
   end
 
   CONST_SEP_ = '::'.freeze
 
-  Event_ = Lib_::Old_event_lib[]  # or a subclass
+  Event_ = LIB_.old_event_lib  # or a subclass
 
 
   #         ~ define the enhancement "contained DSL" ~
 
 
 
-  Shell_ = Lib_::Simple_shell[ %i( fields ) ]
+  Shell_ = LIB_.simple_shell %i( fields )
 
   class Kernel_
 
@@ -114,13 +114,13 @@ module Skylab::CodeMolester
 
         mutex_h[ target ].call
 
-        Lib_::Field_box_enhance[ target, -> do
+        LIB_.field_box_enhance target, -> do
 
           meta_fields( * METAFIELDS_BASE_ )
 
           fields( * field_a ) if field_a
 
-        end ]
+        end
         nil
       end
     end

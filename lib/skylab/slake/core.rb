@@ -8,6 +8,10 @@ module Skylab::Slake
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
+  def self._lib
+    @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+  end
+
   module Lib_  # :+[#su-001]
 
     sidesys = Autoloader_.build_require_sidesystem_proc
@@ -18,7 +22,7 @@ module Skylab::Slake
 
     MH__ = sidesys[ :MetaHell ]
 
-    StringIO = -> do
+    String_IO = -> do
       require 'stringio' ; ::StringIO
     end
   end

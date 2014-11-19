@@ -141,6 +141,8 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
       join( 'tmx-beauty-salon search-and-r' ).to_path
   end
 
+  NEWLINE_ = BS_::NEWLINE_
+
   Subject_ = -> do
     BS_::Models_::Search_and_Replace
   end

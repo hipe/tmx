@@ -123,7 +123,7 @@ module Skylab::Flex2Treetop::MyTestSupport
       end
 
       def expct_styled line
-        F2TT_::Lib_::CLI_lib[].pen.unstyle_styled( line ) or
+        F2TT_._lib.CLI_lib.pen.unstyle_styled( line ) or
           fail "expected styled, was not: #{ line }"
       end
 
@@ -209,7 +209,7 @@ module Skylab::Flex2Treetop::MyTestSupport
         @result.should eql true
       end
 
-      define_method :_EM, F2TT_::Lib_::CLI_lib[].pen.stylify.curry[ %i( yellow ) ]
+      define_method :_EM, F2TT_._lib.CLI_lib.pen.stylify.curry[ %i( yellow ) ]
     end
   end
   XX = '@ rb_file_s_stat '.freeze  # 2.1.0 added this

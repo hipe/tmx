@@ -8,11 +8,11 @@ module Skylab::CodeMolester
 
     # immutable
 
-    Lib_::Model_enhance[ self, -> do
+    LIB_.model_enhance self, -> do
 
       do_memoize  # once you create a config instance, it is *the* config.
 
-    end ]
+    end
 
     class << self
 
@@ -80,7 +80,7 @@ module Skylab::CodeMolester
 
   private
 
-    Lib_::Hash_lib[].pairs_at(
+    LIB_.hash_lib.pairs_at(
       :unpack_equal, :unpack_superset,
       & method( :define_method ) )
 

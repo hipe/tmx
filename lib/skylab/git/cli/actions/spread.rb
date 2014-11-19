@@ -30,7 +30,7 @@ module Skylab::Git
     end
 
     def program_name
-      @program_name || Git_::Lib_::CLI_program_basename[]
+      @program_name || Git_._lib.CLI_program_basename
     end
 
     def build_option_parser
@@ -74,7 +74,7 @@ module Skylab::Git
     NUM_NUM_ = "( <num> <num> | #{ EL_ } )"
 
     Hi_ = -> msg do
-      @hi ||= Git_::Lib_::CLI_lib[].pen.stylify.curry[ [ :green ] ]
+      @hi ||= Git_._lib.CLI_lib.pen.stylify.curry[ [ :green ] ]
       @hi[ msg ]
     end
 
@@ -119,7 +119,7 @@ module Skylab::Git
         resolve_move_request_from_integers d_a
       end
     end
-    Match_ = Git_::Lib_::Fuzzy_matcher[ 1, EL_ ]  # fuzzy match 'e'
+    Match_ = Git_._lib.fuzzy_matcher 1, EL_  # fuzzy match 'e'
 
     def get_parsed_contiguous_integers argv
       a = [ ]
@@ -143,7 +143,7 @@ module Skylab::Git
       end.call
     end
 
-    Move_Request_ = Git_::Lib_::Struct[ :from_d, :to_d ]
+    Move_Request_ = Git_._lib.struct :from_d, :to_d
     class Move_Request_
 
       def factor
@@ -173,7 +173,7 @@ module Skylab::Git
 
     def get_branches_stream_line_scanner
       r = get_branches_stream
-      r && Git_::Lib_::Scanner[ r ]
+      r and Git_._lib.scanner r
     end
 
     def get_branches_stream
@@ -238,7 +238,7 @@ module Skylab::Git
 
     module API_Model
 
-      Branches = Git_::Lib_::Struct[ :branch_a ]
+      Branches = Git_._lib.struct :branch_a
       class Branches
 
         class << self
@@ -342,7 +342,7 @@ module Skylab::Git
         end
       end
 
-      Branch_ = Git_::Lib_::Struct[ :num_s, :body, :num_d ]
+      Branch_ = Git_._lib.struct :num_s, :body, :num_d
       class Branch_
         def initialize num_s, body
           @num_s = num_s ; @body = body
@@ -389,9 +389,9 @@ module Skylab::Git
 
         Entity_ = -> client, _fields_, * field_i_a do
           :fields == _fields_ or raise ::ArgumentError
-          Git_::Lib_::Basic_Fields[ :client, client,
+          Git_._lib.basic_fields :client, client,
             :absorber, :initialize,
-            :field_i_a, field_i_a ]
+            :field_i_a, field_i_a
         end
 
         class Branch_Mungulator_
@@ -417,11 +417,11 @@ module Skylab::Git
           end
         end
 
-        Work_Unit_ = Git_::Lib_::Struct[ :from_d, :to_d ]
+        Work_Unit_ = Git_._lib.struct :from_d, :to_d
 
         class Actions::Evenulate < Branch_Mungulator_
 
-          Git_::Lib_::Funcy_globless[ self ]
+          Git_._lib.funcy_globless self
 
           Entity_[ self, :fields, :branches, :outstream, :snitch ]
 
@@ -449,7 +449,7 @@ module Skylab::Git
 
         class Actions::Spread < Branch_Mungulator_
 
-          Git_::Lib_::Funcy_globless[ self ]
+          Git_._lib.funcy_globless self
 
           Entity_[ self, :fields, :branches, :move_request_a,
             :outstream, :snitch ]
@@ -469,7 +469,7 @@ module Skylab::Git
             @branch_number_to_idx_h = @branches._number_to_idx_h
             @work_a = @branches._sorted_number_a.
               map( & Work_Unit_.method( :new ) ).freeze
-            scn = Git_::Lib_::Scanner[ @move_request_a ]
+            scn = Git_._lib.scanner @move_request_a
             r = true
             while (( move_request = scn.gets ))
               r = process_single_move_request( move_request ) or break
@@ -497,7 +497,7 @@ module Skylab::Git
               d1 = ( pair.from_d * move.factor ).to_i
               if d1_h[ d1 ]
                 # when a collision is detected, the number has occurred 2 times.
-                ( col ||= Git_::Lib_::Box[].new ).
+                ( col ||= Git_._lib.box.new ).
                   add_or_modify d1, -> { 2 }, -> i { i + 1 }
               else
                 d1_h[ d1 ] = true

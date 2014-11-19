@@ -6,11 +6,11 @@ module Skylab::TreetopTools
 
     def execute
 
-      file = Lib_::List_scanner[ ::File.open @path, 'r' ]
+      file = LIB_.list_scanner ::File.open @path, 'r'
 
       scn = nil ; set_scanner_to_line = -> line do
         if scn then scn.string = line else
-          scn = Lib_::String_scanner[].new line
+          scn = LIB_.string_scanner.new line
         end
         nil
       end
@@ -75,7 +75,7 @@ module Skylab::TreetopTools
 
     CTX_LEN_ = 40  # heuristic
 
-    Strange_ = Lib_::Strange_proc[].curry[ CTX_LEN_ ]
+    Strange_ = LIB_.strange_proc.curry[ CTX_LEN_ ]
 
     T_MODULE_ = 'module'.freeze
 

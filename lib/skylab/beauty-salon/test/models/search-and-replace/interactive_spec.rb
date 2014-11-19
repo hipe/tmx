@@ -37,7 +37,7 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
         o.expect_line_eventually %r(\A[ ]+grep[ ]+ON\b)
         o.expect_line_eventually %r(\A[ ]+matches[ ])
 
-        o.gets.should eql "\n"
+        o.gets.should eql NEWLINE_
 
         o.puts 'counts'
 
@@ -48,6 +48,10 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
         line.chop!
 
         totals = o.gets
+        if NEWLINE_ == totals
+          totals = o.gets
+        end
+
         totals.chop!
 
         # hinkenlooper
