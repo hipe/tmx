@@ -64,7 +64,7 @@ module Skylab::GitViz
         end ; nil
       end
 
-      GitViz::Lib_::Formal_attribute_definer[ self ]
+      GitViz._lib.formal_attribute_definer self
 
       def self.write_attribute_writer atr  # #storypoint-40
         super

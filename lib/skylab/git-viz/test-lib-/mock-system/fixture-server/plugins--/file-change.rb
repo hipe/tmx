@@ -23,7 +23,7 @@ module Skylab::GitViz
 
       def on_front_responder_initted responder
         if @be_on
-          GitViz::Lib_::Listen[]  # kick it early just to fail fast
+          GitViz._lib.listen  # kick it early just to fail fast
           @responder = responder
           listen_for_manifests_being_added_to_the_manifest_collection
         else
@@ -148,7 +148,7 @@ module Skylab::GitViz
         attr_reader :preterite, :MD5
       private
         def init_MD5 pn
-          @MD5 = GitViz::Lib_::MD5[].hexdigest pn.read
+          @MD5 = GitViz._lib.MD5.hexdigest pn.read
         end
       end
     end

@@ -87,7 +87,7 @@ module Skylab::Snag
 
       extend NF_[].name_function_proprietor_methods
 
-      Entity_ = Snag_::Lib_::Entity[][ -> do
+      Entity_ = Snag_._lib.entity[ -> do
 
         o :meta_property, :is_required
 

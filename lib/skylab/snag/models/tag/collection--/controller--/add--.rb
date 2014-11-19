@@ -71,12 +71,12 @@ module Skylab::Snag
 
           Added__ = Event_[].new :tag_s, :verb_i do
             message_proc do |y, o|
-              y << "#{ Snag_::Lib_::NLP[]::EN::POS::Verb[
+              y << "#{ Snag_._lib.NLP::EN::POS::Verb[
                 o.verb_i.to_s ].preterite } #{ val o.tag_s }" ; nil
             end
           end
 
-          Snag_::Lib_::Entity[][ self, -> do
+          Snag_._lib.entity[ self, -> do
 
             def delegate
               merge_delegate iambic_property

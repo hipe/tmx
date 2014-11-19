@@ -78,7 +78,7 @@ module Skylab::Snag::TestSupport::Models::TD__
 
     def bld_FU_spy
       @FU_msg_s_a = []
-      Snag_::Lib_::FUC[].new do |msg|
+      Snag_._lib.FUC.new do |msg|
         if do_debug
           debug_IO.puts "got FU msg: #{ msg }"
         end

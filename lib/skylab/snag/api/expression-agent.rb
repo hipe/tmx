@@ -7,14 +7,14 @@ module Skylab::Snag
       alias_method :calculate, :instance_exec
 
       def ick x
-        Snag_::Lib_::Strange[ x ]
+        Snag_._lib.strange x
       end
 
       def pth x
         ::Pathname.new( "#{ x }" ).basename.to_path
       end
 
-      Snag_::Lib_::NLP_EN_methods[ self, :private, [ :s ] ]
+      Snag_._lib.NLP_EN_methods self, :private, [ :s ]
 
       self
     end.new

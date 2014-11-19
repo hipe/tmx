@@ -34,10 +34,10 @@ module Skylab::GitViz::TestSupport::API
       Common_shape_listener__[].new emitter
     end
 
-    Common_shape_listener__ = GitViz_::Lib_::Memoize[ -> do
+    Common_shape_listener__ = GitViz_::Callback_.memoize do
       GitViz_::Callback_::Selective_listener.
         make_via_didactic_matrix [ :info ], [ :line ]
-    end ]
+    end
 
     def expect_result_for_failure  # #hook-out
       @result.should eql false

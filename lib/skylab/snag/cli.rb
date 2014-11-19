@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class CLI  # read [#052]
 
-    Snag_::Lib_::CLI_lib[]::Client[ self,
+    Snag_._lib.CLI_lib::Client[ self,
       :client_instance_methods, :three_streams_notify ]
 
     def initialize up, pay, info  # #storypoint-5 "strictify" the signature
@@ -11,7 +11,7 @@ module Skylab::Snag
     end
 
     def invoke argv
-      Snag_::Lib_::Path_tools[].clear  # see
+      Snag_._lib.path_tools.clear  # see
       x = super argv
       if UNABLE_ ==  x
         send_error_string "(a low-level error occured.)"
@@ -200,7 +200,7 @@ module Skylab::Snag
     end
 
     def unparenthesize_message_string s
-      Snag_::Lib_::String_lib[].unparenthesize_message_string s
+      Snag_._lib.string_lib.unparenthesize_message_string s
     end
 
     def render_event ev
@@ -254,7 +254,7 @@ module Skylab::Snag
 
     # ~ now entering DSL zone
 
-    Snag_::Lib_::CLI_legacy_DSL[ self ]
+    Snag_._lib.CLI_legacy_DSL self
 
     namespace :node, -> { CLI::Actions::Node }
 
@@ -308,7 +308,7 @@ module Skylab::Snag
 
     def open message=nil, param_h
       # for fun we do a tricky dynamic syntax
-      pbox = Snag_::Lib_::Old_box_lib[].open_box.via_hash param_h ; param_h = nil
+      pbox = Snag_._lib.old_box_lib.open_box.via_hash param_h ; param_h = nil
       msg_p = -> is_opening do                   # i hope you enjoyed this
         a_b = [ 'opening issues', 'listing open issues' ]
         is_opening and a_b.reverse!

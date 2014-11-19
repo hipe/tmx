@@ -126,8 +126,8 @@ module Skylab::Snag
 
       SPACE_RX_ = /^[[:space:]]/
 
-      DEV_NULL_ = Snag_::Lib_::Dev_null[]
-      WRITE_MODE_ = Snag_::Lib_::Writemode[]
+      DEV_NULL_ = Snag_._lib.dev_null
+      WRITE_MODE_ = Snag_._lib.writemode
 
     end
   end

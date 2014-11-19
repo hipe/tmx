@@ -77,7 +77,7 @@ module Skylab::Snag
             end
           end
 
-          Snag_::Lib_::Entity[][ self, -> do
+          Snag_._lib.entity[ self, -> do
             def delegate
               merge_delegate iambic_property
             end

@@ -16,6 +16,11 @@ module Skylab::Snag
     Autoloader_[ self, :boxxy ]
   end
 
+  def self._lib
+    @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+      self::Lib_, self )
+  end
+
   ACHIEVED_= true
 
   Bsc__ = Autoloader_.build_require_sidesystem_proc :Basic

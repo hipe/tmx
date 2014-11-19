@@ -37,7 +37,7 @@ module Skylab::GitViz
       HL__[]::CLI
     end
 
-    DateTime = memo[ -> do require 'date' ; ::DateTime end ]
+    Date_time = memo[ -> do require 'date' ; ::DateTime end ]
 
     Formal_attribute_definer = -> mod do
       MH__[]::Formal::Attribute::Definer[ mod ] ; nil
@@ -59,8 +59,6 @@ module Skylab::GitViz
       Old_name_lib[].local_normal_name_from_module x
     end
 
-    Memoize = Callback_.memoize
-
     MH__ = wall[ :MetaHell ]
 
     MD5 = memo[ -> do require 'digest/md5' ; ::Digest::MD5 end ]
@@ -71,7 +69,7 @@ module Skylab::GitViz
 
     Open3 = stdlib[ :Open3 ]
 
-    OptionParser = memo[ -> do require 'optparse' ; ::OptionParser end ]
+    Option_parser = memo[ -> do require 'optparse' ; ::OptionParser end ]
 
     oxford = Callback_::Oxford
 
@@ -99,7 +97,7 @@ module Skylab::GitViz
       MH__[].strange 120, x
     end
 
-    StringScanner = memo[ -> do require 'strscan' ; ::StringScanner end ]
+    String_scanner = memo[ -> do require 'strscan' ; ::StringScanner end ]
 
     SubTree__ = sidesys[ :SubTree ]
 

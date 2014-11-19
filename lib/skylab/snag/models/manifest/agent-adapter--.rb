@@ -30,7 +30,7 @@ module Skylab::Snag
         @produce_tmpdir[ x_a ]
       end
 
-      Snag_::Lib_::Entity[][ self, -> do
+      Snag_._lib.entity[ self, -> do
         o :properties,
             :all_nodes,
             :file_utils,

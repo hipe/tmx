@@ -15,7 +15,7 @@ module Skylab::GitViz
     end
   public
 
-    GitViz::Lib_::CLI_legacy_DSL[ self ]
+    GitViz._lib.CLI_legacy_DSL self
 
     desc 'ping'  # #storypoint-20
 
@@ -58,7 +58,7 @@ module Skylab::GitViz
       _bound.invoke_with_iambic @param_x_a
     end
 
-    GitViz::Lib_::CLI_lib[]::Client[ self,
+    GitViz._lib.CLI_lib::Client[ self,
       :client_services,
         :named, :svcs_for_CLI_action ]
 

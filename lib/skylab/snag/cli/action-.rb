@@ -6,9 +6,9 @@ module Skylab::Snag
 
       ACTIONS_ANCHOR_MODULE = -> { CLI::Actions }
 
-      Snag_::Lib_::CLI_lib[].action self, :DSL
+      Snag_._lib.CLI_lib.action self, :DSL
 
-      extend Snag_::Lib_::NLP[]::EN::API_Action_Inflection_Hack
+      extend Snag_._lib.NLP::EN::API_Action_Inflection_Hack
 
       inflection.inflect.noun :singular
 
@@ -206,7 +206,7 @@ module Skylab::Snag
 
       class Box < self
 
-        Snag_::Lib_::CLI_lib[]::Box[ self, :DSL,
+        Snag_._lib.CLI_lib::Box[ self, :DSL,
           :leaf_action_base_class, -> { Leaf_Action__ } ]
 
         def self.inflection

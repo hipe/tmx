@@ -149,4 +149,6 @@ module Skylab::Snag
     end
 
   end
+
+  LIB_ = _lib
 end

@@ -96,27 +96,27 @@ module Skylab::Snag
     ID_NUM_DIGITS__ = 3
 
     def produce_tmpdir_via_iambic_for_agent x_a
-      @tmpdir_pathname ||= Snag_::Lib_::Tmpdir_pathname[].join TMP_DIRNAME_
+      @tmpdir_pathname ||= Snag_._lib.tmpdir_pathname.join TMP_DIRNAME_
       self.class::Tmpdir_produce__[ :tmpdir_pathname, @tmpdir_pathname, * x_a ]
     end
 
     Entity_ = -> client, _fields_, * field_i_a do
       :fields == _fields_ or raise ::ArgumentError
-      Snag_::Lib_::Basic_Fields[ :client, client,
+      Snag_._lib.basic_Fields :client, client,
         :absorber, :initialize,
-        :field_i_a, field_i_a ]
+        :field_i_a, field_i_a
     end
 
     class FU_curry__
 
-      Snag_::Lib_::Entity[][ self, :properties, :be_verbose, :delegate ]
+      Snag_._lib.entity[ self, :properties, :be_verbose, :delegate ]
 
       def initialize x_a
         process_iambic_fully x_a
       end
 
       def execute
-        Snag_::Lib_::FUC[].new -> s do
+        Snag_._lib.FUC.new -> s do
           if @be_verbose
             @delegate.receive_info_event Hacky_Path_Event__.new s
           end
@@ -127,7 +127,7 @@ module Skylab::Snag
     Hacky_Path_Event__ = Snag_::Model_::Event.new :line do
       message_proc do |y, o|  # escape things that look like abs paths
         y << ( o.line.gsub(
-          Snag_::Lib_::Path_tools[].absolute_path_hack_rx
+          Snag_._lib.path_tools.absolute_path_hack_rx
         ) do
           pth ::Pathname.new $~[ 0 ]
         end )
@@ -136,7 +136,7 @@ module Skylab::Snag
 
     class Agent_
 
-      Snag_::Lib_::Funcy_globless[ self ]
+      Snag_._lib.funcy_globless self
 
     private
 
@@ -184,9 +184,9 @@ module Skylab::Snag
 
         def bld_walk
 
-          _evr = Snag_::Lib_::Event[].receiver.channeled.full :walk, @delegate
+          _evr = Snag_._lib.event.receiver.channeled.full :walk, @delegate
 
-          Snag_::Lib_::Filesystem_walk[].build_with(
+          Snag_._lib.filesystem_walk.build_with(
             :filename, @config.manifest_file,
             :max_num_dirs_to_look,
               @config.max_num_dirs_to_search_for_manifest_file,

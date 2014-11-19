@@ -2,7 +2,7 @@ module Skylab::GitViz
 
   class Models_::File_Node
 
-    GitViz::Lib_::Tree[].enhance_with_module_methods_and_instance_methods self
+    GitViz._lib.tree.enhance_with_module_methods_and_instance_methods self
 
     def self.[] * x_a
       Build_Tree_Node__.build_tree_node x_a do |bld|
@@ -26,9 +26,9 @@ module Skylab::GitViz
 
     class Build_Tree_Node__
 
-     GitViz::Lib_::Basic_Set[ self,
+     GitViz._lib.basic_Set self,
         :with_members, %i( pathname VCS_front ).freeze,
-        :initialize_basic_set_with_iambic ]
+        :initialize_basic_set_with_iambic
 
       def self.build_tree_node x_a, & p
         new( x_a, p ).build_tree_node

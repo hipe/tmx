@@ -98,7 +98,7 @@ module Skylab::Snag
 
     class Event < ::Struct
 
-      Snag_::Lib_::Model_event[ self ]
+      Snag_._lib.model_event self
 
       EVENTS_ANCHOR_MODULE = Snag_::Models
 
@@ -133,7 +133,7 @@ module Skylab::Snag
           y << o.message_s
         end
         def verb_lexeme
-          @verb_lexeme ||= Snag_::Lib_::NLP[]::EN::POS::Verb[ inflected_verb ]
+          @verb_lexeme ||= Snag_._lib.NLP::EN::POS::Verb[ inflected_verb ]
         end
         attr_writer :verb_lexeme
       end
@@ -176,7 +176,7 @@ module Skylab::Snag
         attr_reader :ev
         attr_accessor :inflected_verb, :inflected_noun
         def verb_lexeme
-          @verb_lexeme ||= Snag_::Lib_::NLP[]::EN::POS::Verb[ @inflected_verb ]
+          @verb_lexeme ||= Snag_._lib.NLP::EN::POS::Verb[ @inflected_verb ]
         end
         attr_writer :verb_lexeme
         def message_proc
