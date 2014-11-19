@@ -276,7 +276,7 @@ module Skylab::Treemap
 
     def initialize host_module, const
       @host_module = host_module
-      @name = Treemap_::Lib_::Old_name_lib[].via_const const
+      @name = Treemap_._lib.old_name_lib.via_const const
     end
   end
 

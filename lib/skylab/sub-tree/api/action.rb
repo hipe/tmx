@@ -6,7 +6,7 @@ module Skylab::SubTree
 
     Callback_::Actor.methodic self, :simple, :properties
 
-    SubTree_::Lib_::Event_lib[].sender self
+    SubTree_._lib.event_lib.sender self
 
     def initialize
       # you are executed before a block is instance_exec'd
@@ -58,7 +58,7 @@ module Skylab::SubTree
           :x, x, :prop, prop, :tmpl_s, template_s do |y, o|
 
         _noun = par o.prop
-        _tmpl = SubTree_::Lib_::String_lib[].template.via_string o.tmpl_s
+        _tmpl = SubTree_._lib.string_lib.template.via_string o.tmpl_s
         _x = ick o.x
         _s = _tmpl.call x: _x,  noun: _noun
         y << _s
@@ -71,7 +71,7 @@ module Skylab::SubTree
       @event_receiver.receive_event ev
     end
 
-    Data_Event_ = SubTree_::Lib_::Event_lib[].data_event_class_factory
+    Data_Event_ = SubTree_._lib.event_lib.data_event_class_factory
 
     module Local_Actor_
 

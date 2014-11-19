@@ -2,9 +2,9 @@ module Skylab::SubTree
 
   class API::Actions::My_Tree
 
-    class Render_table_ < Lib_::Struct[ :paystream, :row_a ]
+    class Render_table_ < LIB_.struct( :paystream, :row_a )
 
-      Lib_::Funcy_globful[ self ]
+      LIB_.funcy_globful self
 
       def execute
         row_a = [ ]

@@ -22,12 +22,17 @@ module Skylab::SubTree
     Autoloader_[ self ]
   end
 
+  def self._lib
+    @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+      self::Lib_, self )
+  end
+
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
   DOT_ = '.'.freeze
 
   Entity_ = -> * x_a do
-    SubTree_::Lib_::Entity_via_iambic[ x_a ]
+    SubTree_._lib.entity_via_iambic x_a
   end
 
   EMPTY_P_ = -> { }

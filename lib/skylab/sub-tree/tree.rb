@@ -9,11 +9,11 @@ module Skylab::SubTree
 
     Entity_ = -> client, _props_, * i_a do
       :properties == _props_ or raise ::ArgumentError, "'properties' not '#{ _fields_ }'"
-      SubTree_::Lib_::Funcy_globless[ client ]
+      SubTree_._lib.funcy_globless client
       def client.call_via_iambic x_a
         new( x_a ).execute
       end
-      SubTree_::Lib_::Basic_fields[].with :client, client,
+      SubTree_._lib.basic_fields.with :client, client,
         :absorber, :initialize,
         :field_i_a, i_a ; nil
     end

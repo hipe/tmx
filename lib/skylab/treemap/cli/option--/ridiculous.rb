@@ -14,15 +14,15 @@ module Skylab::Treemap
       mod.send :include, CLI::Option__::Ridiculous::InstanceMethods
     end
 
-        DSL = Lib_::Proxy_lib[].functional :more
+        DSL = LIB_.proxy_lib.functional :more
           # the DSL proxy is just for getting the `more` hook for now.
 
-        Dispatch = Lib_::Proxy_lib[].nice :"nil?",
+        Dispatch = LIB_.proxy_lib.nice :"nil?",
           :add_definition_block, :options, :'parse!'
 
         module ModuleMethods
 
-    Treemap_::Lib_::Old_CLI_lib[].action self, :DSL_methods
+    Treemap_._lib.old_CLI_lib.action self, :DSL_methods
 
     def option_parser             # just for resulting in a DSL for the `more`
       if block_given?
@@ -49,7 +49,7 @@ module Skylab::Treemap
 
         module InstanceMethods
 
-    Lib_::CLI_lib[].action self, :core_instance_methods
+    LIB_.CLI_lib.action self, :core_instance_methods
 
       # (taps you into the whole critical f.w of h.l, for e.g `invoke`)
 

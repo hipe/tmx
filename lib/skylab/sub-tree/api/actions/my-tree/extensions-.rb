@@ -21,7 +21,7 @@ module Skylab::SubTree
       end
 
       def add_attribute i, x
-        (( @attribute_box ||= Lib_::Box[] )).add i, x
+        (( @attribute_box ||= LIB_.box )).add i, x
         nil
       end
       attr_reader :attribute_box

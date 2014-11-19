@@ -23,7 +23,7 @@ module Skylab::Treemap
 
   module CLI::Action::InstanceMethods  # might be borrowd by motes, cards, flies
 
-    Treemap_::Lib_::Old_CLI_lib[].action self, :core_instance_methods  # the current favorite for # cli basics like `invoke`
+    Treemap_._lib.old_CLI_lib.action self, :core_instance_methods  # the current favorite for # cli basics like `invoke`
 
     include Treemap::Core::Action::InstanceMethods # brings in our own custom
                                   # subclient methods among other things
@@ -90,7 +90,7 @@ module Skylab::Treemap
     #         ~ because we are a class of action: ~
 
 
-    Treemap_::Lib_::Old_CLI_lib[].action self,
+    Treemap_._lib.old_CLI_lib.action self,
       :actions_anchor_module, -> { Treemap::CLI::Actions }
 
     MODALITIES_ANCHOR_MODULE = Treemap  # actions can reach classes from
@@ -98,7 +98,7 @@ module Skylab::Treemap
 
     #         ~ for our event profile: ~
 
-    Treemap_::Lib_::Old_CLI_lib[].action self, :core_instance_methods  # NOTE *that* ver. of `emit`
+    Treemap_._lib.old_CLI_lib.action self, :core_instance_methods  # NOTE *that* ver. of `emit`
 
 
     Callback_[ self, :employ_DSL_for_digraph_emitter ] # (child classes *must*
@@ -142,7 +142,7 @@ module Skylab::Treemap
 
     Proxy = ::Module.new
 
-    Proxy::Option_Syntax = Lib_::Proxy_lib[].functional(
+    Proxy::Option_Syntax = LIB_.proxy_lib.functional(
       :any?, :help, :options, :parse, :string )
 
                                   # mock a legcay o.syn with a hookback so
@@ -269,7 +269,7 @@ module Skylab::Treemap
 
     #         ~ for when f.w is touching an adapter action raw ~
 
-    LegPxy = Lib_::Proxy_lib[].nice :help, :resolve do
+    LegPxy = LIB_.proxy_lib.nice :help, :resolve do
       def respond_to? _  # +:[#057]
         true
       end

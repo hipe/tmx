@@ -2,7 +2,7 @@ module Skylab::SubTree
 
   class API::Actions::My_Tree
 
-    SubTree_::Lib_::Enhance_as_API_normalizer[ self, :all ]
+    SubTree_._lib.enhance_as_API_normalizer self, :all
 
     Lib_::Basic_fields[ :client, self,
       :absorber, :absrb_iambic_fully,
@@ -46,7 +46,7 @@ module Skylab::SubTree
       nil  # when field is optional, response "shouldn't" matter
     end
 
-    SubTree_::Lib_::API_Params[ :client, self,
+    SubTree_._lib.API_Params :client, self,
 
       :meta_param, :extension,
 
@@ -75,13 +75,13 @@ module Skylab::SubTree
           y << "verbose #{ VERBOSE_SET_A.map( & hilite_first ) * ', ' } #{
            }(any permutation - bitmask-like)"
           y << "#{ kbd 'v' } adds volume for generic msgs, e.g \"-vflvv\""
-        end, :normalizer, Normalize_verbose_flags    ]
+        end, :normalizer, Normalize_verbose_flags
 
     def write_option_parser_to o
       ex_ag = expression_agent
-      SubTree_::Lib_::Write_isomorphic_option_parser_options[
+      SubTree_._lib.write_isomorphic_option_parser_options(
         :field_box, field_box, :any_expression_agent, ex_ag,
-        :param_h, order_proxy, :op, o ]
+        :param_h, order_proxy, :op, o )
       ex_ag.instance_exec do
         o.separator "   (it can also read paths from STDIN instead of #{
           }#{ par :file } or #{ par :path_a })"
@@ -107,7 +107,7 @@ module Skylab::SubTree
       @order_proxy ||= bld_order_proxy
     end
     def bld_order_proxy
-      Lib_::Order_proxy[ @param_h ]
+      LIB_.order_proxy @param_h
     end
 
 
@@ -229,8 +229,8 @@ module Skylab::SubTree
     end
 
     def init_extensions order_i_a
-      bx = Lib_::Box[]
-      bound = Lib_::Bound_field_reflection_class[]
+      bx = LIB_.box
+      bound = LIB_.bound_field_reflection_class
       order_i_a.each do |i|
         fld = field_box.fetch i
         bf = bound.new fld, -> { instance_variable_get fld.as_host_ivar }
@@ -272,10 +272,10 @@ module Skylab::SubTree
 
     alias_method :any_expression_agent, :expression_agent
 
-    class Upstream_resolver_ < Lib_::Struct[ :upstream, :path_a, :file,
-      :pattern, :say_p_p, :change_upstream_p, :cmd_s_p, :exit_status_p_p ]
+    class Upstream_resolver_ < LIB_.struct( :upstream, :path_a, :file,
+      :pattern, :say_p_p, :change_upstream_p, :cmd_s_p, :exit_status_p_p )
 
-      Lib_::Funcy_globful[ self ]
+      LIB_.funcy_globful self
 
       def execute
         have_a = [ ]
@@ -330,7 +330,7 @@ module Skylab::SubTree
           pattern_part = [ :filename, @pattern ]
         end
 
-        cmd_s = SubTree_::Lib_::System[].filesystem.find(
+        cmd_s = SubTree_._lib.system.filesystem.find(
           :paths, @path_a,
           * pattern_part,
           :freeform_query_infix, '-type file',

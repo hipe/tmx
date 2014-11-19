@@ -56,7 +56,7 @@ module Skylab::Treemap::TestSupport::CLI
     end
 
     def styled str
-      Lib_::CLI_lib[].pen.unstyle_styled str
+      LIB_.CLI_lib.pen.unstyle_styled str
     end
 
     def styld exp
@@ -85,7 +85,7 @@ module Skylab::Treemap::TestSupport::CLI
     end
 
     def _unstyle k
-      Treemap_::Lib_::CLI_lib[].pen.unstyle stream[ k ].string
+      Treemap_._lib.CLI_lib.pen.unstyle stream[ k ].string
     end
 
     def stream

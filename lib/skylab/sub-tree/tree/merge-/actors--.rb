@@ -49,7 +49,7 @@ module Skylab::SubTree
         MODI_OPERANDI_A__ = -> do
 
           an = -> x do
-            "#{ SubTree_::Lib_::NLP_EN_lib[].an x }#{ x }"
+            "#{ SubTree_._lib.NLP_EN_lib.an x }#{ x }"
           end
 
           say_merge_conflict = -> xx, yx do

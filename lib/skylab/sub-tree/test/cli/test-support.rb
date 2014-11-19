@@ -193,7 +193,7 @@ module Skylab::SubTree::TestSupport::CLI
     Emission_ = ::Struct.new :stream_name, :payload_x
 
     def cd path, &block
-      SubTree_::Lib_::Clear_pwd_cache[]
+      SubTree_._lib.clear_pwd_cache
       SubTree_::Library_::FileUtils.cd path, verbose: do_debug, &block
     end
   end

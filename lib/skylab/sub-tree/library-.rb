@@ -157,7 +157,7 @@ module Skylab::SubTree
 
     Porcelain__ = sidesys[ :Porcelain ]
 
-    Power_Scanner = -> * x_a do
+    Power_scanner = -> * x_a do
       Callback_::Scn.multi_step.build_via_iambic x_a
     end
 
@@ -211,4 +211,6 @@ module Skylab::SubTree
       Face__[]::CLI::Client::API_Integration_::OP_.new( * a ).execute
     end
   end
+
+  LIB_ = _lib
 end

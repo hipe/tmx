@@ -4,7 +4,7 @@ module Skylab::SubTree
 
     class Code_glob_
 
-      Lib_::Funcy_globless[ self ]
+      LIB_.funcy_globless self
 
       Entity_[ self, :properties, :app_hub_pn, :test_dir_pn, :sub_path_a ]
 

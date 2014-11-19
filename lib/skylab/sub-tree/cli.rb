@@ -20,16 +20,15 @@ module Skylab::SubTree
       Client_Services_.new self
     end
 
-    Client_Services_ = SubTree_::Lib_::Iambic[
-          :emit_proc, -> { method :call_digraph_listeners },
+    Client_Services_ = SubTree_._lib.iambic :emit_proc, -> { method :call_digraph_listeners },
           :instream, -> { some_upstream },
           :errstream, -> { some_infostream },
-          :outstream, -> { some_paystream } ]
+          :outstream, -> { some_paystream }
 
   public
 
     def pen
-      SubTree_::Lib_::CLI_pen[]
+      SubTree_._lib.CLI_pen
     end
 
   private
@@ -44,14 +43,14 @@ module Skylab::SubTree
           def initialize _ ; end
           alias_method :calculate, :instance_exec
         private
-          SubTree_::Lib_::EN_add_methods[ self, :private, %i( s ) ]
-          o = Lib_::CLI_lib[].pen.stylify.curry
+          SubTree_._lib.EN_add_methods self, :private, %i( s )
+          o = LIB_.CLI_lib.pen.stylify.curry
           define_method :em, o[ %i( green ) ]
-          define_method :escape_path, Lib_::Pretty_path_proc[]
-          define_method :ick, Lib_::Strange_proc[].curry[ 60 ]
+          define_method :escape_path, LIB_.pretty_path_proc
+          define_method :ick, LIB_.strange_proc.curry[ 60 ]
         public
           def stylize * a
-            SubTree_::Lib_::CLI_lib[].pen.stylify a, a.pop
+            SubTree_._lib.CLI_lib.pen.stylify a, a.pop
           end
         end
         r = Expression_Agent__.method :new ; p = -> { r } ; r
@@ -66,7 +65,7 @@ module Skylab::SubTree
     # --*--                         DSL ZONE                              --*--
 
 
-    Lib_::CLI_DSL[ self ]
+    LIB_.CLI_DSL self
 
     desc "inspired by unix builtin `tree`"
     desc "but adds custom features geared towards development"
@@ -74,9 +73,8 @@ module Skylab::SubTree
     option_parser do |o|
       front = my_tree_front
       front.with_properties( :param_h, @param_h, :expression_agent,
-        SubTree_::Lib_::Field_front_expression_agent[
-          front.field_box, Lib_::Stock_API_expression_agent[] ]
-      )
+        SubTree_._lib.field_front_expression_agent(
+          front.field_box, LIB_.stock_API_expression_agent ) )
       front.write_option_parser_to o ; nil
     end
 

@@ -11,7 +11,7 @@ module Skylab::Treemap
     # parser definition blocks are being run so care must be taken with
     # lazy-instantiation of the option documenter (singular!).
 
-    Options = Lib_::Proxy_lib[].nice :fetch
+    Options = LIB_.proxy_lib.nice :fetch
 
     def options
       @options ||= Options.new fetch: method( :options_fetch )
@@ -80,7 +80,7 @@ module Skylab::Treemap
       # usually we store what is written to us
     end
 
-    Pxy::Smrz = Lib_::Proxy_lib[].function :summarize do
+    Pxy::Smrz = LIB_.proxy_lib.function :summarize do
       def respond_to?  # :+[#057]
         true
       end
@@ -126,7 +126,7 @@ module Skylab::Treemap
       @model.summary_width = x    # use it to hold it sure why not. f.w needs it
     end
 
-    Pxy::Top = Lib_::Proxy_lib[].nice :list
+    Pxy::Top = LIB_.proxy_lib.nice :list
 
     def top
       @top_pxy ||= Pxy::Top.new list: method( :top_list )
@@ -147,7 +147,7 @@ module Skylab::Treemap
 
     # act like an action, but do 'census' style things
 
-    Probe::Action = Lib_::Proxy_lib[].nice(
+    Probe::Action = LIB_.proxy_lib.nice(
         :read_param_h, :write_param_h, :write_param_queue ) do
 
       # we don't style things during 'census' probe
@@ -167,7 +167,7 @@ module Skylab::Treemap
       end
     end
 
-    Probe::Hash = Lib_::Proxy_lib[].nice :[], :[]= do
+    Probe::Hash = LIB_.proxy_lib.nice :[], :[]= do
       class << self
         def new read, write
           super :[], read, :[]=, write
@@ -175,7 +175,7 @@ module Skylab::Treemap
       end
     end
 
-    Probe::Model = Lib_::Proxy_lib[].nice :on, :separator do
+    Probe::Model = LIB_.proxy_lib.nice :on, :separator do
       def respond_to?  # :+[#057]
         true
       end
@@ -224,7 +224,7 @@ module Skylab::Treemap
 
     def option_definition_added *args, &block
       @model.on(* args, &block )
-      opt = Lib_::CLI_lib[].via_args args, nil, @fail
+      opt = LIB_.CLI_lib.via_args args, nil, @fail
       if opt
         if opt.weak_identifier
           if block  # no block iff cosmetic!
@@ -324,7 +324,7 @@ module Skylab::Treemap
 
     # (see long note at `summarize`)
 
-    Pxy::Action = Lib_::Proxy_lib[].nice :hdr, :more do
+    Pxy::Action = LIB_.proxy_lib.nice :hdr, :more do
       def initialize h
         super
         @param_h = { }
@@ -358,9 +358,9 @@ module Skylab::Treemap
       # we do at least 2 things to it.. (this is from a call of `summarize`
       # from the frameworks)
 
-      fun = Lib_::CLI_lib[].option.parser.scanner
+      fun = LIB_.CLI_lib.option.parser.scanner
 
-      mustache_rx = Treemap_::Lib_::String_lib[].mustache_regexp
+      mustache_rx = Treemap_._lib.string_lib.mustache_regexp
 
       define_method :summarize_switch do |sw, idx, args, blk|
         sw.summarize(* args ) do |line|  # (no how about *I'll* call it)
@@ -379,7 +379,7 @@ module Skylab::Treemap
       end
     end.call
 
-    Pxy::Switch = Lib_::Proxy_lib[].functional(
+    Pxy::Switch = LIB_.proxy_lib.functional(
         :arg, :long, :object_id, :short, :send ) do
       def respond_to?  # i want it all
         true

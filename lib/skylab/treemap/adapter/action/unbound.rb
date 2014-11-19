@@ -31,7 +31,7 @@ module Skylab::Treemap
 
     #         1. (continud)
 
-    LegPxy = Lib_::Proxy_lib[].nice :help, :resolve do
+    LegPxy = LIB_.proxy_lib.nice :help, :resolve do
       def respond_to? _  # :+[#057]
         true
       end
@@ -76,7 +76,7 @@ module Skylab::Treemap
 
     def argument_syntax  # used in `usage_and_invite`
       @arg_params ||= [[:rest, :adapter_specific_arg]]
-      @argument_syntax ||= Lib_::CLI_lib[].argument.syntax.isomorphic(
+      @argument_syntax ||= LIB_.CLI_lib.argument.syntax.isomorphic(
         @arg_params, nil )
     end
 

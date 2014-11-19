@@ -4,11 +4,11 @@ module Skylab::SubTree
 
     class Scanner_
 
-      SubTree_::Lib_::Funcy_globful[ self ]
+      SubTree_._lib.funcy_globful self
 
-      SubTree_::Lib_::Basic_fields[ :client, self,
+      SubTree_._lib.basic_fields :client, self,
         :absorber, :absrb_iambic_fully,
-        :field_i_a, [ :glyphset_x ]]
+        :field_i_a, [ :glyphset_x ]
 
       class Scn__ < ::Proc
         alias_method :gets, :call

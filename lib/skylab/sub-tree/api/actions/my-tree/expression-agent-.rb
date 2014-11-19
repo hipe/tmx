@@ -8,12 +8,12 @@ module Skylab::SubTree
 
     private
 
-      SubTree_::Lib_::EN_add_methods[ self, :private, %i( and_ both ) ]
+      SubTree_._lib.EN_add_methods self, :private, %i( and_ both )
 
       def par i
         "<#{ Hak_lbl__[ i ] }>"
       end
-      Hak_lbl__ = SubTree_::Lib_::Hack_label_proc[]
+      Hak_lbl__ = SubTree_._lib.hack_label_proc
 
     end
 

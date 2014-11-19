@@ -128,7 +128,7 @@ module Skylab::SubTree
       sp = '  '
       p = -> do
         tbl_width = ( fmt % [ 0, 0.0, '', ''] ).length
-        SubTree_::Lib_::CLI_lipstick[ [[ '+', :green ], [ '-', :red  ]] ].
+        SubTree_._lib.CLI_lipstick( [[ '+', :green ], [ '-', :red  ]] ).
           instance.cook_rendering_proc( [ tbl_width ], nil, sp.length )
           # (if you want it to be `git diff --stat`-like, change `nil` to `80`)
       end.call

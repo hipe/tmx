@@ -111,7 +111,7 @@ module Skylab::Treemap
         y = Plugins::R::API::Actions::Render::Tees_LTLT.new # a tee for fun and
         y[:lines] = @lines                    # flexibility (mostly fun.)
         if @the_rscript_is_the_payload        # if the remote host wants to
-          y[ :downstream ] = Lib_::Proxy_lib[].inline :<<, @on_payline
+          y[ :downstream ] = LIB_.proxy_lib.inline :<<, @on_payline
                                               # see every line of the
                                               # script to do whatever with
                                               # as it is made, we way-over

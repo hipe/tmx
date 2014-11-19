@@ -153,7 +153,7 @@ module Skylab::SubTree
 
       Test_File__ = Data_Event_.new :short_pathname, :hub, :list_as
 
-      class Self_Rendering_Box__ < Lib_::Box_class[]
+      class Self_Rendering_Box__ < LIB_.box_class
 
         def render
           case 1 <=> length

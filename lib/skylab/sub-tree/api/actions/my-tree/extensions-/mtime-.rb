@@ -22,7 +22,7 @@ module Skylab::SubTree
       def in_notify leaf
         stat = ::File::Stat.new leaf.input_line  # move into leaf if optimal
         seconds_old = @now_t - stat.mtime
-        unit_i, amt_f = Lib_::Summarize_time[ seconds_old ]
+        unit_i, amt_f = LIB_.summarize_time seconds_old
         leaf.add_subcel "#{ amt_f.round } #{ ABBR_H_[ unit_i ] }"
         nil
       end

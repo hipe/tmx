@@ -36,6 +36,10 @@ module Skylab::Treemap
     Autoloader_[ self ]
   end
 
+  def self._lib
+    @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+  end
+
   module Lib_
 
     sidesys = Autoloader_.build_require_sidesystem_proc
@@ -61,6 +65,8 @@ module Skylab::Treemap
       Callback_::Proxy
     end
   end
+
+  LIB_ = _lib
 
   Headless = ::Skylab::Headless
   IDENTITY_ = -> { x }

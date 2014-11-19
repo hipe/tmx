@@ -13,7 +13,7 @@ module Skylab::Treemap
 
       o[:parse] = -> do
 
-        long_rx, short_rx = Lib_::CLI_lib[].option.value_at :long_rx, :short_rx
+        long_rx, short_rx = LIB_.CLI_lib.option.value_at :long_rx, :short_rx
 
         -> args do
           if ::Hash === args.last

@@ -109,7 +109,7 @@ module Skylab::SubTree
     attr_reader :files_file_pn
 
     def pathnames
-      SubTree_::Lib_::Power_Scanner[ :init, -> do
+      SubTree_._lib.power_scanner :init, -> do
         files_file_pn && top_pn or fail "sanity"
         @tpn = Pathname__.new @top_pn
         rwnd_files_file_IO
@@ -122,7 +122,7 @@ module Skylab::SubTree
           pn and break
         end
         pn
-      end ]
+      end
     end
 
     attr_reader :files_file_IO
@@ -183,7 +183,7 @@ module Skylab::SubTree
 
     def subtree_pathnames
       path = scn = slice = nil
-      SubTree_::Lib_::Power_Scanner[ :init, -> do
+      SubTree_._lib.power_scanner :init, -> do
         path = @pn.instance_variable_get :@path
         _length = path.length - SEPWIDTH_
         slice = 0 .. _length
@@ -196,7 +196,7 @@ module Skylab::SubTree
           break( r = pn )
         end
         r
-      end ]
+      end
     end
 
     SEPWIDTH_ = 1
@@ -385,7 +385,7 @@ module Skylab::SubTree
 
     Distill__ = -> do
       p = -> x do
-        ( p = SubTree_::Lib_::Distill_proc[] )[ x ]
+        ( p = SubTree_._lib.distill_proc )[ x ]
       end
       -> x { p[ x ] }
     end.call
