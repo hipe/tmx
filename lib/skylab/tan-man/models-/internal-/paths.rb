@@ -56,7 +56,7 @@ module Skylab::TanMan
 
         _app_tmpdir_path = app_tmpdir_path
 
-        TanMan_::Lib_::System[].filesystem.normalization.existent_directory(
+        TanMan_._lib.system.filesystem.normalization.existent_directory(
           :path, _app_tmpdir_path,
           :on_event, -> ev do
             ev = ev.with_message_string_mapper MSG_MAP__

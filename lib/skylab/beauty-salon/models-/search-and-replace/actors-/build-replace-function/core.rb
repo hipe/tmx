@@ -12,7 +12,7 @@ module Skylab::BeautySalon
 
       def initialize a
         string, @work_dir, @on_event_selectively = a
-        @scn = BS_::Lib_::String_scanner[].new string
+        @scn = BS_._lib.string_scanner.new string
         @a = []
       end
 

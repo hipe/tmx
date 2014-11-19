@@ -10,7 +10,7 @@ module Skylab::TanMan::TestSupport
   class << self
 
     def tmpdir_pathname
-      @tdpn ||= TanMan_::Lib_::System[].defaults.dev_tmpdir_pathname.join 'tm-testing'
+      @tdpn ||= TanMan_._lib.system.defaults.dev_tmpdir_pathname.join 'tm-testing'
     end
   end
 
@@ -27,7 +27,7 @@ module Skylab::TanMan::TestSupport
     Bsc__ = sidesys[ :Basic ]
 
     Base_tmpdir__ = memoize[ -> do
-      TanMan_::Lib_::System[].filesystem.tmpdir(
+      TanMan_._lib.system.filesystem.tmpdir(
         :path, TS_.tmpdir_pathname.to_path,
         :max_mkdirs, 1 )
     end ]
@@ -334,7 +334,7 @@ module Skylab::TanMan::TestSupport
 
         if ! pn.exist?
 
-          _tmpdir = TanMan_::Lib_::System[].filesystem.tmpdir :path, _PATH,
+          _tmpdir = TanMan_._lib.system.filesystem.tmpdir :path, _PATH,
             :be_verbose, do_debug,
             :debug_IO, debug_IO,
             :max_mkdirs, 2

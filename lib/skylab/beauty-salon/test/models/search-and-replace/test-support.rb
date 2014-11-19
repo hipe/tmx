@@ -68,7 +68,7 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
     end
 
     def event_expression_agent
-      BS_::Lib_::Brazen[]::API.expression_agent_instance
+      BS_._lib.brazen::API.expression_agent_instance
     end
 
     # ~ assertion support
@@ -90,7 +90,7 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
     end
 
     def start
-      @in, @out, @err, @thread = BS_::Lib_::Open3[].popen3 Bin_path_[],
+      @in, @out, @err, @thread = BS_._lib.open3.popen3 Bin_path_[],
         chdir: @chdir_path
       self
     end
@@ -137,7 +137,7 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
   end
 
   Bin_path_ = Callback_.memoize do
-    BS_::Lib_::System[].defaults.bin_pathname.
+    BS_._lib.system.defaults.bin_pathname.
       join( 'tmx-beauty-salon search-and-r' ).to_path
   end
 

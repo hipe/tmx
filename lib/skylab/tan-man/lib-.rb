@@ -79,4 +79,7 @@ module Skylab::TanMan
     TTT = sidesys[ :TreetopTools ]
 
   end
+
+  LIB_ = _lib
+
 end

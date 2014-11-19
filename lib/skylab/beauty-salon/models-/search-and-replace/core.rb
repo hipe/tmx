@@ -96,7 +96,7 @@ module Skylab::BeautySalon
         :sin )
 
       def expression_agent
-        BS_::Lib_::Brazen[]::API.expression_agent_instance
+        BS_._lib.brazen::API.expression_agent_instance
       end
     end
 
@@ -139,7 +139,7 @@ module Skylab::BeautySalon
       end
 
       Final_fallback_on_event_selectively_via_channel__ = -> sout, serr do
-        lib = BS_::Lib_::Brazen[]::API
+        lib = BS_._lib.brazen::API
         evr = lib.two_stream_event_expressor.new(
           sout, serr, lib.expression_agent_instance )
         -> _, & ev_p do
@@ -190,7 +190,7 @@ module Skylab::BeautySalon
       end
     end
 
-    Brazen_ = BS_::Lib_::Brazen[]
+    Brazen_ = BS_._lib.brazen
 
     Zerk_ = Brazen_::Zerk
 
@@ -325,7 +325,7 @@ module Skylab::BeautySalon
 
       def marshal_load s, & p
         s.gsub! "\b", 'b'  # awful #open [#020]
-        @rx = BS_::Lib_::Regexp_lib[].marshal_load s do |ev|
+        @rx = BS_._lib.regexp_lib.marshal_load s do |ev|
           p[ wrap_marshal_load_event ev ]
           UNABLE_
         end

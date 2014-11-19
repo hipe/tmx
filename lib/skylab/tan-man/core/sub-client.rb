@@ -101,7 +101,7 @@ module Skylab::TanMan  # (leave extra whitespacing below for [#bs-010])
       em s                        # tables?)
     end
 
-    rx = TanMan_::Lib_::Path_tools[].absolute_path_hack_rx
+    rx = TanMan_._lib.path_tools.absolute_path_hack_rx
 
     define_method :gsub_path_hack do |str|  # replaced by [#cb-052]
       res = str.gsub rx do

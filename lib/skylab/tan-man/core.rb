@@ -11,6 +11,11 @@ module Skylab::TanMan
     def name_function
       @nf ||= Callback_::Name.via_module self
     end
+
+    def _lib
+      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+        self::Lib_, self )
+    end
   end
 
   Callback_ = ::Skylab::Callback

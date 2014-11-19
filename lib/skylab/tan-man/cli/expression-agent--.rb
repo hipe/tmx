@@ -21,7 +21,7 @@ module Skylab::TanMan
       end
 
       def invoke_notify
-        TanMan_::Lib_::Old_path_tools[].clear
+        TanMan_._lib.old_path_tools.clear
       end
 
     private

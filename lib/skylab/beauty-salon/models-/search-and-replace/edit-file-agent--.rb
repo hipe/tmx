@@ -184,9 +184,9 @@ module Skylab::BeautySalon
             when :normal
               seg.string
             when :original
-              BS_::Lib_::CLI_lib[].pen.stylify ORIGINAL_STYLE__, seg.string
+              BS_._lib.CLI_lib.pen.stylify ORIGINAL_STYLE__, seg.string
             when :replacement
-              BS_::Lib_::CLI_lib[].pen.stylify REPLACEMENT_STYLE__, seg.string
+              BS_._lib.CLI_lib.pen.stylify REPLACEMENT_STYLE__, seg.string
             end
           end
 

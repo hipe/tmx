@@ -1,8 +1,8 @@
 module Skylab::BeautySalon
 
-  class Models_::Deliterate < BS_::Lib_::Brazen[].model.action_class
+  class Models_::Deliterate < BS_._lib.brazen.model.action_class
 
-    Brazen_ = BS_::Lib_::Brazen[]
+    Brazen_ = BS_._lib.brazen
 
     def write_options o
 
@@ -108,9 +108,9 @@ module Skylab::BeautySalon
 
     def normalize_range
       okay = true
-      ok = BS_::Lib_::Range_lib[].normalize @from_line, :begin, 1, @error_p
+      ok = BS_._lib.range_lib.normalize @from_line, :begin, 1, @error_p
       ok or okay = false
-      ok = BS_::Lib_::Range_lib[].normalize @to_line, :is, -1, :or, :begin, 1, @error_p
+      ok = BS_._lib.range_lib.normalize @to_line, :is, -1, :or, :begin, 1, @error_p
       ok or okay = false
       okay
     end

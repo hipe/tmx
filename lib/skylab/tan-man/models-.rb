@@ -229,7 +229,7 @@ module Skylab::TanMan
         # ~ workspace resolution
 
         :memoized, :proc, :global_conf_path, -> do
-          TanMan_::Lib_::Home_directory_pathname[].join( 'tanman-config' ).to_path
+          TanMan_._lib.home_directory_pathname.join( 'tanman-config' ).to_path
         end,
 
         :memoized, :proc, :local_conf_config_name, -> do

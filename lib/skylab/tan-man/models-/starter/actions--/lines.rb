@@ -48,7 +48,7 @@ module Skylab::TanMan
         end
 
         def via_path
-          @template = TanMan_::Lib_::String_lib[].template.via_path @path
+          @template = TanMan_._lib.string_lib.template.via_path @path
           via_template
         end
 
@@ -61,7 +61,7 @@ module Skylab::TanMan
         end
 
         def when_enoent
-          _ev = Lib_::Entity[].event.wrap.exception.with(
+          _ev = LIB_.entity.event.wrap.exception.with(
             :path_hack,
             :terminal_channel_i, :resource_not_found,
             :exception, @enoent )
@@ -69,7 +69,7 @@ module Skylab::TanMan
         end
 
         def via_output_s
-          TanMan_::Lib_::String_IO[].new @output_s
+          TanMan_._lib.string_IO.new @output_s
         end
       end
     end

@@ -39,7 +39,7 @@ module Skylab::BeautySalon
           end
         end
 
-        BS_::Lib_::Event_lib[].sender self
+        BS_._lib.event_lib.sender self
 
         def initialize a
           @path, @on_event_selectively = a
@@ -191,7 +191,7 @@ module Skylab::BeautySalon
         end
 
         def finish_normal
-          @treelib  = BS_::Lib_::Tree_lib[]
+          @treelib  = BS_._lib.tree_lib
           @from_tree = @treelib.new
           @to_node = @from_tree
           @from_children = @tops

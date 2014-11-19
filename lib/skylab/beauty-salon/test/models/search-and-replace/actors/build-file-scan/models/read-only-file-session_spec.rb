@@ -29,7 +29,7 @@ module Skylab::BeautySalon::TestSupport::Models::S_and_R::Actors_BFS
 
       line = last.render_highlighted_line
       _styled_rest = /\A[^:]+:[^:]+:(.+)\z/m.match( line )[ 1 ]
-      _omg = BS_::Lib_::CLI_lib[].parse_styles _styled_rest
+      _omg = BS_._lib.CLI_lib.parse_styles _styled_rest
       _omg.map( & :first ).
         should eql [ :string, :style, :string, :style, :string ]
           # (opening and closing style spans. means one styled item

@@ -56,7 +56,7 @@ module Skylab::TanMan
 
         _RX = TestSupport::TestLib_::String_lib[].regex_for_line_scanning
 
-        scnr = TanMan_::Lib_::String_scanner[].new s
+        scnr = TanMan_._lib.string_scanner.new s
 
         y = []
         current_line_index = 0

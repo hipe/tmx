@@ -6,6 +6,8 @@ module Skylab::TanMan::TestSupport::Models::Meaning::Graph
 
   include Constants
 
+  TanMan_ = TanMan_
+
   extend TestSupport_::Quickie
 
   module InstanceMethods
