@@ -15,14 +15,14 @@ module Skylab::GitViz
         :VCS_adapter_name, DEFAULT_VCS_ADAPTER_NAME_I__,
         :VCS_listener, listnr_for_VCS_front,
         :listener, svcs_for_API_action )
-      GitViz::API.invoke_with_iambic x_a
+      GitViz_::API.invoke_with_iambic x_a
     end
     #
     def self.local_normal_name
-      GitViz::Lib_::Local_normal_name_from_module[ self ]
+      GitViz_._lib.local_normal_name_from_module self
     end
 
-    GitViz::Lib_::CLI_lib[]::Client[ self,
+    GitViz_._lib.CLI_lib::Client[ self,
       :client_services,
         :named, :svcs_for_API_action,
         :named, :listnr_for_VCS_front ]

@@ -50,7 +50,7 @@ module Skylab::Callback
         cls
       end
 
-      CONVERT_RX__ = /\A[A-Z](?=[a-z])/
+      CONVERT_RX__ = /\A[A-Z](?=[a-z_])/
 
       UNDERSCORE_BYTE__ = UNDERSCORE_.getbyte 0
   end

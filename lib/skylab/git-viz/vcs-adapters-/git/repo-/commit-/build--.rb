@@ -33,7 +33,7 @@ module Skylab::GitViz
         s = @scn.gets or self.sanity
         s_ = normalize_ISO_8601_string s
         s_ or fail "test me - ISO compliant string? - #{ s }"
-        _dt = GitViz._lib.date_time.iso8601 s_  # throes a.e, fine for now
+        _dt = GitViz_._lib.date_time.iso8601 s_  # throes a.e, fine for now
         @writable_ci.set_author_datetime _dt
         PROCEDE_
       end

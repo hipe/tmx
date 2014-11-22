@@ -79,11 +79,11 @@ module Skylab::GitViz
           end
           line_s
         end
-        GitViz::Lib_::Power_Scanner[ :init, -> do
+        GitViz_._lib.power_scanner :init, -> do
          line_s.chomp!
         end, :gets, -> do
           gets_p[]
-        end ]
+        end
       end
 
       def fnsh_the_scanner_with_a_proc

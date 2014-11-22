@@ -5,9 +5,11 @@ require_relative '../callback/core'
 
 module Skylab::GitViz
 
-  def self._lib
-    @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
-      self::Lib_, self )
+  class << self
+    def _lib
+      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+        self::Lib_, self )
+    end
   end
 
   Autoloader_ = ::Skylab::Callback::Autoloader
@@ -25,7 +27,7 @@ module Skylab::GitViz
 
   EMPTY_P_ = -> {}
 
-  GitViz = self
+  GitViz_ = self
 
   Name_ = Callback_::Name
 

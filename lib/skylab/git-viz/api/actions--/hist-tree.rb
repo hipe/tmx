@@ -6,7 +6,7 @@ module Skylab::GitViz
 
     def execute
       _VCS_front
-      GitViz::Models_::File_Node[
+      GitViz_::Models_::File_Node[
         :pathname, @pathname, :VCS_front, @VCS_front ]
     end
   end

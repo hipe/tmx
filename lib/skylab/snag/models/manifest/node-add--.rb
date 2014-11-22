@@ -4,9 +4,9 @@ module Skylab::Snag
 
     class Node_add__ < Agent_
 
-      Snag_::Lib_::Basic_Fields[ :client, self,
+      Snag_._lib.basic_fields :client, self,
         :absorber, :absrb_iambic_fully,
-        :field_i_a, [ :is_dry_run, :verbose_x ] ]
+        :field_i_a, [ :is_dry_run, :verbose_x ]
 
       def initialize x_a
         @node, @client, @delegate = x_a.shift 3

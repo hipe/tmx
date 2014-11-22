@@ -4,11 +4,11 @@ module Skylab::GitViz
 
     class Fixture_Client  # [#024] taste the pain of too much docs
 
-      GitViz._lib.plugin::Host[ self ]
+      GitViz_._lib.plugin::Host[ self ]
       Mock_System::Socket_Agent_[ self ]
       include Socket_Agent_Constants_
 
-      x = $VERBOSE ; $VERBOSE = nil ; GitViz._lib.ZMQ ; $VERBOSE = x
+      x = $VERBOSE ; $VERBOSE = nil ; GitViz_._lib.ZMQ ; $VERBOSE = x
 
       def initialize program_name, sout, argv, port_d
         @argv = argv
@@ -167,7 +167,7 @@ module Skylab::GitViz
       end
 
       def path_to_fixture_server
-        GitViz::Test::Script.dir_pathname.join( 'fixture-server' ).to_path
+        GitViz_::Test::Script.dir_pathname.join( 'fixture-server' ).to_path
       end
 
       def try_to_connect_with_plugins
@@ -182,7 +182,7 @@ module Skylab::GitViz
             CONTINUE_
           else
             @y << "expected floating point number, but some plugin resulted #{
-              }in #{ GitViz._lib.ick new_timeout_seconds }"
+              }in #{ GitViz_._lib.ick new_timeout_seconds }"
             NO_SERVER_
           end
         else

@@ -80,7 +80,7 @@ module Skylab::GitViz
             end
             fh.close ; nil
           end
-          @tree = GitViz._lib.tree.from  :path_nodes, _ea ; nil
+          @tree = GitViz_._lib.tree.from  :path_nodes, _ea ; nil
         end
 
         def mutate_manifest_line_into_normd_path_and_get_tree_path line

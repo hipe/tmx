@@ -45,10 +45,10 @@ module Skylab::Snag
 
       def retrieve_param_for_expression_agent i
         if @option_parser.top.long.key?( i.to_s  )
-          Lib_::CLI[]::Option.on "--#{ i }"
+          Snag_._lib.CLI::Option.on "--#{ i }"
         else
           _fp = Fake_Formal_Parameter__.new Callback_::Name.via_variegated_symbol i
-          Lib_::CLI_lib[].argument _fp, :req
+          Snag_._lib.CLI_lib.argument _fp, :req
         end
       end
       Fake_Formal_Parameter__ = ::Struct.new :name

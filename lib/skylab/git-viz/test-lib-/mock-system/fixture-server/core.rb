@@ -4,7 +4,7 @@ module Skylab::GitViz
 
     class Fixture_Server  # read [#018]:#introduction-to-the-middle-end
 
-      GitViz._lib.plugin::Host[ self ]
+      GitViz_._lib.plugin::Host[ self ]
       Mock_System::Socket_Agent_[ self ]
       include Socket_Agent_Constants_
 
@@ -22,7 +22,7 @@ module Skylab::GitViz
       end
     private
       def init_conduit_for_self
-        _name = GitViz::Name_.via_human 'middle server'
+        _name = GitViz_::Name_.via_human 'middle server'
         @conduit_for_self = plugin_conduit_cls.new( @y, self ).curry _name ; nil
       end
 
@@ -202,7 +202,7 @@ module Skylab::GitViz
       def prcss_server_directive
         const_i = @responder_const_i
         cls = Fixture_Server::Alternate_Responders__.const_get const_i, false
-        name = GitViz::Name_.via_const const_i
+        name = GitViz_::Name_.via_const const_i
         cond = plugin_conduit_cls.new( @y, self ).curry( name )
         responder = cls.new cond
         ec = responder.invoke @buffer_a

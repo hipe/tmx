@@ -26,7 +26,7 @@ module Skylab::Snag
 
       define_method :ick, -> do
         p = -> x do
-          p = Snag_._lib.strange.to_proc.curry[ Lib_::A_short_length[] ]
+          p = Snag_._lib.strange.to_proc.curry[ LIB_.a_short_length ]
           p[ x ]
         end
         -> x { p[ x ] }

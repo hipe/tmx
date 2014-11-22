@@ -102,7 +102,7 @@ module Skylab::Snag
 
     Entity_ = -> client, _fields_, * field_i_a do
       :fields == _fields_ or raise ::ArgumentError
-      Snag_._lib.basic_Fields :client, client,
+      Snag_._lib.basic_fields :client, client,
         :absorber, :initialize,
         :field_i_a, field_i_a
     end
@@ -190,7 +190,7 @@ module Skylab::Snag
             :filename, @config.manifest_file,
             :max_num_dirs_to_look,
               @config.max_num_dirs_to_search_for_manifest_file,
-            :prop, Lib_::Entity[]::Property__.new( :path ),
+            :prop, LIB_.entity::Property__.new( :path ),
             :start_path, @path,
             :event_receiver, _evr )
         end

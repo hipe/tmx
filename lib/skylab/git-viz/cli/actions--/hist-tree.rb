@@ -16,7 +16,7 @@ module Skylab::GitViz
       def prepare_VCS_resources  # continuation of [#006]:#storypoint-40
         @do_use_mocks = :do_use_mocks == @x_a.first && @x_a.shift && true
         @pathname = :pathname == @x_a.first && begin @x_a.shift ; @x_a.shift end
-        @x_a.unshift :VCS_adapters_module, GitViz::VCS_Adapters_
+        @x_a.unshift :VCS_adapters_module, GitViz_::VCS_Adapters_
         if @do_use_mocks
           prepare_VCS_resouces_for_mocks
         else
@@ -25,11 +25,11 @@ module Skylab::GitViz
       end
 
       def prepare_VCS_resouces_for_mocks
-        fixtures_mod = GitViz::TestSupport::VCS_Adapters::Git::Fixtures
-        _mock_FS = GitViz::Test_Lib_::Mock_FS::In_module[ fixtures_mod ]
+        fixtures_mod = GitViz_::TestSupport::VCS_Adapters::Git::Fixtures
+        _mock_FS = GitViz_::Test_Lib_::Mock_FS::In_module[ fixtures_mod ]
         _mock_pn = _mock_FS.touch_pn @pathname.to_path
         @x_a.push :pathname, _mock_pn
-        _mock_sc = GitViz::Test_Lib_::Mock_System::In_module[ fixtures_mod ]
+        _mock_sc = GitViz_::Test_Lib_::Mock_System::In_module[ fixtures_mod ]
         @x_a.unshift :system_conduit, _mock_sc
       end
 
