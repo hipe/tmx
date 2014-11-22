@@ -16,6 +16,11 @@ module Skylab::Headless  # ([#013] is reserved for a core node narrative - no st
       Headless_::SubClient.expression_agent
     end
 
+    def _lib
+      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+        self::Lib_, self )
+    end
+
     def system
       @system ||= Headless_::System__::Front.new
     end

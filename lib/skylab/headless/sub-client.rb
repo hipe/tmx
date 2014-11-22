@@ -279,9 +279,9 @@ end
       end
 
       o[ :s ] = -> * args do  # [length] [lexeme_i]
-        len_x, lexeme_i = Headless_::Lib_::Parse_series[ args,
+        len_x, lexeme_i = Headless_._lib.parse_series args,
           -> x { ! x.respond_to? :id2name }, # defer it
-          -> x { x.respond_to? :id2name } ]
+          -> x { x.respond_to? :id2name }
         lexeme_i ||= :s  # when `len_x` is nil it means "use memoized"
         p = if :identity == lexeme_i
           IDENTITY_

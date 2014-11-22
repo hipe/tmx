@@ -79,7 +79,7 @@ module Skylab::MetaHell
         @mod = mod
       end
 
-      MetaHell_::Lib_::Entity_lib[].call self, -> do
+      MetaHell_._lib.entity_lib.call self, -> do
 
         def apply_with_instance
           @apply_with_instance = true

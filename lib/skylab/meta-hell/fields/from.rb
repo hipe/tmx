@@ -83,7 +83,7 @@ module Skylab::MetaHell
             end
           end
 
-          _muxer = MetaHell_::Lib_::Method_added_muxer[ @definee ]
+          _muxer = MetaHell_._lib.method_added_muxer @definee
           _muxer.for_each_method_added_in @p, -> m do
             @box.add m, Field_From_Method__.new( m, p )
           end ; nil

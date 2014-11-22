@@ -64,7 +64,7 @@ module Skylab::Headless
       end
 
       def index
-        bx = Headless_::Lib_::Meso_box_lib[].new
+        bx = Headless_._lib.meso_box_lib.new
         constants.each do |c|
           ar = const_get c, false
           bx.add ar.local_normal_name, ar

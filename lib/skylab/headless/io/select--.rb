@@ -2,7 +2,7 @@ module Skylab::Headless
 
   module IO
 
-  Select__ = Headless_::Lib_::Ivars_with_procs_as_methods[].new :select do
+  Select__ = Headless_._lib.ivars_with_procs_as_methods.new :select do
 
     # Select - a chunking, multstream `select` wrapper
     #

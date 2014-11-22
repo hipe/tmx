@@ -128,7 +128,7 @@ module Skylab::MetaHell
         end
       end
       def bld_fld_box
-        MetaHell_::Lib_::Meso_box_lib[].new
+        MetaHell_._lib.meso_box_lib.new
       end
     end
 
@@ -438,7 +438,7 @@ module Skylab::MetaHell
          } - did you mean #{ say_lev x, _a }?"
       end
       def say_lev x, a
-        MetaHell_::Lib_::Levenshtein[].with(
+        MetaHell_._lib.levenshtein.with(
           :item, x,
           :items, a,
           :closest_N_items, 3,

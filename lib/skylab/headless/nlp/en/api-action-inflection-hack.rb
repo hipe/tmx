@@ -124,7 +124,7 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack  # seed [#018].  wa
     end
 
     def bld_noun  # #note-130
-      chain = Headless_::Lib_::Module_lib[].chain_via_module @klass
+      chain = Headless_._lib.module_lib.chain_via_module @klass
       mod = chain[ -2 ].value_x
       mod_ = chain[ -3 ].value_x
       if mod_ && mod_.respond_to?( :unbound_action_box )
@@ -178,10 +178,10 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack  # seed [#018].  wa
 
     # for setting how to inflect things
 
-    Headless_::Lib_::DSL_DSL[ self, -> do
+    Headless_._lib.DSL_DSL self, -> do
       atom_accessor :noun
       atom_accessor :verb
-    end ]
+    end
 
     def initialize
       @noun = :singular

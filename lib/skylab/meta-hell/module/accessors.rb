@@ -123,7 +123,7 @@ module Skylab::MetaHell
               instance_variable_get ivar
             else
 
-              md = MetaHell_::Lib_::Module_lib[].
+              md = MetaHell_._lib.module_lib.
                 touch_value_via_relative_path mod[ self ], path, create_blk
 
               if extend_blk

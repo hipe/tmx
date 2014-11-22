@@ -32,7 +32,7 @@ module Skylab::Headless
 
         def process_args a, &p
           p[ hooks = Hooks__.new ]
-          bx = Headless_::Lib_::Meso_box_lib[].new
+          bx = Headless_._lib.meso_box_lib.new
           parse = Parse__.new( hooks, bx, a )
           r = @series.parse_notify parse
           if r
@@ -53,7 +53,7 @@ module Skylab::Headless
           end
         end
         def init_result_struct_class
-          bx = Headless_::Lib_::Meso_box_lib[].new
+          bx = Headless_._lib.meso_box_lib.new
           y = ::Enumerator::Yielder.new do |i|
             bx.has?( i ) or bx.add i, nil
           end
@@ -408,7 +408,7 @@ module Skylab::Headless
       class Parse_Recorder__ < Parse__
         def initialize upstream
           @a = upstream.duplicate_a
-          @box = Headless_::Lib_::Meso_box_lib[].new
+          @box = Headless_._lib.meso_box_lib.new
           @emitted_a = []
         end
 

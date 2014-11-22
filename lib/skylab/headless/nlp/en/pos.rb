@@ -53,7 +53,7 @@ module Skylab::Headless
     def self.grammatical_categories h
 
       @category_box ||= begin
-        cls = Headless_::Lib_::Old_box_lib[].open_box
+        cls = Headless_._lib.old_box_lib.open_box
         @form_box = cls.new
         @exponent_box = cls.new
         cls.new  # eew
@@ -84,7 +84,7 @@ module Skylab::Headless
         nil
       end
 
-      @box = Headless_::Lib_::Old_box_lib[].open_box.new
+      @box = Headless_._lib.old_box_lib.open_box.new
 
       class << self
         attr_reader :box
@@ -318,7 +318,7 @@ module Skylab::Headless
 
     # (watch for similarities with `self.as`)
     def add_irregular_forms form_h
-      @irregular_box ||= Headless_::Lib_::Old_box_lib[].open_box.new if form_h.any?
+      @irregular_box ||= Headless_._lib.old_box_lib.open_box.new if form_h.any?
       form_h.each do |combination_x, surface_form|
         c = self.class.build_immutable_combination combination_x
         instance_variable_set c.ivar,  # allow nils
@@ -389,8 +389,8 @@ module Skylab::Headless
 
       def initialize pos_class
         @pos_class = pos_class
-        @monadic_form_box = Headless_::Lib_::Old_box_lib[].open_box.new
-        @monadic_lemma_box = Headless_::Lib_::Old_box_lib[].open_box.new
+        @monadic_form_box = Headless_._lib.old_box_lib.open_box.new
+        @monadic_lemma_box = Headless_._lib.old_box_lib.open_box.new
         @last_lemmaless_id = 0
       end
       private :initialize
@@ -794,7 +794,7 @@ module Skylab::Headless
         end.call
         ea << self
         membership_st =
-          parts.unshift(part).reduce Headless_::Lib_::Old_box_lib[].open_box.new do |bx, x|
+          parts.unshift(part).reduce Headless_._lib.old_box_lib.open_box.new do |bx, x|
             bx.add x, Membership_.new( x, NLP::EN::POS.abbrev_box.fetch( x ) )
             bx
           end.to_struct

@@ -74,6 +74,6 @@ module Skylab::MetaHell
         end )
     end
     #
-    Hash_Pxy__ = MetaHell_::Lib_::Proxy_lib[].nice :key?, :fetch, :dup
+    Hash_Pxy__ = MetaHell_._lib.proxy_lib.nice :key?, :fetch, :dup
   end
 end

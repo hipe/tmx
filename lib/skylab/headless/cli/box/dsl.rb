@@ -264,7 +264,7 @@ module Skylab::Headless
           end
           def help_screen_for_chld y, chld_x  # #storypoint-200
             if @is_engaged
-              x = chld_x[] and fail "sanity - #{ Headless_::Lib_::Strange[ x ] }"
+              x = chld_x[] and fail "sanity - #{ Headless_._lib.strange x }"
               hlp_screen_as_engaged_box y
             else
               bound = rslv_bound_action_for_help chld_x

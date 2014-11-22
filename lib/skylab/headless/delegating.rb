@@ -12,7 +12,7 @@ module Skylab::Headless
       end
     private
       def say_unexpected x
-        "unexpected #{ Headless_::Lib_::Strange[ x_a[ 0 ] ] }"
+        "unexpected #{ Headless_._lib.strange x_a[ 0 ] }"
       end
     end
 
@@ -148,7 +148,7 @@ module Skylab::Headless
       end
       def say_cant_resolve_method_names
         "can't resolve delegator method name or names from #{
-           Headless_::Lib_::Strange[ @x_a.first ] }"
+           Headless_._lib.strange @x_a.first }"
       end
       def if=
         @if_p = @x_a.shift
@@ -182,7 +182,7 @@ module Skylab::Headless
       def say_single
         "'to_method' is for single methods only. cannot delegate these #{
           }to the same method: #{ @method_name_a.map do |i|
-            Headless_::Lib_::Strange[ i ] end * ', ' }"
+            Headless_._lib.strange i end * ', ' }"
       end
     end
 

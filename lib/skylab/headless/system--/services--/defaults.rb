@@ -8,7 +8,7 @@ module Skylab::Headless
         @system = x
       end
 
-      Headless_::Lib_::Properties_stack_frame.call self,
+      Headless_._lib.properties_stack_frame self,
 
         :memoized, :proc, :bin_pathname, -> do
           ::Skylab.dir_pathname.join( '../../bin' ).expand_path

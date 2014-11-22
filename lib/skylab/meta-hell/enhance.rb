@@ -120,7 +120,7 @@ module Skylab::MetaHell
         # that that input (method) receives.
 
         1 => -> func do
-          cnd_kls = MetaHell_::Lib_::Module_lib[].value_via_relative_path self.class, '..'
+          cnd_kls = MetaHell_._lib.module_lib.value_via_relative_path self.class, '..'
           ex = nil
           cnd = cnd_kls.new -> x do
             ex = x

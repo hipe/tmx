@@ -91,7 +91,7 @@ module Skylab::Headless
 
         def no_support_for i_a
           @on_event_selectively.call :error, :regexp_option_not_supported do
-            Headless_::Lib_::Event_lib[].
+            Headless_._lib.event_lib.
               inline_not_OK_with :non_convertible_regexp_options,
                 :option_symbols, i_a, :regexp, @ruby_regexp
           end
@@ -107,7 +107,7 @@ module Skylab::Headless
 
         def get_busy
 
-          shellwords = Headless_::Lib_::Shellwords[]
+          shellwords = Headless_._lib.shellwords
 
           y = [ 'grep', '-E' ]
           if @do_ignore_case
@@ -179,7 +179,7 @@ module Skylab::Headless
 
         def when_system_error err_s
           @on_event_selectively.call :error, :system_call_error do
-            Headless_::Lib_::Event_lib[].inline_not_OK_with :system_call_error,
+            Headless_._lib.event_lib.inline_not_OK_with :system_call_error,
               :message, err_s, :error_category, :system_call_error
           end
           UNABLE_

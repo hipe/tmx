@@ -6,7 +6,7 @@ module Skylab::Headless
 
       module Chunkers
 
-        Functional = Headless_::Lib_::Ivars_with_procs_as_methods[].
+        Functional = Headless_._lib.ivars_with_procs_as_methods.
             new :flush, :write do
 
           def << x

@@ -35,6 +35,11 @@ module Skylab
         MetaHell_::Lib__::Import_methods[ from_mod, i_a, priv_pub, to_mod ]
       end
 
+      def _lib
+        @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+          self::Lib_, self )
+      end
+
       def method_is_defined_by_module i, mod
         mod.method_defined? i or mod.private_method_defined? i
       end
@@ -235,7 +240,7 @@ module Skylab::MetaHell
           end
         end
         def initialize( * )
-          @key_set = MetaHell_::Lib_::Stdlib_set[].new
+          @key_set = MetaHell_._lib.stdlib_set.new
           super
         end
         def keys

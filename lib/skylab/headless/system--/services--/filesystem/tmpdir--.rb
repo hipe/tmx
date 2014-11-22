@@ -10,7 +10,7 @@ module Skylab::Headless
 
     include Headless_::Library_::FileUtils
 
-    Headless_::Lib_::Entity[ self, -> do
+    Headless_._lib.entity self, -> do
 
       o :iambic_writer_method_name_suffix, :'=',
 
@@ -32,7 +32,7 @@ module Skylab::Headless
 
       o :property, :be_verbose
 
-    end ]
+    end
 
     alias_method :init_pathname, :initialize
 

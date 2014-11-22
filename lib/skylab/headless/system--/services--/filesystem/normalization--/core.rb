@@ -68,7 +68,7 @@ module Skylab::Headless
 
         DIR_FTYPE_ = 'directory'.freeze
 
-        Entity_ = Headless_::Lib_::Entity[]
+        Entity_ = Headless_._lib.entity
 
         Event_ = Entity_.event
 

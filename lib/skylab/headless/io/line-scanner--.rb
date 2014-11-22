@@ -2,7 +2,7 @@ module Skylab::Headless
 
   module IO
 
-    Line_Scanner__ = Headless_::Lib_::Ivars_with_procs_as_methods[].new :count, :gets, :line_number
+    Line_Scanner__ = Headless_._lib.ivars_with_procs_as_methods.new :count, :gets, :line_number
 
     class Line_Scanner__  # read [#164]
 
@@ -66,7 +66,7 @@ module Skylab::Headless
 
       attr_reader :fh, :pathname
 
-      LINE_RX__ = Headless_::Lib_::String_lib[].regex_for_line_scanning
+      LINE_RX__ = Headless_._lib.string_lib.regex_for_line_scanning
 
     end
   end

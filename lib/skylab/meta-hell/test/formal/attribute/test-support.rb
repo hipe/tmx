@@ -10,7 +10,7 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute
 
   Formal_TS_ = Formal_TS_
 
-  MetaHell_::Lib_::Stdlib_set[]
+  MetaHell_._lib.stdlib_set
 
   extend TestSupport_::Quickie
 

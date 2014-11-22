@@ -37,7 +37,7 @@ module Skylab::Headless
         end
 
         def say_not_symbol x
-          "no implicit convertion of #{ Headless_::Lib_::Strange[ x ] } to symbol"
+          "no implicit convertion of #{ Headless_._lib.strange x } to symbol"
         end
 
         Weak_identifier_for_switch__ = -> do

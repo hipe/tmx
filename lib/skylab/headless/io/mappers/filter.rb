@@ -11,7 +11,7 @@ module Skylab::Headless
     # intercept write-like messages intended for an ::IO, but do something
     # magical with the content. Don't forget to call flush! at the end.
 
-        Headless_::Lib_::Entity[ self, -> do
+        Headless_._lib.entity self, -> do
 
           o :iambic_writer_method_name_suffix, :'='
 
@@ -44,7 +44,7 @@ module Skylab::Headless
             :downstream_IO,
             :niladic_pass_filter_proc
 
-        end ]
+        end
 
         include Interceptors_::Tee::Is_TTY_Instance_Methods
 

@@ -2,7 +2,7 @@ module Skylab::Headless
 
   module CLI::Pen__
 
-    Chunker__ = Headless_::Lib_::Ivars_with_procs_as_methods[].new :gets
+    Chunker__ = Headless_._lib.ivars_with_procs_as_methods.new :gets
 
     class Chunker__
 
@@ -55,7 +55,7 @@ module Skylab::Headless
       define_method :initialize do |sexp|
         state = :initial
         hot = true
-        scn = Headless_::Lib_::List_lib[].line_scanner sexp
+        scn = Headless_._lib.list_lib.line_scanner sexp
         building = nil
 
         fetch = -> x do

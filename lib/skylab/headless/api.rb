@@ -37,7 +37,7 @@ module Skylab::Headless
           const_set :Action, ::Class.new( Iambic_Action__ )
         define_singleton_method :action_class do end  # future-proofing
       end
-      Headless_::Lib_::Bundle[]::Multiset[ self ]
+      Headless_._lib.bundle::Multiset[ self ]
     end
 
     Touch_dir_patname__ = -> do
@@ -49,7 +49,7 @@ module Skylab::Headless
     end
 
     Rslv_Dpn__ = -> do  # #storypoint-25
-      parent = Headless_::Lib_::Module_lib[].value_via_relative_path self, '..'
+      parent = Headless_._lib.module_lib.value_via_relative_path self, '..'
       parent and Has_dpn__[ parent ] or fail "no support for toplevel modules"
       Autoloader_[ self ] ; nil
     end

@@ -2,11 +2,11 @@ module Skylab::Headless
 
   module CLI::Option__
 
-    Long_ = Headless_::Lib_::Old_box_lib[].struct.
+    Long_ = Headless_._lib.old_box_lib.struct.
 
         new :__, :no, :stem, :arg do
 
-      Headless_::Lib_::Pool[].enhance( self ).with_lease_and_release -> do
+      Headless_._lib.pool.enhance( self ).with_lease_and_release -> do
         # this is how we construct (*not* re-init) a flyweight.
         new '--'  # this never changes
       end
