@@ -1,3 +1,4 @@
+[#066] #todo cool new build-less events
 [#065] #open implement unmarshaling for strings with newlines (git-config)
 [#064]       #done marshal issue near regexps with escape-looking sequences
 [#063]       [ isomorphicisms and emergent interfaces ]
@@ -38,8 +39,8 @@
 [#032]       #parent-node: [#026] the entity scan narrative ..
 [#031]       #parent-node: [#026] the retrieving narrative ..
 [#030]       #parent-node: [#026] the creating narrative ..
-[#029]       #parent-node: [#010] the datastore actor narrative ...
-[#028]       #parent-node: [#010] the git config datastore
+[#029]       #parent-node: [#028] "a universal normal name convention.."
+[#028]       #parent-node: [#010] the datastore actor narrative ...
 [#027]       #done do not throw exceptions for parse errors
 [#026]       #parent-node: [#025] the collection controller narrative ..
 [#025]       #doc-node: the brazen four layer model model ..

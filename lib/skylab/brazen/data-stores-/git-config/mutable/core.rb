@@ -449,7 +449,7 @@ module Skylab::Brazen
           @collection_kernel.map_nodes self.class::SYMBOL_I, p
         end
 
-        def to_scan
+        def to_stream
           @collection_kernel.get_node_scan self.class::SYMBOL_I
         end
 

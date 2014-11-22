@@ -50,7 +50,7 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem
       a = []
       scan = parent_subject.grep :ruby_regexp, /foo[b]ie/i,
         :path, here_path, :as_normal_value, -> cmd do
-            cmd.to_scan
+            cmd.to_stream
           end,
         :on_event_selectively, -> * i_a, & ev_p do
             a.push i_a

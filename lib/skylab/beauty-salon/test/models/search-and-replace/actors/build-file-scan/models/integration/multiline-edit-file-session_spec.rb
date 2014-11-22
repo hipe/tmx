@@ -8,14 +8,14 @@ module Skylab::BeautySalon::TestSupport::Models::S_and_R::Actors_BFS
 
     it "when the filesize is under the limit - OK" do
 
-      file_session_scan = Subject_[].with :upstream_path_scan,
-        build_scan_for_single_path_to_file_with_three_lines,
+      file_session_stream = Actors_[]::Build_file_stream.with :upstream_path_stream,
+        build_stream_for_single_path_to_file_with_three_lines,
         :ruby_regexp, /e[\n!]/m,
         :for_interactive_search_and_replace
 
-      scan = file_session_scan
-      file = scan.gets
-      scan.gets.should be_nil
+      stream = file_session_stream
+      file = stream.gets
+      stream.gets.should be_nil
 
       d = file.match_count
       d.should eql 3

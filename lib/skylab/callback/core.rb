@@ -28,6 +28,8 @@ module Skylab::Callback
       end
     end
 
+    alias_method :stream, :scan
+
     def test_support
       Callback_::Test
     end
@@ -442,6 +444,10 @@ module Skylab::Callback
       @d != @x_a_length
     end
 
+    def unparsed_count
+      @x_a_length - @d
+    end
+
     def gets_one
       x = current_token ; advance_one ; x
     end
@@ -800,7 +806,7 @@ module Skylab::Callback
 
     class Entry_Tree_ < Normpath_  # read [#024]:introduction-to-the-entry-tree
 
-      def to_scan  # :+#public-API, #the-fuzzily-unique-entry-scanner, #fuzzy-sibling-pairs
+      def to_stream  # :+#public-API, #the-fuzzily-unique-entry-scanner, #fuzzy-sibling-pairs
         @did_index_all ||= index_all
         a = @stem_i_a ; d = -1 ; last = a.length - 1
         Callback_.scan do

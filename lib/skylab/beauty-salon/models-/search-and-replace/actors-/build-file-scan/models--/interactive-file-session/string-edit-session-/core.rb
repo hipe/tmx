@@ -2,7 +2,7 @@ module Skylab::BeautySalon
 
   class Models_::Search_and_Replace
 
-    class Actors_::Build_file_scan
+    module Actors_::Build_file_scan
 
       class Models__::Interactive_File_Session
 
@@ -191,7 +191,7 @@ module Skylab::BeautySalon
               @replacement_is_engaged = false
             end
 
-            def to_replacement_segment_scan_proc
+            def to_replacement_segment_stream_proc
               Build_string_segment_proc_[ 0,
                 @replacement_string.length,
                 @replacement_string,
@@ -201,13 +201,13 @@ module Skylab::BeautySalon
 
         public
 
-          def to_line_scan
-            Self_::Mixed_Scan_Agent__.new( self ).build_line_scan
+          def to_line_stream
+            Self_::Mixed_Scan_Agent__.new( self ).build_line_stream
           end
 
-          # ~ context line scanners (#note-105)
+          # ~ context line streams (#note-105)
 
-          def context_scanners num_before, match_d, num_after
+          def context_streams num_before, match_d, num_after
 
             Self_::Build_context_scanners__.new( num_before, match_d, num_after,
               @match_a, @string ).execute

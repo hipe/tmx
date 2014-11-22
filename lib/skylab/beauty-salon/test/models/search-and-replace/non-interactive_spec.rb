@@ -34,9 +34,9 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
 
       expect_neutral_event :grep_command_head
 
-      scan = @result
-      x = scan.gets
-      scan.gets.should be_nil
+      stream = @result
+      x = stream.gets
+      stream.gets.should be_nil
       basename( x ).should eql THREE_LINES_FILE_
     end
 
@@ -59,21 +59,78 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
       basename( x.path ).should eql THREE_LINES_FILE_
     end
 
-    it "matches" do
+    it "matches - many matches on one line." do
+
       call_API( * same, :matches )
+
       expect_neutral_event :grep_command_head
       expect_no_more_events
-      x = @result.gets
-      x_ = @result.gets
+
+      m = @result.gets
+      m_ = @result.gets
+      m__ = @result.gets
       @result.gets.should be_nil
-      x.line_number.should eql 1
-      x_.line_number.should eql 3
-      x.path.should eql x_.path
-      basename( x.path ).should eql THREE_LINES_FILE_
-      x.md[ 0 ].should eql 'WAZOOZLE'
-      x_.md[ 0 ].should eql 'wazoozle'
-      x.line.should match %r(\Ait's time )
-      x_.line.should match %r(\Awhen i say )
+
+      m.line_number.should eql 1
+      m_.line_number.should eql 3
+      m__.line_number.should eql 3
+
+      all = [ m, m_, m_ ]
+
+      all.map( & :path ).uniq.length.should eql 1
+      basename( m.path ).should eql THREE_LINES_FILE_
+
+      m.md[ 0 ].should eql 'WAZOOZLE'
+      m_.md[ 0 ].should eql 'wazoozle'
+
+      o = m.to_line_stream
+      o.gets.should eql "it's time for WAZOOZLE, see\n"
+      o.gets.should be_nil
+      o_ = m_.to_line_stream
+
+      _s_a = o_.to_a
+      _s_a.should eql [ "when i say \"wazoozle\" i mean WaZOOzle!\n" ]
+
+      m = m__.dup_with :do_highlight, true
+      o = m.to_line_stream
+      s = o.gets
+      o.gets.should be_nil
+      haha = BS_::Lib_::CLI_lib[].parse_styles s
+      haha.map( & :first ).should eql [ :string, :style, :string, :style, :string ]
+    end
+
+    it "matches when multiline" do
+      call_API(
+        :grep_rx, '[a-z_]+\(',
+        :search, /[a-z_]+\([^)]*\)/,
+        :dirs, TS_::Fixtures.dir_pathname.join( '01-multiline' ).to_path,
+        :files, '*.txt',
+        :preview,
+        :matches,
+        :grep,
+        :matches )
+
+      match = @result.gets
+      match_ = @result.gets
+      @result.gets.should be_nil
+
+      match.line_number.should eql 3
+      match_.line_number.should eql 9
+
+      st = match.to_line_stream  # regression - just get first line
+      _line = st.gets
+      _line.should eql " foo(\n"
+
+      s = match.to_line_stream.to_a.join BS_::EMPTY_S_
+      s_ = match_.to_line_stream.to_a.join BS_::EMPTY_S_
+      "#{ s }#{ s_ }".should eql <<-O.gsub( /^[ ]{8}/, BS_::EMPTY_S_ )
+         foo(
+           bar
+         ) # baz
+        fizz(  # biff
+          boffo
+        )
+      O
     end
 
     it "REPLACE!" do

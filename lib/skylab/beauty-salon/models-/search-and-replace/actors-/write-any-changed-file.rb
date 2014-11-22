@@ -19,10 +19,10 @@ module Skylab::BeautySalon
       end
 
       def write_temp_file
-        @scan = @edit_session.to_line_scan
-        line = @scan.gets
+        @stream = @edit_session.to_line_stream
+        line = @stream.gets
         if line
-          via_scan_write_lines line
+          via_stream_write_lines line
         else
           @result = @on_event_selectively.call :error do
             build_not_OK_event_with :file_was_empty, :path, @edit_session.path
@@ -31,17 +31,17 @@ module Skylab::BeautySalon
         end
       end
 
-      def via_scan_write_lines line
+      def via_stream_write_lines line
         tmpfile_pn = build_tmpfile_pathname
         @tmpfile = tmpfile_pn.to_path
         io = tmpfile_pn.open WRITE_MODE_
         bytes = 0
         begin
           bytes += io.write line
-          line = @scan.gets
+          line = @stream.gets
         end while line
         io.close
-        @scan = nil
+        @stream = nil
         @wrote_bytes = bytes
         PROCEDE_
       end

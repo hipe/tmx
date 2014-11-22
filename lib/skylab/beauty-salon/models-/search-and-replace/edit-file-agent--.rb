@@ -14,6 +14,7 @@ module Skylab::BeautySalon
           @cm = @es.match_at_index 0
         else
           @has_at_least_one_match = false
+          @cm = nil
         end
       end
 
@@ -68,6 +69,8 @@ module Skylab::BeautySalon
         @do_show_yes_button = false
         if @cm
           via_current_match_activate_button_visibilities
+        elsif @has_next_file
+          @do_show_next_file_button = true
         end ; nil
       end
 
@@ -155,7 +158,7 @@ module Skylab::BeautySalon
 
       def display_context_lines
 
-        bf, *rest = @es.context_scanners NUM_LINES_BEFORE__,
+        bf, *rest = @es.context_streams NUM_LINES_BEFORE__,
           @cm.match_index, NUM_LINES_AFTER__
 
         line_cache = []
@@ -163,8 +166,8 @@ module Skylab::BeautySalon
           line_cache.push _segmented_line
         end
         num_before_lines = line_cache.length
-        rest.each do |scan|
-          while segmented_line = scan.gets
+        rest.each do |stream|
+          while segmented_line = stream.gets
             line_cache.push segmented_line
           end
         end
@@ -184,17 +187,28 @@ module Skylab::BeautySalon
             when :normal
               seg.string
             when :original
-              BS_._lib.CLI_lib.pen.stylify ORIGINAL_STYLE__, seg.string
+              style_line_as_original seg.string
             when :replacement
-              BS_._lib.CLI_lib.pen.stylify REPLACEMENT_STYLE__, seg.string
+              style_line_as_replacement seg.string
             end
           end
-
           @serr.puts ( fmt % [ _line_no, _part_s_a.join( EMPTY_S_ ) ] )
-
         end
         nil
+      end
 
+      def style_line_as_original line
+        style_line line, ORIGINAL_STYLE__
+      end
+
+      def style_line_as_replacement line
+        style_line line, REPLACEMENT_STYLE__
+      end
+
+      def style_line line, style
+        line = line.dup
+        did = line.chomp!
+        "#{ BS_._lib.CLI_lib.pen.stylify style, line }#{ NEWLINE_ if did }"
       end
 
       NUM_LINES_BEFORE__ = NUM_LINES_AFTER__ = 2

@@ -329,7 +329,7 @@ module Skylab::Brazen
 
     def via_properties_init_ivars  # #note-360
       formal = self.class.properties
-      scn = formal.to_scan
+      scn = formal.to_stream
 
       stack = Brazen_::Entity.properties_stack.new nil, formal.get_names  # could pass evr
       bx = any_secondary_box

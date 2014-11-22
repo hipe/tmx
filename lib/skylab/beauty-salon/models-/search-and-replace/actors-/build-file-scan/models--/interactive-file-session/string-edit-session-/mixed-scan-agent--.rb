@@ -2,7 +2,7 @@ module Skylab::BeautySalon
 
   class Models_::Search_and_Replace
 
-    class Actors_::Build_file_scan
+    module Actors_::Build_file_scan
 
       class Models__::Interactive_File_Session
 
@@ -15,19 +15,19 @@ module Skylab::BeautySalon
               @string = x.string
             end
 
-            def build_line_scan
-              build_segmented_line_scan.map_by do |segmented_line|
+            def build_line_stream
+              build_segmented_line_stream.map_by do |segmented_line|
                 segmented_line.map do |seg|
                   seg.string
                 end * EMPTY_S_
               end
             end
 
-            def build_segmented_line_scan
-              scan = build_segment_scan
-              Callback_.scan do
+            def build_segmented_line_stream
+              stream = build_segment_stream
+              Callback_.stream do
                 line = nil
-                while seg = scan.gets
+                while seg = stream.gets
                   line ||= Segmented_Line_.new
                   line.push seg
                   if seg.has_delimiter
@@ -38,7 +38,7 @@ module Skylab::BeautySalon
               end
             end
 
-            def build_segment_scan
+            def build_segment_stream
               queue = []
               match = first_engaged_match
               next_begin_stop = @string.length
@@ -52,7 +52,7 @@ module Skylab::BeautySalon
                     queue.push seg_proc( next_begin, match.begin )
                   end
                   next_begin = match.next_begin
-                  queue.push match.to_replacement_segment_scan_proc
+                  queue.push match.to_replacement_segment_stream_proc
                   match = match.next_engaged_match
 
                 elsif next_begin != next_begin_stop
@@ -83,7 +83,7 @@ module Skylab::BeautySalon
                 end
               end
 
-              Callback_.scan do
+              Callback_.stream do
                 current_p[]
               end
             end

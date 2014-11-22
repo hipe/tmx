@@ -89,6 +89,10 @@ module Skylab::Brazen::TestSupport
   end
 
   module Fixtures
-    Callback_::Autoloader[ self ]
+    Callback_::Autoloader[ self ]  # don't load fixture file when autoloading lib
+  end
+
+  module Zerk
+    Callback_::Autoloader[ self ]  # don't load spec file when autoloading lib
   end
 end

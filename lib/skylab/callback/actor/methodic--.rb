@@ -537,7 +537,7 @@ module Skylab::Callback
         private
 
           def via_default_proc_and_is_required_normalize  # #note-515, :+#courtesy
-            scn = self.class.properties.to_scan
+            scn = self.class.properties.to_stream
             miss_a = nil
             while prop = scn.gets
               ivar = prop.as_ivar
@@ -573,7 +573,7 @@ module Skylab::Callback
           end
 
           def nilify_uninitialized_ivars  # :+#courtesy
-            scn = self.class.properties.to_scan
+            scn = self.class.properties.to_stream
             while prop = scn.gets
               instance_variable_defined? prop.as_ivar and next
               instance_variable_set prop.as_ivar, nil

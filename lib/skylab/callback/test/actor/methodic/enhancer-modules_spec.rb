@@ -118,7 +118,7 @@ module Skylab::Callback::TestSupport::Actor::Methodic::MP
           module_methods_module_for_write
           module ModuleMethods
             def required_properties_scan
-              properties.to_scan.reduce_by do |prop|
+              properties.to_stream.reduce_by do |prop|
                 prop.is_required
               end
             end

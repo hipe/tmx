@@ -61,7 +61,7 @@ module Skylab::Brazen
 
       def via_assignments
         init_child_name_map
-        scn = @assignments.to_scan
+        scn = @assignments.to_stream
         while @ast = scn.gets
           ok = via_ast
           ok or break

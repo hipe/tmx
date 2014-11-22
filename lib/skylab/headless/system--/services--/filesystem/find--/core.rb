@@ -53,7 +53,7 @@ module Skylab::Headless
         end
 
         DEFAULT_AS_NORMAL_VALUE_PROC__ = -> cmd do
-          cmd.to_scan.to_a  # #todo - not yet implemented, part of the grand unification
+          cmd.to_stream.to_a  # #todo - not yet implemented, part of the grand unification
         end
 
         DEFAULT_ON_EVENT_SELECTIVELY__ = -> i, * _, & ev_p do
@@ -103,7 +103,7 @@ module Skylab::Headless
           @any_valid_command_string
         end
 
-        def to_scan
+        def to_stream
           @any_valid_command_string and begin
             Find__::Build_scan__[ @on_event_selectively, @any_valid_command_string ]
           end

@@ -2,7 +2,7 @@ module Skylab::BeautySalon
 
   class Models_::Search_and_Replace
 
-    class Actors_::Build_file_scan
+    module Actors_::Build_file_scan
 
       class Models__::Interactive_File_Session
 
@@ -20,6 +20,7 @@ module Skylab::BeautySalon
           Callback_::Actor.methodic self, :simple, :properties,
 
             :property, :ruby_regexp,
+            :ignore, :grep_extended_regexp_string,
             :ignore, :do_highlight,
             :property, :max_file_size_for_multiline_mode,
             :property, :on_event_selectively

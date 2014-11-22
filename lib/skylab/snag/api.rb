@@ -136,7 +136,7 @@ module Skylab::Snag
       def initialize _API_client, mod
         @API_client = _API_client
         @module = mod ; sc = singleton_class
-        scan = mod.entry_tree.to_scan  # go deep into [cb] API
+        scan = mod.entry_tree.to_stream  # go deep into [cb] API
         while normpath = scan.gets
           name_i = normpath.name_i
           sc.send :define_method, :"#{ name_i }s", bld_reader( name_i )

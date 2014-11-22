@@ -1,3 +1,5 @@
+[#142]       #bibliographic-reference: _Cocoa Programming for Mac OS X_,
+               Aaron Hillegass & Adam Premble, 4th ed., Addison Wesley
 [#141]       #placeholder (working title: "the gobstopper mock cycle")
 [#140]       #parent-node:[#137] off-lining and on-lining ..
 [#139]       #parent-node:[#140] "un-refactor.."

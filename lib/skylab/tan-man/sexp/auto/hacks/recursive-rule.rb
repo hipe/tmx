@@ -398,7 +398,7 @@ module Skylab::TanMan
       end
 
 
-      tree_class.send :define_method, :to_scan do
+      tree_class.send :define_method, :to_stream do
         subsequent_p = nil
         p = -> do
           if self[ item ]  # else zero-width tree stub

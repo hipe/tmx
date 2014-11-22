@@ -53,11 +53,6 @@ module Skylab::BeautySalon
       Face__[]::CLI
     end
 
-    Open3 = Callback_.memoize do
-      require 'open3'
-      ::Open3
-    end
-
     Plugin = -> do
       Face__[]::Plugin
     end
@@ -84,6 +79,10 @@ module Skylab::BeautySalon
     String_scanner = Callback_.memoize do
       require 'strscan'
       ::StringScanner
+    end
+
+    String_lib = -> do
+      Bsc__[]::String
     end
 
     System = -> do

@@ -163,7 +163,7 @@ module Skylab::Brazen
         @partitions = Build_partitions__[ get_full_inferred_props_scan, self ]
       end
       def get_full_inferred_props_scan
-        scn = @properties.to_scan
+        scn = @properties.to_stream
         scn.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :ellipsis
       end
     public
@@ -345,7 +345,7 @@ module Skylab::Brazen
       end
       def get_full_inferred_props_scan
         scan = if @properties
-          @properties.to_scan
+          @properties.to_stream
         else
           Scan_[].via_nonsparse_array EMPTY_A_
         end
@@ -1087,7 +1087,7 @@ module Skylab::Brazen
       def fetch i
         @box.fetch i
       end
-      def to_scan
+      def to_stream
         scn = @box.to_value_scanner
         Scan_[].new do
           scn.gets

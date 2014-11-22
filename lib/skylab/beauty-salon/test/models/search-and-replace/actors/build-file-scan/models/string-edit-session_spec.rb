@@ -67,12 +67,12 @@ module Skylab::BeautySalon::TestSupport::Models::S_and_R::Actors_BFS
         m1.set_replacement_string "iguruma\nand PCRE are\n"
         m2.set_replacement_string "rx engines"
 
-        scan = es.to_line_scan
-        scan.gets.should eql "oniguruma\n"
-        scan.gets.should eql "and PCRE are\n"
-        scan.gets.should eql "two\n"
-        scan.gets.should eql "rx engines"
-        scan.gets.should be_nil
+        stream = es.to_line_stream
+        stream.gets.should eql "oniguruma\n"
+        stream.gets.should eql "and PCRE are\n"
+        stream.gets.should eql "two\n"
+        stream.gets.should eql "rx engines"
+        stream.gets.should be_nil
       end
 
       it "viewing context - minimal normal (note \"segmented line\" class)" do
@@ -87,7 +87,7 @@ module Skylab::BeautySalon::TestSupport::Models::S_and_R::Actors_BFS
         es = subject _input, /^ohai$/
         es.gets_match.set_replacement_string 'yerp'
 
-        bf, m, af = es.context_scanners 1, 0, 1
+        bf, m, af = es.context_streams 1, 0, 1
 
         line = bf.gets
         line.length.should eql 1
@@ -131,7 +131,7 @@ module Skylab::BeautySalon::TestSupport::Models::S_and_R::Actors_BFS
         es.match_at_index( 1 ).set_replacement_string "_2_and"
         es.match_at_index( 2 ).set_replacement_string "\nAND"
 
-        bf, m, af = es.context_scanners 2, 1, 2
+        bf, m, af = es.context_streams 2, 1, 2
 
         bf.gets.to_flat_sexp.should eql(
           [ :normal, 10, "one", :replacement, 0, 0, DELIMITER_ ] )
@@ -177,7 +177,7 @@ module Skylab::BeautySalon::TestSupport::Models::S_and_R::Actors_BFS
         es.gets_match.set_replacement_string "nelf 1\nnelf 2\nnelf 3"
         es.gets_match.should be_nil
 
-        bf, m, af = es.context_scanners 2, 1, 3
+        bf, m, af = es.context_streams 2, 1, 3
 
         bf.gets.to_flat_sexp.should eql(
           [ :replacement, 0, 8, "nourk 2\n" ] )
@@ -219,7 +219,7 @@ module Skylab::BeautySalon::TestSupport::Models::S_and_R::Actors_BFS
         es.gets_match.set_replacement_string 'JE'
         es.gets_match.set_replacement_string 'JIM'
 
-        bf, m, af = es.context_scanners 2, 1, 2
+        bf, m, af = es.context_streams 2, 1, 2
         bf.gets.to_flat_sexp.should eql [ :replacement, 0, 0, "JE", :normal, 2, " zoo\n" ]
         bf.gets.should be_nil
         m.gets.to_flat_sexp.should eql [ :replacement, 1, 0, "JIM", :normal, 10, "\n" ]
@@ -248,7 +248,7 @@ module Skylab::BeautySalon::TestSupport::Models::S_and_R::Actors_BFS
 
         es.gets_match.should be_nil
 
-        bf, m, af = es.context_scanners 2, 1, 2
+        bf, m, af = es.context_streams 2, 1, 2
         bf.gets.to_flat_sexp.should eql(
           [ :normal, 0, "zo ", :replacement, 0, 0, "JE", :normal, 5, " zoo\n" ] )
 
@@ -277,13 +277,13 @@ module Skylab::BeautySalon::TestSupport::Models::S_and_R::Actors_BFS
     end
 
     def subject * a
-      Subject_[]::Models__::Interactive_File_Session::String_Edit_Session_.new( * a )
+      Actors_[]::Build_file_scan::Models__::Interactive_File_Session::String_Edit_Session_.new( * a )
     end
 
     def expect_output es, string
       queue = string.split %r((?<=\n))
-      scan = es.to_line_scan
-      while line = scan.gets
+      stream = es.to_line_stream
+      while line = stream.gets
         expect = queue.shift
         if expect
           if line != expect

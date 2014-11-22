@@ -195,6 +195,8 @@ module Skylab::SubTree
         Tree::Traversal::Scanner_[ self, *a ]
       end
 
+      alias_method :get_traversal_stream, :get_traversal_scanner
+
       def longest_common_base_path
         if (( child = any_only_child ))
           res = [ child.slug ]

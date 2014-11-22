@@ -93,7 +93,7 @@ module Skylab::TanMan
           @fuzzy_matches_found = nil
           @has_neighbors = true
           @num_nodes_seen = 0
-          @scan = @stmt_list.to_scan
+          @scan = @stmt_list.to_stream
           @still_looking_for_lexically_greater = @can_create  # || @can_create.nil?
           init_matchers
         end

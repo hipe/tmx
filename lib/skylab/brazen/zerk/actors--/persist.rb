@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   module Zerk
 
-    class Actors__::Persist
+    class Actors__::Persist  # notes stow away in [#062] under the "3" suffix
 
       Callback_::Actor.call self, :properties,
         :path,
@@ -15,6 +15,11 @@ module Skylab::Brazen
         @children.each do |cx|
           pair = cx.to_marshal_pair
           pair or next
+
+          if UNDERSCORE_RX__ =~ pair.name_i   # note-023
+            pair.name_i = pair.name_i.id2name.gsub( UNDERSCORE_, DASH_ ).intern
+          end
+
           @pair_a.push pair
         end
         if @pair_a.length.zero?
@@ -23,6 +28,8 @@ module Skylab::Brazen
           when_some_fields
         end
       end
+
+      UNDERSCORE_RX__ = /_/
 
       def when_no_fields
         Brazen_::Lib_::System[].filesystem.normalization.unlink_file(

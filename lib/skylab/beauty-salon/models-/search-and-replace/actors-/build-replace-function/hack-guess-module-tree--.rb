@@ -216,7 +216,7 @@ module Skylab::BeautySalon
         end
 
         def via_from_tree
-          scn = @from_tree.get_traversal_scanner
+          scn = @from_tree.get_traversal_stream
           const_i_a = []
           final = Node__.new( nil, nil )
           parent_a = [ final ]

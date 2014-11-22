@@ -56,17 +56,17 @@ module Skylab::BeautySalon
       end
 
       def via_command_execute
-        @scan = @cmd.to_scan
+        @stream = @cmd.to_stream
         if @is_interactive
-          @scan and via_scan
+          @stream and via_stream
         else
-          @scan
+          @stream
         end
       end
 
-      def via_scan
+      def via_stream
         count = 0
-        while line = @scan.gets
+        while line = @stream.gets
           count += 1
           @serr.puts line
         end
@@ -152,40 +152,59 @@ module Skylab::BeautySalon
           end
         end
 
-        def build_counts_scan
+        def build_counts_stream
           ok = refresh_ivars
-          ok and via_ivars_build_path_scan_for :counts
+          ok and via_ivars_build_path_stream_for :counts
         end
 
-        def build_path_scan
+        def build_path_stream
           ok = refresh_ivars
-          ok and via_ivars_build_path_scan_for :paths
+          ok and via_ivars_build_path_stream_for :paths
         end
 
         def refresh_ivars
-          ok = refresh_upstream_path_scan
-          @regex = @parent.regexp_field.regexp
-          @regex && ok
+          ok = refresh_upstream_path_stream
+          ok and resolve_regexp_pair_array
         end
 
-        attr_reader :regex
+        def resolve_regexp_pair_array
+          grx_fld = @parent.grep_rx_field
+          if grx_fld.value_is_known
+            @regexp_pair_a = [ :grep_extended_regexp_string, grx_fld.value_string ]
+            ACHIEVED_
+          elsif (( fld = @parent.regexp_field )).value_is_known
+            @regexp_pair_a = [ :ruby_regexp, fld.regexp ]
+            ACHIEVED_
+          end
+        end
 
-        def refresh_upstream_path_scan
+        def refresh_upstream_path_stream
           cmd = @parent.parent[ :files ].build_command do end
-          @upstream_path_scan = cmd && cmd.to_scan
-          @upstream_path_scan ? ACHIEVED_ : UNABLE_
+          @upstream_path_stream = cmd && cmd.to_stream
+          @upstream_path_stream ? ACHIEVED_ : UNABLE_
         end
 
-        def via_ivars_build_path_scan_for mode_i
-          S_and_R_::Actors_::Build_grep_path_scan.with(
-            :upstream_path_scan, @upstream_path_scan,
-            :ruby_regexp, @regex,
+        def via_ivars_build_path_stream_for mode_i
+          S_and_R_::Actors_::Build_grep_path_stream.with(
+            :upstream_path_stream, @upstream_path_stream,
+            * @regexp_pair_a,
             :mode, mode_i,
-            :on_event_selectively, handle_unsigned_event_selectively )
+            :on_event_selectively, method( :maybe_receive_grep_event ) )
+        end
+
+        def maybe_receive_grep_event * i_a, & ev_p
+          if :grep_command_head == i_a.last && @is_interactive
+            ev = ev_p[]
+            @serr.puts
+            @y << "(grep command head: #{ ev.command_head })"
+            ev.ok
+          else
+            maybe_send_event_via_channel i_a, & ev_p
+          end
         end
 
         def release_resources
-          @upstream_path_scan.receive_signal :release_resource
+          @upstream_path_stream.receive_signal :release_resource
         end
       end
 
@@ -201,10 +220,10 @@ module Skylab::BeautySalon
           end
         end
 
-        def build_path_scan
+        def build_path_stream
           maybe_send_event :error do
             BS_._lib.event_lib.inline_not_OK_with(
-              :not_yet_implemented, :method_name, :build_path_scan )
+              :not_yet_implemented, :method_name, :build_path_stream )
           end
           UNABLE_
         end
@@ -230,8 +249,8 @@ module Skylab::BeautySalon
         end
 
         def receive_focus
-          @scan = against_empty_iambic_stream
-          @scan and via_scan
+          @stream = against_empty_iambic_stream
+          @stream and via_stream
           change_focus_to @parent
           ACHIEVED_
         end
@@ -239,16 +258,16 @@ module Skylab::BeautySalon
       private
 
         def against_empty_iambic_stream
-          @paths_agent_group.active_boolean.build_path_scan
+          @paths_agent_group.active_boolean.build_path_stream
         end
 
-        def via_scan
+        def via_stream
           count = 0
-          line =  @scan.gets
+          line =  @stream.gets
           while line
             count += 1
             @serr.puts line
-            line = @scan.gets
+            line = @stream.gets
           end
           @serr.puts
           y = @y
@@ -283,8 +302,8 @@ module Skylab::BeautySalon
         end
 
         def receive_focus
-          @scan = @grep_boolean_field.build_counts_scan
-          @scan and via_scan
+          @stream = @grep_boolean_field.build_counts_stream
+          @stream and via_stream
           change_focus_to @parent
           ACHIEVED_
         end
@@ -292,17 +311,17 @@ module Skylab::BeautySalon
       private
 
         def against_empty_iambic_stream
-          @grep_boolean_field.build_counts_scan
+          @grep_boolean_field.build_counts_stream
         end
 
-        def via_scan
+        def via_stream
           match_count = file_count = 0
-          item = @scan.gets
+          item = @stream.gets
           while item
             file_count += 1
             match_count += item.count
             @serr.puts "#{ item.path }:#{ item.count }"
-            item = @scan.gets
+            item = @stream.gets
           end
           @serr.puts
           y = @y
@@ -338,7 +357,7 @@ module Skylab::BeautySalon
         end
 
         def receive_focus
-          resolve_file_scan && execute_via_file_scan_when_interactive
+          resolve_file_stream && execute_via_file_stream_when_interactive
         end
 
         def to_marshal_pair
@@ -347,61 +366,117 @@ module Skylab::BeautySalon
       private
 
         def against_empty_iambic_stream
-          resolve_file_scan && execute_via_file_scan_when_non_interactive
+          resolve_file_stream && execute_via_file_stream_when_non_interactive
         end
 
-        def resolve_file_scan
-          rslv_file_scan_ivars && via_file_scan_ivars_resolve_file_scan
+        def resolve_file_stream
+          rslv_file_stream_ivars && via_file_stream_ivars_resolve_file_stream
         end
 
-        def rslv_file_scan_ivars
-          @path_scan = @paths_agent_group.active_boolean.build_path_scan
-          @regex = @parent.regexp_field.regexp
-          @path_scan && @regex && ACHIEVED_
+        def rslv_file_stream_ivars
+          @path_stream = @paths_agent_group.active_boolean.build_path_stream
+          @path_stream && resolve_regexp_ivars
         end
 
-        def via_file_scan_ivars_resolve_file_scan
-          @file_scan = S_and_R_::Actors_::Build_file_scan.with(
-            :upstream_path_scan, @path_scan,
-            :ruby_regexp, @regex,
-            :do_highlight, ( @is_interactive && @serr.tty? ),
+        def resolve_regexp_ivars
+
+          fld = @parent.regexp_field
+          if fld.value_is_known
+            grx_fld = @parent.grep_rx_field
+            @gers = if grx_fld.value_is_known
+              grx_fld.value_string
+            end
+            @rrx = fld.regexp
+            ACHIEVED_
+          end
+        end
+
+        def via_file_stream_ivars_resolve_file_stream
+
+          _do_highlight = @is_interactive && @serr.tty?
+          _oes = handle_unsigned_event_selectively
+
+          @file_stream = S_and_R_::Actors_::Build_file_stream.with(
+            :upstream_path_stream, @path_stream,
+            :ruby_regexp, @rrx,
+            :grep_extended_regexp_string, @gers,
+            :do_highlight, _do_highlight,
             for_interactive_search_and_replace_or_read_only,
-            :on_event_selectively, handle_unsigned_event_selectively )
-          @file_scan && ACHIEVED_
+            :on_event_selectively, _oes )
+
+          @file_stream && ACHIEVED_
         end
 
         def for_interactive_search_and_replace_or_read_only
           :read_only
         end
 
-        def execute_via_file_scan_when_interactive
+        def execute_via_file_stream_when_interactive
 
           @serr.puts  # :+#aesthetics :/
 
-          file = @file_scan.gets
+          file = @file_stream.gets
           if file
-            did_see = true
+            did_see_file = true
           end
 
+          file_count = 0
           while file
-            scn = file.to_read_only_match_scan
-            while match = scn.gets
-              @serr.puts match.render_line
+            file_count += 1
+            scn = file.to_read_only_match_stream
+            match = scn.gets
+            if match
+              did_see_match = true
+              display_matches match, scn
             end
-            file = @file_scan.gets
+            file = @file_stream.gets
           end
 
-          if ! did_see
-            @y << "no files match against the pattern."
-          end
+          summarize did_see_file, did_see_match, file_count
 
           change_focus_to @parent
           ACHIEVED_
         end
 
-        def execute_via_file_scan_when_non_interactive
-          @file_scan.expand_by do |file|
-            file.to_read_only_match_scan
+        def display_matches match, scn
+          @match_path = match.path
+          @subsequent_line_header = "#{ SPACE_ * ( @match_path.length + 1 ) }"  # for colon
+          begin
+            display_match match
+            match = scn.gets
+          end while match
+        end
+
+        def display_match match
+          stream = match.to_line_stream
+          current_line = match.line_number
+          line = stream.gets
+          @serr.puts "#{ @match_path }:#{ current_line }:#{ line }"
+          while line = stream.gets
+            current_line += 1
+            @serr.puts "#{ @subsequent_line_header }#{ current_line }:#{ line }"
+          end
+        end
+
+        def summarize did_see_file, did_see_match, file_count
+          if ! did_see_file
+            @y << "no files match against the grep pattern"
+          elsif ! did_see_match
+            y = @y
+            expression_agent.calculate do
+              if 1 == file_count
+                y << "in the 1 file that was opened, there were no matches"
+              else
+                y << "none of the #{ file_count } #{
+                  }#{ plural_noun 'file', file_count } matched the pattern"
+              end
+            end
+          end ; nil
+        end
+
+        def execute_via_file_stream_when_non_interactive
+          @file_stream.expand_by do |file|
+            file.to_read_only_match_stream
           end
         end
       end
@@ -441,7 +516,7 @@ module Skylab::BeautySalon
         def next_file_or_finished
           if @next_file_ES
             @current_file_ES = @next_file_ES
-            @next_file_ES = @file_scan.gets
+            @next_file_ES = @file_stream.gets
             @node_with_focus = build_edit_file_agent
             ACHIEVED_
           else
@@ -492,7 +567,7 @@ module Skylab::BeautySalon
             ok or break
 
             begin
-              es = @file_scan.gets
+              es = @file_stream.gets
               es or break
             end until es.has_at_least_one_match
 
@@ -545,7 +620,7 @@ module Skylab::BeautySalon
 
         def release_resources
           ok = @paths_agent_group.active_boolean.release_resources
-          ok_ = @path_scan.receive_signal :release_resource
+          ok_ = @path_stream.receive_signal :release_resource
           ok && ok_ and begin
             if @is_interactive
               @y << "(released any `find` or `grep` resources.)"
@@ -556,9 +631,9 @@ module Skylab::BeautySalon
 
       private
 
-        def execute_via_file_scan_when_interactive
-          @current_file_ES = @file_scan.gets
-          @next_file_ES = @file_scan.gets
+        def execute_via_file_stream_when_interactive
+          @current_file_ES = @file_stream.gets
+          @next_file_ES = @file_stream.gets
           if @current_file_ES
             when_files
           else
@@ -574,7 +649,7 @@ module Skylab::BeautySalon
           ACHIEVED_
         end
 
-        def execute_via_file_scan_when_non_interactive
+        def execute_via_file_stream_when_non_interactive
 
           func = replace_function
 
@@ -582,8 +657,8 @@ module Skylab::BeautySalon
             BS_._lib.system.defaults.dev_tmpdir_path,
             handle_unsigned_event_selectively )
 
-          @file_scan.expand_by do |edit_session|
-            Callback_.scan do
+          @file_stream.expand_by do |edit_session|
+            Callback_.stream do
               match = edit_session.gets_match
               if match
                 string = func.call match.md

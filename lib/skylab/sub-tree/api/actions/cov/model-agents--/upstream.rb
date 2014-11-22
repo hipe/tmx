@@ -114,7 +114,7 @@ module Skylab::SubTree
             :on_event_selectively,
               selective_listener_for_find.method( :maybe_receive_event ),
             :as_normal_value, -> command do
-              command.to_scan
+              command.to_stream
             end )
           nil
         end

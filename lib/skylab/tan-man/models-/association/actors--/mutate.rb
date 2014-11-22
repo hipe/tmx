@@ -26,7 +26,7 @@ module Skylab::TanMan
       def rslv_stmt_list_and_scan
         @stmt_list = @datastore.graph_sexp.stmt_list
         if @stmt_list
-          @scan = @stmt_list.to_scan
+          @scan = @stmt_list.to_stream
           ACHIEVED_
         elsif :delete == @verb
           when_no_stmt_list

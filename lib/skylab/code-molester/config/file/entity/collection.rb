@@ -285,7 +285,7 @@ module Skylab::CodeMolester
     def hot_entity_scan_via_sections sects
       rx = entity_story.config_section_rx
       fly = entity_story.flyweight_class.new
-      _scan = sects.to_scan
+      _scan = sects.to_stream
       _scan.map_reduce_by do |sect|
         md = rx.match sect.item_name
         if md

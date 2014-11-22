@@ -173,6 +173,10 @@ module Skylab::BeautySalon
 
       # ~ messages received as parent from children
 
+      def grep_rx_field
+        @parent.grep_rx_field
+      end
+
       def regexp_field
         @parent.regexp_field
       end
@@ -230,6 +234,7 @@ module Skylab::BeautySalon
       def prepare_for_focus
 
         @children = [
+          @grep_rx_field = Grep_RX_Field__.new( self ),
           @regexp_field = Search_Field__.new( self ),
           @replace_field = Replace_Field__.new( self ),
           @dirs_field = Dirs_Field__.new( self ),
@@ -264,9 +269,94 @@ module Skylab::BeautySalon
 
     public
 
-      attr_reader :dirs_field, :files_field, :regexp_field,
+      attr_reader :dirs_field, :files_field, :grep_rx_field, :regexp_field,
         :replace_field, :work_dir
 
+    end
+
+    class Grep_RX_Field__ < Field_
+
+      def initialize x
+        super
+        @s = nil
+      end
+
+      def to_body_item_value_string
+        if @s
+          @s
+        else
+          "(defaults to the same pattern as below)"
+        end
+      end
+
+      def display_description
+        @serr.puts
+        engine = 'oniguruma'
+        other = Search_Field__.name_function.as_slug
+        @y << "`grep` is used to cull the stream of files that `find` finds"
+        @y << "down to only those files that contain the pattern (according"
+        @y << "to grep). each such file is opened and searched (again) for"
+        @y << "the pattern (but this time possibly with the file treated"
+        @y << "as one big string, and with a \"native\" \"platform\""
+        @y << "(currently \"#{ engine }\" regex, in a manner that possibly"
+        @y << "grep does not support (for example with multiline"
+        @y << "matching)). so this grep step amounts to an experimental"
+        @y << "optimization that saves us the considerable resource"
+        @y << "overhead of having to open every file that `find` finds."
+        @y << nil
+        @y << "if left empty, at execution time this field will effectively"
+        @y << "default to the `.source` value of the (native) '#{ other }'"
+        @y << "which works surprisingly often but certainly not always."
+        @y << nil
+        @y << "if the pattern that you need `grep` to use differs from the"
+        @y << "pattern to be used to edit the individual files (for example"
+        @y << "because of incompatible syntaxes between grep's \"extended\" regex"
+        @y << "syntax and e.g the #{ engine } engine, or because multiline"
+        @y << "behavior is desired but grep only operates on one line at a time)"
+        @y << "whatever you enter here will be shellescaped at passed"
+        @y << "to the grep `-E` argument."
+        @y << nil
+        @y << "you can make this far simpler than your '#{ other }' regex"
+        @y << "and things should still work - it is simply a way to decice"
+        @y << "which files to bother with opening."
+        @y << nil
+      end
+
+      def know_via_nonblank_mutable_string s
+        marshal_load s
+      end
+
+      def against_nonempty_iambic_stream stream
+        against_nonempty_iambic_stream_assume_string stream
+      end
+
+      def marshal_load s
+        @s = s
+        ACHIEVED_
+      end
+
+      def value_is_known
+        ! @s.nil?
+      end
+
+      def when_entered_nonzero_length_blank_string
+        when_deleted
+      end
+
+      def unknow_value
+        @s = nil
+        ACHIEVED_
+      end
+
+      def to_marshal_pair
+        if @s
+          Callback_.pair.new @s, name_i
+        end
+      end
+
+      def value_string
+        @s
+      end
     end
 
     class Search_Field__ < Field_
@@ -294,22 +384,8 @@ module Skylab::BeautySalon
         @y << nil
       end
 
-      def when_entered_nonzero_length_blank_string
-        when_deleted
-      end
-
-      def unknow_value
-        @rx = nil
-        ACHIEVED_
-      end
-
-      def against_nonempty_iambic_stream scan
-        @rx = scan.gets_one
-        ACHIEVED_
-      end
-
-      def via_line_know_value
-        @rx = ::Regexp.new @line
+      def know_via_nonblank_mutable_string s
+        @rx = ::Regexp.new s
         ACHIEVED_
       rescue ::RegexpError => @e
         _ = Callback_::Name.via_module( @e.class ).as_human
@@ -317,10 +393,9 @@ module Skylab::BeautySalon
         PROCEDE_
       end
 
-      def to_marshal_pair
-        if @rx
-          Callback_.pair.new @rx.inspect, name_i
-        end
+      def against_nonempty_iambic_stream stream
+        @rx = stream.gets_one
+        ACHIEVED_
       end
 
       def marshal_load s, & p
@@ -331,8 +406,23 @@ module Skylab::BeautySalon
         @rx and ACHIEVED_
       end
 
+      def to_marshal_pair
+        if @rx
+          Callback_.pair.new @rx.inspect, name_i
+        end
+      end
+
       def value_is_known
         ! @rx.nil?
+      end
+
+      def when_entered_nonzero_length_blank_string
+        when_deleted
+      end
+
+      def unknow_value
+        @rx = nil
+        ACHIEVED_
       end
 
       # ~ for children
@@ -349,10 +439,6 @@ module Skylab::BeautySalon
         super
       end
 
-      def replace_function
-        @o
-      end
-
       def to_body_item_value_string
         if @o
           @o.as_text
@@ -361,34 +447,25 @@ module Skylab::BeautySalon
         end
       end
 
-      def when_entered_nonzero_length_blank_string
-        when_deleted
+      def display_description
+        @y << nil
+        @y << "example: foo{{ $1.bar }} baz {{ $2.downcase }}"
+        @y << "content in between the \"{{\" and \"}}\" is our pseudo-DSL:"
+        @y << "$1, $2 etc are the captures in your expression."
+        @y << "`bar` and `downcase` are \"functions\" (called as chainable"
+        @y << "methods), either builtin (like `upcase`, `downcase`) or"
+        @y << "user-provided."
+        @y << nil
       end
 
-      def against_nonempty_iambic_stream scan
-        know_via_string scan.gets_one
-      end
-
-      def via_line_know_value
-        s = @line ; @line = nil
-        know_via_string s
-      end
-
-      def know_via_string s
+      def know_via_nonblank_mutable_string s
         @o = S_and_R_::Actors_::Build_replace_function[
           s, work_dir, handle_unsigned_event_selectively ]
         @o ? ACHIEVED_ : UNABLE_
       end
 
-      def unknow_value
-        @o = nil
-        ACHIEVED_
-      end
-
-      def to_marshal_pair
-        if @o
-          Callback_.pair.new @o.marshal_dump, name_i
-        end
+      def against_nonempty_iambic_stream stream
+        against_nonempty_iambic_stream_assume_string stream
       end
 
       def marshal_load s, & ep
@@ -402,8 +479,29 @@ module Skylab::BeautySalon
         @o ? ACHIEVED_ : UNABLE_
       end
 
+      def to_marshal_pair
+        if @o
+          Callback_.pair.new @o.marshal_dump, name_i
+        end
+      end
+
       def value_is_known
         ! @o.nil?
+      end
+
+      def when_entered_nonzero_length_blank_string
+        when_deleted
+      end
+
+      def unknow_value
+        @o = nil
+        ACHIEVED_
+      end
+
+      # ~ for children
+
+      def replace_function
+        @o
       end
     end
 
@@ -434,29 +532,13 @@ module Skylab::BeautySalon
 
       def prompt_when_value
         @serr.write "new #{ noun } (nothing to cancel, space(s) to remove): "
+        @serr.flush
         PROCEDE_
       end
 
-      def when_entered_nonzero_length_blank_string
-        when_deleted
-      end
-
-      def against_nonempty_iambic_stream scan
-        s = scan.gets_one
-        if SOME_SPACE_RX_ =~ s
-          maybe_send_event :error do
-            build_not_OK_event_with :only_single_item_for_now, :s, s
-          end
-          UNABLE_
-        else
-          @a = [ s ]
-          ACHIEVED_
-        end
-      end
-
-      def via_line_know_value
-        @line.strip!
-        a = @line.split SOME_SPACE_RX_
+      def know_via_nonblank_mutable_string s
+        s.strip!
+        a = s.split SOME_SPACE_RX_
         if a.length.zero?
           @a = nil
           UNABLE_
@@ -466,14 +548,16 @@ module Skylab::BeautySalon
         end
       end
 
-      def unknow_value
-        @a = nil
-        ACHIEVED_
-      end
-
-      def to_marshal_pair
-        if @a
-          Callback_.pair.new @a.join( SPACE_ ), name_i
+      def against_nonempty_iambic_stream stream
+        s = stream.gets_one
+        if SOME_SPACE_RX_ =~ s
+          maybe_send_event :error do
+            build_not_OK_event_with :only_single_item_for_now, :s, s
+          end
+          UNABLE_
+        else
+          @a = [ s ]
+          ACHIEVED_
         end
       end
 
@@ -488,11 +572,26 @@ module Skylab::BeautySalon
         ACHIEVED_
       end
 
-      SOME_SPACE_RX_ = /[[:space:]]+/
+      def to_marshal_pair
+        if @a
+          Callback_.pair.new @a.join( SPACE_ ), name_i
+        end
+      end
 
       def value_is_known
         ! @a.nil?
       end
+
+      def when_entered_nonzero_length_blank_string
+        when_deleted
+      end
+
+      def unknow_value
+        @a = nil
+        ACHIEVED_
+      end
+
+      SOME_SPACE_RX_ = /[[:space:]]+/
     end
 
     THING_ABOUT_SPACES__ =
@@ -535,6 +634,9 @@ module Skylab::BeautySalon
         nil
       end
 
+      def to_body_item_value_string
+      end
+
       def prepare_for_focus
         mod = S_and_R_::Preview_Agent_Children__
         @my_files_agent = mod::Files_Node.new self
@@ -560,15 +662,12 @@ module Skylab::BeautySalon
           @parent_dirs_field.value_is_known
       end
 
-      def to_body_item_value_string
-      end
-
-      def to_marshal_pair
-      end
-
       def prompt
         @serr.puts  # :+#aesthetics - our items list is too busy, needs more space :/
         super
+      end
+
+      def to_marshal_pair
       end
 
     private
@@ -603,7 +702,14 @@ module Skylab::BeautySalon
       end
     end
 
+    module Actors_
+      Autoloader_[ self ]
+      stowaway :Build_file_stream, 'build-file-scan'
+      stowaway :Build_grep_path_stream, 'build-grep-path-scan'
+    end
+
     EMPTY_A_ = [].freeze
+    EMPTY_RX_ = /\A[[:space:]]*\z/
     FINISHED_ = nil
     NONE_S_ = Zerk_::NONE_S
     S_and_R_ = self

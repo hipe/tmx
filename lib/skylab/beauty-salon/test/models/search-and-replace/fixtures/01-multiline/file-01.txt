@@ -1,0 +1,13 @@
+xx
+
+ foo(
+   bar
+ ) # baz
+
+ohai
+
+fizz(  # biff
+  boffo
+)
+
+bango

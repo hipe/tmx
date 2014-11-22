@@ -78,7 +78,7 @@ module Skylab::TanMan
     def get_stmt_scan
       sl = stmt_list
       if sl
-        sl.to_scan
+        sl.to_stream
       else
         Scan_[].the_empty_scan
       end

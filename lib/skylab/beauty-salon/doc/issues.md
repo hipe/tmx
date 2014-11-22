@@ -1,3 +1,5 @@
+[#025] #open have the multiple forms save to one file
+[#024] #open explicit choice of single line v. multiline
 [#023] #open support for spaces in list items
 [#022] #open make this one button with three labels instead of three buttons
 [#021] #open should check mtime before write, abort for that file if stale

@@ -5,7 +5,7 @@
 this is not intended to read/edit git config files per se. it is intended
 to be a library used for creating new, modifying existing and reading from
 existing config files; config files that happen to try and immitate the
-syntax from the git cofig files.
+syntax of git config files.
 
 we implement our rendition of the *git* config file syntax speficially
 because it is complex enough for our needs without being too complex, it

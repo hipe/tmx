@@ -4,67 +4,103 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
 
   describe "[bs] search and replace - interactive" do
 
+    BS_._lib.brazen.test_support::Zerk::Expect_Interactive[ self ]
+
     extend TS_
 
     context "counts" do
 
-      _LAST_ITEM_RX = %r(\A[ ]+files[ ])
+      _COMMON_FIELD_PROMPT_ENDING = ' (nothing to cancel): '
+      _COMMON_BRANCH_PROMPT_ENDING = ' [q]uit: '
+
+      # the following two lines are used by a test in this file:
+      # hinkenlooper
+      # hinkenlooper
 
       it "testing interactivity is possble but cumbersome" do
+        t = ::Time.now
 
-        start_session existent_tmpdir_path
-        o = @session
-        o.expect_line_eventually _LAST_ITEM_RX
+        start_interactive_session existent_empty_tmpdir_path
 
-        o.puts 'search'
-        o.puts '\bhinkenlooper\b'
+        expect_screen_ending_with _COMMON_BRANCH_PROMPT_ENDING
 
-        o.puts 'dirs'
-        o.puts TS_.dir_pathname.to_path
-        o.expect_line_eventually _LAST_ITEM_RX
+        enter_field_selector 'search'
 
-        o.puts 'files'
-        o.puts '*.rb'
-        o.expect_line_eventually _LAST_ITEM_RX
-
-        o.puts 'preview'
-        o.expect_line_eventually %r(\A[ ]+matches[ ])
-
-        o.puts 'matches'
-        o.expect_line_eventually %r(\A[ ]+ruby[ ])
-
-        o.puts 'grep'
-        o.expect_line_eventually %r(\A[ ]+grep[ ]+ON\b)
-        o.expect_line_eventually %r(\A[ ]+matches[ ])
-
-        o.gets.should eql NEWLINE_
-
-        o.puts 'counts'
-
-        line = o.gets
-        line.should match %r(\bgrep -E\b)
-
-        line = o.gets
-        line.chop!
-
-        totals = o.gets
-        if NEWLINE_ == totals
-          totals = o.gets
+        @session.puts '\bhinkenlooper\b'  # hackishly we assert that the file is written
+        in_lines do |lines|
+          lines.advance_one
+          string = lines.gets_one
+          rx = %r(\Acreating 束[^損]+損 \.\. done\.$)  # how do we match « » :+#guillemets ?
+          require 'kconv'
+          string.toutf8.should match rx
         end
 
-        totals.chop!
+        enter_field 'dirs', TS_.dir_pathname.to_path
 
-        # hinkenlooper
-        # hinkenlooper
+        enter_field 'files', '*.rb'
 
-        totals.should eql '(2 matches in 1 file)'
+        enter_navigation_step 'preview'
+        in_screen do
+          expect_string %r(^[ ]+matches[ ])
+        end
 
-        expect_line = "#{ ::File.expand_path( __FILE__ ) }:2"
+        enter_navigation_step 'matches'
+        in_screen do
+          expect_string %r(^[ ]+ruby[ ])
+        end
 
-        line.should eql expect_line
+        push_button 'grep'
+        in_screen do
+          expect_string %r(^[ ]+grep[ ]+ON\b)
+        end
 
-        o.close
+        push_button 'counts'
+        flush_to_lines_screen_ending_with _COMMON_BRANCH_PROMPT_ENDING
+        @session.close
 
+        after_any_blanks_expect_line %r(\A\(grep command head: grep -E )
+        after_any_blanks_expect_line "#{ ::File.expand_path( __FILE__ ) }:2\n"
+        after_any_blanks_expect_line "(2 matches in 1 file)\n"
+
+        expect_blank_line
+        expect_several_more_lines
+
+        t = ::Time.now - t
+        $stderr.puts "(that cumbersome single test took #{ t } seconds.)"
+      end
+
+      def enter_navigation_step s
+        @session.puts s
+      end
+
+      def push_button s
+        @session.puts s
+      end
+
+      define_method :in_lines do | & p |
+        in_lines_of_screen_ending_with _COMMON_BRANCH_PROMPT_ENDING, & p
+      end
+
+      define_method :in_screen do | & p |
+        in_screen_ending_with _COMMON_BRANCH_PROMPT_ENDING, & p
+      end
+
+      def enter_field name, value
+        enter_field_selector name
+        enter_field_value value
+        nil
+      end
+
+      define_method :enter_field_selector do |name|
+        @session.puts name
+        expect_screen_ending_with _COMMON_FIELD_PROMPT_ENDING
+        nil
+      end
+
+      define_method :enter_field_value do |value|
+        @session.puts value
+        expect_screen_ending_with _COMMON_BRANCH_PROMPT_ENDING
+        nil
       end
     end
   end

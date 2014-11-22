@@ -35,6 +35,8 @@ better this time.
   in these kind of objects, arguments are a (non-iambic) (positional)
   arglist. must not be used for non-proc-like classes. :+[#020]
 
++ `dup_with` - more explicit alias of `with`
+
 + `execute` has a strict API meaning for a lot of our libraries as the
   one #hook-out method the client must supply. it must take no
   arguments. [#cb-042] actors exemplify these semantics, as well as many
@@ -46,7 +48,7 @@ better this time.
 
 + `get_` - result is the result object of having allocated new memory
   for and initialized an object that is either of a native "primitive
-  data structure or type" or a ubiquitous low-level utilty class (scan,
+  data structure or type" or a ubiquitous low-level utilty class (stream,
   box, hash, array etc). see [#094] dedicated section on this. this method
   must have no side-effects.
 
@@ -98,7 +100,8 @@ better this time.
 + `with` - arguments must be treated as a literal [#cb-046] iambic phrase.
   must have no side-effects on the receiver, instead the result must be
   a dup of the receiver that has been transformed as is described by the
-  iambic argument phrase.
+  iambic argument phrase. (call it `dup_with` to be more explicit but
+  #todo let's pick one or the other)
   (use the never-been-used-before `_who_has` to mutate the receiver.)
 
 + `work` is our "go-to" name for the interesting body of ..er.. work
@@ -115,8 +118,9 @@ better this time.
   is `foo`, `bar`, or both.
 
   the first form (`to_`) is used in the platform idiomatic way, e.g
-  `to_a` etc.  `to_scan` is a popular one in this universe (note it used
-   to be `get_scan`, i.e uses the same semantics as `get_`).
+  `to_a` etc. `to_stream` is a popular one in this universe (it used
+  to be `to_scan`, and before that `get_scan`, and still it has the
+  same underlying sematics as the `get_` prefix).
 
 
 
@@ -125,15 +129,15 @@ better this time.
 ### the `get_` prefix semantics as a nod to an ObjC convention :[#094]
 
 it is perhaps a misunderstanding of the convention, but we base these
-semantics off of something we read in the hilleglas book: "In the common
+semantics off of something we read in the [#sk-142] hilleglas book: "In the common
 idioms of Objective-C, a method prefixed with `get` takes an address
 where data can be copied. [..]" [3][3]  We take a very liberal
 interpretatin of this convention to make it one of ours: whereas in the
 Obj-C case the `get_` method presumably allocates memory to carry out
 the said copying, we use the `get_` prefix to apply more broadly to all
-of those to all of those methods that allocate memory towards their result
-object and are not already covered by `build_` (that is, the simpler
-ones).
+of those methods that allocate memory towards their result
+object and are not already covered by `build_` (that is, this convention
+is for the simpler operations, `build_` is for the more complex ones.)
 
 
 

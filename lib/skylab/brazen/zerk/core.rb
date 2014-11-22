@@ -148,6 +148,12 @@ module Skylab::Brazen
 
       # `prompt` defined by child classes
 
+      def write_and_flush s  # for testing it is necessary to flush explicitly
+        @serr.write s
+        @serr.flush
+        nil
+      end
+
       def block_for_response
         receive_mutable_input_line @sin.gets
       end
@@ -307,7 +313,7 @@ module Skylab::Brazen
       end
 
       def prompt
-        @serr.write "#{ build_prompt_line }: "
+        write_and_flush "#{ build_prompt_line }: "
         PROCEDE_
       end
 
@@ -380,13 +386,10 @@ module Skylab::Brazen
       #   `value_is_known` - will be used for prompt behavior, perhaps
       #                      used by custom branch nodes
       #
-      #   `via_line_know_value` -  attempt to normalize and memoize the
-      #                            string in @line. result is treated as
-      #                            boolean-ish with true-ish as success.
-      #                            on failure, default behavior is to stay.
+      #   `know_via_nonblank_mutable_string` - #note-390
       #
-      #   `unknow_value` - when opt-in delete is used, un-memoize
-      #                    the value. result is not regarded.
+      #   `unknow_value` - called when opt-in delete is used.
+      #                    un-memoize the value. result is not regarded.
       #
       #   `to_marshal_pair` - false-ish means "do not persist". must look
       #                       like [#cb-055] pair. justification at #note-222.
@@ -396,6 +399,99 @@ module Skylab::Brazen
 
 
     private
+
+      # ~ displaying the prompt (for interactive mode)
+
+      def prompt
+        if value_is_known
+          prompt_when_value
+        else
+          prompt_when_no_value
+        end
+      end
+
+      def prompt_when_value  #:+public-API
+        write_and_flush "new #{ noun } (nothing to cancel): "
+        PROCEDE_
+      end
+
+      def prompt_when_no_value
+        write_and_flush "#{ noun } (nothing to cancel): "
+        PROCEDE_
+      end
+
+      public def noun
+        s = self.class::NOUN___
+        s || "'#{ @name.as_human }' value"
+      end
+
+      NOUN___ = nil
+
+      # ~ processing input (from three sources)
+
+      def receive_mutable_input_line line
+        @line = line
+        @line.chomp!
+        if @line.length.zero?
+          when_entered_zero_length_string
+        elsif BLANK_RX_ =~ @line
+          when_entered_nonzero_length_blank_string
+        else
+          when_entered_string_with_content
+        end
+      end
+
+      def against_nonempty_iambic_stream_assume_string scan
+        s = scan.gets_one
+        if s.length.zero?
+          when_passed_zero_length_string
+        elsif BLANK_RX_ =~ s
+          when_passed_nonzero_length_blank_string s
+        else
+          when_passed_string_with_content s
+        end
+      end
+
+      def when_entered_zero_length_string
+        when_cancelled
+      end
+
+      def when_passed_zero_length_string
+        maybe_send_event :error, :invalid_property_value, :empty_string_is_meaningless  # #open :+[#066]
+        UNABLE_
+      end
+
+      def when_entered_nonzero_length_blank_string
+        # it's tempting to make this a "delete" but also kinda nasty -
+        # such behavior should be opt-in, lest it is produced accidentally
+        when_cancelled
+      end
+
+      def when_passed_nonzero_length_blank_string s
+        maybe_send_event :error, :invalid_property_value, :blank_string_is_meaningless  # #open :+[#066]
+        UNABLE_
+      end
+
+      def when_cancelled
+        @y << "edit #{ slug } cancelled."
+        change_focus_to @parent
+        ACHIEVED_
+      end
+
+      def when_entered_string_with_content
+        s = @line ; @line = nil
+        ok = know_via_nonblank_mutable_string s  # (hook-out)
+        if ok
+          when_value_changed
+        else
+          PROCEDE_
+        end
+      end
+
+      def when_passed_string_with_content s
+        ok = know_via_nonblank_mutable_string s
+        ok and when_value_changed
+      end
 
       def against_empty_iambic_stream
         maybe_send_event :error do
@@ -412,71 +508,6 @@ module Skylab::Brazen
         end
       end
 
-      # ~ displaying the prompt
-
-      def prompt
-        if value_is_known
-          prompt_when_value
-        else
-          prompt_when_no_value
-        end
-      end
-
-      def prompt_when_value  #:+public-API
-        @serr.write "new #{ noun } (nothing to cancel): "
-        PROCEDE_
-      end
-
-      def prompt_when_no_value
-        @serr.write "#{ noun } (nothing to cancel): "
-        PROCEDE_
-      end
-
-      public def noun
-        s = self.class::NOUN___
-        s || "'#{ @name.as_human }' value"
-      end
-
-      NOUN___ = nil
-
-      # ~ blocking for & processing the response
-
-      def receive_mutable_input_line line
-        @line = line
-        @line.chomp!
-        if @line.length.zero?
-          when_entered_zero_length_string
-        else
-          when_entered_nonzero_length_string
-        end
-      end
-
-      def when_entered_zero_length_string
-        when_cancelled
-      end
-
-      def when_entered_nonzero_length_string
-        if BLANK_RX__ =~ @line
-          when_entered_nonzero_length_blank_string
-        else
-          when_entered_string_with_content
-        end
-      end
-
-      BLANK_RX__ = /\A[[:space:]]*\z/
-
-      def when_entered_nonzero_length_blank_string
-        # it's tempting to make this a "delete" but also kinda nasty -
-        # such behavior should be opt-in, lest it is produced accidentally
-        when_cancelled
-      end
-
-      def when_cancelled
-        @y << "edit #{ slug } cancelled."
-        change_focus_to @parent
-        ACHIEVED_
-      end
-
       def when_deleted  # :+#courtesy
         ok = unknow_value
         if ok
@@ -488,24 +519,13 @@ module Skylab::Brazen
         end
       end
 
-      def when_entered_string_with_content
-        ok = via_line_know_value
-        if ok
-          when_value_changed
-        else
-          PROCEDE_
-        end
-      end
-
       def when_value_changed
         if @is_interactive
           try_to_persist  # for now we procede whether or not it succeeds
           change_focus_to @parent
-          ACHIEVED_
         end
+        ACHIEVED_
       end
-
-      # ~ persistence stuff for leaf nodes
 
       def try_to_persist
         @parent.receive_try_to_persist
@@ -638,6 +658,7 @@ module Skylab::Brazen
     end
 
     ACHIEVED_ = true  # #todo this will be the virgin voyage of [#bs-016]
+    BLANK_RX_ = /\A[[:space:]]*\z/
     FINISHED_ = nil
     NONE_S = '(none)'.freeze
     NOTHING_TO_DO_ = nil

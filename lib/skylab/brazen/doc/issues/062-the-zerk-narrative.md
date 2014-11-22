@@ -198,6 +198,24 @@ go hog-wild with interface generation here:
 
 
 
+## :note-390
+
+the argument string passed to this "hook-out" method may have leading or
+trailing /[[:space:]]/ characters, does have characters other than these.
+
+via this mutable string attempt to normalize and memoize (e.g to an ivar)
+some internal representation of the business element.
+
+result is treated as boolean-ish with true-ish signaling achievement.
+
+if achievement is signaled hooks may be called indicating the field may
+have changed. if achievement is not signaled, default behavior in
+interactive mode is to stay, so in such cases it is strongly recommended
+that the client emit UI.
+
+
+
+
 ## :#note-222
 
 relying on the hook-out method to result in a pair structure rather than
@@ -209,8 +227,33 @@ wondering if a false-ish value from the method means "don't persist" or
 means "this is the marshalled value".
 
 agents that never persist can simply define the hook-out method with an
-empty body. this is better than doing this with `marshal_dump` would have
-ambiguous semantics.
+empty body. this is better than doing this with `marshal_dump` which
+would have ambiguous semantics.
+
+
+
+
+## :#note-023
+
+our "normal persistece names" are lowercase with underscores. in the
+datastore, variable names cannot have underscores but dashes are OK. so a
+conversion is necessary in both directions.
+
+it is "right" for the datastore to expect to receive only valid names,
+because otherwise how should the datastore decide how to do a conversion
+of names, when that conversion might be lossy?
+
+(information is lost: `foo-bar_baz` -> `foo-bar-baz` -> `foo_bar_baz`)
+
+on the other end, the problem of making names 'look right' for the
+datastore should not be a concern of the business objects: the datastore
+may certainly change and we want the business layer to be insulated from
+this. busiess objects are providing name value pairs in a format that is
+"normal" by some standard, and somewhere in this pipeline we need to
+convert those names to names compatible with the datastore.
+
+for now, that place is here. but this has become [#029], which suggests
+a possible better way.
 
 
 

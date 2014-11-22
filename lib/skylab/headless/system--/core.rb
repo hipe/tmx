@@ -12,7 +12,7 @@ module Skylab::Headless
         use_name = ::Hash.new { |h, k| k }
         use_name[ :io ] = :IO  # hard-coded name changes meh
 
-        @mod.entry_tree.to_scan.each do | normpath |
+        @mod.entry_tree.to_stream.each do | normpath |
           name_i = use_name[ normpath.name.as_variegated_symbol ]
           @svc_i_a.push name_i
           define_singleton_method name_i, bld_reader_method_via_variegated_name_i( name_i )

@@ -18,18 +18,17 @@ module Skylab::BeautySalon::TestSupport::Models::S_and_R::Actors_BFS
 
   module InstanceMethods
 
-    def build_scan_for_single_path_to_file_with_three_lines
+    def build_stream_for_single_path_to_file_with_three_lines
 
-      _path = TestSupport_::Data::Universal_Fixtures.
-        dir_pathname.join( 'three-lines.txt' ).to_path
+      Callback_.stream.via_item( TestSupport_::Data::Universal_Fixtures.
+        dir_pathname.join( 'three-lines.txt' ).to_path )
 
-      Callback_.scan.via_item _path
     end
   end
 
-  Subject_ = -> do
+  Actors_ = -> do
 
-    Parent_TS_::Subject_[]::Actors_::Build_file_scan
+    Parent_TS_::Subject_[]::Actors_
 
   end
 end

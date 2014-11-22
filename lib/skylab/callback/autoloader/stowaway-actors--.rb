@@ -84,8 +84,12 @@ module Skylab::Callback
         @pn = if ! @mod_et.normpath_from_distilled @name.as_distilled_stem
           real_dpn
         end
+        @do_add_core_file = false
         np = produce_prepared_np
         @load_file_path = real_dpn.to_path
+        if @do_add_core_file
+          @load_file_path = "#{ @load_file_path }#{ PATH_SEP_ }#{ CORE_ }"
+        end
         require @load_file_path
         :loaded == @mod_et.state_i or @mod_et.change_state_to :loaded
         @stwy_normpath = np ; nil
@@ -93,7 +97,14 @@ module Skylab::Callback
 
       def produce_prepared_np
         np = @mod_et.normpath_from_distilled @name.as_distilled_stem
-        np ||= @mod_et.add_imaginary_normpath_for_correct_name @name, @pn
+        if ! np && @np_a.last.norm_pathname == @pn  # this is voooo
+          # but it detects when the stowaway is in a core.rb
+          @do_add_core_file = true
+          np = @np_a.last
+        end
+        if ! np
+          np = @mod_et.add_imaginary_normpath_for_correct_name @name, @pn
+        end
         if :not_loaded == np.state_i
           np.change_state_to :loading
         else
@@ -125,10 +136,17 @@ module Skylab::Callback
 
       def produce_some_value
         np = @stwy_normpath
-        if np.value_is_known
+        if np.value_is_known && ! @do_add_core_file
           x = np.known_value
         else
           x = @const_missing.lookup_x_after_loaded
+          if @do_add_core_file
+            Autoloader[ x, np.some_dir_pathname ]
+            x.module_exec do
+              @did_resolve_entry_tree = true
+              @any_built_entry_tree = np
+            end
+          end
           if x.respond_to?( :dir_pathname ) &&
               x.dir_pathname != np.some_dir_pathname
             np = Stowaway_Actors__::Resolve_relpath__[ @mod, x.dir_pathname ]

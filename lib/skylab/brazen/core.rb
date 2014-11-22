@@ -216,6 +216,11 @@ module Skylab::Brazen
       HL__[]::Name
     end
 
+    Open3 = Callback_.memoize do
+      require 'open3'
+      ::Open3
+    end
+
     Proxy_lib = -> do
       Callback_::Proxy
     end

@@ -97,7 +97,7 @@ module Skylab::Brazen
     # ~
 
     Bound_properties = -> bp_p, properties do
-      properties.to_scan.map_by do |prop|
+      properties.to_stream.map_by do |prop|
         bp_p[ prop ]
       end.immutable_with_random_access_keyed_to_method :name_i
     end

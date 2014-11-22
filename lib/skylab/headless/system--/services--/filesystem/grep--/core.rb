@@ -27,9 +27,11 @@ module Skylab::Headless
 
           :iambic_writer_method_to_be_provided, :paths,
 
-          :properties, :ruby_regexp, :on_event_selectively, :as_normal_value
+          :properties, :grep_extended_regexp_string, :ruby_regexp,
+            :on_event_selectively, :as_normal_value
 
         def initialize
+          @grep_extended_regexp_string = nil
           @ignore_case_is_known = false
           @unescaped_path_s_a = nil
           super
@@ -59,6 +61,15 @@ module Skylab::Headless
         end
 
       public def mixed_result
+
+          if @grep_extended_regexp_string
+            via_grep_regexp_mixed_result
+          else
+            via_ruby_regexp_mixed_result
+          end
+        end
+
+        def via_ruby_regexp_mixed_result
           opts = Headless_::Lib_::Bsc_[]::Regexp.options_via_regexp @ruby_regexp
           xtra_i_a = nil
           if opts.is_multiline
@@ -73,6 +84,7 @@ module Skylab::Headless
             if ! @ignore_case_is_known
               @do_ignore_case = opts.is_ignorecase
             end
+            @grep_regexp_guess = @ruby_regexp.source
             get_busy
           end
         end
@@ -85,6 +97,14 @@ module Skylab::Headless
           end
         end
 
+        def via_grep_regexp_mixed_result
+          if ! @ignore_case_is_known
+            @do_ignore_case = false
+          end
+          @grep_regexp_guess = @grep_extended_regexp_string
+          get_busy
+        end
+
         def get_busy
 
           shellwords = Headless_::Lib_::Shellwords[]
@@ -93,7 +113,7 @@ module Skylab::Headless
           if @do_ignore_case
             y.push '--ignore-case'
           end
-          y.push shellwords.escape @ruby_regexp.source
+          y.push shellwords.escape @grep_regexp_guess
 
           if @unescaped_path_s_a
             @unescaped_path_s_a.each do |path|
@@ -108,8 +128,8 @@ module Skylab::Headless
 
       public
 
-        def to_scan
-          @command_string and via_command_string_produce_scan
+        def to_stream
+          @command_string and via_command_string_produce_stream
         end
 
         def string
@@ -118,13 +138,13 @@ module Skylab::Headless
 
       private
 
-        def via_command_string_produce_scan
-          produce_scan_via_command_string @command_string
+        def via_command_string_produce_stream
+          produce_stream_via_command_string @command_string
         end
 
       public
 
-        def produce_scan_via_command_string command_string
+        def produce_stream_via_command_string command_string
           thread = nil
           p = -> do
             _, o, e, thread = Headless_::Library_::Open3.popen3 command_string
@@ -147,7 +167,7 @@ module Skylab::Headless
               p[]
             end
           end
-          Callback_.scan do
+          Callback_.stream do
             p[]
           end.with_signal_handlers :release_resource, -> do
             if thread && thread.alive?

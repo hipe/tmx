@@ -2,7 +2,7 @@ module Skylab::BeautySalon
 
   class Models_::Search_and_Replace
 
-    class Actors_::Build_file_scan
+    module Actors_::Build_file_scan
 
       class Models__::Interactive_File_Session
 
@@ -16,17 +16,17 @@ module Skylab::BeautySalon
             end
 
             def execute
-              [ build_before_scan, build_match_scan, build_after_scan ]
+              [ build_before_stream, build_match_stream, build_after_stream ]
             end
 
-            def build_after_scan
+            def build_after_stream
               if @num_after.zero?
                 p = EMPTY_P_
               else
                 num_lines_started = 0
                 p = -> do
                   line = nil
-                  while seg = @seg_scan.gets
+                  while seg = @seg_stream.gets
                     if ! line
                       line = Segmented_Line_.new
                       num_lines_started += 1
@@ -42,13 +42,14 @@ module Skylab::BeautySalon
                   line
                 end
               end
-              Callback_.scan do
+              Callback_.stream do
                 p[]
               end
             end
 
-            def build_match_scan
-              @seg_scan = segment_scan_from @match
+            def build_match_stream
+
+              @seg_stream = segment_stream_from @match
 
               line = if @first_interest_line
                 x = @first_interest_line
@@ -57,7 +58,7 @@ module Skylab::BeautySalon
               end
 
               p = -> do
-                while seg = @seg_scan.gets
+                while seg = @seg_stream.gets
                   line ||= Segmented_Line_.new
                   line.push seg
                   if seg.is_in_match
@@ -81,14 +82,16 @@ module Skylab::BeautySalon
                 end
               end
 
-              Callback_.scan do
+              Callback_.stream do
                 p[]
               end
             end
 
-            def build_before_scan
-              scan = backwards_segment_scan_from @match  # #note-185
-              while seg = scan.gets
+            def build_before_stream
+
+              stream = backwards_segment_stream_from @match  # #note-185
+
+              while seg = stream.gets
                 if seg.has_delimiter
                   break
                 else
@@ -100,17 +103,17 @@ module Skylab::BeautySalon
                 interest_head.reverse!
               end
               if seg
-                do_build_before_scan seg, scan
+                do_build_before_stream seg, stream
               else
-                Callback_::Scan.the_empty_scan
+                Callback_::stream.the_empty_stream
               end
             end
 
-            def do_build_before_scan seg, scan
+            def do_build_before_stream seg, stream
               lines = [ line = Segmented_Line_.new ]
               begin
                 line.push seg
-                seg = scan.gets
+                seg = stream.gets
                 if seg
                   if seg.has_delimiter
                     line.reverse!
@@ -129,10 +132,10 @@ module Skylab::BeautySalon
                 end
               end while nil
               lines.reverse!
-              Callback_.scan.via_nonsparse_array lines
+              Callback_.stream.via_nonsparse_array lines
             end
 
-            def segment_scan_from match
+            def segment_stream_from match
               body_p_p = norm_p_p = next_p_p = nil
               do_current_match = current_p = -> do
                 curr = body_p_p[]
@@ -157,7 +160,7 @@ module Skylab::BeautySalon
 
               body_p_p = -> do
                 if match.replacement_is_engaged
-                  match.to_replacement_segment_scan_proc
+                  match.to_replacement_segment_stream_proc
                 else
                   string_segment_proc match.begin, match.next_begin, @string,
                     Match_Segment_.new( match.match_index, :original )
@@ -184,12 +187,12 @@ module Skylab::BeautySalon
                 end
               end
 
-              Callback_.scan do
+              Callback_.stream do
                 current_p[]
               end
             end
 
-            def backwards_segment_scan_from match
+            def backwards_segment_stream_from match
               norm_p_p = rest_p_p = finish = nil
               current_p = backwards_from_match = -> do
                 queue = []
@@ -253,7 +256,7 @@ module Skylab::BeautySalon
                 nil
               end
 
-              Callback_.scan do
+              Callback_.stream do
                 current_p[]
               end
             end

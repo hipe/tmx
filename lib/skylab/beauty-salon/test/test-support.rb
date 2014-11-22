@@ -22,6 +22,14 @@ module Skylab::BeautySalon::TestSupport
 
   module InstanceMethods
 
+    def existent_empty_tmpdir_path
+      td = existent_tmpdir.tmpdir_via_join 'started-out-empty'
+      if ! do_debug != ! td.be_verbose
+        td = td.with :be_verbose, do_debug, :debug_IO, debug_IO
+      end
+      td.clear.to_path
+    end
+
     def existent_tmpdir_path
       existent_tmpdir.to_path
     end

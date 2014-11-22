@@ -329,7 +329,7 @@ module Skylab::CodeMolester
             @sexp.unparse
           end
 
-          def to_scan  # :+#covered-by:cu
+          def to_stream  # :+#covered-by:cu
             @scan_p.call
           end
 

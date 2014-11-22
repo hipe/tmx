@@ -2,9 +2,37 @@ module Skylab::Basic
 
   module String
 
-    class Line_Scanner__  # read [#024] (in [#022]) the string scanner narrative
+    class Line_Scanner__ < Callback_::Scan
+
+      # read [#024] (in [#022]) the string scanner narrative
 
       class << self
+
+        def new * x_a, & p
+          case x_a.length
+          when 1
+            s = x_a.first  # meh
+            count = 0
+            scn = Basic_::Lib_::String_scanner[ s ]
+            p = -> do
+              s = scn.scan LINE_RX__
+              if s
+                count += 1
+                s
+              else
+                p = EMPTY_P_
+                nil
+              end
+            end
+            super -> { count } do
+              p[]
+            end
+          when 0  # when maps, reduces etc are used, you lose the line count for now
+            superclass.new( & p )
+          end
+        end
+
+        LINE_RX__ = String.regex_for_line_scanning
 
         def reverse s
           if block_given?
@@ -15,30 +43,13 @@ module Skylab::Basic
         end
       end
 
-      def initialize s
-        @count = 0
-        scn = Basic_::Lib_::String_scanner[ s ]
-        @gets_p = -> do
-          s = scn.scan LINE_RX__
-          if s
-            @count += 1
-            s
-          else
-            scn.eos? or fail "sanity - rx logic failure"
-            @gets_p = EMPTY_P_ ; nil
-          end
-        end ; nil
-      end
-
-      def gets
-        @gets_p.call
+      def initialize count_p
+        @count_p = count_p
       end
 
       def line_number
-        @count.nonzero?
+        @count_p.call.nonzero?
       end
-
-      LINE_RX__ = String.regex_for_line_scanning
 
       Reverse__ = -> mutable_string do
         is_first = true

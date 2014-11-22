@@ -38,7 +38,7 @@ module Skylab::CodeMolester
         def via_sections_resolve_lesser
           ok = DID_
           @lesser = nil
-          scan = @secs.to_scan
+          scan = @secs.to_stream
           sect = scan.gets
           while sect
             _cmp = @section_name <=> sect.section_name

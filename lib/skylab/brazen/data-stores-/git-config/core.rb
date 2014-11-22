@@ -419,7 +419,7 @@ module Skylab::Brazen
         idx = @h[ i ]
         idx && @a.fetch( idx )
       end
-      def to_scan
+      def to_stream
         Scan_[].via_nonsparse_array @a
       end
       def map & p

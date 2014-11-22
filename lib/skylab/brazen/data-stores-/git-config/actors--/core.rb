@@ -69,11 +69,11 @@ module Skylab::Brazen
       end
 
       def when_all_rslv_section_scan
-        @section_scan = @document.sections.to_scan ; nil
+        @section_scan = @document.sections.to_stream ; nil
       end
 
       def via_subsection_name_query_rslv_section_scan
-        @section_scan = @document.sections.to_scan.reduce_by do |x|
+        @section_scan = @document.sections.to_stream.reduce_by do |x|
           @subsection_name_query.call x
         end ; nil
       end
@@ -153,7 +153,7 @@ module Skylab::Brazen
       end
 
       def via_subsection_id_resolve_section
-        scan = @document.sections.to_scan
+        scan = @document.sections.to_stream
         ss = @subsection_id
         s_i = ss.section_s.intern ; ss_s = ss.subsection_s
         found = false ; count = 0
@@ -211,7 +211,7 @@ module Skylab::Brazen
 
       def via_section_and_model_class_resolve_result
         x_a = [ NAME_, @section.subsect_name_s ]
-        scan = @section.assignments.to_scan
+        scan = @section.assignments.to_stream
         props = @model_class.properties
         while ast = scan.gets
           i = ast.external_normal_name_symbol

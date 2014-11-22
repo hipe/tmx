@@ -231,7 +231,7 @@ module Skylab::Callback
 
       if false  # #todo
       def concat_by scn
-        to_scan.concat_by( scn ).with_random_access_keyed_to_method @meth_i
+        to_stream.concat_by( scn ).with_random_access_keyed_to_method @meth_i
       end
       end
 
@@ -318,7 +318,7 @@ module Skylab::Callback
         end
       end
 
-      def to_scan
+      def to_stream
         if @done
           to_scanner_when_done Scan_
         else
