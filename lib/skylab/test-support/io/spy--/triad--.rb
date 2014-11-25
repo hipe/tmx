@@ -49,7 +49,7 @@ module Skylab::TestSupport
 
     Prefixed_debugging_IO__ = -> do
       p = -> i, io do
-        Prefixed_Debugging_IO__ = TestSupport_::Lib_::Proxy_lib[].nice :puts, :write, :<<
+        Prefixed_Debugging_IO__ = TestSupport_._lib.proxy_lib.nice :puts, :write, :<<
         p = -> i_, io_ do
           fmt = -> x do
             "(#{ i_ }: #{ x.inspect })"

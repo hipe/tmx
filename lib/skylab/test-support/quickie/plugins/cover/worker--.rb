@@ -49,9 +49,9 @@ module Skylab::TestSupport
       def when_tail_part_did_not_match
         @y << "(expected \"#{ @last_s }\" to end in \"#{ @tail_s }\" - #{
           }can't generate coverage for path - #{ @path_s })"
-        FAILED__
+        UNABLE_
       end
-      FAILED__ = false
+      UNABLE_ = false
 
       def when_there_are_multiple_paths
         @lcbp_a = Longest_common_base_path__[ @path_a ]
@@ -66,7 +66,7 @@ module Skylab::TestSupport
         @y << "(found no longest common basepath among #{ @path_a.length } #{
           }paths - can't generate coverage.)"
         @y << "(paths were: #{ @path_a * ', ' })"
-        FAILED__
+        UNABLE_
       end
 
       def when_lcbp_is_nonzero_in_length
@@ -79,7 +79,7 @@ module Skylab::TestSupport
 
       def when_failed_to_find_test_directory
         @y << "(failed to find test directory - #{ @lcbp_a * SEP_ })"
-        FAILED__
+        UNABLE_
       end
 
       def when_found_test_directory
@@ -110,7 +110,7 @@ module Skylab::TestSupport
         @y << "failed to find business path from longest common base path - #{
           }#{ lcbp }"
         tried_a and reprt_tried_these_paths tried_a
-        FAILED__
+        UNABLE_
       end
 
       def reprt_tried_these_paths tried_a

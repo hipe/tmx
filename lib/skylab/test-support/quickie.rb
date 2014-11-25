@@ -1,44 +1,45 @@
-module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
+module Skylab::TestSupport
 
-  ts = ::Skylab::TestSupport
-  Lib_ = ts::Lib_
-  Library_ = ts::Library_
-  NEWLINE_ = ts::NEWLINE_
-  Quickie = self
+  module Quickie  # see [#004] the quickie narrative #intro
 
-  service = nil
+    class << self
 
-  define_singleton_method :extended do |mod|  # #storypoint-10, :+[#sl-111]~
+      def extended mod  # #storypoint-10, :+[#sl-111]~
 
-    singleton_class.send :remove_method, :extended
+        singleton_class.send :remove_method, :extended
 
-    if service[].quickie_has_reign
-      define_singleton_method :extended do |md|
-        md.extend ModuleMethods
+        if _service_instance.quickie_has_reign
+          define_singleton_method :extended do |mod_|
+            mod_.extend Module_Methods__ ; nil
+          end
+          extended mod
+        else
+          define_singleton_method :extended do |*| end ; nil
+        end
       end
-      extended mod
-    else
-      define_singleton_method :extended do |*| end
+
+      define_method :_service_instance, -> do  # #storypoint-25
+        p = -> do
+          x = Service__.new nil, LIB_.stdout, LIB_.stderr
+          x.listen
+          p = -> { x }
+          x
+        end
+        -> { p[] }
+      end.call
     end
-  end
 
-  service = -> do  # #storypoint-25
-    svc = Quickie::Service.new nil, Lib_::Stdout[], Lib_::Stderr[]
-    svc.listen
-    service = -> { svc }
-    svc
-  end
+    # while #open [#036] indentation will jump uglyly: older
+    # code is one level back, correct it as you refactor it
 
-  define_singleton_method :service do service.call end
-
-  class Quickie::Service  # ( re-opens as necessary for narrative )
+  class Service__
 
     def initialize _, o, e
       @paystream = o ; @infostream = e
       @default_info_stream_line_proc = -> line { @infostream.puts line }
       @info_stream_line_proc_is_default = nil
       self.info_stream_line_proc = nil  # see
-      @invoke_is_enabled = true ; @did_resolve_invoke = false
+      @invoke_is_enabled = true ; @did_produce_invoke = false
       @is_listening = false
       @has_seen_one = nil  # to trigger the warning about this not yet impl.
       @kernel_describe_is_enabled = nil
@@ -79,55 +80,54 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     end
   end
 
-  # the story really begins from a `describe` that is from some sort
-  # of non-context, like a quickie-empowered module (empowering revealed above):
+    # the story really begins from a `describe` that is from some sort of non-
+    # context, like a quickie-empowered module like we made above
 
-  module Quickie::ModuleMethods
-    def describe desc, *rest, &p  # (same as 1 below)
-      m, a = Quickie.service.resolve_describe desc, *rest, &p
-      m.receiver.send m.name, *a
+    DESCRIBE_METHOD__ = -> s, * a, & p do
+      bm = Quickie_._service_instance.produce_describe_bound_method s, * a, & p
+      bm.receiver.send bm.name
     end
-  end
 
-  # (or from anywhere, if this hack is turned on #experimental (and we break
-  # the narrative for aesthetics sorry)
+    module Module_Methods__
+      define_method :describe, DESCRIBE_METHOD__
+    end
 
-  def self.enable_kernel_describe
-    Quickie.service.enable_kernel_describe
-  end
+    # or you can use `describe` from anywhere with this #experimental hack
 
-  class Quickie::Service
-
-    def enable_kernel_describe
-      if ! @kernel_describe_is_enabled
-        @kernel_describe_is_enabled = true
-        if ::Kernel.method_defined? :describe then nil else  # just don't mess
-          ::Kernel.module_exec do
-            def describe desc, *rest, &p  # (same as 1 above)
-              m, a = Quickie.service.resolve_describe desc, *rest, &p
-              m.receiver.send m.name, *a
-            end
-          end
-          nil
-        end
+    class << self
+      def enable_kernel_describe
+        _service_instance.enable_kernel_describe
       end
     end
 
-    def resolve_describe first_desc_line, * desc_a, &p
+    class Service__
+
+      def enable_kernel_describe
+        do_enable_kernel_describe if ! @kernel_describe_is_enabled
+      end
+
+      private def do_enable_kernel_describe
+        @kernel_describe_is_enabled = true
+        if ! ::Kernel.method_defined? :describe  # else just don't mes
+          ::Kernel.send :define_method, :describe, DESCRIBE_METHOD__ ; nil
+        end
+      end
+
+    def produce_describe_bound_method first_desc_line, * desc_a, &p
       desc_a.unshift first_desc_line
-      ctx = ::Class.new Quickie::Context  # 1 desc always == 1 context
+      ctx = ::Class.new Context__  # 1 desc always == 1 context
       Context_init__[ ctx, desc_a, nil, p ]
       if @client
-        r = @client.add_context_class_and_resolve ctx
+        x = @client.add_context_class_and_resolve ctx
       else
-        cli = Client.new @y, ctx
+        cli = Client_.new @y, ctx
         touch_multiple_describes cli
         if @invoke_is_enabled
-          @did_resolve_invoke = true
-          r = cli.resolve_invoke ::ARGV
+          @did_produce_invoke = true
+          x = cli.produce_invoke_method ::ARGV
         end
       end
-      r || Noop__[]
+      x || EMPTY_P_.method( :call )
     end
 
     def touch_multiple_describes cli
@@ -143,68 +143,64 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
       end
       nil
     end
-  end
-
-  class Quickie::Context
-
-    # (note that any names here will collide with user-defined module
-    # methods and so on.. so just keep it in mind for now..)
-
-    Lib_::Let_methods[ self ]
-
-    def self.describe desc, *rest, &p
-      context desc, *rest, &p
     end
 
-    def self.description
-      @desc_a.fetch( 0 ) if @desc_a.length.nonzero?  # e.g
-    end
+    class Context__
 
-    def self.context *desc_a, &p
-      c = ::Class.new self
-      Context_init__[ c, desc_a, @tagset_h, p ]
-      @elements << [ :branch, c ]
-      nil
-    end
+      # the instance, singleton method namespaces are ultimately userland
 
-    def self.it desc, * a, & p
-      @elements << [ :leaf, Quickie::Example.new( self, a.unshift( desc ),
-        Tagset__.new( Build_tagset_h__[ a, @tagset_h ],
-          caller_locations( 1, 1 )[ 0 ].lineno ), p ) ] ; nil
-    end
+      class << self
 
-    def self.__quickie_is_pending
-      @is_pending
-    end
+        def describe desc, * rest, & p
+          context desc, * rest, & p
+        end
 
-    def initialize rt
-      @__quickie_runtime = rt
-    end
+        def description
+          @desc_a.fetch( 0 ) if @desc_a.length.nonzero?  # e.g
+        end
 
-    def __quickie_passed
-      @__quickie_runtime.passed
-    end
+        def context * desc_a, & p
+          cls = ::Class.new self
+          Context_init__[ cls, desc_a, @tagset_h, p ]
+          @elements.push [ :branch, cls ] ; nil
+        end
 
-    def __quickie_failed
-      @__quickie_runtime.failed
-    end
-  end  # (re-opened below)
+        def it desc, * a, & p
+          @elements.push [ :leaf, Example__.new( self, a.unshift( desc ),
+            Tagset__.new( Build_tagset_h__[ a, @tagset_h ],
+              caller_locations( 1, 1 )[ 0 ].lineno ), p ) ] ; nil
+        end
 
-  class Tagset__
-    def initialize ts_h, lineno
-      @lineno = lineno ; @ts_h = ts_h ; nil
-    end
-    attr_reader :lineno
-    def [] i
-      @ts_h && @ts_h[ i ]
-    end
-  end
+        def __quickie_is_pending
+          @is_pending
+        end
+      end
 
-  Noop__ = -> do
-    EMPTY_P_.method :call
-    # ( distinct from the empty proc, noop must be a bound method )
-  end
-  EMPTY_P_ = -> {}
+      TestSupport_._lib  # loads LIB_, Library_
+      LIB_.let_methods self
+
+      def initialize rt
+        @__quickie_runtime = rt
+      end
+
+      def __quickie_passed
+        @__quickie_runtime.passed
+      end
+
+      def __quickie_failed
+        @__quickie_runtime.failed
+      end
+    end  # will re-open below
+
+    class Tagset__
+      def initialize * a
+        @ts_h, @lineno = a
+      end
+      attr_reader :lineno
+      def [] i
+        @ts_h && @ts_h[ i ]
+      end
+    end
 
   Context_init__ = -> c, desc_a, inherited_tagset, p do
     c.class_exec do
@@ -233,7 +229,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     tagset_h
   end
 
-  Example_producer__ = -> ctx_class, branch, leaf do  # i love this
+  Example_producer_ = -> ctx_class, branch, leaf do  # i love this
     stack = [ ] ; cur = ctx_class
     push = -> do
       els = cur.instance_variable_get :@elements
@@ -265,11 +261,8 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     poptop
   end
 
-  module API  # :#public-API
-    Example_producer = Example_producer__
-  end
+  class Client_  # #storypoint-285
 
-  class Quickie::Client  # #storypoint-285
     def initialize y, root_context_class
       @at_end_of_run_p_a = nil
       @tag_desc_h = @example_producer_p = @line_set = @or_p_a = nil
@@ -278,14 +271,14 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
       @tag_filter_p = nil ; @y = y
     end
 
-    attr_writer :tag_filter_p, :example_producer_p  # #hacks-only
+    attr_writer :example_producer_p, :tag_filter_p  # #hacks-only
 
-    def resolve_invoke argv
+    def produce_invoke_method argv
       ok = parse_argv argv  # totally absorbed on success
       if ok
         method :execute
       else
-        Noop__[]
+        EMPTY_P_.method :call
       end
     end
 
@@ -328,7 +321,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
 
   private
 
-    Stylize__ = -> do  # the stylize diaspora :[#005] of [#hl-029]
+    Stylize__ = -> do  # #open :[#005] :+[#hl-029] the stylize diaspora
       h = ::Hash[ %i| red green yellow blue magenta cyan white |.
         each_with_index.map do |i, d| [ i, 31 + d ] end ]
       h[ :strong ] = 1 ; p = h.method :fetch
@@ -377,7 +370,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     end
 
     def bld_tag_shell
-      Tag_Shell.new :on_error, -> _ do
+      Tag_Shell_.new :on_error, -> _ do
         raise ::OptionParser::InvalidArgument
       end,
       :on_info_trio, method( :add_tag_description ),
@@ -467,7 +460,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     def execute
       branch, leaf, passed, failed, pended, skip, flush =
         build_rendering_functions
-      rt = Quickie::Runtime.new passed, failed, pended
+      rt = Runtime__.new passed, failed, pended
       commence
       producer = get_producer branch, leaf
       @t1 = ::Time.now
@@ -497,7 +490,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
       if @example_producer_p
         @example_producer_p[ branch, leaf ]
       else
-        Example_producer__[ @root_context_class, branch, leaf ]
+        Example_producer_[ @root_context_class, branch, leaf ]
       end
     end
 
@@ -591,7 +584,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
       end
 
       skip = -> do
-        # Lib_::Stderr[].puts "#{ ind[ d ] }(#{ eg.description } SKIPPED)"
+        # LIB_.stderr.puts "#{ ind[ d ] }(#{ eg.description } SKIPPED)"
         eg = nil
       end
 
@@ -603,7 +596,6 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     end
 
     define_method :stylize, & Stylize__
-    private :stylize
 
     def commence
       if @run_option_p_a
@@ -666,25 +658,23 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     end
   end
 
-  class Quickie::Example  # just a simple data-structure for holding e.g
-    # `it` and its block
+    class Example__  # simple data structure for holding e.g `it` and its block
 
-    def initialize ctx, desc, tagset, p
-      @block = p ; @context = ctx ; @desc = desc ; @tagset = tagset ; nil
+      def initialize * a
+        @context, @desc, @tagset, @block = a
+      end
+
+      attr_reader :block, :context, :tagset
+
+      def description
+        @desc.first
+      end
     end
 
-    attr_reader :block, :context, :tagset
+  class Runtime__
 
-    def description
-      @desc.first
-    end
-  end
-
-  class Quickie::Runtime
-
-    def initialize emit_passed, emit_failed, emit_pending
-      @emit_passed, @emit_failed, @emit_pending =
-        emit_passed, emit_failed, emit_pending
+    def initialize * a
+      @emit_passed, @emit_failed, @emit_pending = a
       @eg_count = 0
       @eg_failed_count = 0
       @eg_pending_count = 0
@@ -721,56 +711,61 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     end
   end
 
-  #  ~ facet 1 - predicates (core) !
+    #  ~ facet 1 - predicates (core) !
 
-  class Quickie::Predicate
+    class Predicate__
 
-    class << self
-      alias_method :quickie_original_new, :new
-    end
+      class << self
 
-    def self.new *args, &p
-      ::Class.new( self ).class_exec do
-        class << self
-          alias_method :new, :quickie_original_new
+        alias_method :quickie_original_new, :new
+
+        def new *args, &p
+
+          ::Class.new( self ).class_exec do
+
+            class << self
+              alias_method :new, :quickie_original_new
+            end
+
+            define_singleton_method :ivars, ( -> do
+              i_a = args.map do |i|
+                attr_accessor i
+                :"@#{ i }"
+              end.freeze
+              -> { i_a }
+            end ).call
+
+            p and class_exec( & p )
+
+            self
+          end
         end
-        args.each do |k|
-          attr_accessor k
+      end
+
+    private
+
+      def initialize * a
+        @runtime, @context, * rest = a
+        ivars = self.class.ivars
+        rest.each_with_index do |x, d|
+          instance_variable_set ivars.fetch( d ), x
         end
-        ivars = args.map{ |x| "@#{ x }".intern }.freeze
-        define_singleton_method :ivars do ivars end
-        p and class_exec( & p )
-        self
+      end
+
+      def passed msg_p
+        @runtime.passed msg_p
+      end
+
+      def failed msg_p
+        @runtime.failed msg_p
       end
     end
 
-  private
-
-    def initialize runtime, context, *rest
-      @runtime = runtime
-      @context = context
-      ivars = self.class.ivars
-      rest.each_with_index do |x, i|
-        instance_variable_set ivars.fetch( i ), x  # implicitly validates
-      end
-    end
-
-    def passed msg_func
-      @runtime.passed msg_func
-    end
-
-    def failed msg
-      @runtime.failed msg
-    end
-  end
-
-  module Quickie::Predicates
-    # fill it with joy, fill it with sadness
-  end
+    Predicates__ = ::Module.new  # filled with joy, sadness
 
   # `eql` (as in "should eql(..)") -
 
-  class Quickie::Predicates::Eql < Quickie::Predicate.new :expected
+  class Predicates__::Eql < Predicate__.new :expected
     def match actual
       if @expected == actual
         passed -> { "equals #{ @expected.inspect }" }
@@ -783,7 +778,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
 
   # `match` (as in "should match( /.../ )") -
 
-  class Quickie::Predicates::Match < Quickie::Predicate.new :expected
+  class Predicates__::Match < Predicate__.new :expected
     def match actual
       if @expected =~ actual
         passed -> { "matches #{ @expected.inspect }" }
@@ -794,8 +789,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     end
   end
 
-  class Quickie::Predicates::RaiseError <
-    Quickie::Predicate.new :expected_class, :message_rx
+  class Predicates__::RaiseError < Predicate__.new :expected_class, :message_rx
 
     def match actual
       begin
@@ -849,22 +843,19 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     end
   end
 
-  #         ~ please excuse me while i do this WONDERHACK ~
+  # for each const in the predicates module (each of which must be a
+  # predicate class) define the corresponding context instance method
 
-  # for each object that is currently a constant set under Predicates,
-  # (which, each one is expected to be a predicate class), define the
-  # corresponding instance method for contexts omgz
-
-  Methify_const__ = -> const do # FooBar NCSASpy CrackNCSACode FOO
+  Methify_const__ = -> const do  # FooBar NCSASpy CrackNCSACode FOO  # #todo - use [cb] name
     const.to_s.gsub( /
      (    (?<= [a-z] )[A-Z] |
           (?<= . ) [A-Z] (?=[a-z]))
      /x ) { "_#{ $1 }" }.downcase.intern
   end
 
-  class Quickie::Context  # re-open it
-    Quickie::Predicates.constants.each do |const|
-      klass = Quickie::Predicates.const_get const, false
+  class Context__  # re-open it
+    Predicates__.constants.each do |const|
+      klass = Predicates__.const_get const, false
       meth = Methify_const__[ const ]
       define_method meth do |*expected|
         klass.new @__quickie_runtime, self, *expected
@@ -874,7 +865,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
 
   #  ~ facet 2 - should `be_<foo>( )` method_missing hack
 
-  class Quickie::Context  # re-open it
+  class Context__  # re-open
 
     be_rx = /\Abe_(?<be_what>[a-z][_a-z0-9]*)\z/
 
@@ -889,7 +880,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
 
     constantize_meth = no_method = msgs = nil
 
-    predicates = Quickie::Predicates ; empty_a = [ ].freeze  # ocd
+    predicates = Predicates__
 
     define_method :_be_the_predicate_you_wish_to_see do |md, args, p|
       const = constantize_meth[ md.string ]
@@ -900,13 +891,15 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
         attr_a = [ ]
         attr_a << :expected if takes_args
         klass = predicates.const_set const,
-          ::Class.new( Quickie::Predicate.new(* attr_a ) )
+          ::Class.new( Predicate__.new(* attr_a ) )
         class << klass
           public :define_method
         end
         klass.define_method :args, & (
-          if ! takes_args then -> { empty_a } else
+          if takes_args
             -> { [ @expected ] }
+          else
+            -> { EMPTY_A_ }
           end )
         meth = "#{ md[:be_what] }?".intern
         klass.define_method :expected_method_name do meth end
@@ -968,11 +961,9 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     }
   end
 
-  #  ~ facet 3 - before hooks
+    #  ~ facet 3 - before hooks
 
-  module Quickie  # LOOK while #open [#036]
-
-    class Context
+    class Context__
       class << self
         def before which_i, & p
           send BEFORE_H__.fetch( which_i ), p
@@ -1000,7 +991,7 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
 
     BEFORE_H__ = { each: :bfr_each, all: :bfr_all }.freeze
 
-    class Example
+    class Example__
       def has_before_each
         @context.const_defined? :BEFORE_EACH_PROC_
       end
@@ -1009,24 +1000,25 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
         nil
       end
     end
-  end
 
-  #  ~ facet N - extrinsic API for hacks
+    #  ~ facet N - extrinsic API for hacks
 
-  #  ~ facet N.1 - `do_not_invoke!`
+    #  ~ facet N.1 - `do_not_invoke!`
 
-  # `Quickie.do_not_invoke` - prevents quickie from flushing its tests.
-  # for hacks e.g in your test file. might make noise.
+    # `Quickie.do_not_invoke` - prevents quickie from flushing its tests.
+    # for hacks e.g in your test file. might make noise.
 
-  def self.do_not_invoke!
-    service.do_not_invoke!
-  end
+    class << self
+      def do_not_invoke!
+        _service_instance.do_not_invoke!
+      end
+    end
 
-  class Quickie::Service  # #re-open for section N.1
+  class Service__  # #re-open for section N.1
     def do_not_invoke!
       me = "`#{ self.class }.do_not_invoke!`"
       if @invoke_is_enabled
-        if @did_resolve_invoke
+        if @did_produce_invoke
           @y << "(#{ me } called after a `describe` block has already #{
             }finished - call it earlier if it does not work as expected.)"
         else
@@ -1040,15 +1032,15 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     end
   end
 
-  #  ~ facet N.2 - the runner experiment ~
+    #  ~ facet N.2 - the runner experiment ~
 
-  module Quickie
-    def self.active_session
-      service.active_sssn  # #de-vowelated names are used
+    class << self
+      def active_session
+        _service_instance.active_sssn  # name convention [#hl-119]
+      end
     end
-  end
 
-  class Quickie::Service
+  class Service__
     def active_sssn
       @front ||= bld_front
     end
@@ -1064,15 +1056,17 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
     attr_reader :paystream, :infostream
   end
 
-  #  ~ N.3
+    #  ~ N.3
 
-  def Quickie.apply_experimental_specify_hack test_context_class
-    Quickie::Specify__.apply_if_not_defined test_context_class
-  end
+    class << self
+      def apply_experimental_specify_hack test_context_class
+        Quickie_::Specify__.apply_if_not_defined test_context_class
+      end
+    end
 
-  # ~ intrinsic / extrinsic classes exposed for hax
+    # ~ :+#protected-API
 
-  class Tag_Shell
+  class Tag_Shell_
 
     def initialize * x_a
       @send_error_p = @send_info_trio_p = @send_filter_proc_p =
@@ -1106,25 +1100,24 @@ module Skylab::TestSupport::Quickie  # see [#004] the quickie narrative #intro
   private
     def build_and_send_tag_byproducts_via_three_parts yes, tag_i, val_x
       if @send_info_trio_p
-        r = @send_info_trio_p[ yes ? :include : :exclude, tag_i, val_x ]
+        x = @send_info_trio_p[ yes ? :include : :exclude, tag_i, val_x ]
       end
       if yes
         p = -> tagset do
           val_x == tagset[ tag_i ]
         end
-        @send_pass_filter_proc_p and r = @send_pass_filter_proc_p[ p ]
+        @send_pass_filter_proc_p and x = @send_pass_filter_proc_p[ p ]
       else
         p = -> tagset do
           val_x != tagset[ tag_i ]
         end
-        @send_no_pass_filter_proc_p and r = @send_no_pass_filter_proc_p[ p ]
+        @send_no_pass_filter_proc_p and x = @send_no_pass_filter_proc_p[ p ]
       end
-      @send_filter_proc_p and r = @send_filter_proc_p[ p ]
-      r
+      @send_filter_proc_p and x = @send_filter_proc_p[ p ]
+      x
     end
   end
 
-  EMPTY_S_ = ts::EMPTY_S_
-  MONADIC_TRUTH_ = ts::MONADIC_TRUTH_
-
+    Quickie_ = self
+  end
 end

@@ -13,7 +13,7 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::Intermediates
   Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   describe "[ts] Regret::API::Actions::Intermediates" do
-    context "we can access the API" do
+    context "we can access the API", wip: true do
       Sandbox_1 = Sandboxer.spawn
       before :all do
         Sandbox_1.with self

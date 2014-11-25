@@ -4,8 +4,8 @@ module Skylab::TestSupport::TestSupport::Quickie
 
   TestSupport_ = ::Skylab::TestSupport
   TestSupport_::TestSupport[ Quickie_TestSupport = self ]
-  Lib_ = TestSupport_::Lib_
   Quickie = TestSupport_::Quickie
+  LIB_ = TestSupport_._lib
 
   extend Quickie  # NOTE the *second* this gives you any grief,
   # just use rspec! Gödel would have something to say about this..
@@ -34,14 +34,14 @@ module Skylab::TestSupport::TestSupport::Quickie
 
     let :context do
       ctx = Quickie_TestSupport.const_set "CTX_#{ last_id += 1 }",
-        ( ::Class.new Quickie::Context )
+        ( ::Class.new Quickie::Context__ )
       desc_a = [ "desc xyzzy #{ last_id }" ]
       Quickie::Context_init__[ ctx, desc_a, nil, -> { } ]
       ctx.new runtime
     end
 
     let :runtime do
-      Quickie::Runtime.new( -> passed_func do
+      Quickie::Runtime__.new( -> passed_func do
         add_output Emission.new( :pass, passed_func[] )
       end, -> fail_msg, failed_eg_count do
         add_output Emission.new( :fail, fail_msg, failed_eg_count )
@@ -52,7 +52,7 @@ module Skylab::TestSupport::TestSupport::Quickie
 
     def add_output e
       if do_debug
-        Lib_::Stderr[].puts "GOT OUTPUT: #{ e.inspect }"
+        LIB_.stderr.puts "GOT OUTPUT: #{ e.inspect }"
       end
       ( @output ||= [ ] ) << e
     end

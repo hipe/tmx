@@ -1,5 +1,22 @@
 # the quickie narrative :[#004]
 
+## brief introductory note on style
+
+this node has a relatively long history in this universe throughout
+which it has undergone many periodic although rarely comprehensive
+modernifications. as such it stands as a mosaic of the many different
+phases we have gone through. there are some ancient muddy patches from
+our foray into functionalism which remain there today both because
+they have no known issues and because they are amusing to read.
+
+we strictly follow [#hl-079] the name conventions for const visibility
+because it has compelling merit in its self-documentation; but the
+effect to the the uninitiated may be jarring with all the trailing
+underscores in the const names.
+
+
+
+## introduction to Quickie
 
 Quickie is an attempt at a minimal drop-in ersatz for the simplest/
 most frequently used 80% of RSpec, but one that is supposed to take
@@ -8,7 +25,12 @@ It tries to hold itself to the "swallow rule" - that the time it takes
 to load and start running one file (or changeset) of tests should not
 take longer than the time it takes you to swallow.
 
-It is not a replacement for RSpec (depening on how you use RSpec),
+As well we wanted a test runner that 1) would be able to run the tests
+on one spec file with an implementation that lives in one file that
+hovers around 1000 lines of code; and 2) we hated what rspec did to our
+exception stacks.
+
+Quickie is not a replacement for RSpec (depening on how you use RSpec);
 it is just a means to an end of writing RSpec-compatible tests that
 can run much faster during development provided that you want to run
 only 1 file and are doing something "simple" (for various definitions
@@ -18,21 +40,21 @@ of that) in that file.
 ### RSpec-like features it *does* include include:
 
   + arbitrarily deeply nested contexts (can define class methods, i.m's).
-  + memoized attr_accessors with `let` (that nest appropriately)
+  + memoized `attr_accessor`s with `let` (that nest appropriately)
   + core predicate matchers for `eql`, `match`, `raise_error`,
     (by design the predicates are added only to the test context, not
      to Kernel, so the places you can make your assertions are limited.)
   + the wildcard predicate matcher `be_<foo>` (`be_include`, `be_kind_of`)
   + tag filters (only run certain examples tagged a certain way)
-  + pending examples (and contexts! unlike r.s)
-  + limited, experimental support for non-nested before( :each )
+  + pending examples (and unlike r.s pending contexts too)
+  + limited support for before( :each | :all ) (currently no overriding)
 
 
 ### These are the most salient (to the author) features of RSpec that
 quickie offers limited or NO support for:
 
   + `should_not` (meh)
-  + run multiple files "at once" - experimental recursive runner exists
+  + run multiple files "at once" - (but now experimental recursive runner exists
   + `before` and `after` blocks - limited support per above
   + `specify` (but experiments in the universe exist at [#017])
   + custom matchers - except for the `be_<foo>` wildcard per above
@@ -41,14 +63,16 @@ quickie offers limited or NO support for:
 
 ### Strange behaviors (features not bugs!):
 
-  + Quickie has the exception matcher (should raise_error(..)) that tries
+  + Quickie has the exception matcher (`should raise_error`(..)) that tries
     to work just like r.s, but beyond this: **Quickie does not use
-    exceptions internally to indicate a test failure.**  2 corollaries
-    follow from this:
+    exceptions internally to indicate a test failure.**
+    2 corollaries follow from this:
+
     1) when there are multiple tests (`x.should eql(y)`)
-    in one example (`it "..." { }`), the first failing test will not
+    in one example (`it "..." { }`), the first failing test will *not*
     automatically halt further processing of the example (in contrast to
     r.s).
+
     2) Quickie makes no effort to rescue any exceptions, so any that are
     unhandled during test execution bubble all the way out and probably
     halt the execution of subsequent tests. it is the way of simplicity.
@@ -64,15 +88,22 @@ quickie offers limited or NO support for:
 
 
 
-~ just for fun, below is sometimes defined in a pre-order-ish traversal ~
 
-(which is supposed to mean that where possible things in the file
+# code comments
+
+for fun and profit, we often define the code in "pre-order traversal"
+which is supposed to mean that where possible things in the file
 are presented in the order they are called during a typical execution,
 so that if you had a stack trace of each first time a function was
 called, that is ideally the order they will appear in this file.
-In theory this should make it more of a narrative story to read top
-to bottom (and hopefully have your eyes jumping shorter distances)
-if it's your idea of fun to read the whole thing .. we'll see..)
+
+the idea is to make it more of a narrative coherent "story" when read
+from top to bottom: ideally its structure has your eyes jumping around
+the shortest disatances necessary to find a method definition you haven't
+seen yet from the first occurrence of its call that you encounter when
+following the narrative. this is all built around the presupposition
+that your idea of fun (like mine) is to read entire files of code from
+start to finish.
 
 
 
@@ -87,7 +118,7 @@ one way to hook into quickie is this: when you extend quickie on to a module
 it will hackishly rewrite this selfsame method based on the state of the
 ruby runtime at the time of first execution.
 
-the state we are checking for  specifically is the question of whether or not
+the state we are checking for specifically is the question of whether or not
 RSpec is in charge.
 
 
@@ -96,14 +127,14 @@ RSpec is in charge.
 ## :#storypoint-25
 
 the way we implement our "service" is that we memoize a service instance
-once ever for the life of the ruby runtime.
+once ever for the life of the platform runtime.
 
 
 
 
 ## :#storypoint-285
 
-one client is creted per test run. it manages
+the client is created one per test run. it manages
 UI, parsing the request to run the tests, creating a test runtime,
 and initiating the test run on the object graph.
 

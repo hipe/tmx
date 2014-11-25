@@ -11,11 +11,12 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible_
   ::Skylab::TestSupport::TestSupport::Quickie[ Possible_TS_ = self ]
 
   TestSupport_ = ::Skylab::TestSupport
-  Lib_ = TestSupport_::Lib_
   Quickie = TestSupport_::Quickie
     Possible_ = Quickie::Possible_
 
   extend Quickie
+
+  LIB_ = TestSupport_._lib
 
   module Articulator_
 
@@ -44,7 +45,7 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible_
         @do_debug ||= false
         @err_a = [ ]
         ::Enumerator::Yielder.new do |msg|
-          @do_debug and Lib_::Stderr[].puts "(dbg:#{ msg })"
+          @do_debug and LIB_.stderr.puts "(dbg:#{ msg })"
           @err_a << msg
           nil
         end

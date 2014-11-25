@@ -4,7 +4,7 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest::RS_
 
   ::Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest[ self, :expect ]
 
-  describe "[ts] regret API actions doc-test recursive" do
+  describe "[ts] regret API actions doc-test recursive", wip: true do
 
     extend TS__
 

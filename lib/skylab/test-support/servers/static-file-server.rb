@@ -17,7 +17,7 @@ module Skylab::TestSupport
       h = { log_level_i: DEFAULT_LOG_LEVEL_, port: DEFAULT_PORT_ }.merge h
       @doc_root = @doc_root_pathname = @rack_app = nil
       h.each { |k, v| send OPT_H_.fetch( k ), v }
-      @downstream = TestSupport_::Lib_::Stderr[]  # or configured if nec.
+      @downstream = TestSupport_._lib.stderr  # or configured if nec.
       nil
     end
 

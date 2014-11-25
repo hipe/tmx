@@ -78,7 +78,7 @@ module Skylab::TestSupport
           end
           do_allow
         end
-        Quickie::Tag_Shell.new :on_error, -> x do
+        Tag_Shell_.new :on_error, -> x do
           @ok = false
           @y << "#{ x }" ; nil
         end,
@@ -134,7 +134,7 @@ module Skylab::TestSupport
 
       def build_client
         a = @ctx_class_a ; @ctx_class_a = nil
-        cli = Quickie::Client.new @y, :no_root_context
+        cli = Client_.new @y, :no_root_context
         cli.tag_filter_p = @tag_filter_p
         cli.example_producer_p = -> branch, leaf do
           p = nil
@@ -142,7 +142,7 @@ module Skylab::TestSupport
             if p
               true
             elsif a.length.nonzero?
-              p = Quickie::API::Example_producer[ a.shift, branch, leaf ]
+              p = Example_producer_[ a.shift, branch, leaf ]
               true
             end
           end

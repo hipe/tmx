@@ -1,4 +1,6 @@
-module Skylab::TestSupport::Sandbox
+module Skylab::TestSupport
+
+  module Sandbox
 
   # A "sandbox" in this universe is always: a module used only in testing
   # (usually called 'Sandbox' and residing under a TestSupport module or
@@ -14,7 +16,7 @@ module Skylab::TestSupport::Sandbox
   # always by hand.
 
 
-  Lib_ = ::Skylab::TestSupport::Lib_
+  LIB_ = ::Skylab::TestSupport._lib
 
   module Spawner
 
@@ -105,9 +107,9 @@ module Skylab::TestSupport::Sandbox
     end
   end
 
-  Shell_ = Lib_::Enhancement_shell[ :kiss_with, :produce_subclasses_of ]
+  Shell_ = LIB_.enhancement_shell :kiss_with, :produce_subclasses_of
 
-  Kernel_ = Lib_::Ivars_with_procs_as_methods[].new :flush do
+  Kernel_ = LIB_.ivars_with_procs_as_methods.new :flush do
 
     def initialize sb_mod, kiss_with, superklass
       @flush = -> do
@@ -139,7 +141,7 @@ module Skylab::TestSupport::Sandbox
     end
   end
 
-  Host::Kernel_ = Lib_::Ivars_with_procs_as_methods[].new :flush do
+  Host::Kernel_ = LIB_.ivars_with_procs_as_methods.new :flush do
 
     def initialize anchor_mod
 
@@ -202,8 +204,9 @@ module Skylab::TestSupport::Sandbox
       end
     end
 
-    Lib_::Ivars_with_procs_as_methods[ self ].
+    LIB_.ivars_with_procs_as_methods( self ).
       as_public_getter :define_sandbox_constant_proc  # grease
 
+  end
   end
 end

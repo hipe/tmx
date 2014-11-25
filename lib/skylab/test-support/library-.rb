@@ -37,9 +37,11 @@ module Skylab::TestSupport
       Face__[]::API
     end
 
-    API_normalizer = -> do
+    API_normalizer_lib = -> do
       Face__[]::API::Normalizer_
     end
+
+    API_normalizer = API_normalizer_lib
 
     Bsc__ = sidesys[ :Basic ]
 
@@ -89,9 +91,11 @@ module Skylab::TestSupport
 
     HL__ = sidesys[ :Headless ]
 
-    Heavy_plugin = -> do
+    Heavy_plugin_lib = -> do
       Face__[]::Plugin
     end
+
+    Heavy_plugin = Heavy_plugin_lib
 
     Iambic_scanner = -> do
       Callback_.iambic_stream
@@ -164,5 +168,11 @@ module Skylab::TestSupport
     Tmpdir = -> do
       System[].filesystem.tmpdir
     end
+
+    INSTANCE = Callback_.produce_library_shell_via_library_and_app_modules(
+      self, TestSupport_ )
   end
+
+  LIB_ = Lib_::INSTANCE
+
 end

@@ -23,6 +23,10 @@ module Skylab::TestSupport  # :[#021].
       self::Lib_::Stderr[]
     end
 
+    def _lib
+      @lib ||= TestSupport_::Lib_::INSTANCE
+    end
+
     def spec_rb
       TestSupport_::Init.spec_rb
     end
@@ -37,11 +41,16 @@ module Skylab::TestSupport  # :[#021].
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
+  ACHIEVED_ = true
+  CONST_SEP_ = '::'.freeze
   EMPTY_A_ = [].freeze
+  EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
   stowaway :Lib_, 'library-'
   MONADIC_TRUTH_ = -> _ { true }
   NEWLINE_ = "\n".freeze
+  PROCEDE_ = true
   TestSupport_ = self  # there is another module called ::SL::TS::TS
+  UNABLE_ = false
 
 end

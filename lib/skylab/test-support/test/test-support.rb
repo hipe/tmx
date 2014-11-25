@@ -7,7 +7,7 @@ module Skylab::TestSupport::TestSupport
   module Constants
     EMPTY_A_ = TestSupport_::EMPTY_A_
     EMPTY_S_ = TestSupport_::EMPTY_S_
-    Lib_ = TestSupport_::Lib_
+    LIB_  = TestSupport_._lib
     TestSupport_ = TestSupport_
   end
 
@@ -26,7 +26,7 @@ module Skylab::TestSupport::TestSupport
     end
 
     def debug_IO
-      @debug_IO ||= TestSupport_::Lib_::Stderr[]
+      @debug_IO ||= TestSupport_._lib.stderr
     end
   end
 
@@ -41,7 +41,7 @@ module Skylab::TestSupport::TestSupport
     end
 
     System = -> do
-      TestSupport_::Lib_::System[]
+      TestSupport_._lib.system
     end
   end
 end

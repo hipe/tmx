@@ -72,7 +72,7 @@ module Skylab::TestSupport
 
       downstream_IO = TestSupport_::Library_::StringIO.new
 
-      _filter = TestSupport_::Lib_::IO[]::Mappers::Filter.new(
+      _filter = TestSupport_._lib.IO::Mappers::Filter.new(
         :downstream_IO, downstream_IO,
         :line_end_proc, -> do
           downstream_IO.rewind
@@ -120,7 +120,7 @@ module Skylab::TestSupport
     end
 
     def some_debug_IO
-      @debug_IO || TestSupport_::Lib_::Stderr[]
+      @debug_IO || TestSupport_._lib.stderr
     end
 
     def debug! stderr  # each time a line is parsed out of any stream we will
