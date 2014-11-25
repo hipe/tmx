@@ -454,7 +454,7 @@ module Skylab::BeautySalon
         @y << "$1, $2 etc are the captures in your expression."
         @y << "`bar` and `downcase` are \"functions\" (called as chainable"
         @y << "methods), either builtin (like `upcase`, `downcase`) or"
-        @y << "user-provided."
+        @y << "user-provided. (supported escape seqences: \\n \\t \\)"
         @y << nil
       end
 
@@ -469,7 +469,6 @@ module Skylab::BeautySalon
       end
 
       def marshal_load s, & ep
-
         @o = S_and_R_::Actors_::Build_replace_function[ s, work_dir, -> *, & ev_p do
           _ev = ev_p[]
           ep[ _ev ]

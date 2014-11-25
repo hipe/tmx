@@ -27,13 +27,17 @@ module Skylab::BeautySalon
           end
         end
 
+        def as_text
+          @function_a.map do |x|
+            x.as_text
+          end * EMPTY_S_
+        end
+
         def marshal_dump
           @function_a.map do |x|
             x.marshal_dump
           end * EMPTY_S_
         end
-
-        alias_method :as_text, :marshal_dump
       end
     end
   end

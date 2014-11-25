@@ -42,6 +42,19 @@ module Skylab::Brazen
           inline_via_iambic_and_any_message_proc_to_be_defaulted x_a, p
         end
 
+        def inline_via_normal_extended_mutable_channel x_a  # #experiment with "buildless" events
+          case x_a.first
+          when :error
+            x_a[ 0 ] = x_a[ 1 ]
+            x_a.push :ok, false
+            inline_via_iambic_and_any_message_proc_to_be_defaulted x_a, nil
+          when :info
+            x_a[ 0 ] = x_a[ 1 ]
+            x_a.push :on, nil
+            inline_via_iambic_and_any_message_proc_to_be_defaulted x_a, nil
+          end
+        end
+
         def inline_via_iambic x_a
           inline_via_iambic_and_any_message_proc_to_be_defaulted x_a, nil
         end

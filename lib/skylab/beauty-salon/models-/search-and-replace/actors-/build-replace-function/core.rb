@@ -21,9 +21,9 @@ module Skylab::BeautySalon
         @result = nil
         until @scn.eos?
           normal = @scn.scan NORMAL_RX__
-          open = @scn.scan OPEN_RX__
+          open = @scn.skip OPEN_RX__
           if normal
-            add_normal_string normal
+            process_normal_mutable_string normal or break
           end
           if open
             parse_replacement_expression or break
@@ -35,9 +35,37 @@ module Skylab::BeautySalon
         @result
       end
 
-      NORMAL_RX__ = /(?:(?!\{\{).)+/
+      NORMAL_RX__ = /(?:(?!\{\{).)+/m
 
       OPEN_RX__ = /{{/
+
+      def process_normal_mutable_string string
+        ok = true
+        string.gsub! ETC_RX__ do
+          s = $~[ 1 ]
+          s and p = UNESCAPE_OK_MAP__[ s.getbyte 0 ]
+          if p
+            p[ s ]
+          else
+            @on_event_selectively.call :error, :invalid_escape_sequence, s  # #open :+[#br-066]
+            ok = false
+            break
+          end
+        end
+        if ok
+          @a.push Normal_String__.new string
+          ACHIEVED_
+        else
+          @ok = ok
+        end
+      end
+
+      ETC_RX__ = /\\(.)?/
+
+      UNESCAPE_OK_MAP__ = {
+        '\\'.getbyte( 0 ) => -> _ { '\\' },
+        'n'.getbyte( 0 ) => -> _ { "\n" },
+        't'.getbyte( 0 ) => -> _ { "\t" } }
 
       def add_normal_string s
         @a.push Normal_String__.new s ; nil
@@ -132,18 +160,26 @@ module Skylab::BeautySalon
 
         def initialize s
           @string = s
+          @as_text = s.gsub ESCAPE_RX__ do
+            ESCAPE_OK_MAP__.fetch $~[ 1 ].getbyte 0
+          end
         end
+
+        ESCAPE_RX__ = /([\n\t\\])/
+
+        ESCAPE_OK_MAP__ = {
+          '\\'.getbyte( 0 ) => "\\\\",
+          "\n".getbyte( 0 ) => "\\n",
+          "\t".getbyte( 0 ) => "\\t" }
+
+        attr_reader :as_text
 
         def call md
           @string
         end
 
         def marshal_dump
-          @string
-        end
-
-        def as_text
-          @string
+          @as_text
         end
       end
 

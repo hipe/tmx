@@ -1,4 +1,4 @@
-[#066] #todo cool new build-less events
+[#066]       #done cool new build-less events
 [#065] #open implement unmarshaling for strings with newlines (git-config)
 [#064]       #done marshal issue near regexps with escape-looking sequences
 [#063]       [ isomorphicisms and emergent interfaces ]
