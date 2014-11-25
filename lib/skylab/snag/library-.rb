@@ -148,7 +148,9 @@ module Skylab::Snag
       HL__[]::WRITE_MODE_
     end
 
+    INSTANCE = Callback_.produce_library_shell_via_library_and_app_modules(
+      self, Snag_ )
   end
 
-  LIB_ = _lib
+  LIB_ = Lib_::INSTANCE
 end

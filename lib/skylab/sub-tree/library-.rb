@@ -210,7 +210,10 @@ module Skylab::SubTree
     Write_isomorphic_option_parser_options = -> * a do
       Face__[]::CLI::Client::API_Integration_::OP_.new( * a ).execute
     end
+
+    INSTANCE = Callback_.produce_library_shell_via_library_and_app_modules(
+      self, SubTree_ )
   end
 
-  LIB_ = _lib
+  LIB_ = Lib_::INSTANCE
 end

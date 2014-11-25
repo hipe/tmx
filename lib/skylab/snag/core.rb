@@ -17,8 +17,7 @@ module Skylab::Snag
   end
 
   def self._lib
-    @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
-      self::Lib_, self )
+    @lib ||= Snag_::Lib_::INSTANCE
   end
 
   ACHIEVED_= true

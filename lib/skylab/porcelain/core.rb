@@ -7,12 +7,13 @@ module Skylab::Porcelain
     Autoloader_ = Callback_::Autoloader
 
   def self._lib
-    @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
-      self::Lib_, self )
+    @lib ||= Porcelain_::Lib_::INSTANCE
   end
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
   stowaway :Lib_, 'library-'
+
+  Porcelain_ = self
 
 end

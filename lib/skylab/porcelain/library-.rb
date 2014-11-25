@@ -31,7 +31,11 @@ module Skylab::Porcelain
     String_lib = -> do
       Bsc__[]::String
     end
+
+    INSTANCE = Callback_.produce_library_shell_via_library_and_app_modules(
+      self, Porcelain_ )
   end
 
-  LIB_ = _lib
+  LIB_ = Lib_::INSTANCE
+
 end

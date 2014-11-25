@@ -158,7 +158,11 @@ module Skylab::CodeMolester
       System[].filesystem.tmpdir_pathname.join 'co-mo'
     end ]
 
+    INSTANCE = Callback_.produce_library_shell_via_library_and_app_modules(
+      self, CM_ )
+
   end
 
-  LIB_ = _lib
+  LIB_ = Lib_::INSTANCE
+
 end
