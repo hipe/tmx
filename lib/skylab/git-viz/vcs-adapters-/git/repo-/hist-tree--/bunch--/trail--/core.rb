@@ -60,11 +60,11 @@ module Skylab::GitViz
           PROCEDE_
         end
 
-        def get_any_nonzero_count_filediff_scanner
-          @filediff_a and bld_fd_scanner
+        def get_any_nonzero_count_filediff_stream
+          @filediff_a and bld_fd_stream
         end
       private
-        def bld_fd_scanner
+        def bld_fd_stream
           d = -1 ; last = @filediff_a.length - 1
           Scn_.new do
             d < last and @filediff_a.fetch d += 1
@@ -72,7 +72,7 @@ module Skylab::GitViz
         end
       public
 
-        def get_filediff_scanner
+        def get_filediff_stream
           d = last = nil
           GitViz_._lib.power_scanner :init, -> do
             d = -1 ; last = ( @filediff_a ? ( @filediff_a.length - 1 ) : -1 )

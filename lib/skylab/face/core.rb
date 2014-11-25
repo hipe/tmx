@@ -145,7 +145,7 @@ module Skylab::Face  # read [#011] the top node narrative
     end
 
     Scanner_for_array = -> a do
-      Bsc__[]::List.line_scanner a
+      Bsc__[]::List.line_stream a
     end
 
     Strange_proc = -> do

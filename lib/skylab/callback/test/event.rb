@@ -91,7 +91,7 @@ module Skylab::Callback::TestSupport
       end
     private
       def exec_expectation
-        scn = @exp.get_element_scanner
+        scn = @exp.get_element_stream
         while (( el = scn.gets ))
           exec_element el
           @do_continue or break
@@ -178,7 +178,7 @@ module Skylab::Callback::TestSupport
         @symbol_count += 1
       end
       def get_some_description_string
-        scn = get_element_scanner
+        scn = get_element_stream
         h = { }
         while (( el = scn.gets ))
           h[ el.description_slot_i ] = el.description_x
@@ -196,7 +196,7 @@ module Skylab::Callback::TestSupport
 
       TEMPLATE_S__ = 'emit{{pos}}{{adj}}{{channel}}{{msg}}'.freeze
 
-      def get_element_scanner
+      def get_element_stream
         d = -1 ; last = @exp_a.length - 1
         Callback_::Lib_::Scn.call do
           @exp_a[ d += 1 ] if d < last

@@ -13,7 +13,7 @@ module Skylab::SubTree::TestSupport::Tree::Traversal_Scanner
     it "3 node triangle" do
       tree = fp 'a/b', 'a/c'
       tree = tree.fetch_only_child
-      scn = tree.get_traversal_scanner
+      scn = tree.get_traversal_stream
       y = [ ]
       while (( card = scn.gets ))
         n = card.node
@@ -25,7 +25,7 @@ module Skylab::SubTree::TestSupport::Tree::Traversal_Scanner
     it "3 deep stem" do
       tree = fp 'a/b/c'
       tree = tree.fetch_only_child
-      scn = tree.get_traversal_scanner
+      scn = tree.get_traversal_stream
       a = [ ]
       while (( card = scn.gets ))
         a << "#{ card.prefix[] }#{ card.node.any_slug }"
@@ -41,7 +41,7 @@ module Skylab::SubTree::TestSupport::Tree::Traversal_Scanner
         'z/snaggoletoogh/liverwords/beef', 'z/snaggoletoogh/jonkerknocker',
         'z/hufflebuff/nikclebonkers', 'z/jipsaw'
       tree = tree.fetch_only_child
-      scn = tree.get_traversal_scanner
+      scn = tree.get_traversal_stream
       wait, exp = exp_a.shift
       while (( card = scn.gets ))
         n = card.node

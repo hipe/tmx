@@ -175,10 +175,10 @@ module Skylab::MetaHell
     #
     # note that while we keep the method signatures simple (monadic in/out),
     # one way to do scanning in addition to matching is to
-    # indicate `token_scanners` instead of `token_matchers`:
+    # indicate `token_streams` instead of `token_matchers`:
     #
     #     P = MetaHell_::Parse.series.curry[
-    #       :token_scanners, [
+    #       :token_streams, [
     #         -> feet   { /\A\d+\z/ =~ feet and feet.to_i },
     #         -> inches { /\A\d+(?:\.\d+)?\z/ =~ inches and inches.to_f }
     #       ] ]

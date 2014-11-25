@@ -82,7 +82,7 @@ module Skylab::GitViz
           parse = Parse_Manifest__.new lookup
           ec = nil
           lookup.IO_key.open 'r' do |fh|
-            ec = parse.parse_lines_in_peeking_scanner Counting_Peeker__.new fh
+            ec = parse.parse_lines_in_peeking_stream Counting_Peeker__.new fh
             ec and break
           end
           ec or add_to_cache( lookup, parse )
@@ -152,7 +152,7 @@ module Skylab::GitViz
           [ @cmd_as_non_unique_key_s_a, @cmd_a_h, @entry_count ]
         end
 
-        def parse_lines_in_peeking_scanner pscn
+        def parse_lines_in_peeking_stream pscn
           @path = pscn.path ; @pscn = pscn
           parse_entry_prototype = Parse_Entry__.
             new @pscn, @lookup, method( :receive_entry )
@@ -624,14 +624,14 @@ module Skylab::GitViz
           if @has_err_dumpfile
             gt_scn_from_prototype_a @e_a
           else
-            Callback_::Scn.the_empty_scanner
+            Callback_::Scn.the_empty_stream
           end
         end
         def gt_some_mock_sout
           if @has_out_dumpfile
             gt_scn_from_prototype_a @o_a
           else
-            Scn_.the_empty_scanner
+            Scn_.the_empty_stream
           end
         end
         def gt_scn_from_prototype_a a

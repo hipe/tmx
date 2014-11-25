@@ -33,15 +33,15 @@ module Skylab::Headless
 
       def each
         if block_given?
-          scn = get_scanner ; arty = nil
+          scn = get_stream ; arty = nil
           yield arty while (( arty = scn.gets ))
         else
           to_enum
         end
       end
 
-      def get_scanner
-        box.get_value_scanner
+      def get_stream
+        box.get_value_stream
       end
 
       def members

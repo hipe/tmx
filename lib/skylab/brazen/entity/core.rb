@@ -16,19 +16,19 @@ module Skylab::Brazen
         Brazen_::Event__
       end
 
-      def via_scanner_iambic_methods
+      def via_stream_iambic_methods
         Via_Scanner_Iambic_Methods_
       end
 
-      def iambic_scanner
-        Callback_.iambic_scanner
+      def iambic_stream
+        Callback_.iambic_stream
       end
 
       def method_added_muxer
         Method_Added_Muxer__
       end
 
-      def mutable_iambic_scanner
+      def mutable_iambic_stream
         Entity::Compound_Iambic_Scanner__::Mutable_Iambic_Scanner
       end
 
@@ -388,12 +388,12 @@ module Skylab::Brazen
             @scanner.current_token.respond_to? :id2name or break
           end
           _did = scan_anything_with_any_ad_hoc_processors
-          _did or metaproperty_scanner.scan_some_DSL
+          _did or metaproperty_stream.scan_some_DSL
           @scanner.unparsed_exists or break
         end while true
       end
 
-      def metaproperty_scanner
+      def metaproperty_stream
         @mprop_scnr ||= Entity::Meta_Property__::Mprop_Scanner.new self
       end
 
@@ -706,7 +706,7 @@ module Skylab::Brazen
         self
       end
 
-      def via_scanner_process_some_iambic
+      def via_stream_process_some_iambic
         box, subject = iambic_methods_box_and_subject
         scn = @scanner
         m_i = box[ scn.current_token ]
@@ -757,7 +757,7 @@ module Skylab::Brazen
         @x_a.fetch @d
       end
 
-      def advance_iambic_scanner_by_one
+      def advance_iambic_stream_by_one
         @d += 1
       end
 
@@ -817,7 +817,7 @@ module Skylab::Brazen
 
       include Iambic_Methods__
 
-      def set_scanner x
+      def set_stream x
         @scanner = x
       end
 
@@ -833,7 +833,7 @@ module Skylab::Brazen
         while unparsed_iambic_exists
           m_i = box[ current_iambic_token ]
           m_i or break
-          advance_iambic_scanner_by_one
+          advance_iambic_stream_by_one
           send reader.send( m_i ).iambic_writer_method_name
         end ; nil
       end
@@ -864,7 +864,7 @@ module Skylab::Brazen
         @scanner.current_token
       end
 
-      def advance_iambic_scanner_by_one
+      def advance_iambic_stream_by_one
         @scanner.advance_one
       end
     end

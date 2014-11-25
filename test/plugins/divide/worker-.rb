@@ -50,7 +50,7 @@ module Skylab::Test
         :syntax, :monikate, -> a { a * ' ' },
         :field, :monikate, -> s { "[ #{ s } ]" },
         :field, :moniker, '<integer>',
-        :token_scanner, fields.int.scan_token,
+        :token_stream, fields.int.scan_token,
         :field, * fields.flag( :random ).to_a,
         :prepend_to_uncurried_queue, :exhaustion ]
 

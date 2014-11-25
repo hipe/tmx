@@ -16,7 +16,7 @@ module Skylab::GitViz
       end
 
       def execute
-        @scn = get_any_nonzero_count_output_line_scanner_from_cmd
+        @scn = get_any_nonzero_count_output_line_stream_from_cmd
         @scn and bld_ci_via_processing_each_line_of_the_show_screen
       end
 

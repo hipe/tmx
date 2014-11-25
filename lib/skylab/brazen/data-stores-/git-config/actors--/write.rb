@@ -36,7 +36,7 @@ module Skylab::Brazen
       end
 
       def flush
-        scn = @section.get_line_scanner
+        scn = @section.get_line_stream
         if line = scn.gets
           ok = PROCEDE_
           @downstream_IO.write line

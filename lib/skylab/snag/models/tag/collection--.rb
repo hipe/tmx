@@ -33,15 +33,15 @@ module Skylab::Snag
 
       def to_enum
         if block_given?
-          scn = to_scanner ; x = nil
+          scn = to_stream ; x = nil
           yield x while x = scn.gets ; nil
         else
           enum_for :to_enum
         end
       end
 
-      def to_scanner
-        scanner = Models::Hashtag.value_peeking_scanner @body_s
+      def to_stream
+        scanner = Models::Hashtag.value_peeking_stream @body_s
         flyweight = Flyweight__.new -> { scanner.peek_for_value }
         tag = Tag_.new flyweight
         Callback_::Scn.new do

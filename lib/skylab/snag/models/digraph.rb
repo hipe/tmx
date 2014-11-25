@@ -14,7 +14,7 @@ module Skylab::Snag
     class Shell__
       def initialize
         @kernel = Kernel__.new
-        yield @kernel.method :get_scanner
+        yield @kernel.method :get_stream
       end
       def delegate= x
         @kernel.delegate= x
@@ -33,14 +33,14 @@ module Skylab::Snag
 
       attr_writer :delegate, :nodes
 
-      def get_scanner
+      def get_stream
         a = produce_every_node_with_a_doc_node_tag_or_parent_node_tag
         produce_hashes_associating_every_parent_node_to_child_node a
         if @parent_h.length.zero?
-          scanner_when_zero_doc_nodes
+          stream_when_zero_doc_nodes
         else
           @node_a = a
-          scanner_when_nonzero_doc_nodes
+          stream_when_nonzero_doc_nodes
         end
       end
 
@@ -99,13 +99,13 @@ module Skylab::Snag
           } or are doc nodes." ; nil
       end
 
-      def scanner_when_nonzero_doc_nodes
+      def stream_when_nonzero_doc_nodes
         h = determine_every_node_that_is_a_doc_node_recursively
         if h.length.zero?
-          scanner_when_zero_doc_nodes
+          stream_when_zero_doc_nodes
         else
           @is_doc_node_h = h
-          scanner_when_graph
+          stream_when_graph
         end
       end
 
@@ -126,13 +126,13 @@ module Skylab::Snag
         is_h
       end
 
-      def scanner_when_zero_doc_nodes
+      def stream_when_zero_doc_nodes
         send_info_string "no nodes in the collection are doc nodes."
-        Callback_::Scn.the_empty_scanner
+        Callback_::Scn.the_empty_stream
       end
 
-      def scanner_when_graph
-        @node_scn = bld_node_scanner
+      def stream_when_graph
+        @node_scn = bld_node_stream
         @advancer_p = method :advance
         @p = @advancer_p
         Callback_::Scn.new do
@@ -140,7 +140,7 @@ module Skylab::Snag
         end
       end
 
-      def bld_node_scanner
+      def bld_node_stream
         d = -1 ; last = @node_a.length - 1
         Callback_::Scn.new do
           if d < last
@@ -175,7 +175,7 @@ module Skylab::Snag
       end
 
       def build_driller
-        scn = bld_doc_child_node_scanner
+        scn = bld_doc_child_node_stream
         -> do
           x = scn.gets
           if ! x
@@ -186,8 +186,8 @@ module Skylab::Snag
         end
       end
 
-      def bld_doc_child_node_scanner
-        scn = bld_child_node_scanner
+      def bld_doc_child_node_stream
+        scn = bld_child_node_stream
         Callback_::Scn.new do
           begin
             s = scn.gets
@@ -201,7 +201,7 @@ module Skylab::Snag
         end
       end
 
-      def bld_child_node_scanner
+      def bld_child_node_stream
         d = -1 ; last = @s_a.length - 1
         Callback_::Scn.new do
           if d < last

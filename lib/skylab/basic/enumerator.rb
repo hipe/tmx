@@ -4,7 +4,7 @@ module Skylab::Basic
 
     class << self
 
-      def line_scanner * a, & p
+      def line_stream * a, & p
         if p
           Line_Scanner__.new ::Enumerator.new( * a, & p )
         elsif a.length.zero?

@@ -60,7 +60,7 @@ module Skylab::GitViz
     public
 
       def get_trail_a
-        @bunch.get_trail_scanner.to_a
+        @bunch.get_trail_stream.to_a
       end
 
       def commitpoint_mani

@@ -13,7 +13,7 @@ module Skylab::Brazen
       def produce_any_result
         o = @render ; token = @token
         scn = @invo.get_action_scn.reduce_by( & :is_visible )
-        scn = @invo.wrap_scanner_with_ordering_buffer scn
+        scn = @invo.wrap_stream_with_ordering_buffer scn
         o.express { "unrecognized action #{ ick token }" }
         s_a = []
         while action = scn.gets

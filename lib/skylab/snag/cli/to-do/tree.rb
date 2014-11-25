@@ -99,7 +99,7 @@ module Skylab::Snag
         @glyphset_i ||= :wide  # wide or narrow
       end
       def execute
-        scn = @tree.get_traversal_scanner :glyphset_x, @glyphset_i
+        scn = @tree.get_traversal_stream :glyphset_x, @glyphset_i
         Callback_::Scn.new do
           card = scn.gets
           card and line_via_card card
@@ -143,13 +143,13 @@ module Skylab::Snag
       def execute
         build_cache
         determine_column_A_width
-        via_cache_build_scanner
+        via_cache_build_stream
       end
 
     private
 
       def build_cache
-        scn = @tree.get_traversal_scanner :glyphset_x, @glyphset_i ; y = []
+        scn = @tree.get_traversal_stream :glyphset_x, @glyphset_i ; y = []
         card = scn.gets
         if card.node.children_count.zero?
           card = nil
@@ -175,7 +175,7 @@ module Skylab::Snag
         end ; nil
       end
 
-      def via_cache_build_scanner
+      def via_cache_build_stream
         d = -1 ; last = @cache_a.length - 1
         Callback_::Scn.new do
           if d < last

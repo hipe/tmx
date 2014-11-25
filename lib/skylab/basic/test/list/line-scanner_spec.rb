@@ -43,7 +43,7 @@ module Skylab::Basic::TestSupport::List
     end
 
     def subject
-      Subject_[].line_scanner
+      Subject_[].line_stream
     end
   end
 end

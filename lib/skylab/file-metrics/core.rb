@@ -99,7 +99,7 @@ module Skylab::FileMetrics
     end
 
     Reverse_string_scanner = -> s do
-      Bsc__[]::String.line_scanner.reverse s
+      Bsc__[]::String.line_stream.reverse s
     end
 
     Select = -> do

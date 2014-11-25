@@ -18,7 +18,7 @@ module Skylab::BeautySalon
       begin
         ok, res = preexecute
         ok or break
-        @scn = resolve_line_scanner or break
+        @scn = resolve_line_stream or break
         @token_buffer = BS_._lib.token_buffer %r([[:space:]]*), %r([^[:space:]]+)
         ok = true
         while line = @scn.gets
@@ -109,7 +109,7 @@ module Skylab::BeautySalon
     Ellipsulate__ = BS_._lib.CLI_lib.ellipsify.
       curry[ A_RATHER_SHORT_LEN__ ]
 
-    def resolve_line_scanner
+    def resolve_line_stream
       res = nil
       begin
         fh = resolve_file or break

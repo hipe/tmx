@@ -162,7 +162,7 @@ module Skylab::Git
     def normalize
       r = false
       begin
-        r = get_branches_stream_line_scanner or break
+        r = get_branches_stream_line_stream or break
         r = API_Model::Branches.from_line_scanner( r, @snitch ) or break
         @branches = r
         true
@@ -171,7 +171,7 @@ module Skylab::Git
       r
     end
 
-    def get_branches_stream_line_scanner
+    def get_branches_stream_line_stream
       r = get_branches_stream
       r and Git_._lib.scanner r
     end

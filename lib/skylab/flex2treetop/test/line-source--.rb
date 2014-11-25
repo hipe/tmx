@@ -11,24 +11,24 @@ module Skylab::Flex2Treetop::MyTestSupport
 
     def init_upstream_line_source_with_emissions chan_i, em_a
       @emission_a = em_a
-      init_chopped_line_scanner_for_channel chan_i ; nil
+      init_chopped_line_stream_for_channel chan_i ; nil
     end
   private
-    def init_chopped_line_scanner_for_channel chan_i
-      init_chopped_line_scanner bld_chopped_line_scanner_for_channel chan_i
+    def init_chopped_line_stream_for_channel chan_i
+      init_chopped_line_stream bld_chopped_line_stream_for_channel chan_i
     end
 
-    def bld_chopped_line_scanner_for_channel chan_i
+    def bld_chopped_line_stream_for_channel chan_i
       Chopped_line_peeking_channel_scanner__[ @emission_a, @debug_IO, chan_i ]
     end
   public
 
     def init_upstream_line_source_with_open_file_IO io
-      init_chopped_line_scanner bld_IO_chopped_line_scanner io ; nil
+      init_chopped_line_stream bld_IO_chopped_line_stream io ; nil
     end
 
   private
-    def init_chopped_line_scanner x
+    def init_chopped_line_stream x
       @crrnt_chopped_line_scanner and fail "upstream scanner alread set"
       @crrnt_chopped_line_scanner = x ; nil
     end
@@ -52,16 +52,16 @@ module Skylab::Flex2Treetop::MyTestSupport
     end
   public
 
-    def change_upstream_scanner_to_channel chan_i
-      chnge_chopped_lines_scanner_to bld_chopped_line_scanner_for_channel chan_i
+    def change_upstream_stream_to_channel chan_i
+      chnge_chopped_lines_stream_to bld_chopped_line_stream_for_channel chan_i
       nil
     end
 
-    def change_upstream_scanner_to_open_filehandle io
-      chnge_chopped_lines_scanner_to bld_IO_chopped_line_scanner io ; nil
+    def change_upstream_stream_to_open_filehandle io
+      chnge_chopped_lines_stream_to bld_IO_chopped_line_stream io ; nil
     end
   private
-    def bld_IO_chopped_line_scanner io
+    def bld_IO_chopped_line_stream io
       Chopped_line_peeking_IO_scanner__[ io, @debug_IO ]
     end
   public
@@ -76,7 +76,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
     def skip_until_last_N_lines d
       bb = Bounceback__.new( d, @crrnt_chopped_line_scanner ).execute
-      chnge_chopped_lines_scanner_to bld_chopped_lines_scanner_from_ary bb.a
+      chnge_chopped_lines_stream_to bld_chopped_lines_stream_from_ary bb.a
       bb.count
     end
 
@@ -102,7 +102,7 @@ module Skylab::Flex2Treetop::MyTestSupport
       attr_reader :a, :count
     end
 
-    def bld_chopped_lines_scanner_from_ary buff_a
+    def bld_chopped_lines_stream_from_ary buff_a
       Chopped_line_peeking_ary_scanner__[ buff_a, @debug_IO ]
     end
 
@@ -134,7 +134,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
   private
 
-    def chnge_chopped_lines_scanner_to scn
+    def chnge_chopped_lines_stream_to scn
       s = @crrnt_chopped_line_scanner.gets and fail say_unspent_lines s
       @crrnt_chopped_line_scanner = scn ; nil
     end

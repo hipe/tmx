@@ -64,7 +64,7 @@ module Skylab::Callback
           while unparsed_iambic_exists
             m_i = :"#{ current_iambic_token }="
             if pass_p[ m_i ]
-              advance_iambic_scanner_by_one
+              advance_iambic_stream_by_one
               send m_i
             else
               x = current_iambic_index
@@ -125,7 +125,7 @@ module Skylab::Callback
 
         def iambic_property
           x = current_iambic_token
-          advance_iambic_scanner_by_one
+          advance_iambic_stream_by_one
           x
         end
 
@@ -137,7 +137,7 @@ module Skylab::Callback
           @x_a.fetch @d
         end
 
-        def advance_iambic_scanner_by_one
+        def advance_iambic_stream_by_one
           @d += 1
         end
       end
@@ -154,7 +154,7 @@ module Skylab::Callback
 
         def iambic_property
           x = current_iambic_token
-          advance_iambic_scanner_by_one
+          advance_iambic_stream_by_one
           x
         end
 
@@ -166,7 +166,7 @@ module Skylab::Callback
           @scanner.current_token
         end
 
-        def advance_iambic_scanner_by_one
+        def advance_iambic_stream_by_one
           @scanner.advance_one
         end
       end
@@ -276,7 +276,7 @@ module Skylab::Callback
 
         def execute
           if :properties == current_iambic_token
-            advance_iambic_scanner_by_one
+            advance_iambic_stream_by_one
             resolve_property_class_and_writable_box
             loop_for_properties
           else
@@ -290,7 +290,7 @@ module Skylab::Callback
           while unparsed_iambic_exists
             i = current_iambic_token
             if :properties == i
-              advance_iambic_scanner_by_one
+              advance_iambic_stream_by_one
               flush_rest_as_flat_list
               break
             end

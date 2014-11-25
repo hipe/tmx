@@ -206,7 +206,7 @@ module Skylab::Face
         :client_class, client,
         :passive, :absorber, :absorb_iambc_psvly,
       -> do
-        scn = client::FIELDS_.get_value_scanner
+        scn = client::FIELDS_.get_value_stream
         while (( fld = scn.gets ))
           if fld.is_property
             Define_property_writer__[ im_mod, fld ]

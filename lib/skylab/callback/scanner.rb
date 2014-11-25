@@ -4,7 +4,7 @@ module Skylab::Callback
 
     class << self
 
-      def build_each_pairable_via_pairs_scanner_proc & p  # #todo covered by [sg]
+      def build_each_pairable_via_pairs_stream_proc & p  # #todo covered by [sg]
         Build_each_pairable_via_pairs_scanner_proc__.new( & p )
       end
     end

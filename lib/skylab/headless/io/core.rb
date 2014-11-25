@@ -8,7 +8,7 @@ module Skylab::Headless
         IO::DRY_STUB__
       end
 
-      def line_scanner io, num_bytes=nil
+      def line_stream io, num_bytes=nil
         IO_::Line_Scanner__.new io, num_bytes
       end
 

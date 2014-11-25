@@ -40,7 +40,7 @@ module Skylab::Brazen
         o.output_header 'actions'
         o.output_option_parser_summary  # sic
         _scn = aa.get_action_scn.reduce_by( & :is_visible )
-        _scn = aa.wrap_scanner_with_ordering_buffer _scn
+        _scn = aa.wrap_stream_with_ordering_buffer _scn
         o.output_items_with_descriptions nil, _scn.to_a, 2
         o.section_boundary
 

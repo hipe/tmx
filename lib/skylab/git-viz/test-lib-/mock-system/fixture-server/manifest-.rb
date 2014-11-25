@@ -16,17 +16,17 @@ module Skylab::GitViz
           @cmd_as_non_unique_key_s_a.length
         end
 
-        def get_command_scanner_scanner
+        def get_command_stream_stream
           a = @cmd_as_non_unique_key_s_a ; d = -1 ; last = a.length - 1
           Scn_.new do
             if d < last
               cmd_s = a.fetch d += 1
-              bld_cmd_scanner @cmd_a_h.fetch cmd_s
+              bld_cmd_stream @cmd_a_h.fetch cmd_s
             end
           end
         end
       private
-        def bld_cmd_scanner a
+        def bld_cmd_stream a
           d = -1 ; last = a.length - 1
           Scn_.new do
             d < last and a.fetch d += 1

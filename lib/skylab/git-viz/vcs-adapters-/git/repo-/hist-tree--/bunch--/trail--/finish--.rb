@@ -10,7 +10,7 @@ module Skylab::GitViz
 
           def execute
             @repo = @bunch.repo
-            @scn = @trail.get_any_nonzero_count_filediff_scanner
+            @scn = @trail.get_any_nonzero_count_filediff_stream
             ok = finish_any_filediffs
             ok && @trail.finish
           end

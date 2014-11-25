@@ -12,7 +12,7 @@ module Skylab::Callback
       Pair_
     end
 
-    def iambic_scanner
+    def iambic_stream
       Iambic_Scanner_
     end
 
@@ -288,7 +288,7 @@ module Skylab::Callback
       Callback_::Scan.via_nonsparse_array @a
     end
 
-    def to_value_scanner
+    def to_value_stream
       d = -1 ; last = @a.length - 1
       Scn.new do
         if d < last
@@ -1734,7 +1734,7 @@ module Skylab::Callback
         Callback_::Scn__::Articulators
       end
 
-      def the_empty_scanner
+      def the_empty_stream
         @_tes_ ||= new do end
       end
 

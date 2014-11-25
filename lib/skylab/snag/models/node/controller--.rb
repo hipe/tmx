@@ -242,10 +242,10 @@ module Skylab::Snag
           @extra_lines_header.length : 0
         @line_width >= @curr_width or self._SANITY
         @line_width > @subsequent_curr_width or self._SANITY
-        @scn = Snag_::Library_::StringScanner.new bld_scanner_string ; nil
+        @scn = Snag_::Library_::StringScanner.new bld_stream_string ; nil
       end
 
-      def bld_scanner_string
+      def bld_stream_string
         a = []
         if @do_prepend_open_tag
           a.push @open_tag_s

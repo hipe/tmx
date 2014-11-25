@@ -41,7 +41,7 @@ module Skylab::TestSupport
           io.puts path_s
           tree = tree_
         end
-        scn = tree.get_traversal_scanner
+        scn = tree.get_traversal_stream
         x = scn.gets
         if ! path_s
           x.node.any_slug and fail "what: #{ x.node.any_slug }"

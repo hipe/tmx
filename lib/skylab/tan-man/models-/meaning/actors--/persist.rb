@@ -42,7 +42,7 @@ module Skylab::TanMan
 
         def find_neighbors
           my_name = @name
-          @scan = produce_fresh_scanner
+          @scan = produce_fresh_stream
           least_greater_name = nil
           while fly = @scan.gets
             name = fly.property_value :name
@@ -77,7 +77,7 @@ module Skylab::TanMan
         end
 
         def find_first_flyweight_with_name s
-          @scan = produce_fresh_scanner
+          @scan = produce_fresh_stream
           @scan.detect do |ent|
             s == ent.property_value( :name )
           end
@@ -151,7 +151,7 @@ module Skylab::TanMan
           send_event _ev ; UNABLE_
         end
 
-        def produce_fresh_scanner
+        def produce_fresh_stream
           @scan_p[]
         end
 

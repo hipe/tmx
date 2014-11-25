@@ -25,7 +25,7 @@ module Skylab::MetaHell
     # like so:
     #
     #     PARSER = MetaHell_::Parse.via_ordered_set.curry[
-    #       :argv_scanners, [
+    #       :argv_streams, [
     #         -> args { args.shift if args.first =~ /bill/i },
     #         -> args { if :hi == args.first then args.shift and :hello end }]]
     #
@@ -74,7 +74,7 @@ module Skylab::MetaHell
         end
         res_a
       end,
-      :uncurried_queue, [ :argv_scanners, :argv ] ]
+      :uncurried_queue, [ :argv_streams, :argv ] ]
 
   end
 end

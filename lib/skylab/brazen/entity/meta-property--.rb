@@ -235,13 +235,13 @@ module Skylab::Brazen
       private
 
         def this_child_must_iambicly_scan_something o
-          o.set_scanner @scanner
+          o.set_stream @scanner
           d = @scanner.current_index
           o.process_iambic_passively
           if d == @scanner.current_index
             when_child_did_not_scan_something
           else
-            o.set_scanner nil
+            o.set_stream nil
             ACHIEVED_
           end
         end
@@ -277,7 +277,7 @@ module Skylab::Brazen
 
         def iambic_keyword i
           if i == current_iambic_token
-            advance_iambic_scanner_by_one
+            advance_iambic_stream_by_one
             ACHIEVED_
           else
             when_not_iambic_keyword i

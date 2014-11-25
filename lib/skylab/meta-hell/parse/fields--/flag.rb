@@ -109,7 +109,7 @@ module Skylab::MetaHell
       def to_a
         a = [ ]
         s = get_moniker and a << :moniker << s
-        a << :token_scanner << method( :scan_token )
+        a << :token_stream << method( :scan_token )
         a
       end
 

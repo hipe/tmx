@@ -264,7 +264,7 @@ module Skylab::Brazen
 
       def execute
         @inflection = Customized_Action_Inflection__.new
-        via_scanner_process_some_iambic
+        via_stream_process_some_iambic
         acpt @inflection
       end
 

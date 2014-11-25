@@ -24,7 +24,7 @@ module Skylab::Basic
         String_::Small_Time_Actors__::Ellipsify.via_arglist a
       end
 
-      def line_scanner * a
+      def line_stream * a
         if a.length.zero?
           String_::Line_Scanner__
         else
@@ -32,7 +32,7 @@ module Skylab::Basic
         end
       end
 
-      alias_method :line_stream, :line_scanner
+      alias_method :line_stream, :line_stream
 
       def looks_like_sentence * a
         if a.length.zero?

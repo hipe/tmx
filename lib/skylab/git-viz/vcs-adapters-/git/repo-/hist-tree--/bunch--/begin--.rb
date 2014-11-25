@@ -42,7 +42,7 @@ module Skylab::GitViz
           end
         public
           def execute
-            get_any_nonzero_count_output_line_scanner_from_cmd
+            get_any_nonzero_count_output_line_stream_from_cmd
           end
         end
       end

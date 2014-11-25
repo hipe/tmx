@@ -8,16 +8,16 @@ module Skylab::Snag
         Scan_Maker__.new( s ).to_a
       end
 
-      def puts_scanner s
+      def puts_stream s
         Callback_::Scanner::Puts_Wrapper.new scanner s
       end
 
-      def value_peeking_scanner s
+      def value_peeking_stream s
         Value_Peeking_Wrapper__.new scanner s
       end
 
       def scanner s
-        Scan_Maker__.new( s ).to_scanner
+        Scan_Maker__.new( s ).to_stream
       end
     end
 
@@ -56,10 +56,10 @@ module Skylab::Snag
         @str = str
       end
       def to_a
-        scn = to_scanner ; y = [] ; x = nil
+        scn = to_stream ; y = [] ; x = nil
         y.push x while x = scn.gets ; y
       end
-      def to_scanner
+      def to_stream
         _kernel = Scan_Kernel__.new @str
         Callback_::Scn.new( & _kernel.method( :gets ) )
       end

@@ -20,7 +20,7 @@ module Skylab::Snag
     private
 
       def if_any_missing_required_raise_argument_error
-        scn  = self.class.properties.to_value_scanner ; a = nil
+        scn  = self.class.properties.to_value_stream ; a = nil
         while (( prop = scn.gets ))
           prop.is_required or next
           ivar = prop.as_ivar

@@ -109,7 +109,7 @@ module Skylab::Brazen
         end
 
         def get_section_body_lines
-          scn = @section.get_body_line_scanner
+          scn = @section.get_body_line_stream
           y = [] ; x = nil ; y.push x while x = scn.gets ; y
         end
 

@@ -26,7 +26,7 @@ module Skylab::Snag
 
     def each
       if block_given?
-        scn = to_scanner ; x = nil
+        scn = to_stream ; x = nil
         yield x while x = scn.gets
         @result
       else
@@ -34,7 +34,7 @@ module Skylab::Snag
       end
     end
 
-    def to_scanner
+    def to_stream
       @seen_count = 0 ; @result = nil
       @p = bld_initial_gets_proc
       Callback_::Scn.new do

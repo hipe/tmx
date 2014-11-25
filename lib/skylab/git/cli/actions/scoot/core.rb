@@ -583,15 +583,15 @@ module Skylab::Git
         @system_conduit = system_conduit
       end
       def execute
-        @scn = get_git_branch_name_scanner
-        @scn && exec_with_git_branch_name_scanner
+        @scn = get_git_branch_name_stream
+        @scn && exec_with_git_branch_name_stream
       end
     private
-      def get_git_branch_name_scanner
+      def get_git_branch_name_stream
         Get_git_branch_name_scanner__.
           new( @system_conduit, @y ).execute
       end
-      def exec_with_git_branch_name_scanner
+      def exec_with_git_branch_name_stream
         @uow_a = [] ; scn = @scn ; @counts = Counts__.new
         while (( s = scn.gets ))
           @counts.seen += 1
@@ -669,7 +669,7 @@ module Skylab::Git
       def execute
         @call = get_git_branch_system_call
         peek_s = @call.gets_chopped_output_line
-        peek_s ? get_good_git_branch_name_scanner( peek_s ) : bad_call
+        peek_s ? get_good_git_branch_name_stream( peek_s ) : bad_call
       end
       def get_git_branch_system_call
         System_Call__.new do |sc|
@@ -684,7 +684,7 @@ module Skylab::Git
         @info_yielder << "(had exitstatus #{ @call.exitstatus })"
         CEASE_
       end
-      def get_good_git_branch_name_scanner peek_s
+      def get_good_git_branch_name_stream peek_s
         p = -> do
           p = -> { @call.gets_chopped_output_line }
           peek_s

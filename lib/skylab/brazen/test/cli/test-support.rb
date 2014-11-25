@@ -272,7 +272,7 @@ module Skylab::Brazen::TestSupport::CLI
 
     def load_expect_the_first_time
       cls = self.class
-      cls.include Entity_[].via_scanner_iambic_methods
+      cls.include Entity_[].via_stream_iambic_methods
       cls.send :define_method, :expect do |*x_a|
         expect_via_arg_list x_a
       end ; nil
@@ -285,7 +285,7 @@ module Skylab::Brazen::TestSupport::CLI
 
     def expect_maybe_a_blank_line
       if unparsed_iambic_exists and NEWLINE__ == current_iambic_token.string
-        advance_iambic_scanner_by_one ; nil
+        advance_iambic_stream_by_one ; nil
       end
     end
 
@@ -327,7 +327,7 @@ module Skylab::Brazen::TestSupport::CLI
       init_expectation_scan x_a
       if :styled == current_iambic_token
         @style_is_expected = true
-        advance_iambic_scanner_by_one
+        advance_iambic_stream_by_one
       else
         @style_is_expected = false
       end
@@ -346,7 +346,7 @@ module Skylab::Brazen::TestSupport::CLI
       if expectation_scanner
         @expectation_scanner.send :initialize, 0, x_a
       else
-        @expectation_scanner = Entity_[].iambic_scanner.new 0, x_a
+        @expectation_scanner = Entity_[].iambic_stream.new 0, x_a
       end
       @scanner = @expectation_scanner ; nil
     end
@@ -354,7 +354,7 @@ module Skylab::Brazen::TestSupport::CLI
     def init_emission_scan
       if ! emission_scanner
         _em_a = build_baked_em_a
-        @emission_scanner = Entity_[].iambic_scanner.new 0, _em_a
+        @emission_scanner = Entity_[].iambic_stream.new 0, _em_a
       end
       @scanner = @emission_scanner ; nil
     end

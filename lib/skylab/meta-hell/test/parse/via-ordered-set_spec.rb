@@ -19,7 +19,7 @@ module Skylab::MetaHell::TestSupport::Parse::FromOrderedSet__
         Sandbox_1.with self
         module Sandbox_1
           PARSER = MetaHell_::Parse.via_ordered_set.curry[
-            :argv_scanners, [
+            :argv_streams, [
               -> args { args.shift if args.first =~ /bill/i },
               -> args { if :hi == args.first then args.shift and :hello end }]]
         end

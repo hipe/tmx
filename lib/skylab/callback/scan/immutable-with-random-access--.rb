@@ -238,7 +238,7 @@ module Skylab::Callback
       def reduce_by i=nil
         if i
           if block_given?
-            scn = to_value_scanner
+            scn = to_value_stream
             ivar = :"@#{ i }"
             while x = scn.gets
               x.instance_variable_defined?( ivar ) and yield x
@@ -248,7 +248,7 @@ module Skylab::Callback
           end
         else
           ::Enumerator.new do |y|
-            scn = to_value_scanner
+            scn = to_value_stream
             while x = scn.gets
               _b = yield x
               _b and y << x
@@ -263,7 +263,7 @@ module Skylab::Callback
 
       def each_value
         if block_given?
-          scn = to_value_scanner
+          scn = to_value_stream
           while x = scn.gets
             yield x
           end ; nil
@@ -300,8 +300,8 @@ module Skylab::Callback
         end
       end
 
-      def to_scanner
-        to_value_scanner
+      def to_simple_stream
+        to_value_stream
       end
 
       def to_pair_scan
@@ -310,19 +310,19 @@ module Skylab::Callback
         end
       end
 
-      def to_value_scanner
+      def to_value_stream
         if @done
-          to_scanner_when_done Callback_::Scn
+          to_stream_when_done Callback_::Scn
         else
-          to_scanner_when_not_done Callback_::Scn
+          to_stream_when_not_done Callback_::Scn
         end
       end
 
       def to_stream
         if @done
-          to_scanner_when_done Scan_
+          to_stream_when_done Scan_
         else
-          to_scanner_when_not_done Scan_
+          to_stream_when_not_done Scan_
         end
       end
 
@@ -336,7 +336,7 @@ module Skylab::Callback
         end
       end
 
-      def to_scanner_when_done cls
+      def to_stream_when_done cls
         d = -1 ; last = @last
         cls.new do
           if d < last
@@ -354,7 +354,7 @@ module Skylab::Callback
         end
       end
 
-      def to_scanner_when_not_done cls
+      def to_stream_when_not_done cls
         d = -1
         cls.new do
           if @done

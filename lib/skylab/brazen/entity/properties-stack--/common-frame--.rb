@@ -452,7 +452,7 @@ module Skylab::Brazen
             end
           end ]
 
-          include Entity.via_scanner_iambic_methods
+          include Entity.via_stream_iambic_methods
 
           def initialize scan
             @reader = scan.reader

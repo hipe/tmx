@@ -38,23 +38,23 @@ module Skylab::GitViz
 
     private
 
-      def get_any_nonzero_count_output_line_scanner_from_cmd
+      def get_any_nonzero_count_output_line_stream_from_cmd
         ok = exec_command
-        ok && gt_output_line_scanner_from_command_result
+        ok && gt_output_line_stream_from_command_result
       end
 
       # [#hl-119] #de-vowelated names are used: 'gt' below is short for 'get'
 
-      def gt_output_line_scanner_from_command_result
+      def gt_output_line_stream_from_command_result
         peek_s = @o.gets
         if peek_s
-          gt_output_line_scanner_when_one_output_line peek_s
+          gt_output_line_stream_when_one_output_line peek_s
         else
-          gt_any_output_line_scanner_when_no_first_output_line
+          gt_any_output_line_stream_when_no_first_output_line
         end
       end
 
-      def gt_any_output_line_scanner_when_no_first_output_line
+      def gt_any_output_line_stream_when_no_first_output_line
         peek_s = @e.gets
         if peek_s
           r = unexpected_errput peek_s
@@ -65,7 +65,7 @@ module Skylab::GitViz
         end
       end
 
-      def gt_output_line_scanner_when_one_output_line line_s
+      def gt_output_line_stream_when_one_output_line line_s
         gets_p = -> do
           gets_p = -> do
             line_s = @o.gets
@@ -73,7 +73,7 @@ module Skylab::GitViz
               line_s.chomp!  # #storypoint-45
               line_s
             else
-              gets_p = fnsh_the_scanner_with_a_proc
+              gets_p = fnsh_the_stream_with_a_proc
               line_s
             end
           end
@@ -86,7 +86,7 @@ module Skylab::GitViz
         end
       end
 
-      def fnsh_the_scanner_with_a_proc
+      def fnsh_the_stream_with_a_proc
         line_s = @e.gets
         line_s and unexpected_errput line_s
         expect_zero_exitstatus

@@ -170,7 +170,7 @@ module Skylab::MetaHell
       end
     end
 
-    def get_value_scanner
+    def get_value_stream
       d = -1 ; last = @order.length - 1
       Callback_::Scn.new do
         if d < last

@@ -64,7 +64,7 @@ module Skylab::Basic
 
     def normalize ev=nil
       @a.sort!
-      scn = Basic_::List.line_scanner @a
+      scn = Basic_::List.line_stream @a
       prev = scn.gets ; elim = nil
       if prev
         while curr = scn.gets

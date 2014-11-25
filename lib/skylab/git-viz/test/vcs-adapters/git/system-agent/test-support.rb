@@ -25,7 +25,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git::System_Agent
 
   testable_client_class :testable_system_agent_class do
     class Testable_System_Agent < GitViz_::VCS_Adapters_::Git::System_Agent_
-      public :get_any_nonzero_count_output_line_scanner_from_cmd
+      public :get_any_nonzero_count_output_line_stream_from_cmd
       self
     end
   end

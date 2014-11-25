@@ -24,11 +24,11 @@ module Skylab::Headless::TestSupport::IO::Line_Scanner
   module InstanceMethods
 
     def subject_via_pathname pn, d=nil
-      Headless_.system.filesystem.line_scanner_via_pathname pn, d
+      Headless_.system.filesystem.line_stream_via_pathname pn, d
     end
 
     def subject_via_filehandle fh, d
-      Headless_::IO.line_scanner fh, d
+      Headless_::IO.line_stream fh, d
     end
 
     def resolve_some_pathname path_s, o_p

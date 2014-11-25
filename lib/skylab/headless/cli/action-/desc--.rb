@@ -46,13 +46,13 @@ module Skylab::Headless
       end
       def sections
         if block_given?
-          scn = get_section_scanner ; section = nil
+          scn = get_section_stream ; section = nil
           yield section while section = scn.gets
         else
           to_enum :sections
         end
       end
-      def get_section_scanner
+      def get_section_stream
         a = @sect_a ; d = -1 ; last = a.length - 1
         Scn_.new { d < last and a.fetch( d += 1 ) }
       end

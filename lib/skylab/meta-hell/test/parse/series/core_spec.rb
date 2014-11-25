@@ -85,11 +85,11 @@ module Skylab::MetaHell::TestSupport::Parse::Series__
     end
     context "changing it from a matching parser to a scanning parser" do
       Sandbox_3 = Sandboxer.spawn
-      it "indicate `token_scanners` instead of `token_matchers`" do
+      it "indicate `token_streams` instead of `token_matchers`" do
         Sandbox_3.with self
         module Sandbox_3
           P = MetaHell_::Parse.series.curry[
-            :token_scanners, [
+            :token_streams, [
               -> feet   { /\A\d+\z/ =~ feet and feet.to_i },
               -> inches { /\A\d+(?:\.\d+)?\z/ =~ inches and inches.to_f }
             ] ]

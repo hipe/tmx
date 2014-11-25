@@ -20,14 +20,14 @@ module Skylab::Headless
         def each_argument
           block_given? and never
           ::Enumerator.new do |y|
-            scn = get_node_scanner ; node = nil
+            scn = get_node_stream ; node = nil
             y << node while (( node = scn.gets ))
             nil
           end
         end
 
-        def get_node_scanner
-          @series.get_node_scanner
+        def get_node_stream
+          @series.get_node_stream
         end
 
         def process_args a, &p
@@ -77,7 +77,7 @@ module Skylab::Headless
           client.render_grp_s_a_as_i collection_type_i, y
         end
 
-        def get_node_scanner
+        def get_node_stream
           Node_Scanner__.new @node_a
         end
 
@@ -130,7 +130,7 @@ module Skylab::Headless
         end
 
         def parse_notify parse
-          r = true ; scn = get_node_scanner
+          r = true ; scn = get_node_stream
           while (( node = scn.gets ))
             r = node.parse_notify( parse ) or break
           end
@@ -306,7 +306,7 @@ module Skylab::Headless
         end
 
         def parse_notify parse
-          scn = get_node_scanner ; fail_a = nil
+          scn = get_node_stream ; fail_a = nil
           while (( node = scn.gets ))
             prs = build_parse_recorder parse
             r = node.parse_notify prs

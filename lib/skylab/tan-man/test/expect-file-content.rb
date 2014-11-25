@@ -84,7 +84,7 @@ module Skylab::TanMan
 
       def excrpt_lines_from_end beg_d, end_d, s
         if s.length.nonzero?
-          scn = backwards_index_scanner s, NEWLINE_
+          scn = backwards_index_stream s, NEWLINE_
           d = s.length - 1
           if NEWLINE_ == s[ -1 ]  # [#sg-020] newline is terminator not separator
             scn.gets
@@ -113,7 +113,7 @@ module Skylab::TanMan
         y
       end
 
-      def backwards_index_scanner s, sep
+      def backwards_index_stream s, sep
         d = s.length - 1
         p = -> do
           r = s.rindex sep, d

@@ -181,7 +181,7 @@ module Skylab::Brazen
     HL__ = sidesys[ :Headless ]
 
     Iambic_scanner = -> do
-      Callback_.iambic_scanner
+      Callback_.iambic_stream
     end
 
     IO = -> do
@@ -195,7 +195,7 @@ module Skylab::Brazen
     end
 
     Mutable_iambic_scanner = -> do
-      Brazen_::Entity.mutable_iambic_scanner
+      Brazen_::Entity.mutable_iambic_stream
     end
 
     N_lines = -> do

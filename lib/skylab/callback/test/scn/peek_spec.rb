@@ -8,7 +8,7 @@ module Skylab::Callback::TestSupport::Scn
       it "like this" do
         Sandbox_1.with self
         module Sandbox_1
-          _scn = Basic_::List.line_scanner %i( a b )
+          _scn = Basic_::List.line_stream %i( a b )
           scn = Callback_::Scn.peek.gets_under _scn
           scn.gets.should eql( :a )
           scn.peek.should eql( :b )

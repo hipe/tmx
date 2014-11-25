@@ -21,7 +21,7 @@ module Skylab::MetaHell
 
       attr_reader :monikate_p
 
-      def normal_token_proc  # assumes `token_scanner`
+      def normal_token_proc  # assumes `token_stream`
         @ntp ||= begin
           -> tok do
             x = @token_scanner_p[ tok ]
@@ -81,7 +81,7 @@ module Skylab::MetaHell
         @moniker = iambic_property ; nil
       end
 
-      def token_scanner
+      def token_stream
         @looks_like_particular_field = true
         @token_scanner_p = iambic_property ; nil
       end

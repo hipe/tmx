@@ -142,7 +142,7 @@ module Skylab::GitViz
         end
 
         def reduce_with_manifest_when_prepared
-          @scn = @mani.get_command_scanner_scanner
+          @scn = @mani.get_command_stream_stream
           while (( scn = @scn.gets ))
             cmd = scn.gets  # assume always at least one
             _ok = command_string_does_pass_white_or_black_filters cmd.cmd_s

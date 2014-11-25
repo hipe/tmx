@@ -44,7 +44,7 @@ module Skylab::TanMan
           begin
             controllers.config.ready? or break
             cnt = collections.dot_file.currently_using or break
-            r = cnt.get_remote_scanner
+            r = cnt.get_remote_stream
           end while nil
           r
         end

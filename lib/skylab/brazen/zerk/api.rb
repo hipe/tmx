@@ -13,7 +13,7 @@ module Skylab::Brazen
       Brazen_.event.sender self
 
       def initialize x_a, branch
-        @scan = Callback_.iambic_scanner.new 0, x_a
+        @scan = Callback_.iambic_stream.new 0, x_a
         @node = branch
         @node.before_focus
         nil

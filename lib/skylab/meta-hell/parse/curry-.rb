@@ -197,8 +197,8 @@ module Skylab::MetaHell
         nil
       end
       def fields_being_added_notification
-        remove_from_curry_queue :token_matchers, :token_scanners,
-          :argv_scanners
+        remove_from_curry_queue :token_matchers, :token_streams,
+          :argv_streams
         nil
       end
       def absorb_along_curry_queue_and_execute * a
@@ -296,10 +296,10 @@ module Skylab::MetaHell
       def token_matchers
         set_abstract_field_list :Token_Matcher_, iambic_property
       end
-      def token_scanners
+      def token_streams
         set_abstract_field_list :Token_Scanner_, iambic_property
       end
-      def argv_scanners
+      def argv_streams
         set_abstract_field_list :Argv_Scanner_, iambic_property
       end
       def pool_procs

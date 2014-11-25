@@ -605,7 +605,7 @@ module Skylab::Porcelain::Legacy
 
     def fetch_param norm, &otr
       if option_parser
-        parm = option_parser_scanner.fetch norm do end
+        parm = option_parser_stream.fetch norm do end
       end
       if ! parm && @action_sheet.argument_syntax
         parm = @action_sheet.argument_syntax.fetch norm do end
@@ -630,7 +630,7 @@ module Skylab::Porcelain::Legacy
     end
     def init_chld request_client, action_sheet  #jump-1 wtf something in here is preventing .. #todo
       @option_parser = nil
-      @option_parser_scanner = nil
+      @option_parser_stream = nil
       @request_client = request_client
       @action_sheet = action_sheet if action_sheet
       @borrowed_queue = nil
@@ -721,11 +721,11 @@ module Skylab::Porcelain::Legacy
       @option_parser
     end
 
-    def option_parser_scanner     # (assumes @option_parser !)
-      @option_parser_scanner ||= bld_op_scanner
+    def option_parser_stream     # (assumes @option_parser !)
+      @option_parser_stream ||= bld_op_stream
     end
 
-    def bld_op_scanner
+    def bld_op_stream
       Porcelain_._lib.CLI_lib.option.parser.scanner @option_parser
     end
 

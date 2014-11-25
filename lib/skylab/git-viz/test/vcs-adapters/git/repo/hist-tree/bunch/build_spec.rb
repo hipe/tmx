@@ -61,13 +61,13 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git::Repo::Hist_Tree
       end
 
       def expect_constituency
-        @trail_a = @bunch.get_trail_scanner.to_a
+        @trail_a = @bunch.get_trail_stream.to_a
         @trail_a.length.should eql 3
         @trail = @trail_a.shift
         expect_trail
       end
       def expect_trail
-        @filediff_a = @trail.get_filediff_scanner.to_a
+        @filediff_a = @trail.get_filediff_stream.to_a
         @filediff = @filediff_a.shift
         expect_filediff
       end

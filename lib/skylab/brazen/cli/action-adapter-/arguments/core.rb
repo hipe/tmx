@@ -81,7 +81,7 @@ module Skylab::Brazen
         public
 
           def execute
-            prepare_scanners
+            prepare_streams
             ev = parse_any_required_arguments_off_beginning
             ev ||= parse_any_required_arguments_off_ending
             ev || parse_any_optional_arguments
@@ -89,7 +89,7 @@ module Skylab::Brazen
             ev || finalize_success
           end
 
-          def prepare_scanners
+          def prepare_streams
             @arg_a_scan = Crazy_Scanner__.new 0, @arg_a
             @argv_scan = Crazy_Scanner__.new 0, @argv
           end
@@ -115,14 +115,14 @@ module Skylab::Brazen
             if @num_trailing_required_args.nonzero?
               @arg_a_scan.x_a_length = @arg_a.length
               @arg_a_scan.d = @arg_a.length - @num_trailing_required_args
-              temporarily_advance_argv_scanner_if_necessary
+              temporarily_advance_argv_stream_if_necessary
               parse_required_segment :'@late_output_segment'
             else
               @previous_d = nil
             end
           end
 
-          def temporarily_advance_argv_scanner_if_necessary
+          def temporarily_advance_argv_stream_if_necessary
             @temporary_d = @argv.length - @num_trailing_required_args
             if @argv_scan.d < @temporary_d
               @previous_d = @argv_scan.d

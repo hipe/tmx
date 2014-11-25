@@ -809,7 +809,7 @@ module Skylab::Headless
 
         def rndr_some_help_sections y
           rnd = bld_hlp_sct_rndrr y
-          scn = @node_stry.get_section_scanner
+          scn = @node_stry.get_section_stream
           while (( section = scn.gets ))
             rnd << section
           end ; nil

@@ -175,12 +175,12 @@ module Skylab::SubTree
         @box_multi.get_enumerator
       end
 
-      def get_child_scanner_p
-        @box_multi.get_scanner_p
+      def get_child_stream_p
+        @box_multi.get_stream_p
       end
 
-      def get_some_child_scanner_p
-        has_children ? get_child_scanner_p : EMPTY_P_
+      def get_some_child_stream_p
+        has_children ? get_child_stream_p : EMPTY_P_
       end
 
       def to_text
@@ -191,11 +191,11 @@ module Skylab::SubTree
         Tree::To_paths_[ :client, self ]
       end
 
-      def get_traversal_scanner *a
+      def get_traversal_stream *a
         Tree::Traversal::Scanner_[ self, *a ]
       end
 
-      alias_method :get_traversal_stream, :get_traversal_scanner
+      alias_method :get_traversal_stream, :get_traversal_stream
 
       def longest_common_base_path
         if (( child = any_only_child ))

@@ -55,7 +55,7 @@ module Skylab::Headless
       define_method :initialize do |sexp|
         state = :initial
         hot = true
-        scn = Headless_._lib.list_lib.line_scanner sexp
+        scn = Headless_._lib.list_lib.line_stream sexp
         building = nil
 
         fetch = -> x do

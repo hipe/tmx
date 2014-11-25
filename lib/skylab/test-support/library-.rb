@@ -94,7 +94,7 @@ module Skylab::TestSupport
     end
 
     Iambic_scanner = -> do
-      Callback_.iambic_scanner
+      Callback_.iambic_stream
     end
 
     Ivars_with_procs_as_methods = -> * a do

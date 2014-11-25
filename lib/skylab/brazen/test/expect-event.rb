@@ -306,7 +306,7 @@ module Skylab::Brazen::TestSupport
 
       def initialize x_a, p
         @call_a = [ [ :resolve_ev_by_expect_one_event ] ]
-        @scn = Brazen_::Entity_[].iambic_scanner.new 0, x_a
+        @scn = Brazen_::Entity_[].iambic_stream.new 0, x_a
         while @scn.unparsed_exists
           send @scn.gets_one
         end
@@ -320,7 +320,7 @@ module Skylab::Brazen::TestSupport
       end
 
       def shorthand
-        scn = Brazen_::Entity_[].iambic_scanner.new 0, @scn.gets_one
+        scn = Brazen_::Entity_[].iambic_stream.new 0, @scn.gets_one
         scn.unparsed_exists and parse_shorthand scn
       end
 

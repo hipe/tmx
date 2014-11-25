@@ -43,7 +43,7 @@ module Skylab::GitViz
           @trail_a = trail_a ; freeze
         end
 
-        def get_trail_scanner
+        def get_trail_stream
           d = last = nil
           GitViz_._lib.power_scanner :init, -> do
             d = -1 ; last = @trail_a.length - 1

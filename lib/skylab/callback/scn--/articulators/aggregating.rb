@@ -61,7 +61,7 @@ module Skylab::Callback
     private
 
       def via_template_parse_rest_of_input
-        @scanner = Callback_.iambic_scanner.new @d, @x_a
+        @scanner = Callback_.iambic_stream.new @d, @x_a
         bx = Box.new
         @nucleus.template.get_formal_parameters.each do |param|
           bx.add param.name_i, Field__.new( param )
@@ -77,7 +77,7 @@ module Skylab::Callback
           field = bx[ current_iambic_token ]
           field or break when_extra_field_template_variables
           @scanner.advance_one
-          field.process_iambic_passively_via_scanner @scanner
+          field.process_iambic_passively_via_stream @scanner
           if field.does_frame_redundancy
             @nucleus.do_frame_redundancy = true
           end
@@ -152,11 +152,11 @@ module Skylab::Callback
             i = current_iambic_token
             case i
             when :frame
-              advance_iambic_scanner_by_one
+              advance_iambic_stream_by_one
               @does_frame_redundancy = true
               @when_frame_value_count_is_two_or_more_p = iambic_property
             when :field
-              advance_iambic_scanner_by_one
+              advance_iambic_stream_by_one
               @does_field_redundancy = true
               @derivative_of_field_i = iambic_property
               @when_field_value_count_is_two_or_more_p = iambic_property  # BE CAREFUL
@@ -167,7 +167,7 @@ module Skylab::Callback
           end
         end
 
-        include Entity_.via_scanner_iambic_methods
+        include Entity_.via_stream_iambic_methods
 
         def initialize tparam
           @aggregate_p = nil
@@ -187,7 +187,7 @@ module Skylab::Callback
           @tparam.name_i
         end
 
-        def process_iambic_passively_via_scanner scanner
+        def process_iambic_passively_via_stream scanner
           @scanner = scanner
           process_iambic_passively
         end

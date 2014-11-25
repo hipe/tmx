@@ -10,9 +10,9 @@ module Skylab::Callback::TestSupport::Scn
         Sandbox_2.with self
         module Sandbox_2
           scn = Callback_::Scn.aggregate(
-            Basic_::List.line_scanner( [ :a, :b ] ),
-            Basic_::List.line_scanner( [] ),
-            Basic_::List.line_scanner( [ :c ] ) )
+            Basic_::List.line_stream( [ :a, :b ] ),
+            Basic_::List.line_stream( [] ),
+            Basic_::List.line_stream( [ :c ] ) )
           scn.count.should eql( 0 )
           scn.gets.should eql( :a )
           scn.count.should eql( 1 )

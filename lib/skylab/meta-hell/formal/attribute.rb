@@ -495,14 +495,14 @@ module Skylab::MetaHell
       end
 
       def each_bound_attribute
-        scn = get_bound_attribute_scanner
+        scn = get_bound_attribute_stream
         while (( ent = scn.gets ))
           yield ent
         end
         nil
       end
 
-      def get_bound_attribute_scanner
+      def get_bound_attribute_stream
         Bound_Attributes_Scanner__.
           new formal_attributes, get_bound_attribute_reader
       end

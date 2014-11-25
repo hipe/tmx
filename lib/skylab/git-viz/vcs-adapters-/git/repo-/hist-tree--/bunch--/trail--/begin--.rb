@@ -20,11 +20,11 @@ module Skylab::GitViz
           INNER_CMD_S_A__ = %w( log --follow --pretty=tformat:%H -- ).freeze
         public
           def execute
-            @scn = get_any_nonzero_count_output_line_scanner_from_cmd
-            @scn and exec_with_nonzero_scanner
+            @scn = get_any_nonzero_count_output_line_stream_from_cmd
+            @scn and exec_with_nonzero_stream
           end
         private
-          def exec_with_nonzero_scanner
+          def exec_with_nonzero_stream
             sha_s = @scn.gets or fail "sanity - nonzero scanner?"
             begin
               sha = Repo_::SHA_.some_instance_from_string sha_s

@@ -9,7 +9,7 @@ module Skylab::TanMan
   private
 
     def execute
-      scn = services.starters.get_scanner
+      scn = services.starters.get_stream
       while (( starter = scn.gets ))
         emit :payload, starter.label
       end

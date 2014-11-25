@@ -98,7 +98,7 @@ module Skylab::Callback
       end
     private
       def steps
-        @scn = bld_any_step_scanner
+        @scn = bld_any_step_stream
         if @scn
           nil while step
           @step_OK
@@ -106,7 +106,7 @@ module Skylab::Callback
           PROCEDE_
         end
       end
-      def bld_any_step_scanner
+      def bld_any_step_stream
         if 1 < @const_path.length
           d = -1 ; last = @const_path.length - 2
           Scn.new do

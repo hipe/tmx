@@ -171,7 +171,7 @@ module Skylab::Snag
 
       first = @file_changes.first
 
-      lines = Snag_._lib.system.filesystem.line_scanner_via_path first.pathname.to_path
+      lines = Snag_._lib.system.filesystem.line_stream_via_path first.pathname.to_path
 
       patch_lib = Snag_._lib.patch_lib
 

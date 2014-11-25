@@ -165,7 +165,7 @@ module Skylab::Brazen
           @scn
         end
 
-        def string_scanner_for_freezable_current_line
+        def string_stream_for_freezable_current_line
           @scn
         end
 
@@ -216,8 +216,8 @@ module Skylab::Brazen
           end ; nil
         end
 
-        def get_body_line_scanner
-          nscn = get_all_node_scanner
+        def get_body_line_stream
+          nscn = get_all_node_stream
           lscn = nil
           Callback_::Scn.new do
             while true
@@ -228,13 +228,13 @@ module Skylab::Brazen
               end
               node = nscn.gets
               node or break
-              lscn = node.get_line_scanner
+              lscn = node.get_line_stream
             end
             x
           end
         end
 
-        def get_all_node_scanner
+        def get_all_node_stream
           Scan_[].via_nonsparse_array @a
         end
 
@@ -255,7 +255,7 @@ module Skylab::Brazen
         end
 
         def aref_node_with_norm_name_i symbol_i, norm_i
-          scn = get_node_scanner symbol_i
+          scn = get_node_stream symbol_i
           while node = scn.gets
             if norm_i == node.external_normal_name_symbol
               found = node ; break
@@ -268,7 +268,7 @@ module Skylab::Brazen
 
         def get_node_enum i
           if block_given?
-            x = nil ; scn = get_node_scanner i
+            x = nil ; scn = get_node_stream i
             yield x while x = scn.gets ; nil
           else
             to_enum :get_node_enum, i
@@ -276,14 +276,14 @@ module Skylab::Brazen
         end
 
         def get_node_scan i
-          get_node_scan_or_scanner Callback_::Scan, i
+          get_node_scan_or_stream Callback_::Scan, i
         end
 
-        def get_node_scanner i
-          get_node_scan_or_scanner Callback_::Scn, i
+        def get_node_stream i
+          get_node_scan_or_stream Callback_::Scn, i
         end
 
-        def get_node_scan_or_scanner cls, i
+        def get_node_scan_or_stream cls, i
           d = -1 ; last = @a.length - 1
           cls.new do
             while d < last
@@ -390,8 +390,8 @@ module Skylab::Brazen
           @sections_shell
         end
 
-        def get_line_scanner
-          get_body_line_scanner
+        def get_line_stream
+          get_body_line_stream
         end
 
         def add_comment str
@@ -450,11 +450,7 @@ module Skylab::Brazen
         end
 
         def to_stream
-          @collection_kernel.get_node_scan self.class::SYMBOL_I
-        end
-
-        def to_scanner
-          @collection_kernel.get_node_scanner self.class::SYMBOL_I
+          @collection_kernel.get_node_stream self.class::SYMBOL_I
         end
 
         def [] norm_name_i
@@ -465,7 +461,7 @@ module Skylab::Brazen
         # ~ the mutators
 
         def touch_comparable_item item, compare_p
-          scn = to_scanner
+          scn = to_stream
           while x = scn.gets
             d = compare_p[ x ]
             case d
@@ -623,8 +619,8 @@ module Skylab::Brazen
           @kernel.unparse_into_yielder y
         end
 
-        def get_line_scanner
-          @kernel.get_line_scanner
+        def get_line_stream
+          @kernel.get_line_stream
         end
 
         def external_normal_name_symbol
@@ -688,7 +684,7 @@ module Skylab::Brazen
           @a = []
           @assignments_shell = Assignments_Facade__.new self, parse
           @parse = parse
-          @scn = parse.string_scanner_for_freezable_current_line
+          @scn = parse.string_stream_for_freezable_current_line
         end
 
         def dup_via_parse_context parse
@@ -833,11 +829,11 @@ module Skylab::Brazen
           end ; nil
         end
 
-        def get_line_scanner
+        def get_line_stream
           p = -> do
             x = @line
             p = -> do
-              scn = get_body_line_scanner
+              scn = get_body_line_stream
               p = -> do
                 scn.gets
               end
@@ -942,13 +938,13 @@ module Skylab::Brazen
         end
 
         def unparse_into_yielder y  # :+#arbitrary-styling
-          scn = get_line_scanner
+          scn = get_line_stream
           while line = scn.gets
             y << line
           end ; nil
         end
 
-        def get_line_scanner
+        def get_line_stream
           p = -> do
             line = rndr_line
             p = EMPTY_P_
@@ -1133,8 +1129,8 @@ module Skylab::Brazen
           @kernel.unparse_into_yielder y
         end
 
-        def get_line_scanner
-          @kernel.get_line_scanner
+        def get_line_stream
+          @kernel.get_line_stream
         end
 
         def internal_normal_name_string
@@ -1184,7 +1180,7 @@ module Skylab::Brazen
       public
 
         def parse
-          @scn = @parse.string_scanner_for_freezable_current_line
+          @scn = @parse.string_stream_for_freezable_current_line
           @name_start_index = @scn.skip SPACE_RX_
           @column_number = 1 + @name_start_index
           d = @scn.skip AST_NAME_RX_
@@ -1348,7 +1344,7 @@ module Skylab::Brazen
 
       public
 
-        def get_line_scanner
+        def get_line_stream
           Single_line_scanner__[ @line ]
         end
 
@@ -1481,7 +1477,7 @@ module Skylab::Brazen
 
       class Assignment_Kernel__
 
-        def get_line_scanner
+        def get_line_stream
           _line = rndr_line
           Single_line_scanner__[ _line ]
         end
@@ -1555,7 +1551,7 @@ module Skylab::Brazen
           y << @line ; nil
         end
 
-        def get_line_scanner
+        def get_line_stream
           Single_line_scanner__[ @line ]
         end
       end

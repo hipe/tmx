@@ -47,7 +47,7 @@ module Skylab::GitViz
       end
 
       def rndr_first_pass
-        scn = @tree.get_traversal_scanner :glyphset_x, :narrow  # wide or narrow
+        scn = @tree.get_traversal_stream :glyphset_x, :narrow  # wide or narrow
         prcss_root scn.gets
         row_a = [] ; max = 0
         while (( card = scn.gets ))
@@ -115,7 +115,7 @@ module Skylab::GitViz
         end
 
         def render_heatmap_row
-          @scn = @row.repo_trail.get_filediff_scanner
+          @scn = @row.repo_trail.get_filediff_stream
           while (( fd = @scn.gets ))
             _index = fd.commitpoint_index
             @string[ _index ] = BULLET__

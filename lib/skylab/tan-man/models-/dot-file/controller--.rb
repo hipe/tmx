@@ -186,8 +186,8 @@ module Skylab::TanMan
       remotes.add_notify x_a
     end
 
-    def get_remote_scanner
-      remotes.get_remote_scanner_notify
+    def get_remote_stream
+      remotes.get_remote_stream_notify
     end
 
     def remove_remote_with_dry_run_and_locator dry_run, locator

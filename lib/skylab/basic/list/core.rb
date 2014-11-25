@@ -8,7 +8,7 @@ module Skylab::Basic
         Build_each_pairable_via_even_iambic__[ a ]
       end
 
-      def line_scanner * a
+      def line_stream * a
         if a.length.zero?
           List_::Line_Scanner__
         else
@@ -22,7 +22,7 @@ module Skylab::Basic
     end
 
     Build_each_pairable_via_even_iambic__ = -> a do
-      Callback_::Scanner.build_each_pairable_via_pairs_scanner_proc do
+      Callback_::Scanner.build_each_pairable_via_pairs_stream_proc do
         Build_pairs_scan_via_even_iambic__[ a ]
       end
     end

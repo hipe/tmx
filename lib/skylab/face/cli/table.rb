@@ -114,7 +114,7 @@ module Skylab::Face
         @kernel.do_show_header = iambic_property
       end
       def target_width
-        @kernel.accept_target_width_from_scanner @iambic_scan
+        @kernel.accept_target_width_from_stream @iambic_scan
       end
       def write_lines_to
         @kernel.write_lines_to = iambic_property
@@ -233,14 +233,14 @@ module Skylab::Face
         @kernel = kernel
       end
       def field_stats_and_cel_matrix
-        if (( @scn = bld_row_scanner ))
+        if (( @scn = bld_row_stream ))
           yield( * rslv_two_from_scan )
         else
           yield @scn
         end
       end
     private
-      def bld_row_scanner
+      def bld_row_stream
         p = nil
         initialize_normal_p = -> do
           ea = @kernel.read_rows_from.to_enum
@@ -601,7 +601,7 @@ module Skylab::Face
       Table_::Fill_.any_calculated_screen_w
     end
   public
-    def accept_target_width_from_scanner scan
+    def accept_target_width_from_stream scan
       @target_width_d = scan.gets_one ; nil
     end
   private

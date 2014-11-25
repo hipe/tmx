@@ -271,7 +271,7 @@ module Skylab::Brazen
         end
       end
 
-      def wrap_scanner_with_ordering_buffer scn
+      def wrap_stream_with_ordering_buffer scn
         CLI::Actors__::Via_after_produce_ordered_scanner[ scn ]
       end
 
@@ -304,7 +304,7 @@ module Skylab::Brazen
         end
       end
       def resolve_bound_call_when_successfully_parsed_options
-        a = [] ; scn = to_actual_parameters_scanner
+        a = [] ; scn = to_actual_parameters_stream
         scn.next
         begin
           i, x = scn.pair
@@ -313,7 +313,7 @@ module Skylab::Brazen
         end  while scn.next
         @bound_call = Aggregate_Bound_Call__.new a
       end
-      def to_actual_parameters_scanner
+      def to_actual_parameters_stream
         Actual_Parameter_Scanner__.new @output_iambic, @properties
       end
       def resolve_bound_call_when_multiple_matching_adapters
@@ -1088,7 +1088,7 @@ module Skylab::Brazen
         @box.fetch i
       end
       def to_stream
-        scn = @box.to_value_scanner
+        scn = @box.to_value_stream
         Scan_[].new do
           scn.gets
         end

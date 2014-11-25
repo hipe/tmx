@@ -194,7 +194,7 @@ module Skylab::Flex2Treetop::MyTestSupport
       end
 
       def change_line_source_channel_to chan_i
-        @ln_source.change_upstream_scanner_to_channel chan_i ; nil
+        @ln_source.change_upstream_stream_to_channel chan_i ; nil
       end
 
       def dbg_IO

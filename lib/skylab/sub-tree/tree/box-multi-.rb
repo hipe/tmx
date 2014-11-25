@@ -51,7 +51,7 @@ module Skylab::SubTree
         end
       end
 
-      def get_scanner_p
+      def get_stream_p
         hot = true ; idx = 0
         -> do
           if hot

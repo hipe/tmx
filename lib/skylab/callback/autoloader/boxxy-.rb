@@ -15,7 +15,7 @@ module Skylab::Callback
           et = entry_tree
           stem_p = fuzzy_stem_cache
           have_h = ::Hash[ a.map { |i| [ stem_p[ i ], true ] } ]
-          scn = et ? et.to_stream : Scn.the_empty_scanner
+          scn = et ? et.to_stream : Scn.the_empty_stream
           y = []
           while (( np = scn.gets ))
             have_h[ stem_p[ np.corename_as_const ] ] and next
@@ -41,7 +41,7 @@ module Skylab::Callback
     private
       def const_might_load_boxxily i
         et = entry_tree ; found = false
-        scn = et ? et.to_stream : Scn.the_empty_scanner
+        scn = et ? et.to_stream : Scn.the_empty_stream
         stem = Distill_[ i ]
         while (( np = scn.gets ))
           stem == np.corename_as_distilled_stem or next

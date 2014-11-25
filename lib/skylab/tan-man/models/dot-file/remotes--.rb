@@ -12,7 +12,7 @@ module Skylab::TanMan
           Addition__.new( self, x_a ).flush
         end
 
-        def get_remote_scanner_notify
+        def get_remote_stream_notify
           Scanner_Maker__.new( self ).flush
         end
 
@@ -42,8 +42,8 @@ module Skylab::TanMan
           _up.full_dotfile_pathname
         end
 
-        def section_scanner
-          get_remote_scanner_notify
+        def section_stream
+          get_remote_stream_notify
         end
       end
     end
@@ -128,7 +128,7 @@ module Skylab::TanMan
         end
         def execute
           found_a = [ ]
-          if (( scn = @client.section_scanner ))
+          if (( scn = @client.section_stream ))
             while (( section = scn.gets ))
               if @locator == section.locator
                 found_a << section.collapse
@@ -136,13 +136,13 @@ module Skylab::TanMan
             end
           end
           case found_a.length
-          when 0 ; not_found_in_scanner scn
+          when 0 ; not_found_in_stream scn
           when 1 ; remove_entity found_a[ 0 ]
           else when_multiple found_a
           end
         end
       private
-        def not_found_in_scanner scn
+        def not_found_in_stream scn
           loc = @locator ; d = scn.count
           emit_error_message do
             "#{ ick loc } was not found among #{ d } remote#{ s d }"

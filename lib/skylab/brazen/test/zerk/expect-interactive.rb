@@ -92,7 +92,7 @@ module Skylab::Brazen
       def build_line_stream_for_screen_ending_with x
         screen = read_screen_ending_with x
         screen and begin
-          Callback_.iambic_scanner.new 0, screen.split( LINE_DELIM_RX__ )  # or we MIGHT switch it to a stream
+          Callback_.iambic_stream.new 0, screen.split( LINE_DELIM_RX__ )  # or we MIGHT switch it to a stream
         end
       end
 

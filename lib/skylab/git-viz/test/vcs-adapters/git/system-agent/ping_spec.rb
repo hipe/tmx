@@ -15,7 +15,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git::System_Agent
       ping_from_path 'wa-da-da-file'
       expect_ping_command_with_chdir_value 'wa-da-da-file'
       expect_cannot_execute_command_saying TS_::Messages::PATH_IS_FILE
-      expect_no_output_scanner
+      expect_no_output_stream
     end
 
     it "ping when chdiring to a noent - x" do
@@ -23,7 +23,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git::System_Agent
       expect_ping_command_with_chdir_value 'wa-da-da-not-exist'
       expect_cannot_execute_command_saying(
         "No such file or directory - wa-da-da-not-exist" )
-      expect_no_output_scanner
+      expect_no_output_stream
     end
 
     def ping_from_path x
@@ -31,7 +31,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git::System_Agent
         sa.set_cmd_s_a %w( print -l winz WINZ )
         sa.set_chdir_pathname mock_pathname x
       end
-      @scn = @sa.get_any_nonzero_count_output_line_scanner_from_cmd
+      @scn = @sa.get_any_nonzero_count_output_line_stream_from_cmd
     end
 
     def expect_pinged
@@ -67,7 +67,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git::System_Agent
       x and fail "expected no more output lines, had: #{ x.inspect }"
     end
 
-    def expect_no_output_scanner
+    def expect_no_output_stream
       @scn.should eql false
     end
 

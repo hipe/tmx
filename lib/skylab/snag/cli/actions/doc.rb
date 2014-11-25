@@ -62,18 +62,18 @@ module Skylab::Snag
       end
 
       def output_body
-        @scn = produce_scanner_for_output_body
-        @scn && output_body_with_scanner
+        @scn = produce_stream_for_output_body
+        @scn && output_body_with_stream
       end
 
-      def produce_scanner_for_output_body
+      def produce_stream_for_output_body
         call_API [ :doc, :digraph ],
           :on_info_line, handle_info_line,
           :on_error_event, handle_error_event,
           :working_dir, @path
       end
 
-      def output_body_with_scanner
+      def output_body_with_stream
         @oy = ::Enumerator::Yielder.new( & delegate.method( :receive_payload_line ))
         @ev = @scn.gets
         while @ev
@@ -110,7 +110,7 @@ module Skylab::Snag
 
         def initialize a
           super
-          @scn = Snag_::Models::Hashtag.puts_scanner @s
+          @scn = Snag_::Models::Hashtag.puts_stream @s
         end
         def execute
           @y = []

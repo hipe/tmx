@@ -73,7 +73,7 @@ module Skylab::Basic
       @a.each { |k| p[ k, @h.fetch( k ) ] }
     end
 
-    def get_value_scanner  # only useful when all vals are known to be trueish
+    def get_value_stream  # only useful when all vals are known to be trueish
       d = -1 ; last = @a.length - 1
       Scn__.new do
         @h[ @a[ d += 1 ] ] if d < last

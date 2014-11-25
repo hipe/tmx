@@ -41,7 +41,7 @@ module Skylab::Headless
         end
       end
 
-      def occurrence_scanner * a
+      def occurrence_stream * a
         if a.length.zero?
           CLI::Lib__::Occurrence_scanner
         else

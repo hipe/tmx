@@ -45,7 +45,7 @@ module Skylab::Snag
       if extra_lines_count.nonzero?
         a.push [ :extra_lines_count, extra_lines_count ]
       end
-      Callback_::Scanner.build_each_pairable_via_pairs_scanner_proc do
+      Callback_::Scanner.build_each_pairable_via_pairs_stream_proc do
         Callback_.scan.via_nonsparse_array a
       end
     end

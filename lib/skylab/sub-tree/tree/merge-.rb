@@ -79,7 +79,7 @@ module Skylab::SubTree
       Destructive_merge_children_ = -> local, remote, algo do
         keyp = algo.key_proc
         use_h = Make_hash__[ keyp, local ]
-        p = remote.get_some_child_scanner_p
+        p = remote.get_some_child_stream_p
         bm = local._bm
         while (( remote_child = p[] ))
           key = keyp[ remote_child ]
@@ -95,7 +95,7 @@ module Skylab::SubTree
 
       Make_hash__ = -> keyp, node do
         use_h = { }
-        p = node.get_some_child_scanner_p
+        p = node.get_some_child_stream_p
         while (( child = p[] ))
           key = keyp[ child ] or fail "sanity - key?"
           did = false
