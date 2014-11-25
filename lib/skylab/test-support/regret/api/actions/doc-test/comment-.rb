@@ -1,4 +1,8 @@
-class Skylab::TestSupport::Regret::API::Actions::DocTest
+module Skylab::TestSupport
+
+  module Regret::API
+
+  class Actions::DocTest
 
   class Comment_
 
@@ -6,8 +10,8 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       new
     end
 
-    def set line, no, col
-      @line, @no, @col = line, no, col
+    def set * a
+      @line, @no, @col = a
       nil
     end
 
@@ -33,40 +37,45 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       @line = @no = @col = nil  # sanity
       otr
     end
-  end
 
-  Comment_::Scanner_ = RegretLib_::Ivars_with_procs_as_methods[].new :gets do
-    class << self
-      alias_method :[], :new
-    end
-  end
-
-  class Comment_::Scanner < Comment_::Scanner_
-
-    def initialize _snitch, lines
-      hack_rx = /[ ][ ]#(?:[ ]|$)/
-      c_a = [ Comment_.lease, Comment_.lease ] ; base = c_a.length ; idx = -1
-      func = -> line do
-        if hack_rx =~ line
-          r = c_a.fetch( idx = ( idx + 1 ) % base )  # it's tivo
-          r.set line, lines.count, $~.offset( 0 ).last
-          r  # (the offset of the end of the capture is the start of content)
-        end
-      end
-      hot = true
-      finish = -> do
-        c_a.each { |x| Comment_.release x }
-        hot = false
-      end
-      @gets = -> do
-        if hot
-          while true
-            line = lines.gets or break finish[]
-            r = func[ line ] and break
+        Stream_ = RegretLib_::Ivars_with_procs_as_methods[].new :gets do
+          class << self
+            alias_method :[], :new
           end
-          r
         end
-      end
-    end
+
+        class Stream < Stream_
+
+          def initialize _snitch, lines
+            hack_rx = /[ ][ ]#(?:[ ]|$)/
+            c_a = [ Comment_.lease, Comment_.lease ]
+            base = c_a.length ; idx = -1
+            func = -> line do
+              if hack_rx =~ line
+                x = c_a.fetch( idx = ( idx + 1 ) % base )  # it's tivo
+                x.set line, lines.count, $~.offset( 0 ).last
+                x  # (the offset of the end of the capture is the start of content)
+              end
+            end
+            hot = true
+            finish = -> do
+              c_a.each do |x|
+                Comment_.release x
+              end
+              hot = false
+            end
+            @gets = -> do
+              while hot
+                line = lines.gets
+                line or break finish[]
+                x = func[ line ]
+                x and break
+              end
+              x
+            end
+          end
+        end
+  end
+  end
   end
 end

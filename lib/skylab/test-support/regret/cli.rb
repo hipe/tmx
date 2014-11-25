@@ -6,7 +6,7 @@ module Skylab::TestSupport
       Client.new( * x_a )
     end
 
-    Client = ::Class.new TestSupport_::Lib_::CLI_client_base_class[]
+    Client = ::Class.new TestSupport_._lib.CLI_client_base_class  # loads 'LIB_'
     RegretLib_ = Regret::API::RegretLib_
   end
 
@@ -14,7 +14,6 @@ module Skylab::TestSupport
 
     API = Regret::API
     CLI = Regret::CLI
-    Plugin_ = Lib_::Heavy_plugin[]
     RegretLib_ = API::RegretLib_
 
     API::Conf::Verbosity[ self ]
@@ -61,7 +60,7 @@ module Skylab::TestSupport
 
       ext = Autoloader_::EXTNAME
 
-      core = Lib_::Default_core_file[]
+      core = LIB_.default_core_file
 
       o.on '-c', "--core[=foo#{ ext }]",
         "try to load missing constants by first looking for a #{ core }",
@@ -269,7 +268,7 @@ module Skylab::TestSupport
       r
     end
 
-    Plugin_::Host::Proxy.enhance self do  # at end
+    LIB_.heavy_plugin_lib::Host::Proxy.enhance self do  # at end
       services [ :out, :ivar ],
                [ :err, :ivar ],
                [ :pth, :ivar ],

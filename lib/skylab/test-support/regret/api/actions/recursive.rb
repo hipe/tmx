@@ -1,8 +1,10 @@
-module Skylab::TestSupport::Regret::API
+module Skylab::TestSupport
 
-  class API::Actions::Recursive < API::Action
+  module Regret::API
 
-    v = API::Conf::Verbosity[ self ]
+  class Actions::Recursive < API_::Action
+
+    v = API_::Conf::Verbosity[ self ]
 
     services [ :out, :ivar ],
              [ :err, :ivar ],
@@ -52,7 +54,7 @@ module Skylab::TestSupport::Regret::API
     end
 
     def get_nonzero_leaf_pathname_a
-      @paths = API::Conf
+      @paths = API_::Conf
       dpn = @wlk.expect_upwards @paths.doc_test_dir
       dpn and gt_nonzero_pn_a_from_doctest_dir_pn dpn
     end
@@ -111,7 +113,7 @@ module Skylab::TestSupport::Regret::API
     end
 
     Special_Path__ = -> * x_a do
-      API::Actions::Recursive__::Special_Path.new( * x_a )
+      API_::Actions::Recursive__::Special_Path.new( * x_a )
     end
 
     def error_string_from_special s
@@ -160,7 +162,7 @@ module Skylab::TestSupport::Regret::API
 
     def prcss_pn_when_list
       @out.puts @pth[ @pn ]
-      SUCCEEDED__
+      ACHIEVED_
     end
 
     def prcss_pn_as_file
@@ -180,9 +182,9 @@ module Skylab::TestSupport::Regret::API
     end
 
     def rslv_open_pathname
-      if @do_check then SUCCEEDED__ else
+      if @do_check then ACHIEVED_ else
         @opn = rslv_some_ouput_pathname
-        @opn and SUCCEEDED__
+        @opn and ACHIEVED_
       end
     end
 
@@ -227,7 +229,7 @@ module Skylab::TestSupport::Regret::API
     end
 
     def bld_doc_test_action
-      bnd = API::Actions::DocTest.new
+      bnd = API_::Actions::DocTest.new
       bnd.set_expression_agent @expression_agent
       bnd.set_vtuple @vtuple
       bnd.absorb_services :out, @o, :err, @err, :pth, @pth
@@ -287,21 +289,20 @@ module Skylab::TestSupport::Regret::API
         }#{ ' fake' if @is_dry_run } bytes)."
       @io.truncate 0
       @io.rewind
-      SUCCEEDED__
+      ACHIEVED_
     end
 
     # ~
 
     def bork msg
       @err.puts msg
-      FAILED__
+      UNABLE_
     end
 
-    FAILED__ = false
     SUBP_TEST_DIR__ = 'test'.freeze
-    SUCCEEDED__ = true
     TEST_DIR_DEPTH__ = 2
       TEST_RX__ = %r|\A(?:[^/]+/){#{ TEST_DIR_DEPTH__ }}[^/]+/?|
     TEST_FILE_SUFFIX = '_spec'.freeze
+  end
   end
 end

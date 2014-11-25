@@ -1,4 +1,8 @@
-class Skylab::TestSupport::Regret::API::Actions::DocTest
+module Skylab::TestSupport
+
+  module Regret::API
+
+  class Actions::DocTest
 
   Specer__::Block = RegretLib_::Ivars_with_procs_as_methods[].new :accept, :flush
 
@@ -82,8 +86,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
           if a.length.nonzero?
             shut last_other, a, ctx
           end
-          # (the outcome of `flush` is that @snippet_a is resolved.)
-          nil
+          nil  # `flush` only has the side effect that `@snippet_a` is resolved
         end
         @snippet_a = [] ; @snitch = snitch
       end
@@ -116,7 +119,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     attr_reader :last_other, :line_a
 
     -> do  # `validate`
-      sep_rx = /#{ ::Regexp.escape SEP }/
+      sep_rx = /#{ ::Regexp.escape SEP_ }/
       define_method :validate do |snitch|
         ln = @line_a.detect do |l|
           sep_rx =~ l
@@ -125,7 +128,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
           loc_desc = " (in block ending on line #{ @context_x.no })"
           snitch.event :medium, Event_[ -> do
             "(warning (?) - code snippet without magic #{
-              }separator #{ SEP.inspect }#{ loc_desc })"
+              }separator #{ SEP_.inspect }#{ loc_desc })"
           end, @line_a ]
           nil
         end
@@ -133,5 +136,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     end.call
 
     Event_ = ::Struct.new :message_proc, :lines
+  end
+  end
   end
 end

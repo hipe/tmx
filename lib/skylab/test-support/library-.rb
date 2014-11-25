@@ -140,7 +140,7 @@ module Skylab::TestSupport
       Callback_::Proxy
     end
 
-    Scanner = -> x do
+    Stream = -> x do
       Callback_::Scn.try_convert x
     end
 

@@ -1,6 +1,8 @@
-module Skylab::TestSupport::Regret::API
+module Skylab::TestSupport
 
-  class API::Actions::DocTest < API::Action  # #read [#015] the narrative
+  module Regret::API
+
+  class Actions::DocTest < API_::Action  # #read [#015] the narrative
 
     # probably no one will ever find a reason to call our API directly
     # to generate doc-test output. but for the purposes of testing and
@@ -57,7 +59,7 @@ module Skylab::TestSupport::Regret::API
       [ :load_module, :arity, :zero_or_one ],
       [ :pathname, :arity, :zero_or_one ],
       [ :template_option_s_a, :arity, :zero_or_more ],
-      API::Conf::Verbosity[ self ].param( :vtuple )
+      API_::Conf::Verbosity[ self ].param( :vtuple )
 
     def initialize( * )
       @core_basename = nil  # until we figure out something
@@ -88,17 +90,17 @@ module Skylab::TestSupport::Regret::API
       if @load_module
         ok = mdls_module::Constant_.validate @sn, @load_module
         if ok
-          PROCEDE__
+          PROCEDE_
         else
           @result = ok
         end
       else
-        PROCEDE__
+        PROCEDE_
       end
     end
 
     def mdls_module
-      DocTest::Models_
+      DocTest_::Models_
     end
 
     def rslv_upstream
@@ -135,7 +137,7 @@ module Skylab::TestSupport::Regret::API
       sp = bld_specer @sn
       ok = sp.set_template_options @template_option_s_a
       if ok
-        @specer = sp ; PROCEDE__
+        @specer = sp ; PROCEDE_
       else
         @result = ok
       end
@@ -143,7 +145,7 @@ module Skylab::TestSupport::Regret::API
 
     def bld_specer snitch
       _path = @pathname && @pathname.to_path
-      DocTest::Specer__.new :snitch, @sn,
+      DocTest_::Specer__.new :snitch, @sn,
         :core_basename, @core_basename, :load_file, @load_file,
         :load_module, @load_module, :outstream, @out,
         :path, _path, :templo_name, :quickie
@@ -153,17 +155,23 @@ module Skylab::TestSupport::Regret::API
       if @upstream
         exec_scan_each_block
       else
-        PROCEDE__
+        PROCEDE_
       end
     end
 
     def exec_scan_each_block
-      bs = DocTest::Comment_::Block::Scanner[ @sn, @upstream ]
-      while cblock = bs.gets
-        @vtuple.do_murmur and cblock.describe_to @err
-        cblock.does_look_testy and @specer.accept cblock
+      bs = DocTest_::Comment_::Block::Stream[ @sn, @upstream ]
+      cblock = bs.gets
+      while cblock
+        if @vtuple.do_murmur
+          cblock.describe_to @err
+        end
+        if cblock.does_look_testy
+          @specer.accept cblock
+        end
+        cblock = bs.gets
       end
-      PROCEDE__
+      PROCEDE_
     end
 
     def exec_flush
@@ -171,7 +179,7 @@ module Skylab::TestSupport::Regret::API
       if ok
         emit_done_message
         @result = SUCCESS_EXITSTATUS__
-        PROCEDE__
+        PROCEDE_
       else
         @result = ok
       end
@@ -190,20 +198,11 @@ module Skylab::TestSupport::Regret::API
       nil
     end
 
-    # we have a hefty branch node - this is used by our many children
-
-    Autoloader_[ self, ::Pathname.new( __FILE__ ).sub_ext( EMPTY_S_ ) ]
-
-    API = API
-    CONST_SEP_ = CONST_SEP_
-    DocTest = self
-    Lib_ = ::Skylab::TestSupport::Lib_
-    PROCEDE__ = true
-    Regret = ::Skylab::TestSupport::Regret
-    RegretLib_ = API::RegretLib_
-    SEP = '# =>'.freeze
+    DocTest_ = self
+    SEP_ = '# =>'.freeze
     SUCCESS_EXITSTATUS__ = 0
     Autoloader_[ Templos__ = ::Module.new, :boxxy ]
 
+  end
   end
 end

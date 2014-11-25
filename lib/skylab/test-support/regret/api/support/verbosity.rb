@@ -1,4 +1,6 @@
-module Skylab::TestSupport::Regret::API
+module Skylab::TestSupport
+
+  module Regret::API
 
   module Support::Verbosity
 
@@ -11,5 +13,6 @@ module Skylab::TestSupport::Regret::API
       Support::Verbosity::Graded.produce_conf_module grade_i_a
 
     end
+  end
   end
 end

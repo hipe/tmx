@@ -72,7 +72,7 @@ module Skylab::TestSupport
         end ]
 
         o[ :InstanceMethods, -> do
-          extend TestSupport_::Lib_::Let[]::ModuleMethods
+          extend TestSupport_._lib.let::ModuleMethods
           pam and include pam.instance_methods_module
         end ]
 
@@ -144,8 +144,6 @@ module Skylab::TestSupport
       mod
     end
 
-    Autoloader_ = Autoloader_
-    CONST_SEP_ = '::'.freeze
     NEAREST__ = :nearest_test_node
     Regret_ = self
 

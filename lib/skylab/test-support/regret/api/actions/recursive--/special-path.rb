@@ -1,6 +1,8 @@
-module Skylab::TestSupport::Regret::API
+module Skylab::TestSupport
 
-  module API::Actions::Recursive__
+  module Regret::API
+
+  module Actions::Recursive__
 
     class Special_Path
 
@@ -11,7 +13,7 @@ module Skylab::TestSupport::Regret::API
         Branch_down_to_core = -> do
           set_output_pathname_proc(
             Output_Pathname_Functions__::Branch_down_to_core )
-          SUCCEEDED__
+          ACHIEVED_
         end
         Regret_setup = -> yes_or_no do
           yes = case yes_or_no
@@ -21,7 +23,7 @@ module Skylab::TestSupport::Regret::API
           end
           if @is_valid
             @do_regret_setup = yes
-            SUCCEEDED__
+            ACHIEVED_
           end
         end
       end
@@ -32,7 +34,7 @@ module Skylab::TestSupport::Regret::API
           op.test_dir_pn.join _middle, "core_spec#{ op.tail_pn.extname }"
         end
         Default = -> op do
-          _sfx = API::Actions::Recursive::TEST_FILE_SUFFIX
+          _sfx = Actions::Recursive::TEST_FILE_SUFFIX
           tailpn = op.tail_pn
           _ext = tailpn.extname
           _tail = "#{ tailpn.sub_ext( EMPTY_S_ ) }#{ _sfx }#{ _ext }"
@@ -60,7 +62,7 @@ module Skylab::TestSupport::Regret::API
       def rest_s=
         @rest_s = @x_a.shift
         _scn = RegretLib_::Hashtag_scanner[ @rest_s ]
-        @scn = Callback_::Scanner::Puts_Wrapper.new _scn
+        @scn = Callback_::Stream::Puts_Wrapper.new _scn
         validate_ht_scn ; nil
       end
 
@@ -217,8 +219,8 @@ module Skylab::TestSupport::Regret::API
         @is_valid = false
       end
 
-      SUCCEEDED__ = true
       TWO_SPACES_FOR_AESTHETICS__ = '  '.freeze
     end
+  end
   end
 end

@@ -1,11 +1,10 @@
-module Skylab::TestSupport::Regret::API
+module Skylab::TestSupport
 
-  class API::Actions::Intermediates < API::Action
+  module Regret::API
 
-    # we can access the API
-    # through the `invoke` method
-    #
-    #     TestSupport_::Regret::API.respond_to?( :invoke )  # => true
+  class Actions::Intermediates < API_::Action
+
+    # we can access the API # through the `invoke` method
     #
     #     HOME_ = TestSupport_::Regret.dir_pathname
     #
@@ -21,6 +20,7 @@ module Skylab::TestSupport::Regret::API
     #       [ r, out_a, err_a ]
     #     end
     #
+    #
     # when the (absolute) path is not found:
     #
     #     in_pn = HOME_.join( 'nope' )  # abspaths
@@ -30,9 +30,11 @@ module Skylab::TestSupport::Regret::API
     #     e.shift  # => "can't make intermediate test files without a start node."
     #     r  # => false
     #
+    #
     # when it is not an absoulte path, borkage
     #
     #     Intr_[ :path, 'nope' ]  # => RuntimeError: we don't want to mess with relpaths..
+    #
     #
     # when it is an existant absolute path - works (dry run):
     #
@@ -55,6 +57,7 @@ module Skylab::TestSupport::Regret::API
     #     matches[ big_rx ]  # => true
     #     matches[ %r|^mkdir .+templos--/quickie/context--| ]  # => true
     #     e.pop  # => 'ok.'
+    #
     #
     # content looks ok:
     #     opn =  TestSupport_::TestSupport.dir_pathname.
@@ -87,7 +90,7 @@ module Skylab::TestSupport::Regret::API
            [ :top, :arity, :zero_or_one ],
            [ :is_dry_run, :arity, :zero_or_one ],
            [ :do_preview, :arity, :zero_or_one ],
-           API::Conf::Verbosity[ self ].param( :vtuple )
+           API_::Conf::Verbosity[ self ].param( :vtuple )
 
     def absorb_any_services_from_parameters_notify param_h
       SVC_AS_PARAM_I_A_.each do |i|
@@ -123,7 +126,7 @@ module Skylab::TestSupport::Regret::API
         w.current_path_exists or break bork "can't make intermediate #{
           }test files without a start node."
         w.find_toplevel_module or break
-        ok = w.load_downwards :core_basename, API::DEFAULT_CORE_BASENAME_
+        ok = w.load_downwards :core_basename, DEFAULT_CORE_BASENAME_
         ok or break
         w.find_first_dir 'test' or break
         r = true
@@ -178,8 +181,8 @@ module Skylab::TestSupport::Regret::API
       io.rewind ; io.truncate 0
       true
     end
-    Dev_null_ = API::RegretLib_::Dev_null
-    WRITE_MODE_ = API::WRITE_MODE_
+    Dev_null_ = API_::RegretLib_::Dev_null
+    WRITE_MODE_ = API_::WRITE_MODE_
 
     def say volume, msg_p
       snitch.say volume, msg_p
@@ -190,5 +193,6 @@ module Skylab::TestSupport::Regret::API
       @err.puts msg
       false
     end
+  end
   end
 end

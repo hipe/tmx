@@ -1,10 +1,12 @@
-class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
+module Skylab::TestSupport
+
+  class Regret::API::Support::Verbosity::Graded < ::Module
 
   # read [#024] the graded verbosity narrative #storypoint-5
 
   Graded = self
 
-  Lib_ = ::Skylab::TestSupport::Regret::API::RegretLib_
+  RegretLib_ = ::Skylab::TestSupport::Regret::API::RegretLib_
 
   class Graded
     def self.produce_conf_module grade_i_a
@@ -192,7 +194,7 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
       self.class.members
     end
 
-    Lib_::Ivars_with_procs_as_methods[ self, :@aref, :[] ]
+    RegretLib_::Ivars_with_procs_as_methods[ self, :@aref, :[] ]
 
     def make_snitch io, *expression_agent  # #storypoint-195
       self.class.get_snitch_class.new self, io, *expression_agent
@@ -245,8 +247,9 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
       self.class.members
     end
 
-    Lib_::Ivars_with_procs_as_methods[ self,
+    RegretLib_::Ivars_with_procs_as_methods[ self,
       :write, :puts, :say, :is, :@puts, :<<, :event, :y ]
         # (reminder: ":@foo, :bar" means "use proc in @foo for method 'bar')
+  end
   end
 end

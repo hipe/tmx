@@ -92,7 +92,7 @@ module Skylab::TestSupport
     private
 
       def find_contiguous_range_of_paths argv
-        scn = QuicLib_::Scanner[ argv ]
+        scn = QuicLib_::Stream[ argv ]
         while (( tok = scn.gets ))
           Dash_[ tok ] or break( a = scn.index )
         end

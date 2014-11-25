@@ -1,10 +1,14 @@
-class Skylab::TestSupport::Regret::API::Actions::DocTest
+module Skylab::TestSupport
+
+  module Regret::API
+
+  class Actions::DocTest
 
   class Specer__  # read [#025] the specer narrative #storypoint-5 intro
 
     RegretLib_ = ::Skylab::TestSupport::Regret::API::RegretLib_
 
-      Autoloader_ = RegretLib_::Autoloader[]
+    Autoloader_ = ::Skylab::Callback::Autoloader
 
     RegretLib_::Basic_Fields[ :client, self,
       :absorber, :absrb_iambic_fully,
@@ -19,7 +23,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
 
     def set_template_options option_a  # #storypoint-15
       @templo_opt_a = option_a
-      PROCEDE__
+      PROCEDE_
     end
 
     # this is the first line of a comment block, to become a context desc:
@@ -34,7 +38,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     #     THIS_FILE_.contains( 'this comment gets included' )       # => true
     #
     #     THIS_FILE_.contains( '"this is the first line of a co' )  # => true
-    #     THIS_FILE_.contains( "you will #{ } not see" )            # => false
+    #     THIS_FILE_.contains( "you will #{ }not see" )             # => false
     #     THIS_FILE_.contains( '"this is the first line of a co' )  # => true
     #
     # note that we now strip trailing colons on these lines:
@@ -51,12 +55,17 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     end
 
     class State__::Machine
-      class << self ; alias_method :orig_new, :new ; end
-      def self.new h
+
+      class << self
+
+        alias_method :orig_new, :new
+
+        def new h
         ::Class.new( self ).class_exec do
           class << self ; alias_method :new, :orig_new end
           const_set :H_, h
           self
+        end
         end
       end
 
@@ -105,23 +114,29 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       o = State__.method :new
 
       Machine__ = State__::Machine.new(
+
         start: o[ nil, [ :nbcode, :blank, :other ] ],
+
         nbcode: o[ /\G[ ][ ][ ][ ](?<content>.+)/,
                        [ :bcode, :nbcode, :other ] ],
+
         bcode: o[ /\G[ ]{0,4}(?<content>[ ]*)$/,
                        [ :bcode, :nbcode, :other ] ],
+
         blank: o[ /\G[[:space:]]*$/, [ :nbcode, :blank, :other ] ],
+
         other: o[ /\G(?:|(?<content>.+))$/, [ :nbcode, :blank, :other ]]
       )
-      # note in regexen above, use of '$' and not '\z' is intentional
     end.call
 
     def accept cblock
       machine = Machine__.new
       sblock = Specer__::Block.new @snitch
-      comment_lines = RegretLib_::Scanner[ cblock.a ]
-      while (( cl = comment_lines.gets ))
+      comment_lines = RegretLib_::Stream[ cblock.a ]
+      cl = comment_lines.gets
+      while cl
         sblock.accept machine.move cl
+        cl = comment_lines.gets
       end
       sblock.flush
       if sblock.is_not_empty
@@ -151,7 +166,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
         rslv_mods_and_paths_when_path_is_set
       else
         @corrected_anchored_const_a = nil
-        PROCEDE__
+        PROCEDE_
       end
     end
 
@@ -168,7 +183,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
         _path = ::File.expand_path @load_file
         require _path  # or load it..
       end
-      PROCEDE__
+      PROCEDE_
     end
 
     def rslv_tail_path  # local, normalized path
@@ -177,7 +192,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       _eql = bms == pns[ 0, bms.length ]
       if _eql
         @tail_path = pns[ bms.length + 1 .. -1 ]
-        PROCEDE__
+        PROCEDE_
       else
         when_tail_path_was_not_under_expected_head_path
       end
@@ -189,7 +204,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
         "expecting to find pathname #{ p } #{
           }under base module `dir_pathnname` - #{ bm.dir_pathname }"
       end
-      FAILED__
+      UNABLE_
     end
 
     def rslv_corrected_anchored_const_a  # #storypoint-165
@@ -207,7 +222,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       @value = rdc_const_array_down_to_some_trueish_value
       if @value
         @corrected_anchored_const_a = rslv_some_normalized_const_array
-        PROCEDE__
+        PROCEDE_
       end
     end
 
@@ -293,7 +308,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
           }#{ s a, :one_of }its #{ a.length } constant#{ s }#{ sac }"
       end
       explain_suggestion_for_no_such_const
-      FAILED__
+      UNABLE_
     end
 
     def explain_suggestion_for_no_such_const
@@ -337,13 +352,13 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
 
     def begn_templo
       _tmod = Autoloader_.const_reduce do |cr|
-        cr.from_module DocTest::Templos__
+        cr.from_module DocTest_::Templos__
         cr.const_path [ @templo_name ]
         cr.assume_is_defined  # we experiment w/ using this instead of boxxy
       end
       @templo = _tmod.begin @snitch, @base_mod,
         @corrected_anchored_const_a, @block_a
-      PROCEDE__
+      PROCEDE_
     end
 
     def flsh_with_templo
@@ -357,21 +372,25 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       end
     end
 
-    FAILED__ = false
+    class Event_
+
+      class  << self
+
+        def [] msg
+          new -> { msg }
+        end
+      end
+
+      def initialize mp
+        @message_proc = mp
+      end
+
+      attr_reader :message_proc
+
+    end
+
     IGNORED_ = nil
-    PROCEDE__ = true
   end
-
-  class Specer__::Event_
-
-    def self.[] msg
-      new -> { msg }
-    end
-
-    def initialize mp
-      @message_proc = mp
-    end
-
-    attr_reader :message_proc
+  end
   end
 end

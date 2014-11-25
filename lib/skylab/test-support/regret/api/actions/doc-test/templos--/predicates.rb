@@ -1,4 +1,6 @@
-class Skylab::TestSupport::Regret::API::Actions::DocTest
+module Skylab::TestSupport
+
+  class Regret::API::Actions::DocTest
 
   class Templos__::Predicates  # a box module and a class.
 
@@ -26,10 +28,10 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       unaltered_line ||= altered_line
       y = ::Enumerator::Yielder.new( & altered_line )
       @add = -> line do
-        idx = line.index SEP ; matched = nil
+        idx = line.index SEP_ ; matched = nil
         if idx   # magic separator hack - "# =>" becomes:
           lef = line[ 0 .. idx - 1 ].strip
-          rig = line[ idx + SEP.length .. -1 ].strip
+          rig = line[ idx + SEP_.length .. -1 ].strip
           matched = self.class.each.reduce nil do |_, p|
             # module as switch statement [#ba-018]
             p[ y, lef, rig ] and break true
@@ -77,5 +79,6 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
   Templos__::Predicates::SHOULD_EQL_ = -> y, lef, rig do
     y << "#{ lef }.should eql( #{ rig } )"
     true  # important
+  end
   end
 end

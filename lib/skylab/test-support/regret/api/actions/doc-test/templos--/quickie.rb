@@ -1,6 +1,8 @@
-module Skylab::TestSupport::Regret::API
+module Skylab::TestSupport
 
-  class Actions::DocTest::Templos__::Quickie < API::Support::Templo_
+  module Regret::API
+
+  class Actions::DocTest::Templos__::Quickie < API_::Support::Templo_
 
     OPTION_X_A__ = [
 
@@ -22,7 +24,7 @@ module Skylab::TestSupport::Regret::API
           @do_include_regret_setup = false
           OPTION_PROCEDE__
         end, :summarize, -> y do
-          y << "exerimental."
+          y << "experimental."
         end,
 
       :help,
@@ -79,7 +81,7 @@ module Skylab::TestSupport::Regret::API
         example: render_example }.freeze
 
       render_tests = -> blk, cnum do
-        y = Resolve_newline_line_joiner__[]
+        y = Inner_line_joiner__[].rewind
         part_a = self.class::Context__::Part_.resolve_parts blk, rlma
         part_a.each do |part|
           y.puts template_h.fetch( part.template_i )[ part, cnum ]
@@ -89,14 +91,14 @@ module Skylab::TestSupport::Regret::API
 
       context_descify = -> blk, num do
         if blk.first_other
-          API::Support::Templo_.descify blk.first_other
+          API_::Support::Templo_.descify blk.first_other
         else
           "context #{ num }".inspect
         end
       end
 
       render_body = -> do
-        y = Resolve_newline_line_joiner__[]
+        y = Outer_line_joiner__[].rewind
         b_a.each do |blk|
           num = y.count + 1
           y.puts ctxt[
@@ -123,7 +125,7 @@ module Skylab::TestSupport::Regret::API
         io.write baset.call( amod: amod, bmod: bmod, cmod: cmod, body: body,
                              cover: render_cover( acon, bmod, cmod ),
                              desc: desc, acon: acon )
-        SUCCEEDED__
+        ACHIEVED_
       end ; nil
     end
 
@@ -170,23 +172,31 @@ module Skylab::TestSupport::Regret::API
 
     OPTION_PROCEDE__ = nil
 
-    Resolve_newline_line_joiner__ = Callback_.memoize do  # SO DODGY but fun
+    Inner_line_joiner__ = Callback_.memoize do
+      Line_joiner__[].duplicate
+    end
+
+    Outer_line_joiner__ = Callback_.memoize do
+      Line_joiner__[].duplicate
+    end
+
+    Line_joiner__ = Callback_.memoize do
+
       Callback_::Scn.articulators.eventing(
-        :any_subsequent_items, -> y, x do
+        :y, [],
+        :any_subsequent_items,  -> y, x do
           y.push "#{ NEWLINE_ }#{ x }" ; nil
         end,
-        :y, [],
         :flush, -> y do
           x = y * EMPTY_S_
           y.clear
           x
-        end
-      )
+        end )
     end
 
     SUCCESS_EXITSTATUS__ = 0
-    SUCCEEDED__ = true
 
     Autoloader_[ self, ::Pathname.new( __FILE__ ).sub_ext( EMPTY_S_ ) ]
+  end
   end
 end

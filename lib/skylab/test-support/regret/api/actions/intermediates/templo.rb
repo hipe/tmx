@@ -1,6 +1,8 @@
-module Skylab::TestSupport::Regret::API
+module Skylab::TestSupport
 
-  class API::Actions::Intermediates::Templo < API::Support::Templo_
+  module Regret::API
+
+  class Actions::Intermediates::Templo < API_::Support::Templo_
 
     def initialize wlk, pn
       @render_to_p = -> io do
@@ -59,5 +61,6 @@ module Skylab::TestSupport::Regret::API
         true
       end
     end
+  end
   end
 end

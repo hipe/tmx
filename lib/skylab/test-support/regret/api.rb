@@ -3,25 +3,12 @@ module Skylab::TestSupport
   module Regret
 
     module API
-      API = self
+
       Autoloader_ = Autoloader_
-      Callback_ = Callback_
-      CONST_SEP_ = CONST_SEP_
-      DEFAULT_CORE_BASENAME_ = "core#{ Autoloader_::EXTNAME }"
-      EMPTY_A_ = [].freeze
-      EMPTY_P_ = -> {}
-      EMPTY_S_ = EMPTY_S_
-      Lib_ = TestSupport_::Lib_
-      Library_ = TestSupport_::Library_
-      NEWLINE_ = TestSupport_::NEWLINE_
-      Plugin_ = TestSupport_::Lib_::Heavy_plugin[]
-      Regret = Regret
-      TestSupport_ = TestSupport_
-      WRITE_MODE_ = 'w'.freeze
 
       module RegretLib_
 
-        sidesys = TestSupport_::Autoloader_.build_require_sidesystem_proc
+        sidesys = Autoloader_.build_require_sidesystem_proc
 
         Autoloader = -> do
           Autoloader_
@@ -117,7 +104,7 @@ module Skylab::TestSupport
           HL__[].system.filesystem.path_tools.pretty_path
         end
 
-        Scanner = Lib_::Scanner
+        Stream = Lib_::Stream
 
         Snag__ = sidesys[ :Snag ]
 
@@ -129,16 +116,15 @@ module Skylab::TestSupport
 
         SubTree__ = sidesys[ :SubTree ]
 
-
         Tree_walker = -> * x_a do
           SubTree__[]::Walker.new x_a
         end
       end
     end
 
-    Lib_::API[][ self ]
+    TestSupport_._lib.API[ self ]  # loads 'LIB_' as well
 
-    action_name_white_rx( /[a-z0-9]$/ )
+    action_name_white_rx %r([a-z0-9]$)
 
     before_each_execution do
       API::RegretLib_::Path_tools_clear[]
@@ -146,13 +132,18 @@ module Skylab::TestSupport
 
     module API
 
-      def self.debug!
-        ( @system_api_client ||= Client.new ).do_debug = true
+      class << self
+
+        def debug!
+          @system_api_client ||= Client.new
+          @system_api_client.do_debug = true
+          nil
+        end
       end
 
       class Client
 
-        Plugin_::Host.enhance self do
+        LIB_.heavy_plugin_lib::Host.enhance self do
           services :pth, :invitation
         end
 
@@ -173,7 +164,7 @@ module Skylab::TestSupport
           # message.
           @system_service_provider ||= begin
             @do_debug ||= nil
-            stderr = Lib_::Stderr[]
+            stderr = LIB_.stderr
             System_Services_.new( Dynamic_Puts_Proxy_.new do |s|
               @do_debug and stderr.puts s
             end )
@@ -188,12 +179,12 @@ module Skylab::TestSupport
         end
 
         def get_expression_agent _bound
-          Expression_agent_class__[].new
+          LIB_.API_normalizer_lib::Expression_agent_class[].new
         end
       end
 
       class System_Services_ < RegretLib_::Struct[ :err ]
-        Plugin_::Host.enhance self do
+        LIB_.heavy_plugin_lib::Host.enhance self do
           services :err, :ivar
         end
       end
@@ -202,7 +193,7 @@ module Skylab::TestSupport
         alias_method :puts, :call
       end
 
-      class Action < Lib_::API[]::Action
+      class Action < LIB_.API::Action
 
         def set_vtuple x
           did = false
@@ -239,9 +230,12 @@ module Skylab::TestSupport
         end
       end
 
-      Expression_agent_class__ = -> do
-        Lib_::API_normalizer[]::Expression_agent_class[]
-      end
+      API_ = self
+
+      DEFAULT_CORE_BASENAME_ = :"core#{ Autoloader_::EXTNAME }"
+
+      WRITE_MODE_ = 'w'.freeze
+
     end
   end
 end

@@ -23,6 +23,10 @@ module Skylab::Callback
 
       attr_reader :count
 
+      def duplicate
+        dup
+      end
+
       def with * x_a
         otr = dup
         otr.init_copy x_a
@@ -46,10 +50,18 @@ module Skylab::Callback
       def init_ivars
         @always_at_the_beginning = @any_first_item = nil
         @at_the_end_iff_nonzero_items = nil
-        @count = 0 ; @gets_under = nil
+        @gets_under = nil
         @iff_zero_items = nil
+        @output_x = nil
+        @y = nil
+        rewind
+        nil
+      end
+
+      public def rewind
+        @count = 0
         @method_i = :receive_first_gets
-        @output_x = nil ; @y = nil
+        self
       end
 
       def sanity_checks

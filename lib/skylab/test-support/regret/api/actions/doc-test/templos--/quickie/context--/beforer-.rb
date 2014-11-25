@@ -1,4 +1,6 @@
-module Skylab::TestSupport::Regret::API  # [#sl-123] exempt:
+module Skylab::TestSupport
+
+  module Regret::API  # [#sl-123] exempt:
 
   class Actions::DocTest                   # these breaks ..
 
@@ -26,7 +28,7 @@ module Skylab::TestSupport::Regret::API  # [#sl-123] exempt:
 
         def self.build_parts blk, y
           part_a = [ ]
-          snips = RegretLib_::Scanner[ blk.snippet_a ]
+          snips = RegretLib_::Stream[ blk.snippet_a ]
           bef, ex = first_snip snips.gets, y
           bef and part_a << bef
           ex and part_a << ex
@@ -47,7 +49,7 @@ module Skylab::TestSupport::Regret::API  # [#sl-123] exempt:
               ( before_a ||= [ ] ) << line
               nil
             end
-            lines = RegretLib_::Scanner[ snip.line_a ]
+            lines = RegretLib_::Stream[ snip.line_a ]
             while line = lines.gets
               preds.add( line ) and break
             end
@@ -66,7 +68,7 @@ module Skylab::TestSupport::Regret::API  # [#sl-123] exempt:
             if example_a
               ex = Context__::Part_::Example_.new( y ) do |e|
                 e.quoted_description_string =
-                  API::Support::Templo_.descify snip.last_other
+                  API_::Support::Templo_.descify snip.last_other
                 e.local_lines = example_a
               end
             end
@@ -75,5 +77,6 @@ module Skylab::TestSupport::Regret::API  # [#sl-123] exempt:
         end
       end
     end
+  end
   end
 end

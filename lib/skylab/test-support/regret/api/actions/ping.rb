@@ -1,6 +1,8 @@
-module Skylab::TestSupport::Regret::API
+module Skylab::TestSupport
 
-  class API::Actions::Ping < API::Action
+  module Regret::API
+
+  class Actions::Ping < API_::Action
 
     services [ :err, :ivar ]
 
@@ -8,5 +10,6 @@ module Skylab::TestSupport::Regret::API
       @err.puts "hello from regret."
       :hello_from_regret
     end
+  end
   end
 end

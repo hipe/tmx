@@ -1,4 +1,6 @@
-class Skylab::TestSupport::Regret::API::Actions::DocTest
+module Skylab::TestSupport
+
+  class Regret::API::Actions::DocTest
 
   class Comment_::Block
 
@@ -16,7 +18,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     end
 
     -> do
-      hack_rx = /\G[ ][ ][ ][ ].*#{ ::Regexp.escape SEP }/
+      hack_rx = /\G[ ][ ][ ][ ].*#{ ::Regexp.escape SEP_ }/
 
       define_method :does_look_testy do
         @a.detect do |c|
@@ -26,7 +28,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     end.call
   end
 
-  class Comment_::Block::Scanner < Comment_::Scanner_
+  class Comment_::Block::Stream < Comment_::Stream_
 
     # this thing turns a filehandle into a series of zero or more comment
     # blocks, where a comment block is defined as two or more contiguous
@@ -74,15 +76,17 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
         hot = false
         a.length > 1 and flush[]
       end
-      cs = Comment_::Scanner[ sn, Lib_::Scanner[ fh ] ]
+      cs = Comment_::Stream[ sn, LIB_.stream( fh ) ]
       @gets = -> do
-        if hot
-          while true
-            cmnt = cs.gets or break ( r = finish[] )
-            r = func[ cmnt ] and break
+        while hot
+          cmnt = cs.gets
+          if ! cmnt
+            x = finish[]
+            break
           end
-          r
+          x = func[ cmnt ] and break
         end
+        x
       end
     end
 
@@ -94,5 +98,6 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       end
       nil
     end
+  end
   end
 end

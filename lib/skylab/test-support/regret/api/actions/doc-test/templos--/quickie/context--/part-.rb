@@ -1,4 +1,6 @@
-module Skylab::TestSupport::Regret::API
+module Skylab::TestSupport
+
+  module Regret::API
 
   module Actions::DocTest::Templos__::Quickie::Context__
 
@@ -17,7 +19,7 @@ module Skylab::TestSupport::Regret::API
       def self.build_example snippet, y
         Example_.new( y ) do |e|
           e.quoted_description_string =
-            API::Support::Templo_.descify snippet.last_other
+            API_::Support::Templo_.descify snippet.last_other
           filter = Actions::DocTest::Templos__::Predicates.new
           snippet.line_a.each( & filter.method( :<< ) )
           e.local_lines = filter.flush
@@ -72,5 +74,6 @@ module Skylab::TestSupport::Regret::API
         end
       end
     end
+  end
   end
 end

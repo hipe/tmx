@@ -2,7 +2,7 @@ module Skylab::TestSupport
 
   module Regret::API
 
-    class API::Actions::DocTest
+    class Actions::DocTest
 
       module Models_::Constant_
 

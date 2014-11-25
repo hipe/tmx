@@ -16,7 +16,7 @@ module Skylab::TestSupport
 
         def execute
           -> do  # #result-block
-            c_a = [] ; scn = Regret::API::Library_::StringScanner.new @tail_path
+            c_a = [] ; scn = TestSupport_::Library_::StringScanner.new @tail_path
             while (( tok = scn.scan RX_ ))  # the regex has a fwd lookahead
               scn.pos = scn.pos + 1         #  assertion so we don't capture
               c_a << Constantify_[ tok ].intern  # the '/' but skip over it
@@ -36,7 +36,7 @@ module Skylab::TestSupport
         FILE_RX_ = /\A (?<noext> [-_a-z0-9]+ ) #{
           }#{ ::Regexp.escape Autoloader_::EXTNAME } \z/x
 
-        Constantify_ = Lib_::Name_sanitize_for_constantize_file_proc[]
+        Constantify_ = LIB_.name_sanitize_for_constantize_file_proc
       end
   end
 end

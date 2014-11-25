@@ -1,8 +1,10 @@
-module Skylab::TestSupport::Regret::API
+module Skylab::TestSupport
 
-  module API::Conf
+  module Regret::API
 
-    Verbosity = API::Support::Verbosity::Graded :notice, :medium, :murmur
+  module Conf
+
+    Verbosity = API_::Support::Verbosity::Graded :notice, :medium, :murmur
     # NOTE the order of the symbols above corresponds to the number of "-v"'s !
 
 
@@ -22,5 +24,6 @@ module Skylab::TestSupport::Regret::API
         end
       end
     end
+  end
   end
 end

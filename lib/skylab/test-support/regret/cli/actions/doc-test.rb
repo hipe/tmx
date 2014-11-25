@@ -20,7 +20,7 @@ module Skylab::TestSupport
 
         class Parse_Recursive_
 
-          Lib_::Funcy_globful[ self ]
+          LIB_.funcy_globful self
 
           def execute
             if @argv.length.nonzero?
@@ -57,7 +57,7 @@ module Skylab::TestSupport
 
           REST_RX_ = /\A-(?<stem>[^-].*)\z/
 
-          Value_ = Regret::API::Lib_::Struct[ :did_error, *
+          Value_ = Regret::API::RegretLib_::Struct[ :did_error, *
             A_.reduce( [] ) { |m, x| x.i and m << x.i ; m } ]
           class Value_
             def to_i

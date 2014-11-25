@@ -16,7 +16,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Simplecov
 
   TestSupport_::Library_.touch :Open3
 
-  Lib_ = TestSupport_::Lib_
+  LIB_ = TestSupport_._lib
 
   NILADIC_EMPTINESS_ = -> { }
 
@@ -83,7 +83,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Simplecov
       lines.shift.line.should match( /about to run:.+run-me\.rb orange/ )
       lines.shift.line.should eql( "welff you probably want orange\n" )
       if lines.length.nonzero?
-        Lib_::Stderr[].puts "LET's FIX SIMPLECOV (that one warning)"
+        LIB_.stderr.puts "LET's FIX SIMPLECOV (that one warning)"
       end
     end
 
@@ -130,7 +130,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Simplecov
 
     def get_any_debugging_yielder
       if do_debug
-        ::Enumerator::Yielder.new( & Lib_::Stderr[].method( :puts ) )
+        ::Enumerator::Yielder.new( & LIB_.stderr.method( :puts ) )
       end
     end
 

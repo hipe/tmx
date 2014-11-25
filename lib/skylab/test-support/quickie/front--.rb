@@ -160,7 +160,7 @@ module Skylab::TestSupport
       end
 
       def check_if_argv_is_completely_parsed sig_a  # assume any
-        scn = QuicLib_::Scanner[ sig_a ] ; g = nil
+        scn = QuicLib_::Stream[ sig_a ] ; g = nil
         until (( g = scn.gets )) ; end
         xtra_a = ::Array.new g.input.length, true
         begin  # ( bitwise OR )
@@ -269,7 +269,7 @@ module Skylab::TestSupport
         HL__[].system.file_system.path_toosl.pretty_path x
       end
 
-      Scanner = Lib_::Scanner
+      Stream = Lib_::Stream
 
       String_lib = -> do
         Bsc__[]::String

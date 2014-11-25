@@ -1,4 +1,6 @@
-module Skylab::TestSupport::Regret::API
+module Skylab::TestSupport
+
+  module Regret::API
 
   class Support::Templo_  # read [#026] the templo narrative #storypoint-5
 
@@ -19,7 +21,7 @@ module Skylab::TestSupport::Regret::API
     end
 
     def get_template i
-      Lib_::String_lib[].template.via_path(
+      LIB_.string_lib.template.via_path(
         self.class.dir_pathname.join "#{ i }#{ EXT__ }" )
     end
 
@@ -50,7 +52,7 @@ module Skylab::TestSupport::Regret::API
         }#{ opt_a.map( & :inspect ) * ', ' } - valid option(s): #{
         }(#{ formals.map( & :name_i ) * ', ' })"
       end
-      FAILED__
+      UNABLE_
     end
   private
     def show_option_help
@@ -71,13 +73,13 @@ module Skylab::TestSupport::Regret::API
           opt.summarize_p[ build_section_yielder[ y, opt.name_i ] ]
         end
       end
-      Lib_::CLI_table[
+      LIB_.CLI_table(
         :field, :id, :name,
         :field, :id, :desc, :left,
         :show_header, false,
         :left, '| ', :sep, '    ',
         :write_lines_to, @snitch.method( :puts ),
-        :read_rows_from, ea ]
+        :read_rows_from, ea )
       nil
     end
 
@@ -86,7 +88,7 @@ module Skylab::TestSupport::Regret::API
         new( x_a ).execute
       end
       def initialize x_a
-        @scn = Array_Scanner__.new x_a
+        @scn = Stream_via_Array__.new x_a
       end
       def execute
         name_i = @scn.gets and bld_nonzero_box name_i
@@ -104,7 +106,7 @@ module Skylab::TestSupport::Regret::API
       end
     end
 
-    class Array_Scanner__
+    class Stream_via_Array__
       def initialize a
         d = -1 ; last = a.length - 1
         @gets_p = -> do
@@ -206,7 +208,6 @@ module Skylab::TestSupport::Regret::API
     end.call
 
     EXT__ = '.tmpl'.freeze
-    FAILED__ = false
-    PROCEDE__ = true
+  end
   end
 end
