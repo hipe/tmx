@@ -32,9 +32,9 @@ module Skylab::Basic
       end
 
       def fetchs
-        r = @a.fetch @idx
+        x = @a.fetch @idx
         @idx += 1
-        r
+        x
       end
 
       def fetch_chunk num

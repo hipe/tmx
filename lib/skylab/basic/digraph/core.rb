@@ -52,7 +52,7 @@ module Skylab::Basic
 
     def absorb_association name_i
       @has_associations ||= true
-      @associations ||= Basic_::Lib_::Old_box_lib[].open_box.new
+      @associations ||= Basic_._lib.old_box_lib.open_box.new
       @associations.has? name_i or @associations.add name_i, true
       nil
     end

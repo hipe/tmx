@@ -32,6 +32,8 @@ module Skylab::Basic
         end
       end
 
+      alias_method :line_stream, :line_scanner
+
       def looks_like_sentence * a
         if a.length.zero?
           String_::Small_Procs__::Looks_like_sentence

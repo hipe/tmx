@@ -37,7 +37,7 @@ module Skylab::Basic
         x_a.shift ; nil
       end
 
-      Basic_::Lib_::Bundle_Multiset[ self ]
+      Basic_._lib.bundle_Multiset self
     end
 
     With_members__ = -> x do
@@ -45,13 +45,13 @@ module Skylab::Basic
         if x.respond_to? :each_with_index then With_members_as_a__
         elsif x.respond_to? :call then With_members_as_p__
         else raise ::ArgumentError,
-          "member set? #{ Basic_::Lib_::Strange[ x ] }" end ) ; nil
+          "member set? #{ Basic_._lib.strange x }" end ) ; nil
     end
     With_members_as_a__ = -> a do
       a.frozen? or raise ::ArgumentError, "when providing an array to #{
         }use as the member list, it must be frozen"
       p = -> do
-        set = Basic_::Lib_::Set[ a ].freeze
+        set = Basic_._lib.set( a ).freeze
         p = -> { set } ; set
       end
       define_method :basic_set_member_set do p[] end
@@ -60,7 +60,7 @@ module Skylab::Basic
       define_method :basic_set_member_set do
         self.class.basic_set_member_set_from_p do
           _a = instance_exec( & p )
-          Basic_::Lib_::Set[ _a ].freeze
+          Basic_._lib.set( _a ).freeze
         end
       end
       def self.basic_set_member_set_from_p & build_set_p
@@ -68,7 +68,7 @@ module Skylab::Basic
       end
     end
     class Common_Runtime__
-      Basic_::Lib_::Funcy_globful[ self ]
+      Basic_._lib.funcy_globful self
       def initialize agent
         @agent = agent
         @agent_mod = agent.class
@@ -259,7 +259,7 @@ module Skylab::Basic
         @vessel_x or fail "sanity - no @vessel_x"
       end
       def traverse
-        @xtra_k_a = nil ; @provided = Basic_::Lib_::Set[]
+        @xtra_k_a = nil ; @provided = Basic_._lib.set
         @fld = Memberhood_Unit_of_Work__.new
         @input_pairs.each_pair do |k, v|
           @fld.replace k, v

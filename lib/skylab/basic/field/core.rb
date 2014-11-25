@@ -27,7 +27,7 @@ module Skylab::Basic
       end
     end
 
-  class Box__ < Basic_::Lib_::Old_box_lib[].open_box
+  class Box__ < Basic_._lib.old_box_lib.open_box
 
     class << self
 
@@ -67,11 +67,11 @@ module Skylab::Basic
     end
   end  # ..
 
-  Shell__ = Basic_::Lib_::Enhancement_shell[ %i(
+  Shell__ = Basic_._lib.enhancement_shell %i(
     meta_fields
     fields
     field_class_instance_methods
-  ) ]
+  )
 
   class Kernel__
 

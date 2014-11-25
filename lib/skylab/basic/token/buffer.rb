@@ -3,7 +3,7 @@ module Skylab::Basic
   class Token::Buffer
 
     def initialize sep_rx, word_rx
-      scn = Lib_::Empty_string_scanner[]
+      scn = Basic_._lib.empty_string_scanner
       up_gets = nil ; is_hot = true
       @gets_proc = -> x { up_gets = x }
       load_scn = -> do
@@ -40,11 +40,11 @@ module Skylab::Basic
 
     A_RATHER_SHORT_LENGTH_FOR_A_STRING__ = 8
 
-    Ellipsatize__ = Basic_::Lib_::CLI_lib[].ellipsify.
+    Ellipsatize__ = Basic_._lib.CLI_lib.ellipsify.
       curry[ A_RATHER_SHORT_LENGTH_FOR_A_STRING__ ]
 
-    Basic_::Lib_::Ivars_with_procs_as_methods[ self,
-      :gets, :@gets_proc, :gets_proc= ]
+    Basic_._lib.ivars_with_procs_as_methods self,
+      :gets, :@gets_proc, :gets_proc=
 
   end
 end

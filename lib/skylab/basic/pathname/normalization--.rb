@@ -6,7 +6,7 @@ module Skylab::Basic
 
         # do not let this seep into the scope of [#hl-022]. do not use FS here
 
-        Basic_::Lib_::Entity.call self do
+        Basic_._lib.entity self do
 
           def absolute
             @relative_is_OK = false

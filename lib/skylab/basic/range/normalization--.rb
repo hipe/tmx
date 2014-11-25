@@ -4,7 +4,7 @@ module Skylab::Basic
 
     class Normalization__  # :+[#037]
 
-      Basic_::Lib_::Entity.call self do
+      Basic_._lib.entity self do
 
         o :iambic_writer_method_name_suffix, :'='
 
@@ -40,7 +40,7 @@ module Skylab::Basic
         o :property, :on_event, :property, :as_normal_value  # put at end because open :+[#br-060]
       end
 
-      Basic_::Lib_::Event[].sender self
+      Basic_._lib.event.sender self
 
       def initialize & p
         @arg_was_provided = false
@@ -145,7 +145,7 @@ module Skylab::Basic
         Explanation__.with :bp, @arg, :or_a, @or_a
       end
 
-      Explanation__ = Basic_::Lib_::Event[].prototype_with(
+      Explanation__ = Basic_._lib.event.prototype_with(
         :actual_property_is_outside_of_formal_property_set,
           :bp, nil, :or_a, nil ) do |y, o|
 

@@ -84,7 +84,7 @@ module Skylab::Basic
 
   class Tree::Leaf
 
-    Basic_::Lib_::Pool[ self ].with_with_instance
+    Basic_._lib.pool( self ).with_with_instance
 
     def init_from_pool x
       @leaf_data = x

@@ -23,7 +23,7 @@ module Skylab::Basic::TestSupport::Digraph::Holes__
       di = Basic_::Digraph.new
       di.node! :waz, is: [ :wiff, :wengle ]
       di.node! :wengle, is: [ :waffle ]
-      io = Basic_::Lib_::String_IO[]
+      io = Basic_._lib.string_IO
       di.describe_digraph :IO, io, :with_spaces, :with_solos
       _act = io.string
       _exp = <<-O.unindent.chop

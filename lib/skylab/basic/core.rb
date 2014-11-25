@@ -8,6 +8,11 @@ module Skylab::Basic  # introduction at [#020]
       Default_property_instance__[]
     end
 
+    def _lib
+      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+        self::Lib_, self )
+    end
+
     def minimal_property name
       Minimal_Property__.new name
     end

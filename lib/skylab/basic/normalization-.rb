@@ -61,7 +61,7 @@ module Skylab::Basic
         end
 
         Event_ = -> do
-          Basic_::Lib_::Event[]
+          Basic_._lib.event
         end
       end
 

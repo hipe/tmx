@@ -25,9 +25,11 @@ module Skylab::Basic
     private
       def init_IO
         if @IO
-          @IO_was_provided = true ; @io = @IO
+          @IO_was_provided = true
+          @io = @IO
         else
-          @IO_was_provided = false ; @io = Basic_::Lib_::String_IO[]
+          @IO_was_provided = false
+          @io = Basic_._lib.string_IO
         end  ; nil
       end
       def init_solo_h
