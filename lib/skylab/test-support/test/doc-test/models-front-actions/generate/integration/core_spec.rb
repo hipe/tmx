@@ -1,16 +1,10 @@
-require_relative 'test-support'
+require_relative '../../../test-support'
 
-module Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest
+module Skylab::TestSupport::TestSupport::DocTest
 
-  ::Skylab::TestSupport::TestSupport::Regret::API::Actions[ self ]
+  module XXX_2
 
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  TestSupport_ = TestSupport_
-
-  Sandboxer = TestSupport_::Sandbox::Spawner.new
+    extend TestSupport_::Quickie
 
   describe "[ts] Regret::API::Actions::DocTest" do
     context "probably no one will ever find a reason to call our API directly", wip: true do
@@ -51,5 +45,7 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest
         end
       end
     end
+  end
+
   end
 end

@@ -1,12 +1,10 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest::RS_
-
-  ::Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest[ self, :expect ]
+module Skylab::TestSupport::TestSupport::DocTest
 
   describe "[ts] regret API actions doc-test recursive", wip: true do
 
-    extend TS__
+    extend TS_
 
     it "the API loads" do
       _API

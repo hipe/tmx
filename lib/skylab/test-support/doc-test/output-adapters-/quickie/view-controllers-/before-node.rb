@@ -68,7 +68,7 @@ module Skylab::TestSupport
             if example_a
               ex = Context__::Part_::Example_.new( y ) do |e|
                 e.quoted_description_string =
-                  API_::Support::Templo_.descify snip.last_other
+                  TestSupport_::View_Controller_.descify snip.last_other
                 e.local_lines = example_a
               end
             end

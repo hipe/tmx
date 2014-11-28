@@ -2,7 +2,7 @@ module Skylab::TestSupport
 
   module Regret::API
 
-  class Actions::Intermediates::Templo < API_::Support::Templo_
+  class Actions::Intermediates::Templo < TestSupport_::View_Controller_
 
     def initialize wlk, pn
       @render_to_p = -> io do

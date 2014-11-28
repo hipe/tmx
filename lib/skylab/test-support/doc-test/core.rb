@@ -1,9 +1,34 @@
 module Skylab::TestSupport
 
-  module Regret::API
+  module DocTest  # see [#015]
 
-  class Actions::DocTest
+    Bzn_ = TestSupport_::Lib_::Bzn_[]
 
+    class << self
+
+      def comment_block_stream_via_line_stream_using_single_line_comment_hack x
+        DocTest_::Input_Adapters__::
+          Comment_block_stream_via_line_stream_using_single_line_comment_hack[ x ]
+      end
+    end
+
+    module API
+
+      extend Bzn_::API.module_methods
+
+      class << self
+
+        def expression_agent_class
+          Bzn_::API.expression_agent_class
+        end
+      end
+    end
+
+    class Kernel_ < Bzn_::Kernel_  # #todo
+
+    end
+
+  if false
   class Specer__  # read [#025] the specer narrative #storypoint-5 intro
 
     RegretLib_ = ::Skylab::TestSupport::Regret::API::RegretLib_
@@ -162,7 +187,7 @@ module Skylab::TestSupport
     end
 
     def rslv_mods_and_paths
-      if @path
+      if @pat
         rslv_mods_and_paths_when_path_is_set
       else
         @corrected_anchored_const_a = nil
@@ -392,5 +417,7 @@ module Skylab::TestSupport
     IGNORED_ = nil
   end
   end
+
+    DocTest_ = self
   end
 end

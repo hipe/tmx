@@ -1,19 +1,15 @@
 module Skylab::TestSupport
 
-  class Regret::API::Support::Verbosity::Graded < ::Module
+  _lib  # load LIB_
 
-  # read [#024] the graded verbosity narrative #storypoint-5
-
-  Graded = self
-
-  RegretLib_ = ::Skylab::TestSupport::Regret::API::RegretLib_
-
-  class Graded
-    def self.produce_conf_module grade_i_a
-      new grade_i_a
-    end
+  class Verbosity_ < ::Module  # see [#024]
 
     class << self
+
+      def produce_conf_module grade_i_a
+        new grade_i_a
+      end
+
       private :new
     end
 
@@ -24,14 +20,13 @@ module Skylab::TestSupport
     attr_reader :lvl_a
 
     def [] mod_x
-      wat = Aggregate_.const_get mod_x.metastory.aggregate_exponent, false
+      wat = Aggregates__.const_get mod_x.metastory.aggregate_exponent, false
       wat[ self, mod_x ]
     end
-  end
 
-  Aggregate_ = ::Module.new
+  Aggregates__ = ::Module.new
 
-  module Aggregate_::CLI_Modality_Client_
+  module Aggregates__::CLI_Modality_Client_
     def self.[] vmod, cli_kls
       cli_kls.class_exec do
         include IM_
@@ -43,7 +38,7 @@ module Skylab::TestSupport
     end
   end
 
-  module Aggregate_::CLI_Modality_Client_::IM_
+  module Aggregates__::CLI_Modality_Client_::IM_
   private
     def verbosity_opt_func
       @verbosity_opt_func ||= begin
@@ -59,7 +54,7 @@ module Skylab::TestSupport
     end
   end
 
-  module Aggregate_::API_Action_
+  module Aggregates__::API_Action_
     def self.[] vmod, api_action_class
       api_action_class.class_exec do
         if respond_to? :mutable_verbosity_story
@@ -79,7 +74,7 @@ module Skylab::TestSupport
     end
   end
 
-  class Aggregate_::API_Action_::Mutable_Vstory_ < ::Module
+  class Aggregates__::API_Action_::Mutable_Vstory_ < ::Module
 
     def initialize vmod, api_application_class
       @param_i = nil
@@ -194,7 +189,7 @@ module Skylab::TestSupport
       self.class.members
     end
 
-    RegretLib_::Ivars_with_procs_as_methods[ self, :@aref, :[] ]
+    LIB_.ivars_with_procs_as_methods self, :@aref, :[]
 
     def make_snitch io, *expression_agent  # #storypoint-195
       self.class.get_snitch_class.new self, io, *expression_agent
@@ -247,8 +242,8 @@ module Skylab::TestSupport
       self.class.members
     end
 
-    RegretLib_::Ivars_with_procs_as_methods[ self,
-      :write, :puts, :say, :is, :@puts, :<<, :event, :y ]
+    LIB_.ivars_with_procs_as_methods self,
+      :write, :puts, :say, :is, :@puts, :<<, :event, :y
         # (reminder: ":@foo, :bar" means "use proc in @foo for method 'bar')
   end
   end

@@ -4,10 +4,13 @@ module Skylab::TestSupport::TestSupport
 
   TestSupport_ = ::Skylab::TestSupport
 
+  TestLib_ = ::Module.new
+
   module Constants
     EMPTY_A_ = TestSupport_::EMPTY_A_
     EMPTY_S_ = TestSupport_::EMPTY_S_
     LIB_  = TestSupport_._lib
+    TestLib_ = TestLib_
     TestSupport_ = TestSupport_
   end
 
@@ -31,6 +34,10 @@ module Skylab::TestSupport::TestSupport
   end
 
   module TestLib_
+
+    Expect_event = -> test_ctx_cls do
+      TestSupport_::Lib_::Bzn_[].test_support.expect_event test_ctx_cls
+    end
 
     Face_module = -> do
       TestSupport_::Lib_::Face__[]

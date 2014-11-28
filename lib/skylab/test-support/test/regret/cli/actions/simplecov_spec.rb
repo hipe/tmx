@@ -22,7 +22,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Simplecov
 
   TS_TS_ = TS_TS_
 
-  describe "[ts] regret CLI action s simplecov" do
+  describe "[ts] regret CLI action s simplecov", wip: true do
 
     extend TS__
 

@@ -18,8 +18,8 @@ module Skylab::TestSupport
 
       def self.build_example snippet, y
         Example_.new( y ) do |e|
-          e.quoted_description_string =
-            API_::Support::Templo_.descify snippet.last_other
+          e.quoted_description_string = TestSupport_::
+            View_Controller_.descify snippet.last_other
           filter = Actions::DocTest::Templos__::Predicates.new
           snippet.line_a.each( & filter.method( :<< ) )
           e.local_lines = filter.flush

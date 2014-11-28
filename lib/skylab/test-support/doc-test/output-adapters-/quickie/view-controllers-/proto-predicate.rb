@@ -1,6 +1,12 @@
 module Skylab::TestSupport
 
-  class Regret::API::Actions::DocTest
+  module DocTest
+
+    module Intermediate_Streams_
+
+      module Models_::Predicate_Expressions
+
+  if false
 
   class Templos__::Predicates  # a box module and a class.
 
@@ -80,5 +86,9 @@ module Skylab::TestSupport
     y << "#{ lef }.should eql( #{ rig } )"
     true  # important
   end
+  end
+
+      end
+    end
   end
 end

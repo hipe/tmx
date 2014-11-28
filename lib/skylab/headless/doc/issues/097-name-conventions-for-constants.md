@@ -36,7 +36,7 @@ idiomatically:
 
 #### the name convention for arbitrary values not in the list :[#114]
 
-we adopt the C-like convention and use names in all caps whose
+adopting the C-like convention, we use names in all caps whose
 constituent words are separated by underscores:
 
     VALID_NAME_RX = /\A[A-Z][_A-Za-z0-9]*\z/
@@ -110,6 +110,7 @@ universe, we employ this convention heavily: how many underscores trail
 a const name indicates how private the value is:
 
 
+
 #### a const with no trailing uderscores is..
 
 .. part of the surrounding node's public API. (for a review of what we
@@ -138,14 +139,15 @@ yet that value is not or should not be made pubic outside of the
 subsystem.
 
 
+
 #### a const with two or more trailing underscores is..
 
-.."visible" only to the surround node and/or file that the const is
-defined in.  this is both the ugliest variant and perhaps most commonly
+.."visible" only to the surrounding node and/or file that the const is
+defined in. this is both the ugliest variant and perhaps most commonly
 used.
 
 the reason we see this convention employed so often is that it reflects
-"good" design: [#xxx]
+and encourages "good" design: [#xxx]
 
 
 

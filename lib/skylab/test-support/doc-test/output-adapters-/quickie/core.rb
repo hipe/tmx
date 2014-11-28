@@ -2,7 +2,7 @@ module Skylab::TestSupport
 
   module Regret::API
 
-  class Actions::DocTest::Templos__::Quickie < API_::Support::Templo_
+  class Actions::DocTest::Templos__::Quickie < TestSupport_::View_Controller_
 
     OPTION_X_A__ = [
 
@@ -91,7 +91,7 @@ module Skylab::TestSupport
 
       context_descify = -> blk, num do
         if blk.first_other
-          API_::Support::Templo_.descify blk.first_other
+          TestSupport_::View_Controller_.descify blk.first_other
         else
           "context #{ num }".inspect
         end

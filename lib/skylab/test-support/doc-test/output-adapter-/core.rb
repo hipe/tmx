@@ -1,8 +1,6 @@
 module Skylab::TestSupport
 
-  module Regret::API
-
-  class Support::Templo_  # read [#026] the templo narrative #storypoint-5
+  class View_Controller_  # see [#026]
 
     class << self
       alias_method :begin, :new  # #storypoint-10
@@ -21,7 +19,7 @@ module Skylab::TestSupport
     end
 
     def get_template i
-      LIB_.string_lib.template.via_path(
+      TestSupport_._lib.string_lib.template.via_path(
         self.class.dir_pathname.join "#{ i }#{ EXT__ }" )
     end
 
@@ -73,7 +71,7 @@ module Skylab::TestSupport
           opt.summarize_p[ build_section_yielder[ y, opt.name_i ] ]
         end
       end
-      LIB_.CLI_table(
+      TestSupport_._lib.CLI_table(
         :field, :id, :name,
         :field, :id, :desc, :left,
         :show_header, false,
@@ -208,6 +206,5 @@ module Skylab::TestSupport
     end.call
 
     EXT__ = '.tmpl'.freeze
-  end
   end
 end

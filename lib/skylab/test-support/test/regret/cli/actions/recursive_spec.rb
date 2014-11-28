@@ -17,7 +17,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Recursiv
 
   extend TestSupport_::Quickie
 
-  describe "[ts] regret CLI actions recursive" do
+  describe "[ts] regret CLI actions recursive", wip: true do
 
     extend TS__
 

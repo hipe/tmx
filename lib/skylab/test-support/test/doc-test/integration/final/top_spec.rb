@@ -1,19 +1,13 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest::Specer__
+module Skylab::TestSupport::TestSupport::DocTest
 
-  ::Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest[ self ]
+  module XXX_1
 
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  TestSupport_ = TestSupport_
-
-  Sandboxer = TestSupport_::Sandbox::Spawner.new
+    extend TestSupport_::Quickie
 
   describe "[ts] Regret::API::Actions::DocTest::Specer__" do
-    context "this is the first line of a comment block, to become a context desc" do
+    context "this is the first line of a comment block, to become a context desc", wip: true do
       Sandbox_1 = Sandboxer.spawn
       before :all do
         Sandbox_1.with self
@@ -41,5 +35,7 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest::Specer__
         end
       end
     end
+  end
+
   end
 end

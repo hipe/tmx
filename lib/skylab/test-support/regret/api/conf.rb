@@ -4,7 +4,7 @@ module Skylab::TestSupport
 
   module Conf
 
-    Verbosity = API_::Support::Verbosity::Graded :notice, :medium, :murmur
+    Verbosity = TestSupport_::Verbosity_.produce_conf_module [ :notice, :medium, :murmur ]
     # NOTE the order of the symbols above corresponds to the number of "-v"'s !
 
 

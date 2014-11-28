@@ -3,11 +3,9 @@
 
 ## :#storypoint-5 introduction
 
-"templo" is a goofy name but we wanted it to be short, unique and semantic.
-a "templo" holds all the ugly, hard-to read, and one-offy logic we need to
+this holds all the ugly, hard-to read, and one-offy logic we need to
 write partly because our templates are truly logic-less and partly because
-what we're doing is so cool we need ad-hoc classes for it. Sure call it a
-wiew controller but eew.
+what we're doing is so cool we need ad-hoc classes for it.
 
 
 
