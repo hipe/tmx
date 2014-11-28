@@ -28,7 +28,7 @@ module Skylab::GitViz
           PROCEDE_
         else
           _ev = build_extra_iambic_event_via x_a[ 0, 1 ]
-          receive_extra_iambic _ev
+          receive_extra_iambic _ev  # #hook-in [cb]
           UNABLE_
         end
       end

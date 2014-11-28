@@ -31,7 +31,11 @@ module Skylab::Brazen
           end
         else
           mc = model_class
-          mc and mc.preconditions
+          if mc
+            if mc.respond_to? :preconditions
+              mc.preconditions
+            end
+          end
         end
         true
       end
@@ -69,14 +73,16 @@ module Skylab::Brazen
   public
 
     def bound_call_via_modality_call x_a, modality_action
-      @event_receiver_is_modality_adapter = true
-      bound_call_via_call x_a, modality_action
+      @hs_modality_action = true
+      @modality_action = modality_action
+      _oes_p = modality_action.handle_event_selectively
+      bound_call_via_call x_a, & _oes_p
     end
 
-    def bound_call_via_call x_a, ev_rcvr
-      @error_count ||= 0
-      @event_receiver = ev_rcvr
+    def bound_call_via_call x_a, & oes_p
       @argument_box = Box_.new
+      @error_count ||= 0
+      recv_selective_listener_proc oes_p
       bc = any_bound_call_via_processing_iambic x_a
       bc || via_arguments_produce_bound_call
     end
@@ -121,7 +127,9 @@ module Skylab::Brazen
 
     def prdc_any_bc_when_preconds a  # see #action-preconditions
 
-      _g = Model_::Preconditions_::Graph.new self, self, @kernel
+      oes_p = handle_event_selectively
+
+      _g = Model_::Preconditions_::Graph.new self, @kernel, & oes_p
 
       _id = model_class.node_identifier
 
@@ -131,7 +139,7 @@ module Skylab::Brazen
         :on_self_reliance, method( :self_as_precondition ),
         :graph, _g,
         :level_i, :action_prcn,
-        :event_receiver, self )
+        :on_event_selectively, oes_p )
 
       if box
         @preconditions = box
@@ -149,45 +157,28 @@ module Skylab::Brazen
       Brazen_.bound_call nil, self, :produce_any_result
     end
 
-  public
-
-    def receive_event ev
-      if ev.has_tag :ok
-        if ev.ok
-          recv_OK_event ev
-        else
-          recv_not_OK_event ev
-        end
-      else
-        recv_neutral_evnt ev
-      end
-    end
-
-  private
-
-    def recv_OK_event ev
-      _ev_ = sign_event ev
-      send_event _ev_
-    end
-
-    def recv_not_OK_event ev  # e.g ad-hoc normalization failure from spot [#012]
-      @error_count += 1
-      _ev_ = sign_event ev
-      send_event _ev_
-    end
-
-    def recv_neutral_evnt ev
-      send_event ev
-    end
-
-    def wrap_event ev
-      sign_event ev
-    end
-
-    def get_actual_argument_scan
+    def get_actual_argument_scan  # used by [tm]
       Scan_[].via_nonsparse_array( self.class.properties.get_names ).map_by do |i|
         Actual_Property_.new any_argument_value( i ), i
       end
+    end
+
+    # ~ the event throughput pipeline, #note-100
+
+    def recv_selective_listener_proc oes_p
+      receive_selective_listener_via_channel_proc(
+        -> i_a, & ev_p do
+          if :error == i_a.first
+            @error_count += 1
+          end
+          oes_p.call( * i_a ) do
+            _sign_event ev_p[]
+          end
+        end )
+    end
+
+    def _sign_event ev
+      Event_[].wrap.signature name, ev
     end
 
   public  # public accessors for arguments & related experimentals
@@ -215,12 +206,12 @@ module Skylab::Brazen
     end
 
     def modality_adapter  # #experimental
-      if event_receiver_is_modality_adapter
-        @event_receiver
+      if hs_modality_action
+        @modality_action
       end
     end
 
-    attr_reader :event_receiver_is_modality_adapter
+    attr_reader :hs_modality_action
 
   private
 
@@ -247,16 +238,14 @@ module Skylab::Brazen
     end
 
     def controller_nucleus  # :+#experimental
-      [ @event_receiver, @kernel ]
+      [ @kernel, handle_event_selectively ]
     end
 
     def preconditions  # for a collaborator that knows they exist & what they are
       @preconditions
     end
 
-    def payload_output_line_yielder  # #note-160
-      @event_receiver.payload_output_line_yielder
-    end
+    # (was #note-160)
 
     class Process_customized_action_inflection_behavior__
 

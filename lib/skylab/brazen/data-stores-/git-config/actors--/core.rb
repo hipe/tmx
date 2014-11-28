@@ -11,16 +11,12 @@ module Skylab::Brazen
       Actor_[ self, :properties,
         :entity_identifier,
         :document,
-        :event_receiver, :kernel ]
+        :kernel, :on_event_selectively ]
 
       def execute
         ok = via_entity_identifier_resolve_subsection_id
         ok && via_subsection_id_resolve_some_result
         ok && @result
-      end
-
-      def maybe_send_event *, & ev_p
-        @event_receiver.receive_event ev_p[]
       end
     end
 
@@ -29,7 +25,7 @@ module Skylab::Brazen
       Actor_[ self, :properties,
         :model_class,
         :document,
-        :event_receiver, :kernel ]
+        :kernel, :on_event_selectively ]
 
       def execute
         rslv_subsection_name_query
@@ -87,7 +83,7 @@ module Skylab::Brazen
       end
 
       def via_section_scan_and_model_class_produce_entity_scan
-        fly = @model_class.new_flyweight @event_receiver, @kernel
+        fly = @model_class.new_flyweight @kernel, & @on_event_selectively
         box = fly.properties
         name_name_s = NAME_.to_s
         @section_scan.map_by do |sect|
@@ -202,7 +198,7 @@ module Skylab::Brazen
       def via_subsection_id_resolve_model_class
         _i = @subsection_id.to_silo_name_i
         _id = Node_Identifier_.via_symbol _i
-        silo = @kernel.silo_via_identifier _id, @event_receiver
+        silo = @kernel.silo_via_identifier _id, & @on_event_selectively
         if silo
           @model_class = silo.model_class
           ACHIEVED_
@@ -225,7 +221,7 @@ module Skylab::Brazen
             end
           end
         end
-        entity = @model_class.unmarshalled @event_receiver, @kernel do |o|
+        entity = @model_class.unmarshalled @kernel, @on_event_selectively do |o|
           o.with_iambic x_a
         end  # :+[#037]
         @result = entity

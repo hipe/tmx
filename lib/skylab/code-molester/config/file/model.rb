@@ -37,7 +37,7 @@ module Skylab::CodeMolester
       instance_exec( & p )
     end
 
-    CM_._lib.new_event_lib.sender self
+    CM_._lib.new_event_lib.selective_builder_sender_receiver self
 
   private
 

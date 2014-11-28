@@ -7,7 +7,7 @@ module Skylab::Brazen
       Actor_[ self, :properties,
         :model_class,
         :datastore,
-        :event_receiver, :kernel ]
+        :kernel, :on_event_selectively ]
 
       def execute
         init_ivars
@@ -74,7 +74,7 @@ module Skylab::Brazen
       end
 
       def get_property_hash_scan_via_payload_h h
-        fly = @model_class.new_flyweight @event_receiver, @kernel
+        fly = @model_class.new_flyweight @kernel, & @on_event_selectively
         box = fly.properties
         Scan_[].via_nonsparse_array( h[ ROWS__ ] ).map_by do |x|
           box.replace_hash x.fetch VALUE__
@@ -84,8 +84,9 @@ module Skylab::Brazen
       ROWS__ = 'rows'.freeze ; VALUE__ = 'value'.freeze
 
       def my_face_when_500_internal_server_error o
-        _ev = o.response_body_to_not_OK_event
-        send_event _ev
+        maybe_send_event :error do
+          o.response_body_to_not_OK_event
+        end
         UNABLE_
       end
 
@@ -98,10 +99,11 @@ module Skylab::Brazen
       end
 
       def my_face_when_201_created o
-        _ev = o.response_body_to_completion_event do |y, ev|
-          y << "added design document #{ val ev.id }"
+        maybe_send_event :success do
+          o.response_body_to_completion_event do |y, ev|
+            y << "added design document #{ val ev.id }"
+          end
         end
-        send_event _ev
         CONTINUE_
       end
     end

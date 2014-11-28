@@ -175,20 +175,22 @@ module Skylab::Brazen
           if @parent_node
 
             @parent_node.first_edit do |o|
-              o.with_event_receiver self
+              o.on_event_selectively( & handle_event_selectively )
               o.with_preconditions @preconditions
               o.with_argument_box @argument_box
             end
-            @edited_entity = @parent_node ; @parent_node = nil
+            @edited_entity = @parent_node
+            @parent_node = nil
 
           else
 
-            @edited_entity = self.class.model_class.edited self, @kernel do |o|
+            @edited_entity = self.class.model_class.
+                  edited @kernel, handle_event_selectively do |o|
               o.with_preconditions @preconditions
               o.with_argument_box @argument_box
             end
-
           end
+
           PROCEDE_
         end
 
@@ -217,20 +219,11 @@ module Skylab::Brazen
           ok = @edited_entity.any_native_create_before_create_in_datastore
           ok && @edited_entity.produce_any_persist_result
         end
-
-        def receive_add_related_event ev
-          receive_event ev
-        end
       end
 
       module List_Methods__
 
         include Semi_Generated_Instance_Methods__
-
-        def initialize kernel
-          super
-          @channel ||= :listed
-        end
 
         def produce_any_result
           ok = rslv_entity_scan
@@ -240,31 +233,38 @@ module Skylab::Brazen
       private
 
         def rslv_entity_scan
-          @entity_scan = datastore.entity_scan_via_class self.class.model_class, self
+          @entity_scan = datastore.entity_scan_via_class(
+            self.class.model_class, & handle_event_selectively )
           @entity_scan and ACHIEVED_
         end
 
         def via_entity_scan_send_list
 
-          _Item_Event = make_item_event_builder
-          item_index = -1
+          ent_fly = nil ; item_index = -1
 
-          if flyweighted_entity = @entity_scan.gets
+          p = -> do
+            ev_fly = make_item_event_builder.new_mutable item_index, ent_fly
+            p = -> do
+              ev_fly.replace_some_values item_index
+              ev_fly
+            end
+            ev_fly
+          end
+
+          if ent_fly = @entity_scan.gets
             item_index += 1
-            flyweighted_event = _Item_Event.new_mutable item_index, flyweighted_entity
-            send_event flyweighted_event
+            maybe_send_event :payload, & p
           end
 
           while @entity_scan.gets
             item_index += 1
-            flyweighted_event.replace_some_values item_index
-            send_event flyweighted_event
+            maybe_send_event :payload, & p
           end
 
-          _ev = build_OK_event_with :number_of_items_found,
-            :count, ( item_index + 1 )
-          _ev_ = sign_event _ev
-          send_event _ev_
+          maybe_send_event :info, :number_of_items_found do
+            build_OK_event_with :number_of_items_found,
+              :count, ( item_index + 1 )
+          end
         end
 
         def make_item_event_builder
@@ -324,7 +324,8 @@ module Skylab::Brazen
         end
 
         def via_dsc_for_one_resolve_entity
-          @entity_scan = @datastore_controller.entity_scan_via_class model_class, self
+          @entity_scan = @datastore_controller.entity_scan_via_class(
+            model_class, & handle_event_selectively )
           via_entity_scan_and_dsc_for_one_resolve_entity
         end
 
@@ -351,7 +352,15 @@ module Skylab::Brazen
         end
 
         def via_dsc_for_one_resolve_entity_when_had_many_via_last one
-          _ev = build_neutral_event_with :single_entity_resolved_with_ambiguity,
+          maybe_send_event :info, :single_entity_resolved_with_ambiguity do
+            bld_single_entity_resolved_with_ambiguity
+          end
+          @entity = one
+          ACHIEVED_
+        end
+
+        def bld_single_entity_resolved_with_ambiguity
+          build_neutral_event_with :single_entity_resolved_with_ambiguity,
               :model, model_class,
               :describable_source, @datastore_controller do |y, o|
 
@@ -361,15 +370,17 @@ module Skylab::Brazen
             y << "in #{ _source } there is more than one #{ _lemma }. #{
              }using the last one."
           end
-
-          send_event _ev
-
-          @entity = one
-          ACHIEVED_
         end
 
         def for_one_resolve_entity_when_had_none
-          _ev = build_not_OK_event_with :entity_not_found,
+          maybe_send_event :error, :entity_not_found do
+            bld_entity_not_found_event
+          end
+          UNABLE_
+        end
+
+        def bld_entity_not_found_event
+          build_not_OK_event_with :entity_not_found,
               :model, model_class,
               :describable_source, @datastore_controller do |y, o|
 
@@ -378,18 +389,21 @@ module Skylab::Brazen
 
             y << "in #{ _source } there are no #{ plural_noun _lemma }"
           end
-          send_event _ev
-          UNABLE_
         end
 
         def via_entity_send_one
-          _ev = build_OK_event_with :entity,
+          maybe_send_event :payload do
+            bld_single_entity_resolved_without_ambiguity
+          end
+        end
+
+        def bld_single_entity_resolved_without_ambiguity
+          build_OK_event_with :entity,
               :entity, @entity, :is_completion, true do |y, o|
 
             y << "#{ o.entity.class.name_function.as_human } is #{
              } #{ ick o.entity.local_entity_identifier_string }"
           end
-          receive_event _ev
         end
       end
 
@@ -398,7 +412,7 @@ module Skylab::Brazen
         include Semi_Generated_Instance_Methods__
 
         def produce_any_result
-          init_evr_for_delete
+          init_selective_listener_proc_for_delete
           ok = via_evr_and_args_resolve_subject_entity
           ok &&= via_evr_and_subject_entity_prepare_for_remove
           ok && via_evr_and_subject_entity_delete_subject_entity
@@ -411,17 +425,22 @@ module Skylab::Brazen
 
       private
 
-        def init_evr_for_delete
-          @evr = _Event.receiver.channeled.full :while_deleting_entity, self ; nil
+        def init_selective_listener_proc_for_delete
+          @on_event_selectively = event_lib.
+            produce_handle_event_selectively_through_methods.
+              full self, :while_deleting_entity do | * i_a, & ev_p |
+            maybe_receive_event_via_channel i_a, & ev_p
+          end
         end
 
         def via_evr_and_subject_entity_delete_subject_entity
-          datastore.delete_entity @subject_entity, @evr
+          datastore.delete_entity @subject_entity, & handle_event_selectively
         end
 
         def via_evr_and_subject_entity_prepare_for_remove
           ok = via_subject_entity_send_parameters
-          ok &&= @subject_entity.any_native_delete_before_delete_in_datastore @evr
+          ok &&= @subject_entity.any_native_delete_before_delete_in_datastore(
+            & handle_event_selectively )
         end
 
         def via_subject_entity_send_parameters
@@ -433,40 +452,6 @@ module Skylab::Brazen
             end
           end
           PROCEDE_
-        end
-
-      public
-
-        def receive_while_deleting_entity_method_not_implemented ev
-          receive_event ev
-        end
-
-        def receive_while_deleting_entity_entity_not_found ev
-          receive_event ev
-        end
-
-        def receive_while_deleting_entity_not_found ev  # #todo
-          receive_event ev
-        end
-
-        def receive_while_deleting_entity_missing_force ev
-          receive_event ev
-        end
-
-        def receive_while_deleting_entity_conflict ev
-          receive_event ev
-        end
-
-        def receive_while_deleting_entity_pretending_for_dry_run ev
-          receive_event ev
-        end
-
-        def receive_while_deleting_entity_datastore_resource_committed_changes ev
-          receive_event ev
-        end
-
-        def receive_while_deleting_entity_ok ev
-          receive_event ev
         end
       end
 
@@ -488,7 +473,7 @@ module Skylab::Brazen
 
         def via_evr_and_identifier_resolve_subject_entity
           datastore
-          @subject_entity = @datastore.entity_via_identifier @identifier, @evr
+          @subject_entity = @datastore.entity_via_identifier @identifier, & handle_event_selectively
           @subject_entity ? PROCEDE_ : UNABLE_
         end
 

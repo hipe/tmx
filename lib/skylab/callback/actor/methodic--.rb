@@ -76,7 +76,7 @@ module Skylab::Callback
 
         def when_extra_iambic
           _ev = via_current_iambic_token_build_extra_iambic_event
-          receive_extra_iambic _ev
+          receive_extra_iambic _ev  # :+#public-API (name) :+#hook-in
         end
 
         def via_current_iambic_token_build_extra_iambic_event
@@ -280,7 +280,7 @@ module Skylab::Callback
             resolve_property_class_and_writable_box
             loop_for_properties
           else
-            receive_extra_iambic Stranger_[ current_iambic_token, [ :properties ] ]
+            receive_extra_iambic Stranger_[ current_iambic_token, [ :properties ] ]  # #hook-in (local)
           end
         end
 

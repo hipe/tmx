@@ -103,9 +103,7 @@ module Skylab::Brazen
     private
 
       def when_marshal_load_fail name_i, ev_p
-        ev_p.call :error, :marshal_load_error do
-          self._ETC  # #todo
-        end
+        ev_p.call :error, :marshal_load_error  # #todo
         UNABLE_
       end
     end

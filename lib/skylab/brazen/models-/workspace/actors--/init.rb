@@ -9,10 +9,11 @@ module Skylab::Brazen
         :path,
         :config_filename,
         :app_name,
-        :event_receiver ]
+        :on_event_selectively ]
 
       def execute
-        @document = Brazen_::Data_Stores_::Git_Config::Mutable.new @event_receiver
+        @document = Brazen_::Data_Stores_::Git_Config::Mutable.new(
+          & @on_event_selectively )
         ok = to_document_add_comment
         ok && write_document
       end

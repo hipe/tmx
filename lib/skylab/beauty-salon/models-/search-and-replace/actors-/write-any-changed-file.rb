@@ -10,7 +10,7 @@ module Skylab::BeautySalon
         :is_dry_run,
         :on_event_selectively
 
-      BS_._lib.event_lib.sender self
+      BS_._lib.event_lib.selective_builder_sender_receiver self
 
       def execute
         ok = write_temp_file

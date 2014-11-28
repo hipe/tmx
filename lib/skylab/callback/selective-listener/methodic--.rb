@@ -2,15 +2,19 @@ module Skylab::Callback
 
   module Selective_Listener
 
-    class Methodic__
+    class Methodic__  # :[#013]. quite similar to [#br-073]
 
-      Callback_::Actor.methodic self, :simple, :properties,
-
-        :properties, :delegate, :prefix
+      Callback_::Actor.methodic self, :simple, :properties, :properties,
+        :delegate,
+        :prefix
 
       def initialize
         super
         nilify_uninitialized_ivars
+      end
+
+      def handle_event_selectively
+        @HES_p ||= method :maybe_receive_event
       end
 
       def maybe_receive_event * routing_i_a, & build_event_p

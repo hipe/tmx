@@ -61,16 +61,16 @@ module Skylab::TanMan
 
       use_workspace_as_dsc
 
-      def persist_entity ent, evr
-        ok = normalize_entity_name_via_fuzzy_lookup ent, evr
-        ok and super ent, evr
+      def persist_entity ent, & oes_p
+        ok = normalize_entity_name_via_fuzzy_lookup ent, & oes_p
+        ok and super ent, & oes_p
       end
 
-      def entity_scan_via_class _cls_, evr
+      def entity_scan_via_class _cls_, & oes_p
 
         p = -> do
 
-          fly = Starter_.new_flyweight evr, @kernel
+          fly = Starter_.new_flyweight @kernel, & oes_p
           props = fly.properties
 
           base_pn = Starter_.dir_pn_instance

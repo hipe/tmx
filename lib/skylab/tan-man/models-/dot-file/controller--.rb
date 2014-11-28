@@ -4,9 +4,11 @@ module Skylab::TanMan
 
     class Controller__  # see [#009]
 
-      def initialize gsp, input_arg, er, k
-        @graph_sexp = gsp ; @event_receiver = er
-        @input_arg = input_arg ; @kernel = k
+      def initialize gsp, input_arg, k, & oes_p
+        @graph_sexp = gsp
+        @input_arg = input_arg
+        @on_event_selectively = oes_p
+        @kernel = k
       end
 
       attr_reader :graph_sexp
@@ -65,10 +67,6 @@ module Skylab::TanMan
 
       def provide_action_precondition _id, _g
         self
-      end
-
-      def event_receiver
-        @event_receiver
       end
 
     if false
@@ -219,7 +217,7 @@ module Skylab::TanMan
 
       def persist_via_args arg
         adapter = Persist_Adapters__.produce_via_argument arg
-        adapter.init @event_receiver, @kernel
+        adapter.init @kernel, & @on_event_selectively
         adapter.receive_rewritten_datastore_controller self
       end
 
@@ -256,12 +254,13 @@ module Skylab::TanMan
             @output_string = output_string
           end
 
-          def init event_receiver, kernel
-            @event_receiver = event_receiver
-            @kernel = kernel ; nil
+          def init k, & oes_p
+            @on_event_selectively = oes_p
+            @kernel = k
+            nil
           end
 
-          def receive_rewritten_datastore_controller o
+          def receive_rewritten_datastore_controller o  # #hook-out (local)
             @output_string.replace o.graph_sexp.unparse
             ACHIEVED_
           end

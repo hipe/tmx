@@ -4,16 +4,16 @@ module Skylab::Brazen
 
     class << self
 
-      def parse_path path_s, & p
-        Parse_[ :via_path, path_s, :receive_events_via_proc, p ]
+      def parse_path path_s, & oes_p
+        Parse_[ :via_path, path_s, :on_event_selectively, oes_p ]
       end
 
-      def parse_string str, & p
-        Parse_[ :via_string, str, :receive_events_via_proc, p ]
+      def parse_string str, & oes_p
+        Parse_[ :via_string, str, :on_event_selectively, oes_p ]
       end
 
-      def read io, & p
-        Parse_[ :via_stream, io, :receive_events_via_proc, p ]
+      def read io, & oes_p
+        Parse_[ :via_stream, io, :on_event_selectively, oes_p ]
       end
 
       def write * a
@@ -23,14 +23,17 @@ module Skylab::Brazen
 
     Actions = ::Module.new
 
-    def initialize *a
+    def initialize * a, & oes_p
       case a.length
       when 1
         kernel = a.first
-      when 3
-        @document, @event_receiver, kernel = a
+      when 2
+        @document, kernel = a
+      else
+        raise ::ArgumentError
       end
-      super kernel
+      @on_event_selectively = oes_p
+      super kernel, & nil
     end
 
     def description_under expag
@@ -39,7 +42,7 @@ module Skylab::Brazen
 
     # ~ persist
 
-    def persist_entity entity, _event_receiver
+    def persist_entity entity
       ok = resolve_mutable_document
       ok &&= Git_Config_::Mutable::Actors::Mutate[ entity, @mutable_document ]
       ok and via_mutated_mutable_document_write_file_via_persisted_entity entity
@@ -47,25 +50,25 @@ module Skylab::Brazen
 
     # ~ retrieve (one)
 
-    def entity_via_identifier id, evr
-      Git_Config_::Actors__::Retrieve[ id, @document, evr, @kernel ]
+    def entity_via_identifier id, & oes_p
+      Git_Config_::Actors__::Retrieve[ id, @document, @kernel, oes_p ]
     end
 
     # ~ retrieve (many)
 
-    def entity_scan_via_class cls, evr
-      Git_Config_::Actors__::Scan[ cls, @document, evr, @kernel ]
+    def entity_scan_via_class cls, & oes_p
+      Git_Config_::Actors__::Scan[ cls, @document, @kernel, oes_p ]
     end
 
-    def section_scan evr
-      Git_Config_::Actors__::Scan[ nil, @document, evr, @kernel ]
+    def section_scan & oes_p
+      Git_Config_::Actors__::Scan[ nil, @document, @kernel, oes_p ]
     end
 
     # ~ delete
 
-    def delete_entity entity, evr
+    def delete_entity entity, & oes_p
       ok = resolve_mutable_document
-      ok &&= Git_Config_::Mutable::Actors::Delete[ entity, @mutable_document, evr ]
+      ok &&= Git_Config_::Mutable::Actors::Delete[ entity, @mutable_document, oes_p ]
       ok and via_mutated_mutable_document_write_file_via_persisted_entity entity
     end
 
@@ -82,7 +85,7 @@ module Skylab::Brazen
         @mutable_document_is_resolved = true
       else
         @mutable_document = Git_Config_::Mutable.
-          parse_input_id @document.input_id, self
+          parse_input_id @document.input_id, & @on_event_selectively
         @mutable_document_is_resolved = @mutable_document ? ACHIEVED_ : UNABLE_
       end
       if @mutable_document_is_resolved
@@ -94,11 +97,11 @@ module Skylab::Brazen
     def via_mutated_mutable_document_write_file_via_persisted_entity entity
       _is_dry = entity.any_parameter_value :dry_run
       _pn = @mutable_document.input_id.to_pathname
-      _on_event_selectively = -> *, & ev_p do
-        entity.receive_event ev_p[]
-      end
+
+      _oes_p = entity.handle_event_selectively
+
       Git_Config_::Mutable::Actors::Persist[
-        _is_dry, _pn, @mutable_document, _on_event_selectively ]
+        _is_dry, _pn, @mutable_document, _oes_p ]
     end
 
     class Silo_Controller__ < Brazen_.model.silo_controller
@@ -113,9 +116,9 @@ module Skylab::Brazen
 
       def datastore_controller_via_entity x
         document = Parse_[ :via_path, x.to_path,
-          :receive_events_via_event_receiver, @event_receiver ]
+                           :on_event_selectively, @on_event_selectively ]
         document and begin
-          Git_Config_.new document, @event_receiver, @kernel
+          Git_Config_.new document, @kernel, & @on_event_selectively
         end
       end
     end
@@ -128,7 +131,7 @@ module Skylab::Brazen
         end
       end
 
-      Entity_[].event.sender self
+      Entity_[].event.selective_builder_sender_receiver self
 
       def initialize a
         input_method_i, input_x, event_receiver_method_i, event_receiver_x = a
@@ -136,13 +139,9 @@ module Skylab::Brazen
         @on_event_selectively = send event_receiver_method_i, event_receiver_x
       end
 
-    private
-
-      def receive_events_via_proc recv_p
-        if recv_p
-          -> *, & ev_p do
-            recv_p[ ev_p[] ]
-          end
+      def on_event_selectively oes_p
+        if oes_p
+          oes_p
         else
           -> i, *, & ev_p do
             if :info != i
@@ -154,11 +153,6 @@ module Skylab::Brazen
         end
       end
 
-      def receive_events_via_event_receiver evr
-        -> *, & ev_p do
-          evr.receive_event ev_p[]
-        end
-      end
     public
 
       def execute
@@ -213,8 +207,17 @@ module Skylab::Brazen
           :input_identifier, @input_id ]
 
         build_not_OK_event_via_mutable_iambic_and_message_proc _x_a, -> y, o do
-          y << "#{ o.reason } #{
-           }(#{ o.line_number }:#{ o.column_number })"
+
+          _s = o.input_identifier.description_under self
+
+          y << "#{ o.reason } in #{ _s }:#{ o.line_number }:#{ o.column_number }"
+
+          s = "#{ o.line_number }:"
+          fmt = "  %#{ s.length }s %s"
+
+          y << fmt % [ s, o.line ]
+          y << fmt % [ nil, "#{ SPACE_ * ( o.column_number - 1 ) }^" ]
+
         end
       end
 
@@ -273,7 +276,8 @@ module Skylab::Brazen
       \r?\n?/x
 
       def accpt_assignment
-        @sect.assignments.accept_asmt Assignment_.new( * @md.captures, @on_event_selectively )
+        @sect.assignments.accept_asmt(
+          Assignment_.new( * @md.captures, & @on_event_selectively ) )
         PROCEDE_
       end
     end
@@ -508,11 +512,11 @@ module Skylab::Brazen
 
     class Assignment_
 
-      def initialize name_s, marshaled_s, oes
+      def initialize name_s, marshaled_s, & oes_p
         @internal_normal_name_string = name_s
         @marshaled_s = marshaled_s
         @did_unmarshal = false
-        @on_event_selectively = oes
+        @on_event_selectively = oes_p
       end
 
       attr_reader :internal_normal_name_string, :marshaled_s

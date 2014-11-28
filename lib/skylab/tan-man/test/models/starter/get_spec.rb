@@ -10,7 +10,7 @@ module Skylab::TanMan::TestSupport::Models::Starter
     it "'workspace_path' is required (currently)" do
       call_API :starter, :get
       expect_event :missing_required_properties do |ev|
-        ev.miss_a.first.name_i.should eql :path
+        ev.to_event.miss_a.first.name_i.should eql :path
       end
       expect_failed
     end
@@ -67,7 +67,7 @@ module Skylab::TanMan::TestSupport::Models::Starter
         'in config there is more than one starter. using the last one.' )
 
       expect_OK_event :entity do |ev_|
-        ev_.entity.local_entity_identifier_string.should eql 'holy-derp.dot'
+        ev_.to_event.entity.local_entity_identifier_string.should eql 'holy-derp.dot'
       end
 
       expect_succeeded

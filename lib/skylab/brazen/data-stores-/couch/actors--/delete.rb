@@ -7,7 +7,7 @@ module Skylab::Brazen
       Actor_[ self, :properties,
         :entity,
         :datastore,
-        :event_receiver ]
+        :on_event_selectively ]
 
       def execute  # any result
         init_ivars
@@ -30,16 +30,23 @@ module Skylab::Brazen
       end
 
       def my_face_when_409_conflict o
-        _ev = o.response_body_to_not_OK_event
-        send_event _ev
+        maybe_send_event :error, :conflict do
+          o.response_body_to_not_OK_event
+        end
         UNABLE_
       end
 
       def my_face_when_200_ok response
+        maybe_send_event :success do
+          bld_success_event response
+        end
+      end
+
+      def bld_success_event response
         _eid = @entity_identifier
         _props = @entity.properties
 
-        _ev = response.response_body_to_completion_event(
+        response.response_body_to_completion_event(
           :eid, _eid, :props, _props ) do |y, o|
 
             y << "removed #{ o.eid.description } #{
@@ -47,7 +54,6 @@ module Skylab::Brazen
                 }(#{ o.code } #{ o.message })"
 
         end
-        send_event _ev
       end
     end
   end

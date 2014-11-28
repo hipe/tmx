@@ -62,7 +62,7 @@ module Skylab::BeautySalon
 
     end
 
-    Brazen_.event.sender self
+    Brazen_.event.selective_builder_sender_receiver self
 
     def produce_any_result
       init_ivars
@@ -76,7 +76,9 @@ module Skylab::BeautySalon
     def init_ivars
       via_properties_init_ivars
       @error_p = -> ev do
-        receive_event ev
+        maybe_send_event :error do
+          ev
+        end
         UNABLE_
       end ; nil
     end
@@ -127,9 +129,10 @@ module Skylab::BeautySalon
       @input_stream = ::File.open @input_path, READ_MODE_
       @input_stream && ACHIEVED_
     rescue ::Errno::ENOENT => e
-      _ev = Brazen_.event.wrap.exception e,
-        :path_hack, :terminal_channel_i, :resource_not_found
-      receive_event _ev
+      maybe_send_event :error, :IO_error do
+        Brazen_.event.wrap.exception e,
+          :path_hack, :terminal_channel_i, :resource_not_found
+      end
       UNABLE_
     end
 

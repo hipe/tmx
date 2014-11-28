@@ -11,7 +11,7 @@ module Skylab::Brazen
         Actor_[ self, :properties,
           :entity_identifier,
           :datastore,
-          :event_receiver, :kernel ]
+          :kernel, :on_event_selectively ]
 
         def execute
           init_ivars
@@ -38,7 +38,7 @@ module Skylab::Brazen
           _h = @payload_h.fetch PROPERTIES__
           _r = @payload_h.fetch REVISION__
 
-          @model_class.edited @event_receiver, @kernel do |o|
+          @model_class.edited @kernel, @on_event_selectively do |o|
             o.set_arg :couch_entity_revision, _r
             o.with_unmarshalled_hash _h
           end  # :+[#037] might be invalid
@@ -49,13 +49,18 @@ module Skylab::Brazen
       public
 
         def my_face_when_404_object_not_found response
-          _ev =  response.response_body_to_not_OK_event :eid, @entity_identifier do |y, o|
+          maybe_send_event :error, :not_found do
+            bld_not_found_event
+          end
+          UNABLE_
+        end
+
+        def bld_not_found_event
+          response.response_body_to_not_OK_event :eid, @entity_identifier do |y, o|
             y << "there is no #{ o.eid.silo_name_parts.reverse * SPACE_ }#{
              } with the name #{ ick o.eid.entity_name_s }#{
               } (#{ o.code } - entity not found)"
           end
-          send_event _ev
-          UNABLE_
         end
       end
     end
@@ -84,7 +89,7 @@ module Skylab::Brazen
       end
 
       def via_entity_identifier_and_kernel_rslv_model_class
-        @model_class = @kernel.model_class_via_identifier @entity_identifier, event_receiver
+        @model_class = @kernel.model_class_via_identifier @entity_identifier, & @on_event_selectively
         @model_class ? ACHIEVED_ : UNABLE_
       end
 

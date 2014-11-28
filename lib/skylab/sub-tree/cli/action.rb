@@ -41,11 +41,12 @@ module Skylab::SubTree
 
     def bound_call
       act = build_corresponding_API_action
-      act and act.bound_call_via_call @local_iambic, event_receiver_for_API
-    end
-
-    def event_receiver_for_API
-      self
+      act and begin
+        act.bound_call_via_call @local_iambic do | *, & ev_p |
+          _ev = ev_p[] or fail
+          receive_event _ev
+        end
+      end
     end
 
     def build_corresponding_API_action

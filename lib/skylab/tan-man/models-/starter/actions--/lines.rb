@@ -25,20 +25,21 @@ module Skylab::TanMan
 
         def via_workspace
           bx = @argument_box
-          ok = @kernel.call :starter, :get,
+          @entity = @kernel.call :starter, :get,
             :workspace, bx[ :workspace ],
             :workspace_path, bx[ :workspace_path ],
             :config_filename, bx[ :config_filename ],
-            :event_receiver, self
-          ok and via_entity
+            :on_event_selectively, prdc_handle_payload
+          @entity and via_entity
         end
 
-        def receive_event ev
-          if :entity == ev.terminal_channel_i
-            @entity = ev.entity
-            ACHIEVED_
-          else
-            @event_receiver.receive_event ev
+        def prdc_handle_payload
+          -> * i_a, & ev_p do
+            if :payload == i_a.first
+              ev_p[].to_event.entity
+            else
+              maybe_send_event_via_channel i_a, & ev_p
+            end
           end
         end
 
@@ -61,11 +62,16 @@ module Skylab::TanMan
         end
 
         def when_enoent
-          _ev = LIB_.entity.event.wrap.exception.with(
+          maybe_send_event :error, :resource_not_found do
+            via_enoent_bld_event
+          end
+        end
+
+        def via_enoent_bld_event
+          LIB_.entity.event.wrap.exception.with(
             :path_hack,
             :terminal_channel_i, :resource_not_found,
             :exception, @enoent )
-          receive_event _ev
         end
 
         def via_output_s

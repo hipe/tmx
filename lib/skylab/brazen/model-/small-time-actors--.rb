@@ -10,11 +10,17 @@ module Skylab::Brazen
           :controller ]
 
         def execute
+          @label_s = caller_locations( 5, 1 ).first.label
+          @controller.maybe_receive_event :error, :method_not_implemented do
+            bld
+          end
+        end
 
-          label_s = caller_locations( 5, 1 ).first.label
-          /(?:\b|_)entity(?:\b|_)/ =~ label_s and lbl_s = label_s
+        def bld
 
-          _ev = build_not_OK_event_with :method_not_implemented,
+          /(?:\b|_)entity(?:\b|_)/ =~ @label_s and lbl_s = @label_s
+
+          build_not_OK_event_with :method_not_implemented,
               :model_class, @controller.class, :lbl, lbl_s do |y, o|
 
             y << "the #{ val o.model_class.node_identifier.full_name_i.id2name } #{
@@ -27,9 +33,6 @@ module Skylab::Brazen
                }implement #{ val _s }"
             end
           end
-
-          @controller.receive_event _ev
-          nil
         end
       end
     end

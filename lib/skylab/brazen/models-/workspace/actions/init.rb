@@ -35,12 +35,16 @@ module Skylab::Brazen
 
       bx.replace :max_num_dirs, 1
 
+      _oes_p = event_lib.
+        produce_handle_event_selectively_through_methods.
+          bookends self, :init
+
       @prop = self.class.properties.fetch :path
-      @ws = model_class.edited self, @kernel do |o|
+      @ws = model_class.edited @kernel, handle_event_selectively do |o|
         o.with_argument_box bx
         o.with :prop, @prop,
-          :app_name, @event_receiver.app_name,
-          :channel, :init
+          :app_name, @kernel.app_name,
+          :on_event_selectively, _oes_p
       end
       @ws.error_count.zero? and work
     end
@@ -55,29 +59,43 @@ module Skylab::Brazen
     end
 
     def when_already
-      send_not_OK_event_with :directory_already_has_config_file,
-        :pathname, @ws.pn, :prop, @prop
+      maybe_send_event :error, :directory_already_has_config_file do
+        build_not_OK_event_with :directory_already_has_config_file,
+          :pathname, @ws.pn, :prop, @prop
+      end
       nil
     end
 
-    def receive_init_resource_not_found ev
+    def on_init_resource_not_found_via_channel i_a, & ev_p
+      # when initting, the resource not being found is normal; so in those
+      # cases we report (a neutral version of) the event IFF verbose
+      @ok = true
       if any_argument_value :verbose
-        _ev = ev.dup_with :ok, ACHIEVED_
-        receive_event _ev
+        maybe_send_event_via_channel i_a do
+          ev_p[].dup_with :ok, nil
+        end
       end
-      @ok = true ; CONTINUE_
+      CONTINUE_
     end
 
-    def receive_init_start_directory_does_not_exist ev
-      receive_event ev ; @ok = false
+    def on_init_start_directory_does_not_exist_via_channel i_a, & ev_p
+      @ok = false
+      maybe_send_event_via_channel i_a, & ev_p
     end
 
-    def receive_init_start_directory_is_not_directory ev
-      receive_event ev ; @ok = false
+    def on_init_start_directory_is_not_directory_via_channel i_a, & ev_p
+      @ok = false
+      maybe_send_event_via_channel i_a, & ev_p
     end
 
-    def receive_init_found_is_not_file ev
-      receive_event ev ; @ok = false
+    def on_init_found_is_not_file_via_channel i_a, & ev_p
+      @ok = false
+      maybe_send_event_via_channel i_a, & ev_p
+    end
+
+    def on_init_success_via_channel i_a, & ev_p
+      @ok = true
+      maybe_send_event_via_channel i_a, & ev_p
     end
 
     def flush

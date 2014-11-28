@@ -7,14 +7,14 @@ module Skylab::TanMan
   end ]
 
   module Entity_
-    def receive_missing_required_properties ev
+    def receive_missing_required_properties ev  # #hook-in [br]
       receive_missing_required_properties_softly ev  # #experimental
     end
   end
 
   Actor_ = -> cls, * a do
     Callback_::Actor.via_client_and_iambic cls, a
-    Event_[].sender cls ; nil
+    Event_[].selective_builder_sender_receiver cls ; nil
   end
 
   Stubber_ = -> model do
@@ -90,37 +90,30 @@ module Skylab::TanMan
     private
 
       def bound_call_for_ping
-        _ev = build_OK_event_with :ping_from_action, :name_i,
-           name.as_lowercase_with_underscores_symbol
-        _x = send_event _ev
+        _x = maybe_send_event :payload, :ping_for_action do
+          build_OK_event_with :ping_from_action, :name_i,
+            name.as_lowercase_with_underscores_symbol
+        end
         Brazen_.bound_call.via_value _x
       end
 
-      def receive_extra_iambic ev
-        send_event ev
+      def receive_extra_iambic ev  # #hook-in [br]
+        maybe_send_event :error do
+          ev
+        end
       end
 
-      def send_event ev
-        ev_ = ev.to_event
-        if ev_.has_tag :ok and ! ev_.ok
+      def maybe_send_event * i_a, & ev_p
+        if :error == i_a.first
           @error_count += 1
         end
-        event_receiver.receive_event ev
+        maybe_send_event_via_channel i_a, & ev_p
       end
 
     public
 
       def krnl
         @kernel
-      end
-
-      def receive_event ev
-        m_i = :"receive_#{ ev.terminal_channel_i }_event"
-        if respond_to? m_i
-          send m_i, ev
-        else
-          event_receiver.receive_event ev
-        end
       end
 
     private
@@ -314,12 +307,17 @@ module Skylab::TanMan
       end ]
 
       def produce_any_result
+        maybe_send_event :info, :ping do
+          bld_ping_event
+        end
+        :hello_from_tan_man
+      end
+
+      def bld_ping_event
         an = @kernel.app_name.gsub Callback_::DASH_, TanMan_::SPACE_
-        ev = build_neutral_event_with :ping do |y, o|
+        build_neutral_event_with :ping do |y, o|
           y << "hello from #{ an }."
         end
-        send_event ev
-        :hello_from_tan_man
       end
     end
 
@@ -397,7 +395,7 @@ module Skylab::TanMan
 
   module Models_::Datastores
 
-    Actions = :_none_
+    Actions = ::Module.new
 
     module Nodes
 

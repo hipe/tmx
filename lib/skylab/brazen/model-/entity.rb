@@ -222,7 +222,7 @@ module Skylab::Brazen
       end
     end
 
-    Event_[].sender self
+    Event_[].selective_builder_sender_receiver self
 
     def aply_ad_hoc_normalizers prop  # this evolved from [#fa-019]
 
@@ -239,10 +239,11 @@ module Skylab::Brazen
             bx.set arg.name_i, new_value_x ; nil
           end,
 
-          -> * x_a, p do
-            _ev = build_event_via_iambic_and_message_proc x_a, p
+          -> * x_a, msg_p do  # #open [#072]
             @error_count += 1  # :+[#054]
-            receive_event _ev
+            maybe_send_event :error, x_a.first do
+              build_event_via_iambic_and_message_proc x_a, msg_p
+            end
           end ]
 
       end ; nil
@@ -312,7 +313,7 @@ module Skylab::Brazen
     end
 
     def whine_about_missing_reqd_props miss_a
-      _ev = Brazen_::Entity.properties_stack.build_missing_required_properties_event( miss_a )
+      _ev = Brazen_::Entity.properties_stack.build_missing_required_properties_event miss_a
       receive_missing_required_properties _ev
     end
 
@@ -321,8 +322,10 @@ module Skylab::Brazen
     end
 
     def receive_missing_required_properties_softly ev
-      @error_count += 1
-      event_receiver.receive_event ev
+      @error_count += 1  # #tracking :+[#054]
+      maybe_send_event :error, ev.terminal_channel_i do
+        ev
+      end
     end
 
     # ~
@@ -331,7 +334,7 @@ module Skylab::Brazen
       formal = self.class.properties
       scn = formal.to_stream
 
-      stack = Brazen_::Entity.properties_stack.new nil, formal.get_names  # could pass evr
+      stack = Brazen_::Entity.properties_stack.new formal.get_names  # could pass oes
       bx = any_secondary_box
       bx and stack.push_frame_via_box bx
       stack.push_frame_via_box primary_box
@@ -339,22 +342,30 @@ module Skylab::Brazen
       while prop = scn.gets
         i = prop.name_i
         pptr = stack.any_proprietor_of i
-        x = if pptr
-          pptr.property_value i
+        if pptr
+          had_value = true
+          x = pptr.property_value i
+        else
+          had_value = false
+          x = nil
         end
         ivar = prop.as_ivar
         is_defined = instance_variable_defined? ivar
         is_defined and x_ = instance_variable_get( ivar )
         if is_defined && ! x_.nil?
-          raise say_wont_clobber_ivar( x_, ivar )
+          if had_value
+            raise say_wont_clobber_ivar( x, x_, ivar )
+          end
         else
           instance_variable_set ivar, x
         end
       end ; nil
     end
 
-    def say_wont_clobber_ivar x, ivar
-      "sanity - won't clobber existing #{ ivar } - #{ Brazen_::Lib_::Strange[ x ] }"
+    def say_wont_clobber_ivar x_, x, ivar
+      p = Brazen_::Lib_::Strange
+      "sanity - won't clobber existing #{ ivar } #{
+        }(#{ p[ x ] }) with new value (#{ p[ x_ ] })"
     end
 
     def accept_entity_property_value prop, x

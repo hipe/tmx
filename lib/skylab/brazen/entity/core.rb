@@ -141,7 +141,7 @@ module Skylab::Brazen
         @ad_hocs_are_known = false
         @reader = reader ; @writer = writer
         @has_writer_method_name_constraints = false
-        @lstnrs = @prop = nil
+        @lstnrs = @plan = @previous_plan = @prop = nil
         @x_a_a = []
       end
 
@@ -222,9 +222,14 @@ module Skylab::Brazen
       end
 
       def flush_because_method m_i
-        plan_in_progress.meth_i = m_i
+        start_plan.meth_i = m_i
         if @x_a_a.length.nonzero?
           flush_iambic_queue
+          if @previous_plan
+            @plan and self._WRITE_ME  # #todo
+            @plan = @previous_plan
+            @previous_plan = nil
+          end
           if @plan
             flush_bc_meth
           else
@@ -232,21 +237,6 @@ module Skylab::Brazen
           end
         else
           flush_bc_meth
-        end
-      end
-
-      def plan_in_progress
-        @plan ||= Property_Plan__.new
-      end
-      attr_reader :plan
-
-      class Property_Plan__
-        def initialize i=nil
-          @prop_i = i
-        end
-        attr_accessor :meth_i, :prop_i
-        def names
-          [ @prop_i, @meth_i ]
         end
       end
 
@@ -265,7 +255,12 @@ module Skylab::Brazen
       end
 
       def flush_because_prop_i prop_i
-        plan_in_progress.prop_i = prop_i
+        pre_existing_plan = plan
+        if pre_existing_plan
+          @previous_plan = pre_existing_plan
+          @plan = nil
+        end
+        start_plan.prop_i = prop_i
         @plan.meth_i = generate_method_name_for_plan @plan
         did_build = touch_and_accept_prop
         define_iambic_writer_method_for_property @prop
@@ -273,6 +268,26 @@ module Skylab::Brazen
           finish_property
         else
           ACHIEVED_
+        end
+      end
+
+      def start_plan
+        if @plan
+          self._COLLISION
+        else
+          @plan = Property_Plan__.new
+        end
+      end
+
+      attr_reader :plan
+
+      class Property_Plan__
+        def initialize i=nil
+          @prop_i = i
+        end
+        attr_accessor :meth_i, :prop_i
+        def names
+          [ @prop_i, @meth_i ]
         end
       end
 
@@ -289,9 +304,9 @@ module Skylab::Brazen
 
       def touch_and_accept_prop
         if @prop
-          mutate_prop_in_progress
+          via_plan_mutate_prop_in_progress
         else
-          create_new_prop
+          via_plan_create_new_prop
           did_build = true
         end
         @plan = nil
@@ -299,13 +314,13 @@ module Skylab::Brazen
         did_build
       end
 
-      def mutate_prop_in_progress
+      def via_plan_mutate_prop_in_progress
         @prop.set_prop_i_and_iambic_writer_method_name( * @plan.names )
         (( p = any_prop_hook @prop.class )) and p[ @prop ]
         nil
       end
 
-      def create_new_prop
+      def via_plan_create_new_prop
         @prop = bld_prop_from_plan @plan ; nil
       end
 
@@ -628,12 +643,14 @@ module Skylab::Brazen
         @name.as_variegated_symbol
       end
 
-      def receive_event ev
-        raise ev.to_exception
-      end
     private
+
       def build_not_OK_event_with * x_a, & p
         Brazen_.event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, p
+      end
+
+      def maybe_send_event *, & ev_p
+        raise ev_p[].to_exception
       end
 
       class << self
@@ -776,7 +793,7 @@ module Skylab::Brazen
 
       def when_extra_iambic
         _ev = via_current_token_build_extra_iambic_event
-        receive_extra_iambic _ev
+        receive_extra_iambic _ev  # :+#public-API :+#hook-in
       end
 
       def via_current_token_build_extra_iambic_event
@@ -787,7 +804,7 @@ module Skylab::Brazen
         Entity.properties_stack.build_extra_properties_event name_i_a, did_you_mean_i_a
       end
 
-      def receive_extra_iambic ev  # :+#public-API
+      def receive_extra_iambic ev
         raise ev.to_exception
       end
 
@@ -851,13 +868,18 @@ module Skylab::Brazen
       end
 
       def when_no_iambic_property
-        _ev = build_not_OK_event_with :missing_required_properties,
+        maybe_send_event :error, :missing_required_properties do
+          bld_MRP_event
+        end
+      end
+
+      def bld_MRP_event
+        build_not_OK_event_with :missing_required_properties,
             :previous_token, @scanner.previous_token,
             :error_category, :argument_error do |y, o|
 
           y << "expecting a value for #{ code o.previous_token }"
         end
-        receive_event _ev
       end
 
       def current_iambic_token
@@ -931,8 +953,8 @@ module Skylab::Brazen
         Brazen_.event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, p
       end
 
-      def receive_event ev
-        raise ev.to_exception
+      def maybe_send_event *, & ev_p
+        raise ev_p[].to_exception
       end
     end
 
@@ -940,7 +962,12 @@ module Skylab::Brazen
 
     module Extension_Module_Methods__
 
-      def [] *a
+      def [] * a
+        via_arglist a
+      end
+
+      def call * a, & p
+        p and a.push p
         via_arglist a
       end
 

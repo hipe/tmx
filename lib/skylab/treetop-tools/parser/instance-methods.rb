@@ -2,7 +2,7 @@ module Skylab::TreetopTools
 
   module Parser::InstanceMethods  # you must implement the #hook-out's below
 
-    LIB_.event_lib.sender self
+    LIB_.event_lib.selective_builder_sender_receiver self
 
     def parse_file pn, *a, &p
       _ia = build_file_input_adapter pn, &p

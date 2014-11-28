@@ -43,14 +43,20 @@ module Skylab::Brazen
         end
 
         def inline_via_normal_extended_mutable_channel x_a  # #experiment with "buildless" events
-          case x_a.first
-          when :error
-            x_a[ 0 ] = x_a[ 1 ]
-            x_a.push :ok, false
-            inline_via_iambic_and_any_message_proc_to_be_defaulted x_a, nil
-          when :info
-            x_a[ 0 ] = x_a[ 1 ]
-            x_a.push :on, nil
+          top_channel_symbol = x_a.first
+          case top_channel_symbol
+          when  :error, :info
+            if x_a.length.even?
+              x_a[ 0, 1 ] = EMPTY_A_
+            else
+              x_a[ 0 ] = x_a[ 1 ]
+            end
+            case top_channel_symbol
+            when :error
+              x_a.push :ok, false
+            when :info
+              x_a.push :ok, nil
+            end
             inline_via_iambic_and_any_message_proc_to_be_defaulted x_a, nil
           end
         end
@@ -69,6 +75,10 @@ module Skylab::Brazen
           Event_::Class_Factories__::Message
         end
 
+        def produce_handle_event_selectively_through_methods
+          PRODUCE_HANDLE_EVENT_SELECTIVELY_THROUGH_METHODS__
+        end
+
         def prototype_with * x_a, & p
           p ||= Inferred_Message.to_proc
           Event_::Prototype__.via_deflist_and_message_proc x_a, p
@@ -78,16 +88,8 @@ module Skylab::Brazen
           Event_::Prototype__
         end
 
-        def receiver & p
-          if p
-            Receiver__::Proc_Adapter__.new p
-          else
-            Receiver__
-          end
-        end
-
-        def sender x
-          x.include Sender_Methods__ ; nil
+        def selective_builder_sender_receiver x
+          x.include Selective_Builder_Receiver_Sender_Methods__ ; nil
         end
 
         def wrap
@@ -359,30 +361,11 @@ module Skylab::Brazen
         PN_RX__ = /(?:_|\A)pathname\z/
       end
 
-      module Sender_Methods__
+      module Selective_Builder_Receiver_Sender_Methods__
+
       private
 
-        def send_not_OK_event_with * x_a, & p
-          _ev = build_not_OK_event_via_mutable_iambic_and_message_proc x_a, p
-          _ev_ = wrap_event _ev
-          send_event _ev_
-        end
-
-        def send_neutral_event_with * x_a, & p
-          _ev = build_event_via_iambic_and_message_proc x_a, p
-          _ev_ = wrap_event _ev
-          send_event _ev_
-        end
-
-        def send_OK_event_with * x_a, & p
-          _ev = build_OK_event_via_mutable_iambic_and_message_proc x_a, p
-          _ev_ = wrap_event _ev
-          send_event _ev_
-        end
-
-        def wrap_event ev
-          ev
-        end
+        # ~  event building
 
         def build_not_OK_event_with * x_a, & p
           build_not_OK_event_via_mutable_iambic_and_message_proc x_a, p
@@ -428,112 +411,127 @@ module Skylab::Brazen
           Event_
         end
 
+      private
+
+        def normal_top_channel_via_OK_value x
+          if x
+            :success
+          elsif x.nil?
+            :info
+          else
+            :error
+          end
+        end
+
+        def _OK_value_via_top_channel i
+          case i
+          when :error
+            UNABLE_
+          when :info, :payload, :success  # for now we include info
+            ACHIEVED_
+          end
+        end
+
+        # ~ event sending
+
         def maybe_send_event * i_a, & ev_p
-          @on_event_selectively.call( * i_a, & ev_p )
+          handle_event_selectively_via_channel.call i_a, & ev_p
         end
 
-        def send_event ev
-          event_receiver.receive_event ev
+        def maybe_send_event_via_channel i_a, & ev_p
+          handle_event_selectively_via_channel.call i_a, & ev_p
         end
 
-        def event_receiver
-          @event_receiver
+      public  # ~ event receiving
+
+        def maybe_receive_event_via_channel i_a, & ev_p
+          handle_event_selectively_via_channel.call i_a, & ev_p
         end
 
-        def _Event
+        def handle_event_selectively
+          @on_event_selectively ||= prdc_HES
+        end
+
+        def handle_event_selectively_via_channel
+          @HESVC_p ||= produce_handle_event_selectively_via_channel
+        end
+
+      private
+
+        def prdc_HES
+          if handle_event_selectively_via_channel
+            -> * i_a, & ev_p do
+              @HESVC_p.call i_a, & ev_p
+            end
+          end
+        end
+
+        def produce_handle_event_selectively_via_channel  # :+#public-API (#hook-in)
+          if @on_event_selectively
+            -> i_a, & ev_p do
+              @on_event_selectively[ * i_a, & ev_p ]
+            end
+          end
+        end
+
+        # ~ common & courtesy
+
+        def receive_selective_listener_proc oes_p
+          @on_event_selectively = oes_p ; nil
+        end
+
+        def receive_selective_listener_via_channel_proc hesvc_p
+          @HESVC_p = hesvc_p ; nil
+        end
+
+        def event_lib
           Event_
         end
       end
 
-      module Receiver__
+      class PRODUCE_HANDLE_EVENT_SELECTIVELY_THROUGH_METHODS__
 
         class << self
 
-          def channeled * a
-            if a.length.zero?
-              Channeled__
+          def bookends * a, & oes_p
+            Bookends__.new( a, & oes_p ).produce_selective_listener_proc
+          end
+
+          def full * a, & oes_p
+            Full__.new( a, & oes_p ).produce_selective_listener_proc
+          end
+        end
+
+        def initialize a, & oes_p
+          @delegate, @channel_i = a
+          @fallback_selective_listener_proc = oes_p
+        end
+
+        def produce_selective_listener_proc
+
+          -> * i_a, & ev_p do
+
+            m_i = build_longer_method_name_via_channel i_a
+
+            if @delegate.respond_to? m_i or ! @fallback_selective_listener_proc
+              @delegate.send m_i, i_a, & ev_p
             else
-              Channeled__.new a
+              @fallback_selective_listener_proc[ * i_a, & ev_p ]
             end
-          end
-
-          def map_reduce evr, & p
-            Map_Reduce__.new p, evr
           end
         end
 
-        class Map_Reduce__
-          def initialize p, evr
-            @evr = evr ; @p = p
-          end
-          def receive_event ev
-            ev_ = @p[ ev ]
-            ev_ and @evr.receive_event ev_
+        class Bookends__ < self
+
+          def build_longer_method_name_via_channel i_a
+            :"on_#{ @channel_i }_#{ i_a.last }_via_channel"
           end
         end
 
-        class Channeled__
+        class Full__ < self
 
-          class << self
-            def full * a
-              if a.length.zero?
-                Full__
-              else
-                Full__.new a
-              end
-            end
-          end
-
-          def initialize a
-            @channel_i, @delegate = a
-            @m_i = build_channeled_event_meth_i
-          end
-
-          attr_reader :channel_i, :delegate  # hax
-
-          def receive_event ev
-            @delegate.send @m_i, ev
-          end
-
-        private
-
-          def build_channeled_event_meth_i
-            :"receive_#{ @channel_i }_event"
-          end
-
-          class Full__ < self
-
-            class << self
-              def cascading * a
-                Cascading__.new a
-              end
-            end
-
-            def initialize a
-              @channel_i, @delegate = a
-            end
-
-            def receive_event ev
-              _m_i = build_longest_meth_i_for_ev ev
-              @delegate.send _m_i, ev
-            end
-          private
-
-            def build_longest_meth_i_for_ev ev
-              :"receive_#{ @channel_i }_#{ ev.terminal_channel_i }"
-            end
-
-            class Cascading__ < self
-              def receive_event ev
-                m_i = build_longest_meth_i_for_ev ev
-                if @delegate.respond_to? m_i
-                  @delegate.send m_i, ev
-                else
-                  _m_i = build_channeled_event_meth_i
-                  @delegate.send _m_i, ev
-                end
-              end
-            end
+          def build_longer_method_name_via_channel i_a
+            :"on_#{ [ @channel_i, * i_a ] * UNDERSCORE_ }_via_channel"
           end
         end
       end

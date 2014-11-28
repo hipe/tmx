@@ -37,10 +37,10 @@ module Skylab::Basic
           set_arg iambic_property
         end
 
-        o :property, :on_event, :property, :as_normal_value  # put at end because open :+[#br-060]
+        o :properties, :on_event, :as_normal_value
       end
 
-      Basic_._lib.event.sender self
+      Basic_._lib.event.selective_builder_sender_receiver self
 
       def initialize & p
         @arg_was_provided = false

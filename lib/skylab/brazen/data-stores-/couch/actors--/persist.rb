@@ -38,14 +38,10 @@ module Skylab::Brazen
 
       def prdc_any_result
         if @entity.came_from_persistence
-          rslv_result_when_update
+          rslv_result_when_update  # #todo
         else
           rslv_result_when_create
         end
-      end
-
-      def rslv_result_when_update
-        self._DO_ME
       end
 
       def rslv_result_when_create
@@ -71,44 +67,46 @@ module Skylab::Brazen
       end
 
       def when_201_created o
-        _ev = o.response_body_to_completion_event do |y, o_|
-          y << "created #{ val o_.id } (rev: #{ val o_.rev })"
+        maybe_send_event :success, :created do
+          o.response_body_to_completion_event do |y, o_|
+            y << "created #{ val o_.id } (rev: #{ val o_.rev })"
+          end
         end
-        any_result_via_send _ev
       end
 
       def when_404_object_not_found o
-        ds_i = @datastore_i.to_s
-        _ev = o.response_body_to_not_OK_event do |y, ev|
-          y << "there is no #{ val ds_i } couch datastore (#{ val ev.reason })"
+        maybe_send_event :error, :not_found do
+          ds_i = @datastore_i.to_s
+          o.response_body_to_not_OK_event do |y, ev|
+            y << "there is no #{ val ds_i } couch datastore (#{ val ev.reason })"
+          end
         end
-        any_result_via_send _ev
       end
 
       def when_409_conflict o
-        _eid = @native_entity_identifier_s
-        _ev = o.response_body_to_not_OK_event :name, _eid do |y, ev|
-          y << "#{ val ev.name } is already taken as a name #{
-           }(#{ o.response.code } #{ ev.reason })"
+        maybe_send_event :error, :conflict do
+          _eid = @native_entity_identifier_s
+          o.response_body_to_not_OK_event :name, _eid do |y, ev|
+            y << "#{ val ev.name } is already taken as a name #{
+             }(#{ o.response.code } #{ ev.reason })"
+          end
         end
-        any_result_via_send _ev
       end
 
       def when_412_precondition_failed o
-        any_result_via_send o.response_body_to_not_OK_event
+        maybe_send_event :error, :precondition_failed do
+          o.response_body_to_not_OK_event
+        end
       end
 
       def when_500_internal_server_error o
-        _ev = o.response_body_to_not_OK_event
-        any_result_via_send _ev
+        maybe_send_event :error, :internal_server_error do
+          o.response_body_to_not_OK_event
+        end
       end
 
-      def any_result_via_send ev
-        send_event ev
-      end
-
-      def event_receiver
-        @entity
+      def produce_handle_event_selectively_via_channel
+        @entity.handle_event_selectively_via_channel
       end
     end
   end

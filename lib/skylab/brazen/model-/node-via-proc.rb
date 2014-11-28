@@ -90,10 +90,10 @@ module Skylab::Brazen
           @kernel = k
         end
 
-        attr_reader :action_class_like, :event_receiver, :kernel
+        attr_reader :action_class_like, :kernel
 
         def members
-          [ :action_class_like, :event_receiver, :kernel ]
+          [ :action_class_like, :kernel ]
         end
 
         def is_branch
@@ -115,8 +115,8 @@ module Skylab::Brazen
           # for now
         end
 
-        def bound_call_via_call x_a, er
-          @event_receiver = er
+        def bound_call_via_call x_a, & oes_p
+          @on_event_selectively = oes_p
           case 0 <=> @action_class_like.p.arity
           when -1 ; bc_when_nonzero_arity x_a
           when  0 ; bc_when_zero_arity
@@ -159,34 +159,45 @@ module Skylab::Brazen
         end
 
         def bc_when_missing_arguments
+          maybe_send_event :error do
+            bld_missing_arguments_event
+          end
+          UNABLE_
+        end
+
+        def bld_missing_arguments_event
           _ev = Brazen_::Entity.properties_stack.
             build_missing_required_properties_event(
               [ @custom_error.property ],
               'argument' )
-
-          bc_via_error_event _ev
+          _sign_event _ev
         end
 
         def bc_when_extra_arguments
-          _ev = Brazen_::Entity.properties_stack.
-            build_extra_properties_event [ @custom_error.x ], nil, 'argument', 'unexpected'
-
-          bc_via_error_event _ev
-        end
-
-        def bc_via_error_event ev
-          _ev_ = sign_event ev
-          @event_receiver.receive_event _ev_
+          maybe_send_event :error do
+            bld_when_extra_arguments_event
+          end
           UNABLE_
         end
 
-        def sign_event ev
-          _nf = @action_class_like.name_function
-          Event_[].wrap.signature _nf, ev
+        private def maybe_send_event * i_a, & ev_p
+          @on_event_selectively[ * i_a, & ev_p ]
         end
 
-        def push_event_receiver_and_kernel_on_to_arglist
-          @x_a.push @er, @k ; nil
+        def maybe_receive_event * i_a, & ev_p
+          @on_event_selectively[ * i_a, & ev_p ]
+        end
+
+        def bld_when_extra_arguments_event
+          _ev = Brazen_::Entity.properties_stack.
+            build_extra_properties_event [ @custom_error.x ], nil, 'argument', 'unexpected'
+
+          _sign_event _ev
+        end
+
+        def _sign_event ev
+          _nf = @action_class_like.name_function
+          Event_[].wrap.signature _nf, ev
         end
       end
     end

@@ -26,7 +26,7 @@ module Skylab::Brazen
         case 1 <=> a.length
         when  0 ; a.first.receive_show_help @help_renderer.invocation
         when  1 ; aa.receive_no_matching_action @any_cmd_string
-        when -1 ; aa.receive_multiple_matching_adapters a
+        when -1 ; aa.receive_multiple_matching_adapters a  # #todo
         end
       end
 

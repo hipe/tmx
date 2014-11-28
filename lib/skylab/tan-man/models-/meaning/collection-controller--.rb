@@ -20,15 +20,15 @@ module Skylab::TanMan
 
       # ~ create
 
-      def persist_entity ent, evr
+      def persist_entity ent, & oes_p
         _p = method :build_scan
         _os = @action.argument_value :output_string
-        Meaning_::Actors__::Persist[ ent, _os, _p, evr ]
+        Meaning_::Actors__::Persist[ ent, _os, _p, oes_p ]
       end
 
       # ~ retrieve (many)
 
-      def entity_scan_via_class cls, evr
+      def entity_scan_via_class cls, & oes_p
         if model_class == cls  # just to punish those who dare defy us
           build_scan
         end

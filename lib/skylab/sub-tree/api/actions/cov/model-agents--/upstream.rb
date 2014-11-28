@@ -7,7 +7,7 @@ module Skylab::SubTree
       Lib_::Properties_stack_frame.call self,
         :globbing, :processor, :initialize,
         :required, :field, :be_verbose,
-        :required, :field, :on_event
+        :required, :field, :on_event_selectively
 
       class Via_Filesystem < self
 
@@ -31,7 +31,9 @@ module Skylab::SubTree
           if @stat
             when_stat
           else
-            send_event No_Such_Directory_[ @stat_e, @path ].to_event
+            maybe_send_event :error, :no_such_directory do
+              No_Such_Directory_[ @stat_e, @path ].to_event
+            end
             @result = UNABLE_
           end
         end
@@ -51,7 +53,9 @@ module Skylab::SubTree
           if 'directory' == @stat.ftype
             PROCEDE_
           else
-            send_event No_Single_File_Support_[ @path ].to_event
+            maybe_send_event :error, :no_single_file_support do
+              No_Single_File_Support_[ @path ].to_event
+            end
             @result = UNABLE_
           end
         end
@@ -112,7 +116,7 @@ module Skylab::SubTree
             :freeform_query_infix, '-type dir',
             :filenames, TEST_DIR_NAME_A_,
             :on_event_selectively,
-              selective_listener_for_find.method( :maybe_receive_event ),
+              selective_listener_for_find.handle_event_selectively,
             :as_normal_value, -> command do
               command.to_stream
             end )
@@ -123,10 +127,6 @@ module Skylab::SubTree
           Callback_::Selective_Listener.methodic self, :prefix, :find
         end
 
-        def send_event ev
-          @on_event[ ev ]
-        end
-
       public
 
         def is_subscribed_to_find_error
@@ -135,11 +135,6 @@ module Skylab::SubTree
 
         def is_subscribed_to_find_info
           @be_verbose
-        end
-
-        def receive_find_info ev
-          send_event ev
-          nil
         end
       end
 

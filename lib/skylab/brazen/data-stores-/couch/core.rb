@@ -80,42 +80,42 @@ module Skylab::Brazen
 
     # ~ for create
 
-    def persist_entity entity, _event_receiver
+    def persist_entity entity
       Couch_::Actors__::Persist[ entity, self ]
     end
 
     def any_native_create_before_create_in_datastore
-      Couch_::Actors__::Touch_datastore[ self, @event_receiver ]
+      Couch_::Actors__::Touch_datastore[ self, handle_event_selectively ]
       PROCEDE_  # #note-085
     end
 
     # ~ for retrieve (one)
 
-    def entity_via_identifier id, evr
-      Couch_::Actors__::Retrieve_datastore_entity[ id, self, evr, @kernel ]
+    def entity_via_identifier id, & oes_p
+      Couch_::Actors__::Retrieve_datastore_entity[ id, self, @kernel, oes_p ]
     end
 
     # ~ for retrieve (list)
 
-    def entity_scan_via_class cls, evr
+    def entity_scan_via_class cls, & oes_p
       Couch_::Actors__::Scan.with :model_class, cls,
         :datastore, self,
-        :event_receiver, evr, :kernel, @kernel
+        :kernel, @kernel, :on_event_selectively, oes_p
     end
 
     # ~ for delete entity
 
-    def delete_entity ent, evr
-      ok = ent.any_native_delete_before_delete_in_datastore evr
-      ok && Couch_::Actors__::Delete[ ent, self, evr ]
+    def delete_entity ent, & oes_p
+      ok = ent.any_native_delete_before_delete_in_datastore( & oes_p )
+      ok && Couch_::Actors__::Delete[ ent, self, oes_p ]
     end
 
     # ~ for delete self
 
-    def any_native_delete_before_delete_in_datastore evr
+    def any_native_delete_before_delete_in_datastore & oes_p
       _remote = _HTTP_remote
       _ok = Couch_::Actors__::Delete_datastore[
-        self, @action_formal_properties, _remote, evr ]
+        self, @action_formal_properties, _remote, oes_p ]
       # NOTE we ignore the above - we want failure of the one not to prevent
       # the other from proceding (otherwise you couldn't remove rogue records)
       PROCEDE_

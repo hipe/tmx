@@ -10,7 +10,7 @@ module Skylab::TanMan
       '"' => 'quot', "'" => 'apos', '&' => 'amp', '<' => 'lt', '>' => 'gt',
     }
 
-    define_method :_escape_string do |string, error|
+    define_method :_escape_string do | string, & oes_p |
       # for now we go with a narrow whitelist, in future we could expand
       # trivially, but for now extensive html escaping support is wayy outside
       # the scope of all this.
@@ -31,9 +31,9 @@ module Skylab::TanMan
         end
 
         if bad
-          res = error[
+          res = oes_p.call :error, :invalid_characters do
             Models_::DotFile::Events_::Invalid_Characters.with :chars, bad.uniq
-          ]
+          end
           break
         end
         res = out

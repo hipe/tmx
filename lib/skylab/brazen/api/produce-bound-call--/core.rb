@@ -10,8 +10,6 @@ module Skylab::Brazen
         :kernel,
         :mod ]
 
-      Event_[].sender self
-
       def execute
         prepare_ivars
         ok = resolve_action
@@ -24,11 +22,11 @@ module Skylab::Brazen
       def prepare_ivars
         @action = nil
         @p and @p[ self ]
-        if :event_receiver == @x_a[ -2 ]  # :+[#049] case study: ordering hacks
-          @event_receiver = @x_a.last
+        if :on_event_selectively == @x_a[ -2 ]  # :+[#049] case study: ordering hacks
+          @on_event_selectively = @x_a.last
           @x_a[ -2, 2 ] = EMPTY_A_
         else
-          @event_receiver = nil
+          @on_event_selectively = nil
         end
         @d = 0 ; @x_a_length = @x_a.length
         nil
@@ -89,8 +87,9 @@ module Skylab::Brazen
       end
 
       def via_action_resolve_bound_call
+        _oes_p = @on_event_selectively || prdc_some_OES
         x_a = @x_a[ @d .. -1 ]
-        x = @action.bound_call_via_call x_a, event_receiver
+        x = @action.bound_call_via_call x_a, & _oes_p
         if x
           @bound_call = x
           OK_
@@ -111,26 +110,26 @@ module Skylab::Brazen
         @d += 1
       end
 
-      def end_in_error_with * x_a, & p
-        _ev = build_not_OK_event_via_mutable_iambic_and_message_proc x_a, p
-        result = send_event _ev
-        @bound_call = Brazen_.bound_call.via_value result
+      def end_in_error_with * x_a
+        _oes_p = @on_event_selectively || prdc_some_OES
+        _result = _oes_p.call :error, * x_a
+        @bound_call = Brazen_.bound_call.via_value _result
         UNABLE_
       end
 
-      def send_event ev
-        event_receiver.receive_event ev
-      end
+      def prdc_some_OES
 
-      def event_receiver
-        @event_receiver || rslv_some_event_receiver
-        @event_receiver
-      end
+        _two_streams = Lib_::Two_streams[]
 
-      def rslv_some_event_receiver
         _expag = @mod::API.expression_agent_class.new @kernel
-        @event_receiver = Produce_bound_call__::Two_Stream_Event_Expressor.
-          new( * Lib_::Two_streams[], _expag ) ; nil
+
+        event_expressor = Produce_bound_call__::Two_Stream_Event_Expressor.
+          new( * _two_streams, _expag )
+
+        -> * x_a do
+          _ev = Brazen_.event.inline_via_normal_extended_mutable_channel x_a
+          event_expressor.receive_ev _ev
+        end
       end
     end
   end

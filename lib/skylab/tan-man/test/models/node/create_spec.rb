@@ -47,10 +47,11 @@ module Skylab::TanMan::TestSupport::Models::Node
       s = " digraph { apple ; zoz ; } "
       add_name_to_string 'menengitis', s
       expect_OK_event :created_node do |ev|
-        a = ev.tag_names
+        ev_ = ev.to_event
+        a = ev_.tag_names
         a.should be_include :ok
         a.should be_include :node_stmt
-        ev.node_stmt.label.should eql 'menengitis'
+        ev_.node_stmt.label.should eql 'menengitis'
       end
       s.should eql " digraph { apple ; menengitis [label=menengitis] ; zoz ; } "
       expect_succeeded

@@ -14,8 +14,10 @@ module Skylab::Brazen
       end ]
 
       def produce_any_result
-        send_not_OK_event_with :not_yet_implemented do |y, o|
-          y << "removing workspaces is not yet implemented."
+        maybe_send_event :error, :not_yet_implemented do
+          _ev = jbuild_not_OK_event_with :not_yet_implemented do |y, o|
+            y << "removing workspaces is not yet implemented."
+          end
         end
         UNABLE_
       end

@@ -62,17 +62,13 @@ module Skylab::Headless
           end
         end
 
-        def send_event ev
-          @on_event[ ev ]
-        end
-
         DIR_FTYPE_ = 'directory'.freeze
 
         Entity_ = Headless_._lib.entity
 
         Event_ = Entity_.event
 
-        Event_.sender self
+        Event_.selective_builder_sender_receiver self
 
         FILE_FTYPE_ = 'file'.freeze
 

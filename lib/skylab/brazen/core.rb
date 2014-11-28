@@ -257,7 +257,7 @@ module Skylab::Brazen
 
   Actor_ = -> cls, * x_a do
     Lib_::Snag__[]::Model_::Actor.via_client_and_iambic cls, x_a
-    Event_[].sender cls ; nil
+    Event_[].selective_builder_sender_receiver cls ; nil
   end
 
   ACHIEVED_ = true

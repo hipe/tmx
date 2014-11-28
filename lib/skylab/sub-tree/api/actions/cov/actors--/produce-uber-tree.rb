@@ -5,7 +5,11 @@ module Skylab::SubTree
     class Actors__::Produce_uber_tree
 
       Callback_::Actor.call self, :properties,
-        :hub_a, :path, :on_event
+        :hub_a,
+        :path,
+        :on_event_selectively
+
+      SubTree_._lib.event_lib.selective_builder_sender_receiver self
 
       def execute
         ok = normalize
@@ -32,9 +36,13 @@ module Skylab::SubTree
         trav = SubTree_::Tree::Traversal.new
         trav.traverse @uber_tree do |node|
           node.prefix = trav.prefix node
-          @on_event[ Tree_Line_Card__[ node ] ]
+          maybe_send_event :payload do
+            Tree_Line_Card__[ node ]
+          end
         end
-        @on_event[ Done_with_Tree[] ]
+        maybe_send_event :info, :done_with_tree do
+          Done_with_Tree[]
+        end
         ACHIEVED_
       end
 

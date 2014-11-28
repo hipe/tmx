@@ -21,7 +21,8 @@ module Skylab::TanMan::TestSupport::Models::Starter
         :name, 'wiz',
         :workspace_path, @ws_pn.to_path, :config_filename, cfn
 
-      expect_not_OK_event :entity_not_found do |ev|
+      expect_not_OK_event :entity_not_found do |ev_|
+        ev = ev_.to_event
         s_a = ev.a_few_ent_a.map( & :local_entity_identifier_string )
         s_a.should eql [ "digraph.dot", "holy-smack.dot" ]
         ev.ent.local_entity_identifier_string.should eql 'wiz'
@@ -49,7 +50,7 @@ module Skylab::TanMan::TestSupport::Models::Starter
         :config_filename, cfn
 
       ev = expect_not_OK_event :config_parse_error
-      a = black_and_white_lines ev
+      a = black_and_white_lines ev.to_event
       a[ 0 ].should eql 'section expected in config:1:1'
       a[ 1 ].should eql "  1: using_starter=hoitus-toitus.dot\n"
       a[ 2 ].should eql "     ^"
@@ -75,7 +76,7 @@ module Skylab::TanMan::TestSupport::Models::Starter
 
       expect_OK_event :normalized_value
       expect_OK_event :datastore_resource_committed_changes do |ev|
-        ev.bytes.should eql 63
+        ev.to_event.bytes.should eql 63
       end
       expect_succeeded
 

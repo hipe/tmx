@@ -80,7 +80,7 @@ module Skylab::BeautySalon
             end
           end
 
-          BS_._lib.event_lib.sender self
+          BS_._lib.event_lib.selective_builder_sender_receiver self
 
           def initialize a
             @custom_i_a, @work_dir, @oes = a

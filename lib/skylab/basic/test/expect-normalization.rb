@@ -14,7 +14,7 @@ module Skylab::Basic
   module Instance_Methods__
 
     def use_event_receiver_against x
-      use_two x, event_receiver ; nil
+      use_two x, event_receiver_for_expect_event ; nil
     end
 
     def use_event_proc_against x

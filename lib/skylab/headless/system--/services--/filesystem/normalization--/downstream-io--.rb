@@ -25,8 +25,15 @@ module Skylab::Headless
               @outstream = iambic_property
             end
 
+            def on_event=
+              oe_p = iambic_property
+              @on_event_selectively = -> *, & ev_p do
+                oe_p[ ev_p[] ]
+              end
+            end
+
             o :properties, :last_looks, :force_arg,
-                :is_dry_run, :on_event
+                :is_dry_run, :on_event_selectively
 
           end
 
@@ -63,11 +70,16 @@ module Skylab::Headless
           end
 
           def when_neither
-            _ev = build_not_OK_event_with :missing_required_properties,
+            maybe_send_event :error, :missing_required_properties do
+              bld_missing_path_event
+            end
+          end
+
+          def bld_missing_path_event
+            build_not_OK_event_with :missing_required_properties,
                 :path_property, @path_arg.property do |y, o|
               y << "expecting #{ par o.path_property }"
             end
-            send_event _ev
           end
 
           def via_path
@@ -101,8 +113,13 @@ module Skylab::Headless
           end
 
           def via_force_arg_not_OK_to_overwrite
+            maybe_send_event :error, :missing_required_properties do
+              bld_missing_force_event
+            end
+          end
 
-            _ev = build_not_OK_event_with :missing_required_permission,
+          def bld_missing_force_event
+            build_not_OK_event_with :missing_required_permission,
                 :force_arg, @force_arg, :path_arg, @path_arg do |y, o|
 
               y << "#{ par o.path_arg.property } #{
@@ -110,8 +127,6 @@ module Skylab::Headless
                 }#{ par o.force_arg.property }: #{
                  }#{ pth o.path_arg.value_x }"
             end
-
-            @on_event[ _ev ]
           end
 
           def when_stat_is_file_OK_to_overwrite
@@ -127,16 +142,27 @@ module Skylab::Headless
           # ~ pairs
 
           def snd_creating_event
-            _ev = build_neutral_event_with :before_probably_creating_new_file,
+            maybe_send_event :info, :before_probably_creating_new_file do
+              bld_BPCNF_event
+            end
+          end
+
+          def bld_BPCNF_event
+            build_neutral_event_with :before_probably_creating_new_file,
                 :path_arg, @path_arg do |y, o|
 
               y << "creating #{ pth o.path_arg.value_x }"
             end
-            send_event _ev ; nil
           end
 
           def snd_updating_event
-            _ev = build_neutral_event_with :before_editing_existing_file,
+            maybe_send_event :info, :before_editing_existing_file do
+              bld_BEEF_event
+            end
+          end
+
+          def bld_BEEF_event
+            build_neutral_event_with :before_editing_existing_file,
                 :path_arg, @path_arg, :stat, @stat do |y, o|
 
               if o.stat.size.zero?
@@ -146,7 +172,6 @@ module Skylab::Headless
 
               y << "updating#{ _zero_note } #{ pth _path }"
             end
-            send_event _ev ; nil
           end
 
           def via_hopefully_still_available_path_open_file
@@ -154,14 +179,18 @@ module Skylab::Headless
             if @IO
               @as_normal_value[ @IO ]
             else
-              @on_event[ wrap_exception @e ]
+              maybe_send_event :error, :exception do
+                wrap_exception @e
+              end
             end
           end
 
           def via_hopefully_still_occupied_path_open_file
             set_IO_and_exception_via_open_mode 'r+'
             if @e
-              @on_event[ wrap_exception @e ]
+              maybe_send_event :error, :exception do
+                wrap_exception @e
+              end
             else
               if @last_looks
                 via_IO_last_looks
@@ -181,7 +210,9 @@ module Skylab::Headless
             x = @last_looks.call _ev, -> do
               is_ok = true ; nil
             end, -> ev do
-              @on_event[ ev ]
+              maybe_send_event do
+                ev
+              end
             end
             if is_ok
               @IO.rewind

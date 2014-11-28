@@ -6,23 +6,22 @@ module Skylab::Brazen
 
       class << self
 
-        def new evr
-          evr.respond_to? :receive_event or raise ::ArgumentError
-          _parse = Parse__.with :receive_events_via_event_receiver, evr
+        def new & oes_p
+          _parse = Parse__.with :on_event_selectively, oes_p
           Document__.new _parse
         end
 
-        def parse_string str, & p
-          Parse__[ :via_string, str, :receive_events_via_proc, p ]
+        def parse_string str, & oes_p
+          Parse__[ :via_string, str, :on_event_selectively, oes_p ]
         end
 
-        def parse_path path_s, & p
-          Parse__[ :via_path, path_s, :receive_events_via_proc, p ]
+        def parse_path path_s, & oes_p
+          Parse__[ :via_path, path_s, :on_event_selectively, oes_p ]
         end
 
-        def parse_input_id input_id, evr
+        def parse_input_id input_id, & oes_p
           Parse__[ :via_input_adapter, input_id,
-            :receive_events_via_event_receiver, evr ]
+                   :on_event_selectively, oes_p ]
         end
       end
 
@@ -36,10 +35,6 @@ module Skylab::Brazen
 
         def initialize a
           absorb_even_iambic_fully a
-        end
-
-        def handle_event_selectively
-          @on_event_selectively
         end
 
       private
@@ -67,18 +62,8 @@ module Skylab::Brazen
           def via_string_for_immediate_parse s
             @receiver.accept_string_for_immediate_scan s
           end
-          def receive_events_via_proc p
-            @receiver.accept_on_event_selectively -> *, & ev_p do
-              p[ ev_p[] ]
-            end ; nil
-          end
-          def receive_events_via_event_receiver x
-            @receiver.accept_on_event_selectively -> *, & ev_p do
-              x.receive_event ev_p[]
-            end ; nil
-          end
-          def receive_events_selectively p
-            @receiver.accept_on_event_selectively p ; nil
+          def on_event_selectively oes_p
+            @receiver.accept_handle_event_selectively_proc oes_p
           end
         end
 
@@ -148,17 +133,8 @@ module Skylab::Brazen
           @scn = Lib_::String_scanner[].new s ; nil
         end
 
-        def accept_on_event_selectively p
+        def accept_handle_event_selectively_proc p
           @on_event_selectively = p ; nil
-        end
-
-        def maybe_receive_event_via_channel i_a, & ev_p
-          @on_event_selectively[ * i_a, & ev_p ]
-        end
-
-        def receive_event ev
-          self._WHERE
-          @event_receiver.receive_event ev
         end
 
         def string_scanner
@@ -478,7 +454,7 @@ module Skylab::Brazen
           end
         end
 
-        def delete_comparable_item x, compare_p, err_p
+        def delete_comparable_item x, compare_p, & oes_p
           do_not_delete_these = [] ; will_delete_count = 0
           scn = @collection_kernel.get_all_node_scan
           while item = scn.gets
@@ -491,8 +467,8 @@ module Skylab::Brazen
           end
           case 1 <=> will_delete_count
           when  0 ; delete_comparable_item_when_found do_not_delete_these
-          when  1 ; delete_comparable_item_when_not_found x, err_p
-          when -1 ; delete_comparable_item_when_many_matches will_delete_count, x, err_p
+          when  1 ; delete_comparable_item_when_not_found x, & oes_p
+          when -1 ; delete_comparable_item_when_many_matches will_delete_count, x, & oes_p
           end
         end
 
@@ -510,15 +486,6 @@ module Skylab::Brazen
           section and begin
             _compare_p = bld_compare section
             touch_comparable_item section, _compare_p
-          end
-        end
-
-        def delete_section subsect_s, sect_s, err_p
-          self._NOT_COVERED   # #todo
-          section = bld_section subsect_s, sect_s
-          section and begin
-            _compare_p = bld_compare section
-            delete_comparable_item section, _compare_p, err_p
           end
         end
 
@@ -929,7 +896,7 @@ module Skylab::Brazen
 
           _parse = Parse__.with :via_string_for_immediate_parse,
             y * EMPTY_S_,
-            :receive_events_selectively,
+            :on_event_selectively,
             @parse.handle_event_selectively
 
           otr = Section_or_Subsection_Parse__.new _parse
@@ -1033,15 +1000,6 @@ module Skylab::Brazen
         def rslv_names
           @normalized_sect_s = @sect_s.downcase
           @external_normal_name_symbol = @normalized_sect_s.intern ; nil
-        end
-
-        def send_event ev  # _DOG_EAR
-          self._NO_MORE
-          if event_receiver  # _DOG_EAR
-            super
-          else
-            raise ev.to_exception
-          end
         end
       end
 
@@ -1526,7 +1484,7 @@ module Skylab::Brazen
       class Event_Sending_Node__
       private
 
-        Event_[].sender self
+        Event_[].selective_builder_sender_receiver self
 
         def maybe_send_event * i_a, & ev_p
           @parse.maybe_receive_event_via_channel i_a, & ev_p

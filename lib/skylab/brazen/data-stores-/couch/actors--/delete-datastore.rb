@@ -8,7 +8,7 @@ module Skylab::Brazen
         :entity,
         :props,
         :remote,
-        :event_receiver ]
+        :on_event_selectively ]
 
       def execute
         init_ivars
@@ -35,15 +35,16 @@ module Skylab::Brazen
       end
 
       def when_force_not_present
-        _ev = bld_missing_force_event
-        send_event _ev
+        maybe_send_event :error, :missing_force do
+          bld_missing_force_event
+        end
         UNABLE_
       end
 
       def bld_missing_force_event
-        _FORCE_ = @props.fetch :force
-        build_not_OK_event_with :missing_force do |y, o|
-           y << "missing required #{ par _FORCE_ }"
+        _prop = @props.fetch :force
+        build_not_OK_event_with :missing_force, :prop, _prop do |y, o|
+          y << "missing required #{ par o.prop }"
         end
       end
 
@@ -62,21 +63,23 @@ module Skylab::Brazen
     public
 
       def delete_datastore_when_dry_run _
-        _ev = build_OK_event_with( :pretending_for_dry_run, :pretending, :pretending )
-        send_event _ev
-        nil
+        maybe_send_event :info, :pretending_for_dry_run do
+          build_OK_event_with :pretending_for_dry_run, :pretending, :pretending
+        end ; nil
       end
 
       def delete_datastore_when_200_ok o
-        _ev = o.response_body_to_completion_event :name, @datastore_s do |y, ev|
-          y << "#{ ev.message } - removed datastore #{ val ev.name }"
-        end
-        send_event _ev ; nil
+        maybe_send_event :info, :removed do
+          o.response_body_to_completion_event :name, @datastore_s do |y, ev|
+            y << "#{ ev.message } - removed datastore #{ val ev.name }"
+          end
+        end ; nil
       end
 
       def delete_datastore_when_404_object_not_found o
-        _ev = o.response_body_to_not_OK_event
-        send_event _ev ; nil
+        maybe_send_event :error, :not_found do
+          o.response_body_to_not_OK_event
+        end ; nil
       end
     end
   end

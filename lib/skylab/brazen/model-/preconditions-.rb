@@ -13,12 +13,12 @@ module Skylab::Brazen
 
       class Graph
 
-        def initialize action, evr, kernel
+        def initialize action, kernel, & oes_p
           @action = action
           @matrix_h = ::Hash.new do |h, k|
             h[ k ] = ::Hash.new { |h_, k_| h_[ k_ ] = Node__.new }
           end
-          @event_receiver = evr
+          @on_event_selectively = oes_p
           @kernel = kernel
         end
 
@@ -31,7 +31,7 @@ module Skylab::Brazen
             node.value_x
           when :none
             # touches do not change state, work does..
-            x = silo.send :"provide_#{ lvl_i }", id, self, @event_receiver
+            x = silo.send :"provide_#{ lvl_i }", id, self, & @on_event_selectively
             if x
               if :none == node.state_i  # just kidding
                 node.state_i = :OK
@@ -45,7 +45,7 @@ module Skylab::Brazen
         end
 
         def work is_self_p, lvl_i, id  # assumes state 'none'
-          silo = @kernel.silo_via_identifier id, @event_receiver
+          silo = @kernel.silo_via_identifier id, & @on_event_selectively
           silo and begin
             node = @matrix_h[ id.full_name_i ][ lvl_i ]
             if is_self_p
@@ -61,7 +61,7 @@ module Skylab::Brazen
               end
             else
               node.state_i = :processing
-              x = silo.send :"provide_#{ lvl_i }", id, self, @event_receiver
+              x = silo.send :"provide_#{ lvl_i }", id, self, & @on_event_selectively
               if x
                 node.state_i = :OK
                 node.value_x = x
@@ -100,7 +100,7 @@ module Skylab::Brazen
           :on_self_reliance,
           :graph,
           :level_i,
-          :event_receiver ]
+          :on_event_selectively ]
 
         def execute
 
@@ -143,10 +143,15 @@ module Skylab::Brazen
         end
 
         def when_processing
-          _ev = build_not_OK_event_with :cyclic_dependency_in_precondition_graph,
-            :model_name, @id.full_name_i
-          @event_receiver.receive_event _ev
+          @on_event_selectively.call :error, :cyclic_dependency_in_precondition_graph do
+            bld_cyclic_dependency_in_precondition_graph_event
+          end
           UNABLE_
+        end
+
+        def bld_cyclic_dependency_in_precondition_graph_event
+          build_not_OK_event_with :cyclic_dependency_in_precondition_graph,
+            :model_name, @id.full_name_i
         end
 
         def work

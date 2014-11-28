@@ -42,12 +42,6 @@ module Skylab::TanMan
             bc or super
           end
         end
-
-      public
-
-        def receive_model_parser_loading_info_event ev
-          # receive_event ev  #dbg
-        end
       end
 
       Ls = make_action_class :List
@@ -86,7 +80,7 @@ module Skylab::TanMan
       end
 
       def touch_node_via_label s
-        node = Node_.edited @event_receiver, @kernel do |o|
+        node = Node_.edited @kernel, handle_event_selectively do |o|
           o.with :name, s
         end
         if node.error_count.zero?
@@ -94,7 +88,7 @@ module Skylab::TanMan
         end
       end
 
-      def persist_entity entity, _event_receiver
+      def persist_entity entity
         ok = mutate_via_verb_and_entity :create, entity
         ok and datastore_controller.persist_via_args( *
           @action.output_related_arguments )
@@ -110,9 +104,10 @@ module Skylab::TanMan
           verb_i,
           entity,
           _dsc,
-          @event_receiver, @kernel ]
+          @kernel, @on_event_selectively ]
       end
     end
+
     STOP_ = false
   end
 

@@ -17,11 +17,11 @@ module Skylab::TanMan
         end
 
         def when_document_did_not_change
-          _ev = build_neutral_event_with :document_did_not_change do |y, o|
-            y << "document did not change."
-          end
-          send_event _ev
-          nil
+          maybe_send_event :info, :document_did_not_change do
+            build_neutral_event_with :document_did_not_change do |y, o|
+              y << "document did not change."
+            end
+          end ; nil
         end
 
         def flush_changed_document_to_ouptut_adapter
@@ -107,8 +107,15 @@ module Skylab::TanMan
         end
 
         def bc_when_non_1_doc_IO direction_i, arg_a
+          _x = maybe_send_event :error, :non_one_IO do
+            bld_non_one_IO_event direction_i, arg_a
+          end
+          Brazen_.bound_call.via_value _x
+        end
+
+        def bld_non_one_IO_event direction_i, arg_a
           _PROPS = self.class.properties
-          _ev = build_not_OK_event_with :non_one_IO,
+          build_not_OK_event_with :non_one_IO,
               :direction_i, direction_i, :arg_a, arg_a do |y, o|
             if o.arg_a.length.zero?
               _prop_a = _PROPS.reduce_by do |arg|
@@ -128,8 +135,6 @@ module Skylab::TanMan
             y << "need exactly 1 #{ o.direction_i }-related argument, #{
              }had #{ o.arg_a.length }#{ _xtra }"
           end
-          _x = send_event _ev
-          Brazen_.bound_call.via_value _x
         end
       end
 

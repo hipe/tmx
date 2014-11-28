@@ -197,8 +197,8 @@ module Skylab::TanMan
           result
         end
 
-        def receive_parse_failure_event ev
-          raise ev.to_exception  # #todo
+        def receive_parse_failure_event ev  # #hook-out [ttt]
+          raise ev.to_exception
         end
 
         def build_parse_failure_event

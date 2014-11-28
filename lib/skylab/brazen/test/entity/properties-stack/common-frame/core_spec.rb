@@ -57,19 +57,19 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__
       it "failing to provide a required field triggers an argument error" do
         Sandbox_2.with self
         module Sandbox_2
+          _rx = ::Regexp.new( "\\Amissing\\ required\\ field\\ \\-\\ 'foo'\\z" )
           -> do
             Foo.new
-          end.should raise_error( ArgumentError,
-                       ::Regexp.new( "\\Amissing\\ required\\ field\\ \\-\\ 'foo'\\z" ) )
+          end.should raise_error( ArgumentError, _rx )
         end
       end
       it "passing nil is considered the same as not passing an argument" do
         Sandbox_2.with self
         module Sandbox_2
+          _rx = ::Regexp.new( "\\Amissing\\ required\\ field\\ \\-\\ 'foo'\\z" )
           -> do
             Foo.new( :foo, nil )
-          end.should raise_error( ArgumentError,
-                       ::Regexp.new( "\\Amissing\\ required\\ field\\ \\-\\ 'foo'\\z" ) )
+          end.should raise_error( ArgumentError, _rx )
         end
       end
       it "passing false is not the same as passing nil, passing false is valid." do

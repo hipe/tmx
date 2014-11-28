@@ -24,9 +24,9 @@ module Skylab::TanMan
 
     LABEL__ = 'label'.freeze
 
-    def _create_node_with_label label, error
+    def _create_node_with_label label, & oes_p
       node_stmt = __dupe
-      ok = Set_label_of_new_node_made_from_prototype__[ label, node_stmt, error ]
+      ok = Set_label_of_new_node_made_from_prototype__[ label, node_stmt, oes_p ]
       ok && node_stmt
     end
 
@@ -50,7 +50,10 @@ module Skylab::TanMan
 
     class Set_label_of_new_node_made_from_prototype__
 
-      Callback_::Actor[ self, :properties, :label, :node, :error_ev_p ]
+      Callback_::Actor[ self, :properties,
+        :label,
+        :node,
+        :on_event_selectively ]
 
       def execute
         @equals = @node._label_sexp[ :content ][ :equals ]
@@ -63,7 +66,7 @@ module Skylab::TanMan
       end
 
       def when_template_parameters
-        s = @equals[ :id ]._escape_string @label, @error_ev_p
+        s = @equals[ :id ]._escape_string @label, & @on_event_selectively
         s and begin
           _tmpl = TanMan_._lib.string_lib.template.via_string @str
           out_s = _tmpl.call label: s

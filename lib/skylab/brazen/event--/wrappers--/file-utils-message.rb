@@ -56,7 +56,7 @@ module Skylab::Brazen
         end
 
         # in the below regex the various commands are coded for in the
-        # order that they appear in the subject file at the this time.
+        # order that they appear in the subject file currently.
 
         PATH_HACK_RX__ = %r(\A
 

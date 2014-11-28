@@ -11,7 +11,7 @@ module Skylab::Headless
 
         :argv, :IO_adapter, :stx, :evr
 
-      Headless_._lib.event_lib.sender self
+      Headless_._lib.event_lib.selective_builder_sender_receiver self
 
       def execute
         if 1 < @argv.length

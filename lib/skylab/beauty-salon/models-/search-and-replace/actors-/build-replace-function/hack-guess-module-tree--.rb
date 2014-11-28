@@ -39,7 +39,7 @@ module Skylab::BeautySalon
           end
         end
 
-        BS_._lib.event_lib.sender self
+        BS_._lib.event_lib.selective_builder_sender_receiver self
 
         def initialize a
           @path, @on_event_selectively = a

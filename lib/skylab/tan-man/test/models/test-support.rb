@@ -30,7 +30,7 @@ module Skylab::TanMan::TestSupport::Models
 
     TestLib_::API_expect[ self ]
 
-    def bld_event_receiver
+    def build_event_receiver_for_expect_event
       evr = super
       evr.add_event_pass_filter do |ev|
         :using != ev.terminal_channel_i
@@ -45,17 +45,18 @@ module Skylab::TanMan::TestSupport::Models
     def b_c_c
       silo
       _id = @silo.model_class.node_identifier
-      evr = event_receiver
-      kernel = self.kernel
+
+      oes_p = handle_event_selectively
+
+      k = kernel
 
       _inp_a = send :"bld_input_args_when_#{ input_mechanism_i }"
 
-      @action = Mock_Action__.new _inp_a, evr, kernel
+      @action = Mock_Action__.new _inp_a, k, & oes_p
 
+      _g = Brazen_::Model_::Preconditions_::Graph.new @action, k, & oes_p
 
-      _g = Brazen_::Model_::Preconditions_::Graph.new @action, evr, kernel
-
-      @silo.provide_collection_controller_prcn _id, _g, evr
+      @silo.provide_collection_controller_prcn _id, _g, & oes_p
     end
 
     def bld_input_args_when_input_file_granule
@@ -134,16 +135,16 @@ module Skylab::TanMan::TestSupport::Models
 
   class Mock_Action__
 
-    def initialize inp_a, evr, k
-      @event_receiver = evr
+    def initialize inp_a, k, & oes_p
       @input_arguments = inp_a
       @kernel = k
+      @oes_p = oes_p
+    end
+
+    def controller_nucleus  # #experiment in [br]
+      [ @kernel, @oes_p ]
     end
 
     attr_reader :input_arguments
-
-    def controller_nucleus
-      [ @event_receiver, @kernel ]
-    end
   end
 end

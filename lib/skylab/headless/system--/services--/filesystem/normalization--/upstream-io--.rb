@@ -30,7 +30,14 @@ module Skylab::Headless
               @is_only_path_ftype_expectation = true
             end
 
-            o :properties, :instream, :on_event
+            def on_event=
+              oe_p = iambic_property
+              @on_event_selectively = -> *, & ev_p do
+                oe_p[ ev_p[] ]
+              end
+            end
+
+            o :properties, :instream, :on_event_selectively
           end
 
           def initialize & p
@@ -87,7 +94,13 @@ module Skylab::Headless
           end
 
           def when_actual_both  # #storypoint-20
-            _ev = build_not_OK_event_with :ambiguous_upstream_arguments,
+            maybe_send_event :error, :ambiguous_upstream_arguments do
+              bld_AUA_event
+            end
+          end
+
+          def bld_AUA_event
+            build_not_OK_event_with :ambiguous_upstream_arguments,
                 :path_arg, @path_arg do |y, o|
 
               _prop = o.path_arg.property
@@ -95,23 +108,32 @@ module Skylab::Headless
               y << "ambiguous upstream arguments - cannot read from both #{
                 }STDIN and #{ par _prop }"
             end
-            send_event _ev
           end
 
           def when_actual_neither
-            _ev = build_not_OK_event_with :missing_required_properties,
+            maybe_send_event :error, :missing_required_properties do
+              bld_MRP_no_path_or_STDIN
+            end
+          end
+
+          def bld_MRP_no_path_or_STDIN
+            build_not_OK_event_with :missing_required_properties,
                 :path_property, @path_arg.property do |y, o|
               y << "expecting #{ par o.path_property } or STDIN"
             end
-            send_event _ev
           end
 
           def when_path_not_provided
-            _ev = build_not_OK_event_with :missing_required_properties,
+            maybe_send_event :error, :missing_required_properties do
+              bld_MRP_no_path
+            end
+          end
+
+          def bld_MRP_no_path
+            build_not_OK_event_with :missing_required_properties,
                 :path_property, @path_arg.property do |y, o|
               y << "expecting #{ par o.path_property }"
             end
-            send_event _ev
           end
 
           def when_actual_instream
@@ -129,15 +151,18 @@ module Skylab::Headless
           end
 
           def when_no_stat
-            @on_event[ wrap_exception @stat_e ]
+            maybe_send_event :error, :stat_error do
+              wrap_exception @stat_e
+            end
           end
 
           def when_stat
             if FILE_FTYPE_ == @stat.ftype
               when_stat_is_file
             else
-              _ev = via_stat_and_path_build_wrong_ftype_event FILE_FTYPE_
-              @on_event[ _ev ]
+              maybe_send_event :error, :wrong_ftype do
+                via_stat_and_path_build_wrong_ftype_event FILE_FTYPE_
+              end
             end
           end
 
@@ -154,7 +179,9 @@ module Skylab::Headless
             if @IO
               @as_normal_value[ @IO ]
             else
-              @on_event[ wrap_excetion @e ]
+              maybe_send_event :error, :exception do
+                wrap_excetion @e
+              end
             end
           end
 

@@ -53,10 +53,10 @@ module Skylab::Brazen
         properties.fetch NAME_
       end
 
-      def new_flyweight evr, kern
-        new kern do
-          @event_receiver = evr
+      def new_flyweight kernel, & oes_p
+        new kernel do
           @property_box = Flyweight_Property_Box__.new self
+          recv_selective_listener_proc oes_p
         end
       end
 
@@ -99,17 +99,17 @@ module Skylab::Brazen
         const_get :Silo__, false
       end
 
-      def unmarshalled event_receiver, kernel, & p
+      def unmarshalled kernel, oes_p, & p
         entity = new kernel do
-          @event_receiver = event_receiver
+          recv_selective_listener_proc oes_p
           @came_from_persistence = true
         end
         entity.first_edit_via_proc p
       end
 
-      def edited event_receiver, kernel, & p
+      def edited kernel, oes_p, & p
         entity = new kernel do
-          @event_receiver = event_receiver
+          recv_selective_listener_proc oes_p
         end
         entity.first_edit_via_proc p
       end
@@ -227,10 +227,6 @@ module Skylab::Brazen
         "action prop not set: '#{ i }'"
       end
 
-      def sign_event ev
-        Event_[].wrap.signature name, ev
-      end
-
       self
     end
 
@@ -304,17 +300,22 @@ module Skylab::Brazen
       @property_box[ i ]
     end
 
-    def normalize_property_value_via_normal_entity prop, ent, evr
+    def normalize_property_value_via_normal_entity prop, ent, & oes_p
       normal_x = ent.property_value prop.name_i
       mine_x = property_value prop.name_i
       if normal_x != mine_x
         @property_box.replace prop.name_i, normal_x
-        _ev = build_OK_event_with :normalized_value, :prop, prop,
-            :previous_x, mine_x, :current_x, normal_x do |y, o|
-          y << "using #{ ick o.current_x } for #{ par o.prop } #{
-           }(was #{ ick o.previous_x })"
+        maybe_send_event :info, :normalized_value do
+          bld_normalized_value_event normal_x, mine_x, prop
         end
-        send_event _ev
+      end
+    end
+
+    def bld_normalized_value_event normal_x, mine_x, prop
+      build_OK_event_with :normalized_value, :prop, prop,
+          :previous_x, mine_x, :current_x, normal_x do |y, o|
+        y << "using #{ ick o.current_x } for #{ par o.prop } #{
+         }(was #{ ick o.previous_x })"
       end
     end
 
@@ -540,8 +541,14 @@ module Skylab::Brazen
       @parameter_box ||= Box_.new
       es = Early_Edit_Shell__.new @parameter_box, x_a=[], self.class.properties
       p[ es ]
-      x = es.evr and @event_receiver = x
-      x = es.precons and @preconditions = x
+      oes_p = es.handle_event_selectively
+      if oes_p
+        recv_selective_listener_proc oes_p
+      end
+      precons = es.precons
+      if precons
+        @preconditions = precons
+      end
       @property_box ||= Box_.new
       @error_count ||= 0
       if x_a.length.nonzero?
@@ -552,11 +559,13 @@ module Skylab::Brazen
 
     class Early_Edit_Shell__ < Late_Edit_Shell__
 
-      attr_accessor :precons, :evr
+      attr_accessor :precons
 
-      def with_event_receiver x
-        @evr = x ; nil
+      def on_event_selectively & oes_p
+        @handle_event_selectively = oes_p ; nil
       end
+
+      attr_reader :handle_event_selectively
 
       def with_preconditions x
         @precons = x ; nil
@@ -579,11 +588,11 @@ module Skylab::Brazen
     # ~ create
 
     def produce_any_persist_result
-      datastore_resolved_OK and @datastore.persist_entity self, self
+      datastore_resolved_OK and @datastore.persist_entity self, & handle_event_selectively
     end
 
-    def persist_entity x, evr
-      datastore_resolved_OK and @datastore.persist_entity x, evr
+    def persist_entity x, & oes_p
+      datastore_resolved_OK and @datastore.persist_entity x, & oes_p
     end
 
     def any_native_create_before_create_in_datastore
@@ -592,25 +601,25 @@ module Skylab::Brazen
 
     # ~ retrive one
 
-    def entity_via_identifier id_o, evr
-      datastore_resolved_OK and @datastore.entity_via_identifier id_o, evr
+    def entity_via_identifier id_o, & oes_p
+      datastore_resolved_OK and @datastore.entity_via_identifier id_o, & oes_p
     end
 
     # ~ retrieve (many)
 
-    def entity_scan_via_class cls, evr
-      datastore_resolved_OK and @datastore.entity_scan_via_class cls, evr
+    def entity_scan_via_class cls, & oes_p
+      datastore_resolved_OK and @datastore.entity_scan_via_class cls, & oes_p
     end
 
     # ~ delete (anemic out-of-box implementation: pass the buck)
 
-    def delete_entity entity, evr
-      datastore_resolved_OK and @datastore.delete_entity entity, evr
+    def delete_entity entity, & oes_p
+      datastore_resolved_OK and @datastore.delete_entity entity, & oes_p
     end
 
   private
 
-    public def any_native_delete_before_delete_in_datastore erv
+    public def any_native_delete_before_delete_in_datastore
       PROCEDE_
     end
 
@@ -646,9 +655,9 @@ module Skylab::Brazen
     end
 
     def via_kernel_rslv_datastore
-      silo = @kernel.silo_via_identifier @persist_to, @event_receiver
+      silo = @kernel.silo_via_identifier @persist_to, & @on_event_selectively
       if silo
-        @datastore = silo.dsc_via_entity self, @event_receiver
+        @datastore = silo.dsc_via_entity self, & @on_event_selectively
         @datastore_resolved_OK = @datastore ? true : false
       else
         @datastore_resolved_OK = false
@@ -677,6 +686,12 @@ module Skylab::Brazen
       @kernel.silo_via_identifier self.class.node_identifier
     end
 
+    # ~ the event throughput pipeline
+
+    def recv_selective_listener_proc oes_p
+      receive_selective_listener_proc oes_p ; nil
+    end
+
  public  # ~ multipurpose internal readers & callbacks
 
     def action_via_action_class cls
@@ -692,10 +707,6 @@ module Skylab::Brazen
     def datastore  # for low-level actors
       _ok = datastore_resolved_OK
       _ok and @datastore
-    end
-
-    def receive_event ev
-      @event_receiver.receive_event ev
     end
 
     class Process_customized_model_inflection_behavior__
@@ -807,7 +818,7 @@ module Skylab::Brazen
         :action,
         :preconditions,
         :model_class,
-        :event_receiver, :kernel ]
+        :kernel, :on_event_selectively ]
 
       class << self
 
@@ -842,40 +853,40 @@ module Skylab::Brazen
         self
       end
 
-      def persist_entity ent, evr
+      def persist_entity ent, & oes_p
         @dsc ||= datastore_controller
-        @dsc and via_dsc_persist_entity ent, evr
+        @dsc and via_dsc_persist_entity ent, & oes_p
       end
 
     private
 
-      def normalize_entity_name_via_fuzzy_lookup ent, evr
-        ent_ = one_entity_via_fuzzy_lookup ent, evr
+      def normalize_entity_name_via_fuzzy_lookup ent, & oes_p  # (covered by [tm] for now)
+        ent_ = one_entity_via_fuzzy_lookup ent, & oes_p
         ent_ and begin
           ent.normalize_property_value_via_normal_entity(
-            ent.class.local_entity_identifier_string, ent_, evr )
+            ent.class.local_entity_identifier_string, ent_, & oes_p )
           ACHIEVED_
         end
       end
 
-      def one_entity_via_fuzzy_lookup ent, evr
-        ent_a = matching_entities_via_fuzzy_lookup ent, evr
+      def one_entity_via_fuzzy_lookup ent, & oes_p
+        ent_a = matching_entities_via_fuzzy_lookup ent, & oes_p
         case 1 <=> ent_a.length
         when  0
           ent_a.fetch 0
         when -1
-          one_entity_when_via_fuzzy_lookup_ambiguous ent_a, ent, evr  # #todo
+          one_entity_when_via_fuzzy_lookup_ambiguous ent_a, ent, & oes_p  # #todo
         when  1
-          one_entity_when_via_fuzzy_lookup_not_found ent, evr
+          one_entity_when_via_fuzzy_lookup_not_found ent, & oes_p
         end
       end
 
-      def matching_entities_via_fuzzy_lookup ent, evr
+      def matching_entities_via_fuzzy_lookup ent, & oes_p
 
         against_s = ent.local_entity_identifier_string
         rx = /\A#{ ::Regexp.escape against_s }/
 
-        a = [] ; scn = entity_scan_via_class ent.class, evr
+        a = [] ; scn = entity_scan_via_class ent.class, & oes_p
 
         while x = scn.gets
           s = x.local_entity_identifier_string
@@ -891,15 +902,24 @@ module Skylab::Brazen
         a
       end
 
-      def one_entity_when_via_fuzzy_lookup_not_found ent, evr
+      def one_entity_when_via_fuzzy_lookup_not_found ent, & oes_p
 
-        scn = entity_scan_via_class ent.class, evr
+        oes_p.call :error, :entity_not_found do
+          bld_entity_not_found_event ent
+        end
 
-        _a_few_ent_a = scn.take A_FEW__ do |x|
+        UNABLE_
+      end
+
+      def bld_entity_not_found_event ent
+
+        _scn = entity_scan_via_class ent.class
+
+        _a_few_ent_a = _scn.take A_FEW__ do |x|
           x.dup
         end
 
-        _ev = build_not_OK_event_with :entity_not_found,
+        build_not_OK_event_with :entity_not_found,
             :ent, ent, :a_few_ent_a, _a_few_ent_a do |y, o|
 
           human_s = ent.class.name_function.as_human
@@ -913,27 +933,25 @@ module Skylab::Brazen
             }(some known #{ human_s }#{ s s_a }: #{ s_a * ', ' })"
 
         end
-        evr.receive_event _ev
-        UNABLE_
       end
 
       A_FEW__ = 3
 
-      def via_dsc_persist_entity ent, evr
-        @dsc.persist_entity ent, evr
+      def via_dsc_persist_entity ent, & oes_p
+        @dsc.persist_entity ent, & oes_p
       end
 
     public
 
-      def delete_entity id_x, evr
+      def delete_entity id_x, & oes_p
         @dsc ||= datastore_controller
-        @dsc and via_dsc_delete_entity id_x, evr
+        @dsc and via_dsc_delete_entity id_x, & oes_p
       end
 
     private
 
       def prvd_act_prcn_when_entity id, _g
-        ds = datastore.entity_via_identifier id, @event_receiver
+        ds = datastore.entity_via_identifier id, & handle_event_selectively
         ds and ds.as_precondition_via_preconditions @preconditions
       end
 
@@ -951,7 +969,7 @@ module Skylab::Brazen
       Actor_[ self, :properties,
         :preconditions,
         :model_class,
-        :event_receiver, :kernel ]
+        :kernel, :on_event_selectively ]
 
       def initialize
         super
@@ -968,20 +986,18 @@ module Skylab::Brazen
             :on_self_reliance, method( :when_cc_relies_on_self ),
             :graph, graph,
             :level_i, :collection_controller_prcn,
-            :event_receiver, @event_receiver )
+            :on_event_selectively, @on_event_selectively )
           bx and begin
             model_class.collection_controller.build_with(
               :action, graph.action,
               :preconditions, bx,
               :model_class, model_class,
-              :event_receiver, @event_receiver,
-              :kernel, @kernel )
+              :kernel, @kernel, :on_event_selectively, @on_event_selectively )
           end
         else
           model_class.collection_controller.build_with(
             :model_class, model_class,
-            :event_receiver, @event_receiver,
-            :kernel, @kernel )
+            :kernel, @kernel, :on_event_selectively, @on_event_selectively )
         end
       end
 
@@ -990,14 +1006,6 @@ module Skylab::Brazen
       end
 
     private
-
-      def receive_silo_controller_as_precondition_method_not_implemented ev
-        receive_event ev
-      end
-
-      def receive_event ev
-        @event_receiver.receive_event ev
-      end
 
       def wrap_action_precondition_not_resolved_from_identifier_event ev
         ev
@@ -1031,21 +1039,21 @@ module Skylab::Brazen
         model_class.name_function.as_lowercase_with_underscores_symbol
       end
 
-      def provide_action_prcn id, g, evr
+      def provide_action_prcn id, g, & oes_p
         cc = g.touch :collection_controller_prcn, id, self
         cc and begin
-          cc.provide_action_precondition id, g
+          cc.provide_action_precondition id, g, & oes_p
         end
       end
 
-      def provide_collection_controller_prcn id, g, evr
+      def provide_collection_controller_prcn id, g, & oes_p
         sc = g.touch :silo_controller_prcn, id, self
         sc and begin
-          sc.provide_collection_controller_precon id, g
+          sc.provide_collection_controller_precon id, g, & oes_p
         end
       end
 
-      def provide_silo_controller_prcn id, g, evr
+      def provide_silo_controller_prcn id, g, & oes_p
         a = model_class.preconditions
         if a && a.length.nonzero?
           bx = Model_::Preconditions_.establish_box_with(
@@ -1054,15 +1062,15 @@ module Skylab::Brazen
             :on_self_reliance, method( :when_silo_controller_relies_on_self ),
             :graph, g,
             :level_i, :silo_controller_prcn,
-            :event_receiver, evr )
+            :on_event_selectively, oes_p )
           bx and begin
             model_class.silo_controller.build_with(
               :preconditions, bx,
               :model_class, model_class,
-              :event_receiver, evr, :kernel, @kernel )
+              :kernel, @kernel, :on_event_selectively, oes_p )
           end
         else
-          build_silo_controller evr
+          build_silo_controller( & oes_p )
         end
       end
 
@@ -1070,14 +1078,14 @@ module Skylab::Brazen
         silo
       end
 
-      def dsc_via_entity entity, evr
-        build_silo_controller( evr ).datastore_controller_via_entity entity
+      def dsc_via_entity entity, & oes_p
+        build_silo_controller( & oes_p ).datastore_controller_via_entity entity
       end
 
-      def build_silo_controller evr
+      def build_silo_controller & oes_p
         model_class.silo_controller.build_with(
           :model_class, model_class,
-          :event_receiver, evr, :kernel, @kernel )
+          :kernel, @kernel, :on_event_selectively, oes_p )
       end
     end
   end

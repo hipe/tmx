@@ -4,7 +4,7 @@
 our primary workhorse method interface (family) for deleting is currently:
 
 
-    delete_entity <entity>, <event receiver>
+    delete_entity <entity>, & <on event selectively>
 
 
 ## why not just pass some kind of entity identifier?
@@ -22,7 +22,7 @@ advantages from the perspective of the collection controller:
 • your custom datastore can leverage existing logic you wrote do do
   things like persist.
 
-• your custom silo may need to ivoke logic that is better suited to live
+• your custom silo may need to invoke logic that is better suited to live
   in the entity (class) itself rather than in the controller:
   the entity may be for example a datastore entity itself, (that is, an
   entity that represents a datastore), and have additional cleanup to do

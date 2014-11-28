@@ -43,7 +43,12 @@ module Skylab::Brazen::TestSupport::Data_Stores::Git_Config
 
     it "a bare word not in a section fails (with more detail)" do
       with 'moby'
-      ev = subject.parse_string @input_string do |x| x end  # IDENTITY_
+      chan_i_a = nil
+      ev = subject.parse_string @input_string do | * i_a, & ev_p |
+        chan_i_a = i_a
+        ev_p[]
+      end
+      chan_i_a.should eql [ :error, :config_parse_error ]
       ev.terminal_channel_i.should eql :config_parse_error
       ev.parse_error_category_i.should eql :expected_open_square_bracket
       ev.line_number.should eql 1

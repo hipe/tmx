@@ -10,7 +10,7 @@ module Skylab::Brazen
         end
       end
 
-      Brazen_.event.sender self
+      Brazen_.event.selective_builder_sender_receiver self
 
       def initialize x_a, branch
         @scan = Callback_.iambic_stream.new 0, x_a

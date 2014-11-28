@@ -30,6 +30,7 @@ module Skylab::Brazen
 
         def initialize bx
           @bx = bx
+          @on_event_selectively = nil
         end
 
         def any_all_names
@@ -55,6 +56,7 @@ module Skylab::Brazen
 
         def initialize h
           @h = h
+          @on_event_selectively = nil
           freeze
         end
 
@@ -82,6 +84,7 @@ module Skylab::Brazen
         def initialize i_a  # mutates
           @i_a = i_a.freeze
           @h = ::Hash[ i_a.map { |i| [ i, nil ] } ]
+          @on_event_selectively = nil
         end
 
         def all_names

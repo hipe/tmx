@@ -4,7 +4,7 @@ module Skylab::TanMan
 
       class Actors__::Mutate
 
-        Event_[].sender self
+        Event_[].selective_builder_sender_receiver self
 
         class Touch < self
 
@@ -12,7 +12,7 @@ module Skylab::TanMan
             :name,
             :verb,  # 'create' | 'retrieve' | 'touch'
             :datastore,
-            :event_receiver, :kernel ]
+            :kernel, :on_event_selectively ]
 
           def resolve_name_string
             @name_s = @name ; @name = nil ; nil
@@ -25,7 +25,7 @@ module Skylab::TanMan
             :verb,
             :entity,
             :datastore,
-            :event_receiver, :kernel ]
+            :kernel, :on_event_selectively ]
 
           def resolve_name_string
             @name_s = @entity.property_value :name ; nil
@@ -203,13 +203,15 @@ module Skylab::TanMan
         end
 
         def when_not_found
-          _ev = build_not_OK_event_with :node_not_found, :label, @name_s
-          send_event _ev ; UNABLE_
+          maybe_send_event :error, :node_not_found do
+            build_not_OK_event_with :node_not_found, :label, @name_s
+          end
+          UNABLE_
         end
 
         def resolve_new_node_without_id
           proto = produce_prototype_node
-          new = proto._create_node_with_label @name_s, handle_error
+          new = proto._create_node_with_label @name_s, & handle_event_selectively
           if new
             @created_existing_or_destoryed_node = new
             ACHIEVED_
@@ -296,13 +298,16 @@ module Skylab::TanMan
         end
 
         def when_tuch_when_one_exists_already one
+
           @created_existing_or_destoryed_node = one  # OVERWRITE
 
-          _is_ok = send :"when_#{ @verb }_and_you_found_one_it_is_OK"
+          is_ok = send :"when_#{ @verb }_and_you_found_one_it_is_OK"
 
-          _ev = Node_::Events__::Found_Existing_Node.
-            with :node_stmt, one, :ok, _is_ok
-          send_event _ev
+          maybe_send_event normal_top_channel_via_OK_value( is_ok ), :found_existing_node do
+            Node_::Events__::Found_Existing_Node.
+              with :node_stmt, one, :ok, is_ok
+          end
+
           if :create == @verb
             UNABLE_
           else
@@ -324,7 +329,14 @@ module Skylab::TanMan
         end
 
         def when_ambiguous
-          _ev = build_not_OK_event_with :ambiguous, :name_s, @name_s,
+          maybe_send_event :error, :ambiguous do
+            bld_ambiguous_event
+          end
+          UNABLE_
+        end
+
+        def bld_ambiguous_event
+          build_not_OK_event_with :ambiguous, :name_s, @name_s,
               :nodes, @fuzzy_matches_found do |y, o|
             _s_a = o.nodes.map do |n|
               lbl n.label_or_node_id_normalized_string
@@ -332,8 +344,6 @@ module Skylab::TanMan
             y << "ambiguous node name #{ ick o.name_s }. #{
              }did you mean #{ or_ _s_a }?"
           end
-          send_event _ev
-          UNABLE_
         end
 
         def insert_when_touch_and_no_matches
@@ -358,19 +368,25 @@ module Skylab::TanMan
         end
 
         def send_created_event_for_node node_stmt
-          _ev = build_OK_event_with :created_node, :node_stmt, node_stmt do |y, o|
+          maybe_send_event :info, :created_node do
+            bld_created_node_event node_stmt
+          end
+        end
+
+        def bld_created_node_event node_stmt
+          build_OK_event_with :created_node, :node_stmt, node_stmt do |y, o|
             y << "created node #{ lbl o.node_stmt.label }"
           end
-          send_event _ev
         end
 
         def when_match_not_found
-          _ev = build_match_not_found_event
-          send_event _ev
+          maybe_send_event :error, :match_not_found do
+            bld_match_not_found_event
+          end
           UNABLE_
         end
 
-        def build_match_not_found_event
+        def bld_match_not_found_event
           build_not_OK_event_with :match_not_found, :name_s, @name_s,
               :seen_count, @num_nodes_seen do |y, o|
             y << "couldn't find a node whose label starts with #{
@@ -384,10 +400,6 @@ module Skylab::TanMan
             send_event ev
             UNABLE_
           end
-        end
-
-        def send_event ev
-          @event_receiver.receive_event ev ; nil
         end
 
         POSITIVE_NOTHINGNESS_ = true

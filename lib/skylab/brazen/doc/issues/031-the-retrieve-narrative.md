@@ -34,7 +34,7 @@ model class (with emphasis on "for now").
 
 for now it is not practical to assume that the collection controller
 exists only to serve the interests of the caller: although it may be
-"wired" (that it, it may have an event recevier inside of it), we will
+"wired" (that it, it may have an event receiver inside of it), we will
 not assume it is wired for us; because to do so would limit us in at
 least two ways:
 
@@ -52,8 +52,8 @@ controller with an event receiver of our chosing, this would be
 trivial to implement but note it would mean an interface change from
 what we are describing here.)
 
-as such, we instead opt to pass a single event handler proc (optionally)
-with each call to our method, implemented as a block.
+as such, we insted opt to pass a [#069] selective event listener (as a
+proc) (and it itself is optional) with each call to our method.
 
 we will say that never should there be a good reason to make a loud
 failure from such a query, so in the event that there is no event
@@ -69,7 +69,7 @@ the possible events we expect to emit from such a query are things like
 and so, given all of the above, we have:
 
 
-    entity_via_identifier <identifier>, <event receiver>
+    entity_via_identifier <identifier>, & <on event selectively>
 
 
 `identifier` is a interface that is currently evolving, but will

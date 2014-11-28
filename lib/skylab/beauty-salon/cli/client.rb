@@ -120,12 +120,12 @@ module Skylab::BeautySalon
       x_a.push :code_line_yieldee, _out_y
       x_a.push :from_line, from_line, :to_line, to_line
       @action ||= BS_::Models_::Deliterate.new :_no_kernel_
-      _evr = BS_._lib.proxy_lib.inline :receive_event, -> ev do
-        ev.render_all_lines_into_under @y,
+      _oes_p = -> *, & ev_p do
+        ev_p[].render_all_lines_into_under @y,
           BS_._lib.brazen::CLI.expression_agent_instance
         false
       end
-      bc = @action.bound_call_via_call x_a, _evr
+      bc = @action.bound_call_via_call x_a, & _oes_p
       bc and bc.receiver.send( bc.method_name, * bc.args )
     end
 

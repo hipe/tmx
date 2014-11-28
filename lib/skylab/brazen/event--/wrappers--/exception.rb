@@ -49,7 +49,7 @@ module Skylab::Brazen
 
         end
 
-        Event__.sender self
+        Event__.selective_builder_sender_receiver self
 
         PATH_HACK_RX__ = / @ rb_(?<rb_function_name>[_a-z]+) - /
 

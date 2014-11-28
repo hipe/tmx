@@ -65,9 +65,7 @@ module Skylab::SubTree
     def bld_upstream
       Cov_::Model_Agents__::Upstream::Via_Filesystem.new :path, @path,
         :be_verbose, ( @be_verbose || false ), # is strict about validation
-        :on_event, -> ev do
-          @event_receiver.receive_event ev
-        end
+        :on_event_selectively, handle_event_selectively
     end
 
     def via_child_path
@@ -113,10 +111,7 @@ module Skylab::SubTree
       @list_behavior = Cov_::Actors__::Build_list_behavior.with(
         :hubs, @hub_a,
         :argument_symbol_list, @list_as_a,
-        :on_event, -> ev do
-          send_event ev
-          nil
-        end )
+        :on_event_selectively, handle_event_selectively )
       @list_behavior ? ACHIEVED_ : UNABLE_
     end
 
@@ -144,14 +139,14 @@ module Skylab::SubTree
         Cov_::Actors__::Produce_uber_tree.with(
           :path, @path,
           :hub_a, @hub_a,
-          :on_event, -> ev do
-            send_event ev  # tree card, done with tree
-          end )
+          :on_event_selectively, handle_event_selectively )
       end
     end
 
     def when_no_directory
-      send_event No_Directory__[ @path ].to_event
+      maybe_send_event :error, :no_directory do
+        No_Directory__[ @path ].to_event
+      end
       UNABLE_
     end
 

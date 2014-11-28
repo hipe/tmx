@@ -27,24 +27,14 @@ module Skylab::Brazen::TestSupport::Zerk
     end
 
     def build_mock_parent
-      @evr = event_receiver
-      Mock_Parent__.new method( :recv_event )
-    end
-
-    def recv_event ev
-      event_receiver.receive_event ev
+      evr = event_receiver_for_expect_event
+      Mock_Parent__.new -> *, & ev_p do
+        evr.receive_ev ev_p[]
+      end
     end
   end
 
-  class Mock_Parent__
-
-    def initialize recv_p
-      @handle_event_selectively_via_channel = -> _, & ev_p do
-        recv_p[ ev_p[] ]
-      end
-    end
-
-    attr_reader :handle_event_selectively_via_channel
+  Mock_Parent__ = ::Struct.new :handle_event_selectively_via_channel do
 
     def is_interactive
       false

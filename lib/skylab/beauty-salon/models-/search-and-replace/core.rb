@@ -143,7 +143,7 @@ module Skylab::BeautySalon
         evr = lib.two_stream_event_expressor.new(
           sout, serr, lib.expression_agent_instance )
         -> _, & ev_p do
-          evr.receive_event ev_p[]
+          evr.receive_ev ev_p[]
         end
       end
 

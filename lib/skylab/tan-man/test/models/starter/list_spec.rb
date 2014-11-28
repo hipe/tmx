@@ -11,11 +11,11 @@ module Skylab::TanMan::TestSupport::Models::Starter
       call_API :starter, :ls
 
       expect_OK_event :item do |ev|
-        ev.flyweighted_entity.local_entity_identifier_string.should eql 'digraph.dot'
+        ev.to_event.flyweighted_entity.local_entity_identifier_string.should eql 'digraph.dot'
       end
 
       expect_OK_event :item do |ev|
-        ev.flyweighted_entity.local_entity_identifier_string.should eql 'holy-smack.dot'
+        ev.to_event.flyweighted_entity.local_entity_identifier_string.should eql 'holy-smack.dot'
       end
 
       expect_OK_event :number_of_items_found do |ev|

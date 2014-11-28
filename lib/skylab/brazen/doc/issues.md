@@ -1,11 +1,21 @@
+[#073]       #parent-node: [#011] selective event listening via methods
+[#072] #open modernize this interface
+[#071]       #tracking-tag wrap
+[#070]       #tracking-tag when we intentionally expose a mechanical
+               ivar as a property
+[#069]       #tracking-tag all implementations of `verbose` can probably
+               be replaced with selective event listeners
+[#068]       #tracking-tag we like list methods to be API friendly and result
+               in a stream instead of emitting one event for each item *maybe*
+[#067] #open smooth different interfacings with API actions taxonomy
 [#066]       #done cool new build-less events
-[#065] #open implement unmarshaling for strings with newlines (git-config)
+[#065]       #done implement unmarshaling for strings with newlines (git-config)
 [#064]       #done marshal issue near regexps with escape-looking sequences
 [#063]       [ isomorphicisms and emergent interfaces ]
                [fa] near [#fa-006], [#gv-030] sets the stage nicely)
 [#062]       #doc-node the zerk narrative ..
 [#061]       #tracking-tag `members` as a universal thing
-[#060] #open issue with parsing properties
+[#060]       #done issue with parsing properties
 [#059]       #doc-node names
 [#058]       #parent-node: [#057] the default frame
 [#057]       #parent-node: [#001] the properties stack
@@ -57,7 +67,7 @@
 [#015]       #doc-node: the kernel narrative ..
 [#014] #open `has_custom_moniker` is a smell to exist in entity.
 [#013]       #parent-node: [#025] the model
-[#012]       #spot #in-situ
+[#012] #hole (was: #spot #in-situ)
 [#011]       #parent-node: [#001] the event narrative ..
 [#010]       #doc-node: data stores
 [#009]       #parent-node: [#010] the git config narrative ..

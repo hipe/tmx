@@ -38,7 +38,7 @@ module Skylab::TanMan::TestSupport::Models::Association
     it "remove when associated" do
       call_API_against "digraph {\n foo\nbar\nfoo -> bar\n }\n"
       expect_OK_event :deleted_association do |ev|
-        ev.association.unparse.should eql "foo -> bar"
+        ev.to_event.association.unparse.should eql "foo -> bar"
       end
       @output_s.should eql "digraph {\n foo\nbar\n }\n"
       expect_succeeded

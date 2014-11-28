@@ -6,7 +6,7 @@ module Skylab::Brazen
 
       Actor_[ self, :properties,
         :entity,
-        :event_receiver ]
+        :on_event_selectively ]
 
       def execute
         init_response_receiver_for_self_on_channel :ensure_exists
@@ -18,17 +18,27 @@ module Skylab::Brazen
     public
 
       def ensure_exists_when_201_created _
-        _ev = build_OK_event_with :created_datastore, :description,
-          @entity.description, * @entity.to_even_iambic
-        send_event _ev
+        @on_event_selectively.call :info, :created_datastore do
+          bld_created_datastore_event
+        end
         ACHIEVED_
       end
 
-      def ensure_exists_when_412_precondition_failed o
-        _ev = build_OK_event_with :datastore_exists, :description,
+      def bld_created_datastore_event
+        build_OK_event_with :created_datastore, :description,
           @entity.description, * @entity.to_even_iambic
-        send_event _ev
+      end
+
+      def ensure_exists_when_412_precondition_failed o
+        @on_event_selectively.call :info, :datastore_exists do
+          bld_datastore_exists_event
+        end
         nil
+      end
+
+      def bld_datastore_exists_event
+        build_OK_event_with :datastore_exists, :description,
+          @entity.description, * @entity.to_even_iambic
       end
     end
   end

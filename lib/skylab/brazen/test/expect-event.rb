@@ -16,18 +16,36 @@ module Skylab::Brazen::TestSupport
         end
 
         def call_API_via_iambic x_a
-          x_a.push :event_receiver, event_receiver
+          x_a.push :on_event_selectively, handle_event_selectively
           @result = subject_API.call( * x_a ) ; nil
         end
 
-        def event_receiver
-          @event_receiver ||= bld_event_receiver
+        def handle_event_selectively
+          @HES_p ||= bld_on_event_selectively
         end
 
-        def bld_event_receiver
-          @ev_a = nil
+        def bld_on_event_selectively
+          evr = event_receiver_for_expect_event
+          -> * x_a, & ev_p do
+            _ev = if ev_p
+              ev_p[]
+            else
+              Brazen_.event.inline_via_normal_extended_mutable_channel x_a
+            end
+            evr.receive_ev _ev
+          end
+        end
+
+        def event_receiver_for_expect_event
+          @evr ||= begin
+            @ev_a = nil
+            build_event_receiver_for_expect_event
+          end
+        end
+
+        def build_event_receiver_for_expect_event  # :+#public-API :#hook-in
           Event_Receiver__.new -> ev do
-            ( @ev_a ||= [] ).push ev ; nil
+            ( @ev_a ||= [] ).push ev
           end, self
         end
 
@@ -68,7 +86,8 @@ module Skylab::Brazen::TestSupport
         def expect_no_more_events
           if @ev_a
             if @ev_a.length.nonzero?
-              raise "expected no more events, has #{ @ev_a.first.description }"
+              _ev = @ev_a.first.to_event
+              raise "expected no more events, has #{ _ev.description }"
             end
           end
         end
@@ -88,7 +107,7 @@ module Skylab::Brazen::TestSupport
         # ~ expectations along the different qualities of events
 
         def via_ev_expect_terminal_channel_of i
-          @ev.terminal_channel_i.should eql i
+          @ev.to_event.terminal_channel_i.should eql i
         end
 
         def via_ev_expect_OK_value_of bool
@@ -217,7 +236,7 @@ module Skylab::Brazen::TestSupport
           ( @p_a ||= [] ).push p ; nil
         end
 
-        def receive_event ev
+        def receive_ev ev
           if @p_a
             d = @p_a.index do |p|
               ! p[ ev ]
@@ -236,10 +255,13 @@ module Skylab::Brazen::TestSupport
           @do_debug and express_event ev
           ev_ = ev.to_event
           if ev_.has_tag :flyweighted_entity
-            ev.object_id == ev_.object_id or self._DO_ME
+            was_wrapped = ev.object_id != ev_.object_id
             _ent = ev_.flyweighted_entity.dup
             ev_ = ev_.dup_with :flyweighted_entity, _ent
             ev = ev_
+            if was_wrapped
+              ev = Fake_Wrapper__.new ev
+            end
           end
           @ev_p[ ev ]
           if ev_.has_tag :ok
@@ -299,6 +321,7 @@ module Skylab::Brazen::TestSupport
         end
       end
 
+      Fake_Wrapper__ = ::Struct.new :to_event
 
     Expectation__ = self
 

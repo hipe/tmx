@@ -39,12 +39,19 @@ module Skylab::Brazen
 
       model_class.merge_workspace_resolution_properties_into_via bx, self
 
-      @ws = model_class.edited self, @kernel do |o|
+      _oes_p = event_lib.
+        produce_handle_event_selectively_through_methods.
+          bookends self, :status do | * i_a, & ev_p |
+        maybe_send_event_via_channel i_a, & ev_p
+      end
+
+      @ws = model_class.edited @kernel, handle_event_selectively do |o|
 
         o.with_argument_box bx
 
-        o.with :channel, :status,
-          :prop, self.class.properties.fetch( :path )
+        o.with(
+          :prop, self.class.properties.fetch( :path ),
+          :on_event_selectively, _oes_p )
       end
 
       @ws.error_count.zero? and work
@@ -55,28 +62,25 @@ module Skylab::Brazen
       pn and when_pn
     end
 
-    def receive_status_resource_not_found ev
-      _ev = ev.dup_with :ok, ACHIEVED_
-      receive_event _ev ; nil
-    end
-
-    def receive_status_start_directory_does_not_exist ev
-      receive_event ev ; nil
-    end
-
-    def receive_status_start_directory_is_not_directory ev
-      receive_event ev ; nil
-    end
-
-    def receive_status_found_is_not_file ev
-      receive_event _ev ; nil
-    end
-
     def when_pn
-      send_OK_event_with :resource_exists,
-        :pathname, @ws.pn, :is_completion, true
+      maybe_send_event :info, :resource_exists do
+        build_OK_event_with :resource_exists,
+          :pathname, @ws.pn, :is_completion, true
+      end
     end
 
+    def on_status_resource_not_found_via_channel i_a, & ev_p
+
+      # in a status inquiry, not finding the resource is not not OK. we chose
+      # to make it OK. however because of what are perhaps confused semantics
+      # if we result in true-ish from this method is it treated as a path for
+      # the resource. hence we result in nil.
+
+      maybe_send_event_via_channel i_a do
+        ev_p[].dup_with :ok, ACHIEVED_
+      end
+      nil
+    end
   end
   end
 end

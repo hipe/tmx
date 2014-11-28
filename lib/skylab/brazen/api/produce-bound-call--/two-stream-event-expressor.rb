@@ -10,7 +10,7 @@ module Skylab::Brazen
         @out, @err, @expag = a
       end
 
-      def receive_event ev
+      def receive_ev ev
         ev_ = ev.to_event
         if ev_.has_tag :ok
           if ev_.ok

@@ -111,7 +111,7 @@ module Skylab::Headless
             :mod,
             :abbrev
 
-          Headless_._lib.event_lib.sender self
+          Headless_._lib.event_lib.selective_builder_sender_receiver self
 
           def initialize
             @abbrev = nil

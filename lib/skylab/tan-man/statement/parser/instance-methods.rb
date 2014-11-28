@@ -76,10 +76,6 @@ module Skylab::TanMan
       res
     end
 
-    def receive_parser_error_message s
-      error s
-    end
-
     def entity_noun_stem
       ENTITY_NOUN_STEM__
     end

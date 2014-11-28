@@ -2,6 +2,8 @@ module Skylab::TanMan
 
   class Models_::Comment
 
+    Actions = ::Module.new
+
     module Line_Scan
 
       class << self

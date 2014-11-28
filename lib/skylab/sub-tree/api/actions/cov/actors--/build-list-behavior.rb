@@ -14,7 +14,9 @@ module Skylab::SubTree
       Callback_::Actor.call self, :properties,
         :hubs,
         :argument_symbol_list,
-        :on_event
+        :on_event_selectively
+
+      SubTree_._lib.event_lib.selective_builder_sender_receiver self
 
       def execute
         ok = normalize
@@ -97,25 +99,22 @@ module Skylab::SubTree
 
       def bork mcls, * a
         @ok = false
-        _msg = mcls.build_via_arglist a
-        _ev = _msg.to_event
-        send_event _ev
-        nil
-      end
-
-      def send_event ev
-        @on_event[ ev ]
+        maybe_send_event :error, :bork do
+          mcls.build_via_arglist( a ).to_event
+        end
         nil
       end
 
       def flush
-        List_Behavior__.new @union, @mutex_value, @hubs, @on_event
+        List_Behavior__.new @union, @mutex_value, @hubs, @on_event_selectively
       end
 
       class List_Behavior__
 
+        SubTree_._lib.event_lib.selective_builder_sender_receiver self
+
         def initialize * a
-          @union, @special_format_symbol, @hubs, @on_event = a
+          @union, @special_format_symbol, @hubs, @on_event_selectively = a
         end
 
         attr_reader :special_format_symbol
@@ -129,20 +128,23 @@ module Skylab::SubTree
           grand_total = 0
           hub_a.each do |hub|
             count = 0
-            send_event Hub_Point__[ hub, @special_format_symbol ]
+            maybe_send_event :info, :hub_point do
+              Hub_Point__[ hub, @special_format_symbol ]
+            end
             hub._local_test_pathname_a.each do |ltpn|
               count += 1
-              send_event Test_File__[ ltpn, hub, @special_format_symbol ]
+              maybe_send_event :info, :test_file do
+                Test_File__[ ltpn, hub, @special_format_symbol ]
+              end
             end
-            send_event Number_of_Test_Files__[ count, :in_hub ]
+            maybe_send_event :info, :number_of_test_files_in_hub do
+              Number_of_Test_Files__[ count, :in_hub ]
+            end
             grand_total += count
           end
-          send_event Number_of_Test_Files__[ grand_total, :grand_total ]
-          nil
-        end
-      private
-        def send_event ev
-          @on_event[ ev ]
+          maybe_send_event :info, :number_of_test_files_total do
+            Number_of_Test_Files__[ grand_total, :grand_total ]
+          end
           nil
         end
       end

@@ -233,6 +233,8 @@ module Skylab::Brazen
 
       module Common_Frame__
 
+        Brazen_.event.selective_builder_sender_receiver self
+
         def any_all_names
           all_names
         end
@@ -261,6 +263,8 @@ module Skylab::Brazen
           end
         end
 
+        attr_reader :on_event_selectively  # avoid a warning
+
       private
 
         def val_via_prop prop
@@ -273,18 +277,19 @@ module Skylab::Brazen
         end
 
         def property_value_when_prop_not_readable prop
-          _ev = build_not_OK_event_with :property_is_not_readable, :property, prop
-          send_event _ev
+          maybe_send_event :error, :property_is_not_readable do
+            build_not_OK_event_with :property_is_not_readable, :property, prop
+          end
         end
 
-        def build_not_OK_event_with * x_a, & p
-          x_a.push :ok, false
-          p ||= Brazen_.event::Inferred_Message.to_proc
-          Brazen_.event.inline_via_iambic_and_message_proc x_a, p
-        end
-
-        def send_event ev
-          raise ev.to_exception
+        def produce_handle_event_selectively_via_channel
+          if on_event_selectively
+            super
+          else
+            -> i_a, & ev_p do
+              raise ev_p[].to_exception
+            end
+          end
         end
       end
 
@@ -394,7 +399,13 @@ module Skylab::Brazen
           end
 
           def normalize_and_validate_when_missing_requireds miss_prop_a, x
-            _ev = build_not_OK_event_with :missing_required_properties,
+            maybe_send_event :error, :missing_required_properties do
+              bld_missing_required_properties_event miss_prop_a
+            end
+          end
+
+          def bld_missing_required_properties_event miss_prop_a
+            build_not_OK_event_with :missing_required_properties,
                 :error_category, :argument_error,
                 :miss_a, miss_prop_a do |y, o|
 
@@ -408,7 +419,6 @@ module Skylab::Brazen
 
               y << "missing required field#{ s s_a } - #{ _x }"
             end
-            send_event _ev
           end
         end
 

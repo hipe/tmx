@@ -115,7 +115,13 @@ module Skylab::Brazen
       module Meta_Prop_IMs__
       private
         def when_bad_enum_value x, name_i, enum_box
-          _ev = build_not_OK_event_with :invalid_property_value,
+          maybe_send_event :error, :invalid_property_value do
+            bld_invalid_property_value_event x, name_i, enum_box
+          end
+        end
+
+        def bld_invalid_property_value_event x, name_i, enum_box
+          build_not_OK_event_with :invalid_property_value,
             :x, x, :name_i, name_i,
             :enum_box, enum_box,
             :error_category, :argument_error do |y, o|
@@ -123,7 +129,6 @@ module Skylab::Brazen
               y << "invalid #{ o.name_i } #{ ick o.x }, #{
                }expecting { #{ _a * ' | ' } }"
           end
-          receive_event _ev
         end
       end
 
@@ -247,9 +252,9 @@ module Skylab::Brazen
         end
 
         def when_child_did_not_scan_something
-          _ev = via_current_token_build_extra_iambic_event
-          receive_event _ev
-          UNABLE_
+          maybe_receive_event :error, :extra_iambic do
+            via_current_token_build_extra_iambic_event
+          end
         end
 
         def when_this_child_scanned_something o
@@ -268,11 +273,16 @@ module Skylab::Brazen
         end
 
         def when_no_def
-          _ev = build_not_OK_event_with :expected_method_definition,
+          maybe_receive_event :error, :expected_method_definition do
+            bld_expected_method_definition_event
+          end
+        end
+
+        def bld_expected_method_definition_event
+          build_not_OK_event_with :expected_method_definition,
               :error_category, :argument_error do |y, o|
             y << "expected method definition at end of iambic input"
           end
-          receive_event _ev
         end
 
         def iambic_keyword i
@@ -285,22 +295,26 @@ module Skylab::Brazen
         end
 
         def when_not_iambic_keyword i
-          _ev = build_not_OK_event_with :expecting_keyword,
+          maybe_receive_event :error, :expecting_keyword do
+            bld_maybe_expecting_keyword_event i
+          end
+        end
+
+        def bld_maybe_expecting_keyword_event i
+          build_not_OK_event_with :expecting_keyword,
               :keyword, i,
               :x, current_iambic_token,
               :error_category, :argument_error do |y, o|
             y << "expected #{ code o.keyword } not #{ ick o.x }"
           end
-          receive_event _ev
         end
 
         def build_not_OK_event_with * x_a, & p
           Brazen_.event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, p
         end
 
-        def receive_event ev
-          _e = ev.to_exception
-          raise _e
+        def maybe_receive_event *, & ev_p
+          raise ev_p[].to_exception
         end
       end
 

@@ -72,6 +72,14 @@ module Skylab::Callback
       @delegate = x ; nil
     end
 
+    def delegate_to_selectively oes_p
+      @delegate = Delegate_Proxy__.new do |ev|
+        oes_p.call do
+          ev
+        end
+      end
+    end
+
     def use_channel_name_in_receiver_method_name i
       @channel_i = i
     end
@@ -143,6 +151,10 @@ module Skylab::Callback
 
     def chan_scan
       Callback_.scan.via_nonsparse_array self.class::CHANNEL_A__
+    end
+
+    class Delegate_Proxy__ < ::Proc
+      alias_method :receive_event, :call
     end
   end
 end

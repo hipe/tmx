@@ -23,10 +23,10 @@ module Skylab::Brazen
 
     DEFAULT_PROPERTY_LEMMA__ = 'property'.freeze
 
-    def initialize event_receiver=nil, namelist=nil
+    def initialize namelist=nil, & oes_p
       @a = []
-      @event_receiver = event_receiver
       @d = -1
+      @on_event_selectively = oes_p
       if namelist
         push_frame Pstack_::Models__::Name_frame_via_namelist[ namelist ]
       end
@@ -37,8 +37,9 @@ module Skylab::Brazen
       if pptr
         pptr.property_value i
       else
-        _ev = self.class.build_extra_properties_event [ i ]
-        send_event _ev
+        maybe_send_event :error, :extra_properties do
+          bld_extra_properties_event [ i ]
+        end
       end
     end
 
@@ -82,15 +83,20 @@ module Skylab::Brazen
   private
 
     def when_xtra xtra_a
-      _ev = Pstack_.build_extra_properties_event xtra_a
-      send_event _ev
+      maybe_send_event :error, :extra_properties do
+        bld_extra_properties_event xtra_a
+      end
     end
 
-    def send_event ev
-      if @event_receiver
-        @event_receiver.receive_event ev
-      else
-        raise ev.to_exception
+    def bld_extra_properties_event xtra_a
+      Pstack_.build_extra_properties_event xtra_a
+    end
+
+    def maybe_send_event * i_a, & ev_p
+      if @on_event_selectively
+        @on_event_selectively.call( * i_a, & ev_p )
+      elsif :error == i_a.first
+        raise ev_p[].to_exception
       end
     end
 

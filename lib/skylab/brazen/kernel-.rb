@@ -48,8 +48,41 @@ module Skylab::Brazen
       get_model_scan.expand_by do |item|
         if item.respond_to? :get_unbound_upper_action_scan
           item.get_unbound_upper_action_scan
-        end  # else #is-ordinary-module
+        else
+          dflt_unbound_upper_action_stream_via_item item
+        end
       end
+    end
+
+    private def dflt_unbound_upper_action_stream_via_item item  # experiment #open [#067]
+      box_mod = const_i_a = d = p = nil
+      main = -> do
+        begin
+          if d.zero?
+            p = EMPTY_P_[]
+            break
+          end
+          d -= 1
+          mod = box_mod.const_get const_i_a.fetch d
+          if mod.is_promoted
+            x = mod
+            break
+          end
+          redo
+        end while nil
+        x
+      end
+      p = -> do
+        box_mod = item::Actions
+        const_i_a = box_mod.constants
+        const_i_a.sort!
+        d = const_i_a.length
+        p = main
+        p[]
+      end
+      ( Callback_.stream do
+        p[]
+      end )
     end
 
     def get_node_scan
@@ -91,26 +124,26 @@ module Skylab::Brazen
 
   public  # ~ silo production
 
-    def model_class_via_identifier id, evr=nil
-      silo = silo_via_identifier id, evr
+    def model_class_via_identifier id, & oes_p
+      silo = silo_via_identifier id, & oes_p
       silo and silo.model_class
     end
 
-    def silo_via_symbol i, evr=nil
-      silo_via_identifier Node_Identifier_.via_symbol( i ), evr
+    def silo_via_symbol i, & oes_p
+      silo_via_identifier Node_Identifier_.via_symbol( i ), & oes_p
     end
 
-    def silo_via_identifier id, evr=nil
+    def silo_via_identifier id, & oes_p
       if id.is_resolved
         prdc_silo id
       else
-        cols_via_unresolved_id id, evr
+        cols_via_unresolved_id id, & oes_p
       end
     end
 
   private
 
-    def cols_via_unresolved_id id, evr
+    def cols_via_unresolved_id id, & oes_p
       id = id.as_mutable_for_resolving
       node = self ; mod_a = nil
       full_raw_s_a = id.raw_name_parts
@@ -144,7 +177,9 @@ module Skylab::Brazen
             mod_a = nil
           end
         when  1
-          result = evr.receive_event bld_model_not_found_event( id, target_s )
+          result = oes_p.call :not_found do
+            bld_model_not_found_event id, target_a
+          end
           break
         when -1
           self._NEATO

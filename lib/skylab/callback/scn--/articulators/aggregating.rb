@@ -40,7 +40,7 @@ module Skylab::Callback
         end
       end
 
-      Entity_.event.sender self
+      Entity_.event.selective_builder_sender_receiver self
 
       def initialize & p
         @ok = true
@@ -114,7 +114,7 @@ module Skylab::Callback
             } #{ and_ s_a }"
           y << "did you mean #{ or_ _s_a_ }?"
         end
-        receive_extra_iambic _ev
+        receive_extra_iambic _ev  # #hook-in (local)
       end
 
       def when_parsed_fields_OK
@@ -162,7 +162,7 @@ module Skylab::Callback
               @when_field_value_count_is_two_or_more_p = iambic_property  # BE CAREFUL
             else
               _ev = build_extra_iambic_event_via [ i ], [ :frame, :field ]
-              receive_extra_iambic _ev
+              receive_extra_iambic _ev  # #hook-in (local)
             end
           end
         end

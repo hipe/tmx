@@ -8,7 +8,7 @@ module Skylab::Brazen
       end
     end
 
-    Brazen_::Model_::Entity[ self, -> do
+    Brazen_::Model_::Entity.call self do
 
       o :desc, -> y do
         y << "manage workspaces."
@@ -34,25 +34,24 @@ module Skylab::Brazen
 
       :property, :app_name,
 
-      :property, :channel  # #todo
+      :property, :on_event_selectively
 
-    end ]
+    end
 
     def execute
 
-      via_properties_init_ivars
-
-      _event_receiver = if @channel
-        _Event.receiver.channeled.full @channel, @event_receiver
-      else
-        @event_receiver
+      if @property_box.has_name :on_event_selectively
+        @on_event_selectively = nil  # ok to clobber this one from top client
       end
 
-      @pn = Filesystem_Walk__.with :start_path, @path,
+      via_properties_init_ivars
+
+      @pn = Filesystem_Walk__.with(
+        :start_path, @path,
         :max_num_dirs_to_look, @max_num_dirs,
         :prop, @prop,
         :filename, @config_filename,
-        :event_receiver, _event_receiver
+        :on_event_selectively, @on_event_selectively )
     end
 
     attr_reader :pn
@@ -62,9 +61,8 @@ module Skylab::Brazen
         :app_name, @app_name,
         :config_filename, @config_filename,
         :is_dry, @dry_run,
-        :event_receiver, @event_receiver,
-        :path, @path
-      )
+        :path, @path,
+        :on_event_selectively, @on_event_selectively )
     end
 
   public
@@ -99,10 +97,11 @@ module Skylab::Brazen
       class Ping < Brazen_::Model_::Action
 
         def produce_any_result
-          _ev = build_OK_event_with :ping do |y, o|
-            y << "hello from #{ app_name }"
+          maybe_send_event :payload, :ping do
+            build_OK_event_with :ping do |y, o|
+              y << "hello from #{ app_name }"
+            end
           end
-          send_event _ev
           :_hello_from_brazen_
         end
       end
@@ -114,7 +113,7 @@ module Skylab::Brazen
       self
     end
 
-    def receive_missing_required_properties ev
+    def receive_missing_required_properties ev  # covered by [tm], #ugly
       receive_missing_required_properties_softly ev
     end
 
@@ -190,52 +189,38 @@ module Skylab::Brazen
       end
 
       def via_action_produce_workspace_via_workspace_silo
+
         @verbose = @action.any_argument_value_at_all :verbose
+
         bx = Box_.new
         @model_class.merge_workspace_resolution_properties_into_via bx, @action
-        _evr = _Event.receiver.channeled.full.cascading :ws_via_action, self
-        @ws = @model_class.edited _evr, @kernel do |o|
+
+        _oes_p = event_lib.
+          produce_handle_event_selectively_through_methods.
+            bookends self, :ws_via_action do | * i_a, & ev_p |
+          maybe_send_event_via_channel i_a, & ev_p
+        end
+
+        @ws = @model_class.edited @kernel, _oes_p do |o|
           o.with_arguments :verbose, @verbose
           o.with_argument_box bx
           o.with :prop, @action.class.properties[ :workspace_path ]
         end
+
         via_ws_workspace
       end
 
-      def receive_ws_via_action_missing_required_properties ev
-       msg_p = ev.message_proc
-       _ev = ev.dup_with do |y, o|
-          instance_exec y_=[], o, & msg_p
-          y << "cannot resolve workspace because workspace is #{ y_ * SPACE_ }"
+      def on_ws_via_action_resource_not_found_via_channel i_a, & ev_p
+        maybe_send_event_via_channel i_a do
+          bld_workspace_not_found_event ev_p[]
         end
-        receive_event _ev
       end
 
-      def receive_ws_via_action_config_parse_error ev
-        _ev_ = ev.dup_with do |y, o|
-          Workspace_::Actors__::Render_parse_error[ y, o, self ]
-        end
-        receive_event _ev_
-      end
-
-      def receive_ws_via_action_resource_not_found ev
+      def bld_workspace_not_found_event ev
         x_a = ev.to_iambic
         x_a[ 0 ] = :workspace_not_found  # was 'resource_not_found'
         x_a.push :invite_to_action, [ :init ]
-        _ev_ = build_event_via_iambic_and_message_proc x_a, ev.message_proc
-        send_event _ev_
-        UNABLE_
-      end
-
-      def receive_ws_via_action_resource_exists ev
-        ev.instance_variable_set :@ok, true  # meh  "the file already exists"
-        # if @event_receiver.any_argument_value :verbose
-        receive_event ev
-        # end ; nil
-      end
-
-      def receive_ws_via_action_event ev  # because '.cascading'
-        receive_event ev
+        build_event_via_iambic_and_message_proc x_a, ev.message_proc
       end
 
     private
@@ -244,8 +229,11 @@ module Skylab::Brazen
         if @ws.error_count.zero?
           _ok = @ws.execute  # result is pn
           _ok and begin
-            if @verbose
-              send_neutral_event_with :using_workspace, :config_pathname, @ws.pn
+            if @verbose  # #tracking [#069] this will probably go away
+            maybe_send_event :info, :verbose, :using_workspace do
+              build_neutral_event_with :using_workspace,
+                :config_pathname, @ws.pn
+            end
             end
             @ws
           end
@@ -263,7 +251,7 @@ module Skylab::Brazen
           :max_num_dirs_to_look,
           :prop,
           :start_path,
-          :event_receiver ]
+          :on_event_selectively ]
 
       def find_any_nearest_file_pathname  # :+#public-API
         execute
@@ -296,15 +284,19 @@ module Skylab::Brazen
       DIRECTORY_FTYPE__ = 'directory'.freeze
 
       def whn_start_directory_is_not_directory st
-        send_not_OK_event_with :start_directory_is_not_directory,
-          :start_pathname, @start_pathname, :ftype, st.ftype,
-            :prop, @prop
+        maybe_send_event :error, :start_directory_is_not_directory do
+          build_not_OK_event_with :start_directory_is_not_directory,
+            :start_pathname, @start_pathname, :ftype, st.ftype,
+              :prop, @prop
+        end
       end
 
       def whn_start_directory_does_not_exist e
-        send_not_OK_event_with :start_directory_does_not_exist,
-          :start_pathname, @start_pathname, :exception, e,
-            :prop, @prop
+        maybe_send_event :error, :start_directory_is_not_directory do
+          build_not_OK_event_with :start_directory_does_not_exist,
+            :start_pathname, @start_pathname, :exception, e,
+              :prop, @prop
+        end
       end
 
       def fnd_any_nearest_file_pathname_when_start_pathname_exist
@@ -336,14 +328,22 @@ module Skylab::Brazen
           :only_apply_expectation_that_path_is_file,
           :path, found.to_path,
           :on_event, -> ev do
-            send_event ev
+            maybe_send_event normal_top_channel_via_OK_value ev.ok do
+              ev
+            end
             UNABLE_
           end )
         ok && found
       end
 
       def whn_resource_not_found count
-        _ev = build_not_OK_event_with :resource_not_found, :filename, @filename,
+        maybe_send_event :error, :resource_not_found do
+          bld_resource_not_found_event count
+        end
+      end
+
+      def bld_resource_not_found_event count
+        build_not_OK_event_with :resource_not_found, :filename, @filename,
             :num_dirs_looked, count, :start_pathname, @start_pathname do |y, o|
           if o.num_dirs_looked.zero?
             y << "no directories were searched."
@@ -355,7 +355,6 @@ module Skylab::Brazen
             y << "#{ ick o.filename } not found in #{ pth o.start_pathname}#{x}"
           end
         end
-        send_event _ev
       end
     end
 

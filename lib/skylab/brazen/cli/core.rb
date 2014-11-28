@@ -46,8 +46,7 @@ module Skylab::Brazen
         resolve_properties
         resolve_partitions
         resolve_bound_call
-        es =
-        @bound_call.receiver.send @bound_call.method_name, * @bound_call.args
+        es = @bound_call.receiver.send @bound_call.method_name, * @bound_call.args
         flush_any_invitations
         es or @exit_status
       end
@@ -172,10 +171,6 @@ module Skylab::Brazen
         @token = tok
         resolve_bound_call_when_no_matching_action
         call_bound_call @bound_call
-      end
-
-      def receive_multiple_matching_adapters aa_a
-        self._DO_ME
       end
 
     private
@@ -539,20 +534,26 @@ module Skylab::Brazen
         @parent.application_kernel
       end
 
-      def receive_event ev
-        ev_ = ev.to_event
-        if ev_.has_tag :ok
-          has_OK_tag = true
-          x = ev_.ok
+      def handle_event_selectively
+        @HES_p ||= -> top_channel_i, *, & ev_p do
+          recv_event ev_p[], top_channel_i
         end
-        if has_OK_tag && ! x.nil?
-          if x
+      end
+
+      def recv_event ev, top_channel_i
+        ev_ = ev.to_event
+        has_OK_tag = if ev_.has_tag :ok
+          ok_x = ev_.ok
+          true
+        end
+        if has_OK_tag && ! ok_x.nil?
+          if ok_x
             if ev_.has_tag :is_completion and ev_.is_completion
               receive_completion_event ev
-            elsif ev.verb_lexeme
-              receive_positive_event ev
-            else
+            elsif :payload == top_channel_i  # or ! ev.verb_lexeme
               receive_payload_event ev
+            else
+              receive_positive_event ev
             end
           else
             receive_negative_event ev
@@ -609,9 +610,8 @@ module Skylab::Brazen
       end
 
       def receive_payload_event ev
-        _a = render_event_lines ev
-        send_payload_event_lines _a
-        maybe_use_exit_status_via_OK_or_not_OK_event ev
+        send_payload_event_lines render_event_lines ev
+        maybe_use_exit_status_via_OK_or_not_OK_event ev.to_event
       end
 
       def receive_info_event ev

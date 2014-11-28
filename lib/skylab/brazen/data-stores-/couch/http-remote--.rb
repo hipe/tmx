@@ -32,7 +32,7 @@ module Skylab::Brazen
     private
 
       def build_request_response i, x_a
-        Request_Response__.new x_a, i, @database, @port, @host, self
+        Request_Response__.new x_a, i, @database, @port, @host
       end
 
       def deliver_response o
@@ -54,11 +54,11 @@ module Skylab::Brazen
           end
         end
 
-        Brazen_.event.sender self  # actually just builds not sends
+        Brazen_.event.selective_builder_sender_receiver self  # just builds
 
         def initialize * a
 
-          x_a, @HTTP_method_i, @database, @port, @host, @event_receiver = a
+          x_a, @HTTP_method_i, @database, @port, @host = a
 
           @body_s = nil
           @entity_identifier_strategy = nil

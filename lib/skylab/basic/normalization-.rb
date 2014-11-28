@@ -21,7 +21,7 @@ module Skylab::Basic
         end
 
         def init_event_proc
-          if @event_receiver.respond_to? :receive_event
+          if @event_receiver.respond_to? :receive_ev
             init_event_proc_when_evr
           else
             @event_p = @event_receiver
@@ -33,7 +33,7 @@ module Skylab::Basic
           _EVR = @event_receiver ; @event_receiver = nil  # this is the only access
           @event_p = -> * x_a, msg_p do
             _ev = bld_ev x_a, msg_p
-            _EVR.receive_event _ev
+            _EVR.receive_ev _ev
           end ; nil
         end
 

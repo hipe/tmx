@@ -69,7 +69,7 @@ module Skylab::TanMan
          cc = datastore
          cc and begin
            # init_evr_for_delete  # too loud
-           cc.delete_entity @argument_box, self
+           cc.delete_entity @argument_box, & handle_event_selectively
          end
        end
       end
@@ -79,19 +79,24 @@ module Skylab::TanMan
 
     private
 
-      def via_dsc_persist_entity entity, evr
+      def via_dsc_persist_entity entity, & oes_p
+
         did_mutate = nil
-        _evr_ = Event_[].receiver.map_reduce evr do |ev|
+
+        _oes_p_ = -> * i_a, & ev_p do
+          ev = ev_p[]
           if ev.ok
             case ev.terminal_channel_i
-            when :created_association ; did_mutate = true
-            when :created_node ; did_mutate = true
-            when :found_existing_association
-            when :found_existing_node
-            else ; raise "self._DO_ME: does or does not '#{ ev.terminal_channel_i }' mutate the document?"
+            when :created_association, :created_node
+              did_mutate = true
+            when :found_existing_association, :found_existing_node
+            else
+              raise "does '#{ ev.terminal_channel_i }' mutate the document?"  # #todo
             end
           end
-          ev
+          oes_p.call( * i_a ) do
+            ev
+          end
         end
 
         ok = Association_::Actors__::Mutate.with(
@@ -101,18 +106,18 @@ module Skylab::TanMan
           :from_node_label, entity.property_value( :from_node_label ),
           :to_node_label, entity.property_value( :to_node_label ),
           :datastore, @dsc,
-          :event_receiver, _evr_, :kernel, @kernel )
+          :kernel, @kernel, :on_event_selectively, _oes_p_ )
 
         ok and flush_maybe_changed_document_to_output_adapter did_mutate
       end
 
-      def via_dsc_delete_entity arg_box, evr
+      def via_dsc_delete_entity arg_box, & oes_p
         ok = Association_::Actors__::Mutate.with(
           :verb, :delete,
           :from_node_label, arg_box.fetch( :from_node_label ),
           :to_node_label, arg_box.fetch( :to_node_label ),
           :datastore, @dsc,
-          :event_receiver, evr, :kernel, @kernel )
+          :kernel, @kernel, :on_event_selectively, oes_p )
 
         ok and flush_changed_document_to_ouptut_adapter
       end

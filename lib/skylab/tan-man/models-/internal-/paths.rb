@@ -2,13 +2,15 @@ module Skylab::TanMan
 
   module Models_::Internal_
 
+    Actions = ::Module.new
+
     class Paths
 
       Callback_::Actor.call self, :properties,
 
         :path_i, :verb_i, :call
 
-      Brazen_.event.sender self
+      Brazen_.event.selective_builder_sender_receiver self
 
       def execute
         case @verb_i
@@ -29,13 +31,15 @@ module Skylab::TanMan
       end
 
       def when_bad_verb
-        _ev = build_not_OK_event_with :unrecognized_verb, :verb_i, @verb_i
-        @call.event_receiver.receive_event _ev
+        @call.maybe_receive_event :error, :unrecognized_verb do
+          build_not_OK_event_with :unrecognized_verb, :verb_i, @verb_i
+        end
       end
 
       def when_bad_noun
-        _ev = build_not_OK_event_with :unknown_path, :path_i, @path_i
-        @call.event_receiver.receive_event _ev
+        @call.maybe_receive_event :error, :unknown_path do
+          build_not_OK_event_with :unknown_path, :path_i, @path_i
+        end
       end
 
       def retrieve_generated_grammar_dir_path
@@ -58,13 +62,15 @@ module Skylab::TanMan
 
         TanMan_._lib.system.filesystem.normalization.existent_directory(
           :path, _app_tmpdir_path,
-          :on_event, -> ev do
-            ev = ev.with_message_string_mapper MSG_MAP__
-            @call.event_receiver.receive_event ev
-            UNABLE_  # info events won't ride all the way out
-          end,
           :create_if_not_exist,
-          :max_mkdirs, 1 )  # you may make the [tm] directory only.
+          :max_mkdirs, 1,  # you may make the [tm] directory only.
+          :on_event_selectively, -> * i_a, & ev_p do
+            maybe_receive_event_via_channel i_a do
+              _ev = ev_p[]
+              _ev.with_message_string_mapper MSG_MAP__
+            end
+            UNABLE_  # info events won't ride all the way out only errors
+          end )
       end
 
       MSG_MAP__ = -> s, line_index, * do

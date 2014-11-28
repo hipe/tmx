@@ -10,7 +10,7 @@ module Skylab::TanMan
        :prototype_i,
        :from_node_label, :to_node_label,
        :datastore,
-       :event_receiver, :kernel ]
+       :kernel, :on_event_selectively ]
 
       def execute
         @parser = @datastore.graph_sexp.class
@@ -36,8 +36,10 @@ module Skylab::TanMan
       end
 
       def when_no_stmt_list
-        _ev = build_not_OK_event_with :no_stmt_list, :datastore, @datastore
-        @result = send_event _ev ; UNABLE_
+        @result = maybe_send_event :error, :no_stmt_list do
+          build_not_OK_event_with :no_stmt_list, :datastore, @datastore
+        end
+        UNABLE_
       end
 
       def find_nodes
@@ -45,8 +47,8 @@ module Skylab::TanMan
         @touch_node_p = Models_::Node.touch.curry_with(
           :verb, _node_verb,
           :datastore, @datastore,
-          :event_receiver, @event_receiver,
-          :kernel, @kernel )
+          :kernel, @kernel,
+          :on_event_selectively, @on_event_selectively )
 
         ok = rslv_from_node
         ok &&= rslv_to_node
@@ -122,12 +124,18 @@ module Skylab::TanMan
       end
 
       def send_found_existing_event stmt
-        _ev = build_OK_event_with :found_existing_association,
+        maybe_send_event :info, :found_existing_association do
+          bld_found_existing_association stmt
+        end
+        nil
+      end
+
+      def bld_found_existing_association stmt
+        build_OK_event_with :found_existing_association,
             :edge_stmt, stmt do |y, o|
           y << "found existing association: #{ stmt.unparse }"
           # "assocation already exists: "
         end
-        send_event _ev ; nil
       end
 
       def work
@@ -159,10 +167,16 @@ module Skylab::TanMan
       end
 
       def when_no_protos
-        _ev = build_not_OK_event_with :association_prototypes_not_found do |y, o|
+        @result = maybe_send_event :error, :association_prototypes_not_found do
+          bld_association_prototypes_not_found_at_all
+        end
+        UNABLE_
+      end
+
+      def bld_association_prototypes_not_found_at_all
+        build_not_OK_event_with :association_prototypes_not_found do |y, o|
           y << "the stmt_list does not have any prototypes"
         end
-        @result = send_event _ev ; UNABLE_
       end
 
       def via_named_protos_resolve_prototype
@@ -175,11 +189,17 @@ module Skylab::TanMan
       end
 
       def when_no_proto
-        _ev = build_not_OK_event_with :association_prototype_not_found,
+        @result = maybe_send_event :error, :association_prototypes_not_found do
+          bld_association_prototypes_not_found_with_that_name
+        end
+        UNABLE_
+      end
+
+      def bld_association_prototypes_not_found_with_that_name
+        build_not_OK_event_with :association_prototype_not_found,
             :prototype_i, @prototype_i do |y, o|
           y << "the stmt_list has no prototype named #{ ick o.prototype_i }"
         end
-        @result = send_event _ev ; UNABLE_
       end
 
       def resolve_default_prototype
@@ -253,12 +273,17 @@ module Skylab::TanMan
       def via_edge_stmt_make_association
         @stmt_list._insert_item_before_item @edge_stmt, @least_greater_edge_stmt  # #todo - do we need the other
         # (result is stmt_list whose stmt is the argument)
-        _ev = build_OK_event_with :created_association,
+        @result = maybe_send_event :info, :created_association do
+          bld_created_association_event
+        end
+        ACHIEVED_
+      end
+
+      def bld_created_association_event
+        build_OK_event_with :created_association,
             :edge_stmt, @edge_stmt do |y, o|
           y << "created association: #{ o.edge_stmt.unparse }"
         end
-        @result = send_event _ev
-        ACHIEVED_
       end
 
       # ~ delete
@@ -272,20 +297,27 @@ module Skylab::TanMan
       end
 
       def when_not_found
-        _ev = build_not_OK_event_with :association_not_found,
+        @result = maybe_send_event :error, :association_not_found do
+          bld_association_no_found_event
+        end
+        UNABLE_
+      end
+
+      def bld_association_no_found_event
+        build_not_OK_event_with :association_not_found,
             :from_node, @from_node, :to_node, @to_node do |y, o|
           _s = "#{ o.from_node.node_id } -> #{ o.to_node.node_id }"
           y << "association not found: #{ code _s }"
         end
-        @result = send_event _ev ; UNABLE_
       end
 
       def via_matched_stmt_work_when_delete
         removed_item = @stmt_list._remove_item @matched_stmt
         # result is structurally like argument, but different object. we discard
         if removed_item
-          _ev = build_OK_event_with :deleted_association, :association, removed_item
-          @result = send_event _ev
+          @result = maybe_send_event :info, :deleted_association do
+            build_OK_event_with :deleted_association, :association, removed_item
+          end
           nil
         else
           removed_item

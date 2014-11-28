@@ -13,7 +13,7 @@ module Skylab::Brazen
         Actor_[ self, :properties,
           :entity,
           :document,
-          :event_receiver ]
+          :on_event_selectively ]
 
         def execute
           ok = via_entity_resolve_subsection_id
@@ -52,9 +52,9 @@ module Skylab::Brazen
               -1
             end
           end
-          @document.sections.delete_comparable_item ss, _compare_p, -> ev do
-            send_event ev
-            UNABLE_
+          @document.sections.delete_comparable_item ss, _compare_p do |*i_a, & ev_p|
+            maybe_send_event_via_channel i_a, & ev_p
+            _OK_value_via_top_channel i_a.first
           end
         end
       end

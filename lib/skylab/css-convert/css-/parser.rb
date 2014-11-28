@@ -97,9 +97,5 @@ module Skylab::CSS_Convert
     def parser_parser_module_module
       PARSER_PARSER_MODULE_MODULE
     end
-
-    def receive_parser_error_message s
-      error s
-    end
   end
 end

@@ -12,7 +12,7 @@ module Skylab::TanMan
             :action ]
 
           def execute
-            @event_receiver, @kernel = @action.controller_nucleus.to_a
+            @kernel, @on_event_selectively = @action.controller_nucleus.to_a
             ok = set_input_argument( * @action.input_arguments )
             ok and begin
               @action = nil
@@ -31,15 +31,17 @@ module Skylab::TanMan
           end
 
           def when_no_IO i
-            _ev = build_not_OK_event_with :cannot_resolve_IO, :direction, i
-            send_event _ev ; UNABLE_
+            maybe_send_event :error, :cannot_resolve_IO do
+              build_not_OK_event_with :cannot_resolve_IO, :direction, i
+            end
+            UNABLE_
           end
         end
 
         Callback_::Actor[ self, :properties,
           :input_arg,
           :parsing_event_subscription,
-          :event_receiver, :kernel ]
+          :kernel, :on_event_selectively ]
 
         def initialize
           @parsing_event_subscription = nil
@@ -61,7 +63,7 @@ module Skylab::TanMan
           -> o do
             o.subscribe_all
             o.use_subscription_channel_name_in_receiver_method_name
-            o.delegate_to @event_receiver
+            o.delegate_to_selectively @on_event_selectively
             if @parsing_event_subscription
               @parsing_event_subscription[ o ]
             end ; nil
@@ -91,7 +93,7 @@ module Skylab::TanMan
         end
 
         def via_graph_sexp_produce_document_controller
-          DotFile_::Controller__.new @graph_sexp, @input_arg, @event_receiver, @kernel
+          DotFile_::Controller__.new @graph_sexp, @input_arg, @kernel, & @on_event_selectively
         end
       end
     end

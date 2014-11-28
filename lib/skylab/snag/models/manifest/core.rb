@@ -172,7 +172,6 @@ module Skylab::Snag
 
         def lookup
           @config = @API_client
-          @delegate = Walk_delegate__.new method :on_walk_error_event
           @did_fail = false
           @pathname = bld_walk.find_any_nearest_file_pathname
           if @did_fail
@@ -184,7 +183,11 @@ module Skylab::Snag
 
         def bld_walk
 
-          _evr = Snag_._lib.event.receiver.channeled.full :walk, @delegate
+          _oes_p = -> * i_a, & ev_p do
+            if :error == i_a.first
+              recv_walk_error_event ev_p[]
+            end
+          end
 
           Snag_._lib.filesystem_walk.build_with(
             :filename, @config.manifest_file,
@@ -192,10 +195,10 @@ module Skylab::Snag
               @config.max_num_dirs_to_search_for_manifest_file,
             :prop, LIB_.entity::Property__.new( :path ),
             :start_path, @path,
-            :event_receiver, _evr )
+            :on_event_selectively, _oes_p )
         end
 
-        def on_walk_error_event ev
+        def recv_walk_error_event ev
           o = Snag_::Model_::Event.inflectable_via_event ev
           o.inflected_verb = 'find'
           o.inflected_noun = 'manifest file'
@@ -212,29 +215,6 @@ module Skylab::Snag
 
       Routing_Wrapper__ = ::Struct.new :channel_i, :ev do
         alias_method :unwrap, :values
-      end
-
-      class Walk_delegate__
-
-        def initialize p
-          @p = p
-        end
-
-        def receive_walk_start_directory_is_not_directory ev
-          @p[ ev ]
-        end
-
-        def receive_walk_start_directory_does_not_exist ev
-          @p[ ev ]
-        end
-
-        def receive_walk_found_is_not_file ev
-          @p[ ev ]
-        end
-
-        def receive_walk_resource_not_found ev
-          @p[ ev ]
-        end
       end
     end
 

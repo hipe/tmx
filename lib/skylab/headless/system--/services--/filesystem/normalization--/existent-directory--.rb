@@ -18,6 +18,13 @@ module Skylab::Headless
               @do_create_if_not_exist = true
             end
 
+            def on_event=
+              oe_p = iambic_property
+              @on_event_selectively = -> *, & ev_p do
+                oe_p[ ev_p[] ]
+              end
+            end
+
             def path=
               @ready_to_execute = true
               @path_x = iambic_property
@@ -26,14 +33,14 @@ module Skylab::Headless
             o :properties,
 
               :as_normal_value,
-              :on_event,
+              :on_event_selectively,
 
               :is_dry_run,
               :max_mkdirs
           end
 
           def initialize & p
-            @on_event = @as_normal_value = nil
+            @as_normal_value = nil
             @do_create_if_not_exist = nil
             @is_dry_run = false
             @max_mkdirs = 1
@@ -94,7 +101,9 @@ module Skylab::Headless
           end
 
           def when_existent_path_is_strange
-            send_event via_stat_and_path_build_wrong_ftype_event DIR_FTYPE_
+            maybe_send_event :error, :wrong_ftype do
+              via_stat_and_path_build_wrong_ftype_event DIR_FTYPE_
+            end
           end
 
           def when_no_stat
@@ -102,10 +111,14 @@ module Skylab::Headless
               if @do_create_if_not_exist
                 try_create
               else
-                send_event via_no_ent_stat_error_build_event
+                maybe_send_event :error, :enoent do
+                  via_no_ent_stat_error_build_event
+                end
               end
             else
-              send_event via_strange_stat_error_build_event
+              maybe_send_event :error, :strange_stat_error do
+                via_strange_stat_error_build_event
+              end
             end
           end
 
@@ -116,11 +129,11 @@ module Skylab::Headless
           end
 
           def work
-            _fuc = Headless_.system.filesystem.file_utils_controller do |msg|
-              _ev = Event_.wrap.file_utils_message msg
-              send_event _ev
-            end
-            _fuc.mkdir_p @path, noop: @is_dry_run  # result is array of argument paths
+            Headless_.system.filesystem.file_utils_controller do |msg|
+              maybe_send_event :info, :file_utils_event do
+                Event_.wrap.file_utils_message msg
+              end
+            end.mkdir_p @path, noop: @is_dry_run  # result is array of argument paths
             @result = via_path_send_normal_value
             PROCEDE_
           end
@@ -157,8 +170,10 @@ module Skylab::Headless
           end
 
           def a_path_too_deep
-            _ev = build_path_too_deep_event
-            unable_because_event _ev
+            @result = maybe_send_event :error, :path_too_deep do
+              build_path_too_deep_event
+            end
+            UNABLE_
           end
 
           def build_proc_for_stop_because_reached_max_mkdirs
@@ -189,8 +204,10 @@ module Skylab::Headless
         private
 
           def when_strange_ftype
-            _ev = via_stat_and_pn_build_wrong_ftype_event DIR_FTYPE_
-            unable_because_event _ev
+            @result = maybe_send_event :error, :wrong_ftype do
+              via_stat_and_pn_build_wrong_ftype_event DIR_FTYPE_
+            end
+            UNABLE_
           end
 
           def build_path_too_deep_event
@@ -247,11 +264,6 @@ module Skylab::Headless
             else
               @as_normal_value[ ::Dir.new @path ]
             end
-          end
-
-          def unable_because_event ev
-            @result = send_event ev
-            UNABLE_
           end
 
           Mock_Dir__ = ::Struct.new :to_path

@@ -58,7 +58,7 @@ module Skylab::Snag
         sign_event Event.inline_via_x_a_and_p x_a, p
       end
 
-      def sign_event ev
+      def sign_event ev  # :[#069].
         ev_ = Event.inflectable_via_event ev
         ev_.inflected_verb = inflected_verb
         ev_.inflected_noun = inflected_noun

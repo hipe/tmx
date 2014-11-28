@@ -8,7 +8,7 @@ module Skylab::TanMan
           :ent,
           :output_s,
           :scan_p,
-          :event_receiver, :action ]
+          :on_event_selectively ]
 
         def execute
           init_ivars
@@ -130,16 +130,28 @@ module Skylab::TanMan
         end
 
         def when_no_change
-          _ev = build_not_OK_event_with :no_change,
+          maybe_send_event :error, :no_change do
+            bld_no_change_event
+          end
+          UNABLE_
+        end
+
+        def bld_no_change_event
+          build_not_OK_event_with :no_change,
               :name, @name, :value, @value do |y, o|
             y << "#{ lbl o.name } is already set to #{ val o.value }."
           end
-          send_event _ev ; UNABLE_
         end
 
         def when_will_not_clobber
+          maybe_send_event :error, :name_collision do
+            bld_name_collision_event
+          end
+          UNABLE_
+        end
 
-          _ev = build_not_OK_event_with :name_collision,
+        def bld_name_collision_event
+          build_not_OK_event_with :name_collision,
               :name, @name,
               :existing_value, @exact_match_fly.property_value( :value ),
               :replacement_value, @value do |y, o|
@@ -147,16 +159,10 @@ module Skylab::TanMan
             y << "cannot set #{ lbl o.name } to #{ val o.replacement_value },#{
              } it is already set to #{ val o.existing_value }"
           end
-
-          send_event _ev ; UNABLE_
         end
 
         def produce_fresh_stream
           @scan_p[]
-        end
-
-        def send_event ev
-          @event_receiver.receive_event ev ; nil
         end
 
         C_STYLE_OPEN_COMMENT_RX_ = /\A[ \t]*\/\*/

@@ -17,7 +17,7 @@ module Skylab::Brazen
         model_class.merge_workspace_resolution_properties_into_via bx, self
 
         @prop = self.class.properties.fetch :path
-        @ws = model_class.edited self, @kernel do |o|
+        @ws = model_class.edited @kernel, handle_event_selectively do |o|
           o.with_preconditions @preconditions
           o.with_argument_box bx
           o.with :prop, @prop
@@ -36,7 +36,7 @@ module Skylab::Brazen
       end
 
       def via_ds
-        @scn = @ds.section_scan self
+        @scn = @ds.section_scan( & handle_event_selectively )
         @box = Box_.new
         one = -> { 1 } ; increment = -> d { d + 1 }
         while sect = @scn.gets
@@ -47,7 +47,13 @@ module Skylab::Brazen
       end
 
       def via_box
-        _ev = build_OK_event_with :summary, :box, @box, :ws, @ws do |y, o|
+        maybe_send_event :info, :summary do
+          bld_summary_event
+        end
+      end
+
+      def bld_summary_event
+        build_OK_event_with :summary, :box, @box, :ws, @ws do |y, o|
           y << "summary of #{ o.ws.description_under self }:"
           scn = o.box.to_pair_scan
           count = 0
@@ -60,7 +66,6 @@ module Skylab::Brazen
           end
           y << "#{ count } section#{ s count } total"
         end
-        send_event _ev
       end
     end
   end

@@ -6,7 +6,7 @@ module Skylab::SubTree
 
     Callback_::Actor.methodic self, :simple, :properties
 
-    SubTree_._lib.event_lib.sender self
+    SubTree_._lib.event_lib.selective_builder_sender_receiver self
 
     def initialize
       # you are executed before a block is instance_exec'd
@@ -16,8 +16,8 @@ module Skylab::SubTree
       true
     end
 
-    def bound_call_via_call iambic, event_receiver
-      @event_receiver = event_receiver
+    def bound_call_via_call iambic, & oes_p
+      @on_event_selectively = oes_p
       ok = receive_iambic iambic
       ok && bound_call
     end
@@ -43,7 +43,9 @@ module Skylab::SubTree
     # ~ receiving events
 
     def receive_missing_required_properties ev
-      send_event ev
+      maybe_send_event :error, :missng_required_properties do
+        ev
+      end
       UNABLE_
     end
 
@@ -51,10 +53,17 @@ module Skylab::SubTree
 
     def whine_about_invalid prop_i, template_s  # 'noun', 'x'
 
+      @oes.call :error, :invalid_property_value do
+        bld_invalid_property_value_event prop_i, template_s
+      end
+    end
+
+    def bld_invalid_property_value_event prop_i, template_s
+
       prop = self.class.properties.fetch prop_i
       x = instance_variable_get prop.name.as_ivar
 
-      _ev = build_not_OK_event_with :invalid_property_value,
+      build_not_OK_event_with :invalid_property_value,
           :x, x, :prop, prop, :tmpl_s, template_s do |y, o|
 
         _noun = par o.prop
@@ -63,12 +72,6 @@ module Skylab::SubTree
         _s = _tmpl.call x: _x,  noun: _noun
         y << _s
       end
-
-      send_event _ev
-    end
-
-    def send_event ev
-      @event_receiver.receive_event ev
     end
 
     Data_Event_ = SubTree_._lib.event_lib.data_event_class_factory

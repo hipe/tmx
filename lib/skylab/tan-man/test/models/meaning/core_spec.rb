@@ -59,13 +59,13 @@ module Skylab::TanMan::TestSupport::Models::Meaning
       call_API :meaning, :ls, :input_string, " foo : fee \n fiffle: faffle"
 
       expect_OK_event :item do |ev|
-        ent = ev.flyweighted_entity
+        ent = ev.to_event.flyweighted_entity
         ent.property_value( :name ).should eql 'foo'
         ent.property_value( :value ).should eql 'fee '
       end
 
       expect_OK_event :item do |ev|
-        ent = ev.flyweighted_entity
+        ent = ev.to_event.flyweighted_entity
         ent.property_value( :name ).should eql 'fiffle'
         ent.property_value( :value ).should eql 'faffle'
       end
