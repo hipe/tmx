@@ -368,6 +368,29 @@ the above rules of line classification will become relevant when we
 define how we turn lines into the larger non-terminal structures defined
 below.
 
+this example synthesizes every point from above:
+
+    #
+    # the above leading blank line of this section is totally disregarded
+    #
+    #
+    # the above blank lines are discarded because we are in a text span
+    #    this line is three (not four) spaces deeper so it is text
+    #       same here, still text because it's 3 deeper (not 4)
+    #           but as soon as we are 4 lines deeper, this is "code."
+    #                         code can go arbitrarily deeply: local margin
+    #                         from the last text line holds throughout
+    #
+    #            the above blank line is code because code span, this line too
+    #          but this is a text line again b.c it's 3 in from local margin
+    #      this line moves the local margin back by one space
+    #                         •    even though very deep, this is text line
+    #                                 this too, because new local margin
+    #                                     and then here is code because 4
+    #
+    #
+    # above line is code, this line is text, below line is ignored
+    #
 
 
 #### how description strings are produced

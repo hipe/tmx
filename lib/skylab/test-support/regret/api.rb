@@ -14,7 +14,7 @@ module Skylab::TestSupport
           Autoloader_
         end
 
-        Bsc__ = Lib_::Bsc__
+        Bsc__ = Lib_::Bsc
 
         Basic_Fields = -> * x_a do
           MH__[]::Basic_Fields.via_iambic x_a

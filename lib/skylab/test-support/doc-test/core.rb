@@ -28,6 +28,22 @@ module Skylab::TestSupport
 
     end
 
+    # ~ support for parsing
+
+    class State_
+      class << self
+        alias_method :[], :new
+      end
+
+      def initialize h
+        @i_i_h = h
+      end
+
+      def method_name_for_state state_symbol
+        @i_i_h.fetch state_symbol
+      end
+    end
+
   if false
   class Specer__  # read [#025] the specer narrative #storypoint-5 intro
 
