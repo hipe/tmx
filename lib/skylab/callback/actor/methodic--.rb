@@ -44,6 +44,11 @@ module Skylab::Callback
 
         # (experimental variations on the theme, but we should DRY these)
 
+        def via_iambic x_a
+          curried = build_via_iambic x_a
+          curried && curried.execute
+        end
+
         def build_via_iambic x_a
           seen = false
           ok = true

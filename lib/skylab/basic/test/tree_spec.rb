@@ -1,26 +1,20 @@
-require_relative 'test-support'
+require_relative 'tree/test-support'
 
 module Skylab::Basic::TestSupport::Tree
 
-  ::Skylab::Basic::TestSupport[ self ]
+  describe "[ba] trees - experiments with different build techniques" do
 
-  include Constants
+    it "lazy via enumeresque" do
 
-  extend TestSupport_::Quickie
-
-  describe "[ba] tree asks - what if trees were functional?" do
-
-    it "enumerator tree" do
-
-      tree = Basic_::Tree.new :local_data_1 do |y|
+      tree = Subject_[].lazy_via_enumeresque :local_data_1 do |y|
 
         y << :node_1
 
-        y << Basic_::Tree.new do |yy|
+        y << Subject_[].lazy_via_enumeresque do |yy|
 
           yy << :node_2_1
 
-          yy << ( Basic_::Tree.new :local_data_3 do |yyy|
+          yy << ( Subject_[].lazy_via_enumeresque :local_data_3 do |yyy|
             yyy << :node_3_1
             yyy << :node_3_2
           end )

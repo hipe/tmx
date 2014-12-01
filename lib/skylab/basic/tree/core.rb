@@ -5,18 +5,49 @@ module Skylab::Basic
     # ordinary trees are well-trodden and boring. we will find a way
     # to goof this one up somehow..
 
-    def self.new *a, &b
+    class << self
 
-      Tree::Via::Enumerator.new a, b
+      def lazy_via_enumeresque * internal_properties, & children_yielder_p
+        Lazy_via_Enumeresque__.new internal_properties, children_yielder_p
+      end
 
+      def via * i_a
+        Via__.via_iambic i_a
+      end
     end
-  end
 
-  module Tree::Via
+    class Via__
 
-  end
+      Callback_::Actor.methodic self, :simple, :properties,
+        :property, :build_using,
+        :property, :glyph,
+        :iambic_writer_method_to_be_provided, :indented_line_stream,
+        :property, :on_event_selectively
 
-  class Tree::Via::Enumerator
+      def initialize
+        @build_using = nil
+        super
+      end
+
+      def execute
+        send @execute_method_name
+      end
+
+    private
+
+      def indented_line_stream=
+        @execute_method_name = :execute_via_indented_line_stream
+        @stream = iambic_property
+        ACHIEVED_
+      end
+
+      def execute_via_indented_line_stream
+        Tree_::Via_Indented_Line_Stream__.new( @build_using, @stream,
+          @glyph, @on_event_selectively ).execute
+      end
+    end
+
+  class Lazy_via_Enumeresque__
 
     -> do  # `initialize`
       h = {
@@ -62,7 +93,7 @@ module Skylab::Basic
           if x.respond_to? :is_leaf
             y << x
           else
-            Tree::Leaf.with_instance do |tl|
+            Pooled_Leaf__.with_instance do |tl|
               tl.init_from_pool x
               y << tl
             end
@@ -82,7 +113,7 @@ module Skylab::Basic
     end
   end
 
-  class Tree::Leaf
+  class Pooled_Leaf__
 
     Basic_._lib.pool( self ).with_with_instance
 
@@ -102,5 +133,8 @@ module Skylab::Basic
     def leaf_data
       @leaf_data  # etc
     end
+  end
+
+    Tree_ = self
   end
 end

@@ -14,6 +14,8 @@ module Skylab::Basic
 
     include Constants
 
+    TestSupport_ = TestSupport_
+
     TestSupport_::Regret[ self ]
 
     TestSupport_::Sandbox::Host[ self ]
@@ -36,6 +38,10 @@ module Skylab::Basic
       end
 
       attr_reader :do_debug
+
+      def debug_IO
+        TestSupport_.debug_IO
+      end
 
       def event_expression_agent
         Basic_::Lib_::Bzn_[]::API.expression_agent_instance

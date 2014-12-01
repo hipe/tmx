@@ -137,7 +137,7 @@ module Skylab::Test
     end
 
     def __hot_subtree__
-      Lib_::Basic_Tree[].new do |y|
+      Lib_::Basic_Tree[].lazy_via_enumeresque do |y|
         conflict_a = nil
         ag = build_aggregated_agent nil, -> do
           true
@@ -166,7 +166,7 @@ module Skylab::Test
         end.call
         if r
           sp_cache_a.each do |sp, a|
-            y << ( Lib_::Basic_Tree[].new sp do |yy|
+            y << ( Lib_::Basic_Tree[].lazy_via_enumeresque sp do |yy|
               a.each( & yy.method( :<< ) ) if a
             end )
           end
