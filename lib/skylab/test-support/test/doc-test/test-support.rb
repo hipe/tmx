@@ -86,7 +86,49 @@ module Skylab::TestSupport::TestSupport::DocTest
 
   CACHE__ = {}
 
-  class Build_fake_file_structure_for_path
+  Build_fake_file_structure_for_path = -> path do
+    const_get( :"Build_#{ NUM_RX__.match( ::File.basename path )[ 0 ] }" )[ path ]
+  end
+
+  NUM_RX__ = /\A\d+/
+
+  Build_fake_file_structure__ = ::Class.new
+
+  class Build_015 < Build_fake_file_structure__
+
+    def work
+      read_fake_file :file_one
+      read_fake_file :file_two
+      read_fake_file :file_three
+      read_fake_file :file_four
+      read_ad_hoc_code_block_one
+      nil
+    end
+
+    def read_ad_hoc_code_block_one
+      @rx = %r(\A[[:space:]]*this example synthesizes every point\b)i
+      advance_to_next_rx
+      skip_blank_lines
+      @stay_rx = /\A[[:space:]]+#/
+      @ad_hoc_code_blocks ||= {}
+      @ad_hoc_code_blocks[ :ad_hoc_one ] =
+        build_fake_file_from_line_and_every_line_while_stay_rx
+      nil
+    end
+  end
+
+  class Build_014 < Build_fake_file_structure__
+
+    def work
+      read_case_pair
+      read_case_pair
+      read_case_pair
+      nil
+    end
+
+  end
+
+  class Build_fake_file_structure__
 
     class << self
 
@@ -96,38 +138,26 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
 
     def initialize path
-      @fake_files_hash_via_regex_h = {}
+      @ad_hoc_code_blocks = nil
+      @case_h = nil
+      @fake_files_hash_via_regex_h = nil
       @path = path
+      @rx = %r(\A[ ]{4,}this is some code$)  # duplicates another, on purpose
       @stay_rx = STAY_RX__
-      @ad_hoc_code_blocks = {}
     end
 
     def build
       @fh = ::File.open @path, 'r'  # READ_MODE_
-      @rx = %r(\A[ ]{4,}this is some code$)  # duplicates another, on purpose
-      read_fake_file :file_one
-      read_fake_file :file_two
-      read_fake_file :file_three
-      read_fake_file :file_four
-      read_ad_hoc_code_block_one
+      work
       @fh.close
       flush
     end
 
-    def read_ad_hoc_code_block_one
-      @rx = %r(\A[[:space:]]*this example synthesizes every point\b)i
-      advance_to_rx
-      @fh.gets  # blank line
-      @line = @fh.gets
-      @stay_rx = /\A[[:space:]]+#/
-      @ad_hoc_code_blocks[ :ad_hoc_one ] =
-        build_fake_file_from_line_and_every_line_while_stay_rx
-      nil
-    end
-
     def read_fake_file name_symbol
 
-      advance_to_rx
+      advance_to_next_rx
+
+      @fake_files_hash_via_regex_h ||= {}
 
       _h = @fake_files_hash_via_regex_h.fetch @rx do
         @fake_files_hash_via_regex_h[ @rx ] = {}
@@ -138,22 +168,63 @@ module Skylab::TestSupport::TestSupport::DocTest
       nil
     end
 
-    def advance_to_rx
+    def read_case_pair
+      md = advance_to_next_rx CASE_INPUT_HEADER_RX__
+      example_name = md[ 1 ]
+      skip_blank_lines
+      ff = build_fake_file_from_line_and_every_line_while_stay_rx
+
+      md = advance_to_rx CASE_OUTPUT_HEADER_RX__
+
+      predicate_category = md[ 1 ]
+      skip_blank_lines
+      ff_ = build_fake_file_from_line_and_every_line_while_stay_rx(
+        /\A[[:space:]]+[^[:space:]]/ )
+
+      @case_h ||= {}
+      kase = TS_::Case_.new( example_name, ff, predicate_category, ff_ )
+      @case_h[ kase.case_name_symbol ] = kase
+    end
+
+    CASE_INPUT_HEADER_RX__ = /\Ahere is (.+\bexample\b.*):$/i
+    CASE_OUTPUT_HEADER_RX__ =
+      /\A(?:so,? )?the above input generates(?: the(?: following)?)?(?: ([^\n:]+))?:?$/i
+
+    def advance_to_next_rx rx=@rx
       @line = @fh.gets
+      advance_to_rx rx
+    end
+
+    def advance_to_rx rx=@rx
       begin
-        @line or fail
-        @rx =~ @line and break
+        @line or fail "never found before end of file: #{ rx.inspect }"
+        md = rx.match @line
+        md and break
         @line = @fh.gets
         redo
       end while nil
+      md
     end
 
-    def build_fake_file_from_line_and_every_line_while_stay_rx
+    def skip_blank_lines
+      begin
+        @line = @fh.gets
+        if BLANK_RX__ =~ @line
+          redo
+        else
+          break
+        end
+      end while nil
+    end
+
+    BLANK_RX__ = TestSupport_::DocTest::BLANK_RX_
+
+    def build_fake_file_from_line_and_every_line_while_stay_rx rx = @stay_rx
       fake_lines = []
       begin
         fake_lines.push @line
         @line = @fh.gets
-        if @line && @stay_rx =~ @line
+        if @line && rx =~ @line
           redo
         end
       end while nil
@@ -162,7 +233,7 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
 
     def flush
-      Fake_File_Structure__.new @ad_hoc_code_blocks, @fake_files_hash_via_regex_h
+      Fake_File_Structure__.new @ad_hoc_code_blocks, @case_h, @fake_files_hash_via_regex_h
     end
 
     STAY_RX__ = /\A[[:space:]]/
@@ -183,7 +254,11 @@ module Skylab::TestSupport::TestSupport::DocTest
   class Fake_File_Structure__
 
     def initialize * a
-      @ad_hoc_fake_file_h, @fake_files_hash_via_regex_h = a
+      @ad_hoc_fake_file_h, @case_h, @fake_files_hash_via_regex_h = a
+    end
+
+    def case i
+      @case_h.fetch i
     end
 
     def fake_files_demarcated_by_regex rx

@@ -1,4 +1,4 @@
-# the templo narrative :[#026]
+# the view controller narrative :[#026]
 
 
 ## :#storypoint-5 introduction

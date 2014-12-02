@@ -230,6 +230,14 @@ module Skylab::Basic
           end
           nil
         end
+
+        def to_child_stream
+          if @child_count.zero?
+            Callback_.stream.the_empty_stream
+          else
+            Callback_.stream.via_nonsparse_array @children
+          end
+        end
       end
 
       module Lazy_Selective_Event_Builder_Sender_Methods__

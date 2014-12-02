@@ -45,7 +45,7 @@ module Skylab::TestSupport
     end
 
   if false
-  class Specer__  # read [#025] the specer narrative #storypoint-5 intro
+  class Specer__  # read [#014] the specer narrative #storypoint-5 intro
 
     RegretLib_ = ::Skylab::TestSupport::Regret::API::RegretLib_
 
@@ -286,7 +286,7 @@ module Skylab::TestSupport
     def get_another_correct_anchored_name_via_the_load_module
       c_a = @load_module.split CONST_SEP_
       top = ::Object.const_get c_a.shift
-      name, = Autloader_.const_reduce do |cr|
+      name, = Autoloader_.const_reduce do |cr|
         cr.from_module top
         cr.path_x c_a
         cr.result_in_name_and_value
@@ -433,6 +433,16 @@ module Skylab::TestSupport
     IGNORED_ = nil
   end
   end
+
+    module Intermediate_Streams_
+      Autoloader_[ self ]
+
+      module Models_
+        Autoloader_[ self ]
+      end
+    end
+
+    BLANK_RX_ = /\A[[:space:]]*\z/
 
     DocTest_ = self
   end

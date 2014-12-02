@@ -35,17 +35,11 @@ module Skylab::TestSupport
 
           while line = up.gets
             md = HACK_RX__.match line
-            if md
-              local_margin_d_ = md[ 1 ].length
-              if local_margin_d == local_margin_d_
-                cb_a.push md
-                md = nil
-              else
-                break
-              end
-            else
-              break
-            end
+            md or break
+            local_margin_d_ = md[ 1 ].length
+            local_margin_d == local_margin_d_ or break
+            cb_a.push md
+            md = nil
           end
 
           if line

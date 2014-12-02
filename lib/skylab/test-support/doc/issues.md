@@ -1,4 +1,5 @@
-[#036] #open make lexical scope deeper in quickie main document.
+[#037]       #tracking tag warnings wishlist (#parent-node: [#014])
+[#036]       make lexical scope deeper in quickie main document.
 [#035]       #parent-node:[#021] the system narrative ..
 [#034] #open #doc-test core.rb
 [#033] #open if you un-orphanize core.rb it presents an issue with autoloader
@@ -7,10 +8,10 @@
 [#030] #open the doc-test recursive spec needs mock fs
 [#029]       #tracking-tag the 'expect' omnibus and narrative ..
 [#028] #open autoloading related ..
-[#027]       #parent-node:[#026] the templo narrative ..
-[#026]       #doc-node the doc-test narratives
-[#025]       #parent-node:[#026] the specer narrative ..
-[#024]       #parent-node:[#026] the graded verbosity narrative ..
+[#027] #hole (was the templo narrative .. )
+[#026]       #doc-node the view-controller narrative ..
+[#025] #hole (moved-to: 014. was: the specer narrative ..)
+[#024]       #doc-node the graded verbosity narrative ..
 [#023]       #doc-node #parent-node: [#020] "the IO spy"
 [#022]       #parent-node:[#021] "when to extlib and not to extlib.."
 [#021]       #doc-node the core node narrative ..
@@ -19,8 +20,8 @@
 [#018]       #quickie #in-situ
 [#017]       #doc-node #regret narrative
 [#016]       #parent-node:[#017] why we do not include parent anchor module..
-[#015]       #doc-test - ridiculous implications of self-generating test..
-[#014]       when you have no desc
+[#015]       #doc-node the doc test narrative ..
+[#014]       #parent-node: [#015] how nodes are generated ..
 [#013]       #done 351 extra tests (but this issue 2 states ago .. oh boy)
 [#012]       #doc-test - setup vs example?
 [#011]       #tracking-tag fix 'test/' - 'TestSupport' for autoloading?

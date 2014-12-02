@@ -6,6 +6,60 @@ module Skylab::TestSupport
 
       module Models_::Predicate_Expressions
 
+        class << self
+
+          def match line
+            RX__.match line
+          end
+
+          def expression_via_matchdata md
+            pre = md.pre_match
+            post = md.post_match
+            post.chomp!
+            Fat_Comma_Proto_Predicate__.new pre, post
+          end
+        end
+
+        RX__ = /[[:space:]]*#[ ]?=>[[:space:]]*/
+
+        class Raw_Line
+          class << self
+            alias_method :[], :new
+          end
+
+          def initialize s
+            @string = s
+          end
+
+          attr_reader :string
+
+          def members
+            [ :string, :expression_symbol ]
+          end
+
+          def expression_symbol
+            :raw_line
+          end
+
+        end
+
+        class Fat_Comma_Proto_Predicate__
+
+          def initialize * a
+            @lhs, @rhs = a
+          end
+
+          attr_reader :lhs, :rhs
+
+          def members
+            [ :lhs, :rhs, :expression_symbol ]
+          end
+
+          def expression_symbol
+            :proto_predicate
+          end
+        end
+
   if false
 
   class Templos__::Predicates  # a box module and a class.
