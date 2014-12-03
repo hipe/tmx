@@ -123,18 +123,25 @@ module Skylab::Headless
           begin
 
             @md = MODULE_LINE_RX_.match @line
-
             if @md
               _ = when_module
               _ ? redo : break
             end
 
-            @md = END_LINE_RX_.match @line
 
+            @md = END_LINE_RX_.match @line
             if @md
               _ = when_end_line
               _ ? redo : break
             end
+
+
+            @md = CONST_ASSIGNMENT_LINE_RX__.match @line
+            if @md
+              _ = when_const_assignment
+              _ ? redo : break
+            end
+
 
             _ = advance_line
             _ ? redo : break
@@ -148,7 +155,19 @@ module Skylab::Headless
 
         _ = '[A-Z][A-Za-z0-9_]*'
 
-        MODULE_LINE_RX_ = /\A(?<space>[[:space:]]*)(?:module|class)[ ](?<name>#{ _ }(?:::#{ _ })*)\b/
+        _name = "#{ _ }(?:::#{ _ })*"
+
+        MODULE_LINE_RX_ =
+          %r(\A (?<space>[[:space:]]*) (?:module|class)[ ] (?<name>#{ _name }) \b)x
+
+        CONST_ASSIGNMENT_LINE_RX__ =
+          %r(\A  (?<space>[[:space:]]*) (?<name>#{ _name })[ ]=[ ] )x
+
+        def when_const_assignment
+          @stack.push Module_Item__.via_matchdata @md
+          @top = @stack.last
+          when_end_line_normal
+        end
 
         def when_module
           @stack.push Module_Item__.via_matchdata @md

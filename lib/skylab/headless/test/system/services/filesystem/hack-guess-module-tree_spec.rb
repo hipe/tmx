@@ -32,12 +32,16 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem
       _lines = Headless_._lib.string_lib.line_stream _whole_s
 
       root = subject :line_upstream, _lines
+
       o = root
       o.child_count.should eql 1
       o = o.children.first
       o.value_x.should eql [ :Jazzmatazz ]
-      o.children.length.should eql 2
-      o.children.first.value_x.should eql [ :Bizzo, :Boffo ]
+      o.children.length.should eql 3
+      o.children.first.value_x.should eql [ :Bizzo ]
+      x = o.children[ 1 ]
+        x.value_x.should eql [ :Bizzo, :Boffo ]
+        x.children.first.value_x.should eql [ :Stfu_OMG ]
       o.children.last.value_x.should eql [ :Other_Module ]
 
       count = 0
@@ -45,34 +49,10 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem
         count += 1
       end
 
-      count.should eql 3
+      count.should eql 5
     end
 
-
-    if false  # #todo
-
-    _RX = /[^[:space:]]+/
-
-    it "CHECK ALL (visual test for now)" do
-      dflts = Headless_.system.defaults
-      _mani_path = dflts.doc_test_manifest_path
-      lines = ::File.open _mani_path, 'r'
-      pn = dflts.top_of_the_universe_pathname
-      count = 0
-      while line = lines.gets
-        count += 1
-        _path = _RX.match( line )[ 0 ]
-        try_this_path pn.join( _path ).to_path
-      end
-      debug_IO.puts "DONE with #{ count } paths."
-    end
-
-    def try_this_path path
-      debug_IO.puts "DOING-->#{ path }<---"
-      subject path  # xx
-    end
-
-    end
+    # (currently this gets more coverage in [#ts-015] doc-test)
 
     def subject * x_a, & p
       super().hack_guess_module_tree( * x_a, & p )

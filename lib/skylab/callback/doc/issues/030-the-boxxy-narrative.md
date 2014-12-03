@@ -11,16 +11,16 @@ one of two categories:
 
 1) convenience methods that allow the module to be treated more like a
    collection ("names" returns an iterator of name objects,
-  "each_const_value" is comparable to "each_value" of a hash)
+  `each_const_value` is comparable to `each_value` of a hash)
 
-2) overrides for "constants" and "const_defined?" that implement
+2) overrides for `constants` and `const_defined?` that implement
    [mh-029] "isomrphic-filenames".
 
 
 ## :#the-boxxy-methods (a.k.a :#boxxy-like behavior)
 
 these are optional and always experimental: they hack 'constants' and
-'const_defined?' to do fuzzy inference based on the files in the filesystem
+`const_defined?` to do fuzzy inference based on the files in the filesystem
 (without loading them!). this is convenient when it works but can potentially
 be a headache when it doesn't..
 
@@ -33,8 +33,8 @@ this pattern in general is why we must ensure that the universal base methods
 must get put on the chain "first" so they are not in front when others are
 added that wish to overrride them.
 
-the boxxy methods hack 'constants' and 'const_defined?', and do not concern
-themselves with 'const_missing' or 'const_get'.
+the boxxy methods hack `constants` and `const_defined?`, and do not concern
+themselves with `const_missing` or `const_get`.
 
 
 ### :#the-fuzzily-unique-entry-scanner

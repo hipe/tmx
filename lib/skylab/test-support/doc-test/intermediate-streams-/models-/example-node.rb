@@ -13,7 +13,7 @@ module Skylab::TestSupport
         def initialize * a
           text_span, md = a
           @description_s = Models_::Description_String[ text_span.a.last ]
-          @expressiona_a = md.flush_to_expression_list
+          @expression_a = md.flush_to_expression_list
         end
 
         def members
@@ -33,6 +33,7 @@ module Skylab::TestSupport
         end
 
         class Matchdata
+
           def initialize * a
             @md, @lines, @span = a
           end

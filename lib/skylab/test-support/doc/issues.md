@@ -9,7 +9,7 @@
 [#030] #open the doc-test recursive spec needs mock fs
 [#029]       #tracking-tag the 'expect' omnibus and narrative ..
 [#028] #open autoloading related ..
-[#027] #hole (was the templo narrative .. )
+[#027]       #parent-node: [#015] peek hack explained .. (was templo)
 [#026]       #parent-node: [#015] the view-controller narrative ..
 [#025]       #parent-node: [#015] output adapters.
 [#024]       #doc-node the graded verbosity narrative ..

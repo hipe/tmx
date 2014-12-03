@@ -132,6 +132,113 @@ module Skylab::TestSupport
           p[]
         end
       end
+
+      # ~ using a stateful scanner
+
+      def expect_next_nonblank_line_is string
+        advance_to_next_nonblank_line
+        line.should eql string
+      end
+
+      def advance_to_rx rx
+        expect_line_scanner.advance_to_rx rx
+      end
+
+      def advance_to_next_rx rx
+        expect_line_scanner.advance_to_next_rx rx
+      end
+
+      def advance_to_next_nonblank_line
+        expect_line_scanner.advance_to_next_rx NONBLANK_RX__
+      end
+
+      def line
+        @expect_line_scanner.line
+      end
+
+      def expect_line_scanner
+        @expect_line_scanner ||= Expect_Line::Scanner.via_string( @output_s )
+      end
+    end
+
+    NONBLANK_RX__ = /[^[:space:]]/
+  end
+
+  module Expect_Line
+
+    class Scanner
+
+      class << self
+
+        def via_line_stream lines
+          new lines
+        end
+
+        def via_string string
+          new TestSupport_._lib.string_lib.line_stream string
+        end
+
+        private :new
+      end
+
+      def initialize up
+        @up = up
+      end
+
+      attr_reader :line
+
+      def advance_to_next_rx rx
+        @line = @up.gets
+        advance_to_rx rx
+      end
+
+      def advance_to_rx rx
+        begin
+          @line or fail "never found before end of file: #{ rx.inspect }"
+          md = rx.match @line
+          md and break
+          @line = @up.gets
+          redo
+        end while nil
+        md
+      end
+
+      def skip_blank_lines
+        begin
+          @line = @up.gets
+          if BLANK_RX__ =~ @line
+            redo
+          else
+            break
+          end
+        end while nil
+      end
+
+      BLANK_RX__ = /\A[[:space:]]*\z/
+
+      def build_fake_file_from_line_and_every_line_while_rx rx
+        fake_lines = []
+        begin
+          fake_lines.push @line
+          @line = @up.gets
+          if @line && rx =~ @line
+            redo
+          end
+        end while nil
+
+        Fake_File__.new fake_lines
+      end
+
+      class Fake_File__
+
+        def initialize a
+          @a = a
+        end
+
+        def fake_open
+          Callback_.stream.via_nonsparse_array @a
+        end
+      end
     end
   end
 end

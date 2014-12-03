@@ -14,7 +14,7 @@ which is necessary to do for some deep, narrow tress and this autoloading
 algorithm.)
 
 we `use-dashes-in-filenames` and `not_underscores` because of the fact that
-it looks unequivocably better. (but still we use _spec.rb in our test
+it looks unequivocably better. (but still we use `_spec.rb` in our test
 because it is the default, and although this makes everything look horrible
 we stubbornly stick it out because of how strongly we feel for the dashes.)
 we could bend the autoloading behavior to anticipate the possibility of
@@ -37,7 +37,7 @@ MyApp::Foo::Bar even though there is no "foo.rb" to load. the autovivifying
 autoloader assumed that any directory immediately under it for which there is
 no corresponding file, that it was OK to go ahead and create a module with
 a name based off that directory name. (here you can even pick your naming
-convention: "biff-baz" can become BiffBaz or Biff_Baz. #todo:explain-how)
+convention: "biff-baz" can become BiffBaz or `Biff_Baz`. #todo:explain-how)
 
 this "autovivification" was problematic for certain structures and
 certain operations and so was removed, having been deemed a mis-feature.

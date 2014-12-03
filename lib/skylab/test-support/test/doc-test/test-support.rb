@@ -20,6 +20,8 @@ module Skylab::TestSupport::TestSupport::DocTest
 
   Callback_ = TestSupport_::Callback_
 
+  DocTest_ = TestSupport_::DocTest
+
   module ModuleMethods
 
     def with_big_file_path & p
@@ -147,9 +149,10 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
 
     def build
-      @fh = ::File.open @path, 'r'  # READ_MODE_
+      fh = ::File.open @path, 'r'  # READ_MODE_
+      @expect_line_scanner = TestSupport_::Expect_Line::Scanner.via_line_stream fh
       work
-      @fh.close
+      fh.close
       flush
     end
 
@@ -191,45 +194,19 @@ module Skylab::TestSupport::TestSupport::DocTest
       /\A(?:so,? )?the above input generates(?: the(?: following)?)?(?: ([^\n:]+))?:?$/i
 
     def advance_to_next_rx rx=@rx
-      @line = @fh.gets
-      advance_to_rx rx
+      @expect_line_scanner.advance_to_next_rx rx
     end
 
     def advance_to_rx rx=@rx
-      begin
-        @line or fail "never found before end of file: #{ rx.inspect }"
-        md = rx.match @line
-        md and break
-        @line = @fh.gets
-        redo
-      end while nil
-      md
+      @expect_line_scanner.advance_to_rx rx
     end
 
     def skip_blank_lines
-      begin
-        @line = @fh.gets
-        if BLANK_RX__ =~ @line
-          redo
-        else
-          break
-        end
-      end while nil
+      @expect_line_scanner.skip_blank_lines
     end
 
-    BLANK_RX__ = TestSupport_::DocTest::BLANK_RX_
-
     def build_fake_file_from_line_and_every_line_while_stay_rx rx = @stay_rx
-      fake_lines = []
-      begin
-        fake_lines.push @line
-        @line = @fh.gets
-        if @line && rx =~ @line
-          redo
-        end
-      end while nil
-
-      Fake_File__.new fake_lines
+      @expect_line_scanner.build_fake_file_from_line_and_every_line_while_rx rx
     end
 
     def flush
@@ -238,17 +215,6 @@ module Skylab::TestSupport::TestSupport::DocTest
 
     STAY_RX__ = /\A[[:space:]]/
 
-  end
-
-  class Fake_File__
-
-    def initialize a
-      @a = a
-    end
-
-    def fake_open
-      Callback_.stream.via_nonsparse_array @a
-    end
   end
 
   class Fake_File_Structure__
@@ -268,6 +234,14 @@ module Skylab::TestSupport::TestSupport::DocTest
     def ad_hoc_fake_file i
       @ad_hoc_fake_file_h.fetch i
     end
+  end
+
+  class Omni_Mock_
+    def initialize x
+      @x = x
+    end
+    attr_reader :x
+    alias_method :a, :x
   end
 
   module Sandboxer

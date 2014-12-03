@@ -8,7 +8,7 @@ module Skylab::TestSupport
 
         def expect_case name_i
           @kase = fake_file_structure_for_path( big_file_path ).case name_i
-          @node_stream = via_case_build_node_stream
+          @node_upstream = via_case_build_node_stream
           _expect_tree = @kase.predicate_tree
           run_case_expectations_of_tree_children _expect_tree
         end
@@ -64,11 +64,11 @@ module Skylab::TestSupport
         def via_node_expect_test_case_context eg
           # we might one day validate description strings like the other
 
-          x = @node_stream.gets
+          x = @node_upstream.gets
           x and raise "re-implement this so that both the expectation and #{
             }the actuals side are args not ivars, OR use actors etc"
 
-          @node_stream = @node.to_child_stream
+          @node_upstream = @node.to_child_stream
           ACHIEVED_
         end
 
@@ -99,7 +99,7 @@ module Skylab::TestSupport
         end
 
         def common_expect_test_case_node eg
-          @node = @node_stream.gets
+          @node = @node_upstream.gets
           if @node
             if eg.expected_node_symbol == @node.node_symbol
               ACHIEVED_
@@ -118,7 +118,7 @@ module Skylab::TestSupport
         end
 
         def check_for_extra_case_nodes
-          node = @node_stream.gets
+          node = @node_upstream.gets
           if node
             fail "expected no more nodes, had '#{ node.node_symbol }'"
             UNABLE_

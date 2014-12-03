@@ -75,6 +75,10 @@ module Skylab::TestSupport
       end
     end
 
+    Event_lib = -> do
+      Bzn_[].event
+    end
+
     Properties_stack_frame = -> * a do
       Bzn_[].properties_stack.common_frame.via_arglist a
     end
@@ -140,18 +144,18 @@ module Skylab::TestSupport
       Callback_::Proxy
     end
 
-    Stream = -> x do
-      Callback_::Scn.try_convert x
-    end
+    Skylab__ = memoize[ -> do
+      require_relative '..'
+      ::Skylab
+    end ]
 
     Stderr = -> { ::STDERR }
       # [#035]:the-reasons-to-access-system-resources-this-way
     Stdout = -> { ::STDOUT }
 
-    Skylab__ = memoize[ -> do
-      require_relative '..'
-      ::Skylab
-    end ]
+    Stream = -> x do
+      Callback_::Scn.try_convert x
+    end
 
     String_lib = -> do
       Bsc[]::String

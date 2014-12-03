@@ -1643,8 +1643,12 @@ module Skylab::Callback
 
   DASH_ = '-'.freeze
 
-  def self.distill
-    Distill_
+  def self.distill * a
+    if a.length.zero?
+      Distill_
+    else
+      Distill_[ * a ]
+    end
   end
 
   UNDERSCORE_ = '_'.freeze

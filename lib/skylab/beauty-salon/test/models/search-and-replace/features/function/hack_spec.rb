@@ -26,10 +26,15 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
           end ]
         end
 
-        s_a[ 0 ].should eql 'Jazzmatazz'
-        s_a[ 1 ].should eql 'Jazzmatazz::Bizzo::Boffo'
-        s_a[ 2 ].should eql 'Jazzmatazz::Other_Module'
-        s_a.length.should eql 3
+        o = Callback_.stream.via_nonsparse_array s_a
+
+        o.gets.should eql "Jazzmatazz"
+        o.gets.should eql "Jazzmatazz::Bizzo"
+        o.gets.should eql "Jazzmatazz::Bizzo::Boffo"
+        o.gets.should eql "Jazzmatazz::Bizzo::Boffo::Stfu_OMG"
+        o.gets.should eql "Jazzmatazz::Other_Module"
+
+        s_a.length.should eql 5
       end
 
       def subject * x_a, & p
