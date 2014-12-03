@@ -9,21 +9,31 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
 
         _path = TS_::Fixtures.stfu_omg_function_file_path
 
-        tree = subject[ _path, nil ]
+        tree = subject :path, _path
 
         s_a = []
-        tree.traverse do |node|
-          s_a.push node.const_i_a * BS_::CONST_SEP_
+
+        _SEP = BS_::CONST_SEP_
+
+        tree.children_depth_first_via_args_hook nil do |node, x, p|
+          a = []
+          x and a.push x
+          a.concat node.value_x
+          mine = a * _SEP
+          s_a.push mine
+          p[ -> do
+            [ mine ]
+          end ]
         end
+
         s_a[ 0 ].should eql 'Jazzmatazz'
-        s_a[ 1 ].should eql 'Jazzmatazz::Bizzo'
-        s_a[ 2 ].should eql 'Jazzmatazz::Bizzo::Boffo'
-        s_a[ 3 ].should eql 'Jazzmatazz::Other_Module'
-        s_a.length.should eql 4
+        s_a[ 1 ].should eql 'Jazzmatazz::Bizzo::Boffo'
+        s_a[ 2 ].should eql 'Jazzmatazz::Other_Module'
+        s_a.length.should eql 3
       end
 
-      def subject
-        Subject_[]::Actors_::Build_replace_function::Hack_guess_module_tree__
+      def subject * x_a, & p
+        BS_::Lib_::System[].filesystem.hack_guess_module_tree( * x_a, & p )
       end
 
   end

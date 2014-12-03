@@ -48,6 +48,10 @@ module Skylab::Callback
       Bsc__[]::Enumerator
     end
 
+    Event_lib = -> do
+      Bzn__[].event
+    end
+
     Hash_lib = -> do
       Bsc__[]::Hash
     end

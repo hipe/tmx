@@ -45,7 +45,7 @@
 [#016]       #done iambify extension interface
 [#015]       #nichepoint "event factory structural" (there are others..)
 [#014]       #parent-node:[#019] the reflection API
-[#013]       selective listener
+[#013]       #parent-node: [#017] selective listener methodic
 [#012]       #done #tracking-tag - can the idea of "specificity" be built ..
 [#011]       #done renamed "pub-sub" to "callback" universe wide.
                (#evolved-from: #tickler consider renaming pub-sub to 'stream')

@@ -10,15 +10,16 @@ module Skylab::Headless
 
       Headless_._lib.properties_stack_frame self,
 
-        :memoized, :proc, :bin_pathname, -> do
-          ::Skylab.dir_pathname.join( '../../bin' ).expand_path
+        :memoized, :inline_method, :bin_pathname, -> do
+          top_of_the_universe_pathname.join 'bin'
         end,
 
         :memoized, :inline_method, :cache_pathname, -> do
           pn = @system.filesystem.tmpdir_pathname.join CACHE_FILE__
-          pn.exist? or ::Dir.mkdir pn.to_s, CACHE_PERMS__
+          pn.exist? or ::Dir.mkdir pn.to_s, 0766  # same perms as `TemporaryItems`
           pn
         end,
+
 
         # ~ tmpdir paths
 
@@ -26,13 +27,35 @@ module Skylab::Headless
           dev_tmpdir_pathname.to_path.freeze
         end,
 
-        :memoized, :proc, :dev_tmpdir_pathname, -> do
-          ::Skylab.dir_pathname.join DEV_TMPDIR_PATH__
+        :memoized, :inline_method, :dev_tmpdir_pathname, -> do
+          top_of_the_universe_pathname.join 'tmp'  # [#128] the devil's work
+        end,
+
+
+        # ~ doc-test related paths (for dev & hax)
+
+        :memoized, :inline_method, :doc_test_manifest_path, -> do
+          top_of_the_universe_pathname.join(
+            "#{ doc_test_dir }/#{ doc_test_files_file }" ).to_path.freeze
+        end,
+
+        :memoized, :proc, :doc_test_dir, -> do
+          'test/doc-test'.freeze
+        end,
+
+        :memoized, :proc, :doc_test_files_file, -> do
+          'data-documents/files'.freeze
+        end,
+
+
+        # ~ support
+
+        :memoized, :proc, :top_of_the_universe_pathname, -> do
+          ::Skylab.dir_pathname.join( '../..' ).expand_path
         end
 
-      CACHE_FILE__ = 'sl.skylab'.freeze
-      CACHE_PERMS__ = 0766  # same perm as `TemporaryItems`
-      DEV_TMPDIR_PATH__ = '../../tmp'.freeze  # [#128] this devil's work
+        CACHE_FILE__ = 'sl.skylab'.freeze  # covered
+
     end
   end
 end

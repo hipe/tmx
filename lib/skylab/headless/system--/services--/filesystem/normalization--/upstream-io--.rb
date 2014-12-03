@@ -37,7 +37,7 @@ module Skylab::Headless
               end
             end
 
-            o :properties, :instream, :on_event_selectively
+            o :properties, :instream, :as_normal_value, :on_event_selectively
           end
 
           def initialize & p

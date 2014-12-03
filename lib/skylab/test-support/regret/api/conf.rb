@@ -7,11 +7,6 @@ module Skylab::TestSupport
     Verbosity = TestSupport_::Verbosity_.produce_conf_module [ :notice, :medium, :murmur ]
     # NOTE the order of the symbols above corresponds to the number of "-v"'s !
 
-
-    DOC_TEST_DIR_ = 'test/doc-test'
-
-    DOC_TEST_FILES_FILE_ = 'data-documents/files'
-
     def self.[] i
       const_get "#{ i.upcase }_", false
     end

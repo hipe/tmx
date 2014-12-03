@@ -23,7 +23,7 @@ module Skylab::Basic
         agent = self
         @stack = [ @frame ]
         ok = nil
-        node = Immutable_Node__.new do
+        node = Immutable_Node_.new do
           cx_a = []
           ok = agent.add_current_and_each_sibling_or_child self do |x|
             cx_a.push x
@@ -62,7 +62,7 @@ module Skylab::Basic
           ok, value_x = value_pair_via_content_string_and_parent(
             current_frame.content_s, parent )
           ok or break
-          node = Immutable_Node__.new do
+          node = Immutable_Node_.new do
             @parent = parent
             @value_x = value_x
             if next_node_is_child
@@ -205,40 +205,6 @@ module Skylab::Basic
       end
 
       Frame__ = ::Struct.new :indent_s, :indent_d, :content_s
-
-      class Immutable_Node__
-
-        def initialize & p
-          instance_exec( & p )
-          freeze
-        end
-
-        attr_reader :child_count, :children, :parent, :value_x
-
-        # ~ courtesy
-
-        def children_depth_first * x_a, & visit_p
-          @children.each do |node|
-            child_p = nil
-            visit_p.call node, * x_a, -> p do
-              child_p = p
-            end
-            if node.child_count.nonzero?
-              x_a_ = child_p[]
-              node.children_depth_first( * x_a_, & visit_p )
-            end
-          end
-          nil
-        end
-
-        def to_child_stream
-          if @child_count.zero?
-            Callback_.stream.the_empty_stream
-          else
-            Callback_.stream.via_nonsparse_array @children
-          end
-        end
-      end
 
       module Lazy_Selective_Event_Builder_Sender_Methods__
 

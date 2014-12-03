@@ -168,17 +168,22 @@ module Skylab::BeautySalon
           end
 
           def resolve_tree_guess_via_path
-            @tree = Self_::Hack_guess_module_tree__[ @path, @oes ]
+            @tree = BS_._lib.system.filesystem.hack_guess_module_tree @path, & @oes
             @tree ? ACHIEVED_ : UNABLE_
           end
 
           def via_tree_guess_and_loaded_path_resolve_function
-            @tree.value = ::Object
+            tree = @tree.dup_mutable
+            tree.value_x = ::Object
             @func = nil
-            @tree.traverse do |node|
-              node.value = node.parent.value.const_get( node.name_i, false )
-              @func = Autoloader_.const_reduce [ @custom_i ], node.value do end
+            tree.children_depth_first do |node|
+              const_i_a = node.value_x
+              mod = const_i_a.reduce node.parent.value_x do |m, i|
+                m.const_get i, false
+              end
+              @func = Autoloader_.const_reduce [ @custom_i ], mod do end
               @func and break
+              node.value_x = mod
             end
             if ! @func  # search at toplevel
               @func = Autoloader_.const_reduce [ @custom_i ], ::Object do end
@@ -189,6 +194,8 @@ module Skylab::BeautySalon
               self._WHEN_func_not_found
             end
           end
+
+          Item__ = ::Struct.new :mod, :const_i_a
 
           def resolve_class
             @normal_path = @functions_pn.expand_path

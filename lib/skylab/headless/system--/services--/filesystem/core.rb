@@ -28,6 +28,10 @@ module Skylab::Headless
         Filesystem_::Grep__.mixed_via_iambic x_a
       end
 
+      def hack_guess_module_tree * x_a, & oes_p
+        Filesystem_::Hack_guess_module_tree__.via_arglist x_a, & oes_p
+      end
+
       def line_stream_via_path path, num_bytes=nil
         Headless_::IO.line_stream ::File.open( path, READ_MODE_ ), num_bytes
       end

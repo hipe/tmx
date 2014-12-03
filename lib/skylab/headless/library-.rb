@@ -39,7 +39,7 @@ module Skylab::Headless
       Bsc__[]::Box
     end
 
-    Bzn__ = sidesys[ :Brazen ]
+    Bzn_ = sidesys[ :Brazen ]
 
     Bundle = -> do
       MH__[]::Bundle
@@ -51,10 +51,10 @@ module Skylab::Headless
 
     Entity = -> * a, & p do
       if a.length.zero? && ! p
-        Bzn__[]::Entity
+        Bzn_[]::Entity
       else
         p and a.push p
-        Bzn__[]::Entity.via_arglist a
+        Bzn_[]::Entity.via_arglist a
       end
     end
 
@@ -63,7 +63,7 @@ module Skylab::Headless
     end
 
     Event_lib = -> do
-      Bzn__[].event
+      Bzn_[].event
     end
 
     Funcy_globful = -> cls do
@@ -97,7 +97,7 @@ module Skylab::Headless
     end
 
     Properties_stack_frame = -> *a do
-      Bzn__[].properties_stack.common_frame.via_arglist a
+      Bzn_[].properties_stack.common_frame.via_arglist a
     end
 
     Pool = -> do
@@ -123,6 +123,10 @@ module Skylab::Headless
 
     String_lib = -> do
       Bsc__[]::String
+    end
+
+    Tree_lib = -> do
+      Bsc__[]::Tree
     end
   end
 end

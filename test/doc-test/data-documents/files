@@ -1,8 +1,6 @@
 lib/skylab/basic/hash/core.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/basic/hash/order-proxy.rb
 lib/skylab/basic/list/core.rb  #output-filename: pairs/core_spec.rb  #regret-setup: no  #look-for-ts
-lib/skylab/basic/list/scanner.rb
-lib/skylab/basic/list/scanner/with/peek.rb
 lib/skylab/basic/method.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/basic/pathname/union.rb
 lib/skylab/basic/rotating-buffer.rb
@@ -10,27 +8,26 @@ lib/skylab/basic/struct.rb
 lib/skylab/brazen/entity/properties-stack--/common-frame--.rb #branch-down-to-core #regret-setup:no
 lib/skylab/callback/proxy/inline--.rb  #branch-down-to-core  #regret-setup: no
 lib/skylab/callback/proxy/functional--.rb  #branch-down-to-core  #regret-setup: no
-lib/skylab/callback/proxy/functional--/nice--.rb   #branch-down-to-core  #regret-setup: no
 lib/skylab/face/cli/lipstick.rb
 lib/skylab/face/cli/table.rb  #branch-down-to-core  #regret-setup:no
-lib/skylab/face/cli/tableize.rb
+lib/skylab/face/cli/tableize--.rb
 lib/skylab/face/plugin/host/metaservices-/chain-.rb
 lib/skylab/face/plugin/host/proxy.rb
-lib/skylab/headless/cli/option.rb  #branch-down-to-core  #regret-setup:no
+lib/skylab/headless/cli/option--/core.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/headless/system--/services--/filesystem/cache--.rb  #branch-down-to-core #regret-setup:no
 lib/skylab/information-tactics/levenshtein.rb
 lib/skylab/meta-hell/basic-fields.rb #branch-down-to-core #regret-setup:no
 lib/skylab/meta-hell/dsl-dsl/core.rb  #regret-setup:no
 lib/skylab/meta-hell/fields/from.rb
-lib/skylab/meta-hell/fun/core.rb  #regret-setup:no
+lib/skylab/meta-hell/lib--.rb  #regret-setup:no
 lib/skylab/meta-hell/parse/core.rb  #regret-setup:no
 lib/skylab/meta-hell/parse/alternation--.rb
-lib/skylab/meta-hell/parse/from-ordered-set--.rb
-lib/skylab/meta-hell/parse/from-set--.rb
+lib/skylab/meta-hell/parse/via-ordered-set--.rb
+lib/skylab/meta-hell/parse/via-set--.rb
 lib/skylab/meta-hell/parse/series--.rb  #branch-down-to-core #regret-setup:no
-lib/skylab/meta-hell/function.rb
+lib/skylab/meta-hell/ivars-with-procs-as-methods.rb
 lib/skylab/meta-hell/module/accessors.rb
 lib/skylab/test-support/quickie/possible-/articulator-.rb
-lib/skylab/test-support/regret/api/actions/doc-test.rb
-lib/skylab/test-support/regret/api/actions/doc-test/specer--.rb
+lib/skylab/test-support/doc-test/core.rb
+lib/skylab/test-support/doc-test/models-/front/actions/generate.rb
 lib/skylab/test-support/regret/api/actions/intermediates.rb

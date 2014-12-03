@@ -1,6 +1,6 @@
 module Skylab::TreetopTools
 
-  class Hack_peek_module_name__  # read [#006] the const-pryer hack
+  class Hack_peek_module_name__  # READ [#006] the const-pryer hack
 
     Callback_::Actor[ self, :properties, :path ]
 

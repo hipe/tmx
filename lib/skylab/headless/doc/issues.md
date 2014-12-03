@@ -72,7 +72,7 @@
 [#109]       #parent-node: [#050] "noise.."
 [#108]       #parent-node: [#093] on structural isomorphicisms to the
               natural language syntactic structures ..
-[#107] #hole (was : #parent-ndoe: [#095] the relationship btwn verb phrases and .. )
+[#107]       #parent-node: [#130] hack guess module tree (docs #in-situ)
 [#106]       #parent-node: [#050] idioms grow from ubiquity ..
 [#105]       #parent-node: [#093] "the rule of business object variable.."
 [#104]       #parent-node: [#093] "list of variable name patterns.."

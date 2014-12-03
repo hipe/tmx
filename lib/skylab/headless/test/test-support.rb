@@ -49,5 +49,9 @@ module Skylab::Headless::TestSupport
     Callback_test_support = -> do
       Headless_::Callback_.test_support
     end
+
+    Expect_event = -> test_context_class do
+      Headless_::Lib_::Bzn_[].test_support.expect_event test_context_class
+    end
   end
 end

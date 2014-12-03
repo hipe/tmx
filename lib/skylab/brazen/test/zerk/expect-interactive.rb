@@ -177,7 +177,7 @@ module Skylab::Brazen
           end
         end
 
-        def expect_line_eventually rx
+        def expect_line_eventually rx  # if this complexifies use [#ts-038]
           if @ok
             do_expect_line_eventually rx
           end

@@ -44,17 +44,23 @@ module Skylab::Callback
 
         # (experimental variations on the theme, but we should DRY these)
 
-        def via_iambic x_a
-          curried = build_via_iambic x_a
+        def via_arglist a, & oes_p
+          curried = build_via_arglist a, & oes_p  # :+#hook-out
           curried && curried.execute
         end
 
-        def build_via_iambic x_a
+        def via_iambic x_a, & oes_p
+          curried = build_via_iambic x_a, & oes_p
+          curried && curried.execute
+        end
+
+        def build_via_iambic x_a, & oes_p
           seen = false
           ok = true
           x = new do
             seen = true
-            ok = process_iambic_fully x_a
+            oes_p and receive_selective_listener_proc oes_p
+            ok = process_iambic_fully 0, x_a
           end
           seen && ok && x
         end
@@ -108,8 +114,8 @@ module Skylab::Callback
 
       private
 
-        def process_iambic_fully x_a
-          process_iambic_passively x_a
+        def process_iambic_fully d=0, x_a
+          process_iambic_passively d, x_a
           if unparsed_iambic_exists
             when_extra_iambic
           else
@@ -117,8 +123,8 @@ module Skylab::Callback
           end
         end
 
-        def process_iambic_passively x_a
-          @d = 0 ; @x_a_length = x_a.length ; @x_a = x_a
+        def process_iambic_passively d=0, x_a
+          @d = d ; @x_a_length = x_a.length ; @x_a = x_a
           via_algorithm_process_iambic_passively
         end
 

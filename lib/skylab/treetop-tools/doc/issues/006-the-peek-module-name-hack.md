@@ -13,3 +13,8 @@ this implementation is a shameless & deferential tribute which, if
 not obvious at first glance, is intended to symbolize the triumph
 of the recursive buck stopping somewhere even if it perhaps doesn't
 need to.  (i.e.: yes i know, and i'm considering it.)
+
+
+somehow, going back years [#hl-107] has existed alongside this. that is
+now better than this so as soon as this gives you any trouble, use that
+instead of this.

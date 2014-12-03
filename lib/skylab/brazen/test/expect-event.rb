@@ -49,6 +49,12 @@ module Skylab::Brazen::TestSupport
           end, self
         end
 
+        def expect_one_event_and_neutral_result * x_a, & p
+          expect_event_via_iambic_and_proc [ :shorthand, x_a ], p
+          expect_no_more_events
+          expect_neutralled
+        end
+
         def expect_one_event * x_a, & p
           expect_event_via_iambic_and_proc [ :shorthand, x_a ], p
           expect_no_more_events

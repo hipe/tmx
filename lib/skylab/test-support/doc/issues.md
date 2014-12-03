@@ -1,16 +1,17 @@
+[#038]       expect line
 [#037]       #tracking tag warnings wishlist (#parent-node: [#014])
 [#036]       make lexical scope deeper in quickie main document.
 [#035]       #parent-node:[#021] the system narrative ..
-[#034] #open #doc-test core.rb
+[#034] #open #parent-node: [#015] core.rb
 [#033] #open if you un-orphanize core.rb it presents an issue with autoloader
-[#032] #open #doc-test change syntax to work with contiguous nonblank lines
+[#032] #open #parent-node: [#015] change syntax to work with contiguous nonblank lines
 [#031] #open #tracking-tag while regret no longer wires test nodes for autoloading
 [#030] #open the doc-test recursive spec needs mock fs
 [#029]       #tracking-tag the 'expect' omnibus and narrative ..
 [#028] #open autoloading related ..
 [#027] #hole (was the templo narrative .. )
-[#026]       #doc-node the view-controller narrative ..
-[#025] #hole (moved-to: 014. was: the specer narrative ..)
+[#026]       #parent-node: [#015] the view-controller narrative ..
+[#025]       #parent-node: [#015] output adapters.
 [#024]       #doc-node the graded verbosity narrative ..
 [#023]       #doc-node #parent-node: [#020] "the IO spy"
 [#022]       #parent-node:[#021] "when to extlib and not to extlib.."
@@ -23,7 +24,7 @@
 [#015]       #doc-node the doc test narrative ..
 [#014]       #parent-node: [#015] how nodes are generated ..
 [#013]       #done 351 extra tests (but this issue 2 states ago .. oh boy)
-[#012]       #doc-test - setup vs example?
+[#012]       #done #parent-node: [#015] setup vs example?
 [#011]       #tracking-tag fix 'test/' - 'TestSupport' for autoloading?
 [#010]       #tracking-tag "dark hack" this one weird old trick makes ..
 [#009]       #subscription - will Quickie ever short-circuit (throw

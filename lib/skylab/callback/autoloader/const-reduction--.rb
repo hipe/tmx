@@ -125,20 +125,39 @@ module Skylab::Callback
         @name = Name.via_variegated_symbol @const_x
         @name.as_const or cannot_construe_valid_const
       end
+
       def cannot_construe_valid_const
-        @exception = ::NameError.
-          new say_cannot_construe, @name.as_variegated_symbol
-        rslv_result_via_exception
+        if @else_p && @else_p.arity.nonzero?  # covered
+          if 1 == @else_p.arity
+            @result = @else_p[ bld_wrong_const_name_exception ]
+          else
+            @result = @else_p.call :error, :wrong_const_name do
+              bld_wrong_const_name_event
+            end
+          end
+        else
+          raise bld_wrong_const_name_exception
+        end
         CEASE_
       end
+
+      def bld_wrong_const_name_event
+        Callback_::Lib_::Event_lib[].inline_not_OK_with :wrong_const_name,
+            :name, @name.as_variegated_symbol,
+            :error_category, :name_error do |y, o|
+
+          y << "wrong constant name #{ ick o.name } for const reduce"
+        end
+      end
+
+      def bld_wrong_const_name_exception
+        ::NameError.new say_cannot_construe, @name.as_variegated_symbol
+      end
+
       def say_cannot_construe
         "wrong constant name #{ @name.as_variegated_symbol } for const reduce"
       end
-      def rslv_result_via_exception
-        @else_p && 1 == @else_p.arity or raise @exception
-        @result = @else_p[ @exception ]
-        IGNORED_
-      end
+
       def step_with_valid_name
         _procede = rslv_result_with_valid_name
         if _procede
@@ -181,7 +200,7 @@ module Skylab::Callback
           stem == Distill_[ const_i ] and a << const_i
         end
         @result = case a.length <=> 1
-        when -1 ; zero_p ? zero_p[] : rslv_some_result_when_const_not_defined
+        when -1 ; zero_p ? zero_p[] : prdc_result_when_const_not_defined
         when  0 ; one_p ? one_p[ a.first ] :
                     rslv_some_result_from_correct_const( a.first )
         when  1 ; many_p ? many_p[ a ] : rslv_some_result_when_ambiguous( a )
@@ -243,7 +262,7 @@ module Skylab::Callback
         if np
           rslv_some_result_by_loading_some_file_in_normpath np
         else
-          rslv_some_result_when_const_not_defined
+          prdc_result_when_const_not_defined
         end
       end
       def rslv_any_tree
@@ -261,7 +280,7 @@ module Skylab::Callback
         if file
           rslv_some_result_by_loading_file_for_normpath file
         else
-          rslv_some_result_when_const_not_defined
+          prdc_result_when_const_not_defined
         end
       end
       def rslv_some_result_by_loading_file_for_normpath file_normpath
@@ -283,17 +302,35 @@ module Skylab::Callback
         r
       end
       def rslv_result_when_const_not_defined
-        @result = rslv_some_result_when_const_not_defined
+        @result = prdc_result_when_const_not_defined
         CEASE_
       end
-      def rslv_some_result_when_const_not_defined
-        @else_p or raise build_name_error
-        if @else_p.arity.zero?
-          @else_p[]
+
+      def prdc_result_when_const_not_defined
+        if @else_p
+          case @else_p.arity
+          when 0
+            @else_p[]
+          when 1
+            @else_p[ build_name_error ]
+          else
+            @else_p.call :error, :uninitialized_constant do
+              bld_name_error_event
+            end
+          end
         else
-          @else_p[ build_name_error ]
+          raise build_name_error
         end
       end
+
+      def bld_name_error_event
+        Callback_::Lib_::Event_lib[].inline_not_OK_with(
+            :uninitialized_constant, :name, @name.as_variegated_symbol,
+              :mod, @mod ) do |y, o|
+          y << "uninitialized constant #{ o.mod }::( ~ #{ o.name } )"
+        end
+      end
+
       def build_name_error
         Name_Error__.new @mod, @name.as_variegated_symbol
       end
