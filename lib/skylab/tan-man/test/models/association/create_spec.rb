@@ -4,9 +4,9 @@ module Skylab::TanMan::TestSupport::Models::Association
 
   describe "[tm] models association create" do
 
-    extend TS_
+    TestSupport_::Expect_line[ self ]
 
-    TanMan_::TestSupport::Expect_File_Content[ self ]
+    extend TS_
 
     it 'ping' do
       call_API :association, :add, :ping

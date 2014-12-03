@@ -357,8 +357,7 @@ describe "[cm] config file" do
             x = config['goal']
             x.should be_respond_to :get_names
             config['goal']['dream'] = 'deadline'
-            _shell = TestLib_::Expect_file_content[].
-              shell config.string
+            _shell = TestLib_::Expect_line[].shell config.string
             _excerpt_s = _shell.excerpt( 0 .. 4 )
             _excerpt_s.should eql <<-O.unindent
               who = hah

@@ -13,6 +13,8 @@ module Skylab::CodeMolester::TestSupport
 
   include Constants
 
+  TestSupport_ = TestSupport_
+
   TestSupport_::Regret[ self ]
 
   TestSupport_::Quickie.enable_kernel_describe
@@ -47,8 +49,8 @@ module Skylab::CodeMolester::TestSupport
       CM_::Lib_::Bzn__[]
     end
 
-    Expect_file_content = -> do
-      CM_::Autoloader_.require_sidesystem( :TanMan ).expect_file_content
+    Expect_line = -> do
+      TestSupport_::Expect_line
     end
 
   end

@@ -1,6 +1,6 @@
-module Skylab::TanMan
+module Skylab::TestSupport
 
-  class TestSupport::Expect_File_Content
+  class Expect_line
 
     # assumes @output_s
 
@@ -54,9 +54,9 @@ module Skylab::TanMan
 
       def excrpt_lines_from_beginning beg_d, end_d, s
 
-        _RX = TestSupport::TestLib_::String_lib[].regex_for_line_scanning
+        _RX = TestSupport_._lib.string_lib.regex_for_line_scanning
 
-        scnr = TanMan_._lib.string_scanner.new s
+        scnr = TestSupport_::Library_::StringScanner.new s
 
         y = []
         current_line_index = 0

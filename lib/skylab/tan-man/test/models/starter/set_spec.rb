@@ -4,9 +4,9 @@ module Skylab::TanMan::TestSupport::Models::Starter
 
   describe "[tm] models starter set" do
 
-    extend TS_
+    TestSupport_::Expect_line[ self ]
 
-    TanMan_::TestSupport::Expect_File_Content[ self ]
+    extend TS_
 
     it "when bad name - shows good names" do
 
