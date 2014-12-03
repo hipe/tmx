@@ -1,8 +1,12 @@
 module Skylab::TestSupport
 
-  module Regret::API
+  module DocTest
 
-  class Actions::Recursive < API_::Action
+    module Models_::Front
+
+      class Actions::Recursive < Action_
+
+    if false
 
     v = API_::Conf::Verbosity[ self ]
 
@@ -303,6 +307,9 @@ module Skylab::TestSupport
     TEST_DIR_DEPTH__ = 2
       TEST_RX__ = %r|\A(?:[^/]+/){#{ TEST_DIR_DEPTH__ }}[^/]+/?|
     TEST_FILE_SUFFIX = '_spec'.freeze
-  end
+
+    end
+      end
+    end
   end
 end

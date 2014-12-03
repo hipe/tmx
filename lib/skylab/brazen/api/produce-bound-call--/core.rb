@@ -87,7 +87,7 @@ module Skylab::Brazen
       end
 
       def via_action_resolve_bound_call
-        _oes_p = @on_event_selectively || prdc_some_OES
+        _oes_p = @on_event_selectively || prdc_some_handle_event_selectively
         x_a = @x_a[ @d .. -1 ]
         x = @action.bound_call_via_call x_a, & _oes_p
         if x
@@ -111,13 +111,13 @@ module Skylab::Brazen
       end
 
       def end_in_error_with * x_a
-        _oes_p = @on_event_selectively || prdc_some_OES
+        _oes_p = @on_event_selectively || prdc_some_handle_event_selectively
         _result = _oes_p.call :error, * x_a
         @bound_call = Brazen_.bound_call.via_value _result
         UNABLE_
       end
 
-      def prdc_some_OES
+      def prdc_some_handle_event_selectively
 
         _two_streams = Lib_::Two_streams[]
 
@@ -126,8 +126,14 @@ module Skylab::Brazen
         event_expressor = Produce_bound_call__::Two_Stream_Event_Expressor.
           new( * _two_streams, _expag )
 
-        -> * x_a do
-          _ev = Brazen_.event.inline_via_normal_extended_mutable_channel x_a
+        -> * i_a, & ev_p do
+
+          _ev = if ev_p
+            ev_p[]
+          else
+            Brazen_.event.inline_via_normal_extended_mutable_channel i_a
+          end
+
           event_expressor.receive_ev _ev
         end
       end

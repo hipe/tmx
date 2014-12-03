@@ -12,6 +12,10 @@ module Skylab::Headless
       def puts *a
       end
 
+      def truncate d
+        d
+      end
+
       def write s
         "#{ s }".length
       end

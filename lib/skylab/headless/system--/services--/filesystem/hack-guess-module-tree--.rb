@@ -91,7 +91,7 @@ module Skylab::Headless
 
         def when_no_upstream
           maybe_send_event :error, :no_upstream do
-            build_not_OK_event :no_upstream
+            build_not_OK_event_with :no_upstream
           end
         end
 

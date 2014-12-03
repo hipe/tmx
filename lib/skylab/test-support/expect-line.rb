@@ -240,5 +240,21 @@ module Skylab::TestSupport
         end
       end
     end
+
+    class File_Shell
+
+      class << self
+        alias_method :[], :new
+      end
+
+      def initialize path
+        @path = path
+        @content = ::File.read path
+      end
+
+      def contains str
+        @content.include? str
+      end
+    end
   end
 end

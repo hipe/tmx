@@ -4,27 +4,27 @@ module Skylab::TestSupport
 
     class Output_Adapters_::Quickie
 
-      class View_Controllers_::Before_Node < View_Controller_
+      class View_Controllers_::Example_Node < View_Controller_
 
-        main_template_name :_bef
+        main_template_name :"_eg-simple"
 
-        def render line_downstream, document_context, node
+        def render line_downstream, doc_context, node
 
           lds = my_line_downstream
-          lines = node.to_line_stream
+          up = node.to_child_stream
 
-          line = lines.gets
-
-          while line
-            lds.puts line.chomp
-            line = lines.gets
+          exp = up.gets
+          while exp
+            _line_renderer = view_controller_for_node_symbol exp.expression_symbol
+            _line_renderer.render lds, doc_context, exp
+            exp = up.gets
           end
 
-          _num = document_context.fetch :context_count
+          _dsc = Render_description_[ node.description_string ]
           _code = lds.flush
 
           _s = main_template.call(
-            num: _num,
+            dsc: _dsc,
             code: _code )
 
           write_to_stream_string_line_by_line line_downstream, _s
@@ -33,7 +33,7 @@ module Skylab::TestSupport
         end
 
         def my_line_downstream
-          o = @shared_resources.cached :_bef_LDS_ do
+          o = @shared_resources.cached :_eg_LDS_ do
             _margin = main_template.first_margin_for :code
             Build_common_marginated_line_downtream_[ _margin ]
           end
@@ -44,4 +44,3 @@ module Skylab::TestSupport
     end
   end
 end
-# :+#posterity - a comment showed primordial thoughts of "intermediates"

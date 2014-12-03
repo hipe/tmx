@@ -41,6 +41,7 @@ module Skylab::TestSupport
             :raw_line
           end
 
+          ( BLANK_LINE = new NEWLINE_ ).chomped_line.freeze
         end
 
         class Fat_Comma_Proto_Predicate__

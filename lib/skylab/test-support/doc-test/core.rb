@@ -8,7 +8,7 @@ module Skylab::TestSupport
     # they will not appear in the generated spec file. the last line however,
     # will appear as the description string of your context or example.
     #
-    #     THIS_FILE_ = TestSupport_::This_File[ __FILE__ ]
+    #     THIS_FILE_ = TestSupport_::Expect_Line::File_Shell[ __FILE__ ]
     #
     #     # this comment gets included in the output because it is indented
     #     # with four or more spaces and is part of a code span that goes out.
@@ -53,6 +53,22 @@ module Skylab::TestSupport
       extend Bzn_::API.module_methods
 
       class << self
+
+        def call * x_a, & oes_p
+
+          # don't ever write events to stdout / stderr by default.
+
+          if oes_p
+            x_a.push :on_event_selectively, oes_p
+          elsif x_a.length < 2 || :on_event_selectively != x_a[ -2 ]
+            x_a.push :on_event_selectively, -> i, *, & ev_p do
+              if :error == i
+                raise ev_p[].to_exception
+              end
+            end
+          end
+          super( * x_a, & nil )
+        end
 
         def expression_agent_class
           Bzn_::API.expression_agent_class

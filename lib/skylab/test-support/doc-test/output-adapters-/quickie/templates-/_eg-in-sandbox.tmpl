@@ -1,4 +1,5 @@
-before :all do
+
+it {{ dsc }} do
   Sandbox_{{ num }}.with self
   module Sandbox_{{ num }}
     {{ code }}

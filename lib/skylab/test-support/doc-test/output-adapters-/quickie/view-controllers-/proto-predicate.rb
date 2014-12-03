@@ -2,146 +2,76 @@ module Skylab::TestSupport
 
   module DocTest
 
-    module Intermediate_Streams_
+    class Output_Adapters_::Quickie
 
-      module Models_::Predicate_Expressions
+      class View_Controllers_::Proto_Predicate < View_Controller_
 
-        class << self
+        def render line_downstream, _doc_context, fat_comma_line
 
-          def match line
-            RX__.match line
-          end
+          @line_downstream = line_downstream
+          @lhs = fat_comma_line.lhs  # left hand side :"lhs"
+          @rhs = fat_comma_line.rhs  # right hand side :"rhs"
 
-          def expression_via_matchdata md
-            pre = md.pre_match
-            post = md.post_match
-            post.chomp!
-            Fat_Comma_Proto_Predicate__.new pre, post
-          end
-        end
+          @md = SHOULD_RAISE_ERROR_MAGIC_PATTERN_RX__.match @rhs
 
-        RX__ = /[[:space:]]*#[ ]?=>[[:space:]]*/
-
-        class Raw_Line
-          class << self
-            alias_method :[], :new
-          end
-
-          def initialize s
-            @string = s
-          end
-
-          attr_reader :string
-
-          def members
-            [ :string, :expression_symbol ]
-          end
-
-          def expression_symbol
-            :raw_line
-          end
-
-        end
-
-        class Fat_Comma_Proto_Predicate__
-
-          def initialize * a
-            @lhs, @rhs = a
-          end
-
-          attr_reader :lhs, :rhs
-
-          def members
-            [ :lhs, :rhs, :expression_symbol ]
-          end
-
-          def expression_symbol
-            :proto_predicate
+          if @md
+            when_raise_error_magic_pattern
+          else
+            when_literal_equals_predicate
           end
         end
 
-  if false
+        # ~ literal equals predicate
 
-  class Templos__::Predicates  # a box module and a class.
+        def when_literal_equals_predicate
 
-    def << line
-      @add[ line ]
-      self
-    end
-
-    def add line
-      @add[ line ]
-    end
-
-    def flush
-      @flush.call
-    end
-
-    def initialize altered_line=nil, unaltered_line=nil
-      altered_line ||= begin
-        a = [ ]
-        @flush = -> do
-          r = a ; a = [ ] ; r
-        end
-        -> line { a << line ; false }
-      end
-      unaltered_line ||= altered_line
-      y = ::Enumerator::Yielder.new( & altered_line )
-      @add = -> line do
-        idx = line.index SEP_ ; matched = nil
-        if idx   # magic separator hack - "# =>" becomes:
-          lef = line[ 0 .. idx - 1 ].strip
-          rig = line[ idx + SEP_.length .. -1 ].strip
-          matched = self.class.each.reduce nil do |_, p|
-            # module as switch statement [#ba-018]
-            p[ y, lef, rig ] and break true
+          _parens_or_not_parens = if false
+            "( #{ @rhs } )"
+          else
+            " #{ @rhs }"
           end
+
+          @line_downstream.puts "#{ @lhs }.should eql#{ _parens_or_not_parens }"
+
+          nil
         end
-        matched or unaltered_line[ line ] && false
-      end
-    end
 
-    def self.each
-      if const_defined? :EACH_, true then const_get :EACH_, true else
-        const_set :EACH_, constants.map { |i| const_get i, false }.freeze  # !
-      end
-    end
-  end
+        # ~ magic raise error predicate pattern
 
-  Templos__::Predicates::SHOULD_RAISE_ = -> do
-    # e.g "NoMethodError: undefined method `wat` .."
-    cnst = '[A-Z][A-Za-z0-9_]'
-    hack_rx = /\A[ ]*
-      (?<const> #{ cnst }*(?:::#{ cnst }*)* ) [ ]* : [ ]+
-      (?:
-        (?<fullmsg> .+ [^.] \.? ) |
-        (?: (?<msgfrag> .* [^. ] ) [ ]* \.{2,} )
-      ) \z
-    /x
+        SHOULD_RAISE_ERROR_MAGIC_PATTERN_RX__ = -> do
 
-    -> y, lef, rig do
-      hack_rx.match rig do |md|
-        const, fullmsg, msgfrag = md.captures
-        _rx = if fullmsg
-          "\\A#{ ::Regexp.escape fullmsg }\\z".inspect
-        else
-          "\\A#{ ::Regexp.escape msgfrag }".inspect
+          # e.g "NoMethodError: undefined method `wat` ..", i.e
+          # the ".." (literally those two characters) is part of the pattern
+
+          cnst = '[A-Z][A-Za-z0-9_]'
+          /\A[ ]*
+            (?<const> #{ cnst }*(?:::#{ cnst }*)* ) [ ]* : [ ]+
+            (?:
+              (?<fullmsg> .+ [^.] \.? ) |
+              (?: (?<msgfrag> .* [^. ] ) [ ]* \.{2,} )
+            ) \z
+          /x
+        end.call
+
+
+        def when_raise_error_magic_pattern
+
+          _const, fullmsg, msgfrag = @md.captures
+
+          _rx = if fullmsg
+            "\\A#{ ::Regexp.escape fullmsg }\\z".inspect
+          else
+            "\\A#{ ::Regexp.escape msgfrag }".inspect
+          end
+
+          o = @line_downstream
+          o.puts "-> do"
+          o.puts "  #{ @lhs }"
+          o.puts "end.should raise_error( #{ _const },"
+          o.puts "             ::Regexp.new( #{ _rx } ) )"
+
+          nil
         end
-        y << '-> do'
-        y << "  #{ lef }"
-        y << "end.should raise_error( #{ const },"
-        y << "             ::Regexp.new( #{ _rx } ) )"
-        true  # important
-      end
-    end
-  end.call
-
-  Templos__::Predicates::SHOULD_EQL_ = -> y, lef, rig do
-    y << "#{ lef }.should eql( #{ rig } )"
-    true  # important
-  end
-  end
-
       end
     end
   end

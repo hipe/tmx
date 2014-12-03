@@ -1,79 +1,49 @@
 module Skylab::TestSupport
 
-  module Regret::API
+  module DocTest
 
-  module Actions::DocTest::Templos__::Quickie::Context__
+    class Output_Adapters_::Quickie
 
-    Context__ = self
+      class View_Controllers_::Context_Node < View_Controller_
 
-    module Part_
+        main_template_name :_ctx
 
-      def self.resolve_parts blk, y
-        case blk.snippet_a.length
-        when 0 ; EMPTY_A_
-        when 1 ; [ build_example( blk.snippet_a.fetch( 0 ), y ) ]
-        else   ; Context__::Beforer_.build_parts blk, y
-        end
-      end
+        def render line_downstream, document_context, node
 
-      def self.build_example snippet, y
-        Example_.new( y ) do |e|
-          e.quoted_description_string = TestSupport_::
-            View_Controller_.descify snippet.last_other
-          filter = Actions::DocTest::Templos__::Predicates.new
-          snippet.line_a.each( & filter.method( :<< ) )
-          e.local_lines = filter.flush
-        end
-      end
-    end
+          d = document_context.fetch :context_count
+          document_context.cache :context_count, ( d += 1 )
 
-    module Part_
-
-      class Part__
-
-        class << self ; alias_method :orig_new, :new end
-
-        def self.new i
-          ::Class.new( self ).class_exec do
-            class << self ; alias_method :new, :orig_new end
-            define_method :template_i do i end
-            self
+          lds = my_line_downstream
+          up = node.to_child_stream
+          cx = up.gets
+          while cx
+            _vc = view_controller_for_node_symbol cx.node_symbol_when_context
+            _vc.render lds, document_context, cx
+            cx = up.gets
           end
-        end
 
-        def initialize y
-          @y = y.call
-          yield self
-          @local_lines or fail "sanity - local lines?"
+          _dsc = Render_description_[ node.description_string ]
+          _body = lds.flush
+
+          _s = main_template.call(
+            dsc: _dsc,
+            num: d,
+            body: _body )
+
+          write_to_stream_string_line_by_line line_downstream, _s
+
           nil
         end
 
-        attr_accessor :local_lines
-
-        def indented_code_string
-          @local_lines.each( & @y.method( :puts ) )
-          @y.flush
-        end
-      end
-
-      class Before_ < Part__.new :before
-
-      end
-
-      class Example_ < Part__.new :example
-
-        attr_accessor :quoted_description_string
-
-      private
-
-        def initialize y
-          super
-          @quoted_description_string or fail "sanity - desc?"
-          freeze
-          nil
+        def my_line_downstream
+          o = @shared_resources.cached :_ctxt_LDS_ do
+            _margin = main_template.first_margin_for :body
+            Build_common_marginated_line_downtream_[ _margin ]
+          end
+          o.rewind
+          o
         end
       end
     end
-  end
   end
 end

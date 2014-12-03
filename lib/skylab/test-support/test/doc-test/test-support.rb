@@ -22,6 +22,8 @@ module Skylab::TestSupport::TestSupport::DocTest
 
   DocTest_ = TestSupport_::DocTest
 
+  Sandboxer = TestSupport_::Sandbox::Spawner.new
+
   module ModuleMethods
 
     def with_big_file_path & p
@@ -84,6 +86,33 @@ module Skylab::TestSupport::TestSupport::DocTest
     def event_expression_agent
       TestSupport_::Lib_::Bzn_[]::API.expression_agent_instance
     end
+
+    define_method :next_interesting_line_dedented, -> do
+      rx = /\A[[:space:]]*/
+      -> do
+        ln = next_interesting_line
+        ln and ln.gsub( rx, TestSupport_::EMPTY_S_ )
+      end
+    end.call
+
+    def next_interesting_line
+      advance_to_next_rx @interesting_line_rx
+      line
+    end
+
+    define_method :advance_to_module_line, -> do
+      rx = %r(\Amodule )
+      -> do
+        advance_to_next_rx rx
+      end
+    end.call
+
+    define_method :advance_to_describe_line, -> do
+      rx = %r(\A[[:space:]]*describe )
+      -> do
+        advance_to_next_rx rx
+      end
+    end.call
   end
 
   CACHE__ = {}
@@ -242,11 +271,6 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
     attr_reader :x
     alias_method :a, :x
-  end
-
-  module Sandboxer
-    define_singleton_method :spawn do
-    end
   end
 
   Subject_ = -> do

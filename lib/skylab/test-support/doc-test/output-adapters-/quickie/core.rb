@@ -1,56 +1,243 @@
 module Skylab::TestSupport
 
-  module Regret::API
+  module DocTest
 
-  class Actions::DocTest::Templos__::Quickie < TestSupport_::View_Controller_
+    class Output_Adapters_::Quickie < DocTest_::Output_Adapter_
 
-    OPTION_X_A__ = [
+      include Lazy_Selective_Event_Methods_
 
-      :cover,
-        :when_not_provided, -> do
-          @cover = nil
-        end, :when_provided, -> do
-          @cover = true
-          OPTION_PROCEDE__
-        end, :summarize, -> y do
-          y << "adds coverage hack to the end"
-          y << "of the `describe` block"
-        end,
+      class << self
 
-      :exclude_regret_setup,
-        :when_not_provided, -> do
-          @do_include_regret_setup = true
-        end, :when_provided, -> do
-          @do_include_regret_setup = false
-          OPTION_PROCEDE__
-        end, :summarize, -> y do
-          y << "experimental."
-        end,
+        def output_adapter & oes_p  # #hook-out
+          new do
+            @on_event_selectively = oes_p
+          end
+        end
 
-      :help,
-        :when_not_provided, EMPTY_P_,
-       :when_provided, -> do
-          show_option_help
-          SUCCESS_EXITSTATUS__
-        end, :summarize, -> y do
-          y << "this screen."
-        end ]
+        private :new
+      end
 
-    def initialize snitch, base_mod, c_a, b_a
-      @snitch = snitch
+      Callback_::Actor.methodic self, :simple, :properties,
 
-      ctxt = tstt = beft = nil
+        :property, :business_module_name,
+        :property, :line_downstream,
+        :property, :node_upstream,
+        :property, :on_shared_resources_created,
+        :property, :shared_resources
 
-      rlma = Callback_.memoize do
+      def initialize
+        @do_coverage_part = false  # :+#re-init
+        @render_as_sibling = true   # :+#re-init  ##todo this will become universal
+        @subsystem_index = 1
+        super
+      end
 
-        _MARGIN = tstt.first_margin_for :code
+    private
+
+      def execute  # #hook-out
+        @node = @node_upstream.gets
+        if @node
+          when_node
+        else
+          when_no_nodes
+        end
+      end
+
+      # ~
+
+      def when_node
+        ok = normalize
+        ok && prepare
+        ok && write_document
+      end
+
+      # ~ prepare
+
+      def prepare
+        resolve_shared_resources
+        init_view_controller
+        load_templates
+        init_downstream_line_streams
+        nil
+      end
+
+      def load_templates
+        @base_template, @bef_template, @ctx_template, @tst_template =
+          templates(
+            @render_as_sibling ? :_sibling : :_base,
+              :_bef, :_ctx, :_tst )
+        nil
+      end
+
+      def init_downstream_line_streams
+        @marginating_body_line_downstream = @shared_resources.cached :SMBDS do
+
+          _margin = template( :_base ).first_margin_for :body
+          Build_common_marginated_line_downtream_[ _margin ]
+        end
+        nil
+      end
+
+      # ~ normalize
+
+      def normalize
+        normalize_business_module_name
+      end
+
+      def normalize_business_module_name
+        @num_subsystem_parts = @subsystem_index + 1
+        s_a = @business_module_name.split CONST_SEP_
+        s_a.first.length.zero? and s_a.shift  # normalize out full qualification
+        if s_a.length < @num_subsystem_parts
+          when_short_business_module_name
+        else
+          @business_const_s_a = s_a.freeze
+          ACHIEVED_
+        end
+      end
+
+      def when_short_business_module_name
+        maybe_send_event :error, :shallow_business_module_name do
+          bld_shallow_business_module_name
+        end
+        UNABLE_
+      end
+
+      def bld_shallow_business_module_name
+        build_not_OK_event_with :shallow_business_module_name,
+            :module_name, @business_module_name,
+            :min_parts, @num_subsystem_parts do |y, o|
+          y << "business module name is too shallow. we need at least #{
+          }#{ o.min_parts } parts to the module name - #{ ick o.module_name }"
+        end
+      end
+
+      # ~ write document
+
+      def write_document
+        _ok = resolve_marginated_body_string
+        _ok && assemble_document
+      end
+
+      def resolve_marginated_body_string
+        o = Shared_Resources_.new
+        o.cache :context_count, 0
+        @doc_ctx = o
+        begin
+          via_node_and_marginated_body_line_downstream_render
+          @node = @node_upstream.gets
+        end while @node
+        s = @marginating_body_line_downstream.flush
+        if s.length.nonzero?
+          @marginated_body_string = s
+          ACHIEVED_
+        else
+          UNABLE_
+        end
+      end
+
+      def via_node_and_marginated_body_line_downstream_render
+
+        o = view_controller_for_node_symbol @node.node_symbol
+        if o
+          o.render( @marginating_body_line_downstream, @doc_ctx, @node )
+        end
+
+        nil
+      end
+
+      def assemble_document
+
+        @amod, @bmod, @cmod = business_module_name_as_three_name_parts
+
+        @acon = @business_const_s_a.fetch @subsystem_index
+
+        @do_coverage_part and _newlined_and_marginated_coverage_part = rndr_cvg
+
+        _desc = description_string
+
+        _whole_string = @base_template.call(
+          acon: @acon,
+          amod: @amod,
+          bmod: @bmod,
+          cmod: @cmod,
+          body: @marginated_body_string,
+          cover: _newlined_and_marginated_coverage_part,
+          desc: _desc )
+
+        _any_result_for_write_to_line_downstream_whole_string _whole_string
+      end
+
+      def _any_result_for_write_to_line_downstream_whole_string whole_string
+
+        o = TestSupport_::Lib_::String_lib[].line_stream whole_string
+
+        bytes = 0 ; lines = 0
+        while line = o.gets
+          lines += 1
+          bytes += line.length
+          @line_downstream.puts line
+        end
+
+        maybe_send_event :success, :wrote do
+          build_neutral_event_with :wrote, :bytes, bytes, :line_count, lines
+        end
+      end
+
+      def business_module_name_as_three_name_parts
+        s_a = @business_const_s_a.map do |const_s|
+          const_s.sub NO_TRAILING_RX_, EMPTY_S_
+        end
+        a = ::Array.new 3
+        a[ 0 ] = s_a[ 0, @num_subsystem_parts ] * CONST_SEP_
+        a[ 2 ] = s_a.fetch( -1 )
+        if @num_subsystem_parts + 1 < s_a.length
+          a[ 1 ] = "#{ CONST_SEP_ }#{ s_a[ @num_subsystem_parts .. -2 ] * CONST_SEP_ }"
+        end
+        a
+      end
+
+      NO_TRAILING_RX_ = /_+$/
+
+      def rndr_cvg
+        _mod = "#{ @acon }#{ @bmod }#{ CONST_SEP_ }#{ @cmod }"
+        tmpl, = templates [ :_cover ]
+        s = tmpl[ mod: _mod ]
+        s.chomp!
+        s
+      end
+
+      def description_string
+        s_a = @business_const_s_a
+        top_usually_ignored, sidesys, * rest = s_a
+        d = s_a.length
+        if d.nonzero?
+          if 1 == d
+            top_usually_ignored
+          else
+            medallion = "[#{ Infer_initials_via_const__[ sidesys ] }]"
+            if 2 == d
+              "#{ medallion } #{ s_a * CONST_SEP_ }"
+            else
+              "#{ medallion } #{ rest * CONST_SEP_ }"
+            end
+          end
+        end
+      end
+
+      Build_common_marginated_line_downtream_ = -> _MARGIN do
 
         Callback_::Scn.articulators.eventing(
+          :any_first_item, -> y, x do
+            if x.length.nonzero?
+              y << x  # first margin is already there. no trailing delimiters
+            end
+          end,
           :any_subsequent_items, -> y, x do
             if x.length.zero?
               y << NEWLINE_
             else
-              y << "#{ NEWLINE_ }#{ _MARGIN }#{ x }"  # don't add trailing spaces
+              y << "#{ NEWLINE_ }#{ _MARGIN }#{ x }"  # no trailing delimiters
             end
           end,
           :y, [],
@@ -61,98 +248,7 @@ module Skylab::TestSupport
           end )
       end
 
-      render_before = -> befor, cnum do
-        beft[
-          context_num: cnum,
-          code: befor.indented_code_string
-        ].chomp
-      end
-
-      render_example = -> example, cnum do
-        tstt[
-          context_num: cnum,
-          dsc: example.quoted_description_string,
-          code: example.indented_code_string
-        ].chomp
-      end
-
-      template_h = {
-        before: render_before,
-        example: render_example }.freeze
-
-      render_tests = -> blk, cnum do
-        y = Inner_line_joiner__[].rewind
-        part_a = self.class::Context__::Part_.resolve_parts blk, rlma
-        part_a.each do |part|
-          y.puts template_h.fetch( part.template_i )[ part, cnum ]
-        end
-        y.flush
-      end
-
-      context_descify = -> blk, num do
-        if blk.first_other
-          TestSupport_::View_Controller_.descify blk.first_other
-        else
-          "context #{ num }".inspect
-        end
-      end
-
-      render_body = -> do
-        y = Outer_line_joiner__[].rewind
-        b_a.each do |blk|
-          num = y.count + 1
-          y.puts ctxt[
-            num: num,
-            dsc: context_descify[ blk, num ],
-            body: render_tests[ blk, num ]
-          ].chomp
-        end
-        y.flush
-      end
-
-      @render_to_p = -> io do
-        baset = rslv_some_base_template
-        ctxt, tstt, beft = get_templates :_ctx, :_tst, :_bef
-        c_a.length < 2 and fail say_less_than_two c_a
-        acon = c_a.fetch 0
-        amod  = [ base_mod.to_s, acon ].join CONST_SEP_
-        bmod = if 2 != c_a.length
-          "#{ CONST_SEP_ }#{ c_a[ 1 .. -2 ] * CONST_SEP_ }"
-        end
-        cmod = "#{ c_a.fetch( -1 ) }"
-        body = render_body[]
-        desc = Generate_description__[ c_a ]
-        io.write baset.call( amod: amod, bmod: bmod, cmod: cmod, body: body,
-                             cover: render_cover( acon, bmod, cmod ),
-                             desc: desc, acon: acon )
-        ACHIEVED_
-      end ; nil
-    end
-
-    def rslv_some_base_template
-      _i = @do_include_regret_setup ? :_base : :_sibling
-      get_template _i
-    end
-
-    def say_less_than_two c_a
-      "sanity - hard-coded for deep paths, we need at least 2 elements in #{
-        }this path for the hacking to work - #{ c_a * CONST_SEP_ }"
-    end
-
-    def render_cover a, any_b, c
-      if @cover
-        mod = "#{ a }#{ any_b }#{ CONST_SEP_ }#{ c }"
-        get_template( :_cover )[ mod: mod ].chomp
-      end
-    end
-
-    Autoloader_[ Context__ = ::Module.new ]  # #stowaway
-
-    Generate_description__ = -> c_a do
-      "[#{ Infer_Initials__[ c_a.first ] }] #{ c_a[ 1 .. -1 ] * CONST_SEP_ }"
-    end
-
-    Infer_Initials__ = -> do
+    Infer_initials_via_const__ = -> do
       h = {}
       rx = %r{  \A  ([A-Z])  ([a-z])  [^A-Z]*  ([A-Z])?  }x
       infer = -> i do
@@ -170,33 +266,11 @@ module Skylab::TestSupport
       end
     end.call
 
-    OPTION_PROCEDE__ = nil
+      Render_description_ = -> s do
+        s.inspect
+      end
 
-    Inner_line_joiner__ = Callback_.memoize do
-      Line_joiner__[].duplicate
+      Self_ = self
     end
-
-    Outer_line_joiner__ = Callback_.memoize do
-      Line_joiner__[].duplicate
-    end
-
-    Line_joiner__ = Callback_.memoize do
-
-      Callback_::Scn.articulators.eventing(
-        :y, [],
-        :any_subsequent_items,  -> y, x do
-          y.push "#{ NEWLINE_ }#{ x }" ; nil
-        end,
-        :flush, -> y do
-          x = y * EMPTY_S_
-          y.clear
-          x
-        end )
-    end
-
-    SUCCESS_EXITSTATUS__ = 0
-
-    Autoloader_[ self, ::Pathname.new( __FILE__ ).sub_ext( EMPTY_S_ ) ]
-  end
   end
 end

@@ -26,6 +26,10 @@ module Skylab::TestSupport
           [ :before_block_category_symbol, :to_line_stream, :node_symbol ]
         end
 
+        def node_symbol_when_context
+          node_symbol
+        end
+
         def node_symbol
           :before_node
         end

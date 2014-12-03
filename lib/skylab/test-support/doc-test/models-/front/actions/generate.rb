@@ -1,44 +1,67 @@
 module Skylab::TestSupport
 
-  module Regret::API
+  module DocTest
 
-  class Actions::DocTest < API_::Action  # #read [#015] the narrative
+    module Models_::Front
 
+  class Actions::Generate < Action_  # storypoints are in [#015]
+
+    # our handle on the whole doc-test API is the API module itself,
+    # which you can call `call` on.
+    #
     # probably no one will ever find a reason to call our API directly
     # to generate doc-test output. but for the purposes of testing and
     # in the interest of system design, we have made an API anyway.
     #
-    # our handle on the whole regret API is the 'API' module itself,
-    # which you can call `invoke` on:
+    # So, the `API` module is application programmer's interface to the API:
     #
-    #     API = TestSupport_::Regret::API
-    #     # API.debug!
-    #     API.invoke( :ping )  # => :hello_from_regret
+    #     API = TestSupport_::DocTest::API
     #
-    # we just pinged the API. if you uncomment the debug! line above, you
-    # may see additional output. Note how we used "# =>" to indicate the
+    #
+    # the minimal action that we can send to our API is the `ping` action:
+    #
+    #     API.call( :ping )  # => :_hello_from_doc_test_
+    #
+    #
+    # we just pinged the API. if you had passed a selective event listener
+    # as a final argument named `on_event_selectively`, you may have seen
+    # additional output.
+    #
+    # Note how we used "# =>" to indicate the
     # expected output from the line in our snippet. Note too that the snippet
     # is indented with four (4) spaces from the "normal" text.
     #
-    # `ping` is one of several API actions (and the most boring, stable one at
-    # that). the action we are interested in seeing is the `doc_test` action:
+    # `ping` is one of several API actions (and the most boring, stable
+    #  one at that). the action we are interested in using is the `generate`
+    #  action.
+    #
     #
     # let's write a comment that has a usage snippet showing how to generate
     # test code programmatically for this file you are reading,
     # from these comments you are reading:
     #
-    #     here = API::Actions::DocTest.dir_pathname.sub_ext '.rb'
-    #     output = TestSupport_.dir_pathname.
-    #       join( 'test/regret/api/actions/doc-test_spec.rb')
-    #     stat = output.stat ; size1 = stat.size ; ctime1 = stat.ctime
+    #
+    #     here = DocTest_::Models_::Front::Actions::Generate.
+    #       dir_pathname.sub_ext( '.rb' ).to_path
+    #
+    #     output_pn = TestSupport_.dir_pathname.
+    #       join( 'test/doc-test/models-front-actions/generate/integration/core_spec.rb' )
+    #
+    #     stat = output_pn.stat ; size1 = stat.size ; ctime1 = stat.ctime
     #       # (this test assumes one such file already exists)
     #
-    #     exitstatus = API.invoke :doc_test, pathname: here, output_path: output
+    #     result = API.call :generate,
+    #       :output_path, output_pn.to_path,
+    #       :upstream_path, here,
+    #       :output_adapter, :quickie
+    #
     #       # the moneyshot. did it work?
     #
-    #     exitstatus  # => 0
-    #       # exit status zero means success. it's the 1970's
-    #     stat = output.stat
+    #     result  # => nil
+    #       # for now this is nil on success
+    #
+    #     stat = output_pn.stat
+    #
     #     stat.size  # => size1
     #       # the size should have stayed the same
     #     ( stat.ctime == ctime1 )  # => false
@@ -48,161 +71,215 @@ module Skylab::TestSupport
     # add e.g a blank like to the generated test file and re-run it again.
     # it should fail only the first time it is re-run.  #storypoint-15
 
-    services [ :out, :ivar ],
-             [ :err, :ivar ],
-             [ :pth, :ivar ]
+        o do
 
-    params [ :core_basename, :arity, :zero_or_one ],
-      [ :do_close_output_stream, :arity, :zero_or_one, :default, -> { true } ],
-      [ :do_force, :arity, :zero_or_one ],
-      [ :load_file, :arity, :zero_or_one ],
-      [ :load_module, :arity, :zero_or_one ],
-      [ :pathname, :arity, :zero_or_one ],
-      [ :template_option_s_a, :arity, :zero_or_more ],
-      API_::Conf::Verbosity[ self ].param( :vtuple )
+          o :is_promoted,
 
-    def initialize( * )
-      @core_basename = nil  # until we figure out something
-      super
-    end
+            :iambic_writer_method_name_suffix, :"="
 
-    def absorb_any_services_from_parameters_notify param_h
-      if (( outpath_x = param_h.delete :output_path ))
-        fh = ::File.open "#{ outpath_x }", WRITE_MODE_
-        accept_value_as_service fh, :out
-      end
-    end
+          def business_module_name=
+            @business_module_name = iambic_property
+          end
 
-    def execute
-      snitch
-      ok = rslv_load_module
-      ok &&= rslv_upstream
-      ok &&= rslv_specer
-      ok &&= exec_scan_each_block_if_appropriate
-      ok &&= exec_flush
-      finally
-      @result
-    end
+          def is_dry_run=
+            @is_dry_run = iambic_property
+          end
 
-  private
+          def line_downstream=
+            x = iambic_property
+            if x
+              @line_downstream = x
+              @do_close_downstream = false
+              @resolve_line_downstream_method_name = :OK
+            end
+          end
 
-    def rslv_load_module
-      if @load_module
-        ok = mdls_module::Constant_.validate @sn, @load_module
-        if ok
-          PROCEDE_
-        else
-          @result = ok
+          def line_upstream=
+            x = iambic_property
+            if x
+              @line_upstream = x
+              @resolve_line_upstream_method_name = :OK
+            end
+          end
+
+          def output_adapter=
+            @output_adapter = iambic_property
+          end
+
+          def output_path=
+            x = iambic_property
+            if x
+              @output_path = x
+              @resolve_line_downstream_method_name = :via_output_path_rslv_line_downstream
+            end
+          end
+
+          def upstream_path=
+            x = iambic_property
+            if x
+              @upstream_path = x
+              @resolve_line_upstream_method_name =
+                :via_upstream_path_rslv_line_upstream
+            end
+          end
+
         end
-      else
-        PROCEDE_
-      end
-    end
 
-    def mdls_module
-      DocTest_::Models_
-    end
-
-    def rslv_upstream
-      ok, up = prcr_upstream_status_tuple
-      if ok
-        @upstream = up
-      else
-        @result = ok
-      end
-      ok
-    end
-
-    def prcr_upstream_status_tuple
-      if ! @pathname then [ true, nil ] else # #storypoint-115
-        up, e = rslv_upstream_status_tuple
-        if up then [ true, up ]
-        else
-          @sn.puts "#{ e }"
-          @sn.puts "aborting."
-          [ false, nil ]
+        def initialize kernel
+          @business_module_name = nil
+          @is_dry_run = false
+          @resolve_line_downstream_method_name = :when_no_downstream
+          @resolve_line_upstream_method_name = :when_no_upstream
+          @upstream_path = nil
+          super
         end
-      end
-    end
 
-    def rslv_upstream_status_tuple
-      begin
-        up = ::File.open @pathname.to_path, 'r'
-      rescue ::Errno::ENOENT => e
-      end
-      [ up, e ]
-    end
+        def produce_any_result
 
-    def rslv_specer
-      sp = bld_specer @sn
-      ok = sp.set_template_options @template_option_s_a
-      if ok
-        @specer = sp ; PROCEDE_
-      else
-        @result = ok
-      end
-    end
+          # order is somewhat arbitrary: what is covered is to resolve
+          # the output adapter first. normalization may hinge on a valid
+          # upstream.
 
-    def bld_specer snitch
-      _path = @pathname && @pathname.to_path
-      DocTest_::Specer__.new :snitch, @sn,
-        :core_basename, @core_basename, :load_file, @load_file,
-        :load_module, @load_module, :outstream, @out,
-        :path, _path, :templo_name, :quickie
-    end
-
-    def exec_scan_each_block_if_appropriate
-      if @upstream
-        exec_scan_each_block
-      else
-        PROCEDE_
-      end
-    end
-
-    def exec_scan_each_block
-      bs = DocTest_::Comment_::Block::Stream[ @sn, @upstream ]
-      cblock = bs.gets
-      while cblock
-        if @vtuple.do_murmur
-          cblock.describe_to @err
+          ok = rslv_downstream
+          ok &&= rslv_upstream
+          ok &&= normalize
+          ok && via_upstream_and_downstream_synthesize
+          @result
         end
-        if cblock.does_look_testy
-          @specer.accept cblock
+
+        # ~ resolve downstream
+
+        def rslv_downstream
+          ok = rslv_output_adatper
+          ok && rslv_line_downstream
         end
-        cblock = bs.gets
-      end
-      PROCEDE_
-    end
 
-    def exec_flush
-      ok = @specer.flush
-      if ok
-        emit_done_message
-        @result = SUCCESS_EXITSTATUS__
-        PROCEDE_
-      else
-        @result = ok
-      end
-    end
+        def rslv_output_adatper
+          mod = Autoloader_.const_reduce [ @output_adapter ], DocTest_::Output_Adapters_ do |*i_a, & ev_p|
+            @result = maybe_send_event_via_channel i_a, & ev_p
+            UNABLE_
+          end
+          mod and begin
+            @output_adapter_module = mod
+            via_output_adapter_module_resolve_output_adapter
+          end
+        end
 
-    def emit_done_message
-      if @vtuple.do_medium
-        @sn.puts "finished generated output for #{ @pathname }"
-      elsif @vtuple.do_notice
-        @sn.puts 'done.'
-      end ; nil
-    end
+        def via_output_adapter_module_resolve_output_adapter
+          @output_adapter = @output_adapter_module.output_adapter( &
+            handle_event_selectively )
+          ACHIEVED_
+        end
 
-    def finally
-      @do_close_output_stream and ( @out.closed? || @out.tty? or @out.close )
-      nil
-    end
+        def rslv_line_downstream
+          send @resolve_line_downstream_method_name
+        end
 
-    DocTest_ = self
-    SEP_ = '# =>'.freeze
-    SUCCESS_EXITSTATUS__ = 0
-    Autoloader_[ Templos__ = ::Module.new, :boxxy ]
+        def when_no_downstream
+          @result = maybe_send_event :error, :no_downstream do
+            build_not_OK_event_with :no_downstream
+          end
+          UNABLE_
+        end
 
+        def via_output_path_rslv_line_downstream
+          io = TestSupport_._lib.system.filesystem.normalization.downstream_IO.
+            with(
+              :path, @output_path,
+              :is_dry_run, @is_dry_run,
+              :on_event_selectively, handle_event_selectively )
+
+          io and begin
+            io.truncate 0
+            @do_close_downstream = true
+            @line_downstream = io
+            ACHIEVED_
+          end
+        end
+
+        # ~ resolve upstream
+
+        def rslv_upstream
+          ok = rslv_line_upstream
+          ok &&= rslv_comment_block_stream_via_line_stream
+          ok && rslv_node_upstream_via_comment_block_stream
+        end
+
+        def rslv_line_upstream
+          send @resolve_line_upstream_method_name
+        end
+
+        def when_no_upstream
+          @result = maybe_send_event :error, :no_upstream do
+            build_not_OK_event_with :no_line_upstream
+          end
+          UNABLE_
+        end
+
+        def via_upstream_path_rslv_line_upstream
+          io = TestSupport_._lib.system.filesystem.normalization.upstream_IO(
+            :path, @upstream_path,
+            :on_event_selectively, -> * i_a, & ev_p do
+              @result = maybe_send_event_via_channel i_a, & ev_p
+              :error != i_a.first
+            end )
+          if io
+            @line_upstream = io ; ACHIEVED_
+          else
+            UNABLE_
+          end
+        end
+
+        def rslv_comment_block_stream_via_line_stream
+          @comment_block_stream = DocTest_.
+            comment_block_stream_via_line_stream_using_single_line_comment_hack(
+              @line_upstream )
+          @comment_block_stream ? ACHIEVED_ : UNABLE_
+        end
+
+        def rslv_node_upstream_via_comment_block_stream
+          @node_upstream = @comment_block_stream.expand_by do | comment_block |
+            DocTest_::Intermediate_Streams_::Node_stream_via_comment_block_stream[ comment_block ]
+          end
+          @node_upstream ? ACHIEVED_ : UNABLE_
+        end
+
+        # ~ normalize
+
+        def normalize
+          @business_module_name ||= DocTest_::Actors_::
+            Infer_business_module_name_loadlessly.call(
+               @upstream_path, & handle_event_selectively )
+          if @business_module_name
+            ACHIEVED_
+          else
+            @result = @business_module_name
+            UNABLE_
+          end
+        end
+
+        # ~ synthesize
+
+        def via_upstream_and_downstream_synthesize
+
+          @result = @output_adapter.against(
+            :business_module_name, @business_module_name,
+            :line_downstream, @line_downstream,
+            :node_upstream, @node_upstream )
+
+          if @do_close_downstream
+            @line_downstream.close
+          end
+
+          nil
+        end
+
+        # ~ support
+
+        def OK
+          ACHIEVED_
+        end
   end
+    end
   end
 end

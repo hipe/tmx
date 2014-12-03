@@ -56,6 +56,7 @@ module Skylab::TestSupport
 
       def when_first_text_span
         @text_span = @span
+        @first_text_span = @span
         @state = @state_machine.fetch :after_first_text_span
         nil
       end
@@ -113,7 +114,7 @@ module Skylab::TestSupport
           @anc_nodes = nil
           a.concat @eg_a
           @eg_a = nil
-          Intermediate_Streams_::Models_::Context.build @text_span, a
+          Intermediate_Streams_::Models_::Context.build @first_text_span, a
         else
           # :+#[#037] warnings wishlist
           nil

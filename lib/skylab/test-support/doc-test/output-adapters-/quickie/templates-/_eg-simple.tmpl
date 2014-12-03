@@ -1,6 +1,4 @@
-      it {{ dsc }} do
-        Sandbox_{{ context_num }}.with self
-        module Sandbox_{{ context_num }}
-          {{ code }}
-        end
-      end
+
+it {{ dsc }} do
+  {{ code }}
+end

@@ -20,6 +20,10 @@ module Skylab::TestSupport
           [ :description_string, :to_child_stream, :node_symbol ]
         end
 
+        def node_symbol_when_context
+          :example_node_in_context
+        end
+
         def node_symbol
           :example_node
         end
@@ -50,6 +54,7 @@ module Skylab::TestSupport
             while @line
               @line_count += 1
               if BLANK_RX_ =~ @line
+                a.push Models_::Predicate_Expressions::Raw_Line::BLANK_LINE
                 @line = @lines.gets
                 next
               end
