@@ -74,7 +74,7 @@ module Skylab::GitViz
 
       # ~ private helper classes
 
-      class Resolve__  # this looks like a :+[#st-007] tree walk
+      class Resolve__  # this looks like a :+[#hl-176] tree walk
 
         def initialize repo_cls, pn, listener
           @listener = listener ; @pn = pn

@@ -5,7 +5,7 @@
 [#010] #open in cov replace olschool [mh] basic fields with actors
 [#009]       #done gut the fucked up event model of `cov`
 [#008]       #done immigrate [#po-018] tree
-[#007]       #node-tracker: the tree walker
+[#007] #hole (was: #node-tracker: the tree walker)
 [#006]       #doc-node the my tree narrative ..
 [#005] #open this is ripe for an upfactor to headless
 [#004] #open #tiny fix glyphs to look like darling child my-tree

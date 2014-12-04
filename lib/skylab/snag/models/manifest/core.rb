@@ -189,7 +189,7 @@ module Skylab::Snag
             end
           end
 
-          Snag_._lib.filesystem_walk.build_with(
+          Snag_._lib.system.filesystem.walk.build_with(
             :filename, @config.manifest_file,
             :max_num_dirs_to_look,
               @config.max_num_dirs_to_search_for_manifest_file,

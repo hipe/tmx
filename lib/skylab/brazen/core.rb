@@ -302,7 +302,6 @@ module Skylab::Brazen
   NILADIC_TRUTH_ = -> { true }
   PROCEDE_ = true
   Scan_ = -> { Callback_::Scan }
-  SLASH_ = '/'.getbyte 0
   SPACE_ = ' '.freeze
 
   stowaway :TestSupport, 'test/test-support'

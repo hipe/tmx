@@ -40,7 +40,9 @@ module Skylab::Snag::TestSupport
     include Constants
 
     def debug!
-      tmpdir.debug!
+      if ! tmpdir.be_verbose
+        @tmpdir = @tmpdir.with :be_verbose, true
+      end
       @do_debug = true
     end
 
@@ -54,9 +56,21 @@ module Skylab::Snag::TestSupport
       Snag_::Library_::FileUtils.cd tmpdir, verbose: do_debug, & p
     end
 
-    -> x do
-      define_method :tmpdir do x end
-    end[ TestSupport_.tmpdir.new :path, TestLib_::Tmpdir_pathname[].join( 'snaggle' ) ]
+    def tmpdir
+      @tmpdir ||= Memoized_tmpdir__[] || Memoize_tmpdir__[ do_debug, debug_IO ]
+    end
+
+    -> do
+      x = nil
+      Memoized_tmpdir__ = -> { x }
+      Memoize_tmpdir__ = -> do_debug, debug_IO do
+        x = TestSupport_.tmpdir.new(
+          :path, TestLib_::Tmpdir_pathname[].join( 'snaggle' ),
+          :be_verbose, do_debug,
+          :debug_IO, debug_IO )
+        x
+      end
+    end.call
 
     -> x do
       define_method :manifest_file do x end

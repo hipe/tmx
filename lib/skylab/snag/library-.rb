@@ -77,10 +77,6 @@ module Skylab::Snag
       System[].filesystem.file_utils_controller
     end
 
-    Filesystem_walk = -> do
-      Bzn__[]::Models_::Workspace.filesystem_walk
-    end
-
     Funcy_globless = -> x do
       MH__[].funcy_globless x
     end

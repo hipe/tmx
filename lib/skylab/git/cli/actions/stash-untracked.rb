@@ -406,7 +406,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
 
     module Services__
-      class Find_Nearest_Hub  # :+[#st-007] this precededs "tree walker"
+      class Find_Nearest_Hub  # :+[#hl-176] this precededs "tree walker"
         def initialize _
         end
         def call
