@@ -51,6 +51,10 @@ module Skylab::Callback
         Actor::Methodic__.via_client_and_iambic cls, i_a
       end
 
+      def methodic_lib
+        Actor::Methodic__
+      end
+
       def via_client_and_iambic cls, i_a
         cls.extend MM__ ; cls.include self
         while i_a.length.nonzero?
@@ -1427,22 +1431,27 @@ module Skylab::Callback
     public
 
       define_method :require_sidesystem, -> do
+
         sl_path = -> do
           x = Callback_.dir_pathname.dirname.to_path ; sl_path = -> { x } ; x
         end
-        execute_require = -> const_i do
-          _stem = Name.via_const( const_i ).as_slug
-          require "#{ sl_path[] }/#{ _stem }/core" ; nil
+
+        require_via_const = -> const_i do
+          require "#{ sl_path[] }/#{  Name.via_const( const_i ).as_slug }/core"
         end
-        resolve_some_sidesystem = -> const_i do
-          ::Skylab.const_defined? const_i, false or execute_require[ const_i ]
+
+        produce_via_const = -> const_i do
+          if ! ::Skylab.const_defined? const_i, false
+            require_via_const[ const_i ]
+          end
           ::Skylab.const_get const_i, false
         end
+
         require_sidesystem = -> * i_a do
           case i_a.length <=> 1
           when -1 ; require_sidesystem
-          when  0 ; resolve_some_sidesystem[ i_a.first ]
-          else    ; i_a.map( & resolve_some_sidesystem )
+          when  0 ; produce_via_const[ i_a.first ]
+          else    ; i_a.map( & produce_via_const )
           end
         end
       end.call

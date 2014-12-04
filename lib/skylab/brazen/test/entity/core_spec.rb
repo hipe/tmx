@@ -9,12 +9,12 @@ module Skylab::Brazen::TestSupport::Entity
       before :all do
 
         class Foo
-          Subject_[][ self, -> do
+          Subject_[].call self do
 
           def foo
           end
 
-          end ]
+          end
         end
       end
 
@@ -30,7 +30,7 @@ module Skylab::Brazen::TestSupport::Entity
       end
 
       def subject
-        Foo.property_method_nms_for_rd
+        @properties ||= Foo.properties
       end
     end
 
@@ -39,28 +39,28 @@ module Skylab::Brazen::TestSupport::Entity
       before :all do
 
         class Foo_Base
-          Subject_[][ self, -> do
+          Subject_[].call self do
             def foo
             end
-          end ]
+          end
         end
 
         class Foo_Child < Foo_Base
-          Subject_[][ self, -> do
+          Subject_[].call self do
             def bar
             end
-          end ]
+          end
         end
       end
 
       it "child inherits properties of base" do
-        Foo_Base.property_method_nms_for_rd.get_names.should eql [ :foo ]
-        Foo_Child.property_method_nms_for_rd.get_names.should eql [ :foo, :bar ]
+        Foo_Base.properties.get_names.should eql [ :foo ]
+        Foo_Child.properties.get_names.should eql [ :foo, :bar ]
       end
 
       it "the child's handle on the property is THE SAME PROPERTY" do
-        foo1 = Foo_Base.property_method_nms_for_rd[ :foo ]
-        foo2 = Foo_Child.property_method_nms_for_rd[ :foo ]
+        foo1 = Foo_Base.properties.fetch :foo
+        foo2 = Foo_Child.properties.fetch :foo
         foo1 or fail
         foo1.object_id.should eql foo2.object_id
       end
@@ -71,17 +71,17 @@ module Skylab::Brazen::TestSupport::Entity
       it "is something you can do" do
 
           class Foo_Reopener_Base
-            Subject_[][ self, -> do
+            Subject_[].call self do
             def foo
             end
-            end ]
+            end
           end
 
           class Foo_Reopener_Child < Foo_Reopener_Base
-            Subject_[][ self, -> do
+            Subject_[].call self do
             def foo
             end
-            end ]
+            end
           end
 
       end

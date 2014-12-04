@@ -45,10 +45,121 @@ module Skylab::Brazen
       end
 
       def via_arglist a, & p
-        p and a.push p
-        Shell__.new.via_arglist a
+        Edit_via_arglist__.new( a, & p ).execute
       end
     end
+
+    # ~ writing properties (without metaproperties)
+
+    class Edit_via_arglist__
+
+      def initialize x_a, & p
+        @x_a = x_a ; @proc_that_uses_DSL = p
+      end
+
+      def execute
+        @formal_entity = @x_a.fetch 0
+        cls = @formal_entity
+        1 < @x_a.length and self._DO_ME
+        Callback_::Actor.methodic cls
+        cls.extend Module_Methods__
+        cls.include Instance_Methods__
+        cls.ent_edit_session do
+          cls.module_exec( & @proc_that_uses_DSL )
+        end
+      end
+    end
+
+    module Module_Methods__
+
+      def properties
+        entity_formal_property_method_names_box_for_rd.to_value_scan.map_by do |i|
+          send i
+        end.immutable_with_random_access_keyed_to_method :name_i
+      end
+
+      def ent_edit_session
+        @active_entity_edit_session = Class_Edit_Session__.new self
+        x = yield
+        @active_entity_edit_session.finish
+        @active_entity_edit_session = nil
+        x
+      end
+
+      def method_added m_i
+        if @active_entity_edit_session
+          @active_entity_edit_session.receive_method_added_name m_i
+          nil
+        end
+        super
+      end
+
+      def entity_formal_property_method_names_box_for_wrt
+        @entity_formal_property_method_names_box_for_write ||= begin
+          const_set :ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___,
+            self::ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___.dup
+        end
+      end
+
+      def entity_formal_property_method_names_box_for_rd
+        self::ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___
+      end
+    end
+
+    module Instance_Methods__
+      ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___ = Callback_::Box.the_empty_box
+    end
+
+    class Class_Edit_Session__
+
+      def initialize cls
+        @current_property = nil
+        @formal_property_writee_module = cls.singleton_class
+        @property_class = Property__
+        @writable_formal_propery_method_names_box =
+          cls.entity_formal_property_method_names_box_for_wrt
+      end
+
+      def receive_method_added_name m_i
+        if @current_property
+          self._DO_ME
+        else
+          prop = @property_class.new do
+            @name = Callback_::Name.via_variegated_symbol m_i
+          end
+          acpt_property prop
+          nil
+        end
+      end
+
+      def acpt_property _PROPERTY
+        box = @writable_formal_propery_method_names_box
+        name_i = _PROPERTY.name_i
+        do_add = false
+        meth_i = box.fetch name_i do
+          do_add = true
+          :"___#{ name_i }_property___"
+        end
+        if do_add
+          box.add name_i, meth_i
+        end
+        @formal_property_writee_module.send :define_method, meth_i do
+          _PROPERTY
+        end
+        nil
+      end
+
+      def finish
+        nil
+      end
+    end
+
+    class Property__ < Callback_::Actor.methodic_lib.simple_property_class
+
+    end
+
+
+    if false
 
     class Common_Shell__  # read [#001] the entity enhancement narrrative
 
@@ -471,11 +582,7 @@ module Skylab::Brazen
         @properties = nil
       end
 
-      def build_props
-        ( property_method_nms_for_rd.to_value_scan.map_by do |i|
-          send i
-        end.immutable_with_random_access_keyed_to_method :name_i )
-      end
+
 
       def property_method_nms_for_rd
         const_get READ_BOX__
@@ -1029,7 +1136,8 @@ module Skylab::Brazen
         mod
       end
     end
+    end
 
-    Entity = self
+    Entity_ = self
   end
 end

@@ -6,6 +6,10 @@ module Skylab::Callback
 
       class << self
 
+        def simple_property_class
+          Simple_Property__
+        end
+
         def via_client_and_iambic mod, i_a
           mod.extend Module_Methods__
           mod.include Instance_Methods__
@@ -20,7 +24,9 @@ module Skylab::Callback
             end
           end
         end
+
       private
+
         def aply_seed_treatment mod, i_a
           mod.module_exec do
             private
