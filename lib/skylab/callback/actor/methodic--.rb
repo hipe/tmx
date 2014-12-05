@@ -6,13 +6,17 @@ module Skylab::Callback
 
       class << self
 
+        def iambic_processing_instance_methods
+          Iambic_Processing_Instance_Methods__
+        end
+
         def simple_property_class
           Simple_Property__
         end
 
         def via_client_and_iambic mod, i_a
           mod.extend Module_Methods__
-          mod.include Instance_Methods__
+          mod.include Iambic_Processing_Instance_Methods__
           if i_a.length.nonzero?
             i = i_a.first
             if :simple == i
@@ -72,7 +76,7 @@ module Skylab::Callback
         end
       end
 
-      module Instance_Methods__
+      module Iambic_Processing_Instance_Methods__
 
       private
 
@@ -88,7 +92,7 @@ module Skylab::Callback
           end  # covered
         end
 
-        def process_iambic_stream_fully stream
+        def process_iambic_stream_fully stream  # :+#public-API :+#hook-in
           process_iambic_stream_passively stream
           if stream.has_no_more_content
             ACHIEVED_
@@ -134,7 +138,7 @@ module Skylab::Callback
           end
         end
 
-        def when_after_process_iambic_fully_stream_has_content stream
+        def when_after_process_iambic_fully_stream_has_content stream  # :+#public-API
           _ev = build_extra_iambic_event_via [ stream.current_token ]
           receive_extra_iambic _ev  # :+#public-API (name) :+#hook-in
         end
@@ -175,6 +179,10 @@ module Skylab::Callback
         end
 
         attr_reader :argument_arity, :ivar, :name, :parameter_arity
+
+        def members
+          [ :argument_arity, :ivar, :name, :name_i, :parameter_arity ]
+        end
 
       private
 

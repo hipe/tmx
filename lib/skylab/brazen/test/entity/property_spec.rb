@@ -9,14 +9,19 @@ module Skylab::Brazen::TestSupport::Entity
       it "1)  the classic form with method definitions as iambic writers" do
 
         class P_Classic
-          Subject_[][ self, -> do
+
+          Subject_[].call self do
+
             def foo
               @foo = iambic_property
+              true
             end
+
             def bar
               @bar = iambic_property
+              true
             end
-          end ]
+          end
         end
         expect P_Classic
       end
@@ -40,10 +45,10 @@ module Skylab::Brazen::TestSupport::Entity
       it "4)  in the '-> { }' with the 'property' keyword" do
 
         class P_In_Block
-          Subject_[][ self, -> do
+          Subject_[].call self do
             o :property, :foo
             o :property, :bar
-          end ]
+          end
         end
         expect P_In_Block
       end
@@ -51,49 +56,41 @@ module Skylab::Brazen::TestSupport::Entity
       it "4b) in the '-> { }' with the 'property' keyword (one line)" do
 
         class P_In_Block_B
-          Subject_[][ self, -> do
+          Subject_[].call self do
             o :property, :foo, :property, :bar
-          end ]
+          end
         end
         expect P_In_Block_B
       end
 
       it  "5)  in the '-> { }' with the 'properties' keyword" do
         class P_In_Block_Props
-          Subject_[][ self, -> do
+          Subject_[].call self do
             o :properties, :foo, :bar
-          end ]
+          end
         end
         expect P_In_Block_Props
       end
 
-      it "5b) in the '-> { }' with the 'properties' keyword (2 lines)" do
-        class P_In_Block_Props_B
-          Subject_[][ self, -> do
-            o :properties, :foo
-            o :bar
-          end ]
-        end
-        expect P_In_Block_Props_B
-      end
-
       it "6) re-use properties with 'reuse'" do
         class P_Reuse_Source
-          Subject_[][ self, -> do
+          Subject_[].call self do
             o :property, :bar,
               :property, :foo
-          end ]
+          end
         end
         class P_Reuse
-          Subject_[][ self, -> do
+          Subject_[].call self do
             o :reuse, P_Reuse_Source.properties.at( :foo, :bar )
-          end ]
+          end
         end
         expect P_Reuse
       end
 
       def expect cls
-        subj = cls.new.send :with, :foo, :x, :bar, :y
+        subj = cls.new do
+          process_iambic_fully [ :foo, :x, :bar, :y ]
+        end
         subj.instance_variable_get( :@foo ).should eql :x
         subj.instance_variable_get( :@bar ).should eql :y
       end

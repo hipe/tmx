@@ -51,11 +51,13 @@ module Skylab::Brazen
         :enum, [ :zero, :one ],
         :default, :one,
         :property_hook, -> prop do
+          ok = true
           if :zero == prop.argument_arity
             prop.iambic_writer_method_proc = -> do
-              accept_entity_property_value prop, true ; nil
+              ok = receive_entity_property_value prop, true
             end
           end
+          ok
         end
 
     o :meta_property, :argument_moniker
@@ -368,8 +370,9 @@ module Skylab::Brazen
         }(#{ p[ x ] }) with new value (#{ p[ x_ ] })"
     end
 
-    def accept_entity_property_value prop, x
-      actual_property_box_for_write.add prop.name_i, x ; nil
+    private def receive_entity_property_value prop, x
+      actual_property_box_for_write.add prop.name_i, x
+      ACHIEVED_
     end
 
     def actual_property_box_for_write

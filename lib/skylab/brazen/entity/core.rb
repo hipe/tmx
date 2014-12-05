@@ -44,15 +44,15 @@ module Skylab::Brazen
         Scope_Kernel__
       end
 
-      def via_arglist x_a, & p
-        if x_a.length.zero?
-          Produce_extension_module__.new( & p ).execute
+      def via_arglist x_a, & edit_p
+        d = x_a.length
+        if d.zero?
+          Produce_extension_module__.new( & edit_p ).execute
         else
-          1 < x_a.length and self._DO_ME
           cls = x_a.fetch 0
           cls.extend Module_Methods__
-          cls.ent_edit_session do
-            cls.module_exec( & p )
+          cls.entity_edit_sess do |sess|
+            sess.process_iambic_flly x_a[ 1 .. -1 ], & edit_p
           end
         end
       end
@@ -73,7 +73,7 @@ module Skylab::Brazen
 
       def call cls, & p
         self[ cls ]
-        cls.ent_edit_session do
+        cls.entity_edit_sess do
           cls.module_exec( & p )
         end
       end
@@ -95,49 +95,104 @@ module Skylab::Brazen
         end
         cls
       end
-
-      def _OLD_via_proc_build_new_extension_module
-        mod = ::Module.new
-        mm = mod.const_set :Module_Methods, ::Module.new
-        mm.include @extension_module::Module_Methods
-        mod.extend Extension_Module_Methods__, Proprietor_Methods__
-        mod.include Iambic_Methods__
-        mod.include @extension_module
-
-        mod.const_set READ_BOX__, bx = Box_.new  # for now
-        mod.const_set WRITE_BOX__, bx
-
-        krn = mod.init_property_scope_krnl
-        krn.apply_p @proc
-        krn.end_scope
-        mod.property_scope_krnl = nil
-        mod
-      end
     end
+
+    METHODIC_ = Callback_::Actor.methodic_lib
 
     module Edit_Session_Methods__
 
+      include METHODIC_.iambic_processing_instance_methods
+
       def init_module mod
         mod.include Instance_Methods__
+        @iambic_writer_method_writee_module = mod
+        @pay_attention_to_method_added = true
         @property_class = Property__
         nil
       end
 
-      def receive_method_added_name m_i
-        if @current_property
+      def process_iambic_stream_fully stream  # [cb] #override
+        process_iambic_stream_passively stream
+        if stream.unparsed_exists
           self._DO_ME
+        end
+        if true
+          ACHIEVED_
         else
-          prop = @property_class.new do
-            @name = Callback_::Name.via_variegated_symbol m_i
-          end
-          acpt_property prop
-          nil
+          when_after_process_iambic_fully_stream_has_content stream
         end
       end
 
-      def acpt_property _PROPERTY
+      def receive_method_added_name m_i
+        if @pay_attention_to_method_added
+          @do_define_method = false
+          @iambic_writer_method_name = m_i
+          _via_plan_realize_property_via_variegated_symbol m_i
+        end
+        nil
+      end
+
+    private
+
+      def properties=
+        stream = @__methodic_actor_iambic_stream__
+        ok = true
+        while stream.unparsed_exists
+          ok = send :property=
+          ok or break
+        end
+        ok
+      end
+
+      def property=
+        name_i = iambic_property
+        @do_define_method = true
+        @iambic_writer_method_name = :"___entity_#{ name_i }_iambic_writer___"
+        _via_plan_realize_property_via_variegated_symbol name_i
+      end
+
+      def _via_plan_realize_property_via_variegated_symbol name_i
+        iwmn = flsh_some_iambic_writer_method_name
+
+        prop = @property_class.new do
+          @name = Callback_::Name.via_variegated_symbol name_i
+          @iwmn = iwmn
+        end
+
+        acpt_property prop
+      end
+
+      def flsh_some_iambic_writer_method_name
+        @iambic_writer_method_name or self._SANITY
+        x = @iambic_writer_method_name
+        @iambic_writer_method_name = nil
+        x
+      end
+
+      def reuse=
+        @do_define_method = true
+        _prop_a = iambic_property
+        ok = true
+        _prop_a.each do | prop |
+          ok = acpt_property prop
+          ok or break
+        end
+        ok
+      end
+
+      def acpt_property prop
+        if @do_define_method
+          befor = @pay_attention_to_method_added
+          @pay_attention_to_method_added = false
+          @iambic_writer_method_writee_module.send(
+            :define_method,
+            prop.iambic_writer_method_name,
+            prop.iambic_writer_method_proc )
+          @pay_attention_to_method_added = befor
+        end
+
         box = @writable_formal_propery_method_names_box
-        name_i = _PROPERTY.name_i
+        name_i = prop.name_i
         do_add = false
         meth_i = box.fetch name_i do
           do_add = true
@@ -146,10 +201,13 @@ module Skylab::Brazen
         if do_add
           box.add name_i, meth_i
         end
+
+        _PROPERTY = prop
         @formal_property_writee_module.send :define_method, meth_i do
           _PROPERTY
         end
-        nil
+
+        ACHIEVED_
       end
     end
 
@@ -158,7 +216,6 @@ module Skylab::Brazen
       include Edit_Session_Methods__
 
       def initialize & p
-        @current_property = nil
         @p = p
       end
 
@@ -171,7 +228,7 @@ module Skylab::Brazen
         mod.const_set :Module_Methods, mod_  # :+#public-API (the name)
         mod.const_set :ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___, box
 
-        mod.include Callback_::Actor.methodic_lib::Instance_Methods__
+        mod.include METHODIC_.iambic_processing_instance_methods
         init_module mod
         mod.extend Extension_Module_Methods__
 
@@ -193,10 +250,23 @@ module Skylab::Brazen
       def initialize cls
         Callback_::Actor.methodic cls
         init_module cls
-        @current_property = nil
         @formal_property_writee_module = cls.singleton_class
         @writable_formal_propery_method_names_box =
           cls.entity_formal_property_method_names_box_for_wrt
+      end
+
+      def process_iambic_flly x_a, & edit_p
+        ok = true
+        if x_a.length.nonzero?
+          ok = process_iambic_fully x_a
+        end
+        ok and begin
+          if edit_p
+            @iambic_writer_method_writee_module.module_exec( & edit_p )  # so result is user's result
+          else
+            @iambic_writer_method_writee_module  # so `[]` is wrappable
+          end
+        end
       end
 
       def finish
@@ -214,10 +284,11 @@ module Skylab::Brazen
         end.immutable_with_random_access_keyed_to_method :name_i
       end
 
-      def ent_edit_session
-        @active_entity_edit_session = Class_Edit_Session__.new self
-        x = yield
-        @active_entity_edit_session.finish
+      def entity_edit_sess
+        sess = Class_Edit_Session__.new self
+        @active_entity_edit_session = sess
+        x = yield sess
+        sess.finish
         @active_entity_edit_session = nil
         x
       end
@@ -241,11 +312,26 @@ module Skylab::Brazen
       def entity_formal_property_method_names_box_for_rd
         self::ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___
       end
+
+    private
+
+      def o * x_a, & edit_p
+        if active_entity_edit_session
+          sess = @active_entity_edit_session
+        else
+          self._DO_ME
+        end
+        sess.process_iambic_flly x_a, & edit_p
+      end
     end
 
     module Instance_Methods__
 
       ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___ = Callback_::Box.the_empty_box
+
+      def initialize & p   # #experimental
+        instance_exec( & p )
+      end
 
     private
 
@@ -258,105 +344,41 @@ module Skylab::Brazen
           end
         end
       end
+
+      def receive_entity_property_value prop, x
+        instance_variable_set prop.as_ivar, x
+        ACHIEVED_
+      end
     end
 
-    class Property__ < Callback_::Actor.methodic_lib.simple_property_class
-
-      def initialize & edit_p
-        super do
-          instance_exec( & edit_p )
-          @iwmn ||= name_i
-        end
-      end
+    class Property__ < METHODIC_.simple_property_class
 
       def iambic_writer_method_name
         @iwmn
+      end
+
+    private
+
+      def iambic_writer_method_proc_when_arity_is_one
+        _NAME_I = name_i
+        -> do
+          _prop = self.class.send self.class.entity_formal_property_method_names_box_for_wrt.fetch _NAME_I
+          receive_entity_property_value _prop, iambic_property  # RESULT VALUE
+        end
+      end
+
+      def iambic_writer_method_proc_when_arity_is_zero
+        _NAME_I = name_i
+        -> do
+          _prop = self.class.send self.class.entity_formal_property_method_names_box_for_wrt.fetch _NAME_I
+          receive_entity_property_value _prop, true  # RESULT VALUE
+        end
       end
     end
 
     if false
 
-    class Common_Shell__  # read [#001] the entity enhancement narrrative
-
-      def via_arglist x_a
-        @d = 0 ; @x_a = x_a ; @x_a_length = x_a.length
-        case @x_a_length <=> 1
-        when  1 ; when_many_length_arg_list_execute
-        when  0 ; when_one_length_arg_list_execute
-        end
-      end
-
-    private
-
-      def when_one_length_arg_list_execute  # build extension moudule via proc
-        if current_iambic_token.respond_to? :arity
-          when_one_length_arg_list_item_is_proc_execute
-        else
-          when_one_length_arg_list_item_is_client_execute
-        end
-      end
-
-      def when_many_length_arg_list_execute  # more than one
-        @reader = iambic_property  # see [#001]:#reader-vs-writer
-        to_reader_apply_setup
-        @kernel = @reader.init_property_scope_krnl
-        r = if current_iambic_token.respond_to? :id2name
-          when_remaining_args_look_iambic_execute
-        else
-          when_remaining_args_do_not_look_iambic_execute
-        end
-        @kernel.end_scope
-        @reader.property_scope_krnl = nil
-        r
-      end
-
-      def when_remaining_args_look_iambic_execute
-        d = @kernel.process_any_DSL @d, @x_a
-        d == @d and raise via_current_token_build_extra_iambic_event.to_exception
-        @d = d
-        @d < @x_a_length and when_remaining_args_do_not_look_iambic_execute
-      end
-
-      def when_remaining_args_do_not_look_iambic_execute
-        d = @x_a_length - @d
-        1 == d or raise ::ArgumentError, "(#{ d } for 1 remaining arg)"
-        p = current_iambic_token
-        p.respond_to? :arity or raise ::ArgumentError, say_expecting_proc
-        clear_all_iambic_ivars
-        @kernel.apply_p p ; nil
-      end
-    end
-
-    class Shell__ < Common_Shell__
-    private
-
-      def when_one_length_arg_list_item_is_proc_execute
-        @p = @x_a.first
-        mod = ::Module.new
-        mod.const_set :Module_Methods, ::Module.new
-        mod.extend Extension_Module_Methods__, Proprietor_Methods__
-        mod.include Iambic_Methods__
-        mod.const_set READ_BOX__, Box_.new
-        krn = mod.init_property_scope_krnl
-        krn.apply_p @p
-        krn.end_scope
-        mod.property_scope_krnl = nil
-        mod
-      end
-
-      def when_one_length_arg_list_item_is_client_execute
-        @reader = @x_a.first
-        to_reader_apply_setup
-      end
-
-      def to_reader_apply_setup
-        @reader.extend Proprietor_Methods__
-        @reader.include Iambic_Methods__
-        @reader.const_defined? READ_BOX__ or
-          @reader.const_set READ_BOX__, Box_.new
-        nil
-      end
-    end
+      # WAS: read [#001] the entity enhancement narrrative
 
     READ_BOX__ = :PROPERTIES_FOR_READ__
     WRITE_BOX__ = :PROPERTIES_FOR_WRITE__
@@ -393,178 +415,10 @@ module Skylab::Brazen
         end ; nil
       end
 
-      # ~
-
-      def accept_reuse
-        @scanner.gets_one.each do |prop|
-          add_property prop
-        end ; nil
-      end
-
-      # ~ direct interface & support
-
-      def has_nonzero_length_iambic_queue
-        @x_a_a.length.nonzero?
-      end
-
-      def add_iambic_row x_a
-        @x_a_a.push x_a ; nil
-      end
-
-      def apply_p p
-        Method_Added_Muxer__[ @reader ].for_each_method_added_in p, -> m_i do
-          flush_because_method m_i
-        end
-        @x_a_a.length.nonzero? and flush_iambic_queue
-        nil
-      end
-
       def iambic_writer_method_name_suffix= i
         @has_writer_method_name_constraints = true
         @method_name_constraints_rx = /\A.+(?=#{ ::Regexp.escape i }\z)/
         @writer_method_name_suffix = i
-      end
-
-      def add_monadic_property_via_i i
-        plan = Property_Plan__.new i
-        plan.meth_i = generate_method_name_for_plan plan
-        prop = bld_prop_from_plan plan
-        define_iambic_writer_method_for_property prop
-        accept_property prop ; nil
-      end
-
-      def add_property_via_i i, & p
-        plan = Property_Plan__.new i
-        plan.meth_i = generate_method_name_for_plan plan
-        prop = bld_prop_from_plan plan do |prp|
-          prp.iambic_writer_method_proc = p
-        end
-        add_property prop ; nil
-      end
-
-      def add_property prop
-        define_iambic_writer_method_for_property prop
-        accept_property prop ; nil
-      end
-
-      def flush_because_method m_i
-        start_plan.meth_i = m_i
-        if @x_a_a.length.nonzero?
-          flush_iambic_queue
-          if @previous_plan
-            @plan and self._WRITE_ME  # #todo
-            @plan = @previous_plan
-            @previous_plan = nil
-          end
-          if @plan
-            flush_bc_meth
-          else
-            ACHIEVED_
-          end
-        else
-          flush_bc_meth
-        end
-      end
-
-      def flush_bc_meth
-        if @has_writer_method_name_constraints
-          @plan.prop_i = aply_method_name_constraints @plan.meth_i
-        else
-          @plan.prop_i = @plan.meth_i
-        end
-        did_build = touch_and_accept_prop
-        if did_build
-          finish_property
-        else
-          ACHIEVED_
-        end
-      end
-
-      def flush_because_prop_i prop_i
-        pre_existing_plan = plan
-        if pre_existing_plan
-          @previous_plan = pre_existing_plan
-          @plan = nil
-        end
-        start_plan.prop_i = prop_i
-        @plan.meth_i = generate_method_name_for_plan @plan
-        did_build = touch_and_accept_prop
-        define_iambic_writer_method_for_property @prop
-        if did_build
-          finish_property
-        else
-          ACHIEVED_
-        end
-      end
-
-      def start_plan
-        if @plan
-          self._COLLISION
-        else
-          @plan = Property_Plan__.new
-        end
-      end
-
-      attr_reader :plan
-
-      class Property_Plan__
-        def initialize i=nil
-          @prop_i = i
-        end
-        attr_accessor :meth_i, :prop_i
-        def names
-          [ @prop_i, @meth_i ]
-        end
-      end
-
-      def define_iambic_writer_method_for_property prop
-        mxr = @reader.method_added_mxr and mxr.stop_listening
-        @reader.send :define_method, prop.iambic_writer_method_name,
-          prop.some_iambic_writer_method_proc
-        mxr and mxr.resume_listening ; nil
-      end
-
-      def generate_method_name_for_plan plan
-        :"__PROCESS_IAMBIC_PARAMETER__#{ plan.prop_i }"
-      end
-
-      def touch_and_accept_prop
-        if @prop
-          via_plan_mutate_prop_in_progress
-        else
-          via_plan_create_new_prop
-          did_build = true
-        end
-        @plan = nil
-        accept_property @prop
-        did_build
-      end
-
-      def via_plan_mutate_prop_in_progress
-        @prop.set_prop_i_and_iambic_writer_method_name( * @plan.names )
-        (( p = any_prop_hook @prop.class )) and p[ @prop ]
-        nil
-      end
-
-      def via_plan_create_new_prop
-        @prop = bld_prop_from_plan @plan ; nil
-      end
-
-      def bld_prop_from_plan plan, & arg_p
-        hook_p = any_prop_hook @reader::PROPERTY_CLASS__
-        p = if arg_p
-          if hook_p
-            -> prp do
-              hook_p[ prp ]
-              arg_p[ prp ]
-            end
-          else
-            arg_p
-          end
-        elsif hook_p
-          hook_p
-        end
-        @reader::PROPERTY_CLASS__.new( * plan.names, & p )
       end
 
       def any_prop_hook cls
@@ -577,14 +431,6 @@ module Skylab::Brazen
             end ; nil
           end
         end
-      end
-
-      def accept_property _PROPERTY_
-        i = _PROPERTY_.name_i
-        m_i = :"produce_#{ i }_property"
-        @reader.property_method_nms_for_wrt.add_or_assert i, m_i
-        @writer.send :define_method, m_i do _PROPERTY_ end
-        nil
       end
 
       def finish_property
@@ -602,41 +448,6 @@ module Skylab::Brazen
       end
 
       # ~
-
-      attr_reader :meth_i, :reader, :scanner
-      attr_writer :prop
-
-      def flush_iambic_queue
-        @scanner = Entity::Compound_Iambic_Scanner__.new @x_a_a
-        prcss_scan_as_DSL_fully
-        @x_a_a.clear ; @scanner = nil
-      end
-
-      def prcss_scan_as_DSL_fully
-        prcss_scan_as_DSL false
-      end
-
-      def prcss_scan_as_DSL_passively
-        prcss_scan_as_DSL true
-      end
-
-      def prcss_scan_as_DSL is_passive
-        dsl = DSL__.new self, @scanner
-        begin
-          dsl.execute
-          @scanner.unparsed_exists or break
-          if is_passive
-            @scanner.current_token.respond_to? :id2name or break
-          end
-          _did = scan_anything_with_any_ad_hoc_processors
-          _did or metaproperty_stream.scan_some_DSL
-          @scanner.unparsed_exists or break
-        end while true
-      end
-
-      def metaproperty_stream
-        @mprop_scnr ||= Entity::Meta_Property__::Mprop_Scanner.new self
-      end
 
       def aply_method_name_constraints m_i
         md = @method_name_constraints_rx.match m_i.to_s
@@ -697,8 +508,6 @@ module Skylab::Brazen
         @properties = nil
       end
 
-
-
       def property_method_nms_for_rd
         const_get READ_BOX__
       end
@@ -714,19 +523,6 @@ module Skylab::Brazen
           const_set READ_BOX__, props
           props
         end
-      end
-
-      def o * x_a, & p
-        if p
-          krnl = init_property_scope_krnl
-          x_a.length.nonzero? and krnl.add_iambic_row x_a
-          krnl.has_nonzero_length_iambic_queue and krnl.flush_iambic_queue
-          krnl.apply_p p
-          krnl.end_scope
-          @property_scope_krnl = nil
-        else
-          @property_scope_krnl.add_iambic_row x_a
-        end ; nil
       end
 
       def set_property_class x
@@ -822,33 +618,15 @@ module Skylab::Brazen
     class Property__
 
       def initialize *a
-        @iambic_writer_method_proc = nil
         a.length.nonzero? and set_prop_i_and_iambic_writer_method_name( * a )
         notificate :at_end_of_process_iambic
         block_given? and yield self
         freeze
       end
 
-      attr_accessor :iambic_writer_method_proc
-
       def set_prop_i_and_iambic_writer_method_name prop_i, meth_i=nil
         @name = Callback_::Name.via_variegated_symbol prop_i
         @iambic_writer_method_name = meth_i ; nil
-      end
-
-      def some_iambic_writer_method_proc
-        if @iambic_writer_method_proc
-          @iambic_writer_method_proc
-        else
-          bld_monadic_iambic_writer_method_proc
-        end
-      end
-
-      def bld_monadic_iambic_writer_method_proc
-        _PROP_ = self
-        -> do
-          accept_entity_property_value _PROP_, iambic_property ; nil
-        end
       end
 
       def description
@@ -892,141 +670,7 @@ module Skylab::Brazen
 
     # ~ iambics
 
-    module Iambic_Methods__
-    private
-
-      def with * a
-        ok = process_iambic_fully 0, a
-        if ok
-          clear_all_iambic_ivars
-          self
-        end
-      end
-
-      def process_iambic_fully * a
-        prcss_iambic_passively_via_args a
-        if unparsed_iambic_exists
-          when_extra_iambic
-        else
-          ACHIEVED_
-        end
-      end
-
-      def unparsed_iambic_exists
-        @d < @x_a_length
-      end
-
-      def process_iambic_passively * a
-        prcss_iambic_passively_via_args a
-      end
-
-      def prcss_iambic_passively_via_args a
-        prep_iambic_parse_via_args a
-        prcss_iambic_passively
-      end
-
-      def prep_iambic_parse_via_args a
-        case a.length
-        when 1 ; @d ||= 0 ; @x_a, = a ; @x_a_length = @x_a.length
-        when 2 ; @d, @x_a = a ; @x_a_length = @x_a.length
-        end ; nil
-      end
-
-      def prcss_iambic_passively
-        box, subject = iambic_methods_box_and_subject
-        while @d < @x_a_length
-          m_i = box[ @x_a[ @d ] ]
-          m_i or break
-          @d += 1
-          send subject.send( m_i ).iambic_writer_method_name
-        end
-        self
-      end
-
-      def via_stream_process_some_iambic
-        box, subject = iambic_methods_box_and_subject
-        scn = @scanner
-        m_i = box[ scn.current_token ]
-        if m_i
-          scn.advance_one
-          send subject.send( m_i ).iambic_writer_method_name
-          prcss_iambic_passively_with_scn_subj_box scn, subject, box
-        else
-          when_extra_iambic
-        end
-      end
-
-      def prcss_iambic_passively_with_scn_subj_box scn, subject, box
-        while scn.unparsed_exists
-          m_i = box[ scn.current_token ]
-          m_i or break
-          scn.advance_one
-          send subject.send( m_i ).iambic_writer_method_name
-        end ; nil
-      end
-
-      def iambic_methods_box_and_subject
-        subject = property_proprietor
-        if subject
-          if subject.respond_to? :property_method_nms_for_rd
-            box = subject.property_method_nms_for_rd
-          end
-        end
-        box ||= MONADIC_EMPTINESS_
-        [ box, subject ]
-      end
-
-      def property_proprietor
-        self.class
-      end
-
-      def iambic_property
-        x = @x_a.fetch @d
-        @d += 1
-        x
-      end
-
-      def replace_current_iambic_token & p
-        @x_a[ @d ] = p[ current_iambic_token ] ; nil
-      end
-
-      def current_iambic_token
-        @x_a.fetch @d
-      end
-
-      def advance_iambic_stream_by_one
-        @d += 1
-      end
-
-      def flush_remaining_iambic
-        a = @x_a[ @d .. -1 ] ; @d = @x_a_length ; a
-      end
-
-      def clear_all_iambic_ivars
-        @d = @x_a = @x_a_length = nil
-        UNDEFINED_
-      end
-
-      def accept_entity_property_value prop, x
-        instance_variable_set prop.name.as_ivar, x
-      end
-
-      def when_extra_iambic
-        _ev = via_current_token_build_extra_iambic_event
-        receive_extra_iambic _ev  # :+#public-API :+#hook-in
-      end
-
-      def via_current_token_build_extra_iambic_event
-        build_extra_iambic_event_via [ current_iambic_token ]
-      end
-
-      def build_extra_iambic_event_via name_i_a, did_you_mean_i_a=nil
-        Entity.properties_stack.build_extra_properties_event name_i_a, did_you_mean_i_a
-      end
-
-      def receive_extra_iambic ev
-        raise ev.to_exception
-      end
+    module Xxx
 
       # ~ experimental property reflection API
 
@@ -1046,46 +690,7 @@ module Skylab::Brazen
       PROPERTY_CLASS__ = Property__  # delicate
     end
 
-    MONADIC_EMPTINESS_ = -> _ { }
-
-    UNDEFINED_ = nil
-
-    module Via_Scanner_Iambic_Methods_
-
-      include Iambic_Methods__
-
-      def set_stream x
-        @scanner = x
-      end
-
-    private
-
-      def prep_iambic_parse_via_args a
-        a.length.zero? or raise ::ArgumentError, say_not_when_scan( a )
-      end
-
-      def prcss_iambic_passively
-        reader = self.class
-        box = reader.property_method_nms_for_rd
-        while unparsed_iambic_exists
-          m_i = box[ current_iambic_token ]
-          m_i or break
-          advance_iambic_stream_by_one
-          send reader.send( m_i ).iambic_writer_method_name
-        end ; nil
-      end
-
-      def unparsed_iambic_exists
-        @scanner.unparsed_exists
-      end
-
-      def iambic_property
-        if @scanner.unparsed_exists
-          @scanner.gets_one
-        else
-          when_no_iambic_property
-        end
-      end
+    module Xxx_
 
       def when_no_iambic_property
         maybe_send_event :error, :missing_required_properties do
@@ -1150,19 +755,6 @@ module Skylab::Brazen
           Entity::Meta_Property__.new( @scanner ).apply_to_property_class _pc
         end
 
-        def properties
-          begin
-            @kernel.flush_because_prop_i @scanner.gets_one
-          end while @scanner.unparsed_exists
-        end
-
-        def property
-          @kernel.flush_because_prop_i iambic_property
-        end
-
-        def reuse
-          @kernel.accept_reuse
-        end
       end ]
 
       include Via_Scanner_Iambic_Methods_

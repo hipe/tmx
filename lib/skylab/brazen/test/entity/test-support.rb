@@ -9,8 +9,10 @@ module Skylab::Brazen::TestSupport::Entity
   extend TestSupport_::Quickie
 
   WITH_CLASS_METHOD_ = -> * x_a do
-    ent = new
-    ok = ent.send :process_iambic_fully, x_a
+    ok = nil
+    ent = new do
+      ok = process_iambic_fully x_a
+    end
     ok and ent
   end
 
