@@ -10,6 +10,8 @@ module Skylab::Callback::TestSupport::Actor::Methodic::IWM
 
   extend TestSupport_::Quickie
 
+  Enhance_for_test_ = Enhance_for_test_
+
   Grandparent_Subject_ = Parent_TS_::Parent_subject_
 
   describe "[cb] actor - methodic - iambic writer methods API" do
@@ -20,7 +22,7 @@ module Skylab::Callback::TestSupport::Actor::Methodic::IWM
 
         class A
           Grandparent_Subject_[].methodic self, :simple, :properties,
-            :iambic_writer_method_to_be_provided, :zippy
+            :iambic_writer_method_to_be_provided, :property, :zippy
 
         private
           def zippy=
@@ -28,7 +30,7 @@ module Skylab::Callback::TestSupport::Actor::Methodic::IWM
             @bungsten = iambic_property
           end
 
-          alias_method :initialize, :instance_exec
+          Enhance_for_test_[ self ]
         end
 
       end
@@ -38,7 +40,7 @@ module Skylab::Callback::TestSupport::Actor::Methodic::IWM
 
       it "staves off the creation of the writer method." do
         o = A.new do
-          process_iambic_fully [ :zippy, :wiffy, :shiffy ]
+          process_fully :zippy, :wiffy, :shiffy
         end
         o.instance_variable_get( :@tungsten ).should eql :wiffy
         o.instance_variable_get( :@bungsten ).should eql :shiffy
@@ -58,11 +60,14 @@ module Skylab::Callback::TestSupport::Actor::Methodic::IWM
         end
 
         class B
+
           Grandparent_Subject_[].methodic self, :simple, :properties,
-            :iambic_writer_method_proc_proc, Do_this_thing, :ohai,
-            :hey
+            :iambic_writer_method_proc_proc, Do_this_thing, :property, :ohai,
+            :property, :hey
 
           alias_method :initialize, :instance_exec
+
+          Enhance_for_test_[ self ]
         end
       end
 
@@ -71,7 +76,7 @@ module Skylab::Callback::TestSupport::Actor::Methodic::IWM
 
       it "pass a proc that makes a proc, this proc defines your I.W.M" do
         o = B.new do
-          process_iambic_fully [ :ohai, 'zeep', :hey, 'zoop' ]
+          process_fully :ohai, 'zeep', :hey, 'zoop'
         end
         o.instance_variable_get( :@hey ).should eql 'zoop'
         o.instance_variable_get( :@ohai ).should eql '<< ZEEP >>'

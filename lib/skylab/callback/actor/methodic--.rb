@@ -14,15 +14,21 @@ module Skylab::Callback
           Simple_Property__
         end
 
-        def via_client_and_iambic mod, i_a
-          mod.extend Module_Methods__
-          mod.include Iambic_Processing_Instance_Methods__
-          if i_a.length.nonzero?
+        def via_client_and_iambic cls, i_a
+          cls.extend Module_Methods__
+          cls.include Iambic_Processing_Instance_Methods__
+          if i_a.length.zero?
+            cls
+          else
             i = i_a.first
-            if :simple == i
-              Simple__.new( mod, Iambic_Stream_.new( 1, i_a ) ).execute
-            elsif :properties == i
-              aply_seed_treatment mod, i_a
+            case i
+            when :simple
+              Apply_simple_enhancement__.new(
+                cls,
+                Iambic_Stream_.new( 1, i_a )
+              ).execute
+            when :properties
+              aply_seed_treatment cls, i_a
             else
               snd_expecting_error i_a.first, [ :properties, :simple ]
             end
@@ -37,11 +43,13 @@ module Skylab::Callback
             1.upto( i_a.length - 1 ) do |d|
               i = i_a.fetch d
               _IVAR = :"@#{ i }"
-              mod.send :define_method, :"#{ i }=" do
+              define_method :"#{ i }=" do
                 instance_variable_set _IVAR, iambic_property
+                KEEP_PARSING_
               end
             end
           end
+          nil
         end
 
         def snd_expecting_error actual_i, exp_i_a
@@ -65,14 +73,12 @@ module Skylab::Callback
         end
 
         def build_via_iambic x_a, & oes_p
-          seen = false
-          ok = true
+          ok = nil
           x = new do
-            seen = true
             oes_p and receive_selective_listener_proc oes_p
-            ok = process_iambic_fully 0, x_a
+            ok = process_iambic_stream_fully Iambic_Stream_.new( 0, x_a )
           end
-          seen && ok && x
+          ok && x
         end
       end
 
@@ -80,28 +86,23 @@ module Skylab::Callback
 
       private
 
-        def process_iambic_fully d=0, x_a
-          process_iambic_stream_fully Iambic_Stream_.new( d, x_a )
-        end
-
-        def process_iambic_passively d=0, x_a
-          stream = Iambic_Stream_.new d, x_a
-          process_iambic_stream_passively stream
-          if stream.unparsed_exists
-            stream.current_index
-          end  # covered
+        def iambic_stream_via_iambic_array x_a
+          Iambic_Stream_.new 0, x_a
         end
 
         def process_iambic_stream_fully stream  # :+#public-API :+#hook-in
-          process_iambic_stream_passively stream
-          if stream.has_no_more_content
-            ACHIEVED_
-          else
-            when_after_process_iambic_fully_stream_has_content stream
+          keep_parsing = process_iambic_stream_passively stream
+          keep_parsing and begin
+            if stream.has_no_more_content
+              ACHIEVED_
+            else
+              when_after_process_iambic_fully_stream_has_content stream
+            end
           end
         end
 
         def process_iambic_stream_passively stream
+          keep_parsing = true
           if stream.unparsed_exists
             method_name_p = iambic_writer_method_name_passive_lookup_proc
             m_i = method_name_p[ stream.current_token ]
@@ -121,10 +122,31 @@ module Skylab::Callback
               @__methodic_actor_iambic_stream__ = nil
             end
           end
-          nil
+          keep_parsing
         end
 
-        def iambic_property
+        def against_iambic_property no_p=nil  # experimental, :+#public-API
+          if @__methodic_actor_iambic_stream__.unparsed_exists
+            yield iambic_property
+          elsif no_p
+            no_p[]
+          else
+            maybe_send_event :error, :missing_required_properties do
+              bld_missing_required_properties_event
+            end
+          end
+        end
+
+        def bld_missing_required_properties_event
+          build_not_OK_event_with :missing_required_properties,
+              :previous_token, @__methodic_actor_iambic_stream__.previous_token,
+              :error_category, :argument_error do |y, o|
+
+            y << "expecting a value for #{ code o.previous_token }"
+          end
+        end
+
+        def iambic_property  # :+#public-API #hook-in
           @__methodic_actor_iambic_stream__.gets_one
         end
 
@@ -152,6 +174,10 @@ module Skylab::Callback
           end
         end
 
+        def build_not_OK_event_with * i_a, & msg_p
+          Callback_::Lib_::Event_lib[].inline_not_OK_via_mutable_iambic_and_message_proc i_a, msg_p
+        end
+
         def receive_extra_iambic ev
           raise ev.to_exception
         end
@@ -164,16 +190,30 @@ module Skylab::Callback
           :ivar,
           :parameter_arity
 
-        def initialize stream=nil, & p
+        class << self
+
+          def via_iambic_stream stream
+            name_was_reached = nil
+            x = new do
+              @name = nil
+              process_iambic_stream_passively stream
+              @name and name_was_reached = true
+            end
+            if name_was_reached
+              x
+            else
+              _ev = Stranger_[
+                ( stream.unparsed_exists && stream.current_token ),
+                [ :property ] ]
+              raise _ev.to_exception  # for now
+            end
+          end
+        end
+
+        def initialize & edit_p
           @iambic_writer_method_proc_is_generated = true
           @parameter_arity = :zero_or_one
-          if stream && stream.unparsed_exists
-            process_iambic_stream_passively stream
-            @name = Callback_::Name.via_variegated_symbol stream.gets_one
-          end
-          if p
-            instance_exec( & p )
-          end
+          instance_exec( & edit_p )
           @argument_arity ||= :one
           freeze
         end
@@ -192,7 +232,8 @@ module Skylab::Callback
         end
 
         def property=
-          nil
+          @name = Callback_::Name.via_variegated_symbol iambic_property
+          STOP_PARSING_
         end
 
       public
@@ -248,7 +289,7 @@ module Skylab::Callback
         end
       }.freeze
 
-      class Simple__
+      class Apply_simple_enhancement__
 
         def initialize cls, iambic_stream
           @cls = cls
@@ -261,8 +302,10 @@ module Skylab::Callback
           stream = @iambic_stream
           if :properties == stream.current_token
             stream.advance_one
-            resolve_property_class_and_writable_box
-            loop_for_properties
+            resolve_property_class
+            resolve_writable_box
+            ok = prcs_iambic_stream_fully_for_properties stream
+            ok && @cls
           else
             receive_extra_iambic Stranger_[ stream.current_token, [ :properties ] ]  # #hook-in (local)
           end
@@ -270,32 +313,39 @@ module Skylab::Callback
 
       private
 
-        def loop_for_properties
-          stream = @iambic_stream
+        def prcs_iambic_stream_fully_for_properties stream
+          ok = true
           while stream.unparsed_exists
-            i = stream.current_token
-            if :properties == i
+            if :properties == stream.current_token
               stream.advance_one
-              flush_rest_as_flat_list
+              do_flush_rest = true
               break
             end
-            accept_property @property_class.new @iambic_stream
-          end ; nil
-        end
-
-        def flush_rest_as_flat_list
-          stream = @iambic_stream
-          begin
-            _prop = @property_class.new do
-              @name = Callback_::Name.via_variegated_symbol stream.gets_one
+            prop = @property_class.via_iambic_stream stream
+            if prop
+              ok = accept_prop prop
+              ok or break
+            else
+              ok = prop
+              break
             end
-            accept_property _prop
-          end while stream.unparsed_exists
+          end
+          if do_flush_rest
+            ok = flush_rest_as_flat_list stream
+          end
+          ok
         end
 
-        def resolve_property_class_and_writable_box
-          resolve_property_class
-          resolve_writable_box ; nil
+        def flush_rest_as_flat_list stream
+          ok = true
+          begin
+            prop = @property_class.new do
+              @name = Callback_::Name.via_variegated_symbol stream.gets_one
+              ACHIEVED_
+            end
+            ok = accept_prop prop
+          end while ok && stream.unparsed_exists
+          ok
         end
 
         def resolve_property_class
@@ -319,7 +369,7 @@ module Skylab::Callback
           end ; nil
         end
 
-        def accept_property prop
+        def accept_prop prop
           name_i = prop.name_i
           m_i = :"produce_#{ name_i }_property"
           @box.add name_i, m_i
@@ -333,7 +383,7 @@ module Skylab::Callback
             @cls.send :define_method, m_i, method_p
             @cls.send :private, m_i
           end
-          nil
+          ACHIEVED_
         end
 
         # ~ override some parent behavior
@@ -373,24 +423,20 @@ module Skylab::Callback
 
         def execute
           if @exp_i_a
-            when_expecting
+            if @exp_i_a.length > @length_limit
+              reduce_exp_i_a
+            else
+              @strange_x_ = @strange_x
+              @exp_x_a = @exp_i_a
+            end
           else
             @strange_x_ = @strange_x
             @exp_x_a = nil
-            flush
           end
+          flush
         end
+
       private
-
-        def when_expecting
-          if @exp_i_a.length > @length_limit
-            reduce_exp_i_a
-          else
-            @strange_x_ = @strange_x
-            @exp_x_a = @exp_i_a
-          end
-
-        end
 
         def reduce_exp_i_a
           if @strange_x.respond_to? :id2name
@@ -426,7 +472,7 @@ module Skylab::Callback
 
       # ~ below is only necessary for "simple" (with meta-properties)
 
-      class Simple__
+      class Apply_simple_enhancement__
 
         module Proprietor_Module_Methods__
 
@@ -491,24 +537,28 @@ module Skylab::Callback
             Methodic__.via_client_and_iambic @client, @x_a
           end
         end
-      end  # Simple__
+      end  # Apply_simple_enhancement__
 
       class Simple_Property__
+
       private
+
         def iambic_writer_method_to_be_provided=
           @iambic_writer_method_proc_is_generated = false
           @iambic_writer_method_proc_proc = nil
+          ACHIEVED_
         end
 
         def iambic_writer_method_proc_proc=
           @iambic_writer_method_proc_is_generated = false
           @iambic_writer_method_proc_proc = iambic_property
+          ACHIEVED_
         end
       end
 
       # ~ courtesies (not part of central operation, here b.c they are common)
 
-      class Simple__
+      class Apply_simple_enhancement__
 
         module Proprietor_Instance_Methods__
 
@@ -567,8 +617,10 @@ module Skylab::Callback
 
       ACHIEVED_ = true
       BX_ = :PROPERTIES_FOR_WRITE__
+      KEEP_PARSING_ = true
       MM_ = :ModuleMethods  # is Module_Methods in [bz] ent
       PC_ = :Property  # is PROPERTY_CLASS__ in [bz] ent
+      STOP_PARSING_ = false
       UNABLE_ = false
     end
   end

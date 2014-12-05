@@ -34,17 +34,13 @@ module Skylab::Brazen::TestSupport::Entity
           end
 
           module self::Module_Methods
-            def with * x_a
-              ent = new { }
-              ok = ent.process_iambic_fully x_a
-              ok and ent
-            end
+            define_method :with, WITH_MODULE_METHOD_
           end
 
+          include Test_Instance_Methods_
         end
 
         module FooE_Two
-          public :process_iambic_fully  # *will* trigger method added
           attr_reader :foo_x, :bar_x
         end
 
@@ -61,7 +57,6 @@ module Skylab::Brazen::TestSupport::Entity
               @baz_x = iambic_property
               true
             end
-
           end
 
           attr_reader :has_bar, :baz_x
@@ -94,8 +89,10 @@ module Skylab::Brazen::TestSupport::Entity
           end
 
           module self::Module_Methods
-            define_method :with, WITH_CLASS_METHOD_
+            define_method :with, WITH_MODULE_METHOD_
           end
+
+          include Test_Instance_Methods_
 
         end
 
@@ -146,7 +143,7 @@ module Skylab::Brazen::TestSupport::Entity
           FooE_Left[ self ]
           FooE_Right[ self ]
           attr_reader :one_x, :two_x, :three_x
-          define_singleton_method :with, WITH_CLASS_METHOD_
+          Enhance_for_test_[ self ]
         end
       end
 

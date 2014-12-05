@@ -8,7 +8,7 @@ module Skylab::Brazen::TestSupport::Entity
 
         class DCF_Minimal
 
-          Subject_[][ self, -> do
+          Subject_[].call self do
 
             o :iambic_writer_method_name_suffix, :_ZOINK
 
@@ -16,10 +16,12 @@ module Skylab::Brazen::TestSupport::Entity
               @foo_bar = iambic_property
             end
 
-          end ]
+          end
+
+          Enhance_for_test_[ self ]
         end
 
-      obj = DCF_Minimal.new.send :with, :foo_bar, :xyz
+      obj = DCF_Minimal.with :foo_bar, :xyz
       obj.instance_variable_get( :@foo_bar ).should eql :xyz
     end
 
@@ -27,7 +29,7 @@ module Skylab::Brazen::TestSupport::Entity
 
         class DCF_With_Two
 
-          Subject_[][ self, -> do
+          Subject_[].call self do
 
             o :iambic_writer_method_name_suffix, :_ZEE
 
@@ -44,10 +46,12 @@ module Skylab::Brazen::TestSupport::Entity
             def baz_ZOO
               @baz = iambic_property
             end
-          end ]
+          end
+
+          Enhance_for_test_[ self ]
         end
 
-      obj = DCF_With_Two.new.send :with, :foo, :F, :bar, :B, :baz, :Z
+      obj = DCF_With_Two.with :foo, :F, :bar, :B, :baz, :Z
       a = obj.instance_exec do
         [ :foo, :bar, :baz ].map do |i|
           instance_variable_get :"@#{ i }"

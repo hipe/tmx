@@ -22,7 +22,10 @@ module Skylab::Brazen::TestSupport::Entity
               true
             end
           end
+
+          Enhance_for_test_[ self ]
         end
+
         expect P_Classic
       end
 
@@ -30,7 +33,9 @@ module Skylab::Brazen::TestSupport::Entity
 
         class P_Simplest
           Subject_[][ self, :property, :foo, :property, :bar ]
+          Enhance_for_test_[ self ]
         end
+
         expect P_Simplest
       end
 
@@ -38,59 +43,77 @@ module Skylab::Brazen::TestSupport::Entity
 
         class P_Props_3
           Subject_[][ self, :properties, :foo, :bar ]
+          Enhance_for_test_[ self ]
         end
+
         expect P_Props_3
       end
 
       it "4)  in the '-> { }' with the 'property' keyword" do
 
         class P_In_Block
+
           Subject_[].call self do
             o :property, :foo
             o :property, :bar
           end
+
+          Enhance_for_test_[ self ]
         end
+
         expect P_In_Block
       end
 
       it "4b) in the '-> { }' with the 'property' keyword (one line)" do
 
         class P_In_Block_B
+
           Subject_[].call self do
             o :property, :foo, :property, :bar
           end
+
+          Enhance_for_test_[ self ]
         end
+
         expect P_In_Block_B
       end
 
       it  "5)  in the '-> { }' with the 'properties' keyword" do
+
         class P_In_Block_Props
+
           Subject_[].call self do
             o :properties, :foo, :bar
           end
+
+          Enhance_for_test_[ self ]
         end
+
         expect P_In_Block_Props
       end
 
       it "6) re-use properties with 'reuse'" do
+
         class P_Reuse_Source
           Subject_[].call self do
             o :property, :bar,
               :property, :foo
           end
         end
+
         class P_Reuse
           Subject_[].call self do
             o :reuse, P_Reuse_Source.properties.at( :foo, :bar )
           end
+          Enhance_for_test_[ self ]
         end
+
         expect P_Reuse
       end
 
       def expect cls
-        subj = cls.new do
-          process_iambic_fully [ :foo, :x, :bar, :y ]
-        end
+        subj = cls.new { }
+        subj.process_fully :foo, :x, :bar, :y
         subj.instance_variable_get( :@foo ).should eql :x
         subj.instance_variable_get( :@bar ).should eql :y
       end

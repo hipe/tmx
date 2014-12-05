@@ -49,19 +49,24 @@ annotation (most recent at top, start at bottom for a narrative):
 
                 | actor                 |     methodic actor |     entity
 
-what does it do | actor leaves your     | although we one did not do it this
-to your ivar    | ivar namespace alone  | way, these two maintain ivar(s)
-namespace?      | completely except for | modeling the current iambic scan
-                | your business ivars   | which is convenient for IWM's (belo)
+what does it do | actor leaves your     | although we once did not do it this
+to your ivar    | ivar namespace alone  | way, these 2 by dflt use 1 mutable ivar
+namespace?      | completely except for | model the current iambic scan
+                | your business ivars   | which is convenient for IWM's (below)
+                                        |
+                | in the interest of    | business actual properties by dflt
+                | simplicity, hard-coded| may write to isomorphic ivars but
+                | to write business     | change this by overriding 1 method
+                | actuals to ivars
 
 property        | actor does not model  | has a base class   | its base p.class
-objects?        | field meta-data with  | that it itself a   | is intentional
+objects?        | field meta-data with  | that it itself a   | is intentionally
                 | these, it has a box   | lithe methodic     | minimal
                 | that maps names to    | actor. modeling    |
                 | ivars and models an   | some common m.p's  |
                 | order, and that's all
 
-customizing     | actor does not doa    | you manipulate the | manipulate
+customizing     | actor does not do     | you manipulate the | manipulate
 your property   | anything like this    | p.class subclass   | directly, or use
 objects (e.g    | at all. by design     | directly           | a crazy DSL. this
 for declarative | it is kept minimally  |                    | thing  models

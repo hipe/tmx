@@ -10,6 +10,8 @@ module Skylab::Callback::TestSupport::Actor::Methodic::MP
 
   extend TestSupport_::Quickie
 
+  Enhance_for_test_ = Enhance_for_test_
+
   Grandparent_Subject_ = Parent_TS_::Parent_subject_
 
   describe "[cb] actor - methodic - enhancer modules" do
@@ -78,11 +80,13 @@ module Skylab::Callback::TestSupport::Actor::Methodic::MP
         class C_1
 
           C.call self, :simple, :properties,
-            :optional, :first_name,
-            :last_name,
-            :flag, :ivar, :'@imp', :important
+            :optional, :property, :first_name,
+            :property, :last_name,
+            :flag, :ivar, :'@imp', :property, :important
 
           alias_method :initialize, :instance_exec
+
+          Enhance_for_test_[ self ]
         end
 
       end )
@@ -95,7 +99,7 @@ module Skylab::Callback::TestSupport::Actor::Methodic::MP
       it "when doing iambics on your business instance, they use syntax of p.cls" do
         require_C_1
         o = C_1.new do
-          process_iambic_fully [ :last_name, :Jernkerns, :important ]
+          process_fully :last_name, :Jernkerns, :important
         end
         o.instance_variable_get( :"@imp" ).should eql true
         o.instance_variable_get( :@last_name ).should eql :Jernkerns
@@ -126,12 +130,15 @@ module Skylab::Callback::TestSupport::Actor::Methodic::MP
         end
 
         class D_2
+
           D.call self, :simple, :properties,
-            :required, :foo,
-            :bar,
-            :required, :baz
+            :required, :property, :foo,
+            :property, :bar,
+            :required, :property, :baz
 
           alias_method :initialize, :instance_exec
+
+          Enhance_for_test_[ self ]
         end
 
       end
@@ -141,7 +148,7 @@ module Skylab::Callback::TestSupport::Actor::Methodic::MP
 
       it "works" do
         o = D_2.new do
-          process_iambic_fully [ :bar, :hi ]
+          process_fully :bar, :hi
           nilify_uninitialized_ivars
         end
         _scan = o.class.required_properties_scan

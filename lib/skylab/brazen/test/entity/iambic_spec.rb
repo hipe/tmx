@@ -9,58 +9,52 @@ module Skylab::Brazen::TestSupport::Entity
       before :all do
 
         class Foo_Iamb
-          Subject_[][ self, -> do
 
-          def foo
-            @foo_x = iambic_property
+          Subject_[].call self do
+
+            def foo
+              @foo_x = iambic_property
+            end
+
+            def bar
+              @bar_x = iambic_property
+            end
+
           end
 
-          def bar
-            @bar_x = iambic_property
-          end
-
-          end ]
           attr_reader :foo_x, :bar_x
 
-          public :process_iambic_fully, :with
+          Enhance_for_test_[ self ]
         end
       end
 
       it "do parse one does work" do
-        Foo_Iamb.new.with( :foo, :FOO ).foo_x.should eql :FOO
+        Foo_Iamb.with( :foo, :FOO ).foo_x.should eql :FOO
       end
 
       it "do parse two does work" do
-        foo = Foo_Iamb.new
-        foo.with :foo, :FOO, :bar, :BAR
+        foo = Foo_Iamb.with( :foo, :FOO, :bar, :BAR )
         foo.foo_x.should eql :FOO
         foo.bar_x.should eql :BAR
       end
 
       it "do parse strange does not work" do
         -> do
-          Foo_Iamb.new.with :wiz
+          Foo_Iamb.with :wiz
         end.should raise_error ::ArgumentError, unrec_rx( :wiz )
       end
 
-      it "parse is non-destructive" do
-        a = [ :foo, :x ]
-        Foo_Iamb.new.process_iambic_fully a
-        a.length.should eql 2
-      end
-
       it "do parse none does work" do
-        foo = Foo_Iamb.new
-        foo.process_iambic_fully Brazen_::EMPTY_A_
+        Foo_Iamb.with
       end
     end
 
     it "DSL syntax fail - strange name" do
-      -> do
+      # -> do
         class FooI_Pity
           Subject_[][ self, :VAG_rounded ]
         end
-      end.should raise_error ::ArgumentError, unrec_rx( :VAG_rounded )
+      # end.should raise_error ::ArgumentError, unrec_rx( :VAG_rounded )
     end
 
     it "DSL syntax fail - strange value" do
@@ -76,12 +70,12 @@ module Skylab::Brazen::TestSupport::Entity
       before :all do
         class FooI_With_Postfix
           attr_reader :x
-          Subject_[][ self, :iambic_writer_method_name_suffix, :'=', -> do
+          Subject_[].call self, :iambic_writer_method_name_suffix, :'=' do
             def some_writer=
               @x = iambic_property
             end
-          end ]
-          define_singleton_method :with, WITH_CLASS_METHOD_
+          end
+          Enhance_for_test_[ self ]
         end
       end
 
@@ -92,10 +86,10 @@ module Skylab::Brazen::TestSupport::Entity
       it "for now enforces that you use the suffix on every guy" do
         -> do
         class FooI_Bad_Suffixer
-          Subject_[][ self, :iambic_writer_method_name_suffix, :_derp, -> do
+          Subject_[].call self, :iambic_writer_method_name_suffix, :_derp do
             def ferp
             end
-          end ]
+          end
         end
         end.should raise_error ::NameError,
           /\bdid not have expected suffix '_derp': 'ferp'/
