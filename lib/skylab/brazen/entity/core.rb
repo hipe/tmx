@@ -44,80 +44,83 @@ module Skylab::Brazen
         Scope_Kernel__
       end
 
-      def via_arglist a, & p
-        Edit_via_arglist__.new( a, & p ).execute
+      def via_arglist x_a, & p
+        if x_a.length.zero?
+          Produce_extension_module__.new( & p ).execute
+        else
+          1 < x_a.length and self._DO_ME
+          cls = x_a.fetch 0
+          cls.extend Module_Methods__
+          cls.ent_edit_session do
+            cls.module_exec( & p )
+          end
+        end
       end
     end
 
     # ~ writing properties (without metaproperties)
 
-    class Edit_via_arglist__
-
-      def initialize x_a, & p
-        @x_a = x_a ; @proc_that_uses_DSL = p
-      end
-
-      def execute
-        @formal_entity = @x_a.fetch 0
-        cls = @formal_entity
-        1 < @x_a.length and self._DO_ME
-        Callback_::Actor.methodic cls
-        cls.extend Module_Methods__
-        cls.include Instance_Methods__
-        cls.ent_edit_session do
-          cls.module_exec( & @proc_that_uses_DSL )
-        end
-      end
-    end
-
-    module Module_Methods__
-
-      def properties
-        entity_formal_property_method_names_box_for_rd.to_value_scan.map_by do |i|
-          send i
-        end.immutable_with_random_access_keyed_to_method :name_i
-      end
-
-      def ent_edit_session
-        @active_entity_edit_session = Class_Edit_Session__.new self
-        x = yield
-        @active_entity_edit_session.finish
-        @active_entity_edit_session = nil
-        x
-      end
+    module Extension_Module_Methods__
 
       def method_added m_i
         if @active_entity_edit_session
           @active_entity_edit_session.receive_method_added_name m_i
-          nil
         end
         super
       end
 
-      def entity_formal_property_method_names_box_for_wrt
-        @entity_formal_property_method_names_box_for_write ||= begin
-          const_set :ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___,
-            self::ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___.dup
+      attr_accessor :active_entity_edit_session
+
+      def call cls, & p
+        self[ cls ]
+        cls.ent_edit_session do
+          cls.module_exec( & p )
         end
       end
 
-      def entity_formal_property_method_names_box_for_rd
-        self::ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___
+      def [] cls
+        if cls.const_defined? :ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___
+          did_already = true
+        else
+          cls.extend Module_Methods__
+        end
+        cls.extend self::Module_Methods
+        cls.include self
+        if did_already
+          _my_box = self::ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___
+          _their_box = cls.entity_formal_property_method_names_box_for_wrt
+          _their_box.ensuring_same_values_merge_box! _my_box
+        else
+          cls.entity_formal_property_method_names_box_for_wrt  # copy them now
+        end
+        cls
+      end
+
+      def _OLD_via_proc_build_new_extension_module
+        mod = ::Module.new
+        mm = mod.const_set :Module_Methods, ::Module.new
+        mm.include @extension_module::Module_Methods
+        mod.extend Extension_Module_Methods__, Proprietor_Methods__
+        mod.include Iambic_Methods__
+        mod.include @extension_module
+
+        mod.const_set READ_BOX__, bx = Box_.new  # for now
+        mod.const_set WRITE_BOX__, bx
+
+        krn = mod.init_property_scope_krnl
+        krn.apply_p @proc
+        krn.end_scope
+        mod.property_scope_krnl = nil
+        mod
       end
     end
 
-    module Instance_Methods__
-      ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___ = Callback_::Box.the_empty_box
-    end
+    module Edit_Session_Methods__
 
-    class Class_Edit_Session__
-
-      def initialize cls
-        @current_property = nil
-        @formal_property_writee_module = cls.singleton_class
+      def init_module mod
+        mod.include Instance_Methods__
         @property_class = Property__
-        @writable_formal_propery_method_names_box =
-          cls.entity_formal_property_method_names_box_for_wrt
+        nil
       end
 
       def receive_method_added_name m_i
@@ -148,16 +151,128 @@ module Skylab::Brazen
         end
         nil
       end
+    end
+
+    class Produce_extension_module__
+
+      include Edit_Session_Methods__
+
+      def initialize & p
+        @current_property = nil
+        @p = p
+      end
+
+      def execute
+
+        mod = ::Module.new
+        box = Callback_::Box.new
+        mod_ = ::Module.new
+
+        mod.const_set :Module_Methods, mod_  # :+#public-API (the name)
+        mod.const_set :ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___, box
+
+        mod.include Callback_::Actor.methodic_lib::Instance_Methods__
+        init_module mod
+        mod.extend Extension_Module_Methods__
+
+        @formal_property_writee_module = mod_
+        @writable_formal_propery_method_names_box = box
+
+        mod.active_entity_edit_session = self
+        mod.module_exec( & @p )
+        mod.active_entity_edit_session = nil
+        mod
+      end
+
+    end
+
+    class Class_Edit_Session__
+
+      include Edit_Session_Methods__
+
+      def initialize cls
+        Callback_::Actor.methodic cls
+        init_module cls
+        @current_property = nil
+        @formal_property_writee_module = cls.singleton_class
+        @writable_formal_propery_method_names_box =
+          cls.entity_formal_property_method_names_box_for_wrt
+      end
 
       def finish
         nil
       end
     end
 
-    class Property__ < Callback_::Actor.methodic_lib.simple_property_class
+    # ~ the enhancement modules & classes
 
+    module Module_Methods__
+
+      def properties
+        entity_formal_property_method_names_box_for_rd.to_value_scan.map_by do |i|
+          send i
+        end.immutable_with_random_access_keyed_to_method :name_i
+      end
+
+      def ent_edit_session
+        @active_entity_edit_session = Class_Edit_Session__.new self
+        x = yield
+        @active_entity_edit_session.finish
+        @active_entity_edit_session = nil
+        x
+      end
+
+      def method_added m_i
+        if active_entity_edit_session
+          @active_entity_edit_session.receive_method_added_name m_i
+        end
+        super
+      end
+
+      attr_reader :active_entity_edit_session
+
+      def entity_formal_property_method_names_box_for_wrt
+        @entity_formal_property_method_names_box_for_write ||= begin
+          const_set :ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___,
+            self::ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___.dup
+        end
+      end
+
+      def entity_formal_property_method_names_box_for_rd
+        self::ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___
+      end
     end
 
+    module Instance_Methods__
+
+      ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___ = Callback_::Box.the_empty_box
+
+    private
+
+      def iambic_writer_method_name_passive_lookup_proc  # [cb] #hook-in
+        bx = self.class.entity_formal_property_method_names_box_for_rd
+        -> name_i do
+          m_i = bx[ name_i ]
+          if m_i
+            self.class.send( m_i ).iambic_writer_method_name
+          end
+        end
+      end
+    end
+
+    class Property__ < Callback_::Actor.methodic_lib.simple_property_class
+
+      def initialize & edit_p
+        super do
+          instance_exec( & edit_p )
+          @iwmn ||= name_i
+        end
+      end
+
+      def iambic_writer_method_name
+        @iwmn
+      end
+    end
 
     if false
 
@@ -714,8 +829,6 @@ module Skylab::Brazen
         freeze
       end
 
-      attr_reader :iambic_writer_method_name, :name
-
       attr_accessor :iambic_writer_method_proc
 
       def set_prop_i_and_iambic_writer_method_name prop_i, meth_i=nil
@@ -1062,78 +1175,6 @@ module Skylab::Brazen
 
       def maybe_send_event *, & ev_p
         raise ev_p[].to_exception
-      end
-    end
-
-    # ~ extension API
-
-    module Extension_Module_Methods__
-
-      def [] * a
-        via_arglist a
-      end
-
-      def call * a, & p
-        p and a.push p
-        via_arglist a
-      end
-
-      def via_arglist a
-        Extension_Shell__.new.execute_via_extmod_and_arglist self, a
-      end
-
-    private
-      def build_property_scope_krnl
-        Scope_Kernel__.new self, const_get( :Module_Methods, false )
-      end
-    end
-
-    class Extension_Shell__ < Common_Shell__
-
-      def execute_via_extmod_and_arglist extension_module, arg_list
-        @extension_module = extension_module
-        via_arglist arg_list
-      end
-
-      def when_one_length_arg_list_execute
-        x = @x_a.first
-        if x.respond_to? :call
-          @proc = @x_a.first
-          via_proc_build_new_extension_module
-        else
-          @reader = @x_a.first
-          to_reader_apply_setup
-        end
-      end
-
-      def to_reader_apply_setup
-        @reader.extend Proprietor_Methods__
-        @reader.extend @extension_module::Module_Methods
-        if ! @reader.const_defined? READ_BOX__  # before we do any includes
-          @reader.const_set READ_BOX__, Box_.new
-        end
-        @reader.include @extension_module  # iambic methods too
-        _box = @reader.property_method_nms_for_wrt
-        _box_ = @extension_module.property_method_nms_for_rd
-        _box.ensuring_same_values_merge_box! _box_ ; nil
-      end
-
-      def via_proc_build_new_extension_module
-        mod = ::Module.new
-        mm = mod.const_set :Module_Methods, ::Module.new
-        mm.include @extension_module::Module_Methods
-        mod.extend Extension_Module_Methods__, Proprietor_Methods__
-        mod.include Iambic_Methods__
-        mod.include @extension_module
-
-        mod.const_set READ_BOX__, bx = Box_.new  # for now
-        mod.const_set WRITE_BOX__, bx
-
-        krn = mod.init_property_scope_krnl
-        krn.apply_p @proc
-        krn.end_scope
-        mod.property_scope_krnl = nil
-        mod
       end
     end
     end

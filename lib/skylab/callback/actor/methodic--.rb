@@ -16,7 +16,7 @@ module Skylab::Callback
           if i_a.length.nonzero?
             i = i_a.first
             if :simple == i
-              Simple__.new( mod, Iambic_Scanner_.new( 1, i_a ) ).execute
+              Simple__.new( mod, Iambic_Stream_.new( 1, i_a ) ).execute
             elsif :properties == i
               aply_seed_treatment mod, i_a
             else
@@ -72,32 +72,71 @@ module Skylab::Callback
         end
       end
 
-      module Algorithmic_Methods__
+      module Instance_Methods__
 
       private
 
-        def via_algorithm_process_iambic_passively
-          pass_p = self.class.method :private_method_defined?
-          while unparsed_iambic_exists
-            m_i = :"#{ current_iambic_token }="
-            if pass_p[ m_i ]
-              advance_iambic_stream_by_one
-              send m_i
-            else
-              x = current_iambic_index
-              break
+        def process_iambic_fully d=0, x_a
+          process_iambic_stream_fully Iambic_Stream_.new( d, x_a )
+        end
+
+        def process_iambic_passively d=0, x_a
+          stream = Iambic_Stream_.new d, x_a
+          process_iambic_stream_passively stream
+          if stream.unparsed_exists
+            stream.current_index
+          end  # covered
+        end
+
+        def process_iambic_stream_fully stream
+          process_iambic_stream_passively stream
+          if stream.has_no_more_content
+            ACHIEVED_
+          else
+            when_after_process_iambic_fully_stream_has_content stream
+          end
+        end
+
+        def process_iambic_stream_passively stream
+          if stream.unparsed_exists
+            method_name_p = iambic_writer_method_name_passive_lookup_proc
+            m_i = method_name_p[ stream.current_token ]
+            if m_i
+              @__methodic_actor_iambic_stream__ = stream
+              begin
+                stream.advance_one
+                keep_parsing = send m_i
+                if keep_parsing
+                  if stream.unparsed_exists
+                    m_i = method_name_p[ stream.current_token ]
+                    m_i and redo
+                  end
+                end
+                break
+              end while nil
+              @__methodic_actor_iambic_stream__ = nil
             end
           end
-          x
+          nil
         end
 
-        def when_extra_iambic
-          _ev = via_current_iambic_token_build_extra_iambic_event
+        def iambic_property
+          @__methodic_actor_iambic_stream__.gets_one
+        end
+
+        def iambic_writer_method_name_passive_lookup_proc  # :+#public-API #hook-in
+          cls = self.class
+          -> name_i do
+            m_i = :"#{ name_i }="
+            if cls.private_method_defined? m_i
+              m_i
+            end
+          end
+        end
+
+        def when_after_process_iambic_fully_stream_has_content stream
+          _ev = build_extra_iambic_event_via [ stream.current_token ]
           receive_extra_iambic _ev  # :+#public-API (name) :+#hook-in
-        end
-
-        def via_current_iambic_token_build_extra_iambic_event
-          build_extra_iambic_event_via [ current_iambic_token ]
         end
 
         def build_extra_iambic_event_via name_i_a, did_you_mean_i_a=nil
@@ -114,80 +153,6 @@ module Skylab::Callback
         end
       end
 
-      module Instance_Methods__
-
-        include Algorithmic_Methods__
-
-      private
-
-        def process_iambic_fully d=0, x_a
-          process_iambic_passively d, x_a
-          if unparsed_iambic_exists
-            when_extra_iambic
-          else
-            ACHIEVED_
-          end
-        end
-
-        def process_iambic_passively d=0, x_a
-          @d = d ; @x_a_length = x_a.length ; @x_a = x_a
-          via_algorithm_process_iambic_passively
-        end
-
-        # ~ duplication
-
-        def unparsed_iambic_exists
-          @d < @x_a_length
-        end
-
-        def iambic_property
-          x = current_iambic_token
-          advance_iambic_stream_by_one
-          x
-        end
-
-        def current_iambic_index
-          @d
-        end
-
-        def current_iambic_token
-          @x_a.fetch @d
-        end
-
-        def advance_iambic_stream_by_one
-          @d += 1
-        end
-      end
-
-      module Via_Scanner_Iambic_Methods__
-
-        include Algorithmic_Methods__
-
-      private
-
-        def unparsed_iambic_exists
-          @keep_scanning && @scanner.unparsed_exists
-        end
-
-        def iambic_property
-          x = current_iambic_token
-          advance_iambic_stream_by_one
-          x
-        end
-
-        def current_iambic_index
-          @scanner.current_index
-        end
-
-        def current_iambic_token
-          @scanner.current_token
-        end
-
-        def advance_iambic_stream_by_one
-          @scanner.advance_one
-        end
-      end
-
       class Simple_Property__  # :+[#mh-053] (was [#hl-030])
 
         Actor.methodic self, :properties,
@@ -195,30 +160,12 @@ module Skylab::Callback
           :ivar,
           :parameter_arity
 
-        include Via_Scanner_Iambic_Methods__
-
-      private
-
-        def ignore=
-          @parameter_arity = nil
-        end
-
-        def property=
-          @keep_scanning = false
-        end
-
-      public
-
-        def initialize scn=nil, & p
+        def initialize stream=nil, & p
           @iambic_writer_method_proc_is_generated = true
           @parameter_arity = :zero_or_one
-          if scn
-            @scanner = scn
-            @keep_scanning = true
-            via_algorithm_process_iambic_passively
-            i = iambic_property
-            @name = Callback_::Name.via_variegated_symbol i
-            @scanner = nil
+          if stream && stream.unparsed_exists
+            process_iambic_stream_passively stream
+            @name = Callback_::Name.via_variegated_symbol stream.gets_one
           end
           if p
             instance_exec( & p )
@@ -228,6 +175,19 @@ module Skylab::Callback
         end
 
         attr_reader :argument_arity, :ivar, :name, :parameter_arity
+
+      private
+
+        def ignore=
+          @parameter_arity = nil
+          ACHIEVED_
+        end
+
+        def property=
+          nil
+        end
+
+      public
 
         def name_i
           @name.as_variegated_symbol
@@ -272,59 +232,57 @@ module Skylab::Callback
 
       IAMBIC_WRITER_METHOD_BODY_WHEN_IGNORE_H__ = {
         zero: -> do
-          # nothing.
+          ACHIEVED_
         end,
         one: -> do
-          iambic_property ; nil
+          iambic_property
+          ACHIEVED_
         end
       }.freeze
 
       class Simple__
 
-        include Via_Scanner_Iambic_Methods__
-
-        def initialize cls, scanner
+        def initialize cls, iambic_stream
           @cls = cls
           @cls.extend Proprietor_Module_Methods__
           @cls.include Proprietor_Instance_Methods__
-          @keep_scanning = true
-          @scanner = scanner
+          @iambic_stream = iambic_stream
         end
 
         def execute
-          if :properties == current_iambic_token
-            advance_iambic_stream_by_one
+          stream = @iambic_stream
+          if :properties == stream.current_token
+            stream.advance_one
             resolve_property_class_and_writable_box
             loop_for_properties
           else
-            receive_extra_iambic Stranger_[ current_iambic_token, [ :properties ] ]  # #hook-in (local)
+            receive_extra_iambic Stranger_[ stream.current_token, [ :properties ] ]  # #hook-in (local)
           end
         end
 
       private
 
         def loop_for_properties
-          while unparsed_iambic_exists
-            i = current_iambic_token
+          stream = @iambic_stream
+          while stream.unparsed_exists
+            i = stream.current_token
             if :properties == i
-              advance_iambic_stream_by_one
+              stream.advance_one
               flush_rest_as_flat_list
               break
             end
-            accept_property @property_class.new @scanner
+            accept_property @property_class.new @iambic_stream
           end ; nil
         end
 
-      private
-
         def flush_rest_as_flat_list
+          stream = @iambic_stream
           begin
-            name_i = iambic_property
             _prop = @property_class.new do
-              @name = Callback_::Name.via_variegated_symbol name_i
+              @name = Callback_::Name.via_variegated_symbol stream.gets_one
             end
             accept_property _prop
-          end while unparsed_iambic_exists
+          end while stream.unparsed_exists
         end
 
         def resolve_property_class_and_writable_box

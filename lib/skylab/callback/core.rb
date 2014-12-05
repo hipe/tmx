@@ -13,7 +13,7 @@ module Skylab::Callback
     end
 
     def iambic_stream
-      Iambic_Scanner_
+      Iambic_Stream_
     end
 
     def produce_library_shell_via_library_and_app_modules lib_mod, app_mod
@@ -438,14 +438,18 @@ module Skylab::Callback
     end
   end
 
-  class Iambic_Scanner_  # :[#046]
+  class Iambic_Stream_  # :[#046]
 
     def initialize d, x_a
       @d = d ; @x_a = x_a ; @x_a_length = @x_a.length
     end
 
+    def has_no_more_content
+      @x_a_length == @d
+    end
+
     def unparsed_exists
-      @d != @x_a_length
+      @x_a_length != @d
     end
 
     def unparsed_count

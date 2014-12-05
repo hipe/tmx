@@ -7,8 +7,9 @@ module Skylab::Brazen::TestSupport::Entity
     context "empty definition block" do
 
       before :all do
-        FooE_Mod = Subject_[][ -> do
-        end ]
+        _ = Subject_[]
+        FooE_Mod = _.call do
+        end
       end
 
       it "with one argument (a proc), subject creates a new module" do
@@ -19,14 +20,17 @@ module Skylab::Brazen::TestSupport::Entity
     context "definition block with two properties" do
 
       before :all do
-        FooE_Two = Subject_[][ -> do
+
+        FooE_Two = Subject_[].call do
 
           def foo
             @foo_x = iambic_property
+            true
           end
 
           def bar
             @bar_x = iambic_property
+            true
           end
 
           module self::Module_Methods
@@ -37,14 +41,16 @@ module Skylab::Brazen::TestSupport::Entity
             end
           end
 
-        end ]
+        end
+
         module FooE_Two
           public :process_iambic_fully  # *will* trigger method added
           attr_reader :foo_x, :bar_x
         end
 
         class FooE_Two_Child
-          FooE_Two[ self, -> do
+
+          FooE_Two.call self do
 
             def bar
               @has_bar = true
@@ -53,9 +59,10 @@ module Skylab::Brazen::TestSupport::Entity
 
             def baz
               @baz_x = iambic_property
+              true
             end
 
-          end ]
+          end
 
           attr_reader :has_bar, :baz_x
         end
@@ -73,17 +80,25 @@ module Skylab::Brazen::TestSupport::Entity
     context "just extension with no extra" do
 
       before :all do
-        FooE_Props = Subject_[][ -> do
+
+        FooE_Props = Subject_[].call do
+
           def uh
             @uh_x = iambic_property
+            true
           end
+
           def ah
             @ah_x = iambic_property
+            true
           end
+
           module self::Module_Methods
             define_method :with, WITH_CLASS_METHOD_
           end
-        end ]
+
+        end
+
         class FooE_Prop_Wanter
           FooE_Props[ self ]
           attr_reader :uh_x, :ah_x
@@ -100,25 +115,32 @@ module Skylab::Brazen::TestSupport::Entity
     context "diamond" do
 
       before :all do
-        FooE_Left = Subject_[][ -> do
+
+        FooE_Left = Subject_[].call do
+
           def one
             @one_x = iambic_property
+            true
           end
 
           def two
             @one_x = iambic_property
+            true
           end
-        end ]
+        end
 
-        FooE_Right = Subject_[][ -> do
+        FooE_Right = Subject_[].call do
+
           def two
             @two_x = iambic_property.to_s.upcase.intern
+            true
           end
 
           def three
             @three_x = iambic_property
+            true
           end
-        end ]
+        end
 
         class FooE_Mid
           FooE_Left[ self ]

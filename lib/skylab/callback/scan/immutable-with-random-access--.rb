@@ -55,7 +55,7 @@ module Skylab::Callback
       end
 
       def process_iambic_fully x_a
-        @scanner = Iambic_Scanner_.new 0, x_a
+        @scanner = Iambic_Stream_.new 0, x_a
         begin
           m_i = :"_process_#{ @scanner.current_token }_argument_"
           if respond_to? m_i
