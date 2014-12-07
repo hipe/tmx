@@ -9,28 +9,29 @@ module Skylab::Brazen::TestSupport::Entity
       before :all do
 
         class AHP_Base
-          Subject_[][ self, -> do
+          Subject_[].call self do
             o :ad_hoc_processor, :gazoink, -> x { Gazoink_.new( x ).go }
-          end ]
-
+          end
         end
 
         class Gazoink_
-          def initialize scn
-            @scn = scn
+          def initialize pc
+            @pc = pc
           end
           def go
-            @scn.advance_one  # skip name
-            a = @scn.gets_one
+            @pc.upstream.advance_one  # skip name
+            a = @pc.upstream.gets_one
             a.each do |i|
-              @scn.reader.property_scope_krnl.add_monadic_property_via_i i
-            end ; nil
+              @pc.edit_session.property_related_nonterminal.finish_property_with_three(
+                :do_define_method, :"#{ i }=", i )
+            end
+            true
           end
         end
 
         class AHP_Child < AHP_Base
           attr_reader :foo, :baz
-          Subject_[][ self, -> do
+          Subject_[].call self do
             o :iambic_writer_method_name_suffix, :'='
             def foo=
               @foo = iambic_property
@@ -38,8 +39,13 @@ module Skylab::Brazen::TestSupport::Entity
             o :gazoink, [ :bar, :baz ]
             def biff=
             end
-          end ]
+          end
+
+          Enhance_for_test_[ self ]
         end
+      end
+
+      it "loads" do
       end
 
       it "reflects" do
@@ -48,7 +54,7 @@ module Skylab::Brazen::TestSupport::Entity
       end
 
       it "writes" do
-        o = AHP_Child.new.send :with, :foo, :F, :baz, :B
+        o = AHP_Child.with :foo, :F, :baz, :B
         o.foo.should eql :F
         o.baz.should eql :B
       end

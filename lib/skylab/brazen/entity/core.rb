@@ -52,50 +52,13 @@ module Skylab::Brazen
           cls = x_a.fetch 0
           cls.extend Module_Methods__
           cls.entity_edit_sess do |sess|
-            sess.receive_edit_sess x_a[ 1 .. -1 ], & edit_p
+            sess.receive_edit x_a[ 1 .. -1 ], & edit_p
           end
         end
       end
     end
 
-    # ~ parsing the DSL
-
-    module Extension_Module_Methods__
-
-      def method_added m_i
-        if @active_entity_edit_session
-          @active_entity_edit_session.receive_method_added_name m_i
-        end
-        super
-      end
-
-      attr_accessor :active_entity_edit_session
-
-      def call cls, & p
-        self[ cls ]
-        cls.entity_edit_sess do
-          cls.module_exec( & p )
-        end
-      end
-
-      def [] cls
-        if cls.const_defined? :ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___
-          did_already = true
-        else
-          cls.extend Module_Methods__
-        end
-        cls.extend self::Module_Methods
-        cls.include self
-        if did_already
-          _my_box = self::ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___
-          _their_box = cls.entity_formal_property_method_names_box_for_wrt
-          _their_box.ensuring_same_values_merge_box! _my_box
-        else
-          cls.entity_formal_property_method_names_box_for_wrt  # copy them now
-        end
-        cls
-      end
-    end
+    # ~ parsing the DSL: edit sessions for modules and classes
 
     METHODIC_ = Callback_::Actor.methodic_lib
 
@@ -103,26 +66,83 @@ module Skylab::Brazen
 
       include METHODIC_.iambic_processing_instance_methods
 
+    end
+
+    class Produce_extension_module__
+
+      include Edit_Session_Methods__
+
+      def initialize & p
+        @p = p
+      end
+
+      def execute
+
+        mod = ::Module.new
+        box = Callback_::Box.new
+        mod_ = ::Module.new
+
+        mod.const_set :Module_Methods, mod_  # :+#public-API (the name)
+        mod.const_set :ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___, box
+
+        mod.include METHODIC_.iambic_processing_instance_methods
+        init_edit_session_via_extended_client_module mod
+        mod.extend Extension_Module_Methods__
+
+        @formal_property_writee_module = mod_
+        @writable_formal_propery_method_names_box = box
+
+        mod.active_entity_edit_session = self
+        mod.module_exec( & @p )
+        mod.active_entity_edit_session = nil
+        mod
+      end
+
+    end
+
+    class Class_Edit_Session__
+
+      include Edit_Session_Methods__
+
+      def initialize cls
+        Callback_::Actor.methodic cls
+        init_edit_session_via_extended_client_module cls
+        @formal_property_writee_module = cls.singleton_class
+        @writable_formal_propery_method_names_box =
+          cls.entity_formal_property_method_names_box_for_wrt
+      end
+
+      def finish
+        nil
+      end
+    end
+
+    module Edit_Session_Methods__
+
       private def init_edit_session_via_extended_client_module mod
         mod.include Instance_Methods__
         @iambic_writer_method_writee_module = mod
         @method_added_filter = IDENTITY_
         @pay_attention_to_method_added = true
         @property_related_nonterminal = mod::Entity_Property.nonterminal_for self
-        @ad_hoc_nonterminal_queue = nil  # FOR NOW
+        @ad_hoc_nonterminal_queue = mod::ENTITY_AD_HOCS___
         @nonterminal_queue = Non_Terminal_Queue_.new(  # #note-115
           * @ad_hoc_nonterminal_queue,
           @property_related_nonterminal,
           self )
       end
 
-    public
+      attr_reader :property_related_nonterminal  # hax only (covered)
 
-      def receive_edit_sess x_a, & edit_p
+      def receive_edit x_a, & edit_p
         x = true
         if x_a.length.nonzero?
-          _st = iambic_stream_via_iambic_array x_a
-          x = @nonterminal_queue.receive_iambic_stream_for_passive_processing _st
+          pc = Parse_Context__.new x_a, self
+          st = pc.upstream
+          x = @nonterminal_queue.receive_parse_context pc
+          if x && st.unparsed_exists
+            x = when_after_process_iambic_fully_stream_has_content st
+          end
         end
         if x
           if edit_p
@@ -134,10 +154,10 @@ module Skylab::Brazen
         x
       end
 
-      def receive_iambic_stream_for_passive_processing stream
+      def receive_parse_context pc
         # if this object added itself to the @nonterminal_queue, then this
         # method is where we receive calls to attempt to parse the stream.
-        process_iambic_stream_passively stream
+        process_iambic_stream_passively pc.upstream
       end
 
     private
@@ -160,6 +180,12 @@ module Skylab::Brazen
           end
           ACHIEVED_
         end
+      end
+
+      def ad_hoc_processor=
+        @iambic_writer_method_writee_module.
+          entity_ad_hocs_for_wrt.add_processor( iambic_property, iambic_property )
+        ACHIEVED_
       end
 
     public
@@ -230,54 +256,7 @@ module Skylab::Brazen
       end
     end
 
-    class Produce_extension_module__
-
-      include Edit_Session_Methods__
-
-      def initialize & p
-        @p = p
-      end
-
-      def execute
-
-        mod = ::Module.new
-        box = Callback_::Box.new
-        mod_ = ::Module.new
-
-        mod.const_set :Module_Methods, mod_  # :+#public-API (the name)
-        mod.const_set :ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___, box
-
-        mod.include METHODIC_.iambic_processing_instance_methods
-        init_edit_session_via_extended_client_module mod
-        mod.extend Extension_Module_Methods__
-
-        @formal_property_writee_module = mod_
-        @writable_formal_propery_method_names_box = box
-
-        mod.active_entity_edit_session = self
-        mod.module_exec( & @p )
-        mod.active_entity_edit_session = nil
-        mod
-      end
-
-    end
-
-    class Class_Edit_Session__
-
-      include Edit_Session_Methods__
-
-      def initialize cls
-        Callback_::Actor.methodic cls
-        init_edit_session_via_extended_client_module cls
-        @formal_property_writee_module = cls.singleton_class
-        @writable_formal_propery_method_names_box =
-          cls.entity_formal_property_method_names_box_for_wrt
-      end
-
-      def finish
-        nil
-      end
-    end
+    # ~~ in support of the above module
 
     class Non_Terminal_Queue_
 
@@ -289,7 +268,7 @@ module Skylab::Brazen
         freeze
       end
 
-      def process_iambic_stream_passively stream  # #hook-in
+      def receive_parse_context pc
 
         # if any input exists, step thru each of the children in our queue
         # looking for any first child that consumes any input. if one such
@@ -300,11 +279,12 @@ module Skylab::Brazen
         # the parse stop (true means stay); and not if any parsing occured
 
         ok = true
+        stream = pc.upstream
         while stream.unparsed_exists
           d = stream.current_index
           stream_is_same = true
           @a.each do |cx|
-            ok = cx.receive_iambic_stream_for_passive_processing stream
+            ok = cx.receive_parse_context pc
             ok or break
             if d != stream.current_index
               stream_is_same = false
@@ -315,11 +295,172 @@ module Skylab::Brazen
         end
         ok
       end
-
-      alias_method :receive_iambic_stream_for_passive_processing,
-        :process_iambic_stream_passively
-
     end
+
+    class Parse_Context__
+
+      def initialize x_a, edit_session
+        @edit_session = edit_session
+        @upstream = Callback_::Iambic_Stream_.new 0, x_a
+      end
+
+      attr_reader :edit_session, :upstream
+    end
+
+    # ~ the modules that enhance the extension modules or entity classes
+
+    MODULE_ATTR_READER_WRITER_METHOD__ = -> rd_i, wrt_i, _CONST, _IVAR, & bld_p do  # #note-320
+
+      define_method rd_i do
+        const_get _CONST
+      end
+
+      define_method wrt_i do
+        if instance_variable_defined? _IVAR
+          instance_variable_get _IVAR
+        else
+          x = bld_p[ self ]
+          const_set _CONST, x
+          instance_variable_set _IVAR, x
+          x
+        end
+      end
+
+      nil
+    end
+
+    module Common_Module_Methods__
+
+      def properties
+        entity_formal_property_method_names_box_for_rd.to_value_scan.map_by do |i|
+          send i
+        end.immutable_with_random_access_keyed_to_method :name_i
+      end
+
+      def method_added m_i
+        if active_entity_edit_session
+          @active_entity_edit_session.receive_method_added_name m_i
+        end
+        super
+      end
+
+      define_singleton_method :module_attr_reader_writer, MODULE_ATTR_READER_WRITER_METHOD__
+
+      module_attr_reader_writer(
+        :entity_formal_property_method_names_box_for_rd,
+        :entity_formal_property_method_names_box_for_wrt,
+        :ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___,
+        :@entity_formal_property_method_names_box_for_write ) do |o|
+
+          o::ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___.dup
+
+        end
+
+      module_attr_reader_writer(
+        :entity_ad_hocs_for_rd,
+        :entity_ad_hocs_for_wrt,
+        :ENTITY_AD_HOCS___,
+        :@entity_ad_hocs_for_write ) do |o|
+
+          otr = o::ENTITY_AD_HOCS___
+          if otr
+            self._DO_ME
+          else
+            Entity_::Ad_Hoc_Processor__::Mutable_Nonterminal_Queue.new
+          end
+        end
+
+    private
+
+      def o * x_a, & edit_p
+        if active_entity_edit_session
+          sess = @active_entity_edit_session
+        else
+          self._DO_ME
+        end
+        sess.receive_edit x_a, & edit_p
+      end
+    end
+
+    module Extension_Module_Methods__
+
+      include Common_Module_Methods__
+
+      attr_accessor :active_entity_edit_session
+
+      def call cls, & p
+        self[ cls ]
+        cls.entity_edit_sess do
+          cls.module_exec( & p )
+        end
+      end
+
+      def [] cls
+        if cls.const_defined? :ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___
+          did_already = true
+        else
+          cls.extend Module_Methods__
+        end
+        cls.extend self::Module_Methods
+        cls.include self
+        if did_already
+          _my_box = self::ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___
+          _their_box = cls.entity_formal_property_method_names_box_for_wrt
+          _their_box.ensuring_same_values_merge_box! _my_box
+        else
+          cls.entity_formal_property_method_names_box_for_wrt  # copy them now
+        end
+        cls
+      end
+    end
+
+    module Module_Methods__
+
+      include Common_Module_Methods__
+
+      attr_reader :active_entity_edit_session
+
+      def entity_edit_sess
+        sess = Class_Edit_Session__.new self
+        @active_entity_edit_session = sess
+        x = yield sess
+        sess.finish
+        @active_entity_edit_session = nil
+        x
+      end
+    end
+
+    module Instance_Methods__
+
+      ENTITY_AD_HOCS___  = nil
+
+      ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___ = Callback_::Box.the_empty_box
+
+      # Entity_Property = Property__ below
+
+      def initialize & p   # #experimental
+        instance_exec( & p )
+      end
+
+    private
+
+      def iambic_writer_method_name_passive_lookup_proc  # [cb] #hook-in
+        bx = self.class.entity_formal_property_method_names_box_for_rd
+        -> name_i do
+          m_i = bx[ name_i ]
+          if m_i
+            self.class.send( m_i ).iambic_writer_method_name
+          end
+        end
+      end
+
+      def receive_entity_property_value prop, x
+        instance_variable_set prop.as_ivar, x
+        ACHIEVED_
+      end
+    end
+
+    # ~ the property implementation
 
     class Property_Related_Nonterminal__
 
@@ -329,10 +470,9 @@ module Skylab::Brazen
         @edit_session, @property_class = a
       end
 
-      alias_method :receive_iambic_stream_for_passive_processing,
-        :process_iambic_stream_passively
-
-      public :receive_iambic_stream_for_passive_processing
+      def receive_parse_context pc
+        process_iambic_stream_passively pc.upstream
+      end
 
       def iambic_writer_method_name_passive_lookup_proc  # #hook-in
         super_p = super
@@ -385,11 +525,53 @@ module Skylab::Brazen
       end
     end
 
-    class Property__ < METHODIC_.simple_property_class
+    IAMBIC_WRITER_METHOD_NAME_RX__ = /\A.+(?==\z)/
+
+    class Property____ < METHODIC_.simple_property_class
 
       class << self
+        attr_reader :iamb_writer_method_name_dictionary
+      end
+
+      h = {}
+      superclass.private_instance_methods( false ).each do |meth_i|
+        md = IAMBIC_WRITER_METHOD_NAME_RX__.match meth_i
+        md or next
+        h[ md[ 0 ].intern ] = meth_i
+      end
+
+      @iamb_writer_method_name_dictionary = h.freeze
+    end
+
+    class Property__ < Property____
+
+      class << self
+
         def nonterminal_for edit_session
           Property_Related_Nonterminal__.new edit_session, self
+        end
+
+      # ~ internal
+
+        def iamb_writer_method_name_passive_proc
+          @iamb_writer_method_name_passive_proc ||=
+            bld_iambic_writer_method_name_passive_proc
+        end
+
+      private
+
+        def bld_iambic_writer_method_name_passive_proc
+          h = iamb_writer_method_name_dictionary
+          -> prop_i do
+            h[ prop_i ]
+          end
+        end
+
+        def iamb_writer_method_name_dictionary
+          @iamb_writer_method_name_dictionary ||= -> do
+            _h = super.dup
+            self._DO_ME
+          end
         end
       end
 
@@ -414,107 +596,15 @@ module Skylab::Brazen
           receive_entity_property_value _prop, true  # RESULT VALUE
         end
       end
-    end
 
-
-    # ~ the enhancement modules & classes
-
-    MODULE_ATTR_READER_WRITER_METHOD__ = -> rd_i, wrt_i, _CONST, _IVAR, & bld_p do  # #note-320
-
-      define_method rd_i do
-        const_get _CONST
-      end
-
-      define_method wrt_i do
-        if instance_variable_defined? _IVAR
-          instance_variable_get _IVAR
-        else
-          x = bld_p[ self ]
-          const_set _CONST, x
-          instance_variable_set _IVAR, x
-          x
-        end
-      end
-
-      nil
-    end
-
-    module Module_Methods__
-
-      def properties
-        entity_formal_property_method_names_box_for_rd.to_value_scan.map_by do |i|
-          send i
-        end.immutable_with_random_access_keyed_to_method :name_i
-      end
-
-      def entity_edit_sess
-        sess = Class_Edit_Session__.new self
-        @active_entity_edit_session = sess
-        x = yield sess
-        sess.finish
-        @active_entity_edit_session = nil
-        x
-      end
-
-      def method_added m_i
-        if active_entity_edit_session
-          @active_entity_edit_session.receive_method_added_name m_i
-        end
-        super
-      end
-
-      attr_reader :active_entity_edit_session
-
-      define_singleton_method :module_attr_reader_writer, MODULE_ATTR_READER_WRITER_METHOD__
-
-      module_attr_reader_writer(
-        :entity_formal_property_method_names_box_for_rd,
-        :entity_formal_property_method_names_box_for_wrt,
-        :ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___,
-        :@entity_formal_property_method_names_box_for_write ) do |o|
-
-          o::ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___.dup
-
-        end
-
-    private
-
-      def o * x_a, & edit_p
-        if active_entity_edit_session
-          sess = @active_entity_edit_session
-        else
-          self._DO_ME
-        end
-        sess.receive_edit_sess x_a, & edit_p
+      def iambic_writer_method_name_passive_lookup_proc
+        self._RIDE_ME
+        self.class.iamb_writer_method_name_passive_proc
       end
     end
 
     module Instance_Methods__
-
-      ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___ = Callback_::Box.the_empty_box
-
-      Entity_Property = Property__
-
-      def initialize & p   # #experimental
-        instance_exec( & p )
-      end
-
-    private
-
-      def iambic_writer_method_name_passive_lookup_proc  # [cb] #hook-in
-        bx = self.class.entity_formal_property_method_names_box_for_rd
-        -> name_i do
-          m_i = bx[ name_i ]
-          if m_i
-            self.class.send( m_i ).iambic_writer_method_name
-          end
-        end
-      end
-
-      def receive_entity_property_value prop, x
-        instance_variable_set prop.as_ivar, x
-        ACHIEVED_
-      end
+      Entity_Property = Property__  # as promised above
     end
 
     if false
@@ -697,10 +787,6 @@ module Skylab::Brazen
 
       Entity[ self, -> do
 
-        def ad_hoc_processor
-          @kernel.accept_ad_hoc_processor
-        end
-
         def meta_property
           _pc = @kernel.reader.metaproperty_kernel.property_cls_for_wrt
           Entity::Meta_Property__.new( @scanner ).apply_to_property_class _pc
@@ -721,6 +807,8 @@ module Skylab::Brazen
       end
     end
     end
+
+    KEEP_PARSING_ = true
 
     Entity_ = self
   end

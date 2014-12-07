@@ -50,11 +50,11 @@ module Skylab::Brazen::TestSupport::Entity
     end
 
     it "DSL syntax fail - strange name" do
-      # -> do
+      -> do
         class FooI_Pity
           Subject_[][ self, :VAG_rounded ]
         end
-      # end.should raise_error ::ArgumentError, unrec_rx( :VAG_rounded )
+      end.should raise_error ::ArgumentError, unrec_rx( :VAG_rounded )
     end
 
     it "DSL syntax fail - strange value" do

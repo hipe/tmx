@@ -386,13 +386,6 @@ module Skylab::Callback
           ACHIEVED_
         end
 
-        # ~ override some parent behavior
-
-        def via_current_iambic_token_build_extra_iambic_event
-          self._DO_ME
-          Stranger_[ current_iambic_token ]
-        end
-
         module Proprietor_Module_Methods__
 
           def properties
