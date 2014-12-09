@@ -795,6 +795,18 @@ module Skylab::Brazen
         h.delete :property  # this must not be in the syntax of metapropertiesk
         h
       end
+
+      # ~ internal support
+
+      def add_to_write_proc_chain & p
+        if @iambic_writer_method_proc_is_generated
+          @iambic_writer_method_proc_is_generated = false
+          @iambic_writer_method_proc_proc = p
+        else
+          self._DO_ME
+        end
+        nil
+      end
     end
 
     class MetaProperty__ < Property_or_MetaProperty__
@@ -850,16 +862,6 @@ module Skylab::Brazen
       def after_wrt & p
         @aftr_write_hooks ||= bld_and_init_after_write_hooks
         @aftr_write_hooks.push p
-        nil
-      end
-
-      def add_to_write_proc_chain  & p
-        if @iambic_writer_method_proc_is_generated
-          @iambic_writer_method_proc_is_generated = false
-          @iambic_writer_method_proc_proc = p
-        else
-          self._DO_ME
-        end
         nil
       end
 
