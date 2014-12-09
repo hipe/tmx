@@ -4,6 +4,25 @@ module Skylab::Brazen
 
     module Meta_Property__
 
+      Apply_default = -> mprop, default_x do
+
+        mprop.against_property_class do
+
+          during_normalize do |prop|
+            x = prop.any_value_of_metaprop mprop
+            if x.nil?
+              prop.set_value_of_metaprop default_x, mprop
+            end
+            KEEP_PARSING_
+          end
+
+          include Evented_Property_Common_Instance_Methods__
+
+          KEEP_PARSING_
+        end
+        KEEP_PARSING_
+      end
+
       Apply_enum = -> mprop, enum_i_a do
 
         _ENUM_BOX = Callback_::Box.new
@@ -18,7 +37,7 @@ module Skylab::Brazen
         end
 
         mprop.after_wrt do |prop|
-          x = prop.send mprop.name_i
+          x = prop.any_value_of_metaprop mprop
           if _ENUM_BOX[ x ]
             KEEP_PARSING_
           else
@@ -45,6 +64,20 @@ module Skylab::Brazen
               _a = o.enum_box.get_names
               y << "invalid #{ o.name_i } #{ ick o.x }, #{
                }expecting { #{ _a * ' | ' } }"
+          end
+        end
+
+        def normalize_property
+          if self.class::NORM_P_A
+            p_a = self.class::NORM_P_A
+            ok = true
+            p_a.each do |p|
+              ok = p[ self ]
+              ok or break
+            end
+            ok && super
+          else
+            super
           end
         end
 

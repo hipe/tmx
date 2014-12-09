@@ -696,12 +696,14 @@ module Skylab::Brazen
         st = @__methodic_actor_iambic_stream__
         ok = true
         while st.unparsed_exists
-          _prop = @property_class.new do
+          ok = nil
+          prop = @property_class.new do
             @name = Callback_::Name.via_variegated_symbol st.gets_one
             @iambic_writer_method_proc_is_generated = true
             @iwmn = bld_iambic_writer_method_name_from_name
+            ok = normalize_property
           end
-          ok = @edit_session.receive_prop _prop
+          ok &&= @edit_session.receive_prop prop
           ok or break
         end
         ok
@@ -728,7 +730,8 @@ module Skylab::Brazen
         else
           cls = @property_class
         end
-        _prop = cls.new do
+        ok = nil
+        prop = cls.new do
           @name = Callback_::Name.via_variegated_symbol name_i
           if proc_is_generated
             @iambic_writer_method_proc_is_generated = proc_is_generated
@@ -737,8 +740,9 @@ module Skylab::Brazen
             @iambic_writer_method_proc_proc ||= nil
           end
           @iwmn = meth_i
+          ok = normalize_property
         end
-        @edit_session.receive_prop _prop
+        ok and @edit_session.receive_prop prop
       end
     end
 
@@ -753,6 +757,10 @@ module Skylab::Brazen
     class MetaProperty__ < Property_or_MetaProperty__
 
     private
+
+      def default=
+        Entity_::Meta_Property__::Apply_default[ self, iambic_property ]
+      end
 
       def enum=
         Entity_::Meta_Property__::Apply_enum[ self, iambic_property ]
@@ -840,6 +848,7 @@ module Skylab::Brazen
     class Property__ < Property_or_MetaProperty__
 
       class << self
+
         def nonterminal_for edit_session
           Property_Related_Nonterminal__.new edit_session, self
         end
@@ -857,6 +866,15 @@ module Skylab::Brazen
         otr = dup
         otr.instance_exec( & p )
         otr.freeze
+      end
+
+      def any_value_of_metaprop mprop
+        send mprop.name_i
+      end
+
+      def set_value_of_metaprop x, mprop
+        instance_variable_set mprop.as_ivar, x
+        nil
       end
 
     private
@@ -886,6 +904,29 @@ module Skylab::Brazen
           receive_entity_property_value _prop, true  # RESULT VALUE
         end
       end
+
+      class << self
+
+      private
+
+        def during_normalize & p
+          nrmlz_wrt.push p
+          nil
+        end
+
+        define_singleton_method :module_attr_reader_writer, MODULE_ATTR_READER_WRITER_METHOD__
+
+        module_attr_reader_writer :nrmlz_rd, :nrmlz_wrt, :NORM_P_A, :@nrmlz do |o|
+          a = o::NORM_P_A
+          if a
+            a.dup
+          else
+            []
+          end
+        end
+      end
+
+      NORM_P_A = nil
     end
 
     module Instance_Methods__

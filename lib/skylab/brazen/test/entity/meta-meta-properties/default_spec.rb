@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity meta-meta-properties: default", wip: true do
+  describe "[br] entity meta-meta-properties: default" do
 
     context "uses an event hook" do
 
@@ -12,11 +12,12 @@ module Skylab::Brazen::TestSupport::Entity
 
           attr_reader :foo, :bar, :baz
 
-          Subject_[][ self, :iambic_writer_method_name_suffix, :"=", -> do
+          Subject_[].call self, :iambic_writer_method_name_suffix, :"=" do
 
-            o :meta_property, :importance, :default, 22
+            o :default, 22,
+              :meta_property, :importance,
 
-            o :importance, 10
+              :importance, 10
 
             def foo=
               @foo = iambic_property
@@ -32,7 +33,7 @@ module Skylab::Brazen::TestSupport::Entity
               @baz = iambic_property
             end
 
-          end ]
+          end
         end
       end
 

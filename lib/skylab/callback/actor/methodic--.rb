@@ -195,22 +195,30 @@ module Skylab::Callback
         class << self
 
           def via_iambic_stream stream, & oes_p  # :+public-API  #hook-in
-            keep_parsing = nil
             name_was_reached = false
+            keep_parsing = nil
+            ok = nil
             x = new do
               @name = nil
               keep_parsing = process_iambic_stream_passively stream, & oes_p
               @name and name_was_reached = true
+              if name_was_reached || keep_parsing
+                ok = normalize_property
+              end
             end
             if name_was_reached
-              x
+              ok && x
             elsif keep_parsing
-              if oes_p
-                oes_p.call :no_name do
-                  x
+              if ok
+                if oes_p
+                  oes_p.call :no_name do
+                    x
+                  end
+                else
+                  raise bld_parse_fail_event( stream ).to_exception
                 end
               else
-                raise bld_parse_fail_event( stream ).to_exception
+                ok
               end
             else
               keep_parsing
@@ -224,7 +232,7 @@ module Skylab::Callback
               ( stream.unparsed_exists && stream.current_token ),
               [ :property ] ]
           end
-        end
+        end  # >>
 
         def initialize & edit_p
           @iambic_writer_method_proc_is_generated = true  # :+#public-API (name)
@@ -294,6 +302,10 @@ module Skylab::Callback
             instance_variable_set _IVAR, true
             KEEP_PARSING_
           end
+        end
+
+        def normalize_property
+          ACHIEVED_
         end
       end
 
