@@ -2,60 +2,68 @@ require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity meta-properties examples: required fields", wip: true do
+  describe "[br] entity meta-properties examples: required fields" do
 
     context "didactic" do
 
       before :all do
 
-        MPER_Entity = Subject_[][ -> do
-          o :meta_property, :parameter_arety, :entity_class_hook_once, -> cls do
-            req = cls.properties.reduce_by( & :is_required ).to_a.freeze
-            cls.add_iambic_event_listener :iamby_normalize_and_validate,
-              -> obj do
-                obj.whine_about_missin_reqd_fields req ; nil
-              end
+        MPER_Entity = Subject_[].call do
+
+          o :meta_property, :parameter_arety
+
+          during_entity_normalize do |ent|
+            miss_a = ent.class.requored_prop_a.reduce nil do | m, prop |
+              ent.any_property_value( prop ).nil? and ( m ||= [] ).push prop.name_i
+              m
+            end
+            if miss_a
+              ent.missing = miss_a
+              false
+            else
+              true
+            end
           end
 
-          property_class_for_write
-          class self::Property
+          module self::Module_Methods
+            def requored_prop_a
+              @requored_prop_a ||= properties.reduce_by( & :is_requored ).to_a.freeze
+            end
+          end
+
+          entity_property_class_for_write
+          class self::Entity_Property
             def initialize( * )
               @parameter_arety = nil
               super
             end
-            def is_required
+            def is_requored
               :one == @parameter_arety
             end
-          end
-        end ]
-
-        module MPER_Entity
-          def whine_about_missin_reqd_fields prop_a
-            a = prop_a.reduce [] do |m, x|
-              instance_variable_defined?( x.as_ivar ) &&
-                ! instance_variable_get( x.as_ivar ).nil? or m << x
-              m
-            end
-            if a.length.nonzero?
-              @missing = a.map( & :name_i )
-            end ; nil
           end
         end
 
         class MPER_Business_Widget
-          attr_reader :missing
+          attr_accessor :missing
 
-          MPER_Entity[ self, -> do
+          MPER_Entity.call self do
             o :parameter_arety, :one, :property, :foo
             o :property, :bar
             o :parameter_arety, :one, :property, :baz
-          end ]
+          end
+
+          Enhance_for_test_[ self ]
         end
       end
 
       it 'ok' do
-        obj = MPER_Business_Widget.new.send :with, :bar, :hi
-        obj.send :notificate, :iamby_normalize_and_validate
+
+        ok = nil
+        obj = MPER_Business_Widget.new do
+          process_fully :bar, :hi
+          ok = normalize
+        end
+        ok.should eql false
         obj.instance_variable_get( :@bar ).should eql :hi
         obj.missing.should eql [ :foo, :baz ]
       end
