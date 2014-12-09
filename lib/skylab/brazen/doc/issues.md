@@ -31,7 +31,7 @@
 [#048]       #parent-node: [#024] "#action-preconditions.."
 [#047]       #parent-node: [#013] the model entity narrative
 [#046] #open so fragile this hack (entity properties to action props)
-[#045]       #tracking-tag when we wish we had meta-property reflection
+[#045]       #parent-node: [#001] "the meta-properties narrative.."
 [#044]       #done graph has an action so maybe we don't need to pass it everywhere
 [#043]      #tracking-tag loading hacks
 [#042]       #done make persit entity interface symmetrical with delete entity

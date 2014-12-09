@@ -4,60 +4,34 @@ module Skylab::Brazen
 
     module Meta_Property__
 
-        def when_enum_box pc, _ENUM_BOX
-          pc.include Meta_Prop_IMs__
-          _IVAR = @as_ivar ; _NAME_I = @name_i
-          pc.send :define_method, @iambic_writer_method_name do
-            x = iambic_property
-            if _ENUM_BOX[ x ]
-              instance_variable_set _IVAR, x
-              ACHIEVED_
-            else
-              when_bad_enum_value x, _NAME_I, _ENUM_BOX
-              UNABLE_
-            end
+      Apply_enum = -> mprop, enum_i_a do
+
+        _ENUM_BOX = Callback_::Box.new
+
+        enum_i_a.each do |i|
+          _ENUM_BOX.add i, true
+        end
+
+        mprop.against_property_class do
+          include Evented_Property_Common_Instance_Methods__
+          KEEP_PARSING_
+        end
+
+        mprop.after_wrt do |prop|
+          x = prop.send mprop.name_i
+          if _ENUM_BOX[ x ]
+            KEEP_PARSING_
+          else
+            prop.receive_bad_enum_value x, mprop.name_i, _ENUM_BOX
           end
         end
 
-        def aply_defaulting_behavior_to_property_class pc
-          pc.add_iambic_event_listener :at_end_of_process_iambic, -> prop do
-            if ! prop.instance_variable_defined?( @as_ivar ) ||
-                prop.instance_variable_get( @as_ivar ).nil?
-              prop.instance_variable_set @as_ivar, @default_x
-            end
-          end
-        end
+        KEEP_PARSING_
+      end
 
-          def default
-            @has_default_x = true
-            @default_x = iambic_property
-          end
+      module Evented_Property_Common_Instance_Methods__
 
-          def entity_class_hook
-            @entity_class_hook_p = iambic_property
-          end
-
-          def entity_class_hook_once
-            @entity_class_hook_once_p = iambic_property
-          end
-
-          def enum
-            x = iambic_property
-            bx = Box_.new
-            x.each do |i|
-              bx.add i, true
-            end
-            @enum_box = bx ; nil
-          end
-
-          def property_hook
-            @property_hook_p = iambic_property
-          end
-
-
-      module Meta_Prop_IMs__
-      private
-        def when_bad_enum_value x, name_i, enum_box
+        def receive_bad_enum_value x, name_i, enum_box
           maybe_send_event :error, :invalid_property_value do
             bld_invalid_property_value_event x, name_i, enum_box
           end
@@ -73,7 +47,13 @@ module Skylab::Brazen
                }expecting { #{ _a * ' | ' } }"
           end
         end
+
+        def maybe_send_event * i_a, & ev_p
+          @__methodic_actor_handle_event_selectively__.call( * i_a, & ev_p )
+        end
       end
+
+      if false
 
       module Muxer
         class << self
@@ -236,7 +216,7 @@ module Skylab::Brazen
       end
 
       Hook__ = ::Struct.new :variety_i, :p
-
+      end
 
     end
   end

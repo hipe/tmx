@@ -260,6 +260,19 @@ module Skylab::Brazen
 
       include METHODIC_.iambic_processing_instance_methods
 
+      def maybe_receive_event * i_a, & ev_p
+        receive_event ev_p[]
+      end
+
+      def receive_event ev
+        raise ev.to_exception
+      end
+
+    private
+
+      def maybe_send_event *, & ev_p  # #hook-OUT of [cb]
+        raise ev_p[].to_exception
+      end
     end
 
     class Produce_extension_module__ < Module_Edit_Session__
@@ -389,15 +402,7 @@ module Skylab::Brazen
         if did_create_class
           @property_related_nonterminal.receive_new_property_cls pcls
         end
-        _m_i = mprop.iambic_writer_method_name
-        _m_p = mprop.iambic_writer_method_proc
-        pcls.class_exec do
-          attr_reader mprop.name_i  # maybe ?
-        private
-          define_method _m_i, _m_p
-        end
-        pcls.clear_iambic_writer_method_name_passive_proc
-        KEEP_PARSING_
+        pcls.class_exec( & mprop.apply )
       end
 
       def receive_method_added_name m_i
@@ -415,7 +420,7 @@ module Skylab::Brazen
 
       def receive_prop prop
 
-        if prop.iambic_writer_method_proc_is_generated
+        if prop.do_define_method
           befor = @pay_attention_to_method_added
           @pay_attention_to_method_added = false
           @iambic_writer_method_writee_module.send(
@@ -457,12 +462,8 @@ module Skylab::Brazen
         end
       end
 
-      def maybe_send_event *, & ev_p  # #hook-out [cb]
-        raise ev_p[].to_exception
-      end
-
       def receive_invalid_propery ev  # possible placeholder
-        raise ev.to_exception
+        receive_event ev
       end
     end
 
@@ -637,7 +638,7 @@ module Skylab::Brazen
     private
 
       def bld_metaproperty_nonterminal
-        cls = Meta_Property__
+        cls = MetaProperty__
         Nonterminal_.new do |pc|
 
           if cls.is_keyword pc.upstream.current_token
@@ -662,24 +663,27 @@ module Skylab::Brazen
 
         Nonterminal_.new do |pc|
 
-          last_incomplete_property = nil
+          last_incomplete_prop = nil
 
           prop = if pcls.is_keyword pc.upstream.current_token
             st = pc.upstream
             d = st.current_index
-            pcls.via_iambic_stream st do | i, & ev_p |
-              if :no_name == i
+            pcls.via_iambic_stream st do | i, * i_a, & ev_p |
+              case i
+              when :no_name
                 if st.unparsed_exists && :meta_property == st.current_token
                   st.current_index = d
                 else
-                  last_incomplete_property = ev_p[]
+                  last_incomplete_prop = ev_p[]
                 end
+                false  # NO PROP
+              else
+                @edit_session.maybe_receive_event i, * i_a, & ev_p
               end
-              false
             end
           end
 
-          @last_incomplete_property = last_incomplete_property
+          @last_incomplete_property = last_incomplete_prop
           if prop
             @edit_session.receive_prop prop
           else
@@ -718,16 +722,27 @@ module Skylab::Brazen
     public
 
       def finish_property_with_three proc_is_generated, meth_i, name_i
-        _prop = ( @last_incomplete_property || @property_class ).new do
+        if @last_incomplete_property
+          cls = @last_incomplete_property
+          @last_incomplete_property = nil
+        else
+          cls = @property_class
+        end
+        _prop = cls.new do
           @name = Callback_::Name.via_variegated_symbol name_i
-          @iambic_writer_method_proc_is_generated = proc_is_generated
+          if proc_is_generated
+            @iambic_writer_method_proc_is_generated = proc_is_generated
+          else
+            @iambic_writer_method_proc_is_generated = proc_is_generated
+            @iambic_writer_method_proc_proc ||= nil
+          end
           @iwmn = meth_i
         end
         @edit_session.receive_prop _prop
       end
     end
 
-    class Property_or_Metaproperty__ < METHODIC_.simple_property_class
+    class Property_or_MetaProperty__ < METHODIC_.simple_property_class
 
       Cache_iambic_writer_methods__.call self, superclass do |h|
         h.delete :property  # this must not be in the syntax of metapropertiesk
@@ -735,21 +750,94 @@ module Skylab::Brazen
       end
     end
 
-    class Meta_Property__ < Property_or_Metaproperty__
-
-      def iambic_writer_method_name
-        :"#{ name_i }="
-      end
+    class MetaProperty__ < Property_or_MetaProperty__
 
     private
+
+      def enum=
+        Entity_::Meta_Property__::Apply_enum[ self, iambic_property ]
+      end
 
       def meta_property=
         @name = Callback_::Name.via_variegated_symbol iambic_property
         STOP_PARSING_
       end
+
+    public
+
+      # ~ internal support
+
+      def apply
+        p_a = aply_chain || [ dflt_apply ]
+        mprop = self
+        -> do
+          ok = true
+          p_a.each do |p|
+            ok = instance_exec mprop, & p
+            ok or break
+          end
+          ok
+        end
+      end
+
+      attr_reader :aply_chain
+
+      def against_property_class & p
+        @aply_chain ||= [ dflt_apply ]
+        @aply_chain.push p
+        nil
+      end
+
+      def after_wrt & p
+        @aftr_write_hooks ||= bld_and_init_after_write_hooks
+        @aftr_write_hooks.push p
+        nil
+      end
+
+      def bld_and_init_after_write_hooks
+        before_p_p = if @iambic_writer_method_proc_is_generated
+          @iambic_writer_method_proc_is_generated = false
+          -> mprop do
+            mprop.iambic_writer_method_proc_when_arity_is_one
+          end
+        else
+          @iambic_writer_method_proc_proc
+        end
+        after_write_hook_p_a = []
+        @iambic_writer_method_proc_proc = -> mprop do
+          logic_p = before_p_p[ mprop ]
+          -> do
+            ok = instance_exec( & logic_p )
+            if ok
+              after_write_hook_p_a.each do |p|
+                ok = p[ self ]
+                ok or break
+              end
+            end
+            ok
+          end
+        end
+        after_write_hook_p_a
+      end
+      public :iambic_writer_method_proc_when_arity_is_one
+
+      def dflt_apply
+        -> mprop do
+          name_i = mprop.name_i
+          meth_i = :"#{ name_i }="
+          _meth_p = mprop.iambic_writer_method_proc
+          attr_reader name_i
+          define_method meth_i, _meth_p
+          private meth_i
+          clear_iambic_writer_method_name_passive_proc
+          KEEP_PARSING_
+        end
+      end
+
+      Autoloader_[ Self_ = self ]
     end
 
-    class Property__ < Property_or_Metaproperty__
+    class Property__ < Property_or_MetaProperty__
 
       class << self
         def nonterminal_for edit_session
@@ -757,10 +845,8 @@ module Skylab::Brazen
         end
       end  # >>
 
-      attr_reader :iambic_writer_method_proc_is_generated
-
-      def is_metaproperty
-        false
+      def do_define_method
+        @iambic_writer_method_proc_is_generated || @iambic_writer_method_proc_proc
       end
 
       def iambic_writer_method_name
@@ -937,7 +1023,7 @@ module Skylab::Brazen
 
       class << self
         def hook_shell_for_write
-          @hook_shell ||= Meta_Property__::Hook_Shell.new self
+          @hook_shell ||= MetaProperty__::Hook_Shell.new self
         end
 
         attr_reader :hook_shell
@@ -972,35 +1058,6 @@ module Skylab::Brazen
       end
     end
 
-    # ~ core DSL
-
-    class DSL__
-
-      def initialize kernel, scanner
-        @kernel = kernel ; @scanner = scanner
-      end
-
-      Entity[ self, -> do
-
-        def meta_property
-          _pc = @kernel.reader.metaproperty_kernel.property_cls_for_wrt
-          Entity::Meta_Property__.new( @scanner ).apply_to_property_class _pc
-        end
-
-      end ]
-
-      include Via_Scanner_Iambic_Methods_
-
-    private
-
-      def build_not_OK_event_with * x_a, & p
-        Brazen_.event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, p
-      end
-
-      def maybe_send_event *, & ev_p
-        raise ev_p[].to_exception
-      end
-    end
     end
 
     Entity_ = self

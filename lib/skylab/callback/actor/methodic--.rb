@@ -101,13 +101,14 @@ module Skylab::Callback
           end
         end
 
-        def process_iambic_stream_passively stream
+        def process_iambic_stream_passively stream, & oes_p
           keep_parsing = true
           if stream.unparsed_exists
             method_name_p = iambic_writer_method_name_passive_lookup_proc
             m_i = method_name_p[ stream.current_token ]
             if m_i
               @__methodic_actor_iambic_stream__ = stream
+              @__methodic_actor_handle_event_selectively__ = oes_p
               begin
                 stream.advance_one
                 keep_parsing = send m_i
@@ -120,6 +121,7 @@ module Skylab::Callback
                 break
               end while nil
               @__methodic_actor_iambic_stream__ = nil
+              @__methodic_actor_handle_event_selectively__ = nil
             end
           end
           keep_parsing
@@ -193,20 +195,25 @@ module Skylab::Callback
         class << self
 
           def via_iambic_stream stream, & oes_p  # :+public-API  #hook-in
+            keep_parsing = nil
             name_was_reached = false
             x = new do
               @name = nil
-              process_iambic_stream_passively stream
+              keep_parsing = process_iambic_stream_passively stream, & oes_p
               @name and name_was_reached = true
             end
             if name_was_reached
               x
-            elsif oes_p
-              oes_p.call :no_name do
-                x
+            elsif keep_parsing
+              if oes_p
+                oes_p.call :no_name do
+                  x
+                end
+              else
+                raise bld_parse_fail_event( stream ).to_exception
               end
             else
-              raise bld_parse_fail_event( stream ).to_exception
+              keep_parsing
             end
           end
 
@@ -277,6 +284,7 @@ module Skylab::Callback
           _IVAR = as_ivar
           -> do
             instance_variable_set _IVAR, iambic_property
+            KEEP_PARSING_
           end
         end
 
@@ -284,6 +292,7 @@ module Skylab::Callback
           _IVAR = as_ivar
           -> do
             instance_variable_set _IVAR, true
+            KEEP_PARSING_
           end
         end
       end

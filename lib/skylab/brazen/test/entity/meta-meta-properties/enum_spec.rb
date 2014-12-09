@@ -2,7 +2,16 @@ require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity meta-meta-properties: enum", wip: true do
+  describe "[br] entity meta-meta-properties: enum" do
+
+    it "(minimal)" do
+
+        class MME_Min
+          Subject_[].call self do
+            o :enum, [ :foo, :bar ], :meta_property, :zig
+          end
+        end
+    end
 
     context "a normative example is boring" do
 
@@ -10,11 +19,15 @@ module Skylab::Brazen::TestSupport::Entity
 
         class MME_Foo
 
-          Subject_[][ self, :iambic_writer_method_name_suffix, :"=", -> do
+          Subject_[].call self do
 
-            o :meta_property, :color, :enum, [ :red, :blue ]
+            o :enum, [ :red, :blue ],
 
-            o :color, :red
+              :meta_property, :color,
+
+              :iambic_writer_method_name_suffix, :"=",
+
+              :color, :red
 
             def red_thing=
             end
@@ -32,7 +45,7 @@ module Skylab::Brazen::TestSupport::Entity
             def other_blue_thing=
             end
 
-          end ]
+          end
         end
       end
 
@@ -45,20 +58,27 @@ module Skylab::Brazen::TestSupport::Entity
         h[ :blue ].map( & :name_i ).should eql [ :blue_thing, :other_blue_thing ]
         h[ nil ].map( & :name_i ).should eql [ :no_color ]
       end
+    end
 
-      it "enums try and prevent you from being naughty" do
 
-        -> do
+    it "enums try and prevent you from being naughty" do
+
+       -> do
+
         class MME_Bar
-          Subject_[][ self, -> do
-            o :meta_property, :color, :enum, [ :green, :purple ]
+
+          Subject_[].call self do
+
+            o :enum, [ :green, :purple ],
+              :meta_property, :color
+
             o :color, :red
+
             def wizzo
             end
-          end ]
+          end
         end
-        end.should raise_error ::ArgumentError, /\Ainvalid color 'red', expecting { green \| purple }/
-      end
+      end.should raise_error ::ArgumentError, /\Ainvalid color 'red', expecting { green \| purple }/
     end
   end
 end

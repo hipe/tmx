@@ -3,7 +3,7 @@
 ## introduction
 
 the "entity" facility continues a [#mh-053] long line of entity- and
-property-modelig libraries. of them all this is the most overwrought,
+property-modeling libraries. of them all this is the most overwrought,
 and as this is written is undergoing its first overhaul.
 
 once this overhaul is complete (probably by the time you read this), it
@@ -155,3 +155,7 @@ for such cases we use an ivar to store this writable form of the object
 in the module. an ivar "lookup" does not actually look up anything: it
 either is set for that module or it isn't; the ancestors don't come in
 to play.
+
+
+
+## the meta-properties narrative :[#045]
