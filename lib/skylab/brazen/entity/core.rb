@@ -397,8 +397,8 @@ module Skylab::Brazen
 
       def receive_metaproperty mprop
         mod = @iambic_writer_method_writee_module
-        did_create_class = mod.entity_property_class_for_write.nil?
-        pcls = mod.entity_property_class_for_wrt
+        did_create_class = mod.ent_property_class_for_write.nil?
+        pcls = mod.entity_property_class_for_write
         if did_create_class
           @property_related_nonterminal.receive_new_property_cls pcls
         end
@@ -520,14 +520,13 @@ module Skylab::Brazen
         end
 
       module_attr_reader_writer(
-        :entity_property_class_for_rd,
-        :entity_property_class_for_wrt,
+        :entity_property_class_for_write,
         :Entity_Property,
-        :@entity_property_class_for_write ) do |o|
+        :@ent_property_class_for_write ) do |o|
           ::Class.new o::Entity_Property
         end
 
-      attr_reader :entity_property_class_for_write
+      attr_reader :ent_property_class_for_write
 
     private
 

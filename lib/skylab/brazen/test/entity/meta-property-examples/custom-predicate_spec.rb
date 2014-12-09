@@ -2,35 +2,39 @@ require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity meta-properties examples: customizing the..", wip: true do
+  describe "[br] entity meta-properties examples: customizing the.." do
 
     context "..property class w/ a boolean predicate & custom niladic writer" do
 
       before :all do
 
-        MPEC_Entity = Subject_[][ -> do
+        MPEC_Entity = Subject_[].call do
 
-          o :meta_property, :arety, :enum, [ :"0-1", :"1" ]
+          o :enum, [ :"0-1", :"1" ],
 
-          property_class_for_write  # necessary to flush above and create below
+            :meta_property, :arety
 
-          class self::Property
+          entity_property_class_for_write
+
+          class self::Entity_Property
+
             def is_necessary
               arety == :"1"
             end
 
-            o :iambic_writer_method_name_suffix, :'=' do
-              def necessary=
-                @arety = :"1"
-              end
+          private
+
+            def necessary=
+              @arety = :"1"
+              true
             end
           end
-        end ]
+        end
 
 
         class MPEC_Business_Widget
 
-          MPEC_Entity[ self, -> do
+          MPEC_Entity.call self do
 
             o :necessary
 
@@ -40,11 +44,12 @@ module Skylab::Brazen::TestSupport::Entity
             def hey
             end
 
-          end ]
+          end
         end
       end
 
       it "..can make property-based code arbitrarily more readable" do
+
         hi, hey = MPEC_Business_Widget.properties.each_value.to_a
         hi.is_necessary.should eql true
         hey.is_necessary.should eql false

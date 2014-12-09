@@ -67,7 +67,7 @@
 [#015]       #doc-node: the kernel narrative ..
 [#014] #open `has_custom_moniker` is a smell to exist in entity.
 [#013]       #parent-node: [#025] the model
-[#012] #hole (was: #spot #in-situ)
+[#012] #open now that the `properties` shell is not memoized, see if etc
 [#011]       #parent-node: [#001] the event narrative ..
 [#010]       #doc-node: data stores
 [#009]       #parent-node: [#010] the git config narrative ..
