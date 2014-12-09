@@ -58,10 +58,12 @@ module Skylab::Brazen
       end
     end
 
-    MODULE_ATTR_READER_WRITER_METHOD__ = -> rd_i, wrt_i, _CONST, _IVAR, & bld_p do  # #note-065
+    MODULE_ATTR_READER_WRITER_METHOD__ = -> rd_i=nil, wrt_i, _CONST, _IVAR, & bld_p do  # #note-065
 
-      define_method rd_i do
-        const_get _CONST
+      if rd_i
+        define_method rd_i do
+          const_get _CONST
+        end
       end
 
       define_method wrt_i do
@@ -73,9 +75,7 @@ module Skylab::Brazen
           instance_variable_set _IVAR, x
           x
         end
-      end
-
-      nil
+      end ; nil
     end
 
     # ~ parsing support
@@ -539,6 +539,14 @@ module Skylab::Brazen
         end
         sess.receive_edit x_a, & edit_p
       end
+
+      def during_entity_normalize & p
+        normz_for_wrt.push p ; nil
+      end
+
+      module_attr_reader_writer :normz_for_wrt, :ENTITY_NORM_P_A, :@ent_norm_p_a do |o|
+        o::ENTITY_NORM_P_A ? o::ENTITY_NORM_P_A.dup : []
+      end
     end
 
     module Extension_Module_Methods__
@@ -591,14 +599,26 @@ module Skylab::Brazen
 
     module Instance_Methods__
 
-      ENTITY_AD_HOCS___  = nil
+      ENTITY_AD_HOCS___ = nil
 
       ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___ = Callback_::Box.the_empty_box
+
+      ENTITY_NORM_P_A = nil
 
       # Entity_Property = Property__ below
 
       def initialize & p   # #experimental
         instance_exec( & p )
+      end
+
+      def any_property_value prop
+        if instance_variable_defined? prop.as_ivar
+          instance_variable_get prop.as_ivar
+        end
+      end
+
+      def property_value prop
+        instance_variable_get prop.as_ivar
       end
 
     private
@@ -613,7 +633,19 @@ module Skylab::Brazen
         end
       end
 
-      def receive_entity_property_value prop, x
+      def normalize
+        ok = true
+        p_a = self.class::ENTITY_NORM_P_A
+        if p_a
+          p_a.each do |p|
+            ok = p[ self ]
+            ok or break
+          end
+        end
+        ok
+      end
+
+      def receive_value_of_entity_property x, prop
         instance_variable_set prop.as_ivar, x
         ACHIEVED_
       end
@@ -926,7 +958,7 @@ module Skylab::Brazen
         _NAME_I = name_i
         -> do
           _prop = self.class.send self.class.entity_formal_property_method_names_box_for_wrt.fetch _NAME_I
-          receive_entity_property_value _prop, iambic_property  # RESULT VALUE
+          receive_value_of_entity_property iambic_property, _prop  # RESULT VALUE
         end
       end
 
@@ -934,7 +966,7 @@ module Skylab::Brazen
         _NAME_I = name_i
         -> do
           _prop = self.class.send self.class.entity_formal_property_method_names_box_for_wrt.fetch _NAME_I
-          receive_entity_property_value _prop, true  # RESULT VALUE
+          receive_value_of_entity_property true, _prop  # RESULT VALUE
         end
       end
 
@@ -949,7 +981,7 @@ module Skylab::Brazen
 
         define_singleton_method :module_attr_reader_writer, MODULE_ATTR_READER_WRITER_METHOD__
 
-        module_attr_reader_writer :nrmlz_rd, :nrmlz_wrt, :NORM_P_A, :@nrmlz do |o|
+        module_attr_reader_writer :nrmlz_wrt, :NORM_P_A, :@nrmlz do |o|
           a = o::NORM_P_A
           if a
             a.dup

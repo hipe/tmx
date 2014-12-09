@@ -54,7 +54,7 @@ module Skylab::Brazen
           ok = true
           if :zero == prop.argument_arity
             prop.iambic_writer_method_proc = -> do
-              ok = receive_entity_property_value prop, true
+              ok = receive_value_of_entity_property true, prop
             end
           end
           ok
@@ -370,7 +370,7 @@ module Skylab::Brazen
         }(#{ p[ x ] }) with new value (#{ p[ x_ ] })"
     end
 
-    private def receive_entity_property_value prop, x
+    private def receive_value_of_entity_property x, prop
       actual_property_box_for_write.add prop.name_i, x
       ACHIEVED_
     end

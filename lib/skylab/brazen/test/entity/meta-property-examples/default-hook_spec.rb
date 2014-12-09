@@ -2,28 +2,35 @@ require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity meta-properties examples: default..", wip: true do
+  describe "[br] entity meta-properties examples: default.." do
 
     context "..has lots of moving parts actually" do
 
       before :all do
 
-        MPED_Entity = Subject_[][ -> do
-          o :meta_property, :defalt_proc,
-              :entity_class_hook, -> prop, cls do
-            cls.add_iambic_event_listener :iambuc_normalize_and_validate,
-              -> obj do
-                obj.aply_dflt_proc_if_necessary prop ; nil
-              end
-          end
-        end ]
+        MPED_Entity = Subject_[].call do
 
-        module MPED_Entity
-          def aply_dflt_proc_if_necessary prop
-            ivar = :"#{ prop.as_ivar }_x"
-            if ! instance_variable_defined? ivar ||
-                instance_variable_get( ivar ).nil?
-              instance_variable_set ivar, prop.defalt_proc.call
+          o :meta_property, :defolt_proc
+
+          during_entity_normalize do |ent|
+            ent.class.properties_with_defaults.each do |prop|
+              x = ent.any_property_value prop
+              if x.nil?
+                _x = prop.defolt_proc[]
+                prop_ = prop.new do  # meh #grease
+                  @ivar = :"#{ as_ivar }_x"
+                end
+                ent.send :receive_value_of_entity_property, _x, prop_
+              end
+            end
+            true
+          end
+
+          module self::Module_Methods
+            def properties_with_defaults
+              @properties_with_defaults ||= properties.reduce_by do |prop|
+                ! prop.defolt_proc.nil?
+              end.to_a.freeze
             end
           end
         end
@@ -32,9 +39,14 @@ module Skylab::Brazen::TestSupport::Entity
 
           attr_reader :mingle_x, :mongle_x
 
-          MPED_Entity[ self, -> do
+          MPED_Entity.call self do
+
             hehe = 0
-            o :defalt_proc, -> { "ohai: #{ hehe += 1 }" }
+
+            o :defolt_proc, -> do
+              "ohai: #{ hehe += 1 }"
+            end
+
             def mingle
               @mingle_x = iambic_property
             end
@@ -42,16 +54,18 @@ module Skylab::Brazen::TestSupport::Entity
             def mongle
               @mongle_x = iambic_property
             end
-          end ]
+          end
 
-          public :process_iambic_fully
+          Enhance_for_test_[ self ]
         end
       end
 
       it "ok" do
-        obj = MPED_Business_Widget.new
-        obj.process_iambic_fully [ :mongle, :sure ]
-        obj.notificate :iambuc_normalize_and_validate
+        ok = nil
+        obj = MPED_Business_Widget.new do
+          process_fully :mongle, :sure
+          ok = normalize
+        end
         obj.mongle_x.should eql :sure
         obj.mingle_x.should eql "ohai: 1"
       end
