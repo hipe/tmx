@@ -8,7 +8,7 @@ module Skylab::Brazen
 
         mprop.against_property_class do
 
-          during_normalize do |prop|
+          during_property_normalize do |prop|
             x = prop.any_value_of_metaprop mprop
             if x.nil?
               prop.set_value_of_metaprop default_x, mprop
@@ -20,6 +20,24 @@ module Skylab::Brazen
 
           KEEP_PARSING_
         end
+        KEEP_PARSING_
+      end
+
+      Apply_entity_class_hook = -> mprop, recv_parse_ctx_p do
+
+        mprop.against_property_class do
+          include Evented_Property_Common_Instance_Methods__
+        end
+
+        mprop.add_to_write_proc_chain do
+          -> do
+            _ctx = Parse_Context____.new @__methodic_actor_iambic_stream__
+            _against_ec = instance_exec _ctx, & recv_parse_ctx_p
+            against_entity_class( & _against_ec )
+            KEEP_PARSING_
+          end
+        end
+
         KEEP_PARSING_
       end
 
@@ -65,6 +83,31 @@ module Skylab::Brazen
 
       module Evented_Property_Common_Instance_Methods__
 
+        def against_entity_class & p
+          ( @against_EC_p_a ||= [] ).push p
+          nil
+        end
+
+        attr_reader :against_EC_p_a
+
+        def normalize_property
+
+          if self.class::NORM_P_A
+            p_a = self.class::NORM_P_A
+          end
+
+          if p_a
+            ok = true
+            p_a.each do |p|
+              ok = p[ self ]
+              ok or break
+            end
+            ok && super
+          else
+            super
+          end
+        end
+
         def receive_bad_enum_value x, name_i, enum_box
           maybe_send_event :error, :invalid_property_value do
             bld_invalid_property_value_event x, name_i, enum_box
@@ -79,20 +122,6 @@ module Skylab::Brazen
               _a = o.enum_box.get_names
               y << "invalid #{ o.name_i } #{ ick o.x }, #{
                }expecting { #{ _a * ' | ' } }"
-          end
-        end
-
-        def normalize_property
-          if self.class::NORM_P_A
-            p_a = self.class::NORM_P_A
-            ok = true
-            p_a.each do |p|
-              ok = p[ self ]
-              ok or break
-            end
-            ok && super
-          else
-            super
           end
         end
 

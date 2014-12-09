@@ -419,6 +419,18 @@ module Skylab::Brazen
       end
 
       def receive_prop prop
+        ok = true
+        if prop.against_EC_p_a
+          _ec = @iambic_writer_method_writee_module
+          prop.against_EC_p_a.each do |p|
+            ok = _ec.class_exec( prop, & p )
+            ok or break
+          end
+        end
+        ok and acpt_prop prop
+      end
+
+      def acpt_prop prop
 
         if prop.do_define_method
           befor = @pay_attention_to_method_added
@@ -762,6 +774,10 @@ module Skylab::Brazen
         Entity_::Meta_Property__::Apply_default[ self, iambic_property ]
       end
 
+      def entity_class_hook=
+        Entity_::Meta_Property__::Apply_entity_class_hook[ self, iambic_property ]
+      end
+
       def enum=
         Entity_::Meta_Property__::Apply_enum[ self, iambic_property ]
       end
@@ -891,6 +907,9 @@ module Skylab::Brazen
         nil
       end
 
+      def against_EC_p_a  # #hook-over
+      end
+
     private
 
       def property=
@@ -923,7 +942,7 @@ module Skylab::Brazen
 
       private
 
-        def during_normalize & p
+        def during_property_normalize & p
           nrmlz_wrt.push p
           nil
         end
@@ -948,54 +967,6 @@ module Skylab::Brazen
     end
 
     if false
-
-      # WAS: read [#001] the entity enhancement narrrative
-
-    READ_BOX__ = :PROPERTIES_FOR_READ__
-    WRITE_BOX__ = :PROPERTIES_FOR_WRITE__
-
-    class Scope_Kernel__  # formerly "flusher"
-
-      def any_prop_hook cls
-        if cls.hook_shell and (( box = cls.hook_shell.props ))
-          -> prop do
-            box.each_pair do |i, p|
-              if prop.send i
-                p[ prop ]
-              end
-            end ; nil
-          end
-        end
-      end
-
-      def f_inish_property
-        if @prop.class.hook_shell
-          @prop.class.hook_shell.process_relevant_later_hooks @reader, @prop
-        end
-        @prop = nil
-        ACHIEVED_
-      end
-
-      def process_any_DSL d, x_a
-        @scanner = Lib_::Mutable_iambic_scanner[].new d, x_a
-        prcss_scan_as_DSL_passively
-        d = @scanner.current_index ; @scanner = nil ; d
-      end
-
-      # ~
-
-      def end_scope
-        if @lstnrs and (( box = @lstnrs[ :at_end_of_scope ] ))
-          box.each_value( & :call )
-        end
-      end
-
-      def listener_box_for_eventpoint i
-        (( @lstnrs ||= {} )).fetch i do
-          @lstnrs[ i ] = Box_.new
-        end
-      end
-    end
 
     module Proprietor_Methods__
 
@@ -1060,28 +1031,6 @@ module Skylab::Brazen
       end
       def method_added_notify method_i
         @p && @p[ method_i ] ; nil
-      end
-    end
-
-    class P_roperty__
-
-      def initialize *a
-        a.length.nonzero? and set_prop_i_and_iambic_writer_method_name( * a )
-        notificate :at_end_of_process_iambic
-        block_given? and yield self
-        freeze
-      end
-
-      def description
-        @name.as_variegated_symbol
-      end
-
-      class << self
-        def hook_shell_for_write
-          @hook_shell ||= MetaProperty__::Hook_Shell.new self
-        end
-
-        attr_reader :hook_shell
       end
     end
 
