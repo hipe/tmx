@@ -766,6 +766,10 @@ module Skylab::Brazen
         Entity_::Meta_Property__::Apply_enum[ self, iambic_property ]
       end
 
+      def property_hook=
+        Entity_::Meta_Property__::Apply_property_hook[ self, iambic_property ]
+      end
+
       def meta_property=
         @name = Callback_::Name.via_variegated_symbol iambic_property
         STOP_PARSING_
@@ -799,6 +803,16 @@ module Skylab::Brazen
       def after_wrt & p
         @aftr_write_hooks ||= bld_and_init_after_write_hooks
         @aftr_write_hooks.push p
+        nil
+      end
+
+      def add_to_write_proc_chain  & p
+        if @iambic_writer_method_proc_is_generated
+          @iambic_writer_method_proc_is_generated = false
+          @iambic_writer_method_proc_proc = p
+        else
+          self._DO_ME
+        end
         nil
       end
 

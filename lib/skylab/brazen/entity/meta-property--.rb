@@ -48,6 +48,21 @@ module Skylab::Brazen
         KEEP_PARSING_
       end
 
+      Apply_property_hook = -> mprop, recv_parse_ctx_p do
+
+        mprop.add_to_write_proc_chain do
+          -> do
+            _ctx = Parse_Context____.new @__methodic_actor_iambic_stream__
+            _recv_prop = recv_parse_ctx_p[ _ctx ]
+            _recv_prop[ self ]
+          end
+        end
+
+        KEEP_PARSING_
+      end
+
+      Parse_Context____ = ::Struct.new :upstream
+
       module Evented_Property_Common_Instance_Methods__
 
         def receive_bad_enum_value x, name_i, enum_box
