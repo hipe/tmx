@@ -10,7 +10,7 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__::
 
   Brazen_ = Brazen_ ; Subject_ = Subject_
 
-  describe "[br] properties stack common frame - integrate with pstack" do
+  describe "[br] properties stack common frame - integrate with pstack", wip: true do
 
     before :all do
 

@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity meta-properties examples: required fields" do
+  describe "[br] entity meta-properties examples: required fields", wip: true do
 
     context "didactic" do
 

@@ -2,59 +2,7 @@ module Skylab::Brazen
 
   module Entity
 
-    class Meta_Property__
-
-        def initialize scanner
-          @scanner = scanner
-          @entity_class_hook_p = @entity_class_hook_once_p =
-            @property_hook_p = nil
-          @has_default_x = false
-          @name_i = iambic_property
-          @as_ivar = :"@#{ @name_i }"
-          @iambic_writer_method_name = :"#{ @name_i }="
-          process_iambic_passively
-          @last_iambic_idx = @scanner.current_index
-          @scanner = nil
-          freeze
-        end
-
-        attr_reader :as_ivar, :iambic_writer_method_name, :name_i,
-          :has_default_x, :default_x,
-          :enum_box
-
-        def apply_to_property_class pc
-          Scope_Kernel__.new( pc, pc.singleton_class ).accept_property self
-          aply_iambic_writers_to_property_class pc
-          @has_default_x and aply_defaulting_behavior_to_property_class pc
-          @entity_class_hook_p and pc.hook_shell_for_write.add_hook(
-            :each, @name_i, @entity_class_hook_p )
-          @entity_class_hook_once_p and pc.hook_shell_for_write.add_hook(
-            :once, @name_i, @entity_class_hook_once_p )
-          @property_hook_p and pc.hook_shell_for_write.add_hook(
-            :prop, @name_i, @property_hook_p )
-          nil
-        end
-
-        class << self
-          def hook_shell
-          end
-        end
-
-      private
-
-        def aply_iambic_writers_to_property_class pc
-          enum = enum_box
-          pc.send :attr_reader, @name_i
-          if enum
-            when_enum_box pc, enum
-          else
-            _IVAR = @as_ivar
-            pc.send :define_method, @iambic_writer_method_name do
-              instance_variable_set _IVAR, iambic_property
-            end
-          end
-          nil
-        end
+    module Meta_Property__
 
         def when_enum_box pc, _ENUM_BOX
           pc.include Meta_Prop_IMs__
@@ -79,8 +27,6 @@ module Skylab::Brazen
             end
           end
         end
-
-        Entity[ self, -> do
 
           def default
             @has_default_x = true
@@ -107,9 +53,6 @@ module Skylab::Brazen
           def property_hook
             @property_hook_p = iambic_property
           end
-
-        end ]
-        include Via_Scanner_Iambic_Methods_
 
 
       module Meta_Prop_IMs__
@@ -189,89 +132,6 @@ module Skylab::Brazen
         end
       end
 
-      class Client_Kernel  # long-running, stays with module, stateless
-        def initialize mod
-          @reader = mod
-        end
-
-        def property_class_for_write_impl
-          if @reader.property_scope_krnl.has_nonzero_length_iambic_queue
-            @reader.property_scope_krnl.flush_iambic_queue
-          end
-          property_cls_for_wrt
-        end
-
-        def set_property_class x
-          @reader.const_set :PROPERTY_CLASS__, x ; nil
-        end
-
-        def property_cls_for_wrt
-          @reader.module_exec do
-            if const_defined? :PROPERTY_CLASS__, false
-              const_get :PROPERTY_CLASS__, false
-            else
-              cls = ::Class.new const_get( :PROPERTY_CLASS__, true )
-              const_set :Property, cls
-              const_set :PROPERTY_CLASS__, cls
-            end
-          end
-        end
-      end
-
-      class Mprop_Scanner
-
-        include Via_Scanner_Iambic_Methods_
-
-        def initialize scope_kernel
-          @scope_kernel = scope_kernel
-        end
-
-        def scan_some_DSL
-          pcls = @scope_kernel.reader::PROPERTY_CLASS__
-          @scanner = @scope_kernel.scanner
-          ok = true
-          pcls.new do |prop|
-            ok = this_child_must_iambicly_scan_something prop
-            ok &&= when_this_child_scanned_something prop
-          end
-          ok && @scope_kernel.finish_property
-        end
-
-      private
-
-        def this_child_must_iambicly_scan_something o
-          o.set_stream @scanner
-          d = @scanner.current_index
-          o.process_iambic_passively
-          if d == @scanner.current_index
-            when_child_did_not_scan_something
-          else
-            o.set_stream nil
-            ACHIEVED_
-          end
-        end
-
-        def when_child_did_not_scan_something
-          maybe_receive_event :error, :extra_iambic do
-            via_current_token_build_extra_iambic_event
-          end
-        end
-
-        def when_this_child_scanned_something o
-          @scope_kernel.prop = o
-          if unparsed_iambic_exists
-            ok = iambic_keyword :property
-            ok and @scope_kernel.flush_because_prop_i @scanner.gets_one
-          else
-            plan = @scope_kernel.plan
-            if plan && plan.meth_i
-              @scope_kernel.flush_bc_meth
-            else
-              when_no_def
-            end
-          end
-        end
-
         def when_no_def
           maybe_receive_event :error, :expected_method_definition do
             bld_expected_method_definition_event
@@ -316,7 +176,6 @@ module Skylab::Brazen
         def maybe_receive_event *, & ev_p
           raise ev_p[].to_exception
         end
-      end
 
       # ~ entity class hooks
 
@@ -377,6 +236,7 @@ module Skylab::Brazen
       end
 
       Hook__ = ::Struct.new :variety_i, :p
+
 
     end
   end

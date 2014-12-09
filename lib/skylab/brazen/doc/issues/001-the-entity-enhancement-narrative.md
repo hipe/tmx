@@ -30,6 +30,66 @@ those of its successors that became upstream dependees is:
 
 
 
+
+## explorations on re-use across modules :#note-065
+
+this was distilled from the following pattern: we have an object that if
+used for the purposes of reading (that is, the constituency of the object
+itself will not mutate), the object can be accessed in an inherited way:
+the different modules in a module graph may all access the same object,
+and do not need (nor should not have) their own deep copies.
+
+
+
+
+## experimental extension to the "simple" iambic parsing  (:#note-085)
+
+
+### re-introduction to the upstream library
+
+the simplest iambic parsing mechanism we have yet come up with to allow
+for writing arbitrary methods to parse arbitrary symbols is this: at
+parse time we check for a `private` instance method whose name is the
+concatenation of the current symbol name and `=`.
+
+we use this pattern because typically such methods are never otherwise
+created: because there is no unawkward way to call a private method
+that ends in `=`, if we find one we assume it is in the employement of
+this algorithm.
+
+as well no such protected or public instance methods exist in ::Object
+(that is, method whose name ends in `=`); so if you don't add any
+yourself, this whole namespace is wide open to your business symbols.
+
+(but we add the private requirement just as an extra added sanity check
+on top of this, and perhaps for those occasions when we may want to use
+a `=` method in the typical way but at the cost of reducing our business
+symbol namespace. but don't do this.)
+
+this mechanism we just described is what is employed by [#cb-058]
+"methodic actors" which is the upstream library of the subject.
+
+
+
+### introduction to our extension
+
+for this extension here, rather than checking for the existence of
+private methods that end in `=` at parse time, we cache these name
+mappings at code file load time, which a) will perhaps speed things up
+for certain of our parsing use-cases and b) allow us to edit this cache
+itself to reduce or modify syntax from that which is defined by those
+"magic methods" that are private and end in `=`.
+
+to do this the syntax must reside in classes and not just (as with
+upstream library) modules, because from the instance methods, the
+memoization container must be reachable, which in this case is the ivar
+namespace of the class. this is why we have decided to keep this
+extension out of the upstream library, because all of this, although
+more efficient, is decidedly no longer simple.
+
+
+
+
 ## on parsing (new for the second edition)  (#note-115)
 
 we build a queue of nonterminal parsers each of whose children will be
@@ -38,7 +98,8 @@ state.
 
 any ad-hoc parsers node will go first in this queue, giving ad-hoc
 parsers the ability to override any other syntax that comes from us
-out-of-the-box or otherwise further down on the queue.
+out-of-the-box or otherwise further down on the queue (but only as long
+as we are in an ad-hoc 'section' of the parse).
 
 we then place the property-related nonterminal, giving *it* the ability
 (with the metaproperties etc of the property class) to override the
@@ -48,16 +109,6 @@ then finally we place the edit session itself as a nonterminal parser in
 this queue which will catch the limited number of symbols that we parse
 out of the box.
 
-
-
-
-## explorations on re-use across modules :#note-320
-
-this was distilled from the following pattern: we have an object that if
-used for the purposes of reading (that is, the constituency of the object
-itself will not mutate), the object can be accessed in an inherited way:
-the different modules in a module graph may all access the same object,
-and do not need (nor should not have) their own deep copies.
 
 
 

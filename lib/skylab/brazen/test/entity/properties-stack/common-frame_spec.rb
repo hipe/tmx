@@ -2,7 +2,7 @@ require_relative 'common-frame/test-support'
 
 module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__
 
-  describe "[br] entity properties stack common frame" do
+  describe "[br] entity properties stack common frame", wip: true do
 
     it "loads." do
 

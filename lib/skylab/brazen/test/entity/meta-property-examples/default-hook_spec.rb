@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity meta-properties examples: default.." do
+  describe "[br] entity meta-properties examples: default..", wip: true do
 
     context "..has lots of moving parts actually" do
 

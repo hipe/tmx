@@ -192,8 +192,8 @@ module Skylab::Callback
 
         class << self
 
-          def via_iambic_stream stream
-            name_was_reached = nil
+          def via_iambic_stream stream, & oes_p  # :+public-API  #hook-in
+            name_was_reached = false
             x = new do
               @name = nil
               process_iambic_stream_passively stream
@@ -201,17 +201,26 @@ module Skylab::Callback
             end
             if name_was_reached
               x
+            elsif oes_p
+              oes_p.call :no_name do
+                x
+              end
             else
-              _ev = Stranger_[
-                ( stream.unparsed_exists && stream.current_token ),
-                [ :property ] ]
-              raise _ev.to_exception  # for now
+              raise bld_parse_fail_event( stream ).to_exception
             end
+          end
+
+        private
+
+          def bld_parse_fail_event stream
+            Stranger_[
+              ( stream.unparsed_exists && stream.current_token ),
+              [ :property ] ]
           end
         end
 
         def initialize & edit_p
-          @iambic_writer_method_proc_is_generated = true
+          @iambic_writer_method_proc_is_generated = true  # :+#public-API (name)
           @parameter_arity = :zero_or_one
           instance_exec( & edit_p )
           @argument_arity ||= :one

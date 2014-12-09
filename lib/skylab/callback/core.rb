@@ -472,6 +472,10 @@ module Skylab::Callback
       @d
     end
 
+    def current_index= d  # assume is valid index
+      @d = d
+    end
+
     def advance_one
       @d += 1 ; nil
     end

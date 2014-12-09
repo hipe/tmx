@@ -4,15 +4,36 @@ module Skylab::Brazen::TestSupport::Entity
 
   describe "[br] entity meta-properties" do
 
+    it "(sneak ahead to an essential case)" do
+
+        class MP_Sneak
+          Subject_[].call self do
+            o :argument_arity, :zero, :meta_property, :requored,
+              :requored, :property, :wazoozle,
+              :property, :foozle
+          end
+        end
+
+        _a = MP_Sneak.properties.reduce_by do |prop|
+          prop.requored
+        end.to_a
+
+        _a.length.should eql 1
+        prop = _a.first
+        prop.name_i.should eql :wazoozle
+    end
+
     context "create arbitrary meta-properties and use them in the properties" do
 
       before :all do
 
         class MP_Foo
-          Subject_[][ self, -> do
+          Subject_[].call self do
             o :meta_property, :fun_ness
             o :fun_ness, :really_fun, :property, :foo
-          end ]
+          end
+
+          define_singleton_method :with, WITH_MODULE_METHOD_
         end
       end
 
@@ -30,13 +51,15 @@ module Skylab::Brazen::TestSupport::Entity
       before :all do
 
         class MP_Bar
-          Subject_[][ self, -> do
+          Subject_[].call self do
             o :meta_property, :fun_ness
             o :fun_ness, :really_fun
             def foo
               @foo = iambic_property
             end
-          end ]
+          end
+
+          define_singleton_method :with, WITH_MODULE_METHOD_
         end
       end
 
@@ -50,7 +73,7 @@ module Skylab::Brazen::TestSupport::Entity
     end
 
     def expect_works_as_property cls
-      foo = cls.new.send :with, :foo, :bar
+      foo = cls.with :foo, :bar
       foo.instance_variable_get( :@foo ).should eql :bar
     end
 

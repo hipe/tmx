@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity meta-meta-properties: property hook" do
+  describe "[br] entity meta-meta-properties: property hook", wip: true do
 
     context "happens when property is build before it is frozen." do
 
@@ -29,7 +29,7 @@ module Skylab::Brazen::TestSupport::Entity
         end
       end
 
-      it "ok", f:true do
+      it "ok" do
         hi, hey = MMPH_Business_Widget.properties.each_value.to_a
         hi.wants_to_know.should eql true
         hey.wants_to_know.should eql nil

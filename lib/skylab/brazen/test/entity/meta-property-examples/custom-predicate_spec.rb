@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity meta-properties examples: customizing the.." do
+  describe "[br] entity meta-properties examples: customizing the..", wip: true do
 
     context "..property class w/ a boolean predicate & custom niladic writer" do
 

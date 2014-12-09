@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity meta-property errors" do
+  describe "[br] entity meta-property errors", wip: true do
 
     context "there are times when given the syntax you create" do
 

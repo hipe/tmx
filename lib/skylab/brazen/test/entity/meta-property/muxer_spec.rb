@@ -12,7 +12,7 @@ module Skylab::Brazen::TestSupport::Entity::Muxer__
     Entity_[]::Meta_Property__::Muxer
   end
 
-  describe "[br] entity muxer" do
+  describe "[br] entity muxer", wip: true do
 
     it "'notificate' with one class" do
       class One_Doodley_Hah

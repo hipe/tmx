@@ -84,6 +84,7 @@ module Skylab::Brazen::TestSupport::Entity
       end
 
       it "for now enforces that you use the suffix on every guy" do
+        _rx = /\bdid not have expected suffix '_derp': 'ferp'/
         -> do
         class FooI_Bad_Suffixer
           Subject_[].call self, :iambic_writer_method_name_suffix, :_derp do
@@ -91,8 +92,7 @@ module Skylab::Brazen::TestSupport::Entity
             end
           end
         end
-        end.should raise_error ::NameError,
-          /\bdid not have expected suffix '_derp': 'ferp'/
+        end.should raise_error ::NameError, _rx
       end
     end
 

@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity meta-meta-properties: enum" do
+  describe "[br] entity meta-meta-properties: enum", wip: true do
 
     context "a normative example is boring" do
 

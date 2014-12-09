@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity meta-properties examples: flag: we can" do
+  describe "[br] entity meta-properties examples: flag: we can", wip: true do
 
     context "associate with a metaproperty a hook that the property.." do
 

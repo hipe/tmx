@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Brazen::TestSupport::Entity
 
-  describe "[br] entity meta-meta-properties: entity class hook.." do
+  describe "[br] entity meta-meta-properties: entity class hook..", wip: true do
 
     context "lets you alter the entity class in arbitrary ways when.." do
 
