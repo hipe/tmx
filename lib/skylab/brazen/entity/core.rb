@@ -16,10 +16,6 @@ module Skylab::Brazen
         Brazen_::Event__
       end
 
-      def via_stream_iambic_methods
-        Via_Scanner_Iambic_Methods_
-      end
-
       def iambic_stream
         Callback_.iambic_stream
       end
@@ -49,10 +45,11 @@ module Skylab::Brazen
         if d.zero?
           Produce_extension_module__.new( & edit_p ).execute
         else
-          cls = x_a.fetch 0
+          st = Callback_::Iambic_Stream_.new 0, x_a
+          cls = st.gets_one
           cls.extend Module_Methods__
           cls.entity_edit_sess do |sess|
-            sess.receive_edit x_a[ 1 .. -1 ], & edit_p
+            sess.receive_edit st, & edit_p
           end
         end
       end
@@ -246,9 +243,9 @@ module Skylab::Brazen
 
     class Parse_Context__
 
-      def initialize x_a, edit_session
+      def initialize upstream, edit_session
         @edit_session = edit_session
-        @upstream = Callback_::Iambic_Stream_.new 0, x_a
+        @upstream = upstream
       end
 
       attr_reader :edit_session, :upstream
@@ -289,6 +286,8 @@ module Skylab::Brazen
 
         mod.const_set :Module_Methods, mod_  # :+#public-API (the name)
         mod.const_set :ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___, box
+        mod.instance_variable_set(
+          :@entity_formal_property_method_nms_bx_for_wrt, box )
 
         mod.include METHODIC_.iambic_processing_instance_methods
         init_edit_session_via_extended_client_module mod
@@ -335,13 +334,14 @@ module Skylab::Brazen
           Methodic_as_Nonterminal_[ self ] )
       end
 
+      attr_reader :iambic_writer_method_writee_module  # for e.g p.stack
+
       attr_reader :property_related_nonterminal  # hax only (covered)
 
-      def receive_edit x_a, & edit_p
+      def receive_edit st, & edit_p
         x = true
-        if x_a.length.nonzero?
-          pc = Parse_Context__.new x_a, self
-          st = pc.upstream
+        if st.unparsed_exists
+          pc = Parse_Context__.new st, self
           x = @nonterminal_queue.receive_parse_context pc
           if x && st.unparsed_exists
             x = when_after_process_iambic_fully_stream_has_content st
@@ -423,7 +423,7 @@ module Skylab::Brazen
         if prop.against_EC_p_a
           _ec = @iambic_writer_method_writee_module
           prop.against_EC_p_a.each do |p|
-            ok = _ec.class_exec( prop, & p )
+            ok = _ec.class_exec prop, & p
             ok or break
           end
         end
@@ -433,13 +433,12 @@ module Skylab::Brazen
       def acpt_prop prop
 
         if prop.do_define_method
-          befor = @pay_attention_to_method_added
-          @pay_attention_to_method_added = false
-          @iambic_writer_method_writee_module.send(
-            :define_method,
-            prop.iambic_writer_method_name,
-            prop.iambic_writer_method_proc )
-          @pay_attention_to_method_added = befor
+          while_ignoring_method_added do
+            @iambic_writer_method_writee_module.send(
+              :define_method,
+              prop.iambic_writer_method_name,
+              prop.iambic_writer_method_proc )
+          end
         end
 
         box = @writable_formal_propery_method_names_box
@@ -459,6 +458,14 @@ module Skylab::Brazen
         end
 
         ACHIEVED_
+      end
+
+      def while_ignoring_method_added
+        befor = @pay_attention_to_method_added
+        @pay_attention_to_method_added = false
+        x = yield
+        @pay_attention_to_method_added = befor
+        x
       end
 
     private
@@ -489,6 +496,10 @@ module Skylab::Brazen
         end.immutable_with_random_access_keyed_to_method :name_i
       end
 
+      def property_via_symbol i
+        send entity_formal_property_method_names_box_for_rd.fetch i
+      end
+
       def method_added m_i
         if active_entity_edit_session
           @active_entity_edit_session.receive_method_added_name m_i
@@ -515,7 +526,7 @@ module Skylab::Brazen
         :entity_formal_property_method_names_box_for_rd,
         :entity_formal_property_method_names_box_for_wrt,
         :ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___,
-        :@entity_formal_property_method_names_box_for_write ) do |o|
+        :@entity_formal_property_method_nms_bx_for_wrt ) do |o|
           o::ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___.dup
         end
 
@@ -536,7 +547,7 @@ module Skylab::Brazen
         else
           self._DO_ME
         end
-        sess.receive_edit x_a, & edit_p
+        sess.receive_edit Callback_::Iambic_Stream_.new( 0, x_a ), & edit_p
       end
 
       def during_entity_normalize & p
@@ -606,17 +617,17 @@ module Skylab::Brazen
 
       # Entity_Property = Property__ below
 
-      def initialize & p   # #experimental
+      def initialize & p  # #experimental
         instance_exec( & p )
       end
 
-      def any_property_value prop
+      def any_property_value_via_property prop
         if instance_variable_defined? prop.as_ivar
           instance_variable_get prop.as_ivar
         end
       end
 
-      def property_value prop
+      def property_value_via_property prop
         instance_variable_get prop.as_ivar
       end
 
@@ -743,7 +754,7 @@ module Skylab::Brazen
           prop = @property_class.new do
             @name = Callback_::Name.via_variegated_symbol st.gets_one
             @iambic_writer_method_proc_is_generated = true
-            @iwmn = bld_iambic_writer_method_name_from_name
+            @iwmn = via_name_build_internal_iambic_writer_meth_nm
             ok = normalize_property
           end
           ok &&= @edit_session.receive_prop prop
@@ -917,6 +928,13 @@ module Skylab::Brazen
         end
       end  # >>
 
+      def description_under expag
+        symbol = @name.as_variegated_symbol
+        expag.calculate do
+          code symbol
+        end
+      end
+
       def do_define_method
         @iambic_writer_method_proc_is_generated || @iambic_writer_method_proc_proc
       end
@@ -947,12 +965,8 @@ module Skylab::Brazen
 
       def property=
         x = super
-        @iwmn ||= bld_iambic_writer_method_name_from_name
+        @iwmn ||= via_name_build_internal_iambic_writer_meth_nm
         x
-      end
-
-      def bld_iambic_writer_method_name_from_name
-        :"___entity_#{ @name.as_variegated_symbol }_iambic_writer___"
       end
 
       def iambic_writer_method_proc_when_arity_is_one
@@ -969,6 +983,12 @@ module Skylab::Brazen
           _prop = self.class.send self.class.entity_formal_property_method_names_box_for_wrt.fetch _NAME_I
           receive_value_of_entity_property true, _prop  # RESULT VALUE
         end
+      end
+
+    public  # ~ lib internal
+
+      def via_name_build_internal_iambic_writer_meth_nm
+        :"___entity_#{ @name.as_variegated_symbol }_iambic_writer___"
       end
 
       class << self
@@ -1000,7 +1020,6 @@ module Skylab::Brazen
     end
 
     if false
-
     module Proprietor_Methods__
 
       def add_iambic_event_listener i, p
@@ -1020,6 +1039,7 @@ module Skylab::Brazen
       def build_property_scope_krnl
         Scope_Kernel__.new self, singleton_class
       end
+    end
     end
 
     class Method_Added_Muxer__  # from [mh] re-written
@@ -1067,6 +1087,7 @@ module Skylab::Brazen
       end
     end
 
+    if false
     if ! ::Object.private_method_defined? :notificate
       class ::Object
       private

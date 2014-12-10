@@ -22,8 +22,8 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Core
     it "the stack with one frame produces the values it has" do
       stack = Subject_[].new
       stack.push_frame_with :foo, :Foo, :bar, :Bar
-      stack.property_value( :foo ).should eql :Foo
-      stack.property_value( :bar ).should eql :Bar
+      stack.property_value_via_symbol( :foo ).should eql :Foo
+      stack.property_value_via_symbol( :bar ).should eql :Bar
     end
 
     it "the first frame determines what names the subsequent frames may have" do
@@ -52,16 +52,16 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Core
       stack.push_frame_with :b, :B2, :c, :c2
       stack.push_frame_with :c, :C3
 
-      stack.property_value( :a ).should eql :A1
-      stack.property_value( :b ).should eql :B2
-      stack.property_value( :c ).should eql :C3
+      stack.property_value_via_symbol( :a ).should eql :A1
+      stack.property_value_via_symbol( :b ).should eql :B2
+      stack.property_value_via_symbol( :c ).should eql :C3
     end
 
     it "strange value when event receiver produces the same event as earlier" do
       stack = Subject_[].new( & handle_event_selectively )
       stack.push_frame_with :a, :A1, :b, :B1
       stack.push_frame_with :b, :B2
-      x = stack.property_value :c
+      x = stack.property_value_via_symbol :c
       expect_not_OK_event :extra_properties do |ev|
         ev.name_i_a.should eql [ :c ]
       end

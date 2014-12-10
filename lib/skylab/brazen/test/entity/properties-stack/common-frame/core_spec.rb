@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__
 
-  describe "[br] Entity::Properties_Stack__::Common_Frame__", wip: true do
+  describe "[br] Entity::Properties_Stack__::Common_Frame__" do
     context "use its memoized and non-memoized procs and inline methods" do
       Sandbox_1 = Sandboxer.spawn
       it "like so" do
@@ -28,7 +28,7 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__
 
           # one chunk #until:[#ts-032]
 
-          foo = Foo.new
+          foo = Foo.new {}
           foo.foo.should eql( 1 )
           foo.foo.should eql( 2 )
           foo.bar.should eql( 1 )

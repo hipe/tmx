@@ -10,7 +10,7 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__::
 
   Brazen_ = Brazen_ ; Subject_ = Subject_
 
-  describe "[br] properties stack common frame - integrate with pstack", wip: true do
+  describe "[br] properties stack common frame - integrate with pstack" do
 
     before :all do
 
@@ -48,14 +48,14 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__::
     end
 
     it "ok" do
-      frame = Base_Frame.new
+      frame = Base_Frame.new {}
       stack = Brazen_.properties_stack.new
       stack.push_frame frame
       stack.push_frame_with :foo, :FOO
-      stack.property_value( :foo ).should eql :FOO
-      stack.property_value( :bar ).should eql 1
-      stack.property_value( :bar ).should eql 1
-      stack.property_value( :boffo ).should eql "Foo: 1"
+      stack.property_value_via_symbol( :foo ).should eql :FOO
+      stack.property_value_via_symbol( :bar ).should eql 1
+      stack.property_value_via_symbol( :bar ).should eql 1
+      stack.property_value_via_symbol( :boffo ).should eql "Foo: 1"
     end
   end
 end

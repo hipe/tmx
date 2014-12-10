@@ -10,7 +10,7 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__::
 
   Brazen_ = Brazen_ ; Subject_ = Subject_
 
-  describe "[br] properties stack common frame - integrate with entity", wip: true do
+  describe "[br] properties stack common frame - integrate with entity" do
 
     before :all do
 
@@ -21,9 +21,10 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__::
           :readable, :field, :foo,
           :required, :readable, :field, :bar
 
-        Brazen_::Entity.call self, -> do
+        Brazen_::Entity.call self do
           def biz
             @biz_x = iambic_property
+            true
           end
         end
 
@@ -39,10 +40,10 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__::
     end
 
     it "required fields still bork" do
+      _rx = /\Amissing required field - 'bar'/
       -> do
         Foo.new
-      end.should raise_error ::ArgumentError,
-        /\Amissing required field - 'bar'/
+      end.should raise_error ::ArgumentError, _rx
     end
 
     it "works with all" do

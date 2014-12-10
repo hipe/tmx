@@ -27,7 +27,7 @@ module Skylab::Brazen
       #
       #     # one chunk #until:[#ts-032]
       #
-      #     foo = Foo.new
+      #     foo = Foo.new {}
       #     foo.foo  # => 1
       #     foo.foo  # => 2
       #     foo.bar  # => 1
@@ -39,171 +39,201 @@ module Skylab::Brazen
       #     foo.baz.object_id  # => foo.baz.object_id
 
 
-      Common_Frame__ = Entity[ -> do
+      Common_Frame__ = Entity_.call do
 
-        class << self  # "LIB" only (this node only)
-          def call * a
-            via_arglist a
+        class << self
+
+          def via_arglist x_a
+            st = Callback_::Iambic_Stream_.new 0, x_a
+            client_cls = st.gets_one
+            self[ client_cls ]
+            client_cls.entity_edit_sess do |sess|
+              sess.receive_edit st  # on success result is client class
+            end  # result is same
+            nil
           end
         end
 
-        o :meta_property, :read_technique_i,
-
-          :enum, [ :method, :inline_method, :proc, :reader, :no_reader ],
-
-          :entity_class_hook, -> prop, cls do
-            prop.write_to_reader cls
+        o :ad_hoc_processor, :globbing, -> pc do
+            Properties_Stack__::Define_process_method_.new( pc ).execute
           end,
 
-        :meta_property, :is_memoized,
+          :ad_hoc_processor, :processor, -> pc do
+            Properties_Stack__::Define_process_method_.new( pc ).execute
+          end
 
-        :meta_property, :external_read_proc
+        entity_property_class_for_write
 
-        property_class_for_write  # flush the above so we get the below
+      end  # end the edit sesson of the extension module
 
-        class self::Property
+      module Common_Frame__  # open it with lexical scope and no edit session
 
-          def initialize( * )
-            @reader_p_a = @read_technique_i = nil
+        def any_all_names
+          all_names
+        end
+
+        def members  # :+[#br-061]
+          all_names
+        end
+
+        def all_names
+          self.class.entity_formal_property_method_names_box_for_rd.get_names
+        end
+
+        def any_proprietor_of i
+          if self.class.entity_formal_property_method_names_box_for_rd.has_name i
+            self
+          end
+        end
+
+        def property_value_via_symbol name_i
+          prop = self.class.property_via_symbol name_i
+          p = prop.external_read_proc
+          if p
+            p[ self, prop ]
+          else
+            prp_val_when_property_not_readable prop
+          end
+        end
+
+      private
+
+        def prp_val_when_property_not_readable prop
+          maybe_send_event :error, :property_is_not_readable do
+            build_not_OK_event_with :property_is_not_readable, :property, prop
+          end
+        end
+
+        def set_val_of_property x, prop
+          instance_variable_set prop.as_ivar, x
+          ACHIEVED_
+        end
+
+        def maybe_send_event *, & ev_p  # here for now..
+          raise ev_p[].to_exception
+        end
+
+        class Entity_Property
+
+          def initialize
+            @is_memoized = false
+            @reader_classification = nil
             super
-          end
-
-          def freeze
-            if ! @read_technique_i  # e.g in conjunction w/ pure Entity extension
-              @read_technique_i = :no_reader
-            end
-            execute
-            @reader_p_a and @reader_p_a.freeze
-            super
-          end
-
-          o do
-
-            o :iambic_writer_method_name_suffix, :'='
-
-            def memoized=
-              @is_memoized = true
-            end
-
-            def method=
-              @read_technique_i = :method
-              @scanner.puts_with :property
-            end
-
-            def inline_method=
-              name_i = iambic_property
-              @literal_proc = iambic_property
-              @read_technique_i = :inline_method
-              @scanner.puts_with :property, name_i
-            end
-
-            def proc=
-              name_i = iambic_property
-              @literal_proc = iambic_property
-              @read_technique_i = :proc
-              @scanner.puts_with :property, name_i
-            end
-          end
-
-          def execute
-            send :"when_read_technique_is_#{ @read_technique_i }"
-          end
-
-          # ~ proc
-
-          def when_read_technique_is_proc
-            _METH_I_ = @name.as_variegated_symbol
-            _MONADIC_P_ = if is_memoized
-              Callback_.memoize @literal_proc
-            else
-              @literal_proc
-            end
-            reader_p_a.push( -> cls do
-              cls.send :define_method, _METH_I_, _MONADIC_P_
-            end )
-            init_external_read_proc_to_use_eponymous_method
-          end
-
-          # ~ inline method
-
-          def when_read_technique_is_inline_method
-            if is_memoized
-              when_read_technique_is_memoized_inline_method
-            else
-              when_read_technique_is_non_memoized_inline_method
-            end
-          end
-
-          def when_read_technique_is_non_memoized_inline_method
-            _METH_I_ = @name.as_variegated_symbol
-            reader_p_a.push( -> cls do
-              cls.send :define_method, _METH_I_, @literal_proc
-            end )
-            init_external_read_proc_to_use_eponymous_method
-          end
-
-          def when_read_technique_is_memoized_inline_method  # (was: [#062] "i just blue myself")
-            _METH_I = :"__NON_MEMOIZED_#{ @name.as_variegated_symbol }"
-            _METH_I_ = @name.as_variegated_symbol
-            _IVAR = :"@use_memoized_#{ @name.as_variegated_symbol }"
-            _IVAR_ = @name.as_ivar
-            _METH_P = -> do
-              if instance_variable_defined?( _IVAR ) and instance_variable_get( _IVAR )
-                instance_variable_get _IVAR_
-              else
-                instance_variable_set _IVAR, true
-                instance_variable_set _IVAR_, send( _METH_I )
-              end
-            end
-            reader_p_a.push( -> cls do
-              cls.send :define_method, _METH_I, @literal_proc
-              cls.send :define_method, _METH_I_, _METH_P
-            end )
-            init_external_read_proc_to_use_eponymous_method
-          end
-
-          # ~ method
-
-          def when_read_technique_is_method
-            if is_memoized
-              raise ::ArgumentError, say_no_memo_meth
-            else
-              init_external_read_proc_to_use_eponymous_method ; nil
-            end
-          end
-
-          def say_no_memo_meth
-            "pre-existing methods cannot be memoized - won't overwrite #{
-             }original mehtod and won't allow original method and reader #{
-              }proc to have different behavior."
-          end
-
-        # ~ support
-
-          def write_to_reader cls
-            if @reader_p_a
-              cls.ignore_added_methods do
-                @reader_p_a.each do |p|
-                  p[ cls ]
-                end
-              end
-            end ; nil
           end
 
         private
 
-          def init_external_read_proc_to_use_eponymous_method
-            _METH_I = @name.as_variegated_symbol
-            @external_read_proc = -> entity do
-              entity.__send__ _METH_I
-            end ; nil
+          def field=
+            if @reader_classification.nil?
+              @reader_classification = :no_reader
+            end
+            read_name
           end
 
-          def reader_p_a
-            @reader_p_a ||= []
+          def inline_method=
+            @reader_classification = :inline_method
+            read_name
+            @literal_proc = iambic_property
+            STOP_PARSING_
           end
-        end
-      end ]
+
+          def memoized=
+            @is_memoized = true
+            KEEP_PARSING_
+          end
+
+          def method=
+            @reader_classification = :method
+            read_name
+          end
+
+          def proc=
+            @reader_classification = :proc
+            read_name
+            @literal_proc = iambic_property
+            STOP_PARSING_
+          end
+
+          def readable=
+            @reader_classification = :reader
+            KEEP_PARSING_
+          end
+
+          def read_name
+            @name = Callback_::Name.via_variegated_symbol iambic_property
+            STOP_PARSING_
+          end
+
+          def required=
+            @parameter_arity = :one
+            @did_hack_for_required_check ||= begin
+              during_apply do
+                include When_Parameter_Arity_Of_One_Instance_Methods__
+                p_a = normz_for_wrt
+                p = Missing_required_check_do_this_once__
+                if ! p_a.include? p
+                  define_singleton_method :reqrd_prop_a, REQUIRED_PROP_METHOD__
+                  p_a.push p
+                end
+                KEEP_PARSING_
+              end
+            end
+            KEEP_PARSING_
+          end
+
+          def normalize_property
+            if @reader_classification
+              _ok = READER_TECHNIQUE__.fetch( @reader_classification )[ self ]
+              _ok and super
+            else
+              super
+            end
+          end
+
+        public  # ~ internal
+
+          attr_reader :against_EC_p_a  # #hook-over
+
+          def during_apply & p
+            ( @against_EC_p_a ||= [] ).push p ; nil
+          end
+
+          def set_argument_arity x
+            @argument_arity = x ; nil
+          end
+
+          attr_reader :external_read_proc
+
+          def external_read & p
+            @external_read_proc = p ; nil
+          end
+
+          def set_iambic_writer_method_name x
+            @iwmn = x ; nil
+          end
+
+          def set_iambic_writer_method_proc_is_generated x
+            @iambic_writer_method_proc_is_generated = x ; nil
+          end
+
+          def set_iambic_writer_method_proc_proc x
+            @iambic_writer_method_proc_proc = x ; nil
+          end
+
+          def set_internal_read_proc & p
+            @internal_read_proc = p ; nil
+          end
+
+          attr_reader :internal_read_proc
+
+          attr_reader :is_memoized
+
+          attr_reader :literal_proc
+
+          attr_reader :reader_classification
+
+        end  # end of the properry class
+
 
     # [ `required` ] `field`s -
     #
@@ -231,178 +261,222 @@ module Skylab::Brazen
     #     Foo.new( :foo, :x, :bar, nil ).bar  # => nil
     #
 
-      module Common_Frame__
+        Common_Methods__ = ::Module.new
 
-        Brazen_.event.selective_builder_sender_receiver self
+        READER_TECHNIQUE__ = {}
 
-        def any_all_names
-          all_names
-        end
+        # ~ inline method
 
-        def members  # :+[#br-061]
-          all_names
-        end
+        module Read_via_Inline_Method__ extend Common_Methods__
 
-        def all_names
-          self.class.properties.get_names
-        end
+          READER_TECHNIQUE__[ :inline_method ] = self
 
-        def any_proprietor_of i
-          if self.class.properties.has_name i
-            self
-          end
-        end
+          class << self
 
-        def property_value name_i
-          prop = self.class.properties.fetch name_i
-          p = prop.external_read_proc
-          if p
-            p[ self ]
-          else
-            property_value_when_prop_not_readable prop
-          end
-        end
-
-        attr_reader :on_event_selectively  # avoid a warning
-
-      private
-
-        def val_via_prop prop
-          p = prop.external_read_proc
-          if p
-            p[ self ]
-          else
-            prop.internal_read_proc[ self ]
-          end
-        end
-
-        def property_value_when_prop_not_readable prop
-          maybe_send_event :error, :property_is_not_readable do
-            build_not_OK_event_with :property_is_not_readable, :property, prop
-          end
-        end
-
-        def produce_handle_event_selectively_via_channel
-          if on_event_selectively
-            super
-          else
-            -> i_a, & ev_p do
-              raise ev_p[].to_exception
-            end
-          end
-        end
-      end
-
-      module Common_Frame__
-
-        Entity[ self, -> do
-
-          o :meta_property, :parameter_arity,
-
-            :enum, [ :zero_or_one, :one ],
-
-            :default, :zero_or_one,
-
-            :entity_class_hook, -> prop, cls do
-              if :one == prop.parameter_arity
-                cls.include When_Parameter_Arity_Of_One_Instance_Methods__  # might occur multiple times
+            def [] prop
+              common_setup prop
+              if prop.is_memoized
+                when_memoized prop
+              else
+                when_not_memoized prop
               end
-            end,
-
-          :ad_hoc_processor, :globbing, -> scan do
-            Processor__.via_scan scan
-          end,
-
-          :ad_hoc_processor, :processor, -> scan do
-            Processor__.via_scan scan
-          end,
-
-          :ad_hoc_processor, :actoresque, -> scan do
-            Actoresque__[ scan ]
-          end
-
-        end ]
-
-        class self::Property
-
-          o do
-
-            o :iambic_writer_method_name_suffix, :'='
-
-            def readable=
-              @read_technique_i = :reader
             end
 
-            def required=
-              @parameter_arity = :one
-            end
-
-            def field=
-              if @read_technique_i.nil?
-                @read_technique_i = :no_reader
+            def when_not_memoized prop
+              Read_via_Method_.write_external_read_proc prop
+              prop.during_apply do | prop_ |
+                @active_entity_edit_session.while_ignoring_method_added do
+                  define_method prop_.name_i, prop_.literal_proc ; nil
+                end
+                ACHIEVED_
               end
-              @scanner.puts_with :property
+              ACHIEVED_
             end
-          end
 
-          attr_reader :internal_read_proc
-
-          def is_required
-            :one == @parameter_arity
-          end
-
-          def when_read_technique_is_reader
-            _PROP_ = self
-            _METH_P = -> do
-              field_value_via_property _PROP_
+            def when_memoized prop  # (was: [#062] "i just blue myself")
+              _METH_I_ = prop.name_i
+              _METHOD_NAME = :"__NON_MEMOIZED_#{ _METH_I_ }"
+              _IVAR = :"@use_memoized_#{ _METH_I_  }"
+              _IVAR_ = prop.as_ivar
+              _METH_P = -> do
+                if instance_variable_defined?( _IVAR ) and instance_variable_get( _IVAR )
+                  instance_variable_get _IVAR_
+                else
+                  instance_variable_set _IVAR, true
+                  instance_variable_set _IVAR_, send( _METHOD_NAME )
+                end
+              end
+              prop.during_apply do | prop_ |
+                @active_entity_edit_session.while_ignoring_method_added do
+                  define_method _METHOD_NAME, prop_.literal_proc
+                  define_method _METH_I_, _METH_P
+                end
+                ACHIEVED_
+              end
+              Read_via_Method_.write_external_read_proc prop
             end
-            _METH_I = @name.as_variegated_symbol
-            reader_p_a.push( -> cls do
-              cls.send :define_method, _METH_I, _METH_P
-            end )
-            init_external_read_proc_to_use_eponymous_method
-          end
-
-          def when_read_technique_is_no_reader
-            @internal_read_proc = -> entity do
-              entity.field_value_via_property self
-            end ; nil
           end
         end
 
-        def field_value_via_property prop
-          if instance_variable_defined? prop.as_ivar
-            instance_variable_get prop.as_ivar
+        # ~ method
+
+        module Read_via_Method_ extend Common_Methods__
+
+          READER_TECHNIQUE__[ :method ] = self
+
+          class << self
+
+            def [] prop
+              common_setup prop
+              if prop.is_memoized
+                raise ::ArgumentError, say_no_memo_meth
+              else
+                write_external_read_proc prop
+                ACHIEVED_
+              end
+            end
+
+            def say_no_memo_meth
+              "pre-existing methods cannot be memoized - won't overwrite #{
+               }original mehtod and won't allow original method and reader #{
+                }proc to have different behavior."
+            end
+
+            def write_external_read_proc prop
+              _READ_METHOD_NAME = prop.name_i
+              prop.external_read do | entity |
+                entity.__send__ _READ_METHOD_NAME
+              end
+              ACHIEVED_
+            end
           end
         end
 
-      private
+        # ~ proc
 
-        def normalize_and_validate x
-          x
+        READER_TECHNIQUE__[ :proc ] = -> _PROP do
+
+          COMMON_SETUP_[ _PROP ]
+
+          _MONADIC_P_ = if _PROP.is_memoized
+            Callback_.memoize _PROP.literal_proc
+          else
+            _PROP.literal_proc
+          end
+
+          _PROP.during_apply do
+            @active_entity_edit_session.while_ignoring_method_added do
+              define_method _PROP.name_i, _MONADIC_P_
+            end
+            ACHIEVED_
+          end
+
+          Read_via_Method_.write_external_read_proc _PROP
+        end
+
+        # ~ [no] reader
+
+        READER_TECHNIQUE__[ :reader ] = -> prop do
+
+          COMMON_SETUP_[ prop ]
+
+          _WRITER_METHOD_NAME = prop.via_name_build_internal_iambic_writer_meth_nm
+
+          prop.during_apply do | prop_ |
+
+            @active_entity_edit_session.while_ignoring_method_added do
+
+              define_method prop_.name_i do
+                any_property_value_via_property prop_
+              end
+
+              define_method _WRITER_METHOD_NAME do
+                set_val_of_property iambic_property, prop_
+              end
+
+            end
+            ACHIEVED_
+          end
+
+          prop.set_iambic_writer_method_name _WRITER_METHOD_NAME
+
+          Read_via_Method_.write_external_read_proc prop
+        end
+
+        READER_TECHNIQUE__[ :no_reader ] = -> prop do
+          COMMON_SETUP_[ prop ]
+          prop.set_internal_read_proc do | entity, prop_ |
+            entity.any_property_value_via_property prop_
+          end
+
+          _WRITER_METHOD_NAME = prop.via_name_build_internal_iambic_writer_meth_nm
+
+          prop.during_apply do | prop_ |
+
+            @active_entity_edit_session.while_ignoring_method_added do
+
+              define_method _WRITER_METHOD_NAME do
+                set_val_of_property iambic_property, prop_
+              end
+            end
+          end
+
+          prop.set_iambic_writer_method_name _WRITER_METHOD_NAME
+
+          ACHIEVED_
+        end
+
+        # ~ support
+
+        COMMON_SETUP_ = -> prop do
+          prop.set_argument_arity :_not_applicable_
+          prop.set_iambic_writer_method_proc_is_generated false
+          prop.set_iambic_writer_method_proc_proc nil
+          nil
+        end
+
+        module Common_Methods__
+          define_method :common_setup, COMMON_SETUP_
+        end
+
+        Missing_required_check_do_this_once__ = -> entity do
+          _prop_a = entity.class.reqrd_prop_a
+          miss_a = _prop_a.reduce nil do | m, prop |
+            x = entity.val_via_prop prop
+            if x.nil?
+              ( m ||= [] ).push prop
+            end
+            m
+          end
+          if miss_a
+            entity.receive_missing_required_props miss_a
+          else
+            KEEP_PARSING_
+          end
+        end
+
+        REQUIRED_PROP_METHOD__ = -> do
+          @reqd_prop_a ||= properties.reduce_by( & :is_required ).to_a.freeze
         end
 
         module When_Parameter_Arity_Of_One_Instance_Methods__
 
-          def normalize_and_validate x
-
-            miss_prop_a = self.class.properties.reduce_by do |prop|
-              prop.is_required or next
-              val_via_prop( prop ).nil?
-            end.to_a
-
-            if miss_prop_a.length.zero?
-              super
+          def val_via_prop prop
+            p = prop.external_read_proc
+            if p
+              p[ self, prop ]
             else
-              normalize_and_validate_when_missing_requireds miss_prop_a, x
+              prop.internal_read_proc[ self, prop ]
             end
           end
 
-          def normalize_and_validate_when_missing_requireds miss_prop_a, x
+          def receive_missing_required_props miss_prop_a
             maybe_send_event :error, :missing_required_properties do
               bld_missing_required_properties_event miss_prop_a
             end
           end
+
+        private
 
           def bld_missing_required_properties_event miss_prop_a
             build_not_OK_event_with :missing_required_properties,
@@ -420,100 +494,9 @@ module Skylab::Brazen
               y << "missing required field#{ s s_a } - #{ _x }"
             end
           end
-        end
 
-        class Actoresque__
-
-          Callback_::Actor[ self, :properties, :scan ]
-
-          def execute
-
-            @reader = @scan.reader
-
-            @reader.send :define_singleton_method, :[] do | * x_a |
-              new( x_a ).execute  # is `funcy_globless`
-            end
-
-            scanner = @scan.scanner
-            scanner.advance_one
-            scanner.puts_with :processor, :initialize
-
-          end
-        end
-
-        class Processor__  # rewrite of [#mh-060]
-
-          class << self
-
-            def via_scan scan
-              new( scan ).execute
-            end
-          end
-
-          Entity[ self, -> do
-
-            def globbing
-              @is_globbing = true
-            end
-
-            def processor
-              @is_complete = true
-              @method_i = iambic_property
-            end
-          end ]
-
-          include Entity.via_stream_iambic_methods
-
-          def initialize scan
-            @reader = scan.reader
-            @scanner = scan.scanner
-            @is_complete = false
-            @is_globbing = false
-          end
-
-          def execute
-            process_iambic_passively
-            if @is_complete
-              via_reader_write
-            else
-              when_not_complete
-            end
-          end
-
-          def when_not_complete
-            raise ::ArgumentError, say_incomplete
-          end
-
-          def say_incomplete
-            if unparsed_iambic_exists
-              i = current_iambic_token
-              if i.respond_to? :id2name
-                context_s = " (near '#{ i }')"
-              end
-            end
-            "'processor' term is incomplete#{ context_s }"
-          end
-
-          def via_reader_write
-            if @is_globbing
-              @reader.send :define_method, @method_i do |*x_a|
-                @error_count ||= 0
-                x = process_iambic_fully x_a
-                if @error_count.zero?
-                  x = normalize_and_validate x
-                end
-                x
-              end
-            else
-              @reader.send :define_method, @method_i do |x_a|
-                @error_count ||= 0
-                x = process_iambic_fully x_a
-                if @error_count.zero?
-                  x = normalize_and_validate x
-                end
-                x
-              end
-            end
+          def build_not_OK_event_with * i_a, & msg_p
+            Entity_.event.inline_not_OK_via_mutable_iambic_and_message_proc i_a, msg_p
           end
         end
       end

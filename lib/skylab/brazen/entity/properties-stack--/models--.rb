@@ -47,7 +47,7 @@ module Skylab::Brazen
           end
         end
 
-        def property_value i
+        def property_value_via_symbol i
           @bx.fetch i
         end
       end
@@ -74,7 +74,7 @@ module Skylab::Brazen
           end
         end
 
-        def property_value i
+        def property_value_via_symbol i
           @h.fetch i
         end
       end
@@ -95,7 +95,7 @@ module Skylab::Brazen
           nil
         end
 
-        def property_value i
+        def property_value_via_symbol i
           raise ::KeyError
         end
       end

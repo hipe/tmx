@@ -14,7 +14,7 @@ module Skylab::Brazen::TestSupport::Entity
 
           during_entity_normalize do |ent|
             ent.class.properties_with_defaults.each do |prop|
-              x = ent.any_property_value prop
+              x = ent.any_property_value_via_property prop
               if x.nil?
                 _x = prop.defolt_proc[]
                 prop_ = prop.new do  # meh #grease

@@ -32,10 +32,10 @@ module Skylab::Brazen
       end
     end
 
-    def property_value i
+    def property_value_via_symbol i
       pptr = any_proprietor_of i
       if pptr
-        pptr.property_value i
+        pptr.property_value_via_symbol i
       else
         maybe_send_event :error, :extra_properties do
           bld_extra_properties_event [ i ]
