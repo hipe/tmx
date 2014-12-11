@@ -110,7 +110,7 @@ module Skylab::Brazen
 
     Build_extra_properties_event__ = -> name_i_a, did_you_mean_i_a=nil, lemma=nil, adj=nil do
 
-      Event_[].inline_with :extra_properties,
+      Brazen_.event.inline_with :extra_properties,
           :name_i_a, name_i_a,
           :did_you_mean_i_a, did_you_mean_i_a,
           :lemma, lemma,
@@ -139,7 +139,7 @@ module Skylab::Brazen
 
     Build_missing_required_properties_event__ = -> miss_a, lemma=nil, nv=nil do
 
-      Event_[].inline_with :missing_required_properties,
+      Brazen_.event.inline_with :missing_required_properties,
           :miss_a, miss_a,
           :lemma, lemma,
           :nv, nv,

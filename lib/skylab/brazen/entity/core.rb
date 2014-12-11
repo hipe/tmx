@@ -16,10 +16,6 @@ module Skylab::Brazen
         Brazen_::Event__
       end
 
-      def iambic_stream
-        Callback_.iambic_stream
-      end
-
       def method_added_muxer
         Method_Added_Muxer__
       end
@@ -47,6 +43,7 @@ module Skylab::Brazen
         else
           st = Callback_::Iambic_Stream_.new 0, x_a
           cls = st.gets_one
+          Callback_::Actor.methodic cls
           cls.extend Module_Methods__
           cls.entity_edit_sess do |sess|
             sess.receive_edit st, & edit_p
@@ -175,7 +172,7 @@ module Skylab::Brazen
       end
     end
 
-    class Adaptive_Nonterminal_Queue_
+    class Adaptive_Nonterminal_Queue_  # read #note-185
 
       def initialize * passive_parsers, & oes_p
         @on_event_selectively = oes_p
@@ -183,15 +180,6 @@ module Skylab::Brazen
       end
 
       def receive_parse_context pc
-
-        # if any input exists, step thru each of the children in our queue
-        # looking for any first child that consumes any input. if one such
-        # child is found (and there is still more input) repeat the search
-        # again from the first child in the queue. at any point, any child
-        # may stop the entire parse completely. our boolean result is only
-        # an indication of whether or not we ourselves wish to signal that
-        # the parse stop (true means stay) and not if any parsing occurred
-
         ok = true
         nonfront_matching_index = nil
         st = pc.upstream
@@ -209,12 +197,6 @@ module Skylab::Brazen
           end
           input_was_consumed or break
         end
-
-        # furthermore if a nonterminal consumed input and it was somewhere
-        # other than the front of the queue, reorder the queue so that the
-        # most recent winning non-terminal is always in front and the rest
-        # are still in the same order with respect to each other.
-
         nonfront_matching_index and reorder nonfront_matching_index
         ok
       end
@@ -307,7 +289,6 @@ module Skylab::Brazen
     class Class_Edit_Session__ < Module_Edit_Session__
 
       def initialize cls
-        Callback_::Actor.methodic cls
         init_edit_session_via_extended_client_module cls
         @formal_property_writee_module = cls.singleton_class
         @writable_formal_propery_method_names_box =
@@ -328,7 +309,7 @@ module Skylab::Brazen
         @pay_attention_to_method_added = true
         @property_related_nonterminal = mod::Entity_Property.nonterminal_for self
         @ad_hoc_nonterminal_queue = mod::ENTITY_AD_HOCS___
-        @nonterminal_queue = Adaptive_Nonterminal_Queue_.new(  # #note-115
+        @nonterminal_queue = Adaptive_Nonterminal_Queue_.new(  # #note-330
           * @ad_hoc_nonterminal_queue,
           @property_related_nonterminal,
           Methodic_as_Nonterminal_[ self ] )
@@ -468,6 +449,10 @@ module Skylab::Brazen
         x
       end
 
+      def ignore_methods_added
+        @pay_attention_to_method_added = false
+      end
+
     private
 
       def bld_method_added_without_suffix_event m_i, sfx
@@ -491,6 +476,10 @@ module Skylab::Brazen
     module Common_Module_Methods__
 
       def properties
+        @properties ||= bld_immutable_properties_stream_with_random_access
+      end
+
+      def bld_immutable_properties_stream_with_random_access
         entity_formal_property_method_names_box_for_rd.to_value_scan.map_by do |i|
           send i
         end.immutable_with_random_access_keyed_to_method :name_i
@@ -565,6 +554,19 @@ module Skylab::Brazen
 
       attr_accessor :active_entity_edit_session
 
+      def via_arglist a, & edit_p
+        st = Callback_::Iambic_Stream_.new 0, a
+        cls = st.gets_one
+        if st.unparsed_exists || edit_p
+          self[ cls ]
+          cls.entity_edit_sess do |sess|
+            sess.receive_edit st, & edit_p
+          end
+       else
+          self[ cls ]
+        end
+      end
+
       def call cls, & p
         self[ cls ]
         cls.entity_edit_sess do
@@ -576,6 +578,7 @@ module Skylab::Brazen
         if cls.const_defined? :ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___
           did_already = true
         else
+          Callback_::Actor.methodic cls
           cls.extend Module_Methods__
         end
         cls.extend self::Module_Methods
@@ -631,7 +634,25 @@ module Skylab::Brazen
         instance_variable_get prop.as_ivar
       end
 
+      def receive_value_of_entity_property x, prop
+        instance_variable_set prop.as_ivar, x
+        ACHIEVED_
+      end
+
     private
+
+      def bound_properties
+        @bp ||= Entity::Properties_Stack__::Bound_properties[
+          method( :get_bound_property_via_property ), self.class.properties ]
+      end
+
+      def get_bound_property_via_property prop
+        had = true
+        x = actual_property_box.fetch prop.name_i do
+          had = false ; nil
+        end
+        Brazen_::Lib_::Trio[].new x, had, prop
+      end
 
       def iambic_writer_method_name_passive_lookup_proc  # [cb] #hook-in
         bx = self.class.entity_formal_property_method_names_box_for_rd
@@ -653,11 +674,6 @@ module Skylab::Brazen
           end
         end
         ok
-      end
-
-      def receive_value_of_entity_property x, prop
-        instance_variable_set prop.as_ivar, x
-        ACHIEVED_
       end
     end
 
@@ -958,7 +974,7 @@ module Skylab::Brazen
         nil
       end
 
-      def against_EC_p_a  # #hook-over
+      def against_EC_p_a  # :+#hook-over
       end
 
     private
@@ -1087,40 +1103,7 @@ module Skylab::Brazen
       end
     end
 
-    if false
-    if ! ::Object.private_method_defined? :notificate
-      class ::Object
-      private
-        def notificate i  # :+[#sl-131] the easiest implementation for this
-        end
-      end
-    end
-
-    # ~ iambics
-
-    module Xxx
-
-      # ~ experimental property reflection API
-
-      def bound_properties
-        @bp ||= Entity::Properties_Stack__::Bound_properties[
-          method( :get_bound_property_via_property ), self.class.properties ]
-      end
-
-      def get_bound_property_via_property prop
-        had = true
-        x = actual_property_box.fetch prop.name_i do
-          had = false ; nil
-        end
-        Brazen_::Lib_::Trio[].new x, had, prop
-      end
-    end
-
-    end
-
     Entity_ = self
-
-    KEEP_PARSING_ = true
 
     STOP_PARSING_ = false
   end

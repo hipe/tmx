@@ -90,7 +90,31 @@ more efficient, is decidedly no longer simple.
 
 
 
-## on parsing (new for the second edition)  (#note-115)
+## a "clever" parsing experiment  (#note-185)
+
+if any input exists, step thru each of the children in our queue
+looking for any first child that consumes any input. if one such
+child is found (and there is still more input) repeat the search
+again from the first child in the queue. at any point, any child
+may stop the entire parse completely. our boolean result is only
+an indication of whether or not we ourselves wish to signal that
+the parse stop (true means stay) and not if any parsing occurred
+
+furthermore if a nonterminal consumed input and it was somewhere
+other than the front of the queue, reorder the queue so that the
+most recent winning non-terminal is always in front and the rest
+are still in the same order with respect to each other.
+
+certainly for certain grammars and certain inputs this will slow
+the parse down more than if the parser were not "adaptive": this
+is intended for inputs that are written in "sections". when each
+next section is reached the parser puts the relevant nonterminal
+at the front.
+
+
+
+
+## on parsing (new for the second edition)  (#note-330)
 
 we build a queue of nonterminal parsers each of whose children will be
 used in order in attempt to parse the symbol upstream in its current

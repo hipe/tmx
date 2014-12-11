@@ -18,6 +18,10 @@ module Skylab::Brazen
           Collection_Controller_
         end
 
+        def entity
+          Model_::Entity
+        end
+
         def name_function_class
           Model_Name_Function_
         end

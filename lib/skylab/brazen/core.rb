@@ -33,15 +33,6 @@ module Skylab::Brazen
       Brazen_::Model_::LIB
     end
 
-    def model_entity * a, & p
-      if a.length.nonzero? || p
-        p and a.push p
-        Brazen_::Model_::Entity.via_arglist a
-      else
-        Brazen_::Model_::Entity
-      end
-    end
-
     def name_library
       NAME_LIBRARY_
     end
@@ -199,7 +190,7 @@ module Skylab::Brazen
     end
 
     N_lines = -> do
-      Event_[]::N_Lines
+      Brazen_.event::N_Lines
     end
 
     Net_HTTP = memoize[ -> { require 'net/http' ; ::Net::HTTP } ]
@@ -257,7 +248,7 @@ module Skylab::Brazen
 
   Actor_ = -> cls, * x_a do
     Lib_::Snag__[]::Model_::Actor.via_client_and_iambic cls, x_a
-    Event_[].selective_builder_sender_receiver cls ; nil
+    Brazen_.event.selective_builder_sender_receiver cls ; nil
   end
 
   ACHIEVED_ = true
@@ -285,18 +276,10 @@ module Skylab::Brazen
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> { }
   EMPTY_S_ = ''.freeze
-
-  Entity_ = -> * x_a do
-    if x_a.length.zero?
-      Brazen_::Entity
-    else
-      Brazen_::Entity.via_arglist x_a
-    end
-  end
-
   Event_ = -> { Brazen_.event }
   Autoloader_[ Models_ = ::Module.new, :boxxy ]
   IDENTITY_ = -> x { x }
+  KEEP_PARSING_ = true
   NAME_ = :name
   NEWLINE_ = "\n".freeze
   NILADIC_TRUTH_ = -> { true }

@@ -1,5 +1,44 @@
 # About Tags in tmx code :[#011]
 
+## prependix-A: semantics of particular tags
+
+    #hook-in etc: for a library node to declare a method as a
+        "hook in" node it is an explicit acknowledgement by that library
+        that the method may be overridden by client nodes to customize
+        the library's behavior. as such, such a tagging implies that the
+        behavior (rougly), semantics, and most importantly *name* of the
+        method are bound to the public API of the library.
+
+        `:#hook-in`, `:+#hook-in`, and `:+#public-API #hook-in` are all
+        variations on the same expression, that is a declaration of this
+        classification.
+
+        `#hook-in` (without the leading ":") is an indication that such
+        a method is being overridden: this form is used by the client
+        module, not the library module.
+
+
+    #hook-out etc: a "hook *out*" is similar to a "hook-in" but the
+        library itself does not supply a default implementation for this
+        method. as such, the library will not work unless the client
+        node implements this method, and so the client node must
+        implement every such method itself.
+
+
+    #hook-with: this is a method provided by a library as a courtesy, as
+        a method that might be used as an implementation for a "hook-out"
+        or "hook-in". the library iteslf does not call this method.
+
+
+    #hook-over: this is a special kind of "hook-in" that itself does
+        nothing (i.e results in nil). if a client overrrides such a
+        method it may do so knowing that the library method itself has
+        no side-effects.
+
+
+
+
+## introduction
 
 Tags are used to mark definitively a certain kind of thing (1) at a
 certain particular place (2) in text-based documents.

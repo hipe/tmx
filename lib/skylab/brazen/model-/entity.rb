@@ -2,335 +2,456 @@ module Skylab::Brazen
 
   class Model_
 
-    Entity = Entity_.call -> do  # see [#047]
+    Entity = Brazen_::Entity.call do  # see [#047]
 
-    o :ad_hoc_processor, :after, -> scan do
-      scan.scanner.advance_one
-      scan.reader.after_i = scan.scanner.gets_one ; nil
-    end
+      class << self
 
-    o :ad_hoc_processor, :desc, -> scan do
-      scan.scanner.advance_one  # `desc`
-      scan.reader.description_block = scan.scanner.gets_one ; nil
-    end
+        def normalizers
+          Brazen_::Lib_::Bsc_[].normalizers
+        end
 
-    o :ad_hoc_processor, :inflect, -> scan do
-      scan.scanner.advance_one  # `inflect`
-      scan.reader.process_some_customized_inflection_behavior scan.scanner
-    end
+        def trio
+          Brazen_::Lib_::Trio[]
+        end
+      end
 
-    o :ad_hoc_processor, :is_promoted, -> scan do
-      scan.scanner.advance_one
-      scan.reader.is_promoted = true
-    end
+      # ~ ad-hoc processors
 
-    o :ad_hoc_processor, :persist_to, -> scan do
-      scan.scanner.advance_one
-      scan.reader.persist_to = scan.scanner.gets_one ; nil
-    end
+      o :ad_hoc_processor, :after, -> pc do  # pc = "parse context"
+        pc.upstream.advance_one
+        pc.downstream.after_i = pc.upstream.gets_one
+        KEEP_PARSING_
+      end
 
-    o :ad_hoc_processor, :preconditions, -> scan do
-      scan.scanner.advance_one
-      a = scan.reader.precondition_controller_i_a
-      a_ = scan.scanner.gets_one
-      if a
-        self._COVER_ME
-      else
-        scan.reader.precondition_controller_i_a = a_
-      end ; nil
-    end
+      o :ad_hoc_processor, :desc, -> pc do
+        pc.upstream.advance_one  # `desc`
+        pc.downstream.description_block = pc.upstream.gets_one
+        KEEP_PARSING_
+      end
 
-    o :ad_hoc_processor, :precondition, -> scan do
-      scan.scanner.advance_one
-      i_a = ( scan.reader.precondition_controller_i_a ||= [] )
-      i = scan.scanner.gets_one
-      i_a.include?( i ) or i_a.push i ; nil
-    end
+      o :ad_hoc_processor, :inflect, -> pc do
+        pc.upstream.advance_one  # `inflect`
+        pc.downstream.process_some_customized_inflection_behavior pc.upstream
+      end
 
-    o :meta_property, :argument_arity,
-        :enum, [ :zero, :one ],
-        :default, :one,
-        :property_hook, -> prop do
-          ok = true
-          if :zero == prop.argument_arity
-            prop.iambic_writer_method_proc = -> do
-              ok = receive_value_of_entity_property true, prop
+      o :ad_hoc_processor, :is_promoted, -> pc do
+        pc.upstream.advance_one
+        pc.downstream.is_promoted = true
+        KEEP_PARSING_
+      end
+
+      o :ad_hoc_processor, :persist_to, -> pc do
+        pc.upstream.advance_one
+        pc.downstream.persist_to = pc.upstream.gets_one
+        KEEP_PARSING_
+      end
+
+      o :ad_hoc_processor, :preconditions, -> pc do
+        pc.upstream.advance_one
+        a = pc.downstream.precondition_controller_i_a
+        a_ = pc.upstream.gets_one
+        if a
+          self._COVER_ME
+        else
+          pc.downstream.precondition_controller_i_a = a_
+        end
+        KEEP_PARSING_
+      end
+
+      o :ad_hoc_processor, :precondition, -> pc do
+        pc.upstream.advance_one
+        i_a = ( pc.downstream.precondition_controller_i_a ||= [] )
+        i = pc.upstream.gets_one
+        i_a.include?( i ) or i_a.push i
+        KEEP_PARSING_
+      end
+
+      # ~ metaproperties (support)
+
+      @active_entity_edit_session.ignore_methods_added
+
+        # hack turn this off. we won't be adding any fields via
+        # method deinitions in this edit session
+
+
+      entity_property_class_for_write  # touch our own `Entity_Property` cls
+
+      class << self::Module_Methods
+
+        def defn_frozen_prop_a method_name, boolean_attr_reader_method_name
+
+          # define a module method `method_name` that produces a frozen,
+          # memoized array of properites that are true-ish along the
+          # metaproperty indicated by `boolean_attr_reader_method_name`
+
+          define_method method_name do
+            h = @__entity_property_memoized_frozen_arrays__ ||= {}
+            h.fetch method_name do
+              h[ method_name ] = properties.reduce_by( & boolean_attr_reader_method_name ).to_a.freeze
+            end
+          end
+          nil
+        end
+
+        def defn_any_frozen_prop_a method_name, boolean_attr_reader_method_name
+
+          # as above but result in nil for arrays that are zero length
+
+          define_method method_name do
+            h = @__entity_property_memoized_frozen_arrays__ ||= {}
+            h.fetch method_name do
+              a = properties.reduce_by( & boolean_attr_reader_method_name ).to_a
+              h[ method_name ] = ( a.freeze if a.length.nonzero? )
+            end
+          end
+          nil
+        end
+      end
+
+      # • ad-hoc normalizer
+
+        class self::Entity_Property
+        private
+          def ad_hoc_normalizer=
+            add_norm( & iambic_property )
+          end
+
+          def add_norm & p
+            @has_ad_hoc_normalizers = true
+            ( @norm_p_a ||= [] ).push p
+            KEEP_PARSING_
+          end
+        public
+
+          attr_reader :has_ad_hoc_normalizers, :norm_p_a
+        end
+
+        def prop_level_normalization_for_normalize
+          ok = KEEP_PARSING_
+          if self.class.any_ary_of_properties_with_ad_hoc_normalizers
+            self.class.any_ary_of_properties_with_ad_hoc_normalizers.each do |pr|
+              ok = aply_ad_hoc_normalizers pr
+              ok or break
             end
           end
           ok
         end
 
-    o :meta_property, :argument_moniker
+        module self::Module_Methods
+          defn_any_frozen_prop_a :any_ary_of_properties_with_ad_hoc_normalizers, :has_ad_hoc_normalizers
+        end
 
-    o :meta_property, :default,
-        :entity_class_hook, -> prop, cls do
-          cls.add_iambic_event_listener :iambic_normalize_and_validate,
-          -> obj do
-            obj.aply_dflt_value_if_necessary prop ; nil
+        def aply_ad_hoc_normalizers pr  # this evolved from [#fa-019]
+          ok = true
+          bx = actual_property_box_for_write
+          pr.norm_p_a.each do | three_p |
+
+            arg = get_bound_property_via_property pr
+              # at each step, value might have changed.
+              # [#053] bound is not truly bound.
+
+            ok = three_p.call arg,
+
+              -> new_value_x do
+                bx.set arg.name_i, new_value_x
+                KEEP_PARSING_
+              end,
+
+              -> * x_a, msg_p do  # #open [#072]
+                # (was: @error_count += 1  # :+[#054])
+                maybe_send_event :error, x_a.first do
+                  build_event_via_iambic_and_message_proc x_a, msg_p
+                end
+              end
+
+            ok or break
+          end
+          ok
+        end
+
+
+
+      # • "argument arity"
+
+        class self::Entity_Property
+        private
+          def flag=
+            @argument_arity = :zero
+            KEEP_PARSING_
+          end
+
+        public
+
+          def argument_is_required  # *not the same as* parameter is required
+            :one == @argument_arity or :one_to_many == @argument_arity
+          end
+
+          def takes_argument
+            :one == @argument_arity
+          end
+
+          def takes_many_arguments
+            :zero_to_many == @argument_arity or :one_to_many == @argument_arity
           end
         end
 
-    o :meta_property, :has_ad_hoc_normalizers,
-        :entity_class_hook, -> prop, cls do
-          cls.add_iambic_event_listener :iambic_normalize_and_validate,
-          -> obj do
-            obj.aply_ad_hoc_normalizers prop ; nil
+        def receive_value_of_entity_property x, prop  # #hook-in
+
+          # overwrite this hook-in called by our produced iambic writer methods
+          # (determiend by topic) so that we write not to ivars but to this box.
+
+          actual_property_box_for_write.add prop.name_i, x
+          KEEP_PARSING_
+        end
+
+        def actual_property_box_for_write
+          actual_property_box  # :++#hook-out
+        end
+
+        def any_property_value_via_property prop
+          actual_property_box[ prop.name_i ]  # :++#hook-out
+        end
+
+
+
+      # • "argument moniker" (used in some modalities to label the arg iteslf)
+
+      o :meta_property, :argument_moniker
+
+
+
+      # • default
+
+      o :property_hook, -> pc do
+
+          _DEFAULT_X = pc.upstream.gets_one
+          # we future-pad it to accomodate one day procs and not just values
+
+          ( -> prop do
+            prop.set_dflt_proc do | _entity |  # [#hl-119] name conventions are employed
+              _DEFAULT_X
+            end
+          end )
+        end,
+
+        :meta_property, :default
+
+        class self::Entity_Property
+
+          def set_dflt_proc & p
+            @has_default = true
+            @dflt_p = p
+            KEEP_PARSING_
+          end
+
+          attr_reader :has_default
+
+          def dflt_value_via_entity ent
+            @dflt_p[ ent ]
           end
         end
 
-    o :meta_property, :parameter_arity,
-        :enum, [ :zero_or_one, :one ],
-        :default, :zero_or_one,
-        :entity_class_hook_once, -> cls do
-          Entity::Add_check_for_missing_required_properties[ cls ]
-        end
-
-    property_class_for_write  # flush the above to get the below
-
-    class self::Property
-
-      def initialize( * )
-        @can_be_from_argv = true
-        @desc_p_a = nil
-        @default = nil
-        super
-      end
-
-      attr_reader :ad_hoc_normalizer, :norm_p_a
-      attr_reader :can_be_from_argv, :can_be_from_environment
-
-      def upcase_environment_name_i
-        :"BRAZEN_#{ @name.as_variegated_symbol.upcase }"
-      end
-
-      def has_default
-        ! @default.nil?
-      end
-
-      def has_description
-        ! @desc_p_a.nil?
-      end
-
-      def under_expression_agent_get_N_desc_lines expression_agent, n=nil
-        Brazen_::Lib_::N_lines[].
-          new( [], n, @desc_p_a, expression_agent ).execute
-      end
-
-      def is_actually_required  # see [#006]
-        is_required && ! has_default
-      end
-
-      def is_required
-        :one == @parameter_arity
-      end
-
-      def takes_argument
-        :one == @argument_arity
-      end
-
-      def takes_many_arguments
-        :zero_to_many == @argument_arity or :one_to_many == @argument_arity
-      end
-
-      def argument_is_required
-        :one == @argument_arity or :one_to_many == @argument_arity
-      end
-
-      def has_custom_moniker  # [#014] this is a smell here
-      end
-
-      def << a
-        @scanner = Lib_::Iambic_scanner[].new 0, a
-        process_iambic_fully
-        self
-      end
-
-    private
-
-      def add_ad_hoc_normalizer & p
-        @has_ad_hoc_normalizers = true
-        ( @norm_p_a ||= [] ).push p
-      end
-
-      o do
-
-        o :iambic_writer_method_name_suffix, :'='
-
-        def ad_hoc_normalizer=
-          add_ad_hoc_normalizer( & iambic_property ) ; nil
-        end
-
-        def description=
-          x = iambic_property
-          if x.respond_to? :ascii_only?
-            str = x
-            x = -> y { y << str }
+        def dflt_for_normalize
+          ok = KEEP_PARSING_
+          if self.class.any_ary_of_defaulting_props
+            self.class.any_ary_of_defaulting_props.each do | pr |
+              x = any_property_value_via_property pr
+              if x.nil?
+                ok = receive_value_of_entity_property( pr.dflt_value_via_entity( self ), pr )
+                ok or break
+              end
+            end
           end
-          ( @desc_p_a ||= [] ).push x
+          ok
         end
 
-        def environment=
-          @can_be_from_argv = false
-          @can_be_from_environment = true
+        module self::Module_Methods
+          defn_any_frozen_prop_a :any_ary_of_defaulting_props, :has_default
         end
 
-        def flag=
-          @argument_arity = :zero
+
+
+      # • "description"
+
+        class self::Entity_Property
+        private
+          def description=
+            x = iambic_property
+            if x.respond_to? :ascii_only?
+              _STRING = x
+              x = -> y do
+                y << _STRING
+              end
+            end
+            @has_description = true
+            ( @desc_p_a ||= [] ).push x
+            KEEP_PARSING_
+          end
+        public
+          attr_reader :has_description, :desc_p_a
         end
 
-        def integer_greater_than_or_equal_to=
 
-          normalizer = Model_::Entity.normalizers.number(
-            :number_set, :integer,
-            :minimum, iambic_property )
 
-          add_ad_hoc_normalizer do |arg, val_p, ev_p|
-            if ! arg.value_x.nil?
-              normalizer.normalize_via_three arg, val_p, ev_p
+      # • "environment" (experiment)
+
+        class self::Entity_Property
+        private
+          def environment=
+            @_cannot_be_from_argv = true
+            @can_be_from_environment = true
+            KEEP_PARSING_
+          end
+        public
+
+          def can_be_from_argv
+            ! _cannot_be_from_argv
+          end
+          attr_reader :_cannot_be_from_argv, :can_be_from_environment
+
+          def upcase_environment_name_symbol
+            :"BRAZEN_#{ @name.as_variegated_symbol.upcase }"
+          end
+        end
+
+
+
+      # • "integer" related
+
+        class self::Entity_Property
+        private
+          def integer_greater_than_or_equal_to=
+
+            _NORMER = Model_::Entity.normalizers.number(
+              :number_set, :integer,
+              :minimum, iambic_property )
+
+            add_norm do | arg, val_p, ev_p |
+              if ! arg.value_x.nil?
+                _NORMER.normalize_via_three arg, val_p, ev_p
+              end
+            end
+          end
+
+          def non_negative_integer=
+
+            _NORMER = Model_::Entity.normalizers.number(
+              :number_set, :integer,
+              :minimum, 0 )
+
+            add_norm do | arg, val_p, ev_p |
+              if ! arg.value_x.nil?
+                _NORMER.normalize_via_three arg, val_p, ev_p
+              end
             end
           end
         end
 
-        def non_negative_integer=
 
-          normalizer = Model_::Entity.normalizers.number(
-            :number_set, :integer,
-            :minimum, 0 )
 
-          add_ad_hoc_normalizer do |arg, val_p, ev_p|
-            if ! arg.value_x.nil?
-              normalizer.normalize_via_three arg, val_p, ev_p
+      # • "parameter arity" - read synopsis [#fa-024]
+
+        class self::Entity_Property
+        private
+          def required=
+            @parameter_arity = :one
+            KEEP_PARSING_
+          end
+        end
+
+        def chck_parameter_arity_for_normalize
+          miss_a = self.class.ary_of_nonzero_param_arity_props.reduce nil do | m, pr |
+            _x = any_property_value_via_property pr
+            if _x.nil?
+              ( m ||= [] ).push pr
+            end
+            m
+          end
+          if miss_a
+            receive_missing_required_props miss_a
+          else
+            KEEP_PARSING_
+          end
+        end
+
+        module self::Module_Methods
+          defn_frozen_prop_a :ary_of_nonzero_param_arity_props, :is_required
+        end
+
+        def receive_missing_required_props miss_prop_a
+          _ev = Brazen_::Entity.properties_stack.
+            build_missing_required_properties_event miss_prop_a
+          receive_missing_required_properties _ev
+        end
+
+        def receive_missing_required_properties ev  # :+#public-API #hook-in #universal
+          raise ev.to_exception
+        end
+
+        def receive_missing_required_properties_softly ev  # popular :+#hook-with
+          # (was :+[#054] #tracking error count)
+          maybe_send_event :error, ev.terminal_channel_i do
+            ev
+          end
+        end
+
+
+
+        # near [#006] we aggregate three of the above concerns into this one
+        # normalization hook because a) logically the order in which they are
+        # called must be fixed with respect to one another and b) there is
+        # less jumping around this way. if we require more modularity these
+        # can be broken up into separate hooks but the relative order must
+        # be as below: 1) first default those that are nil 2) apply any
+        # custom normalizations defined for the property 3) check that there
+        # are no nil required fields.
+
+        during_entity_normalize do | ent |
+          _ok = ent.dflt_for_normalize
+          _ok &&= ent.prop_level_normalization_for_normalize
+          _ok && ent.chck_parameter_arity_for_normalize
+        end
+
+
+
+      # • misc for nomenclature, description, etc.
+
+        class self::Entity_Property
+
+          def has_custom_moniker  # [#014] maybe a smell, maybe not
+            false
+          end
+
+          def under_expression_agent_get_N_desc_lines expression_agent, n=nil
+            Brazen_::Lib_::N_lines[].
+              new( [], n, @desc_p_a, expression_agent ).execute
+          end
+        end
+
+      # ~ support
+
+      Brazen_.event.selective_builder_sender_receiver self
+
+      attr_reader :on_event_selectively
+      private
+
+        def produce_handle_event_selectively_via_channel  # :+#public-API (#hook-in)
+
+          # allow us to `maybe_send_event` at any cost
+
+          if on_event_selectively
+            super
+          else
+            -> * , & ev_p do  # when we have no handler, we are honeybadger
+              raise ev_p[].to_exception
             end
           end
         end
 
-        def required=
-          @parameter_arity = :one
-        end
-      end
-    end
-  end
 
-  module Entity
 
-    class << self
+      # ~ courtesy
 
-      def normalizers
-        Brazen_::Lib_::Bsc_[].normalizers
-      end
-
-      def trio
-        Brazen_::Lib_::Trio[]
-      end
-    end
-
-    Event_[].selective_builder_sender_receiver self
-
-    def aply_ad_hoc_normalizers prop  # this evolved from [#fa-019]
-
-      bx = actual_property_box_for_write
-
-      prop.norm_p_a.each do | three_p |
-
-        arg = get_bound_property_via_property prop
-          # at each step, value might have changed. ( [#053] bound is not truly bound )
-
-        three_p[ arg,
-
-          -> new_value_x do
-            bx.set arg.name_i, new_value_x ; nil
-          end,
-
-          -> * x_a, msg_p do  # #open [#072]
-            @error_count += 1  # :+[#054]
-            maybe_send_event :error, x_a.first do
-              build_event_via_iambic_and_message_proc x_a, msg_p
-            end
-          end ]
-
-      end ; nil
-    end
-
-    def aply_dflt_value_if_necessary prop
-      i = prop.name_i
-      bx = actual_property_box_for_write
-      if bx[ i ].nil?
-        bx.set i, prop.default
-      end ; nil
-    end
-
-    # ~ missing requireds check
-
-    Add_check_for_missing_required_properties = -> cls do
-      cls.add_iambic_event_listener :iambic_normalize_and_validate,
-        Check_for_missing_required_properties__
-    end
-
-    Check_for_missing_required_properties__ = -> obj do
-      if ! obj.began_checking_for_missing_required_props  # #note-240
-        obj.began_checking_for_missing_required_props = true
-        obj.check_for_missing_required_props
-      end
-    end
-
-    attr_accessor :began_checking_for_missing_required_props
-
-    def check_for_missing_required_props
-      miss_a = Scan_[].via_nonsparse_array( self.class.required_properties ).
-        map_reduce_by do |prop|
-          arg = get_bound_property_via_property prop
-          if argument_is_missing arg
-            arg.property
-          end
-        end.to_a
-      if miss_a.length.nonzero?
-        whine_about_missing_reqd_props miss_a ; nil
-      end
-    end
-
-    const_get :Module_Methods, false  # sanity
-    module Module_Methods
-      def required_properties
-        @required_prop_a ||= bld_required_prop_a
-      end
-    private
-      def bld_required_prop_a
-        req_a = properties.reduce_by( & :is_actually_required ).to_a.freeze
-        clear_properties   # #open [#021]
-        req_a
-      end
-    end
-
-    def argument_is_missing arg
-      if arg.actuals_has_name
-        x = arg.value_x
-        if x.nil?
-          true
-        elsif EMPTY_S_ == x
-          true
-        end
-      else
-        true
-      end
-    end
-
-    def whine_about_missing_reqd_props miss_a
-      _ev = Brazen_::Entity.properties_stack.build_missing_required_properties_event miss_a
-      receive_missing_required_properties _ev
-    end
-
-    def receive_missing_required_properties ev
-      raise ev.to_exception
-    end
-
-    def receive_missing_required_properties_softly ev
-      @error_count += 1  # #tracking :+[#054]
-      maybe_send_event :error, ev.terminal_channel_i do
-        ev
-      end
-    end
-
-    # ~
 
     def via_properties_init_ivars  # #note-360
       formal = self.class.properties
@@ -370,14 +491,9 @@ module Skylab::Brazen
         }(#{ p[ x ] }) with new value (#{ p[ x_ ] })"
     end
 
-    private def receive_value_of_entity_property x, prop
-      actual_property_box_for_write.add prop.name_i, x
-      ACHIEVED_
-    end
 
-    def actual_property_box_for_write
-      actual_property_box
-    end
-  end
-  end
-end
+
+
+    end  # end building the extension module
+  end  # M-odel_
+end  # sl [br]

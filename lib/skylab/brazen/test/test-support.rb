@@ -23,7 +23,6 @@ module Skylab::Brazen::TestSupport
   module Constants
     Brazen_ = Brazen_
     EMPTY_S_ = ''.freeze
-    Entity_ = Brazen_::Entity_
     SPACE_ = ' '.freeze
     TestLib_ = TestLib_
     TestSupport_ = TestSupport_
@@ -86,6 +85,41 @@ module Skylab::Brazen::TestSupport
 
     System = Brazen_::Lib_::System
 
+  end
+
+  Enhance_for_test_ = -> mod do
+    mod.send :define_singleton_method, :with, WITH_MODULE_METHOD_
+    mod.include Test_Instance_Methods_
+    nil
+  end
+
+  WITH_MODULE_METHOD_ = -> * x_a do
+    ok = nil
+    x = new do
+      ok = process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+    end
+    ok && x
+  end
+
+  module Test_Instance_Methods_
+
+    attr_reader :bx
+
+    def process_fully * x_a
+      process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+    end
+
+  private
+
+    def procez * x_a
+      _st = iambic_stream_via_iambic_array x_a
+      _ok = process_iambic_stream_fully _st
+      _ok && normalize
+    end
+
+    def actual_property_box
+      @bx ||= Brazen_::Box_.new
+    end
   end
 
   module Fixtures

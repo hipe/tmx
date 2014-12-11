@@ -1,11 +1,102 @@
 # all about 'arity' as it pertains to metafields :[#024]
 
+
+## introduction to `arity` thru the case study of "parameter arity"
+
+prerequisites:
+
+  • the concept of parameter arity employs the notions of [#mh-025]
+    formal-vs-actual parameters. in summary; the former refers to what is
+    specified/declared/programmed for, and the latter refers to what is
+    passed in actual requests/calls.
+
+  • the terms "field", "parameter" and "property" are interchangeable here.
+
+
+"parameter arity" means "for this given formal parameter, what is the
+acceptable number of occurrences of actual parameters for it in actual
+request?"
+
+"parameter arity" itself is a "metaproperty", that is, it is a property
+of properties.
+
+until a large amount of dust settles there will be contention between
+parameter arity and "argument arity" (introduced below) with regards to
+the "polyadic arities", i.e having more than one thing.
+
+although at its essence an arity is formally defined (by us) to be a
+series of non-overlapping unbound postive ranges, in practice we often
+model arities as a [#it-003] "category of exponents", i.e something like
+an "enum".
+
+to start with, our most basic implementations that use parameter arity
+recognizes something like the following classifications:
+
+    a parameter arity of ..    means ..
+
+    `zero_or_one`              the actual parameter may acceptably
+                               occur zero or one times. i.e it is
+                               an "optional field".
+
+    `one`                      the actual parameter must occur
+                               exactly one time in the request. i.e
+                               it is a "required field".
+
+in a world where we put the "polyady" on the "parameter" and not
+"argument" arity (explored later), we might find it useful to
+classify the below:
+
+    `zero_or_more`             a "polyadic arity", the "field" can take
+                               multiple actual paramters, but none is
+                               necessary.
+
+    `one_or_more`              also a "polyadic arity", the minimum
+                               acceptable number of actual parameters
+                               here is one, making this effectively a
+                               required field that can accept multiple
+                               actual parameters.
+
+
+some concerns care about whether or not the arity includes zero: for
+normalizations that determine whether there are any "missing required
+fields", a required field is generally one whose formal property has a
+parameter arity that does not include zero. (conversely an "optional
+field" is one whose parameter arity includes but is not limited to zero).
+
+other concerns may care about whether or not the arity includes numbers
+possibly greater than one (i.e "polyadic"): in such cases, certain
+interfaces in certain modalities may need to be designed to accomodate
+such input.
+
+for fun we can imagine other classifications and the other semantics
+that could be associated with them (and the behaviors those semantics
+suggest), but this is done purely as a dalliance:
+
+
+    `zero`                     the parameter (by symbolic name, whatever)
+                               must never occur in the request (i.e it is
+                               on a "blacklist"). in practice and typically,
+                               the set of all would-be formal parameters
+                               outside the set of specified formal parameters
+                               act as if they have this paramter arity,
+                               because typically (but not always) we clasify
+                               the request as invalid if it has any
+                               "unrecognized properties." if we were
+                               being cute we could say that there exists
+                               for every such invalid actual argument a
+                               formal property with a parameter arity of
+                               zero. but we are not.
+
+
+
+## the gory detals
+
 to define `arity`, a word that itself is not in "most"
 "dictionaries", we employ another "neologism" : "sensical".
 ("neologism" is a word that means "made up word", said by someone
 who wants you to trust them with the words they made up.)
 
-`arity` as it has come to be used here in the entity library means: "a range
+`arity` as it has come to be used here in the entity library means: "a range-ish
 associated with a particular formal number describing the sensical range for
 the actual numbers that will be associated with that formal number." we mean
 formal/actual in the sense of formal-vs-actual parameters to a function,

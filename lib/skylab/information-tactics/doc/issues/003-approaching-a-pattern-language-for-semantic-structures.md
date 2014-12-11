@@ -29,7 +29,7 @@ counsels against extremism in general."[4]
 [1] - Aristotle (1995). "Categories". In Barnes, Jonathan. The Complete Works
   of Aristotle, 2 vols. Transl. J. L. Ackrill. Princeton: Princeton University
   Press. pp. 3–24.
-[2] - "Stateman_(dialogue)"
+[2] - "Stateman (dialogue)"
 [3] - Plato (1892), "Dialogues, vol. 4 - Parmenides, Theaetetus,
 w  Sophist, Statesman, Philebus", Transl. Benjamin Jowett
 [4] - Tal Ben-Shahar (2009), The Pursuit of Perfect, McGraw Hill Professional,
