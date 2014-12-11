@@ -53,8 +53,7 @@ module Skylab::Headless
       if a.length.zero? && ! p
         Bzn_[]::Entity
       else
-        p and a.push p
-        Bzn_[]::Entity.via_arglist a
+        Bzn_[]::Entity.via_arglist a, & p
       end
     end
 

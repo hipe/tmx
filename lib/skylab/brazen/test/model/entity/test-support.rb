@@ -43,7 +43,7 @@ module Skylab::Brazen::TestSupport::Model::Entity
 
   Subject_ = -> * a, & p do
     if a.length.nonzero? || p
-      Brazen_.model.entity.via_arglist a, & p
+      Brazen_.model.entity.via_nonzero_length_arglist a, & p
     else
       Brazen_.model.entity
     end

@@ -82,7 +82,7 @@ module Skylab::Brazen
       end
 
       def property_default
-        @current_property.default
+        @current_property.default_value_via_any_entity nil  # etc
       end
 
       def pth s
@@ -106,7 +106,7 @@ module Skylab::Brazen
       end
 
       def render_prop_as_environment_variable prop
-        prop.upcase_environment_name_i.id2name
+        prop.upcase_environment_name_symbol.id2name
       end
 
       def render_prop_as_unknown prop

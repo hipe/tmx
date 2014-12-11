@@ -115,7 +115,7 @@ module Skylab::Brazen
 
       def merge_workspace_resolution_properties_into_via bx, action  # #note-120
 
-        scn = Scan_[].via_nonsparse_array INNER_OUTER_A__
+        scn = LIB_.stream.via_nonsparse_array INNER_OUTER_A__
         while pair = scn.gets
           inner_i, outer_i = pair
           if ! bx[ inner_i ]
@@ -195,13 +195,12 @@ module Skylab::Brazen
           maybe_send_event_via_channel i_a, & ev_p
         end
 
-        @ws = @model_class.edited @kernel, _oes_p do |o|
+        @ws = @model_class.edit_entity @kernel, _oes_p do |o|
           o.with_arguments :verbose, @verbose
           o.with_argument_box bx
           o.with :prop, @action.class.properties[ :workspace_path ]
         end
-
-        via_ws_workspace
+        @ws and via_ws_workspace
       end
 
       def on_ws_via_action_resource_not_found_via_channel i_a, & ev_p
@@ -220,19 +219,15 @@ module Skylab::Brazen
     private
 
       def via_ws_workspace
-        if @ws.error_count.zero?
-          _ok = @ws.execute  # result is pn
-          _ok and begin
-            if @verbose  # #tracking [#069] this will probably go away
+        _ok = @ws.execute  # result is pn
+        _ok and begin
+          if @verbose  # #tracking [#069] this will probably go away
             maybe_send_event :info, :verbose, :using_workspace do
               build_neutral_event_with :using_workspace,
                 :config_pathname, @ws.pn
             end
-            end
-            @ws
           end
-        else
-          UNABLE_
+          @ws
         end
       end
     end

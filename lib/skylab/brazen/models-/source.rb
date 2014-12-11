@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Models_::Source < Brazen_::Model_
 
-    Brazen_.model_entity self do
+    Brazen_.model.entity self do
 
       o :desc, -> y do
         y << "manage sources."

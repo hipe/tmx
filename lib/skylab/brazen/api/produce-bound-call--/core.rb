@@ -46,7 +46,7 @@ module Skylab::Brazen
 
       def via_current_tokens_resolve_action
         @current_unbound_action_scan = @kernel.get_unbound_action_scan
-        while true
+        begin
           ok = via_current_branch_resolve_action
           ok or break
           advance_one
@@ -57,7 +57,8 @@ module Skylab::Brazen
             break
           end
           @current_unbound_action_scan = @action.class.get_unbound_lower_action_scan
-        end
+          redo
+        end while nil
         ok
       end
 

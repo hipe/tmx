@@ -67,11 +67,11 @@ module Skylab::TestSupport
       MH__[]::Enhance::Shell.new i_a
     end
 
-    Entity = -> * a do
-      if a.length.zero?
-        Bzn_[]::Entity
+    Entity = -> * a, & p do
+      if a.length.nonzero? || p
+        Bzn_[]::Entity.via_arglist a, & p
       else
-        Bzn_[]::Entity.via_arglist a
+        Bzn_[]::Entity
       end
     end
 

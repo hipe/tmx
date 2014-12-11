@@ -10,7 +10,7 @@ module Skylab::Headless
 
     include Headless_::Library_::FileUtils
 
-    Headless_._lib.entity self, -> do
+    Headless_._lib.entity self do
 
       o :iambic_writer_method_name_suffix, :'=',
 
@@ -41,7 +41,7 @@ module Skylab::Headless
       @be_verbose = false
 
       if x_a.length.nonzero?
-        process_iambic_fully x_a
+        process_iambic_stream_fully iambic_stream_via_iambic_array x_a
       end
 
       if p  # prolly mutex w/ above
@@ -51,7 +51,7 @@ module Skylab::Headless
       @debug_IO ||= Headless_.system.IO.some_stderr_IO
       @max_mkdirs ||= 1
       @path_x ||= Headless_.system.filesystem.tmpdir_path
-      super @path_x, & nil
+      super @path_x do end
       init_path_derivatives
       freeze
     end
@@ -74,7 +74,7 @@ module Skylab::Headless
       init_copy_via_iambic x_a
     end
     def init_copy_via_iambic x_a
-      process_iambic_fully 0, x_a
+      process_iambic_stream_fully iambic_stream_via_iambic_array x_a
       if @path_x
         init_pathname @path_x
         init_path_derivatives

@@ -4,7 +4,7 @@ module Skylab::Brazen
 
   class Actions::Status < Brazen_::Model_::Action
 
-    Brazen_::Model_::Entity[ self, -> do
+    Brazen_::Model_::Entity.call self do
 
       o :desc, -> y do
         y << "get status of a workspace"
@@ -31,7 +31,7 @@ module Skylab::Brazen
         end,
         :required, :property, :path
 
-    end ]
+    end
 
     def produce_any_result
 
@@ -45,7 +45,7 @@ module Skylab::Brazen
         maybe_send_event_via_channel i_a, & ev_p
       end
 
-      @ws = model_class.edited @kernel, handle_event_selectively do |o|
+      @ws = model_class.edit_entity @kernel, handle_event_selectively do |o|
 
         o.with_argument_box bx
 
@@ -53,8 +53,7 @@ module Skylab::Brazen
           :prop, self.class.properties.fetch( :path ),
           :on_event_selectively, _oes_p )
       end
-
-      @ws.error_count.zero? and work
+      @ws and work
     end
 
     def work

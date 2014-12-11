@@ -13,8 +13,8 @@ module Skylab::Brazen
       attr_accessor :after_i, :description_block, :is_promoted,
         :precondition_controller_i_a
 
-      def process_some_customized_inflection_behavior scanner
-        Process_customized_action_inflection_behavior__[ scanner, self ] ; nil
+      def process_some_customized_inflection_behavior upstream
+        Process_customized_action_inflection_behavior__.new( upstream, self ).execute
       end
 
       def preconditions
@@ -56,9 +56,13 @@ module Skylab::Brazen
     extend Brazen_.name_library.name_function_proprietor_methods
     NAME_STOP_INDEX = 2  # sl br models
 
-    # whether or not you define properties we need to override methods
+    # [#013]:#note-A the below order
 
-    include Brazen_::Model_::Entity
+    include Callback_::Actor.methodic_lib.iambic_processing_instance_methods
+
+    include Brazen_::Entity::Instance_Methods
+
+    Brazen_.event.selective_builder_sender_receiver self
 
     include Interface_Element_Instance_Methdods__
 
@@ -81,7 +85,6 @@ module Skylab::Brazen
 
     def bound_call_via_call x_a, & oes_p
       @argument_box = Box_.new
-      @error_count ||= 0
       recv_selective_listener_proc oes_p
       bc = any_bound_call_via_processing_iambic x_a
       bc || via_arguments_produce_bound_call
@@ -90,23 +93,33 @@ module Skylab::Brazen
   private
 
     def any_bound_call_via_processing_iambic x_a
-      process_iambic_fully x_a
-      if @error_count.nonzero?
-        Brazen_.bound_call.via_value UNABLE_
+
+      # the result semantics here are reverse what is normal: something
+      # true-ish means early return, and is assumed to be a bound call.
+      # this step does not include calling normalize, that happens next
+
+      ok = process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+      if ! ok
+        Brazen_.bound_call.via_value ok
       end
     end
 
     def via_arguments_produce_bound_call
       subsume_external_arguments
-      notificate :iambic_normalize_and_validate
-      if @error_count.zero?
+      ok = normalize
+      if ok
         prdc_bound_call_when_valid
       else
         prdc_bound_call_when_invalid
       end
     end
 
-    def subsume_external_arguments
+    def subsume_external_arguments  # :+#public-API #hook-over
+
+      # after arguments are parsed but before they are normalized, your
+      # action may want to hand-write logic here to default arguments
+      # via e.g some zero config e.g environment facility. you cannot fail
+
     end
 
     def prdc_bound_call_when_invalid
@@ -158,7 +171,7 @@ module Skylab::Brazen
     end
 
     def get_actual_argument_scan  # used by [tm]
-      Scan_[].via_nonsparse_array( self.class.properties.get_names ).map_by do |i|
+      LIB_.stream.via_nonsparse_array( self.class.properties.get_names ).map_by do |i|
         Actual_Property_.new any_argument_value( i ), i
       end
     end
@@ -168,9 +181,6 @@ module Skylab::Brazen
     def recv_selective_listener_proc oes_p
       receive_selective_listener_via_channel_proc(
         -> i_a, & ev_p do
-          if :error == i_a.first
-            @error_count += 1
-          end
           oes_p.call( * i_a ) do
             _sign_event ev_p[]
           end
@@ -178,7 +188,7 @@ module Skylab::Brazen
     end
 
     def _sign_event ev
-      Event_[].wrap.signature name, ev
+      Brazen_.event.wrap.signature name, ev
     end
 
   public  # public accessors for arguments & related experimentals
@@ -249,63 +259,68 @@ module Skylab::Brazen
 
     class Process_customized_action_inflection_behavior__
 
-      Actor_[ self, :properties, :scanner, :cls ]
+      def initialize * a
+        @upstream, @cls = a
+      end
 
       def execute
         @inflection = Customized_Action_Inflection__.new
-        via_stream_process_some_iambic
+        process_iambic_stream_passively @upstream
         acpt @inflection
       end
 
+      # Callback_::Actor.methodic self
+      include Callback_::Actor.methodic_lib.iambic_processing_instance_methods
+
+    private
+
+      def noun=
+        parse :noun
+      end
+
+      def verb=
+        parse :verb
+      end
+
       def parse i
-        x = @scanner.gets_one
+        x = @upstream.gets_one
         take_one x, i
-        take_any_others i ; nil
+        take_any_others i
       end
 
       def take_one x, i
         if x.respond_to? :id2name
           if :with_lemma == x
-            @inflection.set_lemma @scanner.gets_one, i
+            @inflection.set_lemma @upstream.gets_one, i
           else
             @inflection.set_comb x, i
           end
         else
           @inflection.set_lemma x, i
-        end ; nil
+        end
+        KEEP_PARSING_
       end
 
       def take_any_others i
-        while @scanner.unparsed_exists
-          x = @scanner.current_token
+        while @upstream.unparsed_exists
+          x = @upstream.current_token
           if x.respond_to? :ascii_only?
-            @inflection.set_lemma @scanner.gets_one, i
+            @inflection.set_lemma @upstream.gets_one, i
           elsif :with_lemma == x
-            @scanner.advance_one
-            @inflection.set_lemma @scanner.gets_one, i
+            @upstream.advance_one
+            @inflection.set_lemma @upstream.gets_one, i
           else
             break
           end
-        end ; nil
+        end
+        KEEP_PARSING_
       end
 
       def acpt _ACTION_INFLECTION_
         @cls.send :define_singleton_method, :custom_action_inflection do
           _ACTION_INFLECTION_
-        end ; nil
-      end
-
-      Entity_.call self, -> do
-
-        o :iambic_writer_method_name_suffix, :'='
-
-        def noun=
-          parse :noun
         end
-
-        def verb=
-          parse :verb
-        end
+        KEEP_PARSING_
       end
     end
 

@@ -10,11 +10,11 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
 
       with_class do
         class AAPA_ORO
-          Ent_[][ self, -> do
+          Ent_[].call self do
             o :property, :foo,
               :required, :property, :bar,
               :property, :baz
-          end ]
+          end
           self
         end
       end
@@ -32,14 +32,14 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
 
       with_class do
         class AAPA_RROORR
-          Ent_[][ self, -> do
+          Ent_[].call self do
             o :required, :property, :alpha,
               :required, :property, :beta,
               :property, :gamma,
               :property, :delta,
               :required, :property, :epsilon,
               :required, :property, :zeta
-          end ]
+          end
           self
         end
       end
@@ -91,10 +91,10 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
 
       with_class do
         class AAPA_RO
-          Ent_[][ self, -> do
+          Ent_[].call self do
             o :required, :property, :foo,
               :property, :bar
-          end ]
+          end
           self
         end
       end
@@ -124,10 +124,10 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
 
       with_class do
         class AAPA_OR
-          Ent_[][ self, -> do
+          Ent_[].call self do
             o :property, :foo,
               :required, :property, :bar
-          end ]
+          end
           self
         end
       end
@@ -157,9 +157,9 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
 
       with_class do
         class AAPA_R
-          Ent_[][ self, -> do
+          Ent_[].call self do
             o :required, :property, :foo
-          end ]
+          end
           self
         end
       end
@@ -183,9 +183,9 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
     context "(O)" do
       with_class do
         class AAPA_O
-          Ent_[][ self, -> do
+          Ent_[].call self do
             o :property, :foo
-          end ]
+          end
           self
         end
       end

@@ -440,9 +440,11 @@ module Skylab::Callback
 
   class Iambic_Stream_  # :[#046]
 
-    def initialize d, x_a
+    def reinitialize d, x_a
       @d = d ; @x_a = x_a ; @x_a_length = @x_a.length
     end
+
+    alias_method :initialize, :reinitialize
 
     def has_no_more_content
       @x_a_length == @d

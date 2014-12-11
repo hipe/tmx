@@ -2,13 +2,14 @@ module Skylab::Brazen
 
   class Models_::Datastore < Brazen_::Model_
 
-    Brazen_::Model_::Entity[ self, -> do
+    Brazen_::Model_::Entity.call self do
+
       o :desc, -> y do
         y << "manage datastores."
       end
 
       o :after, :workspace
-    end ]
+    end
 
     class << self
 
@@ -17,10 +18,13 @@ module Skylab::Brazen
       end
 
       def get_unbound_upper_action_scan
+        # Callback_.stream.via_item self  # #todo is same
         p = -> do
-          r = self ; p = EMPTY_P_ ; r
+          x = self
+          p = EMPTY_P_
+          x
         end
-        Scan_[].new do
+        Callback_.stream do
           p[]
         end
       end

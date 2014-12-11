@@ -5,6 +5,7 @@ module Skylab::Brazen::TestSupport::CLI
   ::Skylab::Brazen::TestSupport[ TS_ = self ]
 
   Brazen_ = ::Skylab::Brazen
+  Callback_ = Brazen_::Callback_
   TestSupport_ = ::Skylab::TestSupport
 
   SPACE_ = Brazen_::SPACE_
@@ -15,8 +16,6 @@ module Skylab::Brazen::TestSupport::CLI
   end
 
   extend TestSupport_::Quickie
-
-  Entity_ = Brazen_::Entity_
 
   module ModuleMethods
 
@@ -196,12 +195,6 @@ module Skylab::Brazen::TestSupport::CLI
 
     # ~ action-under-test phase
 
-    def debug!
-      @do_debug = true
-    end
-
-    attr_reader :do_debug
-
     def invoke * argv
       a = sub_action_s_a and argv[ 0, 0 ] = a
       invoke_via_argv argv
@@ -222,10 +215,6 @@ module Skylab::Brazen::TestSupport::CLI
       @invocation = Brazen_::CLI.new nil, * grp.values_at( :o, :e ), [ 'bzn' ]
       prepare_invocation
       @exitstatus = @invocation.invoke argv ; nil
-    end
-
-    def debug_IO
-      TestSupport_::Lib_::Stderr[]
     end
 
     def prepare_invocation
@@ -270,22 +259,23 @@ module Skylab::Brazen::TestSupport::CLI
       expect_via_arg_list x_a
     end
 
-    def load_expect_the_first_time
+    def load_expect_the_first_time  # ghastly hack that lets us regress
       cls = self.class
-      cls.include Entity_[].via_stream_iambic_methods
+      # cls.include Callback_::Actor.methodic_lib.iambic_processing_instance_methods
       cls.send :define_method, :expect do |*x_a|
         expect_via_arg_list x_a
       end ; nil
     end
 
     def expect_no_more_lines
-      unparsed_iambic_exists and fail "expected no more lines, had #{
-        }#{ current_iambic_token.to_a.inspect }"
+      if @act_stream.unparsed_exists
+        fail "expected no more lines, had #{ @act_stream.current_token.to_a.inspect }"
+      end
     end
 
     def expect_maybe_a_blank_line
-      if unparsed_iambic_exists and NEWLINE__ == current_iambic_token.string
-        advance_iambic_stream_by_one ; nil
+      if @act_stream.unparsed_exists and NEWLINE__ == @act_stream.current_token.string
+        @act_stream.advance_one
       end
     end
 
@@ -297,9 +287,9 @@ module Skylab::Brazen::TestSupport::CLI
 
     def expect_via_arg_list x_a
       prs_expectation x_a
-      init_emission_scan
-      unparsed_iambic_exists or fail "expected more lines, had none."
-      @emission = iambic_property
+      init_actual_stream
+      @act_stream.unparsed_exists or fail "expected more lines, had none."
+      @emission = @act_stream.gets_one
       @line_s = @emission.string
       @style_is_expected and assrt_styled_and_unstyle
       @line_s.chomp!
@@ -324,46 +314,49 @@ module Skylab::Brazen::TestSupport::CLI
     end
 
     def prs_expectation x_a
-      init_expectation_scan x_a
-      if :styled == current_iambic_token
+      init_expectation_stream x_a
+      st = @exp_stream
+      if :styled == st.current_token
         @style_is_expected = true
-        advance_iambic_stream_by_one
+        st.advance_one
       else
         @style_is_expected = false
       end
-      x = iambic_property
+      x = st.gets_one
       @line_assertion_x = x
       if x.respond_to? :ascii_only?
         @line_assertion_method_i = :assrt_expected_line_equals_actual_line
       else
         @line_assertion_method_i = :assrt_expected_rx_matches_actual_line
       end
-      unparsed_iambic_exists and
-        raise ::ArgumentError, "no: #{ current_iambic_token }" ; nil
+      if st.unparsed_exists
+        raise ::ArgumentError, "no: #{ st.current_token }" ; nil
+      end
     end
 
-    def init_expectation_scan x_a
-      if expectation_scanner
-        @expectation_scanner.send :initialize, 0, x_a
+    def init_expectation_stream x_a
+      if exp_stream
+        @exp_stream.reinitialize 0, x_a
       else
-        @expectation_scanner = Entity_[].iambic_stream.new 0, x_a
+        @exp_stream = Callback_.iambic_stream.new 0, x_a
       end
-      @scanner = @expectation_scanner ; nil
+      nil
     end
 
-    def init_emission_scan
-      if ! emission_scanner
-        _em_a = build_baked_em_a
-        @emission_scanner = Entity_[].iambic_stream.new 0, _em_a
+    attr_reader :exp_stream
+
+    def init_actual_stream
+      if ! act_stream
+        @act_stream = Callback_.iambic_stream.new 0, build_baked_em_a
       end
-      @scanner = @emission_scanner ; nil
+      nil
     end
+
+    attr_reader :act_stream
 
     def build_baked_em_a
       @IO_spy_group.release_lines
     end
-
-    attr_reader :expectation_scanner, :emission_scanner
 
     def invocation_string
       self.class.fake_app_name

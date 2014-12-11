@@ -47,7 +47,7 @@ module Skylab::Brazen
             st = Callback_::Iambic_Stream_.new 0, x_a
             client_cls = st.gets_one
             self[ client_cls ]
-            client_cls.entity_edit_sess do |sess|
+            client_cls.edit_entity_class do |sess|
               sess.receive_edit st  # on success result is client class
             end  # result is same
             nil

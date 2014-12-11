@@ -30,7 +30,8 @@
 [#049]       #parent-node: [#cb-046] case study: iambic ordering hacks
 [#048]       #parent-node: [#024] "#action-preconditions.."
 [#047]       #parent-node: [#013] the model entity narrative
-[#046] #open so fragile this hack (entity properties to action props)
+[#046]       #done so fragile this hack (entity properties to action props)
+               one better way is to make the proc a method at etc
 [#045]       #parent-node: [#001] "the meta-properties narrative.."
 [#044]       #done graph has an action so maybe we don't need to pass it everywhere
 [#043]      #tracking-tag loading hacks

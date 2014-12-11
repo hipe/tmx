@@ -87,6 +87,16 @@ wont.
 
 
 
+## :#note-A
+
+whether or not the client entity class uses the "mo-ent" enhancer
+module to model its properties etc, if the client does so we want
+the topic class to be in front of the entity support modules just
+in case we want to customize its methods, like `initialize` below
+
+
+
+
 ## :#note-180
 
 do not set error count in the contructor. error count is set only when

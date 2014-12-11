@@ -32,17 +32,19 @@ module Skylab::TestSupport
 
     class Shell__  # too hard to do this in a basic object
 
-      TestSupport_._lib.entity self, -> do
+      TestSupport_._lib.entity self do
 
         o :iambic_writer_method_name_suffix, :'='
 
         def do_debug=
           @do_debug_value_was_passed = true
           @do_debug_x = iambic_property
+          ACHIEVED_
         end
 
         def nonstandard=
           @is_standard = false
+          ACHIEVED_
         end
 
         o :properties, :debug_IO, :debug_prefix, :do_debug_proc,
@@ -52,7 +54,7 @@ module Skylab::TestSupport
 
       def initialize x_a
         @is_standard = true
-        process_iambic_fully x_a
+        process_iambic_stream_fully iambic_stream_via_iambic_array x_a
       end
 
       attr_reader( * properties.get_names )

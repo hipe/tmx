@@ -31,10 +31,11 @@ module Skylab::Headless
             if x_a.length.zero?
               self
             else
-              new do
-                process_iambic_fully x_a
-                clear_all_iambic_ivars
-              end.produce_mixed_result
+              ok = nil
+              x = new do
+                ok = process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+              end
+              ok and x.produce_mixed_result
             end
           end
         end

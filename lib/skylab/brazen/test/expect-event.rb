@@ -174,7 +174,7 @@ module Skylab::Brazen::TestSupport
         end
 
         def expression_agent_for_expect_event
-          Brazen_::Event_[].codifying_expression_agent
+          Brazen_.event.codifying_expression_agent
         end
 
         def black_and_white ev
@@ -335,7 +335,7 @@ module Skylab::Brazen::TestSupport
 
       def initialize x_a, p
         @call_a = [ [ :resolve_ev_by_expect_one_event ] ]
-        @scn = Brazen_::Entity_[].iambic_stream.new 0, x_a
+        @scn = Callback_.iambic_stream.new 0, x_a
         while @scn.unparsed_exists
           send @scn.gets_one
         end
@@ -349,7 +349,7 @@ module Skylab::Brazen::TestSupport
       end
 
       def shorthand
-        scn = Brazen_::Entity_[].iambic_stream.new 0, @scn.gets_one
+        scn = Callback_.iambic_stream.new 0, @scn.gets_one
         scn.unparsed_exists and parse_shorthand scn
       end
 

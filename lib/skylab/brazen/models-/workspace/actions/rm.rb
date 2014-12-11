@@ -4,14 +4,14 @@ module Skylab::Brazen
 
     class Actions::Rm < Brazen_::Model_::Action
 
-      Brazen_::Model_::Entity[ self, -> do
+      Brazen_::Model_::Entity.call self do
 
         o :desc, -> y do
           y << "remove a workspace"
         end
 
         o :flag, :property, :dry_run
-      end ]
+      end
 
       def produce_any_result
         maybe_send_event :error, :not_yet_implemented do

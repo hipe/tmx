@@ -25,9 +25,3 @@ the result value will be `ACHIEVED_` (that is, `true`) if this works and
 if it doesn't we will send an event event (sic) to the [#069] selective
 event listener `<on event selectively>`, and our result will be the
 (if the result is consumed) the result of the callback, otherwise `nil`.
-
-for the lazy, we will probably add an `error_count` check here and
-result in an event send in the case that you accidentally try to
-persist an entity that isn't valid. to hack your way around this you
-will probably have to enusre that you entity respond to `error_count`
-with `0`.

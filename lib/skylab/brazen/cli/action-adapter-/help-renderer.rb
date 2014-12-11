@@ -166,9 +166,13 @@ module Skylab::Brazen
             else
               "<#{ prop.name.as_slug }>"
             end
-            if ! prop.is_actually_required
+
+            _is_effectively_optional = prop.has_default || ! prop.is_required
+
+            if _is_effectively_optional  # near [#006]
               open = '[' ; close = ']'
             end
+
             if prop.takes_many_arguments
               addendum = " [#{ s } [..]]"
             end

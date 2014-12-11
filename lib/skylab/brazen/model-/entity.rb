@@ -108,6 +108,8 @@ module Skylab::Brazen
         end
       end
 
+
+
       # • ad-hoc normalizer
 
         class self::Entity_Property
@@ -158,7 +160,6 @@ module Skylab::Brazen
               end,
 
               -> * x_a, msg_p do  # #open [#072]
-                # (was: @error_count += 1  # :+[#054])
                 maybe_send_event :error, x_a.first do
                   build_event_via_iambic_and_message_proc x_a, msg_p
                 end
@@ -246,7 +247,7 @@ module Skylab::Brazen
 
           attr_reader :has_default
 
-          def dflt_value_via_entity ent
+          def default_value_via_any_entity ent  # :+#public-API
             @dflt_p[ ent ]
           end
         end
@@ -257,7 +258,7 @@ module Skylab::Brazen
             self.class.any_ary_of_defaulting_props.each do | pr |
               x = any_property_value_via_property pr
               if x.nil?
-                ok = receive_value_of_entity_property( pr.dflt_value_via_entity( self ), pr )
+                ok = receive_value_of_entity_property( pr.default_value_via_any_entity( self ), pr )
                 ok or break
               end
             end
@@ -327,7 +328,9 @@ module Skylab::Brazen
               :minimum, iambic_property )
 
             add_norm do | arg, val_p, ev_p |
-              if ! arg.value_x.nil?
+              if arg.value_x.nil?
+                KEEP_PARSING_
+              else
                 _NORMER.normalize_via_three arg, val_p, ev_p
               end
             end
@@ -340,7 +343,9 @@ module Skylab::Brazen
               :minimum, 0 )
 
             add_norm do | arg, val_p, ev_p |
-              if ! arg.value_x.nil?
+              if arg.value_x.nil?
+                KEEP_PARSING_
+              else
                 _NORMER.normalize_via_three arg, val_p, ev_p
               end
             end
@@ -467,7 +472,7 @@ module Skylab::Brazen
         pptr = stack.any_proprietor_of i
         if pptr
           had_value = true
-          x = pptr.property_value i
+          x = pptr.property_value_via_symbol i
         else
           had_value = false
           x = nil

@@ -28,18 +28,18 @@ module Skylab::Callback
           def expand scn, p
             scn_ = nil
             new do
-              while true
+              begin
                 if ! scn_
                   x = scn.gets
                   x or break( scn = nil )
                   scn_ = p[ x ]
-                  scn_ or next  # can reduce too
+                  scn_ or redo  # can reduce too
                 end
                 x_ = scn_.gets
                 x_ and break
                 scn_ = nil
                 redo
-              end
+              end while nil
               x_
             end
           end
@@ -78,12 +78,13 @@ module Skylab::Callback
 
           def reduce scn, p
             new do
-              while true
+              begin
                 x = scn.gets
                 x or break
                 _ok = p[ x ]
                 _ok and break
-              end
+                redo
+              end while nil
               x
             end
           end

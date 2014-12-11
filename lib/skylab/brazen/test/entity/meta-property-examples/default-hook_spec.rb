@@ -20,7 +20,7 @@ module Skylab::Brazen::TestSupport::Entity
                 prop_ = prop.new do  # meh #grease
                   @ivar = :"#{ as_ivar }_x"
                 end
-                ent.send :receive_value_of_entity_property, _x, prop_
+                ent.receive_value_of_entity_property _x, prop_
               end
             end
             true

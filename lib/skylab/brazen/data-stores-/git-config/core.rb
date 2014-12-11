@@ -131,7 +131,7 @@ module Skylab::Brazen
         end
       end
 
-      Entity_[].event.selective_builder_sender_receiver self
+      Brazen_.event.selective_builder_sender_receiver self
 
       def initialize a
         input_method_i, input_x, event_receiver_method_i, event_receiver_x = a
@@ -424,7 +424,7 @@ module Skylab::Brazen
         idx && @a.fetch( idx )
       end
       def to_stream
-        Scan_[].via_nonsparse_array @a
+        LIB_.stream.via_nonsparse_array @a
       end
       def map & p
         @a.map( & p )
@@ -484,18 +484,18 @@ module Skylab::Brazen
 
       def each_normalized_pair
         if block_given?
-          scn = to_normalized_actual_property_scan
+          scn = to_normalized_actual_property_stream
           while pair = scn.gets
-            yield( * pair.to_a )
+            yield pair.name_i, pair.value_x
           end ; nil
         else
           to_enum :each_normalized_pair
         end
       end
 
-      def to_normalized_actual_property_scan
+      def to_normalized_actual_property_stream
         d = -1 ; last = @a.length - 1
-        Scan_[].new do
+        LIB_.stream.new do
           while d < last
             d += 1
             ast = @a.fetch d

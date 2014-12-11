@@ -52,41 +52,27 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
 
     p = -> do
 
-      Entity_ = Entity_[][ -> do
+      Entete_ = Brazen_::Entity.call do
 
-        o :meta_property, :argument_arity,
-            :enum, [ :zero, :one ],
-            :default, :one
+        o :enum, [ :zero, :one ],
+          :default, :one,
+          :meta_property, :argument_arity,
 
-        o :meta_property, :default, :entity_class_hook, -> prop, cls do
-          cls.add_iambic_event_listener :iambuc_normalize_and_validate,
-            -> obj do
-              obj.aply_dflt_proc_if_necessary prop ; nil
-            end
-        end
-
-        o :meta_property, :parameter_arity,
-            :enum, [ :zero_or_one, :one ],
-            :default, :zero_or_one
+          :enum, [ :zero_or_one, :one ],
+          :default, :zero_or_one,
+          :meta_property, :parameter_arity
 
 
-        property_class_for_write
+        entity_property_class_for_write
 
-        class self::Property
+        class self::Entity_Property
 
-          def initialize( * )
-            @default = nil
-            super
+        private
+          def required=
+            @parameter_arity = :one
+            true
           end
-
-          def has_default
-            ! @default.nil?
-          end
-
-          def is_actually_required
-            is_required
-          end
-
+        public
           def is_required
             :one == @parameter_arity
           end
@@ -95,18 +81,16 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
             :one == @argument_arity
           end
 
-          o do
-
-            o :iambic_writer_method_name_suffix, :'='
-
-            def required=
-              @parameter_arity = :one
-            end
+          def has_default
+            false  # per f.w
           end
         end
-      end ]
+      end
 
-      p = -> { Entity_ } ; Entity_
+      p = -> do
+        Entete_
+      end
+      Entete_
     end
 
     -> { p.call }

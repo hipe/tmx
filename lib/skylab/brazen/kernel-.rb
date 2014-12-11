@@ -80,7 +80,7 @@ module Skylab::Brazen
         p = main
         p[]
       end
-      ( Callback_.stream do
+      ( LIB_.stream do
         p[]
       end )
     end
@@ -94,7 +94,7 @@ module Skylab::Brazen
     def get_model_scan
       @const_i_a ||= prdc_sorted_const_i_a
       d = -1 ; last = @const_i_a.length - 1
-      Scan_[].new do
+      LIB_.stream.new do
         while d < last
           d += 1
           i = @const_i_a.fetch d
@@ -241,7 +241,7 @@ module Skylab::Brazen
     end
 
     def bld_model_not_found_event id, s
-      Event_[].inline_with :node_not_found,
+      Brazen_.event.inline_with :node_not_found,
         :token, s, :identifier, id
     end
 

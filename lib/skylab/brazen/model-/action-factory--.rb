@@ -36,15 +36,17 @@ module Skylab::Brazen
 
         @cls2.class_exec do
 
-          extend Entity_[].proprietor_methods  # before e.g `.bulid_props`
+          extend Brazen_::Entity::Common_Module_Methods_  # before next line
 
           class << self
-            alias_method :build_action_props, :build_props
+            alias_method :build_action_props, :build_immutable_properties_stream_with_random_access_
           end
 
           extend Semi_Generated_Module_Methods__
 
-          define_singleton_method :model_class do _MODEL_CLASS_ end
+          define_singleton_method :model_class do
+            _MODEL_CLASS_
+          end
 
         end ; nil
       end
@@ -74,37 +76,40 @@ module Skylab::Brazen
 
         class << cls
 
-          def property_method_nms_for_wrt
-            began_hack or hack
-            super
+          def entity_formal_property_method_names_box_for_write
+
+            # [#046] this is much improved from what it had been but could
+            # still be improved: the first time we go to write our own
+            # properties, experimentally grab ALL of the properties of our
+            # model class and glom them as if they are ours (this is the
+            # beauty of immutable properties. you can just).
+
+            if hack_grab_mutex
+              super
+            else
+              @hack_grab_mutex = true
+              x = super
+              _hack_grab_props  # WARNING this method calls the current one
+              x
+            end
           end
 
-          attr_reader :began_hack
+          attr_reader :hack_grab_mutex
 
-        private
-
-          def hack  # #open [#046] so fragile
-            @began_hack = true
-
-            krnl = Entity_[].scope_kernel.new self, singleton_class
-
-            bx = const_get Brazen_::Entity::READ_BOX__
-            bx = bx.dup
-            const_set Brazen_::Entity::READ_BOX__, bx
-            const_set Brazen_::Entity::WRITE_BOX__, bx  # for below
-
-            model_class.properties.each_value do |prop|
-              krnl.add_property prop
-            end
-
-            ACHIEVED_
+          private def _hack_grab_props
+            ( edit_entity_class do |sess|
+              model_class.properties.each_value do | pr |
+                sess.receive_property pr
+              end
+            end )
+            nil
           end
         end
 
-        @ent[ cls, -> do
+        @ent.call cls do
           o :flag, :property, :dry_run
           o :flag, :property, :verbose
-        end ]
+        end
 
         cls.include Create_Methods__
         cls
@@ -112,22 +117,22 @@ module Skylab::Brazen
 
       def make_List
         cls = begin_class
-        @ent[ cls, -> do
+        @ent.call cls do
           o :inflect, :verb, :with_lemma, 'list', :noun, :plural
           o :flag, :property, :verbose
-        end ]
+        end
         cls.include List_Methods__
         cls
       end
 
       def make_Delete
         cls = begin_class
-        @ent[ cls, -> do
+        @ent.call cls do
           o :inflect, :verb, :with_lemma, 'delete'
           o :required, :property, NAME_
           o :flag, :property, :dry_run
           o :flag, :property, :verbose
-        end ]
+        end
         cls.include Delete_Methods__
         cls
       end
@@ -198,22 +203,12 @@ module Skylab::Brazen
           bc = @edited_entity.any_bound_call_for_edit_result
           if bc
             bc.receiver.send bc.method_name, * bc.args
-          elsif @edited_entity.error_count.zero?
-            via_edited_entity_produce_any_persist_result_when_edited_OK
           else
-            via_edited_entity_produce_any_result_when_edited_not_OK
+            via_edited_entity_produce_any_persist_result_when_edited_OK
           end
         end
+
       public
-
-        def via_edited_entity_produce_any_persist_result_when_edited_not_OK
-
-          # typically "not OK" events were omitted, and with our result here
-          # being false-ish, the client will typically use the "not OK"-ness
-          # of the events to determine some final result (e.g exit status)
-
-          UNABLE_
-        end
 
         def via_edited_entity_produce_any_persist_result_when_edited_OK
           ok = @edited_entity.any_native_create_before_create_in_datastore

@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Data_Stores_::Couch < Brazen_::Data_Store_::Model_  # see [#038]
 
-    Brazen_::Model_::Entity[ self, -> do
+    Brazen_::Model_::Entity.call self do
 
       o :desc, -> y do
         y << "manage couch datastores."
@@ -20,7 +20,7 @@ module Skylab::Brazen
         else
           ev_p[ :error, :name_must_be_lowercase_alphanumeric_with_dashes,
                 :name_s, x, :ok, false, nil ]
-        end ; nil
+        end
       end,
       :required,
       :property, :name
@@ -50,7 +50,7 @@ module Skylab::Brazen
       end,
       :property, :port
 
-    end ]
+    end
 
     Actions = make_action_making_actions_module
 
@@ -62,8 +62,12 @@ module Skylab::Brazen
 
       Rm = make_action_class :Delete do
 
-        Entity_.call self, -> do
-          o :description, -> y { y << 'always necessary for now.' },
+        Brazen_::Model_::Entity.call self do
+
+          o :description,
+            -> y do
+              y << "always necessary for now."
+            end,
             :flag, :property, :force
         end
       end

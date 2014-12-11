@@ -72,7 +72,7 @@ module Skylab::Brazen
 
         def get_module_scan_upwards
           mod = @cls
-          Scan_[].new do
+          LIB_.stream.new do
             if mod
               x = mod
               mod = mod.name_function.parent

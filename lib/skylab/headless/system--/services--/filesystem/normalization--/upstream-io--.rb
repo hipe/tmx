@@ -17,17 +17,20 @@ module Skylab::Headless
             def path=
               @do_execute = true
               @path_arg = Headless_::Lib_::Bsc_[].
-                trio.via_x_and_i iambic_property, :path ; nil
+                trio.via_x_and_i iambic_property, :path
+              ACHIEVED_
             end
 
             def path_arg=  # LOOK a trio, not a value
               @do_execute = true
               @path_arg = iambic_property
               @path_arg_was_explicit = true
+              ACHIEVED_
             end
 
             def only_apply_expectation_that_path_is_file=
               @is_only_path_ftype_expectation = true
+              ACHIEVED_
             end
 
             def on_event=
@@ -35,6 +38,7 @@ module Skylab::Headless
               @on_event_selectively = -> *, & ev_p do
                 oe_p[ ev_p[] ]
               end
+              ACHIEVED_
             end
 
             o :properties, :instream, :as_normal_value, :on_event_selectively

@@ -41,31 +41,29 @@ module Skylab::Brazen
 
       class Request_Response__
 
-        Entity_.call self, :properties,
+        def initialize * a
+          x_a, @HTTP_method_i, @database, @port, @host = a
+          @body_s = nil
+          @entity_identifier_strategy = nil
+          @HTTP_param_box = nil
+          process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+          @need_to_prepare_URI = true
+        end
+
+        Callback_::Actor.methodic self, :properties,
           :body_s,
           :native_entity_identifier_s,
           :entity_identifier_strategy,
           :URI_tail,
           :response_receiver
 
-        Entity_.call self, -> do
-          def add_HTTP_parameter
-            add_HTTP_param iambic_property, iambic_property
-          end
+      private
+
+        def add_HTTP_parameter=
+          add_HTTP_param iambic_property, iambic_property
         end
 
-        Brazen_.event.selective_builder_sender_receiver self  # just builds
-
-        def initialize * a
-
-          x_a, @HTTP_method_i, @database, @port, @host = a
-
-          @body_s = nil
-          @entity_identifier_strategy = nil
-          @HTTP_param_box = nil
-          process_iambic_fully x_a
-          @need_to_prepare_URI = true
-        end
+      public
 
         attr_reader :response_receiver
 
@@ -80,7 +78,8 @@ module Skylab::Brazen
 
         def add_HTTP_param i, x  # parse them late
           bx = @HTTP_param_box ||= Box_.new
-          bx.add i, x ; nil
+          bx.add i, x
+          ACHIEVED_
         end
 
         def prepare_URI
@@ -253,6 +252,10 @@ module Skylab::Brazen
             a[ ( d << 1 ) + 2 ] = h.fetch s
           end
           yield a, h
+        end
+
+        def build_event_via_iambic_and_message_proc a, p
+          Brazen_.event.inline_via_iambic_and_any_message_proc_to_be_defaulted a, p
         end
 
       public

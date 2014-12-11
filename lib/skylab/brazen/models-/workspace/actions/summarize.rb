@@ -4,11 +4,11 @@ module Skylab::Brazen
 
     class Actions::Summarize < Brazen_::Model_::Action
 
-      Brazen_::Model_::Entity[ self, -> do
+      Brazen_::Model_::Entity.call self do
 
         o :required, :property, :path
 
-      end ]
+      end
 
       def produce_any_result
 
@@ -17,12 +17,12 @@ module Skylab::Brazen
         model_class.merge_workspace_resolution_properties_into_via bx, self
 
         @prop = self.class.properties.fetch :path
-        @ws = model_class.edited @kernel, handle_event_selectively do |o|
+        @ws = model_class.edit_entity @kernel, handle_event_selectively do |o|
           o.with_preconditions @preconditions
           o.with_argument_box bx
           o.with :prop, @prop
         end
-        @ws.error_count.zero? and via_ws
+        @ws and via_ws
       end
 
       def via_ws

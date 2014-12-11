@@ -29,7 +29,7 @@ module Skylab::Brazen
             end
             attr_reader :name_i
 
-            def is_actually_required
+            def is_required
               :req == @opt_req_rest_i
             end
 

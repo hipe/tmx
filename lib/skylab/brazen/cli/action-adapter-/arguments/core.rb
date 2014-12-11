@@ -36,6 +36,7 @@ module Skylab::Brazen
         private
 
           def validate_indexes_of_optional_arguments
+
             # optional arguments (if any) may occur at the beginning, middle or
             # end of the formal argument list but they must be contiguous with
             # respect to each other. (inspired by the syntax for ruby arg lists)
@@ -43,7 +44,9 @@ module Skylab::Brazen
             # we are ignoring the idea of #globbing for now
 
             a = @arg_a.length.times.reduce [] do |m, d|
-              if ! @arg_a[ d ].is_actually_required
+
+              prop = @arg_a.fetch d
+              if prop.has_default || ! prop.is_required   # :+[#006]
                 if m.length.nonzero?
                   m.last == d - 1 or raise say_bad_optional_indexes( m, d )
                 end

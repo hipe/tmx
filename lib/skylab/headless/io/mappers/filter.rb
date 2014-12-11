@@ -11,23 +11,27 @@ module Skylab::Headless
     # intercept write-like messages intended for an ::IO, but do something
     # magical with the content. Don't forget to call flush! at the end.
 
-        Headless_._lib.entity self, -> do
+
+        Headless_._lib.entity self do
 
           o :iambic_writer_method_name_suffix, :'='
 
           def line_begin_string=
             s = iambic_property
             s and set_line_begin_proc -> { @downstream_IO.write s }
+            ACHIEVED_
           end
 
           def line_begin_proc=
             p = iambic_property
             p and set_line_begin_proc p
+            ACHIEVED_
           end
 
           def line_end_proc=
             p = iambic_property
             p and set_line_end_proc p
+            ACHIEVED_
           end
 
           def puts_map_proc=
@@ -38,6 +42,7 @@ module Skylab::Headless
 
             p = iambic_property
             p and ( @puts_map_p_a ||= [] ).push p
+            ACHIEVED_
           end
 
           o :properties,
@@ -59,7 +64,7 @@ module Skylab::Headless
             x_a.unshift :downstream_IO
           end
 
-          process_iambic_fully x_a
+          process_iambic_stream_fully iambic_stream_via_iambic_array x_a
 
           @niladic_pass_filter_proc ||= NILADIC_TRUTH_
 

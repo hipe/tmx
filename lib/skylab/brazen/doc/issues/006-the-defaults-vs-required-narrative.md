@@ -13,59 +13,55 @@ nonsensical depending on the definition of your property class) should
 always trigger a missing required field event as appropriate.)
 
 
-## understanding the problem
-
-the problem is a tricky one: we specify that our required fields check hook
-be the kind that is added once to the class at the end of the enhancement
-scope, because we want it to be aggregate operation that is performed once
-at one particular eventpoint (so that we can aggregate all the missing
-required fields into one event at one point).
-
-the defaulting hook, however, is a hook that is added once for each
-property-with-default that is added to the class. this is a different
-hooking mechanism, and as it is implemented it will always get its hooks
-added to the client class before the requied hook does, because these
-defaulting hooks get added as the properties are added to the class,
-whereas the required hook is added once at the end of the scope, and per
-our specification, hooks get called in the reverse order from that in
-which they were added, so later hooks may know about earlier hooks and
-change state accordingly.
 
 
-## possible solutions
+## history of the problem (sequitor of what?)
 
-since it is already ugly that we are sort of locked in to what order these
-hooks are called in given their shape, one possible solution is to emit
-different eventpoints for these different hooks. while we may look
-into this in the future, for now we like the "simplicity" of having one
-singular "normalize" eventpoint that all such hooks cohabitate.
+this used to be more of a hassle because of an eventing API that has
+since been simplified. the way we do it now, there are three distinct
+operations that happen in order during the `normalize` call to one
+entity:
+
+  1) for each (if any) formal property that houses a defaulting proc,
+     if its corresponding actual property is *nil* (not false or other),
+     call the defaulting proc and set the actual property to the
+     resulting value (whatever it is).
+
+  2) for each (if any) formal property that houses one or more property-
+     level normalization procs, run these in order against the actual
+     value, issuing a stop signal (that will bubble all the way out) if
+     any one of these procs itself issues a stop signal (by resulting
+     in false-ish probably).
+
+  3) of the list of formal properties that have a [#fa-024] nonzero
+     parameter arity (the list may have a zero length), reduce a list
+     of those formal properties whose corresponding actual value is nil
+     (not false). this (possibly zero length) list is the list of missing
+     required properties.
 
 
-## our solution
+as it stands now, we determine the three lists of properties above 1)
+separately, 2) lazily, and 3) memoized (and frozen) into the particular
+entity class at call time.
 
-rather than having "requiredness" have to know about "defaultedness"
-explicitly, we create this concept of `is_actually_required`, to mean
-"is required and has no default".  it's a bit of a workaround, but at
-least it is not as ugly and having the requiredness code directly know
-about the existence of defaultedness as a concept.
+it *used* to be that some of the aggregative operations like these were
+calculated for at the end of the *enhanceent scope*, which looking back
+was a problematic way to attempt this.
 
+also it used to be that the defaulting behavior was implemented
+differently: for each property with default that was added, we added a
+hook for this particular property *into* this particular property.
 
-## disadvantages to our solution
+now, for hooks like these it is enhancement module (and ultimately
+entity class) that houses normalization hooks like these and not the
+formal property (although we still "physcically" group the code together
+into sections corresponding to metaproperties).
 
-the "last-line-of-defense" argument no longer holds because we are
-locked into the "wrong" order.
+all hooks aggregate into one flat array. as well, we put the three steps
+into one hand-written normalization hook (added to the flat array of
+normalization hooks).
 
+at least three more awful solutions to this solution were proposed in
+previous versions of this document.
 
-## a more ideal solution
-
-although at first it seems that it would be nice for the order of
-meta-properties being used to determine the order that their hooks are called
-in, in practice we assume it is unlikely that we want this kind of
-knowledge at this level.
-
-alternately it might be nice to have the order that meta-properties are
-declared in determine the order that their hooks are called in, but this
-would require some drastic re-architecting near the fragile hooking
-logic. we could associate a 'meta-property index' with each
-meta-property as it is added and associate that with the hook(s) it
-defines, and then call the hooks in that order..
+_

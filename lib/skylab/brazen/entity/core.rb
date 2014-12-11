@@ -45,7 +45,7 @@ module Skylab::Brazen
           cls = st.gets_one
           Callback_::Actor.methodic cls
           cls.extend Module_Methods__
-          cls.entity_edit_sess do |sess|
+          cls.edit_entity_class do |sess|
             sess.receive_edit st, & edit_p
           end
         end
@@ -231,6 +231,10 @@ module Skylab::Brazen
       end
 
       attr_reader :edit_session, :upstream
+
+      def downstream
+        @edit_session.iambic_writer_method_writee_module
+      end
     end
 
     # ~ parsing the DSL: edit sessions for modules and classes
@@ -256,8 +260,8 @@ module Skylab::Brazen
 
     class Produce_extension_module__ < Module_Edit_Session__
 
-      def initialize & p
-        @p = p
+      def initialize & edit_p
+        @edit_p = edit_p
       end
 
       def execute
@@ -279,11 +283,10 @@ module Skylab::Brazen
         @writable_formal_propery_method_names_box = box
 
         mod.active_entity_edit_session = self
-        mod.module_exec( & @p )
+        mod.module_exec( & @edit_p )
         mod.active_entity_edit_session = nil
-        mod
+        finish mod
       end
-
     end
 
     class Class_Edit_Session__ < Module_Edit_Session__
@@ -292,18 +295,14 @@ module Skylab::Brazen
         init_edit_session_via_extended_client_module cls
         @formal_property_writee_module = cls.singleton_class
         @writable_formal_propery_method_names_box =
-          cls.entity_formal_property_method_names_box_for_wrt
-      end
-
-      def finish
-        nil
+          cls.entity_formal_property_method_names_box_for_write
       end
     end
 
     class Module_Edit_Session__
 
       private def init_edit_session_via_extended_client_module mod
-        mod.include Instance_Methods__
+        mod.include Instance_Methods
         @iambic_writer_method_writee_module = mod
         @method_added_filter = IDENTITY_
         @pay_attention_to_method_added = true
@@ -399,6 +398,10 @@ module Skylab::Brazen
         end
       end
 
+      def receive_property pr  # :+#public-API
+        receive_prop pr
+      end
+
       def receive_prop prop
         ok = true
         if prop.against_EC_p_a
@@ -453,6 +456,19 @@ module Skylab::Brazen
         @pay_attention_to_method_added = false
       end
 
+      def finish x
+        if @property_related_nonterminal.last_incomplete_property
+          pr = @property_related_nonterminal.last_incomplete_property
+          maybe_send_event :error, :property_or_metaproperty_never_received_a_name do
+            build_not_OK_event_with :property_or_metaproperty_never_received_a_name,
+              :property_or_metaproperty, pr,
+              :error_category, :argument_error
+          end
+        else
+          x
+        end
+      end
+
     private
 
       def bld_method_added_without_suffix_event m_i, sfx
@@ -473,13 +489,13 @@ module Skylab::Brazen
 
     # ~ the modules that enhance the extension modules or entity classes
 
-    module Common_Module_Methods__
+    module Common_Module_Methods_
 
       def properties
-        @properties ||= bld_immutable_properties_stream_with_random_access
+        @properties ||= build_immutable_properties_stream_with_random_access_
       end
 
-      def bld_immutable_properties_stream_with_random_access
+      def build_immutable_properties_stream_with_random_access_
         entity_formal_property_method_names_box_for_rd.to_value_scan.map_by do |i|
           send i
         end.immutable_with_random_access_keyed_to_method :name_i
@@ -513,7 +529,7 @@ module Skylab::Brazen
 
       module_attr_reader_writer(
         :entity_formal_property_method_names_box_for_rd,
-        :entity_formal_property_method_names_box_for_wrt,
+        :entity_formal_property_method_names_box_for_write,  # :+#public-API (name)
         :ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___,
         :@entity_formal_property_method_nms_bx_for_wrt ) do |o|
           o::ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___.dup
@@ -550,32 +566,55 @@ module Skylab::Brazen
 
     module Extension_Module_Methods__
 
-      include Common_Module_Methods__
+      include Common_Module_Methods_
 
       attr_accessor :active_entity_edit_session
 
-      def via_arglist a, & edit_p
+      def [] cls, * rest
+        if rest.length.nonzero?
+          st = Callback_::Iambic_Stream_.new 0, rest
+        end
+        _enhance_to_and_edit_entity_class_via_any_nonempty_stream cls, st
+      end
+
+      def call cls, * rest, & edit_p
+        if rest.length.nonzero?
+          st = Callback_::Iambic_Stream_.new 0, rest
+        end
+        _enhance_to_and_edit_entity_class_via_any_nonempty_stream cls, st, & edit_p
+      end
+
+      def via_nonzero_length_arglist a, & edit_p
         st = Callback_::Iambic_Stream_.new 0, a
         cls = st.gets_one
-        if st.unparsed_exists || edit_p
-          self[ cls ]
-          cls.entity_edit_sess do |sess|
-            sess.receive_edit st, & edit_p
+        _enhance_to_and_edit_entity_class_via_any_nonempty_stream cls, st, & edit_p
+      end
+
+    private
+
+      def _enhance_to_and_edit_entity_class_via_any_nonempty_stream cls, st, & edit_p
+
+        # when an edit block is passed, result is the result of the block.
+        # otherwise, result is always the argument class to allow for
+        # nested enhancement calls e.g if the call used the `[]` form
+
+        _touch_extends_and_includes_on_client_class cls
+        if edit_p || st
+          cls.edit_entity_class do |sess|
+            if st
+              sess.receive_edit st, & edit_p
+            else
+              # for #grease, here is how you can fulfill only the block
+              cls.module_exec( & edit_p )
+            end
           end
-       else
-          self[ cls ]
+        else
+          cls
         end
       end
 
-      def call cls, & p
-        self[ cls ]
-        cls.entity_edit_sess do
-          cls.module_exec( & p )
-        end
-      end
-
-      def [] cls
-        if cls.const_defined? :ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___
+      def _touch_extends_and_includes_on_client_class cls
+        if cls.respond_to? :edit_entity_class
           did_already = true
         else
           Callback_::Actor.methodic cls
@@ -585,32 +624,31 @@ module Skylab::Brazen
         cls.include self
         if did_already
           _my_box = self::ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___
-          _their_box = cls.entity_formal_property_method_names_box_for_wrt
+          _their_box = cls.entity_formal_property_method_names_box_for_write
           _their_box.ensuring_same_values_merge_box! _my_box
         else
-          cls.entity_formal_property_method_names_box_for_wrt  # copy them now
+          cls.entity_formal_property_method_names_box_for_write  # copy them now
         end
-        cls
+        nil
       end
     end
 
     module Module_Methods__
 
-      include Common_Module_Methods__
+      include Common_Module_Methods_
 
       attr_reader :active_entity_edit_session
 
-      def entity_edit_sess
+      def edit_entity_class
         sess = Class_Edit_Session__.new self
         @active_entity_edit_session = sess
         x = yield sess
-        sess.finish
         @active_entity_edit_session = nil
-        x
+        sess.finish x
       end
     end
 
-    module Instance_Methods__
+    module Instance_Methods
 
       ENTITY_AD_HOCS___ = nil
 
@@ -620,8 +658,9 @@ module Skylab::Brazen
 
       # Entity_Property = Property__ below
 
-      def initialize & p  # #experimental
+      def initialize * a, & p  # #experimental
         instance_exec( & p )
+        super( * a, & nil )
       end
 
       def any_property_value_via_property prop
@@ -692,6 +731,8 @@ module Skylab::Brazen
           Methodic_as_Nonterminal_[ self ] )
         @last_incomplete_property = nil
       end
+
+      attr_reader :last_incomplete_property
 
       def receive_parse_context pc
         @adaptive_nonterminal_queue.receive_parse_context pc
@@ -945,9 +986,13 @@ module Skylab::Brazen
       end  # >>
 
       def description_under expag
-        symbol = @name.as_variegated_symbol
-        expag.calculate do
-          code symbol
+        if @name
+          symbol = @name.as_variegated_symbol
+          expag.calculate do
+            code symbol
+          end
+        else
+          Entity_::Small_Time_Actors__::Prop_desc_wonderhack[ expag, self ]
         end
       end
 
@@ -988,7 +1033,7 @@ module Skylab::Brazen
       def iambic_writer_method_proc_when_arity_is_one
         _NAME_I = name_i
         -> do
-          _prop = self.class.send self.class.entity_formal_property_method_names_box_for_wrt.fetch _NAME_I
+          _prop = self.class.send self.class.entity_formal_property_method_names_box_for_write.fetch _NAME_I
           receive_value_of_entity_property iambic_property, _prop  # RESULT VALUE
         end
       end
@@ -996,7 +1041,7 @@ module Skylab::Brazen
       def iambic_writer_method_proc_when_arity_is_zero
         _NAME_I = name_i
         -> do
-          _prop = self.class.send self.class.entity_formal_property_method_names_box_for_wrt.fetch _NAME_I
+          _prop = self.class.send self.class.entity_formal_property_method_names_box_for_write.fetch _NAME_I
           receive_value_of_entity_property true, _prop  # RESULT VALUE
         end
       end
@@ -1031,7 +1076,7 @@ module Skylab::Brazen
       NORM_P_A = nil
     end
 
-    module Instance_Methods__
+    module Instance_Methods
       Entity_Property = Property__  # as promised above
     end
 

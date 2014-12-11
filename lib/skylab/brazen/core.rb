@@ -1,4 +1,5 @@
 require_relative '..'
+
 require_relative '../callback/core'
 
 module Skylab::Brazen
@@ -244,6 +245,13 @@ module Skylab::Brazen
     end
   end
 
+  LIB_ = ::Module.new  # stand-in
+  class << LIB_
+    def stream
+      Callback_::Scan
+    end
+  end
+
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
   Actor_ = -> cls, * x_a do
@@ -284,7 +292,6 @@ module Skylab::Brazen
   NEWLINE_ = "\n".freeze
   NILADIC_TRUTH_ = -> { true }
   PROCEDE_ = true
-  Scan_ = -> { Callback_::Scan }
   SPACE_ = ' '.freeze
 
   stowaway :TestSupport, 'test/test-support'

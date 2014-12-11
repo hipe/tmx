@@ -4,7 +4,7 @@ module Skylab::Brazen
 
   class Actions::Init < Brazen_::Model_::Action
 
-    Brazen_::Model_::Entity[ self, -> do
+    Brazen_::Model_::Entity.call self do
 
       o :desc, -> y do
         y << "init a #{ highlight '<workspace>' }"
@@ -25,7 +25,7 @@ module Skylab::Brazen
       end,
       :property, :path  # even though not alphabetical, leave at end
 
-    end ]
+    end
 
     def produce_any_result
 
@@ -40,13 +40,13 @@ module Skylab::Brazen
           bookends self, :init
 
       @prop = self.class.properties.fetch :path
-      @ws = model_class.edited @kernel, handle_event_selectively do |o|
+      @ws = model_class.edit_entity @kernel, handle_event_selectively do |o|
         o.with_argument_box bx
         o.with :prop, @prop,
           :app_name, @kernel.app_name,
           :on_event_selectively, _oes_p
       end
-      @ws.error_count.zero? and work
+      @ws and work
     end
 
     def work

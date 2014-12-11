@@ -342,7 +342,7 @@ module Skylab::Brazen
         scan = if @properties
           @properties.to_stream
         else
-          Scan_[].via_nonsparse_array EMPTY_A_
+          LIB_.stream.via_nonsparse_array EMPTY_A_
         end
         scan.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :help
       end
@@ -408,7 +408,7 @@ module Skylab::Brazen
       def process_environment
         env = @resources.env
         @partitions.env_a.each do |prop|
-          s = env[ prop.upcase_environment_name_i.id2name ]
+          s = env[ prop.upcase_environment_name_symbol.id2name ]
           s or next
           cased_i = prop.name_i.downcase  # [#039] casing
           @seen_h[ cased_i ] and next
@@ -910,7 +910,16 @@ module Skylab::Brazen
             ( @env_a ||= [] ).push prop
           end
           prop.can_be_from_argv or next
-          if prop.is_actually_required
+
+          _is_effectively_required = if prop.is_required
+            if prop.has_default
+              false  # explained fully at [#006]
+            else
+              true
+            end
+          end
+
+          if _is_effectively_required
             ( @arg_a ||= [] ).push prop
           elsif prop.takes_many_arguments
             ( @many_a ||= [] ).push prop
@@ -1019,7 +1028,7 @@ module Skylab::Brazen
 
       def add_env_section o
         o.add_section :item_section, 'environment variable',
-          @env_a, & :upcase_environment_name_i
+          @env_a, & :upcase_environment_name_symbol
       end
 
     public
@@ -1089,7 +1098,7 @@ module Skylab::Brazen
       end
       def to_stream
         scn = @box.to_value_stream
-        Scan_[].new do
+        LIB_.stream.new do
           scn.gets
         end
       end
@@ -1114,8 +1123,6 @@ module Skylab::Brazen
         :can_be_from_environment,
         :custom_moniker,
         :is_required
-
-      alias_method :is_actually_required, :is_required
 
       def name_i
         @name.as_variegated_symbol
@@ -1221,7 +1228,7 @@ module Skylab::Brazen
         @a = a
       end
       def produce_any_result
-        scn = Scan_[].via_nonsparse_array @a
+        scn = LIB_.stream.via_nonsparse_array @a
         while exe = scn.gets
           value = exe.receiver.send exe.method_name, * exe.args
           value.nonzero? and break

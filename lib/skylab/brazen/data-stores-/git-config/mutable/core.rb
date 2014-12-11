@@ -211,7 +211,7 @@ module Skylab::Brazen
         end
 
         def get_all_node_stream
-          Scan_[].via_nonsparse_array @a
+          LIB_.stream.via_nonsparse_array @a
         end
 
         def count_number_of_nodes i
@@ -274,7 +274,7 @@ module Skylab::Brazen
         end
 
         def get_all_node_scan
-          Scan_[].via_nonsparse_array @a
+          LIB_.stream.via_nonsparse_array @a
         end
       end
 
@@ -1484,7 +1484,7 @@ module Skylab::Brazen
       class Event_Sending_Node__
       private
 
-        Event_[].selective_builder_sender_receiver self
+        Brazen_.event.selective_builder_sender_receiver self
 
         def maybe_send_event * i_a, & ev_p
           @parse.maybe_receive_event_via_channel i_a, & ev_p

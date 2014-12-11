@@ -18,8 +18,12 @@ module Skylab::Brazen
           Collection_Controller_
         end
 
-        def entity
-          Model_::Entity
+        def entity * a, & p
+          if a.length.nonzero? || p
+            Model_::Entity.via_nonzero_length_arglist a, & p
+          else
+            Model_::Entity
+          end
         end
 
         def name_function_class
@@ -103,19 +107,17 @@ module Skylab::Brazen
         const_get :Silo__, false
       end
 
-      def unmarshalled kernel, oes_p, & p
-        entity = new kernel do
+      def unmarshalled kernel, oes_p, & edit_p
+        new kernel do
           recv_selective_listener_proc oes_p
           @came_from_persistence = true
-        end
-        entity.first_edit_via_proc p
+        end.first_edit( & edit_p )
       end
 
-      def edited kernel, oes_p, & p
-        entity = new kernel do
+      def edit_entity kernel, oes_p, & edit_p
+        new kernel do
           recv_selective_listener_proc oes_p
-        end
-        entity.first_edit_via_proc p
+        end.first_edit( & edit_p )
       end
 
       def persist_to= i
@@ -156,7 +158,7 @@ module Skylab::Brazen
       end
 
       def process_some_customized_inflection_behavior scanner
-        Process_customized_model_inflection_behavior__[ scanner, self ] ; nil
+        Process_customized_model_inflection_behavior__[ scanner, self ]
       end
 
       def node_identifier
@@ -189,6 +191,12 @@ module Skylab::Brazen
     end  # >>
 
     extend Brazen_.name_library.name_function_proprietor_methods
+
+    # [#013]:#note-A the below order
+
+    include Callback_::Actor.methodic_lib.iambic_processing_instance_methods
+
+    include Brazen_::Entity::Instance_Methods
 
     include module Interface_Element_Instance_Methdods__
 
@@ -248,8 +256,7 @@ module Skylab::Brazen
     # ~ multipurpose, simple readers
 
     attr_reader :any_bound_call_for_edit_result,
-      :came_from_persistence,
-      :error_count
+      :came_from_persistence
 
     def is_branch
       true
@@ -260,25 +267,25 @@ module Skylab::Brazen
     end
 
     def to_even_iambic
-      scn = to_normalized_actual_property_scan ; y = []
+      scn = to_normalized_actual_property_stream ; y = []
       while actual = scn.gets
         y.push actual.name_i, actual.value_x
       end ; y
     end
 
     def to_normalized_actual_property_scan_for_persist
-      to_normalized_actual_property_scan
+      to_normalized_actual_property_stream
     end
 
-    def to_normalized_actual_property_scan
-      Scan_[].via_nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
+    def to_normalized_actual_property_stream
+      LIB_.stream.via_nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
         Actual_Property_.new any_property_value( i ), i
       end
     end
 
     def to_normalized_bound_property_scan
       props = self.class.properties
-      Scan_[].via_nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
+      LIB_.stream.via_nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
         get_bound_property_via_property props.fetch i
       end
     end
@@ -399,17 +406,17 @@ module Skylab::Brazen
 
       def get_upper_action_cls_scan
         @did ||= work
-        Scan_[].via_nonsparse_array @up_a
+        LIB_.stream.via_nonsparse_array @up_a
       end
 
       def get_lower_action_cls_scan
         @did ||= work
-        Scan_[].via_nonsparse_array @down_a
+        LIB_.stream.via_nonsparse_array @down_a
       end
 
       def get_node_scan
         @did ||= work
-        Scan_[].via_nonsparse_array @all_a
+        LIB_.stream.via_nonsparse_array @all_a
       end
 
       def all_a
@@ -452,31 +459,68 @@ module Skylab::Brazen
 
     # ~ edit :+#hook-in
 
-    def first_edit &p
-      first_edit_via_proc p
+    def first_edit & edit_p
+      _ok = set_prps_via_first_edit( & edit_p )
+      _ok && via_props_produce_edit_result
     end
 
-    def first_edit_via_proc p
-      set_property_values_via_edit_proc p
-      via_properties_produce_edit_result
-    end
-
-    def edit & p
-      es = Late_Edit_Shell__.new @parameter_box, x_a=[], self.class.properties
-      p[ es ]
-      if x_a.length.nonzero?
-        process_iambic_fully 0, x_a
-      end
-      afp = es.action_formal_properties
-      if afp
-        @action_formal_properties = afp
-      end
-      nil
+    def edit & edit_p  # #todo this is covered visually by `source rm` ONLY
+      _ok = set_prps_via_subsequent_edit( & edit_p )
+      _ok && via_props_produce_edit_result
     end
 
     attr_reader :action_formal_properties
 
-    class Late_Edit_Shell__
+  private
+
+    def set_prps_via_first_edit & edit_p
+
+      @parameter_box ||= Box_.new
+
+      x_a = []
+
+      es = First_Edit_Session__.new @parameter_box, x_a, self.class.properties
+      edit_p[ es ]  # the blocks of edit sessions are only for setting parameters
+
+      oes_p = es.handle_event_selectively
+      if oes_p
+        recv_selective_listener_proc oes_p
+      end
+
+      precons = es.precons
+      if precons
+        @preconditions = precons
+      end
+
+      @property_box ||= Box_.new
+
+      if x_a.length.zero?
+        ACHIEVED_
+      else
+        process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+      end
+    end
+
+    def set_prps_via_subsequent_edit & edit_p
+
+      x_a = []
+
+      es = Subsequent_Edit_Session__.new @parameter_box, x_a, self.class.properties
+      edit_p[ es ]  # the blocks of edit sessions are only for setting parameters
+
+      afp = es.action_formal_properties
+      if afp
+        @action_formal_properties = afp
+      end
+
+      if x_a.length.zero?
+        ACHIEVED_
+      else
+        process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+      end
+    end
+
+    class Subsequent_Edit_Session__
 
       def initialize pbx, x_a, props
 
@@ -539,29 +583,7 @@ module Skylab::Brazen
       end
     end
 
-  private
-
-    def set_property_values_via_edit_proc p
-      @parameter_box ||= Box_.new
-      es = Early_Edit_Shell__.new @parameter_box, x_a=[], self.class.properties
-      p[ es ]
-      oes_p = es.handle_event_selectively
-      if oes_p
-        recv_selective_listener_proc oes_p
-      end
-      precons = es.precons
-      if precons
-        @preconditions = precons
-      end
-      @property_box ||= Box_.new
-      @error_count ||= 0
-      if x_a.length.nonzero?
-        process_iambic_fully 0, x_a
-      end
-      nil
-    end
-
-    class Early_Edit_Shell__ < Late_Edit_Shell__
+    class First_Edit_Session__ < Subsequent_Edit_Session__
 
       attr_accessor :precons
 
@@ -582,9 +604,13 @@ module Skylab::Brazen
       end
     end
 
-    def via_properties_produce_edit_result  # :+#public-API
-      notificate :iambic_normalize_and_validate
-      self
+    def via_props_produce_edit_result
+      ok = normalize
+      if ok
+        self
+      else
+        ok
+      end
     end
 
   public
@@ -742,7 +768,8 @@ module Skylab::Brazen
       def acpt _MODEL_INFLECTION_
         @cls.send :define_singleton_method, :custom_branch_inflection do
           _MODEL_INFLECTION_
-        end ; nil
+        end
+        KEEP_PARSING_
       end
     end
 

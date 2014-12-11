@@ -197,7 +197,7 @@ module Skylab::Brazen
 
         def _sign_event ev
           _nf = @action_class_like.name_function
-          Event_[].wrap.signature _nf, ev
+          Brazen_.event.wrap.signature _nf, ev
         end
       end
     end
