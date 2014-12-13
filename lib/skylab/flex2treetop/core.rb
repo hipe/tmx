@@ -291,6 +291,7 @@ module Skylab::Flex2Treetop
         @default_proc = -> do
           _X
         end
+        KEEP_PARSING_
       end
 
       def flag=
@@ -300,13 +301,14 @@ module Skylab::Flex2Treetop
 
       def optional=
         @parameter_arity = :zero_or_one
+        KEEP_PARSING_
       end
     end
 
   private
 
     def init_via_iambic x_a
-      process_iambic_fully x_a
+      process_iambic_stream_fully iambic_stream_via_iambic_array x_a
       via_default_proc_and_is_required_normalize
     end
 
@@ -331,6 +333,8 @@ module Skylab::Flex2Treetop
       end
     end
   end
+
+  KEEP_PARSING_ = true  # must be defined before local actor is used below
 
   module API
 
@@ -382,7 +386,7 @@ module Skylab::Flex2Treetop
     class Actions::Ping < Action
 
       o :simple, :properties,
-          :ivar, :@arg_x, :arg_1
+          :ivar, :@arg_x, :property, :arg_1
 
       def execute
         @errstream.puts "helo:(#{ @arg_x })"
@@ -393,7 +397,7 @@ module Skylab::Flex2Treetop
     class Actions::Version < Action
 
       o :simple, :properties,
-          :flag, :bare
+          :flag, :property, :bare
 
       def execute
         if @bare
@@ -424,7 +428,8 @@ module Skylab::Flex2Treetop
         super
       end
       def _CHANGE_PROGRAM_NAME! x
-        @program_name = x ; nil
+        @program_name = x
+        KEEP_PARSING_
       end
       def program_name
         @program_name || ::File.basename( $PROGRAM_NAME )
@@ -443,20 +448,36 @@ module Skylab::Flex2Treetop
 
       o :simple, :properties,
         # * parameter_members,  # #storypoint-315
-        :flag, :ivar, :@is_case_sensitive, :case_sensitive,
-        :flag, :ivar, :@do_clear_files, :clear_generated_files,
-        :flag, :endpoint_is_FS_parser,
-        :flexfile,
-        :flag, :ivar, :@force_is_present, :force,
-        :optional, :iambic_writer_method_proc_proc, Pathname_writer__, :FS_parser_dir,
-        :emit_info_line_p,
-        :emit_info_string_p,
-        :iambic_writer_method_to_be_provided, :paystream_via,
-        :pp_IO_for_show_sexp,
-        :flag, :ivar, :@do_show_sexp_only, :show_sexp_only,
-        :flag, :ivar, :@do_use_FS_parser, :use_FS_parser,
-        :flag, :default, true, :ivar, :@be_verbose, :verbose,
-        :optional, :wrap_in_grammar_s
+
+        :flag, :ivar, :@is_case_sensitive, :property, :case_sensitive,
+
+        :flag, :ivar, :@do_clear_files, :property, :clear_generated_files,
+
+        :flag, :property, :endpoint_is_FS_parser,
+
+        :property, :flexfile,
+
+        :flag, :ivar, :@force_is_present, :property, :force,
+
+        :optional,
+          :iambic_writer_method_proc_proc, Pathname_writer__,
+          :property, :FS_parser_dir,
+
+        :property, :emit_info_line_p,
+
+        :property, :emit_info_string_p,
+
+        :iambic_writer_method_to_be_provided, :property, :paystream_via,
+
+        :property, :pp_IO_for_show_sexp,
+
+        :flag, :ivar, :@do_show_sexp_only, :property, :show_sexp_only,
+
+        :flag, :ivar, :@do_use_FS_parser, :property, :use_FS_parser,
+
+        :flag, :default, true, :ivar, :@be_verbose, :property, :verbose,
+
+        :optional, :property, :wrap_in_grammar_s
 
       private
 
@@ -467,9 +488,11 @@ module Skylab::Flex2Treetop
           when :IO
             @pay_i = :IO
             @pay_x = iambic_property
+            KEEP_PARSING_
           when :path
             @pay_i = :path
             @pay_x = iambic_property
+            KEEP_PARSING_
           else
             raise ::ArgumentError, "no: '#{ type_i }'"
           end
@@ -674,6 +697,7 @@ module Skylab::Flex2Treetop
       x = iambic_property
       if x && ! x.closed?
         instance_variable_set ivar, x
+        KEEP_PARSING_
       else
         raise ::ArgumentError, "for '#{ name_i }' #{
           }need open stream, had #{ LIB_.strange x }"
@@ -691,21 +715,37 @@ module Skylab::Flex2Treetop
 Translate__ = Class_as_function__[ -> do class Translate____
 
     Local_Actor_.call self, :simple, :properties,
-      :be_verbose,
-      :optional, :do_clear_files,
-      :optional, :do_show_sexp_only,
-      :optional, :do_use_FS_parser,
-      :emit_info_line_p,
-      :emit_info_string_p,
-      :optional, :endpoint_is_FS_parser,
-      :optional, :FS_parser_dir,
-      :iambic_writer_method_proc_proc, Assert_open_stream__, :instream,
-      :instream_moniker,
-      :iambic_writer_method_to_be_provided, :outstream,
-      :outstream_moniker,
-      :pp_IO_for_show_sexp,
-      :verb_s,
-      :optional, :wrap_in_grammar_s
+
+      :property, :be_verbose,
+
+      :optional, :property, :do_clear_files,
+
+      :optional, :property, :do_show_sexp_only,
+
+      :optional, :property, :do_use_FS_parser,
+
+      :property, :emit_info_line_p,
+
+      :property, :emit_info_string_p,
+
+      :optional, :property, :endpoint_is_FS_parser,
+
+      :optional, :property, :FS_parser_dir,
+
+      :iambic_writer_method_proc_proc, Assert_open_stream__,
+        :property, :instream,
+
+      :property, :instream_moniker,
+
+      :iambic_writer_method_to_be_provided, :property, :outstream,
+
+      :property, :outstream_moniker,
+
+      :property, :pp_IO_for_show_sexp,
+
+      :property, :verb_s,
+
+      :optional, :property, :wrap_in_grammar_s
 
     def initialize x_a
       init_via_iambic x_a
@@ -733,11 +773,12 @@ Translate__ = Class_as_function__[ -> do class Translate____
         x = iambic_property
         if :_no_outstream_ == x
           @outstream = x  # still it must pass arity check
+          KEEP_PARSING_
         else
           raise ::ArgumentError,
             "pass no #{ prop.name_i } when nonconventional endpoint (#{ x })"
         end
-      end ; nil
+      end
     end
 
     # ~ we comport with [#hl-154] control-flow method-naming idioms
@@ -917,13 +958,20 @@ Translate__ = Class_as_function__[ -> do class Translate____
   class Translate_Stream__
 
     Local_Actor_.call self, :simple, :properties,
-      :optional, :do_show_sexp_only,
-      :emit_info_line_p,
-      :emit_info_string_p,
-      :instream,
-      :outstream,
-      :pp_IO_for_show_sexp,
-      :optional, :wrap_in_grammar_s
+
+      :optional, :property, :do_show_sexp_only,
+
+      :property, :emit_info_line_p,
+
+      :property, :emit_info_string_p,
+
+      :property, :instream,
+
+      :property, :outstream,
+
+      :property, :pp_IO_for_show_sexp,
+
+      :optional, :property, :wrap_in_grammar_s
 
     def initialize x_a
       init_via_iambic x_a

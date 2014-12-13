@@ -2,17 +2,18 @@ module Skylab::Callback::TestSupport
 
   class Call_Digraph_Listeners_Spy__  # read [#022] the narrative  #storypoint-1
 
-    Callback_::Lib_::Entity[ self, -> do
+    Callback_::Lib_::Entity.call self do
 
       o :iambic_writer_method_name_suffix, :'='
 
       def debug=
         @do_debug_proc = NILADIC_TRUTH_
+        KEEP_PARSING_
       end
 
       o :properties, :do_debug_proc, :debug_IO
 
-    end ]
+    end
 
     EMPTY_P_ = Callback_::EMPTY_P_
 
@@ -25,7 +26,7 @@ module Skylab::Callback::TestSupport
 
     def init_via_iambic x_a
       @emission_a = []
-      process_iambic_fully x_a
+      process_iambic_stream_fully iambic_stream_via_iambic_array x_a
       @do_debug_proc ||= EMPTY_P_
     end
 
@@ -63,5 +64,7 @@ module Skylab::Callback::TestSupport
     def delete_emission_a
       r = @emission_a ; @emission_a = nil ; r
     end
+
+    KEEP_PARSING_ = true
   end
 end

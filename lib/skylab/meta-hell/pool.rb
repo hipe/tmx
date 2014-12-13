@@ -2,9 +2,9 @@ module Skylab::MetaHell
 
   module Pool
 
-    # Pool's `with_instance` enhancement is essentially a partial
-    # implementation of a flyweight pattern. It is for when you want to
-    # avoid incuring the overhead of allocating and de-allocating lots of
+    # Pool's `with_instance` enhancement is a partial implementation of
+    # a flyweight pattern. It is for when you want to
+    # avoid incurring the overhead of allocating and de-allocating lots of
     # objects that you expect to need for perhaps only a short time or
     # limited scope.
     #
@@ -79,28 +79,33 @@ module Skylab::MetaHell
         @mod = mod
       end
 
-      MetaHell_._lib.entity_lib.call self, -> do
-
-        def apply_with_instance
-          @apply_with_instance = true
-        end
-
-        def apply_lease_and_release
-          @apply_lease_and_release = true
-        end
-
-        def fly_p
-          @fly_p = iambic_property
-        end
-
-        def new_stays_public
-          @make_new_private = ! iambic_property
-        end
+      def receive_iambic x_a
+        _ok = process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+        _ok and execute
       end
 
-      def receive_iambic x_a
-        ok = process_iambic_fully 0, x_a
-        ok and execute
+      include Callback_::Actor.methodic_lib.iambic_processing_instance_methods
+
+    private
+
+      def apply_with_instance=
+        @apply_with_instance = true
+        KEEP_PARSING_
+      end
+
+      def apply_lease_and_release=
+        @apply_lease_and_release = true
+        KEEP_PARSING_
+      end
+
+      def fly_p=
+        @fly_p = iambic_property
+        KEEP_PARSING_
+      end
+
+      def new_stays_public=
+        @make_new_private = ! iambic_property
+        KEEP_PARSING_
       end
 
       def execute
@@ -164,6 +169,8 @@ module Skylab::MetaHell
       # (The two enhancements exist as separate only because they came from
       # different places. Whenever it is optimal to merge the other on top of
       # the one we should do so [#023].)
+
+    KEEP_PARSING_ = true
 
   end
 end

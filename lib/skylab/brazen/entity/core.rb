@@ -1149,7 +1149,5 @@ module Skylab::Brazen
     end
 
     Entity_ = self
-
-    STOP_PARSING_ = false
   end
 end

@@ -293,6 +293,7 @@ module Skylab::Brazen
   NILADIC_TRUTH_ = -> { true }
   PROCEDE_ = true
   SPACE_ = ' '.freeze
+  STOP_PARSING_ = false
 
   stowaway :TestSupport, 'test/test-support'
 

@@ -26,6 +26,8 @@ these structures of "service" and "session".
 
 
 
+
+
 ## :#storypoint-315
 
 this is a "frontier hack": we subclassed the parameter class and customized
@@ -37,6 +39,7 @@ here is rewriting those (~threee) parameters but this time with the new
 parameter class. note we are not passing meta-parameter values to those
 parameters, hence they get the defaults. this "should" work provided our
 default metaparameter values line up with the parameters we int
+
 
 
 
@@ -56,6 +59,7 @@ when needed.
 
 this achieves the same effect as balkanizing this file into many smaller
 files, which we are avoiding for some reason.
+
 
 
 

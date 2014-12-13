@@ -36,11 +36,11 @@ module Skylab::Callback
       MH__[]::Enhance::Shell.new a
     end
 
-    Entity = -> * a do
-      if a.length.zero?
-        Bzn__[]::Entity
+    Entity = -> * a, & edit_p do
+      if a.length.nonzero? || edit_p
+        Bzn__[]::Entity.via_arglist a, & edit_p
       else
-        Bzn__[]::Entity.via_arglist a
+        Bzn__[]::Entity
       end
     end
 

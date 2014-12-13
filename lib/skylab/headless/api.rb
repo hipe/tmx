@@ -142,13 +142,15 @@ module Skylab::Headless
         :service,
         :unbound_action_box
 
-      def initialize x_a  # mutates the scan, "parses-off" what it takes
-        d = process_iambic_passively x_a
-        @local_mutable_iambic = if d
-          x_a[ 0, d ] = EMPTY_A_
-          x_a
-        else
+      def initialize x_a  # mutates the scan, "parses-off" what it takes. #todo this should pass a stream not an array
+        st = iambic_stream_via_iambic_array x_a
+        d = st.current_index
+        process_iambic_stream_passively st
+        @local_mutable_iambic = if d == st.current_index
           EMPTY_A_  # it's a trap
+        else
+          x_a[ 0, st.current_index ] = EMPTY_A_
+          x_a
         end
         rslv_errstream
         rslv_unbound_action_box ; nil
@@ -217,9 +219,9 @@ module Skylab::Headless
       Callback_::Actor.methodic self, :simple, :properties,
         :properties, :errstream, :service, :session
 
-      def initialize x_a=nil
+      def initialize x_a=nil  # #todo pass stream not array
         if x_a
-          process_iambic_fully x_a
+          process_iambic_stream_fully iambic_stream_via_iambic_array x_a
           nilify_uninitialized_ivars
         end
         super()

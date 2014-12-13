@@ -23,7 +23,8 @@ module Skylab::Brazen
           end
 
           def properties
-            @xtra_prop_x_a = flush_remaining_iambic
+            @xtra_prop_x_a = @__methodic_actor_iambic_stream__.flush_remaining_to_array
+            KEEP_PARSING_  # altho we should stop now, it looks like error otherwise
           end
 
           def search_and_replace_hack
@@ -60,7 +61,8 @@ module Skylab::Brazen
         end
 
         def add_mutator & p
-          ( @mutator_p_a ||= [] ).push p ; nil
+          ( @mutator_p_a ||= [] ).push p
+          KEEP_PARSING_
         end
 
         def execute

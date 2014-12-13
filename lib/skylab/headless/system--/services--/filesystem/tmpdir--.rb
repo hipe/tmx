@@ -8,6 +8,8 @@ module Skylab::Headless
 
       class Tmpdir__ < ::Pathname
 
+        alias_method :init_pathname, :initialize
+
     include Headless_::Library_::FileUtils
 
     Headless_._lib.entity self do
@@ -20,21 +22,23 @@ module Skylab::Headless
 
       def noop=
         @is_noop = iambic_property
+        KEEP_PARSING_
       end
 
       def path=
         @path_x = iambic_property
+        KEEP_PARSING_
       end
 
       def verbose=  # #open [#174] waiting for [#cb] fix (this should go after next)
         @be_verbose = true
+        KEEP_PARSING_
       end
 
       o :property, :be_verbose
 
     end
 
-    alias_method :init_pathname, :initialize
 
     def initialize * x_a, & p
       @is_noop = false
@@ -349,6 +353,8 @@ module Skylab::Headless
     def dirname
       @to_pathname.dirname
     end
+
+        KEEP_PARSING_ = true
 
       end
     end

@@ -25,7 +25,7 @@ module Skylab::Basic
       Callback_::Actor.methodic self, :simple, :properties,
         :property, :build_using,
         :property, :glyph,
-        :iambic_writer_method_to_be_provided, :indented_line_stream,
+        :iambic_writer_method_to_be_provided, :property, :indented_line_stream,
         :property, :on_event_selectively
 
       def initialize

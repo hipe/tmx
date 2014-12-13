@@ -462,6 +462,12 @@ module Skylab::Callback
       x = current_token ; advance_one ; x
     end
 
+    def flush_remaining_to_array
+      x = @x_a[ @d .. -1 ]
+      @d = @x_a_length
+      x
+    end
+
     def current_token
       @x_a.fetch @d
     end
