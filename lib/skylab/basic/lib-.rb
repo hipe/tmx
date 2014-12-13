@@ -27,10 +27,9 @@ module Skylab::Basic
       MH__[]::Enhance::Shell.new a
     end
 
-    Entity = -> * x_a, & p do
-      p and x_a.push p
-      if x_a.length.nonzero?
-        Bzn_[]::Entity.via_arglist x_a
+    Entity = -> * a, & edit_p do
+      if a.length.nonzero? || edit_p
+        Bzn_[]::Entity.via_arglist a, & edit_p
       else
         Bzn_[]::Entity
       end

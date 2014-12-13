@@ -64,7 +64,5 @@ module Skylab::Callback::TestSupport
     def delete_emission_a
       r = @emission_a ; @emission_a = nil ; r
     end
-
-    KEEP_PARSING_ = true
   end
 end

@@ -125,6 +125,7 @@ module Skylab::Basic  # introduction at [#020]
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
   IDENTITY_ = -> x { x }
+  KEEP_PARSING_ = true
   MONADIC_EMPTINESS_ = -> _ {}
   MONADIC_TRUTH_ = -> _ { true }
   NILADIC_FALSEHOOD_ = -> { false }

@@ -6,26 +6,42 @@ module Skylab::Basic
 
         # do not let this seep into the scope of [#hl-022]. do not use FS here
 
+        class << self
+
+          def build_with * x_a  # was there, then went away. may go back there.
+            ok = nil
+            x = new do
+              ok = process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+            end
+            ok && x
+          end
+        end
+
         Basic_._lib.entity self do
 
           def absolute
             @relative_is_OK = false
+            KEEP_PARSING_
           end
 
           def relative
             @absolute_is_OK = false
+            KEEP_PARSING_
           end
 
           def downward_only
             add_content_validation_against :dot_dot
+            KEEP_PARSING_
           end
 
           def no_single_dots
             add_content_validation_against :single_dot
+            KEEP_PARSING_
           end
 
           def no_dotfiles
             add_content_validation_against :dot_file
+            KEEP_PARSING_
           end
         end
 

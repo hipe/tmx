@@ -72,6 +72,11 @@ module Skylab::Callback
           curried && curried.execute
         end
 
+        def with * x_a, & oes_p
+          curried = build_via_iambic x_a, & oes_p
+          curried && curried.execute
+        end
+
         def build_via_iambic x_a, & oes_p
           ok = nil
           x = new do
@@ -640,7 +645,6 @@ module Skylab::Callback
 
       ACHIEVED_ = true
       BX_ = :PROPERTIES_FOR_WRITE__
-      KEEP_PARSING_ = true
       MM_ = :ModuleMethods  # is Module_Methods in [bz] ent
       PC_ = :Property  # is PROPERTY_CLASS__ in [bz] ent
       STOP_PARSING_ = false

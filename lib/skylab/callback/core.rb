@@ -1696,6 +1696,8 @@ module Skylab::Callback
 
   EMPTY_S_ = ''.freeze  # think of all the memory you'll save
 
+  KEEP_PARSING_ = true
+
   def self.memoize *a, &p
     Memoize_.via_arglist_and_proc a, p
   end

@@ -4,9 +4,11 @@ module Skylab::Basic
 
     class Normalization__  # :+[#037]
 
-      Basic_._lib.entity self do
+      Callback_::Actor.methodic self, :properties,
+        :on_event,
+        :as_normal_value
 
-        o :iambic_writer_method_name_suffix, :'='
+      private
 
         def begin=
           touch_current_mutable_range.set_begin iambic_property
@@ -37,18 +39,13 @@ module Skylab::Basic
           set_arg iambic_property
         end
 
-        o :properties, :on_event, :as_normal_value
-      end
-
-      Basic_._lib.event.selective_builder_sender_receiver self
+      # Basic_._lib.event.selective_builder_sender_receiver self
 
       def initialize & p
         @arg_was_provided = false
         @as_normal_value = @on_event = @rng = nil
         instance_exec( & p )
       end
-
-    private
 
       def touch_current_mutable_range
         @rng ||= Mutable_Range__.new
@@ -58,12 +55,13 @@ module Skylab::Basic
         @or_a ||= []
         @or_a.push @rng
         @rng = nil
-        nil
+        KEEP_PARSING_
       end
 
       def set_arg arg
         @arg_was_provided = true
-        @arg = arg ; nil
+        @arg = arg
+        KEEP_PARSING_
       end
 
     public
@@ -98,7 +96,7 @@ module Skylab::Basic
     protected
 
       def init_copy_with * x_a
-        process_iambic_fully 0, x_a ; nil
+        process_iambic_stream_fully iambic_stream_via_iambic_array x_a ; nil
       end
 
       def execute_is_valid
@@ -180,7 +178,8 @@ module Skylab::Basic
           if @end_is_set
             @is_of_width_one = ! @begin_is_unbound && @end_x == x
           end
-          @begin_x = x ; nil
+          @begin_x = x
+          KEEP_PARSING_
         end
 
         def set_end x
@@ -189,7 +188,8 @@ module Skylab::Basic
           if @begin_is_set
             @is_of_width_one = ! @end_is_unbound && @begin_x == x
           end
-          @end_x = x ; nil
+          @end_x = x
+          KEEP_PARSING_
         end
 
         def compare x

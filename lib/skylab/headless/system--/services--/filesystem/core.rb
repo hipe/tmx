@@ -73,6 +73,9 @@ module Skylab::Headless
       end
 
       Filesystem_ = self
+
+      KEEP_PARSING_ = true
+
     end
   end
 end

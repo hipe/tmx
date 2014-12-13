@@ -23,12 +23,12 @@ module Skylab::Basic
           end
         end
 
-        Callback_::Actor[ self, :properties,
+        Callback_::Actor.call self, :properties,
           :argument,
           :as_normal_value,
           :event_receiver,
           :number_set,  # symbol
-          :minimum ]
+          :minimum
 
         def initialize
           @minimum = nil

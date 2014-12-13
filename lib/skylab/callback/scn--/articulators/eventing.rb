@@ -41,7 +41,7 @@ module Skylab::Callback
     protected
 
       def init_copy x_a
-        process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+        process_iambic_fully x_a
         nil
       end
 

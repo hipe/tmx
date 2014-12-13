@@ -11,7 +11,7 @@ module Skylab::Headless
           def mixed_via_iambic x_a
 
             new do
-              process_iambic_fully x_a
+              process_iambic_stream_fully iambic_stream_via_iambic_array x_a
             end.mixed_result
 
           end
@@ -19,13 +19,13 @@ module Skylab::Headless
 
         Callback_::Actor.methodic self, :simple, :properties,
 
-          :iambic_writer_method_to_be_provided, :ignore_case,
+          :iambic_writer_method_to_be_provided, :property, :ignore_case,
 
-          :iambic_writer_method_to_be_provided, :do_ignore_case,
+          :iambic_writer_method_to_be_provided, :property, :do_ignore_case,
 
-          :iambic_writer_method_to_be_provided, :path,
+          :iambic_writer_method_to_be_provided, :property, :path,
 
-          :iambic_writer_method_to_be_provided, :paths,
+          :iambic_writer_method_to_be_provided, :property, :paths,
 
           :properties, :grep_extended_regexp_string, :ruby_regexp,
             :on_event_selectively, :as_normal_value
@@ -45,19 +45,23 @@ module Skylab::Headless
           @do_ignore_case = nil
           @ignore_case_is_known = true
           @do_ignore_case = true
+          KEEP_PARSING_
         end
 
         def do_ignore_case=
           @ignore_case_is_known = true
           @do_ignore_case = iambic_property
+          KEEP_PARSING_
         end
 
         def path=
           ( @unescaped_path_s_a ||= [] ).clear.push iambic_property
+          KEEP_PARSING_
         end
 
         def paths=
           @unescaped_path_s_a = iambic_property
+          KEEP_PARSING_
         end
 
       public def mixed_result

@@ -5,13 +5,13 @@ module Skylab::Basic
     class Describe__
 
       Callback_::Actor.methodic self, :simple, :properties,
-        :IO,
-        :argument_arity, :zero, :ivar, :@do_solos, :with_solos,
-        :argument_arity, :zero, :ivar, :@do_spaces, :with_spaces
+        :property, :IO,
+        :argument_arity, :zero, :ivar, :@do_solos, :property, :with_solos,
+        :argument_arity, :zero, :ivar, :@do_spaces, :property, :with_spaces
 
 
       def initialize g, x_a
-        process_iambic_fully x_a
+        process_iambic_stream_fully iambic_stream_via_iambic_array x_a
         nilify_uninitialized_ivars
         @associations = g.send :node_assctns
         init_IO

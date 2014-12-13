@@ -354,8 +354,6 @@ module Skylab::Headless
       @to_pathname.dirname
     end
 
-        KEEP_PARSING_ = true
-
       end
     end
   end

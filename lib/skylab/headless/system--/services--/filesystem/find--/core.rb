@@ -10,7 +10,7 @@ module Skylab::Headless
 
           def mixed_via_iambic x_a
             new do
-              process_iambic_fully x_a
+              process_iambic_stream_fully iambic_stream_via_iambic_array x_a
               @x_a = @d = @x_a_length = nil  # #todo
             end.mixed_result
           end
@@ -20,16 +20,16 @@ module Skylab::Headless
 
         Callback_::Actor.methodic self, :simple, :properties,
 
-          :iambic_writer_method_to_be_provided, :filename,
+          :iambic_writer_method_to_be_provided, :property, :filename,
 
-          :iambic_writer_method_to_be_provided, :filenames,
+          :iambic_writer_method_to_be_provided, :property, :filenames,
 
-          :iambic_writer_method_to_be_provided, :freeform_query_infix,
+          :iambic_writer_method_to_be_provided, :property, :freeform_query_infix,
 
-          :iambic_writer_method_to_be_provided, :ignore_dirs,
+          :iambic_writer_method_to_be_provided, :property, :ignore_dirs,
 
-          :iambic_writer_method_to_be_provided, :path,
-          :iambic_writer_method_to_be_provided, :paths,
+          :iambic_writer_method_to_be_provided, :property, :path,
+          :iambic_writer_method_to_be_provided, :property, :paths,
 
           :properties, :as_normal_value, :on_event_selectively
 

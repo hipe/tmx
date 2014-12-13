@@ -37,8 +37,9 @@ module Skylab::Headless::TestSupport::API
         class Actions::Ping < Action
 
           o :simple, :properties,
-            :iambic_writer_method_to_be_provided, :ivar, :@do_say_hello,
-              :say_hello_to_my_little_errstream
+              :iambic_writer_method_to_be_provided,
+              :ivar, :@do_say_hello,
+              :property, :say_hello_to_my_little_errstream
 
           def execute
             if @do_say_hello

@@ -26,28 +26,15 @@ module Skylab::Callback
 
     class Articulators::Aggregating < ::Module  # see [#050]
 
-      Entity_ = Callback_::Lib_::Entity[]
+      Callback_::Actor.methodic self
 
-      Entity_.call self, -> do
+      # Entity_.event.selective_builder_sender_receiver self
 
-        def on_zero_items
-          @nucleus.on_zero_items_p = iambic_property
-        end
-
-        def template
-          @nucleus.template = Callback_::Lib_::String_lib[].template.via_string iambic_property
-          via_template_parse_rest_of_input
-        end
-      end
-
-      Entity_.event.selective_builder_sender_receiver self
-
-      def initialize & p
+      def initialize
         @ok = true
         @nucleus = Nucleus__.new
-        instance_exec( & p )
+        super  # will run the block that was passed that passes an iambic array
       end
-
       Nucleus__ = ::Struct.new(
         :name_i_a,
         :field_box,
@@ -60,24 +47,33 @@ module Skylab::Callback
 
     private
 
-      def via_template_parse_rest_of_input
-        @scanner = Callback_.iambic_stream.new @d, @x_a
+      def on_zero_items=
+        @nucleus.on_zero_items_p = iambic_property
+        KEEP_PARSING_
+      end
+
+      def template=
+        @nucleus.template = Callback_::Lib_::String_lib[].template.via_string iambic_property
+        via_template_parse_remainder_of_iambic_stream @__methodic_actor_iambic_stream__
+      end
+
+      def via_template_parse_remainder_of_iambic_stream st
         bx = Box.new
         @nucleus.template.get_formal_parameters.each do |param|
           bx.add param.name_i, Field__.new( param )
         end
         @nucleus.field_box = bx
         @nucleus.name_i_a = bx.get_names.freeze
-        via_template_variables_parse_remainder_of_iambic
+        via_template_variables_parse_remainder_of_iambic_stream st
       end
 
-      def via_template_variables_parse_remainder_of_iambic
+      def via_template_variables_parse_remainder_of_iambic_stream st
         bx = @nucleus.field_box
-        while unparsed_iambic_exists
-          field = bx[ current_iambic_token ]
+        while st.unparsed_exists
+          field = bx[ st.current_token ]
           field or break when_extra_field_template_variables
-          @scanner.advance_one
-          field.process_iambic_passively_via_stream @scanner
+          st.advance_one
+          field.process_iambic_passively_via_st st
           if field.does_frame_redundancy
             @nucleus.do_frame_redundancy = true
           end
@@ -88,11 +84,10 @@ module Skylab::Callback
             @nucleus.do_field_aggregation = true
           end
           field.cleanup_after_scan
-          @d = @scanner.current_index
         end
-        if @ok
+        @ok and begin
           when_parsed_fields_OK
-        end ; nil
+        end
       end
 
       def when_extra_field_template_variables
@@ -120,7 +115,7 @@ module Skylab::Callback
       def when_parsed_fields_OK
         _ = Aggregator_Maker__.new @nucleus
         const_set :Aggregator_Maker__, _
-        nil
+        KEEP_PARSING_
       end
 
     public
@@ -131,48 +126,60 @@ module Skylab::Callback
 
       class Field__
 
-        Entity_.call self, -> do
+        def initialize tparam
+          @aggregate_p = nil
+          @tparam = tparam
+        end
 
-          def aggregate
+        def process_iambic_passively_via_st st
+          process_iambic_stream_passively st
+          nil
+        end
+
+        include Callback_::Actor.methodic_lib.iambic_processing_instance_methods
+
+      private
+
+          def aggregate=
             @does_field_aggregation = true
             @aggregate_p = iambic_property
+            KEEP_PARSING_
           end
 
-          def on_first_mention
+          def on_first_mention=
             @does_field_redundancy = true
             @when_field_value_count_is_one_p = iambic_property
+            KEEP_PARSING_
           end
 
-          def on_subsequent_mentions
+          def on_subsequent_mentions=
             @does_field_redundancy = true
             @when_field_value_count_is_two_or_more_p = iambic_property
+            KEEP_PARSING_
           end
 
-          def on_subsequent_mentions_of
-            i = current_iambic_token
+          def on_subsequent_mentions_of=
+            st = @__methodic_actor_iambic_stream__
+            i = st.current_token
             case i
             when :frame
-              advance_iambic_stream_by_one
+              st.advance_one
               @does_frame_redundancy = true
-              @when_frame_value_count_is_two_or_more_p = iambic_property
+              @when_frame_value_count_is_two_or_more_p = st.gets_one
+              KEEP_PARSING_
             when :field
-              advance_iambic_stream_by_one
+              st.advance_one
               @does_field_redundancy = true
-              @derivative_of_field_i = iambic_property
-              @when_field_value_count_is_two_or_more_p = iambic_property  # BE CAREFUL
+              @derivative_of_field_i = st.gets_one
+              @when_field_value_count_is_two_or_more_p = st.gets_one  # BE CAREFUL
+              KEEP_PARSING_
             else
               _ev = build_extra_iambic_event_via [ i ], [ :frame, :field ]
               receive_extra_iambic _ev  # #hook-in (local)
             end
           end
-        end
 
-        include Entity_.via_stream_iambic_methods
-
-        def initialize tparam
-          @aggregate_p = nil
-          @tparam = tparam
-        end
+        public
 
         attr_reader :aggregate_p,
           :derivative_of_field_i,
@@ -185,11 +192,6 @@ module Skylab::Callback
 
         def name_i
           @tparam.name_i
-        end
-
-        def process_iambic_passively_via_stream scanner
-          @scanner = scanner
-          process_iambic_passively
         end
 
         def cleanup_after_scan
