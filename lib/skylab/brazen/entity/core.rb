@@ -547,12 +547,8 @@ module Skylab::Brazen
     private
 
       def o * x_a, & edit_p
-        if active_entity_edit_session
-          sess = @active_entity_edit_session
-        else
-          self._DO_ME
-        end
-        sess.receive_edit Callback_::Iambic_Stream_.new( 0, x_a ), & edit_p
+        @active_entity_edit_session.receive_edit(
+          Callback_::Iambic_Stream_.new( 0, x_a ), & edit_p )
       end
 
       def during_entity_normalize & p

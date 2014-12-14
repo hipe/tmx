@@ -7,19 +7,21 @@ module Skylab::SubTree
       :field, :do_verbose_lines,
       :field, :info_p
 
-    public :with
-
-    Lib_::Entity.call self, -> do
+    Lib_::Entity.call self do
 
       def out_p
-        p = iambic_property
-        @out_p = case p.arity
-        when 3     ; out_proc_when_arity_is_three p
-        when 2     ; out_proc_when_arity_is_two p
-        when 1, -1 ; out_proc_when_arity_is_one_or_glob p
-        else       ; when_out_proc_arity_is_strange p
-        end ; nil
+        set_output_proc iambic_property
       end
+    end
+
+    def set_output_proc p
+      @out_p = case p.arity
+      when 3     ; out_proc_when_arity_is_three p
+      when 2     ; out_proc_when_arity_is_two p
+      when 1, -1 ; out_proc_when_arity_is_one_or_glob p
+      else       ; when_out_proc_arity_is_strange p
+      end
+      true  # KEEP_PARSING_
     end
 
   private
@@ -55,7 +57,7 @@ module Skylab::SubTree
     def initialize * x_a
       @curr_a = [] ; @matrix_a = [] ; @sep ||= SEP_
       @glyph_set = SubTree_._lib.CLI_lib.tree.glyph_sets_module::WIDE
-      process_iambic_fully x_a
+      process_iambic_stream_fully iambic_stream_via_iambic_array x_a
     end
 
   public
@@ -107,7 +109,7 @@ module Skylab::SubTree
         min_a = ::Array.new len
         len.zero? or min_a[ -1 ] = Node_.new( seen_a.last, extra_x )
         @matrix_a << min_a
-        pipe_d = len - 2                       # the imainary pipe is last nil
+        pipe_d = len - 2                       # the imaginary pipe is last nil
         d = @matrix_a.length - 1
       else                                     # a flush run
         pipe_d = -1                            # the imaginary pipe would go
@@ -150,7 +152,9 @@ module Skylab::SubTree
 
     SubTree_._lib.CLI_lib.tree.glyphs.each_const_value do |glyph|
       m = glyph.normalized_glyph_name
-      define_method m do @glyph_set[ m ] end
+      define_method m do
+        @glyph_set[ m ]
+      end
       private m
     end  # blank crook pipe separator tee
   end

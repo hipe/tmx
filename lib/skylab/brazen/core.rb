@@ -247,8 +247,12 @@ module Skylab::Brazen
 
   LIB_ = ::Module.new  # stand-in
   class << LIB_
-    def stream
-      Callback_::Scan
+    def stream & p
+      if block_given?
+        Callback_::Scan.new( & p )
+      else
+        Callback_::Scan
+      end
     end
   end
 

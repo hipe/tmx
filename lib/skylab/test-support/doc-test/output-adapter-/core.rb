@@ -13,8 +13,8 @@ module Skylab::TestSupport
 
       def against * x_a
         before_call
-        ok = process_iambic_fully 0, x_a
-        ok and execute
+        _ok = process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+        _ok and execute
       end
 
     private

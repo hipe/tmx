@@ -27,7 +27,7 @@ module Skylab::SubTree
     # ~ intiation lifecycle
 
     def receive_iambic x_a
-      ok = process_iambic_fully x_a
+      ok = process_iambic_stream_fully iambic_stream_via_iambic_array x_a
       ok &&= via_default_proc_and_is_required_normalize
       ok && normalize
     end

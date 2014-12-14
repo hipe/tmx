@@ -66,7 +66,7 @@ module Skylab::Headless
 
           def init * x_a
             process_iambic_stream_fully iambic_stream_via_iambic_array x_a
-            clear_all_iambic_ivars
+            nil
           end
 
           def execute

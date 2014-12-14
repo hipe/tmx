@@ -113,11 +113,13 @@ module Skylab::Headless
 
         def filename=
           @unescaped_filename_a.clear.push iambic_property
+          KEEP_PARSING_
         end
 
         def filenames=
           # an "or" list
           @unescaped_filename_a.replace iambic_property
+          KEEP_PARSING_
         end
 
         def freeform_query_infix=
@@ -131,7 +133,8 @@ module Skylab::Headless
             end
           else
             @freeform_query_infix = s
-          end ; nil
+          end
+          KEEP_PARSING_
         end
 
         FREEFORM_QUERY_VALIDATION_HACK_RX__ = -> do
@@ -141,14 +144,17 @@ module Skylab::Headless
 
         def ignore_dirs=
           @unescaped_ignore_dir_a.replace iambic_property
+          KEEP_PARSING_
         end
 
         def path=
           @unescaped_path_a.clear.push iambic_property
+          KEEP_PARSING_
         end
 
         def paths=
           @unescaped_path_a.clear.replace iambic_property
+          KEEP_PARSING_
         end
 
         # ~ done with iambic writers

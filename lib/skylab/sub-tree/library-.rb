@@ -89,8 +89,8 @@ module Skylab::SubTree
       Face__[]::API::Normalizer_.enhance_client_class x, * x_a
     end
 
-    Entity = -> * a do
-      Bzn_[]::Entity.via_arglist a
+    Entity = -> * x_a, & edit_p do
+      Bzn_[]::Entity.via_arglist x_a, & edit_p
     end
 
     Entity_via_iambic = -> x_a do

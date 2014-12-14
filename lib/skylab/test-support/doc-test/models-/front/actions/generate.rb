@@ -71,7 +71,7 @@ module Skylab::TestSupport
     # add e.g a blank like to the generated test file and re-run it again.
     # it should fail only the first time it is re-run.  #storypoint-15
 
-        o do
+        edit_entity_class do
 
           o :is_promoted,
 
@@ -79,10 +79,12 @@ module Skylab::TestSupport
 
           def business_module_name=
             @business_module_name = iambic_property
+            KEEP_PARSING_
           end
 
           def is_dry_run=
             @is_dry_run = iambic_property
+            KEEP_PARSING_
           end
 
           def line_downstream=
@@ -92,6 +94,7 @@ module Skylab::TestSupport
               @do_close_downstream = false
               @resolve_line_downstream_method_name = :OK
             end
+            KEEP_PARSING_
           end
 
           def line_upstream=
@@ -100,10 +103,12 @@ module Skylab::TestSupport
               @line_upstream = x
               @resolve_line_upstream_method_name = :OK
             end
+            KEEP_PARSING_
           end
 
           def output_adapter=
             @output_adapter = iambic_property
+            KEEP_PARSING_
           end
 
           def output_path=
@@ -112,6 +117,7 @@ module Skylab::TestSupport
               @output_path = x
               @resolve_line_downstream_method_name = :via_output_path_rslv_line_downstream
             end
+            KEEP_PARSING_
           end
 
           def upstream_path=
@@ -121,11 +127,13 @@ module Skylab::TestSupport
               @resolve_line_upstream_method_name =
                 :via_upstream_path_rslv_line_upstream
             end
+            KEEP_PARSING_
           end
 
         end
 
         def initialize kernel
+          block_given? and self._WHAT
           @business_module_name = nil
           @is_dry_run = false
           @resolve_line_downstream_method_name = :when_no_downstream
@@ -142,7 +150,7 @@ module Skylab::TestSupport
 
           ok = rslv_downstream
           ok &&= rslv_upstream
-          ok &&= normalize
+          ok &&= my_normalize
           ok && via_upstream_and_downstream_synthesize
           @result
         end
@@ -246,7 +254,7 @@ module Skylab::TestSupport
 
         # ~ normalize
 
-        def normalize
+        def my_normalize
           @business_module_name ||= DocTest_::Actors_::
             Infer_business_module_name_loadlessly.call(
                @upstream_path, & handle_event_selectively )
@@ -279,6 +287,8 @@ module Skylab::TestSupport
         def OK
           ACHIEVED_
         end
+
+        KEEP_PARSING_ = true
   end
     end
   end

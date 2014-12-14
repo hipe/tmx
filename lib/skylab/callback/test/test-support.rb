@@ -45,4 +45,7 @@ module Skylab::Callback::TestSupport
       Callback_::TestSupport.dir_pathname.join 'fixtures'
     end ]
   end
+
+  KEEP_PARSING_ = true
+
 end

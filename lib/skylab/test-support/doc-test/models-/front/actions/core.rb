@@ -4,7 +4,7 @@ module Skylab::TestSupport
 
     class Action_ < Bzn_.model.action_class
 
-      Bzn_.model_entity self do
+      Bzn_.model.entity self do
 
       end
     end
@@ -30,7 +30,7 @@ module Skylab::TestSupport
 
       class Actions::Ping < Action_
 
-        o do
+        edit_entity_class do
           o :is_promoted
         end
 

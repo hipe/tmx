@@ -158,8 +158,12 @@ module Skylab::SubTree
 
     def traverse_direct
       t = @traversal ; u = @upstream ; line = nil
-      t.with :out_p, @paystream.method( :puts )
-      t.puts line while (( line = u.gets ))
+      t.set_output_proc @paystream.method :puts
+      line = u.gets
+      while line
+        t.puts line
+        line = u.gets
+      end
       close_upstream_and_flush_traversal
       true
     end
@@ -176,28 +180,32 @@ module Skylab::SubTree
 
     def traverse_with_notification  # assume extensions
       u = @upstream ; t = @traversal
-      t.with :out_p, @paystream.method( :puts )
-      while (( line = u.gets ))
+      t.set_output_proc @paystream.method :puts
+      line = u.gets
+      while line
         line.chomp!
         lf = Leaf_.new line
         @extensions.any_in_notify_notify lf
         t.puts_with_free_cel lf.input_line, lf.any_free_cel
+        line = u.gets
       end
       close_upstream_and_flush_traversal
       nil
     end
 
     def traverse_via_triple_buffer  # assume extensions
-      u = @upstream ; t = @traversal ; row_a = [ ]
-      t.with :out_p, -> glyphs, slug, any_leaf do
+      u = @upstream ; t = @traversal ; row_a = []
+      t.set_output_proc -> glyphs, slug, any_leaf do
         row_a << Row_.new( glyphs, slug, any_leaf )
         nil
       end
-      while (( line = u.gets ))
+      line = u.gets
+      while line
         line.chomp!
         lf = Leaf_.new line
         @extensions.any_in_notify_notify lf
         t.puts_with_free_cel lf.input_line, lf
+        line = u.gets
       end
       close_upstream_and_flush_traversal
       @extensions.post_notify_notify row_a

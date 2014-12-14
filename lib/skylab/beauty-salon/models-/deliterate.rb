@@ -50,17 +50,13 @@ module Skylab::BeautySalon
       O
     end
 
-    Brazen_.model_entity self, -> do
-
-      o :properties,
+    Brazen_.model.entity self, :properties,
           :input_path,
           :input_stream,
           :from_line,
           :to_line,
           :comment_line_yieldee,
           :code_line_yieldee
-
-    end
 
     Brazen_.event.selective_builder_sender_receiver self
 
@@ -96,7 +92,7 @@ module Skylab::BeautySalon
 
     def normalize_as_integers
       ok = true
-      integer = Brazen_.model_entity.normalizers.number.instance
+      integer = Brazen_.model.entity.normalizers.number.instance
       @range.each do |bp|
         d = integer.normalize_via_two bp, @error_p
         if d

@@ -4,11 +4,12 @@ module Skylab::SubTree
 
     Local_Actor_.call self, :simple, :properties,
 
-      :iambic_writer_method_to_be_provided, :ivar, :@list_as_a, :list_as,
+      :iambic_writer_method_to_be_provided,
+        :ivar, :@list_as_a, :property, :list_as,
 
-      :required, :path,
+      :required, :property, :path,
 
-      :flag, :ivar, :@be_verbose, :verbose
+      :flag, :ivar, :@be_verbose, :property, :verbose
 
     Event_ = SubTree_::Lib_::Event_lib[]
 

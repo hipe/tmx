@@ -9,9 +9,11 @@ module Skylab::BeautySalon
         class << self
 
           def producer_via_iambic x_a
-            Producer__.new do
-              process_iambic_fully x_a
+            ok = nil
+            x = Producer__.new do
+              ok = process_iambic_stream_fully iambic_stream_via_iambic_array x_a
             end
+            ok && x
           end
         end
 
@@ -20,8 +22,8 @@ module Skylab::BeautySalon
           Callback_::Actor.methodic self, :simple, :properties,
 
             :property, :ruby_regexp,
-            :ignore, :grep_extended_regexp_string,
-            :ignore, :do_highlight,
+            :ignore, :property, :grep_extended_regexp_string,
+            :ignore, :property, :do_highlight,
             :property, :max_file_size_for_multiline_mode,
             :property, :on_event_selectively
 

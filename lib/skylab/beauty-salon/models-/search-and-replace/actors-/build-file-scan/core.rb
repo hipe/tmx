@@ -9,22 +9,13 @@ module Skylab::BeautySalon
       Callback_::Actor.methodic self, :simple, :properties,
 
         :property, :upstream_path_stream,
-        :iambic_writer_method_to_be_provided, :ruby_regexp,
-        :iambic_writer_method_to_be_provided, :grep_extended_regexp_string,
-        :iambic_writer_method_to_be_provided, :do_highlight,
-        :iambic_writer_method_to_be_provided, :read_only,
-        :iambic_writer_method_to_be_provided, :for_interactive_search_and_replace,
-        :iambic_writer_method_to_be_provided, :max_file_size_for_multiline_mode,
+        :iambic_writer_method_to_be_provided, :property, :ruby_regexp,
+        :iambic_writer_method_to_be_provided, :property, :grep_extended_regexp_string,
+        :iambic_writer_method_to_be_provided, :property, :do_highlight,
+        :iambic_writer_method_to_be_provided, :property, :read_only,
+        :iambic_writer_method_to_be_provided, :property, :for_interactive_search_and_replace,
+        :iambic_writer_method_to_be_provided, :property, :max_file_size_for_multiline_mode,
         :property, :on_event_selectively
-
-      class << self
-
-        def with * x_a
-          new do
-            process_iambic_fully x_a
-          end.execute
-        end
-      end
 
       def initialize
         @on_event_selectively = nil
@@ -36,26 +27,32 @@ module Skylab::BeautySalon
 
       def ruby_regexp=
         @currier_x_a.push :ruby_regexp, iambic_property
+        KEEP_PARSING_
       end
 
       def grep_extended_regexp_string=
         @currier_x_a.push :grep_extended_regexp_string, iambic_property
+        KEEP_PARSING_
       end
 
       def do_highlight=
         @currier_x_a.push :do_highlight, iambic_property
+        KEEP_PARSING_
       end
 
       def read_only=
         @currier = Self_::Models__::Read_Only_File_Session
+        KEEP_PARSING_
       end
 
       def for_interactive_search_and_replace=
         @currier = Self_::Models__::Interactive_File_Session
+        KEEP_PARSING_
       end
 
       def max_file_size_for_multiline_mode=
         @currier_x_a.push :max_file_size_for_multiline_mode, iambic_property
+        KEEP_PARSING_
       end
 
     public
@@ -70,6 +67,8 @@ module Skylab::BeautySalon
           producer.produce_file_session_via_ordinal_and_path path_count, path
         end
       end
+
+      KEEP_PARSING_ = true
 
       Self_ = Actors_::Build_file_scan
     end

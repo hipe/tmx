@@ -116,8 +116,9 @@ module Skylab::GitViz
           :on_channel_i, :on_channel_i_a
 
         def initialize x_a, p
-          process_iambic_passively x_a
-          absrb_any_matcher
+          st = iambic_stream_via_iambic_array x_a
+          process_iambic_stream_passively st
+          absrb_any_matcher st
           @any_finally_proc = p ; nil
         end
 
@@ -127,23 +128,23 @@ module Skylab::GitViz
           @is_styled = true ; nil
         end
 
-        def absrb_any_matcher
-          if unparsed_iambic_exists
-            absrb_some_matcher
+        def absrb_any_matcher st
+          if st.unparsed_exists
+            absrb_some_matcher st
           end
         end
 
-        def absrb_some_matcher
-          @matcher_x = iambic_property
-          if unparsed_iambic_exists
-            when_unexpected
+        def absrb_some_matcher st
+          @matcher_x = st.gets_one
+          if st.unparsed_exists
+            when_unexpected st
           else
             post_absrb_matcher
           end
         end
 
-        def when_unexpected
-          _say =  "unexpected iambic: #{ Inspect_[ current_iambic_token ] }"
+        def when_unexpected st
+          _say =  "unexpected iambic: #{ Inspect_[ st.current_token ] }"
           raise ::ArgumentError, _say
         end
 
