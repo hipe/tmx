@@ -83,7 +83,8 @@ module Skylab::MetaHell
             end
           end
 
-          _muxer = MetaHell_._lib.method_added_muxer @definee
+          _muxer = Touch_method_added_muxer_of__[ @definee ]
+
           _muxer.for_each_method_added_in @p, -> m do
             @box.add m, Field_From_Method__.new( m, p )
           end ; nil
@@ -146,8 +147,50 @@ module Skylab::MetaHell
           argful: Fields.start_shell.frozen( :overriding, :globbing,
             :argful, :destructive, :absorber, :initialize ) }
       end
-    end
 
+      class Touch_method_added_muxer_of__  # moved back to [mh] from [br]
+        class << self
+          def [] mod
+            me = self
+            mod.module_exec do
+              @method_added_mxr ||= me.bld_for self
+            end
+          end
+          def bld_for client
+            muxer = new client
+            client.send :define_singleton_method, :method_added do |m_i|
+              muxer.method_added_notify m_i
+            end
+            muxer
+          end
+          private :new
+        end
+        def initialize reader
+          @reader = reader ; @p = nil
+        end
+        def for_each_method_added_in defs_p, do_p
+          add_listener do_p
+          @reader.module_exec( & defs_p )
+          remove_listener do_p
+        end
+        def add_listener p
+          @p and fail "not implemented - actual muxing"
+          @p = p ; nil
+        end
+        def remove_listener _
+          @p = nil
+        end
+        def stop_listening
+          @stopped_p = @p ; @p = nil
+        end
+        def resume_listening
+          @p = @stopped_p ; @stopped_p = nil
+        end
+        def method_added_notify method_i
+          @p && @p[ method_i ] ; nil
+        end
+      end
+    end
 
     # here's an experimental hack to add metadata to the following field
     # like so

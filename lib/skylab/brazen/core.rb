@@ -26,10 +26,6 @@ module Skylab::Brazen
       Brazen_::Event__
     end
 
-    def method_added_muxer
-      Brazen_::Entity.method_added_muxer
-    end
-
     def model
       Brazen_::Model_::LIB
     end

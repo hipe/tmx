@@ -16,10 +16,6 @@ module Skylab::Brazen
         Brazen_::Event__
       end
 
-      def method_added_muxer
-        Method_Added_Muxer__
-      end
-
       def mutable_iambic_stream
         Entity::Compound_Iambic_Scanner__::Mutable_Iambic_Scanner
       end
@@ -1125,74 +1121,6 @@ module Skylab::Brazen
 
     module Instance_Methods
       Entity_Property = Property__  # as promised above
-    end
-
-    if false
-    module Proprietor_Methods__
-
-      def add_iambic_event_listener i, p
-        iambic_evnt_muxer_for_write.add i, p ; nil
-      end
-    private
-      def iambic_evnt_muxer_for_write
-        Entity::Meta_Property__::Muxer.for self
-      end
-    public
-      def init_property_scope_krnl
-        property_scope_krnl and self._SANITY
-        @property_scope_krnl = build_property_scope_krnl
-      end
-      attr_accessor :property_scope_krnl
-    private
-      def build_property_scope_krnl
-        Scope_Kernel__.new self, singleton_class
-      end
-    end
-    end
-
-    class Method_Added_Muxer__  # from [mh] re-written
-      class << self
-        def via_arglist a
-          self[ * a ]
-        end
-        def [] mod
-          me = self
-          mod.module_exec do
-            @method_added_mxr ||= me.bld_for self
-          end
-        end
-        def bld_for client
-          muxer = new client
-          client.send :define_singleton_method, :method_added do |m_i|
-            muxer.method_added_notify m_i
-          end
-          muxer
-        end
-      end
-      def initialize reader
-        @reader = reader ; @p = nil
-      end
-      def for_each_method_added_in defs_p, do_p
-        add_listener do_p
-        @reader.module_exec( & defs_p )
-        remove_listener do_p
-      end
-      def add_listener p
-        @p and fail "not implemented - actual muxing"
-        @p = p ; nil
-      end
-      def remove_listener _
-        @p = nil
-      end
-      def stop_listening
-        @stopped_p = @p ; @p = nil
-      end
-      def resume_listening
-        @p = @stopped_p ; @stopped_p = nil
-      end
-      def method_added_notify method_i
-        @p && @p[ method_i ] ; nil
-      end
     end
 
     Entity_ = self

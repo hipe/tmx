@@ -37,10 +37,6 @@ module Skylab::MetaHell
       Bsc__[]::Box
     end
 
-    Method_added_muxer = -> * a do
-      Bzn__[].method_added_muxer.via_arglist a
-    end
-
     Module_lib = -> do
       Bsc__[]::Module
     end
