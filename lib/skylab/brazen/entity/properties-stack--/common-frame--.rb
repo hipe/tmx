@@ -44,7 +44,7 @@ module Skylab::Brazen
         class << self
 
           def via_arglist x_a
-            st = Callback_::Iambic_Stream_.new 0, x_a
+            st = Callback_::Iambic_Stream.via_array x_a
             client_cls = st.gets_one
             self[ client_cls ]
             client_cls.edit_entity_class do |sess|

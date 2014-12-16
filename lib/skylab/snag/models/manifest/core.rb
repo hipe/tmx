@@ -68,7 +68,7 @@ module Skylab::Snag
     def bld_agent_adapter
       self.class::Agent_Adapter__.new(
         :all_nodes, method( :all_nodes_for_agent ),
-        :file_utils, method( :build_file_utils_via_iambic_for_agent ),
+        :file_utils, method( :build_file_utils_for_agent_via_iambic_stream ),
         :manifest_file, method( :manifest_file_for_agent ),
         :render_line_a, method( :render_line_a_for_agent ),
         :produce_tmpdir, method( :produce_tmpdir_via_iambic_for_agent ) )
@@ -79,8 +79,8 @@ module Skylab::Snag
       Models::Node.build_scan_from_lines @manifest_file.normalized_line_producer
     end
 
-    def build_file_utils_via_iambic_for_agent x_a  # (was #note-75)
-      FU_curry__.new( x_a ).execute
+    def build_file_utils_for_agent_via_iambic_stream st  # (was #note-75)
+      Build_file_utils_curry__.new( st ).execute
     end
 
     def manifest_file_for_agent
@@ -107,12 +107,12 @@ module Skylab::Snag
         :field_i_a, field_i_a
     end
 
-    class FU_curry__
+    class Build_file_utils_curry__
 
-      Snag_._lib.entity[ self, :properties, :be_verbose, :delegate ]
+      Callback_::Actor[ self, :properties, :be_verbose, :delegate ]
 
-      def initialize x_a
-        process_iambic_fully x_a
+      def initialize st
+        process_iambic_stream_fully st
       end
 
       def execute
@@ -125,12 +125,13 @@ module Skylab::Snag
     end
 
     Hacky_Path_Event__ = Snag_::Model_::Event.new :line do
+
       message_proc do |y, o|  # escape things that look like abs paths
-        y << ( o.line.gsub(
-          Snag_._lib.path_tools.absolute_path_hack_rx
-        ) do
+
+        y << ( o.line.gsub Snag_._lib.path_tools.absolute_path_hack_rx do
           pth ::Pathname.new $~[ 0 ]
         end )
+
       end
     end
 
@@ -193,7 +194,7 @@ module Skylab::Snag
             :filename, @config.manifest_file,
             :max_num_dirs_to_look,
               @config.max_num_dirs_to_search_for_manifest_file,
-            :prop, LIB_.entity::Property__.new( :path ),
+            :property_symbol, :path,
             :start_path, @path,
             :on_event_selectively, _oes_p )
         end

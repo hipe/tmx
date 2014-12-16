@@ -2,7 +2,7 @@
 [#068]       #parent-node: [#003] "melt is a hack.."
 [#067]       #parent-node: [#057] model support
 [#066] #hole (was: the actor dream, moved to [cb])
-[#065] #open tall stacks swallo error results (most of these tests)
+[#065] #open tall stacks swallow error results (most of these tests)
 [#064] #open hide `ping` action
 [#063]       #parent-node: [#057] the melt narrative ..
 [#062]       #parent-node: [#046] on success a cb's false-ish may be upgraded

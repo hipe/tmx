@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class API
+  module API
 
     EXPRESSION_AGENT = class Expression_Agent___
 

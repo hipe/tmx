@@ -8,7 +8,18 @@ module Skylab::Snag
 
         class Rm__ < Edit___
 
-          def rm_i stem_i
+          def using_iambic_stream_remove_symbol st, sym
+            _ok = process_iambic_stream_fully st
+            _ok and rm_tag_via_symbol sym
+          end
+
+        private
+
+          def delegate=
+            merge_delegate iambic_property
+          end
+
+          def rm_tag_via_symbol stem_i
             @tag = build_tag stem_i
             if @tag.is_valid
               rm_tag
@@ -16,8 +27,6 @@ module Skylab::Snag
               @tag.last_callback_result
             end
           end
-
-        private
 
           def rm_tag
             found_tag = find_existing_tag @tag
@@ -76,12 +85,6 @@ module Skylab::Snag
               y << "removed #{ val o.rendered }"
             end
           end
-
-          Snag_._lib.entity[ self, -> do
-            def delegate
-              merge_delegate iambic_property
-            end
-          end ]
         end
       end
     end

@@ -7,8 +7,12 @@ module Skylab::Snag
         :info_event, :info_string,
         :output_line
 
-    Entity_[ self, :make_delegate_properties, :make_sender_methods,
-      :required, :property, :working_dir ]
+    Entity_.call self,
+
+      :make_delegate_properties,
+      :make_sender_methods,
+
+      :required, :property, :working_dir
 
     def if_nodes_execute
       all_count = valid_count = 0

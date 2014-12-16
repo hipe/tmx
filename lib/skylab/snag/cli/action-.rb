@@ -29,10 +29,6 @@ module Skylab::Snag
         @request_client.program_name
       end
 
-      def new_API_invocation
-        @request_client.new_API_invocation
-      end
-
       def rtrv_unbound_action x
         @request_client.rtrv_unbound_action x
       end

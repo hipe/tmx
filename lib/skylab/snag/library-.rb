@@ -43,6 +43,10 @@ module Skylab::Snag
       end
     end
 
+    Bound_call = -> * a do
+      Bzn__[].bound_call.build_via_arglist a
+    end
+
     Bzn__ = sidesys[ :Brazen ]
 
     CLI_legacy_DSL = -> mod do

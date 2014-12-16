@@ -6,16 +6,23 @@ module Skylab::Snag
 
       # so we can keep track of what "services" the agents need
 
+      Callback_::Actor.call self, :properties,
+        :all_nodes,
+        :file_utils,
+        :manifest_file,
+        :render_line_a,
+        :produce_tmpdir
+
       def initialize * x_a
-        process_iambic_fully x_a
+        process_iambic_stream_fully iambic_stream_via_iambic_array x_a
       end
 
       def all_nodes
         @all_nodes.call
       end
 
-      def build_file_utils * x_a
-        @file_utils[ x_a ]
+      def build_file_utils_with * x_a
+        @file_utils[ iambic_stream_via_iambic_array x_a ]
       end
 
       def manifest_file
@@ -29,15 +36,6 @@ module Skylab::Snag
       def produce_tmpdir * x_a
         @produce_tmpdir[ x_a ]
       end
-
-      Snag_._lib.entity[ self, -> do
-        o :properties,
-            :all_nodes,
-            :file_utils,
-            :manifest_file,
-            :render_line_a,
-            :produce_tmpdir
-      end ]
     end
   end
 end

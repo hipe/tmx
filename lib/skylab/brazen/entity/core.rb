@@ -41,7 +41,7 @@ module Skylab::Brazen
         if d.zero?
           Produce_extension_module__.new( & edit_p ).execute
         else
-          st = Callback_::Iambic_Stream_.new 0, x_a
+          st = Callback_::Iambic_Stream.via_array( x_a )
           cls = st.gets_one
           Callback_::Actor.methodic cls
           cls.extend Module_Methods__
@@ -243,19 +243,6 @@ module Skylab::Brazen
 
       include METHODIC_.iambic_processing_instance_methods
 
-      def maybe_receive_event * i_a, & ev_p
-        receive_event ev_p[]
-      end
-
-      def receive_event ev
-        raise ev.to_exception
-      end
-
-    private
-
-      def maybe_send_event *, & ev_p  # #hook-OUT of [cb]
-        raise ev_p[].to_exception
-      end
     end
 
     class Produce_extension_module__ < Module_Edit_Session__
@@ -398,6 +385,10 @@ module Skylab::Brazen
         end
       end
 
+      def property_class  # :+#public-API
+        @property_related_nonterminal.property_cls
+      end
+
       def receive_property pr  # :+#public-API
         receive_prop pr
       end
@@ -485,6 +476,22 @@ module Skylab::Brazen
       def receive_invalid_propery ev  # possible placeholder
         receive_event ev
       end
+
+    public
+
+      def maybe_receive_event * i_a, & ev_p
+        receive_event ev_p[]
+      end
+
+      def receive_event ev
+        raise ev.to_exception
+      end
+
+    private
+
+      def maybe_send_event *, & ev_p  # #hook-OUT of [cb]
+        raise ev_p[].to_exception
+      end
     end
 
     # ~ the modules that enhance the extension modules or entity classes
@@ -548,7 +555,7 @@ module Skylab::Brazen
 
       def o * x_a, & edit_p
         @active_entity_edit_session.receive_edit(
-          Callback_::Iambic_Stream_.new( 0, x_a ), & edit_p )
+          Callback_::Iambic_Stream_.via_array( x_a ), & edit_p )
       end
 
       def during_entity_normalize & p
@@ -568,20 +575,20 @@ module Skylab::Brazen
 
       def [] cls, * rest
         if rest.length.nonzero?
-          st = Callback_::Iambic_Stream_.new 0, rest
+          st = Callback_::Iambic_Stream.via_array rest
         end
         _enhance_to_and_edit_entity_class_via_any_nonempty_stream cls, st
       end
 
       def call cls, * rest, & edit_p
         if rest.length.nonzero?
-          st = Callback_::Iambic_Stream_.new 0, rest
+          st = Callback_::Iambic_Stream.via_array rest
         end
         _enhance_to_and_edit_entity_class_via_any_nonempty_stream cls, st, & edit_p
       end
 
       def via_nonzero_length_arglist a, & edit_p
-        st = Callback_::Iambic_Stream_.new 0, a
+        st = Callback_::Iambic_Stream.via_array a
         cls = st.gets_one
         _enhance_to_and_edit_entity_class_via_any_nonempty_stream cls, st, & edit_p
       end
@@ -726,6 +733,10 @@ module Skylab::Brazen
           bld_metaproperty_nonterminal,
           Methodic_as_Nonterminal_[ self ] )
         @last_incomplete_property = nil
+      end
+
+      def property_cls
+        @property_class
       end
 
       attr_reader :last_incomplete_property

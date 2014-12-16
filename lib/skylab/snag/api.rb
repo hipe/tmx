@@ -1,20 +1,202 @@
 module Skylab::Snag
 
-  class API  # see [#006]
+  module API  # see [#006]
 
     class << self
+
+      # ~ here is how you make an API call:
+
+      def bound_call_via_legacy_arglist arglist, & wire_p
+        Produce_bound_call__.new(
+          Callback_::Iambic_Stream.via_array( arglist ), & wire_p ).execute
+      end
+
+      # ~ convenience accessors for common property stack values
+
       def manifest_file
-        MANIFEST_FILE__
+        bottom_properties_stack_frame.property_value_via_symbol :manifest_file
       end
 
       def max_num_dirs_to_search_for_manifest_file
-        MAX_NUM_DIRS_TO_SEARCH_FOR_MANIFEST_FILE__
+        bottom_properties_stack_frame.property_value_via_symbol(
+          :max_num_dirs_to_search_for_manifest_file )
+      end
+
+      # ~ open [#050] semi-hackish way we mutate what is effectively a config singleton
+
+      def edit_bottom_properties_stack_frame & edit_p
+        frame = bottom_properties_stack_frame.dup
+        x = edit_p[ frame ]
+        frame.freeze
+        replace_bottom_properties_stack_frame frame
+        x
       end
     end
 
-    MANIFEST_FILE__ = 'doc/issues.md'.freeze
+    DEFAULT_MANIFEST_FILE__ = 'doc/issues.md'.freeze
 
-    MAX_NUM_DIRS_TO_SEARCH_FOR_MANIFEST_FILE__ = 15  # wuh-evuh
+    DEFAULT__MAX_NUM_DIRS_TO_SEARCH_FOR_MANIFEST_FILE__ = 15  # wuh-evuh
+
+    # ~ produce bound call & support
+
+    class Produce_bound_call__
+
+      def initialize st, & wire_p
+        @application_module = Snag_
+        @upstream = st
+        @wire_p = wire_p
+      end
+
+      def execute
+
+        st = @upstream
+
+        normal_name = st.gets_one
+
+        if ::Hash.try_convert st.current_token
+          @par_h = st.gets_one
+          if ! @wire_p
+            @wire_p = st.gets_one
+          end
+          st.unparsed_exists and raise ::ArgumentError
+        else
+          @par_h = nil
+        end
+
+        @action = bld_action_via_normal_name normal_name
+        @action and via_action_produce_bound_call
+      end
+
+      def bld_action_via_normal_name normal_name, & mode_wiring_p
+
+        cls = lookup_some_action_class_via_normal_name normal_name
+
+        _frame = @application_module::API.bottom_properties_stack_frame
+
+        invo = Invocation__.new _frame, @application_module
+
+        if @wire_p  # legacy-style action wiring
+
+          cls.new @wire_p, invo
+
+        else  # new-style action
+
+          cls.new invo do
+            # no special customization
+            nil
+          end
+        end
+      end
+
+      def lookup_some_action_class_via_normal_name normal_name
+        Autoloader_.const_reduce normal_name, @application_module::API::Actions
+      end
+
+      def via_action_produce_bound_call
+        if @par_h
+          Snag_._lib.bound_call [ @par_h ], @action, :invoke
+        else
+          Snag_._lib.bound_call [ @upstream ], @action, :invoke_via_argument_stream
+        end
+      end
+    end
+
+    class Invocation__
+
+      # [a] { client | context | services } for one particular invocation
+
+      def initialize properties, application_module
+        @application_module = application_module
+        @props = properties
+      end
+
+      attr_reader :application_module
+
+      def call i_a, par_h, wire_p
+
+        # this is how one action invocation invokes another action.
+        # signature is legacy as needed
+
+        bc = @application_module::API.bound_call_via_legacy_arglist( [ i_a, par_h, wire_p ] )
+        bc and bc.receiver.send bc.method_name, * bc.args
+      end
+
+      def models
+        @application_module.models_cls.new self
+      end
+
+      # ~ business-specific convenience accessors
+
+      def manifest_file
+        @props.property_value_via_symbol :manifest_file
+      end
+
+      def max_num_dirs_to_search_for_manifest_file
+        @props.property_value_via_symbol :max_num_dirs_to_search_for_manifest_file
+      end
+    end
+
+    # ~ implement bottom properties stack frame
+
+    class << self
+
+      frozen_frame_singleton = -> do
+
+        _FRAME = Bottom_Properties_Stack_Frame__.new
+
+        frozen_frame_singleton = -> do
+          _FRAME
+        end
+
+        _FRAME
+      end
+
+      define_method :bottom_properties_stack_frame do
+        frozen_frame_singleton[]
+      end
+
+    private
+
+      define_method :replace_bottom_properties_stack_frame do | _FRAME |
+        frozen_frame_singleton = -> do
+          _FRAME
+        end ; nil
+      end
+    end
+
+    class Bottom_Properties_Stack_Frame__  # minimal implementation of [#br-057]
+
+      def initialize
+        h = {}
+        h[ :manifest_file ] = DEFAULT_MANIFEST_FILE__
+        h[ :max_num_dirs_to_search_for_manifest_file ] =
+          DEFAULT__MAX_NUM_DIRS_TO_SEARCH_FOR_MANIFEST_FILE__
+        @h = h
+        freeze
+      end
+
+      def freeze
+        @h.freeze
+        super
+      end
+
+      def initialize_copy _otr_
+        @h = @h.dup
+        nil
+      end
+
+      def property_value_via_symbol sym
+        @h.fetch sym
+      end
+
+      # ~ business
+
+      def set_max_num_dirs_to_search_for_manifest_file x
+        @h[ :max_num_dirs_to_search_for_manifest_file ] = x ; nil
+      end
+    end
+
+    # ~ stowaways
 
     module Actions
 
@@ -22,151 +204,6 @@ module Skylab::Snag
       end
 
       Autoloader_[ self, :boxxy ]
-    end
-
-    Client = self
-    class Client
-
-      @setup = nil  # #open [#050] this is not the way
-
-      class << self
-
-        attr_reader :setup
-
-        alias_method :setup_ivar, :setup
-
-        def setup f
-          @setup and fail "won't stack (or queue) setups"
-          @setup = f
-          nil
-        end
-
-        def setup_delete
-          x = @setup
-          @setup = nil
-          x
-        end
-      end
-
-      def initialize app_module
-        @app_module = app_module
-        @max_num_dirs_to_search_for_manifest_file = nil
-        @manifest_cache_h = {}
-        API::Client.setup_ivar and API::Client.setup_delete[ self ]
-      end
-
-      attr_writer :max_num_dirs_to_search_for_manifest_file
-
-      def call * a, & p
-        new_invocation.with_a_and_p( a, p ).execute
-      end
-
-      def new_invocation
-        Invocation__.new self
-      end
-
-      def build_action_via_name_and_p normal_name, p
-        _cls = lookup_some_action_class_via_normal_name normal_name
-        _cls.new p, self
-      end
-
-      def build_action_via_name normal_name
-        _cls = lookup_some_action_class_via_normal_name normal_name
-        _cls.new self
-      end
-
-      def lookup_some_action_class_via_normal_name normal_name
-        Autoloader_.const_reduce normal_name, self.class::Actions
-      end
-
-      def models
-        @models ||= API::Models__.new self, @app_module::Models
-      end
-
-      # ~ business
-
-      def manifest_file
-        self.class.manifest_file
-      end
-
-      def max_num_dirs_to_search_for_manifest_file
-        @max_num_dirs_to_search_for_manifest_file ||
-          self.class.max_num_dirs_to_search_for_manifest_file
-      end
-    end
-
-    class Invocation__
-
-      def initialize _API_client
-        @API_client = _API_client
-      end
-
-      def with_a_and_p a, p
-        @x_a = a ; @p = p ; self
-      end
-
-      def execute
-        normal_name = @x_a.shift
-        if ::Hash.try_convert @x_a.first
-          par_h = @x_a.shift
-          @p ||= @x_a.pop
-          @x_a.length.zero? or raise ::ArgumentError
-        end
-        action = bld_action_from_name_and_p normal_name, @p
-        action and begin
-          if par_h
-            action.invoke par_h
-          else
-            action.invoke_via_iambic @x_a
-          end
-        end
-      end
-
-      def bld_action_from_name_and_p normal_name, p
-        if p
-          @API_client.build_action_via_name_and_p normal_name, p
-        else
-          @API_client.build_action_via_name normal_name
-        end
-      end
-    end
-
-    class Models__
-
-      def initialize _API_client, mod
-        @API_client = _API_client
-        @module = mod ; sc = singleton_class
-        scan = mod.entry_tree.to_stream  # go deep into [cb] API
-        while normpath = scan.gets
-          name_i = normpath.name_i
-          sc.send :define_method, :"#{ name_i }s", bld_reader( name_i )
-        end
-        @cache_h = {}
-      end
-
-      # names of methods (public or private) cannot ever end in the letter 's'
-
-      attr_reader :API_client
-
-    private
-
-      def bld_reader name_i
-        -> &p do
-          @cache_h.fetch name_i do
-            silo = bld_shell name_i
-            silo and @cache_h[ name_i ] = silo
-          end
-        end
-      end
-
-      def bld_shell name_i
-        Autoloader_.const_reduce( [ name_i ], @module ).
-          build_silo @API_client
-      end
-    end
-
-    Event_Factory = -> digraph, chan_i, sender, ev  do
-      ev
     end
   end
 end

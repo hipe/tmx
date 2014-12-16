@@ -23,7 +23,7 @@ module Skylab::Snag
         @new_line_a.length.zero? and self._SANITY
         @manifest_file = @client.manifest_file
         @manifest_file_pn = @manifest_file.pathname
-        @fu = @client.build_file_utils(
+        @fu = @client.build_file_utils_with(
           :be_verbose, @verbose_x,
           :delegate, @delegate )
         @tmpdir = @client.produce_tmpdir(

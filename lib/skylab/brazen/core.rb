@@ -173,7 +173,7 @@ module Skylab::Brazen
     HL__ = sidesys[ :Headless ]
 
     Iambic_scanner = -> do
-      Callback_.iambic_stream
+      Callback_::Iambic_Stream
     end
 
     IO = -> do
@@ -269,6 +269,14 @@ module Skylab::Brazen
   Bound_Call__ = ::Struct.new :args, :receiver, :method_name do  # volatility order (subjective)
 
     class << self
+
+      def build_via_arglist a
+        if a.length.zero?
+          self
+        else
+          new( * a )
+        end
+      end
 
       def the_empty_call
         @tec ||= new EMPTY_P_, :call

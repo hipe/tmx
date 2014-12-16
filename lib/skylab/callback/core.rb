@@ -12,10 +12,6 @@ module Skylab::Callback
       Pair_
     end
 
-    def iambic_stream
-      Iambic_Stream_
-    end
-
     def produce_library_shell_via_library_and_app_modules lib_mod, app_mod
       Callback_::Librication__[ lib_mod, app_mod ]
     end
@@ -203,6 +199,14 @@ module Skylab::Callback
       end ; nil
     end
 
+    def process_iambic_stream_fully st
+      bx = self.class.const_get BX_
+      while st.unparsed_exists
+        instance_variable_set bx.fetch( st.gets_one ), st.gets_one
+      end
+      KEEP_PARSING_
+    end
+
     def process_iambic_passively x_a
       box = self.class.const_get BX_
       d = -2 ; last = x_a.length - 2
@@ -217,6 +221,10 @@ module Skylab::Callback
         end
       end
       x
+    end
+
+    def iambic_stream_via_iambic_array x_a
+      Iambic_Stream_.new 0, x_a
     end
 
     def ivar_box
@@ -438,7 +446,7 @@ module Skylab::Callback
     end
   end
 
-  class Iambic_Stream_  # :[#046]
+  Iambic_Stream_ = class Iambic_Stream  # :[#046]
 
     def reinitialize d, x_a
       @d = d ; @x_a = x_a ; @x_a_length = @x_a.length
@@ -487,6 +495,14 @@ module Skylab::Callback
     def advance_one
       @d += 1 ; nil
     end
+
+    class << self
+      def via_array x_a
+        new 0, x_a
+      end
+    end
+
+    self
   end
 
   Pair_ = ::Struct.new :value_x, :name_i  # :[#055].

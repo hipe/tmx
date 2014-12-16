@@ -23,14 +23,6 @@ module Skylab::Snag
 
   private
 
-    public def new_API_invocation
-      _API_client.new_invocation
-    end
-
-    def _API_client
-      @API_client ||= Snag_::API::Client.new Snag_
-    end
-
     # ~ the narrative "order": [inside] string, [inside] event, line) [#031]
 
     public def receive_UI_line s
@@ -399,8 +391,14 @@ module Skylab::Snag
 
       # ~
 
-      def call_API * a, & p
-        x = new_API_invocation.with_a_and_p( a, p ).execute
+      def call_API * a, & wire_p
+
+        x = Snag_::API.bound_call_via_legacy_arglist a, & wire_p
+
+        if x
+          x = x.receiver.send x.method_name, * x.args
+        end
+
         if UNABLE_ == x
           invite_to_self
           UNABLE_

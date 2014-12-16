@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class Entity::Properties_Stack__
+  class Entity::Properties_Stack__  # :[#057].
 
     class << self
 

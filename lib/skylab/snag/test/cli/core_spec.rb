@@ -66,10 +66,12 @@ module Skylab::Snag::TestSupport::CLI
       with_default_expected_stream_name :pay
 
       context "a manifest with two good lines" do
+
         with_manifest <<-O.unindent
           [#001] foo
           [#3] bar
         O
+
         it "ok" do
           setup_tmpdir_read_only
           invoke
@@ -81,7 +83,9 @@ module Skylab::Snag::TestSupport::CLI
       end
 
       context "a manifest with no lines" do
+
         with_manifest TestSupport_::EMPTY_S_
+
         it "ok." do
           setup_tmpdir_read_only
           invoke
@@ -91,9 +95,11 @@ module Skylab::Snag::TestSupport::CLI
       end
 
       context "no manifest" do
+
         with_tmpdir do |o|
           o.clear
         end
+
         it "ok. (note the event is SIGNED TWICE - by both CLI and API!)" do
           setup_tmpdir_read_only
           with_API_max_num_dirs 1

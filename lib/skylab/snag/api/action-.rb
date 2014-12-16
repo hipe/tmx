@@ -1,18 +1,41 @@
 module Skylab::Snag
 
-  class API
+  module API
 
-    class Action_  # replacement
+    class Action_  # this is a replacement action class for sibling node `Action`
 
       include API::Action::Business_Methods___
+
+      Entity_ = Snag_._lib.entity.call do
+
+        o :ad_hoc_processor, :make_delegate_properties, -> x do
+          Make_Delegate_Properties__.new( x ).go
+        end
+
+        o :ad_hoc_processor, :make_sender_methods, -> x do
+          Make_Sender_Methods__.new( x ).go
+        end
+
+        entity_property_class_for_write
+
+        class self::Entity_Property
+
+        private
+
+          def required=
+            @parameter_arity = :one
+            KEEP_PARSING_
+          end
+        end
+      end
 
       def initialize _API_client
         @API_client = _API_client
         @delegate = nil
       end
 
-      def invoke_via_iambic x_a
-        process_iambic_fully x_a
+      def invoke_via_argument_stream st
+        process_iambic_stream_fully st
         if_any_missing_required_raise_argument_error
         execute
       end
@@ -87,63 +110,89 @@ module Skylab::Snag
 
       extend NF_[].name_function_proprietor_methods
 
-      Entity_ = Snag_._lib.entity[ -> do
-
-        o :meta_property, :is_required
-
-        o :ad_hoc_processor, :make_delegate_properties, -> x do
-          Make_Delegate_Properties__.new( x ).go
-        end
-
-        o :ad_hoc_processor, :make_sender_methods, -> x do
-          Make_Sender_Methods__.new( x ).go
-        end
-
-        property_class_for_write
-        class self::Property
-          o do
-            o :iambic_writer_method_name_suffix, :'='
-            def required=
-              @is_required = true
-            end
-          end
-        end
-
-      end ]
-
       class Ad_Hoc_Processor_
-        def initialize scn
-          @scn = scn
+
+        def initialize pc
+          @upstream = pc.upstream
+          @client_module = pc.downstream
         end
       end
 
       class Make_Delegate_Properties__ < Ad_Hoc_Processor_
+
         def go
-          _ = @scn.gets_one  # name
-          kernel = @scn.reader.property_scope_krnl
-          lcls = @scn.reader.const_get :Delegate, false
-          lcls.ordered_dictionary.each_value do |slot|
-            i = :"on_#{ slot.name_i }"
-            kernel.add_property_via_i i do
-              instance_variable_set :"@#{ i }", :_provided_
-              some_delegate.send slot.attr_writer_method_name, iambic_property
+
+          @upstream.advance_one  # name
+          mod = @client_module
+          sess = mod.active_entity_edit_session
+          @property_class = sess.property_class
+
+          ok = KEEP_PARSING_
+
+          mod.const_get( :Delegate, false ).ordered_dictionary.each_value do | slot |
+
+            _prop = bld_delegating_property_for_slot slot
+
+            ok = sess.receive_property _prop
+            ok or break
+
+          end
+          ok
+        end
+
+      private
+
+        def bld_delegating_property_for_slot _SLOT
+
+          stem_symbol = :"on_#{ _SLOT.name_i }"
+
+          @property_class.new do
+
+            @name = Callback_::Name.via_variegated_symbol stem_symbol
+
+            @iambic_writer_method_proc_is_generated = false
+
+            @iwmn = via_name_build_internal_iambic_writer_meth_nm  # #todo publicize this [br] ivar
+
+            _IVAR = :"@#{ stem_symbol }"
+
+            @iambic_writer_method_proc_proc = -> _prp do
+
+              -> do
+
+                _x = iambic_property
+
+                _dlg = some_delegate
+
+                instance_variable_set _IVAR, :_provided_
+
+                _dlg.send _SLOT.attr_writer_method_name, _x
+
+                KEEP_PARSING_
+              end
             end
           end
         end
       end
 
       class Make_Sender_Methods__ < Ad_Hoc_Processor_
+
         def go
-          _ = @scn.gets_one  # name
-          mod = @scn.reader
-          lcls = mod.const_get :Delegate, false
-          lcls.ordered_dictionary.each_value do |slot|
-            m_i = :"send_#{ slot.name_i }"
-            m_i_ = :"receive_#{ slot.name_i }"
-            mod.send :define_method, m_i do |ev|
-              @delegate.send m_i_, ev
+
+          @upstream.advance_one  # name
+          mod = @client_module
+
+          mod.const_get( :Delegate, false ).ordered_dictionary.each_value do |slot|
+
+            _RECEIVE_METHOD_NAME = :"receive_#{ slot.name_i }"
+
+            mod.send :define_method, :"send_#{ slot.name_i }" do |ev|
+
+              @delegate.send _RECEIVE_METHOD_NAME, ev
             end
-          end ; nil
+          end
+
+          KEEP_PARSING_
         end
       end
 

@@ -338,7 +338,7 @@ module Skylab::Brazen::TestSupport::CLI
       if exp_stream
         @exp_stream.reinitialize 0, x_a
       else
-        @exp_stream = Callback_.iambic_stream.new 0, x_a
+        @exp_stream = Callback_::Iambic_Stream.via_array x_a
       end
       nil
     end
@@ -347,7 +347,7 @@ module Skylab::Brazen::TestSupport::CLI
 
     def init_actual_stream
       if ! act_stream
-        @act_stream = Callback_.iambic_stream.new 0, build_baked_em_a
+        @act_stream = Callback_::Iambic_Stream.via_array build_baked_em_a
       end
       nil
     end

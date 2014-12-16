@@ -11,10 +11,16 @@ module Skylab::Headless
             :filename,
             :max_num_dirs_to_look,
             :prop,
+            :property_symbol,
             :start_path,
             :on_event_selectively ]
 
         Headless_._lib.event_lib.selective_builder_sender_receiver self
+
+        def initialize
+          @prop = @property_symbol = nil
+          super
+        end
 
         def find_any_nearest_file_pathname  # :+#public-API
           execute
@@ -52,7 +58,7 @@ module Skylab::Headless
           maybe_send_event :error, :start_directory_is_not_directory do
             build_not_OK_event_with :start_directory_is_not_directory,
               :start_pathname, @start_pathname, :ftype, st.ftype,
-                :prop, @prop
+                :prop, prp
           end
         end
 
@@ -60,7 +66,7 @@ module Skylab::Headless
           maybe_send_event :error, :start_directory_is_not_directory do
             build_not_OK_event_with :start_directory_does_not_exist,
               :start_pathname, @start_pathname, :exception, e,
-                :prop, @prop
+                :prop, prp
           end
         end
 
@@ -119,6 +125,17 @@ module Skylab::Headless
               end
               y << "#{ ick o.filename } not found in #{ pth o.start_pathname}#{x}"
             end
+          end
+        end
+
+        def prp
+          @prop or bld_property
+        end
+
+        def bld_property
+          sym = @property_symbol || :path
+          Calback_::Actor.methodic_lib.simple_property_class.new do
+            @name = Callback_::Name.via_variegated_symbol sym
           end
         end
       end

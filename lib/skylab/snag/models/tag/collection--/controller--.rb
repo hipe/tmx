@@ -10,14 +10,14 @@ module Skylab::Snag
           @collection = collection ; @delegate = delegate
         end
 
-        def add_tag_using_iambic stem_i, x_a
+        def using_iambic_stream_add_tag st, stem_i
           self.class::Add__.new( @collection, @delegate ).
-            with_iambic( x_a ).add_i stem_i
+            using_iambic_stream_add_symbol st, stem_i
         end
 
-        def remove_tag_using_iambic stem_i, x_a
+        def using_iambic_stream_remove_tag st, stem_i
           self.class::Rm__.new( @collection, @delegate ).
-            with_iambic( x_a ).rm_i stem_i
+            using_iambic_stream_remove_symbol st, stem_i
         end
 
         def set_body_s s
@@ -25,15 +25,15 @@ module Skylab::Snag
         end
 
         class Edit___
+
+          include Callback_::Actor.methodic_lib.iambic_processing_instance_methods
+
           def initialize coll, lstn
             @collection = coll ; @delegate = lstn
           end
 
-          def with_iambic x_a
-            process_iambic_fully x_a
-            self
-          end
         private
+
           def build_tag stem_i
             tag = Tag_.controller @delegate
             tag.stem_i = stem_i
@@ -57,7 +57,8 @@ module Skylab::Snag
           end
 
           def merge_delegate x
-            @delegate.merge_in_other_listener_intersect x ; nil
+            @delegate.merge_in_other_listener_intersect x
+            KEEP_PARSING_
           end
         end
       end

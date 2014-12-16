@@ -72,19 +72,26 @@ module Skylab::Snag::TestSupport
       end
     end.call
 
-    -> x do
-      define_method :manifest_file do x end
-    end[ Snag_::API.manifest_file ]
+    define_method :manifest_file, -> do
+      x = Snag_::API.manifest_file
+      -> do
+        x
+      end
+    end.call
 
   end
 
   # ~ business
 
   module InstanceMethods
+
     def with_API_max_num_dirs d
-      Skylab::Snag::API::Client.setup -> o do
-        o.max_num_dirs_to_search_for_manifest_file = d  # #open [#050]
-      end ; nil
+
+      Snag_::API.edit_bottom_properties_stack_frame do | sf |
+
+        sf.set_max_num_dirs_to_search_for_manifest_file d  # #open [#050]
+
+      end
     end
   end
 
@@ -111,9 +118,12 @@ module Skylab::Snag::TestSupport
 
       define_method :has_tmpdir do true end
 
-      -> x do
-        define_method :tmpdir_setup_identifier do x end
-      end[ Produce_tmpdir_setup_identifier__[] ]
+      define_method :tmpdir_setup_identifier, -> do
+        _ID_X = Produce_tmpdir_setup_identifier__[]
+        -> do
+          _ID_X
+        end
+      end.call
 
       define_method :__execute_the_tmpdir_setup__ do
         _td = tmpdir

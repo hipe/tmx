@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class API::Action  # read [#055]
+  class API::Action  # read [#055]  .. this old action class is being repalced by sibling node `Action_`
 
     ACTIONS_ANCHOR_MODULE = -> { API::Actions }
 
@@ -14,8 +14,12 @@ module Skylab::Snag
     Callback_[ self, :employ_DSL_for_digraph_emitter ]  # #note-10
 
     event_factory -> do
-      API::Event_Factory
+      Event_factory__
     end  # #note-15
+
+    Event_factory__ = -> digraph, chan_i, sender, ev  do
+      ev
+    end
 
     class << self  # ~ minimal hand-rolled
 

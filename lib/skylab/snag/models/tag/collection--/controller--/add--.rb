@@ -13,7 +13,27 @@ module Skylab::Snag
             super
           end
 
-          def add_i stem_i
+          def using_iambic_stream_add_symbol st, sym
+            _ok = process_iambic_stream_fully st
+            _ok and add_tag_via_symbol sym
+          end
+
+        private
+
+          def delegate=
+            merge_delegate iambic_property
+          end
+
+          def prepend=
+            @do_prepend = true
+            KEEP_PARSING_
+          end
+
+          def merge_delegate=
+            merge_delegate iambic_property
+          end
+
+          def add_tag_via_symbol stem_i
             @tag = build_tag stem_i
             if @tag.is_valid
               add_tag
@@ -21,8 +41,6 @@ module Skylab::Snag
               @tag.last_callback_result
             end
           end
-
-        private
 
           def add_tag
             found_tag = find_existing_tag @tag
@@ -75,17 +93,6 @@ module Skylab::Snag
                 o.verb_i.to_s ].preterite } #{ val o.tag_s }" ; nil
             end
           end
-
-          Snag_._lib.entity[ self, -> do
-
-            def delegate
-              merge_delegate iambic_property
-            end
-
-            def prepend
-              @do_prepend = true
-            end
-          end ]
         end
       end
     end
