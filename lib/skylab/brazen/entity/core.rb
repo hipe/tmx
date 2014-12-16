@@ -39,7 +39,9 @@ module Skylab::Brazen
       def via_arglist x_a, & edit_p
         d = x_a.length
         if d.zero?
-          Produce_extension_module__.new( & edit_p ).execute
+          o = Extension_Module_Production_Session__.new( & edit_p )
+          o.init_to_create_new_module
+          o.execute
         else
           st = Callback_::Iambic_Stream.via_array( x_a )
           cls = st.gets_one
@@ -245,33 +247,57 @@ module Skylab::Brazen
 
     end
 
-    class Produce_extension_module__ < Module_Edit_Session__
+    class Extension_Module_Production_Session__ < Module_Edit_Session__
 
       def initialize & edit_p
         @edit_p = edit_p
       end
 
+      def init_to_create_new_module
+
+        @iambic_writer_method_writee_module = ::Module.new
+        @writable_formal_propery_method_names_box = Callback_::Box.new
+        @formal_property_writee_module = ::Module.new
+
+        @iambic_writer_method_writee_module.include METHODIC_.iambic_processing_instance_methods
+
+        @iambic_writer_method_writee_module.include Instance_Methods
+
+        nil
+      end
+
+      def init_to_produce_extension_of_extension extmod
+
+        @iambic_writer_method_writee_module = ::Module.new
+        @writable_formal_propery_method_names_box =
+          extmod::ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___.dup
+        @formal_property_writee_module = ::Module.new
+
+        @iambic_writer_method_writee_module.include extmod
+        @formal_property_writee_module.include extmod::Module_Methods
+
+        nil
+      end
+
       def execute
 
-        mod = ::Module.new
-        box = Callback_::Box.new
-        mod_ = ::Module.new
+        mod = @iambic_writer_method_writee_module
+        box = @writable_formal_propery_method_names_box
+        mod_ = @formal_property_writee_module
+
+        init_edit_session_via_extended_included_client_module mod
 
         mod.const_set :Module_Methods, mod_  # :+#public-API (the name)
         mod.const_set :ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___, box
         mod.instance_variable_set(
           :@entity_formal_property_method_nms_bx_for_wrt, box )
 
-        mod.include METHODIC_.iambic_processing_instance_methods
-        init_edit_session_via_extended_client_module mod
         mod.extend Extension_Module_Methods__
-
-        @formal_property_writee_module = mod_
-        @writable_formal_propery_method_names_box = box
 
         mod.active_entity_edit_session = self
         mod.module_exec( & @edit_p )
         mod.active_entity_edit_session = nil
+
         finish mod
       end
     end
@@ -279,7 +305,9 @@ module Skylab::Brazen
     class Class_Edit_Session__ < Module_Edit_Session__
 
       def initialize cls
-        init_edit_session_via_extended_client_module cls
+        @iambic_writer_method_writee_module = cls
+        cls.include Instance_Methods
+        init_edit_session_via_extended_included_client_module cls
         @formal_property_writee_module = cls.singleton_class
         @writable_formal_propery_method_names_box =
           cls.entity_formal_property_method_names_box_for_write
@@ -288,9 +316,7 @@ module Skylab::Brazen
 
     class Module_Edit_Session__
 
-      private def init_edit_session_via_extended_client_module mod
-        mod.include Instance_Methods
-        @iambic_writer_method_writee_module = mod
+      private def init_edit_session_via_extended_included_client_module mod
         @method_added_filter = IDENTITY_
         @pay_attention_to_method_added = true
         @property_related_nonterminal = mod::Entity_Property.nonterminal_for self
@@ -555,7 +581,7 @@ module Skylab::Brazen
 
       def o * x_a, & edit_p
         @active_entity_edit_session.receive_edit(
-          Callback_::Iambic_Stream_.via_array( x_a ), & edit_p )
+          Callback_::Iambic_Stream.via_array( x_a ), & edit_p )
       end
 
       def during_entity_normalize & p
@@ -591,6 +617,12 @@ module Skylab::Brazen
         st = Callback_::Iambic_Stream.via_array a
         cls = st.gets_one
         _enhance_to_and_edit_entity_class_via_any_nonempty_stream cls, st, & edit_p
+      end
+
+      def via & edit_p
+        o = Extension_Module_Production_Session__.new( & edit_p )
+        o.init_to_produce_extension_of_extension self
+        o.execute
       end
 
     private
@@ -991,6 +1023,14 @@ module Skylab::Brazen
           Property_Related_Nonterminal__.new edit_session, self
         end
       end  # >>
+
+      def description  # for [#074]
+        if @name
+          @name.as_variegated_symbol
+        else
+          '[ no name ]'
+        end
+      end
 
       def description_under expag
         if @name

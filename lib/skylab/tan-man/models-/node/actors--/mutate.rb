@@ -28,7 +28,7 @@ module Skylab::TanMan
             :kernel, :on_event_selectively ]
 
           def resolve_name_string
-            @name_s = @entity.property_value :name ; nil
+            @name_s = @entity.property_value_via_symbol :name ; nil
           end
         end
 

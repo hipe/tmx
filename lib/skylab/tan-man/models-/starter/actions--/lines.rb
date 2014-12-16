@@ -6,11 +6,15 @@ module Skylab::TanMan
 
       class Lines < Action_
 
-        Entity_[ self,
-          :required, :property, :value_fetcher,
-          :properties,
-          :use_default,
-          :workspace, :workspace_path, :config_filename ]
+        Entity_.call self,
+
+            :required, :property, :value_fetcher,
+
+            :properties,
+              :use_default,
+              :workspace,
+              :workspace_path,
+              :config_filename
 
         def produce_any_result
           if @argument_box[ :use_default ]

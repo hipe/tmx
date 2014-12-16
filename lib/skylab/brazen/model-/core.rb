@@ -19,8 +19,10 @@ module Skylab::Brazen
         end
 
         def entity * a, & p
-          if a.length.nonzero? || p
+          if a.length.nonzero?
             Model_::Entity.via_nonzero_length_arglist a, & p
+          elsif p
+            Model_::Entity.via( & p )
           else
             Model_::Entity
           end
@@ -309,6 +311,10 @@ module Skylab::Brazen
 
     def any_property_value i
       @property_box[ i ]
+    end
+
+    def property_value_via_property prop
+      @property_box.fetch prop.name_i
     end
 
     def normalize_property_value_via_normal_entity prop, ent, & oes_p

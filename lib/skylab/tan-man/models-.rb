@@ -2,9 +2,20 @@ module Skylab::TanMan
 
   # ~ the stack
 
-  Entity_ = Brazen_::Model_::Entity[ -> do
+  Entity_ = Brazen_.model.entity do
 
-  end ]
+    # create an entity extension module whose foundation is another entity
+    # extension module. effectively we inherit its metaproperties & ad-hoc
+    # processors, etc. we may add to them but not (easily) take them away.
+
+  end
+
+  module Entity_
+  public
+    def property_value_via_symbol sym  # abstraction candidate
+      property_value_via_property self.class.property_via_symbol sym
+    end
+  end
 
   module Entity_
     def receive_missing_required_properties ev  # #hook-in [br]
@@ -61,11 +72,10 @@ module Skylab::TanMan
 
       def use_workspace_as_datastore_controller
 
-        Entity_[ self, -> do
+        Entity_.call self,
 
-          o :reuse, Models_::Workspace.properties_for_reuse
+            :reuse, Models_::Workspace.properties_for_reuse
 
-        end ]
 
         pc_a = model_class.preconditions
         did_resolve_pcia and fail
@@ -97,17 +107,10 @@ module Skylab::TanMan
         Brazen_.bound_call.via_value _x
       end
 
-      def receive_extra_iambic ev  # #hook-in [br]
+      def receive_extra_iambic ev  # #hook-in [cb]
         maybe_send_event :error do
           ev
         end
-      end
-
-      def maybe_send_event * i_a, & ev_p
-        if :error == i_a.first
-          @error_count += 1
-        end
-        maybe_send_event_via_channel i_a, & ev_p
       end
 
     public
@@ -174,8 +177,6 @@ module Skylab::TanMan
         Entity_
       end
     end
-
-    attr_reader :error_count
   end
 
   class Collection_Controller_ < Brazen_.model.collection_controller
@@ -195,8 +196,8 @@ module Skylab::TanMan
 
   class Kernel_ < Brazen_::Kernel_  # :[#083].
 
-    def kernel_property_value i
-      properties_stack.property_value i
+    def kernel_property_value i  # _DOG_EAR
+      properties_stack.property_value_via_symbol i
     end
   private
     def properties_stack
@@ -238,7 +239,10 @@ module Skylab::TanMan
         end
     end
 
-    Bottom_Properties_Frame__.new
+    Bottom_Properties_Frame__.new do
+      # no customization
+    end
+
   end ]
 
   Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]
@@ -255,11 +259,11 @@ module Skylab::TanMan
       Xxx__ = -> do
         p = -> do
           class Xxx___
-            Entity_[ self, -> do
-              o :property, :workspace,
-                :property, :workspace_path,
-                :property, :config_filename
-            end ]
+            Entity_.call self,
+                :properties,
+                  :workspace,
+                  :workspace_path,
+                  :config_filename
           end
           p = -> { Xxx___ }
           Xxx___
@@ -291,20 +295,19 @@ module Skylab::TanMan
       self.is_promoted = true
 
       desc do |y|
-        y << "create the #{ val property_value :local_conf_dirname } directory"
+        y << "create the #{ val property_value_via_symbol :local_conf_dirname } directory"
       end
     end
 
     class Actions::Ping < Action_
 
-      Entity_[ self, -> do
-        o :is_promoted
+      Entity_.call self,
 
-        o :desc, -> y do
-          y << "pings tanman (lowlevel)."
-        end
+          :is_promoted,
 
-      end ]
+          :desc, -> y do
+            y << "pings tanman (lowlevel)."
+          end
 
       def produce_any_result
         maybe_send_event :info, :ping do

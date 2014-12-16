@@ -144,16 +144,17 @@ module Skylab::TanMan
 
           module IO_Proprietor___
 
-            TanMan_::Entity_[ self, -> do
+            TanMan_::Entity_.call self,
 
-              o :meta_property, :IO_direction, :enum, [ :input, :output ]
+                  :enum, [ :input, :output ],
+                :meta_property, :IO_direction,
 
-              o :IO_direction, :input, :property, :input_string,
+                :IO_direction, :input, :property, :input_string,
                 :IO_direction, :input, :property, :input_pathname,
+
                 :IO_direction, :output, :property, :output_string,
                 :IO_direction, :output, :property, :output_pathname
 
-            end ]
           end
 
           p = -> { IO_Proprietor___.properties }

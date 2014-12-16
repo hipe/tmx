@@ -8,10 +8,10 @@ module Skylab::TanMan
 
       class Edit::Normalize_name
 
-        Actor_[ self, :properties,
+        Actor_.call self, :properties,
           :bound,
           :val_p,
-          :ev_p ]
+          :ev_p
 
         def execute
           @x = @bound.value_x
@@ -34,10 +34,10 @@ module Skylab::TanMan
 
       class Edit::Normalize_value
 
-        Actor_[ self, :properties,
+        Actor_.call self, :properties,
           :bound,
           :val_p,
-          :ev_p ]
+          :ev_p
 
         def execute
           @x = @bound.value_x

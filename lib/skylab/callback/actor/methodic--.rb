@@ -25,7 +25,7 @@ module Skylab::Callback
             when :simple
               Apply_simple_enhancement__.new(
                 cls,
-                Iambic_Stream_.new( 1, i_a )
+                Iambic_Stream_via_Array_.new( 1, i_a )
               ).execute
             when :properties
               aply_seed_treatment cls, i_a
@@ -81,7 +81,7 @@ module Skylab::Callback
           ok = nil
           x = new do
             oes_p and receive_selective_listener_proc oes_p
-            ok = process_iambic_stream_fully Iambic_Stream_.new( 0, x_a )
+            ok = process_iambic_stream_fully Iambic_Stream_via_Array_.new( 0, x_a )
           end
           ok && x
         end
@@ -92,7 +92,7 @@ module Skylab::Callback
       private
 
         def iambic_stream_via_iambic_array x_a
-          Iambic_Stream_.new 0, x_a
+          Iambic_Stream_via_Array_.new 0, x_a
         end
 
         def process_iambic_stream_fully stream  # :+#public-API :+#hook-in
@@ -169,7 +169,7 @@ module Skylab::Callback
 
         def when_after_process_iambic_fully_stream_has_content stream  # :+#public-API
           _ev = build_extra_iambic_event_via [ stream.current_token ]
-          receive_extra_iambic _ev  # :+#public-API (name) :+#hook-in
+          receive_extra_iambic _ev
         end
 
         def build_extra_iambic_event_via name_i_a, did_you_mean_i_a=nil
@@ -185,7 +185,7 @@ module Skylab::Callback
           Callback_::Lib_::Event_lib[].inline_not_OK_via_mutable_iambic_and_message_proc i_a, msg_p
         end
 
-        def receive_extra_iambic ev
+        def receive_extra_iambic ev  # :+#public-API (name) :+#hook-in
           raise ev.to_exception
         end
       end

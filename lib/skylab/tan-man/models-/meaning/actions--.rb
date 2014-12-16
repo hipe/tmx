@@ -2,9 +2,9 @@ module Skylab::TanMan
 
   class Models_::Meaning
 
-    Brazen_::Model_::Entity[ self, -> do
+    TanMan_::Entity_.call self,
 
-      o :persist_to, :meaning,
+        :persist_to, :meaning,
 
         :required,
         :ad_hoc_normalizer, -> bound, val_p, ev_p do
@@ -18,7 +18,6 @@ module Skylab::TanMan
         end,
         :property, :value
 
-    end ]
 
     Actions__ = make_action_making_actions_module
 
@@ -28,19 +27,19 @@ module Skylab::TanMan
 
       class Add
 
-        Model_::Entity[ self, -> do
+        edit_entity_class do
           o :required, :property, :input_string,
             :required, :property, :output_string
-        end ]
+        end
       end
 
       Ls = make_action_class :List
 
       class Ls
 
-        Model_::Entity[ self, -> do
+        edit_entity_class do
           o :required, :property, :input_string
-        end ]
+        end
       end
 
       Rm = make_action_class :Delete

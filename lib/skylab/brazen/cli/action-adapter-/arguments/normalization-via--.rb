@@ -8,8 +8,9 @@ module Skylab::Brazen
 
         class Normalization_Via__
 
-          Callback_::Actor[ self, :properties,
-            :parameters ]
+          Callback_::Actor.call self,
+            :properties,
+              :parameters
 
           def execute
 
@@ -27,6 +28,11 @@ module Skylab::Brazen
               @opt_req_rest_i = opt_req_rest_i
               @name_i = name_i
             end
+
+            def has_default
+              false
+            end
+
             attr_reader :name_i
 
             def is_required

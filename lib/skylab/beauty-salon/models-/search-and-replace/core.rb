@@ -317,7 +317,7 @@ module Skylab::BeautySalon
         @y << "to the grep `-E` argument."
         @y << nil
         @y << "you can make this far simpler than your '#{ other }' regex"
-        @y << "and things should still work - it is simply a way to decice"
+        @y << "and things should still work - it is simply a way to decide"
         @y << "which files to bother with opening."
         @y << nil
       end
@@ -454,7 +454,7 @@ module Skylab::BeautySalon
         @y << "$1, $2 etc are the captures in your expression."
         @y << "`bar` and `downcase` are \"functions\" (called as chainable"
         @y << "methods), either builtin (like `upcase`, `downcase`) or"
-        @y << "user-provided. (supported escape seqences: \\n \\t \\)"
+        @y << "user-provided. (supported escape sequences: \\n \\t \\)"
         @y << nil
       end
 

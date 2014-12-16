@@ -8,7 +8,9 @@ module Skylab::TanMan
 
       Callback_::Actor.call self, :properties,
 
-        :path_i, :verb_i, :call
+        :path_i,
+        :verb_i,
+        :call
 
       Brazen_.event.selective_builder_sender_receiver self
 

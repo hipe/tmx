@@ -60,14 +60,14 @@ module Skylab::TanMan::TestSupport::Models::Meaning
 
       expect_OK_event :item do |ev|
         ent = ev.to_event.flyweighted_entity
-        ent.property_value( :name ).should eql 'foo'
-        ent.property_value( :value ).should eql 'fee '
+        ent.property_value_via_symbol( :name ).should eql 'foo'
+        ent.property_value_via_symbol( :value ).should eql 'fee '
       end
 
       expect_OK_event :item do |ev|
         ent = ev.to_event.flyweighted_entity
-        ent.property_value( :name ).should eql 'fiffle'
-        ent.property_value( :value ).should eql 'faffle'
+        ent.property_value_via_symbol( :name ).should eql 'fiffle'
+        ent.property_value_via_symbol( :value ).should eql 'faffle'
       end
 
       expect_OK_event :number_of_items_found do |ev|

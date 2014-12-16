@@ -16,7 +16,7 @@ module Skylab::TanMan
         @kernel.app_name
       end
 
-      def property_value i
+      def property_value_via_symbol i
         @kernel.kernel_property_value i
       end
 

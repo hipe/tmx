@@ -2,9 +2,9 @@ module Skylab::TanMan
 
   class Models_::Association
 
-    Brazen_::Model_::Entity[ self, -> do
+    TanMan_::Entity_.call self,
 
-      o :persist_to, :association,
+        :persist_to, :association,
 
         :preconditions, [ :dot_file ],
 
@@ -16,8 +16,6 @@ module Skylab::TanMan
         :property,
         :to_node_label
 
-    end ]
-
     Actions = make_action_making_actions_module
 
     module Actions
@@ -26,14 +24,14 @@ module Skylab::TanMan
 
       class Add
 
-        Model_::Entity[ self, -> do
+        edit_entity_class do
 
           o :reuse, Model_::Document_Entity.IO_properties,
             :property, :attrs,
             :property, :prototype,
             :flag, :property, :ping
+        end
 
-        end ]
 
         def via_arguments_produce_bound_call
           if @argument_box[ :ping ]
@@ -49,16 +47,17 @@ module Skylab::TanMan
 
       class Rm
 
-        Model_::Entity[ self, -> do
+        edit_entity_class do
 
-          o :reuse, Model_::Document_Entity.IO_properties
+          o :reuse, Model_::Document_Entity.IO_properties,
 
-          property_method_nms_for_wrt.remove Brazen_::NAME_  # ouch/meh
-
-          o :required, :property, :from_node_label,
+            :required, :property, :from_node_label,
             :required, :property, :to_node_label
 
-        end ]
+          entity_formal_property_method_names_box_for_write.
+            remove Brazen_::NAME_  # ouch/meh
+
+        end
 
         def via_arguments_produce_bound_call
           bc = any_bound_call_for_resolve_document_IO
@@ -103,8 +102,8 @@ module Skylab::TanMan
           :verb, :touch,
           :attrs, entity.any_parameter_value( :attrs ),
           :prototype_i, entity.any_parameter_value( :prototype ),
-          :from_node_label, entity.property_value( :from_node_label ),
-          :to_node_label, entity.property_value( :to_node_label ),
+          :from_node_label, entity.property_value_via_symbol( :from_node_label ),
+          :to_node_label, entity.property_value_via_symbol( :to_node_label ),
           :datastore, @dsc,
           :kernel, @kernel, :on_event_selectively, _oes_p_ )
 

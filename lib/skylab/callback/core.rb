@@ -224,7 +224,7 @@ module Skylab::Callback
     end
 
     def iambic_stream_via_iambic_array x_a
-      Iambic_Stream_.new 0, x_a
+      Iambic_Stream_via_Array_.new 0, x_a
     end
 
     def ivar_box
@@ -446,7 +446,7 @@ module Skylab::Callback
     end
   end
 
-  Iambic_Stream_ = class Iambic_Stream  # :[#046]
+  Iambic_Stream_via_Array_ = class Iambic_Stream  # :[#046]
 
     def reinitialize d, x_a
       @d = d ; @x_a = x_a ; @x_a_length = @x_a.length

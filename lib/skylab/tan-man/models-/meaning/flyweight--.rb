@@ -16,7 +16,7 @@ module Skylab::TanMan
       @scn.string = @scn.string.dup
     end
 
-    def property_value i
+    def property_value_via_symbol i
       @indexed or index!
       send PROP_VAL_H__.fetch i
     end

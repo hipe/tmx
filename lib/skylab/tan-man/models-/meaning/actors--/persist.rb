@@ -4,11 +4,11 @@ module Skylab::TanMan
 
       class Actors__::Persist
 
-        Actor_[ self, :properties,
+        Actor_.call self, :properties,
           :ent,
           :output_s,
           :scan_p,
-          :on_event_selectively ]
+          :on_event_selectively
 
         def execute
           init_ivars
@@ -19,9 +19,9 @@ module Skylab::TanMan
       private
 
         def init_ivars
-          @name = @ent.property_value :name
+          @name = @ent.property_value_via_symbol :name
           @new_line = nil
-          @value = @ent.property_value :value
+          @value = @ent.property_value_via_symbol :value
         end
 
         def resolve_insertion_range
@@ -45,7 +45,7 @@ module Skylab::TanMan
           @scan = produce_fresh_stream
           least_greater_name = nil
           while fly = @scan.gets
-            name = fly.property_value :name
+            name = fly.property_value_via_symbol :name
             case name <=> my_name
             when -1 ; greatest_lesser_name = name
             when  0 ; exact = fly ; break
@@ -79,7 +79,7 @@ module Skylab::TanMan
         def find_first_flyweight_with_name s
           @scan = produce_fresh_stream
           @scan.detect do |ent|
-            s == ent.property_value( :name )
+            s == ent.property_value_via_symbol( :name )
           end
         end
 
@@ -121,7 +121,7 @@ module Skylab::TanMan
         end
 
         def when_name_collision
-          value = @exact_match_fly.property_value :value
+          value = @exact_match_fly.property_value_via_symbol :value
           if value == @value
             when_no_change
           else
@@ -153,7 +153,7 @@ module Skylab::TanMan
         def bld_name_collision_event
           build_not_OK_event_with :name_collision,
               :name, @name,
-              :existing_value, @exact_match_fly.property_value( :value ),
+              :existing_value, @exact_match_fly.property_value_via_symbol( :value ),
               :replacement_value, @value do |y, o|
 
             y << "cannot set #{ lbl o.name } to #{ val o.replacement_value },#{

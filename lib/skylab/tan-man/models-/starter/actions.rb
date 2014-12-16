@@ -2,20 +2,18 @@ module Skylab::TanMan
 
   class Models_::Starter
 
-    Entity_[ self, -> do
+    Entity_.call self,
 
-      o :persist_to, :starter,
+        :persist_to, :starter,
 
         :property, :name
 
-    end ]
 
     class << self
 
       def dir_pn_instance
         @dpn ||= TanMan_.dir_pathname.join RELPATH__
       end
-
     end
     RELPATH__ = 'data-documents/starters'.freeze
 
@@ -35,8 +33,6 @@ module Skylab::TanMan
 
         use_workspace_as_datastore_controller
 
-        Entity_::Add_check_for_missing_required_properties[ self ]
-
         include Brazen_.model.retrieve_methods
 
         def produce_any_result
@@ -54,7 +50,7 @@ module Skylab::TanMan
     end
 
     def to_pathname
-      @pn ||= Starter_.dir_pn_instance.join property_value :name
+      @pn ||= Starter_.dir_pn_instance.join property_value_via_symbol :name
     end
 
     class Collection_Controller__ < Collection_Controller_

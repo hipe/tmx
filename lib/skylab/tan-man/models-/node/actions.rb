@@ -2,9 +2,9 @@ module Skylab::TanMan
 
   class Models_::Node
 
-    Brazen_::Model_::Entity[ self, -> do
+    Entity_.call self,
 
-      o :persist_to, :node,
+        :persist_to, :node,
 
         :preconditions, [ :dot_file ],
 
@@ -14,7 +14,6 @@ module Skylab::TanMan
         end,
         :property, :name
 
-    end ]
 
     Actions = make_action_making_actions_module
 
@@ -24,13 +23,11 @@ module Skylab::TanMan
 
       class Add
 
-        Model_::Entity[ self, -> do
+        Model_::Entity.call self,
 
-          o :reuse, Model_::Document_Entity.IO_properties,
+            :reuse, Model_::Document_Entity.IO_properties,
 
             :flag, :property, :ping
-
-        end ]
 
       private
 
@@ -48,11 +45,9 @@ module Skylab::TanMan
 
       class Ls
 
-        Model_::Entity[ self, -> do
+        Model_::Entity.call self,
 
-          o :reuse, Model_::Document_Entity.input_properties
-
-        end ]
+            :reuse, Model_::Document_Entity.input_properties
       end
 
       Rm = make_action_class :Delete
@@ -80,10 +75,12 @@ module Skylab::TanMan
       end
 
       def touch_node_via_label s
-        node = Node_.edited @kernel, handle_event_selectively do |o|
+
+        node = Node_.edit_entity @kernel, handle_event_selectively do |o|
           o.with :name, s
         end
-        if node.error_count.zero?
+
+        node and begin
           produce_relevant_sexp_via_touch_entity node
         end
       end
