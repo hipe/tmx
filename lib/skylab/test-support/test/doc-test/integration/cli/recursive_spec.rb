@@ -1,41 +1,8 @@
 require_relative '../../test-support'
 
-module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Recursiv
-
-  TestSupport_ = ::Skylab::TestSupport
-
-  parent = ::Skylab::TestSupport::TestSupport::Regret::CLI::Actions
-
-  @dir_pathname = parent.dir_pathname.join 'recursive'
-
-  _Face_TS = TestSupport_::Lib_::Face__[]::TestSupport
-  _Face_TS::CLI::Client[ self ]
-
-  parent[ TS__ = self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
+module Skylab::TestSupport::TestSupport::DocTest
 
   describe "[ts] regret CLI actions recursive", wip: true do
-
-    extend TS__
-
-    def client_class
-      TestSupport_::Regret::CLI::Client
-    end
-
-    def cd_and_invoke *argv
-      r = nil
-      TestSupport_::Library_::FileUtils.cd TestSupport_.dir_pathname.to_s do
-        r = invoke_subcmd( * argv )
-      end
-      r
-    end
-
-    def invoke_subcmd * argv
-      invoke 'doc-test', * argv
-    end
 
     it "outputs the lines" do
       r = cd_and_invoke '--recursive', 'list', 'regret'
