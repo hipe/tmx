@@ -18,7 +18,7 @@ module Skylab::Brazen
 
       alias_method :new_top_invocation, :new
       def new * a
-        new_top_invocation Brazen_, * a
+        new_top_invocation a, Brazen_
       end
 
       def pretty_path x
@@ -34,10 +34,10 @@ module Skylab::Brazen
 
     class Top_Invocation__
 
-      def initialize * a
+      def initialize a, mod
         @env = nil
-        @mod = a.first
-        @resources = Resources__.new a
+        @mod = mod
+        @resources = Resources__.new a, mod
       end
       attr_writer :env
       def invoke argv
@@ -1206,8 +1206,9 @@ module Skylab::Brazen
     end
 
     class Resources__
-      def initialize a
-        @mod, @sin, @sout, @serr, @s_a = a
+      def initialize a, mod
+        @mod = mod
+        @sin, @sout, @serr, @s_a = a
         if @s_a
           @s_a.last.nil? and @s_a[ -1 ] = Callback_::Name.via_module( @mod ).as_slug
         else

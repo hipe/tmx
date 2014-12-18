@@ -39,6 +39,50 @@ module Skylab::Brazen::TestSupport::CLI
 
   module InstanceMethods
 
+    include TestSupport_::Expect_Stdout_Stderr::InstanceMethods
+
+    define_method :expect, instance_method( :expect )  # because rspec
+
+    # ~ invoke phase ("action under test")
+
+    def invoke * argv
+      a = sub_action_s_a and argv[ 0, 0 ] = a
+      invoke_via_argv argv
+    end
+
+    def sub_action_s_a  # :+#hook-over
+    end
+
+    def invoke_with_no_prefix * argv
+      invoke_via_argv argv
+    end
+
+    def invoke_via_argv argv
+
+      g = TestSupport_::IO.spy.group.new
+
+      g.do_debug_proc = -> do
+        do_debug
+      end
+
+      g.debug_IO = debug_IO
+
+      g.add_stream :i, :_no_instream_
+      g.add_stream :o
+      g.add_stream :e
+
+      @IO_spy_group_for_expect_stdout_stderr = g
+
+      @invocation = Brazen_::CLI.new nil, * g.values_at( :o, :e ), [ 'bzn' ]
+
+      prepare_invocation
+
+      @exitstatus = @invocation.invoke argv ; nil
+    end
+
+    def prepare_invocation  # :+#hook-over
+    end
+
     # ~ common business assertions
 
     def expect_branch_pattern_zero
@@ -170,6 +214,10 @@ module Skylab::Brazen::TestSupport::CLI
       expect :styled, "use '#{ invocation_string } -h' for help"
     end
 
+    def invocation_string
+      self.class.fake_app_name
+    end
+
     def expect_errored_with i
       expect_no_more_lines
       expect_exitstatus_for i
@@ -192,35 +240,6 @@ module Skylab::Brazen::TestSupport::CLI
       expect_no_more_lines
       @exitstatus.should eql Brazen_::CLI::SUCCESS_
     end
-
-    # ~ action-under-test phase
-
-    def invoke * argv
-      a = sub_action_s_a and argv[ 0, 0 ] = a
-      invoke_via_argv argv
-    end
-
-    def invoke_with_no_prefix * argv
-      invoke_via_argv argv
-    end
-
-    def invoke_via_argv argv
-      grp = TestSupport_::IO.spy.group.new
-      grp.do_debug_proc = -> { do_debug }
-      grp.debug_IO = debug_IO
-      grp.add_stream :i, :_no_instream_
-      grp.add_stream :o
-      grp.add_stream :e
-      @IO_spy_group = grp
-      @invocation = Brazen_::CLI.new nil, * grp.values_at( :o, :e ), [ 'bzn' ]
-      prepare_invocation
-      @exitstatus = @invocation.invoke argv ; nil
-    end
-
-    def prepare_invocation
-    end
-
-    # ~ assertion phase
 
     def expect_option i, rx=nil
       if rx
@@ -253,118 +272,5 @@ module Skylab::Brazen::TestSupport::CLI
         expect( * a )
       end
     end
-
-    def expect * x_a
-      load_expect_the_first_time
-      expect_via_arg_list x_a
-    end
-
-    def load_expect_the_first_time  # ghastly hack that lets us regress
-      cls = self.class
-      # cls.include Callback_::Actor.methodic_lib.iambic_processing_instance_methods
-      cls.send :define_method, :expect do |*x_a|
-        expect_via_arg_list x_a
-      end ; nil
-    end
-
-    def expect_no_more_lines
-      if @act_stream.unparsed_exists
-        fail "expected no more lines, had #{ @act_stream.current_token.to_a.inspect }"
-      end
-    end
-
-    def expect_maybe_a_blank_line
-      if @act_stream.unparsed_exists and NEWLINE__ == @act_stream.current_token.string
-        @act_stream.advance_one
-      end
-    end
-
-    NEWLINE__ = "\n".freeze
-
-    def expect_header_line s
-      expect :styled, "#{ s }:"
-    end
-
-    def expect_via_arg_list x_a
-      prs_expectation x_a
-      init_actual_stream
-      @act_stream.unparsed_exists or fail "expected more lines, had none."
-      @emission = @act_stream.gets_one
-      @line_s = @emission.string
-      @style_is_expected and assrt_styled_and_unstyle
-      @line_s.chomp!
-      send @line_assertion_method_i ; nil
-    end
-
-    def assrt_styled_and_unstyle
-      line_s = @line_s.dup.gsub! SIMPLE_STYLE_RX__, EMPTY_STRING__
-      line_s or fail "expected styled, was not: #{ @line_s }"
-      @line_s = line_s ; nil
-    end
-
-    SIMPLE_STYLE_RX__ = /\e  \[  \d+  (?: ; \d+ )*  m  /x  # copy-paste [hl]
-    EMPTY_STRING__ = ''.freeze
-
-    def assrt_expected_line_equals_actual_line
-      @line_s.should eql @line_assertion_x
-    end
-
-    def assrt_expected_rx_matches_actual_line
-      @line_s.should match @line_assertion_x
-    end
-
-    def prs_expectation x_a
-      init_expectation_stream x_a
-      st = @exp_stream
-      if :styled == st.current_token
-        @style_is_expected = true
-        st.advance_one
-      else
-        @style_is_expected = false
-      end
-      x = st.gets_one
-      @line_assertion_x = x
-      if x.respond_to? :ascii_only?
-        @line_assertion_method_i = :assrt_expected_line_equals_actual_line
-      else
-        @line_assertion_method_i = :assrt_expected_rx_matches_actual_line
-      end
-      if st.unparsed_exists
-        raise ::ArgumentError, "no: #{ st.current_token }" ; nil
-      end
-    end
-
-    def init_expectation_stream x_a
-      if exp_stream
-        @exp_stream.reinitialize 0, x_a
-      else
-        @exp_stream = Callback_::Iambic_Stream.via_array x_a
-      end
-      nil
-    end
-
-    attr_reader :exp_stream
-
-    def init_actual_stream
-      if ! act_stream
-        @act_stream = Callback_::Iambic_Stream.via_array build_baked_em_a
-      end
-      nil
-    end
-
-    attr_reader :act_stream
-
-    def build_baked_em_a
-      @IO_spy_group.release_lines
-    end
-
-    def invocation_string
-      self.class.fake_app_name
-    end
-
-    def sub_action_s_a
-      nil
-    end
-
   end
 end

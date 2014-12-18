@@ -153,8 +153,6 @@ module Skylab::TestSupport
 
     IDENTITY_ = -> x { x }
 
-    KEEP_PARSING_ = true
-
     UNDERSCORE_ = '_'.freeze
   end
 end

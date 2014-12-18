@@ -20,6 +20,8 @@ module Skylab::TestSupport::TestSupport
 
   TestSupport_::Regret[ self ]
 
+  extend TestSupport_::Quickie
+
   module InstanceMethods
 
     attr_reader :do_debug

@@ -4,7 +4,7 @@ module Skylab::TanMan
 
     class << self
       def new * a
-        new_top_invocation TanMan_, * a
+        new_top_invocation a, TanMan_
       end
     end
 

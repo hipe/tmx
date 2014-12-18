@@ -19,9 +19,9 @@ module Skylab::Cull::TestSupport::CLI::Actions::Init
 
       from_inside_empty_directory do |d|
 
-       invoke 'init'
+        invoke 'init'
 
-       expect :creating_done
+        expect :creating_done
 
       end
     end

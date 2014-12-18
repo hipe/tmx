@@ -47,6 +47,7 @@ module Skylab::TestSupport  # :[#021].
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
   FILE_SEP_ = ::File::SEPARATOR
+  KEEP_PARSING_ = true
   stowaway :Lib_, 'library-'
   MONADIC_TRUTH_ = -> _ { true }
   NEWLINE_ = "\n".freeze

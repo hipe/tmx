@@ -6,6 +6,10 @@ module Skylab::Callback
 
       class << self
 
+        def cache_iambic_writer_methods * a, & p
+          Cache_iambic_writer_methods__.call( * a, & p )
+        end
+
         def iambic_processing_instance_methods
           Iambic_Processing_Instance_Methods__
         end
@@ -641,6 +645,83 @@ module Skylab::Callback
             end
           end
         end
+      end
+
+      # ~ totally independent experimental enhancement (#note-650)
+
+      module Cache_iambic_writer_methods__
+
+        class << self
+
+          def call top_class, upstream_class=top_class, & edit_hash_p
+
+            top_class.class_exec do
+
+              extend Cache_iambic_writer_methods__
+
+              def iambic_writer_method_name_passive_lookup_proc  # #hook-in
+                self.class.iamb_writer_method_name_passive_proc
+              end
+
+              h = {}
+              upstream_class.private_instance_methods( false ).each do | meth_i |
+                md = IAMBIC_WRITER_METHOD_NAME_RX__.match meth_i
+                md or next
+                h[ md[ 0 ].intern ] = meth_i
+              end
+
+              if edit_hash_p
+                h = edit_hash_p[ h ]
+              end
+
+              @iambic_writer_method_name_dictionary = h.freeze  # top class only
+            end
+            nil
+          end
+
+          alias_method :[], :call
+
+        end  # >>
+
+        # ~ courtesies
+
+        def is_keyword i
+          iambic_writer_method_name_dictionary.key? i
+        end
+
+        def clear_iambic_writer_method_name_passive_proc
+          @iambic_writer_method_name_dictionary = nil
+          @iambic_writer_method_name_passive_proc = nil
+        end
+
+        # ~ implementation
+
+        def iamb_writer_method_name_passive_proc
+          @iambic_writer_method_name_passive_proc ||= bld_iambic_writer_method_name_passive_proc
+        end
+
+        private def bld_iambic_writer_method_name_passive_proc
+          h = iambic_writer_method_name_dictionary
+          -> prop_i do
+            h[ prop_i ]
+          end
+        end
+
+        def iambic_writer_method_name_dictionary
+          @iambic_writer_method_name_dictionary ||= bld_iambic_writer_method_name_dictionary
+        end
+
+        private def bld_iambic_writer_method_name_dictionary
+          h = superclass.iambic_writer_method_name_dictionary.dup
+          ( private_instance_methods( false ).each do | meth_i |
+            md = IAMBIC_WRITER_METHOD_NAME_RX__.match meth_i
+            md or next
+            h[ md[ 0 ].intern ] = meth_i
+          end )
+          h.freeze
+        end
+
+        IAMBIC_WRITER_METHOD_NAME_RX__ = /\A.+(?==\z)/
       end
 
       ACHIEVED_ = true

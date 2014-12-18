@@ -1,168 +1,208 @@
 module Skylab::TestSupport
 
-  class Expect  # see [#029] the expect omnibus and narrative #intro-to-gamma
+  module Expect_Stdout_Stderr  # see [#029] the expect omnibus and narrative #intro-to-gamma
 
-    def self.apply_on_test_node_with_x_a_passively node, _
-      node.instance_methods_module.include InstanceMethods ; nil
-    end
+    # assumes {  @IO_spy_group_for_expect_stdout_stderr | your own `build_baked_em_a` }
 
-    # ~ three laws for real ~
+    # NOTE currently this mutates emission strings!
 
     module InstanceMethods
     private
 
+      # ~ before the expectation, set default behavior
+
+      def on_stream stream_symbol
+        @__sout_serr_default_stream_symbol__ = stream_symbol ; nil
+      end
+
+      # ~ expect "macros"
+
+      def expect_header_line s
+        expect :styled, "#{ s }:"
+      end
+
+      # ~ expect
+
       def expect * x_a, & p
-        exp = build_expectation_from_x_a_and_p x_a, p
-        exp.assert_under self
-      end
-      alias_method :ts_expect, :expect  # wrestle with rspec
 
-      def build_expectation_from_x_a_and_p x_a, p
-        expectation_class.new x_a, p
-      end
+        @__sout_serr_expectation__ = bld_sout_serr_expectation_via_iambic x_a, & p
 
-      def expectation_class
-        String_Oriented_Expectation_
-      end
-    public
-      def shift_emission
-        baked_em_a.shift
-      end
-      def baked_em_a
-        @baked_em_a ||= build_baked_em_a
-      end
-      def when_no_emission exp
-        fail "expected an emission on the '#{ exp.channel_i }' channel"
-      end
-      def expect_no_more_emissions
-        baked_em_a.length.zero? or when_unexpected_emission
-      end
-      def when_unexpected_emission
-        fail say_unexpected_emission
-      end
-      def say_unexpected_emission
-        em = @baked_em_a.first
-        "unexpected '#{ em.channel_i }' emission: #{ em.payload_x.inspect }"
-      end
-      def expect_channel_for_emission chan_x, em
-        em.channel_i.should eql chan_x
-      end
-      def match_with_string exp_s, em
-        em.payload_x.should eql exp_s
-      end
-      def match_with_regex exp_rx, em
-        em.payload_x.should match exp_rx
+        __sout_serr_actual_stream_is_resolved__.nil? and rslv_sout_serr_actual_stream
+
+        __send__ @__sout_serr_expectation__.method_name
       end
 
-    private  # ~ convenience
-      def expect_succeeded
-        expect_result_for_success
-        expect_no_more_emissions
+      def bld_sout_serr_expectation_via_iambic x_a, & p
+        _sout_serr_expectation_class.new(
+          Callback_::Iambic_Stream.via_array( x_a ),
+            & p )
       end
-      def expect_failed
-        expect_result_for_failure
-        expect_no_more_emissions
-      end
-      def expect_result_for_success
-        @result.should eql true
-      end
-      def expect_result_for_failure
-        @result.should eql false
-      end
-    end
 
-    Expectation_ = self
-    class Expectation_
+      def _sout_serr_expectation_class
+        Expectation__
+      end
 
-      def initialize x_a, p
-        @p = p ; @x_a = x_a
-        absrb_iambic_fully
+      def rslv_sout_serr_actual_stream
+        @__sout_serr_actual_stream_is_resolved__ = true
+        @__sout_serr_actual_stream__ = Callback_::Iambic_Stream.via_array(
+          build_baked_em_a )
+        nil
       end
-    private
-      def absrb_iambic_fully
-        absrb_keywords
-        @x_a.length.nonzero? and absrb_based_on_shape
-        @p and absorb_the_proc
-        @x_a.length.nonzero? and when_unparsed_x_a
+
+      def build_baked_em_a  # :+#hook-near #universal
+        @IO_spy_group_for_expect_stdout_stderr.release_lines
       end
-      def absrb_keywords
-        p = self.class.prefix_map_proc
-        while @x_a.length.nonzero? and (( m_i = p[ @x_a.first ] ))
-          @x_a.shift ; send m_i
-        end ; nil
-      end
-      class << self
-        def prefix_map_proc
-          @prefix_map_proc ||= curry_suffix_map( :_prefix_keyword= )
+
+      # ~ other expectations
+
+      def expect_maybe_a_blank_line
+
+        __sout_serr_actual_stream_is_resolved__.nil? and rslv_sout_serr_actual_stream
+
+        st = @__sout_serr_actual_stream__
+        if st.unparsed_exists and NEWLINE_ == st.current_token.string
+          st.advance_one
+          nil
         end
-      private
-        def curry_suffix_map suffix_i
-          -> prefix_i do
-            if prefix_i.respond_to? :id2name
-              m_i = :"#{ prefix_i }#{ suffix_i }"
-              private_method_defined?( m_i ) and m_i
-            end
+      end
+
+      def expect_no_more_lines
+
+        __sout_serr_actual_stream_is_resolved__.nil? and rslv_sout_serr_actual_stream
+
+        if @__sout_serr_actual_stream__.unparsed_exists
+          _x = @__sout_serr_actual_stream__.current_token
+          fail "expected no more lines, had #{ _x.to_a.inspect }"
+        end
+      end
+
+      # ~~ implementation support
+
+      def _sout_serr_expect_given_regex
+        if _sout_serr_expect_and_resolve_emission_line
+          @__sout_serr_line__.should match @__sout_serr_expectation__.pattern_x
+          @__sout_serr_emission__
+        end
+      end
+
+      def _sout_serr_expect_given_string
+        if _sout_serr_expect_and_resolve_emission_line
+          @__sout_serr_line__.should eql @__sout_serr_expectation__.pattern_x
+          @__sout_serr_emission__
+        end
+      end
+
+      def _sout_serr_expect_and_resolve_emission_line
+        if _sout_serr_expect_and_resolve_emission
+          line = @__sout_serr_emission__.string  # WE MUTATE IT for now
+          s = line.chomp!
+          if s
+            _sout_serr_receive_chomped_emission_line s
+          else
+            fail "for now expecting all lines to be newine terminated: #{ line.inspect }"
           end
         end
       end
-      def absrb_based_on_shape
-        if @x_a.first.respond_to? :named_captures
-          absorb_regex @x_a.shift
-        elsif @x_a.first.respond_to? :ascii_only?
-          absorb_string @x_a.shift
-        end ; nil
+
+      def _sout_serr_receive_chomped_emission_line line
+        if @__sout_serr_expectation__.expect_is_styled
+          s = line.dup.gsub! SIMPLE_STYLE_RX__, EMPTY_S_
+          if s
+            @__sout_serr_line__ = s
+            ACHIEVED_
+          else
+            fail "expected styled, was not: #{ line.inspect }"
+          end
+        else
+          @__sout_serr_line__ = line
+          ACHIEVED_
+        end
       end
-      def when_unparsed_x_a
-        raise ::ArgumentError, "unexpected argument: #{ @x_a.first }"
+
+      def _sout_serr_expect_and_resolve_emission
+        exp = @__sout_serr_expectation__
+        st = @__sout_serr_actual_stream__
+        if st.unparsed_exists
+          em = st.gets_one
+          @__sout_serr_emission__ = em
+          stream_sym = exp.stream_symbol
+          stream_sym ||= __sout_serr_default_stream_symbol__
+          if stream_sym
+            if stream_sym == em.channel_i
+              ACHIEVED_
+            else
+              fail "expected emission on channel '#{ stream_sym }', #{
+                }but emission was on channel '#{ em.channel_i }'"
+            end
+          else
+            ACHIEVED_
+          end
+        else
+          fail "expected an emission, had none"
+        end
       end
     public
-      def assert_under ctx
-        @context = ctx
-        @emission = ctx.shift_emission
-        @emission ? when_emission : @context.when_no_emission( self )
-      end
+
+      attr_reader :__sout_serr_actual_stream_is_resolved__
+
+      attr_reader :__sout_serr_default_stream_symbol__
     end
 
-    class String_Oriented_Expectation_ < Expectation_
-      def initialize a, p
-        @channel_i = nil
+    Callback_ = ::Skylab::Callback
+
+    SIMPLE_STYLE_RX__ = /\e  \[  \d+  (?: ; \d+ )*  m  /x  # copy-paste [hl]
+
+    METHODIC_ = Callback_::Actor.methodic_lib
+
+    class Expectation__
+
+      include METHODIC_.iambic_processing_instance_methods
+
+      def initialize st, & p
         @expect_is_styled = false
-        @pattern_method = nil
-        super a, p
+        @method_name = :_sout_serr_expect_and_resolve_emission
+        process_iambic_stream_passively st
+        while st.unparsed_exists
+          process_the_rest_using_shape_hack st
+        end
+        p and self._DO_ME_receive_proc p
       end
-      attr_reader :channel_i, :expect_is_styled, :pattern_method, :pattern_x
+
+      attr_reader :stream_symbol, :expect_is_styled,
+        :method_name, :pattern_x
+
     private
-      def styled_prefix_keyword=
+
+      def styled=
         @expect_is_styled = true
+        KEEP_PARSING_
       end
-      def out_prefix_keyword=
-        @channel_i = :out
-      end
-      def err_prefix_keyword=
-        @channel_i = :err
-      end
-      def absorb_regex rx
-        @pattern_method = :match_with_regex
-        @pattern_x = rx ; nil
-      end
-      def absorb_string str
-        @pattern_method = :match_with_string
-        @pattern_x = str ; nil
-      end
-      def when_emission
-        expect_any_channel
-        expect_any_content
-      end
-      def expect_any_channel
-        if @channel_i
-          @context.expect_channel_for_emission @channel_i, @emission
+
+      def process_the_rest_using_shape_hack st
+        begin
+          send st.current_token.class.name.intern, st
         end
       end
-      def expect_any_content
-        if @pattern_method
-          @context.send @pattern_method, @pattern_x, @emission
-        end
+
+      def Regexp st
+        @method_name = :_sout_serr_expect_given_regex
+        @pattern_x = st.gets_one
+        KEEP_PARSING_
       end
+
+      def String st
+        @method_name = :_sout_serr_expect_given_string
+        @pattern_x = st.gets_one
+        KEEP_PARSING_
+      end
+
+      def Symbol st
+        @stream_symbol = st.gets_one
+        KEEP_PARSING_
+      end
+
+      METHODIC_.cache_iambic_writer_methods self
     end
   end
 end
+# :+#posterity: we replaced with "methodic" code that was its conceptual ancestor
