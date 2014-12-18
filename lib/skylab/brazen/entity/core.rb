@@ -8,6 +8,19 @@ module Skylab::Brazen
         via_arglist a
       end
 
+      def build_bad_enum_value_event_method_proc
+        -> x, name_sym, enum_box do
+          build_not_OK_event_with :invalid_property_value,
+            :x, x, :name_symbol, name_sym,
+            :enum_box, enum_box,
+            :error_category, :argument_error do |y, o|
+              _a = o.enum_box.get_names
+              y << "invalid #{ o.name_symbol } #{ ick o.x }, #{
+               }expecting { #{ _a * ' | ' } }"
+          end
+        end
+      end
+
       def call * a, & p
         via_arglist a, & p
       end
@@ -385,13 +398,8 @@ module Skylab::Brazen
     public
 
       def receive_metaproperty mprop
-        mod = @iambic_writer_method_writee_module
-        did_create_class = mod.ent_property_class_for_write.nil?
-        pcls = mod.entity_property_class_for_write
-        if did_create_class
-          @property_related_nonterminal.receive_new_property_cls pcls
-        end
-        pcls.class_exec( & mprop.apply )
+        @iambic_writer_method_writee_module.
+          entity_property_class_for_write.class_exec( & mprop.apply )
       end
 
       def receive_method_added_name m_i
@@ -409,6 +417,10 @@ module Skylab::Brazen
 
       def property_class  # :+#public-API
         @property_related_nonterminal.property_cls
+      end
+
+      def receive_new_property_cls x
+        @property_related_nonterminal.receive_new_prop_cls x
       end
 
       def receive_property pr  # :+#public-API
@@ -547,7 +559,7 @@ module Skylab::Brazen
         :entity_ad_hocs_for_rd,
         :entity_ad_hocs_for_wrt,
         :ENTITY_AD_HOCS___,
-        :@entity_ad_hocs_for_write ) do |o|
+        :@__entity_AHFW__ ) do |o|
           otr = o::ENTITY_AD_HOCS___
           if otr
             self._DO_ME
@@ -564,14 +576,14 @@ module Skylab::Brazen
           o::ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___.dup
         end
 
-      module_attr_reader_writer(
-        :entity_property_class_for_write,
-        :Entity_Property,
-        :@ent_property_class_for_write ) do |o|
-          ::Class.new o::Entity_Property
+      def entity_property_class_for_write
+        @__entity_PCFW__ ||= begin
+          new_cls = ::Class.new self::Entity_Property
+          const_set :Entity_Property, new_cls
+          @active_entity_edit_session.receive_new_property_cls new_cls
+          new_cls
         end
-
-      attr_reader :ent_property_class_for_write
+      end
 
     private
 
@@ -670,10 +682,19 @@ module Skylab::Brazen
 
       attr_reader :active_entity_edit_session
 
-      def edit_entity_class
+      def edit_entity_class * x_a
+
         sess = Class_Edit_Session__.new self
         @active_entity_edit_session = sess
-        x = yield sess
+
+        if x_a.length.nonzero?
+          x = sess.receive_edit Callback_::Iambic_Stream.via_array x_a
+        end
+
+        if block_given?
+          x = yield sess
+        end
+
         @active_entity_edit_session = nil
         sess.finish x
       end
@@ -773,7 +794,7 @@ module Skylab::Brazen
         @adaptive_nonterminal_queue.receive_parse_context pc
       end
 
-      def receive_new_property_cls pcls
+      def receive_new_prop_cls pcls
         @property_class = pcls
         new = bld_property_nonterminal pcls
         @adaptive_nonterminal_queue.replace_item @property_nonterminal, new

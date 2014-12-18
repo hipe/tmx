@@ -96,7 +96,7 @@ module Skylab::Headless
         end
       end.call
 
-      Metholate__ = -> i do  # in case your normal is a slug for some reason
+      Metholate____ = -> i do  # in case your normal is a slug for some reason
         i.to_s.gsub DASH_, UNDERSCORE_
       end
 
@@ -160,8 +160,6 @@ module Skylab::Headless
 
     o[ :local_normal_name_from_module, Local_normal_name_from_module__ ]
 
-    o[ :metholate, Metholate__ ]
-
     o[ :module_moniker, Module_moniker___ ]
 
     o[ :naturalize, Naturalize__ ]
@@ -183,7 +181,7 @@ module Skylab::Headless
         end
 
         def as_method  # #storypoint-15
-          Metholate__[ @local_normal_i ].intern
+          Metholate____[ @local_normal_i ].intern
         end
 
         def as_natural

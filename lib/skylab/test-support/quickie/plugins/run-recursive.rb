@@ -2,7 +2,7 @@ module Skylab::TestSupport
 
   module Quickie
 
-    self::Front__.class
+    self::Front__.class  # #open :+[#028]
 
     class Plugins::RunRecursive
 

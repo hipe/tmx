@@ -108,22 +108,13 @@ module Skylab::Brazen
           end
         end
 
-        def receive_bad_enum_value x, name_i, enum_box
+        def receive_bad_enum_value x, name_i, enum_box  # :+#hook-near
           maybe_send_event :error, :invalid_property_value do
-            bld_invalid_property_value_event x, name_i, enum_box
+            bld_bad_enum_value_event x, name_i, enum_box
           end
         end
 
-        def bld_invalid_property_value_event x, name_i, enum_box
-          build_not_OK_event_with :invalid_property_value,
-            :x, x, :name_i, name_i,
-            :enum_box, enum_box,
-            :error_category, :argument_error do |y, o|
-              _a = o.enum_box.get_names
-              y << "invalid #{ o.name_i } #{ ick o.x }, #{
-               }expecting { #{ _a * ' | ' } }"
-          end
-        end
+        define_method :bld_bad_enum_value_event, Entity_.build_bad_enum_value_event_method_proc
 
         def maybe_send_event * i_a, & ev_p
           @__methodic_actor_handle_event_selectively__.call( * i_a, & ev_p )

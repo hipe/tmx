@@ -23,16 +23,23 @@ module Skylab::TestSupport
         :property, :line_downstream,
         :property, :node_upstream,
         :property, :on_shared_resources_created,
+        :iambic_writer_method_to_be_provided, :property, :template_variable_box,
         :property, :shared_resources
 
       def initialize
         @do_coverage_part = false  # :+#re-init
         @render_as_sibling = true   # :+#re-init  ##todo this will become universal
         @subsystem_index = 1
+        @template_var_bx = nil
         super
       end
 
     private
+
+      def template_variable_box=
+        @template_var_bx = iambic_property
+        KEEP_PARSING_
+      end
 
       def execute  # #hook-out
         @node = @node_upstream.gets
@@ -157,6 +164,7 @@ module Skylab::TestSupport
         _desc = description_string
 
         _whole_string = @base_template.call(
+          ts_relpath: some_test_support_relpath,
           acon: @acon,
           amod: @amod,
           bmod: @bmod,
@@ -167,6 +175,15 @@ module Skylab::TestSupport
 
         _any_result_for_write_to_line_downstream_whole_string _whole_string
       end
+
+      def some_test_support_relpath
+        if @template_var_bx
+          x = @template_var_bx[ :require_test_support_relpath ]
+        end
+        x || DEFAULT_TEST_SUPPORT_RELPATH__
+      end
+
+      DEFAULT_TEST_SUPPORT_RELPATH__ = TestSupport_::Init.test_support_filestem
 
       def _any_result_for_write_to_line_downstream_whole_string whole_string
 

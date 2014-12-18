@@ -77,7 +77,7 @@ of ruby entirely both because of how jarring it can be having languages inside
 languages and because we might be painting ourselves into a corner for reasons
 we will describe later relating to #two-way-verification.
 
-we breifly considered JSON and YAML, but we always feel dumb hand-writing
+we briefly considered JSON and YAML, but we always feel dumb hand-writing
 JSON, and YAML might introduce more headaches than is worth having to couple
 to parsing API's and having to worry about encoding.
 

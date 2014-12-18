@@ -9,24 +9,55 @@ module Skylab
       # pull in any other files from this one, and don't expect to have
       # any accesss to any subsystem facilities here.
 
-      define_singleton_method :spec_rb, -> do
-        p = -> do
-          x = '_spec.rb'.freeze  # or look up in a config file
-          p = -> { x }
+
+      _MEMBERS = []
+
+      define_singleton_method :o, -> i, & p do
+
+        _MEMBERS.push i
+
+        p_ = -> do
+          x = p[]
+          p_ = -> { x }
           x
         end
-        -> { p[] }
-      end.call
 
-      define_singleton_method :test_support_filenames, -> do
-        p = -> do
-          x = [ 'test-support.rb'.freeze ].freeze
-          p = -> { x }
-          x
+        define_singleton_method i do
+          p_[]
         end
-        -> { p[] }
-      end.call
+      end
 
+      _EXTNAME = '.rb'.freeze
+
+      o :spec_rb do
+
+        "#{ test_file_basename_suffix_stem }#{ _EXTNAME }".freeze
+
+      end
+
+      o :test_file_basename_suffix_stem  do
+
+        '_spec'.freeze
+
+      end
+
+      o :test_support_filenames do
+
+        [ "#{ test_support_filestem }#{ _EXTNAME }".freeze ].freeze
+
+      end
+
+      o :test_support_filestem do
+
+        'test-support'.freeze
+
+      end
+
+      _MEMBERS.freeze
+
+      define_singleton_method :members, -> do
+        _MEMBERS
+      end
     end
   end
 end

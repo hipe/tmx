@@ -95,6 +95,10 @@ module Skylab::TestSupport
 
     HL__ = sidesys[ :Headless ]
 
+    Hashtag = -> do
+      Snag__[]::Models::Hashtag
+    end
+
     Heavy_plugin_lib = -> do
       Face__[]::Plugin
     end
@@ -113,6 +117,8 @@ module Skylab::TestSupport
       HL__[]::IO
     end
 
+    IT__ = sidesys[ :InformationTactics ]
+
     Let = -> do
       MH__[]::Let
     end
@@ -120,6 +126,10 @@ module Skylab::TestSupport
     Let_methods = -> mod do
       mod.extend MH__[]::Let::ModuleMethods
       mod.include MH__[]::Let::InstanceMethods
+    end
+
+    Levenshtein = -> * x_a do
+      IT__[]::Levenshtein.via_iambic x_a
     end
 
     MH__ = sidesys[ :MetaHell ]
@@ -143,6 +153,8 @@ module Skylab::TestSupport
     Proxy_lib = -> do
       Callback_::Proxy
     end
+
+    Snag__ = sidesys[ :Snag ]
 
     Skylab__ = memoize[ -> do
       require_relative '..'

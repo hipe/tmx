@@ -68,8 +68,12 @@ module Skylab::Headless
         @tmpdir_pathname ||= ::Pathname.new Headless_::Library_::Tmpdir.tmpdir
       end
 
-      def walk
-        Filesystem_::Walk__
+      def walk * x_a
+        if x_a.length.zero?
+          Filesystem_::Walk__
+        else
+          Filesystem_::Walk__.via_iambic x_a
+        end
       end
 
       Filesystem_ = self

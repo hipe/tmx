@@ -105,7 +105,7 @@ module Skylab::TestSupport
         walk_to_test_dir or break
         test_dir = w.dir_pn
         lpn = w.class.subtract w.xpn, test_dir.dirname
-        part_a = lpn.sub_ext( EMPTY_S_ ).to_s.split ::Pathname::SEPARATOR_LIST
+        part_a = lpn.sub_ext( EMPTY_S_ ).to_s.split FILE_SEP_
         curr_d = test_dir
         build_down curr_d, part_a or break
         @err.puts "ok."

@@ -8,7 +8,7 @@ module Skylab::TestSupport
       @render_to_p = -> io do
 
         local_pn = wlk.class.subtract pn , wlk.top_pn
-        local_a = local_pn.sub_ext( EMPTY_S_ ).to_s.split ::Pathname::SEPARATOR_LIST
+        local_a = local_pn.sub_ext( EMPTY_S_ ).to_s.split FILE_SEP_
         'test-support' == (s = local_a.pop) or
           fail "sanity - test support? #{ s }"
         'test' == (s = local_a.fetch 1 ) or fail "sanity - test? #{ s }"

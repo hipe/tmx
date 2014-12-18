@@ -1,12 +1,12 @@
 digraph {
 
-  lib [label="librification"]
-
-  dct [label="new doctest features"]
-
   ev [label="event factory"]
 
   cu [label="revamp cull"]
+
+  lib [label="librification"]
+
+  dct [label="new doctest features" style=filled fillcolor="#b5d5fb"]
 
   sr [label="search and replace" style=filled]
 
@@ -18,8 +18,9 @@ digraph {
 
   API [label="zerk\nAPI API" style=filled]
 
-  cu->lib
   ev->cu
+  cu->lib
+  lib->dct
   lib->sr
   sr->st
   sr->fu

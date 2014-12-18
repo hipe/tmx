@@ -46,9 +46,11 @@ module Skylab::TestSupport  # :[#021].
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
+  FILE_SEP_ = ::File::SEPARATOR
   stowaway :Lib_, 'library-'
   MONADIC_TRUTH_ = -> _ { true }
   NEWLINE_ = "\n".freeze
+  TEST_DIR_FILENAME_ = 'test'.freeze
   TestSupport_ = self  # there is another module called ::SL::TS::TS
   UNABLE_ = false
 

@@ -4,6 +4,24 @@ module Skylab::Basic
 
     module Small_Time_Actors__
 
+      Count_occurrences_OF_string_IN_string = -> needle, haystack do
+
+        # you could `scan`, but why? #not-covered:visually-once
+
+        length = haystack.length
+        d = 0
+        count = 0
+        begin
+          length == d and break
+          d_ = haystack.index needle, d
+          d_ or break
+          count += 1
+          d = d_ + 1
+          redo
+        end while nil
+        count
+      end
+
       class Ellipsify
 
         Callback_::Actor.call self, :properties,

@@ -2,86 +2,104 @@ require_relative '../test-support'
 
 module Skylab::TestSupport::TestSupport::DocTest
 
-  describe "[ts] regret API actions doc-test recursive", wip: true do
+  describe "[ts] doc-test - [ actions ] - recursive " do
+
+    # TestLib_::Mock_FS[ self ]
+    TestLib_::Expect_event[ self ]
 
     extend TS_
 
-    it "the API loads" do
-      _API
+    it "path is required" do
+      _rx = /\Amissing required property 'path'\z/
+      -> do
+        call_API :recursive  # (worked)
+      end.should raise_error ::ArgumentError, _rx
     end
 
-    it "needs things" do
-      invoke :recursive
-      expect :err, %r(\Ainvalid mode value nil\. expecting #{
-        }.*\bdo_list\b)
-      # #expect_failed
+    it "enum works #frontier" do
+      call_API :recursive, :path, 'not-there', :sub_action, :no_wai
+      expect_not_OK_event :invalid_property_value,
+        "invalid sub_action (ick :no_wai), expecting { list | preview }"
+      expect_failed
     end
 
-    it "(live test) some of ours, no hashtags" do  # :[#030]
-      _path = TestSupport_::Regret::API::Actions::DocTest.dir_pathname.to_path
-      invoke :recursive, path: _path, mode: :do_list
-      expect :out, %r(/doc-test.rb\z)
-      expect :out, %r(/doc-test/specer--.rb\z)
-      expect_succeeded
+    it "'list' only those files relevant to the path. emits no events, result is stream" do
+
+      call_API :recursive, :sub_action, :list, :path, Subject_[].dir_pathname.to_path
+
+      expect_no_events
+
+      st = @result
+
+      one = st.gets
+
+      two = st.gets
+
+      st.gets.should be_nil
+
+      ::File.basename( one.path ).should eql 'core.rb'
+
+      ::File.basename( two.path ).should eql 'generate.rb'
     end
 
-    it "(live test) \"special path\" (hashtags)" do  # :[#030]
-      _path = TS_TS_::TestLib_::Face_module[].dir_pathname.to_path
-      invoke :recursive, path: _path, mode: :do_list
-      rx = /#[-a-z]+/ ; hashtag_count = 0
-      while (( em = shift_emission ))
-        :out == em.channel_i or fail "expected out"
-        rx =~ em.payload_x and hashtag_count += 1
-      end
-      hashtag_count > 0 or fail "expected to find hashtags in the [fa] files"
-      expect_succeeded
+    it "'preview' adds a conditional property requirement" do
+
+      call_API :recursive, :sub_action, :preview, :path, 'x'
+
+      ev = expect_not_OK_event :missing_required_properties
+
+      black_and_white( ev ).should eql "missing required property 'errstream'"
+
+      expect_failed
+
     end
 
-    def invoke i, h={}
-      h[ :out ] = initial_writable_out_spy
-      h[ :err ] = initial_writable_err_spy
-      @result = _API.invoke i, h
+    it "'preview' results in a stream of \"generation\"s" do
+
+      errstream = build_IO_spy_errstream_for_doctest
+
+      call_API :recursive, :sub_action, :preview, :path,
+
+        Subject_[].dir_pathname.to_path,
+
+        :errstream, errstream
+
+      gen_stream = @result
+
+
+      _gen = gen_stream.gets
+
+      x = _gen.execute
+
+      x.should be_nil  # result of generate is result of last event, which
+      # was an informational event about the number of bytes written
+
+      ev = expect_neutral_event :current_output_path
+
+      ev.to_event.path.should match %r( integration/final/top_spec\.rb \z)x
+
+      ev = expect_neutral_event :wrote
+
+      expect_no_more_events
+
+      ( 43 .. 45 ).should be_include ev.to_event.line_count
+
+      gen_ = gen_stream.gets
+
+      gen_.manifest_entry.path.should match %r( actions/generate\.rb \z)x
+
+      x = gen_stream.gets
+
+      x.should be_nil
+
+      validate_content_of_the_generated_file_of_interest errstream
+
     end
 
-    def initial_writable_out_spy
-      @out = initial_writable_spy
+    def validate_content_of_the_generated_file_of_interest io
+      string_IO = io[ :buffer ]
+      string_IO.rewind
+      string_IO.gets.should eql "require_relative '../test-support'\n"
     end
-
-    def initial_writable_err_spy
-      @err = initial_writable_spy
-    end
-
-    def initial_writable_spy
-      TestSupport_::IO.spy.new(
-        :do_debug_proc, -> { do_debug },
-        :debug_IO, debug_IO )
-    end
-
-    def build_baked_em_a
-      y = @err.string.split( LINE_SEPARATOR_ ).map do |s|
-        Emission_.new :err, s
-      end
-      y.concat (( @out.string.split( LINE_SEPARATOR_ ).map do |s|
-        Emission_.new :out, s
-      end ))
-      y
-    end
-
-    def expect * a  # i can't believe that whatever rspec does makes this necessary..
-      ts_expect( * a )
-    end
-
-    def _API
-      TestSupport_::Regret::API
-    end
-
-    class Emission_
-      def initialize i, s
-        @channel_i = i ; @payload_x = s
-      end
-      attr_reader :channel_i, :payload_x
-    end
-
-    LINE_SEPARATOR_ = "\n".freeze
   end
 end

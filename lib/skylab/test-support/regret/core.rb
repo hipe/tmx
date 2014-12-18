@@ -9,7 +9,7 @@ module Skylab::TestSupport
         s_a = mod.name.split CONST_SEP_  # rewrite of :+[#ba-034]
         s_a.pop
         _parent_mod = s_a.reduce( ::Object ) { |m, s| m.const_get s, false }
-        Autoloader_[ mod, _parent_mod.dir_pathname.join( TEST_DIR_FILENAME__ ) ]
+        Autoloader_[ mod, _parent_mod.dir_pathname.join( TEST_DIR_FILENAME_ ) ]
       end
       mod.extend Anchor_ModuleMethods
       mod.initialize_for_regret_with_parent_anchor_mod nil
@@ -19,8 +19,6 @@ module Skylab::TestSupport
         Regret_::Infer_const__[ * x_a ]
       end
     end
-
-    TEST_DIR_FILENAME__ = 'test'.freeze
 
     module Anchor_ModuleMethods
 

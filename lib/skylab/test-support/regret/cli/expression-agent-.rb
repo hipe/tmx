@@ -123,12 +123,12 @@ module Skylab::TestSupport
             end
 
             def say_lev_or
-              RegretLib_::Levenshtein.with(
+              TestSupport_::Lib_::Levenshtein[
                 :item, @i,
                 :closest_N_items, 5,
                 :items, @box.get_names,
                 :item_proc, -> x { "'#{ x }'" },
-                :aggregation_proc, -> a { a * ' or ' } )
+                :aggregation_proc, -> a { a * ' or ' } ]
             end
           end
         end

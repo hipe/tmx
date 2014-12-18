@@ -20,6 +20,11 @@ module Skylab::Basic
         end
       end
 
+      def count_occurrences_in_string_of_string haystack, needle
+        String_::Small_Time_Actors__::Count_occurrences_OF_string_IN_string[
+          needle, haystack ]
+      end
+
       def ellipsify * a
         String_::Small_Time_Actors__::Ellipsify.via_arglist a
       end

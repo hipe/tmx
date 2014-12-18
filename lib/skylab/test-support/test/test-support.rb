@@ -43,6 +43,10 @@ module Skylab::TestSupport::TestSupport
       TestSupport_::Lib_::Face__[]
     end
 
+    Mock_FS = -> test_ctx_class do
+      Callback_::Autoloader.require_sidesystem( :GitViz ).mock_FS[ test_ctx_class ]
+    end
+
     Supernode_binfile = -> do
       TestSupport_::Autoloader_.require_sidesystem( :TMX ).supernode_binfile
     end

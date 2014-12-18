@@ -147,6 +147,14 @@ module Skylab::TestSupport
 
     BLANK_RX_ = /\A[[:space:]]*\z/
 
+    DASH_ = '-'.freeze
+
     DocTest_ = self
+
+    IDENTITY_ = -> x { x }
+
+    KEEP_PARSING_ = true
+
+    UNDERSCORE_ = '_'.freeze
   end
 end

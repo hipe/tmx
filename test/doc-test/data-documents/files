@@ -28,6 +28,6 @@ lib/skylab/meta-hell/parse/series--.rb  #branch-down-to-core #regret-setup:no
 lib/skylab/meta-hell/ivars-with-procs-as-methods.rb
 lib/skylab/meta-hell/module/accessors.rb
 lib/skylab/test-support/quickie/possible-/articulator-.rb
-lib/skylab/test-support/doc-test/core.rb
+lib/skylab/test-support/doc-test/core.rb  #regret-setup:no #output-filename: integration/final/top_spec.rb  #look-for-ts
 lib/skylab/test-support/doc-test/models-/front/actions/generate.rb
 lib/skylab/test-support/regret/api/actions/intermediates.rb

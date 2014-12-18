@@ -2,6 +2,15 @@
 
 ## prependix-A: semantics of particular tags
 
+   the members of the "hook" family of 5 tags described below are
+   typically used in a parent-child sort of way, where one "declaration"
+   tagging may have several corresponding "reference" taggings
+   (explained below). as well, the members of this family of tags
+   are typically used in cases where this parent-child association
+   crosses some sort of library (usually sidesystem) boundary. if this
+   doesn't make sense then it need not do so at this time.
+
+
     #hook-in etc: for a library node to declare a method as a
         "hook in" node it is an explicit acknowledgement by that library
         that the method may be overridden by client nodes to customize
@@ -11,11 +20,19 @@
 
         `:#hook-in`, `:+#hook-in`, and `:+#public-API #hook-in` are all
         variations on the same expression, that is a declaration of this
-        classification.
+        classification. (notation is described more below.)
 
         `#hook-in` (without the leading ":") is an indication that such
         a method is being overridden: this form is used by the client
         module, not the library module.
+
+        a kneejerk response to this might be "well, duh: you can
+        override any library method you want to anytime anywhere". but
+        without an assurance that the library method name won't change,
+        then it probably will change and will probably break your code
+        in ways that are hard to track down.
+
+        mnemonic: you can hook "in" to the library if you want.
 
 
     #hook-out etc: a "hook *out*" is similar to a "hook-in" but the
@@ -24,16 +41,41 @@
         node implements this method, and so the client node must
         implement every such method itself.
 
+        when using the declaration from as opposed to the instance
+        form of the tag, it is recommended to use the full formal form
+        `:+#hook-out` (":" meaning "declaration" and "+" meaning
+        "one of many). this is the most correct form to use, and for
+        this tag expecially it will be useful to use consistent notation
+        so that we can gather all such method names; becuase of how
+        crucial it is to implement them.
+
+        mnemonic: the library must reach "out" to your code to work.
+
 
     #hook-with: this is a method provided by a library as a courtesy, as
         a method that might be used as an implementation for a "hook-out"
         or "hook-in". the library iteslf does not call this method.
+
+        mnemoic: implement your method "with" this one.
 
 
     #hook-over: this is a special kind of "hook-in" that itself does
         nothing (i.e results in nil). if a client overrrides such a
         method it may do so knowing that the library method itself has
         no side-effects.
+
+        mnemonic: program flow just passes "over" this method.
+
+
+    #hook-near: when used as declaration, indicatates that this method
+        name should not change because other semantically similar
+        methods use this name in order to reference this method.
+        when used as a reference tagging, indicates that this method
+        is named after one that does something similar.
+        however and perhaps, this is done only for the purpose of
+        self-documentation and consistency; because calls to these
+        methods are sent from different structures to different
+        structures in different places in the code.
 
 
 

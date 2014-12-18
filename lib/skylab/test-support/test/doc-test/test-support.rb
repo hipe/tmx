@@ -39,6 +39,22 @@ module Skylab::TestSupport::TestSupport::DocTest
 
   module InstanceMethods
 
+    def build_IO_spy_errstream_for_doctest
+
+      TestSupport_::IO.spy :do_debug_proc, -> do
+        do_debug
+      end, :debug_IO, debug_IO, :puts_map_proc, -> s do
+        s_ = s.chomp
+
+        if s_.length < s.length
+          "dbg: «#{ s_ }»"
+        else
+          "dbg: «#{ s_ }[no newline]»"
+        end
+        # :+#guillemets
+      end
+    end
+
     def with_comment_block_in_ad_hoc_fake_file symbol
       _fake_file = fake_file_structure_for_path( big_file_path ).
         ad_hoc_fake_file( symbol )
@@ -113,6 +129,10 @@ module Skylab::TestSupport::TestSupport::DocTest
         advance_to_next_rx rx
       end
     end.call
+
+    def subject_API
+      Subject_[]::API
+    end
   end
 
   CACHE__ = {}

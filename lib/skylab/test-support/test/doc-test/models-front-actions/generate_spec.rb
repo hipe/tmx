@@ -103,9 +103,5 @@ module Skylab::TestSupport::TestSupport::DocTest
       x_a.push :upstream_path, x
       call_API_via_iambic x_a
     end
-
-    def subject_API
-      Subject_[]::API
-    end
   end
 end

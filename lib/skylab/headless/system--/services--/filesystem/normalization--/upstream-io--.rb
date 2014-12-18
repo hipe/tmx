@@ -28,8 +28,9 @@ module Skylab::Headless
               ACHIEVED_
             end
 
-            def only_apply_expectation_that_path_is_file=
-              @is_only_path_ftype_expectation = true
+            def only_apply_expectation_that_path_is_ftype_of=
+              @only_apply_ftype_expectation = true
+              @expected_ftype = iambic_property
               ACHIEVED_
             end
 
@@ -47,7 +48,7 @@ module Skylab::Headless
           def initialize & p
             @do_execute = false
             @instream = nil
-            @is_only_path_ftype_expectation = false
+            @only_apply_ftype_expectation = false
             @path_arg_was_explicit = false
             instance_exec( & p )
             @as_normal_value ||= IDENTITY_
@@ -161,8 +162,10 @@ module Skylab::Headless
           end
 
           def when_stat
-            if FILE_FTYPE_ == @stat.ftype
-              when_stat_is_file
+            if @only_apply_ftype_expectation
+              via_stat_and_expected_ftype_exert_expectation
+            elsif FILE_FTYPE_ == @stat.ftype
+              via_path_open_file
             else
               maybe_send_event :error, :wrong_ftype do
                 via_stat_and_path_build_wrong_ftype_event FILE_FTYPE_
@@ -170,11 +173,13 @@ module Skylab::Headless
             end
           end
 
-          def when_stat_is_file
-            if @is_only_path_ftype_expectation
+          def via_stat_and_expected_ftype_exert_expectation
+            if @expected_ftype == @stat.ftype
               @as_normal_value[ ACHIEVED_ ]
             else
-              via_path_open_file
+              maybe_send_event :error, :wron_ftype do
+                via_stat_and_path_build_wrong_ftype_event @expected_ftype
+              end
             end
           end
 

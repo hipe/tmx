@@ -135,6 +135,10 @@ module Skylab::Callback
         cls
       end
 
+      def members
+        const_get( BX_ ).get_names
+      end
+
       def actor_property_box_for_write
         if const_defined? BX_
           if const_defined? BX_, false

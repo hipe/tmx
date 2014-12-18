@@ -2,13 +2,13 @@
 [#037]       #tracking tag warnings wishlist (#parent-node: [#014])
 [#036]       make lexical scope deeper in quickie main document.
 [#035]       #parent-node:[#021] the system narrative ..
-[#034] #open #parent-node: [#015] core.rb
-[#033] #open if you un-orphanize core.rb it presents an issue with autoloader
-[#032] #open #parent-node: [#015] change syntax to work with contiguous nonblank lines
-[#031] #open #tracking-tag while regret no longer wires test nodes for autoloading
+[#034] #hole (was reference to a filename but no description)
+[#033]       #done if you un-orphanize core.rb it presents an issue with autoloader)
+[#032]       #done #parent-node: [#015] change syntax to work with contiguous nonblank lines
+[#031] #open #universal while regret no longer wires test nodes for autoloading
 [#030] #open the doc-test recursive spec needs mock fs
 [#029]       #tracking-tag the 'expect' omnibus and narrative ..
-[#028] #open autoloading related ..
+[#028] #open #instances-tagged autoloading related ..
 [#027]       #parent-node: [#015] peek hack explained .. (was templo)
 [#026]       #parent-node: [#015] the view-controller narrative ..
 [#025]       #parent-node: [#015] output adapters.

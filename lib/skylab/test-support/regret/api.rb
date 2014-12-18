@@ -56,23 +56,7 @@ module Skylab::TestSupport
           MH__[]::Ivars_with_Procs_as_Methods.via_arglist a
         end
 
-        IT__ = sidesys[ :InformationTactics ]
-
-        Levenshtein = -> do
-          IT__[]::Levenshtein
-        end
-
         MH__ = Lib_::MH__
-
-        Name_normal_to_slug = -> i do
-          HL__[]::Name.slugulate( i )
-        end
-
-        Name_slug_to_const = -> s do
-          s_ = HL__[]::Name.metholate( s )
-          s_[ 0 ] = s_[ 0 ].upcase
-          s_.intern
-        end
 
         Name_symbol_to_label = -> i do
           HL__[]::Name.labelize( i ).downcase
@@ -112,12 +96,6 @@ module Skylab::TestSupport
 
         System = -> do
           HL__[].system
-        end
-
-        SubTree__ = sidesys[ :SubTree ]
-
-        Tree_walker = -> * x_a do
-          SubTree__[]::Walker.new x_a
         end
       end
     end

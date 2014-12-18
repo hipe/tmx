@@ -40,7 +40,7 @@ module Skylab::Brazen
 
       via_properties_init_ivars
 
-      @pn = Brazen_::Lib_::System[].filesystem.walk.with(
+      @pn = Brazen_::Lib_::System[].filesystem.walk(
         :start_path, @path,
         :max_num_dirs_to_look, @max_num_dirs,
         :prop, @prop,

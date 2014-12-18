@@ -27,7 +27,7 @@ module Skylab::TestSupport
     # as a final argument named `on_event_selectively`, you may have seen
     # additional output.
     #
-    # Note how we used "# =>" to indicate the
+    # Note how in this very comment block we have used "# =>" to indicate the
     # expected output from the line in our snippet. Note too that the snippet
     # is indented with four (4) spaces from the "normal" text.
     #
@@ -106,6 +106,11 @@ module Skylab::TestSupport
             KEEP_PARSING_
           end
 
+          def template_variable_box=
+            @template_variable_box = iambic_property
+            KEEP_PARSING_
+          end
+
           def output_adapter=
             @output_adapter = iambic_property
             KEEP_PARSING_
@@ -138,6 +143,7 @@ module Skylab::TestSupport
           @is_dry_run = false
           @resolve_line_downstream_method_name = :when_no_downstream
           @resolve_line_upstream_method_name = :when_no_upstream
+          @template_variable_box = nil
           @upstream_path = nil
           super
         end
@@ -273,7 +279,8 @@ module Skylab::TestSupport
           @result = @output_adapter.against(
             :business_module_name, @business_module_name,
             :line_downstream, @line_downstream,
-            :node_upstream, @node_upstream )
+            :node_upstream, @node_upstream,
+            :template_variable_box, @template_variable_box )
 
           if @do_close_downstream
             @line_downstream.close
@@ -287,8 +294,6 @@ module Skylab::TestSupport
         def OK
           ACHIEVED_
         end
-
-        KEEP_PARSING_ = true
   end
     end
   end
