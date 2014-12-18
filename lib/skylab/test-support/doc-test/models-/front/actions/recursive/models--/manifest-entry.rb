@@ -19,6 +19,21 @@ module Skylab::TestSupport
             [ :get_absolute_path, :path, :tagging_a, :top_path ]
           end
 
+          def render_all_lines_into_under y, expag
+            s = get_absolute_path
+            if @tagging_a
+              s_a = []
+              @tagging_a.each do | tg |
+                tg.render_all_lines_into_under s_a, expag
+              end
+              if s_a.length.nonzero?
+                s.concat "  #{ s_a * '  ' }"
+              end
+            end
+            y << s
+            ACHIEVED_
+          end
+
           def get_absolute_path
             "#{ @top_path }#{ FILE_SEP_ }#{ @path }"
           end
@@ -112,6 +127,15 @@ module Skylab::TestSupport
 
             def members
               [ :normal_name_symbol, :value_x ]
+            end
+
+            def render_all_lines_into_under y, _expag
+              s = "##{ @normal_name_symbol.id2name.gsub UNDERSCORE_, DASH_ }"
+              if @value_x
+                s.concat ":#{ @value_x }"
+              end
+              y << s
+              ACHIEVED_
             end
           end
         end

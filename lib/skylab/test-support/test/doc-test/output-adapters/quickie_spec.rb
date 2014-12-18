@@ -62,7 +62,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
       def against business_module_name, desc_line, code_line_a
 
-        _oa = subject.output_adapter( & handle_event_selectively )
+        _oa = subject.output_adapter false, & handle_event_selectively  # is known dry
 
         _mns = mock_node_stream desc_line, code_line_a
 
@@ -111,6 +111,8 @@ module Skylab::TestSupport::TestSupport::DocTest
         @result = DocTest_::API.call :generate,
           :upstream_path, _input_path,
           :output_path, _output_path,
+          :dry_run,
+          :force,
           :output_adapter, :quickie,
           :on_event_selectively, handle_event_selectively
 

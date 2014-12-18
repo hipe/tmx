@@ -5,15 +5,15 @@ module Skylab::Brazen
     class << self
 
       def arguments
-        CLI::Action_Adapter_::Arguments
+        CLI_::Action_Adapter_::Arguments
       end
 
       def expression_agent_class
-        CLI::Expression_Agent__
+        CLI_::Expression_Agent__
       end
 
       def expression_agent_instance
-        CLI::Expression_Agent__.instance
+        CLI_::Expression_Agent__.instance
       end
 
       alias_method :new_top_invocation, :new
@@ -46,14 +46,15 @@ module Skylab::Brazen
         resolve_properties
         resolve_partitions
         resolve_bound_call
-        es = @bound_call.receiver.send @bound_call.method_name, * @bound_call.args
+        x = @bound_call.receiver.send @bound_call.method_name, * @bound_call.args
         flush_any_invitations
-        es or @exit_status
+        if x
+          whn_result_is_trueish x
+        else
+          @exit_status
+        end
       end
     private
-      def call_bound_call exe
-        exe.receiver.send exe.method_name, * exe.args
-      end
       def resolve_app_kernel
         @app_kernel = @mod.const_get( :Kernel_, false ).new @mod ; nil
       end
@@ -107,8 +108,8 @@ module Skylab::Brazen
         @poly ||= ::Enumerator::Yielder.new( & @resources.sout.method( :puts ) )
       end
 
-      def leaf_class
-        self.class::Action_Adapter__
+      def default_leaf_class
+        self.class::Action_Adapter_
       end
 
       def branch_class
@@ -144,11 +145,21 @@ module Skylab::Brazen
           end
         end.clear
       end
+
+      def whn_result_is_trueish x
+        if x.respond_to? :bit_length or x.respond_to? :id2name
+          x
+        else
+          CLI_::When_Result_::Looks_like_stream.new( @adapter, x ).execute
+        end
+      end
     end
 
     # ~
 
     class Branch_Invocation__ < Invocation__
+
+      Actions = ::Module.new.freeze  # #note-165
 
       def resources
         @resources
@@ -174,6 +185,9 @@ module Skylab::Brazen
       end
 
     private
+      def call_bound_call exe
+        exe.receiver.send exe.method_name, * exe.args
+      end
 
       def resolve_bound_call
         if argv.length.zero?
@@ -185,7 +199,7 @@ module Skylab::Brazen
         end
       end
       def resolve_bound_call_when_no_arguments
-        @bound_call = CLI::When_::No_Arguments.new action_prop, help_renderer
+        @bound_call = CLI_::When_::No_Arguments.new action_prop, help_renderer
       end
       def action_prop
         @properties.fetch :action
@@ -262,25 +276,39 @@ module Skylab::Brazen
           branch_class.new action
         else
           action.accept_parent_node self.action
-          leaf_class.new action
+          leaf_class_for_action( action ).new action
         end
       end
 
       def wrap_stream_with_ordering_buffer scn
-        CLI::Actors__::Via_after_produce_ordered_scanner[ scn ]
+        CLI_::Actors__::Via_after_produce_ordered_scanner[ scn ]
       end
 
-      def leaf_class
-        @leaf_class ||= @parent.leaf_class
+      def leaf_class_for_action action
+
+        # this is CLI. you need not cache this.
+
+        const_sym = action.name.as_const
+        mod = self.class::Actions
+
+        if mod.const_defined? const_sym, false
+          mod.const_get const_sym
+        else
+          default_leaf_class
+        end
+      end
+
+      def default_leaf_class
+        @parent.default_leaf_class
       end
 
       def branch_class
-        @branch_class ||= @parent.branch_class
+        @parent.branch_class
       end
 
     private
       def resolve_bound_call_when_no_matching_action
-        @bound_call = CLI::When_::No_Matching_Action.new @token, help_renderer, self
+        @bound_call = CLI_::When_::No_Matching_Action.new @token, help_renderer, self
       end
       def resolve_bound_call_when_looks_like_option_for_first_argument
         prepare_to_parse_parameters
@@ -312,12 +340,13 @@ module Skylab::Brazen
         Actual_Parameter_Scanner__.new @output_iambic, @properties
       end
       def resolve_bound_call_when_multiple_matching_adapters
-        @bound_call = CLI::When_::Ambiguous_Matching_Actions.new self._TODO
+        @bound_call = CLI_::When_::Ambiguous_Matching_Actions.new self._TODO
       end
       def resolve_bound_call_when_one_matching_adapter
-        adapter = @adapter_a.first
-        adapter.receive_frame self
-        @bound_call = adapter.via_argv_resolve_some_bound_call
+        @adapter = @adapter_a.first
+        @adapter_a = nil
+        @adapter.receive_frame self
+        @bound_call = @adapter.via_argv_resolve_some_bound_call
       end
     end
 
@@ -325,7 +354,7 @@ module Skylab::Brazen
 
     Adapter_Methods__ = ::Module.new
 
-    class Action_Adapter__ < Invocation__
+    Action_Adapter = class Action_Adapter_ < Invocation__
 
       include Adapter_Methods__
 
@@ -370,7 +399,7 @@ module Skylab::Brazen
         a.push bound_call_class_via_option_property_name_i( :help ).
            new( nil, help_renderer, self )
         if argv.length.nonzero?
-          a.push CLI::When_::Unhandled_Arguments.
+          a.push CLI_::When_::Unhandled_Arguments.
             new argv, help_renderer
         end
         @bound_call = Aggregate_Bound_Call__.new a
@@ -393,10 +422,10 @@ module Skylab::Brazen
         send :"resolve_bound_call_when_#{ ev.terminal_channel_i }_arguments", ev
       end
       def resolve_bound_call_when_missing_arguments ev
-        @bound_call = CLI::When_::Missing_Arguments.new ev, help_renderer
+        @bound_call = CLI_::When_::Missing_Arguments.new ev, help_renderer
       end
       def resolve_bound_call_when_extra_arguments ev
-        @bound_call = CLI::When_::Extra_Arguments.new ev, help_renderer
+        @bound_call = CLI_::When_::Extra_Arguments.new ev, help_renderer
       end
 
       def resolve_bound_call_when_ARGV_parsed
@@ -417,6 +446,14 @@ module Skylab::Brazen
       end
 
       def resolve_bound_call_via_output_iambic
+
+        # begin experiment
+        prp = @action.class.any_property_via_symbol :downstream
+        if prp && prp.is_hidden
+          @output_iambic.push :downstream, @resources.sout
+        end
+        # end experiment
+
         @bound_call = @action.bound_call_via_modality_call @output_iambic, self
         @bound_call or self._SANITY
         nil
@@ -435,6 +472,8 @@ module Skylab::Brazen
       end
 
       Autoloader_[ self ]
+
+      self
     end
 
     class Simple_Bound_Call_
@@ -468,7 +507,7 @@ module Skylab::Brazen
 
       def receive_show_help otr
         receive_frame otr
-        CLI::When_::Help.new( nil, help_renderer, self ).produce_any_result
+        CLI_::When_::Help.new( nil, help_renderer, self ).produce_any_result
       end
     end
 
@@ -477,6 +516,8 @@ module Skylab::Brazen
       def initialize action
         @action = action
       end
+
+      attr_reader :resources  # for magic results [#021]
 
       def name
         @action.name
@@ -535,12 +576,16 @@ module Skylab::Brazen
       end
 
       def handle_event_selectively
-        @HES_p ||= -> top_channel_i, *, & ev_p do
-          recv_event ev_p[], top_channel_i
+        @HES_p ||= build_handle_event_selectively
+      end
+
+      def build_handle_event_selectively
+       -> top_channel_i, *, & ev_p do
+          receive_event_on_top_channel ev_p[], top_channel_i
         end
       end
 
-      def recv_event ev, top_channel_i
+      def receive_event_on_top_channel ev, top_channel_i
         ev_ = ev.to_event
         has_OK_tag = if ev_.has_tag :ok
           ok_x = ev_.ok
@@ -708,7 +753,7 @@ module Skylab::Brazen
       end
 
       def redundancy_filter
-        @redundancy_filter ||= CLI::Redundancy_Filter__.new
+        @redundancy_filter ||= CLI_::Redundancy_Filter__.new
       end
 
       def send_payload_event_lines a
@@ -748,7 +793,7 @@ module Skylab::Brazen
     class Invocation__
 
       def option_parser_class
-        CLI::Lib_::Option_parser[]
+        CLI_::Lib_::Option_parser[]
       end
 
       def receive_partitions partitions
@@ -854,12 +899,12 @@ module Skylab::Brazen
           send m_i
         else
           i_ = Callback_::Name.via_variegated_symbol( i ).as_const
-          CLI::When_.const_get( i_, false )
+          CLI_::When_.const_get( i_, false )
         end
       end
 
       def resolve_bound_call_when_parse_error e
-        @bound_call = CLI::When_::Parse_Error.new e, help_renderer
+        @bound_call = CLI_::When_::Parse_Error.new e, help_renderer
       end
 
       def expression_agent
@@ -892,7 +937,9 @@ module Skylab::Brazen
     # ~
 
     class Build_partitions__
+
       Actor_[ self, :properties, :scn, :kernel ]
+
       def execute
         Partitions__.new do |p|
           @kernel.receive_partitions p
@@ -901,15 +948,22 @@ module Skylab::Brazen
         end
         @partitions
       end
+
       def work
+
         @arg_a = @env_a = @opt_a = @many_a = nil
+
         d = 0 ; @original_index = {}
+
         while prop = @scn.gets
+
           @original_index[ prop.name_i ] = ( d += 1 )
+
           if prop.can_be_from_environment
             ( @env_a ||= [] ).push prop
           end
-          prop.can_be_from_argv or next
+
+          prop.is_hidden and next
 
           _is_effectively_required = if prop.is_required
             if prop.has_default
@@ -1005,7 +1059,7 @@ module Skylab::Brazen
       end
 
       def resolve_help_renderer
-        CLI::Action_Adapter_::Help_Renderer.new @op, @kernel ; nil
+        CLI_::Action_Adapter_::Help_Renderer.new @op, @kernel ; nil
       end
 
     public def receive_help_renderer o
@@ -1109,7 +1163,6 @@ module Skylab::Brazen
         @argument_arity = :one
         @custom_moniker = nil
         @desc = nil
-        @can_be_from_argv = true
         @name = Callback_::Name.via_variegated_symbol name_i
         x_a.each_slice( 2 ) do |i, x|
           instance_variable_set :"@#{ i }", x
@@ -1119,10 +1172,13 @@ module Skylab::Brazen
       attr_reader :desc, :name,
         :argument_arity,
         :argument_moniker,
-        :can_be_from_argv,
         :can_be_from_environment,
         :custom_moniker,
         :is_required
+
+      def is_hidden
+        false
+      end
 
       def name_i
         @name.as_variegated_symbol
@@ -1246,6 +1302,7 @@ module Skylab::Brazen
       end
     end
 
+    CLI_ = self
     DASH_BYTE_ = '-'.getbyte 0
     GENERIC_ERROR_ = 5
     NOTHING_ = nil

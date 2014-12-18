@@ -29,7 +29,7 @@ module Skylab::TestSupport
 
               add_to_write_proc_chain do | _PROP |
                 -> do
-                  x = iambic_property
+                  x = iambic_property.intern
                   if _ENUM_BOX_P[][ x ]
                     receive_value_of_entity_property x, _PROP
                   else
@@ -52,28 +52,13 @@ module Skylab::TestSupport
         define_method :bld_bad_enum_value_event,
           Lib_::Bzn_[]::Entity.build_bad_enum_value_event_method_proc
 
-        # ~ hidden experiment ( abstraction candidate )
-
-        class self::Entity_Property
-
-          def initialize
-            @is_visible = true
-            super
-          end
-
-          attr_reader :is_visible
-
-        private
-
-          def hidden=
-            @is_visible = false
-            KEEP_PARSING_
-          end
-        end
-
         # ~ end experiments
 
         edit_entity_class :is_promoted,
+
+            :inflect,
+              :verb, '(recursively) generate',
+              :noun, 'document',
 
             :flag, :property, :force,
 
@@ -84,7 +69,7 @@ module Skylab::TestSupport
 
             :flag, :property, :verbose,
 
-            :hidden, :property, :errstream,
+            :hidden, :property, :downstream,
 
             :required, :property, :path
 
@@ -112,11 +97,11 @@ module Skylab::TestSupport
 
           @sub_action ||= :none
 
-          if :preview == @sub_action && ! @errstream
+          if :preview == @sub_action && ! @downstream
             maybe_send_event :error, :missing_required_properties do
               TestSupport_._lib.entity.properties_stack.
                 build_missing_required_properties_event(
-                  [ self.class.property_via_symbol( :errstream ) ] )
+                  [ self.class.property_via_symbol( :downstream ) ] )
             end
             UNABLE_
           else
@@ -144,19 +129,31 @@ module Skylab::TestSupport
           when :list
             @st
           when :preview
-            via_stream_result_for_preview
-          when :normal
-            via_stream_behave_normally
+            result_via_proto proto_for_preview
+          when :none
+            result_via_proto proto_for_generate
           end
         end
 
-        def via_stream_result_for_preview
+        def proto_for_preview
+          common_prototype_with :downstream, @downstream
+        end
 
-          proto = Recursive_::Models__::File_Generation.new(
-            @dry_run,
-            @errstream,
-            @kernel,
+        def proto_for_generate
+          common_prototype_with
+        end
+
+        def common_prototype_with * x_a
+
+          Recursive_::Models__::File_Generation.new(
+            :is_dry, @dry_run,
+            :force_is_present, @force,
+            * x_a,
+            :kernel, @kernel,
             & @on_event_selectively )
+        end
+
+        def result_via_proto proto
 
           @st.map_by do | manifest_entry |
 

@@ -269,7 +269,6 @@ module Skylab::Brazen
         acpt @inflection
       end
 
-      # Callback_::Actor.methodic self
       include Callback_::Actor.methodic_lib.iambic_processing_instance_methods
 
     private

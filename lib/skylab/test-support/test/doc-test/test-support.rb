@@ -39,7 +39,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
   module InstanceMethods
 
-    def build_IO_spy_errstream_for_doctest
+    def build_IO_spy_downstream_for_doctest
 
       TestSupport_::IO.spy :do_debug_proc, -> do
         do_debug

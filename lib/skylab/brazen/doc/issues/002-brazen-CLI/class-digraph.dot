@@ -2,7 +2,7 @@ digraph {
 
 Invocation__
 
-Action_Adapter__ -> Invocation__
+Action_Adapter_ -> Invocation__
 
 Branch_Invocation__ -> Invocation__
 

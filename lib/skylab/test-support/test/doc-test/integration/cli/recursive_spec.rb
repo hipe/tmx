@@ -1,46 +1,86 @@
-require_relative '../../test-support'
+require_relative 'test-support'
 
-module Skylab::TestSupport::TestSupport::DocTest
+module Skylab::TestSupport::TestSupport::DocTest::CLI
 
-  describe "[ts] regret CLI actions recursive", wip: true do
+  describe "[ts] doc-test integration: CLI recursive" do
 
-    it "outputs the lines" do
-      r = cd_and_invoke '--recursive', 'list', 'regret'
-      stdout_gets.should eql( "./regret/api/actions/doc-test.rb" )
-      stdout_gets.should eql( "./regret/api/actions/doc-test/specer--.rb" )
-      stderr_lines.should eql TestSupport_::EMPTY_A_
-      r.should eql( true )
+    extend TS_
+
+    # three laws compliant.
+
+    it "loads" do
+      _CLI_module
+    end
+
+    it "pings" do
+      invoke 'ping'
+      on_stream :output
+      expect :styled, 'ping !'
+      expect_no_more_lines
+      @exitstatus.should eql :_hello_from_doc_test_
+    end
+
+    it "list" do
+      invoke 'recursive', '--sub-act', 'list', common_path
+      on_stream :output
+      expect %r(\A/.+/doc-test/core\.rb\b.+  #output-filename:inte)
+      expect %r(\A/)
+      expect :errput, '(2 manifest entries total)'
+      expect_no_more_lines
+      @exitstatus.should be_zero
     end
 
     it "does the dry run that generates fake bytes omg" do
-      r = cd_and_invoke '-rn', 'regret', '-f'
-      str = stderr_gets
-      str.should eql( '<<< ./regret/api/actions/doc-test.rb .. done.' )
-      stderr_gets.should match( %r{\A>>> \./test/regret/api/#{
-        }actions/doc-test_spec\.rb written \(\d\d\d+ fake bytes\)\.\z} )
-      left = stderr_lines.length
-      ( left % 2 ).should eql( 0 )
-      ( 2..6 ).include?( left ).should eql( true )
-      r.should eql( true )
+
+      invoke 'recursive', '--sub-act', 'preview', common_path
+
+      on_stream :errput
+
+      expect :styled, %r(\Acurrent output path -)
+
+      _d = count_contiguous_lines_on_stream :output
+      ( 40 .. 50 ).should be_include _d
+
+      expect %r(\A done \(\d+ lines)
+      expect :styled, %r(\Acurrent output path -)
+
+      _d = count_contiguous_lines_on_stream :output
+      ( 50 .. 60 ).should be_include _d
+
+      expect %r(\A done \(\d+ lines)
+      expect '(2 file generations total)'
+
+      expect_no_more_lines
+
+      @exitstatus.should be_zero
     end
 
-    it "cannot combine -r with other non-r-related sub-options" do
-      r = invoke_subcmd '-rv'
-      line = stderr_gets
-      line.should match( /did not recognize "-v" as a valid argument to/ )
-      line.should match( /expected .+ or "--"/ )
-      line.should match( /if you intended .+ use "--"/ )
-      r.should eql( nil )
+    it "requires force to overwrite" do
+
+      invoke 'recursive', '--dry-run', common_path
+
+      on_stream :errput
+
+      expect :styled, /\Acouldn't .+ generate .+ because .+ exists, won't/
+      expect '(0 file generations total)'
+      expect_no_more_lines
+
     end
 
-    it "requires force to overwrite (BUGGY BEHAVIOR LOCKED DOWN)" do
-      cd_and_invoke '-r', './regret/api/actions/doc-test.rb'
-      stderr_gets.should match( /won't overwrite without force -#{
-        }.+doc-test_spec.rb/ )
-      content = unstyle_styled( stderr_gets )
-      content.should match( /try wtvr -h recursive for help/i )
-        # because of the `change_command` hack, this reports what to
-        # the surface should be a non-existant command, but meh.
+    it "money" do
+
+      invoke 'recursive', '--forc', '--dry-run', common_path
+
+      on_stream :errput
+      expect %r(\Aupdating [^ ]+/final/top_spec\.rb \.\. done \(\d+ lines\b)
+      expect %r(\Aupdating [^ ]+/integration/core_spec\.rb \.\. done \(\d+ lines\b)
+      expect '(2 file generations total)'
+      expect_no_more_lines
+
+    end
+
+    def common_path
+      Subject_[].dir_pathname.to_path
     end
   end
 end

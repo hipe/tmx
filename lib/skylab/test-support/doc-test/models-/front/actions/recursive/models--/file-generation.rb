@@ -15,14 +15,49 @@ module Skylab::TestSupport
           # as a decidedly mutable data structure so that parameter funcs
           # can mutate the request progressively on top of each other.
 
-          def initialize is_dry_run, errstream, kernel, & oes_p
-            @errstream = errstream
-            @is_dry_run = is_dry_run
-            @kernel = kernel
+          class << self
+            def new * x_a, & oes_p
+              ok = true
+              x = super() do
+                @on_event_selectively = oes_p
+                ok = process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+              end
+              ok and x
+            end
+          end
+
+          def initialize & p
+            @errstream = @force = nil
+            instance_exec( & p )
             @template_variable_box = nil
-            @on_event_selectively = oes_p
             freeze
           end
+
+          include Callback_::Actor.methodic_lib.iambic_processing_instance_methods
+
+        private
+
+          def is_dry=
+            @is_dry = iambic_property
+            KEEP_PARSING_
+          end
+
+          def downstream=
+            @errstream = iambic_property
+            KEEP_PARSING_
+          end
+
+          def force_is_present=
+            @force_is_present = iambic_property
+            KEEP_PARSING_
+          end
+
+          def kernel=
+            @kernel = iambic_property
+            KEEP_PARSING_
+          end
+
+        public
 
           def new manifest_entry
             otr = dup
@@ -187,13 +222,13 @@ module Skylab::TestSupport
                 TestSupport_._lib.event_lib.inline_neutral_with(
                   :current_output_path, :path, @output_path )
               end
-            else
-              self._RIDE_ME
             end
 
-            _x = @kernel.call :generate,
+            x = @kernel.call :generate,
 
-              :is_dry_run, @is_dry_run,
+              * ( :dry_run if @is_dry ),
+
+              * ( :force if @force_is_present ),
 
               :template_variable_box, @template_variable_box,
 
@@ -206,7 +241,19 @@ module Skylab::TestSupport
               :output_adapter, :quickie,
               :on_event_selectively, @on_event_selectively
 
-            _x  # result is result of the last (informational) callback
+            if x.nil?
+
+              # when the above API call succeeds, the result is the result
+              # of the last callback, whose event may be informational and
+              # hence result in nil above by default. we upgrade this here
+              # so this isn't mis-read as a failure (covered) with a side-
+              # effect that you cannot meaningfully result in nil, which is
+              # no big deal
+
+              ACHIEVED_
+            else
+              x
+            end
           end
 
           # ~ support

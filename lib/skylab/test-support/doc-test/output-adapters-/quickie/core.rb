@@ -8,8 +8,9 @@ module Skylab::TestSupport
 
       class << self
 
-        def output_adapter & oes_p  # #hook-out
+        def output_adapter is_known_dry, & oes_p  # #hook-out
           new do
+            @is_known_dry = is_known_dry  # cosmetic only!
             @on_event_selectively = oes_p
           end
         end
@@ -197,7 +198,7 @@ module Skylab::TestSupport
         end
 
         maybe_send_event :success, :wrote do
-          build_neutral_event_with :wrote, :bytes, bytes, :line_count, lines
+          Event_for_Wrote_[ @is_known_dry, bytes, lines ]
         end
       end
 

@@ -465,6 +465,11 @@ module Skylab::Brazen
         end.immutable_with_random_access_keyed_to_method :name_i
       end
 
+      def any_property_via_symbol i
+        m_i = entity_formal_property_method_names_box_for_rd[ i ]
+        m_i and send m_i
+      end
+
       def property_via_symbol i
         send entity_formal_property_method_names_box_for_rd.fetch i
       end
@@ -658,6 +663,10 @@ module Skylab::Brazen
       def bound_properties
         @bp ||= Entity::Properties_Stack__::Bound_properties[
           method( :get_bound_property_via_property ), self.class.properties ]
+      end
+
+      def get_argument_via_property_symbol sym
+        get_bound_property_via_property self.class.property_via_symbol sym
       end
 
       def get_bound_property_via_property prop

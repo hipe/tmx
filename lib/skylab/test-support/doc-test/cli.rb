@@ -1,72 +1,61 @@
 module Skylab::TestSupport
 
-  module Regret
+  module DocTest
 
-    module CLI::Actions
+    # this new guy, it's gotta be light and generated
 
-      module DocTest
+    class CLI < TestSupport_::Lib_::Bzn_[]::CLI
 
-        RegretLib_ = Regret::API::RegretLib_
+      class << self
 
-        Parse_Recursive_ = RegretLib_::Struct[ :y, :v, :argv ]
+        def new * a
+          new_top_invocation a, DocTest_
+        end
+      end
 
-        # the things we do for love. **necessary** to support argv's like:
-        #
-        #   foo -r   some-path     # ordinary recursive
-        #   foo -rn  some-path     # dry run
-        #   foo -r n some-path     # same
-        #   foo -r list list       # e.g use the "list" sub-opt on path "list"
-        #
+      def expression_agent_class
+        CLI_LIB_.expression_agent_class
+      end
 
-        class Parse_Recursive_
+      CLI_LIB_ = superclass
 
-          LIB_.funcy_globful self
+      # ~ specific action customization
 
-          def execute
-            if @argv.length.nonzero?
-              did = P_[ @v, @argv ]
-              if ! did && (( t = @argv[ 0 ] )) && REST_RX_.match( t )
-                if P_[ @v, [ $~[:stem] ] ]
-                  @argv.shift
-                else
-                  @v[ :did_error ] = true
-                  @y << "did not recognize \"#{ t }\" as a valid argument #{
-                  }to -r (expected #{
-                  }#{ Or_[ A_.reduce [] { |m, fld| fld.name_monikers m }]}#{
-                  }). if you intended \"#{ t }\" as other option(s), please#{
-                  } use \"--\" to sepearate them from -r."
-                  @argv.shift  # it may or may not be a valid option - but
-                    # just in case, this way we avoid triggering 2 notices
-                end
+      module Actions
+
+        class Recursive < CLI_LIB_::Action_Adapter
+
+          # do not put a trailing newline on these ones - they
+          # are first of a pair and "look better" in one line.
+          # this behavior will probably become [#ba-021] magic
+
+          def build_handle_event_selectively
+            default_p = super
+            -> * i_a, & ev_p do
+              m_i = i_a.fetch 1
+              if respond_to? m_i
+                send m_i, ev_p[]
+              else
+                default_p[ * i_a, & ev_p ]
               end
             end
-            nil
           end
 
-          o = RegretLib_::Field_exponent_proc[]
+          def before_editing_existing_file ev
+            render_event_as_first_in_multipart_line ev
+          end
 
-          A_ = [ o[ :do_list, 'list', nil, "just list the files" ],
-                 o[ :do_check, 'check', nil, "write to stdout all output" ],
-                 o[ :is_dry_run, 'dry-run', 'n' ],
-                 o[  nil, '--' ] ]
+          def before_probably_creating_new_file ev
+            render_event_as_first_in_multipart_line ev
+          end
 
-          P_ = RegretLib_::Parse_alternation[].
-            curry[ :pool_procs, A_.map(& :p ) ]
+        private
 
-          Or_ = RegretLib_::Oxford_or
-
-          REST_RX_ = /\A-(?<stem>[^-].*)\z/
-
-          Value_ = Regret::API::RegretLib_::Struct[ :did_error, *
-            A_.reduce( [] ) { |m, x| x.i and m << x.i ; m } ]
-          class Value_
-            def to_i
-              @did_error and fail "sanity"
-              one = A_.reduce nil do |_, fld|
-                fld.i and self[ fld.i ] and break fld.i
-              end
-              one || :do_execute
-            end
+          def render_event_as_first_in_multipart_line ev
+            s_a = render_event_lines ev
+            send_non_payload_event_lines s_a[ 0 .. -2 ]
+            @parent.stderr.write "#{ s_a.last } .."
+            nil
           end
         end
       end

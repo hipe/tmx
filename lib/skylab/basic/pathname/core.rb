@@ -4,6 +4,56 @@ module Skylab::Basic
 
     class << self
 
+      def expand_real_parts_by_relative_parts real_parts, rel_parts, sep=FILE_SEP_, & oes_p
+
+        a = real_parts.dup
+        ok = true
+
+        rel_parts.length.times do | d |
+          s = rel_parts.fetch d
+          if DOT_DOT_ == s
+            if a.length.zero?
+              ok = when_dot_dot_error real_parts, rel_parts, sep, & oes_p
+              ok or break
+            else
+              a.pop
+            end
+          else
+            a.push s
+          end
+        end
+
+        ok ? a : ok
+      end
+
+    private
+
+      def when_dot_dot_error real_parts, rel_parts, sep, & oes_p
+        if oes_p
+          oes_p.call :error, :cannot_go_higher_than_top do
+            build_dot_dot_event real_parts, rel_parts, sep
+          end
+        else
+          raise build_dot_dot_event( real_parts, rel_parts, sep ).to_exception
+        end
+      end
+
+      def build_dot_dot_event real_parts, rel_parts, sep
+
+        Basic_._lib.event.inline_not_OK_with :cannot_go_higher_than_top,
+            :real_parts, real_parts, :rel_parts, rel_parts, :sep, sep do | y, o |
+
+          _s = o.real_parts.join o.sep
+          _s_ = o.rel_parts.join o.sep
+
+          y << "cannot go higher than top. meaningless path: #{
+            } #{ ick "#{ _s }#{ o.sep }#{ _s_ }" }"
+
+        end
+      end
+
+    public
+
       def normalization
         Pathname::Normalization__
       end
@@ -20,6 +70,10 @@ module Skylab::Basic
         end
       end
     end
+
+    DOT_DOT_ = ::Skylab::DOT_DOT_
+
+    FILE_SEP_ = ::File::SEPARATOR
 
     Pathname_ = self
   end

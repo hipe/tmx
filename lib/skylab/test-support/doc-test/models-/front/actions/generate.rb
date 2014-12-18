@@ -53,6 +53,7 @@ module Skylab::TestSupport
     #     result = API.call :generate,
     #       :output_path, output_pn.to_path,
     #       :upstream_path, here,
+    #       :force,
     #       :output_adapter, :quickie
     #
     #       # the moneyshot. did it work?
@@ -77,13 +78,28 @@ module Skylab::TestSupport
 
             :iambic_writer_method_name_suffix, :"="
 
+          # NOTE those properties that want to trigger side-effects are
+          # written by hand below, and for readability they write their
+          # values directly to ivars. given this, we have to go ahead &
+          # write all properties this way, otherwise we straddle values
+          # being stored in two ways. maybe we'll automate it [#br-075]
+
           def business_module_name=
             @business_module_name = iambic_property
             KEEP_PARSING_
           end
 
-          def is_dry_run=
-            @is_dry_run = iambic_property
+          o :flag
+
+          def dry_run=
+            @dry_run = true
+            KEEP_PARSING_
+          end
+
+          o :flag
+
+          def force=
+            @force = true
             KEEP_PARSING_
           end
 
@@ -140,7 +156,8 @@ module Skylab::TestSupport
         def initialize kernel
           block_given? and self._WHAT
           @business_module_name = nil
-          @is_dry_run = false
+          @dry_run = false
+          @force = false
           @resolve_line_downstream_method_name = :when_no_downstream
           @resolve_line_upstream_method_name = :when_no_upstream
           @template_variable_box = nil
@@ -180,8 +197,9 @@ module Skylab::TestSupport
         end
 
         def via_output_adapter_module_resolve_output_adapter
-          @output_adapter = @output_adapter_module.output_adapter( &
-            handle_event_selectively )
+          @output_adapter = @output_adapter_module.output_adapter(
+            @dry_run,
+            & handle_event_selectively )
           ACHIEVED_
         end
 
@@ -197,17 +215,28 @@ module Skylab::TestSupport
         end
 
         def via_output_path_rslv_line_downstream
-          io = TestSupport_._lib.system.filesystem.normalization.downstream_IO.
-            with(
-              :path, @output_path,
-              :is_dry_run, @is_dry_run,
-              :on_event_selectively, handle_event_selectively )
 
-          io and begin
+          _force_arg = TestSupport_._lib.basic.trio(
+            # because we use ivars and not property boxes, we must make this manually
+            @force,
+            true,
+            self.class.property_via_symbol( :force ) )
+
+          io = TestSupport_._lib.system.filesystem.normalization.downstream_IO(
+            :path, @output_path,
+            :is_dry_run, @dry_run,
+            :force_arg, _force_arg,
+            :on_event_selectively, handle_event_selectively )
+
+          if io
             io.truncate 0
             @do_close_downstream = true
             @line_downstream = io
             ACHIEVED_
+          else
+            # upgrade any `nil` to `false` so that this spills all the way out
+            @result = UNABLE_
+            UNABLE_
           end
         end
 

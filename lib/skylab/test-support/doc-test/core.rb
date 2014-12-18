@@ -63,7 +63,7 @@ module Skylab::TestSupport
           elsif x_a.length < 2 || :on_event_selectively != x_a[ -2 ]
             x_a.push :on_event_selectively, -> i, *, & ev_p do
               if :error == i
-                raise ev_p[].to_exception
+                raise ev_p[].to_event.to_exception
               end
             end
           end

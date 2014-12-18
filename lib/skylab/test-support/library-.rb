@@ -43,12 +43,12 @@ module Skylab::TestSupport
 
     API_normalizer = API_normalizer_lib
 
-    Bsc = sidesys[ :Basic ]
+    Basic = sidesys[ :Basic ]
 
     Bzn_ = sidesys[ :Brazen ]
 
     Box = -> do
-      Bsc[]::Box.new
+      Basic[]::Box.new
     end
 
     CLI_client_base_class = -> do
@@ -170,11 +170,11 @@ module Skylab::TestSupport
     end
 
     String_lib = -> do
-      Bsc[]::String
+      Basic[]::String
     end
 
     Struct = -> * i_a do
-      Bsc[]::Struct.make_via_arglist i_a
+      Basic[]::Struct.make_via_arglist i_a
     end
 
     System = -> do

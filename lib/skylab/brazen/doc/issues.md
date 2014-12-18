@@ -1,3 +1,6 @@
+[#077] #open maybe try a positive meta-property with a default instead of `hidden`.
+[#076] #open one day integrate [#021] with action factory, where the idea was conceived.)
+[#075]    #tracking :+#wishlist optionally generate ivar-based iambic writers
 [#074]       #parent-node: [#011] the codifying expression agent (for events)
 [#073]       #parent-node: [#011] selective event listening via methods
 [#072] #open modernize this interface
@@ -60,7 +63,7 @@
 [#023]       #parent-node: [#011] event prototype
 [#022]       #done obliterate `receive_negative_event` and the rest - single
              entrypoint is better. rely on `ok` : false
-[#021] #hole (was "scope kernel")
+[#021]       magic results (was "scope kernel")
 [#020] #open  --help and --host
 [#019]       #done turn `is_positive` into `ok` to match HTTP responses
 [#018]       #done #parent-node: [#013] "model ivars.."

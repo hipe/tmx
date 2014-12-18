@@ -99,15 +99,7 @@ module Skylab::Basic
         else
           @starting_module.name.split CONST_SEP_
         end
-        @relative_path_parts.length.times do |d|
-          s = @relative_path_parts.fetch d
-          if BACK_TOKEN_ == s
-            real_parts.pop
-          else
-            real_parts.push s
-          end
-        end
-        real_parts
+        Basic_::Pathname.expand_real_parts_by_relative_parts real_parts, @relative_path_parts, CONST_SEP_
       end
 
       def via_normal_path_parts_execute
@@ -178,7 +170,6 @@ module Skylab::Basic
       end
     end
 
-    BACK_TOKEN_ = '..'.freeze
     CONST_SEP_ = '::'.freeze
     PATH_SEP_RX__ = %r(::|/)
 

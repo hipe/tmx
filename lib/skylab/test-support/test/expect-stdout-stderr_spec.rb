@@ -253,7 +253,7 @@ module Skylab::TestSupport::TestSupport
       alias_method :matches?, :match
     end
 
-    ESS_Mock_Emission = ::Struct.new :channel_i, :string
+    ESS_Mock_Emission = ::Struct.new :stream_symbol, :string
 
   end
 end

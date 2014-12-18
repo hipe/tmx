@@ -67,19 +67,29 @@ module Skylab::TestSupport::TestSupport::DocTest
 
     end
 
+    it "`force` argument works" do
+
+      call_API :generate,
+        :output_path, common_real_life_output_path,
+        :output_adapter, :quickie
+
+      ev = expect_not_OK_event :missing_required_permission
+
+      black_and_white( ev ).should match %r(\A'path' exists, won't overwrite #{
+        }without 'force': «[^»]+/integration/core_spec\.rb»\z)
+
+      expect_failed
+
+    end
+
     it "PRE-FINAL INTEGRATION HACK TEST (dry run)" do
-
-      _upstream_path_OMG = DocTest_.dir_pathname.
-        join( 'models-/front/actions/generate.rb' ).to_path
-
-      _output_path_OMG = TestSupport_.dir_pathname.
-        join( 'test/doc-test/models-front-actions/generate/integration/core_spec.rb' ).to_path
 
       @result = subject_API.call(
         :generate,
-        :is_dry_run, true,  # FLIP THIS OFF to re-write the file!
-        :output_path, _output_path_OMG,
-        :upstream_path, _upstream_path_OMG,
+        :dry_run,  # comment this out to re-write the file!
+        :force,
+        :output_path, common_real_life_output_path,
+        :upstream_path, common_upstream_path,
         :output_adapter, :quickie,
         :on_event_selectively, handle_event_selectively )
 
@@ -87,6 +97,16 @@ module Skylab::TestSupport::TestSupport::DocTest
       expect_neutral_event :wrote
       expect_no_more_events
       expect_neutral_result
+    end
+
+    def common_upstream_path
+      DocTest_.dir_pathname.join( 'models-/front/actions/generate.rb' ).to_path
+    end
+
+    def common_real_life_output_path
+      TestSupport_.dir_pathname.join(
+        'test/doc-test/models-front-actions/generate/integration/core_spec.rb'
+      ).to_path
     end
 
     def call_API_with * x_a

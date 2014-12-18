@@ -124,7 +124,7 @@ module Skylab::Brazen::TestSupport
                 when_ev_OK_value_is_not_nil ev.ok
               end
             else
-              self._TO_DO
+              when_neutral_expected_and_ev_does_not_have_OK_tag
             end
           elsif ev.has_tag :ok
             x = ev.ok
@@ -148,6 +148,10 @@ module Skylab::Brazen::TestSupport
 
         def when_ev_is_OK
           send_event_failure "was 'ok', expected not"
+        end
+
+        def when_neutral_expected_and_ev_does_not_have_OK_tag
+          when_ev_does_not_have_OK_tag
         end
 
         def when_ev_does_not_have_OK_tag

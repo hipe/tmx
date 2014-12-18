@@ -21,8 +21,12 @@ module Skylab::Basic  # introduction at [#020]
       Normalizers_instance__[]
     end
 
-    def trio
-      Trio_
+    def trio * x_a
+      if x_a.length.zero?
+        Trio_
+      else
+        Trio_.new( * x_a )
+      end
     end
   end
 

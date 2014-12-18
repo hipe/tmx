@@ -37,6 +37,7 @@ module Skylab::TestSupport::TestSupport::DocTest::Models::Front::Actions::Genera
           result = API.call :generate,
             :output_path, output_pn.to_path,
             :upstream_path, here,
+            :force,
             :output_adapter, :quickie
 
             # the moneyshot. did it work?

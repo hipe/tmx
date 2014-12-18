@@ -235,7 +235,7 @@ module Skylab::TestSupport
 
     module QuicLib_
 
-      Bsc__ = TestSupport_::Lib_::Bsc
+      Bsc__ = TestSupport_::Lib_::Basic
 
       CLI_lib = -> do
         HL__[]::CLI

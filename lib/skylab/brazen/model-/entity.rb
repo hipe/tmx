@@ -294,21 +294,25 @@ module Skylab::Brazen
 
 
 
-      # • "environment" (experiment)
+      # • "environment", "hidden" (experiment)
 
         class self::Entity_Property
         private
+
           def environment=
-            @_cannot_be_from_argv = true
             @can_be_from_environment = true
+            @is_hidden = true
             KEEP_PARSING_
           end
+
+          def hidden=
+            @is_hidden = true
+            KEEP_PARSING_
+          end
+
         public
 
-          def can_be_from_argv
-            ! _cannot_be_from_argv
-          end
-          attr_reader :_cannot_be_from_argv, :can_be_from_environment
+          attr_reader :can_be_from_environment, :is_hidden
 
           def upcase_environment_name_symbol
             :"BRAZEN_#{ @name.as_variegated_symbol.upcase }"

@@ -30,15 +30,11 @@ module Skylab::TestSupport::TestSupport::DocTest
       expect_no_events
 
       st = @result
-
       one = st.gets
-
       two = st.gets
-
       st.gets.should be_nil
 
       ::File.basename( one.path ).should eql 'core.rb'
-
       ::File.basename( two.path ).should eql 'generate.rb'
     end
 
@@ -48,7 +44,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
       ev = expect_not_OK_event :missing_required_properties
 
-      black_and_white( ev ).should eql "missing required property 'errstream'"
+      black_and_white( ev ).should eql "missing required property 'downstream'"
 
       expect_failed
 
@@ -56,13 +52,13 @@ module Skylab::TestSupport::TestSupport::DocTest
 
     it "'preview' results in a stream of \"generation\"s" do
 
-      errstream = build_IO_spy_errstream_for_doctest
+      downstream = build_IO_spy_downstream_for_doctest
 
       call_API :recursive, :sub_action, :preview, :path,
 
         Subject_[].dir_pathname.to_path,
 
-        :errstream, errstream
+        :downstream, downstream
 
       gen_stream = @result
 
@@ -71,8 +67,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
       x = _gen.execute
 
-      x.should be_nil  # result of generate is result of last event, which
-      # was an informational event about the number of bytes written
+      x.should eql true
 
       ev = expect_neutral_event :current_output_path
 
@@ -92,7 +87,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
       x.should be_nil
 
-      validate_content_of_the_generated_file_of_interest errstream
+      validate_content_of_the_generated_file_of_interest downstream
 
     end
 

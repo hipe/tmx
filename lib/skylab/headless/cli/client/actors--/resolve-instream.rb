@@ -59,7 +59,7 @@ module Skylab::Headless
         x = @argv.fetch 0 do
           actuals_has_name = false ; nil
         end
-        Headless_::Lib_::Bsc_[].trio.new x, actuals_has_name, _prp
+        Headless_::Lib_::Bsc_[].trio x, actuals_has_name, _prp
       end
 
       def resolve_property  # (was: `infile_moniker`)

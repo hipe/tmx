@@ -15,7 +15,7 @@ module Skylab::TestSupport
         @__sout_serr_default_stream_symbol__ = stream_symbol ; nil
       end
 
-      # ~ expect "macros"
+      # ~ simple expect "macros"
 
       def expect_header_line s
         expect :styled, "#{ s }:"
@@ -76,6 +76,32 @@ module Skylab::TestSupport
         end
       end
 
+      def count_contiguous_lines_on_stream sym
+        count = 0
+        st = _sout_serr_chunk_for do | em |
+          sym == em.stream_symbol
+        end
+        while st.gets
+          count += 1
+        end
+        count
+      end
+
+      def _sout_serr_chunk_for
+        st = @__sout_serr_actual_stream__
+        p = -> do
+          if st.unparsed_exists and yield( st.current_token )
+            st.gets_one
+          else
+            p = EMPTY_P_
+            nil
+          end
+        end
+        Callback_.stream do
+          p[]
+        end
+      end
+
       # ~~ implementation support
 
       def _sout_serr_expect_given_regex
@@ -128,11 +154,11 @@ module Skylab::TestSupport
           stream_sym = exp.stream_symbol
           stream_sym ||= __sout_serr_default_stream_symbol__
           if stream_sym
-            if stream_sym == em.channel_i
+            if stream_sym == em.stream_symbol
               ACHIEVED_
             else
               fail "expected emission on channel '#{ stream_sym }', #{
-                }but emission was on channel '#{ em.channel_i }'"
+                }but emission was on channel '#{ em.stream_symbol }'"
             end
           else
             ACHIEVED_
