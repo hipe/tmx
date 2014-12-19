@@ -93,7 +93,7 @@ module Skylab::Callback::TestSupport::Digraph
       it "notifies subscribers of parent events about child events" do
         msg = nil
         emitter.on_informational do |e|
-          msg = "#{ e.stream_name }: #{ e.payload_a.first }"
+          msg = "#{ e.stream_symbol }: #{ e.payload_a.first }"
         end
         emitter.call_digraph_listeners :error, 'yes'
         msg.should eql 'error: yes'
@@ -103,8 +103,8 @@ module Skylab::Callback::TestSupport::Digraph
           }to multiple facets of it" do
         chld = nil
         prnt = nil
-        emitter.on_informational { |e| prnt = "#{e.stream_name}: #{e.payload_a.first}" }
-        emitter.on_info          { |e| chld = "#{e.stream_name}: #{e.payload_a.first}" }
+        emitter.on_informational { |e| prnt = "#{e.stream_symbol}: #{e.payload_a.first}" }
+        emitter.on_info          { |e| chld = "#{e.stream_symbol}: #{e.payload_a.first}" }
         emitter.call_digraph_listeners :info, 'foo'
         chld.should eql 'info: foo'
         prnt.should eql 'info: foo'

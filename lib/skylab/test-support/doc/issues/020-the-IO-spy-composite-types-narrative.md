@@ -31,7 +31,7 @@ with `IO.spy.group#for` with a name you choose for each stream spy.
 When any of those stream-likes gets written to (with `<<`, `write`, `puts`,
 e.g) and that data has a newline in it, this puppy will create a "line"
 struct out of the line which simply groups the name you chose
-and the string (the struct hence has the members `stream_name` and `string`).
+and the string (the struct hence has the members `stream_symbol` and `string`).
 
 (If you have added line filter(s) with `add_line_map_proc`, this will be
 applied to the string before creating the metadata struct out of it.

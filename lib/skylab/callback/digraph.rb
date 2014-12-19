@@ -53,13 +53,13 @@ module Skylab::Callback
     end
 
     def listeners_digraph * graph_x_a
-      event_stream_graph.absorb_nodes graph_x_a, -> stream_name do
+      event_stream_graph.absorb_nodes graph_x_a, -> stream_symbol do
         # (this hookback is called only when a new node is added to the graph)
-        m = "on_#{ stream_name }"
+        m = "on_#{ stream_symbol }"
         if ! method_defined? m
           define_method m do |*a, &p|
             if p || a.length.nonzero?
-              on stream_name, *a, &p
+              on stream_symbol, *a, &p
             else
               read_handler_for_event_stream_notify m  # you're on your own
             end
@@ -142,8 +142,8 @@ module Skylab::Callback
 
     #         ~ in rougly lifecycle (and then pre-) order ~
 
-    def on stream_name, * a_p, & block  # #storypoint-5
-      event_listeners.add_listener stream_name, * a_p, & block
+    def on stream_symbol, * a_p, & block  # #storypoint-5
+      event_listeners.add_listener stream_symbol, * a_p, & block
     end
 
   private
@@ -197,8 +197,8 @@ module Skylab::Callback
 
     # `listeners_digraph` - part of the reflection API [#014]
 
-    def callback_digraph_has? stream_name
-      event_stream_graph.has? stream_name
+    def callback_digraph_has? stream_symbol
+      event_stream_graph.has? stream_symbol
     end
 
     #                      ~ #storypoint-9 ~
@@ -272,13 +272,13 @@ module Skylab::Callback
 
     # ~ event production
 
-    def build_event stream_name, *payload_a
-      @event_factory.call @event_stream_graph_p.call, stream_name, *payload_a
+    def build_event stream_symbol, *payload_a
+      @event_factory.call @event_stream_graph_p.call, stream_symbol, *payload_a
     end
 
     def build_event_factory  # expected to be called once per instance..
-      -> esg, stream_name, *payload_a do
-        event_class.new esg, stream_name, *payload_a
+      -> esg, stream_symbol, *payload_a do
+        event_class.new esg, stream_symbol, *payload_a
       end
     end
     alias_method :default_build_event_factory, :build_event_factory
@@ -306,7 +306,7 @@ module Skylab::Callback
     def call_digraph_listeners x, *payload_a  # sacred & holy workhorse: a #center-of-the-unverse
       event = nil ; esg = @event_stream_graph_p.call
       if payload_a.length.zero? && x.respond_to?( :is_event ) && x.is_event
-        stream_i = x.stream_name ; event = x  # (re-emit an existing event
+        stream_i = x.stream_symbol ; event = x  # (re-emit an existing event
       else                          # but under a possibly different graph)
         do_build = true
         stream_i = esg.fetch x do

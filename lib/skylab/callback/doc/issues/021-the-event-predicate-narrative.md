@@ -70,7 +70,7 @@ index 0 should be nil (hence the array should be empty. there should be no
 events). Since the index that is implied is the last valid index of the queue
 (i.e length - 1), an arguably poor way to state something might be:
 [ :foo, 1, nil ], which effectively states "the last event should be of
-`stream_name` :foo, and oh by the way, since at index 1 we expect `nil`, it
+`stream_symbol` :foo, and oh by the way, since at index 1 we expect `nil`, it
 means that there should only be one event in the queue."  #experimental
 
 (what would of course be nice is that an expectation array of [nil]

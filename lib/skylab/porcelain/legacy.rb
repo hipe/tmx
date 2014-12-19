@@ -1160,8 +1160,8 @@ module Skylab::Porcelain::Legacy
 
     # non [cb] digraph variant of `call_digraph_listeners` gets "turned on" elsewhere
 
-    def _porcelain_legacy_emit stream_name, text
-      ( :payload == stream_name ? @paystream : @infostream ).puts text
+    def _porcelain_legacy_emit stream_symbol, text
+      ( :payload == stream_symbol ? @paystream : @infostream ).puts text
       nil
     end
 

@@ -35,8 +35,8 @@ module Skylab::Snag::TestSupport::CLI::Actions
         setup_tmpdir_read_only
         invoke 'o'
         a = output.lines
-        :info == a.first.stream_name and a.shift
-        a.map(& :stream_name).should eql(
+        :info == a.first.stream_symbol and a.shift
+        a.map(& :stream_symbol ).should eql(
           [:pay, :pay, :pay, :pay, :pay, :info] )
         exp = <<-O.unindent
           [#004.2] #open this is #feature-creep but meh
@@ -53,7 +53,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
         setup_tmpdir_read_only
         invoke 'open', '-v'
         act = output.lines.reduce( [] ) do |m, (x, _)|
-          if :pay == x.stream_name
+          if :pay == x.stream_symbol
             m.push x.string
             if 4 == m.length
               break( m )

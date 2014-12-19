@@ -212,7 +212,7 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute
         o.first_name = "toff tofferson"
         @em_a.length.should eql 1
         em = @em_a.shift
-        em.stream_name.should eql :error
+        em.stream_symbol.should eql :error
         em.payload_x.should eql '"toff tofferson" did not match regex: /^[A-Z]/'
         o.first_name.should eql "Billford Brimley"
       end

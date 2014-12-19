@@ -69,8 +69,8 @@ module Skylab::Callback::TestSupport::Digraph::Specificity
         nil
       end
 
-      def call_digraph_listeners stream_name
-        z.call_digraph_listeners stream_name, true
+      def call_digraph_listeners stream_symbol
+        z.call_digraph_listeners stream_symbol, true
       end
 
       touch = -> a, i, e do

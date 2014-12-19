@@ -96,13 +96,13 @@ module Skylab::Headless::CLI::Table
   Table::Events = ::Module.new
 
   module Table::Events::Datapoint
-    def self.event graph, stream_name, payload_x
+    def self.event graph, stream_symbol, payload_x
       payload_x
     end
   end
 
   module Table::Events::Text
-    def self.event graph, stream_name, payload_x
+    def self.event graph, stream_symbol, payload_x
       payload_x
     end
   end

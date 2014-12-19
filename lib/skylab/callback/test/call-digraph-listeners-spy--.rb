@@ -36,22 +36,22 @@ module Skylab::Callback::TestSupport
       @emission_a.push Emission__.new( stream, payload_x )
       if @do_debug_proc.call
         o = @emission_a.last
-        @debug_IO.puts [ o.stream_name, o.payload_x ].inspect
+        @debug_IO.puts [ o.stream_symbol, o.payload_x ].inspect
       end ; nil
     end
 
     class Emission__
 
       def initialize *a
-        @stream_name, @payload_x = a
+        @stream_symbol, @payload_x = a
       end
 
-      attr_reader :stream_name, :payload_x
+      attr_reader :stream_symbol, :payload_x
 
-      alias_method :channel_x, :stream_name
+      alias_method :channel_x, :stream_symbol
 
       def to_a  # e.g for pretty debugging output
-        [ @stream_name, @payload_x ]
+        [ @stream_symbol, @payload_x ]
       end
     end
 

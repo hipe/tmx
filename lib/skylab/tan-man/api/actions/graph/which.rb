@@ -11,7 +11,7 @@ module Skylab::TanMan
       begin
         col = collections.dot_file
         b = col.ready? -> o do
-          if :no_config_dir == o.stream_name
+          if :no_config_dir == o.stream_symbol
             send_info_string "#{ o.message } - #{ o.dirname }"
             emit :call_to_action, template: "try {{action}} to create it",
                               action_class: API::Actions::Init # #ref [#059]

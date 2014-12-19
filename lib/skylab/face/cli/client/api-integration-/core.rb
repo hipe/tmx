@@ -125,8 +125,8 @@ module Skylab::Face
           @api_stream_box ||= begin
             a = [ ] ; h = { } ; private_instance_methods.each do |i|
               if rx =~ i  # eek, meh
-                a << ( stream_name = $~[1].intern )
-                h[ stream_name ] = i
+                a << ( stream_symbol = $~[1].intern )
+                h[ stream_symbol ] = i
               end
             end
             [ a.freeze, h.freeze ].freeze

@@ -93,16 +93,16 @@ module Skylab::TestSupport
     end
     #
     class Line__  # :+[#ts-007]
-      def initialize stream_name, string
-        @stream_name = stream_name ; @string = string
+      def initialize stream_symbol, string
+        @stream_symbol = stream_symbol ; @string = string
       end
-      attr_reader :stream_name, :string
-      alias_method :channel_x, :stream_name
+      attr_reader :stream_symbol, :string
+      alias_method :channel_x, :stream_symbol
       def payload_x
         @string.chop
       end
       def to_a
-        [ @stream_name, @string ]
+        [ @stream_symbol, @string ]
       end
     end
 
@@ -130,7 +130,7 @@ module Skylab::TestSupport
       @debug ||= Debug__.new
       @debug.condition_p ||= MONADIC_TRUTH_
       @debug.emit_line_p = -> line do
-        stderr.puts [ line.stream_name, line.string ].inspect
+        stderr.puts [ line.stream_symbol, line.string ].inspect
       end
       stderr
     end
@@ -148,7 +148,7 @@ module Skylab::TestSupport
       r = Names_And_Strings__.new 2
       name_i_a = r[ 0 ] = [ ] ; string_a = r[ 1 ] = [ ]
       @line_a.each do |o|
-        name_i_a << o.stream_name
+        name_i_a << o.stream_symbol
         string_a << o.string
       end
       r
@@ -175,7 +175,7 @@ module Skylab::TestSupport
       end
 
       def see struct
-        @stream_name_hash.fetch struct.stream_name do |k|
+        @stream_name_hash.fetch struct.stream_symbol do |k|
           @stream_name_hash[k] = true
           @unique_stream_name_order_i_a << k
         end

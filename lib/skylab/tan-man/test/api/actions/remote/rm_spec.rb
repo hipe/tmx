@@ -12,7 +12,7 @@ module Skylab::TanMan::TestSupport::API::Actions
       r = api_invoke
       r.success?.should eql(false)
       e = r.events.first
-      e.stream_name.should eql(:error)
+      e.stream_symbol.should eql(:error)
       e.message.should match( /missing required attribute.*remote_name/ )
     end
   end

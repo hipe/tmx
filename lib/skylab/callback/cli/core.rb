@@ -125,11 +125,11 @@ module Skylab::Callback
       o << ' <stream-name>  fizzle'
     end
 
-    def fire file, klass, stream_name
+    def fire file, klass, stream_symbol
       _, o, e = three_streams
       fi = Callback_::API::Actions::Fire.new program_name, o, e
       fi.absorb_param_h_fully @param_h.merge!( files: [ file ], modul: klass,
-        opendata: ( @opendata || false ), stream_name: stream_name.intern )
+        opendata: ( @opendata || false ), stream_symbol: stream_symbol.intern )
       x = fi.execute
       usage_and_invite if false == x
       x ? x : ( false == x ? 1 : 0 )

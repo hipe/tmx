@@ -64,11 +64,11 @@ module Skylab::Callback
           define_singleton_method :members do key_a end
           key_a.each do |sym| attr_reader sym end
           ivar_h = ::Hash[ key_a.map { |k| [ k, :"@#{ k }" ] } ]
-          define_method :initialize do |esg, stream_name, payload_h|
+          define_method :initialize do |esg, stream_symbol, payload_h|
             payload_h.each do |k, v|
               instance_variable_set ivar_h.fetch( k ), v
             end
-            super esg, stream_name
+            super esg, stream_symbol
           end
           define_method :to_hash do
             ::Hash[ key_a.map { |k| [ k, instance_variable_get( ivar_h[k] ) ] }]

@@ -6,7 +6,7 @@ module Skylab::Callback
 
       -> do  # `initialize`
         next_id = nil
-        define_method :initialize do |esg, stream_name, *payload| # #storypoint-10
+        define_method :initialize do |esg, stream_symbol, *payload| # #storypoint-10
           @event_id = next_id[ ]
           @event_stream_graph_p = if esg
             esg.respond_to?( :call ) and fail 'where'
@@ -17,7 +17,7 @@ module Skylab::Callback
           end
           @is_touched = false
           payload.length.nonzero? and @payload_a = payload
-          @stream_name = stream_name ; nil
+          @stream_symbol = stream_symbol ; nil
         end
 
         next_id = -> do
@@ -27,7 +27,7 @@ module Skylab::Callback
 
       end.call
 
-      attr_reader :event_id, :is_touched, :payload_a, :stream_name
+      attr_reader :event_id, :is_touched, :payload_a, :stream_symbol
 
       def is_event
         true
@@ -39,7 +39,7 @@ module Skylab::Callback
 
       def is? stream_i
         (( @cs ||= Callback_::Digraph::Contextualized_Stream_Name.
-          new( @stream_name, event_stream_graph ) )).is? stream_i
+          new( @stream_symbol, event_stream_graph ) )).is? stream_i
       end
 
       undef_method :to_s  # for now this is here to catch mistakes loudly
@@ -55,9 +55,9 @@ module Skylab::Callback
 
     class Textual < Unified  # #storypoint-12
 
-      def initialize esg, stream_name, text
+      def initialize esg, stream_symbol, text
         @text = text
-        super esg, stream_name
+        super esg, stream_symbol
       end
 
       attr_reader :text

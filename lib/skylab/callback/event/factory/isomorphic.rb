@@ -7,19 +7,19 @@ module Skylab::Callback
       @reso = Resolution__.curry h, box_module
     end
 
-    def call graph, stream_name, * payload_a
-      mod = @stream_name_to_event_class_cache_h.fetch stream_name do
-        resolve_event_module graph, stream_name
+    def call graph, stream_symbol, * payload_a
+      mod = @stream_name_to_event_class_cache_h.fetch stream_symbol do
+        resolve_event_module graph, stream_symbol
       end
-      mod.event graph, stream_name, *payload_a
+      mod.event graph, stream_symbol, *payload_a
     end
 
     alias_method :[], :call  # quack like a ::Proc
 
   private
 
-    def resolve_event_module graph, stream_name
-      @reso.curry( graph, stream_name ).resolve
+    def resolve_event_module graph, stream_symbol
+      @reso.curry( graph, stream_symbol ).resolve
     end
 
     class Resolution__
@@ -41,22 +41,22 @@ module Skylab::Callback
         @stream_name_to_event_class_cache_h = otr.stream_name_to_event_class_cache_h
       end
     public
-      def curry graph, stream_name
+      def curry graph, stream_symbol
         otr = dup
-        otr.init_curry graph, stream_name
+        otr.init_curry graph, stream_symbol
         otr
       end
     protected
-      def init_curry graph, stream_name
-        @graph = graph ; @stream_name = stream_name
+      def init_curry graph, stream_symbol
+        @graph = graph ; @stream_symbol = stream_symbol
       end
     public
       def resolve  # the name isn't associated with an event class, so now we
         # walk: first we walk the whole nerk looking for *any* cached clas
         # all the way up.
         @class = nil
-        @seen_a = @graph.walk_pre_order( @stream_name, 1 ).
-            reduce( [ @stream_name ] ) do |seen, sym|
+        @seen_a = @graph.walk_pre_order( @stream_symbol, 1 ).
+            reduce( [ @stream_symbol ] ) do |seen, sym|
           @class = @stream_name_to_event_class_cache_h.fetch sym do
             seen << sym ; nil
           end

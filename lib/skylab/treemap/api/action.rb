@@ -161,9 +161,9 @@ module Skylab::Treemap
         2 => -> a, b { b.merge message: a }
       }
 
-      define_method :build_event do |stream_name, *payload_a|
+      define_method :build_event do |stream_symbol, *payload_a|
         payload_x = norm_h.fetch( payload_a.length )[ * payload_a ]
-        @event_factory[ self.class, stream_name, payload_x ]
+        @event_factory[ self.class, stream_symbol, payload_x ]
       end
     end.call
 

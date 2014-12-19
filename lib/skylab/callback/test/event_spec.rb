@@ -87,7 +87,7 @@ module Skylab::Callback::TestSupport::Event_Tests__
       end.call
 
       -> do
-        d = 'emit :nerk' ; m = 'expected stream_name :nerk, had :jerk'
+        d = 'emit :nerk' ; m = 'expected stream_symbol :nerk, had :jerk'
         it "an event with a not-matching stream name - x, #{ m.inspect }" do
           match [ build_event( :jerk ) ]
           expect_result false
@@ -97,7 +97,7 @@ module Skylab::Callback::TestSupport::Event_Tests__
       end.call
 
       -> do
-        rx = /undefined method `stream_name'/
+        rx = /undefined method `stream_symbol'/
         it "an array with a non-event element - X #{ rx }" do
           -> do
             match [ nil ]
@@ -251,7 +251,7 @@ module Skylab::Callback::TestSupport::Event_Tests__
 
       -> do
         d = "emit styled :important /\\bfoo\\b/"
-        m = "expected stream_name :important, had :impordunt"
+        m = "expected stream_symbol :important, had :impordunt"
         it "everything correct but channel - x, #{ m.inspect }" do
           match [ build_text_event( :impordunt, "\e[32mfoo\e[0m" ) ]
           expect_result false
@@ -326,19 +326,19 @@ module Skylab::Callback::TestSupport::Event_Tests__
       nub.failure_message_for_should.should eql x
     end
 
-    def build_event stream_name, *rest
+    def build_event stream_symbol, *rest
       # (a necessarily much simpler version than the one found in p.s)
-      Callback_::Event::Unified.new false, stream_name, *rest  # (no event graph)
+      Callback_::Event::Unified.new false, stream_symbol, *rest  # (no event graph)
     end
 
-    def build_text_event stream_name, text
-      TextEvent__.new false, stream_name, text
+    def build_text_event stream_symbol, text
+      TextEvent__.new false, stream_symbol, text
     end
     #
     class TextEvent__ < Callback_::Event::Unified
 
-      def initialize esg, stream_name, text
-        super esg, stream_name
+      def initialize esg, stream_symbol, text
+        super esg, stream_symbol
         @payload_x = text
       end
 

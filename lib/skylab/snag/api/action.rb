@@ -197,8 +197,8 @@ module Skylab::Snag
 
     # ~ overrides
 
-    def build_event stream_name, pay_x  # #note-195
-      @event_factory.call @event_stream_graph_p.call, stream_name, self, pay_x
+    def build_event stream_symbol, pay_x  # #note-195
+      @event_factory.call @event_stream_graph_p.call, stream_symbol, self, pay_x
     end
 
     include module Business_Methods___

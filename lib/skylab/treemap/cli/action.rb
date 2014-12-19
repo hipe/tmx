@@ -14,8 +14,8 @@ module Skylab::Treemap
 
     # it was too hard and too ridiculous to try to wedge this into the
     # mode client and the actions without overwriting a bunch of stuff.
-    o[:build_event] = -> stream_name, text do
-      @event_factory[ self.class, stream_name, text ]
+    o[:build_event] = -> stream_symbol, text do
+      @event_factory[ self.class, stream_symbol, text ]
     end
 
     o

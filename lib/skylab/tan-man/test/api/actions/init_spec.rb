@@ -16,7 +16,7 @@ module Skylab::TanMan::TestSupport::API::Actions
       end
 
       it "event stream name" do
-        event.stream_name.should eql :error
+        event.stream_symbol.should eql :error
       end
 
       it "event message" do
@@ -38,7 +38,7 @@ module Skylab::TanMan::TestSupport::API::Actions
           response.success?.should eql( true )
           event_a = response.send :json_data
           event = event_a.first
-          event[ :stream_name ].should eql( :info )
+          event[ :stream_symbol ].should eql( :info )
           event[ :shape ].should eql( :textual )
           event[ :payload ].should match( /mkdir local-conf\.d/ )
           _JSON = TestLib_::JSON[]
@@ -46,7 +46,7 @@ module Skylab::TanMan::TestSupport::API::Actions
           unencoded_a = _JSON.parse json
           unencoded_a.length.should eql( 2 )
           event = unencoded_a[ 0 ]
-          event[ 'stream_name' ].should eql( 'info' )
+          event[ 'stream_symbol' ].should eql( 'info' )
           event[ 'shape' ].should eql( 'textual' )
           event[ 'payload' ].should match( /mkdir local-conf\.d/ )
         end
@@ -64,7 +64,7 @@ module Skylab::TanMan::TestSupport::API::Actions
           response.events.length.should be_gte(1)
           response.success?.should eql(true)
           e = response.events.first
-          e.stream_name.should eql(:skip)
+          e.stream_symbol.should eql(:skip)
           e.message.should match( /already exists, skipping/i )
         end
       end
@@ -80,7 +80,7 @@ module Skylab::TanMan::TestSupport::API::Actions
           api_invoke path: path # not *from* tmpdir
           response.success?.should eql(false)
           e = response.events.first
-          e.stream_name.should eql(:error)
+          e.stream_symbol.should eql(:error)
           e.message.should match(
             /directory must exist: not-exist/
           )
@@ -98,7 +98,7 @@ module Skylab::TanMan::TestSupport::API::Actions
           api_invoke path: TMPDIR.join('nerk') # not *from* tmpdir
           response.success?.should eql(false)
           e = response.events.first
-          e.stream_name.should eql(:error)
+          e.stream_symbol.should eql(:error)
           e.message.should match(
             /path was file, not directory: nerk/ )
         end

@@ -151,7 +151,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
       _scn = Callback_::Scn.new do
 
-        if em_a.length.nonzero? && chan_i == em_a.first.stream_name
+        if em_a.length.nonzero? && chan_i == em_a.first.stream_symbol
           str = em_a.shift.string
           str.chop! or fail "empty string?"
           str

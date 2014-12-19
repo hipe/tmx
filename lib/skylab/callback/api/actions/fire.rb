@@ -6,7 +6,7 @@ module Skylab::Callback
                :files,
                :opendata,
                :modul,
-               :stream_name
+               :stream_symbol
     ].each { |k| attr_writer k }
 
     def execute
@@ -23,16 +23,16 @@ module Skylab::Callback
         n = @mod.instance_method(:initialize).parameters.count{|a, _| :req == a}
         obj = @mod.new(* n.times.map { } )
         did_fire = false
-        obj.send :"on_#{ @stream_name }" do |x|
+        obj.send :"on_#{ @stream_symbol }" do |x|
           did_fire = true
           if x.instance_variable_defined? :@event_stream_graph
             x.instance_variable_set :@event_stream_graph, '[..]'  # pray
           end
           @infostream.puts "OK: #{ x.inspect }"
         end
-        obj.send :call_digraph_listeners, @stream_name, _pay_x
+        obj.send :call_digraph_listeners, @stream_symbol, _pay_x
         if ! did_fire
-          @infostream.puts "(#{ prefix }did not see a #{ @stream_name } #{
+          @infostream.puts "(#{ prefix }did not see a #{ @stream_symbol } #{
             }event fire.)"
         end
         true

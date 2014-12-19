@@ -51,7 +51,7 @@ module Skylab::SubTree::TestSupport::CLI
       es = emit_spy
       client = client_class.new do |clnt|
         clnt.on_all do |e|
-          es.call_digraph_listeners e.stream_name, e.text
+          es.call_digraph_listeners e.stream_symbol, e.text
         end
       end
       client.instance_variable_set :@program_name, PN_
@@ -69,7 +69,7 @@ module Skylab::SubTree::TestSupport::CLI
       client_class.new sin: t.instream, out: t.outstream, err: t.errstream,
         program_name: PN_, wire_p:( -> emtr do
           emtr.on_all do |e|
-            es.call_digraph_listeners e.stream_name, e.text
+            es.call_digraph_listeners e.stream_symbol, e.text
           end
         end )
     end
@@ -109,7 +109,7 @@ module Skylab::SubTree::TestSupport::CLI
     def line_thru p
       e = emission_a.shift
       if e
-        @names.push e.stream_name
+        @names.push e.stream_symbol
         ev = e.payload_x
         _s = if ev.respond_to? :ascii_only? then ev else
           _exag = SubTree_::CLI.expression_agent
@@ -190,7 +190,7 @@ module Skylab::SubTree::TestSupport::CLI
       nil
     end
 
-    Emission_ = ::Struct.new :stream_name, :payload_x
+    Emission_ = ::Struct.new :stream_symbol, :payload_x
 
     def cd path, &block
       SubTree_._lib.clear_pwd_cache

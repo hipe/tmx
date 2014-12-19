@@ -7,13 +7,13 @@ module Skylab::Callback
     # on how the payload data looked.  Please don't use this for new code -
     # it is intended to help adapt old code to the New Way.
 
-    def call esg, stream_name, payload_x
+    def call esg, stream_symbol, payload_x
       name = payload_x.class.name
       if name.index ':'
-        rewrap esg, stream_name, payload_x
+        rewrap esg, stream_symbol, payload_x
       else
         fact = @const_getter.const_get name.intern, false
-        fact.event esg, stream_name, payload_x
+        fact.event esg, stream_symbol, payload_x
       end
     end
 
@@ -26,9 +26,9 @@ module Skylab::Callback
       @rewrap = rewrap
     end
 
-    def rewrap esg, stream_name, payload_x
+    def rewrap esg, stream_symbol, payload_x
       if @rewrap
-        @rewrap[ esg, stream_name, payload_x ]
+        @rewrap[ esg, stream_symbol, payload_x ]
       else
         payload_x  # meh.
       end

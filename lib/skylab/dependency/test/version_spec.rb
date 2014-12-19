@@ -60,7 +60,7 @@ module Skylab::Dependency::TestSupport
     def _parse str
       ui = UI::Tee.new
       sexp = Dep_::Version::parse_string_with_version(str) do |o|
-        o.on_informational { |e| ui.err.puts("#{e.stream_name}: #{e.text}") }
+        o.on_informational { |e| ui.err.puts("#{e.stream_symbol}: #{e.text}") }
       end
       sexp.unparse.should eql(str)
       ui.err_string.should eql("")

@@ -5,12 +5,12 @@ module Skylab::Treemap
 
   module API::Event::Annotated
     # we had to do some late-binding to preserve how api wants to do it
-    def self.event arg1, stream_name, payload_x
+    def self.event arg1, stream_symbol, payload_x
       if payload_x.respond_to? :key?
         API::Event::Annotated::Struct_Presumtuous.event(
-          arg1, stream_name, payload_x )
+          arg1, stream_symbol, payload_x )
       else
-        API::Event::Annotated::Text.event arg1, stream_name, payload_x
+        API::Event::Annotated::Text.event arg1, stream_symbol, payload_x
       end
     end
   end
@@ -45,7 +45,7 @@ module Skylab::Treemap
       self.class.members.include? name
     end
 
-    def initialize action_sheet, stream_name
+    def initialize action_sheet, stream_symbol
       # (at this point your ivars are already set with rich, complex metadata)
       super action_sheet
     end

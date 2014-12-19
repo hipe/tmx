@@ -53,7 +53,7 @@ module Skylab::Git::TestSupport::CLI
       baked_a = bkd_a
       line = baked_a.shift
       line or fail "expected at least one more '#{ stream_i }' line, had none"
-      line.stream_name.should eql stream_i
+      line.stream_symbol.should eql stream_i
       s = line.string.chomp!
       styled_i and s = filter_for_style_expectation( styled_i, s )
       if exp_x.respond_to? :named_captures
@@ -86,7 +86,7 @@ module Skylab::Git::TestSupport::CLI
     def contiguous_string_from_lines_on i
       line_a = bkd_a
       s_a = []
-      while line_a.length.nonzero? and i == line_a[ 0 ].stream_name
+      while line_a.length.nonzero? and i == line_a[ 0 ].stream_symbol
         line = line_a.shift
         s_a << line.string
       end
@@ -103,7 +103,7 @@ module Skylab::Git::TestSupport::CLI
       if bkd_a.length.nonzero?
         no = @baked_a.fetch 0
         fail "expected no more lines, had at least #{
-          }on more: [#{ no.stream_name.inspect }, #{ no.string.inspect }]"
+          }on more: [#{ no.stream_symbol.inspect }, #{ no.string.inspect }]"
       end
     end
 

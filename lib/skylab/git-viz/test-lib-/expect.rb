@@ -27,7 +27,7 @@ module Skylab::GitViz
           elsif @expectation.on_channel_i_a
             expct_channel_i_a
           elsif (( i = default_channel_i ))
-            @em.stream_name.should eql i
+            @em.stream_symbol.should eql i
           end
           @matchee_x = @em.payload_x
           @expectation.is_styled and expct_styled_and_unstyle
@@ -44,7 +44,7 @@ module Skylab::GitViz
         end
 
         def expct_channel_i
-          @em.stream_name.should eql @expectation.on_channel_i ; nil
+          @em.stream_symbol.should eql @expectation.on_channel_i ; nil
         end
 
         def expct_channel_i_a

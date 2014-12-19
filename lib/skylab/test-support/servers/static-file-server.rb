@@ -40,7 +40,7 @@ module Skylab::TestSupport
 
     def init_event_handling
       on_all do |e|
-        lvl_d = LEVELS_.index e.stream_name
+        lvl_d = LEVELS_.index e.stream_symbol
         if ! lvl_d || lvl_d >= @log_level_idx
           @downstream.puts render_event_as_line( e )
         end
@@ -51,7 +51,7 @@ module Skylab::TestSupport
     LEVELS_= Callback_::Digraph::COMMON_LEVELS
 
     def render_event_as_line e
-      ">>> (#{ moniker } #{ e.stream_name } - #{ e.text })"
+      ">>> (#{ moniker } #{ e.stream_symbol } - #{ e.text })"
     end
 
     def send_error_string msg

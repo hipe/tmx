@@ -137,8 +137,8 @@ module Skylab::Callback::TestSupport
         @s = nil ; @up = act_a[ idx ] ; nil
       end
       attr_reader :index
-      def stream_name
-        @up.stream_name
+      def stream_symbol
+        @up.stream_symbol
       end
       def any_matchable_string
         @matchable_string_was_mutated ? @s : ( @up.payload_x if @up )
@@ -319,9 +319,9 @@ module Skylab::Callback::TestSupport
         end
         description_slot_i :channel
         def see_when_event act
-          act_i = act.stream_name
+          act_i = act.stream_symbol
           if @i != act_i
-            fail_with_message "expected stream_name #{ @i.inspect }, #{
+            fail_with_message "expected stream_symbol #{ @i.inspect }, #{
               }had #{ act_i.inspect }"
           end ; nil
         end

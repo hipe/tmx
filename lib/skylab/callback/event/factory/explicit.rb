@@ -45,9 +45,9 @@ module Skylab::Callback
       physical_box.change name, x
     end
 
-    def call arg1, stream_name, arg3
-      @physical_h.fetch( @logical_h.fetch( stream_name ) ).event(
-        arg1, stream_name, arg3 )
+    def call arg1, stream_symbol, arg3
+      @physical_h.fetch( @logical_h.fetch( stream_symbol ) ).event(
+        arg1, stream_symbol, arg3 )
     end
 
     alias_method :[], :call  # #comport to look ::Proc-like

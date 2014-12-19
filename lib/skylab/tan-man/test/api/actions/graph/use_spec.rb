@@ -24,7 +24,7 @@ module Skylab::TanMan::TestSupport::API::Actions::Graph
           api_invoke path: 'some-path'
         end
         e = response.events.first
-        e.stream_name.should eql(:no_config_dir)
+        e.stream_symbol.should eql(:no_config_dir)
         e.message.should match( /local conf dir not found/ )
       end
     end

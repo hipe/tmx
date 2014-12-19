@@ -20,12 +20,12 @@ module Skylab::Dependency::TestSupport::Tasks
       o.context = context
       o.on_all do |e|
         debug_event e if do_debug
-        fingers[ e.stream_name ] << unstyle( e.text )
+        fingers[ e.stream_symbol ] << unstyle( e.text )
       end
     end
 
     def debug_event e
-      dputs [ e.stream_name, e.text ].inspect
+      dputs [ e.stream_symbol, e.text ].inspect
       nil
     end
   end

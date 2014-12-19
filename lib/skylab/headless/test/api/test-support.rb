@@ -53,7 +53,7 @@ module Skylab::Headless::TestSupport::API
     def shft_some_baked_chomped_line stream_i
       emission = bkd_emission_a.shift
       emission or fail "expected more emissions, had none"
-      emission.stream_name.should eql stream_i
+      emission.stream_symbol.should eql stream_i
       emission.string.chomp!
     end
     def bkd_emission_a

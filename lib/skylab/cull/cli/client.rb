@@ -125,7 +125,7 @@ module Skylab::Cull
     end
 
     def on_all e
-      @y << "#{ last_invocation_string } #{ e.stream_name }: #{
+      @y << "#{ last_invocation_string } #{ e.stream_symbol }: #{
         }#{ e.payload_a.first }"
       nil
     end

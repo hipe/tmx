@@ -60,7 +60,7 @@ describe "[st] CLI actions cov" do
 
     scn = Callback_::Scan.via_nonsparse_array emission_a
     em = scn.gets
-    em.stream_name.should eql :payload
+    em.stream_symbol.should eql :payload
 
     begin
 
@@ -68,21 +68,21 @@ describe "[st] CLI actions cov" do
       s.should match srbrx2
 
       em = scn.gets
-      if :payload == em.stream_name
+      if :payload == em.stream_symbol
         redo
       end
 
-      em.stream_name.should eql :info
+      em.stream_symbol.should eql :info
       s = text[ em ]
       s.should match test_files_in_hub_rx
 
       em = scn.gets
-      if :payload == em.stream_name
+      if :payload == em.stream_symbol
         redo
       end
     end while false
 
-    em.stream_name.should eql :info
+    em.stream_symbol.should eql :info
     text[ em ].should match test_files_in_total_rx
 
     em = scn.gets
@@ -95,21 +95,21 @@ describe "[st] CLI actions cov" do
     argv CMD_, '-s', Abs_testdir_[]
     scn = Callback_::Scan.via_nonsparse_array emission_a
     em = scn.gets
-    em.stream_name.should eql :payload
+    em.stream_symbol.should eql :payload
     text[ em ].should match %r(\A/.+/test\z)  # first line is test dir abspath
     em = scn.gets
-    em.stream_name.should eql :payload
+    em.stream_symbol.should eql :payload
     begin
       text[ em ].should match srbrx
       em = scn.gets
-      if :payload == em.stream_name
+      if :payload == em.stream_symbol
         redo
       end
     end while false
-    em.stream_name.should eql :info
+    em.stream_symbol.should eql :info
     text[ em ].should match test_files_in_hub_rx
     em = scn.gets
-    em.stream_name.should eql :info
+    em.stream_symbol.should eql :info
     text[ em ].should match test_files_in_total_rx
     em = scn.gets
     em.should be_nil

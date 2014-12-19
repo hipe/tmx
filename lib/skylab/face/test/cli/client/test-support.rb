@@ -129,7 +129,7 @@ module Skylab::Face::TestSupport::CLI::Client
     end
   end
 
-  Whereby = ::Struct.new :sym, :rx, :modifier, :stream_name
+  Whereby = ::Struct.new :sym, :rx, :modifier, :stream_symbol
 
   module InstanceMethods
 
@@ -212,7 +212,7 @@ module Skylab::Face::TestSupport::CLI::Client
       define_method :expect_line_to_be do |as_sym, idx_ref=true|
         as = fetch_as as_sym
         meth = which_h.fetch as.modifier
-        send meth, as.rx, idx_ref, as.stream_name
+        send meth, as.rx, idx_ref, as.stream_symbol
       end
     end.call
 
@@ -228,8 +228,8 @@ module Skylab::Face::TestSupport::CLI::Client
       expect_line_to_be as_sym, idx
     end
 
-    def expect_styled_line rx, idx_ref=true, stream_name=:err
-      line = expect_line idx_ref, stream_name
+    def expect_styled_line rx, idx_ref=true, stream_symbol=:err
+      line = expect_line idx_ref, stream_symbol
       if ! line then line else  # future-proof
         text = expect_styled line
         if ! text then text else
@@ -261,16 +261,16 @@ module Skylab::Face::TestSupport::CLI::Client
       did_match  # (sorry, we are waiting for [#ts-009] test-failure exceptions)
     end
 
-    def expect_line idx_ref, stream_name=:err
+    def expect_line idx_ref, stream_symbol=:err
       if true == idx_ref
-        lines.fetch( stream_name ).shift or
-          fail "there was no more \"#{ stream_name }\" line."
+        lines.fetch( stream_symbol ).shift or
+          fail "there was no more \"#{ stream_symbol }\" line."
       else
-        lins = lines.fetch stream_name
+        lins = lines.fetch stream_symbol
         begin
           lins.fetch idx_ref
         rescue ::IndexError => e
-          raise ::IndexError, "can't fetch \"#{ stream_name }\" line - #{ e }"
+          raise ::IndexError, "can't fetch \"#{ stream_symbol }\" line - #{ e }"
         end
       end
     end

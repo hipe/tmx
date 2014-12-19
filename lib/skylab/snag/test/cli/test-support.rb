@@ -132,7 +132,7 @@ module Skylab::Snag::TestSupport::CLI
       emission = output.lines.shift
       emission or fail "had no more events in queue, expecting #{
         }#{ [ chan_i, x ].inspect }"
-      emission.stream_name.should eql chan_i
+      emission.stream_symbol.should eql chan_i
       emission.string.chomp!  # meh
       if x.respond_to? :ascii_only?
         emission.string.should eql x
