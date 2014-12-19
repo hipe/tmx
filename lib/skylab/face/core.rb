@@ -63,7 +63,7 @@ module Skylab::Face  # read [#011] the top node narrative
     end
 
     DSL_DSL_story = -> * a do
-      MH__[]::DSL_DSL::Story_.new( * a )
+      MH__[]::DSL_DSL::Story.new( * a )
     end
 
     EN_add_private_methods_to_module = -> i_a, mod do

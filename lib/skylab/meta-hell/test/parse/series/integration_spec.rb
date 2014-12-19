@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::Parse::Series__::Intgrtn
+module Skylab::MetaHell::TestSupport::Parse::Series::Intgrtn
 
-  ::Skylab::MetaHell::TestSupport::Parse::Series__[ self ]
+  ::Skylab::MetaHell::TestSupport::Parse::Series[ self ]
 
   include Constants
 

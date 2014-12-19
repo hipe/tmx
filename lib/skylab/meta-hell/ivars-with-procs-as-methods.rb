@@ -2,8 +2,8 @@ module Skylab::MetaHell
 
   module Ivars_with_Procs_as_Methods
 
-    # can act as an enhancer that enhances a class via
-    # enabling ivars that hold procs to act as methods of the object:
+
+    # enhance a class via enabling ivars to hold procs that act as methods
     #
     #     class Foo
     #       def initialize
@@ -14,22 +14,22 @@ module Skylab::MetaHell
     #
     #     Foo.new.bar  # => :baz
 
-    # You can use ivars with arbitrary names
-    # like so:
+
+    # you can indicate an ivar with a name other than the method name:
     #
-    #     class Foo
+    #     class Bar
     #       def initialize
     #         @_secret = -> { :ting }
     #       end
     #       Subject_[ self, :@_secret, :wahoo ]
     #     end
     #
-    #     Foo.new.wahoo  # => :ting
+    #     Bar.new.wahoo  # => :ting
 
-    # You can use the DSL to control visibility
-    # like so:
+
+    # you can use the DSL to control visibility
     #
-    #     class Foo
+    #     class Baz
     #       def initialize
     #         @_go = -> { :thats_right }
     #         @_hi = -> x { "HI:#{ x }" }
@@ -41,24 +41,26 @@ module Skylab::MetaHell
     #
     #     end
     #
-    #     f = Foo.new
+    #     foo = Baz.new
     #
-    #     foo._hi 'X' #=> "HI:X"
+    #     foo._hi( 'X' ) #=> "HI:X"
     #     foo.yep  # => NoMethodError: private method `yep' called for ..
     #     foo.send( :yep )  # => :thats_right
     #
 
-    # Alternately you can use the struct-like producer to create an entire
-    # class with this behavior like so:
+
+    # you can use the struct-like producer to create the class automatically
     #
     #     Wahoo = Subject_[].new :fief do
     #       def initialize
     #         @fief = -> { :zap }
     #       end
     #     end
+    #
     #     Wahoo.new.fief  # => :zap
     #
     # enjoy!
+
 
     class << self
 

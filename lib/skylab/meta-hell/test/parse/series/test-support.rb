@@ -1,6 +1,6 @@
 require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport::Parse::Series__
+module Skylab::MetaHell::TestSupport::Parse::Series
 
   ::Skylab::MetaHell::TestSupport::Parse[ self ]
 

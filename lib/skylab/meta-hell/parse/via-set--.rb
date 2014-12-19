@@ -40,38 +40,49 @@ module Skylab::MetaHell
     # your `memo` as an #output-argument.
     #
     # regardless of the input,
+    #
+    # with one such parser build from an empty set of parsers,
+    #
+    #     None = MetaHell_::Parse.via_set.curry[ :pool_procs, [ ] ]
+    #
+    #
     # a parser with no nodes in it will always report 'no parse' and 'spent':
     #
-    #     P = MetaHell_::Parse.via_set.curry[ :pool_procs, [ ] ]
-    #
-    #     P[ argv = [] ]  # => [ false, true ]
+    #     None[ argv = [] ]  # => [ false, true ]
     #     argv # => []
+    #
     #
     # even if the input is rando calrissian:
     #
-    #     P[ argv = :hi_mom ]  # => [ false, true ]
+    #     None[ argv = :hi_mom ]  # => [ false, true ]
     #     argv  # => :hi_mom
 
+
     # with parser with one node that reports it always matches & always spends
-    # it always reports the same as a final result:
     #
-    #     P = MetaHell_::Parse.via_set.curry[ :pool_procs, [
+    #     One = MetaHell_::Parse.via_set.curry[ :pool_procs, [
     #      -> _input {  [ true, true ] }
     #     ]]
     #
-    #     P[ :whatever ]  # => [ true, true ]
-
-    # with a parser with one node that reports it never matches & always spends
+    #
     # it always reports the same as a final result:
     #
-    #     P = MetaHell_::Parse.via_set.curry[ :pool_procs, [
+    #     One[ :whatever ]  # => [ true, true ]
+
+
+    # with a parser with one node that reports it never matches & always spends
+    #
+    #     Spendless = MetaHell_::Parse.via_set.curry[ :pool_procs, [
     #       -> _input {  [ false, true ] }
     #     ]]
     #
-    #     P[ :whatever ]  # => [ false, true ]
+    #
+    # it always reports the same as a final result:
+    #
+    #     Spendless[ :whatever ]  # => [ false, true ]
 
-    # with a parser that parses any digits & any of 2 keywords (only once each):
-    # it will do nothing to nothing:
+
+    # a parser that parses any digits & any of 2 keywords (only once each):
     #
     #     keyword = -> kw do
     #       -> memo, argv do
@@ -83,7 +94,7 @@ module Skylab::MetaHell
     #       end
     #     end
     #
-    #     P = MetaHell_::Parse.via_set.curry[ :pool_procs, [
+    #     Digits = MetaHell_::Parse.via_set.curry[ :pool_procs, [
     #       keyword[ 'foo' ],
     #       keyword[ 'bar' ],
     #       -> memo, argv do
@@ -94,44 +105,53 @@ module Skylab::MetaHell
     #       end
     #     ]]
     #
-    #     P[ ( memo = { } ), [] ] # => [ false, false ]
+    #
+    # does nothing with nothing:
+    #
+    #     Digits[ ( memo = {} ), [] ]  # => [ false, false ]
     #     memo.length  # => 0
+    #
     #
     # parses one digit:
     #
-    #     P[ ( memo = { } ), argv = [ '1' ] ]  # => [ true, false ]
+    #     Digits[ ( memo = { } ), argv = [ '1' ] ]  # => [ true, false ]
     #     argv.length  # => 0
     #     memo[ :nums ]  # => [ 1 ]
     #
+    #
     # parses two digits:
     #
-    #     P[ ( memo = { } ), argv = [ '2', '3' ] ]  # => [ true, false ]
+    #     Digits[ ( memo = { } ), argv = [ '2', '3' ] ]  # => [ true, false ]
     #     argv.length  # => 0
     #     memo[ :nums ]  # => [ 2, 3 ]
     #
+    #
     # parses one keyword:
     #
-    #     P[ ( memo = { } ), argv = [ 'bar' ] ]  # => [ true, false ]
+    #     Digits[ ( memo = { } ), argv = [ 'bar' ] ]  # => [ true, false ]
     #     argv.length  # => 0
     #     memo[ :bar ]  # => true
+    #
     #
     # parses two keywords:
     #
-    #     P[ ( memo = { } ), argv = [ 'bar', 'foo' ] ]  # => [ true, false ]
+    #     Digits[ ( memo = { } ), argv = [ 'bar', 'foo' ] ]  # => [ true, false ]
     #     argv.length  # => 0
     #     memo[ :bar ]  # => true
     #     memo[ :foo ]  # => true
     #
+    #
     # will not parse multiple of same keyword:
     #
-    #     P[ ( memo = { } ), argv = [ 'foo', 'foo' ] ]  # => [ true, false ]
+    #     Digits[ ( memo = { } ), argv = [ 'foo', 'foo' ] ]  # => [ true, false ]
     #     argv  # => [ 'foo' ]
     #     memo[ :foo ]  # => true
+    #
     #
     # will stop at first non-parsable:
     #
     #     argv = [ '1', 'foo', '2', 'biz', 'bar' ]
-    #     P[ ( memo = { } ), argv ]  # => [ true, false ]
+    #     Digits[ ( memo = { } ), argv ]  # => [ true, false ]
     #     argv  # => [ 'biz', 'bar' ]
     #     memo[ :nums ]  # => [ 1, 2 ]
     #     memo[ :foo  ]  # => true

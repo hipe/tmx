@@ -27,32 +27,32 @@ module Skylab::MetaHell
     #       end
     #     end
     #
-    #     MyApp::CLI::Client.class  # => ::Class
-    #
     # There is a class MyApp::CLI::Client and a class MyApp::API::Client.
     # There are the modules MyApp, MyApp::CLI and MyApp::API.
     #
     # Let's say that the CLI Client *instance* for some reason (and watch for
-    # smells here!) wanted to access the API Client *class*. This enhancement
-    # library would facilitate that thus:
+    # smells here!) wanted to access the API Client *class*.
+    #
+    # from one instance you can reach a module in its class's graph:
     #
     #     module MyApp
     #       class CLI::Client
     #         MetaHell_::Module::Accessors.enhance self do
     #           public_methods do
-    #             module_reader :api_client, '../../API/Client'
+    #             module_reader :API_client_module, '../../API/Client'
     #           end
     #         end
     #       end
     #     end
     #
     #     cli = MyApp::CLI::Client.new
-    #     cli.api_client  # => MyApp::API::Client
+    #     cli.API_client_module  # => MyApp::API::Client
     #
     #
-    # The above says, "define on MyAppp::CLI::Client a private instance method
-    # called `api_client` that when called will result in the class
+    # The above says, "define on MyAppp::CLI::Client a public instance method
+    # called `API_client_module` that when called will result in the class
     # `MyApp::API::Client`."
+
 
     # There are also undocumented facilities for auto-vivifying the constants
     # (that is, creating them when they don't already exist (or aren't
@@ -61,11 +61,12 @@ module Skylab::MetaHell
     # ("initializing" a module might mean enhancing it with some nonsense
     # before you use it, e.g boxxy-fying it.)
     #
-    # here's the autovivifying hack -
-    # like so
+    # here's the autovivifying hack:
     #
     #     class Foo
+    #
     #       MetaHell_::Module::Accessors.enhance self do
+    #
     #         private_module_autovivifier_reader :zapper, 'Ohai_',
     #           -> do  # when didn't exist
     #             m = ::Module.new
@@ -84,13 +85,13 @@ module Skylab::MetaHell
     #       end
     #     end
     #
-    #     Foo.const_defined?( :Ohai_, false )  # => false
     #
     # the first time the thing is accessed, the two procs are called:
     #
     #     foo = Foo.new
     #     foo.touch
     #     Foo::Ohai_.instance_variable_get( :@counter )  # => 1
+    #
     #
     # if you create the thing before it is accessed, etc:
     #

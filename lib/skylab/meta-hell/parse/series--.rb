@@ -13,11 +13,11 @@ module Skylab::MetaHell
     # specifically, consider the example "grammar" of `[age] [sex] [location]`.
     # a primitive attempt at this as a ruby method signature is:
     #
-    #   def asl age=nil, sex=nil, location=nil
+    #     def asl age=nil, sex=nil, location=nil
     #
     # however we would like it to work for calls like
     #
-    #   asl "male", "Berlin"
+    #     asl "male", "Berlin"
     #
     # which would not work as illustrated. we can, however, create one
     # function for each of the formal parameters that can be used to indicate
@@ -36,7 +36,7 @@ module Skylab::MetaHell
     #
     # (as such, `args` of length zero always succeeds. `args` of length longer
     # than length of `p_a` will always execute the "exhaustion action")
-    #
+
     # NOTE that despite the flexibility that is afforded by such a signature,
     # the position of the actual arguments still is not freeform - they must
     # occur in the same order with respect to each other as they occur in the
@@ -67,8 +67,7 @@ module Skylab::MetaHell
     # with `curry` you can separate the step of creating the parser from
     # the step of using it.
     #
-    # curry a parser by telling it what part(s) you are giving it,
-    # e.g curry this parser by giving it `matchers` in advance of usage:
+    # curried usage:
     #
     #     P = MetaHell_::Parse.series.curry[
     #       :token_matchers, [
@@ -83,19 +82,26 @@ module Skylab::MetaHell
     #         end
     #     ] ]
     #
+    #
+    # works to match each of the three terms
+    #
     #     P[ [ '30', 'male', "Mom's basement" ] ]  # => [ '30', 'male', "Mom's basement" ]
+    #
     #
     # or just the first one:
     #
     #     P[ [ '30' ] ]              # => [ '30', nil, nil ]
     #
+    #
     # or just the last one:
     #
     #     P[ [ "Mom's basement" ] ]  # => [ nil, nil, "Mom's basement" ]
     #
+    #
     # or just the middle one, etc (note it gets precedence over last)
     #
     #     P[ [ 'M' ] ]               # => [ nil, 'M', nil ]
+    #
     #
     # but now here's the rub: if you re-curry the parser (!) and
     # if you set `exhaustion` to `false`, it terminates at first non-parsable:
@@ -104,6 +110,7 @@ module Skylab::MetaHell
     #     omg = P.curry[ :exhaustion, false ]
     #     omg[ argv ]  # => [ '30', 'm', "Mom's" ]
     #     argv  # => [ "Mom's again" ]
+    #
     #
     # (for contrast, here's the same thing, but with errors:)
     #
@@ -175,18 +182,20 @@ module Skylab::MetaHell
     #
     # note that while we keep the method signatures simple (monadic in/out),
     # one way to do scanning in addition to matching is to
-    # indicate `token_streams` instead of `token_matchers`:
+    # indicate `token_scanners` instead of `token_matchers`:
     #
-    #     P = MetaHell_::Parse.series.curry[
-    #       :token_streams, [
+    # indicating `token_scanners` instead of `token_matchers`
+    #
+    #     p = MetaHell_::Parse.series.curry[
+    #       :token_scanners, [
     #         -> feet   { /\A\d+\z/ =~ feet and feet.to_i },
     #         -> inches { /\A\d+(?:\.\d+)?\z/ =~ inches and inches.to_f }
     #       ] ]
     #
-    #     P[ [ "8"   ] ]         # => [ 8,  nil  ]
-    #     P[ [ "8.1" ] ]         # => [ nil, 8.1 ]
-    #     P[ [ "8", "9" ] ]      # => [ 8, 9.0 ]
-    #     P[ [ "8.1", "8.2" ] ]  # => ArgumentError: unrecognized argument ..
+    #     p[ [ "8"   ] ]         # => [ 8,  nil  ]
+    #     p[ [ "8.1" ] ]         # => [ nil, 8.1 ]
+    #     p[ [ "8", "9" ] ]      # => [ 8, 9.0 ]
+    #     p[ [ "8.1", "8.2" ] ]  # => ArgumentError: unrecognized argument ..
     #
     # NOTE however that when doing this you have to be more careful:
     # no longer is the simple true-ishness of your result used to determine

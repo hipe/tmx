@@ -2,12 +2,12 @@ module Skylab::MetaHell
 
   module Lib__
 
-    # `function_chain` - given a stack of functions and one seed value,
-    # resolve one result.. fuller description at [#026].
+    # given a queue of functions and one seed value, produce one result
     #
-    # opaque but comprehensive example:
     #
-    #     f_a = [
+    #     FUNC = begin
+    #
+    #     _p_a = [
     #       -> item do
     #         if 'cilantro' == item            # the true-ishness of the 1st
     #           [ false, 'i hate cilantro' ]   # element in the result tuple
@@ -23,18 +23,39 @@ module Skylab::MetaHell
     #           [ item1, item2 ]
     #         end
     #       end ]
-    #     s = MetaHell_.function_chain 'cilantro',  * f_a
+    #
+    #
+    #       MetaHell_.function_chain.curry[ _p_a ]
+    #     end
+    #
+    #
+    # this short circuits at te first branch, resulting in a value
+    #
+    #     s = FUNC[ 'cilantro' ]
     #     s  # => 'i hate cilantro'
-    #     s = MetaHell_.function_chain 'carrots', * f_a
+    #
+    #
+    # resulting in a single true-ish item will result in that value
+    #
+    #     s = FUNC[ 'carrots' ]
     #     s  # => "let's have carrots and potato"
-    #     s = MetaHell_.function_chain 'red', * f_a
+    #
+    #
+    # resulting in the tuple [ false, X ] gives you X
+    #
+    #     s = FUNC[ 'red' ]
     #     s  # => 'nope i hate tomato'
-    #     x = MetaHell_.function_chain 'blue', * f_a
+    #
+    #
+    # this followed all the way through to the end with a true-ish itme
+    #
+    #     x = FUNC[ 'blue' ]
     #     x  # => [ 'blue', 'potato' ]
+    #
     #
     # Blue potato. everything should be perfectly clear now.
 
-    Function_chain = -> p_a, first_arg_a do
+    Function_chain = -> p_a, first_arg_a do  # see [#026]
       res_a = p_a.reduce first_arg_a do |arg_a, p|
         ok, *rest = p[ * arg_a ]
         if ok

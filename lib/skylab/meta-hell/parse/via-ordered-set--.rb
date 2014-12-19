@@ -22,14 +22,13 @@ module Skylab::MetaHell
     # "ordered" because the order the symbols appear in determines the order
     # of the result.
     #
-    # like so:
+    # with an ordered set parser (built from a list of arbitrary procs)
     #
     #     PARSER = MetaHell_::Parse.via_ordered_set.curry[
     #       :argv_streams, [
     #         -> args { args.shift if args.first =~ /bill/i },
     #         -> args { if :hi == args.first then args.shift and :hello end }]]
     #
-    #     1  # => 1
     #
     # result array is in order of "grammar", not of elements in argv:
     #
@@ -39,12 +38,14 @@ module Skylab::MetaHell
     #     two  # => :hello
     #     argv # => [ 'bob' ]
     #
+    #
     # it cannot fail (if `set_a` is array of monadic functions and `argv` is ary)
     #
     #     argv = [ :nope ]
     #     res = PARSER.call argv
     #     res  # => [ nil, nil ]
     #     argv # => [ :nope ]
+    #
     #
     # an unparsable element will "mask" subsequent would-be parsables:
     #

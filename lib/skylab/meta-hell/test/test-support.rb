@@ -42,4 +42,17 @@ module Skylab::MetaHell::TestSupport
       klass.new
     end
   end
+
+  module Ivars_with_Procs_as_Methods
+
+    # #tracking [#ts-039] frontier for a possible new argument function for `Subject_`
+
+    Skylab::MetaHell::TestSupport[ self ]
+
+    Subject_ = -> * x_a, & p do
+
+      MetaHell_::Ivars_with_Procs_as_Methods[ * x_a, & p ]
+
+    end
+  end
 end

@@ -7,24 +7,34 @@ module Skylab::MetaHell
     # `initialize` for use in constructors) that accept as arguments
     # "iambic"-looking lists (either globbed or not globbed depending on you).
     #
+    # enhance your class using the iambic DSL:
+    #
     #     class Foo
     #       MetaHell_::Basic_Fields.with :client, self,
     #         :globbing, :absorber, :initialize,
     #         :field_i_a, [ :ding, :bat ]
     #     end
     #
-    #     (( FOO = Foo.new )).instance_variables.sort  # => [ :@bat, :@ding ]
+    #     foo = Foo.new
+    #
+    #
+    # contructed with no args, your instance will have nilified ivars
+    #
+    #     foo.instance_variables.sort  # => [ :@bat, :@ding ]
+    #
     #
     # it does not, however, give you attr readers
     #
-    #     FOO.respond_to?( :bat )  # => false
-    #     FOO.class.private_method_defined?( :bat )  # => false
+    #     foo.respond_to?( :bat )  # => false
+    #     foo.class.private_method_defined?( :bat )  # => false
+    #
     #
     # it sets *all* field ivars to nil, and then sets the values given
     #
     #     foo = Foo.new( :bat, :x )
     #     foo.instance_variable_get( :@bat )  # => :x
     #     foo.instance_variable_get( :@ding )  # => nil
+    #
     #
     # although it does not enforce required fields, it enforces the valid set
     #
@@ -167,19 +177,20 @@ module Skylab::MetaHell
     end
 
     # when you use the "struct like" "macro",
-    # you get a `members` instance method
     #
-    #     class Foo
+    #     class Bar
     #       MetaHell_::Basic_Fields.with :client, self, :struct_like,
     #         :globbing, :absorber, :initialize,
     #         :field_i_a, [ :fiz, :faz ]
     #     end
     #
-    #     Foo.new.members  # => [ :fiz, :faz ]
+    # you get a `members` instance method
+    #
+    #     Bar.new.members  # => [ :fiz, :faz ]
     #
     # you get an attr reader and writer for each member
     #
-    #     f = Foo.new :faz, :hi
+    #     f = Bar.new :faz, :hi
     #     f.faz  # => :hi
     #     f.fiz  # => nil
     #     f.faz = :horf
@@ -189,7 +200,7 @@ module Skylab::MetaHell
     #
     # and you get an alias from '[]' to 'new'
     #
-    #     Foo[ :fiz, :hoo, :faz, :harf ].fiz  # => :hoo
+    #     Bar[ :fiz, :hoo, :faz, :harf ].fiz  # => :hoo
     #
 
     Define_struct_like_methods__ = -> mod, field_i_a do
@@ -223,15 +234,10 @@ module Skylab::MetaHell
       end
     end
 
-    # Iambic_detect
-    # is a hack that lets to peek into iambic arrays:
+    # `iambic_detect` is a hack to peek into an iambic array
     #
-    #   a = [ :one, 'two', :three, 'four' ]
-    #   Iambic_detect__[ :three, a ]  # => 'four'
+    #     a = [ :one, 'two', :three, 'four' ]
+    #     MetaHell_::Basic_Fields.iambic_detect[ :three, a ]  # => 'four'
 
-  end
-
-  module BasicFields
-    # #until [#mh-059]
   end
 end

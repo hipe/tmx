@@ -41,12 +41,11 @@ module Skylab::MetaHell
       end
     end
 
-    # fuzzy matcher - partial match anchored to beginning
-    # it's a proc that generates other procs
+    # `fuzzy_metcher` generates pass filter procs with a specified precision
     #
     #     p = Subject_[].fuzzy_matcher 3, 'foobie'
     #
-    #     p[ 'f' ] # => nil
+    #     p[ 'f' ]  # => nil
     #     p[ 'foo' ]  # => true
     #     p[ 'foob' ]  # => true
     #     p[ 'foobie-doobie' ]  # => nil
@@ -63,8 +62,7 @@ module Skylab::MetaHell
       end
     end
 
-    # hack label
-    # like so -
+    # `hack_label` hacks an `as_human`-ish label from e.g an ivar name
     #
     #     p = Subject_[].hack_label
     #

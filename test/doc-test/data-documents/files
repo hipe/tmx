@@ -16,18 +16,18 @@ lib/skylab/face/plugin/host/proxy.rb
 lib/skylab/headless/cli/option--/core.rb  #branch-down-to-core  #regret-setup:no
 lib/skylab/headless/system--/services--/filesystem/cache--.rb  #branch-down-to-core #regret-setup:no
 lib/skylab/information-tactics/levenshtein.rb
-lib/skylab/meta-hell/basic-fields.rb #branch-down-to-core #regret-setup:no
-lib/skylab/meta-hell/dsl-dsl/core.rb  #regret-setup:no
+lib/skylab/meta-hell/basic-fields.rb  #branch-down-to-core
+lib/skylab/meta-hell/dsl-dsl/core.rb
 lib/skylab/meta-hell/fields/from.rb
-lib/skylab/meta-hell/lib--.rb  #regret-setup:no
-lib/skylab/meta-hell/parse/core.rb  #regret-setup:no
-lib/skylab/meta-hell/parse/alternation--.rb
-lib/skylab/meta-hell/parse/via-ordered-set--.rb
-lib/skylab/meta-hell/parse/via-set--.rb
-lib/skylab/meta-hell/parse/series--.rb  #branch-down-to-core #regret-setup:no
+lib/skylab/meta-hell/lib--.rb  #branch-down-to-core
+lib/skylab/meta-hell/parse/core.rb
+lib/skylab/meta-hell/parse/alternation--.rb  #setup-for-regret
+lib/skylab/meta-hell/parse/via-ordered-set--.rb  #chomp-module
+lib/skylab/meta-hell/parse/via-set--.rb  #setup-for-regret
+lib/skylab/meta-hell/parse/series--.rb  #branch-down-to-core
 lib/skylab/meta-hell/ivars-with-procs-as-methods.rb
-lib/skylab/meta-hell/module/accessors.rb
-lib/skylab/test-support/quickie/possible-/articulator-.rb #setup-for-regret #eponymous-const
+lib/skylab/meta-hell/module/accessors.rb  #setup-for-regret
+lib/skylab/test-support/quickie/possible-/articulator-.rb
 lib/skylab/test-support/doc-test/core.rb  #output-filename: integration/final/top_spec.rb  #look-for-ts
 lib/skylab/test-support/doc-test/models-/front/actions/generate.rb  #output-filename: ../../../models-front-actions/generate/integration/core_spec.rb
-  # we will do this at end of 'A-block':  lib/skylab/test-support/regret/api/actions/intermediates.rb  #setup-for-regret
+lib/skylab/test-support/regret/api/actions/intermediates.rb

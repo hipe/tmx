@@ -3,11 +3,11 @@
 [#037]       #tracking tag warnings wishlist (#parent-node: [#014])
 [#036]       make lexical scope deeper in quickie main document.
 [#035]       #parent-node:[#021] the system narrative ..
-[#034] #hole (was reference to a filename but no description)
+[#034] #open #parent-node: [015] "re-architect.."
 [#033]       #done if you un-orphanize core.rb it presents an issue with autoloader)
 [#032]       #done #parent-node: [#015] change syntax to work with contiguous nonblank lines
 [#031] #open #universal while regret no longer wires test nodes for autoloading
-[#030] #open the doc-test recursive spec needs mock fs
+[#030] #open #parent-node:[#015] the doc-test recursive spec needs mock fs
 [#029]       #tracking-tag the 'expect' omnibus and narrative ..
 [#028] #open #instances-tagged autoloading related ..
 [#027]       #parent-node: [#015] peek hack explained .. (was templo)
@@ -22,7 +22,7 @@
 [#018]       #quickie #in-situ
 [#017]       #doc-node #regret narrative
 [#016]       #parent-node:[#017] why we do not include parent anchor module..
-[#015]       #doc-node the doc test narrative ..
+[#015]       #doc-node the doc-test narrative ..
 [#014]       #parent-node: [#015] how nodes are generated ..
 [#013]       #done 351 extra tests (but this issue 2 states ago .. oh boy)
 [#012]       #done #parent-node: [#015] setup vs example?

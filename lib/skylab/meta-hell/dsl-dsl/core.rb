@@ -22,7 +22,7 @@ module Skylab::MetaHell
   # a "container proxy" adapter to take arbitrary actions when the DSL
   # is engaged if you like.
   #
-  # introductory example:
+  # if you define an `atom` field called 'wiz':
   #
   #     class Foo
   #       MetaHell_::DSL_DSL.enhance self do
@@ -35,42 +35,47 @@ module Skylab::MetaHell
   #     class Bar < Foo                   # subclass..
   #       wiz :piz                        # then set the value of `wiz`
   #     end
-  #                                       # read the value:
-  #     Bar.wiz_value # => :piz
   #
-  #     # but setters are private by default:
+  #
+  # you can read this value on the pertinent classes with `wiz_value`:
+  #
+  #     Bar.wiz_value  # => :piz
+  #
+  #
+  # these setter module methods are by default private:
   #
   #     Bar.wiz :other  # => NoMethodError: private method `wiz' called..
   #
-  #     # because this DSL generates only readers and not writers for your
-  #     # instances, you get a public reader of the same name in your
-  #     # instances (not suffixed with "_value").
   #
-  #                                        # read the value in an instance:
-  #     Bar.new.wiz # => :piz
+  # because this DSL generates only readers and not writers for your instances,
+  # you get a public instance getter of the same name (no `_value` suffix):
+  #
+  #     Bar.new.wiz  # => :piz
+  #
   #
   # happy hacking!
 
+
   def self.enhance host, &def_blk
-    Story_.new( host.singleton_class, host, ENHANCE_ADAPTER_ ).
+    Story.new( host.singleton_class, host, ENHANCE_ADAPTER__ ).
       instance_exec( & def_blk )
     nil
   end
 
   class Enhance_Adapter
     def add_field mm, im, fs
-      Add_field_[ mm, im, fs ]
+      Add_field__[ mm, im, fs ]
       nil
     end
 
     def add_or_change_value host, fs, x
-      Add_or_change_value_[ host.singleton_class, fs, x ]
+      Add_or_change_value__[ host.singleton_class, fs, x ]
       nil
     end
   end
-  ENHANCE_ADAPTER_ = Enhance_Adapter.new
+  ENHANCE_ADAPTER__ = Enhance_Adapter.new
 
-  Add_field_ = -> mm, im, fs do
+  Add_field__ = -> mm, im, fs do
     mm.send :private, fs.w1  # make the writer private
     mm.send :define_method, fs.r1 do end  # if it is never set
     mg = fs.r1
@@ -82,16 +87,16 @@ module Skylab::MetaHell
     nil
   end
 
-  Add_or_change_value_ = -> mm, fs, x do
+  Add_or_change_value__ = -> mm, fs, x do
     mm.send :undef_method, fs.r1
     mm.send :define_method, fs.r1 do x end
     nil
   end
 
-  Story_ = MetaHell_::Ivars_with_Procs_as_Methods.new(
+  Story = MetaHell_::Ivars_with_Procs_as_Methods.new(
     :atom, :atom_accessor, :list, :block )
 
-  class Story_
+  class Story
 
     # (the implementation of the DSL DSL)
 
@@ -100,7 +105,7 @@ module Skylab::MetaHell
       @atom, @atom_accessor, @list, @block = mm.module_exec do
 
         atom = -> i do
-          fs = Fstory_[ i, :atom ]
+          fs = Fstory__[ i, :atom ]
           define_method i do |x|
             box.add_or_change_value self, fs, x
             nil
@@ -124,7 +129,7 @@ module Skylab::MetaHell
         end
 
         list = -> i do
-          fs = Fstory_[ i, :list ]
+          fs = Fstory__[ i, :list ]
           define_method i do | * x_a |
             x_a.freeze  # at both instance and mod-level don't accid. mutate.
             box.add_or_change_value self, fs, x_a
@@ -135,7 +140,7 @@ module Skylab::MetaHell
         end
 
         block = -> i do
-          fs = Fstory_[ i, :block ]
+          fs = Fstory__[ i, :block ]
           define_method i do |&blk|
             blk or raise ::ArgumentError, "block required"
             box.add_or_change_value self, fs, blk
@@ -150,69 +155,76 @@ module Skylab::MetaHell
       nil
     end
 
-    Fstory_ = ::Struct.new :nn, :type, :r1, :w1, :r2
+    Fstory__ = ::Struct.new :nn, :type, :r1, :w1, :r2 do
     # `nn` = normalize name ; `r1` = read 1 (the module) ; `w1` = write 1 (
     # the module) ; `r2` = read 2 (the instance)
-    class Fstory_
       def initialize nn, type, r1="#{ nn }_value".intern, w1=nn, r2=nn
         super
       end
     end
 
-    # `block` define the value with a block
-    # but note you use `foo.call` from the instance:
+    # a `block` field called 'zinger' gives you an eponymous proc writer:
     #
-    #     class Foo
+    #     class Fob
     #       MetaHell_::DSL_DSL.enhance self do
     #         block :zinger
     #       end
     #     end
     #
-    #     class Bar < Foo
+    #     class Bab < Fob
     #       ohai = 0
     #       zinger do
     #         ohai += 1
     #       end
     #     end
     #
-    #     bar = Bar.new
+    #
+    # you must use `zinger.call` on the instance:
+    #
+    #     bar = Bab.new
     #     bar.zinger.call  # => 1
     #     bar.zinger.call  # => 2
     #
 
-    # `atom_accessor` lets you access the field
-    # in the instance in the same DSL-y way as in the class
+    # if you define an `atom_accessor` field 'with_name'
     #
-    #     class Foo
+    #     class Foc
     #       MetaHell_::DSL_DSL.enhance self do
     #         atom_accessor :with_name
     #       end
     #     end
     #
-    #     foo = Foo.new
+    #
+    # in the instance you can write to the field in the same DSL-y way
+    #
+    #     foo = Foc.new
     #     foo.with_name :x
     #     foo.with_name  # => :x
     #
 
   end
 
-  # can we use a module to hold and share an entire DSL?
-  # you can attempt to make a DSL reusable and inheritable like so:
+
+
+  # if you must, use a module and not a class to encapsulate reusability:
   #
-  #     module Foo
+  #     module Fod
   #       MetaHell_::DSL_DSL.enhance_module self do
   #         atom :pik
   #       end
   #     end
   #
-  #     class Bar
-  #       extend Foo::ModuleMethods
-  #       include Foo::InstanceMethods
+  #     class Badd
+  #       extend Fod::ModuleMethods
+  #       include Fod::InstanceMethods
   #       pik :nic
   #     end
   #
-  #     Bar.pik_value # => :nic
-  #     Bar.new.pik # => :nic
+  #
+  # then you can enhance a class with your module with the above two steps:
+  #
+  #     Badd.pik_value # => :nic
+  #     Badd.new.pik # => :nic
 
   def self.enhance_module amod, &def_blk
     mm, im = %i| ModuleMethods InstanceMethods |.map do |i|
@@ -222,29 +234,29 @@ module Skylab::MetaHell
         amod.const_set i, ::Module.new
       end
     end
-    Story_.new( mm, im, ENHANCE_MODULE_ADAPTER_ ).instance_exec( & def_blk )
+    Story.new( mm, im, ENHANCE_MODULE_ADAPTER__ ).instance_exec( & def_blk )
     nil
   end
 
-  Enhance_Module_Adapter_ = MetaHell_::Ivars_with_Procs_as_Methods.new(
+  Enhance_Module_Adapter__ = MetaHell_::Ivars_with_Procs_as_Methods.new(
     :add_field, :add_or_change_value )
-  class Enhance_Module_Adapter_
+  class Enhance_Module_Adapter__
     def initialize
       @add_field = -> mm, im, fs do
-        Add_field_[ mm, im, fs ]
+        Add_field__[ mm, im, fs ]
         nil
       end
       @add_or_change_value = -> host, fs, x do
         # imagine a child class that extended a module methods is changing
         # the defn for a field.
-        Add_or_change_value_[ host.singleton_class, fs, x ]
+        Add_or_change_value__[ host.singleton_class, fs, x ]
         nil
       end
       nil
     end
   end
 
-  ENHANCE_MODULE_ADAPTER_ = Enhance_Module_Adapter_.new
+  ENHANCE_MODULE_ADAPTER__ = Enhance_Module_Adapter__.new
 
   end  # #pay-one-back
 end

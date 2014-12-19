@@ -2,8 +2,7 @@ module Skylab::MetaHell
 
   module Fields
 
-    # let a class define its fields via particular methods it defines
-    # in a special DSL block
+    # in this primordial ancestor of `entity`, define fields with methods:
     #
     #     class Foo
     #
@@ -13,6 +12,7 @@ module Skylab::MetaHell
     #       MetaHell_::Fields::From.methods(
     #         :overriding, :argful, :destructive, :globbing, :absorber, :initialize
     #       ) do
+    #
     #         def two a
     #           @two_value = a.shift
     #         end
@@ -24,7 +24,11 @@ module Skylab::MetaHell
     #       end
     #     end
     #
+    #
+    # the "absorber" you defined was globbing, and was `initialize` so:
+    #
     #     Foo.new( :two, "foozle" ).two_value  # => 'foozle'
+    #
     #
     # a subclass will inherit the same behavior and fieldset (by default)
     #
@@ -33,7 +37,8 @@ module Skylab::MetaHell
     #
     #     Bar.new( :two, "fazzle" ).two_value  # => 'fazzle'
     #
-    # a subclasss can extend the fieldset (and it won't do the bad thing)
+    #
+    # a subclasss can mutate its own fieldset without disturbing parent:
     #
     #     class Baz < Foo
     #
@@ -192,10 +197,9 @@ module Skylab::MetaHell
       end
     end
 
-    # here's an experimental hack to add metadata to the following field
-    # like so
+    # use the experimental `use_o_DSL` to give yourself the 'o' method
     #
-    #     class Foo
+    #     class Fob
     #       MetaHell_::Fields::From.methods :use_o_DSL do
     #
     #         o :desc, "a", "b"
@@ -209,10 +213,19 @@ module Skylab::MetaHell
     #       end
     #     end
     #
-    #     Foo::FIELDS_[:foo].desc_p[ a = [] ]
+    #
+    # the `desc` function is an experimental way to add this metadata to
+    # the subsequent field.
+    #
+    # you can add desc strings in long lists or one at a time
+    #
+    #     Fob::FIELDS_[:foo].desc_p[ a = [] ]
     #     a  # => %w( a b c )
     #
-    #     Foo::FIELDS_[:bar].desc_p[ a = [] ]
+    #
+    # you can define desc strings by defining functions that will produce them
+    #
+    #     Fob::FIELDS_[:bar].desc_p[ a = [] ]
     #     a.first  # => "ok."
 
   end

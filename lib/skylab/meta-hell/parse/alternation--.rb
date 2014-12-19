@@ -35,8 +35,7 @@ module Skylab::MetaHell
       :glob_extra_args ]
   end
 
-  # a normative example
-  # like so:
+  # minimally you can call it inine with (p_a, arg)
   #
   #     res = MetaHell_::Parse.alternation[ [
   #       -> ix { :a == ix and :A },
@@ -46,14 +45,17 @@ module Skylab::MetaHell
   #     res  # => :B
   #
 
-  # it may be useful to curry your parser in one place
-  # and then use it in another:
+  # it may be more efficient to curry the parser in one place
   #
   #     P = MetaHell_::Parse.alternation.curry[ :pool_procs, [
   #       -> ix { :a == ix and :A },
   #       -> ix { :b == ix and :B } ] ]
   #
+  #
+  # and call it in another
+  #
   #     P[ :a ]  # => :A
+  #
   #
   # and another:
   #
@@ -61,17 +63,15 @@ module Skylab::MetaHell
   #     P[ :c ]  # => nil
 
 
-  # the minimal case
-  # the empty parser always result in nil
+  # in the minimal case, the empty parser always results in nil
   #
-  #     P = MetaHell_::Parse.alternation.curry[ :pool_procs, [] ]
+  #     p = MetaHell_::Parse.alternation.curry[ :pool_procs, [] ]
   #
-  #     P[ :bizzle ]  # => nil
+  #     p[ :bizzle ]  # => nil
 
   # maintaining parse state (artibrary extra arguments)
-  # like so:
   #
-  #     P = MetaHell_::Parse.alternation.curry[ :pool_procs, [
+  #     P_ = MetaHell_::Parse.alternation.curry[ :pool_procs, [
   #       -> output_x, input_x do
   #         if :one == input_x.first
   #           input_x.shift
@@ -89,26 +89,32 @@ module Skylab::MetaHell
   #
   #     Result = ::Struct.new :is_one, :is_two
   #
-  #     P[ Result.new, [ :will, :not, :parse ] ]  # => nil
+  #
+  # it parses none:
+  #
+  #     P_[ Result.new, [ :will, :not, :parse ] ]  # => nil
+  #
   #
   # it parses one:
   #
   #     r = Result.new
-  #     P[ r, [ :one ] ]  # => true
+  #     P_[ r, [ :one ] ]  # => true
   #     r.is_one  # => true
   #     r.is_two  # => nil
+  #
   #
   # it parses two:
   #
   #     r = Result.new
-  #     P[ r, [ :two ] ]  # => true
+  #     P_[ r, [ :two ] ]  # => true
   #     r.is_one  # => nil
   #     r.is_two  # => true
+  #
   #
   # but it won't parse two after one:
   #
   #     input_a = [ :one, :two ] ; r = Result.new
-  #     P[ r, input_a ]  # => true
+  #     P_[ r, input_a ]  # => true
   #     r.is_one  # => true
   #     r.is_two  # => nil
   #

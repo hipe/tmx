@@ -417,3 +417,17 @@ it is self-correcting. what a weird useless thing!
 we jump through hoops to allow the system to go through all of its motions
 without a path just so that the template options can display without there
 needing to be a valid input stream.
+
+
+
+
+## notes on issues
+
+
+### :[#034] rearchitect ..
+
+the way we have implemented "parameter functions" is "good" in its
+isomorpic nature but problematic in its broader context. no single one
+of these is specific to the "recursive" action. what *is* specific to it
+is the tag-like syntax. but the functions themselves would be better
+suited to live near the "generate" action..
