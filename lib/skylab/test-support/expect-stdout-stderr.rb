@@ -78,13 +78,28 @@ module Skylab::TestSupport
 
       def count_contiguous_lines_on_stream sym
         count = 0
-        st = _sout_serr_chunk_for do | em |
-          sym == em.stream_symbol
-        end
+        st = _sout_serr_stream_for_contiguous_lines_on_stream sym
         while st.gets
           count += 1
         end
         count
+      end
+
+      def get_string_for_contiguous_lines_on_stream sym
+        io = TestSupport_::Library_::StringIO.new
+        st = _sout_serr_stream_for_contiguous_lines_on_stream sym
+        em = st.gets
+        while em
+          io.write em.string
+          em = st.gets
+        end
+        io.string
+      end
+
+      def _sout_serr_stream_for_contiguous_lines_on_stream sym
+        _sout_serr_chunk_for do | em |
+          sym == em.stream_symbol
+        end
       end
 
       def _sout_serr_chunk_for

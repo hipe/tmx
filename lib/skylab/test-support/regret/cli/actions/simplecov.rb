@@ -158,7 +158,7 @@ module Skylab
 
     def usage
       usage_string = -> do
-        "#{ program_name } [ <white-path> [ <white-path> [..] ] -- ] <something-that-runs-some-ruby>"
+        "#{ program_name } [ <white-path> [ <white-path> [..] ] -- ] <a-ruby-file>"
       end
       usage = -> do
         @y << "usage: #{ usage_string[] }"

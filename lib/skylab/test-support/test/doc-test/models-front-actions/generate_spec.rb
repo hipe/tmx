@@ -42,6 +42,8 @@ module Skylab::TestSupport::TestSupport::DocTest
       expect_failed
     end
 
+    it "nothing specy in the file"
+
     it "normal (partial integration) - spot check of content in a single context" do
 
       _path = DocTest_.dir_pathname.join( Callback_::Autoloader.default_core_file ).to_path

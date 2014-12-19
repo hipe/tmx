@@ -72,7 +72,9 @@ module Skylab::Brazen
     end
 
     Exit_statii__ = Callback_.memoize do
+
       class Exit_Statii__
+
         h = {
           # order matters: more specific error codes may trump more general ones
           generic_error: ( d = 5 ),
@@ -84,8 +86,11 @@ module Skylab::Brazen
           resource_not_found: ( d += 1 ),
           resource_exists: ( d += 1 ),
         }.freeze
+
         define_method :[], & h.method( :[] )
         define_method :fetch, & h.method( :fetch )
+        define_method :members, & h.method( :keys )
+
         self
       end.new
     end

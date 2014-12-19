@@ -23,6 +23,20 @@ module Skylab::TestSupport
 
       module Actions
 
+        class Generate < CLI_LIB_::Action_Adapter
+
+          # here is one way to hack modality-specific defaults
+
+          def prepare_to_parse_parameters  # #hook-in to [br]
+            super
+            @output_iambic.push(
+              :output_adapter, :quickie,
+              :line_downstream, @resources.sout )
+                # hidden property, can't be overwritten except
+                # effectively so with the --output-path option
+          end
+        end
+
         class Recursive < CLI_LIB_::Action_Adapter
 
           # do not put a trailing newline on these ones - they

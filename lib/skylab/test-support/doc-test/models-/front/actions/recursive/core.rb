@@ -38,7 +38,17 @@ module Skylab::TestSupport
                 end
               end
 
+              @enum_members_p = -> do
+                set_sym_a.dup
+              end
+
               KEEP_PARSING_
+            end
+
+          public
+
+            def enum_members
+              @enum_members_p[]
             end
           end
         end
@@ -56,22 +66,49 @@ module Skylab::TestSupport
 
         edit_entity_class :is_promoted,
 
+            :after, :generate,
+
             :inflect,
               :verb, '(recursively) generate',
               :noun, 'document',
 
-            :flag, :property, :force,
+            :desc, -> y do
+                y << 'generate multiple documents at once'
+                y << 'using a manifest file'
+            end,
+
+            :flag,
+            :description, -> y do
+              y << "necessary to overwrite existing files"
+            end,
+            :property, :force,
 
             :enum, [ :list, :preview ],
-              :property, :sub_action,
+            :description, -> y do
+              _prop = Recursive_.property_via_symbol :sub_action
+              y << "{ #{ _prop.enum_members * ' | ' } }"
+            end,
+            :property, :sub_action,
 
-            :flag, :property, :dry_run,
+            :flag,
+            :description, -> y do
+              y << 'do not actually write files'
+            end,
+            :property, :dry_run,
 
-            :flag, :property, :verbose,
+            :flag,
+            :description, -> y do
+              y << "perhaps nothing."
+            end,
+            :property, :verbose,
 
             :hidden, :property, :downstream,
 
-            :required, :property, :path
+            :required,
+              :description, -> y do
+
+              end,
+              :property, :path
 
 
         def initialize k  # no block here

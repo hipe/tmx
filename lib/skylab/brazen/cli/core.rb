@@ -85,6 +85,10 @@ module Skylab::Brazen
         Callback_::Name.via_module( @mod ).as_slug  # etc.
       end
 
+      def get_styled_description_string_array_via_name nm  # for #ouroboros
+        [ "the #{ nm.as_slug } utility" ]  # placeholder
+      end
+
       def has_description
       end
 
@@ -878,8 +882,10 @@ module Skylab::Brazen
         s or prop.name.as_variegated_string.split( UNDERSCORE_ ).last.upcase
       end
 
-      def prepare_to_parse_parameters
-        @bound_call = nil ; @output_iambic = [] ; @seen_h = {}
+      def prepare_to_parse_parameters  # :+#public-API :+#hook-in
+        @output_iambic = []  # :+#public-API (name)
+        @seen_h = {}
+        @bound_call = nil
       end
 
       def parse_options

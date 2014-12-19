@@ -76,6 +76,15 @@ module Skylab::TestSupport
 
           o :is_promoted,
 
+            :inflect,
+              :verb, 'generate',
+              :noun, 'test document',
+
+            :desc, -> y do
+              y << "generate a test file from special"
+              y << "comments in a code file."
+            end,
+
             :iambic_writer_method_name_suffix, :"="
 
           # NOTE those properties that want to trigger side-effects are
@@ -83,6 +92,12 @@ module Skylab::TestSupport
           # values directly to ivars. given this, we have to go ahead &
           # write all properties this way, otherwise we straddle values
           # being stored in two ways. maybe we'll automate it [#br-075]
+
+
+          o :description, -> y do
+            y << "if this main `Foo::Bar::Baz` subject of your file is"
+            y << "not specified here, a guess is attempted with a hack"
+          end
 
           def business_module_name=
             @business_module_name = iambic_property
@@ -96,12 +111,16 @@ module Skylab::TestSupport
             KEEP_PARSING_
           end
 
-          o :flag
+          o :flag, :description, -> y do
+            y << "necessary to overwrite existing files"
+          end
 
           def force=
             @force = true
             KEEP_PARSING_
           end
+
+          o :hidden
 
           def line_downstream=
             x = iambic_property
@@ -113,6 +132,8 @@ module Skylab::TestSupport
             KEEP_PARSING_
           end
 
+          o :hidden
+
           def line_upstream=
             x = iambic_property
             if x
@@ -122,14 +143,28 @@ module Skylab::TestSupport
             KEEP_PARSING_
           end
 
+          o :hidden  # #todo
+
           def template_variable_box=
             @template_variable_box = iambic_property
             KEEP_PARSING_
           end
 
-          def output_adapter=
+          o :description, -> y do
+            a = (  DocTest_::Output_Adapters_.entry_tree.to_stream.map_by do |et|
+              highlight et.name.as_slug
+            end ).to_a
+            y << "available adapter#{ s a }: {#{ a * ' | ' }}"
+          end
+
+          def output_adapter=  # overwrites ("idempotence") must be OK
             @output_adapter = iambic_property
             KEEP_PARSING_
+          end
+
+          o :description, -> y do
+            y << "if this is not provided, the generated"
+            y << "document will be written to STDOUT"
           end
 
           def output_path=

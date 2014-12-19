@@ -27,143 +27,63 @@ module Skylab::TestSupport
 
     use :hi, [ :last_hot, :as, :command ]
 
-    option_parser do |o|
+    # ~ hack an adapter for doc-test for this ancient [fa] legacy API
 
-      o.separator "#{ hi 'description:' } process <path> with doc-test. #{
-        }results to stdout by default."
-
-      o.separator "#{ hi 'options:' }"
-
-      pr = CLI::Actions::DocTest::Parse_Recursive_
-
-      hack = o.define '-r', "--recursive",
-        "regenerate all under path (directory) recursively.",
-        "(assumes the existence of \"#{ API::Conf[:doc_test_dir] }\" #{
-          }somewhere above)",
-        "the (mutually exclusive) sub-options for this beast include:",
-        * ( pr::A_.reduce( [] ) do |m, f|
-          f.with_each_desc_line { |s| m << "  #{ s }" } ; m
-        end ),
-        "(various forms work: \"-rl\", \"-rn\", \"-r dry\")" do
-
-        v = (( @param_h[:recursive_o] ||= pr::Value_.new ))
-        pr[ @y, v, @argv ]
-
-        @mechanics.change_command :recursive
-        nil
-      end
-      hack.short[ 0 ] = "#{ hack.short.first } [ list | check | dry-run | -- ]"
-
-      o.on '-F', '--force', "when used with -r, confirms file overwrite" do
-        @param_h[:do_force] = true
-      end
-
-      ext = Autoloader_::EXTNAME
-
-      core = LIB_.default_core_file
-
-      o.on '-c', "--core[=foo#{ ext }]",
-        "try to load missing constants by first looking for a #{ core }",
-        "(for e.g) file under a corresponding inferred directory" do |s|
-        @param_h[ :core_basename ] = s || core
-      end
-
-      o.on '-t', '--template-option <x>',
-          "template option (try \"-t help\")" do |x|
-        ( @param_h[ :template_option_s_a ] ||= [] ) << x
-      end
-
-      o.on '-- <load-module>',
-          "(distinguishes <load-module> from <load-file>)" do |x|
-        @param_h[:load_module] = x
-      end
-
-      o.on '-v', '--verbose', 'verbose. (try multiple.)', & verbosity_opt_func
-      o.on '-V', '--less-verbose', 'reduce verbosity.', &
-        deincrement_verbosity_opt_func
-
-      o.banner = command.usage_line
+    namespace :doc_test, -> do
+      Doc_Test_____
     end
 
-    set :node, :doc_test,
-      :render_argument_syntax_as,
-        '<path> [ <load-file> ] [ -- <load-module> ]',
-      :additional_help_proc, -> y do
-        y << "#{ hi '    arguments:' }"
-        y <<        "    <load-file> is a bootstrapping file to load before #{
-          }your main is loaded"
-        y <<        "    <load-module> e.g Foo::NLP::EN (because autoloading #{
-          }doesn't always work)"
-      end
+    module Doc_Test_____
+      module Adapter
+        module For
+          class Face
 
-    def doc_test *a
-      r = parse_doc_test_args a
-      r and execute_with :param_x, @param_h
-    end
+            module Of
+              Hot = -> _NS_sheet, _doc_test_adpter_module do
+                -> k, slug do
+                  Adapter_____.new k, slug, _NS_sheet
+                end
+              end
+            end
 
-  private
+            def initialize kernel, slug, ns_sheet
 
-    def parse_doc_test_args a
-      a.length.nonzero? and path = a.shift
-      a.length.nonzero? and load_file = a.shift
-      if a.length.nonzero?
-        @y << "unexpected argument(s) - #{ a.fetch( 0 ).inspect }"
-        false
-      elsif ! path and ! @param_h[ :template_option_s_a ]  # eew
-        @y << "wrong number of arguments (0 for 1..)"
-        @y << "expecting <path>"
-        false
-      else
-        @param_h[ :load_file ] = load_file
-        @param_h[ :pathname ] = ( path and ::Pathname.new path )
-        true
-      end
-    end
+              svcs = kernel.instance_variable_get :@parent_services  # meh
+              a = svcs.three_streams
+              a.push [ svcs.program_name, slug ]
 
-  public
+              @ns_sheet = ns_sheet
+              @native_client = TestSupport_::DocTest::CLI.new( * a )
 
-    set :node, :recursive, :invisible
+            end
 
-    def recursive path=nil
-      r = recursive_check_bad_keys &&
-        recursive_dissolve_subcommand
-      if r
-        api( path )
-      elsif false == r
-        @mechanics.change_command :doc_test  # eew
-        invite
-      end
-    end
+            def is_visible
+              true
+            end
 
-  private
+            def name
+              @ns_sheet.name
+            end
 
-    def recursive_check_bad_keys
-      if (( bad_a = @param_h.keys - WHITE_A__ )).length.zero? then true else
-        @y << say_bad_keys( bad_a )
-        false
-      end
-    end
+            def get_summary_a_from_sheet ns_sheet
+              @native_client.get_styled_description_string_array_via_name ns_sheet.name
+            end
 
-    def say_bad_keys bad_a
-      RegretLib_::EN_calculate.call do
-       "the #{ and_ bad_a.map( & Cleanup_hack__ ) } option#{ s } #{
-         }#{ s :is } not supported with the recursive option."
-      end
-    end
+            def pre_execute
+              true
+            end
 
-    WHITE_A__ = %i( core_basename do_force recursive_o vtuple ).freeze
+            def invokee
+              @native_client
+            end
 
-    Cleanup_hack__ = -> i do
-      "'#{ RegretLib_::Name_symbol_to_label[ i ] }'"
-    end
-
-    def recursive_dissolve_subcommand
-      if (( o = @param_h.delete :recursive_o ))
-        if o.did_error then false else
-          @param_h[ :mode ] = o.to_i
+            Adapter_____ = self
+          end
         end
-      else true end
+      end
     end
+
+    # ~
 
   public
 
