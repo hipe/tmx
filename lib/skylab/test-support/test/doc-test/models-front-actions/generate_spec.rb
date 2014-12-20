@@ -61,8 +61,6 @@ module Skylab::TestSupport::TestSupport::DocTest
 
       @interesting_line_rx = /\A      (?!end\b)[^ ]/
 
-      next_interesting_line_dedented.should eql "Sandbox_1 = Sandboxer.spawn\n"
-
       next_interesting_line_dedented.should eql "before :all do\n"
 
       next_interesting_line_dedented.should match %r(\Ait "this line here)

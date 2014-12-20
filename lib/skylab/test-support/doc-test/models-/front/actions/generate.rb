@@ -143,10 +143,10 @@ module Skylab::TestSupport
             KEEP_PARSING_
           end
 
-          o :hidden  # #todo
+          o :hidden
 
-          def template_variable_box=
-            @template_variable_box = iambic_property
+          def arbitrary_proc_array=
+            @arbiitrary_proc_a = iambic_property
             KEEP_PARSING_
           end
 
@@ -190,12 +190,13 @@ module Skylab::TestSupport
 
         def initialize kernel
           block_given? and self._WHAT
+          @arbiitrary_proc_a = nil
+          @arbitrary_O_A_proc_array = nil
           @business_module_name = nil
           @dry_run = false
           @force = false
           @resolve_line_downstream_method_name = :when_no_downstream
           @resolve_line_upstream_method_name = :when_no_upstream
-          @template_variable_box = nil
           @upstream_path = nil
           super
         end
@@ -329,22 +330,58 @@ module Skylab::TestSupport
             Infer_business_module_name_loadlessly.call(
                @upstream_path, & handle_event_selectively )
           if @business_module_name
-            ACHIEVED_
+            if @arbiitrary_proc_a
+              when_arbitrary_procs
+            else
+              ACHIEVED_
+            end
           else
             @result = @business_module_name
             UNABLE_
           end
         end
 
+        def when_arbitrary_procs
+          ok = true
+          @arbiitrary_proc_a.each do |p|
+            ok = p[ self ]
+            ok or break
+          end
+          ok
+        end
+      public
+
+        # ~ for arbitrary procs
+
+        def get_business_test_module_name
+          @business_module_name.dup
+        end
+
+        def set_business_test_module_name x
+          if x
+            @business_module_name = x
+            ACHIEVED_
+          else
+            x
+          end
+        end
+
+        def during_output_adapter & p
+          ( @arbitrary_O_A_proc_array ||= [] ).push p
+          ACHIEVED_
+        end
+
+      private
+
         # ~ synthesize
 
         def via_upstream_and_downstream_synthesize
 
           @result = @output_adapter.against(
+            :arbitrary_proc_array, @arbitrary_O_A_proc_array,
             :business_module_name, @business_module_name,
             :line_downstream, @line_downstream,
-            :node_upstream, @node_upstream,
-            :template_variable_box, @template_variable_box )
+            :node_upstream, @node_upstream )
 
           if @do_close_downstream
             @line_downstream.close

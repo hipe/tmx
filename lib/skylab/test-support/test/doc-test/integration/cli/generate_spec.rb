@@ -51,7 +51,7 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
 
       @output_s = ::File.read _opath
       _d = count_occurrences_of_newlines_in_string @output_s
-      ( 42 .. 46 ).should be_include _d
+      ( 29 .. 33 ).should be_include _d
       @exitstatus.should be_zero
 
       ::File.unlink _opath

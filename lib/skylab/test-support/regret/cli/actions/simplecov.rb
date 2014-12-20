@@ -72,7 +72,7 @@ module Skylab
 
     def calculate_lib_skylab_absolute_path
       ::File.expand_path(
-        ::Array.new( HOST_C_A_.length, '..' ) * '/', __FILE__ )
+        ::Array.new( HOST_C_A_.length, DOT_DOT_ ) * '/', __FILE__ )
     end
 
     def execute argv

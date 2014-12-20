@@ -70,12 +70,19 @@ module Skylab::TestSupport
 
             if ok
               flush
-            else
+            elsif @not_found_ev_a
               self._DO_ME_when_not_OK ok  # #todo (we have the ev's memoized)
+            else
+              UNABLE_
             end
           end
 
           def resolve_nearest_possible_manifest_dir_pathname_from_path start_path
+
+            if ::File.file? start_path
+              # the below walk needs a dir not a file
+              start_path = ::File.dirname start_path
+            end
 
             @manifest_dir_pn = @filesystem.walk(
               :start_path, start_path,

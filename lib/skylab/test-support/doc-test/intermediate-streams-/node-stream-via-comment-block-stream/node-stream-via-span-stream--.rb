@@ -29,26 +29,27 @@ module Skylab::TestSupport
         end
       end
 
-      o = State_
+      STATE_MACHINE__ = State_Machine_.new do
 
-      STATE_MACHINE__ = {
+        o :beginning_state,
+            code_span: :ignore,
+            text_span: :when_first_text_span
 
-        beginning_state: o[
-          code_span: :ignore,
-          text_span: :when_first_text_span ],
+        o :expect_first_code_span,
+            code_span: :when_first_code_span
 
-        after_first_text_span: o[
-          code_span: :when_first_code_span ],
+        o :expect_contextualized_example_text_span,
+            text_span: :when_contextualized_example_text_span
 
-        after_ancillaries: o[
-          text_span: :when_text_span_for_example_in_context ],
+        o :expect_contextualized_example_code_span,
+            code_span: :when_contextualized_example_code_span
 
-        after_text_for_example_in_context: o[
-          code_span: :when_code_span_for_example_in_context ],
+        o :expect_bare_example_text_span,
+            text_span: :when_bare_example_text_span
 
-        after_bare_example: o[
-          text_span: :when_intermediate_text_span ]
-      }
+        o :expect_bare_example_code_span,
+            code_span: :when_bare_example_code_span
+      end
 
       def ignore
         nil
@@ -57,13 +58,7 @@ module Skylab::TestSupport
       def when_first_text_span
         @text_span = @span
         @first_text_span = @span
-        @state = @state_machine.fetch :after_first_text_span
-        nil
-      end
-
-      def when_text_span_for_example_in_context
-        @text_span = @span
-        @state = @state_machine.fetch :after_text_for_example_in_context
+        @state = @state_machine.fetch :expect_first_code_span
         nil
       end
 
@@ -72,41 +67,63 @@ module Skylab::TestSupport
         if matchdata.is_ancillary_nodes
           when_ancillary_nodes matchdata
         else
-          when_code_span_for_bare_example matchdata
+          when_bare_example_code_span_via_matchdata matchdata
         end
-      end
-
-      def when_code_span_for_bare_example example_md
-        @do_stay = false
-        @result = Intermediate_Streams_::Models_::Example_Node.build(
-          @text_span, example_md )
-        @state = @state_machine.fetch :after_bare_example
-        nil
-      end
-
-      def when_code_span_for_example_in_context
-
-        example_md = Example_Code_Span__.match @span
-        @span = nil
-
-        if example_md
-          _eg = Intermediate_Streams_::Models_::Example_Node.build(
-            @text_span, example_md )
-          @eg_a ||= []
-          @eg_a.push _eg
-        end
-
-        @state = @state_machine.fetch :after_ancillaries
-
-        nil
       end
 
       def when_ancillary_nodes matchdata
         @anc_nodes = matchdata
         @flush_method_name = :flush_context_node
-        @state = @state_machine.fetch :after_ancillaries
+        @state = @state_machine.fetch :expect_contextualized_example_text_span
         nil
       end
+
+      def when_bare_example_code_span_via_matchdata example_md
+        @do_stay = false
+        @result = Intermediate_Streams_::Models_::Example_Node.build(
+          @text_span, example_md )
+        @state = @state_machine.fetch :expect_bare_example_text_span
+        nil
+      end
+
+      def when_contextualized_example_text_span
+        @text_span = @span
+        @state = @state_machine.fetch :expect_contextualized_example_code_span
+        nil
+      end
+
+      def when_contextualized_example_code_span
+        build_and_accept_any_example_code_span
+        @state = @state_machine.fetch :expect_contextualized_example_text_span
+        nil
+      end
+
+      def when_bare_example_text_span
+        @text_span = @span
+        @state = @state_machine.fetch :expect_bare_example_code_span
+        nil
+      end
+
+      def when_bare_example_code_span
+        build_and_accept_any_example_code_span
+        @state = @state_machine.fetch :expect_bare_example_text_span
+        nil
+      end
+
+      def build_and_accept_any_example_code_span
+
+        example_md = Example_Code_Span__.match @span
+        @span = nil
+
+        if example_md
+          @eg_a ||= []
+          @eg_a.push Intermediate_Streams_::Models_::Example_Node.build(
+            @text_span, example_md )
+        end
+
+        nil
+      end
+
 
       def flush_context_node
         if @eg_a

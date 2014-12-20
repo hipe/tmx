@@ -157,7 +157,7 @@ module Skylab::TestSupport
     Snag__ = sidesys[ :Snag ]
 
     Skylab__ = memoize[ -> do
-      require_relative '..'
+      require_relative DOT_DOT_
       ::Skylab
     end ]
 

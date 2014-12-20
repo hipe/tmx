@@ -7,42 +7,52 @@ module Skylab::TestSupport
       class Articulator_
 
         # this generates a simple articulator class.
-        # one way to use it is like so:
         #
-        #     Wing_Wang_Predicate = Articulator_.
+        #     _Wing_Wang_Predicate = Articulator_.
         #       new( :wing, :wang, -> do
         #         "wing is: #{ @wing }, wang: #{ @wang }"
         #       end )
         #
-        #     ( obj = Wing_Wang_Predicate.new 'DING', 'DANG' ).wing  # => 'DING'
+        #     obj = _Wing_Wang_Predicate.new 'DING', 'DANG'
+        #
+        #     obj.wing  # => 'DING'
+        #
         #     obj.wang  # => 'DANG'
+        #
         #     obj.instance_exec( & obj.articulation_proc )  # => "wing is: DING, wang: DANG"
 
-        # another way to manage your signature is to pass the same fields
-        # in as arguments.
-        # then you can use `articulate_self`:
-        #
-        #     P = Articulator_.new( :a, :b, -> a, b { "#{ a } + #{ b }" } )
-        #     P[ "one", "two" ].articulate_self  # => "one + two"
 
-        # a shorthand way to accomplish the above is by
-        # defining an articulator with ony one function:
+        # with `articulate_self` pass the same fields in as arguments
         #
-        #     P = Articulator_[ -> a, b do
+        #     o = Articulator_.new( :a, :b, -> a, b { "#{ a } + #{ b }" } )
+        #     o[ "one", "two" ].articulate_self  # => "one + two"
+
+
+        # a shorthand way to accomplish the above is
+        # definine the articulator with ony one function:
+        #
+        #     o = Articulator_.new do |a, b|
         #       "#{ a } + #{ b }"
-        #     end ]
+        #     end
         #
-        #     P[ "one", "two" ].articulate_self  # => "one + two"
+        #     o[ "one", "two" ].articulate_self  # => "one + two"
 
         class << self
           alias_method :orig_new, :new
         end
 
-        def self.new * i_a, procedure
+        def self.new * i_a, & procedure
+
+          if ! procedure
+            procedure = i_a.pop
+          end
+
           if i_a.length.zero?
             i_a = procedure.parameters.map( & :last )
           end
+
           i_a.freeze
+
           ::Class.new( self ).class_exec do
             class << self
               alias_method :new, :orig_new
@@ -99,15 +109,14 @@ module Skylab::TestSupport
       end
 
       # other times you might do clever things with the rendering context
-      # like so:
       #
-      #     Error_Predicate = Articulator_.new(
+      #     _Error_Predicate = Articulator_.new(
       #       :name, :val, -> o do
       #         n, v = o.at :name, :val
       #         "#{ n } had a #{ em 'bad' } issue - #{ v }"
       #       end )
       #
-      #     err = Error_Predicate.new 'I', 'burnout'
+      #     err = _Error_Predicate.new 'I', 'burnout'
       #
       #     o = ::Object.new
       #     def o.em s ; "__#{ s.upcase }__" end
@@ -115,31 +124,30 @@ module Skylab::TestSupport
       #     exp = "I had a __BAD__ issue - burnout"
       #     ( o.instance_exec err, & err.articulation_proc )  # => exp
 
+
       # write your proc signature however you like, e.g use `to_a`
-      # like so:
       #
-      #     P = Articulator_.new :up, :down, -> up, down do
+      #     _Art = Articulator_.new :up, :down, -> up, down do
       #       "#{ up } and #{ down }"
       #     end
       #
-      #     p = P.new( 'hi', 'lo' )
+      #     p = _Art.new( 'hi', 'lo' )
       #     p.articulation_proc[ * p.to_a ]  # => 'hi and lo'
       #
 
 
       # articulators have a stupid simple but powerful algorithm for inflection
-      # like so:
       #
-      #     NP = Articulator_[ :a, -> a { a * ' and ' } ]
-      #     VP = Articulator_[ :tense, :a, -> t, a do
+      #     _NP = Articulator_[ :a, -> a { a * ' and ' } ]
+      #     _VP = Articulator_[ :tense, :a, -> t, a do
       #       :present == t ? ( 1 == a.length ? 'has' : 'have' ) : 'had'
       #     end ]
       #
-      #     ( NP[ [ 'jack' ] ] | VP[ :present ] ).inflect  # => "jack has"
+      #     ( _NP[ [ 'jack' ] ] | _VP[ :present ] ).inflect  # => "jack has"
       #
-      #     ( NP[ %w(Jack Jill) ] | VP[ :present ] ).inflect  # => "Jack and Jill have"
+      #     ( _NP[ %w(Jack Jill) ] | _VP[ :present ] ).inflect  # => "Jack and Jill have"
       #
-      #     ( NP[ %w( Jack ) ] | VP[ :past ] ).inflect  # => "Jack had"
+      #     ( _NP[ %w( Jack ) ] | _VP[ :past ] ).inflect  # => "Jack had"
 
       class Articulator_
         def | art_x

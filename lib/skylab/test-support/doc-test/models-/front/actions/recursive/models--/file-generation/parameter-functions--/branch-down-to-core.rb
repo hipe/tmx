@@ -21,6 +21,9 @@ module Skylab::TestSupport
               if @basename == stem
                 self._TODO_when_strange_basename  # #todo
               else
+
+                Mutate_string_by_removing_trailing_dashes_[ stem ]
+
                 _path = ::File.join( dirname, stem, "core#{ TestSupport_::Init.spec_rb }" )
                 @generation.receive_output_path _path
               end

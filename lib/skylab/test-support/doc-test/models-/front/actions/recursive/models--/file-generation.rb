@@ -29,7 +29,6 @@ module Skylab::TestSupport
           def initialize & p
             @errstream = @force = nil
             instance_exec( & p )
-            @template_variable_box = nil
             freeze
           end
 
@@ -142,7 +141,7 @@ module Skylab::TestSupport
             _upstream_parts = sidesys_relpath.split FILE_SEP_
 
             _downstream_parts = _upstream_parts.map do | s |
-              s.gsub Callback_::Name::TRAILING_DASHES_RX__, EMPTY_S_  # ick/meh
+              Remove_trailing_dashes__[ s ]
             end
 
             _downstream_parts.join FILE_SEP_
@@ -152,7 +151,19 @@ module Skylab::TestSupport
             pn = ::Pathname.new basename
             ext  = pn.extname
             stem = pn.sub_ext( EMPTY_S_ ).to_path
+            Mutate_string_by_removing_trailing_dashes_[ stem ]
             "#{ stem }#{ TestSupport_::Init.test_file_basename_suffix_stem }#{ ext }"
+          end
+
+          Remove_trailing_dashes__ = -> s do
+            s_ = s.dup
+            Mutate_string_by_removing_trailing_dashes_[ s_ ]
+            s_
+          end
+
+          Mutate_string_by_removing_trailing_dashes_ = -> s do
+            s.gsub! Callback_::Name::TRAILING_DASHES_RX__, EMPTY_S_  # ick/meh
+            nil
           end
 
           SEP_LENGTH_ = FILE_SEP_.length
@@ -196,6 +207,13 @@ module Skylab::TestSupport
 
         public
 
+          def during_generate & p
+            ( @during_generate_p_a ||= [] ).push p
+            ACHIEVED_
+          end
+
+          attr_reader :during_generate_p_a
+
           def receive_output_path x
             if x
               @output_path = x
@@ -205,11 +223,6 @@ module Skylab::TestSupport
             end
           end
 
-          def set_template_variable sym, x
-            @template_variable_box ||= Callback_::Box.new
-            @template_variable_box.set sym, x
-            nil
-          end
 
         private
 
@@ -230,7 +243,7 @@ module Skylab::TestSupport
 
               * ( :force if @force_is_present ),
 
-              :template_variable_box, @template_variable_box,
+              :arbitrary_proc_array, during_generate_p_a,
 
               :line_downstream, @errstream,  # nil ok
 

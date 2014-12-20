@@ -10,9 +10,8 @@ module {{ amod }}::TestSupport{{ bmod }}::{{ cmod }}
 
   {{ acon }}_ = {{ acon }}_
 
-  Sandboxer = TestSupport_::Sandbox::Spawner.new
-
   describe "{{ desc }}" do
-    {{ body }}{{ cover }}
+
+    {{ pre_body }}{{ body }}{{ cover }}
   end
 end

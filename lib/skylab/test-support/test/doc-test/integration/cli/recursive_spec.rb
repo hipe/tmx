@@ -23,12 +23,14 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
     it "list" do
       invoke 'recursive', '--sub-act', 'list', common_path
       on_stream :output
-      expect %r(\A/.+/doc-test/core\.rb\b.+  #output-filename:inte)
+      expect %r(\A/.+/doc-test/core\.rb[ ]{2}#output-filename:inte)
       expect %r(\A/)
       expect :errput, '(2 manifest entries total)'
       expect_no_more_lines
       @exitstatus.should be_zero
     end
+
+    _preview_done_rx = %r(\A\(preview for one file done \(\d+ lines)
 
     it "does the dry run that generates fake bytes omg" do
 
@@ -39,15 +41,15 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
       expect :styled, %r(\Acurrent output path -)
 
       _d = count_contiguous_lines_on_stream :output
-      ( 40 .. 50 ).should be_include _d
+      ( 29 .. 33 ).should be_include _d
 
-      expect %r(\A done \(\d+ lines)
+      expect _preview_done_rx
       expect :styled, %r(\Acurrent output path -)
 
       _d = count_contiguous_lines_on_stream :output
-      ( 50 .. 60 ).should be_include _d
+      ( 42 .. 46 ).should be_include _d
 
-      expect %r(\A done \(\d+ lines)
+      expect _preview_done_rx
       expect '(2 file generations total)'
 
       expect_no_more_lines

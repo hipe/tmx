@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::TestSupport::TestSupport::Quickie::Possible_
+module Skylab::TestSupport::TestSupport::Quickie::Possible
 
   describe "[ts] quickie possible carry" do
 

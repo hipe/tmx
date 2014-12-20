@@ -43,6 +43,7 @@ module Skylab::TestSupport  # :[#021].
 
   ACHIEVED_ = true
   CONST_SEP_ = '::'.freeze
+  DOT_DOT_ = '..'.freeze
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze

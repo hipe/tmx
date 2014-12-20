@@ -66,11 +66,32 @@ module Skylab::TestSupport
 
             def via_payload_pathname
 
-              @generation.set_template_variable(
-                :require_test_support_relpath,
-                @payload_pn.relative_path_from( @test_pn ).sub_ext( EMPTY_S_ ).to_path )
+              # `relative_path_from` is off by one for what we need here
 
-              ACHIEVED_
+              abspath = @payload_pn.to_path
+
+              _basename_no_ext = @payload_pn.basename.sub_ext EMPTY_S_
+
+              _dirname = ::File.dirname abspath
+
+              _difference = @test_path[ _dirname.length + 1 .. -1 ]
+
+              _d = TestSupport_._lib.basic::String.count_occurrences_in_string_of_string _difference, FILE_SEP_
+
+              s_a = _d.times.map { DOT_DOT_ }
+              s_a.push _basename_no_ext
+              _PATH = s_a.join FILE_SEP_
+
+              @generation.during_generate do | generate |
+
+                generate.during_output_adapter do | oa |
+
+                  oa.receive_template_variable(
+                    :require_test_support_relpath,
+                    _PATH )
+
+                end
+              end
             end
 
             a = TestSupport_::Init.test_support_filenames

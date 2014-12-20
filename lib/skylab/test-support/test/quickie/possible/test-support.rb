@@ -6,7 +6,7 @@ module Skylab::TestSupport::TestSupport::Quickie
 
 end
 
-module Skylab::TestSupport::TestSupport::Quickie::Possible_
+module Skylab::TestSupport::TestSupport::Quickie::Possible
 
   ::Skylab::TestSupport::TestSupport::Quickie[ Possible_TS_ = self ]
 
@@ -17,12 +17,6 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible_
   extend Quickie
 
   LIB_ = TestSupport_._lib
-
-  module Articulator_
-
-    Articulator_ = Quickie::Possible_::Articulator_
-
-  end
 
   module InstanceMethods
 

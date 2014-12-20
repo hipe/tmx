@@ -28,7 +28,7 @@ module Skylab::TestSupport
           _s = main_template.call(
             dsc: _dsc,
             num: d,
-            body: _body )
+            ctx_body: _body )
 
           write_to_stream_string_line_by_line line_downstream, _s
 
@@ -37,7 +37,7 @@ module Skylab::TestSupport
 
         def my_line_downstream
           o = @shared_resources.cached :_ctxt_LDS_ do
-            _margin = main_template.first_margin_for :body
+            _margin = main_template.first_margin_for :ctx_body
             Build_common_marginated_line_downtream_[ _margin ]
           end
           o.rewind

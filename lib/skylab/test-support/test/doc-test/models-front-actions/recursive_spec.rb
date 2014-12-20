@@ -77,7 +77,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
       expect_no_more_events
 
-      ( 43 .. 45 ).should be_include ev.to_event.line_count
+      ( 28 .. 33 ).should be_include ev.to_event.line_count
 
       gen_ = gen_stream.gets
 
@@ -94,7 +94,7 @@ module Skylab::TestSupport::TestSupport::DocTest
     def validate_content_of_the_generated_file_of_interest io
       string_IO = io[ :buffer ]
       string_IO.rewind
-      string_IO.gets.should eql "require_relative '../test-support'\n"
+      string_IO.gets.should eql "require_relative '../../test-support'\n"
     end
   end
 end

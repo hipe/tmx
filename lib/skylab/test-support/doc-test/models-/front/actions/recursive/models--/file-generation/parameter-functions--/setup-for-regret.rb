@@ -8,11 +8,22 @@ module Skylab::TestSupport
 
         class Models__::File_Generation
 
-          class Parameter_Functions__::Regret_setup < Parameter_Function_
+          class Parameter_Functions__::Setup_for_Regret < Parameter_Function_
 
             # ~ yes / no validation ( abstraction candidate )
 
             def normalize
+              if @value_x
+                via_value_resolve_do
+              else
+                @do = true
+                ACHIEVED_
+              end
+            end
+
+          private
+
+            def via_value_resolve_do
               case @value_x
               when YES__
                 @do = true
@@ -35,10 +46,13 @@ module Skylab::TestSupport
               UNABLE_
             end
 
-            # ~
-
             def flush
-              @generation.set_template_variable :do_regret_setup, @do
+              yes = @do
+              @generation.during_generate do | generate |
+                generate.during_output_adapter do | oa |
+                  oa.receive_do_regret_setup yes
+                end
+              end
               ACHIEVED_
             end
           end

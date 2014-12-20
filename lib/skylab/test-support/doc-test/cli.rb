@@ -44,6 +44,7 @@ module Skylab::TestSupport
           # this behavior will probably become [#ba-021] magic
 
           def build_handle_event_selectively
+
             default_p = super
             -> * i_a, & ev_p do
               m_i = i_a.fetch 1
@@ -55,6 +56,24 @@ module Skylab::TestSupport
             end
           end
 
+          def current_output_path ev
+            @is_for_preview = true
+            receive_event_on_top_channel ev, :info
+          end
+
+          def wrote ev
+            if is_for_preview
+              s_a = render_event_lines ev
+              s = s_a.first
+              s.strip!
+              s_a[ 0 ] = "(preview for one file #{ s })"
+              send_non_payload_event_lines s_a
+              nil
+            else
+              receive_event_on_top_channel ev, :success
+            end
+          end
+
           def before_editing_existing_file ev
             render_event_as_first_in_multipart_line ev
           end
@@ -62,6 +81,8 @@ module Skylab::TestSupport
           def before_probably_creating_new_file ev
             render_event_as_first_in_multipart_line ev
           end
+
+          attr_reader :is_for_preview
 
         private
 

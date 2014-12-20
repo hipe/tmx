@@ -37,14 +37,16 @@ module Skylab::Basic
         end
       end
 
-      alias_method :line_stream, :line_stream
-
       def looks_like_sentence * a
         if a.length.zero?
           String_::Small_Procs__::Looks_like_sentence
         else
           String_::Small_Procs__::Looks_like_sentence[ * a ]
         end
+      end
+
+      def members
+        singleton_class.public_instance_methods( false ) - [ :members ]
       end
 
       def mustache_regexp

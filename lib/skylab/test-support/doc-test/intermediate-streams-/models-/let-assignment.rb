@@ -36,6 +36,10 @@ module Skylab::TestSupport
           [ :variable_name, :rhs, :node_symbol ]
         end
 
+        def node_symbol_when_context
+          node_symbol
+        end
+
         def node_symbol
           :let_assignment
         end
