@@ -21,6 +21,31 @@ module Skylab::TestSupport
 
       # ~ specific action customization
 
+      module Experimental_Hax__
+      private
+
+        def build_handle_event_selectively
+          default_p = super
+          -> * i_a, & ev_p do
+
+            m_i = i_a.fetch 1
+
+            if respond_to? m_i
+              send m_i, ev_p[]
+            else
+              default_p[ * i_a, & ev_p ]
+            end
+          end
+        end
+
+        def render_event_as_first_in_multipart_line ev
+          s_a = render_event_lines ev
+          send_non_payload_event_lines s_a[ 0 .. -2 ]
+          @parent.stderr.write "#{ s_a.last } .."
+          nil
+        end
+      end
+
       module Actions
 
         class Generate < CLI_LIB_::Action_Adapter
@@ -37,24 +62,39 @@ module Skylab::TestSupport
           end
         end
 
+        class Intermediates < CLI_LIB_::Action_Adapter
+
+          include Experimental_Hax__
+
+          def writing ev
+            render_event_as_first_in_multipart_line ev
+          end
+
+          def wrote ev
+            send_non_payload_event_lines render_event_lines ev
+            ACHIEVED_  # don't stop the batch job
+          end
+
+          def resolve_bound_call_via_output_iambic
+
+            if :path == @output_iambic[ -2 ]  # EEEW tracked by [#br-078]
+              path = @output_iambic.last
+              if FILE_SEP_ != path[ 0 ]
+                path = ::File.expand_path path
+                @output_iambic[ -1 ] = path
+              end
+            end
+            super
+          end
+        end
+
         class Recursive < CLI_LIB_::Action_Adapter
 
           # do not put a trailing newline on these ones - they
           # are first of a pair and "look better" in one line.
           # this behavior will probably become [#ba-021] magic
 
-          def build_handle_event_selectively
-
-            default_p = super
-            -> * i_a, & ev_p do
-              m_i = i_a.fetch 1
-              if respond_to? m_i
-                send m_i, ev_p[]
-              else
-                default_p[ * i_a, & ev_p ]
-              end
-            end
-          end
+          include Experimental_Hax__
 
           def current_output_path ev
             @is_for_preview = true
@@ -83,15 +123,6 @@ module Skylab::TestSupport
           end
 
           attr_reader :is_for_preview
-
-        private
-
-          def render_event_as_first_in_multipart_line ev
-            s_a = render_event_lines ev
-            send_non_payload_event_lines s_a[ 0 .. -2 ]
-            @parent.stderr.write "#{ s_a.last } .."
-            nil
-          end
         end
       end
     end

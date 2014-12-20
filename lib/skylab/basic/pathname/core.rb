@@ -54,6 +54,10 @@ module Skylab::Basic
 
     public
 
+      def members
+        singleton_class.public_instance_methods( false ) - [ :members ]
+      end
+
       def normalization
         Pathname::Normalization__
       end

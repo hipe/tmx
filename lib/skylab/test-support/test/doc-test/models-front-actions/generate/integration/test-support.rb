@@ -15,8 +15,6 @@ module Skylab::TestSupport::TestSupport::DocTest
 
   TestSupport_ = TestSupport_
 
-  Sandboxer = TestSupport_::Sandbox::Spawner.new
-
   DocTest_ = DocTest_  # custom addition to old template
 
         end

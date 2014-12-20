@@ -33,10 +33,6 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
       @exitstatus.should equal_generic_error
     end
 
-    def a_path_for_a_file_that_does_not_exist
-      TestSupport_.dir_pathname.join( 'does-not-exist.rb' ).to_path
-    end
-
     it "1.3) money" do
 
       td = TestSupport_::Lib_::System[].filesystem.tmpdir.new(

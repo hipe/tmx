@@ -13,7 +13,7 @@ module Skylab::Brazen
 
       :inflect, :noun, :lemma, :with_lemma, 'workspace',
 
-      :is_promoted,
+      :promote_action,
 
       :flag, :property, :dry_run,
 

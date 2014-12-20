@@ -12,7 +12,7 @@ module Skylab::Brazen
 
       o :inflect, :verb, 'determine'
 
-      o :is_promoted
+      o :promote_action
 
       o :after, :init
 

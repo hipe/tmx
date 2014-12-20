@@ -74,7 +74,7 @@ module Skylab::TestSupport
 
         edit_entity_class do
 
-          o :is_promoted,
+          o :promote_action,
 
             :inflect,
               :verb, 'generate',

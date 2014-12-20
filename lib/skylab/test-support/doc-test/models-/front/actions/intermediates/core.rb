@@ -1,198 +1,276 @@
 module Skylab::TestSupport
 
-  module Regret::API
+  module DocTest
 
-  class Actions::Intermediates < API_::Action
+    module Models_::Front
 
-    # we can access the API # through the `invoke` method
-    #
-    #     HOME_ = TestSupport_::Regret.dir_pathname
-    #
-    #     # ( ignore this ENTIRE TEST SUPPORT INSIDE YOUR DOC-TEST )
-    #     Intr_ = -> *a do
-    #       io = TestSupport_::IO.spy.triad.new nil
-    #       # io.debug!
-    #       h = { out: io.outstream, err: io.errstream }
-    #       0.step(a.length-1, 2).each { |d| h[a[d]] = a[d+1] }
-    #       r = TestSupport_::Regret::API.invoke :intermediates, h
-    #       out_a = io.outstream.string.split "\n"
-    #       err_a = io.errstream.string.split "\n"
-    #       [ r, out_a, err_a ]
-    #     end
-    #
-    #
-    # when the (absolute) path is not found:
-    #
-    #     in_pn = HOME_.join( 'nope' )  # abspaths
-    #     r, o, e = Intr_[ :path, in_pn ]
-    #     o.length  # => 0
-    #     e.shift  # => "not found: #{ in_pn }"
-    #     e.shift  # => "can't make intermediate test files without a start node."
-    #     r  # => false
-    #
-    #
-    # when it is not an absoulte path, borkage
-    #
-    #     Intr_[ :path, 'nope' ]  # => RuntimeError: we don't want to mess with relpaths..
-    #
-    #
-    # when it is an existant absolute path - works (dry run):
-    #
-    #     in_pn = HOME_.join( 'api/actions/doc-test/templos--/quickie/context--' )
-    #     r, o, e = Intr_[ :path, in_pn, :vtuple, 4, :is_dry_run, true ]
-    #     s = e * "\n"
-    #     matches = -> rx do
-    #       rx =~ s or fail "string did not contain #{ rx }"
-    #       true
-    #     end
-    #     o.length  # => 0
-    #     r  # => true
-    #     yes = e.include?(
-    #       "(verbosity level 3 is the highest. ignoring 1 of the verboses.)" )
-    #     yes  # => true
-    #     matches[ /yep i see it there.+context--$/ ]  # => true
-    #     s.scan( /^exists - / ).length  # => 5
-    #     big_rx =  %r|^\(writing .+templos--/quickie/test-support\.rb #{
-    #       }\.\. done \(\d+ fake bytes\)\)$|
-    #     matches[ big_rx ]  # => true
-    #     matches[ %r|^mkdir .+templos--/quickie/context--| ]  # => true
-    #     e.pop  # => 'ok.'
-    #
-    #
-    # content looks ok:
-    #     opn =  TestSupport_::TestSupport.dir_pathname.
-    #       join( 'regret/code-fixtures-' )
-    #     remove_entry_secure = -> do
-    #       TestSupport_::Library_::FileUtils.remove_entry_secure opn.to_s
-    #     end
-    #     opn.exist? and remove_entry_secure[]
-    #     in_pn = HOME_.join( 'code-fixtures-/asap/whootenany.rb' )
-    #     r, o, e = Intr_[ :path, in_pn ]
-    #     r  # => true
-    #     o.length  # => 0
-    #     these = e.grep( /\A\(writing/ )
-    #     rx = /\A\(writing #{ ::Regexp.escape opn.to_s }/
-    #     same = e.grep rx
-    #     these.length.nonzero? or fail "sanity - no match?"
-    #     these.length  # => same.length
-    #     contents = opn.join( 'asap/whootenany/test-support.rb' ).read
-    #     ok = contents.include?(
-    #       'TestSupport::Regret::Code_Fixtures_::ASAP::Whootenany' )
-    #     ok # => true
-    #     remove_entry_secure[]
+      class Actions::Intermediates < Action_
 
-    services [ :out, :ivar ],
-             [ :err, :ivar ],
-             [ :pth, :ivar ],
-             [ :invitation ]
+        edit_entity_class :promote_action,
 
-    params :path,
-           [ :top, :arity, :zero_or_one ],
-           [ :is_dry_run, :arity, :zero_or_one ],
-           [ :do_preview, :arity, :zero_or_one ],
-           API_::Conf::Verbosity[ self ].param( :vtuple )
+          :desc, -> y do
+            y << "generate #{ val TestSupport_::Init.test_support_filenames.first } files"
+          end,
 
-    def absorb_any_services_from_parameters_notify param_h
-      SVC_AS_PARAM_I_A_.each do |i|
-        x = param_h.delete( i ) or next
-        accept_value_as_service x, i
+          :after, :recursive,
+
+          :inflect,
+            :verb, 'generate',
+            :noun, 'intermedate file',
+
+          :flag, :property, :preview,
+
+          :flag, :property, :dry_run,
+
+          :hidden, :property, :downstream,
+
+          :required,
+
+          :description, -> y do
+            y << "a spec file that needs a corresponding test-support file"
+          end,
+
+          :ad_hoc_normalizer, -> arg, yes_p, no_p do
+            if arg.value_x
+              TestSupport_._lib.basic::Pathname.normalization.build_with(
+                :absolute, :downward_only,
+                :no_single_dots,
+                :no_dotfiles ).normalize_via_three arg, yes_p, no_p
+            else
+              ACHIEVED_
+            end
+          end,
+          :property, :path
+
+
+        def normalize
+          _ok = super
+          _ok and my_normalize
+        end
+
+        def my_normalize
+          via_properties_init_ivars
+          ACHIEVED_
+        end
+
+        def produce_any_result
+
+          @FS = DocTest_::Idioms_::Filesystem.new( & handle_event_selectively )
+
+          @tmpl = DocTest_::Idioms_::Template.new(
+            DocTest_::Output_Adapters_::Quickie.templates_path,
+            Shared_Resources_.new )
+
+          ok = @FS.file_must_exist @path
+
+          ok and begin
+
+            @dirname = ::File.dirname @path
+
+            pn = @FS.find_testsupport_file_upwards @dirname
+            pn and begin
+              @ts_path = pn.to_path
+              via_ts_path
+            end
+
+          end
+        end
+
+        def via_ts_path
+
+          if "#{ @dirname }#{ FILE_SEP_ }" == @ts_path[ 0, @dirname.length + 1 ]
+            via_attempt_to_find_second_path
+          else
+            via_one_path
+          end
+        end
+
+        def via_one_path
+
+          swap = @ts_path
+          @ts_path = "#{ @path }/hack-no-see"
+          @ts_path_ = swap
+
+          via_two_paths
+        end
+
+        def via_attempt_to_find_second_path
+
+          @dirname_ = ::File.dirname ::File.dirname @ts_path
+
+          pn = @FS.find_testsupport_file_upwards @dirname_
+          pn and begin
+            @ts_path_ = pn.to_path
+            via_two_paths
+          end
+
+        end
+
+        def via_two_paths
+
+          current = ::File.dirname @ts_path_
+          dirname = ::File.dirname ::File.dirname @ts_path
+
+          if current == dirname
+            no_intermediates
+          else
+            via_current_and_dirname current, dirname
+          end
+        end
+
+        def no_intermediates
+          maybe_send_event :info, :nothing_to_do do
+            build_neutral_event_with :nothing_to_do,
+                :upper_TS_path, @ts_path_,
+                :lower_TS_path, @ts_path do | y, o |
+
+              y << "no intermediates to make between #{ pth o.upper_TS_path } #{
+                }and #{ pth o.lower_TS_path }"
+            end
+          end
+        end
+
+        def via_current_and_dirname current, dirname
+
+          work_a = dirname[ current.length + 1 .. -1 ].split FILE_SEP_
+
+          job = Job__.new( @dry_run, @preview, @downstream, @tmpl, @FS,
+                          & handle_event_selectively )
+
+          p = -> do
+            if work_a.length.zero?
+              p = EMPTY_P_
+              nil
+            else
+              job.new current, work_a.shift
+            end
+          end
+
+          _st = Callback_.stream do
+            p[]
+          end
+
+          via_job_stream _st
+        end
+
+        def via_job_stream st
+          ok = true
+          job = st.gets
+          count = 0
+          while job
+            count += 1
+            ok = job.execute
+            ok or break
+            job = st.gets
+          end
+          report_via_count count
+        end
+
+        def report_via_count d
+          @on_event_selectively.call :info, :finished do
+            TestSupport_._lib.event_lib.inline_with :finished,
+                :number_of_files, d,
+                :ok, ( d.nonzero? ? true : false ) do | y, o |
+
+              d_ = o.number_of_files
+              y << "(generated #{ d_ } file#{ s d_ })"
+            end
+          end
+        end
+
+        class Job__
+
+          def initialize * a, & oes_p
+            @is_dry, @is_preview, @downstream, @tmpl, @FS = a
+            @on_event_selectively = oes_p
+            freeze
+          end
+
+          def new * a
+            otr = dup
+            otr.init a
+            otr
+          end
+
+          protected def init a
+            @current, @dir = a
+            nil
+          end
+
+          def execute
+
+            @existent_path = ::File.join @current, @FS.test_support_file
+            @desired_path = ::File.join @current, @dir, @FS.test_support_file
+
+            @tree = TestSupport_._lib.system.filesystem.hack_guess_module_tree(
+              :path, @existent_path,
+              :on_event_selectively, @on_event_selectively )
+
+            @tree and via_tree
+          end
+
+        private
+
+          def via_tree
+            i_a = @tree.children.first.value_x.dup
+            const_sym = Callback_::Name.via_slug( @dir ).as_const
+            i_a.push const_sym
+            _lines = Self_::View_Controller__.new( i_a, @tmpl ).execute
+            via_line_stream _lines
+          end
+
+          def via_line_stream st
+
+            resolve_down_IO
+
+            d = 0
+            d_ = 0
+            line = st.gets
+            while line
+              d_ += 1
+              d += ( @down_IO.write line )
+              line = st.gets
+            end
+
+            if @did_open
+              @down_IO.close
+            end
+
+            @on_event_selectively.call :info, :wrote do
+
+              DocTest_::Output_Adapter_.event_for_wrote.with(
+                :is_known_to_be_dry, @is_dry,
+                :bytes, d,
+                :line_count, d_,
+                :ok, true )  # important - batch job will stop early without this
+
+            end  # result of client can stop the job here
+          end
+
+          def resolve_down_IO
+
+            @did_open = false
+            @down_IO = if @is_preview
+              @downstream
+            else
+
+              @on_event_selectively.call :info, :writing do
+                TestSupport_._lib.event_lib.inline_neutral_with :writing,
+                  :path, @desired_path
+              end
+
+              if @is_dry
+                TestSupport_._lib.IO.dry_stub_instance
+              else
+                @did_open = true
+                ::File.open @desired_path, 'w'
+              end
+            end
+          end
+        end
+
+        Self_ = self
       end
     end
-    SVC_AS_PARAM_I_A_ = %i( out err ).freeze
-
-    def execute
-      begin ; w = @wlk = build_walker ; r = false
-        walk_to_test_dir or break
-        test_dir = w.dir_pn
-        lpn = w.class.subtract w.xpn, test_dir.dirname
-        part_a = lpn.sub_ext( EMPTY_S_ ).to_s.split FILE_SEP_
-        curr_d = test_dir
-        build_down curr_d, part_a or break
-        @err.puts "ok."
-        r = true
-      end while nil
-      r
-    end
-
-  private
-
-    def build_walker
-      RegretLib_::Tree_walker[ :path, @path, :top, @top,
-        :vtuple, @vtuple, :listener, generic_listener ]
-    end
-
-    def walk_to_test_dir
-      begin ; r = false ; w = @wlk
-        w.current_path_exists or break bork "can't make intermediate #{
-          }test files without a start node."
-        w.find_toplevel_module or break
-        ok = w.load_downwards :core_basename, DEFAULT_CORE_BASENAME_
-        ok or break
-        w.find_first_dir 'test' or break
-        r = true
-      end while nil
-      r
-    end
-
-    def build_down d, a
-      @buff = TestSupport_::Library_::StringIO.new
-      r = true ; begin
-        p = d.join TEST_SUPPORT_FILE_
-        if p.exist?
-          say :medium, -> { "exists - #{ p }" }
-        else
-          r = make( d ) or break
-        end
-        a.length.zero? and break
-        d = d.join a.shift
-      end while true
-      r
-    end
-    TEST_SUPPORT_FILE_ = 'test-support.rb'.freeze
-
-    def make dpn
-      io = @buff ; pn = dpn.join TEST_SUPPORT_FILE_
-      dpn.exist? or make_dir dpn
-      tmpl = self.class.const_get( :Templo, false ).begin @wlk, pn
-      tmpl.render_to io
-      pn.exist? and fail "sanity - existed #{ pn }"
-      io.pos.zero? and fail "strange - template rendered nothing for #{ pn }"
-      write pn, io
-    end
-
-    def make_dir dpn
-      pth = @pth
-      say :medium, -> { "mkdir #{ pth[ dpn ] }" }
-      @is_dry_run or ::Dir.mkdir dpn.to_s
-      nil
-    end
-
-    def write pn, io
-      io.rewind
-      if @do_preview
-        @err.write io.read
-      else
-        @err.write "(writing #{ @pth[ pn ] } .." ; bytes = nil
-        ( @is_dry_run ? Dev_null_[] : pn ).open WRITE_MODE_ do |fh|
-          bytes = fh.write io.read
-        end
-        @err.puts " done (#{ bytes }#{ ' fake' if @is_dry_run } bytes))"
-      end
-      io.rewind ; io.truncate 0
-      true
-    end
-    Dev_null_ = API_::RegretLib_::Dev_null
-    WRITE_MODE_ = API_::WRITE_MODE_
-
-    def say volume, msg_p
-      snitch.say volume, msg_p
-      nil
-    end
-
-    def bork msg
-      @err.puts msg
-      false
-    end
-  end
   end
 end

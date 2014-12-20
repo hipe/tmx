@@ -64,7 +64,7 @@ module Skylab::TestSupport
 
         # ~ end experiments
 
-        edit_entity_class :is_promoted,
+        edit_entity_class :promote_action,
 
             :after, :generate,
 
@@ -172,6 +172,8 @@ module Skylab::TestSupport
           end
         end
 
+      private
+
         def proto_for_preview
           common_prototype_with :downstream, @downstream
         end
@@ -181,11 +183,11 @@ module Skylab::TestSupport
         end
 
         def common_prototype_with * x_a
-
           Recursive_::Models__::File_Generation.new(
             :is_dry, @dry_run,
             :force_is_present, @force,
             * x_a,
+            :action, self,
             :kernel, @kernel,
             & @on_event_selectively )
         end
@@ -287,6 +289,12 @@ module Skylab::TestSupport
             end while nil
             entry
           end
+        end
+
+      public
+
+        def filesys_idioms
+          @FS_idioms ||= DocTest_::Idioms_::Filesystem.new
         end
 
         Recursive_ = self

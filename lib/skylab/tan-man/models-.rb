@@ -303,7 +303,7 @@ module Skylab::TanMan
 
       Entity_.call self,
 
-          :is_promoted,
+          :promote_action,
 
           :desc, -> y do
             y << "pings tanman (lowlevel)."

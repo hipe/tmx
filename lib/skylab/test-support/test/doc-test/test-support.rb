@@ -22,8 +22,6 @@ module Skylab::TestSupport::TestSupport::DocTest
 
   DocTest_ = TestSupport_::DocTest
 
-  Sandboxer = TestSupport_::Sandbox::Spawner.new
-
   module ModuleMethods
 
     def with_big_file_path & p
@@ -53,6 +51,10 @@ module Skylab::TestSupport::TestSupport::DocTest
         end
         # :+#guillemets
       end
+    end
+
+    def a_path_for_a_file_that_does_not_exist
+      TestSupport_.dir_pathname.join( 'this-file-does-not-exist.somefile' ).to_path
     end
 
     def with_comment_block_in_ad_hoc_fake_file symbol

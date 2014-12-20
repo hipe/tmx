@@ -6,6 +6,21 @@ module Skylab::TestSupport
 
       include Lazy_Selective_Event_Methods_
 
+      class << self
+
+        def event_for_wrote
+          Event_for_Wrote_
+        end
+
+        def templates_path
+          templates_pathname.to_path
+        end
+
+        def templates_pathname
+          dir_pathname.join 'templates-'
+        end
+      end
+
       def initialize
         @on_shared_resources_created = nil
         @shared_resources = nil
@@ -41,7 +56,7 @@ module Skylab::TestSupport
       end
 
       def build_template_dir_pathname
-        self.class.dir_pathname.join 'templates-'
+        self.class.templates_path
       end
 
       def init_view_controller
@@ -88,21 +103,7 @@ module Skylab::TestSupport
         # ~ templates - random access
 
         def templates * i_a
-          templates_via_list i_a
-        end
-
-        def templates_via_list i_a
-          pn = -> do
-            x = @shared_resources.fetch :template_dir_pathname
-            pn = -> { x }
-            x
-          end
-          h = @shared_resources.touch_head_hash :templates
-          i_a.map do |i|
-            h.fetch i do
-              h[ i ] = Template__.via_path pn[].join( "#{ i }#{ EXT__ }" ).to_path
-            end
-          end
+          template_idiom.templates_via_list i_a
         end
 
         def main_template
@@ -110,14 +111,21 @@ module Skylab::TestSupport
         end
 
         def template i
-          @shared_resources.cached :templates, i do
-            Template__.via_path(
-              @shared_resources.fetch( :template_dir_pathname ).join(
-                "#{ i }#{ EXT__ }" ).to_path )
-          end
+          template_idiom.template i
         end
 
-        EXT__ = '.tmpl'.freeze
+        def templates_via_list i_a
+          template_idiom.templates_via_list i_a
+        end
+
+        def template_idiom
+          @shared_resources.cached :template_idiom do
+            DocTest_::Idioms_::Template.new(
+              @shared_resources.fetch( :template_dir_pathname ),
+              @shared_resources,
+              & @on_event_selectively )
+          end
+        end
 
         # ~ other view controllrs
 
@@ -142,47 +150,6 @@ module Skylab::TestSupport
           while s = o.gets
             s.chomp!
             line_downstream.puts s
-          end
-        end
-      end
-
-      Template__ = TestSupport_._lib.string_lib.template
-
-      class Shared_Resources_
-
-        def initialize
-          @h = {}
-        end
-
-        def fetch * i_a, & p
-          touch_tail_hash( i_a ).fetch( i_a.last, & p )
-        end
-
-        def cached * i_a, & build_p
-          h = touch_tail_hash i_a
-          h.fetch i_a.last do
-            h[ i_a.last ] = build_p[]
-          end
-        end
-
-        def cache * i_a, x
-          touch_tail_hash( i_a )[ i_a.last ] = x
-          nil
-        end
-
-        def touch_head_hash i
-          @h.fetch i do
-            @h[ i ] = {}
-          end
-        end
-
-      private
-
-        def touch_tail_hash i_a
-          i_a[ 0 .. -2 ].reduce @h do | m, i |
-            m.fetch i do
-              m[ i ] = {}
-            end
           end
         end
       end

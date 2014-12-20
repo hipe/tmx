@@ -36,6 +36,11 @@ module Skylab::TestSupport
 
         private
 
+          def action=
+            @action = iambic_property
+            KEEP_PARSING_
+          end
+
           def is_dry=
             @is_dry = iambic_property
             KEEP_PARSING_
@@ -206,6 +211,10 @@ module Skylab::TestSupport
           # ~ public API for parameter functions
 
         public
+
+          def filesys_idioms
+            @action.filesys_idioms
+          end
 
           def during_generate & p
             ( @during_generate_p_a ||= [] ).push p

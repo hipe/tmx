@@ -18,6 +18,7 @@ module Skylab::TestSupport
 
             def initialize( * )
               super  # before below
+              @idioms = @generation.filesys_idioms
               @test_path = @generation.output_path
               @test_pn = ::Pathname.new @test_path
             end
@@ -37,7 +38,7 @@ module Skylab::TestSupport
 
               _test_path_as_directory_pn = @test_pn.sub_ext EMPTY_S_
 
-              maybe_pn = _test_path_as_directory_pn.join TEST_SUPPORT_FILE_
+              maybe_pn = _test_path_as_directory_pn.join @idioms.test_support_file
 
               if maybe_pn.exist?
                 @payload_pn = maybe_pn
@@ -47,14 +48,10 @@ module Skylab::TestSupport
 
             def resolve_payload_pathname_by_looking_upwards
 
-              _dirname = ::File.dirname @test_path
-
-              pn = TestSupport_._lib.system.filesystem.walk(
-                :start_path, _dirname,
-                :filename, TEST_SUPPORT_FILE_,
-                :max_num_dirs_to_look, -1,
+              pn = @generation.filesys_idioms.find_testsupport_file_upwards(
+                ::File.dirname( @test_path ),
                 :property_symbol, :dirname_derived_from_output_path,
-                :on_event_selectively, @on_event_selectively )
+                & @on_event_selectively )
 
               if pn
                 @payload_pn = pn
@@ -93,14 +90,6 @@ module Skylab::TestSupport
                 end
               end
             end
-
-            a = TestSupport_::Init.test_support_filenames
-
-            TEST_SUPPORT_FILE_ = a.fetch( a.length - 1 << 2 )
-
-            TEST_SUPPORT_DIR_ =
-              ::Pathname.new( TEST_SUPPORT_FILE_ ).sub_ext( EMPTY_S_ ).to_path
-
           end
         end
       end

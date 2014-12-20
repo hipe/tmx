@@ -143,6 +143,11 @@ module Skylab::Basic
 
       attr_reader :children, :parent, :value_x
 
+      def members
+        [ :children, :parent, :value_x, :children_depth_first,
+          :children_depth_first_via_args_hook, :to_child_stream ]
+      end
+
       def children_depth_first & p
         if has_children
           _children_depth_first_when_nonzero_children p
@@ -187,6 +192,10 @@ module Skylab::Basic
       def initialize & p
         instance_exec( & p )
         freeze
+      end
+
+      def members
+        [ :child_count, :has_children, * super ]
       end
 
       attr_reader :child_count

@@ -34,7 +34,7 @@ module Skylab::Brazen
         pc.downstream.process_some_customized_inflection_behavior pc.upstream
       end
 
-      o :ad_hoc_processor, :is_promoted, -> pc do
+      o :ad_hoc_processor, :promote_action, -> pc do
         pc.upstream.advance_one
         pc.downstream.is_promoted = true
         KEEP_PARSING_

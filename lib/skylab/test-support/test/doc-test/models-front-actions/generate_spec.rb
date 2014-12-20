@@ -35,9 +35,8 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
 
     it "noent" do
-      _path = DocTest_.dir_pathname.join( 'no-such-file' ).to_path
       @down_IO = :_HI_
-      call_API_against_path _path
+      call_API_against_path a_path_for_a_file_that_does_not_exist
       expect_not_OK_event :errno_enoent
       expect_failed
     end
