@@ -14,12 +14,15 @@ module Skylab::TestSupport::TestSupport::DocTest::Models::Front::Actions::Genera
       end
       it "from these comments you are reading" do
         here = DocTest_::Models_::Front::Actions::Generate.
-          dir_pathname.sub_ext( '.rb' ).to_path
+          dir_pathname.join( 'core.rb' ).to_path
 
         output_pn = TestSupport_.dir_pathname.
           join( 'test/doc-test/models-front-actions/generate/integration/core_spec.rb' )
 
-        stat = output_pn.stat ; size1 = stat.size ; ctime1 = stat.ctime
+        stat = output_pn.stat
+        size1 = stat.size
+        ctime1 = stat.ctime
+
           # (this test assumes one such file already exists)
 
         result = API.call :generate,

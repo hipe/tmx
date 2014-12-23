@@ -2,39 +2,34 @@ module Skylab::TestSupport
 
   module DocTest
 
-    module Models_::Front
+    class Output_Adapters_::Quickie
 
-      class Actions::Recursive
+      module Parameter_Functions_
+        Callback_::Autoloader[ self, :boxxy ]  # for now
+      end
 
-        class Models__::File_Generation
 
-          Parameter_Functions__::Eponymous_const = -> gen, val_x, & oes_p do
+      Parameter_Functions_::Eponymous_const = -> gen, & oes_p do
 
-            # this parameter function puts limits on your whole spec file:
-            # it takes up a root-level "before" block which (in quickie)
-            # means you cannot use other before blocks at a deeper level.
-            # as always, becuase it writes to a const, know your namespace.
+        # this parameter function puts limits on your whole spec file:
+        # it takes up a root-level "before" block which (in quickie)
+        # means you cannot use other before blocks at a deeper level.
+        # as always, becuase it writes to a const, know your namespace.
 
-            gen.during_generate do | generate |
+        gen.during_generate do | oa |
 
-              generate.during_output_adapter do | oa |
+          oa.in_pre_body do | y |
 
-                oa.in_pre_body do | y |
+            y << "before :all do"
 
-                  y << "before :all do"
+            _stem = oa.chomp_trailing_underscores oa.business_module_basename
 
-                  _stem = oa.chomp_trailing_underscores oa.business_module_basename
+            y << "  #{ _stem }#{ UNDERSCORE_ } #{
+              }= #{ oa.test_local_qualified_business_module_name }"
 
-                  y << "  #{ _stem }#{ UNDERSCORE_ } #{
-                    }= #{ oa.test_local_qualified_business_module_name }"
+            y << "end"
 
-                  y << "end"
-
-                  nil
-                end
-
-              end
-            end
+            nil
           end
         end
       end

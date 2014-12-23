@@ -26,10 +26,47 @@ module Skylab::TestSupport
         @shared_resources = nil
       end
 
+      def initialize_copy _
+        # nothing yet. (child classes should do this, though)
+      end
+
+      def formal_properties_array
+
+        # assume that this will not be mutated by the caller
+        # and its uptake will be cached so we need not do so
+
+        mod = self.class.const_get :Parameter_Functions_, false  # etc
+
+        pcls = DocTest::Models_::Front::Actions::Generate::Entity_Property
+
+        mod.constants.map do | sym |
+
+          Parameter_Function_::Build_property_for_function[
+            :output_adapter_pfunc,
+            pcls,
+            mod.const_get( sym, false ),
+            sym ]
+        end
+      end
+
       def against * x_a
         before_call
         _ok = process_iambic_stream_fully iambic_stream_via_iambic_array x_a
         _ok and execute
+      end
+
+      def receive_stream_and_pfunc_prop st, prp
+
+        pfunc = Autoloader_.const_reduce(
+          [ prp.name.as_const ],
+          self.class::Parameter_Functions_ )
+
+        if prp.takes_argument
+          _x = st.gets_one
+          pfunc.call self, _x, @o, & @on_event_selectively
+        else
+          pfunc.call self, & @on_event_selectively
+        end
       end
 
     private
@@ -103,7 +140,7 @@ module Skylab::TestSupport
         # ~ templates - random access
 
         def templates * i_a
-          template_idiom.templates_via_list i_a
+          template_idioms.templates_via_list i_a
         end
 
         def main_template
@@ -111,15 +148,15 @@ module Skylab::TestSupport
         end
 
         def template i
-          template_idiom.template i
+          template_idioms.template i
         end
 
         def templates_via_list i_a
-          template_idiom.templates_via_list i_a
+          template_idioms.templates_via_list i_a
         end
 
-        def template_idiom
-          @shared_resources.cached :template_idiom do
+        def template_idioms
+          @shared_resources.cached :template_idioms do
             DocTest_::Idioms_::Template.new(
               @shared_resources.fetch( :template_dir_pathname ),
               @shared_resources,

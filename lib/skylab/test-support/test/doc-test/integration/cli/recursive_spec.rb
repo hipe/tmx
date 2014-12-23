@@ -32,6 +32,8 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
 
     _preview_done_rx = %r(\A\(preview for one file done \(\d+ lines)
 
+    _NOUN_STEM = 'test document generation'
+
     it "does the dry run that generates fake bytes omg" do
 
       invoke 'recursive', '--sub-act', 'preview', common_path
@@ -47,10 +49,10 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
       expect :styled, %r(\Acurrent output path -)
 
       _d = count_contiguous_lines_on_stream :output
-      ( 42 .. 46 ).should be_include _d
+      ( 45 .. 49 ).should be_include _d
 
       expect _preview_done_rx
-      expect '(2 file generations total)'
+      expect "(2 #{ _NOUN_STEM }s total)"
 
       expect_no_more_lines
 
@@ -64,7 +66,7 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
       on_stream :errput
 
       expect :styled, /\Acouldn't .+ generate .+ because .+ exists, won't/
-      expect '(0 file generations total)'
+      expect "(0 #{ _NOUN_STEM }s total)"
       expect_no_more_lines
 
     end
@@ -76,7 +78,7 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
       on_stream :errput
       expect %r(\Aupdating [^ ]+/final/top_spec\.rb \.\. done \(\d+ lines\b)
       expect %r(\Aupdating [^ ]+/integration/core_spec\.rb \.\. done \(\d+ lines\b)
-      expect '(2 file generations total)'
+      expect "(2 #{ _NOUN_STEM }s total)"
       expect_no_more_lines
 
     end

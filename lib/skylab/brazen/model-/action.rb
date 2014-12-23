@@ -120,7 +120,7 @@ module Skylab::Brazen
       end
     end
 
-    def via_arguments_produce_bound_call
+    def via_arguments_produce_bound_call  # :+#public-API [ts]
       subsume_external_arguments
       ok = normalize
       if ok
@@ -286,6 +286,10 @@ module Skylab::Brazen
         parse :verb
       end
 
+      def verb_as_noun=
+        parse :verb_as_noun
+      end
+
       def parse i
         x = @upstream.gets_one
         take_one x, i
@@ -334,7 +338,10 @@ module Skylab::Brazen
         :verb_exponent_combination_i, :verb_lemma,
 
         :has_noun_exponent_combination, :has_noun_lemma,
-        :noun_exponent_combination_i, :noun_lemma
+        :noun_exponent_combination_i, :noun_lemma,
+
+        :has_verb_as_noun_lemma,
+        :verb_as_noun_lemma
 
       def set_lemma s, i
         instance_variable_set :"@has_#{ i }_lemma", true
@@ -355,6 +362,10 @@ module Skylab::Brazen
 
       def verb_lexeme
         inflection_kernel.verb_lexeme
+      end
+
+      def verb_as_noun_lexeme
+        inflection_kernel.verb_as_noun_lexeme
       end
 
     private

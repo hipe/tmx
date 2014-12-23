@@ -46,7 +46,14 @@ module Skylab::TestSupport
         DocTest_::Input_Adapters__::
           Comment_block_stream_via_line_stream_using_single_line_comment_hack[ x ]
       end
-    end
+
+      def get_output_adapter_slug_array
+        self::Output_Adapters_.entry_tree.to_stream.map_by do | et |
+          et.name.as_slug
+        end.to_a
+      end
+
+    end  # >>
 
     module API
 
@@ -191,6 +198,83 @@ module Skylab::TestSupport
       def handle_event_selectively
         @on_event_selectively
       end
+    end
+
+    class Parameter_Function_
+
+      class << self
+
+        def arity
+          instance_method( :initialize ).arity
+        end
+
+        def call gen, * a, & oes_p
+          new( gen, * a, & oes_p ).execute
+        end
+
+        attr_reader :description_proc
+
+      private
+
+        def description & p
+          @description_proc = p ; nil
+        end
+      end
+
+      def initialize gen, & oes_p
+        @generation = gen
+        @on_event_selectively = oes_p
+      end
+
+      def execute
+        _ok = normalize
+        _ok && flush
+      end
+
+    private
+
+      def build_unrecognized_param_arg ok_x_a
+        TestSupport_._lib.entity.properties_stack.
+          build_extra_properties_event(
+            [ @value_x ],
+            ok_x_a,
+            "parameter argument" )
+      end
+
+      def maybe_send_event * i_a, & oes_p
+        @on_event_selectively.call( * i_a, & oes_p )
+      end
+
+      Build_property_for_function = -> category, prop_cls, x, sym do  # #curry-friendly
+
+        argument_arity_symbol = case x.arity
+        when 1 ; :zero
+        when 2 ; :one
+        end
+
+        if argument_arity_symbol
+
+          if x.respond_to? :description_proc
+            desc_p = x.description_proc  # might be nil
+          end
+
+          prop_cls.new do
+
+            @name = Callback_::Name.via_const sym
+            @argument_arity = argument_arity_symbol
+            @origin_category = category
+
+            if desc_p
+              accept_description_proc desc_p
+            end
+          end
+        end
+      end
+    end
+
+    Mutate_string_by_removing_trailing_dashes_ = -> s do
+      s.gsub! Callback_::Name::TRAILING_DASHES_RX__, EMPTY_S_  # ick/meh
+      nil
     end
 
     class Shared_Resources_

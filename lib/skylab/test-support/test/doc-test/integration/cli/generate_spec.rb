@@ -21,7 +21,7 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
       string = get_string_for_contiguous_lines_on_stream :errput
       string.should be_include '-o, --output-adapter ADAPTER'
       _d = count_occurrences_of_newlines_in_string string
-      ( 16 .. 20 ).should be_include _d
+      ( 21 .. 25 ).should be_include _d
 
       @exitstatus.should be_zero
     end

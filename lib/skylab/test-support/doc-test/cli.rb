@@ -21,30 +21,7 @@ module Skylab::TestSupport
 
       # ~ specific action customization
 
-      module Experimental_Hax__
-      private
-
-        def handle_event_selectively  # #hook-in [br]
-          default_p = super
-          -> * i_a, & ev_p do
-
-            m_i = i_a.fetch 1
-
-            if respond_to? m_i
-              send m_i, ev_p[]
-            else
-              default_p[ * i_a, & ev_p ]
-            end
-          end
-        end
-
-        def render_event_as_first_in_multipart_line ev
-          s_a = render_event_lines ev
-          send_non_payload_event_lines s_a[ 0 .. -2 ]
-          @parent.stderr.write "#{ s_a.last } .."
-          nil
-        end
-      end
+      Experimental_Hax__ = ::Module.new  # below
 
       module Actions
 
@@ -59,6 +36,51 @@ module Skylab::TestSupport
               :line_downstream, @resources.sout )
                 # hidden property, can't be overwritten except
                 # effectively so with the --output-path option
+          end
+
+          # ~ experiment
+
+          def optparse_behavior_for_property prop  # #hook-in: [br]
+
+            # we do not push the token onto the output iambic  # #todo do we ever need to?
+
+            if :help == prop.name_i
+              -> _ do
+                @seen_h[ :help ] = true  # important
+              end
+            else
+              super
+            end
+          end
+
+          def resolve_bound_call_when_help_request
+
+            # hack an experiment where we re-build the option parser before
+            # we use it to render a help screen, only in those cases where
+            # the output adapter was indicated explicitly in the ARGV buffer
+            # alongside the --help flag
+
+            if @seen_h[ :output_adapter ]
+
+              _ok = @bound.receive_iambic_stream_(
+                Callback_::Iambic_Stream_via_Array_.new 0, @output_iambic )
+
+              # if the above changes our output adapter
+              # it may change our formal properties
+
+              if _ok
+                @properties = @bound.formal_properties
+                resolve_partitions  # just does it all again!
+                super
+              else
+
+                # e.g the name of the output adapter was bad. show help anyway
+
+                super
+              end
+            else
+              super
+            end
           end
         end
 
@@ -96,33 +118,69 @@ module Skylab::TestSupport
 
           include Experimental_Hax__
 
-          def current_output_path ev
-            @is_for_preview = true
-            receive_event_on_channel ev, :info
+          def current_output_path ev, i_a
+            receive_event_on_channel ev, * i_a
           end
 
-          def wrote ev
-            if is_for_preview
+          def before_editing_existing_file ev
+            @_saw_first_part = true
+            render_event_as_first_in_multipart_line ev
+          end
+
+          def before_probably_creating_new_file ev
+            @_saw_first_part = true
+            render_event_as_first_in_multipart_line ev
+          end
+
+          def wrote ev, i_a
+
+            if _saw_first_part
+              receive_event_on_channel ev, * i_a
+              true  # don't stop the batch
+            else
               s_a = render_event_lines ev
               s = s_a.first
               s.strip!
               s_a[ 0 ] = "(preview for one file #{ s })"
               send_non_payload_event_lines s_a
-              nil
-            else
-              receive_event_on_channel ev, :success
+              true  # don't stop the batch
             end
           end
 
-          def before_editing_existing_file ev
-            render_event_as_first_in_multipart_line ev
-          end
+          attr_reader :_saw_first_part
+        end
 
-          def before_probably_creating_new_file ev
-            render_event_as_first_in_multipart_line ev
-          end
+      end
 
-          attr_reader :is_for_preview
+      module Experimental_Hax__
+      private
+
+        def handle_event_selectively  # #hook-in [br]
+
+          default_p = super
+
+          -> * i_a, & ev_p do
+
+            m = i_a.fetch 1
+
+            if respond_to? m
+
+              if 1 == method( m ).arity
+                send m, ev_p[]
+              else
+                send m, ev_p[], i_a
+              end
+            else
+              default_p[ * i_a, & ev_p ]
+            end
+          end
+        end
+
+        def render_event_as_first_in_multipart_line ev
+          s_a = render_event_lines ev
+          send_non_payload_event_lines s_a[ 0 .. -2 ]
+          @parent.stderr.write "#{ s_a.last } .."
+          nil
         end
       end
     end

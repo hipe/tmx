@@ -24,7 +24,7 @@ module Skylab::TestSupport
         :property, :line_downstream,
         :property, :node_upstream,
         :property, :on_shared_resources_created,
-        :property, :arbitrary_proc_array,
+        :iambic_writer_method_to_be_provided, :property, :arbitrary_proc_array,
         :property, :shared_resources
 
       def initialize
@@ -32,9 +32,128 @@ module Skylab::TestSupport
         @do_coverage_part = false  # :+#re-init
         @marginated_pre_body_string = nil
         @subsystem_index = 1
+        @num_subsystem_parts = @subsystem_index + 1
         @template_var_bx = nil
         super
       end
+
+      def initialize_copy _
+        super
+        if @template_var_bx
+          @template_var_bx = @template_var_bx.dup
+        end
+        if @arbitrary_proc_array
+          @arbitrary_proc_array = @arbitrary_proc_array.dup
+        end
+      end
+
+    private
+
+      def arbitrary_proc_array=
+        x = iambic_property
+        if x
+          if @arbitrary_proc_array
+            @arbitrary_proc_array.concat x
+          else
+            @arbitrary_proc_array = x
+          end
+        end
+        KEEP_PARSING_
+      end
+    public
+
+      # ~ public API for parameter functions (alphabetical by stem)
+
+      # ~~ arbitrary procs
+
+      def during_generate & edit_p
+        @arbitrary_proc_array ||= []
+        @arbitrary_proc_array.push edit_p
+        ACHIEVED_
+      end
+
+
+      # ~~ chomp trailing underscores (a function)
+
+      Chomp_trailing_underscores__ = -> s do
+        s.sub NO_TRAILING_RX___, EMPTY_S_
+      end
+
+      NO_TRAILING_RX___ = /_+$/
+
+      define_method :chomp_trailing_underscores, Chomp_trailing_underscores__
+
+
+      # ~~ business test module name
+
+      def get_test_module_name
+        @test_module_name ||= @business_module_name
+        @test_module_name.dup
+      end
+
+      def set_test_module_name x
+        x and begin
+          s_a = normalize_module_name x
+          s_a and begin
+            @test_module_name = x
+            @test_s_a = s_a
+            ACHIEVED_
+          end
+        end
+      end
+
+
+      # ~~ pre body
+
+      def in_pre_body & receive_yielder_p
+
+        to_join = []
+        p = -> line do
+          to_join.push line
+          p = -> line_ do
+            to_join.push "#{ @marg }#{ line_ }"
+            nil
+          end
+          nil
+        end
+
+        receive_yielder_p.call(
+          ::Enumerator::Yielder.new do | line |
+            p[ line ]
+          end )
+
+        to_join.push @marg
+
+        @marginated_pre_body_string = to_join.join NEWLINE_
+
+        ACHIEVED_
+      end
+
+
+      # ~~ regret
+
+      def receive_do_setup_for_regret yes_do
+        if yes_do
+          if ! @will_do_regret_setup
+            @base_template = @base_when_do_regret_setup
+            @will_do_regret_setup = false
+          end
+        elsif @will_do_regret_setup
+          @base_template = @base_when_not_do_regret_setup
+          @will_do_regret_setup = true
+        end
+        ACHIEVED_
+      end
+
+      # ~~ template variables
+
+      def receive_template_variable sym, x
+        @template_var_bx ||= Callback_::Box.new
+        @template_var_bx.set sym, x
+        ACHIEVED_
+      end
+
+      # ~ end of parameter function public API
 
     private
 
@@ -111,27 +230,34 @@ module Skylab::TestSupport
       end
 
       def normalize_business_module_name
-        @num_subsystem_parts = @subsystem_index + 1
-        s_a = @business_module_name.split CONST_SEP_
-        s_a.first.length.zero? and s_a.shift  # normalize out full qualification
-        if s_a.length < @num_subsystem_parts
-          when_short_business_module_name
-        else
-          @business_const_s_a = s_a.freeze
+        s_a = normalize_module_name @business_module_name
+        s_a and begin
+          @business_s_a = s_a.freeze
+          @test_s_a ||= s_a
           ACHIEVED_
         end
       end
 
-      def when_short_business_module_name
+      def normalize_module_name name_s
+        s_a = name_s.split CONST_SEP_
+        s_a.first.length.zero? and s_a.shift  # normalize out full qualification
+        if s_a.length < @num_subsystem_parts
+          when_short_business_module_name name_s
+        else
+          s_a
+        end
+      end
+
+      def when_short_business_module_name s
         maybe_send_event :error, :shallow_business_module_name do
-          bld_shallow_business_module_name
+          bld_shallow_business_module_name s
         end
         UNABLE_
       end
 
-      def bld_shallow_business_module_name
+      def bld_shallow_business_module_name s
         build_not_OK_event_with :shallow_business_module_name,
-            :module_name, @business_module_name,
+            :module_name, s,
             :min_parts, @num_subsystem_parts do |y, o|
           y << "business module name is too shallow. we need at least #{
           }#{ o.min_parts } parts to the module name - #{ ick o.module_name }"
@@ -156,59 +282,6 @@ module Skylab::TestSupport
         end
         ok
       end
-
-    public  # for above
-
-      def in_pre_body & receive_yielder_p
-
-        to_join = []
-        p = -> line do
-          to_join.push line
-          p = -> line_ do
-            to_join.push "#{ @marg }#{ line_ }"
-            nil
-          end
-          nil
-        end
-
-        receive_yielder_p.call(
-          ::Enumerator::Yielder.new do | line |
-            p[ line ]
-          end )
-
-        to_join.push @marg
-
-        @marginated_pre_body_string = to_join.join NEWLINE_
-
-        ACHIEVED_
-      end
-
-      def receive_template_variable sym, x
-        @template_var_bx ||= Callback_::Box.new
-        @template_var_bx.set sym, x
-        ACHIEVED_
-      end
-
-      def receive_do_regret_setup yes_do
-        if yes_do
-          if ! @will_do_regret_setup
-            @base_template = @base_when_do_regret_setup
-            @will_do_regret_setup = false
-          end
-        elsif @will_do_regret_setup
-          @base_template = @base_when_not_do_regret_setup
-          @will_do_regret_setup = true
-        end
-        ACHIEVED_
-      end
-
-      Chomp_trailing_underscores__ = -> s do
-        s.sub NO_TRAILING_RX___, EMPTY_S_
-      end
-
-      NO_TRAILING_RX___ = /_+$/
-
-      define_method :chomp_trailing_underscores, Chomp_trailing_underscores__
 
     private
 
@@ -255,9 +328,9 @@ module Skylab::TestSupport
 
       def assemble_document
 
-        @amod, @bmod, @cmod = business_module_name_as_three_name_parts
+        @amod, @bmod, @cmod = test_name_as_tree_parts
 
-        @acon = @business_const_s_a.fetch @subsystem_index
+        @acon = @business_s_a.fetch @subsystem_index
 
         @do_coverage_part and _newlined_and_marginated_coverage_part = rndr_cvg
 
@@ -302,8 +375,8 @@ module Skylab::TestSupport
         end
       end
 
-      def business_module_name_as_three_name_parts
-        s_a = @business_const_s_a.map do |const_s|
+      def test_name_as_tree_parts
+        s_a = @test_s_a.map do |const_s|
           Chomp_trailing_underscores__[ const_s ]
         end
         a = ::Array.new 3
@@ -322,17 +395,17 @@ module Skylab::TestSupport
       end
 
       def test_local_qualified_business_module_name_parts
-        a = @business_const_s_a[ @num_subsystem_parts  .. -1 ]
+        a = @test_s_a[ @num_subsystem_parts  .. -1 ]
         a.unshift get_sidesystem_test_local_const
         a
       end
 
       def get_sidesystem_test_local_const
-        "#{ @business_const_s_a[ @num_subsystem_parts - 1 ] }#{ UNDERSCORE_ }"
+        "#{ @business_s_a[ @num_subsystem_parts - 1 ] }#{ UNDERSCORE_ }"
       end
 
       def business_module_basename
-        @business_const_s_a.last
+        @business_s_a.last
       end
 
     private  # ~
@@ -346,7 +419,7 @@ module Skylab::TestSupport
       end
 
       def description_string
-        s_a = @business_const_s_a
+        s_a = @business_s_a
         top_usually_ignored, sidesys, * rest = s_a
         d = s_a.length
         if d.nonzero?

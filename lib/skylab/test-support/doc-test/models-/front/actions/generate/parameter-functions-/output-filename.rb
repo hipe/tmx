@@ -4,11 +4,9 @@ module Skylab::TestSupport
 
     module Models_::Front
 
-      class Actions::Recursive
+      class Actions::Generate
 
-        class Models__::File_Generation
-
-          Parameter_Functions__::Output_filename = -> gen, val_x, & oes_p do
+          Parameter_Functions_::Output_filename = -> gen, val_x, & oes_p do
 
             # our scope is decidedly limited to doing simple string arithmetic
             # on the received path using the argument string. we eschew use of
@@ -48,7 +46,7 @@ module Skylab::TestSupport
               gen.receive_output_path _new_path
             end
           end
-        end
+
       end
     end
   end

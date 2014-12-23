@@ -71,11 +71,34 @@ module Skylab::Brazen
         d = @count
         nm = @name
         serr = @adapter.resources.serr
+
+        if nm.respond_to? :verb_as_noun_lexeme
+          lexeme = nm.verb_as_noun_lexeme
+        end
+
+        if ! lexeme and nm.respond_to? :noun_lexeme
+          lexeme = nm.noun_lexeme
+        end
+
+        surface = if lexeme
+          if 1 == d
+            lexeme.singuar
+          else
+            lexeme.plural
+          end
+        elsif 1 == d
+          nm.as_human
+        else
+          @expag.calculate do
+            plural_noun nm.as_human
+          end
+        end
+
         @expag.calculate do
           if 1 == d
-            serr.puts "(one #{ nm.as_human } total)"
+            serr.puts "(one #{ surface } total)"
           else
-            serr.puts "(#{ d } #{ plural_noun nm.as_human } total)"
+            serr.puts "(#{ d } #{ surface } total)"
           end
         end
 

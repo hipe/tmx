@@ -34,8 +34,8 @@ module Skylab::TestSupport::TestSupport::DocTest
       two = st.gets
       st.gets.should be_nil
 
-      ::File.basename( one.path ).should eql 'core.rb'
-      ::File.basename( two.path ).should eql 'generate.rb'
+      one.path.should match %r(/doc-test/core\.rb\z)
+      two.path.should match %r(/generate/core\.rb\z)
     end
 
     it "'preview' adds a conditional property requirement" do
@@ -67,7 +67,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
       x = _gen.execute
 
-      x.should eql true
+      x.should eql nil
 
       ev = expect_neutral_event :current_output_path
 
@@ -81,7 +81,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
       gen_ = gen_stream.gets
 
-      gen_.manifest_entry.path.should match %r( actions/generate\.rb \z)x
+      gen_.output_path.should match %r( integration/core_spec\.rb \z)x
 
       x = gen_stream.gets
 

@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::Parse
 
-  describe "[mh] Parse" do
+  describe "[mh] Parse::Via_ordered_set__" do
 
     context "with an ordered set parser (built from a list of arbitrary procs)" do
 

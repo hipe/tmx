@@ -58,12 +58,6 @@ module Skylab::Callback
         nil
       end
 
-      public def rewind
-        @count = 0
-        @method_i = :receive_first_gets
-        self
-      end
-
       def sanity_checks
         if @gets_under
           @gets_under.respond_to?( :gets ) or raise ::ArgumentError, "signature changed"
@@ -149,8 +143,14 @@ module Skylab::Callback
       def flush
         puts nil
         x = @flush[ @y ]
-        @count = 0
+        rewind
         x
+      end
+
+      def rewind
+        @count = 0
+        @method_i = :receive_first_gets
+        self
       end
 
       def puts x

@@ -4,11 +4,9 @@ module Skylab::TestSupport
 
     module Models_::Front
 
-      class Actions::Recursive
+      class Actions::Generate
 
-        class Models__::File_Generation
-
-          class Parameter_Functions__::Look_for_TS < Parameter_Function_
+          class Parameter_Functions_::Look_for_TS < Parameter_Function_
 
             # rather than always adhering to the strong convention of having
             # the test support file in a fixed relative path from every test
@@ -16,7 +14,14 @@ module Skylab::TestSupport
             # test file, searching for any nearest test support file, and if
             # found use that relative path in the generated test file.
 
-            def initialize( * )
+            description do | y |
+
+              y << "search upwards for the nearest test support file to require"
+
+            end
+
+            def initialize generation, & oes_p
+
               super  # before below
               @idioms = @generation.filesys_idioms
               @test_path = @generation.output_path
@@ -79,19 +84,16 @@ module Skylab::TestSupport
               s_a.push _basename_no_ext
               _PATH = s_a.join FILE_SEP_
 
-              @generation.during_generate do | generate |
+              @generation.during_output_adapter do | oa |
 
-                generate.during_output_adapter do | oa |
+                oa.receive_template_variable(
+                  :require_test_support_relpath,
+                  _PATH )
 
-                  oa.receive_template_variable(
-                    :require_test_support_relpath,
-                    _PATH )
-
-                end
               end
             end
           end
-        end
+
       end
     end
   end

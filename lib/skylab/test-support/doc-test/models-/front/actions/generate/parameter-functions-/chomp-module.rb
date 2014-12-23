@@ -4,23 +4,21 @@ module Skylab::TestSupport
 
     module Models_::Front
 
-      class Actions::Recursive
+      class Actions::Generate
 
-        class Models__::File_Generation
+        Parameter_Functions_::Chomp_module = -> gen, & oes_p do
 
-          Parameter_Functions__::Chomp_module = -> gen, val_x, & oes_p do
+          gen.during_output_adapter do | oa |
 
-            gen.during_generate do | generate |
+            s = oa.get_test_module_name
 
-              s = generate.get_business_test_module_name
+            s.gsub! %r(::[^:]+\z), EMPTY_S_
 
-              s.gsub! %r(::[^:]+\z), EMPTY_S_
+            oa.set_test_module_name s
 
-              generate.set_business_test_module_name s
-
-            end
           end
         end
+
       end
     end
   end

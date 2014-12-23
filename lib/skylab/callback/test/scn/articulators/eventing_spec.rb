@@ -57,13 +57,13 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Eventing
         scn.puts 'hi'
         scn.puts 'hej'
         scn.flush.should eql "[#{ NEWLINE_ } hi,#{ NEWLINE_ } hej#{ NEWLINE_ }]"
-        scn.flush.should be_nil
+        scn.flush.should eql '[ ]'
       end
 
       it "when zero input items and buffering mode" do
         scn = EX1.dup
         scn.flush.should eql "[ ]"
-        scn.flush.should be_nil
+        scn.flush.should eql '[ ]'
       end
     end
   end

@@ -127,6 +127,11 @@ module Skylab::Brazen
           @verb_lexeme ||= produce_verb_lexeme
         end
 
+        def verb_as_noun_lexeme
+          @__did_resolve_verb_as_noun_lexeme__ ||= __rslv_VAN_lexeme
+          @any_verb_as_noun_lexeme
+        end
+
         def verb_exponent_combination_i
           @verb_exponent_combination_i ||= prdc_verb_exponent_combination_i
         end
@@ -150,6 +155,19 @@ module Skylab::Brazen
             @nf.as_human
           end
           Lib_::NLP[]::EN::POS::Verb[ _s ]
+        end
+
+        def __rslv_VAN_lexeme
+
+          if @ci
+            if @ci.has_verb_as_noun_lemma
+              _s = @ci.verb_as_noun_lemma
+              x = Lib_::NLP[]::EN::POS::Noun[ _s ]
+            end
+          end
+
+          @any_verb_as_noun_lexeme = x
+          ACHIEVED_
         end
 
         def prdc_verb_exponent_combination_i

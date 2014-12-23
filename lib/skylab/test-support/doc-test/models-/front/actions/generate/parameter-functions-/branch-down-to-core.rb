@@ -4,11 +4,15 @@ module Skylab::TestSupport
 
     module Models_::Front
 
-      class Actions::Recursive
+      class Actions::Generate
 
-        class Models__::File_Generation
+          class Parameter_Functions_::Branch_down_to_core < Parameter_Function_
 
-          class Parameter_Functions__::Branch_down_to_core < Parameter_Function_
+            description do | y |
+
+              y << "instead of #{ val 'foo_spec.rb' }, make #{ val 'foo/core_spec.rb' }"
+
+            end
 
             def execute
 
@@ -32,7 +36,7 @@ module Skylab::TestSupport
 
           GET_RID_OF_THIS_ENDING_RX__ = /#{
             ::Regexp.escape TestSupport_::Init.spec_rb }\z/
-        end
+
       end
     end
   end

@@ -77,6 +77,13 @@ module Skylab::TestSupport
                 y << 'using a manifest file'
             end,
 
+            :description, -> y do
+              a = DocTest_.get_output_adapter_slug_array
+              y << "available adapter#{ s a }: #{ a * ' | ' }"
+            end,
+            :default, :quickie,
+            :property, :output_adapter,
+
             :flag,
             :description, -> y do
               y << "necessary to overwrite existing files"
@@ -96,23 +103,19 @@ module Skylab::TestSupport
             end,
             :property, :dry_run,
 
-            :flag,
-            :description, -> y do
-              y << "perhaps nothing."
-            end,
-            :property, :verbose,
-
             :hidden, :property, :downstream,
 
             :required,
               :description, -> y do
 
+                y << "a \"code file\" as input"
+
               end,
               :property, :path
 
 
-        def initialize k  # no block here
-          super k
+        def initialize boundish  # and oes_p
+          super
         end
 
         def normalize
@@ -175,7 +178,7 @@ module Skylab::TestSupport
       private
 
         def proto_for_preview
-          common_prototype_with :downstream, @downstream
+          common_prototype_with :line_downstream, @downstream
         end
 
         def proto_for_generate
@@ -183,20 +186,41 @@ module Skylab::TestSupport
         end
 
         def common_prototype_with * x_a
-          Recursive_::Models__::File_Generation.new(
-            :is_dry, @dry_run,
-            :force_is_present, @force,
-            * x_a,
-            :action, self,
-            :kernel, @kernel,
-            & @on_event_selectively )
+
+          Actions::Generate.new(
+
+            @kernel, & @on_event_selectively ).curry_where(
+
+              * ( :dry_run if @dry_run ),
+              * ( :force if @force ),
+              :output_adapter, @output_adapter,
+              * x_a )
         end
 
         def result_via_proto proto
 
-          @st.map_by do | manifest_entry |
+          @st.map_by do | entry |
 
-            proto.new manifest_entry
+            # because this is a map and not a map reduce, it will break
+            # the processing chain as soon as one fails. but this could
+            # be changed.
+
+            x_a = [
+              :upstream_path, entry.get_absolute_path ]
+
+            tagging_a = entry.tagging_a
+            if tagging_a
+              tagging_a.each do | tagging |
+                x = tagging.value_x
+                if x.nil?
+                  x_a.push tagging.normal_name_symbol
+                else
+                  x_a.push tagging.normal_name_symbol, x
+                end
+              end
+            end
+
+            proto.build_via_iambic x_a
 
           end
         end
@@ -289,12 +313,6 @@ module Skylab::TestSupport
             end while nil
             entry
           end
-        end
-
-      public
-
-        def filesys_idioms
-          @FS_idioms ||= DocTest_::Idioms_::Filesystem.new
         end
 
         Recursive_ = self

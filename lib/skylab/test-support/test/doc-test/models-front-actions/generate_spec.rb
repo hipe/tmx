@@ -48,6 +48,7 @@ module Skylab::TestSupport::TestSupport::DocTest
       _path = DocTest_.dir_pathname.join( Callback_::Autoloader.default_core_file ).to_path
       call_API_against_path _path
 
+      expect_neutral_event :current_output_path
       expect_neutral_event :wrote
       expect_no_more_events
       expect_neutral_result
@@ -99,7 +100,7 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
 
     def common_upstream_path
-      DocTest_.dir_pathname.join( 'models-/front/actions/generate.rb' ).to_path
+      DocTest_.dir_pathname.join( 'models-/front/actions/generate/core.rb' ).to_path
     end
 
     def common_real_life_output_path

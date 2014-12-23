@@ -2,62 +2,28 @@ module Skylab::TestSupport
 
   module DocTest
 
-    module Models_::Front
+    class Output_Adapters_::Quickie
 
-      class Actions::Recursive
+          class Parameter_Functions_::Setup_for_Regret < Parameter_Function_
 
-        class Models__::File_Generation
+            description do | y |
 
-          class Parameter_Functions__::Setup_for_Regret < Parameter_Function_
+              y << "include the extra code for this being a standalone node"
 
-            # ~ yes / no validation ( abstraction candidate )
+            end
 
             def normalize
-              if @value_x
-                via_value_resolve_do
-              else
-                @do = true
-                ACHIEVED_
-              end
-            end
-
-          private
-
-            def via_value_resolve_do
-              case @value_x
-              when YES__
-                @do = true
-                ACHIEVED_
-              when NO__
-                @do = false
-                ACHIEVED_
-              else
-                when_unrecognized_argument
-              end
-            end
-
-            NO__ = 'no'.freeze
-            YES__ = 'yes'.freeze
-
-            def when_unrecognized_argument  # #todo:cover-me
-              maybe_send_event :error, :unrecognzied_parameter_argument do
-                build_unrecognized_param_arg [ YES__, NO__ ]
-              end
-              UNABLE_
+              ACHIEVED_
             end
 
             def flush
-              yes = @do
-              @generation.during_generate do | generate |
-                generate.during_output_adapter do | oa |
-                  oa.receive_do_regret_setup yes
-                end
+              @generation.during_generate do | o |
+                o.receive_do_setup_for_regret true
               end
-              ACHIEVED_
             end
           end
-        end
-      end
+
+
     end
   end
 end
