@@ -1,10 +1,10 @@
-lib/skylab/basic/hash/core.rb  #branch-down-to-core  #regret-setup:no
-lib/skylab/basic/hash/order-proxy.rb
-lib/skylab/basic/list/core.rb  #output-filename: pairs/core_spec.rb  #regret-setup: no  #look-for-ts
-lib/skylab/basic/method.rb  #branch-down-to-core  #regret-setup:no
-lib/skylab/basic/pathname/union.rb
-lib/skylab/basic/rotating-buffer.rb
-lib/skylab/basic/struct.rb
+lib/skylab/basic/hash/core.rb
+lib/skylab/basic/hash/order-proxy.rb  #setup-for-regret  #subject-proc
+lib/skylab/basic/list/core.rb  #output-filename: pair/core_spec.rb  #look-for-ts
+lib/skylab/basic/method.rb  #branch-down-to-core
+lib/skylab/basic/pathname/union.rb  #setup-for-regret  #subject-proc
+lib/skylab/basic/rotating-buffer.rb  #setup-for-regret  #subject-proc
+lib/skylab/basic/struct.rb  #setup-for-regret  #subject-proc
 
 lib/skylab/brazen/entity/properties-stack--/common-frame--.rb #branch-down-to-core #regret-setup:no
 

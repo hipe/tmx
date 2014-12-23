@@ -31,6 +31,7 @@ module Skylab::TestSupport
         @arbitrary_proc_array = nil
         @do_coverage_part = false  # :+#re-init
         @marginated_pre_body_string = nil
+        @pre_describe_x = nil
         @subsystem_index = 1
         @num_subsystem_parts = @subsystem_index + 1
         @template_var_bx = nil
@@ -63,6 +64,27 @@ module Skylab::TestSupport
     public
 
       # ~ public API for parameter functions (alphabetical by stem)
+
+
+      # ~~ acon etc
+
+      def acon
+        @business_s_a.fetch @subsystem_index
+      end
+
+      def bmod
+        if @num_subsystem_parts + 1 < @business_s_a.length
+          a = @business_s_a[ @num_subsystem_parts .. -2 ]
+          a[ 0, 0 ] = EMPTY_S_
+          a * CONST_SEP_
+        end
+      end
+
+      def cmod
+        if @num_subsystem_parts < @business_s_a.length
+          "#{ CONST_SEP_ }#{ @business_s_a.last }"
+        end
+      end
 
       # ~~ arbitrary procs
 
@@ -102,16 +124,31 @@ module Skylab::TestSupport
         end
       end
 
-
       # ~~ pre body
 
       def in_pre_body & receive_yielder_p
+
+        _str = _string_from @marg, & receive_yielder_p
+
+        @marginated_pre_body_string = _str
+
+        ACHIEVED_
+      end
+
+      def in_pre_describe & receive_yielder_p
+
+        @pre_describe_x = _string_from '  ', & receive_yielder_p
+
+        ACHIEVED_
+      end
+
+      def _string_from marg, & receive_yielder_p
 
         to_join = []
         p = -> line do
           to_join.push line
           p = -> line_ do
-            to_join.push "#{ @marg }#{ line_ }"
+            to_join.push "#{ marg }#{ line_ }"
             nil
           end
           nil
@@ -122,11 +159,11 @@ module Skylab::TestSupport
             p[ line ]
           end )
 
-        to_join.push @marg
+        to_join.push EMPTY_S_
 
-        @marginated_pre_body_string = to_join.join NEWLINE_
+        to_join.push marg
 
-        ACHIEVED_
+        to_join.join NEWLINE_
       end
 
 
@@ -342,6 +379,7 @@ module Skylab::TestSupport
           amod: @amod,
           bmod: @bmod,
           cmod: @cmod,
+          pre_describe: @pre_describe_x,
           pre_body: @marginated_pre_body_string,
           body: @marginated_body_string,
           cover: _newlined_and_marginated_coverage_part,

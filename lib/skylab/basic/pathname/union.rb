@@ -1,6 +1,5 @@
 module Skylab::Basic
 
-  # progressive construction:
   # you can build up the union progressively, one path at at time:
   #
   #     u = Subject_[].new
@@ -11,24 +10,26 @@ module Skylab::Basic
   #     u << '/biff/baz'
   #     u.length  # => 3
 
-  # `normalize` eliminates logical redundancies in the union
-  # like so:
+  # you can build a union from a list of paths
   #
   #     u = Subject_[ '/foo/bar', '/foo', '/biff/baz' ]
+  #
+  #
+  # `normalize` eliminates logical redundancies in the union:
+  #
   #     u.length  # => 3
   #     e = u.normalize
   #     e.message_proc[] # => 'eliminating redundant entry /foo/bar which is covered by /foo'
   #     u.length  # => 2
-
-  # `match` will result in the first path in the union that 'matches'
-  # like so:
   #
-  #     u = Subject_[ '/foo/bar', '/foo', '/biff/baz' ]
+  #
+  # `match` will result in the first path in the union that 'matches':
+  #
   #     x = u.match '/no'
-  #     x # => nil
+  #     x  # => nil
   #     x = u.match '/biff/baz'
   #     x.to_s # => '/biff/baz'
-
+  #
   # if you use the result of `match` be aware it may be counter-intuitive.
   # the constituent paths that make up the union can "act like" files or
   # folders (leaves or branches) based on how the argument string "treats"
@@ -36,9 +37,8 @@ module Skylab::Basic
   #
   # result of `match` is the node that matched:
   #
-  #     u = Subject_[ '/foo/bar', '/foo', '/biff/baz' ]
   #     x = u.match '/biff/baz/other'
-  #     x.to_s # => '/biff/baz'
+  #     x.to_s  # => '/biff/baz'
   #
 
   class Pathname::Union
@@ -168,5 +168,5 @@ module Skylab::Basic
   # like so:
   #
   #     u = Subject_[ '/foo/bar', '/foo/baz/bing', '/foo', '/a', '/a/b', '/a/b/c' ]
-  #     u.normalize.message_proc[]  # => "eliminating redundant entries /a/b and /a/b/c which are covered by /a. eliminating redundant entries /foo/bar and /foo/baz/bing which are covered by /foo"
+  #     u.normalize.message_proc[]  # => "eliminating redundant entries /a/b and /a/b/c which are covered by /a. eliminating redundant entries /foo/bar and /foo/baz/bing which are covered by /foo."
 end

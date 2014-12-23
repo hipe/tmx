@@ -10,70 +10,50 @@ module Skylab::Basic::TestSupport::Pathname::Union
 
   Basic_ = Basic_
 
-  Sandboxer = TestSupport_::Sandbox::Spawner.new
+  Subject_ = -> * x_a, & p do
+    if x_a.length.nonzero? || p
+      Basic_::Pathname::Union[ * x_a, & p ]
+    else
+      Basic_::Pathname::Union
+    end
+  end
 
   describe "[ba] Pathname::Union" do
-    context "progressive construction" do
-      Sandbox_1 = Sandboxer.spawn
-      it "you can build up the union progressively, one path at at time" do
-        Sandbox_1.with self
-        module Sandbox_1
-          u = Basic_::Pathname::Union.new
-          u.length.should eql( 0 )
-          u << ::Pathname.new( '/foo/bar' )  # (internally converted to string)
-          u.length.should eql( 1 )
-          u << '/foo'
-          u << '/biff/baz'
-          u.length.should eql( 3 )
-        end
-      end
+
+    it "you can build up the union progressively, one path at at time" do
+      u = Subject_[].new
+      u.length.should eql 0
+      u << ::Pathname.new( '/foo/bar' )  # (internally converted to string)
+      u.length.should eql 1
+      u << '/foo'
+      u << '/biff/baz'
+      u.length.should eql 3
     end
-    context "`normalize` eliminates logical redundancies in the union" do
-      Sandbox_2 = Sandboxer.spawn
-      it "like so" do
-        Sandbox_2.with self
-        module Sandbox_2
-          u = Basic_::Pathname::Union[ '/foo/bar', '/foo', '/biff/baz' ]
-          u.length.should eql( 3 )
-          e = u.normalize
-          e.message_proc[].should eql( 'eliminating redundant entry /foo/bar which is covered by /foo' )
-          u.length.should eql( 2 )
-        end
+    context "you can build a union from a list of paths" do
+
+      let :u do
+        Subject_[ '/foo/bar', '/foo', '/biff/baz' ]
       end
-    end
-    context "`match` will result in the first path in the union that 'matches'" do
-      Sandbox_3 = Sandboxer.spawn
-      it "like so" do
-        Sandbox_3.with self
-        module Sandbox_3
-          u = Basic_::Pathname::Union[ '/foo/bar', '/foo', '/biff/baz' ]
-          x = u.match '/no'
-          x.should eql( nil )
-          x = u.match '/biff/baz'
-          x.to_s.should eql( '/biff/baz' )
-        end
+      it "`normalize` eliminates logical redundancies in the union" do
+        u.length.should eql 3
+        e = u.normalize
+        e.message_proc[].should eql 'eliminating redundant entry /foo/bar which is covered by /foo'
+        u.length.should eql 2
       end
-    end
-    context "if you use the result of `match` be aware it may be counter-intuitive." do
-      Sandbox_4 = Sandboxer.spawn
+      it "`match` will result in the first path in the union that 'matches'" do
+        x = u.match '/no'
+        x.should eql nil
+        x = u.match '/biff/baz'
+        x.to_s.should eql '/biff/baz'
+      end
       it "result of `match` is the node that matched" do
-        Sandbox_4.with self
-        module Sandbox_4
-          u = Basic_::Pathname::Union[ '/foo/bar', '/foo', '/biff/baz' ]
-          x = u.match '/biff/baz/other'
-          x.to_s.should eql( '/biff/baz' )
-        end
+        x = u.match '/biff/baz/other'
+        x.to_s.should eql '/biff/baz'
       end
     end
-    context "for fun, `message_proc` may play with `aggregated articulation`" do
-      Sandbox_5 = Sandboxer.spawn
-      it "like so" do
-        Sandbox_5.with self
-        module Sandbox_5
-          u = Basic_::Pathname::Union[ '/foo/bar', '/foo/baz/bing', '/foo', '/a', '/a/b', '/a/b/c' ]
-          u.normalize.message_proc[].should eql( "eliminating redundant entries /a/b and /a/b/c which are covered by /a. eliminating redundant entries /foo/bar and /foo/baz/bing which are covered by /foo." )
-        end
-      end
+    it "like so" do
+      u = Subject_[ '/foo/bar', '/foo/baz/bing', '/foo', '/a', '/a/b', '/a/b/c' ]
+      u.normalize.message_proc[].should eql "eliminating redundant entries /a/b and /a/b/c which are covered by /a. eliminating redundant entries /foo/bar and /foo/baz/bing which are covered by /foo."
     end
   end
 end

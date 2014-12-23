@@ -6,8 +6,7 @@ module Skylab::Basic
       1 == d ? A_Buffer_Of_One__.new : new( d )
     end
 
-    # it's just like tivo
-    # like so
+    # it's just like tivo:
     #
     #     rotbuf = Subject_[].new 4
     #     rotbuf << :a << :b << :c << :d << :e
@@ -20,8 +19,8 @@ module Skylab::Basic
     #     rotbuf[ -10 .. -1 ] # =>  nil
     #     rotbuf[ 2, 22 ] # =>  %i( d e )
 
-    # and when you are
-    # under buffer
+    # if you haven't yet reached the size limit of your buffer,
+    # accessing the last N items will work:
     #
     #     rotbuf = Subject_[].new 5
     #     rotbuf << :a << :b << :c
@@ -40,17 +39,19 @@ module Skylab::Basic
 
     attr_reader :virtual_buffer_length
 
-    # 'to_a' works on
-    # short buffers
+    # you can use `to_a` on a rotating buffer
     #
     #     r = Subject_[].new 3
+    #
+    #
+    # it works on not-yet-cycles buffers:
+    #
     #     r << :a << :b
     #     r.to_a  # => %i( a b )
-
-    # 'to_a' works on
-    # cycled buffers
     #
-    #     r = Subject_[].new 3
+    #
+    # on a buffer that has cycled, it gives you the last N items:
+    #
     #     r << :a << :b << :c << :d
     #     r.to_a  # => %i( b c d )
     #

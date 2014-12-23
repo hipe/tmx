@@ -22,25 +22,28 @@ module Skylab::Basic
 
     Loquacious_default_proc__ = -> moniker, h, k do
 
-      # the loquacious default proc
-      # can be used like so:
+      # the loquacious default proc tries to generate sexy helpful messages:
+      #
       #     h = { foo: 'bar', biff: 'baz' }
       #     h.default_proc = Subject_[].loquacious_default_proc.curry[ 'beefel' ]
       #     h[ :luhrmann ]  # => KeyError: no such beefel 'luhrmann'. did you mean 'foo' or 'biff'?
 
-      _msg = "no such #{ moniker } #{ Basic_::Lib_::Strange[ k ] }. #{
-        }did you mean #{
-          Basic_::Lib_::Oxford_or[ h.keys.map( & Lib_::Strange ) ] }?"
+      o = Basic_._lib
+
+      _msg = "no such #{ moniker } #{ o.strange k }. #{
+        }did you mean #{ o.oxford_or h.keys.map( & Lib_::Strange ) }?"
+
       raise ::KeyError, _msg
     end
 
-      # read [#026] the hash narrative # #storypoint-105
-      # but here's the gist of it:
+      # `unpack_equal` flattens a hash's values into an array
       #
       #     h = { age: 2, name: "me" }
-      #     name, age = Basic_::Hash__.unpack_equal h, :name, :age
+      #     name, age = Subject_[].unpack_equal h, :name, :age
       #     name  # => "me"
       #     age  # => 2
+      #
+      # but read [#026] the hash narrative # #storypoint-105
 
       Unpack_equal__ = -> h, * k_a do
         Validate_superset__[ h, k_a ]

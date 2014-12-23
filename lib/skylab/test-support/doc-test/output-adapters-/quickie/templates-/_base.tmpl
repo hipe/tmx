@@ -10,7 +10,7 @@ module {{ amod }}::TestSupport{{ bmod }}{{ cmod }}
 
   {{ acon }}_ = {{ acon }}_
 
-  describe "{{ desc }}" do
+  {{ pre_describe }}describe "{{ desc }}" do
 
     {{ pre_body }}{{ body }}{{ cover }}
   end

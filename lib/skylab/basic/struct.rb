@@ -2,32 +2,39 @@ module Skylab::Basic
 
   module Struct  # [#030].
 
-    # use it
-    # like this
+    # make a basic struct class with a list of member names (like ::Struct)
     #
-    #     Foo = Basic_::Struct[ :nerp ]
+    #     Foo = Basic_::Struct.new :nerp
+    #
+    #
+    # build an instance with `new`, by default the member is nil (like ::Struct)
     #
     #     Foo.new.nerp  # => nil
     #
-    # beep
+    #
+    # arguments passed to `new` will become the member values:
     #
     #     Foo.new( :bleep ).nerp  # => :bleep
     #
-    # berp
     #
-    #     Foo[ :fazzle ].nerp  # = :fazzle
+    # `[]` is effectively an alias for `new`:
     #
-    # bingo
+    #     Foo[ :fazzle ].nerp  # => :fazzle
+    #
+    #
+    # with an instance you can set (mutate) the value of a member with '='
     #
     #     foo = Foo.new
     #     foo.nerp = :dango
     #     foo.nerp  # => :dango
     #
-    # django unchained
+    #
+    # `members` as a class method works like in ::Struct
     #
     #     Foo.members  # => [ :nerp ]
     #
-    # hotsauce
+    #
+    # `members` as an instance method does the same
     #
     #     Foo.new.members  # => [ :nerp ]
     #

@@ -2,8 +2,10 @@ module Skylab::Basic
 
   class Hash::Order_Proxy
 
-    # a proxy around a hash that tracks in order every key of every `aset` call
-    # for dark hacks
+    # it acts sort of like a hash, but one that internally tracks the
+    # order of every `aset` call (add or update) for dark hacks
+    #
+    # so it acts like a hash, but it memoizes the order of `aset` keys:
     #
     #     h = { }
     #     op = Subject_[].new h

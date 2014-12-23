@@ -10,7 +10,6 @@ module Skylab::TestSupport
 
           st = line_downstream
 
-          st.puts ''
           st.puts "let :#{ node.variable_name } do"
           st.puts "  #{ node.rhs }"
           st.puts "end"

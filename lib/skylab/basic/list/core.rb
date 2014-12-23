@@ -34,11 +34,11 @@ module Skylab::Basic
       end
     end
 
-    # `build_each_pairable_via_even_iambic`
-    # like so:
+    # with `build_each_pairable_via_even_iambic` produce an object
+    # that responds to `each_pair` via a flat list of name-value pairs
     #
-    #     ea = Subject_[].build_each_pairable_via_even_iambic [ :a, :b, :c, :d ]
-    #     ::Hash[ ea.each_pair.to_a ]  # => { a: :b, c: :d }
+    #     ea = Basic_::List.build_each_pairable_via_even_iambic [ :a, :b, :c, :d ]
+    #     ::Hash[ ea.each_pair.to_a ]  # => ( { a: :b, c: :d } )
 
     List_ = self
   end

@@ -21,8 +21,7 @@ module Skylab::Basic
         end
       end
 
-      # a method curry binds arguments to a bound method
-      # like so:
+      # a method curry (like that other thing) binds arguments to a bound method call
       #
       #     class Foo
       #       def bar a, b
@@ -32,8 +31,9 @@ module Skylab::Basic
       #
       #     foo = Foo.new
       #     mc = Basic_::Method.curry.new foo.method(:bar), [ 'yes', 'sir' ]
-      #     r = mc.receiver.send mc.method_name, * mc.arguments
-      #     r  # => "ok:yessir"
+      #     x = mc.receiver.send mc.method_name, * mc.arguments
+      #     x  # => "ok:yessir"
+      #
 
       def initialize method, arg_a=EMPTY_A_
         @bound_method = method
@@ -51,15 +51,14 @@ module Skylab::Basic
       attr_reader :arguments
 
       # you can validate your argument arity before the call
-      # like so:
       #
-      #     class Foo
+      #     class Bar
       #       def bar x, y=nil
       #         [ x, y ]
       #       end
       #     end
       #
-      #     foo = Foo.new
+      #     foo = Bar.new
       #
       #     p = -> *a do
       #       mc = Basic_::Method.curry.new foo.method(:bar), a
