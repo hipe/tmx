@@ -82,7 +82,7 @@ module Skylab::Brazen
 
         surface = if lexeme
           if 1 == d
-            lexeme.singuar
+            lexeme.singular
           else
             lexeme.plural
           end

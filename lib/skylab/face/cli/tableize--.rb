@@ -2,13 +2,11 @@ module Skylab::Face
 
   CLI::Tableize__ = -> opts, line_p, rows do  # :+#deprecation:until-cull
 
-    # `tableize` - deprecated, see  [#036]
+    # `tableize` has been deprecated (use [#036]). but here's a demo:
     #
-    # `tableize` has been deprecated.  but here's a demo:
-    #
-    #     y = [ ]
+    #     y = []
     #     Face_::CLI.tableize(
-    #       [ food: 'donuts', drink: 'coffee' ], -> line { y << line } ]
+    #       [ food: 'donuts', drink: 'coffee' ], -> line { y << line } )
     #
     #     y.shift   # => "|   Food  |   Drink |"
     #     y.shift   # => "| donuts  |  coffee |"

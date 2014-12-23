@@ -8,5 +8,9 @@ module Skylab::Face::TestSupport::CLI
     parent_anchor_module.bundles_class
   end
 
+  include Constants
+
+  extend TestSupport_::Quickie
+
   stowaway :Client, 'client/test-support'  # [#045] this is part of our public API
 end

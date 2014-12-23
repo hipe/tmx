@@ -376,15 +376,29 @@ module Skylab::TestSupport
       end
 
       def test_name_as_tree_parts
+
+        d = @test_s_a.length
+
         s_a = @test_s_a.map do |const_s|
           Chomp_trailing_underscores__[ const_s ]
         end
+
         a = ::Array.new 3
-        a[ 0 ] = s_a[ 0, @num_subsystem_parts ] * CONST_SEP_
-        a[ 2 ] = s_a.fetch( -1 )
-        if @num_subsystem_parts + 1 < s_a.length
-          a[ 1 ] = "#{ CONST_SEP_ }#{ s_a[ @num_subsystem_parts .. -2 ] * CONST_SEP_ }"
+
+        if 0 < d
+
+          a[ 0 ] = s_a[ 0, @num_subsystem_parts ] * CONST_SEP_
+
+          if @num_subsystem_parts < d
+
+            a[ 2 ] = "#{ CONST_SEP_ }#{ s_a.fetch( -1 ) }"
+
+            if @num_subsystem_parts + 1 < d
+              a[ 1 ] = "#{ CONST_SEP_ }#{ s_a[ @num_subsystem_parts .. -2 ] * CONST_SEP_ }"
+            end
+          end
         end
+
         a
       end
 

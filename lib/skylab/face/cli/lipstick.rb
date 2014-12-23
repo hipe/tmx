@@ -25,11 +25,11 @@ module Skylab::Face
     # simple, but are nonetheless separate currently. here is
     # an illustration of the steps for building and using a lipstick:
     #
-    #     Lipstick = Face_::CLI::Lipstick.new '*', :yellow, -> { 20 }
+    #     _LIPSTICK = Face_::CLI::Lipstick.new '*', :yellow, -> { 20 }
     #       # we want to render yellow '*' characters. a fallback width
     #       # is the (quite narrow) 20 characters, for the whole pane "screen"
     #
-    #     rendering_proc = Lipstick.instance.cook_rendering_proc([12])
+    #     rendering_proc = _LIPSTICK.instance.cook_rendering_proc [ 12 ]
     #       # to "cook" a rendering function, we tell it that we will have a
     #       # table on the left half of the screen that has one column that
     #       # is 12 characters wide.
@@ -42,18 +42,17 @@ module Skylab::Face
     #       # the width you get may vary based on your terminal's width when
     #       # you run this!
 
-    # You can also render compound "tuple ratios"
-    # like so:
+    # You can also render compound "tuple ratios":
     #
-    #     Lipstick = Face_::CLI::Lipstick.new [['+', :green],['-', :red]]
+    #     _LIPSTICK = Face_::CLI::Lipstick.new [ ['+', :green], ['-', :red] ]
     #       # first arg is instead an array of "pen tuples"
     #       # we chose not to provide a 2nd arg (default width function).
     #
-    #     f = Lipstick.instance.cook_rendering_proc [ 28 ], 60
+    #     p = _LIPSTICK.instance.cook_rendering_proc [ 28 ], 60
     #       # existing table is 1 column, 28 chars wide. explicitly set
     #       # the "panel" width to 60 (overriding any attempt at ncurses).
     #
-    #     ohai = f[ 0.50, 0.25 ]  # we have 32 chars to work within..
+    #     ohai = p[ 0.50, 0.25 ]  # we have 32 chars to work within..
     #     num_pluses = /\++/.match( ohai )[ 0 ].length
     #     num_minuses = /-+/.match( ohai )[ 0 ].length
     #     num_pluses # => 15

@@ -1,13 +1,14 @@
 module Skylab::InformationTactics
 
-  # levenshtein distance
-  # is kind of amazing
+  # levenshtein distance is kind of amazing
   #
   #     a = [ :apple, :banana, :ernana, :onono, :strawberry, :orange ]
-  #     a_ = Subject_[].with(
+  #
+  #     a_ = IT_::Levenshtein.with(
   #       :item, :bernono,
   #       :items, a,
   #       :closest_N_items, 3 )
+  #
   #     a_  # => [ :onono, :ernana, :banana ]
 
   class Levenshtein

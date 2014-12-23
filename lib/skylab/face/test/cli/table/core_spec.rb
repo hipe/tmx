@@ -3,121 +3,80 @@ require_relative 'test-support'
 module Skylab::Face::TestSupport::CLI::Table
 
   describe "[fa] CLI::Table" do
-    context "a table" do
-      Sandbox_1 = Sandboxer.spawn
+
+    context "is a pesudo-proc .." do
+
       before :all do
-        Sandbox_1.with self
-        module Sandbox_1
-          Table = Face_::CLI::Table
-        end
+        Table = Face_::CLI::Table
       end
-      it "with nothing renders nothing" do
-        Sandbox_1.with self
-        module Sandbox_1
-          Table[].should eql( nil )
-        end
+      it "call it with nothing and it renders nothing" do
+        Table[].should eql nil
       end
-      it "with one thing, must respond to each (in two dimensions)" do
-        Sandbox_1.with self
-        module Sandbox_1
-          -> do
-            Table[ :a ]
-          end.should raise_error( NoMethodError,
-                       ::Regexp.new( "\\Aundefined\\ method\\ `each'\\ for\\ :a" ) )
-        end
+      it "call it with one thing, must respond to each (in two dimensions)" do
+        -> do
+          Table[ :a ]
+        end.should raise_error( NoMethodError,
+                     ::Regexp.new( "\\Aundefined\\ method\\ `each'\\ for\\ :a" ) )
       end
       it "that is, an array of atoms won't fly either" do
-        Sandbox_1.with self
-        module Sandbox_1
-          -> do
-            Table[ [ :a, :b ] ]
-          end.should raise_error( NoMethodError,
-                       ::Regexp.new( "\\Aundefined\\ method\\ `each_wi" ) )
-        end
+        -> do
+          Table[ [ :a, :b ] ]
+        end.should raise_error( NoMethodError,
+                     ::Regexp.new( "\\Aundefined\\ method\\ `each_wi" ) )
       end
-      it "but here is the smallest table you can render, which is boring" do
-        Sandbox_1.with self
-        module Sandbox_1
-          Table[ [] ].should eql( '' )
-        end
+      it "here is the smallest table you can render, which is boring" do
+        Table[ [] ].should eql ''
       end
       it "default styling (\"| \", \" |\") is evident in this minimal non-empty table" do
-        Sandbox_1.with self
-        module Sandbox_1
-          Table[ [ [ 'a' ] ] ].should eql( "| a |\n" )
-        end
+        Table[ [ [ 'a' ] ] ].should eql "| a |\n"
       end
-      it "with this minimal normative example" do
-        Sandbox_1.with self
-        module Sandbox_1
-          act = Table[ [ [ 'Food', 'Drink' ], [ 'donuts', 'coffee' ] ] ]
-          exp = <<-HERE.gsub %r<^ +>, ''
-            | Food   | Drink  |
-            | donuts | coffee |
-          HERE
-          act.should eql( exp )
-        end
+      it "minimal normative example" do
+        act = Table[ [ [ 'Food', 'Drink' ], [ 'donuts', 'coffee' ] ] ]
+        exp = <<-HERE.gsub %r<^ +>, ''
+          | Food   | Drink  |
+          | donuts | coffee |
+        HERE
+        act.should eql exp
       end
     end
-    context "but wait there's more -" do
-      Sandbox_2 = Sandboxer.spawn
-      it "specify custom headers, separators, and output functions" do
-        Sandbox_2.with self
-        module Sandbox_2
-          Table = Face_::CLI::Table
-          a = []
-          r = Table[ :field, 'Food', :field, 'Drink',
-                     :left, '(', :sep, ',', :right, ')',
-                     :read_rows_from, [[ 'nut', 'pomegranate' ]],
-                     :write_lines_to, a.method( :<< )
-                     ]
+    it "specify custom headers, separators, and output functions" do
+      a = []
+      x = Face_::CLI::Table[ :field, 'Food', :field, 'Drink',
+        :left, '(', :sep, ',', :right, ')',
+        :read_rows_from, [[ 'nut', 'pomegranate' ]],
+        :write_lines_to, a.method( :<< ) ]
 
-          r.should eql( nil )
-          ( a * 'X' ).should eql( "(Food,Drink      )X(nut ,pomegranate)" )
-        end
-      end
+      x.should eql nil
+      ( a * 'X' ).should eql "(Food,Drink      )X(nut ,pomegranate)"
     end
-    context "this syntax is \"contoured\" - fields themselves eat keywords" do
-      Sandbox_3 = Sandboxer.spawn
-      it "like so : you can align `left` or `right` (ambiguity is possible)" do
-        Sandbox_3.with self
-        module Sandbox_3
-          str = Face_::CLI::Table[
-            :field, :right, :label, "Subproduct",
-            :field, :left, :label, "num test files",
-            :read_rows_from, [ [ 'face', 100 ], [ 'headless', 99 ] ] ]
+    it "add field modifiers between the `field` keyword and its label (left/right)" do
+      str = Face_::CLI::Table[
+        :field, :right, :label, "Subproduct",
+        :field, :left, :label, "num test files",
+        :read_rows_from, [ [ 'face', 100 ], [ 'headless', 99 ] ] ]
 
-          exp = <<-HERE.unindent
-            | Subproduct | num test files |
-            |       face | 100            |
-            |   headless | 99             |
-          HERE
-          str.should eql( exp )
-        end
-      end
+      exp = <<-HERE.unindent
+        | Subproduct | num test files |
+        |       face | 100            |
+        |   headless | 99             |
+      HERE
+      str.should eql exp
     end
-    context "but the real fun begins with currying - curry a table in one place" do
-      Sandbox_4 = Sandboxer.spawn
+    context "you can curry properties and behavior for table in one place .." do
+
       before :all do
-        Sandbox_4.with self
-        module Sandbox_4
-          P = Face_::CLI::Table.curry :left, '<', :sep, ',', :right, '>'
-        end
+        P = Face_::CLI::Table.curry :left, '<', :sep, ',', :right, '>'
       end
-      it "and (perhaps modify it) and use it in another (CASCADING stylesheet like!)" do
-        Sandbox_4.with self
-        module Sandbox_4
-          P[ :sep, ';', :read_rows_from, [%w(a b), %w(c d)] ].should eql( "<a;b>\n<c;d>\n" )
-          P[ [ %w(a b), %w(c d) ] ].should eql( "<a,b>\n<c,d>\n" )
-        end
+      it "and then use it in another place" do
+        P[ [ %w(a b), %w(c d) ] ].should eql "<a,b>\n<c,d>\n"
+      end
+      it "you can optionally modify the properties for your call" do
+        P[ :sep, ';', :read_rows_from, [%w(a b), %w(c d)] ].should eql "<a;b>\n<c;d>\n"
       end
       it "you can even curry the curried \"function\", curry the data, and so on -" do
-        Sandbox_4.with self
-        module Sandbox_4
-          Q = P.curry( :read_rows_from, [ %w( a b ) ], :sep, 'X' )
-          Q[ :sep, '_' ].should eql( "<a_b>\n" )
-          Q[].should eql( "<aXb>\n" )
-        end
+        q = P.curry( :read_rows_from, [ %w( a b ) ], :sep, 'X' )
+        q[ :sep, '_' ].should eql "<a_b>\n"
+        q[].should eql "<aXb>\n"
       end
     end
   end

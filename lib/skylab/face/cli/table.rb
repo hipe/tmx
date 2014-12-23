@@ -2,23 +2,30 @@ module Skylab::Face
 
   class CLI::Table  # read [#036] the CLI table narrative #storypoint-5
 
-    # a table
-    # with nothing renders nothing
+    # it is a pesudo-proc ..
     #
     #     Table = Face_::CLI::Table
+    #
+    #
+    # call it with nothing and it renders nothing:
+    #
     #     Table[]  # => nil
     #
-    # with one thing, must respond to each (in two dimensions)
+    #
+    # call it with one thing, must respond to each (in two dimensions)
     #
     #     Table[ :a ]  # => NoMethodError: undefined method `each' for :a..
+    #
     #
     # that is, an array of atoms won't fly either
     #
     #     Table[ [ :a, :b ] ]  # => NoMethodError: undefined method `each_wi..
     #
-    # but here is the smallest table you can render, which is boring
+    #
+    # here is the smallest table you can render, which is boring
     #
     #     Table[ [] ]  # => ''
+    #
     #
     # default styling ("| ", " |") is evident in this minimal non-empty table:
     #
@@ -26,8 +33,8 @@ module Skylab::Face
     #
     #
     # the default styling also includes " | " as the middle separator
-    # and text cels aligned left
-    # with this minimal normative example
+    # and text cels aligned left with this
+    # minimal normative example:
     #
     #     act = Table[ [ [ 'Food', 'Drink' ], [ 'donuts', 'coffee' ] ] ]
     #     exp = <<-HERE.gsub %r<^ +>, ''
@@ -122,18 +129,15 @@ module Skylab::Face
     end
     end
 
-    # but wait there's more -
     # specify custom headers, separators, and output functions:
     #
-    #     Table = Face_::CLI::Table
     #     a = []
-    #     r = Table[ :field, 'Food', :field, 'Drink',
-    #                :left, '(', :sep, ',', :right, ')',
-    #                :read_rows_from, [[ 'nut', 'pomegranate' ]],
-    #                :write_lines_to, a.method( :<< )
-    #                ]
+    #     x = Face_::CLI::Table[ :field, 'Food', :field, 'Drink',
+    #       :left, '(', :sep, ',', :right, ')',
+    #       :read_rows_from, [[ 'nut', 'pomegranate' ]],
+    #       :write_lines_to, a.method( :<< ) ]
     #
-    #     r  # => nil
+    #     x  # => nil
     #     ( a * 'X' )  # => "(Food,Drink      )X(nut ,pomegranate)"
 
     class Field_Shell__
@@ -185,8 +189,7 @@ module Skylab::Face
       end )
     end
 
-    # this syntax is "contoured" - fields themselves eat keywords
-    # like so : you can align `left` or `right` (ambiguity is possible)
+    # add field modifiers between the `field` keyword and its label (left/right):
     #
     #     str = Face_::CLI::Table[
     #       :field, :right, :label, "Subproduct",
@@ -554,20 +557,28 @@ module Skylab::Face
       end
     end
 
-    # but the real fun begins with currying - curry a table in one place
-    # and (perhaps modify it) and use it in another (CASCADING stylesheet like!)
+    # but the real fun begins with currying
+    # you can curry properties and behavior for table in one place ..
     #
     #     P = Face_::CLI::Table.curry :left, '<', :sep, ',', :right, '>'
     #
-    #     P[ :sep, ';', :read_rows_from, [%w(a b), %w(c d)] ]  # => "<a;b>\n<c;d>\n"
+    #
+    # and then use it in another place:
     #
     #     P[ [ %w(a b), %w(c d) ] ]  # => "<a,b>\n<c,d>\n"
     #
+    #
+    # you can optionally modify the properties for your call:
+    #
+    #     P[ :sep, ';', :read_rows_from, [%w(a b), %w(c d)] ]  # => "<a;b>\n<c;d>\n"
+    #
+    #
+    #
     # you can even curry the curried "function", curry the data, and so on -
     #
-    #     Q = P.curry( :read_rows_from, [ %w( a b ) ], :sep, 'X' )
-    #     Q[ :sep, '_' ]  # => "<a_b>\n"
-    #     Q[]  # => "<aXb>\n"
+    #     q = P.curry( :read_rows_from, [ %w( a b ) ], :sep, 'X' )
+    #     q[ :sep, '_' ]  # => "<a_b>\n"
+    #     q[]  # => "<aXb>\n"
 
     class << self
       def curry * x_a
