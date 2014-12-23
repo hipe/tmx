@@ -50,6 +50,11 @@ module Skylab::Brazen
 
     class << self
 
+      def is_branch
+        true  # for now, every model node exists (in the eyes of invocation
+        # engines) only to dispatch each request down to one of its children
+      end
+
       def is_promoted
       end
 
@@ -64,9 +69,9 @@ module Skylab::Brazen
       end
 
       def new_flyweight kernel, & oes_p
-        new kernel do
-          @property_box = Flyweight_Property_Box__.new self
-          recv_selective_listener_proc oes_p
+        me = self
+        edit_entity_directly kernel, oes_p do
+          @property_box = Flyweight_Property_Box__.new me
         end
       end
 
@@ -110,16 +115,19 @@ module Skylab::Brazen
       end
 
       def unmarshalled kernel, oes_p, & edit_p
-        new kernel do
-          recv_selective_listener_proc oes_p
+        edit_entity_directly kernel, oes_p do
           @came_from_persistence = true
         end.first_edit( & edit_p )
       end
 
-      def edit_entity kernel, oes_p, & edit_p
-        new kernel do
-          recv_selective_listener_proc oes_p
-        end.first_edit( & edit_p )
+      def edit_entity boundish, oes_p, & edit_p
+        new( boundish, & oes_p ).first_edit( & edit_p )
+      end
+
+      def edit_entity_directly boundish, oes_p, & edit_p
+        o = new boundish, & oes_p
+        o.instance_exec( & edit_p )
+        o
       end
 
       def persist_to= i
@@ -210,6 +218,10 @@ module Skylab::Brazen
         ! is_invisible
       end
 
+      def to_kernel
+        @kernel
+      end
+
       attr_reader :is_invisible
 
       def has_description
@@ -244,11 +256,12 @@ module Skylab::Brazen
       self
     end
 
-    def initialize kernel, & p  # #note-180 do not set error count here
-      @kernel = kernel
+    def initialize boundish, & oes_p  # #note-180 do not set error count here
+
+      @on_event_selectively = oes_p or self._WHERE # #t-odo
+      @kernel = boundish.to_kernel
       @kernel.do_debug and @kernel.debug_IO.
         puts ">> >> >> >> MADE #{ name.as_slug } CTRL"
-      p and instance_exec( & p )
     end
 
     def initialize_copy _otr_  # when entity is flyweight
@@ -259,10 +272,6 @@ module Skylab::Brazen
 
     attr_reader :any_bound_call_for_edit_result,
       :came_from_persistence
-
-    def is_branch
-      true
-    end
 
     def is_visible
       true
@@ -286,14 +295,14 @@ module Skylab::Brazen
     end
 
     def to_normalized_bound_property_scan
-      props = self.class.properties
+      props = formal_properties
       LIB_.stream.via_nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
         get_bound_property_via_property props.fetch i
       end
     end
 
     def get_sorted_property_name_i_a
-      i_a = self.class.properties.get_names
+      i_a = formal_properties.get_names
       i_a.sort! ; i_a
     end
 
@@ -340,42 +349,31 @@ module Skylab::Brazen
       @property_box.fetch i
     end
 
-    # ~ action scanning
+    # ~ action streaming
 
-    def get_action_scan
-      get_lower_action_scan
-    end
-
-    def get_lower_action_scan
-      acr = self.class.actn_class_reflection
-      acr and acr.get_lower_action_cls_scan.map_by do |cls|
-        cls.new @kernel
-      end
-    end
-
-    def get_unbound_action_scan
-      self.class.get_unbound_lower_action_scan
+    def to_unbound_action_stream
+      self.class.to_lower_unbound_action_stream
     end
 
     class << self
 
-      def get_unbound_action_scan
-        get_unbound_upper_action_scan
+      def to_unbound_action_stream
+        to_upper_unbound_action_stream
       end
 
-      def get_unbound_upper_action_scan
+      def to_upper_unbound_action_stream  # :+#public-API
         acr = actn_class_reflection
-        acr and acr.get_upper_action_cls_scan
+        acr and acr.to_upper_action_cls_strm
       end
 
-      def get_node_scan
+      def to_node_stream
         acr = actn_class_reflection
-        acr and acr.get_node_scan
+        acr and acr.to_node_stream
       end
 
-      def get_unbound_lower_action_scan
+      def to_lower_unbound_action_stream  # :+#public-API
         acr = actn_class_reflection
-        acr and acr.get_lower_action_cls_scan
+        acr and acr.to_lower_action_cls_strm
       end
 
       def is_actionable
@@ -410,17 +408,17 @@ module Skylab::Brazen
         @cls, @mod = a
       end
 
-      def get_upper_action_cls_scan
+      def to_upper_action_cls_strm
         @did ||= work
         LIB_.stream.via_nonsparse_array @up_a
       end
 
-      def get_lower_action_cls_scan
+      def to_lower_action_cls_strm
         @did ||= work
         LIB_.stream.via_nonsparse_array @down_a
       end
 
-      def get_node_scan
+      def to_node_stream
         @did ||= work
         LIB_.stream.via_nonsparse_array @all_a
       end
@@ -466,11 +464,16 @@ module Skylab::Brazen
     # ~ edit :+#hook-in
 
     def first_edit & edit_p
+
       _ok = set_prps_via_first_edit( & edit_p )
       _ok && via_props_produce_edit_result
     end
 
-    def edit & edit_p  # #todo this is covered visually by `source rm` ONLY
+    def edit & edit_p  # #todo - `edit` method is covered visually only
+
+      # this is covered visually by [ datastore | source ] `rm` ONLY
+      # currently it is only used to pass in action formals or "adverbs"
+
       _ok = set_prps_via_subsequent_edit( & edit_p )
       _ok && via_props_produce_edit_result
     end
@@ -481,132 +484,176 @@ module Skylab::Brazen
 
     def set_prps_via_first_edit & edit_p
 
-      @parameter_box ||= Box_.new
+      stct = First_Edit_Yield__.new
 
-      x_a = []
+      es = First_Edit_Session__.new stct, formal_properties
 
-      es = First_Edit_Session__.new @parameter_box, x_a, self.class.properties
       edit_p[ es ]  # the blocks of edit sessions are only for setting parameters
 
-      oes_p = es.handle_event_selectively
-      if oes_p
-        recv_selective_listener_proc oes_p
+      @property_box = Box_.new
+
+      @parameter_box = stct.param_bx || Box_.new
+
+      p = stct.replacement_sel_channel_proc
+      if p
+        change_selective_listener_via_channel_proc p
       end
 
-      precons = es.precons
-      if precons
-        @preconditions = precons
+      pcns = stct.precons
+      if pcns
+        @preconditions = pcns
       end
 
-      @property_box ||= Box_.new
+      x_a = stct.iambic
 
-      if x_a.length.zero?
-        ACHIEVED_
-      else
+      if x_a
         process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+      else
+        ACHIEVED_
       end
     end
 
     def set_prps_via_subsequent_edit & edit_p
 
-      x_a = []
+      stct = Subsequent_Edit_Yield__.new
 
-      es = Subsequent_Edit_Session__.new @parameter_box, x_a, self.class.properties
+      es = Subsequent_Edit_Session__.new stct, formal_properties
+
       edit_p[ es ]  # the blocks of edit sessions are only for setting parameters
 
-      afp = es.action_formal_properties
+      afp = stct.action_formal_prps
       if afp
         @action_formal_properties = afp
       end
 
-      if x_a.length.zero?
-        ACHIEVED_
-      else
-        process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+      delta_param_bx = stct.param_bx
+      if delta_param_bx
+        delta_param_bx.each_pair do | sym, x |
+          @parameter_box.set sym, x
+        end
       end
+
+      ACHIEVED_
     end
+
+    Common_Edit_Session_Methods__ = ::Module.new
+
+    Subsequent_Edit_Yield__ = ::Struct.new :param_bx, :action_formal_prps
 
     class Subsequent_Edit_Session__
 
-      def initialize pbx, x_a, props
+      include Common_Edit_Session_Methods__
 
-        add_prop_iambic = nil
-
-        @set_arg = -> i, x do
-          prop = props[ i ]
-
-          if prop
-            add_prop_iambic[ prop, x ]
-          else
-            pbx.set i, x
-          end ; nil
-        end
-
-        @set_prop = -> i, x do
-          prop = props[ i ]
-          if prop
-            add_prop_iambic[ prop, x ]
-          else
-            x_a.push i, x  # [#037] errors welcome
-          end ; nil
-        end
-
-        add_prop_iambic = -> prop, x do
-          if prop.takes_argument
-            x_a.push prop.name_i, x
-          else
-            x_a.push prop.name_i
-          end
-        end
-
-        @concat_props = -> x_a_ do
-          x_a.concat x_a_ ; nil
-        end
+      def initialize yld, formal_properties
+        @prps = formal_properties
+        @yld = yld
       end
 
-      attr_accessor :action_formal_properties
-
-      def with_arguments * x_a
-        x_a.each_slice 2 do |x, y|
-          @set_arg[ x, y ]
-        end ; nil
-      end
-
-      def set_arg i, x
-        @set_arg[ i, x ] ; nil
-      end
-
-      def with_argument_box bx
-        bx.each_pair( & @set_arg ) ; nil
-      end
-
-      def with * x_a
-        @concat_props[ x_a ] ; nil
-      end
-
-      def with_iambic x_a
-        @concat_props[ x_a ] ; nil
+      def action_formal_props x
+        @yld.action_formal_prps = x ; nil
       end
     end
 
-    class First_Edit_Session__ < Subsequent_Edit_Session__
+    First_Edit_Yield__ = ::Struct.new :iambic, :param_bx, :replacement_sel_channel_proc, :precons
 
-      attr_accessor :precons
+    class First_Edit_Session__
 
-      def on_event_selectively & oes_p
-        @handle_event_selectively = oes_p ; nil
+      # classify each incoming argument into either a recognized business-
+      # specific actual property value or a presumed parameter ("adverb").
+      # each former is written to the iambic presumably to be processed by
+      # that pipeline. each latter is written to a freeform box the values
+      # of which are not validated but just kept around in case the entity
+      # recognizes them. handle other facet-specific concerns as well.
+
+      include Common_Edit_Session_Methods__
+
+      def initialize yld, props
+        @prps = props
+        @yld = yld
       end
 
-      attr_reader :handle_event_selectively
-
-      def with_preconditions x
-        @precons = x ; nil
-      end
-
-      def with_unmarshalled_hash h
-        h.each_pair do |s, x|
-          @set_prop[ s.intern, x ]
+      def arguments * x_a
+        x_a.each_slice 2 do | sym, x |
+          _receive_nonclassified_argument sym, x
         end ; nil
+      end
+
+      def argument_box bx
+        bx.each_pair( & method( :_receive_nonclassified_argument ) ) ; nil
+      end
+
+      def where * x_a
+        iambic x_a
+      end
+
+      def iambic x_a
+        _some_mutable_iambic.concat x_a ; nil
+      end
+
+      def unmarshalled_hash h
+        h.each_pair do | s, x |
+          prp = @prps[ s.intern ]
+          if prp
+            _add_to_iambic_via_value_and_property x, prp
+          else
+            _some_mutable_iambic.push s.intern, x  # [#037] assume future error
+          end
+        end ; nil
+      end
+
+      def replace_selective_event_listener_via_channel_proc x
+        @yld.replacement_sel_channel_proc = x ; nil
+      end
+
+      def preconditions x
+        @yld.precons = x ; nil
+      end
+    end
+
+    module Common_Edit_Session_Methods__
+
+      def set_arg sym, x
+        _receive_nonclassified_argument sym, x
+      end
+
+    private
+
+      def _receive_nonclassified_argument sym, x
+        prp = @prps[ sym ]
+        if prp
+          _add_to_iambic_via_value_and_property x, prp
+        else
+          _set_in_parameter_box_value_and_name x, sym
+        end
+        nil
+      end
+
+      def _add_to_iambic_via_value_and_property x, prp
+        if prp.takes_argument
+          _some_mutable_iambic.push prp.name_symbol, x
+        else
+          _some_mutable_iambic.push prp.name_symbol
+        end
+        nil
+      end
+
+      def _some_mutable_iambic
+        x = @yld.iambic
+        if x.nil?
+          x = []
+          @yld.iambic = x
+        end
+        x
+      end
+
+      def _set_in_parameter_box_value_and_name x, sym
+        bx = @yld.param_bx
+        if bx.nil?
+          bx = Box_.new
+          @yld.param_bx = bx
+        end
+        bx.add sym, x
+        nil
       end
     end
 
@@ -643,8 +690,8 @@ module Skylab::Brazen
 
     # ~ retrieve (many)
 
-    def entity_scan_via_class cls, & oes_p
-      datastore_resolved_OK and @datastore.entity_scan_via_class cls, & oes_p
+    def entity_stream_via_model cls, & oes_p
+      datastore_resolved_OK and @datastore.entity_stream_via_model cls, & oes_p
     end
 
     # ~ delete (anemic out-of-box implementation: pass the buck)
@@ -722,22 +769,12 @@ module Skylab::Brazen
       @kernel.silo_via_identifier self.class.node_identifier
     end
 
-    # ~ the event throughput pipeline
-
-    def recv_selective_listener_proc oes_p
-      receive_selective_listener_proc oes_p ; nil
-    end
-
  public  # ~ multipurpose internal readers & callbacks
-
-    def action_via_action_class cls
-      @kernel.action_via_action_class cls
-    end
 
     attr_reader :preconditions
 
     def properties
-      @property_box
+      @property_box or fail "no prop box for #{ self.class }"
     end
 
     def datastore  # for low-level actors
@@ -814,9 +851,9 @@ module Skylab::Brazen
 
     class Flyweight_Property_Box__
 
-      def initialize ent
+      def initialize unbound
         symbol_to_string_h = {}
-        ent.class.properties.get_names.each do |i|
+        unbound.properties.get_names.each do |i|
           symbol_to_string_h[ i ] = i.id2name
         end
         @symbol_to_string_h = symbol_to_string_h ; nil
@@ -912,7 +949,7 @@ module Skylab::Brazen
         when  0
           ent_a.fetch 0
         when -1
-          one_entity_when_via_fuzzy_lookup_ambiguous ent_a, ent, & oes_p  # #todo
+          one_entity_when_via_fuzzy_lookup_ambiguous ent_a, ent, & oes_p  # #todo - model ambiguity method not implemented
         when  1
           one_entity_when_via_fuzzy_lookup_not_found ent, & oes_p
         end
@@ -923,7 +960,7 @@ module Skylab::Brazen
         against_s = ent.local_entity_identifier_string
         rx = /\A#{ ::Regexp.escape against_s }/
 
-        a = [] ; scn = entity_scan_via_class ent.class, & oes_p
+        a = [] ; scn = entity_stream_via_model ent.class, & oes_p
 
         while x = scn.gets
           s = x.local_entity_identifier_string
@@ -950,7 +987,8 @@ module Skylab::Brazen
 
       def bld_entity_not_found_event ent
 
-        _scn = entity_scan_via_class ent.class
+        _scn = entity_stream_via_model ent.class do
+        end
 
         _a_few_ent_a = _scn.take A_FEW__ do |x|
           x.dup

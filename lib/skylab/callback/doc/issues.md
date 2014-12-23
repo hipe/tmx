@@ -47,7 +47,7 @@
 [#014]       #parent-node:[#019] the reflection API
 [#013]       #parent-node: [#017] selective listener methodic
 [#012]       #done #tracking-tag - can the idea of "specificity" be built ..
-[#011]       #done renamed "pub-sub" to "callback" universe wide.
+[#011]       (was: #done renamed "pub-sub" to "callback" universe wide.
                (#evolved-from: #tickler consider renaming pub-sub to 'stream')
 [#010]       #done cover [cb] digraph viz
 [#009]       #tracking-tag advanced semantic reflection -
@@ -57,7 +57,8 @@
 [#007] #open #tracking-tag this new way to do boxxy event factories
 [#006]       #event-marker: asssuming event shape/utility is a smell
 [#005] #open (#waiting) cross reference to [#tr-055], can use nifty ridiculous
-[#004]       #done rename `event_cloud` -> `event_graph`
+[#004] #open rename `name_i` => `name_symbol` universe-wide
+             (was: #done rename `event_cloud` -> `event_graph`)
 [#003]       #done event class should not be a struct
 [#002]       #tracking-tag #pattern: public emitters
 [#001]       #pattern: #parent-node: [#019] "events and their payloads"

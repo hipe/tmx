@@ -222,7 +222,7 @@ module Skylab::Brazen
           end
         end
         entity = @model_class.unmarshalled @kernel, @on_event_selectively do |o|
-          o.with_iambic x_a
+          o.iambic x_a
         end  # :+[#037]
         @result = entity
         PROCEDE_

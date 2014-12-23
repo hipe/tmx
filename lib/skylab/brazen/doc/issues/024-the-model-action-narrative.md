@@ -25,7 +25,6 @@ you typically write) unless its preconditions are met.
 
 ## :#note-100
 
-this method is named in accordance with [#hl-116]  ("shibboleth").
 the selective listener proc that is our argument is from some outside
 agent (like a top client of some sort).
 

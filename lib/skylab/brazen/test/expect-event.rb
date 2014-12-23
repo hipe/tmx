@@ -21,7 +21,7 @@ module Skylab::Brazen::TestSupport
         end
 
         def handle_event_selectively
-          @HES_p ||= bld_on_event_selectively
+          @__HES_p__ ||= bld_on_event_selectively
         end
 
         def bld_on_event_selectively

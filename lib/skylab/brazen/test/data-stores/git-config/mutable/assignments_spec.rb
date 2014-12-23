@@ -39,7 +39,7 @@ module Skylab::Brazen::TestSupport::Data_Stores::Git_Config::Mutable
         expect_one_event :added_value
       end
 
-      it "things get escaped TODO this won't unmarshal" do  # #todo
+      it "things get escaped TODO this won't unmarshal" do  # #todo is there still an issue with unmarshalling?
         _sect = document.sections[ :foo ]
         _sect[ :hi ] = "\\ \" \n \t \b"
         expect_document_content %([foo]\nhi = \\\\ \\" \\\n \\t \\b\n)

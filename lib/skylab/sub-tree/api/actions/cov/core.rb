@@ -13,7 +13,7 @@ module Skylab::SubTree
 
     Event_ = SubTree_::Lib_::Event_lib[]
 
-    def initialize
+    def initialize _
       @list_as_a = []
       super
     end

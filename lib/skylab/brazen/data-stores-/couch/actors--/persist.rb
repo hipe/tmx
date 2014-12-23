@@ -38,7 +38,7 @@ module Skylab::Brazen
 
       def prdc_any_result
         if @entity.came_from_persistence
-          rslv_result_when_update  # #todo
+          rslv_result_when_update  # #todo unimplemented case
         else
           rslv_result_when_create
         end

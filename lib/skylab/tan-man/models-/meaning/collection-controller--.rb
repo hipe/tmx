@@ -28,7 +28,7 @@ module Skylab::TanMan
 
       # ~ retrieve (many)
 
-      def entity_scan_via_class cls, & oes_p
+      def entity_stream_via_model cls, & oes_p
         if model_class == cls  # just to punish those who dare defy us
           build_scan
         end

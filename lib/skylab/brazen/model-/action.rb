@@ -10,6 +10,10 @@ module Skylab::Brazen
         true
       end
 
+      def is_branch
+        false  # for now, every action node is always a terminal (leaf) node
+      end
+
       attr_accessor :after_i, :description_block, :is_promoted,
         :precondition_controller_i_a
 
@@ -51,7 +55,7 @@ module Skylab::Brazen
       def name_function_class
         Action_Name_Function__
       end
-    end
+    end  # >>
 
     extend Brazen_.name_library.name_function_proprietor_methods
     NAME_STOP_INDEX = 2  # sl br models
@@ -66,39 +70,51 @@ module Skylab::Brazen
 
     include Interface_Element_Instance_Methdods__
 
-    def initialize kernel
-      @kernel = kernel
-    end
+    def initialize boundish, & oes_p
 
-    def is_branch
-      false
+      oes_p or raise ::ArgumentError
+
+      accept_selective_listener_via_channel_proc( -> i_a, & ev_p do  # #note-100
+
+        # when the action receives a potential event (eg from one of its
+        # collaborating actors), we call our received selective listener
+        # with the same channel, and if it wants the event we wrap it.
+
+        oes_p.call( * i_a ) do
+          _sign_event ev_p[]
+        end
+      end )
+
+      @kernel = boundish.to_kernel
     end
 
   public
 
-    def bound_call_via_modality_call x_a, modality_action
+    def ___bound_call_via_iambic_stream_and_modality_adapter___ st, modality_action
+
+      # this goes away in [#078]
+
       @hs_modality_action = true
       @modality_action = modality_action
-      _oes_p = modality_action.handle_event_selectively
-      bound_call_via_call x_a, & _oes_p
+      bound_call_against_iambic_stream st
     end
 
-    def bound_call_via_call x_a, & oes_p
+    def bound_call_against_iambic_stream st
       @argument_box = Box_.new
-      recv_selective_listener_proc oes_p
-      bc = any_bound_call_via_processing_iambic x_a
+      bc = _any_bound_call_via_processing_iambic_stream st
       bc || via_arguments_produce_bound_call
     end
 
   private
 
-    def any_bound_call_via_processing_iambic x_a
+    def _any_bound_call_via_processing_iambic_stream st
 
       # the result semantics here are reverse what is normal: something
       # true-ish means early return, and is assumed to be a bound call.
       # this step does not include calling normalize, that happens next
 
-      ok = process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+      ok = process_iambic_stream_fully st
+
       if ! ok
         Brazen_.bound_call.via_value ok
       end
@@ -170,21 +186,10 @@ module Skylab::Brazen
       Brazen_.bound_call nil, self, :produce_any_result
     end
 
-    def get_actual_argument_scan  # used by [tm]
-      LIB_.stream.via_nonsparse_array( self.class.properties.get_names ).map_by do |i|
+    def to_actual_argument_stream  # used by [tm]
+      LIB_.stream.via_nonsparse_array( formal_properties.get_names ).map_by do |i|
         Actual_Property_.new any_argument_value( i ), i
       end
-    end
-
-    # ~ the event throughput pipeline, #note-100
-
-    def recv_selective_listener_proc oes_p
-      receive_selective_listener_via_channel_proc(
-        -> i_a, & ev_p do
-          oes_p.call( * i_a ) do
-            _sign_event ev_p[]
-          end
-        end )
     end
 
     def _sign_event ev
@@ -194,21 +199,21 @@ module Skylab::Brazen
   public  # public accessors for arguments & related experimentals
 
     def get_bound_argument i
-      get_bound_property_via_property self.class.properties.fetch i
+      get_bound_property_via_property formal_properties.fetch i
     end
 
     def any_argument_value_at_all i
-      if self.class.properties.has_name i
+      if formal_properties.has_name i
         any_argument_value i
       end
     end
 
     def any_argument_value i
-      @argument_box[ self.class.properties.fetch( i ).name_i ]
+      @argument_box[ formal_properties.fetch( i ).name_i ]
     end
 
     def argument_value i
-      @argument_box.fetch self.class.properties.fetch( i ).name_i
+      @argument_box.fetch formal_properties.fetch( i ).name_i
     end
 
     def argument_box
@@ -229,7 +234,7 @@ module Skylab::Brazen
       @argument_box
     end
 
-    def any_secondary_box  # #todo - this is during development only. in future result in nil
+    def any_secondary_box  # #todo - after universal integration, get rid of secondary box of action
       Callback_::Box.the_empty_box
     end
 
@@ -243,7 +248,7 @@ module Skylab::Brazen
 
   public
 
-    def accept_parent_node x
+    def accept_parent_node_ x
       @parent_node = x ; nil
     end
 

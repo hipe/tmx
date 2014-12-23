@@ -7,6 +7,10 @@ module Skylab::Brazen
       @models_mod = mod.const_get :Models_, false
     end
 
+    def to_kernel
+      self  # the top
+    end
+
     def app_name
       @module.name_function.as_human
     end
@@ -27,9 +31,19 @@ module Skylab::Brazen
       bc and bc.receiver.send bc.method_name, * bc.args
     end
 
+    def to_unbound_action_stream
+      _to_model_stream.expand_by do | item |
+        if item.respond_to? :to_upper_unbound_action_stream
+          item.to_upper_unbound_action_stream
+        else
+          dflt_upper_unbound_action_stream_via_item item
+        end
+      end
+    end
+
     def unbound_action_via_normalized_name i_a
       i_a.reduce self do |m, i|
-        scn = m.get_unbound_action_scan
+        scn = m.to_unbound_action_stream
         while cls = scn.gets
           _i = cls.name_function.as_lowercase_with_underscores_symbol
           i == _i and break( found = cls )
@@ -38,23 +52,7 @@ module Skylab::Brazen
       end
     end
 
-    def get_action_scan
-      get_unbound_action_scan.map_by do |cls|
-        action_via_action_class cls
-      end
-    end
-
-    def get_unbound_action_scan
-      get_model_scan.expand_by do |item|
-        if item.respond_to? :get_unbound_upper_action_scan
-          item.get_unbound_upper_action_scan
-        else
-          dflt_unbound_upper_action_stream_via_item item
-        end
-      end
-    end
-
-    private def dflt_unbound_upper_action_stream_via_item item  # experiment #open [#067]
+    private def dflt_upper_unbound_action_stream_via_item item  # experiment #open [#067]
       box_mod = const_i_a = d = p = nil
       main = -> do
         begin
@@ -85,28 +83,36 @@ module Skylab::Brazen
       end )
     end
 
-    def get_node_scan
-      get_model_scan
+    def bound_action_via_unbound_action_bound_to cls, & oes_p
+      cls.new self, & oes_p
+    end
+
+    def to_node_stream
+      _to_model_stream
     end
 
   private
 
-    def get_model_scan
+    def _to_model_stream
+
       @const_i_a ||= prdc_sorted_const_i_a
+
       d = -1 ; last = @const_i_a.length - 1
+
       LIB_.stream.new do
         while d < last
           d += 1
           i = @const_i_a.fetch d
           x = @models_mod.const_get i, false
+
           if x.respond_to? :name
-            mod_like = x
+            modish = x
             break
           end
-          mod_like = try_convert_to_node_like_via_mixed x, i, @models_mod
-          mod_like and break
+          modish = try_convert_to_node_like_via_mixed x, i, @models_mod
+          modish and break
         end
-        mod_like
+        modish
       end
     end
 
@@ -210,8 +216,8 @@ module Skylab::Brazen
     end
 
     def some_modules_array_via_mod mod
-      if mod.respond_to? :get_node_scan
-        mod.get_node_scan.to_a
+      if mod.respond_to? :to_node_stream
+        mod.to_node_stream.to_a
       else
         box_mod = mod.const_get :Nodes, false
         box_mod.constants.map do |i|
@@ -243,12 +249,6 @@ module Skylab::Brazen
     def bld_model_not_found_event id, s
       Brazen_.event.inline_with :node_not_found,
         :token, s, :identifier, id
-    end
-
-  public
-
-    def action_via_action_class cls
-      cls.new self
     end
   end
 

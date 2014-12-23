@@ -40,18 +40,20 @@ module Skylab::SubTree
     end
 
     def bound_call
-      act = build_corresponding_API_action
-      act and begin
-        act.bound_call_via_call @local_iambic do | *, & ev_p |
-          _ev = ev_p[] or fail
-          receive_event _ev
-        end
+      bnd = build_corresponding_API_action
+      bnd and begin
+        bnd.bound_call_against_iambic_stream(
+          Callback_::Iambic_Stream.via_array @local_iambic )
       end
     end
 
     def build_corresponding_API_action
       @API_action_class = corresponding_API_action_class
-      @API_action_class.new do
+      _oes_p = -> * , & ev_p do
+        _ev = ev_p[] or fail
+        receive_event _ev
+      end
+      @API_action_class.edit_entity_directly nil, _oes_p  do
         is_API_action
       end
     end

@@ -103,7 +103,7 @@ module Skylab::Brazen
     private
 
       def when_marshal_load_fail name_i, ev_p
-        ev_p.call :error, :marshal_load_error  # #todo
+        ev_p.call :error, :marshal_load_error  # #todo - zerk unimplemented error case
         UNABLE_
       end
     end

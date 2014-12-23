@@ -34,6 +34,7 @@ module Skylab::Brazen
         end
 
         def initialize a
+          a.last.nil? and self._WHERE
           absorb_even_iambic_fully a
         end
 
@@ -145,10 +146,6 @@ module Skylab::Brazen
           @scn
         end
 
-        def receive_error_i_and_column i, d
-          recv_error_i i, d
-        end
-
         def accept_sect sect
           @document.accept_sect sect
           @current_nonterminal_node = sect
@@ -204,7 +201,7 @@ module Skylab::Brazen
               end
               node = nscn.gets
               node or break
-              lscn = node.get_line_stream
+              lscn = node.to_line_stream
             end
             x
           end
@@ -231,7 +228,7 @@ module Skylab::Brazen
         end
 
         def aref_node_with_norm_name_i symbol_i, norm_i
-          scn = get_node_stream symbol_i
+          scn = _to_node_scn_via_symbol symbol_i
           while node = scn.gets
             if norm_i == node.external_normal_name_symbol
               found = node ; break
@@ -244,22 +241,23 @@ module Skylab::Brazen
 
         def get_node_enum i
           if block_given?
-            x = nil ; scn = get_node_stream i
+            x = nil ; scn = _to_node_scn_via_symbol i
             yield x while x = scn.gets ; nil
           else
             to_enum :get_node_enum, i
           end
         end
 
-        def get_node_scan i
-          get_node_scan_or_stream Callback_::Scan, i
+        def _to_node_stream_via_symbol sym
+          _to_node_streamish Callback_::Scan, sym
+
         end
 
-        def get_node_stream i
-          get_node_scan_or_stream Callback_::Scn, i
+        def _to_node_scn_via_symbol sym
+          _to_node_streamish Callback_::Scn, sym
         end
 
-        def get_node_scan_or_stream cls, i
+        def _to_node_streamish cls, i
           d = -1 ; last = @a.length - 1
           cls.new do
             while d < last
@@ -366,7 +364,7 @@ module Skylab::Brazen
           @sections_shell
         end
 
-        def get_line_stream
+        def to_line_stream
           get_body_line_stream
         end
 
@@ -426,7 +424,7 @@ module Skylab::Brazen
         end
 
         def to_stream
-          @collection_kernel.get_node_stream self.class::SYMBOL_I
+          @collection_kernel._to_node_stream_via_symbol self.class::SYMBOL_I
         end
 
         def [] norm_name_i
@@ -550,7 +548,7 @@ module Skylab::Brazen
               new kernel
             end
           end
-        end
+        end  # >>
 
         def initialize kernel
           @kernel = kernel
@@ -586,8 +584,8 @@ module Skylab::Brazen
           @kernel.unparse_into_yielder y
         end
 
-        def get_line_stream
-          @kernel.get_line_stream
+        def to_line_stream
+          @kernel.to_line_stream
         end
 
         def external_normal_name_symbol
@@ -692,7 +690,7 @@ module Skylab::Brazen
           if d
             parse_name d
           else
-            recv_err_i :expected_open_square_bracket
+            recv_error_symbol :expected_open_square_bracket
           end
         end
 
@@ -713,7 +711,7 @@ module Skylab::Brazen
           if d
             parse_rest d
           else
-            recv_err_i :expected_section_name
+            recv_error_symbol :expected_section_name
           end
         end
 
@@ -728,7 +726,7 @@ module Skylab::Brazen
             if d
               parse_subsection_rest d
             else
-              recv_err_i :expected_subsection_name
+              recv_error_symbol :expected_subsection_name
             end
           else
             @subsection_leader_width = nil
@@ -750,7 +748,7 @@ module Skylab::Brazen
           if d
             finish_parse
           else
-            recv_err_i :expected_close_square_bracket
+            recv_error_symbol :expected_close_square_bracket
           end
         end
         CLOSE_SQUARE_BRACKET_RX__ = /[ ]*\][ ]*(?:[;#]|\r?\n?\z)/
@@ -796,7 +794,7 @@ module Skylab::Brazen
           end ; nil
         end
 
-        def get_line_stream
+        def to_line_stream
           p = -> do
             x = @line
             p = -> do
@@ -905,13 +903,13 @@ module Skylab::Brazen
         end
 
         def unparse_into_yielder y  # :+#arbitrary-styling
-          scn = get_line_stream
+          scn = to_line_stream
           while line = scn.gets
             y << line
           end ; nil
         end
 
-        def get_line_stream
+        def to_line_stream
           p = -> do
             line = rndr_line
             p = EMPTY_P_
@@ -1022,8 +1020,8 @@ module Skylab::Brazen
 
       private
 
-        def recv_err_i i
-          @parse.receive_error_i_and_column i, @column_number
+        def recv_error_symbol sym
+          @parse.receive_error_symbol_and_column_number_ sym, @column_number
           UNABLE_
         end
       end
@@ -1087,8 +1085,8 @@ module Skylab::Brazen
           @kernel.unparse_into_yielder y
         end
 
-        def get_line_stream
-          @kernel.get_line_stream
+        def to_line_stream
+          @kernel.to_line_stream
         end
 
         def internal_normal_name_string
@@ -1145,7 +1143,7 @@ module Skylab::Brazen
           if d
             parse_any_value d
           else
-            recv_err_i :expected_variable_name
+            recv_error_symbol :expected_variable_name
           end
         end
 
@@ -1159,7 +1157,7 @@ module Skylab::Brazen
             parse_value d
           else
             d = @scn.skip THE_REST_RX_
-            d or recv_err_i :expected_equals_sign_or_end_of_line
+            d or recv_error_symbol :expected_equals_sign_or_end_of_line
           end
         end
         EQUALS_RX__ = /[ ]*=/
@@ -1230,7 +1228,7 @@ module Skylab::Brazen
               ok
             end
           else
-            recv_err_i(
+            recv_error_symbol(
               :expected_integer_or_boolean_or_quoted_or_non_quoted_string )
           end
         end
@@ -1261,7 +1259,7 @@ module Skylab::Brazen
                 UNABLE_
               end
             else
-              recv_err_i :end_quote_not_found_anywhere_before_end_of_line
+              recv_error_symbol :end_quote_not_found_anywhere_before_end_of_line
             end
           end
         end
@@ -1289,7 +1287,7 @@ module Skylab::Brazen
               PROCEDE_
             end
           else
-            recv_err_i :expected_end_of_line
+            recv_error_symbol :expected_end_of_line
           end
         end
         THE_REST_RX_ = /[ ]*(?:[#;]|\r?\n?\z)/
@@ -1302,7 +1300,7 @@ module Skylab::Brazen
 
       public
 
-        def get_line_stream
+        def to_line_stream
           Single_line_scanner__[ @line ]
         end
 
@@ -1357,8 +1355,8 @@ module Skylab::Brazen
           @line.freeze ; nil
         end
 
-        def recv_err_i i  # #todo
-          @parse.receive_error_i_and_column i, @column_number
+        def recv_error_symbol sym
+          @parse.receive_error_symbol_and_column_number_ sym, @column_number
           UNABLE_
         end
       end
@@ -1435,7 +1433,7 @@ module Skylab::Brazen
 
       class Assignment_Kernel__
 
-        def get_line_stream
+        def to_line_stream
           _line = rndr_line
           Single_line_scanner__[ _line ]
         end
@@ -1509,7 +1507,7 @@ module Skylab::Brazen
           y << @line ; nil
         end
 
-        def get_line_stream
+        def to_line_stream
           Single_line_scanner__[ @line ]
         end
       end

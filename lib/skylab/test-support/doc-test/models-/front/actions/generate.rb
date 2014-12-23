@@ -188,8 +188,7 @@ module Skylab::TestSupport
 
         end
 
-        def initialize kernel
-          block_given? and self._WHAT
+        def initialize boundish  # and oes_p
           @arbiitrary_proc_a = nil
           @arbitrary_O_A_proc_array = nil
           @business_module_name = nil

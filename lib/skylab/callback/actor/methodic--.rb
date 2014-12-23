@@ -84,7 +84,7 @@ module Skylab::Callback
         def build_via_iambic x_a, & oes_p
           ok = nil
           x = new do
-            oes_p and receive_selective_listener_proc oes_p
+            oes_p and accept_selective_listener_proc oes_p  # :+#public-API :+#hook-out #hook-near
             ok = process_iambic_stream_fully Iambic_Stream_via_Array_.new( 0, x_a )
           end
           ok && x
@@ -274,6 +274,8 @@ module Skylab::Callback
         def name_i
           @name.as_variegated_symbol
         end
+
+        alias_method :name_symbol, :name_i  # #open [#004]
 
         def as_ivar
           ivar || @name.as_ivar

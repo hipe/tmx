@@ -25,7 +25,9 @@ module Skylab::Brazen::TestSupport::Data_Stores::Git_Config
   module InstanceMethods
 
     def expect_no_sections_from str
-      @document = subject.parse_string str
+      @document = subject.parse_string str do
+        self._NEVER
+      end
       @document.sections.length.should be_zero
     end
 
@@ -133,7 +135,9 @@ module Skylab::Brazen::TestSupport::Data_Stores::Git_Config
     end
 
     def expect_config & p
-      conf = subject.parse_string @input_string
+      conf = subject.parse_string @input_string do
+        self._NEVER
+      end
       if conf
         block_given? ? yield( conf ) : conf
       else

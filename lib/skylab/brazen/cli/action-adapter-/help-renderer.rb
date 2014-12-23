@@ -6,17 +6,17 @@ module Skylab::Brazen
 
       class Help_Renderer  # read [#004]
 
-        def initialize op, kernel
+        def initialize op, ad
           @arg_a = nil
-          @action = kernel.action
-          @action_adapter = kernel.action_adapter
-          @expression_agent = kernel.expression_agent
-          @invocation = kernel.invocation
+          @action = ad.bound_action
+          @action_adapter = ad.action_adapter
+          @expression_agent = ad.expression_agent
+          @invocation = ad.invocation
           set_op op
           @section_a = []
           @section_separator_p = -> { @y << nil }
-          @y = ::Enumerator::Yielder.new( & kernel.stderr.method( :puts ) )
-          kernel.partitions.receive_help_renderer self
+          @y = ::Enumerator::Yielder.new( & ad.stderr.method( :puts ) )
+          ad.partitions.receive_help_renderer self
           screen_boundary
         end
 
@@ -125,7 +125,7 @@ module Skylab::Brazen
         end
 
         def shortest_moniker_for_opt opt
-          ( opt.short ? opt.short : opt.long ).first  # #todo
+          ( opt.short ? opt.short : opt.long ).first
         end
 
         def render_argument_moniker_and_arity moniker, arity_i
@@ -223,7 +223,7 @@ module Skylab::Brazen
         end
 
         def output_invite_to_particular_action i_a
-          o = @action_adapter.retrieve_bound_action_via_normalized_name i_a
+          o = @action_adapter.retrieve_bound_action_via_nrml_nm i_a
           s = o.primary_syntax_string
           express do
             "use #{ code s }"

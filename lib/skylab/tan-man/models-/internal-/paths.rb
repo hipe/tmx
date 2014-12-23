@@ -6,6 +6,10 @@ module Skylab::TanMan
 
     class Paths
 
+      # reminder: there is no magic here, no API affiliations. this is just
+      # a plain old actor implementing an action internally whose surface
+      # form is a proc with corresponding parameters as the below four.
+
       Callback_::Actor.call self, :properties,
 
         :path_i,

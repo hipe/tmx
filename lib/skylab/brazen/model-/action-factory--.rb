@@ -179,10 +179,12 @@ module Skylab::Brazen
 
           if @parent_node
 
-            @parent_node.first_edit do |o|
-              o.on_event_selectively( & handle_event_selectively )
-              o.with_preconditions @preconditions
-              o.with_argument_box @argument_box
+            # experimentally, the child action "takes over" the parent
+
+            @parent_node.first_edit do | o |
+              o.replace_selective_event_listener_via_channel_proc @__HESVC_p__
+              o.preconditions @preconditions
+              o.argument_box @argument_box  # _DOG_EAR
             end
             @edited_entity = @parent_node
             @parent_node = nil
@@ -191,8 +193,8 @@ module Skylab::Brazen
 
             @edited_entity = self.class.model_class.
                   edited @kernel, handle_event_selectively do |o|
-              o.with_preconditions @preconditions
-              o.with_argument_box @argument_box
+              o.preconditions @preconditions
+              o.argument_box @argument_box
             end
           end
 
@@ -228,7 +230,7 @@ module Skylab::Brazen
       private
 
         def rslv_entity_scan
-          @entity_scan = datastore.entity_scan_via_class(
+          @entity_scan = datastore.entity_stream_via_model(
             self.class.model_class, & handle_event_selectively )
           @entity_scan and ACHIEVED_
         end
@@ -319,7 +321,7 @@ module Skylab::Brazen
         end
 
         def via_dsc_for_one_resolve_entity
-          @entity_scan = @datastore_controller.entity_scan_via_class(
+          @entity_scan = @datastore_controller.entity_stream_via_model(
             model_class, & handle_event_selectively )
           via_entity_scan_and_dsc_for_one_resolve_entity
         end
@@ -408,9 +410,9 @@ module Skylab::Brazen
 
         def produce_any_result
           init_selective_listener_proc_for_delete
-          ok = via_evr_and_args_resolve_subject_entity
-          ok &&= via_evr_and_subject_entity_prepare_for_remove
-          ok && via_evr_and_subject_entity_delete_subject_entity
+          ok = via_OES_and_args_resolve_subject_entity
+          ok &&= via_OES_and_subject_entity_prepare_for_remove
+          ok && via_OES_and_subject_entity_delete_subject_entity
         end
 
         def via_edited_entity_produce_any_persist_result_when_edited_OK
@@ -428,20 +430,20 @@ module Skylab::Brazen
           end
         end
 
-        def via_evr_and_subject_entity_delete_subject_entity
+        def via_OES_and_subject_entity_delete_subject_entity
           datastore.delete_entity @subject_entity, & handle_event_selectively
         end
 
-        def via_evr_and_subject_entity_prepare_for_remove
+        def via_OES_and_subject_entity_prepare_for_remove
           ok = via_subject_entity_send_parameters
           ok &&= @subject_entity.any_native_delete_before_delete_in_datastore(
             & handle_event_selectively )
         end
 
         def via_subject_entity_send_parameters
-          i_a = @argument_box.get_names - @subject_entity.class.properties.get_names
+          i_a = @argument_box.get_names - @subject_entity.formal_properties.get_names
           @subject_entity.edit do |o|
-            o.action_formal_properties = self.class.properties
+            o.action_formal_props formal_properties
             i_a.each do |i|
               o.set_arg i, @argument_box.fetch( i )
             end
@@ -454,9 +456,9 @@ module Skylab::Brazen
 
       private
 
-        def via_evr_and_args_resolve_subject_entity
+        def via_OES_and_args_resolve_subject_entity
           ok = via_args_resolve_identifier
-          ok && via_evr_and_identifier_resolve_subject_entity
+          ok && via_OES_and_identifier_resolve_subject_entity
         end
 
         def via_args_resolve_identifier
@@ -466,7 +468,7 @@ module Skylab::Brazen
           PROCEDE_
         end
 
-        def via_evr_and_identifier_resolve_subject_entity
+        def via_OES_and_identifier_resolve_subject_entity
           datastore
           @subject_entity = @datastore.entity_via_identifier @identifier, & handle_event_selectively
           @subject_entity ? PROCEDE_ : UNABLE_

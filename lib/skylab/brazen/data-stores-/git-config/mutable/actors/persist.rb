@@ -32,7 +32,7 @@ module Skylab::Brazen
         end
 
         def work
-          scn = @document.get_line_stream ; d = 0
+          scn = @document.to_line_stream ; d = 0
           with_IO_opened_for_writing do |io|
             while line = scn.gets
               d += io.write line

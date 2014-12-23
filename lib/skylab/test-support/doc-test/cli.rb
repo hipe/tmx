@@ -24,7 +24,7 @@ module Skylab::TestSupport
       module Experimental_Hax__
       private
 
-        def build_handle_event_selectively
+        def handle_event_selectively  # #hook-in [br]
           default_p = super
           -> * i_a, & ev_p do
 
@@ -98,7 +98,7 @@ module Skylab::TestSupport
 
           def current_output_path ev
             @is_for_preview = true
-            receive_event_on_top_channel ev, :info
+            receive_event_on_channel ev, :info
           end
 
           def wrote ev
@@ -110,7 +110,7 @@ module Skylab::TestSupport
               send_non_payload_event_lines s_a
               nil
             else
-              receive_event_on_top_channel ev, :success
+              receive_event_on_channel ev, :success
             end
           end
 

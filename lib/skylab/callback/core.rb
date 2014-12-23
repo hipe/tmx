@@ -300,7 +300,7 @@ module Skylab::Callback
       @h.fetch @a.fetch d
     end
 
-    def to_key_scan
+    def to_name_stream
       Callback_::Scan.via_nonsparse_array @a
     end
 
@@ -453,7 +453,7 @@ module Skylab::Callback
   Iambic_Stream_via_Array_ = class Iambic_Stream  # :[#046]
 
     def reinitialize d, x_a
-      @d = d ; @x_a = x_a ; @x_a_length = @x_a.length
+      @d = d ; @x_a = x_a ; @x_a_length = x_a.length
     end
 
     alias_method :initialize, :reinitialize
@@ -470,16 +470,6 @@ module Skylab::Callback
       @x_a_length - @d
     end
 
-    def gets_one
-      x = current_token ; advance_one ; x
-    end
-
-    def flush_remaining_to_array
-      x = @x_a[ @d .. -1 ]
-      @d = @x_a_length
-      x
-    end
-
     def current_token
       @x_a.fetch @d
     end
@@ -492,13 +482,31 @@ module Skylab::Callback
       @d
     end
 
-    def current_index= d  # assume is valid index
-      @d = d
+    def flush_remaining_to_array
+      x = @x_a[ @d .. -1 ]
+      @d = @x_a_length
+      x
     end
 
     def advance_one
       @d += 1 ; nil
     end
+
+    def current_index= d  # assume is valid index
+      @d = d
+    end
+
+    def gets_one
+      x = current_token ; advance_one ; x
+    end
+
+    # ~ hax (for "collaborators")
+
+    def array_for_read
+      @x_a
+    end
+
+    attr_accessor :x_a_length
 
     class << self
       def via_array x_a

@@ -1,3 +1,10 @@
+[#079] #open rather than the model action ever having to know about the
+             modality adapter, the modality action should make a custom
+             adapter class and in that class set the default iambic starter.
+             this is what the new hidden-ness of properties is for. all
+             modality-specific customization of actions should be
+             available thru this means, obviating a need for the action
+             to have direct knowledge of the adapter layer
 [#078]    #tracking - need better way to do this (in [ts])
 [#077] #open maybe try a positive meta-property with a default instead of `hidden`.
 [#076] #open one day integrate [#021] with action factory, where the idea was conceived.)

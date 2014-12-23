@@ -1,6 +1,8 @@
 digraph {
 
-Invocation__
+Invocation__ [ label="Invocation__\n(no event handling)" ]
+
+Branch_Invocation__ [ label="Branch_Invocation__\n(bound node creator)" ]
 
 Action_Adapter_ -> Invocation__
 
@@ -9,5 +11,11 @@ Branch_Invocation__ -> Invocation__
 Top_Invocation__ -> Branch_Invocation__
 
 Branch_Adapter__ -> Branch_Invocation__
+
+Adapter_Methods__ [ label="Adapter_Methods__\n(event handling)" ]
+
+Branch_Adapter__ -> Adapter_Methods__
+
+Action_Adapter_ -> Adapter_Methods__
 
 }

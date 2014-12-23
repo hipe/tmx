@@ -77,11 +77,11 @@ module Skylab::Brazen
         end
 
         def all_names
-          self.class.entity_formal_property_method_names_box_for_rd.get_names
+          self.class.entity_formal_property_method_names_box_for_read.get_names
         end
 
         def any_proprietor_of i
-          if self.class.entity_formal_property_method_names_box_for_rd.has_name i
+          if self.class.entity_formal_property_method_names_box_for_read.has_name i
             self
           end
         end

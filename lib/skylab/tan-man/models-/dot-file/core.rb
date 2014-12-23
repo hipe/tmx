@@ -10,7 +10,7 @@ module Skylab::TanMan
 
       # ~
 
-      def get_unbound_upper_action_scan
+      def to_upper_unbound_action_stream
       end
 
       def is_silo

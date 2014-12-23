@@ -196,9 +196,9 @@ module Skylab::Brazen
         end
 
         @ws = @model_class.edit_entity @kernel, _oes_p do |o|
-          o.with_arguments :verbose, @verbose
-          o.with_argument_box bx
-          o.with :prop, @action.class.properties[ :workspace_path ]
+          o.arguments :verbose, @verbose
+          o.argument_box bx
+          o.where :prop, @action.class.properties[ :workspace_path ]
         end
         @ws and via_ws_workspace
       end

@@ -40,8 +40,10 @@ module Skylab::TanMan
         end
       end
 
-      Lines = Stub__.new :Lines do |k|
-        Starter_::Actions__::Lines.new k
+      Lines = Stub_.new :Lines do | boundish, & oes_p |
+
+        Starter_::Actions__::Lines.new boundish, & oes_p
+
       end
     end
 
@@ -62,7 +64,9 @@ module Skylab::TanMan
         ok and super ent, & oes_p
       end
 
-      def entity_scan_via_class _cls_, & oes_p
+      def entity_stream_via_model _cls_, & oes_p
+
+        oes_p or self._WHERE
 
         p = -> do
 

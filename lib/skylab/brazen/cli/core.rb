@@ -38,8 +38,11 @@ module Skylab::Brazen
         @env = nil
         @mod = mod
         @resources = Resources__.new a, mod
+        # (abstract base class "invocation" has no initialize method)
       end
+
       attr_writer :env
+
       def invoke argv
         @resources.complete @env || ::ENV, argv
         resolve_app_kernel
@@ -61,7 +64,7 @@ module Skylab::Brazen
 
     public
 
-      def action
+      def bound_action
         @app_kernel
       end
 
@@ -141,7 +144,7 @@ module Skylab::Brazen
               seen_i_a_h[ i_a ] = true
             end
           else
-            i_a = adapter.action.class.full_name_function.map( & :as_lowercase_with_underscores_symbol )
+            i_a = adapter.bound_action.class.full_name_function.map( & :as_lowercase_with_underscores_symbol )
             seen_general_h.fetch i_a do
               seen_general_h[ i_a ] = true
               adapter.output_invite_to_general_help
@@ -170,16 +173,20 @@ module Skylab::Brazen
       end
 
     private
+
       def resolve_properties
         @properties = Properties__.new
       end
+
       def resolve_partitions
-        @partitions = Build_partitions__[ get_full_inferred_props_scan, self ]
+        @partitions = Build_partitions__[ to_full_inferred_prop_strm, self ]
       end
-      def get_full_inferred_props_scan
+
+      def to_full_inferred_prop_strm
         scn = @properties.to_stream
         scn.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :ellipsis
       end
+
     public
 
       def receive_no_matching_action tok
@@ -189,6 +196,7 @@ module Skylab::Brazen
       end
 
     private
+
       def call_bound_call exe
         exe.receiver.send exe.method_name, * exe.args
       end
@@ -202,15 +210,18 @@ module Skylab::Brazen
           resolve_bound_call_when_looks_like_action_for_first_argument
         end
       end
+
       def resolve_bound_call_when_no_arguments
         @bound_call = CLI_::When_::No_Arguments.new action_prop, help_renderer
       end
+
       def action_prop
         @properties.fetch :action
       end
+
       def resolve_bound_call_when_looks_like_action_for_first_argument
         @token = @resources.argv.shift
-        @adapter_a = find_matching_action_adapters_with_token @token
+        @adapter_a = find_matching_action_adapters_against_tok @token
         case 1 <=> @adapter_a.length
         when  0 ; resolve_bound_call_when_one_matching_adapter
         when  1 ; resolve_bound_call_when_no_matching_action
@@ -220,43 +231,67 @@ module Skylab::Brazen
 
     public
 
-      def retrieve_bound_action_via_normalized_name i_a
-        retrieve_bound_action_via_normalized_name_scan(
-          Lib_::Iambic_scanner[].new 0, i_a )
+      def retrieve_bound_action_via_nrml_nm i_a
+        retrv_bound_action_via_normal_name_symbol_stream(
+          Callback_::Iambic_Stream.via_array i_a )
       end
 
-      def retrieve_bound_action_via_normalized_name_scan xa_scan
-        scn = get_action_scn
-        i = xa_scan.gets_one
-        while action = scn.gets
-          if i == action.name.as_lowercase_with_underscores_symbol
-            found = action
+      def retrv_bound_action_via_normal_name_symbol_stream sym_st
+
+        ad_st = to_adapter_stream
+        sym = sym_st.gets_one
+
+        ad = ad_s.gets
+        while ad
+          if sym == ad.name.as_lowercase_with_underscores_symbol
+            found = ad
             break
           end
+          ad = ad_st.gets
         end
+
         if found
           found.receive_frame self
-          if xa_scan.unparsed_exists
-            found.retrieve_bound_action_via_normalized_name_scan xa_scan
+          if sym_st.unparsed_exists
+            found.retrv_bound_action_via_normal_name_symbol_stream sym_st
           else
             found
           end
         else
-          raise ::KeyError, "not found: '#{ i }'"
+          raise ::KeyError, "not found: '#{ sym }'"
         end
       end
 
-      def find_matching_action_adapters_with_token tok
-        a = find_matching_action_classes_with_token tok
-        a.map! do |cls|
-          bld_adapter_via_action action.action_via_action_class cls
+      def find_matching_action_adapters_against_tok tok
+
+        _unbound_a = __array_of_matching_unbounds_against_token tok
+
+        _unbound_a.map do | unbound |
+
+          _adapter_via_unbound unbound
+
         end
-        a
       end
 
-      def find_matching_action_classes_with_token tok
+      def to_adapter_stream
+
+        # rely on your associated bound action to give you an unbound action
+        # stream representing its children. your bound action may be for e.g
+        # a model instance just querying its child consts, or maybe it is an
+        # arbitrary kernel doing something else, you neither know nor care.
+
+        _st = bound_action.to_unbound_action_stream
+
+        _st.map_by do | unbound |
+
+          _adapter_via_unbound unbound
+
+        end
+      end
+
+      def __array_of_matching_unbounds_against_token tok
         matching_actions = [] ; rx = /\A#{ ::Regexp.escape tok }/
-        scn = self.action.get_unbound_action_scan
+        scn = bound_action.to_unbound_action_stream
         while action = scn.gets
           slug = action.name_function.as_slug
           if rx =~ slug
@@ -270,30 +305,25 @@ module Skylab::Brazen
         matching_actions
       end
 
-      def get_action_scn
-        scan = action.get_action_scan
-        scan and scan.map_by( & method( :bld_adapter_via_action ) )
-      end
+      def _adapter_via_unbound unbound
 
-      def bld_adapter_via_action action
-        if action.is_branch
-          branch_class.new action
+        if unbound.is_branch
+          branch_class.new unbound, bound_action
         else
-          action.accept_parent_node self.action
-          leaf_class_for_action( action ).new action
+          _leaf_class_for_unbound_action( unbound ).new unbound, bound_action
         end
       end
 
-      def wrap_stream_with_ordering_buffer scn
+      def wrap_adapter_stream_with_ordering_buffer scn
         CLI_::Actors__::Via_after_produce_ordered_scanner[ scn ]
       end
 
-      def leaf_class_for_action action
+      def _leaf_class_for_unbound_action unbound
 
         # this is CLI. you need not cache this.
 
-        const_sym = action.name.as_const
         mod = self.class::Actions
+        const_sym = unbound.name_function.as_const
 
         if mod.const_defined? const_sym, false
           mod.const_get const_sym
@@ -311,14 +341,17 @@ module Skylab::Brazen
       end
 
     private
+
       def resolve_bound_call_when_no_matching_action
         @bound_call = CLI_::When_::No_Matching_Action.new @token, help_renderer, self
       end
+
       def resolve_bound_call_when_looks_like_option_for_first_argument
         prepare_to_parse_parameters
         parse_options
         @bound_call or resolve_bound_call_when_parsed_options
       end
+
       def resolve_bound_call_when_parsed_options
         if @output_iambic.length.zero?
           if argv.length.zero?
@@ -330,6 +363,7 @@ module Skylab::Brazen
           resolve_bound_call_when_successfully_parsed_options
         end
       end
+
       def resolve_bound_call_when_successfully_parsed_options
         a = [] ; scn = to_actual_parameters_stream
         scn.next
@@ -340,12 +374,15 @@ module Skylab::Brazen
         end  while scn.next
         @bound_call = Aggregate_Bound_Call__.new a
       end
+
       def to_actual_parameters_stream
         Actual_Parameter_Scanner__.new @output_iambic, @properties
       end
+
       def resolve_bound_call_when_multiple_matching_adapters
         @bound_call = CLI_::When_::Ambiguous_Matching_Actions.new self._TODO
       end
+
       def resolve_bound_call_when_one_matching_adapter
         @adapter = @adapter_a.first
         @adapter_a = nil
@@ -362,16 +399,23 @@ module Skylab::Brazen
 
       include Adapter_Methods__
 
+      def initialize unbound, boundish
+        super
+        @bound.accept_parent_node_ boundish
+      end
+
     private
+
       def resolve_properties
-        @properties = if @action.class.respond_to? :properties
-          @action.class.properties
-        end ; nil
+        @properties = @bound.formal_properties  # nil ok
+        nil
       end
+
       def resolve_partitions
-        @partitions = Build_partitions__[ get_full_inferred_props_scan, self ]
+        @partitions = Build_partitions__[ to_full_inferred_prop_strm, self ]
       end
-      def get_full_inferred_props_scan
+
+      def to_full_inferred_prop_strm
         scan = if @properties
           @properties.to_stream
         else
@@ -379,18 +423,19 @@ module Skylab::Brazen
         end
         scan.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :help
       end
-    public
-      def receive_show_help otr
+
+    public def receive_show_help otr
         receive_frame otr
         help_renderer.output_help_screen
         SUCCESS_
       end
-    private
+
       def resolve_bound_call
         prepare_to_parse_parameters
         parse_options
         @bound_call or resolve_bound_call_after_parsed_options
       end
+
       def resolve_bound_call_after_parsed_options
         if @seen_h[ :help ]
           resolve_bound_call_when_help_request
@@ -398,6 +443,7 @@ module Skylab::Brazen
           resolve_bound_call_when_any_args
         end
       end
+
       def resolve_bound_call_when_help_request
         a = []
         a.push bound_call_class_via_option_property_name_i( :help ).
@@ -408,9 +454,11 @@ module Skylab::Brazen
         end
         @bound_call = Aggregate_Bound_Call__.new a
       end
+
     public def bound_call_class_for_help_option
         When_Action_Help__
       end
+
       def resolve_bound_call_when_any_args
         _n11n = Action_Adapter_::Arguments.normalization(
           @partitions.arg_a || EMPTY_A_ )
@@ -422,12 +470,15 @@ module Skylab::Brazen
           resolve_bound_call_when_ARGV_parsed
         end
       end
+
       def resolve_bound_call_when_ARGV_parsing_error_event ev
         send :"resolve_bound_call_when_#{ ev.terminal_channel_i }_arguments", ev
       end
+
       def resolve_bound_call_when_missing_arguments ev
         @bound_call = CLI_::When_::Missing_Arguments.new ev, help_renderer
       end
+
       def resolve_bound_call_when_extra_arguments ev
         @bound_call = CLI_::When_::Extra_Arguments.new ev, help_renderer
       end
@@ -452,18 +503,22 @@ module Skylab::Brazen
       def resolve_bound_call_via_output_iambic
 
         # begin experiment
-        prp = @action.class.any_property_via_symbol :downstream
+        prp = @bound.class.any_property_via_symbol :downstream
         if prp && prp.is_hidden
           @output_iambic.push :downstream, @resources.sout
         end
         # end experiment
 
-        @bound_call = @action.bound_call_via_modality_call @output_iambic, self
+        @bound_call = @bound.___bound_call_via_iambic_stream_and_modality_adapter___(
+          Callback_::Iambic_Stream.via_array( @output_iambic ),
+          self )  # away in #open [#078]
+
         @bound_call or self._SANITY
         nil
       end
 
     public
+
       def app_name
         @parent.app_name
       end
@@ -499,6 +554,7 @@ module Skylab::Brazen
         @help_renderer = help_renderer
         _ and self._SANITY
       end
+
       def produce_any_result
         @help_renderer.output_help_screen
         SUCCESS_
@@ -517,26 +573,26 @@ module Skylab::Brazen
 
     module Adapter_Methods__
 
-      def initialize action
-        @action = action
+      def initialize unbound, boundish
+        @bound = unbound.new boundish, & handle_event_selectively
       end
 
       attr_reader :resources  # for magic results [#021]
 
       def name
-        @action.name
+        @bound.name
       end
 
       def is_visible
-        @action.is_visible
+        @bound.is_visible
       end
 
       def has_description
-        @action.has_description
+        @bound.has_description
       end
 
       def under_expression_agent_get_N_desc_lines exp, d=nil
-        @action.under_expression_agent_get_N_desc_lines exp, d
+        @bound.under_expression_agent_get_N_desc_lines exp, d
       end
 
       def receive_frame otr
@@ -551,8 +607,8 @@ module Skylab::Brazen
         @bound_call
       end
 
-      def action
-        @action
+      def bound_action
+        @bound
       end
 
       def action_adapter
@@ -563,8 +619,8 @@ module Skylab::Brazen
         self
       end
 
-      def retrieve_bound_action_via_normalized_name i_a
-        @parent.retrieve_bound_action_via_normalized_name i_a
+      def retrieve_bound_action_via_nrml_nm i_a
+        @parent.retrieve_bound_action_via_nrml_nm i_a
       end
 
       def retrieve_unbound_action * i_a
@@ -579,17 +635,20 @@ module Skylab::Brazen
         @parent.application_kernel
       end
 
-      def handle_event_selectively
-        @HES_p ||= build_handle_event_selectively
-      end
+      def handle_event_selectively  # :+#public-API #hook-in
 
-      def build_handle_event_selectively
-       -> top_channel_i, *, & ev_p do
-          receive_event_on_top_channel ev_p[], top_channel_i
+        # as it must it produces a [#cb-017] selective listener-style proc.
+        # this default implementation accepts and routes every event to our
+        # friendly general-purpose behavior dispatcher, but some hookers-in
+        # will for example first check if a special method is defined which
+        # corresponds to the channel name in some way and instead use that.
+
+        -> * i_a, & ev_p do
+          receive_event_on_channel ev_p[], * i_a
         end
       end
 
-      def receive_event_on_top_channel ev, top_channel_i
+      def receive_event_on_channel ev, * i_a  # :+#public-API
         ev_ = ev.to_event
         has_OK_tag = if ev_.has_tag :ok
           ok_x = ev_.ok
@@ -599,7 +658,7 @@ module Skylab::Brazen
           if ok_x
             if ev_.has_tag :is_completion and ev_.is_completion
               receive_completion_event ev
-            elsif :payload == top_channel_i  # or ! ev.verb_lexeme
+            elsif :payload == i_a.first  # or ! ev.verb_lexeme
               receive_payload_event ev
             else
               receive_positive_event ev
@@ -827,20 +886,27 @@ module Skylab::Brazen
             else
               args.push "#{ base } [#{ argument_label_for prop }]"
             end
-            p = -> x do
-              @seen_h[ prop.name_i ] = true
-              @output_iambic.push prop.name_i, x
-            end
           else
             args.push base
-            p = -> _ do
-              @seen_h[ prop.name_i ] = true
-              @output_iambic.push prop.name_i
-            end
           end
+          _p = optparse_behavior_for_property prop
           prop.has_description and render_property_description args, prop
-          op.on( * args, & p )
+          op.on( * args, & _p )
         end ; nil
+      end
+
+      def optparse_behavior_for_property prop  # :+#public-API #hook-in
+        if prop.takes_argument
+          -> x do
+            @seen_h[ prop.name_i ] = true
+            @output_iambic.push prop.name_i, x
+          end
+        else
+          -> _ do
+            @seen_h[ prop.name_i ] = true
+            @output_iambic.push prop.name_i
+          end
+        end
       end
 
       def render_property_description a, prop
@@ -867,7 +933,7 @@ module Skylab::Brazen
       end
 
       def write_any_auxiliary_syntax_string y
-        help = get_full_inferred_props_scan.each.detect do |prop|
+        help = to_full_inferred_prop_strm.each.detect do |prop|
           :help == prop.name_i
         end
         if help
@@ -1247,7 +1313,7 @@ module Skylab::Brazen
 
     class Actual_Parameter_Scanner__
       def initialize output_iambic, props
-        scn = Lib_::Iambic_scanner[].new 0, output_iambic
+        scn = Callback_::Iambic_Stream.via_array output_iambic
         prop = i = x = nil
         @prop_p = -> { prop }
         @pair_p = -> { [ i, x ] }
@@ -1301,7 +1367,6 @@ module Skylab::Brazen
     end
 
     module Lib_
-      Iambic_scanner = Brazen_::Lib_::Iambic_scanner
       Option_parser = -> do
         require 'optparse'
         ::OptionParser

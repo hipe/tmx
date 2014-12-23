@@ -168,10 +168,6 @@ module Skylab::Brazen
 
     HL__ = sidesys[ :Headless ]
 
-    Iambic_scanner = -> do
-      Callback_::Iambic_Stream
-    end
-
     IO = -> do
       HL__[]::IO
     end
@@ -216,7 +212,7 @@ module Skylab::Brazen
     Snag__ = sidesys[ :Snag ]
 
     Strange = -> x do
-      Autoloader_.require_sidesystem( :MetaHell ).strange x  # #todo
+      Autoloader_.require_sidesystem( :MetaHell ).strange x
     end
 
     String_IO = -> do

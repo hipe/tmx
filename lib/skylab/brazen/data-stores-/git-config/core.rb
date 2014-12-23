@@ -32,8 +32,7 @@ module Skylab::Brazen
       else
         raise ::ArgumentError
       end
-      @on_event_selectively = oes_p
-      super kernel, & nil
+      super kernel, & oes_p
     end
 
     def description_under expag
@@ -42,9 +41,9 @@ module Skylab::Brazen
 
     # ~ persist
 
-    def persist_entity entity
-      ok = resolve_mutable_document
-      ok &&= Git_Config_::Mutable::Actors::Mutate[ entity, @mutable_document ]
+    def persist_entity entity, & oes_p
+      ok = resolve_mutable_document( & oes_p )
+      ok &&= Git_Config_::Mutable::Actors::Mutate[ entity, @mutable_document, oes_p ]
       ok and via_mutated_mutable_document_write_file_via_persisted_entity entity
     end
 
@@ -56,7 +55,7 @@ module Skylab::Brazen
 
     # ~ retrieve (many)
 
-    def entity_scan_via_class cls, & oes_p
+    def entity_stream_via_model cls, & oes_p
       Git_Config_::Actors__::Scan[ cls, @document, @kernel, oes_p ]
     end
 
@@ -74,18 +73,18 @@ module Skylab::Brazen
 
   private  # ~ verb support
 
-    def resolve_mutable_document
-      @did_resolve_mutable_document ||= rslv_mutable_document
+    def resolve_mutable_document & oes_p
+      @did_resolve_mutable_document ||= rslv_mutable_document( & oes_p )
       @mutable_document_is_resolved
     end
 
-    def rslv_mutable_document
+    def rslv_mutable_document & oes_p
       if @document.is_mutable
         @mutable_document = @document
         @mutable_document_is_resolved = true
       else
-        @mutable_document = Git_Config_::Mutable.
-          parse_input_id @document.input_id, & @on_event_selectively
+        @mutable_document = Git_Config_::Mutable.parse_input_id(
+          @document.input_id, & ( oes_p || @on_event_selectively ) )
         @mutable_document_is_resolved = @mutable_document ? ACHIEVED_ : UNABLE_
       end
       if @mutable_document_is_resolved
@@ -183,16 +182,20 @@ module Skylab::Brazen
       end
       BLANK_LINE_OR_COMMENT_RX_ = /\A[ ]*(?:\r?\n?\z|[#;])/
 
-    private
+      private def recv_error_symbol sym
+        receive_error_symbol_and_column_number_ sym, @column_number   # col num nil OK
+      end
 
-      def recv_error_i i, col_number=nil
+      def receive_error_symbol_and_column_number_ sym, col_number
 
         @result = @on_event_selectively.call :error, :config_parse_error do
-          bld_config_parse_error i, col_number
+          bld_config_parse_error sym, col_number
         end
 
         UNABLE_
       end
+
+    private
 
       def bld_config_parse_error i, col_number
 
@@ -239,7 +242,7 @@ module Skylab::Brazen
         if @md
           accpt_section
         else
-          recv_error_i :section_expected
+          recv_error_symbol :section_expected
         end
       end
       _NAME_RX = '[-A-Za-z0-9.]+'
@@ -267,7 +270,7 @@ module Skylab::Brazen
         elsif (( @md = SECTION_RX__.match @line ))
           accpt_section
         else
-          recv_error_i :assignment_or_section_expected
+          recv_error_symbol :assignment_or_section_expected
         end
       end
       ASSIGNMENT_LINE_RX__ = /\A[ ]*
@@ -618,7 +621,7 @@ module Skylab::Brazen
               _otr
             else
               oes.call :error, :invalid_escape_sequence do
-                build_invalid_escape_sequence_event $~[ 0 ]  # #todo
+                build_invalid_escape_sequence_event $~[ 0 ]  # #todo - unimplemented error cse
               end
               ok = false
               s  # put the string "back in" as-is

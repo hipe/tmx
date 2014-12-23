@@ -17,16 +17,8 @@ module Skylab::Brazen
         false
       end
 
-      def get_unbound_upper_action_scan
-        # Callback_.stream.via_item self  # #todo is same
-        p = -> do
-          x = self
-          p = EMPTY_P_
-          x
-        end
-        Callback_.stream do
-          p[]
-        end
+      def to_upper_unbound_action_stream
+        Callback_.stream.via_item self
       end
 
       def init_action_class_reflection

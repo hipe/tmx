@@ -79,7 +79,7 @@ module Skylab::TanMan
         end
 
         def partition_IO_related_arguments
-          scn = get_actual_argument_scan
+          scn = to_actual_argument_stream
           props = self.class.properties
           in_a = [] ; out_a = []
           while bound = scn.gets

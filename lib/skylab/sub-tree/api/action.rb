@@ -2,32 +2,40 @@ module Skylab::SubTree
 
   class API::Action
 
+    class << self
+
+      def edit_entity_directly _, oes_p, & edit_p  # #hook-near [br]
+        o = new _, & oes_p
+        o.instance_exec( & edit_p )
+        o
+      end
+    end
+
     extend SubTree_::Lib_::Bzn_[].name_library.name_function_proprietor_methods
 
     Callback_::Actor.methodic self, :simple, :properties
 
     SubTree_._lib.event_lib.selective_builder_sender_receiver self
 
-    def initialize
-      # you are executed before a block is instance_exec'd
+    def initialize _, & oes_p
+      @on_event_selectively = oes_p
     end
 
     def is_API_action
       true
     end
 
-    def bound_call_via_call iambic, & oes_p
-      @on_event_selectively = oes_p
-      ok = receive_iambic iambic
-      ok && bound_call
+    def bound_call_against_iambic_stream st  # #hook-near [br]
+      _ok = recv_iambic_stream st
+      _ok && bound_call
     end
 
   private
 
     # ~ intiation lifecycle
 
-    def receive_iambic x_a
-      ok = process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+    def recv_iambic_stream st
+      ok = process_iambic_stream_fully st
       ok &&= via_default_proc_and_is_required_normalize
       ok && normalize
     end

@@ -460,18 +460,18 @@ module Skylab::Brazen
       end
 
       def build_immutable_properties_stream_with_random_access_
-        entity_formal_property_method_names_box_for_rd.to_value_scan.map_by do |i|
+        entity_formal_property_method_names_box_for_read.to_value_scan.map_by do |i|
           send i
         end.immutable_with_random_access_keyed_to_method :name_i
       end
 
       def any_property_via_symbol i
-        m_i = entity_formal_property_method_names_box_for_rd[ i ]
+        m_i = entity_formal_property_method_names_box_for_read[ i ]
         m_i and send m_i
       end
 
       def property_via_symbol i
-        send entity_formal_property_method_names_box_for_rd.fetch i
+        send entity_formal_property_method_names_box_for_read.fetch i
       end
 
       def method_added m_i
@@ -497,7 +497,7 @@ module Skylab::Brazen
         end
 
       module_attr_reader_writer(
-        :entity_formal_property_method_names_box_for_rd,
+        :entity_formal_property_method_names_box_for_read,
         :entity_formal_property_method_names_box_for_write,  # :+#public-API (name)
         :ENTITY_FORMAL_PROPERTY_METHOD_NAMES_BOX___,
         :@entity_formal_property_method_nms_bx_for_wrt ) do |o|
@@ -658,11 +658,15 @@ module Skylab::Brazen
         ACHIEVED_
       end
 
+      def formal_properties
+        self.class.properties
+      end
+
     private
 
       def bound_properties
         @bp ||= Entity::Properties_Stack__::Bound_properties[
-          method( :get_bound_property_via_property ), self.class.properties ]
+          method( :get_bound_property_via_property ), formal_properties ]
       end
 
       def get_argument_via_property_symbol sym
@@ -678,7 +682,7 @@ module Skylab::Brazen
       end
 
       def iambic_writer_method_name_passive_lookup_proc  # [cb] #hook-in
-        bx = self.class.entity_formal_property_method_names_box_for_rd
+        bx = self.class.entity_formal_property_method_names_box_for_read
         -> name_i do
           m_i = bx[ name_i ]
           if m_i

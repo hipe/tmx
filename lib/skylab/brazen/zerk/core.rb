@@ -661,7 +661,7 @@ module Skylab::Brazen
       end
     end
 
-    ACHIEVED_ = true  # #todo this will be the virgin voyage of [#bs-016]
+    ACHIEVED_ = true
     BLANK_RX_ = /\A[[:space:]]*\z/
     FINISHED_ = nil
     NONE_S = '(none)'.freeze

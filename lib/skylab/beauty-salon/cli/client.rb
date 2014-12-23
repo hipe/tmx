@@ -100,33 +100,57 @@ module Skylab::BeautySalon
     end
 
     option_parser do |o|
-      @x_a ||= []
-      @action ||= BS_::Models_::Deliterate.new :_no_kernel_
+
+      @action = BS_::Models_::Deliterate.new NO_KERNEL__ do | *, & ev_p |
+
+        ev_p[].render_all_lines_into_under @y,
+
+          BS_._lib.brazen::CLI.expression_agent_instance
+
+        false
+      end
+
       @action.write_options o
+
+      @x_a = []
+
       nil
     end
 
+    NO_KERNEL__ = class No_Kernel__
+      def to_kernel
+      end
+      self
+    end.new
+
     def deliterate file=nil, from_line, to_line
-      x_a = ( @x_a ||= [] )
+
+      x_a =  @x_a
+
       if file
         x_a.push :input_path, file
       else
         x_a.push :input_stream, @sin
       end
+
       _out_y = ::Enumerator::Yielder.new do |s|
         @out.write s
       end
+
       x_a.push :comment_line_yieldee, @y
       x_a.push :code_line_yieldee, _out_y
       x_a.push :from_line, from_line, :to_line, to_line
-      @action ||= BS_::Models_::Deliterate.new :_no_kernel_
-      _oes_p = -> *, & ev_p do
-        ev_p[].render_all_lines_into_under @y,
-          BS_._lib.brazen::CLI.expression_agent_instance
-        false
+
+      bc = @action.bound_call_against_iambic_stream(
+        Callback_::Iambic_Stream.via_array( x_a ) )
+
+      @x_a = nil
+
+      if bc
+        bc.receiver.send( bc.method_name, * bc.args )
+      else
+        bc
       end
-      bc = @action.bound_call_via_call x_a, & _oes_p
-      bc and bc.receiver.send( bc.method_name, * bc.args )
     end
 
     option_parser do |o|

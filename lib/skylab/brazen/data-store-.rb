@@ -29,7 +29,7 @@ module Skylab::Brazen
 
       def via_entity_resolve_entity_identifier
         @entity_identifier = @entity.class.node_identifier.
-          with_local_entity_identifier_string @entity.local_entity_identifier_string  # #todo
+          with_local_entity_identifier_string @entity.local_entity_identifier_string  # #todo - is this covered
         PROCEDE_
       end
     end

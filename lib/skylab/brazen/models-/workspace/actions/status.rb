@@ -46,10 +46,8 @@ module Skylab::Brazen
       end
 
       @ws = model_class.edit_entity @kernel, handle_event_selectively do |o|
-
-        o.with_argument_box bx
-
-        o.with(
+        o.argument_box bx
+        o.where(
           :prop, self.class.properties.fetch( :path ),
           :on_event_selectively, _oes_p )
       end

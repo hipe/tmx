@@ -101,7 +101,7 @@ module Skylab::Brazen
 
     # ~ for retrieve (list)
 
-    def entity_scan_via_class cls, & oes_p
+    def entity_stream_via_model cls, & oes_p
       Couch_::Actors__::Scan.with :model_class, cls,
         :datastore, self,
         :kernel, @kernel, :on_event_selectively, oes_p

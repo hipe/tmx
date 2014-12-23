@@ -35,7 +35,7 @@ module Skylab::Brazen
           end
 
           def work
-            scn = Lib_::Iambic_scanner[].new 0, @deflist_a
+            scn = Callback_::Iambic_Stream.via_array @deflist_a
             cls = ::Class.new Prototype__
             _MESSAGE_PROC_ = @message_proc
             cls.class_exec do

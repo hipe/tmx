@@ -276,6 +276,7 @@ module Skylab::Brazen
 
         class self::Entity_Property
         private
+
           def description=
             x = iambic_property
             if x.respond_to? :ascii_only?
@@ -284,10 +285,19 @@ module Skylab::Brazen
                 y << _STRING
               end
             end
-            @has_description = true
-            ( @desc_p_a ||= [] ).push x
-            KEEP_PARSING_
+            accept_description_proc x
           end
+
+          def accept_description_proc p
+            if p
+              @has_description = true
+              ( @desc_p_a ||= [] ).push p
+              KEEP_PARSING_
+            else
+              STOP_PARSING_
+            end
+          end
+
         public
           attr_reader :has_description, :desc_p_a
         end
@@ -463,7 +473,7 @@ module Skylab::Brazen
 
 
     def via_properties_init_ivars  # #note-360
-      formal = self.class.properties
+      formal = self.formal_properties
       scn = formal.to_stream
 
       stack = Brazen_::Entity.properties_stack.new formal.get_names  # could pass oes

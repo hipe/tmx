@@ -97,6 +97,11 @@ better this time.
   use is encouraged along with other conventions, in which case the word
   may get bumped off the front of the method name (`via_X_when_Y`).
 
++ `where` - receiver is an "edit shell" (representing an interface to an
+  edit session of some sort (e.g of a business entity)), this is the
+  conventional method name used for that public method of the edit shell
+  that accepts a [#cb-046] literal iambic phrase.
+
 + `with` - arguments must be treated as a literal [#cb-046] iambic phrase.
   must have no side-effects on the receiver, instead the result must be
   a dup of the receiver that has been transformed as is described by the

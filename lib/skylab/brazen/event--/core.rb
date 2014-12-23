@@ -111,7 +111,7 @@ module Skylab::Brazen
 
     private def init_via_x_a_and_p x_a, p
         @message_proc = p
-        scn = Lib_::Iambic_scanner[].new 0, x_a
+        scn = Callback_::Iambic_Stream.via_array x_a
         @terminal_channel_i = scn.gets_one
         box = Box_.new
         sc = singleton_class
@@ -458,7 +458,7 @@ module Skylab::Brazen
         end
 
         def handle_event_selectively_via_channel
-          @HESVC_p ||= produce_handle_event_selectively_via_channel
+          @__HESVC_p__ ||= produce_handle_event_selectively_via_channel
         end
 
       private
@@ -466,7 +466,7 @@ module Skylab::Brazen
         def prdc_HES
           if handle_event_selectively_via_channel
             -> * i_a, & ev_p do
-              @HESVC_p.call i_a, & ev_p
+              @__HESVC_p__.call i_a, & ev_p
             end
           end
         end
@@ -481,12 +481,17 @@ module Skylab::Brazen
 
         # ~ common & courtesy
 
-        def receive_selective_listener_proc oes_p
+        def change_selective_listener_via_channel_proc x
+          @on_event_selectively = nil
+          @__HESVC_p__ = x ; nil
+        end
+
+        def accept_selective_listener_proc oes_p
           @on_event_selectively = oes_p ; nil
         end
 
-        def receive_selective_listener_via_channel_proc hesvc_p
-          @HESVC_p = hesvc_p ; nil
+        def accept_selective_listener_via_channel_proc hesvc_p
+          @__HESVC_p__ = hesvc_p ; nil
         end
 
         def event_lib

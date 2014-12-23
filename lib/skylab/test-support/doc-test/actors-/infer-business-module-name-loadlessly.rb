@@ -29,8 +29,9 @@ module Skylab::TestSupport
         super
       end
 
-      def receive_selective_listener_proc p
-        @on_event_selectively = p ; nil
+      def accept_selective_listener_proc oes_p  # #hook-out [cb]
+        @on_event_selectively = oes_p
+        nil
       end
 
       def execute

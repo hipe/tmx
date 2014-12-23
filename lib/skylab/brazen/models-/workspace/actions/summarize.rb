@@ -18,9 +18,9 @@ module Skylab::Brazen
 
         @prop = self.class.properties.fetch :path
         @ws = model_class.edit_entity @kernel, handle_event_selectively do |o|
-          o.with_preconditions @preconditions
-          o.with_argument_box bx
-          o.with :prop, @prop
+          o.preconditions @preconditions
+          o.argument_box bx
+          o.where :prop, @prop
         end
         @ws and via_ws
       end

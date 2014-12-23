@@ -8,10 +8,10 @@ module Skylab::Brazen
 
       class Mutate < Git_Config_Actor_
 
-        Actor_[ self, :properties,
+        Actor_.call self, :properties,
           :entity,
-          :mutable_document
-        ]
+          :mutable_document,
+          :on_event_selectively
 
         def execute
           ok = resolve_properties

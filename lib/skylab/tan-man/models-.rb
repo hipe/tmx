@@ -29,28 +29,38 @@ module Skylab::TanMan
   end
 
   Stubber_ = -> model do
-    -> i do
-      Stub__.new i do |x|
-        model::Actions__.const_get( i, false ).new x
+
+    -> action_const do
+
+      Stub_.new action_const do | boundish, & oes_p |
+
+        model::Actions__.const_get( action_const, false ).new boundish, & oes_p
       end
     end
   end
 
-  class Stub__
-    def initialize name_i, & p
-      @p = p
-      @name_function = Callback_::Name.via_variegated_symbol name_i
+  class Stub_
+
+    def initialize action_const, & build_bound_p
+
+      @build_bound_p = build_bound_p
+      @name_function = Callback_::Name.via_const action_const
     end
+
     attr_reader :name_function
+
     def is_actionable
       true
     end
+
     def is_promoted
       false
     end
-    def new kernel
-      @p[ kernel ]
+
+    def new boundish, & oes_p
+      @build_bound_p.call boundish, & oes_p
     end
+
     def name
       self._ONLY_TO_LOOK_LIKE_A_MODULE  # #todo
     end
@@ -159,11 +169,11 @@ module Skylab::TanMan
 
         class << self
 
-          def get_unbound_upper_action_scan
+          def to_upper_unbound_action_stream
             Scan_[].via_nonsparse_array [ self ]
           end
 
-          def get_unbound_lower_action_scan
+          def to_lower_unbound_action_stream  # #hook-in [br]
             @did_load_actions ||= begin
               self.const_get :Actions, false
               true
@@ -196,8 +206,8 @@ module Skylab::TanMan
 
   class Kernel_ < Brazen_::Kernel_  # :[#083].
 
-    def kernel_property_value i  # _DOG_EAR
-      properties_stack.property_value_via_symbol i
+    def kernel_property_value sym
+      properties_stack.property_value_via_symbol sym
     end
   private
     def properties_stack

@@ -55,18 +55,11 @@ module Skylab::Callback
       end
 
       def process_iambic_fully x_a
-        @scanner = Iambic_Stream_via_Array_.new 0, x_a
-        begin
-          m_i = :"_process_#{ @scanner.current_token }_argument_"
-          if respond_to? m_i
-            @scanner.advance_one
-            send m_i
-          else
-            raise ::ArgumentError, "no such argument '#{ @scanner.current_token }'"
-          end
-        end while @scanner.unparsed_exists
-        @scanner = nil
+        process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+        nil
       end
+
+      include Callback_::Actor.methodic_lib.iambic_processing_instance_methods
 
       def init_scn scn
         @a = [] ; @h = {}
@@ -75,38 +68,44 @@ module Skylab::Callback
         @scn = scn ; nil
       end
 
+    private
+
+      def key_method_name=
+        @meth_i = iambic_property
+        KEEP_PARSING_
+      end
+
+      def each_mapper=
+        @each_mapper = iambic_property
+        KEEP_PARSING_
+      end
+
+      def each_pair_mapper=
+        @each_pair_mapper = iambic_property
+        KEEP_PARSING_
+      end
+
+      def scan_proc=
+        @produce_scan_p = iambic_property
+        KEEP_PARSING_
+      end
+
+      def scn=
+        init_scn iambic_property
+        KEEP_PARSING_
+      end
+
+      def on_assignment_via_value_and_name=
+        @on_assignment_via_value_and_name = iambic_property
+        KEEP_PARSING_
+      end
+
+      def value_mapper=  # #ra-105 in [#044]
+        @value_mapper = iambic_property
+        KEEP_PARSING_
+      end
+
     public
-
-      def _process_key_method_name_argument_
-        @meth_i = @scanner.gets_one ; nil
-      end
-
-      def _process_each_mapper_argument_
-        @each_mapper = @scanner.gets_one ; nil
-      end
-
-      def _process_each_pair_mapper_argument_
-        @each_pair_mapper = @scanner.gets_one ; nil
-      end
-
-      def _process_scan_proc_argument_
-        @produce_scan_p = @scanner.get_one ; nil
-      end
-
-      def _process_scn_argument_
-        _scn = @scanner.gets_one
-        init_scn _scn ; nil
-      end
-
-      def _process_on_assignment_via_value_and_name_argument_
-        @on_assignment_via_value_and_name = @scanner.gets_one ; nil
-      end
-
-      def _process_value_mapper_argument_  # #ra-105 in [#044]
-        @value_mapper = @scanner.gets_one ; nil
-      end
-
-      # ~
 
       def length
         @done or flush
@@ -228,12 +227,6 @@ module Skylab::Callback
       end
 
     public
-
-      if false  # #todo
-      def concat_by scn
-        to_stream.concat_by( scn ).with_random_access_keyed_to_method @meth_i
-      end
-      end
 
       def reduce_by i=nil
         if i

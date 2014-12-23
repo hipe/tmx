@@ -216,7 +216,7 @@ module Skylab::Brazen
             end
           end
 
-          class Crazy_Scanner__ < Lib_::Iambic_scanner[]
+          class Crazy_Scanner__ < Callback_::Iambic_Stream_via_Array_
             attr_writer :d, :x_a_length
             attr_reader :d
           end

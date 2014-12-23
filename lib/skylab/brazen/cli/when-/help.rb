@@ -22,33 +22,54 @@ module Skylab::Brazen
 
       def whn_command_string
         aa = @aa
-        a = aa.find_matching_action_adapters_with_token @any_cmd_string
+        a = aa.find_matching_action_adapters_against_tok @any_cmd_string
         case 1 <=> a.length
         when  0 ; a.first.receive_show_help @help_renderer.invocation
         when  1 ; aa.receive_no_matching_action @any_cmd_string
-        when -1 ; aa.receive_multiple_matching_adapters a  # #todo
+        when -1 ; aa.receive_multiple_matching_adapters a  # #todo - unimplemented ambiguity case
         end
       end
 
       def whn_no_command_string
-        o = @help_renderer ; aa = @aa
+
+        aa = @aa
+        o = @help_renderer
+
+
+        # ~ usage line
+
         o.output_usage
 
-        aa.has_description and o.output_description
+
+        # ~ description section
+
+        if aa.has_description
+          o.output_description
+        end
+
+
+        # ~ actions section
 
         o.section_boundary
         o.output_header 'actions'
         o.output_option_parser_summary  # sic
-        _scn = aa.get_action_scn.reduce_by( & :is_visible )
-        _scn = aa.wrap_stream_with_ordering_buffer _scn
-        o.output_items_with_descriptions nil, _scn.to_a, 2
-        o.section_boundary
 
+        _visible_st = aa.to_adapter_stream.reduce_by( & :is_visible )
+
+        _ordered_st = aa.wrap_adapter_stream_with_ordering_buffer _visible_st
+
+        o.output_items_with_descriptions nil, _ordered_st.to_a, 2
+
+
+        # ~ invite to more help
+
+        o.section_boundary
         prop = aa.properties.fetch :action
         o.express do
           "use #{ code "#{ aa.invocation_string } -h #{
             }#{ par prop }" } for help on that action."
         end
+
         SUCCESS_
       end
     end

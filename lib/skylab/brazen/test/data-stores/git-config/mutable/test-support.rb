@@ -35,7 +35,7 @@ module Skylab::Brazen::TestSupport::Data_Stores::Git_Config::Mutable
 
     def with_content s
       document_p = -> do
-        doc = Subject__[].parse_string s
+        doc = Subject__[].parse_string s do self._NEVER end
         document_p = -> { doc } ; doc
       end
       define_method :__build_document__ do

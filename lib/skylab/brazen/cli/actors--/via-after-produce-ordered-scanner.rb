@@ -24,7 +24,9 @@ module Skylab::Brazen
 
       def main_loop
         begin
+
           item = @upstream.gets
+
           if ! item
             @p = EMPTY_P_
             if @waiting_h.length.nonzero?
@@ -35,7 +37,7 @@ module Skylab::Brazen
 
           my_name_sym = item.name.as_lowercase_with_underscores_symbol
 
-          i_go_after_this_sym = item.action.class.after_i
+          i_go_after_this_sym = item.bound_action.class.after_i
 
           _i_may_go_now = if i_go_after_this_sym
             @went_h.key? i_go_after_this_sym

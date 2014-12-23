@@ -40,7 +40,7 @@ module Skylab::Brazen
 
           @model_class.edit_entity @kernel, @on_event_selectively do |o|
             o.set_arg :couch_entity_revision, _r
-            o.with_unmarshalled_hash _h
+            o.unmarshalled_hash _h
           end
         end
 

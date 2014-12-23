@@ -4,6 +4,8 @@ module Skylab::Brazen
 
     module Node_via_Proc
 
+      # #todo - node via proc is covered elsewhere
+
       class << self
 
         def produce_nodelike p, i, mod
@@ -24,7 +26,7 @@ module Skylab::Brazen
           @name_s
         end
 
-        def get_unbound_upper_action_scan
+        def to_upper_unbound_action_stream
           Callback_.scan.via_item ActionClassLike__.new( @p, @i, @name_s, @mod )
         end
       end
@@ -49,8 +51,8 @@ module Skylab::Brazen
           @name_s
         end
 
-        def new k
-          CallLike__.new k, self
+        def new k , & oes_p
+          CallLike__.new k, self, & oes_p
         end
 
       private
@@ -63,8 +65,8 @@ module Skylab::Brazen
         def search_for_name_stop_index
 
           # assume convention: insist that some nearest module has the
-          # 'Actions_' const (probably the application node), and insist
-          # that the Actions_ node has the name stop index const.
+          # 'Action_' const (probably the application node), and insist
+          # that the Action_ node has the name stop index const.
 
           chain = Brazen_::Lib_::Module_lib[].chain_via_module @parent_module
           _mod = ( chain.length - 1 ).downto( 0 ).reduce nil do |_, d|
@@ -83,11 +85,16 @@ module Skylab::Brazen
           def after_i
             # for now
           end
+
+          def is_branch
+            false
+          end
         end
 
-        def initialize k, action_class_like
+        def initialize k, action_class_like, & oes_p
           @action_class_like = action_class_like
           @kernel = k
+          @on_event_selectively = oes_p
         end
 
         attr_reader :action_class_like, :kernel
@@ -96,15 +103,11 @@ module Skylab::Brazen
           [ :action_class_like, :kernel ]
         end
 
-        def is_branch
-          false  # for now
-        end
-
         def is_visible
           true  # for now
         end
 
-        def accept_parent_node _
+        def accept_parent_node_ _
         end
 
         def name
@@ -115,42 +118,46 @@ module Skylab::Brazen
           # for now
         end
 
-        def bound_call_via_call x_a, & oes_p
-          @on_event_selectively = oes_p
+        def bound_call_against_iambic_stream st
           case 0 <=> @action_class_like.p.arity
-          when -1 ; bc_when_nonzero_arity x_a
+          when -1 ; bc_when_nonzero_arity_via_stream st
           when  0 ; bc_when_zero_arity
-          when  1 ; bc_when_glob x_a
+          when  1 ; bc_when_glob st
           end
         end
 
-        def bc_when_zero_arity
+        def __REDO_bc_when_zero_arity
           Brazen_.bound_call nil, @action_class_like.p, :call
         end
 
-        def bc_when_glob x_a
+        def __REDO_bc_when_glob st
           x_a.push self
           Brazen_.bound_call x_a, @action_class_like.p, :call
         end
 
-        def bc_when_nonzero_arity x_a
+        def bc_when_nonzero_arity_via_stream st
 
           param_a = @action_class_like.p.parameters
           param_a[ -1, 1 ] = EMPTY_A_  # always 1 arg for the call used #here
 
-          _n11n = Brazen_::CLI.arguments.normalization.via :parameters, param_a
-          any_custom_err = _n11n.any_error_event_via_validate_x x_a
+          mutable_iambic = st.array_for_read[ st.current_index .. st.x_a_length - 1 ]
+
+          any_custom_err = Brazen_::CLI.arguments.normalization.via(
+            :parameters, param_a ).
+              any_error_event_via_validate_x( mutable_iambic )
 
           if any_custom_err
             bc_when_custom_error any_custom_err
           else
-            bc_when_OK x_a
+            bc_when_OK mutable_iambic
           end
         end
 
-        def bc_when_OK x_a
-          x_a.push self  # :#here is where we use the 1 extra arg
-          Brazen_.bound_call x_a, @action_class_like.p, :call
+        def bc_when_OK mutable_iambic
+
+          mutable_iambic.push self  # :#here is where we use the 1 extra arg
+
+          Brazen_.bound_call mutable_iambic, @action_class_like.p, :call
         end
 
         def bc_when_custom_error err

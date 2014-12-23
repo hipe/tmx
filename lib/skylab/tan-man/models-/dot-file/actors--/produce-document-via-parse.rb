@@ -53,7 +53,11 @@ module Skylab::TanMan
         attr_reader :subscribe_p_a
 
         def set_generated_grammar_dir_path x
-          @generated_grammar_dir_path = x ; nil
+          if x
+            @generated_grammar_dir_path = x
+          else
+            raise ::ArgumentError, "invalid `generated_grammar_dir_path`: #{ x.inspect }"
+          end
         end
 
         def set_input_tuple i, x
@@ -134,6 +138,7 @@ module Skylab::TanMan
         end.call
 
         def build_parser_class
+
           TanMan_._lib.TTT::Parser::Load.new( self,
             -> o do
               do_force_overwrite_for_load and o.force_overwrite!
@@ -148,8 +153,7 @@ module Skylab::TanMan
               if @conduit.is_subscribed_to_parser_loading_error_event
                 o.on_error @conduit.handle_parser_loading_error_event
               end
-            end
-          ).invoke
+            end ).invoke
         end
 
         def add_grammar_paths_to_load o
