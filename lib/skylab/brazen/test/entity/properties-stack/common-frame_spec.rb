@@ -1,6 +1,6 @@
 require_relative 'common-frame/test-support'
 
-module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__
+module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Common_Frame
 
   describe "[br] entity properties stack common frame" do
 
@@ -13,7 +13,7 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__
     it "whines on weirdness" do
       _rx = /\bunrecognized property 'weirdness'/
       -> do
-        module Foo
+        module Foo_Thing
           Subject_[ self, :weirdness ]
         end
       end.should raise_error ::ArgumentError, _rx

@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__::IWE
+module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Common_Frame::IWE
 
-  ::Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__[ self ]
+  ::Skylab::Brazen::TestSupport::Entity::Properties_Stack::Common_Frame[ self ]
 
   include Constants
 

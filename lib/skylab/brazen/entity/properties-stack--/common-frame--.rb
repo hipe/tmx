@@ -4,8 +4,8 @@ module Skylab::Brazen
 
     class Properties_Stack__
 
-      # use its memoized and non-memoized procs and inline methods
-      # like so:
+      # enhance a class as a `common_frame`
+      # you can define [non-]memoized { proc | inline } methods
       #
       #     class Foo
       #       Brazen_.properties_stack.common_frame self,
@@ -25,15 +25,29 @@ module Skylab::Brazen
       #         end
       #     end
       #
-      #     # one chunk #until:[#ts-032]
+      #     foo = Foo.new { }
       #
-      #     foo = Foo.new {}
+      #
+      # accessing a field's value when it is an ordinary proc
+      #
       #     foo.foo  # => 1
       #     foo.foo  # => 2
+      #
+      #
+      # accessing a field's value when it is a memoized proc
+      #
       #     foo.bar  # => 1
       #     foo.bar  # => 1
+      #
+      #
+      # accessing a field's value when it is an "inline method"
+      #
       #     foo.bif  # => "_3_"
       #     foo.bif  # => "_4_"
+      #
+      #
+      # accessing a field's value when it is a memoized inline method
+      #
       #     foo.baz  # => "<5>"
       #     foo.baz  # => "<5>"
       #     foo.baz.object_id  # => foo.baz.object_id
@@ -237,28 +251,32 @@ module Skylab::Brazen
 
     # [ `required` ] `field`s -
     #
-    # failing to provide a required field triggers an argument error
-    #
-    #     class Foo
+    #     class Bar
     #       Brazen_.properties_stack.common_frame self,
     #         :globbing, :processor, :initialize,
     #         :required, :readable, :field, :foo,
     #         :readable, :field, :bar
     #     end
     #
-    #     Foo.new  # => ArgumentError: missing required field - 'foo'
+    #
+    # failing to provide a required field triggers an argument error
+    #
+    #     Bar.new  # => ArgumentError: missing required field - 'foo'
+    #
     #
     # passing nil is considered the same as not passing an argument
     #
-    #     Foo.new( :foo, nil )  # => ArgumentError: missing required field - 'foo'
+    #     Bar.new( :foo, nil )  # => ArgumentError: missing required field - 'foo'
+    #
     #
     # passing false is not the same as passing nil, passing false is valid.
     #
-    #     Foo.new( :foo, false ).foo  # => false
+    #     Bar.new( :foo, false ).foo  # => false
+    #
     #
     # you can of course pass nil as the value for a non-required field
     #
-    #     Foo.new( :foo, :x, :bar, nil ).bar  # => nil
+    #     Bar.new( :foo, :x, :bar, nil ).bar  # => nil
     #
 
         Common_Methods__ = ::Module.new

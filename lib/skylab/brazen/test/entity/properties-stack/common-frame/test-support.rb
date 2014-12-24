@@ -1,16 +1,14 @@
 require_relative '../test-support'
 
-module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Common_Frame__
+module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Common_Frame
 
-  ::Skylab::Brazen::TestSupport::Entity::Properties_Stack__[ self ]
+  ::Skylab::Brazen::TestSupport::Entity::Properties_Stack[ self ]
 
   include Constants
 
   extend TestSupport_::Quickie
 
   Brazen_ = Brazen_
-
-  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   module Constants
 

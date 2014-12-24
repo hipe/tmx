@@ -6,10 +6,10 @@ lib/skylab/basic/pathname/union.rb  #setup-for-regret  #subject-proc
 lib/skylab/basic/rotating-buffer.rb  #setup-for-regret  #subject-proc
 lib/skylab/basic/struct.rb  #setup-for-regret  #subject-proc
 
-lib/skylab/brazen/entity/properties-stack--/common-frame--.rb #branch-down-to-core #regret-setup:no
+lib/skylab/brazen/entity/properties-stack--/common-frame--.rb  #branch-down-to-core  #look-for-ts
 
-lib/skylab/callback/proxy/inline--.rb  #branch-down-to-core  #regret-setup: no
-lib/skylab/callback/proxy/functional--.rb  #branch-down-to-core  #regret-setup: no
+lib/skylab/callback/proxy/inline--.rb  #branch-down-to-core  #setup-for-regret  #subject-proc
+lib/skylab/callback/proxy/functional--.rb  #branch-down-to-core
 
 lib/skylab/face/cli/lipstick.rb  #setup-for-regret
 lib/skylab/face/cli/table.rb  #branch-down-to-core
@@ -17,8 +17,8 @@ lib/skylab/face/cli/tableize--.rb  #chomp-module
 lib/skylab/face/plugin/host/metaservices-/chain-.rb  #setup-for-regret
 lib/skylab/face/plugin/host/proxy.rb  #setup-for-regret
 
-lib/skylab/headless/cli/option--/core.rb  #branch-down-to-core  #regret-setup:no
-lib/skylab/headless/system--/services--/filesystem/cache--.rb  #branch-down-to-core #regret-setup:no
+lib/skylab/headless/cli/option--/core.rb
+# lib/skylab/headless/system--/services--/filesystem/cache--.rb  #branch-down-to-core has some issues
 
 lib/skylab/information-tactics/levenshtein.rb  #chomp-module
 

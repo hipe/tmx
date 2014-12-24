@@ -15,6 +15,7 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible::Articulator
     before :all do
       Articulator_ = TestSupport_::Quickie::Possible_::Articulator_
     end
+
     it "this generates a simple articulator class." do
       _Wing_Wang_Predicate = Articulator_.
         new( :wing, :wang, -> do

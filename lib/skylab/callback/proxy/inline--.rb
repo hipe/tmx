@@ -6,11 +6,11 @@ module Skylab::Callback
 
       # produce a proxy "inline" from a hash-like whose values are procs:
       #
-      #     pxy = Subject_[].inline(
+      #     pxy = Subject_.call(
       #       :foo, -> x { "bar: #{ x }" },
       #       :biz, -> { :baz } )
       #
-      #     pxy.foo :wee  # => "bar wee"
+      #     pxy.foo( :wee )  # => "bar: wee"
       #
       #     pxy.biz  # => :baz
       #
@@ -21,6 +21,11 @@ module Skylab::Callback
       #   `generic`, `plastic`, `dynamic`, `ad_hoc`)
 
       class << self
+
+        def [] * a, & p
+          new a, p
+        end
+
         def via_arglist a, & p
           new a, p
         end

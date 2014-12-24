@@ -13,7 +13,6 @@ module Skylab::MetaHell::TestSupport::Basic_Fields
             :field_i_a, [ :ding, :bat ]
         end
       end
-
       let :foo do
         Foo.new
       end

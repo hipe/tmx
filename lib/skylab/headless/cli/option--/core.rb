@@ -123,13 +123,12 @@ module Skylab::Headless
       ::Struct.new( * i_a ).new( * i_a_ )
     end.call
 
-    # hack to see if a basic switch is present
-    # like this
+    # `basic_switch_index_curry` is a hack to see if a basic switch is present
     #
-    #     P = Subject_[].basic_switch_index_curry '--foom'
-    #     P[ [ 'abc' ] ]  # => nil
-    #     P[ [ 'abc', '--fo', 'def' ] ]  # => 1
-    #     P[ [ '--foomer', '-fap', '-f', '--foom' ] ]  # => 2
+    #     p = Subject_[].basic_switch_index_curry '--foom'
+    #     p[ [ 'abc' ] ]  # => nil
+    #     p[ [ 'abc', '--fo', 'def' ] ]  # => 1
+    #     p[ [ '--foomer', '-fap', '-f', '--foom' ] ]  # => 2
 
 
   end

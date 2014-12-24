@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::Brazen::TestSupport::Entity::Properties_Stack__::Core
+module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Core
 
-  ::Skylab::Brazen::TestSupport::Entity::Properties_Stack__[ TS_ = self ]
+  ::Skylab::Brazen::TestSupport::Entity::Properties_Stack[ TS_ = self ]
 
   include Constants
 

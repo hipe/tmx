@@ -4,15 +4,20 @@ module Skylab::Callback
 
     class Functional__ < ::BasicObject
 
-      # whereas "inline" creates a proxy "inline" by mutating a singleton
-      # class, this makes a (BasicObject subclass) proxy class in one step
-      # that you instantiate in another step:
+      # make a 'fuctional' proxy class with a list of member names:
       #
-      #     My_Proxy = Subject_[].functional :foo, :bar
+      #     My_Proxy = Subject_[].functional :foo, :baz
       #
-      #     pxy = My_Proxy.new :foo, -> x { "bar: #{ x } }, :baz, -> { :BAZ }
+      # in contrast to `inline` which creates a proxy "inline" by mutating
+      # a singleton class, this makes a (::BasicObject) subclass proxy class
+      # in one step that you instantiate in another step.
       #
-      #     pxy.foo :wee  #=> "bar wee"
+      # build a proxy instance by passing it procs to implement the fields:
+      #
+      #     pxy = My_Proxy.new :foo, -> x { "bar: #{ x }" },
+      #       :baz, -> { :BAZ }
+      #
+      #     pxy.foo( :wee )  #=> "bar: wee"
       #     pxy.baz  # => :BAZ
 
       class << self

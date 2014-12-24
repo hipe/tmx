@@ -13,7 +13,7 @@ module Skylab::Headless
     # dir pathname you want to be inherited by nested modules), and given
     # nested module Foo::Bar, if you call e.g:
     #
-    #     Subject_[].cache_pathname_proc_via_module Foo::Bar
+    #    Subject_[].cache_pathname_proc_via_module Foo::Bar
     #
     # the result is a function that will result in a memoized pathname that
     # represents the cache directory for you to use based on appending an
@@ -24,7 +24,8 @@ module Skylab::Headless
     # module reflect a directory that exists. any such created directory
     # will use the same mode (permission set) as this parent directory.
     #
-    # it is expected to be used something like this:
+    # some top module will need to define `cache_pathname` for itself,
+    # then a nested module can use the topic:
     #
     #     module Foo
     #       def self.cache_pathname
@@ -38,7 +39,7 @@ module Skylab::Headless
     #         Subject_[].cache_pathname_proc_via_module( self )
     #     end
     #
-    #     # now you have:
+    # the nested client module builds its `cache_pathname` isomoprhically:
     #
     #     Foo::BarBaz.cache_pathname  # => #<Pathname:/var/xkcd/foo/bar-baz>
     #
@@ -56,44 +57,44 @@ module Skylab::Headless
     #     runtime hence if you or something else removes the directory or
     #     changes its permissions during runtime, you are on your own to
     #     re-create the directory as necessary.
-    #
+
     # Some features / behavior details:
     #
     #   + the filename ("foo-bar" in the above example) is of course inferred
-    #     from the const name ("FooBar" in the example above. if you want a
-    #     different filaname you can use the `abbrev` iambic option:
+    #     from the const name ("FooBar" in the example above.
+    #     for a different filename you can use the `abbrev` iambic option:
     #
-    #    p = Subject_[].cache_pathname_proc_via_module self,
-    #      :abbrev, 'some-other-filename'
+    #         p = Subject_[].cache_pathname_proc_via_module self,
+    #           :abbrev, 'some-other-filename'
     #
-    #    p[]  # => #<Pathname:/var/xkcd/foo-some-other-filename>
+    #         p[]  # => #<Pathname:/var/xkcd/foo-some-other-filename>
     #
     #   + when searching upwards for a parent module that responds to
     #     `cache_pathname`, the search will hop over intermediate modules
     #     that do not do so; so you can design your module graph to contain
     #     as many modules as you find taxonomically useful, and not be held
-    #     to making intermediate directories in your cache tree for modules
-    #     that will not need their own cache directories.
+    #     to making intermediate directories in your cache tree. so not all
+    #     modules need to have their own cache directories:
     #
-    #     module Foo
-    #       define_singleton_method :cache_pathname, -> do
-    #         _PN = ::Pathname.new( ::Dir.tmpdir ).join( 'my-app' )
-    #         -> do
-    #           _PN
+    #         module Foo_
+    #           define_singleton_method :cache_pathname, -> do
+    #             _PN = ::Pathname.new( '/var/xkcd' ).join( 'my-app' )
+    #             -> do
+    #               _PN
+    #             end
+    #           end.call
+    #
+    #           module Bar
+    #             module Baz
+    #               define_singleton_method :cache_pathname, &
+    #                 Subject_[].cache_pathname_proc_via_module( self )
+    #             end
+    #           end
     #         end
-    #       end.call
     #
-    #       module Bar
-    #         module Baz
-    #           define_singleton_method :cache_pathname, &
-    #             Subject_[].cache_pathname_proc_via_module( self )
-    #         end
-    #       end
-    #     end
-    #
-    #     Foo.cache_pathname            # => #<Pathname:/var/xkcd/my-app>
-    #     Foo::Bar.cache_pathname       # raises ::NoMethodError
-    #     Foo::Bar::Baz.cache_pathname  # => #<Pathname:/var/xkcd/my-app/baz>
+    #         Foo_.cache_pathname  # => <Pathname:/var/xkcd/my-app>
+    #         Foo_::Bar.respond_to?( :cache_pathname )  # => false
+    #         Foo_::Bar::Baz.cache_pathname  # => <Pathname:/var/xkcd/my-app/baz>
     #
     # happy hacking!
 
