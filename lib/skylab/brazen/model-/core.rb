@@ -32,6 +32,10 @@ module Skylab::Brazen
           singleton_class.instance_methods( false ) - [ :members ]
         end
 
+        def model_class
+          Model_
+        end
+
         def name_function_class
           Model_Name_Function_
         end
@@ -467,7 +471,7 @@ module Skylab::Brazen
 
       def try_convert_to_node_like_via_mixed x, i
         if x.respond_to? :call
-          Model_::Node_via_Proc._DO_ME_like_an_action x, i
+          Model_::Node_via_Proc.produce_action_class_like x, i, @mod
         end
       end
     end

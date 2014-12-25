@@ -21,6 +21,13 @@ module Skylab::Cull::TestSupport
       x.should eql :hello_from_cull
     end
 
+    it "ping the model node" do
+      call_API :survey, :ping
+      expect_OK_event :ping, 'cull says (highlight "hello")'
+      expect_no_more_events
+      @result.should eql :_hi_again_
+    end
+
     if false
 
     as :creating_done,

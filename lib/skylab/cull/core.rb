@@ -38,6 +38,8 @@ module Skylab::Cull
 
   Cull_ = self
 
+  Model_ = Brazen_.model.model_class
+
   Autoloader_[ self, ::Pathname.new( ::File.dirname( __FILE__ ) ) ]
 
 end

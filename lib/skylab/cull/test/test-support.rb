@@ -31,8 +31,14 @@ module Skylab::Cull::TestSupport
       TestSupport_.debug_IO
     end
 
-    def event_expression_agent  # #hook-out for [br]
+    # ~ #hook-outs for [br]
+
+    def event_expression_agent
       Cull_::Brazen_.event.codifying_expression_agent
+    end
+
+    def subject_API
+      Cull_::API
     end
   end
 

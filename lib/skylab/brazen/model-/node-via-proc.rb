@@ -51,6 +51,14 @@ module Skylab::Brazen
           false
         end
 
+        def is_actionable
+          true
+        end
+
+        def is_promoted
+          true  # meh
+        end
+
         attr_reader :p, :parent_module
 
         def members

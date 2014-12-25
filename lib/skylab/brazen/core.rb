@@ -79,7 +79,7 @@ module Skylab::Brazen
     module Name_Function_Proprietor_Methods__  # infects upwards
 
       def name_function
-        @nf ||= bld_name_function
+        @name_function ||= bld_name_function  # :+#public-API (ivar name)
       end
 
       def full_name_function

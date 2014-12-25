@@ -1,6 +1,6 @@
 module Skylab::Cull
 
-  class Models_::Survey
+  class Models_::Survey < Model_
 
     # ~ begin stowaways
 
@@ -18,6 +18,27 @@ module Skylab::Cull
       end
 
       :hello_from_cull
+    end
+
+    class Actions::Ping2 < Action_
+
+      # we have the odd situation of wanting to use the same name
+      # twice: one for the promoted action and once for this one.
+
+      @name_function = Brazen_.model.action_class.name_function_class.new(
+        self, Actions, :Ping )
+
+      def produce_any_result
+
+        maybe_send_event :info, :ping do
+          app_name = @kernel.app_name
+          build_OK_event_with :ping do | y, o |
+            y << "#{ app_name } says #{ highlight 'hello' }"
+          end
+        end
+
+        :_hi_again_
+      end
     end
 
     # ~ end stowaways
