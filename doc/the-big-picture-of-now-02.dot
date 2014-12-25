@@ -2,11 +2,11 @@ digraph {
 
   ev [label="event factory"]
 
-  cu [label="revamp cull"]
+  cu [label="revamp cull" style=filled fillcolor="#b5d5fb"]
 
   lib [label="librification"]
 
-  dct [label="new doctest features" style=filled fillcolor="#b5d5fb"]
+  dct [label="new doctest features" style=filled]
 
   sr [label="search and replace" style=filled]
 
@@ -26,4 +26,6 @@ digraph {
   sr->fu
   fu->API
   sr->al
+
+  # that one color of blue: fillcolor="#b5d5fb"
 }

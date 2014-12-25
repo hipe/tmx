@@ -19,7 +19,7 @@ module Skylab::Brazen
 
       o :ad_hoc_processor, :after, -> pc do  # pc = "parse context"
         pc.upstream.advance_one
-        pc.downstream.after_i = pc.upstream.gets_one
+        pc.downstream.after_name_symbol = pc.upstream.gets_one
         KEEP_PARSING_
       end
 

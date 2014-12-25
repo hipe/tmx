@@ -4,60 +4,39 @@ module Skylab::Cull
 
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
-  couple = Autoloader_.method :require_sidesystem
 
-  CodeMolester = couple[ :CodeMolester ]
-  Cull_ = self
-  Face = couple[ :Face ]
+  class << self
 
-  module CLI
-    def self.new *a, &p
-      self::Client.new( *a, &p )
+    def _lib
+      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
     end
-    Autoloader_[ self ]
-  end
-
-  module API
-    module Actions
-      Autoloader_[ self, :boxxy ]
-    end
-    module Events_
-      # gets filled with generated event classes
-    end
-    Autoloader_[ self, :boxxy ]  # peek to find client
-  end
-
-  Models = Autoloader_[ ::Module.new, :boxxy ]
-
-  def self._lib
-    @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
-  end
+  end  # >>
 
   module Lib_  # :+[#su-001]
 
-    sidesys, stdlib = Autoloader_.at :build_require_sidesystem_proc,
-      :build_require_stdlib_proc
+    # _sidesys = Autoloader_.build_require_sidesystem_proc
 
-    File_utils = stdlib[ :FileUtils ]
+  end
 
-    HL__ = sidesys[ :Headless ]
+  Brazen_ = Autoloader_.require_sidesystem :Brazen
 
-    Name_slugulate = -> i do
-      Callback_::Name.via_variegated_symbol( i ).as_slug
-    end
+  module API
 
-    System__ = -> do
-      HL__[].system
-    end
+    class << self
 
-    System_tmpdir_pathname = -> do
-      System__[].filesystem.tmpdir_pathname
-    end
+      include Brazen_::API.module_methods
 
-    Pretty_path_safe = -> x do
-      System__[].filesystem.path_tools.pretty_path_safe x
+      def expression_agent_class
+        Brazen_::API.expression_agent_class
+      end
     end
   end
+
+  Kernel_ = Brazen_.kernel_class
+
+  Action_ = Brazen_.model.action_class  # for name stop index we need this const
+
+  Cull_ = self
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname( __FILE__ ) ) ]
 

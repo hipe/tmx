@@ -1,16 +1,27 @@
-require_relative 'test-support'
+require_relative '../../../test-support'
 
-module Skylab::Cull::TestSupport::CLI::Actions::Init
+module Skylab::Cull::TestSupport
 
-  ::Skylab::Cull::TestSupport::CLI::Actions[ TS_ = self ]
+  describe "[cu] models - survey create" do
 
-  include Constants
-
-  extend TestSupport::Quickie
-
-  describe "[cu] CLI actions - init" do
+    Expect_event_[ self ]
 
     extend TS_
+
+    it "loads" do
+
+      Cull_::API
+
+    end
+
+    it "ping the top" do
+      x = Cull_::API.call :ping, :on_event_selectively, handle_event_selectively
+      expect_neutral_event :ping, "hello from cull."
+      expect_no_more_events
+      x.should eql :hello_from_cull
+    end
+
+    if false
 
     as :creating_done,
       %r{creating #{ PN_ } \.\. done \(\d\d bytes\)\.\z}i, :nonstyled
@@ -38,6 +49,7 @@ module Skylab::Cull::TestSupport::CLI::Actions::Init
         expect :exists
 
       end
+    end
     end
   end
 end

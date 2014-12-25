@@ -21,11 +21,11 @@
 [#043]       #doc-point feature of `isomorphic api action resolution`
 [#042]       #doc-point this fun problem w/ customizing your clients..
 [#041]       #doc-point `isomorphic command composition` is the formal name
-[#040]       #doc-point the matryoshka doll UI pattern ..
+[#040]       #doc-point :"modality" and the matryoshka doll UI pattern ..
 [#039]       #question in light of [#037], o.p receiver ..?
 [#038]       #doc-point `touching` is a small API corner of clients that
                allows for the (e.g branch) client to vivify lazily on-demand
-[#037]       #eventpoint, #parent-node: [#040]: fundamentally rearchitect Face
+[#037]       #eventpoint, #parent-node: [#040] : fundamentally rearchitect Face
                to deal with the DSL public instance method namespace problem.
 [#036]       #doc-node the CLI table narrative
        #todo replace universe with `tableize` with [ face cli table ]

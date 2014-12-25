@@ -460,7 +460,7 @@ module Skylab::Brazen
       end
 
       def build_immutable_properties_stream_with_random_access_
-        entity_formal_property_method_names_box_for_read.to_value_scan.map_by do |i|
+        entity_formal_property_method_names_box_for_read.to_value_stream.map_by do |i|
           send i
         end.immutable_with_random_access_keyed_to_method :name_i
       end
@@ -658,6 +658,14 @@ module Skylab::Brazen
         ACHIEVED_
       end
 
+      def any_formal_property_via_symbol sym
+        self.class.any_property_via_symbol sym
+      end
+
+      def formal_property_via_symbol sym
+        self.class.property_via_symbol sym
+      end
+
       def formal_properties
         self.class.properties
       end
@@ -670,7 +678,7 @@ module Skylab::Brazen
       end
 
       def get_argument_via_property_symbol sym
-        get_bound_property_via_property self.class.property_via_symbol sym
+        get_bound_property_via_property formal_property_via_symbol sym
       end
 
       def get_bound_property_via_property prop
@@ -852,7 +860,7 @@ module Skylab::Brazen
     class Property_or_MetaProperty__ < METHODIC_.simple_property_class
 
       METHODIC_.cache_iambic_writer_methods self, superclass do |h|
-        h.delete :property  # this must not be in the syntax of metapropertiesk
+        h.delete :property  # this must not be in the syntax of metaproperties
         h
       end
 

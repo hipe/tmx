@@ -1,5 +1,14 @@
 # the matryoska Doll UI / controller architecture pattern :[#040]
 
+## edit
+
+most of the thoughts expressed herein gave rise to and have been
+obviated by the [#br-013] model; however this is maintained (for now) as
+a historical document so that posterity remembers how different things
+were before they were good. as well we are maintaining this node as the
+one day home of the introduction to the concept of "modality".
+
+
 ## clients and sub-clients revisited at the most basic level
 
 ### where we came from: sub-clients

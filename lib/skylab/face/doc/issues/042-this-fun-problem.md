@@ -1,5 +1,14 @@
 # this fun design problem. :[#042]
 
+## edit
+
+the problem described herein was more or less solved by [#br-002] which
+used the concepts described here as a startingpoint.
+
+
+
+## (content of original edition)
+
 the matryoshka doll model [#040] is solid and we are sticking with it
 (for now). one of its driving design principles was to offer over its
 chronological predecessors (porcelain/legacy and headless CLI) is relative

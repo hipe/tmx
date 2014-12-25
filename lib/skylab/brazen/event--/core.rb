@@ -38,6 +38,11 @@ module Skylab::Brazen
           inline_via_iambic_and_any_message_proc_to_be_defaulted x_a, p
         end
 
+        def inline_OK_with * x_a, & p
+          x_a.push :ok, true
+          inline_via_iambic_and_any_message_proc_to_be_defaulted x_a, p
+        end
+
         def inline_via_iambic_and_any_message_proc_to_be_defaulted x_a, p
           p ||= Inferred_Message.to_proc
           inline_via_iambic_and_message_proc x_a, p

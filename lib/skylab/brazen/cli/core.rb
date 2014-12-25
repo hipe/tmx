@@ -503,7 +503,7 @@ module Skylab::Brazen
       def resolve_bound_call_via_output_iambic
 
         # begin experiment
-        prp = @bound.class.any_property_via_symbol :downstream
+        prp = @bound.any_formal_property_via_symbol :downstream
         if prp && prp.is_hidden
           @output_iambic.push :downstream, @resources.sout
         end
@@ -1343,6 +1343,11 @@ module Skylab::Brazen
           @s_a = [ ::File.basename( $PROGRAM_NAME ) ].freeze
         end
       end
+
+      def members
+        [ :argv, :env, :invocation_s_a, :mod, :sin, :sout, :serr ]
+      end
+
       attr_reader :argv, :env, :sin, :sout, :serr, :mod
       def complete env, argv
         @argv = argv ; @env = env ; freeze ; nil

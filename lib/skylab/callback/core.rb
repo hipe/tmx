@@ -304,7 +304,7 @@ module Skylab::Callback
       Callback_::Scan.via_nonsparse_array @a
     end
 
-    def to_value_stream
+    def to_value_minimal_stream
       d = -1 ; last = @a.length - 1
       Scn.new do
         if d < last
@@ -313,9 +313,9 @@ module Skylab::Callback
       end
     end
 
-    def to_value_scan
+    def to_value_stream
       d = -1 ; last = @a.length - 1
-      Callback_.scan do
+      Callback_.stream do
         if d < last
           @h.fetch @a.fetch d += 1
         end

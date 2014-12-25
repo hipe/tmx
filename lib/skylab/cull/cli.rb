@@ -1,5 +1,66 @@
 module Skylab::Cull
 
+  class CLI < Brazen_::CLI
+
+    class << self
+      def new * a
+        new_top_invocation a, Cull_
+      end
+    end  # >>
+
+    def expression_agent_class  # #hook-in [br]
+      Brazen_::CLI.expression_agent_class
+    end
+
+    # ~ to support *ANCIENT* tmx ("ouroboros") integration
+
+    Client = self
+
+    module Adapter
+      module For
+        module Face
+          module Of
+            Hot = -> namespace_sheet, my_CLI_class do
+              -> k, _ do
+
+                s_a = k.get_normal_invocation_string_parts
+                s_a.push namespace_sheet.name.as_slug
+
+                my_CLI_class.new( k.istream, k.ostream, k.estream, s_a )
+              end
+            end
+          end
+        end
+      end
+    end
+
+    def pre_execute
+      ACHIEVED_
+    end
+
+    def is_visible
+      true
+    end
+
+    def name
+      @__nf__ ||= Callback_::Name.via_slug( @resources.invocation_s_a.last )
+    end
+
+    def get_summary_a_from_sheet _
+      [ "make decisions" ]
+    end
+
+    def invokee
+      self
+    end
+
+    # ~ end integration
+  end
+
+  ACHIEVED_ = true
+
+  if false
+
   class CLI::Client < Face::CLI::Client
 
     # (see i.m's `prepend`'ed at the end!)
@@ -177,5 +238,6 @@ module Skylab::Cull
         self
       end
     end
+  end
   end
 end

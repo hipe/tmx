@@ -4,9 +4,15 @@ module Skylab::Brazen
 
     module Node_via_Proc
 
-      # #todo - node via proc is covered elsewhere
+      # #todo - node via proc is covered elsewhere: [tm], [cu]
 
       class << self
+
+        def produce_action_class_like p, const_sym, parent_mod
+          ActionClassLike__.new( p,
+            "#{ parent_mod.name }#{ CONST_SEP_ }#{ const_sym }",
+            parent_mod )
+        end
 
         def produce_nodelike p, i, mod
           NodeLike__.new p, i, mod
@@ -27,7 +33,7 @@ module Skylab::Brazen
         end
 
         def to_upper_unbound_action_stream
-          Callback_.scan.via_item ActionClassLike__.new( @p, @i, @name_s, @mod )
+          Callback_.scan.via_item ActionClassLike__.new( @p, @name_s, @mod )
         end
       end
 
@@ -35,16 +41,32 @@ module Skylab::Brazen
 
         include NAME_LIBRARY_.name_function_proprietor_methods
 
-        def initialize p, i, name_s, mod
+        def initialize p, name_s, mod
           @parent_module = mod
           @name_s = name_s
           @p = p
+        end
+
+        def is_branch
+          false
         end
 
         attr_reader :p, :parent_module
 
         def members
           [ :name_function, :parent_module ]
+        end
+
+        def name_function
+          super
+        end
+
+        def name_function_class  # #hook-in
+          Brazen_.model.action_class.name_function_class
+        end
+
+        def custom_action_inflection
+          nil
         end
 
         def name
@@ -82,7 +104,7 @@ module Skylab::Brazen
       class CallLike__
 
         class << self
-          def after_i
+          def after_name_symbol
             # for now
           end
 
@@ -100,7 +122,7 @@ module Skylab::Brazen
         attr_reader :action_class_like, :kernel
 
         def members
-          [ :action_class_like, :kernel ]
+          [ :action_class_like, :kernel, :maybe_receive_event ]
         end
 
         def is_visible
@@ -116,6 +138,61 @@ module Skylab::Brazen
 
         def has_description
           # for now
+        end
+
+        def formal_properties
+          Mock_Formal_Properties__.new do
+            __parameter_box.to_value_stream
+          end
+        end
+
+        def any_formal_property_via_symbol sym
+          __parameter_box[ sym ]
+        end
+
+        def __parameter_box
+          @pbx ||= bld_parameter_box
+        end
+
+        def bld_parameter_box
+
+          params = @action_class_like.p.parameters
+
+          params.pop  # because #here
+
+          bx = Callback_::Box.new
+          params.each do | opt_req_rest, name_symbol |
+
+            case opt_req_rest
+            when :req
+              parameter_arity = :one
+            else
+              raise ::NoMethodError, opt_req_rest
+            end
+
+            bx.add( name_symbol,
+
+            Brazen_.model.entity::Entity_Property.new do
+
+              @name = Callback_::Name.via_variegated_symbol name_symbol
+              @parameter_arity = parameter_arity
+
+            end )
+          end
+          bx
+        end
+
+        class Mock_Formal_Properties__
+          def initialize & p
+            @p = p
+          end
+          def to_stream
+            @p.call
+          end
+        end
+
+        def ___bound_call_via_iambic_stream_and_modality_adapter___ st, x
+          bound_call_against_iambic_stream st
         end
 
         def bound_call_against_iambic_stream st

@@ -348,7 +348,7 @@ module Skylab::Callback
 
         def when_some_same_on_second_frame  # :#310
           @is_repeated_h = ::Hash[ @same_i_a.map { |i| [ i, true ] } ]
-          scn = @nucleus.field_box.to_value_scan
+          scn = @nucleus.field_box.to_value_minimal_stream
           agg_fld_a = []
           while fld = scn.gets
             @is_repeated_h[ fld.name_i ] and next
@@ -508,7 +508,7 @@ module Skylab::Callback
 
         def via_redundant_oframe
           @subs_h = {}
-          scn = @nucleus.field_box.to_value_scan
+          scn = @nucleus.field_box.to_value_minimal_stream
           while @fld = scn.gets
             @p = @fld.when_frame_value_count_is_two_or_more_p
             if @p
@@ -523,7 +523,7 @@ module Skylab::Callback
         def via_aggregate
           @oframe = @frame_a.fetch 0
           @subs_h = {} ; @derivative_p_a = false  # #experiment 1 of 2
-          scn = @nucleus.field_box.to_value_scan
+          scn = @nucleus.field_box.to_value_minimal_stream
           agg_i = @afield.name_i
           while @fld = scn.gets
             if agg_i == @fld.name_i
@@ -540,7 +540,7 @@ module Skylab::Callback
 
         def via_unique_oframe
           @subs_h = {} ; @derivative_p_a = false  # #experiment 2 of 2
-          scn = @nucleus.field_box.to_value_scan
+          scn = @nucleus.field_box.to_value_minimal_stream
           while @fld = scn.gets
             via_field_substitute_value
           end

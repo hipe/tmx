@@ -14,8 +14,8 @@ module Skylab::Brazen
         false  # for now, every action node is always a terminal (leaf) node
       end
 
-      attr_accessor :after_i, :description_block, :is_promoted,
-        :precondition_controller_i_a
+      attr_accessor :after_name_symbol, :description_block,
+        :is_promoted, :precondition_controller_i_a
 
       def process_some_customized_inflection_behavior upstream
         Process_customized_action_inflection_behavior__.new( upstream, self ).execute
@@ -51,9 +51,14 @@ module Skylab::Brazen
       def custom_action_inflection
       end
 
-    private
       def name_function_class
         Action_Name_Function__
+      end
+
+    private  # ~ experimental alternative to the iambic DSL
+
+      def after sym
+        @after_name_symbol = sym ; nil
       end
     end  # >>
 

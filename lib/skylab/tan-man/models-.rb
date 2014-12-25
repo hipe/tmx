@@ -290,7 +290,7 @@ module Skylab::TanMan
 
       self.is_promoted = true
 
-      self.after_i = :init
+      after :init
 
     desc "show the status of the config director{y|ies} active at the path."
 
@@ -343,7 +343,7 @@ module Skylab::TanMan
 
     desc "manage remotes."
 
-    self.after_i = :graph
+    after :graph
 
     Actions = ::Module.new
 
@@ -355,7 +355,7 @@ module Skylab::TanMan
 
     autoload_actions
 
-    self.after_i = :status
+    after :status
 
     # desc "there's a lot you can tell about a man from his choice of words"
   end
@@ -390,7 +390,7 @@ module Skylab::TanMan
 
     desc "manage meaning."
 
-    self.after_i = :graph
+    after :graph
 
     Stub_ = Stubber_[ self ]
 

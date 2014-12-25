@@ -19,11 +19,15 @@ module Skylab::Brazen
     end
 
     def expression_agent_library
-      API::Expression_Agent__::LIB
+      Brazen_::API::Expression_Agent__::LIB
     end
 
     def event
       Brazen_::Event__
+    end
+
+    def kernel_class
+      Brazen_::Kernel_
     end
 
     def model

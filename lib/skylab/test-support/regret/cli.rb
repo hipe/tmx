@@ -87,40 +87,6 @@ module Skylab::TestSupport
 
   public
 
-    option_parser do |o|
-      o.separator "#{ NEWLINE_ }#{ hi 'description:' } make intermediate test files."
-      o.separator "always safe to run - never clobbers.#{ NEWLINE_ }#{ NEWLINE_ }"
-      o.separator "#{ hi 'options:' }"
-
-      @param_h[:do_preview] = nil
-      o.on '-p', '--preview', 'writes file output to stderr' do
-        @param_h[:do_preview] = true
-      end
-
-      o.on '--top <top>', "indicate a toplevel node, e.g \"skylab\".",
-        "(only used when disambiguation is necessary)" do |v|
-        @param_h[:top] = v
-      end
-
-      o.on '-v', '--verbose', 'verbose (try multiple.)', & verbosity_opt_func
-      o.on '-V', '--less-verbose', 'reduce verbosity.', &
-        deincrement_verbosity_opt_func
-
-      o.on '-n', '--dry-run', 'dry-run.' do
-        @param_h[:is_dry_run] = true
-      end
-
-      o.banner = command.usage_line
-    end
-
-    def intermediates path
-      if path and SEP_ != path.getbyte( 0 )
-        path = ::File.expand_path path
-      end
-      api path
-    end
-    SEP_ = '/'.getbyte 0
-
     set :node, :simplecov, :autonomous
 
     def simplecov * arg

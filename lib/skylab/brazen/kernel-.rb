@@ -5,6 +5,11 @@ module Skylab::Brazen
     def initialize mod
       @module = mod
       @models_mod = mod.const_get :Models_, false
+      @nm = nil
+    end
+
+    def members
+      [ :app_name, :debug_IO, :module ]
     end
 
     def to_kernel
@@ -12,7 +17,13 @@ module Skylab::Brazen
     end
 
     def app_name
-      @module.name_function.as_human
+      ( if @nm
+        @nm
+      elsif @module.respond_to? :name_function
+        @module.name_function
+      else
+        @nm = Callback_::Name.via_module @module
+      end ).as_human
     end
 
     def do_debug
@@ -61,11 +72,25 @@ module Skylab::Brazen
             break
           end
           d -= 1
-          mod = box_mod.const_get const_i_a.fetch d
-          if mod.is_promoted
-            x = mod
+          unb = box_mod.const_get const_i_a.fetch d
+
+          if unb.respond_to? :is_promoted
+            if unb.is_promoted
+              x = unb
+              break
+            end
+          else
+
+            # assume proc and for now all procs are treated as promoted (here)
+
+            x = Brazen_::Model_::Node_via_Proc.produce_action_class_like(
+              unb,
+              const_i_a.fetch( d ),
+              box_mod )
+
             break
           end
+
           redo
         end while nil
         x

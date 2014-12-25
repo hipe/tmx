@@ -1,14 +1,10 @@
-require_relative 'test-support'
+require_relative '../../../test-support'
 
-module Skylab::Cull::TestSupport::CLI::Actions::Status
+module Skylab::Cull::TestSupport
 
-  ::Skylab::Cull::TestSupport::CLI::Actions[ TS_ = self ]
+  describe "[cu] models - survey status" do
 
-  include Constants
-
-  extend TestSupport::Quickie
-
-  describe "[cu] CLI actions - status" do
+    if false
 
     extend TS_
 
@@ -38,6 +34,7 @@ module Skylab::Cull::TestSupport::CLI::Actions::Status
         expect :active_is
 
       end
+    end
     end
   end
 end

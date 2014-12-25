@@ -1,14 +1,10 @@
-require_relative 'test-support'
+require_relative '../../../../test-support'
 
-module Skylab::Cull::TestSupport::CLI::Actions::DataSource
+module Skylab::Cull::TestSupport
 
-  ::Skylab::Cull::TestSupport::CLI::Actions[ TS_ = self ]
+  describe "[cu] models - survey create" do
 
-  include Constants
-
-  extend TestSupport::Quickie
-
-  describe "[cu] CLI actions - data source" do
+    if false
 
     extend TS_
 
@@ -121,6 +117,7 @@ module Skylab::Cull::TestSupport::CLI::Actions::DataSource
       idx_b4 = contents.index( '[data-source "foo"]' ) or fail( 'where?' )
       idx_af = contents.index( '[data-source "fuz"]' ) or fail( 'where?' )
       ( idx_b4 < idx_af ).should eql( true )
+    end
     end
   end
 end

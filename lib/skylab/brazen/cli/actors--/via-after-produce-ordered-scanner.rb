@@ -37,7 +37,7 @@ module Skylab::Brazen
 
           my_name_sym = item.name.as_lowercase_with_underscores_symbol
 
-          i_go_after_this_sym = item.bound_action.class.after_i
+          i_go_after_this_sym = item.bound_action.class.after_name_symbol
 
           _i_may_go_now = if i_go_after_this_sym
             @went_h.key? i_go_after_this_sym

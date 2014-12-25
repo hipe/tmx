@@ -18,7 +18,7 @@ module Skylab::TanMan
     class Expression_Agent__  # follows [#fa-052]:#the-semantic-markup-guidelines
 
       def initialize k
-        # you could use kernel for ap,_name but we don't
+        # you could use kernel for app_name but we don't
       end
 
       alias_method :calculate, :instance_exec

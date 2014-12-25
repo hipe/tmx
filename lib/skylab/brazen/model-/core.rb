@@ -28,6 +28,10 @@ module Skylab::Brazen
           end
         end
 
+        def members
+          singleton_class.instance_methods( false ) - [ :members ]
+        end
+
         def name_function_class
           Model_Name_Function_
         end
@@ -62,7 +66,8 @@ module Skylab::Brazen
         true  # for now
       end
 
-      attr_accessor :after_i, :description_block, :precondition_controller_i_a
+      attr_accessor :after_name_symbol, :description_block,
+        :precondition_controller_i_a
 
       def local_entity_identifier_string
         properties.fetch NAME_
@@ -197,6 +202,12 @@ module Skylab::Brazen
 
       def main_model_class
         superclass
+      end
+
+      # ~ experimental alternative do the iambic DSL
+
+      def after sym
+        @after_name_symbol = sym ; nil
       end
     end  # >>
 
