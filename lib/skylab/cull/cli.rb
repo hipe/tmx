@@ -80,23 +80,8 @@ module Skylab::Cull
     use :hi, :api, [ :last_hot, :as, :command ],
       [ :normal_last_invocation_string, :as, :last_invocation_string ]
 
-    with_dsl_off do
-      def invoke( * )
-        res = super
-        if false == res
-          @y << "try #{ hi "#{ last_invocation_string } -h" } for help."
-          res = nil
-        end
-        res
-      end
-    end                           # (reminder: this won't run when under tmx)
 
     set :node, :ping, :invisible
-
-    def ping
-      @y << "hello from cull."
-      :hello_from_cull
-    end
 
     option_parser do |o|
       o.separator "#{ hi 'description:' } wanktasktic awesomeness"
@@ -106,25 +91,6 @@ module Skylab::Cull
       dry_run_option o
 
       o.banner = command.usage_line
-    end
-
-    def init directory=nil
-      api directory
-    end
-
-    option_parser do |o|
-      o.separator "#{ hi 'description:' } display status of config file"
-
-      o.separator "#{ hi 'option:' }"
-      @param_h[:do_list_file] = false
-      o.on '-l', '--list-file', 'only write the file to stdout.' do
-        @param_h[:do_list_file] = true
-      end
-      o.banner = command.usage_line
-    end
-
-    def status
-      api
     end
 
     namespace :'data-source', -> { CLI::Actions::DataSource }, aliases: [ 'ds' ]

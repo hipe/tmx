@@ -4,23 +4,30 @@ module Skylab::Cull::TestSupport
 
   describe "[cu] models - survey status" do
 
-    if false
+    Expect_event_[ self ]
 
     extend TS_
 
-    as :no_cull, /\Ano cull config file found in \. or 3 levels up\.\z/, :nonstyled
-    as :invite_specific, /\Atry wtvr status -h for help\.\z/i, :styled
-
-    it "from inside an empty directory, explains the situation" do
-
-      from_inside_empty_directory do
-
-        invoke 'st'
-
-        expect :no_cull, :invite_specific
-
-      end
+    it "with a noent path" do
+      call_API :survey, :status, :path, Cull_.dir_pathname.join( 'no-ent' ).to_path
+      expect_not_OK_event :start_directory_does_not_exist
+      expect_failed
     end
+
+    it "with a path that is a file" do
+      call_API :survey, :status, :path, Cull_.dir_pathname.join( 'core.rb' ).to_path
+      expect_not_OK_event :start_directory_is_not_directory
+      expect_failed
+    end
+
+    it "with a path that is a directory but workspace not found #egads" do
+      _egads = Cull_._lib.filesystem.tmpdir_path
+      call_API :survey, :status, :path, _egads
+      expect_not_OK_event :resource_not_found
+      expect_failed
+    end
+
+    if false
 
     as :active_is,
       %r{\Aactive config file is: #{ PN_ }\z}, :nonstyled

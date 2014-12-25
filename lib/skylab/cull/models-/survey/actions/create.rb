@@ -1,10 +1,10 @@
 module Skylab::Cull
 
-  class Models_::Survey < Model_
+  class Models_::Survey
 
     # ~ begin stowaways
 
-    Actions = ::Module.new
+    Autoloader_[ ( Actions = ::Module.new ), :boxxy ]
 
     Actions::Ping = -> call do
 

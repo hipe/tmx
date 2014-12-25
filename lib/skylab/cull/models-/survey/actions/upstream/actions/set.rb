@@ -1,5 +1,19 @@
 module Skylab::Cull
 
+  class Models_::Survey
+
+    class Actions::Upstream
+
+      Actions = ::Module.new
+
+      class Actions::Set < Action_
+      end
+
+    end
+  end
+
+  if false
+
   module API::Actions::DataSource
 
   end
@@ -46,5 +60,6 @@ module Skylab::Cull
         after: method( :after ),
         all: method( :all )
     end
+  end
   end
 end

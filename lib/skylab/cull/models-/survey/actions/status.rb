@@ -1,42 +1,46 @@
 module Skylab::Cull
 
-  class API::Actions::Status < API::Action
+  class Models_::Survey
 
-    params [ :do_list_file, :arity, :zero_or_one, :argument_arity, :zero ]
+    class Actions::Status < Action_
 
-    services :configs, [ :pth, :ivar ]
+      Brazen_.model.entity self,
 
-    listeners_digraph yes: :structural, no: :structural,
-      hard_yes: :payload_lines
+        :after, :create,
 
-    event_factory Callback_::Event::Factory::Structural.new(
-      3, nil, API::Events_ ).method( :event )
-      # #todo the above is good but can probably be cleaned up
+        :desc, -> y do
+          y << "display status of the survey"
+        end,
 
-    def execute
-      configs.find_nearest_config_file_path nil, nil,
-        method( :with_yes ), method( :with_no )
-    end
+        :description, -> y do
+          y << "path from which the survey is searched for"
+        end,
+        :required, :property, :path
 
-  private
+      def produce_any_result
 
-    def with_yes pn
-      if @do_list_file
-        hard_yes payload_lines: [ "#{ @pth[ pn ] }" ]
-      else
-        yes pathname: pn,
-            message_proc: -> { "active config file is: #{ @pth[ pn ] }" }
+        @path = Models_::Survey.any_nearest_path_via_looking_upwards_from_path(
+          get_argument_via_property_symbol( :path ),
+          & ___custom_listener )
+
+        @path and via_path
       end
-      true
-    end
 
-    def with_no num, from_pn
-      no num: num, from_pn: from_pn,
-        message_proc: -> do
-          "no cull config file found in #{ @pth[ from_pn ] } or #{
-          }#{ num } levels up."
+      def ___custom_listener
+        -> * i_a, & ev_p do
+          m = :"receive_#{ i_a.reverse.join UNDERSCORE_ }"
+          if respond_to? m
+            send m, ev_p[]
+          else
+            handle_event_selectively_via_channel.call i_a, & ev_p
+          end
         end
-      false
+      end
+
+      def receive_xyz_event ev
+      end
+
+      UNDERSCORE_ = '_'.freeze
     end
   end
 end

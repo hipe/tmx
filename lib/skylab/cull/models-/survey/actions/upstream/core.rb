@@ -1,6 +1,10 @@
 module Skylab::Cull
 
-  module Models::Data::Source
+  class Models_::Survey
+
+    class Actions::Upstream < Model_
+
+      if false
 
     # (see also Skylab::Cull::API::Actions::DataSource::Add)
 
@@ -18,7 +22,6 @@ module Skylab::Cull
       )  # (trailing comma above is intentional)
     end
 
-  end
 
   class Models::Data::Source::Collection
 
@@ -42,6 +45,10 @@ module Skylab::Cull
       add
 
     end
+  end
 
+
+      end
+    end
   end
 end

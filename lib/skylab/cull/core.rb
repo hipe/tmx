@@ -14,8 +14,13 @@ module Skylab::Cull
 
   module Lib_  # :+[#su-001]
 
-    # _sidesys = Autoloader_.build_require_sidesystem_proc
+    sidesys = Autoloader_.build_require_sidesystem_proc
 
+    HL__ = sidesys[ :Headless ]
+
+    Filesystem = -> do
+      HL__[].system.filesystem
+    end
   end
 
   Brazen_ = Autoloader_.require_sidesystem :Brazen
