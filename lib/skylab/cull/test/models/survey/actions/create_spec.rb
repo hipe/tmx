@@ -28,35 +28,29 @@ module Skylab::Cull::TestSupport
       @result.should eql :_hi_again_
     end
 
-    if false
-
-    as :creating_done,
-      %r{creating #{ PN_ } \.\. done \(\d\d bytes\)\.\z}i, :nonstyled
-
-    it "from inside an empty directory, explains the situation" do
-
-      from_inside_empty_directory do |d|
-
-        invoke 'init'
-
-        expect :creating_done
-
-      end
+    it "create on a directory with the thing already" do
+      call_API :create, :path, TS_::Fixtures::Directories[ :freshly_initted ]
+      expect_not_OK_event :directory_exists
+      expect_failed
     end
 
-    as :exists,
-      %r{\Awtvr init: exists, skipping - #{ PN_ }\z}, :nonstyled
+    it "go money" do
 
-    it "from inside a directory with a nerk, explains it all" do
+      fs =  Cull_._lib.filesystem
+      path = fs.tmpdir_pathname.join( 'culio' ).to_path
+      td = fs.tmpdir(
+        :path, path,
+        :be_verbose, do_debug,
+        :debug_IO, debug_IO )
 
-      from_inside_a_directory_with( :some_config_file ) do
+      td.prepare
+      call_API :create, :path, path
 
-        invoke 'init'
+      expect_neutral_event :creating_directory
+      expect_neutral_event :created_file
+      expect_OK_event :created_survey
 
-        expect :exists
-
-      end
-    end
+      expect_succeeded
     end
   end
 end

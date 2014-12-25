@@ -1,6 +1,6 @@
 [#176]       #parent-node: [#130] walk.
 [#175]       #parent-node: [#095] "naming conventions around events.."
-[#174] #open waiting for [#cb-060] property parsing issue
+[#174]       #done waiting for [#cb-060] property parsing issue
 [#173]       #parent-node: [#14] the grep narrative ..
 [#172]       #parent-node: [#126]  [ CLI tree glyphs ]
 [#171]       #parent-node: [#140] the find narrative ..
@@ -12,7 +12,8 @@
 [#165] #open unify the new post-F-UN strategties
 [#164]       #parent-node: [#161] the IO line scannar narrative ..
 [#163] #open merge ellipsify with [#ba-032]
-[#162] #open re-write patch to be an actor
+[#162] #open re-write patch to be an actor; take patch path as
+optional arg
 [#161]       #doc-node the headless IO node
 [#160]       #parent-node: [#161] the tmpdir narrative ..
 [#159]       #node-identity: (e.g IO interceptors filter) #marker

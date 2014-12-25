@@ -1,0 +1,6 @@
+diff --git a/cull-survey/config b/cull-survey/config
+new file mode 100644
+--- /dev/null
++++ b/cull-survey/config
+@@ -0,0 +1 @@
++# ohai

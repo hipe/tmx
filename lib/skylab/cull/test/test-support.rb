@@ -45,4 +45,7 @@ module Skylab::Cull::TestSupport
   Expect_event_ = -> test_context_module do
     Cull_::Brazen_.test_support::Expect_Event[ test_context_module ]
   end
+
+  DASH_ = '-'
+  UNDERSCORE_ = '_'
 end

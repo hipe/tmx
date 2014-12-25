@@ -49,37 +49,32 @@ module Skylab::Cull
 
       @after_name_symbol = :ping
 
-    end
+      Brazen_.model.entity self,
 
-    if false
+        :required,
+        :description, -> y do
+          y << "create a cull survey workspace directory in the path"
+        end,
+        :property, :path
 
-    meta_params :cfg
 
-    params [ :directory, :cfg,
-                 :desc, -> y do
-                   y << "where to write #{ config_filename } #{
-                     }(default: #{ pth[ config_default_init_directory ] })"
-                 end,
-                 :default, -> { config_default_init_directory } ],
-           [ :is_dry_run,
-                 :arity, :zero_or_one,
-                 :argument_arity, :zero,
-                 :desc, "dry run." ]
+      def produce_any_result
 
-    services :configs, [ :pth, :ivar ], :config_default_init_directory
+        arg = get_argument_via_property_symbol( :path )
 
-    listeners_digraph :before, :after, :all, couldnt_event: :entity_event
+        @ent = Models_::Survey.edit_entity @kernel, handle_event_selectively do | o |
+          o.create_via_path_arg arg
+        end
+        @ent and via_ent
+      end
 
-    cfg
-
-    def execute
-      c_h, o_h = unpack_params :cfg, true
-      configs.create c_h, o_h,
-        couldnt: method( :couldnt_event ),
-        before: method( :before ),
-        after: method( :after ),
-        all: method( :all )
-    end
+      def via_ent
+        maybe_send_event :info, :created_survey do
+          build_OK_event_with :created_survey,
+              :path, @ent.config_path,
+              :is_completion, true
+        end
+      end
     end
   end
 end

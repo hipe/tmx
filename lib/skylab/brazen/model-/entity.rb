@@ -451,15 +451,15 @@ module Skylab::Brazen
 
       Brazen_.event.selective_builder_sender_receiver self
 
-      attr_reader :on_event_selectively
       private
 
         def produce_handle_event_selectively_via_channel  # :+#public-API (#hook-in)
 
           # allow us to `maybe_send_event` at any cost
 
-          if on_event_selectively
-            super
+          p = super
+          if p
+            p
           else
             -> * , & ev_p do  # when we have no handler, we are honeybadger
               raise ev_p[].to_exception

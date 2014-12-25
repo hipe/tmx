@@ -118,6 +118,12 @@ module Skylab::Basic  # introduction at [#020]
     def name
       @property.name
     end
+
+    def with_value x
+      otr = dup
+      otr.value_x = x
+      otr.freeze
+    end
   end
 
   Autoloader_ = Callback_::Autoloader

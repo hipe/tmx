@@ -14,15 +14,28 @@ module Skylab::Headless
 
             o :iambic_writer_method_name_suffix, :'='
 
+            def ftype=
+              @ftype = iambic_property
+              KEEP_PARSING_
+            end
+
             def path=
               @do_execute = true
               @path_arg = Headless_::Lib_::Bsc_[].trio.
                 via_value_and_variegated_symbol iambic_property, :path
+              KEEP_PARSING_
+            end
+
+            def path_arg=
+              @do_execute = true
+              @path_arg = iambic_property
+              KEEP_PARSING_
             end
 
             def outstream=
               @do_execute = true
               @outstream = iambic_property
+              KEEP_PARSING_
             end
 
             def on_event=
@@ -30,6 +43,7 @@ module Skylab::Headless
               @on_event_selectively = -> *, & ev_p do
                 oe_p[ ev_p[] ]
               end
+              KEEP_PARSING_
             end
 
             o :properties, :last_looks, :force_arg,
@@ -40,6 +54,8 @@ module Skylab::Headless
           def initialize & p
             @do_execute = false
             @force_arg = nil
+            @ftype = FILE_FTYPE_
+            @is_dir_mode = false
             @is_dry_run = false
             @last_looks = nil
             @outstream = nil
@@ -92,7 +108,25 @@ module Skylab::Headless
           end
 
           def when_no_stat
-            snd_creating_event
+            send :"when_no_stat_for_#{ @ftype }"
+          end
+
+          def when_no_stat_for_directory
+            snd_creating_event_for_directory
+            d = if @is_dry_run
+              0
+            else
+              ::Dir.mkdir @path
+            end
+            if d.zero?
+              @as_normal_value[ @path ]
+            else
+              self._COVER_ME
+            end
+          end
+
+          def when_no_stat_for_file
+            snd_creating_event_for_file
             if @is_dry_run
               @as_normal_value[ Headless_::IO.dry_stub_instance ]
             else
@@ -101,6 +135,16 @@ module Skylab::Headless
           end
 
           def when_stat
+            send :"when_stat_for_#{ @ftype }"
+          end
+
+          def when_stat_for_directory
+            maybe_send_event :error, :directory_exists do
+              build_not_OK_event_with :directory_exists, :path, @path
+            end
+          end
+
+          def when_stat_for_file
             if @force_arg
               if @force_arg.value_x
                 when_stat_is_file_OK_to_overwrite
@@ -130,7 +174,7 @@ module Skylab::Headless
           end
 
           def when_stat_is_file_OK_to_overwrite
-            snd_updating_event
+            snd_updating_event_for_file
 
             if @is_dry_run
               @as_normal_value[ Headless_::IO.dry_stub_instance ]
@@ -141,13 +185,13 @@ module Skylab::Headless
 
           # ~ pairs
 
-          def snd_creating_event
+          def snd_creating_event_for_file
             maybe_send_event :info, :before_probably_creating_new_file do
-              bld_BPCNF_event
+              bld_BPCNF_event_for_file
             end
           end
 
-          def bld_BPCNF_event
+          def bld_BPCNF_event_for_file
             build_neutral_event_with :before_probably_creating_new_file,
                 :path_arg, @path_arg do |y, o|
 
@@ -155,13 +199,20 @@ module Skylab::Headless
             end
           end
 
-          def snd_updating_event
-            maybe_send_event :info, :before_editing_existing_file do
-              bld_BEEF_event
+          def snd_creating_event_for_directory
+            maybe_send_event :info, :creating_directory do
+              build_neutral_event_with :creating_directory,
+                :path, @path, :path_arg, @path_arg
             end
           end
 
-          def bld_BEEF_event
+          def snd_updating_event_for_file
+            maybe_send_event :info, :before_editing_existing_file do
+              bld_BEEF_event_for_file
+            end
+          end
+
+          def bld_BEEF_event_for_file
             build_neutral_event_with :before_editing_existing_file,
                 :path_arg, @path_arg, :stat, @stat do |y, o|
 

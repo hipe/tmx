@@ -480,7 +480,7 @@ module Skylab::Brazen
 
     def first_edit & edit_p
 
-      _ok = set_prps_via_first_edit( & edit_p )
+      _ok = process_first_edit( & edit_p )
       _ok && via_props_produce_edit_result
     end
 
@@ -497,7 +497,7 @@ module Skylab::Brazen
 
   private
 
-    def set_prps_via_first_edit & edit_p
+    def process_first_edit & edit_p  # :+#public-API :#hook-in
 
       stct = First_Edit_Yield__.new
 

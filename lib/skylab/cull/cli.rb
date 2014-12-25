@@ -57,8 +57,6 @@ module Skylab::Cull
     # ~ end integration
   end
 
-  ACHIEVED_ = true
-
   if false
 
   class CLI::Client < Face::CLI::Client

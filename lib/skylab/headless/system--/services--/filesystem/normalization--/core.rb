@@ -16,6 +16,10 @@ module Skylab::Headless
             Normalization__::Existent_Directory__.mixed_via_iambic x_a
           end
 
+          def members
+            singleton_class.instance_methods( false ) - [ :members ]
+          end
+
           def upstream_IO * x_a
             Normalization__::Upstream_IO__.mixed_via_iambic x_a
           end

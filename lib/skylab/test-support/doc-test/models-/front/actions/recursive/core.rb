@@ -301,7 +301,7 @@ module Skylab::TestSupport
         def via_lines_and_top_path_bld_entry_stream
 
           proto = Recursive_::Models__::Manifest_Entry.new(
-            @top_path, & on_event_selectively )
+            @top_path, & handle_event_selectively )
 
           Callback_.stream do
             begin

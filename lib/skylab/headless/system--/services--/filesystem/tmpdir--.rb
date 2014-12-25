@@ -30,13 +30,12 @@ module Skylab::Headless
         KEEP_PARSING_
       end
 
-      def verbose=  # #open [#174] waiting for [#cb] fix (this should go after next)
+      o :property, :be_verbose
+
+      def verbose=
         @be_verbose = true
         KEEP_PARSING_
       end
-
-      o :property, :be_verbose
-
     end
 
 
