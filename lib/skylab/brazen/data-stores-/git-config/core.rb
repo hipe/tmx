@@ -59,7 +59,7 @@ module Skylab::Brazen
       Git_Config_::Actors__::Scan[ cls, @document, @kernel, oes_p ]
     end
 
-    def section_scan & oes_p
+    def to_section_stream & oes_p
       Git_Config_::Actors__::Scan[ nil, @document, @kernel, oes_p ]
     end
 
@@ -410,11 +410,18 @@ module Skylab::Brazen
       def description_under expag
         @input_id.description_under expag
       end
+
+      def to_section_stream & oes_p
+        @sections.to_stream( & oes_p )
+      end
     end
 
     class Box__
       def initialize
         @a = [] ; @h = {}
+      end
+      def members
+        [ :length, :first, :to_stream ]
       end
       def length
         @a.length
@@ -463,6 +470,11 @@ module Skylab::Brazen
         @external_normal_name_symbol = @internal_normal_name_string.downcase.intern
       end
 
+      def members
+        [ :assignments, :external_normal_name_symbol,
+          :internal_normal_name_string, :subsect_name_s ]
+      end
+
       attr_reader :assignments,
         :external_normal_name_symbol,
         :internal_normal_name_string,
@@ -470,6 +482,10 @@ module Skylab::Brazen
     end
 
     class Assignments__ < Box__
+
+      def members
+        [ * super, :each_normalized_pair, :to_normalized_actual_property_stream ]
+      end
 
       def accept_asmt asmt
         @h[ asmt.internal_normal_name_symbol ] = @a.length
@@ -520,6 +536,10 @@ module Skylab::Brazen
         @marshaled_s = marshaled_s
         @did_unmarshal = false
         @on_event_selectively = oes_p
+      end
+
+      def members
+        [ :internal_normal_name_string, :external_normal_name_symbol, :value_x ]
       end
 
       attr_reader :internal_normal_name_string, :marshaled_s

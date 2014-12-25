@@ -36,7 +36,7 @@ module Skylab::Brazen
       end
 
       def via_ds
-        @scn = @ds.section_scan( & handle_event_selectively )
+        @scn = @ds.to_section_stream( & handle_event_selectively )
         @box = Box_.new
         one = -> { 1 } ; increment = -> d { d + 1 }
         while sect = @scn.gets

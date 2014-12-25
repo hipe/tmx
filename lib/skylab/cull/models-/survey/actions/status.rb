@@ -21,23 +21,20 @@ module Skylab::Cull
 
         @path = Models_::Survey.any_nearest_path_via_looking_upwards_from_path(
           get_argument_via_property_symbol( :path ),
-          & ___custom_listener )
+          & handle_event_selectively )
 
         @path and via_path
       end
 
-      def ___custom_listener
-        -> * i_a, & ev_p do
-          m = :"receive_#{ i_a.reverse.join UNDERSCORE_ }"
-          if respond_to? m
-            send m, ev_p[]
-          else
-            handle_event_selectively_via_channel.call i_a, & ev_p
-          end
+      def via_path
+        @ent = Models_::Survey.edit_entity @kernel, handle_event_selectively do | o |
+          o.existent_valid_workspace_path @path
         end
+        @ent and via_ent
       end
 
-      def receive_xyz_event ev
+      def via_ent
+        @ent.to_datapoint_stream_for_synopsis
       end
 
       UNDERSCORE_ = '_'.freeze

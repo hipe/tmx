@@ -23,55 +23,98 @@ module Skylab::Cull
       end
     end  # >>
 
+
     def process_first_edit  & edit_p # hook-in to [br]
       edit_p[ fes = First_Edit_Session__.new ]
-      send fes.method_name, * fes.args
-    end
-
-    def when_nothing_done_during_edit_session
-      nil
-    end
-
-    def create_via_path_arg pa
-      @path_arg = pa
-      @special_normalize_method_name = :via_path_arg_create
-      ACHIEVED_
+      send fes.receive_first_edit_data_method_name, * fes.args
     end
 
     def normalize
-      super && ___normalize
+      super && ___via_post_normalize_method_name
     end
 
-    def ___normalize
-      send @special_normalize_method_name
+    def ___via_post_normalize_method_name
+      send @post_normalize_method_name
     end
+
+    # ~ edit session where nothing happens is gigo
+
+    def recv_nothing_from_edit_session
+      nil
+    end
+
+    # ~ edit session for create
+
+    def recv_edit_data_for_create_via_path_arg pa
+      @path_arg = pa
+      @post_normalize_method_name = :via_path_arg_create
+      ACHIEVED_
+    end
+
+    attr_reader :path_arg  # talk to the actor
+
+    attr_accessor :config_path
 
     def via_path_arg_create
       Self_::Actors__::Create[ self ]
     end
 
+    # ~ edit session for retrieve
+
+    def recv_edit_data_for_valid_workspace_path path
+
+      @_existent_workspace_path = path
+      @post_normalize_method_name = :via_existent_workspace_path_normalize
+      ACHIEVED_
+    end
+
+    def via_existent_workspace_path_normalize
+
+      @cfg_for_read = Brazen_.data_stores::Git_Config.parse_path(
+        ::File.join( @_existent_workspace_path, CONFIG_FILENAME_ ),
+        & handle_event_selectively )
+
+      if @cfg_for_read
+        ACHIEVED_
+      else
+        @cfg_for_read
+      end
+    end
+
+    def to_datapoint_stream_for_synopsis
+      @cfg_for_read.to_section_stream( & handle_event_selectively ).map_by do | x |
+        Self_::Models__::Section_Summary.new x
+      end
+    end
+
+    # ~ shared support
+
     def handle_event_selectively
       @on_event_selectively
     end
 
-    attr_accessor :config_path
-
-    attr_reader :path_arg
-
     class First_Edit_Session__
 
       def initialize
-        @method_name = :when_nothing_done_during_edit_session
+        @receive_first_edit_data_method_name = :recv_nothing_from_edit_session
       end
 
-      attr_reader :method_name, :args
+      attr_reader :receive_first_edit_data_method_name, :args
 
       def create_via_path_arg path_arg
         @args = [ path_arg ]
-        @method_name = :create_via_path_arg
+        @receive_first_edit_data_method_name = :recv_edit_data_for_create_via_path_arg
+        nil
+      end
+
+      def existent_valid_workspace_path path
+        @args = [ path ]
+        @receive_first_edit_data_method_name = :recv_edit_data_for_valid_workspace_path
+        nil
       end
     end
 
+    CONFIG_FILENAME_ = 'config'.freeze
     DIR_FTYPE_ = 'directory'.freeze
     FILENAME_ = 'cull-survey'.freeze
     Self_ = self

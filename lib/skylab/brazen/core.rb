@@ -18,6 +18,10 @@ module Skylab::Brazen
       Brazen_::Data_Stores_::Git_Config
     end
 
+    def data_stores
+      Brazen_::Data_Stores_
+    end
+
     def expression_agent_library
       Brazen_::API::Expression_Agent__::LIB
     end
@@ -28,6 +32,10 @@ module Skylab::Brazen
 
     def kernel_class
       Brazen_::Kernel_
+    end
+
+    def members
+      singleton_class.instance_methods( false ) - [ :members ]
     end
 
     def model

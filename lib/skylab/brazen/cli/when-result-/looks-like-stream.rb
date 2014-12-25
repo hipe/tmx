@@ -23,6 +23,11 @@ module Skylab::Brazen
         end
       end
 
+      def when_no_items
+        @adapter.resources.serr.puts "empty."
+        ACHIEVED_
+      end
+
       def when_at_least_one_item
 
         @name = if @item.respond_to? :name_function
