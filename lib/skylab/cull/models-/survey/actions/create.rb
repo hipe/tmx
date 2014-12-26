@@ -70,9 +70,7 @@ module Skylab::Cull
 
       def via_ent
         maybe_send_event :info, :created_survey do
-          build_OK_event_with :created_survey,
-              :path, @ent.config_path,
-              :is_completion, true
+          @ent.to_event
         end
       end
     end

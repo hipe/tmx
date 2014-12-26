@@ -1,6 +1,26 @@
 # workflow patterns :[#137]
 
 
+
+## branch and divide :[#143]
+
+(edit: this may duplicate somewhat something of below. we don't have time
+ to read it just now)
+
+when a changeset gets too big (for example because its scope is too big)
+break it up into two smaller scopes in your mind, and decided which
+should come first. make a branch from your last stable commit (where all
+tests in some pre-ordained set of tests is passing).
+
+using a compination of stash, stash pop, and your 'git-x'-style
+interface, get *all* of the work into one or the other branch.
+
+get the first branch green, then rebase the second branch over the first
+(resolving conflicts as necessary) and proceed.
+
+
+
+
 ## the golden two-step :[#136]
 
 this is an at-the-time-of-this-writing an imaginary maneuver consisiting of

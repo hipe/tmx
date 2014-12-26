@@ -53,7 +53,9 @@ module Skylab::Cull
 
     attr_reader :path_arg  # talk to the actor
 
-    attr_accessor :config_path
+    def config_path
+      ::File.join( @path_arg.value_x, CONFIG_FILENAME_ )
+    end
 
     def via_path_arg_create
       Self_::Actors__::Create[ self ]
@@ -88,6 +90,12 @@ module Skylab::Cull
     end
 
     # ~ shared support
+
+    def to_event
+      Brazen_.event.inline_OK_with :survey,
+          :path, @path_arg.value_x,
+          :is_completion, true
+    end
 
     def handle_event_selectively
       @on_event_selectively

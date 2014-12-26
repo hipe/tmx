@@ -12,8 +12,7 @@
 [#165] #open unify the new post-F-UN strategties
 [#164]       #parent-node: [#161] the IO line scannar narrative ..
 [#163] #open merge ellipsify with [#ba-032]
-[#162] #open re-write patch to be an actor; take patch path as
-optional arg
+[#162]       #done re-write patch to be an actor; patch can be string or path
 [#161]       #doc-node the headless IO node
 [#160]       #parent-node: [#161] the tmpdir narrative ..
 [#159]       #node-identity: (e.g IO interceptors filter) #marker

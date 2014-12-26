@@ -56,9 +56,10 @@ module Skylab::Brazen
 
       class << self
 
-        def new & p
+        def new * x_a, & p
           ::Class.new( Message__ ).class_exec do
             const_set :P___, p
+            const_set :X_A__, ( x_a.freeze if x_a.length.nonzero? )
             self
           end
         end
@@ -95,7 +96,14 @@ module Skylab::Brazen
               x_a.push i, nil
             end
             x_a.push :original_message_proc, msg_p
-            x_a.push :ok, false  # meh
+
+            x_a_ = self::X_A__
+            if x_a_
+              x_a.concat x_a_
+            else
+              x_a.push :ok, false  # meh
+            end
+
             cls = Event_.prototype.via_deflist_and_message_proc x_a, ( -> y, o do
               _a = _NAME_I_A.map do |i|
                 o.send i

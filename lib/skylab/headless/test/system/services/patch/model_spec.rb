@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Headless::TestSupport::System::Services
 
-  describe "[hl] system services patch" do
+  describe "[hl] system services patch - model" do
 
     extend TS_
 

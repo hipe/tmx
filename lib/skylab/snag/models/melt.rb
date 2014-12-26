@@ -180,9 +180,22 @@ module Skylab::Snag
       @file_changes.each do |todo|
         patch.change_line todo.line_number, todo.replacement_line
       end
-      ok = patch_lib.file patch.render_simple,
-        first.path, @dry_run, @be_verbose, method( :send_info_line )
-      if ok  # typically an exit_code, like 0
+
+      _ok = patch_lib.call(
+          :target_file, first.path,
+          :patch_string, patch.render_simple,
+          :is_dry_run, @dry_run ) do | * i_a, ev_p |
+
+        if :info == i_a.first
+          if @be_verbose
+            send_info_event ev_p[]
+          end
+        else
+          send_error_event ev_p[]
+        end
+      end
+
+      _ok and begin
         send_info_line say_summary_of_changes_in_file
         @file_changes.clear
         NEUTRAL_

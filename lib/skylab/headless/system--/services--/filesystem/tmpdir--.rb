@@ -109,9 +109,28 @@ module Skylab::Headless
       end
     end
 
-    def patch str  # result is exit_status
-      Headless_.system.patch.directory str, to_path,
-        @is_noop, @be_verbose, method( :send_debug_string )
+    def patch str
+
+      Headless_.system.patch(
+          :target_directory, to_path,
+          :patch_string, str,
+          :is_dry_run, @is_noop ) do | * i_a, & ev_p |
+
+        if :info == i_a.first
+          if @be_verbose
+            ev_p[].render_each_line_under ___expag do | line |
+              send_debug_string line
+            end
+          end
+        else
+          raise ev_p[].to_exception
+        end
+      end
+
+    end
+
+    def ___expag
+      Headless_::Lib_::Bzn_[]::API.expression_agent_instance
     end
 
     alias_method :tmpdir_original_touch, :touch

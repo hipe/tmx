@@ -11,4 +11,10 @@ module Skylab::Headless::TestSupport::System::Services
   Subject____ = -> do
     Headless_::System__::Services__
   end
+
+  Expect_event_ = -> x do
+    TestLib_::Expect_event[ x ]
+  end
+
+  EMPTY_S_ = Headless_::EMPTY_S_
 end

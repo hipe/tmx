@@ -47,9 +47,8 @@ module Skylab::Cull::TestSupport
       call_API :create, :path, path
 
       expect_neutral_event :creating_directory
-      expect_neutral_event :created_file
-      expect_OK_event :created_survey
-
+      expect_neutral_event :process_line
+      expect_OK_event :survey
       expect_succeeded
     end
   end

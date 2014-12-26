@@ -27,16 +27,18 @@ module Skylab::Headless
 
       def bld_reader_method_via_variegated_name_i name_i
 
-        -> * x_a do
+        -> * x_a, & p do
           front = @svc_h.fetch name_i do
             @svc_h[ name_i ] = bld_any_service_by_variegated_name_i name_i
           end
-          if x_a.length.zero?
-            front
-          elsif front
-            front.call( * x_a )
+          if x_a.length.nonzero? || p
+            if front
+              front.call( * x_a, & p )
+            else
+              raise ::SystemCallError, say_system_not_available( name_i )  # #note-40
+            end
           else
-            raise ::SystemCallError, say_system_not_available( name_i )  # #note-40
+            front
           end
         end
       end
@@ -57,6 +59,7 @@ module Skylab::Headless
       end
     end
 
+    KEEP_PARSING_ = true
     PROCEDE_ = true
     UNABLE_ = false
 
