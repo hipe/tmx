@@ -186,7 +186,7 @@ module Skylab::Brazen::TestSupport
         end
 
         def black_and_white_lines ev
-          ev.render_all_lines_into_under y=[], event_expression_agent
+          ev.render_all_lines_into_under y=[], black_and_white_expression_agent_for_expect_event
           y
         end
 
@@ -310,7 +310,7 @@ module Skylab::Brazen::TestSupport
           _y = ::Enumerator::Yielder.new do |s|
             p[ s ]
           end
-          ev.render_all_lines_into_under _y, @test_context.event_expression_agent
+          ev.render_all_lines_into_under _y, @test_context.expression_agent_for_expect_event
           nil
         end
 

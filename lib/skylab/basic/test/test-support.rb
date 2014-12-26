@@ -43,7 +43,7 @@ module Skylab::Basic
         TestSupport_.debug_IO
       end
 
-      def event_expression_agent
+      def black_and_white_expression_agent_for_expect_event
         Basic_::Lib_::Bzn_[]::API.expression_agent_instance
       end
     end

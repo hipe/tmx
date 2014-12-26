@@ -67,7 +67,7 @@ module Skylab::Brazen::TestSupport::Models::Workspace
         :path, ws_tmpdir.to_path
 
       ev = expect_event :summary
-      ev.render_all_lines_into_under y=[], event_expression_agent
+      ev.render_all_lines_into_under y=[], black_and_white_expression_agent_for_expect_event
       scn = Brazen_::LIB_.stream.via_nonsparse_array y
       scn.gets.should match %r(\Asummary of «.+#{ ::Regexp.escape cfn }»:\z)
       scn.gets.should match %r(\A[^[:alnum:]]*2 poet or authors\z)

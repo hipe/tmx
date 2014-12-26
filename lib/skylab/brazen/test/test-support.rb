@@ -53,7 +53,7 @@ module Skylab::Brazen::TestSupport
       td
     end
 
-    def event_expression_agent
+    def black_and_white_expression_agent_for_expect_event
       @eea ||= begin
         Brazen_::API.expression_agent_class.new Brazen_::API.application_kernel
       end

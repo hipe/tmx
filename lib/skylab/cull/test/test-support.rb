@@ -33,7 +33,7 @@ module Skylab::Cull::TestSupport
 
     # ~ #hook-outs for [br]
 
-    def event_expression_agent
+    def expression_agent_for_expect_event
       Cull_::Brazen_.event.codifying_expression_agent
     end
 
