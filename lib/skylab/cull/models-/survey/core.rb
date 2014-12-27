@@ -24,7 +24,7 @@ module Skylab::Cull
     end  # >>
 
 
-    def process_first_edit  & edit_p # hook-in to [br]
+    def process_first_edit_by & edit_p  # hook-in to [br]
       edit_p[ fes = First_Edit_Session__.new ]
       send fes.receive_first_edit_data_method_name, * fes.args
     end
@@ -34,7 +34,7 @@ module Skylab::Cull
     end
 
     def ___via_post_normalize_method_name
-      send @post_normalize_method_name
+      send @post_normalize_method, * @post_normalize_args
     end
 
     # ~ edit session where nothing happens is gigo
@@ -45,41 +45,40 @@ module Skylab::Cull
 
     # ~ edit session for create
 
-    def recv_edit_data_for_create_via_path_arg pa
-      @path_arg = pa
-      @post_normalize_method_name = :via_path_arg_create
+    def recv_create_via_mutable_arg_box bx
+      @post_normalize_args = bx
+      @post_normalize_method = :create_via_mutable_arg_box
       ACHIEVED_
     end
 
-    attr_reader :path_arg  # talk to the actor
+    def create_via_mutable_arg_box bx
 
-    def config_path
-      ::File.join( @path_arg.value_x, CONFIG_FILENAME_ )
-    end
-
-    def via_path_arg_create
-      Self_::Actors__::Create[ self ]
+      workspace_dir = Self_::Actors__::Create[ bx, & handle_event_selectively ]
+      workspace_dir and begin
+        @___path___ = workspace_dir
+        ACHIEVED_
+      end
     end
 
     # ~ edit session for retrieve
 
     def recv_edit_data_for_valid_workspace_path path
 
-      @_existent_workspace_path = path
-      @post_normalize_method_name = :via_existent_workspace_path_normalize
+      @post_normalize_args = path
+      @post_normalize_method = :normalize_via_existent_workspace_path
+
       ACHIEVED_
     end
 
-    def via_existent_workspace_path_normalize
+    def normalize_via_existent_workspace_path path
 
-      @cfg_for_read = Brazen_.data_stores::Git_Config.parse_path(
-        ::File.join( @_existent_workspace_path, CONFIG_FILENAME_ ),
+      o = Brazen_.data_stores::Git_Config.parse_path(
+        ::File.join( path , CONFIG_FILENAME_ ),
         & handle_event_selectively )
 
-      if @cfg_for_read
+      o and begin
+        @cfg_for_read = o
         ACHIEVED_
-      else
-        @cfg_for_read
       end
     end
 
@@ -89,17 +88,43 @@ module Skylab::Cull
       end
     end
 
+    # ~ property-level exposures
+
+    def receive_upstream_argument arg
+      upstream = Self_::Actions::Upstream.edit_entity(
+          self,
+          handle_event_selectively ) do | o |
+
+        o.arg arg
+      end
+      if upstream
+        @upstream = upstream
+        maybe_send_event :info, :set_upstream do
+          upstream.to_event
+        end
+        ACHIEVED_
+      else
+        upstream
+      end
+    end
+
     # ~ shared support
+
+    def members
+      [ :path ]
+    end
 
     def to_event
       Brazen_.event.inline_OK_with :survey,
-          :path, @path_arg.value_x,
-          :is_completion, true
+        :path, ::File.join( @___path___, FILENAME_ ),
+        :is_completion, true
     end
 
     def handle_event_selectively
       @on_event_selectively
     end
+
+    include Simple_Selective_Sender_Methods_
 
     class First_Edit_Session__
 
@@ -109,9 +134,9 @@ module Skylab::Cull
 
       attr_reader :receive_first_edit_data_method_name, :args
 
-      def create_via_path_arg path_arg
-        @args = [ path_arg ]
-        @receive_first_edit_data_method_name = :recv_edit_data_for_create_via_path_arg
+      def create_via_mutable_bound_argument_box bx
+        @args = bx
+        @receive_first_edit_data_method_name = :recv_create_via_mutable_arg_box
         nil
       end
 
@@ -119,6 +144,45 @@ module Skylab::Cull
         @args = [ path ]
         @receive_first_edit_data_method_name = :recv_edit_data_for_valid_workspace_path
         nil
+      end
+    end
+
+    module Survey_Action_Methods_
+    private
+
+      def via_path_argument_resolve_existent_survey
+
+        path = Models_::Survey.any_nearest_path_via_looking_upwards_from_path(
+          get_argument_via_property_symbol( :path ),
+          & handle_event_selectively )
+
+        path and rslv_existent_survey_via_path path
+      end
+
+      def rslv_existent_survey_via_path path
+        sv = Models_::Survey.edit_entity @kernel, handle_event_selectively do | o |
+          o.existent_valid_workspace_path path
+        end
+        if sv
+          @survey = sv
+          ACHIEVED_
+        else
+          sv
+        end
+      end
+
+      def normalize_path str
+        if str
+          if str.length.zero?
+            UNABLE_
+          elsif ::File::SEPARATOR == str[ 0 ]
+            str
+          else
+            ::File.join @survey.path, str
+          end
+        else
+          str
+        end
       end
     end
 

@@ -1,0 +1,133 @@
+# actors, agent and models
+
+
+## quick rundown of every detail of "actions" and "events" et. al
+
+in a typical [br]-powered application, the following general points hold:
+
+  • [br] applications exist to process requests. for each request, the
+    kernel will by default navigate the application's tree-like "model"
+    to try and resolve one "unbound action" that corresponds to the
+    request, or (when one unbound action cannot be resolved) fail in
+    some pluggable way.
+
+  • an "unbound action" can be viewed as a function that accepts as
+    arguments 1) the remainder of the request structure that wasn't
+    processed by the above step, and 2) zero or one
+    "selective event listener".
+
+  • the "unbound action" may be a simple proc, or (more typically)
+    a dedicated class. but ultimately it can be anything, provided that
+    it has an interface that is among the set of recognized interfaces
+    for a [br] unbound action.
+
+  • in the common case that an unbound action is implemented as a
+    decicated class, the class (by the hands of the kernel) will almost
+    always produce exacty one instance per request, dedicated to fulfilling
+    that request and that request alone. in such cases we refer to this
+    instance as a "bound action" (in contrast to the "unbound action",
+    which refers (in such cases) to class that made it).
+
+  • a long-running action instance capable of processing multiple requests
+    is something imagined but as yet not needed. it may be better to
+    implement something like this through "shared resources", a point
+    that brings us outside of our scope.
+
+  • the result of this function-call-ish (either bound action or otherwise)
+    against the input can be anything. whatever this final return result
+    is of this "call", this is what the kernel will present as the final
+    result of this request.
+
+  • as well, it is common (although certainly not mandatory) that
+    "potential events" are emitted during the course of this execution.
+    it is tempting to thing of "events" as "side-effects" of the call,
+    but given that they do not necessarily change state, they are more
+    their own thing. but whether or not any potential events are emitted
+    depends on the action. it is the "selective event listener"
+    that will receive notifications of these potential events (if any).
+
+  • typically this selective event listener will receive notification of
+    "potential events" in the form of a "channel" and a function.
+    typically the listener will look at the channel (or not) and decide
+    whether or not, given the channel, it would like the event. if it
+    would like it, it calls the function that was passed to it, whose
+    job it is to produce the event object.
+
+  • a "channel" is always isomorphic to a simple "tuple" or "list" of
+    "symbols". if you prefer, you can think of a channel as an array
+    of strings. different applications may use different idioms to
+    dictate how they express potential events with channels, but
+    typically the "topmost" component of this list of symbols is
+    something like `error` or `info` (the sybols), to express in a
+    pseudo-universal way something broadly semantic about the event.
+
+  • typically this selective event listener, once it has decided that
+    (given the channel) it wants the event, and once it has called the
+    event-producing function, will take this event and pass it to some
+    kind of top (a.k.a "modality") client that expresses the event in
+    some way appropriate to the modality as determined by its adapters.
+    but all of this is totally invisible to the "bound action".
+
+
+## quick rundown of every detail of "models"
+
+here are some points as we think of them, but these are just disjoint
+thoughts for now:
+
+  • we *always* model our business objects (if any) with classes, one
+    class per formal business entity. such classes "live" in the "model"
+    [tree] of your application. confusingly we also call each such class
+    a "model" as well.
+
+  • when dismbiguation is needed, we will use "model tree" to refer to
+    the whole thing, and "model" to refer to one individual node.
+
+  • in local jargon we refer to an instance of a model as an "entity".
+    confusingly a popular and powerful library called "entity" is also
+    used to enhance arbitrary classes, sometimes actions.
+
+  • i.e., the "model" is the class; the "entity" is the instance.
+
+  • we typically require that every action "live" under one such model.
+    if your model calls for an action that does not fit naturally under
+    a business model node, for now we accomplish the effect of this
+    through a combination of a "promotion" and the use of business-eque
+    dummy node called "front".
+
+  • a "model" has zero or more "properties" and zero or more "actions".
+
+  • a "model" acts like an unbound action (in fact one day we might etc)
+    in that it receives requests and produces results. in this regard,
+    however, a model's only job is to dispatch the request down to an
+    appropriate child action of the model; it does not fulfill the
+    request "directly" itself.
+
+  • as one of its actions, a model can "have" another model node.
+    in this way a model tree may be arbitrarily deeply nested.
+
+
+## models and actions
+
+we want to live in a world where we do not have to write the most
+typical of actions for our data-driven applications. we want our
+each action's behavior to emerge naturally from the model, specifically
+the model's properties and (maybe one day) associations. but hold that
+idea nearby but off to the side for now.
+
+the action is where all the (er) action takes place. but surprisingly
+we frequently find the action nodes the simplest of all of the three
+categories of thing presented in this document.
+
+why is that? it's because given the fundamental mandate of 'D.R.Y', the
+bulk of ancillary logic required by a typical action frequently lives
+elsewhere. why is *that*? [edit: figure out why]
+
+
+## actors in this context
+
+
+
+
+
+## models, actors, and actions with side-effects
+

@@ -29,22 +29,14 @@ module Skylab::Cull::TestSupport
     end
 
     it "create on a directory with the thing already" do
-      call_API :create, :path, TS_::Fixtures::Directories[ :freshly_initted ]
+      call_API :create, :path, freshly_initted_path
       expect_not_OK_event :directory_exists
       expect_failed
     end
 
     it "go money" do
 
-      fs =  Cull_._lib.filesystem
-      path = fs.tmpdir_pathname.join( 'culio' ).to_path
-      td = fs.tmpdir(
-        :path, path,
-        :be_verbose, do_debug,
-        :debug_IO, debug_IO )
-
-      td.prepare
-      call_API :create, :path, path
+      call_API :create, :path, prepare_tmpdir.to_path
 
       expect_neutral_event :creating_directory
       expect_neutral_event :process_line

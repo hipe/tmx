@@ -480,7 +480,7 @@ module Skylab::Brazen
 
     def first_edit & edit_p
 
-      _ok = process_first_edit( & edit_p )
+      _ok = process_first_edit_by( & edit_p )
       _ok && via_props_produce_edit_result
     end
 
@@ -497,13 +497,22 @@ module Skylab::Brazen
 
   private
 
-    def process_first_edit & edit_p  # :+#public-API :#hook-in
+    def process_first_edit_by & edit_p  # :+#public-API :#hook-in
 
-      stct = First_Edit_Yield__.new
+      edit_p[ first_edit_shell ]
+        # the blocks of edit sessions are only for setting parameters
 
-      es = First_Edit_Session__.new stct, formal_properties
+      process_first_edit
+    end
 
-      edit_p[ es ]  # the blocks of edit sessions are only for setting parameters
+    def first_edit_shell
+      @yield = First_Edit_Yield__.new
+      First_Edit_Session__.new( @yield, formal_properties )
+    end
+
+    def process_first_edit
+
+      stct = @yield ; @yield = nil
 
       @property_box = Box_.new
 

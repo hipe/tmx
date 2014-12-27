@@ -1,5 +1,8 @@
 # the perfect agent interaction model :[#139]
 
+(edit: this is kept for historical posterity, but its spirit has been
+eclipsed by [#br-080])
+
 (note: we will probably merge this node into [#sl-102] and move that one here,
 whenever the time is right.)
 
@@ -48,7 +51,7 @@ needs
 
               fig 2.A. the client services façade
 
-the client services façade is a popuar choice to manage providing *basic*
+the client services façade is a popular choice to manage providing *basic*
 services to the sub-agent, but it is not the only way. other equally suitable
 mechanisms include:
 

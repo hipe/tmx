@@ -1,3 +1,4 @@
+[#080]       #parent-node:[#013] actors, agents and models ..
 [#079] #open rather than the model action ever having to know about the
              modality adapter, the modality action should make a custom
              adapter class and in that class set the default iambic starter.
@@ -17,7 +18,8 @@
                ivar as a property
 [#069]       #tracking-tag all implementations of `verbose` can probably
                be replaced with selective event listeners
-[#068]       #tracking-tag we like list methods to be API friendly and result
+[#068]       #tracking-tag #parent-node: [#021] we like list methods to be
+               API friendly and result
                in a stream instead of emitting one event for each item *maybe*
 [#067] #open smooth different interfacings with API actions taxonomy
 [#066]       #done cool new build-less events

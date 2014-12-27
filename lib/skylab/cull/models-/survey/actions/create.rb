@@ -51,6 +51,8 @@ module Skylab::Cull
 
       Brazen_.model.entity self,
 
+        :flag, :property, :dry_run,
+
         :required,
         :description, -> y do
           y << "create a cull survey workspace directory in the path"
@@ -60,11 +62,11 @@ module Skylab::Cull
 
       def produce_any_result
 
-        arg = get_argument_via_property_symbol( :path )
-
         @ent = Models_::Survey.edit_entity @kernel, handle_event_selectively do | o |
-          o.create_via_path_arg arg
+
+          o.create_via_mutable_bound_argument_box to_bound_argument_box
         end
+
         @ent and via_ent
       end
 

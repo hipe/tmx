@@ -219,6 +219,13 @@ module Skylab::Brazen
         "(#{ s_a * ', ' })"
       end
 
+      def render_each_line_under expag
+        render_all_lines_into_under(
+          ::Enumerator::Yielder.new do | s |
+            yield s
+          end, expag )
+      end
+
       def render_all_lines_into_under y, expression_agent
         render_into_yielder_N_lines_under y, nil, expression_agent
       end

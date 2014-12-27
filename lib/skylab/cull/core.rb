@@ -12,6 +12,60 @@ module Skylab::Cull
     end
   end  # >>
 
+  Brazen_ = Autoloader_.require_sidesystem :Brazen
+
+  module API
+
+    class << self
+
+      include Brazen_::API.module_methods
+
+      def expression_agent_class
+        Brazen_::API.expression_agent_class
+      end
+    end
+  end
+
+  COMMON_ACTOR_AREF_METHOD_ = -> arg_box, & oes_p do
+
+    seen = false
+
+    x = new do
+
+      seen = true
+
+      st = self.class.properties.to_stream
+
+      prp = st.gets
+      while prp
+        instance_variable_set(
+          :"@#{ prp.name_symbol }_arg",
+          arg_box.fetch( prp.name_symbol ) )
+        prp = st.gets
+      end
+
+      @on_event_selectively = oes_p
+    end
+
+    seen and x.execute
+  end
+
+  module Simple_Selective_Sender_Methods_
+  private
+    def maybe_send_event * i_a, & ev_p
+      @on_event_selectively.call( * i_a, & ev_p )
+    end
+
+    def build_event_with * i_a, & msg_p
+      Brazen_.event.inline_via_iambic_and_any_message_proc_to_be_defaulted i_a, msg_p
+    end
+
+  public
+    def handle_event_selectively
+      @on_event_selectively
+    end
+  end
+
   module Lib_  # :+[#su-001]
 
     sidesys = Autoloader_.build_require_sidesystem_proc
@@ -24,20 +78,6 @@ module Skylab::Cull
 
     System = -> do
       HL__[].system
-    end
-  end
-
-  Brazen_ = Autoloader_.require_sidesystem :Brazen
-
-  module API
-
-    class << self
-
-      include Brazen_::API.module_methods
-
-      def expression_agent_class
-        Brazen_::API.expression_agent_class
-      end
     end
   end
 

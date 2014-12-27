@@ -4,24 +4,20 @@ module Skylab::Cull
 
     class Actors__::Create
 
-      # #todo in next ci - fix and standardize actor/model interface
+      Callback_::Actor.methodic self, :simple, :properties, :properties,
 
-      Callback_::Actor.call self, :properties, :survey
+        :dry_run,
+        :path
 
-      def initialize
+      define_singleton_method :[], COMMON_ACTOR_AREF_METHOD_
 
-        @is_dry_run = false  # future
+      def initialize & edit_p
 
-        super
-
-        @path_arg = @survey.path_arg
+        instance_exec( & edit_p )
 
         @deeper_path_arg = @path_arg.with_value(
           ::File.join( @path_arg.value_x, FILENAME_ ) )
 
-        @on_event_selectively = @survey.handle_event_selectively
-
-        @build_eigen_event = @survey.method( :to_event )
       end
 
       def execute
@@ -37,12 +33,16 @@ module Skylab::Cull
 
       def when_dir
 
+        workspace_dir = @path_arg.value_x
+
         Cull_._lib.system.patch(
-          :target_directory, @path_arg.value_x,
+          :target_directory, workspace_dir,
           :patch_file,
-            Cull_.dir_pathname.join( 'data-documents/create.patch' ).to_path,
-          :is_dry_run, @is_dry_run,
-          & @on_event_selectively )
+            Cull_.dir_pathname.join( 'data-documents-/create.patch' ).to_path,
+          :is_dry_run, @dry_run_arg.value_x,
+          & @on_event_selectively ) and
+
+        workspace_dir
       end
     end
   end

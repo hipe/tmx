@@ -31,10 +31,26 @@ module Skylab::Cull::TestSupport
       TestSupport_.debug_IO
     end
 
+    def prepare_tmpdir
+
+      fs =  Cull_._lib.filesystem
+      path = fs.tmpdir_pathname.join( 'culio' ).to_path
+      td = fs.tmpdir(
+        :path, path,
+        :be_verbose, do_debug,
+        :debug_IO, debug_IO )
+
+      td.clear
+    end
+
+    def freshly_initted_path
+      TS_::Fixtures::Directories[ :freshly_initted ]
+    end
+
     # ~ #hook-outs for [br]
 
-    def expression_agent_for_expect_event
-      Cull_::Brazen_.event.codifying_expression_agent
+    def black_and_white_expression_agent_for_expect_event
+      Cull_::Brazen_::API.expression_agent_instance
     end
 
     def subject_API

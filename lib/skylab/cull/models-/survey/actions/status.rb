@@ -19,22 +19,15 @@ module Skylab::Cull
 
       def produce_any_result
 
-        @path = Models_::Survey.any_nearest_path_via_looking_upwards_from_path(
-          get_argument_via_property_symbol( :path ),
-          & handle_event_selectively )
+        _ok = via_path_argument_resolve_existent_survey
+        _ok and via_survey
 
-        @path and via_path
       end
 
-      def via_path
-        @ent = Models_::Survey.edit_entity @kernel, handle_event_selectively do | o |
-          o.existent_valid_workspace_path @path
-        end
-        @ent and via_ent
-      end
+      include Survey_Action_Methods_
 
-      def via_ent
-        @ent.to_datapoint_stream_for_synopsis
+      def via_survey
+        @survey.to_datapoint_stream_for_synopsis
       end
 
       UNDERSCORE_ = '_'.freeze
