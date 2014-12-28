@@ -24,8 +24,9 @@ module Skylab::Brazen
       end
 
       def write_document
-        _pn = ::Pathname.new "#{ @path }/#{ @config_filename }"
-        @document.write_to_pathname _pn, :is_dry, @is_dry
+        @document.write_to_path(
+          ::File.join( @path, @config_filename ),
+          :is_dry, @is_dry )
       end
     end
   end

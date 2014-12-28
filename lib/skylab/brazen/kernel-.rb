@@ -103,7 +103,7 @@ module Skylab::Brazen
         p = main
         p[]
       end
-      ( LIB_.stream do
+      ( Callback_.stream do
         p[]
       end )
     end
@@ -124,7 +124,7 @@ module Skylab::Brazen
 
       d = -1 ; last = @const_i_a.length - 1
 
-      LIB_.stream.new do
+      Callback_.stream do
         while d < last
           d += 1
           i = @const_i_a.fetch d

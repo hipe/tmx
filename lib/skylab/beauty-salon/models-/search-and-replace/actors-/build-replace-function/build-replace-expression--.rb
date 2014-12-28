@@ -173,17 +173,28 @@ module Skylab::BeautySalon
           end
 
           def via_tree_guess_and_loaded_path_resolve_function
+
             tree = @tree.dup_mutable
             tree.value_x = ::Object
             @func = nil
+
             tree.children_depth_first do |node|
+
               const_i_a = node.value_x
-              mod = const_i_a.reduce node.parent.value_x do |m, i|
+
+              x = const_i_a.reduce node.parent.value_x do |m, i|
                 m.const_get i, false
               end
-              @func = Autoloader_.const_reduce [ @custom_i ], mod do end
+
+              if const_i_a.last.downcase == @custom_i
+                @func = x
+              else
+                @func = Autoloader_.const_reduce [ @custom_i ], x do end
+              end
+
               @func and break
-              node.value_x = mod
+
+              node.value_x = x
             end
             if ! @func  # search at toplevel
               @func = Autoloader_.const_reduce [ @custom_i ], ::Object do end

@@ -32,7 +32,7 @@ module Skylab::Brazen
       UNDERSCORE_RX__ = /_/
 
       def when_no_fields
-        Brazen_::Lib_::System[].filesystem.normalization.unlink_file(
+        LIB_.system.filesystem.normalization.unlink_file(
           :path, @path,
           :if_exists,
           :on_event_selectively, @on_event_selectively )
@@ -53,7 +53,7 @@ module Skylab::Brazen
 
       def do_resolve_downstream_directory
         _dirname = ::File.dirname @path
-        _dir = Brazen_::Lib_::System[].filesystem.normalization.existent_directory(
+        _dir = LIB_.system.filesystem.normalization.existent_directory(
           :path, _dirname,
           :create_if_not_exist,
           :max_mkdirs, 1,
@@ -67,7 +67,7 @@ module Skylab::Brazen
       end
 
       def write  # assume any dirname of path exists and is a directory
-        @down_IO = Brazen_::Lib_::System[].filesystem.normalization.downstream_IO(
+        @down_IO = LIB_.system.filesystem.normalization.downstream_IO(
           :path, @path,
           :on_event, -> ev do
             scan = line_scan_for_event ev

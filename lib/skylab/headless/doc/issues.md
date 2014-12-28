@@ -80,7 +80,8 @@
 [#103]       #parent-node: [#095] "list of method prefixes and suffixes.."
 [#102]       #parent-node: [#097] "the way shape is reflected in.."
 [#101]       #parent-node: [#097] "the name conventions for proc-like consts.."
-[#100] #hole (was: #parent-node: [#097] "multiple trailing underscores in..")
+[#100]       #tracking-tag for everything not threadsafe
+             (was: #parent-node: [#097] "multiple trailing underscores in..")
 [#099]       #parent-node: [#098] module visibility thru architected ..
 [#098]       #parent-node: [#097] module name conventions..
 [#097]       #parent-node: [#050] name conventions for constants ..

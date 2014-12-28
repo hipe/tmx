@@ -154,7 +154,11 @@ module Skylab::Brazen
       end
 
       def whn_result_is_trueish x
-        if x.respond_to? :bit_length or x.respond_to? :id2name
+        if ACHIEVED_ == x  # covered
+          SUCCESS_
+        elsif x.respond_to? :bit_length  # covered
+          x
+        elsif x.respond_to? :id2name  # covered by [cu]
           x
         else
           CLI_::When_Result_::Looks_like_stream.new( @adapter, x ).execute
@@ -419,7 +423,7 @@ module Skylab::Brazen
         scan = if @properties
           @properties.to_stream
         else
-          LIB_.stream.via_nonsparse_array EMPTY_A_
+          Callback_.stream.via_nonsparse_array EMPTY_A_
         end
         scan.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :help
       end
@@ -793,7 +797,7 @@ module Skylab::Brazen
       HACK_IS_ONE_WORD_RX__ = /\A[a-z]+\z/
 
       def unparenthesize s
-        Brazen_::Lib_::String_lib[].unparenthesize_message_string s
+        LIB_.basic::String.unparenthesize_message_string s
       end
 
       def downcase_first s
@@ -856,7 +860,7 @@ module Skylab::Brazen
     class Invocation__
 
       def option_parser_class
-        CLI_::Lib_::Option_parser[]
+        Option_parser__[]
       end
 
       def receive_partitions partitions
@@ -1004,6 +1008,11 @@ module Skylab::Brazen
       def argv
         @resources.argv
       end
+    end
+
+    Option_parser__ = Callback_.memoize do
+      require 'optparse'
+      ::OptionParser
     end
 
     # ~
@@ -1224,7 +1233,7 @@ module Skylab::Brazen
       end
       def to_stream
         scn = @box.to_value_stream
-        LIB_.stream.new do
+        Callback_.stream do
           scn.gets
         end
       end
@@ -1265,7 +1274,7 @@ module Skylab::Brazen
       end
 
       def under_expression_agent_get_N_desc_lines expag, d=nil
-        Brazen_::Lib_::N_lines[].new( [], d, [ @desc ], expag ).execute
+        LIB_.N_lines.new( [], d, [ @desc ], expag ).execute
       end
 
       def takes_argument  # zero to many takes argument
@@ -1362,19 +1371,12 @@ module Skylab::Brazen
         @a = a
       end
       def produce_any_result
-        scn = LIB_.stream.via_nonsparse_array @a
+        scn = Callback_.stream.via_nonsparse_array @a
         while exe = scn.gets
           value = exe.receiver.send exe.method_name, * exe.args
           value.nonzero? and break
         end
         value
-      end
-    end
-
-    module Lib_
-      Option_parser = -> do
-        require 'optparse'
-        ::OptionParser
       end
     end
 

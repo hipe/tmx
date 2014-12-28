@@ -93,14 +93,17 @@ module Skylab::Brazen
       ACHIEVED_
     end
 
-    def via_mutated_mutable_document_write_file_via_persisted_entity entity
-      _is_dry = entity.any_parameter_value :dry_run
-      _pn = @mutable_document.input_id.to_pathname
+    def via_mutated_mutable_document_write_file_via_persisted_entity entity  # #covered-by [tm]
 
-      _oes_p = entity.handle_event_selectively
+      Git_Config_::Mutable::Actors::Persist.with(
 
-      Git_Config_::Mutable::Actors::Persist[
-        _is_dry, _pn, @mutable_document, _oes_p ]
+        :is_dry, entity.any_parameter_value( :dry_run ),
+
+        :path, @mutable_document.input_id.to_path,
+
+        :document, @mutable_document,
+
+        & entity.handle_event_selectively )
     end
 
     class Silo_Controller__ < Brazen_.model.silo_controller
@@ -326,6 +329,7 @@ module Skylab::Brazen
     end
 
     class String_Input_Identifier__
+
       def initialize s
         @s = s
       end
@@ -340,8 +344,13 @@ module Skylab::Brazen
     end
 
     class Path_Input_Identifier__
+
       def initialize s
         @path_s = s
+      end
+
+      def members
+        [ :to_path, :to_pathname, :description_under, :input_lines_adapter ]
       end
 
       def to_path
@@ -366,7 +375,7 @@ module Skylab::Brazen
 
     class String_Input_Adapter_
       def initialize str
-        @scn = Lib_::String_scanner[].new str
+        @scn = LIB_.string_scanner.new str
       end
 
       def gets
@@ -386,19 +395,15 @@ module Skylab::Brazen
       end
     end
 
-    module Lib_
-      memoize = -> p { p_ = -> { x = p[] ; p_ = -> { x } ; x } ; -> { p_[] } }
-
-      String_scanner = memoize[ -> do
-        require 'strscan' ; ::StringScanner
-      end ]
-    end
-
     class Document_
 
       def initialize input_id
         @input_id = input_id
         @sections = Sections__.new
+      end
+
+      def members
+        Document_.public_instance_methods( false ) - [ :members ]
       end
 
       attr_reader :input_id, :sections
@@ -434,7 +439,7 @@ module Skylab::Brazen
         idx && @a.fetch( idx )
       end
       def to_stream
-        LIB_.stream.via_nonsparse_array @a
+        Callback_.stream.via_nonsparse_array @a
       end
       def map & p
         @a.map( & p )
@@ -514,7 +519,7 @@ module Skylab::Brazen
 
       def to_normalized_actual_property_stream
         d = -1 ; last = @a.length - 1
-        LIB_.stream.new do
+        Callback_.stream do
           while d < last
             d += 1
             ast = @a.fetch d

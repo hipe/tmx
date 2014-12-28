@@ -30,7 +30,7 @@ module Skylab::Brazen
 
         def resolve_message_string
           resolve_message_lines
-          @message_s = Callback_::Lib_::String_lib[].
+          @message_s = LIB_.basic::String.
             paragraph_string_via_message_lines @message_s_a ; nil
         end
 

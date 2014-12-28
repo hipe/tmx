@@ -41,7 +41,12 @@ module Skylab::Callback
           cls.send(
             :define_method,
             if md
-              "#{ md[ 0 ].downcase }#{ md.post_match }".intern
+              s = md[ :typical ]
+              if s
+                "#{ s.downcase }#{ md.post_match }".intern
+              else
+                "a_#{ md.post_match }".intern  # indefinite
+              end
             else
               const_i
             end,
@@ -50,7 +55,10 @@ module Skylab::Callback
         cls
       end
 
-      CONVERT_RX__ = /\A[A-Z](?=[a-z_])/
+      CONVERT_RX__ = %r(\A (?:
+        (?<typical> [A-Z] (?= [a-z] ) ) |
+        (?<indef>    A_ )
+      ) )x
 
       UNDERSCORE_BYTE__ = UNDERSCORE_.getbyte 0
   end

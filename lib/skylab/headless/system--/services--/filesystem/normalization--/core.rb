@@ -20,7 +20,8 @@ module Skylab::Headless
             singleton_class.instance_methods( false ) - [ :members ]
           end
 
-          def upstream_IO * x_a
+          def upstream_IO * x_a, & p
+            p and x_a.push :on_event_selectively, p
             Normalization__::Upstream_IO__.mixed_via_iambic x_a
           end
 

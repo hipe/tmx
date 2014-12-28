@@ -328,7 +328,7 @@ module Skylab::Brazen
           a.push cx.slug
         end
 
-        Brazen_::Lib_::Bsc_[]::Hash.determine_hotstrings( a ).map do | o |
+        LIB_.basic::Hash.determine_hotstrings( a ).map do | o |
           if o
             "[#{ o.hotstring }]#{ o.rest }"
           end
@@ -507,7 +507,7 @@ module Skylab::Brazen
       def build_request_ended_prematurely_event
         build_not_OK_event_with :request_ended_prematurely,
             :name, @name do |y, o|
-          _prop = Brazen_::Lib_::Bsc_[].minimal_property o.name
+          _prop = LIB_.basic.minimal_property o.name
           y << "request ended prematurely - expecting value for #{ par _prop }"
         end
       end

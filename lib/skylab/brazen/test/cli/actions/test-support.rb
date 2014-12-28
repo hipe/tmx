@@ -96,7 +96,9 @@ module Skylab::Brazen::TestSupport::CLI::Actions
     def blow_away path
       td_path = tmpdir.to_path
       if td_path == path[ 0, td_path.length ] && path.include?( '/brAzen/' )
-        debug_IO.puts "rm -rf #{ path }"
+        if do_debug
+          debug_IO.puts "rm -rf #{ path }"
+        end
         file_utils.remove_entry_secure path  # SCARY
       else
         self._SANITY

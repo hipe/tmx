@@ -89,7 +89,7 @@ module Skylab::Brazen
               if @scn
                 @scn.string = @line
               else
-                @scn = Lib_::String_scanner[].new @line
+                @scn = LIB_.string_scanner.new @line
               end
               ok = send @state_i
               ok or break
@@ -131,7 +131,7 @@ module Skylab::Brazen
         end
 
         def accept_string_for_immediate_scan s
-          @scn = Lib_::String_scanner[].new s ; nil
+          @scn = LIB_.string_scanner.new s ; nil
         end
 
         def accept_handle_event_selectively_proc p
@@ -208,7 +208,7 @@ module Skylab::Brazen
         end
 
         def get_all_node_stream
-          LIB_.stream.via_nonsparse_array @a
+          Callback_.stream.via_nonsparse_array @a
         end
 
         def count_number_of_nodes i
@@ -272,7 +272,7 @@ module Skylab::Brazen
         end
 
         def get_all_node_scan
-          LIB_.stream.via_nonsparse_array @a
+          Callback_.stream.via_nonsparse_array @a
         end
       end
 
@@ -373,21 +373,38 @@ module Skylab::Brazen
           PROCEDE_
         end
 
-        def write_to_pathname pn, * x_a
-          x_a.push :pathname, pn
-          write_via_mutable_iambic x_a
+        def write * x_a, & oes_p  # experimental
+
+          Mutable::Actors::Persist.build_mutable_with(
+
+            :write_to_tempfile_first,
+
+            :path, @input_id.to_path,
+
+            :is_dry, false,
+
+            :document, self,
+
+            :on_event_selectively, ( oes_p || _handle_event_selectively )
+
+          ).where_iambic( x_a ).execute
+
         end
 
-        def write_via_mutable_iambic x_a
+        def write_to_path path, * x_a, & oes_p
 
-          x_a.first.respond_to?( :id2name ) or raise ::ArgumentError, "where"
+          Mutable::Actors::Persist.build_mutable_with(
 
-          x_a.push :document, self,
-            :on_event_selectively, @parse.handle_event_selectively
+            :path, path,
 
-          Mutable::Actors::Persist.via_iambic x_a do |o|
-            o.did_see :pathname or o.set_pathname @input_id.to_pathname
-          end
+            :is_dry, false,
+
+            :document, self,
+
+            :on_event_selectively, ( oes_p || _handle_event_selectively )
+
+          ).where_iambic( x_a ).execute
+
         end
 
         # ~ for child agents only:
@@ -398,6 +415,12 @@ module Skylab::Brazen
 
         def accept_blank_line_or_comment_line line_s
           @a.push Blank_Line_Or_Comment_Line__.new line_s ; nil
+        end
+
+      private
+
+        def _handle_event_selectively
+          @parse.handle_event_selectively
         end
       end
 

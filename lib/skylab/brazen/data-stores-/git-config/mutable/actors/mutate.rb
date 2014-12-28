@@ -78,7 +78,7 @@ module Skylab::Brazen
         end
 
         def edit_file_via_create_section_when_section_empty
-          @verb_i = :created
+          @verb_symbol = :created
           write_section
         end
 
@@ -96,7 +96,7 @@ module Skylab::Brazen
         end
 
         def edit_file_via_update_section
-          @verb_i = :updated
+          @verb_symbol = :updated
           y = get_section_body_lines
           @section.clear_section
           write_section

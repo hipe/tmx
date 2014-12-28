@@ -19,67 +19,65 @@ module Skylab::Cull
             UNABLE_
           end )
 
-        x || result
+        if x
+          x.to_path
+        else
+          result
+        end
       end
     end  # >>
 
+    # ~ #hook-in to [br] edit session API
 
-    def process_first_edit_by & edit_p  # hook-in to [br]
-      edit_p[ fes = First_Edit_Session__.new ]
-      send fes.receive_first_edit_data_method_name, * fes.args
+    def first_edit_shell
+      First_Edit_Session__.new
     end
 
-    def normalize
-      super && ___via_post_normalize_method_name
+    def process_first_edit sh
+      send sh.receive_first_edit_data_method_name, * sh.args
     end
 
-    def ___via_post_normalize_method_name
-      send @post_normalize_method, * @post_normalize_args
-    end
+    # ~ end
 
     # ~ edit session where nothing happens is gigo
 
-    def recv_nothing_from_edit_session
+    def _first_edit_when_nothing
       nil
     end
 
     # ~ edit session for create
 
-    def recv_create_via_mutable_arg_box bx
-      @post_normalize_args = bx
-      @post_normalize_method = :create_via_mutable_arg_box
-      ACHIEVED_
-    end
+    def _create_via_mutable_arg_box bx
 
-    def create_via_mutable_arg_box bx
-
-      workspace_dir = Self_::Actors__::Create[ bx, & handle_event_selectively ]
-      workspace_dir and begin
-        @___path___ = workspace_dir
-        ACHIEVED_
+      x = Self_::Actors__::Create[ bx, & handle_event_selectively ]
+      x and begin
+        @___path___ = x
+        self
       end
     end
 
     # ~ edit session for retrieve
 
-    def recv_edit_data_for_valid_workspace_path path
+    def _retrieve_via_valid_path path
 
-      @post_normalize_args = path
-      @post_normalize_method = :normalize_via_existent_workspace_path
-
-      ACHIEVED_
-    end
-
-    def normalize_via_existent_workspace_path path
-
-      o = Brazen_.data_stores::Git_Config.parse_path(
-        ::File.join( path , CONFIG_FILENAME_ ),
+      cfg = Brazen_.data_stores::Git_Config.parse_path(
+        ::File.join( path, CONFIG_FILENAME_ ),
         & handle_event_selectively )
 
-      o and begin
-        @cfg_for_read = o
-        ACHIEVED_
+      cfg and begin
+        @_path = path
+        @cfg_for_write = nil
+        @cfg_for_read = cfg
+        self
       end
+    end
+
+    def path
+      @_path
+    end
+
+    private def _config
+      @cfg_for_write || @cfg_for_read
     end
 
     def to_datapoint_stream_for_synopsis
@@ -88,27 +86,101 @@ module Skylab::Cull
       end
     end
 
-    # ~ property-level exposures
+    # ~ subsequent edit session (edit an existing (new or persisted) survey)
 
-    def receive_upstream_argument arg
-      upstream = Self_::Actions::Upstream.edit_entity(
-          self,
-          handle_event_selectively ) do | o |
+    def subsequent_edit_shell  # #hook-in [br]
+      Subsequent_Edit_Shell__.new
+    end
 
-        o.arg arg
+    class Subsequent_Edit_Shell__
+
+      # think of this as a struture for modeling all the changes that might
+      # be (and were requested to be) made to an existing entity. first, we
+      # cache all the changes here as one atomic-esque structure. then in a
+      # separate step we flush the changes to the entity. then IFF flushing
+      # these changes succeeds, the entity can [re-]persist itself. in this
+      # way the entity can convene all attempts at persisting into one step
+
+      def initialize
+        @a = []
       end
-      if upstream
-        @upstream = upstream
-        maybe_send_event :info, :set_upstream do
-          upstream.to_event
-        end
-        ACHIEVED_
-      else
-        upstream
+
+      attr_reader :a
+
+      def set_upstream_via_mutable_arg_box bx
+        @a.push :_set_upstream_via_mutable_arg_box, bx
+        nil
       end
     end
 
+    def process_subsequent_edit sh  # #hook-in [br]
+
+      # for now, we assume (reasonably) that all successful edits sessions
+      # mutate the entity and therefor should be persisted.
+
+      ok = true
+      sh.a.each_slice 2 do | sym, x |
+        ok = send sym, x
+        ok or break
+      end
+      ok && normalize && _end_edit_session_by_writing_self
+    end
+
+    # ~ property-level exposures
+
+    def _set_upstream_via_mutable_arg_box bx
+
+      upstream = Self_::Actions::Upstream.edit_entity( self, handle_event_selectively ) do | o |
+
+        o.via_mutable_arg_box bx
+
+      end
+
+      upstream and accpt_upstream upstream
+    end
+
+    def accpt_upstream upstream
+
+      cfg = cfg_for_write
+
+      st = cfg.sections.to_stream
+
+      sec = st.gets
+      while sec
+        self._DO_ME
+        sec = st.gets
+      end
+
+      _str = upstream.marshal_dump
+      cfg.sections.touch_section _str, :upstream
+
+      @upstream = upstream
+
+      maybe_send_event :info, :set_upstream do
+        upstream.to_event
+      end
+
+      ACHIEVED_
+    end
+
+    def _end_edit_session_by_writing_self
+      cfg_for_write.write
+    end
+
     # ~ shared support
+
+    def maybe_relativize_path path
+
+      relpath = ::Pathname.new( path ).relative_path_from(
+        ::Pathname.new( @_path ) ).to_path
+
+      if relpath.length < path.length
+        relpath
+      else
+        path
+      end
+
+    end
 
     def members
       [ :path ]
@@ -120,29 +192,40 @@ module Skylab::Cull
         :is_completion, true
     end
 
-    def handle_event_selectively
-      @on_event_selectively
+  private
+
+    def cfg_for_write
+      @cfg_for_write ||= begin
+        x = @cfg_for_read
+        @cfg_for_read = nil
+        Brazen_.data_stores::Git_Config::Mutable.parse_input_id(
+          x.input_id,
+          & @on_event_selectively )
+      end
     end
 
     include Simple_Selective_Sender_Methods_
 
     class First_Edit_Session__
 
+      # a frontier example of an experimental edit session category wherein
+      # it ulitmately resolves to do only one thing (whatever was last)
+
       def initialize
-        @receive_first_edit_data_method_name = :recv_nothing_from_edit_session
+        @receive_first_edit_data_method_name = :_first_edit_when_nothing
       end
 
       attr_reader :receive_first_edit_data_method_name, :args
 
       def create_via_mutable_bound_argument_box bx
         @args = bx
-        @receive_first_edit_data_method_name = :recv_create_via_mutable_arg_box
+        @receive_first_edit_data_method_name = :_create_via_mutable_arg_box
         nil
       end
 
       def existent_valid_workspace_path path
-        @args = [ path ]
-        @receive_first_edit_data_method_name = :recv_edit_data_for_valid_workspace_path
+        @args = path
+        @receive_first_edit_data_method_name = :_retrieve_via_valid_path
         nil
       end
     end
@@ -156,22 +239,22 @@ module Skylab::Cull
           get_argument_via_property_symbol( :path ),
           & handle_event_selectively )
 
-        path and rslv_existent_survey_via_path path
+        path and rslv_existent_survey_via_existent_path path
       end
 
-      def rslv_existent_survey_via_path path
+      def rslv_existent_survey_via_existent_path path
+
         sv = Models_::Survey.edit_entity @kernel, handle_event_selectively do | o |
           o.existent_valid_workspace_path path
         end
-        if sv
+
+        sv and begin
           @survey = sv
           ACHIEVED_
-        else
-          sv
         end
       end
 
-      def normalize_path str
+      def via_survey_dir_absolutize_path str
         if str
           if str.length.zero?
             UNABLE_

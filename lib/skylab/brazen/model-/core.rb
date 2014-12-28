@@ -244,7 +244,7 @@ module Skylab::Brazen
       end
 
       def under_expression_agent_get_N_desc_lines expression_agent, d=nil
-        Brazen_::Lib_::N_lines[].
+        LIB_.N_lines.
           new( [], d, [ self.class.description_block ], expression_agent ).
            execute
       end
@@ -283,6 +283,11 @@ module Skylab::Brazen
       @property_box = @property_box.dup
     end
 
+    def accept_parent_node_ x
+      # for non-top model nodes
+      @parent_node = x ; nil
+    end
+
     # ~ multipurpose, simple readers
 
     attr_reader :any_bound_call_for_edit_result,
@@ -304,14 +309,14 @@ module Skylab::Brazen
     end
 
     def to_normalized_actual_property_stream
-      LIB_.stream.via_nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
+      Callback_.stream.via_nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
         Actual_Property_.new any_property_value( i ), i
       end
     end
 
     def to_normalized_bound_property_scan
       props = formal_properties
-      LIB_.stream.via_nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
+      Callback_.stream.via_nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
         get_bound_property_via_property props.fetch i
       end
     end
@@ -405,7 +410,12 @@ module Skylab::Brazen
 
       def init_action_class_reflection
         has = const_defined? ACTIONS__, false  # #one
-        has ||= entry_tree.instance_variable_get( :@h ).key? ACTIONS___
+        if ! has
+          h = entry_tree.instance_variable_get :@h
+          if h.key? ACTIONS_DIR__ or h.key? ACTIONS_FILE__
+            has = true
+          end
+        end
         @acr = has && bld_action_class_reflection
         @is_actionable = @acr && true
         true
@@ -414,7 +424,10 @@ module Skylab::Brazen
       def bld_action_class_reflection
         Lazy_Action_Class_Reflection.new self, const_get( ACTIONS__, false )
       end
-      ACTIONS__ = :Actions ; ACTIONS___ = 'actions'.freeze
+
+      ACTIONS__ = :Actions
+      ACTIONS_DIR__ = 'actions'.freeze
+      ACTIONS_FILE__ = "#{ ACTIONS_DIR__ }#{ Autoloader_::EXTNAME }"
     end
 
     class Lazy_Action_Class_Reflection
@@ -425,17 +438,17 @@ module Skylab::Brazen
 
       def to_upper_action_cls_strm
         @did ||= work
-        LIB_.stream.via_nonsparse_array @up_a
+        Callback_.stream.via_nonsparse_array @up_a
       end
 
       def to_lower_action_cls_strm
         @did ||= work
-        LIB_.stream.via_nonsparse_array @down_a
+        Callback_.stream.via_nonsparse_array @down_a
       end
 
       def to_node_stream
         @did ||= work
-        LIB_.stream.via_nonsparse_array @all_a
+        Callback_.stream.via_nonsparse_array @all_a
       end
 
       def all_a
@@ -476,43 +489,42 @@ module Skylab::Brazen
       end
     end
 
-    # ~ edit :+#hook-in
+    # ~ the edit session API - :#public-API :#hook-in as pursuant to :[#hl-119]
+
+    #   the below methods fugue in pairs continually. every comment in the
+    #   first method is relevant to any corresponding part of the second.
 
     def first_edit & edit_p
 
-      _ok = process_first_edit_by( & edit_p )
-      _ok && via_props_produce_edit_result
+      # the result of this is the result of your edit session (the user block)
+
+      sh, yld = first_edit_shell
+      edit_p[ sh ]  # only for setting values
+      process_first_edit yld || sh
     end
 
-    def edit & edit_p  # #todo - `edit` method is covered visually only
+    def edit & edit_p
 
-      # this is covered visually by [ datastore | source ] `rm` ONLY
-      # currently it is only used to pass in action formals or "adverbs"
-
-      _ok = set_prps_via_subsequent_edit( & edit_p )
-      _ok && via_props_produce_edit_result
+      sh, yld = subsequent_edit_shell
+      edit_p[ sh ]
+      process_subsequent_edit yld || sh
     end
 
     attr_reader :action_formal_properties
 
   private
 
-    def process_first_edit_by & edit_p  # :+#public-API :#hook-in
-
-      edit_p[ first_edit_shell ]
-        # the blocks of edit sessions are only for setting parameters
-
-      process_first_edit
-    end
-
     def first_edit_shell
-      @yield = First_Edit_Yield__.new
-      First_Edit_Session__.new( @yield, formal_properties )
+      yld = First_Edit_Yield__.new
+      [ First_Edit_Session__.new( yld, formal_properties ), yld ]
     end
 
-    def process_first_edit
+    def subsequent_edit_shell
+      yld = Subsequent_Edit_Yield__.new
+      [ First_Edit_Session__.new( yld, formal_properties ), yld ]
+    end
 
-      stct = @yield ; @yield = nil
+    def process_first_edit stct
 
       @property_box = Box_.new
 
@@ -530,20 +542,18 @@ module Skylab::Brazen
 
       x_a = stct.iambic
 
-      if x_a
+      ok = if x_a
         process_iambic_stream_fully iambic_stream_via_iambic_array x_a
       else
-        ACHIEVED_
+        true
       end
+
+      ok &&= normalize
+
+      ok && self
     end
 
-    def set_prps_via_subsequent_edit & edit_p
-
-      stct = Subsequent_Edit_Yield__.new
-
-      es = Subsequent_Edit_Session__.new stct, formal_properties
-
-      edit_p[ es ]  # the blocks of edit sessions are only for setting parameters
+    def process_subsequent_edit stct
 
       afp = stct.action_formal_prps
       if afp
@@ -557,7 +567,7 @@ module Skylab::Brazen
         end
       end
 
-      ACHIEVED_
+      normalize && self
     end
 
     Common_Edit_Session_Methods__ = ::Module.new
@@ -681,14 +691,7 @@ module Skylab::Brazen
       end
     end
 
-    def via_props_produce_edit_result
-      ok = normalize
-      if ok
-        self
-      else
-        ok
-      end
-    end
+    # ~ end edit session API
 
   public
 

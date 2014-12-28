@@ -6,63 +6,146 @@ module Skylab::Brazen
 
       class Actors::Persist
 
-        Actor_[ self, :properties,
-          :is_dry,
-          :pathname,
-          :document,
-          :on_event_selectively ]
+        Callback_::Actor.methodic self
 
-        def did_see i
-          instance_variable_defined? ivar_box.fetch i
+        # ~ :+[081] experimental extensions to methodic actor
+
+        class << self
+
+          def build_mutable_with * x_a
+            build_via_iambic x_a
+          end
         end
 
-        def set_pathname pn
-          @pathname = pn ; nil
+        def where_iambic x_a
+          if x_a.length.nonzero?
+            process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+          else
+            true
+          end and self
         end
 
-        def execute
-          init_ivars
-          work
+        # ~ end experimental extensions
+
+        def initialize & edit_p
+
+          @do_write_to_tmpfile_first = false
+
+          instance_exec( & edit_p )
         end
 
       private
 
-        def init_ivars
-          @verb_i = @pathname.exist? ? :update : :create
+        def is_dry=
+          @is_dry = iambic_property
+          KEEP_PARSING_
         end
 
-        def work
-          scn = @document.to_line_stream ; d = 0
+        def document=
+          @document = iambic_property
+          KEEP_PARSING_
+        end
+
+        def on_event_selectively=
+          @on_event_selectively = iambic_property
+          KEEP_PARSING_
+        end
+
+        def path=
+          @path = iambic_property
+          KEEP_PARSING_
+        end
+
+        def write_to_tempfile_first=
+          @do_write_to_tmpfile_first = true
+          KEEP_PARSING_
+        end
+
+        def accept_selective_listener_proc p  # #covered-by [tm]
+          @on_event_selectively = p ; nil
+        end
+
+      public
+
+        def execute
+
+          @verb_symbol = ::File.exist?( @path ) ? :update : :create
+
+          st = @document.to_line_stream
+          d = 0
+
           with_IO_opened_for_writing do |io|
-            while line = scn.gets
+            line = st.gets
+            while line
               d += io.write line
+              line = st.gets
             end
           end
+
           @on_event_selectively.call :info, :success do
             build_wrote_file_event d
           end
+
+          # let's no longer let `info` events dictate our result
+
+          ACHIEVED_
         end
 
         def build_wrote_file_event d
+
           build_OK_event_with( :datastore_resource_committed_changes,
-            :bytes, d,
-            :is_completion, true,
-            :is_dry, @is_dry,
-            :pn, @pathname,
-            :verb_i, @verb_i
-          ) do |y, o|
-            dry_ = ( "dry " if o.is_dry )
-            y << "#{ o.verb_i }d #{ pth o.pn } (#{ o.bytes } #{ dry_ }bytes)"
+              :bytes, d,
+              :is_completion, true,
+              :is_dry, @is_dry,
+              :path, @path,
+              :verb_symbol, @verb_symbol ) do | y, o |
+
+            _dry = ( "dry " if o.is_dry )
+
+            y << "#{ o.verb_symbol }d #{ pth o.path } (#{ o.bytes } #{ _dry }bytes)"
+
           end
         end
 
-        def with_IO_opened_for_writing & p
-          if @is_dry
-            p[ Brazen_::Lib_::IO[].dry_stub_instance ]
-          else
-            ::File.open @pathname.to_path, 'w', & p  # WRITE_MODE_
+        module Simple_Event_Builder_Methods_
+        private
+          def build_OK_event_with * x_a, & p
+            Brazen_.event.inline_OK_via_mutable_iambic_and_message_proc x_a, p
           end
         end
+
+        include Simple_Event_Builder_Methods_
+
+        def with_IO_opened_for_writing & p
+
+          io = if @is_dry
+
+            Brazen_::_::IO[].dry_stub_instance
+
+          elsif @do_write_to_tmpfile_first
+
+            @__tmpfile__ = ::File.join(
+              LIB_.system.filesystem.tmpdir_path,
+              'br-VOLATILE' )  # :+[#hl-100]
+
+            ::File.open @__tmpfile__, WRITE_MODE_
+          else
+
+            ::File.open @path, WRITE_MODE_
+          end
+
+          x = p[ io ]
+
+          io.close
+
+          if @do_write_to_tmpfile_first
+            ::FileUtils.mv @__tmpfile__, @path, noop: @is_dry
+          end
+
+          x
+        end
+
+        WRITE_MODE_ = 'w'.freeze
       end
     end
   end

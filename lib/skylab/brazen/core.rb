@@ -34,6 +34,10 @@ module Skylab::Brazen
       Brazen_::Kernel_
     end
 
+    def _lib
+      Brazen_::Lib_::SHELL
+    end
+
     def members
       singleton_class.instance_methods( false ) - [ :members ]
     end
@@ -64,8 +68,44 @@ module Skylab::Brazen
     end
   end
 
+  Actor_ = -> cls, * x_a do
+    Lib_::Snag_[]::Model_::Actor.via_client_and_iambic cls, x_a
+    Brazen_.event.selective_builder_sender_receiver cls ; nil
+  end
+
+  Bound_Call__ = ::Struct.new :args, :receiver, :method_name do  # volatility order (subjective)
+
+    class << self
+
+      def build_via_arglist a
+        if a.length.zero?
+          self
+        else
+          new( * a )
+        end
+      end
+
+      def the_empty_call
+        @tec ||= new EMPTY_P_, :call
+      end
+
+      def via_value x
+        new nil, -> { x }, :call
+      end
+    end
+  end
+
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
+
+  module Data_Stores_
+    class << self
+      def name_function
+        Models_::Datastore.name_function  # hack city
+      end
+    end
+    Autoloader_[ self, :boxxy ]
+  end
 
   module NAME_LIBRARY_
 
@@ -80,7 +120,7 @@ module Skylab::Brazen
       end
 
       def surrounding_module mod
-        Brazen_::Lib_::Module_lib[].value_via_relative_path mod, '..'
+        LIB_.module_lib.value_via_relative_path mod, '..'
       end
     end
 
@@ -108,7 +148,7 @@ module Skylab::Brazen
         s_a = name.split CONST_SEP_
         i = s_a.pop.intern
 
-        chain = Brazen_::Lib_::Module_lib[].chain_via_parts s_a
+        chain = LIB_.module_lib.chain_via_parts s_a
         d = chain.length
 
         while stop_index < ( d -= 1 )  # find nearest relevant parent
@@ -153,25 +193,16 @@ module Skylab::Brazen
     end
   end
 
-  module Data_Stores_
-    class << self
-      def name_function
-        Models_::Datastore.name_function  # hack city
-      end
-    end
-    Autoloader_[ self, :boxxy ]
-  end
-
   module Lib_
 
     memoize = Callback_.memoize
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
-    Bsc_ = sidesys[ :Basic ]
+    Basic = sidesys[ :Basic ]
 
     Ellipsify = -> * x_a do
-      Snag__[]::CLI.ellipsify.via_arglist x_a
+      Snag_[]::CLI.ellipsify.via_arglist x_a
     end
 
     NLP_EN_methods = -> do
@@ -187,7 +218,7 @@ module Skylab::Brazen
     JSON = memoize[ -> { require 'json' ; ::JSON  } ]
 
     Module_lib = -> do
-      Bsc_[]::Module
+      Basic[]::Module
     end
 
     Mutable_iambic_scanner = -> do
@@ -221,7 +252,7 @@ module Skylab::Brazen
       Callback_::Proxy
     end
 
-    Snag__ = sidesys[ :Snag ]
+    Snag_ = sidesys[ :Snag ]
 
     Strange = -> x do
       Autoloader_.require_sidesystem( :MetaHell ).strange x
@@ -232,16 +263,17 @@ module Skylab::Brazen
       ::StringIO
     end
 
-    String_lib = -> do
-      Bsc_[]::String
-    end
+    String_scanner = memoize[ -> do
+      require 'strscan'
+      ::StringScanner
+    end ]
 
     System = -> do
       HL__[].system
     end
 
     Trio = -> do
-      Bsc_[].trio
+      Basic[].trio
     end
 
     Two_streams = -> do
@@ -249,49 +281,10 @@ module Skylab::Brazen
     end
   end
 
-  LIB_ = ::Module.new  # stand-in
-  class << LIB_
-    def stream & p
-      if block_given?
-        Callback_::Scan.new( & p )
-      else
-        Callback_::Scan
-      end
-    end
-  end
-
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
-
-  Actor_ = -> cls, * x_a do
-    Lib_::Snag__[]::Model_::Actor.via_client_and_iambic cls, x_a
-    Brazen_.event.selective_builder_sender_receiver cls ; nil
-  end
 
   ACHIEVED_ = true
   Brazen_ = self
-
-  Bound_Call__ = ::Struct.new :args, :receiver, :method_name do  # volatility order (subjective)
-
-    class << self
-
-      def build_via_arglist a
-        if a.length.zero?
-          self
-        else
-          new( * a )
-        end
-      end
-
-      def the_empty_call
-        @tec ||= new EMPTY_P_, :call
-      end
-
-      def via_value x
-        new nil, -> { x }, :call
-      end
-    end
-  end
-
   Box_ = Callback_::Box
   CONTINUE_ = nil
   CONST_SEP_ = Callback_.const_sep
@@ -304,6 +297,7 @@ module Skylab::Brazen
   Autoloader_[ Models_ = ::Module.new, :boxxy ]
   IDENTITY_ = -> x { x }
   KEEP_PARSING_ = true
+  LIB_ = Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
   NAME_ = :name
   NEWLINE_ = "\n".freeze
   NILADIC_TRUTH_ = -> { true }

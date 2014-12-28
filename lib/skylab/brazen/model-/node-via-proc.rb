@@ -98,7 +98,7 @@ module Skylab::Brazen
           # 'Action_' const (probably the application node), and insist
           # that the Action_ node has the name stop index const.
 
-          chain = Brazen_::Lib_::Module_lib[].chain_via_module @parent_module
+          chain = LIB_.module_lib.chain_via_module @parent_module
           _mod = ( chain.length - 1 ).downto( 0 ).reduce nil do |_, d|
             if chain.fetch( d ).value_x.const_defined? :Action_
               break chain[ d ].value_x

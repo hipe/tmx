@@ -40,7 +40,7 @@ module Skylab::Brazen
 
       via_properties_init_ivars
 
-      @pn = Brazen_::Lib_::System[].filesystem.walk(
+      @pn = LIB_.system.filesystem.walk(
         :start_path, @path,
         :max_num_dirs_to_look, @max_num_dirs,
         :prop, @prop,
@@ -115,7 +115,7 @@ module Skylab::Brazen
 
       def merge_workspace_resolution_properties_into_via bx, action  # #note-120
 
-        scn = LIB_.stream.via_nonsparse_array INNER_OUTER_A__
+        scn = Callback_.stream.via_nonsparse_array INNER_OUTER_A__
         while pair = scn.gets
           inner_i, outer_i = pair
           if ! bx[ inner_i ]

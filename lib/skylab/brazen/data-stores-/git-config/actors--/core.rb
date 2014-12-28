@@ -229,8 +229,7 @@ module Skylab::Brazen
       end
 
       def resolve_result_via_write_file dry_run
-        _pn = ::Pathname.new @to_path
-        @result = @document.write_to_pathname _pn, :is_dry, @dry_run
+        @result = @document.write_to_path @to_path, :is_dry, @dry_run
       end
     end
 

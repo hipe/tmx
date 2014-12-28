@@ -89,6 +89,8 @@ module Skylab::Callback
           end
           ok && x
         end
+
+        # (experimental features near here exist in: [#br-081])
       end
 
       module Iambic_Processing_Instance_Methods__

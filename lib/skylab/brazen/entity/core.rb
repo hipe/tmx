@@ -686,7 +686,7 @@ module Skylab::Brazen
         x = actual_property_box.fetch prop.name_i do
           had = false ; nil
         end
-        Brazen_::Lib_::Trio[].new x, had, prop
+        LIB_.trio.new x, had, prop
       end
 
       def iambic_writer_method_name_passive_lookup_proc  # [cb] #hook-in

@@ -136,7 +136,7 @@ module Skylab::Brazen
 
       def __prdc_some_handle_event_selectively
 
-        _two_streams = Lib_::Two_streams[]
+        _two_streams = LIB_.two_streams
 
         _expag = @mod::API.expression_agent_class.new @kernel
 

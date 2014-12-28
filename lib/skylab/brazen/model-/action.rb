@@ -192,7 +192,7 @@ module Skylab::Brazen
     end
 
     def to_actual_argument_stream  # used by [tm]
-      LIB_.stream.via_nonsparse_array( formal_properties.get_names ).map_by do |i|
+      Callback_.stream.via_nonsparse_array( formal_properties.get_names ).map_by do |i|
         Actual_Property_.new any_argument_value( i ), i
       end
     end

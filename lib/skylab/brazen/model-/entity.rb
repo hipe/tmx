@@ -7,11 +7,11 @@ module Skylab::Brazen
       class << self
 
         def normalizers
-          Brazen_::Lib_::Bsc_[].normalizers
+          LIB_.basic.normalizers
         end
 
         def trio
-          Brazen_::Lib_::Trio[]
+          LIB_.trio
         end
       end
 
@@ -442,7 +442,7 @@ module Skylab::Brazen
           end
 
           def under_expression_agent_get_N_desc_lines expression_agent, n=nil
-            Brazen_::Lib_::N_lines[].
+            LIB_.N_lines.
               new( [], n, @desc_p_a, expression_agent ).execute
           end
         end

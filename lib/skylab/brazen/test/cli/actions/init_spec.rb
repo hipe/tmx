@@ -9,7 +9,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
     with_invocation 'init'
     with_max_num_dirs '1'
 
-    context "from within empty directory (NOTE misspelling)" do
+    context "from within empty directory ( NOTE misspelling in preterite :P )" do
       from_new_directory_one_deep
       it "ok, inits." do
         invoke
