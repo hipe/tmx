@@ -158,11 +158,11 @@ module Skylab::Headless
         def build_nonzero_event status, serr_line
 
           Headless_._lib.event_lib.inline_not_OK_with :nonzero_exitstatus,
-              :existatus, status.exitstatus,
+              :exitstatus, status.exitstatus,
               :first_error_line, serr_line do | y, o_ |
 
             y << "#{ o_.first_error_line || 'nonzero exitstatus' } #{
-              }(exitstatus: #{ o.exitstatus })"
+              }(exitstatus: #{ o_.exitstatus })"
           end
         end
 

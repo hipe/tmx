@@ -141,30 +141,18 @@ module Skylab::Cull
 
     def accpt_upstream upstream
 
-      cfg = cfg_for_write
+      ok = _set_monadic_slotular_section upstream.marshal_dump, :upstream
 
-      st = cfg.sections.to_stream
+      ok and begin
 
-      sec = st.gets
-      while sec
-        self._DO_ME
-        sec = st.gets
+        @upstream = upstream
+
+        maybe_send_event :info, :set_upstream do
+          upstream.to_event
+        end
+
+        ACHIEVED_
       end
-
-      _str = upstream.marshal_dump
-      cfg.sections.touch_section _str, :upstream
-
-      @upstream = upstream
-
-      maybe_send_event :info, :set_upstream do
-        upstream.to_event
-      end
-
-      ACHIEVED_
-    end
-
-    def _end_edit_session_by_writing_self
-      cfg_for_write.write
     end
 
     # ~ shared support
@@ -193,6 +181,44 @@ module Skylab::Cull
     end
 
   private
+
+    def _set_monadic_slotular_section value_string, section_symbol
+
+      cfg = cfg_for_write
+
+      st = cfg.sections.to_stream.reduce_by do | x |
+        section_symbol == x.external_normal_name_symbol
+      end
+
+      sec = st.gets
+      if sec
+        change_the_name_of_this_one = sec
+        sec = st.gets
+        if sec
+          delete_these = [ sec ]
+          sec = st.gets
+          while sec
+            delete_these.push sec
+            sec = st.gets
+          end
+        end
+      end
+
+      if delete_these
+        cfg.sections.delete_these_ones delete_these
+      end
+
+      if change_the_name_of_this_one
+        change_the_name_of_this_one.set_subsection_name value_string
+      else
+        _ = cfg.sections.touch_section value_string, section_symbol
+        _ ? ACHIEVED_ : UNABLE_
+      end
+    end
+
+    def _end_edit_session_by_writing_self
+      cfg_for_write.write
+    end
 
     def cfg_for_write
       @cfg_for_write ||= begin

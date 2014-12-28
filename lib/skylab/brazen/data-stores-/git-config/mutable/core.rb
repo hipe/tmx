@@ -174,6 +174,10 @@ module Skylab::Brazen
 
       module Readable_Branch_Methods__  # for documents and [sub] sections, not assignment or comments
 
+        def members
+          EMPTY_A_  # meh
+        end
+
         def is_empty
           @a.length.zero?
         end
@@ -327,6 +331,10 @@ module Skylab::Brazen
           @sections_shell = Sections_Facade__.new self, parse
         end
 
+        def members
+          [ :input_id, :sections, :to_line_stream, * super ]
+        end
+
         def input_id
           @input_id
         end
@@ -434,6 +442,10 @@ module Skylab::Brazen
         def initialize_copy _otr_
         end
 
+        def members
+          [ :length, :first, :to_stream ]
+        end
+
         def length
           @collection_kernel.count_number_of_nodes self.class::SYMBOL_I
         end
@@ -476,31 +488,61 @@ module Skylab::Brazen
         end
 
         def delete_comparable_item x, compare_p, & oes_p
-          do_not_delete_these = [] ; will_delete_count = 0
-          scn = @collection_kernel.get_all_node_scan
-          while item = scn.gets
-            d = compare_p[ item ]
-            if d.zero?
-              will_delete_count += 1
-            else
-              do_not_delete_these.push item
-            end
-          end
-          case 1 <=> will_delete_count
-          when  0 ; delete_comparable_item_when_found do_not_delete_these
-          when  1 ; delete_comparable_item_when_not_found x, & oes_p
-          when -1 ; delete_comparable_item_when_many_matches will_delete_count, x, & oes_p
+
+          delete, keep = _partition compare_p
+
+          case 1 <=> delete.length
+          when  0
+            replace_all_children_with_these_children keep
+          when  1
+            delete_comparable_item_when_not_found x, & oes_p
+          when -1
+            delete_comparable_item_when_ambiguous delete, x, & oes_p
           end
         end
 
-        def delete_comparable_item_when_found keep_these
+        def delete_comparable_items_plural x, compare_p, & oes_p
+
+          delete, keep = _partition compare_p
+
+          d = replace_all_children_with_these_children keep
+
+          if d == - delete.length
+            delete
+          else
+            UNABLE_
+          end
+        end
+
+        def replace_all_children_with_these_children keep_these
           @collection_kernel.replace_children_with_this_array keep_these
+        end
+
+        def _partition compare_p
+
+          x = [ yes=[], no=[] ]
+
+          scn = @collection_kernel.get_all_node_scan
+
+          while item = scn.gets
+            if compare_p[ item ].zero?
+              yes.push item
+            else
+              no.push item
+            end
+          end
+
+          x
         end
       end
 
       class Sections_Facade__ < Mutable_Collection_Shell__
 
         SYMBOL_I = :section_or_subsection
+
+        def members
+          [ :touch_section, :delete_these_ones, * super ]
+        end
 
         def touch_section subsect_s=nil, sect_s
           section = bld_section subsect_s, sect_s
@@ -509,6 +551,8 @@ module Skylab::Brazen
             touch_comparable_item section, _compare_p
           end
         end
+
+      private
 
         def bld_section subsect_s, sect_s
           Section_or_Subsection__.via_literals subsect_s, sect_s, @parse
@@ -543,6 +587,43 @@ module Skylab::Brazen
             else d end
           end
         end
+
+      public
+
+        def delete_these_ones a
+
+          h = {}
+          a.each do |x|
+            h[ x.object_id ] = true
+          end
+
+          _compare_p = -> x do
+            if h[ x.object_id ]
+              ZERO___
+            else
+              NONZERO___
+            end
+          end
+
+          delete_comparable_items_plural :_hi_, _compare_p
+
+          # result is a (different) array of the deleted items
+
+        end
+      end
+
+      NONZERO___ = class Nonzero___
+        def zero?
+          false
+        end
+        new
+      end
+
+      ZERO___ = class Zero___
+        def zero?
+          true
+        end
+        new
       end
 
       class Section_or_Subsection__
@@ -575,6 +656,14 @@ module Skylab::Brazen
 
         def initialize kernel
           @kernel = kernel
+        end
+
+        def members
+          [ :assignments,
+            :external_normal_name_symbol,
+            :internal_normal_name_string,
+            :subsect_name_s,
+            :to_line_stream ]
         end
 
         def dup_via_parse_context parse
@@ -631,11 +720,15 @@ module Skylab::Brazen
           @kernel.assignments
         end
 
+        # ~ mutators
+
         def accept_blank_line_or_comment_line s
           @kernel.accept_blank_line_or_comment_line s
         end
 
-        # ~ mutators
+        def set_subsection_name s
+          @kernel.set_subsect_name_ s
+        end
 
         def []= i, x
           if k = @kernel.for_edit
@@ -801,6 +894,25 @@ module Skylab::Brazen
         end
 
       public
+
+        def set_subsect_name_ s  # #covered-by [cu]
+
+          s_ = s.dup
+
+          s__ = s_.dup
+          Section_.mutate_subsection_name_for_marshal s__
+
+          line_ = @line.dup
+          line_[ @name_start_index + @name_width + @subsection_leader_width,
+                 @subsection_name_width ] = s__
+
+          @subsect_s = s_.freeze
+          @subsection_name_width = s__.length
+
+          @line = line_
+
+          ACHIEVED_
+        end
 
         def accept_asmt asmt
           @a.push asmt ; nil

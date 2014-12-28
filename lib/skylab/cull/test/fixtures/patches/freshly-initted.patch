@@ -1,8 +1,4 @@
-diff --git a/.cullconfig b/.cullconfig
-new file mode 100644
-index 0000000..b32dbc0
 --- /dev/null
-+++ b/.cullconfig
-@@ -0,0 +1,2 @@
-+[foo]
-+  bar = baz
++++ b/cull-survey/config
+@@ -0,0 +1 @@
++# ohai

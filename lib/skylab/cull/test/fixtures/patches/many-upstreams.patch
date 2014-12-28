@@ -1,0 +1,17 @@
+new file mode 100644
+--- /dev/null
++++ b/cull-survey/config
+@@ -0,0 +1,13 @@
++#ohai
++
++[upstream "zoop"]
++
++[upstream "\"zeep\""]
++
++[zafarelli "gazoonk"]
++keep-this=value
++
++[upstream "nerp"]
++go-this=away
++
++[you-can-stay "ok"]

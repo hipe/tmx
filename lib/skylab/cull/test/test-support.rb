@@ -47,6 +47,10 @@ module Skylab::Cull::TestSupport
       TS_::Fixtures::Directories[ :freshly_initted ]
     end
 
+    def config_path
+      Config_path___[]
+    end
+
     # ~ #hook-outs for [br]
 
     def black_and_white_expression_agent_for_expect_event
@@ -58,10 +62,16 @@ module Skylab::Cull::TestSupport
     end
   end
 
+  Config_path___ = Cull_::Callback_.memoize do
+    o = Cull_::Models_::Survey
+    ::File.join o::FILENAME_, o::CONFIG_FILENAME_
+  end
+
   Expect_event_ = -> test_context_module do
     Cull_::Brazen_.test_support::Expect_Event[ test_context_module ]
   end
 
   DASH_ = '-'
+  NEWLINE_ = "\n"
   UNDERSCORE_ = '_'
 end

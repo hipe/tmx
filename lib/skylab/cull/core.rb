@@ -60,7 +60,6 @@ module Skylab::Cull
       Brazen_.event.inline_via_iambic_and_any_message_proc_to_be_defaulted i_a, msg_p
     end
 
-  public
     def handle_event_selectively
       @on_event_selectively
     end

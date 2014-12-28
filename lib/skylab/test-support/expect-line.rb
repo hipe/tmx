@@ -148,6 +148,14 @@ module Skylab::TestSupport
         expect_line_scanner.advance_to_next_rx rx
       end
 
+      def next_nonblank_line
+        advance_to_next_nonblank_line and line
+      end
+
+      def next_line
+        expect_line_scanner.next_line_
+      end
+
       def advance_to_next_nonblank_line
         expect_line_scanner.advance_to_next_rx NONBLANK_RX__
       end
@@ -186,6 +194,10 @@ module Skylab::TestSupport
       end
 
       attr_reader :line
+
+      def next_line_
+        @line = @up.gets
+      end
 
       def advance_to_next_rx rx
         @line = @up.gets

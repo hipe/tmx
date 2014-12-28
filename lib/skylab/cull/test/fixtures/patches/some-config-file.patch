@@ -1,9 +1,6 @@
 new file mode 100644
 --- /dev/null
-+++ b/.cullconfig
-@@ -0,0 +1,5 @@
-+[data-source "one"]
-+  url = two
-+  tag_a = false
-+[foo]
-+  bar = baz
++++ b/cull-survey/config
+@@ -0,0 +1,2 @@
++#ohai
++[upstream "it doesn't matter what this is"]
