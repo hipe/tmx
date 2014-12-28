@@ -111,6 +111,11 @@ module Skylab::Cull
         @a.push :_set_upstream_via_mutable_arg_box, bx
         nil
       end
+
+      def delete_upstream
+        @a.push :_delete_upstream, nil
+        nil
+      end
     end
 
     def process_subsequent_edit sh  # #hook-in [br]
@@ -155,6 +160,10 @@ module Skylab::Cull
       end
     end
 
+    def _delete_upstream _
+      _unset_monadic_slotular_section :upstream, :no_upstream_set, :deleted_upstream
+    end
+
     # ~ shared support
 
     def maybe_relativize_path path
@@ -181,6 +190,44 @@ module Skylab::Cull
     end
 
   private
+
+    def _unset_monadic_slotular_section section_symbol, no_sym, yes_sym
+
+      cfg = cfg_for_write
+
+      st = cfg.sections.to_stream.reduce_by do | x |
+        section_symbol == x.external_normal_name_symbol
+      end
+
+      delete_these = st.to_a
+
+      if delete_these.length.nonzero?
+        a = cfg.sections.delete_these_ones delete_these
+        maybe_send_event :info, yes_sym do
+          bld_deleted_slotular a, yes_sym, section_symbol
+        end
+        ACHIEVED_
+      else
+        maybe_send_event :error, :no_upstream_set do
+          build_not_OK_event_with :no_upstream_set
+        end
+        UNABLE_
+      end
+    end
+
+    def bld_deleted_slotular a, yes_sym, sym
+
+      build_event_with yes_sym,
+          :symbol, sym,
+          :count, a.length, :ok, true do | y, o |
+
+        if 1 == o.count
+          y << "deleted #{ par o.symbol.id2name }"
+        else
+          y << "deleted #{ o.count } #{ par plural_noun o.symbol.id2name }"
+        end
+      end
+    end
 
     def _set_monadic_slotular_section value_string, section_symbol
 

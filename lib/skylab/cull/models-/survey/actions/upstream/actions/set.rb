@@ -4,7 +4,7 @@ module Skylab::Cull
 
     class Actions::Upstream
 
-      Actions = ::Module.new
+      Autoloader_[ ( Actions = ::Module.new ), :boxxy ]
 
       class Actions::Set < Action_
 

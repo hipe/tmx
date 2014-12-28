@@ -94,6 +94,22 @@ module Skylab::Cull::TestSupport
 
     end
 
+    it "unset - no" do
+      call_API :survey, :upstream, :unset, :path, freshly_initted_path
+      expect_not_OK_event :no_upstream_set
+      expect_failed
+    end
+
+    it "unset - yes" do
+      td = prepare_tmpdir_with_patch :many_upstreams
+      call_API :survey, :upstream, :unset, :path, td.to_path
+      ev = expect_OK_event :deleted_upstream
+      expect_event :datastore_resource_committed_changes
+      s = black_and_white ev
+      s.should eql "deleted 3 'upstreams'"
+      expect_succeeded
+    end
+
     def prepare_tmpdir_with_patch_and_do_common sym
       td = prepare_tmpdir_with_patch sym
       call_API_with_td_and_file td, big_JSON_file
