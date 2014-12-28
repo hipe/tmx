@@ -1,8 +1,6 @@
 module Skylab::Cull
 
-  class Models_::Survey
-
-    class Actions::Upstream
+  class Models_::Upstream
 
       class File_Based_Adapter_
 
@@ -20,11 +18,11 @@ module Skylab::Cull
 
         include Simple_Selective_Sender_Methods_
 
-        def marshal_dump_for_survey survey
+        def marshal_dump_for_survey_ survey
 
           "file:#{ survey.maybe_relativize_path @path }"
         end
       end
-    end
+
   end
 end

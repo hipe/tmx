@@ -18,7 +18,10 @@
 looking at it is as a specialized spreadsheet front-loaded with idioms
 and logic to the end of making table-ish reports.
 
-the reports it produces can be any permutation of quantitative and
+another way of thinking of it is as a recommender system, but that
+connotes something a bit heavier than `cull` aims to be.
+
+the reports that [cu] produces can be any permutation of quantitative and
 qualitative. specifically, they can be one, the other or both. by this
 very definition we are now positing here, the machine does not know what
 the criteria are for a report that is qualitative. as such the machine's
@@ -116,7 +119,7 @@ then it probably has no utility in doing so (again) at this point.
 
 ### scoring
 
-scoring, then, is (for now) simple arithmetic: with eeach entity from
+scoring, then, is (for now) simple arithmetic: with each entity from
 the "entity stream" we pass that entity to each "criterion" in the
 "criteria". each criterion results in a real number (perhaps negative).
 the score for each entity is simply the sum of these numbers.

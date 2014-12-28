@@ -1,32 +1,42 @@
 module Skylab::Cull
 
-  class Models_::Survey
+  class Models_::Upstream < Model_
 
-    class Actions::Upstream < Model_
+      class First_Edit
 
-      def initialize srv
-        @survey = srv
-        super
+        def initialize
+          @bx = Callback_::Box.new
+        end
+
+        def reference_path x
+          @bx.set :_any_ref_path, x
+        end
+
+        def shell sh
+          sh.bx.each_pair do | i, x |
+            @bx.set i, x
+          end
+          nil
+        end
+
+        def via_mutable_arg_box bx
+          @bx.set :_up_id, bx[ :upstream_identifier ].value_x
+        end
+
+        attr_reader :bx
       end
-
-    private
 
       def first_edit_shell
-        self
+        First_Edit.new
       end
 
-      public def via_mutable_arg_box bx
+      def process_first_edit sh
 
-        @___argument_string___ = bx[ :upstream_identifier ].value_x
+        bx = sh.bx
 
-        nil
-      end
+        @reference_path = bx[ :_any_ref_path ]
 
-      def process_first_edit _
-
-        md = /\A([^:]*):?(.+)?\z/.match @___argument_string___
-
-        @___argument_string___ = nil
+        md = /\A([^:]*):?(.+)?\z/.match bx[ :_up_id ]
 
         @prefix, identifier_string = md.captures
 
@@ -61,13 +71,11 @@ module Skylab::Cull
       end
 
       public def process_as_file_identifier_string str
-        path = via_survey_dir_absolutize_path str
+        path = _via_reference_path_absolutize_path str
         path and process_as_file_absolute_path path
       end
 
       include Simple_Selective_Sender_Methods_
-
-      include Survey_Action_Methods_
 
       def process_as_file_absolute_path path
 
@@ -128,46 +136,43 @@ module Skylab::Cull
         end
       end
 
+      def _via_reference_path_absolutize_path str
+        if str
+          if str.length.zero?
+            UNABLE_
+          elsif ::File::SEPARATOR == str[ 0 ]
+            str
+          elsif @reference_path
+            ::File.join @reference_path, str
+          else
+            when_relpath str
+          end
+        else
+          str
+        end
+      end
+
+      def when_relpath path
+        maybe_send_event :error, :no_relative_paths do
+          build_not_OK_event_with :no_relative_paths, path
+        end
+        UNABLE_
+      end
+
     public
+
+      def marshal_dump_for_survey sur
+        @_adapter.marshal_dump_for_survey_ sur
+      end
 
       def to_event
         @_adapter.to_descriptive_event
       end
 
-      def marshal_dump
-        @_adapter.marshal_dump_for_survey @survey
-      end
-
-      if false
-
-  class Models::Data::Source::Collection
-
-    CodeMolester::Config::File::Entity::Collection.enhance self do
-
-      with Models::Data::Source
-
-      add
-
-      list_as_json
-
-    end
-  end
-
-  class Models::Data::Source::Controller
-
-    CodeMolester::Config::File::Entity::Controller.enhance self do
-
-      with Models::Data::Source
-
-      add
-
-    end
-  end
-      end
 
       FILE_FTYPE_ = 'file'
 
       Upstream_ = self
-    end
+
   end
 end

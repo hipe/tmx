@@ -1,8 +1,6 @@
 module Skylab::Cull
 
-  class Models_::Survey
-
-    class Actions::Upstream
+  class Models_::Upstream
 
       class Adapters__::Markdown < Upstream_::File_Based_Adapter_
 
@@ -16,6 +14,6 @@ module Skylab::Cull
           end
         end
       end
-    end
+
   end
 end

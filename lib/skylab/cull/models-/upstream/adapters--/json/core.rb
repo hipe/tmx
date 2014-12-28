@@ -1,8 +1,6 @@
 module Skylab::Cull
 
-  class Models_::Survey
-
-    class Actions::Upstream
+  class Models_::Upstream
 
       Autoloader_[ ( Adapters__ = ::Module.new ), :boxxy ]  # ~ stowaway
 
@@ -18,6 +16,6 @@ module Skylab::Cull
           end
         end
       end
-    end
+
   end
 end

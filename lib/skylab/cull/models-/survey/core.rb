@@ -326,26 +326,11 @@ module Skylab::Cull
           ACHIEVED_
         end
       end
-
-      def via_survey_dir_absolutize_path str
-        if str
-          if str.length.zero?
-            UNABLE_
-          elsif ::File::SEPARATOR == str[ 0 ]
-            str
-          else
-            ::File.join @survey.path, str
-          end
-        else
-          str
-        end
-      end
     end
 
     CONFIG_FILENAME_ = 'config'.freeze
     DIR_FTYPE_ = 'directory'.freeze
     FILENAME_ = 'cull-survey'.freeze
     Self_ = self
-    UNABLE_ = false
   end
 end
