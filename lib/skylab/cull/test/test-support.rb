@@ -51,6 +51,10 @@ module Skylab::Cull::TestSupport
       Config_path___[]
     end
 
+    def file_path sym
+      TS_::Fixtures::Files[ sym ]
+    end
+
     # ~ #hook-outs for [br]
 
     def black_and_white_expression_agent_for_expect_event

@@ -201,9 +201,9 @@ module Skylab::Brazen
       Brazen_.event.wrap.signature name, ev
     end
 
-  public  # ~ accessors for arguments & related experimentals
+    # ~ accessors for arguments & related experimentals
 
-    private def to_bound_argument_box
+    def to_bound_argument_box
       bx = Callback_::Box.new
       st = formal_properties.to_stream
       prp = st.gets
@@ -213,6 +213,20 @@ module Skylab::Brazen
       end
       bx
     end
+
+    def to_bound_argument_box_except * i_a
+      bld_bound_argument_box_via_name_symbols get_formal_property_name_symbols - i_a
+    end
+
+    def bld_bound_argument_box_via_name_symbols i_a
+      bx = Callback_::Box.new
+      i_a.each do | sym |
+        bx.set( sym, get_bound_property_via_property( self.class.property_via_symbol sym ) )
+      end
+      bx
+    end
+
+  public
 
     def get_bound_argument i
       get_bound_property_via_property formal_properties.fetch i

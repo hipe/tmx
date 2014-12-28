@@ -16,7 +16,7 @@ module Skylab::Cull
       def execute
         if @upstream_identifier
           via_ID
-        elsif
+        else
           process_as_file_identifier_string @upstream_file
         end
       end

@@ -14,6 +14,21 @@ module Skylab::Cull::TestSupport
 
     end
 
+    module Files
+
+      class << self
+        def [] sym
+          s = sym.id2name
+          s[ s.rindex UNDERSCORE_ ] = DOT_
+          s.gsub! UNDERSCORE_, DASH_
+          dir_pathname.join( s ).to_path
+        end
+      end
+
+      Cull_::Autoloader_[ self ]
+
+    end
+
     module Patches
 
       class << self
@@ -25,5 +40,7 @@ module Skylab::Cull::TestSupport
       Cull_::Autoloader_[ self ]
 
     end
+
+    DOT_ = '.'.freeze
   end
 end

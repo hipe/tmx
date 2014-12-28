@@ -10,10 +10,13 @@ module Skylab::Cull
 
       def mutable_arg_box bx
 
-        x = bx[ :upstream_adapter ]
-        if x
-          @bx.set :upstream_adapter, x.value_x
-        end
+        # ~ some actions have these (as formals, not nec. as actuals)
+
+        x = bx[ :upstream_adapter ] and @bx.set( :upstream_adapter, x.value_x )
+
+        x = bx[ :upstream_file ] and @bx.set( :upstream_file, x.value_x )
+
+        # ~ all actions have these (as formals, but not nec. as actuals)
 
         @bx.set :upstream_identifier, bx[ :upstream_identifier ].value_x
 
@@ -70,6 +73,14 @@ module Skylab::Cull
 
     def to_event
       @_adapter.to_descriptive_event
+    end
+
+    def to_entity_collection_stream
+      @_adapter.to_entity_collection_stream
+    end
+
+    def event_for_fell_short_of_count needed_number, had_number
+      @_adapter.event_for_fell_short_of_count needed_number, had_number
     end
 
 

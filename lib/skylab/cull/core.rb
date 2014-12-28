@@ -26,6 +26,10 @@ module Skylab::Cull
     end
   end
 
+  module Models_
+    Autoloader_[ self, :boxxy ]
+  end
+
   HARD_CALL_METHOD_ = -> arg_box, & oes_p do
 
     seen = false
@@ -76,6 +80,11 @@ module Skylab::Cull
       @on_event_selectively.call( * i_a, & ev_p )
     end
 
+    def build_not_OK_event_with * i_a, & msg_p
+      i_a.push :ok, false
+      Brazen_.event.inline_via_iambic_and_any_message_proc_to_be_defaulted i_a, msg_p
+    end
+
     def build_event_with * i_a, & msg_p
       Brazen_.event.inline_via_iambic_and_any_message_proc_to_be_defaulted i_a, msg_p
     end
@@ -89,10 +98,17 @@ module Skylab::Cull
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
-    HL__ = sidesys[ :Headless ]
+    Basic = sidesys[ :Basic ]
 
     Filesystem = -> do
       HL__[].system.filesystem
+    end
+
+    HL__ = sidesys[ :Headless ]
+
+    String_scanner = -> x do
+      require 'strscan'
+      ::StringScanner.new x
     end
 
     System = -> do
@@ -105,6 +121,7 @@ module Skylab::Cull
   Cull_ = self
   Kernel_ = Brazen_.kernel_class
   Model_ = Brazen_.model.model_class
+  NIL_ = nil
   UNABLE_ = false
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname( __FILE__ ) ) ]

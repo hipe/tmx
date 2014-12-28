@@ -670,6 +670,10 @@ module Skylab::Brazen
         self.class.properties
       end
 
+      def get_formal_property_name_symbols
+        self.class.entity_formal_property_method_names_box_for_read.get_names
+      end
+
     private
 
       def bound_properties

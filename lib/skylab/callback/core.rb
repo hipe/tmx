@@ -98,9 +98,9 @@ module Skylab::Callback
         end.execute
       end
 
-      def with * x_a, & p  # #note-70
-        p and self._WAHOO
+      def with * x_a, & oes_p  # #note-70
         new do
+          @on_event_selectively = oes_p
           process_iambic_fully x_a
         end.execute
       end

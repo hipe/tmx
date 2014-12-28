@@ -29,10 +29,13 @@ module Skylab::Basic
           :minimum
 
         def initialize
+          @argument = nil
           @minimum = nil
           super
           normalize_self
-          freeze
+          if ! @argument
+            freeze
+          end
         end
 
         def normalize_argument arg, & oes_p
