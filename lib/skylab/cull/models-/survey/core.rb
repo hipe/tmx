@@ -94,7 +94,7 @@ module Skylab::Cull
 
     class Subsequent_Edit_Shell__
 
-      # think of this as a struture for modeling all the changes that might
+      # think of this as a structure for modeling all the changes that might
       # be (and were requested to be) made to an existing entity. first, we
       # cache all the changes here as one atomic-esque structure. then in a
       # separate step we flush the changes to the entity. then IFF flushing
@@ -137,7 +137,7 @@ module Skylab::Cull
 
       upstream = Self_::Actions::Upstream.edit_entity( self, handle_event_selectively ) do | o |
 
-        o.via_mutable_arg_box bx
+        o.mutable_arg_box bx
 
       end
 

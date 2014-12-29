@@ -9,7 +9,7 @@ module Skylab::Cull
         :dry_run,
         :path
 
-      define_singleton_method :[], COMMON_ACTOR_AREF_METHOD_
+      define_singleton_method :[], HARD_CALL_METHOD_
 
       def initialize & edit_p
 

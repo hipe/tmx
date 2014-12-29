@@ -26,12 +26,11 @@ module Skylab::Cull
     end
   end
 
-  COMMON_ACTOR_AREF_METHOD_ = -> arg_box, & oes_p do
+  HARD_CALL_METHOD_ = -> arg_box, & oes_p do
 
     seen = false
 
     x = new do
-
       seen = true
 
       st = self.class.properties.to_stream
@@ -47,7 +46,28 @@ module Skylab::Cull
       @on_event_selectively = oes_p
     end
 
-    seen and x.execute
+    seen && x.execute
+  end
+
+  VALUE_BOX_CALL_METHOD_ = -> value_box, & oes_p do
+
+    seen = false
+
+    x = new do
+      seen = true
+
+      st = self.class.properties.to_stream
+
+      prp = st.gets
+      while prp
+        instance_variable_set :"@#{ prp.name_symbol }", value_box[ prp.name_symbol ]
+        prp = st.gets
+      end
+
+      @on_event_selectively = oes_p
+    end
+
+    seen && x.execute
   end
 
   module Simple_Selective_Sender_Methods_
