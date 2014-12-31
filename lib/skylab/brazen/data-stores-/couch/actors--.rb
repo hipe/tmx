@@ -108,7 +108,7 @@ module Skylab::Brazen
     private
 
       def _JSON
-        Lib_::JSON[]
+        LIB_.JSON
       end
     end
   end

@@ -35,7 +35,7 @@ module Skylab::Brazen
     end
 
     def _lib
-      Brazen_::Lib_::SHELL
+      LIB_
     end
 
     def members

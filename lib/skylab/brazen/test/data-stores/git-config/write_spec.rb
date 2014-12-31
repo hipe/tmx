@@ -29,7 +29,7 @@ module Skylab::Brazen::TestSupport::Data_Stores::Git_Config
     it "don't fall over on backslashes" do
       _a = [ Callback_.pair.new( '\b', :'two-characters' ) ]
       _scan = Callback_.scan.via_nonsparse_array _a
-      io = Brazen_::Lib_::String_IO[].new
+      io = Brazen_::LIB_.string_IO.new
       x = subject.write io, _scan, 'sub.sect', 'se-ct'
       x.should eql true
       s = io.string

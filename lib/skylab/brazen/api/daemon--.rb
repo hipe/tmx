@@ -45,7 +45,7 @@ module Skylab::Brazen
     public
 
       def debug_IO
-        @debug_IO ||= Lib_::HL__[]::System::IO.some_stderr_IO
+        @debug_IO ||= LIB_.system.IO.some_stderr_IO
       end
 
       def expression_agent_class

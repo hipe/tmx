@@ -6,11 +6,11 @@ the age of this content is older that as is reflected in the VCS).
 ### implementation
 
 just for fun we implement our own double-buffering. yes, OS IO is better at
-this generally, but we do it ourselves just as an excercize, and in case we
+this generally, but we do it ourselves just as an exercise, and in case we
 ever want to have arbitrarily complex critera for what constitues a record
 and record separator.
 
-also as an excercize, this is written in functional soup: the only instance
+also as an exercise, this is written in functional soup: the only instance
 variables that we employ are either procs that operate within a closure, or
 they are auxiliary service accessors (i.e not part of the core algorithm or
 operation). all of our public methods simply wrap these procs (or again are

@@ -130,8 +130,8 @@ module Skylab::Brazen
 
         def via_append_generated_UUID_resolve_URI
 
-          @req = Lib_::Net_HTTP[]::Get.new UUIDS_URL__
-          @response = Lib_::Net_HTTP[].start @host, @port do |http|
+          @req = LIB_.Net_HTTP::Get.new UUIDS_URL__
+          @response = LIB_.Net_HTTP.start @host, @port do |http|
             http.request @req
           end
 
@@ -152,7 +152,7 @@ module Skylab::Brazen
         end
 
         def via_response_resolve_UUID
-          h = Lib_::JSON[].parse @response.body
+          h = LIB_.JSON.parse @response.body
           @UUID = h.fetch( UUIDS__ ).fetch 0 ; nil
         end
         UUIDS__ = 'uuids'.freeze
@@ -188,11 +188,11 @@ module Skylab::Brazen
         SIMPLE_SAFETY_RX__ = /\A[-0-9a-z]+\z/
 
         def do_send_and_receive
-          _cls = Lib_::Net_HTTP[].const_get @HTTP_method_i, false
+          _cls = LIB_.Net_HTTP.const_get @HTTP_method_i, false
           @req = _cls.new @URI_s
           apply_headers
           @req.body = @body_s
-          @response = Lib_::Net_HTTP[].start @host, @port do |http|
+          @response = LIB_.Net_HTTP.start @host, @port do |http|
             http.request @req
           end ; nil
         end
@@ -244,7 +244,7 @@ module Skylab::Brazen
       private
 
         def rsp_body_to_event  # needs block
-          h = Lib_::JSON[].parse @response.body
+          h = LIB_.JSON.parse @response.body
           a = ::Array.new h.length * 2 + 1
           s_a = h.keys ; s_a.sort!
           s_a.each_with_index do |s, d|

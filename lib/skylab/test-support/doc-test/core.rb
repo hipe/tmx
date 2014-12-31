@@ -318,12 +318,8 @@ module Skylab::TestSupport
 
     BLANK_RX_ = /\A[[:space:]]*\z/
 
-    DASH_ = '-'.freeze
-
     DocTest_ = self
 
     IDENTITY_ = -> x { x }
-
-    UNDERSCORE_ = '_'.freeze
   end
 end

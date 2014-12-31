@@ -77,41 +77,50 @@ module Skylab::Callback
 
     module MM__
 
-      def [] * a
+      def [] * a, & oes_p
         new do
+          @on_event_selectively = oes_p
           process_arglist_fully a
+        end.execute
+      end
+
+      def call * x_a, & oes_p
+        new do
+          @on_event_selectively = oes_p
+          process_iambic_fully x_a
         end.execute
       end
 
       def via_arglist a, & p
+        p and self._WAHOO
         new do
           process_arglist_fully a
-          p and p[ self ]
         end.execute
       end
 
       def with * x_a, & p  # #note-70
+        p and self._WAHOO
         new do
           process_iambic_fully x_a
-          p and p[ self ]
         end.execute
       end
 
       def build_with * x_a, & p
+        p and self._WAHOO
         new do
           process_iambic_fully x_a
-          p and p[ self ]
         end
       end
 
       def via_iambic x_a, & p
+        p and self._WAHOO
         new do
           process_iambic_fully x_a
-          p and p[ self ]
         end.execute
       end
 
-      def build_via_iambic x_a
+      def build_via_iambic x_a, & p
+        p and self._WAHOO
         new do
           process_iambic_fully x_a
         end

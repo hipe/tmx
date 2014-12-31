@@ -68,6 +68,11 @@ module Skylab::Headless
 
       LINE_RX__ = Headless_._lib.string_lib.regex_for_line_scanning
 
+      # ~
+
+      def to_identifier
+        Headless_._lib.basic::Pathname.identifier @pathname
+      end
     end
   end
 end

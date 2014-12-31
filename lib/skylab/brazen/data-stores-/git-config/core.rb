@@ -167,7 +167,7 @@ module Skylab::Brazen
         @column_number = nil
         @line_number = 0
         @state_i = initial_state_i
-        @lines = @input_id.input_lines_adapter
+        @lines = @input_id.to_line_stream_
         resolve_document
       end
 
@@ -323,7 +323,7 @@ module Skylab::Brazen
         end
       end
 
-      def input_lines_adapter
+      def to_line_stream_
         @io
       end
     end
@@ -335,10 +335,10 @@ module Skylab::Brazen
       end
 
       def description_under _expr_
-        Lib_::Ellispify[ @s ].inspect
+        LIB_.ellispsify( @s ).inspect
       end
 
-      def input_lines_adapter
+      def to_line_stream_
         String_Input_Adapter_.new @s
       end
     end
@@ -350,7 +350,7 @@ module Skylab::Brazen
       end
 
       def members
-        [ :to_path, :to_pathname, :description_under, :input_lines_adapter ]
+        [ :to_path, :to_pathname, :description_under, :to_line_stream_ ]
       end
 
       def to_path
@@ -362,13 +362,10 @@ module Skylab::Brazen
       end
 
       def description_under expr
-        s = @path_s
-        expr.calculate do
-          pth s
-        end
+        Brazen_._lib.basic::Pathname.description_under_of_path expr, @path_s
       end
 
-      def input_lines_adapter
+      def to_line_stream_
         Path_Input_Adapter_.new @path_s
       end
     end

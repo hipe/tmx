@@ -4,6 +4,12 @@ module Skylab::Basic
 
     class << self
 
+      def description_under_of_path expag, path
+        expag.calculate do
+          pth path
+        end
+      end
+
       def expand_real_parts_by_relative_parts real_parts, rel_parts, sep=FILE_SEP_, & oes_p
 
         a = real_parts.dup
@@ -54,6 +60,10 @@ module Skylab::Basic
 
     public
 
+      def identifier pathname
+        Identifier__.new pathname
+      end
+
       def members
         singleton_class.public_instance_methods( false ) - [ :members ]
       end
@@ -72,6 +82,17 @@ module Skylab::Basic
             ::Pathname.new x
           end
         end
+      end
+    end  # >>
+
+    class Identifier__
+
+      def initialize pn
+        @pn = pn
+      end
+
+      def description_under expag
+        Pathname_.description_under_of_path expag, @pn.to_path
       end
     end
 

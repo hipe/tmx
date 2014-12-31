@@ -43,6 +43,7 @@ module Skylab::TestSupport  # :[#021].
 
   ACHIEVED_ = true
   CONST_SEP_ = '::'.freeze
+  DASH_ = '-'.freeze
   DOT_DOT_ = '..'.freeze
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> {}
@@ -55,5 +56,6 @@ module Skylab::TestSupport  # :[#021].
   TEST_DIR_FILENAME_ = 'test'.freeze
   TestSupport_ = self  # there is another module called ::SL::TS::TS
   UNABLE_ = false
+  UNDERSCORE_ = '_'.freeze
 
 end

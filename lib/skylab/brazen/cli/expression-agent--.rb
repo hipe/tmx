@@ -114,7 +114,7 @@ module Skylab::Brazen
       end
 
       public def stylize s, * i_a
-        Brazen_::Lib_::Old_CLI_lib[].pen.stylify i_a, s
+        LIB_.old_CLI_lib.pen.stylify i_a, s
       end
 
       def val s
@@ -132,7 +132,7 @@ module Skylab::Brazen
       end
 
       Singleton_instance__ = Callback_.memoize do
-        _partitions = Brazen_::Lib_::Proxy_lib[].
+        _partitions = LIB_.proxy_lib.
           inline :rendering_method_name_for, -> prp do
             :render_prop_as_unknown
           end

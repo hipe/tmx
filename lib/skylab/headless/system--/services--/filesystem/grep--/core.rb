@@ -74,7 +74,7 @@ module Skylab::Headless
         end
 
         def via_ruby_regexp_mixed_result
-          opts = Headless_::Lib_::Bsc_[]::Regexp.options_via_regexp @ruby_regexp
+          opts = Headless_._lib.basic::Regexp.options_via_regexp @ruby_regexp
           xtra_i_a = nil
           if opts.is_multiline
             ( xtra_i_a ||= [] ).push :MULTILINE

@@ -31,12 +31,10 @@ module Skylab::Headless
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
-    Bsc__ = sidesys[ :Basic ]
-
-    Bsc_ = Bsc__
+    Basic = sidesys[ :Basic ]
 
     Meso_box_lib = -> do
-      Bsc__[]::Box
+      Basic[]::Box
     end
 
     Bzn_ = sidesys[ :Brazen ]
@@ -58,7 +56,7 @@ module Skylab::Headless
     end
 
     Enumerator_lib = -> do
-      Bsc__[]::Enumerator
+      Basic[]::Enumerator
     end
 
     Event_lib = -> do
@@ -74,17 +72,17 @@ module Skylab::Headless
     end
 
     List_lib = -> do
-      Bsc__[]::List
+      Basic[]::List
     end
 
     MH__ = sidesys[ :MetaHell ]
 
     Method_lib = -> do
-      Bsc__[]::Method
+      Basic[]::Method
     end
 
     Module_lib = -> do
-      Bsc__[]::Module
+      Basic[]::Module
     end
 
     Old_box_lib = -> do
@@ -121,11 +119,11 @@ module Skylab::Headless
     end
 
     String_lib = -> do
-      Bsc__[]::String
+      Basic[]::String
     end
 
     Tree_lib = -> do
-      Bsc__[]::Tree
+      Basic[]::Tree
     end
   end
 end

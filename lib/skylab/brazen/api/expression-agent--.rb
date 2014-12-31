@@ -101,7 +101,7 @@ module Skylab::Brazen
           def make_NLP_agent * x_a
             cls = ::Class.new
             x_a.unshift cls
-            Lib_::NLP_EN_methods[].via_arglist x_a
+            LIB_.NLP_EN_methods.via_arglist x_a
             cls
           end
         end
