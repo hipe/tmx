@@ -59,13 +59,13 @@
 [#122]       #parent-node: [#050] a list of hash tags and their tentative m..
 [#121]       #parent-node: [#120] "bundle as method definitions macro.."
 [#120]       #parent-node: [#090] patterns for developing bundles ..
-[#119]       #parent-node: [#095] the method naming shibboleth
+[#119]       #parent-node: [#095] "the method naming shibboleth.."
 [#118]       #parent-node: [#092] "memberhood" defined
 [#117]       #parent-node: [#069] what does "application" even mean?
 [#116]       #parent-node: [#050] "vectors of concern defined.."
 [#115]       #biliographic-reference: the Wikipedia page on _Idiom_
               (the text cited is from user Glane23 from 2010-03-11)
-[#114]       #parent-node: [#097] name conventions for const values..
+[#114]       #parent-node: [#097] "name conventions for const values.."
 [#113]       #parent-node: [#091] "the meaning of node in this context.."
 [#112]       #parent-node: [#106] "a list of idioms.."
 [#111]       #parent-node: [#093] "the idiomacy of plural noun phrases.."

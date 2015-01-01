@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module Pathname
 
-      class Normalization__ < Basic_::Normalization_
+      class Normalization__
 
         # do not let this seep into the scope of [#hl-022]. do not use FS here
 
@@ -15,7 +15,7 @@ module Skylab::Basic
             end
             ok && x
           end
-        end
+        end  # >>
 
         Basic_._lib.entity self do
 
@@ -78,17 +78,16 @@ module Skylab::Basic
 
       public
 
-        def normalize_via_three arg, ok_val_p, evr
+        def normalize_argument arg, & oes_p
           otr = dup
-          otr.init_copy_via_three arg, ok_val_p, evr
+          otr.init_copy arg, & oes_p
           otr.execute
         end
 
-        protected def init_copy_via_three arg, ok_val_p, evr
+        protected def init_copy arg, & oes_p
           @arg = arg
-          @as_normal_value = ok_val_p
-          @event_receiver = evr
-          init_event_proc ; nil
+          oes_p and @on_event_selectively = oes_p
+          nil
         end
 
         def execute
@@ -220,27 +219,31 @@ module Skylab::Basic
         end
 
         def when_bad_box
-          i = @bad_box.first_name  # for now we don't report every issue
-          nope :"path_cannot_contain_#{ i }"
+          nope :"path_cannot_contain_#{ @bad_box.first_name }"
+            # for now we don't report every issue
         end
 
         # the above generates:
-        # path_cannot_contain_single_dot,
-        # path_cannot_contain_contain_dot_dot
-        # path_cannot_contain_contain_dot_file
+        #   + `path_cannot_contain_single_dot`
+        #   + `path_cannot_contain_contain_dot_dot`
+        #   + `path_cannot_contain_contain_dot_file`
 
         def accept_arg_as_is
-          @result = @as_normal_value[ @arg.value_x ]
+          @result = @arg
           ACHIEVED_
         end
 
-        def nope i
-          mxa = [ i,
-            :path, @value_x,
-            :prop, @arg.property ]
-          @result = send_not_OK_event_with_mutable_iambic_and_any_msg_p mxa
+        def nope terminal_channel_symbol
+          @result = maybe_send_event :error, :invalid_property_value do
+            build_argument_error_event_with terminal_channel_symbol,
+              :path, @value_x,
+              :prop, @arg.property
+          end
           UNABLE_
         end
+
+        include Simple_Selective_Sender_Methods_  # instead of "entity"'s
+          # event-building stuff, just for consistency within the library
       end
   end
 end

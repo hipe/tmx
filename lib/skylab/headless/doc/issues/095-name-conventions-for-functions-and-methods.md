@@ -267,7 +267,12 @@ malleability by being faster to refactor.
 
 this is a bit of a contentious pattern, but one we find utility from:
 for certain kinds of classes/modules, we may abbreviate certain words of
-certain of their method names in a regular way. to absolutely *anyone*
+certain of their method names in a regular way.
+
+(as well there is a simplified variant whose draft is in the commit
+message of this commit)
+
+to absolutely *anyone*
 who hasn't read this, the effect may just appear as messy and erratic,
 but there is in fact an a simple set of rules governing this obscure
 shorthand. this section describes both the pattern behind this chaos

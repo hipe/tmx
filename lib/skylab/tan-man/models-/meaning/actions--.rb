@@ -7,14 +7,14 @@ module Skylab::TanMan
         :persist_to, :meaning,
 
         :required,
-        :ad_hoc_normalizer, -> bound, val_p, ev_p do
-          Meaning_::Actors__::Edit::Normalize_name[ bound, val_p, ev_p ]
+        :ad_hoc_normalizer, -> arg, & oes_p do
+          Meaning_::Actors__::Edit::Normalize_name[ arg, & oes_p ]
         end,
         :property, :name,
 
         :required,
-        :ad_hoc_normalizer, -> bound, val_p, ev_p do
-          Meaning_::Actors__::Edit::Normalize_value[ bound, val_p, ev_p ]
+        :ad_hoc_normalizer, -> arg, & oes_p do
+          Meaning_::Actors__::Edit::Normalize_value[ arg, & oes_p ]
         end,
         :property, :value
 

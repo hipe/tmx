@@ -86,6 +86,34 @@ module Skylab::Basic  # introduction at [#020]
     end.new
   end
 
+  module Simple_Selective_Sender_Methods_
+
+    # for better regression, don't load the event lib until you need it
+
+  private
+
+    def maybe_send_event * i_a, & ev_p
+      if @on_event_selectively
+        @on_event_selectively[ * i_a, & ev_p ]
+      else
+        raise ev_p[].to_exception
+      end
+    end
+
+    def build_argument_error_event_with * x_a, & msg_p
+      x_a.push :error_category, :argument_error
+      build_not_OK_event_via_mutable_iambic_and_message_proc x_a, msg_p
+    end
+
+    def build_not_OK_event_with * x_a, & msg_p
+      build_not_OK_event_via_mutable_iambic_and_message_proc x_a, msg_p
+    end
+
+    def build_not_OK_event_via_mutable_iambic_and_message_proc x_a, msg_p
+      Basic_._lib.event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, msg_p
+    end
+  end
+
   class Trio_  # :[#038].
 
     class << self
@@ -111,9 +139,11 @@ module Skylab::Basic  # introduction at [#020]
       [ :actuals_has_name, :property, :name_i, :name, :value_x ]
     end
 
-    def name_i
-      @property.name_i
+    def name_symbol
+      @property.name_symbol
     end
+
+    alias_method :name_i, :name_symbol
 
     def name
       @property.name

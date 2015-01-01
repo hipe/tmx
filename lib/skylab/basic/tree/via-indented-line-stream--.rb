@@ -4,9 +4,7 @@ module Skylab::Basic
 
     class Via_Indented_Line_Stream__
 
-      Lazy_Selective_Event_Builder_Sender_Methods__ = ::Module.new
-
-      include Lazy_Selective_Event_Builder_Sender_Methods__
+      include Simple_Selective_Sender_Methods_
 
       def initialize * a
         @build_using, @stream, @glyph, @on_event_selectively = a
@@ -142,7 +140,7 @@ module Skylab::Basic
           ACHIEVED_
         else
           maybe_send_event :error, :whitespace_mismatch do
-            build_not_OK_event :whitespace_mismatch,
+            build_not_OK_event_with :whitespace_mismatch,
                 :previous_whitespace, current_frame.indent_s,
                 :current_whitespace, @frame.indent_s do |y, o|
               y << "whitespace mismatch"
@@ -158,7 +156,7 @@ module Skylab::Basic
         begin
           if @stack.length.zero?
             maybe_send_event :error, :invalid_dedent do
-              build_not_OK_event :invalid_dedent
+              build_not_OK_event_with :invalid_dedent
             end
             ok = false
             break
@@ -198,7 +196,7 @@ module Skylab::Basic
       attr_reader :frame
 
       def bld_line_parse_error
-        build_not_OK_event :line_does_not_have_glyph,
+        build_not_OK_event_with :line_does_not_have_glyph,
             :line, @line, :glyph, @glyph do |y, o|
           y << "line does not have glyph #{ ick o.glyph }: #{ ick o.line }"
         end
@@ -206,24 +204,6 @@ module Skylab::Basic
 
       Frame__ = ::Struct.new :indent_s, :indent_d, :content_s
 
-      module Lazy_Selective_Event_Builder_Sender_Methods__
-
-        # don't load event lib until you need it (for better regression)
-
-      private
-
-        def build_not_OK_event * i_a, & msg_p
-          Basic_._lib.event.inline_not_OK_via_mutable_iambic_and_message_proc i_a, msg_p
-        end
-
-        def maybe_send_event * i_a, & ev_p
-          if @on_event_selectively
-            @on_event_selectively[ * i_a, & ev_p ]
-          else
-            raise ev_p[].to_exception
-          end
-        end
-      end
     end
   end
 end

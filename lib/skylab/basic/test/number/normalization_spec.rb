@@ -29,16 +29,15 @@ module Skylab::Basic::TestSupport::Numeric
       it "builds" do
       end
 
-      it "with an evr againt an integer-looking string" do
-        use_event_receiver_against '123'
+      it "againt an integer-looking string" do
+        normalize_against '123'
         output_value_was_written
         @output_x.should eql 123
-        @result_x.should eql :happy
         expect_no_events
       end
 
-      it "with an evr against a non-integer looking string" do
-        use_event_receiver_against 'A'
+      it "against a non-integer looking string" do
+        normalize_against 'A'
         output_value_was_not_written
         @result_x.should eql false
         expect_not_OK_event expected_terminal_channel,
@@ -46,25 +45,8 @@ module Skylab::Basic::TestSupport::Numeric
         expect_no_more_events
       end
 
-      it "with a proc evr against an integer-looking string" do
-        use_event_proc_against '456'
-        output_value_was_written
-        event_proc_was_not_called
-        @output_x.should eql 456
-        @result_x.should eql :happy
-      end
-
-      it "with a proc evr against a non-integer looking string" do
-        use_event_proc_against 'A'
-        output_value_was_not_written
-        @result_x.should eql :sad_from_proc
-        ( 4..12 ).should be_include @event_x_a.length
-        @event_x_a.first.should eql expected_terminal_channel
-        @event_x_a.last.arity.should eql 2  # msg proc
-      end
-
       it "against a float" do
-        use_event_receiver_against 1.23
+        normalize_against 1.23
         output_value_was_not_written
         expect_not_OK_event expected_terminal_channel
         @result_x.should eql false
@@ -82,12 +64,12 @@ module Skylab::Basic::TestSupport::Numeric
       end
 
       it "when input is below minimum (string)" do
-        use_event_receiver_against '-4'
+        normalize_against '-4'
         expect_result_for_input_was_below_minimum
       end
 
       it "when input is below minimum (int)" do
-        use_event_receiver_against( -4 )
+        normalize_against( -4 )
         expect_result_for_input_was_below_minimum
       end
 
@@ -103,14 +85,14 @@ module Skylab::Basic::TestSupport::Numeric
       end
 
       it "when input is at minimum it is OK" do
-        use_event_receiver_against '-3'
+        normalize_against '-3'
         output_value_was_written
         @output_x.should eql( -3 )
         expect_no_events
       end
 
       it "when input is above minimum OK too" do
-        use_event_proc_against( -2 )
+        normalize_against( -2 )
         output_value_was_written
         event_proc_was_not_called
         @output_x.should eql( -2 )

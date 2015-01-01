@@ -84,7 +84,7 @@ module Skylab::Brazen::TestSupport::Model::Entity
           ok = procez :zoip, -3
         end
         ok.should eql false
-        _i_a.should eql [ :error, :number_too_small ]
+        _i_a.should eql [ :error, :invalid_property_value]
         ev.terminal_channel_i.should eql :number_too_small
       end
     end

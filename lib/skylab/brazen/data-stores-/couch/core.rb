@@ -13,13 +13,14 @@ module Skylab::Brazen
       o :description, -> y do
         y << "the name of the database"
       end,
-      :ad_hoc_normalizer, -> arg, val_p, ev_p do
-        x = arg.value_x
-        if /\A[-a-z0-9]+\z/ =~ x
-          val_p[ x ]
+      :ad_hoc_normalizer, -> arg, & oes_p do
+        if /\A[-a-z0-9]+\z/ =~ arg.value_x
+          arg
         else
-          ev_p[ :error, :name_must_be_lowercase_alphanumeric_with_dashes,
-                :name_s, x, :ok, false, nil ]
+          oes_p.call :error, :invalid_property_value do
+            Brazen_.event.inline_not_OK_with(
+              :name_must_be_lowercase_alphanumeric_with_dashes, :name_s, x )
+          end
         end
       end,
       :required,
@@ -37,15 +38,19 @@ module Skylab::Brazen
         y << "the HTTP port to connect to (default: #{ property_default })"
       end,
       :default, '5984',
-      :ad_hoc_normalizer, -> arg, val_p, ev_p do
+      :ad_hoc_normalizer, -> arg, & oes_p do
         x = arg.value_x
         if x
           if /\A[0-9]{1,4}\z/ =~ x
-            val_p[ x ]
+            arg
           else
-            ev_p[ :error, :port_must_be_one_to_four_digits, :port_s, x,
-                  :ok, false, nil ]
+            oes_p.call :error, :invalid_property_value do
+              Brazen_.event.inline_not_OK_with(
+                :port_must_be_one_to_four_digits, :port_s, x )
+            end
           end
+        else
+          arg
         end
       end,
       :property, :port

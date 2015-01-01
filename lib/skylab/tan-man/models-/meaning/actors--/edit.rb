@@ -8,25 +8,25 @@ module Skylab::TanMan
 
       class Edit::Normalize_name
 
-        Actor_.call self, :properties,
-          :bound,
-          :val_p,
-          :ev_p
+        Actor_.call self, :properties, :arg
 
         def execute
-          @x = @bound.value_x
-          if VALID_NAME_RX__ =~ @x
-            @val_p[ @x ]
+          @arg.value_x
+          if VALID_NAME_RX__ =~ @arg.value_x
+            @arg
           else
             when_invalid
           end
         end
 
         def when_invalid
-          @ev_p[ :error, :invalid_meaning_name, :meaning_name, @x, -> y, o do
-            y << "invalid meaning name #{ ick o.meaning_name } - meaning names #{
-             }must start with a-z followd by [-a-z0-9]"
-          end ]
+          @on_event_selectively.call :error, :invalid_property_value do
+            Event_[].inline_not_OK_with :invalid_meaning_name,
+                :meaning_name, @arg.value_x do | y, o |
+              y << "invalid meaning name #{ ick o.meaning_name } - meaning names #{
+               }must start with a-z followd by [-a-z0-9]"
+            end
+          end
         end
 
         VALID_NAME_RX__ = /\A[a-z][-a-z0-9]*\z/
@@ -34,13 +34,10 @@ module Skylab::TanMan
 
       class Edit::Normalize_value
 
-        Actor_.call self, :properties,
-          :bound,
-          :val_p,
-          :ev_p
+        Actor_.call self, :properties, :arg
 
         def execute
-          @x = @bound.value_x
+          @x = @arg.value_x
           if NL_RX__ =~ @x
             when_invalid
           else
@@ -50,10 +47,12 @@ module Skylab::TanMan
         NL_RX__ = /[\r\n]/
 
         def when_invalid
-          @ev_p[ :error, :invalid_meaning_value, :meaning_value, @x,
-            -> y, o do
+          @on_event_selectively.call :error, :invalid_property_value do
+            Event_[].inline_not_OK_with :invalid_meaning_name,
+                :meaning_value, @x do | y, o |
               y << "value cannot contain newlines."
-            end ]
+            end
+          end
         end
 
         def when_valid
@@ -63,14 +62,15 @@ module Skylab::TanMan
             report_strip d
             @x = s
           end
-          @val_p[ @x ]
+          @arg
         end
 
         def report_strip d
-          @ev_p[ :info, :value_changed_during_normalization, -> y, o do
-            y << "trimming #{ d } char#{ s d } of whitespace from value"
-          end ]
-          @ev_p[ _ev ]
+          @on_event_selectively.call :info, :value_changed_during_normalization do
+            Event_[].inline_neutral_with :value_changed_during_normalization do | y, o |
+              y << "trimming #{ d } char#{ s d } of whitespace from value"
+            end
+          end
         end
       end
     end

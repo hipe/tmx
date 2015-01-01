@@ -30,23 +30,23 @@ module Skylab::Basic::TestSupport::Pathname::N11n
     context "the empty normalizer" do
 
       before :all do
-        Empty = Subject_[].build_via_iambic Basic_::EMPTY_A_
+        EMPTY = Subject_[].build_via_iambic Basic_::EMPTY_A_
       end
 
       it "against nil does nothing - checking required-ness is outside of scope" do
-        use_event_proc_against nil
+        normalize_against nil
         expect_nothing
       end
 
       it "against false results in false - this is your problem not ours" do
-        use_event_proc_against false
+        normalize_against false
         output_value_was_not_written
         event_proc_was_not_called
         @result_x.should eql false
       end
 
       it 'against the empty string - "your value cannot be empty" (ever)' do
-        use_event_receiver_against Basic_::EMPTY_S_
+        normalize_against Basic_::EMPTY_S_
         output_value_was_not_written
         @result_x.should eql false
         expect_event :path_cannot_be_empty,
@@ -67,7 +67,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
       end
 
       it "BUT two contiguous separators with nothing between them - NO" do
-        use_event_receiver_against '//'
+        normalize_against '//'
         expect_errored_with :path_cannot_contain_repeated_separators,
           '(par «your_value») cannot contain repeated separators - (ick "//")'
       end
@@ -81,7 +81,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
       end
 
       def subject
-        Empty
+        EMPTY
       end
     end
 
@@ -92,7 +92,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
       end
 
       it "an abspath - NO" do
-        use_event_receiver_against '/'
+        normalize_against '/'
         expect_errored_with :path_cannot_be_absolute,
           '(par «your_value») cannot be absolute - (ick "/")'
       end
@@ -117,7 +117,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
       end
 
       it "a relpath - NO" do
-        use_event_receiver_against ' '
+        normalize_against ' '
         expect_errored_with :path_cannot_be_relative,
           '(par «your_value») cannot be relative - (ick " ")'
       end
@@ -137,7 +137,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
       end
 
       it "no" do
-        use_event_receiver_against '..'
+        normalize_against '..'
         expect_errored_with :path_cannot_contain_dot_dot,
           '(par «your_value») cannot contain dot dot - (ick "..")'
       end
@@ -161,7 +161,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
       end
 
       it "in the middle - no" do
-        use_event_receiver_against 'a/./c'
+        normalize_against 'a/./c'
         expect_errored_with :path_cannot_contain_single_dot,
           '(par «your_value») cannot contain single dot - (ick "a/./c")'
       end
@@ -185,7 +185,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
       end
 
       it "no" do
-        use_event_receiver_against '...'
+        normalize_against '...'
         expect_errored_with :path_cannot_contain_dot_file,
           '(par «your_value») cannot contain dot file - (ick "...")'
       end
@@ -200,7 +200,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
     end
 
     def expect_the_passthru_normalization_with s
-      use_event_proc_against s
+      normalize_against s
       expect_the_passthru_normalization
     end
 

@@ -9,8 +9,8 @@ module Skylab::TanMan
         :preconditions, [ :dot_file ],
 
         :required,
-        :ad_hoc_normalizer, -> bound, val_p, ev_p do
-          Node_::Controller__::Normalize_name[ self, bound, val_p, ev_p ]
+        :ad_hoc_normalizer, -> arg, & oes_p do
+          Node_::Controller__::Normalize_name[ self, arg, & oes_p ]
         end,
         :property, :name
 

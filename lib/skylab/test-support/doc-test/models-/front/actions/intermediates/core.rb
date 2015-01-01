@@ -30,14 +30,15 @@ module Skylab::TestSupport
             y << "a spec file that needs a corresponding test-support file"
           end,
 
-          :ad_hoc_normalizer, -> arg, yes_p, no_p do
+          :ad_hoc_normalizer, -> arg, & oes_p do
+
             if arg.value_x
               TestSupport_._lib.basic::Pathname.normalization.build_with(
                 :absolute, :downward_only,
                 :no_single_dots,
-                :no_dotfiles ).normalize_via_three arg, yes_p, no_p
+                :no_dotfiles ).normalize_argument arg, & oes_p
             else
-              ACHIEVED_
+              arg
             end
           end,
           :property, :path

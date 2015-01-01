@@ -113,14 +113,16 @@ module Skylab::Brazen
       # • ad-hoc normalizer
 
         class self::Entity_Property
+
         private
+
           def ad_hoc_normalizer=
             add_norm( & iambic_property )
           end
 
-          def add_norm & p
+          def add_norm & arg_and_oes_block_p
             @has_ad_hoc_normalizers = true
-            ( @norm_p_a ||= [] ).push p
+            ( @norm_p_a ||= [] ).push arg_and_oes_block_p
             KEEP_PARSING_
           end
         public
@@ -146,26 +148,21 @@ module Skylab::Brazen
         def aply_ad_hoc_normalizers pr  # this evolved from [#fa-019]
           ok = true
           bx = actual_property_box_for_write
-          pr.norm_p_a.each do | three_p |
+          pr.norm_p_a.each do | arg_and_oes_block_p |
 
             arg = get_bound_property_via_property pr
               # at each step, value might have changed.
               # [#053] bound is not truly bound.
 
-            ok = three_p.call arg,
+            ok_arg = arg_and_oes_block_p.call arg, & handle_event_selectively  # was [#072]
 
-              -> new_value_x do
-                bx.set arg.name_i, new_value_x
-                KEEP_PARSING_
-              end,
-
-              -> * x_a, msg_p do  # #open [#072]
-                maybe_send_event :error, x_a.first do
-                  build_event_via_iambic_and_message_proc x_a, msg_p
-                end
-              end
-
-            ok or break
+            if ok_arg
+              bx.set arg.name_symbol, ok_arg.value_x
+              KEEP_PARSING_
+            else
+              ok = ok_arg
+              break
+            end
           end
           ok
         end
@@ -341,11 +338,11 @@ module Skylab::Brazen
               :number_set, :integer,
               :minimum, iambic_property )
 
-            add_norm do | arg, val_p, ev_p |
+            add_norm do | arg, & oes_p |
               if arg.value_x.nil?
-                KEEP_PARSING_
+                arg
               else
-                _NORMER.normalize_via_three arg, val_p, ev_p
+                _NORMER.normalize_argument arg, & oes_p
               end
             end
           end
@@ -356,11 +353,12 @@ module Skylab::Brazen
               :number_set, :integer,
               :minimum, 0 )
 
-            add_norm do | arg, val_p, ev_p |
+            add_norm do | arg, & oes_p |
+
               if arg.value_x.nil?
-                KEEP_PARSING_
+                arg
               else
-                _NORMER.normalize_via_three arg, val_p, ev_p
+                _NORMER.normalize_argument arg, & oes_p
               end
             end
           end

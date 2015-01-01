@@ -6,14 +6,12 @@ module Skylab::TanMan
 
       class Normalize_name
 
-        Callback_::Actor[ self, :properties,
+        Callback_::Actor.call self, :properties,
           :ent,
-          :bound,
-          :value_p,
-          :event_with_p ]
+          :arg
 
         def execute
-          @value_p[ @bound.value_x ]
+          @arg
         end
       end
 

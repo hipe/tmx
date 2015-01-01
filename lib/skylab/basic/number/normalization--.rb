@@ -10,7 +10,7 @@ module Skylab::Basic
     end  # >>
 
 
-      class Normalization__ < Basic_::Normalization_
+      class Normalization__
 
         class << self
 
@@ -25,8 +25,6 @@ module Skylab::Basic
 
         Callback_::Actor.call self, :properties,
           :argument,
-          :as_normal_value,
-          :event_receiver,
           :number_set,  # symbol
           :minimum
 
@@ -37,22 +35,21 @@ module Skylab::Basic
           freeze
         end
 
-        protected def init_copy_with * x_a
+        def normalize_argument arg, & oes_p
+          otr = dup
+          otr.init_copy_with :argument, arg, & oes_p
+          otr.execute
+        end
+
+        protected def init_copy_with * x_a, & oes_p
+          oes_p and @on_event_selectively = oes_p
           process_iambic_fully x_a
           normalize_self
         end
 
         private def normalize_self
           @number_set ||= :integer
-          super
-        end
-
-        def normalize_via_three arg, val_p, evr_x
-          otr = dup
-          otr.init_copy_with :argument, arg,
-            :as_normal_value, val_p,
-            :event_receiver, evr_x
-          otr.execute
+          nil
         end
 
         def execute
@@ -62,7 +59,7 @@ module Skylab::Basic
             ok = via_number_and_minimum_validate
           end
           if ok
-            @as_normal_value[ @number ]
+            Trio_.new @number, true
           else
             @result
           end
@@ -93,11 +90,19 @@ module Skylab::Basic
         INTEGER_RX__ = /\A-?\d+\z/
 
         def result_when_did_not_match
+          maybe_send_event :error, :invalid_property_value do
+            bld_did_not_match_event
+          end
+        end
 
-          send_not_OK_event_with :value_not_in_number_set,
+        include Simple_Selective_Sender_Methods_
+
+        def bld_did_not_match_event
+
+          build_argument_error_event_with :value_not_in_number_set,
 
               :x, @x, :prop, @argument.property,
-              :number_set, @number_set, -> y, o do
+              :number_set, @number_set do | y, o |
 
             y << "#{ par o.prop } must be #{
              }#{ indefinite_noun o.number_set.id2name }, #{
@@ -121,11 +126,17 @@ module Skylab::Basic
         end
 
         def result_when_number_is_too_small
+          maybe_send_event :error, :invalid_property_value do
+            bld_number_too_small_event
+          end
+        end
 
-          send_not_OK_event_with :number_too_small,
+        def bld_number_too_small_event
+
+          build_argument_error_event_with :number_too_small,
 
               :number, @number, :minimum, @minimum,
-              :prop, @argument.property, -> y, o do
+              :prop, @argument.property do | y, o |
 
             if o.minimum.zero?
               y << "#{ par o.prop } must be non-negative, had #{ ick o.number }"

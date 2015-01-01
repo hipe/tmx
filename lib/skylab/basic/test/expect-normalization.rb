@@ -6,50 +6,48 @@ module Skylab::Basic
 
       class << self
         def [] test_ctxt_cls
+          # TestSupport_::Expect_Event[ test_ctxt_cls ]  assumed?
           test_ctxt_cls.include Instance_Methods__
+          nil
         end
       end  # >>
 
 
   module Instance_Methods__
 
-    def use_event_receiver_against x
-      use_two x, event_receiver_for_expect_event ; nil
-    end
+    def normalize_against x
 
-    def use_event_proc_against x
-      @event_x_a = nil
-      @event_proc_was_called = false
-      use_two x, -> * x_a do
-        @event_proc_was_called = true
-        @event_x_a = x_a
-        :sad_from_proc
-      end ; nil
-    end
+      _cls = subject
 
-    def use_two x, evr_x
-      @input_x = x
-      _arg = mock_arg x
-      @output_value_was_written = false
-      @result_x = subject.normalize_via_three _arg,
-        -> x_ do
-          @output_value_was_written = true
-          @output_x = x_
-          :happy
-        end,
-        evr_x
+      _oes_p = handle_event_selectively
+
+      @input_arg = _mock_argument x
+
+      ok_arg = _cls.normalize_argument @input_arg, & _oes_p
+
+      @event_proc_was_called = @ev_a ? true : false  # [br] expect event
+
+      if ok_arg
+        @output_value_was_written = true
+        @output_arg = ok_arg
+        @output_x = ok_arg.value_x
+      else
+        @output_value_was_written = false
+        @result_x = ok_arg
+      end
+
       nil
     end
 
-    def mock_arg *a
+    def _mock_argument * a
       Mock_arg__[].via_arglist a
     end
 
     def expect_the_passthru_normalization
       event_proc_was_not_called
       output_value_was_written
-      @output_x.should eql @input_x
-      @result_x.should eql :happy  ; nil
+      @output_arg.object_id.should eql @input_arg.object_id
+      nil
     end
 
     def expect_nothing
@@ -107,10 +105,10 @@ module Skylab::Basic
         end
 
         def description
-          "«#{ name_i }»"  # :+#guillemets
+          "«#{ name_symbol }»"  # :+#guillemets
         end
 
-        def name_i
+        def name_symbol
           @nm.as_variegated_symbol
         end
 
@@ -118,6 +116,7 @@ module Skylab::Basic
           @nm
         end
       end
+
       MOCK_PROPERTY__ = Mock_Property__.new Callback_::Name.via_variegated_symbol :your_value
 
       self
