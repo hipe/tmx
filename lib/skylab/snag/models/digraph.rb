@@ -86,7 +86,7 @@ module Skylab::Snag
       end
 
       def normalize_identifier_string s
-        Snag_::Models::Identifier.normalize s, @delegate
+        Snag_::Models::Identifier.normal s, @delegate
       end
 
       def when_multi_parent node

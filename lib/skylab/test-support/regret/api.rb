@@ -14,8 +14,6 @@ module Skylab::TestSupport
           Autoloader_
         end
 
-        Bsc__ = Lib_::Basic
-
         Basic_Fields = -> * x_a do
           MH__[]::Basic_Fields.via_iambic x_a
         end
@@ -74,10 +72,6 @@ module Skylab::TestSupport
 
         Path_tools_clear = -> do
           HL__[].system.filesystem.path_tools.clear
-        end
-
-        Pathname_union = -> a do
-          Bsc__[]::Pathname::Union[ * a ]
         end
 
         Pool = -> mod do

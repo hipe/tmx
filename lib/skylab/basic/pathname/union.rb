@@ -62,26 +62,33 @@ module Skylab::Basic
       nil
     end
 
-    def normalize ev=nil
+    def normalize & oes_p
       @a.sort!
-      scn = Basic_::List.line_stream @a
-      prev = scn.gets ; elim = nil
+      st = Basic_::List.line_stream @a
+      prev = st.gets
+      elim = nil
       if prev
-        while curr = scn.gets
+        curr = st.gets
+        while curr
           if _match prev, curr
             ( elim ||= Eliminated_.new ) << Elim_[ prev, curr ]
-            @a[ scn.count - 1 ] = nil
+            @a[ st.count - 1 ] = nil
           else
             prev = curr
           end
+          curr = st.gets
         end
       end
-      res = nil
       if elim
         @a.compact!
-        res = ev ? ev[ elim ] : elim
+        if oes_p
+          oes_p.call :info do
+            elim
+          end
+        else
+          elim
+        end
       end
-      res
     end
 
     def match x

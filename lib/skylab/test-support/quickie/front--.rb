@@ -235,7 +235,9 @@ module Skylab::TestSupport
 
     module QuicLib_
 
-      Bsc__ = TestSupport_::Lib_::Basic
+      parent = TestSupport_::Lib_
+
+      Basic = parent::Basic
 
       CLI_lib = -> do
         HL__[]::CLI
@@ -249,9 +251,9 @@ module Skylab::TestSupport
         MH__[].function_chain[ p_a, nil ]
       end
 
-      HL__ = TestSupport_::Lib_::HL__
+      HL__ = parent::HL__
 
-      MH__ = TestSupport_::Lib_::MH__
+      MH__ = parent::MH__
 
       Name_const_basename = -> s do
         HL__[]::Name.const_basename s
@@ -270,10 +272,6 @@ module Skylab::TestSupport
       end
 
       Stream = Lib_::Stream
-
-      String_lib = -> do
-        Bsc__[]::String
-      end
 
       SubTree__ = Autoloader_.build_require_sidesystem_proc :SubTree
 

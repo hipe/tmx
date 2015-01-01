@@ -52,18 +52,18 @@ module Skylab::Brazen
       end
 
       def do_resolve_downstream_directory
+
         _dirname = ::File.dirname @path
-        _dir = LIB_.system.filesystem.normalization.existent_directory(
+
+        _valid_arg = LIB_.system.filesystem.normalization.existent_directory(
           :path, _dirname,
           :create_if_not_exist,
-          :max_mkdirs, 1,
-          :on_event, -> ev do
-            @on_event_selectively.call do
-              ev
-            end
-            ev.ok  # propagate 'false' in case this is failure
-          end )
-        _dir ? ACHIEVED_ : UNABLE_
+          :max_mkdirs, 1 ) do | * i_a, & ev_p |
+            @on_event_selectively.call( * i_a, & ev_p )
+            UNABLE_
+          end
+
+        _valid_arg ? ACHIEVED_ : UNABLE_
       end
 
       def write  # assume any dirname of path exists and is a directory

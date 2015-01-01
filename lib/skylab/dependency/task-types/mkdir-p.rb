@@ -12,26 +12,32 @@ module Skylab::Dependency
     listeners_digraph  :all, :info => :all
 
     def execute args
+
       @context ||= (args[:context] || {})
+
       valid? or fail(invalid_reason)
 
       _n11n = Dep_._lib.system.filesystem.normalization
 
       did_send_event = nil
-      x = _n11n.existent_directory :path, mkdir_p,
+
+      valid_arg = _n11n.existent_directory(
+        :path, mkdir_p,
         :is_dry_run, dry_run?,
         :max_mkdirs, max_depth,
-        :create_if_not_exist,
-        :on_event, -> ev do
+        :create_if_not_exist
+      ) do | * i_a, & ev_p |
           did_send_event = true
-          send :"receive_#{ ev.terminal_channel_i }", ev
-        end, :as_normal_value, -> do
-          true
+          send :"receive_#{ i_a.last }", ev_p[]
+          UNABLE_
         end
-      if x and ! did_send_event
+
+      if valid_arg
+        valid_arg.value_x
+      elsif ! did_send_event
         call_digraph_listeners :info, "directory exists: #{ mkdir_p }"
+        valid_arg
       end
-      x
     end
 
     def receive_path_too_deep o

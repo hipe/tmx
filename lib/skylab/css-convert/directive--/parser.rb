@@ -16,12 +16,14 @@ module Skylab::CSS_Convert
 
     def produce_parser_class
 
-      ggd = DIR_N11N__.normalize actual_parameters.tmpdir_absolute do |ev|
-        @delegate.receive_event ev
+      valid_arg = DIR_N11N__.normalize_value actual_parameters.tmpdir_absolute do | *, & ev_p |
+        @delegate.receive_event ev_p[]
         UNABLE_
       end
 
-      ggd and produce_parser_class_via_generate_grammar_dir ggd
+      valid_arg and begin
+        produce_parser_class_via_generate_grammar_dir valid_arg.value_x
+      end
     end
 
     def produce_parser_class_via_generate_grammar_dir ggd

@@ -113,7 +113,7 @@ module Skylab::TestSupport
 
       def my_get_any_test_path_a
         found_all = true ; lg = local_glob
-        p = QuicLib_::String_lib[].build_proc_for_string_ends_with_string _spec_rb
+        p = QuicLib_::Basic[]::String.build_proc_for_string_ends_with_string _spec_rb
         path_a = @input_path_a.reduce [] do |m, path|
           if p[ path ]
             m << path

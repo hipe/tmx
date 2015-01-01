@@ -30,6 +30,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Simplecov
     stop_range = 0.. ( stop_s.length - 1 )
 
     it "SO BEAUTIFUL / SO UGLY : test simplecov in a sub-process" do
+      debug!
       cmd_a = build_command_a
       line_a, exitstatus = open2 cmd_a
       while line = line_a.first and :err == line.out_or_err and
@@ -42,14 +43,16 @@ module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Simplecov
     end
 
     def handle_last_line any_line
-      (( line = any_line )) or fail "expected serveral lines of output, had none"
+      line = any_line
+      line or fail "expected serveral lines of output, had none"
       line.out_or_err.should eql( :out )
-      if ! (( md = terrible_rx.match line.line ))
-        line.line.should match( md )  # trigger the test suite failure :/
-      else
+      md = terrible_rx.match line.line
+      if md
         md[ :x ].should eql( '13' )
         md[ :y ].should eql( '20' )
         do_cleanup md
+      else
+        line.line.should match terrible_rx  # trigger the test suite failure :/
       end
     end
 
@@ -91,8 +94,8 @@ module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Simplecov
 
     def build_command_a
       cmd_a = sut_cmd_a
-      path = self.path
-      cmd_a << path << '--' << path << 'orange'
+      cmd_a.push path, 'orange'
+      cmd_a
     end
 
     let :path do

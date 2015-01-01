@@ -169,10 +169,6 @@ module Skylab::TestSupport
       Callback_::Scn.try_convert x
     end
 
-    String_lib = -> do
-      Basic[]::String
-    end
-
     Struct = -> * i_a do
       Basic[]::Struct.make_via_arglist i_a
     end

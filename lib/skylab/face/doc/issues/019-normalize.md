@@ -65,6 +65,61 @@ perhaps even when the input value is valid but gets normalized.
 
 
 
+## the normal value normalization method
+
+there were once 5 (five) variants (each documented) that this following
+one new method replaces.
+
+(the were: `normalize`, `normalize_argument`,
+`any_error_event_via_validate_x`, `normalize_via_two`,
+`normalize_via_three` #tombstone (their documentation too).)
+
+for a single, unified solution that is universally applicable,
+recognizable, and poka-yoke; we have adopted this one method name,
+signature and semantics:
+
+`normalize_argument` - argument ("arg") is a [#ba-038] argument
+structure. optional block is a [#ca-017] selective listener.
+
+"arg" contains the knowledge of whether or not a value was passed,
+and in the case that it is known to have been passed, "arg" also
+contains this value. (as well "arg" contains a name function that
+may be useful when building events.)
+
+if it is known to have been passed, note that depending on your
+interface the incoming value may be `false`, `nil`, or any other
+value (e.g arbitrary objects).
+
+depending on your definition for what is normal for that field
+(and more broadly what is valid), you may transform the incoming
+value into any other value (for example, convert a string "1" into
+a native integer `1`). if it is already valid and normal as it is
+you may leave it as it is.
+
+if based on your definition of normal this normalization was
+successful, your result must be a [#ba-038]-shaped argument
+structure containing the new (or same) value for the argument value.
+
+any true-ish result that you return will be assumed to be an object
+of this shape. if the incoming result was itself already valid and
+normal as-is, you may result in this same object as your result.
+
+in the case where you tranformed the value in some way, it may
+be useful to use the `with_value` method of [#ba-038] to create
+a modified frozen dup of the incoming argument structure, but with
+the new desired value.
+
+any false-ish result that you return will be assumed to signify that
+the incoming argument value (or absence of value) was invalid.
+
+in the cases where the value was invalid or the value was changed for
+normalization -AND- and event listener was passed (the optional block
+argument), you can emit possible events. it is recommended that you do
+so for all such cases when the value is invalid, but not you should
+always check whether the listener was passed at all first.
+
+
+
 
 ## normal normalizers
 
@@ -99,82 +154,7 @@ of normalization.
 
 
 
-## the superset of normalization methods
-
-not all formal values can support all the below signatures of validation
-method. typically which ones you may want to implement depend on whether
-or not your field can validly be `nil` or `false`, and whether or not
-your normalization potentially needs to transform the argument value (that
-is, "normalization" in the traditional, formal sense).
-
-
-  + `normalize` - argument is mixed argument x. if x is valid, result is
-       x or a normalized transformation of x. informational events about
-       for e.g transformation cannot be emitted. if x is invalid,
-       the event is converted to an exception and raised.
-
-       although this reads well, its use is discouraged except for cases
-       where invalid arguments are truly exceptional, i.e this is
-       appropriate for sanity checks but not for UI-level validation.
-
-       (except wait, there's more: pass an error proc as an optional
-       block and now this works perhaps identically to
-       `normalize_via_two` below except that in this case here the first
-       argument is not a [#ba-038].
-
-
-  + `normalize_argument` - same as above but argument is a [#ba-038],
-       whose metadata may be useful to make more attractive-sounding
-       UI decoration in the generation of events.
-
-
-  + `any_error_event_via_validate_x` - normalizations that offer this
-       method may not ever perform transformations: mixed argument either
-       is valid or isn't. if it is valid result must be `nil` (not false).
-       if is isn't result is an error event.
-
-
-  + `normalize_via_two` - first argument is a [#ba-038],
-       second argument is an event proc. if argument is valid, apply
-       any normalization and result is the normalized value. if argument
-       is invalid the event proc receives the event and result is the
-       result of the callback.
-
-       it is the responsibility of the caller to ensure that the
-       semantic space of these two values doesn't collide. for e.g this
-       method is not recommended to be used for fields whose valid value
-       may be false-ish unless you flip error flags in your event
-       receiver accordingly.
-
-
-  + `normalize_via_three` - this is the universal form from which
-       possibly all others can be derived as determined by the formal
-       space of your value. first argument is a [#ba-038] argument object.
-       second argument is a proc that will receive a (potentially
-       normalized) valid value based off the first argument. the third
-       argument is an object that responds to `receive_event` or a proc.
-       this third argument may receive one or more error events if the
-       argument is invalid. it may also receive informational events
-       about any transformations that were performed.
-
-       formally the only way to know whether the argument was valid or
-       not is whether or not the proc in the *second* argument is called
-       (not the third argument) because it is not formally mandated that
-       normalizations necessarily produce events ever, although it is
-       strongly encouraged always to produce an error event as appropriate.
-
-
-
-## a summary of the above in a table
-
-    method name                    | can xform?| falseish allowed? | raises e? |
-    normalize [argument]           |       yes |               yes |       yes |
-    any_error_event_via_validate_x |        no |               yes |        no |
-    normalize_via_{ two | three }  |       yes |              yes* |        no |
-
-
-* care must be taken to deal with fields that can validly be `false` / `nil`.
-
+#
 
 
 
@@ -250,7 +230,7 @@ held in e.g a constant, or perhaps even as the result of some other proc).
 
 when a field indicates itself as having a `normalizer` as described above,
 the `normalizer callable` is guaranteed to be called whenever the agent
-(e.g action) hits the `normalize` eventpoint during the course of the API
+(e.g action) hits the normalization eventpoint during the course of the API
 action lifecycle. this is true regardless of whether or not the particular
 actual parameter was provided for this field (!).
 

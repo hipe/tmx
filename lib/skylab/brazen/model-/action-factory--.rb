@@ -184,7 +184,7 @@ module Skylab::Brazen
             @parent_node.first_edit do | o |
               o.replace_selective_event_listener_via_channel_proc @__HESVC_p__
               o.preconditions @preconditions
-              o.argument_box @argument_box  # _DOG_EAR
+              o.argument_box @argument_box
             end
             @edited_entity = @parent_node
             @parent_node = nil

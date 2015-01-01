@@ -18,9 +18,9 @@ module Skylab::BeautySalon
       Face__[]::API::Action
     end
 
-    Brazen = sidesys[ :Brazen ]
+    Basic = sidesys[ :Basic ]
 
-    Bsc__ = sidesys[ :Basic ]
+    Brazen = sidesys[ :Brazen ]
 
     CLI_lib = -> do
       HL__[]::CLI
@@ -57,16 +57,8 @@ module Skylab::BeautySalon
       Face__[]::Plugin
     end
 
-    Range_lib = -> do
-      Bsc__[]::Range
-    end
-
     Proxy_lib = -> do
       Callback_::Proxy
-    end
-
-    Regexp_lib = -> do
-      Bsc__[]::Regexp
     end
 
     Shellwords = -> do
@@ -81,16 +73,12 @@ module Skylab::BeautySalon
       ::StringScanner
     end
 
-    String_lib = -> do
-      Bsc__[]::String
-    end
-
     System = -> do
       HL__[].system
     end
 
     Token_buffer = -> x, y do
-      Bsc__[]::Token::Buffer.new x, y
+      Basic[]::Token::Buffer.new x, y
     end
 
     Tree_lib = -> do

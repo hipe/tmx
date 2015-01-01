@@ -25,8 +25,11 @@ module Skylab::Snag
     PREFIX_SEPARATOR_WIDTH = 1  # '-'.length
 
     class << self
-      def normalize x, delegate
+
+      def normal x, delegate
+
         md = NORMALIZING_RX__.match x.to_s
+
         if md
           o = new md[ :prefix ], md[ :integer ], md[ :suffix ]
           if o.prefix_s && delegate.info_event_p

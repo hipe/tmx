@@ -16,7 +16,7 @@ module Skylab::Face
       nil
     end
     H_ = {
-      normalize: [ :public, :Normalize_method_ ],
+      normalize_against_into: [ :public, :Normalize_against_into_method ],
       field_normalize: [ :public, :Field_normalize_method_ ],
       field_value_notify: [ :public, :Field_value_notify_method_ ],
       flush: [ :public, :Flush_method_ ]
@@ -24,11 +24,11 @@ module Skylab::Face
     SET_H_ = -> do
       o = { }
       o[ :all ] = (( o[ :conventional ] =
-        %i( normalize field_normalize field_value_notify ) )).dup << :flush
+        %i( normalize_against_into field_normalize field_value_notify ) )).dup << :flush
       o.freeze
     end.call
     #
-    Normalize_method_ = -> y, par_h do  # assume `any_expression_agent`
+    Normalize_against_into_method = -> par_h, y do  # assume `any_expression_agent`
       _fb = field_box
       _noti = Normalization_.new :any_expression_agent, any_expression_agent,
         :field_box, _fb, :notice_yielder, y, :notifiee, self,
@@ -97,10 +97,14 @@ module Skylab::Face
         %i( any_expression_agent field_box notice_yielder notifiee param_h )
 
       def execute
+        @notice_yielder or self._WHERE
         resolve_notifiers
-        @y = @notice_yielder ; par_h = @param_h ; miss_a = nil
+        @y = @notice_yielder
+        par_h = @param_h
+        miss_a = nil
         av = Arity_Validator_.new @y, @any_expression_agent
-        r = false ; befor = @y.count
+        r = false
+        befor = @y.count
         @field_box.each_pair do |i, fld|
           x = ( par_h.delete i if par_h and par_h.key? i )
           @field_value_notify_p[ fld, x ]

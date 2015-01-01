@@ -98,12 +98,12 @@ module Skylab::Snag
     end
 
     def message= msg
-      ok = Models::Message.normalize msg, method( :receive_error_string )
-      if ok
+      valid_msg = Models::Message.normal msg, method( :receive_error_string )
+      if valid_msg
         undelineate
-        @message = ok
+        @message = valid_msg
       end
-      msg
+      valid_msg
     end
 
     def is_valid

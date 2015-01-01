@@ -61,23 +61,13 @@ module Skylab::BeautySalon
     Brazen_.event.selective_builder_sender_receiver self
 
     def produce_any_result
-      init_ivars
+      via_properties_init_ivars
       ok = normalize_line_ranges
       ok &&= resolve_input_stream
       ok and work
     end
 
   private
-
-    def init_ivars
-      via_properties_init_ivars
-      @error_p = -> ev do
-        maybe_send_event :error do
-          ev
-        end
-        UNABLE_
-      end ; nil
-    end
 
     def normalize_line_ranges
       @range = bound_properties.at :from_line, :to_line
@@ -93,22 +83,26 @@ module Skylab::BeautySalon
     def normalize_as_integers
       ok = true
       integer = Brazen_.model.entity.normalizers.number.instance
-      @range.each do |bp|
-        d = integer.normalize_via_two bp, @error_p
-        if d
-          bp.value_x = d
+
+      @range.each do | arg |
+
+        ok_arg = integer.normalize_argument arg, & handle_event_selectively
+        if ok_arg
+          bp.value_x = ok_arg.value_x
         else
-          ok = d
+          ok = ok_arg
         end
       end
+
       ok
     end
 
-    def normalize_range
-      okay = true
-      ok = BS_._lib.range_lib.normalize @from_line, :begin, 1, @error_p
+    def normalize_range           # for example,
+      okay = true                 # you could deliterate
+      o = BS_._lib.basic::Range   # just these three lines
+      ok = o.normalize_argument @from_line, :begin, 1, & handle_event_selectively
       ok or okay = false
-      ok = BS_._lib.range_lib.normalize @to_line, :is, -1, :or, :begin, 1, @error_p
+      ok = o.normalize_argument @to_line, :is, -1, :or, :begin, 1, & handle_event_selectively
       ok or okay = false
       okay
     end

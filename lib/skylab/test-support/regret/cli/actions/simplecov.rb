@@ -51,10 +51,11 @@ module Skylab
         require 'skylab/basic/core'
         @matcher = -> a do
           a.map! { |x| ::File.expand_path x }
-          u = ::Skylab::TestSupport::Regret::API::RegretLib_::Pathname_union[a]
-          u.normalize -> e do
-            @y << "(#{ program_name } #{
-              }#{ nil.instance_exec( & e.message_proc ) })"
+          u = ::Skylab::Basic::Pathname::Union[ a ]
+          u.normalize do | *, & ev_p |
+            ev_p[].render_each_line_under nil do | line |
+              @y << "(#{ program_name } #{ line })"
+            end
             nil
           end
           u

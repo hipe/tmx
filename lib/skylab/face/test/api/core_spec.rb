@@ -100,10 +100,10 @@ module Skylab::Face::TestSupport::API::Core_
       end
 
       it "but don't touch the sides" do
+        _rx = /undefined method `normalize_against_into'/
         -> do
-          nightclub::API.invoke( :wah_hoo, one: :two )
-        end.should raise_error( ::NoMethodError,
-          /undefined method `normalize'/ )
+          nightclub::API.invoke :wah_hoo, one: :two
+        end.should raise_error( ::NoMethodError, _rx )
       end
     end
 

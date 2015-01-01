@@ -79,7 +79,7 @@ module Skylab::Face
     end
 
     # `self.params` - rabbit hole .. er "facet" [#013]
-    # placed here because it fits in semantically with the `normalize`
+    # placed here because it fits in semantically with the normalize
     # step of the API Action lifecycle.
 
     def self.meta_params * x_a

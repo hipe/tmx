@@ -58,11 +58,11 @@ module Skylab::Face
         true  # so we receive the call to normalize below
       end
 
-      define_method :super_normalize, & API::Normalizer_::Normalize_method_
+      define_method :super_normalize, & API::Normalizer_::Normalize_against_into_method
 
-      def normalize y, par_h
+      def normalize_against_into par_h, y
         par_h and @keys_provided_set = Library_::Set.new( par_h.keys )
-        super_normalize y, par_h
+        super_normalize par_h, y
       end
 
       def field_value_notify fld, x

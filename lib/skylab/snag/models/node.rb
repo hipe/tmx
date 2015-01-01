@@ -21,7 +21,7 @@ module Skylab::Snag
       end
 
       def build_valid_query query_sexp, max_count, delegate
-        self::Query__.new_valid query_sexp, max_count, delegate
+        self::Query__.normal query_sexp, max_count, delegate
       end
 
       def build_scan_from_lines normalized_line_producer

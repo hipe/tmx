@@ -7,7 +7,7 @@ describe "[bnf2tt] API parameter - square" do
   it 'the parameter "square" lets you use square brackets differently' do
     normal = translate(string: 'foo ::= [bar]')
     crazy  = translate(string: 'foo ::= [bar]', squares: true)
-    normalize(normal).should eql('rule foo [bar] end')
-    normalize(crazy).should  eql('rule foo bar? end')
+    normal_of( normal ).should eql('rule foo [bar] end')
+    normal_of( crazy ).should  eql('rule foo bar? end')
   end
 end

@@ -26,7 +26,7 @@ module Skylab::TestSupport::TestSupport::DocTest
         end
       HERE
 
-      _line_ups = TestSupport_._lib.string_lib.line_stream _whole_string
+      _line_ups = TestSupport_._lib.basic::String.line_stream _whole_string
 
       _name = subject(
         :path, '/var/xkcd/skorlorb/morta-horl/porse/voa-ordered-set--.rb',

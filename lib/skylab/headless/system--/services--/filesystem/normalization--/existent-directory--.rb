@@ -18,13 +18,6 @@ module Skylab::Headless
               @do_create_if_not_exist = true
             end
 
-            def on_event=
-              oe_p = iambic_property
-              @on_event_selectively = -> *, & ev_p do
-                oe_p[ ev_p[] ]
-              end
-            end
-
             def path=
               @ready_to_execute = true
               @path_x = iambic_property
@@ -32,7 +25,6 @@ module Skylab::Headless
 
             o :properties,
 
-              :as_normal_value,
               :on_event_selectively,
 
               :is_dry_run,
@@ -40,7 +32,6 @@ module Skylab::Headless
           end
 
           def initialize & p
-            @as_normal_value = nil
             @do_create_if_not_exist = nil
             @is_dry_run = false
             @max_mkdirs = 1
@@ -56,21 +47,21 @@ module Skylab::Headless
             end
           end
 
-          def normalize path_x, & p
+          def normalize_value path_x, & oes_p
             otr = dup
-            otr.init :path, path_x, :on_event, p
+            otr.init :path, path_x, & oes_p
             otr.execute
           end
 
         protected
 
-          def init * x_a
+          def init * x_a, & oes_p
+            @on_event_selectively = oes_p
             process_iambic_stream_fully iambic_stream_via_iambic_array x_a
             nil
           end
 
           def execute
-            @as_normal_value ||= IDENTITY_
             @path = if @path_x.respond_to? :to_path
               @path_x.to_path
             else
@@ -97,7 +88,7 @@ module Skylab::Headless
           end
 
           public def when_path_is_directory
-            via_path_send_normal_value
+            result
           end
 
           def when_existent_path_is_strange
@@ -134,7 +125,7 @@ module Skylab::Headless
                 Event_.wrap.file_utils_message msg
               end
             end.mkdir_p @path, noop: @is_dry_run  # result is array of argument paths
-            @result = via_path_send_normal_value
+            @result = result
             PROCEDE_
           end
 
@@ -256,14 +247,13 @@ module Skylab::Headless
             end
           end
 
-          def via_path_send_normal_value
-            if @as_normal_value.arity.zero?
-              @as_normal_value[]
-            elsif @is_dry_run
-              @as_normal_value[ Mock_Dir__.new @path ]
-            else
-              @as_normal_value[ ::Dir.new @path ]
-            end
+          def result
+            Headless_._lib.basic.trio(
+              ( if @is_dry_run
+                Mock_Dir__.new @path
+              else
+                ::Dir.new @path
+              end ), true )
           end
 
           Mock_Dir__ = ::Struct.new :to_path

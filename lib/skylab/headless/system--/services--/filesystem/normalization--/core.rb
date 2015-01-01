@@ -12,8 +12,8 @@ module Skylab::Headless
             Normalization__::Downstream_IO__.mixed_via_iambic x_a
           end
 
-          def existent_directory * x_a
-            Normalization__::Existent_Directory__.mixed_via_iambic x_a
+          def existent_directory * x_a, & oes_p
+            Normalization__::Existent_Directory__.mixed_via_iambic x_a, & oes_p
           end
 
           def members
@@ -32,15 +32,16 @@ module Skylab::Headless
 
         module Common_Module_Methods_
 
-          def mixed_via_iambic x_a
-            if x_a.length.zero?
-              self
-            else
+          def mixed_via_iambic x_a, & oes_p
+            if x_a.length.nonzero?
               ok = nil
               x = new do
+                accept_selective_listener_proc oes_p
                 ok = process_iambic_stream_fully iambic_stream_via_iambic_array x_a
               end
               ok and x.produce_mixed_result
+            else
+              self
             end
           end
         end

@@ -11,9 +11,11 @@ module Skylab::Bnf2Treetop::API::Parameters::TestSupport
   end
 
   module InstanceMethods
+
     include ::Skylab::Bnf2Treetop::API::TestSupport::InstanceMethods
-    def normalize str
-      str.gsub(/[[:space:]]+/, ' ').strip
+
+    def normal_of str
+      str.gsub( %r([[:space:]]+), ' ').strip
     end
   end
 end

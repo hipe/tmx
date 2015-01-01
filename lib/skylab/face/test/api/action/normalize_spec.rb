@@ -11,10 +11,14 @@ module Skylab::Face::TestSupport::API::Action::Normalize
     context "roll own normalize if you must" do
 
       define_sandbox_constant :nightclub do
+
         module Sandbox::Nightclub_1
+
           Face_::API[ self ]
+
           class API::Actions::W < Face_::API::Action
-            def normalize y, p_h
+
+            def normalize_against_into p_h, y
               if ! p_h
                 y << "no params provided"
               elsif p_h.length.zero?
@@ -24,6 +28,7 @@ module Skylab::Face::TestSupport::API::Action::Normalize
               else
                 @valid_p_h = p_h
               end
+              nil
             end
 
             def execute

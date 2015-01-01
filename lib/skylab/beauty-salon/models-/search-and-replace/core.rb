@@ -399,7 +399,7 @@ module Skylab::BeautySalon
       end
 
       def marshal_load s, & p
-        @rx = BS_._lib.regexp_lib.marshal_load s do |ev|
+        @rx = BS_._lib.basic::Regexp.marshal_load s do |ev|
           p[ wrap_marshal_load_event ev ]
           UNABLE_
         end

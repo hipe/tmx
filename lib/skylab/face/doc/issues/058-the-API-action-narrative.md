@@ -34,7 +34,7 @@ to an API Action instance for a moment):
                   -o          the services it declared as using, e.g
                     \         implemented by a plugin subsystem ([fa]? [hl]?)
                      \
-                      o-->  `normalize`                 [#019]
+                      o-->  `normalize_against_into`    [#019]
                         /
     [executable]  <----o       with its formal and/or actual parameters,
                   -o           with all its field-level assertions of

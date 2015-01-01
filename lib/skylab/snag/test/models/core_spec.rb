@@ -21,7 +21,7 @@ module Skylab::Snag::TestSupport::Models
       end
 
       def subject s
-        @result = Snag_::Models::Date.normalize s, listener_spy
+        @result = Snag_::Models::Date.normal s, listener_spy
       end
     end
   end

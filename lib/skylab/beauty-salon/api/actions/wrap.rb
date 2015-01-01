@@ -74,10 +74,11 @@ module Skylab::BeautySalon
     # [#fa-019] assume that x is nil or an array.
 
     def normalize_lines y, x, z
-      ok = y.count ; unio = BS_._lib.range_lib::Positive::Union.new
+      ok = y.count
+      unio = BS_._lib.basic::Range::Positive::Union.new
       if x
         inputs = BS_._lib.list_scanner x
-        parse = BS_._lib.range_lib::Positive::List::Scanner.new
+        parse = BS_._lib.basic::Range::Positive::List::Scanner.new
         parse.unexpected_proc = -> xx, exp_a do
           _excerpt = Ellipsulate__[ xx ]
           y << "didn't understand \"#{ _excerpt }\" in the #{

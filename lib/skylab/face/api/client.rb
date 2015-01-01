@@ -65,7 +65,7 @@ module Skylab::Face
       action = build_primordial_action o.name_i_a    # [#016]
       wire_for_expression action, o                  # [#017]
       resolve_services action, o                     # [#018]
-      normalize action, o.param_h                    # [#019]
+      normalize_against_bound o.param_h, action      # [#019]
     end
 
     class Executable_Request_
@@ -201,16 +201,20 @@ module Skylab::Face
 
     MSVCS_CHAIN__ = :Plugin_Metaservices_Chain
 
-    def normalize ex, par_h  # #storypoint-185
+    def normalize_against_bound par_h, ex  # #storypoint-185
       begin
         Some_[ par_h ] and break
         ex.respond_to? :has_param_facet and ex.has_param_facet and break
-        ex.respond_to? :normalize and break
-        skip = true ; res = ex  # probably never gets here
+        ex.respond_to? :normalize_against_into and break
+        skip = true
+        res = ex  # probably never gets here
       end while nil
-      if skip then res else
+
+      if skip
+        res
+      else
         y = build_counting_message_yielder_for ex
-        ex.normalize y, par_h  # result is undefined.
+        ex.normalize_against_into par_h, y  # result is undefined.
         y.count.zero? ? ex : false
       end
     end

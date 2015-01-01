@@ -3,15 +3,17 @@ module Skylab::Snag
   class Models::Date
 
     class << self
-      def normalize x, delegate
+
+      def normal x, delegate
+
         if RX__ =~ x
           x
         else
-          _ev = new( x ).build_error_event
-          delegate.receive_error_event _ev
+          delegate.receive_error_event new( x ).build_error_event
           UNABLE_  # (used to be a :+[#017], no longer)
         end
       end
+
       RX__ = %r{ \A \d{4} - \d{2} - \d{2} \z }x
     end
 

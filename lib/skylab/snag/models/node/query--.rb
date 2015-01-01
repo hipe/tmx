@@ -3,7 +3,8 @@ module Skylab::Snag
   class Models::Node::Query__
 
     class << self
-      def new_valid query_sexp, max_count, delegate
+
+      def normal query_sexp, max_count, delegate
         o = new query_sexp, max_count, delegate
         o.valid
       end
@@ -21,7 +22,7 @@ module Skylab::Snag
       else
         @max_count = nil
       end
-      qry = Query_Nodes_.new_valid query_sexp, delegate
+      qry = Query_Nodes_.normal query_sexp, delegate
       if qry
         @query = qry
       else
@@ -91,17 +92,17 @@ module Skylab::Snag
 
     module Query_Nodes_  # #borrow-indent
 
-    def self.new_valid query_sexp, delegate
+    def self.normal query_sexp, delegate
       _cls = Autoloader_.const_reduce [ query_sexp.first ], self
-      _cls.new_valid query_sexp, delegate
+      _cls.normal query_sexp, delegate
     end
 
     class And
 
-      def self.new_valid query_sexp, delegate
+      def self.normal query_sexp, delegate
         a = query_sexp[ 1 .. -1 ].map do |x|
           klass = Autoloader_.const_reduce [ x.first ], Query_Nodes_
-          klass.new_valid x, delegate
+          klass.normal x, delegate
         end
         if ! a.index { |x| ! x }
           if a.length < 2
@@ -128,7 +129,7 @@ module Skylab::Snag
 
     class All
 
-      def self.new_valid _sexp, _delegate
+      def self.normal _sexp, _delegate
         ALL__
       end
 
@@ -150,7 +151,7 @@ module Skylab::Snag
 
     class HasTag
 
-      def self.new_valid sexp, delegate
+      def self.normal sexp, delegate
         tag_i = sexp.fetch 1
         tag_i_ = Models::Tag.normalize_stem_i tag_i,
           -> ev do
@@ -180,10 +181,13 @@ module Skylab::Snag
 
     class IdentifierRef
 
-      def self.new_valid sexp, delegate
-        identifier_body = sexp[1]  # prefixes might bite [#019]
-        normalized = Models::Identifier.normalize identifier_body, delegate
-        normalized and new normalized
+      class << self
+
+        def normal sexp, delegate
+          identifier_body = sexp[ 1 ]  # prefixes might bite [#019]
+          normal = Models::Identifier.normal identifier_body, delegate
+          normal and new normal
+        end
       end
 
       def initialize identifier_o
@@ -204,7 +208,7 @@ module Skylab::Snag
 
     class Valid
 
-      def self.new_valid _sexp, _delegate
+      def self.normal _sexp, _delegate
         VALID__
       end
 
