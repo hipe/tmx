@@ -37,7 +37,7 @@ module Skylab::TanMan
       if @scn
         @scn.string = str
       else
-        @scn = TanMan_._lib.string_scanner.new str
+        @scn = TanMan_.lib_.string_scanner.new str
       end ; nil
     end
 

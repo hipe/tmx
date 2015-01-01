@@ -16,7 +16,7 @@ module Skylab::TestSupport
   # always by hand.
 
 
-  LIB_ = ::Skylab::TestSupport._lib
+  LIB_ = ::Skylab::TestSupport.lib_
 
   module Spawner
 

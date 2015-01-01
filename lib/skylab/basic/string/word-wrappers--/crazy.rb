@@ -43,7 +43,7 @@ module Skylab::Basic
         end
         process_input_line = -> input_line do
           input_line or fail 'never'
-          _sx = Basic_._lib.CLI_lib.parse_styles input_line
+          _sx = Basic_.lib_.CLI_lib.parse_styles input_line
           _sx ||= [[ :string, input_line ]]
           scn = build_word_scanner[ _sx ]
           while (( word = scn.gets ))

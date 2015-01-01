@@ -15,14 +15,14 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
 
     As_basic_set = -> x_a do
-      module_exec x_a, & Git_._lib.set.to_proc
+      module_exec x_a, & Git_.lib_.set.to_proc
     end
 
     As_basic_set_via_params_const = -> x_a do
       x_a.unshift :with_members, -> do
         self.class::PARAMS
       end
-      module_exec x_a, & Git_._lib.set.to_proc
+      module_exec x_a, & Git_.lib_.set.to_proc
     end
 
     Color_inquisitor = -> _ do
@@ -33,11 +33,11 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
 
     Funcy_globful = -> _ do
-      Git_._lib.funcy_globful self ; nil
+      Git_.lib_.funcy_globful self ; nil
     end
 
     Funcy_globless = -> _ do
-      Git_._lib.funcy_globless self ; nil
+      Git_.lib_.funcy_globless self ; nil
     end
 
     Emit_payload_line_to_listener = -> _ do
@@ -73,7 +73,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
 
     Service_terminal = -> x_a do
-      module_exec x_a, & Git_._lib.service_terminal.to_proc
+      module_exec x_a, & Git_.lib_.service_terminal.to_proc
     end
 
     Shellesc = -> _ do
@@ -89,7 +89,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       end ; nil
     end
 
-    Git_._lib.bundle::Multiset[ self ]
+    Git_.lib_.bundle::Multiset[ self ]
   end
 
   Verb_lemma_hack_ = -> mod do
@@ -132,7 +132,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
   end
 
-  CLI_lib_ = Git_._lib.CLI_lib
+  CLI_lib_ = Git_.lib_.CLI_lib
 
   class CLI
 
@@ -154,7 +154,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
     class Expression_Agent__ < CLI_lib_.pen.minimal_class
       def escape_path x
-        Git_._lib.path_tools.pretty_path x.to_s
+        Git_.lib_.path_tools.pretty_path x.to_s
       end
     end
   public
@@ -453,7 +453,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       :service_terminal, :intermediate,
       :verb_lemma_hack ]
 
-    Git_._lib.client self, :client_services
+    Git_.lib_.client self, :client_services
 
     def initialize client
       @be_verbose = false ; @error_count = 0 ; @hub = nil
@@ -477,7 +477,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
 
     def invoke par_h
-      Git_._lib.path_tools.clear  # #storypoint-8.5
+      Git_.lib_.path_tools.clear  # #storypoint-8.5
       r = resolve_hub par_h
       r &&= initialize_basic_set_with_hash par_h
       r && execute
@@ -550,7 +550,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       (?<a>[#][ ]*) (?<s>.+) (?<b>)
     )\n?\z}x
 
-    Git_._lib.action self,
+    Git_.lib_.action self,
       :anchored_names, :with, :name_waypoint_module, -> { API::Actions }
 
     def render_hub_info
@@ -580,7 +580,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
           call_digraph_listeners i, str.gsub( RX__ ) { escape_path $~[ 0 ] }
         end
     end
-    RX__ = Git_._lib.path_tools.absolute_path_hack_rx
+    RX__ = Git_.lib_.path_tools.absolute_path_hack_rx
 
   end
 
@@ -608,7 +608,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     def _FU_agent
       resolve_service( :FU_agent ).invoke nil, nil
     end
-    Git_._lib.bundle::Multiset[ self ]
+    Git_.lib_.bundle::Multiset[ self ]
   end
   class API::Action
     class Client_Services
@@ -619,7 +619,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
   private
     def build_FU_agent
-      Git_._lib.FUC.new -> msg do
+      Git_.lib_.FUC.new -> msg do
         emit_info_line "# #{ msg }"
       end
     end
@@ -1159,7 +1159,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
   end
 
-  define_singleton_method :stylize, Git_._lib.CLI_lib.pen.stylize  # #posterity for the below ancient lines
+  define_singleton_method :stylize, Git_.lib_.CLI_lib.pen.stylize  # #posterity for the below ancient lines
 
   PATCH_STYLE_P_A__ = [
     ->(s) { stylize(s, :strong, :red) },

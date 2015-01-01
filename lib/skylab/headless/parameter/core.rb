@@ -22,7 +22,7 @@ module Skylab::Headless
         module_exec a, & Parameter::Controller__::Struct_Adapter.to_proc
       end
 
-      Headless_._lib.bundle::Multiset[ self ]
+      Headless_.lib_.bundle::Multiset[ self ]
     end
   end
 
@@ -154,7 +154,7 @@ module Skylab::Headless
     end
   end
 
-  class Parameter::Set < Headless_._lib.old_box_lib
+  class Parameter::Set < Headless_.lib_.old_box_lib
 
     def initialize host
       host.respond_to? :formal_parameter_class or

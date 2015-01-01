@@ -45,7 +45,7 @@ module Skylab::GitViz::TestSupport
     end
     attr_reader :do_debug
     def debug_IO
-      GitViz_._lib.some_stderr_IO
+      GitViz_.lib_.some_stderr_IO
     end
 
     def listener

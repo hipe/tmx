@@ -19,7 +19,7 @@ module Skylab::BeautySalon
         ok, res = preexecute
         ok or break
         @scn = resolve_line_stream or break
-        @token_buffer = BS_._lib.token_buffer %r([[:space:]]*), %r([^[:space:]]+)
+        @token_buffer = BS_.lib_.token_buffer %r([[:space:]]*), %r([^[:space:]]+)
         ok = true
         while line = @scn.gets
           if @line_range_union.include? @scn.count
@@ -75,10 +75,10 @@ module Skylab::BeautySalon
 
     def normalize_lines y, x, z
       ok = y.count
-      unio = BS_._lib.basic::Range::Positive::Union.new
+      unio = BS_.lib_.basic::Range::Positive::Union.new
       if x
-        inputs = BS_._lib.list_scanner x
-        parse = BS_._lib.basic::Range::Positive::List::Scanner.new
+        inputs = BS_.lib_.list_scanner x
+        parse = BS_.lib_.basic::Range::Positive::List::Scanner.new
         parse.unexpected_proc = -> xx, exp_a do
           _excerpt = Ellipsulate__[ xx ]
           y << "didn't understand \"#{ _excerpt }\" in the #{
@@ -107,14 +107,14 @@ module Skylab::BeautySalon
 
     A_RATHER_SHORT_LEN__ = 8
 
-    Ellipsulate__ = BS_._lib.CLI_lib.ellipsify.
+    Ellipsulate__ = BS_.lib_.CLI_lib.ellipsify.
       curry[ A_RATHER_SHORT_LEN__ ]
 
     def resolve_line_stream
       res = nil
       begin
         fh = resolve_file or break
-        res = BS_._lib.list_scanner fh
+        res = BS_.lib_.list_scanner fh
       end while nil
       res
     end

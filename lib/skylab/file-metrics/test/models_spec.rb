@@ -10,7 +10,7 @@ module Skylab::FileMetrics::TestSupport::Models
 
   include Constants
 
-  FM_._lib.DSL_DSL_enhance_module self, -> do
+  FM_.lib_.DSL_DSL_enhance_module self, -> do
     block :with_klass
   end
 
@@ -18,7 +18,7 @@ module Skylab::FileMetrics::TestSupport::Models
 
     include Constants
 
-    extend FM_._lib.let
+    extend FM_.lib_.let
 
     let :klass do
       TS_::Sandbox.kiss with_klass_value.call

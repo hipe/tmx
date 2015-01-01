@@ -4,7 +4,7 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
 
   describe "[bs] search and replace - interactive" do
 
-    BS_._lib.brazen.test_support::Zerk::Expect_Interactive[ self ]
+    BS_.lib_.brazen.test_support::Zerk::Expect_Interactive[ self ]
 
     extend TS_
 

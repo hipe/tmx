@@ -44,7 +44,7 @@ module Skylab::TestSupport
               cmod: cmod,
               bles: _bles )
 
-            TestSupport_._lib.basic::String.line_stream _whole_string
+            TestSupport_.lib_.basic::String.line_stream _whole_string
           end
         end
       end

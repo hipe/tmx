@@ -182,12 +182,12 @@ module Skylab::TestSupport
     private
 
       def build_not_OK_event_with * x_a, & msg_p
-        TestSupport_._lib.event_lib.
+        TestSupport_.lib_.event_lib.
           inline_not_OK_via_mutable_iambic_and_message_proc x_a, msg_p
       end
 
       def build_neutral_event_with * x_a, & msg_p
-        TestSupport_._lib.event_lib.
+        TestSupport_.lib_.event_lib.
           inline_neutral_via_mutable_iambic_and_message_proc x_a, msg_p
       end
 
@@ -234,7 +234,7 @@ module Skylab::TestSupport
     private
 
       def build_unrecognized_param_arg ok_x_a
-        TestSupport_._lib.entity.properties_stack.
+        TestSupport_.lib_.entity.properties_stack.
           build_extra_properties_event(
             [ @value_x ],
             ok_x_a,

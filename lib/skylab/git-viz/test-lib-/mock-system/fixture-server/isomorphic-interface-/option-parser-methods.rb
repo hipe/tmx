@@ -46,7 +46,7 @@ module Skylab::GitViz
         end
 
         def build_option_parser
-          op = GitViz_._lib.option_parser.new
+          op = GitViz_.lib_.option_parser.new
           alter_default_help op
           formal_parameter_a.each do |param|
             if param.takes_exactly_one_argument
@@ -159,7 +159,7 @@ module Skylab::GitViz
           1 == param_a.length or many = true
           "please provide the required (option-looking) parameter#{
             many && 's' }: #{
-              }#{ many && '(' }#{ GitViz_._lib.oxford_and s_a }#{
+              }#{ many && '(' }#{ GitViz_.lib_.oxford_and s_a }#{
                }#{ many && ')' }"
         end
 

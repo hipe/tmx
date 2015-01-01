@@ -22,7 +22,7 @@ module Skylab::Cull
 
       def execute
 
-        Cull_._lib.filesystem.normalization.downstream_IO(
+        Cull_.lib_.filesystem.normalization.downstream_IO(
           :path_arg, @deeper_path_arg,
           :is_dry_run, true,  # always true, we are checking only
           :ftype, DIR_FTYPE_,
@@ -35,7 +35,7 @@ module Skylab::Cull
 
         workspace_dir = @path_arg.value_x
 
-        Cull_._lib.system.patch(
+        Cull_.lib_.system.patch(
           :target_directory, workspace_dir,
           :patch_file,
             Cull_.dir_pathname.join( 'data-documents-/create.patch' ).to_path,

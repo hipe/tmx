@@ -4,7 +4,7 @@ module Skylab::GitViz
 
     module Socket_Agent_
 
-      x = $VERBOSE ; $VERBOSE = nil ; GitViz_._lib.ZMQ ; $VERBOSE = x
+      x = $VERBOSE ; $VERBOSE = nil ; GitViz_.lib_.ZMQ ; $VERBOSE = x
 
       def self.[] cls
         cls.include self

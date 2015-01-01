@@ -6,7 +6,7 @@ module Skylab::Snag
 
   class CLI::ToDo::Tree::Node
 
-    Snag_._lib.tree.enhance_with_module_methods_and_instance_methods self
+    Snag_.lib_.tree.enhance_with_module_methods_and_instance_methods self
 
     attr_accessor :todo
 
@@ -134,7 +134,7 @@ module Skylab::Snag
         @path_style_a = [ :strong, :green ].freeze
         @tag_style_a = [ :reverse, :yellow ].freeze  # #etc
         @fun = -> do
-          fun = Snag_._lib.CLI_lib.pen
+          fun = Snag_.lib_.CLI_lib.pen
           @fun = -> { fun }
           fun
         end

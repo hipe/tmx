@@ -8,7 +8,7 @@ module Skylab::Cull
 
         result = nil
 
-        x = Cull_._lib.filesystem.walk(
+        x = Cull_.lib_.filesystem.walk(
           :start_path, arg.value_x,
           :filename, FILENAME_,
           :ftype, DIR_FTYPE_,

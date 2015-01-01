@@ -30,7 +30,7 @@ module Skylab::BeautySalon
           def initialize
             super
             @max_file_size_for_multiline_mode ||= DEFAULT_MAX_FILE_SIZE_FOR_MULTIINE_MODE__
-            @rx_opts = BS_._lib.basic::Regexp.options_via_regexp @ruby_regexp
+            @rx_opts = BS_.lib_.basic::Regexp.options_via_regexp @ruby_regexp
           end
 
           DEFAULT_MAX_FILE_SIZE_FOR_MULTIINE_MODE__ = 463296

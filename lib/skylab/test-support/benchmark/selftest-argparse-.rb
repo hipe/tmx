@@ -3,7 +3,7 @@ module Skylab::TestSupport
   Benchmark::Selftest_argparse_ = -> test_proc, bench_proc do # a bit of a #hack
 
     argv = ::ARGV
-    _serr = TestSupport_._lib.stderr
+    _serr = TestSupport_.lib_.stderr
     y = ::Enumerator::Yielder.new( & _serr.method( :puts ) )
     call = -> f do
       f[ * ( [ y ] if 1 == f.arity ) ]

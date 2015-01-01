@@ -7,7 +7,7 @@ module Skylab::Cull
 
   class << self
 
-    def _lib
+    def lib_
       @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
     end
   end  # >>

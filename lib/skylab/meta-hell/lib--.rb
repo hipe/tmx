@@ -111,7 +111,7 @@ module Skylab::MetaHell
 
     Say_not_found_ = -> d, a, k do
 
-      s = MetaHell_._lib.levenshtein.with(
+      s = MetaHell_.lib_.levenshtein.with(
         :item, k,
         :items, a,
         :closest_N_items, d,

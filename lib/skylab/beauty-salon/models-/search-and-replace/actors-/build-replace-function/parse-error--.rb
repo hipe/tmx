@@ -4,7 +4,7 @@ module Skylab::BeautySalon
 
     class Actors_::Build_replace_function
 
-      Parse_error__ = BS_._lib.event_lib.
+      Parse_error__ = BS_.lib_.event_lib.
 
         prototype_with :replace_function_parse_error, :expecting, nil,
 

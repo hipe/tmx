@@ -6,7 +6,7 @@ module Skylab::Snag
 
       include API::Action::Business_Methods___
 
-      Entity_ = Snag_._lib.entity.call do
+      Entity_ = Snag_.lib_.entity.call do
 
         o :ad_hoc_processor, :make_delegate_properties, -> x do
           Make_Delegate_Properties__.new( x ).go

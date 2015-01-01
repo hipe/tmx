@@ -49,7 +49,7 @@ module Skylab::Headless
         module_exec( & Three_streams_notify_methods__ ) ; nil
       end
 
-      Headless_._lib.bundle::Multiset[ self ]
+      Headless_.lib_.bundle::Multiset[ self ]
     end
 
       Three_streams_notify_methods__ = -> do

@@ -16,7 +16,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Simplecov
 
   TestSupport_::Library_.touch :Open3
 
-  LIB_ = TestSupport_._lib
+  LIB_ = TestSupport_.lib_
 
   NILADIC_EMPTINESS_ = -> { }
 

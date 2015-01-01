@@ -22,7 +22,7 @@ module Skylab::TanMan::TestSupport::Sexp
       end
 
       let :grammars_module do
-        ::Skylab::TanMan._lib.module_lib.expand_path_via_module '..', self
+        ::Skylab::TanMan.lib_.module_lib.expand_path_via_module '..', self
       end
 
       self
@@ -170,7 +170,7 @@ module Skylab::TanMan::TestSupport::Sexp
         receive_info_string "      (loading parser ^_^ #{ s })"  # was gsub_path_hack
       end
 
-      TanMan_._lib.TTT::Parser::Load.new( self,
+      TanMan_.lib_.TTT::Parser::Load.new( self,
         -> o do
           do_force_overwrite and o.force_overwrite!
           o.generated_grammar_dir tmpdir_prepared

@@ -4,7 +4,7 @@ module Skylab::Face  # read [#011] the top node narrative
 
   class << self
 
-    def _lib
+    def lib_
       @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
     end
   end
@@ -165,7 +165,7 @@ module Skylab::Face  # read [#011] the top node narrative
     end
   end
 
-  LIB_ = _lib
+  LIB_ = lib_
 
   Some_ = -> x { x && x.length.nonzero? }
 

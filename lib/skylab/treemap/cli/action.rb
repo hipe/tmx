@@ -23,7 +23,7 @@ module Skylab::Treemap
 
   module CLI::Action::InstanceMethods  # might be borrowd by motes, cards, flies
 
-    Treemap_._lib.old_CLI_lib.action self, :core_instance_methods  # the current favorite for # cli basics like `invoke`
+    Treemap_.lib_.old_CLI_lib.action self, :core_instance_methods  # the current favorite for # cli basics like `invoke`
 
     include Treemap::Core::Action::InstanceMethods # brings in our own custom
                                   # subclient methods among other things
@@ -90,7 +90,7 @@ module Skylab::Treemap
     #         ~ because we are a class of action: ~
 
 
-    Treemap_._lib.old_CLI_lib.action self,
+    Treemap_.lib_.old_CLI_lib.action self,
       :actions_anchor_module, -> { Treemap::CLI::Actions }
 
     MODALITIES_ANCHOR_MODULE = Treemap  # actions can reach classes from
@@ -98,7 +98,7 @@ module Skylab::Treemap
 
     #         ~ for our event profile: ~
 
-    Treemap_._lib.old_CLI_lib.action self, :core_instance_methods  # NOTE *that* ver. of `emit`
+    Treemap_.lib_.old_CLI_lib.action self, :core_instance_methods  # NOTE *that* ver. of `emit`
 
 
     Callback_[ self, :employ_DSL_for_digraph_emitter ] # (child classes *must*

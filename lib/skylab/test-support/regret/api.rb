@@ -94,7 +94,7 @@ module Skylab::TestSupport
       end
     end
 
-    TestSupport_._lib.API[ self ]  # loads 'LIB_' as well
+    TestSupport_.lib_.API[ self ]  # loads 'LIB_' as well
 
     action_name_white_rx %r([a-z0-9]$)
 

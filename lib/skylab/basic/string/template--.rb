@@ -89,7 +89,7 @@ module Skylab::Basic
     end
 
     def say_extra i_a
-      Basic_._lib.NLP_EN_agent.calculate do
+      Basic_.lib_.NLP_EN_agent.calculate do
         "no member#{ s i_a } #{ or_( i_a.map { |x| "'#{ x }'" } ) } in struct"
       end
     end
@@ -161,7 +161,7 @@ module Skylab::Basic
 
       seen_h = {}
 
-      scn = Basic_._lib.string_scanner template_string
+      scn = Basic_.lib_.string_scanner template_string
 
       Callback_.scan do
         while ! scn.eos?
@@ -187,7 +187,7 @@ module Skylab::Basic
       alias_method :name_i, :local_normal_name
     end
 
-    Margin_Engine__ = Basic_._lib.ivars_with_procs_as_methods.new :give, :take do
+    Margin_Engine__ = Basic_.lib_.ivars_with_procs_as_methods.new :give, :take do
 
       def initialize
 

@@ -52,7 +52,7 @@ module Skylab::GitViz
         end
 
         def expct_styled_and_unstyle
-          s = GitViz_._lib.CLI_lib.unstyle_styled @matchee_x
+          s = GitViz_.lib_.CLI_lib.unstyle_styled @matchee_x
           s or fail "expected styled, was not: #{ @matchee_x }"
           @matchee_x = s ; nil
         end
@@ -161,7 +161,7 @@ module Skylab::GitViz
       end
 
       Inspect_ = -> x do
-        GitViz_._lib.strange x
+        GitViz_.lib_.strange x
       end
     end
   end

@@ -23,7 +23,7 @@ module Skylab::TestSupport  # :[#021].
       self::Lib_::Stderr[]
     end
 
-    def _lib
+    def lib_
       @lib ||= TestSupport_::Lib_::INSTANCE
     end
 

@@ -362,7 +362,7 @@ module Skylab::Brazen
       end
 
       def description_under expr
-        Brazen_._lib.basic::Pathname.description_under_of_path expr, @path_s
+        Brazen_.lib_.basic::Pathname.description_under_of_path expr, @path_s
       end
 
       def to_line_stream_

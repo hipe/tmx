@@ -8,7 +8,7 @@ module Skylab::Basic  # introduction at [#020]
       Default_property_instance__[]
     end
 
-    def _lib
+    def lib_
       @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
         self::Lib_, self )
     end
@@ -110,7 +110,7 @@ module Skylab::Basic  # introduction at [#020]
     end
 
     def build_not_OK_event_via_mutable_iambic_and_message_proc x_a, msg_p
-      Basic_._lib.event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, msg_p
+      Basic_.lib_.event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, msg_p
     end
   end
 

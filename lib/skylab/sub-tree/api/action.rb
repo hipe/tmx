@@ -15,7 +15,7 @@ module Skylab::SubTree
 
     Callback_::Actor.methodic self, :simple, :properties
 
-    SubTree_._lib.event_lib.selective_builder_sender_receiver self
+    SubTree_.lib_.event_lib.selective_builder_sender_receiver self
 
     def initialize _, & oes_p
       @on_event_selectively = oes_p
@@ -75,14 +75,14 @@ module Skylab::SubTree
           :x, x, :prop, prop, :tmpl_s, template_s do |y, o|
 
         _noun = par o.prop
-        _tmpl = SubTree_._lib.string_lib.template.via_string o.tmpl_s
+        _tmpl = SubTree_.lib_.string_lib.template.via_string o.tmpl_s
         _x = ick o.x
         _s = _tmpl.call x: _x,  noun: _noun
         y << _s
       end
     end
 
-    Data_Event_ = SubTree_._lib.event_lib.data_event_class_factory
+    Data_Event_ = SubTree_.lib_.event_lib.data_event_class_factory
 
     module Local_Actor_
 

@@ -10,7 +10,7 @@ module Skylab::BeautySalon
         :is_dry_run,
         :on_event_selectively
 
-      BS_._lib.event_lib.selective_builder_sender_receiver self
+      BS_.lib_.event_lib.selective_builder_sender_receiver self
 
       def execute
         ok = write_temp_file
@@ -52,7 +52,7 @@ module Skylab::BeautySalon
 
       def via_tmpfile_pn
         # we could compare the byte count first with stat, but why?
-        is_same = BS_._lib.file_utils.cmp @edit_session.path, @tmpfile
+        is_same = BS_.lib_.file_utils.cmp @edit_session.path, @tmpfile
         if is_same
           when_no_change
         else
@@ -68,7 +68,7 @@ module Skylab::BeautySalon
       end
 
       def flush
-        _fuc = BS_._lib.system.filesystem.file_utils_controller.new -> msg do
+        _fuc = BS_.lib_.system.filesystem.file_utils_controller.new -> msg do
           @result = @on_event_selectively.call :info do
             Changed_[ @edit_session.path, @is_dry_run ]
           end
@@ -77,7 +77,7 @@ module Skylab::BeautySalon
         nil
       end
 
-      Changed_ = BS_._lib.event_lib.prototype_with :changed_file,
+      Changed_ = BS_.lib_.event_lib.prototype_with :changed_file,
         :path, nil, :is_dry_run, nil, :ok, true
 
     end

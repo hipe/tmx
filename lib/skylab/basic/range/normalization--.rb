@@ -39,7 +39,7 @@ module Skylab::Basic
           set_arg iambic_property
         end
 
-      # Basic_._lib.event.selective_builder_sender_receiver self
+      # Basic_.lib_.event.selective_builder_sender_receiver self
 
       def initialize & p
         @arg_was_provided = false
@@ -143,7 +143,7 @@ module Skylab::Basic
         Explanation__.with :bp, @arg, :or_a, @or_a
       end
 
-      Explanation__ = Basic_._lib.event.prototype_with(
+      Explanation__ = Basic_.lib_.event.prototype_with(
         :actual_property_is_outside_of_formal_property_set,
           :bp, nil, :or_a, nil ) do |y, o|
 

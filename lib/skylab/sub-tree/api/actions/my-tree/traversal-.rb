@@ -56,7 +56,7 @@ module Skylab::SubTree
 
     def initialize * x_a
       @curr_a = [] ; @matrix_a = [] ; @sep ||= SEP_
-      @glyph_set = SubTree_._lib.CLI_lib.tree.glyph_sets_module::WIDE
+      @glyph_set = SubTree_.lib_.CLI_lib.tree.glyph_sets_module::WIDE
       process_iambic_stream_fully iambic_stream_via_iambic_array x_a
     end
 
@@ -150,7 +150,7 @@ module Skylab::SubTree
       @info_p[ "(adding row: #{ seen_a.inspect }#{ '..' if extra_x })" ]
     end
 
-    SubTree_._lib.CLI_lib.tree.glyphs.each_const_value do |glyph|
+    SubTree_.lib_.CLI_lib.tree.glyphs.each_const_value do |glyph|
       m = glyph.normalized_glyph_name
       define_method m do
         @glyph_set[ m ]

@@ -16,7 +16,7 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible
 
   extend Quickie
 
-  LIB_ = TestSupport_._lib
+  LIB_ = TestSupport_.lib_
 
   module InstanceMethods
 

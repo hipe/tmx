@@ -12,7 +12,7 @@ module Skylab::Headless
     # magical with the content. Don't forget to call flush! at the end.
 
 
-        Headless_._lib.entity self do
+        Headless_.lib_.entity self do
 
           o :iambic_writer_method_name_suffix, :'='
 

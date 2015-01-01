@@ -1,6 +1,6 @@
 module Skylab::TestSupport
 
-  _lib  # load LIB_
+  lib_  # load LIB_
 
   class Verbosity_ < ::Module  # see [#024]
 

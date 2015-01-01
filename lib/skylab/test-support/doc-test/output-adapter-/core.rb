@@ -191,7 +191,7 @@ module Skylab::TestSupport
         end
       end
 
-      Event_for_Wrote_ = TestSupport_._lib.event_lib.prototype_with :wrote,
+      Event_for_Wrote_ = TestSupport_.lib_.event_lib.prototype_with :wrote,
 
         :is_known_to_be_dry, false,
         :bytes, nil,
@@ -222,7 +222,7 @@ module Skylab::TestSupport
           opt.summarize_p[ build_section_yielder[ y, opt.name_i ] ]
         end
       end
-      TestSupport_._lib.CLI_table(
+      TestSupport_.lib_.CLI_table(
         :field, :id, :name,
         :field, :id, :desc, :left,
         :show_header, false,

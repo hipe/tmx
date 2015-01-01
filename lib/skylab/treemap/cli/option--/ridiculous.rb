@@ -22,7 +22,7 @@ module Skylab::Treemap
 
         module ModuleMethods
 
-    Treemap_._lib.old_CLI_lib.action self, :DSL_methods
+    Treemap_.lib_.old_CLI_lib.action self, :DSL_methods
 
     def option_parser             # just for resulting in a DSL for the `more`
       if block_given?

@@ -4,9 +4,9 @@ module Skylab::SubTree
 
     class Scanner_
 
-      SubTree_._lib.funcy_globful self
+      SubTree_.lib_.funcy_globful self
 
-      SubTree_._lib.basic_fields :client, self,
+      SubTree_.lib_.basic_fields :client, self,
         :absorber, :absrb_iambic_fully,
         :field_i_a, [ :glyphset_x ]
 

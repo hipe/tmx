@@ -67,7 +67,7 @@ module Skylab::Treemap
       nil
     end
 
-    Treemap_._lib.ivars_with_procs_as_methods( self ).as_public_getter :@rc, :mode_client
+    Treemap_.lib_.ivars_with_procs_as_methods( self ).as_public_getter :@rc, :mode_client
 
     public :actions_const_get  # (child s.c only)
 
@@ -112,7 +112,7 @@ module Skylab::Treemap
       @is_visible = true
       if const
         @is_native = true
-        @name = Treemap_._lib.old_name_lib.via_const const
+        @name = Treemap_.lib_.old_name_lib.via_const const
       else
         @is_native = false
         @name = nf

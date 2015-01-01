@@ -61,7 +61,7 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
     end
 
     def count_occurrences_in_string_of_string haystack_s, needle_s
-      TestSupport_._lib.basic::String.
+      TestSupport_.lib_.basic::String.
         count_occurrences_in_string_of_string haystack_s, needle_s
     end
   end

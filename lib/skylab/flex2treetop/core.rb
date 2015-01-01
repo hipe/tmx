@@ -9,7 +9,7 @@ module Skylab::Flex2Treetop
 
   Autoloader_[ self, ::Pathname.new( ::File.dirname __FILE__ ) ]
 
-  def self._lib
+  def self.lib_
     @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
   end
 
@@ -64,7 +64,7 @@ module Skylab::Flex2Treetop
     end
   end
 
-  LIB_ = _lib
+  LIB_ = lib_
 
   module CLI
     def self.new i, o, e  # #hook-out[tmx]
@@ -319,7 +319,7 @@ module Skylab::Flex2Treetop
     end
 
     def moniker_for_errmsg
-      o = F2TT_._lib.old_name_lib
+      o = F2TT_.lib_.old_name_lib
       o.naturalize o.normify o.const_basename self.class.name
     end
 

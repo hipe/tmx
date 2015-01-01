@@ -16,7 +16,7 @@ module Skylab::SubTree
         :argument_symbol_list,
         :on_event_selectively
 
-      SubTree_._lib.event_lib.selective_builder_sender_receiver self
+      SubTree_.lib_.event_lib.selective_builder_sender_receiver self
 
       def execute
         ok = normalize
@@ -111,7 +111,7 @@ module Skylab::SubTree
 
       class List_Behavior__
 
-        SubTree_._lib.event_lib.selective_builder_sender_receiver self
+        SubTree_.lib_.event_lib.selective_builder_sender_receiver self
 
         def initialize * a
           @union, @special_format_symbol, @hubs, @on_event_selectively = a

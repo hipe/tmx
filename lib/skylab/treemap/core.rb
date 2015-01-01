@@ -36,7 +36,7 @@ module Skylab::Treemap
     Autoloader_[ self ]
   end
 
-  def self._lib
+  def self.lib_
     @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
   end
 
@@ -66,7 +66,7 @@ module Skylab::Treemap
     end
   end
 
-  LIB_ = _lib
+  LIB_ = lib_
 
   Headless = ::Skylab::Headless
   IDENTITY_ = -> { x }

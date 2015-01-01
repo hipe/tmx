@@ -34,7 +34,7 @@ module Skylab::Brazen
       Brazen_::Kernel_
     end
 
-    def _lib
+    def lib_
       LIB_
     end
 

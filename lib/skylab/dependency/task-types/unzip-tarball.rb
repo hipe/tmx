@@ -2,9 +2,9 @@ module Skylab::Dependency
 
   class TaskTypes::UnzipTarball < Dep_::Task
 
-    Dep_._lib.open_2 self
+    Dep_.lib_.open_2 self
 
-    include Dep_._lib.path_tools.instance_methods_module
+    include Dep_.lib_.path_tools.instance_methods_module
 
     include Dep_::TaskTypes::TarballTo::Constants
 

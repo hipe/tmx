@@ -54,7 +54,7 @@ module Skylab::GitViz::TestSupport::CLI
     # ~ assertion phase
     def expect_expecting_line_with_action_subset * i_a
       _s_a = i_a.map { |i| i.id2name.gsub( GitViz_::UNDERSCORE_, GitViz_::DASH_ ) }
-      subset = GitViz_._lib.set.new _s_a
+      subset = GitViz_.lib_.set.new _s_a
       expect_expecting_line do
         _s_a_ = @md[ :altrntn ].split( / *\| */ )
         superset = ::Set.new _s_a_

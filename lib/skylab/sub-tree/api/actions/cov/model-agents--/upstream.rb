@@ -111,7 +111,7 @@ module Skylab::SubTree
         end
 
         def find_with_find
-          @result = SubTree_._lib.system.filesystem.find(
+          @result = SubTree_.lib_.system.filesystem.find(
             :path, @path,
             :freeform_query_infix, '-type dir',
             :filenames, TEST_DIR_NAME_A_,

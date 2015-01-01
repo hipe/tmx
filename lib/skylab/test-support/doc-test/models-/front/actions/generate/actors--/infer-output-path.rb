@@ -21,7 +21,7 @@ module Skylab::TestSupport
 
           def via_manifest_entry_absolute_path_resolve_test_dir_pathname
 
-            @test_dir_pn = TestSupport_._lib.system.filesystem.walk(
+            @test_dir_pn = TestSupport_.lib_.system.filesystem.walk(
               :start_path, ::File.dirname( @input_path ),
               :filename, TEST_DIR_FILENAME_,
               :ftype, DIR_FTYPE_,

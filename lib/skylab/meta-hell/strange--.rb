@@ -33,7 +33,7 @@ module Skylab::MetaHell
         "'#{ x }'"
       elsif x.respond_to? :ascii_only?
 
-        _s = MetaHell_._lib.CLI_lib.ellipsify(
+        _s = MetaHell_.lib_.CLI_lib.ellipsify(
           A_REASONABLY_SHORT_LENGTH_FOR_A_STRING, x )
 
         "\"#{ _s }\""

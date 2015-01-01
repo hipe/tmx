@@ -33,7 +33,7 @@ module Skylab::TestSupport
           :ad_hoc_normalizer, -> arg, & oes_p do
 
             if arg.value_x
-              TestSupport_._lib.basic::Pathname.normalization.build_with(
+              TestSupport_.lib_.basic::Pathname.normalization.build_with(
                 :absolute, :downward_only,
                 :no_single_dots,
                 :no_dotfiles ).normalize_argument arg, & oes_p
@@ -169,7 +169,7 @@ module Skylab::TestSupport
 
         def report_via_count d
           @on_event_selectively.call :info, :finished do
-            TestSupport_._lib.event_lib.inline_with :finished,
+            TestSupport_.lib_.event_lib.inline_with :finished,
                 :number_of_files, d,
                 :ok, ( d.nonzero? ? true : false ) do | y, o |
 
@@ -203,7 +203,7 @@ module Skylab::TestSupport
             @existent_path = ::File.join @current, @FS.test_support_file
             @desired_path = ::File.join @current, @dir, @FS.test_support_file
 
-            @tree = TestSupport_._lib.system.filesystem.hack_guess_module_tree(
+            @tree = TestSupport_.lib_.system.filesystem.hack_guess_module_tree(
               :path, @existent_path,
               :on_event_selectively, @on_event_selectively )
 
@@ -256,12 +256,12 @@ module Skylab::TestSupport
             else
 
               @on_event_selectively.call :info, :writing do
-                TestSupport_._lib.event_lib.inline_neutral_with :writing,
+                TestSupport_.lib_.event_lib.inline_neutral_with :writing,
                   :path, @desired_path
               end
 
               if @is_dry
-                TestSupport_._lib.IO.dry_stub_instance
+                TestSupport_.lib_.IO.dry_stub_instance
               else
                 @did_open = true
                 ::File.open @desired_path, 'w'

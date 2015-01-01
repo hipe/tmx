@@ -16,7 +16,7 @@ module Skylab::Dependency
     Autoloader_[ self ]
   end
 
-  def self._lib
+  def self.lib_
     @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
       self::Lib_, self )
   end

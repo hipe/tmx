@@ -31,7 +31,7 @@ module Skylab::CodeMolester
             end
           end  # >>
 
-    Shell__ = CM_._lib.simple_shell %i( with add list_as_json )
+    Shell__ = CM_.lib_.simple_shell %i( with add list_as_json )
 
     class Kernel__
 
@@ -100,7 +100,7 @@ module Skylab::CodeMolester
     end
 
     def inflection
-      @inflection ||= CM_._lib.entity_inflection name
+      @inflection ||= CM_.lib_.entity_inflection name
     end
 
     def name

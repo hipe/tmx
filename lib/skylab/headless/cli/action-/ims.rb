@@ -200,7 +200,7 @@ module Skylab::Headless
 
         Action_::LEXICON__ = class Action_::Lexicon__  # #storypoint-20, #storypoint-155
           def initialize
-            @bx = Headless_._lib.meso_box_lib.new
+            @bx = Headless_.lib_.meso_box_lib.new
             @is_collapsed = false ; @p_a = [] ; nil
           end
           def fetch_default_values_at_i_a i_a
@@ -512,7 +512,7 @@ module Skylab::Headless
           @q_x_a.fetch 0
         end
 
-        class Action_::Bound_Task__ < Headless_._lib.method_lib.curry
+        class Action_::Bound_Task__ < Headless_.lib_.method_lib.curry
           alias_method :replace, :initialize ; public :replace
           def initialize bm, arg_a, p
             super bm, arg_a ; @p = p ; nil

@@ -12,7 +12,7 @@ module Skylab::Headless
 
     include Headless_::Library_::FileUtils
 
-    Headless_._lib.entity self do
+    Headless_.lib_.entity self do
 
       o :iambic_writer_method_name_suffix, :'=',
 

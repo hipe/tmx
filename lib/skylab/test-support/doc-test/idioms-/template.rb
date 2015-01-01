@@ -42,7 +42,7 @@ module Skylab::TestSupport
 
       EXT__ = '.tmpl'.freeze
 
-      Template__ = TestSupport_._lib.basic::String.template
+      Template__ = TestSupport_.lib_.basic::String.template
 
     end
   end

@@ -2,7 +2,7 @@ module Skylab::SubTree
 
   class API::Actions::My_Tree
 
-    SubTree_._lib.enhance_as_API_normalizer self, :all
+    SubTree_.lib_.enhance_as_API_normalizer self, :all
 
     Lib_::Basic_fields[ :client, self,
       :absorber, :absrb_iambic_fully,
@@ -46,7 +46,7 @@ module Skylab::SubTree
       nil  # when field is optional, response "shouldn't" matter
     end
 
-    SubTree_._lib.API_Params :client, self,
+    SubTree_.lib_.API_Params :client, self,
 
       :meta_param, :extension,
 
@@ -79,7 +79,7 @@ module Skylab::SubTree
 
     def write_option_parser_to o
       ex_ag = expression_agent
-      SubTree_._lib.write_isomorphic_option_parser_options(
+      SubTree_.lib_.write_isomorphic_option_parser_options(
         :field_box, field_box, :any_expression_agent, ex_ag,
         :param_h, order_proxy, :op, o )
       ex_ag.instance_exec do
@@ -338,7 +338,7 @@ module Skylab::SubTree
           pattern_part = [ :filename, @pattern ]
         end
 
-        cmd_s = SubTree_._lib.system.filesystem.find(
+        cmd_s = SubTree_.lib_.system.filesystem.find(
           :paths, @path_a,
           * pattern_part,
           :freeform_query_infix, '-type file',

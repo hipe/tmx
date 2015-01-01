@@ -696,7 +696,7 @@ module Skylab::Porcelain::Legacy
               instance_exec op, &blk
             end
             h = false                                 # is '-h' defined?
-            ea = Porcelain_._lib.CLI_lib.option.enumerator op
+            ea = Porcelain_.lib_.CLI_lib.option.enumerator op
             help_is_defined = ea.detect do |sw|
               if sw.respond_to? :short
                 h = true if ! h && sw.short.include?( '-h' )
@@ -726,7 +726,7 @@ module Skylab::Porcelain::Legacy
     end
 
     def bld_op_stream
-      Porcelain_._lib.CLI_lib.option.parser.scanner @option_parser
+      Porcelain_.lib_.CLI_lib.option.parser.scanner @option_parser
     end
 
     def resolve_queue  # assume nonzero length queue
@@ -876,7 +876,7 @@ module Skylab::Porcelain::Legacy
 
     def render_option_syntax
       if option_parser
-        ea = Porcelain_._lib.CLI_lib.option.enumerator option_parser
+        ea = Porcelain_.lib_.CLI_lib.option.enumerator option_parser
         parts = ea.reduce [] do |m, sw|
           if sw.respond_to?( :short ) && @switch_is_visible[ sw ]
             m << "[#{ sw.short.first || sw.long.first }#{ sw.arg }]"
@@ -1015,7 +1015,7 @@ module Skylab::Porcelain::Legacy
 
     include Namespace::InstanceMethods
 
-    include Porcelain_._lib.CLI_lib.pen.instance_methods_module
+    include Porcelain_.lib_.CLI_lib.pen.instance_methods_module
 
     def invoke argv  # mutates argv. standard 3-arg result.
       exit_code, method, args = resolve_argv argv

@@ -35,7 +35,7 @@ module Skylab::CodeMolester
       end
 
       private def say_not_string x
-        _ = CM_._lib.strange x
+        _ = CM_.lib_.strange x
         "no implicit conversion of #{ _ } into String"
       end
     end

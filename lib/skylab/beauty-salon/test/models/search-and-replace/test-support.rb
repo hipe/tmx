@@ -67,7 +67,7 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
     end
 
     def black_and_white_expression_agent_for_expect_event
-      BS_._lib.brazen::API.expression_agent_instance
+      BS_.lib_.brazen::API.expression_agent_instance
     end
 
     # ~ assertion support
@@ -81,7 +81,7 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
   end
 
   Bin_path_ = Callback_.memoize do
-    BS_._lib.system.defaults.bin_pathname.
+    BS_.lib_.system.defaults.bin_pathname.
       join( 'tmx-beauty-salon search-and-r' ).to_path
   end
 

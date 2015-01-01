@@ -59,9 +59,9 @@ module Skylab::BeautySalon::TestSupport
 
     Memoize_tmpdir__ = -> do_debug, debug_IO do
 
-      _pn = BS_._lib.system.defaults.dev_tmpdir_pathname.join 'bertie-serern'
+      _pn = BS_.lib_.system.defaults.dev_tmpdir_pathname.join 'bertie-serern'
 
-      _TMPDIR = BS_._lib.system.filesystem.tmpdir :path, _pn.to_path,
+      _TMPDIR = BS_.lib_.system.filesystem.tmpdir :path, _pn.to_path,
         :be_verbose, do_debug,
         :debug_IO, debug_IO,
         :max_mkdirs, 1
@@ -75,7 +75,7 @@ module Skylab::BeautySalon::TestSupport
   module TestLib_
 
     Expect_event = -> test_context_mod do
-      BS_._lib.brazen.test_support::Expect_Event[ test_context_mod ]
+      BS_.lib_.brazen.test_support::Expect_Event[ test_context_mod ]
     end
 
   end

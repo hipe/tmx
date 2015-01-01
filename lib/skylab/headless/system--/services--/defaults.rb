@@ -8,7 +8,7 @@ module Skylab::Headless
         @system = x
       end
 
-      Headless_._lib.properties_stack_frame self,
+      Headless_.lib_.properties_stack_frame self,
 
         :memoized, :inline_method, :bin_pathname, -> do
           top_of_the_universe_pathname.join 'bin'

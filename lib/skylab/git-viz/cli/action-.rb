@@ -19,10 +19,10 @@ module Skylab::GitViz
     end
     #
     def self.local_normal_name
-      GitViz_._lib.local_normal_name_from_module self
+      GitViz_.lib_.local_normal_name_from_module self
     end
 
-    GitViz_._lib.CLI_lib::Client[ self,
+    GitViz_.lib_.CLI_lib::Client[ self,
       :client_services,
         :named, :svcs_for_API_action,
         :named, :listnr_for_VCS_front ]

@@ -10,7 +10,7 @@ module Skylab::Slake
 
   class Task < ::Rake::Task
 
-    Slake_._lib.formal_attribute::DSL[ self ]
+    Slake_.lib_.formal_attribute::DSL[ self ]
 
     extend Slake_::Interpolate
     extend TaskClassMethods

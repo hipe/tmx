@@ -33,7 +33,7 @@ module Skylab::Cull::TestSupport
 
     def prepare_tmpdir
 
-      fs =  Cull_._lib.filesystem
+      fs =  Cull_.lib_.filesystem
       path = fs.tmpdir_pathname.join( 'culio' ).to_path
       td = fs.tmpdir(
         :path, path,

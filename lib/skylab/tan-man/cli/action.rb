@@ -163,7 +163,7 @@ module Skylab::TanMan
       on_call_to_action do |e|
         if ! e.touched?
           e.touch!
-          msg = TanMan_._lib.string_lib.template[
+          msg = TanMan_.lib_.string_lib.template[
             e.template, action: act( e.action_class ) ]
           emit :help, msg  # if something else is listening to *this* ..
         end

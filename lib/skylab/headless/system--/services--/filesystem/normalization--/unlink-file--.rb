@@ -42,7 +42,7 @@ module Skylab::Headless
 
           def via_e
             @on_event_selectively.call :error, :enoent do
-              Headless_._lib.event_lib.wrap.exception @e, :path_hack
+              Headless_.lib_.event_lib.wrap.exception @e, :path_hack
             end
           end
 
@@ -56,7 +56,7 @@ module Skylab::Headless
 
           def when_success
             @on_event_selectively.call :info, :success do
-              Headless_._lib.event_lib.inline_neutral_with :deleted_file,
+              Headless_.lib_.event_lib.inline_neutral_with :deleted_file,
                 :path, @path
             end
           end

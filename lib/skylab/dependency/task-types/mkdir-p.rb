@@ -17,7 +17,7 @@ module Skylab::Dependency
 
       valid? or fail(invalid_reason)
 
-      _n11n = Dep_._lib.system.filesystem.normalization
+      _n11n = Dep_.lib_.system.filesystem.normalization
 
       did_send_event = nil
 

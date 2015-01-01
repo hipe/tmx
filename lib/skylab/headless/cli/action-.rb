@@ -154,7 +154,7 @@ module Skylab::Headless
       Inflection = -> x_a do
         module_exec x_a, & Headless_::Action::Bundles::Inflection
       end
-      Headless_._lib.bundle::Multiset[ self ]
+      Headless_.lib_.bundle::Multiset[ self ]
     end
 
     module DSL_Meths  # #storypoint-10

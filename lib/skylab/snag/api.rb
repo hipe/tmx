@@ -94,9 +94,9 @@ module Skylab::Snag
 
       def via_action_produce_bound_call
         if @par_h
-          Snag_._lib.bound_call [ @par_h ], @action, :invoke
+          Snag_.lib_.bound_call [ @par_h ], @action, :invoke
         else
-          Snag_._lib.bound_call [ @upstream ], @action, :invoke_via_argument_stream
+          Snag_.lib_.bound_call [ @upstream ], @action, :invoke_via_argument_stream
         end
       end
     end

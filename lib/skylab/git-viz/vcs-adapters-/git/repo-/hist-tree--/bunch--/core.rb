@@ -45,7 +45,7 @@ module Skylab::GitViz
 
         def get_trail_stream
           d = last = nil
-          GitViz_._lib.power_scanner :init, -> do
+          GitViz_.lib_.power_scanner :init, -> do
             d = -1 ; last = @trail_a.length - 1
           end, :gets, -> do
             d < last and @trail_a.fetch d += 1

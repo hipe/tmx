@@ -62,7 +62,7 @@ module Skylab::TanMan
       end
     end
 
-    CircleHash = TanMan_._lib.proxy_lib.nice :[], :[]=, :fetch
+    CircleHash = TanMan_.lib_.proxy_lib.nice :[], :[]=, :fetch
 
     class Models::Meaning::Interminable
       attr_reader :trail_a, :reason

@@ -58,7 +58,7 @@ module Skylab::FileMetrics
 
     def build_find_dirs_command_string
 
-      FM_._lib.system.filesystem.find(
+      FM_.lib_.system.filesystem.find(
         :path, @req[ :path ],
         :ignore_dirs, @req[ :exclude_dirs ],
         :filenames, @req[ :include_names ],

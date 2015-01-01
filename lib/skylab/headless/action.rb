@@ -52,13 +52,13 @@ module Skylab::Headless
         extend Headless_::NLP::EN::API_Action_Inflection_Hack ; nil
       end
 
-      Headless_._lib.bundle::Multiset[ self ]
+      Headless_.lib_.bundle::Multiset[ self ]
 
     end
 
     Keyword_required__ = -> i, x_a do
       i == x_a.first or raise ::ArgumentError, "expected '#{ i }' had #{
-        }#{ Headless_._lib.strange x_a.first }"
+        }#{ Headless_.lib_.strange x_a.first }"
       x_a.shift ; nil
     end
 

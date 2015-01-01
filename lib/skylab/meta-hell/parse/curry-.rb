@@ -74,7 +74,7 @@ module Skylab::MetaHell
         @abstract_field_list = @call_p = @constantspace_mod =
           @default_field = @do_glob_extra_args = @exhaustion_p = @syntax = nil
 
-        @state_mutex = MetaHell_._lib.mutex_lib.write_once.new :state_mutex
+        @state_mutex = MetaHell_.lib_.mutex_lib.write_once.new :state_mutex
 
           # state encompasses input and output. various algorithms may handle
           # input and output together or separately, but we ensure that etc.
@@ -129,7 +129,7 @@ module Skylab::MetaHell
       end
 
       def say_lev x
-        MetaHell_._lib.levenshtein.with(
+        MetaHell_.lib_.levenshtein.with(
           :item, x,
           :items, field_box.get_names,
           :closest_N_items, 3,

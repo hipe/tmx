@@ -157,7 +157,7 @@ module Skylab::Headless
 
         def build_nonzero_event status, serr_line
 
-          Headless_._lib.event_lib.inline_not_OK_with :nonzero_exitstatus,
+          Headless_.lib_.event_lib.inline_not_OK_with :nonzero_exitstatus,
               :exitstatus, status.exitstatus,
               :first_error_line, serr_line do | y, o_ |
 
@@ -195,7 +195,7 @@ module Skylab::Headless
           Headless_::Library_::Shellwords.shellescape s
         end
 
-        Process_Line_ = Headless_._lib.event_lib.message_class_factory.new :ok, nil do | line |
+        Process_Line_ = Headless_.lib_.event_lib.message_class_factory.new :ok, nil do | line |
           line
         end
       end

@@ -33,9 +33,9 @@ module Skylab::Basic
         end
       end
 
-      Shell__ = Basic_._lib.enhancement_shell %i( with )
+      Shell__ = Basic_.lib_.enhancement_shell %i( with )
 
-  Kernel__ = Basic_._lib.ivars_with_procs_as_methods.new :flush do
+  Kernel__ = Basic_.lib_.ivars_with_procs_as_methods.new :flush do
 
     def initialize target
       @host = nil
@@ -147,7 +147,7 @@ module Skylab::Basic
 
     attr_reader :field
 
-    Basic_._lib.ivars_with_procs_as_methods self, :@value_p, :value
+    Basic_.lib_.ivars_with_procs_as_methods self, :@value_p, :value
 
     def local_normal_name
       @field.local_normal_name

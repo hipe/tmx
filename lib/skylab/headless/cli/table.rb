@@ -40,7 +40,7 @@ module Skylab::Headless::CLI::Table
     # --*--
     def initialize
       @head = @tail = @separator = nil
-      @field_box = Headless_._lib.old_box_lib.open_box.new
+      @field_box = Headless_.lib_.old_box_lib.open_box.new
     end
   end
 
@@ -221,7 +221,7 @@ module Skylab::Headless::CLI::Table
 
     def ancestor_names_recursive
       @ancestor_names_recursive ||= begin
-        box = Headless_._lib.old_box_lib.open_box.new
+        box = Headless_.lib_.old_box_lib.open_box.new
         _ancestor_names_recursive box
         box.names
       end

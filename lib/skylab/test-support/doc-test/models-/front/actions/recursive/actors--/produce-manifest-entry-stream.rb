@@ -44,7 +44,7 @@ module Skylab::TestSupport
           # that it does not.
 
           def initialize
-            @filesystem = TestSupport_._lib.system.filesystem
+            @filesystem = TestSupport_.lib_.system.filesystem
             super
           end
 

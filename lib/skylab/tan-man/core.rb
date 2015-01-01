@@ -9,7 +9,7 @@ module Skylab::TanMan
       @nf ||= Callback_::Name.via_module self
     end
 
-    def _lib
+    def lib_
       @lib ||= TanMan_::Lib_::INSTANCE
     end
   end

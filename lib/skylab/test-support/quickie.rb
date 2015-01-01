@@ -176,7 +176,7 @@ module Skylab::TestSupport
         end
       end
 
-      TestSupport_._lib  # loads LIB_, Library_
+      TestSupport_.lib_  # loads LIB_, Library_
       LIB_.let_methods self
 
       def initialize rt

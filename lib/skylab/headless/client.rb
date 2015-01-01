@@ -21,7 +21,7 @@ module Skylab::Headless
       Parameter_controller = -> _ do
         Headless_::Parameter[ self, :parameter_controller ]
       end
-      Headless_._lib.bundle::Multiset[ self ]
+      Headless_.lib_.bundle::Multiset[ self ]
     end
   end
 

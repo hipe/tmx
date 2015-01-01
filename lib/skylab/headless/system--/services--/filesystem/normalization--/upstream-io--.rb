@@ -16,7 +16,7 @@ module Skylab::Headless
 
             def path=
               @do_execute = true
-              @path_arg = Headless_._lib.basic.
+              @path_arg = Headless_.lib_.basic.
                 trio.via_x_and_i iambic_property, :path
               ACHIEVED_
             end

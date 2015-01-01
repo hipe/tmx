@@ -29,7 +29,7 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem
         end
       HERE
 
-      _lines = Headless_._lib.string_lib.line_stream _whole_s
+      _lines = Headless_.lib_.string_lib.line_stream _whole_s
 
       root = subject :line_upstream, _lines
 

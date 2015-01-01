@@ -6,7 +6,7 @@ module Skylab::TestSupport
       Client.new( * x_a )
     end
 
-    Client = ::Class.new TestSupport_._lib.CLI_client_base_class  # loads 'LIB_'
+    Client = ::Class.new TestSupport_.lib_.CLI_client_base_class  # loads 'LIB_'
     RegretLib_ = Regret::API::RegretLib_
   end
 

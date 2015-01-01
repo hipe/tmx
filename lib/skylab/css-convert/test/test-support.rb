@@ -56,7 +56,7 @@ module Skylab::CSS_Convert::TestSupport
       build_parser(CSSC_::Directive__::Parser).parse_string pathname.read
     end
 
-    define_method :unstyle, CSSC_._lib.CLI_lib.pen.unstyle
+    define_method :unstyle, CSSC_.lib_.CLI_lib.pen.unstyle
 
   end
 end

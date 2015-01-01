@@ -70,7 +70,7 @@ module Skylab::TestSupport
         end ]
 
         o[ :InstanceMethods, -> do
-          extend TestSupport_._lib.let::ModuleMethods
+          extend TestSupport_.lib_.let::ModuleMethods
           pam and include pam.instance_methods_module
         end ]
 

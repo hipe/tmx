@@ -248,7 +248,7 @@ module Skylab::Headless
           end
 
           def result
-            Headless_._lib.basic.trio(
+            Headless_.lib_.basic.trio(
               ( if @is_dry_run
                 Mock_Dir__.new @path
               else

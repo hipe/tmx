@@ -59,7 +59,7 @@ module Skylab::SubTree
     end
 
     def corresponding_API_action_class
-      SubTree_._lib.module_lib.value_via_module_and_relative_parts(
+      SubTree_.lib_.module_lib.value_via_module_and_relative_parts(
         @app_mod::API::Actions, qualified_const_path )
     end
 

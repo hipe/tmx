@@ -122,7 +122,7 @@ module Skylab::TanMan
 
         attr_writer :do_force_overwrite_for_load
 
-        include TanMan_._lib.TTT::Parser::InstanceMethods
+        include TanMan_.lib_.TTT::Parser::InstanceMethods
 
       private
 
@@ -139,7 +139,7 @@ module Skylab::TanMan
 
         def build_parser_class
 
-          TanMan_._lib.TTT::Parser::Load.new( self,
+          TanMan_.lib_.TTT::Parser::Load.new( self,
             -> o do
               do_force_overwrite_for_load and o.force_overwrite!
               o.generated_grammar_dir @generated_grammar_dir_path
@@ -170,7 +170,7 @@ module Skylab::TanMan
         end
 
         def excerpt_lines
-          scn = TanMan_._lib.string_scanner.new parser.input
+          scn = TanMan_.lib_.string_scanner.new parser.input
           stop_at = parser.failure_line
           line_no = 0
           begin

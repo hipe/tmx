@@ -119,7 +119,7 @@ module Skylab::Basic
 
   class Pooled_Leaf__
 
-    Basic_._lib.pool( self ).with_with_instance
+    Basic_.lib_.pool( self ).with_with_instance
 
     def init_from_pool x
       @leaf_data = x

@@ -74,7 +74,7 @@ module Skylab::GitViz
 
         def get_filediff_stream
           d = last = nil
-          GitViz_._lib.power_scanner :init, -> do
+          GitViz_.lib_.power_scanner :init, -> do
             d = -1 ; last = ( @filediff_a ? ( @filediff_a.length - 1 ) : -1 )
           end, :gets, -> do
             d < last and @filediff_a.fetch d += 1

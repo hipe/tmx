@@ -360,7 +360,7 @@ module Skylab::Treemap
 
       fun = LIB_.CLI_lib.option.parser.scanner
 
-      mustache_rx = Treemap_._lib.string_lib.mustache_regexp
+      mustache_rx = Treemap_.lib_.string_lib.mustache_regexp
 
       define_method :summarize_switch do |sw, idx, args, blk|
         sw.summarize(* args ) do |line|  # (no how about *I'll* call it)

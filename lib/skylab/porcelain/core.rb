@@ -6,7 +6,7 @@ module Skylab::Porcelain
   Callback_ = ::Skylab::Callback
     Autoloader_ = Callback_::Autoloader
 
-  def self._lib
+  def self.lib_
     @lib ||= Porcelain_::Lib_::INSTANCE
   end
 

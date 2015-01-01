@@ -6,9 +6,9 @@ module Skylab::Snag
 
       ACTIONS_ANCHOR_MODULE = -> { CLI::Actions }
 
-      Snag_._lib.CLI_lib.action self, :DSL
+      Snag_.lib_.CLI_lib.action self, :DSL
 
-      extend Snag_._lib.NLP::EN::API_Action_Inflection_Hack
+      extend Snag_.lib_.NLP::EN::API_Action_Inflection_Hack
 
       inflection.inflect.noun :singular
 
@@ -41,10 +41,10 @@ module Skylab::Snag
 
       def retrieve_param_for_expression_agent i
         if @option_parser.top.long.key?( i.to_s  )
-          Snag_._lib.CLI::Option.on "--#{ i }"
+          Snag_.lib_.CLI::Option.on "--#{ i }"
         else
           _fp = Fake_Formal_Parameter__.new Callback_::Name.via_variegated_symbol i
-          Snag_._lib.CLI_lib.argument _fp, :req
+          Snag_.lib_.CLI_lib.argument _fp, :req
         end
       end
       Fake_Formal_Parameter__ = ::Struct.new :name
@@ -202,7 +202,7 @@ module Skylab::Snag
 
       class Box < self
 
-        Snag_._lib.CLI_lib::Box[ self, :DSL,
+        Snag_.lib_.CLI_lib::Box[ self, :DSL,
           :leaf_action_base_class, -> { Leaf_Action__ } ]
 
         def self.inflection

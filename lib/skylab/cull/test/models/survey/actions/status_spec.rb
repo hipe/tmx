@@ -21,7 +21,7 @@ module Skylab::Cull::TestSupport
     end
 
     it "with a path that is a directory but workspace not found #egads" do
-      against Cull_._lib.filesystem.tmpdir_path
+      against Cull_.lib_.filesystem.tmpdir_path
       expect_not_OK_event :resource_not_found
       expect_failed
     end

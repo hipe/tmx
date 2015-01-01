@@ -22,7 +22,7 @@ module Skylab::SubTree
     Autoloader_[ self ]
   end
 
-  def self._lib
+  def self.lib_
     @lib ||= SubTree_::Lib_::INSTANCE
   end
 
@@ -31,7 +31,7 @@ module Skylab::SubTree
   DOT_ = '.'.freeze
 
   Entity_ = -> * x_a do
-    SubTree_._lib.entity_via_iambic x_a
+    SubTree_.lib_.entity_via_iambic x_a
   end
 
   EMPTY_P_ = -> { }

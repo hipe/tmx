@@ -203,7 +203,7 @@ module Skylab::BeautySalon
               end
             end
             p = -> do
-              stream = BS_._lib.basic::String.line_stream @md[ 0 ]
+              stream = BS_.lib_.basic::String.line_stream @md[ 0 ]
               if @do_highlight
                 stream = stream.map_by do |string|
                   did = string.chomp!

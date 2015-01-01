@@ -46,7 +46,7 @@ module Skylab::Headless
 
           :property, :on_event_selectively
 
-        Headless_._lib.event_lib.selective_builder_sender_receiver self
+        Headless_.lib_.event_lib.selective_builder_sender_receiver self
 
      private
 
@@ -268,7 +268,7 @@ module Skylab::Headless
           nil
         end
 
-        Immu_Node__ = Headless_._lib.tree_lib.immutable_node
+        Immu_Node__ = Headless_.lib_.tree_lib.immutable_node
 
         def OK
           ACHIEVED_

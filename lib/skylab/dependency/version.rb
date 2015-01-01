@@ -1,12 +1,12 @@
 module Skylab::Dependency
 
-  class Version < Dep_._lib.sexp
+  class Version < Dep_.lib_.sexp
 
     REGEX      = /(\d+)\.(\d+)(?:\.(\d+))?/ # #bound
 
     split_rx = /\A(?<prefix>.*[^\.\d])?(?<scalar>#{REGEX.source})\z/
 
-    s = ->(* a) { Dep_._lib.sexp.new a }
+    s = ->(* a) { Dep_.lib_.sexp.new a }
 
     define_singleton_method :parse_string_with_version do |str, &err|
       res = nil

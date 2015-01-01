@@ -161,7 +161,7 @@ module Skylab::Basic::TestSupport::Tree
 
     def to_normal_string
 
-      io = Basic_._lib.string_IO
+      io = Basic_.lib_.string_IO
       @tree.children_depth_first_via_args_hook io, nil do |node, io_, indent, p|
         io_.write "#{ indent }+ #{ node.value_x }"
         p[ -> do

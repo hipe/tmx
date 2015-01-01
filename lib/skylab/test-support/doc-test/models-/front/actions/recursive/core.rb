@@ -126,7 +126,7 @@ module Skylab::TestSupport
 
           via_properties_init_ivars
 
-          o = TestSupport_._lib.system.defaults
+          o = TestSupport_.lib_.system.defaults
           @doc_test_dir = o.doc_test_dir
           @doc_test_files_file = o.doc_test_files_file
 
@@ -139,7 +139,7 @@ module Skylab::TestSupport
 
           if :preview == @sub_action && ! @downstream
             maybe_send_event :error, :missing_required_properties do
-              TestSupport_._lib.entity.properties_stack.
+              TestSupport_.lib_.entity.properties_stack.
                 build_missing_required_properties_event(
                   [ self.class.property_via_symbol( :downstream ) ] )
             end

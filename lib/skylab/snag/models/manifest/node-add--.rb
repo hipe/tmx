@@ -4,7 +4,7 @@ module Skylab::Snag
 
     class Node_add__ < Agent_
 
-      Snag_._lib.basic_fields :client, self,
+      Snag_.lib_.basic_fields :client, self,
         :absorber, :absrb_iambic_fully,
         :field_i_a, [ :is_dry_run, :verbose_x ]
 

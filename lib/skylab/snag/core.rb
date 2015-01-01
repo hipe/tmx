@@ -14,7 +14,7 @@ module Skylab::Snag
 
   class << self
 
-    def _lib
+    def lib_
       @lib ||= Snag_::Lib_::INSTANCE
     end
 

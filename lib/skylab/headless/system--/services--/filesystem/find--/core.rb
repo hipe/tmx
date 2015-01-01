@@ -174,7 +174,7 @@ module Skylab::Headless
           nil
         end
 
-        Command_String_Event__ = Headless_._lib.event_lib.prototype_with(
+        Command_String_Event__ = Headless_.lib_.event_lib.prototype_with(
 
             :command_string, :command_string, nil, :ok, nil ) do |y, o|
 
@@ -204,7 +204,7 @@ module Skylab::Headless
 
           def append_nonzero_paths
             @unescaped_path_a.each do |s|
-              @y.push Headless_._lib.shellwords.escape s
+              @y.push Headless_.lib_.shellwords.escape s
             end ; nil
           end
 
@@ -235,7 +235,7 @@ module Skylab::Headless
           end
 
           Dangerous_conditional_shellescape_path__ = -> s do
-            Headless_._lib.shellwords.escape s  # placeholder for hax
+            Headless_.lib_.shellwords.escape s  # placeholder for hax
           end
         end
       end

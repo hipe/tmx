@@ -4,7 +4,7 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
 
   describe "[bs] S & R - the non-interactive API" do
 
-    BS_._lib.brazen.test_support::Expect_Event[ self ]
+    BS_.lib_.brazen.test_support::Expect_Event[ self ]
 
     extend TS_
 

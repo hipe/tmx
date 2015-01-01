@@ -77,7 +77,7 @@ module Skylab::Git::TestSupport::CLI
       s
     end
 
-    pen = Git_._lib.CLI_lib.pen
+    pen = Git_.lib_.CLI_lib.pen
 
     STYLE_RX__ = pen.simple_style_rx
 

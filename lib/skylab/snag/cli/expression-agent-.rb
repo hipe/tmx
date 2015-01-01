@@ -4,7 +4,7 @@ module Skylab::Snag
 
     class Expression_Agent_
 
-      # subclass Snag_._lib.CLI_lib::Pen::Minimal for less DIY
+      # subclass Snag_.lib_.CLI_lib::Pen::Minimal for less DIY
 
       def initialize retrieve_param
         @retrieve_param = retrieve_param
@@ -26,7 +26,7 @@ module Skylab::Snag
 
       define_method :ick, -> do
         p = -> x do
-          p = Snag_._lib.strange.to_proc.curry[ LIB_.a_short_length ]
+          p = Snag_.lib_.strange.to_proc.curry[ LIB_.a_short_length ]
           p[ x ]
         end
         -> x { p[ x ] }
@@ -44,7 +44,7 @@ module Skylab::Snag
       end
 
       def pth x
-        Snag_._lib.pretty_path x.to_path
+        Snag_.lib_.pretty_path x.to_path
       end
 
       def val x
@@ -71,7 +71,7 @@ module Skylab::Snag
 
       Prepend___ = -> do
         Prepend__ = ::Module.new.module_exec do
-          Snag_._lib.NLP_EN_methods( self, :private, [ :and_, :or_, :s ] )
+          Snag_.lib_.NLP_EN_methods( self, :private, [ :and_, :or_, :s ] )
           self
         end
       end

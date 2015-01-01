@@ -70,7 +70,7 @@ module Skylab::Cull
         if @mechanics.last_api_executable.be_verbose
           pn.to_s
         else
-          Cull_._lib.pretty_path_safe pn
+          Cull_.lib_.pretty_path_safe pn
         end
       end
     end

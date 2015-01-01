@@ -520,13 +520,13 @@ module Skylab::TestSupport
 
         def via_output_path_rslv_line_downstream
 
-          _force_arg = TestSupport_._lib.basic.trio(
+          _force_arg = TestSupport_.lib_.basic.trio(
             # because we use ivars and not property boxes, we must make this manually
             @force,
             true,
             self.class.property_via_symbol( :force ) )
 
-          io = TestSupport_._lib.system.filesystem.normalization.downstream_IO(
+          io = TestSupport_.lib_.system.filesystem.normalization.downstream_IO(
             :path, @output_path,
             :is_dry_run, @dry_run,
             :force_arg, _force_arg,
@@ -564,7 +564,7 @@ module Skylab::TestSupport
         end
 
         def via_upstream_path_rslv_line_upstream
-          io = TestSupport_._lib.system.filesystem.normalization.upstream_IO(
+          io = TestSupport_.lib_.system.filesystem.normalization.upstream_IO(
             :path, @upstream_path,
             :on_event_selectively, -> * i_a, & ev_p do
               @result = maybe_send_event_via_channel i_a, & ev_p
@@ -668,7 +668,7 @@ module Skylab::TestSupport
 
           if @do_emit_current_output_path
             maybe_send_event :info, :current_output_path do
-              TestSupport_._lib.event_lib.inline_neutral_with(
+              TestSupport_.lib_.event_lib.inline_neutral_with(
                 :current_output_path, :path, @output_path )
             end
           end

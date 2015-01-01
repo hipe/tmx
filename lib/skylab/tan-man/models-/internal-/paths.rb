@@ -66,7 +66,7 @@ module Skylab::TanMan
 
         _app_tmpdir_path = app_tmpdir_path
 
-        valid_arg = TanMan_._lib.system.filesystem.normalization.existent_directory(
+        valid_arg = TanMan_.lib_.system.filesystem.normalization.existent_directory(
           :path, _app_tmpdir_path,
           :create_if_not_exist,
           :max_mkdirs, 1  # you may make the [tm] directory only.

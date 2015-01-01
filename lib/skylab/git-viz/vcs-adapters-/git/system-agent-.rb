@@ -79,7 +79,7 @@ module Skylab::GitViz
           end
           line_s
         end
-        GitViz_._lib.power_scanner :init, -> do
+        GitViz_.lib_.power_scanner :init, -> do
          line_s.chomp!
         end, :gets, -> do
           gets_p[]

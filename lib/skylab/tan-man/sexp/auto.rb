@@ -12,7 +12,7 @@ module Skylab::TanMan
       alias_method :debug?, :do_debug
     end
 
-    @debug_stream = TanMan_._lib.some_stderr
+    @debug_stream = TanMan_.lib_.some_stderr
 
     @do_debug = true  # true until you know enough to find this line
 
@@ -39,7 +39,7 @@ module Skylab::TanMan
         tree_class.include mod
       end
       a = [ :Sexp, :InstanceMethods,
-        TanMan_._lib.constantize( tree_class.rule ) ]
+        TanMan_.lib_.constantize( tree_class.rule ) ]
 
       im = a.reduce tree_class.grammar.anchor_module do |m, i|
         _ok = m.const_defined? i, false  # one end of [#078]
@@ -296,7 +296,7 @@ module Skylab::TanMan
 
   # --*--
 
-  My_Struct_ = TanMan_._lib.basic_struct
+  My_Struct_ = TanMan_.lib_.basic_struct
 
   ContentTextValue = My_Struct_[ :content_text_value ]
 
@@ -591,7 +591,7 @@ module Skylab::TanMan
   private
 
     def bld_anchor_mod
-      TanMan_._lib.module_lib.value_via_parts_and_relative_path prts, '../..'
+      TanMan_.lib_.module_lib.value_via_parts_and_relative_path prts, '../..'
     end
 
     def prts

@@ -32,7 +32,7 @@ module Skylab::TestSupport
 
     class Shell__  # too hard to do this in a basic object
 
-      TestSupport_._lib.entity self do
+      TestSupport_.lib_.entity self do
 
         o :iambic_writer_method_name_suffix, :'='
 
@@ -101,7 +101,7 @@ module Skylab::TestSupport
     # ~ debugging
 
     def add_debugging_downstream
-      _downstream_IO = @debug_IO || TestSupport_._lib.stderr
+      _downstream_IO = @debug_IO || TestSupport_.lib_.stderr
       @debug_IO = nil
       if @debug_prefix
         _line_begin_string = @debug_prefix
@@ -111,7 +111,7 @@ module Skylab::TestSupport
         _puts_map_proc = @puts_map_proc
       end
       _niladic_pass_filter_proc = @do_debug_p
-      _io = TestSupport_._lib.IO::Mappers::Filter.new(
+      _io = TestSupport_.lib_.IO::Mappers::Filter.new(
         :downstream_IO, _downstream_IO,
         :line_begin_string, _line_begin_string,
         :niladic_pass_filter_proc, _niladic_pass_filter_proc,

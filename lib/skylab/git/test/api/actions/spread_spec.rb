@@ -32,7 +32,7 @@ module Skylab::Git::TestSupport::API::Actions::Spread
     def self.branches a
       let :branches do
         Spread::API_Model::Branches.from_line_scanner(
-          Git_._lib.scanner( a ), snitch )
+          Git_.lib_.scanner( a ), snitch )
       end
     end
 

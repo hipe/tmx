@@ -16,7 +16,7 @@ module Skylab::Headless
             :property_symbol,
             :on_event_selectively ]
 
-        Headless_._lib.event_lib.selective_builder_sender_receiver self
+        Headless_.lib_.event_lib.selective_builder_sender_receiver self
 
         def initialize
           @ftype = @prop = @property_symbol = nil

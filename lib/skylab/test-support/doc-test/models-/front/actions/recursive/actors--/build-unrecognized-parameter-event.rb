@@ -19,7 +19,7 @@ module Skylab::TestSupport
 
             end
 
-            _reduced_s_a = TestSupport_._lib.levenshtein(
+            _reduced_s_a = TestSupport_.lib_.levenshtein(
               :item, o.name.id2name,
               :items, _item_s_a,
               :closest_N_items, 3,

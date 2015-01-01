@@ -51,7 +51,7 @@ module Skylab::SubTree
 
     Resolve_glyphset_ = -> x do
       if x.respond_to? :id2name
-        Autoloader_.const_reduce [ x ], SubTree_._lib.CLI_lib.tree.glyph_sets_module
+        Autoloader_.const_reduce [ x ], SubTree_.lib_.CLI_lib.tree.glyph_sets_module
       end
     end
 
@@ -68,7 +68,7 @@ module Skylab::SubTree
 
     Get_safe_glyph_p_ = -> do
       p = -> do
-        _a = SubTree_._lib.CLI_lib.tree.glyphs.each_const_value.map do |g|
+        _a = SubTree_.lib_.CLI_lib.tree.glyphs.each_const_value.map do |g|
           [ g.normalized_glyph_name, true ]
         end
         p = ::Hash[ _a ].freeze
@@ -122,7 +122,7 @@ module Skylab::SubTree
       end
     end
 
-    SubTree_._lib.CLI_lib.tree.glyphs.each_const_value do |glyph|
+    SubTree_.lib_.CLI_lib.tree.glyphs.each_const_value do |glyph|
       attr_reader glyph.normalized_glyph_name  # blank crook pipe separator tee
     end
   end

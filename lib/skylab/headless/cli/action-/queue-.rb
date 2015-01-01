@@ -51,7 +51,7 @@ module Skylab::Headless
       end
 
       def say_not_i
-        "expected symbol had #{ Headless_._lib.strange @a[ 0 ] }"
+        "expected symbol had #{ Headless_.lib_.strange @a[ 0 ] }"
       end
 
     public

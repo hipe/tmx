@@ -44,7 +44,7 @@ module Skylab::BeautySalon::TestSupport::Models::S_and_R::Actors_BFS
 
       last_match_line = last_match.to_line_stream.to_a.join BS_::EMPTY_S_
 
-      p = BS_._lib.CLI_lib.parse_styles
+      p = BS_.lib_.CLI_lib.parse_styles
 
       mid_sexp = p[ mid_match_line ]
       last_sexp = p[ last_match_line ]

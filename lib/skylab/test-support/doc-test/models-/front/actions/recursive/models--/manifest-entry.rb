@@ -68,7 +68,7 @@ module Skylab::TestSupport
 
             post_path_content.chomp!  # hashtag says no
 
-            st = TestSupport_._lib.hashtag.value_peeking_stream post_path_content
+            st = TestSupport_.lib_.hashtag.value_peeking_stream post_path_content
             tagging_a = nil
 
             x = st.gets

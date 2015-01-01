@@ -29,7 +29,7 @@ module Skylab::Basic
           @io = @IO
         else
           @IO_was_provided = false
-          @io = Basic_._lib.string_IO
+          @io = Basic_.lib_.string_IO
         end  ; nil
       end
       def init_solo_h

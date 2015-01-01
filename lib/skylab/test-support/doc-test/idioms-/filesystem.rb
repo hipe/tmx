@@ -31,7 +31,7 @@ module Skylab::TestSupport
 
       def find_testsupport_file_upwards dirname, * rest, & oes_p
 
-        TestSupport_._lib.system.filesystem.walk(
+        TestSupport_.lib_.system.filesystem.walk(
           :start_path, dirname,
           :filename, test_support_file,
           :max_num_dirs_to_look, -1,
@@ -48,7 +48,7 @@ module Skylab::TestSupport
 
       def file_must_exist x, & oes_p
 
-        TestSupport_._lib.system.filesystem.normalization.upstream_IO(
+        TestSupport_.lib_.system.filesystem.normalization.upstream_IO(
           :path, x,
           :only_apply_expectation_that_path_is_ftype_of, FILE_FTYPE_,
           :on_event_selectively, ( oes_p || @oes_p ) )

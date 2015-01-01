@@ -30,7 +30,7 @@ module Skylab::FileMetrics
     Autoloader_[ self ]
   end
 
-  def self._lib
+  def self.lib_
     @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
   end
 
@@ -124,7 +124,7 @@ module Skylab::FileMetrics
 
   FM_ = self
 
-  LIB_ = FM_._lib
+  LIB_ = FM_.lib_
 
   Face_ = LIB_.face_top
 

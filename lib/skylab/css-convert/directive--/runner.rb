@@ -6,7 +6,7 @@ module Skylab::CSS_Convert
 
     def invoke directive_sexp # #unwrap [#bs-109] prototypical example
 
-      CSSC_._lib.old_name_lib.constantize directive_sexp.node_name
+      CSSC_.lib_.old_name_lib.constantize directive_sexp.node_name
 
       _klass = CSSC_::Directives.const_get _const
       _klass.new( request_client, directive_sexp ).invoke

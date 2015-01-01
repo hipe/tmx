@@ -6,7 +6,7 @@ module Skylab::BeautySalon
     end
   end
 
-  class CLI::Client < BS_._lib.old_CLI_lib::Client
+  class CLI::Client < BS_.lib_.old_CLI_lib::Client
 
     def initialize( * )
       super
@@ -105,7 +105,7 @@ module Skylab::BeautySalon
 
         ev_p[].render_all_lines_into_under @y,
 
-          BS_._lib.brazen::CLI.expression_agent_instance
+          BS_.lib_.brazen::CLI.expression_agent_instance
 
         false
       end
@@ -188,7 +188,7 @@ module Skylab::BeautySalon
       nil
     end
 
-    BS_._lib.plugin::Host::Proxy.enhance self do  # at the end b.c..
+    BS_.lib_.plugin::Host::Proxy.enhance self do  # at the end b.c..
 
       services [ :ostream, :ivar, :@out ],
                [ :estream, :ivar, :@err ]

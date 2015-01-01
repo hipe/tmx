@@ -166,7 +166,7 @@ module Skylab::Cull::TestSupport
 
     def count_lines s
 
-      TestSupport_._lib.basic::String.
+      TestSupport_.lib_.basic::String.
         count_occurrences_in_string_of_string( s, NEWLINE_ )
     end
   end

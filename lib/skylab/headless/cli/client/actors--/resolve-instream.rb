@@ -11,7 +11,7 @@ module Skylab::Headless
 
         :argv, :IO_adapter, :stx, :evr
 
-      Headless_._lib.event_lib.selective_builder_sender_receiver self
+      Headless_.lib_.event_lib.selective_builder_sender_receiver self
 
       def execute
         if 1 < @argv.length
@@ -59,7 +59,7 @@ module Skylab::Headless
         x = @argv.fetch 0 do
           actuals_has_name = false ; nil
         end
-        Headless_._lib.basic.trio x, actuals_has_name, _prp
+        Headless_.lib_.basic.trio x, actuals_has_name, _prp
       end
 
       def resolve_property  # (was: `infile_moniker`)
@@ -68,7 +68,7 @@ module Skylab::Headless
         if _CLI_argument
           _CLI_argument
         else
-          Headless_._lib.basic.property_via_name Callback_::Name.via_slug 'input-file'  # #todo
+          Headless_.lib_.basic.property_via_name Callback_::Name.via_slug 'input-file'  # #todo
         end
       end
     end

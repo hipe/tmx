@@ -54,7 +54,7 @@ module Skylab::TestSupport
 
       def excrpt_lines_from_beginning beg_d, end_d, s
 
-        _RX = TestSupport_._lib.basic::String.regex_for_line_scanning
+        _RX = TestSupport_.lib_.basic::String.regex_for_line_scanning
 
         scnr = TestSupport_::Library_::StringScanner.new s
 
@@ -183,7 +183,7 @@ module Skylab::TestSupport
         end
 
         def via_string string
-          new TestSupport_._lib.basic::String.line_stream string
+          new TestSupport_.lib_.basic::String.line_stream string
         end
 
         private :new

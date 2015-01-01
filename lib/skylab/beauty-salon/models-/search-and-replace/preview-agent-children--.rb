@@ -47,7 +47,7 @@ module Skylab::BeautySalon
       end
 
       def via_fresh_values_build_command & maybe_p
-        BS_._lib.system.filesystem.find(
+        BS_.lib_.system.filesystem.find(
           :filenames, @glob_list,
           :paths, @path_list,
           :freeform_query_infix, '-type f',
@@ -222,7 +222,7 @@ module Skylab::BeautySalon
 
         def build_path_stream
           maybe_send_event :error do
-            BS_._lib.event_lib.inline_not_OK_with(
+            BS_.lib_.event_lib.inline_not_OK_with(
               :not_yet_implemented, :method_name, :build_path_stream )
           end
           UNABLE_
@@ -654,7 +654,7 @@ module Skylab::BeautySalon
           func = replace_function
 
           write_file = curry_file_writer(
-            BS_._lib.system.defaults.dev_tmpdir_path,
+            BS_.lib_.system.defaults.dev_tmpdir_path,
             handle_unsigned_event_selectively )
 
           @file_stream.expand_by do |edit_session|

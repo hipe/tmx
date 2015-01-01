@@ -2,7 +2,7 @@ require_relative 'core'
 
 module Skylab::Permute
 
-  class CLI < Permute_._lib.CLI_Client
+  class CLI < Permute_.lib_.CLI_Client
 
     desc "minimal permutations generator."
 
@@ -31,7 +31,7 @@ module Skylab::Permute
         if b
           fail "block and args?"
         else
-          self.parent = Permute_._lib.CLI_lib::IO::Adapter::Minimal.new( *a )
+          self.parent = Permute_.lib_.CLI_lib::IO::Adapter::Minimal.new( *a )
         end
       end
     }
@@ -45,7 +45,7 @@ module Skylab::Permute
 
   class CLI::Action
 
-    extend Permute_._lib.CLI_Action
+    extend Permute_.lib_.CLI_Action
 
     Callback_[ self, :employ_DSL_for_digraph_emitter ]
 
@@ -225,7 +225,7 @@ module Skylab::Permute
           row_a << pairs.map { |_, value| value }
         end
         o.on_finished do
-          Permute_._lib.table.render row_a do |oo|
+          Permute_.lib_.table.render row_a do |oo|
             oo.on_info { |txt| call_digraph_listeners :info, txt }
             oo.on_row  { |txt| call_digraph_listeners :payload, txt }
           end

@@ -184,7 +184,7 @@ module Skylab::Snag::TestSupport::CLI
 
   Output__ = -> do
     output = TestSupport_::IO.spy.group.new
-    output.add_line_map_proc Snag_._lib.CLI_lib.pen.unstyle
+    output.add_line_map_proc Snag_.lib_.CLI_lib.pen.unstyle
     output
   end
 

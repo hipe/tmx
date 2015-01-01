@@ -17,7 +17,7 @@ module Skylab::Basic
           end
         end  # >>
 
-        Basic_._lib.entity self do
+        Basic_.lib_.entity self do
 
           def absolute
             @relative_is_OK = false

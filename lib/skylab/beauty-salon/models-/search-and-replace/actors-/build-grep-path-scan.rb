@@ -19,11 +19,11 @@ module Skylab::BeautySalon
         @grep_extended_regexp_string = @ruby_regexp = nil
         super
         @chunk_size ||= 50  # meh etc
-        @shellwords = BS_._lib.shellwords
+        @shellwords = BS_.lib_.shellwords
       end
 
       def execute
-        @command = BS_._lib.system.filesystem.grep(
+        @command = BS_.lib_.system.filesystem.grep(
           :grep_extended_regexp_string, @grep_extended_regexp_string,
           :ruby_regexp, @ruby_regexp,
           :on_event_selectively, -> * i_a, & ev_p do
@@ -37,7 +37,7 @@ module Skylab::BeautySalon
         send :"init_command_head_for_#{ @mode }"
 
         @on_event_selectively.call :info, :grep_command_head do
-          BS_._lib.event_lib.inline_neutral_with :grep_command_head,
+          BS_.lib_.event_lib.inline_neutral_with :grep_command_head,
             :command_head, @head_s
         end
 

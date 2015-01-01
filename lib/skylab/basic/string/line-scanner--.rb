@@ -13,7 +13,7 @@ module Skylab::Basic
           when 1
             s = x_a.first  # meh
             count = 0
-            scn = Basic_._lib.string_scanner s
+            scn = Basic_.lib_.string_scanner s
             p = -> do
               s = scn.scan LINE_RX__
               if s

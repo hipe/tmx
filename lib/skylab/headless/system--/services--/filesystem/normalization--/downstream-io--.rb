@@ -21,7 +21,7 @@ module Skylab::Headless
 
             def path=
               @do_execute = true
-              @path_arg = Headless_._lib.basic.trio.
+              @path_arg = Headless_.lib_.basic.trio.
                 via_value_and_variegated_symbol iambic_property, :path
               KEEP_PARSING_
             end

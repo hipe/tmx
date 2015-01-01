@@ -4,7 +4,7 @@ module Skylab::Dependency
 
     CLI_Commands = lambda do |_|
       o do |op, req|
-        extend Dep_._lib.system.filesystem.path_tools.instance_methods_module
+        extend Dep_.lib_.system.filesystem.path_tools.instance_methods_module
         item_name = @parent.name
         syntax "#{ normalized_invocation_string } [opts] [<name> [<name> [..]]]"
         op.banner = <<-HERE.gsub(/^ +/, '')
@@ -26,7 +26,7 @@ module Skylab::Dependency
                "that tries to run a fuller simulation than ordinary dry run of what the task",
                "will look like as it runs and succeeds.") { req[:dry_run] = req[:optimistic_dry_run] = true }
 
-        req[ :build_dir ] = Dep_._lib.home_dir_pn.join( 'build' ).to_s
+        req[ :build_dir ] = Dep_.lib_.home_dir_pn.join( 'build' ).to_s
 
         op.on('--build-dir DIR',
           "Specifies build directory. (default: #{pretty_path(req[:build_dir])})") { |bd| req[:build_dir] = bd }

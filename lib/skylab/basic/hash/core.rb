@@ -28,7 +28,7 @@ module Skylab::Basic
       #     h.default_proc = Subject_[].loquacious_default_proc.curry[ 'beefel' ]
       #     h[ :luhrmann ]  # => KeyError: no such beefel 'luhrmann'. did you mean 'foo' or 'biff'?
 
-      o = Basic_._lib
+      o = Basic_.lib_
 
       _msg = "no such #{ moniker } #{ o.strange k }. #{
         }did you mean #{ o.oxford_or h.keys.map( & Lib_::Strange ) }?"

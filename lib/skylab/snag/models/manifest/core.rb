@@ -96,13 +96,13 @@ module Skylab::Snag
     ID_NUM_DIGITS__ = 3
 
     def produce_tmpdir_via_iambic_for_agent x_a
-      @tmpdir_pathname ||= Snag_._lib.tmpdir_pathname.join TMP_DIRNAME_
+      @tmpdir_pathname ||= Snag_.lib_.tmpdir_pathname.join TMP_DIRNAME_
       self.class::Tmpdir_produce__[ :tmpdir_pathname, @tmpdir_pathname, * x_a ]
     end
 
     Entity_ = -> client, _fields_, * field_i_a do
       :fields == _fields_ or raise ::ArgumentError
-      Snag_._lib.basic_fields :client, client,
+      Snag_.lib_.basic_fields :client, client,
         :absorber, :initialize,
         :field_i_a, field_i_a
     end
@@ -116,7 +116,7 @@ module Skylab::Snag
       end
 
       def execute
-        Snag_._lib.FUC.new -> s do
+        Snag_.lib_.FUC.new -> s do
           if @be_verbose
             @delegate.receive_info_event Hacky_Path_Event__.new s
           end
@@ -128,7 +128,7 @@ module Skylab::Snag
 
       message_proc do |y, o|  # escape things that look like abs paths
 
-        y << ( o.line.gsub Snag_._lib.path_tools.absolute_path_hack_rx do
+        y << ( o.line.gsub Snag_.lib_.path_tools.absolute_path_hack_rx do
           pth ::Pathname.new $~[ 0 ]
         end )
 
@@ -137,7 +137,7 @@ module Skylab::Snag
 
     class Agent_
 
-      Snag_._lib.funcy_globless self
+      Snag_.lib_.funcy_globless self
 
     private
 
@@ -190,7 +190,7 @@ module Skylab::Snag
             end
           end
 
-          Snag_._lib.system.filesystem.walk.build_with(
+          Snag_.lib_.system.filesystem.walk.build_with(
             :filename, @config.manifest_file,
             :max_num_dirs_to_look,
               @config.max_num_dirs_to_search_for_manifest_file,

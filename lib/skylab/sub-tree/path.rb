@@ -30,12 +30,12 @@ module Skylab::SubTree
     end
 
     o[:test_dir_names_moniker] = -> do
-      "[#{ SubTree_._lib.test_dir_name_a * '|' }]"
+      "[#{ SubTree_.lib_.test_dir_name_a * '|' }]"
     end
 
     o[:glob_h] = -> do
       p = -> do
-        srbg = "*#{ SubTree_._lib.spec_rb }"
+        srbg = "*#{ SubTree_.lib_.spec_rb }"
         r = { 'features' => '*.feature',
               'spec'     => srbg,
               'test'     => srbg

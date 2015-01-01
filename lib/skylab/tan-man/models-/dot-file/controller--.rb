@@ -18,7 +18,7 @@ module Skylab::TanMan
       end
     private
       def description_under_expag_when_input_string expag
-        s = TanMan_._lib.ellipsify[ @input_arg.value_x ]
+        s = TanMan_.lib_.ellipsify[ @input_arg.value_x ]
         expag.calculate do
           val s
         end
@@ -97,7 +97,7 @@ module Skylab::TanMan
         sexp = self.sexp or break # emitted
         if verbose
 
-          TanMan_._lib.pretty_print.pp(
+          TanMan_.lib_.pretty_print.pp(
             sexp,
             TanMan_::System[].IO.some_stderr_IO )
 

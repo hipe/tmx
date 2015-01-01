@@ -166,7 +166,7 @@ module Skylab::Treemap
     end
 
     def render_debug
-      o = Treemap._lib.tree.lines( @tree ).each do |line|
+      o = Treemap.lib_.tree.lines( @tree ).each do |line|
         info_line line
       end
       if o.node_count.zero?

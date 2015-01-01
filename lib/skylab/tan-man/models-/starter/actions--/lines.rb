@@ -53,7 +53,7 @@ module Skylab::TanMan
         end
 
         def via_path
-          @template = TanMan_._lib.string_lib.template.via_path @path
+          @template = TanMan_.lib_.string_lib.template.via_path @path
           via_template
         end
 
@@ -79,7 +79,7 @@ module Skylab::TanMan
         end
 
         def via_output_s
-          TanMan_._lib.string_IO.new @output_s
+          TanMan_.lib_.string_IO.new @output_s
         end
       end
     end

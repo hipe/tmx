@@ -105,7 +105,7 @@ module Skylab::Headless
 
     Ellipsify_ = Ellipsify__.curry[ '[..]'.freeze ]
 
-    Ellipsify = Ellipsify_.curry[ Headless_._lib.reasonably_short ]
+    Ellipsify = Ellipsify_.curry[ Headless_.lib_.reasonably_short ]
 
     Cols = -> do
       cols_p = -> else_p do

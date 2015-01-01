@@ -4,7 +4,7 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
 
   describe "[bs] S & R - features - functions" do
 
-    BS_._lib.brazen.test_support::Expect_Event[ self ]
+    BS_.lib_.brazen.test_support::Expect_Event[ self ]
 
     extend TS_
 
@@ -59,7 +59,7 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
     end
 
     def cd path
-      BS_._lib.file_utils.cd path
+      BS_.lib_.file_utils.cd path
     end
 
     def first_workspace

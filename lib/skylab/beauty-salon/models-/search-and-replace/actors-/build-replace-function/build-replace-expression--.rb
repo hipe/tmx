@@ -80,7 +80,7 @@ module Skylab::BeautySalon
             end
           end
 
-          BS_._lib.event_lib.selective_builder_sender_receiver self
+          BS_.lib_.event_lib.selective_builder_sender_receiver self
 
           def initialize a
             @custom_i_a, @work_dir, @oes = a
@@ -168,7 +168,7 @@ module Skylab::BeautySalon
           end
 
           def resolve_tree_guess_via_path
-            @tree = BS_._lib.system.filesystem.hack_guess_module_tree @path, & @oes
+            @tree = BS_.lib_.system.filesystem.hack_guess_module_tree @path, & @oes
             @tree ? ACHIEVED_ : UNABLE_
           end
 
