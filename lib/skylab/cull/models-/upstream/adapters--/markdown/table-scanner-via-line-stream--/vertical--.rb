@@ -69,7 +69,7 @@ module Skylab::Cull
             @scn.string = line
 
             if @has_aesthetic_leading_pipe
-              @scn.skip ANY_WHITESPACE_AND_A_PIPE_RX__
+              @scn.skip ANY_WHITESPACE_AND_A_PIPE_RX_
             end
 
             Models_::Entity_.new do | ent |
@@ -77,8 +77,8 @@ module Skylab::Cull
               cel_count = 0
 
               begin
-                s = @scn.scan NOT_PIPE_RX__
-                had_pipe = @scn.skip PIPE_RX__
+                s = @scn.scan NOT_PIPE_RX_
+                had_pipe = @scn.skip PIPE_RX_
                 is_end = NEWLINE_BYTE__ == line.getbyte( @scn.pos )
                 s.strip!
                 ent.add_actual_property_value_and_name s, @sym_a.fetch( cel_count )
@@ -94,19 +94,9 @@ module Skylab::Cull
             end
           end
 
-          ANY_WHITESPACE_AND_A_PIPE_RX__ = /[ \t]*\|/
-
           NEWLINE_BYTE__ = "\n".getbyte 0
 
-          NOT_PIPE_RX__ = /(?:
-              \\ \|                 # a backslash follwed by a pipe
-            | [^\|\n]               # or anything other than a pipe
-          )*/x                      # zero of them is still a match
-
-          PIPE_RX__ = /\|/
-
           EMPTY_P_ = -> {}
-          EMPTY_S_ = ''
 
         end
       end

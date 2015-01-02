@@ -16,14 +16,29 @@ module Skylab::Cull::TestSupport
 
     module Files
 
-      class << self
-        def [] sym
-          s = sym.id2name
-          s[ s.rindex UNDERSCORE_ ] = DOT_
-          s.gsub! UNDERSCORE_, DASH_
-          dir_pathname.join( s ).to_path
+      define_singleton_method :[], ( -> do
+
+        p = -> sym do
+
+          path = Files.dir_pathname.to_path
+          path_a = ::Dir.glob( "#{ path }/*" )
+          h = {}
+          path_a.each do | path_ |
+            s = ::File.basename path_
+            h[ s.gsub( BLACK_RX__, UNDERSCORE_ ).intern ] = s
+          end
+          p = -> sym_ do
+            ::File.join path, h.fetch( sym_ )
+          end
+          p[ sym ]
         end
-      end
+
+        -> sym do
+          p[ sym ]
+        end
+      end ).call
+
+      BLACK_RX__ = /[^[:alnum:]]/
 
       Cull_::Autoloader_[ self ]
 

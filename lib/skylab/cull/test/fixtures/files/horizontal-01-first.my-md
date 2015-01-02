@@ -1,0 +1,7 @@
+we use a pipe on this line: |
+but none on this line
+
+    name | haskell | swift
+    cost | difficult for me to learn | fun now
+
+x

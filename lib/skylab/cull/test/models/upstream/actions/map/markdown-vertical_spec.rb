@@ -2,7 +2,7 @@ require_relative '../../../../test-support'
 
 module Skylab::Cull::TestSupport
 
-  describe "[cu] models - upstream map (markdown (vertical )" do
+  describe "[cu] models - upstream map (markdown (vertical)" do
 
     Expect_event_[ self ]
 

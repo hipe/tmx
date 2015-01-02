@@ -163,8 +163,12 @@ module Skylab::Cull
         HYPHEN_CEL_RX__ = /\A[ \t]*:?-+:?[ \t]*\z/
 
         def go_vertical sexp
-          @was_inside_of_a_table = true
           Self_::Vertical__.new @line_stream, sexp, & @on_event_selectively
+        end
+
+        def go_horizontal
+          Self_::Horizontal__.new @line_stream, @next_line, @line,
+            & @on_event_selectively
         end
 
         def advance_by_one
@@ -225,6 +229,17 @@ module Skylab::Cull
             :pipe
           end
         end
+
+        ANY_WHITESPACE_AND_A_PIPE_RX_ = /[ \t]*\|/
+
+        EMPTY_S_ = ''.freeze
+
+        NOT_PIPE_RX_ = /(?:
+            \\ \|                 # a backslash follwed by a pipe
+          | [^\|\n]               # or anything other than a pipe
+        )*/x                      # zero of them is still a match
+
+        PIPE_RX_ = /\|/
 
         PIPE_S_ = '|'
 
