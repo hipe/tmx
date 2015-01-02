@@ -1565,7 +1565,7 @@ module Skylab::Callback
         new.send method_i, x
         new
       end
-    end
+    end  # >>
   private
     def initialize_with_const_i const_i
       @as_const = const_i
@@ -1590,6 +1590,15 @@ module Skylab::Callback
       @const_is_resolved = false
     end
   public
+
+    def render_all_lines_into_under y, expag  # #hook-out [#br-023]
+      name = self
+      expag.calculate do
+        y << nm( name )
+      end
+      KEEP_PARSING_
+    end
+
     def as_camelcase_const
       @camelcase_const_is_resolved ||= resolve_camelcase_const
       @camelcase_const

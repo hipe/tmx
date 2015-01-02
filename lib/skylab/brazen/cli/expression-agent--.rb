@@ -60,6 +60,10 @@ module Skylab::Brazen
         _NLP_agent.indefinite_noun.via_arglist a
       end
 
+      def nm name
+        "'#{ name.as_slug }'"
+      end
+
       def or_ x
         _NLP_agent.or_ x
       end

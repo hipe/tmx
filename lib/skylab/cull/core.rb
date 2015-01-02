@@ -119,6 +119,7 @@ module Skylab::Cull
   ACHIEVED_ = true
   Action_ = Brazen_.model.action_class  # for name stop index we need this const
   Cull_ = self
+  EMPTY_S_ = ''.freeze
   Kernel_ = Brazen_.kernel_class
   Model_ = Brazen_.model.model_class
   NIL_ = nil

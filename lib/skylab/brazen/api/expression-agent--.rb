@@ -44,13 +44,20 @@ module Skylab::Brazen
         _NLP_agent.indefinite_noun.via_arglist a
       end
 
+      def nm name
+        "'#{ name.as_slug }'"
+      end
+
       def or_ x
         _NLP_agent.or_ x
       end
 
       def par x
-        _string = x.respond_to?( :ascii_only? ) ? x : x.name.as_slug
-        "'#{ _string }'"
+        if x.respond_to? :ascii_only?
+          "'#{ x }'"
+        else
+          nm x.name
+        end
       end
 
       def plural_noun * a

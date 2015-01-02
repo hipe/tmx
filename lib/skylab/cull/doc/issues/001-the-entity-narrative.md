@@ -50,7 +50,7 @@ so the datamodel so far becomes:
                        |        |
                       /          \
               +----------+    +--------+
-              | property |    | actual |
+              |   name   |    | actual |
               |  symbol  |    | value  |
               +----------+    +--------+
 

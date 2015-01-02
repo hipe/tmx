@@ -52,9 +52,11 @@ module Skylab::Basic  # introduction at [#020]
 
     attr_reader :name
 
-    def name_i
+    def name_symbol
       @name.as_variegated_symbol
     end
+
+    alias_method :name_i, :name_symbol  # until etc
 
     def description
       "« #{ @name.as_slug } »"  # :+#guillemets

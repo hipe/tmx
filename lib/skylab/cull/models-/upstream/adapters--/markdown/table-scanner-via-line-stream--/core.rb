@@ -10,8 +10,28 @@ module Skylab::Cull
           :line_stream
 
         # our "grammar" for what constitutes a github-flavored markdown table
-        # is likely not a perfect subset nor superset of the emergent grammar
-        # of the github-flavored markdown parser; but keep in mind the input
+        # is probably not a perfect subset nor superset of the emergent
+        # grammar of the github-flavored markdown parser:
+        #
+        # because of our needs below it may be the case that there exist
+        # some GFM tables that are not GFM [cu]-compatible tables, because
+        # our [cu] tables require at least 2 rows and 2 columns (maybe to
+        # both). (we have yet to find out if GFM itself has either or both
+        # of these requirements.)
+        #
+        # as well it may be the case that we recognize some strings as a
+        # "table" for [cu] that are not recognized as a table in GFM, becuase
+        # of our hack for horizontal tables involve skipping the use of
+        # the hyphenated dividing line between the header row and the first
+        # body row.
+        #
+        # to cheat this "syntax" further into our universe, we have added
+        # safeguards agaist mis-identifying as a table glyphs that are
+        # actually part of an ASCII diagram. this part (although ony a few
+        # lines of code) is nasty on principle and will need cleaning when
+        # the dust settles.
+        #
+        # despite all of this, for vertical tables the input data
         # of our specs *is* relevant excerpts from the github documentation.
         #
         # our goal is to meet our own needs first and then only secondly try
@@ -231,8 +251,6 @@ module Skylab::Cull
         end
 
         ANY_WHITESPACE_AND_A_PIPE_RX_ = /[ \t]*\|/
-
-        EMPTY_S_ = ''.freeze
 
         NOT_PIPE_RX_ = /(?:
             \\ \|                 # a backslash follwed by a pipe

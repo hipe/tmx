@@ -715,7 +715,7 @@ a highly contrived demonstration:
   | private | corporal | commndr | srgnt |
   +--------------------------------------+
 
-the highest rank you achieved in the U.S. army is *not* univerally applicble
+the highest rank you achieved in the U.S. army is *not* univerally applicable
 to U.S. citizens: not all have served in the U.S army. it is hence a `sparse`
 category. but then BOOM:
 

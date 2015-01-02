@@ -44,7 +44,7 @@ module Skylab::TestSupport
 
             # we do not push the token onto the output iambic  # #todo do we ever need to?
 
-            if :help == prop.name_i
+            if :help == prop.name_symbol
               -> _ do
                 @seen_h[ :help ] = true  # important
               end

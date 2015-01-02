@@ -498,7 +498,7 @@ module Skylab::Brazen
         @partitions.env_a.each do |prop|
           s = env[ prop.upcase_environment_name_symbol.id2name ]
           s or next
-          cased_i = prop.name_i.downcase  # [#039] casing
+          cased_i = prop.name_symbol.downcase  # [#039] casing
           @seen_h[ cased_i ] and next
           @output_iambic.push cased_i, s
         end ; nil
@@ -881,7 +881,7 @@ module Skylab::Brazen
         h = Build_unique_letter_hash__[ opt_a ]
         opt_a.each do |prop|
           args = []
-          letter = h[ prop.name_i ]
+          letter = h[ prop.name_symbol ]
           letter and args.push "-#{ letter }"
           base = "--#{ prop.name.as_slug }"
           if prop.takes_argument
@@ -902,13 +902,13 @@ module Skylab::Brazen
       def optparse_behavior_for_property prop  # :+#public-API #hook-in
         if prop.takes_argument
           -> x do
-            @seen_h[ prop.name_i ] = true
-            @output_iambic.push prop.name_i, x
+            @seen_h[ prop.name_symbol ] = true
+            @output_iambic.push prop.name_symbol, x
           end
         else
           -> _ do
-            @seen_h[ prop.name_i ] = true
-            @output_iambic.push prop.name_i
+            @seen_h[ prop.name_symbol ] = true
+            @output_iambic.push prop.name_symbol
           end
         end
       end
@@ -938,7 +938,7 @@ module Skylab::Brazen
 
       def write_any_auxiliary_syntax_string y
         help = to_full_inferred_prop_strm.each.detect do |prop|
-          :help == prop.name_i
+          :help == prop.name_symbol
         end
         if help
           ai_s = invocation_string
@@ -1038,7 +1038,7 @@ module Skylab::Brazen
 
         while prop = @scn.gets
 
-          @original_index[ prop.name_i ] = ( d += 1 )
+          @original_index[ prop.name_symbol ] = ( d += 1 )
 
           if prop.can_be_from_environment
             ( @env_a ||= [] ).push prop
@@ -1083,7 +1083,7 @@ module Skylab::Brazen
         while d.nonzero?
           prop = @opt_a.fetch d -= 1
           prop.takes_argument or next
-          STANDARD_BRANCH_PROPERTY_BOX__.has_name( prop.name_i ) and next
+          STANDARD_BRANCH_PROPERTY_BOX__.has_name( prop.name_symbol ) and next
           found = prop
           break
         end
@@ -1110,7 +1110,7 @@ module Skylab::Brazen
 
       def re_order a
         a.sort_by! do |prop|
-          @original_index.fetch prop.name_i
+          @original_index.fetch prop.name_symbol
         end ; nil
       end
     end
@@ -1176,7 +1176,7 @@ module Skylab::Brazen
     private
 
       def lookup_property prop
-        i = prop.name_i
+        i = prop.name_symbol
         if opt = option_via_name( i )
           [ :option, opt ]
         elsif arg = argument_via_name( i )
@@ -1203,7 +1203,7 @@ module Skylab::Brazen
       def any_i_in_a i, a
         if a
           a.detect do |o|
-            i == o.name_i
+            i == o.name_symbol
           end
         end
       end
@@ -1216,9 +1216,9 @@ module Skylab::Brazen
         d = name_s.getbyte 0
         case num_times_seen_h[ d ] += 1
         when 1
-          h[ prop.name_i ] = name_s[ 0, 1 ]
+          h[ prop.name_symbol ] = name_s[ 0, 1 ]
         when 2
-          h.delete prop.name_i
+          h.delete prop.name_symbol
         end
       end
       h
@@ -1261,7 +1261,7 @@ module Skylab::Brazen
         false
       end
 
-      def name_i
+      def name_symbol
         @name.as_variegated_symbol
       end
 

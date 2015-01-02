@@ -18,11 +18,13 @@
 looking at it is as a specialized spreadsheet front-loaded with idioms
 and logic to the end of making table-ish reports.
 
-another way of thinking of it is as a recommender system, but that
-connotes something a bit heavier than `cull` aims to be.
+another way of thinking of it is as a recommender system, albeit one
+not quite as heavy-duty as what that term usually evokes.
 
 the reports that [cu] produces can be any permutation of quantitative and
-qualitative. specifically, they can be one, the other or both. by this
+qualitative. specifically, they can be one, the other or both.
+
+to jump ahead a bit, by this
 very definition we are now positing here, the machine does not know what
 the criteria are for a report that is qualitative. as such the machine's
 only function in this case is to present the data to the human's eyes,
@@ -86,6 +88,8 @@ this is largely where `cull`'s scope of responsibility both begins and
 ends: to figure out (given a criteria) what the score is for a particular
 entity (and perhaps present it (perhaps given a stream of entities)).
 
+([#001] for more on the entity datamodel.)
+
 
 
 ### the criteria in more detail
@@ -124,4 +128,19 @@ the "entity stream" we pass that entity to each "criterion" in the
 "criteria". each criterion results in a real number (perhaps negative).
 the score for each entity is simply the sum of these numbers.
 
-_
+
+
+
+## qualitative case study: a feature set comparison
+
+let's say the only thing you care about comparing among your entities is
+their respective sets of features (and no, we haven't defined "feature" yet.)
+
+it may be the case that these features themselves are discrete binary
+properties: either the thing "has" or "does not have" the feature, in a
+direct way. ([#it-011] for wayyy to much explanation on this sort of thing.)
+
+at this moment the topic commit is towards an exploration around this case
+study.
+
+...

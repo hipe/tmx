@@ -11,7 +11,7 @@ module Skylab::Cull
     end
 
     def members
-      [ :actual_properties, :to_even_iambic ]
+      [ :to_actual_property_stream, :to_even_iambic ]
     end
 
     def add_actual_property_value_and_name s, sym
@@ -25,10 +25,36 @@ module Skylab::Cull
       nil
     end
 
+    def render_all_lines_into_under y, expag  # #todo: #not-covered (done visually only)
+      st = to_actual_property_stream
+      expag.calculate do
+        prp = st.gets
+        s_a = [ "(" ]
+        if prp
+          p = -> prp_ do
+            "#{ prp.name.as_slug }: #{ val prp_.actual_value_s }"
+          end
+          s_a.push p[ prp ]
+          prp = st.gets
+          while prp
+            s_a.push ", #{ p[ prp ] }"
+            prp = st.gets
+          end
+        end
+        s_a.push ")"
+        y << ( s_a * EMPTY_S_ )
+      end
+      ACHIEVED_
+    end
+
+    def to_actual_property_stream
+      Callback_.stream.via_nonsparse_array @actual_properties
+    end
+
     def to_even_iambic
       a = []
       @actual_properties.each do | prp |
-        a.push prp.property_symbol, prp.actual_value_s
+        a.push prp.name_symbol, prp.actual_value_s
       end
       a
     end
@@ -45,14 +71,18 @@ module Skylab::Cull
 
       def initialize s, sym
         @actual_value_s = s
-        @property_symbol = sym
+        @name_symbol = sym
       end
 
       def members
-        [ :actual_value_s, :property_symbol ]
+        [ :actual_value_s, :name, :name_symbol ]
       end
 
-      attr_reader :actual_value_s, :property_symbol
+      def name
+        @nm ||= Callback_::Name.via_variegated_symbol @name_symbol
+      end
+
+      attr_reader :actual_value_s, :name_symbol
     end
   end
 end
