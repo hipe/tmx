@@ -107,6 +107,10 @@ module Skylab::Cull
 
       attr_reader :a
 
+      def add_mutator_to_report cls, arg_s_a, rprt_sym
+        @a.push :_add_function_call_to_report, [ cls, arg_s_a, rprt_sym ]
+      end
+
       def set_upstream_via_mutable_arg_box bx
         @a.push :_set_upstream_via_mutable_arg_box, bx
         nil
@@ -125,7 +129,7 @@ module Skylab::Cull
 
       ok = true
       sh.a.each_slice 2 do | sym, x |
-        ok = send sym, x
+        ok = send sym, * x
         ok or break
       end
       ok && normalize && _end_edit_session_by_writing_self
@@ -160,8 +164,20 @@ module Skylab::Cull
       end
     end
 
-    def _delete_upstream _
+    def _delete_upstream
       _unset_monadic_slotular_section :upstream, :no_upstream_set, :deleted_upstream
+    end
+
+    def _add_function_call_to_report func_class, arg_s_a, report_sym
+
+      Models_::Report_.edit_session(
+          report_sym,
+          cfg_for_write,
+          handle_event_selectively ) do | rep |
+
+        rep.add_function_call func_class, arg_s_a
+
+      end
     end
 
     # ~ shared support

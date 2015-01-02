@@ -332,7 +332,8 @@ module Skylab::Brazen
         end
 
         def members
-          [ :input_id, :sections, :to_line_stream, * super ]
+          [ :input_id, :sections, :to_line_stream,
+            :write, :write_to_path, * super ]
         end
 
         def input_id
@@ -717,6 +718,10 @@ module Skylab::Brazen
         end
 
         def assignments
+          x = @kernel.for_edit
+          if x
+            @kernel = x
+          end
           @kernel.assignments
         end
 
@@ -1163,6 +1168,16 @@ module Skylab::Brazen
 
       class Assignments_Facade__ < Mutable_Collection_Shell__
         SYMBOL_I = :assignment
+
+        def members
+          [ :add_to_bag_value_string_and_name_function, * super ]
+        end
+
+        def add_to_bag_value_string_and_name_function s, nm
+          @collection_kernel.accept_asmt(
+            Assignment__.via_literal( nm.as_slug.intern, s, @parse ) )
+          ACHIEVED_
+        end
       end
 
       class Assignment__

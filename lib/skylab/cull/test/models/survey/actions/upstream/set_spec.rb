@@ -118,12 +118,6 @@ module Skylab::Cull::TestSupport
 
     # ~ prepare & execute
 
-    def prepare_tmpdir_with_patch sym
-      td = prepare_tmpdir
-      td.patch_via_path TS_::Fixtures::Patches[ sym ]
-      td
-    end
-
     def big_JSON_file
       ::File.join various_extensions_path, 'cull-survey/not.json'
     end
@@ -158,10 +152,6 @@ module Skylab::Cull::TestSupport
       count_lines( s ).should eql 2
 
       s.should be_include big_JSON_file  # sketchy because marshaling
-    end
-
-    def content_of_the_file td
-      ::File.read( td.to_pathname.join( config_path ).to_path )
     end
 
     def count_lines s

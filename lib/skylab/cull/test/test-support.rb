@@ -31,6 +31,24 @@ module Skylab::Cull::TestSupport
       TestSupport_.debug_IO
     end
 
+    # ~ paths for READ ONLY:
+
+    def freshly_initted_path
+      TS_::Fixtures::Directories[ :freshly_initted ]
+    end
+
+    def file_path sym
+      TS_::Fixtures::Files[ sym ]
+    end
+
+    # ~ mutable workspace methods
+
+    def prepare_tmpdir_with_patch sym
+      td = prepare_tmpdir
+      td.patch_via_path TS_::Fixtures::Patches[ sym ]
+      td
+    end
+
     def prepare_tmpdir
 
       fs =  Cull_.lib_.filesystem
@@ -43,16 +61,14 @@ module Skylab::Cull::TestSupport
       td.clear
     end
 
-    def freshly_initted_path
-      TS_::Fixtures::Directories[ :freshly_initted ]
+    # ~ assertion support
+
+    def content_of_the_file td
+      ::File.read( td.to_pathname.join( config_filename ).to_path )
     end
 
-    def config_path
-      Config_path___[]
-    end
-
-    def file_path sym
-      TS_::Fixtures::Files[ sym ]
+    def config_filename
+      Config_filename___[]
     end
 
     # ~ #hook-outs for [br]
@@ -66,7 +82,7 @@ module Skylab::Cull::TestSupport
     end
   end
 
-  Config_path___ = Cull_::Callback_.memoize do
+  Config_filename___ = Cull_::Callback_.memoize do
     o = Cull_::Models_::Survey
     ::File.join o::FILENAME_, o::CONFIG_FILENAME_
   end
