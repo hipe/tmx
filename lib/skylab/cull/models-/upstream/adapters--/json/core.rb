@@ -6,6 +6,8 @@ module Skylab::Cull
 
       class Adapters__::JSON < Upstream_::File_Based_Adapter_
 
+        EXTENSIONS = %w( .json )
+
         def to_descriptive_event
           build_event_with(
               :json_upstream,

@@ -25,6 +25,9 @@ module Skylab::Cull
           :property, :upstream_adapter,
           :required, :property, :upstream
 
+
+      TABLE_NUMBER_PROPERTY = ___table_number_property_
+
       def accept_selective_listener_proc p
         @on_event_selectively = p ; nil
       end

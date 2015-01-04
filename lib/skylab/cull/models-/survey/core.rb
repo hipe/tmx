@@ -28,6 +28,7 @@ module Skylab::Cull
     end  # >>
 
     def initialize k
+      @cfg_for_read = nil
       @entities = nil
       @persist_step_a = nil
       super k
@@ -59,21 +60,25 @@ module Skylab::Cull
       attr_reader :m, :a
 
       def create_via_mutable_arg_box_and_look_path bx, path
-        @m = :__create_via_mutable_arg_box_and_look_path
-        @a = [ bx, path ]
-        nil
+        _call :__create_via_mutable_arg_box_and_look_path, bx, path
       end
 
       def edit_via_mutable_arg_box_and_look_path bx, path
-        @m = :__edit_via_mutable_arg_box_and_look_path
-        @a = [ bx, path ]
-        nil
+        _call :__edit_via_mutable_arg_box_and_look_path, bx, path
+      end
+
+      def edit_via_mutable_arg_box bx
+        _call :_edit_via_mutable_arg_box, bx
       end
 
       def retrieve_via_workspace_path path
-        @m = :_retrieve_via_workspace_path
-        @a = path
-        nil
+        _call :_retrieve_via_workspace_path, path
+      end
+
+    private
+
+      def _call i, * a
+        @m = i ; @a = a ; nil
       end
     end
 
@@ -198,22 +203,38 @@ module Skylab::Cull
 
     # ~~ misc functions for actors & top entities
 
+    def config_for_read_
+      @cfg_for_read
+    end
+
     def config_for_write_
       @cfg_for_write
     end
 
+    def derelativize path
+      pth = _workspace_path and ::File.join( pth, path )
+    end
+
     def maybe_relativize_path path
 
-      _ws_path = ::File.join @_path, FILENAME_
-
       relpath = ::Pathname.new( path ).relative_path_from(
-        ::Pathname.new( _ws_path ) ).to_path
+        ::Pathname.new( _workspace_path ) ).to_path
 
       if relpath.length < path.length
         relpath
       else
         path
       end
+    end
+
+    def _workspace_path
+      @___did_calc_WS_path ||= begin
+        if @_path
+          @__ws_path = ::File.join @_path, FILENAME_
+        end
+        true
+      end
+      @__ws_path
     end
 
     def persist_value_for_name_symbol_ value_string, section_symbol
@@ -300,6 +321,10 @@ module Skylab::Cull
     end
 
     # ~ public API for #:+actors near "associated entities" API (experiment)
+
+    def existent_associated_entity_ ent_sym  # placeholder for etc.
+      @entities.fetch ent_sym
+    end
 
     def touch_associated_entity_ ent_sym
 

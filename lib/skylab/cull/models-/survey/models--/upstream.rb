@@ -28,10 +28,8 @@ module Skylab::Cull
       def _set arg, bx
 
         @_top_entity = Models_::Upstream.edit_entity @survey.to_kernel, @on_event_selectively do | edit |
-
-          edit.reference_path ::File.join( @survey.path, FILENAME_ )
+          edit.derelativizer @survey
           edit.mutable_arg_box bx
-
         end
 
         @_top_entity and via_edited_upstream
@@ -62,6 +60,10 @@ module Skylab::Cull
 
       def delete
         @survey.destroy_all_persistent_nodes_for_name_symbol_ :upstream
+      end
+
+      def to_entity_collection_stream
+        @_top_entity.to_entity_collection_stream
       end
     end
   end

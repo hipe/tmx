@@ -4,6 +4,8 @@ module Skylab::Cull
 
     class Actions::Edit < Action_
 
+      @after_name_symbol = :ping
+
       Brazen_.model.entity self,
 
         :flag, :property, :dry_run,

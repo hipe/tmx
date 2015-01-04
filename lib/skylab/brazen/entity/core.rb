@@ -253,6 +253,7 @@ module Skylab::Brazen
         @pay_attention_to_method_added = true
         @property_related_nonterminal = mod::Entity_Property.nonterminal_for self
         @ad_hoc_nonterminal_queue = mod::ENTITY_AD_HOCS___
+
         @nonterminal_queue = Adaptive_Nonterminal_Queue_.new(  # #note-330
           * @ad_hoc_nonterminal_queue,
           @property_related_nonterminal,
@@ -378,7 +379,7 @@ module Skylab::Brazen
         do_add = false
         meth_i = box.fetch name_i do
           do_add = true
-          :"___#{ name_i }_property___"
+          :"___#{ name_i }_property_"
         end
         if do_add
           box.add name_i, meth_i

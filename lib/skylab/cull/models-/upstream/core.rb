@@ -8,17 +8,17 @@ module Skylab::Cull
         @bx = Callback_::Box.new
       end
 
+      def derelativizer x
+        @bx.add :derelativizer, x
+        nil
+      end
+
       def mutable_arg_box bx
 
         @bx.add :upstream, bx[ :upstream ].value_x
 
         @bx.add :upstream_adapter, bx[ :upstream_adapter ].value_x
 
-        nil
-      end
-
-      def reference_path x
-        @bx.set :reference_path, x
         nil
       end
 

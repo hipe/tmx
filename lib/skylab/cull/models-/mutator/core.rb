@@ -27,6 +27,8 @@ module Skylab::Cull
       end
     end
 
+    Autoloader_[ ( Items__ = ::Module.new ), :boxxy ]
+
     Mutator_ = Models_::Mutator
   end
 end

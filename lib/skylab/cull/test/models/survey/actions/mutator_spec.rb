@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Cull::TestSupport
 
-  describe "[cu] models - survey mutator add" do
+  describe "[cu] models - survey mutators" do
 
     Expect_event_[ self ]
 
@@ -41,6 +41,27 @@ module Skylab::Cull::TestSupport
 
       sh.next_line.should be_nil
 
+    end
+
+    it "try it on a temporary survey" do
+
+      call_API :survey,
+
+        :reduce,
+
+        :upstream, file_path( :mutators_01_simple_md ),
+
+        :add_mutator, 'remove-empty'
+
+      expect_no_events
+
+      st = @result
+      ent = st.gets
+      ent_ = st.gets
+      st.gets.should be_nil
+
+      ent.to_even_iambic.should eql [ :"prog lang name", "ruby" ]
+      ent_.to_even_iambic.should eql [ :"prog lang name", "haskell", :monads, "yes" ]
     end
   end
 end

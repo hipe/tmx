@@ -6,7 +6,7 @@ module Skylab::Cull
 
       Callback_::Actor.methodic self, :simple, :properties, :properties,
 
-        :reference_path,
+        :derelativizer,
         :upstream,
         :upstream_adapter
 
@@ -70,20 +70,21 @@ module Skylab::Cull
       end
 
       public def process_as_file_identifier_string str
-        path = __via_reference_path_absolutize_path str
+        path = __via_derelativizer_absolutize_path str
         path and process_as_file_absolute_path path
       end
 
-      def __via_reference_path_absolutize_path str
+      def __via_derelativizer_absolutize_path str
         if str
           if str.length.zero?
             UNABLE_
           elsif ::File::SEPARATOR == str[ 0 ]
             str
-          elsif @reference_path
-            ::File.join @reference_path, str
           else
-            when_relpath str
+            if @derelativizer
+              x = @derelativizer.derelativize str
+            end
+            x or when_relpath str
           end
         else
           str
@@ -120,10 +121,7 @@ module Skylab::Cull
 
       def via_path_extension path
         extname = ::File.extname path
-        md = /(?<=\A\.)(.+)\z/.match extname
-        if md
-          cls = cls_via_const_guess Callback_::Name.via_slug( md[ 0 ] ).as_const
-        end
+        cls = __class_via_extension extname
         if cls
           adapter_via_path_and_class path, cls
         else
@@ -131,9 +129,20 @@ module Skylab::Cull
         end
       end
 
+      def __class_via_extension ext
+
+        Upstream_::Adapters__.constants.reduce nil do | m, const |
+
+          cls = Upstream_::Adapters__.const_get const, false
+
+          cls::EXTENSIONS.include?( ext ) and break cls
+
+        end
+      end
+
       def via_upstream_adapter_via_path path
 
-        cls = cls_via_const_guess Callback_::Name.
+        cls = __class_via_const_guess Callback_::Name.
           via_variegated_symbol( @upstream_adapter ).as_const
 
         if cls
@@ -143,7 +152,7 @@ module Skylab::Cull
         end
       end
 
-      def cls_via_const_guess x
+      def __class_via_const_guess x
         Autoloader_.const_reduce( [ x ], Upstream_::Adapters__ ) do  end
       end
 

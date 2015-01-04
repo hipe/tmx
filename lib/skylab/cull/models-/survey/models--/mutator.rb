@@ -12,8 +12,9 @@ module Skylab::Cull
       def add arg, _box
         ok = true
         arg.value_x.each do | s |
-          ok = Add_one___.new( s, self, @survey, @on_event_selectively ).execute
+          ok, args = Function_class_and_args_via_call_expression[ s, & @on_event_selectively ]
           ok or break
+          _add ok, args
         end
         ok
       end
@@ -25,16 +26,16 @@ module Skylab::Cull
 
       end
 
-      class Add_one___
+      class Function_class_and_args_via_call_expression
 
-        def initialize * a
-          @exp_s, @parent, @survey, @on_event_selectively = a
-        end
+        Callback_::Actor.call self, :properties,
+
+          :exp_s
 
         def execute
           ok = via_expression_string_resolve_function_call_S_expression
           ok &&= via_function_call_S_expression_resolve_function
-          ok and @parent._add @function_class, @sexp.arg_s_a
+          ok and [ @function_class, @sexp.arg_s_a ]
         end
 
         def via_expression_string_resolve_function_call_S_expression
@@ -94,8 +95,28 @@ module Skylab::Cull
         include Simple_Selective_Sender_Methods_
 
         def when_one const
-          @function_class = Models_::Mutator::Items__.const_get const, false
+          x = Models_::Mutator::Items__.const_get const, false
+          @function_class = if x.respond_to? :name
+            x
+          else
+            Proc_Wrapper___.new x, const
+          end
           ACHIEVED_
+        end
+      end
+
+      class Proc_Wrapper___
+
+        def initialize * a
+          @p, @const = a
+        end
+
+        def name
+          @const.id2name
+        end
+
+        def [] * a, & p
+          @p[ * a , & p ]
         end
       end
     end

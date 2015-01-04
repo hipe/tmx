@@ -67,6 +67,26 @@ module Skylab::Cull
       end
     end
 
+    # ~ mutation API
+
+    def remove_properties_at_indexes d_a
+
+      range = 0 ... @actual_properties.length
+
+      out_of_range = d_a.detect do | d |
+        ! range.include?( d )
+      end
+      if out_of_range
+        UNABLE_
+      else
+        d_a.each do | d |
+          @actual_properties[ d ] = nil
+        end
+        @actual_properties.compact!
+        ACHIEVED_
+      end
+    end
+
     class Actual_Property__
 
       def initialize s, sym
