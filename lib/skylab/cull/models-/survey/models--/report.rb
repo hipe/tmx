@@ -21,28 +21,20 @@ module Skylab::Cull
         @call_a = []
 
         sect.assignments.each do | ast |
+
           :function == ast.external_normal_name_symbol or next  # for now
 
-          md = RX__.match ast.value_x
-          md or next  # meh
-
-          nm = Callback_::Name.via_slug md[ :scheme ]
-
-          _cls = Models__.const_get nm.as_const, false
-
-          func, args = _cls::Function_class_and_args_via_call_expression[
-            md[ :rest ],
-            & @on_event_selectively ]
+          func, args, category_symbol =
+            Models_::Mutation.func_and_args_and_category_via_call_expression(
+              ast.value_x, & @on_event_selectively )
 
           func or next
 
-          @call_a.push [ args, func, nm.as_lowercase_with_underscores_symbol ]
+          @call_a.push [ args, func, category_symbol ]
 
         end
         nil
       end
-
-      RX__ = /\A(?<scheme>[^:]+):(?<rest>.+)/
 
       def add_function_call arg_s_a, function_class, function_category
 
