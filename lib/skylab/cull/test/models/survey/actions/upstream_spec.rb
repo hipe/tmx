@@ -1,4 +1,4 @@
-require_relative '../../../../test-support'
+require_relative '../../../test-support'
 
 module Skylab::Cull::TestSupport
 
@@ -8,15 +8,21 @@ module Skylab::Cull::TestSupport
 
     extend TS_
 
-    it "add strange prefix" do
+    it "a random string with no prefix - treated as path" do
       freshly_initted_against 'zoidberg'
+      expect_not_OK_event :path_must_be_absolute
+      expect_failed
+    end
+
+    it "use a strange prefix" do
+      freshly_initted_against "zoidberg:no see"
       ev = expect_not_OK_event :extra_properties
       black_and_white_lines( ev ).should eql(
         [ "unrecognized prefix 'zoidberg'", "did you mean 'file'?" ] )
       expect_failed
     end
 
-    it "add noent file" do
+    it "use the 'file' prefix but noent" do
       freshly_initted_against 'file:wazoo.json'
       expect_not_OK_event :errno_enoent
       expect_failed
@@ -24,17 +30,17 @@ module Skylab::Cull::TestSupport
 
     def freshly_initted_against s
 
-      call_API :survey, :upstream, :set,
-        :path, freshly_initted_path,
-        :upstream_identifier, s
+      call_API :survey, :edit,
+        :upstream, s,
+        :path, freshly_initted_path
 
     end
 
-    it "add strange extension file" do
+    it "to an existing survey try to set an upstream with a strange extension" do
 
-      call_API :survey, :upstream, :set,
+      call_API :survey, :edit,
         :path, various_extensions_path,
-        :upstream_identifier, 'file:strange-ext.beefer'
+        :upstream, 'file:strange-ext.beefer'
 
       ev = expect_not_OK_event :extra_properties
 
@@ -95,15 +101,23 @@ module Skylab::Cull::TestSupport
     end
 
     it "unset - no" do
-      call_API :survey, :upstream, :unset, :path, freshly_initted_path
+      call_API :survey, :edit,
+        :upstream, Cull_::EMPTY_S_,
+        :path, freshly_initted_path
+
       expect_not_OK_event :no_upstream_set
       expect_failed
     end
 
     it "unset - yes" do
+
       td = prepare_tmpdir_with_patch :many_upstreams
-      call_API :survey, :upstream, :unset, :path, td.to_path
-      ev = expect_OK_event :deleted_upstream
+
+      call_API :survey, :edit,
+        :upstream, Cull_::EMPTY_S_,
+        :path, td.to_path
+
+      ev = expect_OK_event :deleted_upstreams
       expect_event :datastore_resource_committed_changes
       s = black_and_white ev
       s.should eql "deleted 3 'upstreams'"
@@ -128,9 +142,9 @@ module Skylab::Cull::TestSupport
 
     def call_API_with_td_and_file td, file
 
-      call_API :survey, :upstream, :set,
-        :path, td.to_path,
-        :upstream_identifier, "file:#{ file }"
+      call_API :survey, :edit,
+        :upstream, "file:#{ file }",
+        :path, td.to_path
 
       nil
     end

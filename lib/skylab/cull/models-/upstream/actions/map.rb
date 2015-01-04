@@ -8,10 +8,6 @@ module Skylab::Cull
 
       Brazen_.model.entity self,
 
-          :property, :upstream_identifier,
-
-          :property, :upstream_adapter,
-
           :ad_hoc_normalizer, -> arg, & oes_p do
             if arg.actuals_has_name
               Cull_.lib_.basic::Number.normalization.with(
@@ -26,8 +22,8 @@ module Skylab::Cull
           :default, 1,
           :property, :table_number,
 
-          :property, :upstream_file
-
+          :property, :upstream_adapter,
+          :required, :property, :upstream
 
       def accept_selective_listener_proc p
         @on_event_selectively = p ; nil
@@ -64,8 +60,6 @@ module Skylab::Cull
           @upstream.event_for_fell_short_of_count wanted_number, had_number
         end
       end
-
-      KEEP_PARSING_ = true
     end
   end
 end

@@ -2,25 +2,47 @@ module Skylab::Cull
 
   class Models_::Survey
 
-    class Actions::Upstream
+    class Actors__::Edit_associated_entities
 
-      class Actions::Unset < Action_
+      Callback_::Actor.call self, :properties,
+        :passed_arg_a,
+        :arg_box,
+        :survey
 
-        Brazen_.model.entity self,
+      def execute
+        ok = ACHIEVED_
 
-          :required, :property, :path
+        st = Callback_.stream.via_nonsparse_array @passed_arg_a
 
-        def produce_any_result
-          via_path_argument_resolve_existent_survey and via_survey
-        end
+        while arg = st.gets
 
-        include Survey_Action_Methods_
+          md = RX___.match arg.name_symbol
 
-        def via_survey
-          @survey.edit do | o |
-            o.delete_upstream
+          ok = if md
+
+            via_associated_entity( arg,
+              md[ :add ] ? :add : :remove,
+              md[ :stem ].intern )
+
+          elsif Models__.const_defined?( arg.name.as_const, false )
+
+            via_associated_entity( arg,
+              :set,
+              arg.name.as_lowercase_with_underscores_symbol )
+
+          else
+            KEEP_PARSING_
           end
+          ok or break
         end
+        ok
+      end
+
+      RX___ = /\A(?:(?<add>add_)|(?<remove>remove_))(?<stem>.+)/
+
+      def via_associated_entity arg, verb_sym, ent_sym
+        @survey.touch_associated_entity_( ent_sym ).send(
+          verb_sym, arg, @arg_box )
       end
     end
   end

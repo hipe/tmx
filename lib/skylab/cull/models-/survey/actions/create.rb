@@ -53,26 +53,36 @@ module Skylab::Cull
 
         :flag, :property, :dry_run,
 
-        :required,
+        :reuse, Survey_Action_Methods_.common_properties,
+
         :description, -> y do
           y << "create a cull survey workspace directory in the path"
         end,
-        :property, :path
+        :required, :property, :path
 
 
       def produce_any_result
 
-        @ent = Models_::Survey.edit_entity @kernel, handle_event_selectively do | o |
+        @bx = to_bound_argument_box
 
-          o.create_via_mutable_bound_argument_box to_bound_argument_box
+        @survey = Models_::Survey.edit_entity @kernel, handle_event_selectively do | edit |
+
+          edit.create_via_mutable_arg_box_and_look_path(
+            @bx,
+            @argument_box.fetch( :path ) )
         end
 
-        @ent and via_ent
+        @survey and via_survey
       end
 
-      def via_ent
+      def via_survey
+        Survey_::Actors__::Create[ @survey, @bx, & handle_event_selectively ] and
+          when_created
+      end
+
+      def when_created
         maybe_send_event :info, :created_survey do
-          @ent.to_event
+          @survey.to_event
         end
       end
     end

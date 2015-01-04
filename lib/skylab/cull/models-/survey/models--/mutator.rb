@@ -2,39 +2,42 @@ module Skylab::Cull
 
   class Models_::Survey
 
-    class Actions::Mutator
+    class Models__::Mutator
 
-      Actions = ::Module.new
+      def initialize survey, & oes_p
+        @survey = survey
+        @on_event_selectively = oes_p
+      end
 
-      class Actions::Add < Action_
+      def add arg, _box
+        ok = true
+        arg.value_x.each do | s |
+          ok = Add_one___.new( s, self, @survey, @on_event_selectively ).execute
+          ok or break
+        end
+        ok
+      end
 
-        Brazen_.model.entity self,
+      def _add function_class, any_arg_s_a
 
-          :required, :property, :path,
+        @survey.touch_associated_entity_( :report ).add_function_call(
+          any_arg_s_a, function_class, :mutator )
 
-          :required, :property, :function_call_expression
+      end
 
-        def produce_any_result
+      class Add_one___
 
-          via_path_argument_resolve_existent_survey and
-            via_survey
+        def initialize * a
+          @exp_s, @parent, @survey, @on_event_selectively = a
         end
 
-        include Survey_Action_Methods_
-
-      private
-
-        def via_survey
-
-          @exp_s = @argument_box[ :function_call_expression ]
-
+        def execute
           ok = via_expression_string_resolve_function_call_S_expression
           ok &&= via_function_call_S_expression_resolve_function
-          ok && via_function
+          ok and @parent._add @function_class, @sexp.arg_s_a
         end
 
         def via_expression_string_resolve_function_call_S_expression
-
           md = RX___.match @exp_s
           if md
             s = md[ :args ]
@@ -65,7 +68,7 @@ module Skylab::Cull
 
           rx = /\A#{ nm.as_const.id2name.downcase  }/i
 
-          i_a = Mutator_::Items__.constants
+          i_a = Models_::Mutator::Items__.constants
 
           found_a = i_a.reduce [] do | m, const |
             if rx =~ const
@@ -88,22 +91,13 @@ module Skylab::Cull
           UNABLE_
         end
 
+        include Simple_Selective_Sender_Methods_
+
         def when_one const
-          @function_class = Mutator_::Items__.const_get( const, false )
+          @function_class = Models_::Mutator::Items__.const_get const, false
           ACHIEVED_
         end
-
-        def via_function
-          @survey.edit do | o |
-            o.add_mutator_to_report(
-              @function_class,
-              @sexp.arg_s_a,
-              nil )
-          end
-        end
       end
-
-      Mutator_ = Models_::Mutator
     end
   end
 end

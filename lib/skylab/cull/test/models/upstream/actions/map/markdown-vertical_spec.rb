@@ -9,7 +9,7 @@ module Skylab::Cull::TestSupport
     extend TS_
 
     it "files must be absolute here" do
-      call_API :upstream, :map, :upstream_file, 'non-absolute-path'
+      call_API :upstream, :map, :upstream, 'non-absolute-path'
       expect_not_OK_event :path_must_be_absolute
       expect_failed
     end
@@ -33,7 +33,7 @@ module Skylab::Cull::TestSupport
     end
 
     def markdown_map_against_file sym
-      call_API :upstream, :map, :upstream_file,
+      call_API :upstream, :map, :upstream,
         TestSupport_::Data::Universal_Fixtures[ sym ],
           :upstream_adapter, :markdown
     end
@@ -105,7 +105,7 @@ module Skylab::Cull::TestSupport
     def map_against_file sym, * x_a
 
       call_API :upstream, :map,
-        :upstream_file, file_path( sym ),
+        :upstream, file_path( sym ),
         :upstream_adapter, :markdown,
         * x_a
 

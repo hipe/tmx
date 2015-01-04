@@ -377,11 +377,11 @@ module Skylab::Callback
       @h[ i ] = x ; nil
     end
 
-    def add_if_not_has i, & p
+    def touch i, & p
       @h.fetch i do
         @a.push i
         @h[ i ] = p.call
-      end ; nil
+      end
     end
 
     def add_or_assert i, x_

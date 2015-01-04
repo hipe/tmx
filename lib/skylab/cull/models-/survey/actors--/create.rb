@@ -6,24 +6,18 @@ module Skylab::Cull
 
       Callback_::Actor.methodic self, :simple, :properties, :properties,
 
-        :dry_run,
-        :path
+        :survey,
+        :dry_run
 
       define_singleton_method :[], HARD_CALL_METHOD_
 
-      def initialize & edit_p
-
-        instance_exec( & edit_p )
-
-        @deeper_path_arg = @path_arg.with_value(
-          ::File.join( @path_arg.value_x, FILENAME_ ) )
-
-      end
-
       def execute
 
+        # using dry run, check to see that we could create the directory
+        # if we wanted to -- that is, that it does not already exist.
+
         Cull_.lib_.filesystem.normalization.downstream_IO(
-          :path_arg, @deeper_path_arg,
+          :path, @survey.workspace_path_,
           :is_dry_run, true,  # always true, we are checking only
           :ftype, DIR_FTYPE_,
           :on_event_selectively, @on_event_selectively ) and
@@ -33,16 +27,18 @@ module Skylab::Cull
 
       def when_dir
 
-        workspace_dir = @path_arg.value_x
+        # (we used to patch here)
 
-        Cull_.lib_.system.patch(
-          :target_directory, workspace_dir,
-          :patch_file,
-            Cull_.dir_pathname.join( 'data-documents-/create.patch' ).to_path,
-          :is_dry_run, @dry_run_arg.value_x,
-          & @on_event_selectively ) and
+        @survey.flush_persistence_script_
 
-        workspace_dir
+        cfg = @survey.config_for_write_
+
+        if cfg.is_empty
+          cfg.add_comment "ohai"
+        end
+
+        @survey.write_ @dry_run_arg.value_x
+
       end
     end
   end

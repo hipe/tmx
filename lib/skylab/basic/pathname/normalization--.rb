@@ -214,8 +214,8 @@ module Skylab::Basic
 
         def add_bad d, i
           @bad_box ||= Callback_::Box.new
-          @bad_box.add_if_not_has i do [] end
-          @bad_box.fetch( i ).push d ; nil
+          ( @bad_box.touch i do [] end ).push d
+          nil
         end
 
         def when_bad_box

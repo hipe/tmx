@@ -30,7 +30,7 @@ module Skylab::Cull
     Autoloader_[ self, :boxxy ]
   end
 
-  HARD_CALL_METHOD_ = -> arg_box, & oes_p do
+  HARD_CALL_METHOD_ = -> * values, arg_box, & oes_p do
 
     seen = false
 
@@ -39,10 +39,16 @@ module Skylab::Cull
 
       st = self.class.properties.to_stream
 
+      values.length.times do | d |
+        instance_variable_set(
+          st.gets.name.as_ivar,
+          values.fetch( d ) )
+      end
+
       prp = st.gets
       while prp
         instance_variable_set(
-          :"@#{ prp.name_symbol }_arg",
+          :"#{ prp.name.as_ivar }_arg",
           arg_box.fetch( prp.name_symbol ) )
         prp = st.gets
       end
@@ -64,7 +70,7 @@ module Skylab::Cull
 
       prp = st.gets
       while prp
-        instance_variable_set :"@#{ prp.name_symbol }", value_box[ prp.name_symbol ]
+        instance_variable_set prp.name.as_ivar, value_box[ prp.name_symbol ]
         prp = st.gets
       end
 
@@ -120,6 +126,7 @@ module Skylab::Cull
   Action_ = Brazen_.model.action_class  # for name stop index we need this const
   Cull_ = self
   EMPTY_S_ = ''.freeze
+  KEEP_PARSING_ = true
   Kernel_ = Brazen_.kernel_class
   Model_ = Brazen_.model.model_class
   NIL_ = nil

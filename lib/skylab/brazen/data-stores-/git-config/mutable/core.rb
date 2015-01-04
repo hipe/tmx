@@ -332,7 +332,7 @@ module Skylab::Brazen
         end
 
         def members
-          [ :input_id, :sections, :to_line_stream,
+          [ :add_comment, :input_id, :sections, :to_line_stream,
             :write, :write_to_path, * super ]
         end
 

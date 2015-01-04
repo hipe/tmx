@@ -7,30 +7,40 @@ module Skylab::Cull
       Callback_::Actor.methodic self, :simple, :properties, :properties,
 
         :reference_path,
-        :upstream_adapter,
-        :upstream_file,
-        :upstream_identifier
+        :upstream,
+        :upstream_adapter
 
       define_singleton_method :[], VALUE_BOX_CALL_METHOD_
 
       def execute
-        if @upstream_identifier
-          via_ID
+
+        @md = /\A(?<prefix>[a-z0-9-]+):(?<arg>.+)/.match @upstream
+
+        if @md
+          @prefix = @md[ :prefix ]
+          @arg = @md[ :arg ]
+          via_prefix
         else
-          process_as_file_identifier_string @upstream_file
+          via_path
         end
       end
 
-      def via_ID
+      def via_path
+        if ::File::SEPARATOR == @upstream[ 0 ]
+          @prefix = :file
+          @arg = @upstream
+          via_prefix
+        else
+          when_relpath @upstream
+        end
+      end
 
-        md = /\A([^:]*):?(.+)?\z/.match @upstream_identifier
-
-        @prefix, identifier_string = md.captures
+      def via_prefix
 
         m = :"process_as_#{ @prefix }_identifier_string"
 
         if respond_to? m
-          send m, identifier_string
+          send m, @arg
         else
           when_prefix
         end
@@ -73,14 +83,14 @@ module Skylab::Cull
           elsif @reference_path
             ::File.join @reference_path, str
           else
-            __when_relpath str
+            when_relpath str
           end
         else
           str
         end
       end
 
-      def __when_relpath path
+      def when_relpath path
         maybe_send_event :error, :path_must_be_absolute do
           build_not_OK_event_with :path_must_be_absolute, :path, path
         end

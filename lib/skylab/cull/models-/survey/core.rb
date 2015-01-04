@@ -27,227 +27,198 @@ module Skylab::Cull
       end
     end  # >>
 
-    # ~ #hook-in to [br] edit session API
+    def initialize k
+      @entities = nil
+      @persist_step_a = nil
+      super k
+    end
+
+    # ~ all #hook-in to [br] edit session API
 
     def first_edit_shell
-      First_Edit_Session__.new
+      subsequent_edit_shell
+    end
+
+    def subsequent_edit_shell
+      Edit_Shell__.new
     end
 
     def process_first_edit sh
-      send sh.receive_first_edit_data_method_name, * sh.args
+      process_subsequent_edit sh
     end
 
-    # ~ end
-
-    # ~ edit session where nothing happens is gigo
-
-    def _first_edit_when_nothing
-      nil
+    def process_subsequent_edit sh
+      send sh.m, * sh.a
     end
 
-    # ~ edit session for create
+    class Edit_Shell__
 
-    def _create_via_mutable_arg_box bx
+      def initialize
+      end
 
-      x = Self_::Actors__::Create[ bx, & handle_event_selectively ]
-      x and begin
-        @___path___ = x
-        self
+      attr_reader :m, :a
+
+      def create_via_mutable_arg_box_and_look_path bx, path
+        @m = :__create_via_mutable_arg_box_and_look_path
+        @a = [ bx, path ]
+        nil
+      end
+
+      def edit_via_mutable_arg_box_and_look_path bx, path
+        @m = :__edit_via_mutable_arg_box_and_look_path
+        @a = [ bx, path ]
+        nil
+      end
+
+      def retrieve_via_workspace_path path
+        @m = :_retrieve_via_workspace_path
+        @a = path
+        nil
       end
     end
 
-    # ~ edit session for retrieve
+    def __create_via_mutable_arg_box_and_look_path bx, path
+      @_path = path
+      @persist_step_a ||= []
+      @persist_step_a.push [ :__create_editable_document ]
 
-    def _retrieve_via_valid_path path
+      _edit_via_mutable_arg_box bx
+    end
+
+    def __edit_via_mutable_arg_box_and_look_path bx, path
+      ok = _retrieve_via_workspace_path ::File.join( path, FILENAME_ )
+      ok and begin
+        _edit_via_mutable_arg_box bx
+      end
+    end
+
+    def _retrieve_via_workspace_path ws_path
+
+      _config_path = ::File.join ws_path, CONFIG_FILENAME_
 
       cfg = Brazen_.data_stores::Git_Config.parse_path(
-        ::File.join( path, CONFIG_FILENAME_ ),
+        _config_path,
         & handle_event_selectively )
 
       cfg and begin
-        @_path = path
+        @_path = ::File.dirname ws_path
         @cfg_for_write = nil
         @cfg_for_read = cfg
         self
       end
     end
 
+    include Simple_Selective_Sender_Methods_  # for above `handle_event_selectively`
+
     def path
       @_path
     end
 
-    private def _config
-      @cfg_for_write || @cfg_for_read
-    end
+    def _edit_via_mutable_arg_box bx
 
-    def to_datapoint_stream_for_synopsis
-      @cfg_for_read.to_section_stream( & handle_event_selectively ).map_by do | x |
-        Self_::Models__::Section_Summary.new x
+      arg_a = bx.to_value_stream.reduce_by do | arg |
+        arg.actuals_has_name && :path != arg.name_symbol
+      end.to_a
+
+      if arg_a.length.zero?
+        self
+      else
+
+        _ok = Survey_::Actors__::Edit_associated_entities[
+          arg_a,
+          bx,
+          self,
+          & handle_event_selectively ]
+
+        _ok and self
       end
     end
 
-    # ~ subsequent edit session (edit an existing (new or persisted) survey)
+    # ~ public API for :+#actors near persistence
 
-    def subsequent_edit_shell  # #hook-in [br]
-      Subsequent_Edit_Shell__.new
+    # ~~ flushers
+
+    def re_persist is_dry  # assume a config for read
+
+      @cfg_for_write = Brazen_.data_stores::Git_Config::Mutable.parse_input_id(
+        @cfg_for_read.input_id,
+        & handle_event_selectively )
+
+      @cfg_for_read = nil
+
+      flush_persistence_script_ and _write( is_dry )
     end
 
-    class Subsequent_Edit_Shell__
+    def write_ is_dry
 
-      # think of this as a structure for modeling all the changes that might
-      # be (and were requested to be) made to an existing entity. first, we
-      # cache all the changes here as one atomic-esque structure. then in a
-      # separate step we flush the changes to the entity. then IFF flushing
-      # these changes succeeds, the entity can [re-]persist itself. in this
-      # way the entity can convene all attempts at persisting into one step
+      ::Dir.mkdir workspace_path_  # dry? atomic? meh
 
-      def initialize
-        @a = []
-      end
-
-      attr_reader :a
-
-      def add_mutator_to_report cls, arg_s_a, rprt_sym
-        @a.push :_add_function_call_to_report, [ cls, arg_s_a, rprt_sym ]
-      end
-
-      def set_upstream_via_mutable_arg_box bx
-        @a.push :_set_upstream_via_mutable_arg_box, bx
-        nil
-      end
-
-      def delete_upstream
-        @a.push :_delete_upstream, nil
-        nil
-      end
+      _write is_dry
     end
 
-    def process_subsequent_edit sh  # #hook-in [br]
+    def _write is_dry
 
-      # for now, we assume (reasonably) that all successful edits sessions
-      # mutate the entity and therefor should be persisted.
+      @cfg_for_write.write_to_path(  # results in true on success
 
+        ::File.join( workspace_path_, CONFIG_FILENAME_ ),
+        :is_dry, is_dry,
+        & handle_event_selectively )
+    end
+
+    # ~~ interface for the persistence script
+
+    def add_to_persistence_script_ * step
+      @persist_step_a.nil? and @persist_step_a = []
+      @persist_step_a.push step
+      nil
+    end
+
+    def flush_persistence_script_
+      a = @persist_step_a ; @persist_step_a = nil
       ok = true
-      sh.a.each_slice 2 do | sym, x |
-        ok = send sym, * x
+      a.each do | m, * args |
+        ok = send m, * args
         ok or break
       end
-      ok && normalize && _end_edit_session_by_writing_self
+      ok
     end
 
-    # ~ property-level exposures
+    # ~~ steps avaiable for the persistence script
 
-    def _set_upstream_via_mutable_arg_box bx
-
-      upstream = Self_::Actions::Upstream.edit_entity( self, handle_event_selectively ) do | o |
-
-        o.mutable_arg_box bx
-
-      end
-
-      upstream and accpt_upstream upstream
+    def __create_editable_document
+      @cfg_for_read = nil
+      @cfg_for_write = Brazen_.data_stores::Git_Config::Mutable.new(
+        & handle_event_selectively )
+      ACHIEVED_
     end
 
-    def accpt_upstream upstream
-
-      ok = _set_monadic_slotular_section upstream.marshal_dump, :upstream
-
-      ok and begin
-
-        @upstream = upstream
-
-        maybe_send_event :info, :set_upstream do
-          upstream.to_event
-        end
-
-        ACHIEVED_
-      end
+    def call_on_associated_entity_ ent_sym, m, * args
+      touch_associated_entity_( ent_sym ).send m, * args
     end
 
-    def _delete_upstream
-      _unset_monadic_slotular_section :upstream, :no_upstream_set, :deleted_upstream
+    # ~~ misc functions for actors & top entities
+
+    def config_for_write_
+      @cfg_for_write
     end
-
-    def _add_function_call_to_report func_class, arg_s_a, report_sym
-
-      Models_::Report_.edit_session(
-          report_sym,
-          cfg_for_write,
-          handle_event_selectively ) do | rep |
-
-        rep.add_function_call func_class, arg_s_a
-
-      end
-    end
-
-    # ~ shared support
 
     def maybe_relativize_path path
 
+      _ws_path = ::File.join @_path, FILENAME_
+
       relpath = ::Pathname.new( path ).relative_path_from(
-        ::Pathname.new( @_path ) ).to_path
+        ::Pathname.new( _ws_path ) ).to_path
 
       if relpath.length < path.length
         relpath
       else
         path
       end
-
     end
 
-    def members
-      [ :path ]
-    end
+    def persist_value_for_name_symbol_ value_string, section_symbol
 
-    def to_event
-      Brazen_.event.inline_OK_with :survey,
-        :path, ::File.join( @___path___, FILENAME_ ),
-        :is_completion, true
-    end
-
-  private
-
-    def _unset_monadic_slotular_section section_symbol, no_sym, yes_sym
-
-      cfg = cfg_for_write
-
-      st = cfg.sections.to_stream.reduce_by do | x |
-        section_symbol == x.external_normal_name_symbol
-      end
-
-      delete_these = st.to_a
-
-      if delete_these.length.nonzero?
-        a = cfg.sections.delete_these_ones delete_these
-        maybe_send_event :info, yes_sym do
-          bld_deleted_slotular a, yes_sym, section_symbol
-        end
-        ACHIEVED_
-      else
-        maybe_send_event :error, :no_upstream_set do
-          build_not_OK_event_with :no_upstream_set
-        end
-        UNABLE_
-      end
-    end
-
-    def bld_deleted_slotular a, yes_sym, sym
-
-      build_event_with yes_sym,
-          :symbol, sym,
-          :count, a.length, :ok, true do | y, o |
-
-        if 1 == o.count
-          y << "deleted #{ par o.symbol.id2name }"
-        else
-          y << "deleted #{ o.count } #{ par plural_noun o.symbol.id2name }"
-        end
-      end
-    end
-
-    def _set_monadic_slotular_section value_string, section_symbol
-
-      cfg = cfg_for_write
+      cfg = @cfg_for_write
 
       st = cfg.sections.to_stream.reduce_by do | x |
         section_symbol == x.external_normal_name_symbol
@@ -279,47 +250,114 @@ module Skylab::Cull
       end
     end
 
-    def _end_edit_session_by_writing_self
-      cfg_for_write.write
-    end
+    def destroy_all_persistent_nodes_for_name_symbol_ section_sym
 
-    def cfg_for_write
-      @cfg_for_write ||= begin
-        x = @cfg_for_read
-        @cfg_for_read = nil
-        Brazen_.data_stores::Git_Config::Mutable.parse_input_id(
-          x.input_id,
-          & @on_event_selectively )
+      cfg = @cfg_for_write
+
+      st = cfg.sections.to_stream.reduce_by do | x |
+        section_sym == x.external_normal_name_symbol
+      end
+
+      delete_these = st.to_a
+
+      if delete_these.length.zero?
+        name_sym = :"no_#{ section_sym }_set"
+        maybe_send_event :error, name_sym do
+          build_not_OK_event_with name_sym
+        end
+        UNABLE_
+      else
+        a = cfg.sections.delete_these_ones delete_these
+        maybe_send_event :info, :"deleted_#{ section_sym }" do
+          bld_deleted_slotular a, section_sym
+        end
+        ACHIEVED_
       end
     end
 
-    include Simple_Selective_Sender_Methods_
+    def bld_deleted_slotular a, sym
 
-    class First_Edit_Session__
+      build_event_with :"deleted_#{ sym }#{ 's' if 1 != a.length }",
+          :symbol, sym,
+          :count, a.length, :ok, true do | y, o |
 
-      # a frontier example of an experimental edit session category wherein
-      # it ulitmately resolves to do only one thing (whatever was last)
+        if 1 == o.count
+          y << "deleted #{ par o.symbol.id2name }"
+        else
+          y << "deleted #{ o.count } #{ par plural_noun o.symbol.id2name }"
+        end
+      end
+    end
 
-      def initialize
-        @receive_first_edit_data_method_name = :_first_edit_when_nothing
+    def to_event
+      Brazen_.event.inline_OK_with :survey,
+        :path, ::File.join( @_path, FILENAME_ ),
+        :is_completion, true
+    end
+
+    def workspace_path_
+      @___ws_path ||= ::File.join @_path, FILENAME_
+    end
+
+    # ~ public API for #:+actors near "associated entities" API (experiment)
+
+    def touch_associated_entity_ ent_sym
+
+      if @entities
+        ent = @entities[ ent_sym ]
+      else
+        @entities = {}
       end
 
-      attr_reader :receive_first_edit_data_method_name, :args
+      if ! ent
 
-      def create_via_mutable_bound_argument_box bx
-        @args = bx
-        @receive_first_edit_data_method_name = :_create_via_mutable_arg_box
-        nil
+        ent = Models__.const_get(
+          Callback_::Name.via_variegated_symbol( ent_sym ).as_const,
+          false
+        ).new self, & handle_event_selectively
+
+        @entities[ ent_sym ] = ent
       end
 
-      def existent_valid_workspace_path path
-        @args = path
-        @receive_first_edit_data_method_name = :_retrieve_via_valid_path
-        nil
+      ent
+    end
+
+    # ~ misc public API for actors and actions
+
+    def to_datapoint_stream_for_synopsis
+      @cfg_for_read.to_section_stream( & handle_event_selectively ).map_by do | x |
+        Survey_::Models__::Section_Summary.new x
       end
+    end
+
+    module Models__
+      Autoloader_[ self, :boxxy ]
     end
 
     module Survey_Action_Methods_
+
+      class << self
+        attr_reader :common_properties
+      end
+
+      Brazen_.model.entity self do
+
+        o :property, :upstream,
+          :property, :upstream_adapter
+
+        def add_mutator  # :+[#br-082]
+          ( @argument_box.touch :add_mutator do [] end ).push iambic_property
+          KEEP_PARSING_
+        end
+
+        def remove_mutator
+          self._DO_ME
+          KEEP_PARSING_
+        end
+      end
+
+      @common_properties = properties.to_a
+
     private
 
       def via_path_argument_resolve_existent_survey
@@ -333,8 +371,8 @@ module Skylab::Cull
 
       def rslv_existent_survey_via_existent_path path
 
-        sv = Models_::Survey.edit_entity @kernel, handle_event_selectively do | o |
-          o.existent_valid_workspace_path path
+        sv = Models_::Survey.edit_entity @kernel, handle_event_selectively do | edit |
+          edit.retrieve_via_workspace_path path
         end
 
         sv and begin
@@ -347,6 +385,6 @@ module Skylab::Cull
     CONFIG_FILENAME_ = 'config'.freeze
     DIR_FTYPE_ = 'directory'.freeze
     FILENAME_ = 'cull-survey'.freeze
-    Self_ = self
+    Survey_ = self
   end
 end

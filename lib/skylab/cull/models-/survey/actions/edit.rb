@@ -2,30 +2,36 @@ module Skylab::Cull
 
   class Models_::Survey
 
-    class Actions::Upstream
+    class Actions::Edit < Action_
 
-      Autoloader_[ ( Actions = ::Module.new ), :boxxy ]
+      Brazen_.model.entity self,
 
-      class Actions::Set < Action_
+        :flag, :property, :dry_run,
 
-        Brazen_.model.entity self,
+        :reuse, Survey_Action_Methods_.common_properties,
 
-          :required, :property, :path,
+        :description, -> y do
+          y << "edit an existing survey at this path"
+        end,
+        :required, :property, :path
 
-          :required, :property, :upstream_identifier
+      include Survey_Action_Methods_
 
-        def produce_any_result
-          via_path_argument_resolve_existent_survey and
-          via_survey
+      def produce_any_result
+
+        @survey = @parent_node.edit do | edit |
+
+          edit.edit_via_mutable_arg_box_and_look_path(
+            to_bound_argument_box,
+            @argument_box.fetch( :path ) )
+
         end
 
-        include Survey_Action_Methods_
+        @survey and via_survey
+      end
 
-        def via_survey
-          @survey.edit do | o |
-            o.set_upstream_via_mutable_arg_box to_bound_argument_box
-          end
-        end
+      def via_survey
+        @survey.re_persist @argument_box[ :dry_run ]
       end
     end
   end

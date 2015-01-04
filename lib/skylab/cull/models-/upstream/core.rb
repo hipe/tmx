@@ -10,15 +10,9 @@ module Skylab::Cull
 
       def mutable_arg_box bx
 
-        # ~ some actions have these (as formals, not nec. as actuals)
+        @bx.add :upstream, bx[ :upstream ].value_x
 
-        x = bx[ :upstream_adapter ] and @bx.set( :upstream_adapter, x.value_x )
-
-        x = bx[ :upstream_file ] and @bx.set( :upstream_file, x.value_x )
-
-        # ~ all actions have these (as formals, but not nec. as actuals)
-
-        @bx.set :upstream_identifier, bx[ :upstream_identifier ].value_x
+        @bx.add :upstream_adapter, bx[ :upstream_adapter ].value_x
 
         nil
       end
@@ -38,11 +32,11 @@ module Skylab::Cull
       attr_reader :bx
     end
 
-    def first_edit_shell
-      First_Edit.new
+    def subsequent_edit_shell
+      first_edit_shell
     end
 
-    def subsequent_edit_shell
+    def first_edit_shell
       First_Edit.new
     end
 
@@ -58,7 +52,10 @@ module Skylab::Cull
 
     def _process_edit sh
 
-      x = Upstream_::Actors__::Produce_adapter[ sh.bx, & @on_event_selectively ]
+      x = Upstream_::Actors__::Produce_adapter[
+        sh.bx,
+        & @on_event_selectively ]
+
       x and begin
         @_adapter = x
         self

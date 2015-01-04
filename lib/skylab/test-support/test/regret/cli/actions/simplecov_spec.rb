@@ -30,7 +30,6 @@ module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Simplecov
     stop_range = 0.. ( stop_s.length - 1 )
 
     it "SO BEAUTIFUL / SO UGLY : test simplecov in a sub-process" do
-      debug!
       cmd_a = build_command_a
       line_a, exitstatus = open2 cmd_a
       while line = line_a.first and :err == line.out_or_err and

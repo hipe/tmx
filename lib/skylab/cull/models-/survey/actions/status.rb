@@ -4,9 +4,9 @@ module Skylab::Cull
 
     class Actions::Status < Action_
 
-      Brazen_.model.entity self,
+      @after_name_symbol = :edit
 
-        :after, :create,
+      Brazen_.model.entity self,
 
         :desc, -> y do
           y << "display status of the survey"
