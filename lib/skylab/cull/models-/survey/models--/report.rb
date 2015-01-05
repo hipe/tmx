@@ -7,6 +7,7 @@ module Skylab::Cull
       def initialize survey, & oes_p
 
         @call_a = nil
+
         @survey = survey
         @on_event_selectively = oes_p
 
@@ -95,9 +96,13 @@ module Skylab::Cull
 
       def against st
 
-        @call_a or self._DO_ME_unmarshal
+        if @call_a && @call_a.length.nonzero?
 
-        Self_::Actors__::To_stream[ st, @call_a, & @on_event_selectively ]
+          Self_::Actors__::To_stream[ st, @call_a, & @on_event_selectively ]
+
+        else
+          st
+        end
       end
 
       Self_ = self

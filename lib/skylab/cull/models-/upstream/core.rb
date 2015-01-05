@@ -84,14 +84,8 @@ module Skylab::Cull
       @_adapter.to_entity_stream
     end
 
-    def any_entity_stream_at_some_table_number d  # assume fixnum
-      estream = nil
-      st = to_entity_stream_stream
-      d.times do
-        estream = st.gets
-        estream or break
-      end
-      estream
+    def entity_stream_at_some_table_number d  # assume fixnum
+      @_adapter.entity_stream_at_some_table_number d
     end
 
     def to_entity_stream_stream
@@ -101,7 +95,6 @@ module Skylab::Cull
     def event_for_fell_short_of_count needed_number, had_number
       @_adapter.event_for_fell_short_of_count needed_number, had_number
     end
-
 
     FILE_FTYPE_ = 'file'
 

@@ -96,8 +96,6 @@ module Skylab::Cull
 
           NEWLINE_BYTE__ = "\n".getbyte 0
 
-          EMPTY_P_ = -> {}
-
         end
       end
     end

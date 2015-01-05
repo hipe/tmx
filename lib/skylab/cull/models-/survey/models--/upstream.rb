@@ -127,8 +127,8 @@ module Skylab::Cull
         @survey.destroy_all_persistent_nodes_for_name_symbol_ :upstream
       end
 
-      def any_entity_stream_at_some_table_number d  # is assumed fixnum
-        @_top_entity.any_entity_stream_at_some_table_number d
+      def entity_stream_at_some_table_number d  # is assumed fixnum
+        @_top_entity.entity_stream_at_some_table_number d
       end
 
       def to_entity_stream

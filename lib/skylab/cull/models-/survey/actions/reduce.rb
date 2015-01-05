@@ -64,7 +64,7 @@ module Skylab::Cull
         times_d = @argument_box[ :table_number ]
 
         estream = if times_d
-          upstream.any_entity_stream_at_some_table_number times_d
+          upstream.entity_stream_at_some_table_number times_d
         else
           upstream.to_entity_stream
         end
@@ -73,7 +73,6 @@ module Skylab::Cull
           _x = @survey.touch_associated_entity_ :report  # for now
           _x.against estream
         else
-          # ..
           estream
         end
       end

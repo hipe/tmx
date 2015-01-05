@@ -49,7 +49,7 @@ module Skylab::Cull::TestSupport
 
         :reduce,
 
-        :upstream, file_path( :mutators_01_simple_md ),
+        :upstream, file( :mutators_01_simple_md ),
 
         :add_mutator, 'remove-empty'
 

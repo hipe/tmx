@@ -37,7 +37,7 @@ module Skylab::Cull::TestSupport
       TS_::Fixtures::Directories[ :freshly_initted ]
     end
 
-    def file_path sym
+    def file sym
       TS_::Fixtures::Files[ sym ]
     end
 

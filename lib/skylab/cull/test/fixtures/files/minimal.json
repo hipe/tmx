@@ -1,0 +1,10 @@
+[
+  {
+    "desc": "my favorite socks",
+    "image": "whatever.jpg"
+  },
+  {
+    "flat tags": [ "foo", "bar", "biff-baz:boffo" ],
+    "whatever": { "meh": "bleh" }
+  }
+]

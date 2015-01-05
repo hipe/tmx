@@ -40,29 +40,7 @@ module Skylab::Cull
       end
 
       def via_upstream
-
-        st = @upstream.to_entity_stream_stream
-
-        estream = nil
-        count = 0
-
-        @argument_box[ :table_number ].times do
-          estream = st.gets
-          estream or break
-          count += 1
-        end
-
-        if estream
-          estream
-        else
-          when_fell_short @argument_box[ :table_number ], count
-        end
-      end
-
-      def when_fell_short wanted_number, had_number
-        maybe_send_event :error, :early_end_of_stream do
-          @upstream.event_for_fell_short_of_count wanted_number, had_number
-        end
+        @upstream.entity_stream_at_some_table_number @argument_box[ :table_number ]
       end
     end
   end

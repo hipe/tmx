@@ -105,7 +105,7 @@ module Skylab::Cull::TestSupport
     def map_against_file sym, * x_a
 
       call_API :upstream, :map,
-        :upstream, file_path( sym ),
+        :upstream, file( sym ),
         :upstream_adapter, :markdown,
         * x_a
 

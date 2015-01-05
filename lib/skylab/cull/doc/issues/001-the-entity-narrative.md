@@ -86,9 +86,8 @@ which come with *no* type associations. that is, they are some sort of
 "raw data". this makes things more interesting further down on the
 pipeline as we will discuss in [#004].
 
-because of their universality and human-readability, "strings" are the
-universal substrate we chose to represent these data, free of type
-association.
+in practice what type these values will start out as depends on your
+upstream adapter and your data.
 
 we will certainly be able to exploit and query against numeric or other
 type-aware data derived from these strings, just note here that a

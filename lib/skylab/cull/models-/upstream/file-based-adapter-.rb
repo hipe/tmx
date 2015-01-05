@@ -25,6 +25,24 @@ module Skylab::Cull
           bx.add :adapter, adapter_symbol
           bx
         end
+
+        def entity_stream_at_some_table_number d
+          estream = nil
+          st = to_entity_stream_stream
+          count = 0
+          d.times do
+            estream = st.gets
+            estream or break
+            count += 1
+          end
+          if estream
+            estream
+          else
+            maybe_send_event :error, :early_end_of_stream do
+              event_for_fell_short_of_count d, count
+            end
+          end
+        end
       end
 
   end

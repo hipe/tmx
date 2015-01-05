@@ -60,8 +60,12 @@ module Skylab::Basic
 
     public
 
-      def identifier pathname
-        Identifier__.new pathname
+      def identifier * a
+        if a.length.zero?
+          Identifier__
+        else
+          Identifier__.new( a.fetch( a.length - 1 << 1 ).to_path )
+        end
       end
 
       def members
@@ -87,12 +91,12 @@ module Skylab::Basic
 
     class Identifier__
 
-      def initialize pn
-        @pn = pn
+      def initialize path
+        @path = path
       end
 
       def description_under expag
-        Pathname_.description_under_of_path expag, @pn.to_path
+        Pathname_.description_under_of_path expag, @path
       end
     end
 

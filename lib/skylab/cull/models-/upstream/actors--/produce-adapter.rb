@@ -200,7 +200,7 @@ module Skylab::Cull
       # ~ end pairs
 
       def adapter_via_path_and_class path, cls
-        if @table_number and cls.respond_to? :via_table_number_and_path
+        if @table_number
           cls.via_table_number_and_path @table_number, path, & @on_event_selectively
         else
           cls.via_path path, & @on_event_selectively
