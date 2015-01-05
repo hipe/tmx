@@ -3,4 +3,4 @@ new file mode 100644
 +++ b/cull-survey/config
 @@ -0,0 +1,2 @@
 +#ohai
-+[upstream "it doesn't matter what this is"]
++[upstream "this will trigger an innocuous error"]

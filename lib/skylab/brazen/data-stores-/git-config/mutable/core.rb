@@ -1170,12 +1170,12 @@ module Skylab::Brazen
         SYMBOL_I = :assignment
 
         def members
-          [ :add_to_bag_value_string_and_name_function, * super ]
+          [ :add_to_bag_mixed_value_and_name_function, * super ]
         end
 
-        def add_to_bag_value_string_and_name_function s, nm
+        def add_to_bag_mixed_value_and_name_function x, nm
           @collection_kernel.accept_asmt(
-            Assignment__.via_literal( nm.as_slug.intern, s, @parse ) )
+            Assignment__.via_literal( nm.as_slug.intern, x, @parse ) )
           ACHIEVED_
         end
       end

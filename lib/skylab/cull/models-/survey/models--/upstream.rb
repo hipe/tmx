@@ -7,6 +7,66 @@ module Skylab::Cull
       def initialize survey, & oes_p
         @survey = survey
         @on_event_selectively = oes_p
+
+        cfg = survey.config_for_read_
+        if cfg
+          sect = cfg.sections[ :upstream ]
+          sect and __unmarshal sect
+        end
+      end
+
+      def __unmarshal sect
+
+        @___ubox___ = Callback_::Box.new
+
+        if s = sect.subsect_name_s
+          __unmarshal_id s
+        end
+
+        st = sect.assignments.to_stream
+
+        while ast = st.gets
+          m = :"___unmarshal_#{ ast.external_normal_name_symbol }_property"
+          if respond_to? m
+            send m, ast.value_x
+          end
+        end
+
+        bx = @___ubox___ ; @___ubox___ = nil
+
+        # the below is just to keep things rigid but we might back it off later
+
+        if ! bx.has_name :table_number
+          bx.add :table_number, nil
+        end
+
+        if ! bx.has_name :upstream_adapter
+          bx.add :upstream_adapter, nil
+        end
+
+        if bx.length.nonzero?
+          @_top_entity = Models_::Upstream.edit_entity @survey.to_kernel, @on_event_selectively do | edit |
+            edit.derelativizer @survey
+            edit.mutable_value_box bx
+          end
+        end
+
+        nil
+      end
+
+      def __unmarshal_id s
+        @___ubox___.add :upstream, s
+        nil
+      end
+
+      def ___unmarshal_upstream_adapter_property s
+        @___ubox___.add :upstream_adapter, s
+        nil
+      end
+
+      def ___unmarshal_table_number_property d
+        @___ubox___.add :table_number, d
+        nil
       end
 
       def set arg, bx
@@ -46,9 +106,14 @@ module Skylab::Cull
       end
 
       def persist
-        ok = @_top_entity.marshal_dump_for_survey @survey
-        ok &&= @survey.persist_value_for_name_symbol_ ok, :upstream
-        ok && __maybe_send_set_event
+        bx = @_top_entity.to_mutable_marshal_box_for_survey @survey
+        bx and __persist_via_box bx
+      end
+
+      def __persist_via_box bx
+        x = bx.remove :upstream
+        _ok = @survey.persist_box_and_value_for_name_symbol_ bx, x, :upstream
+        _ok && __maybe_send_set_event
       end
 
       def __maybe_send_set_event
@@ -62,8 +127,16 @@ module Skylab::Cull
         @survey.destroy_all_persistent_nodes_for_name_symbol_ :upstream
       end
 
-      def to_entity_collection_stream
-        @_top_entity.to_entity_collection_stream
+      def any_entity_stream_at_some_table_number d  # is assumed fixnum
+        @_top_entity.any_entity_stream_at_some_table_number d
+      end
+
+      def to_entity_stream
+        @_top_entity.to_entity_stream
+      end
+
+      def to_entity_stream_stream
+        @_top_entity.to_entity_stream_stream
       end
     end
   end

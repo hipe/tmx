@@ -1,0 +1,6 @@
+
+[ upstream "file:../../../files/two-tables.md" ]
+  table-number = 2
+
+[ report ]
+function = mutator:remove-empty-actual-properties

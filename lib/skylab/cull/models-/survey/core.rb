@@ -237,11 +237,42 @@ module Skylab::Cull
       @__ws_path
     end
 
-    def persist_value_for_name_symbol_ value_string, section_symbol
+    def persist_box_and_value_for_name_symbol_ box, value_string, section_symbol
 
       cfg = @cfg_for_write
 
-      st = cfg.sections.to_stream.reduce_by do | x |
+      delete_these, change_the_name_of_this_one = ___all_become_one section_symbol
+
+      if delete_these
+        cfg.sections.delete_these_ones delete_these
+      end
+
+      if change_the_name_of_this_one
+        change_the_name_of_this_one.set_subsection_name value_string
+        guy = change_the_name_of_this_one
+      else
+        guy = cfg.sections.touch_section value_string, section_symbol
+      end
+
+      guy and begin
+        asts = guy.assignments
+        if asts.length.nonzero?
+          self._DO_ME
+        end
+        if box.length.zero?
+          ACHIEVED_
+        else
+          box.each_pair do | sym, x |
+            asts.add_to_bag_mixed_value_and_name_function x, Callback_::Name.via_variegated_symbol( sym )
+          end
+          ACHIEVED_
+        end
+      end
+    end
+
+    def ___all_become_one section_symbol
+
+      st = @cfg_for_write.sections.to_stream.reduce_by do | x |
         section_symbol == x.external_normal_name_symbol
       end
 
@@ -259,16 +290,7 @@ module Skylab::Cull
         end
       end
 
-      if delete_these
-        cfg.sections.delete_these_ones delete_these
-      end
-
-      if change_the_name_of_this_one
-        change_the_name_of_this_one.set_subsection_name value_string
-      else
-        _ = cfg.sections.touch_section value_string, section_symbol
-        _ ? ACHIEVED_ : UNABLE_
-      end
+      [ delete_these, change_the_name_of_this_one ]
     end
 
     def destroy_all_persistent_nodes_for_name_symbol_ section_sym

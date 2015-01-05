@@ -7,10 +7,11 @@ module Skylab::Cull
       Callback_::Actor.methodic self, :simple, :properties, :properties,
 
         :derelativizer,
+        :table_number,
         :upstream,
         :upstream_adapter
 
-      define_singleton_method :[], VALUE_BOX_CALL_METHOD_
+      define_singleton_method :[], VALUE_BOX_EXPLODER_CALL_METHOD_
 
       def execute
 
@@ -199,7 +200,11 @@ module Skylab::Cull
       # ~ end pairs
 
       def adapter_via_path_and_class path, cls
-        cls.via_path path, & @on_event_selectively
+        if @table_number and cls.respond_to? :via_table_number_and_path
+          cls.via_table_number_and_path @table_number, path, & @on_event_selectively
+        else
+          cls.via_path path, & @on_event_selectively
+        end
       end
     end
   end

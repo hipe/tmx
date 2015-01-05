@@ -10,7 +10,10 @@ module Skylab::Cull
 
         :reuse, Survey_Action_Methods_.common_properties,
 
-        :reuse, [ Models_::Upstream::Actions::Map::TABLE_NUMBER_PROPERTY ],
+        :property_object, ( Models_::Upstream::Actions::Map::TABLE_NUMBER_PROPERTY.with do
+          @has_default = false
+          @default_p = nil
+        end ),
 
         :description, -> y do
           y << "if provided, this survey will be used as a startingpoint."
@@ -56,17 +59,23 @@ module Skylab::Cull
 
       def via_survey
 
-        st_st = @survey.existent_associated_entity_( :upstream ).  # for now
-          to_entity_collection_stream
+        upstream = @survey.touch_associated_entity_ :upstream
 
-        st = nil
-        @argument_box[ :table_number ].times do
-          st = st_st.gets
+        times_d = @argument_box[ :table_number ]
+
+        estream = if times_d
+          upstream.any_entity_stream_at_some_table_number times_d
+        else
+          upstream.to_entity_stream
         end
 
-        @survey.existent_associated_entity_( :report ). # for now
-          against( st )
-
+        if estream
+          _x = @survey.touch_associated_entity_ :report  # for now
+          _x.against estream
+        else
+          # ..
+          estream
+        end
       end
     end
   end

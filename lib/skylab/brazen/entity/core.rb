@@ -835,6 +835,10 @@ module Skylab::Brazen
         ok
       end
 
+      def property_object=
+        @edit_session.receive_prop iambic_property
+      end
+
       METHODIC_.cache_iambic_writer_methods self
 
     public
@@ -989,6 +993,12 @@ module Skylab::Brazen
           Property_Related_Nonterminal__.new edit_session, self
         end
       end  # >>
+
+      def with & edit_p
+        otr = dup
+        otr.instance_exec( & edit_p )
+        otr
+      end
 
       def description  # for [#074]
         if @name

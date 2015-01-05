@@ -59,7 +59,7 @@ module Skylab::Cull
     seen && x.execute
   end
 
-  VALUE_BOX_CALL_METHOD_ = -> value_box, & oes_p do
+  VALUE_BOX_EXPLODER_CALL_METHOD_ = -> value_box, & oes_p do
 
     seen = false
 

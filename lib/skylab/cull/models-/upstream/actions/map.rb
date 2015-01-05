@@ -40,7 +40,8 @@ module Skylab::Cull
       end
 
       def via_upstream
-        st = @upstream.to_entity_collection_stream
+
+        st = @upstream.to_entity_stream_stream
 
         estream = nil
         count = 0

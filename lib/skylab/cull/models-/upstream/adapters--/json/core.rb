@@ -8,6 +8,10 @@ module Skylab::Cull
 
         EXTENSIONS = %w( .json )
 
+        def adapter_symbol
+          :json
+        end
+
         def to_descriptive_event
           build_event_with(
               :json_upstream,
@@ -16,6 +20,10 @@ module Skylab::Cull
 
             y << "JSON file: #{ pth o.path }"
           end
+        end
+
+        def to_entity_stream_stream
+          self._IMPLEMENT_ME
         end
       end
 

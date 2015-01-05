@@ -238,14 +238,14 @@ module Skylab::Brazen
 
           def set_dflt_proc & p
             @has_default = true
-            @dflt_p = p
+            @default_p = p
             KEEP_PARSING_
           end
 
           attr_reader :has_default
 
           def default_value_via_any_entity ent  # :+#public-API
-            @dflt_p[ ent ]
+            @default_p[ ent ]
           end
         end
 

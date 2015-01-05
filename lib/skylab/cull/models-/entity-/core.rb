@@ -11,7 +11,7 @@ module Skylab::Cull
     end
 
     def members
-      [ :to_actual_property_stream, :to_even_iambic ]
+      [ :get_property_name_symbols, :to_actual_property_stream, :to_even_iambic ]
     end
 
     def add_actual_property_value_and_name s, sym
@@ -45,6 +45,19 @@ module Skylab::Cull
         y << ( s_a * EMPTY_S_ )
       end
       ACHIEVED_
+    end
+
+    def [] sym
+      prp = @actual_properties.detect do | prp_ |
+        sym == prp_.name_symbol
+      end
+      prp and prp.actual_value_s
+    end
+
+    def get_property_name_symbols
+      @actual_properties.map do | prp |
+        prp.name_symbol
+      end
     end
 
     def to_actual_property_stream

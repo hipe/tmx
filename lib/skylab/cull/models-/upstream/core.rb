@@ -16,8 +16,16 @@ module Skylab::Cull
       def mutable_arg_box bx
 
         @bx.add :upstream, bx[ :upstream ].value_x
-
         @bx.add :upstream_adapter, bx[ :upstream_adapter ].value_x
+
+        nil
+      end
+
+      def mutable_value_box bx
+
+        @bx.add :upstream, bx.fetch( :upstream )
+        @bx.add :upstream_adapter, bx.fetch( :upstream_adapter )
+        @bx.add :table_number, bx.fetch( :table_number )
 
         nil
       end
@@ -64,16 +72,30 @@ module Skylab::Cull
 
   public
 
-    def marshal_dump_for_survey sur
-      @_adapter.marshal_dump_for_survey_ sur
+    def to_mutable_marshal_box_for_survey sur
+      @_adapter.to_mutable_marshal_box_for_survey_ sur
     end
 
     def to_event
       @_adapter.to_descriptive_event
     end
 
-    def to_entity_collection_stream
-      @_adapter.to_entity_collection_stream
+    def to_entity_stream
+      @_adapter.to_entity_stream
+    end
+
+    def any_entity_stream_at_some_table_number d  # assume fixnum
+      estream = nil
+      st = to_entity_stream_stream
+      d.times do
+        estream = st.gets
+        estream or break
+      end
+      estream
+    end
+
+    def to_entity_stream_stream
+      @_adapter.to_entity_stream_stream
     end
 
     def event_for_fell_short_of_count needed_number, had_number

@@ -18,9 +18,12 @@ module Skylab::Cull
 
         include Simple_Selective_Sender_Methods_
 
-        def marshal_dump_for_survey_ survey
+        def to_mutable_marshal_box_for_survey_ survey
 
-          "file:#{ survey.maybe_relativize_path @path }"
+          bx = Callback_::Box.new
+          bx.add :upstream, "file:#{ survey.maybe_relativize_path( @path ) }"
+          bx.add :adapter, adapter_symbol
+          bx
         end
       end
 

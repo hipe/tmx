@@ -6,6 +6,18 @@ module Skylab::Cull
 
       EXTENSIONS = %w( .md .markdown )
 
+      class << self
+
+        def via_table_number_and_path d, path, & oes_p
+          new d, path, & oes_p
+        end
+      end
+
+      def initialize d=nil, path, & oes_p
+        @table_number = d
+        super path, & oes_p
+      end
+
       def to_descriptive_event
         build_event_with(
             :markdown_upstream,
@@ -16,7 +28,33 @@ module Skylab::Cull
         end
       end
 
-      def to_entity_collection_stream
+      def adapter_symbol
+        :markdown
+      end
+
+      def to_entity_stream
+        __to_entity_stream_at_table_number @table_number || 1
+      end
+
+      def __to_entity_stream_at_table_number d
+        estream = nil
+        count = 0
+        st = to_entity_stream_stream
+        d.times do
+          estream = st.gets
+          estream or break
+          count += 1
+        end
+        if estream
+          estream
+        else
+          maybe_send_event :error, :early_end_of_stream do
+            event_for_fell_short_of_count d, count
+          end
+        end
+      end
+
+      def to_entity_stream_stream
 
         @line_stream = Cull_.lib_.filesystem.line_stream_via_path @path
 

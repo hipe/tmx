@@ -12,20 +12,22 @@ module Skylab::Cull
 
         cfg = survey.config_for_read_
         if cfg
-          sect = cfg.sections[ :report ] and __retrieve sect
+          sect = cfg.sections[ :report ] and __unmarshal sect
         end
       end
 
-      def __retrieve sect
+      def __unmarshal sect
 
         @call_a = []
 
-        sect.assignments.each do | ast |
+        st = sect.assignments.to_stream
+
+        while ast = st.gets
 
           :function == ast.external_normal_name_symbol or next  # for now
 
           func, args, category_symbol =
-            Models_::Mutation.func_and_args_and_category_via_call_expression(
+            Models_::Mutator.func_and_args_and_category_via_call_expression(
               ast.value_x, & @on_event_selectively )
 
           func or next
@@ -78,7 +80,7 @@ module Skylab::Cull
             :function_call, marshalled_s, :ok, nil
         end
 
-        @section.assignments.add_to_bag_value_string_and_name_function(
+        @section.assignments.add_to_bag_mixed_value_and_name_function(
           marshalled_s,
           NAME___ )
 

@@ -59,13 +59,15 @@ module Skylab::Cull::TestSupport
       expect_common_OK
     end
 
-    it "add valid upstream file on workspace with existing upstream" do
+    it "add valid upstream file on workspace with existing, erroneous upstream" do
 
       td = prepare_tmpdir_with_patch_and_do_common :some_config_file
 
+      expect_not_OK_event :path_must_be_absolute
+
       expect_common_OK
 
-      ___expect_detail td
+      __expect_detail td
     end
 
     it "add valid upstream on a workspace with multiple upstreams" do
@@ -78,6 +80,8 @@ module Skylab::Cull::TestSupport
 
       call_API_with_td_and_file td, big_JSON_file
 
+      expect_not_OK_event :path_must_be_absolute
+
       expect_common_OK
 
       s_ = content_of_the_file td
@@ -85,13 +89,15 @@ module Skylab::Cull::TestSupport
       d_ = count_lines s_
 
       d.should eql 13
-      d_.should eql 8
+      d_.should eql 9
 
       o = TestSupport_::Expect_line.shell s_
 
       o.advance_to_next_nonblank_line
 
       o.next_nonblank_line.should match %r(\bupstream ".+not\.json\")
+
+      o.next_nonblank_line.should eql "adapter = json\n"
 
       o.next_nonblank_line.should match %r(\bzafarelli )
       o.next_line.should match %r(\Akeep-this=)
@@ -117,6 +123,7 @@ module Skylab::Cull::TestSupport
         :upstream, Cull_::EMPTY_S_,
         :path, td.to_path
 
+      expect_not_OK_event :path_must_be_absolute
       ev = expect_OK_event :deleted_upstreams
       expect_event :datastore_resource_committed_changes
       s = black_and_white ev
@@ -159,13 +166,16 @@ module Skylab::Cull::TestSupport
       expect_succeeded
     end
 
-    def ___expect_detail td
+    def __expect_detail td
 
-      s = content_of_the_file td
+      scn = TestSupport_::Expect_Line::Scanner.via_string(
+        content_of_the_file td )
 
-      count_lines( s ).should eql 2
+      scn.next_line.should eql "#ohai\n"
+      scn.next_line.should match %r(\A\[upstream "file:)
+      scn.next_line.should eql "adapter = json\n"
+      scn.next_line.should be_nil
 
-      s.should be_include big_JSON_file  # sketchy because marshaling
     end
 
     def count_lines s
