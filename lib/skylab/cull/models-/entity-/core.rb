@@ -20,7 +20,8 @@ module Skylab::Cull
     end
 
     def members
-      [ :get_property_name_symbols, :to_actual_property_stream, :to_even_iambic ]
+      [ :actual_property_via_name_symbol, :get_property_name_symbols,
+        :to_actual_property_stream, :to_even_iambic ]
     end
 
     def __init_with_structured_hash h
@@ -64,9 +65,7 @@ module Skylab::Cull
     end
 
     def [] sym
-      prp = @actual_properties.detect do | prp_ |
-        sym == prp_.name_symbol
-      end
+      prp = actual_property_via_name_symbol sym
       prp and prp.value_x
     end
 
@@ -78,6 +77,12 @@ module Skylab::Cull
 
     def to_actual_property_stream
       Callback_.stream.via_nonsparse_array @actual_properties
+    end
+
+    def actual_property_via_name_symbol sym
+      @actual_properties.detect do | prp |
+        sym == prp.name_symbol
+      end
     end
 
     def to_even_iambic
@@ -115,6 +120,21 @@ module Skylab::Cull
         ACHIEVED_
       end
     end
+
+    def remove_property prp
+      oid = prp.object_id
+      d = @actual_properties.index do | prp_ |
+        oid == prp_.object_id
+      end
+      if d
+        @actual_properties[ d, 1 ] = EMPTY_A_
+        ACHIEVED_
+      else
+        UNABLE_
+      end
+    end
+
+    EMPTY_A_ = [].freeze
 
     class Actual_Property__
 

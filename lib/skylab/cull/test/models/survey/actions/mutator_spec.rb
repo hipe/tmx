@@ -63,5 +63,30 @@ module Skylab::Cull::TestSupport
       ent.to_even_iambic.should eql [ :"prog lang name", "ruby" ]
       ent_.to_even_iambic.should eql [ :"prog lang name", "haskell", :monads, "yes" ]
     end
+
+    it "take an existing survey, add a function, run it (does not persist)" do
+
+      call_API :survey,
+
+        :reduce,
+
+        :add_mutator, 'split-and-promote-property(misc tags, yes, ",")',
+
+        :table_number, 1,
+
+        :path, TS_::Fixtures::Directories[ :two_tables ]
+
+      expect_no_events
+      st = @result
+
+      st.gets.to_even_iambic.should eql(  # empty cel is removed:
+        [ :"prog lang name", "ruby" ] )
+
+      st.gets.to_even_iambic.should eql(  # property expansion:
+        [ :"prog lang name", "haskell", :functional, "yes", :difficult, "yes" ] )
+
+      st.gets.should be_nil
+
+    end
   end
 end
