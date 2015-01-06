@@ -1,10 +1,8 @@
 module Skylab::Cull
 
-  class Models_::Mutator
+  class Models_::Function_
 
-    Models__ = ::Module.new
-
-    class Models__::Unmarshal
+    class Unmarshal__  # see #note-006 in [#006]
 
       def initialize & oes_p
         @on_event_selectively = oes_p
@@ -33,7 +31,7 @@ module Skylab::Cull
     private
 
       def flush
-        FUNCTION.new @args, @defined_function, @prefix_name.as_lowercase_with_underscores_symbol
+        Function_.new @args, @defined_function, @prefix_name.as_lowercase_with_underscores_symbol
       end
 
       def parse_prefix_and_resolve_box_module

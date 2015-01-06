@@ -378,7 +378,10 @@ module Skylab::Cull
     end
 
     module Models__
+
       Autoloader_[ self, :boxxy ]
+
+      stowaway :Mutator, 'function--'
     end
 
     module Survey_Action_Methods_

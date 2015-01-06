@@ -27,7 +27,7 @@ module Skylab::Cull
 
           :function == ast.external_normal_name_symbol or next  # for now
 
-          func = Cull_::Models_::Mutator::FUNCTION.unmarshal(
+          func = Cull_::Models_::Function_.unmarshal(
             ast.value_x, & @on_event_selectively )
 
 

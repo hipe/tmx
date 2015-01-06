@@ -49,7 +49,7 @@ module Skylab::Cull::TestSupport
     end
 
     def subject
-      Cull_::Models_::Mutator::FUNCTION
+      Cull_::Models_::Function_
     end
   end
 end

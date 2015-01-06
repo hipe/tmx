@@ -1,46 +1,15 @@
 module Skylab::Cull
 
-  class Models_::Mutator < Model_
-
-    @after_name_symbol = :upstream
-
-    Actions = ::Module.new
-
-    class Actions::List < Action_
-
-      # ~ ick for now
-
-      def formal_properties
-        nil
-      end
-
-      def any_formal_property_via_symbol sym
-        nil
-      end
-
-      # end ick
-
-      def produce_any_result
-        Callback_.stream.via_nonsparse_array Mutator_::Items__.constants do | const_i |
-          Callback_::Name.via_const const_i
-        end
-      end
-    end
-
-    Autoloader_[ ( Items__ = ::Module.new ), :boxxy ]
-
-    Mutator_ = self
-
-  class FUNCTION
+  class Models_::Function_ < Model_
 
     class << self
 
       def unmarshal s, & oes_p
-        Mutator_::Models__::Unmarshal.new( & oes_p ).unmarshal s
+        Function_::Unmarshal__.new( & oes_p ).unmarshal s
       end
 
       def unmarshal_via_string_and_module s, mod, & oes_p
-        Mutator_::Models__::Unmarshal.new( & oes_p ).unmarshal_via_call_expression_and_module s, mod
+        Function_::Unmarshal__.new( & oes_p ).unmarshal_via_call_expression_and_module s, mod
       end
     end  # >>
 
@@ -92,7 +61,7 @@ module Skylab::Cull
       @composition.defined_function[ ent, * @composition.args, & oes_p ]
     end
 
+    Function_ = self
     Composition__ = ::Struct.new :args, :defined_function
-  end
   end
 end

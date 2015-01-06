@@ -2,7 +2,7 @@ module Skylab::Cull
 
   class Models_::Survey
 
-    class Models__::Mutator
+    class Models__::Function__
 
       def initialize survey, & oes_p
         @survey = survey
@@ -14,9 +14,7 @@ module Skylab::Cull
       end
 
       def __add func
-
         _report_associated_entity.add_function_call func
-
       end
 
       def remove arg, box
@@ -47,14 +45,22 @@ module Skylab::Cull
       end
 
       def __parse s
-        Cull_::Models_::Mutator::FUNCTION.unmarshal_via_string_and_module(
+        Cull_::Models_::Function_.unmarshal_via_string_and_module(
           s,
-          Models_::Mutator::Items__,
+          my_box_module,
           & @on_event_selectively )
       end
 
       def _report_associated_entity
         @survey.touch_associated_entity_ :report
+      end
+    end
+
+    class Models__::Mutator < Models__::Function__
+    private
+
+      def my_box_module
+        Cull_::Models_::Mutator::Items__
       end
     end
   end
