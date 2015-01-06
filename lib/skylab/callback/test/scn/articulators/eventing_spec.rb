@@ -46,7 +46,7 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Eventing
       end
 
       it "when zero input items" do
-        scn = EX1.with :gets_under, Callback_::Scan.the_empty_scan
+        scn = EX1.with :gets_under, Callback_::Scan.the_empty_stream
         x = scn.gets
         x.should eql '[ ]'
         scn.gets.should be_nil

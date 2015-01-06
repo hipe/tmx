@@ -33,7 +33,7 @@ module Skylab::Cull::TestSupport
 
       expect_succeeded
 
-      sh = TestSupport_::Expect_line.shell content_of_the_file td
+      sh = _line_shell td
 
       sh.advance_to_next_rx %r(\A\[report\])
 
@@ -43,7 +43,7 @@ module Skylab::Cull::TestSupport
 
     end
 
-    it "try it on a temporary survey" do
+    it "add a mutator to a temporary survey with `reduce`" do
 
       call_API :survey,
 
@@ -74,7 +74,7 @@ module Skylab::Cull::TestSupport
 
         :table_number, 1,
 
-        :path, TS_::Fixtures::Directories[ :two_tables ]
+        :path, dir( :two_tables )
 
       expect_no_events
       st = @result
@@ -87,6 +87,78 @@ module Skylab::Cull::TestSupport
 
       st.gets.should be_nil
 
+    end
+
+    it "remove a function from an existing survey (strange name)" do
+
+      call_API :survey, :edit,
+        :remove_mutator, 'nope',
+        :path, dir( :one_mutator )
+
+      expect_not_OK_event :uninitialized_constant
+      expect_failed
+
+    end
+
+    it "remove a function (good name but not found)" do
+
+      call_API :survey, :edit,
+        :remove_mutator, "split-and-pro( sophie's chioce, true, )",
+        :path, dir( :one_mutator )
+
+      expect_not_OK_event :function_call_not_found
+      expect_failed
+
+    end
+
+    it "remove last of three - comments and formatting preserved in the others" do
+
+      td = prepare_tmpdir_with_patch :with_fuzz_biff
+
+      call_API :survey, :edit,
+        :remove_mutator, 'remove-em(x,y)',
+        :path, td.to_path
+
+      sh = _expect_remove_worked td
+
+      sh.next_line.should be_include 'empty-act( fuz bif, true, 1.3 )'
+      sh.next_line.should eql "# comment 1\n"
+      sh.next_line.should be_include 'stay'
+      sh.next_line.should eql "# comment 2\n"
+      sh.next_line.should be_nil
+
+    end
+
+    it "remove first of three - also we do this hacktastic thing with comments" do
+
+      td = prepare_tmpdir_with_patch :with_fuzz_biff
+
+      call_API :survey, :edit,
+        :remove_mutator, 'remove-em( fuz bif, true, 1.3 )',
+        :path, td.to_path
+
+      sh = _expect_remove_worked td
+
+      sh.next_line.should be_include 'stay'
+      sh.next_line.should be_include 'comment 2'
+      sh.next_line.should be_include 'remove-empt( x, y )'
+      sh.next_line.should eql "# (from removed function) comment 1\n"
+      sh.next_line.should be_nil
+
+    end
+
+    def _expect_remove_worked td
+
+      expect_neutral_event :removed_function_call
+      expect_OK_event :datastore_resource_committed_changes
+      expect_succeeded
+      sh = _line_shell td
+      sh.advance_to_next_rx %r(\A\[ *report *\])
+      sh
+    end
+
+    def _line_shell td
+      TestSupport_::Expect_line.shell content_of_the_file td
     end
   end
 end

@@ -520,7 +520,6 @@ module Skylab::Brazen
           while d < last
             d += 1
             ast = @a.fetch d
-            # no 'symbol_i' here yet
             x = Actual_Property__.new( ast.value_x, ast.external_normal_name_symbol )
             break
           end

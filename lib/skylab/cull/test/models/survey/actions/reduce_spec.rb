@@ -11,7 +11,7 @@ module Skylab::Cull::TestSupport
     it "if persistend table count is high" do
 
       call_API :survey, :reduce,
-        :path, TS_::Fixtures::Directories[ :high_table_number ]
+        :path, dir( :high_table_number )
 
       expect_not_OK_event :early_end_of_stream
       expect_failed
@@ -20,7 +20,7 @@ module Skylab::Cull::TestSupport
     it "integrate with markdown - will recognize the peristed table count" do
 
       call_API :survey, :reduce,
-        :path, TS_::Fixtures::Directories[ :two_tables ]
+        :path, dir( :two_tables )
 
       expect_no_events
 
@@ -38,7 +38,7 @@ module Skylab::Cull::TestSupport
 
     it "integrate with markdown - override with your own table count" do
       call_API :survey, :reduce,
-        :path, TS_::Fixtures::Directories[ :two_tables ],
+        :path, dir( :two_tables ),
         :table_number, '1'
       expect_no_events
       st = @result

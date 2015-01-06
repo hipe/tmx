@@ -16,7 +16,7 @@ module Skylab::Brazen::TestSupport::Data_Stores::Git_Config::Mutable
         x = touch_section 'foo'
         expect_document_content "[foo]\n"
         expect_no_events
-        x.symbol_i.should eql :section_or_subsection
+        x.category_symbol.should eql :section_or_subsection
       end
 
       it "add a section with an invalid name" do

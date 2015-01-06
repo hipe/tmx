@@ -27,7 +27,7 @@ module Skylab::Cull::TestSupport
     end
 
     it "with a workspace with no datappoints" do
-      against TS_::Fixtures::Directories[ :freshly_initted ]
+      against dir :freshly_initted
       scn = @result
       x = scn.gets
       x.should be_nil
@@ -36,7 +36,7 @@ module Skylab::Cull::TestSupport
     it "with an upstream 'foo'" do
       count = 0
       y = []
-      against TS_::Fixtures::Directories[ :upstream_foo ]
+      against dir :upstream_foo
       scn = @result
       x = scn.gets
       while x

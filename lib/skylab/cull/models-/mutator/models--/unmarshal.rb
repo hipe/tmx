@@ -10,20 +10,30 @@ module Skylab::Cull
         @on_event_selectively = oes_p
       end
 
-      def three_via_qualified_call_expression s
+      def unmarshal s
         @scn = Cull_.lib_.string_scanner s
         ok = parse_prefix_and_resolve_box_module
         ok &&= parse_function_name_and_resolve_function
         ok &&= parse_any_args
-        ok and [ @func, @args, @category_symbol ]
+        ok and flush
       end
 
-      def two_via_call_expression_and_module s, box_mod
+      def unmarshal_via_call_expression_and_module s, box_mod
         @box_mod = box_mod
+
+        @prefix_name = Callback_::Name.via_module(
+          Cull_.lib_.basic::Module.value_via_relative_path( box_mod, '..' ) )
+
         @scn = Cull_.lib_.string_scanner s
         ok = parse_function_name_and_resolve_function
         ok &&= parse_any_args
-        ok and [ @func, @args ]
+        ok and flush
+      end
+
+    private
+
+      def flush
+        FUNCTION.new @args, @defined_function, @prefix_name.as_lowercase_with_underscores_symbol
       end
 
       def parse_prefix_and_resolve_box_module
@@ -35,7 +45,6 @@ module Skylab::Cull
         if s
           @scn.skip COLON_RX___
           @prefix = s
-          @category_symbol = s.intern  # until etc
           ACHIEVED_
         else
           expecting :prefix, PREFIX_RX___
@@ -46,9 +55,13 @@ module Skylab::Cull
       PREFIX_RX___ = /[a-z](?:[a-z-]*[a-z])?(?=:)/
 
       def resolve_box_module
+
+        @prefix_name = Callback_::Name.via_slug @prefix
+
         @box_mod = Cull_::Models_.const_get(
-          Callback_::Name.via_slug( @prefix ).as_const,
+          @prefix_name.as_const,
           false )::Items__
+
         ACHIEVED_
       end
 
@@ -117,7 +130,7 @@ module Skylab::Cull
 
         const = correct
 
-        @func = if x.respond_to? :name
+        @defined_function = if x.respond_to? :name
           x
         else
           Proc_Wrapper___.new x, const
@@ -130,6 +143,24 @@ module Skylab::Cull
 
         def initialize * a
           @p, @const = a
+        end
+
+        def hash
+          @p.hash + @const.hash
+        end
+
+        def eql? otr
+          @p == otr.p && @const == otr.const
+        end
+
+      protected
+
+        attr_reader :const, :p
+
+      public
+
+        def members
+          [ :[], :name ]
         end
 
         def name

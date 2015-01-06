@@ -1,11 +1,10 @@
-diff --git a/.cullconfig b/.cullconfig
 new file mode 100644
-index 0000000..176dc9b
 --- /dev/null
-+++ b/.cullconfig
-@@ -0,0 +1,5 @@
-+[data-source "fuz"]
-+  url = biff
-+  tag_a = false
-+[foo]
-+  bar = baz
++++ b/cull-survey/config
+@@ -0,0 +1,6 @@
++[ report ]
++function = mutator:remove-empty-act( fuz bif, true, 1.3 )
++# comment 1
++function = "mutator:split-and( \"stay\" )"
++# comment 2
++function = mutator:remove-empt( x, y )

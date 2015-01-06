@@ -1,3 +1,4 @@
+[#005]       the persist calls narrative ..
 [#004]       the datamodel ..
 [#003]       list of things we want to cull
 [#002]       justification: cull covers some [cm]

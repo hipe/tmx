@@ -194,7 +194,7 @@ module Skylab::Brazen
         end
 
         def get_body_line_stream
-          nscn = get_all_node_stream
+          nscn = to_node_stream
           lscn = nil
           Callback_::Scn.new do
             while true
@@ -211,19 +211,19 @@ module Skylab::Brazen
           end
         end
 
-        def get_all_node_stream
+        def to_node_stream
           Callback_.stream.via_nonsparse_array @a
         end
 
         def count_number_of_nodes i
           @a.count do |x|
-            i == x.symbol_i
+            i == x.category_symbol
           end
         end
 
         def first_node i
           @a.detect do |x|
-            i == x.symbol_i
+            i == x.category_symbol
           end
         end
 
@@ -231,8 +231,8 @@ module Skylab::Brazen
           get_node_enum( i ).map( & p )
         end
 
-        def aref_node_with_norm_name_i symbol_i, norm_i
-          scn = _to_node_scn_via_symbol symbol_i
+        def aref_node_with_norm_name_i sym, norm_i
+          scn = _to_node_scn_via_symbol sym
           while node = scn.gets
             if norm_i == node.external_normal_name_symbol
               found = node ; break
@@ -266,17 +266,13 @@ module Skylab::Brazen
           cls.new do
             while d < last
               d += 1
-              if i == @a[ d ].symbol_i
+              if i == @a[ d ].category_symbol
                 x = @a[ d ]
                 break
               end
             end
             x
           end
-        end
-
-        def get_all_node_scan
-          Callback_.stream.via_nonsparse_array @a
         end
       end
 
@@ -523,7 +519,7 @@ module Skylab::Brazen
 
           x = [ yes=[], no=[] ]
 
-          scn = @collection_kernel.get_all_node_scan
+          scn = @collection_kernel.to_node_stream
 
           while item = scn.gets
             if compare_p[ item ].zero?
@@ -657,14 +653,17 @@ module Skylab::Brazen
 
         def initialize kernel
           @kernel = kernel
+          @is_editable = false
         end
 
         def members
           [ :assignments,
+            :build_assignment_via_mixed_value_and_name_function,
             :external_normal_name_symbol,
             :internal_normal_name_string,
             :subsect_name_s,
-            :to_line_stream ]
+            :to_line_stream,
+            :to_node_stream ]
         end
 
         def dup_via_parse_context parse
@@ -689,7 +688,7 @@ module Skylab::Brazen
           @kernel.is_empty
         end
 
-        def symbol_i
+        def category_symbol
           :section_or_subsection
         end
 
@@ -699,6 +698,10 @@ module Skylab::Brazen
 
         def to_line_stream
           @kernel.to_line_stream
+        end
+
+        def to_node_stream
+          @kernel.to_node_stream
         end
 
         def external_normal_name_symbol
@@ -736,10 +739,21 @@ module Skylab::Brazen
         end
 
         def []= i, x
-          if k = @kernel.for_edit
-            @kernel = k
-          end
+          @is_editable or _make_editable
           @kernel.aref_set i, x ; x
+        end
+
+        def replace_children_with_this_array x
+          @is_editable or _make_editable
+          @kernel.replace_children_with_this_array x
+        end
+
+        def _make_editable
+          x = @kernel.for_edit
+          if x
+            @kernel = x
+          end
+          @is_editable = true
         end
 
         # ~ where available
@@ -755,7 +769,14 @@ module Skylab::Brazen
         def clear_section
           @kernel.clear_section
         end
+
+        # ~ courtesy
+
+        def build_assignment_via_mixed_value_and_name_function x, nm
+          Assignment__.via_literal nm.as_slug.intern, x, :_no_kernel_  # todo
+        end
       end
+
       OPEN_BRACE_RX_ = /[ ]*\[[ ]*/
 
       Event_Sending_Node__ = ::Class.new
@@ -1028,6 +1049,10 @@ module Skylab::Brazen
           true
         end
 
+        def to_node_stream
+          Callback_.stream.the_empty_stream
+        end
+
         def for_edit
 
           unparse_into_yielder y=[]
@@ -1202,6 +1227,11 @@ module Skylab::Brazen
           @kernel = kernel
         end
 
+        def members
+          [ :category_symbol, :external_normal_name_symbol,
+            :internal_normal_name_string, :value_x ]
+        end
+
         def dup_via_parse_context parse
           otr = dup
           otr.init_copy_via_parse_and_other parse, self
@@ -1219,7 +1249,7 @@ module Skylab::Brazen
         attr_reader :kernel
       public
 
-        def symbol_i
+        def category_symbol
           :assignment
         end
 
@@ -1649,7 +1679,11 @@ module Skylab::Brazen
           self._DO_ME  # todo
         end
 
-        def symbol_i
+        def members
+          [ :category_symbol, :to_line, :to_line_stream, :unparse_into_yielder ]
+        end
+
+        def category_symbol
           :blank_line_or_comment_line
         end
 
@@ -1659,6 +1693,10 @@ module Skylab::Brazen
 
         def to_line_stream
           Single_line_scanner__[ @line ]
+        end
+
+        def to_line
+          @line.dup
         end
       end
 

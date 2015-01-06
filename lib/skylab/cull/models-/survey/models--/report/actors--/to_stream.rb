@@ -4,8 +4,6 @@ module Skylab::Cull
 
     class Models__::Report
 
-      Actors__ = ::Module.new
-
       class Actors__::To_stream
 
         Callback_::Actor.call self, :properties,
@@ -25,8 +23,8 @@ module Skylab::Cull
               ent = entity_st.gets
               ent or break
 
-              mutator_call_a.each do | args, function_class |
-                function_class[ ent, * args, & oes_p ]
+              mutator_call_a.each do | func |
+                func[ ent, & oes_p ]
               end
 
             end while nil

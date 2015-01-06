@@ -34,7 +34,11 @@ module Skylab::Cull::TestSupport
     # ~ paths for READ ONLY:
 
     def freshly_initted_path
-      TS_::Fixtures::Directories[ :freshly_initted ]
+      dir :freshly_initted
+    end
+
+    def dir sym
+      TS_::Fixtures::Directories[ sym ]
     end
 
     def file sym
@@ -51,14 +55,16 @@ module Skylab::Cull::TestSupport
 
     def prepare_tmpdir
 
-      fs =  Cull_.lib_.filesystem
-      path = fs.tmpdir_pathname.join( 'culio' ).to_path
-      td = fs.tmpdir(
-        :path, path,
+      td = Cull_.lib_.filesystem.tmpdir(
+        :path, tmpdir_path,
         :be_verbose, do_debug,
         :debug_IO, debug_IO )
 
       td.clear
+    end
+
+    def tmpdir_path
+      Cull_.lib_.filesystem.tmpdir_pathname.join( 'culio' ).to_path
     end
 
     # ~ assertion support

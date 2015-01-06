@@ -398,7 +398,7 @@ module Skylab::Cull
         end
 
         def remove_mutator
-          self._DO_ME
+          ( @argument_box.touch :remove_mutator do [] end ).push iambic_property
           KEEP_PARSING_
         end
       end

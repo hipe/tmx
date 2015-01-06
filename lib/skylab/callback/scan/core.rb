@@ -21,7 +21,7 @@ module Skylab::Callback
             end
           end
 
-          def the_empty_scan
+          def the_empty_stream
             @tes ||= new do end
           end
 

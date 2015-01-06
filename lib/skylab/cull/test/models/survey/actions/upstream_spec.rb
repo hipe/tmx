@@ -144,7 +144,7 @@ module Skylab::Cull::TestSupport
     end
 
     def various_extensions_path
-      TS_::Fixtures::Directories[ :upstreams_with_various_extensions ]
+      dir :upstreams_with_various_extensions
     end
 
     def call_API_with_td_and_file td, file

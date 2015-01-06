@@ -80,7 +80,7 @@ module Skylab::TanMan
       if sl
         sl.to_stream
       else
-        Scan_[].the_empty_scan
+        Scan_[].the_empty_stream
       end
     end
 
