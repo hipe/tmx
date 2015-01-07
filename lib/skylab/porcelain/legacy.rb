@@ -33,10 +33,6 @@ module Skylab::Porcelain::Legacy
       MH__[]::Formal::Box
     end
 
-    Old_name_lib = -> do
-      HL__[]::Name
-    end
-
     Proxy_lib = -> do
       Callback_::Proxy
     end
@@ -559,7 +555,7 @@ module Skylab::Porcelain::Legacy
       # (this will be borked if ever you actually need truly deep names -
       # h.l has to be better at something! (just kidding, it's better at a lot!)
 
-      @full_name_proc ||= LIB_.old_name_lib.simple_chain.new [ @name_function ]
+      @full_name_proc ||= Callback_::Name.simple_chain.new [ @name_function ]
     end
 
     #         ~ catalyzing ~

@@ -22,7 +22,7 @@
 [#155]       (reserved for a forthcoming entry about const names)
 [#154]       #parent-node: [#095] the control flow method-naming idiomspace ..
 [#153]       #parent-node: [#154] method naming idiomspace: validation ..
-[#152]       #node-tracker name
+[#152] #hole ( was: `Name` node, assimilated into [#cb-060] )
 [#151]       #doc-point #in-situ explains a certain #API-private meth. sig.
 [#150]       #node-tracker this whole `expecting` pattern
 [#149]       #parent-node: [#146] the argument syntax isomorphicism

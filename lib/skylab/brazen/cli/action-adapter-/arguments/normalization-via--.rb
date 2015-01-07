@@ -46,9 +46,8 @@ module Skylab::Brazen
           private
 
             def bld_name_function_with_hack
-              _symbol_i = LIB_.old_name_lib.
-                variegated_human_symbol_via_variable_name_symbol @name_i
-              Callback_::Name.via_variegated_symbol _symbol_i
+              Callback_::Name.via_variegated_symbol(
+                Callback_::Name.variegated_human_symbol_via_variable_name_symbol @name_i )
             end
           end
         end

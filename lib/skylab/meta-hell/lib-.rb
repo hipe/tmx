@@ -45,10 +45,6 @@ module Skylab::MetaHell
       Bsc__[]::Mutex
     end
 
-    Old_name_lib = -> do
-      HL__[]::Name
-    end
-
     Proxy_lib = -> do
       Callback_::Proxy
     end

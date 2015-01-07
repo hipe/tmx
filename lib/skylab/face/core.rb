@@ -117,7 +117,7 @@ module Skylab::Face  # read [#011] the top node narrative
     end
 
     Name_module_moniker = -> x do
-      Old_name_lib[].module_moniker x
+      Callback_::Name.module_moniker x
     end
 
     Name_slugulate = -> i do

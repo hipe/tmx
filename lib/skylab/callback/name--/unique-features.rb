@@ -1,35 +1,26 @@
-module Skylab::Headless
+module Skylab::Callback
 
-  module Name  # read [#152] the name narrative  # #storypoint-5
+  module Name__::Unique_Features  # see [#060]
 
-    class << self
-
-      def simple_chain
-        Simple_Chain__
-      end
-
-      def variegated_human_symbol_via_variable_name_symbol name_i
-        s = name_i.id2name
-        Mutate_string_by_chomping_any_trailing_name_convention_suffixes__[ s ]
-        s.downcase.intern
-      end
-
-      def via_module_name_anchored_in_module_name s, s_
-        Via_anchored_in_module_name_module_name__[ s_, s ]
-      end
-    end
+    # this grain of sand is all that remains of our universe's first name
+    # lib. at some point (and with reason) [cb] rewrote a name class from
+    # scratch that we now use exclusively. the name of this topic node is
+    # a tribute to the [cu] report allowing us to cull-out the still-used
+    # the functions here & toss the rest of the now obviated legacy code.
 
     # #storypoint-10
 
-      Labelize__ = -> do  # :+[#088]
+      Labelize = -> do  # :+[#088]
         -> ivar_i do
           s = ivar_i.id2name
           Mutate_string_by_chomping_any_leading_at_character___[ s ]
-          Mutate_string_by_chomping_any_trailing_name_convention_suffixes__[ s ]
+          Mutate_string_by_chomping_any_trailing_name_convention_suffixes[ s ]
           s.gsub! UNDERSCORE_, SPACE_
           Ucfirst___[ s ]
         end
       end.call
+
+      SPACE_ = ' '.freeze
 
       Mutate_string_by_chomping_any_leading_at_character___ = -> do
         rx = /\A@/
@@ -38,7 +29,7 @@ module Skylab::Headless
         end
       end.call
 
-      Mutate_string_by_chomping_any_trailing_name_convention_suffixes__ = -> do
+      Mutate_string_by_chomping_any_trailing_name_convention_suffixes = -> do
         rx = /(?<=[a-z]{2}) (?:  (?:_[a-z])+_* | _+  )  \z/ix
         -> s do
           s.sub! rx, EMPTY_S_ ; nil
@@ -52,7 +43,7 @@ module Skylab::Headless
         end
       end.call
 
-      Module_moniker___ = -> num_parts, mod do
+      Mod_moniker_via_num_parts_and_module___ = -> num_parts, mod do
         s_a = mod.name.split CONST_SEP_
         _s_a_ = if ! num_parts then s_a
         elsif num_parts.respond_to? :cover?
@@ -67,30 +58,14 @@ module Skylab::Headless
         end * TERM_SEPARATOR_STRING_
       end
 
-      Module_moniker__ = Module_moniker___.curry[ 1 ]
+      Module_moniker = Mod_moniker_via_num_parts_and_module___.curry[ 1 ]
 
-
-    o = -> i, p do
-      define_singleton_method i do | * a |
-        if a.length.zero?
-          p
-        else
-          p[ * a ]
-        end
-      end
-    end
-
-    o[ :labelize, Labelize__ ]
-
-    o[ :module_moniker, Module_moniker___ ]
-
-
-      Via_anchored_in_module_name_module_name__ = -> s, s_ do  # #storypoint-105  # :+#curry-friendly
+      Via_anchored_in_module_name_module_name = -> s, s_ do  # #storypoint-105  # :+#curry-friendly
 
         # the first arg is the one that existed first - the surrounding module
 
         if 0 == s_.index( s )
-          Simple_Chain__.new(
+          Simple_Chain.new(
             if s == s_
               EMPTY_A_
             else
@@ -102,7 +77,7 @@ module Skylab::Headless
         end
       end
 
-      class Simple_Chain__  # #storypoint-55
+      class Simple_Chain  # #storypoint-55
 
         class << self
 

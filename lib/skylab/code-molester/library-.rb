@@ -130,10 +130,6 @@ module Skylab::CodeMolester
       Face__[]::Model::Event
     end
 
-    Old_name_lib = -> do
-      HL__[]::Name
-    end
-
     Pool_lib = -> do
       MH__[]::Pool
     end

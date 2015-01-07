@@ -74,10 +74,11 @@ module Skylab::CodeMolester
         n = mod.name
         a = ( n[ ( n.rindex str ) + len .. -1 ] ).split CONST_SEP_
         a.length.nonzero? or fail "sanity - hack failed (#{ n })"
-        _name_a = a.map do |s|
-          LIB_.old_name_lib.via_const s.intern
-        end
-        LIB_.old_name_lib.simple_chain.new _name_a
+
+        Callback_::Name.simple_chain.new( a.map do | s |
+          Callback_::Name.via_const s.intern
+        end )
+
       end
     end.call
   end

@@ -1524,8 +1524,35 @@ module Skylab::Callback
         VALID_CONST_RX__ =~ const_i
       end
 
+      def labelize * a
+        if a.length.zero?
+          Callback_::Name__::Unique_Features::Labelize
+        else
+          Callback_::Name__::Unique_Features::Labelize[ * a ]
+        end
+      end
+
       def lib
         Callback_::Name__
+      end
+
+      def module_moniker * a
+        if a.length.zero?
+          Callback_::Name__::Unique_Features::Module_moniker
+        else
+          Callback_::Name__::Unique_Features::Module_moniker[ * a ]
+        end
+      end
+
+      def simple_chain
+        Callback_::Name__::Unique_Features::Simple_Chain
+      end
+
+      def variegated_human_symbol_via_variable_name_symbol sym
+        s = sym.id2name
+        Callback_::Name__::Unique_Features::
+          Mutate_string_by_chomping_any_trailing_name_convention_suffixes[ s ]
+        s.downcase.intern
       end
 
       def any_valid_via_const const_i
@@ -1547,6 +1574,11 @@ module Skylab::Callback
         d = s.rindex CONST_SEP_
         d and s = s[ d + 2 .. -1 ]
         allocate_with :initialize_with_const_i, s.intern
+      end
+
+      def via_module_name_anchored_in_module_name s, s_
+        Callback_::Name__::Unique_Features::
+          Via_anchored_in_module_name_module_name[ s_, s ]
       end
 
       def via_slug s
@@ -1740,7 +1772,7 @@ module Skylab::Callback
 
   EMPTY_A_ = [].freeze
 
-  EMPTY_P_ = -> { }
+  EMPTY_P_ = -> {}
 
   EMPTY_S_ = ''.freeze  # think of all the memory you'll save
 

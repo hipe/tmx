@@ -239,10 +239,6 @@ module Skylab::Brazen
       HL__[]::CLI
     end
 
-    Old_name_lib = -> do
-      HL__[]::Name
-    end
-
     Open3 = Callback_.memoize do
       require 'open3'
       ::Open3

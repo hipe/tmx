@@ -123,11 +123,11 @@ module Skylab::Headless::TestSupport::CLI::Box
           end
 
           class FooBar < Action_Stub
-            @name_function = Headless_::Name.
+            @name_function = Headless_::Callback_::Name.
               via_module_name_anchored_in_module_name name, Donk.name
           end
           class BazzBiff < Action_Stub
-            @name_function = Headless_::Name.simple_chain.
+            @name_function = Headless_::Callback_::Name.simple_chain.
               via_symbol_list( [ :never_see, :bazz_biff ] )
 
             def help_screen y

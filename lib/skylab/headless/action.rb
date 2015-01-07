@@ -69,7 +69,7 @@ module Skylab::Headless
       end
 
       def name_function
-        @name_function ||= Headless_::Name.from_anchored_module name,
+        @name_function ||= Callback_::Name.from_anchored_module name,
           actions_anchor_module.name
       end
 

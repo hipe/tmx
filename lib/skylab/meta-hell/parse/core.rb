@@ -70,7 +70,7 @@ module Skylab::MetaHell
     #     p[ :some_method ]  # => "some method"
 
     Hack_label_ = -> ivar_i do
-      MetaHell_.lib_.old_name_lib.labelize( ivar_i ).downcase
+      Callback_::Name.labelize( ivar_i ).downcase
     end
 
     module Fields__
