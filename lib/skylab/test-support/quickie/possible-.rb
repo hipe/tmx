@@ -263,7 +263,8 @@ module Skylab::TestSupport
         end
 
         Internen__ = -> mod_x do
-          QuicLib_::Name_const_basename[ mod_x.to_s ].
+
+          Callback_::Name.via_module( mod_x ).as_const.to_s.
             gsub( /_+\z/, EMPTY_S_ ).downcase
         end
 

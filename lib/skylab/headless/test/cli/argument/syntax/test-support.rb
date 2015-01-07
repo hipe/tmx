@@ -37,7 +37,7 @@ module Skylab::Headless::TestSupport::CLI::Argument::Syntax
       formal_data_a = ruby_para_a
       @m.syntax_slice.each_argument.with_index do |farg, count|
         exp_i = exp_i_a.fetch count
-        _act_i = farg.name.local_normal
+        _act_i = farg.name.as_variegated_symbol
         _fdata_i = formal_data_a.fetch( farg.syntax_index_d ).fetch( 1 )
         _act_i.should eql exp_i
         _fdata_i.should eql exp_i

@@ -113,7 +113,7 @@ module Skylab::Headless
       end
 
       def normalized_local_action_name
-        self.class.name_function.local.local_normal
+        self.class.name_function.local.as_variegated_symbol
       end
 
     private

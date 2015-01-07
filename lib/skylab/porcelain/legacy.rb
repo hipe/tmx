@@ -438,7 +438,7 @@ module Skylab::Porcelain::Legacy
       new.instance_exec do
         @is_collapsed = true  # don't take an unbound method as a name
         name = action_class.name
-        @name_function = LIB_.old_name_lib.via_const(
+        @name_function = Callback_::Name.via_const(
           name[ name.rindex(':') + 1  ..  -1] )
         @action_subclient = -> request_client do
           action_class.new request_client, self
@@ -527,7 +527,7 @@ module Skylab::Porcelain::Legacy
         fail "sanity - action sheet is already collapsed (frozen)"
       else
         @is_collapsed = true
-        @name_function = LIB_.old_name_lib.via_symbol unbound_method.name
+        @name_function = Callback_::Name.via_variegated_symbol unbound_method.name
         @unbound_method = unbound_method
         self
       end
@@ -540,7 +540,7 @@ module Skylab::Porcelain::Legacy
                                                #   ~ name derivatives ~
 
     def normalized_local_action_name           # used by action box, NOTE -
-      @name_function.local_normal              #   we might s/_action_/_node_/
+      @name_function.as_variegated_symbol      #   we might s/_action_/_node_/
     end
 
     def slug
@@ -559,7 +559,7 @@ module Skylab::Porcelain::Legacy
       # (this will be borked if ever you actually need truly deep names -
       # h.l has to be better at something! (just kidding, it's better at a lot!)
 
-      @full_name_proc ||= LIB_.old_name_lib.qualified.new [ @name_function ]
+      @full_name_proc ||= LIB_.old_name_lib.simple_chain.new [ @name_function ]
     end
 
     #         ~ catalyzing ~
@@ -959,7 +959,7 @@ module Skylab::Porcelain::Legacy
       if ::Array === ref
         fail "implement me - deep paths" if 1 < ref.length
         ref = ref.first
-        ref = LIB_.old_name_lib.slugulate ref
+        ref = Callback_::Name.via_variegated_symbol( ref ).as_slug
       end
       self.class.story.fetch_action_sheet ref, self.class.story.do_fuzzy,
         -> do
@@ -1294,7 +1294,7 @@ module Skylab::Porcelain::Legacy
     attr_reader :normalized_parameter_name  # needed by a `fetch`
 
     def slug
-      LIB_.old_name_lib.slugulate @normalized_parameter_name
+      Callback_::Name.via_variegated_symbol( @normalized_parameter_name ).as_slug
     end
 
     def string
@@ -1605,7 +1605,7 @@ module Skylab::Porcelain::Legacy
 
       ::Symbol === normalized_local_ns_name or fail 'get with the future'
       s1 = delete_action_sheet!
-      nf = LIB_.old_name_lib.new normalized_local_ns_name
+      nf = Callback_::Name.via_variegated_symbol normalized_local_ns_name
       s2 = s1.collapse_as_namespace nf,
         ext_ref, inline_def, xtra_h, @story_host_module
       @action_box.add s2.normalized_local_node_name, s2
@@ -1672,7 +1672,7 @@ module Skylab::Porcelain::Legacy
     end.call
 
     def normalized_local_node_name
-      @name_function.local_normal
+      @name_function.as_variegated_symbol
     end
 
   private

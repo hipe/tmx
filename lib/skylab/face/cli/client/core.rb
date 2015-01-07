@@ -288,7 +288,7 @@ module Skylab::Face
 
       def close_node &blk
         n = @node_open ; @node_open = nil ; blk[ n ]
-        ln = n.name.local_normal
+        ln = n.name.as_variegated_symbol
         otr = @box.fetch ln do end
         if otr && otr.is_prenatal  # else let the error trigger
           @box.change ln, nil  # sanity, `natalize`
@@ -1102,7 +1102,7 @@ module Skylab::Face
         @anchored_name ||= get_anchored_name.freeze
       end
       def get_anchored_name                      # #in-narrative
-        parent_services.get_anchored_name << name.local_normal
+        parent_services.get_anchored_name << name.as_variegated_symbol
       end
     end
     class CLI_Kernel_  # #re-open for facet 4.2

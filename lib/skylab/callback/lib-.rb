@@ -96,10 +96,6 @@ module Skylab::Callback
       MH__[]::Formal::Box
     end
 
-    Old_name_lib = -> do
-      HL__[]::Name
-    end
-
     Quickie = -> x do
       x.extend TestSupport__[]::Quickie
     end

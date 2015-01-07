@@ -6,14 +6,14 @@ module Skylab::Treemap
                                   # a Catalyzer represents and _adapter_ (not
                                   # its action) and can load it.
 
-    include Treemap_.lib_.old_name_lib.instance_methods
+    # (used to include old name lib instance methods)
 
     define_method :cli_action_names do
       if has_cli_actions
         MetaHell::Formal::Box::Enumerator.new( -> normalized_consumer do
           @module::CLI::Actions.constants.each do |const|
-            nm = Treemap_.lib_.old_name_lib.via_const const
-            normalized_consumer.yield nm.local_normal, nm
+            nm = Callback_::Name.via_const const
+            normalized_consumer.yield nm.as_variegated_symbol, nm
             nil
           end
         end )
@@ -31,7 +31,7 @@ module Skylab::Treemap
     attr_reader :name  # name function
 
     def normalized_local_adapter_name
-      @name.local_normal
+      @name.as_variegated_symbol
     end
 
     def slug  # this makes maps much prettier, and is used as the 'against'
@@ -50,7 +50,7 @@ module Skylab::Treemap
 
     def initialize const, mod
       @const, @module = const, mod
-      @name = Treemap_.lib_.old_name_lib.via_const const
+      @name = Callback_::Name.via_const const
       @has_actions = { }
     end
 

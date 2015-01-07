@@ -85,7 +85,7 @@ module Skylab::CSS_Convert
 
     def parameter_label param, d=nil  # while subclient
       d and _tail = "[#{ d }]"
-      "«#{ param.name.as_method }#{ _tail }»"  # :+#guillemets
+      "«#{ param.name.as_lowercase_with_underscores_symbol }#{ _tail }»"  # :+#guillemets
     end
 
     include Event_Sender_Methods_

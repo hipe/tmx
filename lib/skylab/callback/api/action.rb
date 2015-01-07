@@ -16,7 +16,7 @@ module Skylab::Callback
       end
     private
       def bld_name_function
-        Callback_::Lib_::Old_name_lib[].via_const.via_module_name name
+        Callback_::Name.via_module self
       end
     end
 
@@ -69,7 +69,7 @@ module Skylab::Callback
     end
 
     def prefix
-      "#{ @request_client_prefix } #{ self.class.name_function.local_slug } "
+      "#{ @request_client_prefix } #{ self.class.name_function.as_slug } "
     end
 
     #         ~ in order of typical use ~

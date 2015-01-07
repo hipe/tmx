@@ -1543,8 +1543,10 @@ module Skylab::Callback
       end
 
       def via_module mod
-        allocate_with :initialize_with_const_i,
-          mod.name.split( CONST_SEP_ ).last
+        s = mod.name
+        d = s.rindex CONST_SEP_
+        d and s = s[ d + 2 .. -1 ]
+        allocate_with :initialize_with_const_i, s.intern
       end
 
       def via_slug s

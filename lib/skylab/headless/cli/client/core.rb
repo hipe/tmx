@@ -163,7 +163,7 @@ module Skylab::Headless
       def parameter_label x, idx=nil  # [#036] explains it all, somewhat
         idx = "[#{ idx }]" if idx
         if ::Symbol === x
-          stem = Headless_::Name.slugulate x
+          stem = Callback_::Name.via_variegated_symbol( x ).as_slug
         else
           stem = x.name.as_slug  # errors please
         end

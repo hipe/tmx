@@ -101,7 +101,7 @@ module Skylab::Treemap
     attr_reader :name
 
     def normalized_local_action_name
-      @name.local_normal
+      @name.as_variegated_symbol
     end
 
   private
@@ -112,7 +112,7 @@ module Skylab::Treemap
       @is_visible = true
       if const
         @is_native = true
-        @name = Treemap_.lib_.old_name_lib.via_const const
+        @name = Callback_::Name.via_const const
       else
         @is_native = false
         @name = nf

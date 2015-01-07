@@ -14,14 +14,13 @@ list of things we want to cull :[#003]
 
 */
 
-  API
-  Box
-  CLI
-  Event
   Name
+  Box
+  Event
+  CLI
+  API
   Property
   Param [ label="param\nlib" ]
-
   Param -> Property
 
 }

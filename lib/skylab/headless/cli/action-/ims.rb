@@ -255,7 +255,7 @@ module Skylab::Headless
         end
       private
         def bld_name_func
-          Headless_::Name.via_const.via_module_name self.class.name
+          Callback_::Name.via_module self.class
         end
 
         # ~ stepping out of names and into o.p rendering

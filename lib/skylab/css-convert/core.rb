@@ -22,10 +22,6 @@ module Skylab::CSS_Convert
 
     HL__ = sidesys[ :Headless ]
 
-    Old_name_lib = -> do
-      HL__[]::Name
-    end
-
     Path_tools = -> do
       HL__[].system.filesystem.path_tools
     end

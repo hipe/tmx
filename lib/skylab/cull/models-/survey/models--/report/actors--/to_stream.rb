@@ -59,13 +59,25 @@ module Skylab::Cull
           end while rfstream.unparsed_exists
 
           if 1 < jogs.length
-            self._YEAH_HAVE_FUN_WITH_THAT
+            estream_via_estream_and_multiple_jogs @entity_stream, jogs
           else
             estream_via_estream_and_jog @entity_stream, jogs.first
           end
         end
 
         Jog__ = ::Struct.new :mapishes, :agg
+
+        def estream_via_estream_and_multiple_jogs estream, jogs
+
+          jog = jogs.pop
+          begin
+
+            estream = estream_via_estream_and_jog estream, jog
+            jog = jogs.pop
+
+          end while jog
+          estream
+        end
 
         def estream_via_estream_and_jog estream, jog
 

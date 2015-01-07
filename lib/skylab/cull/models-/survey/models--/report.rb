@@ -30,9 +30,9 @@ module Skylab::Cull
           func = Cull_::Models_::Function_.unmarshal(
             ast.value_x, & @on_event_selectively )
 
-
-          @call_a.push func
-
+          if func
+            @call_a.push func
+          end
         end
         nil
       end
@@ -61,7 +61,7 @@ module Skylab::Cull
         call_a.each do | func |
 
           cat = func.category_symbol
-          const = func.const_string
+          const = func.const_symbol
           args = func.composition.args
 
           idx_idx = index_pool.index do | d |
@@ -69,7 +69,7 @@ module Skylab::Cull
             func_ = @call_a.fetch d
 
             if cat == func_.category_symbol
-              if const == func_.const_string
+              if const == func_.const_symbol
                 if args == func_.composition.args
                   true
                 end

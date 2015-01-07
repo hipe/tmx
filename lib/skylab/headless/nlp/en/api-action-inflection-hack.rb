@@ -1,4 +1,6 @@
-module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack  # seed [#018].  was: [#sl-123] exempt
+module Skylab::Headless
+
+module NLP::EN::API_Action_Inflection_Hack  # seed [#018].  was: [#sl-123] exempt
 
   # This is a weird old (and fun) #experiment that is salvaged from porcelain.
   # Watch for it to cross-fertilize with instances of action inflection
@@ -10,13 +12,6 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack  # seed [#018].  wa
   # Don't be decieved, we don't want self.extended [#sl-111] pattern here,
   # you just extend this module and you get this one knob:
 
-  Headless_ = ::Skylab::Headless
-
-  CONST_SEP_ = Headless_::CONST_SEP_
-
-  EMPTY_S_ = Headless_::EMPTY_S_
-
-  NLP = Headless_::NLP # (future-proof parts in case not [#sl-123])
 
   def inflection
     # Classes or modules that extend this badboy get an `inflection` knob
@@ -132,7 +127,10 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack  # seed [#018].  wa
           do_hop = true
         end
       end
-      word = Headless_::Name.humanize( chain[ do_hop ? -3 : -2 ].name_i.to_s )
+
+      word = Callback_::Name.
+        via_const( chain[ do_hop ? -3 : -2 ].name_i ).as_human.dup
+
       word.gsub! PLURAL_RX__, EMPTY_S_  # :+#singularize-hack
       NLP::EN::POS::Noun[ word ]
     end
@@ -149,7 +147,7 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack  # seed [#018].  wa
     end
 
     define_method :verb do
-      @verb ||= NLP::EN::POS::Verb[ Headless_::Name.humanize( name_pieces.last ) ]
+      @verb ||= NLP::EN::POS::Verb[ Callback_::Name.via_const( name_pieces.last ).as_human ]
     end
 
     def verb= x
@@ -243,4 +241,5 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack  # seed [#018].  wa
       end
     end
   end
+end
 end

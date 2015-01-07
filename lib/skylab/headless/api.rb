@@ -234,7 +234,7 @@ module Skylab::Headless
           @name_function ||= bld_name_function
         end
         def bld_name_function
-          Headless_::Name.via_const.via_module_name name
+          Callback_::Name.via_module self
         end
       end
     end

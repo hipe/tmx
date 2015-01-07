@@ -112,12 +112,8 @@ module Skylab::Face  # read [#011] the top node narrative
       MH__[]::Module::Accessors.enhance x, & p
     end
 
-    Name_from_constant = -> i do
-      HL__[]::Name.via_const i
-    end
-
-    Name_from_symbol = -> i do
-      HL__[]::Name.via_symbol i
+    Name_from_symbol = -> sym do
+      Callback_::Name.via_variegated_symbol sym
     end
 
     Name_module_moniker = -> x do

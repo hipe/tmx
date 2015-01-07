@@ -224,7 +224,7 @@ module Skylab::Face
       def get_autonomous_quad argv  # <receiver> <method_name> <args> <block>
         argv_notify argv
         [ parent_services.surface_receiver,
-          name.as_method,
+          name.as_lowercase_with_underscores_symbol,
           argv,  # passing this raw and not in an array becaue we opt to mandate
           nil ]  # that the host still write a [#015] isomorphic parameters
       end

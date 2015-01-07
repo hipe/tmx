@@ -51,7 +51,7 @@ module Skylab::GitViz
   private
 
     def disptch_to_CLI_action
-      _i = @legacy_last_hot._sheet._name.local_normal
+      _i = @legacy_last_hot._sheet._name.as_variegated_symbol
       _const_i = Name_.via_variegated_symbol( _i ).as_const
       _unbnd = CLI::Actions__.const_get _const_i, false
       _bound = _unbnd.new( svcs_for_CLI_action )

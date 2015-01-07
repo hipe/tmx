@@ -248,7 +248,7 @@ module Skylab::Headless
     end
 
     def name
-      @name ||= Headless_::Name.new @normalized_parameter_name
+      @name ||= Callback_::Name.via_variegated_symbol @normalized_parameter_name
     end
 
     attr_reader :normalized_parameter_name

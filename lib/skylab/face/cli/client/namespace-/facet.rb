@@ -113,7 +113,7 @@ module Skylab::Face
       end
 
       def say_wont_add xtra
-        @name and _ = " \"#{ @name.local_normal }\""
+        @name and _ = " \"#{ @name.as_variegated_symbol }\""
         "won't add a #{ DB__ } to #{ NSM__ }#{ _ } that was loaded via #{
           }#{ @surface_mod_origin_i }"
       end
@@ -292,7 +292,7 @@ module Skylab::Face
     class NS_Sheet_   # ~ 5.3x.Nx ~
 
       def add_namespace_sheet oro  # #called-by revelation, fun hacks
-        write_ns oro.name.local_normal, -> ns do  # not slug, like method
+        write_ns oro.name.as_variegated_symbol, -> ns do  # not slug, like method
           raise "sanity - will not attempt to merge a new namespace #{
             }sheet into an existing node."
         end, -> do

@@ -29,7 +29,7 @@ module Skylab::TanMan
         while x = a.shift
           mod = mod.const_get x, false
           if use
-            o.push TanMan_::Old_name_lib[].methodize x
+            o.push self._WAS_methodize x
           else
             use = true
           end

@@ -754,6 +754,14 @@ module Skylab::Brazen
       end
 
       def inflect_line_for_positivity_via_event s, ev
+        if ev.respond_to? :inflected_noun
+          __ilfp s, ev
+        else
+          s
+        end
+      end
+
+      def __ilfp s, ev
         open, inside, close = unparenthesize s
         downcase_first inside
         n_s = ev.inflected_noun
@@ -779,6 +787,14 @@ module Skylab::Brazen
       end
 
       def maybe_inflect_line_for_completion_via_event s, ev
+        if ev.respond_to? :inflected_noun
+          __milfc s, ev
+        else
+          s
+        end
+      end
+
+      def __milfc s, ev
         open, inside, close = unparenthesize s
         downcase_first inside
         if HACK_IS_ONE_WORD_RX__ =~ inside

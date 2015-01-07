@@ -117,7 +117,7 @@ module Skylab::Face
     end
 
     p = -> space, x do
-      _a = space.each.map { |ar| "'#{ ar.local_name_function.local_normal }'" }
+      _a = space.each.map { |ar| "'#{ ar.local_name_function.as_variegated_symbol }'" }
       _or = LIB_.EN_oxford_or _a
       _for = LIB_.name_module_moniker space
       _msg = "'#{ x }' is not a recognized arity of the #{ _for } - #{

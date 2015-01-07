@@ -1,0 +1,7 @@
+# ohai
+[report]
+function = mutator:remove-empty-actual-properties
+function = aggregator:unique-features(name field:the feature)
+function = map:single-property-value( feature name )
+[upstream "file:../../../../../headless/doc/issues/152-the-name-narrative.md"]
+adapter = markdown

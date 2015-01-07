@@ -77,7 +77,7 @@ module Skylab::CodeMolester
         _name_a = a.map do |s|
           LIB_.old_name_lib.via_const s.intern
         end
-        LIB_.old_name_lib.qualified.new _name_a
+        LIB_.old_name_lib.simple_chain.new _name_a
       end
     end.call
   end

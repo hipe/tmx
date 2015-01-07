@@ -2,7 +2,7 @@ digraph {
 
   ev [label="event factory"]
 
-  cu [label="revamp cull" style=filled fillcolor="#b5d5fb"]
+  cu [label="revamp cull" style=filled]
 
   lib [label="librification"]
 

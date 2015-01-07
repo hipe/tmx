@@ -211,7 +211,7 @@ module Skylab::Face
       # is a tuple of the formal arguments.
 
       def finish_param_h_for_api args, cmd_i=nil
-        sht = @sheet.fetch_constituent( cmd_i || @last_hot.name.as_method )
+        sht = @sheet.fetch_constituent( cmd_i || @last_hot.name.as_lowercase_with_underscores_symbol )
         p_a = get_command_parameters sht
         len = args ? args.length : 0
         len == p_a.length or fail "sanity - #{ len } actual args for for #{

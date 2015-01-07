@@ -97,7 +97,7 @@ module Skylab::Face
 
       def get_anchored_program_name_separated_by sep
         [ * @mechanics.get_normal_invocation_string_parts,
-          @ns_sheet.name.local_normal ] * sep
+          @ns_sheet.name.as_variegated_symbol ] * sep
       end
     end
   end

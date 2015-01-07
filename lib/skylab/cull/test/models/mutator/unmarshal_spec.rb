@@ -12,15 +12,15 @@ module Skylab::Cull::TestSupport
         'remove-empty-actua',
         common_box_module )
 
-      func.const_string.should eql(
-        "Remove_empty_actual_properties" )
+      func.const_symbol.should eql(
+        :Remove_empty_actual_properties )
     end
 
     it "minimal prefix" do
 
       func = subject.unmarshal 'mutator:split-and-pr'
 
-      func.const_string.should eql 'Split_and_promote_property'
+      func.const_symbol.should eql :Split_and_promote_property
 
       func.category_symbol.should eql :mutator
 

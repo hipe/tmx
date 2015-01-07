@@ -56,16 +56,12 @@ module Skylab::GitViz
     Listen = gem[ :Listen ]
 
     Local_normal_name_from_module = -> x do
-      Old_name_lib[].local_normal_name_from_module x
+      Callback_::Name.via_module( x ).as_lowercase_with_underscores_symbol
     end
 
     MH__ = wall[ :MetaHell ]
 
     MD5 = memo[ -> do require 'digest/md5' ; ::Digest::MD5 end ]
-
-    Old_name_lib = -> do
-      HL__[]::Name
-    end
 
     Open3 = stdlib[ :Open3 ]
 

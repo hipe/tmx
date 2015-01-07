@@ -52,17 +52,15 @@ module Skylab::Brazen
       def via_item
         if @item.respond_to? :execute
           via_item_execute
+        elsif @item.respond_to? :render_all_lines_into_under
+          @ok = @item.render_all_lines_into_under @y, @expag
         else
-          via_item_default
+          @y << @item
+          @ok = true
         end
         if ! @ok
           @count -= 1  # since it will short circuit ..
         end
-        nil
-      end
-
-      def via_item_default
-        @ok = @item.render_all_lines_into_under @y, @expag
         nil
       end
 

@@ -80,15 +80,25 @@ module Skylab::Callback
       end
 
       module Names__
-        p = -> do
-          class Fly__ < Callback_::Lib_::Old_name_lib[].via_const
-            alias_method :replace_with_constant_i, :initialize
-            public :replace_with_constant_i
-            def initialize ; end
-          end
-          fly = Fly__.new ; p = -> { fly } ; fly
+
+        Get_fly = Callback_.memoize do
+
+          class Fly_ < Callback_::Name
+
+            def replace_with_constant_i sym
+              @as_const = sym
+              @as_slug = nil
+              nil
+            end
+
+            def _init
+              @const_is_resolved = true
+              self
+            end
+
+            self
+          end.allocate._init
         end
-        Get_fly = -> { p[] }
       end
 
       # ~

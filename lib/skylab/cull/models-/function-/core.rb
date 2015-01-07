@@ -20,7 +20,7 @@ module Skylab::Cull
     end
 
     def members
-      [ :category_symbol, :composition, :const_string ]
+      [ :category_symbol, :composition, :const_symbol ]
     end
 
     def marshal
@@ -33,7 +33,7 @@ module Skylab::Cull
       _name.as_slug
     end
 
-    def const_string
+    def const_symbol
       _name.as_const
     end
 

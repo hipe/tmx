@@ -94,7 +94,9 @@ module Skylab::Callback
 
     -> do
 
-      constantify = Callback_::Lib_::Old_name_lib[].constantify
+      constantify = -> sym do
+        Callback_::Name.via_variegated_symbol( sym ).as_const
+      end
 
       define_method :box_module= do |box_mod|
         @produce_event_class_hookback = -> key_a, kls do

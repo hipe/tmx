@@ -38,7 +38,7 @@ module Skylab::Headless
     end
 
     def name
-      @name ||= Headless_::Name.via_symbol @fprm.normalized_parameter_name
+      @name ||= Callback_::Name.via_variegated_symbol @fprm.normalized_parameter_name
     end
 
     #  ~ all #hook-out to #parameter-reflection-API

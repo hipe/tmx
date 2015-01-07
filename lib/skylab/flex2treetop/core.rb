@@ -319,8 +319,7 @@ module Skylab::Flex2Treetop
     end
 
     def moniker_for_errmsg
-      o = F2TT_.lib_.old_name_lib
-      o.naturalize o.normify o.const_basename self.class.name
+      Callback_::Name.via_module( self.class ).as_human
     end
 
     module_methods_module_for_write

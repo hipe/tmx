@@ -92,7 +92,7 @@ module Skylab::Headless
     end
   private
     def bld_lnf
-      Headless_::Name.new local_normal_name
+      Callback_::Name.via_variegated_symbol local_normal_name
     end
   public
 

@@ -69,8 +69,9 @@ module Skylab::Headless
           attr_reader :crrnt_open_action_cls
         private
           def fnsh_active_action i
-            _const_i = Headless_::Name.constantify( i ).intern
-            unbound_action_box.const_set _const_i, rls_some_open_action_class
+            unbound_action_box.const_set(
+              Callback_::Name.via_variegated_symbol( i ).as_const,
+              rls_some_open_action_class )
           end
           def rls_some_open_action_class
             cls = some_crrnt_open_action_class
@@ -111,7 +112,7 @@ module Skylab::Headless
             end
           end
           def arg_stx_as_DSL_box_engaged
-            argument_syntax_for_action_i @bound_downtree_action.name.as_method
+            argument_syntax_for_action_i @bound_downtree_action.name.as_lowercase_with_underscores_symbol
           end
           def arg_stx_as_DSL_box_disengaged
             argument_syntax_for_action_i default_action_i
@@ -179,7 +180,7 @@ module Skylab::Headless
           end.new
 
           def crt_dispatch_for_bound_downtree  # #storypoint-175
-            _meth_i = @bound_downtree_action.name.as_method
+            _meth_i = @bound_downtree_action.name.as_lowercase_with_underscores_symbol
             enqueue _meth_i
             if @reached_this_point
               NO_OP_
@@ -283,7 +284,7 @@ module Skylab::Headless
           end
           def prepare_for_help_screen_as_bx
             if @is_engaged
-              replace_queue_head_wth_i @bound_downtree_action.name.as_method
+              replace_queue_head_wth_i @bound_downtree_action.name.as_lowercase_with_underscores_symbol
             else
               super
             end ; nil

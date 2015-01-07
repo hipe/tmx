@@ -255,10 +255,6 @@ module Skylab::TestSupport
 
       MH__ = parent::MH__
 
-      Name_const_basename = -> s do
-        HL__[]::Name.const_basename s
-      end
-
       Match_test_dir_proc = -> do
         TestSupport_.constant( :TEST_DIR_NAME_A ).method :include?
       end

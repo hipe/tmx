@@ -116,7 +116,7 @@ module Skylab::Face
     end
 
     def attach_hot_plugin_with_name_proc pi, nf
-      attach_hot_plugin_with_name pi, nf.local_normal
+      attach_hot_plugin_with_name pi, nf.as_variegated_symbol
       pi.plugin_metaservices.set_name_proc nf
       nil
     end
@@ -844,7 +844,7 @@ module Skylab::Face
       mod = box.const_get const, false  # (below is pursuant to [#077])
       host.attach_hot_plugin_with_name_proc(
         ( ::Class == mod.class ? mod : mod.const_get( :Client, false ) ).new,
-        LIB_.name_from_constant( const ) )
+        Callback_::Name.via_const( const ) )
     end
   end
 
