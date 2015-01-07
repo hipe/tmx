@@ -96,9 +96,9 @@ module Skylab::Cull::TestSupport
 
       i_a = [ :"Left-Aligned", :"Center Aligned", :"Right Aligned" ]
 
-      e1.at_( i_a ).should eql [ 'col 3 is', 'some wordy text', '$1600' ]
-      e2.at_( i_a ).should eql [ 'col 2 is', 'centered', '$12' ]
-      e3.at_( i_a ).should eql [ 'zebra stripes', 'are neat', '$1' ]
+      e1.at_fields( i_a ).should eql [ 'col 3 is', 'some wordy text', '$1600' ]
+      e2.at_fields( i_a ).should eql [ 'col 2 is', 'centered', '$12' ]
+      e3.at_fields( i_a ).should eql [ 'zebra stripes', 'are neat', '$1' ]
 
     end
 

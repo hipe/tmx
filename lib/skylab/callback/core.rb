@@ -467,7 +467,7 @@ module Skylab::Callback
 
     alias_method :initialize, :reinitialize
 
-    def has_no_more_content
+    def no_unparsed_exists
       @x_a_length == @d
     end
 

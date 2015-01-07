@@ -63,7 +63,7 @@ module Skylab::Brazen
             break
           end
 
-          if @st.has_no_more_content
+          if @st.no_unparsed_exists
             when_name_is_too_short
             ok = false
             break

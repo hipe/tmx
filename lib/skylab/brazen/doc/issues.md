@@ -1,4 +1,4 @@
-[#082]       :+#wishlist a `list`-style iambic writer method
+[#082]       #tracking `list` implementations
 [#081]       #track experimental extensions to Actor
 [#080]       #parent-node:[#013] actors, agents and models ..
 [#079] #open rather than the model action ever having to know about the

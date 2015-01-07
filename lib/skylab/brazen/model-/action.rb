@@ -55,6 +55,16 @@ module Skylab::Brazen
         Action_Name_Function__
       end
 
+      # ~ default #hook-outs for entity lib (default is no properties)
+
+      def properties
+        nil
+      end
+
+      def any_property_via_symbol _
+        nil
+      end
+
     private  # ~ experimental alternative to the iambic DSL
 
       def after sym

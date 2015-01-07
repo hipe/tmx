@@ -104,7 +104,7 @@ module Skylab::Callback
         def process_iambic_stream_fully stream  # :+#public-API :+#hook-in
           keep_parsing = process_iambic_stream_passively stream
           keep_parsing and begin
-            if stream.has_no_more_content
+            if stream.no_unparsed_exists
               ACHIEVED_
             else
               when_after_process_iambic_fully_stream_has_content stream

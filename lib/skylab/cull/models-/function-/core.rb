@@ -16,6 +16,7 @@ module Skylab::Cull
     def initialize args, defined_function, category_symbol
       @category_symbol = category_symbol
       @composition = Composition__.new args, defined_function
+      @p = method :__first_call
     end
 
     def members
@@ -29,11 +30,15 @@ module Skylab::Cull
     attr_reader :category_symbol, :composition
 
     def __name_as_slug
-      Callback_::Name.via_const( const_string ).as_slug
+      _name.as_slug
     end
 
     def const_string
-      @composition.defined_function.name
+      _name.as_const
+    end
+
+    def _name
+      @nm ||= Callback_::Name.via_module @composition.defined_function
     end
 
     def __any_args_string
@@ -58,7 +63,21 @@ module Skylab::Cull
     RX___ = /[\(\)\[\],"]/
 
     def [] ent, & oes_p
-      @composition.defined_function[ ent, * @composition.args, & oes_p ]
+      @p[ ent, & oes_p ]
+    end
+
+    def __first_call ent, & oes_p
+
+      p = @composition.defined_function
+      a = @composition.args
+
+      if a
+        @p = p.curry[ * a ]
+      else
+        @p = p
+      end
+
+      @p[ ent, & oes_p ]
     end
 
     Function_ = self

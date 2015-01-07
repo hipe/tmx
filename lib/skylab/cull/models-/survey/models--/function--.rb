@@ -56,11 +56,27 @@ module Skylab::Cull
       end
     end
 
+    class Models__::Map < Models__::Function__
+    private
+
+      def my_box_module
+        Cull_::Models_::Map::Items__
+      end
+    end
+
     class Models__::Mutator < Models__::Function__
     private
 
       def my_box_module
         Cull_::Models_::Mutator::Items__
+      end
+    end
+
+    class Models__::Aggregator < Models__::Function__
+    private
+
+      def my_box_module
+        Cull_::Models_::Aggregator::Items__
       end
     end
   end

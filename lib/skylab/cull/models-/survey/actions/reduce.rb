@@ -8,7 +8,7 @@ module Skylab::Cull
 
       Brazen_.model.entity self,
 
-        :reuse, Survey_Action_Methods_.common_properties,
+        :reuse, COMMON_PROPERTIES_,
 
         :property_object, ( Models_::Upstream::Actions::Map::TABLE_NUMBER_PROPERTY.with do
           @has_default = false

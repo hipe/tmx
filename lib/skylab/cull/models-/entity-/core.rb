@@ -14,7 +14,6 @@ module Skylab::Cull
     end
 
     def initialize
-      @_index_of_last_seen = {}
       @actual_properties = []
       yield self
     end
@@ -32,13 +31,8 @@ module Skylab::Cull
     end
 
     def add_actual_property_value_and_name x, sym
-
       a = @actual_properties
-
-      @_index_of_last_seen[ sym ] = a.length
-
       a.push Actual_Property__.new( x, sym )
-
       nil
     end
 
@@ -62,6 +56,26 @@ module Skylab::Cull
         y << ( s_a * EMPTY_S_ )
       end
       ACHIEVED_
+    end
+
+    def at * i_a
+      at_fields i_a
+    end
+
+    def at_fields i_a
+      if i_a.length.zero?
+        EMPTY_A_
+      else
+        h = ::Hash[ i_a.map { |i| [ i, true ] } ]
+        h_ = {}
+        @actual_properties.each do | prp |
+          sym = prp.name_symbol
+          h.delete sym or next
+          h_[ sym ] = prp.value_x
+          h.length.zero? and break
+        end
+        i_a.map { |i| h_[ i ] }
+      end
     end
 
     def [] sym
@@ -93,13 +107,8 @@ module Skylab::Cull
       a
     end
 
-    def at_ i_a
-      a = @actual_properties
-      h = @_index_of_last_seen
-      i_a.map do | sym |
-        ( a.fetch h.fetch sym ).value_x
-      end
-    end
+
+
 
     # ~ mutation API
 

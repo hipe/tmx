@@ -381,32 +381,46 @@ module Skylab::Cull
 
       Autoloader_[ self, :boxxy ]
 
-      stowaway :Mutator, 'function--'
+      stowaway :Map, ( same = 'function--' )
+      stowaway :Mutator, same
+      stowaway :Aggregator, same
     end
 
     module Survey_Action_Methods_
 
-      class << self
-        attr_reader :common_properties
-      end
-
       Brazen_.model.entity self do
 
+        entity_property_class_for_write
+
+        class self::Entity_Property
+
+        private
+
+          def list=  # :+#[br-082]
+            @iambic_writer_method_proc_is_generated = false
+            @iambic_writer_method_proc_proc = -> prp do
+              _SYM = prp.name_symbol
+              -> do
+                ( @argument_box.touch _SYM do [] end ).push iambic_property
+                KEEP_PARSING_
+              end
+            end
+            KEEP_PARSING_
+          end
+        end
+
         o :property, :upstream,
-          :property, :upstream_adapter
+          :property, :upstream_adapter,
 
-        def add_mutator  # :+[#br-082]
-          ( @argument_box.touch :add_mutator do [] end ).push iambic_property
-          KEEP_PARSING_
-        end
+          :list, :property, :add_map,
+          :list, :property, :remove_map,
 
-        def remove_mutator
-          ( @argument_box.touch :remove_mutator do [] end ).push iambic_property
-          KEEP_PARSING_
-        end
+          :list, :property, :add_mutator,
+          :list, :property, :remove_mutator,
+
+          :list, :property, :add_aggregator,
+          :list, :property, :remove_aggregator
       end
-
-      @common_properties = properties.to_a
 
     private
 
@@ -432,6 +446,7 @@ module Skylab::Cull
       end
     end
 
+    COMMON_PROPERTIES_ = Survey_Action_Methods_.properties.to_a
     CONFIG_FILENAME_ = 'config'.freeze
     DIR_FTYPE_ = 'directory'.freeze
     FILENAME_ = 'cull-survey'.freeze

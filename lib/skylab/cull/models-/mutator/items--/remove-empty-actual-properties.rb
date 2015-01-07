@@ -14,9 +14,13 @@ module Skylab::Cull
 
           index += 1
 
-          if prp.value_x.length.zero?
-            d_a ||= []
-            d_a.push index
+          x = prp.value_x
+
+          if x
+            if ! x || x.length.zero?
+              d_a ||= []
+              d_a.push index
+            end
           end
         end
 

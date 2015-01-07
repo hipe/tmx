@@ -10,14 +10,12 @@ module Skylab::Cull
 
         :flag, :property, :dry_run,
 
-        :reuse, Survey_Action_Methods_.common_properties,
+        :reuse, COMMON_PROPERTIES_,
 
         :description, -> y do
           y << "edit an existing survey at this path"
         end,
         :required, :property, :path
-
-      include Survey_Action_Methods_
 
       def produce_any_result
 

@@ -1,6 +1,6 @@
 
 [ upstream "file:../../../files/mutators-01-simple.md" ]
-  table-number = 2
+  table-number = 3
 
 [ report ]
 function = mutator:remove-empty-actual-properties

@@ -131,7 +131,7 @@ module Skylab::Cull
         @defined_function = if x.respond_to? :name
           x
         else
-          Proc_Wrapper___.new x, const
+          Proc_Wrapper___.new x, const, @box_mod
         end
 
         ACHIEVED_
@@ -140,7 +140,7 @@ module Skylab::Cull
       class Proc_Wrapper___
 
         def initialize * a
-          @p, @const = a
+          @p, @const, @mod = a
         end
 
         def hash
@@ -162,7 +162,7 @@ module Skylab::Cull
         end
 
         def name
-          @const.id2name
+          "#{ @mod.name }::#{ @const }"
         end
 
         def [] * a, & p

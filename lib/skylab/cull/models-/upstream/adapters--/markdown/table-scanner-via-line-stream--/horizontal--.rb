@@ -118,7 +118,7 @@ module Skylab::Cull
                 @num_fields.times do | d |
 
                   ent.add_actual_property_value_and_name(
-                    @rows.fetch( d ).fetch( @d ),
+                    @rows.fetch( d )[ @d ],
                     @sym_a.fetch( d ) )
 
                 end
