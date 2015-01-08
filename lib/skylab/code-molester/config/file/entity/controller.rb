@@ -89,13 +89,13 @@ module Skylab::CodeMolester
 
             def rendered_surface_pairs
               skip_me = entity_story.natural_key_field_name
-              upstream = @string_box.to_pair_scan
+              upstream = @string_box.to_pair_stream
               y = []
               Callback_.scan do
                 begin
                   pair = upstream.gets
                   pair or break
-                  i = pair.name_i
+                  i = pair.name_symbol
                   skip_me == i and redo
                   fld = field_box.fetch i
                   upstream_x = pair.value_x
@@ -187,7 +187,7 @@ module Skylab::CodeMolester
 
     def normalize_fields
       did = nil
-      @string_box ||= ( did = true ) && LIB_.old_box_lib.open_box.new
+      @string_box ||= ( did = true ) && Callback_::Box.new
       did or fail "sanity"
       @nerk_a = nil
       a = Event_::Aggregation.new

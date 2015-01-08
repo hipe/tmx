@@ -122,10 +122,6 @@ module Skylab::CodeMolester
       HL__[]::NLP::EN::Methods[ mod ]
     end
 
-    Old_box_lib = -> do
-      MH__[]::Formal::Box
-    end
-
     Old_event_lib = -> do
       Face__[]::Model::Event
     end

@@ -29,7 +29,7 @@ module Skylab::CodeMolester
     end
 
     def initialize
-      @string_box = LIB_.old_box_lib.open_box.new
+      @string_box = Callback_::Box.new
       @fld_box = field_box  # meh
       @miss_a = [ ] ; @xtra_a = [ ] ; @nbp_a = [ ] ; @issue_x_a = [ ]
       @had_issues = nil
@@ -39,7 +39,7 @@ module Skylab::CodeMolester
       if @had_issues
         flush_issues
       end
-      @string_box.clear
+      @string_box.algorithms.clear
       @is_raw = true
       @entity_name_x = entity_name_x
       @section_sexp = section_sexp
@@ -150,7 +150,7 @@ module Skylab::CodeMolester
 
     def check_for_missing_required_fields
       required_field_names.each do |i|
-        if ! @string_box.has? i
+        if ! @string_box.has_name i
           @miss_a << i
           @had_issues = true
         end
@@ -158,7 +158,7 @@ module Skylab::CodeMolester
     end
 
     def check_for_extra_fields
-      @string_box._order.each do |i|
+      @string_box.to_name_stream.each do | i |
         if ! @fld_box.has? i
           @xtra_a << i
           @had_issues = true
@@ -200,7 +200,7 @@ module Skylab::CodeMolester
       define_method :_get_normalized_pairs do |y, ea|
         ea.each do |fld|
           nn = fld.local_normal_name
-          @string_box.has? nn or next
+          @string_box.has_name nn or next
           _get_token_pairs @string_box.fetch nn
           if a.length.nonzero?
             if 1 == a.length

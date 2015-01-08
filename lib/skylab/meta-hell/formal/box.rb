@@ -361,6 +361,7 @@ module Skylab::MetaHell
 
     # ~ nerks that remove constituents (alphabetical, narrative order)
 
+    # :+#algorithm
     def clear                     # clears all constituent data from membership
       @order.clear                # (but of course does not cascade out). does
       @hash.clear                 # not touch non-constituent ivars.
