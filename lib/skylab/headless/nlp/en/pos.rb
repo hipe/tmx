@@ -53,7 +53,7 @@ module Skylab::Headless
     def self.grammatical_categories h
 
       @category_box ||= begin
-        cls = Headless_.lib_.old_box_lib.open_box
+        cls = Callback_::Box
         @form_box = cls.new
         @exponent_box = cls.new
         cls.new  # eew
@@ -76,15 +76,15 @@ module Skylab::Headless
     class Category_
 
       def self.there_exists_a_category cat_sym
-        @box.if? cat_sym, -> cat do
+        @box.algorithms.if? cat_sym, -> cat do
           cat.extent_x += 1
         end, -> bx, k do
-          bx.add k, Category__.new( 1 )
+          @box.add k, Category__.new( 1 )  # after #open [#cb-061] use bx not @box
         end
         nil
       end
 
-      @box = Headless_.lib_.old_box_lib.open_box.new
+      @box = Callback_::Box.new
 
       class << self
         attr_reader :box
@@ -143,7 +143,7 @@ module Skylab::Headless
     # of a form - what you get depends on the state of the category box!
 
     def self.combination_class
-      Exponent_::Combination_::Struct_Factory_[ @category_box._order ]
+      Exponent_::Combination_::Struct_Factory_[ @category_box.instance_variable_get( :@a ) ]
     end
 
     module Exponent_::Combination_
@@ -318,7 +318,11 @@ module Skylab::Headless
 
     # (watch for similarities with `self.as`)
     def add_irregular_forms form_h
-      @irregular_box ||= Headless_.lib_.old_box_lib.open_box.new if form_h.any?
+
+      if form_h.length.nonzero?
+        @irregular_box ||= Callback_::Box.new
+      end
+
       form_h.each do |combination_x, surface_form|
         c = self.class.build_immutable_combination combination_x
         instance_variable_set c.ivar,  # allow nils
@@ -389,8 +393,8 @@ module Skylab::Headless
 
       def initialize pos_class
         @pos_class = pos_class
-        @monadic_form_box = Headless_.lib_.old_box_lib.open_box.new
-        @monadic_lemma_box = Headless_.lib_.old_box_lib.open_box.new
+        @monadic_form_box = Callback_::Box.new
+        @monadic_lemma_box = Callback_::Box.new
         @last_lemmaless_id = 0
       end
       private :initialize
@@ -406,7 +410,7 @@ module Skylab::Headless
 
         # 2. You want to be able to look up the different irregular forms.
         if lexeme.irregular_box
-          lexeme.irregular_box.each do |form|
+          lexeme.irregular_box.each_value do | form |
             x = form.surface_form   # some forms serve to nullify
             if x
               add_monadic_form form.surface_form, lemma_x, form.combination
@@ -447,7 +451,7 @@ module Skylab::Headless
     def irregular_form_exponents
       ::Enumerator.new do |y|
         if irregular_box
-          @irregular_box._order.each do |exponent_sym|
+          @irregular_box.to_name_stream.each do | exponent_sym |
             y << self.class.exponent_box.fetch( exponent_sym )
           end
         end
@@ -489,7 +493,7 @@ module Skylab::Headless
     class Lexicon_  # (re-open)
 
       def has_monadic_form? x
-        @monadic_form_box.has? x
+        @monadic_form_box.has_name x
       end
 
       def fetch_monadic_form x
@@ -502,28 +506,45 @@ module Skylab::Headless
     # time will get baked in to the class (and subsequent categories will
     # not make it into the class as setters).)
 
-    def self.production_class
-      if const_defined? :Production, false
-        const_get :Production, false
-      else
-        lex_cls = self
+    class << self
+
+      def production_class
+
+        if const_defined? :Production, false
+          const_get :Production, false
+        else
+          const_set :Production, bld_production_class
+        end
+      end
+
+      def bld_production_class
+
+        _LEX_CLS = self
         cat_box = @category_box
-        kls = ::Class.new( Production_ ).class_exec do
-          define_singleton_method :lexeme_class do lex_cls end
-          define_method :lexeme_class do lex_cls end
-          cat_box.each do |cat_sym, cat|
-            define_method "#{ cat_sym }=" do |x|
+
+        ::Class.new( Production_ ).class_exec do
+
+          define_singleton_method :lexeme_class do
+            _LEX_CLS
+          end
+
+          define_method :lexeme_class do
+            _LEX_CLS
+          end
+
+          cat_box.to_name_stream.each do | cat_sym |
+
+            define_method :"#{ cat_sym }=" do |x|
               change_exponent cat_sym, x
               x
             end
+
             define_method cat_sym do
               get_exponent cat_sym
             end
           end
           self
         end
-        const_set :Production, kls
-        kls
       end
     end
 
@@ -664,7 +685,7 @@ module Skylab::Headless
     class Lexicon_
 
       def has_monadic_lexeme? x
-        @monadic_lemma_box.has? x
+        @monadic_lemma_box.has_name x
       end
 
       def fetch_monadic_lexeme x
@@ -730,7 +751,7 @@ module Skylab::Headless
         forms_with_irregulars
       else
         ::Enumerator.new do |y|
-          self.class.form_box.each do |frm|
+          self.class.form_box.each_value do | frm |
             y << frm.bind( self )
           end
         end
@@ -743,19 +764,27 @@ module Skylab::Headless
     end
 
     # #todo both above *and* below can be tightened
+
     def forms_with_irregulars
+
       ::Enumerator.new do |y|
+
         # some irregulars replace existing regulars, some irregulars introduce
         # new combinations. for no good reason, we will do the latter group
         # first, and then the first group inline with the regulars in the
         # order of the regulars.
-        special_a = @irregular_box._order - self.class.form_box._order
+
+        special_a = @irregular_box.instance_variable_get( :@a ) -
+          self.class.form_box.instance_variable_get( :@a )
+
         special_a.each do |k|
           y << @irregular_box.fetch( k )
         end
-        self.class.form_box.each do |frm|
+
+        self.class.form_box.to_value_stream.each do | frm |
+
           bound = nil
-          @irregular_box.if? frm.combination.form_key, -> frm_bnd do
+          @irregular_box.algorithms.if? frm.combination.form_key, -> frm_bnd do
             bound = frm_bnd
           end, -> bx, k do
             bound = frm.bind( self )
@@ -781,7 +810,7 @@ module Skylab::Headless
 
     @each = [ ]
 
-    def self.new part, *parts
+    def self.new part, *parts  # #todo this is awful
       ea = @each
       ::Class.new( self ).class_exec do
         agree_a = -> do
@@ -793,30 +822,34 @@ module Skylab::Headless
           agre_a
         end.call
         ea << self
-        membership_st =
-          parts.unshift(part).reduce Headless_.lib_.old_box_lib.open_box.new do |bx, x|
-            bx.add x, Membership_.new( x, NLP::EN::POS.abbrev_box.fetch( x ) )
-            bx
-          end.to_struct
+
+        _MEMBERSHIP = parts.unshift( part ).reduce Callback_::Box.new do | bx, x |
+
+          bx.add x, Membership_.new( x, NLP::EN::POS.abbrev_box.fetch( x ) )
+          bx
+
+        end.algorithms.to_struct
 
         singleton_class.class_exec do
 
           alias_method :new, :pos_new
 
-          define_method :box do membership_st end
+          define_method :box do
+            _MEMBERSHIP
+          end
 
           -> do  # `members`  / `memberships`
 
-            members = membership_st._order.dup.freeze
+            members = _MEMBERSHIP.get_names.freeze
             define_method :members do members end
 
-            memberships = membership_st.values.freeze
+            memberships = _MEMBERSHIP.values.freeze
             define_method :memberships do memberships end
           end.call
 
           define_method :terminal_membership do
             @terminal_membership ||= begin
-              membership_st.detect do |membership|
+              _MEMBERSHIP.detect do |membership|
                 membership.looks_terminal
               end or begin
                 raise ::RuntimeError, "no terminal member - #{ self }"
@@ -827,7 +860,7 @@ module Skylab::Headless
           define_method :agree_a do agree_a end
         end
 
-        membership_st._order.each do |k|
+        _MEMBERSHIP.members.each do | k |
           attr_accessor k  # for now
         end
 
@@ -906,9 +939,12 @@ module Skylab::Headless
         fail 'sanity'
       else
         const_set :CategoryWriterInstanceMethods, (
+
         ::Module.new.module_exec do
+
           NLP::EN::Part_Of_Speech::
-                Lexeme_::Category_.box._order.each do |cat_sym|
+                Lexeme_::Category_.box.to_name_stream.each do | cat_sym |
+
             define_method "#{ cat_sym }=" do |x|
               res = trickle_down_exponent cat_sym, x
               if ! res then raise ::KeyError, "no child node accepted - #{

@@ -154,7 +154,7 @@ module Skylab::Headless
     end
   end
 
-  class Parameter::Set < Headless_.lib_.old_box_lib
+  class Parameter::Set
 
     def initialize host
       host.respond_to? :formal_parameter_class or
@@ -162,38 +162,61 @@ module Skylab::Headless
           Parameter::DEFAULT_DEFINITION_CLASS
         end
       @meta_set = nil ; @host = host
-      super()
+      @bx = Callback_::Box.new
     end
 
-    # ~ :+[#mh-021] typical child class implementation:
-    def get_args_for_copy
-      a = super
-      a.push @host, @meta_set
-      a
+    def has? k
+      @bx.has_name k
     end
-    def init_copy *supr, host, meta_set
-      @meta_set = meta_set ; @host = host
-      super( * supr )
+
+    def get_names
+      @bx.get_names
     end
-    # ~
+
+    def to_a
+      @bx.to_enum( :each_value ).to_a
+    end
+
+    def each_name & p
+      if p
+        @bx.each_name( & p )
+      else
+        @bx.to_enum :each_name
+      end
+    end
+
+    def each_value( & p )
+      if p
+        @bx.each_value( & p )
+      else
+        @bx.to_enum :each_value
+      end
+    end
+
+    def each_pair( & p )
+      if p
+        @bx.each_pair( & p )
+      else
+        @bx.to_enum :each_pair
+      end
+    end
 
     def [] normalized_parameter_name
-      @hash.fetch normalized_parameter_name do end
+      @bx[ normalized_parameter_name ]
     end
 
-    alias_method :known?, :has?  # this one feels ok
+    def fetch k, & p
+      @bx.fetch k, & p
+    end
 
     def fetch! name
-      if? name, IDENTITY_,
-      -> do
-        x = @host.formal_parameter_class.new @host, name
-        add name, x
-        x
+      @bx.touch name do
+        @host.formal_parameter_class.new @host, name
       end
     end
 
     def merge! set
-      set.each do |name, param|
+      set.each_pair do |name, param|
         fetch!( name ).merge! param
       end ; nil
     end

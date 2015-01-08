@@ -30,17 +30,17 @@ module Skylab::Headless::CLI::Table
         empty: :info,
     row_count: :datapoint
 
+    def initialize
+      @field_box = Callback_::Box.new
+      @head = @separator = @tail = nil
+    end
+
     attr_writer :head, :tail, :separator
 
     def field! symbol
-      @field_box.if? symbol, Headless_::IDENTITY_, -> box do
-        box.add symbol, Table::Field::Shell.new
+      @field_box.touch symbol do
+        Table::Field::Shell.new
       end
-    end
-    # --*--
-    def initialize
-      @head = @tail = @separator = nil
-      @field_box = Headless_.lib_.old_box_lib.open_box.new
     end
   end
 
@@ -221,18 +221,17 @@ module Skylab::Headless::CLI::Table
 
     def ancestor_names_recursive
       @ancestor_names_recursive ||= begin
-        box = Headless_.lib_.old_box_lib.open_box.new
-        _ancestor_names_recursive box
-        box.names
+        bx = Callback_::Box.new
+        _ancestor_names_recursive bx
+        bx.get_names
       end
     end
 
-    def _ancestor_names_recursive box
+    public def _ancestor_names_recursive box
       if @ancestor
-        box.if? @ancestor, -> x { }, -> bx do
-          bx.add @ancestor, true
-          anc = Table::Cels.fetch @ancestor
-          anc.send :_ancestor_names_recursive, box
+        bx.touch @ancestor do
+          Table::Cels.fetch( @ancestor )._ancestor_names_recursive bx
+          true
         end
       end
       nil

@@ -79,7 +79,7 @@ module Skylab::Headless
     def dupe changes
       init # should be ok to call multiple times
       self.class.new(Hash[
-        self.class.parameters.each.select(&:inherit?).map do |param|
+        self.class.parameters.each_value.select(&:inherit?).map do |param|
           [param.normalized_parameter_name, send(param.normalized_parameter_name)]
         end].merge(changes) )
     end
@@ -87,7 +87,7 @@ module Skylab::Headless
       f = {}
       host_instance.instance_exec do
         f[:set_p] = ->{ formal_parameters }
-        f[:params_p] = -> { formal_parameters.each.to_a }
+        f[:params_p] = -> { formal_parameters.to_a }
         f[:known_p] = ->(param) { known? param.normalized_parameter_name }
 
         f[:label_p] = -> param, i=nil do

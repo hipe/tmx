@@ -20,12 +20,14 @@ module Skylab::TreetopTools
     private
 
       def init_actual_parameters_class
-        _i_a = parameters.each.map( & :normalized_parameter_name )
-        cls = ::Struct.new( * _i_a )
+
+        cls = ::Struct.new( * parameters.get_names )
+
         cls.class_exec do
           include LIB_.parameter::Definer::InstanceMethods::StructAdapter
           public :known?
         end
+
         const_set AP__, cls ; nil
       end
 

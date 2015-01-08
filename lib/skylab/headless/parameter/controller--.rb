@@ -83,7 +83,7 @@ module Skylab::Headless
         end
 
         def write_defaults_against_actual_to_p actual, write_p  # :+#defaults [#sl-117]
-          formal_parameters.each do |par|
+          formal_parameters.each_value do | par |
             par.has_default? or next
             i = par.normalized_parameter_name
             actual.known?( i ) && ! actual[ i ].nil? and next
@@ -106,7 +106,7 @@ module Skylab::Headless
         end
 
         def check_missing_required_against_actual actual
-          miss_a = formal_parameters.reduce [ ] do |m, (i, par)|
+          miss_a = formal_parameters.each_pair.reduce [] do |m, (i, par)|
             par.required? or next m
             actual.known?( i ) && ! actual[ i ].nil? and next m
             m << par

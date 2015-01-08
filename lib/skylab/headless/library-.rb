@@ -85,10 +85,6 @@ module Skylab::Headless
       Basic[]::Module
     end
 
-    Old_box_lib = -> do
-      MH__[]::Formal::Box
-    end
-
     Parse_series = -> * a do
       MH__[]::Parse.series.via_arglist a
     end

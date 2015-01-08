@@ -28,7 +28,7 @@ module Skylab::TreetopTools
 
     include LIB_.parameter::Bound::InstanceMethods  # bound_parameters
 
-    attr_reader( * Shell__.parameters.each.map(& :normalized_parameter_name ) )
+    attr_reader( * Shell__.parameters.get_names )
 
 
                                   # for after call_body_and_absorb

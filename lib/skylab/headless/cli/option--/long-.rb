@@ -2,9 +2,7 @@ module Skylab::Headless
 
   module CLI::Option__
 
-    Long_ = Headless_.lib_.old_box_lib.struct.
-
-        new :__, :no, :stem, :arg do
+    Long_ = ::Struct.new :__, :no, :stem, :arg do
 
       Headless_.lib_.pool.enhance( self ).with_lease_and_release -> do
         # this is how we construct (*not* re-init) a flyweight.
@@ -27,6 +25,14 @@ module Skylab::Headless
       def clear_for_pool
         self.no = self.stem = self.arg = nil
       end
+
+      # ~ begin thing
+
+      def at * i_a
+        i_a.map( & method( :[] ) )
+      end
+
+      # ~ end thing
     end
   end
 end
