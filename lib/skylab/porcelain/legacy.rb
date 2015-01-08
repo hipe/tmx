@@ -29,10 +29,6 @@ module Skylab::Porcelain::Legacy
       HL__[]::Name
     end
 
-    Old_box_lib = -> do
-      MH__[]::Formal::Box
-    end
-
     Proxy_lib = -> do
       Callback_::Proxy
     end
@@ -108,15 +104,22 @@ module Skylab::Porcelain::Legacy
     end
 
     def story
+
       if ! @is_collapsed
-        if ! @story.action_box.has? :help
+
+        if ! @story.action_box.has_name :help
           @story.add_action_sheet :help, Officious::Help.action_sheet
           @order_a << :help
         end
+
         the_list = @order_a & public_instance_methods( false )  # assumes 1.9!
-        sheetless = the_list - @story.action_box._order
+
+        a = @story.action_box.instance_variable_get :@a
+
+        sheetless = the_list - a
+
         if sheetless.length.nonzero?
-          sheetful = the_list & @story.action_box._order
+          sheetful = the_list & a
           sh = @story.delete_action_sheet_if_building_action_sheet
           sheetless.each do |meth|
             @story.action_sheet!
@@ -124,10 +127,11 @@ module Skylab::Porcelain::Legacy
           end
           @story.adopt_action_sheet( sh ) if sh
           # (you can deal with resorting here)
-          if the_list != @story.action_box._order && sheetful.length.nonzero?
+          if the_list != a && sheetful.length.nonzero?
             fail 'do me - resort'  # #todo
           end
         end
+
         @story.inherit_unseen_ancestor_stories  # modules may have been added
         @is_collapsed = true
       end
@@ -208,6 +212,18 @@ module Skylab::Porcelain::Legacy
                                   # data that makes up the "model" for the
                                   # interface.)
 
+    def initialize story_host_module
+      @action_box = Callback_::Box.new
+      @action_sheet = nil
+      @ancestors_seen_h = {}
+      @do_fuzzy = true  # note this isn't used internally by this class
+      @default_action_i = nil
+      @story_host_module = story_host_module
+      @actions = Actions_Facade___.new @action_box
+    end
+
+    attr_reader :actions
+
     #         ~ action-related methods ~
 
     def action_sheet!
@@ -251,10 +267,6 @@ module Skylab::Porcelain::Legacy
     end
 
     # (`accept_namespace_added` - see re-opening below)
-
-    def actions
-      @action_box.each
-    end
 
     attr_reader :action_box  # used for hacks
 
@@ -316,7 +328,7 @@ module Skylab::Porcelain::Legacy
       ambi_a = nil
       last_ambi_action = nil
       exact_found = catch :exact_found do
-        ambi_a = @action_box.reduce [] do |amb_a, (_, action)|
+        ambi_a = @action_box.to_enum( :each_value ).reduce [] do | amb_a, action |
           action.names.each do |n|
             case match[n]
             when :exact
@@ -374,47 +386,62 @@ module Skylab::Porcelain::Legacy
     end
 
     def inherit_story story
-      story.actions.each do |name, action_sheet|
-        if ! @action_box.has? name
-          @action_box.add name, action_sheet
+      story.actions.each_pair do | sym, action_sheet |
+        @action_box.touch sym do
+          action_sheet
         end
       end
       nil
     end
 
     def adapt_story story
-      story.actions.each do |name, action_sheet|
-        if ! @action_box.has? name
-          @action_box.add name, Pxy::Sheet.new( action_sheet, story )
+
+      story.actions.each_pair do | sym, action_sheet |
+        @action_box.touch sym do
+          Pxy::Sheet.new( action_sheet, story )
         end
       end
       nil
-    end
-
-  private
-
-    def initialize story_host_module
-      @story_host_module = story_host_module
-      @action_sheet = nil
-      @action_box = LIB_.old_box_lib.open_box.new
-      @action_box.enumerator_class = Action::Enumerator
-      @ancestors_seen_h = { }
-      @do_fuzzy = true  # note this isn't used internally by this class
-      @default_action_i = nil
     end
   end
 
   class Action  # used as namespace here, re-opends below as class
   end
 
-  class Action::Enumerator < LIB_.old_box_lib.enumerator  # (used by story)
+  class Actions_Facade___
+
+    def initialize bx
+      @bx = bx
+    end
 
     def [] k  # actually just fetch - will throw on bad key
-      @box_p.call.fetch k
+      @bx.fetch k
+    end
+
+    def detect & p
+      @bx.to_enum( :each_value ).detect( & p )
     end
 
     def visible
-      filter(& :is_visible )
+      @bx.to_value_stream.reduce_by do | x |
+        x.is_visible
+      end.to_enum
+    end
+
+    def map & p
+      @bx.to_value_stream.map_by( & p ).to_a
+    end
+
+    def each_value & p
+      if p
+        @bx.each_value( & p )
+      else
+        @bx.to_enum :each_value
+      end
+    end
+
+    def each_pair & p
+      @bx.each_pair( & p )
     end
   end
 
@@ -980,7 +1007,7 @@ module Skylab::Porcelain::Legacy
     end
 
     def render_actions
-      arr = self.class.story.actions.visible.reduce [] do |m, (_, sheet)|
+      arr = self.class.story.actions.visible.reduce [] do | m, sheet |
         m << "#{ kbd sheet.slug }"
       end
       "{#{ arr * '|' }}"
