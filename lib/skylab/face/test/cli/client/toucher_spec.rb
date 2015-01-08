@@ -35,14 +35,14 @@ module Skylab::Face::TestSupport::CLI::Client::Toucher
 
       it "lets you manipulate your command tree dynamically" do
         wat = client.instance_variable_get( '@mechanics' ).sheet.command_tree
-        wat._order.should eql( [:foo] )
+        wat.instance_variable_get( :@a ).should eql [ :foo ]
         invoke '-h'
         rx = /\A[ ]+([^ ]+)(?=[ ])/
         two = lines[:err][-3..-2]
         two.map do |line| rx.match( unstyle line )[ 1 ]
         end.should eql( [ 'foo', 'haxxville' ] )
         two[1].include?( '[<foo>] <bar>' ).should eql( true )  # snark
-        wat._order.should eql( [:foo, :haxxville] )
+        wat.instance_variable_get( :@a ).should eql [ :foo, :haxxville ]
       end
     end
   end

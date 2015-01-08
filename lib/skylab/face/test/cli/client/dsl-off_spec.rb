@@ -25,7 +25,7 @@ module Skylab::Face::TestSupport::CLI::Client::DSL_Off
                 end
               end
               def foo
-                @mechanics.sheet.command_tree._order
+                @mechanics.sheet.command_tree.instance_variable_get( :@a )
               end
               attr_reader :touched
             end

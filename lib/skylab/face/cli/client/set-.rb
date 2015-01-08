@@ -48,7 +48,11 @@ module Skylab::Face
       undef_method :lift_prenatals
       def lift_prenatals
         @has_prenatals = false
-        a, h = @box._raw_constituency ; existing = [] ; p_h = { }
+        a = nil ; h = nil
+        @box.instance_exec do
+          a = @a ; h = @h
+        end
+        existing = [] ; p_h = { }
         a.each do |i|
           if (( sht = h.fetch i )).is_prenatal
             p_h[ i ] = sht
@@ -61,7 +65,7 @@ module Skylab::Face
           if (( pn = p_h.delete i ))
             cs.subsume pn
             h.fetch( i ).nil? or fail "sanity"
-            @box.change i, cs
+            @box.replace i, cs
             true
           end
         end
@@ -199,16 +203,19 @@ module Skylab::Face
       def parse_xtra_node scn
         node_i, _ = scn.fetch_chunk 2
         scn.ungets  # above is a fun way to assert syntax
-        s = nil
-        @box.if? node_i, -> xs do
-          s = xs
+        sht = nil
+        @box.algorithms.if? node_i, -> xs do
+          sht = xs
         end, -> do
-          s = @node_open or begin
+          if @node_open
+            sht = @node_open
+          else
             @has_prenatals = true
-            s = @box.add node_i, Node_Sheet_.new( node_i )
+            sht = Node_Sheet_.new node_i
+            @box.add node_i, sht
           end
         end
-        s.absorb_xtra_scn scn  # for sure at least 1 left to do per above
+        sht.absorb_xtra_scn scn  # for sure at least 1 left to do per above
         nil
       end
     end

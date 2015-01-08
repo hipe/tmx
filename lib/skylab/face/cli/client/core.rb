@@ -239,7 +239,9 @@ module Skylab::Face
           # n-amespace is defined with a block (these all happen elsewhere)
           # watch for this becoming a case for two child classes of a shared
           # base class..
-          @box = LIB_.open_box
+
+          @box = Callback_::Box.new
+
           @surface_mod = -> { surface_mod }
           @surface_mod_origin_i = :module
           @node_open = false ; @methods_need_to_be_indexed = true
@@ -263,7 +265,11 @@ module Skylab::Face
       def command_tree  # #called-by documenters, everything
         if @methods_need_to_be_indexed || @has_prenatals
           black_a, white_h = @scooper.get_black_a_and_white_h
-          existing, add, flush = @has_prenatals ? lift_prenatals : [@box._order]
+          existing, add, flush = if @has_prenatals
+            lift_prenatals
+          else
+            [ @box.get_names ]
+          end
           if @methods_need_to_be_indexed
             @methods_need_to_be_indexed = false
             addme = @surface_mod.call.public_instance_methods( false ) -
@@ -274,7 +280,7 @@ module Skylab::Face
             end
           end
           flush and flush[]
-          @box.sort_names_by! do |i|
+          @box.algorithms.mutate_by_sorting_name_by do | i |
             white_h.fetch i do
               raise ::KeyError, "element (n#{ }amespace?) name not found in #{
                 }order list (#{ i.inspect } in #{ white_h.keys.inspect })"
@@ -289,11 +295,11 @@ module Skylab::Face
       def close_node &blk
         n = @node_open ; @node_open = nil ; blk[ n ]
         ln = n.name.as_variegated_symbol
-        otr = @box.fetch ln do end
+        otr = @box[ ln ]
         if otr && otr.is_prenatal  # else let the error trigger
-          @box.change ln, nil  # sanity, `natalize`
+          @box.replace ln, nil  # sanity, `natalize`
           n.subsume otr
-          @box.change ln, n
+          @box.replace ln, n
         else
           @box.add ln, n
         end
@@ -309,7 +315,7 @@ module Skylab::Face
       end
 
       def if_constituent norm_i, yes, no  # #exposed-for-hacks #todo:cover
-        @box.if? norm_i, yes, no
+        @box.algorithms.if? norm_i, yes, no
       end
 
       def fetch_constituent norm_i, &no  # #called-by api facet, hacks
@@ -349,7 +355,7 @@ module Skylab::Face
         found_a = when_touched do
           @sheet.command_tree or break Empty_A_
           catch :break_two do
-            @sheet.command_tree.reduce [] do |mem, (_, node)|
+            @sheet.command_tree.to_value_stream.to_enum.reduce [] do |mem, node|
               num = node.all_aliases.reduce 0 do |m, nm|
                 if given == nm
                   throw :break_two, ( mem.clear << node )
@@ -1182,7 +1188,7 @@ module Skylab::Face
       def expecting  # #styled
         when_touched do
           if @sheet.command_tree
-            a = @sheet.command_tree.reduce [] do |m, (_, x)|
+            a = @sheet.command_tree.to_value_stream.to_enum.reduce [] do |m, x|
               if x.is_ok and ! x.defers_invisibility  # ick, meh
                 m << "#{ hi x.name.as_slug }" if x.is_ok
               end
@@ -1234,9 +1240,10 @@ module Skylab::Face
       def argument_syntax
         @item_a = @item_w = false
         # CAREFUL! set in one place, read in one place
-        if (( bx = @sheet.command_tree ))
+        bx = @sheet.command_tree
+        if bx
           slug_a = [] ; w = 0  # reducee three things at once
-          itma = bx.reduce [] do |m, (_, sht)|
+          itma = bx.to_value_stream.to_enum.reduce [] do |m, sht|
             hot = get_hot sht
             if hot && hot.is_visible
               slug_a << (( slu = hot.name.as_slug ))

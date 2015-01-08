@@ -49,8 +49,10 @@ module Skylab::Face::TestSupport::CLI::Client::Namespace::Skip
       end
 
       it "(does thing with load failure, that we snuck in here" do
-        client.instance_variable_get(:@mechanics).sheet.command_tree._order.
-          should eql( [ :lienenkugel ] )
+
+        client.instance_variable_get(:@mechanics).sheet.command_tree.
+          instance_variable_get( :@a ).should eql( [ :lienenkugel ] )
+
         x = invoke 'lienenkugel'
         lines[:err].shift.should match( /lienenkugel.+command failed to load/i )
         x.should eql( nil )

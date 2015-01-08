@@ -30,14 +30,18 @@ module Skylab::Face
     class Proc_::Isomorphic_
 
       def execute
+
         # in theory, if the validaton of the normalization worked correctly
         # w/ re: to required fields, the below algo should be ok but note
         # it needs more testing.
+
         args = [ ] ; bx = field_box ; p_h = @param_h ; set = @keys_provided_set
-        bx._order.each do |i|
+
+        bx._order.each do | i |
           set && set.include?( i ) or next
           args << p_h[ i ]
         end
+
         @proc[ * args ]
       end
 

@@ -99,10 +99,16 @@ module Skylab::MetaHell
       end
     end
   private
-    def whn_if_not_found name, not_found_p
-      not_found_p ||= -> do raise ::NameError, say_name_not_found( name ) end
+    def whn_if_not_found k, not_found_p
+      not_found_p ||= -> do raise ::NameError, say_name_not_found( k ) end
       d = not_found_p.arity.abs
-      a = [] ; d.nonzero? and a << self ; 1 < d and a << name
+      a = []
+      if d.nonzero?
+        a.push self
+        if 1 < d
+          a.push k
+        end
+      end
       not_found_p[ * a ]
     end
     def say_name_not_found name
@@ -654,6 +660,10 @@ module Skylab::MetaHell
     end
 
     public :delete_multiple
+
+    def mutate_by_sorting_name_by & p
+      sort_names_by!( & p )
+    end
 
     def new_box_and_mutate_by_partition_at * sym_a
       bx = Callback_::Box.new

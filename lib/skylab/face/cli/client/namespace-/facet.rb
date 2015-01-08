@@ -41,7 +41,7 @@ module Skylab::Face
 
       def write_ns norm_i, yes_p, no_p  # internally used to create or update n.s
         @node_open and raise say_cant_add_namespace_to_open_command norm_i
-        @box.if? norm_i, -> nss do
+        @box.algorithms.if? norm_i, -> nss do
           updt_namespace norm_i, nss, yes_p
         end, -> _bx do
           add_ns norm_i, no_p

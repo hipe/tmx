@@ -288,7 +288,7 @@ module Skylab::Face
       def initialize host
         @host = host
         @story = nil
-        @box = LIB_.open_box
+        @box = Callback_::Box.new
       end
 
       def _dsl_dsl blk
@@ -307,10 +307,20 @@ module Skylab::Face
 
       attr_reader :box
 
-      %i| fetch [] has? if? |.each do |i|
-        define_method i do |*a, &b|
-          @box.send i, *a, &b
-        end
+      def has? i
+        @box.has_name i
+      end
+
+      def [] i
+        @box[ i ]
+      end
+
+      def fetch i, & p
+        @box.fetch i, & p
+      end
+
+      def if? * a, & p
+        @box.algorithms.if?( * a , & p )
       end
     end
   end

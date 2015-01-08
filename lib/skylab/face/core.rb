@@ -124,10 +124,6 @@ module Skylab::Face  # read [#011] the top node narrative
       Callback_::Name.via_variegated_symbol( i ).as_slug
     end
 
-    Open_box = -> do
-      MH__[]::Formal::Box.open_box.new
-    end
-
     Parse_series = -> * a do
       MH__[]::Parse.series.via_arglist a
     end

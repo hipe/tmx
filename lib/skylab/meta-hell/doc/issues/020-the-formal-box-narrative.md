@@ -34,7 +34,7 @@ focus on those features of original box that new box doesn't yet have.
                    to_struct |
                       accept |
                          add |
-                      change |
+                      change | same | replace
                sort_name_by! |
                        clear |
                   partition! |
