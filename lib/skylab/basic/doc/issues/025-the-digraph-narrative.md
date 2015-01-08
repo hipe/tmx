@@ -60,15 +60,20 @@ nodes themselves. should be same as constructing a new graph.
 
 # :#storypoint-95
 
-result is an enumerator that represently the graph "flatly" as a series of
-associations. each yield of the enumerator will have 2 values: the
-association's source and target symbols (in that order). the order that the
-associations will arrive in is based on the order of the datastructure, not
-e.g a pre-order walk (so just a loop inside a loop, not recursive). (this
-method is private in part because we anticipate possibly having named
-associations one day, in which case we might want e.g 3 params!?) also (and
+result is a stream that represents the graph "flatly" as a series of edges.
+each value the stream produces is an edge object (a copy of internal data).
+
+("edge" is a synonym for "association" in this library.)
+
+each edge has 2 values: the association's source and target symbols.
+
+the order in which these associations arrive from this stream is based
+on the order of the datastructure, not e.g a pre-order walk (so just a
+loop inside a loop, not recursive).
+
+also (and
 perhaps strangely), for orphan nodes that both have no outgoing associations
 of their own and are not pointed to by an association, they will each also
-have representation in this enumeration, presented as a yield with the second
+have representation in this enumeration, presented as a edge with the target
 element being nil. for now we expend memory in order to present orphans in
 their original order with respect to non-orphan nodes, but this may change.

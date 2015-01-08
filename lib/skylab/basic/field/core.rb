@@ -27,15 +27,13 @@ module Skylab::Basic
       end
     end
 
-  class Box__ < Basic_.lib_.old_box_lib.open_box
+  class Box__
 
     class << self
 
       def [] * a
         bx = new
-        a.each do |fld|
-          bx.accept fld
-        end
+        bx._init_via_fields a
         bx
       end
 
@@ -64,7 +62,62 @@ module Skylab::Basic
 
         krnl.flush
       end
+    end  # >>
+
+    def initialize
+      @bx = Callback_::Box.new
     end
+
+    def _init_via_fields fld_a
+      fld_a.each do | fld |
+        @bx.add fld.local_normal_name, fld
+      end ; nil
+    end
+
+    # ~ don't subclass box ever. but the below might be a good case for etc.
+
+    def length
+      @bx.length
+    end
+
+    def to_name_stream
+      @bx.to_name_stream
+    end
+
+    def to_value_stream
+      @bx.to_value_stream
+    end
+
+    def each_value & p
+      @bx.each_value( & p )
+    end
+
+    def each_pair & p
+      @bx.each_pair( & p )
+    end
+
+    def at * a
+      @bx.at( * a )
+    end
+
+    def which & p
+      @bx.to_value_stream.reduce_by do | fld |
+        p[ fld ]
+      end.to_enum
+    end
+
+    def fetch k, & p
+      @bx.fetch k, & p
+    end
+
+    def accept_field fld
+      @bx.add fld.local_normal_name, fld
+    end
+
+    def add i, x
+      @bx.add i, x
+    end
+
   end  # ..
 
   Shell__ = Basic_.lib_.enhancement_shell %i(
@@ -178,7 +231,7 @@ module Skylab::Basic
       ::Class.new( base ).class_exec do
         box.frozen? or box = box.dup.freeze  #  ( we don't need `dupe` )
         const_set :FIELDS_, box
-        box.each do |fld|
+        box.each_value do |fld|
           fld.enhance self
         end
         def initialize( (*x_a), depth=1 )
@@ -212,7 +265,7 @@ module Skylab::Basic
         bx = Box__.new
         field_a.each do | x |
           fld = make_field x, depth
-          bx.accept fld
+          bx.accept_field fld
         end
         bx
       end
@@ -231,7 +284,7 @@ module Skylab::Basic
       reason = if fields.length.zero?
         "this nerk takes no #{ field }s"
       else
-        "expecting #{ fields.names.map { |y| "\"#{ y }\""} * ' or ' }"
+        "expecting #{ fields.to_name_stream.map_by{ |x_| "\"#{ x_ }\"" }.to_a * ' or ' }"
       end
       [ ::KeyError,
         "no such #{ field } \"#{ x }\" - #{ reason } (#{ self.class }) " ]

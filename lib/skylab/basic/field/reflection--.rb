@@ -65,7 +65,7 @@ module Skylab::Basic
 
           include Instance_Methods__
 
-          host::METAFIELDS_.each do |mf|
+          host::METAFIELDS_.each_value do | mf |
             mf.is_reflective or next
             i = mf.binary_predicate or next
 

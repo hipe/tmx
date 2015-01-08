@@ -11,7 +11,7 @@ module Skylab::Face
       def execute
         @short_h = { }
         @opt_box = LIB_.box.new
-        @field_box.values.each do |fld|
+        @field_box.to_value_stream.each do | fld |
           fld.is_required and next
           opt = build_option_with_resolved_short_and_long fld
           fld.has_desc and add_desc opt, fld

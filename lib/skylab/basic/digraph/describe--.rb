@@ -13,7 +13,7 @@ module Skylab::Basic
       def initialize g, x_a
         process_iambic_stream_fully iambic_stream_via_iambic_array x_a
         nilify_uninitialized_ivars
-        @associations = g.send :node_assctns
+        @association_st = g.to_node_edge_stream_
         init_IO
         @is_first_line = true  # (write the newlines at the beginning not end for reasons)
         @sep = @do_spaces ? ARROW__ : ARW__
@@ -49,9 +49,13 @@ module Skylab::Basic
       end
     public
       def execute
-        @associations.each do |source_i, target_i|
+        st = @association_st
+        assoc = st.gets
+        while assoc
+          source_i, target_i = assoc.to_a
           target_i && @do_solos and @see_target_i_p[ target_i ]
           write_line "#{ source_i }#{ "#{ @sep }#{ target_i }" if target_i }"
+          assoc = st.gets
         end
         @is_first_line and write_line "# (empty)"
           # i don't love this, but you could always check `node_count`

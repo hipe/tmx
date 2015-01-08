@@ -7,13 +7,13 @@ rewritten for reasons. the below is a feature comparison table with a
 focus on those features of original box that new box doesn't yet have.
 
                 feature name | orig | new
-                      length | same
+                      length | same | length
                        count | same
-                   get_names | same
+                   get_names | same | same
                         has? | same | has_name
-                         if? | same | ...
-                        each | same
-                   each_pair | same
+                         if? | same | [algorithms]
+                        each | same | each_pair
+                   each_pair | same |
                       detect |
                     defectch |
                       filter |

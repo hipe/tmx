@@ -63,10 +63,6 @@ module Skylab::Basic
       HL__[].expression_agent.NLP_EN_agent
     end
 
-    Old_box_lib = -> do
-      MH__[]::Formal::Box
-    end
-
     Oxford_or = -> a do
       Callback_::Oxford_or[ a ]
     end

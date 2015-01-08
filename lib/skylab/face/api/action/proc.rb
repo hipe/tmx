@@ -37,7 +37,7 @@ module Skylab::Face
 
         args = [ ] ; bx = field_box ; p_h = @param_h ; set = @keys_provided_set
 
-        bx._order.each do | i |
+        bx.to_name_stream.each do | i |
           set && set.include?( i ) or next
           args << p_h[ i ]
         end

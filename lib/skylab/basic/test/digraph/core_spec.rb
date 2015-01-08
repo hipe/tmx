@@ -50,7 +50,7 @@ module Skylab::Basic::TestSupport::Digraph::Core
       d
     end
 
-    context "there are Formal::Box-like accessors you can use:" do
+    context "there are box-like accessors you can use:" do
 
       it "did you know that you can use `has?`" do
         d = Basic_::Digraph[ :mineral, dog: :animal ]
@@ -60,7 +60,7 @@ module Skylab::Basic::TestSupport::Digraph::Core
       end
 
 
-      it "you can use `names` like a Formal::Box - (is there even a flower called a `bedillia`?)" do
+      it "you can use `names` (is there even a flower called a `bedillia`?)" do
         d = plant[]
         names = d.names
         names.should eql([:plant, :flower, :bedillia])

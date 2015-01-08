@@ -51,7 +51,8 @@ module Skylab::Basic::TestSupport::Field
 
         mod1 = self.Mod_1
         box = mod1.field_box
-        box.names.should eql( %i( hacking working family ) )
+        box.to_name_stream.to_a.should eql(
+          %i( hacking working family ) )
 
       end
 
@@ -77,10 +78,10 @@ module Skylab::Basic::TestSupport::Field
 
       it "model integrity is asserted - you must declare all metafields" do
 
+        _rx = /no such meta-field "required" - expecting "gadzooks/i
         -> do
           self.Mod_2
-        end.should raise_error( ::KeyError,
-                     /no such meta-field "required" - expecting "gadzooks/i )
+        end.should raise_error( ::KeyError, _rx )
       end
 
       define_sandbox_constant :Mod_2_2 do
@@ -92,11 +93,10 @@ module Skylab::Basic::TestSupport::Field
       end
 
       it "model integrity errors can happen in the n-th dimension" do
+        _rx = /no such meta-meta-field "merbles"/i
         -> do
           self.Mod_2_2
-        end.should raise_error( ::KeyError,
-                             /no such meta-meta-field "merbles"/i )
-
+        end.should raise_error( ::KeyError, _rx )
       end
     end
 

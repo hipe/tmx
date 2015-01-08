@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  class Digraph
+  class Digraph  # see [#025]
 
     # relevant: http://en.wikipedia.org/wiki/Tree_(data_structure)
 
@@ -40,7 +40,7 @@ module Skylab::Basic
     def init_copy normalized_local_node_name, associations
       @normalized_local_node_name = normalized_local_node_name
       @has_associations = if associations
-        @associations = associations.send :dupe
+        @associations = associations.dup
         true
       else
         false
@@ -52,21 +52,21 @@ module Skylab::Basic
 
     def absorb_association name_i
       @has_associations ||= true
-      @associations ||= Basic_.lib_.old_box_lib.open_box.new
-      @associations.has? name_i or @associations.add name_i, true
+      @associations ||= Callback_::Box.new
+      @associations.touch name_i do true end
       nil
     end
 
     def direct_association_targets_include name_i
-      @has_associations and @associations.has? name_i
+      @has_associations and @associations.has_name name_i
     end
 
     def direct_association_target_names
-      @has_associations and @associations.names
+      @has_associations and @associations.get_names
     end
 
     def has_association_to name_i
-      @has_associations and @associations.has? name_i
+      @has_associations and @associations.has_name name_i
     end
 
     attr_reader :normalized_local_node_name
@@ -81,7 +81,7 @@ module Skylab::Basic
     end
 
     def initialize
-      @order = [] ; @hash = {}  # #open [#033]
+      @a = [] ; @h = {}  # #open [#033]
       @node_class ||= Basic_::Digraph.node_class
     end
 
@@ -94,15 +94,15 @@ module Skylab::Basic
     end
   protected
     def get_args_for_copy
-      [ @order, @hash, @node_class ]
+      [ @a, @h, @node_class ]
     end
   private
     def init_copy order, hash, node_class
-      @order = order.dup ; h = { }
+      @a = order.dup ; h = { }
       hash.each_pair do |k, v|
         h[ k ] = v.dupe
       end
-      @hash = h
+      @h = h
       @node_class = node_class ; nil
     end
     # ~
@@ -112,7 +112,7 @@ module Skylab::Basic
     # ~ non-mutating (i.e inspection & retrieval)
 
     def length
-      @order.length
+      @a.length
     end
 
     def describe_digraph * x_a
@@ -120,11 +120,11 @@ module Skylab::Basic
     end
 
     def fetch name_i, &b
-      @hash.fetch name_i, &b
+      @h.fetch name_i, &b
     end
 
     def has? name_i
-      @hash.key? name_i
+      @h.key? name_i
     end
 
     def x_is_kind_of_y x, y
@@ -140,11 +140,11 @@ module Skylab::Basic
     end ; private :walk_from_d_x_to_y_detect_equal_key
 
     def names
-      @order.dup
+      @a.dup
     end
 
     def node_count
-      @order.length
+      @a.length
     end
 
     # ~ tree-walking enumerators
@@ -176,7 +176,10 @@ module Skylab::Basic
 
     def invert  # #storypoint-35
       order = [ ] ; assoc = { }
-      node_assctns.each do |source, target|
+      st = to_node_edge_stream_
+      edge = st.gets
+      while edge
+        source, target = edge.to_a
         if target
           assoc.fetch target do
             order << target
@@ -186,6 +189,7 @@ module Skylab::Basic
           assoc[ source ] = nil  # this will bork above unless callee is sound
           order << source  # ! (just like original)
         end
+        edge = st.gets
       end
       _build order, assoc
     end
@@ -203,7 +207,7 @@ module Skylab::Basic
       end
       # build a sub-graph wherein you don't include any nodes on the list
       order = [ ] ; assoc = { }
-      @order.each do |key|
+      @a.each do |key|
         if ! extent_h[ key ]
           node = fetch key
           aa = nil
@@ -235,7 +239,7 @@ module Skylab::Basic
       if pred_h
         target_a = Predicate__.new( pred_h ).target_a
         do_absorb = true
-      elsif ! @hash.key? name_i
+      elsif ! @h.key? name_i
         do_absorb = true
       end
       do_absorb and absorb_node name_i, target_a, nil ; nil
@@ -299,55 +303,76 @@ module Skylab::Basic
     end
 
     def absorb_node name_i, target_a=nil, accum=nil  # #storypoint-75
-      if ! @hash.key? name_i
+      if ! @h.key? name_i
         node = @node_class.new name_i
-        @order << name_i
-        @hash[ name_i ] = node
+        @a.push name_i
+        @h[ name_i ] = node
         accum and accum << name_i
       end
       if target_a
         target_a.each do |tsym|
-          absorb_node( tsym, nil, accum ) if ! @hash.key? tsym
-          @hash[ name_i ].absorb_association tsym
+          absorb_node( tsym, nil, accum ) if ! @h.key? tsym
+          @h[ name_i ].absorb_association tsym
         end
       end ; nil
     end
 
     def clear  # #storypoint-85
-      @hash.clear ; @order.clear ; nil
+      @h.clear ; @a.clear ; nil
     end
 
-  private
+    def to_node_edge_stream_  # #storypoint-95
 
-    def node_assctns  # #storypoint-95
-      ::Enumerator.new do |y|
-        source_a = [] ; target_a = [] ; targeted_h = { } ; orphan_a = []
-        @order.each do |key|
-          node = @hash.fetch key
+      p = -> do
+        source_a = []
+        target_a = []
+        targeted_h = {}
+        orphan_a = []
+
+        @a.each do | k |
+          node = @h.fetch k
           cx = node.direct_association_target_names
           if cx and cx.length.nonzero?
-            cx.each do |k|
-              source_a << key
-              target_a << k
-              targeted_h[k] = true
+            cx.each do | k_ |
+              source_a.push k
+              target_a.push k_
+              targeted_h[ k_ ] = true
             end
           else
-            orphan_a << source_a.length
-            source_a << key
-            target_a << nil
+            orphan_a.push source_a.length
+            source_a.push k
+            target_a.push nil
           end
         end
-        while index = orphan_a.pop
+
+        index = orphan_a.pop
+        while index
           if targeted_h[ source_a[ index ] ]
             source_a[ index, 1 ] = EMPTY_A_
             target_a[ index, 1 ] = EMPTY_A_
           end
+          index = orphan_a.pop
         end
-        ( 0 ... source_a.length ).each do |idx|
-          y.yield source_a[ idx ], target_a[ idx ]
-        end ; nil
+
+        num_times = source_a.length
+        d = -1; last = num_times - 1
+        p = -> do
+          if d < last
+            d += 1
+            Edge___.new source_a[ d ], target_a[ d ]
+          end
+        end
+        p[]
+      end
+
+      Callback_.stream do
+        p[]
       end
     end
+
+    Edge___ = ::Struct.new :source_symbol, :target_symbol
+
+  private
 
     def _build order, assoc
       new = self.class.new
@@ -362,7 +387,7 @@ module Skylab::Basic
   public
 
     def _a
-      @order
+      @a
     end
   end
 end
