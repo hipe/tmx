@@ -300,25 +300,34 @@ module Skylab::Snag
 
     def open message=nil, param_h
       # for fun we do a tricky dynamic syntax
-      pbox = Snag_.lib_.old_box_lib.open_box.via_hash param_h ; param_h = nil
+
+      pbox = Callback_::Box.allocate.instance_exec do
+        @a = param_h.keys ; @h = param_h ; self
+      end
+      param_h = nil
+
       msg_p = -> is_opening do                   # i hope you enjoyed this
         a_b = [ 'opening issues', 'listing open issues' ]
         is_opening and a_b.reverse!
         expression_agent.calculate do
-          _s_a = pbox.names.map { |i| par i }
+
+          _s_a = pbox.to_name_stream.map_by do | sym |
+            par sym
+          end.to_a
+
           "sorry - #{ and_ _s_a } #{ s :is } #{
            }used for #{ a_b.first}, not #{ a_b.last }"
         end
       end
       r = if message
-        bx = pbox.partition_where_name_in! :dry_run, :be_verbose
+        bx = pbox.algorithms.new_box_and_mutate_by_partition_at :dry_run, :be_verbose
         if pbox.length.zero?
           opn_node bx, message
         else
           receive_error_line msg_p[ true ]
         end
       else
-        bx = pbox.partition_where_name_in! :max_count, :be_verbose
+        bx = pbox.algorithms.new_box_and_mutate_by_partition_at :max_count, :be_verbose
         if pbox.length.zero?
           rdc_nodes bx
         else
@@ -336,7 +345,7 @@ module Skylab::Snag
 
     def opn_node bx, message
       bx.add :working_dir, working_directory_path
-      _h = bx.to_hash.merge! do_prepend_open_tag: true, message: message
+      _h = bx.algorithms.to_hash.merge! do_prepend_open_tag: true, message: message
       call_API [ :nodes, :add ], _h, -> o do
         o.on_error_event handle_inside_error_event
         o.on_error_string handle_error_string
@@ -348,10 +357,21 @@ module Skylab::Snag
     end
 
     def rdc_nodes bx
+
       bx.add :working_dir, working_directory_path
-      bx.has?( :be_verbose ) or bx.add :be_verbose, false  # decide dflt here
+
+      if bx[ :be_verbose ].nil?
+
+        # whether or not the box has this entry, establish that it is false
+        # not nil in these cases, so the API doesn't put its own default in.
+        # (API defaults to verbose as true for some reason).
+
+        bx.set :be_verbose, false
+
+      end
+
       bx.add :query_sexp, [ :and, [ :has_tag, :open ] ]
-      call_API [ :nodes, :reduce ], bx.to_hash, -> o do
+      call_API [ :nodes, :reduce ], bx.algorithms.to_hash, -> o do
         o.on_error_event handle_inside_error_event
         o.on_error_string handle_error_string
         o.on_info_event handle_inside_info_event

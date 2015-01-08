@@ -265,6 +265,7 @@ module Skylab::MetaHell
 
     # ~ methods that produce new box-like non-boxes ( & support )
 
+    # :+#algorithm
     def to_hash
       @hash.dup
     end
@@ -402,6 +403,7 @@ module Skylab::MetaHell
       end
     end
 
+    # :+#algorithm
     def partition_where_name_in! *name_a  # convenience wrapper - slice out sub-box
       partition! do |k, _|        # composed of any of the members whose name
         name_a.include? k         # is in the list of names. mutates receiver
@@ -653,6 +655,19 @@ module Skylab::MetaHell
 
     public :delete_multiple
 
+    def new_box_and_mutate_by_partition_at * sym_a
+      bx = Callback_::Box.new
+      sym_a.each do | sym |
+        if @hash.key? sym
+          _x = @hash.delete sym
+          @order[ @order.index( sym ), 1 ] = EMPTY_A_
+        else
+          _x = nil
+        end
+        bx.add sym, _x
+      end
+      bx
+    end
   end
 
   class Formal::Box  # just be careful

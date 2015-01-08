@@ -104,10 +104,6 @@ module Skylab::Snag
       HL__[]::Model::Event.apply_on_client mod
     end
 
-    Old_box_lib = -> do
-      MH__[]::Formal::Box
-    end
-
     Patch_lib = -> do
       System[].patch
     end
