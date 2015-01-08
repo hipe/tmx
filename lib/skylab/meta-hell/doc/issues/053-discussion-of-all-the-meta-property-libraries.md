@@ -82,6 +82,16 @@ hooks?          |             no way    | you can write some | an overwrought
                                         | metaprops come in  | m.p's come
 
 
+## a detailed shootout
+
+
+entity name          | [#mh-024] |
+has mprops?          | yes       |
+avoids native hashes | no        |
+uses iambics in DSL  | no        |
+has edit sessions    | no        |
+
+
 
 
 

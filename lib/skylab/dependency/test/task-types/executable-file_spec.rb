@@ -15,11 +15,15 @@ module Skylab::Dependency::TestSupport::Tasks
     end
 
     context "with empty build args" do
+
       let(:build_args) { { } }
+
       it "raises an exception complaining of missing required attributes" do
-        ->(){ subject.invoke }.should raise_error(
-          /missing required attribute: executable_file/
-        )
+
+        _rx = /missing required attribute: executable_file/
+        -> do
+          subject.invoke
+        end.should raise_error _rx
       end
     end
 

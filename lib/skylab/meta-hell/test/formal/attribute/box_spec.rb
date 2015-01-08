@@ -24,27 +24,35 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute::Box
       end
 
       it "like so" do
-        ea = subject.with :flavor
-        ea.should be_respond_to( :filter )
+
+        ea = subject.that_have :flavor
+
         a = ea.to_a
-        a.length.should eql(3)
-        a.map(&:local_normal_name).should eql( [:one, :three, :four] )
-        box = ea.select { |x| x[:flavor] }
+        a.length.should eql 3
+
+        a.map( & :local_normal_name ).should eql [ :one, :three, :four ]
+
+        box = ea.select do |x|
+          x[ :flavor ]
+        end
+
         box.length.should eql( 2 )
       end
     end
 
     context "`select` - " do
+
       memoize :box, -> do
+
         st = ::Struct.new :name, :ready, :flavor
+
         box = MetaHell_::Formal::Attribute::Box.new
-        class << box
-          public :add
-        end
+
         box.add :one,   st[ :foo,   true, :bland ]
         box.add :two,   st[ :bar,   false ]
         box.add :three, st[ :baz,   true,  :spicy ]
         box.add :four,  st[ :boffo, false, nil ]
+
         box
       end
 
@@ -54,21 +62,21 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute::Box
         x.length.should eql( 2 )
       end
 
-      it "select then each with 2 args" do
+      it "select then each pair" do
         ks = [] ; vs = []
-        box.select( &:ready ).each do |k, v|
+        box.select( & :ready ).each_pair do |k, v|
           ks << k ; vs << v
         end
-        ks.should eql( [:one, :three] )
-        vs.first.flavor.should eql( :bland )
+        ks.should eql [ :one, :three ]
+        vs.first.flavor.should eql :bland
       end
 
-      it "select then each with 1 arg" do
+      it "select then each value" do
         xs = []
-        box.select(& :ready ).each do |x|
+        box.select( & :ready ).each_value do |x|
           xs << x
         end
-        xs.first.flavor.should eql( :bland )
+        xs.first.flavor.should eql :bland
       end
 
       it "select then map NEAT" do

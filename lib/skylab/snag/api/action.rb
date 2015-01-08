@@ -81,24 +81,39 @@ module Skylab::Snag
     end
 
     def bork_on_unexpected_params
+
       xtra_a = @param_h.keys.reduce nil do |m, i|
-        @formal.has? i or ( m ||= [] ).push i ; m
+        if ! @formal.has_name i
+          m ||= []
+          m.push i
+        end
+        m
       end
-      ! xtra_a or begin
+
+      if xtra_a
         send_error_string say_extra xtra_a
         UNABLE_
+      else
+        ACHIEVED_
       end
     end
 
     def mutate_param_h_with_defaults_else_set_the_ivars_to_nil
-      @formal.each_pair do |i, prop|
+
+      @formal.each_pair do | i, prp |
+
         ivar = :"@#{ i }"
-        if prop.has?( :default ) && @param_h[ i ].nil?
-          @param_h[ i ] = prop[ :default ]
+
+        if prp.has_name :default and @param_h[ i ].nil?
+
+          @param_h[ i ] = prp[ :default ]
+
         elsif ! instance_variable_defined? ivar
           instance_variable_set ivar, nil
         end
       end
+
+      nil
     end
 
     def check_for_missing_required_params

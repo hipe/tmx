@@ -8,6 +8,23 @@ module Skylab::Basic  # introduction at [#020]
       Default_property_instance__[]
     end
 
+    def dup_mixed x
+      if x
+        if x.respond_to? :dupe
+          x.dupe
+        else
+          case x
+          when ::TrueClass, ::Symbol, ::Numeric
+            x
+          else
+            x.dup
+          end
+        end
+      else
+        x
+      end
+    end
+
     def lib_
       @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
         self::Lib_, self )

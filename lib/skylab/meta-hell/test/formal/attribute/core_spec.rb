@@ -21,7 +21,7 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute
         attribute :foo
         attribute :bar
       end
-      klass.attributes.names.to_set.should eql([:bar, :foo].to_set)
+      klass.attributes.get_names.to_set.should eql([:bar, :foo].to_set)
     end
 
     context "when dealing with class inheritance" do
@@ -41,7 +41,7 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute
       end
 
       it "inherits the reflection" do
-        klass_b.attributes.names.to_set.should eql([:foo, :bar].to_set)
+        klass_b.attributes.get_names.to_set.should eql([:foo, :bar].to_set)
       end
     end
 
@@ -96,14 +96,14 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute
         end
 
         it "as here" do
-          klass_b.meta_attributes.names.to_set.should eql([:height, :weight].to_set)
+          klass_b.meta_attributes.get_names.to_set.should eql([:height, :weight].to_set)
         end
 
         it "but adding things to the parent dynamically won't inherit" do
           klass_a.meta_attribute :age
-          klass_b.meta_attributes.names.to_set.should eql([:height, :weight, :age].to_set)
+          klass_b.meta_attributes.get_names.to_set.should eql([:height, :weight, :age].to_set)
           klass_a.meta_attribute :volume
-          klass_b.meta_attributes.names.to_set.should eql([:height, :weight, :age].to_set)
+          klass_b.meta_attributes.get_names.to_set.should eql([:height, :weight, :age].to_set)
         end
       end
 
@@ -130,7 +130,7 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute
 
           who, hah = klass_b.touched.first
           who.should eql :wankers
-          hah.names.should eql([:whoopie])
+          hah.get_names.should eql([:whoopie])
           hah[:whoopie].should eql(:nerp)
           obj = klass_b.new
           obj.wankers = 'derp'

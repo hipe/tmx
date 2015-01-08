@@ -1,6 +1,6 @@
 module Skylab::MetaHell
 
-  class Formal::Attribute < Formal::Box  # read [#024] the form. #storypoint-5
+  class Formal::Attribute < Callback_::Box # read [#024] the form. #storypoint-5
 
     module Definer
 
@@ -76,7 +76,7 @@ module Skylab::MetaHell
     end
 
     def attribute i, matr_h=nil  # #storypoint-15
-      exist = attributes.fetch i do end
+      exist = attributes[ i ]
       delta = atr_metadata_class.new i
       if matr_h
         if exist
@@ -86,8 +86,12 @@ module Skylab::MetaHell
         end
       end
       exist or merge_defaults_into_delta delta
-      (( a = delta._order - self.meta_attributes._order )).length.zero? or
-        raise say_matr_not_declared( a )
+
+     a = delta.a_ - self.meta_attributes.a_
+     if a.length.nonzero?
+       raise say_matr_not_declared a
+     end
+
       if exist
         exist.merge! delta
       else
@@ -95,7 +99,8 @@ module Skylab::MetaHell
         exist = delta
       end
       delta.each_pair do |k, v|
-        respond_to?(( m_i = :"on_#{ k }_attribute" )) or next
+        m_i = :"on_#{ k }_attribute"
+        respond_to? m_i or next
         prcss_hook exist, i, k, m_i
       end ; nil
     end
@@ -157,8 +162,11 @@ module Skylab::MetaHell
       cls = anc_a.detect do |anc|
         ::Class === anc and anc.respond_to? meth_i
       end
-      if cls and (( x = cls.send meth_i ))
-        x.dupe
+      if cls
+        x = cls.send meth_i
+      end
+      if x
+        x.dup
       else
         else_p[]
       end
@@ -169,9 +177,9 @@ module Skylab::MetaHell
     end
 
     def merge_defaults_into_delta atr_delta_metadata
-      meta_attributes.each do |k, ma|
+      meta_attributes.each_pair do | k, ma |
         if ma.has_default
-          if ! atr_delta_metadata.has? ma.local_normal_name
+          if ! atr_delta_metadata.has_name ma.local_normal_name
             atr_delta_metadata.add_dflt ma.local_normal_name, ma.default_value
           end
         end
@@ -224,7 +232,7 @@ module Skylab::MetaHell
         include mod::InstanceMethods
       matrs = meta_attributes
       mod.meta_attributes.each_pair do |i, matr|
-        respond_to?( matr.hook_name ) || matrs.has?( i ) and
+        respond_to?( matr.hook_name ) || matrs.has_name( i ) and
           fail "implement me: decide clobber behavior"
         p = matr.hook_p
         p and define_singleton_method matr.hook_name, p
@@ -321,7 +329,11 @@ module Skylab::MetaHell
     end
   end
 
-  class Formal::Attribute::Matrs__ < Formal::Box  # #storypoint-50
+  class Formal::Attribute::Matrs__ < Callback_::Box  # #storypoint-50
+
+    def a_  # read only!
+      @a
+    end
 
     def touch_matr_w_hash h  # mutates
       name_i = h.delete(:_unsanitized_name) or raise ::ArgumentError, say_no_nm
@@ -345,22 +357,17 @@ module Skylab::MetaHell
   public
 
     def touch_matr_w_nm atr_i
-      if? atr_i, IDENTITY_, method( :crt_and_add_matr_with_name )
+      touch atr_i do
+        Formal::Attribute::Matr__.new atr_i
+      end
     end
-  private
-    def crt_and_add_matr_with_name _self, atr_i
-      matr = Formal::Attribute::Matr__.new atr_i
-      add matr.local_normal_name, matr
-      matr
-    end
-  public
 
     def accept_matr matr
       add matr.local_normal_name, matr ; nil
     end
   end
 
-  class Formal::Attribute < Formal::Box  # #storypoint-60
+  class Formal::Attribute  #re-open, is a Box subclass  # #storypoint-60
 
     def initialize local_normal_name
       local_normal_name.respond_to?( :id2name ) or self._sanity_
@@ -369,6 +376,10 @@ module Skylab::MetaHell
     end
 
     attr_reader :local_normal_name
+
+    def a_  # read only!
+      @a
+    end
 
     def reader_method_name
       @local_normal_name
@@ -383,23 +394,32 @@ module Skylab::MetaHell
     end
 
     def is? i
-      self[ i ] if has? i
+      if has_name i
+        self[ i ]
+      end
     end
 
     def merge! enum_x  # #storypoint-75
-      enum_x.each do |k, v|
-        if? k,
-          -> x { change k, v },
-          -> { add k, v }
+      enum_x.each_pair do |k, v|
+        set k, v
       end
       nil
     end
 
-    def merge_against! enum_x, compare
-      enum_x.each do |k, v|
-        compare.if? k,
-          -> x { add( k, v ) if x != v },  # will crap out on clobber! #todo
-          -> { add k, v }
+    def merge_against! enum_x, compare  # will crap out on clobber! #todo
+
+      o = compare.algorithms
+
+      enum_x.each_pair do |k, v|
+        o.if? k,
+          -> x do
+            if x != v
+              add( k, v )
+            end
+          end,
+          -> do
+            add k, v
+          end
       end
       nil
     end
@@ -413,17 +433,26 @@ module Skylab::MetaHell
     end
 
     def add_dflt name, val
-      x = dupe_constituent_value val
-      add name, x ; nil
+      # add name, MetaHell_.lib_.basic.dup_mixed( val )
+      add name, val
     end
   end
 
-  class Formal::Attribute::Box < Formal::Box  # #storypoint-90
+  class Formal::Attribute::Box < Callback_::Box  # #storypoint-90
 
     def self.[] i_h_pair_a  # #storypoint-95
       me = new
       me.init_from_i_h_pair_a i_h_pair_a
       me
+    end
+
+    def initialize_copy _otr
+      # we need our dup to be one level deeper that what [cb] does (covered)
+      super
+      @a.each do | sym |
+        @h[ sym ] = @h.fetch( sym ).dup
+      end
+      nil
     end
 
     def init_from_i_h_pair_a i_h_pair_a
@@ -439,41 +468,87 @@ module Skylab::MetaHell
     end
 
     def meta_attribute_value_box matr_i  # #storypoint-105
-      _ea = with matr_i
-      _ea.box_map do |atr|
-        atr[ matr_i ]
+      bx = Callback_::Box.new
+      each_pair do | k, atr |
+        if atr.has_name matr_i
+          bx.add k, atr[ matr_i ]
+        end
       end
+      bx
     end
 
-    def with matr_i, & p  # #storypoint-110
-      ea = filter -> x do
-        x.has? matr_i
+    def that_have matr_i, & p  # #storypoint-110
+      ea = which do | x |
+        x.has_name matr_i
       end
       p ? ea.each( & p ) : ea
     end
 
-    alias_method :which, :filter  # #storypoint-120
+    def which & p
+
+      # we can't use simply `to_value_stream`[..]`to_enum` because
+      # the enumerator needs to be re-runnable (covered)
+
+      ::Enumerator.new do | y |
+        st = to_value_stream.reduce_by do | x |
+          p[ x ]
+        end
+        while x = st.gets
+          y.yield x
+        end
+        nil
+      end
+    end
+
+    def select & p  # covered
+
+      # argument semantics like `which`, but like ::Array#select and
+      # ::Hash#select result in an object of same class as receiver
+
+      otr = self.class.new
+      each_pair do | k, x |
+        if p[ x ]
+          otr.add k, x
+        end
+      end
+      otr
+    end
+
+    def map & p  # #only-because-covered
+      to_value_stream.map_by( & p ).to_a
+    end
+
+    def each_pair & p
+      if p
+        super
+      else
+        to_enum :each_pair
+      end
+    end
   end
 
   class Formal::Attribute
 
     def initialize_atr_spcl i, h
-      @local_normal_name = i ; @order = h.keys ; @hash = h
-      init_base nil ; nil
+      @a = h.keys
+      @local_normal_name = i
+      @h = h
+      nil
     end
 
     module Reflection_IM__
 
-      def names  # #comport to #box-API
-        attribute_definer.attributes.names
+      def get_names  # #comport to #box-API
+        attribute_definer.attributes.get_names
       end
       #
       def fetch i, &p  # #storypoint-135
 
-        if (( atr = attribute_definer.attributes.fetch( i ) { } ))
+        atr = attribute_definer.attributes.fetch( i ) { }
+        if atr
           x = send atr.reader_method_name
           did = if x.nil?
-            atr.has? :default
+            atr.has_name :default
           else
             true
           end
@@ -550,7 +625,7 @@ module Skylab::MetaHell
         @reader_p[ @atr ]
       end
 
-      %i( [] fetch has? local_normal_name ).each do |i|
+      %i( [] fetch has_name local_normal_name ).each do |i|
         define_method i do |*a, &p|
           @atr.send i, *a, &p
         end

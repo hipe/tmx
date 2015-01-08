@@ -33,14 +33,28 @@ module Skylab::Dependency
     end
 
     def valid? # [#hl-047]
-      reqd = self.class.attributes.each.map { |k, v| k if v[:required] }.compact
-      nope = reqd.select { |r| send(r).nil? }
-      if nope.any?
-        @invalid_reason = "#{name} task missing required attribute#{
-          }#{'s' if nope.length != 1}: #{nope.join(', ')}"
-        return false
+
+      _req_i_a = self.class.attributes.each_pair.reduce [] do | m, (k, atr) |
+        if atr[ :required ]
+          m.push k
+        end
+        m
       end
-      true
+
+      miss_i_a = _req_i_a.select do | k |
+        send( k ).nil?
+      end
+
+      if miss_i_a.length.zero?
+        true
+      else
+        a = miss_i_a
+
+        @invalid_reason = "#{ name } task missing required attribute#{
+          }#{ 's' if a.length != 1 }: #{ a * ', ' }"
+
+        false
+      end
     end
   end
 

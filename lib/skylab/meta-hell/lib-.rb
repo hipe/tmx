@@ -5,7 +5,7 @@ module Skylab::MetaHell
     sidesys, stdlib = Autoloader_.at :build_require_sidesystem_proc,
       :build_require_stdlib_proc
 
-    Bsc__ = sidesys[ :Basic ]
+    Basic = sidesys[ :Basic ]
 
     Bzn__ = sidesys[ :Brazen ]
 
@@ -26,7 +26,7 @@ module Skylab::MetaHell
     end
 
     List_lib = -> do
-      Bsc__[]::List
+      Basic[]::List
     end
 
     HL__ = sidesys[ :Headless ]
@@ -34,15 +34,15 @@ module Skylab::MetaHell
     IT__ = sidesys[ :InformationTactics ]
 
     Meso_box_lib = -> do
-      Bsc__[]::Box
+      Basic[]::Box
     end
 
     Module_lib = -> do
-      Bsc__[]::Module
+      Basic[]::Module
     end
 
     Mutex_lib = -> do
-      Bsc__[]::Mutex
+      Basic[]::Mutex
     end
 
     Proxy_lib = -> do
@@ -52,7 +52,7 @@ module Skylab::MetaHell
     Stdlib_set = stdlib[ :Set ]
 
     Struct_lib = -> do
-      Bsc__[]::Struct
+      Basic[]::Struct
     end
 
   end

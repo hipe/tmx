@@ -304,15 +304,13 @@ module Skylab::MetaHell
       end ]
       init_base( * args_for_base )
     end
+
     def dupe_constituent_value x  # #storypoint-270
-      if x.respond_to? :dupe
-        x.dupe
-      elsif ! x || ::TrueClass === x || ::Symbol === x || ::Numeric === x
-        x
-      else
-        x.dup
-      end
+
+      MetaHell_.lib_.basic.dup_mixed x
+
     end
+
     # ~ ~
     Formal::Box::Get_base_copy__ = -> do  # #storypoint-275
       otr = self.class.allocate

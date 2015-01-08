@@ -258,6 +258,7 @@ module Skylab::Callback
     end
 
     def initialize_copy _otr_
+      @_alogrithms = nil
       @a = @a.dup ; @h = @h.dup ; nil
     end
 
@@ -441,7 +442,7 @@ module Skylab::Callback
     end
 
     def algorithms  # ~ experimental bridge to the past
-      @__alogrithms ||= Callback_::Lib_::MH__[]::Formal::Box::Algorithms.new( @a, @h )
+      @_alogrithms ||= Callback_::Lib_::MH__[]::Formal::Box::Algorithms.new( @a, @h )
     end
 
     private def say_not_found i

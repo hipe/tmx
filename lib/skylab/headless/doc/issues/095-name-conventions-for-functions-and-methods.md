@@ -97,6 +97,13 @@ better this time.
   use is encouraged along with other conventions, in which case the word
   may get bumped off the front of the method name (`via_X_when_Y`).
 
++ `which[_..]` - general purpose prefix for something like reduce
+  on a collection. typically the only argument is a block with the
+  same semantics as ::Enumerable#select. result should be the same sort
+  of thing as a receiver, or a corelib collection object like an
+  ::Enumerator, or a ubiquitous collection object like stream or box.
+  see `that_have`
+
 + `where` - receiver is an "edit shell" (representing an interface to an
   edit session of some sort (e.g of a business entity)), this is the
   conventional method name used for that public method of the edit shell
@@ -115,6 +122,9 @@ better this time.
   this bareword name must not accept any arguments. this is a lazy method
   name - it should only be used the behavior that occurs in the method
   is exactly that as described by the name of the containing class.
+
++ `that_have` - a higher-level `which` that takes one or more symbolic
+  arguments.
 
 + `to_`, `_to_` - the second form is explicitly not defined conventionally
   here. use it as you would like to naturally. (but use `via` instead if
