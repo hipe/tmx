@@ -205,9 +205,9 @@ module Skylab::Treemap
     end
   end
 
-  class API::Action::Generic_Box < MetaHell::Formal::Box # experiment
-    public :clear
-    def [] k     ; fetch( k ) { } end
-    def []= k, v ; add k, v end
+  class API::Action::Generic_Box < Callback_::Box  # experimental
+    def []= k, x
+      add k, x
+    end
   end
 end

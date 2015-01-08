@@ -8,15 +8,13 @@ module Skylab::Treemap
 
     # (used to include old name lib instance methods)
 
-    define_method :cli_action_names do
+    def cli_action_names
       if has_cli_actions
-        MetaHell::Formal::Box::Enumerator.new( -> normalized_consumer do
+        ::Enumerator.new do
           @module::CLI::Actions.constants.each do |const|
-            nm = Callback_::Name.via_const const
-            normalized_consumer.yield nm.as_variegated_symbol, nm
-            nil
+            Callback_::Name.via_const const
           end
-        end )
+        end
       end
     end
 

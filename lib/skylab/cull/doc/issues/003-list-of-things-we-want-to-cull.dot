@@ -14,7 +14,7 @@ list of things we want to cull :[#003]
 
 */
 
-  Name
+  Name [style=filled]
   Box
   Event
   CLI
@@ -22,5 +22,7 @@ list of things we want to cull :[#003]
   Property
   Param [ label="param\nlib" ]
   Param -> Property
+
+  /* that one color of blue: fillcolor="#b5d5fb" */
 
 }

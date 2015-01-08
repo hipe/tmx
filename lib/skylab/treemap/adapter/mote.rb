@@ -15,7 +15,7 @@ module Skylab::Treemap
   end
 
 
-  class Adapter::Mote::Actions < MetaHell::Formal::Box.open_box
+  class Adapter::Mote::Actions
 
     include Treemap::Core::SubClient::InstanceMethods
 
@@ -25,33 +25,49 @@ module Skylab::Treemap
     # rest of the app should know about) has a handle on a parent client,
     # etc.
 
-    def each
-      @hot or load
-      super
-    end
-
-  private
-
     def initialize mc
       super nil  # init the box, by way of h.l s.c
       Treemap::CLI::Client === mc or fail "we need the m.c to inspect actions"
       init_treemap_sub_client -> { mc }  # init self as a s.c
       @hot = nil
+      @bx = Callback_::Box.new
     end
+
+    def each( & p )
+      @hot or load
+      @bx.each_value( & p )
+    end
+
+    # ~ mutators
+
+    def add i, bound_action
+      @bx.add i, bound_action
+      nil
+    end
+
+  private
 
     def actions_const_get const
       mode_client.actions_const_get const
     end
 
     def load
+
       mode_client.actions_box_module.constants.reduce self do |memo, const|
         action = Adapter::Mote::Action.new self, const
         memo.add action.normalized_local_action_name, action
         memo
       end # Now the box has cards for all the local (non adapter) actions.
-      adaptrs = mode_client.api_client.adapter_box.each.which(&:has_cli_actions)
-      adaptrs.reduce( self ) do |memo, (_, adapter)|
-        adapter.cli_action_names.reduce memo do |mem, (aname, nf)|
+
+      _adapters = mode_client.api_client.adapter_box.
+        to_value_stream.reduce_by( & :has_cli_actions ).to_enum
+
+      _adapters.reduce self do | memo, adaper |
+
+        adapter.cli_action_names.reduce memo do | mem, * _x |
+
+          self._FML  # look at history if you really want to fix this
+
           mem.if? aname, -> x do
             x.add_adapter adapter
           end, -> do
@@ -63,6 +79,7 @@ module Skylab::Treemap
         end
         memo
       end
+
       @hot = true
       nil
     end

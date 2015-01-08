@@ -189,7 +189,7 @@ module Skylab::Treemap
       @host = host
       @model = ::OptionParser.new              # just for gathering data..
       @flip_box, @default_box, @option_box, @more_box = 4.times.map do
-        MetaHell::Formal::Box.open_box.new
+        Callback_::Box.new
       end
       param_h = { } ; param_queue = [ ]
       @census_probe = Probe::Action.new(

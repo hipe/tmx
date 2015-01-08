@@ -127,7 +127,10 @@ module Skylab::Treemap
     def actual_parameters_box
       if @actual_parameters_box.nil?
         @actual_parameters_box = if @param_h_spent
-          MetaHell::Formal::Box.around_hash @param_h_spent  # frozen h, btw
+          h = @param_h_spent
+          Callback_::Box_.allocate.instance_exec do
+            @a = h.keys ; @h = h ; self  # h is frozen
+          end
         else
           false
         end

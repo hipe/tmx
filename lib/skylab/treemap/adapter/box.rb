@@ -1,6 +1,6 @@
 module Skylab::Treemap
 
-  class Adapter::Box < MetaHell::Formal::Box
+  class Adapter::Box < Callback_::Box
 
     def each *a
       @hot or load

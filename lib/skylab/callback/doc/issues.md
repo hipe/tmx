@@ -1,4 +1,5 @@
-[#060]       [name (the node)]
+[#061]       [the box narrative]
+[#060]       the name narrative ..
 [#059] #open #parent-node: [#044] "signal processing scans.."
 [#058]       #parent-node: [#042] methodic actor (was: [#hl-130]) :+[#mh-058]..
 [#057]       #parent-node: [#046] "the ideal mixed syntax.."

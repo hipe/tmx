@@ -287,13 +287,13 @@ module Skylab::Treemap
     def self.each &blk            # have some fun with lots of things
       @story ||= begin
         # story = Porcelain::Legacy::Story.new self
-        story = MetaHell::Formal::Box.open_box.new
+        story = Callback_::Box.new
         constants.each do |const|  # use boxxy, not necessarily loaded!
           story.add const, CLI::Action_Sheet.new( self, const )
         end
         story
       end
-      @story.each(& blk )
+      @story.each_value( & blk )
     end
   end
 end

@@ -1,5 +1,51 @@
 # the formal box narrative :[#020]
 
+## obviation path
+
+## this node is redundant with [#cb-061] which came after it and was
+rewritten for reasons. the below is a feature comparison table with a
+focus on those features of original box that new box doesn't yet have.
+
+                feature name | orig | new
+                      length | same
+                       count | same
+                   get_names | same
+                        has? | same
+                         if? | same | ...
+                        each | same
+                   each_pair | same
+                      detect |
+                    defectch |
+                      filter |
+                         map |
+                      reduce |
+                      select |
+                       which |
+                          at |
+                at_with_name |
+                to_pair_scan |
+            get_value_stream |
+                       fetch |
+           fetch_at_position |
+                       first |
+                 fuzzy_fetch |
+                      invert |
+                     to_hash |
+                   to_struct |
+                      accept |
+                         add |
+                      change |
+               sort_name_by! |
+                       clear |
+                  partition! |
+                      delete |
+             delete_multiple |
+     partition_where_name_in |
+                        `[]` |
+                        to_a |
+                      values |
+                 around_hash | hack
+
 
 ## :#storypoint-5 introduction
 
