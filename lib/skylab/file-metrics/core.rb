@@ -66,10 +66,6 @@ module Skylab::FileMetrics
 
     Face_top = Face__ = sidesys[ :Face ]
 
-    Formal_box_class = -> do
-      MH__[]::Formal::Box
-    end
-
     HL__ = sidesys[ :Headless ]
 
     Ivars_with_procs_as_methods = -> * a do
@@ -85,10 +81,6 @@ module Skylab::FileMetrics
     NLP_EN__ = memo[ -> do
       HL__[]::NLP::EN
     end ]
-
-    Open_box = -> do
-      MH__[]::Formal::Box.open_box.new
-    end
 
     Proxy_lib = -> do
       Callback_::Proxy

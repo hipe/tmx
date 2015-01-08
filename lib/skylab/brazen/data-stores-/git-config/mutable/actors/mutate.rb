@@ -27,7 +27,7 @@ module Skylab::Brazen
           body_pair_a = []
           did_see_name = false
           while pair = scn.gets
-            if NAME_ == pair.name_i
+            if NAME_ == pair.name_symbol
               did_see_name = true
               @name_x = pair.value_x
               next
@@ -128,7 +128,7 @@ module Skylab::Brazen
 
         def write_section
           @body_pair_a.each do |pair|
-            s = pair.name_i.to_s
+            s = pair.name_symbol.to_s
             if s.include? UNDERSCORE_
               pair = pair.with_name_i s.gsub( UNDERSCORE_, DASH_ ).intern
             end

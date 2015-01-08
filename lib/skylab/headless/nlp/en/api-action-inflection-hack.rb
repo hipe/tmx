@@ -129,7 +129,7 @@ module NLP::EN::API_Action_Inflection_Hack  # seed [#018].  was: [#sl-123] exemp
       end
 
       word = Callback_::Name.
-        via_const( chain[ do_hop ? -3 : -2 ].name_i ).as_human.dup
+        via_const( chain[ do_hop ? -3 : -2 ].name_symbol ).as_human.dup
 
       word.gsub! PLURAL_RX__, EMPTY_S_  # :+#singularize-hack
       NLP::EN::POS::Noun[ word ]

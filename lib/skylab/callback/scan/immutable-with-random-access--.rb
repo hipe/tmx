@@ -267,7 +267,7 @@ module Skylab::Callback
 
       def each  # where available
         if block_given?
-          scn = to_pair_scan
+          scn = to_pair_stream
           while pair = scn.gets
             yield( * @each_mapper[ pair ] )
           end
@@ -278,7 +278,7 @@ module Skylab::Callback
 
       def each_pair
         if block_given?
-          scn = to_pair_scan
+          scn = to_pair_stream
           if @each_pair_mapper
             while pair = scn.gets
               yield( * @each_pair_mapper[ pair ] )
@@ -297,7 +297,7 @@ module Skylab::Callback
         to_value_stream
       end
 
-      def to_pair_scan
+      def to_pair_stream
         to_name_scan.map_by do |i|
           Pair_.new @h.fetch( i ), i
         end

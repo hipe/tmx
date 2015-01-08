@@ -14,7 +14,7 @@ module Skylab::TanMan
       attr_reader :graph_sexp
 
       def description_under expag
-        send :"description_under_expag_when_#{ @input_arg.name_i }", expag
+        send :"description_under_expag_when_#{ @input_arg.name_symbol }", expag
       end
     private
       def description_under_expag_when_input_string expag
@@ -226,17 +226,17 @@ module Skylab::TanMan
         class << self
 
           def produce_via_argument arg
-            ftch_class_via_argument_name( arg.name_i ).build arg.value_x
+            ftch_class_via_argument_name( arg.name_symbol ).build arg.value_x
           end
 
           define_method :ftch_class_via_argument_name, ( -> do
-            p = -> name_i do
+            p = -> name_symbol do
               mod = Persist_Adapters__
               h = {}
               mod.constants.each do |i|
                 h[ i.downcase ] = mod.const_get i, false
               end
-              ( p = h.method :fetch )[ name_i ]
+              ( p = h.method :fetch )[ name_symbol ]
             end
             -> i { p[ i ] }
           end ).call

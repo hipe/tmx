@@ -155,7 +155,7 @@ module Skylab::Brazen
           pair = chain.fetch d
           mod = pair.value_x
           if ! mod.respond_to? :name_function
-            TAXONOMIC_MODULE_RX__ =~ pair.name_i and next
+            TAXONOMIC_MODULE_RX__ =~ pair.name_symbol and next
             mod.extend Name_Function_Proprietor_Methods__
           end
           parent = mod

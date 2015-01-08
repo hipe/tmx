@@ -16,8 +16,8 @@ module Skylab::Brazen
           pair = cx.to_marshal_pair
           pair or next
 
-          if UNDERSCORE_RX__ =~ pair.name_i   # note-023
-            pair.name_i = pair.name_i.id2name.gsub( UNDERSCORE_, DASH_ ).intern
+          if UNDERSCORE_RX__ =~ pair.name_symbol   # note-023
+            pair.name_symbol = pair.name_symbol.id2name.gsub( UNDERSCORE_, DASH_ ).intern
           end
 
           @pair_a.push pair

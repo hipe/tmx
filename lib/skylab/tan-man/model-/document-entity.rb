@@ -83,7 +83,7 @@ module Skylab::TanMan
           props = self.class.properties
           in_a = [] ; out_a = []
           while bound = scn.gets
-            prop = props.fetch bound.name_i
+            prop = props.fetch bound.name_symbol
             prop.respond_to? :IO_direction or next  # :+[#br-046]
             case prop.IO_direction
             when :input ; bound.value_x and in_a.push bound
@@ -119,7 +119,7 @@ module Skylab::TanMan
               :direction_i, direction_i, :arg_a, arg_a do |y, o|
             if o.arg_a.length.zero?
               _prop_a = _PROPS.reduce_by do |arg|
-                prop = _PROPS.fetch arg.name_i
+                prop = _PROPS.fetch arg.name_symbol
                 prop.respond_to? :IO_direction and direction_i == prop.IO_direction  # :+[#br-046]
               end
               _s_a = _prop_a.map do |x|
@@ -128,7 +128,7 @@ module Skylab::TanMan
               _xtra = " (provide #{ or_ _s_a })"
             else
               _s_a = arg_a.map do |arg|
-                par _PROPS.fetch arg.name_i
+                par _PROPS.fetch arg.name_symbol
               end
               _xtra = " (#{ _s_a * ', ' })"
             end

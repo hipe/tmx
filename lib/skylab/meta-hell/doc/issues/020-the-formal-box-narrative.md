@@ -10,7 +10,7 @@ focus on those features of original box that new box doesn't yet have.
                       length | same
                        count | same
                    get_names | same
-                        has? | same
+                        has? | same | has_name
                          if? | same | ...
                         each | same
                    each_pair | same
@@ -23,7 +23,7 @@ focus on those features of original box that new box doesn't yet have.
                        which |
                           at |
                 at_with_name |
-                to_pair_scan |
+                to_pair_scan | same | to_pair_stream
             get_value_stream |
                        fetch |
            fetch_at_position |

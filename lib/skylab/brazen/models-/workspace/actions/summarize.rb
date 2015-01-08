@@ -55,7 +55,7 @@ module Skylab::Brazen
       def bld_summary_event
         build_OK_event_with :summary, :box, @box, :ws, @ws do |y, o|
           y << "summary of #{ o.ws.description_under self }:"
-          scn = o.box.to_pair_scan
+          scn = o.box.to_pair_stream
           count = 0
           while pair = scn.gets
             count += 1

@@ -90,7 +90,7 @@ module Skylab::FileMetrics
       nil
     end
 
-    class Design_ < LIB_.formal_box_class
+    class Design_
 
       # `Table::Render::Design_` -
       # An immutable encapsulation of the visual design of a particular table.
@@ -100,6 +100,21 @@ module Skylab::FileMetrics
       # any function for the rendering of each data ("body") cel for that field,
       # and likewise any function for the rending of that field in any summary
       # row(s).
+
+      def initialize design_x
+        a = [] ; h = {}
+        @bx = Callback_::Box.allocate.instance_exec do
+          @a = a ; @h = h
+          self
+        end
+        @order = a ; @hash = h
+        __receive_design design_x
+        nil
+      end
+
+      def to_a
+        @bx.to_value_stream.to_a
+      end
 
       def prerender_header_row
         @order.map do |sym|
@@ -225,10 +240,7 @@ module Skylab::FileMetrics
 
     private
 
-      # `initialize` a grandiose function that builds an immutable structure
-
-      def initialize design_x
-        super( & nil )
+      def __receive_design design_x
 
         process_fields = process_field = process_the_rest = nil
 
@@ -271,7 +283,8 @@ module Skylab::FileMetrics
                             hsh.each_pair do |k, v| fld[ k ] = v end
                           end ] }
             -> symbol, *x_a do
-              if @hash.key? symbol
+
+              if @bx.has_name symbol
                 fail "merge is not implemented - #{ symbol }"
               else
                 state = state_h.fetch :initial
@@ -285,8 +298,10 @@ module Skylab::FileMetrics
                   state.act[ fld, x ]
                   fld
                 end
-                @order << symbol  # `is_noop` must be processed after `rest`
-                @hash[ symbol ] = field
+
+                @bx.add symbol, field
+                  # `is_noop` must be processed after `rest`
+
               end
               nil
             end
@@ -297,7 +312,7 @@ module Skylab::FileMetrics
 
         sra = nil
         process_field = -> sym do
-          fetch sym  # sanity
+          @bx.fetch sym  # sanity
           Field__::Shell.new(
             summary: -> x, y=nil do
               sra ||= [ { } ]
@@ -339,7 +354,9 @@ module Skylab::FileMetrics
         end.call
 
         -> do  # add the rest / CAUTION box hacking! / `rest` node deleted after
-          (name,) = defectch -> k, v { v.is_rest }, -> { }
+
+          (name,) = @bx.algorithms.defectch -> k, v { v.is_rest }, EMPTY_P_
+
           if name && the_rest
             xtra_a = the_rest - @order
             if xtra_a.length.nonzero?
@@ -351,13 +368,25 @@ module Skylab::FileMetrics
           end
         end.call
 
-        del_a = reduce nil do |x, (nm, fld)|
-          ( x ||= [ ] ) << nm if fld.is_noop || fld.is_rest
-          x
+        del_a = @bx.to_pair_stream.to_enum.reduce nil do | m, pair |
+
+          fld, sym = pair.to_a
+
+          if fld.is_noop || fld.is_rest
+            m ||= []
+            m.push sym
+          end
+          m
         end
-        del_a and delete_multiple( del_a )
+
+        if del_a
+          @bx.algorithms.delete_multiple del_a
+        end
+
         nil
       end
+
+      EMPTY_P_ = -> {}
 
         # `Table::Render::Design_::Shell_` - the shell is the ..er..
         # shell through which we express how we want to create the

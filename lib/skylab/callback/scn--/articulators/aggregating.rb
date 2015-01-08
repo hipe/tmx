@@ -333,7 +333,7 @@ module Skylab::Callback
         def any_same_i_a frame_
           same_i_a = nil
           frame = @queue.first
-          scn = @nucleus.field_box.to_pair_scan
+          scn = @nucleus.field_box.to_pair_stream
           while pair = scn.gets
             _fld_NOT_USED, i = pair.to_a
             x = frame[ i ]

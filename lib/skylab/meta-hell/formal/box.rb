@@ -90,6 +90,7 @@ module Skylab::MetaHell
       @hash.key? key
     end
 
+    # :+#algorithm
     def if? name, found_p, not_found_p=EMPTY_P_  # #storypoint-115
       if @hash.key? name
         found_p[ @hash.fetch name ] if found_p
@@ -141,7 +142,7 @@ module Skylab::MetaHell
 
     [ :detect, :defectch, :filter, :map, :reduce, :select, :which ].each do |m|
       define_method m do |* a, & p|
-      each.send m, * a, & p  # delegate all these to the enumerator
+        each.send m, * a, & p  # delegate all these to the enumerator
       end
     end
 
@@ -386,6 +387,7 @@ module Skylab::MetaHell
       delete_multiple( [ i ] )[ 0 ]
     end
 
+    # :+#algorithm
     def delete_multiple name_a  # #storypoint-340
       idx_a = name_a.map do |n|
         @hash.fetch n  # just assert that it is there
@@ -564,6 +566,7 @@ module Skylab::MetaHell
       super( * a, & p )
     end
 
+    # :+#algorithm
     def defectch key_p, else_p=nil  # #storypoint-480
       @arity_override = 2  # you want the below detect to always get 2 ICK
       norm = NORM_P_P__[ key_p.arity ]
@@ -638,6 +641,17 @@ module Skylab::MetaHell
     end
 
     alias_method :which, :filter  # #experimental
+  end
+
+  class Formal::Box::Algorithms < Formal::Box  # experiment
+
+    def initialize a, h
+      @order = a ; @hash = h
+      @enumerator_class = nil
+    end
+
+    public :delete_multiple
+
   end
 
   class Formal::Box  # just be careful

@@ -55,8 +55,8 @@ module Skylab::TanMan
 
         def via_input_resolve_graph_sexp
           @subscribe = build_subscribe_proc
-          instance_variable_set :"@#{ @input_arg.name_i }", @input_arg.value_x
-          send :"via_#{ @input_arg.name_i }_resolve_graph_sexp"
+          instance_variable_set :"@#{ @input_arg.name_symbol }", @input_arg.value_x
+          send :"via_#{ @input_arg.name_symbol }_resolve_graph_sexp"
         end
 
         def build_subscribe_proc

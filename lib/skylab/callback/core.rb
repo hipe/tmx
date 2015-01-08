@@ -331,9 +331,9 @@ module Skylab::Callback
       end
     end
 
-    def to_pair_scan
+    def to_pair_stream
       d = -1 ; last = @a.length - 1
-      Callback_.scan do
+      Callback_.stream do
         if d < last
           i = @a.fetch d += 1
           Pair_.new @h.fetch( i ), i
@@ -440,6 +440,10 @@ module Skylab::Callback
       @h.delete i
     end
 
+    def algorithms  # ~ experimental bridge to the past
+      @__alogrithms ||= Callback_::Lib_::MH__[]::Formal::Box::Algorithms.new( @a, @h )
+    end
+
     private def say_not_found i
       "key not found: #{ i.inspect }"
     end
@@ -526,9 +530,8 @@ module Skylab::Callback
     self
   end
 
-  Pair_ = ::Struct.new :value_x, :name_i  # :[#055].
-  class Pair_
-    def with_name_i i
+  Pair_ = ::Struct.new :value_x, :name_symbol do  # :[#055].
+    def with_name_symbol i
       self.class.new value_x, i
     end
   end

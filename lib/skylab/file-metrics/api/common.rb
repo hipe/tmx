@@ -138,9 +138,11 @@ module Skylab::FileMetrics
         verb_h = { include: 'include', exclude: 'exclude' }
         interface = LIB_.proxy_lib.nice :conjunction_phrase
         -> do
-          predicate_box = LIB_.open_box
+          predicate_box = Callback_::Box.new
+          predicate_box_ = predicate_box.algorithms
+
           aggregate = -> verb_sym, noun_sym do
-            predicate_box.if? verb_sym, -> vp do
+            predicate_box_.if? verb_sym, -> vp do
               vp << noun_h.fetch( noun_sym )
               nil
             end, -> box, k do
@@ -160,7 +162,7 @@ module Skylab::FileMetrics
              -> sym { aggregate[ :exclude, sym ] },  # `excl`
              interface.new(                          # `prattle`
               conjunction_phrase: -> do
-                cp ||= LIB_.EN_conjuction_phrase predicate_box.values
+                cp ||= LIB_.EN_conjuction_phrase predicate_box.to_value_stream.to_a
               end )
           ]
         end

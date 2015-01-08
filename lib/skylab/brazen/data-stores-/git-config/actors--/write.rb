@@ -30,7 +30,7 @@ module Skylab::Brazen
 
       def resolve_assignment_lines
         while ast = @assignment_scan.gets
-          @section[ ast.name_i ] = ast.value_x
+          @section[ ast.name_symbol ] = ast.value_x
         end
         DONE_
       end
