@@ -236,7 +236,7 @@ module Skylab::Callback
     end
 
     def unhandled_stream_graph
-      event_stream_graph.minus event_listeners.names
+      event_stream_graph.minus event_listeners._a
     end
 
     def some_taxonomic_stream_i_a
@@ -315,8 +315,8 @@ module Skylab::Callback
       end
       ancestor_a = esg.ancestors( stream_i ).to_a
       # (the below line is the central thesis statement of the whole library)
-      ( ancestor_a & @event_listeners._order ).each do |k|
-        @event_listeners.fetch( k ).each do |p|
+      ( ancestor_a & @event_listeners._a ).each do |k|
+        @event_listeners.retrieve( k ).each do |p|
           do_build &&= begin
             event = build_event stream_i, *payload_a
             false
@@ -365,16 +365,26 @@ module Skylab::Callback
     end
   end
 
-  class Digraph::Listeners__ < Callback_::Lib_::Old_box_lib[]
+  class Digraph::Listeners__
 
     def initialize
       @current_group_id = @group_frame_h = @is_in_group = nil
-      super
+      @a = [] ; @h = {}
+    end
+
+    def _a
+      @a
+    end
+
+    def retrieve x
+      @h.fetch x
     end
 
     def add_listener name, * a, & b
+
       p = ( b ? ( a << b ) : a ).fetch( ( a.length << 1 ) - 2 )
       p.respond_to? :call or raise ::ArgumentError, "callabled? #{ p.class }"
+
       if @is_in_group
         group_id = @current_group_id
         p_ = -> * a_ do
@@ -387,7 +397,12 @@ module Skylab::Callback
       else
         p_ = p
       end
-      ( @hash.fetch name do add name, [ ] end ) << p_
+
+      @h.fetch name do
+        @a.push name
+        @h[ name ] = []
+      end.push p_
+
       p  # for chaining
     end
 

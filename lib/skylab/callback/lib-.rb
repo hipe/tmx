@@ -11,7 +11,10 @@ module Skylab::Callback
     end
 
     Boxlike_as_proxy_to_hash = -> h do
-      Old_box_lib[].open_box.hash_controller h
+      Callback_::Box.allocate.instance_exec do
+        @a = h.keys ; @h = h
+        self
+      end
     end
 
     Bundle_Item_Grammar = -> do
@@ -90,10 +93,6 @@ module Skylab::Callback
 
     Num2ord = -> x do
       HL__[]::NLP::EN::Number::Num2ord[ x ]
-    end
-
-    Old_box_lib = -> do
-      MH__[]::Formal::Box
     end
 
     Quickie = -> x do
