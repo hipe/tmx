@@ -1,6 +1,6 @@
 digraph {
 
-  ev [label="event factory"]
+  ev [label="event factory" style=filled]
 
   cu [label="revamp cull" style=filled]
 

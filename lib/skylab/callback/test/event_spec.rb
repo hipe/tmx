@@ -327,22 +327,18 @@ module Skylab::Callback::TestSupport::Event_Tests__
     end
 
     def build_event stream_symbol, *rest
-      # (a necessarily much simpler version than the one found in p.s)
-      Callback_::Event::Unified.new false, stream_symbol, *rest  # (no event graph)
-    end
-
-    def build_text_event stream_symbol, text
-      TextEvent__.new false, stream_symbol, text
+      FML_Old_Event__.new rest, stream_symbol
     end
     #
-    class TextEvent__ < Callback_::Event::Unified
+    FML_Old_Event__ = ::Struct.new :x, :stream_symbol
 
-      def initialize esg, stream_symbol, text
-        super esg, stream_symbol
-        @payload_x = text
-      end
-
-      attr_reader :payload_x
+    def build_text_event stream_symbol, text
+      Textual_Old_Event___.new text, stream_symbol
     end
+    #
+    Textual_Old_Event___ = ::Struct.new :text, :stream_symbol do
+      alias_method :payload_x, :text
+    end
+
   end
 end
