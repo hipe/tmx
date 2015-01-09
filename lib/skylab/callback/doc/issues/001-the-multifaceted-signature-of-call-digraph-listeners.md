@@ -1,3 +1,37 @@
+# this historic document..
+
+.. has been converted to note-taking scratch, to this end: we wish to
+turn "event factory" into a grain of sand.
+
+
+
+
+face                q [ ] unified, OK
+porcelain           Q [ ] textual, unified, OK
+headless            q [ ] isomorphic, OK
+callback            q [ ] unified, OK
+
+permute             Q [ ] isomorphic, OK
+dependency          Q [ ] textual, unified, OK
+code-molester       Q [ ] structural, isomorphic, OK
+sub-tree            q [ ] textual, unified, OK
+treemap             Q [ ] datapoint, explicit OK
+
+
+
+
+unified 5
+textual 3
+isomorphic 3
+datapoint
+structural 1
+explicit 1
+late 0
+
+
+
+
+
 # The Signature of Emit :[#001]
 
 (EDIT: this document is historic and is largely deprecated by point [#035])
