@@ -27,13 +27,13 @@ module Skylab::Callback::TestSupport::Digraph
 
   B_D_E___ = -> * a, i, esg do
     if a.length.zero?
-      Mock_Event___.new nil, i  # covered
+      Mock_Old_Event__.new nil, i  # covered
     else
-      Mock_Event___.new a, i
+      Mock_Old_Event__.new a, i
     end
   end
 
-  class Mock_Event___
+  class Mock_Old_Event__
 
     def initialize x_a, i
       @event_id = Event_ID___[]

@@ -349,9 +349,13 @@ module Skylab::Porcelain::Bleeding
     end
 
     Find = Callback_::Digraph.new ambiguous: :error,
-      not_found: :error, not_provided: :error
+      not_found: :error, not_provided: :error do
 
-    Find.event_factory -> _, __, x { x }  # "datapoint" - events are just the data
+      def build_digraph_event x, _stream_i, _esg
+          # "datapoint" - events are just the data
+        x
+      end
+    end
 
     resolve_builder = nil         # scope
                                   # result is nil or builder, 1st exact match

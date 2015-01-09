@@ -297,7 +297,12 @@ module Skylab::Porcelain::TestSupport
       let(:klass) do
         Class.new.class_eval do
           Callback_[ self, :employ_DSL_for_digraph_emitter ]
-          event_class Callback_::Event::Textual
+
+          def build_digraph_event s, _i, _esg
+            require 'byebug' ; byebug ; $stderr.puts "ZAP DANG" and false
+            # event_class Callback_::Event::Textual
+          end
+
           Porcelain::Legacy::DSL[ self ]
           def foo ; end
           def bar ; end

@@ -396,45 +396,51 @@ module Skylab::Callback
 
   module Digraph  # ad-hoc emitter class producer.
 
-    def self.new * graph_x_a, & p
+    class << self
 
-      ::Class.new.class_exec do
+      def new * graph_x_a, & edit_p
 
-        Callback_[ self, :employ_DSL_for_digraph_emitter ]
+        ::Class.new( Emitter___ ).class_exec do
 
-        public :with_specificity, :call_digraph_listeners  # [#002] objects of this class
-          # are not controller-like they are struct-like so this is always
-          # the desired interface
+          Callback_[ self, :employ_DSL_for_digraph_emitter ]
 
-        graph_x_a.length.nonzero? and listeners_digraph( * graph_x_a )
+            public :with_specificity, :call_digraph_listeners  # [#002]
+              # objects of this class are not controller-like they are
+              # struct-like so this is always the desired interface
 
-        # experimental interface for default constructor: multiple lambdas
-        def initialize * p_a
-          p_a.each { |p| p[ self ] }
+          graph_x_a.length.nonzero? and listeners_digraph( * graph_x_a )
+
+          edit_p and class_exec( & edit_p )
+
+          self
         end
+      end
+    end  # >>
 
-        def error msg  # #courtesy for common method [#sl-112]
-          call_digraph_listeners :error, msg ; false
-        end
+    class Emitter___
 
-        def to_listener
-          Callback_::Selective_Listener.via_digraph_emitter self
-        end
+      # experimental interface for default constructor: multiple lambdas
+      def initialize * p_a
+        p_a.each { |p| p[ self ] }
+      end
 
-        private def build_digraph_event * x_a, i, esg
-          Stub_Event___.new x_a, i
-        end
+      def error msg  # #courtesy for common method [#sl-112]
+        call_digraph_listeners :error, msg ; false
+      end
 
-        p and class_exec( & p )
+      def to_listener
+        Callback_::Selective_Listener.via_digraph_emitter self
+      end
 
-        self
+      private def build_digraph_event * x_a, i, esg
+        Stub_Old_Event___.new x_a, i
       end
     end
 
     COMMON_LEVELS = %i( debug info notice warn error fatal ).freeze
       # didactic, #bound, :+#deprication:pending
 
-    class Stub_Event___
+    class Stub_Old_Event___
       def initialize x_a, i
         @payload_a = x_a
       end

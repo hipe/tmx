@@ -185,10 +185,8 @@ module Skylab::Porcelain::Legacy
       nil
     end
 
+    _B_D_E = nil
     event_graph_init = -> do
-      if ! instance_methods( false ).include?( :event_class )
-        event_class Callback_::Event::Textual
-      end  # experimental ack - all our events are textual, so..
 
       listeners_digraph  payload: :all,
                        info: :all,
@@ -197,12 +195,30 @@ module Skylab::Porcelain::Legacy
                          ui: :info,
                       usage: :info,
                 usage_issue: :error
+
+      if ! private_method_defined?( :build_digraph_event )
+        define_method :build_digraph_event, _B_D_E
+      end
+
       nil
+    end
+
+    _B_D_E = -> s, _i, _esg do
+      Textual_Old_Event___.new s
     end
 
     def inherited kls
       kls._porcelain_legacy_dsl_init
       nil
+    end
+  end
+
+  class Textual_Old_Event___
+    def initialize s
+      @s = s
+    end
+    def text
+      @s
     end
   end
 
