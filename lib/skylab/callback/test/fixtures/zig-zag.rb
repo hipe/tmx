@@ -8,5 +8,17 @@ module Skylab::Callback::TestSupport
 
     public :call_digraph_listeners, :with_specificity
 
+    def build_digraph_event * x_a, channel_i, esg
+      Mock_Event___.new x_a
+    end
+
+    class Mock_Event___
+      def initialize _x_a
+      end
+      def is_event
+        true
+      end
+    end
+
   end
 end

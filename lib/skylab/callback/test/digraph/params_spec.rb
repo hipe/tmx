@@ -58,19 +58,16 @@ module Skylab::Callback::TestSupport::Digraph
 
       it "0 payload args - handler gets 1 event object, with a nil payload" do
         emitter.call_digraph_listeners :bar
-        canary[:arg].should be_kind_of( Callback_::Event::Unified )
         canary[:arg].payload_a.should eql( nil )
       end
 
       it "1 payload arg - handler gets 1 event object" do
         emitter.call_digraph_listeners :bar, 'foo'
-        canary[:arg].should be_kind_of( Callback_::Event::Unified )
         canary[:arg].payload_a.first.should eql( 'foo' )
       end
 
       it "2 payload args - handler gets 1 event obj with 2 args arr in p.l" do
         emitter.call_digraph_listeners :bar, 'foo', 'baz'
-        canary[:arg].should be_kind_of( Callback_::Event::Unified )
         canary[:arg].payload_a.should eql( ['foo', 'baz'] )
       end
     end

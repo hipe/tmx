@@ -25,6 +25,40 @@ module Skylab::Callback::TestSupport::Digraph
     end
   end
 
+  B_D_E___ = -> * a, i, esg do
+    if a.length.zero?
+      Mock_Event___.new nil, i  # covered
+    else
+      Mock_Event___.new a, i
+    end
+  end
+
+  class Mock_Event___
+
+    def initialize x_a, i
+      @event_id = Event_ID___[]
+      @is_touched = false
+      @payload_a = x_a
+      @stream_symbol = i
+    end
+
+    attr_reader :event_id, :payload_a, :stream_symbol
+
+    def touched?
+      @is_touched
+    end
+
+    def touch!
+      @is_touched = true
+      self
+    end
+
+    Event_ID___ = -> do
+      d = 0
+      -> { d += 1 }
+    end.call
+  end
+
   module InstanceMethods
 
     extend Callback_::Lib_::Let[]::ModuleMethods
@@ -37,10 +71,13 @@ module Skylab::Callback::TestSupport::Digraph
 
     let :klass do                 # working in conjunction w/ `inside` below,
       blk = inside                # make a Callback empowered class and nerk it
-      kls = Digraph_TestSupport.const_set "KLS_#{ counter += 1 }", ::Class.new
+      kls = Digraph_TestSupport.const_set :"KLS_#{ counter += 1 }", ::Class.new
       kls.class_exec do
         Callback_[ self, :employ_DSL_for_digraph_emitter ]
         public :call_digraph_listeners  # [#002] public for testing
+
+        define_method :build_digraph_event, B_D_E___
+
         class_exec(& blk ) if blk
       end
       kls

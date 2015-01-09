@@ -23,7 +23,7 @@ module Skylab::Callback::TestSupport::CLI::Fire
       rs = c.invoke argv
       rs.should eql true
       line_a = g.errstream.string.split "\n"
-      line_a.last.should match( /\AOK: #<Skylab::Callback::Event::Unified/ )
+      line_a.last.should match( /\AOK: #<Skylab::Callback::TestSupport::.*\bMock_Event/ )
     end
   end
 end

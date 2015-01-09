@@ -9,7 +9,7 @@ turn "event factory" into a grain of sand.
 face                q [X] unified, OK
 porcelain           Q [ ] textual, unified, OK
 headless            q [ ] isomorphic, OK
-callback            q [ ] unified, OK
+callback            q [X] unified, OK
 
 permute             Q [ ] isomorphic, OK
 dependency          Q [ ] textual, unified, OK

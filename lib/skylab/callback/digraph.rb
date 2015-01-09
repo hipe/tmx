@@ -68,25 +68,6 @@ module Skylab::Callback
       end ; nil
     end
 
-    def event_class cls_x  # #writer-here-reader-there
-      define_method :event_class, ( if cls_x.respond_to? :call then cls_x else
-        -> { cls_x }
-      end ) ; nil
-    end
-
-    def event_factory factory_x  # #writer-here-reader-there
-      define_method :build_event_factory, (
-        if factory_x.respond_to? :arity and factory_x.arity.zero?
-          factory_x
-        else
-          -> { factory_x }
-        end )
-    end
-
-    def use_default_event_factory  # e.g if the superclass customized it
-      alias_method :build_event_factory, :default_build_event_factory ; nil
-    end
-
     #        ~ advanced semantic reflection experiments ~
 
   private
@@ -421,10 +402,6 @@ module Skylab::Callback
 
         Callback_[ self, :employ_DSL_for_digraph_emitter ]
 
-        class << self
-          public :event_class, :event_factory
-        end
-
         public :with_specificity, :call_digraph_listeners  # [#002] objects of this class
           # are not controller-like they are struct-like so this is always
           # the desired interface
@@ -444,6 +421,10 @@ module Skylab::Callback
           Callback_::Selective_Listener.via_digraph_emitter self
         end
 
+        private def build_digraph_event * x_a, i, esg
+          Stub_Event___.new x_a, i
+        end
+
         p and class_exec( & p )
 
         self
@@ -452,5 +433,12 @@ module Skylab::Callback
 
     COMMON_LEVELS = %i( debug info notice warn error fatal ).freeze
       # didactic, #bound, :+#deprication:pending
+
+    class Stub_Event___
+      def initialize x_a, i
+        @payload_a = x_a
+      end
+      attr_reader :payload_a
+    end
   end
 end
