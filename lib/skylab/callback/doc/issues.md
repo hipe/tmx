@@ -1,4 +1,5 @@
-[#061]       [the box narrative]
+[#062]       the box struct proxy narrative ..
+[#061]       the box narrative ..
 [#060]       the name narrative ..
 [#059] #open #parent-node: [#044] "signal processing scans.."
 [#058]       #parent-node: [#042] methodic actor (was: [#hl-130]) :+[#mh-058]..

@@ -1,22 +1,37 @@
 require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport::Formal::Box
+module Skylab::Callback::TestSupport::Box
 
-  ::Skylab::MetaHell::TestSupport::Formal[ TS_ = self ]
+  ::Skylab::Callback::TestSupport[ TS_ = self ]
 
   include Constants
 
   extend TestSupport_::Quickie
 
-  module ModuleMethods
-    include Constants
+  Callback_ = Callback_
 
-    def new_modified_box
-      box = MetaHell_::Formal::Box.new
-      class << box
-        public :add
-      end
-      box
+  module ModuleMethods
+
+    def memoize_subject & p
+
+      define_method :subject, Callback_.memoize( & p )
+
     end
+  end
+
+  module InstanceMethods
+
+    def subject_with_entries * pairs
+      bx = Subject_[].new
+      pairs.each_slice 2 do | k, x |
+        bx.add k, x
+      end
+      bx
+    end
+
+  end
+
+  Subject_ = -> do
+    Callback_::Box
   end
 end

@@ -442,7 +442,11 @@ module Skylab::Callback
     end
 
     def algorithms  # ~ experimental bridge to the past
-      @_alogrithms ||= Callback_::Lib_::MH__[]::Formal::Box::Algorithms.new( @a, @h )
+      @_alogrithms ||= Box::Algorithms__.new( @a, @h, self )
+    end
+
+    def to_struct  # ~ ditto
+      Box::Struct_proxy[ @a, @h, self ]
     end
 
     private def say_not_found i
@@ -540,7 +544,7 @@ module Skylab::Callback
 
   # ~ the #employment story
 
-  module Autoloader  # read [#024] the new autolaoder narrative
+  module Autoloader  # read [#024] the new autoloader narrative
 
     class << self
       def [] mod, * x_a
@@ -1411,6 +1415,7 @@ module Skylab::Callback
   end
 
   Autoloader[ Actor ]
+  Autoloader[ Box ]
 
   module Autoloader  # ~ service methods outside the immediate scope of a.l
     module Methods__

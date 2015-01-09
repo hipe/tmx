@@ -91,8 +91,8 @@ module Skylab::Face
 
     def get_executable_with_notify  # this experimental hack has obvious issues
       # with it, the same issues you run into when dealing with this in rspec
-      conf.if? :before_each_execution, -> f do
-        f.call
+      conf.if_has_name :before_each_execution, -> p do
+        p.call
       end
       nil
     end
@@ -122,7 +122,7 @@ module Skylab::Face
 
     def assert_that_name_passes_any_white_rx i_a
       forbidden_i = nil
-      conf.if? :action_name_white_rx, -> rx do
+      conf.if_has_name :action_name_white_rx, -> rx do
         forbidden_i = i_a.detect { |i| rx !~ i.to_s }
       end
       forbidden_i and raise ::NameError, say_forbidden( forbidden_i )
@@ -319,8 +319,8 @@ module Skylab::Face
         @box.fetch i, & p
       end
 
-      def if? * a, & p
-        @box.algorithms.if?( * a , & p )
+      def if_has_name * a, & p
+        @box.algorithms.if_has_name( * a , & p )
       end
     end
   end

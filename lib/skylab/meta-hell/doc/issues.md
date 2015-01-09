@@ -13,11 +13,10 @@
 [#057] #hole (moved to [#ts-035]. was: the library narrative)
 [#056]       #node-tracker :#contoured-fields
 [#055] #hole (moved to to [#ba-034]. was: #doc-point the module node narrative)
-[#054]       #formal-box:struct #doc-point (all notes)..
+[#054] #hole (moved to [#cb-062]. was: #formal-box:struct )
 [#053]       #doc-point "discussion of all the meta-properties.."
 [#053]       #in-situ
-[#052] #open #formal-box #doc-point #in-situ `to_struct` caveat. spec this ..
-[#051]       #in-situ
+[#052] #hole (was: #formal-box #doc-point #in-situ `to_struct` caveat.)
 [#051]       #doc-point #experimental-pattern :#method-cherry-picker..
 [#050]       #family "strange" (as used in "ick", formerly "inspect")
 [#049]       #tracking-tag :#fuzzy
@@ -60,14 +59,14 @@
              (we didn't know that before) ([fa] CLI table is a model for
              this change)
              #doc-node the 'dupe' narrative ..
-[#020]       #doc-node the formal box narrative .. #refined:once
+[#020] #hole (was: #doc-node the formal box narrative ..)
              (was: instance methods separate from box class maybe?)
 [#019]       #done move parse out of fun (was: #node-tracker: #boxxy)
 [#018]       #done corral proxies
 [#017]       #done corral tees
 [#016]       #tracking-tag wow hash-like iterators are sure annoying
 [#015]       #tracking-tag early deep-copy vs. lazy deep-copy of defaults
-[#014]       #tracking-tag #attr #doc-point dup[e]ing behavior
+[#014] #done? #tracking-tag #attr #doc-point dup[e]ing behavior
 [#013]       #done move porcelain attribtues to here, then clean up
 [#012]       #done foo/ and foo.rb should be automagic, no declaration of module
 [#011]       #doc-node the fun parse curry narrative ..

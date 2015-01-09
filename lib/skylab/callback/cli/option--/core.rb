@@ -60,7 +60,7 @@ module Skylab::Callback
           valid = false
           opt = scn.expect_long or break
           arg = scn.expect_arg or break
-          box.algorithms.if? opt.normalized_parameter_name, -> k do
+          box.algorithms.if_has_name opt.normalized_parameter_name, -> k do
             err[ "can't take multiple values for #{opt.as_parameter_signifier}"]
             false
           end, -> bx, k do

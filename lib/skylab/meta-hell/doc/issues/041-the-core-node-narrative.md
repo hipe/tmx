@@ -1,5 +1,4 @@
 # the core node narrative :[#041]
-#todo:during-merge we will rename this file as appropriate
 
 ## :#storypoint-005 introduction
 
@@ -29,14 +28,13 @@ important facilities:
 
 1. (was M-AARS, offlined by [#ca-024])
 
-2. the Bundle facility. it's simply the best thing.
+2. the Bundle facility. it's simply the best thing. (nah.)
 
 3. (was B-oxxy, replaced by [#ca-030])
 
 4. the Item_Grammar is pretty great
 
-5. formal box is the juggernaut that got mostly replaced by [ba] box but is
-   still crucial in a few places. (this is slated to move to [ba])
+5. (was formal box, the juggernaut that got assimilated into [cb])
 
 6. fun fields (contoured, etc) were an important frontier space for the
    early exploration of things like iambic DSL's.

@@ -411,7 +411,7 @@ module Skylab::MetaHell
       o = compare.algorithms
 
       enum_x.each_pair do |k, v|
-        o.if? k,
+        o.if_has_name k,
           -> x do
             if x != v
               add( k, v )

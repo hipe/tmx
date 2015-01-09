@@ -291,7 +291,7 @@ module Skylab::Treemap
         case cmp
         when 0, -1
           # what is the attr that stops after this eventpoint? we want its label
-          fattr = formal_attributes.defectch -> x do
+          fattr = formal_attributes.retrieve do | x |
             x.has_stop_at and eventpoint_ref == x.stop_at
           end
           parts = [ param( :stop ) ]

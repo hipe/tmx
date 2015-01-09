@@ -76,11 +76,13 @@ module Skylab::Headless
     class Category_
 
       def self.there_exists_a_category cat_sym
-        @box.algorithms.if? cat_sym, -> cat do
+
+        @box.algorithms.if_has_name cat_sym, -> cat do
           cat.extent_x += 1
         end, -> bx, k do
-          @box.add k, Category__.new( 1 )  # after #open [#cb-061] use bx not @box
+          bx.add k, Category__.new( 1 )
         end
+
         nil
       end
 
@@ -783,13 +785,13 @@ module Skylab::Headless
 
         self.class.form_box.to_value_stream.each do | frm |
 
-          bound = nil
-          @irregular_box.algorithms.if? frm.combination.form_key, -> frm_bnd do
-            bound = frm_bnd
-          end, -> bx, k do
-            bound = frm.bind( self )
-          end
-          y << bound
+          y << @irregular_box.algorithms.if_has_name(
+            frm.combination.form_key,
+            IDENTITY_,
+            -> do
+              frm.bind self
+            end )
+
         end
         nil
       end
@@ -828,7 +830,7 @@ module Skylab::Headless
           bx.add x, Membership_.new( x, NLP::EN::POS.abbrev_box.fetch( x ) )
           bx
 
-        end.algorithms.to_struct
+        end.to_struct
 
         singleton_class.class_exec do
 

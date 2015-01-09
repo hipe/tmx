@@ -203,19 +203,19 @@ module Skylab::Face
       def parse_xtra_node scn
         node_i, _ = scn.fetch_chunk 2
         scn.ungets  # above is a fun way to assert syntax
-        sht = nil
-        @box.algorithms.if? node_i, -> xs do
-          sht = xs
-        end, -> do
-          if @node_open
-            sht = @node_open
-          else
-            @has_prenatals = true
-            sht = Node_Sheet_.new node_i
-            @box.add node_i, sht
-          end
-        end
-        sht.absorb_xtra_scn scn  # for sure at least 1 left to do per above
+        @box.algorithms.if_has_name(
+          node_i,
+          IDENTITY_,
+          -> bx, k do
+            if @node_open
+              @node_open
+            else
+              @has_prenatals = true
+              x = Node_Sheet_.new node_i
+              bx.add k, x
+              x
+            end
+          end ).absorb_xtra_scn scn  # for sure at least 1 left to do per above
         nil
       end
     end

@@ -68,13 +68,10 @@ module Skylab::Treemap
 
           self._FML  # look at history if you really want to fix this
 
-          mem.if? aname, -> x do
-            x.add_adapter adapter
-          end, -> do
-            action = Adapter::Mote::Action.new self, nil, nf
-            action.add_adapter adapter
-            mem.add aname, action
-          end
+          mem.touch aname do
+            Adapter::Mote::Action.new self, nil, nf
+          end.add_adapter action
+
           mem
         end
         memo

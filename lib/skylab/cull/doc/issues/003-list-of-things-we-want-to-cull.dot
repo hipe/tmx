@@ -15,7 +15,7 @@ list of things we want to cull :[#003]
 */
 
   Name [style=filled]
-  Box
+  Box [style=filled]
   Event
   CLI
   API

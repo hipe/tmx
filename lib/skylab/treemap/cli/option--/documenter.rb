@@ -272,7 +272,7 @@ module Skylab::Treemap
     #        ~ The Option Reflection API (backend) ~
 
     def options_fetch norm_name, &otherwise
-      option = @option_box.if? norm_name, -> opt do
+      option = @option_box.if_has_name norm_name, -> opt do
         if ! opt.is_collapsed  # in flux..
           if @default_box.has? norm_name
             def_value = @default_box.fetch norm_name
@@ -311,10 +311,8 @@ module Skylab::Treemap
       a  # (yes it is like a reduce)
     end
 
-    def write_more k, &b
-      a = @more_box.if?( k, IDENTITY_, -> box { a = [ ] ; box.add k, a ; a } )
-      # (a = (h[k] ||= []))
-      a << b
+    def write_more k, & p
+      @more_box.touch( k ) { [] }.push p
       nil
     end
 

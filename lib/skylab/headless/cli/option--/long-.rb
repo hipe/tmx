@@ -26,13 +26,7 @@ module Skylab::Headless
         self.no = self.stem = self.arg = nil
       end
 
-      # ~ begin thing
-
-      def at * i_a
-        i_a.map( & method( :[] ) )
-      end
-
-      # ~ end thing
+      include Callback_::Box::Struct_proxy::InstanceMethods
     end
   end
 end

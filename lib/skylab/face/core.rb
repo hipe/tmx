@@ -492,6 +492,8 @@ module Skylab::Face  # read [#011] the top node narrative
 
   Face_ = self
 
+  IDENTITY_ = -> x { x }
+
   Name_ = Callback_::Name
 
   MONADIC_TRUTH_ = -> _ { true }

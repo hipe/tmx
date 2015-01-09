@@ -65,7 +65,7 @@ the topmost (rootmost) node is the
   +-------------+
 
 . true to its name, it is is an ordered key-value collection ("associative
-container") [#mh-020]. its purpose is to represent the available/loaded
+container") [#cb-061]. its purpose is to represent the available/loaded
 adapters in some way, and allow them to be retrieved for doing further
 stuff. as for its implementation, it *simply* glues together some other
 awesomeness from elsewhere and so it itself is quite tiny.

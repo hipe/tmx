@@ -142,7 +142,8 @@ module Skylab::FileMetrics
           predicate_box_ = predicate_box.algorithms
 
           aggregate = -> verb_sym, noun_sym do
-            predicate_box_.if? verb_sym, -> vp do
+
+            predicate_box_.if_has_name verb_sym, -> vp do
               vp << noun_h.fetch( noun_sym )
               nil
             end, -> box, k do
@@ -155,6 +156,7 @@ module Skylab::FileMetrics
               box.add k, x
               nil
             end
+
             nil
           end
           cp = nil

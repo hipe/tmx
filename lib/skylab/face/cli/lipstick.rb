@@ -118,7 +118,6 @@ module Skylab::Face
           end
         end
       end
-      IDENTITY_ = -> x { x }
     end
 
     # `initialize`

@@ -355,7 +355,7 @@ module Skylab::FileMetrics
 
         -> do  # add the rest / CAUTION box hacking! / `rest` node deleted after
 
-          (name,) = @bx.algorithms.defectch -> k, v { v.is_rest }, EMPTY_P_
+          (name,) = @bx.algorithms.retrieve -> _k, x { x.is_rest }, EMPTY_P_
 
           if name && the_rest
             xtra_a = the_rest - @order

@@ -315,7 +315,7 @@ module Skylab::Face
       end
 
       def if_constituent norm_i, yes, no  # #exposed-for-hacks #todo:cover
-        @box.algorithms.if? norm_i, yes, no
+        @box.algorithms.if_has_name norm_i, yes, no
       end
 
       def fetch_constituent norm_i, &no  # #called-by api facet, hacks
