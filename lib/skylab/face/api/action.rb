@@ -29,6 +29,19 @@ module Skylab::Face
 
   private
 
+    def build_digraph_event * x_a, channel_i, esg
+
+      _i_a = esg.ancestors( channel_i ).to_a
+
+      if x_a.length.zero?
+        EMPTY_WRAP___
+      else
+        self._DO_ME
+      end
+    end
+    Wrap___ = ::Struct.new :payload_a
+    EMPTY_WRAP___ = Wrap___.new
+
     def some_expression_agent
       @expression_agent or fail "sanity - expression agent was not set #{
         }set for this intance of #{ self.class }"

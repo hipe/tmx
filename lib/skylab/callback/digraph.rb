@@ -170,8 +170,6 @@ module Skylab::Callback
           -> { esg }
         end
 
-        @event_factory ||= build_event_factory  # idem
-
         @event_listeners ||= Digraph::Listeners__.new  # idem
 
         a = these_a.select( & self.class.method( :public_method_defined? ) )
@@ -270,23 +268,6 @@ module Skylab::Callback
       attr_reader :do_build_msg, :do_include_taxo, :nope_p, :ok_p
     end
 
-    # ~ event production
-
-    def build_event stream_symbol, *payload_a
-      @event_factory.call @event_stream_graph_p.call, stream_symbol, *payload_a
-    end
-
-    def build_event_factory  # expected to be called once per instance..
-      -> esg, stream_symbol, *payload_a do
-        event_class.new esg, stream_symbol, *payload_a
-      end
-    end
-    alias_method :default_build_event_factory, :build_event_factory
-
-    def event_class
-      Callback_::Event::Unified  # a default
-    end
-
     #  ~ misc reflective services
 
     def build_contextualized_stream_name_from_channel_i channel_i
@@ -297,7 +278,6 @@ module Skylab::Callback
     def some_event_stream_graph
       event_stream_graph or raise "no event stream graph"
     end
-
   end
 
   module Digraph::Slidden_IM__
@@ -318,7 +298,7 @@ module Skylab::Callback
       ( ancestor_a & @event_listeners._a ).each do |k|
         @event_listeners.retrieve( k ).each do |p|
           do_build &&= begin
-            event = build_event stream_i, *payload_a
+            event = build_digraph_event( * payload_a, stream_i, esg )  # :+#hook-out
             false
           end
           if 1 == p.arity  # #jump-1

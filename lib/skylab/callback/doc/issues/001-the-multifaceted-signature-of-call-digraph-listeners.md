@@ -6,7 +6,7 @@ turn "event factory" into a grain of sand.
 
 
 
-face                q [ ] unified, OK
+face                q [X] unified, OK
 porcelain           Q [ ] textual, unified, OK
 headless            q [ ] isomorphic, OK
 callback            q [ ] unified, OK
