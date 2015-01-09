@@ -46,7 +46,7 @@ module Skylab::CodeMolester::TestSupport
   module Constants::TestLib_
 
     Bzn = -> do
-      CM_::Lib_::Bzn__[]
+      CM_::Lib_::Brazen[]
     end
 
     Expect_line = -> do

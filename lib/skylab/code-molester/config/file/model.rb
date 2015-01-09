@@ -422,8 +422,6 @@ module Skylab::CodeMolester
         after_create: [ :data, :after, :notice ],
         no_change: [ :data, :notice ]
 
-      event_factory -> { Callback_::Event::Factory::Isomorphic.new Events__ }
-
       attr_accessor :dry_run
       alias_method :is_dry, :dry_run
 
@@ -431,17 +429,15 @@ module Skylab::CodeMolester
         @dry_run = x
       end
 
-      module Events___
-        # filled with joy
-      end
-
-      module Events__
-        Data = -> digraph, chan_i, ev  do
-          ev
+      def build_digraph_event x, i, esg
+        if x.respond_to? :to_event
+          x
+        elsif x.respond_to? :each_pair
+          CM_.lib_.brazen.event.inline_neutral_with i, *
+            ( x.to_a.flatten( 1 ) )
+        else
+          self._DO_ME
         end
-        Data.singleton_class.send :alias_method, :event, :call
-        Structural = Callback_::Event::Factory::Structural.new 2, nil, Events___
-        Text = Callback_::Event::Factory::Datapoint
       end
     end
 

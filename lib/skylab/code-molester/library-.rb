@@ -33,7 +33,7 @@ module Skylab::CodeMolester
 
     Bsc_ = Bsc__
 
-    Bzn__ = sidesys[ :Brazen ]
+    Brazen = sidesys[ :Brazen ]
 
     Cache_pathname = memo[ -> do
       module CM_::Cache
@@ -115,7 +115,7 @@ module Skylab::CodeMolester
     end
 
     New_event_lib = -> do
-      Bzn__[].event
+      Brazen[].event
     end
 
     NLP_EN_methods = -> mod do
