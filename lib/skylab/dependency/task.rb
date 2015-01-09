@@ -16,8 +16,6 @@ module Skylab::Dependency
 
     Callback_[ self, :employ_DSL_for_digraph_emitter ]   # child classes decide what to call_digraph_listeners
 
-    event_class Callback_::Event::Textual  # can be made more complicated..
-
     include Dep_.lib_.path_tools.instance_methods_module
 
     include Dep_.lib_.CLI_lib.pen.instance_methods_module  # `stylize`
@@ -55,6 +53,10 @@ module Skylab::Dependency
 
         false
       end
+    end
+
+    def build_digraph_event s, i, _esg
+      Textual_Old_Event_.new s, i
     end
   end
 

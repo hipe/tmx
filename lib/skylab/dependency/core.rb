@@ -16,6 +16,8 @@ module Skylab::Dependency
     Autoloader_[ self ]
   end
 
+  Textual_Old_Event_ = ::Struct.new :text, :stream_symbol
+
   def self.lib_
     @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
       self::Lib_, self )

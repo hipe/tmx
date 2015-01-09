@@ -4,8 +4,6 @@ module Skylab::TestSupport
 
     Callback_[ self, :employ_DSL_for_digraph_emitter ]
 
-    event_class Callback_::Event::Textual
-
     listeners_digraph info: :all, warn: :all, error: :all  # used internally
 
     include TestSupport_::Library_::FileUtils
@@ -72,6 +70,12 @@ module Skylab::TestSupport
     def fu_output_message msg  # #comport with ruby stdlib file utils
       send_info_string msg
     end
+
+    def build_digraph_event s, i, _esg
+      Textual_Old_Event___.new s, i
+    end
+
+    Textual_Old_Event___ = ::Struct.new :text, :stream_symbol
 
     def moniker
       MONIKER_

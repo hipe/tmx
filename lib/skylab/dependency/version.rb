@@ -61,14 +61,16 @@ module Skylab::Dependency
 
   class Version::Parse
 
-    event_class Callback_::Event::Textual
-
     def self.loud_singleton
       @loud ||= Dep_::Version::Parse.new( -> o do
         o.on_informational do |e|
           fail "find me an outstream"  # #todo
         end
       end )
+    end
+
+    def build_digraph_event x, i, _esg
+      Textual_Old_Event_.new x, i
     end
   end
 end
