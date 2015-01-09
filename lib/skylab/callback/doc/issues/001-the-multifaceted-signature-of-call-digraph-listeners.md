@@ -15,7 +15,7 @@ permute             Q [X] isomorphic, OK
 dependency          Q [X] textual, unified, OK
 code-molester       Q [ ] structural, isomorphic, OK. (last both)
 sub-tree            q [ ] textual, unified, OK. (last both)
-treemap             Q [ ] datapoint, explicit OK (last both)
+treemap             Q [X] datapoint, explicit OK (last both)
 
 
 

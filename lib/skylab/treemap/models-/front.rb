@@ -1,12 +1,25 @@
 module Skylab::Treemap
 
-  class CLI::Actions::Ping < CLI::Action
+  module Models_
 
-    listeners_digraph :info, :info_line, :error, help: :info
+    class Front
 
-    def process
-      call_digraph_listeners :info_line, "hello from treemap."
-      :hello_from_treemap
+      module Actions
+
+        class Ping < Brazen_.model.action_class
+
+          @is_promoted = true
+
+          def produce_any_result
+            maybe_send_event :info, :ping do
+              build_neutral_event_with :ping do | y, o |
+                y << "hello from #{ app_name }."
+              end
+            end
+            :hello_from_treemap
+          end
+        end
+      end
     end
   end
 end

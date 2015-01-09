@@ -28,7 +28,7 @@ module Skylab::Brazen
       end
 
       def app_name
-        Brazen_.name_function.as_human
+        @partitions.kernel.app_name
       end
 
       def s * x_a

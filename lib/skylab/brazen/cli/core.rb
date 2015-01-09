@@ -523,10 +523,6 @@ module Skylab::Brazen
 
     public
 
-      def app_name
-        @parent.app_name
-      end
-
       # ~ experimental hard-coded hook-in method to support workspace resolution
 
       def workspace_resolution_properties  # path, max_num_dirs, config_filename
@@ -866,7 +862,13 @@ module Skylab::Brazen
         any_err_code_for_event( ev ) || GENERIC_ERROR_
       end
 
-      public def maybe_use_exit_status d
+    public
+
+      def app_name
+        @parent.app_name
+      end
+
+      def maybe_use_exit_status d
         @parent.maybe_use_exit_status d
       end
     end
