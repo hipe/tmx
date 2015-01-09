@@ -109,14 +109,6 @@ put `call_digraph_listeners` nearer on the chain than s.c above
 
 
 
-### :#note-15
-
-oh boy .. use the same factory instance for every action subclass
-instance which *should* be fine given the funda-mental supposition of
-isomorphic factories (see)
-# **NOTE** see warnings there too re: coherence
-
-
 
 ### :#note-20
 

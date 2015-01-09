@@ -60,7 +60,8 @@ module Skylab::TMX
         tgt == distill[ c ] and m << c
         m
       end
-      if (( len = match_a.length )).nonzero?
+      len = match_a.length
+      if len.nonzero?
         const_i = if 1 == len
           match_a.fetch 0
         else
@@ -70,7 +71,7 @@ module Skylab::TMX
             fail "unresolvable ambiguity - #{ penult }/#{ ult }"
           ult
         end
-        ::Skylab.const_get( const_i, false )::CLI::Client
+        ::Skylab.const_get( const_i, false )::CLI.const_get :Client, false  # covered
       end
     end
 

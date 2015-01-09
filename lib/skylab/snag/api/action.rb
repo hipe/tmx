@@ -13,14 +13,6 @@ module Skylab::Snag
 
     Callback_[ self, :employ_DSL_for_digraph_emitter ]  # #note-10
 
-    event_factory -> do
-      Event_factory__
-    end  # #note-15
-
-    Event_factory__ = -> digraph, chan_i, sender, ev  do
-      ev
-    end
-
     class << self  # ~ minimal hand-rolled
 
       def attributes_or_params
@@ -208,6 +200,14 @@ module Skylab::Snag
 
     def send_to_delegate i, x
       call_digraph_listeners i, x
+    end
+
+    def build_digraph_event x, i, esg
+      if x.respond_to? :is_event
+        x  # perhaps some custom event
+      else
+        x  # probably string
+      end
     end
 
     # ~ overrides

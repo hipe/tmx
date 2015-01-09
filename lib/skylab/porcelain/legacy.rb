@@ -203,8 +203,8 @@ module Skylab::Porcelain::Legacy
       nil
     end
 
-    _B_D_E = -> s, _i, _esg do
-      Textual_Old_Event___.new s
+    _B_D_E = -> s, i, _esg do
+      Textual_Old_Event___.new s, i
     end
 
     def inherited kls
@@ -213,14 +213,7 @@ module Skylab::Porcelain::Legacy
     end
   end
 
-  class Textual_Old_Event___
-    def initialize s
-      @s = s
-    end
-    def text
-      @s
-    end
-  end
+  Textual_Old_Event___ = ::Struct.new :text, :stream_symbol
 
   class Story                     # (section 3 of 7)
                                   # (experimentally the "story" is the backend
