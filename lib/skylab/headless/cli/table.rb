@@ -23,8 +23,6 @@ module Skylab::Headless::CLI::Table
 
     Callback_[ self, :employ_DSL_for_digraph_emitter ]
 
-    event_factory -> { Callback_::Event::Factory::Isomorphic.new Table::Events }
-
     listeners_digraph  row: :text,  # (contrast with `textual`, `on_text` reads better)
          info: :text,  # (:info is strictly a branch not a leaf)
         empty: :info,
@@ -41,6 +39,10 @@ module Skylab::Headless::CLI::Table
       @field_box.touch symbol do
         Table::Field::Shell.new
       end
+    end
+
+    def build_digraph_event x, _i, _esg
+      x  # text, datapoints
     end
   end
 
@@ -91,20 +93,6 @@ module Skylab::Headless::CLI::Table
     end
 
     define_singleton_method :render, &render
-  end
-
-  Table::Events = ::Module.new
-
-  module Table::Events::Datapoint
-    def self.event graph, stream_symbol, payload_x
-      payload_x
-    end
-  end
-
-  module Table::Events::Text
-    def self.event graph, stream_symbol, payload_x
-      payload_x
-    end
   end
 
   class Table::Engine < Table::Shell
