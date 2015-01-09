@@ -4,7 +4,10 @@ module Skylab::Permute
 
   class API::Action
     Callback_[ self, :employ_DSL_for_digraph_emitter ]
-    event_factory -> _, __, x=nil { x } # "datapoints" - events are just the data
+
+    def build_digraph_event x, _i, _esg
+      x
+    end
   end
 
   class Permuterator < ::Enumerator

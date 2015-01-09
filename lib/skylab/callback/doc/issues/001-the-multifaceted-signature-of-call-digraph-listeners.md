@@ -11,11 +11,11 @@ porcelain           Q [X] textual, unified, OK
 headless            q [X] isomorphic, OK
 callback            q [X] unified, OK
 
-permute             Q [ ] isomorphic, OK
+permute             Q [X] isomorphic, OK
 dependency          Q [ ] textual, unified, OK
-code-molester       Q [ ] structural, isomorphic, OK
-sub-tree            q [ ] textual, unified, OK
-treemap             Q [ ] datapoint, explicit OK
+code-molester       Q [ ] structural, isomorphic, OK. (last both)
+sub-tree            q [ ] textual, unified, OK. (last both)
+treemap             Q [ ] datapoint, explicit OK (last both)
 
 
 

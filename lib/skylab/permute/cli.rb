@@ -51,8 +51,6 @@ module Skylab::Permute
 
     listeners_digraph  syntax_error: :info
 
-    event_factory -> _, __, x { x }  # "datapoints"
-
     def self.build runtime
       act = new
       act.parent = runtime
@@ -63,6 +61,10 @@ module Skylab::Permute
         runtime.call_digraph_listeners :payload, e
       end
       act
+    end
+
+    def build_digraph_event x, _i, _esg
+      x
     end
   end
 
