@@ -58,7 +58,7 @@ module Skylab::BeautySalon
           :comment_line_yieldee,
           :code_line_yieldee
 
-    Brazen_.event.selective_builder_sender_receiver self
+    Callback_::Event.selective_builder_sender_receiver self
 
     def produce_any_result
       via_properties_init_ivars
@@ -120,7 +120,7 @@ module Skylab::BeautySalon
       @input_stream && ACHIEVED_
     rescue ::Errno::ENOENT => e
       maybe_send_event :error, :IO_error do
-        Brazen_.event.wrap.exception e,
+        Callback_::Event.wrap.exception e,
           :path_hack, :terminal_channel_i, :resource_not_found
       end
       UNABLE_

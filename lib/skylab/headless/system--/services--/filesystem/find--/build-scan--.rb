@@ -54,7 +54,7 @@ module Skylab::Headless
 
         @on_event_selectively.call :error, :find_error do
 
-          Headless_.lib_.event_lib.inline_with :find_error,
+          Callback_::Event.inline_with :find_error,
             :message, error_s, :ok, false
         end
         nil

@@ -15,7 +15,7 @@ module Skylab::SubTree
 
     Callback_::Actor.methodic self, :simple, :properties
 
-    SubTree_.lib_.event_lib.selective_builder_sender_receiver self
+    Callback_::Event.selective_builder_sender_receiver self
 
     def initialize _, & oes_p
       @on_event_selectively = oes_p
@@ -82,7 +82,7 @@ module Skylab::SubTree
       end
     end
 
-    Data_Event_ = SubTree_.lib_.event_lib.data_event_class_factory
+    Data_Event_ = Callback_::Event.data_event_class_factory
 
     module Local_Actor_
 

@@ -1,6 +1,6 @@
-module Skylab::Brazen
+module Skylab::Callback
 
-    class Event__
+    class Event
 
       EXPRESSION_AGENT__ = ( class Expression_Agent__ < ::Object
 

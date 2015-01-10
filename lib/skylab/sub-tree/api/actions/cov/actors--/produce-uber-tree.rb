@@ -9,7 +9,7 @@ module Skylab::SubTree
         :path,
         :on_event_selectively
 
-      SubTree_.lib_.event_lib.selective_builder_sender_receiver self
+      Callback_::Event.selective_builder_sender_receiver self
 
       def execute
         ok = normalize

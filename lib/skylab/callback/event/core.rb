@@ -1,6 +1,6 @@
-module Skylab::Brazen
+module Skylab::Callback
 
-    class Event__  # see [#011]
+    class Event  # see [#011]
 
       class << self
 
@@ -118,7 +118,7 @@ module Skylab::Brazen
         @message_proc = p
         scn = Callback_::Iambic_Stream.via_array x_a
         @terminal_channel_i = scn.gets_one
-        box = Box_.new
+        box = Callback_::Box.new
         sc = singleton_class
         while scn.unparsed_exists
           i = scn.gets_one
@@ -587,5 +587,7 @@ module Skylab::Brazen
       end
 
       Event_ = self
+
+      SPACE_ = ' '.freeze
     end
 end

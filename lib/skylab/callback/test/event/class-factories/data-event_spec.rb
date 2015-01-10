@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::Brazen::TestSupport::Event::Class_Factories::DE
+module Skylab::Callback::TestSupport::Event::Class_Factories::DE
 
-  ::Skylab::Brazen::TestSupport::Event::Class_Factories[ self ]
+  ::Skylab::Callback::TestSupport::Event::Class_Factories[ self ]
 
   include Constants
 
@@ -30,7 +30,7 @@ module Skylab::Brazen::TestSupport::Event::Class_Factories::DE
     end
 
     Subject_ = -> do
-      Brazen_.event.data_event_class_factory
+      Callback_::Event.data_event_class_factory
     end
   end
 end

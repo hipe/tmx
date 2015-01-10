@@ -38,10 +38,6 @@ module Skylab::TreetopTools
       Bsc__[]::Digraph
     end
 
-    Event_lib = -> do
-      Bzn__[].event
-    end
-
     File_utils = memoize[ -> { require 'fileutils' ; ::FileUtils } ]
 
     HL__ = sidesys[ :Headless ]

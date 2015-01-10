@@ -95,7 +95,7 @@ module Skylab::Headless
 
         def no_support_for i_a
           @on_event_selectively.call :error, :regexp_option_not_supported do
-            Headless_.lib_.event_lib.
+            Callback_::Event.
               inline_not_OK_with :non_convertible_regexp_options,
                 :option_symbols, i_a, :regexp, @ruby_regexp
           end
@@ -183,7 +183,7 @@ module Skylab::Headless
 
         def when_system_error err_s
           @on_event_selectively.call :error, :system_call_error do
-            Headless_.lib_.event_lib.inline_not_OK_with :system_call_error,
+            Callback_::Event.inline_not_OK_with :system_call_error,
               :message, err_s, :error_category, :system_call_error
           end
           UNABLE_

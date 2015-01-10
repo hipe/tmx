@@ -47,10 +47,10 @@ module Skylab::TanMan
       p = -> do
         Remove_Hooks__ = Headless::Event::Hooks.new :not_found, :success
         p = -> { Remove_Hooks__ }
-        Remove_Not_Found__ = TanMan::Event_.new do |section_name_s|
+        Remove_Not_Found__ = self._TODO_data_event.new do |section_name_s|
           "no such section [#{ section_name_s }]"
         end
-        Remove_Success__ = TanMan::Event_.new do |section_name_s|
+        Remove_Success__ = self._TODO_data_event.new do |section_name_s|
           "removed section [#{ section_name_s }]"
         end
         Remove_Hooks__

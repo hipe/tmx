@@ -103,10 +103,6 @@ module Skylab::SubTree
     end
     EMPTY_A__ = [].freeze  # etc
 
-    Event_lib = -> do
-      Bzn_[].event
-    end
-
     Face__ = sidesys[ :Face ]
 
     Field_front_expression_agent = -> a, b do

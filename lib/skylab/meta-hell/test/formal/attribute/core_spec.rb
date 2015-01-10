@@ -219,7 +219,7 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute
 
       def build_and_attach_to_emit_spy
 
-        es = MetaHell_.lib_.event_lib.test_support.
+        es = Callback_.test_support.
           call_digraph_listeners_spy(
             :do_debug_proc, -> { do_debug },
             :debug_IO, debug_IO )

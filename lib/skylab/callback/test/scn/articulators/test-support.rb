@@ -6,7 +6,7 @@ module Skylab::Callback::TestSupport::Scn::Articulators
 
   module Constants
 
-    NEWLINE_ = "\n".freeze
+    NEWLINE_ = ::Skylab::Callback::TestSupport::NEWLINE_
 
     Subject_ = -> do
       Callback_::Scn.articulators

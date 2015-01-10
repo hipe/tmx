@@ -1,6 +1,6 @@
-module Skylab::Brazen
+module Skylab::Callback
 
-    class Event__
+    class Event
 
       class Wrappers__::File_utils_message
 
@@ -89,7 +89,7 @@ module Skylab::Brazen
             predicate
           end
 
-          Event__.inline_with :file_utils_event,
+          Event_.inline_with :file_utils_event,
               :path, any_path,
               :message_head, _message_head,
               :ok, nil do |y, o|

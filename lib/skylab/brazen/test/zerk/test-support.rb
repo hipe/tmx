@@ -15,7 +15,7 @@ module Skylab::Brazen::TestSupport::Zerk
 
   module InstanceMethods
 
-    Brazen_::TestSupport::Expect_Event[ self ]
+    Constants::TestLib_::Expect_event[ self ]
 
     def call * x_a
       @branch ||= build_branch

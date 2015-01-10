@@ -88,11 +88,11 @@ module Skylab::Cull
 
     def build_not_OK_event_with * i_a, & msg_p
       i_a.push :ok, false
-      Brazen_.event.inline_via_iambic_and_any_message_proc_to_be_defaulted i_a, msg_p
+      Callback_::Event.inline_via_iambic_and_any_message_proc_to_be_defaulted i_a, msg_p
     end
 
     def build_event_with * i_a, & msg_p
-      Brazen_.event.inline_via_iambic_and_any_message_proc_to_be_defaulted i_a, msg_p
+      Callback_::Event.inline_via_iambic_and_any_message_proc_to_be_defaulted i_a, msg_p
     end
 
     def handle_event_selectively

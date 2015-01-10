@@ -90,7 +90,7 @@ module Skylab::Callback::TestSupport::Autoloader
       end
 
       if false  # integ
-        _Face = TestLib_::Face__[]
+        # _Face = [ real Face ]
         _Face::TestSupport
       end
 
@@ -101,7 +101,7 @@ module Skylab::Callback::TestSupport::Autoloader
       end
 
       if false  # integ
-        _Face = TestLib_::Face__[]
+        # _Face = [ real face ]
         _TS = _Face::TestSupport
         _TS::CLI
       end

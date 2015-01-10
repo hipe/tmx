@@ -17,10 +17,6 @@ module Skylab::MetaHell
       Bzn__[]::Entity
     end
 
-    Event_lib = -> do
-      Callback_
-    end
-
     Levenshtein = -> do
       IT__[]::Levenshtein
     end

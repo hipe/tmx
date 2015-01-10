@@ -1735,6 +1735,8 @@ module Skylab::Callback
 
   # ~ public and protected consts and any related public accessor methods
 
+  ACHIEVED_ = true
+
   def self.const_sep
     CONST_SEP_
   end
@@ -1821,6 +1823,8 @@ module Skylab::Callback
     end
   end
 
+  NILADIC_TRUTH_ = -> { true }
+
   Oxford = -> separator, none, final_sep, a do
     if a.length.zero?
       none
@@ -1877,6 +1881,8 @@ module Skylab::Callback
 
     alias_method :gets, :call
   end
+
+  UNABLE_ = false
 
   require 'pathname'  # ~ eat our own dogfood, necessarily at the end
 

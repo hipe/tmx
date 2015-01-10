@@ -26,7 +26,7 @@ module Skylab::Brazen
       end
 
       def event
-        Brazen_::Event__
+        Callback_::Event
       end
 
       def mutable_iambic_stream

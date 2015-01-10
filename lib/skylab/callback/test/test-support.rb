@@ -47,5 +47,6 @@ module Skylab::Callback::TestSupport
   end
 
   KEEP_PARSING_ = true
+  NEWLINE_ = "\n".freeze
 
 end

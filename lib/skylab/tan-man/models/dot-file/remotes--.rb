@@ -214,7 +214,7 @@ module Skylab::TanMan
         end
         #
 
-        Event__ = TanMan::Event_.new do |remote_type, remote_value,
+        Event__ = self._TODO_data_event.new do |remote_type, remote_value,
             any_same_a, any_add_a, any_change_a|
           y = [ ]
           any_same_a and y << "#{ and_( any_same_a.map { |a| lbl a[ 0 ] } ) } #{

@@ -11,8 +11,6 @@ module Skylab::SubTree
 
       :flag, :ivar, :@be_verbose, :property, :verbose
 
-    Event_ = SubTree_::Lib_::Event_lib[]
-
     def initialize _
       @list_as_a = []
       super
@@ -151,7 +149,7 @@ module Skylab::SubTree
       UNABLE_
     end
 
-    Message_ = SubTree_::Lib_::Event_lib[].message_class_factory
+    Message_ = Callback_::Event.message_class_factory
 
     No_Directory__ = Message_.new do |path|
       pn = ::Pathname.new path

@@ -6,7 +6,7 @@ module Skylab::Brazen::TestSupport::Data_Stores::Git_Config::Mutable
 
     extend TS_
 
-    TestLib_::Expect_Event[ self ]
+    TestLib_::Expect_event[ self ]
 
     with_a_document_with_a_section_called_foo
 

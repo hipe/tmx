@@ -23,7 +23,7 @@ module Skylab::Basic
     module TestLib_
 
       Expect_event = -> test_ctxt_cls do
-        Basic_::Lib_::Bzn_[].test_support.expect_event test_ctxt_cls
+        Basic_::Callback_.test_support::Expect_Event[ test_ctxt_cls ]
       end
 
       Expect_normalization = -> test_ctxt_cls do

@@ -222,7 +222,7 @@ module Skylab::BeautySalon
 
         def build_path_stream
           maybe_send_event :error do
-            BS_.lib_.event_lib.inline_not_OK_with(
+            Callback_::Event.inline_not_OK_with(
               :not_yet_implemented, :method_name, :build_path_stream )
           end
           UNABLE_

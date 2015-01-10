@@ -8,7 +8,7 @@ module Skylab::TreetopTools
         :root_bp,
         :event_receiver  # and proprietor
 
-      LIB_.event_lib.selective_builder_sender_receiver self
+      Callback_::Event.selective_builder_sender_receiver self
 
       def execute
         resolve_pathname_actual_a

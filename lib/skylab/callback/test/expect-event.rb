@@ -1,4 +1,4 @@
-module Skylab::Brazen::TestSupport
+module Skylab::Callback::TestSupport
 
   class Expect_Event
 
@@ -30,7 +30,7 @@ module Skylab::Brazen::TestSupport
             _ev = if ev_p
               ev_p[]
             else
-              Brazen_.event.inline_via_normal_extended_mutable_channel x_a
+              Callback_::Event.inline_via_normal_extended_mutable_channel x_a
             end
             evr.receive_ev _ev
           end
@@ -178,7 +178,7 @@ module Skylab::Brazen::TestSupport
         end
 
         def expression_agent_for_expect_event
-          Brazen_.event.codifying_expression_agent
+          Callback_::Event.codifying_expression_agent
         end
 
         def black_and_white ev
@@ -300,7 +300,7 @@ module Skylab::Brazen::TestSupport
             header_s = "#{ comment }#{ @ok_s } #{ @tci } #{ @mems } - "
             io.puts "#{ header_s }#{ s.inspect }"
             p = -> s_ do
-              blank_s = Brazen_::SPACE_ * header_s.length
+              blank_s = SPACE_ * header_s.length
               io.puts "#{ blank_s }#{ s_.inspect }"
               p = -> s__ do
                 io.puts "#{ blank_s }#{ s__.inspect }"
@@ -376,7 +376,5 @@ module Skylab::Brazen::TestSupport
         end ; nil
       end
     end
-
-    NEWLINE_ = Brazen_::NEWLINE_
   end
 end

@@ -16,7 +16,7 @@ module Skylab::TanMan
         :verb_i,
         :call
 
-      Brazen_.event.selective_builder_sender_receiver self
+      Callback_::Event.selective_builder_sender_receiver self
 
       def execute
         case @verb_i

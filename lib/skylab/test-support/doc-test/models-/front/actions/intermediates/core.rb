@@ -169,7 +169,7 @@ module Skylab::TestSupport
 
         def report_via_count d
           @on_event_selectively.call :info, :finished do
-            TestSupport_.lib_.event_lib.inline_with :finished,
+            Callback_::Event.inline_with :finished,
                 :number_of_files, d,
                 :ok, ( d.nonzero? ? true : false ) do | y, o |
 
@@ -256,7 +256,7 @@ module Skylab::TestSupport
             else
 
               @on_event_selectively.call :info, :writing do
-                TestSupport_.lib_.event_lib.inline_neutral_with :writing,
+                Callback_::Event.inline_neutral_with :writing,
                   :path, @desired_path
               end
 

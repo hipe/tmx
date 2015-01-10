@@ -33,7 +33,7 @@ module Skylab::TreetopTools
 
                                   # for after call_body_and_absorb
 
-    LIB_.event_lib.selective_builder_sender_receiver self
+    Callback_::Event.selective_builder_sender_receiver self
 
     def invoke
       ok = call_body_and_absorb!

@@ -188,7 +188,7 @@ module Skylab::Callback
         end
 
         def build_not_OK_event_with * i_a, & msg_p
-          Callback_::Lib_::Event_lib[].inline_not_OK_via_mutable_iambic_and_message_proc i_a, msg_p
+          Callback_::Event.inline_not_OK_via_mutable_iambic_and_message_proc i_a, msg_p
         end
 
         def receive_extra_iambic ev  # :+#public-API (name) :+#hook-in
@@ -728,12 +728,10 @@ module Skylab::Callback
         IAMBIC_WRITER_METHOD_NAME_RX__ = /\A.+(?==\z)/
       end
 
-      ACHIEVED_ = true
       BX_ = :PROPERTIES_FOR_WRITE__
       MM_ = :ModuleMethods  # is Module_Methods in [bz] ent
       PC_ = :Property  # is PROPERTY_CLASS__ in [bz] ent
       STOP_PARSING_ = false
-      UNABLE_ = false
     end
   end
 end

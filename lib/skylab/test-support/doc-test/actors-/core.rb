@@ -18,7 +18,7 @@ module Skylab::TestSupport
             x
           elsif oes_p
             oes_p.call :error, :wrong_const_name do
-              TestSupport_.lib_.event_lib.inline_not_OK_with(
+              Callback_::Event.inline_not_OK_with(
                 :wrong_const_name,
                   :name, x, :error_category, :name_error )
             end

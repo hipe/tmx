@@ -32,7 +32,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
   ::RSpec::Matchers.define :be_event do |*event_a|
     # the below hooks must be called in the order: MATCH [FAIL_MSG] DESCRPTION
 
-    nub = Callback_::TestSupport::Event::Predicate::Nub.new expected
+    nub = Callback_.test_support::Old_Expect_Event::Predicate::Nub.new expected
     nub.textify = -> emission { emission.payload_x }
     nub.unstyle_all_styled!
     match(& nub.handle_match )

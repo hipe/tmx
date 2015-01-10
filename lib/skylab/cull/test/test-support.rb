@@ -94,7 +94,7 @@ module Skylab::Cull::TestSupport
   end
 
   Expect_event_ = -> test_context_module do
-    Cull_::Brazen_.test_support::Expect_Event[ test_context_module ]
+    Cull_::Callback_.test_support::Expect_Event[ test_context_module ]
   end
 
   DASH_ = '-'

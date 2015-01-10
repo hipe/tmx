@@ -4,9 +4,8 @@ require 'skylab/test-support/core'
 module Skylab::Brazen::TestSupport
 
   class << self
-
-    def expect_event x
-      Brazen_::TestSupport::Expect_Event[ x ]
+    def expect_interactive x
+      self::Zerk::Expect_Interactive[ x ]
     end
   end
 
@@ -68,8 +67,8 @@ module Skylab::Brazen::TestSupport
 
     memoize = Brazen_::Callback_.memoize
 
-    Expect_Event = -> test_context_cls do
-      TS_::Expect_Event[ test_context_cls ]
+    Expect_event = -> test_context_cls do
+      Callback_.test_support::Expect_Event[ test_context_cls ]
     end
 
     Fileutils = Callback_.memoize do
@@ -82,8 +81,6 @@ module Skylab::Brazen::TestSupport
       _path = sys.defaults.dev_tmpdir_pathname.join( 'brzn' ).to_path
       sys.filesystem.tmpdir :path, _path
     end ]
-
-    System = Brazen_::Lib_::System
 
   end
 

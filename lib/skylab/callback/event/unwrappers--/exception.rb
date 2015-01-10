@@ -1,6 +1,6 @@
-module Skylab::Brazen
+module Skylab::Callback
 
-    class Event__
+    class Event
 
       class Unwrappers__::Exception
 
@@ -30,7 +30,7 @@ module Skylab::Brazen
 
         def resolve_message_string
           resolve_message_lines
-          @message_s = LIB_.basic::String.
+          @message_s = Callback_::Lib_::Basic[]::String.
             paragraph_string_via_message_lines @message_s_a ; nil
         end
 
@@ -40,7 +40,7 @@ module Skylab::Brazen
         end
 
         def expression_agent
-          Brazen_::API.expression_agent_instance  # hard-coded "black and white" for now
+          Callback_::Lib_::Brazen[]::API.expression_agent_instance  # hard-coded "black and white" for now
         end
       end
     end

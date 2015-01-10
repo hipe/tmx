@@ -46,7 +46,7 @@ module Skylab::Headless
 
           :property, :on_event_selectively
 
-        Headless_.lib_.event_lib.selective_builder_sender_receiver self
+        Callback_::Event.selective_builder_sender_receiver self
 
      private
 

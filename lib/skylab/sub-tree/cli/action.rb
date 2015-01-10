@@ -4,8 +4,6 @@ module Skylab::SubTree
 
     extend SubTree_::Lib_::Bzn_[].name_library.name_function_proprietor_methods
 
-    Event_ = Lib_::Bzn_[].event
-
     def init_for_invocation_via_services svcs
       @app_mod = SubTree_
       @infostream, @CLI_receive_pair = svcs.at :errstream, :emit_proc

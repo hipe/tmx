@@ -10,7 +10,7 @@ module Skylab::BeautySalon
         :is_dry_run,
         :on_event_selectively
 
-      BS_.lib_.event_lib.selective_builder_sender_receiver self
+      Callback_::Event.selective_builder_sender_receiver self
 
       def execute
         ok = write_temp_file
@@ -77,7 +77,7 @@ module Skylab::BeautySalon
         nil
       end
 
-      Changed_ = BS_.lib_.event_lib.prototype_with :changed_file,
+      Changed_ = Callback_::Event.prototype_with :changed_file,
         :path, nil, :is_dry_run, nil, :ok, true
 
     end

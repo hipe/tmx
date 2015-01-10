@@ -4,10 +4,10 @@ module Skylab::Callback
 
     sidesys = Autoloader.build_require_sidesystem_proc
 
-    Bsc__ = sidesys[ :Basic ]
+    Basic = sidesys[ :Basic ]
 
     Digraph_lib = -> do
-      Bsc__[]::Digraph
+      Basic[]::Digraph
     end
 
     Boxlike_as_proxy_to_hash = -> h do
@@ -25,7 +25,7 @@ module Skylab::Callback
       MH__[]::Bundle::Multiset[ x ]
     end
 
-    Bzn__ = sidesys[ :Brazen ]
+    Brazen = sidesys[ :Brazen ]
 
     Class = -> do
       MH__[]::Class
@@ -41,22 +41,18 @@ module Skylab::Callback
 
     Entity = -> * a, & edit_p do
       if a.length.nonzero? || edit_p
-        Bzn__[]::Entity.via_arglist a, & edit_p
+        Brazen[]::Entity.via_arglist a, & edit_p
       else
-        Bzn__[]::Entity
+        Brazen[]::Entity
       end
     end
 
     Enum_lib = -> do
-      Bsc__[]::Enumerator
-    end
-
-    Event_lib = -> do
-      Bzn__[].event
+      Basic[]::Enumerator
     end
 
     Hash_lib = -> do
-      Bsc__[]::Hash
+      Basic[]::Hash
     end
 
     HL__ = sidesys[ :Headless ]
@@ -78,7 +74,7 @@ module Skylab::Callback
     end
 
     List_lib = -> do
-      Bsc__[]::List
+      Basic[]::List
     end
 
     IT__ = sidesys[ :InformationTactics ]
@@ -88,7 +84,7 @@ module Skylab::Callback
     Memoize = Memoize_  # as you like it
 
     Module_lib = -> do
-      Bsc__[]::Module
+      Basic[]::Module
     end
 
     Num2ord = -> x do
@@ -125,11 +121,15 @@ module Skylab::Callback
     end
 
     String_lib = -> do
-      Bsc__[]::String
+      Basic[]::String
     end
 
     Struct_lib = -> do
-      Bsc__[]::Struct
+      Basic[]::Struct
+    end
+
+    System = -> do
+      HL__[].system
     end
 
     TestSupport_ = TestSupport__ = sidesys[ :TestSupport ]

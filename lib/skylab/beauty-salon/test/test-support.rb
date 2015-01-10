@@ -74,8 +74,12 @@ module Skylab::BeautySalon::TestSupport
 
   module TestLib_
 
-    Expect_event = -> test_context_mod do
-      BS_.lib_.brazen.test_support::Expect_Event[ test_context_mod ]
+    Expect_event = -> test_context_cls do
+      Constants::Callback_.test_support::Expect_Event[ test_context_cls ]
+    end
+
+    Expect_interactive = -> x do
+      BS_.lib_.brazen.test_support.expect_interactive x
     end
 
   end

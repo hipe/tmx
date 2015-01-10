@@ -1,7 +1,7 @@
 require_relative '../test-support'
 
-module Skylab::Brazen::TestSupport::Event
+module Skylab::Callback::TestSupport::Event
 
-  ::Skylab::Brazen::TestSupport[ self ]
+  ::Skylab::Callback::TestSupport[ self ]
 
 end

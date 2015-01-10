@@ -25,7 +25,6 @@ module Skylab::TanMan
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
   stowaway :Entity_, 'models-'
-  Event_ = -> { Brazen_.event }
   FILE_SEPARATOR_ = ::File::SEPARATOR
   stowaway :Kernel_, 'models-'
   Model_lib_ = -> { Brazen_.model }

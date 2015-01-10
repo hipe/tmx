@@ -21,7 +21,7 @@ module Skylab::TanMan::TestSupport
     sidesys = TanMan_::Autoloader_.build_require_sidesystem_proc
 
     API_expect = -> ctx_cls do
-      TanMan_::Brazen_::TestSupport::Expect_Event[ ctx_cls ]
+      TanMan_::Callback_.test_support::Expect_Event[ ctx_cls ]
     end
 
     Bsc__ = sidesys[ :Basic ]

@@ -59,10 +59,6 @@ module Skylab::Headless
       Basic[]::Enumerator
     end
 
-    Event_lib = -> do
-      Bzn_[].event
-    end
-
     Funcy_globful = -> cls do
       MH__[].funcy_globful cls
     end

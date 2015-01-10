@@ -182,12 +182,12 @@ module Skylab::TestSupport
     private
 
       def build_not_OK_event_with * x_a, & msg_p
-        TestSupport_.lib_.event_lib.
+        Callback_::Event.
           inline_not_OK_via_mutable_iambic_and_message_proc x_a, msg_p
       end
 
       def build_neutral_event_with * x_a, & msg_p
-        TestSupport_.lib_.event_lib.
+        Callback_::Event.
           inline_neutral_via_mutable_iambic_and_message_proc x_a, msg_p
       end
 

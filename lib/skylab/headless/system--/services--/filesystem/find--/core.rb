@@ -174,7 +174,7 @@ module Skylab::Headless
           nil
         end
 
-        Command_String_Event__ = Headless_.lib_.event_lib.prototype_with(
+        Command_String_Event__ = Callback_::Event.prototype_with(
 
             :command_string, :command_string, nil, :ok, nil ) do |y, o|
 

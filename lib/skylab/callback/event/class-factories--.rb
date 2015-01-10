@@ -1,6 +1,6 @@
-module Skylab::Brazen
+module Skylab::Callback
 
-  class Event__
+  class Event
 
     Class_Factories__ = ::Module.new
 

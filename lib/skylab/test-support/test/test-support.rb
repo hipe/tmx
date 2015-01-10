@@ -38,7 +38,7 @@ module Skylab::TestSupport::TestSupport
   module TestLib_
 
     Expect_event = -> test_ctx_cls do
-      TestSupport_::Lib_::Bzn_[].test_support.expect_event test_ctx_cls
+      TestSupport_::Callback_.test_support::Expect_Event[ test_ctx_cls ]
     end
 
     Face_module = -> do

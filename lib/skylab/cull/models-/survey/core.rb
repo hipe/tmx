@@ -333,7 +333,7 @@ module Skylab::Cull
     end
 
     def to_event
-      Brazen_.event.inline_OK_with :survey,
+      Callback_::Event.inline_OK_with :survey,
         :path, ::File.join( @_path, FILENAME_ ),
         :is_completion, true
     end

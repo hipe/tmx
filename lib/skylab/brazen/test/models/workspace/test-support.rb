@@ -18,7 +18,7 @@ module Skylab::Brazen::TestSupport::Models::Workspace
 
   module InstanceMethods
 
-    Brazen_::TestSupport::Expect_Event[ self ]
+    Constants::TestLib_::Expect_event[ self ]
 
     # ~ tmpdir
 

@@ -37,7 +37,7 @@ module Skylab::BeautySalon
         send :"init_command_head_for_#{ @mode }"
 
         @on_event_selectively.call :info, :grep_command_head do
-          BS_.lib_.event_lib.inline_neutral_with :grep_command_head,
+          Callback_::Event.inline_neutral_with :grep_command_head,
             :command_head, @head_s
         end
 

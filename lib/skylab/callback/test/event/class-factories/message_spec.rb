@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::Brazen::TestSupport::Event::Class_Factories::MSG
+module Skylab::Callback::TestSupport::Event::Class_Factories::MSG
 
-  ::Skylab::Brazen::TestSupport::Event::Class_Factories[ self ]
+  ::Skylab::Callback::TestSupport::Event::Class_Factories[ self ]
 
   include Constants
 
@@ -28,13 +28,14 @@ module Skylab::Brazen::TestSupport::Event::Class_Factories::MSG
 
       _ev = msg.to_event
 
-      _ev.render_all_lines_into_under y=[], Brazen_::API.expression_agent_instance
+      _ev.render_all_lines_into_under y=[],
+        Callback_::Lib_::Brazen[]::API.expression_agent_instance
 
       y.should eql ["ermegerd '_Foo_' (:_Bar_)"]
     end
 
     Subject_ = -> do
-      Brazen_.event.message_class_factory
+      Callback_::Event.message_class_factory
     end
   end
 end

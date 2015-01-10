@@ -27,7 +27,7 @@ module Skylab::Brazen
     end
 
     def event
-      Brazen_::Event__
+      Callback_::Event
     end
 
     def kernel_class
@@ -289,14 +289,12 @@ module Skylab::Brazen
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> { }
   EMPTY_S_ = ''.freeze
-  Event_ = -> { Brazen_.event }
   Autoloader_[ Models_ = ::Module.new, :boxxy ]
   IDENTITY_ = -> x { x }
   KEEP_PARSING_ = true
   LIB_ = Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
   NAME_ = :name
   NEWLINE_ = "\n".freeze
-  NILADIC_TRUTH_ = -> { true }
   PROCEDE_ = true
   SPACE_ = ' '.freeze
   STOP_PARSING_ = false

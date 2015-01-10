@@ -7,7 +7,7 @@ module Skylab::Callback::TestSupport
       o :iambic_writer_method_name_suffix, :'='
 
       def debug=
-        @do_debug_proc = NILADIC_TRUTH_
+        @do_debug_proc = Callback_::NILADIC_TRUTH_
         KEEP_PARSING_
       end
 
@@ -16,8 +16,6 @@ module Skylab::Callback::TestSupport
     end
 
     EMPTY_P_ = Callback_::EMPTY_P_
-
-    NILADIC_TRUTH_ = -> { true }
 
     def initialize * x_a
       block_given? and self._FIXME

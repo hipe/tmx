@@ -26,10 +26,6 @@ module Skylab::BeautySalon
       HL__[]::CLI
     end
 
-    Event_lib = -> do
-      Brazen[].event
-    end
-
     File_utils = Callback_.memoize do
       require 'fileutils'
       ::FileUtils

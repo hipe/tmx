@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Callback::TestSupport::Event_Tests__
 
-  ::Skylab::Callback::TestSupport[ self ]
+  ::Skylab::Callback::TestSupport[ TS_ = self ]
 
   include Constants
 
@@ -12,15 +12,16 @@ module Skylab::Callback::TestSupport::Event_Tests__
 
   describe "[cb] event" do
 
+    extend TS_
+
+    it "loads" do
+      subject_class
+    end
+
     it "you must construct it with 1 arg" do
       -> do
         subject_class.new
-      end.should raise_error ::ArgumentError,
-        'wrong number of arguments (0 for 1)'
-    end
-
-    def subject_class
-      Callback_::TestSupport::Event::Assertion
+      end.should raise_error ::ArgumentError, 'wrong number of arguments (0 for 1)'
     end
 
     context "the empty assertion against" do
@@ -286,11 +287,9 @@ module Skylab::Callback::TestSupport::Event_Tests__
       end.call
     end
 
-    def debug!
-      @do_debug = true
+    def subject_class
+      Callback_::TestSupport::Old_Expect_Event::Assertion
     end
-
-    attr_reader :do_debug
 
     -> do
       stderr = ::STDERR

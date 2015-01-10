@@ -1,6 +1,6 @@
 module Skylab::Callback::TestSupport
 
-  module Event
+  module Old_Expect_Event
 
     class Assertion  # read [#021] the .. narrative #storypoint-005
 
@@ -348,8 +348,9 @@ module Skylab::Callback::TestSupport
   end
 end
 ## HERE ##
+# the below mess is for some ANCIENT [po] tests that we want desparately to go away
 module Skylab::Callback::TestSupport
-  module Event
+  module Old_Expect_Event
     Predicate = ::Module
     class Predicate::Nub  # #retro-fitter. may be temporary.
       def initialize exp_a

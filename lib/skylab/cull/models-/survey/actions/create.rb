@@ -10,9 +10,9 @@ module Skylab::Cull
 
       call.maybe_receive_event :info, :ping do
 
-        Brazen_.event.wrap.signature(
+        Callback_::Event.wrap.signature(
           call.action_class_like.name_function,
-          ( Brazen_.event.inline_neutral_with :ping do | y, o |
+          ( Callback_::Event.inline_neutral_with :ping do | y, o |
             y << "hello from #{ call.kernel.app_name }."
           end ) )
       end

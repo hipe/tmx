@@ -668,7 +668,7 @@ module Skylab::TestSupport
 
           if @do_emit_current_output_path
             maybe_send_event :info, :current_output_path do
-              TestSupport_.lib_.event_lib.inline_neutral_with(
+              Callback_::Event.inline_neutral_with(
                 :current_output_path, :path, @output_path )
             end
           end

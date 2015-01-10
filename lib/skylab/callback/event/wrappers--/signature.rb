@@ -1,6 +1,6 @@
-module Skylab::Brazen
+module Skylab::Callback
 
-  class Event__
+  class Event
 
     module Wrappers__
 

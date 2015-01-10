@@ -1,10 +1,10 @@
-module Skylab::Brazen
+module Skylab::Callback
 
-    class Event__
+    class Event
 
       class Wrappers__::Exception
 
-        Entity.call self do
+        Callback_::Lib_::Entity.call self do
 
           def path_hack  # :[#052].
             add_mutator do |o|
@@ -50,7 +50,7 @@ module Skylab::Brazen
 
         end
 
-        Event__.selective_builder_sender_receiver self
+        Event_.selective_builder_sender_receiver self
 
         PATH_HACK_RX__ = / @ rb_(?<rb_function_name>[_a-z]+) - /
 

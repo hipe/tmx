@@ -12,7 +12,7 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Core
 
     extend TS_
 
-    Brazen_::TestSupport::Expect_Event[ self ]
+    TestLib_::Expect_event[ self ]
 
     it "the empty stack will never find anything" do
       stack = Subject_[].new

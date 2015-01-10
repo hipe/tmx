@@ -1,14 +1,12 @@
 require_relative 'test-support'
 
-module Skylab::Brazen::TestSupport::Event::Wrap_FU_msg
+module Skylab::Callback::TestSupport::Event::Wrap_FU_msg
 
-  ::Skylab::Brazen::TestSupport::Event[ self ]
+  ::Skylab::Callback::TestSupport::Event[ self ]
 
   include Constants
 
   extend TestSupport_::Quickie
-
-  TestLib_ = TestLib_
 
   describe "[br] entity event wrappers - file utils message" do
 
@@ -37,7 +35,7 @@ module Skylab::Brazen::TestSupport::Event::Wrap_FU_msg
 
     def fu_output_message_for i, s
       message = nil
-      _fuc = TestLib_::System[].filesystem.file_utils_controller do |msg|
+      _fuc = Callback_::Lib_::System[].filesystem.file_utils_controller do | msg |
         message = msg
       end
       _fuc.send i, s, noop: true
@@ -45,7 +43,7 @@ module Skylab::Brazen::TestSupport::Event::Wrap_FU_msg
     end
 
     Subject_ = -> do
-      Brazen_.event::Wrappers__::File_utils_message::PATH_HACK_RX__
+      Callback_::Event::Wrappers__::File_utils_message::PATH_HACK_RX__
     end
   end
 end

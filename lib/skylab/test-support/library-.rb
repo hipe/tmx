@@ -75,10 +75,6 @@ module Skylab::TestSupport
       end
     end
 
-    Event_lib = -> do
-      Bzn_[].event
-    end
-
     Properties_stack_frame = -> * a do
       Bzn_[].properties_stack.common_frame.via_arglist a
     end

@@ -25,7 +25,7 @@ module Skylab::TanMan
 
   Actor_ = -> cls, * a do
     Callback_::Actor.via_client_and_iambic cls, a
-    Event_[].selective_builder_sender_receiver cls ; nil
+    Callback_::Event.selective_builder_sender_receiver cls ; nil
   end
 
   Stubber_ = -> model do

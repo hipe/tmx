@@ -1,6 +1,6 @@
-module Skylab::Brazen
+module Skylab::Callback
 
-    class Event__
+    class Event
 
       class Prototype__ < self  # :[#023].
 
@@ -43,7 +43,7 @@ module Skylab::Brazen
               _TERMINAL_CHANNEL_I_ = scn.gets_one
               define_method :terminal_channel_i do _TERMINAL_CHANNEL_I_ end
               define_method :message_proc do _MESSAGE_PROC_ end
-              _BOX_ = Box_.new
+              _BOX_ = Callback_::Box.new
               while scn.unparsed_exists
                 prop = Prop__.new scn.gets_one, scn.gets_one
                 _BOX_.add prop.name_i, prop
@@ -154,7 +154,7 @@ module Skylab::Brazen
           end
         private
           def bld_ivar_bx
-            bx = Box_.new
+            bx = Callback_::Box.new
             prop_bx.each_pair do |i, prop|
               bx.add i, prop.name_as_ivar
             end
