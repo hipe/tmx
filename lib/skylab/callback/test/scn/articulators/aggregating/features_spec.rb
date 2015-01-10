@@ -188,7 +188,7 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
         if s
           s_a = [ s ]
           while s = @output_scn.gets
-            s_a.push SPACE_
+            s_a.push Callback_::SPACE_
             s_a.push s
           end
         end

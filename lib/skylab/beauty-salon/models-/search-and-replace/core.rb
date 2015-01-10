@@ -140,7 +140,7 @@ module Skylab::BeautySalon
 
       Final_fallback_on_event_selectively_via_channel__ = -> sout, serr do
         lib = BS_.lib_.brazen::API
-        evr = lib.two_stream_event_expressor.new(
+        evr = lib.two_stream_event_expresser.new(
           sout, serr, lib.expression_agent_instance )
         -> _, & ev_p do
           evr.receive_ev ev_p[]

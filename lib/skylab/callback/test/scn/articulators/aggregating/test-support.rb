@@ -10,8 +10,6 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
 
   Callback_ = Callback_
 
-  SPACE_ = ' '.freeze
-
   module InstanceMethods
 
     def push * s_a

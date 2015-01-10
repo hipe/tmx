@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class CLI  # magic results are [#021]
 
-    class When_Result_::Looks_like_stream
+    class When_Result_::Looks_like_stream  # :[#068] for the list shape.
 
       def initialize ada, x
         @adapter = ada
@@ -30,15 +30,23 @@ module Skylab::Brazen
 
       def when_at_least_one_item
 
-        @name = if @item.respond_to? :name_function
-          @item.name_function
+        @name = if @item.respond_to? :name
+          @item.name
         else
           Callback_::Name.via_module @item.class
         end
 
+        @via_item = if @item.respond_to? :execute or
+          @item.respond_to? :render_all_lines_into_under or
+            ! @item.class.respond_to? :properties
+          method :per_item
+        else
+          __build_listing_expresser
+        end
+
         @count = 1
         begin
-          via_item
+          @via_item[]
           @ok or break
           @item = @upstream.gets
           @item or break
@@ -49,7 +57,15 @@ module Skylab::Brazen
         finish_when_at_least_one
       end
 
-      def via_item
+      def __build_listing_expresser
+        p = When_Result_::Looks_like_stream__::Build_listing_expresser[ @expag, @item ]
+        -> do
+          @ok = p[ @item, @y ]
+          nil
+        end
+      end
+
+      def per_item
         if @item.respond_to? :execute
           via_item_execute
         elsif @item.respond_to? :render_all_lines_into_under
@@ -107,6 +123,8 @@ module Skylab::Brazen
 
         @ok ? SUCCESS_ : GENERIC_ERROR_
       end
+
+      Self_ = self
     end
   end
 end

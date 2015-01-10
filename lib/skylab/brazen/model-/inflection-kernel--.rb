@@ -19,7 +19,9 @@ module Skylab::Brazen
         def initialize name_function
           @nf = name_function
           @cls = @nf.cls
-          @ci = @cls.custom_branch_inflection
+          @ci = if @cls.respond_to? :custom_branch_inflection
+            @cls.custom_branch_inflection
+          end
         end
 
         def noun_lexeme

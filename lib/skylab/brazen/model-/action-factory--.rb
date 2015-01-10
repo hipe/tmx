@@ -223,86 +223,8 @@ module Skylab::Brazen
         include Semi_Generated_Instance_Methods__
 
         def produce_any_result
-          ok = rslv_entity_scan
-          ok && via_entity_scan_send_list
-        end
-
-      private
-
-        def rslv_entity_scan
-          @entity_scan = datastore.entity_stream_via_model(
+          datastore.entity_stream_via_model(
             self.class.model_class, & handle_event_selectively )
-          @entity_scan and ACHIEVED_
-        end
-
-        def via_entity_scan_send_list
-
-          ent_fly = nil ; item_index = -1
-
-          p = -> do
-            ev_fly = make_item_event_builder.new_mutable item_index, ent_fly
-            p = -> do
-              ev_fly.replace_some_values item_index
-              ev_fly
-            end
-            ev_fly
-          end
-
-          if ent_fly = @entity_scan.gets
-            item_index += 1
-            maybe_send_event :payload, & p
-          end
-
-          while @entity_scan.gets
-            item_index += 1
-            maybe_send_event :payload, & p
-          end
-
-          maybe_send_event :info, :number_of_items_found do
-            build_OK_event_with :number_of_items_found,
-              :count, ( item_index + 1 )
-          end
-        end
-
-        def make_item_event_builder
-
-          key_i_a, format_h = build_black_and_white_property_formatters
-
-          make_event_prototype_with :item,
-              :offset, nil, :flyweighted_entity, nil, :ok, true do |y, o|
-
-            if o.offset.nonzero?
-              y << YAML_SEPARATOR__
-            end
-
-            key_i_a.each do |key_i|
-              _x = o.flyweighted_entity.property_value key_i
-              y << format_h.fetch( key_i ) % _x
-            end ; nil
-          end
-        end
-
-        YAML_SEPARATOR__ = '---'.freeze
-
-        def build_black_and_white_property_formatters
-          @prps = self.class.model_class.properties.to_a
-          fmt = produce_property_value_format_string
-          key_a = [] ; format_h = {}
-          @prps.each do |prop|
-            key_i = prop.name.as_lowercase_with_underscores_symbol
-            key_a.push key_i
-            format_h[ key_i ] = "#{ fmt % prop.name.as_human }: %s"
-          end
-          @prps = nil
-          [ key_a, format_h ]
-        end
-
-        def produce_property_value_format_string
-          d = @prps.reduce 0 do |m, prop|
-            d_ = prop.name.as_human.length
-            m < d_ ? d_ : m
-          end
-          "%#{ d }s"
         end
       end
 

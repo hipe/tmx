@@ -587,7 +587,5 @@ module Skylab::Callback
       end
 
       Event_ = self
-
-      SPACE_ = ' '.freeze
     end
 end

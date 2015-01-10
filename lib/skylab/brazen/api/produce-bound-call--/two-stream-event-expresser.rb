@@ -4,7 +4,7 @@ module Skylab::Brazen
 
     class Produce_bound_call__
 
-    class Two_Stream_Event_Expressor
+    class Two_Stream_Event_Expresser
 
       def initialize * a
         @out, @err, @expag = a

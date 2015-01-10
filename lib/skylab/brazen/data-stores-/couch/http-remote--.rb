@@ -130,8 +130,8 @@ module Skylab::Brazen
 
         def via_append_generated_UUID_resolve_URI
 
-          @req = LIB_.Net_HTTP::Get.new UUIDS_URL__
-          @response = LIB_.Net_HTTP.start @host, @port do |http|
+          @req = LIB_.net_HTTP::Get.new UUIDS_URL__
+          @response = LIB_.net_HTTP.start @host, @port do |http|
             http.request @req
           end
 
@@ -188,11 +188,11 @@ module Skylab::Brazen
         SIMPLE_SAFETY_RX__ = /\A[-0-9a-z]+\z/
 
         def do_send_and_receive
-          _cls = LIB_.Net_HTTP.const_get @HTTP_method_i, false
+          _cls = LIB_.net_HTTP.const_get @HTTP_method_i, false
           @req = _cls.new @URI_s
           apply_headers
           @req.body = @body_s
-          @response = LIB_.Net_HTTP.start @host, @port do |http|
+          @response = LIB_.net_HTTP.start @host, @port do |http|
             http.request @req
           end ; nil
         end

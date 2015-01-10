@@ -663,6 +663,10 @@ module Skylab::Brazen
         self.class.any_property_via_symbol sym
       end
 
+      def get_argument_via_property_symbol sym
+        get_bound_property_via_property formal_property_via_symbol sym
+      end
+
       def formal_property_via_symbol sym
         self.class.property_via_symbol sym
       end
@@ -680,10 +684,6 @@ module Skylab::Brazen
       def bound_properties
         @bp ||= Entity::Properties_Stack__::Bound_properties[
           method( :get_bound_property_via_property ), formal_properties ]
-      end
-
-      def get_argument_via_property_symbol sym
-        get_bound_property_via_property formal_property_via_symbol sym
       end
 
       def get_bound_property_via_property prop

@@ -245,7 +245,7 @@ module Skylab::Brazen
         ad_st = to_adapter_stream
         sym = sym_st.gets_one
 
-        ad = ad_s.gets
+        ad = ad_st.gets
         while ad
           if sym == ad.name.as_lowercase_with_underscores_symbol
             found = ad

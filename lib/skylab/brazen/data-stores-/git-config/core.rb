@@ -36,7 +36,13 @@ module Skylab::Brazen
     end
 
     def description_under expag
-      @document.description_under expag
+      if @document
+        @document.description_under expag
+      elsif @mutable_document
+        @mutable_document.description_under expag
+      else
+        "«git config»"  # :+#guillemets
+      end
     end
 
     # ~ persist

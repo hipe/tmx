@@ -9,7 +9,7 @@ module so that a) they can be re-used elsewhere independent of s.c but
 b) our ancester chain doesn't get annoyingly long. 2) for those NLP
 functions that inflect based on number (most of them) what we do here
 different from our downstream (dependees) is we memoize the last used
-numeric expressors (for the 'number' grammatical category) so that they
+numeric expressers (for the 'number' grammatical category) so that they
 don't need to be re-submitted as arguments for subsequent utterance
 producers, for shorter, more readable utterance templates.
 

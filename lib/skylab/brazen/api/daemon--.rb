@@ -16,15 +16,15 @@ module Skylab::Brazen
         @expag ||= expression_agent_class.new application_kernel
       end
 
-      def two_stream_event_expressor
-        API::Produce_bound_call__::Two_Stream_Event_Expressor
+      def two_stream_event_expresser
+        API::Produce_bound_call__::Two_Stream_Event_Expresser
       end
     end
 
     extend module MM__
 
-      def call * x_a, & p
-        bc = _API_daemon.produce_bound_call_via_iambic_and_proc x_a, p
+      def call * x_a, & x_p
+        bc = _API_daemon.produce_bound_call_via_mutable_iambic x_a, & x_p
         bc and bc.receiver.send bc.method_name, * bc.args
       end
 
@@ -62,8 +62,13 @@ module Skylab::Brazen
         @app_kernel = @mod.const_get( :Kernel_, false ).new @mod ; nil
       end
 
-      def produce_bound_call_via_iambic_and_proc x_a, p
-        API::Produce_bound_call__[ x_a, p, @app_kernel, @mod ]
+      def produce_bound_call_via_mutable_iambic x_a, & x_p
+
+        if x_p
+          x_a.push :on_event_selectively, x_p
+        end
+
+        API::Produce_bound_call__[ x_a, @app_kernel, @mod ]
       end
 
       def application_kernel

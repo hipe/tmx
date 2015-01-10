@@ -20,8 +20,6 @@ module Skylab::Callback
         end
       end.call
 
-      SPACE_ = ' '.freeze
-
       Mutate_string_by_chomping_any_leading_at_character___ = -> do
         rx = /\A@/
         -> s do

@@ -48,33 +48,28 @@ module Skylab::TanMan::TestSupport::Models::Meaning
 
     it "list when input string has no parsable lines" do
       call_API :meaning, :ls, :input_string, "jibber\njabber"
-      expect_OK_event :number_of_items_found do |ev|
-        ev.to_event.count.should be_zero
-      end
-      expect_succeeded
+      expect_no_events
+      st = @result
+      st.gets.should be_nil
     end
 
     it "list when input string has parsable lines" do
 
       call_API :meaning, :ls, :input_string, " foo : fee \n fiffle: faffle"
 
-      expect_OK_event :item do |ev|
-        ent = ev.to_event.flyweighted_entity
+      expect_no_events
+      st = @result
+
+      ent = st.gets
         ent.property_value_via_symbol( :name ).should eql 'foo'
         ent.property_value_via_symbol( :value ).should eql 'fee '
-      end
 
-      expect_OK_event :item do |ev|
-        ent = ev.to_event.flyweighted_entity
+      ent = st.gets
         ent.property_value_via_symbol( :name ).should eql 'fiffle'
         ent.property_value_via_symbol( :value ).should eql 'faffle'
-      end
 
-      expect_OK_event :number_of_items_found do |ev|
-        ev.to_event.count.should eql 2
-      end
+      st.gets.should be_nil
 
-      expect_succeeded
     end
 
     it "add one before one - HERE HAVE A COMMA (this was hard) BUT IT IS MAGIC", wip: true do

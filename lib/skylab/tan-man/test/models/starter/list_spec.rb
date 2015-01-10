@@ -10,19 +10,16 @@ module Skylab::TanMan::TestSupport::Models::Starter
 
       call_API :starter, :ls
 
-      expect_OK_event :item do |ev|
-        ev.to_event.flyweighted_entity.local_entity_identifier_string.should eql 'digraph.dot'
-      end
+      expect_no_events
 
-      expect_OK_event :item do |ev|
-        ev.to_event.flyweighted_entity.local_entity_identifier_string.should eql 'holy-smack.dot'
-      end
+      st  = @result
 
-      expect_OK_event :number_of_items_found do |ev|
-        ev.to_event.count.should eql 2
-      end
+      st.gets.local_entity_identifier_string.should eql 'digraph.dot'
 
-      expect_succeeded
+      st.gets.local_entity_identifier_string.should eql 'holy-smack.dot'
+
+      st.gets.should be_nil
+
     end
   end
 end

@@ -132,7 +132,7 @@ module Skylab::Brazen
             if s.include? UNDERSCORE_
               pair = pair.with_name_i s.gsub( UNDERSCORE_, DASH_ ).intern
             end
-            @section[ pair.name_i ] = pair.value_x
+            @section[ pair.name_symbol ] = pair.value_x
           end
           @result = ACHIEVED_
         end

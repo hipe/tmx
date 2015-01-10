@@ -300,7 +300,7 @@ module Skylab::Callback::TestSupport
             header_s = "#{ comment }#{ @ok_s } #{ @tci } #{ @mems } - "
             io.puts "#{ header_s }#{ s.inspect }"
             p = -> s_ do
-              blank_s = SPACE_ * header_s.length
+              blank_s = Callback_::SPACE_ * header_s.length
               io.puts "#{ blank_s }#{ s_.inspect }"
               p = -> s__ do
                 io.puts "#{ blank_s }#{ s__.inspect }"

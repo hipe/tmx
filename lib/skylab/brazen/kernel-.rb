@@ -36,9 +36,11 @@ module Skylab::Brazen
 
     attr_reader :module
 
-    def call * x_a, & p  # #note-25
+    def call * x_a, & x_p  # #note-25
+
       bc = @module.const_get( :API, false )._API_daemon.
-        produce_bound_call_via_iambic_and_proc x_a, p
+        produce_bound_call_via_mutable_iambic x_a, & x_p
+
       bc and bc.receiver.send bc.method_name, * bc.args
     end
 

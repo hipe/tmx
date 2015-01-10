@@ -1884,6 +1884,8 @@ module Skylab::Callback
     alias_method :gets, :call
   end
 
+  SPACE_ = ' '.freeze
+
   UNABLE_ = false
 
   require 'pathname'  # ~ eat our own dogfood, necessarily at the end

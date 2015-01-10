@@ -332,6 +332,10 @@ module Skylab::Brazen
             :write, :write_to_path, * super ]
         end
 
+        def description_under expag
+          @input_id.description_under expag
+        end
+
         def input_id
           @input_id
         end

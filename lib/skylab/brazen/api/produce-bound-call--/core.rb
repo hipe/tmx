@@ -6,17 +6,12 @@ module Skylab::Brazen
 
       Callback_::Actor.call self, :properties,
         :x_a,
-        :p,
         :kernel,
         :mod
 
       def execute
 
         @bound = nil  # there is no parent bound action to start
-
-        if @p
-          @p[ self ]
-        end
 
         @st = Callback_::Iambic_Stream.via_array @x_a
 
@@ -140,7 +135,7 @@ module Skylab::Brazen
 
         _expag = @mod::API.expression_agent_class.new @kernel
 
-        event_expressor = Produce_bound_call__::Two_Stream_Event_Expressor.
+        event_expresser = Produce_bound_call__::Two_Stream_Event_Expresser.
           new( * _two_streams, _expag )
 
         -> * i_a, & ev_p do
@@ -151,7 +146,7 @@ module Skylab::Brazen
             Brazen_.event.inline_via_normal_extended_mutable_channel i_a
           end
 
-          event_expressor.receive_ev _ev
+          event_expresser.receive_ev _ev
         end
       end
     end

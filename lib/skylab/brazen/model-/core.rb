@@ -300,7 +300,7 @@ module Skylab::Brazen
     def to_even_iambic
       scn = to_normalized_actual_property_stream ; y = []
       while actual = scn.gets
-        y.push actual.name_i, actual.value_x
+        y.push actual.name_symbol, actual.value_x
       end ; y
     end
 
@@ -343,14 +343,14 @@ module Skylab::Brazen
     end
 
     def property_value_via_property prop
-      @property_box.fetch prop.name_i
+      @property_box.fetch prop.name_symbol
     end
 
     def normalize_property_value_via_normal_entity prop, ent, & oes_p
-      normal_x = ent.property_value prop.name_i
-      mine_x = property_value prop.name_i
+      normal_x = ent.property_value prop.name_symbol
+      mine_x = property_value prop.name_symbol
       if normal_x != mine_x
-        @property_box.replace prop.name_i, normal_x
+        @property_box.replace prop.name_symbol, normal_x
         maybe_send_event :info, :normalized_value do
           bld_normalized_value_event normal_x, mine_x, prop
         end
@@ -1137,7 +1137,7 @@ module Skylab::Brazen
           puts ">>          MADE #{ model_class.name_function.as_slug } SILO"
       end
 
-      def name_i
+      def name_symbol
         model_class.name_function.as_lowercase_with_underscores_symbol
       end
 
