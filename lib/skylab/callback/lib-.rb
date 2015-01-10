@@ -17,17 +17,17 @@ module Skylab::Callback
       end
     end
 
-    Bundle_Item_Grammar = -> do
+    Bundle_item_grammar = -> do
       MH__[]::Bundle::Item_Grammar
     end
 
-    Bundle_Multiset = -> x do
+    Bundle_multiset = -> x do
       MH__[]::Bundle::Multiset[ x ]
     end
 
     Brazen = sidesys[ :Brazen ]
 
-    Class = -> do
+    Class_lib = -> do
       MH__[]::Class
     end
 
@@ -81,22 +81,12 @@ module Skylab::Callback
 
     MH__ = sidesys[ :MetaHell ]
 
-    Memoize = Memoize_  # as you like it
-
     Module_lib = -> do
       Basic[]::Module
     end
 
     Num2ord = -> x do
       HL__[]::NLP::EN::Number::Num2ord[ x ]
-    end
-
-    Quickie = -> x do
-      x.extend TestSupport__[]::Quickie
-    end
-
-    Scn = -> & p do
-      HL__[]::Scn.new( & p )
     end
 
     Some_stderr = -> do
@@ -131,8 +121,6 @@ module Skylab::Callback
     System = -> do
       HL__[].system
     end
-
-    TestSupport_ = TestSupport__ = sidesys[ :TestSupport ]
 
     Writemode = -> do
       HL__[]::WRITE_MODE_

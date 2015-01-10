@@ -52,7 +52,7 @@ module Skylab::Callback
           end
         end ; nil
       end
-      Callback_::Lib_::Bundle_Multiset[ self ]
+      Callback_.lib_.bundle_multiset self
     end
 
     Make_via_didactic_matrix__ = -> channel_i_a, shape_i_a do
@@ -66,7 +66,7 @@ module Skylab::Callback
         make_OK_hash = -> moniker_s, i_a do
           h = ::Hash[ i_a.map { |i| [ i, true ] } ]
           h.default_proc =
-            Callback_::Lib_::Hash_lib[].loquacious_default_proc.curry[ moniker_s ]
+            Callback_.lib_.hash_lib.loquacious_default_proc.curry[ moniker_s ]
           h
         end
 
@@ -86,7 +86,7 @@ module Skylab::Callback
       def initialize
         yield self
         @do_debug_proc ||= nil
-        @do_debug_proc and @debug_IO ||= Callback_::Lib_::Some_stderr[]
+        @do_debug_proc and @debug_IO ||= Callback_.lib_.some_stderr
         @emission_a or raise ::ArgumentError, "emission_a must be set in block"
         @inspect_emission_proc ||= method :inspect_emission_channel_and_payload
         freeze
@@ -104,7 +104,7 @@ module Skylab::Callback
       end
     private
       def inspect_emission_channel_and_payload i_a, x
-        "#{ i_a.inspect }: #{ Callback_::Lib_::Strange[ x ] }"
+        "#{ i_a.inspect }: #{ Callback_.lib_.strange x }"
       end
     end
 

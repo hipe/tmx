@@ -8,7 +8,7 @@ module Skylab::Callback::TestSupport::Selective_Listener
 
   Callback_ = Callback_
 
-  Callback_::Lib_::Quickie[ self ]
+  extend TestSupport_::Quickie
 
   module InstanceMethods
     def client

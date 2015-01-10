@@ -186,7 +186,7 @@ module Skylab::Callback::TestSupport
         h.length.zero? ? 'nothing' : rslv_dsc_str( h )
       end
       def rslv_dsc_str h
-        _output_s = TEMPLATE_S__.gsub Callback_::Lib_::String_lib[].mustache_regexp do
+        _output_s = TEMPLATE_S__.gsub Callback_.lib_.string_lib.mustache_regexp do
           did_have = true
           x = h.fetch $1.intern do did_have = nil end
           did_have and " #{ x }"
@@ -198,8 +198,10 @@ module Skylab::Callback::TestSupport
 
       def get_element_stream
         d = -1 ; last = @exp_a.length - 1
-        Callback_::Lib_::Scn.call do
-          @exp_a[ d += 1 ] if d < last
+        Callback_::Scn.new do
+          if d < last
+            @exp_a[ d += 1 ]
+          end
         end
       end
 
@@ -247,7 +249,7 @@ module Skylab::Callback::TestSupport
             up.change_actual_index_to d
             @d = d ; @idx = idx
             _ord_s = if -1 == d then LAST_S_ else
-              Callback_::Lib_::Num2ord[ d + 1 ]
+              Callback_.lib_.num2ord( d + 1 )
             end
             @description_x = '%-6s' % _ord_s
             super()
@@ -305,7 +307,7 @@ module Skylab::Callback::TestSupport
               Channel_Assertion__.new i
             else
               :styled == i or raise ::ArgumentError, "expected 'styled' #{
-                }had #{ Callback_::Lib_::Strange[ i ] }"
+                }had #{ Callback_.lib_.strange x }"
               STYLED_ASSERTION__
             end
           end
@@ -334,7 +336,7 @@ module Skylab::Callback::TestSupport
         STYLED__ = 'styled'.freeze
         def see_when_event act
           s = act.matchable_string
-          s_ = Callback_::Lib_::CLI_lib[].unstyle_styled s
+          s_ = Callback_.lib_.CLI_lib.unstyle_styled s
           if s_
             act.change_matchable_string! s_
           else
@@ -363,7 +365,7 @@ module Skylab::Callback::TestSupport
       end
       def unstyle_all_styled!
         @ass.set_legacy_string_map_proc -> s, &p do
-          s_ = Callback_::Lib_::CLI_lib[].unstyle_styled s
+          s_ = Callback_.lib_.CLI_lib.unstyle_styled s
           s_ and p[ s_ ] ; nil
         end ; nil
       end

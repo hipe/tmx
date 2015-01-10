@@ -53,7 +53,7 @@ module Skylab::Callback
       end
 
       def template=
-        @nucleus.template = Callback_::Lib_::String_lib[].template.via_string iambic_property
+        @nucleus.template = Callback_.lib_.string_lib.template.via_string iambic_property
         via_template_parse_remainder_of_iambic_stream @__methodic_actor_iambic_stream__
       end
 

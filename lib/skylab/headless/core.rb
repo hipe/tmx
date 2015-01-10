@@ -49,7 +49,7 @@ module Skylab::Headless  # ([#013] is reserved for a core node narrative - no st
   NILADIC_TRUTH_ = -> { true }
   PROCEDE_ = true
   READ_MODE_ = 'r'.freeze
-  Scn_ = Scn = Callback_::Scn
+  Scn_ = Callback_::Scn
   SPACE_ = ' '.freeze
   TERM_SEPARATOR_STRING_ = SPACE_
   WRITE_MODE_ = 'w'.freeze

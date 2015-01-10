@@ -8,6 +8,6 @@ module Skylab::Callback::TestSupport::Tree
 
   Callback_ = Callback_
 
-  Callback_::Lib_::Quickie[ self ]
+  extend TestSupport_::Quickie
 
 end

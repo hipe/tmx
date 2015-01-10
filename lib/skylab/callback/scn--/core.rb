@@ -6,13 +6,13 @@ module Skylab::Callback
 
       def try_convert x
         if x.respond_to? :each_index
-          Callback_::Lib_::List_lib[].line_stream x
+          Callback_.lib_.list_lib.line_stream x
         elsif x.respond_to? :read
-          Callback_::Lib_::IO_lib[].line_stream x
+          Callback_.lib_.IO_lib.line_stream x
         elsif x.respond_to? :each
-          Callback_::Lib_::Enum_lib[].line_stream x
+          Callback_.lib_.enum_lib.line_stream x
         elsif x.respond_to? :ascii_only?
-          Callback_::Lib_::String_lib[].line_stream x
+          Callback_.lib_.string_lib.line_stream x
         else
           false
         end

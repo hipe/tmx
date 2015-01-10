@@ -8,7 +8,9 @@ module Skylab::Callback::TestSupport::Bundles
 
   Callback_ = Callback_
 
-  Callback_::Lib_::Quickie[ self ]
+  extend TestSupport_::Quickie
+
+  TestSupport_ = TestSupport_
 
   module InstanceMethods
 

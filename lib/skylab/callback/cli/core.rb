@@ -11,7 +11,7 @@ module Skylab::Callback
       end
     end
 
-    Callback_::Lib_::CLI_lib[]::Client[ self,
+    Callback_.lib_.CLI_lib::CLient[ self,
       :three_streams_notify,
       :DSL ]  # don't add DSL till end b.c of it's method_added hook
 

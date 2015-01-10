@@ -2,7 +2,7 @@ module Skylab::Callback::TestSupport
 
   class Call_Digraph_Listeners_Spy__  # read [#022] the narrative  #storypoint-1
 
-    Callback_::Lib_::Entity.call self do
+    Callback_.lib_.entity self do
 
       o :iambic_writer_method_name_suffix, :'='
 

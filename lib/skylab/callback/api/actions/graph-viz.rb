@@ -238,7 +238,8 @@ module Skylab::Callback
       raw = job.event_stream_graph.describe_digraph
         # (expected never to fail but meh. we don't stream it because:)
       if raw && pay
-        scn = Lib_::StringScanner[].new raw ; num = 0 ; line = nil
+        scn = Callback_.lib_.stringScanner.new raw
+        num = 0 ; line = nil
         gets = -> do
           s = scn.scan( /[^\r\n]*\r?\n|[^\r\n]+/ )
           s and num += 1
@@ -265,7 +266,7 @@ module Skylab::Callback
       end
       nil
     end
-    WRITE_MODE_ = Callback_::Lib_::Writemode[]
+    WRITE_MODE_ = Callback_.lib_.writemode
 
     def conclude_jobs
       if @error_count.zero?  # just to be sure

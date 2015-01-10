@@ -20,7 +20,7 @@ module Skylab::Callback
 
     module Digraph_methods  # assumes an `call_digraph_listeners` method
 
-      Item_Grammar__ = Callback_::Lib_::Bundle_Item_Grammar[].
+      Item_Grammar__ = Callback_.lib_.bundle_item_grammar.
         new %i( structure structifiying ), :emitter, %i( emits_to_channel )
 
       build_method = -> sp do
@@ -86,7 +86,7 @@ module Skylab::Callback
       include Callback_::Digraph::MMs ; nil
     end
 
-    Callback_::Lib_::Bundle_Multiset[ self ]
+    Callback_.lib_.bundle_multiset self
   end
 
   module Emit_to_IO_stream_string_
@@ -116,7 +116,7 @@ module Skylab::Callback
     end
 
     Build_init_method__ = -> do
-      default_proc = Callback_::Lib_::Hash_lib[].loquacious_default_proc.curry[ 'stream' ]
+      default_proc = Callback_.lib_.hash_lib.loquacious_default_proc.curry[ 'stream' ]
       -> h do
         h.default_proc ||= default_proc
         @simple_IO_manifold_h = h ; nil

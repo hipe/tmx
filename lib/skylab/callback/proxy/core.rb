@@ -31,9 +31,9 @@ module Skylab::Callback
 
     Try_convert_iambic_to_pairs_scan_ = -> x_a do
       if 1 == x_a.length
-        Callback_::Lib_::Hash_lib[].pairs_scan x_a.first
+        Callback_.lib_.hash_lib.pairs_scan x_a.first
       else
-        Callback_::Lib_::List_lib[].pairs_scan_via_even_iambic x_a
+        Callback_.lib_.list_lib.pairs_scan_via_even_iambic x_a
       end
     end
 

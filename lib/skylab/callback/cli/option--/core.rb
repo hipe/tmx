@@ -23,7 +23,7 @@ module Skylab::Callback
           end
         end
 
-        class Fire__ < Lib_::Stdlib_option_parser[]
+        class Fire__ < Callback_.lib_.stdlib_option_parser
 
     # do our hacky custom parse yay
     def parse! argv, &setback

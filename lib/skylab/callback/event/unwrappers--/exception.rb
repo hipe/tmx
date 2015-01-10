@@ -30,7 +30,7 @@ module Skylab::Callback
 
         def resolve_message_string
           resolve_message_lines
-          @message_s = Callback_::Lib_::Basic[]::String.
+          @message_s = Callback_.lib_.basic::String.
             paragraph_string_via_message_lines @message_s_a ; nil
         end
 
@@ -40,7 +40,7 @@ module Skylab::Callback
         end
 
         def expression_agent
-          Callback_::Lib_::Brazen[]::API.expression_agent_instance  # hard-coded "black and white" for now
+          Callback_.lib_.brazen::API.expression_agent_instance  # hard-coded "black and white" for now
         end
       end
     end

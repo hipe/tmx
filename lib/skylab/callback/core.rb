@@ -8,6 +8,10 @@ module Skylab::Callback
       self::Bundles.apply_iambic_on_client x_a, mod
     end
 
+    def lib_
+      @__lib ||= produce_library_shell_via_library_and_app_modules self::Lib_, self
+    end
+
     def pair
       Pair_
     end
@@ -586,7 +590,7 @@ module Skylab::Callback
       end
     private
       def say_bad_term x
-        "unexpected argument #{ Callback_::Lib_::Strange[ x ] }. #{
+        "unexpected argument #{ Callback_.lib_.strange x }. #{
           }expecting #{ say_expecting }"
       end
       def say_expecting

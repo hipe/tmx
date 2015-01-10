@@ -4,7 +4,7 @@ module Skylab::Callback
 
       class Wrappers__::Exception
 
-        Callback_::Lib_::Entity.call self do
+        Callback_.lib_.entity self do
 
           def path_hack  # :[#052].
             add_mutator do |o|

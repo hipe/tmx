@@ -35,7 +35,7 @@ module Skylab::Callback::TestSupport::Event::Wrap_FU_msg
 
     def fu_output_message_for i, s
       message = nil
-      _fuc = Callback_::Lib_::System[].filesystem.file_utils_controller do | msg |
+      _fuc = Callback_.lib_.system.filesystem.file_utils_controller do | msg |
         message = msg
       end
       _fuc.send i, s, noop: true

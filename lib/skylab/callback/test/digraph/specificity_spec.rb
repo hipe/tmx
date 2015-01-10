@@ -6,7 +6,7 @@ module Skylab::Callback::TestSupport::Digraph::Specificity
 
   include Constants
 
-  Callback_::Lib_::Quickie[ self ]
+  extend TestSupport_::Quickie
 
   describe "[cb] digraph specificity" do
 
@@ -37,11 +37,11 @@ module Skylab::Callback::TestSupport::Digraph::Specificity
       define_method :length do length end
 
       define_singleton_method :whence do |&blk|  # scope `length`
-        memoized_frame = Callback_::Lib_::Memoize[ -> do
+        memoized_frame = Callback_.memoize do
           a = ::Array.new length
           z = blk[ a ]  # use `call` not `instance_eval` for sane arch.
           [ a, z ]
-        end ]
+        end
 
         # NOTE each new text context (each test) within the scope of
         # the context that says `whence` will use the *SAME* `z` and `a`.

@@ -182,7 +182,7 @@ module Skylab::Callback
           if 1 == name_i_a.length
             Stranger_[ name_i_a.first, did_you_mean_i_a ]
           else
-            Callback_::Lib_::Entity[].properties_stack.
+            Callback_.lib_.entity.properties_stack.
               build_extra_properties_event name_i_a, did_you_mean_i_a
           end
         end
@@ -480,19 +480,19 @@ module Skylab::Callback
             _exp_s_a = @exp_i_a.map( & :id2name )
             @exp_x_a = Levenshtein_reduce_[ @length_limit, _exp_s_a, @strange_x_ ]
           else
-            @strange_x_ = Callback_::Lib_::Strange[ @strange_x ]
+            @strange_x_ = Callback_.lib_.strange @strange_x
             @exp_x_a = exp_i_a[ 0, @length_limit ]
           end
         end
 
         def flush
-          Callback_::Lib_::Entity[].properties_stack.
+          Callback_.lib_.entity.properties_stack.
             build_extra_properties_event [ @strange_x_ ], @exp_x_a
         end
       end
 
       Levenshtein_reduce_ = -> closest_d, good_x_a, strange_x do  # :+#curry-friendly
-        Callback_::Lib_::Levenshtein[].with(
+        Callback_.lib_.levenshtein.with(
           :item, strange_x,
           :closest_N_items, closest_d,
           :items, good_x_a,
@@ -633,7 +633,7 @@ module Skylab::Callback
           end
 
           def build_missing_required_properties_event miss_a
-            Callback_::Lib_::Entity[].properties_stack.
+            Callback_.lib_.entity.properties_stack.
               build_missing_required_properties_event( miss_a )
           end
 

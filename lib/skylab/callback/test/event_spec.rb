@@ -8,7 +8,7 @@ module Skylab::Callback::TestSupport::Event_Tests__
 
   Callback_ = Callback_
 
-  Callback_::Lib_::Quickie[ self ]
+  extend TestSupport_::Quickie
 
   describe "[cb] event" do
 

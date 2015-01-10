@@ -8,11 +8,11 @@ module Skylab::Callback::TestSupport::Digraph
 
   Callback_ = Callback_
 
-  Callback_::Lib_::Quickie[ self ]
+  extend TestSupport_::Quickie
 
   module ModuleMethods
     include Constants
-    include Callback_::Lib_::Class[]::Creator::ModuleMethods
+    include Callback_.lib_.class_lib::Creator::ModuleMethods
 
     def inside &b                 # define the dsl-ish klass body to be somthing
       b or fail 'give a block'    # other than nothing (below)
@@ -20,7 +20,7 @@ module Skylab::Callback::TestSupport::Digraph
     end
 
     def memoize name, func
-      define_method name, & Callback_::Lib_::Memoize[ func ]
+      define_method name, & Callback_.memoize( & func )
       nil
     end
   end
@@ -61,9 +61,9 @@ module Skylab::Callback::TestSupport::Digraph
 
   module InstanceMethods
 
-    extend Callback_::Lib_::Let[]::ModuleMethods
+    extend Callback_.lib_.let::ModuleMethods
 
-    include Callback_::Lib_::Class[]::Creator::InstanceMethods
+    include Callback_.lib_.class_lib::Creator::InstanceMethods
 
     let :meta_hell_anchor_module do ::Module.new end
 
