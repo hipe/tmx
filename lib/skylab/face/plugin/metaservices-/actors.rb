@@ -69,7 +69,7 @@ module Skylab::Face
                   y << ' either'
                 end )
 
-            _upstream_scn = Callback_.scan.via_nonsparse_array @raw_queue_a
+            _upstream_scn = Callback_.stream.via_nonsparse_array @raw_queue_a
             scn_ = _scn.map_reduce_under _upstream_scn
             s_a = []
             while s = scn_.gets

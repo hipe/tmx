@@ -29,14 +29,6 @@ module Skylab::TanMan
   stowaway :Kernel_, 'models-'
   Model_lib_ = -> { Brazen_.model }
   NEWLINE_ = "\n".freeze
-  Scan_ = -> & p do
-    if p
-      Callback_.scan( & p )
-    else
-      Callback_.scan
-    end
-  end
-
   SPACE_ = ' '.freeze
   TanMan_ = self
   UNABLE_ = false

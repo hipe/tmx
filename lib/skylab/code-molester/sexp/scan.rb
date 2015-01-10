@@ -2,7 +2,7 @@ module Skylab::CodeMolester
 
   class Sexp
 
-    class Scan < Callback_.scan
+    class Scan < Callback_.stream
 
       class << self
 

@@ -91,7 +91,7 @@ module Skylab::CodeMolester
               skip_me = entity_story.natural_key_field_name
               upstream = @string_box.to_pair_stream
               y = []
-              Callback_.scan do
+              Callback_.stream do
                 begin
                   pair = upstream.gets
                   pair or break
@@ -254,7 +254,7 @@ module Skylab::CodeMolester
 
       lbl = field.local_normal_name.id2name  # #todo
 
-      _upstream_scan = Callback_::Scan.via_nonsparse_array predicate_s_a
+      _upstream_scan = Callback_.stream.via_nonsparse_array predicate_s_a
 
       scn = Callback_::Scn.articulators.eventing(
 

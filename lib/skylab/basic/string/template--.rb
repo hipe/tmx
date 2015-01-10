@@ -163,7 +163,7 @@ module Skylab::Basic
 
       scn = Basic_.lib_.string_scanner template_string
 
-      Callback_.scan do
+      Callback_.stream do
         while ! scn.eos?
           skipped_s = marg ? ( scn.scan skip_rx ) : ( scn.skip skip_rx )
           surface_s = scn.scan param_rx

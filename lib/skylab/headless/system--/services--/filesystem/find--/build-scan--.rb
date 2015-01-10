@@ -40,7 +40,7 @@ module Skylab::Headless
           p[]
         end
 
-        Callback_.scan do
+        Callback_.stream do
           p[]
         end.with_signal_handlers :release_resource, -> do
           if thread && thread.alive?

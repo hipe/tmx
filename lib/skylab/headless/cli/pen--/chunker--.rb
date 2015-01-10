@@ -10,7 +10,7 @@ module Skylab::Headless
 
         def scan sexp
           scn = Chunker__.new sexp
-          Callback_.scan do
+          Callback_.stream do
             scn.gets
           end
         end

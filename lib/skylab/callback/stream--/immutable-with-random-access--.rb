@@ -1,6 +1,6 @@
 module Skylab::Callback
 
-  class Scan
+  class Stream__
 
     class Immutable_with_Random_Access__
 
@@ -313,9 +313,9 @@ module Skylab::Callback
 
       def to_stream
         if @done
-          to_stream_when_done Scan_
+          to_stream_when_done Stream_
         else
-          to_stream_when_not_done Scan_
+          to_stream_when_not_done Stream_
         end
       end
 
@@ -340,7 +340,7 @@ module Skylab::Callback
 
       def to_name_scan_when_done
         d = -1 ; last = @last
-        Scan_.new do
+        Stream_.new do
           if d < last
             @a.fetch d += 1
           end
@@ -364,7 +364,7 @@ module Skylab::Callback
 
       def to_name_scan_when_not_done
         d = -1
-        Scan_.new do
+        Stream_.new do
           if @done
             @a.fetch d += 1
           elsif d < @d

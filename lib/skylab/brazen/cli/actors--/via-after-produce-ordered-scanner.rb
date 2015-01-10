@@ -17,7 +17,7 @@ module Skylab::Brazen
 
       def execute
         @p = @main_loop
-        Callback_::Scan.new do
+        Callback_.stream do
           @p[]
         end
       end

@@ -439,7 +439,7 @@ module Skylab::Callback
 
           def bld_properties
             _BX = const_get BX_
-            Callback_::Scan.via_nonsparse_array _BX.send( :a ) do |i|
+            Callback_::Stream__.via_nonsparse_array _BX.send( :a ) do |i|
               send _BX.fetch i
             end.immutable_with_random_access_keyed_to_method :name_i
           end

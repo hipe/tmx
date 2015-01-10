@@ -70,7 +70,7 @@ module Skylab::SubTree
           @pn = ::Pathname.new @path
           bn_s = @pn.basename.to_path
           if TEST_DIR_NAME_A_.include? bn_s
-            @result = Callback_::Scan.via_item @pn
+            @result = Callback_.stream.via_item @pn
             CEASE_
           else
             PROCEDE_
@@ -103,7 +103,7 @@ module Skylab::SubTree
           if found
             seen_a.reverse!
             @sub_path_array = seen_a
-            @result = Callback_::Scan.via_item pn
+            @result = Callback_.stream.via_item pn
             CEASE_
           else
             PROCEDE_

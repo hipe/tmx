@@ -1,6 +1,6 @@
 module Skylab::Callback
 
-      class Scan < ::Proc  # see [#044]
+      class Stream__ < ::Proc  # see [#044]
 
         alias_method :gets, :call
 
@@ -45,7 +45,7 @@ module Skylab::Callback
           end
 
           def immutable_with_random_access
-            Scan_::Immutable_with_Random_Access__
+            Stream_::Immutable_with_Random_Access__
           end
 
           def map scn, p
@@ -69,7 +69,7 @@ module Skylab::Callback
           end
 
           def mutable_with_random_access
-            Scan_::Mutable_with_Random_Access__
+            Stream_::Mutable_with_Random_Access__
           end
 
           def pair
@@ -87,6 +87,10 @@ module Skylab::Callback
               end while nil
               x
             end
+          end
+
+          def stream_class
+            self
           end
 
           def via_item x, & p
@@ -124,7 +128,7 @@ module Skylab::Callback
           end
 
           def with_random_access
-            Scan_::With_Random_Access__
+            Stream_::With_Random_Access__
           end
 
         end  # >>
@@ -157,7 +161,7 @@ module Skylab::Callback
         end
 
         def immutable_with_random_access_keyed_to_method i, * x_a
-          Scan_::Immutable_with_Random_Access__.new self, i, x_a
+          Stream_::Immutable_with_Random_Access__.new self, i, x_a
         end
 
         def map_detect & p
@@ -184,7 +188,7 @@ module Skylab::Callback
         end
 
         def push_by * x_a
-          concat_by Scan.via_nonsparse_array x_a
+          concat_by Stream_.via_nonsparse_array x_a
         end
 
         def reduce_by & p
@@ -222,9 +226,9 @@ module Skylab::Callback
         end
 
         def with_signal_handlers * pairs
-          Scan_::With_Signal_Processing__[ self, pairs ]
+          Stream_::With_Signal_Processing__[ self, pairs ]
         end
 
-        Scan_ = self
+        Stream_ = self
       end
 end

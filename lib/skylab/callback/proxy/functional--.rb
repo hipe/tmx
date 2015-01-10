@@ -117,7 +117,7 @@ module Skylab::Callback
         end
 
         def resolve_pairs_scan_via_arglist p_a
-          @pairs_scan = Callback_.scan.via_times( p_a.length ) do |d|
+          @pairs_scan = Callback_.stream.via_times( p_a.length ) do |d|
             [ @box.at_position( d ), p_a.fetch( d ) ]
           end ; nil
         end

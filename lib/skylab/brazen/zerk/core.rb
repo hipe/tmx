@@ -126,7 +126,7 @@ module Skylab::Brazen
           cur = cur.parent
         end
         a.reverse!
-        scn = Callback_::Scan.via_nonsparse_array a
+        scn = Callback_.stream.via_nonsparse_array a
         first = scn.gets
         @y << first.slug
         d = 0
@@ -256,7 +256,7 @@ module Skylab::Brazen
       end
 
       def child_stream
-        Callback_.scan.via_nonsparse_array @children
+        Callback_.stream.via_nonsparse_array @children
       end
 
     private
@@ -601,7 +601,7 @@ module Skylab::Brazen
       end
 
       def receive_focus
-        scn = Callback_.scan.via_times @times
+        scn = Callback_.stream.via_times @times
         if scn.gets
           current = @parent
         end

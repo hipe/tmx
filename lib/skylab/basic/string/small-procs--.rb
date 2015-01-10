@@ -31,7 +31,7 @@ module Skylab::Basic
       end.call
 
       Paragraph_string_via_message_lines = -> s_a do
-        scan = Callback_.scan.via_nonsparse_array s_a
+        scan = Callback_.stream.via_nonsparse_array s_a
         s = scan.gets
         s and begin
           y = [ s ]

@@ -245,7 +245,7 @@ module Skylab::Callback
           s_a.push s
         end
         expag.calculate y, self, & message_proc
-        Callback_.scan.via_nonsparse_array s_a
+        Callback_.stream.via_nonsparse_array s_a
       end
 
       class N_Lines < ::Enumerator::Yielder

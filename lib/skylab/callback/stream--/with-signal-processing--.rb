@@ -1,6 +1,6 @@
 module Skylab::Callback
 
-  class Scan
+  class Stream__
 
     class With_Signal_Processing__ < self  # read #open [#059] (in [#044])
 

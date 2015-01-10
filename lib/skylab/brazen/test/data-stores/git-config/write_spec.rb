@@ -13,7 +13,7 @@ module Skylab::Brazen::TestSupport::Data_Stores::Git_Config
       a = []
       a.push Callback_.pair.new 'x x', :Foo
       a.push Callback_.pair.new true, :zappo
-      _scan = Callback_.scan.via_nonsparse_array a
+      _scan = Callback_.stream.via_nonsparse_array a
       x = subject.write io, _scan, 'sub sec.to', 'se-cto'
       x.should eql true
       io.rewind
@@ -28,7 +28,7 @@ module Skylab::Brazen::TestSupport::Data_Stores::Git_Config
 
     it "don't fall over on backslashes" do
       _a = [ Callback_.pair.new( '\b', :'two-characters' ) ]
-      _scan = Callback_.scan.via_nonsparse_array _a
+      _scan = Callback_.stream.via_nonsparse_array _a
       io = Brazen_::LIB_.string_IO.new
       x = subject.write io, _scan, 'sub.sect', 'se-ct'
       x.should eql true

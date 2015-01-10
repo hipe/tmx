@@ -150,7 +150,7 @@ module Skylab::Callback
     end
 
     def chan_scan
-      Callback_.scan.via_nonsparse_array self.class::CHANNEL_A__
+      Callback_.stream.via_nonsparse_array self.class::CHANNEL_A__
     end
 
     class Delegate_Proxy__ < ::Proc

@@ -16,15 +16,13 @@ module Skylab::Callback
       Callback_::Librication__[ lib_mod, app_mod ]
     end
 
-    def scan( & p )
+    def stream( & p )
       if block_given?
-        Callback_::Scan.new( & p )
+        Callback_::Stream__.new( & p )
       else
-        Callback_::Scan
+        Callback_::Stream__
       end
     end
-
-    alias_method :stream, :scan
 
     def test_support
       Callback_::Test
@@ -311,7 +309,7 @@ module Skylab::Callback
     end
 
     def to_name_stream
-      Callback_::Scan.via_nonsparse_array @a
+      Callback_::Stream__.via_nonsparse_array @a
     end
 
     def to_value_minimal_stream
@@ -874,7 +872,7 @@ module Skylab::Callback
       def to_stream  # :+#public-API, #the-fuzzily-unique-entry-scanner, #fuzzy-sibling-pairs
         @did_index_all ||= index_all
         a = @stem_i_a ; d = -1 ; last = a.length - 1
-        Callback_.scan do
+        Callback_.stream do
           if d < last
             @normpath_lookup_p[ a.fetch d += 1 ]
           end

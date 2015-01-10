@@ -33,7 +33,7 @@ module Skylab::Brazen
         end
 
         def to_upper_unbound_action_stream
-          Callback_.scan.via_item ActionClassLike__.new( @p, @name_s, @mod )
+          Callback_.stream.via_item ActionClassLike__.new( @p, @name_s, @mod )
         end
       end
 

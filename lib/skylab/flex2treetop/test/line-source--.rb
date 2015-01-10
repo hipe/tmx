@@ -185,13 +185,13 @@ module Skylab::Flex2Treetop::MyTestSupport
     NILADIC_EMPTINESS_ = -> {}
 
     Chopped_line_peeking_ary_scanner__ = -> a, debug_IO do
-      _scn = Callback_.scan.via_nonsparse_array a
+      _scn = Callback_.stream.via_nonsparse_array a
       Finish_scn__[ _scn, debug_IO, :ary ]
     end
 
     Finish_scn__ = -> scn, debug_IO, chan_i do
       scn_ = if debug_IO
-        Callback_.scan.map scn, Debug_map__[ chan_i, debug_IO ]
+        Callback_.stream.map scn, Debug_map__[ chan_i, debug_IO ]
       else
         scn
       end

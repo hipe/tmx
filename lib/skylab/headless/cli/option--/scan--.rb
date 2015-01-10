@@ -10,7 +10,7 @@ module Skylab::Headless
       def execute
         resolve_pass_proc
         resolve_enumerator
-        Callback_.scan do
+        Callback_.stream do
           while true
             begin
               sw = @enumerator.next

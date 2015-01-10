@@ -170,7 +170,7 @@ module Skylab::TanMan
         class << self
 
           def to_upper_unbound_action_stream
-            Scan_[].via_nonsparse_array [ self ]
+            Callback_.stream.via_item self
           end
 
           def to_lower_unbound_action_stream  # #hook-in [br]

@@ -14,7 +14,7 @@ module Skylab::Basic
 
       def pairs_scan h
         a = h.keys
-        Callback_.scan.via_times( a.length ).map_by do |d|
+        Callback_.stream.via_times( a.length ).map_by do |d|
           [ a.fetch( d ), h.fetch( a.fetch d ) ]
         end
       end

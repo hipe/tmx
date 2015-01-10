@@ -253,7 +253,7 @@ module Skylab::Brazen
         end
 
         def _to_node_stream_via_symbol sym
-          _to_node_streamish Callback_::Scan, sym
+          _to_node_streamish Callback_.stream.stream_class, sym
 
         end
 
