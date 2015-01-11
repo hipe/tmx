@@ -35,6 +35,12 @@ module Skylab::Brazen
       super kernel, & oes_p
     end
 
+    def members
+      [ :delete_entity, :entity_stream_via_model,
+          :entity_via_identifier, :persist_entity,
+            :property_value_via_symbol ]
+    end
+
     def description_under expag
       if @document
         @document.description_under expag
@@ -75,6 +81,29 @@ module Skylab::Brazen
       ok = resolve_mutable_document
       ok &&= Git_Config_::Mutable::Actors::Delete[ entity, @mutable_document, oes_p ]
       ok and via_mutated_mutable_document_write_file_via_persisted_entity entity
+    end
+
+    # ~ atomic property values
+
+    def property_value_via_symbol sym, & oes_p
+      x = @document.sections[ sym ]
+      if x
+
+        x.subsect_name_s
+
+      elsif oes_p
+
+        oes_p.call :info, :property_not_found do
+
+          Callback_::Event.inline_neutral_with :property_not_found,
+              :property_symbol, sym,
+              :input_identifier, @document.input_id do |y, o|
+
+            y << "no #{ nm Callback_::Name.via_variegated_symbol o.property_symbol } #{
+              }property in #{ o.input_identifier.description_under self }"
+          end
+        end
+      end
     end
 
   private  # ~ verb support

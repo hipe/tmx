@@ -267,7 +267,7 @@ module Skylab::Callback::TestSupport
           if ev_.has_tag :flyweighted_entity
             was_wrapped = ev.object_id != ev_.object_id
             _ent = ev_.flyweighted_entity.dup
-            ev_ = ev_.dup_with :flyweighted_entity, _ent
+            ev_ = ev_.with :flyweighted_entity, _ent
             ev = ev_
             if was_wrapped
               ev = Fake_Wrapper__.new ev

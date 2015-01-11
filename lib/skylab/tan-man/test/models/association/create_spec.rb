@@ -20,7 +20,7 @@ module Skylab::TanMan::TestSupport::Models::Association
         call_API :association, :add, :from_node_label, 'A', :to_node_label, 'B'
         expect_not_OK_event :non_one_IO,
           "need exactly 1 input-related argument, had 0 #{
-           }(provide (or_ [\"(par input_string)\", \"(par input_pathname)\"]))"
+           }(provide (or_ [\"(par input_string)\", \"(par input_path)\", \"(par workspace_path)\"]))"
         expect_failed
       end
     end

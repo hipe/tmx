@@ -74,7 +74,7 @@ module Skylab::Brazen
       # the resource. hence we result in nil.
 
       maybe_send_event_via_channel i_a do
-        ev_p[].dup_with :ok, ACHIEVED_
+        ev_p[].with :ok, ACHIEVED_
       end
       nil
     end

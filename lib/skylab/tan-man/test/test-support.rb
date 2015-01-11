@@ -211,6 +211,8 @@ module Skylab::TanMan::TestSupport
       TanMan_::API::expression_agent_instance
     end
 
+    # ~ grammar testing support
+
     def result
       @did_resolve_result ||= resolve_result
       @result
@@ -353,11 +355,15 @@ module Skylab::TanMan::TestSupport
     end
 
     def via_parse_via_input_file_granule_produce_result
-      @parse.parse_file input_file_pathname
+      @parse.parse_file input_file_path
     end
 
     def via_parse_via_input_string_produce_result
       @parse.parse_string input_string
+    end
+
+    def input_file_path
+      input_file_pathname.to_path
     end
 
     def input_file_pathname
@@ -382,7 +388,7 @@ module Skylab::TanMan::TestSupport
     end
 
     def add_input_arguments_to_iambic_when_input_file_granule x_a
-      x_a.push :input_pathname, input_file_pathname ; nil
+      x_a.push :input_path, input_file_pathname.to_path ; nil
     end
 
     def add_input_arguments_to_iambic_when_input_string x_a
@@ -410,17 +416,6 @@ module Skylab::TanMan::TestSupport
 
     def subject_API
       TanMan_::API
-    end
-
-    # ~ fixtures
-
-    def dir sym
-      ::File.join( dirs,
-        sym.id2name.gsub( Callback_::UNDERSCORE_, Callback_::DASH_ ) )
-    end
-
-    def dirs
-      TS_::Fixtures::Dirs.dir_pathname.to_path
     end
 
     # ~ misc business

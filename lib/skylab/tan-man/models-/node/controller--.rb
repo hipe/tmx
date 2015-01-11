@@ -24,23 +24,6 @@ module Skylab::TanMan
       @node_stmt = node_stmt
     end
 
-    def destroy error, success
-      res = nil
-      begin
-        assocs = dot_file.send :associations # give it here now
-        assocs.destroy_all_associations @node_stmt.node_id, error, success
-        list = dot_file.sexp.stmt_list._remove_item @node_stmt  # raises if not found
-        stmt = list.stmt
-        @node_stmt = nil # avoid shenanigans - also, prob the same as above
-        if success
-          res = success[ Models::Node::Events::Destroyed.new self, stmt ]
-        else
-          res = stmt
-        end
-      end while nil
-      res
-    end
-
     # result is always true - no errors yet to emit. always emits event
     def update_attributes attrs, _, success # no errors to emit yet
       a_list = @node_stmt.attr_list.content

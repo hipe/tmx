@@ -36,7 +36,8 @@
 [#028]       #done during:regret-integration-with-new-autoloader
 [#027]       #done things that exist to comport with old a.l (or fwd with new)
 [#026]       #doc-point the F-UN narrative ..
-[#025] #hole ( was: isomorphic event factory is deprecated .. )
+[#025] #open #wishlist: an event `with` that lets you add new properties
+             ( was: isomorphic event factory is deprecated .. )
 [#024]       #doc-node the new autoloader narative ..
 [#023]       #parent-node: [#033] the different kinds of callback patterns ..
 [#022]       #parent-node: [#036] the `call_digraph_listeners` spy narrative ..

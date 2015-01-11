@@ -311,6 +311,13 @@ module Skylab::Brazen
       instance_exec( & p )
     end
 
+    def members
+      [ :description, :entity_name_s, :full_name_i,
+        :name_parts, :raw_name_parts,
+        :silo_description, :silo_name_i, :silo_name_parts,
+        :silo_slug, :value ]
+    end
+
     def description
       _s = silo_description
       _s_ = entity_name_s

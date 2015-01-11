@@ -32,6 +32,10 @@ module Skylab::Brazen
 
     end
 
+    def members
+      [ :datastore ]
+    end
+
     def execute
 
       if @property_box.has_name :on_event_selectively

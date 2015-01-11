@@ -29,11 +29,11 @@ module Skylab::TanMan::TestSupport::Models::Node
     end
 
     def get_node_array
-      get_node_scan.to_a
+      to_node_stream.to_a
     end
 
-    def get_node_scan
-      collection_controller.get_node_scan
+    def to_node_stream
+      collection_controller.to_node_stream
     end
 
     def touch_node_via_label s

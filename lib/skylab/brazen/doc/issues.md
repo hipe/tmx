@@ -1,3 +1,4 @@
+[#084]       :+#wishlist a `flag` meta-meta prperty
 [#083] #open workspace `init` action should not default to '.' in API
 [#082]       #tracking `list` implementations
 [#081]       #track experimental extensions to Actor

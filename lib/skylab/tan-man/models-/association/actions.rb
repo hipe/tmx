@@ -37,7 +37,7 @@ module Skylab::TanMan
           if @argument_box[ :ping ]
             bound_call_for_ping
           else
-            bc = any_bound_call_for_resolve_document_IO
+            bc = resolve_document_IO_or_produce_bound_call_
             bc or super
           end
         end
@@ -60,7 +60,7 @@ module Skylab::TanMan
         end
 
         def via_arguments_produce_bound_call
-          bc = any_bound_call_for_resolve_document_IO
+          bc = resolve_document_IO_or_produce_bound_call_
           bc or super
         end
 

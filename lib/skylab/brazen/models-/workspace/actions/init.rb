@@ -72,7 +72,7 @@ module Skylab::Brazen
       @ok = true
       if any_argument_value :verbose
         maybe_send_event_via_channel i_a do
-          ev_p[].dup_with :ok, nil
+          ev_p[].with :ok, nil
         end
       end
       CONTINUE_

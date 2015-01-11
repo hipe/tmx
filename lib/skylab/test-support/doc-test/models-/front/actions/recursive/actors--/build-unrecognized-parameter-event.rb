@@ -8,7 +8,7 @@ module Skylab::TestSupport
 
         Actors__::Build_unrecognized_parameter_event = -> ev, mod do
 
-          ev.dup_with do | y, o |
+          ev.with do | y, o |
 
             ev.render_all_lines_into_under y, self
 

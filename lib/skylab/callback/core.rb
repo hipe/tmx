@@ -1670,6 +1670,9 @@ module Skylab::Callback
     def as_parts
       @as_parts ||= as_variegated_string.split( UNDERSCORE_ ).freeze
     end
+    def description  # for our minimal expression agent under event
+      as_slug
+    end
     def as_slug
       @as_slug ||= build_slug
     end

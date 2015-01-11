@@ -2,60 +2,72 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::Models::Node
 
-  describe "[tm] CLI::Actions ::Graph::Node actions:", wip: true do
+  describe "[tm] node list and remove" do
 
     extend TS_
 
-    context "`graph node add`" do
-      it "to a empty 'digraph' -- makes up its own prototype!!" do
-        using_dotfile 'digraph{}'
-        invoke_from_dotfile_dir 'graph', 'node', 'add', 'foo'
-        dotfile_pathname.read.should eql( 'digraph{foo [label=foo]}' )
-      end
+    it "a workspace without a graph value complains & invite" do
 
-      it "to a digraph with a prototype - it adds that puppy" do
-        using_dotfile <<-O.unindent
-          digraph {
-          /*
-            example stmt_list:
-              foo -> bar
-              biff -> baz
+      call_API :node, :ls,
+        :workspace_path, dir( :with_freshly_initted_conf )
 
-            example node_stmt:
-              foo [label=foo]
-          */
-          }
-        O
-        invoke_from_dotfile_dir 'graph', 'node', 'add', 'bar'
-        output.lines.last.string.should match( /created node: bar/ )
-        content = dotfile_pathname.read
-        content.should be_include( 'bar [label=bar]' )
-      end
+      ev = expect_neutral_event :property_not_found
+
+      ev.to_event.invite_to_action.should eql [ :graph, :use ]
+
+      ev.to_event.property_symbol.should eql :graph
+
+      expect_failed
     end
 
-    it "`graph node list` will show you the labels of the node_stmts" do
+    it "`list` results in a stream of entities. see node label with 'name' prop" do
+
+      call_API :node, :ls,
+        :workspace_path, dir( :two_nodes ),
+        :config_filename, cfn_shallow
+
+      st = @result
+
+      x = st.gets
+      x.property_value( :name ).should eql 'foo'
+
+      x = st.gets
+      x.property_value( :name ).should eql 'bar'
+
+      st.gets.should be_nil
+
+    end
+
+    it "remove nope" do
+
+      call_API :node, :rm,
+        :name, 'berk',
+        :workspace_path, dir( :two_nodes ),
+        :config_filename, cfn_shallow
+
+      ev = expect_neutral_event :entity_not_found
+      ev.to_event.entity_name_string.should eql 'berk'
+      expect_failed
+    end
+
+    it "remove money" do
+
       using_dotfile <<-O.unindent
         digraph {
-          foo [label=foo]
-          bar [label=bar]
-          foo -> bar
+          ermagherd [ label = "berks" ]
         }
       O
-      invoke_from_dotfile_dir 'graph', 'node', 'list'
-      names.should eql( [:paystream, :paystream, :infostream] )
-      exp = <<-O.gsub( /^ {10}/, '' )
-          foo
-          bar
-      O
-      strings[0..1].join.should eql( exp )
-      strings.last.should match( /\b2 total\b/ )
-    end
 
-    it "`graph node rm <foo>` works" do
-      using_dotfile 'digraph{ermagherd[label="berks"]}'
-      invoke_from_dotfile_dir 'graph', 'node', 'rm', 'ber'
-      names.should eql( [:infostream] )
-      strings.last.should match( /removed node: berks/ )
+      call_API :node, :rm,
+        :name, 'berks',
+        :workspace_path, @workspace_path,
+        :config_filename, cfn_shallow
+
+      ev = expect_OK_event( :wrote_resource ).to_event
+      ev.is_completion.should eql true
+      ev.bytes.should eql 14
+
+      expect_no_more_events
     end
   end
 end

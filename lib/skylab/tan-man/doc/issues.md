@@ -106,6 +106,6 @@
 [#005]       #open #one-day look into "statement oriented" processing 2012-09-02
 [#004]       #open #one-day look into multibyte regexp 2012-09-02
 [#003]       #open #one-day unshield your eyes : google "dotfile grammar" 2012-09-01
-[#002]       #done 2012-08-30 rename remote* to fit a pattern (e.g. controller)
+[#002]       #done 2012-08-30 rename `remote*` to fit a pattern (e.g. controller)
                examples-controller -> example-collection
 [#001]       #done tan -w ok, #depends-on:(#sl-unwip)

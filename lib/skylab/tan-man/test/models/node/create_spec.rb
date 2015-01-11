@@ -57,6 +57,33 @@ module Skylab::TanMan::TestSupport::Models::Node
       expect_succeeded
     end
 
+    # it "to a empty 'digraph' -- makes up its own prototype" :+#ancient
+    if false
+      using_dotfile 'digraph{}'
+      invoke_from_dotfile_dir 'graph', 'node', 'add', 'foo'
+      dotfile_pathname.read.should eql( 'digraph{foo [label=foo]}' )
+    end
+
+    # it "to a digraph with a prototype - it adds that puppy"  :+#ancient
+    if false
+      using_dotfile <<-O.unindent
+        digraph {
+        /*
+          example stmt_list:
+            foo -> bar
+            biff -> baz
+
+          example node_stmt:
+            foo [label=foo]
+        */
+        }
+      O
+      invoke_from_dotfile_dir 'graph', 'node', 'add', 'bar'
+      output.lines.last.string.should match( /created node: bar/ )
+      content = dotfile_pathname.read
+      content.should be_include( 'bar [label=bar]' )
+    end
+
     def add_name_to_string name_s, s
       call_API :node, :add, :name, name_s, :input_string, s, :output_string, s
     end
@@ -75,9 +102,9 @@ module Skylab::TanMan::TestSupport::Models::Node
         touch_node_via_label 'milk the cow'
         touch_node_via_label 'milk the cat'
         touch_node_via_label 'MiLk the catfish'
-        get_node_scan.map( & :node_id ).
+        to_node_stream.map( & :node_id ).
           should eql [ :milk_3, :milk_2, :milk ]
-        a = get_node_scan.map( & :label )
+        a = to_node_stream.map( & :label )
         a.shift.should eql 'MiLk the catfish'
         a.shift.should eql 'milk the cat'
         a.shift.should eql 'milk the cow'

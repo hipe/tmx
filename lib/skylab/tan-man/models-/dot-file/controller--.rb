@@ -65,6 +65,15 @@ module Skylab::TanMan
         g.stmt_list._insert_item_before_item new, new_before_this
       end
 
+      def destroy_stmt stmt
+        if @graph_sexp.stmt_list
+          _x = @graph_sexp.stmt_list._remove_item stmt
+          _x ? ACHIEVED_ : UNABLE_  # we mean to destroy
+        else
+          UNABLE_
+        end
+      end
+
       def provide_action_precondition _id, _g
         self
       end
@@ -120,12 +129,6 @@ module Skylab::TanMan
 
     attr_reader :pathname
 
-    def rm_node *a
-      if nodes
-        nodes.rm(* a)
-      end
-    end
-
     def set_dependency source_ref, target_ref, do_create,
       do_fuzz, error, success, info
 
@@ -137,24 +140,6 @@ module Skylab::TanMan
                       error, success, info
       meanings.set agent_ref, target_ref, create, dry_run, verbose,
         error, success, info
-    end
-
-    def sexp
-      res = nil
-      begin
-        res = services.tree.fetch pathname do |k, svc|
-          tree = parse_file pathname
-          if tree
-            svc.set! k, tree
-          end
-          tree
-        end
-        if ! res
-          emit :help, "perhaps try fixing above syntax errors and try again"
-          res = nil
-        end
-      end while nil
-      res
     end
 
     def tell statement_sexp, dry_run, force, verbose
@@ -177,48 +162,12 @@ module Skylab::TanMan
     def unset_meaning *a
       meanings.unset(* a)
     end
-
-    attr_reader :verbose_dotfile_parsing # compat
-
-    def add_remote_notify * x_a
-      remotes.add_notify x_a
     end
 
-    def get_remote_stream
-      remotes.get_remote_stream_notify
-    end
-
-    def remove_remote_with_dry_run_and_locator dry_run, locator
-      remotes.remove_with_dry_run_and_locator_notify dry_run, locator
-    end
-
-  private
-    def remotes
-      @remotes ||= Models::DotFile::Remotes__.new client_services
-    end ; private :remotes
-    #
-    TanMan::Sub_Client[ self, :client_services ]
-    #
-    Client_Services_Proc = -> do
-      delegate :controllers
-      delegating :with_suffix, :_for_subclient,
-        %i( emit expression_agent full_dotfile_pathname )
-    end
-    def emit_for_subclient i, x
-      emit i, x
-    end
-    def expression_agent_for_subclient
-      @request_client.expression_agent_for_subclient
-    end
-    def full_dotfile_pathname_for_subclient
-      @pathname
-    end
-    end
-
-      def persist_via_args arg
+      def persist_via_args is_dry, arg
         adapter = Persist_Adapters__.produce_via_argument arg
         adapter.init @kernel, & @on_event_selectively
-        adapter.receive_rewritten_datastore_controller self
+        adapter.receive_rewritten_datastore_controller is_dry, self
       end
 
       module Persist_Adapters__
@@ -260,13 +209,13 @@ module Skylab::TanMan
             nil
           end
 
-          def receive_rewritten_datastore_controller o  # #hook-out (local)
+          def receive_rewritten_datastore_controller is_dry, o  # #hook-out (local)
             @output_string.replace o.graph_sexp.unparse
             ACHIEVED_
           end
         end
 
-        class Ouput_Pathname
+        class Output_Path
 
           class << self
             def build x
@@ -274,55 +223,46 @@ module Skylab::TanMan
             end
           end
 
-          def initialize output_pathname
-            self._IT_WILL_BE_EASY
+          def initialize path
+            @output_path = path
           end
+
+          def init k, & oes_p
+            @on_event_selectively = oes_p
+            @kernel = k
+            nil
+          end
+
+          def receive_rewritten_datastore_controller is_dry, x
+
+            if is_dry
+              bytes = x.graph_sexp.unparse.length
+            else
+              bytes =
+              ::File.open @output_path, WRITE_MODE_ do | fh |
+                fh.write x.graph_sexp.unparse
+              end
+            end
+            @on_event_selectively.call :info, :wrote_resource do
+              Callback_::Event.inline_OK_with :wrote_resource,
+                  :path, @output_path,
+                  :bytes, bytes,
+                  :is_dry, is_dry,
+                  :is_completion, true do  |y, o|
+
+                y << "wrote #{ pth o.path } #{
+                  }(#{ o.bytes }#{ ' dry' if o.is_dry } bytes)"
+              end
+            end
+            ACHIEVED_  # not bytes, it's confusing to the API
+          end
+
+          WRITE_MODE_ = 'w'
         end
       end
 
     if false
-    public
 
-
-    nl_rx = /\n/ # meh
-    num_lines = -> str do
-      scn = TanMan::Services::StringScanner.new str
-      num = 0
-      num += 1 while scn.skip_until( nl_rx )
-      num += 1 unless scn.eos?
-      num
-    end
-
-    define_method :write do |dry_run, force, verbose|
-      bytes = nil
-      begin
-        next_string = sexp.unparse
-        if ! pathname.exist?
-          send_error_string "strange - #{graph_noun} didn't previously exist - won't write"
-          break # or just raise
-        end
-        pathname.exist? or fail 'sanity'
-        prev_string = pathname.read
-        if prev_string == next_string
-          send_info_string "(no changes in #{ graph_noun } - nothing to save.)"
-          break
-        end
-        num_a = num_lines[ prev_string ]
-        num_b = num_lines[ next_string ]
-        if num_b < num_a && ! force
-          send_error_string "ok to reduce number of lines in #{
-            }#{ escape_path pathname } from #{ num_a } to #{ num_b }? #{
-            }If so, use #{ par :force }."
-          break # IMPORTANT!
-        end
-        bytes = write_commit next_string, dry_run, verbose
-        break if ! bytes
-        send_info_string "wrote #{ escape_path pathname } (#{ bytes } bytes)"
-      end while nil
-      bytes
-    end
-
-  private
 
     def associations
       @associations ||= begin                  # #sexp-release
@@ -330,48 +270,6 @@ module Skylab::TanMan
           Models::Association::Collection.new self, sexp
         end
       end
-    end
-
-    def write_commit string, dry_run, verbose
-      res = nil
-      begin
-        temp = services.tmpdir.tmpdir.join 'next.dot'
-        bytes = nil
-        temp.open( 'w' ) { |fh| bytes = fh.write string }
-        diff = services.diff.diff pathname, temp, nil,
-          -> e do
-            send_error_string e
-          end,
-          -> i do
-            if verbose
-              send_info_string( gsub_path_hack i ) # e.g. `diff --normal `...
-            end
-          end
-        break( res = diff ) if ! diff
-        a = []
-        nerk = -> x, verb do
-          break if x == 0
-          a.push "#{ verb } #{ x } line#{ s x }"
-        end
-        nerk[ diff.num_lines_removed, 'removed' ]
-        nerk[ diff.num_lines_added,   'added'   ]
-        no_change = ( 0 == diff.num_lines_added && 0 == diff.num_lines_removed )
-        if no_change
-          a.push "no lines added or removed!"
-        end
-        if verbose
-          send_info_string( a.join ', ' )
-        end
-        break if no_change
-        fu = LIB_.FUC.new -> msg do
-          if verbose
-            send_info_string( gsub_path_hack msg )
-          end
-        end
-        fu.mv temp, pathname, noop: dry_run
-        bytes
-      end while nil
-      res
     end
     end
 

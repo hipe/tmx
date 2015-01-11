@@ -562,6 +562,9 @@ module Skylab::Brazen
 
       delta_param_bx = stct.param_bx
       if delta_param_bx
+
+        @parameter_box ||= Callback_::Box.new
+
         delta_param_bx.each_pair do | sym, x |
           @parameter_box.set sym, x
         end
@@ -581,10 +584,6 @@ module Skylab::Brazen
       def initialize yld, formal_properties
         @prps = formal_properties
         @yld = yld
-      end
-
-      def action_formal_props x
-        @yld.action_formal_prps = x ; nil
       end
     end
 
@@ -645,6 +644,10 @@ module Skylab::Brazen
     end
 
     module Common_Edit_Session_Methods__
+
+      def action_formal_props x
+        @yld.action_formal_prps = x ; nil
+      end
 
       def set_arg sym, x
         _receive_nonclassified_argument sym, x

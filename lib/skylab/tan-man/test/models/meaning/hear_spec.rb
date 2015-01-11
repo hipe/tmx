@@ -28,8 +28,6 @@ module Skylab::TanMan::TestSupport::Models::Meaning
       dotfile_pathname.read.should eql( exp )
     end
 
-
-
     it "assign a known meaning to a new value" do
 
       using_dotfile <<-O.unindent

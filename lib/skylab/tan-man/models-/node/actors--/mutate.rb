@@ -21,11 +21,11 @@ module Skylab::TanMan
 
         class Via_entity < self
 
-          Callback_::Actor[ self, :properties,
+          Callback_::Actor.call self, :properties,
             :verb,
             :entity,
             :datastore,
-            :kernel, :on_event_selectively ]
+            :kernel, :on_event_selectively  # necessary while simple actor
 
           def resolve_name_string
             @name_s = @entity.property_value_via_symbol :name ; nil
@@ -63,6 +63,12 @@ module Skylab::TanMan
           @can_create = false
           @do_fuzzy = false
           @inner_verb = @verb
+        end
+
+        def init_ivars_for_delete
+          @can_create = false
+          @do_fuzzy = false
+          @inner_verb = :del
         end
 
         def find_neighbors
@@ -183,7 +189,7 @@ module Skylab::TanMan
 
         def produce_relevant_sexp_when_tuch
           ok = resolve_relevant_sexp_when_tuch
-          ok && @created_existing_or_destoryed_node
+          ok && @created_existing_or_destroyed_node
         end
 
         def produce_relevant_sexp_when_retrieve
@@ -191,6 +197,16 @@ module Skylab::TanMan
             self._HOLE
           elsif @exact_match_found
             @exact_match_found
+          else
+            when_not_found
+          end
+        end
+
+        def produce_relevant_sexp_when_del
+          if @do_fuzzy
+            self._HOLE
+          elsif @exact_match_found
+            __del
           else
             when_not_found
           end
@@ -213,7 +229,7 @@ module Skylab::TanMan
           proto = produce_prototype_node
           new = proto._create_node_with_label @name_s, & handle_event_selectively
           if new
-            @created_existing_or_destoryed_node = new
+            @created_existing_or_destroyed_node = new
             ACHIEVED_
           else
             new
@@ -251,7 +267,7 @@ module Skylab::TanMan
         def to_new_node_apply_id
           ok = resolve_new_node_id
           if ok
-            @created_existing_or_destoryed_node.set_node_id @new_node_id
+            @created_existing_or_destroyed_node.set_node_id @new_node_id
           end
         end
 
@@ -270,13 +286,13 @@ module Skylab::TanMan
 
         def via_neighbors_and_new_node_insert_if_necessary
           if @has_neighbors
-            via_existant_neighbors_and_new_node_insert_if_necessary
+            via_existent_neighbors_and_new_node_insert_if_necessary
           else
             insert_new_node_into_empty_list
           end
         end
 
-        def via_existant_neighbors_and_new_node_insert_if_necessary
+        def via_existent_neighbors_and_new_node_insert_if_necessary
           if @exact_match_found || @fuzzy_matches_found
             when_matches_exist
           elsif @can_create  # or nil
@@ -299,7 +315,7 @@ module Skylab::TanMan
 
         def when_tuch_when_one_exists_already one
 
-          @created_existing_or_destoryed_node = one  # OVERWRITE
+          @created_existing_or_destroyed_node = one  # OVERWRITE
 
           is_ok = send :"when_#{ @verb }_and_you_found_one_it_is_OK"
 
@@ -349,7 +365,7 @@ module Skylab::TanMan
         def insert_when_touch_and_no_matches
           _least_greater_neighbor = @first_lexically_greater_node_stmt ||
             @first_non_node_stmt || @first_edge_stmt
-          nd = @created_existing_or_destoryed_node
+          nd = @created_existing_or_destroyed_node
           new_stmt_list = @datastore.insert_stmt_before_stmt(
             nd, _least_greater_neighbor )
           node_stmt = new_stmt_list[ :stmt ]
@@ -359,12 +375,16 @@ module Skylab::TanMan
         end
 
         def insert_new_node_into_empty_list
-          nd = @created_existing_or_destoryed_node
+          nd = @created_existing_or_destroyed_node
           stmt_list = @datastore.insert_stmt nd
           node = stmt_list[ :stmt ]
           nd.object_id == node.object_id or self._SANITY
           send_created_event_for_node node
           ACHIEVED_
+        end
+
+        def __del
+          @datastore.destroy_stmt @exact_match_found
         end
 
         def send_created_event_for_node node_stmt
@@ -406,61 +426,4 @@ module Skylab::TanMan
       end
 
   end
-end
-if false
-module Skylab::TanMan
-  class Models::Node::Collection
-    include Core::SubClient::InstanceMethods # for `build_message` of events :/
-
-    def add node_ref, do_fuzzy, error, success
-      res = prod node_ref,
-                     true, # yes `do_create`, call error[] if already exists
-                    false, # no do not destroy
-                 @do_fuzzy,
-                    error, # this determines your result if failed e.g. existed
-                  success  # (if the add succeeded, you get the business object)
-      res
-    end
-
-    def fetch node_ref, error
-      res = prod node_ref,
-                    false, # no do not create
-                    false, # no do not destroy
-                     true, # yes sure why not always fuzzy
-                    error, # if provided receives Not_Found, Ambiguous events
-                      nil  # do not create Exists events, just result in node
-      res
-    end
-
-    def produce node_ref, do_create, do_fuzzy, error, success
-      res = prod node_ref,
-                do_create,
-                    false, # no do not destroy
-                 @do_fuzzy,
-                    error,
-                  success
-      res
-    end
-
-    def rm node_ref, do_fuzzy, error, success
-      res = prod node_ref,
-                    false, # no do not create
-                     true, # yes, we are here to destroy
-                 @do_fuzzy,
-                    error, # required lambda, called e.g. if node not found
-                  success  # if the destroy succeeds you get a destroyed bus. ob
-      res
-    end
-
-    def touch_node_via_label node_ref
-      res = prod node_ref,
-                      nil, # create iff necessary
-                    false, # no do not destroy
-                    false, # this is not fuzzy match - exact match only
- -> e { raise e.message }, # afaik only models sexp events invalid-characters
-                      nil  # do not report success, just please give me the node
-      res
-    end
-  end
-end
 end

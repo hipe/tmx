@@ -35,8 +35,6 @@ better this time.
   in these kind of objects, arguments are a (non-iambic) (positional)
   arglist. must not be used for non-proc-like classes. :+[#020]
 
-+ `dup_with` - more explicit alias of `with`
-
 + `execute` has a strict API meaning for a lot of our libraries as the
   one #hook-out method the client must supply. it must take no
   arguments. [#cb-042] actors exemplify these semantics, as well as many
@@ -112,8 +110,7 @@ better this time.
 + `with` - arguments must be treated as a literal [#cb-046] iambic phrase.
   must have no side-effects on the receiver, instead the result must be
   a dup of the receiver that has been transformed as is described by the
-  iambic argument phrase. (call it `dup_with` to be more explicit but
-  #todo let's pick one or the other)
+  iambic argument phrase.
   (use the never-been-used-before `_who_has` to mutate the receiver.)
 
 + `work` is our "go-to" name for the interesting body of ..er.. work

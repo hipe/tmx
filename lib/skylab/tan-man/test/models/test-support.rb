@@ -60,7 +60,7 @@ module Skylab::TanMan::TestSupport::Models
     end
 
     def bld_input_args_when_input_file_granule
-      [ Brazen_.model.actual_property.new( input_file_pathname, :input_pathname ) ]
+      [ Brazen_.model.actual_property.new( input_file_pathname.to_path, :input_path ) ]
     end
 
     def silo_controller
@@ -79,7 +79,24 @@ module Skylab::TanMan::TestSupport::Models
       subject_API.application_kernel
     end
 
-    # ~ tmpdir/workspace support
+    # ~ fixture and prepared dir and file paths
+
+    def using_dotfile content_s
+
+      prepare_ws_tmpdir
+
+      @workspace_path = @ws_pn.to_path  # push up as needed
+
+      ::File.open( ::File.join( @workspace_path, THE_DOTFILE__ ), W_ ) do | fh |
+        fh.write content_s
+      end
+
+      ::File.open( ::File.join( @workspace_path, cfn_shallow ), W_ ) do | fh |
+        fh.write "[ graph \"#{ THE_DOTFILE__ }\" ]\n"
+      end
+
+      nil
+    end
 
     def use_empty_ws
       td = verbosify_tmpdir empty_dir_pn
@@ -138,10 +155,24 @@ module Skylab::TanMan::TestSupport::Models
       td
     end
 
+    def dir sym
+      ::File.join( dirs,
+        sym.id2name.gsub( Callback_::UNDERSCORE_, Callback_::DASH_ ) )
+    end
+
+    def dirs
+      ::Skylab::TanMan::TestSupport::Fixtures::Dirs.dir_pathname.to_path
+    end
+
     def cfn
       CONFIG_FILENAME___
     end
     CONFIG_FILENAME___ = 'local-conf.d/config'.freeze
+
+    def cfn_shallow
+      CONFIG_FILENAME_SHALLOW___
+    end
+    CONFIG_FILENAME_SHALLOW___ = 'tern-mern.conf'
   end
 
   class Mock_Action__
@@ -158,4 +189,8 @@ module Skylab::TanMan::TestSupport::Models
 
     attr_reader :input_arguments
   end
+
+  THE_DOTFILE__ = 'the.dot'
+
+  W_ = 'w'  # track its use
 end

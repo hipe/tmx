@@ -140,12 +140,12 @@ module Skylab::Callback
       end
 
       def with_message_string_mapper p
-        dup_with( & Event_::Small_Time_Actors__::
+        with( & Event_::Small_Time_Actors__::
           Produce_new_message_proc_from_map_reducer_and_old_message_proc[
             p, message_proc ] )
       end
 
-      def dup_with * x_a, & p  # #note-25
+      def with * x_a, & p  # #note-25
         dup.init_copy_via_iambic_and_message_proc x_a, p
       end
 
