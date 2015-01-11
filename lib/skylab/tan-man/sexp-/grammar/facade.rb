@@ -1,6 +1,6 @@
 module Skylab::TanMan
 
-  class Sexp::Grammar::Facade < ::Struct.new :anchor_module, :grammar_const
+  class Sexp_::Grammar::Facade < ::Struct.new :anchor_module, :grammar_const
 
     # experimental wrapper around a grammar with possibly useful svcs added.
 

@@ -71,11 +71,21 @@ module Skylab::TanMan
           :create_if_not_exist,
           :max_mkdirs, 1  # you may make the [tm] directory only.
         ) do | * i_a, & ev_p |
-          maybe_receive_event_via_channel i_a do
-            _ev = ev_p[]
-            _ev.with_message_string_mapper MSG_MAP__
+
+          if @on_event_selectively
+
+            maybe_receive_event_via_channel i_a do
+              _ev = ev_p[]
+              _ev.with_message_string_mapper MSG_MAP__
+            end
+
+            UNABLE_  # info events won't ride all the way out only errors
+
+          elsif :info == i_a.first
+            # nothing, for now
+           else
+            raise ev_p[].to_exception
           end
-          UNABLE_  # info events won't ride all the way out only errors
         end
 
         valid_arg and valid_arg.value_x

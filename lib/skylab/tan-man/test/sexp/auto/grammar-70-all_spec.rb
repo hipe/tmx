@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-describe "[tm] Sexp::Auto list pattern (grammars 70*)", g: true do
+describe "[tm] sexp auto list pattern (grammars 70*)", g: true do
 
   extend ::Skylab::TanMan::TestSupport::Sexp::Auto
 

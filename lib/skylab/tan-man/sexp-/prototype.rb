@@ -2,7 +2,7 @@
 
 module Skylab::TanMan
 
-  module Sexp::Prototype
+  module Sexp_::Prototype
 
     # Check out this wondrously obtuse, undoubtedly insane but gloriously
     # useful hack: if you use the keyword `example` (without the quotes) in
@@ -47,9 +47,9 @@ module Skylab::TanMan
 
 
 
-  class << Sexp::Prototype
+  class << Sexp_::Prototype
 
-    keyword = Sexp::Prototype.keyword
+    keyword = Sexp_::Prototype.keyword
 
     define_method :match  do |prev_tree, curr_tree, tree_class, member|
       res = nil
@@ -62,13 +62,13 @@ module Skylab::TanMan
         begin
           shell_style_comment_header = scn.scan( /[ \t]*#[ \t]*/ )
           if shell_style_comment_header                     # make a note of
-            klass = Sexp::Prototype::ShellStyle             # what kind of
+            klass = Sexp_::Prototype::ShellStyle             # what kind of
             line_header = shell_style_comment_header        # comment it is
             break                                           # and the line-
           end
           found_c_style_opener = scn.skip %r{ [ \t]* / \* }x
           if found_c_style_opener                           # header, if any
-            klass = Sexp::Prototype::C_Style                # (for this string
+            klass = Sexp_::Prototype::C_Style                # (for this string
             scn.skip( /([ \t]*[\r\n]+)+/ )                  # may not be a
             line_header = scn.scan( /[ \t]*/ )              # comment at all).
           end
@@ -86,7 +86,7 @@ module Skylab::TanMan
 
 
 
-  class Sexp::Prototype::Hack < ::Struct.new :scn, :curr_tree, :line_header,
+  class Sexp_::Prototype::Hack < ::Struct.new :scn, :curr_tree, :line_header,
                                                :member, :tree_class
 
     def commit!
@@ -137,7 +137,7 @@ module Skylab::TanMan
       res
     end
 
-    fun = Sexp::Prototype
+    fun = Sexp_::Prototype
 
     define_method :attempt_to_process_example_body! do
       result = nil
@@ -202,11 +202,11 @@ module Skylab::TanMan
     end
 
     def debug?
-      TanMan_::Sexp::Auto.debug?
+      TanMan_::Sexp_::Auto.debug?
     end
 
     def send_info_string msg
-      TanMan_::Sexp::Auto.debug_stream.puts msg
+      TanMan_::Sexp_::Auto.debug_stream.puts msg
     end
 
     def grammar
@@ -246,7 +246,7 @@ module Skylab::TanMan
             fail "implement me - prototypes for non-list rules"
           end
           hub._prototype = sexp
-          hub.extend Sexp::Prototype::Hub_InstanceMethods
+          hub.extend Sexp_::Prototype::Hub_InstanceMethods
           self.active_hub = hub
         end
         res = true
@@ -273,13 +273,13 @@ module Skylab::TanMan
 
 
 
-  class Sexp::Prototype::ShellStyle < Sexp::Prototype::Hack
+  class Sexp_::Prototype::ShellStyle < Sexp_::Prototype::Hack
 
     # no public methods defined here.
 
   private
 
-    fun = Sexp::Prototype
+    fun = Sexp_::Prototype
     blank_rx = fun.blank_rx
     line_rx = fun.line_rx
 
@@ -344,13 +344,13 @@ module Skylab::TanMan
   end
 
 
-  class Sexp::Prototype::C_Style < Sexp::Prototype::Hack
+  class Sexp_::Prototype::C_Style < Sexp_::Prototype::Hack
 
     # (nothing public defined here.)
 
   private
 
-    fun = Sexp::Prototype
+    fun = Sexp_::Prototype
     rex = fun.rex
     line_rx = fun.line_rx
     end_of_multiline_rx = %r{ . (?= \*/ | ^[ \t]*$ ) }mx # explained below
@@ -400,7 +400,7 @@ module Skylab::TanMan
   end
 
 
-  module Sexp::Prototype::Hub_InstanceMethods  # Here we turn an ordinary
+  module Sexp_::Prototype::Hub_InstanceMethods  # Here we turn an ordinary
                                                # sexp object into a veritable
     def _named_prototypes                      # powerhouse for holding all
       @_named_prototypes ||= { }               # of our prototypes found during

@@ -30,8 +30,8 @@ module Skylab::TanMan
 
     # (this is the other end of [#078]) - This c-onst_defined? hack is an
     # #experimental alternative of loading every extention module file
-    # for every Sexp class whole-hog, "manually".
-    # We must do either one or the other because Sexp::Auto is unaware
+    # for every sexp class whole-hog, "manually".
+    # We must do either one or the other because sexp auto is unaware
     # (as it should be!) of the idea of autoloading. experimental!
 
     def self.const_defined? const_x, look_up=true

@@ -10,19 +10,19 @@ module Skylab
 
       rule forget_statement
         'forget' sep target:cluster
-        { def tree ; TanMan::Sexp::Auto::Recursive[ self ] end }
+        { def tree ; TanMan::Sexp_::Auto::Recursive[ self ] end }
       end
       rule copula_statement
         agent:cluster sep 'is' sep target:cluster
-        { def tree ; TanMan::Sexp::Auto::Recursive[ self ] end }
+        { def tree ; TanMan::Sexp_::Auto::Recursive[ self ] end }
       end
       rule dependency_statement
         agent:cluster sep polarity:( 'depends on' / 'does not depend on' ) sep target:cluster
-        { def tree ; TanMan::Sexp::Auto::Recursive[ self ] end }
+        { def tree ; TanMan::Sexp_::Auto::Recursive[ self ] end }
       end
       rule meaning_statement
         agent:cluster sep 'means' sep target:cluster
-        { def tree ; TanMan::Sexp::Auto::Recursive[ self ] end }
+        { def tree ; TanMan::Sexp_::Auto::Recursive[ self ] end }
       end
       rule cluster
         head:word tail:(sep content:word)*

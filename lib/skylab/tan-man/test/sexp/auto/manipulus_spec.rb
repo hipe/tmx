@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-describe "[tm] Sexp::Auto MANIPULULS", g: true do
+describe "[tm] sexp auto MANIPULULS", g: true do
 
   extend ::Skylab::TanMan::TestSupport::Sexp::Auto
 

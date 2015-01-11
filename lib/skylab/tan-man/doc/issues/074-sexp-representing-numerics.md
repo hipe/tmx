@@ -1,9 +1,9 @@
-# Sexp :[#074]
+# on s-expression represnetation of numerics :[#074]
 
 ## Representing Numeric Values in Sexps
 
 When it comes time to deal with Numerics, consider what
-it means to be a lossless Sexp, and then reconsider having members
+it means to be a lossless sexp, and then reconsider having members
 that are themselves numeric. Consider: since for the kinds of
 grammars we parse, a given numeric value may have multiple ways to
 be represented as a string, (e.g. "3.14", "3.140") converting from

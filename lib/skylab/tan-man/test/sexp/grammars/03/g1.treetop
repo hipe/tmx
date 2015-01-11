@@ -2,11 +2,11 @@ module Skylab::TanMan::TestSupport::Sexp::Grammars::Namespace3
   grammar HerfusDerfus03
     rule dependency_statement
       agent:cluster sep 'depends on' sep target:cluster "\n"
-      { def tree ; ::Skylab::TanMan::Sexp::Auto[ self ] end }
+      { def tree ; ::Skylab::TanMan::Sexp_::Auto[ self ] end }
     end
     rule cluster
       head:word tail:(sep content:word)*
-      { def tree ; ::Skylab::TanMan::Sexp::Auto[ self ] end }
+      { def tree ; ::Skylab::TanMan::Sexp_::Auto[ self ] end }
     end
     rule word
       (

@@ -7,7 +7,7 @@ module Skylab::TanMan
     class SyntaxNodes::Graph < TanMan_.lib_.TT::Runtime::SyntaxNode
 
       def tree
-        TanMan_::Sexp::Auto::Lossless::Recursive[ self ] # :+#strain
+        TanMan_::Sexp_::Auto::Lossless::Recursive[ self ] # :+#strain
       end
     end
   end

@@ -57,7 +57,7 @@ module Skylab::TanMan::Models_::DotFile
     end
     rule id_name
       id_name_start_char id_name_char*
-      { def tree ; ::Skylab::TanMan::Sexp::Auto::ContentTextValue[self] end }
+      { def tree ; ::Skylab::TanMan::Sexp_::Auto::ContentTextValue[self] end }
     end
     rule id_name_start_char
       [_a-zA-Z]
@@ -68,7 +68,7 @@ module Skylab::TanMan::Models_::DotFile
     end
     rule id_numeric
       '-'? ( '.' [0-9]+ / [0-9]+ ( '.' [0-9]* )? )
-      { def tree ; ::Skylab::TanMan::Sexp::Auto::ContentTextValue[self] end }
+      { def tree ; ::Skylab::TanMan::Sexp_::Auto::ContentTextValue[self] end }
     end
     rule double_quoted_string
       '"' content_text_value:('\"' / !'"' .)* '"'

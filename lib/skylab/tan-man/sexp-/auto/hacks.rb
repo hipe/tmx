@@ -1,9 +1,9 @@
 module Skylab::TanMan
-  module Sexp::Auto::Hacks
+  module Sexp_::Auto::Hacks
     # pure container module for holding automagic "hacks"
   end
 
-  class Sexp::Auto::Hack < ::Struct.new :block, :state
+  class Sexp_::Auto::Hack < ::Struct.new :block, :state
     # A commitable hack object (just a simple block-wrapping state machine),
     # it separates the matching of a hack from the application of a hack.
 
@@ -23,7 +23,7 @@ module Skylab::TanMan
   end
 
 
-  class Sexp::Auto::Hack
+  class Sexp_::Auto::Hack
 
     class << self
       def list_rx
@@ -34,7 +34,7 @@ module Skylab::TanMan
   end
 
 
-  module Sexp::Auto::Hack::ModuleMethods
+  module Sexp_::Auto::Hack::ModuleMethods
     def define_items_method klass, stem
       items_method = "#{ stem }s".intern # #pluralize
       klass.instance_methods.include?(items_method) and fail "sanity - #{
@@ -50,7 +50,7 @@ module Skylab::TanMan
   # --*--
 
 
-  module Sexp::Auto::Hacks::HeadTail
+  module Sexp_::Auto::Hacks::HeadTail
     # This HeadTail hack is similar but different from the RecursiveRule hack
     # thus: they both represent alternate ways to define lists in grammars.
     # In this pattern a list is accomplished by use of a kleene star.
@@ -81,24 +81,24 @@ module Skylab::TanMan
     #   - else we will fail
     #
 
-    extend Sexp::Auto::Hack::ModuleMethods
+    extend Sexp_::Auto::Hack::ModuleMethods
 
 
     members = [:head, :tail]
 
     define_singleton_method :match do |i|
       if ( members - i.members_of_interest ).empty? # members incl. head & tail
-        Sexp::Auto::Hack.new { enhance i }
+        Sexp_::Auto::Hack.new { enhance i }
       end
     end
 
 
-    list_rx = Sexp::Auto::Hack.list_rx
+    list_rx = Sexp_::Auto::Hack.list_rx
 
     define_singleton_method :enhance do |i| # `i` for "inference"
       tree_class = i.tree_class
       tree_class._hacks.push :HeadTail #debugging-feature-only
-      tree_class.send :include, Sexp::Auto::Hacks::HeadTail::InstanceMethods
+      tree_class.send :include, Sexp_::Auto::Hacks::HeadTail::InstanceMethods
 
       head = i._node.head or fail 'for this hack to work, head: must exist'
 
@@ -107,7 +107,7 @@ module Skylab::TanMan
       if md
         use_stem = md[:stem].intern
       else
-        head_inference = Sexp::Auto::Inference.get head, tree_class, :head
+        head_inference = Sexp_::Auto::Inference.get head, tree_class, :head
         if head_inference.the_expression_name_is_inferrable
           use_stem = head_inference.rule
         else
@@ -122,7 +122,7 @@ module Skylab::TanMan
   end
 
 
-  module Sexp::Auto::Hacks::HeadTail::InstanceMethods
+  module Sexp_::Auto::Hacks::HeadTail::InstanceMethods
 
     def _items
       a = [ ] ; __items a ; a
@@ -159,15 +159,15 @@ module Skylab::TanMan
 
   # -- * --
 
-  module Sexp::Auto::Hacks::MemberName
+  module Sexp_::Auto::Hacks::MemberName
     # This hack simply states: If the rule component has a name that
     # ends in '_text_value', then the treeification strategy for it is simply
     # to call 'text_value' (to get the result string) of the syntax node.
 
   end
 
-  module Sexp::Auto::Hacks::MemberName::Methods
-    Sexp::Auto::Hacks::MemberName.extend self
+  module Sexp_::Auto::Hacks::MemberName::Methods
+    Sexp_::Auto::Hacks::MemberName.extend self
 
     rx = /\A(?<stem>.+)_text_value\z/
     define_method :matches? do |name|

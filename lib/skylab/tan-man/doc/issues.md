@@ -90,7 +90,7 @@
 [#013]       #DONE UI for chose example, then use example
               1. unify & modernify autoloading
               2. fix api vis-a-vis actions to integrate with autoloading
-[#012]       #done 2012-11-01 refactor UI / NLP to use Sexp::Auto
+[#012]       #done 2012-11-01 refactor UI / NLP to use sexp auto
 [#011]       make sure complex prototypes can be used with nonzero length lists
 [#010]       #done 2012-10-27 associate two nodes
                1. sic, 2. redudantly, 3. agent not exist 4. target not exist

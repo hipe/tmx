@@ -1,6 +1,6 @@
 module Skylab::TanMan
-  module Sexp::Inflection end
-  module Sexp::Inflection::Methods
+  module Sexp_::Inflection end
+  module Sexp_::Inflection::Methods
 
     CHOMP_DIGITS_RX = /\A(?<stem>[^0-9]+)[0-9]+\z/
 

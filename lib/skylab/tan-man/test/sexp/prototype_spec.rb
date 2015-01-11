@@ -2,7 +2,7 @@ require_relative 'prototype/test-support'
 
 module Skylab::TanMan::TestSupport::Sexp::Prototype
 
-  describe "[tm] Sexp::Prototype will be awesome" do
+  describe "[tm] sexp prototype be awesome" do
 
     extend TS_  # #borrow:one
 
@@ -10,7 +10,7 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
 
     using_input_string EMPTY_S_, 'totally empty input string' do
 
-      it 'has no list controller', f: true do
+      it 'has no list controller' do
         result.node_list.should be_nil
       end
     end

@@ -1,5 +1,5 @@
 module Skylab::TanMan
-  module Sexp::Auto::Hacks::RecursiveRule
+  module Sexp_::Auto::Hacks::RecursiveRule
     # This hack matches a node that matches the first of a series of patterns:
     # 1) if a rule has an element that itself has the same name as the rule
     # 2) if the rule is named "foo_list" and has a "foo" as an element
@@ -7,21 +7,21 @@ module Skylab::TanMan
     #      a member called "foo_list")
     # A large portion of the hack is dedicated to an experimental mutation API
 
-    extend Sexp::Auto::Hack::ModuleMethods
+    extend Sexp_::Auto::Hack::ModuleMethods
 
 
-    list_rx = Sexp::Auto::Hack.list_rx  # ( any name that ends in "_list" )
+    list_rx = Sexp_::Auto::Hack.list_rx  # ( any name that ends in "_list" )
 
     define_singleton_method :match do |i|
       if i.has_members_of_interest
         md = list_rx.match i.rule.to_s
         if i.members_of_interest.include? i.rule # "foo" rule with "foo" element
-          Sexp::Auto::Hack.new do
+          Sexp_::Auto::Hack.new do
             enhance i, (md ? md[:stem] : i.rule), :content, i.rule
           end
         elsif md # "foo_list" rule with "foo" elem
           if i.members_of_interest.include? md[:stem].intern
-            Sexp::Auto::Hack.new do
+            Sexp_::Auto::Hack.new do
               enhance i, md[:stem], md[:stem], :tail, i.rule
             end
           end
@@ -58,7 +58,7 @@ module Skylab::TanMan
 
       tree_class._hacks.push :RecursiveRule    # #debugging-feature-only
       tree_class.send :include,
-                          Sexp::Auto::Hacks::RecursiveRule::SexpInstanceMethods
+                          Sexp_::Auto::Hacks::RecursiveRule::SexpInstanceMethods
 
       match_p = -> search_item do              # a function to make matcher
         if ::String === search_item            # functions for matching nodes
@@ -478,7 +478,7 @@ module Skylab::TanMan
   end
 
 
-  module Sexp::Auto::Hacks::RecursiveRule::SexpInstanceMethods
+  module Sexp_::Auto::Hacks::RecursiveRule::SexpInstanceMethods
 
     def _append! new
       _insert_item_before_item new, nil

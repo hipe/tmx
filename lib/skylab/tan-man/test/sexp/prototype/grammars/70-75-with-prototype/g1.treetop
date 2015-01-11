@@ -4,7 +4,7 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype::Grammars::Namespace70_75
       'beginning' s node_list 'ending' s?
       {
         def tree
-          ::Skylab::TanMan::Sexp::Auto::Lossless::Recursive[ self ]
+          ::Skylab::TanMan::Sexp_::Auto::Lossless::Recursive[ self ]
         end
       }
     end
