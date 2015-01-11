@@ -55,7 +55,9 @@ module Skylab::TanMan::TestSupport::CLI
 
     context "with 'tanman/add'" do
 
+      if false
       klass :Actions__Add, extends: :Action do
+      end
       end
 
       it "tanmun failed to add - derp" do
@@ -67,7 +69,9 @@ module Skylab::TanMan::TestSupport::CLI
 
     context "with a 5 level deep action'" do
 
+      if false
       klass :Actions__Beats__Dubstep__WOBBLING__Pokey__Impress, extends: :Action do
+      end
       end
 
       expect = "tanmun wobbling dubstep beats failed to impress pokey - derp"
