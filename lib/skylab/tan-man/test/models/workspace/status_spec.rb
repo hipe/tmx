@@ -1,11 +1,11 @@
 require_relative 'test-support'
 
-module Skylab::TanMan::TestSupport::CLI::Actions
+module Skylab::TanMan::TestSupport::Models::Workspace
 
   # @todo waiting for permute [#056]
   #
 
-  describe "[tm] CLI action `status`", tanman: true, cli_action: true, wip: true do
+  describe "[tm] models workspace - status`", wip: true do
 
     extend TS_
 

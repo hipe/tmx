@@ -1,12 +1,12 @@
 require_relative 'test-support'
 
-module Skylab::TanMan::TestSupport::API::Actions
+module Skylab::TanMan::TestSupport::Models::Workspace
 
-  describe "the [ta] API action Init", tanman: true, api_action: true, wip: true do
+  describe "[ta] models - workspace create", wip: true do
 
     extend TS_
 
-    action_name :init
+    # action_name :init
 
     context "with some bad args" do
 
