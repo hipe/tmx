@@ -1,32 +1,82 @@
 module Skylab::TanMan
-  class Models::Starter::Collection
-    include Core::SubClient::InstanceMethods
 
-    CONFIG_PARAM = 'using_starter'
+  class Models_::Graph
 
-    def using_starter_metadata resource_name, success
-      ok = nil
-      begin
-        meta = controllers.config.value_meta CONFIG_PARAM, resource_name
-        meta or break
-        success[ meta ]
-        ok = true
-      end while nil
-      ok
+    Entity_.call self,
+
+        :persist_to, :graph,
+
+        :required, :property, :digraph_path
+
+    Actions = make_action_making_actions_module
+
+    module Actions
+
+      Use = make_action_class :Create
+
+      class Use
+
+        Entity_.call self,
+
+          :properties,
+            :starter,
+            :created_on
+
+        use_workspace_as_datastore_controller
+
+        def template_value i
+          send :"#{ i }_template_value"
+        end
+
+        def created_on_timestamp_string_template_value
+          if @argument_box.has_name :created_on
+            @argument_box.fetch :created_on
+          else
+            ::Time.now.utc.to_s
+          end
+        end
+
+        def _ws
+          if instance_variable_defined? :@preconditions  # #experimental
+            @preconditions.fetch :workspace
+          end
+        end
+      end
     end
 
-    def using_starter
-      starter = nil
-      begin
-        value = nil
-        b = using_starter_metadata :all, -> m { value = m.value }
-        b or break
-        value ||= API.default_starter_file
-        starter = services.starters.fetch value # could throw if etc
-      end while nil
-      starter
+    def local_entity_identifier_string
+      @property_box.fetch :digraph_path
     end
 
-    attr_accessor :verbose # compat
+    def to_normalized_actual_property_scan_for_persist
+
+      bx = Callback_::Box.new
+
+      bx.add Brazen_::NAME_, ::Pathname.new(
+        @property_box.fetch :digraph_path
+      ).relative_path_from(
+        @datastore.datastore_controller.wsdpn
+      ).to_path
+
+      bx.to_pair_stream
+    end
+
+    class Collection_Controller__ < Collection_Controller_
+
+      use_workspace_as_dsc
+
+      def persist_entity ent, & oes_p
+
+        _is_dry = ent.any_parameter_value :dry_run
+
+        @dsc ||= datastore_controller
+
+        _ok = Graph_::Actors__::Touch[ _is_dry, @action, ent, @dsc, @kernel, & oes_p ]
+
+        _ok and super
+      end
+    end
+
+    Graph_ = self
   end
 end

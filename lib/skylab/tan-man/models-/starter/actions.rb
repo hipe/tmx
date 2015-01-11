@@ -36,7 +36,7 @@ module Skylab::TanMan
         include Brazen_.model.retrieve_methods
 
         def produce_any_result
-          send_one_entity
+          produce_one_entity
         end
       end
 

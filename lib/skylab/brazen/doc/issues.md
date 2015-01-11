@@ -10,8 +10,7 @@
              to have direct knowledge of the adapter layer
 [#078]    #tracking - need better way to do this (in [ts])
 [#077] #open maybe try a positive meta-property with a default instead of `hidden`.
-[#076]       #done one day integrate [#021] with action factory,
-               where the idea was conceived.
+[#076] #open [#021] for `retrieve` (was: [same for list])
 [#075]    #tracking :+#wishlist optionally generate ivar-based iambic writers
 [#074]       #parent-node: [#011] the codifying expression agent (for events)
 [#073]       #parent-node: [#011] selective event listening via methods

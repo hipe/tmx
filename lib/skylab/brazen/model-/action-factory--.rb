@@ -235,47 +235,52 @@ module Skylab::Brazen
       private
 
         def send_one_entity
+          @entity = produce_one_entity
+          @entity and __via_entity_send_one
+        end
+
+        def produce_one_entity
           @datastore_controller = datastore.datastore_controller
-          @datastore_controller and begin
-            ok = via_dsc_for_one_resolve_entity
-            ok and via_entity_send_one
-          end
+          @datastore_controller && __via_dsc_for_one_produce_entity
         end
 
-        def via_dsc_for_one_resolve_entity
-          @entity_scan = @datastore_controller.entity_stream_via_model(
+        def __via_dsc_for_one_produce_entity
+          @__entity_stream = @datastore_controller.entity_stream_via_model(
             model_class, & handle_event_selectively )
-          via_entity_scan_and_dsc_for_one_resolve_entity
+          __via_entity_stream_and_dsc_for_one_produce_entity
         end
 
-        def via_entity_scan_and_dsc_for_one_resolve_entity
-          one = @entity_scan.gets
+        def __via_entity_stream_and_dsc_for_one_produce_entity
+          one = @__entity_stream.gets
           if one
-            x = @entity_scan.gets
+            x = @__entity_stream.gets
             if x
+              one = x
               had_many = true
-              one = x
+              x = @__entity_stream.gets
+              while x
+                one = x
+                x = @__entity_stream.gets
+              end
             end
-            while x = @entity_scan.gets
-              one = x
-            end
+          end
+          @__entity_stream = nil
+          if one
             if had_many
-              via_dsc_for_one_resolve_entity_when_had_many_via_last one
+              __via_dsc_for_one_produce_entity_when_had_many_via_last one
             else
-              @entity = one
-              ACHIEVED_
+              one
             end
           else
-            for_one_resolve_entity_when_had_none
+            __for_one_resolve_entity_when_had_none
           end
         end
 
-        def via_dsc_for_one_resolve_entity_when_had_many_via_last one
+        def __via_dsc_for_one_produce_entity_when_had_many_via_last one
           maybe_send_event :info, :single_entity_resolved_with_ambiguity do
             bld_single_entity_resolved_with_ambiguity
           end
-          @entity = one
-          ACHIEVED_
+          one
         end
 
         def bld_single_entity_resolved_with_ambiguity
@@ -291,7 +296,7 @@ module Skylab::Brazen
           end
         end
 
-        def for_one_resolve_entity_when_had_none
+        def __for_one_resolve_entity_when_had_none
           maybe_send_event :error, :entity_not_found do
             bld_entity_not_found_event
           end
@@ -310,7 +315,7 @@ module Skylab::Brazen
           end
         end
 
-        def via_entity_send_one
+        def __via_entity_send_one
           maybe_send_event :payload do
             bld_single_entity_resolved_without_ambiguity
           end

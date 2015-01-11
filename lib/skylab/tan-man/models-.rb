@@ -12,12 +12,11 @@ module Skylab::TanMan
 
   module Entity_
   public
+
     def property_value_via_symbol sym  # abstraction candidate
       property_value_via_property self.class.property_via_symbol sym
     end
-  end
 
-  module Entity_
     def receive_missing_required_properties ev  # #hook-in [br]
       receive_missing_required_properties_softly ev  # #experimental
     end

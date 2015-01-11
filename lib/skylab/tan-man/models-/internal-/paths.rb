@@ -91,12 +91,11 @@ module Skylab::TanMan
       end
 
       def app_tmpdir_path
-        lib = TanMan_::Lib_
 
-        _tmpdir_head_pathname = lib::System[].defaults.dev_tmpdir_pathname
-        _stem = lib::Tmpdir_stem[]
+        lib = TanMan_.lib_
 
-        _tmpdir_head_pathname.join( _stem ).to_path
+        lib.dev_tmpdir_pathname.join( lib.tmpdir_stem ).to_path
+
       end
     end
   end

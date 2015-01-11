@@ -64,7 +64,6 @@ module Skylab::TanMan
       end
     end
 
-    CONFIG_PARAM = 'using_dotfile'.freeze
     DotFile_ = self
 
     if false

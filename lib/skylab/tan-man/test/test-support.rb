@@ -10,7 +10,7 @@ module Skylab::TanMan::TestSupport
   class << self
 
     def tmpdir_pathname
-      @tdpn ||= TanMan_.lib_.system.defaults.dev_tmpdir_pathname.join 'tm-testing'
+      @tdpn ||= TanMan_.lib_.dev_tmpdir_pathname.join 'tm-testing'
     end
   end
 

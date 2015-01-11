@@ -24,31 +24,61 @@ module Skylab::TanMan
           end
         end
 
-        def via_default
-        end
-
         def via_workspace
+
           bx = @argument_box
-          @entity = @kernel.call :starter, :get,
+
+          @starter = @kernel.call :starter, :get,
             :workspace, bx[ :workspace ],
             :workspace_path, bx[ :workspace_path ],
             :config_filename, bx[ :config_filename ],
-            :on_event_selectively, prdc_handle_payload
-          @entity and via_entity
+            & @on_event_selectively
+
+          @starter and via_starter
         end
 
-        def prdc_handle_payload
-          -> * i_a, & ev_p do
-            if :payload == i_a.first
-              ev_p[].to_event.entity
-            else
-              maybe_send_event_via_channel i_a, & ev_p
-            end
+        def via_default
+          @st = @kernel.call :starter, :ls, & @on_event_selectively
+          @st and via_starter_stream
+        end
+
+        def via_starter_stream
+          x = @st.gets
+          count = 0
+          while x
+            count += 1
+            last = x
+            x = @st.gets
+          end
+
+          if last
+            maybe_send_using_default last, count
+            @starter = last
+            via_starter
+          else
+            self._NEVER
           end
         end
 
-        def via_entity
-          @path = @entity.to_path
+        def maybe_send_using_default strtr, d
+          maybe_send_event :info, :using_default do
+            bld_using_default_event strtr, d
+          end
+        end
+
+        def bld_using_default_event strtr, d
+
+          build_neutral_event_with :using_default,
+              :name_s, strtr.local_entity_identifier_string,
+              :num, d do |y, o|
+
+            y << "using default starter #{ val o.name_s } #{
+             }(the last of #{ o.num } starter#{ s o.num })"
+          end
+        end
+
+        def via_starter
+          @path = @starter.to_path
           via_path
         end
 

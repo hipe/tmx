@@ -6,14 +6,22 @@ module Skylab::TanMan
 
     sidesys, stdlib = Autoloader_.at :build_require_sidesystem_proc, :build_require_stdlib_proc
 
-    Bsc__ = sidesys[ :Basic ]
+    Basic = sidesys[ :Basic ]
 
     Basic_struct = -> do
-      Bsc__[]::Struct
+      Basic[]::Struct
     end
 
     Constantize = -> x do
       Callback_::Name.lib.constantize x
+    end
+
+    Dev_tmpdir_pathname = -> do
+      System[].defaults.dev_tmpdir_pathname
+    end
+
+    Dry_stub = -> do
+      HL__[]::IO.dry_stub_instance
     end
 
     Ellipsify = -> do
@@ -31,7 +39,7 @@ module Skylab::TanMan
     HL__ = sidesys[ :Headless ]
 
     Module_lib = -> do
-      Bsc__[]::Module
+      Basic[]::Module
     end
 
     NLP_EN_methods = -> do
@@ -59,7 +67,7 @@ module Skylab::TanMan
     end ]
 
     String_lib = -> do
-      Bsc__[]::String
+      Basic[]::String
     end
 
     String_scanner = memoize[ -> do

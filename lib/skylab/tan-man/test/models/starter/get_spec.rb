@@ -66,11 +66,10 @@ module Skylab::TanMan::TestSupport::Models::Starter
       black_and_white( ev ).should eql(
         'in config there is more than one starter. using the last one.' )
 
-      expect_OK_event :entity do |ev_|
-        ev_.to_event.entity.local_entity_identifier_string.should eql 'holy-derp.dot'
-      end
+      ent = @result
+      ent.class.name_function.as_human.should eql 'starter'
+      ent.local_entity_identifier_string.should eql 'holy-derp.dot'
 
-      expect_succeeded
     end
 
     context "apply -" do
