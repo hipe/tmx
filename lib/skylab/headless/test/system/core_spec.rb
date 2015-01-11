@@ -11,7 +11,7 @@ module Skylab::Headless::TestSupport::System
     end
 
     it "reflects members #fragile" do
-      subject.members.should eql [ :defaults, :environment, :filesystem, :IO, :patch, :which ]
+      subject.members.should eql [ :defaults, :diff, :environment, :filesystem, :IO, :patch, :which ]
     end
   end
 end
