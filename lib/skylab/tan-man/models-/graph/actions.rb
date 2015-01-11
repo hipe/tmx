@@ -77,6 +77,8 @@ module Skylab::TanMan
       end
     end
 
+    Autoloader_[ Actors__ = ::Module.new ]
+
     Graph_ = self
   end
 end
