@@ -7,7 +7,7 @@
 [#081]       config shell (lost). part of [#mh-053]
 [#078]       #tracking-tag this spot with `const_set`
 [#077]       #done services.rb wat
-[#076] #open events need to be modernized
+[#076] #hole (was: events need to be modernized)
 [#075]       #tracking-tag of hiccup skip Actions module `ANCHOR_BOX_MODULE`
 [#074]       #doc-point numerics in sexps #sexp-auto
 [#073]       #done rename 'examples' to 'starters'
@@ -72,7 +72,7 @@
 [#024]       #done use -h -- we had to etc use bleeding
 [#023]       #deferred combine all Boxxy, consider Boxxy-like solutions
                #depends-on:#018
-[#022] #open refactor-in headless, and sub-client
+[#022] #hole (was: refactor-in headless, and sub-client)
 [#021]       merge singletons into service
 [#020]       #done #low-priority nounify cli commands
                x. check -> graph check
@@ -101,9 +101,9 @@
 [#008]       #done 2012-10-10 #rename rename "nt" to "expression" / "rule"
 [#007]       #done #small #critical models/ dir generated during specs 2012-09-29
 [#006]       meta property reference (.rb!)
-             (was: #open #one-day look into reflection via metagrammer instead 2012-09-27)
+             (was: #one-day look into reflection via metagrammer instead 2012-09-27)
 [#005]       #open #one-day look into "statement oriented" processing 2012-09-02
-[#004]       #open #one-day #one-day look into multibyte regexp 2012-09-02
+[#004]       #open #one-day look into multibyte regexp 2012-09-02
 [#003]       #open #one-day unshield your eyes : google "dotfile grammar" 2012-09-01
 [#002]       #done 2012-08-30 rename remote* to fit a pattern (e.g. controller)
                examples-controller -> example-collection
