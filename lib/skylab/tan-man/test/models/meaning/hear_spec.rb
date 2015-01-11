@@ -1,11 +1,10 @@
 require_relative 'test-support'
 
-module Skylab::TanMan::TestSupport::CLI::Actions::Graph::Tell
+module Skylab::TanMan::TestSupport::Models::Meaning
 
   describe "[tm] CLI::Actions::Graph::Tell - tell the graph meaning", wip: true do
 
     extend TS_
-
 
     it "`foo means bar` assigns a heretofor unknown meaning (OMG OMG OMG)" do
 

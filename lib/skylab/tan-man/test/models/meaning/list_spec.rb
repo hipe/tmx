@@ -1,10 +1,10 @@
 require_relative 'test-support'
 
-module Skylab::TanMan::TestSupport::CLI::Actions::Graph
+module Skylab::TanMan::TestSupport::Models::Meaning
 
   describe "[tm] CLI::Actions ::Graph::Meaning actions:", wip: true do
 
-    extend TanMan_::TestSupport::CLI::Actions::Graph
+    extend TS_
 
     it "`graph meaning list` lists existing meanings found in comments!!!" do
 

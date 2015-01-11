@@ -1,10 +1,10 @@
 require_relative 'test-support'
 
-module Skylab::TanMan::TestSupport::CLI::Actions::Graph
+module Skylab::TanMan::TestSupport::Models::Node
 
   describe "[tm] CLI::Actions ::Graph::Node actions:", wip: true do
 
-    extend TanMan_::TestSupport::CLI::Actions::Graph
+    extend TS_
 
     context "`graph node add`" do
       it "to a empty 'digraph' -- makes up its own prototype!!" do
