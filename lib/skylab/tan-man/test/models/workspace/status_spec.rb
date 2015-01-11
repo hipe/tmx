@@ -2,89 +2,23 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::Models::Workspace
 
-  # @todo waiting for permute [#056]
-  #
-
-  describe "[tm] models workspace - status`", wip: true do
+  describe "[tm] models workspace - `status`" do
 
     extend TS_
 
-    def prepare_configs *whichs
-      prepare_tanman_tmpdir
-      whichs.each do |which|
-        case which
-        when :global
-          TMPDIR.touch 'global-conf-file'
-        when :local_dir
-          TMPDIR.mkdir 'local-conf.d'
-        when :local_file
-          TMPDIR.touch "#{ cfn }/config"
-        else
-          fail("no")
-        end
-      end
+    it "dir w/o config file - is not failure" do
+      call_API :status, :path, dirs
+      ev = expect_OK_event :resource_not_found
+      black_and_white( ev ).should eql '"tan-man.conf" not found in dirs'
+      expect_no_more_events
+      # expect_succeeded  # result is nil - #todo maybe?
     end
 
-    def match_one str
-      input 'status'
-      re = ::Regexp.new( /\A#{ ::Regexp.escape str }/ )
-      lines = output.lines.map(&:string).select { |s| re =~ s }
-      lines.size.should eql(1)
-      lines.first
-    end
-
-    context 'no global' do
-      before :each do
-        prepare_configs
-      end
-      it "says that global not found" do
-        match_one('global ').should match(/global.+not found/)
-      end
-    end
-
-    context 'yes global' do
-      before :each do
-        prepare_configs :global
-      end
-      it 'says that global exists' do
-        match_one('global ').should be_include('global-conf-file')
-      end
-    end
-
-     context 'no local dir' do
-      it 'says that local not found' do
-        prepare_configs
-        match_one('local ').should be_include('local conf dir not found')
-      end
-    end
-
-    context 'yes local dir no file' do
-      before :each do
-        prepare_configs :local_dir
-      end
-      it 'should list the directory (*with a trailing slash*)' do
-        match_one('local ').should be_include "#{ cfn }/"
-      end
-    end
-
-    context 'yes local dir yes file' do
-      before :each do
-        prepare_configs :local_dir, :local_file
-      end
-      it 'should herp a derp' do
-        match_one('local ').should be_include cfn
-      end
-    end
-
-    context 'yes local dir as file' do
-      before :each do
-        prepare_tanman_tmpdir.touch('local-conf.d')
-      end
-      it 'complain that a folder was expected where a file was found' do
-        input 'status'
-        output.lines[0].string.should match(/not a directory.+local-conf\.d/)
-        output.lines[1].string.should be_include('local conf dir not found')
-      end
+    it "partay" do
+      call_API :status, :path, dir( :with_freshly_initted_conf )
+      expect_OK_event :resource_exists
+      expect_succeeded
     end
   end
 end
+# this line is for :+#posterity - "@todo waiting for permute [#056]"

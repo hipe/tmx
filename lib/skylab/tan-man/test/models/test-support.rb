@@ -103,6 +103,17 @@ module Skylab::TanMan::TestSupport::Models
       TestLib_::Empty_dir_pn[]
     end
 
+    def expected_config_path
+      @ws_pn.join( TanMan_::Models_::Workspace.config_filename ).to_path
+    end
+
+    def empty_work_dir
+      @empty_work_dir ||= begin
+        prepare_ws_tmpdir
+        @ws_pn.to_path
+      end
+    end
+
     def prepare_ws_tmpdir s=nil
       td = verbosify_tmpdir volatile_tmpdir
       td.prepare

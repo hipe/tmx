@@ -101,6 +101,18 @@ module Skylab::TanMan
 
       end
 
+
+    private
+
+      def common_edit_path_property_hack  # while #open [#br-083] paths defaulting to '.'
+
+        edit_entity_class :property_object, ( ___path_property_.without_default do
+          @parameter_arity = :one
+        end )
+
+        ACHIEVED_
+      end
+
       self
     end )
 
@@ -260,6 +272,8 @@ module Skylab::TanMan
 
     self.persist_to = :datastores_git_config
 
+    set_workspace_config_filename 'tan-man.conf'  # #open [#022] one day w.s dirs
+
     class << self
 
       def properties_for_reuse
@@ -287,21 +301,33 @@ module Skylab::TanMan
 
       extend Action_::MM
 
-      self.is_promoted = true
+      @is_promoted = true
 
       after :init
 
+      class << self
+        def properties
+          @__edit_props_once ||= common_edit_path_property_hack
+          super
+        end
+      end
+
     desc "show the status of the config director{y|ies} active at the path."
 
-      def produce_any_result
-      end
     end
 
     class Actions::Init < Brazen_::Models_::Workspace::Actions::Init
 
       extend Action_::MM
 
-      self.is_promoted = true
+      @is_promoted = true
+
+      class << self
+        def properties
+          @__edit_props_once ||= common_edit_path_property_hack
+          super
+        end
+      end
 
       desc do |y|
         y << "create the #{ val property_value_via_symbol :local_conf_dirname } directory"

@@ -51,7 +51,7 @@ module Skylab::Brazen
     attr_reader :pn
 
     def any_result_for_flush_for_init
-      self.class::Actors__::Init.with(
+      Workspace_::Actors__::Init.with(
         :app_name, @app_name,
         :config_filename, @config_filename,
         :is_dry, @dry_run,

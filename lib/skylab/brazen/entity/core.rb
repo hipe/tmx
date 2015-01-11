@@ -994,6 +994,20 @@ module Skylab::Brazen
         end
       end  # >>
 
+      def without_default & edit_p
+        otr = dup
+        otr.__init_without_default
+        if edit_p
+          otr.instance_exec( & edit_p )
+        end
+        otr
+      end
+
+      protected def __init_without_default
+        @has_default = false
+        @default_p = nil
+      end
+
       def with & edit_p
         otr = dup
         otr.instance_exec( & edit_p )

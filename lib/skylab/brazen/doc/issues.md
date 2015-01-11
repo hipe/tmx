@@ -1,3 +1,4 @@
+[#083] #open workspace `init` action should not default to '.' in API
 [#082]       #tracking `list` implementations
 [#081]       #track experimental extensions to Actor
 [#080]       #parent-node:[#013] actors, agents and models ..

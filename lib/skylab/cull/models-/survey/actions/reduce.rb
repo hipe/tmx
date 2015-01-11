@@ -10,10 +10,8 @@ module Skylab::Cull
 
         :reuse, COMMON_PROPERTIES_,
 
-        :property_object, ( Models_::Upstream::Actions::Map::TABLE_NUMBER_PROPERTY.with do
-          @has_default = false
-          @default_p = nil
-        end ),
+        :property_object,
+          Models_::Upstream::Actions::Map::TABLE_NUMBER_PROPERTY.without_default,
 
         :description, -> y do
           y << "if provided, this survey will be used as a startingpoint."

@@ -19,7 +19,7 @@ module Skylab::Brazen
 
       :flag, :property, :verbose,
 
-      :default, '.',
+      :default, '.',  # #open [#083] - this will not stay here
       :description, -> y do
         y << "the directory to init"
       end,

@@ -72,7 +72,8 @@
 [#024]       #done use -h -- we had to etc use bleeding
 [#023]       #deferred combine all Boxxy, consider Boxxy-like solutions
                #depends-on:#018
-[#022] #hole (was: refactor-in headless, and sub-client)
+[#022] #open :+#wishlist: workspace directories
+             (was: refactor-in headless, and sub-client)
 [#021]       merge singletons into service
 [#020]       #done #low-priority nounify cli commands
                x. check -> graph check

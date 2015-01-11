@@ -412,6 +412,17 @@ module Skylab::TanMan::TestSupport
       TanMan_::API
     end
 
+    # ~ fixtures
+
+    def dir sym
+      ::File.join( dirs,
+        sym.id2name.gsub( Callback_::UNDERSCORE_, Callback_::DASH_ ) )
+    end
+
+    def dirs
+      TS_::Fixtures::Dirs.dir_pathname.to_path
+    end
+
     # ~ misc business
 
     def cfn
@@ -422,9 +433,18 @@ module Skylab::TanMan::TestSupport
       CONFIG_DIRNAME_THAT_IS_NOT_A_DOTFILE_FOR_VISIBILITY__
     end
 
+
     CONFIG_DIRNAME_THAT_IS_NOT_A_DOTFILE_FOR_VISIBILITY__ = 'local-conf.d'.freeze
     CONFIG_FILENAME_THAT_IS_NOT_A_DOTFILE_FOR_VISIBILITY__ = "#{
       CONFIG_DIRNAME_THAT_IS_NOT_A_DOTFILE_FOR_VISIBILITY__ }/conf.conf".freeze
 
+  end
+
+  module Fixtures
+    Callback_::Autoloader[ self ]
+
+    module Dirs
+      Callback_::Autoloader[ self ]
+    end
   end
 end
