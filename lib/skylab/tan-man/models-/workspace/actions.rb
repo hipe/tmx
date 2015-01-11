@@ -1,5 +1,12 @@
 module Skylab::TanMan
 
+  class Models_::Workspace
+
+    Actions = ::Module.new
+  end
+
+  if false
+
   Models::Config::Value_Metadata = ::Struct.new :name, :value, :value_was_set,
       :searched_resources, :found_resource_index
 
@@ -245,5 +252,6 @@ module Skylab::TanMan
 
       resources
     end
+  end
   end
 end
