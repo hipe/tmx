@@ -99,7 +99,8 @@
                1. with one template (3 permutations) 2. with another template (3 permutes)
 [#008]       #done 2012-10-10 #rename rename "nt" to "expression" / "rule"
 [#007]       #done #small #critical models/ dir generated during specs 2012-09-29
-[#006]       #open #one-day look into reflection via metagrammer instead 2012-09-27
+[#006]       meta property reference (.rb!)
+             (was: #open #one-day look into reflection via metagrammer instead 2012-09-27)
 [#005]       #open #one-day look into "statement oriented" processing 2012-09-02
 [#004]       #open #one-day #one-day look into multibyte regexp 2012-09-02
 [#003]       #open #one-day unshield your eyes : google "dotfile grammar" 2012-09-01
