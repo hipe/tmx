@@ -59,7 +59,8 @@
              (we didn't know that before) ([fa] CLI table is a model for
              this change)
              #doc-node the 'dupe' narrative ..
-[#020] #hole (was: #doc-node the formal box narrative ..)
+[#020]       not covered (in situ)
+             (was: #doc-node the formal box narrative ..)
              (was: instance methods separate from box class maybe?)
 [#019]       #done move parse out of fun (was: #node-tracker: #boxxy)
 [#018]       #done corral proxies

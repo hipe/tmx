@@ -17,11 +17,11 @@ module Skylab::CodeMolester
 
     class << self
 
-      def build_with * x_a
-        build_via_iambic x_a
+      def new_with * x_a
+        new_via_iambic x_a
       end
 
-      def build_via_iambic x_a
+      def new_via_iambic x_a
         if 1 == x_a.length
           raise ::ArgumentError, "no more '#{ x_a.first.class }' arguments supported - pls change to iambic"
         end

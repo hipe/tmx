@@ -24,7 +24,9 @@ module Skylab::MetaHell
             end
           end
         end
-        Fm_ = Fuzzy_matcher_.curry[ 1 ]  # min length
+
+        self._REDO_WALK_WITH_ME  # #open [#020] (that this is not covered)
+        Fm_ = Fuzzy_matcher_.curry_with :min_length, 1
 
         def name_monikers y
           y << @long.inspect

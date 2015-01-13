@@ -31,7 +31,7 @@ module Skylab::Basic
 
         class << self
 
-          def via_arglist a
+          def call_via_arglist a
             if a.length.zero?
               self
             else

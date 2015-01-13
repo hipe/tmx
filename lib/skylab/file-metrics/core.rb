@@ -69,7 +69,7 @@ module Skylab::FileMetrics
     HL__ = sidesys[ :Headless ]
 
     Ivars_with_procs_as_methods = -> * a do
-      MH__[]::Ivars_with_Procs_as_Methods.via_arglist a
+      MH__[]::Ivars_with_Procs_as_Methods.call_via_arglist a
     end
 
     Let = -> do
@@ -87,7 +87,7 @@ module Skylab::FileMetrics
     end
 
     Nice_proxy = -> * a do
-      MH__[]::Proxy.nice.via_arglist a
+      MH__[]::Proxy.nice.call_via_arglist a
     end
 
     Reverse_string_scanner = -> s do

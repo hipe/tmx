@@ -29,7 +29,7 @@ module Skylab::Git
       if x_a.length.zero?
         MH__[]::Basic_Fields
       else
-        MH__[]::Basic_Fields.via_iambic x_a
+        MH__[]::Basic_Fields.call_via_iambic x_a
       end
     end
 

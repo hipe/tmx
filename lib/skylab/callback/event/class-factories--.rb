@@ -26,7 +26,7 @@ module Skylab::Callback
         end
 
         def build_via_arglist a
-          evnt_class.via_arglist a
+          evnt_class.call_via_arglist a
         end
 
       private
@@ -127,7 +127,7 @@ module Skylab::Callback
         end
 
         def to_event
-          self.class.event_cls.via_arglist @a
+          self.class.event_cls.call_via_arglist @a
         end
       end
     end

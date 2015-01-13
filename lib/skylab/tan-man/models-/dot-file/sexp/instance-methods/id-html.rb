@@ -32,7 +32,7 @@ module Skylab::TanMan
 
         if bad
           res = oes_p.call :error, :invalid_characters do
-            Models_::DotFile::Events_::Invalid_Characters.with :chars, bad.uniq
+            Models_::DotFile::Events_::Invalid_Characters.new_with :chars, bad.uniq
           end
           break
         end

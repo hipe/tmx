@@ -26,7 +26,7 @@ module Skylab::SubTree
     memo, sidesys = Autoloader_.at :memoize, :build_require_sidesystem_proc
 
     API_Params = -> * x_a do
-      Face__[]::API::Params_.via_iambic x_a
+      Face__[]::API::Params_.call_via_iambic x_a
     end
 
     Bsc__ = sidesys[ :Basic ]
@@ -35,7 +35,7 @@ module Skylab::SubTree
       if x_a.length.zero?
         MH__[]::Basic_Fields
       else
-        MH__[]::Basic_Fields.via_iambic x_a
+        MH__[]::Basic_Fields.call_via_iambic x_a
       end
     end
 
@@ -70,11 +70,11 @@ module Skylab::SubTree
     end
 
     CLI_table = -> * x_a do
-      Face__[]::CLI::Table.via_iambic x_a
+      Face__[]::CLI::Table.call_via_iambic x_a
     end
 
     Properties_stack_frame = -> * a do
-      Bzn_[].properties_stack.common_frame.via_arglist a
+      Bzn_[].properties_stack.common_frame.call_via_arglist a
     end
 
     Distill_proc = -> do
@@ -82,7 +82,7 @@ module Skylab::SubTree
     end
 
     EN_add_methods = -> * i_a do
-      HL__[].expression_agent.NLP_EN_methods.via_arglist i_a
+      HL__[].expression_agent.NLP_EN_methods.call_via_arglist i_a
     end
 
     Enhance_as_API_normalizer = -> x, * x_a do
@@ -90,7 +90,7 @@ module Skylab::SubTree
     end
 
     Entity = -> * x_a, & edit_p do
-      Bzn_[]::Entity.via_arglist x_a, & edit_p
+      Bzn_[]::Entity.call_via_arglist x_a, & edit_p
     end
 
     Entity_via_iambic = -> x_a do
@@ -128,7 +128,7 @@ module Skylab::SubTree
     HL__ = sidesys[ :Headless ]
 
     Iambic = -> * x_a do
-      Face__[]::Iambic.via_iambic x_a
+      Face__[]::Iambic.call_via_iambic x_a
     end
 
     InformationTactics__ = sidesys[ :InformationTactics ]
@@ -154,7 +154,7 @@ module Skylab::SubTree
     Porcelain__ = sidesys[ :Porcelain ]
 
     Power_scanner = -> * x_a do
-      Callback_::Scn.multi_step.build_via_iambic x_a
+      Callback_::Scn.multi_step.new_via_iambic x_a
     end
 
     Pretty_path_proc = -> do

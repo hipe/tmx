@@ -19,7 +19,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
     attr_reader :o
 
     let :subject do
-      config_file_class.build_with :path, path, :string, input_string
+      config_file_class.new_with :path, path, :string, input_string
     end
 
     def config
@@ -27,7 +27,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
     end
 
     def bld_config
-      config_file_class.build_with :path, path, :string, content
+      config_file_class.new_with :path, path, :string, content
     end
 
     def path
@@ -37,11 +37,11 @@ module Skylab::CodeMolester::TestSupport::Config::File
     end
 
     def init_o_with * x_a
-      @o = config_file_class.build_via_iambic x_a ; nil
+      @o = config_file_class.new_via_iambic x_a ; nil
     end
 
     def build_config_file_with * x_a
-      config_file_class.build_via_iambic x_a
+      config_file_class.new_via_iambic x_a
     end
 
     def config_file_class

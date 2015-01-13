@@ -10,7 +10,7 @@ module Skylab::MetaHell
           new( * a )
         end
 
-        def via_arglist a
+        def call_via_arglist a
           new( * a )
         end
       end

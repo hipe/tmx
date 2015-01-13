@@ -51,7 +51,7 @@ module Skylab::Headless
       if a.length.zero? && ! p
         Bzn_[]::Entity
       else
-        Bzn_[]::Entity.via_arglist a, & p
+        Bzn_[]::Entity.call_via_arglist a, & p
       end
     end
 
@@ -64,7 +64,7 @@ module Skylab::Headless
     end
 
     Ivars_with_procs_as_methods = -> * a do
-      MH__[]::Ivars_with_Procs_as_Methods.via_arglist a
+      MH__[]::Ivars_with_Procs_as_Methods.call_via_arglist a
     end
 
     List_lib = -> do
@@ -82,11 +82,11 @@ module Skylab::Headless
     end
 
     Parse_series = -> * a do
-      MH__[]::Parse.series.via_arglist a
+      MH__[]::Parse.series.call_via_arglist a
     end
 
     Properties_stack_frame = -> *a do
-      Bzn_[].properties_stack.common_frame.via_arglist a
+      Bzn_[].properties_stack.common_frame.call_via_arglist a
     end
 
     Pool = -> do

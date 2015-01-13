@@ -13,11 +13,11 @@ module Skylab::Brazen
         class << self
 
           def build_mutable_with * x_a
-            build_via_iambic x_a
+            new_via_iambic x_a
           end
         end
 
-        def where_iambic x_a
+        def edit_via_iambic x_a
           if x_a.length.nonzero?
             process_iambic_stream_fully iambic_stream_via_iambic_array x_a
           else

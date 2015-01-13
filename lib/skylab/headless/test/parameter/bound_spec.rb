@@ -71,18 +71,20 @@ describe Skylab::Headless::Parameter::Bound do
         object.herkemer = 'the herkemer'
       end
 
-      it '"object.bound_parameters.where { |p| p.this_one? }" works!' do
+      it '"object.bound_parameters reduce { |p| p.this_one? }" works!' do
         emit_lines.should be_empty
         object.noun.should eql([:walk, :walk, :run])
         object.path.should be_kind_of(::Pathname)
         object.path.to_s.should eql('pathos')
-        bp = object.bound_parameters.where { |p| p.this_one? }
+        bp = object.bound_parameters.reduce_by do | bp_ |
+          bp_.this_one?
+        end
         (bp = bp.to_a).length.should eql(4)
         bp.map{ |o| o.value.to_s }.should eql(%w(walk walk run pathos))
       end
 
-      it '"object.bound_parameters.where(this_one: true)" works!' do
-        bp = object.bound_parameters.where(this_one: true)
+      it '"object.bound_parameters reduce (with hash)' do
+        bp = object.bound_parameters.reduce_by this_one: true
         (bp = bp.to_a).length.should eql(1) # contrast to above. do you know why
         bp.first.value.to_s.should eql('pathos')
       end

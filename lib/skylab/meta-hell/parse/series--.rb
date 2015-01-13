@@ -52,24 +52,24 @@ module Skylab::MetaHell
     # one-shot, inline usage:
     #
     #     args = [ '30', 'other' ]
-    #     age, sex, loc =  MetaHell_::Parse.series[ args,
+    #     age, sex, loc =  Subject_[].series[ args,
     #       -> a { /\A\d+\z/ =~ a },
     #       -> s { /\A[mf]\z/i =~ s },
     #       -> l { /./ =~ l } ]
     #
-    #     age  # => "30"
+    #     age  # => '30'
     #     sex  # => nil
     #     loc  # => 'other'
     #
     # (see what happens when we limit ourselves to binary gender)
 
-    # `curry` can make your code more readable and may improve performance:
-    # with `curry` you can separate the step of creating the parser from
-    # the step of using it.
+    # currying can make your code more readable and may improve performance:
+    # with `curry_with` you can separate the step of creating the parseer
+    # from the step of using it.
     #
     # curried usage:
     #
-    #     P = MetaHell_::Parse.series.curry[
+    #     P = Subject_[].series.curry_with(
     #       :token_matchers, [
     #         -> age do
     #           /\A\d+\z/ =~ age
@@ -80,39 +80,39 @@ module Skylab::MetaHell
     #         -> location do
     #           /\A[A-Z]/ =~ location   # must start with capital
     #         end
-    #     ] ]
+    #     ] )
     #
     #
-    # works to match each of the three terms
+    # full normal case (works to match each of the three terms).
     #
     #     P[ [ '30', 'male', "Mom's basement" ] ]  # => [ '30', 'male', "Mom's basement" ]
     #
     #
-    # or just the first one:
+    # one valid input token will match any first matching formal symbol found
     #
     #     P[ [ '30' ] ]              # => [ '30', nil, nil ]
     #
     #
-    # or just the last one:
+    # successful result is always array as long as number of formal symbols
     #
     #     P[ [ "Mom's basement" ] ]  # => [ nil, nil, "Mom's basement" ]
     #
     #
-    # or just the middle one, etc (note it gets precedence over last)
+    # ergo an earlier matching formal symbol will always win over a later one
     #
     #     P[ [ 'M' ] ]               # => [ nil, 'M', nil ]
     #
     #
     # but now here's the rub: if you re-curry the parser (!) and
-    # if you set `exhaustion` to `false`, it terminates at first non-parsable:
+    # `exhaustion` `false` terminates at first non-parsable (input array is mutated)
     #
     #     argv = [ '30', 'm', "Mom's", "Mom's again" ]
-    #     omg = P.curry[ :exhaustion, false ]
+    #     omg = P.curry_with :exhaustion, false
     #     omg[ argv ]  # => [ '30', 'm', "Mom's" ]
     #     argv  # => [ "Mom's again" ]
     #
     #
-    # (for contrast, here's the same thing, but with errors:)
+    # in such a case with exhaustion (deault), you would trip an exception
     #
     #     argv = [ '30', 'm', "Mom's", "Mom's again" ]
     #     P[ argv ]  # => ArgumentError: unrecognized argument at index 3..
@@ -186,11 +186,11 @@ module Skylab::MetaHell
     #
     # indicating `token_scanners` instead of `token_matchers`
     #
-    #     p = MetaHell_::Parse.series.curry[
+    #     p = Subject_[].series.curry_with(
     #       :token_scanners, [
     #         -> feet   { /\A\d+\z/ =~ feet and feet.to_i },
     #         -> inches { /\A\d+(?:\.\d+)?\z/ =~ inches and inches.to_f }
-    #       ] ]
+    #       ] )
     #
     #     p[ [ "8"   ] ]         # => [ 8,  nil  ]
     #     p[ [ "8.1" ] ]         # => [ nil, 8.1 ]

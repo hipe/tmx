@@ -24,9 +24,9 @@ module Skylab::Callback
     # aggregates other scanners, makes them behave as one sequence of scanners
     #
     #     scn = Callback_::Scn.aggregate(
-    #         Basic_::List.line_stream( [ :a, :b ] ),
-    #         Basic_::List.line_stream( [] ),
-    #         Basic_::List.line_stream( [ :c ] ) )
+    #         LIB_.list_lib.line_stream( [ :a, :b ] ),
+    #         LIB_.list_lib.line_stream( [] ),
+    #         LIB_.list_lib.line_stream( [ :c ] ) )
     #     scn.count  # => 0
     #     scn.gets  # => :a
     #     scn.count  # => 1

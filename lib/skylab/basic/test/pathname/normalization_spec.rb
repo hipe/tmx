@@ -30,7 +30,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
     context "the empty normalizer" do
 
       before :all do
-        EMPTY = Subject_[].build_via_iambic Basic_::EMPTY_A_
+        EMPTY = Subject_[].new_via_iambic Basic_::EMPTY_A_
       end
 
       it "against nil does nothing - checking required-ness is outside of scope" do
@@ -88,7 +88,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
     context "the relative normalizer" do
 
       before :all do
-        Rel = Subject_[].build_with :relative
+        Rel = Subject_[].new_with :relative
       end
 
       it "an abspath - NO" do
@@ -109,7 +109,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
     context "the absolute normalizer" do
 
       before :all do
-        Abs = Subject_[].build_with :absolute
+        Abs = Subject_[].new_with :absolute
       end
 
       it "an abspath - YES" do
@@ -130,7 +130,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
     context "downward only" do
 
       before :all do
-        Downward_Only = Subject_[].build_with :downward_only
+        Downward_Only = Subject_[].new_with :downward_only
       end
 
       it "loads" do
@@ -154,7 +154,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
     context "no single dots" do
 
       before :all do
-        No_Single_Dots = Subject_[].build_with :no_single_dots
+        No_Single_Dots = Subject_[].new_with :no_single_dots
       end
 
       it "loads" do
@@ -178,7 +178,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
     context "no dotfiles" do
 
       before :all do
-        No_Dotfiles = Subject_[].build_with :no_dotfiles
+        No_Dotfiles = Subject_[].new_with :no_dotfiles
       end
 
       it "loads" do
@@ -214,7 +214,7 @@ module Skylab::Basic::TestSupport::Pathname::N11n
       if x_a.length.zero?
         Subject_[]
       else
-        Subject_[].build_via_iambic x_a
+        Subject_[].new_via_iambic x_a
       end
     end
 

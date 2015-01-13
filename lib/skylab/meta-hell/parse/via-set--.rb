@@ -43,7 +43,7 @@ module Skylab::MetaHell
     #
     # with one such parser build from an empty set of parsers,
     #
-    #     None = MetaHell_::Parse.via_set.curry[ :pool_procs, [ ] ]
+    #     None = Subject_[].via_set.curry_with :pool_procs, []
     #
     #
     # a parser with no nodes in it will always report 'no parse' and 'spent':
@@ -60,9 +60,9 @@ module Skylab::MetaHell
 
     # with parser with one node that reports it always matches & always spends
     #
-    #     One = MetaHell_::Parse.via_set.curry[ :pool_procs, [
+    #     One = Subject_[].via_set.curry_with( :pool_procs, [
     #      -> _input {  [ true, true ] }
-    #     ]]
+    #     ] )
     #
     #
     # it always reports the same as a final result:
@@ -72,9 +72,9 @@ module Skylab::MetaHell
 
     # with a parser with one node that reports it never matches & always spends
     #
-    #     Spendless = MetaHell_::Parse.via_set.curry[ :pool_procs, [
+    #     Spendless = Subject_[].via_set.curry_with( :pool_procs, [
     #       -> _input {  [ false, true ] }
-    #     ]]
+    #     ] )
     #
     #
     # it always reports the same as a final result:
@@ -94,7 +94,7 @@ module Skylab::MetaHell
     #       end
     #     end
     #
-    #     Digits = MetaHell_::Parse.via_set.curry[ :pool_procs, [
+    #     Digits = Subject_[].via_set.curry_with :pool_procs, [
     #       keyword[ 'foo' ],
     #       keyword[ 'bar' ],
     #       -> memo, argv do
@@ -103,7 +103,7 @@ module Skylab::MetaHell
     #           [ true, false ]
     #         end
     #       end
-    #     ]]
+    #     ]
     #
     #
     # does nothing with nothing:

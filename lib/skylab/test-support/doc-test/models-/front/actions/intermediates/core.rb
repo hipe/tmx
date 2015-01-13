@@ -33,7 +33,7 @@ module Skylab::TestSupport
           :ad_hoc_normalizer, -> arg, & oes_p do
 
             if arg.value_x
-              TestSupport_.lib_.basic::Pathname.normalization.build_with(
+              TestSupport_.lib_.basic::Pathname.normalization.new_with(
                 :absolute, :downward_only,
                 :no_single_dots,
                 :no_dotfiles ).normalize_argument arg, & oes_p
@@ -239,7 +239,7 @@ module Skylab::TestSupport
 
             @on_event_selectively.call :info, :wrote do
 
-              DocTest_::Output_Adapter_.event_for_wrote.with(
+              DocTest_::Output_Adapter_.event_for_wrote.new_with(
                 :is_known_to_be_dry, @is_dry,
                 :bytes, d,
                 :line_count, d_,

@@ -18,7 +18,7 @@ module Skylab::TestSupport
           if 1 == a.length
             a.unshift :path
           end
-          via_iambic a, & oes_p
+          call_via_iambic a, & oes_p
         end
 
         alias_method :call, :[]

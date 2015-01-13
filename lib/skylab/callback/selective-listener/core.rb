@@ -20,7 +20,7 @@ module Skylab::Callback
 
       def methodic delegate, * x_a
         x_a.push :delegate, delegate
-        Selective_Listener_::Methodic__.build_via_iambic x_a
+        Selective_Listener_::Methodic__.new_via_iambic x_a
       end
 
       def spy_proxy & p

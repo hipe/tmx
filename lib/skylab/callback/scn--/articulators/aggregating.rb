@@ -10,12 +10,12 @@ module Skylab::Callback
           if x_a.length.zero?
             Aggregating
           else
-            Aggregating.build_via_iambic x_a
+            Aggregating.new_via_iambic x_a
           end
         end
 
         def eventing * x_a
-          Articulators::Eventing.build_via_iambic x_a
+          Articulators::Eventing.new_via_iambic x_a
         end
 
         def marginating

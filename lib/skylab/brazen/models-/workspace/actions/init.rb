@@ -42,7 +42,7 @@ module Skylab::Brazen
       @prop = self.class.properties.fetch :path
       @ws = model_class.edit_entity @kernel, handle_event_selectively do |o|
         o.argument_box bx
-        o.where :prop, @prop,
+        o.edit_with :prop, @prop,
           :app_name, @kernel.app_name,
           :on_event_selectively, _oes_p
       end

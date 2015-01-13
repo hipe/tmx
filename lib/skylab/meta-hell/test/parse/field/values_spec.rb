@@ -6,14 +6,14 @@ module Skylab::MetaHell::TestSupport::Parse::F_VS_
 
   include Constants
 
-  MetaHell_ = MetaHell_
+  Subject_ = Subject_
 
   describe "[mh] parse field- values- (integration)" do
 
     before :all do
       module Bazzle
-        flag = MetaHell_::Parse.fields.flag
-        BRANCH_ = MetaHell_::Parse.alternation.curry[
+        flag = Subject_[].fields.flag
+        BRANCH_ = Subject_[].alternation.curry_with(
           :syntax, :monikate, -> a { a * ' | ' },
           :field, flag,
             :moniker, :help,
@@ -28,7 +28,7 @@ module Skylab::MetaHell::TestSupport::Parse::F_VS_
             execute
           end,
           :constantspace, self
-        ]
+        )
       end
     end
 

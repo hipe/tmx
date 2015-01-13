@@ -61,22 +61,20 @@ module Skylab::Headless
 
     attr_reader :be_verbose, :to_pathname
 
-    def tmpdir_via_join path_tail
+    def tmpdir_via_join path_tail, * x_a
       otr = dup
-      otr.init_copy_with :path, join( path_tail ).to_path
+      x_a.push :path, ::File.join( @path_s, path_tail )
+      otr._init_copy_via_iambic x_a
       otr
     end
 
-    def with * x_a
+    def new_with * x_a
       otr = dup
-      otr.init_copy_via_iambic x_a
+      otr._init_copy_via_iambic x_a
       otr
     end
   protected
-    def init_copy_with * x_a
-      init_copy_via_iambic x_a
-    end
-    def init_copy_via_iambic x_a
+    def _init_copy_via_iambic x_a
       process_iambic_stream_fully iambic_stream_via_iambic_array x_a
       if @path_x
         init_pathname @path_x
@@ -193,7 +191,7 @@ module Skylab::Headless
       else
         touch_file[ files_x ]
         if last_was_dir
-          with :path, last_pathname
+          new_with :path, last_pathname
         else
           last_pathname
         end

@@ -146,7 +146,7 @@ module Skylab::Callback::TestSupport::Autoloader
       end
 
       it "with a node that does not autoload, also use iambic form" do
-        n, v = Autoloader_.const_reduce.via_iambic( [
+        n, v = Autoloader_.const_reduce.call_via_iambic( [
           :core_basename, nil,
           :do_assume_is_defined, false,
           :do_result_in_n_and_v, true,
@@ -159,7 +159,7 @@ module Skylab::Callback::TestSupport::Autoloader
       end
 
       it "the same as above but value only (name correction)" do
-        v = Autoloader_.const_reduce.via_iambic( [
+        v = Autoloader_.const_reduce.call_via_iambic( [
           :core_basename, nil,
           :do_assume_is_defined, false,
           :from_module, TS_::Const_Reduce::Fixtures::Two_Skorlab,
@@ -169,7 +169,7 @@ module Skylab::Callback::TestSupport::Autoloader
       end
 
       it "the same as above, but via loading" do
-        v = Autoloader_.const_reduce.via_iambic( [
+        v = Autoloader_.const_reduce.call_via_iambic( [
           :core_basename, nil,
           :do_assume_is_defined, false,
           :from_module, TS_::Const_Reduce::Fixtures::Tre_Skorlab,

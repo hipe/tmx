@@ -25,9 +25,9 @@ module Skylab::TanMan
 
       o = TanMan_.lib_.basic::Pathname.normalization
 
-      NORMALIZE_DIGRAPH_PATH_ = o.build_with :absolute
+      NORMALIZE_DIGRAPH_PATH_ = o.new_with :absolute
 
-      NORMALIZE_STARTER_FILE_ = o.build_with :relative, :downward_only
+      NORMALIZE_STARTER_FILE_ = o.new_with :relative, :downward_only
 
       def via_digraph_path
         @pn = ::Pathname.new @digraph_path

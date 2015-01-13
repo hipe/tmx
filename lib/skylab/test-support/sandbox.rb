@@ -39,6 +39,10 @@ module Skylab::TestSupport
 
     module Hax_
       def with ctx
+        self._NO_use_edit_with_context
+      end
+
+      def edit_with_context ctx
         @ctx = ctx
         nil
       end

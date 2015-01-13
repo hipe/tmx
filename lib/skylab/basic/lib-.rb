@@ -29,7 +29,7 @@ module Skylab::Basic
 
     Entity = -> * a, & edit_p do
       if a.length.nonzero? || edit_p
-        Bzn_[]::Entity.via_arglist a, & edit_p
+        Bzn_[]::Entity.call_via_arglist a, & edit_p
       else
         Bzn_[]::Entity
       end
@@ -50,7 +50,7 @@ module Skylab::Basic
     end
 
     Ivars_with_procs_as_methods = -> * a do
-      MH__[]::Ivars_with_Procs_as_Methods.via_arglist a
+      MH__[]::Ivars_with_Procs_as_Methods.call_via_arglist a
     end
 
     Memoize = -> x do

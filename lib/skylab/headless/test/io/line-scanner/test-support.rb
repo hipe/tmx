@@ -52,7 +52,7 @@ module Skylab::Headless::TestSupport::IO::Line_Scanner
         if io
           x_a.push :be_verbose, true, :infostream, io
         end
-        td = TestSupport_.tmpdir.build_via_iambic x_a
+        td = TestSupport_.tmpdir.new_via_iambic x_a
         td.exist? or td.prepare
         p = -> _ { td }
         td

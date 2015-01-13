@@ -16,7 +16,7 @@ module Skylab::Brazen
         if a.length.zero?
           self::Common_Frame__
         else
-          self::Common_Frame__.via_arglist a
+          self::Common_Frame__.call_via_arglist a
         end
       end
     end

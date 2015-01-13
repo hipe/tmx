@@ -34,7 +34,7 @@ module Skylab::Headless
             if 1 == a.length
               a.unshift :path
             end
-            build_via_iambic a, & oes_p
+            new_via_iambic a, & oes_p
           end
         end
 

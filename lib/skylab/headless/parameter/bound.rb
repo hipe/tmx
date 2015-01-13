@@ -19,7 +19,7 @@ module Skylab::Headless
         "i'm not that kind of enumerator (╯°□°）╯︵ ┻━┻")
     end
     def at *parameter_names
-      dupe(
+      reduce_with_changes(
         params_p: ->() do          # Override the default to be more map-like,
           ::Enumerator.new do |y|  # and use only the desired names.
             parameter_names.each do |parameter_name| # But still, we lazy eval
@@ -34,12 +34,17 @@ module Skylab::Headless
       init
       bound set_p.call.fetch(parameter_name)
     end
-    def where props_h=nil, &select_p
-      props_h and props_p = ->(prop) do
-        ! props_h.detect do |k, v|
-          ! prop.known?(k) || prop[k] != v
+
+    def reduce_by_ props_h=nil, & select_p
+
+      if props_h
+        props_p = -> prop do
+          ! props_h.detect do |k, v|
+            ! prop.known?(k) || prop[k] != v
+          end
         end
       end
+
       _filter_p =
       case [(:props if props_p), (:select if select_p)].compact
       when [:props, :select] ; ->(p) { props_p.call(p) && select_p.call(p) }
@@ -47,13 +52,16 @@ module Skylab::Headless
       when [:select]         ; select_p
       when []                ; MONADIC_TRUTH_
       end
-      dupe(params_p: ->() do
+
+      reduce_with_changes( params_p: -> do
         ::Enumerator.new do |y|
           params_p.call.each { |p| _filter_p.call(p) and y << p }
         end
-      end)
+      end )
     end
+
   private
+
     meta_param :inherit, boolean: true, writer: true
     param :known_p, accessor: true, inherit: true
     param :label_p, accessor: true, inherit: true
@@ -76,7 +84,7 @@ module Skylab::Headless
         ->{ read_p.call(parameter) if known_p.call(parameter) },
         ->(val) { write_p.call(parameter, val) }, label_p)
     end
-    def dupe changes
+    def reduce_with_changes changes
       init # should be ok to call multiple times
       self.class.new(Hash[
         self.class.parameters.each_value.select(&:inherit?).map do |param|
@@ -152,6 +160,9 @@ module Skylab::Headless
     def [](k) ; @bridge.fetch(k) end # !
     def at *a, &b ; @bridge.at(*a, &b) end
     def each *a, &b ; @bridge.each(*a, &b) end
-    def where *a, &b ; @bridge.where(*a, &b) end
+
+    def reduce_by * a, & p
+      @bridge.reduce_by_( * a, & p )
+    end
   end
 end

@@ -18,7 +18,7 @@ module Skylab::MetaHell
 
       alias_method :call, :[]
 
-      def via_arglist a
+      def call_via_arglist a
         @parse.dupe.call_notify a
       end
 
@@ -40,10 +40,8 @@ module Skylab::MetaHell
         end,
         :Parse_Value_ ]
 
-      def curry
-        -> * x_a do
-          @parse.dupe.shell_curried_with_iambic x_a
-        end
+      def curry_with * x_a
+        @parse.dupe.shell_curried_with_iambic x_a
       end
 
       def get_parse

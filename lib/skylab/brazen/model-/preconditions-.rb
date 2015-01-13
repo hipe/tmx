@@ -7,7 +7,7 @@ module Skylab::Brazen
       class << self
 
         def establish_box_with * x_a
-          Resolution__.via_iambic x_a
+          Resolution__.call_via_iambic x_a
         end
       end
 

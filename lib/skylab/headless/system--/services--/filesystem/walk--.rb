@@ -6,6 +6,15 @@ module Skylab::Headless
 
       class Walk__  # :[#176] (was [#ts-019], then [#st-007]. was once tagged [#cu-003])
 
+        class << self
+          def new_with * x_a, & oes_p  # :+[#cb-063]
+            new do
+              process_iambic_fully x_a
+              @on_event_selectively ||= oes_p
+            end
+          end
+        end
+
         Callback_::Actor[ self,
           :properties,
             :start_path,

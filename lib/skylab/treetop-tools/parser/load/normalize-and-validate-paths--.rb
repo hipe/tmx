@@ -21,7 +21,7 @@ module Skylab::TreetopTools
       end
 
       def resolve_pathname_actual_a
-        @pathname_actual_a = @event_receiver.bound_parameters.where do |bp|
+        @pathname_actual_a = @event_receiver.bound_parameters.reduce_by do |bp|
           if bp.known? :pathname
             bp[ :pathname ]
           end

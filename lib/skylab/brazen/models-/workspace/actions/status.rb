@@ -47,7 +47,7 @@ module Skylab::Brazen
 
       @ws = model_class.edit_entity @kernel, handle_event_selectively do |o|
         o.argument_box bx
-        o.where(
+        o.edit_with(
           :prop, self.class.properties.fetch( :path ),
           :on_event_selectively, _oes_p )
       end
@@ -74,7 +74,7 @@ module Skylab::Brazen
       # the resource. hence we result in nil.
 
       maybe_send_event_via_channel i_a do
-        ev_p[].with :ok, ACHIEVED_
+        ev_p[].new_with :ok, ACHIEVED_
       end
       nil
     end

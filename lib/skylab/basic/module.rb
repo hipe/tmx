@@ -16,7 +16,7 @@ module Skylab::Basic
         if a.length.zero?
           Mutex__
         else
-          Mutex__.via_arglist a
+          Mutex__.call_via_arglist a
         end
       end
 

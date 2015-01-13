@@ -615,11 +615,11 @@ module Skylab::Brazen
         bx.each_pair( & method( :_receive_nonclassified_argument ) ) ; nil
       end
 
-      def where * x_a
-        iambic x_a
+      def edit_with * x_a
+        edit_via_iambic x_a
       end
 
-      def iambic x_a
+      def edit_via_iambic x_a
         _some_mutable_iambic.concat x_a ; nil
       end
 
@@ -926,13 +926,7 @@ module Skylab::Brazen
 
       class << self
 
-        def build_with * x_a
-          new do
-            process_iambic_fully x_a
-          end
-        end
-
-        def build_via_iambic x_a
+        def new_with * x_a
           new do
             process_iambic_fully x_a
           end
@@ -1071,6 +1065,14 @@ module Skylab::Brazen
 
     class Silo_Controller_
 
+      class << self
+        def new_with * x_a  # :+#[#cb-063] used to be free
+          new do
+            process_iambic_fully x_a
+          end
+        end
+      end
+
       Actor_[ self, :properties,
         :preconditions,
         :model_class,
@@ -1093,14 +1095,14 @@ module Skylab::Brazen
             :level_i, :collection_controller_prcn,
             :on_event_selectively, @on_event_selectively )
           bx and begin
-            model_class.collection_controller.build_with(
+            model_class.collection_controller.curry_with(
               :action, graph.action,
               :preconditions, bx,
               :model_class, model_class,
               :kernel, @kernel, :on_event_selectively, @on_event_selectively )
           end
         else
-          model_class.collection_controller.build_with(
+          model_class.collection_controller.new_with(
             :model_class, model_class,
             :kernel, @kernel, :on_event_selectively, @on_event_selectively )
         end
@@ -1169,7 +1171,7 @@ module Skylab::Brazen
             :level_i, :silo_controller_prcn,
             :on_event_selectively, oes_p )
           bx and begin
-            model_class.silo_controller.build_with(
+            model_class.silo_controller.new_with(
               :preconditions, bx,
               :model_class, model_class,
               :kernel, @kernel, :on_event_selectively, oes_p )
@@ -1188,7 +1190,7 @@ module Skylab::Brazen
       end
 
       def build_silo_controller & oes_p
-        model_class.silo_controller.build_with(
+        model_class.silo_controller.new_with(
           :model_class, model_class,
           :kernel, @kernel, :on_event_selectively, oes_p )
       end

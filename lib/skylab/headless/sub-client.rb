@@ -23,7 +23,7 @@ module Skylab::Headless::SubClient
         if x_a.length.zero?
           NLP_EN_Methods__
         else
-          NLP_EN_Methods__.via_arglist x_a
+          NLP_EN_Methods__.call_via_arglist x_a
         end
       end
     end
@@ -216,7 +216,7 @@ end
         on_mod_via_iambic mod, x_a
       end
 
-      def via_arglist a
+      def call_via_arglist a
         on_mod_via_iambic a.shift, a
       end
 

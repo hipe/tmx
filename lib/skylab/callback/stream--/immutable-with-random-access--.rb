@@ -6,7 +6,7 @@ module Skylab::Callback
 
       class << self
 
-        def build_with * x_a
+        def new_with * x_a
           new do
             init_one_off_via_iambic x_a
           end

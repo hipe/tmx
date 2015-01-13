@@ -225,9 +225,9 @@ module Skylab::TreetopTools
     end
 
     def resolve_pathname_actual_a
-      @pathname_actual_a = bound_parameters.where do |bp|
+      @pathname_actual_a = bound_parameters.reduce_by do | bp |
         if bp.known? :pathname
-          bp[ :pathname ]
+          bp[ :pathname ]  # if is trueish
         end
       end.to_a ; nil
     end

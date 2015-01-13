@@ -127,7 +127,7 @@ module Skylab::Treemap
                                  metadata
                                end
         }
-        formal_attributes.which(& :is_adapter_parameter ).each do |k, fattr|
+        formal_attributes.reduce_by( & :is_adapter_parameter ).each do | k, fattr |
           param_h[ k ] = send k   # fun smell
         end
         res = with_adapter_api_action -> action do

@@ -9,11 +9,11 @@ module Skylab::Callback
       end
 
       def functional * a, & p
-        Proxy_::Functional__.via_arglist a, & p
+        Proxy_::Functional__.call_via_arglist a, & p
       end
 
       def inline * a, & p
-        Proxy_::Inline__.via_arglist a, & p
+        Proxy_::Inline__.call_via_arglist a, & p
       end
 
       def members  # :+[#br-061]
@@ -21,11 +21,11 @@ module Skylab::Callback
       end
 
       def nice * a, & p
-        Proxy_::Functional__::Nice__.via_arglist a, & p
+        Proxy_::Functional__::Nice__.call_via_arglist a, & p
       end
 
       def tee * a, & p
-        Proxy_::Tee__.via_arglist a, & p
+        Proxy_::Tee__.call_via_arglist a, & p
       end
     end
 

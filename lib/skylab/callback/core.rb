@@ -59,163 +59,134 @@ module Skylab::Callback
           case i_a.first
           when :properties
             i_a.shift
-            absrb_prps i_a, cls
+            __absorb_fields i_a, cls
             break
           else
             raise ::ArgumentError, i_a.first
           end
         end ; nil
       end
+
     private
-      def absrb_prps i_a, cls
-        box = cls.actor_property_box_for_write
-        d = -1 ; last = i_a.length - 1 ; i = nil
-        box.add i = i_a.fetch( d += 1 ), :"@#{ i }" while d < last ; nil
+
+      def __absorb_fields i_a, cls
+
+        bx = cls.__formal_fields_ivar_box_for_write
+
+        d = -1 ; last = i_a.length - 1
+
+        while d < last
+          sym = i_a.fetch d += 1
+          bx.add sym, :"@#{ sym }"
+        end
       end
     end
 
     BX_ = :ACTOR_PROPERTY_BOX___
-    D__ = :ACTOR_PROPERTY_BOX_LENGTH_MARKER_FOR_ARGLIST__
 
-    module MM__
+    module Call_Methods_
 
       def [] * a, & oes_p
-        new do
-          @on_event_selectively = oes_p
-          process_arglist_fully a
-        end.execute
+        call_via_arglist a, & oes_p
       end
 
-      def call * x_a, & oes_p
-        new do
-          @on_event_selectively = oes_p
-          process_iambic_fully x_a
-        end.execute
+      def call * a, & oes_p
+        call_via_arglist a, & oes_p
       end
 
-      def via_arglist a, & p
-        p and self._WAHOO
-        new do
-          process_arglist_fully a
-        end.execute
+      def with * x_a, & oes_p  # :+[#hl-095] reserved method name
+        call_via_iambic x_a, & oes_p
       end
 
-      def with * x_a, & oes_p  # #note-70
-        new do
-          @on_event_selectively = oes_p
-          process_iambic_fully x_a
-        end.execute
-      end
-
-      def build_with * x_a, & p
-        p and self._WAHOO
-        new do
-          process_iambic_fully x_a
-        end
-      end
-
-      def via_iambic x_a, & p
-        p and self._WAHOO
-        new do
-          process_iambic_fully x_a
-        end.execute
-      end
-
-      def build_via_iambic x_a, & p
-        p and self._WAHOO
-        new do
-          process_iambic_fully x_a
-        end
-      end
-
-      def curry
-        -> * preset_arglist do
-          cls = ::Class.new self
-          cls.extend Actor::Curried__::Module_Methods
-          cls.include Actor::Curried__::Instance_Methods
-          cls.accept_arglist_for_curry preset_arglist
-          cls
+      def backwards_curry
+        -> * xx_a do
+          new do
+            _init_instance_as_curry
+            process_arglist_fully_as_rcurry_ xx_a
+          end
         end
       end
 
       def curry_with * x_a
-        cls = ::Class.new self
-        cls.extend Actor::Curried__::Module_Methods
-        cls.include Actor::Curried__::Instance_Methods
-        cls.accept_iambic_for_curry x_a
-        cls
+        new do
+          _init_instance_as_curry
+          process_iambic_fully_as_curry_ x_a
+        end
       end
+
+      def call_via_arglist a, & oes_p
+        new do
+          @on_event_selectively ||= oes_p
+          process_arglist_fully a
+        end.execute
+      end
+
+      def call_via_iambic x_a, & oes_p
+        new do
+          @on_event_selectively ||= oes_p
+          process_iambic_fully x_a
+        end.execute
+      end
+    end
+
+    module MM__
+
+      include Call_Methods_
 
       def members
         const_get( BX_ ).get_names
       end
 
-      def actor_property_box_for_write
+      def __formal_fields_ivar_box_for_write
         if const_defined? BX_
           if const_defined? BX_, false
-            self._TEST_ME  # strange - re-opeing. should be OK
+            self._COVER_ME  # re-opening. should be ok, but we never do it
             const_get BX_, false
           else
-            bx = const_get BX_
-            const_set D__, bx.length
-            const_set BX_, bx.dup
+            const_set BX_, const_get( BX_ ).dup
           end
         else
-          const_set D__, 0
           const_set BX_, Box.new
         end
       end
-
-      def actor_property_box_for_arglist
-        @actor_property_box_for_arglist ||= prdc_actor_prop_box_for_arglist
-      end
-
-    private
-
-      def prdc_actor_prop_box_for_arglist
-        d = const_get D__
-        if d.zero?
-          const_get BX_
-        else
-          build_property_box_slice_for_arglist
-        end
-      end
-
-      def build_property_box_slice_for_arglist
-        d = const_get D__
-        bx = const_get BX_
-        bx_ = bx.class.new
-        d.upto( bx.length - 1 ) do |d_|
-          i, ivar = bx.fetch_pair_at_position d_
-          bx_.add i, ivar
-        end
-        bx_
-      end
     end
 
-    def initialize & p
+    def initialize & edit_p
       super( & nil )
-      p and instance_exec( & p )
+      if edit_p
+        instance_exec( & edit_p )
+      end
     end
 
   private
 
+    def _init_instance_as_curry
+
+      _REMAINDER_BOX = formal_fields_ivar_box_for_read_.dup
+
+      define_singleton_method :remainder_box_ do
+        _REMAINDER_BOX
+      end
+      extend Actor::Curried__::Instance_Methods
+      nil
+    end
+
     def process_arglist_fully a
-      box = self.class.actor_property_box_for_arglist
+      bx = formal_fields_ivar_box_for_read_
       a.length.times do |d|
-        instance_variable_set box.fetch_at_position( d ), a.fetch( d )
-      end ; nil  # #etc
+        instance_variable_set bx.fetch_at_position( d ), a.fetch( d )
+      end ; nil
     end
 
     def process_iambic_fully x_a
-      box = self.class.const_get BX_
+      bx = formal_fields_ivar_box_for_read_
       x_a.each_slice( 2 ) do |i, x|
-        instance_variable_set box.fetch( i ), x
+        instance_variable_set bx.fetch( i ), x
       end ; nil
     end
 
     def process_iambic_stream_fully st
-      bx = self.class.const_get BX_
+      bx = formal_fields_ivar_box_for_read_
       while st.unparsed_exists
         instance_variable_set bx.fetch( st.gets_one ), st.gets_one
       end
@@ -223,11 +194,11 @@ module Skylab::Callback
     end
 
     def process_iambic_passively x_a
-      box = self.class.const_get BX_
+      bx = formal_fields_ivar_box_for_read_
       d = -2 ; last = x_a.length - 2
       while d < last
         d += 2
-        ivar = box[ x_a.fetch( d ) ]
+        ivar = bx[ x_a.fetch( d ) ]
         if ivar
           instance_variable_set ivar, x_a.fetch( d + 1 )
         else
@@ -242,7 +213,7 @@ module Skylab::Callback
       Iambic_Stream_via_Array_.new 0, x_a
     end
 
-    def ivar_box
+    def formal_fields_ivar_box_for_read_
       self.class.const_get BX_
     end
   end
@@ -309,7 +280,11 @@ module Skylab::Callback
     end
 
     def at_position d
-      @h.fetch @a.fetch d
+      @h.fetch name_at_position d
+    end
+
+    def name_at_position d
+      @a.fetch d
     end
 
     def to_name_stream
@@ -1871,7 +1846,9 @@ module Skylab::Callback
         if x_a.length.zero?
           Callback_::Scn__::Multi_Step__
         else
-          Callback_::Scn__::Multi_Step__.build_via_iambic x_a
+          Callback_::Scn__::Multi_Step__.new do
+            process_iambic_fully x_a
+          end
         end
       end
 

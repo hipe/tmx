@@ -26,7 +26,7 @@ module Skylab::Basic
       end
 
       def ellipsify * a
-        String_::Small_Time_Actors__::Ellipsify.via_arglist a
+        String_::Small_Time_Actors__::Ellipsify.call_via_arglist a
       end
 
       def line_stream * a

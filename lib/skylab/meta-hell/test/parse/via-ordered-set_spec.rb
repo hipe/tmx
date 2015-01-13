@@ -7,10 +7,10 @@ module Skylab::MetaHell::TestSupport::Parse
     context "with an ordered set parser (built from a list of arbitrary procs)" do
 
       before :all do
-        PARSER = MetaHell_::Parse.via_ordered_set.curry[
+        PARSER = Subject_[].via_ordered_set.curry_with(
           :argv_streams, [
             -> args { args.shift if args.first =~ /bill/i },
-            -> args { if :hi == args.first then args.shift and :hello end }]]
+            -> args { if :hi == args.first then args.shift and :hello end } ] )
       end
       it "result array is in order of \"grammar\", not of elements in argv" do
         argv = [ :hi, 'BILLY', 'bob' ]

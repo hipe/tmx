@@ -53,8 +53,7 @@ module Skylab::TanMan::TestSupport
     end
 
     Empty_dir_pn = memoize[ -> do
-      Base_tmpdir__[].tmpdir_via_join( 'empty-tmpdir' ).
-        with :max_mkdirs, 2
+      Base_tmpdir__[].tmpdir_via_join 'empty-tmpdir', :max_mkdirs, 2
     end ]
 
     Entity = -> do
@@ -108,8 +107,7 @@ module Skylab::TanMan::TestSupport
     TS__ = sidesys[ :TestSupport ]
 
     Volatile_tmpdir = memoize[ -> do
-      Base_tmpdir__[].tmpdir_via_join( 'volatile-tmpdir' ).with(
-        :max_mkdirs, 2 )
+      Base_tmpdir__[].tmpdir_via_join 'volatile-tmpdir', :max_mkdirs, 2
     end ]
   end
 

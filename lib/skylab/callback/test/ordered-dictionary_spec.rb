@@ -73,7 +73,7 @@ module Skylab::Callback::TestSupport::OD__
         end
 
         def subject * x_a
-          @subject = Adapter_Listener_.via_iambic x_a
+          @subject = Adapter_Listener_.call_via_iambic x_a
         end
       end
     end

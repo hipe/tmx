@@ -10,7 +10,7 @@ module Skylab::Headless
         via_client_and_iambic mod, x_a
       end
 
-      def via_arglist x_a
+      def call_via_arglist x_a
         via_client_and_iambic x_a.shift, x_a
       end
 

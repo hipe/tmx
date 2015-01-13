@@ -6,6 +6,8 @@ module Skylab::Callback::TestSupport::Actor
 
   include Constants
 
+  extend TestSupport_::Quickie
+
   Callback = Callback_
 
   Subject_ = -> do

@@ -16,7 +16,7 @@ module Skylab::Callback
 
         class << self
 
-          def via_arglist a, & convenience_p
+          def call_via_arglist a, & convenience_p
 
             cls = super( a, & nil )
 

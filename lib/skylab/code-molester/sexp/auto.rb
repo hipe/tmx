@@ -21,6 +21,10 @@ module Skylab::CodeMolester
 
     class Shell_::SingleShot
       def with sexp_auto_class
+        self._NO_EASY_use_with_sexp_auto_class
+      end
+
+      def with_sexp_auto_class sexp_auto_class
         @mutex = :with
         freeze
         @then[ :sexp_auto_class, sexp_auto_class ]

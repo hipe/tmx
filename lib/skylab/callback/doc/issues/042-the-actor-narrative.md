@@ -10,7 +10,16 @@ side effects) through an interface that is essentially proc-like, being
 called with (a usually nonzero number of) arguments passed typically in
 a single positional arglist or [#046] iambic.
 
-it can probably serve as a replacement for every similar library that
+that is, an actor has a single point of interface (its call method) and
+a single result (the result of the method). whether this call has
+side-effects on the actor itself is unknowable and inconsequential.
+
+ideally all actors will be indiscernable from procs, and all procs (by
+our defintion here) can be classifed as actors (sidestepping all the other
+things you can do with procs, like currying, which we will ignore for now,
+but hold that thought..)
+
+this can probably serve as a replacement for every similar library that
 came before it that does *not* support meta-properties. as such it is
 among the top three most important entries in :+[#mh-053] the parameter
 library pantheon (and see "compared to the others" below).
@@ -146,19 +155,6 @@ here is how it compares:
    however this will probably replace that. (yes: with [#058] methodic
    actors.)
 
-
-
-## :#note-70
-
-the use of the word `with` at the end of a method name is reserved
-exclusively for methods that take as arguments literal iambics.
-typically the method named `with` itself (as a bare word and not part of
-the larger method name)
-either mutates the receiver or dupes, mutates and freezes; resulting in
-either self or the dup respectivey. in this case the result is the
-result of the actor's execution. we make this exception from the
-convention because it reads better, given that actors are recommended to
-be named after verb phrases.
 
 
 

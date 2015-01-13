@@ -1,0 +1,27 @@
+digraph {
+
+
+  hear [label="hear"]
+  lists [label="lists in [br]"]
+  parse [label="parse"]
+  x1 [label="(parsing is\nspecialized n18n)"]
+  x2 [label="(rename \"token scanners\")"]
+  x3 [label="(un-functionalize curriers)"]
+  sequence [label="sequence (new\nformal symbol\ncategory)"]
+  x4 [label="simplify actor,\nunify names" style=filled ]
+
+  hear->lists
+  hear->parse
+  parse->sequence
+  sequence->cleanup
+  cleanup->x1
+  cleanup->x2
+  cleanup->x3
+
+  x1->x4
+  x2->x4
+  x3->x4
+
+
+  # that one color of blue: fillcolor="#b5d5fb" style=filled
+}

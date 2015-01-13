@@ -21,7 +21,7 @@ module Skylab::Callback
       #     pxy.baz  # => :BAZ
 
       class << self
-        def via_arglist a, & p
+        def call_via_arglist a, & p
           Actor__[ a, p, self ]
         end
       end

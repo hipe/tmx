@@ -29,7 +29,7 @@ module Skylab::Headless
       end
 
       def hack_guess_module_tree * x_a, & oes_p
-        Filesystem_::Hack_guess_module_tree__.via_arglist x_a, & oes_p
+        Filesystem_::Hack_guess_module_tree__.call_via_arglist x_a, & oes_p
       end
 
       def line_stream_via_path path, num_bytes=nil
@@ -56,7 +56,7 @@ module Skylab::Headless
         if x_a.length.zero?
           Filesystem_::Tmpdir__
         else
-          Filesystem_::Tmpdir__.build_via_iambic x_a
+          Filesystem_::Tmpdir__.new_via_iambic x_a
         end
       end
 
@@ -72,7 +72,7 @@ module Skylab::Headless
         if x_a.length.zero?
           Filesystem_::Walk__
         else
-          Filesystem_::Walk__.via_iambic x_a
+          Filesystem_::Walk__.call_via_iambic x_a
         end
       end
 

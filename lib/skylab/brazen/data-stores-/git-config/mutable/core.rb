@@ -7,8 +7,7 @@ module Skylab::Brazen
       class << self
 
         def new & oes_p
-          _parse = Parse__.with :on_event_selectively, oes_p
-          Document__.new _parse
+          Document__.new Parse__.new_with( :on_event_selectively, oes_p )
         end
 
         def parse_string str, & oes_p
@@ -29,6 +28,9 @@ module Skylab::Brazen
 
         class << self
           def with * x_a
+            self._NO_EASY_USE_new_with
+          end
+          def new_with * x_a
             new x_a
           end
         end
@@ -163,6 +165,10 @@ module Skylab::Brazen
         undef_method :execute
         class << self
           def with * x_a
+            self._NO_easy_use_new_with
+          end
+
+          def new_with * x_a
             new x_a
           end
         end
@@ -396,7 +402,7 @@ module Skylab::Brazen
 
             :on_event_selectively, ( oes_p || _handle_event_selectively )
 
-          ).where_iambic( x_a ).execute
+          ).edit_via_iambic( x_a ).execute
 
         end
 
@@ -412,7 +418,7 @@ module Skylab::Brazen
 
             :on_event_selectively, ( oes_p || _handle_event_selectively )
 
-          ).where_iambic( x_a ).execute
+          ).edit_via_iambic( x_a ).execute
 
         end
 
@@ -1061,7 +1067,7 @@ module Skylab::Brazen
 
           unparse_into_yielder y=[]
 
-          _parse = Parse__.with :via_string_for_immediate_parse,
+          _parse = Parse__.new_with :via_string_for_immediate_parse,
             y * EMPTY_S_,
             :on_event_selectively,
             @parse.handle_event_selectively

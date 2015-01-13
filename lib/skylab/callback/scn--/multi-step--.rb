@@ -4,6 +4,14 @@ module Skylab::Callback
 
     class Multi_Step__
 
+      class << self
+        def new_via_iambic x_a  # :+[#063]
+          new do
+            process_iambic_fully x_a
+          end
+        end
+      end
+
       Callback_::Actor.call self, :properties,
         :init,
         :gets

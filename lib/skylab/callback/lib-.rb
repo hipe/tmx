@@ -41,7 +41,7 @@ module Skylab::Callback
 
     Entity = -> * a, & edit_p do
       if a.length.nonzero? || edit_p
-        Brazen[]::Entity.via_arglist a, & edit_p
+        Brazen[]::Entity.call_via_arglist a, & edit_p
       else
         Brazen[]::Entity
       end
@@ -62,7 +62,7 @@ module Skylab::Callback
     end
 
     Ivars_with_procs_as_methods = -> * a do
-      MH__[]::Ivars_with_Procs_as_Methods.via_arglist a
+      MH__[]::Ivars_with_Procs_as_Methods.call_via_arglist a
     end
 
     Let = -> do

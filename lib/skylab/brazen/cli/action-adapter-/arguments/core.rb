@@ -22,7 +22,7 @@ module Skylab::Brazen
           class << self
 
             def via * x_a
-              Arguments::Normalization_Via__.via_iambic x_a
+              Arguments::Normalization_Via__.call_via_iambic x_a
             end
           end
 

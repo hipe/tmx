@@ -15,7 +15,7 @@ module Skylab::MetaHell::TestSupport::Parse::Via_Set
     context "with one such parser build from an empty set of parsers" do
 
       before :all do
-        None = MetaHell_::Parse.via_set.curry[ :pool_procs, [ ] ]
+        None = Subject_[].via_set.curry_with :pool_procs, []
       end
       it "a parser with no nodes in it will always report 'no parse' and 'spent'" do
         None[ argv = [] ].should eql [ false, true ]
@@ -29,9 +29,9 @@ module Skylab::MetaHell::TestSupport::Parse::Via_Set
     context "with parser with one node that reports it always matches & always spends" do
 
       before :all do
-        One = MetaHell_::Parse.via_set.curry[ :pool_procs, [
+        One = Subject_[].via_set.curry_with( :pool_procs, [
          -> _input {  [ true, true ] }
-        ]]
+        ] )
       end
       it "always reports the same as a final result" do
         One[ :whatever ].should eql [ true, true ]
@@ -40,9 +40,9 @@ module Skylab::MetaHell::TestSupport::Parse::Via_Set
     context "with a parser with one node that reports it never matches & always spends" do
 
       before :all do
-        Spendless = MetaHell_::Parse.via_set.curry[ :pool_procs, [
+        Spendless = Subject_[].via_set.curry_with( :pool_procs, [
           -> _input {  [ false, true ] }
-        ]]
+        ] )
       end
       it "always reports the same as a final result" do
         Spendless[ :whatever ].should eql [ false, true ]
@@ -61,7 +61,7 @@ module Skylab::MetaHell::TestSupport::Parse::Via_Set
           end
         end
 
-        Digits = MetaHell_::Parse.via_set.curry[ :pool_procs, [
+        Digits = Subject_[].via_set.curry_with :pool_procs, [
           keyword[ 'foo' ],
           keyword[ 'bar' ],
           -> memo, argv do
@@ -70,7 +70,7 @@ module Skylab::MetaHell::TestSupport::Parse::Via_Set
               [ true, false ]
             end
           end
-        ]]
+        ]
       end
       it "does nothing with nothing" do
         Digits[ ( memo = {} ), [] ].should eql [ false, false ]

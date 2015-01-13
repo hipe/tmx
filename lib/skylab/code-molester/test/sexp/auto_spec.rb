@@ -178,7 +178,7 @@ describe "[cm] sexp auto" do
 
         class MyNode < CM_::Library_::Treetop::Runtime::SyntaxNode
 
-          CM_::Sexp::Auto.enhance( self ).with MySexp
+          CM_::Sexp::Auto.enhance( self ).with_sexp_auto_class MySexp
 
         end
       end

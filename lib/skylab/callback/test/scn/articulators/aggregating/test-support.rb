@@ -76,7 +76,7 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
 
   Subject_ = -> * x_a do
 
-    Callback_::Scn.articulators.aggregating.build_via_iambic x_a
+    Callback_::Scn.articulators.aggregating.new_via_iambic x_a
 
   end
 end

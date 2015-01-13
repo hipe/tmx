@@ -365,7 +365,7 @@ module Skylab::Callback
 
       # ~
 
-      def Proc_.via_iambic x_a
+      def Proc_.call_via_iambic x_a
         kernel = Kernel_.new
         shell = Shell_.new kernel
         begin

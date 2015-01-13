@@ -36,7 +36,7 @@ module Skylab::CodeMolester
     end
 
     def initialize pn
-      @file_model = CM_::Config::File::Model.build_with :path, pn
+      @file_model = CM_::Config::File::Model.new_with :path, pn
       freeze
     end
 

@@ -8,6 +8,14 @@ the iambic experiment is one of the grandest and wackiest of them all.
 it has so far yielded a spectrum of phenomena ranging from smelly to
 indispensible.
 
+this is what a call to an iambic method looks like:
+
+    users_ = users.reduce_with :first_name, "John", :last_name, "Smith"
+
+most commonly iambic grammars use symbols as "keywords", often in pairs
+with their values following. parts of them often (but not necessarily)
+ilook like associative arrays.
+
 if it means anything to you, one way of looking at iambics is that they
 are a family of approaches to making a mini-DSL, typically for a method.
 
@@ -64,8 +72,18 @@ for example:
 
 on its surface, the above call is a method call being passed five
 arguments. but hopefully by the way we have formatted the code you can
-infer the semantics here: `is_dry_run` is an option has a `true` value,
-as well as the `be_verbose` option has a value of `true` too.
+infer the semantics here: the first argument is presumably the "actual
+property" for the (presumably) required formal property that models a
+filesystem path.
+
+as well there exists a (presumably optional) formal property `is_dry_run`
+for which we have provided an actual value of `true`.  as well there
+exists an optional formal property `be_verbose` for which we have
+provided an actual value which is `true` too.
+
+so there are five actual arguments (in the raw, platform sense) above,
+but there are only three "actual properties" being passed for three
+formal properties suggested here.
 
 in this imaginary syntax we parse the first argument (the filename) as a
 positional argument rather than a named argument (that is, it does not
@@ -74,8 +92,6 @@ method name that we have one required argument, and it is a path.
 
 after the above call takes this one ("positional") required argument
 (the filename), then it parses any remaining arguments "iambically".
-note that while strictly speaking there are five actual arguments
-being sent to this method call, but conceptually there are three.
 
 (a syntax like this that has *one* required argument and accepts zero or
 one "literal iambic" as the remainder of the arguments (that is, possibly

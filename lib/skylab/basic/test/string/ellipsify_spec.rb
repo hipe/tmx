@@ -50,22 +50,22 @@ module Skylab::Basic::TestSupport::String
       end
     end
 
-    context "ellipsify - curry with arglist" do
+    context "ellipsify - `backwards_curry` with arglist" do
 
       it "curry with two args, call with one (just like a true proc)" do
-        proc_like = subject.curry[ '[...]', 6 ]
+        proc_like = subject.backwards_curry[ '[...]', 6 ]
         proc_like[ '0123456' ].should eql '0[...]'
         proc_like[ '012345' ].should eql '012345'
       end
 
       it "curry with one arg, call with two (NOTE ORDER)" do
-        proc_like = subject.curry[ '•' ]
+        proc_like = subject.backwards_curry[ '•' ]
         proc_like[ '01234', 4 ].should eql '012•'
       end
 
       it "curry multiple times" do
-        proc_one = subject.curry[ 'A' ]
-        proc_two = proc_one.curry[ 3 ]
+        proc_one = subject.backwards_curry[ 'A' ]
+        proc_two = proc_one.backwards_curry[ 3 ]
         proc_two[ '0123' ].should eql '01A'
       end
 

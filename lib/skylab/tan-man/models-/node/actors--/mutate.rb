@@ -321,7 +321,7 @@ module Skylab::TanMan
 
           maybe_send_event normal_top_channel_via_OK_value( is_ok ), :found_existing_node do
             Node_::Events__::Found_Existing_Node.
-              with :node_stmt, one, :ok, is_ok
+              new_with :node_stmt, one, :ok, is_ok
           end
 
           if :create == @verb

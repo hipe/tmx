@@ -15,7 +15,7 @@ module Skylab::TestSupport
         end
 
         Basic_Fields = -> * x_a do
-          MH__[]::Basic_Fields.via_iambic x_a
+          MH__[]::Basic_Fields.call_via_iambic x_a
         end
 
         Box = Lib_::Box
@@ -51,7 +51,7 @@ module Skylab::TestSupport
         end
 
         Ivars_with_procs_as_methods = -> * a do
-          MH__[]::Ivars_with_Procs_as_Methods.via_arglist a
+          MH__[]::Ivars_with_Procs_as_Methods.call_via_arglist a
         end
 
         MH__ = Lib_::MH__

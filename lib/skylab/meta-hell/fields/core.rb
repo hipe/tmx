@@ -50,6 +50,9 @@ module Skylab::MetaHell
         self
       end
       def with * x_a
+        self._NO_EASY_use_edit_with
+      end
+      def edit_with * x_a
         prs_iambic_unobtrusive_fully x_a
         self
       end

@@ -3,7 +3,7 @@ module Skylab::MetaHell
   module Strange__  # :[#050] #:+[#it-002] summarization (trivial)
 
     class << self
-      def via_arglist a
+      def call_via_arglist a
         case a.length
         when 0
           self

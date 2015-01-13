@@ -57,7 +57,7 @@ module Skylab::Brazen
 
         class << self
 
-          def via_arglist x_a
+          def call_via_arglist x_a
             st = Callback_::Iambic_Stream.via_array x_a
             client_cls = st.gets_one
             self[ client_cls ]

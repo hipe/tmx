@@ -12,7 +12,7 @@ module Skylab::Basic
 
       def normalize_argument arg, * x_a, & oes_p
         x_a.push :arg, arg
-        Range_::Normalization__.via_iambic x_a, & oes_p
+        Range_::Normalization__.call_via_iambic x_a, & oes_p
       end
     end
 

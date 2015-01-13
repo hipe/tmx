@@ -66,7 +66,7 @@ module Skylab::Brazen::TestSupport::Data_Stores::Git_Config::Mutable
 
     def bld_parse_context
       @ev_a = nil
-      Subject__[]::Pass_Thru_Parse__.with :on_event_selectively, -> *, & ev_p do
+      Subject__[]::Pass_Thru_Parse__.new_with :on_event_selectively, -> *, & ev_p do
         ev = ev_p[]
         if do_debug
           debug_IO.puts ev.description

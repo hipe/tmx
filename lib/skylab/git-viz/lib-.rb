@@ -78,7 +78,7 @@ module Skylab::GitViz
     Porcelain__ = wall[ :Porcelain ]
 
     Power_scanner = -> * x_a do
-      Callback_::Scn.multi_step.build_via_iambic x_a
+      Callback_::Scn.multi_step.new_via_iambic x_a
     end
 
     Set = stdlib[ :Set ]

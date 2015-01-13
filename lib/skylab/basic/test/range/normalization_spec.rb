@@ -124,7 +124,7 @@ module Skylab::Basic::TestSupport::Range::N11n
     end
 
     def subject * x_a
-      Parent_::Subject_[].normalization.via_iambic x_a
+      Parent_::Subject_[].normalization.call_via_iambic x_a
     end
   end
 end

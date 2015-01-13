@@ -125,7 +125,8 @@ module Skylab::Snag
     end
 
     def bld_yamlizing_node_yieldee
-      downstream_yielder = Snag_.lib_.string_lib.yamlizer.build_with(
+
+      downstream_yielder = Snag_.lib_.string_lib.yamlizer.curry_with(
         :output_line_yielder, @lines,
         :field_names, FIELD_NAMES__ )
 

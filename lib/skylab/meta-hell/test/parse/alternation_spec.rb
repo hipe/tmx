@@ -23,9 +23,9 @@ module Skylab::MetaHell::TestSupport::Parse::Alternation
     context "may be more efficient to curry the parser in one place" do
 
       before :all do
-        P = MetaHell_::Parse.alternation.curry[ :pool_procs, [
+        P = MetaHell_::Parse.alternation.curry_with :pool_procs, [
           -> ix { :a == ix and :A },
-          -> ix { :b == ix and :B } ] ]
+          -> ix { :b == ix and :B } ]
       end
       it "and call it in another" do
         P[ :a ].should eql :A
@@ -36,14 +36,14 @@ module Skylab::MetaHell::TestSupport::Parse::Alternation
       end
     end
     it "in the minimal case, the empty parser always results in nil" do
-      p = MetaHell_::Parse.alternation.curry[ :pool_procs, [] ]
+      p = MetaHell_::Parse.alternation.curry_with :pool_procs, []
 
       p[ :bizzle ].should eql nil
     end
     context "maintaining parse state (artibrary extra arguments)" do
 
       before :all do
-        P_ = MetaHell_::Parse.alternation.curry[ :pool_procs, [
+        P_ = MetaHell_::Parse.alternation.curry_with :pool_procs, [
           -> output_x, input_x do
             if :one == input_x.first
               input_x.shift
@@ -57,7 +57,7 @@ module Skylab::MetaHell::TestSupport::Parse::Alternation
               output_x[ :is_two ] = true
               true
             end
-          end ] ]
+          end ]
 
         Result = ::Struct.new :is_one, :is_two
       end

@@ -102,7 +102,7 @@ module Skylab::Headless
 
           def cache_pathname_proc_via_module mod, * x_a
             x_a.push :mod, mod
-            Actor__.via_iambic x_a
+            Actor__.call_via_iambic x_a
           end
         end
 

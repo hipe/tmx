@@ -28,7 +28,7 @@ module Skylab::MetaHell
         if a.length.zero?
           self::Series__
         else
-          self::Series__.via_arglist a
+          self::Series__.call_via_arglist a
         end
       end
 
@@ -85,7 +85,7 @@ module Skylab::MetaHell
           if a.length.zero?
             Fields__::Flag
           else
-            Fields__::Flag.via_arglist a
+            Fields__::Flag.call_via_arglist a
           end
         end
 

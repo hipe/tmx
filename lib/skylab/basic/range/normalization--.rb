@@ -140,7 +140,7 @@ module Skylab::Basic
     private
 
       def build_explanation
-        Explanation__.with :bp, @arg, :or_a, @or_a
+        Explanation__.new_with :bp, @arg, :or_a, @or_a
       end
 
       Explanation__ = Basic_.lib_.event.prototype_with(

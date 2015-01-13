@@ -224,7 +224,7 @@ module Skylab::SubTree
     #  ~ extension support ~
 
     def resolve_extensions
-      ext_a = field_box.which( & :is_extension ).to_a
+      ext_a = field_box.reduce_by( & :is_extension ).to_a
       opt_order_i_a = @order_proxy.aset_k_a.uniq ; @order_proxy = nil
       # (if the field arities are set right, should be unique already anyway)
       order_i_a = opt_order_i_a & ext_a.map( & :local_normal_name )

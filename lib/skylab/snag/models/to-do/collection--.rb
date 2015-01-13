@@ -19,7 +19,7 @@ module Skylab::Snag
 
     def initialize a  # paths patterns names
       @command = Snag_::Models::Find.new( * a.shift( 3 ) )
-      @delegate = Delegate.via_iambic a
+      @delegate = Delegate.call_via_iambic a
     end
 
     attr_reader :command, :exitstatus, :result, :seen_count

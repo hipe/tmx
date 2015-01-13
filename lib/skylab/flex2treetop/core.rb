@@ -21,7 +21,7 @@ module Skylab::Flex2Treetop
       if a.length.zero?
         HL__[]::API
       else
-        HL__[]::API.via_arglist a
+        HL__[]::API.call_via_arglist a
       end
     end
 

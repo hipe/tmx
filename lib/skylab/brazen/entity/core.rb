@@ -5,7 +5,7 @@ module Skylab::Brazen
     class << self
 
       def [] * a
-        via_arglist a
+        call_via_arglist a
       end
 
       def build_bad_enum_value_event_method_proc
@@ -22,7 +22,7 @@ module Skylab::Brazen
       end
 
       def call * a, & p
-        via_arglist a, & p
+        call_via_arglist a, & p
       end
 
       def event
@@ -45,7 +45,7 @@ module Skylab::Brazen
         Scope_Kernel__
       end
 
-      def via_arglist x_a, & edit_p
+      def call_via_arglist x_a, & edit_p
         d = x_a.length
         if d.zero?
           o = Extension_Module_Production_Session__.new( & edit_p )
@@ -1009,6 +1009,10 @@ module Skylab::Brazen
       end
 
       def with & edit_p
+        self._NO_EASY_use_new
+      end
+
+      def new & edit_p
         otr = dup
         otr.instance_exec( & edit_p )
         otr
@@ -1039,12 +1043,6 @@ module Skylab::Brazen
 
       def iambic_writer_method_name
         @iwmn
-      end
-
-      def new & p
-        otr = dup
-        otr.instance_exec( & p )
-        otr.freeze
       end
 
       def any_value_of_metaprop mprop

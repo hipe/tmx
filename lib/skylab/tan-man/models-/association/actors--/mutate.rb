@@ -43,15 +43,16 @@ module Skylab::TanMan
       end
 
       def find_nodes
-        _node_verb = send :"node_verb_when_#{ @verb }"
+
         @touch_node_p = Models_::Node.touch.curry_with(
-          :verb, _node_verb,
+          :verb,  send( :"node_verb_when_#{ @verb }" ),
           :datastore, @datastore,
           :kernel, @kernel,
           :on_event_selectively, @on_event_selectively )
 
         ok = rslv_from_node
         ok &&= rslv_to_node
+
         if ok
           ACHIEVED_
         else

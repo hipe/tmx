@@ -286,6 +286,10 @@ module Skylab::Brazen
         end
 
         def with * x_a
+          self._NO_EASY_use_new_with
+        end
+
+        def new_with * x_a
           dup.init_dup x_a
         end
       protected
@@ -316,7 +320,7 @@ module Skylab::Brazen
         #           [ <name>, <value> [..]] <delegate>
 
         def response_receiver * x_a
-          Respose_Receiver__.via_iambic x_a
+          Respose_Receiver__.call_via_iambic x_a
         end
       end
     end

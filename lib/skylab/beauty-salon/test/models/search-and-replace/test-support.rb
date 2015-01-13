@@ -24,7 +24,7 @@ module Skylab::BeautySalon::TestSupport::Models::Search_and_Replace
 
     def start_tmpdir
       td = existent_tmpdir
-      @tmpdir = td.with(
+      @tmpdir = td.new_with(
         :path, td.join( 'haha-dir' ).to_path,
         :be_verbose, do_debug,
         :debug_IO, debug_IO )

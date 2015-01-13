@@ -98,7 +98,7 @@ module Skylab::Callback
       # ~
 
       module MM__
-        def via_iambic x_a
+        def call_via_iambic x_a
           rx = via_iambic_rx
           box = ordered_dictionary
           d = -2 ; last = x_a.length - 2
@@ -156,10 +156,14 @@ module Skylab::Callback
         end
 
         def with * x_a
-          with_x_a x_a
+          self._NO_EASY_use_edit_with
         end
 
-        def with_x_a x_a
+        def edit_with * x_a
+          __edit_with_iambic x_a
+        end
+
+        def __edit_with_iambic x_a
           begin
             i = x_a.shift
             case i

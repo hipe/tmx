@@ -140,13 +140,17 @@ module Skylab::Callback
       end
 
       def with_message_string_mapper p
-        with( & Event_::Small_Time_Actors__::
+        new_with( & Event_::Small_Time_Actors__::
           Produce_new_message_proc_from_map_reducer_and_old_message_proc[
             p, message_proc ] )
       end
 
       def with * x_a, & p  # #note-25
-        dup.init_copy_via_iambic_and_message_proc x_a, p
+        self._NO_EASY_use_new_with
+      end
+
+      def new_with * x_a, & msg_p
+        dup.init_copy_via_iambic_and_message_proc x_a, msg_p
       end
 
       def to_exception  # #note-85
@@ -568,7 +572,7 @@ module Skylab::Callback
             else
               # implement an :+[#cb-057] ideal mixed syntax
               x_a[ 0, 0 ] = [ :exception ]
-              Event_::Wrappers__::Exception.via_iambic x_a
+              Event_::Wrappers__::Exception.call_via_iambic x_a
             end
           end
 
@@ -581,7 +585,7 @@ module Skylab::Callback
           end
 
           def signature * a
-            Event_::Wrappers__::Signature.via_arglist a
+            Event_::Wrappers__::Signature.call_via_arglist a
           end
         end
       end

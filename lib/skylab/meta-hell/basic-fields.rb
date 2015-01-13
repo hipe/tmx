@@ -44,7 +44,7 @@ module Skylab::MetaHell
       Shell__.new( x_a ).execute
     end
 
-    def self.via_iambic x_a
+    def self.call_via_iambic x_a
       Shell__.new( x_a ).execute
     end
 

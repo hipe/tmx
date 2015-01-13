@@ -100,7 +100,7 @@ module Skylab::Basic
       @bx.at( * a )
     end
 
-    def which & p
+    def reduce_by & p
       @bx.to_value_stream.reduce_by do | fld |
         p[ fld ]
       end.to_enum

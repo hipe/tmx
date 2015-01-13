@@ -18,8 +18,14 @@ module Skylab::Basic
             @inst ||= new
           end
 
-          def via_arguments x_a
-            build_via_iambic x_a  # for now no inline ..
+          def new_with * a  # :+[#cb-063]
+            new_via_arglist a
+          end
+
+          def new_via_arglist a  # :+[#cb-063] used to have this, may again
+            new do
+              process_iambic_fully a
+            end
           end
         end
 

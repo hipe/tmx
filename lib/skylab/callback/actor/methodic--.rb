@@ -66,22 +66,21 @@ module Skylab::Callback
 
         # (experimental variations on the theme, but we should DRY these)
 
-        def via_arglist a, & oes_p
+        def with * x_a, & oes_p
+          call_via_iambic x_a, & oes_p
+        end
+
+        def call_via_arglist a, & oes_p
           curried = build_via_arglist a, & oes_p  # :+#hook-out
           curried && curried.execute
         end
 
-        def via_iambic x_a, & oes_p
-          curried = build_via_iambic x_a, & oes_p
+        def call_via_iambic x_a, & oes_p
+          curried = new_via_iambic x_a, & oes_p
           curried && curried.execute
         end
 
-        def with * x_a, & oes_p
-          curried = build_via_iambic x_a, & oes_p
-          curried && curried.execute
-        end
-
-        def build_via_iambic x_a, & oes_p
+        def new_via_iambic x_a, & oes_p
           ok = nil
           x = new do
             oes_p and accept_selective_listener_proc oes_p  # :+#public-API :+#hook-out #hook-near

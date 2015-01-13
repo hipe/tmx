@@ -39,7 +39,7 @@ module Skylab::Snag
       if x_a.length.zero?
         MH__[]::Basic_Fields
       else
-        MH__[]::Basic_Fields.via_iambic x_a
+        MH__[]::Basic_Fields.call_via_iambic x_a
       end
     end
 
@@ -119,7 +119,7 @@ module Skylab::Snag
     end
 
     Strange = -> * x_a do
-      MH__[].strange.via_arglist x_a
+      MH__[].strange.call_via_arglist x_a
     end
 
     String_lib = -> do

@@ -65,11 +65,11 @@ module Skylab::MetaHell
     class << self
 
       def [] * a
-        via_arglist a
+        call_via_arglist a
       end
 
       def call * a
-        via_arglist a
+        call_via_arglist a
       end
 
       def new * i_a, & p
@@ -79,7 +79,7 @@ module Skylab::MetaHell
         cls
       end
 
-      def via_arglist a
+      def call_via_arglist a
         case 1 <=> a.length
         when -1 ; via_client_and_iambic a.shift, a
         when  0 ; shell_for a.first

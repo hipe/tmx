@@ -12,6 +12,4 @@ module Skylab::Callback::TestSupport::Scn
 
   Callback_ = Callback_
 
-  Sandboxer = TestSupport_::Sandbox::Spawner.new
-
 end

@@ -16,7 +16,7 @@ module Skylab::Basic
       end
 
       def via * i_a
-        Via__.via_iambic i_a
+        Via__.call_via_iambic i_a
       end
     end
 

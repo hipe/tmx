@@ -2,37 +2,74 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::Parse::Series::Intgrtn
 
-  ::Skylab::MetaHell::TestSupport::Parse::Series[ self ]
+  ::Skylab::MetaHell::TestSupport::Parse::Series[ TS_ = self ]
 
   include Constants
 
   extend TestSupport_::Quickie
 
-  MetaHell_ = MetaHell_
+  Subject_ = Subject_
 
-  describe "[mh] Parse::Series (integration spec)" do
+  describe "[mh] parse series (integration spec)" do
+
+    extend TS_
 
     before :all do
-      fields = MetaHell_::Parse.fields
-      P_ = MetaHell_::Parse::series.curry[
+
+      fields = Subject_[].fields
+
+      P_ = Subject_[].series.curry_with(
         :syntax, :monikate, -> a { a * ' ' },
         :field, :monikate, -> s { "[ #{ s } ]" },
         :field, :moniker, '<integer>',
         :token_stream, fields.int.scan_token,
         :field, * fields::Flag[ :random ].to_a,
-        :prepend_to_uncurried_queue, :exhaustion
-      ]
+        :prepend_to_uncurried_queue, :exhaustion )
+
     end
 
-    def debug! ; @do_debug = true end
+    it "does nothing with nothing" do
+      int, kw = parse
+      @msg1.should be_nil
+      @msg2.should be_nil
+      int.should be_nil
+      kw.should be_nil
+    end
 
-    attr_reader :do_debug
+    it "against one strange string - borks gracefully" do
+      integer, kw = parse 'frinkle'
+      @msg1.should eql 'expecting arguments [ <integer> ] [ random ]'
+      @msg2.should eql 'unrecognized argument at index 0 - "frinkle"'
+      integer.should be_nil
+      kw.should be_nil
+    end
 
-    def y
-      TS_.const_defined?( :Y_, false ) ?
-        TS_.const_get( :Y_, false ) :
-        TS_.const_set( :Y_, ::Enumerator::Yielder.
-          new( & TestSupport_.debug_IO.method( :puts ) ) )
+    it "good first token, strange second one" do
+      a, b = prse '3', 'frinkle'
+      a.should eql 3
+      b.should be_nil
+      @msg.should match %r(\bunrecognized.+at index 1 - "frinkle")i
+    end
+
+    it "two good tokens" do
+      d, r = prse '3', 'random'
+      d.should eql 3
+      r.should eql true
+      @msg.should be_nil
+    end
+
+    it "only one token - a production of the first formal symbol" do
+      d, r = prse '3'
+      d.should eql 3
+      r.should be_nil
+      @msg.should be_nil
+    end
+
+    it "only one token - *the* production of the second formal symbol" do
+      d, r = prse 'random'
+      d.should be_nil
+      r.should eql true
+      @msg.should be_nil
     end
 
     def parse *argv
@@ -53,46 +90,9 @@ module Skylab::MetaHell::TestSupport::Parse::Series::Intgrtn
       end, argv ]
     end
 
-    it "does nothing with nothing" do
-      int, kw = parse
-      @msg1.should eql( nil ) ; @msg2.should eql( nil )
-      int.should eql( nil ) ; kw.should eql( nil )
-    end
-
-    it "borks gracefully with one strange string" do
-      integer, kw = parse 'frinkle'
-      @msg1.should eql( 'expecting arguments [ <integer> ] [ random ]' )
-      @msg2.should eql( 'unrecognized argument at index 0 - "frinkle"' )
-      integer.should eql( nil )
-      kw.should eql( nil )
-    end
-
-    it "when good first param, strange second one" do
-      a, b = prse '3', 'frinkle'
-      a.should eql( 3 )
-      b.should eql( nil )
-      @msg.should match( /unrecognized.+at index 1 - "frinkle"/i )
-    end
-
-    it "when params are all good" do
-      d, r = prse '3', 'random'
-      d.should eql( 3 )
-      r.should eql( true )
-      @msg.should eql( nil )
-    end
-
-    it "only one param, the first of two" do
-      d, r = prse '3'
-      d.should eql( 3 )
-      r.should eql( nil )
-      @msg.should eql( nil )
-    end
-
-    it "only one param, the second of two" do
-      d, r = prse 'random'
-      d.should eql( nil )
-      r.should eql( true )
-      @msg.should eql( nil )
-    end
+    define_method :y, ( TS_::MetaHell_::Callback_.memoize do
+      ::Enumerator::Yielder.new( &
+        TestSupport_.debug_IO.method( :puts ) )
+    end )
   end
 end

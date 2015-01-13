@@ -162,7 +162,7 @@ module Skylab::Snag
 
     def bld_tags_delegate
       lstnr = @delegate
-      Callback_::Ordered_Dictionary.inline.with( :suffix, nil ).inline(
+      Callback_::Ordered_Dictionary.inline.edit_with( :suffix, nil ).inline(
         :error_event, lstnr.method( :receive_error_event ),
         :info_event, lstnr.method( :receive_info_event ),
         :change_body_string, method( :receive_change_body_string ) )

@@ -47,9 +47,9 @@ module Skylab::MetaHell
 
   # it may be more efficient to curry the parser in one place
   #
-  #     P = MetaHell_::Parse.alternation.curry[ :pool_procs, [
+  #     P = MetaHell_::Parse.alternation.curry_with :pool_procs, [
   #       -> ix { :a == ix and :A },
-  #       -> ix { :b == ix and :B } ] ]
+  #       -> ix { :b == ix and :B } ]
   #
   #
   # and call it in another
@@ -65,13 +65,13 @@ module Skylab::MetaHell
 
   # in the minimal case, the empty parser always results in nil
   #
-  #     p = MetaHell_::Parse.alternation.curry[ :pool_procs, [] ]
+  #     p = MetaHell_::Parse.alternation.curry_with :pool_procs, []
   #
   #     p[ :bizzle ]  # => nil
 
   # maintaining parse state (artibrary extra arguments)
   #
-  #     P_ = MetaHell_::Parse.alternation.curry[ :pool_procs, [
+  #     P_ = MetaHell_::Parse.alternation.curry_with :pool_procs, [
   #       -> output_x, input_x do
   #         if :one == input_x.first
   #           input_x.shift
@@ -85,7 +85,7 @@ module Skylab::MetaHell
   #           output_x[ :is_two ] = true
   #           true
   #         end
-  #       end ] ]
+  #       end ]
   #
   #     Result = ::Struct.new :is_one, :is_two
   #

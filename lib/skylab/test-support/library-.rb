@@ -56,7 +56,7 @@ module Skylab::TestSupport
     end
 
     CLI_table = -> * x_a do
-      Face__[]::CLI::Table.via_iambic x_a
+      Face__[]::CLI::Table.call_via_iambic x_a
     end
 
     Default_core_file = -> do
@@ -69,14 +69,14 @@ module Skylab::TestSupport
 
     Entity = -> * a, & p do
       if a.length.nonzero? || p
-        Bzn_[]::Entity.via_arglist a, & p
+        Bzn_[]::Entity.call_via_arglist a, & p
       else
         Bzn_[]::Entity
       end
     end
 
     Properties_stack_frame = -> * a do
-      Bzn_[].properties_stack.common_frame.via_arglist a
+      Bzn_[].properties_stack.common_frame.call_via_arglist a
     end
 
     Funcy_globful = -> mod do
@@ -106,7 +106,7 @@ module Skylab::TestSupport
     end
 
     Ivars_with_procs_as_methods = -> * a do
-      MH__[]::Ivars_with_Procs_as_Methods.via_arglist a
+      MH__[]::Ivars_with_Procs_as_Methods.call_via_arglist a
     end
 
     IO = -> do
@@ -125,7 +125,7 @@ module Skylab::TestSupport
     end
 
     Levenshtein = -> * x_a do
-      IT__[]::Levenshtein.via_iambic x_a
+      IT__[]::Levenshtein.call_via_iambic x_a
     end
 
     MH__ = sidesys[ :MetaHell ]

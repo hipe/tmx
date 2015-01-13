@@ -97,7 +97,7 @@ module Skylab::CodeMolester
     end
 
     Ivars_with_procs_as_methods = -> *a do
-      MH__[]::Ivars_with_Procs_as_Methods.via_arglist a
+      MH__[]::Ivars_with_Procs_as_Methods.call_via_arglist a
     end
 
     MH__ = sidesys[ :MetaHell ]

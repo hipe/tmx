@@ -477,14 +477,14 @@ module Skylab::MetaHell
       bx
     end
 
-    def that_have matr_i, & p  # #storypoint-110
-      ea = which do | x |
+    def reduce_with matr_i, & p  # #storypoint-110
+      ea = reduce_by do | x |
         x.has_name matr_i
       end
       p ? ea.each( & p ) : ea
     end
 
-    def which & p
+    def reduce_by & p
 
       # we can't use simply `to_value_stream`[..]`to_enum` because
       # the enumerator needs to be re-runnable (covered)
@@ -502,7 +502,7 @@ module Skylab::MetaHell
 
     def select & p  # covered
 
-      # argument semantics like `which`, but like ::Array#select and
+      # argument semantics like `reduce_by`, but like ::Array#select and
       # ::Hash#select result in an object of same class as receiver
 
       otr = self.class.new

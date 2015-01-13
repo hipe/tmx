@@ -6,7 +6,7 @@ module Skylab::Callback
 
       class Signature
 
-        def self.via_arglist a
+        def self.call_via_arglist a
           new a
         end
 

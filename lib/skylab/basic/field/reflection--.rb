@@ -171,13 +171,13 @@ module Skylab::Basic
 
     def fields_which predicate
       @fields_which_h.fetch predicate do
-        @fields_which_h[ predicate ] = which( & predicate ).to_a.freeze
+        @fields_which_h[ predicate ] = reduce_by( & predicate ).to_a.freeze
       end
     end
 
     def fields_which_not predicate
       @fields_which_not_h.fetch predicate do
-        @fields_which_not_h[ predicate ] = which do |fld|
+        @fields_which_not_h[ predicate ] = reduce_by do |fld|
           ! fld.send predicate
         end.to_a.freeze
       end
@@ -185,7 +185,7 @@ module Skylab::Basic
 
     def field_names_which predicate
       @field_names_which_h.fetch predicate do
-        @field_names_which_h[ predicate ] = which( & predicate ).
+        @field_names_which_h[ predicate ] = reduce_by( & predicate ).
           map( & :local_normal_name ).freeze
       end
     end

@@ -14,6 +14,14 @@ module Skylab::Callback
         :y,
         :flush
 
+      class << self
+        def new_via_iambic x_a  # :+[#063]
+          new do
+            process_iambic_fully x_a
+          end
+        end
+      end
+
       def initialize
         init_ivars
         super
@@ -27,7 +35,7 @@ module Skylab::Callback
         dup
       end
 
-      def with * x_a
+      def new_with * x_a
         otr = dup
         otr.init_copy x_a
         otr

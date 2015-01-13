@@ -41,7 +41,7 @@ module Skylab::Brazen
       end
 
       def indefinite_noun * a
-        _NLP_agent.indefinite_noun.via_arglist a
+        _NLP_agent.indefinite_noun.call_via_arglist a
       end
 
       def nm name
@@ -61,7 +61,7 @@ module Skylab::Brazen
       end
 
       def plural_noun * a
-        _NLP_agent.plural_noun.via_arglist a
+        _NLP_agent.plural_noun.call_via_arglist a
       end
 
       def preterite_verb lemma_i
@@ -108,7 +108,7 @@ module Skylab::Brazen
           def make_NLP_agent * x_a
             cls = ::Class.new
             x_a.unshift cls
-            LIB_.NLP_EN_methods.via_arglist x_a
+            LIB_.NLP_EN_methods.call_via_arglist x_a
             cls
           end
         end

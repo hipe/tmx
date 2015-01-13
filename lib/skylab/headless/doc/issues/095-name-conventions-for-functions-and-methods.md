@@ -23,8 +23,9 @@ better this time.
   method must have no side-effects. (oops also see [#154] for the same
   thing written 10 months prior)
 
-+ `calculate_` - method must take a block. result of method block must be the
-  result of the call to this method. the block will executed in the
++ `calculate`, `calculate_*` - method must take a block. result of method
+  block (as determined by the user) be the result of the call to this
+  method. the block will be executed in the
   context of some special agent and *not* that of the caller; as such
   this type of method is intended for an explicitly contained employment
   of some particular DSL or another. this method *may* have side effects.
@@ -34,6 +35,10 @@ better this time.
   [#br-001] entities), must do the same as `[]` for this object.
   in these kind of objects, arguments are a (non-iambic) (positional)
   arglist. must not be used for non-proc-like classes. :+[#020]
+
++ `curry_with` - see the #iambic family of method name conventions
+
++ `edit_with` - see the #iambic family of method name conventions
 
 + `execute` has a strict API meaning for a lot of our libraries as the
   one #hook-out method the client must supply. it must take no
@@ -71,6 +76,8 @@ better this time.
   deprecated because it expresses neither what it accepts or what shape
   its result is. :+[#020]
 
++ `new_with` - see the #iambic family of method name conventions below.
+
 + `on_` see [#175] method naming conventions around events below.
 
 + `produce_`, `_produce[_]` - result is the subject object as described
@@ -79,6 +86,8 @@ better this time.
   and `get_`). sometimes we use this when we know that our result is a
   memoized instance but want the ability to change that decision in the
   future.
+
++ `reduce_with` - see the #iambic family of method name conventions below
 
 + `resolve_` - has a dedicated [#154] document that needs a rewrite.
 
@@ -95,23 +104,11 @@ better this time.
   use is encouraged along with other conventions, in which case the word
   may get bumped off the front of the method name (`via_X_when_Y`).
 
-+ `which[_..]` - general purpose prefix for something like reduce
-  on a collection. typically the only argument is a block with the
-  same semantics as ::Enumerable#select. result should be the same sort
-  of thing as a receiver, or a corelib collection object like an
-  ::Enumerator, or a ubiquitous collection object like stream or box.
-  see `that_have`
++ `which[_..]` - see #name-shootout below
 
-+ `where` - receiver is an "edit shell" (representing an interface to an
-  edit session of some sort (e.g of a business entity)), this is the
-  conventional method name used for that public method of the edit shell
-  that accepts a [#cb-046] literal iambic phrase.
++ `where` -  see #name-shootout below
 
-+ `with` - arguments must be treated as a literal [#cb-046] iambic phrase.
-  must have no side-effects on the receiver, instead the result must be
-  a dup of the receiver that has been transformed as is described by the
-  iambic argument phrase.
-  (use the never-been-used-before `_who_has` to mutate the receiver.)
++ `with` - see the #iambic family of method name conventions below
 
 + `work` is our "go-to" name for the interesting body of ..er.. work
   that is done in an [#cb-042] actor's `execute` methods after the
@@ -120,8 +117,6 @@ better this time.
   name - it should only be used the behavior that occurs in the method
   is exactly that as described by the name of the containing class.
 
-+ `that_have` - a higher-level `which` that takes one or more symbolic
-  arguments.
 
 + `to_`, `_to_` - the second form is explicitly not defined conventionally
   here. use it as you would like to naturally. (but use `via` instead if
@@ -133,7 +128,6 @@ better this time.
   `to_a` etc. `to_stream` is a popular one in this universe (it used
   to be `to_scan`, and before that `get_scan`, and still it has the
   same underlying sematics as the `get_` prefix).
-
 
 
 
@@ -229,12 +223,9 @@ here but there are some that are not.
 
 
 
-
 + `receive_event` - this is the old-schoool, simpler, non-conditional
   form of exposed event reception method. it has a fixed, monadic
   signature of one argument (the event) and cannot take blocks.
-
-
 
 
 
@@ -266,6 +257,276 @@ for methods that sign the events they produce or transform.
 
 
 
+## the :#iambics method naming convention family
+
+the meta-classification of "iambic" applies tautologically to method
+name conventions that apply to iambic methods. that is, if any method
+has a name that is covered by any of the below conventions, that method
+must accept [#cb-046] "iambic" arguments; conversely no method covered
+by any of the below conventions can accept anything other than iambic
+arguments (and perhaps a block pursuant to the particular method).
+
+
+
+### sidebar: a moment for meta
+
+   +---------------+ +--------------------------+ +-----------------------+
+   | a method name | | a method name convention | | a meta-classification |
+   +---------------+ +--------------------------+ +-----------------------+
+          ^                      |    ^                       |
+          |                      |    |                       |
+          +----------------------+    +-----------------------+
+           is a classification for     is a classification for
+
+### (end sidebar)
+
+
+
+note that this meta-convention is not very restrictive because
+specification for iambics is itself not very restrictive. in fact,
+whether or not the term "iambic" could formally be applied to any syntax
+is not formally defined here, but suffice it to say "maybe".
+
+to go even further, there may exist methods that accept iambic
+arguments to which none of the below conventions apply; but that must
+be because the particular method is not a good semantic fit for any of
+the below classifications.
+
+broadly we classify the below method name conventions along these axes:
+
+  • does the method mutate the receiver?
+
+  • is the method's meaningful result (if any)
+      the same kind of thing as the reciever?
+
+we have worked and re-worked this constituency and its surface symbols
+so that its members:
+
+  • most naturally fit with the host natural language
+
+  • without being overly redundant with each other in their semantics
+
+  • all the while being optimally mnemonic (i.e poka-yoke)
+
+
+of the method name conventions in this family, a method whose name is
+covered by any of these conventions must have meaning that corresponds
+to those conventions. conversely any method with any meaning that is
+covered by the below (for some definition of "good fit") must employ the
+below pertinent convention(s).
+
+this is the comprehensive constituency of this family:
+
++ `curry_with` - receiver has an actor shape. result must be an actor of
+  the same sort, modified (or even the same) per the characteristics
+  expressed in the literal iambic argument.
+
+  with actors, whether or not the receiver and (separately) result is
+  class-like or instance-like is not a meaningful distiction. they are
+  both actor-like and that is the extent of the specification.
+
+  this could be easily confused with `new_with` unless you remember that
+  this one is for actors and `new_with` is for with class- (or
+  instance-) likes actors are never interacted with in class-like way.
+
+  summary: ( mutates receiver: no. result is receiver-ish: yes. )
+
+
+
++ `edit_with` - receiver may be some arbitrary business object or may be an
+  "edit shell" (representing an interface to an edit session of some sort
+  (e.g of a business entity)). this is the conventional method name used for
+  that public method of the edit shell that accepts a literal iambic.
+
+  summary: ( mutates receiver: yes. result is receiver-ish: no. )
+
+
+
++ `new_with` - receiver is a class-like OR instance-like. if receiver is
+  class-like, result is a would-be instance of that class. if receiver is
+  not class-like, result is of same shape as receiver. this is like calling
+  `new` on a class, but in a form expressly made for accepting literal
+  iambics.
+
+  summary: ( mutates receiver: no. result is receiver-ish: maybe. )
+
+
+
++ `reduce_with` - receiver is a collection (ideally a stream) or something
+  with a collection sub-shape. result is ideally of the exact same shape
+  as the receiver, but may be corelib collection object like an
+  ::Enumerator, or a ubiquitous collection object like stream or box.
+
+  summary: ( mutates receiver: no. result is receiver-ish: yes. )
+
+
+
++ `with` - if this method name followed the meta-convention implied by the
+  rest of the constituency, we might call it something like `call_with`.
+  but we let it occupy a whole (and quite essential) single word of the host
+  natural language because of how much of a consistently natural-sounding
+  fit it is in code-use.
+
+  the receiver must have [#cb-042] actor semantics (but may have other
+  shapes as well). if the receiver (actor) supports this method then the
+  receiver supports iambic calls and vice versa. since the receiver is
+  an actor, whether the call has side-effects on the receiver itself is
+  unknowable and inconsequential; the result is always the yield of the
+  call and the yield of the call is always the result.
+
+      proxy = Build_wazoozle_proxy.with :upstream, foo
+
+  whether or not it is OK to call a `with` with no arguments is
+  explicitly not defined here, but may be so in the future (one way or
+  the other). regardless of any existing specification here, as with any
+  iambic call the particular actor may always chose to raise argument
+  errors (or otherwise act) when the request is un-normalizable, as
+  may be the case of the empty iambic, dependng on the actor.
+
+  summary: ( mutates receiver: no. result is receiver-ish: no. )
+
+
+
+## :#name-shootout: "that" vs. "where" vs. "which" vs "with"
+
+spoiler alert/TL;DR: we don't use any of these names except the last
+one.
+
+### "which" wins over "where"
+
+currently the method name `where` is reserved and must not be used
+because we either do or do not want to collide with the semantics of
+the same SQL keyword, and we are leaning towards the latter:
+
+at first we used `which` in its lieu, because we found it a more
+natural fit:
+
+   contrast:
+
+       users.where :first_name, "John%"  # less natural sounding
+
+       users.which :first_name, "John%"  # more natural-sounding
+
+       users.with :first_name, "John%"   # most natural-sounding, but "with"
+                                         #   has a strong convention already
+
+in the host natural language it seems that "which" typically modifies a
+noun phrase and takes a verb phrase, whereas "where" modifies a noun phrase
+(that is often of the semantic category of "location") and/or takes a
+sentence phrase. contrast:
+
+       cats which have six toes
+       a cafe where i can get wifi
+       a restaurant where hungry people like to eat
+       an arrangement where i can wear my leopard costume
+
+in the above examples we see that "where" is usually (but not always)
+used for places, and always takes a sentence phrase as an "argument".
+"which" on the other hand (in our examples) always modifies a noun
+phrase and always takes a verb phrase as an argument.
+
+for fun:
+
+    |  host word |         modifies  |          "argument"  |
+    |     "that" |    a noun phrase  |       a verb phrase  |
+    |    "where" |  usually a place  |   a sentence phrase  |
+    |    "which" |    a noun phrase  |       a verb phrase  |
+    |     "with" |    a noun phrase  |       a noun phrase  |
+
+so we prefer "which" over "where" for three reasons:
+
+  1) we don't want you to assume that our semantics match exactly the
+     semantics of the SQL keyword.
+
+  2) our "query"-like methods typically operate on collections of
+     "things" (and result in typically smaller collections of those
+     same "things"). "which" is more natural than "where" for this
+     to the extent that our above examples are a fair sampling of the
+     host natural language.
+
+  3) our "query"-like methods typically take arguments that are more
+     like verb "predicates" and less like sentence phrases:
+
+         my_property_stream.which :is_hidden
+
+
+
+### "that" wins over "which"
+
+we would prefer using the less ambiguous "that" over "which", because
+in contrast to "that"; "which" can be used for two distinct purposes,
+one as a qualifier and one as a parenthetical:
+
+    cats, which are mammals
+    cats which have six toes
+
+both of the above phrases are meaningful and both have the same (or
+similar) construction with regards to "which", but the "which" serves
+different functions variously in the above two phrases:
+
+we can infer from the first phrase that all cats are mammals. however we
+cannot infer from the second phrase that all cats have six toes. perhaps
+because of our careful use of the comma, this distinction is made more
+clear; but (thankfully) commas will not be used to bolster our method name
+conventions.
+
+instead consider a similar construction but with "that" instead of
+"which":
+
+    (!) cats that are mammals
+    cats that have six toes
+
+the first phrase is meaningless: all cats are mammals, therefor adding
+"be a mammal" as a qualifier is meaningless to be applied to the collection
+"cats". however the second phrase above means the same thing as all the other
+example phrases about cats with six toes. "that have six toes" is a
+"qualifier" that reduces the collection to a smaller (or same sized)
+collection.
+
+because "that" has a tighter set of meanings when used in this way we
+would prefer it but keep reading..
+
+
+
+### "with" loses in general
+
+we would prefer the more succinct "with" to "which" if it were always
+applicable and didn't already have a more natural-fitting name
+convention being applied to it.
+
+    cats that have six toes
+    cats with six toes
+
+if we can meaningfully omit the "has" (maybe because it can be assumed to
+be the default verb) then we are left with the noun phrase "six toes".
+because the "argument" is a noun phrase and not a verb phrase we use
+"with" and not "which".
+
+however, in practice the "predicates" to our queries are rarely noun
+phrases (they are often verb phrases):
+
+    actions.with :is_visible  # awkward because "is visible" is VP not SP
+    actions.which :is_visible  # OK except for the subject-verb agreement
+
+as well, "with" has an existing convention that is a better fit than
+this one.
+
+
+
+### the sad conclusion
+
+while writing this manifesto something occured to us: keeping in mind
+that our end goal in this was to find the perfect name convention for a
+query-effecting method, we realized that we already have a strong
+candidate word for such a thing: "reduce". `reduce_by` (in the pantheon of
+[#cb-044] stream methods) has a strong, unambiguos meaning and syntax. the
+kind of method we are describing here has the exact same semantics but a
+diffenent syntax: it takes an iambic literal instead of a block. hence
+we must follow suit with the existing word, so please see `reduce_with`.
+
+
+
+
 ## the method naming shibbloleth :[#119]
 
 this convention is not pretty, but that is not its point: it evolved
@@ -281,11 +542,11 @@ message of this commit)
 
 to absolutely *anyone*
 who hasn't read this, the effect may just appear as messy and erratic,
-but there is in fact an a simple set of rules governing this obscure
+but there is in fact a simple set of rules governing this obscure
 shorthand. this section describes both the pattern behind this chaos
 and the utility of it.
 
-in summary, the pattern has to do with visibility and at some level is
+in summary the pattern has to do with visibility and at some level is
 comparable to the [#079] three levels of visibility as expressed by
 trailing underscores of const names. what we mean by "visiblity" and how
 this may be different than the visibility you are familiar with will be
@@ -389,7 +650,7 @@ explained below.
 
 (mnemonic: if the hard to read part is at the beginning of the method,
 it says "turn back now", i.e it is more private than if the hard-to-read
-part is at the end, hence private not protected.)
+part is at the end; hence private not protected.)
 
 if the method is not abbreviated at all, it *may* mean that the method
 is part of this node's public API, depending on what kind of node it is:

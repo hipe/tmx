@@ -25,7 +25,7 @@ module Skylab::MetaHell::TestSupport::Formal::Attribute::Box
 
       it "like so" do
 
-        ea = subject.that_have :flavor
+        ea = subject.reduce_with :flavor
 
         a = ea.to_a
         a.length.should eql 3

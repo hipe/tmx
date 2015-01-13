@@ -16,7 +16,7 @@ module Skylab::Brazen::TestSupport::Entity::Properties_Stack::Common_Frame
       if a.length.zero?
         Brazen_.properties_stack.common_frame
       else
-        Brazen_.properties_stack.common_frame.via_arglist a
+        Brazen_.properties_stack.common_frame.call_via_arglist a
       end
     end
   end

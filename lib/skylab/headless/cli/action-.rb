@@ -8,7 +8,7 @@ module Skylab::Headless
         if a.length.zero?
           Action_
         else
-          Action_.via_arglist a
+          Action_.call_via_arglist a
         end
       end
 
@@ -21,7 +21,7 @@ module Skylab::Headless
       end
 
       def client * a
-        CLI::Client.via_arglist a
+        CLI::Client.call_via_arglist a
       end
 
       def cols * a
@@ -117,7 +117,7 @@ module Skylab::Headless
         _max_d + op.summary_indent.length - 1
       end
 
-      def via_arglist a
+      def call_via_arglist a
         via_client_and_iambic a.shift, a
       end
 

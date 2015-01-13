@@ -2,12 +2,15 @@ require_relative '../test-support'
 
 module Skylab::MetaHell::TestSupport::Parse::Series
 
-  ::Skylab::MetaHell::TestSupport::Parse[ self ]
+  ::Skylab::MetaHell::TestSupport::Parse[ TS_ = self ]
 
   include Constants
 
+  extend TestSupport_::Quickie
+
+  LIB_ = LIB_
+
   MetaHell_ = MetaHell_
 
-  Sandboxer = TestSupport_::Sandbox::Spawner.new
-
+  Subject_ = Subject_
 end

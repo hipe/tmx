@@ -45,7 +45,7 @@ module Skylab::Face  # read [#011] the top node narrative
     end
 
     Basic_fields = -> * x_a do
-      MH__[]::Basic_Fields.via_iambic x_a
+      MH__[]::Basic_Fields.call_via_iambic x_a
     end
 
     Bsc__ = sidesys[ :Basic ]
@@ -125,7 +125,7 @@ module Skylab::Face  # read [#011] the top node narrative
     end
 
     Parse_series = -> * a do
-      MH__[]::Parse.series.via_arglist a
+      MH__[]::Parse.series.call_via_arglist a
     end
 
     Plugin_lib = -> do
@@ -430,7 +430,7 @@ module Skylab::Face  # read [#011] the top node narrative
           via_iambic formal_a
         end
       end
-      def self.via_iambic formal_a
+      def self.call_via_iambic formal_a
         ::Class.new( self ).class_exec do
           @formal_arg_a = formal_a
           def self.collapse

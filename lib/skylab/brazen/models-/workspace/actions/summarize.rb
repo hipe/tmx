@@ -20,7 +20,7 @@ module Skylab::Brazen
         @ws = model_class.edit_entity @kernel, handle_event_selectively do |o|
           o.preconditions @preconditions
           o.argument_box bx
-          o.where :prop, @prop
+          o.edit_with :prop, @prop
         end
         @ws and via_ws
       end

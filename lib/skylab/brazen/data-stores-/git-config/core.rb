@@ -17,7 +17,7 @@ module Skylab::Brazen
       end
 
       def write * a
-        Git_Config_::Actors__::Write.via_arglist a
+        Git_Config_::Actors__::Write.call_via_arglist a
       end
     end
 

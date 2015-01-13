@@ -1,78 +1,89 @@
-require_relative '../../test-support'  # the top one in subsystem
+require_relative 'test-support'
 
-::Skylab::MetaHell::TestSupport::TestSupport_::Quickie.enable_kernel_describe
+module Skylab::MetaHell::TestSupport::Parse::Series
 
 describe "[mh] parse series (periphery)" do
 
-  ::Skylab::MetaHell::DSL_DSL.enhance self do
-    atom :h
-    list :op_a
-  end
-
-  def parse *args
-    f_a = op_a.map { |i| h.fetch i }
-    ::Skylab::MetaHell::Parse.series args, * f_a
+  LIB_.DSL_DSL.enhance self do
+    atom :formal_symbol_h
+    list :formal_symbols
   end
 
   context "`parse_series`" do
 
-    m_p = %i( m f )
+    _SEX_I_A__ = %i( m f )
 
-    h( age: -> x { ::Numeric === x },
-       sex: -> x { m_p.include? x },
-       loc: -> _ { }  # left here to prove that op_a != h.keys
-    )
+    formal_symbol_h(
+       age:
+         -> x { ::Numeric === x },
+       sex:
+         -> x { _SEX_I_A__.include? x },
+       loc:
+         MetaHell_::MONADIC_EMPTINESS_ )
 
-    context "against one" do
+    context "a grammar with one formal symbol" do
 
-      op_a :sex
+      formal_symbols :sex
 
-      it "zero" do
-        parse.should eql( [ nil ] )
+      it "against zero input tokens - is OK" do
+        parse.should eql [ nil ]
       end
 
-      it "one valid" do
-        parse( :m ).should eql( [ :m ] )
+      it "against one valid input token" do
+        parse( :m ).should eql [ :m ]
       end
 
-      it "one invalid" do
+      it "against one invalid input token - no" do
         -> do
           parse 'blah'
         end.should raise_error( ::ArgumentError, /unrecog.+index 0.+blah/i )
       end
 
-      it "one valid then one invalid" do
+      it "if there is more than one (albeit valid) input tokens - no" do
         -> do
           parse :m, :f
         end.should raise_error( ::ArgumentError, /unrecog.+index 1.+:f/i )
       end
     end
 
-    context "against two" do
+    context "a grammar with two formal symbols" do
 
-      op_a :age, :sex
+      formal_symbols :age, :sex
 
-      it "zero" do
-        parse.should eql( [ nil, nil ] )
+      it "against zero input tokens - is OK" do
+        parse.should eql [ nil, nil ]
       end
 
-      it "one (a)" do
-        parse( 12 ).should eql( [ 12, nil ] )
+      it "against a valid input token (that is a production of the 1st formal symbol)" do
+        parse( 12 ).should eql [ 12, nil ]
       end
 
-      it "one (b)" do
-        parse( :m ).should eql( [ nil, :m ] )
+      it "against a valid input token (that is a production of the 2nd formal symbol)" do
+        parse( :m ).should eql [ nil, :m ]
       end
 
-      it "two" do
-        parse( 12, :m ).should eql( [ 12, :m ] )
+      it "against two valid input tokens (of the first then second formal symbols)" do
+        parse( 12, :m ).should eql [ 12, :m ]
       end
 
-      it "wrong order" do
+      it "if the \"valid\" input tokens are in the wrong order - no" do
         -> do
           parse :m, 12
         end.should raise_error( ::ArgumentError, /unrec.+index 1.+\b12\b/i )
       end
     end
   end
+
+  def parse *args
+
+    h = formal_symbol_h
+
+    Subject_[].series args, * (
+      formal_symbols.map do | sym |
+        h.fetch sym
+      end )
+
+  end
+
+end
 end

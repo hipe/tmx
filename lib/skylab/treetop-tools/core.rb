@@ -23,7 +23,7 @@ module Skylab::TreetopTools
     Bsc__ = sidesys[ :Basic ]
 
     Basic_fields = -> * x_a do
-      MH__[]::Basic_Fields.via_iambic x_a
+      MH__[]::Basic_Fields.call_via_iambic x_a
     end
 
     Bzn__ = sidesys[ :Brazen ]

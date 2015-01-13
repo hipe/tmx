@@ -236,7 +236,7 @@ module Skylab::TestSupport
 
         # ~ begin frontier experiment with curried actions
 
-        def curry_where * x_a  # :+#frontier for [br]
+        def curry_action_with__ * x_a  # :+#frontier for [br]
 
           # experiment whereby we can "curry" an action "prototype" with
           # a set of default arguments. we can then dup this prototype &
@@ -249,7 +249,7 @@ module Skylab::TestSupport
           recv_dup_iambic x_a  # CAREFUL - same method that children use
         end
 
-        def build_via_iambic x_a  # :+#frontier for [br]
+        def new_via_iambic x_a  # :+#frontier for [br]
 
           # this is the other side of the above method: call this method
           # on a prototype action and it will produce a new action whose
@@ -400,7 +400,7 @@ module Skylab::TestSupport
 
           @__generate_action_formal_props_box__ = bx
 
-          Callback_.stream.immutable_with_random_access.build_with(
+          Callback_.stream.immutable_with_random_access.new_with(
             :key_method_name, :name_symbol,
             :scn, bx.to_value_stream )
 

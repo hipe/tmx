@@ -12,7 +12,7 @@ module Skylab::Callback
           via_arglist_and_proc a, p
         end
 
-        def via_arglist a, & p
+        def call_via_arglist a, & p
           if a.length.nonzero? || p
             via_arglist_and_proc a, p
           else

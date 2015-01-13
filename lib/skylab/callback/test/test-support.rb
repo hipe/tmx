@@ -46,6 +46,14 @@ module Skylab::Callback::TestSupport
     end ]
   end
 
+  LIB_ = ::Object.new
+  class << LIB_
+
+    def list_lib
+      Callback_.lib_.basic::List
+    end
+  end
+
   KEEP_PARSING_ = true
   NEWLINE_ = "\n".freeze
 

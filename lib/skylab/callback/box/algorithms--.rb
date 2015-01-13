@@ -21,7 +21,10 @@ module Skylab::Callback
 
       # ~ readers that produce single entries and similar
 
-      def if_has_name k, found_p, not_found_p=EMPTY_P_
+      def if_has_name k, * p_a, & p
+        p and p_a.push p
+        1 == p_a.length and p_a.push EMPTY_P_
+        found_p, not_found_p = p_a
 
         had = true
         x = @h.fetch k do
@@ -123,8 +126,8 @@ module Skylab::Callback
           @a[ d, 1 ] = EMPTY_A_
         end
 
-        name_a.map do |n|
-          @h.delete n
+        name_a.map do |k|
+          @h.delete k
         end
       end
     end

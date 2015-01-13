@@ -23,7 +23,7 @@ module Skylab::Basic::TestSupport::Numeric
     context "the normalizer with no args" do
 
       before :all do
-        With_Nothing = Subject_[].build_via_iambic Basic_::EMPTY_A_
+        With_Nothing = Subject_[].new_via_arglist Basic_::EMPTY_A_
       end
 
       it "builds" do
@@ -60,7 +60,7 @@ module Skylab::Basic::TestSupport::Numeric
     context "the normalizer with a minimum" do
 
       before :all do
-        Min = Subject_[].build_with :minimum, -3
+        Min = Subject_[].new_with :minimum, -3
       end
 
       it "when input is below minimum (string)" do
@@ -107,7 +107,7 @@ module Skylab::Basic::TestSupport::Numeric
       if x_a.length.zero?
         Subject_[]
       else
-        Subject_[].build_via_iambic x_a
+        Subject_[].new_via_arglist x_a
       end
     end
 

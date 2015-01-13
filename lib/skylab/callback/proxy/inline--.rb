@@ -26,7 +26,7 @@ module Skylab::Callback
           new a, p
         end
 
-        def via_arglist a, & p
+        def call_via_arglist a, & p
           new a, p
         end
       end

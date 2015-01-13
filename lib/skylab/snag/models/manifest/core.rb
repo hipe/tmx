@@ -190,13 +190,12 @@ module Skylab::Snag
             end
           end
 
-          Snag_.lib_.system.filesystem.walk.build_with(
+          Snag_.lib_.system.filesystem.walk.new_with(
             :filename, @config.manifest_file,
             :max_num_dirs_to_look,
               @config.max_num_dirs_to_search_for_manifest_file,
             :property_symbol, :path,
-            :start_path, @path,
-            :on_event_selectively, _oes_p )
+            :start_path, @path, & _oes_p )
         end
 
         def recv_walk_error_event ev

@@ -4,9 +4,9 @@ module Skylab::Face
 
     class << self
       def [] * x_a
-        via_iambic x_a
+        call_via_iambic x_a
       end
-      def via_iambic x_a
+      def call_via_iambic x_a
         # (in the spirit of [#mh-056] #contoured-fields)
         mod = (( contour = Contour_Parse__.new( x_a ) )).client_mod
         mod.const_set :FIELDS_, contour.params  # gotta #comport with fields lib

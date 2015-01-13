@@ -96,7 +96,7 @@ module Skylab::Basic  # introduction at [#020]
           if a.length.zero?
             Basic_.const_get( _CONST, false ).normalization
           else
-            Basic_.const_get( _CONST, false ).normalization.via_arguments a
+            Basic_.const_get( _CONST, false ).normalization.new_via_arglist a
           end
         end
       end

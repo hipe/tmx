@@ -47,7 +47,7 @@ module Skylab::Face
       def [] * x_a
         new( x_a ).execute
       end
-      def via_iambic x_a
+      def call_via_iambic x_a
         if x_a.length.zero?
           self
         else

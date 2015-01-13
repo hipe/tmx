@@ -29,7 +29,7 @@ module Skylab::Headless
       end
 
       def call * x_a, & p
-        Curry__.via_iambic x_a, & p
+        Curry__.call_via_iambic x_a, & p
       end
 
       class Curry__

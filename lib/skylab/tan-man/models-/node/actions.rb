@@ -121,7 +121,7 @@ module Skylab::TanMan
       def touch_node_via_label s
 
         node = Node_.edit_entity @kernel, handle_event_selectively do |o|
-          o.where :name, s
+          o.edit_with :name, s
         end
 
         node and begin

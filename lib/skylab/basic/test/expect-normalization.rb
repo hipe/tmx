@@ -40,7 +40,7 @@ module Skylab::Basic
     end
 
     def _mock_argument * a
-      Mock_arg__[].via_arglist a
+      Mock_arg__[].call_via_arglist a
     end
 
     def expect_the_passthru_normalization
@@ -79,7 +79,7 @@ module Skylab::Basic
 
       class << self
 
-        def via_arglist a
+        def call_via_arglist a
           case a.length
           when 1 ; via_3 a.first, true, nil
           when 2 ; via_3 a.first, true, a.last

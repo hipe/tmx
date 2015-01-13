@@ -189,7 +189,7 @@ module Skylab::TestSupport
 
           Actions::Generate.new(
 
-            @kernel, & @on_event_selectively ).curry_where(
+            @kernel, & @on_event_selectively ).curry_action_with__(
 
               * ( :dry_run if @dry_run ),
               * ( :force if @force ),
@@ -220,7 +220,7 @@ module Skylab::TestSupport
               end
             end
 
-            proto.build_via_iambic x_a
+            proto.new_via_iambic x_a
 
           end
         end

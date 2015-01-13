@@ -6,10 +6,15 @@ lib/skylab/basic/pathname/union.rb  #setup-for-regret  #subject-proc
 lib/skylab/basic/rotating-buffer.rb  #setup-for-regret  #subject-proc
 lib/skylab/basic/struct.rb  #setup-for-regret  #subject-proc
 
+
 lib/skylab/brazen/entity/properties-stack--/common-frame--.rb  #branch-down-to-core  #look-for-ts
+
 
 lib/skylab/callback/proxy/inline--.rb  #branch-down-to-core  #setup-for-regret  #subject-proc
 lib/skylab/callback/proxy/functional--.rb  #branch-down-to-core
+lib/skylab/callback/scn--/peek--.rb  #chomp-module
+lib/skylab/callback/scn--/core.rb  #chomp-module
+
 
 lib/skylab/face/cli/lipstick.rb  #setup-for-regret
 lib/skylab/face/cli/table.rb  #branch-down-to-core
@@ -17,10 +22,13 @@ lib/skylab/face/cli/tableize--.rb  #chomp-module
 lib/skylab/face/plugin/host/metaservices-/chain-.rb  #setup-for-regret
 lib/skylab/face/plugin/host/proxy.rb  #setup-for-regret
 
+
 lib/skylab/headless/cli/option--/core.rb
 # lib/skylab/headless/system--/services--/filesystem/cache--.rb  #branch-down-to-core has some issues
 
+
 lib/skylab/information-tactics/levenshtein.rb  #chomp-module
+
 
 lib/skylab/meta-hell/basic-fields.rb  #branch-down-to-core
 lib/skylab/meta-hell/dsl-dsl/core.rb
@@ -33,6 +41,7 @@ lib/skylab/meta-hell/parse/via-set--.rb  #setup-for-regret
 lib/skylab/meta-hell/parse/series--.rb  #branch-down-to-core
 lib/skylab/meta-hell/ivars-with-procs-as-methods.rb
 lib/skylab/meta-hell/module/accessors.rb  #setup-for-regret
+
 
 lib/skylab/test-support/quickie/possible-/articulator-.rb  #setup-for-regret #eponymous-const
 lib/skylab/test-support/doc-test/core.rb  #output-filename: integration/final/top_spec.rb  #look-for-ts
