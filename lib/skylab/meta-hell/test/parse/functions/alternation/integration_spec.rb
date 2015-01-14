@@ -1,14 +1,8 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::Parse::F_VS_
+module Skylab::MetaHell::TestSupport::Parse::Alternation
 
-  ::Skylab::MetaHell::TestSupport::Parse[ self ]
-
-  include Constants
-
-  Subject_ = Subject_
-
-  describe "[mh] parse field- values- (integration)" do
+  describe "[mh] parse field- values- (integration)", wip: true do
 
     before :all do
       module Bazzle

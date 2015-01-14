@@ -1,8 +1,8 @@
-require_relative 'test-support'
+require_relative 'serial-optionals/test-support'
 
 module Skylab::MetaHell::TestSupport::Parse::Series
 
-describe "[mh] parse series (periphery)" do
+describe "[mh] parse series (periphery)", wip: true do
 
   LIB_.DSL_DSL.enhance self do
     atom :formal_symbol_h

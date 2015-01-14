@@ -194,19 +194,18 @@ module Skylab::Callback
     end
 
     def process_iambic_passively x_a
+      process_iambic_stream_passively iambic_stream_via_iambic_array x_a
+    end
+
+    def process_iambic_stream_passively st
       bx = formal_fields_ivar_box_for_read_
-      d = -2 ; last = x_a.length - 2
-      while d < last
-        d += 2
-        ivar = bx[ x_a.fetch( d ) ]
-        if ivar
-          instance_variable_set ivar, x_a.fetch( d + 1 )
-        else
-          x = d
-          break
-        end
+      while st.unparsed_exists
+        ivar = bx[ st.current_token ]
+        ivar or break
+        st.advance_one
+        instance_variable_set ivar, st.gets_one
       end
-      x
+      KEEP_PARSING_  # we never fail softly
     end
 
     def iambic_stream_via_iambic_array x_a

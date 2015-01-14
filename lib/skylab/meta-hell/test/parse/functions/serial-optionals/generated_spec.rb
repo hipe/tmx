@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::Parse::Series
 
-  describe "[mh] Parse::Series__" do
+  describe "[mh] Parse::Series__", wip: true do
 
     it "one-shot, inline usage" do
       args = [ '30', 'other' ]

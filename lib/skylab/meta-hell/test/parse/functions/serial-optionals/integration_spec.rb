@@ -1,18 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::Parse::Series::Intgrtn
+module Skylab::MetaHell::TestSupport::Parse::Series
 
-  ::Skylab::MetaHell::TestSupport::Parse::Series[ TS_ = self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  Subject_ = Subject_
-
-  describe "[mh] parse series (integration spec)" do
-
-    extend TS_
+  describe "[mh] parse series (integration spec)", wip: true do
 
     before :all do
 

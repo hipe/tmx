@@ -2,15 +2,7 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::Parse::Alternation
 
-  ::Skylab::MetaHell::TestSupport::Parse[ self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  MetaHell_ = MetaHell_
-
-  describe "[mh] Parse::Alternation__" do
+  describe "[mh] Parse::Alternation__", wip: true do
 
     it "minimally you can call it inine with (p_a, arg)" do
       res = MetaHell_::Parse.alternation[ [

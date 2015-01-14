@@ -70,7 +70,7 @@
 [#014] #done? #tracking-tag #attr #doc-point dup[e]ing behavior
 [#013]       #done move porcelain attribtues to here, then clean up
 [#012]       #done foo/ and foo.rb should be automagic, no declaration of module
-[#011]       #doc-node the fun parse curry narrative ..
+[#011]       #doc-node the parse narrative ..
              (#re-purposed:once, became [#su-001])
 [#010]       #done pull in D-elegatesTo from porcelain!
 [#009]       #done when you made plastic you didn't know about `define_singleton_method`

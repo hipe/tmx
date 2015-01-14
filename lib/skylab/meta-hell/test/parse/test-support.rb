@@ -6,12 +6,9 @@ module Skylab::MetaHell::TestSupport::Parse
 
   include Constants
 
-
   MetaHell_ = MetaHell_
 
   extend TestSupport_::Quickie
-
-  Sandboxer = TestSupport_::Sandbox::Spawner.new
 
   LIB_ = ::Object.new
   class << LIB_

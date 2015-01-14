@@ -1,6 +1,6 @@
 module Skylab::MetaHell
 
-  module Parse
+  module Parse  # read [#011]
 
     class << self
 
@@ -12,16 +12,29 @@ module Skylab::MetaHell
         Parse_::Fields__
       end
 
-      def fuzzy_matcher * a
-        if a.length.zero?
-          Fuzzy_matcher_
-        else
-          Fuzzy_matcher_[ * a ]
-        end
+      def function_ sym
+        Parse_::Functions_.const_get(
+          Callback_::Name.via_variegated_symbol( sym ).as_const,
+          false )
       end
 
-      def hack_label
-        Hack_label_
+      def fuzzy_matcher * a
+        Parse_::Functions_::Keyword.new_via_arglist( a ).to_matcher
+      end
+
+      # hack a human-readable name from an internal name
+      #
+      #     p = Subject_[].moniker_
+      #
+      #     p[ :@foo_bar_x ]  # => "foo bar"
+      #     p[ :some_method ]  # => "some method"
+
+      def hack_moniker_ * a
+        if a.length.zero?
+          Hack_moniker__
+        else
+          Hack_moniker__[ * a ]
+        end
       end
 
       def series * a
@@ -41,36 +54,16 @@ module Skylab::MetaHell
       end
     end
 
-    # `fuzzy_metcher` generates pass filter procs with a specified precision
-    #
-    #     p = Subject_[].fuzzy_matcher 3, 'foobie'
-    #
-    #     p[ 'f' ]  # => nil
-    #     p[ 'foo' ]  # => true
-    #     p[ 'foob' ]  # => true
-    #     p[ 'foobie-doobie' ]  # => nil
-    #
-
-    Fuzzy_matcher_ = -> min, moniker do
-      min ||= 1
-      len = moniker.length
-      use_min = len >= min
-      -> tok do
-        (( tlen = tok.length )) > len and break
-        use_min && tlen < min and break
-        moniker[ 0, tlen ] == tok
-      end
+    Hack_moniker__ = -> for_eg_an_ivar_symbol do
+      Callback_::Name.labelize( for_eg_an_ivar_symbol ).downcase
     end
 
-    # `hack_label` hacks an `as_human`-ish label from e.g an ivar name
-    #
-    #     p = Subject_[].hack_label
-    #
-    #     p[ :@foo_bar_x ]  # => "foo bar"
-    #     p[ :some_method ]  # => "some method"
+    module Functions_
+      Autoloader_[ self ]
+    end
 
-    Hack_label_ = -> ivar_i do
-      Callback_::Name.labelize( ivar_i ).downcase
+    module Input_Streams_
+      Autoloader_[ self ]
     end
 
     module Fields__

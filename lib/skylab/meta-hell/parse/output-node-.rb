@@ -2,8 +2,20 @@ module Skylab::MetaHell
 
   module Parse
 
-    Field = ::Module.new
+    class Output_Node_
 
+      def initialize x
+        @value_x = x
+      end
+
+      def members
+        [ :value_x ]
+      end
+
+      attr_reader :value_x
+    end
+
+    if false
     class Field::Values < ::Struct
 
       class << self
@@ -71,6 +83,7 @@ module Skylab::MetaHell
           self[ i ] and break i
         end
       end
+    end
     end
   end
 end
