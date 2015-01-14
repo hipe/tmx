@@ -81,26 +81,6 @@ module Skylab::MetaHell
             Fields__::Flag.call_via_arglist a
           end
         end
-
-        def int
-          Fields__::Int
-        end
-      end
-
-      module Int
-
-        class << self
-
-          def scan_token
-            Scan_token__
-          end
-        end
-
-        Scan_token__ = -> tok do
-          RX__ =~ tok and tok.to_i
-        end
-
-        RX__ = /\A\d+\z/
       end
 
       Autoloader_[ self ]
