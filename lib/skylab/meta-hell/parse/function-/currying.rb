@@ -1,5 +1,30 @@
 module Skylab::MetaHell
 
+  module Parse
+
+    module Function_
+
+      class Currying
+
+        class << self
+
+          def build_extra_input_tokens_event st
+            Extra_Input___[ st.current_token_object.value_x ]
+          end
+        end  # >>
+
+        Extra_Input___ = Callback_::Event.prototype_with :extra_input,
+            :x, nil,
+            :error_category, :argument_error do | y, o |
+
+          y << "unrecognized argument #{ ick o.x }"
+        end
+
+      end
+    end
+  end
+
+  if false
   module Parse::Curry_  # read [#011] the fun parse curry narrative
 
     def self.[] * input_a
@@ -162,17 +187,12 @@ module Skylab::MetaHell
         case p.arity
         when 0 ; p.call
         when 1
-          v = argv.fetch ai
-          e = Exhausted_[ -> do
-            "unrecognized argument at index #{ ai } - #{ v.inspect }"
-          end, ai, v, get_syntax_proc ]
-          p[ e ]
+          self._REBUILT
         else
           p[ argv, ai ]
         end
         nil
       end
-      Exhausted_ = ::Struct.new :message_proc, :index, :value, :syntax_proc
       def render_syntax_string
         get_syntax_proc.call
       end
@@ -457,5 +477,6 @@ module Skylab::MetaHell
     end
 
     Pool_Proc_ = ::Struct.new :pool_proc
+  end
   end
 end

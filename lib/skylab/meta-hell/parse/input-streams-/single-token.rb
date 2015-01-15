@@ -15,6 +15,10 @@ module Skylab::MetaHell
         @is_hot
       end
 
+      def current_index
+        @is_hot ? 0 : 1
+      end
+
       def advance_one
         @is_hot = false
         @current_token_object = nil

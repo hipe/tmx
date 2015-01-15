@@ -21,14 +21,17 @@ module Skylab::MetaHell::TestSupport::Parse
     end
 
     def against s
-      on = subject[ Subject_[]::Input_Streams_::Single_Token.new s ]
+      on = subject.call Subject_[]::Input_Streams_::Single_Token.new s
       if on
         on.value_x
       end
     end
 
     define_method :subject, ( Callback_.memoize do
-      Subject_[].function_( :non_negative_integer ).via_iambic_stream nil
+
+      Subject_[].function_( :non_negative_integer ).
+        new_via_iambic_stream_passively(
+          Callback_::Iambic_Stream.the_empty_iambic_stream )
     end )
   end
 end

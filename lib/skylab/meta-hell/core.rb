@@ -86,6 +86,8 @@ module Skylab
 
     IDENTITY_ = -> x { x }
 
+    KEEP_PARSING_ = true
+
     MetaHell_ = self
 
     MONADIC_EMPTINESS_ = -> _ { }

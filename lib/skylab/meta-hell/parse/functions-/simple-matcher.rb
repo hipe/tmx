@@ -2,45 +2,22 @@ module Skylab::MetaHell
 
   module Parse
 
-    module Fields__
+    module Functions_::Simple_Matcher
 
-      Exponent = MetaHell_.lib_.struct_lib.new :i, :long, :short, :first_desc_line
+      class << self
 
-      # the term 'exponent' is meant in the "Grammatical_category" sense.
-      # similar but not the same as a flag. this was early-abstracted
-      # out of one project and is #experimental
+        def new_via_iambic_stream_passively st
+          new_via_proc st.gets_one
+        end
 
-      class Exponent
-
-        def p
-          long = Fm_[ @long ]
-          short = @short ? -> tok { @short == tok } : MONADIC_EMPTINESS_
-          -> r, a do
-            if a.length.nonzero? and
-                ( (( long[ tok = a.first ] )) or short[ tok ] )
-              a.shift
-              @i and r[ @i ] = true
-              true
+        def new_via_proc p
+          -> in_st do
+            if p[ in_st.current_token_object.value_x ]
+              tok = in_st.current_token_object
+              in_st.advance_one
+              tok
             end
           end
-        end
-
-        self._REDO_WALK_WITH_ME  # #open [#020] (that this is not covered)
-        Fm_ = Fuzzy_matcher_.curry_with :min_length, 1
-
-        def name_monikers y
-          y << @long.inspect
-          @short and y << @short.inspect
-          y
-        end
-
-        def with_each_desc_line &blk
-          if @first_desc_line
-            blk[ "#{ @long } - #{ @first_desc_line }" ]
-          elsif @i && @long
-            blk[ "#{ @long } - #{ @long.gsub '-', ' ' }." ]  # #hack-alert
-          end
-          nil
         end
       end
     end

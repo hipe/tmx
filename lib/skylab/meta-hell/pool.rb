@@ -170,7 +170,5 @@ module Skylab::MetaHell
       # different places. Whenever it is optimal to merge the other on top of
       # the one we should do so [#023].)
 
-    KEEP_PARSING_ = true
-
   end
 end

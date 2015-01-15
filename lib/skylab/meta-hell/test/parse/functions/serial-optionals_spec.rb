@@ -1,15 +1,51 @@
 require_relative 'serial-optionals/test-support'
 
-module Skylab::MetaHell::TestSupport::Parse::Series
+module Skylab::MetaHell::TestSupport::Parse::Serial_Optionals
 
-describe "[mh] parse series (periphery)", wip: true do
+describe "[mh] serial optionals" do
 
-  LIB_.DSL_DSL.enhance self do
-    atom :formal_symbol_h
-    list :formal_symbols
+  context "my first nonterminal (integration)" do
+
+    define_method :subject, ( Callback_.memoize do
+
+      Subject_[].function_( :serial_optionals ).new_with(
+        :functions,
+          :keyword,
+            'randomize', :minimum_number_of_characters, 3,
+          :non_negative_integer )
+    end )
+
+
+    it "builds" do
+      subject or fail
+    end
+
+    it "built thing is a stream parser (parse a full normal input)" do
+      against( 'rando', '2' ).value_x.should eql [ :randomize, 2 ]
+    end
+
+    def against * s_a
+      subject.call Subject_[]::Input_Streams_::Array.new s_a
+    end
   end
 
-  context "`parse_series`" do
+  it "minimal high level" do
+
+    is_A, is_B = Subject_[].serial_optionals [ :B ],
+      -> x { :A == x and :foo },
+      -> x { :B == x and :bar }
+
+    is_A.should be_nil
+    is_B.should eql :B
+
+  end
+
+  context "periphery" do
+
+    LIB_.DSL_DSL.enhance self do
+      atom :formal_symbol_h
+      list :formal_symbols
+    end
 
     _SEX_I_A__ = %i( m f )
 
@@ -34,15 +70,16 @@ describe "[mh] parse series (periphery)", wip: true do
       end
 
       it "against one invalid input token - no" do
+        _rx = /\bunrecognized argument 'blah'/
         -> do
           parse 'blah'
-        end.should raise_error( ::ArgumentError, /unrecog.+index 0.+blah/i )
+        end.should raise_error( ::ArgumentError, _rx )
       end
 
       it "if there is more than one (albeit valid) input tokens - no" do
         -> do
           parse :m, :f
-        end.should raise_error( ::ArgumentError, /unrecog.+index 1.+:f/i )
+        end.should raise_error( ::ArgumentError, /unrecognized argument 'f'/ )
       end
     end
 
@@ -69,7 +106,7 @@ describe "[mh] parse series (periphery)", wip: true do
       it "if the \"valid\" input tokens are in the wrong order - no" do
         -> do
           parse :m, 12
-        end.should raise_error( ::ArgumentError, /unrec.+index 1.+\b12\b/i )
+        end.should raise_error( ::ArgumentError, /unrecognized argument '12'/ )
       end
     end
   end
@@ -78,7 +115,7 @@ describe "[mh] parse series (periphery)", wip: true do
 
     h = formal_symbol_h
 
-    Subject_[].series args, * (
+    Subject_[].serial_optionals args, * (
       formal_symbols.map do | sym |
         h.fetch sym
       end )

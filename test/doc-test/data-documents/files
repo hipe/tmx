@@ -34,7 +34,6 @@ lib/skylab/meta-hell/basic-fields.rb  #branch-down-to-core
 lib/skylab/meta-hell/dsl-dsl/core.rb
 lib/skylab/meta-hell/fields/from.rb
 lib/skylab/meta-hell/lib--.rb  #branch-down-to-core
-lib/skylab/meta-hell/parse/core.rb  #output-filename: generated_spec.rb
 lib/skylab/meta-hell/parse/alternation--.rb  #setup-for-regret
 lib/skylab/meta-hell/parse/via-ordered-set--.rb  #chomp-module
 lib/skylab/meta-hell/parse/via-set--.rb  #setup-for-regret

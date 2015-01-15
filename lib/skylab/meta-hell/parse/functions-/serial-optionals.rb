@@ -1,55 +1,29 @@
 module Skylab::MetaHell
 
-  module Parse
+  module Parse  # see [#029]
 
-    # parse out (a fixed) N values from M args
+    # a "serial optionals" parse function never fails. any input stream is
+    # passed to the first constituent. if this parse succeeds, any remaining
+    # input stream is passed to any next constituent and so on. if the current
+    # constituent fails to parse, this constituent is permanently passed over
+    # and any remaining constituents are still considered and so on.
     #
-    # imagine a formal parameter syntax that is made up of one or more
-    # contiguous optional arguments, and we want to determine which actual
-    # arguments to tag as which formal arguments not in e.g the usual ruby
-    # left-to-right way (if we are talking about a method signature); but
-    # rather via functions, one function per formal argument.
+    # internally this function is not concerned with whether at the end of
+    # the parse there still remain any unparsed tokens in the input buffer.
     #
-    # specifically, consider the example "grammar" of `[age] [sex] [location]`.
-    # a primitive attempt at this as a ruby method signature is:
+    # in the output node the result value is always a tuple (array) with its
+    # number of elements corresponding to the number of constituents in the
+    # grammar. a constituent whose parse succeeded will have its output value
+    # (not node) in the position of this output array that corresponds to the
+    # constituent's position in the grammar. in those "slots" in the output
+    # array where the corresponding constituent failed to parse (or was never
+    # reached) the value will be `nil`.
     #
-    #     def asl age=nil, sex=nil, location=nil
+    # this function does not have a sense for the input ending "prematurely".
+    # if the end of the input is reached before the end of the grammar, the
+    # function simply results with the result value array as-is.
     #
-    # however we would like it to work for calls like
-    #
-    #     asl "male", "Berlin"
-    #
-    # which would not work as illustrated. we can, however, create one
-    # function for each of the formal parameters that can be used to indicate
-    # whether any given actual parameter is a match for the particular
-    # formal parameter. we would then be able to accept eight possible
-    # permutations of these fields in this order, each one being either
-    # provided or not provided; in contrast to the four permutations of
-    # pseudo-signatures possible in the ruby example. this facility may
-    # offer your application more power without sacrificing clarity or
-    # conciseness.
-    #
-    # the result is always an array of same length as `p_a`, with each element
-    # either nil or the positionally corresponding actual argument. if an
-    # argument cannot be processed with this simple state machine an argument
-    # error is raised by default.
-    #
-    # (as such, `args` of length zero always succeeds. `args` of length longer
-    # than length of `p_a` will always execute the "exhaustion action")
-
-    # NOTE that despite the flexibility that is afforded by such a signature,
-    # the position of the actual arguments still is not freeform - they must
-    # occur in the same order with respect to each other as they occur in the
-    # formal arguments. such a grammar would be possible but is beyond this
-    # scope (and is addressed by the sibling nodes of this node).
-    #
-    # in contrast to the similar-acting "parse from ordered set", this only
-    # matches input that occurs in the same order as the grammar; i.e there
-    # is one cursor that tracks the current head of the input, and one cursor
-    # that tracks the current head of the grammar. neither cursor ever moves
-    # backwards.
-    #
-    # one-shot, inline usage:
+    # using the highlevel shorthand inline convenience macro:
     #
     #     args = [ '30', 'other' ]
     #     age, sex, loc =  Subject_[].series[ args,
@@ -102,88 +76,175 @@ module Skylab::MetaHell
     #
     #     P[ [ 'M' ] ]               # => [ nil, 'M', nil ]
     #
-    #
-    # but now here's the rub: if you re-curry the parser (!) and
-    # `exhaustion` `false` terminates at first non-parsable (input array is mutated)
-    #
-    #     argv = [ '30', 'm', "Mom's", "Mom's again" ]
-    #     omg = P.curry_with :exhaustion, false
-    #     omg[ argv ]  # => [ '30', 'm', "Mom's" ]
-    #     argv  # => [ "Mom's again" ]
-    #
-    #
-    # in such a case with exhaustion (deault), you would trip an exception
-    #
-    #     argv = [ '30', 'm', "Mom's", "Mom's again" ]
-    #     P[ argv ]  # => ArgumentError: unrecognized argument at index 3..
-    #
 
-    Series__ = Parse::Curry_[
-      :algorithm, -> parse, argv do
-        fa = parse.normal_token_proc_a ; fz = fa.length
-        ai = fi = 0 ; az = argv.length
-        res = ::Array.new fz
-        catch :exhausted do
-          while ai < az do
-            v = argv[ ai ]
-            stay = true
-            begin
-              if fz == fi
-                parse.exhaustion_notification argv, ai
-                throw :exhausted
+    class Functions_::Serial_Optionals
+
+      class << self
+
+        def call_via_highlevel_arglist a
+
+          # super oldschool highlevel macro: first arg is ARGV, remaining
+          # args are matchers (constituency of the grammar). if unparsed
+          # exists raise argument error. otherwise result is output tuple.
+
+          arg_st = Callback_::Iambic_Stream.via_array a
+          input_array = arg_st.gets_one
+
+          new_with(
+            :function_objects_array, Callback_.stream do
+              if arg_st.unparsed_exists
+                Functions_::Simple_Matcher.new_via_proc arg_st.gets_one
               end
-              b, x = fa.fetch( fi ).call v
-              if b
-                res[ fi ] = x
-                stay = false
-              end
-              fi += 1
-            end while stay
-            ai += 1
+            end.to_a ).to_parse_array_fully_proc[ input_array ]
+        end
+
+        def new_with * x_a
+          call_via_iambic x_a
+        end
+      end
+
+      Callback_::Actor.methodic self, :simple, :properties,
+        :property, :input_stream
+
+      def initialize
+        @input_stream = nil
+        super
+      end
+
+    private
+
+      def function_objects_array=
+        @function_a = iambic_property
+        KEEP_PARSING_
+      end
+
+      def function_objects=
+        st = @__methodic_actor_iambic_stream__
+        @function_a = []
+        while st.unparsed_exists
+          @function_a.push st.gets_one
+        end
+        KEEP_PARSING_
+      end
+
+      def functions=
+        _init_functions_via_stream @__methodic_actor_iambic_stream__
+      end
+
+      def matcher_functions=
+        st = @__methodic_actor_iambic_stream__
+        @function_a = []
+        cls = Parse_::Functions_::Simple_Matcher
+        while st.unparsed_exists
+          @function_a.push cls.new_via_proc st.gets_one
+        end
+        KEEP_PARSING_
+      end
+
+      def _init_functions_via_stream st
+        ok_x = true
+        @function_a = []
+        while st.unparsed_exists
+          cls = Parse_.function_ st.gets_one # if ever needed we can soften this
+          ok_x = cls.new_via_iambic_stream_passively st
+          ok_x or break
+          @function_a.push ok_x
+        end
+        ok_x && KEEP_PARSING_
+      end
+
+    public
+
+      def render_all_segments_into_under y, * x_a
+        Parse_::Function_::Nonterminal::Actors::Render[ y, x_a, self ]
+      end
+
+      def to_reflective_function_stream_  # for above
+        Callback_.stream.via_nonsparse_array @function_a
+      end
+
+      def to_parse_array_fully_proc
+
+        -> argv do
+
+          in_st = Parse_::Input_Streams_::Array.new argv
+
+          output_node = call in_st
+
+          if in_st.unparsed_exists
+            raise( Parse_::Function_::Currying.
+              build_extra_input_tokens_event( in_st ).to_exception )
+          else
+            output_node.value_x
           end
         end
-        res
-      end,
-      :exhaustion, -> e do
-        raise ::ArgumentError, e.message_proc[]
-      end,
-      :uncurried_queue, [ :token_matchers, :argv ],
-      :call, -> argv, * p_a do
-        absorb_along_curry_queue_and_execute p_a, argv
       end
-    ]
 
-    # changing it from a matching parser to a scanning parser:
-    #
-    # way back in ancient times the original inspiration for something like
-    # this was writing crazy method signatures, like e.g imagine an abstract
-    # representation of a "file" that is constructured with either, both, or
-    # none of an ::IO representing the file as a resource on the system, and
-    # a ::String representing the file's desired content. it is
-    # straightforward enough to accept a glob of arguments to the constructor
-    # and programmatically determine which arguments are which, but man alive
-    # is it ever ugly looking. the desire of this, then was to allow method
-    # signatures to exhibit this flexibility and to yet be readable and
-    # concise in both their calls and implementation
-    #
-    # (this creation myth also suggests why we don't do "pool"-style (non-
-    # orderd) parsing - we wanted it to be relatively fast, and also possibly
-    # to leverage precedence to avoid grammar ambiguities.)
-    #
-    # as such, "scanning" (parsing, even (detailed discussion at [#037])) had
-    # no real meaning in that context - we were just trying to expand an
-    # ordered subset of items to fit within the defined superset, positionally.
-    # the actual "identity" of the items stayed the same.
-    #
-    # any who dad doo, the point of all this is that although it doesn't
-    # out of the box treat your functions as scanners, you may find yourself
-    # wishing that it did, and that you could easily take care of semantic
-    # representation in addition to parsing (again see [#037]).
-    #
-    # note that while we keep the method signatures simple (monadic in/out),
-    # one way to do scanning in addition to matching is to
-    # indicate `token_scanners` instead of `token_matchers`:
-    #
+      def execute
+        if @input_stream  # one-off
+          @mutable_function_a = @function_a
+          @function_a = nil
+          _parse
+        else
+          freeze
+        end
+      end
+
+      def call in_st
+        dup.__init_for_parse( in_st )._parse
+      end
+
+    protected
+
+      def __init_for_parse in_st
+        @mutable_function_a = @function_a.dup
+        @function_a = nil
+        @input_stream = in_st
+        self
+      end
+
+      def _parse
+
+        formal_d = 0
+        is_exhausted = false
+
+        f_p_a = @mutable_function_a
+        formal_length = f_p_a.length
+        output_a = ::Array.new formal_length
+
+        st = @input_stream
+
+        while st.unparsed_exists
+
+          do_stay = true
+          begin
+
+            if formal_length == formal_d
+              # (exhaustion_notification)
+              is_exhausted = true
+              break
+            end
+
+            output_node = f_p_a.fetch( formal_d ).call st
+
+            if output_node
+              output_a[ formal_d ] = output_node.value_x
+              do_stay = false
+            end
+
+            formal_d += 1
+
+          end while do_stay
+
+          if is_exhausted
+            break
+          end
+        end
+
+        Parse_::Output_Node_.new output_a
+      end
+    end
+
     # indicating `token_scanners` instead of `token_matchers`
     #
     #     p = Subject_[].series.curry_with(

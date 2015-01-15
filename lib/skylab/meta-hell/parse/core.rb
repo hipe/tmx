@@ -22,26 +22,11 @@ module Skylab::MetaHell
         Parse_::Functions_::Keyword.new_via_arglist( a ).to_matcher
       end
 
-      # hack a human-readable name from an internal name
-      #
-      #     p = Subject_[].moniker_
-      #
-      #     p[ :@foo_bar_x ]  # => "foo bar"
-      #     p[ :some_method ]  # => "some method"
-
-      def hack_moniker_ * a
+      def serial_optionals * a
         if a.length.zero?
-          Hack_moniker__
+          Parse_::Functions_::Serial_Optionals
         else
-          Hack_moniker__[ * a ]
-        end
-      end
-
-      def series * a
-        if a.length.zero?
-          self::Series__
-        else
-          self::Series__.call_via_arglist a
+          Parse_::Functions_::Serial_Optionals.call_via_highlevel_arglist a
         end
       end
 
@@ -52,10 +37,6 @@ module Skylab::MetaHell
       def via_set
         Parse_::Via_Set__
       end
-    end
-
-    Hack_moniker__ = -> for_eg_an_ivar_symbol do
-      Callback_::Name.labelize( for_eg_an_ivar_symbol ).downcase
     end
 
     module Functions_

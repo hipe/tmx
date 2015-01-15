@@ -506,6 +506,10 @@ module Skylab::Callback
       def via_array x_a
         new 0, x_a
       end
+
+      def the_empty_iambic_stream
+        @__teis ||= via_array EMPTY_A_
+      end
     end
 
     self

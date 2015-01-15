@@ -24,6 +24,16 @@ module Skylab::Callback
           if i_a.length.zero?
             cls
           else
+            Edit_via_nonzero_length_iambic_on_prepared_class__[ i_a, cls ]
+          end
+        end
+      end  # >>
+
+      module Edit_via_nonzero_length_iambic_on_prepared_class__
+
+        class << self
+
+          def [] i_a, cls
             i = i_a.first
             case i
             when :simple
@@ -32,37 +42,36 @@ module Skylab::Callback
                 Iambic_Stream_via_Array_.new( 1, i_a )
               ).execute
             when :properties
-              aply_seed_treatment cls, i_a
+              __apply_seed_treatment cls, i_a
             else
-              snd_expecting_error i_a.first, [ :properties, :simple ]
+              raise Stranger_[ i_a.first, [ :properties, :simple ] ].to_exception
             end
           end
-        end
 
-      private
-
-        def aply_seed_treatment mod, i_a
-          mod.module_exec do
-            private
-            1.upto( i_a.length - 1 ) do |d|
-              i = i_a.fetch d
-              _IVAR = :"@#{ i }"
-              define_method :"#{ i }=" do
-                instance_variable_set _IVAR, iambic_property
-                KEEP_PARSING_
+          def __apply_seed_treatment mod, i_a
+            mod.module_exec do
+              private
+              1.upto( i_a.length - 1 ) do |d|
+                sym = i_a.fetch d
+                _IVAR = :"@#{ sym }"
+                define_method :"#{ sym }=" do
+                  instance_variable_set _IVAR, iambic_property
+                  KEEP_PARSING_
+                end
               end
             end
+            nil
           end
-          nil
-        end
-
-        def snd_expecting_error actual_i, exp_i_a
-          _ev = Stranger_[ actual_i, exp_i_a ]
-          raise _ev.to_exception
-        end
-      end  # >>
+        end  # >>
+      end
 
       module Module_Methods__
+
+        # ~ experiment (looks like [br] `edit_entity_class`)
+
+        def edit_actor_class * x_a
+          Edit_via_nonzero_length_iambic_on_prepared_class__[ x_a, self ]
+        end
 
         # (experimental variations on the theme, but we should DRY these)
 
@@ -600,6 +609,12 @@ module Skylab::Callback
           def initialize & p  # :+#courtesy
             super( & nil )
             p and instance_exec( & p )
+          end
+
+          def members
+            self.class.properties.to_stream.map_by do | x |
+              x.name_symbol
+            end.to_a
           end
 
         private

@@ -2,100 +2,75 @@ module Skylab::MetaHell
 
   module Parse
 
-    class Field_
+    module Function_
 
-      def initialize
-        @normal_parse_p = nil
-      end
+      class Field
 
-      attr_accessor :d  # lowlevel access to parsing
+        class << self
 
-      def looks_like_default?
-        ! looks_like_particular_field
-      end
+          # ~ narrative (not alpha) order
 
-      def merge_defaults! dflt
-        p = dflt.monikate_p and ( @monikate_p ||= p )
-        nil
-      end
-
-      attr_reader :monikate_p
-
-      def normal_token_proc  # assumes `token_stream`
-        @ntp ||= begin
-          -> tok do
-            x = @token_scanner_p[ tok ]
-            if ! x.nil?
-              [ true, x ]
-            end
+          def new_via_arglist a
+            st = Callback_::Iambic_Stream.via_array a
+            x = new_via_iambic_stream_passively st
+            st.unparsed_exists and raise ::ArgumentError, st.current_token
+            x
           end
+
+          def new_via_iambic_stream_passively st  # :+#push-up-candidate to [cb]
+            ok = nil
+            x = new do
+              ok = process_iambic_stream_passively st
+            end
+            ok && x
+          end
+
+          # ~ others
+
+          def __function_category_symbol
+            @__fcs ||= Callback_::Name.via_module( self ).as_lowercase_with_underscores_symbol
+          end
+
+          def __function_supercategory_symbol
+            :field
+          end
+
+        end  # >>
+
+        Callback_::Actor.methodic self
+
+        def initialize & edit_p  # necessary #hook-in when using [cb] methodic
+          @moniker_symbol = nil
+          instance_exec( & edit_p )
+        end
+
+      private
+
+        def moniker_symbol=  # a "moniker" is a name that has zero imapct on logic - it is for humans only
+          @moniker_symbol = iambic_property
+          KEEP_PARSING_
+        end
+
+      public
+
+        def moniker
+          @__did_resolve_moniker_name_function ||= begin
+            @__mnf = if @moniker_symbol
+              Callback_::Name.via_variegated_symbol @moniker_symbol
+            end
+            true
+          end
+          @__mnf
+        end
+
+        def function_category_symbol
+          self.class.__function_category_symbol
+        end
+
+        def function_supercategory_symbol
+          self.class.__function_supercategory_symbol
         end
       end
-
-      def get_monikers_proc
-        me = self
-        -> { [ me.get_moniker ] }
-      end
-
-      def get_moniker
-        ( @monikate_p || Mkt_p_ )[ @moniker ]
-      end
-      Mkt_p_ = -> s { "<<**#{ s }**>>" }
-
-      def get_agent
-        @agent_p.call
-      end
-
-      attr_reader :looks_like_particular_field
-
-      def any_context
-        if @last_x
-          " after \"#{ @last_x }\""
-        else
-          " at beginning of field sub-parse"
-        end
-      end
-
-    private
-
-      def normal_parse memo, argv
-        instance_exec memo, argv, & @normal_parse_p
-      end
-
-      def iambic_property_set_only_once ivar
-        instance_variable_defined? ivar and raise "sanity - can have only #{
-          }one #{ Hack_label_[ ivar ] } for now"
-        instance_variable_set ivar, iambic_property ; nil
-      end
-
-    MetaHell_::Fields::From.methods(
-      :passive, :absorber, :absorb_iambic_passively
-    ) do  # #borrow-one-indent
-
-      def monikate
-        @monikate_p = iambic_property ; nil
-      end
-
-      def moniker
-        @looks_like_particular_field = true
-        @moniker = iambic_property ; nil
-      end
-
-      def token_stream
-        @looks_like_particular_field = true
-        @token_scanner_p = iambic_property ; nil
-      end
-
-      def parse
-        @looks_like_particular_field = true
-        @normal_parse_p = iambic_property ; nil
-      end
-
-      def agent
-        ( @agent_p = iambic_property ).respond_to?( :call ) or
-          raise ::ArgumentError, "proc? #{ @agent_p }" ; nil
-      end
-      end  # #pay-one-back
     end
   end
 end
