@@ -1,114 +1,111 @@
-require_relative '../../test-support'
+require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::Parse::Via_Set
+module Skylab::MetaHell::TestSupport::Parse::Spending_Pool
 
-  ::Skylab::MetaHell::TestSupport::Parse[ self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  MetaHell_ = MetaHell_
-
-  describe "[mh] Parse::Via_Set__", wip: true do
+  describe "[mh] Parse::Via_Set__" do
 
     context "with one such parser build from an empty set of parsers" do
 
       before :all do
-        None = Subject_[].via_set.curry_with :pool_procs, []
+        None = Subject_[].new_with( :functions ).to_call_and_mutate_array_proc
       end
       it "a parser with no nodes in it will always report 'no parse' and 'spent'" do
-        None[ argv = [] ].should eql [ false, true ]
-        argv.should eql []
+        None[ MetaHell_::EMPTY_A_ ].should be_nil
       end
       it "even if the input is rando calrissian" do
-        None[ argv = :hi_mom ].should eql [ false, true ]
-        argv.should eql :hi_mom
+        None[ :hi_mom ].should be_nil
       end
     end
     context "with parser with one node that reports it always matches & always spends" do
 
       before :all do
-        One = Subject_[].via_set.curry_with( :pool_procs, [
-         -> _input {  [ true, true ] }
-        ] )
+
+        One = Subject_[].new_with(
+          :functions,
+            :proc, -> in_st do
+              Parse_lib_[]::Output_Node_.new nil
+            end ).to_call_and_mutate_array_proc
+
       end
-      it "always reports the same as a final result" do
-        One[ :whatever ].should eql [ true, true ]
+      it "is always this same output node" do
+        on = One[ :whatever ]
+        on.function_is_spent.should eql true
       end
     end
     context "with a parser with one node that reports it never matches & always spends" do
 
       before :all do
-        Spendless = Subject_[].via_set.curry_with( :pool_procs, [
-          -> _input {  [ false, true ] }
-        ] )
+        Spendless = Subject_[].new_with(
+          :functions,
+            :proc, -> in_st do
+              nil
+            end ).to_call_and_mutate_array_proc
       end
-      it "always reports the same as a final result" do
-        Spendless[ :whatever ].should eql [ false, true ]
+      it "never parses" do
+        Spendless[ :whatever ].should be_nil
       end
     end
-    context "a parser that parses any digits & any of 2 keywords (only once each)" do
+    context "of 2 keywords, parse them at most once each. parse any and all digits" do
 
       before :all do
-        keyword = -> kw do
-          -> memo, argv do
-            if argv.length.nonzero? and kw == argv.first
-              argv.shift
-              memo[ kw.intern ] = true
-              [ true, true ]
-            end
-          end
-        end
 
-        Digits = Subject_[].via_set.curry_with :pool_procs, [
-          keyword[ 'foo' ],
-          keyword[ 'bar' ],
-          -> memo, argv do
-            if argv.length.nonzero? and /\A\d+\z/ =~ argv.first
-              ( memo[:nums] ||= [ ] ) << argv.shift.to_i
-              [ true, false ]
-            end
-          end
-        ]
+        _NNI = Parent_::Subject_[]::Functions_::Non_Negative_Integer
+
+        Digits = Subject_[].new_with(
+          :functions,
+            :keyword, "foo",
+            :keyword, "bar",
+            :proc, -> in_st do
+              on = _NNI.output_node_via_input_stream in_st
+              if on
+                on.new_with :function_is_not_spent
+              end
+            end ).to_call_and_mutate_array_proc
       end
       it "does nothing with nothing" do
-        Digits[ ( memo = {} ), [] ].should eql [ false, false ]
-        memo.length.should eql 0
+        Digits[ MetaHell_::EMPTY_A_ ].should eql nil
       end
       it "parses one digit" do
-        Digits[ ( memo = { } ), argv = [ '1' ] ].should eql [ true, false ]
+        argv = [ '1' ]
+        on = Digits[ argv ]
         argv.length.should eql 0
-        memo[ :nums ].should eql [ 1 ]
+        on.function_is_spent.should eql false
+        kw, k2, digits = on.value_x
+        ( kw || k2 ).should be_nil
+        digits.should eql [ 1 ]
       end
       it "parses two digits" do
-        Digits[ ( memo = { } ), argv = [ '2', '3' ] ].should eql [ true, false ]
-        argv.length.should eql 0
-        memo[ :nums ].should eql [ 2, 3 ]
+        argv = %w( 2 3 )
+        on = Digits[ argv ]
+        on.function_is_spent.should eql false
+        on.value_x.should eql [ nil, nil, [ 2, 3 ] ]
       end
       it "parses one keyword" do
-        Digits[ ( memo = { } ), argv = [ 'bar' ] ].should eql [ true, false ]
-        argv.length.should eql 0
-        memo[ :bar ].should eql true
+        argv = [ 'bar' ]
+        on = Digits[ argv ]
+        on.function_is_spent.should eql false
+        on.value_x.should eql [ nil, [:bar], nil ]
       end
-      it "parses two keywords" do
-        Digits[ ( memo = { } ), argv = [ 'bar', 'foo' ] ].should eql [ true, false ]
+      it "parses two keywords (in reverse grammar order)" do
+        argv = %w( bar foo )
+        on = Digits[ argv ]
         argv.length.should eql 0
-        memo[ :bar ].should eql true
-        memo[ :foo ].should eql true
+        on.function_is_spent.should eql false
+        on.value_x.should eql [ [:foo], [:bar], nil ]
       end
       it "will not parse multiple of same keyword" do
-        Digits[ ( memo = { } ), argv = [ 'foo', 'foo' ] ].should eql [ true, false ]
-        argv.should eql [ 'foo' ]
-        memo[ :foo ].should eql true
+        argv = %w( foo foo )
+        on = Digits[ argv ]
+        argv.should eql %w( foo )
+        on.function_is_spent.should eql false
+        on.value_x.should eql [ [ :foo ], nil, nil ]
       end
       it "will stop at first non-parsable" do
         argv = [ '1', 'foo', '2', 'biz', 'bar' ]
-        Digits[ ( memo = { } ), argv ].should eql [ true, false ]
+        on = Digits[ argv ]
+        on.function_is_spent.should eql false
         argv.should eql [ 'biz', 'bar' ]
-        memo[ :nums ].should eql [ 1, 2 ]
-        memo[ :foo  ].should eql true
-        memo[ :bar  ].should eql nil
+        on.value_x.should eql [ [ :foo ], nil, [ 1, 2 ] ]
       end
     end
   end

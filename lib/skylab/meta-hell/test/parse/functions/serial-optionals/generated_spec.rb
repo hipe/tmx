@@ -54,15 +54,15 @@ module Skylab::MetaHell::TestSupport::Parse::Serial_Optionals
       feet_rx = /\A\d+\z/
       inch_rx = /\A\d+(?:\.\d+)?\z/
       p = Subject_[].serial_optionals.new_with(
-        :function_objects,
-        -> st do
+        :functions,
+        :proc, -> st do
           if feet_rx =~ st.current_token_object.value_x
             tok = st.current_token_object
             st.advance_one
             Subject_[]::Output_Node_.new tok.value_x.to_i
           end
         end,
-        -> st do
+        :proc, -> st do
           if inch_rx =~ st.current_token_object.value_x
             tok = st.current_token_object
             st.advance_one

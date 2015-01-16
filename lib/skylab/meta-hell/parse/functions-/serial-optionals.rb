@@ -104,7 +104,7 @@ module Skylab::MetaHell
         formal_d = 0
         is_exhausted = false
 
-        f_p_a = @mutable_function_a
+        f_p_a = @function_a
         formal_length = f_p_a.length
         output_a = ::Array.new formal_length
 
@@ -121,10 +121,10 @@ module Skylab::MetaHell
               break
             end
 
-            output_node = f_p_a.fetch( formal_d ).call st
+            on = f_p_a.fetch( formal_d ).output_node_via_input_stream st
 
-            if output_node
-              output_a[ formal_d ] = output_node.value_x
+            if on
+              output_a[ formal_d ] = on.value_x
               do_stay = false
             end
 

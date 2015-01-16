@@ -33,17 +33,22 @@ module Skylab::MetaHell
       end
 
       def to_matcher
+
         p = self
+
         -> input_token_s do
-          output_token = p.call Parse_::Input_Streams_::Single_Token.new input_token_s
-          if output_token
-            output_token.value_x  # sanity
+
+          on = p.output_node_via_input_stream(
+            Parse_::Input_Streams_::Single_Token.new input_token_s )
+
+          if on
+            on.value_x  # sanity
             true
           end
         end
       end
 
-      def call in_st
+      def output_node_via_input_stream in_st
         if @does_need_hotstring
           if @ss
             Resolve_hotstrings__[ @ss ]

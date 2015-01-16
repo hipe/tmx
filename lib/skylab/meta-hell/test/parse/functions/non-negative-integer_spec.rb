@@ -21,7 +21,8 @@ module Skylab::MetaHell::TestSupport::Parse
     end
 
     def against s
-      on = subject.call Subject_[]::Input_Streams_::Single_Token.new s
+      on = subject.output_node_via_input_stream(
+        Subject_[]::Input_Streams_::Single_Token.new s )
       if on
         on.value_x
       end

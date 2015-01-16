@@ -61,15 +61,6 @@ module Skylab::MetaHell
         ok_x && KEEP_PARSING_
       end
 
-      def function_objects=
-        st = @__methodic_actor_iambic_stream__
-        @function_a = []
-        while st.unparsed_exists
-          @function_a.push st.gets_one
-        end
-        KEEP_PARSING_
-      end
-
       def function_objects_array=
         @function_a = iambic_property
         KEEP_PARSING_
@@ -78,9 +69,8 @@ module Skylab::MetaHell
     public
 
       def execute
-        if @input_stream  # one-off
-          @mutable_function_a = @function_a
-          @function_a = nil
+        @function_a.freeze
+        if @input_stream  # then this function is an inline one-off
           parse_
         else
           freeze
@@ -101,37 +91,42 @@ module Skylab::MetaHell
 
           in_st = Parse_::Input_Streams_::Array.new argv
 
-          output_node = call in_st
+          on = output_node_via_input_stream in_st
 
           if in_st.unparsed_exists
             raise self.class.build_extra_input_tokens_event( in_st ).to_exception
           else
-            output_node.value_x
+            on.value_x
           end
         end
       end
 
       def parse_and_mutate_array a
+        _call_and_mutate_array( a ).value_x  # until this doesn't work
+      end
+
+      def to_call_and_mutate_array_proc
+        method :_call_and_mutate_array
+      end
+
+      def _call_and_mutate_array a
         st = Parse_::Input_Streams_::Array.new a
         d = st.current_index
-        on = call st
-        x = on.value_x
+        on = output_node_via_input_stream st
         positive_delta = st.current_index - d
         if positive_delta.nonzero?
           a[ 0, positive_delta ] = EMPTY_A_
         end
-        x
+        on
       end
 
-      def call in_st
+      def output_node_via_input_stream in_st
         dup.__init_for_parse( in_st ).parse_
       end
 
     protected
 
       def __init_for_parse in_st
-        @mutable_function_a = @function_a.dup
-        @function_a = nil
         @input_stream = in_st
         self
       end

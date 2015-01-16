@@ -2,44 +2,20 @@ module Skylab::MetaHell
 
   module Parse
 
-    # more flexible, powerful and complex pool-based deterministic parsing
+    # unlike "serial optionals" and "simple pool", this non-terminal function
+    # frontiers the use of the new `function_is_spent` field:
     #
-    # each parsing node in `set_a` must respond to `[]` (e.g. `call` of a
-    # ::Proc, which we will refer to as `parse` below), that results in
-    # two arguments:
+    # like "orderd pool" the constituent functions are held in a diminishing
+    # pool. unlike "simple pool", these functions are not each necessarily
+    # removed from the pool when they succeed in parsing. that is what the
+    # `function_is_spent` field is for: IFF the function expresses this field
+    # as true-ish (or it fails to match) will it be removed from the pool.
     #
-    # the result of `parse` is assumed be a tuple of two boolean-ish values:
-    # the first indicating whether anything was parsed, and the second
-    # indicating whether the node was "spent" on that parse. whether or not
-    # anything was parsed will be used to decide whether to continue the parse
-    # after this pass. when a node reports that it is "spent" it is
-    # effectively removed from the pool of nodes that will be used on
-    # subsequent passes for the remainder of this parse.
+    # this mechanism is crucial for certain kinds of nonterminal functions,
+    # those with "trailing optional" kleene-star style constituents.
     #
-    # the parse is finished when either no node "parsed" during that pass,
-    # or all nodes are "spent" (that is, there are no nodes left in the
-    # running).
-    #
-    # this allows for nodes that parse by mutating the argv in undefined ways,
-    # e.g possibly adding new elements or changing existing elements; rather
-    # than just removing elements. Note too that this allows for the
-    # possibility that any node could potentially make the parse loop forever,
-    # if for e.g the node continually reports that it parsed the argv, and
-    # that it is not spent. this is the liability that accompanies a power as
-    # absolute as this.
-    #
-    # the *arguments* to `parse` are the reminder of whatever arguments you
-    # pass to the entrypoint function. e.g typically they would be two
-    # arguments, the first being a `memo` #output-argument, and the second
-    # begin e.g `argv`.
-    #
-    # the result will be the the same two-element tuple with the same
-    # semantics: the first indicating if anything was ever parsed (as reported
-    # by the nodes) and the second indicating if *all* of the nodes were spent.
-    # you are on your own to code the semantics of the parse itself into
-    # your `memo` as an #output-argument.
-    #
-    # regardless of the input,
+    # the parse is finished when either no node parsed during that pass
+    # or all nodes are spent (that is, when the pool is empty).
     #
     # with one such parser build from an empty set of parsers,
     #
@@ -157,38 +133,82 @@ module Skylab::MetaHell
     #     memo[ :foo  ]  # => true
     #     memo[ :bar  ]  # => nil
 
-    Via_Set__ = Parse::Curry_[
-      :algorithm, -> parse, input_x_a do
-        did_parse_any = parsed_none_last_pass = false
-        pool_a = parse.get_pool_proc_a
-        while true
-          if ( len = pool_a.length ).zero?
+
+    class Functions_::Spending_Pool < Parse_::Function_::Currying
+
+      def parse_
+
+        func_a = @function_a
+        d = func_a.length
+        res_a = ::Array.new d
+        pool_idx_a = d.times.to_a
+        d = nil
+
+        in_st = @input_stream
+
+        did_parse_any = did_spend_all = parsed_none_last_pass = false
+
+        unparsed_exists = in_st.unparsed_exists
+
+        while unparsed_exists
+
+          pool_length = pool_idx_a.length
+
+          if pool_length.zero?
             did_spend_all = true
             break
           end
-          parsed_none_last_pass and break
-          spent_this_pass = parsed_this_pass = false
-          len.times do |i|
-            parsed, spent = pool_a.fetch( i )[ * input_x_a ]
-            parsed and parsed_this_pass ||= true
-            if spent
-              spent_this_pass ||= true
-              pool_a[ i ] = nil
-            end
+
+          if parsed_none_last_pass
+            break
           end
-          spent_this_pass and pool_a.compact!
+
+          spent_this_pass = parsed_this_pass = false
+
+          pool_length.times do | idx_idx |
+
+            func_idx = pool_idx_a.fetch idx_idx
+
+            on = func_a.fetch( func_idx ).output_node_via_input_stream in_st
+
+            if on
+
+              ( res_a[ func_idx ] ||= [] ).push on.value_x
+
+              parsed_this_pass = true
+              is_spent = on.function_is_spent
+              unparsed_exists = in_st.unparsed_exists
+
+            else
+              is_spent = false
+                # hm .. did the function "spend" even though it didn't parse?
+            end
+
+            if is_spent
+              spent_this_pass = true
+              pool_idx_a[ idx_idx ] = nil
+            end
+
+            unparsed_exists or break
+          end
+
+          if spent_this_pass
+            pool_idx_a.compact!
+          end
+
           if parsed_this_pass
-            did_parse_any ||= true
+            did_parse_any = true
           else
             parsed_none_last_pass = true
           end
         end
-        [ did_parse_any, did_spend_all || false ]
-      end,
-      :uncurried_queue, [ :argv ],
-      :call, -> * input_x_a do
-        absorb_along_curry_queue_and_execute input_x_a
+
+        if did_parse_any
+
+          Parse_::Output_Node_.new_with res_a, :did_spend_function, did_spend_all
+
+        end
       end
-    ]
+    end
   end
 end

@@ -17,7 +17,7 @@ module Skylab::MetaHell::TestSupport::Parse
     end
 
     def against_input_array s_a
-      subject.call input_stream_via_array s_a
+      subject.output_node_via_input_stream input_stream_via_array s_a
     end
 
     def input_stream_via_array s_a

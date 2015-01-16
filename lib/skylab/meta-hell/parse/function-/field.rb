@@ -71,6 +71,24 @@ module Skylab::MetaHell
           self.class.__function_supercategory_symbol
         end
       end
+
+      class Field::Proc_Based < Field
+
+        class << self
+
+          def new_via_iambic_stream_passively st
+            new_via_proc st.gets_one
+          end
+
+          def new_via_proc p
+            new( p )
+          end
+        end
+
+        def initialize p
+          @p = p
+        end
+      end
     end
   end
 end

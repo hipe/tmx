@@ -101,7 +101,7 @@ module Skylab::MetaHell::TestSupport::Parse::Serial_Optionals
     def against * s_a
       st = input_stream_via_array s_a
       d = st.current_index
-      on = G.call st
+      on = G.output_node_via_input_stream st
       @int, @kw = on.value_x
       if d == st.current_index
         @did_parse = false

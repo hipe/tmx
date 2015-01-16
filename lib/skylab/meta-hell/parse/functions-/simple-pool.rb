@@ -65,7 +65,7 @@ module Skylab::MetaHell
     class Functions_::Simple_Pool < Parse::Function_::Currying
 
       def parse_
-        pool_a = @mutable_function_a
+        pool_a = @function_a
         len = pool_a.length
         pool_idx_a = len.times.to_a
         res_a = ::Array.new len
@@ -75,11 +75,11 @@ module Skylab::MetaHell
 
           index, x = pool_idx_a.each_with_index.reduce nil do |_, (idx, idx_idx)|
 
-            output_node = pool_a.fetch( idx ).call in_st
+            on = pool_a.fetch( idx ).output_node_via_input_stream in_st
 
-            if output_node
+            if on
               pool_idx_a[ idx_idx, 1 ] = EMPTY_A_
-              break [ idx, output_node.value_x ]
+              break [ idx, on.value_x ]
             end
           end
 
