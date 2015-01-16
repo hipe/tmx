@@ -2,13 +2,28 @@ require_relative '../test-support'
 
 module Skylab::MetaHell::TestSupport::Parse
 
-  ::Skylab::MetaHell::TestSupport[ self ]
+  ::Skylab::MetaHell::TestSupport[ TS_ = self ]
 
   include Constants
 
   MetaHell_ = MetaHell_
 
   extend TestSupport_::Quickie
+
+  module InstanceMethods
+
+    def against * s_a
+      against_input_array s_a
+    end
+
+    def against_input_array s_a
+      subject.call input_stream_via_array s_a
+    end
+
+    def input_stream_via_array s_a
+      Subject_[]::Input_Streams_::Array.new s_a
+    end
+  end
 
   LIB_ = ::Object.new
   class << LIB_

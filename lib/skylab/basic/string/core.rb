@@ -72,6 +72,22 @@ module Skylab::Basic
       end
       LINE_RX__  = / [^\r\n]* \r? \n  |  [^\r\n]+ \r? \n? /x
 
+      def shortest_unique_or_first_headstrings a
+        h = nil
+        Basic_::Hash.determine_hotstrings( a ).each_with_index.map do | hs, d |
+          if hs
+            hs.hotstring
+          else
+            h ||= {}
+            s = a.fetch d
+            h.fetch s do
+              h[ s ] = nil
+              s
+            end
+          end
+        end
+      end
+
       def template
         String::Template__
       end

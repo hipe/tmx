@@ -145,9 +145,15 @@ module Skylab::MetaHell
         ok_x = true
         @function_a = []
         while st.unparsed_exists
-          cls = Parse_.function_ st.gets_one # if ever needed we can soften this
+          cls = Parse_.function_ st.gets_one  # if ever needed we can soften this
           ok_x = cls.new_via_iambic_stream_passively st
           ok_x or break
+
+          if ok_x.respond_to? :receive_sibling_sandbox
+            @__ss ||= Function_::Nonterminal::Sibling_Sandbox.new @function_a
+            ok_x.receive_sibling_sandbox @__ss
+          end
+
           @function_a.push ok_x
         end
         ok_x && KEEP_PARSING_

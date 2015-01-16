@@ -4,6 +4,8 @@ module Skylab::MetaHell::TestSupport::Parse::Serial_Optionals
 
 describe "[mh] serial optionals" do
 
+  extend TS_
+
   context "my first nonterminal (integration)" do
 
     define_method :subject, ( Callback_.memoize do
@@ -22,10 +24,6 @@ describe "[mh] serial optionals" do
 
     it "built thing is a stream parser (parse a full normal input)" do
       against( 'rando', '2' ).value_x.should eql [ :randomize, 2 ]
-    end
-
-    def against * s_a
-      subject.call Subject_[]::Input_Streams_::Array.new s_a
     end
   end
 

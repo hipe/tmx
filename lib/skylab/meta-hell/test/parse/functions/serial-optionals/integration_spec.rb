@@ -4,6 +4,8 @@ module Skylab::MetaHell::TestSupport::Parse::Serial_Optionals
 
   describe "[mh] parse functions - serial optionals - integrate w/ int & kw" do
 
+    extend TS_
+
     before :all do
 
       G = Subject_[].serial_optionals.new_with(
@@ -97,7 +99,7 @@ module Skylab::MetaHell::TestSupport::Parse::Serial_Optionals
     end
 
     def against * s_a
-      st = Subject_[]::Input_Streams_::Array.new s_a
+      st = input_stream_via_array s_a
       d = st.current_index
       on = G.call st
       @int, @kw = on.value_x
