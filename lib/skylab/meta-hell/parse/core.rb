@@ -8,10 +8,6 @@ module Skylab::MetaHell
         Parse_::Alternation__
       end
 
-      def fields
-        Parse_::Fields__
-      end
-
       def function_ sym
         Parse_::Functions_.const_get(
           Callback_::Name.via_variegated_symbol( sym ).as_const,
@@ -28,10 +24,6 @@ module Skylab::MetaHell
         else
           Parse_::Functions_::Serial_Optionals.call_via_highlevel_arglist a
         end
-      end
-
-      def via_ordered_set
-        Parse_::Via_Ordered_Set__
       end
 
       def via_set

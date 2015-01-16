@@ -2,25 +2,32 @@ module Skylab::MetaHell
 
   module Parse
 
-    # "from ordered set" result is array of same length as `set_a`.
+    # :[#027]: this function cannot fail. output value is a tuple (array)
+    # whose length is the number of constituents in the grammar.
     #
-    # sorta like the packrat parser algorithm, `argv` (if any) will be evaluated
-    # against each remaining element in `set_a`. each element of `set_a` is
-    # assumed to be a function that takes one arg: `argv`. if that function's
-    # result is anything other than nil, it is taken to mean it succeeded in
-    # matching (and should probably have shifted one or more elements off of
-    # `argv`). if the function matched, the function is removed from the
-    # running. the parse is finished and the function yields a result when
-    # either `argv` is empty or there are no more unmatched elements in `set_a`
-    # *or* a matching function could not be found for the current front element
-    # of `argv`. (this function is [#027].)
+    # inspired by the packrat parser algorithm. the constituent parse
+    # functions of this nonterminal are put in an ordered "pool", in the order
+    # they exist in the grammar. the input scanner is passed to each function
+    # in this pool in its order. any first function that matches against the
+    # scanner will be removed from the pool. (in such cases the function
+    # should probably have advanced the scanner).
     #
-    # in contrast to the similar acting "parse series", this algorithm treats
-    # the parsers in the running as a set - any one can match the current
-    # state of input; whereas with the other function, the input symbols
-    # must occur in the order they appear in the grammar. our set is called
-    # "ordered" because the order the symbols appear in determines the order
-    # of the result.
+    # if there is more remaining unparsed input in the scanner and more
+    # remaining unused functions in the pool, this process is repeated again
+    # from the front item of the pool.
+    #
+    # the parse is finished when either a) there is nothing more to parse in
+    # the input scanner or b) there are no more functions left in the pool or
+    # c) a matching function is not found for the current state of the input
+    # scanner.
+    #
+    # in contrast to the similar acting "serial optionals" nonterminal
+    # function, this algorithm treats the pool as set - any function in it
+    # can match the current state of input; whereas with the other function,
+    # the input symbols must occur in the order their corresponding functions
+    # appear in the grammar. we call this function "ordered" only because our
+    # result structure is a tuple whose items correspond to the grammar
+    # constituents positionally.
     #
     # with an ordered set parser (built from a list of arbitrary procs)
     #
@@ -55,27 +62,36 @@ module Skylab::MetaHell
     #     argv.length  # => 3
     #
 
-    Via_ordered_set__ = Parse::Curry_[
-      :algorithm, -> parse, argv do
-        set_a = parse.normal_argv_proc_a
-        len = set_a.length
-        running_a = len.times.to_a
+    class Functions_::Simple_Pool < Parse::Function_::Currying
+
+      def parse_
+        pool_a = @mutable_function_a
+        len = pool_a.length
+        pool_idx_a = len.times.to_a
         res_a = ::Array.new len
-        while argv.length.nonzero? and running_a.length.nonzero?
-          index, res = running_a.each_with_index.reduce nil do |_, (idx, idx_idx)|
-            b, x = set_a.fetch( idx ).call argv
-            if b
-              running_a[ idx_idx ] = nil
-              running_a.compact!
-              break[ idx, x ]
+        in_st = @input_stream
+
+        while in_st.unparsed_exists && pool_idx_a.length.nonzero?
+
+          index, x = pool_idx_a.each_with_index.reduce nil do |_, (idx, idx_idx)|
+
+            output_node = pool_a.fetch( idx ).call in_st
+
+            if output_node
+              pool_idx_a[ idx_idx, 1 ] = EMPTY_A_
+              break [ idx, output_node.value_x ]
             end
           end
-          index or break
-          res_a[ index ] = res
-        end
-        res_a
-      end,
-      :uncurried_queue, [ :argv_streams, :argv ] ]
 
+          if index
+            res_a[ index ] = x
+          else
+            break
+          end
+        end
+
+        Parse_::Output_Node_.new res_a
+      end
+    end
   end
 end

@@ -11,6 +11,12 @@ module Skylab::MetaHell
         @x_a_length = x_a.length
       end
 
+      def gets_one
+        x = current_token_object
+        advance_one
+        x
+      end
+
       def unparsed_exists
         @x_a_length != @d
       end
