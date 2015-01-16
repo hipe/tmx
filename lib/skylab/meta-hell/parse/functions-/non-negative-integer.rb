@@ -4,6 +4,8 @@ module Skylab::MetaHell
 
     class Functions_::Non_Negative_Integer < Parse::Function_::Field
 
+      # this function :+#cannot-operate-on-the-empty-stream.
+
       _RX = /\A\d+\z/
 
       same_method = -> in_st do

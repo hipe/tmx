@@ -22,7 +22,7 @@ module Skylab::MetaHell
         if a.length.zero?
           Parse_::Functions_::Serial_Optionals
         else
-          Parse_::Functions_::Serial_Optionals.call_via_highlevel_arglist a
+          Parse_::Functions_::Serial_Optionals.parse_via_highlevel_arglist a
         end
       end
 

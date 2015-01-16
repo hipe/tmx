@@ -7,7 +7,7 @@ module Skylab::MetaHell::TestSupport::Parse::Spending_Pool
     context "with one such parser build from an empty set of parsers" do
 
       before :all do
-        None = Subject_[].new_with( :functions ).to_call_and_mutate_array_proc
+        None = Subject_[].new_with( :functions ).to_output_node_and_mutate_array_proc
       end
       it "a parser with no nodes in it will always report 'no parse' and 'spent'" do
         None[ MetaHell_::EMPTY_A_ ].should be_nil
@@ -24,7 +24,7 @@ module Skylab::MetaHell::TestSupport::Parse::Spending_Pool
           :functions,
             :proc, -> in_st do
               Parse_lib_[]::Output_Node_.new nil
-            end ).to_call_and_mutate_array_proc
+            end ).to_output_node_and_mutate_array_proc
 
       end
       it "is always this same output node" do
@@ -39,7 +39,7 @@ module Skylab::MetaHell::TestSupport::Parse::Spending_Pool
           :functions,
             :proc, -> in_st do
               nil
-            end ).to_call_and_mutate_array_proc
+            end ).to_output_node_and_mutate_array_proc
       end
       it "never parses" do
         Spendless[ :whatever ].should be_nil
@@ -60,7 +60,7 @@ module Skylab::MetaHell::TestSupport::Parse::Spending_Pool
               if on
                 on.new_with :function_is_not_spent
               end
-            end ).to_call_and_mutate_array_proc
+            end ).to_output_node_and_mutate_array_proc
       end
       it "does nothing with nothing" do
         Digits[ MetaHell_::EMPTY_A_ ].should eql nil

@@ -17,6 +17,8 @@ module Skylab::MetaHell
     # the parse is finished when either no node parsed during that pass
     # or all nodes are spent (that is, when the pool is empty).
     #
+    # this function is :+#empty-stream-safe.
+    #
     # with one such parser build from an empty set of parsers,
     #
     #     None = Subject_[].via_set.curry_with :pool_procs, []

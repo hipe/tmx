@@ -32,6 +32,11 @@ module Skylab::MetaHell
 
     private
 
+      def input_array=
+        @input_stream = _input_stream_via_array iambic_property
+        KEEP_PARSING_
+      end
+
       def matcher_functions=
         st = @__methodic_actor_iambic_stream__
         @function_a = []
@@ -89,7 +94,7 @@ module Skylab::MetaHell
 
         -> argv do
 
-          in_st = Parse_::Input_Streams_::Array.new argv
+          in_st = _input_stream_via_array argv
 
           on = output_node_via_input_stream in_st
 
@@ -102,15 +107,15 @@ module Skylab::MetaHell
       end
 
       def parse_and_mutate_array a
-        _call_and_mutate_array( a ).value_x  # until this doesn't work
+        _output_node_and_mutate_array( a ).value_x  # until this doesn't work
       end
 
-      def to_call_and_mutate_array_proc
-        method :_call_and_mutate_array
+      def to_output_node_and_mutate_array_proc
+        method :_output_node_and_mutate_array
       end
 
-      def _call_and_mutate_array a
-        st = Parse_::Input_Streams_::Array.new a
+      def _output_node_and_mutate_array a
+        st = _input_stream_via_array a
         d = st.current_index
         on = output_node_via_input_stream st
         positive_delta = st.current_index - d
@@ -118,6 +123,18 @@ module Skylab::MetaHell
           a[ 0, positive_delta ] = EMPTY_A_
         end
         on
+      end
+
+      def output_node_via_input_array_fully a
+        st = _input_stream_via_array a
+        on = output_node_via_input_stream st
+        if on and ! st.unparsed_exists
+          on
+        end
+      end
+
+      def output_node_via_single_token_value x
+        output_node_via_input_stream _input_stream_via_array [ x ]
       end
 
       def output_node_via_input_stream in_st
@@ -129,6 +146,12 @@ module Skylab::MetaHell
       def __init_for_parse in_st
         @input_stream = in_st
         self
+      end
+
+    private
+
+      def _input_stream_via_array a
+        Parse_::Input_Streams_::Array.new a
       end
     end
   end

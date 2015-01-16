@@ -22,7 +22,7 @@ module Skylab::MetaHell
 
         super
 
-        @moniker_symbol = @formal_string.intern
+        @moniker_symbol ||= @formal_string.intern
         @formal_length = @formal_string.length
         @does_need_hotstring = true
         @ss = nil
@@ -75,6 +75,8 @@ module Skylab::MetaHell
         # a hotstring and (b) the hotstring must occur at the beginning of the
         # token string. any remainder of the token string that goes "over" the
         # hotstring must match the appropriate substring of the formal string.
+        #
+        # this function :+#cannot-operate-on-the-empty-stream.
 
         tok_s = in_st.current_token_object.value_x
         tok_d = tok_s.length

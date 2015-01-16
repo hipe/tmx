@@ -23,6 +23,8 @@ module Skylab::MetaHell
     # if the end of the input is reached before the end of the grammar, the
     # function simply results with the result value array as-is.
     #
+    # this function is :+#empty-stream-safe.
+    #
     # using the highlevel shorthand inline convenience macro:
     #
     #     args = [ '30', 'other' ]
@@ -81,7 +83,7 @@ module Skylab::MetaHell
 
       class << self
 
-        def call_via_highlevel_arglist a
+        def parse_via_highlevel_arglist a
 
           # super oldschool highlevel macro: first arg is ARGV, remaining
           # args are matchers (constituency of the grammar). if unparsed

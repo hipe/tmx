@@ -2,65 +2,46 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::Parse::Alternation
 
-  describe "[mh] parse field- values- (integration)", wip: true do
+  describe "[mh] parse functions - alternation - (integration)" do
 
     before :all do
-      module Bazzle
-        flag = Subject_[].fields.flag
-        BRANCH_ = Subject_[].alternation.curry_with(
-          :syntax, :monikate, -> a { a * ' | ' },
-          :field, flag,
-            :moniker, :help,
-            :predicate, :do_help,
-            :short, '-h', :long, '--help',
-          :field, flag,
-            :moniker, :server,
-            :predicate, :do_server,
-            :fuzzy_min, 1,
-          :call, -> * input_x_a do
-            with :state_x_a, input_x_a
-            execute
-          end,
-          :constantspace, self
-        )
-      end
+
+      Bazzle = Subject_[].new_with(
+        :functions,
+          :keyword, '--help',
+            :moniker_symbol, :do_help,
+          :keyword, '-h',
+            :moniker_symbol, :do_help,
+          :keyword, :server ).to_output_node_and_mutate_array_proc
+
     end
 
-    def parse_argv any_argv
-      Bazzle::BRANCH_.parse_argv any_argv
-    end
-
-    it "nil - nil" do
-      parse_argv( nil ).should be_nil
-    end
-
-    STRANGE_A_ = [ 'strange' ].freeze
-
-    it "strange token - nil and argv is left alone" do
-      r = parse_argv STRANGE_A_
-      r.should be_nil
+    it "strange token - nil argv is left alone" do
+      argv = %w( strange )
+      against( argv ).should be_nil
+      argv.length.should eql 1
     end
 
     it "strange token blocks parsing of subsequent recognized tokens" do
       argv = [ 'strange', '-h' ]
-      r = parse_argv argv
-      r.should be_nil
-      argv.should eql( %w( strange -h ) )
+      against( argv ).should be_nil
+      argv.length.should eql 2
     end
 
     it "one recognized token then one strange - parses and consumes" do
       argv = [ '-h', 'strange' ]
-      r = parse_argv argv
-      r.do_help.should eql( true )
-      r.do_server.should eql( nil )
-      argv.should eql( [ 'strange' ] )
+      against( argv ).value_x.should eql :do_help
+      argv.should eql [ 'strange' ]
     end
 
     it "two recognizables - only parses first b.c is a branch" do
       argv = [ 'server', '-h' ]
-      r = parse_argv argv
-      r.to_a.should eql( [ nil, true ] )
-      argv.should eql( [ '-h' ] )
+      against( argv ).value_x.should eql :server
+      argv.should eql [ '-h' ]
+    end
+
+    def against argv
+      Bazzle[ argv ]
     end
   end
 end

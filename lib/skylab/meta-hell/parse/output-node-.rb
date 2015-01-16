@@ -27,10 +27,10 @@ module Skylab::MetaHell
       end
 
       def members
-        [ :function_is_spent, :value_x ]
+        [ :constituent_index, :function_is_spent, :value_x ]
       end
 
-      attr_reader :function_is_spent, :value_x
+      attr_reader :constituent_index, :function_is_spent, :value_x
 
       def new_with * x_a
         otr = dup
@@ -46,6 +46,11 @@ module Skylab::MetaHell
       def __init_with_magic_syntax_via_iambic_stream st
         @value_x = st.gets_one
         process_iambic_stream_fully st
+      end
+
+      def constituent_index=
+        @constituent_index = iambic_property
+        KEEP_PARSING_
       end
 
       def did_spend_function=

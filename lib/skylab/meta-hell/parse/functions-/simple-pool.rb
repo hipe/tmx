@@ -29,6 +29,8 @@ module Skylab::MetaHell
     # result structure is a tuple whose items correspond to the grammar
     # constituents positionally.
     #
+    # this function is :+#empty-stream-safe.
+    #
     # with an ordered set parser (built from a list of arbitrary procs)
     #
     #     PARSER = Subject_[].via_ordered_set.curry_with(

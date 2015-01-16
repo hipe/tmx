@@ -2,37 +2,45 @@ module Skylab::MetaHell
 
   module Parse
 
-    # parse `input_x` using no more than one of the parsers from the ordered
-    # pool `pool_a`, where 'parser' is defined as a function that takes two
-    # parameters - `output_x` and `input_x` - and whose result's particular
-    # true-ish-ness reflects whether or not the the parse/parser matched/
-    # succeeded/was spent. the final result is nil if nothing matched,
-    # otherwise the (true-ish) result of the parser/parse that matched (and
-    # presumably parsed, and presumably wrote something to `input_x` if
-    # desired). allà packrat parsers, parsing is deterministic (there is no
-    # ambiguity) because order matters; first match wins.
+    # like all others, this nonterminal parse function is an aggregation
+    # composed of N other parse functions. it passes the input stream to
+    # each constituent in order, stopping at any first one that succeeds
+    # in parsing (the "winner").
     #
-    # it is impossible for this function to result in false.
+    # if a winner is found the resulting output node will contain a) any
+    # output value produced by the function (some functions might ignore
+    # this field) and b) the offset of the parse function in the grammar
+    # (0 thru N-1 inclusive), expressed in the special output node field
+    # `constituent_index`.
     #
-    # this facility has absolutely no knowlege of the shape or behavior of
-    # `input_x` and `output_x` - that is up to you and your functions. all
-    # this function cares about on this end is the true-ish-ness of your
-    # functions' result, at which point when found it short-circuits further
-    # processing. in fact, forget we said anything about two parameters -
-    # it's just `state_x_a`.
+    # so when a winner is found you have an ouput node with the index of
+    # the constituent and its (any) output value. if no winner was found
+    # the result of the `output_node_[..]` call is `nil`.
+    #
+    # allà packrat parsers, this parse is deterministic: there can be no
+    # ambiguity because order matters; first match wins.
+    #
+    # this function is :+#empty-stream-safe.
 
-    Alternation__ = Parse::Curry_[
-      :algorithm, -> parse, state_x_a do
-        parse.get_pool_proc_a.reduce nil do |_, p|
-          x = p[ * state_x_a ]
-          break x if x
+    class Functions_::Alternation < Parse_::Function_::Currying
+
+      def parse_
+
+        in_st = @input_stream
+
+        @function_a.each_with_index.reduce nil do | _, ( g, d ) |
+
+          on = g.output_node_via_input_stream in_st
+
+          if on
+
+            break Parse_::Output_Node_.new_with on.value_x,
+              :constituent_index, d
+
+          end
         end
-      end,
-      :uncurried_queue, [ :pool_procs, :state_x_a ],
-      :call, -> parser_a, * state_x_a do
-        absorb_along_curry_queue_and_execute parser_a, state_x_a
-      end,
-      :glob_extra_args ]
+      end
+    end
   end
 
   # minimally you can call it inine with (p_a, arg)
