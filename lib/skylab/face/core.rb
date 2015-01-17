@@ -124,10 +124,6 @@ module Skylab::Face  # read [#011] the top node narrative
       Callback_::Name.via_variegated_symbol( i ).as_slug
     end
 
-    Parse_series = -> * a do
-      MH__[]::Parse.series.call_via_arglist a
-    end
-
     Plugin_lib = -> do
       Face_::Plugin
     end
@@ -138,6 +134,10 @@ module Skylab::Face  # read [#011] the top node narrative
 
     Scanner_for_array = -> a do
       Bsc__[]::List.line_stream a
+    end
+
+    Parse_lib = -> do
+      MH__[]::Parse
     end
 
     Strange_proc = -> do

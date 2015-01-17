@@ -131,18 +131,18 @@ module Skylab::Face
       if args.length.nonzero? and args.fetch( 0 ).respond_to?(:each_with_index)
         _tuple_a = args.shift
 
-        user_default_width, = LIB_.parse_series args,
+        user_default_width, = LIB_.parse_lib.parse_serial_optionals args,
           -> x { x.respond_to? :call }
 
         _tuple_a.map do |tpl_a|
 
-          Pen_.new( * LIB_.parse_series( tpl_a,
+          Pen_.new( * LIB_.parse_lib.parse_serial_optionals( tpl_a,
             -> x { x.respond_to? :ascii_only? },
             -> x { x.respond_to? :id2name } ) )
         end
       else
 
-        glyph, color, user_default_width = LIB_.parse_series args,
+        glyph, color, user_default_width = LIB_.parse_lib.parse_serial_optionals args,
           -> x { x.respond_to? :ascii_only? },
           -> x { x.respond_to? :id2name },
           -> x { x.respond_to? :call }

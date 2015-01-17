@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::Parse::Serial_Optionals
+module Skylab::MetaHell::TestSupport::Parse::Functions::Serial_Optionals
 
   describe "[mh] parse functions - serial optionals - integrate w/ int & kw" do
 
@@ -8,7 +8,7 @@ module Skylab::MetaHell::TestSupport::Parse::Serial_Optionals
 
     before :all do
 
-      G = Subject_[].serial_optionals.new_with(
+      G = Subject_[].new_with(
         :functions,
           :non_negative_integer,
             :moniker_symbol, :integer,

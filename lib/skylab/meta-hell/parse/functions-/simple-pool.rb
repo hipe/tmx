@@ -33,25 +33,36 @@ module Skylab::MetaHell
     #
     # with an ordered set parser (built from a list of arbitrary procs)
     #
-    #     PARSER = Subject_[].via_ordered_set.curry_with(
-    #       :argv_streams, [
-    #         -> args { args.shift if args.first =~ /bill/i },
-    #         -> args { if :hi == args.first then args.shift and :hello end } ] )
+    #     bill_rx = /bill/i
+    #
+    #     SP = Parse_lib_[]::Functions_::Simple_Pool.new_with(
+    #       :functions,
+    #         :trueish_mapper, -> in_st do
+    #           if bill_rx =~ in_st.current_token_object.value_x
+    #             in_st.gets_one.value_x
+    #           end
+    #         end,
+    #         :trueish_mapper, -> in_st do
+    #           if :hi == in_st.current_token_object.value_x
+    #             in_st.advance_one
+    #             :hello
+    #           end
+    #         end )
     #
     #
     # result array is in order of "grammar", not of elements in argv:
     #
     #     argv = [ :hi, 'BILLY', 'bob' ]
-    #     one, two = PARSER.call argv
+    #     one, two = SP.parse_and_mutate_array argv
     #     one  # => 'BILLY'
     #     two  # => :hello
     #     argv # => [ 'bob' ]
     #
     #
-    # it cannot fail (if `set_a` is array of monadic functions and `argv` is ary)
+    # it cannot fail (if arguments have the right shape)
     #
     #     argv = [ :nope ]
-    #     res = PARSER.call argv
+    #     res = SP.parse_and_mutate_array argv
     #     res  # => [ nil, nil ]
     #     argv # => [ :nope ]
     #
@@ -59,7 +70,7 @@ module Skylab::MetaHell
     # an unparsable element will "mask" subsequent would-be parsables:
     #
     #     argv = [ :nope, 'BILLY', :hi ]
-    #     res = PARSER.call argv
+    #     res = SP.parse_and_mutate_array argv
     #     res  # => [ nil, nil ]
     #     argv.length  # => 3
     #

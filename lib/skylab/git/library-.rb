@@ -75,13 +75,13 @@ module Skylab::Git
       MH__[].funcy_globless x
     end
 
-    Fuzzy_matcher = -> x, y do
-      MH__[]::Parse.fuzzy_matcher[ x, y ]
-    end
-
     HL__ = sidesys[ :Headless ]
 
     MH__ = sidesys[ :MetaHell ]
+
+    Parse_lib = -> do
+      MH__[]::Parse
+    end
 
     Path_tools = -> do
       System[].filesystem.path_tools

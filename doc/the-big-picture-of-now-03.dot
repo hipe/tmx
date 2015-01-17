@@ -4,8 +4,9 @@ digraph {
   hear [label="hear"]
   lists [label="lists in [br]"]
   parse [label="parse"]
-  x1 [label="(parsing is\nspecialized n18n)"]
-  x2 [label="(rename \"token scanners\")"]
+  x1 [label="(parsing is\nspecialized n18n)" style=filled]
+  x2 [label="(rename \"token scanners\")" style=filled]
+  cleanup [style=filled]
   sequence [label="sequence (new\nformal symbol\ncategory)"]
   x4 [label="simplify actor,\nunify names" style=filled ]
 

@@ -1,6 +1,6 @@
 require_relative 'serial-optionals/test-support'
 
-module Skylab::MetaHell::TestSupport::Parse::Serial_Optionals
+module Skylab::MetaHell::TestSupport::Parse::Functions::Serial_Optionals
 
 describe "[mh] serial optionals" do
 
@@ -10,7 +10,7 @@ describe "[mh] serial optionals" do
 
     define_method :subject, ( Callback_.memoize do
 
-      Subject_[].function_( :serial_optionals ).new_with(
+      Subject_[].new_with(
         :functions,
           :keyword,
             'randomize', :minimum_number_of_characters, 3,
@@ -29,7 +29,7 @@ describe "[mh] serial optionals" do
 
   it "minimal high level" do
 
-    is_A, is_B = Subject_[].serial_optionals [ :B ],
+    is_A, is_B = Parse_lib_[].parse_serial_optionals [ :B ],
       -> x { :A == x and :foo },
       -> x { :B == x and :bar }
 
@@ -113,7 +113,7 @@ describe "[mh] serial optionals" do
 
     h = formal_symbol_h
 
-    Subject_[].serial_optionals args, * (
+    Parse_lib_[].parse_serial_optionals args, * (
       formal_symbols.map do | sym |
         h.fetch sym
       end )

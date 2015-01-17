@@ -108,7 +108,7 @@ module Skylab::TestSupport
             :required,
               :description, -> y do
 
-                y << "a \"code file\" as input"
+                y << "a file or directory of code as input"
 
               end,
               :property, :path

@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::Parse::Alternation
+module Skylab::MetaHell::TestSupport::Parse::Functions::Alternation
 
   describe "[mh] parse functions - alternation - (integration)" do
 

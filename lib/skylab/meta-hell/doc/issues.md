@@ -48,7 +48,7 @@
 [#029]       #parent-node: [#011] the parse series narrative ..
              (was: #doc-point the autovivifying autoloader narrative )
 [#028]       #tracking-tag `without_warning`
-[#027]       a freeform `parse_series`? basically like minimal packrat parser
+[#027]       a freeeform "serial optionals" basically like minimal packrat parser
 [#026]       #doc-point "tuple tower" defined ..
 [#025]       #doc-point #parent:024 #body-is-inline-in-parent
                `formal` defined informally.

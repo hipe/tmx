@@ -464,6 +464,12 @@ module Skylab::Callback
       @x_a_length - @d
     end
 
+    def gets_one
+      x = current_token
+      advance_one
+      x
+    end
+
     def current_token
       @x_a.fetch @d
     end
@@ -488,10 +494,6 @@ module Skylab::Callback
 
     def current_index= d  # assume is valid index
       @d = d
-    end
-
-    def gets_one
-      x = current_token ; advance_one ; x
     end
 
     # ~ hax (for "collaborators")

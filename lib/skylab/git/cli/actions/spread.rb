@@ -105,7 +105,7 @@ module Skylab::Git
     end
 
     def resolve_something_from_argv argv
-      if argv.length.nonzero? and Match_[ argv[ 0 ] ]
+      if argv.length.nonzero? and Match___[ argv[ 0 ] ]
         argv.shift
         @do_evenulate = true
       else
@@ -119,7 +119,9 @@ module Skylab::Git
         resolve_move_request_from_integers d_a
       end
     end
-    Match_ = Git_.lib_.fuzzy_matcher 1, EL_  # fuzzy match 'e'
+
+    Match___ = Git_.lib_.parse_lib.fuzzy_matcher EL_,
+      :minimum_number_of_characters, 1
 
     def get_parsed_contiguous_integers argv
       a = [ ]

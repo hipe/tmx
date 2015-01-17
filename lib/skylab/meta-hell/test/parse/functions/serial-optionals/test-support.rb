@@ -1,8 +1,8 @@
 require_relative '../../test-support'
 
-module Skylab::MetaHell::TestSupport::Parse::Serial_Optionals
+module Skylab::MetaHell::TestSupport::Parse::Functions::Serial_Optionals
 
-  ::Skylab::MetaHell::TestSupport::Parse[ TS_ = self ]
+  ::Skylab::MetaHell::TestSupport::Parse::Functions[ TS_ = self ]
 
   include Constants
 
@@ -12,7 +12,11 @@ module Skylab::MetaHell::TestSupport::Parse::Serial_Optionals
 
   MetaHell_ = MetaHell_
 
+  Parse_lib_ = Parse_lib_
+
   SPACE_ = ' '.freeze
 
-  Subject_ = Subject_
+  Subject_ = -> do
+    Parse_lib_[]::Functions_::Serial_Optionals
+  end
 end

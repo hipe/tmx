@@ -25,13 +25,13 @@ module Skylab::MetaHell
     #
     # this function is :+#empty-stream-safe.
     #
-    # using the highlevel shorthand inline convenience macro:
+    # there is a highlevel shorthand inline convenience macro:
     #
     #     args = [ '30', 'other' ]
-    #     age, sex, loc =  Subject_[].series[ args,
+    #     age, sex, loc =  Parse_lib_[].parse_serial_optionals args,
     #       -> a { /\A\d+\z/ =~ a },
     #       -> s { /\A[mf]\z/i =~ s },
-    #       -> l { /./ =~ l } ]
+    #       -> l { /./ =~ l }
     #
     #     age  # => '30'
     #     sex  # => nil
@@ -45,8 +45,8 @@ module Skylab::MetaHell
     #
     # curried usage:
     #
-    #     P = Subject_[].series.curry_with(
-    #       :token_matchers, [
+    #     P = Subject_[].new_with(
+    #       :matcher_functions,
     #         -> age do
     #           /\A\d+\z/ =~ age
     #         end,
@@ -55,8 +55,7 @@ module Skylab::MetaHell
     #         end,
     #         -> location do
     #           /\A[A-Z]/ =~ location   # must start with capital
-    #         end
-    #     ] )
+    #         end ).to_parse_array_fully_proc
     #
     #
     # full normal case (works to match each of the three terms).
@@ -78,6 +77,11 @@ module Skylab::MetaHell
     #
     #     P[ [ 'M' ] ]               # => [ nil, 'M', nil ]
     #
+    #
+    # because we have that 'fully' suffix, we raise argument errors
+    #
+    #     argv = [ '30', 'm', "Mom's", "Mom's again" ]
+    #     P[ argv ]  # => ArgumentError: unrecognized argument 'Mom's..
 
     class Functions_::Serial_Optionals < Parse::Function_::Currying
 
@@ -143,13 +147,27 @@ module Skylab::MetaHell
       end
     end
 
-    # indicating `token_scanners` instead of `token_matchers`
+    # you can provide arbitrary procs to implement your parse functions
     #
-    #     p = Subject_[].series.curry_with(
-    #       :token_scanners, [
-    #         -> feet   { /\A\d+\z/ =~ feet and feet.to_i },
-    #         -> inches { /\A\d+(?:\.\d+)?\z/ =~ inches and inches.to_f }
-    #       ] )
+    #     feet_rx = /\A\d+\z/
+    #     inch_rx = /\A\d+(?:\.\d+)?\z/
+    #
+    #     p = Subject_[].new_with(
+    #       :functions,
+    #       :proc, -> st do
+    #         if feet_rx =~ st.current_token_object.value_x
+    #           tok = st.current_token_object
+    #           st.advance_one
+    #           Parse_lib_[]::Output_Node_.new tok.value_x.to_i
+    #         end
+    #       end,
+    #       :proc, -> st do
+    #         if inch_rx =~ st.current_token_object.value_x
+    #           tok = st.current_token_object
+    #           st.advance_one
+    #           Parse_lib_[]::Output_Node_.new tok.value_x.to_f
+    #         end
+    #       end ).to_parse_array_fully_proc
     #
     #     p[ [ "8"   ] ]         # => [ 8,  nil  ]
     #     p[ [ "8.1" ] ]         # => [ nil, 8.1 ]

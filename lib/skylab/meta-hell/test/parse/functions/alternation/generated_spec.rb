@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::Parse::Alternation
+module Skylab::MetaHell::TestSupport::Parse::Functions::Alternation
 
-  describe "[mh] Parse::Alternation__" do
+  describe "[mh] Parse::Functions_::Alternation" do
 
     it "the output node reports the winning index. can be called inline." do
       on = Subject_[].with(

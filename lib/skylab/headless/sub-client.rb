@@ -279,7 +279,7 @@ end
       end
 
       o[ :s ] = -> * args do  # [length] [lexeme_i]
-        len_x, lexeme_i = Headless_.lib_.parse_series args,
+        len_x, lexeme_i = Headless_.lib_.parse_lib.parse_serial_optionals args,
           -> x { ! x.respond_to? :id2name }, # defer it
           -> x { x.respond_to? :id2name }
         lexeme_i ||= :s  # when `len_x` is nil it means "use memoized"

@@ -21,119 +21,119 @@ module Skylab::MetaHell
     #
     # with one such parser build from an empty set of parsers,
     #
-    #     None = Subject_[].via_set.curry_with :pool_procs, []
+    #     None = Subject_[].new_with( :functions ).to_output_node_and_mutate_array_proc
     #
     #
     # a parser with no nodes in it will always report 'no parse' and 'spent':
     #
-    #     None[ argv = [] ]  # => [ false, true ]
-    #     argv # => []
+    #     None[ MetaHell_::EMPTY_A_ ]  # => nil
     #
     #
     # even if the input is rando calrissian:
     #
-    #     None[ argv = :hi_mom ]  # => [ false, true ]
-    #     argv  # => :hi_mom
+    #     None[ :hi_mom ]  # => nil
 
 
     # with parser with one node that reports it always matches & always spends
     #
-    #     One = Subject_[].via_set.curry_with( :pool_procs, [
-    #      -> _input {  [ true, true ] }
-    #     ] )
+    #     One = Subject_[].new_with(
+    #       :functions,
+    #         :proc, -> in_st do
+    #           Parse_lib_[]::Output_Node_.new nil
+    #         end ).to_output_node_and_mutate_array_proc
     #
+    # is always the same output node:
     #
-    # it always reports the same as a final result:
-    #
-    #     One[ :whatever ]  # => [ true, true ]
+    #     on = One[ :whatever ]
+    #     on.function_is_spent  # => true
 
 
     # with a parser with one node that reports it never matches & always spends
     #
-    #     Spendless = Subject_[].via_set.curry_with( :pool_procs, [
-    #       -> _input {  [ false, true ] }
-    #     ] )
+    #     Spendless = Subject_[].new_with(
+    #       :functions,
+    #         :proc, -> in_st do
+    #           nil
+    #         end ).to_output_node_and_mutate_array_proc
     #
+    # it never parses:
     #
-    # it always reports the same as a final result:
-    #
-    #     Spendless[ :whatever ]  # => [ false, true ]
+    #     Spendless[ :whatever ]  # => nil
 
 
-    # a parser that parses any digits & any of 2 keywords (only once each):
+    # of 2 keywords, parse them at most once each. parse any and all digits:
     #
-    #     keyword = -> kw do
-    #       -> memo, argv do
-    #         if argv.length.nonzero? and kw == argv.first
-    #           argv.shift
-    #           memo[ kw.intern ] = true
-    #           [ true, true ]
-    #         end
-    #       end
-    #     end
+    #     _NNI = Parse_lib_[]::Functions_::Non_Negative_Integer
     #
-    #     Digits = Subject_[].via_set.curry_with :pool_procs, [
-    #       keyword[ 'foo' ],
-    #       keyword[ 'bar' ],
-    #       -> memo, argv do
-    #         if argv.length.nonzero? and /\A\d+\z/ =~ argv.first
-    #           ( memo[:nums] ||= [ ] ) << argv.shift.to_i
-    #           [ true, false ]
-    #         end
-    #       end
-    #     ]
+    #     Digits = Subject_[].new_with(
+    #       :functions,
+    #         :keyword, "foo",
+    #         :keyword, "bar",
+    #         :proc, -> in_st do
+    #           on = _NNI.output_node_via_input_stream in_st
+    #           if on
+    #             on.new_with :function_is_not_spent
+    #           end
+    #         end ).to_output_node_and_mutate_array_proc
     #
     #
     # does nothing with nothing:
     #
-    #     Digits[ ( memo = {} ), [] ]  # => [ false, false ]
-    #     memo.length  # => 0
+    #     Digits[ MetaHell_::EMPTY_A_ ]  # => nil
     #
     #
     # parses one digit:
     #
-    #     Digits[ ( memo = { } ), argv = [ '1' ] ]  # => [ true, false ]
+    #     argv = [ '1' ]
+    #     on = Digits[ argv ]
     #     argv.length  # => 0
-    #     memo[ :nums ]  # => [ 1 ]
+    #     on.function_is_spent  # => false
+    #     kw, k2, digits = on.value_x
+    #     ( kw || k2 )  # => nil
+    #     digits  # => [ 1 ]
     #
     #
     # parses two digits:
     #
-    #     Digits[ ( memo = { } ), argv = [ '2', '3' ] ]  # => [ true, false ]
-    #     argv.length  # => 0
-    #     memo[ :nums ]  # => [ 2, 3 ]
+    #     argv = %w( 2 3 )
+    #     on = Digits[ argv ]
+    #     on.function_is_spent  # => false
+    #     on.value_x  # => [ nil, nil, [ 2, 3 ] ]
     #
     #
     # parses one keyword:
     #
-    #     Digits[ ( memo = { } ), argv = [ 'bar' ] ]  # => [ true, false ]
+    #     argv = [ 'bar' ]
+    #     on = Digits[ argv ]
+    #     on.function_is_spent  # => false
+    #     on.value_x  # => [ nil, [:bar], nil ]
+    #
+    #
+    # parses two keywords (in reverse grammar order):
+    #
+    #     argv = %w( bar foo )
+    #     on = Digits[ argv ]
     #     argv.length  # => 0
-    #     memo[ :bar ]  # => true
-    #
-    #
-    # parses two keywords:
-    #
-    #     Digits[ ( memo = { } ), argv = [ 'bar', 'foo' ] ]  # => [ true, false ]
-    #     argv.length  # => 0
-    #     memo[ :bar ]  # => true
-    #     memo[ :foo ]  # => true
+    #     on.function_is_spent  # => false
+    #     on.value_x  # => [ [:foo], [:bar], nil ]
     #
     #
     # will not parse multiple of same keyword:
     #
-    #     Digits[ ( memo = { } ), argv = [ 'foo', 'foo' ] ]  # => [ true, false ]
-    #     argv  # => [ 'foo' ]
-    #     memo[ :foo ]  # => true
+    #     argv = %w( foo foo )
+    #     on = Digits[ argv ]
+    #     argv  # => %w( foo )
+    #     on.function_is_spent  # => false
+    #     on.value_x  # => [ [ :foo ], nil, nil ]
     #
     #
     # will stop at first non-parsable:
     #
     #     argv = [ '1', 'foo', '2', 'biz', 'bar' ]
-    #     Digits[ ( memo = { } ), argv ]  # => [ true, false ]
+    #     on = Digits[ argv ]
+    #     on.function_is_spent  # => false
     #     argv  # => [ 'biz', 'bar' ]
-    #     memo[ :nums ]  # => [ 1, 2 ]
-    #     memo[ :foo  ]  # => true
-    #     memo[ :bar  ]  # => nil
+    #     on.value_x  # => [ [ :foo ], nil, [ 1, 2 ] ]
 
 
     class Functions_::Spending_Pool < Parse_::Function_::Currying

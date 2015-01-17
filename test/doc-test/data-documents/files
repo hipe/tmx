@@ -34,10 +34,14 @@ lib/skylab/meta-hell/basic-fields.rb  #branch-down-to-core
 lib/skylab/meta-hell/dsl-dsl/core.rb
 lib/skylab/meta-hell/fields/from.rb
 lib/skylab/meta-hell/lib--.rb  #branch-down-to-core
-lib/skylab/meta-hell/parse/alternation--.rb  #setup-for-regret
-lib/skylab/meta-hell/parse/via-ordered-set--.rb  #chomp-module
-lib/skylab/meta-hell/parse/via-set--.rb  #setup-for-regret
-lib/skylab/meta-hell/parse/series--.rb  #branch-down-to-core
+
+
+lib/skylab/meta-hell/parse/functions-/alternation.rb  #output-filename: alternation/generated_spec.rb
+lib/skylab/meta-hell/parse/functions-/simple-pool.rb  #output-filename: simple-pool/generated_spec.rb
+lib/skylab/meta-hell/parse/functions-/spending-pool.rb  #output-filename: spending-pool/generated_spec.rb
+lib/skylab/meta-hell/parse/functions-/serial-optionals.rb  #output-filename: serial-optionals/generated_spec.rb
+
+
 lib/skylab/meta-hell/ivars-with-procs-as-methods.rb
 lib/skylab/meta-hell/module/accessors.rb  #setup-for-regret
 

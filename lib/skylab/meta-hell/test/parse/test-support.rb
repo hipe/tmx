@@ -42,3 +42,15 @@ module Skylab::MetaHell::TestSupport::Parse
   Constants::Subject_ = Subject_
 
 end
+
+module Skylab::MetaHell::TestSupport::Parse::Functions
+
+  ::Skylab::MetaHell::TestSupport::Parse[ self ]
+
+  module Constants
+
+    Parse_lib_ = -> do
+      MetaHell_::Parse
+    end
+  end
+end

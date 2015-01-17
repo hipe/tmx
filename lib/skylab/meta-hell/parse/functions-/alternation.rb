@@ -43,88 +43,71 @@ module Skylab::MetaHell
     end
   end
 
-  # minimally you can call it inine with (p_a, arg)
+  # the output node reports the winning index. can be called inline.
   #
-  #     res = MetaHell_::Parse.alternation[ [
-  #       -> ix { :a == ix and :A },
-  #       -> ix { :b == ix and :B } ],
-  #       :b ]
+  #     on = Subject_[].with(
+  #       :input_array, [ :b ],
+  #       :functions,
+  #         :trueish_single_value_mapper, -> x { :a == x and :A },
+  #         :trueish_single_value_mapper, -> x { :b == x and :B } )
   #
-  #     res  # => :B
+  #     on.value_x  # => :B
+  #     on.constituent_index  # => 1
   #
 
-  # it may be more efficient to curry the parser in one place
+  # you can curry the parser separately
   #
-  #     P = MetaHell_::Parse.alternation.curry_with :pool_procs, [
-  #       -> ix { :a == ix and :A },
-  #       -> ix { :b == ix and :B } ]
+  #     P = Subject_[].new_with(
+  #       :functions,
+  #         :trueish_single_value_mapper, -> x { :a == x and :A },
+  #         :trueish_single_value_mapper, -> x { :b == x and :B } ).
+  #     method( :output_node_via_single_token_value )
   #
   #
   # and call it in another
   #
-  #     P[ :a ]  # => :A
+  #     P[ :a ].value_x  # => :A
   #
   #
   # and another:
   #
-  #     P[ :b ]  # => :B
+  #     P[ :b ].value_x  # => :B
   #     P[ :c ]  # => nil
-
 
   # in the minimal case, the empty parser always results in nil
   #
-  #     p = MetaHell_::Parse.alternation.curry_with :pool_procs, []
-  #
-  #     p[ :bizzle ]  # => nil
+  #     g = Subject_[].new_with :functions
+  #     g.output_node_via_single_token_value( :bizzie )  # => nil
 
   # maintaining parse state (artibrary extra arguments)
   #
-  #     P_ = MetaHell_::Parse.alternation.curry_with :pool_procs, [
-  #       -> output_x, input_x do
-  #         if :one == input_x.first
-  #           input_x.shift
-  #           output_x[ :is_one ] = true
-  #           true
-  #         end
-  #       end,
-  #       -> output_x, input_x do
-  #         if :two == input_x.first
-  #           input_x.shift
-  #           output_x[ :is_two ] = true
-  #           true
-  #         end
-  #       end ]
-  #
-  #     Result = ::Struct.new :is_one, :is_two
+  #     g = Subject_[].new_with(
+  #       :functions,
+  #         :trueish_single_value_mapper, -> x { :one == x and :is_one },
+  #         :trueish_single_value_mapper, -> x { :two == x and :is_two } )
+  #     P_ = -> * x_a do
+  #       g.output_node_via_input_array_fully x_a
+  #     end
   #
   #
   # it parses none:
   #
-  #     P_[ Result.new, [ :will, :not, :parse ] ]  # => nil
+  #     P_[ :will, :not, :parse ]  # => nil
   #
   #
   # it parses one:
   #
-  #     r = Result.new
-  #     P_[ r, [ :one ] ]  # => true
-  #     r.is_one  # => true
-  #     r.is_two  # => nil
+  #     P_[ :one ].value_x  # => :is_one
   #
   #
   # it parses two:
   #
-  #     r = Result.new
-  #     P_[ r, [ :two ] ]  # => true
-  #     r.is_one  # => nil
-  #     r.is_two  # => true
+  #     P_[ :two ].constituent_index  # => 1
   #
   #
   # but it won't parse two after one:
   #
-  #     input_a = [ :one, :two ] ; r = Result.new
-  #     P_[ r, input_a ]  # => true
-  #     r.is_one  # => true
-  #     r.is_two  # => nil
-  #
+  #     P_[ :one, :two ]  # => nil
+
 
 end

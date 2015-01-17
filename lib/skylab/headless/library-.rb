@@ -81,8 +81,8 @@ module Skylab::Headless
       Basic[]::Module
     end
 
-    Parse_series = -> * a do
-      MH__[]::Parse.series.call_via_arglist a
+    Parse_lib = -> do
+      MH__[]::Parse
     end
 
     Properties_stack_frame = -> *a do

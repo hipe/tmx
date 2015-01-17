@@ -18,12 +18,8 @@ module Skylab::MetaHell
         Parse_::Functions_::Keyword.new_via_arglist( a ).to_matcher
       end
 
-      def serial_optionals * a
-        if a.length.zero?
-          Parse_::Functions_::Serial_Optionals
-        else
-          Parse_::Functions_::Serial_Optionals.parse_via_highlevel_arglist a
-        end
+      def parse_serial_optionals * a
+        Parse_::Functions_::Serial_Optionals.parse_via_highlevel_arglist a
       end
 
       def via_set

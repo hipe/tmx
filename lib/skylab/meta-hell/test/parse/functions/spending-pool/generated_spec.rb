@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::Parse::Spending_Pool
+module Skylab::MetaHell::TestSupport::Parse::Functions::Spending_Pool
 
-  describe "[mh] Parse::Via_Set__" do
+  describe "[mh] Parse::Functions_::Spending_Pool" do
 
     context "with one such parser build from an empty set of parsers" do
 
@@ -10,24 +10,22 @@ module Skylab::MetaHell::TestSupport::Parse::Spending_Pool
         None = Subject_[].new_with( :functions ).to_output_node_and_mutate_array_proc
       end
       it "a parser with no nodes in it will always report 'no parse' and 'spent'" do
-        None[ MetaHell_::EMPTY_A_ ].should be_nil
+        None[ MetaHell_::EMPTY_A_ ].should eql nil
       end
       it "even if the input is rando calrissian" do
-        None[ :hi_mom ].should be_nil
+        None[ :hi_mom ].should eql nil
       end
     end
     context "with parser with one node that reports it always matches & always spends" do
 
       before :all do
-
         One = Subject_[].new_with(
           :functions,
             :proc, -> in_st do
               Parse_lib_[]::Output_Node_.new nil
             end ).to_output_node_and_mutate_array_proc
-
       end
-      it "is always this same output node" do
+      it "is always the same output node" do
         on = One[ :whatever ]
         on.function_is_spent.should eql true
       end
@@ -42,14 +40,13 @@ module Skylab::MetaHell::TestSupport::Parse::Spending_Pool
             end ).to_output_node_and_mutate_array_proc
       end
       it "never parses" do
-        Spendless[ :whatever ].should be_nil
+        Spendless[ :whatever ].should eql nil
       end
     end
     context "of 2 keywords, parse them at most once each. parse any and all digits" do
 
       before :all do
-
-        _NNI = Parent_::Subject_[]::Functions_::Non_Negative_Integer
+        _NNI = Parse_lib_[]::Functions_::Non_Negative_Integer
 
         Digits = Subject_[].new_with(
           :functions,
@@ -71,7 +68,7 @@ module Skylab::MetaHell::TestSupport::Parse::Spending_Pool
         argv.length.should eql 0
         on.function_is_spent.should eql false
         kw, k2, digits = on.value_x
-        ( kw || k2 ).should be_nil
+        ( kw || k2 ).should eql nil
         digits.should eql [ 1 ]
       end
       it "parses two digits" do
