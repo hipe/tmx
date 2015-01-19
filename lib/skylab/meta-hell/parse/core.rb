@@ -27,6 +27,10 @@ module Skylab::MetaHell
       end
     end
 
+    module Function_
+      Autoloader_[ self ]
+    end
+
     module Functions_
       Autoloader_[ self ]
     end

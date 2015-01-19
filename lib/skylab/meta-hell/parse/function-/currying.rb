@@ -9,10 +9,6 @@ module Skylab::MetaHell
         def build_extra_input_tokens_event st
           Extra_Input___[ st.current_token_object.value_x ]
         end
-
-        def new_with * x_a
-          call_via_iambic x_a
-        end
       end  # >>
 
       Extra_Input___ = Callback_::Event.prototype_with :extra_input,
@@ -48,22 +44,43 @@ module Skylab::MetaHell
       end
 
       def functions=
-        st = @__methodic_actor_iambic_stream__
-        ok_x = true
         @function_a = []
-        while st.unparsed_exists
-          cls = Parse_.function_ st.gets_one  # if ever needed we can soften this
-          ok_x = cls.new_via_iambic_stream_passively st
-          ok_x or break
-
-          if ok_x.respond_to? :receive_sibling_sandbox
-            @__ss ||= Function_::Nonterminal::Sibling_Sandbox.new @function_a
-            ok_x.receive_sibling_sandbox @__ss
-          end
-
-          @function_a.push ok_x
+        st = __via_iambic_stream_produce_parse_function_stream
+        f = st.gets
+        while f
+          accept_function_ f
+          f = st.gets
         end
-        ok_x && KEEP_PARSING_
+        UNABLE_ == f ? UNABLE_ : KEEP_PARSING_
+      end
+
+      UNABLE_ = false
+
+      def __via_iambic_stream_produce_parse_function_stream
+        st = @__methodic_actor_iambic_stream__
+        Callback_.stream do
+          if st.unparsed_exists
+            sym = st.gets_one
+            if :end_functions == sym
+              nil  # not false
+            else
+              Parse_.function_( sym ).new_via_iambic_stream_passively st
+            end
+          end
+        end
+      end
+
+      def accept_function_ f
+        @function_a.push f
+        nil
+      end
+
+      def maybe_send_sibling_sandbox_to_function_ f  # #courtesy
+        if f.respond_to? :receive_sibling_sandbox
+          @__ss ||= Function_::Nonterminal::Sibling_Sandbox.new @function_a
+          f.receive_sibling_sandbox @__ss
+          nil
+        end
       end
 
       def function_objects_array=

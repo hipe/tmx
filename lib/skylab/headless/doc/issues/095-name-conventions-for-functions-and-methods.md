@@ -529,6 +529,63 @@ we must follow suit with the existing word, so please see `reduce_with`.
 
 ## the method naming shibbloleth :[#119]
 
+### edit: the simplified version:
+
+synopsis:
+
+these conventions are adopted (where they are adopted) not because they
+are pretty but because they make the code optimally refactorable, by
+letting you know immediately the cost of changing the method's interface
+or removing it. (the narrower a method's scope is, the less it costs
+to change). they are:
+
+  • `a_method_with_no_leading_or_trailing_underscores` *may* be
+     universally public. this is the most expensive kind to change.
+
+  • `a_method_with_one_trailing_underscore_` is either "library private"
+     or "node protected", scopes that are similar in "size" generally,
+     but not the same. for "library private", other nodes within the
+     "library" may call the method, but none outside of it. this is
+     comparable in "scope" (not mechanics) to java's `package` scope.
+     (but we don't yet have a rigid way that we express the boundaries of a
+     "library" - often it is a sub-sub-top-level node.)
+
+     for "node protected", this method is visible to the current node and
+     its children nodes. ("node" is defined in the next bullet).
+
+     as well we will sometimes use this scope for "collaborators" - if
+     two disparate nodes need intimate knowledge of each other and an
+     exposure method is needed (perhaps experimentally) just for this
+     end, we may use this scope.
+
+  • `_a_method_with_one_leading_underscore` is "node private" - only the
+     "node" (class, module, or file; author's choice) itself can "see"
+     the method. if class, this means that not even subclasses can "see"
+     the method. likewise if module, objects that have this module in
+     their ancestor chain cannot "see" the method either. this may be
+     comparable to java's "private" scope.
+
+  • `__a_method_with_two_leading_underscores` - we call this an
+    "aesthetc" method for reasons explained below. its definition is
+    straightforward: this is a method that is called from only *one* code
+    location (and that one code location is within the node).
+
+    we call this "aesthetic" because the only "reason" to make such a
+    method is for the human advantages that come from having small,
+    modular methods. unlike with other classifications of methods here,
+    this sort of method does not contribute to the DRY-ness of the code:
+    because it is only called from one code-location, its logic does not
+    "need" to be encapsulated, it just looks better to do so.
+
+    this has the second narrowest scope possible for a method to have,
+    the first being a method that isn't ever called at all. (such
+    methods should be removed so we don't have a special convention for
+    them.) as such, this method is the cheapest to refactor.
+
+
+
+### the original version
+
 this convention is not pretty, but that is not its point: it evolved
 pragmatically (and quite suddenly) as a way to build code optimized for
 malleability by being faster to refactor.
@@ -536,9 +593,6 @@ malleability by being faster to refactor.
 this is a bit of a contentious pattern, but one we find utility from:
 for certain kinds of classes/modules, we may abbreviate certain words of
 certain of their method names in a regular way.
-
-(as well there is a simplified variant whose draft is in the commit
-message of this commit)
 
 to absolutely *anyone*
 who hasn't read this, the effect may just appear as messy and erratic,

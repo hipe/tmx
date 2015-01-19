@@ -44,7 +44,8 @@
 [#032]       #api-point constant trouble's fields are immutable (ergo dupable)
 [#031] #hole (#re-purposed:twice, then was: the MAARS narrative,
                was: API-lock on 'replace' as a flyweight-related meth name)
-[#030] #hole (was: #the-stowaway-experiment)
+[#030] #open get flowchard graphic from phone to here, for `sequence` and `range`
+             (was: #the-stowaway-experiment)
 [#029]       #parent-node: [#011] the parse series narrative ..
              (was: #doc-point the autovivifying autoloader narrative )
 [#028]       #tracking-tag `without_warning`

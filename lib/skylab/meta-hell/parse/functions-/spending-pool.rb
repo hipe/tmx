@@ -11,8 +11,8 @@ module Skylab::MetaHell
     # `function_is_spent` field is for: IFF the function expresses this field
     # as true-ish (or it fails to match) will it be removed from the pool.
     #
-    # this mechanism is crucial for certain kinds of nonterminal functions,
-    # those with "trailing optional" kleene-star style constituents.
+    # this mechanism is an experiment to explore certain kinds of nonterminal
+    # functions, those with "trailing optional" kleene-star style constituents.
     #
     # the parse is finished when either no node parsed during that pass
     # or all nodes are spent (that is, when the pool is empty).
@@ -137,6 +137,11 @@ module Skylab::MetaHell
 
 
     class Functions_::Spending_Pool < Parse_::Function_::Currying
+
+      def accept_function_ f
+        maybe_send_sibling_sandbox_to_function_ f
+        super
+      end
 
       def parse_
 

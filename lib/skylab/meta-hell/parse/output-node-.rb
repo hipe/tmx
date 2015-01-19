@@ -4,7 +4,7 @@ module Skylab::MetaHell
 
     class Output_Node_
 
-      Callback_::Actor.methodic self
+      Callback_::Actor.methodic self, :properties, :try_next
 
       class << self
         def new_with * x_a
@@ -15,22 +15,26 @@ module Skylab::MetaHell
           end
           ok && x
         end
+
+        attr_reader :the_empty_node
       end
 
-      def initialize * a, & edit_p
-        if 1 == a.length
-          @function_is_spent = true
-          @value_x = a.first
+      def initialize * a, & edit_p  # value | block
+        if a.length.zero?
+          instance_exec( & edit_p )  # comport to [cb] actor
         else
-          instance_exec( & edit_p )
+          @function_is_spent = true
+          @value_x = a.fetch( a.length - 1 << 2 )
         end
       end
 
+      @the_empty_node = new( nil ).freeze
+
       def members
-        [ :constituent_index, :function_is_spent, :value_x ]
+        [ :constituent_index, :function_is_spent, :try_next, :value_x ]
       end
 
-      attr_reader :constituent_index, :function_is_spent, :value_x
+      attr_reader :constituent_index, :function_is_spent, :try_next, :value_x
 
       def new_with * x_a
         otr = dup
@@ -61,6 +65,12 @@ module Skylab::MetaHell
       def function_is_not_spent=
         @function_is_spent = false
         KEEP_PARSING_
+      end
+
+    public
+
+      def mutate_try_next_ x
+        @try_next = x ; nil
       end
     end
   end

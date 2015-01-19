@@ -4,12 +4,12 @@ module Skylab::MetaHell::TestSupport::Parse
 
   describe "[mh] parse functions - keyword" do
 
-    define_method :subject, ( Callback_.memoize do
+    extend TS_
 
+    memoize_subject do
       Subject_[].fuzzy_matcher 'foobie',
         :minimum_number_of_characters, 3
-
-    end )
+    end
 
     it "won't match if number of chars is under the minimum" do
       subject[ 'f' ].should be_nil

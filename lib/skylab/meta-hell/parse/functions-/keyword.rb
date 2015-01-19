@@ -5,10 +5,16 @@ module Skylab::MetaHell
     class Functions_::Keyword < Parse_::Function_::Field
 
       class << self
+
+        def new_via_iambic_stream st
+          new do
+            _custom_syntax( st ) and process_iambic_stream_fully( st )
+          end
+        end
+
         def new_via_iambic_stream_passively st
           new do
-            @formal_string = st.gets_one  # magic first token
-            process_iambic_stream_passively st  # always OK
+            _custom_syntax( st ) and process_iambic_stream_passively( st )
           end
         end
       end  # >>
@@ -26,6 +32,11 @@ module Skylab::MetaHell
         @formal_length = @formal_string.length
         @does_need_hotstring = true
         @ss = nil
+      end
+
+      def _custom_syntax st
+        @formal_string = st.gets_one
+        st.unparsed_exists
       end
 
       def receive_sibling_sandbox ss
@@ -49,6 +60,7 @@ module Skylab::MetaHell
       end
 
       def output_node_via_input_stream in_st
+
         if @does_need_hotstring
           if @ss
             Resolve_hotstrings__[ @ss ]
@@ -57,6 +69,13 @@ module Skylab::MetaHell
             @does_need_hotstring = false
           end
         end
+
+        if in_st.unparsed_exists
+          __output_node_via_unexhausted_input_stream in_st
+        end
+      end
+
+      def __output_node_via_unexhausted_input_stream in_st
 
         # a token string that is longer than the formal string is not a match.
         #
@@ -76,7 +95,7 @@ module Skylab::MetaHell
         # token string. any remainder of the token string that goes "over" the
         # hotstring must match the appropriate substring of the formal string.
         #
-        # this function :+#cannot-operate-on-the-empty-stream.
+        # this function is :+#empty-stream-safe
 
         tok_s = in_st.current_token_object.value_x
         tok_d = tok_s.length

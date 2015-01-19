@@ -8,15 +8,13 @@ describe "[mh] serial optionals" do
 
   context "my first nonterminal (integration)" do
 
-    define_method :subject, ( Callback_.memoize do
-
+    memoize_subject do
       Subject_[].new_with(
         :functions,
           :keyword,
             'randomize', :minimum_number_of_characters, 3,
           :non_negative_integer )
-    end )
-
+    end
 
     it "builds" do
       subject or fail

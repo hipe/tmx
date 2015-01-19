@@ -11,18 +11,7 @@ module Skylab::MetaHell
           # ~ narrative (not alpha) order
 
           def new_via_arglist a
-            st = Callback_::Iambic_Stream.via_array a
-            x = new_via_iambic_stream_passively st
-            st.unparsed_exists and raise ::ArgumentError, st.current_token
-            x
-          end
-
-          def new_via_iambic_stream_passively st  # :+#push-up-candidate to [cb]
-            ok = nil
-            x = new do
-              ok = process_iambic_stream_passively st
-            end
-            ok && x
+            new_via_iambic_stream iambic_stream_via_iambic_array a
           end
 
           # ~ others

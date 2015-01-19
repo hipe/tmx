@@ -67,16 +67,10 @@ module Skylab::Callback
 
       module Module_Methods__
 
-        # ~ experiment (looks like [br] `edit_entity_class`)
-
-        def edit_actor_class * x_a
-          Edit_via_nonzero_length_iambic_on_prepared_class__[ x_a, self ]
-        end
-
-        # (experimental variations on the theme, but we should DRY these)
+        # ~ ways to call your actor (pursuant to [#hl-103] name conventions)
 
         def with * x_a, & oes_p
-          call_via_iambic x_a, & oes_p
+          call_via_iambic_stream iambic_stream_via_iambic_array( x_a ), & oes_p
         end
 
         def call_via_arglist a, & oes_p
@@ -85,17 +79,50 @@ module Skylab::Callback
         end
 
         def call_via_iambic x_a, & oes_p
-          curried = new_via_iambic x_a, & oes_p
+          call_via_iambic_stream iambic_stream_via_iambic_array( x_a ), & oes_p
+        end
+
+        def call_via_iambic_stream st, & oes_p
+          curried = new_via_iambic_stream st, & oes_p
           curried && curried.execute
         end
 
+        # ~ ways to build a "curried" actor (to use these makes you a collaborator)
+
+        def new_with * x_a, & oes_p
+          new_via_iambic_stream iambic_stream_via_iambic_array( x_a ), & oes_p
+        end
+
         def new_via_iambic x_a, & oes_p
+          new_via_iambic_stream iambic_stream_via_iambic_array( x_a ), & oes_p
+        end
+
+        def new_via_iambic_stream st, & oes_p
           ok = nil
           x = new do
             oes_p and accept_selective_listener_proc oes_p  # :+#public-API :+#hook-out #hook-near
-            ok = process_iambic_stream_fully Iambic_Stream_via_Array_.new( 0, x_a )
+            ok = process_iambic_stream_fully st
           end
           ok && x
+        end
+
+        def new_via_iambic_stream_passively st, & oes_p
+          ok = nil
+          x = new do
+            oes_p and accept_selective_listener_proc oes_p  # same as above
+            ok = process_iambic_stream_passively st
+          end
+          ok && x
+        end
+
+        def iambic_stream_via_iambic_array x_a
+          Iambic_Stream_via_Array_.new 0, x_a
+        end
+
+        # ~ experiment (looks like [br] `edit_entity_class`)
+
+        def edit_actor_class * x_a
+          Edit_via_nonzero_length_iambic_on_prepared_class__[ x_a, self ]
         end
 
         # (experimental features near here exist in: [#br-081])

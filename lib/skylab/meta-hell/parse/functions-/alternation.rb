@@ -24,6 +24,11 @@ module Skylab::MetaHell
 
     class Functions_::Alternation < Parse_::Function_::Currying
 
+      def accept_function_ f
+        maybe_send_sibling_sandbox_to_function_ f
+        super
+      end
+
       def parse_
 
         in_st = @input_stream

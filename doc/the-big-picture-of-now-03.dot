@@ -7,7 +7,7 @@ digraph {
   x1 [label="(parsing is\nspecialized n18n)" style=filled]
   x2 [label="(rename \"token scanners\")" style=filled]
   cleanup [style=filled]
-  sequence [label="sequence (new\nformal symbol\ncategory)"]
+  sequence [label="sequence (new\nformal symbol\ncategory)" style=filled]
   x4 [label="simplify actor,\nunify names" style=filled ]
 
   hear->lists

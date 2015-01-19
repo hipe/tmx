@@ -34,6 +34,11 @@ module Skylab::MetaHell
         @d
       end
 
+      def current_index= x  # assume is valid index
+        @did = false ; @token = nil
+        @d = x ; nil
+      end
+
       def advance_one
         @did = false
         @d += 1 ; nil

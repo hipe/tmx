@@ -77,6 +77,11 @@ module Skylab::MetaHell
 
     class Functions_::Simple_Pool < Parse::Function_::Currying
 
+      def accept_function_ f
+        maybe_send_sibling_sandbox_to_function_ f
+        super
+      end
+
       def parse_
         pool_a = @function_a
         len = pool_a.length

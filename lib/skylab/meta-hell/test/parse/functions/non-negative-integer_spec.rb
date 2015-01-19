@@ -4,6 +4,8 @@ module Skylab::MetaHell::TestSupport::Parse
 
   describe "[mh] parse functions - integer" do
 
+    extend TS_
+
     it "non-integer - no" do
       against( 'foo' ).should be_nil
     end
@@ -28,11 +30,10 @@ module Skylab::MetaHell::TestSupport::Parse
       end
     end
 
-    define_method :subject, ( Callback_.memoize do
-
+    memoize_subject do
       Subject_[].function_( :non_negative_integer ).
         new_via_iambic_stream_passively(
           Callback_::Iambic_Stream.the_empty_iambic_stream )
-    end )
+    end
   end
 end

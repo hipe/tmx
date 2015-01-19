@@ -10,6 +10,14 @@ module Skylab::MetaHell::TestSupport::Parse
 
   extend TestSupport_::Quickie
 
+  module ModuleMethods
+
+    def memoize_subject & build_p
+      define_method :subject, Callback_.memoize( & build_p )
+      nil
+    end
+  end
+
   module InstanceMethods
 
     def against * s_a
@@ -17,7 +25,15 @@ module Skylab::MetaHell::TestSupport::Parse
     end
 
     def against_input_array s_a
-      subject.output_node_via_input_stream input_stream_via_array s_a
+      against_input_stream input_stream_via_array s_a
+    end
+
+    def against_input_stream st
+      subject.output_node_via_input_stream st
+    end
+
+    def input_stream_containing * x_a
+      input_stream_via_array x_a
     end
 
     def input_stream_via_array s_a

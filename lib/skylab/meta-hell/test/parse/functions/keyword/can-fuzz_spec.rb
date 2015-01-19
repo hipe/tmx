@@ -6,7 +6,7 @@ module Skylab::MetaHell::TestSupport::Parse
 
     extend TS_
 
-    define_method :subject, ( Callback_.memoize do
+    memoize_subject do
 
       Subject_[]::Functions_::Serial_Optionals.new_with(
         :functions,
@@ -15,7 +15,7 @@ module Skylab::MetaHell::TestSupport::Parse
         :non_negative_integer,
         :keyword, 'zip' )
 
-    end )
+    end
 
     it "reach the front one with a hotstring" do
       k1, k2, d, k3 = against 'zipi'
