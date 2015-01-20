@@ -22,20 +22,20 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Serial_Optionals
     end
 
     it "render the syntax string with the default design" do
-      G.render_all_segments_into_under( "" ).should eql "[INTEGER] [random]"
+      G.express_all_segments_into_under( "" ).should eql "[INTEGER] [random]"
     end
 
     it "render the syntax string with a custom design" do
 
-      G.render_all_segments_into_under( "",
+      G.express_all_segments_into_under( "",
 
         :any_first_constituent_string, MetaHell_::IDENTITY_,
 
         :any_subsequent_constituent_string, -> s { " #{ s }" },
 
-        :constituent_string_via_optional_constituent_badge, -> s { "[ #{ s } ]" },
+        :constituent_string_via_constituent_badge, -> s { "[ #{ s } ]" },
 
-        :render_all_segments_into_under_of_constituent_reflective_function, -> y, expag, f do
+        :express_all_segments_into_under_of_constituent_reflective_function, -> y, expag, f do
 
           if :field == f.function_supercategory_symbol
             if :keyword == f.function_category_symbol
@@ -44,7 +44,7 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Serial_Optionals
               y << "<#{ f.moniker.as_slug }>"
             end
           else
-            f.render_all_segments_into_under y, expag
+            f.express_all_segments_into_under y, expag
           end
           nil
         end ).should eql '[ <integer> ] [ random ]'

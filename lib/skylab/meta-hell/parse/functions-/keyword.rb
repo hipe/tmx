@@ -156,6 +156,24 @@ module Skylab::MetaHell
         nil
       end
 
+      # ~ #hook-ins (custom implementations of adjunct facets)
+
+      def express_all_segments_into_under y, _expression_agent
+        if QUOTE_ME_RX__ =~ @formal_string
+          s = @formal_string.dup
+          s.gsub! ESCAPE_ME_RX__ do
+            "\\#{ $1 }"
+          end
+          y << "\"#{ s }\""
+        else
+          y << @formal_string
+        end
+        nil
+      end
+
+      ESCAPE_ME_RX__ = /(["\\])/
+      QUOTE_ME_RX__ = /["'\\[:space:]]/
+
     end
   end
 end

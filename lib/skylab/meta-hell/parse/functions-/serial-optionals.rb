@@ -150,6 +150,12 @@ module Skylab::MetaHell
 
         Parse_::Output_Node_.new output_a
       end
+
+      # #hook-out for adjunct facet: syntax expression
+
+      def constituent_delimiter_pair_for_expression_agent _expag
+        %w( [ ] )
+      end
     end
 
     # you can provide arbitrary procs to implement your parse functions

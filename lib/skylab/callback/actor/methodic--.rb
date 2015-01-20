@@ -34,24 +34,34 @@ module Skylab::Callback
         class << self
 
           def [] i_a, cls
-            i = i_a.first
-            case i
-            when :simple
-              Apply_simple_enhancement__.new(
-                cls,
-                Iambic_Stream_via_Array_.new( 1, i_a )
-              ).execute
-            when :properties
-              __apply_seed_treatment cls, i_a
-            else
-              raise Stranger_[ i_a.first, [ :properties, :simple ] ].to_exception
-            end
+            sym = i_a.first
+            start_index = 1
+            begin
+              case sym
+              when :simple
+                Apply_simple_enhancement__.new(
+                  cls,
+                  Iambic_Stream_via_Array_.new( 1, i_a )
+                ).execute
+              when :properties
+                __apply_seed_treatment start_index, cls, i_a
+              when :property_list
+                __apply_seed_treatment 0, cls, i_a.fetch( start_index )
+                if ( start_index += 1 ) < i_a.length
+                  sym = i_a.fetch( start_index + 1 )
+                  start_index += 2
+                  redo
+                end
+              else
+                raise Stranger_[ i_a.first, [ :properties, :simple ] ].to_exception
+              end
+            end while nil
           end
 
-          def __apply_seed_treatment mod, i_a
+          def __apply_seed_treatment start_index, mod, i_a
             mod.module_exec do
               private
-              1.upto( i_a.length - 1 ) do |d|
+              start_index.upto( i_a.length - 1 ) do |d|
                 sym = i_a.fetch d
                 _IVAR = :"@#{ sym }"
                 define_method :"#{ sym }=" do
@@ -454,7 +464,6 @@ module Skylab::Callback
           @cls.send :define_singleton_method, m_i do
             prop
           end
-          @ivar = prop.as_ivar
           method_p = prop.iambic_writer_method_proc
           if method_p
             m_i = :"#{ name_i }="

@@ -99,8 +99,28 @@ module Skylab::MetaHell
         end
       end
 
-      def render_all_segments_into_under y, * x_a
-        Parse_::Function_::Nonterminal::Actors::Render[ y, x_a, self ]
+      def express_all_segments_into_under y, * x_a
+
+        Parse_::Function_::Nonterminal::Sessions::Express.session do | o |
+
+          case 1 <=> x_a.length
+          when  0
+            o.set_expression_agent x_a.fetch 0
+          when -1
+            o.accept_iambic x_a
+          end
+
+          if o.constituent_delimiter_pair_should_be_specified
+            o.set_constituent_delimiter_pair( *
+              constituent_delimiter_pair_for_expression_agent(
+                o.expression_agent ) )
+          end
+
+          o.set_reflective_function_stream(
+            Callback_.stream.via_nonsparse_array @function_a )
+
+          o.set_downstream y
+        end
       end
 
       def to_reflective_function_stream_  # for above

@@ -4,50 +4,127 @@ module Skylab::MetaHell
 
     module Function_::Nonterminal
 
-      Actors = ::Module.new
+      Sessions = ::Module.new
 
-      class Actors::Render
+      class Sessions::Express
 
         class << self
 
-          def [] y, x_a, nt
-            new( y, x_a, nt ).execute
+          def session
+            o = new
+            yield o
+            o.__execute
           end
-        end # >>
+        end  # >>
 
-        def initialize y, x_a, nt
-          @nt = nt
-          @y = y
-          @x_a = x_a
+        def initialize
+          @cdpsbs = true
+          @x_h = {}
         end
 
-        def execute
-          case 1 <=> @x_a.length
-          when  1
-            @expag = EXPRESSION_AGENT
-          when 0
-            @expag = @x_a.first
+        def accept_iambic x_a
+          process_iambic_stream_fully iambic_stream_via_iambic_array x_a
+          nil
+        end
+
+        Callback_::Actor.methodic self
+
+      private
+
+        def any_first_constituent_string=
+          @expag = nil
+          @x_h[ :any_first_constituent_string ] = iambic_property
+          KEEP_PARSING_
+        end
+
+        def any_subsequent_constituent_string=
+          @expag = nil
+          @x_h[ :any_subsequent_constituent_string ] = iambic_property
+          KEEP_PARSING_
+        end
+
+        def constituent_string_via_constituent_badge=
+          @cdpsbs = false
+          @expag = nil
+          @x_h[ :constituent_string_via_constituent_badge ] = iambic_property
+          KEEP_PARSING_
+        end
+
+        def express_all_segments_into_under_of_constituent_reflective_function=
+          @expag = nil
+          @x_h[ :express_all_segments_into_under_of_constituent_reflective_function ] = iambic_property
+          KEEP_PARSING_
+        end
+
+      public
+
+        # ~ readers for use in session
+
+        def constituent_delimiter_pair_should_be_specified
+          @cdpsbs
+        end
+
+        def expression_agent
+          @expag ||= __build_expression_agent
+        end
+
+        def __build_expression_agent
+          if @x_h.length.zero?
+            EXPRESSION_AGENT
           else
-            @expag = EXPRESSION_AGENT.new_via_iambic @x_a
+            x_a = []
+            @x_h.each_pair do | sym, x |
+              x_a.push sym, x
+            end
+            EXPRESSION_AGENT.new_via_iambic x_a
           end
+        end
+
+        # ~ setters for use in session
+
+        def set_constituent_delimiter_pair _OPEN_DELIMITER=nil, _CLOSE_DELIMITER=nil
+          @expag = nil
+          @cdpsbs = false
+          @x_h[ :constituent_string_via_constituent_badge ] = -> s do
+            "#{ _OPEN_DELIMITER }#{ s }#{ _CLOSE_DELIMITER }"
+          end
+          nil
+        end
+
+        def set_downstream x
+          @y = x
+          nil
+        end
+
+        def set_expression_agent x
+          if x
+            @cdpsbs = false
+          end
+          @expag = x
+          nil
+        end
+
+        def set_reflective_function_stream x
+          @reflective_function_stream = x
+          nil
+        end
+
+        # ~ implementation
+
+        def __execute
+          expression_agent
           __via_expag
         end
 
         class Expag__
 
-          class << self
-            def new_with * x_a
-              new_via_iambic x_a
-            end
-          end
-
           a = [
             :any_first_constituent_string,
             :any_subsequent_constituent_string,
-            :constituent_string_via_optional_constituent_badge,
-            :render_all_segments_into_under_of_constituent_reflective_function ]
+            :constituent_string_via_constituent_badge,
+            :express_all_segments_into_under_of_constituent_reflective_function ]
 
-          Callback_::Actor.methodic self, :simple, :properties, :properties, * a
+          Callback_::Actor.methodic self, :property_list, a
 
           attr_reader( * a )
 
@@ -69,24 +146,15 @@ module Skylab::MetaHell
         EXPRESSION_AGENT = Expag__.new_with(
           :any_first_constituent_string, MetaHell_::IDENTITY_,
           :any_subsequent_constituent_string, -> s { " #{ s }" },
-          :constituent_string_via_optional_constituent_badge, -> s { "[#{ s }]" },
-          :render_all_segments_into_under_of_constituent_reflective_function,
+          :express_all_segments_into_under_of_constituent_reflective_function,
             -> y, expag, f do
-              if :field == f.function_supercategory_symbol
-                if :keyword == f.function_category_symbol
-                  y << f.moniker.as_slug
-                else
-                  y << f.moniker.as_lowercase_with_underscores_symbol.id2name.upcase
-                end
-              else
-                f.render_all_segments_into_under y, expag
-              end
+              f.express_all_segments_into_under y, expag
               nil
             end )
 
         def __via_expag
 
-          st =  @nt.to_reflective_function_stream_
+          st =  @reflective_function_stream
 
           f = st.gets
           f and __when_at_least_one_item f, st
@@ -112,10 +180,10 @@ module Skylab::MetaHell
 
         def render_child f
           y = ""
-          @expag.render_all_segments_into_under_of_constituent_reflective_function[
+          @expag.express_all_segments_into_under_of_constituent_reflective_function[
             y, @expag, f ]
 
-          @expag.constituent_string_via_optional_constituent_badge[ y ]
+          @expag.constituent_string_via_constituent_badge[ y ]
         end
       end
     end

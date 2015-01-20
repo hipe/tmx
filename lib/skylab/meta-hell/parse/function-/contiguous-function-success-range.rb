@@ -12,7 +12,7 @@ module Skylab::MetaHell
 
           alias_method :orig_new, :new
 
-          def new min, max
+          def new min, max, & edit_p
 
             min ||= 0
             max ||= -1
@@ -28,7 +28,19 @@ module Skylab::MetaHell
               const_set :MIN__, min
               const_set :MAX__, max
 
+              if edit_p
+                class_exec( & edit_p )
+              end
+
             end
+          end
+
+          def min
+            self::MIN__
+          end
+
+          def max
+            self::MAX__
           end
         end  # >>
 
@@ -277,6 +289,27 @@ module Skylab::MetaHell
           -> do
             @max == @num_times_succeeded
           end
+        end
+
+        # ~ #hook-ins for adjunct facets
+
+        def express_all_segments_into_under y, expag
+
+          min_d = self.class.min
+          _min_s = if min_d.nonzero?
+            min_d.to_s
+          end
+
+          max_d = self.class.max
+          _max_s = if -1 != max_d
+            max_d.to_s
+          end
+
+          y << "{#{ _min_s },#{ _max_s }}("
+          @f.express_all_segments_into_under y, expag
+          y << ')'
+
+          nil
         end
       end
     end

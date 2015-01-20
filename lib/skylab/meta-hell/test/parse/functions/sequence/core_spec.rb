@@ -329,6 +329,11 @@ module Skylab::MetaHell::TestSupport::Parse::Functions::Sequence
 
         st.current_index.should eql 6
       end
+
+      it "render the syntax string with the default design" do
+        subject.express_all_segments_into_under( "" ).should eql(
+          '(ANY_TOKEN)+ would like (ANY_TOKEN)+' )
+      end
     end
   end
 end

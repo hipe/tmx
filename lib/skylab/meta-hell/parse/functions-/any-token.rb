@@ -12,6 +12,14 @@ module Skylab::MetaHell
           Parse_::Output_Node_.new in_st.gets_one.value_x
         end
       end
+
+      def moniker
+        super or Default_moniker__[]
+      end
+
+      Default_moniker__ = Callback_.memoize do
+        Callback_::Name.via_variegated_symbol :any_token
+      end
     end
   end
 end

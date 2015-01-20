@@ -80,6 +80,12 @@ module Skylab::MetaHell
       def __flush
         Parse_::Output_Node_.new @result_x_a
       end
+
+      # ~ #hook-ins for adjunct facets
+
+      def constituent_delimiter_pair_for_expression_agent _expag
+        nil
+      end
     end
   end
 end

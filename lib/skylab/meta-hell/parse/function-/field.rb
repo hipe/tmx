@@ -59,6 +59,18 @@ module Skylab::MetaHell
         def function_supercategory_symbol
           self.class.__function_supercategory_symbol
         end
+
+        # ~ #hook-ins (custom implementations for adjunct facets)
+
+        def express_all_segments_into_under y, expression_agent
+          mnkr = moniker
+          if mnkr
+            y << mnkr.as_lowercase_with_underscores_symbol.id2name.upcase
+          else
+            y << "«#{ function_supercategory_symbol }:#{ function_category_symbol }»"  # :+#guillemets
+          end
+          nil
+        end
       end
 
       class Field::Proc_Based < Field

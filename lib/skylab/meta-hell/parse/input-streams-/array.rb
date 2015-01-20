@@ -6,7 +6,7 @@ module Skylab::MetaHell
 
       def initialize x_a
         @d = 0
-        @did = false
+        @token_cache_a = []
         @x_a = x_a
         @x_a_length = x_a.length
       end
@@ -22,12 +22,10 @@ module Skylab::MetaHell
       end
 
       def current_token_object
-        if @did
-          @token
-        else
-          @did = true
-          @token = Parse_::Input_Stream_::Token.new @x_a.fetch @d
+        if ! @token_cache_a[ @d ]  # sure, let it be sparse, why not
+          @token_cache_a[ @d ] = Parse_::Input_Stream_::Token.new @x_a.fetch @d
         end
+        @token_cache_a.fetch @d
       end
 
       def current_index
@@ -35,12 +33,10 @@ module Skylab::MetaHell
       end
 
       def current_index= x  # assume is valid index
-        @did = false ; @token = nil
         @d = x ; nil
       end
 
       def advance_one
-        @did = false
         @d += 1 ; nil
       end
     end
