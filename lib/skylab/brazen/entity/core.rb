@@ -1066,18 +1066,35 @@ module Skylab::Brazen
       end
 
       def iambic_writer_method_proc_when_arity_is_one
-        _NAME_I = name_i
+        _SYM = name_symbol
         -> do
-          _prop = self.class.send self.class.entity_formal_property_method_names_box_for_write.fetch _NAME_I
-          receive_value_of_entity_property iambic_property, _prop  # RESULT VALUE
+          receive_value_of_entity_property iambic_property, (
+            self.class.send(
+              self.class.
+                entity_formal_property_method_names_box_for_write.fetch _SYM ) )
+          # RESULT VALUE
         end
       end
 
       def iambic_writer_method_proc_when_arity_is_zero
-        _NAME_I = name_i
+        _SYM = name_symbol
         -> do
-          _prop = self.class.send self.class.entity_formal_property_method_names_box_for_write.fetch _NAME_I
-          receive_value_of_entity_property true, _prop  # RESULT VALUE
+          receive_value_of_entity_property true,
+            self.class.send(
+              self.class.
+                entity_formal_property_method_names_box_for_write.fetch _SYM )
+          # RESULT VALUE
+        end
+      end
+
+      def iambic_writer_method_proc_when_arity_is_one_or_more
+        _SYM = name_symbol
+        -> do
+          receive_list_of_entity_property iambic_property,
+            self.class.send(
+              self.class.
+                entity_formal_property_method_names_box_for_write.fetch _SYM )
+          # RESULT
         end
       end
 

@@ -72,6 +72,10 @@ module Skylab::Callback
             Stream_::Mutable_with_Random_Access__
           end
 
+          def ordered st
+            Stream_::Ordered__[ st ]
+          end
+
           def pair
             Pair_
           end

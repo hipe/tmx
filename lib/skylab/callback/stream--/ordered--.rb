@@ -1,10 +1,11 @@
 module Skylab::Brazen
 
-  class CLI
+  module Callback_
 
-    class Actors__::Via_after_produce_ordered_scanner
+    class Stream__::Ordered__
 
-      Actor_[ self, :properties, :upstream ]
+      Actor_.call self, :properties,
+        :upstream
 
       def initialize
         @went_h = {}
@@ -35,33 +36,33 @@ module Skylab::Brazen
             break
           end
 
-          my_name_sym = item.name.as_lowercase_with_underscores_symbol
+          my_name_x = item.name_value_for_order  # :+#hook-out
 
-          i_go_after_this_sym = item.bound_action.class.after_name_symbol
+          i_go_after_this_x = item.after_name_value_for_order  # :+#hook-out
 
-          _i_may_go_now = if i_go_after_this_sym
-            @went_h.key? i_go_after_this_sym
+          _i_may_go_now = if i_go_after_this_x
+            @went_h.key? i_go_after_this_x
           else
             true
           end
 
           if _i_may_go_now
-            see_item item, my_name_sym
+            see_item item, my_name_x
             x = item
             break
           end
 
-          add_item_to_wait_buffer item, i_go_after_this_sym
+          add_item_to_wait_buffer item, i_go_after_this_x
 
           redo
         end while nil
         x
       end
 
-      def add_item_to_wait_buffer item, sym
+      def add_item_to_wait_buffer item, name_x
         h = @waiting_h
-        a = h.fetch sym do
-          h[ sym ] = []
+        a = h.fetch name_x do
+          h[ name_x ] = []
         end
         a.push item
         nil
@@ -84,9 +85,9 @@ module Skylab::Brazen
         item
       end
 
-      def see_item item, my_name_sym
-        @went_h[ my_name_sym ] = true
-        items_waiting_for_me = @waiting_h.delete my_name_sym
+      def see_item item, my_name_x
+        @went_h[ my_name_x ] = true
+        items_waiting_for_me = @waiting_h.delete my_name_x
         if items_waiting_for_me
           @ready_buffer_queue.push Callback_.stream.via_nonsparse_array items_waiting_for_me
           @p = @gets_from_buffer

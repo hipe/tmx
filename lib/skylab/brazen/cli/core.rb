@@ -319,7 +319,7 @@ module Skylab::Brazen
       end
 
       def wrap_adapter_stream_with_ordering_buffer scn
-        CLI_::Actors__::Via_after_produce_ordered_scanner[ scn ]
+        Callback_.stream.ordered scn
       end
 
       def _leaf_class_for_unbound_action unbound
@@ -870,6 +870,16 @@ module Skylab::Brazen
 
       def maybe_use_exit_status d
         @parent.maybe_use_exit_status d
+      end
+
+      # ~ #hook-outs for adjunct facet: ordering
+
+      def name_value_for_order
+        @bound.name.as_lowercase_with_underscores_symbol
+      end
+
+      def after_name_value_for_order
+        @bound.class.after_name_symbol
       end
     end
 

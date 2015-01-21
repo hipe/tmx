@@ -198,7 +198,7 @@ module Skylab::Brazen
           # overwrite this hook-in called by our produced iambic writer methods
           # (determiend by topic) so that we write not to ivars but to this box.
 
-          actual_property_box_for_write.add prop.name_i, x
+          actual_property_box_for_write.add prop.name_symbol, x
           KEEP_PARSING_
         end
 
