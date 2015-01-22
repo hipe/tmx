@@ -77,39 +77,62 @@ module Skylab::TanMan
           _bc || _mutate_exactly_1_means_or_bc( @output_argument_a, :output )
         end
 
+        def resolve_document_upstream_or_produce_bound_call_
+
+          @input_argument_a = _to_IO_related_twosome_stream.map_reduce_by do | o |
+            if o.property.can_be_used_for_input
+              o.pair
+            end
+          end.to_a
+
+          _mutate_exactly_1_means_or_bc @input_argument_a, :input
+        end
+
         def __input_pairs_and_output_pairs
 
           in_a = []
           out_a = []
 
-          props = self.class.properties
+          st = _to_IO_related_twosome_stream
+          o = st.gets
+          while o
 
-          st = to_actual_argument_stream
-
-          while pair = st.gets
-
-            pair.value_x or next
-              # intentionally set nils are meaningless here
-
-            prp = props.fetch pair.name_symbol
-
-            prp.respond_to? :can_be_used_for_input or next
-              # certainly not all properties are related to this topic
-
-            :config_filename == prp.name_symbol and next
-              # this property is important but not relevant to our counts here
-
-            if prp.can_be_used_for_input
-              in_a.push pair
+            if o.property.can_be_used_for_input
+              in_a.push o.pair
             end
 
-            if prp.can_be_used_for_output
-              out_a.push pair
+            if o.property.can_be_used_for_output
+              out_a.push o.pair
             end
+
+            o = st.gets
           end
 
           [ in_a, out_a ]
         end
+
+        def _to_IO_related_twosome_stream
+
+          props = self.class.properties
+
+          to_actual_argument_stream.map_reduce_by do | pair |
+
+            if pair.value_x  # intentionally set nils are meaningless here
+
+              prp = props.fetch pair.name_symbol
+
+              if prp.respond_to? :can_be_used_for_input  # not all props relate
+
+                if :config_filename != prp.name_symbol  # not relevant to counts
+
+                  Twosome___[ pair, prp ]
+                end
+              end
+            end
+          end
+        end
+
+        Twosome___ = ::Struct.new :pair, :property
 
         def _mutate_exactly_1_means_or_bc arg_a, direction_i
           case 1 <=> arg_a.length

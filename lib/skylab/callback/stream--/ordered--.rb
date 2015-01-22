@@ -72,7 +72,7 @@ module Skylab::Brazen
         begin
           item = @ready_buffer_queue.first.gets
           if item
-            see_item item, item.name.as_lowercase_with_underscores_symbol
+            see_item item, item.name_value_for_order
             break
           end
           @ready_buffer_queue[ 0, 1 ] = EMPTY_A_
@@ -99,7 +99,7 @@ module Skylab::Brazen
 
         _line_a = @waiting_h.each_pair.map do | i, a |
           _i_a = a.map do | item |
-            item.name.as_lowercase_with_underscores_symbol
+            item.name_value_for_order
           end
           "#{ i } <- ( #{ _i_a * ', ' } )"
         end

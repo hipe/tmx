@@ -11,6 +11,10 @@ module Skylab::TanMan
         @kernel = k
       end
 
+      def members
+        [ :graph_sexp, :persist_via_args, :unparse_entire_document ]
+      end
+
       attr_reader :graph_sexp
 
       def description_under expag

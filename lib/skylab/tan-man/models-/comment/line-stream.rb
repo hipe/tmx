@@ -4,12 +4,12 @@ module Skylab::TanMan
 
     Actions = ::Module.new
 
-    module Line_Scan
+    module Line_Stream
 
       class << self
 
         def of_mystery_string str
-          if SHELL_STYLE_OPEN_COMMENT_RX_ =~ str
+          if SHELL_STYLE_OPEN_COMMENT_RX___ =~ str
             of_comment_string str
           elsif C_STYLE_OPEN_COMMENT_RX_ =~ str
             of_comment_string str
@@ -31,7 +31,7 @@ module Skylab::TanMan
 
         def self.[] str
           scn = TanMan_.lib_.string_scanner.new str
-          scan = Scan__.new scn do
+          scan = Stream__.new scn do
             if ! scn.eos?
               scan.last_start_position = scn.pos
               s = scn.scan CONTENT_RX__
@@ -50,14 +50,13 @@ module Skylab::TanMan
         def self.[] str
           scn = TanMan_.lib_.string_scanner.new str
           scn.skip SPACE_RX__
-          if scn.skip C_STYLE_COMMENT_OPENER_RX__
-            type_i = :C_Style__
+          type = if scn.skip C_STYLE_COMMENT_OPENER_RX__
+            :C_Style__
           elsif scn.skip SHELL_STYLE_COMMENT_OPENER_RX__
-            type_i = :Shell_Style__
+            :Shell_Style__
           end
-          if type_i
-            _cls = Line_Scan.const_get type_i, false
-            _cls.new scn
+          if type
+            Line_Stream.const_get( type, false ).new scn
           end
         end
         SPACE_RX__ = /[[:space:]]+/
@@ -68,7 +67,7 @@ module Skylab::TanMan
       module C_Style__
 
         def self.new scn
-          scan = Scan__.new scn do
+          scan = Stream__.new scn do
             while scn and ! scn.eos?
               scan.last_start_position = scn.pos
               s = scn.scan CONTENT_RX__
@@ -91,13 +90,13 @@ module Skylab::TanMan
 
       SHELL_OPEN_RX__ = /[[:space:]]*#/
 
-      SHELL_STYLE_OPEN_COMMENT_RX_ = %r(\A#{ SHELL_OPEN_RX__.source })
+      SHELL_STYLE_OPEN_COMMENT_RX___ = %r(\A#{ SHELL_OPEN_RX__.source })
 
       module Shell_Style__
 
         def self.new scn
           scn.skip SHELL_OPEN_RX__
-          scan = Scan__.new scn do
+          scan = Stream__.new scn do
             while true
               scn or break
               scan.last_start_position = scn.pos
@@ -123,28 +122,32 @@ module Skylab::TanMan
         BLANK_LINES_RX__ = /([ \t]*\r?\n)+/
       end
 
-      class Scan__ < Callback_.stream.stream_class
+      class Stream__ < Callback_.stream.stream_class
 
         def initialize scn=nil, & p
           @last_start_position = @last_end_position = nil
-          @parent_scan = nil
+          @parent_stream = nil
           @string_scanner = scn
           super( & p )
         end
 
-        attr_writer :parent_scan, :last_start_position, :last_end_position
+        def members
+          [ :last_end_position, :last_start_position, :source_string ]
+        end
+
+        attr_writer :parent_stream, :last_start_position, :last_end_position
 
         def source_string
           @string_scanner ? @string_scanner.string :
-            @parent_scan.source_string
+            @parent_stream.source_string
         end
 
         def last_start_position
-          @last_start_position || @parent_scan.last_start_position
+          @last_start_position || @parent_stream.last_start_position
         end
 
         def last_end_position
-          @last_end_position || @parent_scan.last_end_position
+          @last_end_position || @parent_stream.last_end_position
         end
       end
 

@@ -4,9 +4,9 @@ module Skylab::Callback
 
     class Mutable_with_Random_Access__  # abstract base class
 
-      def initialize scan_proc, name_method_i
+      def initialize upstream_proc, name_method_i
         @name_method_i = name_method_i
-        @scan_p = scan_proc
+        @scan_p = upstream_proc
       end
 
       def length

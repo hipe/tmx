@@ -2,9 +2,11 @@ require_relative '../test-support'
 
 module Skylab::TanMan::TestSupport::Models
 
-  ::Skylab::TanMan::TestSupport[ self ]
+  ::Skylab::TanMan::TestSupport[ TS_ = self ]
 
   include Constants
+
+  extend TestSupport_::Quickie
 
   EMPTY_S_ = EMPTY_S_
 
@@ -87,15 +89,19 @@ module Skylab::TanMan::TestSupport::Models
 
       @workspace_path = @ws_pn.to_path  # push up as needed
 
-      ::File.open( ::File.join( @workspace_path, THE_DOTFILE__ ), W_ ) do | fh |
+      ::File.open( dotfile_path, W_ ) do | fh |
         fh.write content_s
       end
 
-      ::File.open( ::File.join( @workspace_path, cfn_shallow ), W_ ) do | fh |
+      ::File.open( File.join( @workspace_path, cfn_shallow ), W_ ) do | fh |
         fh.write "[ graph \"#{ THE_DOTFILE__ }\" ]\n"
       end
 
       nil
+    end
+
+    def dotfile_path
+      ::File.join @workspace_path, THE_DOTFILE__
     end
 
     def use_empty_ws
@@ -147,7 +153,7 @@ module Skylab::TanMan::TestSupport::Models
     def verbosify_tmpdir td
       if do_debug
         if ! td.be_verbose
-          td = td.with :be_verbose, true, :debug_IO, debug_IO
+          td = td.new_with :be_verbose, true, :debug_IO, debug_IO
         end
       elsif td.be_verbose
         self._IT_WILL_BE_EASY

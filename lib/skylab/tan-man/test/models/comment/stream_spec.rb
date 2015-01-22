@@ -21,7 +21,7 @@ module Skylab::TanMan::TestSupport::Models::Scan__
       @s = s
     end
     def expect * s_a
-      _subject = TanMan_::Models_::Comment::Line_Scan
+      _subject = TanMan_::Models_::Comment::Line_Stream
       scn = _subject.send use_method, @s
       a = []
       while s = scn.gets
@@ -31,7 +31,7 @@ module Skylab::TanMan::TestSupport::Models::Scan__
     end
   end
 
-  describe "[tm] comment scan" do
+  describe "[tm] comment stream" do
 
     extend TS__
 

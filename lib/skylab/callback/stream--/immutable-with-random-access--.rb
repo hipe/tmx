@@ -28,8 +28,7 @@ module Skylab::Callback
     protected
       def init_copy_via_iambic x_a
         process_iambic_fully x_a
-        _scn = @produce_scan_p.call
-        init_scn _scn
+        _receive_upstream @produce_upstream_p.call
         nil
       end
     private
@@ -47,10 +46,12 @@ module Skylab::Callback
       end
 
       def init_identity_via_args a
-        scn, meth_i, x_a  = a
-        scn and init_scn scn
-        meth_i and @meth_i = meth_i
-        x_a.length.nonzero? and process_iambic_fully x_a
+        st, key_method_name, x_a  = a
+        st and _receive_upstream st
+        key_method_name and @key_method_name = key_method_name
+        if x_a and x_a.length.nonzero?
+          process_iambic_fully x_a
+        end
         nil
       end
 
@@ -61,17 +62,10 @@ module Skylab::Callback
 
       include Callback_::Actor.methodic_lib.iambic_processing_instance_methods
 
-      def init_scn scn
-        @a = [] ; @h = {}
-        @d = -1
-        @done = false
-        @scn = scn ; nil
-      end
-
     private
 
       def key_method_name=
-        @meth_i = iambic_property
+        @key_method_name = iambic_property
         KEEP_PARSING_
       end
 
@@ -85,24 +79,31 @@ module Skylab::Callback
         KEEP_PARSING_
       end
 
-      def scan_proc=
-        @produce_scan_p = iambic_property
-        KEEP_PARSING_
-      end
-
-      def scn=
-        init_scn iambic_property
-        KEEP_PARSING_
-      end
-
       def on_assignment_via_value_and_name=
         @on_assignment_via_value_and_name = iambic_property
+        KEEP_PARSING_
+      end
+
+      def upstream=  # use for one-offs, not curries
+        _receive_upstream iambic_property
+        KEEP_PARSING_
+      end
+
+      def upstream_proc=  # use for curries, not one-offs
+        @produce_upstream_p = iambic_property
         KEEP_PARSING_
       end
 
       def value_mapper=  # #ra-105 in [#044]
         @value_mapper = iambic_property
         KEEP_PARSING_
+      end
+
+      def _receive_upstream st
+        @a = [] ; @h = {}
+        @d = -1
+        @done = false
+        @upstream = st ; nil
       end
 
     public
@@ -207,12 +208,12 @@ module Skylab::Callback
       def has_name_for_unseen_name_when_not_done i
         did_have = false
         while true
-          x = @scn.gets
+          x = @upstream.gets
           if ! x
             become_done
             break
           end
-          name_i = x.send @meth_i
+          name_i = x.send @key_method_name
           store_via_value_and_supposedly_unique_name x, name_i
           if i == name_i
             did_have = true
@@ -231,20 +232,24 @@ module Skylab::Callback
       def reduce_by i=nil
         if i
           if block_given?
-            scn = to_value_stream
+            st = to_value_stream
             ivar = :"@#{ i }"
-            while x = scn.gets
+            x = st.gets
+            while x
               x.instance_variable_defined?( ivar ) and yield x
+              x = st.gets
             end
           else
             enum_for :reduce_by, i
           end
         else
           ::Enumerator.new do |y|
-            scn = to_value_stream
-            while x = scn.gets
+            st = to_value_stream
+            x = st.gets
+            while x
               _b = yield x
               _b and y << x
+              x = st.gets
             end ; nil
           end
         end
@@ -256,9 +261,11 @@ module Skylab::Callback
 
       def each_value
         if block_given?
-          scn = to_value_stream
-          while x = scn.gets
+          st = to_value_stream
+          x = st.gets
+          while x
             yield x
+            x = st.gets
           end ; nil
         else
           to_enum :each_value
@@ -267,9 +274,11 @@ module Skylab::Callback
 
       def each  # where available
         if block_given?
-          scn = to_pair_stream
-          while pair = scn.gets
+          st = to_pair_stream
+          pair = st.gets
+          while pair
             yield( * @each_mapper[ pair ] )
+            pair = st.gets
           end
         else
           to_enum :each
@@ -278,14 +287,17 @@ module Skylab::Callback
 
       def each_pair
         if block_given?
-          scn = to_pair_stream
+          st = to_pair_stream
+          pair = st.gets
           if @each_pair_mapper
-            while pair = scn.gets
+            while pair
               yield( * @each_pair_mapper[ pair ] )
+              pair = st.gets
             end
           else
-            while pair = scn.gets
+            while pair
               yield pair.name_i, pair.value_x
+              pair = st.gets
             end
           end
         else
@@ -388,7 +400,7 @@ module Skylab::Callback
       def key_at_unknown_index d
         x = at_unknown_index d
         if x
-          x.send @meth_i
+          x.send @key_method_name
         end
       end
 
@@ -400,9 +412,9 @@ module Skylab::Callback
 
       def at_unknown_index d
         while @d < d
-          x = @scn.gets
+          x = @upstream.gets
           if x
-            name_i = x.send @meth_i
+            name_i = x.send @key_method_name
             store_via_value_and_supposedly_unique_name x, name_i
           else
             become_done

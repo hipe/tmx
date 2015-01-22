@@ -1,25 +1,34 @@
 module Skylab::TanMan
-  class API::Actions::Graph::Tell < API::Action
-    extend API::Action::Parameter_Adapter
 
-    param :dry_run, accessor: true, default: false
-    param :force, accessor: true, default: false
-    param :rebuild_tell_grammar, accessor: true, default: false
-    param :verbose, accessor: true, default: false
-    param :words, accessor: true, list: true, required: true
+  class Models_::Workspace
 
-    include TanMan::Statement::Parser::InstanceMethods
+    module Hear_Map
 
-  private
+      module Definitions
 
-    def execute
-      res = nil
-      begin
-        controller = collections.dot_file.currently_using or break
-        statement = parse_words( words ) or break
-        res = controller.tell statement, dry_run, force, verbose
-      end while nil
-      res
+        class Init
+
+          def after
+            [ :meaning, :set_meaning ]
+          end
+
+          def definition
+            [ :sequence, :functions,
+                :keyword, 'start',
+                :keyword, 'a',
+                :keyword, 'new',
+                :one_or_more, :any_token ]
+          end
+
+          def bound_call_via_heard hrd, & oes_p
+
+            self._TODO_fix_grammar  # #todo
+
+            hrd.kernel.bound_API_call_with :init,
+              :path, ::Dir.pwd, & oes_p
+          end
+        end
+      end
     end
   end
 end

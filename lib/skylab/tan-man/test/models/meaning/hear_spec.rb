@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::Models::Meaning
 
-  describe "[tm] CLI::Actions::Graph::Tell - tell the graph meaning", wip: true do
+  describe "[tm] models - meaning - hear" do
 
     extend TS_
 
@@ -14,18 +14,22 @@ module Skylab::TanMan::TestSupport::Models::Meaning
         }
       O
 
-      tell 'foo', 'means', 'bar'
+      call_API :hear,
+        :word, [ 'foo', 'means', 'bar' ],
+        :workspace_path, @workspace_path,
+        :config_filename, cfn_shallow
 
-      strings.join.should match( /added.+new.+meaning.+foo/ )
-      names.should eql( [:infostream] )
+      expect_OK_event :wrote_resource
+      expect_succeeded
 
-      exp = <<-O.unindent
+      _exp = <<-O.unindent
         digraph {
           # biff : baz
           #  foo : bar
         }
       O
-      dotfile_pathname.read.should eql( exp )
+
+      ::File.read( dotfile_path ).should eql _exp
     end
 
     it "assign a known meaning to a new value" do
@@ -36,17 +40,21 @@ module Skylab::TanMan::TestSupport::Models::Meaning
         }
       O
 
-      tell 'success', 'means', 'blue'
+      call_API :hear,
+        :word, [ 'success', 'means', 'blue' ],
+        :workspace_path, @workspace_path,
+        :config_filename, cfn_shallow
 
-      strings.join.should match(/changed meaning of success from red to blue/)
-      names.should eql( [:infostream] )
+      expect_OK_event :wrote_resource
+      expect_succeeded
 
-      exp = <<-O.unindent
+      _exp = <<-O.unindent
         digraph {
           # success : blue
         }
       O
-      dotfile_pathname.read.should eql( exp )
+
+      ::File.read( dotfile_path ).should eql _exp
     end
   end
 end

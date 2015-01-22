@@ -193,6 +193,10 @@ module Skylab::Brazen
           end
         end
 
+        def receive_list_of_entity_property a, prp  # #hook-out to [cb]
+          receive_value_of_entity_property a, prp
+        end
+
         def receive_value_of_entity_property x, prop  # #hook-in
 
           # overwrite this hook-in called by our produced iambic writer methods

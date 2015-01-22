@@ -38,10 +38,19 @@ module Skylab::Brazen
 
     def call * x_a, & x_p  # #note-25
 
-      bc = @module.const_get( :API, false )._API_daemon.
-        produce_bound_call_via_mutable_iambic x_a, & x_p
+      bc = _bound_API_call_via_iambic x_a, & x_p
 
       bc and bc.receiver.send bc.method_name, * bc.args
+    end
+
+    def bound_API_call_with * x_a, & x_p
+      _bound_API_call_via_iambic x_a, & x_p
+    end
+
+    def _bound_API_call_via_iambic x_a, & x_p
+
+      @module.const_get( :API, false )._API_daemon.
+        produce_bound_call_via_mutable_iambic x_a, & x_p
     end
 
     def to_unbound_action_stream

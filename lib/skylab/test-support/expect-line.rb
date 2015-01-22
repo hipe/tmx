@@ -195,6 +195,15 @@ module Skylab::TestSupport
 
       attr_reader :line
 
+      def advance_N_lines d
+        line = nil
+        d.times do
+          line = @up.gets
+        end
+        @line = line
+        line
+      end
+
       def next_line
         @line = @up.gets
       end

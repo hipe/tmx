@@ -13,58 +13,88 @@ module Skylab::TanMan
         end
       end
 
-      def initialize
-        super
-        @input_string = @action.argument_value :input_string
-      end
-
       # ~ create
 
       def persist_entity ent, & oes_p
-        _p = method :build_scan
-        _os = @action.argument_value :output_string
-        Meaning_::Actors__::Persist[ ent, _os, _p, oes_p ]
+
+        @_dot_file = @preconditions.fetch :dot_file
+
+        _ok = Meaning_::Actors__::Persist.call(
+          _build_session,
+          @action.argument_box[ :force ],
+          ent,
+          & oes_p )
+
+        _ok && @_dot_file.persist_via_args( false, * @action.output_arguments )
       end
 
       # ~ retrieve (many)
 
       def entity_stream_via_model cls, & oes_p
+
+        @_dot_file = @preconditions.fetch :dot_file
+
         if model_class == cls  # just to punish those who dare defy us
-          build_scan
+          _build_session.to_stream_of_meanings_with_mutable_string_metadata
         end
       end
 
-      # #todo: remove to_property_hash
+      def _build_session
+        Session__.new @_dot_file.graph_sexp
+      end
 
-    private
+      class Session__
 
-      def build_scan
-        scan = build_comment_line_scan
-        fly = Meaning_::Flyweight__.new
-        scan_ = scan.map_reduce_by do |line|
-          if ASSOCIATION_RX__ =~ line
-            fly.set!(
-              scan.last_start_position,
-              scan.last_end_position,
-              scan.source_string )
-            fly
+        def initialize sx
+          @s_a = []
+
+          if ! sx.e6
+            sx.e6 = ""  # MEH - make life easier by guaranteeing at least one editable
+          end
+
+          @fallback_mutable_string = sx.e6
+
+          [ :e0, :e6, :e10 ].each do | sym |
+            x = sx[ sym ]
+            x and @s_a.push x
           end
         end
-        scan_.parent_scan = scan
-        scan_
-      end
-      ASSOCIATION_RX__ = /\A[ \t]*[-a-z]+[ \t]*:/
 
-      def build_comment_line_scan
-        if @input_string
-          produce_comment_line_scan_via_mystery_string @input_string
-        else
+        attr_reader :fallback_mutable_string
 
+        def to_stream_of_meanings_with_mutable_string_metadata
+
+          # we have a chain of three streams: 1) the stream of editable strings
+          # (probably 1 to3 for each graph document) 2) within each one, the
+          # stream of comment lines and 3) of each comment line *maybe* a
+          # meaning (so 3 is a reduction of 2). from the items produced by the
+          # last stream we want to be able to reach the item that expand (1)
+          # to (2) because it is a special stream subclass that gives us
+          # metadata so we can mutate the strings in (1). this is never easy;
+          # this is the third complete overhaul of how we do this.
+
+          fly = Meaning_::Flyweight__.new
+
+          special_line_st = nil
+
+          Callback_.stream.via_nonsparse_array( @s_a ).expand_by do | mutable_s |
+
+            special_line_st = Models_::Comment::Line_Stream.of_mystery_string mutable_s
+
+          end.map_reduce_by do | line |
+
+            if ASSOCIATION_RX___ =~ line
+              fly.set!(
+                special_line_st.last_start_position,
+                special_line_st.last_end_position,
+                special_line_st.source_string )
+              fly
+            end
+          end
         end
-      end
 
-      def produce_comment_line_scan_via_mystery_string str
-        Models_::Comment::Line_Scan.of_mystery_string str
+        ASSOCIATION_RX___ = /\A[ \t]*[-a-z]+[ \t]*:/
+
       end
     end
 

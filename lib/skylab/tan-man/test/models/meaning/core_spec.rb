@@ -6,39 +6,65 @@ module Skylab::TanMan::TestSupport::Models::Meaning
 
     extend TS_
 
-    it "add - in between" do
-      s = " # cutie : pattootey\n  # fazinkle: doo-dinkle\n"
+    it "add - shell-style, after, in between - spacing mimics greatest lesser neighbor" do
+      s = "digraph{}\n # cutie : patootey\n  # fazinkle: doo-dinkle\n"
       insert_foo_bar_into s
-      s.should eql " # cutie : pattootey\n  # fazinkle: doo-dinkle\n  #      foo: bar\n"
+      s.should eql( <<-O.unindent )
+      digraph{}
+       # cutie : patootey
+        # fazinkle: doo-dinkle
+        #      foo: bar
+      O
       expect_succeeded
     end
 
-    it "add - before" do
-      s = " /* winterly : wanterly \n bliff blaff */ "
+    it "add - C-style, before, before" do
+      s = " /* winterly : wanterly \n bliff blaff */ digraph{}"
       insert_foo_bar_into s
-      s.should eql " /* winterly : wanterly \n         foo : bar\n bliff blaff */ "
+      s.should eql " /* winterly : wanterly \n         foo : bar\n bliff blaff */ digraph{}"
       expect_succeeded
     end
 
-    it "add - after" do
-      s = "  /* dolan : is \n a : duck \n */ "
+    it "add - C-style, inside, after" do
+      s = "digraph{ /* dolan : is \n a : duck \n */ }"
       insert_foo_bar_into s
-      s.should eql "  /* dolan : is \n a : duck \nfoo : bar\n */ "
+      s.should eql "digraph{ /* dolan : is \n a : duck \nfoo : bar\n */ }"
       expect_succeeded
+    end
+
+    it "add - shell-style, inside, after" do
+
+      s = <<-O.unindent
+        # bifd : x
+
+        digraph {
+
+          # biff : baz
+
+        }
+        # zeff: baz
+      O
+
+      insert_foo_bar_into s
+
+      scn = TestSupport_::Expect_Line::Scanner.via_string s
+      scn.advance_N_lines 4
+      scn.next_line.should eql "  # biff : baz\n"
+      scn.next_line.should eql "  #  foo : bar\n"
     end
 
     it "add to string with one space" do
-      s = ' '
+      s = 'digraph{ }'
       insert_foo_bar_into s
-      s.should eql "  foo : bar\n"
+      s.should eql "digraph{ # foo : bar\n}"
       expect_succeeded
     end
 
     it "add will not clobber" do
-      s = ' foo : x '
+      s = "digraph{ # foo : x\n}"
       insert_foo_bar_into s
       expect_not_OK_event :name_collision,
-        'cannot set (lbl "foo") to (val "bar"), it is already set to (val "x ")'
+        'cannot set (lbl "foo") to (val "bar"), it is already set to (val "x")'
       expect_failed
     end
 
@@ -46,16 +72,9 @@ module Skylab::TanMan::TestSupport::Models::Meaning
       call_API :meaning, :add, :input_string, s, :output_string, s, :name, 'foo', :value, 'bar'
     end
 
-    it "list when input string has no parsable lines" do
-      call_API :meaning, :ls, :input_string, "jibber\njabber"
-      expect_no_events
-      st = @result
-      st.gets.should be_nil
-    end
-
     it "list when input string has parsable lines" do
 
-      call_API :meaning, :ls, :input_string, " foo : fee \n fiffle: faffle"
+      call_API :meaning, :ls, :input_string, "digraph{/* foo : fee \n fiffle: faffle */}"
 
       expect_no_events
       st = @result
@@ -66,7 +85,7 @@ module Skylab::TanMan::TestSupport::Models::Meaning
 
       ent = st.gets
         ent.property_value_via_symbol( :name ).should eql 'fiffle'
-        ent.property_value_via_symbol( :value ).should eql 'faffle'
+        ent.property_value_via_symbol( :value ).should eql 'faffle */'  # <- LOOK
 
       st.gets.should be_nil
 
@@ -89,7 +108,6 @@ module Skylab::TanMan::TestSupport::Models::Meaning
       alist._insert_assignment :fontname, 'Futura'
       alist.unparse.should eql('fontname=Futura, label=barl')
     end
-
 
     it "UPDATE ONE AND ADD ONE -- WHAT WILL HAPPEN!!?? - note order logic", wip: true do
 

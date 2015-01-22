@@ -411,7 +411,7 @@ module Skylab::TanMan
     autoload_actions
   end
 
-  class Models_::Meaning < Model_
+  class Models_::Meaning < Model_::Document_Entity
 
     desc "manage meaning."
 

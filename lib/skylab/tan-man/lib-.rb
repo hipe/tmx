@@ -42,8 +42,14 @@ module Skylab::TanMan
       Basic[]::Module
     end
 
+    MH__ = sidesys[ :MetaHell ]
+
     NLP_EN_methods = -> do
       HL__[].expression_agent.NLP_EN_methods
+    end
+
+    Parse_lib = -> do
+      MH__[]::Parse
     end
 
     Path_tools = -> do

@@ -5,46 +5,45 @@ module Skylab::TanMan
       class Actors__::Persist
 
         Actor_.call self, :properties,
-          :ent,
-          :output_s,
-          :scan_p,
-          :on_event_selectively
+          :session,
+          :change_is_OK,
+          :entity
 
         def execute
           init_ivars
-          ok = resolve_insertion_range
+          ok = resolve_insertion_ivars
           ok and rewrite_string
         end
 
       private
 
         def init_ivars
-          @name = @ent.property_value_via_symbol :name
+          @name = @entity.property_value_via_symbol :name
           @new_line = nil
-          @value = @ent.property_value_via_symbol :value
+          @value = @entity.property_value_via_symbol :value
         end
 
-        def resolve_insertion_range
+        def resolve_insertion_ivars
           greatest_lesser_name, exact_fly, least_greater_name = find_neighbors
           if exact_fly
             @exact_match_fly = exact_fly
-            when_exact_match_fly_resolve_insertion_range
+            when_exact_match_fly_resolve_insertion_ivars
           elsif greatest_lesser_name
             @greatest_lesser_name = greatest_lesser_name
-            after_greatest_lesser_name_resolve_insertion_range
+            after_greatest_lesser_name_resolve_insertion_ivars
           elsif least_greater_name
             @least_greater_name = least_greater_name
-            before_least_greater_name_resolve_insertion_range
+            before_least_greater_name_resolve_insertion_ivars
           else
-            when_no_neighbors_resolve_insertion_range
+            when_no_neighbors_resolve_insertion_ivars
           end
         end
 
         def find_neighbors
           my_name = @name
-          @scan = produce_fresh_stream
+          @stream = @session.to_stream_of_meanings_with_mutable_string_metadata
           least_greater_name = nil
-          while fly = @scan.gets
+          while fly = @stream.gets
             name = fly.property_value_via_symbol :name
             case name <=> my_name
             when -1 ; greatest_lesser_name = name
@@ -55,48 +54,60 @@ module Skylab::TanMan
           [ greatest_lesser_name, exact, least_greater_name ]
         end
 
-        def when_exact_match_fly_resolve_insertion_range
-          _change_OK = :change == @ent.name.as_lowercase_with_underscores_symbol  # #todo
-          if _change_OK
-            when_change_OK
+        def when_exact_match_fly_resolve_insertion_ivars
+          if @change_is_OK
+            via_exact_match_resolve_insertion_ivars
           else
             when_name_collision
           end
         end
 
-        def after_greatest_lesser_name_resolve_insertion_range
-          @example = find_first_flyweight_with_name @greatest_lesser_name
-          d = @example.next_line_start_pos
-          @insertion_range = d .. d-1 ; ACHIEVED_
+        def via_exact_match_resolve_insertion_ivars
+          o = @reference_meaning = @exact_match_fly
+          @insertion_range = o.line_start .. o.end_pos
+          @mutable_s = o.whole_string
+          ACHIEVED_
         end
 
-        def before_least_greater_name_resolve_insertion_range
-          @example = find_first_flyweight_with_name @least_greater_name
-          d = @example.next_line_start_pos
-          @insertion_range = d .. d-1 ; ACHIEVED_
+        def after_greatest_lesser_name_resolve_insertion_ivars
+          @reference_meaning = find_first_flyweight_with_name @greatest_lesser_name
+          d = @reference_meaning.next_line_start_pos
+          @insertion_range = d ... d
+          @mutable_s = @reference_meaning.whole_string
+          ACHIEVED_
+        end
+
+        def before_least_greater_name_resolve_insertion_ivars
+          @reference_meaning = find_first_flyweight_with_name @least_greater_name
+          d = @reference_meaning.next_line_start_pos
+          @insertion_range = d ... d
+          @mutable_s = @reference_meaning.whole_string
+          ACHIEVED_
         end
 
         def find_first_flyweight_with_name s
-          @scan = produce_fresh_stream
-          @scan.detect do |ent|
+          @stream = @session.to_stream_of_meanings_with_mutable_string_metadata
+          @stream.detect do |ent|
             s == ent.property_value_via_symbol( :name )
           end
         end
 
-        def when_no_neighbors_resolve_insertion_range
+        def when_no_neighbors_resolve_insertion_ivars
           @new_line = " #{ @name } : #{ @value }\n"
-          d = @scan.last_end_position
-          @insertion_range = d .. d-1 ; ACHIEVED_
+          @mutable_s = @session.fallback_mutable_string
+          @mutable_s[ @mutable_s.length, 0 ] = "#"  # because MEH
+          @insertion_range = @mutable_s.length ... @mutable_s.length
+          ACHIEVED_
         end
 
         def rewrite_string
           @new_line || resolve_new_line
-          @output_s[ @insertion_range ] = @new_line
+          @mutable_s[ @insertion_range ] = @new_line  # etc
           ACHIEVED_
         end
 
         def resolve_new_line
-          o = @example
+          o = @reference_meaning
           o_x = o.line_start
           its_width_to_colon = o.colon_pos - o_x
           its_e2_width = o.colon_pos - o.name_range.end - 1
@@ -161,9 +172,6 @@ module Skylab::TanMan
           end
         end
 
-        def produce_fresh_stream
-          @scan_p[]
-        end
 
         C_STYLE_OPEN_COMMENT_RX_ = /\A[ \t]*\/\*/
         TRAILING_WHITESPACE_RX__ = /[ \t]+\z/

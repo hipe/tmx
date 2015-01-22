@@ -402,7 +402,7 @@ module Skylab::TestSupport
 
           Callback_.stream.immutable_with_random_access.new_with(
             :key_method_name, :name_symbol,
-            :scn, bx.to_value_stream )
+            :upstream, bx.to_value_stream )
 
         end
 

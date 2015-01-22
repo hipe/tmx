@@ -20,7 +20,7 @@ module Skylab::Headless
             _scan_ = _scan.map_by do |sw|
               Option_.build_via_switch sw
             end
-            new_with :scn, _scan_, :key_method_name, :normalized_parameter_name
+            new_with :upstream, _scan_, :key_method_name, :normalized_parameter_name
           end
 
           def weak_identifier_for_switch sw

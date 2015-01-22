@@ -8,6 +8,10 @@ module Skylab::TanMan
       @indexed = @scn = nil
     end
 
+    def members
+      [ :start_pos, :end_pos, :whole_string ]
+    end
+
     attr_reader :start_pos, :end_pos
     attr_reader :next_line_start_pos
 

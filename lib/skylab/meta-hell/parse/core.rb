@@ -14,8 +14,17 @@ module Skylab::MetaHell
           false )
       end
 
+      def function_via_definition_array x_a
+        st = Callback_::Iambic_Stream.via_array x_a
+        function_( st.gets_one ).new_via_iambic_stream st
+      end
+
       def fuzzy_matcher * a
         Parse_::Functions_::Keyword.new_via_arglist( a ).to_matcher
+      end
+
+      def input_stream
+        Parse_::Input_Stream_
       end
 
       def parse_serial_optionals * a

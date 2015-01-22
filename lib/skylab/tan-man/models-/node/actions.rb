@@ -19,9 +19,7 @@ module Skylab::TanMan
 
     module Actions
 
-      Add = make_action_class :Create
-
-      class Add
+      Add = make_action_class :Create do
 
         Model_::Entity.call self,
 
@@ -35,37 +33,30 @@ module Skylab::TanMan
           if @argument_box[ :ping ]
             bound_call_for_ping
           else
-            _bc = resolve_document_IO_or_produce_bound_call_
-            _bc or super
+            resolve_document_IO_or_produce_bound_call_ or super
           end
         end
       end
 
-      Ls = make_action_class :List
-
-      class Ls
+      Ls = make_action_class :List do
 
         Model_::Entity.call self,
 
           :reuse, Model_::Document_Entity.input_properties
 
         def via_arguments_produce_bound_call
-          _bc = resolve_document_IO_or_produce_bound_call_
-          _bc or super
+          resolve_document_IO_or_produce_bound_call_ or super
         end
       end
 
-      Rm = make_action_class :Delete
-
-      class Rm
+      Rm = make_action_class :Delete do
 
         Model_::Entity.call self,
 
           :reuse, Model_::Document_Entity.input_properties
 
         def via_arguments_produce_bound_call
-          _bc = resolve_document_IO_or_produce_bound_call_
-          _bc or super
+          resolve_document_IO_or_produce_bound_call_ or super
         end
       end
     end
