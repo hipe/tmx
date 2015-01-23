@@ -30,15 +30,15 @@ module Skylab::TanMan
 
             o = TanMan_::Model_::Document_Entity
 
-            @input_arg, output_arg = o::IO_Argument_Partition_Session.new(
+            @input_arg, output_args = o::IO_Argument_Partition_Session.new(
               @bx.method( :to_pair_stream ),
               o.IO_properties_shell,
-              & @on_event_selectively ).to_one_input_and_one_output_arg
+              & @on_event_selectively ).to_one_input_and_many_output_args
 
             @input_arg and begin
               dc = super
               dc and begin
-                dc.caddied_output_arg = output_arg
+                dc.caddied_output_args = output_args
                 dc
               end
             end

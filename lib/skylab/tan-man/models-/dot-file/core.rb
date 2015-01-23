@@ -59,6 +59,10 @@ module Skylab::TanMan
 
     class Silo__ < Model_lib_[].silo_class
 
+      def members
+        [ :document_controller_via_argument_box, * super ]
+      end
+
       def model_class
         DotFile_
       end

@@ -4,26 +4,34 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::Models::DotFile
 
-  class Grammar < ::Skylab::TanMan::TestSupport::Sexp::Grammar
+  class Client
 
-    # we jump through some hoops to bootstrap-in a real life grammar
-    # into the testing mix
-
-    def grammars o
-    o.treetop_grammar '../../../models/dot-file/dot-language-hand-made.treetop'
-    o.treetop_grammar '../../../models/dot-file/dot-language.generated.treetop'
+    def initialize
+      @on_event_selectively = -> * i_a, & ev_p do
+        ev = ev_p[]
+        if :using != ev.terminal_channel_i
+          raise ev.to_exception
+        end
+      end
     end
 
-    def do_force_overwrite
-      true
+    def parse_file input_file_path
+      _doc_controller_via_name_value_pair( :input_path, input_file_path ).graph_sexp
     end
 
-    def stem_path
-      'dawt-file' # used to make a tmpdir dir
+    def parse_string input_string
+      _doc_controller_via_name_value_pair( :input_string, input_string ).graph_sexp
+    end
+
+    def _doc_controller_via_name_value_pair sym, x
+      bx = TanMan_::Callback_::Box.new
+      bx.add sym, x
+      TanMan_::API.application_kernel.silo( :dot_file ).
+        document_controller_via_argument_box bx, & @on_event_selectively
     end
   end
 end
 
 if __FILE__ == $PROGRAM_NAME
-  ::Skylab::TanMan::TestSupport::Models::DotFile::Grammar.new.invoke ARGV
+  ::Skylab::TanMan::TestSupport::Models::DotFile::Client.new.invoke ARGV
 end

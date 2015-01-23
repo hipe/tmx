@@ -45,8 +45,6 @@ module Skylab::TestSupport
         nil
       end
 
-     alias_method :regret_extended_notify, :extended
-
     public
 
       def initialize_for_regret_with_parent_anchor_mod pam

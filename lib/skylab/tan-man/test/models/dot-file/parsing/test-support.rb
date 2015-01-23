@@ -1,45 +1,52 @@
 require_relative '../test-support'
 
-# (reference: http://solnic.eu/2014/01/14/custom-rspec-2-matchers.html)
-
-if false
-RSpec::Matchers.define :be_sexp do |expected|
-
-  match do |actual|
-    not
-    if /\ASexps\z/ !~ (_ = actual.class.to_s.split('::')[-2]) then
-      @message = "expected containing module to be Sexps,  had #{_}"
-    elsif (_ = actual.class.expression) != expected
-      @message = "expected expression to be #{expected.inspect} had #{_.inspect}"
-    end
-  end
-  failure_message_for_should do |actual|
-    @message or "unknown failure!"
-  end
-end
-end
-
 module Skylab::TanMan::TestSupport::Models::DotFile::Parsing
 
-  Skylab::TanMan::TestSupport::Models::DotFile[ TS_ = self ]
+  Parent_ = Skylab::TanMan::TestSupport::Models::DotFile
 
-  def self.extended mod
-    regret_extended_notify mod
-    mod.before(:all) { _my_before_all }
-  end
+  Parent_[ TS_ = self ]
 
-  module ModuleMethods
-    def it_unparses_losslessly(*tags)
-      it 'unparses losslessly', *tags do
-        result.unparse.should eql(input_string)
-      end
-    end
-  end
+  include Constants
+
+  extend TestSupport_::Quickie
 
   module InstanceMethods
+
+    def prepare_to_produce_result
+
+      if ! Parent_.const_defined?( :Client, false )
+        load ::File.join( Parent_.dir_pathname.to_path, 'client' )   # because new a.l borks because no extname. meh
+      end
+
+      @parse = Parent_::Client.new
+      true
+    end
 
     def module_with_subject_fixtures_node
       TS_
     end
+
+    def expect_digraph_document_sexp
+      x = result
+      part = Parent_module_name__[ x.class ]
+      if SEXPS__ == part
+        if :graph != x.class.expression
+          fail "expected 'graph', had '#{ x.class.expression }'"
+        end
+      else
+        fail "expected containing moudle to be '#{ SEXPS__ }', had #{ part }"
+      end
+    end
   end
+
+  Parent_module_name__ = -> do  # (is in and belongs in neither [ba] nor [br])
+    rx = /[^:]+(?=::[^:]+\z)/
+    -> mod do
+      rx.match( mod.name )[ 0 ]
+    end
+  end.call
+
+  SEXPS__ = 'Sexps'
+
 end
+# (WAS reference: http://solnic.eu/2014/01/14/custom-rspec-2-matchers.html)

@@ -12,7 +12,7 @@ module Skylab::TanMan
       end
 
       def members
-        [ :caddied_output_arg, :graph_sexp,
+        [ :caddied_output_args, :graph_sexp,
           :persist_via_args, :unparse_entire_document ]
       end
 
@@ -169,7 +169,7 @@ module Skylab::TanMan
     end
     end
 
-      attr_accessor :caddied_output_arg  # topic doesn't do anything with this, just carries it
+      attr_accessor :caddied_output_args  # topic doesn't do anything with this, just carries it
 
       def persist_via_args is_dry, arg
         adapter = Persist_Adapters__.produce_via_argument arg

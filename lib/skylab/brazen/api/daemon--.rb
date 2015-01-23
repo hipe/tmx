@@ -23,6 +23,10 @@ module Skylab::Brazen
 
     extend module MM__
 
+      def members
+        [ :application_kernel, :call ]
+      end
+
       def call * x_a, & x_p
         bc = _API_daemon.produce_bound_call_via_mutable_iambic x_a, & x_p
         bc and bc.receiver.send bc.method_name, * bc.args

@@ -9,7 +9,7 @@ module Skylab::Brazen
     end
 
     def members
-      [ :app_name, :debug_IO, :module ]
+      [ :app_name, :debug_IO, :module, :silo ]
     end
 
     def to_kernel

@@ -10,7 +10,7 @@ module Skylab::TanMan::TestSupport::Sexp::Auto
 
     def it_unparses_losslessly *tags
       it "unparses losslessly", *tags do
-        result.unparse.should eql some_input_string
+        unparse_losslessly
       end
     end
 

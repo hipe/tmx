@@ -1,34 +1,47 @@
 require_relative 'test-support'
 
+module Skylab::TanMan::TestSupport::Models::DotFile::Parsing
 
-describe "[tm] TanMan_::Models::DotFile /parsing/examples-490-699", wip: true do
+describe "[tm] models - dot-file parsing - examples 490 to 699" do
 
-  extend ::Skylab::TanMan::TestSupport::Models::DotFile::Parsing
+  extend TS_
 
-  using_input '490-datastruct-essential.dot' do
+  context "using `rankdir=LR` and pipes in labels (input #490)" do
+
+    against_file '490-datastruct-essential.dot'
+
     it 'should look kewl, unparse losslessly, semantify an edge stmt' do
-      result.unparse.should eql(input_string)
-      result.stmt_list.stmts.map { |x| x.class.expression }.should eql(
+
+      unparse_losslessly
+      x = @result
+
+      x.stmt_list.stmts.map { |x_| x_.class.expression }.should eql(
         [:attr_stmt, :node_stmt, :node_stmt, :node_stmt, :edge_stmt, :edge_stmt]
       )
-      stmt = result.stmt_list.stmts.detect { |x| :edge_stmt == x.class.expression }
+      stmt = x.stmt_list.stmts.detect { |x_| :edge_stmt == x_.class.expression }
       stmt.agent.id.content_text_value.should eql('node0')
       stmt.edge_rhs.edgeop.should eql('->')
       stmt.edge_rhs.recipient.id.content_text_value.should eql('node1')
     end
   end
 
-  using_input '500-datastruct.dot' do
+  context "a full, non-minimal graph-viz example, like above (input #500)" do
+
+    against_file '500-datastruct.dot'
+
     it 'should parse and loslessly unparse this representative example' do
-      (!! result).should eql(true)
-      result.unparse.should eql(input_string)
+      unparse_losslessly
     end
   end
 
-  using_input '699-psg.dot' do
+  context "a full, non-minimal graph-viz examle with HTML in it (input #699)" do
+
+    against_file '699-psg.dot'
+
     it 'should parse this representative graph with HTML in it' do
-      (!! result).should eql(true)
-      stmts = result.stmt_list.stmts
+
+      x = result
+      stmts = x.stmt_list.stmts
       stmts.length.should eql(26)
       stmt = stmts[4]
       a = stmt.attr_list.attrs.first.as.detect do |_a|
@@ -41,4 +54,5 @@ describe "[tm] TanMan_::Models::DotFile /parsing/examples-490-699", wip: true do
         match(%r{\A<table .+</table>\z}))
     end
   end
+end
 end

@@ -133,12 +133,11 @@ module Skylab::TanMan
           @to_actual_arg_stream = to_arg_stream
         end
 
-        def to_one_input_and_one_output_arg
+        def to_one_input_and_many_output_args
           in_a, out_a = to_input_and_output_args
-          ok = _one in_a, :input
-          ok &&= _one( out_a, :output )
-          ok and begin
-            [ in_a.fetch( 0 ), out_a.fetch( 0 ) ]
+          _ok = _one in_a, :input
+          _ok and begin
+            [ in_a.fetch( 0 ), out_a ]
           end
         end
 

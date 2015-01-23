@@ -141,17 +141,11 @@ module Skylab::TanMan::TestSupport
       end
     end
 
-    def using_input _STEM_, *tags, & p
+    def using_input stem, *tags, & p
 
-      context "using input #{ _STEM_ }", *tags do
+      context "using input #{ stem }", *tags do
 
-        define_method :input_mechanism_i do
-          :input_file_granule
-        end
-
-        define_method :input_file_granule do
-          _STEM_
-        end
+        against_file stem
 
         module_exec( & p )
       end
@@ -167,13 +161,26 @@ module Skylab::TanMan::TestSupport
 
       context desc, * tags do
 
-        input _STR_
+        against_string _STR_
 
         module_exec( & p )
       end
     end
 
-    def input _STR_
+    def against_file _RELPATH_
+
+      define_method :input_mechanism_i do
+        :input_file_granule
+      end
+
+      define_method :input_file_granule do
+        _RELPATH_
+      end
+
+      nil
+    end
+
+    def against_string _STR_
 
       define_method :input_mechanism_i do
         :input_string
@@ -182,6 +189,8 @@ module Skylab::TanMan::TestSupport
       define_method :input_string do
         _STR_
       end
+
+      nil
     end
   end
 
@@ -211,12 +220,16 @@ module Skylab::TanMan::TestSupport
 
     # ~ grammar testing support
 
+    def unparse_losslessly
+      result.unparse.should eql some_input_string
+    end
+
     def result
-      @did_resolve_result ||= resolve_result
+      @did_resolve_result ||= __resolve_result
       @result
     end
 
-    def resolve_result
+    def __resolve_result
       @result = produce_result
       true
     end
@@ -227,12 +240,12 @@ module Skylab::TanMan::TestSupport
     end
 
     def prepare_to_produce_result
-      resolve_grammar_class
-      resolve_parse
+      __resolve_grammar_class
+      __resolve_parse
       true
     end
 
-    def resolve_grammar_class
+    def __resolve_grammar_class
       granule_s = using_grammar
       mod = grammars_module
       desired_module_const_i = bld_grammar_const granule_s
@@ -262,7 +275,7 @@ module Skylab::TanMan::TestSupport
 
     GRANULE_TO_CONST_RX__ = /\A(?<num>\d+(?:-\d+)*)(?:-(?<rest>.+))?\z/
 
-    def resolve_parse
+    def __resolve_parse
 
       _path = existent_testing_GGD_path
 

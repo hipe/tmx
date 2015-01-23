@@ -1,33 +1,50 @@
 require_relative 'test-support'
 
+module Skylab::TanMan::TestSupport::Models::DotFile::Parsing
 
-describe "[tm] TanMan_::Models::DotFile parsing/examples-001-thru-489", wip: true do
+describe "[tm] models - dot-file parsing - examples 001 to 489" do
 
-  extend ::Skylab::TanMan::TestSupport::Models::DotFile::Parsing
+  extend TS_
 
-  context 'parsing an empty digragph' do
-    def self.it_yields_a_digraph_document_sexp(*tags)
-      it 'yields a digraph document sexp', *tags do
-        result.should be_sexp(:graph)
+  context "parsing an empty digraph" do
+
+    context "one line no spaces" do
+
+      against_string 'digraph{}'
+
+      it "unparses losslessly" do
+        unparse_losslessly
+      end
+
+      it "produces a digraph document sexp" do
+        expect_digraph_document_sexp
       end
     end
 
-    context "one line no spaces" do
-      input 'digraph{}'
-      it_unparses_losslessly
-      it_yields_a_digraph_document_sexp
-    end
-
     context "multiple lines lots of whitespace" do
-      input " \n\n \tdigraph { \t } \n "
-      it_unparses_losslessly
-      it_yields_a_digraph_document_sexp
+
+      against_string " \n\n \tdigraph { \t } \n "
+
+      it "unparses losslessly" do
+        unparse_losslessly
+      end
+
+      it "produces a digraph document sexp" do
+        expect_digraph_document_sexp
+      end
     end
   end
 
   context 'parsing a digraph with minimal content' do
-    using_input '100-hello-world.dot' do
-      it_unparses_losslessly
+
+    context "against a two-node \"hello world\" graph (input #100)" do
+
+      against_file '100-hello-world.dot'
+
+      it "unparses losslessly" do
+        unparse_losslessly
+      end
+
       it 'should give the same statement object, 2 ways' do
         stmt = result.stmt_list.stmt
         a = result.stmt_list.stmts
@@ -37,8 +54,14 @@ describe "[tm] TanMan_::Models::DotFile parsing/examples-001-thru-489", wip: tru
       end
     end
 
-    using_input '200.dot' do
-      it_unparses_losslessly
+    context "against a four-node, two-edge graph (input #200)" do
+
+      against_file '200.dot'
+
+      it "unparses losslessly" do
+        unparse_losslessly
+      end
+
       it 'can get 2 items' do
         a = result.stmt_list.stmts
         a.length.should eql(2)
@@ -47,20 +70,30 @@ describe "[tm] TanMan_::Models::DotFile parsing/examples-001-thru-489", wip: tru
       end
     end
 
-    using_input '410-node-with-dbl-quotes.dot' do
+    context "parsing a digraph with nodes with double quotes (input #400)" do
+
+      against_file '410-node-with-dbl-quotes.dot'
+
       it 'unparses losslessly (custom)' do
-        result.stmt_list.stmt.unparse.should eql('"node0"')
-        result.unparse.should eql(input_string)
+        result.stmt_list.stmt.unparse.should eql '"node0"'
+        result.unparse.should eql some_input_string
       end
+
       it 'parses double quoted node ID\'s correctly' do
         node_stmt = result.stmt_list.stmts.first
-        node_stmt.class.rule.should eql(:node_stmt)
-        node_stmt[:node_id].id.content_text_value.should eql('node0')
+        node_stmt.class.rule.should eql :node_stmt
+        node_stmt[ :node_id ].id.content_text_value.should eql 'node0'
       end
     end
 
-    using_input '480-bughunt-reduction.dot' do
-      it_unparses_losslessly
+    context "(buthunt reduction, input #480)" do
+
+      against_file '480-bughunt-reduction.dot'
+
+      it "unparses losslessly" do
+        unparse_losslessly
+      end
+
       it 'works' do
         stmts = result.stmt_list.stmts
         a_list = stmts.last.attr_list.content
@@ -69,4 +102,5 @@ describe "[tm] TanMan_::Models::DotFile parsing/examples-001-thru-489", wip: tru
       end
     end
   end
+end
 end

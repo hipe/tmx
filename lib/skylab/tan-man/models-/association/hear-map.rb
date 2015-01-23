@@ -136,7 +136,7 @@ module Skylab::TanMan
 
             @dc.persist_via_args(
               @argument_box[ :dry_run ],  # probably never set, b.c hear
-              @dc.caddied_output_arg )
+              * @dc.caddied_output_args )
 
           else
             ACHIEVED_  # assume that 3 events were emitted
