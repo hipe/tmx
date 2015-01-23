@@ -241,9 +241,16 @@ module Skylab::Headless
       end
     end
 
-    def [] i
-      self.class.form_box.has?( i ) or raise ::NameError, "no such form '#{ i }' - has (#{ self.class.form_box.names * ', ' })"
-      send i
+    def [] sym
+      if self.class.form_box.has_name sym
+        send sym
+      else
+        raise ::NameError, __say_has_no_such_form( sym )
+      end
+    end
+
+    def __say_has_no_such_form sym
+      "no such form '#{ sym }' - has (#{ self.class.form_box.get_names * ', ' })"
     end
 
   private

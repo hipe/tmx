@@ -47,7 +47,7 @@ module Skylab::Brazen
     end
 
     def name_library
-      NAME_LIBRARY_
+      NAME
     end
 
     def name_function
@@ -107,7 +107,7 @@ module Skylab::Brazen
     Autoloader_[ self, :boxxy ]
   end
 
-  module NAME_LIBRARY_
+  module NAME  # because its public interface is as a (library) singleton, not a module
 
     class << self
 
@@ -191,6 +191,8 @@ module Skylab::Brazen
       end
       attr_reader :parent
     end
+
+    Autoloader_[ self ]
   end
 
   module Lib_

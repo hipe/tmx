@@ -1,6 +1,6 @@
 module Skylab::Headless
 
-module NLP::EN::API_Action_Inflection_Hack  # seed [#018].  was: [#sl-123] exempt
+module NLP::EN::API_Action_Inflection_Hack  # see [#018]. compare [#hl-005]. was: [#sl-123] exempt
 
   # This is a weird old (and fun) #experiment that is salvaged from porcelain.
   # Watch for it to cross-fertilize with instances of action inflection

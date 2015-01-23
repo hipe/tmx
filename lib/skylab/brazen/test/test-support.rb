@@ -11,6 +11,8 @@ module Skylab::Brazen::TestSupport
 
   TestSupport_ = ::Skylab::TestSupport
 
+  extend TestSupport_::Quickie
+
   TestSupport_::Regret[ TS_ = self ]
 
   Brazen_ = ::Skylab::Brazen

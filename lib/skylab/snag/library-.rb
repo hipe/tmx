@@ -91,10 +91,6 @@ module Skylab::Snag
 
     HL__ = sidesys[ :Headless ]
 
-    Name = -> do
-      HL__[]::Name
-    end
-
     NLP = -> do
       HL__[]::NLP
     end

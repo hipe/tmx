@@ -39,7 +39,7 @@ module Skylab::Brazen
 
       class ActionClassLike__
 
-        include NAME_LIBRARY_.name_function_proprietor_methods
+        include NAME.name_function_proprietor_methods
 
         def initialize p, name_s, mod
           @parent_module = mod
