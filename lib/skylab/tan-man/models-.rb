@@ -417,6 +417,25 @@ module Skylab::TanMan
 
     after :graph
 
+    def initialize * a
+      if 1 == a.length
+        super
+      else
+        bx = Callback_::Box.new
+        bx.add :name, a.fetch( 0 )
+        bx.add :value, a.fetch( 1 )
+        @property_box = bx
+      end
+    end
+
+    def name
+      @property_box[ :name ]
+    end
+
+    def value
+      @property_box[ :value ]
+    end
+
     Stub_ = Stubber_[ self ]
 
     module Actions

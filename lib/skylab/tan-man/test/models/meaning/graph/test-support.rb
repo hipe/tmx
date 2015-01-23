@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::TanMan::TestSupport::Models::Meaning::Graph
 
-  ::Skylab::TanMan::TestSupport::Models::Meaning[ self ]
+  ::Skylab::TanMan::TestSupport::Models::Meaning[ TS_ = self ]
 
   include Constants
 
@@ -12,14 +12,12 @@ module Skylab::TanMan::TestSupport::Models::Meaning::Graph
 
   module InstanceMethods
 
-    def graph_from a_a
-      ea = ::Enumerator.new do |y|
-        a_a.each do |name, value|
-          y << TanMan_::Models::Meaning.new( nil, name, value )
-        end
-        nil
-      end
-      TanMan_::Models::Meaning::Graph.new nil, ea
+    def graph_from * s_pair_a
+
+      TanMan_::Models_::Meaning::Graph__.new(
+        TanMan_::Callback_.stream.via_nonsparse_array( s_pair_a ) do | s, s_ |
+          TanMan_::Models_::Meaning.new s, s_
+        end )
     end
   end
 end

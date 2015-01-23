@@ -7,7 +7,8 @@
 [#081]       config shell (lost). part of [#mh-053]
 [#078]       #tracking-tag this spot with `const_set`
 [#077]       #done services.rb wat
-[#076] #hole (was: events need to be modernized)
+[#076]       [ meaning graph ]  (comments inline)
+             (was: events need to be modernized)
 [#075]       #tracking-tag of hiccup skip Actions module `ANCHOR_BOX_MODULE`
 [#074]       #doc-point numerics in sexps #sexp-auto
 [#073]       #done rename 'examples' to 'starters'

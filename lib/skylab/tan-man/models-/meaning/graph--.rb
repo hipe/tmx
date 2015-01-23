@@ -1,8 +1,6 @@
 module Skylab::TanMan
 
-  class Models::Meaning::Graph
-
-    include Core::SubClient::InstanceMethods
+  class Models_::Meaning::Graph__  # :[#087].
 
     # Some notes about resolving meaning: Meanings are currently stored
     # in comment strings in the sexps, and are not in their 'resting state'
@@ -21,11 +19,47 @@ module Skylab::TanMan
     # Hence after we index ourselves we can release the source data and not
     # get confused.
 
-    def resolve_meaning_strings meaning_name, interminable_meaning
+
+    def initialize meaning_st
+
+      g = TanMan_.lib_.basic::Digraph.new
+      h = ::Hash.new { |h_, k| h_[ k ] = [] }
+
+      mn = meaning_st.gets
+      while mn
+        sym = mn.name.intern
+        x = mn.value
+        if Looks_like_terminal__[ x ]
+          g.absorb_node sym
+          h[ sym ].push x
+        else
+          g.absorb_node sym, [ x.intern ]
+        end
+        mn = meaning_st.gets
+      end
+
+      @graph = g
+      @terminal_h = h
+    end
+
+    Looks_like_terminal__ = -> do
+
+      # centralize this hack - a meaning looks like a terminal
+      # definition IFF its value is not a valid name!
+
+      valid_name_rx = /\A[a-z][-a-z0-9]*\z/
+      -> x do
+        valid_name_rx !~ x
+      end
+    end.call
+
+    def meaning_values_via_meaning_name meaning_name_s, & oes_p
+
       trail_a = []
-      h = { }
+      h = {}
       is_circular = false
-      outer_h = CircleHash.new(
+
+      outer_h = CircleHash__.new(
         :[]    => -> k     { h[k] },
         :[]=   => -> k, v  { h[k] = v },
         :fetch => -> k, &b do
@@ -39,72 +73,44 @@ module Skylab::TanMan
             trail_a << k
           end
           val
-        end
-      )
-      ea = @graph.walk_pre_order meaning_name.intern, 0, outer_h
-      terminal_a = ea.reduce [] do |m, sym|
-        trail_a << sym
+        end )
+
+      ea = @graph.walk_pre_order meaning_name_s.intern, 0, outer_h
+
+      terminal_a = ea.reduce [] do | m, sym |
+        trail_a.push sym
         if @terminal_h.key? sym
-          m.concat @terminal_h.fetch( sym )
+          m.concat @terminal_h.fetch sym
         end
         m
       end
+
       if terminal_a.length.zero?
-        if is_circular
-          res = Models::Meaning::Circular.new trail_a
-        else
-          res = Models::Meaning::Interminable.new trail_a
+        oes_p ||= -> *, & ev_p do
+          raise ev_p[]
         end
-        interminable_meaning[ res ]
-        false
+        oes_p.call :error, :interminal_meaning, * ( :circular if is_circular ) do
+          if is_circular
+            Circular__.new_with :trail_a, trail_a
+          else
+            Interminable__.new_with :trail_a, trail_a
+          end
+        end
       else
         terminal_a
       end
     end
 
-    CircleHash = TanMan_.lib_.proxy_lib.nice :[], :[]=, :fetch
+    CircleHash__ = TanMan_.lib_.proxy_lib.nice :[], :[]=, :fetch
 
-    class Models::Meaning::Interminable
-      attr_reader :trail_a, :reason
-      def initialize trail_a
-        @reason = :interminable
-        @trail_a = trail_a
-      end
+    Interminable__ = Callback_::Event.prototype_with :interminable,
+        :trail_a, nil, :reason, :interminal, :ok, false do | y, o |
+
+      self._DO_ME
     end
 
-    class Models::Meaning::Circular < Models::Meaning::Interminable
-      def initialize trail_a
-        @reason = :circular
-        @trail_a = trail_a
-      end
+    Circular__ = Callback_::Event.prototype_with :circular,
+        :trail_a, nil, :reason, :circular, :ok, false do | y, o |
     end
-
-  private
-
-    -> do
-
-      looks_like_terminal = nil  # scope
-
-      define_method :initialize do |meaning_controller, meaning_enumerator|
-        @graph = ::Skylab::Basic::Digraph.new  # (loaded by p.s. monadic)
-        @terminal_h = ::Hash.new { |h, k| h[k] = [ ] }
-        meaning_enumerator.each do |fly|
-          if looks_like_terminal[ fly.value ]
-            @graph.absorb_node fly.name.intern
-            @terminal_h[ fly.name.intern ] << fly.value
-          else
-            @graph.absorb_node fly.name.intern, [ fly.value.intern ]
-          end
-        end
-      end
-
-      valid_name_rx = Models::Meaning.valid_name_rx
-                                               # centralize this hack -
-      looks_like_terminal = -> value do        # a meaning looks like a
-        valid_name_rx !~ value                 # terminal definition iff
-      end                                      # its value is not a
-                                               # valid name!
-
-    end.call
   end
 end

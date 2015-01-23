@@ -20,7 +20,6 @@ module Skylab::TanMan
         end,
         :property, :value
 
-
     Actions__ = make_action_making_actions_module
 
     module Actions__

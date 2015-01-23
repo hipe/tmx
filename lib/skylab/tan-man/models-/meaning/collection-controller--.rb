@@ -335,14 +335,10 @@ module Skylab::TanMan
       dotfile_controller.sexp
     end
 
-    def resolve_meaning meaning
-      graph = Models::Meaning::Graph.new self, list  # yes a one-off
-      meaning_a = graph.resolve_meaning_strings meaning.name, -> interm do
-        send_error_string describe_interminable_meaning interm
-        emit :help, "perhaps address these issues with your meaning #{
-          }graph and try again."
-      end
-      meaning_a || nil  # if it was false, we handled it. change to nil
+    def resolve_meaning meaning, & oes_p
+      Models_::Meaning::Graph__.new(  # yes, [#076] graph is a one-off
+        Callback_.stream.via_nonsparse_array( list ) ).
+          meaning_values_via_meaning_name meaning.name, & ( oes_p || handle_event_selectively )
     end
 
     def describe_interminable_meaning o
