@@ -8,11 +8,11 @@ module Skylab::TanMan
 
         class Touch < self
 
-          Callback_::Actor[ self, :properties,
+          Callback_::Actor.call self, :properties,
             :name,
             :verb,  # 'create' | 'retrieve' | 'touch'
             :datastore,
-            :kernel, :on_event_selectively ]
+            :kernel
 
           def resolve_name_string
             @name_s = @name ; @name = nil ; nil
@@ -25,7 +25,7 @@ module Skylab::TanMan
             :verb,
             :entity,
             :datastore,
-            :kernel, :on_event_selectively  # necessary while simple actor
+            :kernel
 
           def resolve_name_string
             @name_s = @entity.property_value_via_symbol :name ; nil
@@ -394,7 +394,12 @@ module Skylab::TanMan
         end
 
         def bld_created_node_event node_stmt
-          build_OK_event_with :created_node, :node_stmt, node_stmt do |y, o|
+
+          build_OK_event_with :created_node,
+
+              :node_stmt, node_stmt,
+              :did_mutate_document, true do | y, o |
+
             y << "created node #{ lbl o.node_stmt.label }"
           end
         end

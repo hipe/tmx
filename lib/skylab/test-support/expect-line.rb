@@ -193,6 +193,12 @@ module Skylab::TestSupport
         @up = up
       end
 
+      def members
+        [ :advance_N_lines, :advance_to_next_rx,
+          :advance_to_rx, :next_line, :skip_blank_lines ]
+      end
+
+
       attr_reader :line
 
       def advance_N_lines d

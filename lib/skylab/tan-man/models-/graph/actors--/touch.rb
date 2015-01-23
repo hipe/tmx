@@ -4,12 +4,12 @@ module Skylab::TanMan
 
     class Actors__::Touch  # ~:+[#049] algo family
 
-      Actor_[ self, :properties,
+      Actor_.call self, :properties,
         :is_dry_run,
         :action,
         :entity,
         :workspace,
-        :kernel ]
+        :kernel
 
       def execute
 

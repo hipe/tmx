@@ -4,7 +4,36 @@ module Skylab::TanMan
 
     class Document_Entity < self
 
-      class Collection_Controller < Brazen_.model.collection_controller
+      class Silo < Brazen_.model.silo_class
+
+        def collection_controller_via_document_controller dc, & oes_p
+
+          pc = Callback_::Box.new
+          pc.add :dot_file, dc
+
+          mc = model_class
+
+          mc.collection_controller_class.new_with(
+            :action, :__no_action__,
+            :preconditions, pc,
+            :model_class, mc,
+            :kernel, @kernel, & oes_p )
+        end
+
+        def model_class
+          self.class.__model_class
+        end
+
+        class << self
+          def __model_class
+            @__model_class ||= TanMan_.lib_.basic::Module.value_via_relative_path( self, '..' )
+          end
+        end
+      end
+
+      Silo_Controller = ::Class.new Brazen_.model.silo_controller_class
+
+      class Collection_Controller < Brazen_.model.collection_controller_class
 
       private
 
@@ -38,14 +67,14 @@ module Skylab::TanMan
         end
       end
 
-      class Silo_Controller < Brazen_.model.silo_controller
-
-      end
-
       class << self
 
         def IO_properties
           IO_properties__[].each_value
+        end
+
+        def IO_properties_shell
+          IO_properties__[]
         end
 
         def input_properties  # an array
@@ -71,24 +100,60 @@ module Skylab::TanMan
 
         def resolve_document_IO_or_produce_bound_call_
 
-          @input_argument_a, @output_argument_a = __input_pairs_and_output_pairs
+          sess = _new_IO_arg_partition_session
 
-          _bc = _mutate_exactly_1_means_or_bc( @input_argument_a, :input )
-          _bc || _mutate_exactly_1_means_or_bc( @output_argument_a, :output )
+          @input_argument_a, @output_argument_a = sess.to_input_and_output_args
+
+          _bc = sess.bound_call_unless_exactly_one_means @input_argument_a, :input
+          _bc or sess.bound_call_unless_exactly_one_means @output_argument_a, :output
         end
 
         def resolve_document_upstream_or_produce_bound_call_
 
-          @input_argument_a = _to_IO_related_twosome_stream.map_reduce_by do | o |
-            if o.property.can_be_used_for_input
-              o.pair
-            end
-          end.to_a
+          sess = _new_IO_arg_partition_session
 
-          _mutate_exactly_1_means_or_bc @input_argument_a, :input
+          @input_argument_a = sess.to_input_args
+
+          sess.bound_call_unless_exactly_one_means @input_argument_a, :input
         end
 
-        def __input_pairs_and_output_pairs
+        def _new_IO_arg_partition_session
+          IO_Argument_Partition_Session.new(
+            method( :to_actual_argument_stream ),
+            self.class.properties,
+            & handle_event_selectively )
+        end
+      end
+
+      class IO_Argument_Partition_Session
+
+        def initialize to_arg_stream, prp, & oes_p
+          @on_event_selectively = oes_p
+          @properties = prp
+          @to_actual_arg_stream = to_arg_stream
+        end
+
+        def to_one_input_and_one_output_arg
+          in_a, out_a = to_input_and_output_args
+          ok = _one in_a, :input
+          ok &&= _one( out_a, :output )
+          ok and begin
+            [ in_a.fetch( 0 ), out_a.fetch( 0 ) ]
+          end
+        end
+
+        def _one a, sym
+          case 1 <=> a.length
+          when -1
+            _maybe_send_non_one_event a, sym  # or pick one ..
+          when  0
+            a.fetch 0
+          when  1
+            _maybe_send_non_one_event a, sym
+          end
+        end
+
+        def to_input_and_output_args
 
           in_a = []
           out_a = []
@@ -111,17 +176,27 @@ module Skylab::TanMan
           [ in_a, out_a ]
         end
 
+        def to_input_args
+          _to_IO_related_twosome_stream.map_reduce_by do | o |
+
+            if o.property.can_be_used_for_input
+              o.pair
+            end
+          end.to_a
+        end
+
         def _to_IO_related_twosome_stream
 
-          props = self.class.properties
+          props = @properties
 
-          to_actual_argument_stream.map_reduce_by do | pair |
+          @to_actual_arg_stream[].map_reduce_by do | pair |
 
             if pair.value_x  # intentionally set nils are meaningless here
 
-              prp = props.fetch pair.name_symbol
+              prp = props[ pair.name_symbol ]  # the formals may be some
+                # arbitrary other set, like e.g they are the topic formals
 
-              if prp.respond_to? :can_be_used_for_input  # not all props relate
+              if prp and prp.respond_to? :can_be_used_for_input  # not all props relate
 
                 if :config_filename != prp.name_symbol  # not relevant to counts
 
@@ -134,7 +209,7 @@ module Skylab::TanMan
 
         Twosome___ = ::Struct.new :pair, :property
 
-        def _mutate_exactly_1_means_or_bc arg_a, direction_i
+        def bound_call_unless_exactly_one_means arg_a, direction_i
           case 1 <=> arg_a.length
           when  1
             __bc_when_non_1_doc_IO arg_a, direction_i
@@ -144,17 +219,21 @@ module Skylab::TanMan
         end
 
         def __bc_when_non_1_doc_IO arg_a, direction_i
-          _x = maybe_send_event :error, :non_one_IO do
-            bld_non_one_IO_event direction_i, arg_a
-          end
-          Brazen_.bound_call.via_value _x
+          Brazen_.bound_call.via_value _maybe_send_non_one_event( arg_a, direction_i )
         end
 
-        def bld_non_one_IO_event direction_i, arg_a
+        def _maybe_send_non_one_event arg_a, direction_i
 
-          _PROPS = self.class.properties
+          @on_event_selectively.call :error, :non_one_IO do
+            __build_non_one_IO_event direction_i, arg_a
+          end
+        end
 
-          build_not_OK_event_with :non_one_IO,
+        def __build_non_one_IO_event direction_i, arg_a
+
+          _PROPS = @properties
+
+          Callback_::Event.inline_not_OK_with :non_one_IO,
               :direction_i, direction_i, :arg_a, arg_a do |y, o|
 
             if o.arg_a.length.zero?
@@ -186,6 +265,7 @@ module Skylab::TanMan
               end
               _xtra = " (#{ _s_a * ', ' })"
             end
+
             y << "need exactly 1 #{ o.direction_i }-related argument, #{
              }had #{ o.arg_a.length }#{ _xtra }"
           end
@@ -222,7 +302,7 @@ module Skylab::TanMan
         # however, if a workspace is expressed in the argument list,
         # this *can* be used to express both input and output graph.
         #
-        # we attempt to resovle (as necessary per the operation) exactly
+        # we attempt to resolve (as necessary per the operation) exactly
         # one input means and exactly one output means.
 
         module IO_Proprietor____

@@ -171,8 +171,8 @@ module Skylab::Brazen
       silo and silo.model_class
     end
 
-    def silo_via_symbol i, & oes_p
-      silo_via_identifier Node_Identifier_.via_symbol( i ), & oes_p
+    def silo sym, & oes_p  # (was `silo_via_symbol`)
+      silo_via_identifier Node_Identifier_.via_symbol( sym ), & oes_p
     end
 
     def silo_via_identifier id, & oes_p
@@ -279,7 +279,7 @@ module Skylab::Brazen
     end
 
     def some_silo_via_mod mod
-      mod.silo.new self
+      mod.silo_class.new self
     end
 
     def bld_model_not_found_event id, s

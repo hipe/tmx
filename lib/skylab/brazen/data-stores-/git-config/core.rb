@@ -141,7 +141,7 @@ module Skylab::Brazen
         & entity.handle_event_selectively )
     end
 
-    class Silo_Controller__ < Brazen_.model.silo_controller
+    class Silo_Controller__ < Brazen_.model.silo_controller_class
 
       def provide_action_precondition _id, _g
         self

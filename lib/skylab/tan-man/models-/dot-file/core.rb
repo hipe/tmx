@@ -19,15 +19,15 @@ module Skylab::TanMan
 
       # ~ the stack (we have to write them explicitly because treetop)
 
-      def collection_controller
+      def collection_controller_class
         Collection_Controller__
       end
 
-      def silo_controller
+      def silo_controller_class
         Silo_Controller__
       end
 
-      def silo
+      def silo_class
         Silo__
       end
 
@@ -50,17 +50,21 @@ module Skylab::TanMan
 
     Collection_Controller__ = :_NONE_
 
-    class Silo_Controller__ < Model_lib_[].silo_controller
+    class Silo_Controller__ < Model_lib_[].silo_controller_class
 
       def provide_collection_controller_precon _id, graph
         DotFile_::Actors__::Build_Document_Controller::Via_action[ graph.action ]
       end
     end
 
-    class Silo__ < Model_lib_[].silo
+    class Silo__ < Model_lib_[].silo_class
 
       def model_class
         DotFile_
+      end
+
+      def document_controller_via_argument_box bx, & oes_p
+        DotFile_::Actors__::Build_Document_Controller::Via_argument_box[ bx, @kernel, & oes_p ]
       end
     end
 

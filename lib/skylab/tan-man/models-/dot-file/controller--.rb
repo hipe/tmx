@@ -12,7 +12,8 @@ module Skylab::TanMan
       end
 
       def members
-        [ :graph_sexp, :persist_via_args, :unparse_entire_document ]
+        [ :caddied_output_arg, :graph_sexp,
+          :persist_via_args, :unparse_entire_document ]
       end
 
       attr_reader :graph_sexp
@@ -167,6 +168,8 @@ module Skylab::TanMan
       meanings.unset(* a)
     end
     end
+
+      attr_accessor :caddied_output_arg  # topic doesn't do anything with this, just carries it
 
       def persist_via_args is_dry, arg
         adapter = Persist_Adapters__.produce_via_argument arg

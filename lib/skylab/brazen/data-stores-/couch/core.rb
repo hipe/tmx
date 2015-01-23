@@ -164,11 +164,11 @@ module Skylab::Brazen
       self
     end
 
-    class Collection_Controller__ < Brazen_.model.collection_controller
+    class Collection_Controller__ < Brazen_.model.collection_controller_class
 
     end
 
-    class Silo_Controller__ < Brazen_.model.silo_controller
+    class Silo_Controller__ < Brazen_.model.silo_controller_class
 
       def wrap_action_precondition_not_resolved_from_identifier_event ev
         x_a = ev.to_iambic

@@ -12,6 +12,10 @@ module Skylab::Basic
         Chain_via_parts__[ s_a ]
       end
 
+      def members
+        singleton_class.public_instance_methods( false ) - [ :members ]
+      end
+
       def mutex *a
         if a.length.zero?
           Mutex__

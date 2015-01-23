@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   class Models_::Meaning
 
-    class Collection_Controller__ < Model_lib_[].collection_controller  # #todo - push up
+    class Collection_Controller__ < Model_lib_[].collection_controller_class  # #todo - push up
 
       class << self
 

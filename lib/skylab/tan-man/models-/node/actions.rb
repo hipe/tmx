@@ -61,6 +61,8 @@ module Skylab::TanMan
       end
     end
 
+    Silo__ = ::Class.new Model_::Document_Entity::Silo
+
     class Collection_Controller__ < Model_::Document_Entity::Collection_Controller
 
       def entity_stream_via_model model
@@ -131,22 +133,22 @@ module Skylab::TanMan
 
       def via_dsc_delete_entity ent, & oes_p
 
-        _ok = Node_::Actors__::Mutate::Via_entity[
+        _ok = Node_::Actors__::Mutate::Via_entity.call(
           :delete,
           ent,
           @dsc,
-          @kernel, ( oes_p || @on_event_selectively ) ]
+          @kernel, & ( oes_p || @on_event_selectively ) )
 
         _ok and _commit_changes_to_dsc @dsc
       end
 
       def mutate_via_verb_and_entity verb_i, entity
         _dsc = datastore_controller
-        Node_::Actors__::Mutate::Via_entity[
+        Node_::Actors__::Mutate::Via_entity.call(
           verb_i,
           entity,
           _dsc,
-          @kernel, @on_event_selectively ]
+          @kernel, & @on_event_selectively )
       end
 
       def _entity_via_node node

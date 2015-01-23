@@ -25,7 +25,7 @@ let's get right to it:
            +----------------+
 
 
-each object at each step come from the object at the previous (below) step,
+each object at each step comes from the object at the previous (below) step,
 except for those models that chose to skip intermediate tiers (the middle
 two may sometimes be munged depending on things like the datastore paradigm).
 

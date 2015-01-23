@@ -51,7 +51,7 @@ module Skylab::TanMan
 
     class << self
 
-      def collection_controller
+      def collection_controller_class
         Meaning_::Collection_Controller__
       end
     end

@@ -20,8 +20,15 @@ module Skylab::TanMan
                 :one_or_more, :any_token ]
           end
 
-          def bound_call_via_heard hrd
-            self._DO_ME
+          def bound_call_via_heard hrd, & oes_p
+
+            pt = hrd.parse_tree
+
+            Touch_Node_and_Create_Association__.new(
+              pt.fetch( 0 ).join( SPACE_ ),
+              pt.fetch( 3 ).join( SPACE_ ),
+              hrd.argument_box,
+              hrd.kernel, & oes_p ).bound_call
           end
         end
 
@@ -43,6 +50,96 @@ module Skylab::TanMan
 
           def bound_call_via_heard hrd
             self._DO_ME
+          end
+        end
+      end
+
+      class Touch_Node_and_Create_Association__
+
+        def initialize * a, & oes_p
+          @src_lbl_s, @dst_lbl_s, @argument_box, @kernel = a
+          @did_mutate = false
+          @did_mutate_filter = -> * i_a, & ev_p do
+            ev = ev_p[]
+            if ev.ok && ev.did_mutate_document
+              @did_mutate = true
+            end
+            oes_p.call( * i_a ) do
+              ev
+            end
+          end
+          @on_event_selectively = oes_p
+        end
+
+        def bound_call
+          ok = __resolve_document_controller
+          ok &&= __via_document_controller_maybe_touch_nodes
+          ok &&= __via_document_controller_and_nodes_touch_association
+          ok &&= __maybe_persist
+          if ok
+            Brazen_.bound_call.via_value ok
+          else
+            ok
+          end
+        end
+
+        def __resolve_document_controller
+          @dc = @kernel.silo( :dot_file ).document_controller_via_argument_box(
+            @argument_box, & @on_event_selectively )
+
+          @dc && ACHIEVED_
+        end
+
+        def __via_document_controller_maybe_touch_nodes
+
+          # because the association silo alone won't do the hacky magic for this
+
+          if @dc.graph_sexp.stmt_list.nil?
+            __via_document_controller_DO_touch_nodes
+          else
+            ACHIEVED_
+          end
+        end
+
+        def __via_document_controller_DO_touch_nodes
+
+          nc = @kernel.silo( :node ).
+            collection_controller_via_document_controller(
+              @dc, & @did_mutate_filter )
+
+          sn = nc.touch_node_via_label @src_lbl_s
+          sn and dn = nc.touch_node_via_label( @dst_lbl_s )
+          sn and dn and begin
+            @src_node_stmt = sn
+            @dst_node_stmt = dn
+            ACHIEVED_
+          end
+        end
+
+        def __via_document_controller_and_nodes_touch_association
+
+          ac = @kernel.silo( :association ).
+            collection_controller_via_document_controller(
+              @dc, & @on_event_selectively )
+
+          _asc = ac.touch_association_via_node_labels(
+            @src_lbl_s, # @src_node_stmt.label,
+            @dst_lbl_s, # @dst_node_stmt.label,
+            & @did_mutate_filter )
+
+          _asc and ACHIEVED_
+        end
+
+        def __maybe_persist
+
+          if @did_mutate
+
+            @dc.persist_via_args(
+              @argument_box[ :dry_run ],  # probably never set, b.c hear
+              @dc.caddied_output_arg )
+
+          else
+            ACHIEVED_  # assume that 3 events were emitted
           end
         end
       end

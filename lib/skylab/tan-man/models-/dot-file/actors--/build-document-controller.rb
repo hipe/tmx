@@ -8,41 +8,66 @@ module Skylab::TanMan
 
         class Via_action < self
 
-          Actor_[ self, :properties,
-            :action ]
+          Actor_.call self, :properties,
+            :action
 
           def execute
             @kernel, @on_event_selectively = @action.controller_nucleus.to_a
             ok = set_input_argument( * @action.input_arguments )
             ok and super
           end
+        end
 
-      private
+        class Via_argument_box < self
 
-          def set_input_argument x
-            if x
-              @input_arg = x ; ACHIEVED_
-            else
-              when_no_IO :input
+          # some concerns (like hear-maps) don't have an action, but have
+          # arguments and want a document controller.
+
+          Actor_.call self, :properties,
+            :bx, :kernel
+
+          def execute
+
+            o = TanMan_::Model_::Document_Entity
+
+            @input_arg, output_arg = o::IO_Argument_Partition_Session.new(
+              @bx.method( :to_pair_stream ),
+              o.IO_properties_shell,
+              & @on_event_selectively ).to_one_input_and_one_output_arg
+
+            @input_arg and begin
+              dc = super
+              dc and begin
+                dc.caddied_output_arg = output_arg
+                dc
+              end
             end
-          end
-
-          def when_no_IO i
-            maybe_send_event :error, :cannot_resolve_IO do
-              build_not_OK_event_with :cannot_resolve_IO, :direction, i
-            end
-            UNABLE_
           end
         end
 
-        Callback_::Actor[ self, :properties,
+        Callback_::Actor.call self, :properties,
           :input_arg,
           :parsing_event_subscription,
-          :kernel, :on_event_selectively ]
+          :kernel
 
         def initialize
           @parsing_event_subscription = nil
           super
+        end
+
+        def set_input_argument x
+          if x
+            @input_arg = x ; ACHIEVED_
+          else
+            when_no_IO :input
+          end
+        end
+
+        def when_no_IO i
+          maybe_send_event :error, :cannot_resolve_IO do
+            build_not_OK_event_with :cannot_resolve_IO, :direction, i
+          end
+          UNABLE_
         end
 
         def execute
@@ -69,7 +94,7 @@ module Skylab::TanMan
 
         def via_workspace_path_resolve_graph_sexp
 
-          ws = @kernel.silo_via_symbol( :workspace ).
+          ws = @kernel.silo( :workspace ).
             build_silo_controller( & @on_event_selectively ).
               workspace_via_rising_action @action
 

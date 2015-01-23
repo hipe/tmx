@@ -166,7 +166,7 @@ module Skylab::Brazen
 
     DEFAULT_WS_CONF_FILENAME__ = 'brazen.conf'.freeze
 
-    class Silo_Controller__ < Brazen_.model.silo_controller
+    class Silo_Controller__ < Brazen_.model.silo_controller_class
 
       def provide_collection_controller_precon _id, graph
         workspace_via_rising_action graph.action

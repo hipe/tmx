@@ -107,8 +107,9 @@ module Skylab::Callback
         end
       end
 
-      def curry_with * x_a
+      def curry_with * x_a, & oes_p
         new do
+          oes_p and @on_event_selectively ||= oes_p
           _init_instance_as_curry
           process_iambic_fully_as_curry_ x_a
         end

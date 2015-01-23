@@ -200,7 +200,7 @@ module Skylab::TanMan
     end
   end
 
-  class Collection_Controller_ < Brazen_.model.collection_controller
+  class Collection_Controller_ < Brazen_.model.collection_controller_class
 
     class << self
 

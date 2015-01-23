@@ -35,7 +35,11 @@ module Skylab::TanMan
   end
 
       Found_Existing_Node = Callback_::Event.prototype_with :found_existing_node,
-          :node_stmt, nil, :ok, nil do |y, o|
+
+          :node_stmt, nil,
+          :did_mutate_document, false,
+          :ok, nil do | y, o |
+
         _s = o.node_stmt.label_or_node_id_normalized_string
         if o.ok
           y << "found existing node #{ lbl _s }"

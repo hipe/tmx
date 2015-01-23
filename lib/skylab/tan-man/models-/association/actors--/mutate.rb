@@ -4,13 +4,13 @@ module Skylab::TanMan
 
     class Actors__::Mutate
 
-      Actor_[ self, :properties,
+      Actor_.call self, :properties,
        :verb,  # 'touch' | 'delete'
        :attrs,
        :prototype_i,
        :from_node_label, :to_node_label,
        :datastore,
-       :kernel, :on_event_selectively ]
+       :kernel
 
       def execute
         @parser = @datastore.graph_sexp.class
@@ -48,7 +48,7 @@ module Skylab::TanMan
           :verb,  send( :"node_verb_when_#{ @verb }" ),
           :datastore, @datastore,
           :kernel, @kernel,
-          :on_event_selectively, @on_event_selectively )
+          & @on_event_selectively )
 
         ok = rslv_from_node
         ok &&= rslv_to_node
@@ -132,8 +132,12 @@ module Skylab::TanMan
       end
 
       def bld_found_existing_association stmt
+
         build_OK_event_with :found_existing_association,
-            :edge_stmt, stmt do |y, o|
+
+            :edge_stmt, stmt,
+            :did_mutate_document, false do | y, o |
+
           y << "found existing association: #{ stmt.unparse }"
           # "assocation already exists: "
         end
@@ -282,7 +286,8 @@ module Skylab::TanMan
 
       def bld_created_association_event
         build_OK_event_with :created_association,
-            :edge_stmt, @edge_stmt do |y, o|
+            :edge_stmt, @edge_stmt,
+            :did_mutate_document, true do | y, o |
           y << "created association: #{ o.edge_stmt.unparse }"
         end
       end

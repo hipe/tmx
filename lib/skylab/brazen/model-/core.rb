@@ -14,7 +14,7 @@ module Skylab::Brazen
           Actual_Property_
         end
 
-        def collection_controller
+        def collection_controller_class
           Collection_Controller_
         end
 
@@ -44,11 +44,11 @@ module Skylab::Brazen
           Model_::Action_Factory__.retrieve_methods
         end
 
-        def silo_controller
+        def silo_controller_class
           Model_::Silo_Controller_
         end
 
-        def silo
+        def silo_class
           Model_::Silo_
         end
       end
@@ -84,12 +84,12 @@ module Skylab::Brazen
         end
       end
 
-      def collection_controller
+      def collection_controller_class
         if ! const_defined? :Collection_Controller__, false
           if const_defined? :Collection_Controller__
             self._DO_ME
           else
-            cls = ::Class.new LIB.collection_controller
+            cls = ::Class.new LIB.collection_controller_class
             const_set :Generated_Collection_Controller___, cls
             const_set :Collection_Controller__, cls
           end
@@ -97,14 +97,14 @@ module Skylab::Brazen
         const_get :Collection_Controller__, false
       end
 
-      def silo_controller
+      def silo_controller_class
         if ! const_defined? :Silo_Controller__, false
           if const_defined? :Silo_Controller__
             cls = ::Class.new const_get( :Silo_Controller__ )
             const_set :Generated_Silo_Controller_Subclass___, cls
             const_set :Silo_Controller__, cls
           else
-            cls = ::Class.new LIB.silo_controller
+            cls = ::Class.new LIB.silo_controller_class
             const_set :Generated_Silo_Controller__, cls
             const_set :Silo_Controller__, cls
           end
@@ -112,7 +112,7 @@ module Skylab::Brazen
         const_get :Silo_Controller__, false
       end
 
-      def silo
+      def silo_class
         if ! const_defined? :Silo__, false
           if const_defined? :Silo__
             const_set :Silo__, const_get( :Silo__ ).make( self )
@@ -918,16 +918,17 @@ module Skylab::Brazen
 
     class Collection_Controller_
 
-      Actor_[ self, :properties,
+      Actor_.call self, :properties,
         :action,
         :preconditions,
         :model_class,
-        :kernel, :on_event_selectively ]
+        :kernel
 
       class << self
 
-        def new_with * x_a
+        def new_with * x_a, & oes_p
           new do
+            oes_p and @on_event_selectively = oes_p
             process_iambic_fully x_a
           end
         end
@@ -1084,8 +1085,14 @@ module Skylab::Brazen
           puts ">> >>       MADE #{ model_class.name_function.as_slug } SCTL"
       end
 
+      def members
+        EMPTY_A_
+      end
+
       def provide_collection_controller_precon id, graph
+
         a = model_class.preconditions
+
         if a
           bx = Model_::Preconditions_.establish_box_with(
             :self_identifier, id,
@@ -1093,18 +1100,22 @@ module Skylab::Brazen
             :on_self_reliance, method( :when_cc_relies_on_self ),
             :graph, graph,
             :level_i, :collection_controller_prcn,
-            :on_event_selectively, @on_event_selectively )
+            & @on_event_selectively )
+
           bx and begin
-            model_class.collection_controller.curry_with(
+            model_class.collection_controller_class.curry_with(
               :action, graph.action,
               :preconditions, bx,
               :model_class, model_class,
-              :kernel, @kernel, :on_event_selectively, @on_event_selectively )
+              :kernel, @kernel,
+              & @on_event_selectively )
           end
         else
-          model_class.collection_controller.new_with(
+
+          model_class.collection_controller_class.new_with(
             :model_class, model_class,
-            :kernel, @kernel, :on_event_selectively, @on_event_selectively )
+            :kernel, @kernel,
+            & @on_event_selectively )
         end
       end
 
@@ -1142,6 +1153,10 @@ module Skylab::Brazen
           puts ">>          MADE #{ model_class.name_function.as_slug } SILO"
       end
 
+      def members
+        [ :build_silo_controller, :name_symbol ]
+      end
+
       def name_symbol
         model_class.name_function.as_lowercase_with_underscores_symbol
       end
@@ -1171,7 +1186,7 @@ module Skylab::Brazen
             :level_i, :silo_controller_prcn,
             :on_event_selectively, oes_p )
           bx and begin
-            model_class.silo_controller.new_with(
+            model_class.silo_controller_class.new_with(
               :preconditions, bx,
               :model_class, model_class,
               :kernel, @kernel, :on_event_selectively, oes_p )
@@ -1190,7 +1205,7 @@ module Skylab::Brazen
       end
 
       def build_silo_controller & oes_p
-        model_class.silo_controller.new_with(
+        model_class.silo_controller_class.new_with(
           :model_class, model_class,
           :kernel, @kernel, :on_event_selectively, oes_p )
       end

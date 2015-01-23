@@ -23,13 +23,15 @@ module Skylab::TanMan
 
         else
 
-          bc = @kernel.silo_via_symbol( :hear_front ).__bound_call_via_etc(
+          bc = @kernel.silo( :hear_front ).__bound_call_via_etc(
             word_s_a,
             @argument_box,
              & handle_event_selectively )
 
-          bc and begin
+          if bc
             bc.receiver.send bc.method_name, * bc.args
+          else
+            bc
           end
         end
       end
