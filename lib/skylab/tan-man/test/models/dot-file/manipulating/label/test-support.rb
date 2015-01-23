@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport::Models::DotFile::Manipulating::Label
 
   include Constants
 
-  extend TestSupport_::Quickie # run some tests without rspec, just `ruby -w`
+  extend TestSupport_::Quickie
 
   module InstanceMethods
 
@@ -14,4 +14,6 @@ module Skylab::TanMan::TestSupport::Models::DotFile::Manipulating::Label
       TS_
     end
   end
+
+  LABEL__ = 'label'.freeze
 end

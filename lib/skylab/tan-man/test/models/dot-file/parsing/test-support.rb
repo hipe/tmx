@@ -2,25 +2,13 @@ require_relative '../test-support'
 
 module Skylab::TanMan::TestSupport::Models::DotFile::Parsing
 
-  Parent_ = Skylab::TanMan::TestSupport::Models::DotFile
-
-  Parent_[ TS_ = self ]
+  Skylab::TanMan::TestSupport::Models::DotFile[ TS_ = self ]
 
   include Constants
 
   extend TestSupport_::Quickie
 
   module InstanceMethods
-
-    def prepare_to_produce_result
-
-      if ! Parent_.const_defined?( :Client, false )
-        load ::File.join( Parent_.dir_pathname.to_path, 'client' )   # because new a.l borks because no extname. meh
-      end
-
-      @parse = Parent_::Client.new
-      true
-    end
 
     def module_with_subject_fixtures_node
       TS_

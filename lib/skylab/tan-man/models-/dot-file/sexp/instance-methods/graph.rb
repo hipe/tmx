@@ -51,7 +51,8 @@ module Skylab::TanMan
       end
       equals_stmt.rhs = str
       if created
-        stmt_list._insert_item_before_item equals_stmt, node_statements.first
+        _first_node_statement = node_statements.gets
+        stmt_list._insert_item_before_item equals_stmt, _first_node_statement
       else
         equals_stmt
       end

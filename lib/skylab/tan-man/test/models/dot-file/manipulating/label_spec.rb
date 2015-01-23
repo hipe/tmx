@@ -2,16 +2,17 @@ require_relative 'label/test-support'
 
 module Skylab::TanMan::TestSupport::Models::DotFile::Manipulating::Label
 
-  describe "[tm] TanMan_::Models::DotFile /manipulating/labels", wip: true do
+  describe "[tm] models - dot file - manipulating: labels" do
 
     extend TS_
 
     using_input '3.0-with-existing-label.dot' do
 
       it 'can change the value (rhs) of the label, escaping when necessary' do
-        result.unparse.should eql( input_string )
 
-        stmt = label_statement
+        unparse_losslessly
+
+        stmt = _retrieve_label_statement
         stmt.rhs.normalized_string.should match( /\ATangent with/ )
 
         stmt.rhs = "zeep"
@@ -30,27 +31,41 @@ module Skylab::TanMan::TestSupport::Models::DotFile::Manipulating::Label
         stmt.unparse.should eql( 'label=""' )
       end
 
-
       it 'can remove the label' do
-        removed = result.stmt_list._remove_item label_statement
-        pn = normalized_input_pathname.dirname.join '1.0-with-no-label.dot'
-        exp = pn.read
-        result.unparse.should eql( exp )
+
+        removed = result.stmt_list._remove_item _retrieve_label_statement
+
+        _expected_s = ::File.read(
+          ::File.join TS_.dir_pathname.to_path, 'fixtures/1.0-with-no-label.dot' )
+
+        @result.unparse.should eql _expected_s
+
         removed.unparse.should eql(
           "label=\"Tangent with the C Programming Language\"")
-        _retrieve_label_statement.should eql( nil )
-      end
 
+        _retrieve_label_statement.should be_nil
+      end
 
       def _retrieve_label_statement
-        result.stmt_list.stmts.detect do |s|
-          :equals_stmt == s.class.rule && 'label' == s.lhs.normalized_string
+        result.stmt_list.stmts.detect do |sx|
+          :equals_stmt == sx.class.rule && LABEL__ == sx.lhs.normalized_string
         end
       end
-
-      let(:label_statement) { _retrieve_label_statement }
     end
 
+    using_input '5.0-with-example-label-stmt-in-c-style-comments-and-empty-graph.dot' do
+
+      it 'can set (AND CREATE) the label' do
+        _can_set_and_create_the_label
+      end
+    end
+
+    using_input '5.5-with-example-label-stmt-in-shell-style-comments-and-empty-graph.dot' do
+
+      it 'can set (AND CREATE) the label' do
+        _can_set_and_create_the_label
+      end
+    end
 
     def _can_set_and_create_the_label
       o = result
@@ -67,27 +82,6 @@ module Skylab::TanMan::TestSupport::Models::DotFile::Manipulating::Label
       ( !!md ).should eql( true ) # egads sorry rspec
       md[:space].should match( /\A[[:space:]]\z/ )
       nil
-    end
-
-
-
-    using_input(
-      '5.0-with-example-label-stmt-in-c-style-comments-and-empty-graph.dot' ) do
-
-      it 'can set (AND CREATE) the label' do
-        _can_set_and_create_the_label
-      end
-    end
-
-
-
-    using_input(
-      '5.5-with-example-label-stmt-in-shell-style-comments-and-empty-graph.dot'
-    ) do
-
-      it 'can set (AND CREATE) the label' do
-        _can_set_and_create_the_label
-      end
     end
   end
 end
