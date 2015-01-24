@@ -322,7 +322,7 @@ module Skylab::Porcelain::Legacy
     # is its result. whew!
     #
 
-    def fetch_action_sheet ref, do_fuzzy, not_found, ambiguous
+    def fetch_action_sheet ref, do_fuzzy, not_found, ambiguous  # :+[#ba-015] fuzzy matching
       exact = -> n { :exact if ref == n }
       match = if do_fuzzy
         rx = /\A#{ ::Regexp.escape ref }/i

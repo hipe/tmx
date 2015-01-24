@@ -25,7 +25,8 @@
                hash and switch statement have `semantic intersect`
 [#016]       #doc-point #parent:006 #body-is-inline-in-parent
                `semantic subset` / `semantic supeset` loosely defined
-[#015] #hole (#moved-to: [#cb-047])
+[#015]       [ this common fuzzy algorithm, externally only in universe ]
+             (was #moved-to: [#cb-047])
              (was: #tracking-tag - places that could benefit maybe from something
                like basic list evented articulation)
 [#014]       #tracking-tag - "get_" vs. "_value" (in basic string template)

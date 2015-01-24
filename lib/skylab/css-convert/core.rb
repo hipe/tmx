@@ -212,7 +212,7 @@ module Skylab::CSS_Convert
       res = nil
       begin
         re = /\A#{ ::Regexp.escape str }/
-        found = DUMPABLE.keys.detect { |s| re =~ s }
+        found = DUMPABLE.keys.detect { |s| re =~ s }  # :~+[#ba-015]
         if ! found
           usage_and_invite "need one of (#{
             }#{ DUMPABLE.keys.map(&:inspect).join ', ' }) #{
@@ -321,7 +321,7 @@ module Skylab::CSS_Convert
     def test name=nil
       if name
         r = /\A#{::Regexp.escape(name)}/
-        list = VISUAL_TESTS_[].select { |t| r.match t.name }
+        list = VISUAL_TESTS_[].select { |t| r.match t.name }  # :+[#ba-015]
       end
       if ! name or list.length > 1
         send_list_of_tests list || VISUAL_TESTS_[]

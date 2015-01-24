@@ -82,17 +82,10 @@ module Skylab::Cull
       def resolve_function
 
         nm = Callback_::Name.via_slug @function_name
-
-        rx = /\A#{ nm.as_const.id2name.downcase  }/i
-
         i_a = @box_mod.constants
 
-        found_a = i_a.reduce [] do | m, const |
-          if rx =~ const
-            m.push const
-          end
-          m
-        end
+        found_a = Cull_.lib_.basic::Fuzzy.reduce_array_against_string(
+          i_a, nm.as_const.id2name.downcase )
 
         case 1 <=> found_a.length
         when  1 ; when_none nm, i_a

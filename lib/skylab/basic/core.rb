@@ -53,6 +53,54 @@ module Skylab::Basic  # introduction at [#020]
     Minimal_Property__.via_variegated_symbol :argument
   end
 
+  module Fuzzy  # :[#015].
+    class << self
+
+      def reduce_array_against_string a, s, * p_a, & p
+        p and p_a.push p
+        _reduce_to_array_stream_against_regex(
+          Callback_.stream.via_nonsparse_array( a.select{ |x| x }.to_a ),
+          case_insensitive_regex_via_string( s ),
+          s,
+          p_a )
+      end
+
+      def reduce_to_array_stream_against_string st, s, * p_a, & p
+        p and p_a.push p
+        _reduce_to_array_stream_against_regex(
+          st, case_insensitive_regex_via_string( s ), s, p_a )
+      end
+
+      def case_insensitive_regex_via_string s
+        /\A#{ ::Regexp.escape s }/i
+      end
+
+      def case_sensitive_regex_via_string s
+        /\A#{ ::Regexp.escape s }/
+      end
+
+      def _reduce_to_array_stream_against_regex st, rx, s, p_a
+        a = []
+        candidate_mapper, result_mapper = p_a
+        candidate_mapper ||= IDENTITY_
+        result_mapper ||= IDENTITY_
+        x = st.gets
+        while x
+          s_ = candidate_mapper[ x ]
+          if rx =~ s_
+            if s == s_
+              a.clear.push result_mapper[ x ]
+              break
+            end
+            a.push result_mapper[ x ]
+          end
+          x = st.gets
+        end
+        a
+      end
+    end  # >>
+  end
+
   class Minimal_Property__
 
     class << self

@@ -263,9 +263,9 @@ module Skylab::Brazen
 
       def receive_mutable_input_line s
         s.strip!
-        rx = /\A#{ ::Regexp.escape s }/
+        rx = Brazen_.lib_.basic::Fuzzy.case_sensitive_regex_via_string s
         cx_a = []
-        @children.each do |cx|
+        @children.each do |cx|  # :~+[#ba-015] the simple fuzzy algorithm
           cx.can_receive_focus or next
           rx =~ cx.slug or next
           if s == cx.slug

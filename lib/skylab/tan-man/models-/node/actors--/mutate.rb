@@ -118,7 +118,7 @@ module Skylab::TanMan
         end
 
         def build_fuzzy_match_p
-          rx = /\A#{ ::Regexp.escape @name_s }/i  # :+[#069] case insensitive?
+          rx = /\A#{ ::Regexp.escape @name_s }/i  # :+[#069] case insensitive?. :~+[#ba-015]
           -> stmt do
             rx !~ stmt.label_or_node_id_normalized_string
           end

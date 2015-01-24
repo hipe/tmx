@@ -981,24 +981,15 @@ module Skylab::Brazen
       end
 
       def matching_entities_via_fuzzy_lookup ent, & oes_p
-
-        against_s = ent.local_entity_identifier_string
-        rx = /\A#{ ::Regexp.escape against_s }/
-
-        a = [] ; scn = entity_stream_via_model ent.class, & oes_p
-
-        while x = scn.gets
-          s = x.local_entity_identifier_string
-          rx =~ s or next
-          if against_s == s
-            a.clear.push x
-            break
-          else
-            a.push x.dup
-          end
-        end
-
-        a
+        Brazen_.lib_.basic::Fuzzy.reduce_to_array_stream_against_string(
+          entity_stream_via_model( ent.class, & oes_p ),
+          ent.local_entity_identifier_string,
+          -> x do
+            x.local_entity_identifier_string
+          end,
+          -> x do
+            x.dup
+          end )
       end
 
       def one_entity_when_via_fuzzy_lookup_not_found ent, & oes_p

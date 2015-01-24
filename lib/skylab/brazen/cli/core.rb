@@ -294,19 +294,12 @@ module Skylab::Brazen
       end
 
       def __array_of_matching_unbounds_against_token tok
-        matching_actions = [] ; rx = /\A#{ ::Regexp.escape tok }/
-        scn = bound_action.to_unbound_action_stream
-        while action = scn.gets
-          slug = action.name_function.as_slug
-          if rx =~ slug
-            if tok == slug
-              matching_actions.clear.push action
-              break
-            end
-            matching_actions.push action
-          end
-        end
-        matching_actions
+        Brazen_.lib_.basic::Fuzzy.reduce_to_array_stream_against_string(
+          bound_action.to_unbound_action_stream,
+          tok,
+          -> unbound do
+            unbound.name_function.as_slug
+          end )
       end
 
       def _adapter_via_unbound unbound

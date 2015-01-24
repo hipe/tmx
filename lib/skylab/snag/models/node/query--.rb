@@ -192,7 +192,7 @@ module Skylab::Snag
 
       def initialize identifier_o
         @identifier = identifier_o
-        @identifier_rx = /\A#{ ::Regexp.escape @identifier.body_s }/  # [#019]
+        @identifier_rx = /\A#{ ::Regexp.escape @identifier.body_s }/  # [#019], :~+[#ba-015]
       end
 
       def phrase
