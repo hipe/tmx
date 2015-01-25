@@ -69,7 +69,7 @@ module Skylab::TanMan
         def bld_using_default_event strtr, d
 
           build_neutral_event_with :using_default,
-              :name_s, strtr.local_entity_identifier_string,
+              :name_s, strtr.natural_key_string,
               :num, d do |y, o|
 
             y << "using default starter #{ val o.name_s } #{

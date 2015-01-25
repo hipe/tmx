@@ -73,7 +73,7 @@ module Skylab::Brazen
       attr_accessor :after_name_symbol, :description_block,
         :precondition_controller_i_a
 
-      def local_entity_identifier_string
+      def natural_key_string
         properties.fetch NAME_
       end
 
@@ -334,7 +334,7 @@ module Skylab::Brazen
       @parameter_box[ i ]
     end
 
-    def local_entity_identifier_string
+    def natural_key_string
       @property_box.fetch NAME_
     end
 
@@ -957,53 +957,67 @@ module Skylab::Brazen
         @dsc and via_dsc_persist_entity ent, & oes_p
       end
 
-    private
+      private def normalize_entity_name_via_fuzzy_lookup ent, & oes_p  # (covered by [tm] for now)
 
-      def normalize_entity_name_via_fuzzy_lookup ent, & oes_p  # (covered by [tm] for now)
-        ent_ = one_entity_via_fuzzy_lookup ent, & oes_p
+        ent_ = one_entity_against_natural_key_fuzzily(
+          ent.natural_key_string, & oes_p )
+
         ent_ and begin
           ent.normalize_property_value_via_normal_entity(
-            ent.class.local_entity_identifier_string, ent_, & oes_p )
+            ent.class.natural_key_string, ent_, & oes_p )
           ACHIEVED_
         end
       end
 
-      def one_entity_via_fuzzy_lookup ent, & oes_p
-        ent_a = matching_entities_via_fuzzy_lookup ent, & oes_p
+      def one_entity_against_natural_key_fuzzily name_s, & oes_p
+        __one_entity_via_entity_array(
+          __reduce_to_array_against_natural_key_fuzzily( name_s, & oes_p ),
+          name_s,
+          & oes_p )
+      end
+
+      def __one_entity_via_entity_array ent_a, name_s, & oes_p
         case 1 <=> ent_a.length
         when  0
           ent_a.fetch 0
         when -1
-          one_entity_when_via_fuzzy_lookup_ambiguous ent_a, ent, & oes_p  # #todo - model ambiguity method not implemented
+          __one_entity_when_via_fuzzy_lookup_ambiguous ent_a, name_s, & oes_p  # #todo - model ambiguity method not implemented
         when  1
-          one_entity_when_via_fuzzy_lookup_not_found ent, & oes_p
+          __when_zero_entities_found_against_natural_key name_s, & oes_p
         end
       end
 
-      def matching_entities_via_fuzzy_lookup ent, & oes_p
+    private
+
+      def __reduce_to_array_against_natural_key_fuzzily name_s, & oes_p
+
         Brazen_.lib_.basic::Fuzzy.reduce_to_array_stream_against_string(
-          entity_stream_via_model( ent.class, & oes_p ),
-          ent.local_entity_identifier_string,
-          -> x do
-            x.local_entity_identifier_string
+
+          entity_stream_via_model( model_class, & oes_p ),
+
+          name_s,
+
+          -> ent do
+            ent.natural_key_string
           end,
-          -> x do
-            x.dup
+
+          -> ent do
+            ent.dup
           end )
       end
 
-      def one_entity_when_via_fuzzy_lookup_not_found ent, & oes_p
+      def __when_zero_entities_found_against_natural_key name_s, & oes_p
 
         oes_p.call :error, :entity_not_found do
-          bld_entity_not_found_event ent
+          __build_zero_entities_found_against_natural_key_event name_s
         end
 
         UNABLE_
       end
 
-      def bld_entity_not_found_event ent
+      def __build_zero_entities_found_against_natural_key_event name_s
 
-        _scn = entity_stream_via_model ent.class do
+        _scn = entity_stream_via_model model_class do
         end
 
         _a_few_ent_a = _scn.take A_FEW__ do |x|
@@ -1011,16 +1025,18 @@ module Skylab::Brazen
         end
 
         build_not_OK_event_with :entity_not_found,
-            :ent, ent, :a_few_ent_a, _a_few_ent_a do |y, o|
+            :name_string, name_s,
+            :a_few_ent_a, _a_few_ent_a,
+            :model_class, model_class do | y, o |
 
-          human_s = ent.class.name_function.as_human
+          human_s = o.model_class.name_function.as_human
 
           s_a = o.a_few_ent_a.map do |x|
-            val x.local_entity_identifier_string
+            val x.natural_key_string
           end
 
           y << "#{ human_s } not found: #{
-           }#{ ick o.ent.local_entity_identifier_string } #{
+           }#{ ick o.name_string } #{
             }(some known #{ human_s }#{ s s_a }: #{ s_a * ', ' })"
 
         end
@@ -1073,7 +1089,7 @@ module Skylab::Brazen
       def initialize
         super
         @kernel.do_debug and @kernel.debug_IO.
-          puts ">> >>       MADE #{ model_class.name_function.as_slug } SCTL"
+          puts ">> >>       MADE #{ Callback_::Name.via_module( model_class ).as_slug } SCTL"
       end
 
       def members
@@ -1141,7 +1157,7 @@ module Skylab::Brazen
       def initialize kernel
         @kernel = kernel
         @kernel.do_debug and @kernel.debug_IO.
-          puts ">>          MADE #{ model_class.name_function.as_slug } SILO"
+          puts ">>          MADE #{ Callback_::Name.via_module( model_class ).as_slug } SILO"
       end
 
       def members

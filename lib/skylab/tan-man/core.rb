@@ -27,7 +27,6 @@ module Skylab::TanMan
   stowaway :Entity_, 'models-'
   FILE_SEPARATOR_ = ::File::SEPARATOR
   stowaway :Kernel_, 'models-'
-  Model_lib_ = -> { Brazen_.model }
   NEWLINE_ = "\n".freeze
   SPACE_ = ' '.freeze
   TanMan_ = self

@@ -132,7 +132,7 @@ module Skylab::Brazen
       end
 
       def via_entity_resolve_subsection_string
-        @subsection_s = @entity.local_entity_identifier_string ; nil
+        @subsection_s = @entity.natural_key_string ; nil
       end
 
       def via_both_strings_resolve_subsection_id

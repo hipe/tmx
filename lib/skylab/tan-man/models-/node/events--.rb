@@ -5,26 +5,6 @@ module Skylab::TanMan
     module Events__
 
   if false
-
-
-  class Models::Node::Events::Attributes_Updated <
-    Model::Event.new :node_stmt, :added, :changed
-
-    def build_message
-      preds = [ ]
-      if added.length.nonzero?
-        preds << "added attribute#{ s added }: #{
-          }[ #{ added.map { |k, v| "#{ k }=#{ v }" }.join ', ' } ]"
-      end
-      if changed.length.nonzero?
-        preds << "changed #{ changed.map do |k, old, new|
-          "#{ k } from #{ val old } to #{ val new }"
-        end.join ' and ' }"
-      end
-      "on node #{ lbl node_stmt.label } #{ preds.join ' and ' }"
-    end
-  end
-
   class Models::Node::Events::Destroyed <
     Model::Event.new :node_stmt
 

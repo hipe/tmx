@@ -72,36 +72,17 @@ module Skylab::TanMan::TestSupport::Models::Meaning
       call_API :meaning, :add, :input_string, s, :output_string, s, :name, 'foo', :value, 'bar'
     end
 
-    it "list when input string has parsable lines" do
-
-      call_API :meaning, :ls, :input_string, "digraph{/* foo : fee \n fiffle: faffle */}"
-
-      expect_no_events
-      st = @result
-
-      ent = st.gets
-        ent.property_value_via_symbol( :name ).should eql 'foo'
-        ent.property_value_via_symbol( :value ).should eql 'fee '
-
-      ent = st.gets
-        ent.property_value_via_symbol( :name ).should eql 'fiffle'
-        ent.property_value_via_symbol( :value ).should eql 'faffle */'  # <- LOOK
-
-      st.gets.should be_nil
-
-    end
-
-    it "add one before one - HERE HAVE A COMMA (this was hard) BUT IT IS MAGIC", wip: true do
+    it "add one before one - HERE HAVE A COMMA (this was hard) BUT IT IS MAGIC" do
                                   # client.parser.root = :node_stmt
-      graph = client.parse_string <<-O.unindent
+      graph = _parse_string <<-O.unindent
         digraph {
           barl [label=barl]
         }
       O
 
-      stmt = graph.node_statements.first
+      stmt = graph.node_statements.gets.stmt
       alist = stmt.attr_list.content
-      alist.class.should eql( TanMan_::Models::DotFile::Sexps::AList ) # meh
+      alist.class.should eql TanMan_::Models_::DotFile::Sexps::AList  # meh
       alist._prototype = graph.class.parse :a_list, 'a=b, c=d'
       alist.unparse.should eql( 'label=barl' )
       alist._prototype.unparse.should eql( 'a=b, c=d' )
@@ -109,21 +90,56 @@ module Skylab::TanMan::TestSupport::Models::Meaning
       alist.unparse.should eql('fontname=Futura, label=barl')
     end
 
-    it "UPDATE ONE AND ADD ONE -- WHAT WILL HAPPEN!!?? - note order logic", wip: true do
+    it "UPDATE ONE AND ADD ONE -- WHAT WILL HAPPEN!!?? - note order logic" do
 
-      graph = client.parse_string <<-O.unindent
+      graph = _parse_string <<-O.unindent
         digraph {
           barl [label=barl, fillcolor="too"]
         }
       O
 
-      stmt = graph.node_statements.first
+      stmt = graph.node_statements.gets.stmt
       alist = stmt.attr_list.content
       alist.unparse.should eql( 'label=barl, fillcolor="too"' )
       attrs = [['fontname', 'Futura'], ['fillcolor', '#11c11']]
       alist._update_attributes attrs
       alist.unparse.should eql(
         'fontname=Futura, label=barl, fillcolor="#11c11"'  )
+    end
+
+    def _parse_string s
+      require Parent_.dir_pathname.join( 'dot-file/test-support' ).to_path  # meh
+      Parent_::DotFile.client_class.new.parse_string s
+    end
+
+    it "OMG associate" do
+
+      _input_string = <<-O.unindent
+        digraph{
+        # done : style=filled fillcolor="#79f234"
+        fizzle [label=fizzle]
+        sickle [label=sickle]
+        fizzle -> sickle
+        }
+      O
+
+      output_string = ""
+
+      call_API :meaning, :associate,
+        :meaning_name, 'done',
+        :node_label, 'fizzle',
+        :input_string, _input_string,
+        :output_string, output_string
+
+      ev = expect_OK_event :updated_attributes
+      expect_succeeded
+
+      black_and_white( ev ).should eql(
+        "on node 'fizzle' added attributes: [ style=filled, fillcolor=#79f234 ]" )
+
+      scn = TestSupport_::Expect_Line::Scanner.via_string output_string
+      scn.advance_N_lines 2
+      scn.next_line.should eql "fizzle [fillcolor=\"#79f234\", label=fizzle, style=filled]\n"
     end
   end
 end

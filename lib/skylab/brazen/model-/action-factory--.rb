@@ -326,7 +326,7 @@ module Skylab::Brazen
               :entity, @entity, :is_completion, true do |y, o|
 
             y << "#{ o.entity.class.name_function.as_human } is #{
-             } #{ ick o.entity.local_entity_identifier_string }"
+             } #{ ick o.entity.natural_key_string }"
           end
         end
       end

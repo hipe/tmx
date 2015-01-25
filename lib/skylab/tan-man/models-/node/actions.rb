@@ -152,7 +152,8 @@ module Skylab::TanMan
       end
 
       def _entity_via_node node
-        model_class.new( @kernel, & @on_event_selectively ).init_via_node node
+        model_class.new( @kernel, & @on_event_selectively ).
+          __init_via_node_stmt_and_immutable_preconditions node, @preconditions
       end
 
       def _commit_changes_to_dsc dsc
@@ -161,10 +162,15 @@ module Skylab::TanMan
       end
     end
 
-    def init_via_node node
+    def __init_via_node_stmt_and_immutable_preconditions node_stmt, precon_bx
 
-      bx = @property_box = Callback_::Box.new
-      bx.add :name, node.label
+      bx = Callback_::Box.new
+      bx.add :name, node_stmt.label
+
+      @preconditions = precon_bx
+      @property_box = bx
+      @node_stmt = node_stmt
+
       self
     end
 

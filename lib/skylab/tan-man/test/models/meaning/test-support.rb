@@ -2,7 +2,9 @@ require_relative '../test-support'
 
 module Skylab::TanMan::TestSupport::Models::Meaning
 
-  ::Skylab::TanMan::TestSupport::Models[ TS_ = self ]
+  Parent_ = ::Skylab::TanMan::TestSupport::Models
+
+  Parent_[ TS_ = self ]
 
   include Constants
 

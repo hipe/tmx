@@ -83,92 +83,6 @@ module Skylab::TanMan
         self
       end
 
-    if false
-    include Core::SubClient::InstanceMethods
-    include Models::DotFile::Parser::InstanceMethods
-
-    def add_association *a
-      if associations
-        associations.add_association(* a)
-      end
-    end
-
-    def apply_meaning node_ref, meaning, dry_run, verbose, error, success, info
-      res = nil
-      begin
-        nodes or break
-        node = nodes.fetch node_ref, error
-        break( res = node ) if ! node
-        res = meanings.apply(
-          node, meaning, dry_run, verbose, error, success, info )
-      end while nil
-      res
-    end
-
-    def check verbose
-      res = true # always succeeds
-      begin
-        sexp = self.sexp or break # emitted
-        if verbose
-
-          TanMan_.lib_.pretty_print.pp(
-            sexp,
-            TanMan_::System[].IO.some_stderr_IO )
-
-          s = ::Pathname.new( __FILE__ ).relative_path_from TanMan.dir_pathname
-          send_info_string "(from #{ s })"
-        else
-          send_info_string "#{ escape_path pathname } looks good : #{ sexp.class }"
-        end
-      end while nil
-      res
-    end
-
-    def graph_noun
-      "#{ escape_path pathname }"
-    end
-
-    def meanings
-      @meanings ||= Models::Meaning::Collection.new self
-    end
-
-    attr_reader :pathname
-
-    def set_dependency source_ref, target_ref, do_create,
-      do_fuzz, error, success, info
-
-      associations.set_dependency source_ref, target_ref, do_create,
-        do_fuzz, error, success, info
-    end
-
-    def set_meaning agent_ref, target_ref, create, dry_run, verbose,
-                      error, success, info
-      meanings.set agent_ref, target_ref, create, dry_run, verbose,
-        error, success, info
-    end
-
-    def tell statement_sexp, dry_run, force, verbose
-      rule = statement_sexp.class.rule.to_s
-      rule_stem = rule.match( /_statement\z/ ).pre_match
-      action_class = Models::DotFile::Actions.const_fetch rule_stem # BOXXY
-      o = action_class.new self
-      res = o.invoke dotfile_controller: self,
-                                dry_run: dry_run,
-                                  force: force,
-                              statement: statement_sexp,
-                                verbose: verbose
-      res
-    end
-
-    def unset_dependency *a
-      associations.unset_dependency(* a)
-    end
-
-    def unset_meaning *a
-      meanings.unset(* a)
-    end
-    end
-
       attr_accessor :caddied_output_args  # topic doesn't do anything with this, just carries it
 
       def persist_via_args is_dry, arg
@@ -267,19 +181,6 @@ module Skylab::TanMan
           WRITE_MODE_ = 'w'
         end
       end
-
-    if false
-
-
-    def associations
-      @associations ||= begin                  # #sexp-release
-        if sexp = self.sexp
-          Models::Association::Collection.new self, sexp
-        end
-      end
-    end
-    end
-
     end
   end
 end

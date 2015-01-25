@@ -50,14 +50,14 @@ module Skylab::TanMan
 
     Collection_Controller__ = :_NONE_
 
-    class Silo_Controller__ < Model_lib_[].silo_controller_class
+    class Silo_Controller__ < Brazen_.model.silo_controller_class
 
       def provide_collection_controller_precon _id, graph
         DotFile_::Actors__::Build_Document_Controller::Via_action[ graph.action ]
       end
     end
 
-    class Silo__ < Model_lib_[].silo_class
+    class Silo__ < Brazen_.model.silo_class
 
       def members
         [ :document_controller_via_argument_box, * super ]

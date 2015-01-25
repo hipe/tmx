@@ -46,6 +46,50 @@ module Skylab::TanMan
 
       Rm = make_action_class :Delete
 
+      class Associate < TanMan_::Model_::Document_Entity.action_class
+
+        Entity_.call self,
+
+          :preconditions, [ :dot_file, :meaning, :node ],
+
+          :reuse, TanMan_::Model_::Document_Entity.IO_properties,
+          :flag, :property, :dry_run,
+          :required, :property, :meaning_name,
+          :required, :property, :node_label
+
+        def via_arguments_produce_bound_call
+          resolve_document_IO_or_produce_bound_call_ or super
+        end
+
+        def produce_any_result
+          @meanings_controller = @preconditions.fetch :meaning
+          @nodes_controller = @preconditions.fetch :node
+          ok = __resolve_meaning
+          ok &&= __resolve_node
+          ok &&= __apply_meaning_to_node
+          ok && __persist
+        end
+
+        def __resolve_meaning
+          @meaning = @meanings_controller.one_entity_against_natural_key_fuzzily @argument_box[ :meaning_name ]
+          @meaning and ACHIEVED_
+        end
+
+        def __resolve_node
+          @node = @nodes_controller.one_entity_against_natural_key_fuzzily @argument_box[ :node_label ]
+          @node and ACHIEVED_
+        end
+
+        def __apply_meaning_to_node
+          @meanings_controller.apply_meaning_to_node @meaning, @node
+        end
+
+        def __persist
+          @preconditions.fetch( :dot_file ).persist_via_args(
+            @argument_box[ :dry_run ],
+            * @output_argument_a )
+        end
+      end
     end
 
     class << self

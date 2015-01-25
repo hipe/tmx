@@ -68,7 +68,7 @@ module Skylab::TanMan::TestSupport::Models::Starter
 
       ent = @result
       ent.class.name_function.as_human.should eql 'starter'
-      ent.local_entity_identifier_string.should eql 'holy-derp.dot'
+      ent.natural_key_string.should eql 'holy-derp.dot'
 
     end
 

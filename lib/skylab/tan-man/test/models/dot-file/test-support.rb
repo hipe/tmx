@@ -8,15 +8,21 @@ module Skylab::TanMan::TestSupport::Models::DotFile
 
   TanMan_ = TanMan_
 
-  module InstanceMethods
+  class << self
 
-    def prepare_to_produce_result
+    def client_class
 
       if ! TS_.const_defined?( :Client, false )
         load ::File.join( TS_.dir_pathname.to_path, 'client' )  # because new a.l borks because no extname. meh
       end
+      TS_::Client
+    end
+  end  # >>
 
-      @parse = TS_::Client.new
+  module InstanceMethods
+
+    def prepare_to_produce_result
+      @parse = TS_.client_class.new
       true
     end
   end

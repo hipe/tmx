@@ -9,7 +9,7 @@ module Skylab::TanMan
     end
 
     def members
-      [ :start_pos, :end_pos, :whole_string ]
+      [ :natural_key_string, :start_pos, :end_pos, :whole_string, :value_string ]
     end
 
     attr_reader :start_pos, :end_pos
@@ -18,6 +18,14 @@ module Skylab::TanMan
     def initialize_copy _otr_
       @scn = @scn.dup
       @scn.string = @scn.string.dup
+    end
+
+    def natural_key_string
+      property_value_via_symbol :name
+    end
+
+    def value_string
+      property_value_via_symbol :value
     end
 
     def property_value_via_symbol i

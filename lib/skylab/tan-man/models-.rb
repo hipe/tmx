@@ -399,6 +399,12 @@ module Skylab::TanMan
       end
     end
 
+    def to_controller  # experiment
+      Models_::Node::Controller__.new self, @preconditions.fetch( :dot_file )
+    end
+
+    attr_reader :node_stmt
+
     Node_ = self
   end
 
@@ -428,11 +434,11 @@ module Skylab::TanMan
       end
     end
 
-    def name
+    def natural_key_string
       @property_box[ :name ]
     end
 
-    def value
+    def value_string
       @property_box[ :value ]
     end
 
@@ -442,6 +448,7 @@ module Skylab::TanMan
       Add = Stub_[ :Add ]
       Ls  = Stub_[ :Ls ]
       Rm = Stub_[ :Rm ]
+      Associate = Stub_[ :Associate ]
     end
   end
 

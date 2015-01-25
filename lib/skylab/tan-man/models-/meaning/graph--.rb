@@ -27,13 +27,13 @@ module Skylab::TanMan
 
       mn = meaning_st.gets
       while mn
-        sym = mn.name.intern
-        x = mn.value
-        if Looks_like_terminal__[ x ]
+        sym = mn.natural_key_string.intern
+        v_s = mn.value_string
+        if Looks_like_terminal__[ v_s ]
           g.absorb_node sym
-          h[ sym ].push x
+          h[ sym ].push v_s
         else
-          g.absorb_node sym, [ x.intern ]
+          g.absorb_node sym, [ v_s.intern ]
         end
         mn = meaning_st.gets
       end
@@ -106,11 +106,34 @@ module Skylab::TanMan
     Interminable__ = Callback_::Event.prototype_with :interminable,
         :trail_a, nil, :reason, :interminal, :ok, false do | y, o |
 
-      self._DO_ME
+      self._RIDE_ME
+
+      trail_a = o.trail_a
+      stack_a = [ "#{ ick trail_a.last } has no meaning." ]
+
+      if 1 < trail_a.length
+        stack_a.push "#{ lbl trail_a[ -2 ] } means #{ val trail_a[ -1 ] }, but "
+        trail_a.pop
+      end
+
+      while 1 < trail_a.length
+        stack_a.push "#{ lbl trail_a[ -2 ] } means #{ val trail_a[ -1 ] } and "
+        trail_a.pop
+      end
+
+      y << stack_a.reverse.join( EMPTY_S_ )
     end
 
     Circular__ = Callback_::Event.prototype_with :circular,
         :trail_a, nil, :reason, :circular, :ok, false do | y, o |
+
+      self._RIDE_ME
+
+      _s = o.trail_a.map do | sym |
+        "#{ lbl sym }"
+      end.join( ' -> ' )
+
+      "circular dependency in meaning: #{ _s }"
     end
   end
 end

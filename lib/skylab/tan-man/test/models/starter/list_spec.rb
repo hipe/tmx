@@ -14,9 +14,9 @@ module Skylab::TanMan::TestSupport::Models::Starter
 
       st  = @result
 
-      st.gets.local_entity_identifier_string.should eql 'digraph.dot'
+      st.gets.natural_key_string.should eql 'digraph.dot'
 
-      st.gets.local_entity_identifier_string.should eql 'holy-smack.dot'
+      st.gets.natural_key_string.should eql 'holy-smack.dot'
 
       st.gets.should be_nil
 

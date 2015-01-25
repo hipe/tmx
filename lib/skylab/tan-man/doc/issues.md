@@ -98,8 +98,8 @@
 [#010]       #done 2012-10-27 associate two nodes
                1. sic, 2. redudantly, 3. agent not exist 4. target not exist
 [#009]       #doc-node: the node controller narrative ..
-             #repurposed: once. was: #done 2012-10-27 create a node
-               1. with one template (3 permutations) 2. with another template (3 permutes)
+             ( was: #done 2012-10-27 create a node
+               1. with one template (3 permutations) 2. with another template (3 permutes) )
 [#008]       #done 2012-10-10 #rename rename "nt" to "expression" / "rule"
 [#007]       #done #small #critical models/ dir generated during specs 2012-09-29
 [#006]       meta property reference (.rb!)
@@ -109,4 +109,5 @@
 [#003]       #open #one-day unshield your eyes : google "dotfile grammar" 2012-09-01
 [#002]       #done 2012-08-30 rename `remote*` to fit a pattern (e.g. controller)
                examples-controller -> example-collection
-[#001]       #done tan -w ok, #depends-on:(#sl-unwip)
+[#001] #open refactor out the repetition among document entity actions
+             (was: #done tan -w ok, #depends-on:(#sl-unwip))

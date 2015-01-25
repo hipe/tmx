@@ -44,7 +44,7 @@ module Skylab::TanMan
       end
     end
 
-    def local_entity_identifier_string
+    def natural_key_string
       @property_box.fetch :digraph_path
     end
 
