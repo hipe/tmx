@@ -131,7 +131,7 @@ module Skylab::Headless::TestSupport::System::Services::Filesystem::Cache
         :path, tmpdir_pathname_path,
         :be_verbose, do_debug,
         :debug_IO, debug_IO,
-        :max_mkdirs, 5 )
+        :max_mkdirs, 6 )  # make the `hl` dir if necessary
     end
   end
 end

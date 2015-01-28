@@ -1,9 +1,9 @@
 [#084]       :+#wishlist a `flag` meta-meta prperty
-[#083] #open workspace `init` action should not default to '.' in API
+[#083]       #done workspace `init` action should not default to '.' in API
 [#082]       #tracking `list` implementations
 [#081]       #track experimental extensions to Actor
 [#080]       #parent-node:[#013] actors, agents and models ..
-[#079] #open rather than the model action ever having to know about the
+[#079]       #done rather than the model action ever having to know about the
              modality adapter, the modality action should make a custom
              adapter class and in that class set the default iambic starter.
              this is what the new hidden-ness of properties is for. all
@@ -12,11 +12,11 @@
              to have direct knowledge of the adapter layer
 [#078]    #tracking - need better way to do this (in [ts])
 [#077] #open maybe try a positive meta-property with a default instead of `hidden`.
-[#076] #open [#021] for `retrieve` (was: [same for list])
+[#076] #open end-client gets [#021] magic for `retrieve` (was: [same for list])
 [#075]    #tracking :+#wishlist optionally generate ivar-based iambic writers
 [#074]       #parent-node: [#011] the codifying expression agent (for events)
 [#073]       #parent-node: [#011] selective event listening via methods
-[#072] #open modernize this interface
+[#072]       #done (was: modernize this interface)
 [#071]       #tracking-tag wrap
 [#070]       #tracking-tag when we intentionally expose a mechanical
                ivar as a property
@@ -48,8 +48,7 @@
 [#049]       #parent-node: [#cb-046] case study: iambic ordering hacks
 [#048]       #parent-node: [#024] "#action-preconditions.."
 [#047]       #parent-node: [#013] the model entity narrative
-[#046]       #done so fragile this hack (entity properties to action props)
-               one better way is to make the proc a method at etc
+[#046]       #parent-ndoe: [#024] the action factory narrative ..
 [#045]       #parent-node: [#001] "the meta-properties narrative.."
 [#044]       #done graph has an action so maybe we don't need to pass it everywhere
 [#043]      #tracking-tag loading hacks
@@ -58,7 +57,7 @@
 [#040] #open in git-config, for set value, nil as literal value is undefined
 [#039]       #tracking-tag whether and where we change case of env vars
 [#038]       #parent-node: [#010] the couch datastore narrative ..
-[#037]       #parent-node: [#028] thoughts on unmarshalling with normalizaiton
+[#037]       [ this feature of unmarshal ]
 [#036]    #watching to go from a literal to a resolved const its kind of awful
              to lose and re-parse the demarcation that is already present
              in it but meh is it worth it to hack the algorithm for this?
@@ -80,8 +79,10 @@
 [#021]       the API magic result shape narrative .. (was "scope kernel")
 [#020] #open  --help and --host
 [#019]       #done turn `is_positive` into `ok` to match HTTP responses
-[#018]       #done #parent-node: [#013] "model ivars.."
-[#017] #open environment variables need a general solution ..
+[#018]       #parent-node: [#013] "the model property ordering rationale.."
+             (was: #parent-node: [#013] "model ivars..")
+[#017] #open environment variables need a general solution, probably one
+               where the front client handles this alone.
 [#016]       #parent-node: [#013] the inferred inflection narrative ..
 [#015]       #doc-node: the kernel narrative ..
 [#014] #open `has_custom_moniker` is a smell to exist in entity.
@@ -92,7 +93,7 @@
 [#009]       #parent-node: [#010] the git config narrative ..
 [#008]       #parent-node: [#009] the mutable git config narrative ..
 [#007] #open anticpating the issue with losing hooks accross inheritance bounds
-[#006] #open #doc-node the defaults vs required narrative ..
+[#006]       #doc-node the defaults vs required narrative ..
 [#005]       [name]  (compound names derived from model nodes)
              (was: #done re-arch expressions agents to work correctly with 'par')k
 [#004]       #parent-node: [#002] the help renderer narrative ..

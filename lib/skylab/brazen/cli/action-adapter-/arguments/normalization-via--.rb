@@ -13,27 +13,23 @@ module Skylab::Brazen
               :parameters
 
           def execute
-
-            _arg_a = @parameters.map do |a|
+            Normalization_.new( @parameters.map do |a|
               Argument_via_Native_Parameter__.new( * a )
-            end
-
-            Normalization_.new _arg_a
-
+            end )
           end
 
           class Argument_via_Native_Parameter__
 
-            def initialize opt_req_rest_i, name_i
+            def initialize opt_req_rest_i, name_symbol
               @opt_req_rest_i = opt_req_rest_i
-              @name_i = name_i
+              @name_symbol = name_symbol
             end
 
             def has_default
               false
             end
 
-            attr_reader :name_i
+            attr_reader :name_symbol
 
             def is_required
               :req == @opt_req_rest_i
@@ -47,7 +43,7 @@ module Skylab::Brazen
 
             def bld_name_function_with_hack
               Callback_::Name.via_variegated_symbol(
-                Callback_::Name.variegated_human_symbol_via_variable_name_symbol @name_i )
+                Callback_::Name.variegated_human_symbol_via_variable_name_symbol @name_symbol )
             end
           end
         end

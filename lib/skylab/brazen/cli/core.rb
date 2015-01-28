@@ -41,6 +41,10 @@ module Skylab::Brazen
         # (abstract base class "invocation" has no initialize method)
       end
 
+      def members
+        [ :application_kernel, :bound_action, * super ]
+      end
+
       attr_writer :env
 
       def invoke argv
@@ -115,12 +119,12 @@ module Skylab::Brazen
         @poly ||= ::Enumerator::Yielder.new( & @resources.sout.method( :puts ) )
       end
 
-      def default_leaf_class
-        self.class::Action_Adapter_
+      def leaf_class
+        self.class::Action_Adapter
       end
 
       def branch_class
-        self.class::Branch_Adapter__
+        self.class::Branch_Adapter
       end
 
       def expression_agent_class
@@ -144,9 +148,9 @@ module Skylab::Brazen
               seen_i_a_h[ i_a ] = true
             end
           else
-            i_a = adapter.bound_action.class.full_name_function.map( & :as_lowercase_with_underscores_symbol )
-            seen_general_h.fetch i_a do
-              seen_general_h[ i_a ] = true
+            k_x = adapter.bound_action.class.name.intern  # must work for proc proxies too
+            seen_general_h.fetch k_x do
+              seen_general_h[ k_x ] = true
               adapter.output_invite_to_general_help
             end
           end
@@ -160,6 +164,9 @@ module Skylab::Brazen
           x
         elsif x.respond_to? :id2name  # covered by [cu]
           x
+        elsif x.respond_to? :ascii_only?  # visually by [tm] paths
+          @resources.sout.puts x
+          SUCCESS_
         else
           CLI_::When_Result_::Looks_like_stream.new( @adapter, x ).execute
         end
@@ -172,6 +179,10 @@ module Skylab::Brazen
 
       Actions = ::Module.new.freeze  # #note-165
 
+      def members
+        [ * super ]
+      end
+
       def resources
         @resources
       end
@@ -179,7 +190,7 @@ module Skylab::Brazen
     private
 
       def resolve_properties
-        @properties = Properties__.new
+        @front_properties = Properties__.new
       end
 
       def resolve_partitions
@@ -187,8 +198,8 @@ module Skylab::Brazen
       end
 
       def to_full_inferred_prop_strm
-        scn = @properties.to_stream
-        scn.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :ellipsis
+        st = @front_properties.to_stream
+        st.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :ellipsis
       end
 
     public
@@ -220,7 +231,7 @@ module Skylab::Brazen
       end
 
       def action_prop
-        @properties.fetch :action
+        @front_properties.fetch :action
       end
 
       def resolve_bound_call_when_looks_like_action_for_first_argument
@@ -303,38 +314,40 @@ module Skylab::Brazen
       end
 
       def _adapter_via_unbound unbound
-
         if unbound.is_branch
-          branch_class.new unbound, bound_action
+          __branch_class_for_unbound_action( unbound ).new unbound, bound_action
         else
-          _leaf_class_for_unbound_action( unbound ).new unbound, bound_action
+          __leaf_class_for_unbound_action( unbound ).new unbound, bound_action
         end
       end
 
-      def wrap_adapter_stream_with_ordering_buffer scn
-        Callback_.stream.ordered scn
+      # this is CLI. you need not cache these.
+
+      def __branch_class_for_unbound_action unbound
+        _any_branch_or_leaf_class_for_unbound( unbound ) || branch_class
       end
 
-      def _leaf_class_for_unbound_action unbound
+      def __leaf_class_for_unbound_action unbound
+        _any_branch_or_leaf_class_for_unbound( unbound ) || leaf_class
+      end
 
-        # this is CLI. you need not cache this.
-
-        mod = self.class::Actions
-        const_sym = unbound.name_function.as_const
-
-        if mod.const_defined? const_sym, false
-          mod.const_get const_sym
-        else
-          default_leaf_class
+      def _any_branch_or_leaf_class_for_unbound unbound
+        sym = unbound.name_function.as_const
+        if self.class::Actions.const_defined? sym, false
+          self.class::Actions.const_get sym
         end
       end
 
-      def default_leaf_class
-        @parent.default_leaf_class
+      def leaf_class
+        @parent.leaf_class
       end
 
       def branch_class
         @parent.branch_class
+      end
+
+      def wrap_adapter_stream_with_ordering_buffer_ st
+        Callback_.stream.ordered st
       end
 
     private
@@ -373,7 +386,7 @@ module Skylab::Brazen
       end
 
       def to_actual_parameters_stream
-        Actual_Parameter_Scanner__.new @output_iambic, @properties
+        Actual_Parameter_Scanner__.new @output_iambic, @front_properties
       end
 
       def resolve_bound_call_when_multiple_matching_adapters
@@ -401,24 +414,22 @@ module Skylab::Brazen
         @bound.accept_parent_node_ boundish
       end
 
-    private
-
-      def resolve_properties
-        @properties = @bound.formal_properties  # nil ok
-        nil
+      def members
+        [ * super ]
       end
+
+    private
 
       def resolve_partitions
         @partitions = Build_partitions__[ to_full_inferred_prop_strm, self ]
       end
 
       def to_full_inferred_prop_strm
-        scan = if @properties
-          @properties.to_stream
+        if @front_properties
+          @front_properties.to_stream
         else
           Callback_.stream.via_nonsparse_array EMPTY_A_
-        end
-        scan.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :help
+        end.push_by STANDARD_ACTION_PROPERTY_BOX__.fetch :help
       end
 
     public def receive_show_help otr
@@ -459,7 +470,7 @@ module Skylab::Brazen
       def resolve_bound_call_when_any_args
         _n11n = Action_Adapter_::Arguments.normalization(
           @partitions.arg_a || EMPTY_A_ )
-        @arg_parse = _n11n.with_x argv
+        @arg_parse = _n11n.new_via_argv argv
         ev = @arg_parse.execute
         if ev
           resolve_bound_call_when_ARGV_parsing_error_event ev
@@ -483,21 +494,32 @@ module Skylab::Brazen
       def resolve_bound_call_when_ARGV_parsed
         @output_iambic.concat @arg_parse.release_result_iambic
         @partitions.env_a and process_environment
-        @bound_call or resolve_bound_call_via_output_iambic
+        @bound_call or via_output_iambic_resolve_bound_call
       end
 
       def process_environment
+
         env = @resources.env
-        @partitions.env_a.each do |prop|
-          s = env[ prop.upcase_environment_name_symbol.id2name ]
+
+        @partitions.env_a.each do | prp |
+          s = env[ environment_variable_name_string_via_property prp ]
           s or next
-          cased_i = prop.name_symbol.downcase  # [#039] casing
+          cased_i = prp.name_symbol.downcase  # [#039] casing
           @seen_h[ cased_i ] and next
           @output_iambic.push cased_i, s
-        end ; nil
+        end
+        nil
       end
 
-      def resolve_bound_call_via_output_iambic
+      public def environment_variable_name_string_via_property prp
+        "#{ __APPNAME }_#{ prp.name.as_lowercase_with_underscores_symbol.id2name.upcase }"
+      end
+
+      def __APPNAME
+        @__APPNAME ||= application_kernel.app_name.gsub( /[^[:alnum:]]+/, EMPTY_S_ ).upcase
+      end
+
+      def via_output_iambic_resolve_bound_call
 
         # begin experiment
         prp = @bound.any_formal_property_via_symbol :downstream
@@ -506,21 +528,12 @@ module Skylab::Brazen
         end
         # end experiment
 
-        @bound_call = @bound.___bound_call_via_iambic_stream_and_modality_adapter___(
-          Callback_::Iambic_Stream.via_array( @output_iambic ),
-          self )  # away in #open [#078]
+        @bound_call = @bound.bound_call_against_iambic_stream(
+          Callback_::Iambic_Stream.via_array @output_iambic )
 
-        @bound_call or self._SANITY
+        @bound_call ||= Brazen_.bound_call.via_value @bound_call
+
         nil
-      end
-
-    public
-
-      # ~ experimental hard-coded hook-in method to support workspace resolution
-
-      def workspace_resolution_properties  # path, max_num_dirs, config_filename
-        yield :path, ::Dir.pwd
-        yield :max_num_dirs, -1 ; nil
       end
 
       Autoloader_[ self ]
@@ -534,7 +547,7 @@ module Skylab::Brazen
       end
 
       def method_name
-        :produce_any_result
+        :produce_result
       end
 
       def args
@@ -548,19 +561,19 @@ module Skylab::Brazen
         _ and self._SANITY
       end
 
-      def produce_any_result
+      def produce_result
         @help_renderer.output_help_screen
         SUCCESS_
       end
     end
 
-    class Branch_Adapter__ < Branch_Invocation__
+    class Branch_Adapter < Branch_Invocation__
 
       include Adapter_Methods__
 
       def receive_show_help otr
         receive_frame otr
-        CLI_::When_::Help.new( nil, help_renderer, self ).produce_any_result
+        CLI_::When_::Help.new( nil, help_renderer, self ).produce_result
       end
     end
 
@@ -568,6 +581,14 @@ module Skylab::Brazen
 
       def initialize unbound, boundish
         @bound = unbound.new boundish, & handle_event_selectively
+      end
+
+      def members
+        [ :bound_, :resources, * super ]
+      end
+
+      def bound_  # #experiment
+        @bound
       end
 
       attr_reader :resources  # for magic results [#021]
@@ -880,6 +901,10 @@ module Skylab::Brazen
 
     class Invocation__
 
+      def members
+        EMPTY_A_
+      end
+
       def option_parser_class
         Option_parser__[]
       end
@@ -1013,7 +1038,7 @@ module Skylab::Brazen
       end
 
       def properties
-        @properties
+        @front_properties
       end
 
       def stderr
@@ -1040,11 +1065,11 @@ module Skylab::Brazen
 
     class Build_partitions__
 
-      Actor_[ self, :properties, :scn, :kernel ]
+      Actor_.call self, :properties, :scn, :adapter
 
       def execute
         Partitions__.new do |p|
-          @kernel.receive_partitions p
+          @adapter.receive_partitions p
           @partitions = p
           work
         end
@@ -1087,7 +1112,7 @@ module Skylab::Brazen
           determine_placement_for_many
         end
         maybe_make_experimental_aesthetic_readjustment
-        @partitions.kernel = @kernel
+        @partitions.adapter = @adapter
         @partitions.arg_a = @arg_a.freeze
         @partitions.env_a = @env_a.freeze
         @partitions.opt_a = @opt_a.freeze ; nil
@@ -1145,23 +1170,23 @@ module Skylab::Brazen
         @help_renderer or resolve_help_renderer
       end
       attr_accessor :opt_a, :arg_a, :env_a
-      attr_accessor :kernel
+      attr_accessor :adapter
       attr_reader :expression_agent, :help_renderer, :partitions
     private
 
       def resolve_expression_agent
-        @expression_agent = @kernel.expression_agent_class.new self ; nil
+        @expression_agent = @adapter.expression_agent_class.new self ; nil
       end
 
       def resolve_option_parser
-        op = @kernel.option_parser_class.new
-        @opt_a and @kernel.populate_option_parser_with_generated_opts op, @opt_a
-        @kernel.populate_option_parser_with_universal_options op
+        op = @adapter.option_parser_class.new
+        @opt_a and @adapter.populate_option_parser_with_generated_opts op, @opt_a
+        @adapter.populate_option_parser_with_universal_options op
         @op = op ; nil
       end
 
       def resolve_help_renderer
-        CLI_::Action_Adapter_::Help_Renderer.new @op, @kernel ; nil
+        CLI_::Action_Adapter_::Help_Renderer.new @op, @adapter; nil
       end
 
     public def receive_help_renderer o
@@ -1183,8 +1208,9 @@ module Skylab::Brazen
       end
 
       def add_env_section o
-        o.add_section :item_section, 'environment variable',
-          @env_a, & :upcase_environment_name_symbol
+        o.add_section :item_section, 'environment variable', @env_a do | prp |
+          adapter.environment_variable_name_string_via_property prp
+        end
       end
 
     public
@@ -1197,28 +1223,28 @@ module Skylab::Brazen
     private
 
       def lookup_property prop
-        i = prop.name_symbol
-        if opt = option_via_name( i )
+        sym = prop.name_symbol
+        if opt = __option_via_name_symbol( sym )
           [ :option, opt ]
-        elsif arg = argument_via_name( i )
+        elsif arg = __argument_via_name_symbol( sym )
           [ :argument, arg ]
-        elsif env = environment_variable_via_name( i )
+        elsif env = __environment_variable_via_name_symbol( sym )
           [ :environment_variable, env ]
         else
           [ :unknown, prop ]
         end
       end
 
-      def option_via_name i
-        any_i_in_a i, @opt_a
+      def __option_via_name_symbol sym
+        any_i_in_a sym, @opt_a
       end
 
-      def argument_via_name i
-        any_i_in_a i, @arg_a
+      def __argument_via_name_symbol sym
+        any_i_in_a sym, @arg_a
       end
 
-      def environment_variable_via_name i
-        any_i_in_a i, @env_a
+      def __environment_variable_via_name_symbol sym
+        any_i_in_a sym, @env_a
       end
 
       def any_i_in_a i, a
@@ -1391,7 +1417,7 @@ module Skylab::Brazen
       def initialize a
         @a = a
       end
-      def produce_any_result
+      def produce_result
         scn = Callback_.stream.via_nonsparse_array @a
         while exe = scn.gets
           value = exe.receiver.send exe.method_name, * exe.args
@@ -1406,5 +1432,130 @@ module Skylab::Brazen
     GENERIC_ERROR_ = 5
     NOTHING_ = nil
     SUCCESS_ = 0
+
+    # we demonstrate how to mutate properties back-to-front with this bit of
+    # ick (which crams these business-specifics into this node): at the time
+    # the action is invoked, mutate the properties we get from the API to be
+    # customized for this modality for these actions. it's CLI so there's no
+    # point in memoizing anything: load-time and run-time are the same time.
+
+    class Action_Adapter  # re-open
+
+      def resolve_properties
+
+        @mutable_back_properties = nil
+        @mutable_front_properties = nil
+
+        @back_properties = @bound.formal_properties  # nil ok
+
+        if @back_properties.has_name :config_filename
+          _mutate_config_filename_properties
+        end
+
+        if @back_properties.has_name :max_num_dirs
+          _mutate_max_num_dirs_properties
+        end
+
+        if @back_properties.has_name :workspace_path
+          _mutate_workspace_path_properties
+        end
+
+        @front_properties ||= @back_properties
+
+        nil
+      end
+
+    private
+
+      def _mutate_config_filename_properties
+
+        # exclude this formal property from the front. leave back as-is.
+
+        mutable_front_properties.remove :config_filename
+      end
+
+      def _mutate_max_num_dirs_properties
+
+        # exclude this formal property from the front. in back, unbound it.
+
+        mutable_front_properties.remove :max_num_dirs
+        mutable_back_properties.replace_by :max_num_dirs do | prp |
+          prp.without_default
+        end
+
+      end
+
+      def _mutate_workspace_path_properties
+
+        # exclude this formal property from the front. default the back to CWD
+
+        mutable_front_properties.remove :workspace_path
+        mutable_back_properties.replace_by :workspace_path do | prp |
+          prp.dup.set_default_proc do
+            _present_working_directory
+          end.freeze
+        end
+      end
+
+      # ~ support
+
+      def mutable_front_properties
+        if ! @mutable_front_properties
+          @mutable_front_properties = @back_properties.to_new_mutable_box_like_proxy
+          @front_properties = @mutable_front_properties
+        end
+        @mutable_front_properties
+      end
+
+      def mutable_back_properties
+        if ! @mutable_back_properties
+          @mutable_back_properties = @back_properties.to_mutable_box_like_proxy
+          @bound.change_formal_properties @mutable_back_properties  # might be same object
+        end
+        @mutable_back_properties
+      end
+
+      def _common_CLI_changes_for_path_property sym
+
+        mutable_front_properties.replace_by sym do | prp |
+          prp.dup.set_is_not_required.freeze
+        end
+
+        mutable_back_properties.replace_by sym do | prp |
+          prp.dup.set_default_proc do
+            _present_working_directory
+          end.freeze
+        end ; nil
+      end
+
+      def _present_working_directory
+        ::Dir.pwd
+      end
+    end
+
+    module Actions
+      class Status < Action_Adapter
+        def resolve_properties
+          super
+          _common_CLI_changes_for_path_property :path
+          nil
+        end
+
+        def _mutate_max_num_dirs_properties
+          # override above - we do nothing. this tests env. vars. near [#017]
+        end
+      end
+
+      class Workspace < Branch_Adapter
+        Actions = ::Module
+        class Actions::Summarize < Action_Adapter
+          def resolve_properties
+            super
+            _common_CLI_changes_for_path_property :path
+            nil
+          end
+        end
+      end
+    end
   end
 end

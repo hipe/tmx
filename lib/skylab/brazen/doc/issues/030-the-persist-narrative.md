@@ -16,7 +16,7 @@ object graph could just write itself entirely "at the end" (of some
 kind). but we are not here to write the next killer ORM (for now).
 
 
-    persist_entity <entity>, & <on event selectively>
+    receive_persist_entity <action>, <entity> & <on event selectively>
 
 
 that is all. if we are using the necessary elements of our model model

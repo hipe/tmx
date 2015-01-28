@@ -287,12 +287,13 @@ module Skylab::Brazen
           first_line_item_format = "#{ s }%-#{ d }s %s"
           d_ = d + s.length + 1  # " " is 1 char wide
           subsequent_line_item_format = "#{ SPACE_ * d_ }%s"
-          -> x do
-            a = x.under_expression_agent_get_N_desc_lines expag, num_lines_per
+          -> prp do
+            expag.current_property = prp
+            a = prp.under_expression_agent_get_N_desc_lines expag, num_lines_per
             if a.length.zero?
-              y << "#{ s }#{ labelize_p[ x ] }"
+              y << "#{ s }#{ labelize_p[ prp ] }"
             else
-              y << first_line_item_format % [ labelize_p[ x ], a.fetch( 0 ) ]
+              y << first_line_item_format % [ labelize_p[ prp ], a.fetch( 0 ) ]
             end
             1.upto( a.length - 1 ) do |idx|
               y << subsequent_line_item_format % a.fetch( idx )

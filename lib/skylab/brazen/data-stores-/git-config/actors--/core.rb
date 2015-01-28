@@ -8,10 +8,10 @@ module Skylab::Brazen
 
     class Actors__::Retrieve < Git_Config_Actor_
 
-      Actor_[ self, :properties,
+      Actor_.call self, :properties,
         :entity_identifier,
         :document,
-        :kernel, :on_event_selectively ]
+        :kernel
 
       def execute
         ok = via_entity_identifier_resolve_subsection_id
@@ -20,12 +20,12 @@ module Skylab::Brazen
       end
     end
 
-    class Actors__::Scan < Git_Config_Actor_
+    class Actors__::Build_stream < Git_Config_Actor_
 
-      Actor_[ self, :properties,
+      Actor_.call self, :properties,
         :model_class,
         :document,
-        :kernel, :on_event_selectively ]
+        :kernel
 
       def execute
         rslv_subsection_name_query
@@ -102,28 +102,28 @@ module Skylab::Brazen
     private
 
       def via_entity_identifier_resolve_subsection_id
-        via_entity_identifier_resolve_both_strings
-        via_both_strings_resolve_subsection_id
+        __via_entity_identifier_resolve_both_strings
+        via_both_strings_resolve_subsection_id_
       end
 
-      def via_entity_identifier_resolve_both_strings
+      def __via_entity_identifier_resolve_both_strings
         id = @entity_identifier
         @section_s = id.silo_name_i.id2name.gsub UNDERSCORE_, DASH_
         @subsection_s = id.entity_name_s ; nil
       end
 
-      def via_entity_resolve_subsection_id
+      def via_entity_resolve_subsection_id__
         via_entity_resolve_model_class
         via_model_class_resolve_section_string
         via_entity_resolve_subsection_string
-        via_both_strings_resolve_subsection_id
+        via_both_strings_resolve_subsection_id_
       end
 
       def via_entity_resolve_subsection_id_via_entity_name s
         via_entity_resolve_model_class
         via_model_class_resolve_section_string
         @subsection_s = s
-        via_both_strings_resolve_subsection_id
+        via_both_strings_resolve_subsection_id_
       end
 
       def via_model_class_resolve_section_string
@@ -135,20 +135,20 @@ module Skylab::Brazen
         @subsection_s = @entity.natural_key_string ; nil
       end
 
-      def via_both_strings_resolve_subsection_id
+      def via_both_strings_resolve_subsection_id_
         @subsection_id = Subsection_Identifier_.
           new @section_s, @subsection_s
         PROCEDE_
       end
 
       def via_subsection_id_resolve_some_result
-        ok = via_subsection_id_resolve_section
-        ok &&= via_subsection_id_resolve_model_class
-        ok && via_section_and_model_class_resolve_result
+        ok = via_subsection_id_resolve_section_
+        ok &&= __via_subsection_id_resolve_model_class
+        ok && __via_section_and_model_class_resolve_unmarshal_result
         ok || @result = false
       end
 
-      def via_subsection_id_resolve_section
+      def via_subsection_id_resolve_section_
         scan = @document.sections.to_stream
         ss = @subsection_id
         s_i = ss.section_s.intern ; ss_s = ss.subsection_s
@@ -195,7 +195,7 @@ module Skylab::Brazen
         end
       end
 
-      def via_subsection_id_resolve_model_class
+      def __via_subsection_id_resolve_model_class
         _i = @subsection_id.to_silo_name_i
         _id = Node_Identifier_.via_symbol _i
         silo = @kernel.silo_via_identifier _id, & @on_event_selectively
@@ -205,27 +205,20 @@ module Skylab::Brazen
         end
       end
 
-      def via_section_and_model_class_resolve_result
-        x_a = [ NAME_, @section.subsect_name_s ]
-        scan = @section.assignments.to_stream
-        props = @model_class.properties
-        while ast = scan.gets
-          i = ast.external_normal_name_symbol
-          prop = props.fetch i
-          if prop.takes_argument
-            x = ast.value_x
-            x_a.push i, x && "#{ x }"
-          else
-            if ast.value_x
-              x_a.push i
+      def __via_section_and_model_class_resolve_unmarshal_result
+
+        @result = @model_class.unmarshalled @kernel, @on_event_selectively do |o|
+          o.edit_pair @section.subsect_name_s, NAME_
+          o.edit_pairs @section.assignments do | x |
+            if ! x.nil?
+              x.to_s  # life is easier if string is the great equalizer:
+              # just because the datastore thinks it's e.g. an int or a
+              # boolean doesn't mean it "is"
             end
           end
         end
-        entity = @model_class.unmarshalled @kernel, @on_event_selectively do |o|
-          o.iambic x_a
-        end  # :+[#037]
-        @result = entity
-        PROCEDE_
+
+        @result and PROCEDE_
       end
 
       def resolve_result_via_write_file dry_run

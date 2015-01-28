@@ -9,8 +9,8 @@ this formal, business-specific conception that we have referred to
 in the past variously as "attribute", "parameter", "field" in our
 [#mh-053] various takes on this through history.
 
-`property_value` is one method you can use to get the actual value from
-the formal value's name.
+`property_value_via_symbol` is one method you can use to get the actual
+value from the formal value's name symbol.
 
 "argument" has two meanings: for one it is the values that actions hold
 and model, as opposed to the values that entities hold and model, which

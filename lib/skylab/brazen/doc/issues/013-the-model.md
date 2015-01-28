@@ -132,6 +132,21 @@ if we are to continue to want to appreciate the convenience of having
 actual properties stored in ivars, then we would have to go to the other
 extreme: somehow avoid using ivars entirely for anything mechanical.
 
-the workaround for this for now is to use `property_value` (and the
+the workaround for this for now is to use `property_value_via_symbol` (and the
 separate but related `action_property_value`) for reading actual
 properties.
+
+
+
+
+## the model property ordering rationale :[#018]
+
+when defining the "properties" (formal arguments) of a typical method,
+we are familiar with the ordering rationale of "volatility order":
+generally we place those formal parameters whose actual parameters are
+more likely to be different from call to call towards the beginning.
+this optimizes for refactorability, as large classes become smaller and
+less volatile arguments become ivars or are given C-style defaults, etc.
+
+when defining the properties for a model we *may* tend towards a
+different ording rationale depending on how certain end clients behave..

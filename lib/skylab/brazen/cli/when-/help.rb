@@ -10,7 +10,7 @@ module Skylab::Brazen
         @help_renderer = help_renderer
       end
 
-      def produce_any_result
+      def produce_result
         if @any_cmd_string
           whn_command_string
         else
@@ -56,7 +56,7 @@ module Skylab::Brazen
 
         _visible_st = aa.to_adapter_stream.reduce_by( & :is_visible )
 
-        _ordered_st = aa.wrap_adapter_stream_with_ordering_buffer _visible_st
+        _ordered_st = aa.wrap_adapter_stream_with_ordering_buffer_ _visible_st
 
         o.output_items_with_descriptions nil, _ordered_st.to_a, 2
 

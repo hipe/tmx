@@ -22,6 +22,19 @@ module Skylab::Basic
         count
       end
 
+      Count_occurrences_OF_regex_IN_string = -> rx, str do
+
+        # you could use `scan`, but why?
+
+        d = 0
+        md = rx.match str
+        while md
+          d += 1
+          md = rx.match str, md.offset( 0 ).last
+        end
+        d
+      end
+
       class Ellipsify
 
         Callback_::Actor.call self, :properties,

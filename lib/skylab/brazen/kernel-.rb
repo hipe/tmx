@@ -166,6 +166,10 @@ module Skylab::Brazen
 
   public  # ~ silo production
 
+    def model_class const_sym
+      @models_mod.const_get const_sym, false
+    end
+
     def model_class_via_identifier id, & oes_p
       silo = silo_via_identifier id, & oes_p
       silo and silo.model_class

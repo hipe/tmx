@@ -84,7 +84,7 @@ module Skylab::TestSupport
               start_path = ::File.dirname start_path
             end
 
-            @manifest_dir_pn = @filesystem.walk(
+            surrounding_path = @filesystem.walk(
               :start_path, start_path,
               :filename, @doc_test_dir,  # or join those two
               :ftype, DIRECTORY_FTYPE__,
@@ -92,7 +92,12 @@ module Skylab::TestSupport
               :prop, @path_prop,
               :on_event_selectively, @on_event_selectively )
 
-            @manifest_dir_pn ? ACHIEVED_ : UNABLE_
+            if surrounding_path
+              @manifest_dir_pn = ::Pathname.new( ::File.join surrounding_path, @doc_test_dir )
+              ACHIEVED_
+            else
+              UNABLE_
+            end
           end
           DIRECTORY_FTYPE__ = 'directory'.freeze
 

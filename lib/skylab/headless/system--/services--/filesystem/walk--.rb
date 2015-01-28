@@ -15,7 +15,7 @@ module Skylab::Headless
           end
         end
 
-        Callback_::Actor[ self,
+        Callback_::Actor.call self,
           :properties,
             :start_path,
             :filename,
@@ -23,13 +23,13 @@ module Skylab::Headless
             :max_num_dirs_to_look,
             :prop,
             :property_symbol,
-            :on_event_selectively ]
+            :on_event_selectively
 
         Callback_::Event.selective_builder_sender_receiver self
 
-        def initialize
+        def initialize & edit_p
           @ftype = @prop = @property_symbol = nil
-          super
+          super( & edit_p )
         end
 
         FILE__ = 'file'.freeze
@@ -55,16 +55,23 @@ module Skylab::Headless
         SLASH_ = '/'.getbyte 0
 
         def work
-          st = ::File::Stat.new @start_path
-          if DIRECTORY_FTYPE__ == st.ftype
-            fnd_any_nearest_file_pathname_when_start_pathname_exist
+          st, e = stat_and_stat_error
+          if st
+            if DIRECTORY_FTYPE == st.ftype
+              fnd_any_nearest_file_pathname_when_start_pathname_exist
+            else
+              whn_start_directory_is_not_directory st
+            end
           else
-            whn_start_directory_is_not_directory st
+            whn_start_directory_does_not_exist e
           end
-        rescue ::Errno::ENOENT => e
-          whn_start_directory_does_not_exist e
         end
-        DIRECTORY_FTYPE__ = 'directory'.freeze
+
+        def stat_and_stat_error
+          ::File::Stat.new @start_path
+        rescue ::Errno::ENOENT => e
+          [ nil, e ]
+        end
 
         def whn_start_directory_is_not_directory st
           maybe_send_event :error, :start_directory_is_not_directory do
@@ -94,32 +101,39 @@ module Skylab::Headless
           while continue_searching[]
             count += 1
             try = pn.join @filename
-            try.exist? and break( found = try )
+            if try.exist?
+              found_path = try.to_path
+              surrounding_path = pn.to_path
+              break
+            end
+            try.exist? and break( found_path = try )
             pn_ = pn.dirname
             pn_ == pn and break  # we've reached the top - the root path
             pn = pn_
           end
-          if found
-            whn_found found
+          if found_path
+            whn_found found_path, surrounding_path
           else
             whn_resource_not_found count
           end
         end
 
-        def whn_found found
-          _ftype = @ftype || FILE_FTYPE__
-          ok = Headless_.system.filesystem.normalization.upstream_IO(
-            :only_apply_expectation_that_path_is_ftype_of, _ftype,
-            :path, found.to_path,
+        def whn_found found_path, surrounding_path
+
+          _ok = Headless_.system.filesystem.normalization.upstream_IO(
+            :only_apply_expectation_that_path_is_ftype_of, ( @ftype || FILE_FTYPE___ ),
+            :path, found_path,
             :on_event, -> ev do
               maybe_send_event normal_top_channel_via_OK_value ev.ok do
                 ev
               end
               UNABLE_
             end )
-          ok && found
+
+          _ok && surrounding_path
         end
-        FILE_FTYPE__ = 'file'.freeze
+
+        FILE_FTYPE___ = 'file'.freeze
 
         def whn_resource_not_found count
           maybe_send_event :error, :resource_not_found do

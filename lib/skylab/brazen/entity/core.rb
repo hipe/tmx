@@ -52,7 +52,8 @@ module Skylab::Brazen
           o.init_to_create_new_module
           o.execute
         else
-          st = Callback_::Iambic_Stream.via_array( x_a )
+          # ~ #duped-here
+          st = Callback_::Iambic_Stream.via_array x_a
           cls = st.gets_one
           Callback_::Actor.methodic cls
           cls.extend Module_Methods__
@@ -263,6 +264,11 @@ module Skylab::Brazen
       attr_reader :iambic_writer_method_writee_module  # for e.g p.stack
 
       attr_reader :property_related_nonterminal  # hax only (covered)
+
+      def edit_entity_class * x_a
+        receive_edit Callback_::Iambic_Stream.via_array x_a
+        nil
+      end
 
       def receive_edit st, & edit_p
         x = true
@@ -536,24 +542,18 @@ module Skylab::Brazen
 
       attr_accessor :active_entity_edit_session
 
-      def [] cls, * rest
-        if rest.length.nonzero?
-          st = Callback_::Iambic_Stream.via_array rest
-        end
-        _enhance_to_and_edit_entity_class_via_any_nonempty_stream cls, st
+      def [] cls, * rest, & edit_p
+        call_via_client_class_and_iambic cls, rest, & edit_p
       end
 
       def call cls, * rest, & edit_p
-        if rest.length.nonzero?
-          st = Callback_::Iambic_Stream.via_array rest
-        end
-        _enhance_to_and_edit_entity_class_via_any_nonempty_stream cls, st, & edit_p
+        call_via_client_class_and_iambic cls, rest, & edit_p
       end
 
       def via_nonzero_length_arglist a, & edit_p
         st = Callback_::Iambic_Stream.via_array a
-        cls = st.gets_one
-        _enhance_to_and_edit_entity_class_via_any_nonempty_stream cls, st, & edit_p
+        _enhance_to_and_edit_entity_class_via_any_nonempty_stream(
+          st.gets_one, st, & edit_p )
       end
 
       def via & edit_p
@@ -562,7 +562,12 @@ module Skylab::Brazen
         o.execute
       end
 
-    private
+      def call_via_client_class_and_iambic cls, x_a, & edit_p
+        if x_a.length.nonzero?
+          st = Callback_::Iambic_Stream.via_array x_a
+        end
+        _enhance_to_and_edit_entity_class_via_any_nonempty_stream cls, st, & edit_p
+      end
 
       def _enhance_to_and_edit_entity_class_via_any_nonempty_stream cls, st, & edit_p
 
@@ -570,7 +575,7 @@ module Skylab::Brazen
         # otherwise, result is always the argument class to allow for
         # nested enhancement calls e.g if the call used the `[]` form
 
-        _touch_extends_and_includes_on_client_class cls
+        touch_extends_and_includes_on_client_class cls
         if edit_p || st
           cls.edit_entity_class do |sess|
             if st
@@ -585,7 +590,7 @@ module Skylab::Brazen
         end
       end
 
-      def _touch_extends_and_includes_on_client_class cls
+      def touch_extends_and_includes_on_client_class cls
         if cls.respond_to? :edit_entity_class
           did_already = true
         else
@@ -659,24 +664,24 @@ module Skylab::Brazen
         ACHIEVED_
       end
 
-      def any_formal_property_via_symbol sym
-        self.class.any_property_via_symbol sym
-      end
-
-      def get_argument_via_property_symbol sym
+      def argument sym
         get_bound_property_via_property formal_property_via_symbol sym
       end
 
       def formal_property_via_symbol sym
-        self.class.property_via_symbol sym
+        formal_properties.fetch sym
       end
 
-      def formal_properties
-        self.class.properties
+      def any_formal_property_via_symbol sym
+        formal_properties[ sym ]
       end
 
       def get_formal_property_name_symbols
-        self.class.entity_formal_property_method_names_box_for_read.get_names
+        formal_properties.get_names
+      end
+
+      def formal_properties  # :+#hook-in for sure
+        self.class.properties
       end
 
     private
@@ -695,11 +700,11 @@ module Skylab::Brazen
       end
 
       def iambic_writer_method_name_passive_lookup_proc  # [cb] #hook-in
-        bx = self.class.entity_formal_property_method_names_box_for_read
-        -> name_i do
-          m_i = bx[ name_i ]
-          if m_i
-            self.class.send( m_i ).iambic_writer_method_name
+        formals = formal_properties
+        -> name_symbol do
+          prp = formals[ name_symbol ]
+          if prp
+            prp.iambic_writer_method_name
           end
         end
       end
@@ -996,20 +1001,17 @@ module Skylab::Brazen
 
       def without_default & edit_p
         otr = dup
-        otr.__init_without_default
+        otr.init_without_default_
         if edit_p
           otr.instance_exec( & edit_p )
         end
         otr
       end
 
-      protected def __init_without_default
+      protected def init_without_default_
         @has_default = false
         @default_p = nil
-      end
-
-      def with & edit_p
-        self._NO_EASY_use_new
+        nil
       end
 
       def new & edit_p

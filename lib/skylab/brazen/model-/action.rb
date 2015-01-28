@@ -5,6 +5,18 @@ module Skylab::Brazen
   class Action  # see [#024]
 
     class << self
+    private
+
+      def edit_entity_class * x_a, & edit_p  # if you are here the class is not yet initted
+        model_class.superclass.const_get( :Entity, false ).
+          call_via_client_class_and_iambic self, x_a, & edit_p
+      end
+
+      def after sym  # experimental alternative to the iambic DSL
+        @after_name_symbol = sym ; nil
+      end
+
+    public
 
       def is_actionable
         true
@@ -65,11 +77,6 @@ module Skylab::Brazen
         nil
       end
 
-    private  # ~ experimental alternative to the iambic DSL
-
-      def after sym
-        @after_name_symbol = sym ; nil
-      end
     end  # >>
 
     extend Brazen_.name_library.name_function_proprietor_methods
@@ -83,93 +90,99 @@ module Skylab::Brazen
 
     Brazen_.event.selective_builder_sender_receiver self
 
-    include Interface_Element_Instance_Methdods__
+    include Interface_Element_Instance_Methods___
 
     def initialize boundish, & oes_p
 
       oes_p or raise ::ArgumentError
 
+      @formal_properties = nil
+      @kernel = boundish.to_kernel
+
       accept_selective_listener_via_channel_proc( -> i_a, & ev_p do  # #note-100
-
-        # when the action receives a potential event (eg from one of its
-        # collaborating actors), we call our received selective listener
-        # with the same channel, and if it wants the event we wrap it.
-
         oes_p.call( * i_a ) do
-          _sign_event ev_p[]
+          Brazen_.event.wrap.signature name, ev_p[]
         end
       end )
-
-      @kernel = boundish.to_kernel
     end
 
   public
 
-    def ___bound_call_via_iambic_stream_and_modality_adapter___ st, modality_action
+    def bound_call_against_iambic_stream st
 
-      # this goes away in [#078]
+      # meet any preconditions before calling the user's `produce_result`.
+      # to meet preconditions we have to parse the iambic stream. to parse
+      # the iambic stream we have to call `normalize`.
 
-      @hs_modality_action = true
-      @modality_action = modality_action
-      bound_call_against_iambic_stream st
+      @argument_box = Box_.new
+      ok = process_iambic_stream_fully st
+      if ok
+        via_arguments_produce_bound_call
+      else
+        Brazen_.bound_call.via_value ok
+      end
     end
 
-    def bound_call_against_iambic_stream st
-      @argument_box = Box_.new
-      bc = _any_bound_call_via_processing_iambic_stream st
-      bc || via_arguments_produce_bound_call
+    def iambic_writer_method_name_passive_lookup_proc  # #hook-in to [cb]
+
+      # bend [cb] methodic to accomodate [#046] mutable formal properties
+
+      cls = self.class
+      formals = formal_properties
+
+      -> sym do
+        prp = formals[ sym ]
+        if prp
+          if cls.method_defined? prp.iambic_writer_method_name  # not private - this is not actor
+            prp.iambic_writer_method_name
+          else
+            @__last_formal_property__ = prp
+            # either this hack or duplicate actor's logic
+            :__via_last_formal_property_process_iambic_argument
+          end
+        end
+      end
+    end
+
+    def __via_last_formal_property_process_iambic_argument
+      prp = @__last_formal_property__
+      if prp.takes_argument
+         @argument_box.add prp.name_symbol, iambic_property
+      else
+        @argument_box.add prp.name_symbol, true
+      end
+      KEEP_PARSING_
     end
 
   private
 
-    def _any_bound_call_via_processing_iambic_stream st
+    def via_arguments_produce_bound_call  # :+#public-API [ts]
 
-      # the result semantics here are reverse what is normal: something
-      # true-ish means early return, and is assumed to be a bound call.
-      # this step does not include calling normalize, that happens next
+      # expose the moment between `process_iambic_stream_fully` and `normalize`
 
-      ok = process_iambic_stream_fully st
+      bc = __bound_call_from_normalize
+      bc ||= __bound_call_from_preconditions
+      bc or Brazen_.bound_call nil, self, :produce_result
+    end
 
+    def __bound_call_from_normalize  # [#hl-116] method naming conventions are followed
+      ok = normalize
       if ! ok
         Brazen_.bound_call.via_value ok
       end
     end
 
-    def via_arguments_produce_bound_call  # :+#public-API [ts]
-      subsume_external_arguments
-      ok = normalize
-      if ok
-        prdc_bound_call_when_valid
-      else
-        prdc_bound_call_when_invalid
-      end
-    end
+    def __bound_call_from_preconditions
 
-    def subsume_external_arguments  # :+#public-API #hook-over
+      # the [#048] preconditions "pipeline" starts here, from the action.
 
-      # after arguments are parsed but before they are normalized, your
-      # action may want to hand-write logic here to default arguments
-      # via e.g some zero config e.g environment facility. you cannot fail
-
-    end
-
-    def prdc_bound_call_when_invalid
-      Brazen_.bound_call.via_value UNABLE_
-    end
-
-    def prdc_bound_call_when_valid
-      bc = prdc_any_bound_call_from_establish_preconditions
-      bc || prdc_bound_call_when_preconditions_are_met
-    end
-
-    def prdc_any_bound_call_from_establish_preconditions
       a = self.class.preconditions
       if a && a.length.nonzero?
-        prdc_any_bc_when_preconds a
+        __bound_call_via_preconditions a
       end
     end
 
-    def prdc_any_bc_when_preconds a  # see #action-preconditions
+    def __bound_call_via_preconditions a
 
       oes_p = handle_event_selectively
 
@@ -177,19 +190,19 @@ module Skylab::Brazen
 
       _id = model_class.node_identifier
 
-      box = Model_::Preconditions_.establish_box_with(
+      bx = Model_::Preconditions_.establish_box_with(
         :self_identifier, _id,
         :identifier_a, a,
         :on_self_reliance, method( :self_as_precondition ),
         :graph, _g,
-        :level_i, :action_prcn,
-        :on_event_selectively, oes_p )
+        :level_i, :Action_preconditioN,
+        & oes_p )
 
-      if box
-        @preconditions = box
+      if bx
+        @preconditions = bx
         CONTINUE_
       else
-        Brazen_.bound_call.via_value box
+        Brazen_.bound_call.via_value bx
       end
     end
 
@@ -197,18 +210,10 @@ module Skylab::Brazen
       g.touch :collection_controller_prcn, id, silo
     end
 
-    def prdc_bound_call_when_preconditions_are_met
-      Brazen_.bound_call nil, self, :produce_any_result
-    end
-
     def to_actual_argument_stream  # used by [tm]
       Callback_.stream.via_nonsparse_array( formal_properties.get_names ).map_by do |i|
         Actual_Property_.new any_argument_value( i ), i
       end
-    end
-
-    def _sign_event ev
-      Brazen_.event.wrap.signature name, ev
     end
 
     # ~ accessors for arguments & related experimentals
@@ -252,21 +257,32 @@ module Skylab::Brazen
       @argument_box[ formal_properties.fetch( i ).name_i ]
     end
 
-    def argument_value i
-      @argument_box.fetch formal_properties.fetch( i ).name_i
+    def argument_value sym
+      @argument_box.fetch sym
     end
 
     def argument_box
       @argument_box
     end
 
-    def modality_adapter  # #experimental
-      if hs_modality_action
-        @modality_action
-      end
+    def formal_properties
+      @formal_properties or init_formal_properties_ super
     end
 
-    attr_reader :hs_modality_action
+    def init_formal_properties_ x
+      cls = model_class
+      if cls.respond_to? :preconditions
+        a = cls.preconditions
+      end
+      if a and a.length.nonzero?
+        a.each do | precon_id |
+          otr = @kernel.silo_via_identifier( precon_id ).
+            any_mutated_formals_for_depender_action_formals x
+          otr and x = otr
+        end
+      end
+      @formal_properties = x  # result
+    end
 
   private
 
@@ -292,8 +308,17 @@ module Skylab::Brazen
       @parent_node = x ; nil
     end
 
+    def change_formal_properties x
+      @formal_properties = x
+      nil
+    end
+
     def controller_nucleus  # :+#experimental
       [ @kernel, handle_event_selectively ]
+    end
+
+    def kernel_
+      @kernel
     end
 
     def preconditions  # for a collaborator that knows they exist & what they are

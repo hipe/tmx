@@ -31,7 +31,7 @@ module Skylab::TestSupport
 
       def find_testsupport_file_upwards dirname, * rest, & oes_p
 
-        TestSupport_.lib_.system.filesystem.walk(
+        path = TestSupport_.lib_.system.filesystem.walk(
           :start_path, dirname,
           :filename, test_support_file,
           :max_num_dirs_to_look, -1,
@@ -39,6 +39,9 @@ module Skylab::TestSupport
           * rest,
           :on_event_selectively, ( oes_p || @oes_p ) )
 
+        path and begin
+          ::Pathname.new ::File.join( path, test_support_file )
+        end
       end
 
       def test_support_file

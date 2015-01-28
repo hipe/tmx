@@ -57,27 +57,26 @@ module Skylab::Brazen
           end
 
           def say_bad_optional_indexes m, d
-            "optional argument '#{ @arg_a.fetch( d ).name_i }' must but did #{
+            "optional argument '#{ @arg_a.fetch( d ).name_symbol }' must but did #{
               }not occur immediately after optional argument #{
-            }'#{ @arg_a.fetch( m.last ).name_i }'"
+            }'#{ @arg_a.fetch( m.last ).name_symbol }'"
           end
 
         public
 
           def any_error_event_via_validate_x argv
-            otr = with_x argv
-            otr.execute
+            new_via_argv( argv ).execute
           end
 
-          def with_x argv
+          def new_via_argv argv
             otr = dup
-            otr.init_copy_via_x argv
+            otr.init_copy_via_argv argv
             otr
           end
 
         protected
 
-          def init_copy_via_x argv
+          def init_copy_via_argv argv
             @argv = argv ; nil
           end
 
@@ -173,7 +172,7 @@ module Skylab::Brazen
           def accept_monadic_actual_property_value i
             a = instance_variable_get i
             a ||= instance_variable_set i, []
-            a.push( @arg_a_scan.gets_one.name_i, @argv_scan.gets_one ) ; nil
+            a.push( @arg_a_scan.gets_one.name_symbol, @argv_scan.gets_one ) ; nil
           end
 
           def complain_about_any_extra_arguments

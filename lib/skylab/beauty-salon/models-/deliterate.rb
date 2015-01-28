@@ -60,7 +60,7 @@ module Skylab::BeautySalon
 
     Callback_::Event.selective_builder_sender_receiver self
 
-    def produce_any_result
+    def produce_result
       via_properties_init_ivars
       ok = normalize_line_ranges
       ok &&= resolve_input_stream

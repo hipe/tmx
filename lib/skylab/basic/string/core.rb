@@ -25,6 +25,11 @@ module Skylab::Basic
           needle, haystack ]
       end
 
+      def count_occurrences_in_string_of_regex haystack, needle_rx
+        String_::Small_Time_Actors__::Count_occurrences_OF_regex_IN_string[
+          needle_rx, haystack ]
+      end
+
       def ellipsify * a
         String_::Small_Time_Actors__::Ellipsify.call_via_arglist a
       end

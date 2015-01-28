@@ -4,9 +4,10 @@ module Skylab::Brazen
 
     class Actors__::Persist < Couch_Actor_
 
-      Actor_[ self, :properties,
+      Actor_.call self, :properties,
+        :is_dry,
         :entity,
-        :datastore ]
+        :datastore
 
       def execute
         init_ivars
@@ -17,7 +18,6 @@ module Skylab::Brazen
     private
 
       def init_ivars
-        @dry_run = @entity.any_parameter_value :dry_run
         @property_scan = @entity.to_normalized_actual_property_scan_for_persist
         @response_receiver = me_as_response_receiver
         nil

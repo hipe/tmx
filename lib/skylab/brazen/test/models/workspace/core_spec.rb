@@ -22,13 +22,13 @@ module Skylab::Brazen::TestSupport::Models::Workspace
         ev_.num_dirs_looked.should eql 1
         ev_.start_pathname.should eql @ws_tmpdir
       end
-      expect_neutralled
+      expect_succeeded
     end
 
     it "when provide 'good' path and maxdirs=`, OK" do
       prepare_ws_tmpdir <<-O.unindent
         --- /dev/null
-        +++ b/#{ cfn }
+        +++ b/#{ cfg_filename }
         @@ -0,0 +1 @@
         +[ whatever ]
       O
@@ -36,7 +36,7 @@ module Skylab::Brazen::TestSupport::Models::Workspace
         :path, @ws_tmpdir.to_path, :max_num_dirs, 1
       expect_OK_event :resource_exists do |ev|
         ev_ = ev.to_event
-        ev_.pathname.should eql @ws_tmpdir.join( cfn )
+        ev_.config_path.should eql @ws_tmpdir.join( cfg_filename ).to_path
       end
       expect_succeeded
     end
@@ -53,7 +53,7 @@ module Skylab::Brazen::TestSupport::Models::Workspace
 
       prepare_ws_tmpdir <<-O.unindent
         --- /dev/null
-        +++ b/#{ cfn }
+        +++ b/#{ cfg_filename }
         @@ -0,0 +1,6 @@
         +[ poet-or-author "elizabeth bishop" ]
         +foo = fa
@@ -69,7 +69,7 @@ module Skylab::Brazen::TestSupport::Models::Workspace
       ev = expect_event :summary
       ev.render_all_lines_into_under y=[], black_and_white_expression_agent_for_expect_event
       scn = Brazen_::Callback_.stream.via_nonsparse_array y
-      scn.gets.should match %r(\Asummary of «.+#{ ::Regexp.escape cfn }»:\z)
+      scn.gets.should match %r(\Asummary of «.+#{ ::Regexp.escape cfg_filename }»:\z)
       scn.gets.should match %r(\A[^[:alnum:]]*2 poet or authors\z)
       scn.gets.should match %r(\A[^[:alnum:]]*2 vocabularies\z)
       scn.gets.should match %r(\A[^[:alnum:]]*1 a single thing\z)

@@ -93,7 +93,7 @@ module Skylab::Headless
 
           def when_existent_path_is_strange
             maybe_send_event :error, :wrong_ftype do
-              via_stat_and_path_build_wrong_ftype_event DIR_FTYPE_
+              via_stat_and_path_build_wrong_ftype_event DIRECTORY_FTYPE
             end
           end
 
@@ -196,7 +196,7 @@ module Skylab::Headless
 
           def when_strange_ftype
             @result = maybe_send_event :error, :wrong_ftype do
-              via_stat_and_pn_build_wrong_ftype_event DIR_FTYPE_
+              via_stat_and_pn_build_wrong_ftype_event DIRECTORY_FTYPE
             end
             UNABLE_
           end

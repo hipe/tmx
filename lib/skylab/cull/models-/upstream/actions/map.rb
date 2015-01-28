@@ -32,7 +32,7 @@ module Skylab::Cull
         @on_event_selectively = p ; nil
       end
 
-      def produce_any_result
+      def produce_result
         @upstream = @parent_node.edit do | o |
           o.mutable_arg_box to_bound_argument_box_except :table_number
         end

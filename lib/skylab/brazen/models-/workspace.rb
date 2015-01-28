@@ -1,10 +1,10 @@
 module Skylab::Brazen
 
-  class Models_::Workspace < Brazen_::Model_
+  class Models_::Workspace < Brazen_::Model_  # see [#055]
 
-    Brazen_::Model_::Entity.call self do
+    edit_entity_class(
 
-      o :desc, -> y do
+      :desc, -> y do
         y << "manage workspaces."
       end,
 
@@ -14,56 +14,78 @@ module Skylab::Brazen
 
       :preconditions, EMPTY_A_,
 
-      :flag, :property, :dry_run,
-
-      :flag, :property, :verbose,
-
-      :required, :integer_greater_than_or_equal_to, -1, :property, :max_num_dirs,
-
       :required, :property, :config_filename,
 
-      :required, :property, :path,
-
-      :property, :prop,
-
-      :property, :app_name,
-
-      :property, :on_event_selectively
-
-    end
+      :required, :property, :surrounding_path )
 
     def members
-      [ :datastore ]
+      [ :datastore, :existent_surrounding_path ]
     end
 
-    def execute
+    # ~ custom exposures
 
-      if @property_box.has_name :on_event_selectively
-        @on_event_selectively = nil  # ok to clobber this one from top client
+    class << self
+
+      def default_config_filename
+        self::WS_CONF_FILENAME__
       end
 
-      via_properties_init_ivars
-
-      @pn = LIB_.system.filesystem.walk(
-        :start_path, @path,
-        :max_num_dirs_to_look, @max_num_dirs,
-        :prop, @prop,
-        :filename, @config_filename,
-        :on_event_selectively, @on_event_selectively )
+      def set_workspace_config_filename x
+        const_set :WS_CONF_FILENAME__, x
+        nil
+      end
     end
 
-    attr_reader :pn
+    WS_CONF_FILENAME__ = 'brazen.conf'.freeze
 
-    def any_result_for_flush_for_init
-      Workspace_::Actors__::Init.with(
-        :app_name, @app_name,
-        :config_filename, @config_filename,
-        :is_dry, @dry_run,
-        :path, @path,
-        :on_event_selectively, @on_event_selectively )
+    # ~~ init
+
+    def init_workspace * x_a, & oes_p  # any result
+
+      bx = @property_box
+      x_a.unshift(
+        :surrounding_path, bx.fetch( :surrounding_path ),
+        :config_filename, bx.fetch( :config_filename ) )
+
+      Workspace_::Actors__::Init.call_via_iambic x_a, & oes_p
     end
 
-  public
+    # ~~ find nearest
+
+    def existent_config_path
+      path = existent_surrounding_path
+      path and ::File.join( path, @property_box.fetch( :config_filename ) )
+    end
+
+    def existent_surrounding_path
+      if @_surrounding_path_exists
+        @property_box.fetch :surrounding_path
+      end
+    end
+
+    def resolve_nearest_existent_surrounding_path max_num_dirs, * x_a, & oes_p
+
+      oes_p or raise ::ArgumentError  # just because we always do anyway
+
+      max_num_dirs ||= -1  # see #note-040 "why we do this here"
+      x_a.unshift :max_num_dirs_to_look, max_num_dirs
+      bx = @property_box
+      x_a.push :start_path, bx.fetch( :surrounding_path ),
+        :filename, bx.fetch( :config_filename )
+
+      surrounding_path = LIB_.system.filesystem.walk.call_via_iambic x_a, & oes_p
+
+      if surrounding_path
+        @property_box.replace :surrounding_path, surrounding_path
+        @_surrounding_path_exists = true
+        ACHIEVED_
+      else
+        @_surrounding_path_exists = false
+        UNABLE_
+      end
+    end
+
+    # ~ #hook-outs and #hook-ins
 
     def description_under expag
       if @datastore_resolved_OK
@@ -78,23 +100,50 @@ module Skylab::Brazen
       end
     end
 
-    def to_path
-      @pn.to_path
-    end
-
-    def to_pathname
-      @pn
-    end
-
     def datastore_controller_via_entity _ent
       self
     end
+
+    def provide_action_precondition _id, graph
+      self
+    end
+
+    def __NO__receive_missing_required_properties ev  # covered by [tm], #ugly
+      receive_missing_required_properties_softly ev
+    end
+
+    # ~ for actions
+
+    COMMON_PROPERTIES_ = make_common_properties do | sess |
+
+      sess.edit_entity_class(
+
+        :default_proc, -> action do
+          action.kernel_.model_class( :Workspace ).default_config_filename
+        end,
+        :property, :config_filename,
+
+        :description, -> y do
+          if @current_property.has_primitive_default
+            _ = " (default: #{ ick @current_property.primitive_default_value })"
+          end
+          y << "max num dirs to look for workspace in#{ _ }"
+        end,
+        :non_negative_integer,
+        :default, 1,
+        :property, :max_num_dirs,
+
+        :required, :property, :workspace_path
+      )
+    end
+
+    # ~ some actions stowed away here
 
     module Actions
 
       class Ping < Brazen_::Model_::Action
 
-        def produce_any_result
+        def produce_result
           maybe_send_event :payload, :ping do
             build_OK_event_with :ping do |y, o|
               y << "hello from #{ app_name }"
@@ -107,104 +156,79 @@ module Skylab::Brazen
       Autoloader_[ self, :boxxy ]
     end
 
-    def provide_action_precondition _id, graph
-      self
-    end
+    # ~ the custom stack
 
-    def receive_missing_required_properties ev  # covered by [tm], #ugly
-      receive_missing_required_properties_softly ev
-    end
+    class Silo__ < Brazen_.model.silo_class
 
-    class << self
-
-      def merge_workspace_resolution_properties_into_via bx, action  # #note-120
-
-        scn = Callback_.stream.via_nonsparse_array INNER_OUTER_A__
-        while pair = scn.gets
-          inner_i, outer_i = pair
-          if ! bx[ inner_i ]
-            x = action.any_argument_value_at_all outer_i
-            x and bx.set inner_i, x
-          end
-        end
-
-        moda = action.modality_adapter
-        if moda
-          moda.workspace_resolution_properties do |inner_i_, trueish_x|
-            trueish_x or next
-            bx[ inner_i_ ] and next
-            bx.set inner_i_, trueish_x
-          end
-        end
-
-        if ! bx[ :config_filename ]
-          x = config_filename
-          x and bx.set :config_filename, x
-        end
-
-        if ! bx[ :max_num_dirs ]
-          bx.set :max_num_dirs, 1
-        end
-
-        nil
+      def model_class
+        Workspace_
       end
 
-      def config_filename
-        self::DEFAULT_WS_CONF_FILENAME__
-      end
-
-      def set_workspace_config_filename s
-        const_set :DEFAULT_WS_CONF_FILENAME__, s.freeze ; nil
+      def any_mutated_formals_for_depender_action_formals x
+        bx = x.to_mutable_box_like_proxy
+        st = COMMON_PROPERTIES_.to_stream
+        prp = st.gets
+        begin
+          bx.add prp.name_symbol, prp
+          prp = st.gets
+        end while prp
+        bx
       end
     end
-
-    INNER_OUTER_A__ = [
-      [ :config_filename, :config_filename ],
-      [ :max_num_dirs, :max_num_dirs ],
-      [ :path, :workspace_path ]
-    ]
-
-    DEFAULT_WS_CONF_FILENAME__ = 'brazen.conf'.freeze
 
     class Silo_Controller__ < Brazen_.model.silo_controller_class
 
       def provide_collection_controller_precon _id, graph
-        workspace_via_rising_action graph.action
+        __workspace_via_rising_action graph.action
       end
 
-      def workspace_via_rising_action action
+      def __workspace_via_rising_action action
         @action = action
-        ws = via_action_produce_workspace_via_object_argument
-        ws || via_action_produce_workspace_via_workspace_silo
+        ws = __via_action_produce_workspace_via_object_argument
+        ws || __via_action_produce_workspace_via_workspace_silo
       end
 
-      def workspace_via_risen_action action
-        action.preconditions.fetch :workspace
-      end
-
-      def via_action_produce_workspace_via_object_argument
+      def __via_action_produce_workspace_via_object_argument
         @action.argument_box[ :workspace ]  # for internal API calls
       end
 
-      def via_action_produce_workspace_via_workspace_silo
+      def __via_action_produce_workspace_via_workspace_silo
 
-        @verbose = @action.any_argument_value_at_all :verbose
-
-        bx = Box_.new
-        @model_class.merge_workspace_resolution_properties_into_via bx, @action
-
-        _oes_p = event_lib.
+        @oes_p = event_lib.
           produce_handle_event_selectively_through_methods.
             bookends self, :ws_via_action do | * i_a, & ev_p |
           maybe_send_event_via_channel i_a, & ev_p
         end
 
-        @ws = @model_class.edit_entity @kernel, _oes_p do |o|
-          o.arguments :verbose, @verbose
-          o.argument_box bx
-          o.edit_with :prop, @action.class.properties[ :workspace_path ]
+        @ws = @model_class.edit_entity @kernel, @oes_p do |o|
+          o.preconditions @preconditions
+          bx = @action.argument_box
+          o.edit_with(
+            :config_filename, bx.fetch( :config_filename ),
+            :surrounding_path, bx.fetch( :workspace_path ) )
         end
-        @ws and via_ws_workspace
+
+        @ws and __existent_workspace_via_workspace
+      end
+
+      def __existent_workspace_via_workspace
+
+        _did_find = @ws.resolve_nearest_existent_surrounding_path(
+          @action.argument_value( :max_num_dirs ),
+          :prop, @action.formal_property_via_symbol( :workspace_path ),
+          & @oes_p )
+
+        _did_find and begin
+
+          if @action.any_argument_value_at_all( :verbose )  # #tracking :+[#069] verbose manually
+            maybe_send_event :info, :verbose, :using_workspace do
+              build_neutral_event_with :using_workspace,
+                :config_path, @ws.existent_config_path
+            end
+          end
+
+          @ws
+        end
       end
 
       def on_ws_via_action_resource_not_found_via_channel i_a, & ev_p
@@ -218,21 +242,6 @@ module Skylab::Brazen
         x_a[ 0 ] = :workspace_not_found  # was 'resource_not_found'
         x_a.push :invite_to_action, [ :init ]
         build_event_via_iambic_and_message_proc x_a, ev.message_proc
-      end
-
-    private
-
-      def via_ws_workspace
-        _ok = @ws.execute  # result is pn
-        _ok and begin
-          if @verbose  # #tracking [#069] this will probably go away
-            maybe_send_event :info, :verbose, :using_workspace do
-              build_neutral_event_with :using_workspace,
-                :config_pathname, @ws.pn
-            end
-          end
-          @ws
-        end
       end
     end
 

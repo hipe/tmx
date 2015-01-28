@@ -97,7 +97,7 @@ module Skylab::TestSupport
             ACHIEVED_  # don't stop the batch job
           end
 
-          def resolve_bound_call_via_output_iambic
+          def via_output_iambic_resolve_bound_call
 
             if :path == @output_iambic[ -2 ]  # EEEW tracked by [#br-078]
               path = @output_iambic.last

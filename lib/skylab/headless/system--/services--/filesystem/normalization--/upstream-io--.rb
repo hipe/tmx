@@ -45,12 +45,12 @@ module Skylab::Headless
             o :properties, :instream, :as_normal_value, :on_event_selectively
           end
 
-          def initialize & p
+          def initialize & edit_p
             @do_execute = false
             @instream = nil
             @only_apply_ftype_expectation = false
             @path_arg_was_explicit = false
-            instance_exec( & p )
+            instance_exec( & edit_p )
             @as_normal_value ||= IDENTITY_
           end
 

@@ -53,7 +53,8 @@
                `N-meta-category` concept introduced.
 [#007]       #doc-point #parent:003 #body-is-inline-in-parent
                `category` as a foundational thing presented.
-[#006]       (available, moved to [#ba-012])
+[#006]       [ambiguity disputes can be settled with specificity]
+             (was: moved to [#ba-012])
 [#005] #open #doc-point `patterns of behavior` #parent:003
                #body-is-inline-in-code (treatement is light at present)
 [#004] #open #doc-point #parent:003 #body-is-inline-in-parent

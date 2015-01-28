@@ -82,7 +82,7 @@ module Skylab::Brazen
         end
 
         def new k , & oes_p
-          CallLike__.new k, self, & oes_p
+          Bound_Action_Like___.new k, self, & oes_p
         end
 
       private
@@ -109,7 +109,7 @@ module Skylab::Brazen
         end
       end
 
-      class CallLike__
+      class Bound_Action_Like___
 
         class << self
           def after_name_symbol
@@ -149,16 +149,14 @@ module Skylab::Brazen
         end
 
         def formal_properties
-          Mock_Formal_Properties__.new do
-            __parameter_box.to_value_stream
-          end
+          _parameter_box
         end
 
         def any_formal_property_via_symbol sym
-          __parameter_box[ sym ]
+          _parameter_box[ sym ]
         end
 
-        def __parameter_box
+        def _parameter_box
           @pbx ||= bld_parameter_box
         end
 
@@ -168,7 +166,7 @@ module Skylab::Brazen
 
           params.pop  # because #here
 
-          bx = Callback_::Box.new
+          bx = Callback_.stream::Mutable_Box_Like_Proxy.new [], {}
           params.each do | opt_req_rest, name_symbol |
 
             case opt_req_rest
@@ -190,20 +188,7 @@ module Skylab::Brazen
           bx
         end
 
-        class Mock_Formal_Properties__
-          def initialize & p
-            @p = p
-          end
-          def to_stream
-            @p.call
-          end
-        end
-
-        def ___bound_call_via_iambic_stream_and_modality_adapter___ st, x
-          bound_call_against_iambic_stream st
-        end
-
-        def bound_call_against_iambic_stream st
+        def bound_call_against_iambic_stream st  # #hook-out
           case 0 <=> @action_class_like.p.arity
           when -1 ; bc_when_nonzero_arity_via_stream st
           when  0 ; bc_when_zero_arity
@@ -225,24 +210,42 @@ module Skylab::Brazen
           param_a = @action_class_like.p.parameters
           param_a[ -1, 1 ] = EMPTY_A_  # always 1 arg for the call used #here
 
-          mutable_iambic = st.array_for_read[ st.current_index .. st.x_a_length - 1 ]
+          h = {}
+          while st.unparsed_exists
+            sym = st.gets_one
+            x = st.gets_one
+            h[ sym ] = x
+          end
 
-          any_custom_err = Brazen_::CLI.arguments.normalization.via(
-            :parameters, param_a ).
-              any_error_event_via_validate_x( mutable_iambic )
+          arglist = []
+          miss_sym_a = nil
+          param_a.each do | orr, name_sym |
+            if h.key? name_sym
+              arglist.push h.delete name_sym
+            elsif :req == orr
+              miss_sym_a ||= []
+              miss_sym_a.push name_sym
+            end
+          end
 
-          if any_custom_err
-            bc_when_custom_error any_custom_err
+          if h.length.nonzero?
+            extra_sym_a = h.keys
+          end
+
+          if extra_sym_a
+            __bc_when_extra extra_sym_a
+          elsif miss_sym_a
+            __bc_when_miss miss_sym_a
           else
-            bc_when_OK mutable_iambic
+            bc_when_OK arglist
           end
         end
 
-        def bc_when_OK mutable_iambic
+        def bc_when_OK mutable_arglist
 
-          mutable_iambic.push self  # :#here is where we use the 1 extra arg
+          mutable_arglist.push self  # :#here is where we use the 1 extra arg
 
-          Brazen_.bound_call mutable_iambic, @action_class_like.p, :call
+          Brazen_.bound_call mutable_arglist, @action_class_like.p, :call
         end
 
         def bc_when_custom_error err

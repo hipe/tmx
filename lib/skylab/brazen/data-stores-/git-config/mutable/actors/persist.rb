@@ -120,7 +120,7 @@ module Skylab::Brazen
 
           io = if @is_dry
 
-            Brazen_::_::IO[].dry_stub_instance
+            Brazen_.lib_.IO.dry_stub_instance
 
           elsif @do_write_to_tmpfile_first
 

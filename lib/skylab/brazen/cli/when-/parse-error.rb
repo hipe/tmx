@@ -9,7 +9,7 @@ module Skylab::Brazen
         @render = help_renderer
       end
 
-      def produce_any_result
+      def produce_result
         o = @render
         o.y << @exception.message
         o.output_invite_to_general_help

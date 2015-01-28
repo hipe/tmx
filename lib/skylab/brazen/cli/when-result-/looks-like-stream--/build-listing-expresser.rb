@@ -26,7 +26,7 @@ module Skylab::Brazen
 
             _FIELD_I_A.each do | sym |
 
-              y << _FORMAT_H.fetch( sym ) % entity.property_value( sym )
+              y << _FORMAT_H.fetch( sym ) % entity.property_value_via_symbol( sym )
 
             end
 

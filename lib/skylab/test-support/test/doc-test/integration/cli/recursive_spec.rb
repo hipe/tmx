@@ -40,13 +40,13 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
 
       on_stream :errput
 
-      expect :styled, %r(\Acurrent output path -)
+      expect  %r(\Acurrent output path -)
 
       _d = count_contiguous_lines_on_stream :output
       ( 29 .. 33 ).should be_include _d
 
       expect _preview_done_rx
-      expect :styled, %r(\Acurrent output path -)
+      expect %r(\Acurrent output path -)
 
       _d = count_contiguous_lines_on_stream :output
       ( 45 .. 49 ).should be_include _d

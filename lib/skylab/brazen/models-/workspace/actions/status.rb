@@ -4,66 +4,81 @@ module Skylab::Brazen
 
   class Actions::Status < Brazen_::Model_::Action
 
-    Brazen_::Model_::Entity.call self do
+    edit_entity_class(
 
-      o :desc, -> y do
+      :desc, -> y do
         y << "get status of a workspace"
-      end
+      end,
 
-      o :inflect, :verb, 'determine'
+      :inflect, :verb, 'determine',
 
-      o :promote_action
+      :promote_action,
 
-      o :after, :init
+      :after, :init,
 
-      o :environment, :non_negative_integer,
-        :description, -> y do
-          y << "how far up do we look?"
-        end,
-        :property, :max_num_dirs
+      :description, -> y do
+        prp = @current_property
+        if prp.has_primitive_default
+          _dflt = " (default: #{ ick prp.primitive_default_value })"
+        end
+        y << "how far up do we look?#{ _dflt }"
+      end,
+      :environment, :non_negative_integer,
+      :default, '1',
+      :property, :max_num_dirs,
 
-      o :flag, :property, :verbose
+      :flag, :property, :verbose,
 
-      o :default, '.',
-        :description, "the location of the workspace",
-        :description, -> y do
-          y << "it's #{ highlight 'really' } neat"
-        end,
-        :required, :property, :path
+      :property_object, COMMON_PROPERTIES_[ :config_filename ],
 
-    end
+      :description, "the location of the workspace",
+      :description, -> y do
+        y << "it's #{ highlight 'really' } neat"
+      end,
+      :required, :property, :path )
 
-    def produce_any_result
-
-      bx = @argument_box
-
-      model_class.merge_workspace_resolution_properties_into_via bx, self
-
-      _oes_p = event_lib.
-        produce_handle_event_selectively_through_methods.
-          bookends self, :status do | * i_a, & ev_p |
-        maybe_send_event_via_channel i_a, & ev_p
-      end
+    def produce_result
 
       @ws = model_class.edit_entity @kernel, handle_event_selectively do |o|
-        o.argument_box bx
+        bx = @argument_box
         o.edit_with(
-          :prop, self.class.properties.fetch( :path ),
-          :on_event_selectively, _oes_p )
+          :surrounding_path, bx.fetch( :path ),
+          :config_filename, bx.fetch( :config_filename ) )
       end
-      @ws and work
+
+      @ws and __via_workspace
     end
 
-    def work
-      pn = @ws.execute
-      pn and when_pn
+    def __via_workspace
+
+      _oes_p = event_lib.produce_handle_event_selectively_through_methods.
+        bookends self, :status do | * i_a, & ev_p |
+          @user_result = maybe_send_event_via_channel i_a, & ev_p
+          UNABLE_
+        end
+
+      _ok = @ws.resolve_nearest_existent_surrounding_path(
+        @argument_box.fetch( :max_num_dirs ),
+        :prop, formal_property_via_symbol( :path ),
+        & _oes_p )
+
+      if _ok
+        __when_found
+      else
+        @user_result
+      end
     end
 
-    def when_pn
+    def __when_found
       maybe_send_event :info, :resource_exists do
         build_OK_event_with :resource_exists,
-          :pathname, @ws.pn, :is_completion, true
+            :config_path, @ws.existent_config_path,
+            :is_completion, true do | y, o |
+
+          y << "resource exists - #{ pth o.config_path }"
+        end
       end
+      # the result is up to the user
     end
 
     def on_status_resource_not_found_via_channel i_a, & ev_p
@@ -73,10 +88,11 @@ module Skylab::Brazen
       # if we result in true-ish from this method is it treated as a path for
       # the resource. hence we result in nil.
 
-      maybe_send_event_via_channel i_a do
+      @user_result = maybe_send_event_via_channel i_a do
         ev_p[].new_with :ok, ACHIEVED_
       end
-      nil
+
+      UNABLE_
     end
   end
   end

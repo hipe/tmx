@@ -16,19 +16,19 @@ module Skylab::Brazen
           :on_event_selectively ]
 
         def execute
-          ok = via_entity_resolve_subsection_id
-          ok &&= via_subsection_id_resolve_section
-          ok &&= via_section_delete_section
+          ok = via_entity_resolve_subsection_id__
+          ok &&= via_subsection_id_resolve_section_
+          ok &&= __via_section_delete_section
           ok
         end
 
         def resolve_subsection_id
           via_model_class_resolve_section_string
-          ok = via_bx_resolve_subsection_string
-          ok && via_both_strings_resolve_subsection_id
+          ok = __via_bx_resolve_subsection_string
+          ok && via_both_strings_resolve_subsection_id_
         end
 
-        def via_bx_resolve_subsection_string
+        def __via_bx_resolve_subsection_string
           s = @bx.fetch NAME_
           if s
             s = s.strip  # b.c it has been frozen in the past
@@ -39,7 +39,7 @@ module Skylab::Brazen
           end
         end
 
-        def via_section_delete_section
+        def __via_section_delete_section
           ss = @subsection_id
           subs_s, sect_s = ss.to_a
           _compare_p = -> item do

@@ -4,30 +4,28 @@ module Skylab::Brazen
 
     class Actors__::Delete_datastore < Couch_Actor_
 
-      Actor_[ self, :properties,
+      Actor_.call self, :properties,
+        :dry_run_arg,
+        :force_arg,
         :entity,
-        :props,
-        :remote,
-        :on_event_selectively ]
+        :remote
 
       def execute
         init_ivars
-        ok = check_force
-        ok && work
+        _ok = check_force
+        _ok && work
       end
 
     private
 
       def init_ivars
-        @dry_run = @entity.any_parameter_value :dry_run
-        @has_force = @entity.any_parameter_value :force
-        @datastore_s = @entity.property_value :name
+        @datastore_s = @entity.property_value_via_symbol :name
         init_response_receiver_for_self_on_channel :delete_datastore
         nil
       end
 
       def check_force
-        if @has_force
+        if @force_arg.value_x
           PROCEDE_
         else
           when_force_not_present
@@ -42,15 +40,14 @@ module Skylab::Brazen
       end
 
       def bld_missing_force_event
-        _prop = @props.fetch :force
-        build_not_OK_event_with :missing_force, :prop, _prop do |y, o|
+        build_not_OK_event_with :missing_force, :prop, @force_arg.property do |y, o|
           y << "missing required #{ par o.prop }"
         end
       end
 
       def work
-        if @dry_run
-          delete_datastore_when_dry_run nil
+        if @dry_run_arg.value_x
+          delete_datastore_when_dry_run
           PROCEDE_
         else
           x_a = []
@@ -62,7 +59,7 @@ module Skylab::Brazen
 
     public
 
-      def delete_datastore_when_dry_run _
+      def delete_datastore_when_dry_run
         maybe_send_event :info, :pretending_for_dry_run do
           build_OK_event_with :pretending_for_dry_run, :pretending, :pretending
         end ; nil

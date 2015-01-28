@@ -6,8 +6,8 @@ module Skylab::Brazen
 
       class << self
 
-        def establish_box_with * x_a
-          Resolution__.call_via_iambic x_a
+        def establish_box_with * x_a, & oes_p
+          Resolution__.call_via_iambic x_a, & oes_p
         end
       end
 
@@ -94,13 +94,12 @@ module Skylab::Brazen
 
       class Resolution__
 
-        Actor_[ self, :properties,
+        Actor_.call self, :properties,
           :self_identifier,
           :identifier_a,
           :on_self_reliance,
           :graph,
-          :level_i,
-          :on_event_selectively ]
+          :level_i
 
         def execute
 

@@ -149,7 +149,7 @@ module Skylab::TestSupport
           end
         end
 
-        def produce_any_result
+        def produce_result
           struct = Recursive_::Actors__::Produce_manifest_entry_stream[
             @path,
             @doc_test_dir,

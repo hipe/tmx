@@ -39,6 +39,8 @@ module Skylab::TestSupport
 
       end
 
+      bx.add :not_here, 'not-here.file'  # guaranteed never to exist
+
       bx
     end
   end

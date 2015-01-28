@@ -93,13 +93,13 @@ module Skylab::Brazen
         if s.respond_to? :to_path
           s = s.to_path
         end
-        if DIR_SEP__ == s.getbyte( 0 )
+        if DIR_SEP___ == s.getbyte( 0 )
           self.class::Pretty_Path__[ s ]
         else
           s
         end
       end
-      DIR_SEP__ = '/'.getbyte 0
+      DIR_SEP___ = ::File::SEPARATOR.getbyte 0
 
       def render_prop_as_option prop
         "--#{ prop.name.as_slug }"
@@ -109,8 +109,8 @@ module Skylab::Brazen
         "<#{ prop.name.as_slug }>"
       end
 
-      def render_prop_as_environment_variable prop
-        prop.upcase_environment_name_symbol.id2name
+      def render_prop_as_environment_variable prp
+        @partitions.adapter.environment_variable_name_string_via_property prp
       end
 
       def render_prop_as_unknown prop

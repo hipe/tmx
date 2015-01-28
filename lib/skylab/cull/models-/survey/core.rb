@@ -8,7 +8,7 @@ module Skylab::Cull
 
         result = nil
 
-        x = Cull_.lib_.filesystem.walk(
+        surrounding_path = Cull_.lib_.filesystem.walk(
           :start_path, arg.value_x,
           :filename, FILENAME_,
           :ftype, DIR_FTYPE_,
@@ -19,8 +19,8 @@ module Skylab::Cull
             UNABLE_
           end )
 
-        if x
-          x.to_path
+        if surrounding_path
+          ::File.join surrounding_path, FILENAME_
         else
           result
         end
@@ -427,7 +427,7 @@ module Skylab::Cull
       def via_path_argument_resolve_existent_survey
 
         path = Models_::Survey.any_nearest_path_via_looking_upwards_from_path(
-          get_argument_via_property_symbol( :path ),
+          argument( :path ),
           & handle_event_selectively )
 
         path and rslv_existent_survey_via_existent_path path

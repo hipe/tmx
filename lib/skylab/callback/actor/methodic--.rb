@@ -147,8 +147,8 @@ module Skylab::Callback
         end
 
         def process_iambic_stream_fully stream  # :+#public-API :+#hook-in
-          keep_parsing = process_iambic_stream_passively stream
-          keep_parsing and begin
+          _keep_parsing = process_iambic_stream_passively stream
+          _keep_parsing and begin
             if stream.no_unparsed_exists
               ACHIEVED_
             else
@@ -164,7 +164,7 @@ module Skylab::Callback
             m_i = method_name_p[ stream.current_token ]
             if m_i
               @__methodic_actor_iambic_stream__ = stream
-              @__methodic_actor_handle_event_selectively__ = oes_p
+              @__methodic_actor_handle_event_selectively__ = oes_p  # for [br] in one place
               begin
                 stream.advance_one
                 keep_parsing = send m_i

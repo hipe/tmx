@@ -8,10 +8,10 @@ module Skylab::Brazen
 
       class Retrieve_datastore_entity < Couch_Actor_
 
-        Actor_[ self, :properties,
+        Actor_.call self, :properties,
           :entity_identifier,
           :datastore,
-          :kernel, :on_event_selectively ]
+          :kernel
 
         def execute
           init_ivars
@@ -35,12 +35,16 @@ module Skylab::Brazen
 
         def via_payload_h_prdc_entity
 
-          _h = @payload_h.fetch PROPERTIES__
-          _r = @payload_h.fetch REVISION__
+          h = @payload_h.fetch PROPERTIES__
+          revision_s = @payload_h.fetch REVISION__
 
-          @model_class.edit_entity @kernel, @on_event_selectively do |o|
-            o.set_arg :couch_entity_revision, _r
-            o.unmarshalled_hash _h
+          ent = @model_class.edit_entity @kernel, @on_event_selectively do | o |
+            o.edit_pairs h, IDENTITY_, & :intern
+          end
+
+          ent and begin
+            ent.couch_entity_revision_ = revision_s
+            ent
           end
         end
 

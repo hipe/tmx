@@ -15,6 +15,29 @@ always trigger a missing required field event as appropriate.)
 
 
 
+## :#specific-code-annotation (originally inline)
+
+near [#006] we aggregate three of the above concerns into this one
+normalization hook because a) all but one of the concerns has pre-
+conditions that are post-conditions of another, i.e they each must
+be executed in a particular order with respect to one another; and
+b) given (a), at a cost of some "modularity" there is less jumping
+around if this logic is bound together, making it less obfuscated.
+the particular relative order is this: 1) if the particular formal
+property has a default proc and its corresponding actual value (if
+any, `nil` if none) is `nil`, then mutate the actual value against
+the proc. 2) for each of the formal property's zero or more custom
+normalizations (each of which may signal out of the entire method)
+apply them in order to the actual value. 3) if the formal property
+is required and the current actual value if any (`nil` if none) is
+`nil` then memoize this as a missing required field and at the end
+act accordingly. note too given that formal properties are dynamic
+we cannot pre-calculate and cache which meet the above categories.
+
+
+
+
+
 ## history of the problem (sequitor of what?)
 
 this used to be more of a hassle because of an eventing API that has
@@ -38,11 +61,6 @@ entity:
      of those formal properties whose corresponding actual value is nil
      (not false). this (possibly zero length) list is the list of missing
      required properties.
-
-
-as it stands now, we determine the three lists of properties above 1)
-separately, 2) lazily, and 3) memoized (and frozen) into the particular
-entity class at call time.
 
 it *used* to be that some of the aggregative operations like these were
 calculated for at the end of the *enhanceent scope*, which looking back

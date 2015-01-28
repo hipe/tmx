@@ -2,23 +2,23 @@ module Skylab::Brazen
 
   class Models_::Source < Brazen_::Model_
 
-    Brazen_.model.entity self do
+    edit_entity_class(
 
-      o :desc, -> y do
+      :desc, -> y do
         y << "manage sources."
-      end
+      end,
 
-      o :after, :datastore
+      :after, :datastore,
 
-      o :persist_to, :datastore_couch_primary,
+      :persist_to, :datastore_couch_primary,
 
       :required,
       :property, :name,
 
       :required,
-      :property, :url
+      :property, :url )
 
-    end
+    attr_accessor :couch_entity_revision_  # special needs
 
     Actions = make_action_making_actions_module
 

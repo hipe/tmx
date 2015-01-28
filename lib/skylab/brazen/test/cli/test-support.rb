@@ -181,7 +181,8 @@ module Skylab::Brazen::TestSupport::CLI
     end
 
     def expect_help_screen_for_init
-      expect :styled, 'usage: bzn init [-d] [-v] [<path>]'
+
+      expect :styled, 'usage: bzn init [-d] [-v] <path>'
       expect %r(\A[ ]{7}bzn init -h\z)
       expect_maybe_a_blank_line
       expect_header_line 'description'

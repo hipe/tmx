@@ -10,8 +10,7 @@ module Skylab::Brazen
 
         Actor_.call self, :properties,
           :entity,
-          :mutable_document,
-          :on_event_selectively
+          :mutable_document
 
         def execute
           ok = resolve_properties

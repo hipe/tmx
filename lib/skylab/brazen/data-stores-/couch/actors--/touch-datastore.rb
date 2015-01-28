@@ -4,9 +4,8 @@ module Skylab::Brazen
 
     class Actors__::Touch_datastore < Couch_Actor_
 
-      Actor_[ self, :properties,
-        :entity,
-        :on_event_selectively ]
+      Actor_.call self, :properties,
+        :entity
 
       def execute
         init_response_receiver_for_self_on_channel :ensure_exists

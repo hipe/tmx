@@ -45,7 +45,7 @@ module Skylab::Brazen::TestSupport
       td = TS_::TestLib_::Tmpdir[]
       if do_debug
         if ! td.be_verbose
-          td = td.with :be_verbose, true, :debug_IO, debug_IO
+          td = td.new_with :be_verbose, true, :debug_IO, debug_IO
         end
       elsif td.be_verbose
         self._IT_WILL_BE_EASY
@@ -60,8 +60,12 @@ module Skylab::Brazen::TestSupport
       end
     end
 
-    def cfn
-      Brazen_::Models_::Workspace.config_filename
+    def cfg_filename
+      Brazen_::Models_::Workspace.default_config_filename
+    end
+
+    def subject_API
+      Brazen_::API
     end
   end
 
@@ -78,12 +82,11 @@ module Skylab::Brazen::TestSupport
       ::FileUtils
     end
 
-    Tmpdir = memoize[ -> do
+    Tmpdir = memoize.call do
       sys = Brazen_::LIB_.system
       _path = sys.defaults.dev_tmpdir_pathname.join( 'brzn' ).to_path
       sys.filesystem.tmpdir :path, _path
-    end ]
-
+    end
   end
 
   Enhance_for_test_ = -> mod do

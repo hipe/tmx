@@ -181,7 +181,7 @@ module Skylab::Callback
 
     def process_iambic_fully x_a
       bx = formal_fields_ivar_box_for_read_
-      x_a.each_slice( 2 ) do |i, x|
+      x_a.each_slice 2 do |i, x|
         instance_variable_set bx.fetch( i ), x
       end ; nil
     end
@@ -332,6 +332,14 @@ module Skylab::Callback
     end
 
     # ~ mutators
+
+    def merge_box! otr
+      a = otr.a ; h = otr.h
+      a.each do | sym |
+        @h.key?( sym ) or @a.push sym
+        @h[ sym ] = h.fetch sym
+      end ; nil
+    end
 
     def ensuring_same_values_merge_box! otr
       a = otr.a ; h = otr.h
@@ -1451,7 +1459,7 @@ module Skylab::Callback
       end
 
       def memoize *a, &p
-        Memoize_.via_arglist_and_proc a, p
+        Memoize_.call_via_arglist a, & p
       end
 
       def names_method
@@ -1775,26 +1783,37 @@ module Skylab::Callback
 
   KEEP_PARSING_ = true
 
-  def self.memoize *a, &p
-    Memoize_.via_arglist_and_proc a, p
+  def self.memoize * a, & p
+    if a.length.zero?
+      if block_given?
+        Memoize_.call_( & p )
+      else
+        Memoize_
+      end
+    else
+      Memoize_.call_( & a.fetch( a.length - 1 << 1 ) )
+    end
   end
 
   module Memoize_
     class << self
-      def via_arglist_and_proc a, p
+      def _call * a, & p
+        call_via_arglist a, & p
+      end
+      def call_via_arglist a, & p
         if a.length.zero?
-          if p
-            self[ p ]
+          if block_given?
+            call_( & p )
           else
             self
           end
         else
-          p and a.push p
-          self[ a.fetch a.length - 1 << 1 ]
+          call_( & a.fetch( a.length - 1 << 1 ) )
         end
       end
-
-      def [] p
+      alias_method :[], :_call
+      alias_method :call, :_call
+      def call_ & p
         p_ = -> do
           x = p[] ; p_ = -> { x } ; x
         end

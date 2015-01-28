@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Model_
 
-    class Action_Factory__ < ::Module
+    class Action_Factory__ < ::Module  # see [#046]
 
       class << self
 
@@ -71,46 +71,11 @@ module Skylab::Brazen
     private
 
       def make_Create
-
         cls = begin_class
-
-        class << cls
-
-          def entity_formal_property_method_names_box_for_write
-
-            # [#046] this is much improved from what it had been but could
-            # still be improved: the first time we go to write our own
-            # properties, experimentally grab ALL of the properties of our
-            # model class and glom them as if they are ours (this is the
-            # beauty of immutable properties. you can just).
-
-            if hack_grab_mutex
-              super
-            else
-              @hack_grab_mutex = true
-              x = super
-              _hack_grab_props  # WARNING this method calls the current one
-              x
-            end
-          end
-
-          attr_reader :hack_grab_mutex
-
-          private def _hack_grab_props
-            ( edit_entity_class do |sess|
-              model_class.properties.each_value do | pr |
-                sess.receive_property pr
-              end
-            end )
-            nil
-          end
-        end
-
         @ent.call cls do
           o :flag, :property, :dry_run
           o :flag, :property, :verbose
         end
-
         cls.include Create_Methods__
         cls
       end
@@ -164,57 +129,55 @@ module Skylab::Brazen
 
         include Semi_Generated_Instance_Methods__
 
-        def produce_any_result
-          ok = resolve_edited_entity
-          ok && via_edited_entity_produce_any_result
+        def init_formal_properties_ x
+
+          # the first time during the lifetime of this action that our formals
+          # are accessed, add in *all* model class formal next to our "adverb"
+          # formals (continued at #note-135..)
+
+          super x  # any preconditions will add their properties here. maybe [#018] order sensitive
+          st = model_class.properties.to_stream
+          prp = st.gets
+          if prp
+            bx = @formal_properties.to_mutable_box_like_proxy
+            @formal_properties = bx  # may be same object
+            begin
+              bx.add prp.name_symbol, prp
+              prp = st.gets
+            end while prp
+          end
+          @formal_properties
         end
 
-      private
-
-        def resolve_edited_entity
-          via_argument_box_resolve_edited_entity
-        end
-
-        def via_argument_box_resolve_edited_entity
+        def produce_result
 
           if @parent_node
 
             # experimentally, the child action "takes over" the parent
 
-            @parent_node.first_edit do | o |
-              o.replace_selective_event_listener_via_channel_proc @__HESVC_p__
-              o.preconditions @preconditions
-              o.argument_box @argument_box
-            end
-            @edited_entity = @parent_node
-            @parent_node = nil
+            @parent_node.__accept_selective_event_listener @on_event_selectively
 
+            @edited_entity = @parent_node.first_edit do | o |
+              o.preconditions @preconditions
+              o.edit_magnetically_from_box @argument_box
+            end
+
+            @parent_node = nil
           else
 
             @edited_entity = self.class.model_class.
                   edited @kernel, handle_event_selectively do |o|
               o.preconditions @preconditions
-              o.argument_box @argument_box
+              o.edit_magnetically_from_box @argument_box
             end
           end
 
-          PROCEDE_
-        end
-
-        def via_edited_entity_produce_any_result
-          bc = @edited_entity.any_bound_call_for_edit_result
-          if bc
-            bc.receiver.send bc.method_name, * bc.args
-          else
-            via_edited_entity_produce_any_persist_result_when_edited_OK
+          @edited_entity and begin
+            _ok = @edited_entity.any_native_create_before_create_in_datastore
+            _ok and begin
+              @edited_entity.result_for_persist self
+            end
           end
-        end
-
-      public
-
-        def via_edited_entity_produce_any_persist_result_when_edited_OK
-          ok = @edited_entity.any_native_create_before_create_in_datastore
-          ok && @edited_entity.produce_any_persist_result
         end
       end
 
@@ -222,7 +185,7 @@ module Skylab::Brazen
 
         include Semi_Generated_Instance_Methods__
 
-        def produce_any_result
+        def produce_result
           datastore.entity_stream_via_model(
             self.class.model_class, & handle_event_selectively )
         end
@@ -335,21 +298,14 @@ module Skylab::Brazen
 
         include Semi_Generated_Instance_Methods__
 
-        def produce_any_result
-          init_selective_listener_proc_for_delete
-          ok = via_OES_and_args_resolve_subject_entity
-          ok &&= via_OES_and_subject_entity_prepare_for_remove
-          ok && via_OES_and_subject_entity_delete_subject_entity
+        def produce_result
+          __init_selective_listener_proc_for_delete
+          ok = __via_args_resolve_subject_entity
+          ok &&= @subject_entity.intrinsic_delete self
+          ok and @datastore.receive_delete_entity self, @subject_entity, & handle_event_selectively
         end
 
-        def via_edited_entity_produce_any_persist_result_when_edited_OK
-          ok = @edited_entity.any_native_create_before_create_in_datastore
-          ok && @edited_entity.produce_any_persist_result
-        end
-
-      private
-
-        def init_selective_listener_proc_for_delete
+        def __init_selective_listener_proc_for_delete
           @on_event_selectively = event_lib.
             produce_handle_event_selectively_through_methods.
               full self, :while_deleting_entity do | * i_a, & ev_p |
@@ -357,56 +313,30 @@ module Skylab::Brazen
           end
         end
 
-        def via_OES_and_subject_entity_delete_subject_entity
-          datastore.delete_entity @subject_entity, & handle_event_selectively
+        def __via_args_resolve_subject_entity
+          _ok = __via_args_resolve_identifier
+          _ok && __via_identifier_resolve_subject_entity
         end
 
-        def via_OES_and_subject_entity_prepare_for_remove
-          ok = via_subject_entity_send_parameters
-          ok &&= @subject_entity.any_native_delete_before_delete_in_datastore(
-            & handle_event_selectively )
-        end
-
-        def via_subject_entity_send_parameters
-          i_a = @argument_box.get_names - @subject_entity.formal_properties.get_names
-          @subject_entity.edit do |o|
-            o.action_formal_props formal_properties
-            i_a.each do |i|
-              o.set_arg i, @argument_box.fetch( i )
-            end
-          end
-          PROCEDE_
-        end
-      end
-
-      module Semi_Generated_Instance_Methods__
-
-      private
-
-        def via_OES_and_args_resolve_subject_entity
-          ok = via_args_resolve_identifier
-          ok && via_OES_and_identifier_resolve_subject_entity
-        end
-
-        def via_args_resolve_identifier
+        def __via_args_resolve_identifier
           _name_s = @argument_box.fetch NAME_
           id = model_class.node_identifier.with_local_entity_identifier_string _name_s
           @identifier = id
           PROCEDE_
         end
 
-        def via_OES_and_identifier_resolve_subject_entity
+        def __via_identifier_resolve_subject_entity
           datastore
           @subject_entity = @datastore.entity_via_identifier @identifier, & handle_event_selectively
           @subject_entity ? PROCEDE_ : UNABLE_
         end
+      end
+
+      module Semi_Generated_Instance_Methods__
+      private
 
         def datastore
-          @datastore ||= prdc_ds
-        end
-
-        def prdc_ds
-          @preconditions.fetch self.class.model_class.persist_to.full_name_i
+          @datastore ||= @preconditions.fetch self.class.model_class.persist_to.full_name_i
         end
 
         def model_class

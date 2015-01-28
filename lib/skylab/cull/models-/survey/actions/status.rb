@@ -17,7 +17,7 @@ module Skylab::Cull
         end,
         :required, :property, :path
 
-      def produce_any_result
+      def produce_result
 
         _ok = via_path_argument_resolve_existent_survey
         _ok and via_survey

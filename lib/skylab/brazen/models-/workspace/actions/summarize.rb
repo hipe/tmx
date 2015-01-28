@@ -4,45 +4,53 @@ module Skylab::Brazen
 
     class Actions::Summarize < Brazen_::Model_::Action
 
-      Brazen_::Model_::Entity.call self do
+      edit_entity_class(
+        :property_object, COMMON_PROPERTIES_[ :config_filename ],
+        :required, :property, :path )
 
-        o :required, :property, :path
-
+      def produce_result
+        ok = resolve_existent_workspace
+        ok &&= resolve_datastore
+        ok && work
       end
 
-      def produce_any_result
+      def resolve_existent_workspace
 
         bx = @argument_box
 
-        model_class.merge_workspace_resolution_properties_into_via bx, self
-
-        @prop = self.class.properties.fetch :path
         @ws = model_class.edit_entity @kernel, handle_event_selectively do |o|
           o.preconditions @preconditions
-          o.argument_box bx
-          o.edit_with :prop, @prop
+          o.edit_with(
+            :surrounding_path, bx.fetch( :path ),
+            :config_filename, bx.fetch( :config_filename ) )
         end
-        @ws and via_ws
+
+        @ws and @ws.resolve_nearest_existent_surrounding_path(
+          ONLY_LOOK_IN_THE_FIRST_DIRECTORY___,
+          :prop, formal_property_via_symbol( :path ),
+          & handle_event_selectively )
       end
 
-      def via_ws
-        pn = @ws.execute
-        pn and when_pn
-      end
+      ONLY_LOOK_IN_THE_FIRST_DIRECTORY___ = 1  # for now, searching upwards is not an option
 
-      def when_pn
+      def resolve_datastore
         @ds = @ws.datastore
-        @ds and via_ds
+        @ds and ACHIEVED_
       end
 
-      def via_ds
-        @scn = @ds.to_section_stream( & handle_event_selectively )
-        @box = Box_.new
-        one = -> { 1 } ; increment = -> d { d + 1 }
-        while sect = @scn.gets
-          _i = sect.external_normal_name_symbol
-          @box.add_or_replace _i, one, increment
+      def work
+        bx = Box_.new
+        one = -> { 1 }
+        increment = -> d { d + 1 }
+        st = @ds.to_section_stream( & handle_event_selectively )
+        sect = st.gets
+
+        while sect
+          bx.add_or_replace sect.external_normal_name_symbol, one, increment
+          sect = st.gets
         end
+
+        @box = bx
         via_box
       end
 
@@ -55,9 +63,9 @@ module Skylab::Brazen
       def bld_summary_event
         build_OK_event_with :summary, :box, @box, :ws, @ws do |y, o|
           y << "summary of #{ o.ws.description_under self }:"
-          scn = o.box.to_pair_stream
+          st = o.box.to_pair_stream
           count = 0
-          while pair = scn.gets
+          while pair = st.gets
             count += 1
             d, i = pair.to_a
             s = i.id2name

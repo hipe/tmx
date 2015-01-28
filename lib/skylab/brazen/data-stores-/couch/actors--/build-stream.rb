@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   class Data_Stores_::Couch
 
-    class Actors__::Scan < Couch_Actor_
+    class Actors__::Build_stream < Couch_Actor_
 
       Actor_[ self, :properties,
         :model_class,

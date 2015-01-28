@@ -54,7 +54,7 @@ module Skylab::TestSupport
           ACHIEVED_
         end
 
-        def produce_any_result
+        def produce_result
 
           @FS = DocTest_::Idioms_::Filesystem.new( & handle_event_selectively )
 

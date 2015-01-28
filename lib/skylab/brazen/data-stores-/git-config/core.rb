@@ -36,8 +36,8 @@ module Skylab::Brazen
     end
 
     def members
-      [ :delete_entity, :entity_stream_via_model,
-          :entity_via_identifier, :persist_entity,
+      [ :receive_delete_entity, :entity_stream_via_model,
+          :entity_via_identifier, :receive_persist_entity,
             :property_value_via_symbol ]
     end
 
@@ -53,34 +53,34 @@ module Skylab::Brazen
 
     # ~ persist
 
-    def persist_entity entity, & oes_p
+    def receive_persist_entity action, entity, & oes_p
       ok = resolve_mutable_document( & oes_p )
-      ok &&= Git_Config_::Mutable::Actors::Mutate[ entity, @mutable_document, oes_p ]
-      ok and via_mutated_mutable_document_write_file_via_persisted_entity entity
+      ok &&= Git_Config_::Mutable::Actors::Mutate[ entity, @mutable_document, & oes_p ]
+      ok and _via_mutated_mutable_document_write_file_via_persist( action, & oes_p )
     end
 
     # ~ retrieve (one)
 
     def entity_via_identifier id, & oes_p
-      Git_Config_::Actors__::Retrieve[ id, @document, @kernel, oes_p ]
+      Git_Config_::Actors__::Retrieve[ id, @document, @kernel, & oes_p ]
     end
 
     # ~ retrieve (many)
 
     def entity_stream_via_model cls, & oes_p
-      Git_Config_::Actors__::Scan[ cls, @document, @kernel, oes_p ]
+      Git_Config_::Actors__::Build_stream[ cls, @document, @kernel, & oes_p ]
     end
 
     def to_section_stream & oes_p
-      Git_Config_::Actors__::Scan[ nil, @document, @kernel, oes_p ]
+      Git_Config_::Actors__::Build_stream[ nil, @document, @kernel, & oes_p ]
     end
 
     # ~ delete
 
-    def delete_entity entity, & oes_p
+    def receive_delete_entity action, entity, & oes_p
       ok = resolve_mutable_document
-      ok &&= Git_Config_::Mutable::Actors::Delete[ entity, @mutable_document, oes_p ]
-      ok and via_mutated_mutable_document_write_file_via_persisted_entity entity
+      ok &&= Git_Config_::Mutable::Actors::Delete[ entity, @mutable_document, & oes_p ]
+      ok and _via_mutated_mutable_document_write_file_via_persist( action, & oes_p )  # _DOG_EAR
     end
 
     # ~ atomic property values
@@ -128,17 +128,13 @@ module Skylab::Brazen
       ACHIEVED_
     end
 
-    def via_mutated_mutable_document_write_file_via_persisted_entity entity  # #covered-by [tm]
+    def _via_mutated_mutable_document_write_file_via_persist action, & oes_p  # #covered-by [tm]
 
       Git_Config_::Mutable::Actors::Persist.with(
-
-        :is_dry, entity.any_parameter_value( :dry_run ),
-
+        :is_dry, action.argument_box[ :dry_run ],
         :path, @mutable_document.input_id.to_path,
-
         :document, @mutable_document,
-
-        & entity.handle_event_selectively )
+        & oes_p )
     end
 
     class Silo_Controller__ < Brazen_.model.silo_controller_class
@@ -152,7 +148,7 @@ module Skylab::Brazen
       end
 
       def datastore_controller_via_entity x
-        document = Parse_[ :via_path, x.to_path,
+        document = Parse_[ :via_path, x.existent_config_path,
                            :on_event_selectively, @on_event_selectively ]
         document and begin
           Git_Config_.new document, @kernel, & @on_event_selectively
@@ -473,6 +469,12 @@ module Skylab::Brazen
       def to_stream
         Callback_.stream.via_nonsparse_array @a
       end
+      def each_pair
+        @a.each do | ast |
+          :assignment == ast.nonterminal_symbol or next
+          yield ast.external_normal_name_symbol, ast.value_x
+        end
+      end
       def map & p
         @a.map( & p )
       end
@@ -576,6 +578,10 @@ module Skylab::Brazen
 
       def members
         [ :internal_normal_name_string, :external_normal_name_symbol, :value_x ]
+      end
+
+      def nonterminal_symbol
+        :assignment
       end
 
       attr_reader :internal_normal_name_string, :marshaled_s

@@ -57,6 +57,17 @@ module Skylab::Brazen
     Actual_Property_ = Callback_::Box.pair
 
     class << self
+    private
+
+      def edit_entity_class * x_a, & edit_p  # if you are here the class is not yet initted
+        entity_module.call_via_client_class_and_iambic self, x_a, & edit_p
+      end
+
+      def make_common_properties & sess_p
+        Common_Properties___.new entity_module, & sess_p
+      end
+
+    public
 
       def is_branch
         true  # for now, every model node exists (in the eyes of invocation
@@ -223,7 +234,7 @@ module Skylab::Brazen
 
     include Brazen_::Entity::Instance_Methods
 
-    include module Interface_Element_Instance_Methdods__
+    include module Interface_Element_Instance_Methods___
 
       def name
         self.class.name_function
@@ -247,13 +258,6 @@ module Skylab::Brazen
         LIB_.N_lines.
           new( [], d, [ self.class.description_block ], expression_agent ).
            execute
-      end
-
-      def any_action_property_value i
-        ivar = :"@#{ i }"
-        if instance_variable_defined? ivar
-          instance_variable_get ivar
-        end
       end
 
       def action_property_value i
@@ -290,8 +294,7 @@ module Skylab::Brazen
 
     # ~ multipurpose, simple readers
 
-    attr_reader :any_bound_call_for_edit_result,
-      :came_from_persistence
+    attr_reader :came_from_persistence
 
     def is_visible
       true
@@ -326,14 +329,6 @@ module Skylab::Brazen
       i_a.sort! ; i_a
     end
 
-    def parameter_value i
-      @parameter_box.fetch i
-    end
-
-    def any_parameter_value i
-      @parameter_box[ i ]
-    end
-
     def natural_key_string
       @property_box.fetch NAME_
     end
@@ -347,8 +342,8 @@ module Skylab::Brazen
     end
 
     def normalize_property_value_via_normal_entity prop, ent, & oes_p
-      normal_x = ent.property_value prop.name_symbol
-      mine_x = property_value prop.name_symbol
+      normal_x = ent.property_value_via_symbol prop.name_symbol
+      mine_x = property_value_via_symbol prop.name_symbol
       if normal_x != mine_x
         @property_box.replace prop.name_symbol, normal_x
         maybe_send_event :info, :normalized_value do
@@ -365,7 +360,7 @@ module Skylab::Brazen
       end
     end
 
-    def property_value i  # ( was #note-120 )
+    def property_value_via_symbol i  # ( was #note-120 )
       @property_box.fetch i
     end
 
@@ -489,7 +484,7 @@ module Skylab::Brazen
       end
     end
 
-    # ~ the edit session API - :#public-API :#hook-in as pursuant to :[#hl-119]
+    # ~ the edit session API - :#public-API :#hook-in
 
     #   the below methods fugue in pairs continually. every comment in the
     #   first method is relevant to any corresponding part of the second.
@@ -498,200 +493,167 @@ module Skylab::Brazen
 
       # the result of this is the result of your edit session (the user block)
 
-      sh, yld = first_edit_shell
+      sh, tree = first_edit_shell
       edit_p[ sh ]  # only for setting values
-      process_first_edit yld || sh
+      process_first_edit tree || sh
     end
 
     def edit & edit_p
 
-      sh, yld = subsequent_edit_shell
+      sh, tree = subsequent_edit_shell
       edit_p[ sh ]
-      process_subsequent_edit yld || sh
+      process_subsequent_edit tree || sh
     end
-
-    attr_reader :action_formal_properties
 
   private
 
     def first_edit_shell
-      yld = First_Edit_Yield__.new
-      [ First_Edit_Session__.new( yld, formal_properties ), yld ]
+      tree = First_Edit_Tree___.new
+      [ Edit_Session__.new( tree, formal_properties ), tree ]
+    end
+
+    Edit_Tree__ = ::Class.new
+
+    class First_Edit_Tree___ < Edit_Tree__
+
+      def initialize
+        super
+        @preconditions_ = nil
+      end
+
+      def to_a
+        [ @delta_box, @preconditions_ ]
+      end
+
+      attr_accessor :preconditions_
     end
 
     def subsequent_edit_shell
-      yld = Subsequent_Edit_Yield__.new
-      [ First_Edit_Session__.new( yld, formal_properties ), yld ]
+      tree = Subsequent_Edit_Tree___.new
+      [ Edit_Session__.new( tree, formal_properties ), tree ]
     end
 
-    def process_first_edit stct
-
-      @property_box = Box_.new
-
-      @parameter_box = stct.param_bx || Box_.new
-
-      p = stct.replacement_sel_channel_proc
-      if p
-        change_selective_listener_via_channel_proc p
-      end
-
-      pcns = stct.precons
-      if pcns
-        @preconditions = pcns
-      end
-
-      x_a = stct.iambic
-
-      ok = if x_a
-        process_iambic_stream_fully iambic_stream_via_iambic_array x_a
-      else
-        true
-      end
-
-      ok &&= normalize
-
-      ok && self
-    end
-
-    def process_subsequent_edit stct
-
-      afp = stct.action_formal_prps
-      if afp
-        @action_formal_properties = afp
-      end
-
-      delta_param_bx = stct.param_bx
-      if delta_param_bx
-
-        @parameter_box ||= Callback_::Box.new
-
-        delta_param_bx.each_pair do | sym, x |
-          @parameter_box.set sym, x
-        end
-      end
-
-      normalize && self
-    end
-
-    Common_Edit_Session_Methods__ = ::Module.new
-
-    Subsequent_Edit_Yield__ = ::Struct.new :param_bx, :action_formal_prps
-
-    class Subsequent_Edit_Session__
-
-      include Common_Edit_Session_Methods__
-
-      def initialize yld, formal_properties
-        @prps = formal_properties
-        @yld = yld
+    class Subsequent_Edit_Tree___ < Edit_Tree__
+      def to_a
+        [ delta_box ]
       end
     end
 
-    First_Edit_Yield__ = ::Struct.new :iambic, :param_bx, :replacement_sel_channel_proc, :precons
+    class Edit_Tree__
 
-    class First_Edit_Session__
-
-      # classify each incoming argument into either a recognized business-
-      # specific actual property value or a presumed parameter ("adverb").
-      # each former is written to the iambic presumably to be processed by
-      # that pipeline. each latter is written to a freeform box the values
-      # of which are not validated but just kept around in case the entity
-      # recognizes them. handle other facet-specific concerns as well.
-
-      include Common_Edit_Session_Methods__
-
-      def initialize yld, props
-        @prps = props
-        @yld = yld
+      def initialize
+        @delta_box = nil
       end
 
-      def arguments * x_a
-        x_a.each_slice 2 do | sym, x |
-          _receive_nonclassified_argument sym, x
-        end ; nil
-      end
+      attr_reader :delta_box
 
-      def argument_box bx
-        bx.each_pair( & method( :_receive_nonclassified_argument ) ) ; nil
+      def delta_box_
+        @delta_box ||= Callback_::Box.new
       end
+    end
 
-      def edit_with * x_a
-        edit_via_iambic x_a
-      end
+    class Edit_Session__
 
-      def edit_via_iambic x_a
-        _some_mutable_iambic.concat x_a ; nil
-      end
-
-      def unmarshalled_hash h
-        h.each_pair do | s, x |
-          prp = @prps[ s.intern ]
-          if prp
-            _add_to_iambic_via_value_and_property x, prp
-          else
-            _some_mutable_iambic.push s.intern, x  # [#037] assume future error
-          end
-        end ; nil
-      end
-
-      def replace_selective_event_listener_via_channel_proc x
-        @yld.replacement_sel_channel_proc = x ; nil
+      def initialize tree, formals
+        @formals = formals
+        @tree = tree
       end
 
       def preconditions x
-        @yld.precons = x ; nil
+        @tree.preconditions_ = x
+        nil
+      end
+
+      def edit_magnetically_from_box pairs  # e.g by a generated action
+        bx = @tree.delta_box_
+        fo = @formals
+        pairs.each_pair do | k, x |
+          fo.has_name k or next
+          bx.add k, x  # chanage to `set` when necessary
+        end
+        nil
+      end
+
+      def edit_with * x_a  # e.g by hand
+        bx = @tree.delta_box_
+        fo = @formals
+        st = Callback_::Iambic_Stream.via_array x_a
+        while st.unparsed_exists
+          prp = fo.fetch st.gets_one
+          if prp.takes_argument
+            bx.add prp.name_symbol, st.gets_one  # change to `set` when necessary
+          else
+            self._COVER_ME
+          end
+        end
+        nil
+      end
+
+      def edit_pair x, k  # e.g by hand
+        if @formals.has_name k
+          @tree.delta_box_.add k, x
+        else
+          @tree.strange_i_a_.push k
+        end
+        nil
+      end
+
+      def edit_pairs pairs, * p_a, & p  # e.g unmarshal
+
+        p and p_a.push p
+        x_p, k_p = p_a
+        x_p ||= IDENTITY_
+        k_p ||= IDENTITY_
+
+        bx = @tree.delta_box_
+        fo = @formals
+        pairs.each_pair do | k, x |
+
+          k = k_p[ k ]
+          x = x_p[ x ]
+
+          if fo.has_name k
+            bx.add k, x
+          else
+            @tree.strange_i_a_.push k  # [#037] one day..
+          end
+        end
+        nil
       end
     end
 
-    module Common_Edit_Session_Methods__
+  private
 
-      def action_formal_props x
-        @yld.action_formal_prps = x ; nil
+    def process_first_edit tree
+
+      bx, prcns = tree.to_a
+
+      if bx
+        @property_box = bx
+      else
+        @property_box = Box_.new
       end
 
-      def set_arg sym, x
-        _receive_nonclassified_argument sym, x
+      if prcns
+        @preconditions = prcns
       end
 
-    private
+      _finish_edit
+    end
 
-      def _receive_nonclassified_argument sym, x
-        prp = @prps[ sym ]
-        if prp
-          _add_to_iambic_via_value_and_property x, prp
-        else
-          _set_in_parameter_box_value_and_name x, sym
-        end
-        nil
+    def process_subsequent_edit tree
+
+      bx = tree.delta_box
+      if bx
+        @property_box.merge_box! bx
       end
 
-      def _add_to_iambic_via_value_and_property x, prp
-        if prp.takes_argument
-          _some_mutable_iambic.push prp.name_symbol, x
-        else
-          _some_mutable_iambic.push prp.name_symbol
-        end
-        nil
-      end
+      _finish_edit
+    end
 
-      def _some_mutable_iambic
-        x = @yld.iambic
-        if x.nil?
-          x = []
-          @yld.iambic = x
-        end
-        x
-      end
-
-      def _set_in_parameter_box_value_and_name x, sym
-        bx = @yld.param_bx
-        if bx.nil?
-          bx = Box_.new
-          @yld.param_bx = bx
-        end
-        bx.add sym, x
-        nil
-      end
+    def _finish_edit
+      _ok = normalize
+      _ok && self
     end
 
     # ~ end edit session API
@@ -700,12 +662,14 @@ module Skylab::Brazen
 
     # ~ create
 
-    def produce_any_persist_result
-      datastore_resolved_OK and @datastore.persist_entity self, & handle_event_selectively
+    def result_for_persist action
+      datastore_resolved_OK and
+        @datastore.receive_persist_entity action, self, & handle_event_selectively
     end
 
-    def persist_entity x, & oes_p
-      datastore_resolved_OK and @datastore.persist_entity x, & oes_p
+    def receive_persist_entity action, ent, & oes_p
+      datastore_resolved_OK and
+        @datastore.receive_persist_entity action, ent, & oes_p
     end
 
     def any_native_create_before_create_in_datastore
@@ -726,15 +690,19 @@ module Skylab::Brazen
 
     # ~ delete (anemic out-of-box implementation: pass the buck)
 
-    def delete_entity entity, & oes_p
-      datastore_resolved_OK and @datastore.delete_entity entity, & oes_p
+    def receive_delete_entity action, entity, & oes_p
+      datastore_resolved_OK and @datastore.receive_delete_entity action, entity, & oes_p
+    end
+
+    def intrinsic_delete _action  # :+#public-API #hook-in
+
+      # override this if your entity requires special delete behavior beyond
+      # what is performed by the datastore (i.e deleting the entity's record)
+
+      PROCEDE_
     end
 
   private
-
-    public def any_native_delete_before_delete_in_datastore
-      PROCEDE_
-    end
 
     def datastore_resolved_OK
       @did_attempt_to_resolve_datastore ||= rslv_datastore
@@ -810,6 +778,13 @@ module Skylab::Brazen
     def datastore  # for low-level actors
       _ok = datastore_resolved_OK
       _ok and @datastore
+    end
+
+    # ~ adjunct & experiments
+
+    def __accept_selective_event_listener x
+      @__HESVC_p__ = nil
+      @on_event_selectively = x ; nil
     end
 
     class Process_customized_model_inflection_behavior__
@@ -940,9 +915,10 @@ module Skylab::Brazen
           puts ">> >> >>    MADE #{ model_class.name_function.as_slug } CCTL"
       end
 
-      def provide_action_precondition id, g
+      def provide_action_precondition id, _g, & oes_p
         if id.entity_name_s
-          prvd_act_prcn_when_entity id, g
+          ent = datastore.entity_via_identifier id, & ( oes_p || handle_event_selectively )
+          ent and ent.as_precondition_via_preconditions @preconditions  # :+#public-API #hook-out
         else
           self
         end
@@ -952,9 +928,9 @@ module Skylab::Brazen
         self
       end
 
-      def persist_entity ent, & oes_p
+      def receive_persist_entity action, ent, & oes_p
         @dsc ||= datastore_controller
-        @dsc and via_dsc_persist_entity ent, & oes_p
+        @dsc and @dsc.receive_persist_entity action, ent, & oes_p
       end
 
       private def normalize_entity_name_via_fuzzy_lookup ent, & oes_p  # (covered by [tm] for now)
@@ -1008,6 +984,8 @@ module Skylab::Brazen
 
       def __when_zero_entities_found_against_natural_key name_s, & oes_p
 
+        oes_p ||= handle_event_selectively
+
         oes_p.call :error, :entity_not_found do
           __build_zero_entities_found_against_natural_key_event name_s
         end
@@ -1035,32 +1013,32 @@ module Skylab::Brazen
             val x.natural_key_string
           end
 
+          _some_known_nodes = case 1 <=> s_a.length
+          when -1
+            "(some known #{ human_s }#{ s s_a }: #{ s_a * ', ' })"
+          when  0
+            "(the only known #{ human_s } is #{ s_a.first })"
+          when  1
+            "(there are no #{ human_s }s)"
+          end
+
           y << "#{ human_s } not found: #{
            }#{ ick o.name_string } #{
-            }(some known #{ human_s }#{ s s_a }: #{ s_a * ', ' })"
+            }#{ _some_known_nodes }"
 
         end
       end
 
       A_FEW__ = 3
 
-      def via_dsc_persist_entity ent, & oes_p
-        @dsc.persist_entity ent, & oes_p
-      end
-
     public
 
-      def delete_entity id_x, & oes_p
+      def receive_delete_entity action, entity, & oes_p
         @dsc ||= datastore_controller
-        @dsc and via_dsc_delete_entity id_x, & oes_p
+        @dsc and via_datastore_controller_receive_delete_entity action, entity, & oes_p
       end
 
     private
-
-      def prvd_act_prcn_when_entity id, _g
-        ds = datastore.entity_via_identifier id, & handle_event_selectively
-        ds and ds.as_precondition_via_preconditions @preconditions
-      end
 
       def datastore
         @preconditions.fetch model_class.persist_to.full_name_i
@@ -1074,8 +1052,11 @@ module Skylab::Brazen
     class Silo_Controller_
 
       class << self
-        def new_with * x_a  # :+#[#cb-063] used to be free
+        def new_with * x_a, & oes_p  # :+#[#cb-063] used to be free
           new do
+            if oes_p
+              @on_event_selectively = oes_p
+            end
             process_iambic_fully x_a
           end
         end
@@ -1132,10 +1113,6 @@ module Skylab::Brazen
 
     private
 
-      def wrap_action_precondition_not_resolved_from_identifier_event ev
-        ev
-      end
-
       def model_class
         @model_class
       end
@@ -1168,7 +1145,7 @@ module Skylab::Brazen
         model_class.name_function.as_lowercase_with_underscores_symbol
       end
 
-      def provide_action_prcn id, g, & oes_p
+      def provide_Action_preconditioN id, g, & oes_p  # :+#public-API
         cc = g.touch :collection_controller_prcn, id, self
         cc and begin
           cc.provide_action_precondition id, g, & oes_p
@@ -1183,20 +1160,25 @@ module Skylab::Brazen
       end
 
       def provide_silo_controller_prcn id, g, & oes_p
+
         a = model_class.preconditions
+
         if a && a.length.nonzero?
+
           bx = Model_::Preconditions_.establish_box_with(
             :self_identifier, id,
             :identifier_a, a,
             :on_self_reliance, method( :when_silo_controller_relies_on_self ),
             :graph, g,
             :level_i, :silo_controller_prcn,
-            :on_event_selectively, oes_p )
+            & oes_p )
+
           bx and begin
             model_class.silo_controller_class.new_with(
               :preconditions, bx,
               :model_class, model_class,
-              :kernel, @kernel, :on_event_selectively, oes_p )
+              :kernel, @kernel,
+              & oes_p )
           end
         else
           build_silo_controller( & oes_p )
@@ -1215,6 +1197,76 @@ module Skylab::Brazen
         model_class.silo_controller_class.new_with(
           :model_class, model_class,
           :kernel, @kernel, :on_event_selectively, oes_p )
+      end
+
+      # ~
+
+      def any_mutated_formals_for_depender_action_formals x  # :+#public-API #hook-in
+
+        # override this IFF your silo wants to add to (or otherwise mutate)
+        # the formal properties of every client action that depends on you.
+
+        a = model_class.preconditions
+        if a and a.length.nonzero?
+          x_ = x
+          a.each do | silo_id |
+            x__ = @kernel.silo_via_identifier( silo_id ).
+              any_mutated_formals_for_depender_action_formals x_
+            if x__
+              x_ = x__
+            end
+          end
+        end
+        x_  # nothing by default
+      end
+    end
+
+    # ~
+
+    class Common_Properties___ < ::Module
+
+      def initialize entity_module, & sess_p
+
+        @array = -> do
+          a = @box[].to_a.freeze
+          @array = -> { a }
+          a
+        end
+
+        @aref = -> sym do
+          @aref = @box[].method :fetch
+          @aref[ sym ]
+        end
+
+        @box = -> do
+          @did_flush || @flush[]
+          bx = properties
+          @box = -> { bx }
+          bx
+        end
+
+        @did_flush = false
+        @flush = -> do
+          @did_flush = true
+          @flush = nil
+          entity_module.touch_extends_and_includes_on_client_class self
+          self.edit_entity_class do | sess |
+            sess_p[ sess ]
+          end
+          nil
+        end
+      end
+
+      def array
+        @array[]
+      end
+
+      def to_stream
+        @box[].to_stream
+      end
+
+      def [] sym
+        @aref[ sym ]
       end
     end
   end

@@ -50,7 +50,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
         it "finds nothing" do
           invoke '.'
           expect :styled,
-            %r('#{ ::Regexp.escape cfn }' not found in \. or 1 dir up\b)
+            %r('#{ ::Regexp.escape cfg_filename }' not found in \. or 1 dir up\b)
           expect_exitstatus_for_resource_not_found
         end
       end
@@ -68,7 +68,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
         end
 
         def expect_same_result
-          expect :styled, %r('#{ ::Regexp.escape cfn }' not found in \.)
+          expect :styled, %r('#{ ::Regexp.escape cfg_filename }' not found in \.)
           expect_exitstatus_for_resource_not_found
         end
       end

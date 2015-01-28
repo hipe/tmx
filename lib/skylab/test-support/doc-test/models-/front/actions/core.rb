@@ -34,7 +34,7 @@ module Skylab::TestSupport
           o :promote_action
         end
 
-        def produce_any_result
+        def produce_result
 
           maybe_send_event :payload, :ping do
 

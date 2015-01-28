@@ -391,35 +391,22 @@ module Skylab::Brazen
         def write * x_a, & oes_p  # experimental
 
           Mutable::Actors::Persist.build_mutable_with(
-
             :write_to_tempfile_first,
-
             :path, @input_id.to_path,
-
             :is_dry, false,
-
             :document, self,
-
             :on_event_selectively, ( oes_p || _handle_event_selectively )
-
           ).edit_via_iambic( x_a ).execute
-
         end
 
         def write_to_path path, * x_a, & oes_p
 
           Mutable::Actors::Persist.build_mutable_with(
-
             :path, path,
-
             :is_dry, false,
-
             :document, self,
-
             :on_event_selectively, ( oes_p || _handle_event_selectively )
-
           ).edit_via_iambic( x_a ).execute
-
         end
 
         # ~ for child agents only:

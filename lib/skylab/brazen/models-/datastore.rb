@@ -2,14 +2,13 @@ module Skylab::Brazen
 
   class Models_::Datastore < Brazen_::Model_
 
-    Brazen_::Model_::Entity.call self do
+    edit_entity_class(
 
-      o :desc, -> y do
+      :desc, -> y do
         y << "manage datastores."
-      end
+      end,
 
-      o :after, :workspace
-    end
+      :after, :workspace )
 
     class << self
 

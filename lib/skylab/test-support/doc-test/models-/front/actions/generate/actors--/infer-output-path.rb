@@ -21,7 +21,7 @@ module Skylab::TestSupport
 
           def via_manifest_entry_absolute_path_resolve_test_dir_pathname
 
-            @test_dir_pn = TestSupport_.lib_.system.filesystem.walk(
+            surrounding_path = TestSupport_.lib_.system.filesystem.walk(
               :start_path, ::File.dirname( @input_path ),
               :filename, TEST_DIR_FILENAME_,
               :ftype, DIR_FTYPE_,
@@ -29,7 +29,12 @@ module Skylab::TestSupport
               :property_symbol, :manifest_entry_path_dirname,
               :on_event_selectively, @on_event_selectively )
 
-            @test_dir_pn ? ACHIEVED_ : UNABLE_
+            if surrounding_path
+              @test_dir_pn = ::Pathname.new( ::File.join surrounding_path, TEST_DIR_FILENAME_ )
+              ACHIEVED_
+            else
+              UNABLE_
+            end
           end
 
           DIR_FTYPE_ = 'directory'.freeze

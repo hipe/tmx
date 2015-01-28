@@ -16,8 +16,11 @@ module Skylab::Brazen::TestSupport::CLI::Actions
       add_env_setting :MAX_NUM_DIRS, d ; nil
     end
 
-    def add_env_setting i, x
-      env_p_a_for_write.push -> env { env[ "BRAZEN_#{ i }" ] = x } ; nil
+    def add_env_setting sym, x
+      env_p_a_for_write.push( -> env do
+        env[ "BRAZEN_#{ sym }" ] = x
+      end )
+      nil
     end
 
     def env_p_a_for_write
@@ -56,7 +59,7 @@ module Skylab::Brazen::TestSupport::CLI::Actions
     def from_directory_with_already_a_file
       from_directory do
         pn = tmpdir.join 'with-one-empty-file'
-        file_pn = pn.join cfn
+        file_pn = pn.join cfg_filename
         if ! file_pn.exist?
           if ! pn.exist?
             file_utils.mkdir pn.to_path

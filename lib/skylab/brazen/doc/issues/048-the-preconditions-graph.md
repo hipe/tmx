@@ -9,7 +9,7 @@ example we may have a business silo that depends on its datastore silo
 on a 'workspace' silo (a workspace being sort of a high level wrapper
 around a config file). the workspace silo in turn may depend on a config
 file silo in order to manage the parsing and ineractions with the
-filesystem:
+filesystem. in the below graph the arrows mean "depends on":
 
                                       ____________________
        _________________             /                    \

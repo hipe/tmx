@@ -33,9 +33,5 @@ module Skylab::Brazen::TestSupport::Models::Workspace
     def ws_tmpdir  # hacks only
       TS_::TestLib_::Tmpdir[]
     end
-
-    def subject_API
-      Brazen_::API
-    end
   end
 end

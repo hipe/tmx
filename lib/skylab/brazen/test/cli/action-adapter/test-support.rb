@@ -25,7 +25,7 @@ module Skylab::Brazen::TestSupport::CLI::A_A_
 
     def with * x_a
       _n11n = Brazen_::CLI::Action_Adapter_::Arguments.normalization arg_a
-      @normalization = _n11n.with_x x_a
+      @normalization = _n11n.new_via_argv x_a
       @result = @normalization.execute
     end
 

@@ -263,13 +263,24 @@ module Skylab::Brazen
         attr_reader :response
       end
 
+      class << self
+
+        # syntax: | <delegate> |
+        #           <channel> <delegate> |
+        #           [ <name>, <value> [..]] <delegate>
+
+        def response_receiver * x_a
+          Respose_Receiver__.new_via_iambic x_a
+        end
+      end
+
       class Respose_Receiver__
 
         Actor_[ self, :properties, :channel ]
 
         class << self
 
-          def via_iambic x_a
+          def new_via_iambic x_a
             case x_a.length
             when 0 ; self
             when 1 ; new x_a.first
@@ -313,16 +324,7 @@ module Skylab::Brazen
 
       WHEN_ = 'when'.freeze
 
-      class << self
 
-        # syntax: | <delegate> |
-        #           <channel> <delegate> |
-        #           [ <name>, <value> [..]] <delegate>
-
-        def response_receiver * x_a
-          Respose_Receiver__.call_via_iambic x_a
-        end
-      end
     end
   end
 end

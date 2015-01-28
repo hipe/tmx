@@ -14,12 +14,19 @@ module Skylab::Brazen
         y << "the name of the database"
       end,
       :ad_hoc_normalizer, -> arg, & oes_p do
-        if /\A[-a-z0-9]+\z/ =~ arg.value_x
+
+        if arg.value_x.nil?
+          # fallthru. let missing required check catch it.
           arg
+
+        elsif /\A[-a-z0-9]+\z/ =~ arg.value_x
+          arg
+
         else
           oes_p.call :error, :invalid_property_value do
             Brazen_.event.inline_not_OK_with(
-              :name_must_be_lowercase_alphanumeric_with_dashes, :name_s, x )
+              :name_must_be_lowercase_alphanumeric_with_dashes,
+                :name_s, arg.value_x )
           end
         end
       end,
@@ -89,44 +96,50 @@ module Skylab::Brazen
 
     # ~ for create
 
-    def persist_entity entity
-      Couch_::Actors__::Persist[ entity, self ]
+    def receive_persist_entity action, entity
+      Couch_::Actors__::Persist[ action.argument_box[ :dry_run ], entity, self ]
     end
 
     def any_native_create_before_create_in_datastore
-      Couch_::Actors__::Touch_datastore[ self, handle_event_selectively ]
+      Couch_::Actors__::Touch_datastore[ self, & handle_event_selectively ]
       PROCEDE_  # #note-085
     end
 
     # ~ for retrieve (one)
 
     def entity_via_identifier id, & oes_p
-      Couch_::Actors__::Retrieve_datastore_entity[ id, self, @kernel, oes_p ]
+      Couch_::Actors__::Retrieve_datastore_entity[ id, self, @kernel, & oes_p ]
     end
 
     # ~ for retrieve (list)
 
     def entity_stream_via_model cls, & oes_p
-      Couch_::Actors__::Scan.with :model_class, cls,
+      Couch_::Actors__::Build_stream.with :model_class, cls,
         :datastore, self,
-        :kernel, @kernel, :on_event_selectively, oes_p
+        :kernel, @kernel,
+        & oes_p
     end
 
     # ~ for delete entity
 
-    def delete_entity ent, & oes_p
-      ok = ent.any_native_delete_before_delete_in_datastore( & oes_p )
-      ok && Couch_::Actors__::Delete[ ent, self, oes_p ]
+    def receive_delete_entity action, ent, & oes_p
+      _ok = ent.intrinsic_delete action, & oes_p
+      _ok && Couch_::Actors__::Delete[ action, ent, self, & oes_p ]
     end
 
     # ~ for delete self
 
-    def any_native_delete_before_delete_in_datastore & oes_p
-      _remote = _HTTP_remote
-      _ok = Couch_::Actors__::Delete_datastore[
-        self, @action_formal_properties, _remote, oes_p ]
+    def intrinsic_delete action, & oes_p
+
+      Couch_::Actors__::Delete_datastore.call(
+        action.argument( :dry_run ),
+        action.argument( :force ),
+        self,
+        _HTTP_remote, & ( oes_p || handle_event_selectively ) )
+
       # NOTE we ignore the above - we want failure of the one not to prevent
       # the other from proceding (otherwise you couldn't remove rogue records)
+
       PROCEDE_
     end
 
@@ -156,7 +169,7 @@ module Skylab::Brazen
       Couch_.HTTP_remote.new( * @property_box.at( :name, :port, :host ) )
     end
 
-  public  # ~ hook in's
+  public  # ~ hook out's & hook in's
 
     def as_precondition_via_preconditions precons
       @preconditions = precons
@@ -164,17 +177,30 @@ module Skylab::Brazen
       self
     end
 
-    class Collection_Controller__ < Brazen_.model.collection_controller_class
+    class Silo__ < Brazen_.model.silo_class
 
+      def model_class
+        Data_Stores_::Couch
+      end
+
+      def provide_Action_preconditioN id, g, & oes_p  # :+#public-API
+        super id, g do | * i_a, & ev_p |
+          oes_p.call( * i_a ) do
+            ev = ev_p[]
+            x_a = ev.to_iambic
+            x_a.push :invite_to_action, [ :datastore, :couch, :add ]
+            ev.class.inline_via_iambic x_a, & ev.message_proc
+          end
+        end
+      end
     end
 
     class Silo_Controller__ < Brazen_.model.silo_controller_class
 
-      def wrap_action_precondition_not_resolved_from_identifier_event ev
-        x_a = ev.to_iambic
-        x_a.push :invite_to_action, [ :datastore, :couch, :add ]
-        build_event_via_iambic x_a, & ev.message_proc
-      end
+    end
+
+    class Collection_Controller__ < Brazen_.model.collection_controller_class
+
     end
 
     class << self

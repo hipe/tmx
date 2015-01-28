@@ -174,10 +174,11 @@ module Skylab::Snag
         def lookup
           @config = @API_client
           @did_fail = false
-          @pathname = bld_walk.find_any_nearest_file_pathname
+          surrounding_path = bld_walk.find_any_nearest_file_pathname
           if @did_fail
             @no_p[ @ev ]
           else
+            @pathname = ::Pathname.new ::File.join( surrounding_path, @config.manifest_file )
             when_found
           end
         end

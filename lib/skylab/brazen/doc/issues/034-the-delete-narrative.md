@@ -4,7 +4,7 @@
 our primary workhorse method interface (family) for deleting is currently:
 
 
-    delete_entity <entity>, & <on event selectively>
+    receive_delete_entity <action>, <entity>, & <on event selectively>
 
 
 ## why not just pass some kind of entity identifier?

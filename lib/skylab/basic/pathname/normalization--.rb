@@ -236,11 +236,19 @@ module Skylab::Basic
         def nope terminal_channel_symbol
           @result = maybe_send_event :error, :invalid_property_value do
             build_argument_error_event_with terminal_channel_symbol,
-              :path, @value_x,
-              :prop, @arg.property
+                :path, @value_x,
+                :prop, @arg.property do | y, o |
+
+              s_a = o.terminal_channel_i.to_s.split UNDERSCORE_
+              s_a.shift
+
+              y << "#{ par o.prop } #{ s_a * SPACE_ } - #{ ick o.path }"
+            end
           end
           UNABLE_
         end
+
+        UNDERSCORE_ = '_' ; SPACE_ = ' '
 
         include Simple_Selective_Sender_Methods_  # instead of "entity"'s
           # event-building stuff, just for consistency within the library

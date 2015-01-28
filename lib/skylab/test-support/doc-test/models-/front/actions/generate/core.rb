@@ -276,11 +276,12 @@ module Skylab::TestSupport
           _ok && self
         end
 
-        def name_function  # for  [#br-021] magic stream results (above)
+        def name_function  # for [#br-021] magic stream results (above)
           self.class.name_function
         end
 
         def execute  # no, this wasn't already implemented by the f.w!
+          @argument_box ||= Callback_::Box.the_empty_box # ick/meh
           bc = via_arguments_produce_bound_call  # will call normalize
           bc and begin
             bc.receiver.send bc.method_name, * bc.args  # result matters
@@ -453,7 +454,7 @@ module Skylab::TestSupport
 
 
 
-        def produce_any_result
+        def produce_result
 
           # order is somewhat arbitrary: what is covered is to resolve
           # the output adapter first. normalization may hinge on a valid

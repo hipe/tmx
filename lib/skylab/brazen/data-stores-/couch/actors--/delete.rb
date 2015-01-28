@@ -4,10 +4,10 @@ module Skylab::Brazen
 
     class Actors__::Delete < Couch_Actor_
 
-      Actor_[ self, :properties,
+      Actor_.call self, :properties,
+        :action,
         :entity,
-        :datastore,
-        :on_event_selectively ]
+        :datastore
 
       def execute  # any result
         init_ivars
@@ -22,7 +22,7 @@ module Skylab::Brazen
 
       def work
 
-        @rev = @entity.parameter_value :couch_entity_revision
+        @rev = @entity.couch_entity_revision_
 
         @datastore.delete @native_entity_identifier_s,
           :add_HTTP_parameter, :rev, @rev,

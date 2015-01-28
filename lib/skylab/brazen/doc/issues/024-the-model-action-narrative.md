@@ -11,18 +11,6 @@ modality.
 
 
 
-## #action-preconditions
-
-see [#048] the preconditions graph for a (mandatory) introduction to
-preconditions.
-
-in its implementation the preconditions "pipeline" starts from the
-action. the action will not get to its body of execution (the part that
-you typically write) unless its preconditions are met.
-
-
-
-
 ## :#note-100
 
 the selective listener proc that is our argument is from some outside
@@ -33,8 +21,9 @@ this outside proc that gets to decide whether the event should even
 necesarily be produced. but once we hear back a "yes" from this
 callback, it is up to "us" to decide how the event is built.
 
-
-
+when the action receives a potential event (eg from one of its
+collaborating actors), we call our received selective listener
+with the same channel, and if it wants the event we wrap it.
 
 
 ## :#note-160

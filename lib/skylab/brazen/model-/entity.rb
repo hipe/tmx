@@ -76,40 +76,6 @@ module Skylab::Brazen
 
       entity_property_class_for_write  # touch our own `Entity_Property` cls
 
-      class << self::Module_Methods
-
-        def defn_frozen_prop_a method_name, boolean_attr_reader_method_name
-
-          # define a module method `method_name` that produces a frozen,
-          # memoized array of properites that are true-ish along the
-          # metaproperty indicated by `boolean_attr_reader_method_name`
-
-          define_method method_name do
-            h = @__entity_property_memoized_frozen_arrays__ ||= {}
-            h.fetch method_name do
-              h[ method_name ] = properties.reduce_by( & boolean_attr_reader_method_name ).to_a.freeze
-            end
-          end
-          nil
-        end
-
-        def defn_any_frozen_prop_a method_name, boolean_attr_reader_method_name
-
-          # as above but result in nil for arrays that are zero length
-
-          define_method method_name do
-            h = @__entity_property_memoized_frozen_arrays__ ||= {}
-            h.fetch method_name do
-              a = properties.reduce_by( & boolean_attr_reader_method_name ).to_a
-              h[ method_name ] = ( a.freeze if a.length.nonzero? )
-            end
-          end
-          nil
-        end
-      end
-
-
-
       # • ad-hoc normalizer
 
         class self::Entity_Property
@@ -117,35 +83,27 @@ module Skylab::Brazen
         private
 
           def ad_hoc_normalizer=
-            add_norm( & iambic_property )
-          end
-
-          def add_norm & arg_and_oes_block_p
-            @has_ad_hoc_normalizers = true
-            ( @norm_p_a ||= [] ).push arg_and_oes_block_p
+            _add_ad_hoc_normalizer( & iambic_property )
             KEEP_PARSING_
           end
+
         public
+
+          def add_ad_hoc_normalizer & arg_and_oes_block_p
+            _add_ad_hoc_normalizer( & arg_and_oes_block_p )
+            self
+          end
+
+          def _add_ad_hoc_normalizer & arg_and_oes_block_p
+            @has_ad_hoc_normalizers = true
+            ( @norm_p_a ||= [] ).push arg_and_oes_block_p
+            nil
+          end
 
           attr_reader :has_ad_hoc_normalizers, :norm_p_a
         end
 
-        def prop_level_normalization_for_normalize
-          ok = KEEP_PARSING_
-          if self.class.any_ary_of_properties_with_ad_hoc_normalizers
-            self.class.any_ary_of_properties_with_ad_hoc_normalizers.each do |pr|
-              ok = aply_ad_hoc_normalizers pr
-              ok or break
-            end
-          end
-          ok
-        end
-
-        module self::Module_Methods
-          defn_any_frozen_prop_a :any_ary_of_properties_with_ad_hoc_normalizers, :has_ad_hoc_normalizers
-        end
-
-        def aply_ad_hoc_normalizers pr  # this evolved from [#fa-019]
+        def _apply_ad_hoc_normalizers pr  # this evolved from [#fa-019]
           ok = true
           bx = actual_property_box_for_write
           pr.norm_p_a.each do | arg_and_oes_block_p |
@@ -154,7 +112,11 @@ module Skylab::Brazen
               # at each step, value might have changed.
               # [#053] bound is not truly bound.
 
-            ok_arg = arg_and_oes_block_p.call arg, & handle_event_selectively  # was [#072]
+            args = [ arg ]
+            if 2 == arg_and_oes_block_p.arity
+              args.push self
+            end
+            ok_arg = arg_and_oes_block_p.call( * args, & handle_event_selectively )  # was [#072]
 
             if ok_arg
               bx.set arg.name_symbol, ok_arg.value_x
@@ -222,53 +184,64 @@ module Skylab::Brazen
 
 
 
-      # • default
-
-      o :property_hook, -> pc do
-
-          _DEFAULT_X = pc.upstream.gets_one
-          # we future-pad it to accomodate one day procs and not just values
-
-          ( -> prop do
-            prop.set_dflt_proc do | _entity |  # [#hl-119] name conventions are employed
-              _DEFAULT_X
-            end
-          end )
-        end,
-
-        :meta_property, :default
+      # • default (used to be a declared metaproperty, now is hand-written)
 
         class self::Entity_Property
-
-          def set_dflt_proc & p
-            @has_default = true
-            @default_p = p
-            KEEP_PARSING_
-          end
-
-          attr_reader :has_default
 
           def default_value_via_any_entity ent  # :+#public-API
             @default_p[ ent ]
           end
-        end
 
-        def dflt_for_normalize
-          ok = KEEP_PARSING_
-          if self.class.any_ary_of_defaulting_props
-            self.class.any_ary_of_defaulting_props.each do | pr |
-              x = any_property_value_via_property pr
-              if x.nil?
-                ok = receive_value_of_entity_property( pr.default_value_via_any_entity( self ), pr )
-                ok or break
-              end
-            end
+          attr_reader :has_default, :has_primitive_default, :primitive_default_value
+
+        private
+
+          def default=
+            set_primitive_default iambic_property
+            KEEP_PARSING_
           end
-          ok
-        end
 
-        module self::Module_Methods
-          defn_any_frozen_prop_a :any_ary_of_defaulting_props, :has_default
+          def default_proc=
+            set_default_proc( & iambic_property )
+            KEEP_PARSING_
+          end
+
+        protected
+
+          def init_without_default_
+            super
+            @has_primitive_default = false
+            @primitive_default_value = nil
+            nil
+          end
+
+        public
+
+          def new_with_default & p
+            dup.set_default_proc( & p ).freeze
+          end
+
+          def new_with_primitive_default x
+            dup.set_primitive_default( x ).freeze
+          end
+
+          def set_default_proc & p
+            @has_default = true
+            @has_primitive_default = false
+            @primitive_default_value = nil
+            @default_p = p
+            self
+          end
+
+          def set_primitive_default x
+            @has_default = true
+            @has_primitive_default = true
+            @primitive_default_value = x
+            @default_p = -> _ do
+              @primitive_default_value
+            end
+            self
+          end
         end
 
 
@@ -308,6 +281,9 @@ module Skylab::Brazen
       # • "environment", "hidden" (experiment)
 
         class self::Entity_Property
+
+          attr_reader :can_be_from_environment, :is_hidden
+
         private
 
           def environment=
@@ -319,14 +295,6 @@ module Skylab::Brazen
           def hidden=
             @is_hidden = true
             KEEP_PARSING_
-          end
-
-        public
-
-          attr_reader :can_be_from_environment, :is_hidden
-
-          def upcase_environment_name_symbol
-            :"BRAZEN_#{ @name.as_variegated_symbol.upcase }"
           end
         end
 
@@ -342,13 +310,14 @@ module Skylab::Brazen
               :number_set, :integer,
               :minimum, iambic_property )
 
-            add_norm do | arg, & oes_p |
+            _add_ad_hoc_normalizer do | arg, & oes_p |
               if arg.value_x.nil?
                 arg
               else
                 _NORMER.normalize_argument arg, & oes_p
               end
             end
+            KEEP_PARSING_
           end
 
           def non_negative_integer=
@@ -357,7 +326,7 @@ module Skylab::Brazen
               :number_set, :integer,
               :minimum, 0 )
 
-            add_norm do | arg, & oes_p |
+            _add_ad_hoc_normalizer do | arg, & oes_p |
 
               if arg.value_x.nil?
                 arg
@@ -365,6 +334,7 @@ module Skylab::Brazen
                 _NORMER.normalize_argument arg, & oes_p
               end
             end
+            KEEP_PARSING_
           end
         end
 
@@ -373,30 +343,16 @@ module Skylab::Brazen
       # • "parameter arity" - read synopsis [#fa-024]
 
         class self::Entity_Property
+
+          def set_is_not_required
+            @parameter_arity = :zero_or_one
+            self
+          end
         private
           def required=
             @parameter_arity = :one
             KEEP_PARSING_
           end
-        end
-
-        def chck_parameter_arity_for_normalize
-          miss_a = self.class.ary_of_nonzero_param_arity_props.reduce nil do | m, pr |
-            _x = any_property_value_via_property pr
-            if _x.nil?
-              ( m ||= [] ).push pr
-            end
-            m
-          end
-          if miss_a
-            receive_missing_required_props miss_a
-          else
-            KEEP_PARSING_
-          end
-        end
-
-        module self::Module_Methods
-          defn_frozen_prop_a :ary_of_nonzero_param_arity_props, :is_required
         end
 
         def receive_missing_required_props miss_prop_a
@@ -418,21 +374,43 @@ module Skylab::Brazen
 
 
 
-        # near [#006] we aggregate three of the above concerns into this one
-        # normalization hook because a) logically the order in which they are
-        # called must be fixed with respect to one another and b) there is
-        # less jumping around this way. if we require more modularity these
-        # can be broken up into separate hooks but the relative order must
-        # be as below: 1) first default those that are nil 2) apply any
-        # custom normalizations defined for the property 3) check that there
-        # are no nil required fields.
+        during_entity_normalize do | ent |  # see [#006]:#specific-code-annotation
 
-        during_entity_normalize do | ent |
-          _ok = ent.dflt_for_normalize
-          _ok &&= ent.prop_level_normalization_for_normalize
-          _ok && ent.chck_parameter_arity_for_normalize
+          ok = true
+          miss_prop_a = nil
+          st = ent.formal_properties.to_stream
+          prp = st.gets
+
+          while prp
+
+            x = ent.any_property_value_via_property prp
+
+            if x.nil? and prp.has_default
+              x = prp.default_value_via_any_entity ent
+              ok = ent.receive_value_of_entity_property x, prp
+              ok or break
+            end
+
+            if prp.has_ad_hoc_normalizers
+              ok = ent._apply_ad_hoc_normalizers prp
+              ok or break
+              x = ent.any_property_value_via_property prp
+            end
+
+            if x.nil? && prp.is_required
+              ( miss_prop_a ||= [] ).push prp
+              ok = false
+            end
+
+            prp = st.gets
+          end
+
+          if miss_prop_a
+            ent.receive_missing_required_props miss_prop_a
+          end
+
+          ok
         end
-
 
 
       # • misc for nomenclature, description, etc.

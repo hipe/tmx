@@ -71,8 +71,8 @@ module Skylab::Callback
           end
         end
 
-        def inline_via_iambic x_a
-          inline_via_iambic_and_any_message_proc_to_be_defaulted x_a, nil
+        def inline_via_iambic x_a, & msg_p
+          inline_via_iambic_and_any_message_proc_to_be_defaulted x_a, msg_p
         end
 
         def inline_via_iambic_and_message_proc x_a, p
@@ -145,11 +145,7 @@ module Skylab::Callback
             p, message_proc ] )
       end
 
-      def with * x_a, & p  # #note-25
-        self._NO_EASY_use_new_with
-      end
-
-      def new_with * x_a, & msg_p
+      def new_with * x_a, & msg_p  # #note-25
         dup.init_copy_via_iambic_and_message_proc x_a, msg_p
       end
 
@@ -318,7 +314,10 @@ module Skylab::Callback
 
         def maybe_replace_noun_phrase_with_prop
           if @o.has_tag( :prop ) and find_verb_index
-            _pretty = @expression_agent.par @o.prop
+            o = @o
+            _pretty = @expression_agent.calculate do
+              par o.prop
+            end
             @sp_as_s_a[ 0, @verb_index ] = [ _pretty ]
           end ; nil
         end
@@ -379,7 +378,7 @@ module Skylab::Callback
           @item_x = s ; nil
         end
 
-        PN_RX__ = /(?:_|\A)pathname\z/
+        PN_RX__ = /(?:_|\A)path(?:name)?\z/
       end
 
       module Selective_Builder_Receiver_Sender_Methods__

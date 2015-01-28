@@ -28,7 +28,7 @@ module Skylab::Cull
       @name_function = Brazen_.model.action_class.name_function_class.new(
         self, Actions, :Ping )
 
-      def produce_any_result
+      def produce_result
 
         maybe_send_event :info, :ping do
           app_name = @kernel.app_name
@@ -61,7 +61,7 @@ module Skylab::Cull
         :required, :property, :path
 
 
-      def produce_any_result
+      def produce_result
 
         @bx = to_bound_argument_box
 

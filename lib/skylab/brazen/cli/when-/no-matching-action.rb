@@ -10,14 +10,14 @@ module Skylab::Brazen
         @token = token
       end
 
-      def produce_any_result
+      def produce_result
 
         o = @render
         token = @token
 
         _scn = @invo.to_adapter_stream.reduce_by( & :is_visible )
 
-        scn = @invo.wrap_adapter_stream_with_ordering_buffer _scn
+        scn = @invo.wrap_adapter_stream_with_ordering_buffer_ _scn
 
         o.express do
           "unrecognized action #{ ick token }"

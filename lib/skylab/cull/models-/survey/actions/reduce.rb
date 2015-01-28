@@ -20,7 +20,7 @@ module Skylab::Cull
 
       include Survey_Action_Methods_
 
-      def produce_any_result
+      def produce_result
 
         path = @argument_box[ :path ]
 
