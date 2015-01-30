@@ -24,7 +24,7 @@ module Skylab::TanMan::TestSupport::Models::Starter
       expect_not_OK_event :entity_not_found do |ev_|
         ev = ev_.to_event
         s_a = ev.a_few_ent_a.map( & :natural_key_string )
-        s_a.should eql [ "digraph.dot", "holy-smack.dot" ]
+        s_a.should eql [ "digraph.dot", "holy-smack.dot", "minimal.dot" ]
         ev.name_string.should eql 'wiz'
       end
       expect_failed

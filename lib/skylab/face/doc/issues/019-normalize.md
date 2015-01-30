@@ -105,7 +105,7 @@ of this shape. if the incoming result was itself already valid and
 normal as-is, you may result in this same object as your result.
 
 in the case where you tranformed the value in some way, it may
-be useful to use the `with_value` method of [#ba-038] to create
+be useful to use the `new_with_value` method of [#ba-038] to create
 a modified frozen dup of the incoming argument structure, but with
 the new desired value.
 

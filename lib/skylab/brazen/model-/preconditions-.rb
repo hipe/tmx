@@ -24,6 +24,16 @@ module Skylab::Brazen
 
         attr_reader :action
 
+        def receive_starting_actual_preconditions box
+          box.each_pair do | k, x |
+            node = Node__.new :OK
+            node.value_x = x
+            node.self_value_x = x  # or not
+            @matrix_h[ k ][ :collection_controller_prcn ] = node  # and cetera
+          end
+          nil
+        end
+
         def touch lvl_i, id, silo
           node = @matrix_h[ id.full_name_i ][ lvl_i ]
           case node.state_i
@@ -84,8 +94,8 @@ module Skylab::Brazen
         end
 
         class Node__
-          def initialize
-            @state_i = :none
+          def initialize state_sym=:none
+            @state_i = state_sym
           end
           attr_accessor :state_i
           attr_accessor :value_x, :self_value_x

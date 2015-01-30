@@ -164,8 +164,12 @@ module Skylab::Callback
           x
         end
 
-        def immutable_with_random_access_keyed_to_method i, * x_a
+        def flush_to_immutable_with_random_access_keyed_to_method i, * x_a
           Stream_::Immutable_with_Random_Access__.new self, i, x_a
+        end
+
+        def flush_to_mutable_box_like_proxy_keyed_to_method sym
+          Stream_::Mutable_Box_Like_Proxy.via_flushable_stream__ self, sym
         end
 
         def map_detect & p

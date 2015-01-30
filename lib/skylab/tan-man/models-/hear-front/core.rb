@@ -8,13 +8,19 @@ module Skylab::TanMan
 
       @is_promoted = true
 
+      @after_name_symbol = :status
+
       Entity_.call self,
+
+        :desc, -> y do
+          y << 'experimental natural language-ISH interface'
+        end,
 
         :required, :argument_arity, :one_or_more, :property, :word,
 
         :reuse, Model_::Document_Entity.IO_properties
 
-      def produce_any_result
+      def produce_result
 
         word_s_a = @argument_box.fetch :word
 

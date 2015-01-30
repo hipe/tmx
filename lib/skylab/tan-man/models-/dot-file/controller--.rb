@@ -13,7 +13,7 @@ module Skylab::TanMan
 
       def members
         [ :caddied_output_args, :graph_sexp,
-          :persist_via_args, :unparse_entire_document ]
+          :persist_via_args, :unparse_into ]
       end
 
       attr_reader :graph_sexp
@@ -41,8 +41,8 @@ module Skylab::TanMan
         @graph_sexp.send i
       end
 
-      def unparse_entire_document
-        @graph_sexp.unparse
+      def unparse_into y
+        @graph_sexp.unparse_into y
       end
 
       def insert_stmt_before_stmt new, least_greater_neighbor
@@ -85,10 +85,22 @@ module Skylab::TanMan
 
       attr_accessor :caddied_output_args  # topic doesn't do anything with this, just carries it
 
-      def persist_via_args is_dry, arg
+      def persist_via_args is_dry, arg, *_
         adapter = Persist_Adapters__.produce_via_argument arg
         adapter.init @kernel, & @on_event_selectively
         adapter.receive_rewritten_datastore_controller is_dry, self
+      end
+
+      class Common_Persist_Adapter__
+        class << self
+          alias_method :build, :new
+        end
+
+        def init k, & oes_p
+          @on_event_selectively = oes_p
+          @kernel = k
+          nil
+        end
       end
 
       module Persist_Adapters__
@@ -112,46 +124,34 @@ module Skylab::TanMan
           end ).call
         end
 
-        class Output_String
-
-          class << self
-            def build x
-              new x
-            end
-          end
+        class Output_String < Common_Persist_Adapter__
 
           def initialize output_string
             @output_string = output_string
           end
 
-          def init k, & oes_p
-            @on_event_selectively = oes_p
-            @kernel = k
-            nil
-          end
-
-          def receive_rewritten_datastore_controller is_dry, o  # #hook-out (local)
+          def receive_rewritten_datastore_controller _is_dry, o  # #hook-out (local)
             @output_string.replace o.graph_sexp.unparse
             ACHIEVED_
           end
         end
 
-        class Output_Path
+        class Output_Stream < Common_Persist_Adapter__
 
-          class << self
-            def build x
-              new x
-            end
+          def initialize io
+            @io = io
           end
+
+          def receive_rewritten_datastore_controller _is_dry, o
+            o.graph_sexp.unparse_into @io
+            ACHIEVED_
+          end
+        end
+
+        class Output_Path < Common_Persist_Adapter__
 
           def initialize path
             @output_path = path
-          end
-
-          def init k, & oes_p
-            @on_event_selectively = oes_p
-            @kernel = k
-            nil
           end
 
           def receive_rewritten_datastore_controller is_dry, x

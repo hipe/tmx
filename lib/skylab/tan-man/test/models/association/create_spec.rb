@@ -29,6 +29,11 @@ module Skylab::TanMan::TestSupport::Models::Association
 
       it 'associates nodes when neither exists, creating them' do
         associate 'one', 'two'
+
+        if :creating == @ev_a.first.terminal_channel_i  # ugly fix for [#086]
+          @ev_a.shift
+        end
+
         expect_OK_event :created_node, 'created node (lbl "one")'
         expect_OK_event :created_node, 'created node (lbl "two")'
         expect_OK_event :created_association, 'created association: one -> two'

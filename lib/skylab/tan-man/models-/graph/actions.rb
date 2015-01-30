@@ -8,21 +8,24 @@ module Skylab::TanMan
 
         :required, :property, :digraph_path
 
+    class << self
+      def action_class  # luckily we want all our (one) action(s) to be this way
+        TanMan_::Model_::Document_Entity.action_class
+      end
+    end
+
     Actions = make_action_making_actions_module
 
     module Actions
 
-      Use = make_action_class :Create
+      Use = make_action_class :Create do
 
-      class Use
-
-        Entity_.call self,
-
+        edit_entity_class(
+          :preconditions, [ :workspace, :graph ],
           :properties,
             :starter,
-            :created_on
-
-        use_workspace_as_datastore_controller
+            :created_on )
+            # :reuse, Models_::Workspace.common_properties.array
 
         def template_value i
           send :"#{ i }_template_value"
@@ -48,14 +51,14 @@ module Skylab::TanMan
       @property_box.fetch :digraph_path
     end
 
-    def to_normalized_actual_property_scan_for_persist
+    def to_pair_stream_for_persist
 
       bx = Callback_::Box.new
 
       bx.add Brazen_::NAME_, ::Pathname.new(
         @property_box.fetch :digraph_path
       ).relative_path_from(
-        @datastore.datastore_controller.wsdpn
+        ::Pathname.new( @datastore.datastore_controller.asset_directory_ )
       ).to_path
 
       bx.to_pair_stream
@@ -63,17 +66,21 @@ module Skylab::TanMan
 
     class Collection_Controller__ < Collection_Controller_
 
-      use_workspace_as_dsc
-
-      def persist_entity ent, & oes_p
-
-        _is_dry = ent.any_parameter_value :dry_run
+      def receive_persist_entity action, ent, & oes_p
 
         @dsc ||= datastore_controller
 
-        _ok = Graph_::Actors__::Touch[ _is_dry, @action, ent, @dsc, @kernel, & oes_p ]
+        _bytes = Graph_::Actors__::Touch.call(
 
-        _ok and super
+          action.argument_box[ :dry_run ],
+
+          action, ent, @dsc, @kernel, & oes_p )
+
+        _bytes and super
+      end
+
+      def datastore_controller
+        @action.preconditions.fetch :workspace
       end
     end
 

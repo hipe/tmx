@@ -30,8 +30,6 @@ module Skylab::TanMan::TestSupport::Models
 
   module InstanceMethods
 
-    TestLib_::API_expect[ self ]
-
     # ~ adjunct facet : hearing ( & abstract graphs )
 
     def add_association_to_abstract_graph lbl_src_s, lbl_dst_s
@@ -218,10 +216,6 @@ module Skylab::TanMan::TestSupport::Models
 
     def empty_dir_pn
       TestLib_::Empty_dir_pn[]
-    end
-
-    def expected_config_path
-      @ws_pn.join( TanMan_::Models_::Workspace.config_filename ).to_path
     end
 
     def empty_work_dir

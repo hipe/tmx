@@ -1,0 +1,9 @@
+digraph{
+
+  ss [ label="get [tm] to\nbe self-supporting" ]
+  xx [ label="basic CLI\nvisaul re-integration" fillcolor="#b5d5fb" style=filled ]
+  ss->xx
+
+  # that one color of blue: fillcolor="#b5d5fb" style=filled
+
+}

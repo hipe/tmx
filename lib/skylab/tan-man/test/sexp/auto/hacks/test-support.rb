@@ -70,10 +70,12 @@ module Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
     end.call
 
     def build_graph_sexp_once
-      TanMan_::Models_::DotFile.produce_document_via_parse do |parse|
-        parse.generated_grammar_dir_path existent_testing_GGD_path
-        parse.via_input_string 'digraph{}'
-        parse.subscribe( & method( :subscribe_to_parse_events ) )
+
+      TanMan_::Models_::DotFile.produce_parse_tree_via(
+        handle_event_selectively
+      ) do | o |
+        o.input_string 'digraph{}'
+        o.generated_grammar_dir_path existent_testing_GGD_path
       end
     end
   end
@@ -98,11 +100,12 @@ module Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
 
     def resolve_stmt_list
 
-      @graph_sexp = TanMan_::Models_::DotFile.produce_document_via_parse do |parse|
-          parse.generated_grammar_dir_path existent_testing_GGD_path
-          parse.via_input_string "digraph{#{ with_string }}"
-          parse.subscribe( & method( :subscribe_to_parse_events ) )
-        end
+      @graph_sexp = TanMan_::Models_::DotFile.produce_parse_tree_via(
+        handle_event_selectively
+      )  do | o |
+        o.input_string "digraph{#{ with_string }}"
+        o.generated_grammar_dir_path existent_testing_GGD_path
+      end
 
       @stmt_list = @graph_sexp.stmt_list
       true

@@ -52,7 +52,7 @@ module Skylab::Brazen
     def on_init_resource_not_found_via_channel i_a, & ev_p
       # when initting, the resource not being found is normal; so in those
       # cases we report (a neutral version of) the event IFF verbose
-      if any_argument_value :verbose
+      if @argument_box[ :verbose ]
         maybe_send_event_via_channel i_a do
           ev_p[].with :ok, nil
         end

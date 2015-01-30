@@ -30,18 +30,12 @@ module Skylab::TanMan
           :flag, :property, :force,
           :reuse, Model_::Document_Entity.IO_properties )
 
-        def via_arguments_produce_bound_call
-          resolve_document_IO_or_produce_bound_call_ or super
-        end
       end
 
       Ls = make_action_class :List do
 
-        edit_entity_class :reuse, Model_::Document_Entity.IO_properties
+        edit_entity_class :reuse, Model_::Document_Entity.input_properties
 
-        def via_arguments_produce_bound_call
-          resolve_document_upstream_or_produce_bound_call_ or super
-        end
       end
 
       Rm = make_action_class :Delete
@@ -50,6 +44,10 @@ module Skylab::TanMan
 
         Entity_.call self,
 
+          :desc, -> y do
+            y << "apply a meaningful tag to a node"
+          end,
+
           :preconditions, [ :dot_file, :meaning, :node ],
 
           :reuse, TanMan_::Model_::Document_Entity.IO_properties,
@@ -57,11 +55,7 @@ module Skylab::TanMan
           :required, :property, :meaning_name,
           :required, :property, :node_label
 
-        def via_arguments_produce_bound_call
-          resolve_document_IO_or_produce_bound_call_ or super
-        end
-
-        def produce_any_result
+        def produce_result
           @meanings_controller = @preconditions.fetch :meaning
           @nodes_controller = @preconditions.fetch :node
           ok = __resolve_meaning
@@ -87,7 +81,7 @@ module Skylab::TanMan
         def __persist
           @preconditions.fetch( :dot_file ).persist_via_args(
             @argument_box[ :dry_run ],
-            * @output_argument_a )
+            * @output_arguments )
         end
       end
     end

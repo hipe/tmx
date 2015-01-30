@@ -22,10 +22,11 @@ module Skylab::Brazen
       private
 
         def resolve_properties
-          scn = @entity.to_normalized_actual_property_scan_for_persist
           body_pair_a = []
           did_see_name = false
-          while pair = scn.gets
+          st = @entity.to_pair_stream_for_persist
+
+          while pair = st.gets
             if NAME_ == pair.name_symbol
               did_see_name = true
               @name_x = pair.value_x
@@ -34,11 +35,14 @@ module Skylab::Brazen
             pair.value_x.nil? and next
             body_pair_a.push pair
           end
+
           if did_see_name
             @body_pair_a = body_pair_a  # zero length ok
             PROCEDE_
+
           elsif body_pair_a.length.zero?
             cannot_persist_entity_with_no_properties
+
           else
             self._CANNOT_persist_entity_with_no_name
           end

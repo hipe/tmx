@@ -32,13 +32,11 @@ module Skylab::TanMan
             :flag, :property, :ping
         end
 
-
         def via_arguments_produce_bound_call
           if @argument_box[ :ping ]
             bound_call_for_ping
           else
-            bc = resolve_document_IO_or_produce_bound_call_
-            bc or super
+            super
           end
         end
       end
@@ -47,27 +45,20 @@ module Skylab::TanMan
 
       class Rm
 
-        edit_entity_class do
+        edit_entity_class(
 
-          o :reuse, Model_::Document_Entity.IO_properties,
+          :reuse, Model_::Document_Entity.IO_properties,
 
-            :required, :property, :from_node_label,
-            :required, :property, :to_node_label
+          :required, :property, :from_node_label,
+          :required, :property, :to_node_label )
 
-          entity_formal_property_method_names_box_for_write.
-            remove Brazen_::NAME_  # ouch/meh
+        entity_formal_property_method_names_box_for_write.
+          remove Brazen_::NAME_  # ouch/meh
 
-        end
-
-        def via_arguments_produce_bound_call
-          bc = resolve_document_IO_or_produce_bound_call_
-          bc or super
-        end
-
-       def produce_any_result
+       def produce_result
          cc = datastore
          cc and begin
-           cc.delete_entity @argument_box, & handle_event_selectively
+           cc.receive_delete_entity self, nil, & handle_event_selectively
          end
        end
       end
@@ -87,19 +78,36 @@ module Skylab::TanMan
         end
 
         asc and begin
-          info = _info_via_into_datastore_marshal_entity asc, & oes_p
+          info = _info_via_into_datastore_marshal_entity(
+            nil, nil, asc, & oes_p )
           info and asc
         end
       end
 
-    private
+      def receive_persist_entity action, entity, & oes_p
 
-      def via_dsc_persist_entity entity, & oes_p
-        info = _info_via_into_datastore_marshal_entity entity, & oes_p
-        info and flush_maybe_changed_document_to_output_adapter info.did_mutate
+        bx = action.argument_box
+
+        x = bx[ :attrs ]
+        if x
+          any_attrs_x = x  # :+[#007] should be a hash from iternal call..
+            # (the front client would have to write a custom normalizer)
+        end
+
+        x = bx[ :prototype ]
+        if x
+          any_proto_sym = x.intern
+        end
+
+        info = _info_via_into_datastore_marshal_entity(
+          any_attrs_x,
+          any_proto_sym,
+          entity, & oes_p )
+
+        info and flush_maybe_changed_document_to_output_adapter__ info.did_mutate
       end
 
-      def _info_via_into_datastore_marshal_entity entity, & oes_p
+      def _info_via_into_datastore_marshal_entity any_attrs_x, any_proto_sym, entity, & oes_p  # _DOG_EAR
 
         @dsc ||= datastore_controller  # ick
 
@@ -117,8 +125,8 @@ module Skylab::TanMan
 
         _ok = Association_::Actors__::Mutate.with(
           :verb, :touch,
-          :attrs, entity.any_parameter_value( :attrs ),
-          :prototype_i, entity.any_parameter_value( :prototype ),
+          :attrs, any_attrs_x,
+          :prototype_i, any_proto_sym,
           :from_node_label, entity.property_value_via_symbol( :from_node_label ),
           :to_node_label, entity.property_value_via_symbol( :to_node_label ),
           :datastore, @dsc,
@@ -129,11 +137,14 @@ module Skylab::TanMan
 
       Info___ = ::Struct.new :did_mutate
 
-      def via_dsc_delete_entity arg_box, & oes_p
+      def via_datastore_controller_receive_delete_entity action, _, & oes_p
+
+        bx = action.argument_box
+
         _ok = Association_::Actors__::Mutate.with(
           :verb, :delete,
-          :from_node_label, arg_box.fetch( :from_node_label ),
-          :to_node_label, arg_box.fetch( :to_node_label ),
+          :from_node_label, bx.fetch( :from_node_label ),
+          :to_node_label, bx.fetch( :to_node_label ),
           :datastore, @dsc,
           :kernel, @kernel,
           & oes_p )

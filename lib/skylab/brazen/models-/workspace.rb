@@ -26,6 +26,10 @@ module Skylab::Brazen
 
     class << self
 
+      def common_properties  # [tm]
+        COMMON_PROPERTIES_
+      end
+
       def default_config_filename
         self::WS_CONF_FILENAME__
       end
@@ -160,6 +164,14 @@ module Skylab::Brazen
 
     class Silo__ < Brazen_.model.silo_class
 
+      # ~ custom exposures
+
+      def workspace_via_trio_box box, & oes_p
+        build_silo_controller( & oes_p )._workspace_via_trio_box box
+      end
+
+      # ~ hook-outs / hook-ins
+
       def model_class
         Workspace_
       end
@@ -179,48 +191,42 @@ module Skylab::Brazen
     class Silo_Controller__ < Brazen_.model.silo_controller_class
 
       def provide_collection_controller_precon _id, graph
-        __workspace_via_rising_action graph.action
+        _workspace_via_trio_box graph.action.to_trio_box
       end
 
-      def __workspace_via_rising_action action
-        @action = action
-        ws = __via_action_produce_workspace_via_object_argument
-        ws || __via_action_produce_workspace_via_workspace_silo
-      end
+      def _workspace_via_trio_box bx
 
-      def __via_action_produce_workspace_via_object_argument
-        @action.argument_box[ :workspace ]  # for internal API calls
-      end
-
-      def __via_action_produce_workspace_via_workspace_silo
+        @preconditions ||= nil
 
         @oes_p = event_lib.
           produce_handle_event_selectively_through_methods.
-            bookends self, :ws_via_action do | * i_a, & ev_p |
+            bookends self, :Workspace_via_trio_boX do | * i_a, & ev_p |
           maybe_send_event_via_channel i_a, & ev_p
         end
 
         @ws = @model_class.edit_entity @kernel, @oes_p do |o|
-          o.preconditions @preconditions
-          bx = @action.argument_box
+          if @preconditions
+            o.preconditions @preconditions
+          end
           o.edit_with(
-            :config_filename, bx.fetch( :config_filename ),
-            :surrounding_path, bx.fetch( :workspace_path ) )
+            :config_filename, bx.fetch( :config_filename ).value_x,
+            :surrounding_path, bx.fetch( :workspace_path ).value_x )
         end
 
-        @ws and __existent_workspace_via_workspace
+        @ws and __via_workspace_produce_existent_workspace_via_trio_box bx
       end
 
-      def __existent_workspace_via_workspace
+      def __via_workspace_produce_existent_workspace_via_trio_box bx
 
         _did_find = @ws.resolve_nearest_existent_surrounding_path(
-          @action.argument_value( :max_num_dirs ),
-          :prop, @action.formal_property_via_symbol( :workspace_path ),
+          bx.fetch( :max_num_dirs ).value_x,
+          :prop, bx.fetch( :workspace_path ).property,
           & @oes_p )
 
         _did_find and begin
 
-          if @action.any_argument_value_at_all( :verbose )  # #tracking :+[#069] verbose manually
+          trio = bx[ :verbose ]
+          if trio and trio.value_x  # #tracking :+[#069] verbose manually
             maybe_send_event :info, :verbose, :using_workspace do
               build_neutral_event_with :using_workspace,
                 :config_path, @ws.existent_config_path
@@ -231,7 +237,7 @@ module Skylab::Brazen
         end
       end
 
-      def on_ws_via_action_resource_not_found_via_channel i_a, & ev_p
+      def on_Workspace_via_trio_boX_resource_not_found_via_channel i_a, & ev_p
         maybe_send_event_via_channel i_a do
           bld_workspace_not_found_event ev_p[]
         end

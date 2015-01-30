@@ -198,25 +198,23 @@ module Skylab::Basic  # introduction at [#020]
       freeze
     end
 
+    def members
+      [ :actuals_has_name, :property, :name, :name_symbol, :value_x ]
+    end
+
     attr_reader :value_x, :actuals_has_name, :property
 
     attr_writer :value_x
-
-    def members
-      [ :actuals_has_name, :property, :name_i, :name, :value_x ]
-    end
 
     def name_symbol
       @property.name_symbol
     end
 
-    alias_method :name_i, :name_symbol
-
     def name
       @property.name
     end
 
-    def with_value x
+    def new_with_value x
       otr = dup
       otr.value_x = x
       otr.freeze

@@ -14,8 +14,8 @@
 [#077] #open maybe try a positive meta-property with a default instead of `hidden`.
 [#076] #open end-client gets [#021] magic for `retrieve` (was: [same for list])
 [#075]    #tracking :+#wishlist optionally generate ivar-based iambic writers
-[#074]       #parent-node: [#011] the codifying expression agent (for events)
-[#073]       #parent-node: [#011] selective event listening via methods
+[#074] #hole ( was: #parent-node: [#011] the codifying expression agents)
+[#073] #hole ( was: #parent-node: [#011] selective event listening via methods )
 [#072]       #done (was: modernize this interface)
 [#071]       #tracking-tag wrap
 [#070]       #tracking-tag when we intentionally expose a mechanical
@@ -73,7 +73,7 @@
 [#026]       #parent-node: [#025] the collection controller narrative ..
 [#025]       #doc-node: the brazen four layer model model ..
 [#024]       #parent-node: [#025] the model action narrative ..
-[#023]       #parent-node: [#011] event prototype
+[#023] #hole ( was: #parent-node: [#011] event prototype )
 [#022]       #done obliterate `receive_negative_event` and the rest - single
              entrypoint is better. rely on `ok` : false
 [#021]       the API magic result shape narrative .. (was "scope kernel")
@@ -88,7 +88,7 @@
 [#014] #open `has_custom_moniker` is a smell to exist in entity.
 [#013]       #parent-node: [#025] the model
 [#012] #open now that the `properties` shell is not memoized, see if etc
-[#011]       #parent-node: [#001] the event narrative ..
+[#011] #hole ( was: #parent-node: [#001] the event narrative )
 [#010]       #doc-node: data stores
 [#009]       #parent-node: [#010] the git config narrative ..
 [#008]       #parent-node: [#009] the mutable git config narrative ..

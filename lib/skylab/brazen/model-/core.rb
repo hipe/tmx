@@ -11,7 +11,7 @@ module Skylab::Brazen
         end
 
         def actual_property
-          Actual_Property_
+          Pair_
         end
 
         def collection_controller_class
@@ -54,7 +54,7 @@ module Skylab::Brazen
       end
     end
 
-    Actual_Property_ = Callback_::Box.pair
+    Pair_ = Callback_::Box.pair
 
     class << self
     private
@@ -64,7 +64,11 @@ module Skylab::Brazen
       end
 
       def make_common_properties & sess_p
-        Common_Properties___.new entity_module, & sess_p
+        Common_Properties__.new entity_module, & sess_p
+      end
+
+      def common_properties_class
+        Common_Properties__
       end
 
     public
@@ -168,11 +172,9 @@ module Skylab::Brazen
     public
 
       def preconditions
-        @did_resolve_pcia ||= resolve_precondition_controller_identifer_a
+        @__did_resolve_pcia ||= resolve_precondition_controller_identifer_a
         @preconditions
       end
-
-      attr_reader :did_resolve_pcia
 
       def resolve_precondition_controller_identifer_a
         if precondition_controller_i_a
@@ -301,26 +303,30 @@ module Skylab::Brazen
     end
 
     def to_even_iambic
-      scn = to_normalized_actual_property_stream ; y = []
-      while actual = scn.gets
-        y.push actual.name_symbol, actual.value_x
-      end ; y
+      y = []
+      st = to_full_pair_stream
+      pair = st.gets
+      while pair
+        y.push pair.name_symbol, pair.value_x
+        pair = st.gets
+      end
+      y
     end
 
-    def to_normalized_actual_property_scan_for_persist
-      to_normalized_actual_property_stream
+    def to_pair_stream_for_persist
+      to_full_pair_stream
     end
 
-    def to_normalized_actual_property_stream
+    def to_full_pair_stream
       Callback_.stream.via_nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
-        Actual_Property_.new any_property_value( i ), i
+        Pair_.new any_property_value( i ), i
       end
     end
 
     def to_normalized_bound_property_scan
       props = formal_properties
       Callback_.stream.via_nonsparse_array( get_sorted_property_name_i_a ).map_by do |i|
-        get_bound_property_via_property props.fetch i
+        trio_via_property props.fetch i
       end
     end
 
@@ -331,6 +337,11 @@ module Skylab::Brazen
 
     def natural_key_string
       @property_box.fetch NAME_
+    end
+
+    def trio sym  # #hook-near action. may soften if needed.
+      LIB_.basic.trio(
+        @property_box.fetch( sym ), true, formal_properties.fetch( sym ) )
     end
 
     def any_property_value i
@@ -356,7 +367,7 @@ module Skylab::Brazen
       build_OK_event_with :normalized_value, :prop, prop,
           :previous_x, mine_x, :current_x, normal_x do |y, o|
         y << "using #{ ick o.current_x } for #{ par o.prop } #{
-         }(was #{ ick o.previous_x })"
+         }(inferred from #{ ick o.previous_x })"
       end
     end
 
@@ -1206,10 +1217,15 @@ module Skylab::Brazen
         # override this IFF your silo wants to add to (or otherwise mutate)
         # the formal properties of every client action that depends on you.
 
+        my_name_sym = model_class.node_identifier.full_name_i
+
         a = model_class.preconditions
         if a and a.length.nonzero?
           x_ = x
           a.each do | silo_id |
+            if my_name_sym == silo_id.full_name_i
+              next
+            end
             x__ = @kernel.silo_via_identifier( silo_id ).
               any_mutated_formals_for_depender_action_formals x_
             if x__
@@ -1223,7 +1239,7 @@ module Skylab::Brazen
 
     # ~
 
-    class Common_Properties___ < ::Module
+    class Common_Properties__ < ::Module
 
       def initialize entity_module, & sess_p
 
@@ -1233,16 +1249,15 @@ module Skylab::Brazen
           a
         end
 
-        @aref = -> sym do
-          @aref = @box[].method :fetch
-          @aref[ sym ]
-        end
-
         @box = -> do
           @did_flush || @flush[]
-          bx = properties
+          bx = @properties_p[]
           @box = -> { bx }
           bx
+        end
+
+        @properties_p = -> do
+          self.properties
         end
 
         @did_flush = false
@@ -1257,6 +1272,14 @@ module Skylab::Brazen
         end
       end
 
+      def [] sym
+        @box[][ sym ]
+      end
+
+      def fetch sym, & p
+        @box[].fetch sym, & p
+      end
+
       def array
         @array[]
       end
@@ -1265,8 +1288,15 @@ module Skylab::Brazen
         @box[].to_stream
       end
 
-      def [] sym
-        @aref[ sym ]
+      def box
+        @box[]
+      end
+
+      def set_properties_proc & p  # if you are making a derivative collection
+        @did_flush = true
+        @flush = nil
+        @properties_p = p
+        self
       end
     end
   end

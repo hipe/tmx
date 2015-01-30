@@ -72,7 +72,7 @@ with a stream we can do interesting chaining:
       :some_condition == x.some_value
     end.map_by do |x|
       Some_Other_Class.new x
-    end.immutable_with_random_access_keyed_to_method :some_method
+    end.flush_to_immutable_with_random_access_keyed_to_method :some_method
 
 so we take a potentially large set of results, reduce it down to a
 smaller set, build some wrapper objects around it, and put them into a

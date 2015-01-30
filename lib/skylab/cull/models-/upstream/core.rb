@@ -13,10 +13,13 @@ module Skylab::Cull
         nil
       end
 
-      def mutable_arg_box bx
+      def mutable_trio_box bx
 
         @bx.add :upstream, bx[ :upstream ].value_x
-        @bx.add :upstream_adapter, bx[ :upstream_adapter ].value_x
+        x = bx[ :upstream_adapter ]
+        if x
+          @bx.add :upstream_adapter, x.value_x
+        end
 
         nil
       end

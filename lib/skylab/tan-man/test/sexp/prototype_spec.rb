@@ -2,7 +2,7 @@ require_relative 'prototype/test-support'
 
 module Skylab::TanMan::TestSupport::Sexp::Prototype
 
-  describe "[tm] sexp prototype be awesome" do
+  describe "[tm] sexp prototype" do
 
     extend TS_  # #borrow:one
 

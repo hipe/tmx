@@ -1,37 +1,84 @@
 module Skylab::TanMan::TestSupport
 
-  class Parse < TanMan_::Models_::DotFile::Actors__::Produce_document_via_parse::Parse__
+  class Parse
 
+    # insulate testing from production with this testing-only adapter that
+    # encapsulates the ancillary session of our business parser to work with
+    # the smaller ad-hoc grammars we have in testing.
 
-    # customize an ancillary component of our main business parser to work
-    # with our smaller ad-hoc grammars.
-
-
-    def initialize
-      @grammar_path_a = []
-      super
+    def initialize oes_p
+      @bx = TanMan_::Callback_::Box.new
+      @on_event_selectively = oes_p
+      yield self
     end
 
-    def produce_parser_class  # we don't memoize the result here. parent does
-      build_parser_class
+    # ~ edit phase
+
+    def generated_grammar_dir_path x
+      @bx.add :generated_grammar_dir_path, x
+      nil
     end
 
-    def add_grammar_path s
-      @grammar_path_a.push s ; nil
+    def root_for_relative_paths_for_load x
+      @bx.add :root_for_relative_paths_for_load, x
+      nil
     end
 
-    def add_grammar_paths_to_load o
-      @grammar_path_a.each do |s|
-        o.treetop_grammar s
-      end ; nil
+    def grammar_path x  # in theory we could support a list of grammars
+      @bx.add :grammar_path, x
+      nil
     end
 
-    def root_for_relative_paths_for_load
-      @root_for_relative_paths_for_load
+    # ~ work phase
+
+    def parse_file path
+      @bx.set :parse_method, :parse_file
+      @bx.set :parse_argument, path
+      _work
     end
 
-    def set_root_for_relative_paths_for_load x
-      @root_for_relative_paths_for_load = x ; nil
+    def parse_string s
+      @bx.set :parse_method, :parse_string
+      @bx.set :parse_argument, s
+      _work
+    end
+
+    def _work
+      Customized_Session__.new( @bx, & @on_event_selectively ).produce_parse_tree
+    end
+
+    class Customized_Session__ < TanMan_::Models_::DotFile::Sessions__::Produce_Parse_Tree
+
+      def initialize bx, & oes_p
+        @_h = bx.h_
+        super
+      end
+
+      def produce_parser_class  # override the parent's version of this :#hook-out for [ttt]
+
+        TanMan_.lib_.TTT::Parser::Load.new( :_xxx_,
+          -> o do
+            o.generated_grammar_dir @_h.fetch :generated_grammar_dir_path
+            o.root_for_relative_paths @_h.fetch :root_for_relative_paths_for_load
+            o.treetop_grammar @_h.fetch :grammar_path
+          end,
+          -> o do
+
+            # for clarity, we may below duplicate some of parent's wiring logic
+
+            o.on_info do | ev |
+              @on_event_selectively.call :info, ev.terminal_channel_i do
+                ev
+              end
+            end
+            o.on_error do | ev |
+              @on_event_selectively.call :error, ev.terminal_channel_i do
+                ev
+              end
+            end
+          end ).invoke  # a transient load session is created that produces (hopefully) a parser class
+
+      end
     end
   end
 end

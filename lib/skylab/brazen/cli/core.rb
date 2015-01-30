@@ -1448,16 +1448,18 @@ module Skylab::Brazen
 
         @back_properties = @bound.formal_properties  # nil ok
 
-        if @back_properties.has_name :config_filename
-          _mutate_config_filename_properties
-        end
+        if @back_properties
+          if @back_properties.has_name :config_filename
+            _mutate_config_filename_properties
+          end
 
-        if @back_properties.has_name :max_num_dirs
-          _mutate_max_num_dirs_properties
-        end
+          if @back_properties.has_name :max_num_dirs
+            _mutate_max_num_dirs_properties
+          end
 
-        if @back_properties.has_name :workspace_path
-          _mutate_workspace_path_properties
+          if @back_properties.has_name :workspace_path
+            _mutate_workspace_path_properties
+          end
         end
 
         @front_properties ||= @back_properties

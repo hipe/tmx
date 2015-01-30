@@ -12,23 +12,24 @@ module Skylab::TanMan
 
       Callback_::Actor.call self, :properties,
 
-        :path_i,
-        :verb_i,
+        :path_x,
+        :verb_x,
         :call
 
       Callback_::Event.selective_builder_sender_receiver self
 
       def execute
-        case @verb_i
-        when :retrieve
-          retrieve
+
+        m = :"execute_#{ @verb_x }_verb"
+        if respond_to? m
+          send m
         else
           when_bad_verb
         end
       end
 
-      def retrieve
-        m = :"retrieve_#{ @path_i }_path"
+      def execute_retrieve_verb
+        m = :"retrieve_#{ @path_x }_path"
         if respond_to? m
           send m
         else
@@ -38,13 +39,37 @@ module Skylab::TanMan
 
       def when_bad_verb
         @call.maybe_receive_event :error, :unrecognized_verb do
-          build_not_OK_event_with :unrecognized_verb, :verb_i, @verb_i
+          _build_common_event :unrecognized_verb, :verb, @verb_x, /\Aexecute_(.+)_verb\z/
         end
       end
 
       def when_bad_noun
         @call.maybe_receive_event :error, :unknown_path do
-          build_not_OK_event_with :unknown_path, :path_i, @path_i
+          _build_common_event :unknown_path, :path, @path_x, /\Aretrieve_(.+)_path\z/
+        end
+      end
+
+      def _build_common_event sym, * i_a, rx
+
+        _i_a_ = self.class.public_instance_methods( false ).reduce [] do | m, i |
+          md = rx.match i
+          if md
+            m.push md[ 1 ].intern
+          end
+          m
+        end
+
+        _term = /[^_]+\z/.match( sym )[ 0 ]
+
+        build_not_OK_event_with sym,
+            * i_a, :term, _term, :did_you_mean, _i_a_ do | y, o |
+
+          _s_a = o.did_you_mean.map do | x |
+            ick x
+          end
+
+          y << "#{ Callback_::Name.via_variegated_symbol( o.terminal_channel_i ).as_human } #{
+            }#{ ick o.send( o.term ) }. did you mean #{ or_ _s_a }?"
         end
       end
 

@@ -4,6 +4,12 @@ module Skylab::TanMan
 
   class Flyweight__
 
+    class << self
+      def properties  # :+#hook-out for [#br-021] magic result shapes
+        Models_::Meaning.properties
+      end
+    end  # >>
+
     def initialize
       @indexed = @scn = nil
     end

@@ -34,11 +34,11 @@ module Skylab::Brazen
         end
 
         def any_all_names
-          @bx.send :a
+          @bx.a_
         end
 
         def all_names
-          @bx.send :a
+          @bx.a_
         end
 
         def any_proprietor_of i

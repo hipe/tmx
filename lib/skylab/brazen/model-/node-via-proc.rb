@@ -212,9 +212,11 @@ module Skylab::Brazen
 
           h = {}
           while st.unparsed_exists
-            sym = st.gets_one
-            x = st.gets_one
-            h[ sym ] = x
+            _sym = st.gets_one
+            _x = if st.unparsed_exists
+              st.gets_one
+            end
+            h[ _sym ] = _x
           end
 
           arglist = []
@@ -241,6 +243,30 @@ module Skylab::Brazen
           end
         end
 
+        def __bc_when_extra extra_sym_a
+          _x = maybe_send_event :error do
+            __build_when_extra_arguments_event extra_sym_a
+          end
+          Brazen_.bound_call.via_value _x
+        end
+
+        def __build_when_extra_arguments_event extra_sym_a
+          _sign_event Brazen_::Entity.properties_stack.
+            build_extra_properties_event extra_sym_a, nil, 'argument', 'unexpected'
+        end
+
+        def __bc_when_miss miss_sym_a
+          _x = maybe_send_event :error do
+            __build_missing_arguments_event miss_sym_a
+          end
+          Brazen_.bound_call.via_value _x
+        end
+
+        def __build_missing_arguments_event miss_sym_a
+          _sign_event Brazen_::Entity.properties_stack.
+            build_missing_required_properties_event miss_sym_a, 'argument'
+        end
+
         def bc_when_OK mutable_arglist
 
           mutable_arglist.push self  # :#here is where we use the 1 extra arg
@@ -253,27 +279,10 @@ module Skylab::Brazen
           send :"bc_when_#{ err.terminal_channel_i }_arguments"
         end
 
-        def bc_when_missing_arguments
-          maybe_send_event :error do
-            bld_missing_arguments_event
-          end
-          UNABLE_
-        end
 
-        def bld_missing_arguments_event
-          _ev = Brazen_::Entity.properties_stack.
-            build_missing_required_properties_event(
-              [ @custom_error.property ],
-              'argument' )
-          _sign_event _ev
-        end
 
-        def bc_when_extra_arguments
-          maybe_send_event :error do
-            bld_when_extra_arguments_event
-          end
-          UNABLE_
-        end
+
+
 
         private def maybe_send_event * i_a, & ev_p
           @on_event_selectively[ * i_a, & ev_p ]
@@ -283,12 +292,7 @@ module Skylab::Brazen
           @on_event_selectively[ * i_a, & ev_p ]
         end
 
-        def bld_when_extra_arguments_event
-          _ev = Brazen_::Entity.properties_stack.
-            build_extra_properties_event [ @custom_error.x ], nil, 'argument', 'unexpected'
 
-          _sign_event _ev
-        end
 
         def _sign_event ev
           _nf = @action_class_like.name_function

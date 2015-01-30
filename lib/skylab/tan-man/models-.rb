@@ -56,6 +56,10 @@ module Skylab::TanMan
       false
     end
 
+    def is_branch
+      false
+    end
+
     def new boundish, & oes_p
       @build_bound_p.call boundish, & oes_p
     end
@@ -77,40 +81,12 @@ module Skylab::TanMan
 
     extend( module MM
 
-      define_method :desc, DESC_METHOD_
-
-      def use_workspace_as_datastore_controller
-
-        Entity_.call self,
-
-            :reuse, Models_::Workspace.properties_for_reuse
-
-
-        pc_a = model_class.preconditions
-        did_resolve_pcia and fail
-        @did_resolve_pcia = true
-        a = @preconditions = pc_a.dup
-        d = a.index do |pc|
-          :workspace == pc.full_name_i
-        end
-        if ! d
-          a.push Brazen_.node_identifier.via_symbol :workspace
-        end
-
-        include Uses_Workspace_Action_Methods__
-
-      end
-
-
     private
 
-      def common_edit_path_property_hack  # while #open [#br-083] paths defaulting to '.'
+      define_method :desc, DESC_METHOD_
 
-        edit_entity_class :property_object, ( ___path_property_.without_default do
-          @parameter_arity = :one
-        end )
-
-        ACHIEVED_
+      def entity_module
+        Entity_
       end
 
       self
@@ -140,29 +116,14 @@ module Skylab::TanMan
         @kernel
       end
 
-    private
-
-      def workspace_config_filename
-        WS_C_FN__
+      def receive_stdout_ x
+        @stdout = x
+        nil
       end
-      WS_C_FN__ = '.tanman-workspace/conf'.freeze
+
+      attr_reader :stdout
 
       self
-    end
-  end
-
-  module Uses_Workspace_Action_Methods__
-
-    def subsume_external_arguments
-      if ! @argument_box[ :workspace ] && ! @argument_box[ :config_filename ]
-        a = []
-        a.push @kernel.kernel_property_value :local_conf_config_name
-        a.push @kernel.kernel_property_value :local_conf_dirname
-        a.compact!
-        if a.length.nonzero?
-          @argument_box.add :config_filename, a.join( FILE_SEPARATOR_ )
-        end
-      end ; nil
     end
   end
 
@@ -202,69 +163,11 @@ module Skylab::TanMan
 
   class Collection_Controller_ < Brazen_.model.collection_controller_class
 
-    class << self
-
-      def use_workspace_as_dsc
-
-        define_method :datastore_controller do
-
-          @action.preconditions.fetch :workspace
-
-        end
-      end
-    end
   end
 
   class Kernel_ < Brazen_::Kernel_  # :[#083].
-
-    def kernel_property_value sym
-      properties_stack.property_value_via_symbol sym
-    end
-  private
-    def properties_stack
-      @pstack ||= bld_pstack
-    end
-    def bld_pstack
-      stack = Brazen_.properties_stack.new
-      stack.push_frame Bottom_properties_frame__[]
-      stack
-    end
+    # :+#archive-tombstone: this used to be bottom properties frame
   end
-
-  Bottom_properties_frame__ = Callback_.memoize[ -> do
-
-    class Bottom_Properties_Frame__
-
-      Brazen_.properties_stack.common_frame self,
-
-        :memoized, :proc, :starter_file, -> do
-          'holy-smack.dot'.freeze
-        end,
-
-        # ~ workspace resolution
-
-        :memoized, :proc, :global_conf_path, -> do
-          TanMan_.lib_.home_directory_pathname.join( 'tanman-config' ).to_path
-        end,
-
-        :memoized, :proc, :local_conf_config_name, -> do
-          'config'.freeze
-        end,
-
-        :memoized, :proc, :local_conf_dirname, -> do
-          '.tanman-workspace'.freeze
-        end,
-
-        :memoized, :proc, :local_conf_maxdepth, -> do
-          1
-        end
-    end
-
-    Bottom_Properties_Frame__.new do
-      # no customization
-    end
-
-  end ]
 
   Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]
 
@@ -272,27 +175,26 @@ module Skylab::TanMan
 
     self.persist_to = :datastores_git_config
 
-    set_workspace_config_filename 'tan-man.conf'  # #open [#022] one day w.s dirs
+    set_workspace_config_filename 'tanman-workspace/config'
 
     class << self
-
-      def properties_for_reuse
-        Xxx__[].properties.to_a
+      def common_properties
+        COMMON_PROPERTIES___
       end
-      Xxx__ = -> do
-        p = -> do
-          class Xxx___
-            Entity_.call self,
-                :properties,
-                  :workspace,
-                  :workspace_path,
-                  :config_filename
-          end
-          p = -> { Xxx___ }
-          Xxx___
-        end
-        -> { p[] }
-      end.call
+
+      def entity_module  # for below
+        Entity_
+      end
+    end
+
+    COMMON_PROPERTIES___ = make_common_properties do | sess |
+
+      otr = Brazen_::Models_::Workspace.common_properties
+      sess.edit_entity_class(
+        :property_object, otr.fetch( :config_filename ),
+        :property_object, otr.fetch( :max_num_dirs ),
+        :property_object, otr.fetch( :workspace_path ) )
+
     end
 
     Actions = ::Module.new
@@ -303,17 +205,12 @@ module Skylab::TanMan
 
       @is_promoted = true
 
-      after :init
+      @after_name_symbol = :init
 
-      class << self
-        def properties
-          @__edit_props_once ||= common_edit_path_property_hack
-          super
-        end
+    desc "show the status of the config director{y|ies} active at the path"
+
+      def receive_stdout_ _
       end
-
-    desc "show the status of the config director{y|ies} active at the path."
-
     end
 
     class Actions::Init < Brazen_::Models_::Workspace::Actions::Init
@@ -322,15 +219,12 @@ module Skylab::TanMan
 
       @is_promoted = true
 
-      class << self
-        def properties
-          @__edit_props_once ||= common_edit_path_property_hack
-          super
-        end
+      desc do |y|
+        _ = @kernel.silo( :workspace ).model_class.default_config_filename
+        y << "create the #{ val _ } directory"
       end
 
-      desc do |y|
-        y << "create the #{ val property_value_via_symbol :local_conf_dirname } directory"
+      def receive_stdout_ _
       end
     end
 
@@ -341,10 +235,10 @@ module Skylab::TanMan
           :promote_action,
 
           :desc, -> y do
-            y << "pings tanman (lowlevel)."
+            y << "pings tanman (lowlevel)"
           end
 
-      def produce_any_result
+      def produce_result
         maybe_send_event :info, :ping do
           bld_ping_event
         end
@@ -359,8 +253,14 @@ module Skylab::TanMan
       end
     end
 
-    def wsdpn
-      @wsdpn ||= @pn.dirname
+    def asset_directory_
+      @___did_calculate_asset_dir ||= begin
+        if @_surrounding_path_exists
+          @__asset_dir = ::File.dirname existent_config_path
+          true
+        end
+      end
+      @__asset_dir
     end
   end
 
@@ -368,7 +268,7 @@ module Skylab::TanMan
 
     desc "manage remotes."
 
-    after :graph
+    @after_name_symbol = :graph
 
     Actions = ::Module.new
 
@@ -376,19 +276,21 @@ module Skylab::TanMan
 
   class Models_::Graph < Model_
 
+    @after_name_symbol = :init
+
     desc "with the current graph.."
 
     autoload_actions
-
-    after :status
 
     # desc "there's a lot you can tell about a man from his choice of words"
   end
 
   class Models_::Node < Model_::Document_Entity
 
+    @after_name_symbol = :hear
+
     desc do |y|
-      y << "x."
+      y << "view and edit nodes"
     end
 
     autoload_actions
@@ -410,8 +312,10 @@ module Skylab::TanMan
 
   class Models_::Association < Model_::Document_Entity
 
+    @after_name_symbol = :node
+
     desc do |y|
-      y << "x."
+      y << "view and edit associations"
     end
 
     autoload_actions
@@ -419,9 +323,9 @@ module Skylab::TanMan
 
   class Models_::Meaning < Model_::Document_Entity
 
-    desc "manage meaning."
+    @after_name_symbol = :association
 
-    after :graph
+    desc "manage meaning"
 
     def initialize * a
       if 1 == a.length
@@ -454,6 +358,12 @@ module Skylab::TanMan
 
   class Models_::Starter < Model_
 
+    @after_name_symbol = :meaning
+
+    desc do | y |
+      y << "get or set the starter file used to create digraphs"
+    end
+
     autoload_actions
   end
 
@@ -468,7 +378,7 @@ module Skylab::TanMan
     end
   end
 
-  Models_::Paths = -> path_i, verb_i, call do
-    Models_::Internal_::Paths[ path_i, verb_i, call ]
+  Models_::Paths = -> path, verb, call do
+    Models_::Internal_::Paths[ path, verb, call ]
   end
 end

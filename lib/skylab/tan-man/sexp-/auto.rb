@@ -338,6 +338,10 @@ module Skylab::TanMan
     def unparse
       @content_text_value
     end
+
+    def unparse_into y
+      y << @content_text_value
+    end
   end
 
   # --*--
@@ -350,6 +354,10 @@ module Skylab::TanMan
       @extension_module_metas, @member, @_node, @_parent_class,
         @tree_class = extension_module_meta_a, member_i, _node, _parent_class,
           tree_class
+    end
+
+    def members
+      [ :extension_module_metas, :member, :tree_class, :_node, :_parent_class ]
     end
 
     attr_reader :extension_module_metas, :member, :_node, :_parent_class
@@ -441,6 +449,10 @@ module Skylab::TanMan
     # What can we do with a node with one extension module?
 
     include Sexp_::Inflection::Methods # symbolize, chomp_digits
+
+    def members
+      [ * super, :expression, :rule, :sexp_const, :sexps_module ]
+    end
 
     def expression
       symbolize(sexp_const.to_s).intern
@@ -541,6 +553,11 @@ module Skylab::TanMan
       @methods_idx = methods_idx
       super(* a )
     end
+
+    def members
+      [ * super, :methods_of_interest ]
+    end
+
 
     def methods_of_interest
       extension_module_metas[ @methods_idx ].module.instance_methods
@@ -703,6 +720,18 @@ module Lossless
         else            ; child.unparse
         end
       end.join EMPTY_S_
+    end
+
+    def unparse_into y
+      each do | child |
+        child or next
+        if child.respond_to? :unparse_into
+          child.unparse_into y
+        else
+          y << child
+        end
+      end
+      y
     end
   end
 

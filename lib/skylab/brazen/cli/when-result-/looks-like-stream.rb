@@ -15,6 +15,18 @@ module Skylab::Brazen
       end
 
       def execute
+        if @upstream.respond_to? :gets
+          @was_a_stream = true
+          __via_stream
+        else
+          @item = @upstream
+          @upstream = Callback_::Scn.the_empty_stream
+          @was_a_stream = false
+          when_at_least_one_item
+        end
+      end
+
+      def __via_stream
         @item = @upstream.gets
         if @item
           when_at_least_one_item
@@ -54,7 +66,11 @@ module Skylab::Brazen
           redo
         end while nil
 
-        finish_when_at_least_one
+        if @was_a_stream
+          finish_when_at_least_one
+        else
+          @ok ? SUCCESS_ : GENERIC_ERROR_
+        end
       end
 
       def __build_listing_expresser

@@ -15,7 +15,10 @@ module Skylab::TanMan::TestSupport::Models::Graph
         call_API :graph, :use
 
         expect_not_OK_event :missing_required_properties do | ev |
-          ev.to_event.miss_a.first.name_i.should eql :digraph_path
+
+          [ :digraph_path, :workspace_path ].should be_include(
+            ev.to_event.miss_a.first.name_symbol
+          )
         end
 
         expect_failed
@@ -27,7 +30,7 @@ module Skylab::TanMan::TestSupport::Models::Graph
           :digraph_path, 'some-path'
 
         ev = expect_not_OK_event :missing_required_properties
-        black_and_white( ev ).should eql "missing required property 'path'"
+        black_and_white( ev ).should eql "missing required property 'workspace_path'"
 
         expect_failed
       end
@@ -186,11 +189,11 @@ module Skylab::TanMan::TestSupport::Models::Graph
 
             ev = expect_neutral_event :using_default
             black_and_white( ev ).should match(
-              /\Ausing default starter "holy-smack\.dot" \(the last of [23] starters\)/ )
+              /\Ausing default starter "minimal\.dot" \(the last of [23] starters\)/ )
 
             ev = expect_OK_event :wrote_file
             black_and_white( ev ).should match(
-              /\Awrote make-me\.dot \([456]\d\d bytes\)/ )
+              /\Awrote make-me\.dot \([456]\d bytes\)/ )
 
             ev = expect_OK_event :datastore_resource_committed_changes
             black_and_white( ev ).should match(

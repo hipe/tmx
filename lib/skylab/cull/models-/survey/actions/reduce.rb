@@ -37,8 +37,8 @@ module Skylab::Cull
 
         @survey = @parent_node.edit do | edit |
 
-          edit.edit_via_mutable_arg_box_and_look_path(
-            to_bound_argument_box,
+          edit.edit_via_mutable_trio_box_and_look_path(
+            to_trio_box,
             path )
 
         end
@@ -49,7 +49,7 @@ module Skylab::Cull
       def resolve_transient_survey
 
         @survey = @parent_node.edit do  | edit |
-          edit.edit_via_mutable_arg_box to_bound_argument_box
+          edit.edit_via_mutable_trio_box to_trio_box
         end
 
         @survey ? ACHIEVED_ : UNABLE_

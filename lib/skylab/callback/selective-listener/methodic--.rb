@@ -2,7 +2,7 @@ module Skylab::Callback
 
   module Selective_Listener
 
-    class Methodic__  # :[#013]. quite similar to [#br-073]
+    class Methodic__  # :[#013]. quite similar to [#006]
 
       Callback_::Actor.methodic self, :simple, :properties, :properties,
         :delegate,

@@ -13,7 +13,7 @@ module Skylab::TanMan
 
       def execute
 
-        arg = @entity.get_argument_via_property_symbol :digraph_path
+        arg = @entity.trio :digraph_path
 
         ok_arg = NORMALIZE_DIGRAPH_PATH_.normalize_argument arg, & @on_event_selectively
 
@@ -157,20 +157,17 @@ module Skylab::TanMan
 
         # first, use any starter indicated in the workspace
 
-        @kernel.call :starter, :lines,
-          :value_fetcher, @value_fetcher,
-          :workspace, @ws,
-          & @on_event_selectively
+        @kernel.silo( :starter ).lines_via__(
+          @value_fetcher, @workspace, & @on_event_selectively )
       end
 
       def any_lines
 
         # if no starter is indicated in the workspace, use default
 
-        @kernel.call :starter, :lines,
-          :value_fetcher, @value_fetcher,
-          :use_default, true,
-          & @on_event_selectively
+        Models_::Starter::Actions::Lines.session @kernel, @on_event_selectively do | o |
+          o.value_fetcher = @value_fetcher
+        end.via_default
       end
 
       def via_lines

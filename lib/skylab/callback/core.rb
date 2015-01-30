@@ -226,6 +226,11 @@ module Skylab::Callback
       @a = [] ; @h = {}
     end
 
+    def init a, h
+      @a = a ; @h = h
+      self
+    end
+
     def freeze
       @a.freeze ; @h.freeze ; super
     end
@@ -334,7 +339,7 @@ module Skylab::Callback
     # ~ mutators
 
     def merge_box! otr
-      a = otr.a ; h = otr.h
+      a = otr.a_ ; h = otr.h_
       a.each do | sym |
         @h.key?( sym ) or @a.push sym
         @h[ sym ] = h.fetch sym
@@ -342,7 +347,7 @@ module Skylab::Callback
     end
 
     def ensuring_same_values_merge_box! otr
-      a = otr.a ; h = otr.h
+      a = otr.a_ ; h = otr.h_
       a.each do |i|
         had = true
         m_i = @h.fetch i do
@@ -438,8 +443,13 @@ module Skylab::Callback
       "key not found: #{ i.inspect }"
     end
 
-  protected
-    attr_reader :a, :h
+    def a_
+      @a
+    end
+
+    def h_
+      @h
+    end
 
     class << self
 
@@ -460,6 +470,22 @@ module Skylab::Callback
     end
 
     alias_method :initialize, :reinitialize
+
+    def flush_remaining_to_array
+      x = @x_a[ @d .. -1 ]
+      @d = @x_a_length
+      x
+    end
+
+    def flush_to_each_pairer
+      p = -> & yield_p do
+        while unparsed_exists
+          yield_p[ gets_one, gets_one ]
+        end
+      end
+      p.singleton_class.send :alias_method, :each_pair, :call  # while etc
+      p
+    end
 
     def no_unparsed_exists
       @x_a_length == @d
@@ -489,12 +515,6 @@ module Skylab::Callback
 
     def current_index
       @d
-    end
-
-    def flush_remaining_to_array
-      x = @x_a[ @d .. -1 ]
-      @d = @x_a_length
-      x
     end
 
     def advance_one

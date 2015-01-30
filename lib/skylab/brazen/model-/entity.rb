@@ -108,7 +108,7 @@ module Skylab::Brazen
           bx = actual_property_box_for_write
           pr.norm_p_a.each do | arg_and_oes_block_p |
 
-            arg = get_bound_property_via_property pr
+            arg = trio_via_property pr
               # at each step, value might have changed.
               # [#053] bound is not truly bound.
 
@@ -134,13 +134,6 @@ module Skylab::Brazen
       # • "argument arity"
 
         class self::Entity_Property
-        private
-          def flag=
-            @argument_arity = :zero
-            KEEP_PARSING_
-          end
-
-        public
 
           def argument_is_required  # *not the same as* parameter is required
             :one == @argument_arity or :one_to_many == @argument_arity
@@ -152,6 +145,13 @@ module Skylab::Brazen
 
           def takes_many_arguments
             :zero_to_many == @argument_arity or :one_to_many == @argument_arity
+          end
+
+        private
+
+          def flag=
+            @argument_arity = :zero
+            KEEP_PARSING_
           end
         end
 
@@ -188,11 +188,23 @@ module Skylab::Brazen
 
         class self::Entity_Property
 
-          def default_value_via_any_entity ent  # :+#public-API
-            @default_p[ ent ]
+          # ~ :*#public-API
+
+          def default_value_via_any_entity ent
+            if @default_p.arity.zero?
+              @default_p[]
+            else
+              @default_p[ ent ]
+            end
+          end
+
+          def default_proc
+            @default_p
           end
 
           attr_reader :has_default, :has_primitive_default, :primitive_default_value
+
+          # ~
 
         private
 
@@ -237,7 +249,7 @@ module Skylab::Brazen
             @has_default = true
             @has_primitive_default = true
             @primitive_default_value = x
-            @default_p = -> _ do
+            @default_p = -> do
               @primitive_default_value
             end
             self
@@ -249,6 +261,17 @@ module Skylab::Brazen
       # • "description"
 
         class self::Entity_Property
+
+          # ~ :*#public-API
+
+          def description_proc
+            @desc_p_a.fetch @desc_p_a.length - 1 << 1
+          end
+
+          attr_reader :has_description, :desc_p_a
+
+          # ~
+
         private
 
           def description=
@@ -271,9 +294,6 @@ module Skylab::Brazen
               STOP_PARSING_
             end
           end
-
-        public
-          attr_reader :has_description, :desc_p_a
         end
 
 

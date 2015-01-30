@@ -34,7 +34,7 @@ module Skylab::Cull
 
       def produce_result
         @upstream = @parent_node.edit do | o |
-          o.mutable_arg_box to_bound_argument_box_except :table_number
+          o.mutable_trio_box to_trio_box_except__ :table_number
         end
         @upstream and via_upstream
       end

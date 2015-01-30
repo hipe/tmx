@@ -12,10 +12,65 @@ module Skylab::TanMan
       @app_kernel = TanMan_::API.application_kernel ; nil
     end
 
+    # ~ experimental front client customizations:
+
+    Branch_Adapter = Branch_Adapter
+
+    class Action_Adapter < Action_Adapter
+
+      def receive_frame adapter
+        if @bound.respond_to? :receive_stdout_
+          @bound.receive_stdout_ adapter.resources.sout
+        end
+        super
+      end
+    end
+
+    Previous_Actions___ = Actions
+    module Actions
+      include Previous_Actions___
+
+      class Status < Action_Adapter
+        def resolve_properties
+          super
+          mutable_back_properties.replace_by :path do | prp |
+            prp.dup.set_default_proc do
+              ::Dir.pwd
+            end.set_is_not_required.freeze
+          end
+          @front_properties = @mutable_back_properties
+          nil
+        end
+      end
+
+      class Graph < Branch_Adapter
+        module Actions
+          class Use < Action_Adapter
+            def resolve_properties  # e.g
+              super
+              mutable_back_properties.replace_by :digraph_path do | prp |
+                prp.dup.add_ad_hoc_normalizer do | arg |
+                  if arg.value_x and SLASH_BYTE___ != arg.value_x.getbyte( 0 )
+                    arg = arg.new_with_value ::File.expand_path arg.value_x
+                  end
+                  arg
+                end.freeze
+              end
+              nil
+            end
+          end
+        end
+      end
+    end
+
+    SLASH_BYTE___ = ::File::SEPARATOR.getbyte 0
+
+    # ~ could go away:
+
     class Expression_Agent__
 
       def initialize partitions
-        @kernel = partitions.kernel.application_kernel
+        @kernel = partitions.adapter.application_kernel
       end
 
       attr_writer :current_property
@@ -24,10 +79,6 @@ module Skylab::TanMan
 
       def app_name
         @kernel.app_name
-      end
-
-      def property_value_via_symbol i
-        @kernel.kernel_property_value i
       end
 
       def invoke_notify
@@ -41,7 +92,7 @@ module Skylab::TanMan
       green = 32 ; strong = 1
 
       def and_ a
-        a * ' and '  # #todo
+        _NLP_agent.and_ a
       end
 
       def code s
@@ -74,6 +125,14 @@ module Skylab::TanMan
         kbd x
       end
 
+      def nm name
+        "'#{ name.as_slug }'"
+      end
+
+      def or_ a
+        _NLP_agent.or_ a
+      end
+
       def par prop  # [#sl-036] - super hacked for now
         kbd "<#{ prop.name.as_slug.gsub '_', '-' }>"
       end
@@ -82,15 +141,20 @@ module Skylab::TanMan
         _NLP_agent.plural_noun.call_via_arglist a
       end
 
-      def pth path_x
-        FUN__.pretty_path[ path_x ]
-      end
-
-      def s *a  # #todo
-        if a.last.respond_to? :id2name then a.last
-        elsif a[ 0 ].respond_to? :upto
-          's' if 1 != a[ 0 ]
+      def pth s
+        if s.respond_to? :to_path
+          s = s.to_path
         end
+        if DIR_SEP___ == s.getbyte( 0 )
+          Brazen_::CLI.expression_agent_class.pretty_path s
+        else
+          s
+        end
+      end
+      DIR_SEP___ = ::File::SEPARATOR.getbyte 0
+
+      def s * x_a
+        _NLP_agent.s( * x_a )
       end
 
       def val x
@@ -102,7 +166,7 @@ module Skylab::TanMan
       end
 
       def _NLP_agent
-        @NLP_agent ||= TanMan_::API.expression_agent_class.NLP_agent.new
+        @NLP_agent ||= TanMan_::API.expression_agent_class.NLP_agent_class.new
       end
     end
 

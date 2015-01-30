@@ -1,5 +1,7 @@
 module Skylab::TanMan
+
   module Sexp_::Auto::Hacks::RecursiveRule
+
     # This hack matches a node that matches the first of a series of patterns:
     # 1) if a rule has an element that itself has the same name as the rule
     # 2) if the rule is named "foo_list" and has a "foo" as an element
@@ -9,56 +11,66 @@ module Skylab::TanMan
 
     extend Sexp_::Auto::Hack::ModuleMethods
 
+    def self.match o
 
-    list_rx = Sexp_::Auto::Hack.list_rx  # ( any name that ends in "_list" )
+      if o.has_members_of_interest
 
-    define_singleton_method :match do |i|
-      if i.has_members_of_interest
-        md = list_rx.match i.rule.to_s
-        if i.members_of_interest.include? i.rule # "foo" rule with "foo" element
+        cls = o.tree_class
+        md = LIST_RX__.match o.rule.to_s
+        if md
+          stem_i = md[ :stem ].intern
+        end
+        moi = o.members_of_interest
+
+        if moi.include? o.rule  # "foo" rule with "foo" element
+
           Sexp_::Auto::Hack.new do
-            enhance i, (md ? md[:stem] : i.rule), :content, i.rule
+            _enhance cls,
+              ( md ? stem_i : o.rule ),  # stem
+              :content,  # item
+              o.rule  # tail
           end
-        elsif md # "foo_list" rule with "foo" elem
-          if i.members_of_interest.include? md[:stem].intern
+
+
+        elsif md  # "foo_list" rule with "foo" elem
+
+          if moi.include? stem_i
+
             Sexp_::Auto::Hack.new do
-              enhance i, md[:stem], md[:stem], :tail, i.rule
+              _enhance cls,
+                stem_i,  # stem
+                stem_i,  # item
+                :tail,  # tail
+                o.rule  # list
             end
           end
         end
       end
     end
 
+    LIST_RX__ = Sexp_::Auto::Hack.list_rx  # any name that ends in "_list"
 
-    methods = [ :_append!, :_insert_item_before_item, :_items, :_remove_item ]
+    METHOD_I_A__ = [ :_append!, :_insert_item_before_item, :_items, :_remove_item ]
 
-    methods.push :_named_prototypes # this is *so* sketchy here #experimental
+    METHOD_I_A__.push :_named_prototypes # this is *so* sketchy here #experimental
                                   # but still we want in the check below
                                   # to make sure we aren't overriding the
                                   # good methods
 
-    define_singleton_method :enhance do |i, stem, item, tail, list=nil|
+    def self._enhance tree_class, stem, item, tail, list=nil
+
                                   # *NOTE* the above 3 parameters `item`,
                                   # `tail`, `list` are *all* symbols that
                                   # represent struct member names (rule names)
                                   # from the grammar!
 
       # #experimental'y functional - everything is here
-      tree_class = i.tree_class
 
-      (methods & tree_class.instance_methods).empty? or fail 'sanity'
+      ( METHOD_I_A__ & tree_class.instance_methods ).length.nonzero? and fail 'sanity'
+
                                                # be sure we're not overwriting
-
-      item = item.intern          # normalize every actual param
-      list = list.intern if list
-      stem = stem.intern
-      tail = tail.intern
-
-
-
       tree_class._hacks.push :RecursiveRule    # #debugging-feature-only
-      tree_class.send :include,
-                          Sexp_::Auto::Hacks::RecursiveRule::SexpInstanceMethods
+      tree_class.include Sexp_::Auto::Hacks::RecursiveRule::SexpInstanceMethods
 
       match_p = -> search_item do              # a function to make matcher
         if ::String === search_item            # functions for matching nodes
@@ -68,15 +80,26 @@ module Skylab::TanMan
         end
       end
 
-      next_node = if list then                # determining what is the next
-        -> node do                            # node after a node is different
-          o = node[ tail ]                    # based on whether or not there
-          o && o[ list ]                      # is a tail getter
+      # determining what is the node that follows a node is different
+      # based on whether or not there is a list member
+
+      next_node = if list then
+        -> node do
+          x = node[ tail ]
+          if x
+            if tree_class == x.class
+              # #todo - this is an edge case that happens in nature. not covered
+              x
+            else
+              x[ list ]
+            end
+          end
         end
       else
-        -> node { node[tail] }
+        -> node do
+          node[ tail ]
+        end
       end
-
 
       # -- Item insertion lambdas
 

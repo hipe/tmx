@@ -20,10 +20,6 @@ module Skylab::TanMan::TestSupport
 
     sidesys = TanMan_::Autoloader_.build_require_sidesystem_proc
 
-    API_expect = -> ctx_cls do
-      TanMan_::Callback_.test_support::Expect_Event[ ctx_cls ]
-    end
-
     Bsc__ = sidesys[ :Basic ]
 
     Base_tmpdir__ = memoize[ -> do
@@ -196,6 +192,8 @@ module Skylab::TanMan::TestSupport
 
   module InstanceMethods
 
+    include TanMan_::Callback_.test_support::Expect_Event::Test_Context_Instance_Methods
+
     def debug!
       @do_debug = true
     end
@@ -241,7 +239,7 @@ module Skylab::TanMan::TestSupport
 
     def prepare_to_produce_result
       __resolve_grammar_class
-      __resolve_parse
+      __resolve_parse_session
       true
     end
 
@@ -275,59 +273,32 @@ module Skylab::TanMan::TestSupport
 
     GRANULE_TO_CONST_RX__ = /\A(?<num>\d+(?:-\d+)*)(?:-(?<rest>.+))?\z/
 
-    def __resolve_parse
+    def __resolve_parse_session
 
-      _path = existent_testing_GGD_path
+      _oes_p = -> * i_a, & ev_p do
 
-      @parse = TS_::Parse.new do |parse|
-        parse.generated_grammar_dir_path _path
-        parse.subscribe( & method( :subscribe_to_parse_events ) )
-        parse.set_root_for_relative_paths_for_load TS_.dir_pathname
-        _rel_pn = @grammar_class.dir_pathname.relative_path_from TS_.dir_pathname
-        parse.add_grammar_path _rel_pn.join( ALWAYS_G1__ ).to_path
-      end
-    end
-    ALWAYS_G1__ = 'g1.treetop'.freeze
-
-    def subscribe_to_parse_events o
-      o.delegate_to debugging_event_receiver
-      o.subscribe_to_parser_loading_error_event
-      o.subscribe_to_parser_error_event
-      if do_debug
-        o.subscribe_to_parser_loading_info_event
-      else
-        o.on_parser_loading_info_event do |ev|
-          # because #open [#ttt-004]
-        end
-      end ; nil
-    end
-
-    def debugging_event_receiver
-      Debugging_event_receiver__[]
-    end
-
-    Debugging_event_receiver__ = Callback_.memoize do
-      Debugging_Event_Receiver__.new Some_debug_IO[], TS_::EXPRESSION_AGENT
-    end
-
-    class Debugging_Event_Receiver__
-      def initialize *a
-        @io, @expression_agent = a
-      end
-      def receive_event ev
-        y = ::Enumerator::Yielder.new do |s|
-          @io.puts "(dbg: #{ s })"
-        end
-        if ::String === ev
-          y << "(WAS STRING: #{ ev })"
-        else
-          ev.render_all_lines_into_under y, @expression_agent
-          if ev.has_tag :ok
-            ev.ok
+        if :info == i_a.first && :using == i_a[ 1 ]  # always ignore these, too noisy
+          if do_debug
+            ev = ev_p[]
+            debug_IO.puts "(ignoring #{ i_a.inspect } event: #{ black_and_white( ev ).inspect })" ; nil
           end
+        else
+          ev = ev_p[]
+          event_receiver_for_expect_event.receive_ev ev
+          ev.ok
         end
       end
+
+      @parse = TS_::Parse.new _oes_p do | o |
+        o.generated_grammar_dir_path existent_testing_GGD_path
+        o.root_for_relative_paths_for_load TS_.dir_pathname.to_path
+        o.grammar_path @grammar_class.dir_pathname.relative_path_from( TS_.dir_pathname ).join( ALWAYS_G1__ ).to_path
+      end
+
+      nil
     end
+
+    ALWAYS_G1__ = 'g1.treetop'.freeze
 
     def existent_testing_GGD_path
       path = Memoized_GGD_path__[]

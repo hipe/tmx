@@ -113,7 +113,7 @@ module Skylab::CodeMolester
                   y.clear
                 end while false
                 pair  # just for fun we result in the pair but ..
-              end.immutable_with_random_access_keyed_to_method :name_i,
+              end.flush_to_immutable_with_random_access_keyed_to_method :name_i,
                 :each_pair_mapper, -> pair do
                   [ pair.name_i, pair.value_x.value_x ]  # .. then we have 2 pairs
                 end

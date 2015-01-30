@@ -55,7 +55,7 @@ module Skylab::Callback
         end
 
         def resolve_members
-          @member_i_a = [ * @base_class.const_get( CONST_ ).send( :a ), * @i_a ]
+          @member_i_a = [ * @base_class.const_get( CONST_ ).a_, * @i_a ]
           nil
         end
 
@@ -65,9 +65,9 @@ module Skylab::Callback
           @class.send :define_method, :__functional_proxy_property_box__ do
             _BOX
           end
-          @box.send( :a ).each do |i|
-            @class.send :define_method, i do | * a, & p |
-              @__proxy_kernel__.method_proc( i )[ * a, & p ]
+          @box.a_.each do | sym |
+            @class.send :define_method, sym do | * a, & p |
+              @__proxy_kernel__.method_proc( sym )[ * a, & p ]
             end
           end
           nil
@@ -109,7 +109,7 @@ module Skylab::Callback
       private
 
         def begin_process
-          @missing_h = ::Hash[ @box.send( :a ).map { |i| [ i, nil ] } ] ; nil
+          @missing_h = ::Hash[ @box.a_.map { |i| [ i, nil ] } ] ; nil
         end
 
         def resolve_pairs_scan_via_iambic x_a

@@ -202,18 +202,19 @@ module Skylab::Brazen
           @entity and __via_entity_send_one
         end
 
-        def produce_one_entity
+        def produce_one_entity & oes_p
+          oes_p ||= handle_event_selectively
           @datastore_controller = datastore.datastore_controller
-          @datastore_controller && __via_dsc_for_one_produce_entity
+          @datastore_controller && __via_dsc_for_one_produce_entity( & oes_p )
         end
 
-        def __via_dsc_for_one_produce_entity
+        def __via_dsc_for_one_produce_entity & oes_p
           @__entity_stream = @datastore_controller.entity_stream_via_model(
-            model_class, & handle_event_selectively )
-          __via_entity_stream_and_dsc_for_one_produce_entity
+            model_class, & oes_p )
+          __via_entity_stream_and_dsc_for_one_produce_entity( & oes_p )
         end
 
-        def __via_entity_stream_and_dsc_for_one_produce_entity
+        def __via_entity_stream_and_dsc_for_one_produce_entity & oes_p
           one = @__entity_stream.gets
           if one
             x = @__entity_stream.gets
@@ -230,17 +231,17 @@ module Skylab::Brazen
           @__entity_stream = nil
           if one
             if had_many
-              __via_dsc_for_one_produce_entity_when_had_many_via_last one
+              __via_dsc_for_one_produce_entity_when_had_many_via_last one, & oes_p
             else
               one
             end
           else
-            __for_one_resolve_entity_when_had_none
+            __for_one_resolve_entity_when_had_none( & oes_p )
           end
         end
 
-        def __via_dsc_for_one_produce_entity_when_had_many_via_last one
-          maybe_send_event :info, :single_entity_resolved_with_ambiguity do
+        def __via_dsc_for_one_produce_entity_when_had_many_via_last one, & oes_p
+          oes_p.call :info, :single_entity_resolved_with_ambiguity do
             bld_single_entity_resolved_with_ambiguity
           end
           one
@@ -259,8 +260,8 @@ module Skylab::Brazen
           end
         end
 
-        def __for_one_resolve_entity_when_had_none
-          maybe_send_event :error, :entity_not_found do
+        def __for_one_resolve_entity_when_had_none & oes_p
+          oes_p.call :error, :entity_not_found do
             bld_entity_not_found_event
           end
           UNABLE_

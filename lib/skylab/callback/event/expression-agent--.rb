@@ -2,7 +2,7 @@ module Skylab::Callback
 
     class Event
 
-      EXPRESSION_AGENT__ = ( class Expression_Agent__ < ::Object
+      EXPRESSION_AGENT__ = ( class Expression_Agent__ < ::Object  # :[#010].
 
         # used for 'description' of events (typically for development & tests)
 

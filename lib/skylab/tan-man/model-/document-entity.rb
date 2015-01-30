@@ -4,6 +4,306 @@ module Skylab::TanMan
 
     class Document_Entity < self
 
+      class << self
+
+        def IO_properties
+          IO_PROPERTIES__.array
+        end
+
+        def input_properties  # an array
+          INPUT_PROPERTIES___.array
+        end
+
+        def action_class
+          Action___
+        end
+      end  # >>
+
+      Action___ = ::Class.new Action_  # before below
+
+      # every document entity action (by default) must resolve at least an
+      # input means (add, ls, rm). those that mutate must also resolve one
+      # output means (add, rm). back clients don't have a concept of "PWD"
+      # but the front client may re-write the `workspace_path` property to
+      # default to an arbitrary path that it provides at run-time (for e.g
+      # its own `pwd`). however this effort is wasted if the input and any
+      # output means are expressed explicitly for eg path, string or stream
+
+      IO_PROPERTIES__ = make_common_properties do | sess |
+
+        sess.edit_entity_class do
+
+          entity_property_class_for_write  # (was until #wishlist [#br-084] a flag meta meta property)
+          class self::Entity_Property
+
+            attr_reader(
+              :can_be_for_document_input,
+              :can_be_for_document_output,
+              :is_document_direction_specific,
+              :is_document_input_specific,
+              :is_document_output_specific,
+              :is_document_IO_essential,
+              :is_for_document_IO
+            )
+
+          private
+
+            def document_IO_essential=
+              @is_document_IO_essential = true
+              KEEP_PARSING_
+            end
+
+            def for_document_input_only=
+              @can_be_for_document_input = true
+              @is_document_direction_specific = true
+              @is_for_document_IO = true
+              @is_document_input_specific = true
+              KEEP_PARSING_
+            end
+
+            def for_document_IO=
+              @can_be_for_document_input = true
+              @can_be_for_document_output = true
+              @is_for_document_IO = true
+              KEEP_PARSING_
+            end
+
+            def for_document_output_only=
+              @can_be_for_document_output = true
+              @is_document_direction_specific = true
+              @is_for_document_IO = true
+              @is_document_output_specific = true
+              KEEP_PARSING_
+            end
+          end
+
+          otr = Brazen_::Models_::Workspace.common_properties
+
+          o :for_document_input_only, :property, :input_string,
+            :for_document_input_only, :property, :input_path,
+
+            :for_document_output_only, :property, :output_string,
+            :for_document_output_only, :property, :output_path,
+
+            :for_document_IO,
+              :default_proc, otr[ :config_filename ].default_proc,
+              :property, :config_filename,
+
+            :for_document_IO,
+              :non_negative_integer,
+              :default, 1,
+              :description, otr[ :max_num_dirs ].description_proc,
+              :property, :max_num_dirs,
+
+            :for_document_IO,
+              :document_IO_essential,
+              :property, :workspace_path  # at end
+
+          # during the input and output resolution, if there is more than one
+          # relevant argument it's a (perhaps resolvable) ambiguity. if among
+          # these arguments one is a workspace-related argument it is trumped
+          # by any and all non-workspace-related arguments with the following
+          # rationale: a workspace-related argument (unlike an argument under
+          # opposing classifications) is potentially dual-purpose, expressing
+          # a means of both input and output. hence arguments of the opposing
+          # classifications may be interpreted to be more specific. [#it-006]
+          # this is an example of the principle that specificity may be a
+          # reasonable characteristic to help resolve ambiguity disputes.
+
+        end
+      end
+
+      KEEP_PARSING_ = true
+
+      INPUT_PROPERTIES___ = common_properties_class.new( nil ).set_properties_proc do
+
+        IO_PROPERTIES__.to_stream.reduce_by( & :can_be_for_document_input ).
+
+          flush_to_mutable_box_like_proxy_keyed_to_method( :name_symbol )
+      end
+
+      class Partition_IO_Args
+
+        def initialize pair_st, properties=nil, & oes_p
+          @pair_st = pair_st
+          @on_event_selectively = oes_p
+          if properties
+            @formals_were_provided = true
+            @properties = properties
+          else
+            @formals_were_provided = false
+            @properties = IO_PROPERTIES__.box
+          end
+        end
+
+        def partition_and_sort
+          __determine_what_we_are_normalizing_for
+
+          input_specific_a = nil
+          input_non_specific_a = nil
+          output_specific_a = nil
+          output_non_specific_a = nil
+
+          _Trio = TanMan_.lib_.basic.trio
+          st = @pair_st
+          while pair = st.gets
+            prp = @properties[ pair.name_symbol ]
+            prp or next
+            prp.respond_to? :is_for_document_IO or next
+            pair.value_x or next
+            trio = _Trio.new pair.value_x, true, prp
+            if prp.is_document_direction_specific
+              if prp.is_document_input_specific
+                ( input_specific_a ||= [] ).push trio
+              else
+                ( output_specific_a ||= [] ).push trio
+              end
+            else
+              if prp.can_be_for_document_input
+                ( input_non_specific_a ||= [] ).push trio
+              end
+              if prp.can_be_for_document_output
+                ( output_non_specific_a ||= [] ).push trio
+              end
+            end
+          end
+
+          @result_array_pair = []
+
+          _ok = _money( input_specific_a, input_non_specific_a, @normalize_for_input, 0 ) and
+            _money( output_specific_a, output_non_specific_a, @normalize_for_output, 1 )
+
+          _ok and @result_array_pair
+        end
+
+        def __determine_what_we_are_normalizing_for
+          if @formals_were_provided
+            __determine_normalization_directions_set
+          else
+            @normalize_for_input = false
+            @normalize_for_output = false
+          end
+        end
+
+        def __determine_normalization_directions_set
+
+          # whether (variously) any output or input *specific* formals are
+          # expressed in the box determines whether we are normalizing for
+          # a one-ness of that particular category against the arguments.
+
+          seen = []
+          saw_input = saw_output = false
+          p_a = [  # diminishing pool
+            -> prp do
+              prp.is_document_input_specific and saw_input = true
+            end,
+            -> prp do
+              prp.is_document_output_specific and saw_output = true
+            end ]
+
+          @properties.each do | prp |
+            prp.respond_to? :is_for_document_IO or next
+            p_a.each_with_index do | p, idx |
+              p[ prp ] and seen.push idx
+            end
+            seen.length.zero? and next
+            seen.each do | d |
+              p_a[ d ] = nil
+            end
+            p_a.compact!
+            if p_a.length.zero?
+              break
+            end
+            seen.clear
+          end
+          @normalize_for_input = saw_input
+          @normalize_for_output = saw_output
+          nil
+        end
+
+        def _money spec_a, non_spec_a, do_normalize, idx
+
+          if non_spec_a
+            essential_a, non_essential_a = non_spec_a.partition do | arg |
+              arg.property.is_document_IO_essential
+            end
+          end
+
+          if spec_a  # assume nonzero length
+            winners_a = spec_a
+          elsif essential_a && essential_a.length.nonzero?
+            winners_a = essential_a
+          end
+
+          if winners_a
+
+            if 1 < winners_a.length  # more than one essential argument
+              # of the same ranking is an unresolvable ambiguity always
+
+              _non_one winners_a, idx
+
+            else  # every non-nil input or output value provided is put
+              # into the result array sorted by significance descending
+
+              @result_array_pair[ idx ] = [ * spec_a, * essential_a, * non_essential_a ]
+              ACHIEVED_
+            end
+          elsif do_normalize  # because this was in the provided formal
+            # array and none was resolved, it's an error
+            _non_one EMPTY_A_, idx
+          else
+            @result_array_pair[ idx ] = EMPTY_A_
+            ACHIEVED_
+          end
+        end
+
+        def _non_one arg_a, d
+          @on_event_selectively.call :error, :non_one_IO do
+            _build_non_one_IO_event DIRECTIONS__[ d ], arg_a
+          end
+          UNABLE_
+        end
+
+        DIRECTIONS__ = [ :input, :output ]
+
+        def _build_non_one_IO_event direction_sym, arg_a
+
+          Callback_::Event.inline_not_OK_with :non_one_IO,
+              :direction_i, direction_sym,
+              :arg_a, arg_a,
+              :properties, @properties do | y, o |
+
+            if o.arg_a.length.zero?
+
+              meth_sym = {
+                input: :can_be_for_document_input,
+                output: :can_be_for_document_output
+              }.fetch o.direction_i
+
+              _s_a = o.properties.reduce_by do | prp |
+
+                prp.respond_to?( meth_sym ) &&
+                  prp.send( meth_sym ) &&  # :+[#br-046]
+                  ( prp.is_document_IO_essential || prp.is_document_direction_specific )
+
+              end.map_by do | prp |
+                par prp
+              end.to_a
+
+              _xtra = " (provide #{ or_ _s_a })"
+            else
+              _s_a = arg_a.map do |arg|
+                par arg.property
+              end
+              _xtra = " (#{ _s_a * ', ' })"
+            end
+
+            y << "need exactly 1 #{ o.direction_i }-related argument, #{
+             }had #{ o.arg_a.length }#{ _xtra }"
+          end
+        end
+      end
+
       class Silo < Brazen_.model.silo_class
 
         def collection_controller_via_document_controller dc, & oes_p
@@ -31,13 +331,15 @@ module Skylab::TanMan
         end
       end
 
-      Silo_Controller = ::Class.new Brazen_.model.silo_controller_class
-
       class Collection_Controller < Brazen_.model.collection_controller_class
+
+        def unparse_into y
+          datastore_controller.unparse_into y
+        end
 
       private
 
-        def flush_maybe_changed_document_to_output_adapter did_mutate
+        def flush_maybe_changed_document_to_output_adapter__ did_mutate
           if did_mutate
             flush_changed_document_to_ouptut_adapter
           else
@@ -54,299 +356,56 @@ module Skylab::TanMan
         end
 
         def flush_changed_document_to_ouptut_adapter
+
+          args = @action.output_arguments
+
+          if 1 == args.length && :output_path == args.first.name_symbol && DASH___ == args.first.value_x
+            args = [ args.first.class.new( @action.stdout, :output_stream ) ]
+          end
+
           datastore_controller.persist_via_args(
-            @action.any_argument_value( :dry_run, ), * @action.output_arguments )
+            @action.argument_box[ :dry_run ], * args )
         end
 
-      public def unparse_entire_document
-          datastore_controller.unparse_entire_document
-        end
+        DASH___ = '-'.freeze
 
         def datastore_controller
           @preconditions.fetch :dot_file  # yes
         end
       end
 
-      class << self
-
-        def IO_properties
-          IO_properties__[].each_value
-        end
-
-        def IO_properties_shell
-          IO_properties__[]
-        end
-
-        def input_properties  # an array
-          Input_properties__[]
-        end
-
-        def action_class
-          Action__
-        end
-      end
-
-      class Action__ < Action_
+      class Action___  # re-open
 
         def input_arguments
           @input_argument_a
         end
 
-        def output_arguments
-          @output_argument_a
-        end
+        attr_reader :output_arguments  # not guaranteed to exist for some actions
 
       private
 
-        def resolve_document_IO_or_produce_bound_call_
+        def normalize
 
-          sess = _new_IO_arg_partition_session
+          # first call ordinary normalize to let any user-provided defaulting
+          # logic play out. then with the result arguments, resolve from them
+          # one input and (as appropriate) one output means.
 
-          @input_argument_a, @output_argument_a = sess.to_input_and_output_args
-
-          _bc = sess.bound_call_unless_exactly_one_means @input_argument_a, :input
-          _bc or sess.bound_call_unless_exactly_one_means @output_argument_a, :output
+          super && __document_entity_normalize
         end
 
-        def resolve_document_upstream_or_produce_bound_call_
+        def __document_entity_normalize
 
-          sess = _new_IO_arg_partition_session
+          in_a, out_a = Partition_IO_Args.new(
+            @argument_box.to_pair_stream,
+            @formal_properties,
+            & handle_event_selectively ).partition_and_sort
 
-          @input_argument_a = sess.to_input_args
-
-          sess.bound_call_unless_exactly_one_means @input_argument_a, :input
-        end
-
-        def _new_IO_arg_partition_session
-          IO_Argument_Partition_Session.new(
-            method( :to_actual_argument_stream ),
-            self.class.properties,
-            & handle_event_selectively )
-        end
-      end
-
-      class IO_Argument_Partition_Session
-
-        def initialize to_arg_stream, prp, & oes_p
-          @on_event_selectively = oes_p
-          @properties = prp
-          @to_actual_arg_stream = to_arg_stream
-        end
-
-        def to_one_input_and_many_output_args
-          in_a, out_a = to_input_and_output_args
-          _ok = _one in_a, :input
-          _ok and begin
-            [ in_a.fetch( 0 ), out_a ]
+          in_a and begin
+            @input_argument_a = in_a
+            @output_arguments = out_a
+            ACHIEVED_
           end
         end
-
-        def _one a, sym
-          case 1 <=> a.length
-          when -1
-            _maybe_send_non_one_event a, sym  # or pick one ..
-          when  0
-            a.fetch 0
-          when  1
-            _maybe_send_non_one_event a, sym
-          end
-        end
-
-        def to_input_and_output_args
-
-          in_a = []
-          out_a = []
-
-          st = _to_IO_related_twosome_stream
-          o = st.gets
-          while o
-
-            if o.property.can_be_used_for_input
-              in_a.push o.pair
-            end
-
-            if o.property.can_be_used_for_output
-              out_a.push o.pair
-            end
-
-            o = st.gets
-          end
-
-          [ in_a, out_a ]
-        end
-
-        def to_input_args
-          _to_IO_related_twosome_stream.map_reduce_by do | o |
-
-            if o.property.can_be_used_for_input
-              o.pair
-            end
-          end.to_a
-        end
-
-        def _to_IO_related_twosome_stream
-
-          props = @properties
-
-          @to_actual_arg_stream[].map_reduce_by do | pair |
-
-            if pair.value_x  # intentionally set nils are meaningless here
-
-              prp = props[ pair.name_symbol ]  # the formals may be some
-                # arbitrary other set, like e.g they are the topic formals
-
-              if prp and prp.respond_to? :can_be_used_for_input  # not all props relate
-
-                if :config_filename != prp.name_symbol  # not relevant to counts
-
-                  Twosome___[ pair, prp ]
-                end
-              end
-            end
-          end
-        end
-
-        Twosome___ = ::Struct.new :pair, :property
-
-        def bound_call_unless_exactly_one_means arg_a, direction_i
-          case 1 <=> arg_a.length
-          when  1
-            __bc_when_non_1_doc_IO arg_a, direction_i
-          when -1
-            self._DO_ME  # do we play favorites or fail with ambiguity?
-          end
-        end
-
-        def __bc_when_non_1_doc_IO arg_a, direction_i
-          Brazen_.bound_call.via_value _maybe_send_non_one_event( arg_a, direction_i )
-        end
-
-        def _maybe_send_non_one_event arg_a, direction_i
-
-          @on_event_selectively.call :error, :non_one_IO do
-            __build_non_one_IO_event direction_i, arg_a
-          end
-        end
-
-        def __build_non_one_IO_event direction_i, arg_a
-
-          _PROPS = @properties
-
-          Callback_::Event.inline_not_OK_with :non_one_IO,
-              :direction_i, direction_i, :arg_a, arg_a do |y, o|
-
-            if o.arg_a.length.zero?
-
-              meth_sym = {
-                input: :can_be_used_for_input,
-                output: :can_be_used_for_output
-              }.fetch o.direction_i
-
-              _prop_a = _PROPS.reduce_by do |arg|
-
-                prp = _PROPS.fetch arg.name_symbol
-
-                prp.respond_to?( meth_sym ) and  # :+[#br-046]
-                   prp.send( meth_sym ) and
-                     :config_filename != prp.name_symbol
-
-              end
-
-              _s_a = _prop_a.map do |x|
-                par x
-              end
-
-              _xtra = " (provide #{ or_ _s_a })"
-
-            else
-              _s_a = arg_a.map do |arg|
-                par _PROPS.fetch arg.name_symbol
-              end
-              _xtra = " (#{ _s_a * ', ' })"
-            end
-
-            y << "need exactly 1 #{ o.direction_i }-related argument, #{
-             }had #{ o.arg_a.length }#{ _xtra }"
-          end
-        end
-      end
-
-      IO_properties__ = Callback_.memoize do
-
-        # every (relevant) document entity action does at least one of the
-        # following: 1) operate on an input graph 2) produce an output graph.
-        #
-        # the below table expresses the traits along these lines for a
-        # typical document entity action:
-        #
-        #     create   [ maybe one input ]   definitely one output
-        #     list     definitely one input
-        #     delete   definitely one input  definitely one output
-        #
-        # as the above table suggests, operations that mutate the graph
-        # need one output. every operation can potentially start with an
-        # existing graph. in fact all operations necessarily start with
-        # an existing graph except (perhaps) the create operation.
-        #
-        # as such, the typical action of the document entity needs to resolve
-        # maybe one input plan, maybe one output plan, and at least one of
-        # these if not both. inputs and outputs alike can be expressed
-        # variously as a string (buffer), a path, or as properties in the
-        # workspace.
-        #
-        # the properties for string and path are straightforward: there
-        # exist four specific properties for the the four permutations
-        # (`input_string`, `output_path` and the other two.)
-        #
-        # however, if a workspace is expressed in the argument list,
-        # this *can* be used to express both input and output graph.
-        #
-        # we attempt to resolve (as necessary per the operation) exactly
-        # one input means and exactly one output means.
-
-        module IO_Proprietor____
-
-          TanMan_::Entity_.call self do
-
-            entity_property_class_for_write  # until #wishlist [#br-084] a flag meta meta property
-            class Entity_Property
-
-              attr_reader :can_be_used_for_input,
-                :can_be_used_for_output
-
-            private
-
-              def can_be_used_for_input=
-                @can_be_used_for_input = true
-              end
-
-              def can_be_used_for_output=
-                @can_be_used_for_output = true
-              end
-            end
-
-            o :can_be_used_for_input, :property, :input_string,
-            :can_be_used_for_input, :property, :input_path,
-
-            :can_be_used_for_output, :property, :output_string,
-            :can_be_used_for_output, :property, :output_path,
-
-            :can_be_used_for_input,
-            :can_be_used_for_output, :property, :workspace_path,
-
-            :can_be_used_for_input,
-            :can_be_used_for_output, :property, :config_filename
-
-          end
-
-          self
-        end.properties
-      end
-
-      Input_properties__ = Callback_.memoize do
-
-        IO_properties__[].to_stream.reduce_by( & :can_be_used_for_input ).to_a.freeze
-
       end
     end
   end

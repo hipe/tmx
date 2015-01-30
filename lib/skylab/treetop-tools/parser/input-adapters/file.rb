@@ -48,10 +48,11 @@ module Skylab::TreetopTools
 
       io = TreetopTools_::Lib_::System[].filesystem.normalization.upstream_IO(
         :path, @pathname.to_path,
-        :on_event, -> ev do
-          receive_event ev  # :+#hook-out
-          UNABLE_
+
+        :on_event_selectively, -> * i_a, & ev_p do
+          @block[ * i_a, & ev_p ]
         end )
+
       io and begin
         @upstream = io
         @state = :open

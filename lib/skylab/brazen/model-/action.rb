@@ -7,9 +7,14 @@ module Skylab::Brazen
     class << self
     private
 
+      # ~ mutators that define the action:
+
       def edit_entity_class * x_a, & edit_p  # if you are here the class is not yet initted
-        model_class.superclass.const_get( :Entity, false ).
-          call_via_client_class_and_iambic self, x_a, & edit_p
+        entity_module.call_via_client_class_and_iambic self, x_a, & edit_p
+      end
+
+      def entity_module
+        model_class.superclass.const_get :Entity, false
       end
 
       def after sym  # experimental alternative to the iambic DSL
@@ -17,6 +22,24 @@ module Skylab::Brazen
       end
 
     public
+
+      # ~ exposures of adjunct & experimental algorithms
+
+      def process_some_customized_inflection_behavior upstream
+        Process_customized_action_inflection_behavior__.new( upstream, self ).execute
+      end
+
+      def edit_and_call boundish, oes_p, & edit_p
+        new( boundish, & oes_p ).__edit_and_call( & edit_p )
+      end
+
+      # ~ reflection-like exposures for model API
+
+      attr_accessor :after_name_symbol, :description_block,
+        :is_promoted, :precondition_controller_i_a
+
+      def custom_action_inflection
+      end
 
       def is_actionable
         true
@@ -26,21 +49,12 @@ module Skylab::Brazen
         false  # for now, every action node is always a terminal (leaf) node
       end
 
-      attr_accessor :after_name_symbol, :description_block,
-        :is_promoted, :precondition_controller_i_a
-
-      def process_some_customized_inflection_behavior upstream
-        Process_customized_action_inflection_behavior__.new( upstream, self ).execute
-      end
-
       def preconditions
-        @did_resolve_pcia ||= resolve_precondition_controller_identifer_a
+        @__did_resolve_pcia ||= __resolve_precondition_controller_identifer_a
         @preconditions
       end
 
-      attr_reader :did_resolve_pcia
-
-      def resolve_precondition_controller_identifer_a
+      def __resolve_precondition_controller_identifer_a
         @preconditions = if precondition_controller_i_a
           @precondition_controller_i_a.map do |i|
             Node_Identifier_.via_symbol i
@@ -58,9 +72,6 @@ module Skylab::Brazen
 
       def model_class
         name_function.parent
-      end
-
-      def custom_action_inflection
       end
 
       def name_function_class
@@ -97,6 +108,7 @@ module Skylab::Brazen
       oes_p or raise ::ArgumentError
 
       @formal_properties = nil
+      @preconditions = nil
       @kernel = boundish.to_kernel
 
       accept_selective_listener_via_channel_proc( -> i_a, & ev_p do  # #note-100
@@ -122,6 +134,43 @@ module Skylab::Brazen
         Brazen_.bound_call.via_value ok
       end
     end
+
+    # ~ experiment: is it worth it hacking external API actions for internal calls? [tm]
+
+    def __edit_and_call & edit_p  # in the spirit of `<model class>.edit`
+
+      @argument_box = Callback_::Box.new
+      edit_p[ es = Edit_Session__.new ]
+      mf, @preconditions = es.to_a  # nil ok on both.
+
+      if mf
+        formal_properties
+        @formal_properties = @formal_properties.to_mutable_box_like_proxy  # might be same object
+        mf[ @formal_properties ]
+      end
+
+      bc = via_arguments_produce_bound_call
+      bc and begin
+        bc.receiver.send bc.method_name, * bc.args
+      end
+    end
+
+    class Edit_Session__
+      def initialize
+        @fo = @pcns = nil
+      end
+      def preconditions x
+        @pcns = x
+      end
+      def mutate_formal_properties & p
+        @fo = p ; nil
+      end
+      def to_a
+        [ @fo, @pcns ]
+      end
+    end
+
+    # (end experiment)
 
     def iambic_writer_method_name_passive_lookup_proc  # #hook-in to [cb]
 
@@ -160,49 +209,49 @@ module Skylab::Brazen
 
       # expose the moment between `process_iambic_stream_fully` and `normalize`
 
-      bc = __bound_call_from_normalize
-      bc ||= __bound_call_from_preconditions
-      bc or Brazen_.bound_call nil, self, :produce_result
-    end
-
-    def __bound_call_from_normalize  # [#hl-116] method naming conventions are followed
       ok = normalize
-      if ! ok
+      ok &&= __resolve_preconditions
+      if ok
+        Brazen_.bound_call nil, self, :produce_result
+      else
         Brazen_.bound_call.via_value ok
       end
     end
 
-    def __bound_call_from_preconditions
+    def __resolve_preconditions
 
       # the [#048] preconditions "pipeline" starts here, from the action.
 
-      a = self.class.preconditions
+      a = _formal_preconditions
+
       if a && a.length.nonzero?
-        __bound_call_via_preconditions a
+        __resolve_preconditions_via_formal_preconditions a
+      else
+        ACHIEVED_
       end
     end
 
-    def __bound_call_via_preconditions a
+    def __resolve_preconditions_via_formal_preconditions a
 
       oes_p = handle_event_selectively
 
-      _g = Model_::Preconditions_::Graph.new self, @kernel, & oes_p
+      g = Model_::Preconditions_::Graph.new self, @kernel, & oes_p
 
-      _id = model_class.node_identifier
+      if @preconditions
+        g.receive_starting_actual_preconditions @preconditions
+      end
 
       bx = Model_::Preconditions_.establish_box_with(
-        :self_identifier, _id,
+        :self_identifier, model_class.node_identifier,
         :identifier_a, a,
         :on_self_reliance, method( :self_as_precondition ),
-        :graph, _g,
+        :graph, g,
         :level_i, :Action_preconditioN,
         & oes_p )
 
-      if bx
+      bx and begin
         @preconditions = bx
-        CONTINUE_
-      else
-        Brazen_.bound_call.via_value bx
+        ACHIEVED_
       end
     end
 
@@ -210,51 +259,58 @@ module Skylab::Brazen
       g.touch :collection_controller_prcn, id, silo
     end
 
-    def to_actual_argument_stream  # used by [tm]
-      Callback_.stream.via_nonsparse_array( formal_properties.get_names ).map_by do |i|
-        Actual_Property_.new any_argument_value( i ), i
-      end
-    end
+  public
 
     # ~ accessors for arguments & related experimentals
 
-    def to_bound_argument_box
+    def to_full_trio_box
       bx = Callback_::Box.new
+      _Trio = LIB_.basic.trio
+      h = @argument_box.h_
       st = formal_properties.to_stream
       prp = st.gets
       while prp
-        bx.set prp.name_i, get_bound_property_via_property( prp )
+        sym = prp.name_symbol
+        had = true
+        x = h.fetch sym do
+          had = false
+          nil
+        end
+        bx.add sym, _Trio.new( x, had, prp )
         prp = st.gets
       end
       bx
     end
 
-    def to_bound_argument_box_except * i_a
-      bld_bound_argument_box_via_name_symbols get_formal_property_name_symbols - i_a
-    end
-
-    def bld_bound_argument_box_via_name_symbols i_a
-      bx = Callback_::Box.new
-      i_a.each do | sym |
-        bx.set( sym, get_bound_property_via_property( self.class.property_via_symbol sym ) )
+    def to_trio_box
+      _Trio = LIB_.basic.trio
+      fo = formal_properties
+      a = @argument_box.a_ ; h = @argument_box.h_
+      h_ = {}
+      d = -1 ; last = a.length - 1
+      while d < last
+        d += 1
+        k = a.fetch d
+        h_[ k ] = _Trio.new h.fetch( k ), true, fo.fetch( k )
       end
-      bx
+      Callback_::Box.allocate.init a.dup, h_
     end
 
-  public
-
-    def get_bound_argument i
-      get_bound_property_via_property formal_properties.fetch i
-    end
-
-    def any_argument_value_at_all i
-      if formal_properties.has_name i
-        any_argument_value i
+    def to_trio_box_except__ * i_a  # [cu]
+      _Trio = LIB_.basic.trio
+      fo = formal_properties
+      h = @argument_box.h_
+      a_ = @argument_box.a_ - i_a
+      h_ = {}
+      a_.each do | k |
+        h_[ k ] = _Trio.new h.fetch( k ), true, fo.fetch( k )
       end
+      Callback_::Box.allocate.init a_, h_
     end
 
-    def any_argument_value i
-      @argument_box[ formal_properties.fetch( i ).name_i ]
+    def trio sym  # #hook-near model. may soften if needed.
+      LIB_.basic.trio(
+        @argument_box.fetch( sym ), true, formal_properties.fetch( sym ) )
     end
 
     def argument_value sym
@@ -270,10 +326,7 @@ module Skylab::Brazen
     end
 
     def init_formal_properties_ x
-      cls = model_class
-      if cls.respond_to? :preconditions
-        a = cls.preconditions
-      end
+      a = _formal_preconditions
       if a and a.length.nonzero?
         a.each do | precon_id |
           otr = @kernel.silo_via_identifier( precon_id ).
@@ -282,6 +335,10 @@ module Skylab::Brazen
         end
       end
       @formal_properties = x  # result
+    end
+
+    def _formal_preconditions  # maybe one day there will be mutable preconditions
+      self.class.preconditions
     end
 
   private

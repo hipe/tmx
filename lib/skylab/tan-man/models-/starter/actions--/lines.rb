@@ -6,35 +6,56 @@ module Skylab::TanMan
 
       class Lines < Action_
 
-        Entity_.call self,
+        o = Models_::Workspace.common_properties
 
-            :required, :property, :value_fetcher,
+        edit_entity_class(
 
-            :properties,
-              :use_default,
-              :workspace,
-              :workspace_path,
-              :config_filename
+          :flag, :property, :use_default,
 
-        def produce_any_result
-          if @argument_box[ :use_default ]
-            via_default
-          else
-            via_workspace
+          # reading from the workspace is an option, but the workspace is not a precondition
+
+          :property_object, o[ :max_num_dirs ],
+          :property_object, o[ :config_filename ],
+          :property_object, o[ :workspace_path ].dup.set_is_not_required.freeze )
+
+        def produce_result
+          Session.new @kernel, handle_event_selectively do | o |
+            o.trio_box = to_trio_box
+          end.via_trio_box
+        end
+
+        class << self
+
+          def via__ value_fetcher, starter, k, & oes_p
+            Session.new k, oes_p do | o |
+              o.starter = starter
+              o.value_fetcher = value_fetcher
+            end.via_starter
           end
         end
 
-        def via_workspace
+        # we cleaved an API action into an internal API
 
-          bx = @argument_box
+      class Session
 
-          @starter = @kernel.call :starter, :get,
-            :workspace, bx[ :workspace ],
-            :workspace_path, bx[ :workspace_path ],
-            :config_filename, bx[ :config_filename ],
-            & @on_event_selectively
+        Callback_::Event.selective_builder_sender_receiver self
 
-          @starter and via_starter
+        def initialize k, oes_p
+          @trio_box = nil
+          @kernel = k
+          @on_event_selectively = oes_p
+          @value_fetcher = nil
+          yield self
+        end
+
+        attr_writer :starter, :trio_box, :value_fetcher
+
+        def via_trio_box
+          if @trio_box[ :use_default ] && @trio_box[ :use_default ].value_x
+            via_default
+          else
+            via_workspace_related_arguments
+          end
         end
 
         def via_default
@@ -61,7 +82,7 @@ module Skylab::TanMan
         end
 
         def maybe_send_using_default strtr, d
-          maybe_send_event :info, :using_default do
+          @on_event_selectively.call :info, :using_default do
             bld_using_default_event strtr, d
           end
         end
@@ -77,26 +98,42 @@ module Skylab::TanMan
           end
         end
 
+        def via_workspace_related_arguments
+
+          @ws = @kernel.silo( :workspace ).workspace_via_trio_box(
+            @trio_box, & handle_event_selectively )
+
+          @ws and via_workspace
+        end
+
+        def via_workspace
+          @starter = @kernel.silo( :starter ).starter_in_workspace( @ws, & @on_event_selectively )
+          @starter and via_starter
+        end
+
         def via_starter
-          @path = @starter.to_path
-          via_path
+          @template = TanMan_.lib_.string_lib.template.via_path @starter.to_path
+
+          if ! @value_fetcher
+            @value_fetcher = Mocking_Fetcher___.new
+          end
+
+          @output_s, @enoent = call_template
+          if @output_s
+            via_output_s
+          else
+            when_enoent
+          end
         end
 
-        def via_path
-          @template = TanMan_.lib_.string_lib.template.via_path @path
-          via_template
-        end
-
-        def via_template
-          @output_s = @template.call @argument_box.fetch( :value_fetcher )
-          via_output_s
+        def call_template
+          @template.call @value_fetcher
         rescue ::Errno::ENOENT => e
-          @enoent = e
-          when_enoent
+          [ false, e ]
         end
 
         def when_enoent
-          maybe_send_event :error, :resource_not_found do
+          @on_event_selectively.call :error, :resource_not_found do
             via_enoent_bld_event
           end
         end
@@ -111,6 +148,17 @@ module Skylab::TanMan
         def via_output_s
           TanMan_.lib_.string_IO.new @output_s
         end
+
+        class Mocking_Fetcher___
+
+          def fetch sym
+
+            "{{ #{ Callback_::Name.via_variegated_symbol( sym ).
+              as_lowercase_with_underscores_symbol.id2name.upcase } }}"
+
+          end
+        end
+      end
       end
     end
   end

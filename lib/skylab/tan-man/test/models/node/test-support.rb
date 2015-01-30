@@ -41,7 +41,7 @@ module Skylab::TanMan::TestSupport::Models::Node
     end
 
     def unparsed
-      collection_controller.unparse_entire_document
+      collection_controller.unparse_into ""
     end
 
     def module_with_subject_fixtures_node

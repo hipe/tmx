@@ -2,284 +2,174 @@ module Skylab::TanMan
 
   module Models_::DotFile
 
-    # #todo this whole node needs a simplification rewrite. make it one actor.
+    Sessions__ = ::Module.new
 
-  module Actors__
+    class Sessions__::Produce_Parse_Tree
 
-    module Produce_document_via_parse
+      class Shell < ::BasicObject
 
-      def self.[] p
-        kernel = Call_Kernel__.new
-        shell = Call_Shell__.new kernel
-        p[ shell ]
-        kernel.result
-      end
-
-      class Call_Shell__ < ::BasicObject
-
-        def initialize kernel
-          @kernel = kernel
+        def initialize bx
+          @bx = bx
         end
 
         def generated_grammar_dir_path path
-          @kernel.set_generated_grammar_dir_path path
+          @bx.add :generated_grammar_dir_path, path
         end
 
-        def via_path path
-          @kernel.set_input_tuple :path, path ; nil
+        def input_path path
+          @bx.add :parse_method, :parse_file
+          @bx.add :parse_argument, path
         end
 
-        def via_input_path path
-          @kernel.set_input_tuple :path, path ; nil
-        end
-
-        def via_input_string s
-          @kernel.set_input_tuple :string, s ; nil
-        end
-
-        def subscribe & p
-          @kernel.subscribe_p_a.push p ; nil
-        end
-      end
-
-      class Call_Kernel__
-
-        def initialize
-          @subscribe_p_a = []
-          @generated_grammar_dir_path = nil
-          @result_has_been_resolved = false
-        end
-
-        attr_reader :subscribe_p_a
-
-        def set_generated_grammar_dir_path x
-          if x
-            @generated_grammar_dir_path = x
-          else
-            raise ::ArgumentError, "invalid `generated_grammar_dir_path`: #{ x.inspect }"
-          end
-        end
-
-        def set_input_tuple i, x
-          @input_i = i ; @input_x = x ; nil
-        end
-
-        def result
-          @result_has_been_resolved or resolve_result
-          @result
-        end
-
-      private
-
-        def resolve_result
-          @result_has_been_resolved = true
-          @parse = Parse__.new do |parse|
-            parse.generated_grammar_dir_path @generated_grammar_dir_path
-            @subscribe_p_a.each do |p|
-              parse.subscribe( & p )
-            end
-          end
-          send :"resolve_result_via_input_#{ @input_i }"
-          nil
-        end
-
-        def resolve_result_via_input_path
-          @result = @parse.parse_file ::Pathname.new @input_x ; nil
-        end
-
-        def resolve_result_via_input_pathname
-          @result = @parse.parse_file @input_x ; nil
-        end
-
-        def resolve_result_via_input_string
-          @result = @parse.parse_string @input_x ; nil
+        def input_string s
+          @bx.add :parse_method, :parse_string
+          @bx.add :parse_argument, s
         end
       end
 
       DotFile_::SyntaxNodes.class
       DotFile_::Sexp::InstanceMethods.class
 
-      Subscriptions__ = Callback_::Subscriptions.new(
-        :parser_loading_info_event,
-        :parser_loading_error_event,
-        :parser_error_event )
+      include TanMan_.lib_.TTT::Parser::InstanceMethods
 
-      class Parse__
+      def initialize bx, & oes_p
+        @bx = bx
+        @on_event_selectively = oes_p
+      end
 
-        def initialize
-          @do_force_overwrite_for_load = false
-          @conduit = Subscriptions__.new
-          yield self
-        end
+      def produce_parse_tree
+        h = @bx.h_
+        send h.fetch( :parse_method ), h.fetch( :parse_argument ), & @on_event_selectively
+      end
 
-        def generated_grammar_dir_path x
-          @generated_grammar_dir_path = x ; nil
-        end
+      def produce_parser_class  # :#hook-out for [ttt]
+        Memoized_parser_class__[] || Memoize_parser_class__[ __build_parser_class ]
+      end
 
-        def subscribe
-          yield @conduit
-        end
+      -> do
+        cls = nil
+        Memoized_parser_class__ = -> { cls }
+        Memoize_parser_class__ = -> x { cls = x ; x }
+      end.call
 
-        attr_writer :do_force_overwrite_for_load
+      def __build_parser_class
 
-        include TanMan_.lib_.TTT::Parser::InstanceMethods
+        TanMan_.lib_.TTT::Parser::Load.new( self,
 
-      private
+          -> o do
 
-        def produce_parser_class  # :#hook-out to [ttt]
-          cls = Memoized_parser_class__[]
-          cls || Memoize_parser_class__[ build_parser_class ]
-        end
+            # o.force_overwrite!  will re-write generated parser files
 
-        -> do
-          cls = nil
-          Memoized_parser_class__ = -> { cls }
-          Memoize_parser_class__ = -> x { cls = x ; x }
-        end.call
+            o.generated_grammar_dir @bx.fetch :generated_grammar_dir_path
 
-        def build_parser_class
+            o.root_for_relative_paths Models_::DotFile.dir_pathname.to_path
 
-          TanMan_.lib_.TTT::Parser::Load.new( self,
-            -> o do
-              do_force_overwrite_for_load and o.force_overwrite!
-              o.generated_grammar_dir @generated_grammar_dir_path
-              o.root_for_relative_paths root_for_relative_paths_for_load
-              add_grammar_paths_to_load o
-            end,
-            -> o do
-              if @conduit.is_subscribed_to_parser_loading_info_event
-                o.on_info @conduit.handle_parser_loading_info_event
+            o.treetop_grammar 'dot-language-hand-made.treetop'
+
+            o.treetop_grammar 'dot-language.generated.treetop'
+          end,
+
+          -> o do
+
+            # one day ..
+
+            o.on_info do | ev |
+              @on_event_selectively.call :info, ev.terminal_channel_i do
+                ev
               end
-              if @conduit.is_subscribed_to_parser_loading_error_event
-                o.on_error @conduit.handle_parser_loading_error_event
+            end
+
+            o.on_error do | ev |
+              @on_event_selectively.call :error, ev.terminal_channel_i do
+                ev
               end
-            end ).invoke
-        end
-
-        def add_grammar_paths_to_load o
-          o.treetop_grammar 'dot-language-hand-made.treetop'
-          o.treetop_grammar 'dot-language.generated.treetop'
-        end
-
-        def do_force_overwrite_for_load
-          @do_force_overwrite_for_load
-        end
-
-        def root_for_relative_paths_for_load
-          Models_::DotFile.dir_pathname.to_path
-        end
-
-        def excerpt_lines
-          scn = TanMan_.lib_.string_scanner.new parser.input
-          stop_at = parser.failure_line
-          line_no = 0
-          begin
-            line_no += 1
-            line = scn.scan LINE_CONTENT_RX__
-          end until line_no >= stop_at
-          margin = " #{ line_no }: "
-          [ "#{ margin }#{ line.chomp }",
-            "#{ SPACE_ * margin.length }#{ '-' * [0, parser.failure_column - 1].max }^"
-          ]
-        end
-
-        LINE_CONTENT_RX__ = (/[^\r\n]*$\r?\n?/)
-
-        def expecting
-          a = parser.terminal_failures
-          format = -> tf { tf.expected_string.inspect }
-          result = nil
-          begin
-            inside = case a.length
-            when 0 ; nil
-            when 1 ; format[ a.first ]
-            else   ; "one of #{ a.map { |tf| format[tf] }.uniq.join ', ' }"
             end
-            inside or break
-            result = "expecting #{ inside }"
-          end while nil
-          result
-        end
 
-        def receive_parse_failure_event ev  # #hook-out [ttt]
-          raise ev.to_exception
-        end
+          end ).invoke
+      end
 
-        def build_parse_failure_event
-          a = build_parse_failure_iambic
-          build_not_OK_event_via_mutable_iambic_and_message_proc( a, -> y, o do
-            line_col = "#{ o.line_no }:#{ o.line_col }"
-            y << if o.has_tag :pn
-              "In #{ pth o.pn }:#{ line_col }"
-            else
-              "In #{ o.ens }:#{ line_col }"
-            end
-            s = o.exp_s and y << s
-            o.excerpt_line_a.each do |s_|
-              y << s_
-            end
-          end )
-        end
-
-        def build_parse_failure_iambic
-          a = [ :parse_failed ]
-          add_line_and_column a
-          add_pathname_or_ENS a
-          a.push :exp_s, expecting
-          a.push :excerpt_line_a, excerpt_lines
-          a
-        end
-
-        def add_line_and_column a
-          a.push :line_no, @parser.failure_line
-          a.push :line_col, @parser.failure_column
-        end
-
-        def add_pathname_or_ENS a
-          if @input_adapter.respond_to? :pathname
-            a.push :pn, @input_adapter.pathname
+      def build_parse_failure_event  # #hook-out for [ttt]
+        a = __build_parse_failure_iambic
+        build_not_OK_event_via_mutable_iambic_and_message_proc( a, -> y, o do
+          line_col = "#{ o.line_no }:#{ o.line_col }"
+          y << if o.has_tag :pn
+            "In #{ pth o.pn }:#{ line_col }"
           else
-            a.push :ens, @input_adapter.entity_noun_stem
+            "In #{ o.ens }:#{ line_col }"
           end
-        end
-
-        def entity_noun_stem
-          ENS__
-        end
-        ENS__ = 'dot file'.freeze
-
-      public
-
-        def parameter_label x, d=nil
-          "#{ x.normalized_parameter_name }#{ "[#{ d }]" if d }"
-        end
-
-      private
-
-
-        def __parser_result result
-          @result = super
-          if profile
-            maybe_do_profile
+          s = o.exp_s and y << s
+          o.excerpt_line_a.each do |s_|
+            y << s_
           end
-          @result
-        end
+        end )
+      end
 
-        def maybe_do_profile
-          _is = @input_adapter.type.
-            is? TestLib_::TTT[]::Parser::InputAdapter::Types::FILE
-          if _is
-            do_profile
-          end
-        end
+      def __build_parse_failure_iambic
+        a = [ :parse_failed ]
+        __add_line_and_column a
+        __add_pathname_or_ENS a
+        a.push :exp_s, __expecting
+        a.push :excerpt_line_a, __excerpt_lines
+        a
+      end
 
-        def do_profile
-          d = parse_time_elapsed_seconds * 1000
-          path = @input_adapter.pathname.basename.to_s
-          send_info_string '      (%2.1f ms to parse %s)' % [ d, path ] ; nil
+      def __add_pathname_or_ENS a
+        if @input_adapter.respond_to? :pathname
+          a.push :pn, @input_adapter.pathname
+        else
+          a.push :ens, @input_adapter.entity_noun_stem
         end
       end
+
+      def __add_line_and_column a
+        a.push :line_no, @parser.failure_line
+        a.push :line_col, @parser.failure_column
+      end
+
+      def __expecting
+        a = parser.terminal_failures
+        format = -> tf { tf.expected_string.inspect }
+        result = nil
+        begin
+          inside = case a.length
+          when 0 ; nil
+          when 1 ; format[ a.first ]
+          else   ; "one of #{ a.map { |tf| format[tf] }.uniq.join ', ' }"
+          end
+          inside or break
+          result = "expecting #{ inside }"
+        end while nil
+        result
+      end
+
+      def __excerpt_lines
+        scn = TanMan_.lib_.string_scanner.new parser.input
+        stop_at = parser.failure_line
+        line_no = 0
+        begin
+          line_no += 1
+          line = scn.scan LINE_CONTENT_RX__
+        end until line_no >= stop_at
+        margin = " #{ line_no }: "
+        [ "#{ margin }#{ line.chomp }",
+          "#{ SPACE_ * margin.length }#{ '-' * [0, parser.failure_column - 1].max }^"
+        ]
+      end
+
+      LINE_CONTENT_RX__ = (/[^\r\n]*$\r?\n?/)
+
+    public  # ~ smaller #hook-in's & #hook-outs for [ttt]
+
+      def receive_parse_failure_event ev
+        raise ev.to_exception
+      end
+
+      def entity_noun_stem
+        ENS__
+      end
+      ENS__ = 'dot file'.freeze
+
     end
   end
-  end
 end
+# :+#tombstone: profiling (how long it took)

@@ -5,11 +5,11 @@ module Skylab::Callback::TestSupport
     class << self
 
       def [] test_context_cls
-        test_context_cls.include Test_Context_Instance_Methods__ ; nil
+        test_context_cls.include Test_Context_Instance_Methods ; nil
       end
     end
 
-      module Test_Context_Instance_Methods__
+      module Test_Context_Instance_Methods
 
         def call_API * x_a
           call_API_via_iambic x_a

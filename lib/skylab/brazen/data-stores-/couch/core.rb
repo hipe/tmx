@@ -132,8 +132,8 @@ module Skylab::Brazen
     def intrinsic_delete action, & oes_p
 
       Couch_::Actors__::Delete_datastore.call(
-        action.argument( :dry_run ),
-        action.argument( :force ),
+        action.trio( :dry_run ),
+        action.trio( :force ),
         self,
         _HTTP_remote, & ( oes_p || handle_event_selectively ) )
 

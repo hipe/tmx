@@ -92,7 +92,6 @@ module Skylab::Brazen
         x.subsect_name_s
 
       elsif oes_p
-
         oes_p.call :info, :property_not_found do
 
           Callback_::Event.inline_neutral_with :property_not_found,
@@ -523,7 +522,7 @@ module Skylab::Brazen
     class Assignments__ < Box__
 
       def members
-        [ * super, :each_normalized_pair, :to_normalized_actual_property_stream ]
+        [ * super, :each_normalized_pair, :to_pair_stream ]
       end
 
       def accept_asmt asmt
@@ -542,16 +541,18 @@ module Skylab::Brazen
 
       def each_normalized_pair
         if block_given?
-          scn = to_normalized_actual_property_stream
-          while pair = scn.gets
+          st = to_pair_stream
+          pair = st.gets
+          while pair
             yield pair.name_i, pair.value_x
-          end ; nil
+            pair = st.gets
+          end
         else
           to_enum :each_normalized_pair
         end
       end
 
-      def to_normalized_actual_property_stream
+      def to_pair_stream
         d = -1 ; last = @a.length - 1
         Callback_.stream do
           while d < last

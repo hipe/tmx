@@ -4,14 +4,14 @@ module Skylab::TreetopTools
 
     Callback_::Event.selective_builder_sender_receiver self
 
-    def parse_file pn, *a, &p
-      _ia = build_file_input_adapter pn, &p
-      parse _ia, a, p
+    def parse_file pn, * a, & oes_p
+      _ia = build_file_input_adapter pn, & oes_p
+      parse _ia, a, & oes_p
     end
 
   private
 
-    def build_file_input_adapter *a, &p
+    def build_file_input_adapter *a, & oes_p
       opts = if a.last.respond_to? :each_pair
         a.last.dup  # don't modify original
       else
@@ -19,27 +19,28 @@ module Skylab::TreetopTools
       end
       opts.key? :entity_noun_stem or
         opts[ :entity_noun_stem ] = entity_noun_stem
-      Parser::InputAdapters::File.new self, *a, &p
+
+      Parser::InputAdapters::File.new self, *a, & oes_p
     end
 
-    def entity_noun_stem
+    def entity_noun_stem  # :+#public-API #hook-in
       'input'
     end
 
   public
 
-    def parse_stream io, *a, &p
-      _ia = build_stream_input_adapter io, &p
-      parse _ia, a, p
+    def parse_stream io, * a, & oes_p
+      _ia = build_stream_input_adapter io, & oes_p
+      parse _ia, a, & oes_p
     end
 
-    private def build_stream_input_adapter *a
-      Parser::InputAdapters::Stream.new self, *a
+    private def build_stream_input_adapter *a, & oes_p
+      Parser::InputAdapters::Stream.new self, *a, & oes_p
     end
 
-    def parse_string whole_string, *a, &p
-      _ia = build_string_input_adapter whole_string, &p
-      parse _ia, a, p
+    def parse_string whole_string, *a, & oes_p
+      _ia = build_string_input_adapter whole_string, & oes_p
+      parse _ia, a, & oes_p
     end
 
   private
@@ -48,10 +49,9 @@ module Skylab::TreetopTools
       Parser::InputAdapters::String.new self, *a
     end
 
-    def parse input_adapter, a, p
+    def parse input_adapter, a, & oes_p
       @input_adapter = input_adapter  # :#API
       @parse_time_elapsed_seconds = nil
-      p and self._TEST_ME
       load_grammars_if_necessary
       ok = true
       a.length.nonzero? and ok = absorb_parse_opts!( * a )
@@ -64,7 +64,7 @@ module Skylab::TreetopTools
         if x
           parser_result x
         else
-          when_parse_failure
+          when_parse_failure( & oes_p )
         end
       end
     end
@@ -99,13 +99,19 @@ module Skylab::TreetopTools
       @parser_class ||= produce_parser_class  # :+#hook-out
     end
 
-    def when_parse_failure
-      _ev = build_parse_failure_event
-      receive_parse_failure_event _ev  # :+#hook-out
+    def when_parse_failure & oes_p
+      require 'byebug' ; byebug ; $stderr.puts "ZAP DANG" and false
+      if oes_p
+        oes_p.call :error, :parse_failed do
+          build_parse_failure_event
+        end
+      else
+        receive_parse_failure_event build_parser  # :+#hook-out
+      end
       UNABLE_
     end
 
-    def build_parse_failure_event
+    def build_parse_failure_event  # :+#public-API #hook-in
       msg = parser_failure_reason
       msg ||= "Got nil from parser without a reason!"
       build_not_OK_event_with :parse_failed, :reason, msg do |y, o|

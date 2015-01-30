@@ -265,8 +265,8 @@ module Skylab::Brazen
 
       attr_reader :property_related_nonterminal  # hax only (covered)
 
-      def edit_entity_class * x_a
-        receive_edit Callback_::Iambic_Stream.via_array x_a
+      def edit_entity_class * x_a, & edit_p
+        receive_edit Callback_::Iambic_Stream.via_array( x_a ), & edit_p
         nil
       end
 
@@ -469,7 +469,7 @@ module Skylab::Brazen
       def build_immutable_properties_stream_with_random_access_
         entity_formal_property_method_names_box_for_read.to_value_stream.map_by do |i|
           send i
-        end.immutable_with_random_access_keyed_to_method :name_i
+        end.flush_to_immutable_with_random_access_keyed_to_method :name_i
       end
 
       def any_property_via_symbol i
@@ -665,7 +665,7 @@ module Skylab::Brazen
       end
 
       def argument sym
-        get_bound_property_via_property formal_property_via_symbol sym
+        trio_via_property formal_property_via_symbol sym
       end
 
       def formal_property_via_symbol sym
@@ -673,7 +673,8 @@ module Skylab::Brazen
       end
 
       def any_formal_property_via_symbol sym
-        formal_properties[ sym ]
+        fo = formal_properties
+        fo and fo[ sym ]
       end
 
       def get_formal_property_name_symbols
@@ -688,10 +689,10 @@ module Skylab::Brazen
 
       def bound_properties
         @bp ||= Entity::Properties_Stack__::Bound_properties[
-          method( :get_bound_property_via_property ), formal_properties ]
+          method( :trio_via_property ), formal_properties ]
       end
 
-      def get_bound_property_via_property prop
+      def trio_via_property prop
         had = true
         x = actual_property_box.fetch prop.name_i do
           had = false ; nil
@@ -1020,7 +1021,7 @@ module Skylab::Brazen
         otr
       end
 
-      def description  # for [#074]
+      def description  # for [#cb-010]
         if @name
           @name.as_variegated_symbol
         else

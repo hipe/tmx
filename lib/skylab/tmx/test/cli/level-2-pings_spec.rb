@@ -87,11 +87,11 @@ module Skylab::TMX::TestSupport::CLI::L2P
       go :sub_tree
     end
 
-    it "tan man", wip: true do
+    it "tan man" do
       go :tan_man
     end
 
-    it "treemap", wip: true do
+    it "treemap" do
       go :treemap
     end
 

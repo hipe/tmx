@@ -17,32 +17,34 @@ module Skylab::TanMan::TestSupport::Models::Internal
       it "missing" do
         call_API :paths
         ev = expect_not_OK_event :missing_required_properties
-        black_and_white( ev ).should match %r(\bmissing required argument\W+path\b)i
+        black_and_white( ev ).should match %r(\bmissing required arguments 'path' and 'verb')
         expect_failed
       end
 
       it "extra" do
         call_API :paths, :wiz, :waz, :wazoozle
         ev = expect_not_OK_event :extra_properties
-        black_and_white( ev ).should match %r(\bunexpected argument\W+wazoozle\b)i
+        black_and_white( ev ).should match %r(\bunexpected arguments :wiz and :wazoozle)
         expect_failed
       end
 
       it "strange verb" do
-        call_API :paths, :generated_grammar_dir, :wiznippl
-        expect_not_OK_event :unrecognized_verb
+        call_API :paths, :path, :generated_grammar_dir, :verb, :wiznippl
+        ev = expect_not_OK_event :unrecognized_verb
+        ev.verb.should eql :wiznippl
         expect_failed
       end
 
       it "strange noun" do
-        call_API :paths, :baznoozer, :retrieve
-        expect_not_OK_event :unknown_path
+        call_API :paths, :path, :waznoozle, :verb, :retrieve
+        ev = expect_not_OK_event :unknown_path
+        ev.did_you_mean.should be_include :generated_grammar_dir
         expect_failed
       end
 
       it "retrieves (and possibly generates) the GGD path" do
         # it may or may not emit events based on whether the dir already existed
-        call_API :paths, :generated_grammar_dir, :retrieve
+        call_API :paths, :path, :generated_grammar_dir, :verb, :retrieve
         %r([^/]+\z).match( @result )[ 0 ].should eql TanMan_.lib_.tmpdir_stem
       end
     end

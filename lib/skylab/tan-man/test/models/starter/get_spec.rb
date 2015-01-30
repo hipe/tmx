@@ -10,7 +10,7 @@ module Skylab::TanMan::TestSupport::Models::Starter
     it "'workspace_path' is required (currently)" do
       call_API :starter, :get
       expect_event :missing_required_properties do |ev|
-        ev.to_event.miss_a.first.name_i.should eql :path
+        ev.to_event.miss_a.first.name_i.should eql :workspace_path
       end
       expect_failed
     end
@@ -84,7 +84,6 @@ module Skylab::TanMan::TestSupport::Models::Starter
         O
 
         call_API :starter, :lines,
-          :value_fetcher, :_not_quite_to_here_,
           :workspace_path, @ws_pn.to_path, :config_filename, cfn
 
         scn = @result
@@ -102,35 +101,28 @@ module Skylab::TanMan::TestSupport::Models::Starter
           --- /dev/null
           +++ a/#{ cfn }
           @@ -0,0 +1 @@
-          +[ starter "digraph.dot" ]
+          +[ starter "minimal.dot" ]
         O
 
         call_API :starter, :lines,
-          :value_fetcher, get_value_fetcher,
           :workspace_path, @ws_pn.to_path, :config_filename, cfn
-        scn = @result
+        st = @result
 
-        d = 0
-        io = _IO_spy
-
-        while line = scn.gets
+        first_line = st.gets
+        d = first_line.length
+        line = st.gets
+        while line
           d += line.length
-          io.puts line
+          line = st.gets
         end
 
-        ( 80 .. 1000 ).should be_include d  # the number of bytes written
+        ( 50 .. 60 ).should be_include d  # the number of bytes written
 
-        io.string[ 0, 32  ].should eql "# created by tan-man on CRTD ON\n"
+        first_line.should eql "# created by tan-man on {{ CREATED_ON }}\n"
 
         expect_no_events
 
       end
-    end
-
-    def get_value_fetcher
-      bx = TanMan_::Callback_::Box.new
-      bx.add :created_on, 'CRTD ON'
-      bx
     end
 
     def _IO_spy

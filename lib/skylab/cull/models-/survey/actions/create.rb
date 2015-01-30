@@ -63,11 +63,11 @@ module Skylab::Cull
 
       def produce_result
 
-        @bx = to_bound_argument_box
+        @bx = to_full_trio_box
 
         @survey = Models_::Survey.edit_entity @kernel, handle_event_selectively do | edit |
 
-          edit.create_via_mutable_arg_box_and_look_path(
+          edit.create_via_mutable_trio_box_and_look_path(
             @bx,
             @argument_box.fetch( :path ) )
         end

@@ -15,15 +15,22 @@ module Skylab::TanMan
 
       # ~ create
 
-      def persist_entity ent, & oes_p
+      def receive_persist_entity action, ent, & oes_p
+
+        bx = action.argument_box
 
         _ok = Meaning_::Actors__::Persist.call(
           _build_session,
-          @action.argument_box[ :force ],
+          bx[ :force ],
           ent,
           & oes_p )
 
-        _ok && _dot_file.persist_via_args( false, * @action.output_arguments )
+        _ok and begin
+
+          _dot_file.persist_via_args(
+            bx[ :dry_run ],
+            * @action.output_arguments )  # :+[#041] should this happen here?
+        end
       end
 
       # ~ retrieve (many)

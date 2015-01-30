@@ -37,7 +37,7 @@
 [#028]       #done during:regret-integration-with-new-autoloader
 [#027]       #done things that exist to comport with old a.l (or fwd with new)
 [#026]       #doc-point the F-UN narrative ..
-[#025] #open #wishlist: an event `with` that lets you add new properties
+[#025] #open #wishlist: an event duper that lets you add new properties
              ( was: isomorphic event factory is deprecated .. )
 [#024]       #doc-node the new autoloader narative ..
 [#023]       #parent-node: [#033] the different kinds of callback patterns ..
@@ -51,21 +51,26 @@
 [#015]       #nichepoint "event factory structural" (there are others..)
 [#014]       #parent-node:[#019] the reflection API
 [#013]       #parent-node: [#017] selective listener methodic
-[#012]       #done #tracking-tag - can the idea of "specificity" be built ..
+[#012]       #parent-node: [#003]  [event prototypes.]
+             (was: #done #tracking-tag - can the idea of "specificity" be built ..)
 [#011]       (was: #done renamed "pub-sub" to "callback" universe wide.
                (#evolved-from: #tickler consider renaming pub-sub to 'stream')
-[#010]       #done cover [cb] digraph viz
+[#010]       #parent-node: [#003] the codifying expression agent
+             (was: #done cover [cb] digraph viz)
 [#009]       #tracking-tag advanced semantic reflection -
                `significant_unhandled_event_stream_names`
                #parent: 014
 [#008]       #tracking-tag this option scanner
 [#007] #open #tracking-tag this new way to do boxxy event factories
-[#006]       #event-marker: asssuming event shape/utility is a smell
+[#006]       #parent-node: [#003] selective event listeners via methods
+             ( was: #event-marker: asssuming event shape/utility is a smell )
 [#005] #open (#waiting) cross reference to [#tr-055], can use nifty ridiculous
 [#004] #open rename `name_i` => `name_symbol` universe-wide
              (was: #done rename `event_cloud` -> `event_graph`)
-[#003]       #done event class should not be a struct
+[#003]       the event narrative ..
+             (was: #done event class should not be a struct)
 [#002]       #tracking-tag #pattern: public emitters
-[#001]       #pattern: #parent-node: [#019] "events and their payloads"
-               assume emit(type, *payload) and ..
+[#001]       the selective listener pattern
+             (was: #pattern: #parent-node: [#019] "events and their payloads"
+               assume emit(type, *payload) and ..)
 [#sl-059] 2012-02-18 #open no redundant events per listener

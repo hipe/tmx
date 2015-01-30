@@ -1,6 +1,6 @@
 module Skylab::TanMan
 
-  class Models_::Node
+  class Models_::Node  # is document entity
 
     Entity_.call self,
 
@@ -21,11 +21,9 @@ module Skylab::TanMan
 
       Add = make_action_class :Create do
 
-        Model_::Entity.call self,
-
-          :reuse, Model_::Document_Entity.IO_properties,
-
-          :flag, :property, :ping
+        edit_entity_class(
+          :flag, :property, :ping,
+          :reuse, Model_::Document_Entity.IO_properties )
 
       private
 
@@ -33,31 +31,21 @@ module Skylab::TanMan
           if @argument_box[ :ping ]
             bound_call_for_ping
           else
-            resolve_document_IO_or_produce_bound_call_ or super
+            super
           end
         end
       end
 
       Ls = make_action_class :List do
 
-        Model_::Entity.call self,
-
-          :reuse, Model_::Document_Entity.input_properties
-
-        def via_arguments_produce_bound_call
-          resolve_document_IO_or_produce_bound_call_ or super
-        end
+        edit_entity_class(
+          :reuse, Model_::Document_Entity.input_properties )
       end
 
       Rm = make_action_class :Delete do
 
-        Model_::Entity.call self,
-
-          :reuse, Model_::Document_Entity.input_properties
-
-        def via_arguments_produce_bound_call
-          resolve_document_IO_or_produce_bound_call_ or super
-        end
+        edit_entity_class(
+          :reuse, Model_::Document_Entity.IO_properties )
       end
     end
 
@@ -122,16 +110,16 @@ module Skylab::TanMan
         end
       end
 
-      def persist_entity entity
+      def receive_persist_entity action, entity
         _ok = mutate_via_verb_and_entity :create, entity
-        _ok and _commit_changes_to_dsc datastore_controller
+        _ok and _commit_changes action
       end
 
       def produce_relevant_sexp_via_touch_entity entity
         mutate_via_verb_and_entity :touch, entity
       end
 
-      def via_dsc_delete_entity ent, & oes_p
+      def via_datastore_controller_receive_delete_entity action, ent, & oes_p
 
         _ok = Node_::Actors__::Mutate::Via_entity.call(
           :delete,
@@ -139,7 +127,7 @@ module Skylab::TanMan
           @dsc,
           @kernel, & ( oes_p || @on_event_selectively ) )
 
-        _ok and _commit_changes_to_dsc @dsc
+        _ok and _commit_changes action
       end
 
       def mutate_via_verb_and_entity verb_i, entity
@@ -156,9 +144,9 @@ module Skylab::TanMan
           __init_via_node_stmt_and_immutable_preconditions node, @preconditions
       end
 
-      def _commit_changes_to_dsc dsc
-        dsc.persist_via_args(
-          @action.any_argument_value( :dry_run ), * @action.output_arguments )
+      def _commit_changes action
+        datastore_controller.persist_via_args(
+          @action.argument_box[ :dry_run ], * @action.output_arguments )
       end
     end
 

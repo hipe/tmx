@@ -14,6 +14,12 @@ module Skylab::Callback
           Event_::Class_Factories__::Data_Event
         end
 
+        def inline_via_mutable_box_and_terminal_channel_symbol bx, sym, & msg_p
+          construct do
+            __init_via_box_and_terminal_channel_symbol bx, sym, & ( msg_p || Inferred_Message.to_proc )
+          end
+        end
+
         def inline_neutral_with * x_a, & p
           x_a.push :ok, nil
           inline_via_iambic_and_any_message_proc_to_be_defaulted x_a, p
@@ -75,9 +81,9 @@ module Skylab::Callback
           inline_via_iambic_and_any_message_proc_to_be_defaulted x_a, msg_p
         end
 
-        def inline_via_iambic_and_message_proc x_a, p
+        def inline_via_iambic_and_message_proc x_a, msg_p
           construct do
-            init_via_x_a_and_p x_a, p
+            __init_via_iambic x_a, & msg_p
           end
         end
 
@@ -108,27 +114,43 @@ module Skylab::Callback
 
         private :new  # #note-045
 
-      end # >>
+      end  # >>
 
       def initialize & p
         instance_exec( & p )
       end
 
-    private def init_via_x_a_and_p x_a, p
-        @message_proc = p
-        scn = Callback_::Iambic_Stream.via_array x_a
-        @terminal_channel_i = scn.gets_one
-        box = Callback_::Box.new
-        sc = singleton_class
-        while scn.unparsed_exists
-          i = scn.gets_one
-          ivar = :"@#{ i }"
-          box.add i, ivar
-          instance_variable_set ivar, scn.gets_one
-          sc.send :attr_reader, i
-        end
-        @__ivar_box__ = box ; nil
+    private
+
+      def __init_via_iambic x_a, & msg_p
+        st = Callback_::Iambic_Stream.via_array x_a
+        @terminal_channel_i = st.gets_one
+        _process_pairs st.flush_to_each_pairer, & msg_p
+        nil
       end
+
+      def __init_via_box_and_terminal_channel_symbol bx, sym, & msg_p
+        @terminal_channel_i = sym
+        _process_pairs bx, & msg_p
+      end
+
+      def _process_pairs pairs, & msg_p
+        bx = Callback_::Box.new
+        sc = singleton_class
+
+        pairs.each_pair do | k, x |
+          ivar = :"@#{ k }"
+          bx.add k, ivar
+          instance_variable_set ivar, x
+          sc.send :attr_reader, k
+        end
+
+        @__ivar_box__ = bx
+        @message_proc = msg_p
+        nil
+      end
+
+    public
 
       attr_reader :message_proc, :terminal_channel_i
 
@@ -149,13 +171,22 @@ module Skylab::Callback
         dup.init_copy_via_iambic_and_message_proc x_a, msg_p
       end
 
+      def new_inline_with * x_a, & msg_p
+        bx = __to_mutable_box
+        x_a.each_slice 2 do | k, x |
+          bx.set k, x
+        end
+        self.class.inline_via_mutable_box_and_terminal_channel_symbol(
+          bx, @terminal_channel_i, & ( msg_p || @message_proc ) )
+      end
+
       def to_exception  # #note-85
         Event_::Unwrappers__::Exception[ self ]
       end
 
       def to_iambic
         box = ivar_box
-        a = box.send :a ; h = box.send :h
+        a = box.a_ ; h = box.h_
         y = ::Array.new 1 + a.length * 2
         y[ 0 ] = terminal_channel_i
         d = -1 ; last = a.length - 1
@@ -165,6 +196,14 @@ module Skylab::Callback
           y[ d * 2 + 2 ] = instance_variable_get h.fetch a.fetch d
         end
         y
+      end
+
+      def __to_mutable_box  # just "tags", no terminal channel
+        bx = Callback_::Box.new
+        ivar_box.each_pair do | k, ivar |
+          bx.add k, instance_variable_get( ivar )
+        end
+        bx
       end
 
     protected( def init_copy_via_iambic_and_message_proc x_a, p  # #note-70
@@ -514,7 +553,7 @@ module Skylab::Callback
         end
       end
 
-      class PRODUCE_HANDLE_EVENT_SELECTIVELY_THROUGH_METHODS__
+      class PRODUCE_HANDLE_EVENT_SELECTIVELY_THROUGH_METHODS__  # :[#006]. (see also [#013])
 
         class << self
 

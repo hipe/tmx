@@ -34,7 +34,7 @@ module Skylab::Callback
     private
 
       def initialize * a, & p
-        @each_mapper = @each_pair_mapper = @value_mapper = nil
+        @each_pair_mapper = @value_mapper = nil
         if a.length.nonzero?
           init_identity_via_args a
         end
@@ -66,11 +66,6 @@ module Skylab::Callback
 
       def key_method_name=
         @key_method_name = iambic_property
-        KEEP_PARSING_
-      end
-
-      def each_mapper=
-        @each_mapper = iambic_property
         KEEP_PARSING_
       end
 
@@ -281,12 +276,12 @@ module Skylab::Callback
         end
       end
 
-      def each  # where available
+      def each
         if block_given?
           st = to_pair_stream
           pair = st.gets
           while pair
-            yield( * @each_mapper[ pair ] )
+            yield pair.value_x
             pair = st.gets
           end
         else
@@ -318,8 +313,26 @@ module Skylab::Callback
         to_value_stream
       end
 
+      def each_name & p
+        if @done
+          @a.each( & p )
+        else
+          d = -1
+          begin
+            if d < @d
+              yield @a.fetch d += 1
+              redo
+            end
+            x = at_unknown_index d += 1
+            x or break
+            yield x.send @key_method_name
+            redo
+          end while nil
+        end
+      end
+
       def to_pair_stream
-        to_name_scan.map_by do |i|
+        _to_name_stream.map_by do |i|
           Pair_.new @h.fetch( i ), i
         end
       end
@@ -342,11 +355,11 @@ module Skylab::Callback
 
     private
 
-      def to_name_scan
+      def _to_name_stream
         if @done
-          to_name_scan_when_done
+          to_name_stream_when_done
         else
-          to_name_scan_when_not_done
+          to_name_stream_when_not_done
         end
       end
 
@@ -359,7 +372,7 @@ module Skylab::Callback
         end
       end
 
-      def to_name_scan_when_done
+      def to_name_stream_when_done
         d = -1 ; last = @last
         Stream_.new do
           if d < last
@@ -383,7 +396,7 @@ module Skylab::Callback
         end
       end
 
-      def to_name_scan_when_not_done
+      def to_name_stream_when_not_done
         d = -1
         Stream_.new do
           if @done

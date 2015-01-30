@@ -2,7 +2,7 @@ module Skylab::Callback
 
     class Event
 
-      class Prototype__ < self  # :[#023].
+      class Prototype__ < self  # :[#012].
 
         class << self
           def via_deflist_and_message_proc i_a, p

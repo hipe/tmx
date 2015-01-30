@@ -1,3 +1,6 @@
+## (EDIT: this document is historical and largely no longer relevant)
+
+
 ## this architecture
 
 

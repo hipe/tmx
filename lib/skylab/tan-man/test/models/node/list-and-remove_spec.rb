@@ -9,9 +9,10 @@ module Skylab::TanMan::TestSupport::Models::Node
     it "a workspace without a graph value complains & invite" do
 
       call_API :node, :ls,
-        :workspace_path, dir( :with_freshly_initted_conf )
+        :workspace_path, dir( :with_freshly_initted_conf ),
+        :config_filename, 'tan-man.conf'
 
-      ev = expect_neutral_event :property_not_found
+      ev = expect_not_OK_event :property_not_found
 
       ev.to_event.invite_to_action.should eql [ :graph, :use ]
 
@@ -29,13 +30,12 @@ module Skylab::TanMan::TestSupport::Models::Node
       st = @result
 
       x = st.gets
-      x.property_value( :name ).should eql 'foo'
+      x.property_value_via_symbol( :name ).should eql 'foo'
 
       x = st.gets
-      x.property_value( :name ).should eql 'bar'
+      x.property_value_via_symbol( :name ).should eql 'bar'
 
       st.gets.should be_nil
-
     end
 
     it "remove nope" do

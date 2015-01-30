@@ -28,7 +28,7 @@ module Skylab::Brazen
       end
 
       def app_name
-        @partitions.kernel.app_name
+        @partitions.adapter.bound_.kernel_.app_name  # ick/meh
       end
 
       def s * x_a

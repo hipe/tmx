@@ -58,7 +58,7 @@ module Skylab::Callback
         end
 
         def inspect
-          _a = self.class.const_get( CONST_ ).send( :a )
+          _a = self.class.const_get( CONST_ ).a_
           "#<#{ self.class.name } #{ _a * ', ' }>"
         end
       end

@@ -17,6 +17,12 @@ module Skylab::TanMan
 
     class Expression_Agent__  # follows [#fa-052]:#the-semantic-markup-guidelines
 
+      class << self
+        def NLP_agent_class
+          NLP_agent___[]
+        end
+      end  # >>
+
       def initialize k
         # you could use kernel for app_name but we don't
       end
@@ -97,14 +103,13 @@ module Skylab::TanMan
       end
 
       def _NLP_agent
-        @NLP_agent ||= NLP_agent__[].new
+        @NLP_agent ||= self.class.NLP_agent_class.new
       end
 
-      NLP_agent__ = Callback_.memoize do
-        NLP_Agent__ = Brazen_.expression_agent_library.make_NLP_agent :public,
+      NLP_agent___ = Callback_.memoize do
+        NLP_Agent____ = Brazen_.expression_agent_library.make_NLP_agent :public,
           [ :and_, :indefinite_noun, :or_, :plural_noun, :s ]
       end
-
     end
   end
 end

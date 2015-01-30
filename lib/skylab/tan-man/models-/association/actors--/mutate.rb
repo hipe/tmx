@@ -14,7 +14,7 @@ module Skylab::TanMan
 
       def execute
         @parser = @datastore.graph_sexp.class
-        ok = rslv_stmt_list_and_scan
+        ok = rslv_stmt_list_and_stream
         ok &&= find_nodes
         ok &&= find_neighbor_associations
         ok && work
@@ -23,16 +23,32 @@ module Skylab::TanMan
 
     private
 
-      def rslv_stmt_list_and_scan
+      def rslv_stmt_list_and_stream
         @stmt_list = @datastore.graph_sexp.stmt_list
         if @stmt_list
-          @scan = @stmt_list.to_stream
+          @st = @stmt_list.to_stream
           ACHIEVED_
         elsif :delete == @verb
           when_no_stmt_list
+        elsif :touch == @verb
+          __resolve_stmt_list_and_stream_by_hacking_an_empty_thing_into_existence
         else
           self._HOLE
         end
+      end
+
+      def __resolve_stmt_list_and_stream_by_hacking_an_empty_thing_into_existence
+
+        # we have for example an empty digraph and a `touch` verb.
+        # life is easier if we hack an empty statement list into existence.
+        # these do not occur in nature. we need one because touch.
+
+        sx = @datastore.graph_sexp.class.parse :stmt_list, 'a->b'  # the NT classes are not guaranteed to be generated yet
+        sx.stmt = nil  # then throw the above away. we just want the empty NT parse tree, which does not occur naturaly
+        @datastore.graph_sexp.stmt_list = sx
+        @stmt_list = sx
+        @st = @stmt_list.to_stream
+        ACHIEVED_
       end
 
       def when_no_stmt_list
@@ -85,7 +101,9 @@ module Skylab::TanMan
         ok = ACHIEVED_
         snid_s = @from_node.node_id.id2name
         tnid_s = @to_node.node_id.id2name
-        while stmt_list = @scan.gets
+
+        stmt_list = @st.gets
+        while stmt_list
           stmt = stmt_list.stmt
           if :edge_stmt == stmt.class.rule
             snid_s_ = stmt.source_node_id.id2name
@@ -105,7 +123,9 @@ module Skylab::TanMan
               @greatest_lesser_edge_stmt = stmt
             end
           end
+          stmt_list = @st.gets
         end
+
         ok
       end
 
@@ -278,10 +298,10 @@ module Skylab::TanMan
       def via_edge_stmt_make_association
         @stmt_list._insert_item_before_item @edge_stmt, @least_greater_edge_stmt  # #todo - do we need the other
         # (result is stmt_list whose stmt is the argument)
-        @result = maybe_send_event :info, :created_association do
+        maybe_send_event :info, :created_association do
           bld_created_association_event
         end
-        ACHIEVED_
+        @result = ACHIEVED_  # is result
       end
 
       def bld_created_association_event
@@ -321,9 +341,10 @@ module Skylab::TanMan
         removed_item = @stmt_list._remove_item @matched_stmt
         # result is structurally like argument, but different object. we discard
         if removed_item
-          @result = maybe_send_event :info, :deleted_association do
+          maybe_send_event :info, :deleted_association do
             build_OK_event_with :deleted_association, :association, removed_item
           end
+          @result = ACHIEVED_
           nil
         else
           removed_item

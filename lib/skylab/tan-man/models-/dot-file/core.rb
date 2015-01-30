@@ -4,8 +4,22 @@ module Skylab::TanMan
 
     class << self
 
-      def produce_document_via_parse & p
-        DotFile_::Actors__::Produce_document_via_parse[ p ]
+      def produce_parse_tree_via oes_p
+        _Sess = DotFile_::Sessions__::Produce_Parse_Tree
+        bx = Callback_::Box.new
+        yield _Sess::Shell.new bx
+        _Sess.new bx do | * i_a, & ev_p |
+
+          # errors like file not found etc (that stem from path math errors)
+          # have causes that are so hard to track down we throw them so that
+          # the call stack is presented immediately rather than from hunting
+
+          if :error == i_a.first && :stat_error == i_a[ 1 ]
+            raise ev_p[].exception
+          else
+            oes_p[ * i_a, & ev_p ]
+          end
+        end.produce_parse_tree
       end
 
       # ~

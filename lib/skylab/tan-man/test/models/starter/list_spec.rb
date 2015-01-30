@@ -18,6 +18,8 @@ module Skylab::TanMan::TestSupport::Models::Starter
 
       st.gets.natural_key_string.should eql 'holy-smack.dot'
 
+      st.gets.natural_key_string.should eql 'minimal.dot'
+
       st.gets.should be_nil
 
     end

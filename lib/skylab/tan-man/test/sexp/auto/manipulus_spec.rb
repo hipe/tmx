@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-describe "[tm] sexp auto MANIPULULS", g: true do
+describe "[tm] sexp - auto - MANIPULULS", g: true do
 
   extend ::Skylab::TanMan::TestSupport::Sexp::Auto
 
@@ -13,17 +13,17 @@ describe "[tm] sexp auto MANIPULULS", g: true do
       context 'adds' do
 
         it 'before first' do
+          _rx = /cannot insert into a list with less than 2 items/i
           -> do
             result._insert_item_before_item 'fap', 'fip'
-          end.should raise_error(
-            /cannot insert into a list with less than 2 items/i )
+          end.should raise_error _rx
         end
 
         it 'before nil (append)' do
+          _rx = /cannot insert into a list with less than 2 items/i
           -> do
             result._insert_item_before_item 'fap', 'fip'
-          end.should raise_error(
-            /cannot insert into a list with less than 2 items/i )
+          end.should raise_error _rx
         end
       end
 

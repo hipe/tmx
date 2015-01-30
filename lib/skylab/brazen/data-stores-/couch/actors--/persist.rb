@@ -18,7 +18,7 @@ module Skylab::Brazen
     private
 
       def init_ivars
-        @property_scan = @entity.to_normalized_actual_property_scan_for_persist
+        @property_scan = @entity.to_pair_stream_for_persist
         @response_receiver = me_as_response_receiver
         nil
       end

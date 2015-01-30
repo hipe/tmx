@@ -1,5 +1,10 @@
-[#086] #open on first test run with an empty "[tmx root]/tmp/", the
+[#090] #open association add is not magnetic
+[#089] #open [br] datastore / file-based [ file etc ] <= [ttt]
+[#088] #open same issue as below with graph use
+[#087] #open setting a starter doesn't remove the last one
+[#086]       #done on first test run with an empty "[tmx root]/tmp/", the
                event of creating the tmpdir breaks the comprehensive test run
+             this is now #wishlist because the fix is so ugly.
 [#085] #open refactor `_nodes` to use `to_scan` (now `to_stream`)
 [#084]       #parent-node: [#model] the node model narrative ..
 [#083]       #doc-node kernel
@@ -35,7 +40,7 @@
              3. applying them
 [#056]       #tracking-tag: can we use tan-man to guide refactorings yet?
                #waiting-on:(#014, #015)
-[#055]       wtf
+[#055] #open meaning delete
 [#054]       #watching it seems like it will probably be dangerous to
              reuse the same parser for multiple parses?, also #tracking-tag
 [#053]       #postponed normalizing string here
@@ -45,14 +50,17 @@
 [#049]       #watch #pattern - four permutations for file creation (dirname etc)
 [#048]       #done failing on tan init should do porcelain too
 [#048]       upstreams.
-             (was: #watch what is the deal with the non-orthogonal-ass event interface for remote list)
-[#047] #watch where to specify local/global, or merge?
+             (was: #watch what is the deal with the non-orthogonal-ass
+              event interface for remote list)
+[#047] #hole (was: #watch where to specify local/global, or merge?)
 [#046]       #trend away from Parameter::Definer etc. and towards lamba args
 [#045]       #postponed Parameter::Definer (up?), vs Attribute::Definer
 [#044]       #branch-down cli tests (but issue wip)
 [#043]       #tracking-tag other guys that could benefit from svc
 [#042]       #done FileUtils as a service (JSON)
-[#041] #watch i don't like how status is implemented with the arrays
+[#041] #open resolve one layer where all datastore persists happen (i.e
+             should collection controllers write files or should actions?)
+             (was: #watch i don't like how status is implemented with the arrays)
 [#040]       #done make your own SubClient::InstanceMethods to DRY CLI & API
 [#039]       #done API::Whatever becomes MetaHell::Generic
 [#038]       #done `text_styler` away!
@@ -73,7 +81,8 @@
 [#024]       #done use -h -- we had to etc use bleeding
 [#023]       #deferred combine all Boxxy, consider Boxxy-like solutions
                #depends-on:#018
-[#022] #open :+#wishlist: workspace directories
+[#022]       #done end client defaulting patterns (workspace etc)
+             (was: workspace directories)
              (was: refactor-in headless, and sub-client)
 [#021]       merge singletons into service
 [#020]       #done #low-priority nounify cli commands
@@ -101,13 +110,15 @@
              ( was: #done 2012-10-27 create a node
                1. with one template (3 permutations) 2. with another template (3 permutes) )
 [#008]       #done 2012-10-10 #rename rename "nt" to "expression" / "rule"
-[#007]       #done #small #critical models/ dir generated during specs 2012-09-29
+[#007] #open tracking all non-primitive values still used in our trans-modality API
+             (was: #done #small #critical models/ dir generated during specs 2012-09-29)
 [#006]       meta property reference (.rb!)
              (was: #one-day look into reflection via metagrammer instead 2012-09-27)
 [#005]       #open #one-day look into "statement oriented" processing 2012-09-02
 [#004]       #open #one-day look into multibyte regexp 2012-09-02
 [#003]       #open #one-day unshield your eyes : google "dotfile grammar" 2012-09-01
-[#002]       #done 2012-08-30 rename `remote*` to fit a pattern (e.g. controller)
-               examples-controller -> example-collection
+[#002] #open implement ambiguity expressor for 'st[atus]' and 'st[arter]'
+             (was: #done 2012-08-30 rename `remote*` to fit a pattern (e.g. controller)
+               examples-controller -> example-collection)
 [#001] #open refactor out the repetition among document entity actions
              (was: #done tan -w ok, #depends-on:(#sl-unwip))

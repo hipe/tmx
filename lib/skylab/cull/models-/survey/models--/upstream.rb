@@ -89,7 +89,7 @@ module Skylab::Cull
 
         @_top_entity = Models_::Upstream.edit_entity @survey.to_kernel, @on_event_selectively do | edit |
           edit.derelativizer @survey
-          edit.mutable_arg_box bx
+          edit.mutable_trio_box bx
         end
 
         @_top_entity and via_edited_upstream
