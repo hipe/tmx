@@ -17,8 +17,8 @@ module Skylab::TanMan
 
         a_list = @node.node_stmt.attr_list.content
 
-        if ! a_list._prototype
-          a_list._prototype = Memoized___[] || Memoize___[ @node.node_stmt ]
+        if ! a_list.prototype_
+          a_list.prototype_ = Memoized___[] || Memoize___[ @node.node_stmt ]
         end
 
         add_a = []

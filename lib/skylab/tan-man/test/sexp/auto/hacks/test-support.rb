@@ -55,14 +55,14 @@ module Skylab::TanMan::TestSupport::Sexp::Auto::Hacks
         a_list = _parser.parse :a_list, s
       end
 
-      a_list._prototype = Memoized_A_list_prototype___[] || Memoize_A_list_prototype___[ _parser ]
+      a_list.prototype_ = Memoized_A_list_prototype___[] || Memoize_A_list_prototype___[ _parser ]
 
       new_before_this_item = Find_new_before_this_item__[ a_list, asst_to_insert_s, :content ]
 
       if new_before_this_item
-        a_list._insert_item_before_item asst_to_insert_s, new_before_this_item
+        a_list.insert_item_before_item_string_ asst_to_insert_s, new_before_this_item
       else
-        a_list._append! asst_to_insert_s
+        a_list.append_item_via_string_ asst_to_insert_s
       end
 
       @a_list_s = a_list.unparse
@@ -119,10 +119,10 @@ module Skylab::TanMan::TestSupport::Sexp::Auto::Hacks
       new_before_this_node = Find_new_before_this_item__[ x, node_to_insert_s, :stmt ]
 
       if new_before_this_node
-        x._insert_item_before_item(
+        x.insert_item_before_item_(
           node_to_insert_s, new_before_this_node )
       else
-        x._append! node_to_insert_s
+        x.append_item_via_string_ node_to_insert_s
       end
 
       @stmt_list_s = x.unparse
@@ -154,7 +154,7 @@ module Skylab::TanMan::TestSupport::Sexp::Auto::Hacks
           @stmt_list = x_
         end
 
-        @stmt_list._prototype = x
+        @stmt_list.prototype_ = x
       end
 
       nil

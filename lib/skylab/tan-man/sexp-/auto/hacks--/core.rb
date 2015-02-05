@@ -46,7 +46,7 @@ module Skylab::TanMan
         else
           cls.send :define_method, meth_i do
             # future-proof the method's inheritability. also, too #opaque?
-            self._items
+            self.to_item_array_
           end
         end
         nil
@@ -73,11 +73,11 @@ module Skylab::TanMan
     # "head:" and "tail:" (it can have other labels).
     #
     # We enhance the resulting tree class as follows: we include unto it
-    # a module that defines a method called "_items" that presumably
+    # a module that defines a method called "to_item_array_" that presumably
     # results in an enumerable that will yield the child trees you seek.
     #
     # Also, as a possibly too #opaque added bonus, we will effectively
-    # alias the above mentioned "_items" method to a business-specific name we
+    # alias the above mentioned "to_item_array_" method to a business-specific name we
     # infer by adding an 's' to an inferred stem that we derive from:
     #
     #   - If the rule name is of the form "foo_list" we infer the stem "foo"
@@ -132,24 +132,27 @@ module Skylab::TanMan
 
   module Instance_Methods___
 
-    def _items
-      a = [ ] ; __items a ; a
+    def to_item_array_
+      a = []
+      yield_items_into_ a
+      a
     end
 
     # we are experimenting with different patterns for this (as seen in
     # the various grammars in the unit tests), so this is all subject to change.
-    def __items y
+
+    def yield_items_into_ y
       head = self.head ; tail = self.tail
       head and y << head
       if ! tail
         # nothing
-      elsif tail.list?
+      elsif tail.is_list
         tail.each do |tree|
           y << tree.content
         end
       elsif tail.class.expression == self.class.expression
         # foo_list ::= (s? head:foo s? ';'? '?' tail:foo_list?)?
-        tail.__items y
+        tail.yield_items_into_ y
       else
         # foo_list ::= (head:foo tail:(sep content:foo_list)? sep?)?
         if tail.class.rule != self.class.rule
@@ -158,7 +161,7 @@ module Skylab::TanMan
         end
         if tail.content
           tail.content.class.expression == self.class.expression or fail('sanity')
-          tail.content.__items y
+          tail.content.yield_items_into_ y
         end
       end
       nil
@@ -177,8 +180,8 @@ module Skylab::TanMan
 
     extend ( module Methods
 
-      def matches? name_s
-        RX___ =~ name_s
+      def hack_matches_member_name name_symbol
+        RX___ =~ name_symbol
       end
 
       def tree inference

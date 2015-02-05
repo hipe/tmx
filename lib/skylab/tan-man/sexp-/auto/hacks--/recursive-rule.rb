@@ -112,14 +112,23 @@ module Skylab::TanMan
 
             # ~ mutators
 
-            define_method :_append!, me.build_append_item_method
-            define_method :_insert_item_before_item, me.build_insert_item_before_item_method
-            define_method :_remove_item, me.build_remove_item_method
+            # (while #open [#092])
+            x = me.build_append_item_method
+            define_method :append_item_via_string_, x
+            define_method :append_item_, x
+
+            x = me.build_insert_item_before_item_method
+            define_method :insert_item_before_item_string_, x
+            define_method :insert_item_before_item_, x
+
+            x = me.build_remove_item_method
+            define_method :remove_item_via_string_, x
+            define_method :remove_item_, x
 
             # ~ readers
 
             define_method me.pluralized_method_name, ITEMS_SOFT_ALIAS_METHOD___
-            define_method :_items, me.build_to_items_array_method  # #todo: rename this to `to_items_array_`
+            define_method :to_item_array_, me.build_to_item_array_method
             define_method :to_node_stream_, me.build_to_node_stream_method
 
             nil
@@ -166,7 +175,7 @@ module Skylab::TanMan
         :"#{ @some_stem_i }s"
       end
 
-      def build_to_items_array_method
+      def build_to_item_array_method
         item_k = @session.item_k
         -> do
           to_node_stream_.map_by do | x |
@@ -177,7 +186,7 @@ module Skylab::TanMan
     end
 
     ITEMS_SOFT_ALIAS_METHOD___ = -> do
-      _items
+      to_item_array_
     end
 
     class Simple_Recursion_Methods_Builder___ < Methods_Builder__
@@ -603,7 +612,7 @@ module Skylab::TanMan
       end
 
       def _prototype_list
-        @front_node._prototype
+        @front_node.prototype_
       end
     end
 
@@ -844,25 +853,17 @@ module Skylab::TanMan
 
     module Common_Static_Methods___
 
-      attr_accessor :_prototype  # so that we can add to lists with zero or one items
+      attr_accessor :prototype_  # so that we can add to lists with zero or one items
 
-      def list?  # #todo
+      def is_list
         true
       end
 
-      def _named_prototypes  # collude in a hack implemented elsewhere meh
+      def named_prototypes_  # collude in a hack implemented elsewhere meh
       end
 
-      def _nodes  # #open [#085]
-        ::Enumerator.new do | y |
-          st = to_node_stream_
-          begin
-            x = st.gets
-            x or break
-            y << x
-            redo
-          end while nil
-        end
+      def nodes_
+        to_node_stream_.to_enum
       end
     end
 

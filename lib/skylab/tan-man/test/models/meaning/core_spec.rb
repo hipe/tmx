@@ -83,9 +83,9 @@ module Skylab::TanMan::TestSupport::Models::Meaning
       stmt = graph.node_statements.gets.stmt
       alist = stmt.attr_list.content
       alist.class.should eql TanMan_::Models_::DotFile::Sexps::AList  # meh
-      alist._prototype = graph.class.parse :a_list, 'a=b, c=d'
+      alist.prototype_ = graph.class.parse :a_list, 'a=b, c=d'
       alist.unparse.should eql( 'label=barl' )
-      alist._prototype.unparse.should eql( 'a=b, c=d' )
+      alist.prototype_.unparse.should eql( 'a=b, c=d' )
       alist._insert_assignment :fontname, 'Futura'
       alist.unparse.should eql('fontname=Futura, label=barl')
     end

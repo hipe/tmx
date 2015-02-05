@@ -237,14 +237,14 @@ module Skylab::TanMan
           hub = nil
           if curr_tree
             curr_tree.class == sexp.class or fail 'test me'
-            curr_tree._prototype and fail 'sanity - _prototype already set!'
+            curr_tree.prototype_ and fail 'sanity - prototype_ already set!'
             hub = curr_tree
-          elsif sexp.list?
+          elsif sexp.is_list
             hub = sexp.class.new
           else
             fail "implement me - prototypes for non-list rules"
           end
-          hub._prototype = sexp
+          hub.prototype_ = sexp
           hub.extend Sexp_::Prototype::Hub_InstanceMethods
           self.active_hub = hub
         end
@@ -401,15 +401,15 @@ module Skylab::TanMan
 
   module Sexp_::Prototype::Hub_InstanceMethods  # Here we turn an ordinary
                                                # sexp object into a veritable
-    def _named_prototypes                      # powerhouse for holding all
-      @_named_prototypes ||= { }               # of our prototypes found during
+    def named_prototypes_                      # powerhouse for holding all
+      @named_prototypes_ ||= {}                # of our prototypes found during
     end                                        # this hack.
 
     def set_named_prototype! name, prototype # no normalization here..
-      if _named_prototypes.key? name
+      if named_prototypes_.key? name
         fail "name collision: #{ name }"
       else
-        _named_prototypes[name] = prototype
+        named_prototypes_[name] = prototype
       end
     end
   end

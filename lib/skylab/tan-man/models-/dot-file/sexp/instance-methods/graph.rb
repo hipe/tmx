@@ -15,7 +15,7 @@ module Skylab::TanMan
         end
         [e0, e4, e6].each(& space)
         if stmt_list
-          stmt_list._nodes.each do |node|
+          stmt_list.nodes_.each do |node|
             space[ node.e2 ]
             space[ node.tail.stmt_separator ] if node.tail
           end
@@ -44,7 +44,7 @@ module Skylab::TanMan
     def set_label str
       equals_stmt = _first_label_stmt
       equals_stmt ||= begin
-        proto = stmt_list._named_prototypes[:label]
+        proto = stmt_list.named_prototypes_[ :label ]
         proto or fail 'no label prototype'
         created = true
         proto.__dupe except: [:rhs]
@@ -53,9 +53,9 @@ module Skylab::TanMan
       if created
         first_node_statement = node_statements.gets
         if first_node_statement
-          stmt_list._insert_item_before_item equals_stmt, first_node_statement
+          stmt_list.insert_item_before_item_ equals_stmt, first_node_statement
         else
-          stmt_list._append! equals_stmt
+          stmt_list.append_item_ equals_stmt
         end
       else
         equals_stmt

@@ -16,7 +16,7 @@ describe "[tm] sexp auto list pattern (grammars 70*)", g: true do
     using_input 'feep-forp' do
       it 'enumerates the nodes' do
         result.unparse.should eql("feep ; forp ;\n")
-        a = result.nodes.to_a  # _items
+        a = result.nodes.to_a  # to_item_array_
         a.length.should eql(2)
         a.should eql(['feep', 'forp'])
       end

@@ -45,18 +45,18 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
 
         o = result.node_list
 
-        x = o._append! 'faeioup'
+        x = o.append_item_via_string_ 'faeioup'
         x.object_id.should eql o.object_id
         o.unparse.should eql 'faeioup'  # no separator here
         lines = result.unparse.split NEWLINE_
         lines.length.should eql 2
         lines.last.should eql 'faeioup'
 
-        x = o._append! 'fooooop'
+        x = o.append_item_via_string_ 'fooooop'
         ( x.object_id == o.object_id ).should eql false
         o.unparse.should eql 'faeioup ;  fooooop'  # exactly what u asked for
 
-        x = o._append! 'fuuup'
+        x = o.append_item_via_string_ 'fuuup'
         ( x.object_id == o.object_id ).should eql false
 
         exp = 'faeioup ;  fooooop ;  fuuup'
@@ -64,14 +64,14 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
         @result.unparse.split( TanMan_::NEWLINE_ ).last.should eql exp
 
         if false  # #todo - necessary stuff not yet implemented
-        o._insert_item_before_item 'faeup', 'fooooop'
+        o.insert_item_before_item_string_ 'faeup', 'fooooop'
         o.unparse.should eql( 'faeioup ;  faeup ;  fooooop ;  fuuup' )
         end
       end
 
       it "append an invalid node - raises" do
         -> do
-          result.node_list._append! 'fzzzp'
+          result.node_list.append_item_via_string_ 'fzzzp'
         end.should raise_error TanMan_::Sexp_::Auto::Parse_Failure
       end
     end
@@ -107,18 +107,18 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
         o = result.node_list
         o.nodes.should eql TanMan_::EMPTY_A_
 
-        x = o._append! 'fiiiiip;'
+        x = o.append_item_via_string_ 'fiiiiip;'
         x.object_id.should eql o.object_id
         o.unparse.should eql "fiiiiip\n"
 
-        o._append! 'fap;'
+        o.append_item_via_string_ 'fap;'
         o.unparse.should eql "fiiiiip;\nfap\n"
       end
 
       it 'raises an exception if you try to append an invalid string' do
 
         -> do
-          result.node_list._append! 'fzzzp'
+          result.node_list.append_item_via_string_ 'fzzzp'
         end.should raise_error TanMan_::Sexp_::Auto::Parse_Failure
       end
     end

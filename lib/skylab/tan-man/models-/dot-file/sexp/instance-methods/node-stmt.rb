@@ -16,7 +16,7 @@ module Skylab::TanMan
     def _label_sexp
       al = self[ :attr_list ]
       if al
-        al[ :content ]._nodes.detect do |n|
+        al[ :content ].nodes_.detect do |n|
           n[ :content ][ :id ][ :content_text_value ] == LABEL__
         end
       end

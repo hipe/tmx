@@ -57,14 +57,14 @@ module Skylab::TanMan
           g.stmt_list = __empty_stmt_list
         end
 
-        if ! g.stmt_list._prototype && ! g.stmt_list.to_node_stream_.length_exceeds( 1 )
-          g.stmt_list._prototype = _sl_proto
+        if ! g.stmt_list.prototype_ && ! g.stmt_list.to_node_stream_.length_exceeds( 1 )
+          g.stmt_list.prototype_ = _sl_proto
         end
 
         if new_before_this
-          g.stmt_list._insert_item_before_item new, new_before_this
+          g.stmt_list.insert_item_before_item_ new, new_before_this
         else
-          g.stmt_list._append! new
+          g.stmt_list.append_item_ new
         end
       end
 
@@ -90,7 +90,7 @@ module Skylab::TanMan
 
       def destroy_stmt stmt
         if @graph_sexp.stmt_list
-          _x = @graph_sexp.stmt_list._remove_item stmt
+          _x = @graph_sexp.stmt_list.remove_item_ stmt
           _x ? ACHIEVED_ : UNABLE_  # we mean to destroy
         else
           UNABLE_

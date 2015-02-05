@@ -183,7 +183,7 @@ module Skylab::TanMan
       end
 
       def via_prototype_i_resolve_prototype
-        @named_protos = @stmt_list._named_prototypes
+        @named_protos = @stmt_list.named_prototypes_
         if @named_protos
           via_named_protos_resolve_prototype
         else
@@ -228,7 +228,7 @@ module Skylab::TanMan
       end
 
       def resolve_default_prototype
-        np = @stmt_list._named_prototypes
+        np = @stmt_list.named_prototypes_
         if np
           proto = np[ :edge_stmt ]
         end
@@ -288,7 +288,7 @@ module Skylab::TanMan
       def to_edge_stmt_add_attr_list
         alp = @parser.parse :a_list, 'c=d, e=f'  # attr_list proto
         ale = alp.class.new  # attr_list empty
-        ale._prototype = alp
+        ale.prototype_ = alp
         atl = @parser.parse :attr_list, '[]'
         atl[ :content ] = ale
         @edge_stmt[ :attr_list ] = atl
@@ -299,9 +299,9 @@ module Skylab::TanMan
 
         ref_x = @least_greater_edge_stmt
         if ref_x
-          @stmt_list._insert_item_before_item @edge_stmt, ref_x
+          @stmt_list.insert_item_before_item_ @edge_stmt, ref_x
         else
-          @stmt_list._append! @edge_stmt
+          @stmt_list.append_item_ @edge_stmt
         end
 
         maybe_send_event :info, :created_association do
@@ -345,7 +345,7 @@ module Skylab::TanMan
       end
 
       def via_matched_stmt_work_when_delete
-        removed_item = @stmt_list._remove_item @matched_stmt
+        removed_item = @stmt_list.remove_item_ @matched_stmt
         # result is structurally like argument, but different object. we discard
         if removed_item
           maybe_send_event :info, :deleted_association do
@@ -393,7 +393,7 @@ module Skylab::TanMan
     def each_edge_stmt_list       # repeats some of `prod` but w/o all the
       ::Enumerator.new do |y|     # lexcial trappings
         sl = graph_sexp.stmt_list or break
-        sl._nodes.each do |stmt_list|
+        sl.nodes_.each do |stmt_list|
           stmt = stmt_list.stmt or next
           :edge_stmt == stmt.class.rule or next
           y << stmt_list

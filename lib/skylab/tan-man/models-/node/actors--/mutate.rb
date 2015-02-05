@@ -245,7 +245,7 @@ module Skylab::TanMan
         end
 
         def produce_prototype_node_when_stmt_list
-          np = @stmt_list._named_prototypes
+          np = @stmt_list.named_prototypes_
           if np
             node = np[ :node_stmt ]  # might be nil
           end

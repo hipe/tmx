@@ -3,7 +3,7 @@ digraph{
   am [ label="associate\nmagnetic" ]
   cd [ label="cleanup\ndupe" ]
   cv [ label="basic CLI\nvisaul re-integration" style=filled ]
-  cn [ label="cleanup\nnames" ]
+  cn [ label="cleanup\nnames" style=filled ]
   si [ label="silo\nsquash" ]
   ss [ label="get [tm] to\nbe self-supporting" ]
   st [ label="sg\ntags" style=filled ]

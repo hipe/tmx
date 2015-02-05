@@ -107,7 +107,7 @@ module Skylab::TanMan
     end
 
     def inference2tree o # extent: solo def, 2 calls
-      if o.member and Auto_::Hacks__::MemberName.matches? o.member
+      if o.member and Auto_::Hacks__::MemberName.hack_matches_member_name o.member
         Auto_::Hacks__::MemberName.tree o
       elsif o.element_names_are_inferrable
         tree_class = if o.sexps_module.const_defined?( o.sexp_const, false )
@@ -290,7 +290,7 @@ module Skylab::TanMan
       res
     end
 
-    def list? # is this sexp node a list-like node?
+    def is_list  # is this sexp node a list-like node?
       false
     end
   end
@@ -305,7 +305,7 @@ module Skylab::TanMan
       other
     end
 
-    def list?
+    def is_list
       true
     end
   end

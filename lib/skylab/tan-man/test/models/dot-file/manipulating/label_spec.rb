@@ -33,7 +33,7 @@ module Skylab::TanMan::TestSupport::Models::DotFile::Manipulating::Label
 
       it 'can remove the label' do
 
-        removed = result.stmt_list._remove_item _retrieve_label_statement
+        removed = result.stmt_list.remove_item_ _retrieve_label_statement
 
         _expected_s = ::File.read(
           ::File.join TS_.dir_pathname.to_path, 'fixtures/1.0-with-no-label.dot' )

@@ -26,11 +26,11 @@ module Skylab::TanMan
       # because of the nature of the grammar, you are guaranteed to have at
       # least one item in the list. #algorithm:lexical *however* hacks
       # may occur where we have zero!! at these times you need a
-      # _prototype! all of this because we need a prototype for the item
+      # prototype_! all of this because we need a prototype for the item
       # (an AList1)
 
       first_a_list_1 = nil        # as a last resort prototype, use existing
-      items = _items              # (easier to debug when memoized)
+      items = to_item_array_     # (easier to debug when memoized)
       key_s = sym.to_s            # id of new assignment as string for comp.
       new_before_this_asst = nil  # before which asst will we insert ourselves?
 
@@ -46,8 +46,8 @@ module Skylab::TanMan
         end
       end
 
-      proto = if _prototype and _prototype.content
-        _prototype.content
+      proto = if prototype_ and prototype_.content
+        prototype_.content
       else
         first_a_list_1 || new_before_this_asst # any one from above
       end
@@ -58,9 +58,9 @@ module Skylab::TanMan
       new[:equals][:id] = _parse_id val.to_s
 
       if new_before_this_asst
-        _insert_item_before_item new, new_before_this_asst
+        insert_item_before_item_ new, new_before_this_asst
       else
-        _append! new
+        append_item_ new
       end
     end
   end
